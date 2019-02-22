@@ -144,6 +144,16 @@ BKViewController(p, theGraph)
     clusterMinMaxSlider->setJustifyRight(false);
     addAndMakeVisible(clusterMinMaxSlider);
     
+    holdTimeMinMaxSlider = new BKRangeSlider("hold min/max", 0., 12000., 0.0, 12000., 1);
+    holdTimeMinMaxSlider->setToolTipString("Sets Min and Max time (ms) held to trigger pulses; Min can be greater than Max");
+    holdTimeMinMaxSlider->setJustifyRight(false);
+    addAndMakeVisible(holdTimeMinMaxSlider);
+    
+    velocityMinMaxSlider = new BKRangeSlider("velocity min/max (0-127)", 0, 127, 0, 127, 1);
+    velocityMinMaxSlider->setToolTipString("Sets Min and Max velocity (0-127) to trigger pulses; Min can be greater than Max");
+    velocityMinMaxSlider->setJustifyRight(false);
+    addAndMakeVisible(velocityMinMaxSlider);
+    
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.0001);
     gainSlider->setToolTipString("Overall volume of Synchronic pulse");
     gainSlider->setJustifyRight(false);
@@ -165,6 +175,10 @@ BKViewController(p, theGraph)
     gainSlider->addWantsBigOneListener(this);
     
     clusterMinMaxSlider->addWantsBigOneListener(this);
+    
+    holdTimeMinMaxSlider->addWantsBigOneListener(this);
+    velocityMinMaxSlider->addWantsBigOneListener(this);
+    
 #endif
     
     releaseVelocitySetsSynchronicToggle.addListener(this);
@@ -256,7 +270,7 @@ void SynchronicViewController::resized()
         
         leftColumn.removeFromTop(gPaddingConst * (1. - processor.paddingScalarY));
         leftColumn.removeFromBottom(gYSpacing * 2);
-        int sliderHeight = leftColumn.getHeight() / 5;
+        int sliderHeight = leftColumn.getHeight() / 6.25;
         int sliderSpacing = (sliderHeight - gComponentSingleSliderHeight) * 0.5;
         
         gainSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
@@ -265,13 +279,19 @@ void SynchronicViewController::resized()
         clusterMinMaxSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
         leftColumn.removeFromBottom(sliderSpacing);
         
+        clusterThreshSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderSpacing);
+        
+        holdTimeMinMaxSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderSpacing);
+        
+        velocityMinMaxSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
+        leftColumn.removeFromBottom(sliderSpacing);
+        
         numClusterSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
         leftColumn.removeFromBottom(sliderSpacing);
         
         howManySlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
-        leftColumn.removeFromBottom(sliderSpacing);
-        
-        clusterThreshSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight));
         leftColumn.removeFromBottom(sliderSpacing);
         
         Rectangle<int> modeSlice2 = leftColumn.removeFromBottom(gComponentComboBoxHeight);
@@ -333,6 +353,8 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         numClusterSlider->setVisible(false);
         clusterThreshSlider->setVisible(false);
         clusterMinMaxSlider->setVisible(false);
+        holdTimeMinMaxSlider->setVisible(false);
+        velocityMinMaxSlider->setVisible(false);
         offsetParamStartToggle.setVisible(false);
         modeSelectCB.setVisible(false);
         modeLabel.setVisible(false);
@@ -359,6 +381,8 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
         numClusterSlider->setVisible(true);
         clusterThreshSlider->setVisible(true);
         clusterMinMaxSlider->setVisible(true);
+        holdTimeMinMaxSlider->setVisible(true);
+        velocityMinMaxSlider->setVisible(true);
         offsetParamStartToggle.setVisible(true);
         modeSelectCB.setVisible(true);
         modeLabel.setVisible(true);
@@ -409,6 +433,8 @@ SynchronicViewController(p, theGraph)
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
+    holdTimeMinMaxSlider->addMyListener(this);
+    velocityMinMaxSlider->addMyListener(this);
 
     gainSlider->addMyListener(this);
     numClusterSlider->addMyListener(this);
@@ -635,6 +661,20 @@ void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double 
         active->setClusterMin(minval);
         active->setClusterMax(maxval);
     }
+    else if(name == "hold min/max") {
+        DBG("got new hold min/max " + String(minval) + " " + String(maxval));
+        prep->setHoldMin(minval);
+        prep->setHoldMax(maxval);
+        active->setHoldMin(minval);
+        active->setHoldMax(maxval);
+    }
+    else if(name == "velocity min/max (0-127)") {
+        DBG("got new velocity min/max " + String(minval) + " " + String(maxval));
+        prep->setVelocityMin(minval);
+        prep->setVelocityMax(maxval);
+        active->setVelocityMin(minval);
+        active->setVelocityMax(maxval);
+    }
 }
 
 void SynchronicPreparationEditor::update(NotificationType notify)
@@ -655,6 +695,13 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
         clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
         clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
+        
+        holdTimeMinMaxSlider->setMinValue(prep->getHoldMin(), notify);
+        holdTimeMinMaxSlider->setMaxValue(prep->getHoldMax(), notify);
+        
+        velocityMinMaxSlider->setMinValue(prep->getVelocityMin(), notify);
+        velocityMinMaxSlider->setMaxValue(prep->getVelocityMax(), notify);
+        
         gainSlider->setValue(prep->getGain(), notify);
         numClusterSlider->setValue(prep->getNumClusters(), notify);
         
@@ -1053,12 +1100,16 @@ SynchronicViewController(p, theGraph)
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
+    holdTimeMinMaxSlider->addMyListener(this);
+    velocityMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
     numClusterSlider->addMyListener(this);
     
     howManySlider->displaySliderVisible(false);
     clusterThreshSlider->displaySliderVisible(false);
     clusterMinMaxSlider->displaySliderVisible(false);
+    holdTimeMinMaxSlider->displaySliderVisible(false);
+    velocityMinMaxSlider->displaySliderVisible(false);
     
     for(int i = 0; i < envelopeSliders.size(); i++) envelopeSliders[i]->addMyListener(this);
 
@@ -1077,6 +1128,8 @@ void SynchronicModificationEditor::greyOutAllComponents()
     numClusterSlider->setDim(gModAlpha);
     
     clusterMinMaxSlider->setDim(gModAlpha);
+    holdTimeMinMaxSlider->setDim(gModAlpha);
+    velocityMinMaxSlider->setDim(gModAlpha);
     
     for(int i = 0; i < paramSliders.size(); i++)
     {
@@ -1101,6 +1154,10 @@ void SynchronicModificationEditor::highlightModedComponents()
     if(mod->getParam(SynchronicClusterThresh) != "")    clusterThreshSlider->setBright();
     if(mod->getParam(SynchronicClusterMin) != "")       clusterMinMaxSlider->setBright();
     if(mod->getParam(SynchronicClusterMax) != "")       clusterMinMaxSlider->setBright();
+    if(mod->getParam(SynchronicHoldMin) != "")          holdTimeMinMaxSlider->setBright();
+    if(mod->getParam(SynchronicHoldMax) != "")          holdTimeMinMaxSlider->setBright();
+    if(mod->getParam(SynchronicVelocityMin) != "")      velocityMinMaxSlider->setBright();
+    if(mod->getParam(SynchronicVelocityMax) != "")      velocityMinMaxSlider->setBright();
     if(mod->getParam(SynchronicBeatsToSkip) != "")      offsetParamStartToggle.setAlpha(1.);
     if(mod->getParam(SynchronicGain) != "")             gainSlider->setBright();
     if(mod->getParam(SynchronicNumClusters) != "")      numClusterSlider->setBright();
@@ -1191,6 +1248,18 @@ void SynchronicModificationEditor::update(NotificationType notify)
         
         val = mod->getParam(SynchronicClusterMax);
         clusterMinMaxSlider->setMaxValue(val.getIntValue(), notify);
+        
+        val = mod->getParam(SynchronicHoldMin);
+        holdTimeMinMaxSlider->setMinValue(val.getIntValue(), notify);
+        
+        val = mod->getParam(SynchronicHoldMax);
+        holdTimeMinMaxSlider->setMaxValue(val.getIntValue(), notify);
+        
+        val = mod->getParam(SynchronicVelocityMin);
+        velocityMinMaxSlider->setMinValue(val.getIntValue(), notify);
+        
+        val = mod->getParam(SynchronicVelocityMax);
+        velocityMinMaxSlider->setMaxValue(val.getIntValue(), notify);
         
         val = mod->getParam(SynchronicGain);
         gainSlider->setValue(val.getFloatValue(), notify);
@@ -1418,8 +1487,19 @@ void SynchronicModificationEditor::BKRangeSliderValueChanged(String name, double
     {
         mod->setParam(SynchronicClusterMin, String(minval));
         mod->setParam(SynchronicClusterMax, String(maxval));
-        //clusterMinMaxSlider->setAlpha(1.);
         clusterMinMaxSlider->setBright();
+    }
+    else if (name == "hold min/max")
+    {
+        mod->setParam(SynchronicClusterMin, String(minval));
+        mod->setParam(SynchronicClusterMax, String(maxval));
+        holdTimeMinMaxSlider->setBright();
+    }
+    else if (name == "velocity min/max")
+    {
+        mod->setParam(SynchronicVelocityMin, String(minval));
+        mod->setParam(SynchronicVelocityMax, String(maxval));
+        velocityMinMaxSlider->setBright();
     }
     
     updateModification();

@@ -22,9 +22,11 @@ tuner(tuning),
 tempo(tempo)
 {
     velocities.ensureStorageAllocated(128);
+    holdTimers.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
         velocities.insert(i, 0.);
+        holdTimers.insert(i, 0);
     }
     
     clusterTimer = 0;
@@ -96,14 +98,66 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
     
 }
 
+bool SynchronicProcessor::velocityCheck(int noteNumber)
+{
+    SynchronicPreparation::Ptr prep = synchronic->aPrep;
+    
+    int velocity = (int)(velocities.getUnchecked(noteNumber) * 128.0);
+
+    if(prep->getVelocityMin() <= prep->getVelocityMax())
+    {
+        if (velocity >= prep->getVelocityMin() && velocity <= prep->getVelocityMax())
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if (velocity >= prep->getVelocityMin() || velocity <= prep->getVelocityMax())
+        {
+            return true;
+        }
+    }
+    
+    DBG("failed velocity check");
+    return false;
+}
+
+bool SynchronicProcessor::holdCheck(int noteNumber)
+{
+    SynchronicPreparation::Ptr prep = synchronic->aPrep;
+    
+    uint64 hold = holdTimers.getUnchecked(noteNumber) * (1000.0 / sampleRate);
+    
+    if(prep->getHoldMin() <= prep->getHoldMax())
+    {
+        if (hold >= prep->getHoldMin() && hold <= prep->getHoldMax())
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if (hold >= prep->getHoldMin() || hold <= prep->getHoldMax())
+        {
+            return true;
+        }
+    }
+    
+    DBG("failed hold check");
+    return false;
+}
+
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
-	velocities.set(noteNumber, velocity);
- 
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
+    velocities.set(noteNumber, velocity);
+    holdTimers.set(noteNumber, 0);
+    
+    if (!velocityCheck(noteNumber)) return;
     
     //cluster management
     if (prep->getOnOffMode() == KeyOn)
@@ -165,6 +219,9 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     keysDepressed.removeAllInstancesOf(noteNumber);
     
     SynchronicCluster::Ptr cluster = clusters.getLast();
+    
+    if (!velocityCheck(noteNumber)) return;
+    if (!holdCheck(noteNumber)) return;
     
     //cluster management
     if (synchronic->aPrep->getOnOffMode() == KeyOff)
@@ -248,6 +305,12 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     clusterThresholdSamples = (prep->getClusterThreshSEC() * sampleRate);
     beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
     
+    for (auto key : keysDepressed)
+    {
+        uint64 time = holdTimers.getUnchecked(key) + numSamples;
+        holdTimers.setUnchecked(key, time);
+    }
+    
     //cluster management
     if (inCluster)
     {
@@ -326,20 +389,22 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                      */
                     
                     //figure out whether to play the cluster
-                    playCluster = false;
+                    bool passCluster = false;
                     
                     //in the normal case, where cluster is within a range defined by clusterMin and Max
                     if(prep->getClusterMin() <= prep->getClusterMax())
                     {
                         if (clusterNotes.size() >= prep->getClusterMin() && clusterNotes.size() <= prep->getClusterMax())
-                            playCluster = true;
+                            passCluster = true;
                     }
                     //the inverse case, where we only play cluster that are *outside* the range set by clusterMin and Max
                     else
                     {
                         if (clusterNotes.size() >= prep->getClusterMin() || clusterNotes.size() <= prep->getClusterMax())
-                            playCluster = true;
+                            passCluster = true;
                     }
+                    
+                    playCluster = passCluster;
                     
                     if(playCluster)
                     {

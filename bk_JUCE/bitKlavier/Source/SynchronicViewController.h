@@ -68,8 +68,13 @@ protected:
     ScopedPointer<BKSingleSlider> howManySlider;
     ScopedPointer<BKSingleSlider> clusterThreshSlider;
     ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
+    
+    ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
+    ScopedPointer<BKRangeSlider> velocityMinMaxSlider;
+
     ScopedPointer<BKSingleSlider> gainSlider;
     ScopedPointer<BKSingleSlider> numClusterSlider;
+    
     
     BKLabel modeLabel;
     BKLabel onOffLabel;

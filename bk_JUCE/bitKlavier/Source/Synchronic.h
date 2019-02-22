@@ -33,6 +33,10 @@ public:
     sNumBeats(p->getNumBeats()),
     sClusterMin(p->getClusterMin()),
     sClusterMax(p->getClusterMax()),
+    holdMin(p->getHoldMin()),
+    holdMax(p->getHoldMax()),
+    velocityMin(p->getVelocityMin()),
+    velocityMax(p->getVelocityMax()),
     sClusterCap(p->getClusterCap()),
     sMode(p->getMode()),
     sBeatsToSkip(p->getBeatsToSkip()),
@@ -77,7 +81,13 @@ public:
     sTransposition(transp),
     sClusterThresh(clusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
-    sReleaseVelocitySetsSynchronic(velocityMode)
+    sReleaseVelocitySetsSynchronic(velocityMode),
+    holdMin(0),
+    holdMax(12000),
+    velocityMin(0),
+    velocityMax(127),
+    numClusters(1),
+    onOffMode(KeyOn)
     {
     }
 
@@ -100,7 +110,12 @@ public:
     sGain(1.0),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
-    numClusters(1)
+    holdMin(0),
+    holdMax(12000),
+    velocityMin(0),
+    velocityMax(127),
+    numClusters(1),
+    onOffMode(KeyOn)
     {
         sTransposition.ensureStorageAllocated(1);
         sTransposition.add(Array<float>({0.0}));
@@ -131,6 +146,13 @@ public:
         envelopeOn = s->getEnvelopesOn();
         
         numClusters = s->getNumClusters();
+        onOffMode = s->getOnOffMode();
+        
+        holdMin = s->getHoldMin();
+        holdMax = s->getHoldMax();
+        
+        velocityMin = s->getVelocityMin();
+        velocityMax = s->getVelocityMax();
     }
     
     bool compare(SynchronicPreparation::Ptr s)
@@ -244,7 +266,12 @@ public:
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
                 sReleaseVelocitySetsSynchronic == s->getReleaseVelocitySetsSynchronic() &&
-                numClusters == s->getNumClusters());
+                numClusters == s->getNumClusters() &&
+                onOffMode == s->getOnOffMode() &&
+                holdMin == s->getHoldMin() &&
+                holdMax == s->getHoldMax() &&
+                velocityMin == s->getVelocityMin() &&
+                velocityMax == s->getVelocityMax());
     }
 
 	inline void randomize()
@@ -265,6 +292,11 @@ public:
         
         
         numClusters = (int)(r[idx++] * 20) + 1;
+        onOffMode = (r[idx++] < 0.5) ? KeyOn : KeyOff;
+        holdMin = (int)(r[idx++] * 12000);
+        holdMax = (int)(r[idx++] * 12000);
+        velocityMin = (int)(r[idx++] * 127);
+        velocityMax = (int)(r[idx++] * 127);
         
 		sBeatMultipliers.clear();
 		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
@@ -420,6 +452,18 @@ public:
     inline void setSustain(int which, float val)    {sSustains.set(which, val);}
     inline void setRelease(int which, int val)      {sReleases.set(which, val);}
     
+    inline const int getHoldMin() const noexcept { return holdMin; }
+    inline const int getHoldMax() const noexcept { return holdMax; }
+    
+    inline const void setHoldMin(int min)  { holdMin = min; }
+    inline const void setHoldMax(int max)  { holdMax = max; }
+    
+    inline const int getVelocityMin() const noexcept { return velocityMin; }
+    inline const int getVelocityMax() const noexcept { return velocityMax; }
+    
+    inline const void setVelocityMin(int min)  { velocityMin = min; }
+    inline const void setVelocityMax(int max)  { velocityMax = max; }
+    
 	inline void clearADSRs()
 	{
 		sAttacks.clear();
@@ -510,6 +554,9 @@ private:
     int sClusterCap = 8; //max in cluster; 8 in original bK. pulseDepth?
     
     int numClusters;
+    
+    int holdMin, holdMax;
+    int velocityMin, velocityMax;
     
     SynchronicSyncMode sMode;
     int sBeatsToSkip;
@@ -616,6 +663,12 @@ public:
         prep.setProperty( "numClusters", sPrep->getNumClusters(), 0);
         prep.setProperty( "onOffMode", sPrep->getOnOffMode(), 0);
         
+        prep.setProperty( "holdMin", sPrep->getHoldMin(), 0);
+        prep.setProperty( "holdMax", sPrep->getHoldMax(), 0);
+        
+        prep.setProperty( "velocityMin", sPrep->getVelocityMin(), 0);
+        prep.setProperty( "velocityMax", sPrep->getVelocityMax(), 0);
+        
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
         for (auto f : sPrep->getBeatMultipliers())
@@ -695,6 +748,26 @@ public:
         i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
         sPrep->setClusterMax(i);
         
+        n = e->getStringAttribute("holdMin");
+        
+        if (n != "")    sPrep->setHoldMin(n.getIntValue());
+        else            sPrep->setHoldMin(0);
+    
+        n = e->getStringAttribute("holdMax");
+        
+        if (n != "")    sPrep->setHoldMax(n.getIntValue());
+        else            sPrep->setHoldMax(12000);
+        
+        n = e->getStringAttribute("velocityMin");
+        
+        if (n != "")    sPrep->setVelocityMin(n.getIntValue());
+        else            sPrep->setVelocityMin(0);
+        
+        n = e->getStringAttribute("velocityMax");
+        
+        if (n != "")    sPrep->setVelocityMax(n.getIntValue());
+        else            sPrep->setVelocityMax(127);
+
         f = e->getStringAttribute(ptagSynchronic_clusterThresh).getFloatValue();
         sPrep->setClusterThresh(f);
         
@@ -944,6 +1017,18 @@ public:
         p = getParam(SynchronicGain);
         if (p != String::empty) prep.setProperty( ptagSynchronic_gain,                p.getFloatValue(), 0);
         
+        p = getParam(SynchronicHoldMin);
+        if (p != String::empty) prep.setProperty( "holdMin", p.getIntValue(), 0);
+        
+        p = getParam(SynchronicHoldMax);
+        if (p != String::empty) prep.setProperty( "holdMax", p.getIntValue(), 0);
+        
+        p = getParam(SynchronicVelocityMin);
+        if (p != String::empty) prep.setProperty( "velocityMin", p.getIntValue(), 0);
+        
+        p = getParam(SynchronicVelocityMax);
+        if (p != String::empty) prep.setProperty( "velocityMax", p.getIntValue(), 0);
+        
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
         p = getParam(SynchronicBeatMultipliers);
@@ -1038,6 +1123,18 @@ public:
         
         p = e->getStringAttribute(ptagSynchronic_clusterMax);
         setParam(SynchronicClusterMax, p);
+        
+        p = e->getStringAttribute("holdMin");
+        setParam(SynchronicHoldMin, p);
+        
+        p = e->getStringAttribute("holdMax");
+        setParam(SynchronicHoldMax, p);
+        
+        p = e->getStringAttribute("velocityMin");
+        setParam(SynchronicVelocityMin, p);
+        
+        p = e->getStringAttribute("velocityMax");
+        setParam(SynchronicVelocityMax, p);
         
         p = e->getStringAttribute(ptagSynchronic_clusterThresh);
         setParam(SynchronicClusterThresh, p);
@@ -1521,6 +1618,9 @@ public:
         return clusters[which];
     }
     
+    bool velocityCheck(int noteNumber);
+    bool holdCheck(int noteNumber);
+    
 private:
     BKSynthesiser* synth;
     GeneralSettings::Ptr general;
@@ -1550,6 +1650,8 @@ private:
 
     uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
     uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
+    
+    Array<uint64> holdTimers; 
     
     //adaptive tempo stuff
     /*

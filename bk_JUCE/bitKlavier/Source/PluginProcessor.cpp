@@ -1119,6 +1119,12 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == SynchronicLengthMultipliers)   active->setLengthMultipliers(modfa);
         else if (type == SynchronicAccentMultipliers)   active->setAccentMultipliers(modfa);
         else if (type == SynchronicADSRs)               active->setADSRs(modafa);
+        else if (type == SynchronicOnOff)               active->setOnOffMode((SynchronicOnOffMode)modi);
+        else if (type == SynchronicHoldMin)             active->setHoldMin(modi);
+        else if (type == SynchronicHoldMax)             active->setHoldMax(modi);
+        else if (type == SynchronicVelocityMin)         active->setVelocityMin(modi);
+        else if (type == SynchronicVelocityMax)         active->setVelocityMax(modi);
+        else if (type == SynchronicNumClusters)         active->setNumClusters(modi);
         
         updateState->synchronicPreparationDidChange = true;
     }
