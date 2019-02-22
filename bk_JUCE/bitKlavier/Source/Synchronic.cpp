@@ -300,6 +300,11 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
+    while (clusters.size() > prep->getNumClusters())
+    {
+        clusters.remove(0);
+    }
+    
     //do this every block, for adaptive tempo updates
     sampleType = type;
     clusterThresholdSamples = (prep->getClusterThreshSEC() * sampleRate);
