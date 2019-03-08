@@ -410,6 +410,12 @@ static const std::vector<std::string> cGeneralParameterTypes = {
 
 #pragma mark - Synchronic
 
+typedef enum SynchronicOnOffMode {
+    KeyOn,
+    KeyOff,
+    OnOffModeNil
+};
+
 typedef enum SynchronicSyncMode {
     FirstNoteOnSync = 0,
     AnyNoteOnSync,
@@ -439,6 +445,12 @@ typedef enum SynchronicParameterType {
     SynchronicBeatMultipliers,
     SynchronicGain,
     SynchronicADSRs,
+    SynchronicOnOff,
+    SynchronicNumClusters,
+    SynchronicHoldMin,
+    SynchronicHoldMax,
+    SynchronicVelocityMin,
+    SynchronicVelocityMax,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -456,7 +468,13 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKFloatArr,
     BKFloatArr,
     BKFloat,
-    BKArrFloatArr
+    BKArrFloatArr,
+    BKInt,
+    BKInt,
+    BKInt,
+    BKInt,
+    BKInt,
+    BKInt
 };
 
 static const std::vector<std::string> cSynchronicParameterTypes = {
@@ -472,7 +490,13 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "sustain length multipliers",
     "beat length multipliers",
     "gain",
-    "ADSRs"
+    "ADSRs",
+    "SynchronicOnOff",
+    "NumClusters",
+    "SynchronicHoldMin",
+    "SynchronicHoldMax",
+    "SynchronicVelocityMin",
+    "SynchronicVelocityMax"
 };
 
 static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc = {
@@ -518,6 +542,12 @@ typedef enum NostalgicParameterType {
     NostalgicTuning,
     NostalgicReverseADSR,
     NostalgicUndertowADSR,
+    NostalgicHoldMin,
+    NostalgicHoldMax,
+    NostalgicClusterMin,
+    NostalgicKeyOnReset,
+    NostalgicVelocityMin,
+    NostalgicVelocityMax,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -535,7 +565,13 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKFloatArr,
-    BKFloatArr
+    BKFloatArr,
+    BKFloat,
+    BKFloat,
+    BKInt,
+    BKInt,
+    BKInt,
+    BKInt
 };
 
 static const std::vector<std::string> cNostalgicParameterTypes = {
@@ -550,6 +586,13 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "SyncTarget",
     "ReverseADSR",
     "UndertowADSR",
+    "HoldMin",
+    "HoldMax",
+    "ClusterMin",
+    "ClusterMax",
+    "KeyOnReset",
+    "VelocityMin",
+    "VelocityMax",
     "Tuning Id"
 };
 

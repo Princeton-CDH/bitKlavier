@@ -45,10 +45,20 @@ BKViewController(p, theGraph)
     lengthMultiplierSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(lengthMultiplierSlider);
     
-    holdTimeMinMaxSlider = new BKRangeSlider("hold time", 0., 12000., 0.0, 12000., 1);
-    holdTimeMinMaxSlider->setToolTipString("Sets Min and Max time held to trigger swell; Min can be greater than Max");
+    holdTimeMinMaxSlider = new BKRangeSlider("hold time (ms)", 0., 12000., 0.0, 12000., 1);
+    holdTimeMinMaxSlider->setToolTipString("Sets Min and Max time (ms) held to trigger swell; Min can be greater than Max");
     holdTimeMinMaxSlider->setJustifyRight(true);
     addAndMakeVisible(holdTimeMinMaxSlider);
+    
+    velocityMinMaxSlider = new BKRangeSlider("velocity min/max (0-127)", 0, 127, 0, 127, 1);
+    velocityMinMaxSlider->setToolTipString("Sets Min and Max velocity (0-127) to trigger swell; Min can be greater than Max");
+    velocityMinMaxSlider->setJustifyRight(true);
+    addAndMakeVisible(velocityMinMaxSlider);
+    
+    clusterMinSlider = new BKSingleSlider("cluster min", 1, 10, 1, 1);
+    clusterMinSlider->setToolTipString("Sets Min cluster size needed to trigger swell");
+    clusterMinSlider->setJustifyRight(true);
+    addAndMakeVisible(clusterMinSlider);
     
     beatsToSkipSlider = new BKSingleSlider("beats to skip", 0, 10, 0, 1);
     beatsToSkipSlider->setToolTipString("Indicates how long Nostalgic wave lasts with respect to linked Synchronic sequence");
@@ -79,8 +89,17 @@ BKViewController(p, theGraph)
     undertowADSRSlider->setToolTip("ADSR settings for Undertow");
     addAndMakeVisible(undertowADSRSlider);
     
+    
+    addAndMakeVisible(keyOnResetToggle);
+    
+    keyOnResetLabel.setText("key-on reset:", dontSendNotification);
+    addAndMakeVisible(keyOnResetLabel);
+    
+    
 #if JUCE_IOS
     holdTimeMinMaxSlider->addWantsBigOneListener(this);
+    velocityMinMaxSlider->addWantsBigOneListener(this);
+    clusterMinSlider->addWantsBigOneListener(this);
     beatsToSkipSlider->addWantsBigOneListener(this);
     gainSlider->addWantsBigOneListener(this);
     lengthMultiplierSlider->addWantsBigOneListener(this);
@@ -186,6 +205,15 @@ void NostalgicViewController::resized()
         //lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
         lengthModeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
         
+        float dim = lengthModeSelectCB.getHeight();
+        keyOnResetToggle.setBounds(lengthModeSelectCB.getX() - (dim + gXSpacing), lengthModeSelectCB.getY(), dim, dim);
+        keyOnResetToggle.changeWidthToFitText();
+        
+        keyOnResetLabel.setBounds(keyOnResetToggle.getX() - 100, keyOnResetToggle.getY(), 100, dim);
+        
+        DBG("kt: " + rectangleToString(keyOnResetToggle.getBounds()) );
+        DBG("kl: " + rectangleToString(keyOnResetLabel.getBounds()) );
+        
         Rectangle<int> sliderSlice = area;
         sliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
         //sliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
@@ -194,24 +222,33 @@ void NostalgicViewController::resized()
          4 + 2.*gPaddingConst * processor.paddingScalarY);
          */
         
-        int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
+        int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.15f;
         lengthMultiplierSlider->setBounds(sliderSlice.getX(),
                                           nextCenter - gComponentSingleSliderHeight/2 + 8,
                                           sliderSlice.getWidth(),
                                           gComponentSingleSliderHeight);
         beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
         
-        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.5f;
+        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.4f;
         holdTimeMinMaxSlider->setBounds(sliderSlice.getX(),
                               nextCenter - gComponentSingleSliderHeight/2 + 4,
                               sliderSlice.getWidth(),
                               gComponentSingleSliderHeight);
         
-        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.75f;
-        gainSlider->setBounds(sliderSlice.getX(),
+        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.65f;
+        clusterMinSlider->setBounds(sliderSlice.getX(),
+                                        nextCenter - gComponentSingleSliderHeight/2 + 4,
+                                        sliderSlice.getWidth(),
+                                        gComponentSingleSliderHeight);
+        
+        
+        
+        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.9f;
+        velocityMinMaxSlider->setBounds(sliderSlice.getX(),
                               nextCenter - gComponentSingleSliderHeight/2 + 4,
                               sliderSlice.getWidth(),
                               gComponentSingleSliderHeight);
+
         
         //leftColumn.reduce(4, 0);
         leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
@@ -222,14 +259,19 @@ void NostalgicViewController::resized()
                                        gComponentStackedSliderHeight + processor.paddingScalarY * 30);
         
         reverseADSRSlider->setBounds(leftColumn.getX(),
-                                      gainSlider->getY() + gComponentComboBoxHeight * 0.5,
+                                      transpositionSlider->getBottom() + gComponentComboBoxHeight * 0.5,
                                       leftColumn.getWidth() * 0.5 - gYSpacing,
                                       gComponentComboBoxHeight);
         
         undertowADSRSlider->setBounds(leftColumn.getX() + leftColumn.getWidth() * 0.5 + gYSpacing,
-                                     gainSlider->getY() + gComponentComboBoxHeight * 0.5,
+                                     transpositionSlider->getBottom() + gComponentComboBoxHeight * 0.5,
                                      leftColumn.getWidth() * 0.5 - gYSpacing,
                                      gComponentComboBoxHeight);
+        
+        gainSlider->setBounds(leftColumn.getX(),
+                              reverseADSRSlider->getBottom() + gComponentComboBoxHeight * 0.5,
+                              leftColumn.getWidth(),
+                              gComponentStackedSliderHeight + processor.paddingScalarY * 30);
     }
     else
     {
@@ -278,7 +320,11 @@ NostalgicViewController(p, theGraph)
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
     holdTimeMinMaxSlider->addMyListener(this);
+    velocityMinMaxSlider->addMyListener(this);
+    clusterMinSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
+    
+    keyOnResetToggle.addListener(this);
     
     gainSlider->addMyListener(this);
     
@@ -332,6 +378,13 @@ void NostalgicPreparationEditor::update(void)
         
         holdTimeMinMaxSlider->setMinValue(prep->getHoldMin(), dontSendNotification);
         holdTimeMinMaxSlider->setMaxValue(prep->getHoldMax(), dontSendNotification);
+        
+        velocityMinMaxSlider->setMinValue(prep->getVelocityMin(), dontSendNotification);
+        velocityMinMaxSlider->setMaxValue(prep->getVelocityMax(), dontSendNotification);
+        
+        clusterMinSlider->setValue(prep->getClusterMin(), dontSendNotification);
+        
+        keyOnResetToggle.setToggleState(prep->getKeyOnReset(), dontSendNotification);
         
         beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
         gainSlider->setValue(prep->getGain(), dontSendNotification);
@@ -523,6 +576,11 @@ void NostalgicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
         prep->setGain(val);
         active->setGain(val);
     }
+    else if (name == "cluster min")
+    {
+        prep->setClusterMin(val);
+        active->setClusterMin(val);
+    }
 }
 
 void NostalgicPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
@@ -636,6 +694,9 @@ void NostalgicPreparationEditor::timerCallback()
 
 void NostalgicPreparationEditor::buttonClicked (Button* b)
 {
+    NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+    NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+    
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
@@ -650,21 +711,34 @@ void NostalgicPreparationEditor::buttonClicked (Button* b)
     {
         getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
+    else if (b == &keyOnResetToggle)
+    {
+        bool state = b->getToggleState();
+        prep->setKeyOnReset(state);
+        active->setKeyOnReset(state);
+    }
 }
-
 
 void NostalgicPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
     NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
     NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
 
-    if (name == "hold time")
+    if (name == "hold time (ms)")
     {
         prep->setHoldMin(minval);
         active->setHoldMin(minval);
         
         prep->setHoldMax(maxval);
         active->setHoldMax(maxval);
+    }
+    else if (name == "velocity min/max (0-127)")
+    {
+        prep->setVelocityMin(minval);
+        active->setVelocityMin(minval);
+        
+        prep->setVelocityMax(maxval);
+        active->setVelocityMax(maxval);
     }
 }
 
@@ -682,7 +756,11 @@ NostalgicViewController(p, theGraph)
     transpositionSlider->addMyListener(this);
     lengthMultiplierSlider->addMyListener(this);
     holdTimeMinMaxSlider->addMyListener(this);
+    velocityMinMaxSlider->addMyListener(this);
+    clusterMinSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
+    
+    keyOnResetToggle.addListener(this);
     
     gainSlider->addMyListener(this);
     
@@ -702,6 +780,12 @@ void NostalgicModificationEditor::greyOutAllComponents()
     gainSlider->setDim(gModAlpha);
     reverseADSRSlider->setDim(gModAlpha);
     undertowADSRSlider->setDim(gModAlpha);
+    holdTimeMinMaxSlider->setDim(gModAlpha);
+    velocityMinMaxSlider->setDim(gModAlpha);
+    clusterMinSlider->setDim(gModAlpha);
+    
+    keyOnResetToggle.setAlpha(gModAlpha);
+    keyOnResetLabel.setAlpha(gModAlpha);
 }
 
 void NostalgicModificationEditor::highlightModedComponents()
@@ -717,6 +801,12 @@ void NostalgicModificationEditor::highlightModedComponents()
     if(mod->getParam(NostalgicGain) != "")              gainSlider->setBright();
     if(mod->getParam(NostalgicReverseADSR) != "")       reverseADSRSlider->setBright();
     if(mod->getParam(NostalgicUndertowADSR) != "")      undertowADSRSlider->setBright();
+    if(mod->getParam(NostalgicHoldMin) != "")           holdTimeMinMaxSlider->setBright();
+    if(mod->getParam(NostalgicHoldMax) != "")           holdTimeMinMaxSlider->setBright();
+    if(mod->getParam(NostalgicVelocityMin) != "")       velocityMinMaxSlider->setBright();
+    if(mod->getParam(NostalgicVelocityMax) != "")       velocityMinMaxSlider->setBright();
+    if(mod->getParam(NostalgicClusterMin) != "")        clusterMinSlider->setBright();
+    if(mod->getParam(NostalgicKeyOnReset) != "")        { keyOnResetToggle.setAlpha(1.); keyOnResetLabel.setAlpha(1.); }
 }
 
 void NostalgicModificationEditor::update(void)
@@ -773,6 +863,24 @@ void NostalgicModificationEditor::update(void)
         
         val = mod->getParam(NostalgicUndertowADSR);
         undertowADSRSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        
+        val = mod->getParam(NostalgicHoldMin);
+        holdTimeMinMaxSlider->setMinValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicHoldMax);
+        holdTimeMinMaxSlider->setMaxValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicVelocityMin);
+        velocityMinMaxSlider->setMinValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicVelocityMax);
+        velocityMinMaxSlider->setMaxValue(val.getFloatValue(), dontSendNotification);
+        
+        val = mod->getParam(NostalgicClusterMin);
+        clusterMinSlider->setValue(val.getFloatValue(), dontSendNotification);
+    
+        val = mod->getParam(NostalgicKeyOnReset);
+        keyOnResetToggle.setToggleState((bool)val.getIntValue(), dontSendNotification);
     }
     
     
@@ -1005,6 +1113,11 @@ void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         mod->setParam(NostalgicGain, String(val));
         gainSlider->setBright();
     }
+    else if (name == "cluster min")
+    {
+        mod->setParam(NostalgicClusterMin, String(val));
+        clusterMinSlider->setBright();
+    }
     
     updateModification();
 }
@@ -1026,6 +1139,8 @@ void NostalgicModificationEditor::updateModification(void)
 
 void NostalgicModificationEditor::buttonClicked (Button* b)
 {
+    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
@@ -1034,6 +1149,14 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
     {
         getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
+    else if (b == &keyOnResetToggle)
+    {
+        mod->setParam(NostalgicKeyOnReset, String((int)b->getToggleState()));
+        keyOnResetToggle.setAlpha(1.);
+        keyOnResetLabel.setAlpha(1.);
+    }
+    
+    updateModification();
 }
 
 void NostalgicModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
@@ -1060,4 +1183,22 @@ void NostalgicModificationEditor::BKADSRButtonStateChanged(String name, bool mod
 {
     setShowADSR(name, !state);
     setSubWindowInFront(!state);
+}
+
+void NostalgicModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    
+    if (name == "hold time (ms)")
+    {
+        mod->setParam(NostalgicHoldMin, String(minval));
+        mod->setParam(NostalgicHoldMax, String(maxval));
+        holdTimeMinMaxSlider->setBright();
+    }
+    else if (name == "velocity min/max (0-127)")
+    {
+        mod->setParam(NostalgicVelocityMin, String(minval));
+        mod->setParam(NostalgicVelocityMax, String(maxval));
+        velocityMinMaxSlider->setBright();
+    }
 }

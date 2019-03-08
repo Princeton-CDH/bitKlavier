@@ -710,7 +710,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     }
  
     int time;
-    MidiMessage m;
     bool didNoteOffs = false;
     
     int numSamples = buffer.getNumSamples();
@@ -718,13 +717,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     // Process all active prep maps in current piano
     for (auto pmap : currentPiano->activePMaps)
-        pmap->processBlock(numSamples, m.getChannel(), currentSampleType, false);
+        pmap->processBlock(numSamples, channel, currentSampleType, false);
     
     // OLAGON: Process all active nostalgic preps in previous piano
     if(prevPiano != currentPiano)
     {
         for (auto pmap : prevPiano->activePMaps)
-            pmap->processBlock(numSamples, m.getChannel(), currentSampleType, true); // true for onlyNostalgic
+            pmap->processBlock(numSamples, channel, currentSampleType, true); // true for onlyNostalgic
     }
 
     
@@ -740,32 +739,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         notesOffUI.remove(i);
     }
     
-#if LITTLE_NOTE_MACHINE
-    // LITTLE NOTE MACHINE
-    count++;
-    if (count > NOTE)
-    {
-        count = 0;
-
-        for (int i = 0; i < 3; i++)
-        {
-            times[i]++;
-            
-            if (times[i] > 3)
-            {
-                handleNoteOff(notes[i], 0.5, 1);
-                times[i] = 0;
-            }
-        }
-        
-        notes[note] = 48 + Random::getSystemRandom().nextInt(Range<int>(0, 24));
-        
-        handleNoteOn(notes[note], 0.8, 1);
-        
-        note++;
-    }
-#endif
     
+    MidiMessage m;
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
         int noteNumber = m.getNoteNumber();
@@ -1098,6 +1073,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         modf = nMod[i]->getModFloat();
         modi = nMod[i]->getModInt();
         modia = nMod[i]->getModIntArr();
+        modb = nMod[i]->getModBool();
         
         if (type == NostalgicTransposition)         active->setTransposition(modfa);
         else if (type == NostalgicGain)             active->setGain(modf);
@@ -1108,6 +1084,12 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
         else if (type == NostalgicReverseADSR)      active->setReverseADSRvals(modfa);
         else if (type == NostalgicUndertowADSR)     active->setUndertowADSRvals(modfa);
+        else if (type == NostalgicHoldMin)          active->setHoldMin(modf);
+        else if (type == NostalgicHoldMax)          active->setHoldMax(modf);
+        else if (type == NostalgicClusterMin)       active->setClusterMin(modi);
+        else if (type == NostalgicVelocityMin)      active->setVelocityMin(modi);
+        else if (type == NostalgicVelocityMax)      active->setVelocityMax(modi);
+        else if (type == NostalgicKeyOnReset)       active->setKeyOnReset((bool)modi);
         
         updateState->nostalgicPreparationDidChange = true;
     }
@@ -1137,6 +1119,12 @@ void BKAudioProcessor::performModifications(int noteNumber)
         else if (type == SynchronicLengthMultipliers)   active->setLengthMultipliers(modfa);
         else if (type == SynchronicAccentMultipliers)   active->setAccentMultipliers(modfa);
         else if (type == SynchronicADSRs)               active->setADSRs(modafa);
+        else if (type == SynchronicOnOff)               active->setOnOffMode((SynchronicOnOffMode)modi);
+        else if (type == SynchronicHoldMin)             active->setHoldMin(modi);
+        else if (type == SynchronicHoldMax)             active->setHoldMax(modi);
+        else if (type == SynchronicVelocityMin)         active->setVelocityMin(modi);
+        else if (type == SynchronicVelocityMax)         active->setVelocityMax(modi);
+        else if (type == SynchronicNumClusters)         active->setNumClusters(modi);
         
         updateState->synchronicPreparationDidChange = true;
     }

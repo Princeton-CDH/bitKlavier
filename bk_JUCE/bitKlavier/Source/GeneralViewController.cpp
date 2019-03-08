@@ -250,36 +250,6 @@ void GeneralViewController::resized()
     noteOnSetsNoteOffVelocityB.changeWidthToFitText();
     noteOnSetsNoteOffVelocityL.setBounds(noteOnSetsNoteOffVelocityB.getRight() +gXSpacing, noteOnSetsNoteOffVelocityB.getY(),
                              250, 30);
-    
-   
-    
-    
-    /*
-    Rectangle<int> sliderSlice = leftColumn;
-    sliderSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-     
-    int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 4.;
-    A4tuningReferenceFrequencySlider->setBounds(sliderSlice.getX(),
-                                   nextCenter - gComponentSingleSliderHeight/2 + 8,
-                                   sliderSlice.getWidth(),
-                                   gComponentSingleSliderHeight);
-    
-    nextCenter = sliderSlice.getY() + sliderSlice.getHeight() / 2.;
-    tempoMultiplierSlider->setBounds(sliderSlice.getX(),
-                                          nextCenter - gComponentSingleSliderHeight/2 + 8,
-                                          sliderSlice.getWidth(),
-                                          gComponentSingleSliderHeight);
-     
-    
-    nextCenter = sliderSlice.getY() + sliderSlice.getHeight();
-    invertSustainL.setBounds(sliderSlice.getX(),
-                            nextCenter - gComponentSingleSliderHeight/2 + 8,
-                            sliderSlice.getWidth()/2,
-                            gComponentSingleSliderHeight*2);
-    
-    invertSustainB.setBounds(invertSustainL.getRight()+gXSpacing,
-                             invertSustainL.getY(), invertSustainL.getHeight(), invertSustainL.getHeight());
-     */
 }
 
 

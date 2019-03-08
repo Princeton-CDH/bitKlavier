@@ -60,22 +60,29 @@ protected:
     
     BKEditableComboBox selectCB;
     BKComboBox modeSelectCB;
+    
+    BKComboBox onOffSelectCB;
 
     ToggleButton offsetParamStartToggle;
     ToggleButton releaseVelocitySetsSynchronicToggle;
     ScopedPointer<BKSingleSlider> howManySlider;
     ScopedPointer<BKSingleSlider> clusterThreshSlider;
     ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
+    
+    ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
+    ScopedPointer<BKRangeSlider> velocityMinMaxSlider;
+
     ScopedPointer<BKSingleSlider> gainSlider;
+    ScopedPointer<BKSingleSlider> numClusterSlider;
+    
     
     BKLabel modeLabel;
+    BKLabel onOffLabel;
     
     void setShowADSR(String name, bool newval);
     int visibleADSR;
     
     BKLabel envelopeName;
-    
-    void fillModeSelectCB(void);
     
 private:
     
@@ -103,6 +110,7 @@ public:
     void timerCallback() override;
     
     void fillSelectCB(int last, int current);
+    void fillModeSelectCB(void);
     
     static void actionButtonCallback(int action, SynchronicPreparationEditor*);
     
@@ -112,6 +120,8 @@ public:
     int duplicatePreparation(void);
     void setCurrentId(int Id);
     void deleteCurrent(void);
+    
+    
     
 private:
 
@@ -157,6 +167,7 @@ public:
     void timerCallback() override;
     
     void fillSelectCB(int last, int current);
+    void fillModeSelectCB(void);
     
     static void actionButtonCallback(int action, SynchronicModificationEditor*);
     

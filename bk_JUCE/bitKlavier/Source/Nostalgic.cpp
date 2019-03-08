@@ -53,170 +53,214 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 {
     float duration = 0.0;
     
+    NostalgicPreparation::Ptr prep = nostalgic->aPrep;
+    
     if (post || noteOn[midiNoteNumber])
     {
         
         int offRamp;
-        if (nostalgic->aPrep->getUndertow() > 0) offRamp = aRampUndertowCrossMS;
+        if (prep->getUndertow() > 0) offRamp = aRampUndertowCrossMS;
         else offRamp = aRampNostalgicOffMS;
 
         SynchronicSyncMode syncTargetMode = synchronic->getSynchronic()->aPrep->getMode();
         
-        if (nostalgic->aPrep->getMode() == SynchronicSync2)
+        if (prep->getMode() == SynchronicSync2)
         {
             float duration = 0.0;
             
             int offRamp;
-            if (nostalgic->aPrep->getUndertow() > 0) offRamp = aRampUndertowCrossMS;
+            if (prep->getUndertow() > 0) offRamp = aRampUndertowCrossMS;
             else offRamp = aRampNostalgicOffMS;
             
-            //get time in ms to target beat, summing over skipped beat lengths
-            SynchronicSyncMode syncTargetMode = synchronic->getMode();
+            duration = synchronic->getTimeToBeatMS(prep->getBeatsToSkip()) + offRamp + 30; // sum
             
-            //if(syncTargetMode == FirstNoteOnSync || syncTargetMode == AnyNoteOnSync)
+            for (auto t : prep->getTransposition())
             {
-                duration = synchronic->getTimeToBeatMS(nostalgic->aPrep->getBeatsToSkip()) + offRamp + 30; // sum
+                float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
+                int synthNoteNumber = midiNoteNumber;
                 
-                for (auto t : nostalgic->aPrep->getTransposition())
+                //if (sampleType < BKLoadSoundfont)
                 {
-                    float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
-                    int synthNoteNumber = midiNoteNumber;
-                    
-                    //if (sampleType < BKLoadSoundfont)
-                    {
-                        synthNoteNumber += (int)offset;
-                        synthOffset     -= (int)offset;
-                    }
-                    
-                    //play nostalgic note
-
-                    DBG("reverse note on noteNum/offset " +
-                        String(synthNoteNumber) + " " +
-                        String(synthOffset));
-                    
-                    synth->keyOn(
-                                 midiChannel,
-                                 midiNoteNumber,
-                                 synthNoteNumber,
-                                 synthOffset,
-                                 velocities.getUnchecked(midiNoteNumber),
-                                 nostalgic->aPrep->getGain() * aGlobalGain,
-                                 Reverse,
-                                 FixedLengthFixedStart,
-                                 NostalgicNote,
-                                 nostalgic->getId(),
-                                 duration + nostalgic->aPrep->getWavedistance(),
-                                 duration,  // length
-                                 nostalgic->aPrep->getReverseAttack(),
-                                 nostalgic->aPrep->getReverseDecay(),
-                                 nostalgic->aPrep->getReverseSustain(),
-                                 nostalgic->aPrep->getReverseRelease(),
-                                 tuner);
+                    synthNoteNumber += (int)offset;
+                    synthOffset     -= (int)offset;
                 }
                 
-                activeNotes.removeFirstMatchingValue(midiNoteNumber);
-                noteOn.set(midiNoteNumber, false);
-                noteLengthTimers.set(midiNoteNumber, 0);
+                //play nostalgic note
+
+                DBG("reverse note on noteNum/offset " +
+                    String(synthNoteNumber) + " " +
+                    String(synthOffset));
                 
-                reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
-                NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
-                currentNote->setPrepAtKeyOn(nostalgic->aPrep);
-                currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
-                currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber));
-                currentNote->setReverseStartPosition((duration + nostalgic->aPrep->getWavedistance()) * sampleRate/1000.);
-                //currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
-                currentNote->setReverseTargetLength((duration - nostalgic->aPrep->getReverseRelease()) * sampleRate/1000.);
-                currentNote->setUndertowTargetLength(nostalgic->aPrep->getUndertow() * sampleRate/1000.);
+                synth->keyOn(
+                             midiChannel,
+                             midiNoteNumber,
+                             synthNoteNumber,
+                             synthOffset,
+                             velocities.getUnchecked(midiNoteNumber),
+                             prep->getGain() * aGlobalGain,
+                             Reverse,
+                             FixedLengthFixedStart,
+                             NostalgicNote,
+                             nostalgic->getId(),
+                             duration + prep->getWavedistance(),
+                             duration,  // length
+                             prep->getReverseAttack(),
+                             prep->getReverseDecay(),
+                             prep->getReverseSustain(),
+                             prep->getReverseRelease(),
+                             tuner);
             }
+            
+            activeNotes.removeFirstMatchingValue(midiNoteNumber);
+            noteOn.set(midiNoteNumber, false);
+            noteLengthTimers.set(midiNoteNumber, 0);
+            
+            reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
+            NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
+            currentNote->setPrepAtKeyOn(prep);
+            currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
+            currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber));
+            currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * sampleRate/1000.);
+            currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * sampleRate/1000.);
+            currentNote->setUndertowTargetLength(prep->getUndertow() * sampleRate/1000.);
+            
         }
-        else if (nostalgic->aPrep->getMode() == NoteLengthSync)
+        else if (prep->getMode() == NoteLengthSync)
         {
-            float held = noteLengthTimers.getUnchecked(midiNoteNumber) * (1000.0 / sampleRate);
-    
-            bool playNote = false;
-
-            if(nostalgic->aPrep->getHoldMin() <= nostalgic->aPrep->getHoldMax())
+            //===========CLUSTER MANAGEMENT===========
+            if(!inCluster) //we have a new cluster
             {
-                if (held >= nostalgic->aPrep->getHoldMin() && held <= nostalgic->aPrep->getHoldMax())
-                {
-                    playNote = true;
-                }
-            }
-            else
-            {
-                if (held >= nostalgic->aPrep->getHoldMin() || held <= nostalgic->aPrep->getHoldMax())
-                {
-                    playNote = true;
-                }
+                // clear cluster
+                cluster.clearQuick();
+                clusterNotesPlayed.clearQuick();
+                
+                // now we are in a cluster!
+                inCluster = true;
             }
             
-            //get length of played notes, subtract wave distance to set nostalgic reverse note length
-            duration =  (noteLengthTimers.getUnchecked(midiNoteNumber) *
-                         nostalgic->aPrep->getLengthMultiplier() +
-                         (offRamp + 30)) *     
-                        (1000.0 / sampleRate);
+            cluster.addIfNotAlreadyThere(midiNoteNumber);
             
-            if (playNote)
+            //reset the timer for time between notes
+            clusterThresholdTimer = 0;
+            
+            playCluster = false;
+            
+            if (inCluster)
             {
-                for (auto t : nostalgic->aPrep->getTransposition())
+                if (cluster.size() >= prep->getClusterMin())
                 {
-                    float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
-                    int synthNoteNumber = midiNoteNumber;
+                    playCluster = true;
+                }
+            }
+            //=========================================
+            
+            if (playCluster)
+            {
+                for (auto note : cluster)
+                {
+                    bool passHoldTest = false, passVelocityTest = false;
                     
-                    //if (sampleType < BKLoadSoundfont)
+                    float held = noteLengthTimers.getUnchecked(note) * (1000.0 / sampleRate);
+                    int velocity = (int) (velocities.getUnchecked(note) * 128);
+                    
+                    if (prep->getHoldMin() <= prep->getHoldMax())
                     {
-                        synthNoteNumber += (int)offset;
-                        synthOffset     -= (int)offset;
+                        if (held >= prep->getHoldMin() && held <= prep->getHoldMax())
+                        {
+                            passHoldTest = true;
+                        }
+                    }
+                    else
+                    {
+                        if (held >= prep->getHoldMin() || held <= prep->getHoldMax())
+                        {
+                            passHoldTest = true;
+                        }
                     }
                     
-                    //play nostalgic note
-                    DBG("reverse note on noteNum/offset " +
-                        String(synthNoteNumber) + " " +
-                        String(synthOffset));
+                    if (prep->getVelocityMin() <= prep->getVelocityMax())
+                    {
+                        if (velocity >= prep->getVelocityMin() && velocity <= prep->getVelocityMax())
+                        {
+                            passVelocityTest = true;
+                        }
+                    }
+                    else
+                    {
+                        if (velocity >= prep->getVelocityMin() || velocity <= prep->getVelocityMax())
+                        {
+                            passVelocityTest = true;
+                        }
+                    }
                     
-                    synth->keyOn(
-                                 midiChannel,
-                                 midiNoteNumber,
-                                 synthNoteNumber,
-                                 synthOffset,
-                                 velocities.getUnchecked(midiNoteNumber),
-                                 nostalgic->aPrep->getGain() * aGlobalGain,
-                                 Reverse,
-                                 FixedLengthFixedStart,
-                                 NostalgicNote,
-                                 nostalgic->getId(),
-                                 duration + nostalgic->aPrep->getWavedistance(),
-                                 duration,  // length
-                                 nostalgic->aPrep->getReverseAttack(),
-                                 nostalgic->aPrep->getReverseDecay(),
-                                 nostalgic->aPrep->getReverseSustain(),
-                                 nostalgic->aPrep->getReverseRelease(),
-                                 tuner);
+                    bool playNote = (passHoldTest && passVelocityTest);
+                    
+                    if (clusterNotesPlayed.contains(note) || !playNote) continue;
+
+                    clusterNotesPlayed.addIfNotAlreadyThere(note);
+                    
+                    //get length of played notes, subtract wave distance to set nostalgic reverse note length
+                    duration =  (noteLengthTimers.getUnchecked(note) *
+                                 prep->getLengthMultiplier() +
+                                 (offRamp + 30)) * (1000.0 / sampleRate);
+                    
+                    for (auto t : prep->getTransposition())
+                    {
+                        float offset = t + tuner->getOffset(note, false), synthOffset = offset;
+                        int synthNoteNumber = note;
+                        
+                        //if (sampleType < BKLoadSoundfont)
+                        {
+                            synthNoteNumber += (int)offset;
+                            synthOffset     -= (int)offset;
+                        }
+                        
+                        //play nostalgic note
+                        synth->keyOn(midiChannel,
+                                     note,
+                                     synthNoteNumber,
+                                     synthOffset,
+                                     velocities.getUnchecked(note),
+                                     prep->getGain() * aGlobalGain,
+                                     Reverse,
+                                     FixedLengthFixedStart,
+                                     NostalgicNote,
+                                     nostalgic->getId(),
+                                     duration + prep->getWavedistance(),
+                                     duration,  // length
+                                     prep->getReverseAttack(),
+                                     prep->getReverseDecay(),
+                                     prep->getReverseSustain(),
+                                     prep->getReverseRelease(),
+                                     tuner);
+                        
+                        reverseNotes.insert(0, new NostalgicNoteStuff(note));
+                        NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
+                        currentNote->setPrepAtKeyOn(prep);
+                        currentNote->setTuningAtKeyOn(tuner->getOffset(note, false));
+                        currentNote->setVelocityAtKeyOn(velocities.getUnchecked(note));
+                        currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * sampleRate/1000.);
+                        currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * sampleRate/1000.);
+                        currentNote->setUndertowTargetLength(prep->getUndertow() * sampleRate/1000.);
+                        
+                        noteLengthTimers.set(note, 0);
+                    }
+
                 }
-                
-                reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
-                NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
-                currentNote->setPrepAtKeyOn(nostalgic->aPrep);
-                currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
-                currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber));
-                currentNote->setReverseStartPosition((duration + nostalgic->aPrep->getWavedistance()) * sampleRate/1000.);
-                //currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS + 30)) * sampleRate/1000.);
-                //currentNote->setReverseTargetLength((duration - (aRampUndertowCrossMS)) * sampleRate/1000.);
-                currentNote->setReverseTargetLength((duration - nostalgic->aPrep->getReverseRelease()) * sampleRate/1000.);
-                currentNote->setUndertowTargetLength(nostalgic->aPrep->getUndertow() * sampleRate/1000.);
             }
+            
             
             // turn note length timers off
             activeNotes.removeFirstMatchingValue(midiNoteNumber);
             noteOn.set(midiNoteNumber, false);
-            noteLengthTimers.set(midiNoteNumber, 0);
             //DBG("nostalgic removed active note " + String(midiNoteNumber));
+            
         }
         else if(syncTargetMode == LastNoteOffSync || syncTargetMode == AnyNoteOffSync)
         {
-            duration = synchronic->getTimeToBeatMS(nostalgic->aPrep->getBeatsToSkip()) + offRamp + 30; // sum
+            duration = synchronic->getTimeToBeatMS(prep->getBeatsToSkip()) + offRamp + 30; // sum
             
-            for (auto t : nostalgic->aPrep->getTransposition())
+            for (auto t : prep->getTransposition())
             {
                 float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
                 int synthNoteNumber = midiNoteNumber;
@@ -237,27 +281,29 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                              synthNoteNumber,
                              synthOffset,
                              velocities.getUnchecked(midiNoteNumber),
-                             nostalgic->aPrep->getGain() * aGlobalGain,
+                             prep->getGain() * aGlobalGain,
                              Reverse,
                              FixedLengthFixedStart,
                              NostalgicNote,
                              nostalgic->getId(),
-                             duration + nostalgic->aPrep->getWavedistance(),
+                             duration + prep->getWavedistance(),
                              duration,  // length
-                             nostalgic->aPrep->getReverseAttack(),
-                             nostalgic->aPrep->getReverseDecay(),
-                             nostalgic->aPrep->getReverseSustain(),
-                             nostalgic->aPrep->getReverseRelease(), tuner);
+                             prep->getReverseAttack(),
+                             prep->getReverseDecay(),
+                             prep->getReverseSustain(),
+                             prep->getReverseRelease(),
+                             tuner);
             }
             
             reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
-            currentNote->setPrepAtKeyOn(nostalgic->aPrep);
+            currentNote->setPrepAtKeyOn(prep);
             currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
-            currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber) * nostalgic->aPrep->getGain());
-            currentNote->setReverseStartPosition((duration + nostalgic->aPrep->getWavedistance()) * sampleRate/1000.);
-            currentNote->setReverseTargetLength((duration - nostalgic->aPrep->getReverseRelease()) * sampleRate/1000.);
-            currentNote->setUndertowTargetLength(nostalgic->aPrep->getUndertow() * sampleRate/1000.);
+            currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber) * prep->getGain());
+            currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * sampleRate/1000.);
+            //currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
+            currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * sampleRate/1000.);
+            currentNote->setUndertowTargetLength(prep->getUndertow() * sampleRate/1000.);
         }
     }
 
@@ -266,13 +312,14 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 //start timer for length of a particular note; called when key is pressed
 void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel)
 {
+    NostalgicPreparation::Ptr prep = nostalgic->aPrep;
     
-    if (nostalgic->aPrep->getMode() == SynchronicSync)
+    if (prep->getMode() == SynchronicSync)
     {
         float duration = 0.0;
         
         int offRamp;
-        if (nostalgic->aPrep->getUndertow() > 0) offRamp = aRampUndertowCrossMS;
+        if (prep->getUndertow() > 0) offRamp = aRampUndertowCrossMS;
         else offRamp = aRampNostalgicOffMS;
         
         //get time in ms to target beat, summing over skipped beat lengths
@@ -280,9 +327,9 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
         
         if(syncTargetMode == FirstNoteOnSync || syncTargetMode == AnyNoteOnSync)
         {
-            duration = synchronic->getTimeToBeatMS(nostalgic->aPrep->getBeatsToSkip()) + offRamp + 30; // sum
+            duration = synchronic->getTimeToBeatMS(prep->getBeatsToSkip()) + offRamp + 30; // sum
             
-            for (auto t : nostalgic->aPrep->getTransposition())
+            for (auto t : prep->getTransposition())
             {
                 float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
                 int synthNoteNumber = midiNoteNumber;
@@ -304,37 +351,94 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                              synthNoteNumber,
                              synthOffset,
                              midiNoteVelocity,
-                             nostalgic->aPrep->getGain() * aGlobalGain,
+                             prep->getGain() * aGlobalGain,
                              Reverse,
                              FixedLengthFixedStart,
                              NostalgicNote,
                              nostalgic->getId(),
-                             duration + nostalgic->aPrep->getWavedistance(),
+                             duration + prep->getWavedistance(),
                              duration,  // length
-                             nostalgic->aPrep->getReverseAttack(),
-                             nostalgic->aPrep->getReverseDecay(),
-                             nostalgic->aPrep->getReverseSustain(),
-                             nostalgic->aPrep->getReverseRelease(),
+                             prep->getReverseAttack(),
+                             prep->getReverseDecay(),
+                             prep->getReverseSustain(),
+                             prep->getReverseRelease(),
                              tuner);
             }
             
             reverseNotes.insert(0, new NostalgicNoteStuff(midiNoteNumber));
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
-            currentNote->setPrepAtKeyOn(nostalgic->aPrep);
+            currentNote->setPrepAtKeyOn(prep);
             currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
             currentNote->setVelocityAtKeyOn(midiNoteVelocity);
-            currentNote->setReverseStartPosition((duration + nostalgic->aPrep->getWavedistance()) * sampleRate/1000.);
+            currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * sampleRate/1000.);
             //currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
-            currentNote->setReverseTargetLength((duration - nostalgic->aPrep->getReverseRelease()) * sampleRate/1000.);
-            currentNote->setUndertowTargetLength(nostalgic->aPrep->getUndertow() * sampleRate/1000.);
+            currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * sampleRate/1000.);
+            currentNote->setUndertowTargetLength(prep->getUndertow() * sampleRate/1000.);
         }
     }
     
     //activeNotes is for measuring lengths of held notes, so only relevant in NoteLengthSync mode
-    if(nostalgic->aPrep->getMode() == NoteLengthSync)
+    if (prep->getMode() == NoteLengthSync)
     {
         activeNotes.addIfNotAlreadyThere(midiNoteNumber);
         noteLengthTimers.set(midiNoteNumber, 0);
+        
+        // KEY ON RESET STUFF
+        if (prep->getKeyOnReset())
+        {
+            // REMOVE REVERSE NOTES
+            for (int i = reverseNotes.size(); --i >= 0;)
+            {
+                NostalgicNoteStuff* note = reverseNotes[i];
+                
+                if ((note->getNoteNumber() == midiNoteNumber) && note->isActive())
+                {
+                    if (prep != nullptr)
+                    {
+                        for (auto transp : prep->getTransposition())
+                        {
+                            DBG("reverse remove: " + String(midiNoteNumber + transp));
+                            synth->keyOff (midiChannel,
+                                           NostalgicNote,
+                                           nostalgic->getId(),
+                                           midiNoteNumber,
+                                           midiNoteNumber+transp,
+                                           64,
+                                           true,
+                                           true); // true for nostalgicOff
+                        }
+                    }
+                    reverseNotes.remove(i);
+                }
+            }
+            
+            // REMOVE UNDERTOW NOTES
+            for (int i = undertowNotes.size(); --i >= 0;)
+            {
+                NostalgicNoteStuff* note = undertowNotes[i];
+                
+                if ((note->getNoteNumber() == midiNoteNumber))
+                {
+                    if (prep != nullptr)
+                    {
+                        for (auto transp : prep->getTransposition())
+                        {
+                            //DBG("undertow remove: " + String(midiNoteNumber + transp));
+                            synth->keyOff (midiChannel,
+                                           NostalgicNote,
+                                           nostalgic->getId(),
+                                           midiNoteNumber,
+                                           midiNoteNumber+transp,
+                                           64,
+                                           false, // THIS NEEDS TO BE FALSE ATM TO GET RID OF UNDERTOW NOTES : because our processsPiano doesn't distinguish between true keyOn/Offs from keyboard and these under the hood keyOn/Offs (which don't correspond with Off/On from keyboard)
+                                           true); // true for nostalgicOff
+                        }
+                    }
+                    undertowNotes.remove(i);
+                }
+            }
+        }
+        
     }
     
     noteOn.set(midiNoteNumber, true);
@@ -345,13 +449,30 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
 //main scheduling function
 void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoadType type)
 {
+    //cluster management
+    if (inCluster)
+    {
+        //moved beyond clusterThreshold time, done with cluster
+        if (clusterThresholdTimer >= (sampleRate * 0.15))
+        {
+            inCluster = false;
+            clusterNotesPlayed.clearQuick();
+        }
+        //otherwise incrument cluster timer
+        else
+        {
+            clusterThresholdTimer += numSamples;
+        }
+    }
+    
     sampleType = type;
     incrementTimers(numSamples);
 
     for(int i = undertowNotes.size() - 1; i >= 0; --i)
-    //for(int i=0; i<undertowNotes.size(); i++)
     {
-        if(undertowNotes.getUnchecked(i)->undertowTimerExceedsTarget())
+        NostalgicNoteStuff* thisNote = undertowNotes.getUnchecked(i);
+        
+        if(thisNote->undertowTimerExceedsTarget() || !thisNote->isActive())
             undertowNotes.remove(i);
     }
     
@@ -359,8 +480,8 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
     //for(int i=0; i<reverseNotes.size(); i++)
     {
         NostalgicNoteStuff* thisNote = reverseNotes.getUnchecked(i);
-        
-        if(thisNote->reverseTimerExceedsTarget())
+
+        if (thisNote->reverseTimerExceedsTarget())
         {
             NostalgicPreparation::Ptr noteOnPrep = thisNote->getPrepAtKeyOn();
             
@@ -377,10 +498,13 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                         synthOffset     -= (int)offset;
                     }
                     
-                    DBG("undertow note on noteNum/offset/duration " +
+                    /*
+                     DBG("undertow note on note/noteNum/offset/duration " +
+                        String(thisNote->getNoteNumber()) + " " +
                         String(synthNoteNumber) + " " +
                         String(synthOffset) + " " +
                         String(noteOnPrep->getUndertow()));
+                     */
                     
                     synth->keyOn(midiChannel,
                                  thisNote->getNoteNumber(),
@@ -411,7 +535,10 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
             reverseNotes.remove(i);
         }
         
-        if(!thisNote->isActive()) reverseNotes.remove(i);
+        if(!thisNote->isActive())
+        {
+            reverseNotes.remove(i);
+        }
     }
 }
 
