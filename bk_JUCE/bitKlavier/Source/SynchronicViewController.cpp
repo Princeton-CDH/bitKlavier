@@ -290,39 +290,72 @@ void SynchronicViewController::displayTab(int tab)
     
     if (tab == 0)
     {
-        // SET VISIBILITY
-        offsetParamStartToggle.setVisible(true);
-        
-        for (int i = 0; i < paramSliders.size(); i++)
+        if (showADSR)
         {
-            paramSliders[i]->setVisible(true);
+            // DEAL WITH ENVELOPE
+            for(int i=0; i<envelopeSliders.size(); i++)
+            {
+                if(i == visibleADSR)    envelopeSliders[i]->setVisible(true);
+                else                    envelopeSliders[i]->setVisible(false);
+                
+                envelopeSliders[i]->setAlpha(1.);
+            }
+            envelopeName.setVisible(false);
+            envelopeSliders[visibleADSR]->setButtonText("close");
+            
+            
+            envelopeSliders[visibleADSR]->setBounds(x0, y0+ 100, width, height-100);
+            
+            selectCB.toFront(false);
         }
-        
-        //envelopeName.setVisible(true);
-        for(int i=envelopeSliders.size() - 1; i>=0; i--)
+        else
         {
-            envelopeSliders[i]->setVisible(true);
+            // DEAL WITH ENVELOPE
+            for(int i=0; i<envelopeSliders.size(); i++)
+            {
+                envelopeSliders[i]->setVisible(true);
+                envelopeSliders[i]->setAlpha(0.5);
+                envelopeSliders[i]->setButtonText(String(""));
+                envelopeSliders[i]->resized();
+            }
+            //envelopeName.setVisible(true);
+            
+            if(envelopeSliders[visibleADSR]->isEnabled()) envelopeSliders[visibleADSR]->setActive();
+            
+            // SET VISIBILITY
+            offsetParamStartToggle.setVisible(true);
+            
+            for (int i = 0; i < paramSliders.size(); i++)
+            {
+                paramSliders[i]->setVisible(true);
+            }
+            
+            //envelopeName.setVisible(true);
+            for(int i=envelopeSliders.size() - 1; i>=0; i--)
+            {
+                envelopeSliders[i]->setVisible(true);
+            }
+            
+            // SET BOUNDS
+            int sliderHeight = height * 0.225f;
+            int sliderWidth = width;
+            
+            for (int i = 0; i < paramSliders.size(); i++)
+            {
+                paramSliders[i]->setBounds(x0, y0 + i * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+            }
+            
+            int envelopeWidth = (sliderWidth - 50) / 12;
+            int envelopeHeight = height * 0.1f;
+            
+            for(int i = 0; i < envelopeSliders.size(); i++)
+            {
+                envelopeSliders[i]->setBounds(x0 + 50 + i * (envelopeWidth + 0.65), paramSliders.getLast()->getBottom() + gYSpacing,
+                                              envelopeWidth, envelopeHeight - gYSpacing);
+            }
+            
+            offsetParamStartToggle.setBounds(right - 100, selectCB.getY(), 100, 30);
         }
-        
-        // SET BOUNDS
-        int sliderHeight = height * 0.225f;
-        int sliderWidth = width;
-        
-        for (int i = 0; i < paramSliders.size(); i++)
-        {
-            paramSliders[i]->setBounds(x0, y0 + i * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
-        }
-        
-        int envelopeWidth = (sliderWidth - 50) / 12;
-        int envelopeHeight = height * 0.1f;
-        
-        for(int i = 0; i < envelopeSliders.size(); i++)
-        {
-            envelopeSliders[i]->setBounds(x0 + 50 + i * (envelopeWidth + 0.65), paramSliders.getLast()->getBottom() + gYSpacing,
-                                          envelopeWidth, envelopeHeight - gYSpacing);
-        }
-        
-        offsetParamStartToggle.setBounds(right - 100, selectCB.getY(), 100, 30);
         
     }
     else if (tab == 1)
@@ -364,14 +397,14 @@ void SynchronicViewController::displayTab(int tab)
         idx = 0;
         howManySlider->setBounds(col2x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
         numClusterSlider->setBounds(col2x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
-
+        
         
         modeSelectCB.setBounds(col2x, numClusterSlider->getBottom() + gYSpacing, 200, 30);
         modeLabel.setBounds(modeSelectCB.getRight()+gXSpacing, modeSelectCB.getY(), 150, 30);
-
+        
         onOffSelectCB.setBounds(col2x, modeSelectCB.getBottom() + 40, 200, 30);
         onOffLabel.setBounds(modeSelectCB.getRight()+gXSpacing, onOffSelectCB.getY(), 150, 30);
-
+        
         releaseVelocitySetsSynchronicToggle.setVisible(true);
     }
 }
@@ -493,70 +526,8 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
     {
         if(envelopeSliders[i]->getName() == name) visibleADSR = i;
     }
-    
-    if(showADSR)
-    {
-        for(int i = 0; i < paramSliders.size(); i++)
-        {
-            paramSliders[i]->setVisible(false);
-        }
-        howManySlider->setVisible(false);
-        clusterThreshSlider->setVisible(false);
-        gainSlider->setVisible(false);
-        numClusterSlider->setVisible(false);
-        clusterThreshSlider->setVisible(false);
-        clusterMinMaxSlider->setVisible(false);
-        holdTimeMinMaxSlider->setVisible(false);
-        velocityMinMaxSlider->setVisible(false);
-        offsetParamStartToggle.setVisible(false);
-        modeSelectCB.setVisible(false);
-        modeLabel.setVisible(false);
-        onOffSelectCB.setVisible(false);
-        onOffLabel.setVisible(false);
-        
-        for(int i=0; i<envelopeSliders.size(); i++)
-        {
-            if(i != visibleADSR) envelopeSliders[i]->setVisible(false);
-            envelopeSliders[i]->setAlpha(1.);
-        }
-        envelopeName.setVisible(false);
-        envelopeSliders[visibleADSR]->setButtonText("close");
-    }
-    else
-    {
-        for(int i = 0; i < paramSliders.size(); i++)
-        {
-            paramSliders[i]->setVisible(true);
-        }
-        howManySlider->setVisible(true);
-        clusterThreshSlider->setVisible(true);
-        gainSlider->setVisible(true);
-        numClusterSlider->setVisible(true);
-        clusterThreshSlider->setVisible(true);
-        clusterMinMaxSlider->setVisible(true);
-        holdTimeMinMaxSlider->setVisible(true);
-        velocityMinMaxSlider->setVisible(true);
-        offsetParamStartToggle.setVisible(true);
-        modeSelectCB.setVisible(true);
-        modeLabel.setVisible(true);
-        onOffSelectCB.setVisible(true);
-        onOffLabel.setVisible(true);
-        
-        for(int i=0; i<envelopeSliders.size(); i++)
-        {
-            envelopeSliders[i]->setVisible(true);
-            envelopeSliders[i]->setAlpha(0.5);
-            envelopeSliders[i]->setButtonText(String(""));
-            envelopeSliders[i]->resized();
-        }
-        envelopeName.setVisible(true);
-        
-        if(envelopeSliders[visibleADSR]->isEnabled()) envelopeSliders[visibleADSR]->setActive();
-        
-    }
-    
+
     resized();
-    
 }
 
 
