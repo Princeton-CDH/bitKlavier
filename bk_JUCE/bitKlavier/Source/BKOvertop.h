@@ -121,9 +121,71 @@ public:
 
     }
     
+    
+    inline void arrowPressed(BKArrowType arrow)
+    {
+        BKPreparationDisplay display = currentDisplay;
+        
+        if (display == DisplayKeymap)
+        {
+            kvc.arrowPressed(arrow);
+        }
+        else if (display == DisplayGeneral)
+        {
+            gvc.arrowPressed(arrow);
+        }
+        else if (display == DisplayAbout)
+        {
+            avc.arrowPressed(arrow);
+        }
+        else if (display == DisplayComment)
+        {
+            cvc.arrowPressed(arrow);
+        }
+        else if (display == DisplayTuning)
+        {
+            tvc.arrowPressed(arrow);
+        }
+        else if (display == DisplayTempo)
+        {
+            ovc.arrowPressed(arrow);
+        }
+        else if (display == DisplaySynchronic)
+        {
+            svc.arrowPressed(arrow);
+        }
+        else if (display == DisplayNostalgic)
+        {
+            nvc.arrowPressed(arrow);
+        }
+        else if (display == DisplayDirect)
+        {
+            dvc.arrowPressed(arrow);
+        }
+        else if (display == DisplayTuningMod)
+        {
+            tvcm.arrowPressed(arrow);
+        }
+        else if (display == DisplayTempoMod)
+        {
+            ovcm.arrowPressed(arrow);
+        }
+        else if (display == DisplaySynchronicMod)
+        {
+            svcm.arrowPressed(arrow);
+        }
+        else if (display == DisplayNostalgicMod)
+        {
+            nvcm.arrowPressed(arrow);
+        }
+        else if (display == DisplayDirectMod)
+        {
+            dvcm.arrowPressed(arrow);
+        }
+    }
+    
     inline void setCurrentDisplay(BKPreparationDisplay type)
     {
-
         currentDisplay = type;
         
         if (type == DisplayNil)

@@ -15,7 +15,7 @@
 #include "Synchronic.h"
 
 SynchronicViewController::SynchronicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 3)
+BKViewController(p, theGraph, 2)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
@@ -206,10 +206,9 @@ void SynchronicViewController::paint (Graphics& g)
 }
 
 
-
-void SynchronicViewController::displayTab(int tab)
+void SynchronicViewController::invisible(void)
 {
-    currentTab = tab;
+    gainSlider->setVisible(false);
     
     offsetParamStartToggle.setVisible(false);
     
@@ -223,17 +222,17 @@ void SynchronicViewController::displayTab(int tab)
     {
         envelopeSliders[i]->setVisible(false);
     }
-        
+    
     clusterMinMaxSlider->setVisible(false);
-        
+    
     clusterThreshSlider->setVisible(false);
-        
+    
     holdTimeMinMaxSlider->setVisible(false);
-        
+    
     velocityMinMaxSlider->setVisible(false);
-        
+    
     numClusterSlider->setVisible(false);
-        
+    
     howManySlider->setVisible(false);
     
     modeLabel.setVisible(false);
@@ -243,24 +242,94 @@ void SynchronicViewController::displayTab(int tab)
     onOffSelectCB.setVisible(false);
     
     releaseVelocitySetsSynchronicToggle.setVisible(false);
+}
+
+void SynchronicViewController::displayShared(void)
+{
+    Rectangle<int> area (getBounds());
+    
+    iconImageComponent.setBounds(area);
+    
+    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+    
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(4 + 2.0f * gPaddingConst * processor .paddingScalarX);
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+    
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    
+    leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
+    rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
+
+}
+
+void SynchronicViewController::displayTab(int tab)
+{
+    currentTab = tab;
+    
+    invisible();
+    displayShared();
+    
+    int x0 = leftArrow.getRight() + gXSpacing;
+    int y0 = hideOrShow.getBottom() + gYSpacing;
+    int right = rightArrow.getX() - gXSpacing;
+    int width = right - x0;
+    int height = getHeight() - y0;
+    
+    int col1x = x0;
+    int col2x = x0 + width * 0.5f;
     
     if (tab == 0)
     {
+        // SET VISIBILITY
         offsetParamStartToggle.setVisible(true);
         
-        for(int i = 0; i < paramSliders.size(); i++)
+        for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setVisible(true);
         }
         
-        envelopeName.setVisible(true);
+        //envelopeName.setVisible(true);
         for(int i=envelopeSliders.size() - 1; i>=0; i--)
         {
             envelopeSliders[i]->setVisible(true);
         }
+        
+        // SET BOUNDS
+        int sliderHeight = height * 0.225f;
+        int sliderWidth = width;
+        
+        for (int i = 0; i < paramSliders.size(); i++)
+        {
+            paramSliders[i]->setBounds(x0, y0 + i * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+        }
+        
+        int envelopeWidth = (sliderWidth - 50) / 12;
+        int envelopeHeight = height * 0.1f;
+        
+        for(int i = 0; i < envelopeSliders.size(); i++)
+        {
+            envelopeSliders[i]->setBounds(x0 + 50 + i * (envelopeWidth + 0.65), paramSliders.getLast()->getBottom() + gYSpacing,
+                                          envelopeWidth, envelopeHeight - gYSpacing);
+        }
+        
+        offsetParamStartToggle.setBounds(right - 100, selectCB.getY(), 100, 30);
+        
     }
     else if (tab == 1)
     {
+        // SET VISIBILITY
+        gainSlider->setVisible(true);
+        
         clusterMinMaxSlider->setVisible(true);
         
         clusterThreshSlider->setVisible(true);
@@ -279,49 +348,41 @@ void SynchronicViewController::displayTab(int tab)
         onOffLabel.setVisible(true);
         onOffSelectCB.setVisible(true);
         
+        //releaseVelocitySetsSynchronicToggle.setVisible(true);
+        
+        // SET BOUNDS
+        int sliderHeight = height * 0.2f;
+        int sliderWidth = width * 0.5f - gXSpacing;
+        
+        int idx = 0;
+        gainSlider->setBounds(col1x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+        clusterThreshSlider->setBounds(col1x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+        clusterMinMaxSlider->setBounds(col1x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+        holdTimeMinMaxSlider->setBounds(col1x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+        velocityMinMaxSlider->setBounds(col1x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+        
+        idx = 0;
+        howManySlider->setBounds(col2x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+        numClusterSlider->setBounds(col2x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+
+        
+        modeSelectCB.setBounds(col2x, numClusterSlider->getBottom() + gYSpacing, 200, 30);
+        modeLabel.setBounds(modeSelectCB.getRight()+gXSpacing, modeSelectCB.getY(), 150, 30);
+
+        onOffSelectCB.setBounds(col2x, modeSelectCB.getBottom() + 40, 200, 30);
+        onOffLabel.setBounds(modeSelectCB.getRight()+gXSpacing, onOffSelectCB.getY(), 150, 30);
+
         releaseVelocitySetsSynchronicToggle.setVisible(true);
     }
-    else if (tab == 2)
-    {
-        
-    }
-    
-    gainSlider->setVisible(true);
 }
 
 void SynchronicViewController::resized()
 {
-    Rectangle<int> area (getBounds());
     
-    area.removeFromLeft(40);
-    area.removeFromRight(40);
-
-    iconImageComponent.setBounds(area);
+    displayShared();
+    displayTab(currentTab);
     
-    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
-    
-    Rectangle<int> areaSave = area;
-    
-    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
-    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(4 + 2.0f * gPaddingConst * processor .paddingScalarX);
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
-    
-    actionButton.setBounds(selectCB.getRight()+gXSpacing,
-                           selectCB.getY(),
-                           selectCB.getWidth() * 0.5,
-                           selectCB.getHeight());
-    
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    
-    if (numTabs > 1)
-    {
-        leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
-        rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
-    }
+#if 0
     
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
@@ -420,7 +481,7 @@ void SynchronicViewController::resized()
         
         selectCB.toFront(false);
     }
-    
+#endif
     repaint();
 }
 
@@ -1191,9 +1252,7 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &rightArrow)
     {
-        currentTab++;
-        
-        if (currentTab >= numTabs) currentTab = 0;
+        arrowPressed(RightArrow);
         
         DBG("currentTab: " + String(currentTab));
         
@@ -1201,9 +1260,7 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &leftArrow)
     {
-        currentTab--;
-        
-        if (currentTab < 0) currentTab = numTabs - 1;
+        arrowPressed(LeftArrow);
         
         DBG("currentTab: " + String(currentTab));
         

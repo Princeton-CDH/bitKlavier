@@ -115,6 +115,8 @@ protected:
     BKLabel envelopeName;
     
     void displayTab(int tab) override;
+    void displayShared(void) override;
+    void invisible(void) override;
     
 private:
     

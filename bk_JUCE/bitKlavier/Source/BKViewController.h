@@ -289,7 +289,26 @@ public:
     void setSubWindowInFront(bool f)    {   subWindowInFront = f;       }
     
     virtual void displayTab(int tab) {};
+    virtual void displayShared(void) {};
+    virtual void invisible(void) {};
     
+    inline void arrowPressed(BKArrowType type)
+    {
+        if (type == RightArrow)
+        {
+            currentTab++;
+            
+            if (currentTab >= numTabs) currentTab = 0;
+        }
+        else
+        {
+            currentTab--;
+            
+            if (currentTab < 0) currentTab = numTabs - 1;
+        }
+        
+        displayTab(currentTab);
+    }
 protected:
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;

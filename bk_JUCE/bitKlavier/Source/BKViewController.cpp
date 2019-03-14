@@ -17,8 +17,8 @@ BKViewController::BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph, i
 processor(p),
 theGraph(theGraph),
 lastId(0),
-numTabs(nt),
 bigOne(p),
+numTabs(nt),
 leftArrow(LeftArrow),
 rightArrow(RightArrow)
 {

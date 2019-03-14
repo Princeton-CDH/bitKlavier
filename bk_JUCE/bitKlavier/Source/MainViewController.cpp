@@ -395,18 +395,36 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == KeyPress::rightKey)
     {
-        if (e.getModifiers().isCommandDown())   construction.align(1);
-        else                                    construction.move(1, e.getModifiers().isShiftDown());
+        if (processor.updateState->currentDisplay == DisplayNil)
+        {
+            if (e.getModifiers().isCommandDown())   construction.align(1);
+            else                                    construction.move(1, e.getModifiers().isShiftDown());
+        }
+        else
+        {
+            overtop.arrowPressed(RightArrow);
+        }
     }
     else if (code == KeyPress::downKey)
     {
-        if (e.getModifiers().isCommandDown())   construction.align(2);
-        else                                    construction.move(2, e.getModifiers().isShiftDown());
+        
+            if (e.getModifiers().isCommandDown())   construction.align(2);
+            else                                    construction.move(2, e.getModifiers().isShiftDown());
+        
+        
     }
     else if (code == KeyPress::leftKey)
     {
-        if (e.getModifiers().isCommandDown())   construction.align(3);
-        else                                    construction.move(3, e.getModifiers().isShiftDown());
+        if (processor.updateState->currentDisplay == DisplayNil)
+        {
+            
+            if (e.getModifiers().isCommandDown())   construction.align(3);
+            else                                    construction.move(3, e.getModifiers().isShiftDown());
+        }
+        else
+        {
+            overtop.arrowPressed(LeftArrow);
+        }
     }
     else if (code == KeyPress::tabKey)
     {
