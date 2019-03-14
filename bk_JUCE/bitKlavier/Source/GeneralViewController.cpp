@@ -11,7 +11,7 @@
 #include "GeneralViewController.h"
 
 CommentViewController::CommentViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p,theGraph)
+BKViewController(p, theGraph, 1)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
@@ -98,7 +98,7 @@ void CommentViewController::bkButtonClicked (Button* b)
 }
 
 AboutViewController::AboutViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p,theGraph)
+BKViewController(p, theGraph, 1)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
@@ -153,7 +153,7 @@ void AboutViewController::bkButtonClicked (Button* b)
 
 //==============================================================================
 GeneralViewController::GeneralViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph)
+BKViewController(p, theGraph, 1)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);

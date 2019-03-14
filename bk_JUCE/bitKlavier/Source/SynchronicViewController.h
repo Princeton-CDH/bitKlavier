@@ -13,6 +13,36 @@
 
 #include "BKViewController.h"
 
+class SynchronicPage : public Component
+{
+public:
+    ~SynchronicPage()
+    {
+        
+    }
+    
+    SynchronicPage()
+    {
+        
+    }
+    
+    void resized(void) override
+    {
+        
+    }
+    
+    void paint (Graphics&) override
+    {
+        
+    }
+    
+private:
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicPage)
+    
+    
+};
+
 class SynchronicViewController :
 public BKMultiSlider::Listener,
 public BKViewController
@@ -83,6 +113,8 @@ protected:
     int visibleADSR;
     
     BKLabel envelopeName;
+    
+    void displayTab(int tab) override;
     
 private:
     

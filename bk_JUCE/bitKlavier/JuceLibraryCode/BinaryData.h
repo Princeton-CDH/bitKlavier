@@ -206,6 +206,12 @@ namespace BinaryData
     extern const char*   Mikes_Gallery_xml;
     const int            Mikes_Gallery_xmlSize = 35379;
 
+    extern const char*   leftarrow_png;
+    const int            leftarrow_pngSize = 9722;
+
+    extern const char*   rightarrow_png;
+    const int            rightarrow_pngSize = 10663;
+
     extern const char*   icon_iOS_72_png;
     const int            icon_iOS_72_pngSize = 8662;
 
@@ -279,7 +285,7 @@ namespace BinaryData
     const int            tuning_icon_pngSize = 12404;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 90;
+    const int namedResourceListSize = 92;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

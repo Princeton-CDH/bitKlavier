@@ -195,6 +195,91 @@ private:
     
 };
 
+typedef enum BKArrowType
+{
+    LeftArrow,
+    RightArrow,
+    BKTabArrowNil
+} BKArrowType;
+
+class BKArrowButton : public TextButton
+{
+public:
+    BKArrowButton(BKArrowType type):
+    TextButton(),
+    bright(true),
+    hover(false),
+    type(type)
+    {
+        placement = RectanglePlacement::centred;
+        
+        if (type == LeftArrow)
+        {
+            image = ImageCache::getFromMemory(BinaryData::leftarrow_png, BinaryData::leftarrow_pngSize);
+        }
+        else
+        {
+            image = ImageCache::getFromMemory(BinaryData::rightarrow_png, BinaryData::rightarrow_pngSize);
+        }
+    }
+    
+    ~BKArrowButton(void)
+    {
+        
+    }
+    
+    void paint(Graphics& g) override
+    {
+        float brightness = (bright ? 0.8f : 0.4f) * (hover ? 1.25f : 1.0f);
+        g.setOpacity (brightness);
+        g.drawImage (image, getLocalBounds().toFloat(), placement);
+    }
+    
+    void resized(void) override
+    {
+        image.rescaled((getWidth() > 2) ? getWidth() : 2, (getHeight() > 2) ? getHeight() : 2);
+    }
+private:
+    
+    /*
+     void mouseDown(const MouseEvent& e) override
+     {
+     bright = false;
+     repaint();
+     }
+     
+     void mouseUp(const MouseEvent& e) override
+     {
+     bright = true;
+     repaint();
+     }
+     
+     void mouseExit(const MouseEvent& e) override
+     {
+     bright = true;
+     hover = false;
+     repaint();
+     }
+     
+     void mouseEnter(const MouseEvent& e) override
+     {
+     hover = true;
+     repaint();
+     }
+     */
+    
+    Image image;
+    RectanglePlacement placement;
+    
+    BKArrowType type;
+    
+    bool bright;
+    bool hover;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKArrowButton)
+    
+};
+
 class BKTextButton : public TextButton
 {
 public:

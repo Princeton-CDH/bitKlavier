@@ -20,7 +20,7 @@
 
 //==============================================================================
 KeymapViewController::KeymapViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph)
+BKViewController(p, theGraph, 1)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     

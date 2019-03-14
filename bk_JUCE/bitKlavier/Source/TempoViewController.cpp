@@ -12,7 +12,7 @@
 
 
 TempoViewController::TempoViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph)
+BKViewController(p, theGraph, 1)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -87,8 +87,6 @@ BKViewController(p, theGraph)
 void TempoViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    
-    
     
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);

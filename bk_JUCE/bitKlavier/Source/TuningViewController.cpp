@@ -11,7 +11,7 @@
 #include "TuningViewController.h"
 
 TuningViewController::TuningViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p,theGraph),
+BKViewController(p, theGraph, 1),
 showSprings(false)
 #if JUCE_IOS
 , absoluteKeyboard(true)

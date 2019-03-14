@@ -267,10 +267,12 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BigOne)
 };
 
+#define ALL 0
+
 class BKViewController    : public BKComponent, public BKListener, public BigOne::Listener
 {
 public:
-    BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph);
+    BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph, int nt);
     
     ~BKViewController();
     
@@ -283,8 +285,10 @@ public:
         hideOrShow.setAlwaysOnTop(true);
     }
     
-    bool getSubWindowInFront(void) {return subWindowInFront; }
-    void setSubWindowInFront(bool f) { subWindowInFront = f; }
+    bool getSubWindowInFront(void)      {   return subWindowInFront;    }
+    void setSubWindowInFront(bool f)    {   subWindowInFront = f;       }
+    
+    virtual void displayTab(int tab) {};
     
 protected:
     BKAudioProcessor& processor;
@@ -298,16 +302,18 @@ protected:
     BKButtonAndMenuLAF buttonsAndMenusLAF2;
 
     BKExitButton hideOrShow;
+    BKArrowButton leftArrow;
+    BKArrowButton rightArrow;
     ImageComponent iconImageComponent;
     
     bool subWindowInFront;
-    
 
     int lastId;
     
+    int numTabs;
+    int currentTab;
+    
 private:
-    BKRangeSliderType rangeType;
-    NostalgicParameterType wdutType;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKViewController)
 };

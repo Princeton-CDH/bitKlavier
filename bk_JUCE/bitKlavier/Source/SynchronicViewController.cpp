@@ -15,27 +15,22 @@
 #include "Synchronic.h"
 
 SynchronicViewController::SynchronicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph)
+BKViewController(p, theGraph, 3)
 {
-    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
-    
     setLookAndFeel(&buttonsAndMenusLAF);
     
-    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::synchronic_icon_png, BinaryData::synchronic_icon_pngSize));
-    iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
-    iconImageComponent.setAlpha(0.095);
-    addAndMakeVisible(iconImageComponent);
+    SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     
     // MultSliders
     paramSliders = OwnedArray<BKMultiSlider>();
-    
+
     int idx = 0;
     for (int i = 0; i < cSynchronicParameterTypes.size(); i++)
     {
         if ((cSynchronicDataTypes[i] == BKFloatArr || cSynchronicDataTypes[i] == BKArrFloatArr) && cSynchronicParameterTypes[i] != "ADSRs")
         {
             paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
-            addAndMakeVisible(paramSliders[idx]);
+            addAndMakeVisible(paramSliders[idx], ALL);
             paramSliders[idx]->setName(cSynchronicParameterTypes[idx+SynchronicTranspOffsets]);
             paramSliders[idx]->addMyListener(this);
 #if JUCE_IOS
@@ -77,7 +72,7 @@ BKViewController(p, theGraph)
         envelopeSliders[i]->toFront(false);
         //envelopeSliders[i]->setAlpha(0.5);
         envelopeSliders[i]->setDim(0.5);
-        addAndMakeVisible(envelopeSliders[i]);
+        addAndMakeVisible(envelopeSliders[i], ALL);
     }
     envelopeSliders[0]->setBright();
     showADSR = false;
@@ -88,7 +83,7 @@ BKViewController(p, theGraph)
     selectCB.addListener(this);
     selectCB.setSelectedId(1, dontSendNotification);
     selectCB.setTooltip("Select from available saved preparation settings");
-    addAndMakeVisible(selectCB);
+    addAndMakeVisible(&selectCB, ALL);
     
     // MODE
     modeSelectCB.setName("Mode");
@@ -98,11 +93,11 @@ BKViewController(p, theGraph)
     modeSelectCB.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
     
     
-    addAndMakeVisible(modeSelectCB);
+    addAndMakeVisible(&modeSelectCB, ALL);
     
     modeLabel.setText("triggers pulse", dontSendNotification);
     modeLabel.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
-    addAndMakeVisible(modeLabel);
+    addAndMakeVisible(&modeLabel, ALL);
     
     // ON OFF
     onOffSelectCB.setName("OnOff");
@@ -114,11 +109,11 @@ BKViewController(p, theGraph)
     onOffSelectCB.addItem("Key On", 1);
     onOffSelectCB.addItem("Key Off", 2);
     
-    addAndMakeVisible(onOffSelectCB);
+    addAndMakeVisible(&onOffSelectCB, ALL);
     
     onOffLabel.setText("determines cluster", dontSendNotification);
     onOffLabel.setTooltip("Determines whether MIDI note On or note Off is used to measure cluster");
-    addAndMakeVisible(onOffLabel);
+    addAndMakeVisible(&onOffLabel, ALL);
     
     
     
@@ -127,43 +122,43 @@ BKViewController(p, theGraph)
     offsetParamStartToggle.setTooltip("Indicates whether Synchronic will skip first column of sequenced parameters for first cycle");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
-    addAndMakeVisible(offsetParamStartToggle);
+    addAndMakeVisible(&offsetParamStartToggle, ALL);
     
     howManySlider = new BKSingleSlider("num pulses", 1, 100, 20, 1);
     howManySlider->setToolTipString("Indicates number of steps/repetitions in Synchronic pulse");
     howManySlider->setJustifyRight(false);
-    addAndMakeVisible(howManySlider);
+    addAndMakeVisible(howManySlider, ALL);
         
     clusterThreshSlider = new BKSingleSlider("cluster threshold", 20, 2000, 200, 10);
     clusterThreshSlider->setToolTipString("Indicates window of time (milliseconds) within which notes are grouped as a cluster");
     clusterThreshSlider->setJustifyRight(false);
-    addAndMakeVisible(clusterThreshSlider);
+    addAndMakeVisible(clusterThreshSlider, ALL);
     
     clusterMinMaxSlider = new BKRangeSlider("cluster min/max", 1, 12, 3, 4, 1);
     clusterMinMaxSlider->setToolTipString("Sets Min and Max numbers of keys pressed to launch pulse; Min can be greater than Max");
     clusterMinMaxSlider->setJustifyRight(false);
-    addAndMakeVisible(clusterMinMaxSlider);
+    addAndMakeVisible(clusterMinMaxSlider, ALL);
     
     holdTimeMinMaxSlider = new BKRangeSlider("hold min/max", 0., 12000., 0.0, 12000., 1);
     holdTimeMinMaxSlider->setToolTipString("Sets Min and Max time (ms) held to trigger pulses; Min can be greater than Max");
     holdTimeMinMaxSlider->setJustifyRight(false);
-    addAndMakeVisible(holdTimeMinMaxSlider);
+    addAndMakeVisible(holdTimeMinMaxSlider, ALL);
     
     velocityMinMaxSlider = new BKRangeSlider("velocity min/max (0-127)", 0, 127, 0, 127, 1);
     velocityMinMaxSlider->setToolTipString("Sets Min and Max velocity (0-127) to trigger pulses; Min can be greater than Max");
     velocityMinMaxSlider->setJustifyRight(false);
-    addAndMakeVisible(velocityMinMaxSlider);
+    addAndMakeVisible(velocityMinMaxSlider, ALL);
     
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.0001);
     gainSlider->setToolTipString("Overall volume of Synchronic pulse");
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
-    addAndMakeVisible(gainSlider);
+    addAndMakeVisible(gainSlider, ALL);
     
     numClusterSlider = new BKSingleSlider("num clusters", 1, 10, 1, 1);
     numClusterSlider->setToolTipString("Number of clusters.");
     numClusterSlider->setJustifyRight(false);
-    addAndMakeVisible(numClusterSlider);
+    addAndMakeVisible(numClusterSlider, ALL);
     
 #if JUCE_IOS
     numClusterSlider->addWantsBigOneListener(this);
@@ -188,7 +183,7 @@ BKViewController(p, theGraph)
     releaseVelocitySetsSynchronicToggle.setToggleState (false, dontSendNotification);
     //addAndMakeVisible(releaseVelocitySetsSynchronicToggle); //possibly for future version, but it seems even keyboards that do noteOff velocity suck at it.
     
-    addAndMakeVisible(actionButton);
+    addAndMakeVisible(&actionButton, ALL);
     actionButton.setButtonText("Action");
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
@@ -198,7 +193,11 @@ BKViewController(p, theGraph)
     envelopeName.setJustificationType(Justification::centredRight);
     envelopeName.toBack();
     envelopeName.setInterceptsMouseClicks(false, true);
-    addAndMakeVisible(envelopeName);
+    addAndMakeVisible(&envelopeName, ALL);
+    
+    currentTab = 0;
+    
+    displayTab(currentTab);
 
 }
 void SynchronicViewController::paint (Graphics& g)
@@ -206,18 +205,106 @@ void SynchronicViewController::paint (Graphics& g)
     g.fillAll(Colours::black);
 }
 
+
+
+void SynchronicViewController::displayTab(int tab)
+{
+    currentTab = tab;
+    
+    offsetParamStartToggle.setVisible(false);
+    
+    for(int i = 0; i < paramSliders.size(); i++)
+    {
+        paramSliders[i]->setVisible(false);
+    }
+    
+    envelopeName.setVisible(false);
+    for(int i=envelopeSliders.size() - 1; i>=0; i--)
+    {
+        envelopeSliders[i]->setVisible(false);
+    }
+        
+    clusterMinMaxSlider->setVisible(false);
+        
+    clusterThreshSlider->setVisible(false);
+        
+    holdTimeMinMaxSlider->setVisible(false);
+        
+    velocityMinMaxSlider->setVisible(false);
+        
+    numClusterSlider->setVisible(false);
+        
+    howManySlider->setVisible(false);
+    
+    modeLabel.setVisible(false);
+    modeSelectCB.setVisible(false);
+    
+    onOffLabel.setVisible(false);
+    onOffSelectCB.setVisible(false);
+    
+    releaseVelocitySetsSynchronicToggle.setVisible(false);
+    
+    if (tab == 0)
+    {
+        offsetParamStartToggle.setVisible(true);
+        
+        for(int i = 0; i < paramSliders.size(); i++)
+        {
+            paramSliders[i]->setVisible(true);
+        }
+        
+        envelopeName.setVisible(true);
+        for(int i=envelopeSliders.size() - 1; i>=0; i--)
+        {
+            envelopeSliders[i]->setVisible(true);
+        }
+    }
+    else if (tab == 1)
+    {
+        clusterMinMaxSlider->setVisible(true);
+        
+        clusterThreshSlider->setVisible(true);
+        
+        holdTimeMinMaxSlider->setVisible(true);
+        
+        velocityMinMaxSlider->setVisible(true);
+        
+        numClusterSlider->setVisible(true);
+        
+        howManySlider->setVisible(true);
+        
+        modeLabel.setVisible(true);
+        modeSelectCB.setVisible(true);
+        
+        onOffLabel.setVisible(true);
+        onOffSelectCB.setVisible(true);
+        
+        releaseVelocitySetsSynchronicToggle.setVisible(true);
+    }
+    else if (tab == 2)
+    {
+        
+    }
+    
+    gainSlider->setVisible(true);
+}
+
 void SynchronicViewController::resized()
 {
-    Rectangle<int> area (getLocalBounds());
+    Rectangle<int> area (getBounds());
+    
+    area.removeFromLeft(40);
+    area.removeFromRight(40);
 
     iconImageComponent.setBounds(area);
+    
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
     Rectangle<int> areaSave = area;
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
+    comboBoxSlice.removeFromRight(4 + 2.0f * gPaddingConst * processor .paddingScalarX);
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
@@ -230,15 +317,21 @@ void SynchronicViewController::resized()
     
     comboBoxSlice.removeFromLeft(gXSpacing);
     
+    if (numTabs > 1)
+    {
+        leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
+        rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
+    }
+    
     /* *** above here should be generic to all prep layouts *** */
     /* ***    below here will be specific to each prep      *** */
     
-    if(!showADSR)
+    if (!showADSR)
     {
         Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
         modeSlice.removeFromRight(gXSpacing);
         offsetParamStartToggle.setBounds(modeSlice.removeFromRight(modeSlice.getWidth()));
-                                         
+        
         
         Rectangle<float> envelopeSlice = area.removeFromBottom(gComponentComboBoxHeight + gPaddingConst * processor.paddingScalarY).toFloat();
         
@@ -329,7 +422,6 @@ void SynchronicViewController::resized()
     }
     
     repaint();
-    
 }
 
 void SynchronicViewController::setShowADSR(String name, bool newval)
@@ -411,6 +503,8 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
 void SynchronicViewController::iWantTheBigOne(TextEditor* tf, String name)
 {
     hideOrShow.setAlwaysOnTop(false);
+    rightArrow.setAlwaysOnTop(false);
+    leftArrow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
 }
 #endif
@@ -1094,6 +1188,26 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
             setShowADSR(envelopeSliders[i]->getName(), false);
         }
         setSubWindowInFront(false);
+    }
+    else if (b == &rightArrow)
+    {
+        currentTab++;
+        
+        if (currentTab >= numTabs) currentTab = 0;
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
+    }
+    else if (b == &leftArrow)
+    {
+        currentTab--;
+        
+        if (currentTab < 0) currentTab = numTabs - 1;
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
     }
     else if (b == &actionButton)
     {

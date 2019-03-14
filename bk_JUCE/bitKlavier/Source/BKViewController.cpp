@@ -13,11 +13,14 @@
 #include "KeymapViewController.h"
 
 
-BKViewController::BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+BKViewController::BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph, int nt):
 processor(p),
 theGraph(theGraph),
 lastId(0),
-bigOne(p)
+numTabs(nt),
+bigOne(p),
+leftArrow(LeftArrow),
+rightArrow(RightArrow)
 {
     addAndMakeVisible(hideOrShow);
     hideOrShow.setAlwaysOnTop(true);
@@ -27,6 +30,19 @@ bigOne(p)
     addChildComponent(bigOne);
     
     subWindowInFront = false;
+
+    if (numTabs > 1)
+    {
+        addAndMakeVisible(leftArrow);
+        leftArrow.setAlwaysOnTop(true);
+        leftArrow.setName("leftArrow");
+        leftArrow.addListener(this);
+        
+        addAndMakeVisible(rightArrow);
+        rightArrow.setAlwaysOnTop(true);
+        rightArrow.setName("rightArrow");
+        rightArrow.addListener(this);
+    }
 }
 
 BKViewController::~BKViewController()
