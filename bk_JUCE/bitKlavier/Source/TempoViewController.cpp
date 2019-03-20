@@ -569,15 +569,15 @@ void TempoModificationEditor::greyOutAllComponents()
 
 void TempoModificationEditor::highlightModedComponents()
 {
-    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
     
-    if(mod->getParam(TempoBPM) != "")           tempoSlider->setBright();
-    if(mod->getParam(TempoSystem) != "")        modeCB.setAlpha(1);
-    if(mod->getParam(AT1History) != "")         AT1HistorySlider->setBright();
-    if(mod->getParam(AT1Subdivisions) != "")    AT1SubdivisionsSlider->setBright();
-    if(mod->getParam(AT1Min) != "")             AT1MinMaxSlider->setBright();
-    if(mod->getParam(AT1Max) != "")             AT1MinMaxSlider->setBright();
-    if(mod->getParam(AT1Mode) != "")            { A1ModeCB.setAlpha(1.);  A1ModeLabel.setAlpha(1.); }
+    if(mod->getDirty(TempoBPM))           tempoSlider->setBright();
+    if(mod->getDirty(TempoSystem))        modeCB.setAlpha(1);
+    if(mod->getDirty(AT1History))         AT1HistorySlider->setBright();
+    if(mod->getDirty(AT1Subdivisions))    AT1SubdivisionsSlider->setBright();
+    if(mod->getDirty(AT1Min))             AT1MinMaxSlider->setBright();
+    if(mod->getDirty(AT1Max))             AT1MinMaxSlider->setBright();
+    if(mod->getDirty(AT1Mode))            { A1ModeCB.setAlpha(1.);  A1ModeLabel.setAlpha(1.); }
 
 }
 
@@ -585,7 +585,7 @@ void TempoModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    for (auto prep : processor.gallery->getTempoModPreparations())
+    for (auto prep : processor.gallery->getTempoModifications())
     {
         int Id = prep->getId();;
         String name = prep->getName();
@@ -615,7 +615,7 @@ void TempoModificationEditor::update(void)
 {
     selectCB.setSelectedId(processor.updateState->currentModTempoId, dontSendNotification);
     
-    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
     
     if (mod != nullptr)
     {
@@ -623,33 +623,19 @@ void TempoModificationEditor::update(void)
         greyOutAllComponents();
         highlightModedComponents();
         
-        String val = mod->getParam(TempoSystem);
-        modeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-        //                       modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
+        modeCB.setSelectedItemIndex(mod->getTempoSystem(), dontSendNotification);
+
+        tempoSlider->setValue(mod->getTempo(), dontSendNotification);
         
-        val = mod->getParam(TempoBPM);
-        tempoSlider->setValue(val.getFloatValue(), dontSendNotification);
-        //                       tempoSlider->setValue(prep->getTempo(), dontSendNotification);
+        A1ModeCB.setSelectedItemIndex(mod->getAdaptiveTempo1Mode(), dontSendNotification);
         
-        val = mod->getParam(AT1Mode);
-        A1ModeCB.setSelectedItemIndex(val.getIntValue(), dontSendNotification);
-        //                       A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
+        AT1HistorySlider->setValue(mod->getAdaptiveTempo1History(), dontSendNotification);
         
-        val = mod->getParam(AT1History);
-        AT1HistorySlider->setValue(val.getIntValue(), dontSendNotification);
-        //                       AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
+        AT1SubdivisionsSlider->setValue(mod->getAdaptiveTempo1Subdivisions(), dontSendNotification);
         
-        val = mod->getParam(AT1Subdivisions);
-        AT1SubdivisionsSlider->setValue(val.getFloatValue(), dontSendNotification);
-        //                       AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
+        AT1MinMaxSlider->setMinValue(mod->getAdaptiveTempo1Min(), dontSendNotification);
         
-        val = mod->getParam(AT1Min);
-        AT1MinMaxSlider->setMinValue(val.getDoubleValue(), dontSendNotification);
-        //                       AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
-        
-        val = mod->getParam(AT1Max);
-        AT1MinMaxSlider->setMaxValue(val.getDoubleValue(), dontSendNotification);
-        //                       AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
+        AT1MinMaxSlider->setMaxValue(mod->getAdaptiveTempo1Max(), dontSendNotification);
         
         updateComponentVisibility();
     }
@@ -661,14 +647,14 @@ int TempoModificationEditor::addPreparation(void)
 {
     processor.gallery->add(PreparationTypeTempoMod);
     
-    return processor.gallery->getTempoModPreparations().getLast()->getId();
+    return processor.gallery->getTempoModifications().getLast()->getId();
 }
 
 int TempoModificationEditor::duplicatePreparation(void)
 {
     processor.gallery->duplicate(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
     
-    return processor.gallery->getTempoModPreparations().getLast()->getId();
+    return processor.gallery->getTempoModifications().getLast()->getId();
 }
 
 void TempoModificationEditor::deleteCurrent(void)
@@ -730,7 +716,7 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentModTempoId;
-        TempoModPreparation::Ptr prep = processor.gallery->getTempoModPreparation(Id);
+        TempoModification::Ptr prep = processor.gallery->getTempoModification(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -757,7 +743,7 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     int index = box->getSelectedItemIndex();
     int Id = box->getSelectedId();
     
-    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
     
     if (name == selectCB.getName())
     {
@@ -765,13 +751,17 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == modeCB.getName())
     {
-        mod->setParam(TempoSystem, String(index));
+        mod->setTempoSystem((TempoType) index);
+        mod->setDirty(TempoSystem);
+        
         modeCB.setAlpha(1.);
         updateComponentVisibility();
     }
     else if (name == A1ModeCB.getName())
     {
-        mod->setParam(AT1Mode, String(index));
+        mod->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
+        mod->setDirty(AT1Mode);
+        
         A1ModeCB.setAlpha(1.);
         A1ModeLabel.setAlpha(1.);
     }
@@ -790,12 +780,16 @@ void TempoModificationEditor::BKEditableComboBoxChanged(String name, BKEditableC
 
 void TempoModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
 
     if(name == AT1MinMaxSlider->getName())
     {
-        mod->setParam(AT1Min, String(minval));
-        mod->setParam(AT1Max, String(maxval));
+        mod->setAdaptiveTempo1Min(minval);
+        mod->setDirty(AT1Min);
+        
+        mod->setAdaptiveTempo1Max(maxval);
+        mod->setDirty(AT1Max);
+        
         AT1MinMaxSlider->setBright();
     }
     
@@ -806,21 +800,24 @@ void TempoModificationEditor::BKRangeSliderValueChanged(String name, double minv
 
 void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    TempoModPreparation::Ptr mod = processor.gallery->getTempoModPreparation(processor.updateState->currentModTempoId);
+    TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
     
     if(name == tempoSlider->getName())
     {
-        mod->setParam(TempoBPM, String(val));
+        mod->setTempo(val);
+        mod->setDirty(TempoBPM);
         tempoSlider->setBright();
     }
     else if(name == AT1HistorySlider->getName())
     {
-        mod->setParam(AT1History, String(val));
+        mod->setAdaptiveTempo1History(val);
+        mod->setDirty(AT1History);
         AT1HistorySlider->setBright();
     }
     else if(name == AT1SubdivisionsSlider->getName())
     {
-        mod->setParam(AT1Subdivisions, String(val));
+        mod->setAdaptiveTempo1Subdivisions(val);
+        mod->setDirty(AT1Subdivisions);
         AT1SubdivisionsSlider->setBright();
     }
     

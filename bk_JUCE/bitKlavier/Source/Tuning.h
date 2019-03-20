@@ -349,6 +349,170 @@ public:
     inline void setAdaptiveType (TuningAdaptiveSystemType type) { adaptiveType = type; }
     inline TuningAdaptiveSystemType getAdaptiveType (void) { return adaptiveType; }
     
+    inline ValueTree getState(void)
+    {
+        ValueTree prep("params");
+        
+        prep.setProperty( ptagTuning_scale,                 getScale(), 0);
+        prep.setProperty( ptagTuning_scaleName,             getScaleName(), 0);
+        prep.setProperty( ptagTuning_fundamental,           getFundamental(), 0);
+        prep.setProperty( ptagTuning_offset,                getFundamentalOffset(), 0 );
+        prep.setProperty( ptagTuning_adaptiveIntervalScale, getAdaptiveIntervalScale(), 0 );
+        prep.setProperty( ptagTuning_adaptiveInversional,   getAdaptiveInversional(), 0 );
+        prep.setProperty( ptagTuning_adaptiveAnchorScale,   getAdaptiveAnchorScale(), 0 );
+        prep.setProperty( ptagTuning_adaptiveAnchorFund,    getAdaptiveAnchorFundamental(), 0 );
+        prep.setProperty( ptagTuning_adaptiveClusterThresh, (int)getAdaptiveClusterThresh(), 0 );
+        prep.setProperty( ptagTuning_adaptiveHistory,       getAdaptiveHistory(), 0 );
+        
+        prep.setProperty( ptagTuning_nToneRoot,             getNToneRoot(), 0);
+        prep.setProperty( ptagTuning_nToneSemitoneWidth,    getNToneSemitoneWidth(), 0 );
+        
+        prep.setProperty( "adaptiveSystem", getAdaptiveType(), 0);
+        
+        ValueTree scale( vtagTuning_customScale);
+        int count = 0;
+        for (auto note : getCustomScale())
+            scale.setProperty( ptagFloat + String(count++), note, 0 );
+        prep.addChild(scale, -1, 0);
+        
+        ValueTree absolute( vTagTuning_absoluteOffsets);
+        count = 0;
+        for (auto note : getAbsoluteOffsets())
+        {
+            if(note != 0.) absolute.setProperty( ptagFloat + String(count), note, 0 );
+            count++;
+        }
+        prep.addChild(absolute, -1, 0);
+        
+        prep.addChild(getSpringTuning()->getState(), -1, 0);
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        int i; float f; bool b;
+        
+        i = e->getStringAttribute( ptagTuning_scale).getIntValue();
+        setScale((TuningSystem)i);
+        
+        TuningSystem scale = (TuningSystem) i;
+        
+        if (scale == AdaptiveTuning)
+        {
+            setAdaptiveType(AdaptiveNormal);
+            setScale(EqualTemperament);
+        }
+        else if (scale == AdaptiveAnchoredTuning)
+        {
+            setAdaptiveType(AdaptiveAnchored);
+            setScale(EqualTemperament);
+        }
+        else
+        {
+            setAdaptiveType(AdaptiveNone);
+        }
+        
+        //if a tuning has been saved by name, use that instead of the index value; need to resave all built-in galleries to do this, eventually
+        setScaleByName(e->getStringAttribute(ptagTuning_scaleName));
+        
+        i = e->getStringAttribute( ptagTuning_fundamental).getIntValue();
+        setFundamental((PitchClass)i);
+        
+        f = e->getStringAttribute( ptagTuning_offset).getFloatValue();
+        setFundamentalOffset(f);
+        
+        i = e->getStringAttribute( ptagTuning_adaptiveIntervalScale).getIntValue();
+        setAdaptiveIntervalScale((TuningSystem)i);
+        
+        i = e->getStringAttribute( ptagTuning_adaptiveAnchorScale).getIntValue();
+        setAdaptiveAnchorScale((TuningSystem)i);
+        
+        i = e->getStringAttribute( ptagTuning_adaptiveHistory).getIntValue();
+        setAdaptiveHistory(i);
+        
+        b = (bool) e->getStringAttribute( ptagTuning_adaptiveInversional).getIntValue();
+        setAdaptiveInversional(b);
+        
+        i = e->getStringAttribute( ptagTuning_adaptiveClusterThresh).getIntValue();
+        setAdaptiveClusterThresh(i);
+        
+        i = e->getStringAttribute( ptagTuning_adaptiveAnchorFund).getIntValue();
+        setAdaptiveAnchorFundamental((PitchClass)i);
+        
+        i = e->getStringAttribute( ptagTuning_nToneRoot).getIntValue();
+        if(i > 0) setNToneRoot(i);
+        else setNToneRoot(60);
+        
+        f = e->getStringAttribute( ptagTuning_nToneSemitoneWidth).getFloatValue();
+        if(f > 0) setNToneSemitoneWidth(f);
+        else setNToneSemitoneWidth(100);
+        
+        String str = e->getStringAttribute("adaptiveSystem");
+        
+        if (str != "")
+        {
+            i = str.getIntValue();
+            
+            TuningAdaptiveSystemType type = (TuningAdaptiveSystemType) i;
+            
+            setAdaptiveType(type);
+            
+            if (type == AdaptiveSpring)
+            {
+                setSpringsActive(true);
+            }
+        }
+        
+        // custom scale
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName("springtuning"))
+            {
+                getSpringTuning()->setState(sub);
+            }
+            else if (sub->hasTagName(vtagTuning_customScale))
+            {
+                Array<float> scale;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        scale.add(f);
+                    }
+                }
+                setCustomScale(scale);
+            }
+            else if (sub->hasTagName(vTagTuning_absoluteOffsets))
+            {
+                Array<float> absolute;
+                absolute.ensureStorageAllocated(ABSOLUTE_OFFSET_SIZE);
+                for (int k = 0; k < ABSOLUTE_OFFSET_SIZE; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    f = attr.getFloatValue();
+                    absolute.set(k, f);
+                    
+                }
+                
+                setAbsoluteOffsets(absolute);
+            }
+        }
+        
+        if (getSpringTuning()->getActive())
+        {
+            setAdaptiveType(AdaptiveSpring);
+        }
+        
+        // MOD REWORK FIX
+        // getSpringTuning()->setTetherTuning(getStaticScale());
+        
+    }
+    
 private:
     String name;
     // basic tuning settings, for static tuning
@@ -497,7 +661,7 @@ public:
     }
     
     
-    ValueTree getState(void);
+    ValueTree getState();
     void setState(XmlElement*);
     
     ~Tuning() {};
@@ -674,277 +838,6 @@ private:
     
     
     JUCE_LEAK_DETECTOR(Tuning)
-};
-
-class TuningModPreparation : public ReferenceCountedObject
-{
-public:
-    
-    typedef ReferenceCountedObjectPtr<TuningModPreparation>   Ptr;
-    typedef Array<TuningModPreparation::Ptr>                  PtrArr;
-    typedef Array<TuningModPreparation::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<TuningModPreparation>                  Arr;
-    typedef OwnedArray<TuningModPreparation, CriticalSection> CSArr;
-    
-    TuningModPreparation(TuningPreparation::Ptr p, int Id):
-    Id(Id)
-    {
-        param.ensureStorageAllocated((int)TuningParameterTypeNil);
-        
-        for (int i = 0; i < TuningParameterTypeNil; i++)
-        {
-            param.set(i, "");
-        }
-        
-        for (int i = 0; i < 128; i++)   tetherWeightsActive.add(false);
-        for (int i = 0; i < 12; i++)    springWeightsActive.add(false);
-        
-        param.set(TuningScale, String(p->getScale()));
-        param.set(TuningFundamental, String(p->getFundamental()));
-        param.set(TuningOffset, String(p->getFundamentalOffset()));
-        param.set(TuningA1IntervalScale, String(p->getAdaptiveIntervalScale()));
-        param.set(TuningA1Inversional, String((int)p->getAdaptiveInversional()));
-        param.set(TuningA1AnchorScale, String(p->getAdaptiveAnchorScale()));
-        param.set(TuningA1AnchorFundamental, String(p->getAdaptiveAnchorFundamental()));
-        param.set(TuningA1ClusterThresh, String(p->getAdaptiveClusterThresh()));
-        param.set(TuningA1History, String(p->getAdaptiveHistory()));
-        param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
-        param.set(TuningAbsoluteOffsets, floatArrayToString(p->getAbsoluteOffsets()));
-        
-        
-        param.set(TuningSpringTetherStiffness,      String(p->getSpringTuning()->getTetherStiffness()));
-        param.set(TuningSpringIntervalStiffness,    String(p->getSpringTuning()->getIntervalStiffness()));
-        param.set(TuningSpringRate,                 String(p->getSpringTuning()->getRate()));
-        param.set(TuningSpringDrag,                 String(p->getSpringTuning()->getDrag()));
-        param.set(TuningSpringActive,               String((int)p->getSpringTuning()->getActive()));
-        param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getTetherWeights()));
-        param.set(TuningSpringIntervalWeights,      floatArrayToString(p->getSpringTuning()->getSpringWeights()));
-        param.set(TuningSpringIntervalScale,        String(p->getSpringTuning()->getScaleId()));
-        param.set(TuningSpringIntervalFundamental,  String(p->getSpringTuning()->getIntervalFundamental()));
-        
-    }
-    
-    
-    TuningModPreparation(int Id):
-    Id(Id)
-    {
-        param.ensureStorageAllocated((int)TuningParameterTypeNil);
-        
-        for (int i = 0; i < TuningParameterTypeNil; i++)
-        {
-            param.set(i, "");
-        }
-        
-        for (int i = 0; i < 128; i++)   tetherWeightsActive.add(false);
-        for (int i = 0; i < 12; i++)    springWeightsActive.add(false);
-    }
-    
-    inline TuningModPreparation::Ptr duplicate(void)
-    {   
-        TuningModPreparation::Ptr copyPrep = new TuningModPreparation(-1);
-       
-        copyPrep->copy(this);
-        
-        copyPrep->setName(this->getName() );
-        
-        return copyPrep;
-    }
-    
-    inline void setId(int newId) { Id = newId; }
-    inline int getId(void) const noexcept { return Id; }
-    
-    ~TuningModPreparation(void)
-    {
-        
-    }
-    
-    inline void copy(TuningPreparation::Ptr p)
-    {
-        param.ensureStorageAllocated((int)TuningParameterTypeNil);
-        
-        for (int i = 0; i < TuningParameterTypeNil; i++)
-        {
-            param.set(i, "");
-        }
-        
-        for (int i = 0; i < 128; i++)   tetherWeightsActive.add(false);
-        for (int i = 0; i < 12; i++)    springWeightsActive.add(false);
-        
-        param.set(TuningScale, String(p->getScale()));
-        param.set(TuningFundamental, String(p->getFundamental()));
-        param.set(TuningOffset, String(p->getFundamentalOffset()));
-        param.set(TuningA1IntervalScale, String(p->getAdaptiveIntervalScale()));
-        param.set(TuningA1Inversional, String((int)p->getAdaptiveInversional()));
-        param.set(TuningA1AnchorScale, String(p->getAdaptiveAnchorScale()));
-        param.set(TuningA1AnchorFundamental, String(p->getAdaptiveAnchorFundamental()));
-        param.set(TuningA1ClusterThresh, String(p->getAdaptiveClusterThresh()));
-        param.set(TuningA1History, String(p->getAdaptiveHistory()));
-        param.set(TuningCustomScale, floatArrayToString(p->getCustomScale()));
-        param.set(TuningAbsoluteOffsets, offsetArrayToString(p->getAbsoluteOffsets()));
-        
-        param.set(TuningSpringTetherStiffness,      String(p->getSpringTuning()->getTetherStiffness()));
-        param.set(TuningSpringIntervalStiffness,    String(p->getSpringTuning()->getIntervalStiffness()));
-        param.set(TuningSpringRate,                 String(p->getSpringTuning()->getRate()));
-        param.set(TuningSpringDrag,                 String(p->getSpringTuning()->getDrag()));
-        param.set(TuningSpringIntervalScale,        String(p->getSpringTuning()->getScaleId()));
-        param.set(TuningSpringActive,               String((int)p->getSpringTuning()->getActive()));
-        param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getTetherWeights()));
-        param.set(TuningSpringTetherWeights,        floatArrayToString(p->getSpringTuning()->getSpringWeights()));
-        param.set(TuningSpringTetherStiffness,      floatArrayToString(p->getSpringTuning()->getIntervalTuning()));
-        param.set(TuningSpringIntervalFundamental,  String(p->getSpringTuning()->getIntervalFundamental()));
-        
-    }
-    
-    inline void copy(TuningModPreparation::Ptr p)
-    {
-        param.ensureStorageAllocated((int)TuningParameterTypeNil);
-        
-        for (int i = 0; i < TuningParameterTypeNil; i++)
-        {
-            param.set(i, "");
-        }
-        
-        for (int i = 0; i < TuningParameterTypeNil; i++)
-        {
-            param.set(i, p->getParam((TuningParameterType)i));
-        }
-        
-        setTetherWeightsActive(p->getTetherWeightsActive());
-        setSpringWeightsActive(p->getSpringWeightsActive());
-    }
-    
-    inline bool compare(TuningModPreparation::Ptr t)
-    {
-        return (getParam(TuningScale) == t->getParam(TuningScale) &&
-                getParam(TuningFundamental) == t->getParam(TuningFundamental) &&
-                getParam(TuningOffset) == t->getParam(TuningOffset) &&
-                getParam(TuningA1IntervalScale) == t->getParam(TuningA1IntervalScale) &&
-                getParam(TuningA1Inversional) == t->getParam(TuningA1Inversional) &&
-                getParam(TuningA1AnchorScale) == t->getParam(TuningA1AnchorScale) &&
-                getParam(TuningA1AnchorFundamental) == t->getParam(TuningA1AnchorFundamental) &&
-                getParam(TuningA1ClusterThresh) == t->getParam(TuningA1ClusterThresh) &&
-                getParam(TuningA1History) == t->getParam(TuningA1History) &&
-                getParam(TuningCustomScale) == t->getParam(TuningCustomScale) &&
-                getParam(TuningAbsoluteOffsets) == t->getParam(TuningAbsoluteOffsets) &&
-                getParam(TuningSpringTetherStiffness) == t->getParam(TuningSpringTetherStiffness) &&
-                getParam(TuningSpringIntervalStiffness) == t->getParam(TuningSpringIntervalStiffness) &&
-                getParam(TuningSpringRate) == t->getParam(TuningSpringRate) &&
-                getParam(TuningSpringDrag) == t->getParam(TuningSpringDrag) &&
-                getParam(TuningSpringIntervalScale) == t->getParam(TuningSpringIntervalScale) &&
-                getParam(TuningSpringTetherWeights) == t->getParam(TuningSpringTetherWeights) &&
-                getParam(TuningSpringIntervalWeights) == t->getParam(TuningSpringIntervalWeights) &&
-                getParam(TuningSpringIntervalScale) == t->getParam(TuningSpringIntervalScale) &&
-                getParam(TuningSpringActive) == t->getParam(TuningSpringActive) &&
-                getParam(TuningSpringIntervalFundamental) == t->getParam(TuningSpringIntervalFundamental) );
-            
-    }
-
-	inline void randomize()
-	{
-		TuningPreparation p;
-		p.randomize();
-
-		param.set(TuningScale, String(p.getScale()));
-        //scaleName
-		param.set(TuningFundamental, String(p.getFundamental()));
-		param.set(TuningOffset, String(p.getFundamentalOffset()));
-		param.set(TuningA1IntervalScale, String(p.getAdaptiveIntervalScale()));
-		param.set(TuningA1Inversional, String((int)p.getAdaptiveInversional()));
-		param.set(TuningA1AnchorScale, String(p.getAdaptiveAnchorScale()));
-		param.set(TuningA1AnchorFundamental, String(p.getAdaptiveAnchorFundamental()));
-		param.set(TuningA1ClusterThresh, String(p.getAdaptiveClusterThresh()));
-		param.set(TuningA1History, String(p.getAdaptiveHistory()));
-		param.set(TuningCustomScale, floatArrayToString(p.getCustomScale()));
-		param.set(TuningAbsoluteOffsets, offsetArrayToString(p.getAbsoluteOffsets()));
-        
-        param.set(TuningSpringTetherStiffness,      String(p.getSpringTuning()->getTetherStiffness()));
-        param.set(TuningSpringIntervalStiffness,    String(p.getSpringTuning()->getIntervalStiffness()));
-        param.set(TuningSpringRate,                 String(p.getSpringTuning()->getRate()));
-        param.set(TuningSpringDrag,                 String(p.getSpringTuning()->getDrag()));
-        param.set(TuningSpringIntervalScale,        String(p.getSpringTuning()->getScaleId()));
-        param.set(TuningSpringActive,               String((int)p.getSpringTuning()->getActive()));
-        param.set(TuningSpringTetherWeights,        floatArrayToString(p.getSpringTuning()->getTetherWeights()));
-        param.set(TuningSpringIntervalWeights,      floatArrayToString(p.getSpringTuning()->getSpringWeights()));
-        param.set(TuningSpringTetherStiffness,      floatArrayToString(p.getSpringTuning()->getIntervalTuning()));
-        param.set(TuningSpringIntervalFundamental,  String(p.getSpringTuning()->getIntervalFundamental()));
-        
-        /*
-         TuningSpringStiffness,
-         TuningSpringTetherStiffness,
-         TuningSpringIntervalStiffness,
-         TuningSpringRate,
-         TuningSpringDrag,
-         TuningSpringActive,
-         TuningSpringTetherWeights,
-         TuningSpringIntervalWeights,
-         TuningSpringIntervalScale,
-         TuningSpringIntervalFundamental,
-         */
-        
-	}
-    
-    void clearAll()
-    {
-        for (int i = TuningId+1; i < TuningParameterTypeNil; i++)
-        {
-            param.set(i, "");
-        }
-    }
-    
-    ValueTree getState(void);
-    
-    void setState(XmlElement*);
-    
-    inline const String getParam(TuningParameterType type)
-    {
-        if (type != TuningId)   return param[type];
-        else                    return "";
-    }
-    
-    inline const StringArray getStringArray(void) { return param; }
-    
-    inline void setParam(TuningParameterType type, String val)
-    {
-        DBG("set param " + String(type) + " of " + String(param.size()));
-        param.set(type, val);
-    }
-    
-    void print(void)
-    {
-        
-    }
-    
-    inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName) {name = newName;}
-    
-    inline void setPreps(Array<int> ps) { preps = ps; }
-    inline Array<int> getPreps(void) { return preps; }
-    
-    
-    
-    inline void setTetherWeightsActive(Array<bool> a) { tetherWeightsActive = a; }
-    inline Array<bool> getTetherWeightsActive(void) { return tetherWeightsActive; }
-    
-    inline void setSpringWeightsActive(Array<bool> a) { springWeightsActive = a; }
-    inline Array<bool> getSpringWeightsActive(void) { return springWeightsActive; }
-    
-    inline bool getTetherWeightActive(int i) { return tetherWeightsActive[i]; }
-    inline void setTetherWeightActive(int i, bool a) { tetherWeightsActive.setUnchecked(i, a); }
-    
-    inline bool getSpringWeightActive(int i) { return springWeightsActive[i]; }
-    inline void setSpringWeightActive(int i, bool a) { springWeightsActive.setUnchecked(i, a); }
-
-private:
-    int Id; 
-    String name;
-    StringArray          param;
-    
-    Array<int> preps;
-    
-    Array<bool> tetherWeightsActive;
-    Array<bool> springWeightsActive;
-    
-    JUCE_LEAK_DETECTOR(TuningModPreparation);
 };
 
 class TuningProcessor : public ReferenceCountedObject

@@ -391,30 +391,25 @@ private:
         return which;
     }
     
-    void configureDirectModification(DirectModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
-    void configureDirectModification(int key, DirectModPreparation::Ptr, Array<int>);
-    void deconfigureDirectModification(DirectModPreparation::Ptr, Array<int> whichKeymaps);
-    void deconfigureDirectModificationForKeys(DirectModPreparation::Ptr, Array<bool>);
+    void configureDirectModification(DirectModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureDirectModification(DirectModification::Ptr, Array<int> whichKeymaps);
+    void deconfigureDirectModificationForKeys(DirectModification::Ptr, Array<bool>);
     
-    void configureSynchronicModification(SynchronicModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
-    void configureSynchronicModification(int key, SynchronicModPreparation::Ptr, Array<int>);
-    void deconfigureSynchronicModification(SynchronicModPreparation::Ptr, Array<int> whichKeymaps);
-    void deconfigureSynchronicModificationForKeys(SynchronicModPreparation::Ptr, Array<bool>);
+    void configureSynchronicModification(SynchronicModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureSynchronicModification(SynchronicModification::Ptr, Array<int> whichKeymaps);
+    void deconfigureSynchronicModificationForKeys(SynchronicModification::Ptr, Array<bool>);
     
-    void configureNostalgicModification(NostalgicModPreparation::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
-    void configureNostalgicModification(int key, NostalgicModPreparation::Ptr, Array<int>);
-    void deconfigureNostalgicModification(NostalgicModPreparation::Ptr, Array<int> whichKeymaps);
-    void deconfigureNostalgicModificationForKeys(NostalgicModPreparation::Ptr, Array<bool>);
+    void configureNostalgicModification(NostalgicModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureNostalgicModification(NostalgicModification::Ptr, Array<int> whichKeymaps);
+    void deconfigureNostalgicModificationForKeys(NostalgicModification::Ptr, Array<bool>);
     
-    void configureTuningModification(TuningModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
-    void configureTuningModification(int key, TuningModPreparation::Ptr, Array<int>);
-    void deconfigureTuningModification(TuningModPreparation::Ptr, Array<int> whichKeymaps);
-    void deconfigureTuningModificationForKeys(TuningModPreparation::Ptr, Array<bool>);
+    void configureTuningModification(TuningModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureTuningModification(TuningModification::Ptr, Array<int> whichKeymaps);
+    void deconfigureTuningModificationForKeys(TuningModification::Ptr, Array<bool>);
     
-    void configureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
-    void configureTempoModification(int key, TempoModPreparation::Ptr, Array<int>);
-    void deconfigureTempoModification(TempoModPreparation::Ptr, Array<int> whichKeymaps);
-    void deconfigureTempoModificationForKeys(TempoModPreparation::Ptr, Array<bool>);
+    void configureTempoModification(TempoModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
+    void deconfigureTempoModification(TempoModification::Ptr, Array<int> whichKeymaps);
+    void deconfigureTempoModificationForKeys(TempoModification::Ptr, Array<bool>);
     
     JUCE_LEAK_DETECTOR(Piano)
 };

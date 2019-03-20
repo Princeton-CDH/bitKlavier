@@ -696,7 +696,7 @@ public:
 			DBG("test consistency: " + name);
 
 			NostalgicPreparation::Ptr np1 = new NostalgicPreparation();
-			NostalgicModPreparation::Ptr nm1 = new NostalgicModPreparation(np1, 1);
+			NostalgicModification::Ptr nm1 = new NostalgicModification(np1, 1);
 
 
 			nm1->randomize();
@@ -707,7 +707,7 @@ public:
 			ScopedPointer<XmlElement> xml = vt1.createXml();
 
 			NostalgicPreparation::Ptr np2 = new NostalgicPreparation();
-			NostalgicModPreparation::Ptr nm2 = new NostalgicModPreparation(np2, 1);
+			NostalgicModification::Ptr nm2 = new NostalgicModification(np2, 1);
 
 			nm2->setState(xml);
 

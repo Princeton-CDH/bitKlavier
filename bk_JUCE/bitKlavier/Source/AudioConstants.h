@@ -104,6 +104,7 @@ const String ptagSynchronic_reset = "synchronicReset";
 const String vtagSynchronic_ADSRs = "ADSRs";
 
 
+#define ABSOLUTE_OFFSET_SIZE 256
 const String vtagNostalgic = "nostalgic";
 const String vtagModNostalgic = "modNostalgic";
 const String ptagNostalgic_Id = "Id";

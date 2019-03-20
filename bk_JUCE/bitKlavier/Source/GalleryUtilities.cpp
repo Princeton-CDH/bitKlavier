@@ -41,7 +41,7 @@ void Gallery::removePiano(int Id)
     }
 }
 
-void Gallery::removeSynchronicModPreparation(int Id)
+void Gallery::removeSynchronicModification(int Id)
 {
     for (int i = modSynchronic.size(); --i >= 0; )
     {
@@ -49,7 +49,7 @@ void Gallery::removeSynchronicModPreparation(int Id)
     }
 }
 
-void Gallery::removeNostalgicModPreparation(int Id)
+void Gallery::removeNostalgicModification(int Id)
 {
     for (int i = modNostalgic.size(); --i >= 0; )
     {
@@ -57,7 +57,7 @@ void Gallery::removeNostalgicModPreparation(int Id)
     }
 }
 
-void Gallery::removeDirectModPreparation(int Id)
+void Gallery::removeDirectModification(int Id)
 {
     for (int i = modDirect.size(); --i >= 0; )
     {
@@ -65,7 +65,7 @@ void Gallery::removeDirectModPreparation(int Id)
     }
 }
 
-void Gallery::removeTuningModPreparation(int Id)
+void Gallery::removeTuningModification(int Id)
 {
     for (int i = modTuning.size(); --i >= 0; )
     {
@@ -73,7 +73,7 @@ void Gallery::removeTuningModPreparation(int Id)
     }
 }
 
-void Gallery::removeTempoModPreparation(int Id)
+void Gallery::removeTempoModification(int Id)
 {
     for (int i = modTempo.size(); --i >= 0; )
     {
@@ -158,23 +158,23 @@ void Gallery::remove(BKPreparationType type, int Id)
     }
     if (type == PreparationTypeDirectMod)
     {
-        removeDirectModPreparation(Id);
+        removeDirectModification(Id);
     }
     else if (type == PreparationTypeSynchronicMod)
     {
-        removeSynchronicModPreparation(Id);
+        removeSynchronicModification(Id);
     }
     else if (type == PreparationTypeNostalgicMod)
     {
-        removeNostalgicModPreparation(Id);
+        removeNostalgicModification(Id);
     }
     else if (type == PreparationTypeTuningMod)
     {
-        removeTuningModPreparation(Id);
+        removeTuningModification(Id);
     }
     else if (type == PreparationTypeTempoMod)
     {
-        removeTempoModPreparation(Id);
+        removeTempoModification(Id);
     }
     else if (type == PreparationTypePiano)
     {
@@ -221,27 +221,30 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
     }
     if (type == PreparationTypeDirectMod)
     {
-         name = getDirectModPreparation(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
-        for (auto p : modDirect)    if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+         name = getDirectModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+        for (auto p : modDirect)
+        {
+            if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+        }
     }
     else if (type == PreparationTypeSynchronicMod)
     {
-         name = getSynchronicModPreparation(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+         name = getSynchronicModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modSynchronic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeNostalgicMod)
     {
-         name = getNostalgicModPreparation(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+         name = getNostalgicModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modNostalgic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeTuningMod)
     {
-         name = getTuningModPreparation(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+         name = getTuningModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modTuning)     if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeTempoMod)
     {
-         name = getTempoModPreparation(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+         name = getTempoModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modTempo)    if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypePiano)
@@ -315,8 +318,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
     }
     if (type == PreparationTypeDirectMod)
     {
-        DirectModPreparation::Ptr toCopy = getDirectModPreparation(Id);
-        DirectModPreparation::Ptr newOne = toCopy->duplicate();
+        DirectModification::Ptr toCopy = getDirectModification(Id);
+        DirectModification::Ptr newOne = toCopy->duplicate();
         addDirectMod(newOne);
         newId = newOne->getId();
         String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeDirectMod, newId))+")";
@@ -324,8 +327,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeSynchronicMod)
     {
-        SynchronicModPreparation::Ptr toCopy = getSynchronicModPreparation(Id);
-        SynchronicModPreparation::Ptr newOne = toCopy->duplicate();
+        SynchronicModification::Ptr toCopy = getSynchronicModification(Id);
+        SynchronicModification::Ptr newOne = toCopy->duplicate();
         addSynchronicMod(newOne);
         newId = newOne->getId();
         String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeSynchronicMod, newId))+")";
@@ -333,8 +336,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeNostalgicMod)
     {
-        NostalgicModPreparation::Ptr toCopy = getNostalgicModPreparation(Id);
-        NostalgicModPreparation::Ptr newOne = toCopy->duplicate();
+        NostalgicModification::Ptr toCopy = getNostalgicModification(Id);
+        NostalgicModification::Ptr newOne = toCopy->duplicate();
         addNostalgicMod(newOne);
         newId = newOne->getId();
         String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeNostalgicMod, newId))+")";
@@ -342,8 +345,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeTuningMod)
     {
-        TuningModPreparation::Ptr toCopy = getTuningModPreparation(Id);
-        TuningModPreparation::Ptr newOne = toCopy->duplicate();
+        TuningModification::Ptr toCopy = getTuningModification(Id);
+        TuningModification::Ptr newOne = toCopy->duplicate();
         addTuningMod(newOne);
         newId = newOne->getId();
         String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTuningMod, newId))+")";
@@ -351,8 +354,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeTempoMod)
     {
-        TempoModPreparation::Ptr toCopy = getTempoModPreparation(Id);
-        TempoModPreparation::Ptr newOne = toCopy->duplicate();
+        TempoModification::Ptr toCopy = getTempoModification(Id);
+        TempoModification::Ptr newOne = toCopy->duplicate();
         addTempoMod(newOne);
         newId = newOne->getId();
         String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTempoMod, newId))+")";
@@ -467,15 +470,15 @@ int Gallery::getNum(BKPreparationType type)
 void Gallery::addDirectMod()
 {
     int newId = getNewId(PreparationTypeDirectMod);
-    modDirect.add           (new DirectModPreparation(newId));
+    modDirect.add           (new DirectModification(newId));
 }
 
 void Gallery::addDirectModWithId(int Id)
 {
-    modDirect.add           (new DirectModPreparation(Id));
+    modDirect.add           (new DirectModification(Id));
 }
 
-void Gallery::addDirectMod(DirectModPreparation::Ptr mod)
+void Gallery::addDirectMod(DirectModification::Ptr mod)
 {
     int newId = getNewId(PreparationTypeDirectMod);
     mod->setId(newId);
@@ -485,15 +488,15 @@ void Gallery::addDirectMod(DirectModPreparation::Ptr mod)
 void Gallery::addSynchronicMod()
 {
     int newId = getNewId(PreparationTypeSynchronicMod);
-    modSynchronic.add       (new SynchronicModPreparation(newId));
+    modSynchronic.add       (new SynchronicModification(newId));
 }
 
 void Gallery::addSynchronicModWithId(int Id)
 {
-    modSynchronic.add       (new SynchronicModPreparation(Id));
+    modSynchronic.add       (new SynchronicModification(Id));
 }
 
-void Gallery::addSynchronicMod(SynchronicModPreparation::Ptr mod)
+void Gallery::addSynchronicMod(SynchronicModification::Ptr mod)
 {
     int newId = getNewId(PreparationTypeSynchronicMod);
     mod->setId(newId);
@@ -503,15 +506,15 @@ void Gallery::addSynchronicMod(SynchronicModPreparation::Ptr mod)
 void Gallery::addNostalgicMod()
 {
     int newId = getNewId(PreparationTypeNostalgicMod);
-    modNostalgic.add        (new NostalgicModPreparation(newId));
+    modNostalgic.add        (new NostalgicModification(newId));
 }
 
 void Gallery::addNostalgicModWithId(int Id)
 {
-    modNostalgic.add        (new NostalgicModPreparation(Id));
+    modNostalgic.add        (new NostalgicModification(Id));
 }
 
-void Gallery::addNostalgicMod(NostalgicModPreparation::Ptr mod)
+void Gallery::addNostalgicMod(NostalgicModification::Ptr mod)
 {
     int newId = getNewId(PreparationTypeNostalgicMod);
     mod->setId(newId);
@@ -521,10 +524,10 @@ void Gallery::addNostalgicMod(NostalgicModPreparation::Ptr mod)
 void Gallery::addTuningMod()
 {
     int newId = getNewId(PreparationTypeTuningMod);
-    modTuning.add           (new TuningModPreparation(newId));
+    modTuning.add           (new TuningModification(newId));
 }
 
-void Gallery::addTuningMod(TuningModPreparation::Ptr tmod)
+void Gallery::addTuningMod(TuningModification::Ptr tmod)
 {
     int newId = getNewId(PreparationTypeTuningMod);
     tmod->setId(newId);
@@ -533,21 +536,21 @@ void Gallery::addTuningMod(TuningModPreparation::Ptr tmod)
 
 void Gallery::addTuningModWithId(int Id)
 {
-    modTuning.add           (new TuningModPreparation(Id));
+    modTuning.add           (new TuningModification(Id));
 }
 
 void Gallery::addTempoMod()
 {
     int newId = getNewId(PreparationTypeTempoMod);
-    modTempo.add           (new TempoModPreparation(newId));
+    modTempo.add           (new TempoModification(newId));
 }
 
 void Gallery::addTempoModWithId(int Id)
 {
-    modTempo.add           (new TempoModPreparation(Id));
+    modTempo.add           (new TempoModification(Id));
 }
 
-void Gallery::addTempoMod(TempoModPreparation::Ptr tmod)
+void Gallery::addTempoMod(TempoModification::Ptr tmod)
 {
     int newId = getNewId(PreparationTypeTempoMod);
     tmod->setId(newId);

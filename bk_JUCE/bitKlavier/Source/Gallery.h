@@ -187,11 +187,11 @@ public:
         return tempo;
     }
     
-    inline TuningModPreparation::Ptr matches(TuningModPreparation::Ptr prep)
+    inline TuningModification::Ptr matches(TuningModification::Ptr mod)
     {
         for (auto p : modTuning)
         {
-            if (p->compare(prep)) return p;
+            if (p->compare(mod)) return p;
         }
         
         return nullptr;
@@ -328,9 +328,9 @@ public:
     {
         StringArray names;
         
-        for (auto prep : modDirect)
+        for (auto mod : modDirect)
         {
-            names.add(prep->getName());
+            names.add(mod->getName());
         }
         
         return names;
@@ -340,9 +340,9 @@ public:
     {
         StringArray names;
         
-        for (auto prep : modNostalgic)
+        for (auto mod : modNostalgic)
         {
-            names.add(prep->getName());
+            names.add(mod->getName());
         }
         
         return names;
@@ -352,9 +352,9 @@ public:
     {
         StringArray names;
         
-        for (auto prep : modSynchronic)
+        for (auto mod : modSynchronic)
         {
-            names.add(prep->getName());
+            names.add(mod->getName());
         }
         
         return names;
@@ -364,9 +364,9 @@ public:
     {
         StringArray names;
         
-        for (auto prep : modTempo)
+        for (auto mod : modTempo)
         {
-            names.add(prep->getName());
+            names.add(mod->getName());
         }
         
         return names;
@@ -376,9 +376,9 @@ public:
     {
         StringArray names;
         
-        for (auto prep : modTuning)
+        for (auto mod : modTuning)
         {
-            names.add(prep->getName());
+            names.add(mod->getName());
         }
         
         return names;
@@ -533,7 +533,7 @@ public:
         return nullptr;
     }
     
-    inline const SynchronicModPreparation::Ptr getSynchronicModPreparation(int Id) const noexcept
+    inline const SynchronicModification::Ptr getSynchronicModification(int Id) const noexcept
     {
 
         for (auto p : modSynchronic)
@@ -543,7 +543,7 @@ public:
         return nullptr;
     }
     
-    inline const NostalgicModPreparation::Ptr getNostalgicModPreparation(int Id) const noexcept
+    inline const NostalgicModification::Ptr getNostalgicModification(int Id) const noexcept
     {
 
         for (auto p : modNostalgic)
@@ -553,7 +553,7 @@ public:
         return nullptr;
     }
     
-    inline const DirectModPreparation::Ptr getDirectModPreparation(int Id) const noexcept
+    inline const DirectModification::Ptr getDirectModification(int Id) const noexcept
     {
 
         for (auto p : modDirect)
@@ -563,7 +563,7 @@ public:
         return nullptr;
     }
     
-    inline const TuningModPreparation::Ptr getTuningModPreparation(int Id) const noexcept
+    inline const TuningModification::Ptr getTuningModification(int Id) const noexcept
     {
 
         for (auto p : modTuning)
@@ -573,7 +573,7 @@ public:
         return nullptr;
     }
     
-    inline const TempoModPreparation::Ptr getTempoModPreparation(int Id) const noexcept
+    inline const TempoModification::Ptr getTempoModification(int Id) const noexcept
     {
 
         for (auto p : modTempo)
@@ -605,27 +605,27 @@ public:
 
     void copy(BKPreparationType type, int from, int to);
     
-    inline const SynchronicModPreparation::PtrArr getSynchronicModPreparations(void) const noexcept
+    inline const SynchronicModification::PtrArr getSynchronicModifications(void) const noexcept
     {
         return modSynchronic;
     }
     
-    inline const NostalgicModPreparation::PtrArr getNostalgicModPreparations(void) const noexcept
+    inline const NostalgicModification::PtrArr getNostalgicModifications(void) const noexcept
     {
         return modNostalgic;
     }
     
-    inline const DirectModPreparation::PtrArr getDirectModPreparations(void) const noexcept
+    inline const DirectModification::PtrArr getDirectModifications(void) const noexcept
     {
         return modDirect;
     }
     
-    inline const TuningModPreparation::PtrArr getTuningModPreparations(void) const noexcept
+    inline const TuningModification::PtrArr getTuningModifications(void) const noexcept
     {
         return modTuning;
     }
     
-    inline const TempoModPreparation::PtrArr getTempoModPreparations(void) const noexcept
+    inline const TempoModification::PtrArr getTempoModifications(void) const noexcept
     {
         return modTempo;
     }
@@ -715,11 +715,11 @@ private:
     Tuning::PtrArr                      tuning;
     Tempo::PtrArr                       tempo;
     
-    SynchronicModPreparation::PtrArr    modSynchronic;
-    DirectModPreparation::PtrArr        modDirect;
-    NostalgicModPreparation::PtrArr     modNostalgic;
-    TuningModPreparation::PtrArr        modTuning;
-    TempoModPreparation::PtrArr         modTempo;
+    SynchronicModification::PtrArr      modSynchronic;
+    DirectModification::PtrArr          modDirect;
+    NostalgicModification::PtrArr       modNostalgic;
+    TuningModification::PtrArr          modTuning;
+    TempoModification::PtrArr           modTempo;
     
     Keymap::PtrArr                      bkKeymaps;
     Piano::PtrArr                       bkPianos;
@@ -769,11 +769,11 @@ private:
     void addTuningModWithId(int Id);
     void addTempoModWithId(int Id);
     
-    void addTuningMod(TuningModPreparation::Ptr);
-    void addTempoMod(TempoModPreparation::Ptr);
-    void addDirectMod(DirectModPreparation::Ptr);
-    void addSynchronicMod(SynchronicModPreparation::Ptr);
-    void addNostalgicMod(NostalgicModPreparation::Ptr);
+    void addTuningMod(TuningModification::Ptr);
+    void addTempoMod(TempoModification::Ptr);
+    void addDirectMod(DirectModification::Ptr);
+    void addSynchronicMod(SynchronicModification::Ptr);
+    void addNostalgicMod(NostalgicModification::Ptr);
     
     void removeDirect(int Id);
     void removeSynchronic(int Id);
@@ -781,11 +781,11 @@ private:
     void removeTuning(int Id);
     void removeTempo(int Id);
     void removeKeymap(int Id);
-    void removeDirectModPreparation(int Id);
-    void removeNostalgicModPreparation(int Id);
-    void removeSynchronicModPreparation(int Id);
-    void removeTuningModPreparation(int Id);
-    void removeTempoModPreparation(int Id);
+    void removeDirectModification(int Id);
+    void removeNostalgicModification(int Id);
+    void removeSynchronicModification(int Id);
+    void removeTuningModification(int Id);
+    void removeTempoModification(int Id);
     
     
     

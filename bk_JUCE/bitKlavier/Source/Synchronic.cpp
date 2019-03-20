@@ -575,7 +575,7 @@ public:
 			DBG("test consistency: " + name);
 
 			SynchronicPreparation::Ptr sp1 = new SynchronicPreparation();
-			SynchronicModPreparation::Ptr sm1 = new SynchronicModPreparation(sp1, 1);
+			SynchronicModification::Ptr sm1 = new SynchronicModification(sp1, 1);
 
 
 			sm1->randomize();
@@ -586,7 +586,7 @@ public:
 			ScopedPointer<XmlElement> xml = vt1.createXml();
 
 			SynchronicPreparation::Ptr sp2 = new SynchronicPreparation();
-			SynchronicModPreparation::Ptr sm2 = new SynchronicModPreparation(sp2, 1);
+			SynchronicModification::Ptr sm2 = new SynchronicModification(sp2, 1);
 
 			sm2->setState(xml);
 

@@ -151,7 +151,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
             {
                 addSynchronicWithId(0);
                 
-                synchronic.getLast()->setState(e, tuning, tempo);
+                synchronic.getLast()->setState(e);
                 
             }
             else if (e->hasTagName( vtagModSynchronic))
@@ -179,7 +179,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
             {
                 addNostalgicWithId(0);
                 
-                nostalgic.getLast()->setState(e, tuning, synchronic);
+                nostalgic.getLast()->setState(e);
             }
             else if (e->hasTagName( vtagModNostalgic))
             {

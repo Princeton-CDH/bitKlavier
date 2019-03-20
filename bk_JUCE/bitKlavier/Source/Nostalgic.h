@@ -299,6 +299,217 @@ public:
         DBG("nMode: " + String(nMode));
     }
     
+    ValueTree getState(void)
+    {
+        ValueTree prep("params");
+        
+        prep.setProperty( ptagNostalgic_waveDistance,       getWavedistance(), 0);
+        prep.setProperty( ptagNostalgic_undertow,           getUndertow(), 0);
+        
+        ValueTree transp( vtagNostalgic_transposition);
+        int count = 0;
+        for (auto f : getTransposition())
+        {
+            transp.      setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(transp, -1, 0);
+        
+        prep.setProperty( ptagNostalgic_gain,               getGain(), 0);
+        prep.setProperty( ptagNostalgic_lengthMultiplier,   getLengthMultiplier(), 0);
+        prep.setProperty( ptagNostalgic_beatsToSkip,        getBeatsToSkip(), 0);
+        prep.setProperty( ptagNostalgic_mode,               getMode(), 0);
+        
+        prep.setProperty( "holdMin", getHoldMin(), 0);
+        prep.setProperty( "holdMax", getHoldMax(), 0);
+        
+        prep.setProperty( "clusterMin", getClusterMin(), 0);
+        prep.setProperty( "clusterMax", getClusterMax(), 0);
+        
+        prep.setProperty( "velocityMin", getVelocityMin(), 0);
+        prep.setProperty( "velocityMax", getVelocityMax(), 0);
+        
+        prep.setProperty( "keyOnReset", getKeyOnReset() ? 1 : 0, 0);
+        
+        ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
+        count = 0;
+        for (auto f : getReverseADSRvals())
+        {
+            reverseADSRvals.setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(reverseADSRvals, -1, 0);
+        
+        ValueTree undertowADSRvals( vtagNostalgic_undertowADSR);
+        count = 0;
+        for (auto f : getUndertowADSRvals())
+        {
+            undertowADSRvals.setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(undertowADSRvals, -1, 0);
+        
+        return prep;
+    }
+    
+    void setState(XmlElement* e)
+    {
+        int i; float f;
+        
+        i = e->getStringAttribute(ptagNostalgic_waveDistance).getIntValue();
+        setWaveDistance(i);
+        
+        i = e->getStringAttribute(ptagNostalgic_undertow).getIntValue();
+        setUndertow(i);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagNostalgic_transposition))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                setTransposition(transp);
+                
+            }
+            else  if (sub->hasTagName(vtagNostalgic_reverseADSR))
+            {
+                Array<float> envVals;
+                for (int k = 0; k < 4; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envVals.add(f);
+                    }
+                }
+                
+                setReverseADSRvals(envVals);
+                
+            }
+            else  if (sub->hasTagName(vtagNostalgic_undertowADSR))
+            {
+                Array<float> envVals;
+                for (int k = 0; k < 4; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envVals.add(f);
+                    }
+                }
+                
+                setUndertowADSRvals(envVals);
+                
+            }
+        }
+        
+        
+        f = e->getStringAttribute(ptagNostalgic_lengthMultiplier).getFloatValue();
+        setLengthMultiplier(f);
+        
+        f = e->getStringAttribute(ptagNostalgic_beatsToSkip).getFloatValue();
+        setBeatsToSkip(f);
+        
+        f = e->getStringAttribute(ptagNostalgic_gain).getFloatValue();
+        setGain(f);
+        
+        i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
+        setMode((NostalgicSyncMode)i);
+        
+        
+        // HOLD MIN / MAX
+        String str = e->getStringAttribute("holdMin");
+        
+        if (str != "")
+        {
+            f = str.getFloatValue();
+            setHoldMin(f);
+        }
+        else
+        {
+            setHoldMin(0);
+        }
+        
+        str = e->getStringAttribute("holdMax");
+        
+        if (str != "")
+        {
+            f = str.getFloatValue();
+            setHoldMax(f);
+        }
+        else
+        {
+            setHoldMax(12000);
+        }
+        
+        
+        // CLUSTER MIN
+        str = e->getStringAttribute("clusterMin");
+        
+        if (str != "")
+        {
+            i = str.getIntValue();
+            setClusterMin(i);
+        }
+        else
+        {
+            setClusterMin(1);
+        }
+        
+        // VELOCITY MIN
+        str = e->getStringAttribute("velocityMin");
+        
+        if (str != "")
+        {
+            i = str.getIntValue();
+            setVelocityMin(i);
+        }
+        else
+        {
+            setVelocityMin(0);
+        }
+        
+        // VELOCITY MAX
+        str = e->getStringAttribute("velocityMax");
+        
+        if (str != "")
+        {
+            i = str.getIntValue();
+            setVelocityMax(i);
+        }
+        else
+        {
+            setVelocityMax(127);
+        }
+        
+        str = e->getStringAttribute("keyOnReset");
+        
+        if (str != "")
+        {
+            i = str.getIntValue();
+            setKeyOnReset((bool) i);
+        }
+        else
+        {
+            setKeyOnReset(false);
+        }
+        
+    }
+    
     
 private:
     String name;
@@ -474,226 +685,38 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep( vtagNostalgic );
+        ValueTree prep(vtagNostalgic);
         
         prep.setProperty( "Id",Id, 0);
-        prep.setProperty( "name", name, 0);
+        prep.setProperty( "name",                          name, 0);
         
-        prep.setProperty( ptagNostalgic_waveDistance,       sPrep->getWavedistance(), 0);
-        prep.setProperty( ptagNostalgic_undertow,           sPrep->getUndertow(), 0);
-        
-        ValueTree transp( vtagNostalgic_transposition);
-        int count = 0;
-        for (auto f : sPrep->getTransposition())
-        {
-            transp.      setProperty( ptagFloat + String(count++), f, 0);
-        }
-        prep.addChild(transp, -1, 0);
-        
-        prep.setProperty( ptagNostalgic_gain,               sPrep->getGain(), 0);
-        prep.setProperty( ptagNostalgic_lengthMultiplier,   sPrep->getLengthMultiplier(), 0);
-        prep.setProperty( ptagNostalgic_beatsToSkip,        sPrep->getBeatsToSkip(), 0);
-        prep.setProperty( ptagNostalgic_mode,               sPrep->getMode(), 0);
-        
-        prep.setProperty( "holdMin", sPrep->getHoldMin(), 0);
-        prep.setProperty( "holdMax", sPrep->getHoldMax(), 0);
-        
-        prep.setProperty( "clusterMin", sPrep->getClusterMin(), 0);
-        prep.setProperty( "clusterMax", sPrep->getClusterMax(), 0);
-        
-        prep.setProperty( "velocityMin", sPrep->getVelocityMin(), 0);
-        prep.setProperty( "velocityMax", sPrep->getVelocityMax(), 0);
-        
-        prep.setProperty( "keyOnReset", sPrep->getKeyOnReset() ? 1 : 0, 0);
-        
-        ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
-        count = 0;
-        for (auto f : sPrep->getReverseADSRvals())
-        {
-            reverseADSRvals.setProperty( ptagFloat + String(count++), f, 0);
-        }
-        prep.addChild(reverseADSRvals, -1, 0);
-        
-        ValueTree undertowADSRvals( vtagNostalgic_undertowADSR);
-        count = 0;
-        for (auto f : sPrep->getUndertowADSRvals())
-        {
-            undertowADSRvals.setProperty( ptagFloat + String(count++), f, 0);
-        }
-        prep.addChild(undertowADSRvals, -1, 0);
+        prep.addChild(sPrep->getState(), -1, 0);
         
         return prep;
     }
     
-    inline void setState(XmlElement* e, Tuning::PtrArr tuning, Synchronic::PtrArr synchronic)
+    inline void setState(XmlElement* e)
     {
-        int i; float f;
-        
         Id = e->getStringAttribute("Id").getIntValue();
         
         String n = e->getStringAttribute("name");
         
         if (n != String::empty)     name = n;
         else                        name = String(Id);
-
         
-        i = e->getStringAttribute(ptagNostalgic_waveDistance).getIntValue();
-        sPrep->setWaveDistance(i);
         
-        i = e->getStringAttribute(ptagNostalgic_undertow).getIntValue();
-        sPrep->setUndertow(i);
+        XmlElement* params = e->getChildByName("params");
         
-        forEachXmlChildElement (*e, sub)
+        if (params != nullptr)
         {
-            if (sub->hasTagName(vtagNostalgic_transposition))
-            {
-                Array<float> transp;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        transp.add(f);
-                    }
-                }
-                
-                sPrep->setTransposition(transp);
-                
-            }
-            else  if (sub->hasTagName(vtagNostalgic_reverseADSR))
-            {
-                Array<float> envVals;
-                for (int k = 0; k < 4; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        envVals.add(f);
-                    }
-                }
-                
-                sPrep->setReverseADSRvals(envVals);
-                
-            }
-            else  if (sub->hasTagName(vtagNostalgic_undertowADSR))
-            {
-                Array<float> envVals;
-                for (int k = 0; k < 4; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        envVals.add(f);
-                    }
-                }
-                
-                sPrep->setUndertowADSRvals(envVals);
-                
-            }
-        }
-        
-        
-        f = e->getStringAttribute(ptagNostalgic_lengthMultiplier).getFloatValue();
-        sPrep->setLengthMultiplier(f);
-        
-        f = e->getStringAttribute(ptagNostalgic_beatsToSkip).getFloatValue();
-        sPrep->setBeatsToSkip(f);
-        
-        f = e->getStringAttribute(ptagNostalgic_gain).getFloatValue();
-        sPrep->setGain(f);
-        
-        i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
-        sPrep->setMode((NostalgicSyncMode)i);
-        
-        
-        // HOLD MIN / MAX
-        String str = e->getStringAttribute("holdMin");
-        
-        if (str != "")
-        {
-            f = str.getFloatValue();
-            sPrep->setHoldMin(f);
+            sPrep->setState(params);
         }
         else
         {
-            sPrep->setHoldMin(0);
-        }
-        
-        str = e->getStringAttribute("holdMax");
-        
-        if (str != "")
-        {
-            f = str.getFloatValue();
-            sPrep->setHoldMax(f);
-        }
-        else
-        {
-            sPrep->setHoldMax(12000);
-        }
-        
-        
-        // CLUSTER MIN
-        str = e->getStringAttribute("clusterMin");
-        
-        if (str != "")
-        {
-            i = str.getIntValue();
-            sPrep->setClusterMin(i);
-        }
-        else
-        {
-            sPrep->setClusterMin(1);
-        }
-        
-        // VELOCITY MIN
-        str = e->getStringAttribute("velocityMin");
-        
-        if (str != "")
-        {
-            i = str.getIntValue();
-            sPrep->setVelocityMin(i);
-        }
-        else
-        {
-            sPrep->setVelocityMin(0);
-        }
-        
-        // VELOCITY MAX
-        str = e->getStringAttribute("velocityMax");
-        
-        if (str != "")
-        {
-            i = str.getIntValue();
-            sPrep->setVelocityMax(i);
-        }
-        else
-        {
-            sPrep->setVelocityMax(127);
-        }
-        
-        str = e->getStringAttribute("keyOnReset");
-        
-        if (str != "")
-        {
-            i = str.getIntValue();
-            sPrep->setKeyOnReset((bool) i);
-        }
-        else
-        {
-            sPrep->setKeyOnReset(false);
+            sPrep->setState(e);
         }
         
         aPrep->copy(sPrep);
-        
     }
     
     inline int getId() {return Id;}
@@ -725,392 +748,6 @@ private:
     int Id;
     
     JUCE_LEAK_DETECTOR(Nostalgic)
-};
-
-
-class NostalgicModPreparation : public ReferenceCountedObject
-{
-public:
-    
-    typedef ReferenceCountedObjectPtr<NostalgicModPreparation>   Ptr;
-    typedef Array<NostalgicModPreparation::Ptr>                  PtrArr;
-    typedef Array<NostalgicModPreparation::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<NostalgicModPreparation>                  Arr;
-    typedef OwnedArray<NostalgicModPreparation, CriticalSection> CSArr;
-    
-    /*
-     NostalgicId = 0,
-     NostalgicTuning,
-     NostalgicWaveDistance,
-     NostalgicUndertow,
-     NostalgicTransposition,
-     NostalgicGain,
-     NostalgicLengthMultiplier,
-     NostalgicBeatsToSkip,
-     NostalgicMode,
-     NostalgicParameterTypeNil
-     
-     */
-    
-    NostalgicModPreparation(NostalgicPreparation::Ptr p, int Id):
-    Id(Id)
-    {
-        param.ensureStorageAllocated((int)cNostalgicParameterTypes.size());
-        
-        param.set(NostalgicWaveDistance, String(p->getWavedistance()));
-        param.set(NostalgicUndertow, String(p->getUndertow()));
-        param.set(NostalgicTransposition, floatArrayToString(p->getTransposition()));
-        param.set(NostalgicGain, String(p->getGain()));
-        param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
-        param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
-        param.set(NostalgicReverseADSR, String(floatArrayToString(p->getReverseADSRvals())));
-        param.set(NostalgicUndertowADSR, String(floatArrayToString(p->getUndertowADSRvals())));
-        param.set(NostalgicMode, String(p->getMode()));
-        param.set(NostalgicHoldMin, String(p->getHoldMin()));
-        param.set(NostalgicHoldMax, String(p->getHoldMax()));
-        param.set(NostalgicClusterMin, String(p->getClusterMin()));
-        param.set(NostalgicKeyOnReset, String((int)p->getKeyOnReset()));
-        param.set(NostalgicVelocityMin, String(p->getVelocityMin()));
-        param.set(NostalgicVelocityMax, String(p->getVelocityMax()));
-        
-    }
-    
-    
-    NostalgicModPreparation(int Id):
-    Id(Id)
-    {
-        
-        for(int i=0; i<=cNostalgicDataTypes.size(); i++) param.add("");
-        param.set(NostalgicWaveDistance, "");
-        param.set(NostalgicUndertow, "");
-        param.set(NostalgicTransposition, "");
-        param.set(NostalgicGain, "");
-        param.set(NostalgicLengthMultiplier, "");
-        param.set(NostalgicBeatsToSkip, "");
-        param.set(NostalgicReverseADSR, "");
-        param.set(NostalgicUndertowADSR, "");
-        param.set(NostalgicMode, "");
-        param.set(NostalgicHoldMin, "");
-        param.set(NostalgicHoldMax, "");
-        param.set(NostalgicClusterMin, "");
-        param.set(NostalgicKeyOnReset, "");
-        param.set(NostalgicVelocityMin, "");
-        param.set(NostalgicVelocityMax, "");
-
-    }
-    
-    inline NostalgicModPreparation::Ptr duplicate(void)
-    {
-        NostalgicModPreparation::Ptr copyPrep = new NostalgicModPreparation(-1);
-        
-        copyPrep->copy(this);
-        
-        copyPrep->setName(getName());
-        
-        return copyPrep;
-    }
-    
-    inline void setId(int newId) { Id = newId; }
-    inline int getId(void) const noexcept { return Id; }
-    
-    inline ValueTree getState(void)
-    {
-        ValueTree prep( vtagModNostalgic );
-        
-        prep.setProperty( "Id",Id, 0);
-        
-        String p = "";
-        
-        p = getParam(NostalgicWaveDistance);
-        if (p != String::empty) prep.setProperty( ptagNostalgic_waveDistance,       p.getIntValue(), 0);
-        
-        p = getParam(NostalgicUndertow);
-        if (p != String::empty) prep.setProperty( ptagNostalgic_undertow,           p.getIntValue(), 0);
-        
-        ValueTree transp( vtagNostalgic_transposition);
-        int count = 0;
-        p = getParam(NostalgicTransposition);
-        if (p != String::empty)
-        {
-            Array<float> m = stringToFloatArray(p);
-            for (auto f : m)
-            {
-                transp.      setProperty( ptagFloat + String(count++), f, 0);
-            }
-        }
-        prep.addChild(transp, -1, 0);
-        
-        ValueTree revADSR( vtagNostalgic_reverseADSR);
-        count = 0;
-        p = getParam(NostalgicReverseADSR);
-        if (p != String::empty)
-        {
-            Array<float> m = stringToFloatArray(p);
-            for (auto f : m)
-            {
-                revADSR.      setProperty( ptagFloat + String(count++), f, 0);
-            }
-        }
-        prep.addChild(revADSR, -1, 0);
-        
-        ValueTree undADSR( vtagNostalgic_undertowADSR);
-        count = 0;
-        p = getParam(NostalgicUndertowADSR);
-        if (p != String::empty)
-        {
-            Array<float> m = stringToFloatArray(p);
-            for (auto f : m)
-            {
-                undADSR.      setProperty( ptagFloat + String(count++), f, 0);
-            }
-        }
-        prep.addChild(undADSR, -1, 0);
-        
-        p = getParam(NostalgicGain);
-        if (p != String::empty) prep.setProperty( ptagNostalgic_gain,               p.getFloatValue(), 0);
-        
-        p = getParam(NostalgicLengthMultiplier);
-        if (p != String::empty) prep.setProperty( ptagNostalgic_lengthMultiplier,   p.getFloatValue(), 0);
-        
-        p = getParam(NostalgicBeatsToSkip);
-        if (p != String::empty) prep.setProperty( ptagNostalgic_beatsToSkip,        p.getFloatValue(), 0);
-        
-        p = getParam(NostalgicMode);
-        if (p != String::empty) prep.setProperty( ptagNostalgic_mode,               p.getIntValue(), 0);
-        
-        p = getParam(NostalgicHoldMin);
-        if (p != String::empty) prep.setProperty( "holdMin", p.getFloatValue(), 0);
-        
-        p = getParam(NostalgicHoldMax);
-        if (p != String::empty) prep.setProperty( "holdMax", p.getFloatValue(), 0);
-        
-        p = getParam(NostalgicClusterMin);
-        if (p != String::empty) prep.setProperty( "clusterMin", p.getFloatValue(), 0);
-        
-        p = getParam(NostalgicKeyOnReset);
-        if (p != String::empty) prep.setProperty( "keyOnReset", p.getIntValue(), 0);
-        
-        p = getParam(NostalgicVelocityMin);
-        if (p != String::empty) prep.setProperty( "velocityMin", p.getIntValue(), 0);
-        
-        p = getParam(NostalgicVelocityMax);
-        if (p != String::empty) prep.setProperty( "velocityMax", p.getIntValue(), 0);
-        
-        return prep;
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        float f;
-        
-        Id = e->getStringAttribute("Id").getIntValue();
-        
-        String p = e->getStringAttribute(ptagNostalgic_waveDistance);
-        setParam(NostalgicWaveDistance, p);
-        
-        p = e->getStringAttribute(ptagNostalgic_undertow);
-        setParam(NostalgicUndertow, p);
-        
-        forEachXmlChildElement (*e, sub)
-        {
-            if (sub->hasTagName(vtagNostalgic_transposition))
-            {
-                Array<float> transp;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        transp.add(f);
-                    }
-                }
-                
-                setParam(NostalgicTransposition, floatArrayToString(transp));
-                
-            }
-            
-            if (sub->hasTagName(vtagNostalgic_reverseADSR))
-            {
-                Array<float> revADSR;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        revADSR.add(f);
-                    }
-                }
-                
-                setParam(NostalgicReverseADSR, floatArrayToString(revADSR));
-                
-            }
-            
-            if (sub->hasTagName(vtagNostalgic_undertowADSR))
-            {
-                Array<float> undADSR;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        undADSR.add(f);
-                    }
-                }
-                
-                setParam(NostalgicUndertowADSR, floatArrayToString(undADSR));
-                
-            }
-        }
-        
-        p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
-        setParam(NostalgicLengthMultiplier, p);
-        
-        p = e->getStringAttribute(ptagNostalgic_beatsToSkip);
-        setParam(NostalgicBeatsToSkip, p);
-        
-        p = e->getStringAttribute(ptagNostalgic_gain);
-        setParam(NostalgicGain, p);
-        
-        p = e->getStringAttribute(ptagNostalgic_mode);
-        setParam(NostalgicMode, p);
-        
-        p = e->getStringAttribute("holdMin");
-        setParam(NostalgicHoldMin, p);
-                                  
-        p = e->getStringAttribute("holdMax");
-        setParam(NostalgicHoldMax, p);
-        
-        p = e->getStringAttribute("clusterMin");
-        setParam(NostalgicClusterMin, p);
-        
-        p = e->getStringAttribute("keyOnReset");
-        setParam(NostalgicKeyOnReset, p);
-        
-        p = e->getStringAttribute("velocityMin");
-        setParam(NostalgicVelocityMin, p);
-        
-        p = e->getStringAttribute("velocityMax");
-        setParam(NostalgicVelocityMax, p);
-
-    }
-    
-    
-    ~NostalgicModPreparation(void)
-    {
-        
-    }
-    
-    inline void copy(NostalgicPreparation::Ptr p)
-    {
-        param.set(NostalgicWaveDistance, String(p->getWavedistance()));
-        param.set(NostalgicUndertow, String(p->getUndertow()));
-        param.set(NostalgicTransposition, floatArrayToString(p->getTransposition()));
-        param.set(NostalgicGain, String(p->getGain()));
-        param.set(NostalgicLengthMultiplier, String(p->getLengthMultiplier()));
-        param.set(NostalgicBeatsToSkip, String(p->getBeatsToSkip()));
-        param.set(NostalgicMode, String(p->getMode()));
-        param.set(NostalgicReverseADSR, floatArrayToString(p->getReverseADSRvals()));
-        param.set(NostalgicUndertowADSR, floatArrayToString(p->getUndertowADSRvals()));
-        param.set(NostalgicHoldMin, String(p->getHoldMin()));
-        param.set(NostalgicHoldMax, String(p->getHoldMax()));
-        param.set(NostalgicClusterMin, String(p->getClusterMin()));
-        param.set(NostalgicKeyOnReset, String((int)p->getKeyOnReset()));
-        param.set(NostalgicVelocityMin, String(p->getVelocityMin()));
-        param.set(NostalgicVelocityMax, String(p->getVelocityMax()));
-    }
-
-	inline bool compare(NostalgicModPreparation::Ptr t)
-	{
-		return (getParam(NostalgicWaveDistance) == t->getParam(NostalgicWaveDistance) &&
-			getParam(NostalgicUndertow) == t->getParam(NostalgicUndertow) &&
-			getParam(NostalgicTransposition) == t->getParam(NostalgicTransposition) &&
-			getParam(NostalgicGain) == t->getParam(NostalgicGain) &&
-			getParam(NostalgicLengthMultiplier) == t->getParam(NostalgicLengthMultiplier) &&
-			getParam(NostalgicBeatsToSkip) == t->getParam(NostalgicBeatsToSkip) &&
-			getParam(NostalgicMode) == t->getParam(NostalgicMode) &&
-			getParam(NostalgicReverseADSR) == t->getParam(NostalgicReverseADSR) &&
-			getParam(NostalgicUndertowADSR) == t->getParam(NostalgicUndertowADSR) &&
-                getParam(NostalgicHoldMin) == t->getParam(NostalgicHoldMin) &&
-                getParam(NostalgicHoldMax) == t->getParam(NostalgicHoldMax) &&
-                getParam(NostalgicClusterMin) == t->getParam(NostalgicClusterMin) &&
-                getParam(NostalgicKeyOnReset) == t->getParam(NostalgicKeyOnReset) &&
-                getParam(NostalgicVelocityMin) == t->getParam(NostalgicVelocityMin) &&
-                getParam(NostalgicVelocityMax) == t->getParam(NostalgicVelocityMax) );
-	}
-
-	inline void randomize()
-	{
-		NostalgicPreparation p;
-		p.randomize();
-
-		param.set(NostalgicWaveDistance, String(p.getWavedistance()));
-		param.set(NostalgicUndertow, String(p.getUndertow()));
-		param.set(NostalgicTransposition, floatArrayToString(p.getTransposition()));
-		param.set(NostalgicGain, String(p.getGain()));
-		param.set(NostalgicLengthMultiplier, String(p.getLengthMultiplier()));
-		param.set(NostalgicBeatsToSkip, String(p.getBeatsToSkip()));
-		param.set(NostalgicMode, String(p.getMode()));
-		param.set(NostalgicReverseADSR, floatArrayToString(p.getReverseADSRvals()));
-		param.set(NostalgicUndertowADSR, floatArrayToString(p.getUndertowADSRvals()));
-        param.set(NostalgicHoldMin, String(p.getHoldMin()));
-        param.set(NostalgicHoldMax, String(p.getHoldMax()));
-        param.set(NostalgicClusterMin, String(p.getClusterMin()));
-        param.set(NostalgicKeyOnReset, String((int)p.getKeyOnReset()));
-        param.set(NostalgicVelocityMin, String(p.getVelocityMin()));
-        param.set(NostalgicVelocityMax, String(p.getVelocityMax()));
-	}
-    
-    inline void copy(NostalgicModPreparation::Ptr p)
-    {
-        for (int i = NostalgicId+1; i < NostalgicParameterTypeNil; i++)
-        {
-            param.set(i, p->getParam((NostalgicParameterType)i));
-        }
-    }
-    
-    void clearAll()
-    {
-        for (int i = NostalgicId+1; i < NostalgicParameterTypeNil; i++)
-        {
-            param.set(i, "");
-        }
-    }
-    
-    inline const StringArray getStringArray(void) { return param; }
-    
-    inline const String getParam(NostalgicParameterType type)
-    {
-        if (type != NostalgicId)
-            return param[type];
-        else
-            return "";
-    }
-    
-    inline void setParam(NostalgicParameterType type, String val) { param.set(type, val);}
-    
-    void print(void)
-    {
-        
-    }
-    
-    inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName) {name = newName;}
-    
-private:
-    int Id;
-    String name;
-    StringArray          param;
-    
-    JUCE_LEAK_DETECTOR(NostalgicModPreparation);
 };
 
 class NostalgicProcessor : public ReferenceCountedObject

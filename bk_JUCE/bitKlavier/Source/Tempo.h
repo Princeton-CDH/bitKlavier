@@ -148,6 +148,46 @@ public:
         DBG("| - - - - - - - - -- - - - - - - - - |");
     }
     
+    ValueTree getState(void)
+    {
+        ValueTree prep("params");
+        
+        prep.setProperty( ptagTempo_tempo,                 getTempo(), 0);
+        prep.setProperty( ptagTempo_system,                getTempoSystem(), 0);
+        prep.setProperty( ptagTempo_at1Mode,               getAdaptiveTempo1Mode(), 0 );
+        prep.setProperty( ptagTempo_at1History,            getAdaptiveTempo1History(), 0 );
+        prep.setProperty( ptagTempo_at1Subdivisions,       getAdaptiveTempo1Subdivisions(), 0 );
+        prep.setProperty( ptagTempo_at1Min,                getAdaptiveTempo1Min(), 0 );
+        prep.setProperty( ptagTempo_at1Max,                getAdaptiveTempo1Max(), 0 );
+        
+        return prep;
+    }
+    
+    void setState(XmlElement* e)
+    {
+        float f; int i;
+        f = e->getStringAttribute(ptagTempo_tempo).getFloatValue();
+        setTempo(f);
+        
+        i = e->getStringAttribute(ptagTempo_system).getIntValue();
+        setTempoSystem((TempoType)i);
+        
+        i = e->getStringAttribute(ptagTempo_at1Mode).getIntValue();
+        setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
+        
+        i = e->getStringAttribute(ptagTempo_at1History).getIntValue();
+        setAdaptiveTempo1History(i);
+        
+        f = e->getStringAttribute(ptagTempo_at1Subdivisions).getFloatValue();
+        setAdaptiveTempo1Subdivisions(f);
+        
+        f = e->getStringAttribute(ptagTempo_at1Min).getFloatValue();
+        setAdaptiveTempo1Min(f);
+        
+        f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
+        setAdaptiveTempo1Max(f);
+    }
+    
     
 private:
     String name;
@@ -220,22 +260,13 @@ public:
         prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name",                          name, 0);
         
-        prep.setProperty( ptagTempo_tempo,                           sPrep->getTempo(), 0);
-        prep.setProperty( ptagTempo_system,                sPrep->getTempoSystem(), 0);
-        prep.setProperty( ptagTempo_at1Mode,               sPrep->getAdaptiveTempo1Mode(), 0 );
-        prep.setProperty( ptagTempo_at1History,            sPrep->getAdaptiveTempo1History(), 0 );
-        prep.setProperty( ptagTempo_at1Subdivisions,       sPrep->getAdaptiveTempo1Subdivisions(), 0 );
-        prep.setProperty( ptagTempo_at1Min,                sPrep->getAdaptiveTempo1Min(), 0 );
-        prep.setProperty( ptagTempo_at1Max,                sPrep->getAdaptiveTempo1Max(), 0 );
+        prep.addChild(sPrep->getState(), -1, 0);
     
         return prep;
     }
     
     inline void setState(XmlElement* e)
     {
-        
-        float f; int i;
-        
         Id = e->getStringAttribute("Id").getIntValue();
         
         String n = e->getStringAttribute("name");
@@ -243,27 +274,17 @@ public:
         if (n != String::empty)     name = n;
         else                        name = String(Id);
         
-        f = e->getStringAttribute(ptagTempo_tempo).getFloatValue();
-        sPrep->setTempo(f);
         
-        i = e->getStringAttribute(ptagTempo_system).getIntValue();
-        sPrep->setTempoSystem((TempoType)i);
+        XmlElement* params = e->getChildByName("params");
         
-        i = e->getStringAttribute(ptagTempo_at1Mode).getIntValue();
-        sPrep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
-        
-        i = e->getStringAttribute(ptagTempo_at1History).getIntValue();
-        sPrep->setAdaptiveTempo1History(i);
-        
-        f = e->getStringAttribute(ptagTempo_at1Subdivisions).getFloatValue();
-        sPrep->setAdaptiveTempo1Subdivisions(f);
-        
-        f = e->getStringAttribute(ptagTempo_at1Min).getFloatValue();
-        sPrep->setAdaptiveTempo1Min(f);
-        
-        f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
-        sPrep->setAdaptiveTempo1Max(f);
-        
+        if (params != nullptr)
+        {
+            sPrep->setState(params);
+        }
+        else
+        {
+            sPrep->setState(e);
+        }
         
         aPrep->copy(sPrep);
     }
@@ -310,230 +331,6 @@ private:
     
 
     JUCE_LEAK_DETECTOR(Tempo)
-};
-
-class TempoModPreparation : public ReferenceCountedObject
-{
-public:
-    
-    typedef ReferenceCountedObjectPtr<TempoModPreparation>   Ptr;
-    typedef Array<TempoModPreparation::Ptr>                  PtrArr;
-    typedef Array<TempoModPreparation::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<TempoModPreparation>                  Arr;
-    typedef OwnedArray<TempoModPreparation, CriticalSection> CSArr;
-    
-    /*
-     TempoId = 0,
-     Tempo,
-     TempoMode,
-     AT1History,
-     AT1Subdivisions,
-     AT1Min,
-     AT1Max,
-     AT1Mode,
-     */
-    
-    TempoModPreparation(TempoPreparation::Ptr p, int Id):
-    Id(Id)
-    {
-        param.ensureStorageAllocated((int)cTempoParameterTypes.size());
-        
-        param.set(TempoBPM, String(p->getTempo()));
-        param.set(TempoSystem, String(p->getTempoSystem()));
-        param.set(AT1History, String(p->getAdaptiveTempo1History()));
-        param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
-        param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
-        param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
-        param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
-        
-    }
-    
-    
-    TempoModPreparation(int Id):
-    Id(Id)
-    {
-        param.set(TempoBPM, "");
-        param.set(TempoSystem, "");
-        param.set(AT1History, "");
-        param.set(AT1Subdivisions, "");
-        param.set(AT1Min, "");
-        param.set(AT1Max, "");
-        param.set(AT1Mode, "");
-    }
-    
-    inline TempoModPreparation::Ptr duplicate(void)
-    {
-        TempoModPreparation::Ptr copyPrep = new TempoModPreparation(-1);
-       
-        copyPrep->copy(this);
-        
-        copyPrep->setName(this->getName() );
-        
-        return copyPrep;
-    }
-    
-    ~TempoModPreparation(void)
-    {
-        
-    }
-    
-    inline void copy(TempoPreparation::Ptr p)
-    {
-        param.set(TempoBPM, String(p->getTempo()));
-        param.set(TempoSystem, String(p->getTempoSystem()));
-        param.set(AT1History, String(p->getAdaptiveTempo1History()));
-        param.set(AT1Subdivisions, String(p->getAdaptiveTempo1Subdivisions()));
-        param.set(AT1Min, String(p->getAdaptiveTempo1Min()));
-        param.set(AT1Max, String(p->getAdaptiveTempo1Max()));
-        param.set(AT1Mode, String(p->getAdaptiveTempo1Mode()));
-    }
-    
-    inline void copy(TempoModPreparation::Ptr p)
-    {
-        for (int i = TempoId+1; i < TempoParameterTypeNil; i++)
-        {
-            param.set(i, p->getParam((TempoParameterType)i));
-        }
-    }
-    
-    inline bool compare(TempoModPreparation::Ptr t)
-    {
-        return (getParam(TempoBPM)          == t->getParam(TempoBPM) &&
-                getParam(TempoSystem)       == t->getParam(TempoSystem) &&
-                getParam(AT1History)        == t->getParam(AT1History) &&
-                getParam(AT1Subdivisions)   == t->getParam(AT1Subdivisions) &&
-                getParam(AT1Min)            == t->getParam(AT1Min) &&
-                getParam(AT1Max)            == t->getParam(AT1Max) &&
-                getParam(AT1Mode)           == t->getParam(AT1Mode));
-    }
-    
-	inline void randomize(void)
-	{
-		TempoPreparation p;
-		p.randomize();
-
-		param.set(TempoBPM, String(p.getTempo()));
-		param.set(TempoSystem, String(p.getTempoSystem()));
-		param.set(AT1History, String(p.getAdaptiveTempo1History()));
-		param.set(AT1Subdivisions, String(p.getAdaptiveTempo1Subdivisions()));
-		param.set(AT1Min, String(p.getAdaptiveTempo1Min()));
-		param.set(AT1Max, String(p.getAdaptiveTempo1Max()));
-		param.set(AT1Mode, String(p.getAdaptiveTempo1Mode()));
-	}
-
-    void clearAll()
-    {
-        for (int i = TempoId+1; i < TempoParameterTypeNil; i++)
-        {
-            param.set(i, "");
-        }
-    }
-    
-    
-    inline void setId(int newId)
-    {
-        Id = newId;
-    }
-    
-    inline int getId(void) const noexcept { return Id; }
-    
-    inline ValueTree getState(void)
-    {
-        
-        ValueTree prep(vtagModTempo);
-        
-        prep.setProperty( "Id",Id, 0);
-        
-        prep.setProperty("name",name,0);
-        
-        String p = getParam(TempoBPM);
-        if (p != String::empty) prep.setProperty( ptagTempo_tempo, p.getFloatValue(), 0);
-        
-        p = getParam(TempoSystem);
-        if (p != String::empty) prep.setProperty( ptagTempo_system, p.getIntValue(), 0);
-        
-        p = getParam(AT1History);
-        if (p != String::empty) prep.setProperty( ptagTempo_at1History, p.getIntValue(), 0 );
-        
-        p = getParam(AT1Subdivisions);
-        if (p != String::empty) prep.setProperty( ptagTempo_at1Subdivisions, p.getIntValue(), 0 );
-        
-        p = getParam(AT1Min);
-        if (p != String::empty) prep.setProperty( ptagTempo_at1Min, p.getIntValue(), 0 );
-        
-        p = getParam(AT1Max);
-        if (p != String::empty) prep.setProperty( ptagTempo_at1Max, p.getIntValue(), 0 );
-        
-        p = getParam(AT1Mode);
-        if (p != String::empty) prep.setProperty( ptagTempo_at1Mode, p.getIntValue(), 0 );
-        
-    
-        return prep;
-        
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        
-        Id = e->getStringAttribute("Id").getIntValue();
-        
-        String n = e->getStringAttribute("name");
-        
-        
-        if (n != String::empty)     name = n;
-        else                        name = "mm"+String(Id);
- 
-        String p = e->getStringAttribute(ptagTempo_tempo);
-        setParam(TempoBPM, p);
-        
-        p = e->getStringAttribute(ptagTempo_system);
-        setParam(TempoSystem, p);
-        
-        p = e->getStringAttribute(ptagTempo_at1Mode);
-        setParam(AT1Mode, p);
-        
-        p = e->getStringAttribute(ptagTempo_at1History);
-        setParam(AT1History, p);
-        
-        p = e->getStringAttribute(ptagTempo_at1Subdivisions);
-        setParam(AT1Subdivisions, p);
-        
-        p = e->getStringAttribute(ptagTempo_at1Min);
-        setParam(AT1Min, p);
-        
-        p = e->getStringAttribute(ptagTempo_at1Max);
-        setParam(AT1Max, p);
-        
-    }
-    
-    
-    inline const String getParam(TempoParameterType type)
-    {
-        if (type != TempoId)   return param[type];
-        else                    return "";
-    }
-    
-    inline const StringArray getStringArray(void) { return param; }
-    
-    inline void setParam(TempoParameterType type, String val)
-    {
-        param.set(type, val);
-    }
-    
-    void print(void)
-    {
-        
-    }
-    
-    inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName) {name = newName;}
-    
-private:
-    int Id;
-    String name;
-    StringArray          param;
-    
-    JUCE_LEAK_DETECTOR(TempoModPreparation);
 };
 
 class TempoProcessor  : public ReferenceCountedObject

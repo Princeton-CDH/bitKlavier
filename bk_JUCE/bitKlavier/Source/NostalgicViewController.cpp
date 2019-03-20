@@ -790,23 +790,23 @@ void NostalgicModificationEditor::greyOutAllComponents()
 
 void NostalgicModificationEditor::highlightModedComponents()
 {
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
 
-    if(mod->getParam(NostalgicWaveDistance) != "")      nDisplaySlider.setBright();
-    if(mod->getParam(NostalgicUndertow) != "")          nDisplaySlider.setBright();
-    if(mod->getParam(NostalgicTransposition) != "")     transpositionSlider->setBright();
-    if(mod->getParam(NostalgicLengthMultiplier) != "")  lengthMultiplierSlider->setBright();
-    if(mod->getParam(NostalgicBeatsToSkip) != "")       beatsToSkipSlider->setBright();
-    if(mod->getParam(NostalgicMode) != "")              lengthModeSelectCB.setAlpha(1.);
-    if(mod->getParam(NostalgicGain) != "")              gainSlider->setBright();
-    if(mod->getParam(NostalgicReverseADSR) != "")       reverseADSRSlider->setBright();
-    if(mod->getParam(NostalgicUndertowADSR) != "")      undertowADSRSlider->setBright();
-    if(mod->getParam(NostalgicHoldMin) != "")           holdTimeMinMaxSlider->setBright();
-    if(mod->getParam(NostalgicHoldMax) != "")           holdTimeMinMaxSlider->setBright();
-    if(mod->getParam(NostalgicVelocityMin) != "")       velocityMinMaxSlider->setBright();
-    if(mod->getParam(NostalgicVelocityMax) != "")       velocityMinMaxSlider->setBright();
-    if(mod->getParam(NostalgicClusterMin) != "")        clusterMinSlider->setBright();
-    if(mod->getParam(NostalgicKeyOnReset) != "")        { keyOnResetToggle.setAlpha(1.); keyOnResetLabel.setAlpha(1.); }
+    if(mod->getDirty(NostalgicWaveDistance))      nDisplaySlider.setBright();
+    if(mod->getDirty(NostalgicUndertow))          nDisplaySlider.setBright();
+    if(mod->getDirty(NostalgicTransposition))     transpositionSlider->setBright();
+    if(mod->getDirty(NostalgicLengthMultiplier))  lengthMultiplierSlider->setBright();
+    if(mod->getDirty(NostalgicBeatsToSkip))       beatsToSkipSlider->setBright();
+    if(mod->getDirty(NostalgicMode))              lengthModeSelectCB.setAlpha(1.);
+    if(mod->getDirty(NostalgicGain))              gainSlider->setBright();
+    if(mod->getDirty(NostalgicReverseADSR))       reverseADSRSlider->setBright();
+    if(mod->getDirty(NostalgicUndertowADSR))      undertowADSRSlider->setBright();
+    if(mod->getDirty(NostalgicHoldMin))           holdTimeMinMaxSlider->setBright();
+    if(mod->getDirty(NostalgicHoldMax))           holdTimeMinMaxSlider->setBright();
+    if(mod->getDirty(NostalgicVelocityMin))       velocityMinMaxSlider->setBright();
+    if(mod->getDirty(NostalgicVelocityMax))       velocityMinMaxSlider->setBright();
+    if(mod->getDirty(NostalgicClusterMin))        clusterMinSlider->setBright();
+    if(mod->getDirty(NostalgicKeyOnReset))        { keyOnResetToggle.setAlpha(1.); keyOnResetLabel.setAlpha(1.); }
 }
 
 void NostalgicModificationEditor::update(void)
@@ -814,7 +814,7 @@ void NostalgicModificationEditor::update(void)
     if (processor.updateState->currentModNostalgicId < 0) return;
     
     
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
     
     if (mod != nullptr)
     {
@@ -825,14 +825,11 @@ void NostalgicModificationEditor::update(void)
         
         selectCB.setSelectedId(processor.updateState->currentModNostalgicId, dontSendNotification);
         
-        String val = mod->getParam(NostalgicWaveDistance);
-        nDisplaySlider.setWaveDistance(val.getIntValue(), dontSendNotification);
+        nDisplaySlider.setWaveDistance(mod->getWavedistance(), dontSendNotification);
         
-        val = mod->getParam(NostalgicUndertow);
-        nDisplaySlider.setUndertow(val.getIntValue(), dontSendNotification);
+        nDisplaySlider.setUndertow(mod->getUndertow(), dontSendNotification);
         
-        val = mod->getParam(NostalgicMode);
-        NostalgicSyncMode mode = (NostalgicSyncMode) val.getIntValue();
+        NostalgicSyncMode mode = (NostalgicSyncMode) mod->getMode();
         lengthModeSelectCB.setSelectedItemIndex(mode, dontSendNotification);
         
         if(mode == NoteLengthSync)
@@ -845,42 +842,31 @@ void NostalgicModificationEditor::update(void)
             lengthMultiplierSlider->setVisible(false);
             beatsToSkipSlider->setVisible(true);
         }
+
+        transpositionSlider->setTo(mod->getTransposition(), dontSendNotification);
         
-        val = mod->getParam(NostalgicTransposition);
-        transpositionSlider->setTo(stringToFloatArray(val), dontSendNotification);
+        lengthMultiplierSlider->setValue(mod->getLengthMultiplier(), dontSendNotification);
         
-        val = mod->getParam(NostalgicLengthMultiplier);
-        lengthMultiplierSlider->setValue(val.getFloatValue(), dontSendNotification);
+        beatsToSkipSlider->setValue(mod->getBeatsToSkip(), dontSendNotification);
         
-        val = mod->getParam(NostalgicBeatsToSkip);
-        beatsToSkipSlider->setValue(val.getFloatValue(), dontSendNotification);
+        gainSlider->setValue(mod->getGain(), dontSendNotification);
         
-        val = mod->getParam(NostalgicGain);
-        gainSlider->setValue(val.getFloatValue(), dontSendNotification);
+
+        reverseADSRSlider->setValue(mod->getReverseADSRvals(), dontSendNotification);
         
-        val = mod->getParam(NostalgicReverseADSR);
-        reverseADSRSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        undertowADSRSlider->setValue(mod->getUndertowADSRvals(), dontSendNotification);
         
-        val = mod->getParam(NostalgicUndertowADSR);
-        undertowADSRSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        holdTimeMinMaxSlider->setMinValue(mod->getHoldMin(), dontSendNotification);
         
-        val = mod->getParam(NostalgicHoldMin);
-        holdTimeMinMaxSlider->setMinValue(val.getFloatValue(), dontSendNotification);
+        holdTimeMinMaxSlider->setMaxValue(mod->getHoldMax(), dontSendNotification);
         
-        val = mod->getParam(NostalgicHoldMax);
-        holdTimeMinMaxSlider->setMaxValue(val.getFloatValue(), dontSendNotification);
+        velocityMinMaxSlider->setMinValue(mod->getVelocityMin(), dontSendNotification);
         
-        val = mod->getParam(NostalgicVelocityMin);
-        velocityMinMaxSlider->setMinValue(val.getFloatValue(), dontSendNotification);
+        velocityMinMaxSlider->setMaxValue(mod->getVelocityMax(), dontSendNotification);
         
-        val = mod->getParam(NostalgicVelocityMax);
-        velocityMinMaxSlider->setMaxValue(val.getFloatValue(), dontSendNotification);
-        
-        val = mod->getParam(NostalgicClusterMin);
-        clusterMinSlider->setValue(val.getFloatValue(), dontSendNotification);
+        clusterMinSlider->setValue(mod->getClusterMin(), dontSendNotification);
     
-        val = mod->getParam(NostalgicKeyOnReset);
-        keyOnResetToggle.setToggleState((bool)val.getIntValue(), dontSendNotification);
+        keyOnResetToggle.setToggleState((bool)mod->getKeyOnReset(), dontSendNotification);
     }
     
     
@@ -891,7 +877,7 @@ void NostalgicModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    for (auto prep : processor.gallery->getNostalgicModPreparations())
+    for (auto prep : processor.gallery->getNostalgicModifications())
     {
         int Id = prep->getId();;
         String name = prep->getName();
@@ -935,10 +921,13 @@ void NostalgicModificationEditor::timerCallback()
 
 void NostalgicModificationEditor::BKWaveDistanceUndertowSliderValueChanged(String name, double wavedist, double undertow)
 {
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
     
-    mod     ->setParam(NostalgicWaveDistance, String(wavedist));
-    mod     ->setParam(NostalgicUndertow, String(undertow));
+    mod->setDirty(NostalgicWaveDistance);
+    mod->setWaveDistance(wavedist);
+    
+    mod->setDirty(NostalgicUndertow);
+    mod->setUndertow(undertow);
     
     nDisplaySlider.setBright();
     
@@ -947,7 +936,7 @@ void NostalgicModificationEditor::BKWaveDistanceUndertowSliderValueChanged(Strin
 
 void NostalgicModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
     
     mod->setName(name);
     
@@ -966,14 +955,14 @@ int NostalgicModificationEditor::addPreparation(void)
 {
     processor.gallery->add(PreparationTypeNostalgicMod);
     
-    return processor.gallery->getNostalgicModPreparations().getLast()->getId();
+    return processor.gallery->getNostalgicModifications().getLast()->getId();
 }
 
 int NostalgicModificationEditor::duplicatePreparation(void)
 {
     processor.gallery->duplicate(PreparationTypeNostalgicMod, processor.updateState->currentModNostalgicId);
     
-    return processor.gallery->getNostalgicModPreparations().getLast()->getId();
+    return processor.gallery->getNostalgicModifications().getLast()->getId();
 }
 
 void NostalgicModificationEditor::deleteCurrent(void)
@@ -1036,7 +1025,7 @@ void NostalgicModificationEditor::actionButtonCallback(int action, NostalgicModi
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentModNostalgicId;
-        NostalgicModPreparation::Ptr prep = processor.gallery->getNostalgicModPreparation(Id);
+        NostalgicModification::Ptr prep = processor.gallery->getNostalgicModification(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -1069,11 +1058,12 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == "Length Mode")
     {
-        NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+        NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
         
         NostalgicSyncMode mode = (NostalgicSyncMode) index;
         
-        mod->setParam(NostalgicMode, String(mode));
+        mod->setMode(mode);
+        mod->setDirty(NostalgicMode);
         
         if(mode == NoteLengthSync)
         {
@@ -1096,26 +1086,34 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
     
     if(name == "note length multiplier")
     {
-        mod->setParam(NostalgicLengthMultiplier, String(val));
+        mod->setLengthMultiplier(val);
+        mod->setDirty(NostalgicLengthMultiplier);
+        
         lengthMultiplierSlider->setBright();
     }
     else if(name == "beats to skip")
     {
-        mod->setParam(NostalgicBeatsToSkip, String(val));
+        mod->setBeatsToSkip(val);
+        mod->setDirty(NostalgicBeatsToSkip);
+        
         beatsToSkipSlider->setBright();
     }
     else if(name == "gain")
     {
-        mod->setParam(NostalgicGain, String(val));
+        mod->setGain(val);
+        mod->setDirty(NostalgicGain);
+        
         gainSlider->setBright();
     }
     else if (name == "cluster min")
     {
-        mod->setParam(NostalgicClusterMin, String(val));
+        mod->setClusterMin(val);
+        mod->setDirty(NostalgicClusterMin);
+        
         clusterMinSlider->setBright();
     }
     
@@ -1124,9 +1122,11 @@ void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
 
 void NostalgicModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
     
-    mod->setParam(NostalgicTransposition, floatArrayToString(val));
+    mod->setTransposition(val);
+    mod->setDirty(NostalgicTransposition);
+    
     transpositionSlider->setBright();
     
     updateModification();
@@ -1139,7 +1139,7 @@ void NostalgicModificationEditor::updateModification(void)
 
 void NostalgicModificationEditor::buttonClicked (Button* b)
 {
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
     
     if (b == &hideOrShow)
     {
@@ -1151,7 +1151,9 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &keyOnResetToggle)
     {
-        mod->setParam(NostalgicKeyOnReset, String((int)b->getToggleState()));
+        mod->setKeyOnReset(b->getToggleState());
+        mod->setDirty(NostalgicKeyOnReset);
+        
         keyOnResetToggle.setAlpha(1.);
         keyOnResetLabel.setAlpha(1.);
     }
@@ -1161,17 +1163,21 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
 
 void NostalgicModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
 {
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
     
     Array<float> newvals = {(float)attack, (float)decay, sustain, (float)release};
     if(name == reverseADSRSlider->getName())
     {
-        mod->setParam(NostalgicReverseADSR, floatArrayToString(newvals));
+        mod->setReverseADSRvals(newvals);
+        mod->setDirty(NostalgicReverseADSR);
+        
         reverseADSRSlider->setBright();
     }
     else if(name == undertowADSRSlider->getName())
     {
-        mod->setParam(NostalgicUndertowADSR, floatArrayToString(newvals));
+        mod->setUndertowADSRvals(newvals);
+        mod->setDirty(NostalgicUndertowADSR);
+        
         undertowADSRSlider->setBright();
     }
 
@@ -1187,18 +1193,26 @@ void NostalgicModificationEditor::BKADSRButtonStateChanged(String name, bool mod
 
 void NostalgicModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    NostalgicModPreparation::Ptr mod = processor.gallery->getNostalgicModPreparation(processor.updateState->currentModNostalgicId);
+    NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
     
     if (name == "hold time (ms)")
     {
-        mod->setParam(NostalgicHoldMin, String(minval));
-        mod->setParam(NostalgicHoldMax, String(maxval));
+        mod->setHoldMin(minval);
+        mod->setDirty(NostalgicHoldMin);
+        
+        mod->setHoldMax(maxval);
+        mod->setDirty(NostalgicHoldMax);
+        
         holdTimeMinMaxSlider->setBright();
     }
     else if (name == "velocity min/max (0-127)")
     {
-        mod->setParam(NostalgicVelocityMin, String(minval));
-        mod->setParam(NostalgicVelocityMax, String(maxval));
+        mod->setVelocityMin(minval);
+        mod->setDirty(NostalgicVelocityMin);
+        
+        mod->setVelocityMax(maxval);
+        mod->setDirty(NostalgicVelocityMax);
+        
         velocityMinMaxSlider->setBright();
     }
 }

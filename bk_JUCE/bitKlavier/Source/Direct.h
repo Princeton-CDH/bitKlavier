@@ -159,7 +159,82 @@ public:
         DBG("dRelease: "        + String(dRelease));
     }
     
+    ValueTree getState(void)
+    {
+        ValueTree prep( "params" );
     
+        prep.setProperty( ptagDirect_gain,              getGain(), 0);
+        prep.setProperty( ptagDirect_resGain,           getResonanceGain(), 0);
+        prep.setProperty( ptagDirect_hammerGain,        getHammerGain(), 0);
+        
+        ValueTree transp( vtagDirect_transposition);
+        Array<float> m = getTransposition();
+        int count = 0;
+        for (auto f : m)    transp.setProperty( ptagFloat + String(count++), f, 0);
+        prep.addChild(transp, -1, 0);
+        
+        ValueTree ADSRvals( vtagDirect_ADSR);
+        m = getADSRvals();
+        count = 0;
+        for (auto f : m) ADSRvals.setProperty( ptagFloat + String(count++), f, 0);
+        prep.addChild(ADSRvals, -1, 0);
+        
+        return prep;
+    }
+    
+    void setState(XmlElement* e)
+    {
+        float f; int i;
+        
+        f = e->getStringAttribute(ptagDirect_gain).getFloatValue();
+        setGain(f);
+        
+        f = e->getStringAttribute(ptagDirect_hammerGain).getFloatValue();
+        setHammerGain(f);
+        
+        f = e->getStringAttribute(ptagDirect_resGain).getFloatValue();
+        setResonanceGain(f);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagDirect_transposition))
+            {
+                Array<float> transp;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        transp.add(f);
+                    }
+                }
+                
+                setTransposition(transp);
+                
+            }
+            else  if (sub->hasTagName(vtagDirect_ADSR))
+            {
+                Array<float> envVals;
+                for (int k = 0; k < 4; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        envVals.add(f);
+                    }
+                }
+                
+                setADSRvals(envVals);
+                
+            }
+        }
+    }
 
 private:
     String  name;
@@ -224,34 +299,18 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree prep( vtagDirect);
+        ValueTree prep(vtagDirect);
         
         prep.setProperty( "Id",Id, 0);
-        prep.setProperty( "name", name, 0);
+        prep.setProperty( "name",                          name, 0);
         
-        prep.setProperty( ptagDirect_gain,              sPrep->getGain(), 0);
-        prep.setProperty( ptagDirect_resGain,           sPrep->getResonanceGain(), 0);
-        prep.setProperty( ptagDirect_hammerGain,        sPrep->getHammerGain(), 0);
-        
-        ValueTree transp( vtagDirect_transposition);
-        Array<float> m = sPrep->getTransposition();
-        int count = 0;
-        for (auto f : m)    transp.setProperty( ptagFloat + String(count++), f, 0);
-        prep.addChild(transp, -1, 0);
-        
-        ValueTree ADSRvals( vtagDirect_ADSR);
-        m = sPrep->getADSRvals();
-        count = 0;
-        for (auto f : m) ADSRvals.setProperty( ptagFloat + String(count++), f, 0);
-        prep.addChild(ADSRvals, -1, 0);
+        prep.addChild(sPrep->getState(), -1, 0);
         
         return prep;
     }
     
     inline void setState(XmlElement* e)
     {
-        float f;
-        
         Id = e->getStringAttribute("Id").getIntValue();
         
         String n = e->getStringAttribute("name");
@@ -259,55 +318,18 @@ public:
         if (n != String::empty)     name = n;
         else                        name = String(Id);
         
-        f = e->getStringAttribute(ptagDirect_gain).getFloatValue();
-        sPrep->setGain(f);
         
-        f = e->getStringAttribute(ptagDirect_hammerGain).getFloatValue();
-        sPrep->setHammerGain(f);
+        XmlElement* params = e->getChildByName("params");
         
-        f = e->getStringAttribute(ptagDirect_resGain).getFloatValue();
-        sPrep->setResonanceGain(f);
-        
-        forEachXmlChildElement (*e, sub)
+        if (params != nullptr)
         {
-            if (sub->hasTagName(vtagDirect_transposition))
-            {
-                Array<float> transp;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        transp.add(f);
-                    }
-                }
-                
-                sPrep->setTransposition(transp);
-                
-            }
-            else  if (sub->hasTagName(vtagDirect_ADSR))
-            {
-                Array<float> envVals;
-                for (int k = 0; k < 4; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        envVals.add(f);
-                    }
-                }
-                
-                sPrep->setADSRvals(envVals);
-                
-            }
+            sPrep->setState(params);
         }
-        // copy static to active
+        else
+        {
+            sPrep->setState(e);
+        }
+        
         aPrep->copy(sPrep);
     }
     
@@ -346,250 +368,6 @@ private:
     String name;;
     
     JUCE_LEAK_DETECTOR(Direct)
-};
-
-class DirectModPreparation : public ReferenceCountedObject
-{
-public:
-    
-    typedef ReferenceCountedObjectPtr<DirectModPreparation>   Ptr;
-    typedef Array<DirectModPreparation::Ptr>                  PtrArr;
-    typedef Array<DirectModPreparation::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<DirectModPreparation>                  Arr;
-    typedef OwnedArray<DirectModPreparation, CriticalSection> CSArr;
-
-    DirectModPreparation(DirectPreparation::Ptr p, int Id):
-    Id(Id)
-    {
-        init();
-        param.set(DirectTransposition, floatArrayToString(p->getTransposition()));
-        param.set(DirectGain, String(p->getGain()));
-        param.set(DirectResGain, String(p->getResonanceGain()));
-        param.set(DirectHammerGain, String(p->getHammerGain()));
-        param.set(DirectADSR, floatArrayToString(p->getADSRvals()));
-    }
-    
-    
-    DirectModPreparation(int Id):
-    Id(Id)
-    {
-        init();
-    }
-    
-    inline void init(void)
-    {
-        param.clear();
-        param.ensureStorageAllocated((int)DirectParameterTypeNil);
-        for (int i = 0; i < DirectParameterTypeNil; i++) param.add({});
-        param.set(DirectTransposition, {});
-        param.set(DirectGain, {});
-        param.set(DirectResGain, {});
-        param.set(DirectHammerGain, {});
-        param.set(DirectTuning, "blah");
-        param.set(DirectADSR, {});
-    }
-    
-    inline void randomize (void)
-    {
-		DirectPreparation p;
-		p.randomize();
-        
-        param.set(DirectTransposition, floatArrayToString(p.getTransposition()));
-        param.set(DirectGain, String(p.getGain()));
-        param.set(DirectResGain, String(p.getResonanceGain()));
-        param.set(DirectTuning, "blah");
-        param.set(DirectHammerGain, String(p.getHammerGain()));
-        param.set(DirectADSR, floatArrayToString(p.getADSRvals()));
-    }
-    
-    inline bool compare(DirectModPreparation::Ptr dm)
-    {
-        for (int i = 0; i < param.size(); ++i)
-        {
-            DBG("param" + String(i) + "A " + param[i]);
-            DBG("param" + String(i) + "B " + dm->param[i]);
-            
-            if (param[i] != dm->param[i]) return false;
-        }
-        
-        return true;
-    }
-    
-    inline DirectModPreparation::Ptr duplicate(void)
-    {
-        DirectModPreparation::Ptr copyPrep = new DirectModPreparation(-1);
-        
-        copyPrep->copy(this);
-        
-        copyPrep->setName(getName());
-        
-        return copyPrep;
-    }
-    
-    inline ValueTree getState(void)
-    {
-        ValueTree prep( vtagModDirect);
-        
-        prep.setProperty( "Id",Id, 0);
-        
-        String p = "";
-        
-        ValueTree transp( vtagDirect_transposition);
-        int count = 0;
-        p = getParam(DirectTransposition);
-        if (p != "")
-        {
-            Array<float> m = stringToFloatArray(p);
-            for (auto f : m)
-            {
-                transp.      setProperty( ptagFloat + String(count++), f, 0);
-            }
-        }
-        prep.addChild(transp, -1, 0);
-        
-        ValueTree envelope( vtagDirect_ADSR);
-        count = 0;
-        p = getParam(DirectADSR);
-        if (p != "")
-        {
-            Array<float> m = stringToFloatArray(p);
-            for (auto f : m)
-            {
-                envelope.      setProperty( ptagFloat + String(count++), f, 0);
-            }
-        }
-        prep.addChild(envelope, -1, 0);
-        
-        p = getParam(DirectGain);
-        if (p != "") prep.setProperty( ptagDirect_gain,              p.getFloatValue(), 0);
-        
-        p = getParam(DirectResGain);
-        if (p != "") prep.setProperty( ptagDirect_resGain,           p.getFloatValue(), 0);
-        
-        p = getParam(DirectHammerGain);
-        if (p != "") prep.setProperty( ptagDirect_hammerGain,        p.getFloatValue(), 0);
-        
-        
-        return prep;
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        float f;
-        
-        Id = e->getStringAttribute("Id").getIntValue();
-        
-        String p = e->getStringAttribute(ptagDirect_gain);
-        setParam(DirectGain, p);
-        
-        p = e->getStringAttribute(ptagDirect_hammerGain);
-        setParam(DirectHammerGain, p);
-        
-        p = e->getStringAttribute(ptagDirect_resGain);
-        setParam(DirectResGain, p);
-        
-        forEachXmlChildElement (*e, sub)
-        {
-            if (sub->hasTagName(vtagDirect_transposition))
-            {
-                Array<float> transp;
-                
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        transp.add(f);
-                    }
-                }
-                
-                setParam(DirectTransposition, floatArrayToString(transp));
-                
-            }
-            else if (sub->hasTagName(vtagDirect_ADSR))
-            {
-                Array<float> envelope;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        envelope.add(f);
-                    }
-                }
-                
-                setParam(DirectADSR, floatArrayToString(envelope));
-            }
-        }
-    }
-    
-    ~DirectModPreparation(void)
-    {
-        
-    }
-    
-    inline void copy(DirectPreparation::Ptr d)
-    {
-        param.set(DirectTransposition, floatArrayToString(d->getTransposition()));
-        param.set(DirectGain, String(d->getGain()));
-        param.set(DirectResGain, String(d->getResonanceGain()));
-        param.set(DirectHammerGain, String(d->getHammerGain()));
-        param.set(DirectADSR, floatArrayToString(d->getADSRvals()));
-    }
-    
-    inline void copy(DirectModPreparation::Ptr p)
-    {
-        for (int i = DirectId+1; i < DirectParameterTypeNil; i++)
-        {
-            param.set(i, p->getParam((DirectParameterType)i));
-        }
-    }
-    
-    void clearAll()
-    {
-        for (int i = DirectId+1; i < DirectParameterTypeNil; i++)
-        {
-            param.set(i, " ");
-        }
-    }
-    
-    inline const String getParam(DirectParameterType type)
-    {
-        if (type != DirectId)   { return param[type]; }
-        else                    return " ";
-    }
-    
-    inline void setParam(DirectParameterType type, String val)
-    {
-        param.set((int)type, val);
-    }
-
-    
-    inline const StringArray getStringArray(void) { return param; }
-    
-    void print(void)
-    {
-        DBG("hey");
-    }
-    
-    inline void setId(int newId) { Id = newId; }
-    inline int getId(void)const noexcept {return Id;}
-    
-    inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName) {name = newName;}
-    
-private:
-    int Id;
-    String name;
-    StringArray          param;
-    
-    JUCE_LEAK_DETECTOR(DirectModPreparation);
 };
 
 class DirectProcessor : public ReferenceCountedObject
@@ -660,6 +438,5 @@ private:
     
     JUCE_LEAK_DETECTOR(DirectProcessor);
 };
-
 
 #endif  // DIRECT_H_INCLUDED

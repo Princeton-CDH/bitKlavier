@@ -57,8 +57,7 @@ public:
     TuningModification::PtrArr getTuningModifications(void);
     
     TempoModification::PtrArr getTempoModifications(void);
-    
-    String  stringRepresentation(void);
+
     
     void clearModifications(void);
     void clearResets(void);
@@ -75,7 +74,6 @@ private:
     NostalgicModification::PtrArr   nostalgicMods;
     TuningModification::PtrArr      tuningMods;
     TempoModification::PtrArr       tempoMods;
-    
     
     JUCE_LEAK_DETECTOR(Modifications)
 };

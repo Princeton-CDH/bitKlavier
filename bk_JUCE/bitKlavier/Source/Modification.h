@@ -14,12 +14,21 @@
 
 #include "BKUtilities.h"
 
-class Modification : public ReferenceCountedObject
+#include "Direct.h"
+#include "Nostalgic.h"
+#include "Synchronic.h"
+#include "Tuning.h"
+#include "Tempo.h"
+
+class Modification
 {
 public:
-    Modification()
+    Modification(int Id, int note, int numParams):
+    Id(Id),
+    note(note)
     {
-        
+        dirty.ensureStorageAllocated(numParams);
+        for (int i = 0; i < numParams; i++) dirty.add(false);
     }
     
     ~Modification()
@@ -29,44 +38,48 @@ public:
     
     inline void setId(int I){ Id = I; }
     inline void setNote(int n){note=n;}
-    inline void setPrepId(int Id) { prepId = Id; }
-    inline void setModBool(bool val) { modBool = val; }
-    inline void setModInt(int val){modInt = val;}
-    inline void setModFloat(float val){modFloat = val;}
-    inline void setModIntArr(Array<int> arr){modIntArr = arr;}
-    inline void setModFloatArr(Array<float> arr){modFloatArr = arr;}
-    
-    inline void setModArrFloatArr(Array<Array<float>> afarr)
-    {
-        modArrFloatArr.clear();
-        for (auto arr : afarr)
-        {
-            modArrFloatArr.add(arr);
-        }
-    }
+    inline void setTargets(Array<int> targ) { targets = targ; }
 
     inline const int getId(void){return Id;}
     inline const int getNote(void){return note;}
-    inline const int getPrepId(void) { return prepId; }
-    inline const bool getModBool(void){return modBool;}
-    inline const int getModInt(void){return modInt;}
-    inline const float getModFloat(void){return modFloat;}
-    inline const Array<float> getModFloatArr(void){return modFloatArr;}
+    inline const Array<int> getTargets(void) { return targets; }
     
-    inline const Array<Array<float>> getModArrFloatArr(void){return modArrFloatArr;}
-    inline const Array<int> getModIntArr(void){return modIntArr;}
+    inline void addTarget(int targ) { targets.addIfNotAlreadyThere(targ); }
     
+    inline void removeTarget(int targ)
+    {
+        for (int i = targets.size(); --i >= 0;)
+        {
+            if (targets[i] == targ) targets.remove(i);
+        }
+    }
+    
+    inline void reset(void)
+    {
+        for (auto b : dirty) b = false;
+    }
+    
+    inline bool getDirty(int param)
+    {
+        return dirty[param];
+    }
+    
+    inline void setDirty(int param)
+    {
+        dirty.setUnchecked(param, true);
+    }
+    
+    inline void setClean(int param)
+    {
+        dirty.setUnchecked(param, false);
+    }
     
 protected:
     int             Id;
     int             note;
-    int             prepId;
-    bool            modBool;
-    int             modInt;
-    float           modFloat;
-    Array<int>      modIntArr;
-    Array<float>    modFloatArr;
-    Array<Array<float>> modArrFloatArr;
+    
+    Array<int>      targets;
+    Array<bool>     dirty;
     
 private:
     
@@ -74,110 +87,94 @@ private:
     JUCE_LEAK_DETECTOR(Modification)
 };
 
-class DirectModification : public Modification
+class DirectModification :
+public Modification,
+public DirectPreparation
 {
 public:
     typedef ReferenceCountedObjectPtr<DirectModification>   Ptr;
     typedef Array<DirectModification::Ptr>                  PtrArr;
-    typedef Array<DirectModification::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<DirectModification>                  Arr;
-    typedef OwnedArray<DirectModification, CriticalSection> CSArr;
     
-    
-    DirectModification(int key, int whichPrep, DirectParameterType type, String val, int ident):
-    type(type)
+    DirectModification(int Id):
+    Modification(Id, -1, DirectParameterTypeNil),
+    DirectPreparation()
     {
-        modFloatArr = Array<float>();
-        modIntArr   = Array<int>();
-        modBool = var::null;
-        modInt = var::null;
-        modFloat = var::null;
-        
-        Id = ident;
-        note = key;
-        prepId = whichPrep;
-        
-        if (cDirectDataTypes[type] == BKInt)
-        {
-            modInt = val.getIntValue();
-        }
-        else if (cDirectDataTypes[type] == BKIntArr)
-        {
-            modIntArr = stringToIntArray(val);
-        }
-        else if (cDirectDataTypes[type] == BKFloatArr)
-        {
-            modFloatArr = stringToFloatArray(val);
-        }
-        else // BKFloat
-        {
-            modFloat = val.getFloatValue();
-        }
-        
-
+        DBG("dirtysize: " + String(dirty.size()));
     }
-    
+
     ~DirectModification(void)
     {
         
     }
     
-    inline void setParameterType(DirectParameterType t) { type = t; }
+    inline DirectModification::Ptr duplicate(void)
+    {
+        DirectModification::Ptr mod = new DirectModification(-1);
+        
+        mod->copy(this);
+        
+        return mod;
+    }
     
-    inline DirectParameterType getParameterType(void) {return type; }
+    inline void copy (DirectModification::Ptr mod)
+    {
+        setName(mod->getName() + "copy");
+        
+        DirectPreparation::copy(mod);
+    }
+    
+    inline ValueTree getState(void)
+    {
+        ValueTree prep(vtagModDirect);
+        
+        prep.setProperty( "Id", Id, 0);
+        prep.setProperty( "name", getName(), 0);
+        
+        prep.addChild(DirectPreparation::getState(), -1, 0);
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        Id = e->getStringAttribute("Id").getIntValue();
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     setName(n);
+        else                        setName(String(Id));
+        
+        
+        XmlElement* params = e->getChildByName("params");
+        
+        if (params != nullptr)
+        {
+            DirectPreparation::setState(params);
+        }
+        else
+        {
+            DirectPreparation::setState(e);
+        }
+    }
+    
     
 private:
-    
-    DirectParameterType type;
-    
+
     JUCE_LEAK_DETECTOR(DirectModification)
 };
 
-class SynchronicModification : public Modification
+class SynchronicModification :
+public Modification,
+public SynchronicPreparation
 {
 public:
     typedef ReferenceCountedObjectPtr<SynchronicModification>   Ptr;
     typedef Array<SynchronicModification::Ptr>                  PtrArr;
-    typedef Array<SynchronicModification::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<SynchronicModification>                  Arr;
-    typedef OwnedArray<SynchronicModification, CriticalSection> CSArr;
     
-    SynchronicModification(int key, int whichPrep, SynchronicParameterType type, String val, int ident):
-    type(type)
+    SynchronicModification(int Id):
+    Modification(Id, -1, SynchronicParameterTypeNil),
+    SynchronicPreparation()
     {
-        modArrFloatArr = Array<Array<float>>();
-        modFloatArr = Array<float>();
-        modIntArr   = Array<int>();
-        modBool = var::null;
-        modInt = var::null;
-        modFloat = var::null;
-        
-        Id = ident;
-        note = key;
-        prepId = whichPrep;
-        
-        if (cSynchronicDataTypes[type] == BKInt)
-        {
-            modInt = val.getIntValue();
-        }
-        else if (cSynchronicDataTypes[type] == BKFloat) // BKFloat
-        {
-            modFloat = val.getFloatValue();
-        }
-        else if (cSynchronicDataTypes[type] == BKFloatArr)
-        {
-            modFloatArr = stringToFloatArray(val);
-        }
-        else if (cSynchronicDataTypes[type] == BKIntArr)
-        {
-            modIntArr = stringToIntArray(val);
-        }
-        else if (cSynchronicDataTypes[type] == BKArrFloatArr)
-        {
-            modArrFloatArr = stringToArrayFloatArray(val);
-        }
-            
-        
     }
     
     ~SynchronicModification(void)
@@ -185,59 +182,74 @@ public:
         
     }
     
-    inline void setParameterType(SynchronicParameterType t) { type = t; }
+    inline SynchronicModification::Ptr duplicate(void)
+    {
+        SynchronicModification::Ptr mod = new SynchronicModification(-1);
+        
+        mod->copy(this);
+        
+        return mod;
+    }
     
-    inline SynchronicParameterType getParameterType(void) {return type; }
-
+    inline void copy (SynchronicModification::Ptr mod)
+    {
+        setName(mod->getName() + "copy");
+        
+        SynchronicPreparation::copy(mod);
+    }
+    
+    inline ValueTree getState(void)
+    {
+        ValueTree prep(vtagModSynchronic);
+        
+        prep.setProperty( "Id", Id, 0);
+        prep.setProperty( "name", getName(), 0);
+        
+        prep.addChild(SynchronicPreparation::getState(), -1, 0);
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        Id = e->getStringAttribute("Id").getIntValue();
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     setName(n);
+        else                        setName(String(Id));
+        
+        
+        XmlElement* params = e->getChildByName("params");
+        
+        if (params != nullptr)
+        {
+            SynchronicPreparation::setState(params);
+        }
+        else
+        {
+            SynchronicPreparation::setState(e);
+        }
+    }
     
     
 private:
     
-    SynchronicParameterType type;
-    
     JUCE_LEAK_DETECTOR(SynchronicModification)
 };
 
-
-class NostalgicModification : public Modification
+class NostalgicModification :
+public Modification,
+public NostalgicPreparation
 {
 public:
     typedef ReferenceCountedObjectPtr<NostalgicModification>   Ptr;
     typedef Array<NostalgicModification::Ptr>                  PtrArr;
-    typedef Array<NostalgicModification::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<NostalgicModification>                  Arr;
-    typedef OwnedArray<NostalgicModification, CriticalSection> CSArr;
     
-    NostalgicModification(int key, int whichPrep, NostalgicParameterType type, String val, int ident):
-    type(type)
+    NostalgicModification(int Id):
+    Modification(Id, -1, NostalgicParameterTypeNil),
+    NostalgicPreparation()
     {
-        modFloatArr = Array<float>();
-        modIntArr   = Array<int>();
-        modBool = var::null;
-        modInt = var::null;
-        modFloat = var::null;
-        
-        Id = ident;
-        note = key;
-        prepId = whichPrep;
-        
-        if (cNostalgicDataTypes[type] == BKInt)
-        {
-            modInt = val.getIntValue();
-        }
-        else if (cNostalgicDataTypes[type] == BKFloat) // BKFloat
-        {
-            modFloat = val.getFloatValue();
-        }
-        else if (cNostalgicDataTypes[type] == BKFloatArr)
-        {
-            modFloatArr = stringToFloatArray(val);
-        }
-        else if (cNostalgicDataTypes[type] == BKIntArr)
-        {
-            modIntArr = stringToIntArray(val);
-        }
-       
     }
     
     ~NostalgicModification(void)
@@ -245,138 +257,227 @@ public:
         
     }
     
-    inline void setParameterType(NostalgicParameterType t) { type = t; }
+    inline NostalgicModification::Ptr duplicate(void)
+    {
+        NostalgicModification::Ptr mod = new NostalgicModification(-1);
+        
+        mod->copy(this);
+        
+        return mod;
+    }
     
-    inline NostalgicParameterType getParameterType(void) {return type; }
+    inline void copy (NostalgicModification::Ptr mod)
+    {
+        setName(mod->getName() + "copy");
+        
+        NostalgicModification::copy(mod);
+    }
     
-
+    inline ValueTree getState(void)
+    {
+        ValueTree prep(vtagModNostalgic);
+        
+        prep.setProperty( "Id", Id, 0);
+        prep.setProperty( "name", getName(), 0);
+        
+        prep.addChild(NostalgicPreparation::getState(), -1, 0);
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        Id = e->getStringAttribute("Id").getIntValue();
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     setName(n);
+        else                        setName(String(Id));
+        
+        
+        XmlElement* params = e->getChildByName("params");
+        
+        if (params != nullptr)
+        {
+            NostalgicPreparation::setState(params);
+        }
+        else
+        {
+            NostalgicPreparation::setState(e);
+        }
+    }
+    
+    
 private:
-    
-    NostalgicParameterType type;
-    
     
     JUCE_LEAK_DETECTOR(NostalgicModification)
 };
 
-class TuningModification : public Modification
+
+class TuningModification :
+public Modification,
+public TuningPreparation
 {
 public:
     typedef ReferenceCountedObjectPtr<TuningModification>   Ptr;
     typedef Array<TuningModification::Ptr>                  PtrArr;
-    typedef Array<TuningModification::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<TuningModification>                  Arr;
-    typedef OwnedArray<TuningModification, CriticalSection> CSArr;
     
-    TuningModification(int key, int whichPrep, TuningParameterType type, String val, int ident):
-    type(type)
+    TuningModification(int Id):
+    Modification(Id, -1, TuningParameterTypeNil),
+    TuningPreparation()
     {
-        modFloatArr = Array<float>();
-        modIntArr = Array<int>();
-        modBool = var::null;
-        modInt = var::null;
-        modFloat = var::null;
-        
-        Id = ident;
-        note = key;
-        prepId = whichPrep;
-        
-        if (cTuningDataTypes[type] == BKInt)
-        {
-            modInt = val.getIntValue();
-        }
-        else if (cTuningDataTypes[type] == BKFloat)
-        {
-            modFloat = val.getFloatValue();
-        }
-        else if (cTuningDataTypes[type] == BKFloatArr)
-        {
-            modFloatArr = stringToFloatArray(val);
-        }
-        else if (cTuningDataTypes[type] == BKBool)
-        {
-            modBool = (bool)val.getIntValue();
-        }
-        else if (cTuningDataTypes[type] == BKIntArr)
-        {
-            modIntArr = stringToIntArray(val);
-        }
     }
-    
     
     ~TuningModification(void)
     {
         
     }
     
-    inline void setParameterType(TuningParameterType t) { type = t; }
+    inline TuningModification::Ptr duplicate(void)
+    {
+        TuningModification::Ptr mod = new TuningModification(-1);
+        
+        mod->copy(this);
+        
+        return mod;
+    }
     
-    inline TuningParameterType getParameterType(void) {return type; }
-
+    inline void copy (TuningModification::Ptr mod)
+    {
+        setName(mod->getName() + "copy");
+        
+        TuningModification::copy(mod);
+    }
+    
+    inline ValueTree getState(void)
+    {
+        ValueTree prep(vtagModTuning);
+        
+        prep.setProperty( "Id", Id, 0);
+        prep.setProperty( "name", getName(), 0);
+        
+        prep.addChild(TuningPreparation::getState(), -1, 0);
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        Id = e->getStringAttribute("Id").getIntValue();
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     setName(n);
+        else                        setName(String(Id));
+        
+        
+        XmlElement* params = e->getChildByName("params");
+        
+        if (params != nullptr)
+        {
+            TuningPreparation::setState(params);
+        }
+        else
+        {
+            TuningPreparation::setState(e);
+        }
+    }
+    
+    inline void setTetherWeightsActive(Array<bool> a) { tetherWeightsActive = a; }
+    inline Array<bool> getTetherWeightsActive(void) { return tetherWeightsActive; }
+    
+    inline void setSpringWeightsActive(Array<bool> a) { springWeightsActive = a; }
+    inline Array<bool> getSpringWeightsActive(void) { return springWeightsActive; }
+    
+    inline bool getTetherWeightActive(int i) { return tetherWeightsActive[i]; }
+    inline void setTetherWeightActive(int i, bool a) { tetherWeightsActive.setUnchecked(i, a); }
+    
+    inline bool getSpringWeightActive(int i) { return springWeightsActive[i]; }
+    inline void setSpringWeightActive(int i, bool a) { springWeightsActive.setUnchecked(i, a); }
+    
     
 private:
     
-    TuningParameterType type;
+    Array<bool> tetherWeightsActive;
+    Array<bool> springWeightsActive;
     
     JUCE_LEAK_DETECTOR(TuningModification)
 };
 
-class TempoModification : public Modification
+
+
+class TempoModification :
+public Modification,
+public TempoPreparation
 {
 public:
     typedef ReferenceCountedObjectPtr<TempoModification>   Ptr;
     typedef Array<TempoModification::Ptr>                  PtrArr;
-    typedef Array<TempoModification::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<TempoModification>                  Arr;
-    typedef OwnedArray<TempoModification, CriticalSection> CSArr;
     
-    TempoModification(int key, int whichPrep, TempoParameterType type, String val, int ident):
-    type(type)
+    TempoModification(int Id):
+    Modification(Id, -1, TempoParameterTypeNil),
+    TempoPreparation()
     {
-        modFloatArr = Array<float>();
-        modIntArr = Array<int>();
-        modBool = var::null;
-        modInt = var::null;
-        modFloat = var::null;
         
-        Id = ident;
-        note = key;
-        prepId = whichPrep;
-        
-        if (cTempoDataTypes[type] == BKInt)
-        {
-            modInt = val.getIntValue();
-        }
-        else if (cTempoDataTypes[type] == BKFloat)
-        {
-            modFloat = val.getFloatValue();
-        }
-        else if (cTempoDataTypes[type] == BKFloatArr)
-        {
-            modFloatArr = stringToFloatArray(val);
-        }
-        else if (cTempoDataTypes[type] == BKBool)
-        {
-            modBool = (bool)val.getIntValue();
-        }
-        else if (cTempoDataTypes[type] == BKIntArr)
-        {
-            modIntArr = stringToIntArray(val);
-        }
     }
-    
     
     ~TempoModification(void)
     {
         
     }
     
-    inline void setParameterType(TempoParameterType t) { type = t; }
+    inline TempoModification::Ptr duplicate(void)
+    {
+        TempoModification::Ptr mod = new TempoModification(-1);
+        
+        mod->copy(this);
+        
+        return mod;
+    }
     
-    inline TempoParameterType getParameterType(void) {return type; }
+    inline void copy (TempoModification::Ptr mod)
+    {
+        setName(mod->getName() + "copy");
+        
+        TempoPreparation::copy(mod);
+    }
+    
+    inline ValueTree getState(void)
+    {
+        ValueTree prep(vtagModTempo);
+        
+        prep.setProperty( "Id", Id, 0);
+        prep.setProperty( "name", getName(), 0);
+        
+        prep.addChild(TempoPreparation::getState(), -1, 0);
+        
+        return prep;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        Id = e->getStringAttribute("Id").getIntValue();
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     setName(n);
+        else                        setName(String(Id));
+        
+        
+        XmlElement* params = e->getChildByName("params");
+        
+        if (params != nullptr)
+        {
+            TempoPreparation::setState(params);
+        }
+        else
+        {
+            TempoPreparation::setState(e);
+        }
+    }
+    
     
 private:
-    
-    TempoParameterType type;
     
     JUCE_LEAK_DETECTOR(TempoModification)
 };

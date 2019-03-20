@@ -532,13 +532,13 @@ void DirectModificationEditor::greyOutAllComponents()
 
 void DirectModificationEditor::highlightModedComponents()
 {
-    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
 
-    if(mod->getParam(DirectTransposition) != "")    transpositionSlider->setBright();
-    if(mod->getParam(DirectGain) != "")             gainSlider->setBright();
-    if(mod->getParam(DirectResGain) != "")          resonanceGainSlider->setBright();
-    if(mod->getParam(DirectHammerGain) != "")       hammerGainSlider->setBright();
-    if(mod->getParam(DirectADSR) != "")             ADSRSlider->setBright();
+    if(mod->getDirty(DirectTransposition))    transpositionSlider->setBright();
+    if(mod->getDirty(DirectGain))             gainSlider->setBright();
+    if(mod->getDirty(DirectResGain))          resonanceGainSlider->setBright();
+    if(mod->getDirty(DirectHammerGain))       hammerGainSlider->setBright();
+    if(mod->getDirty(DirectADSR))             ADSRSlider->setBright();
 }
 
 void DirectModificationEditor::update(void)
@@ -547,27 +547,22 @@ void DirectModificationEditor::update(void)
     
     selectCB.setSelectedId(processor.updateState->currentModDirectId, dontSendNotification);
     
-    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
     
     if (mod != nullptr)
     {
         greyOutAllComponents();
         highlightModedComponents();
         
-        String val = mod->getParam(DirectTransposition);
-        transpositionSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        transpositionSlider->setValue(mod->getTransposition(), dontSendNotification);
         
-        val = mod->getParam(DirectResGain);
-        resonanceGainSlider->setValue(val.getFloatValue(), dontSendNotification);
+        resonanceGainSlider->setValue(mod->getResonanceGain(), dontSendNotification);
         
-        val = mod->getParam(DirectHammerGain);
-        hammerGainSlider->setValue(val.getFloatValue(), dontSendNotification);
+        hammerGainSlider->setValue(mod->getHammerGain(), dontSendNotification);
         
-        val = mod->getParam(DirectGain);
-        gainSlider->setValue(val.getFloatValue(), dontSendNotification);
+        gainSlider->setValue(mod->getGain(), dontSendNotification);
         
-        val = mod->getParam(DirectADSR);
-        ADSRSlider->setValue(stringToFloatArray(val), dontSendNotification);
+        ADSRSlider->setValue(mod->getADSRvals(), dontSendNotification);
     }
     
     
@@ -577,7 +572,7 @@ void DirectModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    for (auto prep : processor.gallery->getDirectModPreparations())
+    for (auto prep : processor.gallery->getDirectModifications())
     {
         int Id = prep->getId();;
         String name = prep->getName();
@@ -615,14 +610,14 @@ int DirectModificationEditor::addPreparation(void)
 {
     processor.gallery->add(PreparationTypeDirectMod);
     
-    return processor.gallery->getDirectModPreparations().getLast()->getId();
+    return processor.gallery->getDirectModifications().getLast()->getId();
 }
 
 int DirectModificationEditor::duplicatePreparation(void)
 {
     processor.gallery->duplicate(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
     
-    return processor.gallery->getDirectModPreparations().getLast()->getId();
+    return processor.gallery->getDirectModifications().getLast()->getId();
 }
 
 void DirectModificationEditor::deleteCurrent(void)
@@ -685,7 +680,7 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentModDirectId;
-        DirectModPreparation::Ptr prep = processor.gallery->getDirectModPreparation(Id);
+        DirectModification::Ptr prep = processor.gallery->getDirectModification(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -719,7 +714,7 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void DirectModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
     
     mod->setName(name);
     
@@ -729,21 +724,27 @@ void DirectModificationEditor::BKEditableComboBoxChanged(String name, BKEditable
 
 void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
     
     if(name == "resonance gain")
     {
-        mod->setParam(DirectResGain, String(val));
+        mod->setResonanceGain(val);
+        mod->setDirty(DirectResGain);
+        
         resonanceGainSlider->setBright();
     }
     else if(name == "hammer gain")
     {
-        mod->setParam(DirectHammerGain, String(val));
+        mod->setHammerGain(val);
+        mod->setDirty(DirectHammerGain);
+        
         hammerGainSlider->setBright();
     }
     else if(name == "gain")
     {
-        mod->setParam(DirectGain, String(val));
+        mod->setGain(val);
+        mod->setDirty(DirectGain);
+        
         gainSlider->setBright();
     }
     
@@ -754,9 +755,10 @@ void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
 void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
     
-    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
     
-    mod->setParam(DirectTransposition, floatArrayToString(val));
+    mod->setTransposition(val);
+    mod->setDirty(DirectTransposition);
     
     transpositionSlider->setBright();
     
@@ -766,10 +768,13 @@ void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<fl
 
 void DirectModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
 {
-    DirectModPreparation::Ptr mod = processor.gallery->getDirectModPreparation(processor.updateState->currentModDirectId);
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
     
     Array<float> newvals = {(float)attack, (float)decay, sustain, (float)release};
-    mod->setParam(DirectADSR, floatArrayToString(newvals));
+    
+    mod->setADSRvals(newvals);
+    mod->setDirty(DirectADSR);
+    
     ADSRSlider->setBright();
     
     updateModification();

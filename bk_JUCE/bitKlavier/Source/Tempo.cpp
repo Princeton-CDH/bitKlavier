@@ -197,7 +197,7 @@ public:
 			DBG("test consistency: " + name);
 
 			TempoPreparation::Ptr tp1 = new TempoPreparation();
-			TempoModPreparation::Ptr tm1 = new TempoModPreparation(tp1, 1);
+			TempoModification::Ptr tm1 = new TempoModification(tp1, 1);
 			
 
 			tm1->randomize();
@@ -208,7 +208,7 @@ public:
 			ScopedPointer<XmlElement> xml = vt1.createXml();
 
 			TempoPreparation::Ptr tp2 = new TempoPreparation();
-			TempoModPreparation::Ptr tm2 = new TempoModPreparation(tp2, 1);
+			TempoModification::Ptr tm2 = new TempoModification(tp2, 1);
 
 			tm2->setState(xml);
 

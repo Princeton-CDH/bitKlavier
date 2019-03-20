@@ -264,7 +264,7 @@ public:
             DBG("test consistency: " + name);
             
             DirectPreparation::Ptr dp1 = new DirectPreparation();
-            DirectModPreparation::Ptr dm1 = new DirectModPreparation(dp1, 1);
+            DirectModification::Ptr dm1 = new DirectModification(dp1, 1);
             
             dm1->randomize();
             
@@ -273,7 +273,7 @@ public:
             ScopedPointer<XmlElement> xml = vt1.createXml();
             
             DirectPreparation::Ptr dp2 = new DirectPreparation();
-            DirectModPreparation::Ptr dm2 = new DirectModPreparation(dp2, 1);
+            DirectModification::Ptr dm2 = new DirectModification(dp2, 1);
             
             dm2->setState(xml);
         

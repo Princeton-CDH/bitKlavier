@@ -856,12 +856,12 @@ void Gallery::setStateFromJson(var myJson)
                         int noteNumber = notenum.getIntValue();
                         
                         
-                        TuningModPreparation::Ptr testMod = new TuningModPreparation(-1);
+                        TuningModification::Ptr testMod = new TuningModification(-1);
                         
-                        testMod->setParam(TuningFundamental, String(fund));
-                        testMod->setParam(TuningScale, String(tscale));
+                        testMod->setFundamental(fund);
+                        testMod->setScale(tscale);
                         
-                        TuningModPreparation::Ptr thisTuningMod = matches(testMod);
+                        TuningModification::Ptr thisTuningMod = matches(testMod);
                         
                         if (thisTuningMod == nullptr)
                         {
@@ -958,7 +958,7 @@ if (!(tm.size() % 3))
         TuningSystem tscale = tuningStringToTuningSystem(tun);
         int noteNumber = notenum.getIntValue();
         
-        TuningModPreparation::Ptr myMod = new TuningModPreparation();
+        TuningModification::Ptr myMod = new TuningModification();
         
         myMod->setParam(TuningFundamental, String(fund));
         myMod->setParam(TuningScale, String(tscale));
@@ -996,9 +996,9 @@ if (!(tm.size() % 3))
         TuningSystem tscale = tuningStringToTuningSystem(tun);
         int noteNumber = notenum.getIntValue();
         
-        // create TuningModPreparation and TuningModification attached to key
+        // create TuningModification and TuningModification attached to key
         
-        TuningModPreparation::Ptr myMod = new TuningModPreparation();
+        TuningModification::Ptr myMod = new TuningModification();
         
         myMod->setParam(TuningFundamental, String(fund));
         myMod->setParam(TuningScale, String(tscale));

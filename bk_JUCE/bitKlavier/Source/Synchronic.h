@@ -547,6 +547,248 @@ public:
         DBG("| - - - - - - - - -- - - - - - - - - |");
     }
     
+    ValueTree getState(void)
+    {
+        ValueTree prep(vtagModSynchronic);
+        
+        prep.setProperty( "gain", getGain(), 0);
+        prep.setProperty( ptagSynchronic_numBeats,            getNumBeats(), 0);
+        prep.setProperty( ptagSynchronic_clusterMin,          getClusterMin(), 0);
+        prep.setProperty( ptagSynchronic_clusterMax,          getClusterMax(), 0);
+        prep.setProperty( ptagSynchronic_clusterThresh,       getClusterThreshMS(), 0);
+        prep.setProperty( ptagSynchronic_mode,                getMode(), 0);
+        prep.setProperty( ptagSynchronic_beatsToSkip,         getBeatsToSkip(), 0);
+        
+        prep.setProperty( "numClusters", getNumClusters(), 0);
+        prep.setProperty( "onOffMode", getOnOffMode(), 0);
+        
+        prep.setProperty( "holdMin", getHoldMin(), 0);
+        prep.setProperty( "holdMax", getHoldMax(), 0);
+        
+        prep.setProperty( "velocityMin", getVelocityMin(), 0);
+        prep.setProperty( "velocityMax", getVelocityMax(), 0);
+        
+        ValueTree beatMults( vtagSynchronic_beatMults);
+        int count = 0;
+        for (auto f : getBeatMultipliers())
+        {
+            beatMults.      setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(beatMults, -1, 0);
+        
+        
+        ValueTree lenMults( vtagSynchronic_lengthMults);
+        count = 0;
+        for (auto f : getLengthMultipliers())
+        {
+            lenMults.       setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(lenMults, -1, 0);
+        
+        
+        ValueTree accentMults( vtagSynchronic_accentMults);
+        count = 0;
+        for (auto f : getAccentMultipliers())
+        {
+            accentMults.    setProperty( ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(accentMults, -1, 0);
+        
+        
+        ValueTree transposition( vtagSynchronic_transpOffsets);
+        
+        int tcount = 0;
+        for (auto arr : getTransposition())
+        {
+            ValueTree t("t"+String(tcount++));
+            count = 0;
+            for (auto f : arr)  t.setProperty( ptagFloat + String(count++), f, 0);
+            transposition.addChild(t,-1,0);
+        }
+        prep.addChild(transposition, -1, 0);
+        
+        ValueTree ADSRs( vtagSynchronic_ADSRs);
+        
+        tcount = 0;
+        for (auto arr : getADSRs())
+        {
+            ValueTree e("e"+String(tcount++));
+            count = 0;
+            for (auto f : arr)  e.setProperty( ptagFloat + String(count++), f, 0);
+            ADSRs.addChild(e,-1,0);
+        }
+        prep.addChild(ADSRs, -1, 0);
+        
+        return prep;
+    }
+    
+    void setState(XmlElement* e)
+    {
+        String n; int i; float f; bool b;
+        
+        n = e->getStringAttribute("gain");
+        if (n != "") setGain(n.getFloatValue());
+        else         setGain(1.0);
+        
+        i = e->getStringAttribute(ptagSynchronic_numBeats).getIntValue();
+        setNumBeats(i);
+        
+        i = e->getStringAttribute(ptagSynchronic_clusterMin).getIntValue();
+        setClusterMin(i);
+        
+        i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
+        setClusterMax(i);
+        
+        n = e->getStringAttribute("holdMin");
+        
+        if (n != "")    setHoldMin(n.getIntValue());
+        else            setHoldMin(0);
+        
+        n = e->getStringAttribute("holdMax");
+        
+        if (n != "")    setHoldMax(n.getIntValue());
+        else            setHoldMax(12000);
+        
+        n = e->getStringAttribute("velocityMin");
+        
+        if (n != "")    setVelocityMin(n.getIntValue());
+        else            setVelocityMin(0);
+        
+        n = e->getStringAttribute("velocityMax");
+        
+        if (n != "")    setVelocityMax(n.getIntValue());
+        else            setVelocityMax(127);
+        
+        f = e->getStringAttribute(ptagSynchronic_clusterThresh).getFloatValue();
+        setClusterThresh(f);
+        
+        i = e->getStringAttribute(ptagSynchronic_mode).getIntValue();
+        setMode((SynchronicSyncMode) i);
+        
+        i = e->getStringAttribute(ptagSynchronic_beatsToSkip).getIntValue();
+        setBeatsToSkip(i);
+        
+        n = e->getStringAttribute("numClusters");
+        
+        if (n != String::empty)     setNumClusters(n.getIntValue());
+        else                        setNumClusters(1);
+        
+        n = e->getStringAttribute("onOffMode");
+        
+        if (n != String::empty)     setOnOffMode((SynchronicOnOffMode) n.getIntValue());
+        else                        setOnOffMode(KeyOn);
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagSynchronic_beatMults))
+            {
+                Array<float> beats;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        beats.add(f);
+                    }
+                }
+                
+                setBeatMultipliers(beats);
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_accentMults))
+            {
+                Array<float> accents;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        accents.add(f);
+                    }
+                }
+                
+                setAccentMultipliers(accents);
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_lengthMults))
+            {
+                Array<float> lens;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String::empty) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        lens.add(f);
+                    }
+                }
+                
+                setLengthMultipliers(lens);
+                
+            }
+            else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
+            {
+                Array<Array<float>> atransp;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
+                {
+                    if (asub->hasTagName("t"+String(tcount++)))
+                    {
+                        Array<float> transp;
+                        for (int k = 0; k < 128; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                transp.add(f);
+                            }
+                        }
+                        atransp.set(tcount-1, transp);
+                    }
+                }
+                
+                setTransposition(atransp);
+            }
+            else  if (sub->hasTagName(vtagSynchronic_ADSRs))
+            {
+                Array<Array<float>> aADSRs;
+                int tcount = 0;
+                forEachXmlChildElement (*sub, asub)
+                {
+                    if (asub->hasTagName("e"+String(tcount++)))
+                    {
+                        Array<float> singleADSR;
+                        for (int k = 0; k < 5; k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+                            
+                            if (attr == String::empty) break;
+                            else
+                            {
+                                f = attr.getFloatValue();
+                                singleADSR.add(f);
+                            }
+                        }
+                        aADSRs.set(tcount-1, singleADSR);
+                    }
+                }
+                
+                setADSRs(aADSRs);
+            }
+        }
+    }
+    
 private:
     String name;
     float sTempo;
@@ -645,89 +887,21 @@ public:
 		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
 	}
-    
+
     inline ValueTree getState(void)
     {
-        ValueTree prep( vtagSynchronic);
+        ValueTree prep(vtagSynchronic);
         
         prep.setProperty( "Id",Id, 0);
-        prep.setProperty( "name", name, 0);
-        prep.setProperty( "gain", sPrep->getGain(), 0);
-        prep.setProperty( ptagSynchronic_numBeats,            sPrep->getNumBeats(), 0);
-        prep.setProperty( ptagSynchronic_clusterMin,          sPrep->getClusterMin(), 0);
-        prep.setProperty( ptagSynchronic_clusterMax,          sPrep->getClusterMax(), 0);
-        prep.setProperty( ptagSynchronic_clusterThresh,       sPrep->getClusterThreshMS(), 0);
-        prep.setProperty( ptagSynchronic_mode,                sPrep->getMode(), 0);
-        prep.setProperty( ptagSynchronic_beatsToSkip,         sPrep->getBeatsToSkip(), 0);
+        prep.setProperty( "name",                          name, 0);
         
-        prep.setProperty( "numClusters", sPrep->getNumClusters(), 0);
-        prep.setProperty( "onOffMode", sPrep->getOnOffMode(), 0);
-        
-        prep.setProperty( "holdMin", sPrep->getHoldMin(), 0);
-        prep.setProperty( "holdMax", sPrep->getHoldMax(), 0);
-        
-        prep.setProperty( "velocityMin", sPrep->getVelocityMin(), 0);
-        prep.setProperty( "velocityMax", sPrep->getVelocityMax(), 0);
-        
-        ValueTree beatMults( vtagSynchronic_beatMults);
-        int count = 0;
-        for (auto f : sPrep->getBeatMultipliers())
-        {
-            beatMults.      setProperty( ptagFloat + String(count++), f, 0);
-        }
-        prep.addChild(beatMults, -1, 0);
-        
-        
-        ValueTree lenMults( vtagSynchronic_lengthMults);
-        count = 0;
-        for (auto f : sPrep->getLengthMultipliers())
-        {
-            lenMults.       setProperty( ptagFloat + String(count++), f, 0);
-        }
-        prep.addChild(lenMults, -1, 0);
-        
-        
-        ValueTree accentMults( vtagSynchronic_accentMults);
-        count = 0;
-        for (auto f : sPrep->getAccentMultipliers())
-        {
-            accentMults.    setProperty( ptagFloat + String(count++), f, 0);
-        }
-        prep.addChild(accentMults, -1, 0);
-        
-        
-        ValueTree transposition( vtagSynchronic_transpOffsets);
-        
-        int tcount = 0;
-        for (auto arr : sPrep->getTransposition())
-        {
-            ValueTree t("t"+String(tcount++));
-            count = 0;
-            for (auto f : arr)  t.setProperty( ptagFloat + String(count++), f, 0);
-            transposition.addChild(t,-1,0);
-        }
-        prep.addChild(transposition, -1, 0);
-        
-        ValueTree ADSRs( vtagSynchronic_ADSRs);
-        
-        tcount = 0;
-        for (auto arr : sPrep->getADSRs())
-        {
-            ValueTree e("e"+String(tcount++));
-            count = 0;
-            for (auto f : arr)  e.setProperty( ptagFloat + String(count++), f, 0);
-            ADSRs.addChild(e,-1,0);
-        }
-        prep.addChild(ADSRs, -1, 0);
+        prep.addChild(sPrep->getState(), -1, 0);
         
         return prep;
-        
     }
     
-    inline void setState(XmlElement* e, Tuning::PtrArr tuning, Tempo::PtrArr tempo)
+    inline void setState(XmlElement* e)
     {
-        int i; float f;
-        
         Id = e->getStringAttribute("Id").getIntValue();
         
         String n = e->getStringAttribute("name");
@@ -735,166 +909,16 @@ public:
         if (n != String::empty)     name = n;
         else                        name = String(Id);
         
-        n = e->getStringAttribute("gain");
-        if (n != "") sPrep->setGain(n.getFloatValue());
-        else         sPrep->setGain(1.0);
         
-        i = e->getStringAttribute(ptagSynchronic_numBeats).getIntValue();
-        sPrep->setNumBeats(i);
+        XmlElement* params = e->getChildByName("params");
         
-        i = e->getStringAttribute(ptagSynchronic_clusterMin).getIntValue();
-        sPrep->setClusterMin(i);
-        
-        i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
-        sPrep->setClusterMax(i);
-        
-        n = e->getStringAttribute("holdMin");
-        
-        if (n != "")    sPrep->setHoldMin(n.getIntValue());
-        else            sPrep->setHoldMin(0);
-    
-        n = e->getStringAttribute("holdMax");
-        
-        if (n != "")    sPrep->setHoldMax(n.getIntValue());
-        else            sPrep->setHoldMax(12000);
-        
-        n = e->getStringAttribute("velocityMin");
-        
-        if (n != "")    sPrep->setVelocityMin(n.getIntValue());
-        else            sPrep->setVelocityMin(0);
-        
-        n = e->getStringAttribute("velocityMax");
-        
-        if (n != "")    sPrep->setVelocityMax(n.getIntValue());
-        else            sPrep->setVelocityMax(127);
-
-        f = e->getStringAttribute(ptagSynchronic_clusterThresh).getFloatValue();
-        sPrep->setClusterThresh(f);
-        
-        i = e->getStringAttribute(ptagSynchronic_mode).getIntValue();
-        sPrep->setMode((SynchronicSyncMode) i);
-        
-        i = e->getStringAttribute(ptagSynchronic_beatsToSkip).getIntValue();
-        sPrep->setBeatsToSkip(i);
-        
-        n = e->getStringAttribute("numClusters");
-        
-        if (n != String::empty)     sPrep->setNumClusters(n.getIntValue());
-        else                        sPrep->setNumClusters(1);
-        
-        n = e->getStringAttribute("onOffMode");
-        
-        if (n != String::empty)     sPrep->setOnOffMode((SynchronicOnOffMode) n.getIntValue());
-        else                        sPrep->setOnOffMode(KeyOn);
-        
-        forEachXmlChildElement (*e, sub)
+        if (params != nullptr)
         {
-            if (sub->hasTagName(vtagSynchronic_beatMults))
-            {
-                Array<float> beats;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        beats.add(f);
-                    }
-                }
-                
-                sPrep->setBeatMultipliers(beats);
-                
-            }
-            else  if (sub->hasTagName(vtagSynchronic_accentMults))
-            {
-                Array<float> accents;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        accents.add(f);
-                    }
-                }
-                
-                sPrep->setAccentMultipliers(accents);
-                
-            }
-            else  if (sub->hasTagName(vtagSynchronic_lengthMults))
-            {
-                Array<float> lens;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        lens.add(f);
-                    }
-                }
-                
-                sPrep->setLengthMultipliers(lens);
-                
-            }
-            else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
-            {
-                Array<Array<float>> atransp;
-                int tcount = 0;
-                forEachXmlChildElement (*sub, asub)
-                {
-                    if (asub->hasTagName("t"+String(tcount++)))
-                    {
-                        Array<float> transp;
-                        for (int k = 0; k < 128; k++)
-                        {
-                            String attr = asub->getStringAttribute(ptagFloat + String(k));
-                            
-                            if (attr == String::empty) break;
-                            else
-                            {
-                                f = attr.getFloatValue();
-                                transp.add(f);
-                            }
-                        }
-                        atransp.set(tcount-1, transp);
-                    }
-                }
-                
-                sPrep->setTransposition(atransp);
-            }
-            else  if (sub->hasTagName(vtagSynchronic_ADSRs))
-            {
-                Array<Array<float>> aADSRs;
-                int tcount = 0;
-                forEachXmlChildElement (*sub, asub)
-                {
-                    if (asub->hasTagName("e"+String(tcount++)))
-                    {
-                        Array<float> singleADSR;
-                        for (int k = 0; k < 5; k++)
-                        {
-                            String attr = asub->getStringAttribute(ptagFloat + String(k));
-                            
-                            if (attr == String::empty) break;
-                            else
-                            {
-                                f = attr.getFloatValue();
-                                singleADSR.add(f);
-                            }
-                        }
-                        aADSRs.set(tcount-1, singleADSR);
-                    }
-                }
-                
-                sPrep->setADSRs(aADSRs);
-            }
+            sPrep->setState(params);
+        }
+        else
+        {
+            sPrep->setState(e);
         }
         
         aPrep->copy(sPrep);
@@ -922,457 +946,6 @@ private:
     
     
     JUCE_LEAK_DETECTOR(Synchronic)
-};
-
-class SynchronicModPreparation : public ReferenceCountedObject
-{
-public:
-    
-    typedef ReferenceCountedObjectPtr<SynchronicModPreparation>   Ptr;
-    typedef Array<SynchronicModPreparation::Ptr>                  PtrArr;
-    typedef Array<SynchronicModPreparation::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<SynchronicModPreparation>                  Arr;
-    typedef OwnedArray<SynchronicModPreparation, CriticalSection> CSArr;
-    
-    SynchronicModPreparation(SynchronicPreparation::Ptr p, int Id):
-    Id(Id)
-    {
-        param.ensureStorageAllocated((int)cSynchronicParameterTypes.size());
-        
-        param.set(SynchronicNumPulses, String(p->getNumBeats()));
-        param.set(SynchronicClusterMin, String(p->getClusterMin()));
-        param.set(SynchronicClusterMax, String(p->getClusterMax()));
-        param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
-        param.set(SynchronicMode, String(p->getMode()));
-        param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
-        param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
-        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
-        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
-        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
-        param.set(SynchronicGain, String(p->getGain()));
-        param.set(SynchronicADSRs, arrayFloatArrayToString(p->getADSRs()));
-        param.set(SynchronicNumClusters, String(p->getNumClusters()));
-        
-    }
-    
-    
-    SynchronicModPreparation(int Id):
-    Id(Id)
-    {
-        param.clear();
-        
-        for (int i = 0; i < SynchronicParameterTypeNil; i ++)
-        {
-            param.add("");
-        }
-
-    }
-    
-    inline SynchronicModPreparation::Ptr duplicate(void)
-    {
-        SynchronicModPreparation::Ptr copyPrep = new SynchronicModPreparation(-1);
-        
-        copyPrep->copy(this);
-        
-        copyPrep->setName(this->getName());
-        
-        return copyPrep;
-    }
-    
-    inline void setId(int newId) { Id = newId; }
-    inline int getId(void) const noexcept { return Id; }
-    
-    inline ValueTree getState(void)
-    {
-        ValueTree prep( vtagModSynchronic );
-        
-        prep.setProperty( "Id",Id, 0);
-        
-        String p = "";
-        
-        p = getParam(SynchronicNumPulses);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_numBeats,            p.getIntValue(), 0);
-        
-        p = getParam(SynchronicClusterMin);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_clusterMin,          p.getIntValue(), 0);
-        
-        p = getParam(SynchronicClusterMax);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_clusterMax,          p.getIntValue(), 0);
-        
-        p = getParam(SynchronicClusterThresh);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_clusterThresh,       p.getIntValue(), 0);
-        
-        p = getParam(SynchronicMode);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_mode,                p.getIntValue(), 0);
-        
-        p = getParam(SynchronicBeatsToSkip);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_beatsToSkip,         p.getIntValue(), 0);
-        
-        p = getParam(SynchronicNumClusters);
-        if (p != String::empty) prep.setProperty( "numClusters", p.getIntValue(), 0);
-        
-        p = getParam(SynchronicOnOff);
-        if (p != String::empty) prep.setProperty( "onOffMode", p.getIntValue(), 0);
-        
-        p = getParam(SynchronicGain);
-        if (p != String::empty) prep.setProperty( ptagSynchronic_gain,                p.getFloatValue(), 0);
-        
-        p = getParam(SynchronicHoldMin);
-        if (p != String::empty) prep.setProperty( "holdMin", p.getIntValue(), 0);
-        
-        p = getParam(SynchronicHoldMax);
-        if (p != String::empty) prep.setProperty( "holdMax", p.getIntValue(), 0);
-        
-        p = getParam(SynchronicVelocityMin);
-        if (p != String::empty) prep.setProperty( "velocityMin", p.getIntValue(), 0);
-        
-        p = getParam(SynchronicVelocityMax);
-        if (p != String::empty) prep.setProperty( "velocityMax", p.getIntValue(), 0);
-        
-        ValueTree beatMults( vtagSynchronic_beatMults);
-        int count = 0;
-        p = getParam(SynchronicBeatMultipliers);
-        if (p != String::empty)
-        {
-            Array<float> m = stringToFloatArray(p);
-            for (auto f : m)
-            {
-                beatMults.      setProperty( ptagFloat + String(count++), f, 0);
-            }
-        }
-        prep.addChild(beatMults, -1, 0);
-        
-        
-        ValueTree lengthMults( vtagSynchronic_lengthMults);
-        count = 0;
-        p = getParam(SynchronicLengthMultipliers);
-        if (p != String::empty)
-        {
-            Array<float> m = stringToFloatArray(p);
-            for (auto f : m)
-            {
-                lengthMults.      setProperty( ptagFloat + String(count++), f, 0);
-            }
-        }
-        prep.addChild(lengthMults, -1, 0);
-        
-        
-        ValueTree accentMults( vtagSynchronic_accentMults);
-        count = 0;
-        p = getParam(SynchronicAccentMultipliers);
-        if (p != String::empty)
-        {
-            Array<float> m = stringToFloatArray(p);
-            for (auto f : m)
-            {
-                accentMults.      setProperty( ptagFloat + String(count++), f, 0);
-            }
-        }
-        prep.addChild(accentMults, -1, 0);
- 
-        
-        ValueTree transpOffsets( vtagSynchronic_transpOffsets);
-        int tcount = 0;
-        p = getParam(SynchronicTranspOffsets);
-        if (p != String::empty)
-        {
-            Array<Array<float>> m = stringToArrayFloatArray(p);
-            for (auto f : m)
-            {
-                ValueTree t("t"+String(tcount++));
-                count = 0;
-                for (auto nf : f) t.setProperty( ptagFloat + String(count++), nf, 0);
-                transpOffsets.addChild(t,-1,0);
-            }
-        }
-        prep.addChild(transpOffsets, -1, 0);
-        
-        
-        ValueTree envelopes( vtagSynchronic_ADSRs);
-        tcount = 0;
-        p = getParam(SynchronicADSRs);
-        if (p != String::empty)
-        {
-            Array<Array<float>> m = stringToArrayFloatArray(p);
-            for (auto f : m)
-            {
-                ValueTree e("e"+String(tcount++));
-                count = 0;
-                for (auto nf : f) e.setProperty( ptagFloat + String(count++), nf, 0);
-                envelopes.addChild(e,-1,0);
-            }
-        }
-        prep.addChild(envelopes, -1, 0);
-        
-        
-        return prep;
-        
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        float f;
-        
-        Id = e->getStringAttribute("Id").getIntValue();
-        
-        String p = e->getStringAttribute(ptagSynchronic_numBeats);
-        setParam(SynchronicNumPulses, p);
-        
-        p = e->getStringAttribute(ptagSynchronic_clusterMin);
-        setParam(SynchronicClusterMin, p);
-        
-        p = e->getStringAttribute(ptagSynchronic_clusterMax);
-        setParam(SynchronicClusterMax, p);
-        
-        p = e->getStringAttribute("holdMin");
-        setParam(SynchronicHoldMin, p);
-        
-        p = e->getStringAttribute("holdMax");
-        setParam(SynchronicHoldMax, p);
-        
-        p = e->getStringAttribute("velocityMin");
-        setParam(SynchronicVelocityMin, p);
-        
-        p = e->getStringAttribute("velocityMax");
-        setParam(SynchronicVelocityMax, p);
-        
-        p = e->getStringAttribute(ptagSynchronic_clusterThresh);
-        setParam(SynchronicClusterThresh, p);
-        
-        p = e->getStringAttribute(ptagSynchronic_mode);
-        setParam(SynchronicMode, p);
-        
-		p = e->getStringAttribute(ptagSynchronic_beatsToSkip);
-		setParam(SynchronicBeatsToSkip, p);
-        
-        p = e->getStringAttribute("numClusters");
-        setParam(SynchronicNumClusters, p);
-        
-        p = e->getStringAttribute("onOffMode");
-        setParam(SynchronicOnOff, p);
-
-        p = e->getStringAttribute(ptagSynchronic_gain);
-        setParam(SynchronicGain, p);
-        
-        forEachXmlChildElement (*e, sub)
-        {
-            if (sub->hasTagName(vtagSynchronic_beatMults))
-            {
-                Array<float> beats;
-                
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        beats.add(f);
-                    }
-                }
-                
-                setParam(SynchronicBeatMultipliers, floatArrayToString(beats));
-                
-            }
-            else  if (sub->hasTagName(vtagSynchronic_accentMults))
-            {
-                Array<float> accents;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        accents.add(f);
-                    }
-                }
-                
-                setParam(SynchronicAccentMultipliers, floatArrayToString(accents));
-                
-            }
-            else  if (sub->hasTagName(vtagSynchronic_lengthMults))
-            {
-                Array<float> lens;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String::empty) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        lens.add(f);
-                    }
-                }
-                
-                setParam(SynchronicLengthMultipliers, floatArrayToString(lens));
-                
-            }
-            else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
-            {
-                Array<Array<float>> atransp;
-                int tcount = 0;
-                forEachXmlChildElement (*sub, asub)
-                {
-                    if (asub->hasTagName("t"+String(tcount++)))
-                    {
-                        Array<float> transp;
-                        for (int k = 0; k < 128; k++)
-                        {
-                            String attr = asub->getStringAttribute(ptagFloat + String(k));
-                            
-                            if (attr == String::empty) break;
-                            else
-                            {
-                                f = attr.getFloatValue();
-                                transp.add(f);
-                            }
-                        }
-                        atransp.set(tcount-1, transp);
-                    }
-                }
-                
-                setParam(SynchronicTranspOffsets, arrayFloatArrayToString(atransp));
-                
-            }
-            else  if (sub->hasTagName(vtagSynchronic_ADSRs))
-            {
-                Array<Array<float>> aenvs;
-                int tcount = 0;
-                forEachXmlChildElement (*sub, asub)
-                {
-                    if (asub->hasTagName("e"+String(tcount++)))
-                    {
-                        Array<float> envs;
-                        for (int k = 0; k < 128; k++)
-                        {
-                            String attr = asub->getStringAttribute(ptagFloat + String(k));
-                            
-                            if (attr == String::empty) break;
-                            else
-                            {
-                                f = attr.getFloatValue();
-                                envs.add(f);
-                            }
-                        }
-                        aenvs.set(tcount-1, envs);
-                    }
-                }
-                
-                setParam(SynchronicADSRs, arrayFloatArrayToString(aenvs));
-            }
-        }
-        
-    }
-    
-    
-    ~SynchronicModPreparation(void)
-    {
-        
-    }
-    
-	inline bool compare(SynchronicModPreparation::Ptr t)
-	{
-		return (getParam(SynchronicNumPulses) == t->getParam(SynchronicNumPulses) &&
-			getParam(SynchronicClusterMin) == t->getParam(SynchronicClusterMin) &&
-			getParam(SynchronicClusterMax) == t->getParam(SynchronicClusterMax) &&
-			getParam(SynchronicClusterThresh) == t->getParam(SynchronicClusterThresh) &&
-			getParam(SynchronicGain) == t->getParam(SynchronicGain) &&
-			getParam(SynchronicGain) == t->getParam(SynchronicGain) &&
-			getParam(SynchronicBeatsToSkip) == t->getParam(SynchronicBeatsToSkip) &&
-			getParam(SynchronicBeatMultipliers) == t->getParam(SynchronicBeatMultipliers) &&
-			getParam(SynchronicLengthMultipliers) == t->getParam(SynchronicLengthMultipliers) && 
-			getParam(SynchronicAccentMultipliers) == t->getParam(SynchronicAccentMultipliers) &&
-			getParam(SynchronicTranspOffsets) == t->getParam(SynchronicTranspOffsets) &&
-			getParam(SynchronicADSRs) == t->getParam(SynchronicADSRs));
-	}
-
-    inline void copy(SynchronicPreparation::Ptr p)
-    {
-        param.set(SynchronicNumPulses, String(p->getNumBeats()));
-        param.set(SynchronicClusterMin, String(p->getClusterMin()));
-        param.set(SynchronicClusterMax, String(p->getClusterMax()));
-        param.set(SynchronicClusterThresh, String(p->getClusterThreshMS()));
-        param.set(SynchronicGain, String(p->getGain()));
-        param.set(SynchronicMode, String(p->getMode()));
-        param.set(SynchronicBeatsToSkip, String(p->getBeatsToSkip()));
-        param.set(SynchronicBeatMultipliers, floatArrayToString(p->getBeatMultipliers()));
-        param.set(SynchronicLengthMultipliers, floatArrayToString(p->getLengthMultipliers()));
-        param.set(SynchronicAccentMultipliers, floatArrayToString(p->getAccentMultipliers()));
-        param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p->getTransposition()));
-        param.set(SynchronicADSRs, arrayFloatArrayToString(p->getADSRs()));
-    }
-    
-    inline void copy(SynchronicModPreparation::Ptr p)
-    {
-        for (int i = SynchronicId+1; i < SynchronicParameterTypeNil; i++)
-        {
-            param.set(i, p->getParam((SynchronicParameterType)i));
-        }
-    }
-
-	inline void randomize()
-	{
-		SynchronicPreparation p;
-		p.randomize();
-
-		param.set(SynchronicNumPulses, String(p.getNumBeats()));
-		param.set(SynchronicClusterMin, String(p.getClusterMin()));
-		param.set(SynchronicClusterMax, String(p.getClusterMax()));
-		param.set(SynchronicClusterThresh, String(p.getClusterThreshMS()));
-		param.set(SynchronicGain, String(p.getGain()));
-		param.set(SynchronicMode, String(p.getMode()));
-		param.set(SynchronicBeatsToSkip, String(p.getBeatsToSkip()));
-		param.set(SynchronicBeatMultipliers, floatArrayToString(p.getBeatMultipliers()));
-		param.set(SynchronicLengthMultipliers, floatArrayToString(p.getLengthMultipliers()));
-		param.set(SynchronicAccentMultipliers, floatArrayToString(p.getAccentMultipliers()));
-		param.set(SynchronicTranspOffsets, arrayFloatArrayToString(p.getTransposition()));
-		param.set(SynchronicADSRs, arrayFloatArrayToString(p.getADSRs()));
-	}
-    
-    void clearAll()
-    {
-        for (int i = SynchronicId+1; i < SynchronicParameterTypeNil; i++)
-        {
-            param.set(i, "");
-        }
-    }
-    
-    
-    inline const StringArray getStringArray(void) { return param; }
-    
-    inline const String getParam(SynchronicParameterType type)
-    {
-        if (type != SynchronicId)
-            return param[type];
-        else
-            return "";
-    }
-    
-    inline void setParam(SynchronicParameterType type, String val)
-    {
-        param.set(type, val);
-        
-        
-    }
-    
-    void print(void)
-    {
-        
-    }
-    
-    inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName) {name = newName;}
-    
-private:
-    int Id;
-    String name;
-    StringArray          param;
-    
-    JUCE_LEAK_DETECTOR(SynchronicModPreparation);
 };
 
 class SynchronicCluster : public ReferenceCountedObject

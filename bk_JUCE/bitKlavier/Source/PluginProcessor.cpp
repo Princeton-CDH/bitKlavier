@@ -891,175 +891,47 @@ void BKAudioProcessor::performResets(int noteNumber)
 // Modification
 void BKAudioProcessor::performModifications(int noteNumber)
 {
-    // NEEDS OPTIMIZATION
-    Array<float> modfa;
-    Array<Array<float>> modafa;
-    Array<int> modia;
-    float modf;
-    int   modi;
-    bool  modb;
-    
     TuningModification::PtrArr tMod = currentPiano->modificationMap[noteNumber]->getTuningModifications();
     for (int i = tMod.size(); --i >= 0;)
     {
-        Tuning::Ptr tuning = gallery->getTuning(tMod[i]->getPrepId());
-        TuningPreparation::Ptr active = tuning->aPrep;
-        TuningModPreparation::Ptr mod = gallery->getTuningModPreparation(tMod[i]->getId());
-        TuningParameterType type = tMod[i]->getParameterType();
-        modf = tMod[i]->getModFloat();
-        modi = tMod[i]->getModInt();
-        modb = tMod[i]->getModBool();
-        modfa = tMod[i]->getModFloatArr();
-        modia = tMod[i]->getModIntArr();
+        TuningModification::Ptr mod = tMod[i];
+        Array<int> targets = mod->getTargets();
         
-        if (type == TuningScale)
+        for (auto target : targets)
         {
-            active->setScale((TuningSystem)modi);
-            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScale());
+            TuningPreparation::Ptr prep = gallery->getTuning(target)->aPrep;
+            prep->copy(mod);
         }
-        else if (type == TuningFundamental)         active->setFundamental((PitchClass)modi);
-        else if (type == TuningOffset)              active->setFundamentalOffset(modf);
-        else if (type == TuningA1IntervalScale)     active->setAdaptiveIntervalScale((TuningSystem)modi);
-        else if (type == TuningA1Inversional)       active->setAdaptiveInversional(modb);
-        else if (type == TuningA1AnchorScale)       active->setAdaptiveAnchorScale((TuningSystem)modi);
-        else if (type == TuningA1ClusterThresh)     active->setAdaptiveClusterThresh(modi);
-        else if (type == TuningA1AnchorFundamental) active->setAdaptiveAnchorFundamental((PitchClass) modi);
-        else if (type == TuningA1History)           active->setAdaptiveHistory(modi);
-        else if (type == TuningNToneRootCB)         active->setNToneRoot(modi);
-        else if (type == TuningNToneRootOctaveCB)   active->setNToneRootOctave(modi);
-        else if (type == TuningNToneSemitoneWidth)  active->setNToneSemitoneWidth(modi);
-        else if (type == TuningCustomScale)
-        {
-            active->setScale(CustomTuning);
-            active->setCustomScaleCents(modfa);
-            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScale());
-        }
-        else if (type == TuningAbsoluteOffsets)
-        {
-            for(int i = 0; i< modfa.size(); i+=2) {
-                active->setAbsoluteOffset(modfa[i], modfa[i+1] * .01);
-            }
-        }
-        else if (type == TuningSpringTetherStiffness)
-        {
-            active->getSpringTuning()->setTetherStiffness(modf);
-        }
-        else if (type == TuningSpringIntervalStiffness)
-        {
-            active->getSpringTuning()->setIntervalStiffness(modf);
-        }
-        else if (type == TuningSpringRate)
-        {
-            active->getSpringTuning()->setRate(modf);
-        }
-        else if (type == TuningSpringDrag)
-        {
-            active->getSpringTuning()->setDrag(modf);
-        }
-        else if (type == TuningSpringActive)
-        {
-            active->getSpringTuning()->setActive(modb);
-        }
-        else if (type == TuningSpringTetherWeights)
-        {
-            for (int i = 0; i < 128; i++)
-            {
-                if (mod->getTetherWeightActive(i)) active->getSpringTuning()->setTetherWeight(i, modfa[i]);
-            }
-        }
-        else if (type == TuningSpringIntervalWeights)
-        {
-            for (int i = 0; i < 12; i++)
-            {
-                if (mod->getSpringWeightActive(i)) active->getSpringTuning()->setSpringWeight(i, modfa[i]);
-            }
-        }
-        else if (type == TuningSpringIntervalScale)
-        {
-            int springScaleId = modi;
-            active->getSpringTuning()->setScaleId((TuningSystem) springScaleId);
-            
-            Array<float> scale = tuning->getScaleCents(springScaleId);
-            
-            active->getSpringTuning()->setIntervalTuning(scale);
-        }
-        else if (type == TuningSpringIntervalFundamental)
-        {
-            active->getSpringTuning()->setIntervalFundamental((PitchClass)modi);
-        }
-        else if (type == TuningAdaptiveSystem)
-        {
-            TuningAdaptiveSystemType atype = (TuningAdaptiveSystemType) modi;
-            
-            if (atype == AdaptiveSpring)
-            {
-                active->getSpringTuning()->setActive(true);
-                
-                active->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
-                
-                TuningSystem springScaleId = active->getSpringTuning()->getScaleId();
-                Array<float> scale = tuning->getScaleCents(springScaleId);
-                active->getSpringTuning()->setIntervalTuning(scale);
-            }
-            else
-            {
-                active->getSpringTuning()->setActive(false);
-            }
-            
-            if (atype == AdaptiveNormal)
-            {
-                active->setScaleByName(cTuningSystemNames[AdaptiveTuning]);
-            }
-            else if (atype == AdaptiveAnchored)
-            {
-                active->setScaleByName(cTuningSystemNames[AdaptiveAnchoredTuning]);
-            }
-            else // AdaptiveNone
-            {
-                active->setScale(active->getScale());
-            }
-            
-        }
-        
+
         updateState->tuningPreparationDidChange = true;
     }
     
     TempoModification::PtrArr mMod = currentPiano->modificationMap[noteNumber]->getTempoModifications();
     for (int i = mMod.size(); --i >= 0;)
     {
-        TempoPreparation::Ptr active = gallery->getTempo(mMod[i]->getPrepId())->aPrep;
-        TempoParameterType type = mMod[i]->getParameterType();
-        modfa = mMod[i]->getModFloatArr();
-        modf = mMod[i]->getModFloat();
-        modi = mMod[i]->getModInt();
-        modia = mMod[i]->getModIntArr();
+        TempoModification::Ptr mod = mMod[i];
+        Array<int> targets = mod->getTargets();
         
-        if (type == TempoBPM)               active->setTempo(modf);
-        else if (type == TempoSystem)       active->setTempoSystem((TempoType)modi);
-        else if (type == AT1History)        active->setAdaptiveTempo1History(modi);
-        else if (type == AT1Subdivisions)   active->setAdaptiveTempo1Subdivisions(modf);
-        else if (type == AT1Min)            active->setAdaptiveTempo1Min(modf);
-        else if (type == AT1Max)            active->setAdaptiveTempo1Max(modf);
-        else if (type == AT1Mode)           active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode)modi);
-
+        for (auto target : targets)
+        {
+            TempoPreparation::Ptr prep = gallery->getTempo(target)->aPrep;
+            prep->copy(mod);
+        }
+        
         updateState->tempoPreparationDidChange = true;
     }
     
     DirectModification::PtrArr dMod = currentPiano->modificationMap[noteNumber]->getDirectModifications();
     for (int i = dMod.size(); --i >= 0;)
     {
-        DirectPreparation::Ptr active = gallery->getDirect(dMod[i]->getPrepId())->aPrep;
-        DirectParameterType type = dMod[i]->getParameterType();
-        modfa = dMod[i]->getModFloatArr();
-        modf = dMod[i]->getModFloat();
-        modi = dMod[i]->getModInt();
-        modia = dMod[i]->getModIntArr();
+        DirectModification::Ptr mod = dMod[i];
+        Array<int> targets = mod->getTargets();
         
-        if (type == DirectTransposition)    active->setTransposition(modfa);
-        else if (type == DirectGain)        active->setGain(modf);
-        else if (type == DirectHammerGain)  active->setHammerGain(modf);
-        else if (type == DirectResGain)     active->setResonanceGain(modf);
-        else if (type == DirectADSR)        active->setADSRvals(modfa);
+        for (auto target : targets)
+        {
+            DirectPreparation::Ptr prep = gallery->getDirect(target)->aPrep;
+            prep->copy(mod);
+        }
         
         updateState->directPreparationDidChange = true;
     }
@@ -1067,29 +939,14 @@ void BKAudioProcessor::performModifications(int noteNumber)
     NostalgicModification::PtrArr nMod = currentPiano->modificationMap[noteNumber]->getNostalgicModifications();
     for (int i = nMod.size(); --i >= 0;)
     {
-        NostalgicPreparation::Ptr active = gallery->getNostalgic(nMod[i]->getPrepId())->aPrep;
-        NostalgicParameterType type = nMod[i]->getParameterType();
-        modfa = nMod[i]->getModFloatArr();
-        modf = nMod[i]->getModFloat();
-        modi = nMod[i]->getModInt();
-        modia = nMod[i]->getModIntArr();
-        modb = nMod[i]->getModBool();
+        NostalgicModification::Ptr mod = nMod[i];
+        Array<int> targets = mod->getTargets();
         
-        if (type == NostalgicTransposition)         active->setTransposition(modfa);
-        else if (type == NostalgicGain)             active->setGain(modf);
-        else if (type == NostalgicMode)             active->setMode((NostalgicSyncMode)modi);
-        else if (type == NostalgicUndertow)         active->setUndertow(modi);
-        else if (type == NostalgicBeatsToSkip)      active->setBeatsToSkip(modi);
-        else if (type == NostalgicWaveDistance)     active->setWaveDistance(modi);
-        else if (type == NostalgicLengthMultiplier) active->setLengthMultiplier(modf);
-        else if (type == NostalgicReverseADSR)      active->setReverseADSRvals(modfa);
-        else if (type == NostalgicUndertowADSR)     active->setUndertowADSRvals(modfa);
-        else if (type == NostalgicHoldMin)          active->setHoldMin(modf);
-        else if (type == NostalgicHoldMax)          active->setHoldMax(modf);
-        else if (type == NostalgicClusterMin)       active->setClusterMin(modi);
-        else if (type == NostalgicVelocityMin)      active->setVelocityMin(modi);
-        else if (type == NostalgicVelocityMax)      active->setVelocityMax(modi);
-        else if (type == NostalgicKeyOnReset)       active->setKeyOnReset((bool)modi);
+        for (auto target : targets)
+        {
+            NostalgicPreparation::Ptr prep = gallery->getNostalgic(target)->aPrep;
+            prep->copy(mod);
+        }
         
         updateState->nostalgicPreparationDidChange = true;
     }
@@ -1097,34 +954,14 @@ void BKAudioProcessor::performModifications(int noteNumber)
     SynchronicModification::PtrArr sMod = currentPiano->modificationMap[noteNumber]->getSynchronicModifications();
     for (int i = sMod.size(); --i >= 0;)
     {
-        SynchronicPreparation::Ptr active = gallery->getSynchronic(sMod[i]->getPrepId())->aPrep;
-        SynchronicParameterType type = sMod[i]->getParameterType();
-        modf = sMod[i]->getModFloat();
-        modi = sMod[i]->getModInt();
-        modfa = sMod[i]->getModFloatArr();
-        modafa = sMod[i]->getModArrFloatArr();
-        modia = sMod[i]->getModIntArr();
+        SynchronicModification::Ptr mod = sMod[i];
+        Array<int> targets = mod->getTargets();
         
-        DBG("transps: " + arrayFloatArrayToString(modafa));
-        
-        if (type == SynchronicTranspOffsets)            active->setTransposition(modafa);
-        else if (type == SynchronicMode)                active->setMode((SynchronicSyncMode)modi);
-        else if (type == SynchronicClusterMin)          active->setClusterMin(modi);
-        else if (type == SynchronicClusterMax)          active->setClusterMax(modi);
-        else if (type == SynchronicClusterThresh)       active->setClusterThresh(modi);
-        else if (type == SynchronicNumPulses )          active->setNumBeats(modi);
-        else if (type == SynchronicGain )               active->setGain(modf);
-        else if (type == SynchronicBeatsToSkip)         active->setBeatsToSkip(modi);
-        else if (type == SynchronicBeatMultipliers)     active->setBeatMultipliers(modfa);
-        else if (type == SynchronicLengthMultipliers)   active->setLengthMultipliers(modfa);
-        else if (type == SynchronicAccentMultipliers)   active->setAccentMultipliers(modfa);
-        else if (type == SynchronicADSRs)               active->setADSRs(modafa);
-        else if (type == SynchronicOnOff)               active->setOnOffMode((SynchronicOnOffMode)modi);
-        else if (type == SynchronicHoldMin)             active->setHoldMin(modi);
-        else if (type == SynchronicHoldMax)             active->setHoldMax(modi);
-        else if (type == SynchronicVelocityMin)         active->setVelocityMin(modi);
-        else if (type == SynchronicVelocityMax)         active->setVelocityMax(modi);
-        else if (type == SynchronicNumClusters)         active->setNumClusters(modi);
+        for (auto target : targets)
+        {
+            SynchronicPreparation::Ptr prep = gallery->getSynchronic(target)->aPrep;
+            prep->copy(mod);
+        }
         
         updateState->synchronicPreparationDidChange = true;
     }
@@ -1542,23 +1379,23 @@ void BKAudioProcessor::reset(BKPreparationType type, int Id)
     }
     if (type == PreparationTypeDirectMod)
     {
-        gallery->getDirectModPreparation(Id)->clearAll();
+        gallery->getDirectModification(Id)->reset();
     }
     else if (type == PreparationTypeNostalgicMod)
     {
-        gallery->getNostalgicModPreparation(Id)->clearAll();
+        gallery->getNostalgicModification(Id)->reset();
     }
     else if (type == PreparationTypeSynchronicMod)
     {
-        gallery->getSynchronicModPreparation(Id)->clearAll();
+        gallery->getSynchronicModification(Id)->reset();
     }
     else if (type == PreparationTypeTuningMod)
     {
-        gallery->getTuningModPreparation(Id)->clearAll();
+        gallery->getTuningModification(Id)->reset();
     }
     else if (type == PreparationTypeTempoMod)
     {
-        gallery->getTempoModPreparation(Id)->clearAll();
+        gallery->getTempoModification(Id)->reset();
     }
     
 }
@@ -1611,23 +1448,23 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     }
     if (type == PreparationTypeDirectMod)
     {
-        gallery->getDirectModPreparation(Id)->clearAll();
+        gallery->getDirectModification(Id)->reset();
     }
     else if (type == PreparationTypeNostalgicMod)
     {
-        gallery->getNostalgicModPreparation(Id)->clearAll();
+        gallery->getNostalgicModification(Id)->reset();
     }
     else if (type == PreparationTypeSynchronicMod)
     {
-        gallery->getSynchronicModPreparation(Id)->clearAll();
+        gallery->getSynchronicModification(Id)->reset();
     }
     else if (type == PreparationTypeTuningMod)
     {
-        gallery->getTuningModPreparation(Id)->clearAll();
+        gallery->getTuningModification(Id)->reset();
     }
     else if (type == PreparationTypeTempoMod)
     {
-        gallery->getTempoModPreparation(Id)->clearAll();
+        gallery->getTempoModification(Id)->reset();
     }
     
 }

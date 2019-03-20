@@ -25,34 +25,6 @@ Modifications::~Modifications()
 }
 
 
-
-String  Modifications::stringRepresentation(void)
-{
-    String out = "";
-    
-    for (auto mod : directMods)
-    {
-        out += (String(mod->getNote())+ ":dm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
-    }
-    
-    for (auto mod : synchronicMods)
-    {
-        out += (String(mod->getNote())+ ":sm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
-    }
-    
-    for (auto mod : nostalgicMods)
-    {
-        out += (String(mod->getNote())+ ":nm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
-    }
-
-    for (auto mod : tuningMods)
-    {
-        out += (String(mod->getNote())+ ":tm" + String(mod->getId()) + ":{" + String( mod->getPrepId()) + "} ");
-    }
-    
-    return out;
-}
-
 void Modifications::addSynchronicModification(SynchronicModification::Ptr m)
 {
     synchronicMods.add(m);
@@ -133,14 +105,11 @@ void Modifications::removeDirectModification(int which)
 {
     for (int i = 0; i < directMods.size(); i++)
     {
-        DBG("trying to remove: " + String(which));
-        DBG("dmod ID: " + String(directMods[i]->getId()));
         if (directMods[i]->getId() == which)
         {
             directMods.remove(i);
             break;
         }
-        
     }
 }
 
