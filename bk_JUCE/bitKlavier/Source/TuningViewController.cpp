@@ -602,7 +602,7 @@ void TuningViewController::fillTuningCB(void)
         }
                 
         if(name == "Custom") {
-            customIndex = i;
+            customIndex = i - 2;
         }
         
         if(i>8 && i<=35) //historical
@@ -1321,6 +1321,7 @@ void TuningPreparationEditor::update(void)
         int scaleIndex = prep->getScale();
         scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
         scaleCB.setSelectedItemIndex(scaleIndex, dontSendNotification);
+
         
         int springScaleId = prep->getCurrentSpringScaleId();
         if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId - 2);
@@ -1332,9 +1333,9 @@ void TuningPreparationEditor::update(void)
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
 
+        DBG("offsets: " + floatArrayToString(prep->getAbsoluteOffsets()));
         absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
-        Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-        customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+        customKeyboard.setValues(tuning->getCurrentScaleCents());
         
         A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
         A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
@@ -1702,7 +1703,9 @@ void TuningModificationEditor::update(void)
         
         selectCB.setSelectedId(processor.updateState->currentModTuningId, dontSendNotification);
         
-        scaleCB.setSelectedItemIndex(mod->getScale(), dontSendNotification);
+        int scaleIndex = mod->getScale();
+        scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
+        scaleCB.setSelectedItemIndex(scaleIndex, dontSendNotification);
         
         fundamentalCB.setSelectedItemIndex( mod->getFundamental(), dontSendNotification);
         
@@ -1712,7 +1715,9 @@ void TuningModificationEditor::update(void)
         
         customKeyboard.setValues(mod->getCustomScaleCents());
         
-        A1IntervalScaleCB.setSelectedItemIndex(mod->getAdaptiveIntervalScale(), dontSendNotification);
+        scaleIndex = mod->getAdaptiveIntervalScale();
+        scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
+        A1IntervalScaleCB.setSelectedItemIndex(scaleIndex, dontSendNotification);
         
         A1Inversional.setToggleState((bool)mod->getAdaptiveInversional(), dontSendNotification);
         
@@ -1757,9 +1762,9 @@ void TuningModificationEditor::update(void)
         for (int i = 0; i < 12; i++) springSliders[i]->setValue(vals[i], dontSendNotification);
         */
    
-        int springScaleId = mod->getSpringTuning()->getScaleId();
-        if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId - 2);
-        springScaleCB.setSelectedItemIndex(springScaleId, dontSendNotification);
+        scaleIndex = mod->getSpringTuning()->getScaleId();
+        scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
+        springScaleCB.setSelectedItemIndex(scaleIndex, dontSendNotification);
         
         int fund = mod->getSpringTuning()->getIntervalFundamental();
         springScaleFundamentalCB.setSelectedItemIndex(fund, dontSendNotification);
@@ -1908,9 +1913,10 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (box == &scaleCB)
     {
-        int scaleIndex = (index >= AdaptiveTuning) ? index - 2 : index;
-        mod->setScale((TuningSystem)scaleIndex);
-        mod->setDirty(TuningScale);
+        DBG("name of scale chosen: " + box->getItemText(index));
+        
+        //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
+        mod->setScaleByName(box->getItemText(index));
         
         scaleCB.setAlpha(1.);
         
@@ -2005,6 +2011,8 @@ void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> v
     
     if(name == absoluteKeyboard.getName())
     {
+        mod->setAbsoluteOffsets(values);
+        mod->setDirty(TuningAbsoluteOffsets);
         
         absoluteKeyboard.setAlpha(1.);
         
@@ -2016,7 +2024,7 @@ void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> v
         mod->setCustomScale(values);
         mod->setDirty(TuningCustomScale);
         
-        mod->setScale((TuningSystem) customIndex);
+        mod->setScaleByName(scaleCB.getItemText(customIndex));
         mod->setDirty(TuningScale);
         
         customKeyboard.setAlpha(1.);

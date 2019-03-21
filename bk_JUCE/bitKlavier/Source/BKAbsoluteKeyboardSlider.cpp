@@ -325,4 +325,5 @@ void BKAbsoluteKeyboardSlider::setValues(Array<float> newvals)
         keyboard->setKeyValue(i, newvals.getUnchecked(i));
     }
     
+    keyboard->repaint();
 }

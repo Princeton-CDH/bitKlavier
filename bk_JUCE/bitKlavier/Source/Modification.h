@@ -23,9 +23,8 @@
 class Modification
 {
 public:
-    Modification(int Id, int note, int numParams):
-    Id(Id),
-    note(note)
+    Modification(int Id, int numParams):
+    Id(Id)
     {
         dirty.ensureStorageAllocated(numParams);
         for (int i = 0; i < numParams; i++) dirty.add(false);
@@ -37,11 +36,9 @@ public:
     }
     
     inline void setId(int I){ Id = I; }
-    inline void setNote(int n){note=n;}
     inline void setTargets(Array<int> targ) { targets = targ; }
 
     inline const int getId(void){return Id;}
-    inline const int getNote(void){return note;}
     inline const Array<int> getTargets(void) { return targets; }
     
     inline void addTarget(int targ) { targets.addIfNotAlreadyThere(targ); }
@@ -76,7 +73,6 @@ public:
     
 protected:
     int             Id;
-    int             note;
     
     Array<int>      targets;
     Array<bool>     dirty;
@@ -96,7 +92,7 @@ public:
     typedef Array<DirectModification::Ptr>                  PtrArr;
     
     DirectModification(int Id):
-    Modification(Id, -1, DirectParameterTypeNil),
+    Modification(Id, DirectParameterTypeNil),
     DirectPreparation()
     {
         DBG("dirtysize: " + String(dirty.size()));
@@ -197,7 +193,7 @@ public:
     typedef Array<SynchronicModification::Ptr>                  PtrArr;
     
     SynchronicModification(int Id):
-    Modification(Id, -1, SynchronicParameterTypeNil),
+    Modification(Id, SynchronicParameterTypeNil),
     SynchronicPreparation()
     {
     }
@@ -297,7 +293,7 @@ public:
     typedef Array<NostalgicModification::Ptr>                  PtrArr;
     
     NostalgicModification(int Id):
-    Modification(Id, -1, NostalgicParameterTypeNil),
+    Modification(Id, NostalgicParameterTypeNil),
     NostalgicPreparation()
     {
     }
@@ -398,7 +394,7 @@ public:
     typedef Array<TuningModification::Ptr>                  PtrArr;
     
     TuningModification(int Id):
-    Modification(Id, -1, TuningParameterTypeNil),
+    Modification(Id, TuningParameterTypeNil),
     TuningPreparation()
     {
     }
@@ -515,7 +511,7 @@ public:
     typedef Array<TempoModification::Ptr>                  PtrArr;
     
     TempoModification(int Id):
-    Modification(Id, -1, TempoParameterTypeNil),
+    Modification(Id, TempoParameterTypeNil),
     TempoPreparation()
     {
         

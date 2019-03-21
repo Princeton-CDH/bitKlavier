@@ -902,7 +902,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
             TuningPreparation::Ptr prep = gallery->getTuning(target)->aPrep;
             prep->copy(mod);
         }
-
+ 
         updateState->tuningPreparationDidChange = true;
     }
     
