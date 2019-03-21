@@ -130,6 +130,14 @@ public:
         prep.setProperty( "Id", Id, 0);
         prep.setProperty( "name", getName(), 0);
         
+        ValueTree dirtyVT( "dirty");
+        int count = 0;
+        for (auto b : dirty)
+        {
+            dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
+        }
+        prep.addChild(dirtyVT, -1, 0);
+        
         prep.addChild(DirectPreparation::getState(), -1, 0);
         
         return prep;
@@ -144,6 +152,23 @@ public:
         if (n != String::empty)     setName(n);
         else                        setName(String(Id));
         
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName("dirty"))
+            {
+                dirty.clear();
+                for (int k = 0; k < DirectParameterTypeNil; k++)
+                {
+                    String attr = sub->getStringAttribute("d" + String(k));
+                    
+                    if (attr == String::empty) dirty.add(false);
+                    else
+                    {
+                        dirty.add((bool)attr.getIntValue());
+                    }
+                }
+            }
+        }
         
         XmlElement* params = e->getChildByName("params");
         
@@ -205,6 +230,14 @@ public:
         prep.setProperty( "Id", Id, 0);
         prep.setProperty( "name", getName(), 0);
         
+        ValueTree dirtyVT( "dirty");
+        int count = 0;
+        for (auto b : dirty)
+        {
+            dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
+        }
+        prep.addChild(dirtyVT, -1, 0);
+        
         prep.addChild(SynchronicPreparation::getState(), -1, 0);
         
         return prep;
@@ -219,6 +252,23 @@ public:
         if (n != String::empty)     setName(n);
         else                        setName(String(Id));
         
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName("dirty"))
+            {
+                dirty.clear();
+                for (int k = 0; k < SynchronicParameterTypeNil; k++)
+                {
+                    String attr = sub->getStringAttribute("d" + String(k));
+                    
+                    if (attr == String::empty) dirty.add(false);
+                    else
+                    {
+                        dirty.add((bool)attr.getIntValue());
+                    }
+                }
+            }
+        }
         
         XmlElement* params = e->getChildByName("params");
         
@@ -280,6 +330,14 @@ public:
         prep.setProperty( "Id", Id, 0);
         prep.setProperty( "name", getName(), 0);
         
+        ValueTree dirtyVT( "dirty");
+        int count = 0;
+        for (auto b : dirty)
+        {
+            dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
+        }
+        prep.addChild(dirtyVT, -1, 0);
+        
         prep.addChild(NostalgicPreparation::getState(), -1, 0);
         
         return prep;
@@ -294,6 +352,23 @@ public:
         if (n != String::empty)     setName(n);
         else                        setName(String(Id));
         
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName("dirty"))
+            {
+                dirty.clear();
+                for (int k = 0; k < NostalgicParameterTypeNil; k++)
+                {
+                    String attr = sub->getStringAttribute("d" + String(k));
+                    
+                    if (attr == String::empty) dirty.add(false);
+                    else
+                    {
+                        dirty.add((bool)attr.getIntValue());
+                    }
+                }
+            }
+        }
         
         XmlElement* params = e->getChildByName("params");
         
@@ -356,6 +431,14 @@ public:
         prep.setProperty( "Id", Id, 0);
         prep.setProperty( "name", getName(), 0);
         
+        ValueTree dirtyVT( "dirty");
+        int count = 0;
+        for (auto b : dirty)
+        {
+            dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
+        }
+        prep.addChild(dirtyVT, -1, 0);
+        
         prep.addChild(TuningPreparation::getState(), -1, 0);
         
         return prep;
@@ -370,6 +453,23 @@ public:
         if (n != String::empty)     setName(n);
         else                        setName(String(Id));
         
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName("dirty"))
+            {
+                dirty.clear();
+                for (int k = 0; k < TuningParameterTypeNil; k++)
+                {
+                    String attr = sub->getStringAttribute("d" + String(k));
+                    
+                    if (attr == String::empty) dirty.add(false);
+                    else
+                    {
+                        dirty.add((bool)attr.getIntValue());
+                    }
+                }
+            }
+        }
         
         XmlElement* params = e->getChildByName("params");
         
@@ -449,6 +549,14 @@ public:
         prep.setProperty( "Id", Id, 0);
         prep.setProperty( "name", getName(), 0);
         
+        ValueTree dirtyVT( "dirty");
+        int count = 0;
+        for (auto b : dirty)
+        {
+            dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
+        }
+        prep.addChild(dirtyVT, -1, 0);
+        
         prep.addChild(TempoPreparation::getState(), -1, 0);
         
         return prep;
@@ -463,6 +571,24 @@ public:
         if (n != String::empty)     setName(n);
         else                        setName(String(Id));
         
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName("dirty"))
+            {
+                dirty.clear();
+                for (int k = 0; k < TempoParameterTypeNil; k++)
+                {
+                    String attr = sub->getStringAttribute("d" + String(k));
+                    
+                    if (attr == String::empty) dirty.add(false);
+                    else
+                    {
+                        dirty.add((bool)attr.getIntValue());
+                    }
+                }
+            }
+        }
         
         XmlElement* params = e->getChildByName("params");
         

@@ -1047,16 +1047,16 @@ void Piano::setState(XmlElement* e)
                     
                     thisItem->setItemName("Comment");
                     
-                    i = item->getStringAttribute("X").getIntValue();
+                    i =  (int) atof(item->getStringAttribute("X").getCharPointer());
                     int x = i;
                     
-                    i = item->getStringAttribute("Y").getIntValue();
+                    i =  (int) atof(item->getStringAttribute("Y").getCharPointer());
                     int y = i;
                     
-                    i = item->getStringAttribute("W").getIntValue();
+                    i =  (int) atof(item->getStringAttribute("W").getCharPointer());
                     int w = i;
                     
-                    i = item->getStringAttribute("H").getIntValue();
+                    i =  (int) atof(item->getStringAttribute("H").getCharPointer());
                     int h = i;
                     
                     String s = item->getStringAttribute("text");
@@ -1085,10 +1085,10 @@ void Piano::setState(XmlElement* e)
                         
                         thisItem->setItemName(item->getStringAttribute("name"));
                         
-                        i = item->getStringAttribute("X").getIntValue();
+                        i =  (int) atof(item->getStringAttribute("X").getCharPointer());
                         int x = i;
                         
-                        i = item->getStringAttribute("Y").getIntValue();
+                        i =  (int) atof(item->getStringAttribute("Y").getCharPointer());
                         int y = i;
                         
                         thisItem->setCentrePosition(x, y);
@@ -1130,10 +1130,10 @@ void Piano::setState(XmlElement* e)
                         
                         thisConnection->setPianoTarget(cPiano);
                         
-                        i = connection->getStringAttribute("X").getIntValue();
+                        i =  (int) atof(connection->getStringAttribute("X").getCharPointer());
                         int x = i;
                         
-                        i = connection->getStringAttribute("Y").getIntValue();
+                        i =  (int) atof(connection->getStringAttribute("Y").getCharPointer());
                         int y = i;
                         
                         thisConnection->setCentrePosition(x, y);
