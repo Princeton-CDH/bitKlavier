@@ -141,43 +141,40 @@ public:
     
     inline void setState(XmlElement* e)
     {
+        
         Id = e->getStringAttribute("Id").getIntValue();
         
         String n = e->getStringAttribute("name");
         
         if (n != String::empty)     setName(n);
         else                        setName(String(Id));
+    
+        XmlElement* dirtyXml = e->getChildByName("dirty");
+        XmlElement* paramsXml = e->getChildByName("params");
         
-        forEachXmlChildElement (*e, sub)
+        if (dirtyXml != nullptr && paramsXml != nullptr)
         {
-            if (sub->hasTagName("dirty"))
+            dirty.clear();
+            for (int k = 0; k < DirectParameterTypeNil; k++)
             {
-                dirty.clear();
-                for (int k = 0; k < DirectParameterTypeNil; k++)
+                String attr = dirtyXml->getStringAttribute("d" + String(k));
+                
+                if (attr == String::empty) dirty.add(false);
+                else
                 {
-                    String attr = sub->getStringAttribute("d" + String(k));
-                    
-                    if (attr == String::empty) dirty.add(false);
-                    else
-                    {
-                        dirty.add((bool)attr.getIntValue());
-                    }
+                    dirty.add((bool)attr.getIntValue());
                 }
             }
-        }
-        
-        XmlElement* params = e->getChildByName("params");
-        
-        if (params != nullptr)
-        {
-            DirectPreparation::setState(params);
+            
+            DirectPreparation::setState(paramsXml);
         }
         else
         {
-            DirectPreparation::setState(e);
+            setStateOld(e);
         }
     }
     
+    void setStateOld(XmlElement* e);
     
 private:
 
@@ -248,36 +245,32 @@ public:
         if (n != String::empty)     setName(n);
         else                        setName(String(Id));
         
-        forEachXmlChildElement (*e, sub)
+        XmlElement* dirtyXml = e->getChildByName("dirty");
+        XmlElement* paramsXml = e->getChildByName("params");
+        
+        if (dirtyXml != nullptr && paramsXml != nullptr)
         {
-            if (sub->hasTagName("dirty"))
+            dirty.clear();
+            for (int k = 0; k < SynchronicParameterTypeNil; k++)
             {
-                dirty.clear();
-                for (int k = 0; k < SynchronicParameterTypeNil; k++)
+                String attr = dirtyXml->getStringAttribute("d" + String(k));
+                
+                if (attr == String::empty) dirty.add(false);
+                else
                 {
-                    String attr = sub->getStringAttribute("d" + String(k));
-                    
-                    if (attr == String::empty) dirty.add(false);
-                    else
-                    {
-                        dirty.add((bool)attr.getIntValue());
-                    }
+                    dirty.add((bool)attr.getIntValue());
                 }
             }
-        }
-        
-        XmlElement* params = e->getChildByName("params");
-        
-        if (params != nullptr)
-        {
-            SynchronicPreparation::setState(params);
+            
+            SynchronicPreparation::setState(paramsXml);
         }
         else
         {
-            SynchronicPreparation::setState(e);
+            setStateOld(e);
         }
     }
     
+    void setStateOld(XmlElement* e);
     
 private:
     
@@ -348,36 +341,32 @@ public:
         if (n != String::empty)     setName(n);
         else                        setName(String(Id));
         
-        forEachXmlChildElement (*e, sub)
+        XmlElement* dirtyXml = e->getChildByName("dirty");
+        XmlElement* paramsXml = e->getChildByName("params");
+        
+        if (dirtyXml != nullptr && paramsXml != nullptr)
         {
-            if (sub->hasTagName("dirty"))
+            dirty.clear();
+            for (int k = 0; k < NostalgicParameterTypeNil; k++)
             {
-                dirty.clear();
-                for (int k = 0; k < NostalgicParameterTypeNil; k++)
+                String attr = dirtyXml->getStringAttribute("d" + String(k));
+                
+                if (attr == String::empty) dirty.add(false);
+                else
                 {
-                    String attr = sub->getStringAttribute("d" + String(k));
-                    
-                    if (attr == String::empty) dirty.add(false);
-                    else
-                    {
-                        dirty.add((bool)attr.getIntValue());
-                    }
+                    dirty.add((bool)attr.getIntValue());
                 }
             }
-        }
-        
-        XmlElement* params = e->getChildByName("params");
-        
-        if (params != nullptr)
-        {
-            NostalgicPreparation::setState(params);
+            
+            NostalgicPreparation::setState(paramsXml);
         }
         else
         {
-            NostalgicPreparation::setState(e);
+            setStateOld(e);
         }
     }
     
+    void setStateOld(XmlElement* e);
     
 private:
     
@@ -449,35 +438,32 @@ public:
         if (n != String::empty)     setName(n);
         else                        setName(String(Id));
         
-        forEachXmlChildElement (*e, sub)
+        XmlElement* dirtyXml = e->getChildByName("dirty");
+        XmlElement* paramsXml = e->getChildByName("params");
+        
+        if (dirtyXml != nullptr && paramsXml != nullptr)
         {
-            if (sub->hasTagName("dirty"))
+            dirty.clear();
+            for (int k = 0; k < TuningParameterTypeNil; k++)
             {
-                dirty.clear();
-                for (int k = 0; k < TuningParameterTypeNil; k++)
+                String attr = dirtyXml->getStringAttribute("d" + String(k));
+                
+                if (attr == String::empty) dirty.add(false);
+                else
                 {
-                    String attr = sub->getStringAttribute("d" + String(k));
-                    
-                    if (attr == String::empty) dirty.add(false);
-                    else
-                    {
-                        dirty.add((bool)attr.getIntValue());
-                    }
+                    dirty.add((bool)attr.getIntValue());
                 }
             }
-        }
-        
-        XmlElement* params = e->getChildByName("params");
-        
-        if (params != nullptr)
-        {
-            TuningPreparation::setState(params);
+            
+            TuningPreparation::setState(paramsXml);
         }
         else
         {
-            TuningPreparation::setState(e);
+            setStateOld(e);
         }
     }
+    
+    void setStateOld(XmlElement* e);
     
     inline void setTetherWeightsActive(Array<bool> a) { tetherWeightsActive = a; }
     inline Array<bool> getTetherWeightsActive(void) { return tetherWeightsActive; }
@@ -490,7 +476,6 @@ public:
     
     inline bool getSpringWeightActive(int i) { return springWeightsActive[i]; }
     inline void setSpringWeightActive(int i, bool a) { springWeightsActive.setUnchecked(i, a); }
-    
     
 private:
     
@@ -567,37 +552,32 @@ public:
         if (n != String::empty)     setName(n);
         else                        setName(String(Id));
         
+        XmlElement* dirtyXml = e->getChildByName("dirty");
+        XmlElement* paramsXml = e->getChildByName("params");
         
-        forEachXmlChildElement (*e, sub)
+        if (dirtyXml != nullptr && paramsXml != nullptr)
         {
-            if (sub->hasTagName("dirty"))
+            dirty.clear();
+            for (int k = 0; k < TempoParameterTypeNil; k++)
             {
-                dirty.clear();
-                for (int k = 0; k < TempoParameterTypeNil; k++)
+                String attr = dirtyXml->getStringAttribute("d" + String(k));
+                
+                if (attr == String::empty) dirty.add(false);
+                else
                 {
-                    String attr = sub->getStringAttribute("d" + String(k));
-                    
-                    if (attr == String::empty) dirty.add(false);
-                    else
-                    {
-                        dirty.add((bool)attr.getIntValue());
-                    }
+                    dirty.add((bool)attr.getIntValue());
                 }
             }
-        }
-        
-        XmlElement* params = e->getChildByName("params");
-        
-        if (params != nullptr)
-        {
-            TempoPreparation::setState(params);
+            
+            TempoPreparation::setState(paramsXml);
         }
         else
         {
-            TempoPreparation::setState(e);
+            setStateOld(e);
         }
     }
     
+    void setStateOld(XmlElement* e);
     
 private:
     

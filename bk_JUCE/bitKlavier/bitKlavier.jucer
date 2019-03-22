@@ -233,7 +233,6 @@
         <GROUP id="{047FD2F8-E8BA-EA56-25D7-A60B1DB51FE3}" name="Maps">
           <FILE id="T5gv2Z" name="ItemMapper.h" compile="0" resource="0" file="Source/ItemMapper.h"/>
           <FILE id="hJbk7x" name="Keymap.h" compile="0" resource="0" file="Source/Keymap.h"/>
-          <FILE id="xHx6az" name="Modification.h" compile="0" resource="0" file="Source/Modification.h"/>
           <FILE id="sbtYa6" name="Modifications.cpp" compile="1" resource="0"
                 file="Source/Modifications.cpp"/>
           <FILE id="jsTxEL" name="Modifications.h" compile="0" resource="0" file="Source/Modifications.h"/>
@@ -243,6 +242,9 @@
                 file="Source/PreparationMap.h"/>
         </GROUP>
         <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparation">
+          <FILE id="VFgtPR" name="Modification.cpp" compile="1" resource="0"
+                file="Source/Modification.cpp"/>
+          <FILE id="xHx6az" name="Modification.h" compile="0" resource="0" file="Source/Modification.h"/>
           <FILE id="JhmXbp" name="Direct.cpp" compile="1" resource="0" file="Source/Direct.cpp"/>
           <FILE id="QYzU0z" name="Direct.h" compile="0" resource="0" file="Source/Direct.h"/>
           <FILE id="hzuh1H" name="Nostalgic.cpp" compile="1" resource="0" file="Source/Nostalgic.cpp"/>
