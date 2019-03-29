@@ -31,7 +31,7 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
     //do adaptive tunings if using
     if(tuning->aPrep->getAdaptiveType() == AdaptiveNormal || tuning->aPrep->getAdaptiveType() == AdaptiveAnchored)
     {
-        float lastNoteOffset = adaptiveCalculate(midiNoteNumber);
+        float lastNoteOffset = adaptiveCalculate(midiNoteNumber) + tuning->aPrep->getFundamentalOffset(); // added getFundamentalOffset()
         
         if(updateLastInterval)
         {
