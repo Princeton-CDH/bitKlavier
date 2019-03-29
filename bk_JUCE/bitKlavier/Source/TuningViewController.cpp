@@ -1389,8 +1389,8 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         //DBG("updating custom tuning vals");
         scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
         
-        prep->setScale((TuningSystem)customIndex);
-        active->setScale((TuningSystem)customIndex);
+        prep->setScaleByName(scaleCB.getItemText(customIndex));
+        active->setScaleByName(scaleCB.getItemText(customIndex));
         
         //DBG("keyboardSliderChanged values.size() = " + String(values.size()));
         prep->setCustomScaleCents(values);
