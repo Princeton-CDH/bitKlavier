@@ -257,16 +257,17 @@ public:
     inline const void setHoldMin(float min)  { holdMin = min; }
     inline const void setHoldMax(float max)  { holdMax = max; }
     
-    inline const float getVelocityMin() const noexcept { return velocityMin; }
-    inline const float getVelocityMax() const noexcept { return velocityMax; }
+    inline const int getVelocityMin() const noexcept { return velocityMin; }
+    inline const int getVelocityMax() const noexcept { return velocityMax; }
     
-    inline const void setVelocityMin(float min)  { velocityMin = min; }
-    inline const void setVelocityMax(float max)  { velocityMax = max; }
+    inline const void setVelocityMin(int min)  { velocityMin = min; }
+    inline const void setVelocityMax(int max)  { velocityMax = max; }
     
-    inline const float getClusterMin() const noexcept { return clusterMin; }
-    inline const float getClusterMax() const noexcept { return clusterMax; }
+    inline const int getClusterMin() const noexcept { return clusterMin; }
+    inline const int getClusterMax() const noexcept { return clusterMax; }
     
-    inline const void setClusterMin(float min)  { clusterMin = min; }
+    inline const void setClusterMin(int min)  { clusterMin = min; }
+    inline const void setClusterMax(int max)  { clusterMax = max; }
     
     inline const bool getKeyOnReset() const noexcept { return keyOnReset; }
     
@@ -475,7 +476,7 @@ public:
         
         if (str != "")
         {
-            i = str.getIntValue();
+            i = atoi(str.getCharPointer());
             setVelocityMin(i);
         }
         else
@@ -488,7 +489,7 @@ public:
         
         if (str != "")
         {
-            i = str.getIntValue();
+            i = atoi(str.getCharPointer());
             setVelocityMax(i);
         }
         else

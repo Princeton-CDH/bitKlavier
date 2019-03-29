@@ -461,8 +461,15 @@ public:
     inline const int getVelocityMin() const noexcept { return velocityMin; }
     inline const int getVelocityMax() const noexcept { return velocityMax; }
     
-    inline const void setVelocityMin(int min)  { velocityMin = min; }
-    inline const void setVelocityMax(int max)  { velocityMax = max; }
+    inline const void setVelocityMin(int min)
+    {
+        velocityMin = min;
+    }
+    
+    inline const void setVelocityMax(int max)
+    {
+        velocityMax = max;
+    }
     
 	inline void clearADSRs()
 	{

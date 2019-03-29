@@ -739,6 +739,9 @@ void NostalgicPreparationEditor::BKRangeSliderValueChanged(String name, double m
         
         prep->setVelocityMax(maxval);
         active->setVelocityMax(maxval);
+        
+        DBG("velocity min: " + String(prep->getVelocityMin()));
+        DBG("velocity max: " + String(prep->getVelocityMax()));
     }
 }
 
