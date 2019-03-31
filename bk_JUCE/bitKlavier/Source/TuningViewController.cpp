@@ -586,6 +586,16 @@ void TuningViewController::fillTuningCB(void)
     submenus2.add(new PopupMenu());
     submenus2.add(new PopupMenu());
     
+    PopupMenu* additionalTuningsPopUp3 = A1AnchorScaleCB.getRootMenu();
+    OwnedArray<PopupMenu> submenus3;
+    submenus3.add(new PopupMenu());
+    submenus3.add(new PopupMenu());
+    
+    PopupMenu* additionalTuningsPopUp4 = A1IntervalScaleCB.getRootMenu();
+    OwnedArray<PopupMenu> submenus4;
+    submenus4.add(new PopupMenu());
+    submenus4.add(new PopupMenu());
+    
     int count =0;
     for (int i = 0; i < cTuningSystemNames.size(); i++) //&& if(i<=8), for original systems; otherwise add to submenu of historical temperaments
     {
@@ -614,6 +624,12 @@ void TuningViewController::fillTuningCB(void)
             
             PopupMenu* historicalMenu2 = submenus2.getUnchecked(0);
             historicalMenu2->addItem(i+1, name);
+            
+            PopupMenu* historicalMenu3 = submenus3.getUnchecked(0);
+            historicalMenu3->addItem(i+1, name);
+            
+            PopupMenu* historicalMenu4 = submenus4.getUnchecked(0);
+            historicalMenu4->addItem(i+1, name);
         }
         else if (i>35) //various
         {
@@ -624,6 +640,12 @@ void TuningViewController::fillTuningCB(void)
             
             PopupMenu* variousMenu2 = submenus2.getUnchecked(1);
             variousMenu2->addItem(i+1, name);
+            
+            PopupMenu* variousMenu3 = submenus3.getUnchecked(1);
+            variousMenu3->addItem(i+1, name);
+            
+            PopupMenu* variousMenu4 = submenus4.getUnchecked(1);
+            variousMenu4->addItem(i+1, name);
         }
     }
     
@@ -634,6 +656,14 @@ void TuningViewController::fillTuningCB(void)
     springScaleCB.addSeparator();
     additionalTuningsPopUp2->addSubMenu("Historical", *submenus2.getUnchecked(0));
     additionalTuningsPopUp2->addSubMenu("Various", *submenus2.getUnchecked(1));
+    
+    A1AnchorScaleCB.addSeparator();
+    additionalTuningsPopUp3->addSubMenu("Historical", *submenus3.getUnchecked(0));
+    additionalTuningsPopUp3->addSubMenu("Various", *submenus3.getUnchecked(1));
+    
+    A1IntervalScaleCB.addSeparator();
+    additionalTuningsPopUp4->addSubMenu("Historical", *submenus4.getUnchecked(0));
+    additionalTuningsPopUp4->addSubMenu("Various", *submenus4.getUnchecked(1));
     
 }
 

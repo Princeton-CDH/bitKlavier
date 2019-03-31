@@ -470,7 +470,7 @@ void TempoPreparationEditor::update(void)
 {
     if (processor.updateState->currentTempoId < 0) return;
     
-    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr prep = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
     
     if (prep != nullptr)
     {
