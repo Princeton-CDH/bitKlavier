@@ -93,9 +93,6 @@ void Piano::configure(void)
         BKPreparationType thisType = item->getType();
         int thisId = item->getId();
         
-        //DBG("type: " + cPreparationTypes[thisType] + " Id: " + String(thisId));
-        //DBG("bounds: " + rectangleToString(item->getBounds()));
-        
         if (thisId > processor.gallery->getIdCount(thisType)) processor.gallery->setIdCount(thisType, thisId);
         
         addProcessor(thisType, thisId);

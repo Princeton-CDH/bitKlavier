@@ -564,7 +564,6 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
                 && voice->isPlayingChannel (midiChannel)
                 && (voice->layerId == layerToLayerId(type, layerId))) //need to add transposition level as well here
             {
-                
                 if (BKSynthesiserSound* const sound = voice->getCurrentlyPlayingSound())
                 {
                     if (sound->appliesToNote (midiNoteNumber) 

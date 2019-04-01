@@ -183,6 +183,7 @@ public:
                                 int startSample, int numSamples,
                                 const BKPianoSamplerSound* playingSound);
     
+    BKNoteType getNoteType(void) { return bkType; };
     
 private:
     //==============================================================================

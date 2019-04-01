@@ -454,6 +454,8 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
 {
     if (allowTailOff)
     {
+        DBG("note type: " + cNoteTypes[getNoteType()]);
+        adsr.setReleaseTime(0.003f);
         adsr.keyOff();
         sfzadsr.keyOff();
     }
@@ -766,6 +768,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     
     while (--numSamples >= 0)
     {
+
         if ((adsr.getState() != stk::ADSR::IDLE) &&
             (playDirection == Reverse) &&
             (sourceSamplePosition > playingSound->soundLength - 1))

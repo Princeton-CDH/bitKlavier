@@ -220,6 +220,17 @@ typedef enum BKNoteType {
     BKNoteTypeNil,
 } BKNoteType;
 
+static const std::vector<std::string> cNoteTypes = {
+    "SynchronicNote",
+    "NostalgicNote",
+    "DirectNote",
+    "MainNote",
+    "HammerNote",
+    "ResonanceNote",
+    "PedalNote",
+    "NilNote"
+};
+
 typedef enum BKPreparationType {
     PreparationTypeDirect = 0,
     PreparationTypeSynchronic,

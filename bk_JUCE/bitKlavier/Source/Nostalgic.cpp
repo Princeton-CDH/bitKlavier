@@ -423,7 +423,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                     {
                         for (auto transp : prep->getTransposition())
                         {
-                            //DBG("undertow remove: " + String(midiNoteNumber + transp));
+                            DBG("undertow remove: " + String(midiNoteNumber + transp));
                             synth->keyOff (midiChannel,
                                            NostalgicNote,
                                            nostalgic->getId(),
