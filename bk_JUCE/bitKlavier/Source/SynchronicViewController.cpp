@@ -412,22 +412,29 @@ void SynchronicViewController::displayTab(int tab)
         leftColumn.removeFromRight(processor.paddingScalarX * 20);
         leftColumn.removeFromLeft(processor.paddingScalarX * 20);
         
-        area.removeFromLeft(processor.paddingScalarX * 20); //now right column
+        area.removeFromLeft(processor.paddingScalarX * 20); //area is now right column
         area.removeFromRight(processor.paddingScalarX * 20);
         
         int columnHeight = leftColumn.getHeight();
         
-        Rectangle<int> modeSelectCBRect (leftColumn.removeFromTop(columnHeight / 5));
-        modeSelectCB.setBounds(modeSelectCBRect.removeFromLeft(modeSelectCBRect.getWidth()*0.5).removeFromTop(gComponentComboBoxHeight));
-        modeLabel.setBounds(modeSelectCBRect.removeFromTop(gComponentComboBoxHeight));
+        Rectangle<int> modeSelectCBRect (leftColumn.removeFromTop(columnHeight / 4));
+        Rectangle<int> modeSelectLabel (modeSelectCBRect.removeFromRight(modeSelectCBRect.getWidth()*0.5));
+        modeSelectCB.setBounds(modeSelectCBRect.removeFromTop(gComponentComboBoxHeight));
+        modeLabel.setBounds(modeSelectLabel.removeFromTop(gComponentComboBoxHeight));
+        modeSelectCBRect.removeFromTop(gYSpacing);
+        modeSelectLabel.removeFromTop(gYSpacing);
+        onOffSelectCB.setBounds(modeSelectCBRect.removeFromTop(gComponentComboBoxHeight));
+        onOffLabel.setBounds(modeSelectLabel.removeFromTop(gComponentComboBoxHeight));
         
+        /*
         Rectangle<int> onOffSelectCBRect (leftColumn.removeFromTop(columnHeight / 5));
         onOffSelectCB.setBounds(onOffSelectCBRect.removeFromLeft(onOffSelectCBRect.getWidth()*0.5).removeFromTop(gComponentComboBoxHeight));
         onOffLabel.setBounds(onOffSelectCBRect.removeFromTop(gComponentComboBoxHeight));
+        */
         
-        howManySlider->setBounds(leftColumn.removeFromTop(columnHeight / 5));
-        numClusterSlider->setBounds(leftColumn.removeFromTop(columnHeight / 5));
-        gainSlider->setBounds(leftColumn.removeFromTop(columnHeight / 5));
+        howManySlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
+        numClusterSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
+        gainSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
         
         clusterThreshSlider->setBounds(area.removeFromTop(columnHeight / 4));
         clusterMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
