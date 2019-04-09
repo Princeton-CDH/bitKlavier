@@ -144,7 +144,7 @@ BKViewController(p, theGraph, 2)
     holdTimeMinMaxSlider->setJustifyRight(true);
     addAndMakeVisible(holdTimeMinMaxSlider, ALL);
     
-    velocityMinMaxSlider = new BKRangeSlider("velocity min/max (0-127)", 0, 127, 0, 127, 1);
+    velocityMinMaxSlider = new BKRangeSlider("velocity min/max", 0, 127, 0, 127, 1);
     velocityMinMaxSlider->setToolTipString("Sets Min and Max velocity (0-127) to trigger pulses; Min can be greater than Max");
     velocityMinMaxSlider->setJustifyRight(true);
     addAndMakeVisible(velocityMinMaxSlider, ALL);
@@ -155,8 +155,8 @@ BKViewController(p, theGraph, 2)
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(gainSlider, ALL);
     
-    numClusterSlider = new BKSingleSlider("num clusters", 1, 10, 1, 1);
-    numClusterSlider->setToolTipString("Number of clusters.");
+    numClusterSlider = new BKSingleSlider("num layers", 1, 10, 1, 1);
+    numClusterSlider->setToolTipString("Number of simultaneous layers of pulses");
     numClusterSlider->setJustifyRight(false);
     addAndMakeVisible(numClusterSlider, ALL);
     
@@ -850,7 +850,7 @@ void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double 
         active->setHoldMin(minval);
         active->setHoldMax(maxval);
     }
-    else if(name == "velocity min/max (0-127)") {
+    else if(name == "velocity min/max") {
         DBG("got new velocity min/max " + String(minval) + " " + String(maxval));
         prep->setVelocityMin(minval);
         prep->setVelocityMax(maxval);
