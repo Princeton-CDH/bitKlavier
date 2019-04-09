@@ -357,6 +357,7 @@ void SynchronicViewController::displayTab(int tab)
             offsetParamStartToggle.setBounds(right - 100, selectCB.getY(), 100, 30);
         }
         
+        iconImageComponent.toBack();
     }
     else if (tab == 1)
     {
@@ -380,6 +381,8 @@ void SynchronicViewController::displayTab(int tab)
         
         onOffLabel.setVisible(true);
         onOffSelectCB.setVisible(true);
+        
+        iconImageComponent.toBack();
         
         //releaseVelocitySetsSynchronicToggle.setVisible(true);
         
