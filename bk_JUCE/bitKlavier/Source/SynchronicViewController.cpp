@@ -408,8 +408,13 @@ void SynchronicViewController::displayTab(int tab)
         area.removeFromLeft(leftArrow.getWidth());
         
         Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth()* 0.5));
+        
         leftColumn.removeFromRight(processor.paddingScalarX * 20);
+        leftColumn.removeFromLeft(processor.paddingScalarX * 20);
+        
         area.removeFromLeft(processor.paddingScalarX * 20); //now right column
+        area.removeFromRight(processor.paddingScalarX * 20);
+        
         int columnHeight = leftColumn.getHeight();
         
         Rectangle<int> modeSelectCBRect (leftColumn.removeFromTop(columnHeight / 5));
