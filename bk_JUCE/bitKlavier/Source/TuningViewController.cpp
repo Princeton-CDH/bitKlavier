@@ -504,9 +504,6 @@ void TuningViewController::displayTab(int tab)
                                          intervalStiffnessSlider->getWidth(),
                                          gComponentSingleSliderHeight);
         
-        //dragSlider->setBounds(fundamentalCB.getX()-gComponentSingleSliderXOffset, intervalStiffnessSlider->getY(), fundamentalCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
-        
-        
         float sliderHeight = (absoluteKeyboard.getBottom() - (rateSlider->getBottom() + gYSpacing)) / 13.;
         
         for (int i = 0; i < 12; i++)
@@ -988,6 +985,7 @@ void TuningViewController::fillFundamentalCB(void)
     springScaleFundamentalCB.addItem("lowest", (int)cFundamentalNames.size()+2);
     springScaleFundamentalCB.addItem("highest", (int)cFundamentalNames.size()+3);
     springScaleFundamentalCB.addItem("last", (int)cFundamentalNames.size()+4);
+    
 }
 
 void TuningViewController::updateComponentVisibility()
@@ -1017,6 +1015,18 @@ void TuningViewController::updateComponentVisibility()
             nToneRootCB.setVisible(true);
             nToneRootOctaveCB.setVisible(true);
             nToneSemitoneWidthSlider->setVisible(true);
+            
+            
+            Array<float> intervalWeights = active->getSpringTuning()->getSpringWeights();
+            if (intervalWeights.size() < 12)
+            {
+                intervalWeights = tuning->getStaticSpringTuning()->getSpringWeights();
+            }
+            
+            for (int i = 0; i < 12; i++)
+            {
+                springSliders[i]->setValue(intervalWeights[i], dontSendNotification);
+            }
         }
         
         if (adaptiveType == AdaptiveNormal)
@@ -2526,7 +2536,6 @@ void TuningModificationEditor::sliderValueChanged (Slider* slider)
     
     if (intervalWeights.size() < 12)
     {
-        
         intervalWeights = tuning->getStaticSpringTuning()->getSpringWeights();
     }
     
