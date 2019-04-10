@@ -15,31 +15,38 @@
 Gallery::Gallery(BKAudioProcessor& p):
 processor(p)
 {
-    general = new GeneralSettings();
-    
-    addDefaultPrepIfNotThere();
-    
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
         used.add(Array<int>({-1}));
+        idmap.add(new HashMap<int,int>());
     }
+    
+    DBG("idmap size: " + String(idmap.size()));
+    
+    general = new GeneralSettings();
+    
+    addDefaultPrepIfNotThere();
+
     
     isDirty = false;
 }
 
 Gallery::Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor& p):
 processor(p)
-{    
+{
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        used.add( Array<int>( {-1} ) );
+        idmap.add(new HashMap<int,int>());
+    }
+    
+    DBG("idmap size: " + String(idmap.size()));
+    
     general = new GeneralSettings();
 
     setStateFromXML(xml);
     
     addDefaultPrepIfNotThere();
-    
-    for (int i = 0; i < BKPreparationTypeNil; i++)
-    {
-        used.add( Array<int>( {-1} ) );
-    }
     
     isDirty = false;
 }
@@ -51,7 +58,10 @@ url(String::empty)
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
         idCount.add(10);
+        idmap.add(new HashMap<int,int>());
     }
+    
+    DBG("idmap size: " + String(idmap.size()));
     
     general = new GeneralSettings();
 

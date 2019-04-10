@@ -10,6 +10,29 @@
 
 #include "PluginProcessor.h"
 
+int Gallery::transformId(BKPreparationType type, int oldId)
+{
+    int newId = 0;
+    
+    if (oldId == -1) return -1;
+    
+    if (idmap[type]->contains(oldId))
+    {
+        newId = idmap[type]->getReference(oldId);
+    }
+    else
+    {
+        newId = idcounts[type]++;
+        idmap[type]->set(oldId, newId);
+        
+        DBG("TRANS " + String(cPreparationTypes[type]) + " old: " + String(oldId) + " new: " + String(newId));
+    }
+    
+    
+    
+    return newId;
+}
+
 ValueTree  Gallery::getState(void)
 {
     ValueTree galleryVT( vtagGallery);
@@ -71,6 +94,8 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
     
     bkPianos.clear();
     
+    for (int i = 0; i < BKPreparationTypeNil; i++) idcounts[i] = 1;
+    
     if (xml != nullptr)
     {
         name = xml->getStringAttribute("name");
@@ -100,7 +125,10 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 
                 Keymap::Ptr newKeymap = bkKeymaps.getLast();
                 
-                newKeymap->setId(e->getStringAttribute("Id").getIntValue());
+                int oldId = e->getStringAttribute("Id").getIntValue();
+                int newId = transformId(PreparationTypeKeymap, oldId);
+                
+                newKeymap->setId(newId);
                 
                 if (n != String::empty)     newKeymap->setName(n);
                 
@@ -128,24 +156,45 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 addTuningWithId(0);
                 
                 tuning.getLast()->setState(e);
+                
+                int oldId = tuning.getLast()->getId();
+                int newId = transformId(PreparationTypeTuning, oldId);
+                
+                tuning.getLast()->setId(newId);
+                
             }
             else if (e->hasTagName( vtagModTuning))
             {
                 addTuningModWithId(0);
                 
                 modTuning.getLast()->setState(e);
+                
+                int oldId = modTuning.getLast()->getId();
+                int newId = transformId(PreparationTypeTuningMod, oldId);
+                
+                modTuning.getLast()->setId(newId);
             }
             else if (e->hasTagName( vtagDirect))
             {
                 addDirectWithId(0);
                 
                 direct.getLast()->setState(e);
+                
+                int oldId = direct.getLast()->getId();
+                int newId = transformId(PreparationTypeDirect, oldId);
+                
+                direct.getLast()->setId(newId);
             }
             else if (e->hasTagName( vtagModDirect))
             {
                 addDirectModWithId(0);
                 
                 modDirect.getLast()->setState(e);
+                
+                int oldId = modDirect.getLast()->getId();
+                int newId = transformId(PreparationTypeDirectMod, oldId);
+                
+                modDirect.getLast()->setId(newId);
             }
             else if (e->hasTagName( vtagSynchronic))
             {
@@ -153,12 +202,21 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 
                 synchronic.getLast()->setState(e);
                 
+                int oldId = synchronic.getLast()->getId();
+                int newId = transformId(PreparationTypeSynchronic, oldId);
+                
+                synchronic.getLast()->setId(newId);
             }
             else if (e->hasTagName( vtagModSynchronic))
             {
                 addSynchronicModWithId(0);
             
                 modSynchronic.getLast()->setState(e);
+                
+                int oldId = modSynchronic.getLast()->getId();
+                int newId = transformId(PreparationTypeSynchronicMod, oldId);
+                
+                modSynchronic.getLast()->setId(newId);
                 
             }
             else if (e->hasTagName( vtagTempo))
@@ -167,6 +225,11 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
 
                 tempo.getLast()->setState(e);
                 
+                int oldId = tempo.getLast()->getId();
+                int newId = transformId(PreparationTypeTempo, oldId);
+                
+                tempo.getLast()->setId(newId);
+                
             }
             else if (e->hasTagName( vtagModTempo))
             {
@@ -174,26 +237,55 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 
                 modTempo.getLast()->setState(e);
                 
+                int oldId = modTempo.getLast()->getId();
+                int newId = transformId(PreparationTypeTempoMod, oldId);
+                
+                modTempo.getLast()->setId(newId);
+                
             }
             else if (e->hasTagName( vtagNostalgic))
             {
                 addNostalgicWithId(0);
                 
                 nostalgic.getLast()->setState(e);
+                
+                int oldId = nostalgic.getLast()->getId();
+                int newId = transformId(PreparationTypeNostalgic, oldId);
+                
+                nostalgic.getLast()->setId(newId);
             }
             else if (e->hasTagName( vtagModNostalgic))
             {
                 addNostalgicModWithId(0);
                 
                 modNostalgic.getLast()->setState(e);
+                
+                int oldId = modNostalgic.getLast()->getId();
+                int newId = transformId(PreparationTypeNostalgicMod, oldId);
+                
+                modNostalgic.getLast()->setId(newId);
             }
             else if (e->hasTagName(vtagPiano))
             {
                 addPianoWithId(0);
                 
                 Piano::Ptr thisPiano = bkPianos.getLast();
+ 
+                int oldId = e->getStringAttribute("Id").getIntValue();
+                int newId = transformId(PreparationTypePiano, oldId);
                 
-                thisPiano->setState(e);
+                thisPiano->setId(newId);
+            }
+        }
+        
+        int which = 0;
+        forEachXmlChildElement (*xml, e)
+        {
+            if (e->hasTagName(vtagPiano))
+            {
+                Piano::Ptr thisPiano = bkPianos[which++];
+                
+                thisPiano->setState(e, &idmap);
             }
         }
     }

@@ -1014,17 +1014,16 @@ ValueTree Piano::getState(void)
 }
 #define LOAD_VERSION 0
 
-void Piano::setState(XmlElement* e)
+void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>> *idmap)
 {
     int i = 0;
     
-    Id = e->getStringAttribute("Id").getIntValue();
+    //Id = e->getStringAttribute("Id").getIntValue();
+    //setId(e->getStringAttribute("Id").getIntValue());
     
     String pianoName = e->getStringAttribute("name");
     
     if (pianoName != String::empty) setName(pianoName);
-    
-    setId(e->getStringAttribute("Id").getIntValue());
     
     BKItem::Ptr thisItem;
     BKItem::Ptr thisConnection;
@@ -1066,11 +1065,23 @@ void Piano::setState(XmlElement* e)
                 }
                 else
                 {
-                    i = item->getStringAttribute("Id").getIntValue();
-                    int thisId = i;
+                    int oldId = item->getStringAttribute("Id").getIntValue();
                     
+                    int thisId = oldId;
+                    
+                    if (idmap->getUnchecked(type)->contains(oldId))
+                    {
+                        thisId = idmap->getUnchecked(type)->getReference(oldId);
+                    }
+                
                     i = item->getStringAttribute("piano").getIntValue();
                     int piano = i;
+                    DBG("piano target old: " + String(piano));
+                    
+                    if (idmap->getUnchecked(PreparationTypePiano)->contains(piano))
+                    {
+                        piano = idmap->getUnchecked(PreparationTypePiano)->getReference(piano);
+                    }
                     
                     thisItem = itemWithTypeAndId(type, thisId);
                     
@@ -1079,7 +1090,6 @@ void Piano::setState(XmlElement* e)
                         thisItem = new BKItem(type, thisId, processor);
                         
                         thisItem->setPianoTarget(piano);
-                        
                         thisItem->setItemName(item->getStringAttribute("name"));
                         
                         i =  (int) atof(item->getStringAttribute("X").getCharPointer());
@@ -1114,8 +1124,21 @@ void Piano::setState(XmlElement* e)
                     i = connection->getStringAttribute("Id").getIntValue();
                     int cId = i;
                     
+                    if (idmap->getUnchecked(cType)->contains(cId))
+                    {
+                        cId = idmap->getUnchecked(cType)->getReference(cId);
+                    }
+                    
                     i = connection->getStringAttribute("piano").getIntValue();
                     int cPiano = i;
+                    DBG("conn piano target old: " + String(cPiano));
+                    
+                    if (idmap->getUnchecked(PreparationTypePiano)->contains(cPiano))
+                    {
+                        cPiano = idmap->getUnchecked(PreparationTypePiano)->getReference(cPiano);
+                    }
+                    
+                    DBG("conn piano target new: " + String(cPiano));
                     
                     thisConnection = itemWithTypeAndId(cType, cId);
                     

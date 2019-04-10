@@ -258,7 +258,7 @@ public:
     
     ValueTree getState(void);
     
-    void setState(XmlElement* e);
+    void setState(XmlElement* e, OwnedArray<HashMap<int,int>> *idmap);
     
     String modificationMapsToString(void)
     {

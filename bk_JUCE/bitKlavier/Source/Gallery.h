@@ -704,6 +704,12 @@ private:
     
     Array< int> idCount;
     
+    OwnedArray<HashMap<int,int>> idmap;
+    int idcounts[BKPreparationTypeNil];
+    
+    
+    
+    
     String url;
     String name;
     
@@ -787,6 +793,8 @@ private:
     void removeTuningModification(int Id);
     void removeTempoModification(int Id);
     
+    
+    int transformId(BKPreparationType type, int oldId);
     
     
     JUCE_LEAK_DETECTOR(Gallery);
