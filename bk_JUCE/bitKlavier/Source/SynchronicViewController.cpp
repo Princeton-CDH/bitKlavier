@@ -196,7 +196,6 @@ BKViewController(p, theGraph, 2)
     addAndMakeVisible(&envelopeName, ALL);
     
     currentTab = 0;
-    
     displayTab(currentTab);
 
 }
@@ -412,8 +411,6 @@ void SynchronicViewController::displayTab(int tab)
         Rectangle<int> area (getBounds());
         //area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
-        area.removeFromRight(rightArrow.getWidth());
-        area.removeFromLeft(leftArrow.getWidth());
         
         Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth()* 0.5));
         
@@ -448,7 +445,6 @@ void SynchronicViewController::displayTab(int tab)
         clusterMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
         holdTimeMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
         velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
-        
         
         releaseVelocitySetsSynchronicToggle.setVisible(true);
     }
