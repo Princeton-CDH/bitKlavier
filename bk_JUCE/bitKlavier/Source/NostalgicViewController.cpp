@@ -11,7 +11,7 @@
 #include "NostalgicViewController.h"
 
 NostalgicViewController::NostalgicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 1)
+BKViewController(p, theGraph, 3)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -68,6 +68,7 @@ BKViewController(p, theGraph, 1)
     gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
     gainSlider->setToolTipString("Volume multiplier for Nostalgic notes");
     gainSlider->setSkewFactorFromMidPoint(1.);
+    gainSlider->setJustifyRight(false);
     addAndMakeVisible(gainSlider);
     
     addAndMakeVisible(actionButton);
@@ -82,13 +83,22 @@ BKViewController(p, theGraph, 1)
     reverseADSRSlider = new BKADSRSlider("reverseEnvelope");
     reverseADSRSlider->setButtonText("edit reverse envelope");
     reverseADSRSlider->setToolTip("ADSR settings for Nostalgic wave");
+    reverseADSRSlider->setButtonMode(false);
     addAndMakeVisible(reverseADSRSlider);
+    
+    reverseADSRLabel.setText("Reverse ADSR", dontSendNotification);
+    reverseADSRLabel.setJustificationType(Justification::centred);
+    addAndMakeVisible(&reverseADSRLabel, ALL);
     
     undertowADSRSlider = new BKADSRSlider("undertowEnvelope");
     undertowADSRSlider->setButtonText("edit undertow envelope");
     undertowADSRSlider->setToolTip("ADSR settings for Undertow");
+    undertowADSRSlider->setButtonMode(false);
     addAndMakeVisible(undertowADSRSlider);
     
+    undertowADSRLabel.setText("Undertow ADSR", dontSendNotification);
+    undertowADSRLabel.setJustificationType(Justification::centred);
+    addAndMakeVisible(&undertowADSRLabel, ALL);
     
     addAndMakeVisible(keyOnResetToggle);
     
@@ -111,6 +121,167 @@ BKViewController(p, theGraph, 1)
     showReverseADSR = false;
     showUndertowADSR = false;
     
+    currentTab = 0;
+    displayTab(currentTab);
+    
+}
+
+void NostalgicViewController::invisible(void)
+{
+    gainSlider->setVisible(false);
+    lengthMultiplierSlider->setVisible(false);
+    beatsToSkipSlider->setVisible(false);
+    transpositionSlider->setVisible(false);
+    nDisplaySlider.setVisible(false);
+    
+    holdTimeMinMaxSlider->setVisible(false);
+    velocityMinMaxSlider->setVisible(false);
+    clusterMinSlider->setVisible(false);
+    
+    reverseADSRSlider->setVisible(false);
+    undertowADSRSlider->setVisible(false);
+    reverseADSRLabel.setVisible(false);
+    undertowADSRLabel.setVisible(false);
+}
+
+void NostalgicViewController::displayShared(void)
+{
+    Rectangle<int> area (getBounds());
+    
+    iconImageComponent.setBounds(area);
+    
+    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+    
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(4 + 2.0f * gPaddingConst * processor .paddingScalarX);
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+    
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    
+    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+    modeSlice.removeFromRight(gXSpacing);
+    //modeSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX, 0);
+    //lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+    lengthModeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
+    
+    float dim = lengthModeSelectCB.getHeight();
+    keyOnResetToggle.setBounds(lengthModeSelectCB.getX() - (dim + gXSpacing), lengthModeSelectCB.getY(), dim, dim);
+    keyOnResetToggle.changeWidthToFitText();
+    keyOnResetLabel.setBounds(keyOnResetToggle.getX() - 100, keyOnResetToggle.getY(), 100, dim);
+    
+    leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
+    rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
+    
+}
+
+void NostalgicViewController::displayTab(int tab)
+{
+    currentTab = tab;
+    
+    invisible();
+    displayShared();
+    
+    int x0 = leftArrow.getRight() + gXSpacing;
+    int y0 = hideOrShow.getBottom() + gYSpacing;
+    int right = rightArrow.getX() - gXSpacing;
+    int width = right - x0;
+    int height = getHeight() - y0;
+    
+    int col1x = x0;
+    int col2x = x0 + width * 0.5f;
+    
+    if (tab == 0)
+    {
+        gainSlider->setVisible(true);
+        lengthMultiplierSlider->setVisible(true);
+        beatsToSkipSlider->setVisible(true);
+        transpositionSlider->setVisible(true);
+        nDisplaySlider.setVisible(true);
+        
+        Rectangle<int> area (getLocalBounds());
+        area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        
+        Rectangle<int> nDisplayRow = area.removeFromBottom(100 + 80 * processor.paddingScalarY);
+        nDisplayRow.reduce(0, 4);
+        nDisplayRow.removeFromLeft(gXSpacing + gPaddingConst * processor.paddingScalarX * 0.5);
+        nDisplayRow.removeFromRight(gXSpacing + gPaddingConst * processor.paddingScalarX * 0.5);
+        nDisplaySlider.setBounds(nDisplayRow);
+        
+        area.removeFromBottom(gYSpacing + processor.paddingScalarY * 30);
+        area.removeFromLeft(leftArrow.getWidth());
+        area.removeFromRight(rightArrow.getWidth());
+        transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+        
+        area.removeFromBottom(gYSpacing + processor.paddingScalarY * 30);
+        
+        Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth()* 0.5));
+        
+        leftColumn.removeFromRight(processor.paddingScalarX * 20);
+        leftColumn.removeFromLeft(processor.paddingScalarX * 20);
+        
+        area.removeFromLeft(processor.paddingScalarX * 20); //area is now right column
+        area.removeFromRight(processor.paddingScalarX * 20);
+        
+        gainSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight + processor.paddingScalarY * 30));
+        lengthMultiplierSlider->setBounds(area.removeFromBottom(gComponentSingleSliderHeight + processor.paddingScalarY * 30));
+        
+    }
+    else if (tab == 1)
+    {
+        // SET VISIBILITY
+        holdTimeMinMaxSlider->setVisible(true);
+        velocityMinMaxSlider->setVisible(true);
+        clusterMinSlider->setVisible(true);
+        
+        Rectangle<int> area (getBounds());
+        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
+        
+        area.removeFromLeft(processor.paddingScalarX * 100);
+        area.removeFromRight(processor.paddingScalarX * 100);
+        
+        int columnHeight = area.getHeight();
+
+        holdTimeMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 3));
+        velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 3));
+        clusterMinSlider->setBounds(area.removeFromTop(columnHeight / 3));
+
+    }
+    else if (tab == 2)
+    {
+        reverseADSRSlider->setVisible(true);
+        undertowADSRSlider->setVisible(true);
+        reverseADSRLabel.setVisible(true);
+        undertowADSRLabel.setVisible(true);
+        
+        Rectangle<int> area (getBounds());
+        Rectangle<int> areaSave (getBounds());
+        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
+        
+        area.removeFromLeft(processor.paddingScalarX * 20);
+        area.removeFromRight(processor.paddingScalarX * 20);
+    
+        int columnHeight = area.getHeight();
+        
+        reverseADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.5));
+        undertowADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.5));
+        
+        reverseADSRLabel.setBounds(areaSave.removeFromTop(columnHeight * 0.5));
+        undertowADSRLabel.setBounds(areaSave.removeFromTop(columnHeight * 0.5));
+
+    }
 }
 
 void NostalgicViewController::paint (Graphics& g)
@@ -168,6 +339,10 @@ void NostalgicViewController::setShowADSR(String name, bool newval)
 
 void NostalgicViewController::resized()
 {
+    displayShared();
+    displayTab(currentTab);
+    
+#if 0
     Rectangle<int> area (getLocalBounds());
     
     iconImageComponent.setBounds(area);
@@ -282,6 +457,7 @@ void NostalgicViewController::resized()
         
         selectCB.toFront(false);
     }
+#endif
 }
 
 void NostalgicViewController::fillModeSelectCB(void)
@@ -716,6 +892,22 @@ void NostalgicPreparationEditor::buttonClicked (Button* b)
         bool state = b->getToggleState();
         prep->setKeyOnReset(state);
         active->setKeyOnReset(state);
+    }
+    else if (b == &rightArrow)
+    {
+        arrowPressed(RightArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
+    }
+    else if (b == &leftArrow)
+    {
+        arrowPressed(LeftArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
     }
 }
 

@@ -2523,6 +2523,7 @@ sliderName(name)
     
     isButtonOnly = true;
     setButtonToggle(true);
+    buttonMode = true;
 
 }
 
@@ -2622,18 +2623,40 @@ void BKADSRSlider::buttonClicked (Button* b)
 
 void BKADSRSlider::resized()
 {
-    
-    Rectangle<int> area (getLocalBounds());
 
-    if(!isButtonOnly)
+    if(buttonMode)
     {
-        Rectangle<int> topSlice = area.removeFromTop(gComponentComboBoxHeight);
-        Rectangle<int> bottomSlice = area.removeFromBottom(gComponentComboBoxHeight);
+        Rectangle<int> area (getLocalBounds());
         
-        int midSpace = (bottomSlice.getWidth() - gComponentLabelWidth) * 0.5;
-        bottomSlice.removeFromLeft(midSpace);
-        bottomSlice.removeFromRight(midSpace);
-        adsrButton.setBounds(bottomSlice);
+        if(!isButtonOnly)
+        {
+            Rectangle<int> topSlice = area.removeFromTop(gComponentComboBoxHeight);
+            Rectangle<int> bottomSlice = area.removeFromBottom(gComponentComboBoxHeight);
+            
+            int midSpace = (bottomSlice.getWidth() - gComponentLabelWidth) * 0.5;
+            bottomSlice.removeFromLeft(midSpace);
+            bottomSlice.removeFromRight(midSpace);
+            adsrButton.setBounds(bottomSlice);
+            
+            area.removeFromTop(gYSpacing);
+            
+            Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+            
+            attackSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+            decaySlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+            leftColumn.removeFromTop(gYSpacing * 2);
+            area.removeFromTop(gYSpacing * 2);
+            sustainSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+            releaseSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+        }
+        else
+        {
+            adsrButton.setBounds(area);
+        }
+    }
+    else
+    {
+        Rectangle<int> area (getLocalBounds());
         
         area.removeFromTop(gYSpacing);
         
@@ -2645,10 +2668,6 @@ void BKADSRSlider::resized()
         area.removeFromTop(gYSpacing * 2);
         sustainSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
         releaseSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
-    }
-    else
-    {
-        adsrButton.setBounds(area);
     }
 }
 

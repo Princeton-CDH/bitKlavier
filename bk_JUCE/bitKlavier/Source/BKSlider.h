@@ -795,8 +795,9 @@ public:
     int getReleaseValue()   { return releaseSlider->getValue(); }
     
     void setIsButtonOnly(bool state) { isButtonOnly = state; }
-    void setButtonToggle(bool state) {adsrButton.setToggleState(state, dontSendNotification);}
-    bool getButtonToggle() { return adsrButton.getToggleState(); }
+    void setButtonToggle(bool state) { adsrButton.setToggleState(state, dontSendNotification);}
+    bool getButtonToggle()           { return adsrButton.getToggleState(); }
+    void setButtonMode(bool bmode)   { buttonMode = bmode; adsrButton.setVisible(bmode); }
     
     void setHighlighted() { adsrButton.setToggleState(false, dontSendNotification); adsrButton.setLookAndFeel(&highlightedADSRLookAndFeel); }
     void setActive() { adsrButton.setToggleState(false, dontSendNotification); adsrButton.setLookAndFeel(&activeADSRLookAndFeel);}
@@ -853,6 +854,8 @@ private:
 
     bool justifyRight;
     bool isButtonOnly;
+    
+    bool buttonMode; //true by default; appears as button that can be clicked to open ADSR sliders
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKADSRSlider)
     
