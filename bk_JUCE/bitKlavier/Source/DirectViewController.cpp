@@ -11,14 +11,14 @@
 #include "DirectViewController.h"
 
 DirectViewController::DirectViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 1)
+BKViewController(p, theGraph, 2)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::direct_icon_png, BinaryData::direct_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
     iconImageComponent.setAlpha(0.095);
-    addAndMakeVisible(iconImageComponent);
+    //addAndMakeVisible(iconImageComponent);
     
     selectCB.setName("Direct");
     selectCB.addSeparator();
@@ -51,6 +51,7 @@ BKViewController(p, theGraph, 1)
     ADSRSlider = new BKADSRSlider("ADSR");
     ADSRSlider->setButtonText("edit envelope");
     ADSRSlider->setToolTip("adjust Attack, Decay, Sustain, and Release envelope parameters");
+    ADSRSlider->setButtonMode(false);
     addAndMakeVisible(ADSRSlider);
     setShowADSR(false);
     
@@ -66,8 +67,113 @@ BKViewController(p, theGraph, 1)
     actionButton.setButtonText("Action");
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
+    
+    currentTab = 0;
+    displayTab(currentTab);
 
 }
+
+void DirectViewController::invisible(void)
+{
+    gainSlider->setVisible(false);
+    resonanceGainSlider->setVisible(false);
+    hammerGainSlider->setVisible(false);
+    ADSRSlider->setVisible(false);
+    
+    transpositionSlider->setVisible(false);
+    //etc...
+}
+
+void DirectViewController::displayShared(void)
+{
+    Rectangle<int> area (getBounds());
+    
+    iconImageComponent.setBounds(area);
+    
+    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+    
+    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    comboBoxSlice.removeFromRight(4 + 2.0f * gPaddingConst * processor .paddingScalarX);
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+    comboBoxSlice.removeFromLeft(gXSpacing);
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+    
+    leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
+    rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
+    
+}
+
+void DirectViewController::displayTab(int tab)
+{
+    currentTab = tab;
+    
+    invisible();
+    displayShared();
+    
+    int x0 = leftArrow.getRight() + gXSpacing;
+    int y0 = hideOrShow.getBottom() + gYSpacing;
+    int right = rightArrow.getX() - gXSpacing;
+    int width = right - x0;
+    int height = getHeight() - y0;
+    
+    int col1x = x0;
+    int col2x = x0 + width * 0.5f;
+    
+    if (tab == 0)
+    {
+        gainSlider->setVisible(true);
+        resonanceGainSlider->setVisible(true);
+        hammerGainSlider->setVisible(true);
+        ADSRSlider->setVisible(true);
+        
+        Rectangle<int> area (getBounds());
+        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
+
+        area.removeFromBottom(gYSpacing + 100 * processor.paddingScalarY);
+        ADSRSlider->setBounds(area.removeFromBottom(area.getHeight() * 0.35));
+        
+        area.removeFromLeft(processor.paddingScalarX * 100); //area is now right column
+        area.removeFromRight(processor.paddingScalarX * 100);
+        area.removeFromBottom(8*gYSpacing * processor.paddingScalarY);
+        
+        int columnHeight = area.getHeight();
+        
+        gainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
+        resonanceGainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
+        hammerGainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
+        
+    }
+    else if (tab == 1)
+    {
+        // SET VISIBILITY
+        transpositionSlider->setVisible(true);
+        
+        Rectangle<int> area (getBounds());
+        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
+        //area.removeFromBottom(8*gYSpacing * processor.paddingScalarY);
+        area.removeFromBottom(area.getHeight() * 0.3);
+        
+        transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+        
+        area.removeFromLeft(processor.paddingScalarX * 100);
+        area.removeFromRight(processor.paddingScalarX * 100);
+        
+        int columnHeight = area.getHeight();
+        
+    }
+}
+
 
 void DirectViewController::paint (Graphics& g)
 {
@@ -105,6 +211,11 @@ void DirectViewController::setShowADSR(bool newval)
 
 void DirectViewController::resized()
 {
+    
+    displayShared();
+    displayTab(currentTab);
+    
+#if 0
     Rectangle<int> area (getLocalBounds());
 
     iconImageComponent.setBounds(area);
@@ -203,6 +314,7 @@ void DirectViewController::resized()
         
         selectCB.toFront(false);
     }
+#endif
 }
 
 #if JUCE_IOS
@@ -496,6 +608,22 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     else if (b == &actionButton)
     {
         getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
+    else if (b == &rightArrow)
+    {
+        arrowPressed(RightArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
+    }
+    else if (b == &leftArrow)
+    {
+        arrowPressed(LeftArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
     }
 }
 
