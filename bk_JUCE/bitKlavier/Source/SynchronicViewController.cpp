@@ -22,7 +22,7 @@ BKViewController(p, theGraph, 2)
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::synchronic_icon_png, BinaryData::synchronic_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
     iconImageComponent.setAlpha(0.095);
-    addAndMakeVisible(iconImageComponent);
+    //addAndMakeVisible(iconImageComponent);
     
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     
@@ -411,6 +411,8 @@ void SynchronicViewController::displayTab(int tab)
         Rectangle<int> area (getBounds());
         //area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
         
         Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth()* 0.5));
         
