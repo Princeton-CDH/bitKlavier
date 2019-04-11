@@ -298,6 +298,20 @@ void TuningViewController::displayShared(void)
     
     comboBoxSlice.removeFromLeft(gXSpacing);
     
+    leftColumn.removeFromLeft(leftArrow.getWidth());
+    
+    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
+    modeSlice.removeFromLeft(gXSpacing);
+    modeSlice.removeFromRight(gXSpacing);
+    //adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(showSpringsButton.getWidth()));
+    adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 3.));
+    modeSlice.removeFromLeft(gXSpacing);
+    //scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
+    scaleCB.setBounds(modeSlice.removeFromLeft(2. * modeSlice.getWidth() / 3. - 2.*gXSpacing));
+    
+    modeSlice.removeFromLeft(gXSpacing);
+    fundamentalCB.setBounds(modeSlice);
+    
     leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
     rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
     
@@ -362,6 +376,7 @@ void TuningViewController::displayTab(int tab)
         Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
         leftColumn.removeFromLeft(leftArrow.getWidth());
         
+        /*
         Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
         modeSlice.removeFromLeft(gXSpacing);
         modeSlice.removeFromRight(gXSpacing);
@@ -373,6 +388,7 @@ void TuningViewController::displayTab(int tab)
         
         modeSlice.removeFromLeft(gXSpacing);
         fundamentalCB.setBounds(modeSlice);
+        */
         
         int customKeyboardHeight = 80 + 70. * processor.paddingScalarY;
         int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gYSpacing * 3)) * 0.25;
@@ -487,7 +503,7 @@ void TuningViewController::displayTab(int tab)
         lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
         
         rateSlider->setBounds(selectCB.getX()-gComponentSingleSliderXOffset, selectCB.getBottom() + gYSpacing, selectCB.getWidth()+gComponentSingleSliderXOffset, gComponentSingleSliderHeight);
-        dragSlider->setBounds(actionButton.getX()-gComponentSingleSliderXOffset, rateSlider->getY(), showSpringsButton.getWidth() + actionButton.getWidth(), gComponentSingleSliderHeight);
+        dragSlider->setBounds(actionButton.getX()-gComponentSingleSliderXOffset, rateSlider->getY(), rateSlider->getWidth(), gComponentSingleSliderHeight);
         
         springScaleCB.setBounds(scaleCB.getX(), rateSlider->getY(), scaleCB.getWidth(), gComponentComboBoxHeight);
         springScaleFundamentalCB.setBounds(fundamentalCB.getX(), springScaleCB.getY(), fundamentalCB.getWidth(), gComponentComboBoxHeight);
@@ -499,17 +515,19 @@ void TuningViewController::displayTab(int tab)
         
         tetherStiffnessSlider->setBounds(//fundamentalCB.getX() - gComponentSingleSliderXOffset,
                                          fundamentalCB.getRight() - intervalStiffnessSlider->getWidth(),
+                                         //springScaleCB.getX(),
                                          intervalStiffnessSlider->getY(),
                                          //fundamentalCB.getWidth() + 2.*gComponentSingleSliderXOffset,
                                          intervalStiffnessSlider->getWidth(),
                                          gComponentSingleSliderHeight);
         
-        float sliderHeight = (absoluteKeyboard.getBottom() - (rateSlider->getBottom() + gYSpacing)) / 13.;
+        //float sliderHeight = (absoluteKeyboard.getBottom() - (rateSlider->getBottom() + gYSpacing)) / 13.;
+        float sliderHeight = (getBounds().getBottom() - (rateSlider->getBottom() + 2*gYSpacing)) / 13.;
         
         for (int i = 0; i < 12; i++)
         {
             springLabels[i]->setBounds(selectCB.getX(),
-                                       intervalStiffnessSlider->getBottom() + (sliderHeight) * (11 - i),
+                                       intervalStiffnessSlider->getBottom() + (sliderHeight) * (11 - i) - gYSpacing,
                                        hideOrShow.getWidth(),
                                        sliderHeight);
             springSliders[i]->setBounds(springLabels[i]->getRight() + 2,
@@ -517,8 +535,8 @@ void TuningViewController::displayTab(int tab)
                                         intervalStiffnessSlider->getWidth() * 0.7,
                                         sliderHeight);
         }
-    
     }
+    repaint();
 }
 
 
