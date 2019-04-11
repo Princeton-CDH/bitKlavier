@@ -1317,7 +1317,7 @@ void TuningViewController::timerCallback(void)
         
         
         
-        if (showSprings)
+        if (currentTab == 1)
         {
             float sliderHeight = springSliders.getUnchecked(0)->getHeight();
             
