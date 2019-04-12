@@ -11,7 +11,7 @@
 #include "DirectViewController.h"
 
 DirectViewController::DirectViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 2)
+BKViewController(p, theGraph, 1)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
@@ -105,8 +105,10 @@ void DirectViewController::displayShared(void)
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
     
-    leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
-    rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
+    //leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
+    //rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
+    leftArrow.setVisible(false); //use one tab for now
+    rightArrow.setVisible(false);
     
 }
 
@@ -132,12 +134,31 @@ void DirectViewController::displayTab(int tab)
         resonanceGainSlider->setVisible(true);
         hammerGainSlider->setVisible(true);
         ADSRSlider->setVisible(true);
+        transpositionSlider->setVisible(true);
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
-        area.removeFromRight(rightArrow.getWidth());
-        area.removeFromLeft(leftArrow.getWidth());
+        area.removeFromBottom(gYSpacing + 30 * processor.paddingScalarY);
+        area.removeFromLeft(processor.paddingScalarX * 20);
+        area.removeFromRight(processor.paddingScalarX * 20);
+        
+        ADSRSlider->setBounds(area.removeFromBottom(area.getHeight() * 0.35));
 
+        area.removeFromBottom(processor.paddingScalarY * 50);
+        Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth()* 0.5)); //area is now right column
+        leftColumn.removeFromRight(processor.paddingScalarX * 20);
+        area.removeFromLeft(processor.paddingScalarX * 20);
+        
+        int columnHeight = leftColumn.getHeight();
+        
+        gainSlider->setBounds(leftColumn.removeFromBottom(columnHeight / 3));
+        resonanceGainSlider->setBounds(leftColumn.removeFromBottom(columnHeight / 3));
+        hammerGainSlider->setBounds(leftColumn.removeFromBottom(columnHeight / 3));
+    
+        area.removeFromBottom(gainSlider->getHeight());
+        transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+        
+        /*
         area.removeFromBottom(gYSpacing + 100 * processor.paddingScalarY);
         ADSRSlider->setBounds(area.removeFromBottom(area.getHeight() * 0.35));
         
@@ -150,6 +171,7 @@ void DirectViewController::displayTab(int tab)
         gainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
         resonanceGainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
         hammerGainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
+         */
         
     }
     else if (tab == 1)
