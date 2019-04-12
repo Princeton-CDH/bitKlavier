@@ -201,11 +201,22 @@ void NostalgicViewController::displayTab(int tab)
     
     if (tab == 0)
     {
+        NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+        
         gainSlider->setVisible(true);
-        lengthMultiplierSlider->setVisible(true);
-        beatsToSkipSlider->setVisible(true);
         transpositionSlider->setVisible(true);
         nDisplaySlider.setVisible(true);
+        
+        if(prep->getMode() == NoteLengthSync)
+        {
+            lengthMultiplierSlider->setVisible(true);
+            beatsToSkipSlider->setVisible(false);
+        }
+        else
+        {
+            lengthMultiplierSlider->setVisible(false);
+            beatsToSkipSlider->setVisible(true);
+        }
         
         Rectangle<int> area (getLocalBounds());
         area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
@@ -233,6 +244,7 @@ void NostalgicViewController::displayTab(int tab)
         
         gainSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight + processor.paddingScalarY * 30));
         lengthMultiplierSlider->setBounds(area.removeFromBottom(gComponentSingleSliderHeight + processor.paddingScalarY * 30));
+        beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
         
     }
     else if (tab == 1)
@@ -715,15 +727,18 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep    ->setMode((NostalgicSyncMode) index);
         active  ->setMode((NostalgicSyncMode) index);
         
-        if(prep->getMode() == NoteLengthSync)
+        if(currentTab == 0)
         {
-            lengthMultiplierSlider->setVisible(true);
-            beatsToSkipSlider->setVisible(false);
-        }
-        else
-        {
-            lengthMultiplierSlider->setVisible(false);
-            beatsToSkipSlider->setVisible(true);
+            if(prep->getMode() == NoteLengthSync)
+            {
+                lengthMultiplierSlider->setVisible(true);
+                beatsToSkipSlider->setVisible(false);
+            }
+            else
+            {
+                lengthMultiplierSlider->setVisible(false);
+                beatsToSkipSlider->setVisible(true);
+            }
         }
 
     }
