@@ -58,7 +58,8 @@ scaleId(JustTuning)
     tetherFundamental = PitchClass(C);
     
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
-    intervalFundamental = PitchClass(C);
+    //intervalFundamental = PitchClass(C);
+    intervalFundamental = PitchClass(12);
     
     useLowestNoteForFundamental = false;
     useHighestNoteForFundamental = false;
