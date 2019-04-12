@@ -94,9 +94,8 @@ BKViewController(p, theGraph, 2)
     modeSelectCB.setName("Mode");
     modeSelectCB.addSeparator();
     modeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
-    modeSelectCB.setSelectedItemIndex(0);
+    modeSelectCB.setSelectedItemIndex(0, dontSendNotification);
     modeSelectCB.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
-    
     
     addAndMakeVisible(&modeSelectCB, ALL);
     
@@ -617,13 +616,15 @@ SynchronicViewController(p, theGraph)
     
     startTimer(30);
     
+    fillModeSelectCB();
+    
 }
 
 void SynchronicPreparationEditor::fillModeSelectCB()
 {
     SynchronicPreparation::Ptr prep = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
-    modeSelectCB.clear();
+    modeSelectCB.clear(dontSendNotification);
     
     if (prep->getOnOffMode() == KeyOn)
     {
@@ -671,7 +672,7 @@ void SynchronicPreparationEditor::timerCallback()
             holdTimeMinMaxSlider->setEnabled(true);
         }
         
-        fillModeSelectCB();
+        //fillModeSelectCB();
         
         if (cluster == nullptr) return;
         
@@ -867,6 +868,8 @@ void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double 
 
 void SynchronicPreparationEditor::update(NotificationType notify)
 {
+    DBG("SynchronicPreparationEditor::update " + String((int)notify));
+    
     if (processor.updateState->currentSynchronicId < 0) return;
     
     SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
@@ -1143,6 +1146,8 @@ void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPre
 
 void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
+    DBG("SynchronicPreparationEditor::bkComboBoxDidChange called " + box->getName());
+    
     String name = box->getName();
     int index = box->getSelectedItemIndex();
     int Id = box->getSelectedId();
@@ -1322,7 +1327,10 @@ SynchronicViewController(p, theGraph)
 void SynchronicModificationEditor::greyOutAllComponents()
 {
     modeSelectCB.setAlpha(gModAlpha);
+    modeLabel.setAlpha(gModAlpha);
     onOffSelectCB.setAlpha(gModAlpha);
+    onOffLabel.setAlpha(gModAlpha);
+    
     offsetParamStartToggle.setAlpha(gModAlpha);
     
     howManySlider->setDim(gModAlpha);
@@ -1417,6 +1425,8 @@ void SynchronicModificationEditor::timerCallback()
 
 void SynchronicModificationEditor::update(NotificationType notify)
 {
+    DBG("SynchronicModificationEditor::update " + String((int)notify));
+    
     if (processor.updateState->currentModSynchronicId < 0) return;
     
     fillModeSelectCB();
@@ -1505,7 +1515,7 @@ void SynchronicModificationEditor::fillModeSelectCB()
 {
     SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
     
-    modeSelectCB.clear();
+    modeSelectCB.clear(dontSendNotification);
     
     if (mod->getOnOffMode() == KeyOn)
     {
@@ -1819,6 +1829,7 @@ void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicMo
 
 void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
+    DBG("SynchronicModificationEditor::bkComboBoxDidChange " + box->getName());
     String name = box->getName();
     int index = box->getSelectedItemIndex();
     int Id = box->getSelectedId();
