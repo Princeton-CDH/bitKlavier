@@ -1780,6 +1780,9 @@ void TuningPreparationEditor::update(void)
         double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
         dragSlider->setValue(newval, dontSendNotification);
         
+        if (prep->getSpringTuning()->getActive()) showSprings = true;
+        else showSprings = false;
+        
         /*
         if (!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
             springScaleFundamentalCB.setSelectedItemIndex(12, dontSendNotification);
