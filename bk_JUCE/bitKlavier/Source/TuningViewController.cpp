@@ -360,7 +360,8 @@ void TuningViewController::displayTab(int tab)
         A1FundamentalCB.setVisible(true);
         
         Rectangle<int> area (getBounds());
-        area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
+        //area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         
         float keyboardHeight = 100 + 50 * processor.paddingScalarY;
         Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
