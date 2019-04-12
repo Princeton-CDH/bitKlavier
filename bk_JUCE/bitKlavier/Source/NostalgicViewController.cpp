@@ -19,7 +19,7 @@ BKViewController(p, theGraph, 3)
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::nostalgic_icon_png, BinaryData::nostalgic_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
     iconImageComponent.setAlpha(0.095);
-    addAndMakeVisible(iconImageComponent);
+    //addAndMakeVisible(iconImageComponent);
     
     selectCB.setName("Nostalgic");
     selectCB.setTooltip("Select from available saved preparation settings");
@@ -1366,6 +1366,22 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
         
         keyOnResetToggle.setAlpha(1.);
         keyOnResetLabel.setAlpha(1.);
+    }
+    else if (b == &rightArrow)
+    {
+        arrowPressed(RightArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
+    }
+    else if (b == &leftArrow)
+    {
+        arrowPressed(LeftArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
     }
     
     updateModification();

@@ -2624,6 +2624,22 @@ void TuningModificationEditor::buttonClicked (Button* b)
         
         updateComponentVisibility();
     }
+    else if (b == &rightArrow)
+    {
+        arrowPressed(RightArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
+    }
+    else if (b == &leftArrow)
+    {
+        arrowPressed(LeftArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
+    }
     
     updateModification();
 }

@@ -161,7 +161,6 @@ void DirectViewController::displayTab(int tab)
         area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
         area.removeFromRight(rightArrow.getWidth());
         area.removeFromLeft(leftArrow.getWidth());
-        //area.removeFromBottom(8*gYSpacing * processor.paddingScalarY);
         area.removeFromBottom(area.getHeight() * 0.3);
         
         transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
@@ -928,6 +927,22 @@ void DirectModificationEditor::buttonClicked (Button* b)
     else if (b == &actionButton)
     {
         getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
+    else if (b == &rightArrow)
+    {
+        arrowPressed(RightArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
+    }
+    else if (b == &leftArrow)
+    {
+        arrowPressed(LeftArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
     }
 }
 
