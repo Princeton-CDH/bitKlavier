@@ -996,6 +996,9 @@ void NostalgicModificationEditor::greyOutAllComponents()
     
     keyOnResetToggle.setAlpha(gModAlpha);
     keyOnResetLabel.setAlpha(gModAlpha);
+    
+    reverseADSRLabel.setAlpha(gModAlpha);
+    undertowADSRLabel.setAlpha(gModAlpha);
 }
 
 void NostalgicModificationEditor::highlightModedComponents()
