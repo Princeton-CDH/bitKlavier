@@ -118,10 +118,13 @@ protected:
     void updateComponentVisibility();
     
     int customIndex; //index of Custom tuning in combobox
+    
+    void displayTab(int tab) override;
+    void displayShared(void) override;
+    void invisible(void) override;
+    
 private:
-    
-    
-    
+  
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController)
     
 };

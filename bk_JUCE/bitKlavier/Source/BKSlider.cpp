@@ -2492,23 +2492,27 @@ sliderName(name)
     attackSlider->setSkewFactorFromMidPoint(200);
     attackSlider->setJustifyRight(true);
     attackSlider->addMyListener(this);
+    attackSlider->setToolTipString("envelope attack time (ms)");
     addAndMakeVisible(attackSlider);
     
     decaySlider = new BKSingleSlider("decay time (ms)", 1, 1000, 10, 1);
     decaySlider->setSkewFactorFromMidPoint(200);
     decaySlider->setJustifyRight(false);
     decaySlider->addMyListener(this);
+    decaySlider->setToolTipString("envelope decay time (ms)");
     addAndMakeVisible(decaySlider);
     
     sustainSlider = new BKSingleSlider("sustain level (0-1)", 0., 1., 1., 0.001);
     sustainSlider->setJustifyRight(true);
     sustainSlider->addMyListener(this);
+    sustainSlider->setToolTipString("envelope sustain level (0-1)");
     addAndMakeVisible(sustainSlider);
     
     releaseSlider = new BKSingleSlider("release time (ms)", 1, 1000, 30, 1);
     releaseSlider->setSkewFactorFromMidPoint(200);
     releaseSlider->setJustifyRight(false);
     releaseSlider->addMyListener(this);
+    releaseSlider->setToolTipString("envelope release time (ms)");
     addAndMakeVisible(releaseSlider);
     
     adsrButton.setButtonText("ADSR");
@@ -2523,6 +2527,7 @@ sliderName(name)
     
     isButtonOnly = true;
     setButtonToggle(true);
+    buttonMode = true;
 
 }
 
@@ -2622,18 +2627,40 @@ void BKADSRSlider::buttonClicked (Button* b)
 
 void BKADSRSlider::resized()
 {
-    
-    Rectangle<int> area (getLocalBounds());
 
-    if(!isButtonOnly)
+    if(buttonMode)
     {
-        Rectangle<int> topSlice = area.removeFromTop(gComponentComboBoxHeight);
-        Rectangle<int> bottomSlice = area.removeFromBottom(gComponentComboBoxHeight);
+        Rectangle<int> area (getLocalBounds());
         
-        int midSpace = (bottomSlice.getWidth() - gComponentLabelWidth) * 0.5;
-        bottomSlice.removeFromLeft(midSpace);
-        bottomSlice.removeFromRight(midSpace);
-        adsrButton.setBounds(bottomSlice);
+        if(!isButtonOnly)
+        {
+            Rectangle<int> topSlice = area.removeFromTop(gComponentComboBoxHeight);
+            Rectangle<int> bottomSlice = area.removeFromBottom(gComponentComboBoxHeight);
+            
+            int midSpace = (bottomSlice.getWidth() - gComponentLabelWidth) * 0.5;
+            bottomSlice.removeFromLeft(midSpace);
+            bottomSlice.removeFromRight(midSpace);
+            adsrButton.setBounds(bottomSlice);
+            
+            area.removeFromTop(gYSpacing);
+            
+            Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+            
+            attackSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+            decaySlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+            leftColumn.removeFromTop(gYSpacing * 2);
+            area.removeFromTop(gYSpacing * 2);
+            sustainSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+            releaseSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
+        }
+        else
+        {
+            adsrButton.setBounds(area);
+        }
+    }
+    else
+    {
+        Rectangle<int> area (getLocalBounds());
         
         area.removeFromTop(gYSpacing);
         
@@ -2645,10 +2672,6 @@ void BKADSRSlider::resized()
         area.removeFromTop(gYSpacing * 2);
         sustainSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
         releaseSlider->setBounds(area.removeFromTop(gComponentSingleSliderHeight));
-    }
-    else
-    {
-        adsrButton.setBounds(area);
     }
 }
 

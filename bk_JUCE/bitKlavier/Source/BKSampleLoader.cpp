@@ -401,7 +401,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
                     }
                     
                     processor.progress += processor.progressInc;
-                    DBG(soundName+": " + String(processor.progress));
+                    //DBG(soundName+": " + String(processor.progress));
                     
                 }
                 else
@@ -519,7 +519,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
                     }
                     
                     processor.progress += processor.progressInc;
-                    DBG(soundName+": " + String(processor.progress));
+                    //DBG(soundName+": " + String(processor.progress));
                 }
                 else
                 {
@@ -597,7 +597,7 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
                                                                     velocityRange));
             }
             processor.progress += processor.progressInc;
-            DBG(soundName+": " + String(processor.progress));
+            //DBG(soundName+": " + String(processor.progress));
         }
         else
         {
@@ -677,7 +677,7 @@ void BKSampleLoader::loadPedalSamples(void)
                                                         velocityRange));
             }
             processor.progress += processor.progressInc;
-            DBG(soundName+": " + String(processor.progress));
+            //DBG(soundName+": " + String(processor.progress));
         }
         else
         {

@@ -191,6 +191,10 @@ typedef enum PitchClass {
     GFlat = FSharp,
     AFlat = GSharp,
     BFlat = ASharp,
+    none,
+    lowest,
+    highest,
+    last,
     PitchClassNil
 } PitchClass;
 

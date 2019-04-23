@@ -48,6 +48,10 @@ public:
     void iWantTheBigOne(TextEditor*, String name) override;
 #endif
     
+    void displayTab(int tab) override;
+    void displayShared(void) override;
+    void invisible(void) override;
+    
 private:
     
     bool showADSR;

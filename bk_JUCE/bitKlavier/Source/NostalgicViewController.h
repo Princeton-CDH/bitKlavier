@@ -45,7 +45,10 @@ public:
     ScopedPointer<BKRangeSlider> velocityMinMaxSlider;
     
     ToggleButton    keyOnResetToggle;
-    BKLabel           keyOnResetLabel;
+    BKLabel         keyOnResetLabel;
+    
+    BKLabel         reverseADSRLabel;
+    BKLabel         undertowADSRLabel;
     
     void paint (Graphics&) override;
     void resized() override;
@@ -59,12 +62,17 @@ public:
 #if JUCE_IOS
     void iWantTheBigOne(TextEditor*, String name) override;
 #endif
+    
+    void displayTab(int tab) override;
+    void displayShared(void) override;
+    void invisible(void) override;
 
 private:
     
     bool showADSR;
     bool showReverseADSR;
     bool showUndertowADSR;
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NostalgicViewController)
     
