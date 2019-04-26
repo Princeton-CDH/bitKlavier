@@ -173,8 +173,58 @@ void BKAudioProcessor::updateGalleries()
     resonanceReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
     pedalSynth.updateGeneralSettings(gallery->getGeneralSettings());
     
-    clipboard.clear();
+    //clipboard.clear();
     
     updateState->galleriesUpdated = true;
+}
+
+ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
+{
+    if (type == PreparationTypeDirect)
+    {
+        return gallery->getDirect(Id)->getState(true);
+    }
+    else if (type == PreparationTypeDirectMod)
+    {
+        return gallery->getDirectModification(Id)->getState();
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        return gallery->getNostalgic(Id)->getState(true);
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        return gallery->getNostalgicModification(Id)->getState();
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        return gallery->getSynchronic(Id)->getState(true);
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        return gallery->getSynchronicModification(Id)->getState();
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        return gallery->getTuning(Id)->getState(true);
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        return gallery->getTuningModification(Id)->getState();
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        return gallery->getTempo(Id)->getState(true);
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        return gallery->getTempoModification(Id)->getState();
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        return gallery->getKeymap(Id)->getState();
+    }
+    
+    return ValueTree();
 }
 

@@ -56,11 +56,13 @@ void Piano::deconfigure(void)
     activePMaps.clear();
     numPMaps = 0;
     
+    /*
     for (auto proc : dprocessor) proc->reset();
     for (auto proc : mprocessor) proc->reset();
     for (auto proc : sprocessor) proc->reset();
     for (auto proc : nprocessor) proc->reset();
     for (auto proc : tprocessor) proc->reset();
+    */
     
     dprocessor.clear();
     mprocessor.clear();
@@ -89,7 +91,6 @@ void Piano::configure(void)
     
     for (auto item : items)
     {
-        
         BKPreparationType thisType = item->getType();
         int thisId = item->getId();
         

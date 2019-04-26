@@ -133,6 +133,8 @@ BKItem* BKItem::duplicate(void)
     
     newItem->setBounds(getBounds());
     
+    newItem->setContent(getContent());
+    
     return newItem;
 }
 

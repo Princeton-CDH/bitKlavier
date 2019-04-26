@@ -116,12 +116,19 @@ public:
     
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
     
-    int add(BKPreparationType type);
+    int add     (BKPreparationType type);
+    int addCopy (BKPreparationType type, XmlElement* xml);
+    
     int numWithSameNameAs(BKPreparationType type, int Id);
+    String iterateName(BKPreparationType type, String name);
+    
     int duplicate(BKPreparationType type, int Id);
     void addTypeWithId(BKPreparationType type, int Id);
     void remove(BKPreparationType type, int Id);
     int  getNum(BKPreparationType type);
+    
+    
+    
     
     
     inline const bool isGalleryDirty(void) const noexcept {return isDirty; }
@@ -644,13 +651,13 @@ public:
 
     inline int getNewId(BKPreparationType type)
     {
-        int oldId = idCount[type];
+        int oldId = idcounts[type];
         
         //DBG("OLD: " + String(oldId));
         
         int newId = oldId + 1;
         
-        idCount.set(type, newId);
+        idcounts[type] = newId;
         
         //DBG("NEW: " + String(newId));
         
@@ -659,13 +666,13 @@ public:
     
     inline void setIdCount(BKPreparationType type, int count)
     {
-        idCount.set(type, count);
+        idcounts[type] = count;
         isDirty = true;
     }
     
     inline int getIdCount(BKPreparationType type)
     {
-        return idCount[type];
+        return idcounts[type];
     }
     
     inline void setDefaultPiano(int Id)
@@ -697,12 +704,11 @@ public:
     
     inline void setName(String n) { name = n;}
     
+    
     Array<Array<int>> used;
     
 private:
     BKAudioProcessor& processor;
-    
-    Array< int> idCount;
     
     OwnedArray<HashMap<int,int>> idmap;
     int idcounts[BKPreparationTypeNil];
@@ -796,6 +802,8 @@ private:
     
     int transformId(BKPreparationType type, int oldId);
     
+    void addFromXML(ScopedPointer<XmlElement> xml);
+    void addFromValueTree(ValueTree vt);
     
     JUCE_LEAK_DETECTOR(Gallery);
 };

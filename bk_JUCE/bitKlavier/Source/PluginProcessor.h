@@ -309,6 +309,8 @@ public:
 #endif
     }
     
+    ValueTree getPreparationState(BKPreparationType type, int Id);
+    
 private:
     
 
@@ -320,6 +322,7 @@ private:
    
     void sustainActivate(void);
     void sustainDeactivate(void);
+    
     
     double pitchbendVal;
     

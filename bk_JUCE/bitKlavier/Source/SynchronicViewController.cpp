@@ -603,6 +603,8 @@ SynchronicViewController(p, theGraph)
     clusterMinMaxSlider->addMyListener(this);
     holdTimeMinMaxSlider->addMyListener(this);
     velocityMinMaxSlider->addMyListener(this);
+    
+    for (auto slider : paramSliders) slider->addMyListener(this);
 
     gainSlider->addMyListener(this);
     numClusterSlider->addMyListener(this);
@@ -1313,6 +1315,8 @@ SynchronicViewController(p, theGraph)
     velocityMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
     numClusterSlider->addMyListener(this);
+    
+    for (auto slider : paramSliders) slider->addMyListener(this);
     
     howManySlider->displaySliderVisible(false);
     clusterThreshSlider->displaySliderVisible(false);

@@ -145,6 +145,7 @@ public:
     
     bool edittingComment;
     
+    OwnedArray<HashMap<int,int>> pastemap;
 private:
     
     OwnedArray<TouchEvent> touches;

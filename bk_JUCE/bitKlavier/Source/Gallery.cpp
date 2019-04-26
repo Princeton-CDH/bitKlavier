@@ -57,7 +57,7 @@ url(String::empty)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCount.add(10);
+        idcounts[i] = 1;
         idmap.add(new HashMap<int,int>());
     }
     

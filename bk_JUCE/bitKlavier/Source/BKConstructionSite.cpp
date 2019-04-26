@@ -348,6 +348,7 @@ BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
     
     BKItem::PtrArr clipboard;
     
+    // SHOULD ALSO SAVE VALUE TREE OF STATE WITH ITEMs in CLIPBOARD
     for (auto item : these)
     {
         BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
@@ -365,6 +366,8 @@ BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
             distFromOrigin = dist;
             upperLeftest = newItem;
         }
+        
+        newItem->setContent(processor.getPreparationState(item->getType(), item->getId()).createXml());
         
         clipboard.add(newItem);
     }
@@ -394,15 +397,22 @@ BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
         }
     }
     
+    
     return clipboard;
 }
 
 void BKConstructionSite::copy(void)
 {
-    
     BKItem::PtrArr selected = graph->getSelectedItems();
 
     processor.setClipboard(duplicate(selected));
+    
+    // just for debugging
+    for (auto item : processor.clipboard)
+    {
+        DBG(" ~ ~ ~ ~ COPY ~ ~ ~ ~ " );
+        DBG(item->getContent()->createDocument(""));
+    }
     
     getParentComponent()->grabKeyboardFocus();
 }
@@ -411,36 +421,85 @@ void BKConstructionSite::paste(void)
 {
     BKItem::PtrArr clipboard = processor.getClipboard();
     
+    // just for debugging
+    for (auto item : clipboard)
+    {
+        DBG(" ~ ~ ~ ~ PASTE ~ ~ ~ ~ " );
+        DBG(item->getContent()->createDocument(""));
+    }
+    
+    BKItem::PtrArr newItems;
+    
     if (!clipboard.size() || (upperLeftest == nullptr)) return;
     
-    BKItem::PtrArr newItems = duplicate(clipboard);
+    pastemap.clear();
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        pastemap.add(new HashMap<int,int>());
+    }
     
     graph->deselectAll();
     
     int offsetX = upperLeftest->getX(); int offsetY = upperLeftest->getY();
     
-    for (auto item : newItems)
+    for (auto item : clipboard)
     {
-        BKPreparationType type = item->getType(); int Id = item->getId();
+        BKItem::Ptr newItem = item->duplicate();
+        
+        newItem->print();
+        
+        BKPreparationType type = newItem->getType();
+        int oldId = item->getId();
 
-        if (processor.currentPiano->contains(type, Id))
-        {
-            // duplicate (all we need to do is set to new Id and add to gallery)
-            int newId = processor.gallery->duplicate(type, Id);
-            
-            item->setId(newId);
-            
-        }
+        // duplicate (all we need to do is set to new Id and add to gallery)
+        int newId = processor.gallery->addCopy(type, newItem->getContent());
         
-        item->setSelected(true);
+        pastemap[type]->set(oldId, newId);
+
+        newItem->setSelected(true);
         
-        item->setTopLeftPosition((item->getX()-offsetX) + lastEX, (item->getY()-offsetY) + lastEY);
+        newItem->setTopLeftPosition((newItem->getX()-offsetX) + lastEX, (newItem->getY()-offsetY) + lastEY);
         
-        processor.currentPiano->add(item);
+        processor.currentPiano->add(newItem);
         
-        newItems.add(item);
+        newItems.add(newItem);
     }
     
+    for (int i = 0; i < newItems.size(); i++)
+    {
+        BKItem* oldItem = clipboard[i];
+        BKItem* newItem = newItems[i];
+        
+        for (auto connection : oldItem->getConnections())
+        {
+            BKPreparationType connectionType = connection->getType();
+            int connectionId = connection->getId();
+            
+            BKItem* connectionItem = nullptr;
+            
+            for (auto item : newItems)
+            {
+                if (item->getType() == connectionType && item->getId() == connectionId) connectionItem = item;
+            }
+            
+            if (connectionItem != nullptr)
+            {
+                newItem->addConnection(connectionItem);
+                connectionItem->addConnection(newItem);
+            }
+        }
+
+    }
+    
+    // NOW set new Id for item. didnt want to do it before so that
+    for (auto item : newItems)
+    {
+        int oldId = item->getId();
+        int newId = pastemap[item->getType()]->getReference(item->getId());
+        DBG(String(cPreparationTypes[item->getType()]) + " old: " + String(oldId) + " new: " + String(newId));
+        item->setId(newId);
+    }
+
     processor.currentPiano->configure();
     
     redraw();

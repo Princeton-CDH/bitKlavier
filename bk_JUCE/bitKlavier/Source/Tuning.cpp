@@ -187,14 +187,14 @@ void TuningProcessor::adaptiveReset()
 }
 
 
-ValueTree Tuning::getState(void)
+ValueTree Tuning::getState(bool active)
 {
     ValueTree prep(vtagTuning);
     
     prep.setProperty( "Id", Id, 0);
     prep.setProperty( "name", name, 0);
     
-    prep.addChild(sPrep->getState(), -1, 0);
+    prep.addChild(active ? aPrep->getState() : sPrep->getState(), -1, 0);
     
     return prep;
 }

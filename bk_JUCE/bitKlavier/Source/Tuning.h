@@ -661,7 +661,7 @@ public:
     }
     
     
-    ValueTree getState();
+    ValueTree getState(bool active = false);
     void setState(XmlElement*);
     
     ~Tuning() {};

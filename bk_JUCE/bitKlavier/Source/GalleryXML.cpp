@@ -10,6 +10,11 @@
 
 #include "PluginProcessor.h"
 
+void Gallery::addFromXML(ScopedPointer<XmlElement> xml)
+{
+    
+}
+
 int Gallery::transformId(BKPreparationType type, int oldId)
 {
     int newId = 0;
@@ -28,8 +33,6 @@ int Gallery::transformId(BKPreparationType type, int oldId)
         DBG("TRANS " + String(cPreparationTypes[type]) + " old: " + String(oldId) + " new: " + String(newId));
     }
     
-    
-    
     return newId;
 }
 
@@ -43,11 +46,11 @@ ValueTree  Gallery::getState(void)
     galleryVT.setProperty("soundfontURL", processor.currentSoundfont, 0);
     galleryVT.setProperty("soundfontInst", processor.currentInstrument, 0);
     
-    ValueTree idCountVT( "idCount");
+    ValueTree idCountVT( "idcounts");
     
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
-        idCountVT.setProperty( "i"+String(i), idCount[i], 0);
+        idCountVT.setProperty( "i"+String(i), idcounts[i], 0);
     }
     
     galleryVT.addChild(idCountVT, -1, 0);
@@ -93,8 +96,13 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
     Array<int> fi;
     
     bkPianos.clear();
+    idmap.clear();
     
-    for (int i = 0; i < BKPreparationTypeNil; i++) idcounts[i] = 1;
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        idmap.add(new HashMap<int, int>());
+        idcounts[i] = 1;
+    }
     
     if (xml != nullptr)
     {
@@ -105,19 +113,7 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
         // iterate through its sub-elements
         forEachXmlChildElement (*xml, e)
         {
-            
-            if (e->hasTagName("idCount"))
-            {
-                for (int idType = 0; idType < BKPreparationTypeNil; idType++)
-                {
-                    String attr = e->getStringAttribute("i"+String(idType));
-                    
-                    i = attr.getIntValue();
-                    
-                    idCount.set(idType, i);
-                }
-            }
-            else if (e->hasTagName( vtagKeymap))
+            if (e->hasTagName( vtagKeymap))
             {
                 addKeymap();
                 
@@ -290,4 +286,5 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
         }
     }
 }
+
 

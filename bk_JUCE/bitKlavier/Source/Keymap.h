@@ -408,7 +408,6 @@ public:
     
     inline ValueTree getState(void)
     {
- 
         ValueTree keysave( vtagKeymap );
         
         keysave.setProperty( "Id",Id, 0);
@@ -422,6 +421,30 @@ public:
         }
         
         return keysave;
+    }
+    
+    inline void setState(XmlElement* e)
+    {
+        Id = e->getStringAttribute("Id").getIntValue();
+        
+        String n = e->getStringAttribute("name");
+        
+        if (n != String::empty)     name = n;
+        else                        name = String(Id);
+
+        keymap.clear();
+        int i;
+        for (int k = 0; k < 128; k++)
+        {
+            String attr = e->getStringAttribute(ptagKeymap_key + String(k));
+            
+            if (attr == String::empty) break;
+            else
+            {
+                bool active = (bool)attr.getIntValue();
+                keymap.add(active);
+            }
+        }
     }
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }

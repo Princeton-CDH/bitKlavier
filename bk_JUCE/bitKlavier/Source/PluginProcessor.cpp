@@ -716,6 +716,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     if(numSamples != levelBuf.getNumSamples()) levelBuf.setSize(buffer.getNumChannels(), numSamples);
     
     // Process all active prep maps in current piano
+    
+    if (currentPiano == nullptr) return;
+    
     for (auto pmap : currentPiano->activePMaps)
         pmap->processBlock(numSamples, channel, currentSampleType, false);
     
@@ -1089,8 +1092,6 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
     
     updateGalleries();
 }
-
-
 
 void BKAudioProcessor::saveCurrentGallery(void)
 {

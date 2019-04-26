@@ -253,14 +253,14 @@ public:
         return copy;
     }
     
-    inline ValueTree getState(void)
+    inline ValueTree getState(bool active = false)
     {
         ValueTree prep(vtagTempo);
         
         prep.setProperty( "Id",Id, 0);
         prep.setProperty( "name",                          name, 0);
         
-        prep.addChild(sPrep->getState(), -1, 0);
+        prep.addChild(active ? aPrep->getState() : sPrep->getState(), -1, 0);
     
         return prep;
     }
