@@ -407,26 +407,12 @@ void BKConstructionSite::copy(void)
 
     processor.setClipboard(duplicate(selected));
     
-    // just for debugging
-    for (auto item : processor.clipboard)
-    {
-        DBG(" ~ ~ ~ ~ COPY ~ ~ ~ ~ " );
-        DBG(item->getContent()->createDocument(""));
-    }
-    
     getParentComponent()->grabKeyboardFocus();
 }
 
 void BKConstructionSite::paste(void)
 {
     BKItem::PtrArr clipboard = processor.getClipboard();
-    
-    // just for debugging
-    for (auto item : clipboard)
-    {
-        DBG(" ~ ~ ~ ~ PASTE ~ ~ ~ ~ " );
-        DBG(item->getContent()->createDocument(""));
-    }
     
     BKItem::PtrArr newItems;
     

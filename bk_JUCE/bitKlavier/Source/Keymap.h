@@ -432,17 +432,14 @@ public:
         if (n != String::empty)     name = n;
         else                        name = String(Id);
 
-        keymap.clear();
-        int i;
+        clear();
         for (int k = 0; k < 128; k++)
         {
-            String attr = e->getStringAttribute(ptagKeymap_key + String(k));
+            String attr = e->getStringAttribute("k" + String(k));
             
-            if (attr == String::empty) break;
-            else
+            if (attr != String::empty)
             {
-                bool active = (bool)attr.getIntValue();
-                keymap.add(active);
+                keymap.setUnchecked(attr.getIntValue(), true);
             }
         }
     }
