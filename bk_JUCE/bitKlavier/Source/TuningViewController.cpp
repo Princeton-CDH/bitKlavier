@@ -1663,6 +1663,20 @@ void TuningPreparationEditor::update(void)
         if (prep->getSpringTuning()->getActive()) showSprings = true;
         else showSprings = false;
         
+        Array<float> intervalWeights = prep->getSpringTuning()->getSpringWeights();
+        if (intervalWeights.size() < 12)
+        {
+            intervalWeights = tuning->getStaticSpringTuning()->getSpringWeights();
+        }
+        
+        for (int i = 0; i < 12; i++)
+        {
+            springSliders[i]->setValue(intervalWeights[i], dontSendNotification);
+            //update springModeButtons;
+        }
+        
+        currentTab = 0;
+        displayTab(currentTab);
         /*
         if (!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
             springScaleFundamentalCB.setSelectedItemIndex(12, dontSendNotification);

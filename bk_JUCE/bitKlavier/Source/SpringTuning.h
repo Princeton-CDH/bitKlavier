@@ -166,7 +166,6 @@ public:
     
     inline void setSpringMode(int which, bool on)
     {
-        DBG("setSpringModeButtonOn " + String(which));
         springMode.set(which, on);
     }
     
@@ -255,6 +254,7 @@ public:
         ValueTree tethers( "tethers");
         ValueTree springs( "springs");
         ValueTree intervalScale("intervalScale");
+        ValueTree springMode("springMode");
         
         for (int i = 0; i < 128; i++)
         {
@@ -265,10 +265,12 @@ public:
         {
             springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
             intervalScale.setProperty("s"+String(i), intervalTuning[i], 0);
+            springMode.setProperty("s"+String(i), getSpringMode(i), 0);
         }
         prep.addChild(tethers, -1, 0);
         prep.addChild(springs, -1, 0);
         prep.addChild(intervalScale, -1, 0);
+        prep.addChild(springMode, -1, 0);
 
         return prep;
     }
@@ -300,6 +302,7 @@ public:
         {
             setSpringWeight(i, r[idx++]);
             intervalTuning.setUnchecked(i, r[idx++] - 0.5);
+            setSpringMode(i, r[idx++]);
         }
     }
     
@@ -364,6 +367,22 @@ public:
                     else
                     {
                         setSpringWeight(i, attr.getDoubleValue());
+                    }
+                }
+            }
+            else if (sub->hasTagName("springMode"))
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    String attr = sub->getStringAttribute("s" + String(i));
+                    
+                    if (attr == "")
+                    {
+                        setSpringMode(i, false);
+                    }
+                    else
+                    {
+                        setSpringMode(i, (bool)attr.getIntValue());
                     }
                 }
             }
