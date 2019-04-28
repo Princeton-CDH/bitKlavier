@@ -1517,16 +1517,8 @@ void TuningPreparationEditor::update(void)
                 springModeButtons[i]->setButtonText("L");
             }
         }
-        
-        //currentTab = 0;
+
         displayTab(currentTab);
-        
-        /*
-        if (!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
-            springScaleFundamentalCB.setSelectedItemIndex(12, dontSendNotification);
-        else
-            springScaleFundamentalCB.setSelectedItemIndex(prep->getSpringTuning()->getIntervalFundamental(), dontSendNotification);
-        */
 
     }
     
@@ -2131,6 +2123,31 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         mod->setAdaptiveType((TuningAdaptiveSystemType) index);
         mod->setDirty(TuningAdaptiveSystem);
+
+        TuningAdaptiveSystemType type = (TuningAdaptiveSystemType) index;
+        adaptiveSystemsCB.setAlpha(1.);
+        
+        if (type == AdaptiveSpring)
+        {
+            showSprings = true;
+            
+            displayTab(currentTab);
+            
+        }
+        else
+        {
+            showSprings = false;
+            
+            displayTab(currentTab);
+        }
+        
+        
+        if (type == AdaptiveNone) // Non-adaptive
+        {
+
+        }
+
+        
     }
     else if (box == &fundamentalCB)
     {

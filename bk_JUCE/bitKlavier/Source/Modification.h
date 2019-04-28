@@ -386,6 +386,11 @@ public:
     Modification(Id, TuningParameterTypeNil),
     TuningPreparation()
     {
+        //Array<bool> tetherWeightsActive;
+        //Array<bool> springWeightsActive;
+        
+        for(int i=0; i<128; i++) tetherWeightsActive.insert(i, false);
+        for(int i=0; i<12; i++) springWeightsActive.insert(i, false);
     }
     
     ~TuningModification(void)
