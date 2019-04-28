@@ -28,6 +28,11 @@ void SpringTuning::copy(SpringTuning::Ptr st)
         springWeights[i] = st->springWeights[i];
     }
     
+    for (int i=0; i<12; i++)
+    {
+        setSpringMode(i, st->getSpringMode(i));
+    }
+    
     scaleId = st->getScaleId();
     
     setIntervalTuning(st->getIntervalTuning());

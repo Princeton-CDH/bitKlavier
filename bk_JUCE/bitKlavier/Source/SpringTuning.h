@@ -166,6 +166,7 @@ public:
     
     inline void setSpringMode(int which, bool on)
     {
+        DBG("SpringTuning.h::setSpringMode " + String(which) + " " + String((int)on));
         springMode.set(which, on);
     }
     
@@ -265,7 +266,7 @@ public:
         {
             springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
             intervalScale.setProperty("s"+String(i), intervalTuning[i], 0);
-            springMode.setProperty("s"+String(i), getSpringMode(i), 0);
+            springMode.setProperty("s"+String(i), (int)getSpringMode(i), 0);
         }
         prep.addChild(tethers, -1, 0);
         prep.addChild(springs, -1, 0);
@@ -383,6 +384,7 @@ public:
                     else
                     {
                         setSpringMode(i, (bool)attr.getIntValue());
+                        DBG("setState::setSpringMode " + String(attr.getIntValue()));
                     }
                 }
             }

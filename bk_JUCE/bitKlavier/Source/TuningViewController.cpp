@@ -905,7 +905,7 @@ void TuningViewController::updateComponentVisibility()
             nToneRootOctaveCB.setVisible(true);
             nToneSemitoneWidthSlider->setVisible(true);
             
-            
+            /*
             Array<float> intervalWeights = active->getSpringTuning()->getSpringWeights();
             if (intervalWeights.size() < 12)
             {
@@ -917,6 +917,7 @@ void TuningViewController::updateComponentVisibility()
                 springSliders[i]->setValue(intervalWeights[i], dontSendNotification);
                 //update springModeButtons;
             }
+             */
         }
         
         if (adaptiveType == AdaptiveNormal)
@@ -954,176 +955,6 @@ void TuningViewController::updateComponentVisibility()
             nToneSemitoneWidthSlider->setVisible(false);
         }
     }
-    
-#if 0
-    for (auto s : tetherSliders)    s->setVisible(false);
-    for (auto s : springSliders)    s->setVisible(false);
-    for (auto l : springLabels)     l->setVisible(false);
-    
-    
-    rateSlider->setVisible(false);
-    dragSlider->setVisible(false);
-    springScaleCB.setVisible(false);
-    springScaleFundamentalCB.setVisible(false);
-    
-    tetherStiffnessSlider->setVisible(false);
-    intervalStiffnessSlider->setVisible(false);
-    
-    absoluteKeyboard.setVisible(true);
-    customKeyboard.setVisible(true);
-    lastInterval.setVisible(true);
-    lastNote.setVisible(true);
-    offsetSlider->setVisible(true);
-    adaptiveSystemsCB.setVisible(true);
-    adaptiveSystemsCB.toFront(true);
-    showSpringsButton.setVisible(true);
-    
-    if (adaptiveType == AdaptiveNone || showSprings || AdaptiveSpring)
-    {
-        A1IntervalScaleCB.setVisible(false);
-        A1Inversional.setVisible(false);
-        A1AnchorScaleCB.setVisible(false);
-        A1FundamentalCB.setVisible(false);
-        A1ClusterThresh->setVisible(false);
-        A1ClusterMax->setVisible(false);
-        A1IntervalScaleLabel.setVisible(false);
-        A1AnchorScaleLabel.setVisible(false);
-        A1FundamentalLabel.setVisible(false);
-        A1reset.setVisible(false);
-        currentFundamental.setVisible(false);
-        nToneRootCB.setVisible(true);
-        nToneRootOctaveCB.setVisible(true);
-        nToneSemitoneWidthSlider->setVisible(true);
-    }
-    
-    if (!showSprings)
-    {
-        if (adaptiveType == AdaptiveNormal)
-        {
-            A1IntervalScaleCB.setVisible(true);
-            A1Inversional.setVisible(true);
-            A1AnchorScaleCB.setVisible(false);
-            A1FundamentalCB.setVisible(false);
-            A1ClusterThresh->setVisible(true);
-            A1ClusterMax->setVisible(true);
-            A1IntervalScaleLabel.setVisible(true);
-            A1AnchorScaleLabel.setVisible(false);
-            A1FundamentalLabel.setVisible(false);
-            A1reset.setVisible(true);
-            currentFundamental.setVisible(true);
-            nToneRootCB.setVisible(false);
-            nToneRootOctaveCB.setVisible(false);
-            nToneSemitoneWidthSlider->setVisible(false);
-        }
-        else if (adaptiveType == AdaptiveAnchored)
-        {
-            A1IntervalScaleCB.setVisible(true);
-            A1Inversional.setVisible(true);
-            A1AnchorScaleCB.setVisible(true);
-            A1FundamentalCB.setVisible(true);
-            A1ClusterThresh->setVisible(true);
-            A1ClusterMax->setVisible(true);
-            A1IntervalScaleLabel.setVisible(true);
-            A1AnchorScaleLabel.setVisible(true);
-            A1FundamentalLabel.setVisible(true);
-            A1reset.setVisible(true);
-            currentFundamental.setVisible(true);
-            nToneRootCB.setVisible(false);
-            nToneRootOctaveCB.setVisible(false);
-            nToneSemitoneWidthSlider->setVisible(false);
-        }
-    }
-    else
-    {
-        bool tuningMod = (processor.updateState->currentDisplay == DisplayTuningMod);
-
-        lastInterval.setVisible(false);
-        lastNote.setVisible(false);
-        
-        Array<float> springWeights;
-        Array<float> tetherWeights;
-        
-        if (tuningMod)
-        {
-            springWeights = mod->getSpringTuning()->getSpringWeights();
-            tetherWeights = mod->getSpringTuning()->getTetherWeights();
-        }
-        else
-        {
-            springWeights = tuning->getCurrentSpringTuning()->getSpringWeights();
-            tetherWeights = tuning->getCurrentSpringTuning()->getTetherWeights();
-        }
-        
-        nToneRootCB.setVisible(false);
-        nToneRootOctaveCB.setVisible(false);
-        nToneSemitoneWidthSlider->setVisible(false);
-        
-        absoluteKeyboard.setVisible(false);
-        customKeyboard.setVisible(false);
-        offsetSlider->setVisible(false);
-        
-        if (tuning->getCurrentSpringTuning()->getActive() || tuningMod)
-        {
-            double val;
-            
-            rateSlider->setVisible(true);
-            rateSlider->toFront(false);
-            
-            if (tuningMod)  val = mod->getSpringRate();
-            else            val = active->getSpringTuning()->getRate();
-            
-            rateSlider->setValue(val, dontSendNotification);
-            
-            dragSlider->setVisible(true);
-            dragSlider->toFront(false);
-            
-            if (tuningMod)  val = mod->getSpringTuning()->getDrag();
-            else            val = active->getSpringTuning()->getDrag();
-            
-            val = dt_asymwarp_inverse(1.0f - val, 100.);
-            dragSlider->setValue(val, dontSendNotification);
-            
-            tetherStiffnessSlider->setVisible(true);
-            tetherStiffnessSlider->toFront(false);
-            
-            if (tuningMod)  val = mod->getSpringTuning()->getTetherStiffness();
-            else            val = active->getSpringTuning()->getTetherStiffness();
-            
-            tetherStiffnessSlider->setValue(val, dontSendNotification);
-            
-            intervalStiffnessSlider->setVisible(true);
-            intervalStiffnessSlider->toFront(false);
-            
-            if (tuningMod)  val = mod->getSpringTuning()->getIntervalStiffness();
-            else            val = active->getSpringTuning()->getIntervalStiffness();
-            
-            intervalStiffnessSlider->setValue(val, dontSendNotification);
-            
-            springScaleCB.setVisible(true);
-            springScaleCB.toFront(false);
-            
-            springScaleFundamentalCB.setVisible(true);
-            springScaleFundamentalCB.toFront(false);
-            
-            for (int i = 0; i < 12; i++)
-            {
-                springSliders[i]->setVisible(true);
-                springSliders[i]->toFront(false);
-                
-                springSliders[i]->setValue(springWeights[i], dontSendNotification);
-                
-                springLabels[i]->setVisible(true);
-            }
-            
-            for (int i = 0; i < 128; i++)
-            {
-                tetherSliders[i]->toFront(false);
-                
-                tetherSliders[i]->setValue(tetherWeights[i], dontSendNotification);
-            }
-        }
-    }
-#endif
 }
 
 #if JUCE_IOS
@@ -1627,13 +1458,13 @@ void TuningPreparationEditor::update(void)
         if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId - 2);
         springScaleCB.setSelectedItemIndex(springScaleId, dontSendNotification);
         
-        DBG("springScaleFundamentalCB.setSelectedItemIndex " + String(prep->getSpringTuning()->getIntervalFundamental()));
+        //DBG("springScaleFundamentalCB.setSelectedItemIndex " + String(prep->getSpringTuning()->getIntervalFundamental()));
         springScaleFundamentalCB.setSelectedItemIndex((int)prep->getSpringTuning()->getIntervalFundamental(), dontSendNotification);
         
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
 
-        DBG("offsets: " + floatArrayToString(prep->getAbsoluteOffsets()));
+        //DBG("offsets: " + floatArrayToString(prep->getAbsoluteOffsets()));
         absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
         customKeyboard.setValues(tuning->getCurrentScaleCents());
         
@@ -1672,11 +1503,24 @@ void TuningPreparationEditor::update(void)
         for (int i = 0; i < 12; i++)
         {
             springSliders[i]->setValue(intervalWeights[i], dontSendNotification);
+            
             //update springModeButtons;
+            DBG("TuningPreparationEditor::update::getSpringMode = " + String(i) + " " + String((int)prep->getSpringTuning()->getSpringMode(i)));
+            if(prep->getSpringTuning()->getSpringMode(i))
+            {
+                springModeButtons[i]->setToggleState(true, dontSendNotification);
+                springModeButtons[i]->setButtonText("F");
+            }
+            else
+            {
+                springModeButtons[i]->setToggleState(false, dontSendNotification);
+                springModeButtons[i]->setButtonText("L");
+            }
         }
         
-        currentTab = 0;
+        //currentTab = 0;
         displayTab(currentTab);
+        
         /*
         if (!prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
             springScaleFundamentalCB.setSelectedItemIndex(12, dontSendNotification);
