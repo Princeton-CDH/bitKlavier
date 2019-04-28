@@ -27,6 +27,7 @@ showSprings(false)
         
         s->setSliderStyle(Slider::SliderStyle::LinearBar);
         s->setRange(0.0, 1.0);
+        s->setNumDecimalPlacesToDisplay(2);
         addChildComponent(s);
         tetherSliders.add(s);
         
@@ -42,6 +43,7 @@ showSprings(false)
         
         s->setSliderStyle(Slider::SliderStyle::LinearBar);
         s->setRange(0.0, 1.0);
+        s->setNumDecimalPlacesToDisplay(2);
         addChildComponent(s);
         springSliders.add(s);
         
@@ -49,6 +51,13 @@ showSprings(false)
         l->setColour(juce::Label::ColourIds::textColourId, Colours::white);
         addChildComponent(l);
         springLabels.add(l);
+        
+        BKTextButton* springModeButton = new BKTextButton();
+        springModeButton->setClickingTogglesState(true);
+        springModeButton->setButtonText("L");
+        springModeButton->setColour(TextButton::buttonOnColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
+        addChildComponent(springModeButton);
+        springModeButtons.add(springModeButton);
     
     }
     
@@ -162,7 +171,7 @@ showSprings(false)
     showSpringsButton.setClickingTogglesState(true);
     showSpringsButton.setTooltip("show spiral view of tuning relationships");
     showSpringsButton.setColour(TextButton::buttonOnColourId, Colours::red.withMultipliedAlpha(0.5));
-    addAndMakeVisible(showSpringsButton);
+    //addAndMakeVisible(showSpringsButton);
     
     nToneRootCB.setName("nToneRoot");
     nToneRootCB.setTooltip("set root note, when semitone width is not 100");
@@ -262,9 +271,10 @@ void TuningViewController::invisible(void)
     A1AnchorScaleCB.setVisible(false);
     A1FundamentalCB.setVisible(false);
     
-    for (auto s : tetherSliders)    s->setVisible(false);
-    for (auto s : springSliders)    s->setVisible(false);
-    for (auto l : springLabels)     l->setVisible(false);
+    for (auto s : tetherSliders)        s->setVisible(false);
+    for (auto s : springSliders)        s->setVisible(false);
+    for (auto l : springLabels)         l->setVisible(false);
+    for (auto b : springModeButtons)    b->setVisible(false);
     
     rateSlider->setVisible(false);
     dragSlider->setVisible(false);
@@ -466,9 +476,10 @@ void TuningViewController::displayTab(int tab)
         // SET VISIBILITY
         if(showSprings)
         {
-            for (auto s : tetherSliders)    s->setVisible(true);
-            for (auto s : springSliders)    s->setVisible(true);
-            for (auto l : springLabels)     l->setVisible(true);
+            for (auto s : tetherSliders)        s->setVisible(true);
+            for (auto s : springSliders)        s->setVisible(true);
+            for (auto l : springLabels)         l->setVisible(true);
+            for (auto b : springModeButtons)    b->setVisible(true); //need to add another conditional so these show only when in a "fundamental" mode
             
             rateSlider->setVisible(true);
             dragSlider->setVisible(true);
@@ -533,8 +544,13 @@ void TuningViewController::displayTab(int tab)
                                        sliderHeight);
             springSliders[i]->setBounds(springLabels[i]->getRight() + 2,
                                         springLabels[i]->getY(),
-                                        intervalStiffnessSlider->getWidth() * 0.7,
+                                        //intervalStiffnessSlider->getWidth() * 0.7,
+                                        intervalStiffnessSlider->getWidth() * 0.7 - sliderHeight,
                                         sliderHeight);
+            springModeButtons[i]->setBounds(springSliders[i]->getRight() + 2,
+                                            springSliders[i]->getY(),
+                                            sliderHeight,
+                                            sliderHeight);
         }
     }
     repaint();
@@ -1045,6 +1061,7 @@ void TuningViewController::updateComponentVisibility()
             for (int i = 0; i < 12; i++)
             {
                 springSliders[i]->setValue(intervalWeights[i], dontSendNotification);
+                //update springModeButtons;
             }
         }
         
@@ -1088,6 +1105,7 @@ void TuningViewController::updateComponentVisibility()
     for (auto s : tetherSliders)    s->setVisible(false);
     for (auto s : springSliders)    s->setVisible(false);
     for (auto l : springLabels)     l->setVisible(false);
+    
     
     rateSlider->setVisible(false);
     dragSlider->setVisible(false);
@@ -1378,6 +1396,7 @@ TuningViewController(p, theGraph)
     for (int i = 0; i < 12; i++)
     {
         springSliders[i]->addListener(this);
+        springModeButtons[i]->addListener(this);
     }
     
     for (int i = 0; i < 128; i++)
@@ -1960,6 +1979,29 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         
         displayTab(currentTab);
     }
+    else {
+        for (int i=0; i<springModeButtons.size(); i++)
+        {
+            if(b == springModeButtons[i])
+            {
+                if(springModeButtons[i]->getButtonText() == "L")
+                {
+                    springModeButtons[i]->setButtonText("F");
+                    prep->setSpringModeButtonState(i, true);
+                    active->setSpringModeButtonState(i, true);
+                    DBG("springModeButton TRUE: " + String(i));
+                }
+                else
+                {
+                    springModeButtons[i]->setButtonText("L");
+                    prep->setSpringModeButtonState(i, false);
+                    active->setSpringModeButtonState(i, false);
+                    DBG("springModeButton FALSE: " + String(i));
+                }
+                break;
+            }
+        }
+    }
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TuningModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
@@ -1998,6 +2040,7 @@ TuningViewController(p, theGraph)
     for (int i = 0; i < 12; i++)
     {
         springSliders[i]->addListener(this);
+        springModeButtons[i]->addListener(this);
     }
     
     for (int i = 0; i < 128; i++)
@@ -2043,6 +2086,7 @@ void TuningModificationEditor::greyOutAllComponents()
     for (int i = 0; i < 12; i++)
     {
         springSliders[i]->setAlpha(gModAlpha);
+        springModeButtons[i]->setAlpha(gModAlpha);
     }
     
     for (int i = 0; i < 128; i++)
@@ -2113,8 +2157,8 @@ void TuningModificationEditor::highlightModedComponents()
     {
         for (int i = 0; i < 12; i++)
         {
-            if (mod->getSpringWeightActive(i))  springSliders[i]->setAlpha(1);
-            else                                springSliders[i]->setAlpha(gModAlpha);
+            if (mod->getSpringWeightActive(i))  { springSliders[i]->setAlpha(1); springModeButtons[i]->setAlpha(1); }
+            else                                { springSliders[i]->setAlpha(gModAlpha); springModeButtons[i]->setAlpha(gModAlpha); }
         }
     }
     if (mod->getDirty(TuningSpringIntervalScale))

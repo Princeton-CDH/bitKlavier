@@ -164,6 +164,15 @@ public:
         }
     }
     
+    inline void setSpringModeButtonState(int which, bool on)
+    {
+        DBG("setSpringModeButtonOn " + String(which));
+        springMode.set(which, on);
+    }
+    
+    bool getSpringMode(int which) {return springMode.getUnchecked(which);}
+    bool getSpringModeButtonState(int which) {return springMode.getUnchecked(which);}
+    
 	double getFrequency(int index);
 	bool pitchEnabled(int index);
 
@@ -392,6 +401,7 @@ private:
     TuningSystem scaleId;
     Array<float> intervalTuning;
     PitchClass intervalFundamental;
+    Array<bool> springMode;
     
     Array<float> tetherTuning;
     TuningSystem tetherTuningId;

@@ -57,6 +57,9 @@ scaleId(JustTuning)
     tetherTuning = Array<float>({0,0,0,0,0,0,0,0,0,0,0,0});
     tetherFundamental = PitchClass(C);
     
+    springMode.ensureStorageAllocated(12);
+    for(int i=0; i<12; i++) springMode.insert(i, false);
+    
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     //intervalFundamental = PitchClass(C);
     intervalFundamental = PitchClass(12);
@@ -322,6 +325,7 @@ void SpringTuning::setTetherWeight(int which, double weight)
     
 }
 
+
 double SpringTuning::getTetherWeight(int which)
 {
     return tetherSpringArray[which]->getStrength();
@@ -472,10 +476,15 @@ void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
     
     //when every note is its own fundamental, or when the interval is a P5, P4, or M3,
     //set resting length to interval scale without regard to intervalFundamental
+    /*
     if(!usingFundamentalForIntervalSprings ||
        interval == 7 ||
        interval == 5 ||
        interval == 4)
+     */
+    DBG("getSpringMode = " + String((int)getSpringMode(interval - 1)));
+    if(!usingFundamentalForIntervalSprings ||
+       !getSpringMode(interval - 1))
     {
         int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
         spring->setRestingLength(fabs(diff) + intervalTuning[interval]);

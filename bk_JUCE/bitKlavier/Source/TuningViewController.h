@@ -97,6 +97,7 @@ protected:
     OwnedArray<Slider> tetherSliders;
     OwnedArray<Label>  springLabels;
     OwnedArray<Label>  tetherLabels;
+    OwnedArray<BKTextButton> springModeButtons;
     
     BKComboBox springScaleCB;
     BKComboBox springScaleFundamentalCB;
