@@ -85,7 +85,7 @@ public:
             nativeContext.reset();
     }
 
-    ~CachedImage() override
+    ~CachedImage()
     {
         stop();
     }
@@ -671,7 +671,7 @@ public:
             attach();
     }
 
-    ~Attachment() override
+    ~Attachment()
     {
         detach();
     }

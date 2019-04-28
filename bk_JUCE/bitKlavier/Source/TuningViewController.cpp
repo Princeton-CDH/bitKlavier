@@ -479,7 +479,10 @@ void TuningViewController::displayTab(int tab)
             for (auto s : tetherSliders)        s->setVisible(true);
             for (auto s : springSliders)        s->setVisible(true);
             for (auto l : springLabels)         l->setVisible(true);
-            for (auto b : springModeButtons)    b->setVisible(true); //need to add another conditional so these show only when in a "fundamental" mode
+            
+            Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+            if(tuning->getCurrentSpringTuning()->getUsingFundamentalForIntervalSprings())
+                for (auto b : springModeButtons)    b->setVisible(true);
             
             rateSlider->setVisible(true);
             dragSlider->setVisible(true);
@@ -559,159 +562,8 @@ void TuningViewController::displayTab(int tab)
 
 void TuningViewController::resized()
 {
-    
     displayShared();
     displayTab(currentTab);
-    
-#if 0
-    Rectangle<int> area (getLocalBounds());
-    
-    iconImageComponent.setBounds(area);
-    area.reduce(10 * processor.paddingScalarX+3, 10 * processor.paddingScalarY+3);
-    
-    float keyboardHeight = 100 + 50 * processor.paddingScalarY;
-    Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
-    absoluteKeymapRow.reduce(gXSpacing, 0);
-    
-    absoluteKeyboard.setBounds(absoluteKeymapRow);
-    
-    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
-    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(gXSpacing);
-    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    actionButton.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    showSpringsButton.setBounds(comboBoxSlice);
-
-    /* *** above here should be generic (mostly) to all prep layouts *** */
-    /* ***         below here will be specific to each prep          *** */
-    
-    // ********* right column
-    
-    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.removeFromLeft(gXSpacing);
-    modeSlice.removeFromRight(gXSpacing);
-    //adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(showSpringsButton.getWidth()));
-    adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 3.));
-    modeSlice.removeFromLeft(gXSpacing);
-    //scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
-    scaleCB.setBounds(modeSlice.removeFromLeft(2. * modeSlice.getWidth() / 3. - 2.*gXSpacing));
-    
-    modeSlice.removeFromLeft(gXSpacing);
-    fundamentalCB.setBounds(modeSlice);
-    
-    int customKeyboardHeight = 80 + 70. * processor.paddingScalarY;
-    int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gYSpacing * 3)) * 0.25;
-    
-    area.removeFromTop(extraY);
-    Rectangle<int> customKeyboardSlice = area.removeFromTop(customKeyboardHeight);
-    customKeyboardSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    customKeyboardSlice.removeFromRight(gXSpacing);
-    customKeyboard.setBounds(customKeyboardSlice);
-    
-    area.removeFromTop(extraY);
-    Rectangle<int> offsetSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
-    offsetSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
-    offsetSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
-    offsetSlider->setBounds(offsetSliderSlice);
-    
-    area.removeFromTop(extraY);
-    Rectangle<int> currentFundamentalSlice = area.removeFromTop(gComponentTextFieldHeight);
-    currentFundamental.setBounds(currentFundamentalSlice);
-    
-    // ********* left column
-    
-    extraY = (leftColumn.getHeight() -
-              (gComponentComboBoxHeight * 2 +
-               gComponentSingleSliderHeight * 2 +
-               gYSpacing * 5)) * 0.25;
-    
-    leftColumn.removeFromTop(extraY + gYSpacing);
-    Rectangle<int> A1IntervalScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    A1IntervalScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    A1IntervalScaleCBSlice.removeFromLeft(gXSpacing);
-    int tempwidth = A1IntervalScaleCBSlice.getWidth() / 3.;
-    A1Inversional.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
-    A1IntervalScaleCB.setBounds(A1IntervalScaleCBSlice.removeFromRight(tempwidth));
-    A1IntervalScaleCBSlice.removeFromRight(gXSpacing);
-    A1reset.setBounds(A1IntervalScaleCBSlice);
-    
-    leftColumn.removeFromTop(extraY + gYSpacing);
-    Rectangle<int> A1ClusterMaxSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
-    A1ClusterMaxSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
-    A1ClusterMax->setBounds(A1ClusterMaxSlice);
-    nToneSemitoneWidthSlider->setBounds(A1ClusterMaxSlice);
-    
-    leftColumn.removeFromTop(gYSpacing);
-    Rectangle<int> A1ClusterThreshSlice = leftColumn.removeFromTop(gComponentSingleSliderHeight);
-    A1ClusterThreshSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
-    A1ClusterThresh->setBounds(A1ClusterThreshSlice);
-    
-    Rectangle<int> nToneRootCBSlice = A1ClusterThreshSlice.removeFromLeft(tempwidth);
-    nToneRootCBSlice = nToneRootCBSlice.removeFromTop(gComponentComboBoxHeight);
-    nToneRootCBSlice.removeFromLeft(gXSpacing * 2);
-    nToneRootCB.setBounds(nToneRootCBSlice);
-    
-    Rectangle<int> nToneRootOctaveCBSlice = A1ClusterThreshSlice.removeFromLeft(tempwidth);
-    nToneRootOctaveCBSlice = nToneRootOctaveCBSlice.removeFromTop(gComponentComboBoxHeight);
-    nToneRootOctaveCBSlice.removeFromLeft(gXSpacing * 2);
-    nToneRootOctaveCB.setBounds(nToneRootOctaveCBSlice);
-    
-    leftColumn.removeFromTop(extraY + gYSpacing);
-    Rectangle<int> A1AnchorScaleCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    A1AnchorScaleCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-    A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
-    tempwidth = A1AnchorScaleCBSlice.getWidth() / 3.;
-    A1AnchorScaleLabel.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));
-    A1AnchorScaleCB.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));
-    A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
-    A1FundamentalCB.setBounds(A1AnchorScaleCBSlice);
-    
-    Rectangle<float> editAllBounds = absoluteKeyboard.getEditAllBounds();
-    editAllBounds.translate(absoluteKeyboard.getX(), absoluteKeyboard.getY());
-    lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
-    lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
-    
-    rateSlider->setBounds(selectCB.getX()-gComponentSingleSliderXOffset, selectCB.getBottom() + gYSpacing, selectCB.getWidth()+gComponentSingleSliderXOffset, gComponentSingleSliderHeight);
-    dragSlider->setBounds(actionButton.getX()-gComponentSingleSliderXOffset, rateSlider->getY(), showSpringsButton.getWidth() + actionButton.getWidth(), gComponentSingleSliderHeight);
-    
-    springScaleCB.setBounds(scaleCB.getX(), rateSlider->getY(), scaleCB.getWidth(), gComponentComboBoxHeight);
-    springScaleFundamentalCB.setBounds(fundamentalCB.getX(), springScaleCB.getY(), fundamentalCB.getWidth(), gComponentComboBoxHeight);
-    
-    intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
-                                       rateSlider->getBottom() + gYSpacing,
-                                       rateSlider->getWidth(),
-                                       gComponentSingleSliderHeight);
-    
-    tetherStiffnessSlider->setBounds(//fundamentalCB.getX() - gComponentSingleSliderXOffset,
-                                     fundamentalCB.getRight() - intervalStiffnessSlider->getWidth(),
-                                     intervalStiffnessSlider->getY(),
-                                     //fundamentalCB.getWidth() + 2.*gComponentSingleSliderXOffset,
-                                     intervalStiffnessSlider->getWidth(),
-                                     gComponentSingleSliderHeight);
-    
-    //dragSlider->setBounds(fundamentalCB.getX()-gComponentSingleSliderXOffset, intervalStiffnessSlider->getY(), fundamentalCB.getWidth()+gComponentSingleSliderXOffset*2., gComponentSingleSliderHeight);
-    
-    
-    float sliderHeight = (absoluteKeyboard.getBottom() - (rateSlider->getBottom() + gYSpacing)) / 13.;
-    
-    for (int i = 0; i < 12; i++)
-    {
-        springLabels[i]->setBounds(hideOrShow.getX(),
-                                   intervalStiffnessSlider->getBottom() + (sliderHeight) * (11 - i),
-                                   hideOrShow.getWidth(),
-                                   sliderHeight);
-        springSliders[i]->setBounds(selectCB.getX(),
-                                    springLabels[i]->getY(),
-                                    intervalStiffnessSlider->getWidth() * 0.75,
-                                    sliderHeight);
-    }
-    
-    //updateComponentVisibility();
-#endif
 }
 
 void TuningViewController::paint (Graphics& g)
@@ -1031,6 +883,8 @@ void TuningViewController::updateComponentVisibility()
     TuningModification::Ptr mod = processor.gallery->getTuningModification(processor.updateState->currentModTuningId);
     
     TuningAdaptiveSystemType adaptiveType = active->getAdaptiveType();
+    
+    
     
     if (currentTab == 0)
     {
@@ -1353,11 +1207,12 @@ void TuningViewController::timerCallback(void)
                 {
                     tetherSliders[i]->setBounds(//fundamentalCB.getX(),
                                                 //tetherStiffnessSlider->getRight() - springSliders[0]->getWidth() - hideOrShow.getWidth(),
-                                                tetherStiffnessSlider->getX(),
+                                                tetherStiffnessSlider->getX() + springLabels[0]->getWidth(),
                                                 tetherStiffnessSlider->getBottom() + sliderHeight * (count),
                                                 //fundamentalCB.getWidth() * 0.75,
                                                 //(tetherStiffnessSlider->getWidth() - gComponentSingleSliderXOffset) * 0.85,
-                                                springSliders[0]->getWidth(),
+                                                tetherStiffnessSlider->getWidth() - 2 * springLabels[0]->getWidth() - rightArrow.getWidth(),
+                                                //springSliders[0]->getWidth(),
                                                 sliderHeight);
                     
                     if (!isMod) tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
@@ -1696,6 +1551,12 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->getSpringTuning()->setIntervalFundamental((PitchClass)index);
         active->getSpringTuning()->setIntervalFundamental((PitchClass)index);
         
+        Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        if(tuning->getCurrentSpringTuning()->getUsingFundamentalForIntervalSprings())
+            for (auto b : springModeButtons)    b->setVisible(true);
+        else
+            for (auto b : springModeButtons)    b->setVisible(false);
+        
         DBG("current springtuning interval Fundamental = " + String(index));
     }
     
@@ -1987,15 +1848,15 @@ void TuningPreparationEditor::buttonClicked (Button* b)
                 if(springModeButtons[i]->getButtonText() == "L")
                 {
                     springModeButtons[i]->setButtonText("F");
-                    prep->setSpringModeButtonState(i, true);
-                    active->setSpringModeButtonState(i, true);
+                    prep->setSpringMode(i, true);
+                    active->setSpringMode(i, true);
                     DBG("springModeButton TRUE: " + String(i));
                 }
                 else
                 {
                     springModeButtons[i]->setButtonText("L");
-                    prep->setSpringModeButtonState(i, false);
-                    active->setSpringModeButtonState(i, false);
+                    prep->setSpringMode(i, false);
+                    active->setSpringMode(i, false);
                     DBG("springModeButton FALSE: " + String(i));
                 }
                 break;

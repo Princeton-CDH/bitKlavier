@@ -334,9 +334,9 @@ public:
         getSpringTuning()->setTetherWeight(which, weight);
     }
     
-    inline void setSpringModeButtonState(int which, bool on)
+    inline void setSpringMode(int which, bool on)
     {
-        getSpringTuning()->setSpringModeButtonState(which, on);
+        getSpringTuning()->setSpringMode(which, on);
     }
     
     inline void setSpringsActive(bool status) { getSpringTuning()->setActive(status); }

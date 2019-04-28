@@ -164,7 +164,7 @@ public:
         }
     }
     
-    inline void setSpringModeButtonState(int which, bool on)
+    inline void setSpringMode(int which, bool on)
     {
         DBG("setSpringModeButtonOn " + String(which));
         springMode.set(which, on);

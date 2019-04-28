@@ -482,7 +482,7 @@ void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
        interval == 5 ||
        interval == 4)
      */
-    DBG("getSpringMode = " + String((int)getSpringMode(interval - 1)));
+    //DBG("getSpringMode = " + String((int)getSpringMode(interval - 1)));
     if(!usingFundamentalForIntervalSprings ||
        !getSpringMode(interval - 1))
     {

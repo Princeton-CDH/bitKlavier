@@ -66,17 +66,8 @@ static int warnOnFailure (int result) noexcept
     DBG (message);
     return result;
 }
-
-static int warnOnFailureIfImplemented (int result) noexcept
-{
-    if (result != kResultOk && result != kNotImplemented)
-        return warnOnFailure (result);
-
-    return result;
-}
 #else
  #define warnOnFailure(x) x
- #define warnOnFailureIfImplemented(x) x
 #endif
 
 //==============================================================================
@@ -958,7 +949,7 @@ private:
         const File file (filePath);
         const char* const utf8 = file.getFullPathName().toRawUTF8();
 
-        if (CFURLRef url = CFURLCreateFromFileSystemRepresentation (nullptr, (const UInt8*) utf8, (CFIndex) std::strlen (utf8), file.isDirectory()))
+        if (CFURLRef url = CFURLCreateFromFileSystemRepresentation (0, (const UInt8*) utf8, (CFIndex) std::strlen (utf8), file.isDirectory()))
         {
             bundleRef = CFBundleCreate (kCFAllocatorDefault, url);
             CFRelease (url);
@@ -1140,7 +1131,7 @@ struct VST3PluginWindow : public AudioProcessorEditor,
         }
     }
 
-    ~VST3PluginWindow() override
+    ~VST3PluginWindow()
     {
         warnOnFailure (view->removed());
         warnOnFailure (view->setFrame (nullptr));
@@ -1725,7 +1716,7 @@ public:
         holder->host->setPlugin (this);
     }
 
-    ~VST3PluginInstance() override
+    ~VST3PluginInstance()
     {
         jassert (getActiveEditor() == nullptr); // You must delete any editors before deleting the plugin instance!
 
@@ -1895,7 +1886,7 @@ public:
         cachedBusLayouts = getBusesLayout();
 
         warnOnFailure (holder->component->setActive (true));
-        warnOnFailureIfImplemented (processor->setProcessing (true));
+        warnOnFailure (processor->setProcessing (true));
 
         isActive = true;
     }
@@ -1910,7 +1901,7 @@ public:
         setStateForAllMidiBuses (false);
 
         if (processor != nullptr)
-            warnOnFailureIfImplemented (processor->setProcessing (false));
+            warnOnFailure (processor->setProcessing (false));
 
         if (holder->component != nullptr)
             warnOnFailure (holder->component->setActive (false));
@@ -2628,7 +2619,7 @@ private:
 
         if (holder->component->getState (&stream) == kResultTrue)
             if (stream.seek (0, Steinberg::IBStream::kIBSeekSet, nullptr) == kResultTrue)
-                warnOnFailureIfImplemented (editController->setComponentState (&stream));
+                warnOnFailure (editController->setComponentState (&stream));
     }
 
     void grabInformationObjects()
