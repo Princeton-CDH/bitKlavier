@@ -206,7 +206,7 @@ public:
     Array<float> getTetherTuning(void) {return tetherTuning;}
     
     void setTetherFundamental(PitchClass  newfundamental);
-    int getTetherFundamental(void) {return tetherFundamental;}
+    PitchClass getTetherFundamental(void) {return tetherFundamental;}
     
     void setIntervalTuning(Array<float> tuning);
     Array<float> getIntervalTuning(void){return intervalTuning;}

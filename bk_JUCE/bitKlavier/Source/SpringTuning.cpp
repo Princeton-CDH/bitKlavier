@@ -65,20 +65,20 @@ scaleId(JustTuning)
     enabledSpringArray.clear();
     
     tetherTuning = Array<float>({0,0,0,0,0,0,0,0,0,0,0,0});
-    tetherFundamental = PitchClass(C);
     
     springMode.ensureStorageAllocated(12);
     for(int i=0; i<12; i++) springMode.insert(i, false);
     
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     //intervalFundamental = PitchClass(C);
-    intervalFundamental = PitchClass(12);
+    intervalFundamental = C;
     
     useLowestNoteForFundamental = false;
     useHighestNoteForFundamental = false;
     useLastNoteForFundamental = false;
     
     setFundamentalSetsTether(false);
+    tetherFundamental = C;
     setTetherWeightGlobal(0.5);
     setTetherWeightSecondaryGlobal(0.1);
     
