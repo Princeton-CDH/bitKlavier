@@ -1032,7 +1032,6 @@ void TuningViewController::timerCallback(void)
             int count = 0;
             for (int i = 0; i < 128; i++)
             {
-                int pc = i % 12;
             
                 if (tetherSprings[i]->getEnabled())
                 {

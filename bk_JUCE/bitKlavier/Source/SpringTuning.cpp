@@ -42,6 +42,11 @@ void SpringTuning::copy(SpringTuning::Ptr st)
     setTetherWeights(st->getTetherWeights());
     
     setIntervalFundamental(st->getIntervalFundamental());
+    
+    setFundamentalSetsTether(st->getFundamentalSetsTether());
+    setTetherWeightGlobal(st->getTetherWeightGlobal());
+    setTetherWeightSecondaryGlobal(st->getTetherWeightSecondaryGlobal());
+
 }
 
 SpringTuning::SpringTuning(SpringTuning::Ptr st):
@@ -72,6 +77,10 @@ scaleId(JustTuning)
     useLowestNoteForFundamental = false;
     useHighestNoteForFundamental = false;
     useLastNoteForFundamental = false;
+    
+    setFundamentalSetsTether(false);
+    setTetherWeightGlobal(0.5);
+    setTetherWeightSecondaryGlobal(0.1);
     
     for (int i = 0; i < 13; i++) springWeights[i] = 0.5;
     
@@ -299,7 +308,6 @@ double SpringTuning::getSpringWeight(int which)
 
 void SpringTuning::setTetherWeight(int which, double weight)
 {
-    int pc = which % 12;
 
     Spring* spring = tetherSpringArray[which];
     
@@ -326,8 +334,6 @@ void SpringTuning::setTetherWeight(int which, double weight)
             if (weight == 0.0) tethered->setEnabled(false);
         }
     }
-    
-    
 }
 
 
@@ -473,28 +479,33 @@ void SpringTuning::addSpringsByNote(int note)
 
     tetherSpringArray[note]->setEnabled(true);
     
+    if(getFundamentalSetsTether())
+    {
+        if(note % 12 == getTetherFundamental())
+        {
+            setTetherWeight(note, getTetherWeightGlobal());
+        }
+        else{
+            setTetherWeight(note, getTetherWeightSecondaryGlobal());
+        }
+    }
+    
+    
 }
 
 void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
 {
     int interval = spring->getIntervalIndex();
     
-    //when every note is its own fundamental, or when the interval is a P5, P4, or M3,
-    //set resting length to interval scale without regard to intervalFundamental
-    /*
-    if(!usingFundamentalForIntervalSprings ||
-       interval == 7 ||
-       interval == 5 ||
-       interval == 4)
-     */
-    //DBG("getSpringMode = " + String((int)getSpringMode(interval - 1)));
+    //set spring length locally, for all if !usingFundamentalForIntervalSprings, or for individual springs as set by L/F
     if(!usingFundamentalForIntervalSprings ||
        !getSpringMode(interval - 1))
     {
         int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
         spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
     }
-    //otherwise, set resting length to interval scale relative to intervalFundamental
+    
+    //otherwise, set resting length to interval scale relative to intervalFundamental (F)
     else
     {
         int scaleDegree1 = spring->getA()->getNote();
@@ -504,7 +515,6 @@ void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
         float diff =    (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamental) % 12]) -
         (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamental) % 12]);
         
-        DBG("retuneIndividualSpring: " + String(fabs(diff)));
         spring->setRestingLength(fabs(diff));
     }
 }
@@ -516,6 +526,7 @@ void SpringTuning::retuneAllActiveSprings(void)
         retuneIndividualSpring(spring);
     }
 }
+
 void SpringTuning::removeSpringsByNote(int note)
 {
 	Particle* p = particleArray[note];
