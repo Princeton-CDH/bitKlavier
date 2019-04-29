@@ -283,6 +283,35 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
         
         vc->update();
     }
+    else if (action == 7)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentKeymapId;
+        Keymap::Ptr keymap = processor.gallery->getKeymap(Id);
+        
+        prompt.addTextEditor("name", keymap->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        DBG("name: " + String(name));
+        
+        if (result == 1)
+        {
+            processor.exportPreparation(PreparationTypeKeymap, Id, name);
+        }
+    }
+    else if (action >= 100)
+    {
+        int which = action - 100;
+        processor.importPreparation(PreparationTypeKeymap, processor.updateState->currentKeymapId, which);
+        vc->update();
+    }
 }
 
 
@@ -435,7 +464,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getModOptionMenu(PreparationTypeKeymap).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &keysButton)
     {

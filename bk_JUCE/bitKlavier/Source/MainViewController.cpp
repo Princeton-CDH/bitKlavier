@@ -569,6 +569,8 @@ void MainViewController::timerCallback()
     {
         timerCallbackCount = 0;
         processor.collectGalleries();
+        processor.collectPreparations();
+        processor.collectPianos();
         processor.collectSoundfonts();
         
         header.fillGalleryCB();

@@ -276,9 +276,11 @@ public:
     
     ~BKViewController();
     
-    PopupMenu getPrepOptionMenu(void);
+    PopupMenu getPrepOptionMenu(BKPreparationType type);
     
-    PopupMenu getModOptionMenu(void);
+    PopupMenu getModOptionMenu(BKPreparationType type);
+    
+    PopupMenu getExportedPrepsMenu(BKPreparationType type);
     
     inline void bigOneDismissed(void) override
     {

@@ -108,7 +108,6 @@ inline PopupMenu getNewItemMenu(LookAndFeel* laf)
     newMenu.addItem(RESET_ID, "Reset (R)");
     newMenu.addSeparator();
     newMenu.addItem(COMMENT_ID, "Comment (Q)");
-
     
     return newMenu;
 }

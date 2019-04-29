@@ -228,3 +228,238 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     return ValueTree();
 }
 
+void BKAudioProcessor::setPreparationState(BKPreparationType type, int Id, XmlElement* xml)
+{
+    if (type == PreparationTypeDirect)
+    {
+        Direct::Ptr prep = gallery->getDirect(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeDirectMod)
+    {
+        DirectModification::Ptr prep = gallery->getDirectModification(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+        Nostalgic::Ptr prep = gallery->getNostalgic(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+        NostalgicModification::Ptr prep = gallery->getNostalgicModification(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        Synchronic::Ptr prep = gallery->getSynchronic(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        SynchronicModification::Ptr prep = gallery->getSynchronicModification(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        Tuning::Ptr prep = gallery->getTuning(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+        TuningModification::Ptr prep = gallery->getTuningModification(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        Tempo::Ptr prep = gallery->getTempo(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+        TempoModification::Ptr prep = gallery->getTempoModification(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+        Keymap::Ptr keymap = gallery->getKeymap(Id);
+        String name = keymap->getName();
+        keymap->setState(xml);
+        keymap->setName(name);
+        keymap->setId(Id);
+    }
+}
+
+void BKAudioProcessor::collectPreparations(void)
+{
+    File file;
+    
+    exportedPreparations.clear();
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++)
+    {
+        exportedPreparations.add(new StringArray());
+    }
+    
+#if JUCE_IOS
+    file  = file.getSpecialLocation(File::userDocumentsDirectory);
+#endif
+#if JUCE_MAC
+    file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier");
+#endif
+    
+    file = file.getChildFile("preparations");
+
+    for (int i = 0; i < BKPreparationTypeNil; i++ )
+    {
+        File preps = file.getChildFile(cPreparationTypes[i]);
+
+        DirectoryIterator xmlIter (File(preps), true, "*.xml");
+        
+        while (xmlIter.next())
+        {
+            exportedPreparations[i]->add(xmlIter.getFile().getFileName());
+        }
+    }
+}
+
+void BKAudioProcessor::importPreparation(BKPreparationType type, int Id, int importId)
+{
+    File file;
+    
+#if JUCE_IOS
+    file  = file.getSpecialLocation(File::userDocumentsDirectory);
+#endif
+#if JUCE_MAC
+    file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier");
+#endif
+    
+    file = file.getChildFile("preparations");
+    file = file.getChildFile(cPreparationTypes[type]);
+    file = file.getChildFile(exportedPreparations[type]->getReference(importId));
+    
+    ScopedPointer<XmlElement> xml (XmlDocument::parse (file));
+    
+    setPreparationState(type, Id, xml);
+}
+
+
+void BKAudioProcessor::exportPreparation(BKPreparationType type, int Id, String name)
+{
+    File file;
+    
+#if JUCE_IOS
+    file  = file.getSpecialLocation(File::userDocumentsDirectory);
+#endif
+#if JUCE_MAC
+    file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier");
+#endif
+    
+    file = file.getChildFile("preparations");
+    
+    if (!file.isDirectory()) file.createDirectory();
+
+    file = file.getChildFile(cPreparationTypes[type]);
+    
+    if (!file.isDirectory()) file.createDirectory();
+    
+    file = file.getChildFile(name+".xml");
+    
+    DBG("URL: " + file.getFullPathName());
+    
+    XmlElement* xml = getPreparationState(type, Id).createXml();
+    xml->writeToFile(file, String::empty);
+}
+
+void BKAudioProcessor::collectPianos(void)
+{
+    File file;
+    
+    exportedPianos.clear();
+    
+#if JUCE_IOS
+    file  = file.getSpecialLocation(File::userDocumentsDirectory);
+#endif
+#if JUCE_MAC
+    file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier");
+#endif
+    
+    file = file.getChildFile("pianos");
+    
+    DirectoryIterator iter (File(file), true, "*.xml");
+    while (iter.next())
+    {
+        File piano (iter.getFile());
+        
+        exportedPianos.add(piano.getFileName());
+    }
+}
+
+
+void BKAudioProcessor::exportPiano(int Id, String name)
+{
+    XmlElement* xml = gallery->getPiano(Id)->getState().createXml();
+    
+    File file;
+    
+#if JUCE_IOS
+    file  = file.getSpecialLocation(File::userDocumentsDirectory);
+#endif
+#if JUCE_MAC
+    file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier");
+#endif
+    
+    file = file.getChildFile("pianos");
+    
+    if (!file.isDirectory()) file.createDirectory();
+    
+    file = file.getChildFile("pianos").getChildFile(name);
+    
+    xml->writeToFile(file, String::empty);
+}
+
