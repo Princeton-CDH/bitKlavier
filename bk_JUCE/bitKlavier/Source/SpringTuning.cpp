@@ -67,20 +67,21 @@ scaleId(JustTuning)
     tetherTuning = Array<float>({0,0,0,0,0,0,0,0,0,0,0,0});
     
     springMode.ensureStorageAllocated(12);
-    for(int i=0; i<12; i++) springMode.insert(i, false);
+    for(int i=0; i<12; i++) springMode.insert(i, true);
     
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     //intervalFundamental = PitchClass(C);
-    intervalFundamental = C;
+    intervalFundamental = PitchClass(12);
     
     useLowestNoteForFundamental = false;
     useHighestNoteForFundamental = false;
     useLastNoteForFundamental = false;
     
-    setFundamentalSetsTether(false);
+    //"automatic" fundamental mode
+    setFundamentalSetsTether(false);        //needs UI toggle; when on, don't show tether sliders for current notes, only the two tether weight sliders
     tetherFundamental = C;
-    setTetherWeightGlobal(0.5);
-    setTetherWeightSecondaryGlobal(0.1);
+    setTetherWeightGlobal(0.5);             //needs UI slider; only show when fundamentalSetsTether == true
+    setTetherWeightSecondaryGlobal(0.1);    //needs UI slider; only show when fundamentalSetsTether == true
     
     for (int i = 0; i < 13; i++) springWeights[i] = 0.5;
     
@@ -309,6 +310,7 @@ double SpringTuning::getSpringWeight(int which)
 void SpringTuning::setTetherWeight(int which, double weight)
 {
 
+    DBG("SpringTuning::setTetherWeight " + String(which) + " " + String(weight));
     Spring* spring = tetherSpringArray[which];
     
     spring->setStrength(weight);
@@ -481,6 +483,7 @@ void SpringTuning::addSpringsByNote(int note)
     
     if(getFundamentalSetsTether())
     {
+        DBG("SpringTuning::addSpringsByNote " + String(note % 12) + " " + String(getTetherFundamental()));
         if(note % 12 == getTetherFundamental())
         {
             setTetherWeight(note, getTetherWeightGlobal());

@@ -103,12 +103,14 @@ protected:
     BKComboBox springScaleFundamentalCB;
 
     ScopedPointer<BKSingleSlider> rateSlider;
-    
     ScopedPointer<BKSingleSlider> dragSlider;
-    
     ScopedPointer<BKSingleSlider> tetherStiffnessSlider;
-
     ScopedPointer<BKSingleSlider> intervalStiffnessSlider;
+    
+    ScopedPointer<BKSingleSlider> tetherWeightGlobalSlider;
+    ScopedPointer<BKSingleSlider> tetherWeightSecondaryGlobalSlider;
+    
+    ToggleButton fundamentalSetsTether; 
     
     BKComboBox adaptiveSystemsCB;
     
