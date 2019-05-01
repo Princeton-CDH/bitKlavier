@@ -155,6 +155,8 @@ loader(*this)
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     
     collectGalleries();
+    collectPianos();
+    collectPreparations();
     collectSoundfonts();
     
     updateUI();

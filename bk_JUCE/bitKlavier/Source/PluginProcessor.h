@@ -103,6 +103,8 @@ public:
     StringArray                         instrumentNames;
     String                              currentInstrumentName;
     
+    OwnedArray<StringArray>             exportedPreparations;
+    StringArray                         exportedPianos;
     
     BKSampleLoadType                    currentSampleType;
     String                              currentSoundfont;
@@ -120,8 +122,13 @@ public:
     void updateGalleries(void);
     
     void collectGalleries(void);
+    void collectPianos(void);
+    void collectPreparations(void);
     void collectSoundfonts(void);
+    
     void collectGalleriesFromFolder(File folder);
+    void collectPianosFromFolder(File folder);
+    void collectPreparationsFromFolder(File folder);
     void collectSoundfontsFromFolder(File folder);
     
     void updateUI(void);
@@ -310,6 +317,13 @@ public:
     }
     
     ValueTree getPreparationState(BKPreparationType type, int Id);
+    void setPreparationState(BKPreparationType type, int Id, XmlElement* xml);
+    
+    void exportPreparation(BKPreparationType type, int Id, String name);
+    void importPreparation(BKPreparationType type, int Id, int importId);
+    
+    void exportPiano(int Id, String name);
+    void importPiano(int Id, int importId);
     
 private:
     

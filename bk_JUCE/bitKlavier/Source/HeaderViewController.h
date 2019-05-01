@@ -72,6 +72,8 @@ private:
     PopupMenu getPianoMenu(void);
     PopupMenu getGalleryMenu(void);
     
+    PopupMenu getExportedPianoMenu(void);
+    
     //OwnedArray<PopupMenu> submenus;
     //StringArray submenuNames;
     

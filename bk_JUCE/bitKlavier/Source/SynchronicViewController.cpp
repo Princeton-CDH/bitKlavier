@@ -1143,6 +1143,35 @@ void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPre
         
         vc->update();
     }
+    else if (action == 7)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentSynchronicId;
+        Synchronic::Ptr prep = processor.gallery->getSynchronic(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        DBG("name: " + String(name));
+        
+        if (result == 1)
+        {
+            processor.exportPreparation(PreparationTypeSynchronic, Id, name);
+        }
+    }
+    else if (action >= 100)
+    {
+        int which = action - 100;
+        processor.importPreparation(PreparationTypeSynchronic, processor.updateState->currentSynchronicId, which);
+        vc->update();
+    }
 }
 
 
@@ -1289,7 +1318,7 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getPrepOptionMenu(PreparationTypeSynchronic).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 
@@ -1828,6 +1857,35 @@ void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicMo
         
         vc->update();
     }
+    else if (action == 7)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModSynchronicId;
+        SynchronicModification::Ptr prep = processor.gallery->getSynchronicModification(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        DBG("name: " + String(name));
+        
+        if (result == 1)
+        {
+            processor.exportPreparation(PreparationTypeSynchronicMod, Id, name);
+        }
+    }
+    else if (action >= 100)
+    {
+        int which = action - 100;
+        processor.importPreparation(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId, which);
+        vc->update();
+    }
 }
 
 
@@ -1957,7 +2015,7 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getModOptionMenu(PreparationTypeSynchronicMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
     {

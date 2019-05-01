@@ -497,6 +497,35 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
         
         vc->update();
     }
+    else if (action == 7)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentDirectId;
+        Direct::Ptr prep = processor.gallery->getDirect(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        DBG("name: " + String(name));
+        
+        if (result == 1)
+        {
+            processor.exportPreparation(PreparationTypeDirect, Id, name);
+        }
+    }
+    else if (action >= 100)
+    {
+        int which = action - 100;
+        processor.importPreparation(PreparationTypeDirect, processor.updateState->currentDirectId, which);
+        vc->update();
+    }
 }
 
 void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
@@ -628,7 +657,7 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getPrepOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getPrepOptionMenu(PreparationTypeDirect).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
     {
@@ -848,6 +877,36 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
         
         vc->update();
     }
+    else if (action == 7)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModDirectId;
+        DirectModification::Ptr prep = processor.gallery->getDirectModification(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        DBG("name: " + String(name));
+        
+        if (result == 1)
+        {
+            processor.exportPreparation(PreparationTypeDirectMod, Id, name);
+        }
+    }
+    else if (action >= 100)
+    {
+        int which = action - 100;
+        processor.importPreparation(PreparationTypeDirectMod, processor.updateState->currentModDirectId, which);
+        vc->update();
+    }
+    
 }
 
 void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
@@ -948,7 +1007,7 @@ void DirectModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getModOptionMenu(PreparationTypeDirectMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
     {

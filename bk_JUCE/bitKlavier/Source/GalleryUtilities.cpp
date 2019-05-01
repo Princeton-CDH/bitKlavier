@@ -14,6 +14,21 @@
 
 #include "BKGraph.h"
 
+void Gallery::addPiano(XmlElement* xml, OwnedArray<HashMap<int,int>>* map)
+{
+    DBG(xml->createDocument(""));
+    addPiano();
+    Piano::Ptr piano = bkPianos.getLast();
+    
+    int Id = piano->getId();
+    
+    piano->setState(xml, map);
+    
+    piano->setId(Id);
+    
+    piano->configure();
+}
+
 void Gallery::addPiano()
 {
     int newId = getNewId(PreparationTypePiano);
