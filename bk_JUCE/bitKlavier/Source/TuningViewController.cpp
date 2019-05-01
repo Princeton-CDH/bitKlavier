@@ -1554,6 +1554,7 @@ void TuningPreparationEditor::update(void)
         
         tetherStiffnessSlider->setValue(prep->getSpringTuning()->getTetherStiffness(), dontSendNotification);
         intervalStiffnessSlider->setValue(prep->getSpringTuning()->getIntervalStiffness(), dontSendNotification);
+        fundamentalSetsTether.setToggleState(prep->getSpringTuning()->getFundamentalSetsTether(), dontSendNotification);
 
         // springs active or adaptive tuning
         adaptiveSystemsCB.setSelectedItemIndex(prep->getAdaptiveType(), dontSendNotification);

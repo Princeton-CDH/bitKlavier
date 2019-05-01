@@ -146,7 +146,6 @@ scaleId(JustTuning)
     else
     {
         //usingFundamentalForIntervalSprings
-
         for (int i = 0; i < 128; i++)
         {
             for (int j = 0; j < i; j++)
@@ -176,24 +175,6 @@ scaleId(JustTuning)
                 spring->setName(intervalLabels[interval]);
                 springArray.add(spring);
             }
-            
-            /*
-             to make this dependent on scale degree (so the interval springs have a fundamental), we need something like
-             
-             diff = (scaledegree1 + intervalTuning[(scaledegree1 - fundamental) % 12]) -
-             (scaledegree2 + intervalTuning[(scaledegree2 - fundamental) % 12]])
-             
-             where  scaledegree1 = particleArray[i]->getNote() = i
-             and    scaledegree2 = particleArray[j]->getNote() = j
-             
-             so, if i = 64, and j = 62, and fundamental is C (0)
-             diff = (64 + intervalTuning[64 % 12 = 4]) -
-             (62 + intervalTuning[62 % 12 = 2]);
-             
-             or, if i = 66, and j = 64, and fundamental is D (2)
-             diff = (66 + intervalTuning[64 % 12 = 4]) -
-             (64 + intervalTuning[62 % 12 = 2])
-             */
         }
     }
 	
@@ -222,56 +203,12 @@ void SpringTuning::setTetherTuning(Array<float> tuning)
 void SpringTuning::setTetherFundamental(PitchClass newfundamental)
 {
     tetherFundamental = newfundamental;
-    
     setTetherTuning(getTetherTuning());
-    
-    /*
-     if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
-     else setUsingFundamentalForIntervalSprings(true);
-     
-     if(newfundamental == 13) useLowestNoteForFundamental = true;
-     else useLowestNoteForFundamental = false;
-     
-     if(newfundamental == 14) useHighestNoteForFundamental = true;
-     else useHighestNoteForFundamental = false;
-     
-     if(newfundamental == 15) useLastNoteForFundamental = true;
-     else useLastNoteForFundamental = false;
-     */
 }
 
 void SpringTuning::setIntervalTuning(Array<float> tuning)
 {
     intervalTuning = tuning;
-    
-    //shouldn't need any of the below, now that we're tuning with noteOn
-/*
-    for (auto spring : enabledSpringArray)
-    {
-        int interval = spring->getIntervalIndex();
-        int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
-        
-        spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
-    }
-
-    if(!usingFundamentalForIntervalSprings)
-    {
-        for (auto spring : springArray)
-        {
-            int interval = spring->getIntervalIndex();
-            int diff = spring->getA()->getRestX() - spring->getB()->getRestX();
-
-            spring->setRestingLength(fabs(diff) + intervalTuning[interval]);
-        }
-    }
-    else
-    {
-        for (auto spring : springArray)
-        {
-            retuneIndividualSpring(spring);
-        }
-    }
-*/
 }
 
 void SpringTuning::simulate()
@@ -546,20 +483,6 @@ void SpringTuning::findFundamental()
             
         }
     }
-    
-   
-    /*
-    for (auto s : enabledSpringArray)
-    {
-        
-        DBG("enabledSpring " +
-              String(s->getIntervalIndex()) + " " +
-              String(s->getA()->getNote()) + " " +
-              String(s->getB()->getNote()));
-         
-        
-    }
-     */
 }
 
 void SpringTuning::addSpring(Spring::Ptr spring)
