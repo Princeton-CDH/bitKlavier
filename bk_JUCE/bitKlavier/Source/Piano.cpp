@@ -911,7 +911,6 @@ ValueTree Piano::getState(void)
     
     pianoVT.setProperty("Id", Id, 0);
     
-
     for (auto item : items)
     {
         BKPreparationType type = item->getType();
@@ -1015,7 +1014,7 @@ ValueTree Piano::getState(void)
 }
 #define LOAD_VERSION 0
 
-void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>> *idmap)
+void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap)
 {
     int i = 0;
     
@@ -1077,7 +1076,6 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>> *idmap)
                 
                     i = item->getStringAttribute("piano").getIntValue();
                     int piano = i;
-                    DBG("piano target old: " + String(piano));
                     
                     if (idmap->getUnchecked(PreparationTypePiano)->contains(piano))
                     {

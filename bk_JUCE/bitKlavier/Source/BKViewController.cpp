@@ -75,9 +75,10 @@ PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type)
     optionMenu.addItem(3, "Delete");
     optionMenu.addSeparator();
     optionMenu.addItem(7, "Export");
+    
     PopupMenu exported = getExportedPrepsMenu(type);
-    DBG("num exported: " + String(exported.getNumItems()));
     optionMenu.addSubMenu("Import...", exported);
+    
     optionMenu.addSeparator();
     optionMenu.addItem(4, "Reset");
     optionMenu.addItem(5, "Clear");

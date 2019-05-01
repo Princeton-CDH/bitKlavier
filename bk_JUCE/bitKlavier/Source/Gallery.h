@@ -707,10 +707,15 @@ public:
     
     Array<Array<int>> used;
     
+    OwnedArray<HashMap<int,int>> idmap;
+    
+    void addPiano(XmlElement* xml, OwnedArray<HashMap<int,int>>* map);
+    
+    
 private:
     BKAudioProcessor& processor;
     
-    OwnedArray<HashMap<int,int>> idmap;
+    
     int idcounts[BKPreparationTypeNil];
     
     
@@ -763,6 +768,7 @@ private:
     void addKeymap(void);
     void addKeymap(Keymap::Ptr);
     inline const int getNumKeymaps(void) const noexcept {return bkKeymaps.size();}
+    
     
     void addPiano(void);
     void addPiano(Piano::Ptr);

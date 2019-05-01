@@ -146,18 +146,34 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     return loadMenu;
 }
 
+PopupMenu HeaderViewController::getExportedPianoMenu(void)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    StringArray names = processor.exportedPianos;
+    for (int i = 0; i < names.size(); i++)
+    {
+        menu.addItem(i+100, names[i]);
+    }
+    
+    return menu;
+}
+
 PopupMenu HeaderViewController::getPianoMenu(void)
 {
     PopupMenu pianoMenu;
     pianoMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     pianoMenu.addItem(1, "New");
-    pianoMenu.addSeparator();
     pianoMenu.addItem(2, "Duplicate");
-    pianoMenu.addSeparator();
     pianoMenu.addItem(4, "Rename");
-    pianoMenu.addSeparator();
     pianoMenu.addItem(3, "Remove");
+    pianoMenu.addSeparator();
+    pianoMenu.addItem(7, "Export");
+    
+    PopupMenu exported = getExportedPianoMenu();
+    pianoMenu.addSubMenu("Import...", exported);
     
     return pianoMenu;
 }
@@ -319,6 +335,34 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
         }
         
         hvc->fillPianoCB();
+    }
+    else if (res == 7)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.currentPiano->getId();
+        Piano::Ptr piano = processor.currentPiano;
+        
+        prompt.addTextEditor("name", piano->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        DBG("name: " + String(name));
+        
+        if (result == 1)
+        {
+            processor.exportPiano(Id, name);
+        }
+    }
+    else if (res >= 100)
+    {
+        int which = res - 100;
+        processor.importPiano(processor.currentPiano->getId(), which);
     }
     
 }

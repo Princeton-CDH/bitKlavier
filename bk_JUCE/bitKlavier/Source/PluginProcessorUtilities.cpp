@@ -437,11 +437,106 @@ void BKAudioProcessor::collectPianos(void)
     }
 }
 
+void BKAudioProcessor::importPiano(int Id, int importId)
+{
+    File file;
+    
+#if JUCE_IOS
+    file  = file.getSpecialLocation(File::userDocumentsDirectory);
+#endif
+#if JUCE_MAC
+    file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier");
+#endif
+    
+    file = file.getChildFile("pianos");
+    file = file.getChildFile(exportedPianos[importId]);
+    
+    ScopedPointer<XmlElement> xml (XmlDocument::parse (file));
+    
+    OwnedArray<HashMap<int,int>> importmap;
+    
+    for (int i = 0; i < BKPreparationTypeNil; i++) importmap.add(new HashMap<int, int>());
+    
+    forEachXmlChildElement (*xml, sub)
+    {
+        String tag = sub->getTagName();
+        
+        int newId = -1;
+        BKPreparationType type = BKPreparationTypeNil;
+        
+        if (tag == vtagDirect)
+        {
+            newId = gallery->addCopy(PreparationTypeDirect, sub);
+            type = PreparationTypeDirect;
+        }
+        else if (tag == vtagNostalgic)
+        {
+            newId = gallery->addCopy(PreparationTypeNostalgic, sub);
+            type = PreparationTypeNostalgic;
+        }
+        else if (tag == vtagSynchronic)
+        {
+            newId = gallery->addCopy(PreparationTypeSynchronic, sub);
+            type = PreparationTypeSynchronic;
+        }
+        else if (tag == vtagTempo)
+        {
+            newId = gallery->addCopy(PreparationTypeTempo, sub);
+            type = PreparationTypeTempo;
+        }
+        else if (tag == vtagTuning)
+        {
+            newId = gallery->addCopy(PreparationTypeTuning, sub);
+            type = PreparationTypeTuning;
+        }
+        else if (tag == vtagModDirect)
+        {
+            newId = gallery->addCopy(PreparationTypeDirectMod, sub);
+            type = PreparationTypeDirectMod;
+        }
+        else if (tag == vtagModNostalgic)
+        {
+            newId = gallery->addCopy(PreparationTypeNostalgicMod, sub);
+            type = PreparationTypeNostalgicMod;
+        }
+        else if (tag == vtagModSynchronic)
+        {
+            newId = gallery->addCopy(PreparationTypeSynchronicMod, sub);
+            type = PreparationTypeSynchronicMod;
+        }
+        else if (tag == vtagModTempo)
+        {
+            newId = gallery->addCopy(PreparationTypeTempoMod, sub);
+            type = PreparationTypeTempoMod;
+        }
+        else if (tag == vtagModTuning)
+        {
+            newId = gallery->addCopy(PreparationTypeTuningMod, sub);
+            type = PreparationTypeTuningMod;
+        }
+        else if (tag == vtagKeymap)
+        {
+            newId = gallery->addCopy(PreparationTypeKeymap, sub);
+            type = PreparationTypeKeymap;
+        }
+        else continue;
+        
+        int oldId = sub->getStringAttribute("Id").getIntValue();
+        
+        importmap[type]->set(oldId, newId);
+    }
+    
+    XmlElement* pianoxml = xml->getChildByName("piano");
+    gallery->addPiano(pianoxml, &importmap);
+    
+    setCurrentPiano(gallery->getPianos().getLast()->getId());
+}
 
 void BKAudioProcessor::exportPiano(int Id, String name)
 {
-    XmlElement* xml = gallery->getPiano(Id)->getState().createXml();
-    
     File file;
     
 #if JUCE_IOS
@@ -458,8 +553,26 @@ void BKAudioProcessor::exportPiano(int Id, String name)
     
     if (!file.isDirectory()) file.createDirectory();
     
-    file = file.getChildFile("pianos").getChildFile(name);
+    file = file.getChildFile(name+".xml");
     
-    xml->writeToFile(file, String::empty);
+    
+    Piano::Ptr piano = gallery->getPiano(Id);
+    
+    ValueTree toExport("exportedPiano");
+    
+    for (auto item : piano->getItems())
+    {
+        BKPreparationType type = item->getType();
+        int Id = item->getId();
+        
+        if (type <= PreparationTypeTempoMod)
+        {
+            toExport.addChild( getPreparationState(type, Id), -1, 0 );
+        }
+    }
+   
+    toExport.addChild(piano->getState(), -1, 0);
+    
+    toExport.createXml()->writeToFile(file, String::empty);
 }
 
