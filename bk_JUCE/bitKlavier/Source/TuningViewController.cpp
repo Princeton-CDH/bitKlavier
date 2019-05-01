@@ -55,7 +55,7 @@ showSprings(false)
         BKTextButton* springModeButton = new BKTextButton();
         springModeButton->setClickingTogglesState(true);
         springModeButton->setButtonText("L");
-        springModeButton->setTooltip("F:spring length determined by fundamental");
+        springModeButton->setTooltip("set spring length relative to fundamental (F) or locally (L)");
         springModeButton->setColour(TextButton::buttonOnColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
         addChildComponent(springModeButton);
         springModeButtons.add(springModeButton);
@@ -515,6 +515,8 @@ void TuningViewController::displayTab(int tab)
             {
                 fundamentalSetsTether.setVisible(true);
             }
+            
+            currentFundamental.setVisible(true);
         }
 
         iconImageComponent.setVisible(false);
@@ -590,6 +592,12 @@ void TuningViewController::displayTab(int tab)
                                             sliderHeight,
                                             sliderHeight);
         }
+        
+        
+        currentFundamental.setBounds(currentFundamental.getX(),
+                                     springSliders[0]->getY(),
+                                     currentFundamental.getWidth(),
+                                     currentFundamental.getHeight()  );
     }
     repaint();
 }
@@ -1051,6 +1059,9 @@ void TuningViewController::timerCallback(void)
             Tuning::Ptr tuning = tProcessor->getTuning();
             Spring::PtrArr tetherSprings =  active->getTetherSprings();
             //Array<bool> locked = active->getSpringTuning()->getTethersLocked();
+            
+            if(active->getSpringTuning()->getUsingFundamentalForIntervalSprings())
+                currentFundamental.setText("current fundamental: " + cFundamentalNames[active->getSpringTuning()->getIntervalFundamental()], dontSendNotification);
     
             if(!active->getSpringTuning()->getFundamentalSetsTether())
             {
@@ -1413,6 +1424,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             for (auto b : springModeButtons)    b->setVisible(true);
             fundamentalSetsTether.setVisible(true);
+            currentFundamental.setVisible(true);
             
             if(prep->getSpringTuning()->getFundamentalSetsTether())
             {
@@ -1426,6 +1438,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             fundamentalSetsTether.setVisible(false);
             tetherWeightGlobalSlider->setVisible(false);
             tetherWeightSecondaryGlobalSlider->setVisible(false);
+            currentFundamental.setVisible(false);
         }
         
         
@@ -1754,6 +1767,10 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         {
             tetherWeightGlobalSlider->setVisible(true);
             tetherWeightSecondaryGlobalSlider->setVisible(true);
+            
+            //hide other tether sliders
+            for (auto s : tetherSliders) s->setVisible(false);
+            for (auto l : springLabels) l->setVisible(false);
         }
         else
         {
