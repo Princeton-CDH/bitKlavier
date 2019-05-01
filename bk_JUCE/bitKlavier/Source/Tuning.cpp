@@ -107,6 +107,8 @@ void TuningProcessor::keyReleased(int midiNoteNumber)
 //add note to the adaptive tuning history, update adaptive fundamental
 void TuningProcessor::keyPressed(int midiNoteNumber)
 {
+    //DBG("TuningProcessor::keyPressed " + String(midiNoteNumber));
+    
     adaptiveHistoryCounter++;
     
     TuningAdaptiveSystemType type = tuning->aPrep->getAdaptiveType();

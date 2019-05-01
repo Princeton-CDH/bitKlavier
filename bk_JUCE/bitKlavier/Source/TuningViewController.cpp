@@ -55,6 +55,7 @@ showSprings(false)
         BKTextButton* springModeButton = new BKTextButton();
         springModeButton->setClickingTogglesState(true);
         springModeButton->setButtonText("L");
+        springModeButton->setTooltip("F:spring length determined by fundamental");
         springModeButton->setColour(TextButton::buttonOnColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
         addChildComponent(springModeButton);
         springModeButtons.add(springModeButton);
@@ -96,20 +97,20 @@ showSprings(false)
     intervalStiffnessSlider->setToolTipString("overall stiffness of interval sliders");
     addChildComponent(intervalStiffnessSlider);
     
-    fundamentalSetsTether.setButtonText ("sets anchor");
-    fundamentalSetsTether.setTooltip("anchor will track interval fundamental");
+    fundamentalSetsTether.setButtonText ("sets weights");
+    fundamentalSetsTether.setTooltip("anchor weights will be set by interval fundamental");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     fundamentalSetsTether.setToggleState (false, dontSendNotification);
     addAndMakeVisible(&fundamentalSetsTether, ALL);
     
-    tetherWeightGlobalSlider = new BKSingleSlider("fund weight", 0., 1., 0.5, 0.0001);
+    tetherWeightGlobalSlider = new BKSingleSlider("fund weight", 0., 1., 0.5, 0.001);
     tetherWeightGlobalSlider->setJustifyRight(false);
     tetherWeightGlobalSlider->displaySliderVisible(false);
-    tetherWeightGlobalSlider->setToolTipString("sets tether weight for all octaves of fundamental");
+    tetherWeightGlobalSlider->setToolTipString("sets tether weight for fundamental");
     addChildComponent(tetherWeightGlobalSlider);
     
     //tetherWeightSecondaryGlobalSlider
-    tetherWeightSecondaryGlobalSlider = new BKSingleSlider("other weights", 0., 1., 0.1, 0.0001);
+    tetherWeightSecondaryGlobalSlider = new BKSingleSlider("other weights", 0., 1., 0.1, 0.001);
     tetherWeightSecondaryGlobalSlider->setJustifyRight(false);
     tetherWeightSecondaryGlobalSlider->displaySliderVisible(false);
     tetherWeightSecondaryGlobalSlider->setToolTipString("sets tether weight for all non-fundamentals");
@@ -599,7 +600,7 @@ void TuningViewController::displayTab(int tab)
             springSliders[i]->setBounds(springLabels[i]->getRight() + 2,
                                         springLabels[i]->getY(),
                                         //intervalStiffnessSlider->getWidth() * 0.7,
-                                        intervalStiffnessSlider->getWidth() * 0.7 - sliderHeight,
+                                        intervalStiffnessSlider->getWidth() * 0.65 - sliderHeight,
                                         sliderHeight);
             springModeButtons[i]->setBounds(springSliders[i]->getRight() + 2,
                                             springSliders[i]->getY(),
@@ -923,6 +924,7 @@ void TuningViewController::fillFundamentalCB(void)
     springScaleFundamentalCB.addItem("lowest", (int)cFundamentalNames.size()+2);
     springScaleFundamentalCB.addItem("highest", (int)cFundamentalNames.size()+3);
     springScaleFundamentalCB.addItem("last", (int)cFundamentalNames.size()+4);
+    springScaleFundamentalCB.addItem("automatic", (int)cFundamentalNames.size()+5);
     
 }
 
@@ -1371,9 +1373,6 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->setFundamental((PitchClass) index);
         active->setFundamental((PitchClass) index);
         
-        prep->getSpringTuning()->setTetherFundamental((PitchClass) index);
-        active->getSpringTuning()->setTetherFundamental((PitchClass) index);
-        
         customKeyboard.setFundamental(index);
         
         //updateComponentVisibility();
@@ -1437,9 +1436,6 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         prep->getSpringTuning()->setIntervalFundamental((PitchClass)index);
         active->getSpringTuning()->setIntervalFundamental((PitchClass)index);
-        
-        prep->getSpringTuning()->setTetherFundamental((PitchClass)index);
-        active->getSpringTuning()->setTetherFundamental((PitchClass)index);
         
         Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         

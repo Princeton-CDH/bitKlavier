@@ -215,6 +215,8 @@ public:
     {
         intervalFundamental = newfundamental;
         
+        DBG("setIntervalFundamental " + String(newfundamental));
+        
         if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
         else setUsingFundamentalForIntervalSprings(true);
         
@@ -226,9 +228,16 @@ public:
         
         if(newfundamental == 15) useLastNoteForFundamental = true;
         else useLastNoteForFundamental = false;
+        
+        if(newfundamental == 16) useAutomaticFundamental = true;
+        else useAutomaticFundamental = false;
+        
+        setTetherFundamental(newfundamental); //when  == fundamentalSetsTether true, tetherFundamental will be used to set tether weights
     }
     
     PitchClass getIntervalFundamental(void) { return intervalFundamental; }
+    
+    void findFundamental();
     
     void retuneIndividualSpring(Spring::Ptr spring);
     void retuneAllActiveSprings(void);
@@ -320,6 +329,7 @@ public:
     
     void setState(XmlElement* e)
     {
+        DBG("SpringTuning::setState called!!");
         active = (bool) e->getStringAttribute("active").getIntValue();
         
         setRate(e->getStringAttribute("rate").getDoubleValue());
@@ -432,8 +442,9 @@ private:
     bool useLowestNoteForFundamental;
     bool useHighestNoteForFundamental;
     bool useLastNoteForFundamental;
+    bool useAutomaticFundamental; //uses findFundamental() to set fundamental automatically, based on what is played
     
-    bool fundamentalSetsTether;
+    bool fundamentalSetsTether; //when true, the fundamental will be used to set tether weights
     double tetherWeightGlobal; //sets weight for tethers to fundamental, when in fundamentalSetsTether mode
     double tetherWeightSecondaryGlobal; //sets weights for tethers to non-fundamental notes
     //int intervalSpringsFundamental;
