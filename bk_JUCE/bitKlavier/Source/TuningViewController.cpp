@@ -1061,7 +1061,7 @@ void TuningViewController::timerCallback(void)
             //Array<bool> locked = active->getSpringTuning()->getTethersLocked();
             
             if(active->getSpringTuning()->getUsingFundamentalForIntervalSprings())
-                currentFundamental.setText("current fundamental: " + cFundamentalNames[active->getSpringTuning()->getIntervalFundamental()], dontSendNotification);
+                currentFundamental.setText("current fundamental " + cFundamentalNames[active->getSpringTuning()->getIntervalFundamental()], dontSendNotification);
     
             if(!active->getSpringTuning()->getFundamentalSetsTether())
             {
