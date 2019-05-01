@@ -1062,6 +1062,9 @@ void TuningViewController::timerCallback(void)
             
             if(active->getSpringTuning()->getUsingFundamentalForIntervalSprings())
                 currentFundamental.setText("current fundamental " + cFundamentalNames[active->getSpringTuning()->getIntervalFundamental()], dontSendNotification);
+            
+            for (auto s : tetherSliders)        s->setVisible(false);
+            for (auto s : tetherLabels)         s->setVisible(false);
     
             if(!active->getSpringTuning()->getFundamentalSetsTether())
             {
@@ -1094,12 +1097,6 @@ void TuningViewController::timerCallback(void)
                         count++;
                         
                     }
-                    else
-                    {
-                        tetherSliders[i]->setVisible(false);
-                        tetherLabels[i]->setVisible(false);
-                    }
-                    
                 }
             }
             
