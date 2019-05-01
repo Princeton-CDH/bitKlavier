@@ -411,20 +411,6 @@ void TuningViewController::displayTab(int tab)
         Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
         leftColumn.removeFromLeft(leftArrow.getWidth());
         
-        /*
-        Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-        modeSlice.removeFromLeft(gXSpacing);
-        modeSlice.removeFromRight(gXSpacing);
-        //adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(showSpringsButton.getWidth()));
-        adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 3.));
-        modeSlice.removeFromLeft(gXSpacing);
-        //scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
-        scaleCB.setBounds(modeSlice.removeFromLeft(2. * modeSlice.getWidth() / 3. - 2.*gXSpacing));
-        
-        modeSlice.removeFromLeft(gXSpacing);
-        fundamentalCB.setBounds(modeSlice);
-        */
-        
         int customKeyboardHeight = 80 + 70. * processor.paddingScalarY;
         int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gYSpacing * 3)) * 0.25;
         
@@ -570,11 +556,8 @@ void TuningViewController::displayTab(int tab)
                                            rateSlider->getWidth(),
                                            gComponentSingleSliderHeight);
         
-        tetherStiffnessSlider->setBounds(//fundamentalCB.getX() - gComponentSingleSliderXOffset,
-                                         fundamentalCB.getRight() - intervalStiffnessSlider->getWidth() - rightArrow.getWidth() * 0.5,
-                                         //springScaleCB.getX(),
+        tetherStiffnessSlider->setBounds(fundamentalCB.getRight() - intervalStiffnessSlider->getWidth() - rightArrow.getWidth() * 0.5,
                                          intervalStiffnessSlider->getY(),
-                                         //fundamentalCB.getWidth() + 2.*gComponentSingleSliderXOffset,
                                          intervalStiffnessSlider->getWidth(),
                                          gComponentSingleSliderHeight);
         
@@ -957,20 +940,7 @@ void TuningViewController::updateComponentVisibility()
             nToneRootCB.setVisible(true);
             nToneRootOctaveCB.setVisible(true);
             nToneSemitoneWidthSlider->setVisible(true);
-            
-            /*
-            Array<float> intervalWeights = active->getSpringTuning()->getSpringWeights();
-            if (intervalWeights.size() < 12)
-            {
-                intervalWeights = tuning->getStaticSpringTuning()->getSpringWeights();
-            }
-            
-            for (int i = 0; i < 12; i++)
-            {
-                springSliders[i]->setValue(intervalWeights[i], dontSendNotification);
-                //update springModeButtons;
-            }
-             */
+
         }
         
         if (adaptiveType == AdaptiveNormal)
