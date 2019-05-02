@@ -86,7 +86,7 @@ showSprings(false)
     addChildComponent(dragSlider);
     
     tetherStiffnessSlider = new BKSingleSlider("anchor stiff", 0., 1., 0.5, 0.0001);
-    tetherStiffnessSlider->setJustifyRight(false);
+    tetherStiffnessSlider->setJustifyRight(true);
     tetherStiffnessSlider->displaySliderVisible(false);
     tetherStiffnessSlider->setToolTipString("overall stiffness of anchor sliders");
     addChildComponent(tetherStiffnessSlider);
@@ -104,14 +104,14 @@ showSprings(false)
     addAndMakeVisible(&fundamentalSetsTether, ALL);
     
     tetherWeightGlobalSlider = new BKSingleSlider("fund weight", 0., 1., 0.5, 0.001);
-    tetherWeightGlobalSlider->setJustifyRight(false);
+    tetherWeightGlobalSlider->setJustifyRight(true);
     tetherWeightGlobalSlider->displaySliderVisible(false);
     tetherWeightGlobalSlider->setToolTipString("sets tether weight for fundamental");
     addChildComponent(tetherWeightGlobalSlider);
     
     //tetherWeightSecondaryGlobalSlider
     tetherWeightSecondaryGlobalSlider = new BKSingleSlider("other weights", 0., 1., 0.1, 0.001);
-    tetherWeightSecondaryGlobalSlider->setJustifyRight(false);
+    tetherWeightSecondaryGlobalSlider->setJustifyRight(true);
     tetherWeightSecondaryGlobalSlider->displaySliderVisible(false);
     tetherWeightSecondaryGlobalSlider->setToolTipString("sets tether weight for all non-fundamentals");
     addChildComponent(tetherWeightSecondaryGlobalSlider);
