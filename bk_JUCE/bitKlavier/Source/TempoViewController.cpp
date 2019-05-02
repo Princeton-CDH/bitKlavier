@@ -35,8 +35,12 @@ BKViewController(p, theGraph, 1)
     addAndMakeVisible(modeCB);
     
     tempoSlider = new BKSingleSlider("Tempo", 40, 208, 100, 0.01);
-    tempoSlider->setToolTipString("Indicates current BPM");
+    tempoSlider->setToolTipString("Indicates current beats-per-minute (BPM)");
     addAndMakeVisible(tempoSlider);
+    
+    subSlider = new BKSingleSlider("Subdivisions", 0.01, 32.0, 1.0, 0.01);
+    subSlider->setToolTipString("Number of pulses per beat");
+    addAndMakeVisible(subSlider);
     
     AT1HistorySlider = new BKSingleSlider("History", 1, 10, 4, 1);
     AT1HistorySlider->setJustifyRight(false);
@@ -78,6 +82,7 @@ BKViewController(p, theGraph, 1)
     AT1HistorySlider->addWantsBigOneListener(this);
     AT1SubdivisionsSlider->addWantsBigOneListener(this);
     tempoSlider->addWantsBigOneListener(this);
+    subSlider->addWantsBigOneListener(this);
 #endif
 
     updateComponentVisibility();
@@ -155,6 +160,9 @@ void TempoViewController::resized()
     tempoSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     tempoSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     tempoSlider->setBounds(tempoSliderSlice);
+    
+    subSlider->setBounds(tempoSlider->getX(), tempoSlider->getBottom() + gYSpacing,
+                         tempoSlider->getWidth(), tempoSlider->getHeight());
     
 }
 
@@ -247,6 +255,7 @@ TempoViewController(p, theGraph)
     modeCB.addListener(this);
     
     tempoSlider->addMyListener(this);
+    subSlider->addMyListener(this);
     A1ModeCB.addListener(this);
     A1reset.addListener(this);
     AT1HistorySlider->addMyListener(this);
@@ -506,7 +515,9 @@ void TempoPreparationEditor::update(void)
         selectCB.setSelectedId(processor.updateState->currentTempoId, dontSendNotification);
         modeCB.setSelectedItemIndex((int)prep->getTempoSystem(), dontSendNotification);
         tempoSlider->setValue(prep->getTempo(), dontSendNotification);
+        subSlider->setValue(prep->getSubdivisions(), dontSendNotification);
         DBG("tempoSlider set to " + String(prep->getTempo()));
+        DBG("subSlider set to " + String(prep->getSubdivisions()));
         
         A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
         AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
@@ -528,6 +539,11 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, 
         DBG("got tempo " + String(val));
         prep->setTempo(val);
         active->setTempo(val);
+    }
+    if(name == subSlider->getName()) {
+        DBG("got sub " + String(val));
+        prep->setSubdivisions(val);
+        active->setSubdivisions(val);
     }
     else if(name == AT1HistorySlider->getName()) {
         DBG("got A1History " + String(val));
@@ -575,6 +591,7 @@ TempoViewController(p, theGraph)
     selectCB.addMyListener(this);
     modeCB.addListener(this);
     tempoSlider->addMyListener(this);
+    subSlider->addMyListener(this);
     AT1HistorySlider->addMyListener(this);
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
@@ -591,6 +608,7 @@ void TempoModificationEditor::greyOutAllComponents()
     modeCB.setAlpha(gModAlpha);
     A1ModeCB.setAlpha(gModAlpha);
     tempoSlider->setDim(gModAlpha);
+    subSlider->setDim(gModAlpha);
     AT1HistorySlider->setDim(gModAlpha);
     AT1SubdivisionsSlider->setDim(gModAlpha);
     AT1MinMaxSlider->setDim(gModAlpha);
@@ -600,7 +618,7 @@ void TempoModificationEditor::highlightModedComponents()
 {
     TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
     
-    if(mod->getDirty(TempoBPM))           tempoSlider->setBright();
+    if(mod->getDirty(TempoBPM))           subSlider->setBright();
     if(mod->getDirty(TempoSystem))        modeCB.setAlpha(1);
     if(mod->getDirty(AT1History))         AT1HistorySlider->setBright();
     if(mod->getDirty(AT1Subdivisions))    AT1SubdivisionsSlider->setBright();
@@ -655,6 +673,8 @@ void TempoModificationEditor::update(void)
         modeCB.setSelectedItemIndex(mod->getTempoSystem(), dontSendNotification);
 
         tempoSlider->setValue(mod->getTempo(), dontSendNotification);
+        
+        subSlider->setValue(mod->getSubdivisions(), dontSendNotification);
         
         A1ModeCB.setSelectedItemIndex(mod->getAdaptiveTempo1Mode(), dontSendNotification);
         
@@ -865,6 +885,12 @@ void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
         mod->setTempo(val);
         mod->setDirty(TempoBPM);
         tempoSlider->setBright();
+    }
+    else if(name == subSlider->getName())
+    {
+        mod->setSubdivisions(val);
+        mod->setDirty(TempoSubdivisions);
+        subSlider->setBright();
     }
     else if(name == AT1HistorySlider->getName())
     {
