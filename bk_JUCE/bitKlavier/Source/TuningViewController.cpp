@@ -1796,7 +1796,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
             
             //hide other tether sliders
             for (auto s : tetherSliders) s->setVisible(false);
-            for (auto l : springLabels) l->setVisible(false);
+            for (auto l : tetherLabels) l->setVisible(false);
         }
         else
         {
