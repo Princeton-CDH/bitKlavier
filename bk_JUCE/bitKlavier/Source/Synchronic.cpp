@@ -56,7 +56,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
     
-    float noteLength = (fabs(prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()]) * tempo->getTempo()->aPrep->getBeatThreshMS());
+    float noteLength = (fabs(prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()]) * tempo->getTempo()->aPrep->getBeatThreshMS() / tempo->getTempo()->aPrep->getSubdivisions());
     
     if (prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()] < 0)
     {
@@ -308,7 +308,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     //do this every block, for adaptive tempo updates
     sampleType = type;
     clusterThresholdSamples = (prep->getClusterThreshSEC() * sampleRate);
-    beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() * sampleRate);
+    beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() / tempo->getTempo()->aPrep->getSubdivisions() * sampleRate);
     
     for (auto key : keysDepressed)
     {

@@ -42,6 +42,7 @@ protected:
     BKComboBox modeCB;
     
     ScopedPointer<BKSingleSlider> tempoSlider;
+    ScopedPointer<BKSingleSlider> subSlider;
     
     ScopedPointer<BKSingleSlider> AT1HistorySlider;
     ScopedPointer<BKSingleSlider> AT1SubdivisionsSlider;

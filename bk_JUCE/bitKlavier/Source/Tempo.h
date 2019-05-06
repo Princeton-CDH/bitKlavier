@@ -41,6 +41,7 @@ public:
     TempoPreparation():
     sWhichTempoSystem(ConstantTempo),
     sTempo(120),
+    subdivisions(1.),
     at1History(4),
     at1Min(100),
     at1Max(2000),
@@ -54,6 +55,7 @@ public:
     inline void copy(TempoPreparation::Ptr s)
     {
         sTempo = s->getTempo();
+        subdivisions = s->getSubdivisions();
         sWhichTempoSystem = s->getTempoSystem();
         at1History = s->getAdaptiveTempo1History();
         at1Min = s->getAdaptiveTempo1Min();
@@ -69,6 +71,7 @@ public:
     {
         
         return (sTempo == s->getTempo() &&
+                subdivisions == s->getSubdivisions() &&
                 sWhichTempoSystem == s->getTempoSystem() &&
                 at1History == s->getAdaptiveTempo1History() &&
                 at1Min == s->getAdaptiveTempo1Min() &&
@@ -81,12 +84,13 @@ public:
 	{
 		Random::getSystemRandom().setSeedRandomly();
 
-		float r[10];
+		float r[12];
 
 		for (int i = 0; i < 10; i++)  r[i] = (Random::getSystemRandom().nextFloat());
 		int idx = 0;
 
 		sTempo = r[idx++];
+        subdivisions = r[idx++] * 10.0;
 		sWhichTempoSystem = (TempoType)(int)(r[idx++] * TempoSystemNil);
 		at1History = r[idx++];
 		at1Min = r[idx++];
@@ -134,6 +138,16 @@ public:
         return false;
     }
     
+    void setSubdivisions(float sub)
+    {
+        subdivisions = sub;
+    }
+    
+    float getSubdivisions(void)
+    {
+        return subdivisions;
+    }
+    
     //Adaptive Tempo 1
     inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;}
     inline void setAdaptiveTempo1History(int hist)                      {at1History = hist;}
@@ -159,6 +173,7 @@ public:
         prep.setProperty( ptagTempo_at1Subdivisions,       getAdaptiveTempo1Subdivisions(), 0 );
         prep.setProperty( ptagTempo_at1Min,                getAdaptiveTempo1Min(), 0 );
         prep.setProperty( ptagTempo_at1Max,                getAdaptiveTempo1Max(), 0 );
+        prep.setProperty( "subdivisions",                  getSubdivisions(), 0);
         
         return prep;
     }
@@ -186,6 +201,11 @@ public:
         
         f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
         setAdaptiveTempo1Max(f);
+        
+        String s = e->getStringAttribute("subdivisions");
+        
+        if (s == "")    setSubdivisions(1.0);
+        else            setSubdivisions(s.getFloatValue());
     }
     
     
@@ -201,8 +221,9 @@ private:
     int at1History;
     float at1Min, at1Max;
     float at1Subdivisions;
+    float subdivisions;
     AdaptiveTempo1Mode at1Mode;
-  
+    
     JUCE_LEAK_DETECTOR(TempoPreparation);
 };
 
