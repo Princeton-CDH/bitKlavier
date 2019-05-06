@@ -797,6 +797,7 @@ typedef enum TempoParameterType
     AT1Min,
     AT1Max,
     AT1Mode,
+    TempoSubdivisions,
     TempoParameterTypeNil
     
 } TempoParameterType;
@@ -809,7 +810,8 @@ static const std::vector<BKParameterDataType> cTempoDataTypes = {
     BKFloat,
     BKFloat,
     BKFloat,
-    BKInt
+    BKInt,
+    BKFloat
 };
 
 static const std::vector<std::string> cTempoParameterTypes = {
@@ -820,7 +822,8 @@ static const std::vector<std::string> cTempoParameterTypes = {
     "AT1Subdivs",
     "AT1Min",
     "AT1Max",
-    "AT1Mode"
+    "AT1Mode",
+    "Subdivisions"
 };
 
 #pragma mark - PrepMap

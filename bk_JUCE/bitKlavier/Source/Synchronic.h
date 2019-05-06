@@ -53,7 +53,8 @@ public:
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
     sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic()),
-    numClusters(1)
+    numClusters(1),
+    onOffMode(KeyOn)
     {
         
     }
