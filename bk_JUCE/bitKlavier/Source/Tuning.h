@@ -902,9 +902,11 @@ public:
 private:
     Tuning::Ptr tuning;
 
-    float   intervalToRatio(float interval) const noexcept { return mtof(interval + 60.) / mtof(60.); }
-    float   lastNote[128];
     float   globalTuningReference = 440.; //A440
+    float   intervalToRatio(float interval) const noexcept {
+        return mtof(interval + 60., globalTuningReference) / mtof(60., globalTuningReference);
+    }
+    float   lastNote[128];
     
     float lastNoteTuning;
     float lastIntervalTuning;

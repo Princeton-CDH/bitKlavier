@@ -134,7 +134,8 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
             
             const Array<float> anchorTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getAdaptiveAnchorScale());
             adaptiveFundamentalFreq = mtof(midiNoteNumber +
-                                           anchorTuning[(midiNoteNumber + tuning->aPrep->getAdaptiveAnchorFundamental()) % anchorTuning.size()]
+                                           anchorTuning[(midiNoteNumber + tuning->aPrep->getAdaptiveAnchorFundamental()) % anchorTuning.size()],
+                                           globalTuningReference
                                            );
             adaptiveFundamentalNote = midiNoteNumber;
 
@@ -177,13 +178,13 @@ float TuningProcessor::adaptiveCalculateRatio(const int midiNoteNumber) const
 float TuningProcessor::adaptiveCalculate(int midiNoteNumber) const
 {
     float newnote = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
-    return ftom(newnote) - midiNoteNumber;
+    return ftom(newnote, globalTuningReference) - midiNoteNumber;
 }
 
 void TuningProcessor::adaptiveReset()
 {
     adaptiveFundamentalNote = tuning->aPrep->getFundamental();
-    adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote);
+    adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote, globalTuningReference);
     adaptiveHistoryCounter = 0;
     
 }

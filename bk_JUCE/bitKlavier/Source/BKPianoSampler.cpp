@@ -165,7 +165,8 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
  
         double x = particles[currentMidiNoteNumber]->getX();
         int octave = particles[currentMidiNoteNumber]->getOctave();
-        double midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(x - 1200.0 * octave)), 128) - 60.0 + (octave * 12.0);
+        double midi = Utilities::clip(0, ftom(Utilities::centsToFreq(x - 1200.0 * octave),
+                                              tuning->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
         midi += (tuning->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(currentMidiNoteNumber) +
                  tuning->getTuning()->aPrep->getFundamentalOffset());
         

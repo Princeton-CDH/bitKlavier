@@ -664,7 +664,8 @@ void TuningViewController::paint (Graphics& g)
         if (s != nullptr && s->getEnabled())
         {
             Particle* a = s->getA();
-            if(springsOn) midi = Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave())));
+            if(springsOn) midi = ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave())),
+                                      tuning->getGlobalTuningReference());
             else
             {
                 midi = tuning->getOffset(a->getNote(), false);
@@ -675,7 +676,8 @@ void TuningViewController::paint (Graphics& g)
             
             float midiSave = midi;
             
-            midiScale = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave()))), 128);
+            midiScale = Utilities::clip(0, ftom(Utilities::centsToFreq(a->getX() - (1200.0 * a->getOctave())),
+                                                tuning->getGlobalTuningReference()), 128);
             midiScale += ((a->getOctave() - 5) * 12.0);
             midiScale /= 60.;
             
@@ -1033,7 +1035,8 @@ void TuningViewController::timerCallback(void)
                 lastNote.setText("note: " + String(lastNoteTuningSave, 3), dontSendNotification);
                 lastInterval.setText("interval: "  + String(tProcessor->getLastIntervalTuning(), 3), dontSendNotification);
                 
-                currentFundamental.setText("current fundamental: " + String(ftom(tProcessor->getAdaptiveFundamentalFreq()), 3), dontSendNotification);
+                currentFundamental.setText("current fundamental: " + String(ftom(tProcessor->getAdaptiveFundamentalFreq(),
+                                                                                 tProcessor->getGlobalTuningReference()), 3), dontSendNotification);
             }
             
             if(active->getAdaptiveType() == AdaptiveNormal || active->getAdaptiveType() == AdaptiveAnchored )
