@@ -157,7 +157,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
 
 void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
 {
-    //pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/12.0f);
+    pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/12.0f);
     
     if (tuning != nullptr && tuning->getTuning()->aPrep->getSpringsActive())
     {
@@ -469,7 +469,8 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
 
 void BKPianoSamplerVoice::pitchWheelMoved (const int newValue)
 {
-    pitchbendMultiplier = powf(2.0f, (newValue / 8192. - 1.)/12.);
+    pitchWheel = newValue;
+    pitchbendMultiplier = powf(2.0f, (newValue / 8192. - 1.)/6.);
     bentRatio = pitchRatio * pitchbendMultiplier;
     DBG("BKPianoSamplerVoice::pitchWheelMoved : " + String(pitchbendMultiplier));
 }

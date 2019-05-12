@@ -41,6 +41,9 @@
  #pragma clang diagnostic ignored "-Wnon-virtual-dtor"
  #pragma clang diagnostic ignored "-Wsign-conversion"
  #pragma clang diagnostic ignored "-Wextra-semi"
+ #if __has_warning("-Wpragma-pack")
+  #pragma clang diagnostic ignored "-Wpragma-pack"
+ #endif
 #endif
 
 #ifdef _MSC_VER
@@ -1472,7 +1475,7 @@ namespace AAXClasses
         // parameter steps.
         static int32_t getSafeNumberOfParameterSteps (const AudioProcessorParameter& param)
         {
-            return jmax (param.getNumSteps(), 2048);
+            return jmin (param.getNumSteps(), 2048);
         }
 
         void addAudioProcessorParameters()

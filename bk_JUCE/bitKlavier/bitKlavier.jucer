@@ -435,10 +435,10 @@
                   iosBackgroundBle="1" iCloudPermissions="1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
-                       plistPreprocessorDefinitions="" iosCompatibility="8.0" enablePluginBinaryCopyStep="1"
+                       plistPreprocessorDefinitions="" iosCompatibility="9.0" enablePluginBinaryCopyStep="1"
                        codeSigningIdentity="YT6AXURH62"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       iosCompatibility="8.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="YT6AXURH62"/>
+                       iosCompatibility="9.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="YT6AXURH62"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../../../JUCE/modules"/>
