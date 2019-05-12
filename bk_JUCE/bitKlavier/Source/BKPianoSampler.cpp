@@ -157,7 +157,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
 
 void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
 {
-    pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/12.0f);
+    //pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/12.0f);
     
     if (tuning != nullptr && tuning->getTuning()->aPrep->getSpringsActive())
     {
@@ -167,6 +167,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         int octave = particles[currentMidiNoteNumber]->getOctave();
         double midi = Utilities::clip(0, ftom(Utilities::centsToFreq(x - 1200.0 * octave),
                                               tuning->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
+        
         midi += (tuning->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(currentMidiNoteNumber) +
                  tuning->getTuning()->aPrep->getFundamentalOffset());
         
@@ -470,6 +471,7 @@ void BKPianoSamplerVoice::pitchWheelMoved (const int newValue)
 {
     pitchbendMultiplier = powf(2.0f, (newValue / 8192. - 1.)/12.);
     bentRatio = pitchRatio * pitchbendMultiplier;
+    DBG("BKPianoSamplerVoice::pitchWheelMoved : " + String(pitchbendMultiplier));
 }
 
 void BKPianoSamplerVoice::controllerMoved (const int /*controllerNumber*/,

@@ -648,6 +648,7 @@ bool BKSynthesiserVoice::wasStartedBefore (const BKSynthesiserVoice& other) cons
         const ScopedLock sl (lock);
         
         pitchWheelValue = wheelValue;
+        //DBG("BKSynthesiser::handlePitchWheel : " + String(pitchWheelValue));
         
         for (int i = voices.size(); --i >= 0;)
         {
