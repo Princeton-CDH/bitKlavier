@@ -494,6 +494,7 @@ public:
     inline void setNumClusters(int c)
     {
         numClusters = c;
+        DBG("setNumClusters = " + String(c));
     }
     
     inline int getNumClusters(void)
