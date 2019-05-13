@@ -54,6 +54,8 @@ SpringTuning::SpringTuning(SpringTuning::Ptr st):
 rate(100),
 tetherStiffness(0.5),
 intervalStiffness(0.5),
+tetherWeightGlobal(0.5),
+tetherWeightSecondaryGlobal(0.1),
 drag(0.1),
 active(false),
 usingFundamentalForIntervalSprings(false), //should be false by default
@@ -81,8 +83,8 @@ scaleId(JustTuning)
     //"automatic" fundamental mode
     setFundamentalSetsTether(false);        //needs UI toggle; when on, don't show tether sliders for current notes, only the two tether weight sliders
     tetherFundamental = C;
-    setTetherWeightGlobal(0.5);             //needs UI slider; only show when fundamentalSetsTether == true
-    setTetherWeightSecondaryGlobal(0.1);    //needs UI slider; only show when fundamentalSetsTether == true
+    //setTetherWeightGlobal(0.5);             //needs UI slider; only show when fundamentalSetsTether == true
+    //setTetherWeightSecondaryGlobal(0.1);    //needs UI slider; only show when fundamentalSetsTether == true
     
     for (int i = 0; i < 13; i++) springWeights[i] = 0.5;
     
@@ -539,6 +541,7 @@ void SpringTuning::addSpringsByNote(int note)
 
                 if(tnoteA % 12 == getTetherFundamental() || tnoteB % 12 == getTetherFundamental())
                 {
+                    DBG("SpringTuning::addSpringsByNote getTetherWeightGlobal = " + String((int)getTetherWeightGlobal()));
                     setTetherWeight(tnoteA, getTetherWeightGlobal());
                 }
                 else{

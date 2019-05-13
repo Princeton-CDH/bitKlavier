@@ -1578,6 +1578,9 @@ void TuningPreparationEditor::update(void)
         if (prep->getSpringTuning()->getActive()) showSprings = true;
         else showSprings = false;
         
+        tetherWeightGlobalSlider->setValue(prep->getSpringTuning()->getTetherWeightGlobal(), dontSendNotification);
+        tetherWeightSecondaryGlobalSlider->setValue(prep->getSpringTuning()->getTetherWeightSecondaryGlobal(), dontSendNotification);
+        
         Array<float> intervalWeights = prep->getSpringTuning()->getSpringWeights();
         if (intervalWeights.size() < 12)
         {

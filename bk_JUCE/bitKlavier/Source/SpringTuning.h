@@ -174,7 +174,7 @@ public:
     
     double getTetherWeightGlobal() { return tetherWeightGlobal; }
     double getTetherWeightSecondaryGlobal() { return tetherWeightSecondaryGlobal; }
-    void setTetherWeightGlobal(double s) { tetherWeightGlobal = s; }
+    void setTetherWeightGlobal(double s) { tetherWeightGlobal = s; DBG("setTetherWeightGlobal :" + String(tetherWeightGlobal)); }
     void setTetherWeightSecondaryGlobal(double s) { tetherWeightSecondaryGlobal = s; }
     
     bool getSpringMode(int which) {return springMode.getUnchecked(which);}
