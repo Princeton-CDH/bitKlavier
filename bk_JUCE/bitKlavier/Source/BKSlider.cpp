@@ -2050,8 +2050,9 @@ sliderIncrement(increment)
     }
     
     topSlider = new Slider;
-    //topSlider->setSliderStyle(Slider::LinearBar);
+    topSlider->setSliderStyle(Slider::LinearBar);
     topSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 0,0);
+    //topSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 50,50);
     topSlider->setRange(sliderMin, sliderMax, sliderIncrement);
     topSlider->setValue(sliderDefault, dontSendNotification);
     topSlider->addListener(this);
@@ -2229,6 +2230,14 @@ void BKStackedSlider::mouseMove(const MouseEvent& e)
 {
     //topSlider->setValue(topSlider->proportionOfLengthToValue((double)e.x / getWidth()), dontSendNotification);
     topSlider->setValue(dataSliders.getUnchecked(whichSlider(e))->getValue());
+    
+    for(int i=0; i<dataSliders.size(); i++)
+    {
+        if(dataSliders.getUnchecked(whichSlider(e)) == dataSliders.getUnchecked(i))
+            dataSliders.getUnchecked(i)->setTextBoxStyle(Slider::TextBoxLeft, false, 50, 50);
+        else
+            dataSliders.getUnchecked(i)->setTextBoxStyle(Slider::NoTextBox, false, 50, 50);
+    }
 }
 
 
