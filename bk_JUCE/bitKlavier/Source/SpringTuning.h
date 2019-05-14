@@ -235,6 +235,28 @@ public:
         setTetherFundamental(newfundamental); //when  == fundamentalSetsTether true, tetherFundamental will be used to set tether weights
     }
     
+    void setIntervalFundamentalMode(PitchClass  newfundamental)
+    {
+        
+        DBG("setIntervalFundamentalMode " + String(newfundamental));
+        
+        if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
+        else setUsingFundamentalForIntervalSprings(true);
+        
+        if(newfundamental == 13) useLowestNoteForFundamental = true;
+        else useLowestNoteForFundamental = false;
+        
+        if(newfundamental == 14) useHighestNoteForFundamental = true;
+        else useHighestNoteForFundamental = false;
+        
+        if(newfundamental == 15) useLastNoteForFundamental = true;
+        else useLastNoteForFundamental = false;
+        
+        if(newfundamental == 16) useAutomaticFundamental = true;
+        else useAutomaticFundamental = false;
+
+    }
+    
     PitchClass getIntervalFundamental(void) { return intervalFundamental; }
     
     void findFundamental();

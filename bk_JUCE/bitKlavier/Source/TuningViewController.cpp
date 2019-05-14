@@ -1536,7 +1536,6 @@ void TuningPreparationEditor::update(void)
         scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
         scaleCB.setSelectedItemIndex(scaleIndex, dontSendNotification);
 
-        
         int springScaleId = prep->getCurrentSpringScaleId();
         if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId - 2);
         springScaleCB.setSelectedItemIndex(springScaleId, dontSendNotification);
