@@ -75,6 +75,7 @@ scaleId(JustTuning)
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
     //intervalFundamental = PitchClass(C);
     intervalFundamental = PitchClass(12);
+    intervalFundamentalActive = PitchClass(12);
     
     useLowestNoteForFundamental = false;
     useHighestNoteForFundamental = false;
@@ -163,8 +164,8 @@ scaleId(JustTuning)
                 int scaleDegree2 = particleArray[j]->getNote();;
                 //int intervalFundamental = 0; //temporary, will set in preparation
                 
-                diff =  100. * ((scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamental) % 12]) -
-                                (scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamental) % 12]));
+                diff =  100. * ((scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamentalActive) % 12]) -
+                                (scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamentalActive) % 12]));
                 
                 //DBG("setting new spring " + String(scaleDegree1) + " " + String(scaleDegree2) + " length = " + String(fabs(diff)));
                 Spring* spring = new Spring(particleArray[j],
@@ -336,28 +337,28 @@ void SpringTuning::addNote(int note)
     if(useLowestNoteForFundamental)
     {
         DBG("lowest current note = " + String(getLowestActiveParticle()));
-        intervalFundamental = (PitchClass)(getLowestActiveParticle() % 12);
+        intervalFundamentalActive = (PitchClass)(getLowestActiveParticle() % 12);
         
-        if(fundamentalSetsTether) setTetherFundamental(intervalFundamental);
+        if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
     }
     else if(useHighestNoteForFundamental)
     {
         DBG("highest current note = " + String(getHighestActiveParticle()));
-        intervalFundamental = (PitchClass)(getHighestActiveParticle() % 12);
+        intervalFundamentalActive = (PitchClass)(getHighestActiveParticle() % 12);
         
-        if(fundamentalSetsTether) setTetherFundamental(intervalFundamental);
+        if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
     }
     else if(useLastNoteForFundamental)
     {
         DBG("last note = " + String(note));
-        intervalFundamental = (PitchClass)(note % 12);
+        intervalFundamentalActive = (PitchClass)(note % 12);
         
-        if(fundamentalSetsTether) setTetherFundamental(intervalFundamental);
+        if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
     }
     else if(useAutomaticFundamental)
     {
         findFundamental(); //sets intervalFundamental internally
-        if(fundamentalSetsTether) setTetherFundamental(intervalFundamental);
+        if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
     }
     
     addSpringsByNote(note);
@@ -372,17 +373,17 @@ void SpringTuning::removeNote(int note)
     if(useLowestNoteForFundamental)
     {
         DBG("lowest current note = " + String(getLowestActiveParticle()));
-        intervalFundamental = (PitchClass)(getLowestActiveParticle() % 12);
+        intervalFundamentalActive = (PitchClass)(getLowestActiveParticle() % 12);
     }
     else if(useHighestNoteForFundamental)
     {
         DBG("highest current note = " + String(getHighestActiveParticle()));
-        intervalFundamental = (PitchClass)(getHighestActiveParticle() % 12);
+        intervalFundamentalActive = (PitchClass)(getHighestActiveParticle() % 12);
     }
     else if(useAutomaticFundamental)
     {
         findFundamental();
-        if(fundamentalSetsTether) setTetherFundamental(intervalFundamental);
+        if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
     }
     
     removeSpringsByNote(note);
@@ -470,18 +471,18 @@ void SpringTuning::findFundamental()
         if(fundamental_57 > -1)
         {
             DBG("CHOICE = " + String(fundamental_57));
-            intervalFundamental = (PitchClass(fundamental_57));
+            intervalFundamentalActive = (PitchClass(fundamental_57));
         }
         else if(fundamental_48 > -1)
         {
             DBG("CHOICE = " + String(fundamental_48));
-            intervalFundamental = (PitchClass(fundamental_48));
+            intervalFundamentalActive = (PitchClass(fundamental_48));
             
         }
         else if(fundamental_39 > -1)
         {
             DBG("CHOICE = " + String(fundamental_39));
-            intervalFundamental = (PitchClass(fundamental_39));
+            intervalFundamentalActive = (PitchClass(fundamental_39));
             
         }
     }
@@ -573,8 +574,8 @@ void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
         int scaleDegree2 = spring->getB()->getNote();
         //int intervalFundamental = 0; //temporary, will set in preparation
         
-        float diff =    (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamental) % 12]) -
-        (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamental) % 12]);
+        float diff =    (100. * scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamentalActive) % 12]) -
+        (100. * scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamentalActive) % 12]);
         
         spring->setRestingLength(fabs(diff));
     }

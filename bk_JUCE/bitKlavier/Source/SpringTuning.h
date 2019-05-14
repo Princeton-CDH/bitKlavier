@@ -215,6 +215,8 @@ public:
     {
         intervalFundamental = newfundamental;
         
+        if(newfundamental < 12) intervalFundamentalActive = newfundamental;
+        
         DBG("setIntervalFundamental " + String(newfundamental));
         
         if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
@@ -232,32 +234,12 @@ public:
         if(newfundamental == 16) useAutomaticFundamental = true;
         else useAutomaticFundamental = false;
         
-        setTetherFundamental(newfundamental); //when  == fundamentalSetsTether true, tetherFundamental will be used to set tether weights
-    }
-    
-    void setIntervalFundamentalMode(PitchClass  newfundamental)
-    {
-        
-        DBG("setIntervalFundamentalMode " + String(newfundamental));
-        
-        if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
-        else setUsingFundamentalForIntervalSprings(true);
-        
-        if(newfundamental == 13) useLowestNoteForFundamental = true;
-        else useLowestNoteForFundamental = false;
-        
-        if(newfundamental == 14) useHighestNoteForFundamental = true;
-        else useHighestNoteForFundamental = false;
-        
-        if(newfundamental == 15) useLastNoteForFundamental = true;
-        else useLastNoteForFundamental = false;
-        
-        if(newfundamental == 16) useAutomaticFundamental = true;
-        else useAutomaticFundamental = false;
-
+        //setTetherFundamental(newfundamental); //when  == fundamentalSetsTether true, tetherFundamental will be used to set tether weights
+        setTetherFundamental(intervalFundamentalActive);
     }
     
     PitchClass getIntervalFundamental(void) { return intervalFundamental; }
+    PitchClass getIntervalFundamentalActive(void) { return intervalFundamentalActive; }
     
     void findFundamental();
     
@@ -460,7 +442,7 @@ private:
     double drag;
     
     bool active;
-    bool usingFundamentalForIntervalSprings;
+    bool usingFundamentalForIntervalSprings; //only false when in "none" mode
     bool useLowestNoteForFundamental;
     bool useHighestNoteForFundamental;
     bool useLastNoteForFundamental;
@@ -473,7 +455,8 @@ private:
     
     TuningSystem scaleId;
     Array<float> intervalTuning;
-    PitchClass intervalFundamental;
+    PitchClass intervalFundamental; //one stored, including the mode
+    PitchClass intervalFundamentalActive; //one actually used in the moment, changed by auto/last/highest/lowest modes
     Array<bool> springMode;
     
     Array<float> tetherTuning;
