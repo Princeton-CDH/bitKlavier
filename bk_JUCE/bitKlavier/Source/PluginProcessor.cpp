@@ -527,9 +527,10 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     /*
     for ( auto t : currentPiano->getTuningProcessors())
     {
-        t->getTuning()->getSpringTuning()->addNote(noteNumber);
+        t->getTuning()->getCurrentSpringTuning()->addNote(noteNumber);
+        //t->getTuning()->getSpringTuning()->addNote(noteNumber);
     }
-     */
+    */
     //keeping out for now; I just think it's better to be consistent, and even though it can be easy to forget
     //that you need to connect a Keymap to Tuning to get adaptive/spring tunings, it also allows you
     //control over which keys are going to spring tuning, which i can imagine being useful sometimes.
@@ -566,9 +567,9 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
      //do this in the PreparationMap, not here; springs should be turned on/off by Keymap
     for ( auto t : currentPiano->getTuningProcessors())
     {
-        t->getTuning()->getSpringTuning()->removeNote(noteNumber);
+        t->getTuning()->getCurrentSpringTuning()->removeNote(noteNumber);
     }
-     */
+    */
     
     --noteOnCount;
     if(noteOnCount < 0) noteOnCount = 0;
