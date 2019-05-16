@@ -2134,7 +2134,7 @@ void TuningModificationEditor::highlightModedComponents()
     {
         for (int i = 0; i < 128; i++)
         {
-            if (mod->getTetherWeightActive(i))  tetherSliders[i]->setAlpha(1);
+            if (mod->getTetherWeightActive(i))  tetherSliders[i]->setAlpha(1.0);
             else                                tetherSliders[i]->setAlpha(gModAlpha);
         }
     }
@@ -2142,7 +2142,7 @@ void TuningModificationEditor::highlightModedComponents()
     {
         for (int i = 0; i < 12; i++)
         {
-            if (mod->getSpringWeightActive(i))  springSliders[i]->setAlpha(1);
+            if (mod->getSpringWeightActive(i))  springSliders[i]->setAlpha(1.0);
             else                                springSliders[i]->setAlpha(gModAlpha);
         }
     }
