@@ -164,6 +164,22 @@ public:
         }
     }
     
+    inline void setSpringMode(int which, bool on)
+    {
+        springMode.set(which, on);
+    }
+    
+    bool getFundamentalSetsTether() { return fundamentalSetsTether; }
+    void setFundamentalSetsTether(bool s) { fundamentalSetsTether = s; }
+    
+    double getTetherWeightGlobal() { return tetherWeightGlobal; }
+    double getTetherWeightSecondaryGlobal() { return tetherWeightSecondaryGlobal; }
+    void setTetherWeightGlobal(double s) { tetherWeightGlobal = s; DBG("setTetherWeightGlobal :" + String(tetherWeightGlobal)); }
+    void setTetherWeightSecondaryGlobal(double s) { tetherWeightSecondaryGlobal = s; }
+    
+    bool getSpringMode(int which) {return springMode.getUnchecked(which);}
+    bool getSpringModeButtonState(int which) {return springMode.getUnchecked(which);}
+    
 	double getFrequency(int index);
 	bool pitchEnabled(int index);
 
@@ -190,7 +206,7 @@ public:
     Array<float> getTetherTuning(void) {return tetherTuning;}
     
     void setTetherFundamental(PitchClass  newfundamental);
-    int getTetherFundamental(void) {return tetherFundamental;}
+    PitchClass getTetherFundamental(void) {return tetherFundamental;}
     
     void setIntervalTuning(Array<float> tuning);
     Array<float> getIntervalTuning(void){return intervalTuning;}
@@ -198,6 +214,10 @@ public:
     void setIntervalFundamental(PitchClass  newfundamental)
     {
         intervalFundamental = newfundamental;
+        
+        if(newfundamental < 12) intervalFundamentalActive = newfundamental;
+        
+        DBG("setIntervalFundamental " + String(newfundamental));
         
         if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
         else setUsingFundamentalForIntervalSprings(true);
@@ -210,9 +230,18 @@ public:
         
         if(newfundamental == 15) useLastNoteForFundamental = true;
         else useLastNoteForFundamental = false;
+        
+        if(newfundamental == 16) useAutomaticFundamental = true;
+        else useAutomaticFundamental = false;
+        
+        //setTetherFundamental(newfundamental); //when  == fundamentalSetsTether true, tetherFundamental will be used to set tether weights
+        setTetherFundamental(intervalFundamentalActive);
     }
     
-    PitchClass getIntervalFundamental(void) {DBG("getIntervalFundamental " + String(intervalFundamental)); return intervalFundamental;}
+    PitchClass getIntervalFundamental(void) { return intervalFundamental; }
+    PitchClass getIntervalFundamentalActive(void) { return intervalFundamentalActive; }
+    
+    void findFundamental();
     
     void retuneIndividualSpring(Spring::Ptr spring);
     void retuneAllActiveSprings(void);
@@ -241,11 +270,16 @@ public:
         prep.setProperty( "active", active ? 1 : 0, 0);
         prep.setProperty( "intervalTuningId", scaleId, 0);
         prep.setProperty( "intervalFundamental", (int)intervalFundamental, 0);
+        prep.setProperty( "fundamentalSetsTether", (int)fundamentalSetsTether, 0);
+        prep.setProperty( "tetherWeightGlobal", tetherWeightGlobal, 0);
+        prep.setProperty( "tetherWeightSecondaryGlobal", tetherWeightSecondaryGlobal, 0);
+ 
         //prep.setProperty( "usingFundamentalForIntervalSprings", (int)usingFundamentalForIntervalSprings, 0);
     
         ValueTree tethers( "tethers");
         ValueTree springs( "springs");
         ValueTree intervalScale("intervalScale");
+        ValueTree springMode("springMode");
         
         for (int i = 0; i < 128; i++)
         {
@@ -256,10 +290,12 @@ public:
         {
             springs.setProperty( "s"+String(i), getSpringWeight(i), 0 );
             intervalScale.setProperty("s"+String(i), intervalTuning[i], 0);
+            springMode.setProperty("s"+String(i), (int)getSpringMode(i), 0);
         }
         prep.addChild(tethers, -1, 0);
         prep.addChild(springs, -1, 0);
         prep.addChild(intervalScale, -1, 0);
+        prep.addChild(springMode, -1, 0);
 
         return prep;
     }
@@ -291,11 +327,13 @@ public:
         {
             setSpringWeight(i, r[idx++]);
             intervalTuning.setUnchecked(i, r[idx++] - 0.5);
+            setSpringMode(i, r[idx++]);
         }
     }
     
     void setState(XmlElement* e)
     {
+        DBG("SpringTuning::setState called!!");
         active = (bool) e->getStringAttribute("active").getIntValue();
         
         setRate(e->getStringAttribute("rate").getDoubleValue());
@@ -307,7 +345,11 @@ public:
         
         scaleId = (TuningSystem) e->getStringAttribute("intervalTuningId").getIntValue();
         setIntervalFundamental((PitchClass) e->getStringAttribute("intervalFundamental").getIntValue());
-        DBG("getIntervalFundamental = " + String(getIntervalFundamental()));
+
+        fundamentalSetsTether = (bool) e->getStringAttribute("fundamentalSetsTether").getIntValue();
+        tetherWeightGlobal = e->getStringAttribute("tetherWeightGlobal").getDoubleValue();
+        tetherWeightSecondaryGlobal = e->getStringAttribute("tetherWeightSecondaryGlobal").getDoubleValue();
+
         //usingFundamentalForIntervalSprings = (bool) e->getStringAttribute("usingFundamentalForIntervalSprings").getIntValue();
         
         forEachXmlChildElement (*e, sub)
@@ -358,6 +400,23 @@ public:
                     }
                 }
             }
+            else if (sub->hasTagName("springMode"))
+            {
+                for (int i = 0; i < 12; i++)
+                {
+                    String attr = sub->getStringAttribute("s" + String(i));
+                    
+                    if (attr == "")
+                    {
+                        setSpringMode(i, false);
+                    }
+                    else
+                    {
+                        setSpringMode(i, (bool)attr.getIntValue());
+                        DBG("setState::setSpringMode " + String(attr.getIntValue()));
+                    }
+                }
+            }
         }
     }
     
@@ -383,15 +442,22 @@ private:
     double drag;
     
     bool active;
-    bool usingFundamentalForIntervalSprings;
+    bool usingFundamentalForIntervalSprings; //only false when in "none" mode
     bool useLowestNoteForFundamental;
     bool useHighestNoteForFundamental;
     bool useLastNoteForFundamental;
+    bool useAutomaticFundamental; //uses findFundamental() to set fundamental automatically, based on what is played
+    
+    bool fundamentalSetsTether; //when true, the fundamental will be used to set tether weights
+    double tetherWeightGlobal; //sets weight for tethers to fundamental, when in fundamentalSetsTether mode
+    double tetherWeightSecondaryGlobal; //sets weights for tethers to non-fundamental notes
     //int intervalSpringsFundamental;
     
     TuningSystem scaleId;
     Array<float> intervalTuning;
-    PitchClass intervalFundamental;
+    PitchClass intervalFundamental; //one stored, including the mode
+    PitchClass intervalFundamentalActive; //one actually used in the moment, changed by auto/last/highest/lowest modes
+    Array<bool> springMode;
     
     Array<float> tetherTuning;
     TuningSystem tetherTuningId;

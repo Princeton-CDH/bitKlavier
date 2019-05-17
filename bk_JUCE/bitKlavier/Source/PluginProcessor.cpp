@@ -595,7 +595,7 @@ void BKAudioProcessor::sustainActivate(void)
                            21,
                            21,
                            0,
-                           0.1, //gain
+                           0.02, //gain
                            1.,
                            Forward,
                            Normal, //FixedLength,

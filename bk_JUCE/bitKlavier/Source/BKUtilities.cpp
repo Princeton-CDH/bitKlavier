@@ -653,6 +653,15 @@ double mtof( double f )
     else return ( pow(2, (f - 69) / 12.0) * 440.0 );
 }
 
+double mtof( double f, double sr )
+{
+    if( f <= -1500 ) return (0);
+    else if( f > 1499 ) return (mtof(1499));
+    // else return (8.17579891564 * exp(.0577622650 * f));
+    // TODO: optimize
+    else return ( pow(2, (f - 69) / 12.0) * sr );
+}
+
 
 //-----------------------------------------------------------------------------
 // name: ftom()
@@ -665,6 +674,13 @@ double ftom( double f )
     return (f > 0 ? (log(f / 440.0) / LOGTWO) * 12.0 + 69 : -1500);
 }
 
+
+double ftom( double f, double sr )
+{
+    // return (f > 0 ? 17.3123405046 * log(.12231220585 * f) : -1500);
+    // TODO: optimize
+    return (f > 0 ? (log(f / sr) / LOGTWO) * 12.0 + 69 : -1500);
+}
 
 
 //these require inval to be between 0 and 1, and k != 1

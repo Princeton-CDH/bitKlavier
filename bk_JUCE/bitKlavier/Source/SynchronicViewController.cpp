@@ -832,9 +832,10 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         prep->setGain(val);
         active->setGain(val);
     }
-    else if(name == "num clusters")
+    //else if(name == "num layers")
+    else if(slider == numClusterSlider)
     {
-        DBG("num clusters " + String(val));
+        DBG("num layers " + String(val));
         prep->setNumClusters(val);
         active->setNumClusters(val);
     }

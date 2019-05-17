@@ -235,6 +235,9 @@ Array<float>    stringOrderedPairsToFloatArray(String s, int size);
 double          mtof(double f);
 double          ftom(double f);
 
+double          mtof(double f, double sr);
+double          ftom(double f, double sr);
+
 
 //these require inval to be between 0 and 1, and k != 1
 double          dt_asymwarp(double inval, double k);

@@ -195,6 +195,7 @@ typedef enum PitchClass {
     lowest,
     highest,
     last,
+    automatic,
     PitchClassNil
 } PitchClass;
 

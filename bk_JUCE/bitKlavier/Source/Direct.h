@@ -137,7 +137,7 @@ public:
     inline void setAttack(int val)                                      {dAttack = val;         }
     inline void setDecay(int val)                                       {dDecay = val;          }
     inline void setSustain(float val)                                   {dSustain = val;        }
-    inline void setRelease(int val)                                     {dRelease = val;        }
+    inline void setRelease(int val)                                     {dRelease = val;      DBG("setting Direct Release time :" + String(val));  }
     inline void setADSRvals(Array<float> vals)
     {
         dAttack = vals[0];

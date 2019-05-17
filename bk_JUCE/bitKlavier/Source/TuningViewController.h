@@ -97,17 +97,20 @@ protected:
     OwnedArray<Slider> tetherSliders;
     OwnedArray<Label>  springLabels;
     OwnedArray<Label>  tetherLabels;
+    OwnedArray<BKTextButton> springModeButtons;
     
     BKComboBox springScaleCB;
     BKComboBox springScaleFundamentalCB;
 
     ScopedPointer<BKSingleSlider> rateSlider;
-    
     ScopedPointer<BKSingleSlider> dragSlider;
-    
     ScopedPointer<BKSingleSlider> tetherStiffnessSlider;
-
     ScopedPointer<BKSingleSlider> intervalStiffnessSlider;
+    
+    ScopedPointer<BKSingleSlider> tetherWeightGlobalSlider;
+    ScopedPointer<BKSingleSlider> tetherWeightSecondaryGlobalSlider;
+    
+    ToggleButton fundamentalSetsTether; 
     
     BKComboBox adaptiveSystemsCB;
     
