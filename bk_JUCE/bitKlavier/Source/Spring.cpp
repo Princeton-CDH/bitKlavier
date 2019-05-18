@@ -67,7 +67,7 @@ void Spring::setStrength(double newStrength)
 {
 	strength = newStrength;
     double warpCoeff = 100.;
-    adjustedStrength = 0.6 * stiffness * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.);
+    adjustedStrength = 0.6 * stiffness * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.); //replace with dt_asymwarp, for clarity
     // > ~0.6 and the system can become unstable...
 }
 

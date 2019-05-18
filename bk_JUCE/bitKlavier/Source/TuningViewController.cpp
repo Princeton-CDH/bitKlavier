@@ -687,7 +687,7 @@ void TuningViewController::paint (Graphics& g)
             float cya = centery + sinf(radians) * radius * midiScale;
             
             Particle* b = s->getB();
-            if(springsOn) midi = Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())));
+            if(springsOn) midi = ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())), tuning->getGlobalTuningReference());
             else {
                 midi = tuning->getOffset(b->getNote(), false);
                 midi += b->getNote();
@@ -695,7 +695,8 @@ void TuningViewController::paint (Graphics& g)
             
             scalex = ((midi - 60.0f) / 12.0f);
             
-            midiScale = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave()))), 128);
+            midiScale = Utilities::clip(0, ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())),
+                                            tuning->getGlobalTuningReference()), 128);
             midiScale += ((b->getOctave() - 5) * 12.0);
             midiScale /= 60.;
             
@@ -737,7 +738,8 @@ void TuningViewController::paint (Graphics& g)
         {
             // DRAW PARTICLE IN MOTION
             if(springsOn) {
-                midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave()))), 128);
+                midi = Utilities::clip(0, ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave())),
+                                               tuning->getGlobalTuningReference()), 128);
                 midi += ((p->getOctave() - 5) * 12.0);
             }
             else {
@@ -746,7 +748,7 @@ void TuningViewController::paint (Graphics& g)
                 midi += p->getNote();
             }
             
-            //DBG("midi = " + String(midi));
+            //DBG(String(100.*(midi - 60.)) + " " + String(mtof(midi)));
             midiScale = midi / 60.;
             
             //int cents = roundToInt(((midi - (float)p->getNote())) * 100.0);
@@ -775,7 +777,8 @@ void TuningViewController::paint (Graphics& g)
         }
         
         //DRAW REST PARTICLE
-        midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getRestX() - (1200.0 * p->getOctave()))), 128);
+        midi = Utilities::clip(0, ftom(Utilities::centsToFreq(p->getRestX() - (1200.0 * p->getOctave())),
+                                       tuning->getGlobalTuningReference()), 128);
         midi += ((p->getOctave() - 5) * 12.0);
         
         if(midi > 20 && midi < 109) {
