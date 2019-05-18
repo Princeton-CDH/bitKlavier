@@ -1698,32 +1698,34 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     
     if(slider == offsetSlider) {
-        //DBG("got offset " + String(val));
+        DBG("got offset " + String(val));
         prep->setFundamentalOffset(val * 0.01);
         active->setFundamentalOffset(val * 0.01);
     }
     else if(slider == A1ClusterThresh) {
-        //DBG("got A1ClusterThresh " + String(val));
+        DBG("got A1ClusterThresh " + String(val));
         prep->setAdaptiveClusterThresh(val);
         active->setAdaptiveClusterThresh(val);
     }
     else if(slider == A1ClusterMax) {
-        //DBG("got A1ClusterMax " + String(val));
+        DBG("got A1ClusterMax " + String(val));
         prep->setAdaptiveHistory(val);
         active->setAdaptiveHistory(val);
     }
     else if(slider == nToneSemitoneWidthSlider) {
-        //DBG("got nToneSemiToneSliderWidth " + String(val));
+        DBG("got nToneSemiToneSliderWidth " + String(val));
         prep->setNToneSemitoneWidth(val);
         active->setNToneSemitoneWidth(val);
     }
     else if (slider == rateSlider)
     {
+        DBG("got rateSlider " + String(val));
         prep->getSpringTuning()->setRate(val, false);
         active->getSpringTuning()->setRate(val);
     }
     else if (slider == dragSlider)
     {
+        DBG("got dragSlider " + String(val));
         double newval = dt_asymwarp(val, 100.);
         //DBG("warped = " + String(newval) + " inverted = " + String(dt_asymwarp_inverse(newval, 100.)));
         prep->getSpringTuning()->setDrag(1. - newval);
@@ -1731,21 +1733,25 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     }
     else if (slider == tetherStiffnessSlider)
     {
+        DBG("got tetherStiffnessSlider " + String(val));
         prep->getSpringTuning()->setTetherStiffness(val);
         active->getSpringTuning()->setTetherStiffness(val);
     }
     else if (slider == intervalStiffnessSlider)
     {
+        DBG("got intervalStiffnessSlider " + String(val));
         prep->getSpringTuning()->setIntervalStiffness(val);
         active->getSpringTuning()->setIntervalStiffness(val);
     }
     else if (slider == tetherWeightGlobalSlider)
     {
+        DBG("got tetherWeightGlobalSlider " + String(val));
         prep->getSpringTuning()->setTetherWeightGlobal(val);
         active->getSpringTuning()->setTetherWeightGlobal(val);
     }
     else if (slider == tetherWeightSecondaryGlobalSlider)
     {
+        DBG("got tetherWeightGlobalSlider " + String(val));
         prep->getSpringTuning()->setTetherWeightSecondaryGlobal(val);
         active->getSpringTuning()->setTetherWeightSecondaryGlobal(val);
     }
