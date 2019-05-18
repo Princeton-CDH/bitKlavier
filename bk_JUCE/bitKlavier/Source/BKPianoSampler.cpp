@@ -173,6 +173,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
                  tuning->getTuning()->aPrep->getFundamentalOffset());
          */
         
+        //need to get tuning values for active particles, which are only those associated with depressed keys
         double x = particles[getCurrentlyPlayingKey()]->getX();
         int octave = particles[getCurrentlyPlayingKey()]->getOctave();
         double transpOffset = (currentMidiNoteNumber - getCurrentlyPlayingKey()) * 100.;

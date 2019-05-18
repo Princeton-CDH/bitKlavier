@@ -1481,6 +1481,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             for (auto b : springModeButtons)    b->setVisible(false);
             fundamentalSetsTether.setVisible(false);
+            prep->getSpringTuning()->setFundamentalSetsTether(false);
+            active->getSpringTuning()->setFundamentalSetsTether(false);
             tetherWeightGlobalSlider->setVisible(false);
             tetherWeightSecondaryGlobalSlider->setVisible(false);
             currentFundamental.setVisible(false);
