@@ -63,6 +63,17 @@ public:
         nToneRoot = p->getNToneRoot();
         adaptiveType = p->getAdaptiveType();
         stuning->copy(p->getSpringTuning());
+        
+        if (adaptiveType == AdaptiveSpring)
+        {
+            stuning->setActive(true);
+        }
+        else
+        {
+            stuning->setActive(false);
+        }
+        
+        
         //stuning = new SpringTuning(p->getSpringTuning());
     }
     

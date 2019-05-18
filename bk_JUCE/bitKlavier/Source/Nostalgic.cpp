@@ -215,6 +215,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                             synthOffset     -= (int)offset;
                         }
                         
+                        DBG("Nostalgic::keyReleased note, offset : " + String(note) + " " + String(offset));
+                        
                         //play nostalgic note
                         synth->keyOn(midiChannel,
                                      note,

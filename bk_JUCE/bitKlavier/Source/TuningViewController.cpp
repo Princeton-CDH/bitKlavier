@@ -485,6 +485,12 @@ void TuningViewController::displayTab(int tab)
     {
         // SET VISIBILITY
         TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
+        TuningPreparation::Ptr mod = processor.gallery->getStaticTuningPreparation(processor.updateState->currentModTuningId);
+        
+        if (processor.updateState->currentDisplay == DisplayTuningMod)
+        {
+            showSprings = true;
+        }
         
         if(showSprings)
         {
@@ -493,8 +499,15 @@ void TuningViewController::displayTab(int tab)
             for (auto l : springLabels)         l->setVisible(true);
             
             Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-            if(tuning->getCurrentSpringTuning()->getUsingFundamentalForIntervalSprings())
-                for (auto b : springModeButtons)    b->setVisible(true);
+            
+            if (tuning->getCurrentSpringTuning()->getUsingFundamentalForIntervalSprings())
+            {
+                for (auto b : springModeButtons)
+                {
+                    b->setVisible(true);
+                }
+            }
+            
             
             rateSlider->setVisible(true);
             dragSlider->setVisible(true);
@@ -504,7 +517,7 @@ void TuningViewController::displayTab(int tab)
             tetherStiffnessSlider->setVisible(true);
             intervalStiffnessSlider->setVisible(true);
 
-            if(tuning->getCurrentSpringTuning()->getUsingFundamentalForIntervalSprings()
+            if (tuning->getCurrentSpringTuning()->getUsingFundamentalForIntervalSprings()
                && prep->getSpringTuning()->getFundamentalSetsTether())
             {
                 tetherWeightGlobalSlider->setVisible(true);
@@ -1577,8 +1590,14 @@ void TuningPreparationEditor::update(void)
         double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
         dragSlider->setValue(newval, dontSendNotification);
         
-        if (prep->getSpringTuning()->getActive()) showSprings = true;
-        else showSprings = false;
+        if (prep->getSpringTuning()->getActive())
+        {
+            showSprings = true;
+        }
+        else
+        {
+            showSprings = false;
+        }
         
         tetherWeightGlobalSlider->setValue(prep->getSpringTuning()->getTetherWeightGlobal(), dontSendNotification);
         tetherWeightSecondaryGlobalSlider->setValue(prep->getSpringTuning()->getTetherWeightSecondaryGlobal(), dontSendNotification);
@@ -1610,6 +1629,8 @@ void TuningPreparationEditor::update(void)
         displayTab(currentTab);
 
     }
+    
+    //repaint();
     
     //updateComponentVisibility();
 }
@@ -1680,32 +1701,34 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     
     if(slider == offsetSlider) {
-        //DBG("got offset " + String(val));
+        DBG("got offset " + String(val));
         prep->setFundamentalOffset(val * 0.01);
         active->setFundamentalOffset(val * 0.01);
     }
     else if(slider == A1ClusterThresh) {
-        //DBG("got A1ClusterThresh " + String(val));
+        DBG("got A1ClusterThresh " + String(val));
         prep->setAdaptiveClusterThresh(val);
         active->setAdaptiveClusterThresh(val);
     }
     else if(slider == A1ClusterMax) {
-        //DBG("got A1ClusterMax " + String(val));
+        DBG("got A1ClusterMax " + String(val));
         prep->setAdaptiveHistory(val);
         active->setAdaptiveHistory(val);
     }
     else if(slider == nToneSemitoneWidthSlider) {
-        //DBG("got nToneSemiToneSliderWidth " + String(val));
+        DBG("got nToneSemiToneSliderWidth " + String(val));
         prep->setNToneSemitoneWidth(val);
         active->setNToneSemitoneWidth(val);
     }
     else if (slider == rateSlider)
     {
+        DBG("got rateSlider " + String(val));
         prep->getSpringTuning()->setRate(val, false);
         active->getSpringTuning()->setRate(val);
     }
     else if (slider == dragSlider)
     {
+        DBG("got dragSlider " + String(val));
         double newval = dt_asymwarp(val, 100.);
         //DBG("warped = " + String(newval) + " inverted = " + String(dt_asymwarp_inverse(newval, 100.)));
         prep->getSpringTuning()->setDrag(1. - newval);
@@ -1713,21 +1736,25 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     }
     else if (slider == tetherStiffnessSlider)
     {
+        DBG("got tetherStiffnessSlider " + String(val));
         prep->getSpringTuning()->setTetherStiffness(val);
         active->getSpringTuning()->setTetherStiffness(val);
     }
     else if (slider == intervalStiffnessSlider)
     {
+        DBG("got intervalStiffnessSlider " + String(val));
         prep->getSpringTuning()->setIntervalStiffness(val);
         active->getSpringTuning()->setIntervalStiffness(val);
     }
     else if (slider == tetherWeightGlobalSlider)
     {
+        DBG("got tetherWeightGlobalSlider " + String(val));
         prep->getSpringTuning()->setTetherWeightGlobal(val);
         active->getSpringTuning()->setTetherWeightGlobal(val);
     }
     else if (slider == tetherWeightSecondaryGlobalSlider)
     {
+        DBG("got tetherWeightGlobalSlider " + String(val));
         prep->getSpringTuning()->setTetherWeightSecondaryGlobal(val);
         active->getSpringTuning()->setTetherWeightSecondaryGlobal(val);
     }
@@ -1984,7 +2011,7 @@ void TuningModificationEditor::highlightModedComponents()
     {
         for (int i = 0; i < 128; i++)
         {
-            if (mod->getTetherWeightActive(i))  tetherSliders[i]->setAlpha(1);
+            if (mod->getTetherWeightActive(i))  tetherSliders[i]->setAlpha(1.0);
             else                                tetherSliders[i]->setAlpha(gModAlpha);
         }
     }
@@ -1992,8 +2019,16 @@ void TuningModificationEditor::highlightModedComponents()
     {
         for (int i = 0; i < 12; i++)
         {
-            if (mod->getSpringWeightActive(i))  { springSliders[i]->setAlpha(1); springModeButtons[i]->setAlpha(1); }
-            else                                { springSliders[i]->setAlpha(gModAlpha); springModeButtons[i]->setAlpha(gModAlpha); }
+            if (mod->getSpringWeightActive(i))
+            {
+                springSliders[i]->setAlpha(1);
+                springModeButtons[i]->setAlpha(1);
+            }
+            else
+            {
+                springSliders[i]->setAlpha(gModAlpha);
+                springModeButtons[i]->setAlpha(gModAlpha);
+            }
         }
     }
     if (mod->getDirty(TuningSpringIntervalScale))
@@ -2284,12 +2319,16 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             showSprings = true;
             
+            mod->getSpringTuning()->setActive(true);
+            
             displayTab(currentTab);
             
         }
         else
         {
             showSprings = false;
+            
+            mod->getSpringTuning()->setActive(false);
             
             displayTab(currentTab);
         }
