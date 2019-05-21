@@ -157,12 +157,13 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
 
 void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
 {
-    pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/12.0f);
+    pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/6.0f); //whole-step range for pitchbend
     
     if (tuning != nullptr && tuning->getTuning()->aPrep->getSpringsActive())
     {
         Particle::PtrArr particles = tuning->getTuning()->aPrep->getParticles();
  
+        /*
         double x = particles[currentMidiNoteNumber]->getX();
         int octave = particles[currentMidiNoteNumber]->getOctave();
         double midi = Utilities::clip(0, ftom(Utilities::centsToFreq(x - 1200.0 * octave),
@@ -170,6 +171,19 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         
         midi += (tuning->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(currentMidiNoteNumber) +
                  tuning->getTuning()->aPrep->getFundamentalOffset());
+         */
+        
+        //need to get tuning values for active particles, which are only those associated with depressed keys
+        double x = particles[getCurrentlyPlayingKey()]->getX();
+        int octave = particles[getCurrentlyPlayingKey()]->getOctave();
+        double transpOffset = (currentMidiNoteNumber - getCurrentlyPlayingKey()) * 100.;
+        double midi = Utilities::clip(0, ftom(Utilities::centsToFreq((x + transpOffset) - 1200.0 * octave),
+                                              tuning->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
+        
+        midi += (tuning->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
+                 tuning->getTuning()->aPrep->getFundamentalOffset());
+        
+        //DBG("BKPianoSamplerVoice::updatePitch :" + String(midi));
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
                             sound->sourceSampleRate *

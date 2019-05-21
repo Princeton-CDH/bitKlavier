@@ -708,7 +708,7 @@ void TuningViewController::paint (Graphics& g)
             float cya = centery + sinf(radians) * radius * midiScale;
             
             Particle* b = s->getB();
-            if(springsOn) midi = Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())));
+            if(springsOn) midi = ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())), tuning->getGlobalTuningReference());
             else {
                 midi = tuning->getOffset(b->getNote(), false);
                 midi += b->getNote();
@@ -716,7 +716,8 @@ void TuningViewController::paint (Graphics& g)
             
             scalex = ((midi - 60.0f) / 12.0f);
             
-            midiScale = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave()))), 128);
+            midiScale = Utilities::clip(0, ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())),
+                                            tuning->getGlobalTuningReference()), 128);
             midiScale += ((b->getOctave() - 5) * 12.0);
             midiScale /= 60.;
             
@@ -758,7 +759,8 @@ void TuningViewController::paint (Graphics& g)
         {
             // DRAW PARTICLE IN MOTION
             if(springsOn) {
-                midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave()))), 128);
+                midi = Utilities::clip(0, ftom(Utilities::centsToFreq(p->getX() - (1200.0 * p->getOctave())),
+                                               tuning->getGlobalTuningReference()), 128);
                 midi += ((p->getOctave() - 5) * 12.0);
             }
             else {
@@ -767,7 +769,7 @@ void TuningViewController::paint (Graphics& g)
                 midi += p->getNote();
             }
             
-            //DBG("midi = " + String(midi));
+            //DBG(String(100.*(midi - 60.)) + " " + String(mtof(midi)));
             midiScale = midi / 60.;
             
             //int cents = roundToInt(((midi - (float)p->getNote())) * 100.0);
@@ -796,7 +798,8 @@ void TuningViewController::paint (Graphics& g)
         }
         
         //DRAW REST PARTICLE
-        midi = Utilities::clip(0, Utilities::ftom(Utilities::centsToFreq(p->getRestX() - (1200.0 * p->getOctave()))), 128);
+        midi = Utilities::clip(0, ftom(Utilities::centsToFreq(p->getRestX() - (1200.0 * p->getOctave())),
+                                       tuning->getGlobalTuningReference()), 128);
         midi += ((p->getOctave() - 5) * 12.0);
         
         if(midi > 20 && midi < 109) {
@@ -1484,6 +1487,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             for (auto b : springModeButtons)    b->setVisible(false);
             fundamentalSetsTether.setVisible(false);
+            prep->getSpringTuning()->setFundamentalSetsTether(false);
+            active->getSpringTuning()->setFundamentalSetsTether(false);
             tetherWeightGlobalSlider->setVisible(false);
             tetherWeightSecondaryGlobalSlider->setVisible(false);
             currentFundamental.setVisible(false);
@@ -1708,32 +1713,34 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     
     if(slider == offsetSlider) {
-        //DBG("got offset " + String(val));
+        DBG("got offset " + String(val));
         prep->setFundamentalOffset(val * 0.01);
         active->setFundamentalOffset(val * 0.01);
     }
     else if(slider == A1ClusterThresh) {
-        //DBG("got A1ClusterThresh " + String(val));
+        DBG("got A1ClusterThresh " + String(val));
         prep->setAdaptiveClusterThresh(val);
         active->setAdaptiveClusterThresh(val);
     }
     else if(slider == A1ClusterMax) {
-        //DBG("got A1ClusterMax " + String(val));
+        DBG("got A1ClusterMax " + String(val));
         prep->setAdaptiveHistory(val);
         active->setAdaptiveHistory(val);
     }
     else if(slider == nToneSemitoneWidthSlider) {
-        //DBG("got nToneSemiToneSliderWidth " + String(val));
+        DBG("got nToneSemiToneSliderWidth " + String(val));
         prep->setNToneSemitoneWidth(val);
         active->setNToneSemitoneWidth(val);
     }
     else if (slider == rateSlider)
     {
+        DBG("got rateSlider " + String(val));
         prep->getSpringTuning()->setRate(val, false);
         active->getSpringTuning()->setRate(val);
     }
     else if (slider == dragSlider)
     {
+        DBG("got dragSlider " + String(val));
         double newval = dt_asymwarp(val, 100.);
         //DBG("warped = " + String(newval) + " inverted = " + String(dt_asymwarp_inverse(newval, 100.)));
         prep->getSpringTuning()->setDrag(1. - newval);
@@ -1741,21 +1748,25 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     }
     else if (slider == tetherStiffnessSlider)
     {
+        DBG("got tetherStiffnessSlider " + String(val));
         prep->getSpringTuning()->setTetherStiffness(val);
         active->getSpringTuning()->setTetherStiffness(val);
     }
     else if (slider == intervalStiffnessSlider)
     {
+        DBG("got intervalStiffnessSlider " + String(val));
         prep->getSpringTuning()->setIntervalStiffness(val);
         active->getSpringTuning()->setIntervalStiffness(val);
     }
     else if (slider == tetherWeightGlobalSlider)
     {
+        DBG("got tetherWeightGlobalSlider " + String(val));
         prep->getSpringTuning()->setTetherWeightGlobal(val);
         active->getSpringTuning()->setTetherWeightGlobal(val);
     }
     else if (slider == tetherWeightSecondaryGlobalSlider)
     {
+        DBG("got tetherWeightGlobalSlider " + String(val));
         prep->getSpringTuning()->setTetherWeightSecondaryGlobal(val);
         active->getSpringTuning()->setTetherWeightSecondaryGlobal(val);
     }
