@@ -43,10 +43,13 @@ void SpringTuning::copy(SpringTuning::Ptr st)
     setTetherWeights(st->getTetherWeights());
     
     setIntervalFundamental(st->getIntervalFundamental());
+    //setUsingFundamentalForIntervalSprings(st->getUsingFundamentalForIntervalSprings());
     
     setFundamentalSetsTether(st->getFundamentalSetsTether());
     setTetherWeightGlobal(st->getTetherWeightGlobal());
     setTetherWeightSecondaryGlobal(st->getTetherWeightSecondaryGlobal());
+    
+    
 
 }
 

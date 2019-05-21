@@ -534,6 +534,27 @@ void TuningModification::setStateOld(XmlElement* e)
         setDirty(TuningSpringIntervalStiffness);
     }
     
+    p = e->getStringAttribute( "tetherWeightGlobal");
+    if (p != "")
+    {
+        getSpringTuning()->setTetherWeightGlobal(p.getDoubleValue());
+        setDirty(TuningTetherWeightGlobal);
+    }
+    
+    p = e->getStringAttribute( "tetherWeightGlobal2");
+    if (p != "")
+    {
+        getSpringTuning()->setTetherWeightSecondaryGlobal(p.getDoubleValue());
+        setDirty(TuningTetherWeightGlobal2);
+    }
+    
+    p = e->getStringAttribute( "fundamentalSetsTether");
+    if (p != "")
+    {
+        getSpringTuning()->setFundamentalSetsTether((bool)p.getIntValue());
+        setDirty(TuningFundamentalSetsTether);
+    }
+    
     p = e->getStringAttribute( ptagTuning_rate);
     if (p != "")
     {

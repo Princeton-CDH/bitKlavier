@@ -695,9 +695,15 @@ typedef enum TuningParameterType
     TuningSpringIntervalScale,
     TuningSpringIntervalFundamental,
     TuningAdaptiveSystem,
+    TuningTetherWeightGlobal,
+    TuningTetherWeightGlobal2,
+    TuningFundamentalSetsTether,
     TuningParameterTypeNil
     
 } TuningParameterType;
+
+// ~~ ~ ! ! ! ! ! ~ ~ ~ 
+// HAVE TO INTEGRATE TETHER WEIGHT GLOBAL AND FUND SETS TETHER BUTTON PARAMS AS MODS
 
 static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKInt,
@@ -727,6 +733,9 @@ static const std::vector<BKParameterDataType> cTuningDataTypes = {
     BKInt,
     BKInt,
     BKInt,
+    BKFloat,
+    BKFloat,
+    BKInt
 };
 
 static const std::vector<std::string> cTuningParameterTypes = {
@@ -756,7 +765,10 @@ static const std::vector<std::string> cTuningParameterTypes = {
     "SpringIntervalWeights",
     "SpringIntervalScale",
     "SpringIntervalFundamental",
-    "SpringAdaptiveSystem"
+    "SpringAdaptiveSystem",
+    "SpringGlobalWeight",
+    "SpringGlobalWeight2",
+    "FundamentalSetsTether"
 };
 
 

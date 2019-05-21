@@ -99,7 +99,7 @@ PopupMenu BKViewController::getModOptionMenu(BKPreparationType type)
     optionMenu.addItem(7, "Export");
     optionMenu.addSubMenu("Import...", getExportedPrepsMenu(type));
     optionMenu.addSeparator();
-    optionMenu.addItem(5, "Clear");
+    optionMenu.addItem(5, "Reset");
 
     return optionMenu;
 }
