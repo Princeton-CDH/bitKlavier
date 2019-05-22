@@ -179,6 +179,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         double transpOffset = (currentMidiNoteNumber - getCurrentlyPlayingKey()) * 100.;
         double midi = Utilities::clip(0, ftom(Utilities::centsToFreq((x + transpOffset) - 1200.0 * octave),
                                               tuning->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
+        //need to update centsToFreq to be movable to other As, non-440
         
         midi += (tuning->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
                  tuning->getTuning()->aPrep->getFundamentalOffset());
