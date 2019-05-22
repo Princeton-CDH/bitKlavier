@@ -53,7 +53,7 @@ public:
     
     inline void reset(void)
     {
-        for (auto b : dirty) b = false;
+        for (int i = 0; i < dirty.size(); i++) dirty.setUnchecked(i, false);
     }
     
     inline bool getDirty(int param)

@@ -575,7 +575,7 @@ public:
 
         for (auto p : modTuning)
         {
-            if (p->getId() == Id)   return p;
+            if (p->TuningModification::getId() == Id)   return p;
         }
         return nullptr;
     }
@@ -585,7 +585,7 @@ public:
 
         for (auto p : modTempo)
         {
-            if (p->getId() == Id)   return p;
+            if (p->TempoModification::getId() == Id)   return p;
         }
         return nullptr;
     }
