@@ -56,6 +56,15 @@ typedef enum BKMultiSliderType {
     BKMultiSliderTypeNil
 } BKMultiSliderType;
 
+
+/*
+ WantsBigOne
+ The key here is that it is for setting parameters via keyboard in iOS rather than through sliders. Classes that inherit from WantsBigOne send notifications to their parent class that they will require them to display the special numeric keyboards that we provide for typing in numbers (decimal or integer) in bitKlavier iOS.
+ 
+ Classes that inherit from WantsBigOne::Listener receive notifications from the above-described WantsBigOne UI components through a virtual callback ( iWantTheBigOne ) that they must implement and which must display the big text input keyboard called "bigOne."
+ 
+ So, the new sliders should all still work as you describe, but if you tap on the text boxes which display their current values, they may not display the "bigOne" for keyboard input.
+ */
 class WantsBigOne
 {
 public:
