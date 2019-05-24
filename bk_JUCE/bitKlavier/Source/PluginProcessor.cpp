@@ -295,7 +295,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 #if JUCE_IOS
     stk::Stk::setSampleRate(sampleRate);
 #endif
-    //stk::Stk::setSampleRate(sampleRate); //crashes Logic Audio Unit Validation Tool
+    stk::Stk::setSampleRate(sampleRate); //crashes Logic Audio Unit Validation Tool
     
     mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
     hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
