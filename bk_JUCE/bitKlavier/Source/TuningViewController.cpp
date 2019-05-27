@@ -256,6 +256,11 @@ showSprings(false)
     customKeyboard.addWantsBigOneListener(this);
     
     nToneSemitoneWidthSlider->addWantsBigOneListener(this);
+    
+    intervalStiffnessSlider->addWantsBigOneListener(this);
+    tetherStiffnessSlider->addWantsBigOneListener(this);
+    tetherWeightGlobalSlider->addWantsBigOneListener(this);
+    tetherWeightSecondaryGlobalSlider->addWantsBigOneListener(this);
 #endif
     
     currentTab = 0;
@@ -573,11 +578,18 @@ void TuningViewController::displayTab(int tab)
                                         springScaleCB.getY(),
                                         adaptiveSystemsCB.getWidth() - gXSpacing,
                                         gComponentComboBoxHeight);
-        
+
+#if JUCE_IOS
+        intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
+                                           rateSlider->getBottom() + gYSpacing,
+                                           rateSlider->getWidth() * 1.25,
+                                           gComponentSingleSliderHeight);
+#else
         intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
                                            rateSlider->getBottom() + gYSpacing,
                                            rateSlider->getWidth(),
                                            gComponentSingleSliderHeight);
+#endif
         
         tetherStiffnessSlider->setBounds(fundamentalCB.getRight() - intervalStiffnessSlider->getWidth() - rightArrow.getWidth() * 0.5,
                                          intervalStiffnessSlider->getY(),
@@ -1114,7 +1126,7 @@ void TuningViewController::timerCallback(void)
                         
                         tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + gXSpacing,
                                                    tetherSliders[i]->getY(),
-                                                   30,
+                                                   45,
                                                    sliderHeight);
                         
                         tetherLabels[i]->setText(Utilities::getNoteString(i), dontSendNotification);
