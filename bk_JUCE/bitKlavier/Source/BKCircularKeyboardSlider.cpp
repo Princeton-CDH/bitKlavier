@@ -62,6 +62,8 @@ ratio(1.0)
     keyboardValsTextFieldOpen.setButtonText("edit all");
     keyboardValsTextFieldOpen.setTooltip("click drag on keys to set offsets in cents by key, or press 'edit all' to edit as text");
     addAndMakeVisible(keyboardValsTextFieldOpen);
+    
+    
 }
 
 void BKCircularKeyboardSlider::paint (Graphics& g)

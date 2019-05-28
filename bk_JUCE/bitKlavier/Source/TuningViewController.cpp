@@ -256,6 +256,13 @@ showSprings(false)
     customKeyboard.addWantsBigOneListener(this);
     
     nToneSemitoneWidthSlider->addWantsBigOneListener(this);
+    
+    rateSlider->addWantsBigOneListener(this);
+    dragSlider->addWantsBigOneListener(this);
+    tetherStiffnessSlider->addWantsBigOneListener(this);
+    intervalStiffnessSlider->addWantsBigOneListener(this);
+    tetherWeightGlobalSlider->addWantsBigOneListener(this);
+    tetherWeightSecondaryGlobalSlider->addWantsBigOneListener(this);
 #endif
     
     currentTab = 0;
@@ -573,7 +580,19 @@ void TuningViewController::displayTab(int tab)
                                         springScaleCB.getY(),
                                         adaptiveSystemsCB.getWidth() - gXSpacing,
                                         gComponentComboBoxHeight);
+#if JUCE_IOS
+        intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
+                                           rateSlider->getBottom() + gYSpacing,
+                                           rateSlider->getWidth() + 50,
+                                           gComponentSingleSliderHeight);
         
+
+        tetherStiffnessSlider->setBounds(fundamentalCB.getRight() - intervalStiffnessSlider->getWidth() -
+                                         rightArrow.getWidth() * 0.5,
+                                         intervalStiffnessSlider->getY(),
+                                         intervalStiffnessSlider->getWidth(),
+                                         gComponentSingleSliderHeight);
+#else
         intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
                                            rateSlider->getBottom() + gYSpacing,
                                            rateSlider->getWidth(),
@@ -583,6 +602,8 @@ void TuningViewController::displayTab(int tab)
                                          intervalStiffnessSlider->getY(),
                                          intervalStiffnessSlider->getWidth(),
                                          gComponentSingleSliderHeight);
+#endif
+        
         
         tetherWeightGlobalSlider->setBounds(tetherStiffnessSlider->getX(),
                                             tetherStiffnessSlider->getBottom() + gYSpacing,
@@ -1016,7 +1037,10 @@ void TuningViewController::updateComponentVisibility(void)
 void TuningViewController::iWantTheBigOne(TextEditor* tf, String name)
 {
     hideOrShow.setAlwaysOnTop(false);
+    rightArrow.setAlwaysOnTop(false);
+    leftArrow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
+    
 }
 #endif
 

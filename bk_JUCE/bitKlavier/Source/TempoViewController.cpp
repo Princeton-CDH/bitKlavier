@@ -237,6 +237,8 @@ void TempoViewController::updateComponentVisibility()
 void TempoViewController::iWantTheBigOne(TextEditor* tf, String name)
 {
     hideOrShow.setAlwaysOnTop(false);
+    rightArrow.setAlwaysOnTop(false);
+    leftArrow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
 }
 #endif

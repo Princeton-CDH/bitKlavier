@@ -580,6 +580,8 @@ void SynchronicViewController::iWantTheBigOne(TextEditor* tf, String name)
     rightArrow.setAlwaysOnTop(false);
     leftArrow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
+    
+    
 }
 #endif
 

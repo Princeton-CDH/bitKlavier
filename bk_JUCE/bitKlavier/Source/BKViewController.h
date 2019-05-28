@@ -249,6 +249,7 @@ public:
     inline void hide(void)
     {
         listeners.call(&BigOne::Listener::bigOneDismissed);
+        
         setVisible(false);
     }
     
@@ -260,6 +261,7 @@ protected:
     Label bigOneLabel;
     
 private:
+    
     ListenerList<BigOne::Listener> listeners;
     
     BKAudioProcessor& processor;
