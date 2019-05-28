@@ -71,6 +71,7 @@ public:
         }
     }
     
+    //don't use these! use from regular utilities, which take into account variable A ref tunings
     static double ftom(double f)
     {
         if (f < 0.0) f = 0.0;

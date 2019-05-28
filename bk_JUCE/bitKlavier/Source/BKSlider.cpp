@@ -144,7 +144,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
         sliderHeight = 60;
     }
     
-    displaySliderWidth = 50;
+    displaySliderWidth = 80;
     
     clickedHeight = 0.;
     

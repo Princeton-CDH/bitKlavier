@@ -103,6 +103,7 @@ BKViewController(p, theGraph, 3)
     addAndMakeVisible(keyOnResetToggle);
     
     keyOnResetLabel.setText("key-on reset:", dontSendNotification);
+    keyOnResetLabel.setJustificationType(Justification::centredRight);
     addAndMakeVisible(keyOnResetLabel);
     
     
@@ -176,7 +177,9 @@ void NostalgicViewController::displayShared(void)
     float dim = lengthModeSelectCB.getHeight();
     keyOnResetToggle.setBounds(lengthModeSelectCB.getX() - (dim + gXSpacing), lengthModeSelectCB.getY(), dim, dim);
     keyOnResetToggle.changeWidthToFitText();
-    keyOnResetLabel.setBounds(keyOnResetToggle.getX() - 100, keyOnResetToggle.getY(), 100, dim);
+    keyOnResetLabel.setBounds(keyOnResetToggle.getX() - 200, keyOnResetToggle.getY(), 200, dim);
+    
+    actionButton.toFront(false);
     
     leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
     rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);

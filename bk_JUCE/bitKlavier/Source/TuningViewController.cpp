@@ -261,6 +261,7 @@ showSprings(false)
     dragSlider->addWantsBigOneListener(this);
     tetherStiffnessSlider->addWantsBigOneListener(this);
     intervalStiffnessSlider->addWantsBigOneListener(this);
+
     tetherWeightGlobalSlider->addWantsBigOneListener(this);
     tetherWeightSecondaryGlobalSlider->addWantsBigOneListener(this);
 #endif
@@ -592,6 +593,7 @@ void TuningViewController::displayTab(int tab)
                                          intervalStiffnessSlider->getY(),
                                          intervalStiffnessSlider->getWidth(),
                                          gComponentSingleSliderHeight);
+
 #else
         intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
                                            rateSlider->getBottom() + gYSpacing,
@@ -1138,7 +1140,7 @@ void TuningViewController::timerCallback(void)
                         
                         tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + gXSpacing,
                                                    tetherSliders[i]->getY(),
-                                                   30,
+                                                   45,
                                                    sliderHeight);
                         
                         tetherLabels[i]->setText(Utilities::getNoteString(i), dontSendNotification);
