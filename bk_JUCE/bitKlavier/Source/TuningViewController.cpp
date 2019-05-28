@@ -240,7 +240,7 @@ showSprings(false)
     addAndMakeVisible(lastNote);
     addAndMakeVisible(lastInterval);
     
-    currentFundamental.setJustificationType(juce::Justification::centredRight);
+    //currentFundamental.setJustificationType(juce::Justification::centredRight);
     addAndMakeVisible(currentFundamental);
     
     actionButton.setButtonText("Action");
@@ -641,7 +641,7 @@ void TuningViewController::displayTab(int tab)
         }
         
         
-        currentFundamental.setBounds(currentFundamental.getX(),
+        currentFundamental.setBounds(springScaleCB.getX(),
                                      springSliders[0]->getY(),
                                      currentFundamental.getWidth(),
                                      currentFundamental.getHeight()  );
