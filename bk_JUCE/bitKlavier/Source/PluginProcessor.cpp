@@ -147,7 +147,7 @@ loader(*this)
     gComponentRangeSliderHeight = heightUnit * 1.25f;
     gComponentSingleSliderHeight = heightUnit * 1.25f;
     gComponentSingleSliderHeight = heightUnit* 1.1;
-    //gComponentStackedSliderHeight = heightUnit * 1.25f;
+    gComponentStackedSliderHeight = heightUnit * 1.25f;
 
 #endif
     
