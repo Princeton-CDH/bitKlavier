@@ -1184,6 +1184,8 @@ sliderIncrement(increment)
     displaySlider->setLookAndFeel(&displaySliderLookAndFeel);
     displaySlider->setInterceptsMouseClicks(false, false);
     addAndMakeVisible(displaySlider);
+    
+    sliderTextResolution = -1;
 
 }
 
@@ -1210,7 +1212,8 @@ void BKSingleSlider::sliderValueChanged (Slider *slider)
                        getName(),
                        thisSlider.getValue());
         
-        valueTF.setText(String(thisSlider.getValue()), dontSendNotification);
+        if(sliderTextResolution < 0) valueTF.setText(String(thisSlider.getValue()), dontSendNotification);
+        else valueTF.setText(String(thisSlider.getValue(), sliderTextResolution), dontSendNotification);
     }
 }
 
@@ -1364,6 +1367,12 @@ void BKSingleSlider::setValue(double newval, NotificationType notify)
     valueTF.setText(String(thisSlider.getValue()), notify);
 }
 
+void BKSingleSlider::setValue(double newval, int numDecimalPoints, NotificationType notify)
+{
+    checkValue(newval);
+    thisSlider.setValue(newval, notify);
+    valueTF.setText(String(thisSlider.getValue(), numDecimalPoints), notify);
+}
 
 
 // ******************************************************************************************************************** //

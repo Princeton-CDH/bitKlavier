@@ -138,13 +138,16 @@ loader(*this)
     fontHeight = screenHeight * 0.025f;
     fontHeight = (fontHeight < 13) ? 13 : fontHeight;
     
-    gComponentComboBoxHeight = heightUnit;
+    //gComponentComboBoxHeight = heightUnit;
+    gComponentComboBoxHeight = heightUnit * 0.85;
     gComponentLabelHeight = heightUnit * 0.75f;
-    gComponentTextFieldHeight = heightUnit * 0.75f;
+    //gComponentTextFieldHeight = heightUnit * 0.75f;
+    gComponentTextFieldHeight = heightUnit * 0.6f;
     
     gComponentRangeSliderHeight = heightUnit * 1.25f;
     gComponentSingleSliderHeight = heightUnit * 1.25f;
-    gComponentStackedSliderHeight = heightUnit * 1.25f;
+    gComponentSingleSliderHeight = heightUnit* 1.1;
+    //gComponentStackedSliderHeight = heightUnit * 1.25f;
 
 #endif
     

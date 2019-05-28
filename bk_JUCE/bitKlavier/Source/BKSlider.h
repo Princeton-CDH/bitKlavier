@@ -267,6 +267,7 @@ public:
     }
     
     void setValue(double newval, NotificationType notify);
+    void setValue(double newval, int numDecimalPoints, NotificationType notify);
     void checkValue(double newval);
     double getValue() {return thisSlider.getValue();}
     
@@ -286,6 +287,8 @@ public:
     
     void setSkewFactor (double factor, bool symmetricSkew) { thisSlider.setSkewFactor(factor, symmetricSkew); }
     void setSkewFactorFromMidPoint (double sliderValueToShowAtMidPoint    ) { thisSlider.setSkewFactorFromMidPoint(sliderValueToShowAtMidPoint); }
+    
+    void setSliderTextResolution(int res) {sliderTextResolution = res;}
     
     class Listener
     {
@@ -310,6 +313,7 @@ private:
     double sliderMin, sliderMax;
     double sliderDefault;
     double sliderIncrement;
+    int sliderTextResolution;
     
     bool focusLostByEscapeKey;
     

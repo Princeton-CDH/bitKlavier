@@ -83,6 +83,7 @@ showSprings(false)
     dragSlider->setJustifyRight(false);
     dragSlider->displaySliderVisible(false);
     dragSlider->setToolTipString("frictional component in spring model");
+    dragSlider->setSliderTextResolution(2);
     addChildComponent(dragSlider);
     
     tetherStiffnessSlider = new BKSingleSlider("anchor stiff", 0., 1., 0.5, 0.0001);
@@ -583,13 +584,13 @@ void TuningViewController::displayTab(int tab)
                                         gComponentComboBoxHeight);
 #if JUCE_IOS
         intervalStiffnessSlider->setBounds(selectCB.getX() - gComponentSingleSliderXOffset,
-                                           rateSlider->getBottom() + gYSpacing,
+                                           //rateSlider->getBottom() + gYSpacing,
+                                           rateSlider->getBottom(),
                                            rateSlider->getWidth() + 50,
                                            gComponentSingleSliderHeight);
         
 
-        tetherStiffnessSlider->setBounds(fundamentalCB.getRight() - intervalStiffnessSlider->getWidth() -
-                                         rightArrow.getWidth() * 0.5,
+        tetherStiffnessSlider->setBounds(fundamentalCB.getRight() - intervalStiffnessSlider->getWidth() - rightArrow.getWidth() * 0.5,
                                          intervalStiffnessSlider->getY(),
                                          intervalStiffnessSlider->getWidth(),
                                          gComponentSingleSliderHeight);
@@ -617,13 +618,15 @@ void TuningViewController::displayTab(int tab)
                                             tetherStiffnessSlider->getWidth(),
                                             tetherStiffnessSlider->getHeight());
         
-        //float sliderHeight = (absoluteKeyboard.getBottom() - (rateSlider->getBottom() + gYSpacing)) / 13.;
-        float sliderHeight = (getBounds().getBottom() - (rateSlider->getBottom() + 2*gYSpacing)) / 13.;
+
+        //float sliderHeight = (getBounds().getBottom() - (rateSlider->getBottom() + 2*gYSpacing)) / 13.;
+        float sliderHeight = (getBounds().getBottom() - (intervalStiffnessSlider->getBottom() + 2*gYSpacing)) / 12.;
         
         for (int i = 0; i < 12; i++)
         {
             springLabels[i]->setBounds(selectCB.getX(),
-                                       intervalStiffnessSlider->getBottom() + (sliderHeight) * (11 - i) - gYSpacing,
+                                       //intervalStiffnessSlider->getBottom() + (sliderHeight) * (11 - i) - gYSpacing,
+                                       intervalStiffnessSlider->getBottom() + (sliderHeight) * (11 - i),
                                        hideOrShow.getWidth(),
                                        sliderHeight);
             springSliders[i]->setBounds(springLabels[i]->getRight() + 2,
@@ -1624,7 +1627,7 @@ void TuningPreparationEditor::update(void)
 
         //dragSlider->setValue(  //must remember to use dt_asym_inversion on 1 - val)
         double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
-        dragSlider->setValue(newval, dontSendNotification);
+        dragSlider->setValue(newval, 2, dontSendNotification);
         
         
         
