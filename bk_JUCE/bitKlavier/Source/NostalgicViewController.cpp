@@ -100,10 +100,12 @@ BKViewController(p, theGraph, 3)
     undertowADSRLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(&undertowADSRLabel, ALL);
     
+    keyOnResetToggle.setTooltip("interrupts currently sounding nostalgic notes of the same pitch");
     addAndMakeVisible(keyOnResetToggle);
     
     keyOnResetLabel.setText("key-on reset:", dontSendNotification);
     keyOnResetLabel.setJustificationType(Justification::centredRight);
+    keyOnResetLabel.setTooltip("interrupts currently sounding nostalgic notes of the same pitch");
     addAndMakeVisible(keyOnResetLabel);
     
     
