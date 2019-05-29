@@ -1028,15 +1028,10 @@ public:
             beatMultiplierCounter = 0;
         }
         
-        if (beatCounter > prep->getNumBeats())
+        if (++beatCounter >= prep->getNumBeats())
         {
             shouldPlay = false;
         }
-        
-        beatCounter++;
-        
-        
-        
     }
     
     inline void resetPhase()

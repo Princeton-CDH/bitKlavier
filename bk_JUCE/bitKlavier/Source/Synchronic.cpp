@@ -160,6 +160,16 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     if (!velocityCheck(noteNumber)) return;
     
+    // Remove old clusters 
+    for (int i = clusters.size(); --i >= 0; )
+    {
+        if (!clusters[i]->getShouldPlay() && !inCluster)
+        {
+            clusters.remove(i);
+            continue;
+        }
+    }
+    
     //cluster management
     if (prep->getOnOffMode() == KeyOn)
     {
@@ -263,6 +273,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
         //repeated notes to push older notes out the back.
         //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
         cluster->addNote(noteNumber);
+        DBG("cluster: " + intArrayToString(cluster->getCluster()));
         
         //reset the timer for time between notes
         clusterThresholdTimer = 0;
@@ -356,7 +367,10 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             
             //remove duplicates from cluster, so we don't play the same note twice in a single pulse
             slimCluster.clearQuick();
-            for(int i = 0; i< tempCluster.size(); i++) slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
+            for(int i = 0; i< tempCluster.size(); i++)
+            {
+                slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
+            }
             
             //get time until next beat => beat length scaled by beatMultiplier parameter
             

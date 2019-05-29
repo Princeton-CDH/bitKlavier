@@ -44,7 +44,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
             synthOffset     -= (int)offset;
         }
         
-        DBG("DirectProcessor::keyPressed noteNumber, synthNoteNumber, synthOffset " + String(noteNumber) + " " + String(synthNoteNumber) + " " + String(synthOffset));
+        //DBG("DirectProcessor::keyPressed noteNumber, synthNoteNumber, synthOffset " + String(noteNumber) + " " + String(synthNoteNumber) + " " + String(synthOffset));
         synth->keyOn(channel,
                      noteNumber,
                      synthNoteNumber,
