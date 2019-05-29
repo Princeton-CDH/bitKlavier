@@ -135,6 +135,7 @@ void NostalgicViewController::invisible(void)
     transpositionSlider->setVisible(false);
     nDisplaySlider.setVisible(false);
     
+    
     holdTimeMinMaxSlider->setVisible(false);
     velocityMinMaxSlider->setVisible(false);
     clusterMinSlider->setVisible(false);
@@ -334,8 +335,17 @@ void NostalgicViewController::setShowADSR(String name, bool newval)
     }
     else
     {
-        if(lengthModeSelectCB.getSelectedId() == 0) lengthMultiplierSlider->setVisible(true);
-        else beatsToSkipSlider->setVisible(true);
+        if (currentTab == 0)
+        {
+            if (lengthModeSelectCB.getSelectedId() == 0)
+            {
+                lengthMultiplierSlider->setVisible(true);
+            }
+            else
+            {
+                beatsToSkipSlider->setVisible(true);
+            }
+        }
         
         gainSlider->setVisible(true);
         transpositionSlider->setVisible(true);
@@ -582,15 +592,19 @@ void NostalgicPreparationEditor::update(void)
         beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
         gainSlider->setValue(prep->getGain(), dontSendNotification);
         
-        if(prep->getMode() == NoteLengthSync)
+        if (currentTab == 0)
         {
-            lengthMultiplierSlider->setVisible(true);
-            beatsToSkipSlider->setVisible(false);
-        }
-        else
-        {
-            lengthMultiplierSlider->setVisible(false);
-            beatsToSkipSlider->setVisible(true);
+            if(prep->getMode() == NoteLengthSync)
+            {
+                
+                lengthMultiplierSlider->setVisible(true);
+                beatsToSkipSlider->setVisible(false);
+            }
+            else
+            {
+                lengthMultiplierSlider->setVisible(false);
+                beatsToSkipSlider->setVisible(true);
+            }
         }
         
         reverseADSRSlider->setAttackValue(prep->getReverseAttack(), dontSendNotification);
@@ -1079,17 +1093,21 @@ void NostalgicModificationEditor::update(void)
         NostalgicSyncMode mode = (NostalgicSyncMode) mod->getMode();
         lengthModeSelectCB.setSelectedItemIndex(mode, dontSendNotification);
         
-        if(mode == NoteLengthSync)
+        if (currentTab == 0)
         {
-            lengthMultiplierSlider->setVisible(true);
-            beatsToSkipSlider->setVisible(false);
-        }
-        else
-        {
-            lengthMultiplierSlider->setVisible(false);
-            beatsToSkipSlider->setVisible(true);
-        }
+            if(mode == NoteLengthSync)
+            {
+                lengthMultiplierSlider->setVisible(true);
+                beatsToSkipSlider->setVisible(false);
+            }
+            else
+            {
+                lengthMultiplierSlider->setVisible(false);
+                beatsToSkipSlider->setVisible(true);
+            }
 
+        }
+        
         transpositionSlider->setTo(mod->getTransposition(), dontSendNotification);
         
         lengthMultiplierSlider->setValue(mod->getLengthMultiplier(), dontSendNotification);
@@ -1341,16 +1359,20 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         mod->setMode(mode);
         mod->setDirty(NostalgicMode);
         
-        if(mode == NoteLengthSync)
+        if (currentTab == 0)
         {
-            lengthMultiplierSlider->setVisible(true);
-            beatsToSkipSlider->setVisible(false);
+            if(mode == NoteLengthSync)
+            {
+                lengthMultiplierSlider->setVisible(true);
+                beatsToSkipSlider->setVisible(false);
+            }
+            else
+            {
+                lengthMultiplierSlider->setVisible(false);
+                beatsToSkipSlider->setVisible(true);
+            }
         }
-        else
-        {
-            lengthMultiplierSlider->setVisible(false);
-            beatsToSkipSlider->setVisible(true);
-        }
+        
         
         updateModification();
         lengthModeSelectCB.setAlpha(1.);

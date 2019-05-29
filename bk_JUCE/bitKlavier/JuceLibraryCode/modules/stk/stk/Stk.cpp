@@ -82,12 +82,8 @@ void Stk :: setSampleRate( StkFloat rate )
     StkFloat oldRate = srate_;
     srate_ = rate;
 
-    /*
     for ( unsigned int i=0; i<alertList_.size(); i++ )
       alertList_[i]->sampleRateChanged( srate_, oldRate );
-    */
-      //we are setting sampleRates individually for Stk class, not sure why this is crashing Logic
- 
   }
 }
 
