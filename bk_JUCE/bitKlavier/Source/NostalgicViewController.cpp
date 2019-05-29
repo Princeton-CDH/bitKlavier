@@ -1373,7 +1373,6 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
             }
         }
         
-        
         updateModification();
         lengthModeSelectCB.setAlpha(1.);
         
