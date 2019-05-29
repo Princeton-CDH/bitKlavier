@@ -970,7 +970,6 @@ public:
         phasor = 0;
         envelopeCounter = 0;
         shouldPlay = false;
-        over = false;
         
         SynchronicSyncMode mode = prep->getMode();
         
@@ -1022,9 +1021,22 @@ public:
             if (envelopeCounter >= prep->getEnvelopesOn().size()) envelopeCounter = 0;
         }
         
-        //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
-        if (++beatMultiplierCounter >= prep->getBeatMultipliers().size()) beatMultiplierCounter = 0;
-        if (++beatCounter >= prep->getNumBeats()) { over = true; shouldPlay = false; } //done with pulses
+        
+        if (++beatMultiplierCounter >= prep->getBeatMultipliers().size())
+        {
+            //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
+            beatMultiplierCounter = 0;
+        }
+        
+        if (beatCounter > prep->getNumBeats())
+        {
+            shouldPlay = false;
+        }
+        
+        beatCounter++;
+        
+        
+        
     }
     
     inline void resetPhase()
@@ -1225,7 +1237,6 @@ private:
     bool inCluster;
     uint64 clusterThresholdSamples;
     uint64 clusterThresholdTimer;
-    uint64 clusterTimer;
     Array<int> slimCluster;     //cluster without repetitions
     
     SynchronicCluster::PtrArr clusters;

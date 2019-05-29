@@ -28,9 +28,7 @@ tempo(tempo)
         velocities.insert(i, 0.);
         holdTimers.insert(i, 0);
     }
-    
-    clusterTimer = 0;
-     
+
     inCluster = false;
     
     keysDepressed = Array<int>();
@@ -103,6 +101,9 @@ bool SynchronicProcessor::velocityCheck(int noteNumber)
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
     int velocity = (int)(velocities.getUnchecked(noteNumber) * 128.0);
+    
+    if (velocity > 127) velocity = 127;
+    if (velocity < 0)   velocity = 0;
 
     if(prep->getVelocityMin() <= prep->getVelocityMax())
     {
@@ -171,12 +172,6 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
             // phasor = 0;
             //clear cluster
             // cluster.clearQuick();
-            DBG("cluster size: " + String(clusters.size()));
-            
-            if (clusters.size() >= prep->getNumClusters())
-            {
-                clusters.remove(0); // remove first (oldest) cluster
-            }
             
             cluster = new SynchronicCluster(prep);
             clusters.add(cluster);
@@ -195,6 +190,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
             {
                 clusters.getLast()->setPhasor(0);
                 clusters.getLast()->resetPhase();
+                clusters.getLast()->setShouldPlay(true);
             }
         }
         
@@ -256,6 +252,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             {
                 clusters.getLast()->setPhasor(0);
                 clusters.getLast()->resetPhase();
+                clusters.getLast()->setShouldPlay(true);
             }
         }
         
@@ -336,100 +333,92 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     {
         SynchronicCluster::Ptr cluster = clusters.getUnchecked(i);
     
-        if (cluster->getOver()) // check if pulses are done and remove cluster if so
+        if (cluster->getShouldPlay()) // check if pulses are done and remove cluster if so
         {
-            clusters.remove(i);
-            continue;
-        }
-        else
-        {
-            if (cluster->getShouldPlay())
+            Array<int> clusterNotes = cluster->getCluster();
+            
+            //DBG("cluster " + String(i) + ": " + intArrayToString(clusterNotes));
+            
+            //cap size of slimCluster, removing oldest notes
+            Array<int> tempCluster;
+            for(int i = 0; i< clusterNotes.size(); i++) tempCluster.set(i, clusterNotes.getUnchecked(i));
+            if(tempCluster.size() > prep->getClusterCap()) tempCluster.resize(prep->getClusterCap());
+            
+            //why not use clusterMax for this? the intent is different:
+            //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
+            //clusterCap: the most number of notes allowed in a cluster when playing pulses
+            //an example: clusterMax=9, clusterCap=8; playing 9 notes simultaneously will result in cluster with 8 notes, but playing 10 notes will shut off pulse
+            //another example: clusterMax=20, clusterCap=8; play a rapid ascending scale more than 8 and less than 20 notes, then stop; only last 8 notes will be in the cluster. If your scale exceeds 20 notes then it won't play.
+            
+            //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
+            //I used it this way for all of the etudes to date! but might want to expose eventually...
+            //perhaps call beatVoices? since it's essentially the number of "voices" in the pulse chord?
+            
+            //remove duplicates from cluster, so we don't play the same note twice in a single pulse
+            slimCluster.clearQuick();
+            for(int i = 0; i< tempCluster.size(); i++) slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
+            
+            //get time until next beat => beat length scaled by beatMultiplier parameter
+            
+            numSamplesBeat =    beatThresholdSamples *
+            prep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+            general->getPeriodMultiplier() *
+            tempo->getPeriodMultiplier();
+            
+            //check to see if enough time has passed for next beat
+            if (cluster->getPhasor() >= numSamplesBeat)
             {
-                Array<int> clusterNotes = cluster->getCluster();
+                //update display of counters in UI
+                /*
+                 DBG(" samplerate: " + String(sampleRate) +
+                 " length: "         + String(prep->getLengthMultipliers()[lengthMultiplierCounter]) +
+                 " length counter: "  + String(lengthMultiplierCounter) +
+                 " accent: "         + String(prep->getAccentMultipliers()[accentMultiplierCounter]) +
+                 " accent counter: " + String(accentMultiplierCounter) +
+                 " transp: "         + "{ "+floatArrayToString(prep->getTransposition()[transpCounter]) + " }" +
+                 " transp counter: " + String(transpCounter) +
+                 " envelope on: "       + String((int)prep->getEnvelopesOn()[envelopeCounter]) +
+                 " envelope counter: " + String(envelopeCounter) +
+                 " ADSR :" + String(prep->getAttack(envelopeCounter)) + " " + String(prep->getDecay(envelopeCounter)) + " " + String(prep->getSustain(envelopeCounter)) + " " + String(prep->getRelease(envelopeCounter))
+                 );
+                 */
                 
-                //DBG("cluster " + String(i) + ": " + intArrayToString(clusterNotes));
+                //figure out whether to play the cluster
+                bool passCluster = false;
                 
-                //cap size of slimCluster, removing oldest notes
-                Array<int> tempCluster;
-                for(int i = 0; i< clusterNotes.size(); i++) tempCluster.set(i, clusterNotes.getUnchecked(i));
-                if(tempCluster.size() > prep->getClusterCap()) tempCluster.resize(prep->getClusterCap());
-                
-                //why not use clusterMax for this? the intent is different:
-                //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
-                //clusterCap: the most number of notes allowed in a cluster when playing pulses
-                //an example: clusterMax=9, clusterCap=8; playing 9 notes simultaneously will result in cluster with 8 notes, but playing 10 notes will shut off pulse
-                //another example: clusterMax=20, clusterCap=8; play a rapid ascending scale more than 8 and less than 20 notes, then stop; only last 8 notes will be in the cluster. If your scale exceeds 20 notes then it won't play.
-                
-                //for now, we'll leave clusterCap unexposed, just to avoid confusion for the user. after all,
-                //I used it this way for all of the etudes to date! but might want to expose eventually...
-                //perhaps call beatVoices? since it's essentially the number of "voices" in the pulse chord?
-                
-                //remove duplicates from cluster, so we don't play the same note twice in a single pulse
-                slimCluster.clearQuick();
-                for(int i = 0; i< tempCluster.size(); i++) slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
-                
-                //get time until next beat => beat length scaled by beatMultiplier parameter
-                
-                numSamplesBeat =    beatThresholdSamples *
-                prep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
-                general->getPeriodMultiplier() *
-                tempo->getPeriodMultiplier();
-                
-                //check to see if enough time has passed for next beat
-                if (cluster->getPhasor() >= numSamplesBeat)
+                //in the normal case, where cluster is within a range defined by clusterMin and Max
+                if(prep->getClusterMin() <= prep->getClusterMax())
                 {
-                    //update display of counters in UI
-                    /*
-                     DBG(" samplerate: " + String(sampleRate) +
-                     " length: "         + String(prep->getLengthMultipliers()[lengthMultiplierCounter]) +
-                     " length counter: "  + String(lengthMultiplierCounter) +
-                     " accent: "         + String(prep->getAccentMultipliers()[accentMultiplierCounter]) +
-                     " accent counter: " + String(accentMultiplierCounter) +
-                     " transp: "         + "{ "+floatArrayToString(prep->getTransposition()[transpCounter]) + " }" +
-                     " transp counter: " + String(transpCounter) +
-                     " envelope on: "       + String((int)prep->getEnvelopesOn()[envelopeCounter]) +
-                     " envelope counter: " + String(envelopeCounter) +
-                     " ADSR :" + String(prep->getAttack(envelopeCounter)) + " " + String(prep->getDecay(envelopeCounter)) + " " + String(prep->getSustain(envelopeCounter)) + " " + String(prep->getRelease(envelopeCounter))
-                     );
-                     */
-                    
-                    //figure out whether to play the cluster
-                    bool passCluster = false;
-                    
-                    //in the normal case, where cluster is within a range defined by clusterMin and Max
-                    if(prep->getClusterMin() <= prep->getClusterMax())
-                    {
-                        if (clusterNotes.size() >= prep->getClusterMin() && clusterNotes.size() <= prep->getClusterMax())
-                            passCluster = true;
-                    }
-                    //the inverse case, where we only play cluster that are *outside* the range set by clusterMin and Max
-                    else
-                    {
-                        if (clusterNotes.size() >= prep->getClusterMin() || clusterNotes.size() <= prep->getClusterMax())
-                            passCluster = true;
-                    }
-                    
-                    playCluster = passCluster;
-                    
-                    if(playCluster)
-                    {
-                        for (int n=0; n < slimCluster.size(); n++)
-                        {
-                            playNote(channel,
-                                     slimCluster[n],
-                                     velocities.getUnchecked(slimCluster[n]),
-                                     cluster);
-                        }
-                    }
-                    
-                    // step cluster data
-                    cluster->step(numSamplesBeat);
-                    
+                    if (clusterNotes.size() >= prep->getClusterMin() && clusterNotes.size() <= prep->getClusterMax())
+                        passCluster = true;
+                }
+                //the inverse case, where we only play cluster that are *outside* the range set by clusterMin and Max
+                else
+                {
+                    if (clusterNotes.size() >= prep->getClusterMin() || clusterNotes.size() <= prep->getClusterMax())
+                        passCluster = true;
                 }
                 
-                //pass time until next beat
-                cluster->incrementPhasor(numSamples);
+                playCluster = passCluster;
+                
+                if(playCluster)
+                {
+                    for (int n=0; n < slimCluster.size(); n++)
+                    {
+                        playNote(channel,
+                                 slimCluster[n],
+                                 velocities.getUnchecked(slimCluster[n]),
+                                 cluster);
+                    }
+                }
+                
+                // step cluster data
+                cluster->step(numSamplesBeat);
+                
             }
+            
+            //pass time until next beat
+            cluster->incrementPhasor(numSamples);
         }
     }
 }
