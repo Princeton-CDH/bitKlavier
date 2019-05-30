@@ -195,6 +195,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                     
                     bool playNote = (passHoldTest && passVelocityTest);
                     
+
                     if (!playNote) continue;
 
                     //clusterNotesPlayed.addIfNotAlreadyThere(note);
