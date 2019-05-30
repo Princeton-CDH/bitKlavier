@@ -374,6 +374,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                 slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
             }
             
+            DBG("slimCluster " + String(i) + ": " + intArrayToString(slimCluster));
+            
             //get time until next beat => beat length scaled by beatMultiplier parameter
             
             numSamplesBeat =    beatThresholdSamples *

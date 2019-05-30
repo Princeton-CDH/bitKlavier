@@ -1060,7 +1060,8 @@ public:
     inline void addNote(int note)
     {
         DBG("adding note: " + String(note));
-        cluster.add(note);
+        //cluster.add(note);
+        cluster.insert(0, note);
     }
     
     inline void removeNote(int note)
