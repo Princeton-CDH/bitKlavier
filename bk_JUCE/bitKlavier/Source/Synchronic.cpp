@@ -255,7 +255,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             //now we are in a cluster!
             inCluster = true;
         }
-        else if (synchronic->aPrep->getMode() == AnyNoteOnSync)
+        else if (synchronic->aPrep->getMode() == AnyNoteOffSync)
         {
             // might be able to move this whole else block ^ out of if else, since we are in cluster
             //reset phasor if in AnyNoteOnSync
