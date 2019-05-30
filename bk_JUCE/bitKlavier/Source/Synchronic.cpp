@@ -265,6 +265,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             
             //reset parameter counters; need to account for skipBeats
             cluster->resetPhase();
+            cluster->setShouldPlay(true);
             
             //now we are in a cluster!
             inCluster = true;
@@ -388,7 +389,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                 slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
             }
             
-            DBG("slimCluster " + String(i) + ": " + intArrayToString(slimCluster));
+            //DBG("slimCluster " + String(i) + ": " + intArrayToString(slimCluster));
             
             //get time until next beat => beat length scaled by beatMultiplier parameter
             

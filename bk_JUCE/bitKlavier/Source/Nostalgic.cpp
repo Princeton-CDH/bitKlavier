@@ -132,7 +132,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             {
                 // clear cluster
                 cluster.clearQuick();
-                clusterNotesPlayed.clearQuick();
+                //clusterNotesPlayed.clearQuick();
                 
                 // now we are in a cluster!
                 inCluster = true;
@@ -195,9 +195,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                     
                     bool playNote = (passHoldTest && passVelocityTest);
                     
-                    if (clusterNotesPlayed.contains(note) || !playNote) continue;
+                    if (!playNote) continue;
 
-                    clusterNotesPlayed.addIfNotAlreadyThere(note);
+                    //clusterNotesPlayed.addIfNotAlreadyThere(note);
                     
                     //get length of played notes, subtract wave distance to set nostalgic reverse note length
                     duration =  (noteLengthTimers.getUnchecked(note) *
@@ -458,7 +458,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
         if (clusterThresholdTimer >= (sampleRate * 0.15))
         {
             inCluster = false;
-            clusterNotesPlayed.clearQuick();
+            //clusterNotesPlayed.clearQuick();
         }
         //otherwise incrument cluster timer
         else

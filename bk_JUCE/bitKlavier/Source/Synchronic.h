@@ -1032,11 +1032,6 @@ public:
         {
             shouldPlay = false;
         }
-        
-        DBG("~ ~ ~ ~ ~ ~");
-        DBG("should play: " + String((int)shouldPlay));
-        DBG("beat counter: " + String(beatCounter));
-        DBG("beats to skip: " + String(prep->getBeatsToSkip()));
     }
     
     inline void resetPhase()
