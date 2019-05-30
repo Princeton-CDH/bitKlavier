@@ -168,6 +168,20 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
             clusters.remove(i);
             continue;
         }
+        
+        if(   (synchronic->aPrep->getMode() == LastNoteOffSync)
+           || (synchronic->aPrep->getMode() == AnyNoteOffSync))
+        {
+            if(clusters.size() == 1) clusters[0]->setShouldPlay(false);
+            else
+            {
+                if(clusters[i]->containsNote(noteNumber))
+                {
+                    clusters[i]->removeNote(noteNumber);
+                }
+                
+            }
+        }
     }
     
     //cluster management
@@ -373,6 +387,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             {
                 slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
             }
+            
+            DBG("slimCluster " + String(i) + ": " + intArrayToString(slimCluster));
             
             //get time until next beat => beat length scaled by beatMultiplier parameter
             
