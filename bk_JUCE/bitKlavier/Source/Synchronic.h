@@ -1027,24 +1027,30 @@ public:
             //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
             beatMultiplierCounter = 0;
         }
-        
-        if (++beatCounter >= prep->getNumBeats())
+
+        if (++beatCounter >= (prep->getNumBeats() + prep->getBeatsToSkip()))
         {
             shouldPlay = false;
         }
+        
+        DBG("~ ~ ~ ~ ~ ~");
+        DBG("should play: " + String((int)shouldPlay));
+        DBG("beat counter: " + String(beatCounter));
+        DBG("beats to skip: " + String(prep->getBeatsToSkip()));
     }
     
     inline void resetPhase()
     {
         int skipBeats = prep->getBeatsToSkip();
+        int idx = (skipBeats < 0) ? 0 : skipBeats;
         
-        beatMultiplierCounter   = skipBeats % prep->getBeatMultipliers().size();
-        lengthMultiplierCounter = skipBeats % prep->getLengthMultipliers().size();
-        accentMultiplierCounter = skipBeats % prep->getAccentMultipliers().size();
-        transpCounter           = skipBeats % prep->getTransposition().size();
-        envelopeCounter         = skipBeats % prep->getEnvelopesOn().size();
+        beatMultiplierCounter   = idx % prep->getBeatMultipliers().size();
+        lengthMultiplierCounter = idx % prep->getLengthMultipliers().size();
+        accentMultiplierCounter = idx % prep->getAccentMultipliers().size();
+        transpCounter           = idx % prep->getTransposition().size();
+        envelopeCounter         = idx % prep->getEnvelopesOn().size();
         
-        beatCounter = 0;
+        beatCounter             = skipBeats;
     }
     
     inline Array<int> getCluster() {return cluster;}

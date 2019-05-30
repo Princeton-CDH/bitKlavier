@@ -160,7 +160,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     if (!velocityCheck(noteNumber)) return;
     
-    // Remove old clusters 
+    // Remove old clusters
     for (int i = clusters.size(); --i >= 0; )
     {
         if (!clusters[i]->getShouldPlay() && !inCluster)
@@ -198,9 +198,16 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
             //reset phasor if in AnyNoteOnSync
             if (cluster != nullptr)
             {
-                clusters.getLast()->setPhasor(0);
-                clusters.getLast()->resetPhase();
-                clusters.getLast()->setShouldPlay(true);
+                cluster->setPhasor(0);
+                cluster->resetPhase();
+                cluster->setShouldPlay(true);
+            }
+        }
+        else if (prep->getMode() == FirstNoteOnSync)
+        {
+            if (cluster != nullptr)
+            {
+                cluster->setShouldPlay(true);
             }
         }
         
@@ -234,12 +241,6 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     {
         if(!inCluster) //we have a new cluster
         {
-            // [OLD]
-            //reset phasor
-            // phasor = 0;
-            //clear cluster
-            // cluster.clearQuick();
-            
             if (clusters.size() >= synchronic->aPrep->getNumClusters())
             {
                 clusters.remove(0); // remove first (oldest) cluster
@@ -260,11 +261,12 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             //reset phasor if in AnyNoteOnSync
             if (cluster != nullptr)
             {
-                clusters.getLast()->setPhasor(0);
-                clusters.getLast()->resetPhase();
-                clusters.getLast()->setShouldPlay(true);
+                cluster->setPhasor(0);
+                cluster->resetPhase();
+                cluster->setShouldPlay(true);
             }
         }
+
         
         //at this point, we are in cluster one way or another!
         

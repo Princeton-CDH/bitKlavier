@@ -1201,17 +1201,10 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         int toggleVal;
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;
+
+        prep->setBeatsToSkip(toggleVal);
+        active->setBeatsToSkip(toggleVal);
         
-        if(prep->getMode() == FirstNoteOnSync || prep->getMode() == AnyNoteOnSync)
-        {
-            prep->setBeatsToSkip(toggleVal - 1);
-            active->setBeatsToSkip(toggleVal - 1);
-        }
-        else
-        {
-            prep->setBeatsToSkip(toggleVal);
-            active->setBeatsToSkip(toggleVal);
-        }
     }
     else if (name == "OnOff")
     {
@@ -1271,17 +1264,10 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
         int toggleVal;
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;
+
+        prep->setBeatsToSkip(toggleVal);
+        active->setBeatsToSkip(toggleVal);
         
-        if(prep->getMode() == FirstNoteOnSync || prep->getMode() == AnyNoteOnSync)
-        {
-            prep->setBeatsToSkip(toggleVal - 1);
-            active->setBeatsToSkip(toggleVal - 1);
-        }
-        else
-        {
-            prep->setBeatsToSkip(toggleVal);
-            active->setBeatsToSkip(toggleVal);
-        }
 
     }
     else if (b == &releaseVelocitySetsSynchronicToggle)
@@ -1915,16 +1901,8 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;
         
-        if(mod->getMode() == FirstNoteOnSync || mod->getMode()  == AnyNoteOnSync)
-        {
-            mod->setBeatsToSkip(toggleVal - 1);
-            mod->setDirty(SynchronicBeatsToSkip);
-        }
-        else
-        {
-            mod->setBeatsToSkip(toggleVal);
-            mod->setDirty(SynchronicBeatsToSkip);
-        }
+        mod->setBeatsToSkip(toggleVal);
+        mod->setDirty(SynchronicBeatsToSkip);
         
         updateModification();
         modeSelectCB.setAlpha(1.);
@@ -1990,16 +1968,8 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;
         
-        if(mod->getMode() == FirstNoteOnSync || mod->getMode()  == AnyNoteOnSync)
-        {
-            mod->setBeatsToSkip(toggleVal - 1);
-            mod->setDirty(SynchronicBeatsToSkip);
-        }
-        else
-        {
-            mod->setBeatsToSkip(toggleVal);
-            mod->setDirty(SynchronicBeatsToSkip);
-        }
+        mod->setBeatsToSkip(toggleVal);
+        mod->setDirty(SynchronicBeatsToSkip);
         
         offsetParamStartToggle.setAlpha(1.);
         
