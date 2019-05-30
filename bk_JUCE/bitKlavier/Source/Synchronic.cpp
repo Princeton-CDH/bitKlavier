@@ -160,7 +160,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     
     if (!velocityCheck(noteNumber)) return;
     
-    // Remove old clusters
+    // Remove old clusters, deal with layers and NoteOffSync modes
     for (int i = clusters.size(); --i >= 0; )
     {
         if (!clusters[i]->getShouldPlay() && !inCluster)
@@ -301,6 +301,27 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
 		(synchronic->aPrep->getMode() == AnyNoteOffSync))
     {
         
+        for (int i = clusters.size(); --i >= 0; )
+        {
+            if(clusters[i]->containsNote(noteNumber))
+            {
+                clusters[i]->resetPhase();
+                clusters[i]->setShouldPlay(true);
+                
+                //start right away
+                uint64 phasor = beatThresholdSamples *
+                                synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                                general->getPeriodMultiplier() *
+                                tempo->getPeriodMultiplier();
+                
+                clusters[i]->setPhasor(phasor);
+                
+                inCluster = true;
+                
+            }
+        }
+        
+        /*
         if (cluster != nullptr)
         {
             cluster->resetPhase();
@@ -316,6 +337,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             
             inCluster = true;
         }
+         */
     }
 }
 
