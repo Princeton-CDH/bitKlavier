@@ -168,6 +168,20 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
             clusters.remove(i);
             continue;
         }
+        
+        if(   (synchronic->aPrep->getMode() == LastNoteOffSync)
+           || (synchronic->aPrep->getMode() == AnyNoteOffSync))
+        {
+            if(clusters.size() == 1) clusters[0]->setShouldPlay(false);
+            else
+            {
+                if(clusters[i]->containsNote(noteNumber))
+                {
+                    clusters[i]->removeNote(noteNumber);
+                }
+                
+            }
+        }
     }
     
     //cluster management

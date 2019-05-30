@@ -1080,6 +1080,11 @@ public:
         cluster.remove(idx);
     }
     
+    inline bool containsNote(int note)
+    {
+        return cluster.contains(note);
+    }
+    
     inline void setShouldPlay(bool play)
     {
         shouldPlay = play;
