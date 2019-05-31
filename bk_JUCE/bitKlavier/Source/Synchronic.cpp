@@ -291,6 +291,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 
 void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel)
 {
+    SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
@@ -299,6 +300,12 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     if (!velocityCheck(noteNumber)) return;
     if (!holdCheck(noteNumber)) return;
+    
+    if (cluster == nullptr)
+    {
+        cluster = new SynchronicCluster(prep);
+        clusters.add(cluster);
+    }
     
     //cluster management
     if (synchronic->aPrep->getOnOffMode() == KeyOff)
@@ -311,6 +318,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             }
             
             cluster = new SynchronicCluster(synchronic->aPrep);
+            clusters.clearQuick();
             clusters.add(cluster);
             
             //reset parameter counters; need to account for skipBeats
@@ -324,7 +332,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
         {
             // might be able to move this whole else block ^ out of if else, since we are in cluster
             //reset phasor if in AnyNoteOnSync
-            if (cluster != nullptr)
+            //if (cluster != nullptr)
             {
                 cluster->setPhasor(0);
                 cluster->resetPhase();
