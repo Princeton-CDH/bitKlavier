@@ -242,10 +242,13 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
             //reset phasor
             // phasor = 0;
             //clear cluster
-            // cluster.clearQuick();
+            //cluster.clearQuick();
             
-            //cluster = new SynchronicCluster(prep);
+            cluster = new SynchronicCluster(prep);
             //clusters.add(cluster);
+            
+            clusters.clearQuick();
+            clusters.add(cluster);
             
             //reset parameter counters; need to account for skipBeats
             cluster->resetPhase();
