@@ -185,6 +185,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     }
     
     //cluster management
+    /*
     if (prep->getOnOffMode() == KeyOn)
     {
         SynchronicCluster::Ptr cluster = clusters.getLast();
@@ -220,6 +221,52 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         else if (prep->getMode() == FirstNoteOnSync)
         {
             if (cluster != nullptr)
+            {
+                cluster->setShouldPlay(true);
+            }
+        }
+     */
+    if (prep->getOnOffMode() == KeyOn)
+    {
+        SynchronicCluster::Ptr cluster = clusters.getLast();
+        
+        if (cluster == nullptr)
+        {
+            cluster = new SynchronicCluster(prep);
+            clusters.add(cluster);
+        }
+        
+        if(!inCluster) //we have a new cluster
+        {
+            // [OLD]
+            //reset phasor
+            // phasor = 0;
+            //clear cluster
+            // cluster.clearQuick();
+            
+            //cluster = new SynchronicCluster(prep);
+            //clusters.add(cluster);
+            
+            //reset parameter counters; need to account for skipBeats
+            cluster->resetPhase();
+            
+            //now we are in a cluster!
+            inCluster = true;
+        }
+        else if (prep->getMode() == AnyNoteOnSync)
+        {
+            // might be able to move this whole else block ^ out of if else, since we are in cluster
+            //reset phasor if in AnyNoteOnSync
+            //if (cluster != nullptr)
+            {
+                cluster->setPhasor(0);
+                cluster->resetPhase();
+                cluster->setShouldPlay(true);
+            }
+        }
+        else if (prep->getMode() == FirstNoteOnSync)
+        {
+            //if (cluster != nullptr)
             {
                 cluster->setShouldPlay(true);
             }

@@ -750,6 +750,11 @@ public:
     
     ~BKADSRSlider()
     {
+        attackSlider->setLookAndFeel(nullptr);
+        ecaySlider->setLookAndFeel(nullptr);
+        sustainSlider->setLookAndFeel(nullptr);
+        releaseSlider->setLookAndFeel(nullptr);
+        
         setLookAndFeel(nullptr);
     };
     
