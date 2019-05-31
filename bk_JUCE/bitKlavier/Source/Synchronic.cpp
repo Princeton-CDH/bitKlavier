@@ -243,11 +243,15 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
             // phasor = 0;
             //clear cluster
             //cluster.clearQuick();
+            if (clusters.size() >= synchronic->aPrep->getNumClusters())
+            {
+                clusters.remove(0); // remove first (oldest) cluster
+            }
             
             cluster = new SynchronicCluster(prep);
             //clusters.add(cluster);
             
-            clusters.clearQuick();
+            //clusters.clearQuick();
             clusters.add(cluster);
             
             //reset parameter counters; need to account for skipBeats
@@ -318,7 +322,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             }
             
             cluster = new SynchronicCluster(synchronic->aPrep);
-            clusters.clearQuick();
+            //clusters.clearQuick();
             clusters.add(cluster);
             
             //reset parameter counters; need to account for skipBeats
