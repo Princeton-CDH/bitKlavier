@@ -851,6 +851,7 @@ private:
     // CLUSTER STUFF
     bool inCluster;
     Array<int> cluster;
+    int currentClusterSize;
     bool playCluster;
     uint64 clusterThresholdTimer;
     Array<int> clusterNotesPlayed;
