@@ -754,6 +754,7 @@ public:
         decaySlider->setLookAndFeel(nullptr);
         sustainSlider->setLookAndFeel(nullptr);
         releaseSlider->setLookAndFeel(nullptr);
+        adsrButton.setLookAndFeel(nullptr);
         
         setLookAndFeel(nullptr);
     };
