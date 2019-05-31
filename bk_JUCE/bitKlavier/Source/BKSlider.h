@@ -751,7 +751,7 @@ public:
     ~BKADSRSlider()
     {
         attackSlider->setLookAndFeel(nullptr);
-        ecaySlider->setLookAndFeel(nullptr);
+        decaySlider->setLookAndFeel(nullptr);
         sustainSlider->setLookAndFeel(nullptr);
         releaseSlider->setLookAndFeel(nullptr);
         
