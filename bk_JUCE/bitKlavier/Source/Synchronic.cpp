@@ -100,7 +100,7 @@ bool SynchronicProcessor::velocityCheck(int noteNumber)
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
-    int velocity = (int)(velocities.getUnchecked(noteNumber) * 128.0);
+    int velocity = (int)(velocities.getUnchecked(noteNumber) * 127.0);
     
     if (velocity > 127) velocity = 127;
     if (velocity < 0)   velocity = 0;
