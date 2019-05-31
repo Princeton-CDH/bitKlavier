@@ -909,7 +909,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         for (auto target : targets)
         {
             TuningPreparation::Ptr prep = gallery->getTuning(target)->aPrep;
-            prep->copy(mod);
+            prep->performModification(mod, mod->getDirty());
         }
  
         updateState->tuningPreparationDidChange = true;
@@ -924,7 +924,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         for (auto target : targets)
         {
             TempoPreparation::Ptr prep = gallery->getTempo(target)->aPrep;
-            prep->copy(mod);
+            prep->performModification(mod, mod->getDirty());
         }
         
         updateState->tempoPreparationDidChange = true;
@@ -939,7 +939,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         for (auto target : targets)
         {
             DirectPreparation::Ptr prep = gallery->getDirect(target)->aPrep;
-            prep->copy(mod);
+            prep->performModification(mod, mod->getDirty());
         }
         
         updateState->directPreparationDidChange = true;
@@ -954,7 +954,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         for (auto target : targets)
         {
             NostalgicPreparation::Ptr prep = gallery->getNostalgic(target)->aPrep;
-            prep->copy(mod);
+            prep->performModification(mod, mod->getDirty());
         }
         
         updateState->nostalgicPreparationDidChange = true;
@@ -969,7 +969,7 @@ void BKAudioProcessor::performModifications(int noteNumber)
         for (auto target : targets)
         {
             SynchronicPreparation::Ptr prep = gallery->getSynchronic(target)->aPrep;
-            prep->copy(mod);
+            prep->performModification(mod, mod->getDirty());
         }
         
         updateState->synchronicPreparationDidChange = true;
@@ -1204,6 +1204,8 @@ void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
         
         gallery->setGalleryDirty(false);
     }
+    
+    currentPiano->configure();
 }
 
 void BKAudioProcessor::loadGalleryFromPath(String path)

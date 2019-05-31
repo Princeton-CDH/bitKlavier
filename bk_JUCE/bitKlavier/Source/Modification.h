@@ -56,6 +56,11 @@ public:
         for (int i = 0; i < dirty.size(); i++) dirty.setUnchecked(i, false);
     }
     
+    inline Array<bool> getDirty(void)
+    {
+        return dirty;
+    }
+    
     inline bool getDirty(int param)
     {
         return dirty[param];

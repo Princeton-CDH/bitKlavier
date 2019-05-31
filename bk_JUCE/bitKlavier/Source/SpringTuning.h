@@ -25,6 +25,7 @@ public:
     ~SpringTuning(){stopTimer();};
 	void simulate();
     
+    void performModification(SpringTuning::Ptr st, Array<bool> dirty);
     void copy(SpringTuning::Ptr st);
 
 	void toggleSpring();

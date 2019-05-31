@@ -10,6 +10,8 @@
 
 #include "Tuning.h"
 
+#include "Modification.h"
+
 
 TuningProcessor::TuningProcessor(Tuning::Ptr tuning):
 tuning(tuning),
@@ -225,6 +227,7 @@ void Tuning::setState(XmlElement* e)
     
     aPrep->copy(sPrep);
 }
+
 
 #if BK_UNIT_TESTS
 

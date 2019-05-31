@@ -67,6 +67,21 @@ public:
         sBeatThreshMS = sBeatThreshSec * 1000.;
     }
     
+    inline void performModification(TempoPreparation::Ptr s, Array<bool> dirty)
+    {
+        if (dirty[TempoBPM]) sTempo = s->getTempo();
+        if (dirty[TempoSubdivisions]) subdivisions = s->getSubdivisions();
+        if (dirty[TempoSystem]) sWhichTempoSystem = s->getTempoSystem();
+        if (dirty[AT1History]) at1History = s->getAdaptiveTempo1History();
+        if (dirty[AT1Min]) at1Min = s->getAdaptiveTempo1Min();
+        if (dirty[AT1Max]) at1Max = s->getAdaptiveTempo1Max();
+        if (dirty[AT1Subdivisions]) at1Subdivisions = s->getAdaptiveTempo1Subdivisions();
+        if (dirty[AT1Mode]) at1Mode = s->getAdaptiveTempo1Mode();
+        
+        sBeatThreshSec = (60.0/sTempo);
+        sBeatThreshMS = sBeatThreshSec * 1000.;
+    }
+    
     bool compare(TempoPreparation::Ptr s)
     {
         

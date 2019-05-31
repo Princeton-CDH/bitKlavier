@@ -1623,7 +1623,11 @@ void TuningPreparationEditor::update(void)
         fundamentalSetsTether.setToggleState(fundSetsTether, dontSendNotification);
 
         // springs active or adaptive tuning
-        adaptiveSystemsCB.setSelectedItemIndex(prep->getAdaptiveType(), dontSendNotification);
+        TuningAdaptiveSystemType adaptiveType = prep->getAdaptiveType();
+        
+        if ((adaptiveType < AdaptiveNone) || (adaptiveType >= AdaptiveNil)) adaptiveType = AdaptiveNone;
+            
+        adaptiveSystemsCB.setSelectedItemIndex(adaptiveType, dontSendNotification);
 
         //dragSlider->setValue(  //must remember to use dt_asym_inversion on 1 - val)
         double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
@@ -2140,8 +2144,13 @@ void TuningModificationEditor::update(void)
         float val = mod->getSpringTuning()->getDrag();
         double newval = dt_asymwarp_inverse(1.0f - val, 100.);
         dragSlider->setValue(newval, dontSendNotification);
+        
+        TuningAdaptiveSystemType adaptiveType = mod->getAdaptiveType();
+        
+        if ((adaptiveType < AdaptiveNone) || (adaptiveType >= AdaptiveNil)) adaptiveType = AdaptiveNone;
+        
     
-        adaptiveSystemsCB.setSelectedItemIndex(mod->getAdaptiveType(), dontSendNotification);
+        adaptiveSystemsCB.setSelectedItemIndex(adaptiveType, dontSendNotification);
 
         Array<float> vals;
         

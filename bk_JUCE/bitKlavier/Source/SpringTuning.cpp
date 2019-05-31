@@ -53,6 +53,28 @@ void SpringTuning::copy(SpringTuning::Ptr st)
 
 }
 
+void SpringTuning::performModification(SpringTuning::Ptr st, Array<bool> dirty)
+{
+    DBG("SpringTuning::performModification called!!");
+    if (dirty[TuningSpringRate]) rate = st->getRate();
+    if (dirty[TuningSpringStiffness]) stiffness = st->getStiffness();
+    if (dirty[TuningSpringActive]) active = st->getActive();
+    if (dirty[TuningSpringDrag]) drag = st->getDrag();
+    
+    if (dirty[TuningSpringIntervalStiffness]) intervalStiffness = st->getIntervalStiffness();
+    if (dirty[TuningSpringTetherStiffness]) tetherStiffness = st->getTetherStiffness();
+    
+    if (dirty[TuningSpringIntervalScale]) scaleId = st->getScaleId();
+    
+    if (dirty[TuningSpringIntervalFundamental]) setIntervalFundamental(st->getIntervalFundamental());
+    //setUsingFundamentalForIntervalSprings(st->getUsingFundamentalForIntervalSprings());
+    
+    if (dirty[TuningFundamentalSetsTether]) setFundamentalSetsTether(st->getFundamentalSetsTether());
+    if (dirty[TuningTetherWeightGlobal]) setTetherWeightGlobal(st->getTetherWeightGlobal());
+    if (dirty[TuningTetherWeightGlobal2]) setTetherWeightSecondaryGlobal(st->getTetherWeightSecondaryGlobal());
+}
+
+
 SpringTuning::SpringTuning(SpringTuning::Ptr st):
 rate(100),
 tetherStiffness(0.5),

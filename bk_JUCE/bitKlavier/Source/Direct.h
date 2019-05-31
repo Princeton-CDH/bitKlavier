@@ -84,6 +84,22 @@ public:
         dRelease = d->getRelease();
     }
     
+    inline void performModification(DirectPreparation::Ptr d, Array<bool> dirty)
+    {
+        if (dirty[DirectTransposition]) dTransposition = d->getTransposition();
+        if (dirty[DirectGain]) dGain = d->getGain();
+        if (dirty[DirectResGain]) dResonanceGain = d->getResonanceGain();
+        if (dirty[DirectHammerGain]) dHammerGain = d->getHammerGain();
+        if (dirty[DirectADSR])
+        {
+            dAttack = d->getAttack();
+            dDecay = d->getDecay();
+            dSustain = d->getSustain();
+            dRelease = d->getRelease();
+        }
+       
+    }
+    
     inline bool compare(DirectPreparation::Ptr d)
     {
         return  (dTransposition     ==      d->getTransposition()   )   &&

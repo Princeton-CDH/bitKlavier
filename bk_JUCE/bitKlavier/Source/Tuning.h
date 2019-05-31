@@ -18,6 +18,7 @@
 
 #include "SpringTuning.h"
 
+
 class TuningPreparation : public ReferenceCountedObject
 {
 public:
@@ -72,11 +73,38 @@ public:
         {
             stuning->setActive(false);
         }
-        
-        
-        //stuning = new SpringTuning(p->getSpringTuning());
     }
     
+    void performModification(TuningPreparation::Ptr p, Array<bool> dirty)
+    {
+        if (dirty[TuningScale]) tScale = p->getScale();
+        if (dirty[TuningFundamental]) tFundamental = p->getFundamental();
+        if (dirty[TuningOffset]) tFundamentalOffset = p->getFundamentalOffset();
+        if (dirty[TuningA1IntervalScale]) tAdaptiveIntervalScale = p->getAdaptiveIntervalScale();
+        if (dirty[TuningA1Inversional]) tAdaptiveInversional = p->getAdaptiveInversional();
+        if (dirty[TuningA1AnchorScale]) tAdaptiveAnchorScale = p->getAdaptiveAnchorScale();
+        if (dirty[TuningA1AnchorFundamental]) tAdaptiveAnchorFundamental = p->getAdaptiveAnchorFundamental();
+        if (dirty[TuningA1ClusterThresh]) tAdaptiveClusterThresh = p->getAdaptiveClusterThresh();
+        if (dirty[TuningA1History]) tAdaptiveHistory = p->getAdaptiveHistory();
+        if (dirty[TuningCustomScale]) tCustom = p->getCustomScale();
+        if (dirty[TuningAbsoluteOffsets]) tAbsolute = p->getAbsoluteOffsets();
+        if (dirty[TuningNToneSemitoneWidth]) nToneSemitoneWidth = p->getNToneSemitoneWidth();
+        if (dirty[TuningNToneRootCB]) nToneRoot = p->getNToneRoot();
+        if (dirty[TuningAdaptiveSystem]) adaptiveType = p->getAdaptiveType();
+
+        stuning->performModification(p->getSpringTuning(), dirty);
+        
+        if (adaptiveType == AdaptiveSpring)
+        {
+            stuning->setActive(true);
+        }
+        else
+        {
+            stuning->setActive(false);
+        }
+    }
+
+
     inline bool compare (TuningPreparation::Ptr p)
     {
         bool custom = true;

@@ -156,6 +156,44 @@ public:
         velocityMax = s->getVelocityMax();
     }
     
+    inline void performModification(SynchronicPreparation::Ptr s, Array<bool> dirty)
+    {
+        if (dirty[SynchronicNumPulses]) sNumBeats = s->getNumBeats();
+        if (dirty[SynchronicClusterMin]) sClusterMin = s->getClusterMin();
+        if (dirty[SynchronicClusterMax]) sClusterMax = s->getClusterMax();
+        if (dirty[SynchronicMode]) sMode = s->getMode();
+        if (dirty[SynchronicBeatsToSkip]) sBeatsToSkip = s->getBeatsToSkip();
+        if (dirty[SynchronicBeatMultipliers]) sBeatMultipliers = s->getBeatMultipliers();
+        if (dirty[SynchronicAccentMultipliers]) sAccentMultipliers = s->getAccentMultipliers();
+        if (dirty[SynchronicLengthMultipliers]) sLengthMultipliers = s->getLengthMultipliers();
+        if (dirty[SynchronicGain]) sGain = s->getGain();
+        if (dirty[SynchronicTranspOffsets]) sTransposition = s->getTransposition();
+        if (dirty[SynchronicClusterThresh])
+        {
+            sClusterThresh = s->getClusterThreshMS();
+            sClusterThreshSec = s->getClusterThreshSEC();
+        }
+
+        if (dirty[SynchronicADSRs])
+        {
+            sAttacks = s->getAttacks();
+            sDecays = s->getDecays();
+            sSustains = s->getSustains();
+            sReleases = s->getReleases();
+            
+            envelopeOn = s->getEnvelopesOn();
+        }
+        
+        if (dirty[SynchronicNumClusters]) numClusters = s->getNumClusters();
+        if (dirty[SynchronicOnOff]) onOffMode = s->getOnOffMode();
+        
+        if (dirty[SynchronicHoldMin]) holdMin = s->getHoldMin();
+        if (dirty[SynchronicHoldMax]) holdMax = s->getHoldMax();
+        
+        if (dirty[SynchronicVelocityMin]) velocityMin = s->getVelocityMin();
+        if (dirty[SynchronicVelocityMax]) velocityMax = s->getVelocityMax();
+    }
+    
     bool compare(SynchronicPreparation::Ptr s)
     {
         bool lens = true;

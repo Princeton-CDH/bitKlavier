@@ -48,7 +48,6 @@ public:
     holdMin(p->getHoldMin()),
     holdMax(p->getHoldMax()),
     clusterMin(p->getClusterMin()),
-    clusterMax(p->getClusterMax()),
     keyOnReset(p->getKeyOnReset()),
     velocityMin(p->getVelocityMin()),
     velocityMax(p->getVelocityMax())
@@ -78,7 +77,6 @@ public:
         holdMax = 12000;
         
         clusterMin = 1;
-        clusterMax = 12;
         
         velocityMin = 0;
         velocityMax = 127;
@@ -105,7 +103,6 @@ public:
     holdMin(0),
     holdMax(12000),
     clusterMin(1),
-    clusterMax(12),
     keyOnReset(false),
     velocityMin(0),
     velocityMax(127)
@@ -140,10 +137,42 @@ public:
         holdMin = n->getHoldMin();
         holdMax = n->getHoldMax();
         clusterMin = n->getClusterMin();
-        clusterMax = n->getClusterMax();
         keyOnReset = n->getKeyOnReset();
         velocityMin = n->getVelocityMin();
         velocityMax = n->getVelocityMax();
+    }
+    
+    inline void performModification(NostalgicPreparation::Ptr n, Array<bool> dirty)
+    {
+        if (dirty[NostalgicWaveDistance]) nWaveDistance = n->getWavedistance();
+        if (dirty[NostalgicUndertow]) nUndertow = n->getUndertow();
+        if (dirty[NostalgicTransposition]) nTransposition = n->getTransposition();
+        if (dirty[NostalgicGain]) nGain = n->getGain();
+        if (dirty[NostalgicLengthMultiplier]) nLengthMultiplier = n->getLengthMultiplier();
+        if (dirty[NostalgicBeatsToSkip]) nBeatsToSkip = n->getBeatsToSkip();
+        if (dirty[NostalgicMode]) nMode = n->getMode();
+        if (dirty[NostalgicReverseADSR])
+        {
+            nReverseAttack = n->getReverseAttack();
+            nReverseDecay = n->getReverseDecay();
+            nReverseSustain = n->getReverseSustain();
+            nReverseRelease = n->getReverseRelease();
+        }
+        
+        if (dirty[NostalgicUndertowADSR])
+        {
+            nUndertowAttack = n->getUndertowAttack();
+            nUndertowDecay = n->getUndertowDecay();
+            nUndertowSustain = n->getUndertowSustain();
+            nUndertowRelease = n->getUndertowRelease();
+        }
+        
+        if (dirty[NostalgicHoldMin]) holdMin = n->getHoldMin();
+        if (dirty[NostalgicHoldMax]) holdMax = n->getHoldMax();
+        if (dirty[NostalgicClusterMin]) clusterMin = n->getClusterMin();
+        if (dirty[NostalgicKeyOnReset]) keyOnReset = n->getKeyOnReset();
+        if (dirty[NostalgicVelocityMin]) velocityMin = n->getVelocityMin();
+        if (dirty[NostalgicVelocityMax]) velocityMax = n->getVelocityMax();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -166,7 +195,6 @@ public:
                 holdMin == n->getHoldMin() &&
                 holdMax == n->getHoldMax() &&
                 clusterMin == n->getClusterMin() &&
-                clusterMax == n->getClusterMax() &&
                 keyOnReset == n->getKeyOnReset() &&
                 velocityMin == n->getVelocityMin() &&
                 velocityMax == n->getVelocityMax());
@@ -203,7 +231,6 @@ public:
         holdMin = (float)(r[idx++] * 12000.);
         holdMax = (float)(r[idx++] * 12000.);
         clusterMin = (int)(r[idx++] * 12) + 1;
-        clusterMax = (int)(r[idx++] * 12) + 1;
         keyOnReset = (r[idx++] < 0.5) ? true : false;
         velocityMin = (int)(r[idx++] * 127) + 1;
         velocityMax = (int)(r[idx++] * 127) + 1;
@@ -264,10 +291,8 @@ public:
     inline const void setVelocityMax(int max)  { velocityMax = max; }
     
     inline const int getClusterMin() const noexcept { return clusterMin; }
-    inline const int getClusterMax() const noexcept { return clusterMax; }
     
     inline const void setClusterMin(int min)  { clusterMin = min; }
-    inline const void setClusterMax(int max)  { clusterMax = max; }
     
     inline const bool getKeyOnReset() const noexcept { return keyOnReset; }
     
@@ -324,7 +349,6 @@ public:
         prep.setProperty( "holdMax", getHoldMax(), 0);
         
         prep.setProperty( "clusterMin", getClusterMin(), 0);
-        prep.setProperty( "clusterMax", getClusterMax(), 0);
         
         prep.setProperty( "velocityMin", getVelocityMin(), 0);
         prep.setProperty( "velocityMax", getVelocityMax(), 0);
@@ -538,7 +562,7 @@ private:
     float   nUndertowSustain;
     
     float holdMin, holdMax;
-    int clusterMin, clusterMax;
+    int clusterMin;
     int velocityMin, velocityMax;
     
     bool keyOnReset;
