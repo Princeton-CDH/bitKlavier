@@ -1077,11 +1077,11 @@ public:
         int skipBeats = prep->getBeatsToSkip();
         int idx = (skipBeats < 0) ? 0 : skipBeats;
         
-        beatMultiplierCounter   = idx % prep->getBeatMultipliers().size();
-        lengthMultiplierCounter = idx % prep->getLengthMultipliers().size();
-        accentMultiplierCounter = idx % prep->getAccentMultipliers().size();
-        transpCounter           = idx % prep->getTransposition().size();
-        envelopeCounter         = idx % prep->getEnvelopesOn().size();
+        if(prep->getBeatMultipliers().size() > 0)   beatMultiplierCounter   = idx % prep->getBeatMultipliers().size();
+        if(prep->getLengthMultipliers().size() > 0) lengthMultiplierCounter = idx % prep->getLengthMultipliers().size();
+        if(prep->getAccentMultipliers().size() > 0) accentMultiplierCounter = idx % prep->getAccentMultipliers().size();
+        if(prep->getTransposition().size() > 0)     transpCounter           = idx % prep->getTransposition().size();
+        if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = idx % prep->getEnvelopesOn().size();
         
         beatCounter             = skipBeats;
     }
