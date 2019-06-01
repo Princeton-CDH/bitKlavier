@@ -847,6 +847,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
     currentPiano->copyAdaptiveTuningState(prevPiano);
     currentPiano->copyAdaptiveTempoState(prevPiano);
+    currentPiano->configure();
     
     updateState->pianoDidChangeForGraph = true;
     updateState->synchronicPreparationDidChange = true;
