@@ -153,6 +153,9 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
+    lastKeyPressed = noteNumber;
+    lastKeyVelocity = velocity;
+    
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
     velocities.set(noteNumber, velocity);

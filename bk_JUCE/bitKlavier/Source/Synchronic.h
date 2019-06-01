@@ -1185,6 +1185,18 @@ public:
     inline const int getNumKeysDepressed() const noexcept {return keysDepressed.size(); }
     inline const bool getPlayCluster() const noexcept { return playCluster; }
     
+    inline const float getHoldTimer() const noexcept
+    {
+        if(keysDepressed.size() == 0 ) return 0;
+        return 1000. * holdTimers[lastKeyPressed] / sampleRate ;
+    }
+    
+    inline const float getLastVelocity() const noexcept
+    {
+        if(keysDepressed.size() == 0 ) return 0;
+        return lastKeyVelocity;
+    }
+    
     inline const SynchronicSyncMode getMode() const noexcept {return synchronic->aPrep->getMode(); }
 
     inline int getId(void) const noexcept { return synchronic->getId(); }
@@ -1284,7 +1296,9 @@ private:
     uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
     uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
     
-    Array<uint64> holdTimers; 
+    Array<uint64> holdTimers;
+    int lastKeyPressed;
+    float lastKeyVelocity;
     
     //adaptive tempo stuff
     /*
