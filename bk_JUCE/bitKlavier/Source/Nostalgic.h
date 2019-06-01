@@ -860,6 +860,16 @@ public:
     Array<int> getPlayPositions();
     Array<int> getUndertowPositions();
     
+    inline int getHoldTime() const noexcept
+    {
+        if(activeNotes.size() == 0) return 0;
+        else return 1000. * noteLengthTimers[lastKeyPlayed] / sampleRate;
+    }
+    
+    inline float getLastVelocity() const noexcept { return lastVelocity; }
+    
+    inline int getNumActiveNotes() const noexcept {return activeNotes.size(); }
+    
 private:
     BKSynthesiser*              synth;
     
@@ -871,6 +881,10 @@ private:
     Array<int> activeNotes;             // table of notes currently being played by player
     Array<bool> noteOn;                 // table of booleans representing state of each note
     Array<float> velocities;            // table of velocities played
+    
+    uint64 lastHoldTime;
+    int lastKeyPlayed;
+    float lastVelocity;
     
     // CLUSTER STUFF
     bool inCluster;

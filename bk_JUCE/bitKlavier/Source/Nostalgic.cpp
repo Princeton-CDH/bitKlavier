@@ -324,6 +324,8 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
 {
     NostalgicPreparation::Ptr prep = nostalgic->aPrep;
     
+    lastVelocity = midiNoteVelocity; 
+    
     if (prep->getMode() == SynchronicSync)
     {
         float duration = 0.0;
@@ -392,6 +394,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
     {
         activeNotes.addIfNotAlreadyThere(midiNoteNumber);
         noteLengthTimers.set(midiNoteNumber, 0);
+        lastKeyPlayed = midiNoteNumber; 
         
         // KEY ON RESET STUFF
         if (prep->getKeyOnReset())

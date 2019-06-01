@@ -928,6 +928,11 @@ void NostalgicPreparationEditor::timerCallback()
             currentPlayPositions.addArray(currentUndertowPositions);
             
             nDisplaySlider.updateSliderPositions(currentPlayPositions);
+            
+            holdTimeMinMaxSlider->setDisplayValue(nProcessor->getHoldTime());
+            if(nProcessor->getNumActiveNotes()) velocityMinMaxSlider->setDisplayValue(nProcessor->getLastVelocity() * 127.);
+            else velocityMinMaxSlider->setDisplayValue(0);
+            clusterMinSlider->setDisplayValue(nProcessor->getNumActiveNotes());
         }
     }
 }
