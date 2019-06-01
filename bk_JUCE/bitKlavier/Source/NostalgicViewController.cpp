@@ -930,9 +930,36 @@ void NostalgicPreparationEditor::timerCallback()
             nDisplaySlider.updateSliderPositions(currentPlayPositions);
             
             holdTimeMinMaxSlider->setDisplayValue(nProcessor->getHoldTime());
-            if(nProcessor->getNumActiveNotes()) velocityMinMaxSlider->setDisplayValue(nProcessor->getLastVelocity() * 127.);
-            else velocityMinMaxSlider->setDisplayValue(0);
-            clusterMinSlider->setDisplayValue(nProcessor->getNumActiveNotes());
+            if(nProcessor->getNumActiveNotes())
+            {
+                velocityMinMaxSlider->setDisplayValue(nProcessor->getLastVelocity() * 127.);
+                clusterMinSlider->setDisplayValue(nProcessor->getCurrentClusterSize());
+            }
+            else
+            {
+                velocityMinMaxSlider->setDisplayValue(0);
+                clusterMinSlider->setDisplayValue(0);
+            }
+            
+            NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+            if(active->getMode() == NoteLengthSync)
+            {
+                holdTimeMinMaxSlider->setBright();
+                holdTimeMinMaxSlider->setEnabled(true);
+                
+                clusterMinSlider->setBright();
+                clusterMinSlider->setEnabled(true);
+            }
+            else
+            {
+                holdTimeMinMaxSlider->setDim(gModAlpha);
+                holdTimeMinMaxSlider->setEnabled(false);
+                
+                clusterMinSlider->setDim(gModAlpha);
+                clusterMinSlider->setEnabled(false);
+            }
+
+            
         }
     }
 }

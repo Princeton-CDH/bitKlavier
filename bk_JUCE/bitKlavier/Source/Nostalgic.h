@@ -870,6 +870,8 @@ public:
     
     inline int getNumActiveNotes() const noexcept {return activeNotes.size(); }
     
+    inline int getCurrentClusterSize() const noexcept {return currentClusterSize;}
+    
 private:
     BKSynthesiser*              synth;
     
