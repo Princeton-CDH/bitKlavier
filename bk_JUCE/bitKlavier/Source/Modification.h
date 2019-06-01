@@ -314,7 +314,7 @@ public:
     {
         setName(mod->getName() + "copy");
         
-        NostalgicModification::copy(mod);
+        NostalgicPreparation::copy(mod);
     }
     
     inline ValueTree getState(void)
@@ -416,7 +416,7 @@ public:
     {
         setName(mod->getName() + "copy");
         
-        TuningModification::copy(mod);
+        TuningPreparation::copy(mod);
     }
     
     inline ValueTree getState(void)
