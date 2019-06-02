@@ -474,6 +474,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
         if (clusterThresholdTimer >= (sampleRate * 0.15))
         {
             inCluster = false;
+            currentClusterSize = 0;
             //clusterNotesPlayed.clearQuick();
         }
         //otherwise incrument cluster timer

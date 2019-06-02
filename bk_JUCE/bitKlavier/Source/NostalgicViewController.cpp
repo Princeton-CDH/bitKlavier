@@ -933,7 +933,7 @@ void NostalgicPreparationEditor::timerCallback()
             if(nProcessor->getNumActiveNotes())
             {
                 velocityMinMaxSlider->setDisplayValue(nProcessor->getLastVelocity() * 127.);
-                clusterMinSlider->setDisplayValue(nProcessor->getCurrentClusterSize());
+                clusterMinSlider->setDisplayValue(nProcessor->getCurrentClusterSize() + 1);
             }
             else
             {
