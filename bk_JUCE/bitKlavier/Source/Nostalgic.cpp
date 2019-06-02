@@ -394,7 +394,12 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
     {
         activeNotes.addIfNotAlreadyThere(midiNoteNumber);
         noteLengthTimers.set(midiNoteNumber, 0);
-        lastKeyPlayed = midiNoteNumber; 
+        lastKeyPlayed = midiNoteNumber;
+        
+        if(!inCluster)
+        {
+            currentClusterSize = 0;
+        }
         
         // KEY ON RESET STUFF
         if (prep->getKeyOnReset())
