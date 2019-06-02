@@ -84,8 +84,8 @@ void Stk :: setSampleRate( StkFloat rate )
 /*
     for ( unsigned int i=0; i<alertList_.size(); i++ )
       alertList_[i]->sampleRateChanged( srate_, oldRate );
-  }
  */
+  }
 }
 
 void Stk :: sampleRateChanged( StkFloat newRate, StkFloat oldRate )
