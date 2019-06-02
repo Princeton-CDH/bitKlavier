@@ -52,7 +52,6 @@ struct Region
   };
 
   Region();
-    ~Region(){sample=nullptr;};
   void clear();
   void clearForSF2();
   void clearForRelativeSF2();
@@ -73,7 +72,7 @@ struct Region
         
     }
 
-    Sample* sample;
+  Sample *sample;
   int lokey, hikey;
   int lovel, hivel;
   Trigger trigger;

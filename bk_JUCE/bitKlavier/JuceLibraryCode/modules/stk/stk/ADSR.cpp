@@ -313,18 +313,17 @@ void AHDSR :: setDecayTime( StkFloat time )
     
     decayRate_ = (1.0 - sustainLevel_) / ( time * Stk::sampleRate() );
 }
-    
+
 void AHDSR :: setReleaseTime( StkFloat time )
 {
     if ( time <= 0.0 ) {
-        oStream_ << "AHDSR::setReleaseTime: negative or zero times not allowed!";
+        oStream_ << "ADSR::setReleaseTime: negative or zero times not allowed!";
         handleError( StkError::WARNING ); return;
     }
     
     releaseRate_ = sustainLevel_ / ( time * Stk::sampleRate() );
     releaseTime_ = time;
 }
-
 
 StkFloat AHDSR :: getReleaseTime( void )
 {

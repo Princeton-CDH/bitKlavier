@@ -102,11 +102,6 @@ class ADSR : public Generator
     will trigger an StkError exception.
   */
   StkFrames& tick( StkFrames& frames, unsigned int channel = 0 );
-    
-    void print(void)
-    {
-        printf("%f %f %f %f %f\n", attackRate_, decayRate_, releaseRate_, releaseTime_, sustainLevel_);
-    }
 
  protected:  
 
@@ -287,11 +282,6 @@ inline StkFrames& ADSR :: tick( StkFrames& frames, unsigned int channel )
          will trigger an StkError exception.
          */
         StkFrames& tick( StkFrames& frames, unsigned int channel = 0 );
-        
-        void print(void)
-        {
-            printf("%f %f %f %f %f\n", attackRate_, decayRate_, releaseRate_, releaseTime_, sustainLevel_);
-        }
         
     protected:
         

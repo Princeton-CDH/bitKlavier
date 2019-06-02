@@ -81,12 +81,11 @@ void Stk :: setSampleRate( StkFloat rate )
   if ( rate > 0.0 && rate != srate_ ) {
     StkFloat oldRate = srate_;
     srate_ = rate;
-
-      /*
+/*
     for ( unsigned int i=0; i<alertList_.size(); i++ )
       alertList_[i]->sampleRateChanged( srate_, oldRate );
-       */
   }
+ */
 }
 
 void Stk :: sampleRateChanged( StkFloat newRate, StkFloat oldRate )
