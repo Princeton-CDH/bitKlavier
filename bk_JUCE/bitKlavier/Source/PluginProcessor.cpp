@@ -844,27 +844,30 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     prevPiano = currentPiano;
 
     currentPiano = gallery->getPiano(which);
-    currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
-    currentPiano->copyAdaptiveTuningState(prevPiano);
-    currentPiano->copyAdaptiveTempoState(prevPiano);
-    currentPiano->configure();
-    
-    updateState->pianoDidChangeForGraph = true;
-    updateState->synchronicPreparationDidChange = true;
-    updateState->nostalgicPreparationDidChange = true;
-    updateState->directPreparationDidChange = true;
-    updateState->tempoPreparationDidChange = true;
-    updateState->tuningPreparationDidChange = true;
-    
-    gallery->setDefaultPiano(which);
-    gallery->setGalleryDirty(false);
-    
-    DBG("setting current piano to: " + String(which));
-    
-    if (sustainIsDown)
+    if(currentPiano != nullptr)
     {
-        for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-            currentPiano->activePMaps[p]->sustainPedalPressed();
+        currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
+        currentPiano->copyAdaptiveTuningState(prevPiano);
+        currentPiano->copyAdaptiveTempoState(prevPiano);
+        currentPiano->configure();
+        
+        updateState->pianoDidChangeForGraph = true;
+        updateState->synchronicPreparationDidChange = true;
+        updateState->nostalgicPreparationDidChange = true;
+        updateState->directPreparationDidChange = true;
+        updateState->tempoPreparationDidChange = true;
+        updateState->tuningPreparationDidChange = true;
+        
+        gallery->setDefaultPiano(which);
+        gallery->setGalleryDirty(false);
+        
+        DBG("setting current piano to: " + String(which));
+        
+        if (sustainIsDown)
+        {
+            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
+                currentPiano->activePMaps[p]->sustainPedalPressed();
+        }
     }
 }
 

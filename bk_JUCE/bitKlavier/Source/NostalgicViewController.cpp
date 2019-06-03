@@ -60,6 +60,12 @@ BKViewController(p, theGraph, 3)
     clusterMinSlider->setJustifyRight(true);
     addAndMakeVisible(clusterMinSlider);
     
+    //clusterThresholdSlider
+    clusterThresholdSlider = new BKSingleSlider("cluster thresh", 0, 1000, 150, 1);
+    clusterThresholdSlider->setToolTipString("time between note releases (ms) to be included in cluster");
+    clusterThresholdSlider->setJustifyRight(true);
+    addAndMakeVisible(clusterThresholdSlider);
+    
     beatsToSkipSlider = new BKSingleSlider("beats to skip", 0, 10, 0, 1);
     beatsToSkipSlider->setToolTipString("Indicates how long Nostalgic wave lasts with respect to linked Synchronic sequence");
     addAndMakeVisible(beatsToSkipSlider);
@@ -113,6 +119,7 @@ BKViewController(p, theGraph, 3)
     holdTimeMinMaxSlider->addWantsBigOneListener(this);
     velocityMinMaxSlider->addWantsBigOneListener(this);
     clusterMinSlider->addWantsBigOneListener(this);
+    clusterThresholdSlider->addWantsBigOneListener(this);
     beatsToSkipSlider->addWantsBigOneListener(this);
     gainSlider->addWantsBigOneListener(this);
     lengthMultiplierSlider->addWantsBigOneListener(this);
@@ -141,6 +148,7 @@ void NostalgicViewController::invisible(void)
     holdTimeMinMaxSlider->setVisible(false);
     velocityMinMaxSlider->setVisible(false);
     clusterMinSlider->setVisible(false);
+    clusterThresholdSlider->setVisible(false);
     
     reverseADSRSlider->setVisible(false);
     undertowADSRSlider->setVisible(false);
@@ -259,6 +267,7 @@ void NostalgicViewController::displayTab(int tab)
         holdTimeMinMaxSlider->setVisible(true);
         velocityMinMaxSlider->setVisible(true);
         clusterMinSlider->setVisible(true);
+        clusterThresholdSlider->setVisible(true);
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
@@ -270,9 +279,10 @@ void NostalgicViewController::displayTab(int tab)
         
         int columnHeight = area.getHeight();
 
-        holdTimeMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 3));
-        velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 3));
-        clusterMinSlider->setBounds(area.removeFromTop(columnHeight / 3));
+        holdTimeMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
+        velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
+        clusterMinSlider->setBounds(area.removeFromTop(columnHeight / 4));
+        clusterThresholdSlider->setBounds(area.removeFromTop(columnHeight / 4));
 
     }
     else if (tab == 2)
@@ -527,6 +537,7 @@ NostalgicViewController(p, theGraph)
     holdTimeMinMaxSlider->addMyListener(this);
     velocityMinMaxSlider->addMyListener(this);
     clusterMinSlider->addMyListener(this);
+    clusterThresholdSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
     
     keyOnResetToggle.addListener(this);
@@ -588,6 +599,7 @@ void NostalgicPreparationEditor::update(void)
         velocityMinMaxSlider->setMaxValue(prep->getVelocityMax(), dontSendNotification);
         
         clusterMinSlider->setValue(prep->getClusterMin(), dontSendNotification);
+        clusterThresholdSlider->setValue(prep->getClusterThreshold(), dontSendNotification);
         
         keyOnResetToggle.setToggleState(prep->getKeyOnReset(), dontSendNotification);
         
@@ -822,6 +834,13 @@ void NostalgicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
         prep->setClusterMin(val);
         active->setClusterMin(val);
     }
+    else if (name == "cluster thresh")
+    {
+        prep->setClusterThreshold(val);
+        active->setClusterThreshold(val);
+        
+        DBG("setting cluster thresh : " + String(val));
+    }
 }
 
 void NostalgicPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
@@ -934,12 +953,18 @@ void NostalgicPreparationEditor::timerCallback()
             {
                 velocityMinMaxSlider->setDisplayValue(nProcessor->getLastVelocity() * 127.);
                 clusterMinSlider->setDisplayValue(nProcessor->getCurrentClusterSize() + 1);
+                //clusterThresholdSlider->setDisplayValue(nProcessor->getClusterThresholdTimer());
+                if(nProcessor->getCurrentClusterSize()) clusterThresholdSlider->setDisplayValue(nProcessor->getClusterThresholdTimer());
+                else clusterThresholdSlider->setDisplayValue(0);
             }
             else
             {
                 velocityMinMaxSlider->setDisplayValue(0);
                 clusterMinSlider->setDisplayValue(0);
+                clusterThresholdSlider->setDisplayValue(0);
             }
+            
+            
             
             NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
             if(active->getMode() == NoteLengthSync)
@@ -949,6 +974,9 @@ void NostalgicPreparationEditor::timerCallback()
                 
                 clusterMinSlider->setBright();
                 clusterMinSlider->setEnabled(true);
+                
+                clusterThresholdSlider->setBright();
+                clusterThresholdSlider->setEnabled(true);
             }
             else
             {
@@ -957,6 +985,9 @@ void NostalgicPreparationEditor::timerCallback()
                 
                 clusterMinSlider->setDim(gModAlpha);
                 clusterMinSlider->setEnabled(false);
+                
+                clusterThresholdSlider->setDim(gModAlpha);
+                clusterThresholdSlider->setEnabled(false);
             }
 
             
@@ -1050,6 +1081,7 @@ NostalgicViewController(p, theGraph)
     holdTimeMinMaxSlider->addMyListener(this);
     velocityMinMaxSlider->addMyListener(this);
     clusterMinSlider->addMyListener(this);
+    clusterThresholdSlider->addMyListener(this);
     beatsToSkipSlider->addMyListener(this);
     
     keyOnResetToggle.addListener(this);
@@ -1075,6 +1107,7 @@ void NostalgicModificationEditor::greyOutAllComponents()
     holdTimeMinMaxSlider->setDim(gModAlpha);
     velocityMinMaxSlider->setDim(gModAlpha);
     clusterMinSlider->setDim(gModAlpha);
+    clusterThresholdSlider->setDim(gModAlpha);
     
     keyOnResetToggle.setAlpha(gModAlpha);
     keyOnResetLabel.setAlpha(gModAlpha);
@@ -1101,6 +1134,7 @@ void NostalgicModificationEditor::highlightModedComponents()
     if(mod->getDirty(NostalgicVelocityMin))       velocityMinMaxSlider->setBright();
     if(mod->getDirty(NostalgicVelocityMax))       velocityMinMaxSlider->setBright();
     if(mod->getDirty(NostalgicClusterMin))        clusterMinSlider->setBright();
+    if(mod->getDirty(NostalgicClusterThreshold))  clusterThresholdSlider->setBright();
     if(mod->getDirty(NostalgicKeyOnReset))        { keyOnResetToggle.setAlpha(1.); keyOnResetLabel.setAlpha(1.); }
 }
 
@@ -1164,6 +1198,8 @@ void NostalgicModificationEditor::update(void)
         velocityMinMaxSlider->setMaxValue(mod->getVelocityMax(), dontSendNotification);
         
         clusterMinSlider->setValue(mod->getClusterMin(), dontSendNotification);
+        
+        clusterThresholdSlider->setValue(mod->getClusterThreshold(), dontSendNotification);
     
         keyOnResetToggle.setToggleState((bool)mod->getKeyOnReset(), dontSendNotification);
     }
@@ -1445,7 +1481,18 @@ void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         mod->setClusterMin(val);
         mod->setDirty(NostalgicClusterMin);
         
+        DBG("setting cluster min : " + String(val));
+        
         clusterMinSlider->setBright();
+    }
+    else if (name == "cluster thresh")
+    {
+        mod->setClusterThreshold(val);
+        mod->setDirty(NostalgicClusterThreshold);
+        
+        DBG("setting cluster thresh : " + String(val));
+        
+        clusterThresholdSlider->setBright();
     }
     
     updateModification();

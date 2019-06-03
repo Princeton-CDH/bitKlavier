@@ -470,8 +470,10 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
     //cluster management
     if (inCluster)
     {
+        NostalgicPreparation::Ptr prep = nostalgic->aPrep;
         //moved beyond clusterThreshold time, done with cluster
-        if (clusterThresholdTimer >= (sampleRate * 0.15)) //eventually expose this threshold
+        //if (clusterThresholdTimer >= (sampleRate * 0.15)) //eventually expose this threshold
+        if (clusterThresholdTimer >= (sampleRate * .001 * prep->getClusterThreshold()))
         {
             inCluster = false;
             currentClusterSize = 0;

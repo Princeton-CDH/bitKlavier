@@ -562,6 +562,7 @@ typedef enum NostalgicParameterType {
     NostalgicHoldMin,
     NostalgicHoldMax,
     NostalgicClusterMin,
+    NostalgicClusterThreshold,
     NostalgicKeyOnReset,
     NostalgicVelocityMin,
     NostalgicVelocityMax,
@@ -588,6 +589,7 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKInt,
+    BKInt,
     BKInt
 };
 
@@ -601,12 +603,13 @@ static const std::vector<std::string> cNostalgicParameterTypes = {
     "BeatsToSkip",
     "Length Mode",
     "SyncTarget",
+    "NostalgicTuning",
     "ReverseADSR",
     "UndertowADSR",
     "HoldMin",
     "HoldMax",
     "ClusterMin",
-    "ClusterMax",
+    "ClusterThreshold",
     "KeyOnReset",
     "VelocityMin",
     "VelocityMax",

@@ -48,6 +48,7 @@ public:
     holdMin(p->getHoldMin()),
     holdMax(p->getHoldMax()),
     clusterMin(p->getClusterMin()),
+    clusterThreshold(p->getClusterThreshold()),
     keyOnReset(p->getKeyOnReset()),
     velocityMin(p->getVelocityMin()),
     velocityMax(p->getVelocityMax())
@@ -77,6 +78,7 @@ public:
         holdMax = 12000;
         
         clusterMin = 1;
+        clusterThreshold = 150;
         
         velocityMin = 0;
         velocityMax = 127;
@@ -103,6 +105,7 @@ public:
     holdMin(0),
     holdMax(12000),
     clusterMin(1),
+    clusterThreshold(150),
     keyOnReset(false),
     velocityMin(0),
     velocityMax(127)
@@ -137,6 +140,7 @@ public:
         holdMin = n->getHoldMin();
         holdMax = n->getHoldMax();
         clusterMin = n->getClusterMin();
+        clusterThreshold = n->getClusterThreshold();
         keyOnReset = n->getKeyOnReset();
         velocityMin = n->getVelocityMin();
         velocityMax = n->getVelocityMax();
@@ -170,6 +174,7 @@ public:
         if (dirty[NostalgicHoldMin]) holdMin = n->getHoldMin();
         if (dirty[NostalgicHoldMax]) holdMax = n->getHoldMax();
         if (dirty[NostalgicClusterMin]) clusterMin = n->getClusterMin();
+        if (dirty[NostalgicClusterThreshold]) clusterThreshold = n->getClusterThreshold();
         if (dirty[NostalgicKeyOnReset]) keyOnReset = n->getKeyOnReset();
         if (dirty[NostalgicVelocityMin]) velocityMin = n->getVelocityMin();
         if (dirty[NostalgicVelocityMax]) velocityMax = n->getVelocityMax();
@@ -195,6 +200,7 @@ public:
                 holdMin == n->getHoldMin() &&
                 holdMax == n->getHoldMax() &&
                 clusterMin == n->getClusterMin() &&
+                clusterThreshold == n->getClusterThreshold() &&
                 keyOnReset == n->getKeyOnReset() &&
                 velocityMin == n->getVelocityMin() &&
                 velocityMax == n->getVelocityMax());
@@ -291,8 +297,10 @@ public:
     inline const void setVelocityMax(int max)  { velocityMax = max; }
     
     inline const int getClusterMin() const noexcept { return clusterMin; }
+    inline const int getClusterThreshold() const noexcept { return clusterThreshold; }
     
     inline const void setClusterMin(int min)  { clusterMin = min; }
+    inline const void setClusterThreshold(int min)  { clusterThreshold = min; }
     
     inline const bool getKeyOnReset() const noexcept { return keyOnReset; }
     
@@ -349,6 +357,7 @@ public:
         prep.setProperty( "holdMax", getHoldMax(), 0);
         
         prep.setProperty( "clusterMin", getClusterMin(), 0);
+        prep.setProperty( "clusterThreshold", getClusterThreshold(), 0);
         
         prep.setProperty( "velocityMin", getVelocityMin(), 0);
         prep.setProperty( "velocityMax", getVelocityMax(), 0);
@@ -495,6 +504,19 @@ public:
             setClusterMin(1);
         }
         
+        // CLUSTER THRESHOLD
+        str = e->getStringAttribute("clusterThreshold");
+        
+        if (str != "")
+        {
+            i = str.getIntValue();
+            setClusterThreshold(i);
+        }
+        else
+        {
+            setClusterThreshold(150);
+        }
+        
         // VELOCITY MIN
         str = e->getStringAttribute("velocityMin");
         
@@ -563,6 +585,7 @@ private:
     
     float holdMin, holdMax;
     int clusterMin;
+    int clusterThreshold; //in ms
     int velocityMin, velocityMax;
     
     bool keyOnReset;
@@ -867,10 +890,9 @@ public:
     }
     
     inline float getLastVelocity() const noexcept { return lastVelocity; }
-    
     inline int getNumActiveNotes() const noexcept {return activeNotes.size(); }
-    
     inline int getCurrentClusterSize() const noexcept {return currentClusterSize;}
+    inline int getClusterThresholdTimer() const noexcept {return clusterThresholdTimer * 1000. / sampleRate;}
     
 private:
     BKSynthesiser*              synth;
@@ -894,6 +916,7 @@ private:
     int currentClusterSize;
     bool playCluster;
     uint64 clusterThresholdTimer;
+
     Array<int> clusterNotesPlayed;
     
     OwnedArray<NostalgicNoteStuff> reverseNotes;

@@ -41,6 +41,7 @@ public:
     ScopedPointer<BKADSRSlider> undertowADSRSlider;
     
     ScopedPointer<BKSingleSlider> clusterMinSlider;
+    ScopedPointer<BKSingleSlider> clusterThresholdSlider;
     ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
     ScopedPointer<BKRangeSlider> velocityMinMaxSlider;
     
