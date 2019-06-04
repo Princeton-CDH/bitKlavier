@@ -1026,6 +1026,7 @@ public:
     inline const int getTranspCounter() const noexcept { return transpCounter; }
     inline const int getEnvelopeCounter() const noexcept { return envelopeCounter; }
     inline const int getBeatCounter() const noexcept { return beatCounter; }
+    inline const int getClusterSize() const noexcept { return cluster.size(); }
     
     inline void setPhasor(uint64 c)  { phasor = c; }
     inline void setBeatMultiplierCounter(int c) {  beatMultiplierCounter = c; }

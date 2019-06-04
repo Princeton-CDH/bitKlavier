@@ -697,12 +697,21 @@ void SynchronicPreparationEditor::timerCallback()
         
         int maxTemp = 12; //arbitrary
         if(active->getClusterMax() > active->getClusterMin()) maxTemp = active->getClusterMax();
+        
+        /*
         if(sProcessor->getNumKeysDepressed() <= maxTemp && sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
             //clusterMinMaxSlider->setDisplayValue((float)sProcessor->getNumKeysDepressed() * active->getClusterMax() / clusterMinMaxSlider->maxSlider.getMaximum());
             clusterMinMaxSlider->setDisplayValue(sProcessor->getNumKeysDepressed());
         else clusterMinMaxSlider->setDisplayValue(0);
+         */
         
-        DBG("sProcessor->getNumKeysDepressed() = " + String(sProcessor->getNumKeysDepressed()) + "active->getClusterMax() = " + String(active->getClusterMax()));
+        if(sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
+            clusterMinMaxSlider->setDisplayValue(cluster->getClusterSize()  * 12. / clusterMinMaxSlider->maxSlider.getMaximum()); //scaling not working when minmaxSlider max is > 12
+        else clusterMinMaxSlider->setDisplayValue(0);
+        
+        //DBG("active->getClusterMax() = " + String(active->getClusterMax()) + "clusterMinMaxSlider->maxSlider.getMaximum() = " + String(clusterMinMaxSlider->maxSlider.getMaximum()));
+        
+        //DBG("cluster size = " + String(cluster->getClusterSize()));
         
         int counter = 0, size = 0;
         
