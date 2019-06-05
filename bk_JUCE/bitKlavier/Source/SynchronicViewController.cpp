@@ -134,7 +134,7 @@ BKViewController(p, theGraph, 2)
     addAndMakeVisible(howManySlider, ALL);
     
     clusterThreshSlider = new BKSingleSlider("cluster threshold", 20, 2000, 200, 10);
-    clusterThreshSlider->setToolTipString("Indicates window of time (milliseconds) within which notes are grouped as a cluster");
+    clusterThreshSlider->setToolTipString("successive notes spaced by less than this time (ms) are grouped as a cluster");
     clusterThreshSlider->setJustifyRight(true);
     addAndMakeVisible(clusterThreshSlider, ALL);
     
