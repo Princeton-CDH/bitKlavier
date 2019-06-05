@@ -110,6 +110,8 @@ protected:
     BKLabel modeLabel;
     BKLabel onOffLabel;
     
+    BKButtonAndMenuLAF comboBoxRightJustifyLAF;
+    
     void setShowADSR(String name, bool newval);
     int visibleADSR;
     

@@ -99,14 +99,18 @@ BKViewController(p, theGraph, 2)
     
     addAndMakeVisible(&modeSelectCB, ALL);
     
-    modeLabel.setText("triggers pulse", dontSendNotification);
+    modeLabel.setText("pulse triggered by", dontSendNotification);
+    modeLabel.setJustificationType(juce::Justification::centredRight);
     modeLabel.setTooltip("Determines which aspect of MIDI signal triggers the Synchronic sequence");
     addAndMakeVisible(&modeLabel, ALL);
     
     // ON OFF
     onOffSelectCB.setName("OnOff");
     onOffSelectCB.addSeparator();
-    onOffSelectCB.BKSetJustificationType(juce::Justification::centredRight);
+    //onOffSelectCB.BKSetJustificationType(juce::Justification::centredRight);
+    onOffSelectCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+    //onOffSelectCB.BKSetJustificationType(juce::Justification::centredLeft);
     onOffSelectCB.setSelectedItemIndex(0);
     onOffSelectCB.setTooltip("Determines whether MIDI note-on or note-off is used to measure cluster");
     
@@ -145,7 +149,7 @@ BKViewController(p, theGraph, 2)
     
     clusterCapSlider = new BKSingleSlider("cluster thickness", 1, 20, 8, 1);
     clusterCapSlider->setToolTipString("maximum number of notes in sounding pulse");
-    clusterCapSlider->setJustifyRight(true);
+    //clusterCapSlider->setJustifyRight(true);
     addAndMakeVisible(clusterCapSlider, ALL);
     
     holdTimeMinMaxSlider = new BKRangeSlider("hold min/max", 0., 12000., 0.0, 12000., 1);
@@ -431,6 +435,7 @@ void SynchronicViewController::displayTab(int tab)
         area.removeFromLeft(processor.paddingScalarX * 20); //area is now right column
         area.removeFromRight(processor.paddingScalarX * 20);
         
+        /*
         int columnHeight = leftColumn.getHeight();
         
         Rectangle<int> modeSelectCBRect (leftColumn.removeFromTop(columnHeight / 4));
@@ -442,12 +447,6 @@ void SynchronicViewController::displayTab(int tab)
         onOffSelectCB.setBounds(modeSelectCBRect.removeFromTop(gComponentComboBoxHeight));
         onOffLabel.setBounds(modeSelectLabel.removeFromTop(gComponentComboBoxHeight));
         
-        /*
-        Rectangle<int> onOffSelectCBRect (leftColumn.removeFromTop(columnHeight / 5));
-        onOffSelectCB.setBounds(onOffSelectCBRect.removeFromLeft(onOffSelectCBRect.getWidth()*0.5).removeFromTop(gComponentComboBoxHeight));
-        onOffLabel.setBounds(onOffSelectCBRect.removeFromTop(gComponentComboBoxHeight));
-        */
-        
         howManySlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
         numClusterSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
         gainSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
@@ -457,6 +456,32 @@ void SynchronicViewController::displayTab(int tab)
         clusterCapSlider->setBounds(area.removeFromTop(columnHeight / 5));
         holdTimeMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 5));
         velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 5));
+        */
+        
+        Rectangle<int> modeSelectCBRect (leftColumn.removeFromTop(gComponentComboBoxHeight));
+        Rectangle<int> modeSelectLabel (modeSelectCBRect.removeFromLeft(modeSelectCBRect.getWidth()*0.5));
+        modeSelectCB.setBounds(modeSelectCBRect);
+        modeLabel.setBounds(modeSelectLabel);
+        
+        Rectangle<int> onOffSelectCBRect (area.removeFromTop(gComponentComboBoxHeight));
+        Rectangle<int> onOffSelectLabel (onOffSelectCBRect.removeFromRight(onOffSelectCBRect.getWidth()*0.5));
+        onOffSelectCB.setBounds(onOffSelectCBRect);
+        onOffLabel.setBounds(onOffSelectLabel);
+        
+        leftColumn.removeFromTop(gYSpacing + gComponentComboBoxHeight * 2 * processor.paddingScalarY);
+        area.removeFromTop(gYSpacing + gComponentComboBoxHeight * 2 * processor.paddingScalarY);
+        
+        int columnHeight = leftColumn.getHeight();
+        
+        howManySlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
+        numClusterSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
+        clusterCapSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
+        gainSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
+        
+        clusterThreshSlider->setBounds(area.removeFromTop(columnHeight / 4));
+        clusterMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
+        holdTimeMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
+        velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
         
         releaseVelocitySetsSynchronicToggle.setVisible(true);
     }
