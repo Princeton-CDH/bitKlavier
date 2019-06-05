@@ -80,6 +80,7 @@ const String ptagSynchronic_tempo = "tempoId";
 const String ptagSynchronic_numBeats = "numBeats";
 const String ptagSynchronic_clusterMin = "clusterMin";
 const String ptagSynchronic_clusterMax = "clusterMax";
+const String ptagSynchronic_clusterCap = "clusterCap";
 const String ptagSynchronic_clusterThresh = "clusterThresh";
 const String ptagSynchronic_mode = "mode";
 const String ptagSynchronic_beatsToSkip = "beatsToSkip";
@@ -453,6 +454,7 @@ typedef enum SynchronicParameterType {
     SynchronicNumPulses,
     SynchronicClusterMin,
     SynchronicClusterMax,
+    SynchronicClusterCap,
     SynchronicClusterThresh,
     SynchronicMode,
     SynchronicBeatsToSkip,
@@ -473,6 +475,7 @@ typedef enum SynchronicParameterType {
 
 
 static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
+    BKInt,
     BKInt,
     BKInt,
     BKInt,
@@ -499,6 +502,7 @@ static const std::vector<std::string> cSynchronicParameterTypes = {
     "NumPulses",
     "ClusterMin",
     "ClusterMax",
+    "ClusterCap",
     "ClusterThresh",
     "Mode",
     "BeatsToSkip",
@@ -520,7 +524,8 @@ static const std::vector<std::vector<float>> cSynchronicDefaultRangeValuesAndInc
 	{ 0.0f, 0.0f, 0.0f, 0.0f }, //min, max, default, increment, skew
 	{ 1.0f, 100.0f, 20.0f, 1.0f },
 	{ 1.0f, 4.0f, 1.0f, 1.0f },
-	{ 2.0f, 8.0f, 8.0f, 1.0f },
+    { 2.0f, 8.0f, 8.0f, 1.0f },
+	{ 1.0f, 20.0f, 8.0f, 1.0f },
 	{ 20.0f, 2000.0f, 500.0f, 10.0f },
 	{ 0.0f, 0.0f, 0.0f },
 	{ 0.0f, 4.0f, 0.0f, 1.0f },

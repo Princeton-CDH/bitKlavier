@@ -98,6 +98,7 @@ protected:
     ScopedPointer<BKSingleSlider> howManySlider;
     ScopedPointer<BKSingleSlider> clusterThreshSlider;
     ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
+    ScopedPointer<BKSingleSlider> clusterCapSlider;
     
     ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
     ScopedPointer<BKRangeSlider> velocityMinMaxSlider;

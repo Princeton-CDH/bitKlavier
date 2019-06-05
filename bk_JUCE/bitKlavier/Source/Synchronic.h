@@ -74,6 +74,7 @@ public:
     sNumBeats(numBeats),
     sClusterMin(clusterMin),
     sClusterMax(clusterMax),
+    sClusterCap(8),
     sMode(mode),
     sBeatsToSkip(beatsToSkip),
     sBeatMultipliers(beatMultipliers),
@@ -161,6 +162,7 @@ public:
         if (dirty[SynchronicNumPulses]) sNumBeats = s->getNumBeats();
         if (dirty[SynchronicClusterMin]) sClusterMin = s->getClusterMin();
         if (dirty[SynchronicClusterMax]) sClusterMax = s->getClusterMax();
+        if (dirty[SynchronicClusterCap]) sClusterCap = s->getClusterCap();
         if (dirty[SynchronicMode]) sMode = s->getMode();
         if (dirty[SynchronicBeatsToSkip]) sBeatsToSkip = s->getBeatsToSkip();
         if (dirty[SynchronicBeatMultipliers]) sBeatMultipliers = s->getBeatMultipliers();
@@ -602,6 +604,7 @@ public:
         prep.setProperty( ptagSynchronic_numBeats,            getNumBeats(), 0);
         prep.setProperty( ptagSynchronic_clusterMin,          getClusterMin(), 0);
         prep.setProperty( ptagSynchronic_clusterMax,          getClusterMax(), 0);
+        prep.setProperty( ptagSynchronic_clusterCap,          getClusterCap(), 0);
         prep.setProperty( ptagSynchronic_clusterThresh,       getClusterThreshMS(), 0);
         prep.setProperty( ptagSynchronic_mode,                getMode(), 0);
         prep.setProperty( ptagSynchronic_beatsToSkip,         getBeatsToSkip(), 0);
@@ -685,6 +688,11 @@ public:
         
         i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
         setClusterMax(i);
+        
+        //i = e->getStringAttribute(ptagSynchronic_clusterCap).getIntValue();
+        n = e->getStringAttribute(ptagSynchronic_clusterCap);
+        if (n != "")    setClusterCap(n.getIntValue());
+        else            setClusterCap(8);
         
         n = e->getStringAttribute("holdMin");
         

@@ -143,6 +143,11 @@ BKViewController(p, theGraph, 2)
     clusterMinMaxSlider->setJustifyRight(true);
     addAndMakeVisible(clusterMinMaxSlider, ALL);
     
+    clusterCapSlider = new BKSingleSlider("cluster thickness", 1, 20, 8, 1);
+    clusterCapSlider->setToolTipString("maximum number of notes in sounding pulse");
+    clusterCapSlider->setJustifyRight(true);
+    addAndMakeVisible(clusterCapSlider, ALL);
+    
     holdTimeMinMaxSlider = new BKRangeSlider("hold min/max", 0., 12000., 0.0, 12000., 1);
     holdTimeMinMaxSlider->setToolTipString("Sets Min and Max time (ms) held to trigger pulses; Min can be greater than Max");
     holdTimeMinMaxSlider->setJustifyRight(true);
@@ -168,6 +173,7 @@ BKViewController(p, theGraph, 2)
     numClusterSlider->addWantsBigOneListener(this);
     howManySlider->addWantsBigOneListener(this);
     clusterThreshSlider->addWantsBigOneListener(this);
+    clusterCapSlider->addWantsBigOneListener(this);
     gainSlider->addWantsBigOneListener(this);
     clusterMinMaxSlider->addWantsBigOneListener(this);
     holdTimeMinMaxSlider->addWantsBigOneListener(this);
@@ -224,6 +230,8 @@ void SynchronicViewController::invisible(void)
     clusterMinMaxSlider->setVisible(false);
     
     clusterThreshSlider->setVisible(false);
+    
+    clusterCapSlider->setVisible(false);
     
     holdTimeMinMaxSlider->setVisible(false);
     
@@ -366,6 +374,8 @@ void SynchronicViewController::displayTab(int tab)
         
         clusterThreshSlider->setVisible(true);
         
+        clusterCapSlider->setVisible(true);
+        
         holdTimeMinMaxSlider->setVisible(true);
         
         velocityMinMaxSlider->setVisible(true);
@@ -442,10 +452,11 @@ void SynchronicViewController::displayTab(int tab)
         numClusterSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
         gainSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
         
-        clusterThreshSlider->setBounds(area.removeFromTop(columnHeight / 4));
-        clusterMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
-        holdTimeMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
-        velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
+        clusterThreshSlider->setBounds(area.removeFromTop(columnHeight / 5));
+        clusterMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 5));
+        clusterCapSlider->setBounds(area.removeFromTop(columnHeight / 5));
+        holdTimeMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 5));
+        velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 5));
         
         releaseVelocitySetsSynchronicToggle.setVisible(true);
     }
@@ -602,6 +613,7 @@ SynchronicViewController(p, theGraph)
     offsetParamStartToggle.addListener(this);
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
+    clusterCapSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
     holdTimeMinMaxSlider->addMyListener(this);
     velocityMinMaxSlider->addMyListener(this);
@@ -847,6 +859,12 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         prep->setClusterThresh(val);
         active->setClusterThresh(val);
     }
+    else if(name == "cluster thickness")
+    {
+        DBG("got new cluster thickness " + String(val));
+        prep->setClusterCap(val);
+        active->setClusterCap(val);
+    }
     else if(name == "gain")
     {
         DBG("gain " + String(val));
@@ -908,6 +926,7 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         releaseVelocitySetsSynchronicToggle.setToggleState(prep->getReleaseVelocitySetsSynchronic(), notify);
         howManySlider->setValue(prep->getNumBeats(), notify);
         clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
+        clusterCapSlider->setValue(prep->getClusterCap(), notify);
         clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
         clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
         
@@ -1348,6 +1367,7 @@ SynchronicViewController(p, theGraph)
     howManySlider->addMyListener(this);
     clusterThreshSlider->addMyListener(this);
     clusterMinMaxSlider->addMyListener(this);
+    clusterCapSlider->addMyListener(this);
     holdTimeMinMaxSlider->addMyListener(this);
     velocityMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
@@ -1357,6 +1377,7 @@ SynchronicViewController(p, theGraph)
     
     howManySlider->displaySliderVisible(false);
     clusterThreshSlider->displaySliderVisible(false);
+    clusterCapSlider->displaySliderVisible(false);
     clusterMinMaxSlider->displaySliderVisible(false);
     holdTimeMinMaxSlider->displaySliderVisible(false);
     velocityMinMaxSlider->displaySliderVisible(false);
@@ -1376,7 +1397,7 @@ void SynchronicModificationEditor::greyOutAllComponents()
     
     howManySlider->setDim(gModAlpha);
     clusterThreshSlider->setDim(gModAlpha);
-    clusterThreshSlider->setDim(gModAlpha);
+    clusterCapSlider->setDim(gModAlpha);
     gainSlider->setDim(gModAlpha);
     numClusterSlider->setDim(gModAlpha);
     
@@ -1405,6 +1426,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     if(mod->getDirty(SynchronicOnOff))            onOffSelectCB.setAlpha(1.);
     if(mod->getDirty(SynchronicNumPulses))        howManySlider->setBright();
     if(mod->getDirty(SynchronicClusterThresh))    clusterThreshSlider->setBright();
+    if(mod->getDirty(SynchronicClusterCap))       clusterCapSlider->setBright();
     if(mod->getDirty(SynchronicClusterMin))       clusterMinMaxSlider->setBright();
     if(mod->getDirty(SynchronicClusterMax))       clusterMinMaxSlider->setBright();
     if(mod->getDirty(SynchronicHoldMin))          holdTimeMinMaxSlider->setBright();
@@ -1492,6 +1514,8 @@ void SynchronicModificationEditor::update(NotificationType notify)
         howManySlider->setValue(mod->getNumBeats(), notify);
         
         clusterThreshSlider->setValue(mod->getClusterThreshMS(), notify);
+        
+        clusterCapSlider->setValue(mod->getClusterCap(), notify);
         
         clusterMinMaxSlider->setMinValue(mod->getClusterMin(), notify);
         
@@ -1714,6 +1738,13 @@ void SynchronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
         mod->setDirty(SynchronicClusterThresh);
         
         clusterThreshSlider->setBright();
+    }
+    else if(name == "cluster thickness")
+    {
+        mod->setClusterCap(val);
+        mod->setDirty(SynchronicClusterCap);
+        
+        clusterCapSlider->setBright();
     }
     else if(name == "gain")
     {
