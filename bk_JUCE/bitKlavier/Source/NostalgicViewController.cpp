@@ -975,8 +975,16 @@ void NostalgicPreparationEditor::timerCallback()
                 clusterMinSlider->setBright();
                 clusterMinSlider->setEnabled(true);
                 
-                clusterThresholdSlider->setBright();
-                clusterThresholdSlider->setEnabled(true);
+                if(active->getClusterMin() > 1)
+                {
+                    clusterThresholdSlider->setBright();
+                    clusterThresholdSlider->setEnabled(true);
+                }
+                else
+                {
+                    clusterThresholdSlider->setDim(gModAlpha);
+                    clusterThresholdSlider->setEnabled(false);
+                }
             }
             else
             {
