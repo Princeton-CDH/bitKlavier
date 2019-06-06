@@ -105,100 +105,100 @@ namespace BinaryData
     const int            _32__Spring_Tuning_5_xmlSize = 10777;
 
     extern const char*   And_So_xml;
-    const int            And_So_xmlSize = 7254;
+    const int            And_So_xmlSize = 15871;
 
     extern const char*   Around_60_xml;
-    const int            Around_60_xmlSize = 6261;
+    const int            Around_60_xmlSize = 17805;
 
     extern const char*   Circleville_xml;
-    const int            Circleville_xmlSize = 10751;
+    const int            Circleville_xmlSize = 21501;
 
     extern const char*   Crests_xml;
-    const int            Crests_xmlSize = 10605;
+    const int            Crests_xmlSize = 26079;
 
     extern const char*   Cygnet_xml;
-    const int            Cygnet_xmlSize = 10157;
+    const int            Cygnet_xmlSize = 25740;
 
     extern const char*   Daily_Decrease_xml;
-    const int            Daily_Decrease_xmlSize = 7404;
+    const int            Daily_Decrease_xmlSize = 16883;
 
     extern const char*   Didymus_xml;
-    const int            Didymus_xmlSize = 5166;
+    const int            Didymus_xmlSize = 12392;
 
     extern const char*   for_Bill_D_xml;
-    const int            for_Bill_D_xmlSize = 23322;
+    const int            for_Bill_D_xmlSize = 50692;
 
     extern const char*   Gigue_Interrupted_xml;
-    const int            Gigue_Interrupted_xmlSize = 10613;
+    const int            Gigue_Interrupted_xmlSize = 24106;
 
     extern const char*   Houseboat_xml;
-    const int            Houseboat_xmlSize = 23661;
+    const int            Houseboat_xmlSize = 46856;
 
     extern const char*   Hurra_xml;
-    const int            Hurra_xmlSize = 7848;
+    const int            Hurra_xmlSize = 20351;
 
     extern const char*   Juxtaposed_Weather_xml;
-    const int            Juxtaposed_Weather_xmlSize = 10274;
+    const int            Juxtaposed_Weather_xmlSize = 41284;
 
     extern const char*   Keep_It_Steady_OrNot_xml;
-    const int            Keep_It_Steady_OrNot_xmlSize = 9682;
+    const int            Keep_It_Steady_OrNot_xmlSize = 28581;
 
     extern const char*   Keep_It_Steady_xml;
-    const int            Keep_It_Steady_xmlSize = 14264;
+    const int            Keep_It_Steady_xmlSize = 29584;
 
     extern const char*   Listen_xml;
-    const int            Listen_xmlSize = 13704;
+    const int            Listen_xmlSize = 33318;
 
     extern const char*   Mamas_Musette_xml;
-    const int            Mamas_Musette_xmlSize = 10646;
+    const int            Mamas_Musette_xmlSize = 33046;
 
     extern const char*   Petite_Gymnopedie_xml;
-    const int            Petite_Gymnopedie_xmlSize = 8328;
+    const int            Petite_Gymnopedie_xmlSize = 20452;
 
     extern const char*   Pyramids_xml;
-    const int            Pyramids_xmlSize = 8033;
+    const int            Pyramids_xmlSize = 22390;
 
     extern const char*   Quickie_xml;
-    const int            Quickie_xmlSize = 10127;
+    const int            Quickie_xmlSize = 29279;
 
     extern const char*   Scales_within_Sliding_Scales_xml;
-    const int            Scales_within_Sliding_Scales_xmlSize = 7856;
+    const int            Scales_within_Sliding_Scales_xmlSize = 19682;
 
     extern const char*   Slow_To_Come_Back_xml;
-    const int            Slow_To_Come_Back_xmlSize = 15494;
+    const int            Slow_To_Come_Back_xmlSize = 26113;
 
     extern const char*   Southwing_xml;
-    const int            Southwing_xmlSize = 7775;
+    const int            Southwing_xmlSize = 22126;
 
     extern const char*   Who_do_you_think_you_are_Mars_xml;
-    const int            Who_do_you_think_you_are_Mars_xmlSize = 4941;
+    const int            Who_do_you_think_you_are_Mars_xmlSize = 12377;
 
     extern const char*   Worm_xml;
-    const int            Worm_xmlSize = 6954;
+    const int            Worm_xmlSize = 18502;
 
     extern const char*   NS_1_Prelude_xml;
-    const int            NS_1_Prelude_xmlSize = 47562;
+    const int            NS_1_Prelude_xmlSize = 59383;
 
     extern const char*   NS_2_Undertow_xml;
-    const int            NS_2_Undertow_xmlSize = 44344;
+    const int            NS_2_Undertow_xmlSize = 61095;
 
     extern const char*   NS_3_Song_xml;
-    const int            NS_3_Song_xmlSize = 47563;
+    const int            NS_3_Song_xmlSize = 59366;
 
     extern const char*   NS_4_Marbles_xml;
-    const int            NS_4_Marbles_xmlSize = 56590;
+    const int            NS_4_Marbles_xmlSize = 68813;
 
     extern const char*   NS_5_Wallumrod_xml;
-    const int            NS_5_Wallumrod_xmlSize = 69940;
+    const int            NS_5_Wallumrod_xmlSize = 103183;
 
     extern const char*   NS_6_PointsAmongLines_xml;
-    const int            NS_6_PointsAmongLines_xmlSize = 46095;
+    const int            NS_6_PointsAmongLines_xmlSize = 58183;
 
     extern const char*   NS_7_Systerslaat_xml;
-    const int            NS_7_Systerslaat_xmlSize = 94887;
+    const int            NS_7_Systerslaat_xmlSize = 176928;
 
     extern const char*   NS_8_ItIsEnough_xml;
-    const int            NS_8_ItIsEnough_xmlSize = 65316;
+    const int            NS_8_ItIsEnough_xmlSize = 65783;
 
     extern const char*   Basic_Piano_xml;
     const int            Basic_Piano_xmlSize = 4393;
