@@ -50,11 +50,23 @@ void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
 void SynchronicProcessor::playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster)
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
+    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
     
-    float noteLength = (fabs(prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()]) * tempo->getTempo()->aPrep->getBeatThreshMS() / tempo->getTempo()->aPrep->getSubdivisions());
+    float noteLength = 0.0;
+    
+ 
+    if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
+    {
+        noteLength = (fabs(prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()]) * tempoPrep->getBeatThreshMS());
+    }
+    else
+    {
+        noteLength = (fabs(prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()]) * tempoPrep->getBeatThreshMS() / tempoPrep->getSubdivisions());
+    }
+    
     
     if (prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()] < 0)
     {
@@ -411,6 +423,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
 void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoadType type)
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
+    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
     while (clusters.size() > prep->getNumClusters())
     {
@@ -420,7 +433,17 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     //do this every block, for adaptive tempo updates
     sampleType = type;
     clusterThresholdSamples = (prep->getClusterThreshSEC() * sampleRate);
-    beatThresholdSamples = (tempo->getTempo()->aPrep->getBeatThresh() / tempo->getTempo()->aPrep->getSubdivisions() * sampleRate);
+
+    if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
+    {
+        beatThresholdSamples = (tempoPrep->getBeatThresh() * sampleRate);
+    }
+    else
+    {
+        beatThresholdSamples = (tempoPrep->getBeatThresh() / tempoPrep->getSubdivisions() * sampleRate);
+    }
+    
+    
     
     for (auto key : keysDepressed)
     {

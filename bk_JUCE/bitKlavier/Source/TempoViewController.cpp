@@ -205,7 +205,7 @@ void TempoViewController::updateComponentVisibility()
     if(modeCB.getText() == "Adaptive Tempo 1")
     {
         AT1HistorySlider->setVisible(true);
-        AT1SubdivisionsSlider->setVisible(true);;
+        AT1SubdivisionsSlider->setVisible(true);
         AT1MinMaxSlider->setVisible(true);
         
         A1ModeLabel.setVisible(true);
@@ -215,6 +215,8 @@ void TempoViewController::updateComponentVisibility()
         A1AdaptedPeriodMultiplier.setVisible(true);
         
         A1reset.setVisible(true);
+        
+        subSlider->setVisible(false);
     }
     else
     {
@@ -229,6 +231,8 @@ void TempoViewController::updateComponentVisibility()
         A1AdaptedPeriodMultiplier.setVisible(false);
         
         A1reset.setVisible(false);
+        
+        subSlider->setVisible(true);
     }
     
 }
@@ -537,22 +541,22 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, 
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);;
     
-    if(name == tempoSlider->getName()) {
+    if(slider == tempoSlider) {
         DBG("got tempo " + String(val));
         prep->setTempo(val);
         active->setTempo(val);
     }
-    if(name == subSlider->getName()) {
+    if(slider == subSlider) {
         DBG("got sub " + String(val));
         prep->setSubdivisions(val);
         active->setSubdivisions(val);
     }
-    else if(name == AT1HistorySlider->getName()) {
+    else if(slider == AT1HistorySlider) {
         DBG("got A1History " + String(val));
         prep->setAdaptiveTempo1History(val);
         active->setAdaptiveTempo1History(val);
     }
-    else if(name == AT1SubdivisionsSlider->getName()) {
+    else if(slider == AT1SubdivisionsSlider) {
         DBG("got A1Subdivisions " + String(val));
         prep->setAdaptiveTempo1Subdivisions(val);
         active->setAdaptiveTempo1Subdivisions(val);
@@ -825,7 +829,7 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
     
-    if (name == selectCB.getName())
+    if (box == selectCB.getName())
     {
         setCurrentId(Id);
     }
@@ -882,25 +886,25 @@ void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
 {
     TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
     
-    if(name == tempoSlider->getName())
+    if(slider == tempoSlider)
     {
         mod->setTempo(val);
         mod->setDirty(TempoBPM);
         tempoSlider->setBright();
     }
-    else if(name == subSlider->getName())
+    else if(slider == subSlider)
     {
         mod->setSubdivisions(val);
         mod->setDirty(TempoSubdivisions);
         subSlider->setBright();
     }
-    else if(name == AT1HistorySlider->getName())
+    else if(slider == AT1HistorySlider)
     {
         mod->setAdaptiveTempo1History(val);
         mod->setDirty(AT1History);
         AT1HistorySlider->setBright();
     }
-    else if(name == AT1SubdivisionsSlider->getName())
+    else if(slider == AT1SubdivisionsSlider)
     {
         mod->setAdaptiveTempo1Subdivisions(val);
         mod->setDirty(AT1Subdivisions);

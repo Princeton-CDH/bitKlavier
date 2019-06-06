@@ -386,7 +386,11 @@ public:
     void processBlock(int numSamples, int channel);
     void keyPressed(int noteNumber, float velocity);
     void keyReleased(int noteNumber, int channel);
-    inline float getPeriodMultiplier(void)              {return adaptiveTempoPeriodMultiplier;}
+    inline float getPeriodMultiplier(void)
+    {
+        return ((tempo->aPrep->getTempoSystem() == AdaptiveTempo1) ? adaptiveTempoPeriodMultiplier : 1.0);
+        
+    }
     inline float getAdaptedTempo(void)                  {return tempo->aPrep->getTempo() / adaptiveTempoPeriodMultiplier;}
     
     void  adaptiveReset();

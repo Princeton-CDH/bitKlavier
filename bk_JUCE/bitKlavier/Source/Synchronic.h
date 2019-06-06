@@ -1308,17 +1308,7 @@ private:
     Array<uint64> holdTimers;
     int lastKeyPressed;
     float lastKeyVelocity;
-    
-    //adaptive tempo stuff
-    /*
-     uint64 atTimer, atLastTime; //in samples
-     int atDelta;                //in ms
-     Array<int> atDeltaHistory;  //in ms
-     void atNewNote();
-     void atNewNoteOff();
-     void atCalculatePeriodMultiplier();
-     float adaptiveTempoPeriodMultiplier;
-     */
+
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };
