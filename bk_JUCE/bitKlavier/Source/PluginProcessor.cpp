@@ -233,7 +233,7 @@ loader(*this)
     });
     
     mikroetudes = StringArray({
-        "And So...",
+        "And So",
         "Around 60",
         "Circleville",
         "Crests",
@@ -247,7 +247,7 @@ loader(*this)
         "Juxtaposed Weather",
         "Keep It Steady (OrNot)",
         "Keep It Steady",
-        "Listen!",
+        "Listen",
         "Mama's Musette",
         "Petite Gymnopedie",
         "Pyramids",
@@ -255,7 +255,7 @@ loader(*this)
         "Scales within Sliding Scales",
         "Slow To Come Back",
         "Southwing",
-        "Who do you think you are, Mars?",
+        "Who do you think you are Mars",
         "Worm"
     });
     
