@@ -55,6 +55,9 @@ public:
     ~SynchronicViewController()
     {
         setLookAndFeel(nullptr);
+        releaseVelocitySetsSynchronicToggle.setLookAndFeel(nullptr);
+        onOffSelectCB.setLookAndFeel(nullptr);
+        
     };
     
     void paint (Graphics&) override;
@@ -138,7 +141,12 @@ public Timer
 {
 public:
     SynchronicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~SynchronicPreparationEditor() {setLookAndFeel(nullptr);}
+    ~SynchronicPreparationEditor()
+    {
+        setLookAndFeel(nullptr);
+        releaseVelocitySetsSynchronicToggle.setLookAndFeel(nullptr);
+        onOffSelectCB.setLookAndFeel(nullptr);
+    }
     
     void update(void) override;
     
