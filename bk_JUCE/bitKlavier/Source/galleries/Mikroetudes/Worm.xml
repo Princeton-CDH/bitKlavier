@@ -1,78 +1,239 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="Worm" defaultPiano="1">
-  <idCount i0="11" i1="11" i2="12" i3="12" i4="11" i5="17" i6="10" i7="10"
-           i8="10" i9="10" i10="10" i11="10" i12="10" i13="10" i14="10"/>
-  <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
-           resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
-           resAndHammer="1" invertSustain="0" tuningFund="440"/>
-  <tempo Id="11" name="11" tempo="120" system="0" at1Mode="0" at1History="4"
-         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
-  <tempo Id="-1" name="-1" tempo="120" system="0" at1Mode="0" at1History="4"
-         at1Subdivisions="1" at1Min="100" at1Max="2000"/>
-  <tuning Id="11" name="11" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
-          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
-          adaptiveClusterThresh="100" adaptiveHistory="4">
-    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
-                 f9="0" f10="0" f11="0"/>
-    <absoluteOffsets/>
+<gallery name="Worm" sampleType="3" soundfontURL="/Applications/bitKlavier/soundfonts/472.V1-Glockenspeil.sf2"
+         soundfontInst="2" defaultPiano="1">
+  <idcounts i0="2" i1="2" i2="3" i3="3" i4="2" i5="8" i6="1" i7="1" i8="1"
+            i9="1" i10="1" i11="1" i12="1" i13="1" i14="2" i15="1"/>
+  <general globalGain="1.0" tempoMultiplier="1.0" tuningFund="440.0" invertSustain="0"
+           noteOnSetsNoteOffVelocity="0"/>
+  <tempo Id="1" name="11">
+    <params tempo="120.0" system="0" at1Mode="0" at1History="4" at1Subdivisions="1.0"
+            at1Min="100.0" at1Max="2000.0" subdivisions="1.0"/>
+  </tempo>
+  <tempo Id="-1" name="-1">
+    <params tempo="120.0" system="0" at1Mode="0" at1History="4" at1Subdivisions="1.0"
+            at1Min="100.0" at1Max="2000.0" subdivisions="1.0"/>
+  </tempo>
+  <tuning Id="1" name="11">
+    <params scale="2" scaleName="Equal Temperament" fundamental="0" offset="0.0"
+            adaptiveIntervalScale="1" adaptiveInversional="1" adaptiveAnchorScale="2"
+            adaptiveAnchorFund="0" adaptiveClusterThresh="100" adaptiveHistory="4"
+            nToneRoot="60" nToneSemitoneWidth="100.0" adaptiveSystem="0">
+      <customScale f0="0.0" f1="0.0" f2="0.0" f3="0.0" f4="0.0" f5="0.0" f6="0.0"
+                   f7="0.0" f8="0.0" f9="0.0" f10="0.0" f11="0.0"/>
+      <absoluteOffsets/>
+      <springtuning rate="100.0" drag="0.1" tetherStiffness="0.5" intervalStiffness="0.5"
+                    stiffness="1.0" active="0" intervalTuningId="1" intervalFundamental="12"
+                    fundamentalSetsTether="0" tetherWeightGlobal="0.5" tetherWeightSecondaryGlobal="0.1">
+        <tethers t0="0.5" t1="0.5" t2="0.5" t3="0.5" t4="0.5" t5="0.5" t6="0.5"
+                 t7="0.5" t8="0.5" t9="0.5" t10="0.5" t11="0.5" t12="0.5" t13="0.5"
+                 t14="0.5" t15="0.5" t16="0.5" t17="0.5" t18="0.5" t19="0.5" t20="0.5"
+                 t21="0.5" t22="0.5" t23="0.5" t24="0.5" t25="0.5" t26="0.5" t27="0.5"
+                 t28="0.5" t29="0.5" t30="0.5" t31="0.5" t32="0.5" t33="0.5" t34="0.5"
+                 t35="0.5" t36="0.5" t37="0.5" t38="0.5" t39="0.5" t40="0.5" t41="0.5"
+                 t42="0.5" t43="0.5" t44="0.5" t45="0.5" t46="0.5" t47="0.5" t48="0.5"
+                 t49="0.5" t50="0.5" t51="0.5" t52="0.5" t53="0.5" t54="0.5" t55="0.5"
+                 t56="0.5" t57="0.5" t58="0.5" t59="0.5" t60="0.5" t61="0.5" t62="0.5"
+                 t63="0.5" t64="0.5" t65="0.5" t66="0.5" t67="0.5" t68="0.5" t69="0.5"
+                 t70="0.5" t71="0.5" t72="0.5" t73="0.5" t74="0.5" t75="0.5" t76="0.5"
+                 t77="0.5" t78="0.5" t79="0.5" t80="0.5" t81="0.5" t82="0.5" t83="0.5"
+                 t84="0.5" t85="0.5" t86="0.5" t87="0.5" t88="0.5" t89="0.5" t90="0.5"
+                 t91="0.5" t92="0.5" t93="0.5" t94="0.5" t95="0.5" t96="0.5" t97="0.5"
+                 t98="0.5" t99="0.5" t100="0.5" t101="0.5" t102="0.5" t103="0.5"
+                 t104="0.5" t105="0.5" t106="0.5" t107="0.5" t108="0.5" t109="0.5"
+                 t110="0.5" t111="0.5" t112="0.5" t113="0.5" t114="0.5" t115="0.5"
+                 t116="0.5" t117="0.5" t118="0.5" t119="0.5" t120="0.5" t121="0.5"
+                 t122="0.5" t123="0.5" t124="0.5" t125="0.5" t126="0.5" t127="0.5"/>
+        <springs s0="0.5" s1="0.5" s2="0.5" s3="0.5" s4="0.5" s5="0.5" s6="0.5"
+                 s7="0.5" s8="0.5" s9="0.5" s10="0.5" s11="0.5"/>
+        <intervalScale s0="0.0" s1="0.1173129975795746" s2="0.0391010008752346" s3="0.1564140021800995"
+                       s4="-0.1368599981069565" s5="-0.0195470005273819" s6="-0.1748729944229126"
+                       s7="0.0195470005273819" s8="0.1368640065193176" s9="-0.1564099937677383"
+                       s10="-0.3117449879646301" s11="-0.1173100024461746"/>
+        <springMode s0="1" s1="1" s2="1" s3="1" s4="1" s5="1" s6="1" s7="1" s8="1"
+                    s9="1" s10="1" s11="1"/>
+      </springtuning>
+    </params>
   </tuning>
-  <tuning Id="12" name="12" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="0"
-          adaptiveInversional="0" adaptiveAnchorScale="0" adaptiveAnchorFund="0"
-          adaptiveClusterThresh="300" adaptiveHistory="5">
-    <customScale f0="0.059999998658895492554" f1="0" f2="0.019999999552965164185"
-                 f3="0.039999999105930328369" f4="-0.019999999552965164185" f5="0.059999998658895492554"
-                 f6="-0.019999999552965164185" f7="0.039999999105930328369" f8="0.019999999552965164185"
-                 f9="0" f10="0.059999998658895492554" f11="-0.019999999552965164185"
-                 f12="0" f13="1" f14="2" f15="3" f16="4" f17="5" f18="6" f19="7"
-                 f20="8" f21="9" f22="10" f23="11"/>
-    <absoluteOffsets/>
+  <tuning Id="2" name="12">
+    <params scale="2" scaleName="Equal Temperament" fundamental="0" offset="0.0"
+            adaptiveIntervalScale="0" adaptiveInversional="0" adaptiveAnchorScale="0"
+            adaptiveAnchorFund="0" adaptiveClusterThresh="300" adaptiveHistory="5"
+            nToneRoot="60" nToneSemitoneWidth="100.0" adaptiveSystem="0">
+      <customScale f0="0.05999999865889549" f1="0.0" f2="0.01999999955296516" f3="0.03999999910593033"
+                   f4="-0.01999999955296516" f5="0.05999999865889549" f6="-0.01999999955296516"
+                   f7="0.03999999910593033" f8="0.01999999955296516" f9="0.0" f10="0.05999999865889549"
+                   f11="-0.01999999955296516" f12="0.0" f13="1.0" f14="2.0" f15="3.0"
+                   f16="4.0" f17="5.0" f18="6.0" f19="7.0" f20="8.0" f21="9.0" f22="10.0"
+                   f23="11.0"/>
+      <absoluteOffsets/>
+      <springtuning rate="100.0" drag="0.1" tetherStiffness="0.5" intervalStiffness="0.5"
+                    stiffness="1.0" active="0" intervalTuningId="1" intervalFundamental="12"
+                    fundamentalSetsTether="0" tetherWeightGlobal="0.5" tetherWeightSecondaryGlobal="0.1">
+        <tethers t0="0.5" t1="0.5" t2="0.5" t3="0.5" t4="0.5" t5="0.5" t6="0.5"
+                 t7="0.5" t8="0.5" t9="0.5" t10="0.5" t11="0.5" t12="0.5" t13="0.5"
+                 t14="0.5" t15="0.5" t16="0.5" t17="0.5" t18="0.5" t19="0.5" t20="0.5"
+                 t21="0.5" t22="0.5" t23="0.5" t24="0.5" t25="0.5" t26="0.5" t27="0.5"
+                 t28="0.5" t29="0.5" t30="0.5" t31="0.5" t32="0.5" t33="0.5" t34="0.5"
+                 t35="0.5" t36="0.5" t37="0.5" t38="0.5" t39="0.5" t40="0.5" t41="0.5"
+                 t42="0.5" t43="0.5" t44="0.5" t45="0.5" t46="0.5" t47="0.5" t48="0.5"
+                 t49="0.5" t50="0.5" t51="0.5" t52="0.5" t53="0.5" t54="0.5" t55="0.5"
+                 t56="0.5" t57="0.5" t58="0.5" t59="0.5" t60="0.5" t61="0.5" t62="0.5"
+                 t63="0.5" t64="0.5" t65="0.5" t66="0.5" t67="0.5" t68="0.5" t69="0.5"
+                 t70="0.5" t71="0.5" t72="0.5" t73="0.5" t74="0.5" t75="0.5" t76="0.5"
+                 t77="0.5" t78="0.5" t79="0.5" t80="0.5" t81="0.5" t82="0.5" t83="0.5"
+                 t84="0.5" t85="0.5" t86="0.5" t87="0.5" t88="0.5" t89="0.5" t90="0.5"
+                 t91="0.5" t92="0.5" t93="0.5" t94="0.5" t95="0.5" t96="0.5" t97="0.5"
+                 t98="0.5" t99="0.5" t100="0.5" t101="0.5" t102="0.5" t103="0.5"
+                 t104="0.5" t105="0.5" t106="0.5" t107="0.5" t108="0.5" t109="0.5"
+                 t110="0.5" t111="0.5" t112="0.5" t113="0.5" t114="0.5" t115="0.5"
+                 t116="0.5" t117="0.5" t118="0.5" t119="0.5" t120="0.5" t121="0.5"
+                 t122="0.5" t123="0.5" t124="0.5" t125="0.5" t126="0.5" t127="0.5"/>
+        <springs s0="0.5" s1="0.5" s2="0.5" s3="0.5" s4="0.5" s5="0.5" s6="0.5"
+                 s7="0.5" s8="0.5" s9="0.5" s10="0.5" s11="0.5"/>
+        <intervalScale s0="0.0" s1="0.1173129975795746" s2="0.0391010008752346" s3="0.1564140021800995"
+                       s4="-0.1368599981069565" s5="-0.0195470005273819" s6="-0.1748729944229126"
+                       s7="0.0195470005273819" s8="0.1368640065193176" s9="-0.1564099937677383"
+                       s10="-0.3117449879646301" s11="-0.1173100024461746"/>
+        <springMode s0="1" s1="1" s2="1" s3="1" s4="1" s5="1" s6="1" s7="1" s8="1"
+                    s9="1" s10="1" s11="1"/>
+      </springtuning>
+    </params>
   </tuning>
-  <tuning Id="-1" name="-1" scale="2" fundamental="0" offset="0" adaptiveIntervalScale="1"
-          adaptiveInversional="1" adaptiveAnchorScale="2" adaptiveAnchorFund="0"
-          adaptiveClusterThresh="100" adaptiveHistory="4">
-    <customScale f0="0" f1="0" f2="0" f3="0" f4="0" f5="0" f6="0" f7="0" f8="0"
-                 f9="0" f10="0" f11="0"/>
-    <absoluteOffsets/>
+  <tuning Id="-1" name="-1">
+    <params scale="2" scaleName="Equal Temperament" fundamental="0" offset="0.0"
+            adaptiveIntervalScale="1" adaptiveInversional="1" adaptiveAnchorScale="2"
+            adaptiveAnchorFund="0" adaptiveClusterThresh="100" adaptiveHistory="4"
+            nToneRoot="60" nToneSemitoneWidth="100.0" adaptiveSystem="0">
+      <customScale f0="0.0" f1="0.0" f2="0.0" f3="0.0" f4="0.0" f5="0.0" f6="0.0"
+                   f7="0.0" f8="0.0" f9="0.0" f10="0.0" f11="0.0"/>
+      <absoluteOffsets/>
+      <springtuning rate="100.0" drag="0.1" tetherStiffness="0.5" intervalStiffness="0.5"
+                    stiffness="1.0" active="0" intervalTuningId="1" intervalFundamental="12"
+                    fundamentalSetsTether="0" tetherWeightGlobal="0.5" tetherWeightSecondaryGlobal="0.1">
+        <tethers t0="0.5" t1="0.5" t2="0.5" t3="0.5" t4="0.5" t5="0.5" t6="0.5"
+                 t7="0.5" t8="0.5" t9="0.5" t10="0.5" t11="0.5" t12="0.5" t13="0.5"
+                 t14="0.5" t15="0.5" t16="0.5" t17="0.5" t18="0.5" t19="0.5" t20="0.5"
+                 t21="0.5" t22="0.5" t23="0.5" t24="0.5" t25="0.5" t26="0.5" t27="0.5"
+                 t28="0.5" t29="0.5" t30="0.5" t31="0.5" t32="0.5" t33="0.5" t34="0.5"
+                 t35="0.5" t36="0.5" t37="0.5" t38="0.5" t39="0.5" t40="0.5" t41="0.5"
+                 t42="0.5" t43="0.5" t44="0.5" t45="0.5" t46="0.5" t47="0.5" t48="0.5"
+                 t49="0.5" t50="0.5" t51="0.5" t52="0.5" t53="0.5" t54="0.5" t55="0.5"
+                 t56="0.5" t57="0.5" t58="0.5" t59="0.5" t60="0.5" t61="0.5" t62="0.5"
+                 t63="0.5" t64="0.5" t65="0.5" t66="0.5" t67="0.5" t68="0.5" t69="0.5"
+                 t70="0.5" t71="0.5" t72="0.5" t73="0.5" t74="0.5" t75="0.5" t76="0.5"
+                 t77="0.5" t78="0.5" t79="0.5" t80="0.5" t81="0.5" t82="0.5" t83="0.5"
+                 t84="0.5" t85="0.5" t86="0.5" t87="0.5" t88="0.5" t89="0.5" t90="0.5"
+                 t91="0.5" t92="0.5" t93="0.5" t94="0.5" t95="0.5" t96="0.5" t97="0.5"
+                 t98="0.5" t99="0.5" t100="0.5" t101="0.5" t102="0.5" t103="0.5"
+                 t104="0.5" t105="0.5" t106="0.5" t107="0.5" t108="0.5" t109="0.5"
+                 t110="0.5" t111="0.5" t112="0.5" t113="0.5" t114="0.5" t115="0.5"
+                 t116="0.5" t117="0.5" t118="0.5" t119="0.5" t120="0.5" t121="0.5"
+                 t122="0.5" t123="0.5" t124="0.5" t125="0.5" t126="0.5" t127="0.5"/>
+        <springs s0="0.5" s1="0.5" s2="0.5" s3="0.5" s4="0.5" s5="0.5" s6="0.5"
+                 s7="0.5" s8="0.5" s9="0.5" s10="0.5" s11="0.5"/>
+        <intervalScale s0="0.0" s1="0.1173129975795746" s2="0.0391010008752346" s3="0.1564140021800995"
+                       s4="-0.1368599981069565" s5="-0.0195470005273819" s6="-0.1748729944229126"
+                       s7="0.0195470005273819" s8="0.1368640065193176" s9="-0.1564099937677383"
+                       s10="-0.3117449879646301" s11="-0.1173100024461746"/>
+        <springMode s0="1" s1="1" s2="1" s3="1" s4="1" s5="1" s6="1" s7="1" s8="1"
+                    s9="1" s10="1" s11="1"/>
+      </springtuning>
+    </params>
   </tuning>
-  <direct Id="11" name="11" gain="1" resGain="1" hammerGain="1">
-    <transposition f0="0"/>
+  <direct Id="1" name="11">
+    <params gain="1.0" resGain="0.4000000059604645" hammerGain="0.2000000029802322">
+      <transposition f0="0.0"/>
+      <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
+    </params>
   </direct>
-  <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
-    <transposition f0="0"/>
+  <direct Id="-1" name="-1">
+    <params gain="1.0" resGain="1.0" hammerGain="1.0">
+      <transposition f0="0.0"/>
+      <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
+    </params>
   </direct>
-  <synchronic Id="11" name="11" numBeats="0" clusterMin="1" clusterMax="100"
-              clusterThresh="500" mode="0" beatsToSkip="0">
-    <beatMultipliers f0="1"/>
-    <lengthMultipliers f0="1"/>
-    <accentMultipliers f0="1"/>
-    <transpOffsets>
-      <t0 f0="0"/>
-    </transpOffsets>
+  <synchronic Id="1" name="11">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127">
+      <beatMultipliers f0="1.0"/>
+      <lengthMultipliers f0="1.0"/>
+      <accentMultipliers f0="1.0"/>
+      <transpOffsets>
+        <t0 f0="0.0"/>
+      </transpOffsets>
+      <ADSRs>
+        <e0 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="1.0"/>
+        <e1 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e2 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e3 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e4 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e5 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e6 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e7 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e8 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e9 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e10 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e11 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      </ADSRs>
+    </params>
   </synchronic>
-  <synchronic Id="-1" name="-1" numBeats="0" clusterMin="1" clusterMax="100"
-              clusterThresh="500" mode="0" beatsToSkip="0">
-    <beatMultipliers f0="1"/>
-    <lengthMultipliers f0="1"/>
-    <accentMultipliers f0="1"/>
-    <transpOffsets>
-      <t0 f0="0"/>
-    </transpOffsets>
+  <synchronic Id="-1" name="-1">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127">
+      <beatMultipliers f0="1.0"/>
+      <lengthMultipliers f0="1.0"/>
+      <accentMultipliers f0="1.0"/>
+      <transpOffsets>
+        <t0 f0="0.0"/>
+      </transpOffsets>
+      <ADSRs>
+        <e0 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="1.0"/>
+        <e1 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e2 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e3 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e4 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e5 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e6 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e7 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e8 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e9 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e10 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e11 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      </ADSRs>
+    </params>
   </synchronic>
-  <nostalgic Id="11" name="Nostalgic11" waveDistance="0" undertow="0" gain="1"
-             lengthMultiplier="1" beatsToSkip="0" mode="0">
-    <transposition f0="0"/>
+  <nostalgic Id="1" name="Nostalgic11">
+    <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
+            beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0">
+      <transposition f0="0.0"/>
+      <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
+      <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
+    </params>
   </nostalgic>
-  <nostalgic Id="12" name="12" waveDistance="0" undertow="0" gain="1" lengthMultiplier="1"
-             beatsToSkip="1" mode="0">
-    <transposition f0="0"/>
+  <nostalgic Id="2" name="12">
+    <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
+            beatsToSkip="1.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0">
+      <transposition f0="0.0"/>
+      <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
+      <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
+    </params>
   </nostalgic>
-  <nostalgic Id="-1" name="Nostalgic-1" waveDistance="0" undertow="0" gain="1"
-             lengthMultiplier="1" beatsToSkip="0" mode="0">
-    <transposition f0="0"/>
+  <nostalgic Id="-1" name="Nostalgic-1">
+    <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
+            beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0">
+      <transposition f0="0.0"/>
+      <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
+      <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
+    </params>
   </nostalgic>
-  <keymap Id="11" name="11"/>
-  <keymap Id="12" name="12" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5" k6="6"
+  <keymap Id="2" name="11"/>
+  <keymap Id="4" name="12" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5" k6="6"
           k7="7" k8="8" k9="9" k10="10" k11="11" k12="12" k13="13" k14="14"
           k15="15" k16="16" k17="17" k18="18" k19="19" k20="20" k21="21"
           k22="22" k23="23" k24="24" k25="25" k26="26" k27="27" k28="28"
@@ -91,7 +252,7 @@
           k111="111" k112="112" k113="113" k114="114" k115="115" k116="116"
           k117="117" k118="118" k119="119" k120="120" k121="121" k122="122"
           k123="123" k124="124" k125="125" k126="126" k127="127"/>
-  <keymap Id="13" name="13" k0="21" k1="22" k2="23" k3="24" k4="25" k5="26"
+  <keymap Id="6" name="13" k0="21" k1="22" k2="23" k3="24" k4="25" k5="26"
           k6="27" k7="28" k8="29" k9="30" k10="31" k11="32" k12="33" k13="34"
           k14="35" k15="36" k16="37" k17="38" k18="39" k19="40" k20="41"
           k21="42" k22="43" k23="44" k24="45" k25="46" k26="47" k27="48"
@@ -107,23 +268,23 @@
   <keymap Id="-1" name="-1"/>
   <piano name="Worm" Id="1">
     <item>
-      <item name="Tuning12" type="3" Id="12" piano="-1" active="1" X="451"
-            Y="108"/>
+      <item name="Tuning12" type="3" Id="2" piano="-1" active="1" X="451.5"
+            Y="108.5" W="57.0" H="129.0"/>
       <connections>
-        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="333"
-              Y="273"/>
-        <item name="Nostalgic12" type="2" Id="12" piano="-1" active="1" X="488"
-              Y="273"/>
+        <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="333.0"
+              Y="273.0" W="144.0" H="64.0"/>
+        <item name="Nostalgic12" type="2" Id="2" piano="-1" active="1" X="488.0"
+              Y="273.0" W="144.0" H="64.0"/>
       </connections>
     </item>
     <item>
-      <item name="Keymap12" type="5" Id="12" piano="-1" active="1" X="429"
-            Y="400"/>
+      <item name="Keymap12" type="5" Id="4" piano="-1" active="1" X="429.0"
+            Y="400.0" W="106.0" H="72.0"/>
       <connections>
-        <item name="Direct11" type="0" Id="11" piano="-1" active="1" X="333"
-              Y="273"/>
-        <item name="Nostalgic12" type="2" Id="12" piano="-1" active="1" X="488"
-              Y="273"/>
+        <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="333.0"
+              Y="273.0" W="144.0" H="64.0"/>
+        <item name="Nostalgic12" type="2" Id="2" piano="-1" active="1" X="488.0"
+              Y="273.0" W="144.0" H="64.0"/>
       </connections>
     </item>
   </piano>
