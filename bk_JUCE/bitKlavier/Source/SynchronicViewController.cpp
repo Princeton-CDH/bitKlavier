@@ -759,26 +759,27 @@ void SynchronicPreparationEditor::timerCallback()
                 if(paramSliders[i]->getName() == "beat length multipliers")
                 {
                     size = paramSliders[i]->getNumVisible();
-                    counter = cluster->getBeatMultiplierCounter();
+                    counter = cluster->getBeatMultiplierCounterForDisplay(); 
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "sustain length multipliers")
                 {
                     size = paramSliders[i]->getNumVisible();
-                    counter = cluster->getLengthMultiplierCounter();
+                    counter = cluster->getLengthMultiplierCounterForDisplay();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "accents")
                 {
                     size = paramSliders[i]->getNumVisible();
-                    counter = cluster->getAccentMultiplierCounter();
+                    counter = cluster->getAccentMultiplierCounterForDisplay();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
                 else if(paramSliders[i]->getName() == "transpositions")
                 {
                     size = paramSliders[i]->getNumVisible();
-                    counter = cluster->getTranspCounter();
+                    counter = cluster->getTranspCounterForDisplay();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+
                 }
             }
             
