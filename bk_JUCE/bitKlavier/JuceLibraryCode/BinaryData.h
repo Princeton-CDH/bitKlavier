@@ -207,7 +207,7 @@ namespace BinaryData
     const int            Mikes_Gallery_xmlSize = 35379;
 
     extern const char*   Exercise_Constraint_xml;
-    const int            Exercise_Constraint_xmlSize = 51516;
+    const int            Exercise_Constraint_xmlSize = 51501;
 
     extern const char*   leftarrow_png;
     const int            leftarrow_pngSize = 9722;
