@@ -948,7 +948,8 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         selectCB.setSelectedId(processor.updateState->currentSynchronicId, notify);
         modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
         onOffSelectCB.setSelectedItemIndex(prep->getOnOffMode(), notify);
-        offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
+        //offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
+        offsetParamStartToggle.setToggleState(prep->getBeatsToSkip(), notify);
         releaseVelocitySetsSynchronicToggle.setToggleState(prep->getReleaseVelocitySetsSynchronic(), notify);
         howManySlider->setValue(prep->getNumBeats(), notify);
         clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
@@ -1535,7 +1536,8 @@ void SynchronicModificationEditor::update(NotificationType notify)
         
         //FIXIT offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
         //SynchronicBeatsToSkip determines whether to set this toggle
-        offsetParamStartToggle.setToggleState(mod->getBeatsToSkip() + 1, notify);
+        //offsetParamStartToggle.setToggleState(mod->getBeatsToSkip() + 1, notify);
+        offsetParamStartToggle.setToggleState(mod->getBeatsToSkip(), notify);
 
         howManySlider->setValue(mod->getNumBeats(), notify);
         
