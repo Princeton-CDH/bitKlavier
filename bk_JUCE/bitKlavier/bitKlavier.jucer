@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.4"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.4.1"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -142,8 +142,8 @@
           <FILE id="askqrZ" name="Basic Piano.xml" compile="0" resource="1" file="Source/galleries/Basic Piano.xml"/>
           <FILE id="wtEnXB" name="Mike's Gallery.xml" compile="0" resource="1"
                 file="Source/galleries/Mike's Gallery.xml"/>
-          <FILE id="lAhaOY" name="Exercise Constraint.xml" compile="0" resource="1"
-                file="/Applications/bitKlavier/galleries/Exercise Constraint.xml"/>
+          <FILE id="j2mnOE" name="Exercise Constraint.xml" compile="0" resource="1"
+                file="Source/galleries/Exercise Constraint.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
           <FILE id="xOwvX8" name="left-arrow.png" compile="0" resource="1" file="Source/icons/left-arrow.png"/>

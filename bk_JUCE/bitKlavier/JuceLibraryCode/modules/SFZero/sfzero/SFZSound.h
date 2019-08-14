@@ -26,7 +26,7 @@ public:
   bool appliesToChannel(int midiChannel) override;
 
   void addRegion(Region *region); // Takes ownership of the region.
-  Sample *addSample(juce::String path, juce::String defaultPath = juce::String());
+  Sample *addSample(juce::String path, juce::String defaultPath = juce::String::empty);
   void addError(const juce::String &message);
   void addUnsupportedOpcode(const juce::String &opcode);
 

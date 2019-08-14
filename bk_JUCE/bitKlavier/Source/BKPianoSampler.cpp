@@ -173,10 +173,13 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
                  tuning->getTuning()->aPrep->getFundamentalOffset());
          */
         
+        
         //need to get tuning values for active particles, which are only those associated with depressed keys
         double x = particles[getCurrentlyPlayingKey()]->getX();
         int octave = particles[getCurrentlyPlayingKey()]->getOctave();
-        double transpOffset = (currentMidiNoteNumber - getCurrentlyPlayingKey()) * 100.;
+        //double transpOffset = (currentMidiNoteNumber - getCurrentlyPlayingKey()) * 100.;
+        double transpOffset = (cookedNote - getCurrentlyPlayingKey()) * 100.;
+        //DBG("BKPianoSamplerVoice::updatePitch cookedNote = " + String(cookedNote));
         double midi = Utilities::clip(0, ftom(Utilities::centsToFreq((x + transpOffset) - 1200.0 * octave),
                                               tuning->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
         //need to update centsToFreq to be movable to other As, non-440
@@ -184,7 +187,6 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         midi += (tuning->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
                  tuning->getTuning()->aPrep->getFundamentalOffset());
         
-        //DBG("BKPianoSamplerVoice::updatePitch :" + String(midi));
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
                             sound->sourceSampleRate *

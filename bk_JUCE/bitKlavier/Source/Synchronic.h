@@ -1036,6 +1036,50 @@ public:
     inline const int getBeatCounter() const noexcept { return beatCounter; }
     inline const int getClusterSize() const noexcept { return cluster.size(); }
     
+    int getLengthMultiplierCounterForDisplay()
+    {
+        int tempsize = prep->getLengthMultipliers().size();
+        int counter = getLengthMultiplierCounter() - 1;
+        
+        if(counter < 0) counter = tempsize - 1;
+        if(counter >= tempsize) counter = 0;
+        
+        return counter;
+    }
+    
+    int getBeatMultiplierCounterForDisplay()
+    {
+        int tempsize = prep->getBeatMultipliers().size();
+        int counter = getBeatMultiplierCounter() - 1;
+        
+        if(counter < 0) counter = tempsize - 1;
+        if(counter >= tempsize) counter = 0;
+        
+        return counter;
+    }
+    
+    int getAccentMultiplierCounterForDisplay()
+    {
+        int tempsize = prep->getAccentMultipliers().size();
+        int counter = getAccentMultiplierCounter() - 1;
+        
+        if(counter < 0) counter = tempsize - 1;
+        if(counter >= tempsize) counter = 0;
+        
+        return counter;
+    }
+    
+    int getTranspCounterForDisplay()
+    {
+        int tempsize = prep->getTransposition().size();
+        int counter = getTranspCounter() - 1;
+        
+        if(counter < 0) counter = tempsize - 1;
+        if(counter >= tempsize) counter = 0;
+        
+        return counter;
+    }
+    
     inline void setPhasor(uint64 c)  { phasor = c; }
     inline void setBeatMultiplierCounter(int c) {  beatMultiplierCounter = c; }
     inline void setAccentMultiplierCounter(int c)  { accentMultiplierCounter = c; }
