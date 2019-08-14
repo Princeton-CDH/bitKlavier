@@ -31,19 +31,19 @@ public:
     BKEditableComboBox selectCB;
     BKComboBox lengthModeSelectCB;
     
-    ScopedPointer<BKSingleSlider> lengthMultiplierSlider;
-    ScopedPointer<BKSingleSlider> beatsToSkipSlider;
-    ScopedPointer<BKSingleSlider> gainSlider;
+    std::unique_ptr<BKSingleSlider> lengthMultiplierSlider;
+    std::unique_ptr<BKSingleSlider> beatsToSkipSlider;
+    std::unique_ptr<BKSingleSlider> gainSlider;
     
-    ScopedPointer<BKStackedSlider> transpositionSlider;
+    std::unique_ptr<BKStackedSlider> transpositionSlider;
 
-    ScopedPointer<BKADSRSlider> reverseADSRSlider;
-    ScopedPointer<BKADSRSlider> undertowADSRSlider;
+    std::unique_ptr<BKADSRSlider> reverseADSRSlider;
+    std::unique_ptr<BKADSRSlider> undertowADSRSlider;
     
-    ScopedPointer<BKSingleSlider> clusterMinSlider;
-    ScopedPointer<BKSingleSlider> clusterThresholdSlider;
-    ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
-    ScopedPointer<BKRangeSlider> velocityMinMaxSlider;
+    std::unique_ptr<BKSingleSlider> clusterMinSlider;
+    std::unique_ptr<BKSingleSlider> clusterThresholdSlider;
+    std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
+    std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
     
     ToggleButton    keyOnResetToggle;
     BKLabel         keyOnResetLabel;

@@ -34,29 +34,29 @@ BKViewController(p, theGraph, 1)
     fillModeCB();
     addAndMakeVisible(modeCB);
     
-    tempoSlider = new BKSingleSlider("Tempo", 40, 208, 100, 0.01);
+    tempoSlider = std::make_unique<BKSingleSlider>("Tempo", 40, 208, 100, 0.01);
     tempoSlider->setToolTipString("Indicates current beats-per-minute (BPM)");
-    addAndMakeVisible(tempoSlider);
+    addAndMakeVisible(*tempoSlider);
     
-    subSlider = new BKSingleSlider("Subdivisions", 0.01, 32.0, 1.0, 0.01);
+    subSlider = std::make_unique<BKSingleSlider>("Subdivisions", 0.01, 32.0, 1.0, 0.01);
     subSlider->setToolTipString("Number of pulses per beat");
-    addAndMakeVisible(subSlider);
+    addAndMakeVisible(*subSlider);
     
-    AT1HistorySlider = new BKSingleSlider("History", 1, 10, 4, 1);
+    AT1HistorySlider = std::make_unique<BKSingleSlider>("History", 1, 10, 4, 1);
     AT1HistorySlider->setJustifyRight(false);
     AT1HistorySlider->setToolTipString("Indicates how many notes Tempo is using to determine and generate an average pulse ");
-    addAndMakeVisible(AT1HistorySlider);
+    addAndMakeVisible(*AT1HistorySlider);
     
-    AT1SubdivisionsSlider = new BKSingleSlider("Subdivisions", 0., 12, 1, 0.01);
+    AT1SubdivisionsSlider = std::make_unique<BKSingleSlider>("Subdivisions", 0., 12, 1, 0.01);
     AT1SubdivisionsSlider->setJustifyRight(false);
     AT1SubdivisionsSlider->setToolTipString("Multiplies tempo by interpreting rhythmic value of played notes; values less than 1 will result in tempos slower than what is played, values greater than 1 will result in tempos faster than what is played");
-    addAndMakeVisible(AT1SubdivisionsSlider);
+    addAndMakeVisible(*AT1SubdivisionsSlider);
     
-    AT1MinMaxSlider = new BKRangeSlider("Min/Max (ms)", 1, 2000, 100, 500, 10);
+    AT1MinMaxSlider = std::make_unique<BKRangeSlider>("Min/Max (ms)", 1, 2000, 100, 500, 10);
     AT1MinMaxSlider->setJustifyRight(false);
     AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
     AT1MinMaxSlider->setToolTipString("Time within which Tempo will consider notes to be part of a constant pulse; any notes played futher apart than Max, or closer together than Min, will be ignored");
-    addAndMakeVisible(AT1MinMaxSlider);
+    addAndMakeVisible(*AT1MinMaxSlider);
     
     A1ModeCB.setName("AT1Mode");
     addAndMakeVisible(A1ModeCB);
@@ -314,7 +314,7 @@ void TempoPreparationEditor::fillSelectCB(int last, int current)
         
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("Tempo"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
@@ -541,22 +541,22 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, 
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);;
     
-    if(slider == tempoSlider) {
+    if(slider == tempoSlider.get()) {
         DBG("got tempo " + String(val));
         prep->setTempo(val);
         active->setTempo(val);
     }
-    if(slider == subSlider) {
+    if(slider == subSlider.get()) {
         DBG("got sub " + String(val));
         prep->setSubdivisions(val);
         active->setSubdivisions(val);
     }
-    else if(slider == AT1HistorySlider) {
+    else if(slider == AT1HistorySlider.get()) {
         DBG("got A1History " + String(val));
         prep->setAdaptiveTempo1History(val);
         active->setAdaptiveTempo1History(val);
     }
-    else if(slider == AT1SubdivisionsSlider) {
+    else if(slider == AT1SubdivisionsSlider.get()) {
         DBG("got A1Subdivisions " + String(val));
         prep->setAdaptiveTempo1Subdivisions(val);
         active->setAdaptiveTempo1Subdivisions(val);
@@ -643,7 +643,7 @@ void TempoModificationEditor::fillSelectCB(int last, int current)
         int Id = prep->getId();;
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("TempoMod"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
@@ -886,25 +886,25 @@ void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
 {
     TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
     
-    if(slider == tempoSlider)
+    if(slider == tempoSlider.get())
     {
         mod->setTempo(val);
         mod->setDirty(TempoBPM);
         tempoSlider->setBright();
     }
-    else if(slider == subSlider)
+    else if(slider == subSlider.get())
     {
         mod->setSubdivisions(val);
         mod->setDirty(TempoSubdivisions);
         subSlider->setBright();
     }
-    else if(slider == AT1HistorySlider)
+    else if(slider == AT1HistorySlider.get())
     {
         mod->setAdaptiveTempo1History(val);
         mod->setDirty(AT1History);
         AT1HistorySlider->setBright();
     }
-    else if(slider == AT1SubdivisionsSlider)
+    else if(slider == AT1SubdivisionsSlider.get())
     {
         mod->setAdaptiveTempo1Subdivisions(val);
         mod->setDirty(AT1Subdivisions);

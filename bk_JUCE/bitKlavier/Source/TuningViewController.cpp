@@ -73,30 +73,30 @@ showSprings(false)
     adaptiveSystemsCB.addItem("Adaptive Anchored 1", 3);
     adaptiveSystemsCB.addItem("Spring", 4);
 
-    rateSlider = new BKSingleSlider("rate", 5., 400., 100., 1);
+    rateSlider = std::make_unique<BKSingleSlider>("rate", 5., 400., 100., 1);
     rateSlider->setJustifyRight(false);
     rateSlider->displaySliderVisible(false);
     rateSlider->setToolTipString("rate that spring model runs at (Hz)");
-    addChildComponent(rateSlider);
+    addChildComponent(*rateSlider);
     
-    dragSlider = new BKSingleSlider("drag", 0., 1., 0.5, 0.0001);
+    dragSlider = std::make_unique<BKSingleSlider>("drag", 0., 1., 0.5, 0.0001);
     dragSlider->setJustifyRight(false);
     dragSlider->displaySliderVisible(false);
     dragSlider->setToolTipString("frictional component in spring model");
     dragSlider->setSliderTextResolution(2);
-    addChildComponent(dragSlider);
+    addChildComponent(*dragSlider);
     
-    tetherStiffnessSlider = new BKSingleSlider("anchor stiff", 0., 1., 0.5, 0.0001);
+    tetherStiffnessSlider = std::make_unique<BKSingleSlider>("anchor stiff", 0., 1., 0.5, 0.0001);
     tetherStiffnessSlider->setJustifyRight(true);
     tetherStiffnessSlider->displaySliderVisible(false);
     tetherStiffnessSlider->setToolTipString("overall stiffness of anchor sliders");
-    addChildComponent(tetherStiffnessSlider);
+    addChildComponent(*tetherStiffnessSlider);
     
-    intervalStiffnessSlider = new BKSingleSlider("interval stiff", 0., 1., 0.5, 0.0001);
+    intervalStiffnessSlider = std::make_unique<BKSingleSlider>("interval stiff", 0., 1., 0.5, 0.0001);
     intervalStiffnessSlider->setJustifyRight(false);
     intervalStiffnessSlider->displaySliderVisible(false);
     intervalStiffnessSlider->setToolTipString("overall stiffness of interval sliders");
-    addChildComponent(intervalStiffnessSlider);
+    addChildComponent(*intervalStiffnessSlider);
     
     fundamentalSetsTether.setButtonText ("sets weights");
     fundamentalSetsTether.setTooltip("anchor weights will be set by interval fundamental");
@@ -104,18 +104,18 @@ showSprings(false)
     fundamentalSetsTether.setToggleState (false, dontSendNotification);
     addAndMakeVisible(&fundamentalSetsTether, ALL);
     
-    tetherWeightGlobalSlider = new BKSingleSlider("fund weight", 0., 1., 0.5, 0.001);
+    tetherWeightGlobalSlider = std::make_unique<BKSingleSlider>("fund weight", 0., 1., 0.5, 0.001);
     tetherWeightGlobalSlider->setJustifyRight(true);
     tetherWeightGlobalSlider->displaySliderVisible(false);
     tetherWeightGlobalSlider->setToolTipString("sets tether weight for fundamental");
-    addChildComponent(tetherWeightGlobalSlider);
+    addChildComponent(*tetherWeightGlobalSlider);
     
     //tetherWeightSecondaryGlobalSlider
-    tetherWeightSecondaryGlobalSlider = new BKSingleSlider("other weights", 0., 1., 0.1, 0.001);
+    tetherWeightSecondaryGlobalSlider = std::make_unique<BKSingleSlider>("other weights", 0., 1., 0.1, 0.001);
     tetherWeightSecondaryGlobalSlider->setJustifyRight(true);
     tetherWeightSecondaryGlobalSlider->displaySliderVisible(false);
     tetherWeightSecondaryGlobalSlider->setToolTipString("sets tether weight for all non-fundamentals");
-    addChildComponent(tetherWeightSecondaryGlobalSlider);
+    addChildComponent(*tetherWeightSecondaryGlobalSlider);
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
@@ -175,15 +175,15 @@ showSprings(false)
     A1FundamentalCB.setTooltip("sets fundamental for the anchor scale");
     addAndMakeVisible(A1FundamentalCB);
     
-    A1ClusterThresh = new BKSingleSlider("Threshold", 1, 1000, 0, 1);
+    A1ClusterThresh = std::make_unique<BKSingleSlider>("Threshold", 1, 1000, 0, 1);
     A1ClusterThresh->setJustifyRight(false);
     A1ClusterThresh->setToolTipString("if this time (ms) is exceeded, the fundamental will reset");
-    addAndMakeVisible(A1ClusterThresh);
+    addAndMakeVisible(*A1ClusterThresh);
     
-    A1ClusterMax = new BKSingleSlider("Maximum", 1, 8, 1, 1);
+    A1ClusterMax = std::make_unique<BKSingleSlider>("Maximum", 1, 8, 1, 1);
     A1ClusterMax->setJustifyRight(false);
     A1ClusterMax->setToolTipString("after these many notes are played, the fundamental will reset");
-    addAndMakeVisible(A1ClusterMax);
+    addAndMakeVisible(*A1ClusterMax);
     
     A1reset.setButtonText("reset");
     addAndMakeVisible(A1reset);
@@ -202,11 +202,11 @@ showSprings(false)
     nToneRootOctaveCB.setTooltip("set octave for root note, when semitone width is not 100");
     addAndMakeVisible(nToneRootOctaveCB);
     
-    nToneSemitoneWidthSlider = new BKSingleSlider("semitone width and root", 1, 200, 100, 0.001);
+    nToneSemitoneWidthSlider = std::make_unique<BKSingleSlider>("semitone width and root", 1, 200, 100, 0.001);
     nToneSemitoneWidthSlider->setJustifyRight(false);
     nToneSemitoneWidthSlider->displaySliderVisible(false);
     nToneSemitoneWidthSlider->setToolTipString("Adjusts half step distance. For example, 50 cents is a quarter-tone keyboard, and -100 cents is an inverted keyboard");
-    addAndMakeVisible(nToneSemitoneWidthSlider);
+    addAndMakeVisible(*nToneSemitoneWidthSlider);
     
     fillTuningCB();
     fillFundamentalCB();
@@ -227,10 +227,10 @@ showSprings(false)
     customKeyboard.setFundamental(0);
     addAndMakeVisible(customKeyboard);
     
-    offsetSlider = new BKSingleSlider("offset: ", -100, 100, 0, 0.1);
+    offsetSlider = std::make_unique<BKSingleSlider>("offset: ", -100, 100, 0, 0.1);
     offsetSlider->displaySliderVisible(false);
     offsetSlider->setToolTipString("Raise or lower the entire temperament in cents");
-    addAndMakeVisible(offsetSlider);
+    addAndMakeVisible(*offsetSlider);
     
     lastNote.setText("note: ", dontSendNotification);
     lastNote.setTooltip("last note played as MIDI value");
@@ -1544,7 +1544,7 @@ void TuningPreparationEditor::fillSelectCB(int last, int current)
         
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("Tuning"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
@@ -1745,33 +1745,33 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     
-    if(slider == offsetSlider) {
+    if (slider == offsetSlider.get()) {
         DBG("got offset " + String(val));
         prep->setFundamentalOffset(val * 0.01);
         active->setFundamentalOffset(val * 0.01);
     }
-    else if(slider == A1ClusterThresh) {
+    else if(slider == A1ClusterThresh.get()) {
         DBG("got A1ClusterThresh " + String(val));
         prep->setAdaptiveClusterThresh(val);
         active->setAdaptiveClusterThresh(val);
     }
-    else if(slider == A1ClusterMax) {
+    else if(slider == A1ClusterMax.get()) {
         DBG("got A1ClusterMax " + String(val));
         prep->setAdaptiveHistory(val);
         active->setAdaptiveHistory(val);
     }
-    else if(slider == nToneSemitoneWidthSlider) {
+    else if(slider == nToneSemitoneWidthSlider.get()) {
         DBG("got nToneSemiToneSliderWidth " + String(val));
         prep->setNToneSemitoneWidth(val);
         active->setNToneSemitoneWidth(val);
     }
-    else if (slider == rateSlider)
+    else if (slider == rateSlider.get())
     {
         DBG("got rateSlider " + String(val));
         prep->getSpringTuning()->setRate(val, false);
         active->getSpringTuning()->setRate(val);
     }
-    else if (slider == dragSlider)
+    else if (slider == dragSlider.get())
     {
         DBG("got dragSlider " + String(val));
         double newval = dt_asymwarp(val, 100.);
@@ -1779,25 +1779,25 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
         prep->getSpringTuning()->setDrag(1. - newval);
         active->getSpringTuning()->setDrag(1. - newval);
     }
-    else if (slider == tetherStiffnessSlider)
+    else if (slider == tetherStiffnessSlider.get())
     {
         DBG("got tetherStiffnessSlider " + String(val));
         prep->getSpringTuning()->setTetherStiffness(val);
         active->getSpringTuning()->setTetherStiffness(val);
     }
-    else if (slider == intervalStiffnessSlider)
+    else if (slider == intervalStiffnessSlider.get())
     {
         DBG("got intervalStiffnessSlider " + String(val));
         prep->getSpringTuning()->setIntervalStiffness(val);
         active->getSpringTuning()->setIntervalStiffness(val);
     }
-    else if (slider == tetherWeightGlobalSlider)
+    else if (slider == tetherWeightGlobalSlider.get())
     {
         DBG("got tetherWeightGlobalSlider " + String(val));
         prep->getSpringTuning()->setTetherWeightGlobal(val);
         active->getSpringTuning()->setTetherWeightGlobal(val);
     }
-    else if (slider == tetherWeightSecondaryGlobalSlider)
+    else if (slider == tetherWeightSecondaryGlobalSlider.get())
     {
         DBG("got tetherWeightGlobalSlider " + String(val));
         prep->getSpringTuning()->setTetherWeightSecondaryGlobal(val);
@@ -2189,7 +2189,7 @@ void TuningModificationEditor::fillSelectCB(int last, int current)
         int Id = prep->getId();;
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("TuningMod"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
@@ -2527,42 +2527,42 @@ void TuningModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
 {
     TuningModification::Ptr mod = processor.gallery->getTuningModification(processor.updateState->currentModTuningId);
     
-    if(slider == offsetSlider)
+    if(slider == offsetSlider.get())
     {
         mod->setFundamentalOffset(val * 0.01);
         mod->setDirty(TuningOffset);
         
         offsetSlider->setBright();
     }
-    else if(slider == A1ClusterThresh)
+    else if(slider == A1ClusterThresh.get())
     {
         mod->setAdaptiveClusterThresh(val);
         mod->setDirty(TuningA1ClusterThresh);
         
         A1ClusterThresh->setBright();
     }
-    else if(slider == A1ClusterMax)
+    else if(slider == A1ClusterMax.get())
     {
         mod->setAdaptiveHistory(val);
         mod->setDirty(TuningA1History);
         
         A1ClusterMax->setBright();
     }
-    else if(slider == nToneSemitoneWidthSlider)
+    else if(slider == nToneSemitoneWidthSlider.get())
     {
         mod->setNToneSemitoneWidth(val);
         mod->setDirty(TuningNToneSemitoneWidth);
         
         nToneSemitoneWidthSlider->setBright();
     }
-    else if (slider == rateSlider)
+    else if (slider == rateSlider.get())
     {
         mod->getSpringTuning()->setRate(val);
         mod->setDirty(TuningSpringRate);
         
         rateSlider->setBright();
     }
-    else if (slider == dragSlider)
+    else if (slider == dragSlider.get())
     {
         double newval = dt_asymwarp(val, 100.);
         mod->getSpringTuning()->setDrag(1.-newval);
@@ -2570,28 +2570,28 @@ void TuningModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
         
         dragSlider->setBright();
     }
-    else if (slider == tetherStiffnessSlider)
+    else if (slider == tetherStiffnessSlider.get())
     {
         mod->getSpringTuning()->setTetherStiffness(val);
         mod->setDirty(TuningSpringTetherStiffness);
         
         tetherStiffnessSlider->setBright();
     }
-    else if (slider == intervalStiffnessSlider)
+    else if (slider == intervalStiffnessSlider.get())
     {
         mod->getSpringTuning()->setIntervalStiffness(val);
         mod->setDirty(TuningSpringIntervalStiffness);
         
         intervalStiffnessSlider->setBright();
     }
-    else if (slider == tetherWeightGlobalSlider)
+    else if (slider == tetherWeightGlobalSlider.get())
     {
         mod->getSpringTuning()->setTetherWeightGlobal(val);
         mod->setDirty(TuningTetherWeightGlobal);
         
         tetherWeightGlobalSlider->setBright();
     }
-    else if (slider == tetherWeightSecondaryGlobalSlider)
+    else if (slider == tetherWeightSecondaryGlobalSlider.get())
     {
         mod->getSpringTuning()->setTetherWeightSecondaryGlobal(val);
         mod->setDirty(TuningTetherWeightGlobal2);

@@ -18,7 +18,7 @@ AudioProcessorEditor (&p),
 processor (p),
 mvc(p),
 constrain(new ComponentBoundsConstrainer()),
-resizer(new ResizableCornerComponent (this, constrain))
+resizer(new ResizableCornerComponent (this, constrain.get()))
 {
     viewPort.setViewedComponent(&mvc);
     viewPort.setViewPosition(0, 0);
@@ -34,7 +34,7 @@ resizer(new ResizableCornerComponent (this, constrain))
     constrain->setSizeLimits(DEFAULT_MIN_WIDTH, DEFAULT_MIN_HEIGHT, processor.screenWidth, processor.screenHeight);
     
 #if !JUCE_IOS
-    addAndMakeVisible(resizer);
+    addAndMakeVisible(*resizer);
     resizer->setAlwaysOnTop(true);
 #endif
     

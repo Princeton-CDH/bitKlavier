@@ -195,7 +195,7 @@ public:
             
             ValueTree vt1 = d1.getState();
             
-            ScopedPointer<XmlElement> xml = vt1.createXml();
+            XmlElement* xml = vt1.createXml();
             
             DirectPreparation::Ptr dp2 = new DirectPreparation();
             
@@ -226,7 +226,7 @@ public:
 
 			ValueTree vt1 = d1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			Direct d2(-1, true);
 
@@ -272,7 +272,7 @@ public:
             
             ValueTree vt1 = dm1->getState();
             
-            ScopedPointer<XmlElement> xml = vt1.createXml();
+            XmlElement* xml = vt1.createXml();
             
             DirectPreparation::Ptr dp2 = new DirectPreparation();
             DirectModification::Ptr dm2 = new DirectModification(dp2, 1);

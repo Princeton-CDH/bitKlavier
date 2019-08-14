@@ -36,46 +36,46 @@ BKViewController(p, theGraph, 3)
     fillModeSelectCB();
     addAndMakeVisible(lengthModeSelectCB);
     
-    transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
+    transpositionSlider = std::make_unique<BKStackedSlider>("transpositions", -12, 12, -12, 12, 0, 0.01);
     transpositionSlider->setTooltip("Determines pitch (in semitones) of Nostalgic notes; control-click to add another voice, double-click to edit all");
-    addAndMakeVisible(transpositionSlider);
+    addAndMakeVisible(*transpositionSlider);
     
-    lengthMultiplierSlider = new BKSingleSlider("note length multiplier", 0, 10, 1, 0.01);
+    lengthMultiplierSlider = std::make_unique<BKSingleSlider>("note length multiplier", 0, 10, 1, 0.01);
     lengthMultiplierSlider->setToolTipString("Changes length of Nostalgic wave as a factor of note duration");
     lengthMultiplierSlider->setSkewFactorFromMidPoint(1.);
-    addAndMakeVisible(lengthMultiplierSlider);
+    addAndMakeVisible(*lengthMultiplierSlider);
     
-    holdTimeMinMaxSlider = new BKRangeSlider("hold time (ms)", 0., 12000., 0.0, 12000., 1);
+    holdTimeMinMaxSlider = std::make_unique<BKRangeSlider>("hold time (ms)", 0., 12000., 0.0, 12000., 1);
     holdTimeMinMaxSlider->setToolTipString("Sets Min and Max time (ms) held to trigger swell; Min can be greater than Max");
     holdTimeMinMaxSlider->setJustifyRight(true);
-    addAndMakeVisible(holdTimeMinMaxSlider);
+    addAndMakeVisible(*holdTimeMinMaxSlider);
     
-    velocityMinMaxSlider = new BKRangeSlider("velocity min/max (0-127)", 0, 127, 0, 127, 1);
+    velocityMinMaxSlider = std::make_unique<BKRangeSlider>("velocity min/max (0-127)", 0, 127, 0, 127, 1);
     velocityMinMaxSlider->setToolTipString("Sets Min and Max velocity (0-127) to trigger swell; Min can be greater than Max");
     velocityMinMaxSlider->setJustifyRight(true);
-    addAndMakeVisible(velocityMinMaxSlider);
+    addAndMakeVisible(*velocityMinMaxSlider);
     
-    clusterMinSlider = new BKSingleSlider("cluster min", 1, 10, 1, 1);
+    clusterMinSlider = std::make_unique<BKSingleSlider>("cluster min", 1, 10, 1, 1);
     clusterMinSlider->setToolTipString("Sets Min cluster size needed to trigger swell");
     clusterMinSlider->setJustifyRight(true);
-    addAndMakeVisible(clusterMinSlider);
+    addAndMakeVisible(*clusterMinSlider);
     
     //clusterThresholdSlider
-    clusterThresholdSlider = new BKSingleSlider("cluster thresh", 0, 1000, 150, 1);
+    clusterThresholdSlider = std::make_unique<BKSingleSlider>("cluster thresh", 0, 1000, 150, 1);
     clusterThresholdSlider->setToolTipString("time between note releases (ms) to be included in cluster");
     clusterThresholdSlider->setJustifyRight(true);
-    addAndMakeVisible(clusterThresholdSlider);
+    addAndMakeVisible(*clusterThresholdSlider);
     
-    beatsToSkipSlider = new BKSingleSlider("beats to skip", 0, 10, 0, 1);
+    beatsToSkipSlider = std::make_unique<BKSingleSlider>("beats to skip", 0, 10, 0, 1);
     beatsToSkipSlider->setToolTipString("Indicates how long Nostalgic wave lasts with respect to linked Synchronic sequence");
-    addAndMakeVisible(beatsToSkipSlider);
+    addAndMakeVisible(*beatsToSkipSlider);
     beatsToSkipSlider->setVisible(false);
     
-    gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider = std::make_unique<BKSingleSlider>("gain", 0, 10, 1, 0.01);
     gainSlider->setToolTipString("Volume multiplier for Nostalgic notes");
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
-    addAndMakeVisible(gainSlider);
+    addAndMakeVisible(*gainSlider);
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
@@ -86,21 +86,21 @@ BKViewController(p, theGraph, 3)
     nDisplaySlider.setUndertowTooltip("Determines total length of Undertow beginning at wave endpoint");
     addAndMakeVisible(nDisplaySlider);
     
-    reverseADSRSlider = new BKADSRSlider("reverseEnvelope");
+    reverseADSRSlider = std::make_unique<BKADSRSlider>("reverseEnvelope");
     reverseADSRSlider->setButtonText("edit reverse envelope");
     reverseADSRSlider->setToolTip("ADSR settings for Nostalgic wave");
     reverseADSRSlider->setButtonMode(false);
-    addAndMakeVisible(reverseADSRSlider);
+    addAndMakeVisible(*reverseADSRSlider);
     
     reverseADSRLabel.setText("Reverse ADSR", dontSendNotification);
     reverseADSRLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(&reverseADSRLabel, ALL);
     
-    undertowADSRSlider = new BKADSRSlider("undertowEnvelope");
+    undertowADSRSlider = std::make_unique<BKADSRSlider>("undertowEnvelope");
     undertowADSRSlider->setButtonText("edit undertow envelope");
     undertowADSRSlider->setToolTip("ADSR settings for Undertow");
     undertowADSRSlider->setButtonMode(false);
-    addAndMakeVisible(undertowADSRSlider);
+    addAndMakeVisible(*undertowADSRSlider);
     
     undertowADSRLabel.setText("Undertow ADSR", dontSendNotification);
     undertowADSRLabel.setJustificationType(Justification::centred);
@@ -504,7 +504,7 @@ void NostalgicViewController::fillModeSelectCB(void)
     for (int i = 0; i < cNostalgicSyncModes.size(); i++)
     {
         String name = cNostalgicSyncModes[i];
-        if (name != String::empty)  lengthModeSelectCB.addItem(name, i+1);
+        if (name != String())  lengthModeSelectCB.addItem(name, i+1);
         else                        lengthModeSelectCB.addItem(String(i+1), i+1);
     }
     
@@ -913,7 +913,7 @@ void NostalgicPreparationEditor::fillSelectCB(int last, int current)
         
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("Nostalgic"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
@@ -1225,7 +1225,7 @@ void NostalgicModificationEditor::fillSelectCB(int last, int current)
         int Id = prep->getId();;
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("NostalgicMod"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);

@@ -624,7 +624,7 @@ public:
 
 			ValueTree vt1 = s1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			SynchronicPreparation::Ptr sp2 = new SynchronicPreparation();
 
@@ -663,7 +663,7 @@ public:
 
 			ValueTree vt1 = s1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			Synchronic s2(-1, true);
 
@@ -715,7 +715,7 @@ public:
 
 			ValueTree vt1 = sm1->getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			SynchronicPreparation::Ptr sp2 = new SynchronicPreparation();
 			SynchronicModification::Ptr sm2 = new SynchronicModification(sp2, 1);

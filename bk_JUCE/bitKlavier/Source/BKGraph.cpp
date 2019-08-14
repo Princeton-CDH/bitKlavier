@@ -21,7 +21,7 @@ ItemMapper(type, Id),
 BKDraggableComponent(true,false,true, 50, 50, 50, 50),
 processor(p),
 constrain(new ComponentBoundsConstrainer()),
-resizer(new ResizableCornerComponent (this, constrain))
+resizer(new ResizableCornerComponent (this, constrain.get()))
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
@@ -104,7 +104,7 @@ resizer(new ResizableCornerComponent (this, constrain))
         comment.setSize(150*processor.uiScaleFactor,75*processor.uiScaleFactor);
         constrain->setSizeLimits(50,25,500,500);
         
-        addAndMakeVisible (resizer);
+        addAndMakeVisible (*resizer);
         resizer->setAlwaysOnTop(true);
         
         comment.setName("Comment");
@@ -176,7 +176,7 @@ void BKItem::configurePianoCB(void)
         
         if (pianos[i]->getId() == getPianoTarget()) targetExists = true;
         
-        if (name != String::empty)
+        if (name != String())
         {
             menu.addItem(pianos[i]->getName(), pianos[i]->getId());
             menu.addSeparator();
@@ -377,8 +377,8 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
-    if (e.originalComponent == resizer) resizing = true;
-    else                                resizing = false;
+    if (e.originalComponent == resizer.get())   resizing = true;
+    else                                        resizing = false;
         
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
     BKItem* current = cs->getCurrentItem();

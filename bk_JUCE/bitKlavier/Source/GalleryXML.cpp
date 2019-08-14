@@ -10,7 +10,7 @@
 
 #include "PluginProcessor.h"
 
-void Gallery::addFromXML(ScopedPointer<XmlElement> xml)
+void Gallery::addFromXML(XmlElement* xml)
 {
     
 }
@@ -89,7 +89,7 @@ ValueTree  Gallery::getState(void)
     return galleryVT;
 }
 
-void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
+void Gallery::setStateFromXML(XmlElement* xml)
 {
     int i;
     Array<float> fa;
@@ -126,14 +126,14 @@ void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
                 
                 newKeymap->setId(newId);
                 
-                if (n != String::empty)     newKeymap->setName(n);
+                if (n != String())     newKeymap->setName(n);
                 
                 Array<int> keys;
                 for (int k = 0; k < 128; k++)
                 {
                     String attr = e->getStringAttribute(ptagKeymap_key + String(k));
                     
-                    if (attr == String::empty) break;
+                    if (attr == String()) break;
                     else
                     {
                         i = attr.getIntValue();

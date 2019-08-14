@@ -163,16 +163,16 @@ BKViewController(p, theGraph, 1)
     iconImageComponent.setAlpha(0.095);
     addAndMakeVisible(iconImageComponent);
     
-    A4tuningReferenceFrequencySlider = new BKSingleSlider("A4 reference frequency", 415., 450., 440., 0.1);
+    A4tuningReferenceFrequencySlider = std::make_unique<BKSingleSlider>("A4 reference frequency", 415., 450., 440., 0.1);
     A4tuningReferenceFrequencySlider->setJustifyRight(false);
     A4tuningReferenceFrequencySlider->addMyListener(this);
-    addAndMakeVisible(A4tuningReferenceFrequencySlider);
+    addAndMakeVisible(*A4tuningReferenceFrequencySlider);
     
-    tempoMultiplierSlider = new BKSingleSlider("tempo multiplier", 0.25, 4., 1., 0.01);
+    tempoMultiplierSlider = std::make_unique<BKSingleSlider>("tempo multiplier", 0.25, 4., 1., 0.01);
     tempoMultiplierSlider->setSkewFactorFromMidPoint(1.);
     tempoMultiplierSlider->setJustifyRight(false);
     tempoMultiplierSlider->addMyListener(this);
-    addAndMakeVisible(tempoMultiplierSlider);
+    addAndMakeVisible(*tempoMultiplierSlider);
     
     GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
     

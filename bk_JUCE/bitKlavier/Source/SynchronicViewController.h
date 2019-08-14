@@ -98,16 +98,16 @@ protected:
 
     ToggleButton offsetParamStartToggle;
     ToggleButton releaseVelocitySetsSynchronicToggle;
-    ScopedPointer<BKSingleSlider> howManySlider;
-    ScopedPointer<BKSingleSlider> clusterThreshSlider;
-    ScopedPointer<BKRangeSlider> clusterMinMaxSlider;
-    ScopedPointer<BKSingleSlider> clusterCapSlider;
+    std::unique_ptr<BKSingleSlider> howManySlider;
+    std::unique_ptr<BKSingleSlider> clusterThreshSlider;
+    std::unique_ptr<BKRangeSlider> clusterMinMaxSlider;
+    std::unique_ptr<BKSingleSlider> clusterCapSlider;
     
-    ScopedPointer<BKRangeSlider> holdTimeMinMaxSlider;
-    ScopedPointer<BKRangeSlider> velocityMinMaxSlider;
+    std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
+    std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
 
-    ScopedPointer<BKSingleSlider> gainSlider;
-    ScopedPointer<BKSingleSlider> numClusterSlider;
+    std::unique_ptr<BKSingleSlider> gainSlider;
+    std::unique_ptr<BKSingleSlider> numClusterSlider;
     
     
     BKLabel modeLabel;

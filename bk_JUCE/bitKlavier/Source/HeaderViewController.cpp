@@ -732,7 +732,7 @@ void HeaderViewController::fillPianoCB(void)
     {
         String name = piano->getName();
         
-        if (name != String::empty)  pianoCB.addItem(name,  piano->getId());
+        if (name != String())  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());
     }
 
@@ -862,7 +862,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 processor.defaultLoaded = true;
                 processor.defaultName = BinaryData::namedResourceList[index];
                 
-                processor.loadGalleryFromXml(XmlDocument::parse(xmlData));
+                processor.loadGalleryFromXml(XmlDocument::parse(xmlData).get());
             }
             else
             {

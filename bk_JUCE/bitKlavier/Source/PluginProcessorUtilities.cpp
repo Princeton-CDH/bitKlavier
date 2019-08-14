@@ -374,7 +374,7 @@ void BKAudioProcessor::importPreparation(BKPreparationType type, int Id, int imp
     file = file.getChildFile(cPreparationTypes[type]);
     file = file.getChildFile(exportedPreparations[type]->getReference(importId));
     
-    ScopedPointer<XmlElement> xml (XmlDocument::parse (file));
+    XmlElement* xml = XmlDocument::parse (file).get();
     
     setPreparationState(type, Id, xml);
 }
@@ -406,8 +406,8 @@ void BKAudioProcessor::exportPreparation(BKPreparationType type, int Id, String 
     
     DBG("URL: " + file.getFullPathName());
     
-    XmlElement* xml = getPreparationState(type, Id).createXml();
-    xml->writeToFile(file, String::empty);
+    XmlElement* xml = getPreparationState(type, Id).createXml().get();
+    xml->writeToFile(file, String());
 }
 
 void BKAudioProcessor::collectPianos(void)
@@ -454,7 +454,7 @@ void BKAudioProcessor::importPiano(int Id, int importId)
     file = file.getChildFile("pianos");
     file = file.getChildFile(exportedPianos[importId]);
     
-    ScopedPointer<XmlElement> xml (XmlDocument::parse (file));
+    XmlElement* xml = XmlDocument::parse (file).get();
     
     OwnedArray<HashMap<int,int>> importmap;
     
@@ -573,6 +573,6 @@ void BKAudioProcessor::exportPiano(int Id, String name)
    
     toExport.addChild(piano->getState(), -1, 0);
     
-    toExport.createXml()->writeToFile(file, String::empty);
+    toExport.createXml()->writeToFile(file, String());
 }
 

@@ -41,12 +41,12 @@ protected:
     BKLabel modeLabel;
     BKComboBox modeCB;
     
-    ScopedPointer<BKSingleSlider> tempoSlider;
-    ScopedPointer<BKSingleSlider> subSlider;
+    std::unique_ptr<BKSingleSlider> tempoSlider;
+    std::unique_ptr<BKSingleSlider> subSlider;
     
-    ScopedPointer<BKSingleSlider> AT1HistorySlider;
-    ScopedPointer<BKSingleSlider> AT1SubdivisionsSlider;
-    ScopedPointer<BKRangeSlider> AT1MinMaxSlider; //need to have "MinAlwaysLessThanMax" mode
+    std::unique_ptr<BKSingleSlider> AT1HistorySlider;
+    std::unique_ptr<BKSingleSlider> AT1SubdivisionsSlider;
+    std::unique_ptr<BKRangeSlider> AT1MinMaxSlider; //need to have "MinAlwaysLessThanMax" mode
     
     BKLabel A1ModeLabel;
     BKComboBox A1ModeCB;

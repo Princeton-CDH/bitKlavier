@@ -30,12 +30,12 @@ public:
     
     BKEditableComboBox selectCB;
     
-    ScopedPointer<BKStackedSlider> transpositionSlider;
-    ScopedPointer<BKSingleSlider> gainSlider;
-    ScopedPointer<BKSingleSlider> resonanceGainSlider;
-    ScopedPointer<BKSingleSlider> hammerGainSlider;
+    std::unique_ptr<BKStackedSlider> transpositionSlider;
+    std::unique_ptr<BKSingleSlider> gainSlider;
+    std::unique_ptr<BKSingleSlider> resonanceGainSlider;
+    std::unique_ptr<BKSingleSlider> hammerGainSlider;
     
-    ScopedPointer<BKADSRSlider> ADSRSlider;
+    std::unique_ptr<BKADSRSlider> ADSRSlider;
     
     void paint (Graphics&) override;
     void resized() override;

@@ -151,7 +151,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     setName(n);
+        if (n != String())     setName(n);
         else                        setName(String(Id));
     
         XmlElement* dirtyXml = e->getChildByName("dirty");
@@ -164,7 +164,7 @@ public:
             {
                 String attr = dirtyXml->getStringAttribute("d" + String(k));
                 
-                if (attr == String::empty) dirty.add(false);
+                if (attr == String()) dirty.add(false);
                 else
                 {
                     dirty.add((bool)attr.getIntValue());
@@ -247,7 +247,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     setName(n);
+        if (n != String())     setName(n);
         else                        setName(String(Id));
         
         XmlElement* dirtyXml = e->getChildByName("dirty");
@@ -260,7 +260,7 @@ public:
             {
                 String attr = dirtyXml->getStringAttribute("d" + String(k));
                 
-                if (attr == String::empty) dirty.add(false);
+                if (attr == String()) dirty.add(false);
                 else
                 {
                     dirty.add((bool)attr.getIntValue());
@@ -343,7 +343,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     setName(n);
+        if (n != String())     setName(n);
         else                        setName(String(Id));
         
         XmlElement* dirtyXml = e->getChildByName("dirty");
@@ -356,7 +356,7 @@ public:
             {
                 String attr = dirtyXml->getStringAttribute("d" + String(k));
                 
-                if (attr == String::empty) dirty.add(false);
+                if (attr == String()) dirty.add(false);
                 else
                 {
                     dirty.add((bool)attr.getIntValue());
@@ -445,7 +445,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     setName(n);
+        if (n != String())     setName(n);
         else                        setName(String(Id));
         
         XmlElement* dirtyXml = e->getChildByName("dirty");
@@ -458,7 +458,7 @@ public:
             {
                 String attr = dirtyXml->getStringAttribute("d" + String(k));
                 
-                if (attr == String::empty) dirty.add(false);
+                if (attr == String()) dirty.add(false);
                 else
                 {
                     dirty.add((bool)attr.getIntValue());
@@ -559,7 +559,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     setName(n);
+        if (n != String())     setName(n);
         else                        setName(String(Id));
         
         XmlElement* dirtyXml = e->getChildByName("dirty");
@@ -572,7 +572,7 @@ public:
             {
                 String attr = dirtyXml->getStringAttribute("d" + String(k));
                 
-                if (attr == String::empty) dirty.add(false);
+                if (attr == String()) dirty.add(false);
                 else
                 {
                     dirty.add((bool)attr.getIntValue());

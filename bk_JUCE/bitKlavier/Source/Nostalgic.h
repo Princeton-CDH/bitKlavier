@@ -402,7 +402,7 @@ public:
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
-                    if (attr == String::empty) break;
+                    if (attr == String()) break;
                     else
                     {
                         f = attr.getFloatValue();
@@ -420,7 +420,7 @@ public:
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
-                    if (attr == String::empty) break;
+                    if (attr == String()) break;
                     else
                     {
                         f = attr.getFloatValue();
@@ -438,7 +438,7 @@ public:
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
-                    if (attr == String::empty) break;
+                    if (attr == String()) break;
                     else
                     {
                         f = attr.getFloatValue();
@@ -749,7 +749,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     name = n;
+        if (n != String())     name = n;
         else                        name = String(Id);
         
         

@@ -34,7 +34,7 @@ public:
     
 
  
-    Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor&);
+    Gallery(XmlElement* xml, BKAudioProcessor&);
     Gallery(var json, BKAudioProcessor&);
     Gallery(BKAudioProcessor& p);
     ~Gallery();
@@ -80,7 +80,7 @@ public:
     }
     
     ValueTree  getState(void);
-    void setStateFromXML(ScopedPointer<XmlElement> xml);
+    void setStateFromXML(XmlElement* xml);
     void setStateFromJson(var myJson);
     
     void resetPreparations(void);
@@ -808,7 +808,7 @@ private:
     
     int transformId(BKPreparationType type, int oldId);
     
-    void addFromXML(ScopedPointer<XmlElement> xml);
+    void addFromXML(XmlElement* xml);
     void addFromValueTree(ValueTree vt);
     
     JUCE_LEAK_DETECTOR(Gallery);

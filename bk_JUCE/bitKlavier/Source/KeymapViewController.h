@@ -69,7 +69,7 @@ private:
     BKTextEditor  keymapTF;
     
     BKKeymapKeyboardState keyboardState;
-    ScopedPointer<Component> keyboardComponent;
+    std::unique_ptr<Component> keyboardComponent;
     BKKeymapKeyboardComponent* keyboard;
     BKTextButton keyboardValsTextFieldOpen;
     

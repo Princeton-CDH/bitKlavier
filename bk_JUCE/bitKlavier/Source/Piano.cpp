@@ -907,7 +907,7 @@ ValueTree Piano::getState(void)
     ValueTree pianoVT( vtagPiano);
     
     String name = getName();
-    pianoVT.setProperty("name", ((name == String::empty) ? "Piano"+String(Id) : name) , 0);
+    pianoVT.setProperty("name", ((name == String()) ? "Piano"+String(Id) : name) , 0);
     
     pianoVT.setProperty("Id", Id, 0);
     
@@ -1023,7 +1023,7 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap)
     
     String pianoName = e->getStringAttribute("name");
     
-    if (pianoName != String::empty) setName(pianoName);
+    if (pianoName != String()) setName(pianoName);
     
     BKItem::Ptr thisItem;
     BKItem::Ptr thisConnection;

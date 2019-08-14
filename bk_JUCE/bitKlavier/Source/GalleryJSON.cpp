@@ -14,13 +14,13 @@
 
 #define jsonGetValue(ID) data.getProperty(ID, "").getArray()->getFirst()
 #define jsonGetProperty(ID) data.getProperty(ID, "")
-#define jsonPropertyDoesExist(ID) (data.getProperty(ID, "") != String::empty)
+#define jsonPropertyDoesExist(ID) (data.getProperty(ID, "") != String())
 
 #define jsonGetKeys(ID) \
 isLayer = true; \
 kvar = data.getProperty(ID, ""); \
 keys.clearQuick(); \
-if (kvar == String::empty) isLayer = false; \
+if (kvar == String()) isLayer = false; \
 if (isLayer) \
 {\
 for (int k = 0; k < kvar.size(); k++) keys.add(kvar[k]);\

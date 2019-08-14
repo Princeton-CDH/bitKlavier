@@ -430,7 +430,7 @@ private:
     int rangeAll;
     float firstKey;
     bool canScroll, useMousePositionForVelocity, shouldCheckMousePos;
-    ScopedPointer<Button> scrollDown, scrollUp;
+    std::unique_ptr<Button> scrollDown, scrollUp;
 
     Array<KeyPress> keyPresses; //this leaks: change to OwnedArray?
     Array<int> keyPressNotes;

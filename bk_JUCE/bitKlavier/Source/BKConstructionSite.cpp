@@ -367,7 +367,7 @@ BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
             upperLeftest = newItem;
         }
         
-        newItem->setContent(processor.getPreparationState(item->getType(), item->getId()).createXml());
+        newItem->setContent(processor.getPreparationState(item->getType(), item->getId()).createXml().get());
         
         clipboard.add(newItem);
     }
@@ -786,7 +786,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 
         selected.deselectAll();
         
-        addAndMakeVisible(lasso = new LassoComponent<BKItem*>());
+        lasso = std::make_unique<LassoComponent<BKItem*>>();
+        addAndMakeVisible(*lasso);
         
         lasso->setAlpha(0.5);
         lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoFillColourId, Colours::lightgrey);

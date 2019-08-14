@@ -170,7 +170,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     {
         int tempheight = sliderHeight;
         
-        bigInvisibleSlider = new BKSubSlider(Slider::LinearBarVertical,
+        bigInvisibleSlider = std::make_unique<BKSubSlider>(Slider::LinearBarVertical,
                                              sliderMin,
                                              sliderMax,
                                              sliderDefault,
@@ -178,7 +178,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
                                              numActiveSliders * 20,
                                              tempheight);
         
-        displaySlider = new BKSubSlider(Slider::LinearBarVertical,
+        displaySlider = std::make_unique<BKSubSlider>(Slider::LinearBarVertical,
                                         sliderMin,
                                         sliderMax,
                                         sliderDefault,
@@ -192,7 +192,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     {
         int tempwidth = 0;
         
-        bigInvisibleSlider = new BKSubSlider(Slider::LinearBar,
+        bigInvisibleSlider = std::make_unique<BKSubSlider>(Slider::LinearBar,
                                              sliderMin,
                                              sliderMax,
                                              sliderDefault,
@@ -207,7 +207,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     bigInvisibleSlider->setName("BIG");
     bigInvisibleSlider->addListener(this);
     bigInvisibleSlider->setLookAndFeel(&activeSliderLookAndFeel);
-    addAndMakeVisible(bigInvisibleSlider);
+    addAndMakeVisible(*bigInvisibleSlider);
     
     displaySlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 0,0);
     displaySlider->addMouseListener(this, true);
@@ -215,17 +215,17 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     displaySlider->addListener(this);
     displaySlider->setInterceptsMouseClicks(false, false);
     displaySlider->setLookAndFeel(&displaySliderLookAndFeel);
-    addAndMakeVisible(displaySlider);
+    addAndMakeVisible(*displaySlider);
     
     showName.setInterceptsMouseClicks(false, true);
     addAndMakeVisible(showName);
     
-    editValsTextField = new TextEditor();
+    editValsTextField = std::make_unique<TextEditor>();
     editValsTextField->setMultiLine(true);
     editValsTextField->setName("PARAMTXTEDIT");
     editValsTextField->setColour(TextEditor::highlightColourId, Colours::darkgrey);
     editValsTextField->addListener(this);
-    addAndMakeVisible(editValsTextField);
+    addAndMakeVisible(*editValsTextField);
     
 #if JUCE_IOS
     editValsTextField->setReadOnly(true);
@@ -580,7 +580,7 @@ void BKMultiSlider::deactivateAllBefore(int where, NotificationType notify)
 
 void BKMultiSlider::mouseDrag(const MouseEvent& e)
 {
-    if(e.eventComponent == bigInvisibleSlider)
+    if(e.eventComponent == bigInvisibleSlider.get())
     {
         int which = whichSlider(e);
         
@@ -622,7 +622,7 @@ void BKMultiSlider::mouseDrag(const MouseEvent& e)
 
 void BKMultiSlider::mouseMove(const MouseEvent& e)
 {
-    if(e.eventComponent == bigInvisibleSlider)
+    if(e.eventComponent == bigInvisibleSlider.get())
     {
         int which = whichSlider(e);
         int whichSub = whichSubSlider(which, e);
@@ -1178,12 +1178,12 @@ sliderIncrement(increment)
     valueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);
     addAndMakeVisible(valueTF);
     
-    displaySlider = new Slider(); 
+    displaySlider = std::make_unique<Slider>();
     displaySlider->setRange(min, max, increment);
     displaySlider->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
     displaySlider->setLookAndFeel(&displaySliderLookAndFeel);
     displaySlider->setInterceptsMouseClicks(false, false);
-    addAndMakeVisible(displaySlider);
+    addAndMakeVisible(*displaySlider);
     
     sliderTextResolution = -1;
 
@@ -1443,12 +1443,12 @@ sliderIncrement(increment)
     newDrag = false;
     isMinAlwaysLessThanMax = false;
     
-    displaySlider = new Slider();
+    displaySlider = std::make_unique<Slider>();
     displaySlider->setRange(min, max, increment);
     displaySlider->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
     displaySlider->setLookAndFeel(&displaySliderLookAndFeel);
     displaySlider->setInterceptsMouseClicks(false, false);
-    addAndMakeVisible(displaySlider);
+    addAndMakeVisible(*displaySlider);
     
 #if JUCE_IOS
     maxValueTF.setReadOnly(true);
@@ -1737,7 +1737,7 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     sampleImageComponent.setTooltip("Provides real-time visualization of each independent Nostalgic wave");
     addAndMakeVisible(sampleImageComponent);
     
-    wavedistanceSlider = new Slider();
+    wavedistanceSlider = std::make_unique<Slider>();
     wavedistanceSlider->addMouseListener(this, true);
     wavedistanceSlider->setRange(sliderMin, sliderMax, sliderIncrement);
     wavedistanceSlider->setSliderStyle(Slider::SliderStyle::LinearBar);
@@ -1745,9 +1745,9 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     wavedistanceSlider->setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
     wavedistanceSlider->addListener(this);
     wavedistanceSlider->setSkewFactor(skewFactor);
-    addAndMakeVisible(wavedistanceSlider);
+    addAndMakeVisible(*wavedistanceSlider);
     
-    undertowSlider = new Slider();
+    undertowSlider = std::make_unique<Slider>();
     undertowSlider->addMouseListener(this, true);
     undertowSlider->setRange(sliderMin, sliderMax, sliderIncrement);
     undertowSlider->setSliderStyle(Slider::SliderStyle::LinearBar);
@@ -1755,7 +1755,7 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     undertowSlider->setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
     undertowSlider->addListener(this);
     undertowSlider->setSkewFactor(skewFactor);
-    addAndMakeVisible(undertowSlider);
+    addAndMakeVisible(*undertowSlider);
     
     for(int i=0; i<maxSliders; i++)
     {
@@ -1969,7 +1969,7 @@ void BKWaveDistanceUndertowSlider::textEditorFocusLost(TextEditor& textEditor)
 
 void BKWaveDistanceUndertowSlider::sliderDragEnded(Slider *slider)
 {
-    if(slider == wavedistanceSlider)
+    if(slider == wavedistanceSlider.get())
     {
         setWaveDistance(wavedistanceSlider->getValue(), dontSendNotification);
     }
@@ -2024,7 +2024,7 @@ sliderIncrement(increment)
     showName.setInterceptsMouseClicks(false, true);
     addAndMakeVisible(showName);
 
-    editValsTextField = new BKTextEditor();
+    editValsTextField = std::make_unique<BKTextEditor>();
     editValsTextField->setMultiLine(true);
     editValsTextField->setName("PARAMTXTEDIT");
     editValsTextField->addListener(this);
@@ -2033,7 +2033,7 @@ sliderIncrement(increment)
     editValsTextField->setReadOnly(true);
     editValsTextField->setCaretVisible(true);
 #endif
-    addAndMakeVisible(editValsTextField);
+    addAndMakeVisible(*editValsTextField);
     editValsTextField->setVisible(false);
     
     numSliders = 12;
@@ -2058,7 +2058,7 @@ sliderIncrement(increment)
         else activeSliders.insert(0, true);
     }
     
-    topSlider = new Slider;
+    topSlider = std::make_unique<Slider>();
     topSlider->setSliderStyle(Slider::LinearBar);
     topSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 0,0);
     //topSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 50,50);
@@ -2068,7 +2068,7 @@ sliderIncrement(increment)
     topSlider->addMouseListener(this, true);
     topSlider->setLookAndFeel(&topSliderLookAndFeel);
     topSlider->setAlpha(0.);
-    addAndMakeVisible(topSlider);
+    addAndMakeVisible(*topSlider);
     
     topSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.0f));
     stackedSliderLookAndFeel.setColour(Slider::thumbColourId, Colours::goldenrod.withMultipliedAlpha(0.95));
@@ -2506,32 +2506,32 @@ sliderName(name)
     else showName.setJustificationType(Justification::bottomLeft);
     //addAndMakeVisible(showName);
     
-    attackSlider = new BKSingleSlider("attack time (ms)", 1, 1000, 10, 1);
+    attackSlider = std::make_unique<BKSingleSlider>("attack time (ms)", 1, 1000, 10, 1);
     attackSlider->setSkewFactorFromMidPoint(200);
     attackSlider->setJustifyRight(true);
     attackSlider->addMyListener(this);
     attackSlider->setToolTipString("envelope attack time (ms)");
-    addAndMakeVisible(attackSlider);
+    addAndMakeVisible(*attackSlider);
     
-    decaySlider = new BKSingleSlider("decay time (ms)", 1, 1000, 10, 1);
+    decaySlider = std::make_unique<BKSingleSlider>("decay time (ms)", 1, 1000, 10, 1);
     decaySlider->setSkewFactorFromMidPoint(200);
     decaySlider->setJustifyRight(false);
     decaySlider->addMyListener(this);
     decaySlider->setToolTipString("envelope decay time (ms)");
-    addAndMakeVisible(decaySlider);
+    addAndMakeVisible(*decaySlider);
     
-    sustainSlider = new BKSingleSlider("sustain level (0-1)", 0., 1., 1., 0.001);
+    sustainSlider = std::make_unique<BKSingleSlider>("sustain level (0-1)", 0., 1., 1., 0.001);
     sustainSlider->setJustifyRight(true);
     sustainSlider->addMyListener(this);
     sustainSlider->setToolTipString("envelope sustain level (0-1)");
-    addAndMakeVisible(sustainSlider);
+    addAndMakeVisible(*sustainSlider);
     
-    releaseSlider = new BKSingleSlider("release time (ms)", 1, 1000, 30, 1);
+    releaseSlider = std::make_unique<BKSingleSlider>("release time (ms)", 1, 1000, 30, 1);
     releaseSlider->setSkewFactorFromMidPoint(200);
     releaseSlider->setJustifyRight(false);
     releaseSlider->addMyListener(this);
     releaseSlider->setToolTipString("envelope release time (ms)");
-    addAndMakeVisible(releaseSlider);
+    addAndMakeVisible(*releaseSlider);
     
     adsrButton.setButtonText("ADSR");
     adsrButton.setClickingTogglesState(true);

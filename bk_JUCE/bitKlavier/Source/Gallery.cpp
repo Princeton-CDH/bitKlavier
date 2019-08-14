@@ -31,7 +31,7 @@ processor(p)
     isDirty = false;
 }
 
-Gallery::Gallery(ScopedPointer<XmlElement> xml, BKAudioProcessor& p):
+Gallery::Gallery(XmlElement* xml, BKAudioProcessor& p):
 processor(p)
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
@@ -53,7 +53,7 @@ processor(p)
 
 Gallery::Gallery(var myJson, BKAudioProcessor& p):
 processor(p),
-url(String::empty)
+url(String())
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {

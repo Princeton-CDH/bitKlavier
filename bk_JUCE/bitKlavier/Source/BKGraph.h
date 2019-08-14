@@ -262,9 +262,9 @@ private:
     BKAudioProcessor& processor;
     Label label;
     
-    ScopedPointer<ComponentBoundsConstrainer> constrain;
+    std::unique_ptr<ComponentBoundsConstrainer> constrain;
     
-    ScopedPointer<ResizableCornerComponent> resizer;
+    std::unique_ptr<ResizableCornerComponent> resizer;
     
     // Piano menu
     BKComboBox menu;

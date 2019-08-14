@@ -126,7 +126,7 @@ public:
 
 			ValueTree vt1 = t1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			TempoPreparation::Ptr tp2 = new TempoPreparation();
 
@@ -157,7 +157,7 @@ public:
 
 			ValueTree vt1 = m1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			Tempo m2(-1, true);
 
@@ -205,7 +205,7 @@ public:
 
 			ValueTree vt1 = tm1->getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			TempoPreparation::Ptr tp2 = new TempoPreparation();
 			TempoModification::Ptr tm2 = new TempoModification(tp2, 1);

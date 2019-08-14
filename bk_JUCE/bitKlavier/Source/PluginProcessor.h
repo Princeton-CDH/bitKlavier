@@ -42,11 +42,11 @@ public:
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
     void loadGalleryFromPath(String path);
-    void loadGalleryFromXml(ScopedPointer<XmlElement> xml);
+    void loadGalleryFromXml(XmlElement* xml);
     void loadJsonGalleryFromPath(String path);
     void saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
-    void createNewGallery(String name, ScopedPointer<XmlElement> xml = nullptr);
+    void createNewGallery(String name, XmlElement* xml = nullptr);
     void renameGallery(String name);
     void duplicateGallery(String name);
     void deleteGallery(void);
@@ -79,8 +79,8 @@ public:
     Array<sfzero::Region*> regions;
     
     AudioFormatManager formatManager;
-    ScopedPointer<AudioFormatReader> sampleReader;
-    ScopedPointer<AudioSampleBuffer> sampleBuffer;
+    std::unique_ptr<AudioFormatReader> sampleReader;
+    std::unique_ptr<AudioSampleBuffer> sampleBuffer;
     
     // Synthesisers.
     BKSynthesiser                       mainPianoSynth;

@@ -429,7 +429,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     name = n;
+        if (n != String())     name = n;
         else                        name = String(Id);
 
         clear();
@@ -437,7 +437,7 @@ public:
         {
             String attr = e->getStringAttribute("k" + String(k));
             
-            if (attr != String::empty)
+            if (attr != String())
             {
                 keymap.setUnchecked(attr.getIntValue(), true);
             }

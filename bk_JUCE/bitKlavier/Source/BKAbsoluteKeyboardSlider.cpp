@@ -14,9 +14,9 @@ BKAbsoluteKeyboardSlider::BKAbsoluteKeyboardSlider(bool nos):
 ratio(1.0),
 needsOctaveSlider(nos)
 {
+    keyboardComponent = std::make_unique<BKKeymapKeyboardComponent>(keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard)
     
-    addAndMakeVisible (keyboardComponent =
-                       new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
+    addAndMakeVisible (*keyboardComponent);
 
     keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     

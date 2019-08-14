@@ -638,7 +638,7 @@ public:
 
 			ValueTree vt1 = n1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			NostalgicPreparation::Ptr np2 = new NostalgicPreparation();
 
@@ -673,7 +673,7 @@ public:
 
 			ValueTree vt1 = n1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			Nostalgic n2(-1, true);
 
@@ -725,7 +725,7 @@ public:
 
 			ValueTree vt1 = nm1->getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			NostalgicPreparation::Ptr np2 = new NostalgicPreparation();
 			NostalgicModification::Ptr nm2 = new NostalgicModification(np2, 1);
