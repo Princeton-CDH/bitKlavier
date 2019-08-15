@@ -244,6 +244,9 @@
                 file="Source/PreparationMap.h"/>
         </GROUP>
         <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparation">
+          <FILE id="zDj4jy" name="Blendronomer.cpp" compile="1" resource="0"
+                file="Source/Blendronomer.cpp"/>
+          <FILE id="xipLRY" name="Blendronomer.h" compile="0" resource="0" file="Source/Blendronomer.h"/>
           <FILE id="VFgtPR" name="Modification.cpp" compile="1" resource="0"
                 file="Source/Modification.cpp"/>
           <FILE id="xHx6az" name="Modification.h" compile="0" resource="0" file="Source/Modification.h"/>
@@ -396,9 +399,9 @@
         <FILE id="Umuv7J" name="BKLookAndFeel.cpp" compile="1" resource="0"
               file="Source/BKLookAndFeel.cpp"/>
         <FILE id="p6ebdl" name="BKLabel.h" compile="0" resource="0" file="Source/BKLabel.h"/>
-        <FILE id="Yc4pLT" name="BKTextField.h" compile="0" resource="0" file="Source/BKTextField.h"/>
       </GROUP>
     </GROUP>
+    <FILE id="Yc4pLT" name="BKTextField.h" compile="0" resource="0" file="Source/BKTextField.h"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" customXcodeResourceFolders="" customPList=""
@@ -426,8 +429,8 @@
         <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="SFZero" path="../../../modules"/>
-        <MODULEPATH id="stk" path="../../../modules"/>
+        <MODULEPATH id="SFZero" path="../../../external juce modules/SFZero/modules"/>
+        <MODULEPATH id="stk" path="../../../external juce modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
@@ -459,8 +462,8 @@
         <MODULEPATH id="juce_audio_formats" path="../../../../JUCE_projects"/>
         <MODULEPATH id="juce_audio_devices" path="../../../../JUCE_projects"/>
         <MODULEPATH id="juce_audio_basics" path="../../../../JUCE_projects"/>
-        <MODULEPATH id="SFZero" path="../../../modules"/>
-        <MODULEPATH id="stk" path="../../../modules"/>
+        <MODULEPATH id="SFZero" path="../../../external juce modules/SFZero/modules"/>
+        <MODULEPATH id="stk" path="../../../external juce modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2017 targetFolder="Builds/VisualStudio2017" bigIcon="iHGLGD" smallIcon="smHM8h"
@@ -474,25 +477,50 @@
                        enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_video" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_opengl" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_extra" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_basics" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_graphics" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_events" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_data_structures" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_cryptography" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_core" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_utils" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_processors" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_formats" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_devices" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_basics" path="..\..\..\JUCE\modules"/>
-        <MODULEPATH id="SFZero" path="../../../modules"/>
-        <MODULEPATH id="stk" path="../../../modules"/>
+        <MODULEPATH id="juce_video" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_opengl" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_cryptography" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="..\..\..\..\..\..\..\..\Program Files\JUCE\modules"/>
+        <MODULEPATH id="SFZero" path="../../../external juce modules/SFZero/modules"/>
+        <MODULEPATH id="stk" path="../../../external juce modules"/>
       </MODULEPATHS>
     </VS2017>
+    <VS2019 targetFolder="Builds/VisualStudio2019">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="stk" path="../../../external juce modules"/>
+        <MODULEPATH id="SFZero" path="../../../external juce modules/SFZero/modules"/>
+        <MODULEPATH id="juce_video"/>
+        <MODULEPATH id="juce_opengl"/>
+        <MODULEPATH id="juce_gui_extra"/>
+        <MODULEPATH id="juce_gui_basics"/>
+        <MODULEPATH id="juce_graphics"/>
+        <MODULEPATH id="juce_events"/>
+        <MODULEPATH id="juce_data_structures"/>
+        <MODULEPATH id="juce_cryptography"/>
+        <MODULEPATH id="juce_core"/>
+        <MODULEPATH id="juce_audio_utils"/>
+        <MODULEPATH id="juce_audio_processors"/>
+        <MODULEPATH id="juce_audio_plugin_client"/>
+        <MODULEPATH id="juce_audio_formats"/>
+        <MODULEPATH id="juce_audio_devices"/>
+        <MODULEPATH id="juce_audio_basics"/>
+      </MODULEPATHS>
+    </VS2019>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="1"/>

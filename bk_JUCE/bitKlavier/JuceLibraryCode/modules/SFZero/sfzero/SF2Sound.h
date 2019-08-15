@@ -29,7 +29,7 @@ public:
     juce::OwnedArray<Region> regions;
 
     Preset(juce::String nameIn, int bankIn, int presetIn) : name(nameIn), bank(bankIn), preset(presetIn) {}
-    ~Preset() {}
+      ~Preset() {regions.clear();}
     void addRegion(Region *region) { regions.add(region); }
   };
   void addPreset(Preset *preset);
