@@ -62,7 +62,6 @@ sfzero::Sample *sfzero::Sound::addSample(juce::String path, juce::String default
 
 void sfzero::Sound::addError(const juce::String &message) { errors_.add(message); }
 
-
 void sfzero::Sound::addUnsupportedOpcode(const juce::String &opcode)
 {
   if (!unsupportedOpcodes_.contains(opcode))
@@ -137,7 +136,7 @@ sfzero::Region *sfzero::Sound::regionAt(int index) { return regions_[index]; }
 
 int sfzero::Sound::numSubsounds() { return 1; }
 
-juce::String sfzero::Sound::subsoundName(int /*whichSubsound*/) { return juce::String::empty; }
+juce::String sfzero::Sound::subsoundName(int /*whichSubsound*/) { return juce::String(); }
 
 void sfzero::Sound::useSubsound(int /*whichSubsound*/) {}
 

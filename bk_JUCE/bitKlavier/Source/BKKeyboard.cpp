@@ -66,8 +66,8 @@ octaveNumForMiddleC (3)
 {
     firstKeyDown = -1; lastKeyDown = -1; lastKeySelected = -1;
     
-    addChildComponent (scrollDown = new BKKeymapKeyboardUpDownButton (*this, -1));
-    addChildComponent (scrollUp   = new BKKeymapKeyboardUpDownButton (*this, 1));
+    addChildComponent ((scrollDown = std::make_unique<BKKeymapKeyboardUpDownButton>(*this, -1)).get());
+    addChildComponent ((scrollUp = std::make_unique<BKKeymapKeyboardUpDownButton>(*this, 1)).get());
     
     // initialise with a default set of qwerty key-mappings..
     const char* const keymap = "awsedftgyhujkolp;";
@@ -1116,7 +1116,7 @@ void BKKeymapKeyboardComponent::timerCallback()
     {
         const Array<MouseInputSource>& mouseSources = Desktop::getInstance().getMouseSources();
         
-        for (MouseInputSource* mi = mouseSources.begin(), * const e = mouseSources.end(); mi != e; ++mi)
+        for (MouseInputSource* mi = (juce::MouseInputSource *) mouseSources.begin(), * const e = (juce::MouseInputSource *const) mouseSources.end(); mi != e; ++mi)
             if (mi->getComponentUnderMouse() == this || isParentOf (mi->getComponentUnderMouse()))
                 updateNoteUnderMouse (getLocalPoint (nullptr, mi->getScreenPosition()).roundToInt(), mi->isDragging(), mi->getIndex());
     }
