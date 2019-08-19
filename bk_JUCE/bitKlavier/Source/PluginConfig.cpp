@@ -88,7 +88,7 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     
     DBG("sustain inversion saved: " + String((int)getSustainInversion()));
     
-    XmlElement* galleryXML = galleryVT.createXml().get();
+    std::unique_ptr<XmlElement> galleryXML = galleryVT.createXml();
     copyXmlToBinary (*galleryXML, destData);
 }
 
@@ -126,7 +126,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     DBG("BKAudioProcessor::setStateInformation");
     
-    XmlElement* galleryXML = getXmlFromBinary (data, sizeInBytes).get();
+    std::unique_ptr<XmlElement> galleryXML = getXmlFromBinary (data, sizeInBytes);
     
     DBG("galleryXML: " + galleryXML->createDocument(""));
     if (galleryXML != nullptr)

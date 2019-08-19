@@ -53,10 +53,10 @@ public:
             
             ValueTree vt1 = processor.gallery->getState();
             
-            XmlElement* xml = vt1.createXml();
+            std::unique_ptr<XmlElement> xml = vt1.createXml();
             
             // GALLERY 2
-            processor.gallery = new Gallery(xml, processor);
+            processor.gallery = new Gallery(*xml, processor);
             processor.gallery->setName(name);
             
             ValueTree vt2 =  processor.gallery->getState();
@@ -360,11 +360,11 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     
     galleryVT.setProperty("name", myFile.getFileName().upToFirstOccurrenceOf(".xml", false, false), 0);
     
-    XmlElement* myXML = galleryVT.createXml().get();
+    std::unique_ptr<XmlElement> myXML = galleryVT.createXml();
     
     myXML->writeToFile(myFile, String());
     
-    loadGalleryFromXml(myXML);
+    loadGalleryFromXml(myXML.get());
     
     gallery->setURL(newURL);
     
@@ -1038,9 +1038,9 @@ void BKAudioProcessor::importCurrentGallery(void)
             
              if (url.createInputStream (false) != nullptr)
              {
-                 XmlElement* xml = url.readEntireXmlStream().get();
+                 std::unique_ptr<XmlElement> xml = url.readEntireXmlStream();
                 
-                 createNewGallery(url.getFileName().replace("%20", " "), xml);
+                 createNewGallery(url.getFileName().replace("%20", " "), xml.get());
              }
          }
      });
@@ -1179,13 +1179,13 @@ void BKAudioProcessor::loadGalleryDialog(void)
             else                            DBG("NOT MOVED");
         }
         
-        XmlElement* xml = XmlDocument::parse (user).get();
+        std::unique_ptr<XmlElement> xml = XmlDocument::parse (user);
         
         if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
         {
             currentGallery = user.getFileName();
             
-            gallery = new Gallery(xml, *this);
+            gallery = new Gallery(xml.get(), *this);
             
             gallery->setURL(user.getFullPathName());
             
@@ -1230,9 +1230,9 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
     {
         File myFile (path);
 
-        XmlElement* xml = XmlDocument::parse(myFile).get();
+        std::unique_ptr<XmlElement> xml = XmlDocument::parse(myFile);
 
-        loadGalleryFromXml(xml);
+        loadGalleryFromXml(xml.get());
 
         gallery->setURL(path);
     }

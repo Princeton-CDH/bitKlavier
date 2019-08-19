@@ -240,7 +240,7 @@ private:
     }
 };
 
-JUCE_DECLARE_DEPRECATED_STATIC (const String String::empty;)
+JUCE_DECLARE_DEPRECATED_STATIC (const String String();)
 
 //==============================================================================
 String::String() noexcept  : text (&(emptyString.text))
