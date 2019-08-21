@@ -81,7 +81,7 @@ public:
     const float getPeriodMultiplier(void)   const noexcept  { return periodMultiplier;      };
     const float getGlobalGain(void)         const noexcept  { return globalGain;            };
     const bool  getInvertSustain(void)      const noexcept  { return invertSustain;         };
-    const bool  getNoteOnSetsNoteOffVelocity(void)      const noexcept  { return noteOnSetsNoteOffVelocity;         };
+    const bool  getNoteOnSetsNoteOffVelocity(void)      const noexcept  { return noteOnSetsNoteOffVelocity; };
     
     void setTuningFundamental(float val)    {
         tuningFundamental = val;
@@ -107,7 +107,6 @@ private:
     bool resonanceAndHammer;
     bool invertSustain;
     bool noteOnSetsNoteOffVelocity;
-    
     
     JUCE_LEAK_DETECTOR(GeneralSettings);
 };

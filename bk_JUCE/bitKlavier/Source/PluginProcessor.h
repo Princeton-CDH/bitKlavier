@@ -31,7 +31,7 @@
 /**
 */
 class BKAudioProcessor  : public AudioProcessor,
-                           public ChangeListener
+                            public ChangeListener
 {
     
 public:
@@ -62,7 +62,6 @@ public:
     
     String firstGallery(void);
     void initializeGallery(void);
-    
     
     FileChooser* fc;
     
@@ -118,6 +117,8 @@ public:
     
     bool                                defaultLoaded;
     String                              defaultName;
+    
+    std::shared_ptr<MidiOutput>         midiOutput;
 
     void updateGalleries(void);
     
@@ -336,7 +337,6 @@ private:
    
     void sustainActivate(void);
     void sustainDeactivate(void);
-    
     
     double pitchbendVal;
     

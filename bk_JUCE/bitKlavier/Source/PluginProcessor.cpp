@@ -101,7 +101,8 @@ hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
 doneWithSetStateInfo(false),
-loader(*this)
+loader(*this),
+midiOutput(nullptr)
 {
 #if BK_UNIT_TESTS
     

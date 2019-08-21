@@ -1062,5 +1062,4 @@ static const std::vector<std::string> cFundamentalNames = {
     "11: B"
 };
 
-
 #endif  // AUDIOCONSTANTS_H_INCLUDED

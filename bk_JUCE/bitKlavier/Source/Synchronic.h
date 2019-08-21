@@ -1218,7 +1218,8 @@ public:
                         TuningProcessor::Ptr tuning,
                         TempoProcessor::Ptr tempo,
                         BKSynthesiser* main,
-                        GeneralSettings::Ptr general);
+                        GeneralSettings::Ptr general,
+                        std::shared_ptr<MidiOutput>* output);
     
     ~SynchronicProcessor();
     
@@ -1328,6 +1329,8 @@ private:
     TuningProcessor::Ptr tuner;
     TempoProcessor::Ptr tempo;
     
+    std::shared_ptr<MidiOutput>* midiOutput;
+    
     double sampleRate;
 
     
@@ -1352,6 +1355,9 @@ private:
     Array<uint64> holdTimers;
     int lastKeyPressed;
     float lastKeyVelocity;
+    
+    BKSynthesiserVoice** asv;
+    Array<BKSynthesiserVoice*> activeSynchronicVoices;
 
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);

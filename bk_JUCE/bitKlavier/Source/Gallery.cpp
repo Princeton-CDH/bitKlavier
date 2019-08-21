@@ -115,6 +115,7 @@ void Gallery::randomize()
 
     BKSynthesiser* dummySynth;
     GeneralSettings::Ptr dummyGeneral = new GeneralSettings();
+    std::shared_ptr<MidiOutput>* dummyOutput;
 
     //each piano
     for (int h = 0; h < Random::getSystemRandom().nextInt(Range<int>(1, 5)); h++)
@@ -150,7 +151,7 @@ void Gallery::randomize()
             Synchronic::Ptr s = new Synchronic(-1, true);
             addSynchronic(s);
             int synchronicId = s->getId();
-            SynchronicProcessor::Ptr sProc = new SynchronicProcessor(s, tProc, mProc, dummySynth, dummyGeneral);
+            SynchronicProcessor::Ptr sProc = new SynchronicProcessor(s, tProc, mProc, dummySynth, dummyGeneral, dummyOutput);
             p->addSynchronicProcessor(synchronicId);
 
             Nostalgic::Ptr n = new Nostalgic(-1, true);
