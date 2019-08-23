@@ -31,7 +31,7 @@
 /**
 */
 class BKAudioProcessor  : public AudioProcessor,
-                           public ChangeListener
+                            public ChangeListener
 {
     
 public:
@@ -42,11 +42,11 @@ public:
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
     void loadGalleryFromPath(String path);
-    void loadGalleryFromXml(ScopedPointer<XmlElement> xml);
+    void loadGalleryFromXml(XmlElement* xml);
     void loadJsonGalleryFromPath(String path);
     void saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
-    void createNewGallery(String name, ScopedPointer<XmlElement> xml = nullptr);
+    void createNewGallery(String name, XmlElement* xml = nullptr);
     void renameGallery(String name);
     void duplicateGallery(String name);
     void deleteGallery(void);
@@ -63,7 +63,6 @@ public:
     String firstGallery(void);
     void initializeGallery(void);
     
-    
     FileChooser* fc;
     
     Gallery::Ptr                        gallery;
@@ -79,8 +78,8 @@ public:
     Array<sfzero::Region*> regions;
     
     AudioFormatManager formatManager;
-    ScopedPointer<AudioFormatReader> sampleReader;
-    ScopedPointer<AudioSampleBuffer> sampleBuffer;
+    std::unique_ptr<AudioFormatReader> sampleReader;
+    std::unique_ptr<AudioSampleBuffer> sampleBuffer;
     
     // Synthesisers.
     BKSynthesiser                       mainPianoSynth;
@@ -118,6 +117,8 @@ public:
     
     bool                                defaultLoaded;
     String                              defaultName;
+    
+    std::shared_ptr<MidiOutput>         midiOutput;
 
     void updateGalleries(void);
     
@@ -336,7 +337,6 @@ private:
    
     void sustainActivate(void);
     void sustainDeactivate(void);
-    
     
     double pitchbendVal;
     

@@ -229,6 +229,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
     {
         //DBG("BKPianoSamplerVoice::startNote " + String(midi));
         
+        
         currentMidiNoteNumber = midi;
         cookedNote = ((float)midi + pitchoffset);
         pitchWheel = pitchWheelValue;
@@ -245,11 +246,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
         
         uint64 totalLength = length;
         
-        
-        
         if (bkType != MainNote)
         {
-            
             //constrain total length minimum to no less than 50ms
             if(totalLength < 0.05 * getSampleRate()) totalLength = 0.05 * getSampleRate();
             

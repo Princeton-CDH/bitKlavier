@@ -132,19 +132,19 @@ private:
     BKConstructionSite  construction;
 
     BKOvertop overtop;
-    ScopedPointer<DropShadower> overtopShadow;
+    std::unique_ptr<DropShadower> overtopShadow;
     
     BKSplashScreen splash;
     
     //ImageComponent backgroundImageComponent;
     
     Slider mainSlider;
-    ScopedPointer<BKLevelMeterComponent> levelMeterComponentL;
-    ScopedPointer<BKLevelMeterComponent> levelMeterComponentR;
+    std::unique_ptr<BKLevelMeterComponent> levelMeterComponentL;
+    std::unique_ptr<BKLevelMeterComponent> levelMeterComponentR;
     
-    ScopedPointer<PreparationPanel> preparationPanel;
+    std::unique_ptr<PreparationPanel> preparationPanel;
     
-    ScopedPointer<BKKeymapKeyboardComponent> keyboard;
+    std::unique_ptr<BKKeymapKeyboardComponent> keyboard;
     BKKeymapKeyboardState keyboardState;
     Component *keyboardComponent;
     

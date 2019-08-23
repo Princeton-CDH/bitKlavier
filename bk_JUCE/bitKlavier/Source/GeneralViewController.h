@@ -99,8 +99,8 @@ private:
     ToggleButton noteOnSetsNoteOffVelocityB;
     BKLabel     noteOnSetsNoteOffVelocityL;
     
-    ScopedPointer<BKSingleSlider> A4tuningReferenceFrequencySlider; //A440
-    ScopedPointer<BKSingleSlider> tempoMultiplierSlider;
+    std::unique_ptr<BKSingleSlider> A4tuningReferenceFrequencySlider; //A440
+    std::unique_ptr<BKSingleSlider> tempoMultiplierSlider;
     
     
     void bkTextFieldDidChange       (TextEditor&)               override;

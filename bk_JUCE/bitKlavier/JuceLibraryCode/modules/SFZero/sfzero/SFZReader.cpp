@@ -624,7 +624,7 @@ const char *sfzero::Reader::readPathInto(juce::String *pathOut, const char *pIn,
   }
   else
   {
-    *pathOut = juce::String::empty;
+    *pathOut = juce::String();
   }
   return p;
 }

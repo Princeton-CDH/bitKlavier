@@ -179,9 +179,9 @@ private:
     double currentInvisibleSliderValue;
     
     OwnedArray< OwnedArray<BKSubSlider>> sliders;
-    ScopedPointer< BKSubSlider> displaySlider;
-    ScopedPointer< BKSubSlider> bigInvisibleSlider;
-    ScopedPointer< TextEditor> editValsTextField;
+    std::unique_ptr< BKSubSlider> displaySlider;
+    std::unique_ptr< BKSubSlider> bigInvisibleSlider;
+    std::unique_ptr< TextEditor> editValsTextField;
     
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
     double sliderDefault;
@@ -243,7 +243,7 @@ public:
     };
     
     Slider thisSlider;
-    ScopedPointer<Slider> displaySlider;
+    std::unique_ptr<Slider> displaySlider;
     
     String sliderName;
     BKLabel showName;
@@ -357,7 +357,7 @@ public:
     
     Slider invisibleSlider;
     
-    ScopedPointer<Slider> displaySlider;
+    std::unique_ptr<Slider> displaySlider;
     
     String sliderName;
     BKLabel showName;
@@ -490,8 +490,8 @@ public:
         }
     };
     
-    ScopedPointer<Slider> wavedistanceSlider;
-    ScopedPointer<Slider> undertowSlider;
+    std::unique_ptr<Slider> wavedistanceSlider;
+    std::unique_ptr<Slider> undertowSlider;
     OwnedArray<Slider> displaySliders;
     
     String wavedistanceSliderName;
@@ -692,11 +692,11 @@ public:
     
 private:
     
-    ScopedPointer<Slider> topSlider; //user interacts with this
+    std::unique_ptr<Slider> topSlider; //user interacts with this
     OwnedArray<Slider> dataSliders;  //displays data, user controls with topSlider
     Array<bool> activeSliders;
     
-    ScopedPointer<BKTextEditor> editValsTextField;
+    std::unique_ptr<BKTextEditor> editValsTextField;
     
     int numSliders;
     int numActiveSliders;
@@ -850,10 +850,10 @@ public:
     
 private:
     
-    ScopedPointer<BKSingleSlider> attackSlider;
-    ScopedPointer<BKSingleSlider> decaySlider;
-    ScopedPointer<BKSingleSlider> sustainSlider;
-    ScopedPointer<BKSingleSlider> releaseSlider;
+    std::unique_ptr<BKSingleSlider> attackSlider;
+    std::unique_ptr<BKSingleSlider> decaySlider;
+    std::unique_ptr<BKSingleSlider> sustainSlider;
+    std::unique_ptr<BKSingleSlider> releaseSlider;
     
     String sliderName;
     BKLabel showName;

@@ -107,9 +107,9 @@ private:
 
     BKTextEditor keyboardValueTF;
     BKKeymapKeyboardState keyboardState;
-    ScopedPointer<Component> keyboardComponent;
+    std::unique_ptr<Component> keyboardComponent;
     BKKeymapKeyboardComponent* keyboard;
-    ScopedPointer<BKTextEditor> keyboardValsTextField;
+    std::unique_ptr<BKTextEditor> keyboardValsTextField;
     TextButton keyboardValsTextFieldOpen;
     
     int keyboardSize, minKey, maxKey;

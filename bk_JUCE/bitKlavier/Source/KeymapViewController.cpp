@@ -64,9 +64,10 @@ BKViewController(p, theGraph, 1)
     keymapTF.setTooltip("Select or deselect all keys by individually clicking or click-dragging, or press 'edit all' to type or copy/paste MIDI notes to be selected in Keymap");
     keymapTF.setMultiLine(true);
     
+    keyboardComponent = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    
     // Keyboard
-    addAndMakeVisible (keyboardComponent = new BKKeymapKeyboardComponent (keyboardState,
-                                                                 BKKeymapKeyboardComponent::horizontalKeyboard));
+    addAndMakeVisible(*keyboardComponent);
     
     keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
     keyboard->setScrollButtonsVisible(false);

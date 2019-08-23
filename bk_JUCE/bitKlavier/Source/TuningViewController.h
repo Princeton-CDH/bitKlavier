@@ -52,7 +52,7 @@ protected:
     BKLabel fundamentalLabel;
     BKComboBox fundamentalCB;
     
-    ScopedPointer<BKSingleSlider> offsetSlider;
+    std::unique_ptr<BKSingleSlider> offsetSlider;
     
     //adaptive tuning 1 stuff
     BKLabel A1IntervalScaleLabel;
@@ -66,8 +66,8 @@ protected:
     BKLabel A1FundamentalLabel;
     BKComboBox A1FundamentalCB;
     
-    ScopedPointer<BKSingleSlider> A1ClusterThresh;
-    ScopedPointer<BKSingleSlider> A1ClusterMax;
+    std::unique_ptr<BKSingleSlider> A1ClusterThresh;
+    std::unique_ptr<BKSingleSlider> A1ClusterMax;
     
     BKTextButton A1reset;
     
@@ -91,7 +91,7 @@ protected:
     
     BKComboBox nToneRootCB;
     BKComboBox nToneRootOctaveCB;
-    ScopedPointer<BKSingleSlider> nToneSemitoneWidthSlider;
+    std::unique_ptr<BKSingleSlider> nToneSemitoneWidthSlider;
     
     OwnedArray<Slider> springSliders;
     OwnedArray<Slider> tetherSliders;
@@ -102,13 +102,13 @@ protected:
     BKComboBox springScaleCB;
     BKComboBox springScaleFundamentalCB;
 
-    ScopedPointer<BKSingleSlider> rateSlider;
-    ScopedPointer<BKSingleSlider> dragSlider;
-    ScopedPointer<BKSingleSlider> tetherStiffnessSlider;
-    ScopedPointer<BKSingleSlider> intervalStiffnessSlider;
+    std::unique_ptr<BKSingleSlider> rateSlider;
+    std::unique_ptr<BKSingleSlider> dragSlider;
+    std::unique_ptr<BKSingleSlider> tetherStiffnessSlider;
+    std::unique_ptr<BKSingleSlider> intervalStiffnessSlider;
     
-    ScopedPointer<BKSingleSlider> tetherWeightGlobalSlider;
-    ScopedPointer<BKSingleSlider> tetherWeightSecondaryGlobalSlider;
+    std::unique_ptr<BKSingleSlider> tetherWeightGlobalSlider;
+    std::unique_ptr<BKSingleSlider> tetherWeightSecondaryGlobalSlider;
     
     ToggleButton fundamentalSetsTether; 
     

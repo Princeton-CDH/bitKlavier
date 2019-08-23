@@ -37,8 +37,8 @@ timerCallbackCount(0)
     
     gen = processor.gallery->getGeneralSettings();
     
-    levelMeterComponentL = new BKLevelMeterComponent;
-    addAndMakeVisible(levelMeterComponentL);
+    levelMeterComponentL = std::make_unique<BKLevelMeterComponent>();
+    addAndMakeVisible(*levelMeterComponentL);
     
     mainSlider.setLookAndFeel(&laf);
 
@@ -86,7 +86,7 @@ timerCallbackCount(0)
     addAndMakeVisible(instrumentCB);
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
     
-    keyboard =  ((BKKeymapKeyboardComponent*) keyboardComponent);
+    keyboard =  std::unique_ptr<BKKeymapKeyboardComponent>((BKKeymapKeyboardComponent*)keyboardComponent);
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(keyStart, keyEnd);
     keyboard->setOctaveForMiddleC(4);
@@ -105,8 +105,8 @@ timerCallbackCount(0)
 
     addAndMakeVisible(octaveSlider);
     
-    preparationPanel = new PreparationPanel(processor);
-    addAndMakeVisible(preparationPanel);
+    preparationPanel = std::make_unique<PreparationPanel>(processor);
+    addAndMakeVisible(*preparationPanel);
     
     addAndMakeVisible(header);
     
@@ -116,7 +116,7 @@ timerCallbackCount(0)
     
     juce::Point<int> myshadowOffset(2, 2);
     DropShadow myshadow(Colours::darkgrey, 5, myshadowOffset);
-    overtopShadow = new DropShadower(myshadow);
+    overtopShadow = std::make_unique<DropShadower>(myshadow);
     overtopShadow->setOwner(&overtop);
     
     startTimerHz (50);

@@ -10,7 +10,7 @@
 
 #include "PluginProcessor.h"
 
-void Gallery::addFromXML(ScopedPointer<XmlElement> xml)
+void Gallery::addFromXML(XmlElement* xml)
 {
     
 }
@@ -89,7 +89,7 @@ ValueTree  Gallery::getState(void)
     return galleryVT;
 }
 
-void Gallery::setStateFromXML(ScopedPointer<XmlElement> xml)
+void Gallery::setStateFromXML(XmlElement* xml)
 {
     int i;
     Array<float> fa;

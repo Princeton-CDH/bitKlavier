@@ -57,60 +57,60 @@ void BKSynthesiserVoice::channelPressureChanged(int) {}
 
 bool BKSynthesiserVoice::wasStartedBefore(const BKSynthesiserVoice& other) const noexcept
 {
-	return noteOnTime < other.noteOnTime;
+return noteOnTime < other.noteOnTime;
 }
-
-void BKSynthesiserVoice::renderNextBlock(AudioBuffer<double>& outputBuffer,
-	int startSample, int numSamples)
+    
+void BKSynthesiserVoice::renderNextBlock (AudioBuffer<double>& outputBuffer,
+                                          int startSample, int numSamples)
 {
-	AudioBuffer<double> subBuffer(outputBuffer.getArrayOfWritePointers(),
-		outputBuffer.getNumChannels(),
-		startSample, numSamples);
-
-	tempBuffer.makeCopyOf(subBuffer);
-	renderNextBlock(tempBuffer, 0, numSamples);
-	subBuffer.makeCopyOf(tempBuffer);
+    AudioBuffer<double> subBuffer (outputBuffer.getArrayOfWritePointers(),
+                                   outputBuffer.getNumChannels(),
+                                   startSample, numSamples);
+    
+    tempBuffer.makeCopyOf (subBuffer);
+    renderNextBlock (tempBuffer, 0, numSamples);
+    subBuffer.makeCopyOf (tempBuffer);
 }
-
+    
 //==============================================================================
-BKSynthesiser::BKSynthesiser(GeneralSettings::Ptr gen) :
-	pitchWheelValue(8192),
-	generalSettings(gen),
-	sampleRate(0),
-	lastNoteOnCounter(0),
-	minimumSubBlockSize(32),
-	subBlockSubdivisionIsStrict(false),
-	shouldStealNotes(true)
+BKSynthesiser::BKSynthesiser(GeneralSettings::Ptr gen):
+pitchWheelValue(8192),
+generalSettings(gen),
+sampleRate (0),
+lastNoteOnCounter (0),
+minimumSubBlockSize (32),
+subBlockSubdivisionIsStrict (false),
+shouldStealNotes (true)
 {
-	for (int i = 0; i < numElementsInArray(lastPitchWheelValues); ++i)
-		lastPitchWheelValues[i] = 0x2000;
-
+    for (int i = 0; i < numElementsInArray (lastPitchWheelValues); ++i)
+        lastPitchWheelValues[i] = 0x2000;
+    
 }
-
-BKSynthesiser::BKSynthesiser(void) :
-	pitchWheelValue(8192),
-	sampleRate(0),
-	lastNoteOnCounter(0),
-	minimumSubBlockSize(32),
-	subBlockSubdivisionIsStrict(false),
-	shouldStealNotes(true)
+    
+BKSynthesiser::BKSynthesiser(void):
+pitchWheelValue(8192),
+sampleRate (0),
+lastNoteOnCounter (0),
+minimumSubBlockSize (32),
+subBlockSubdivisionIsStrict (false),
+shouldStealNotes (true)
 {
-	for (int i = 0; i < numElementsInArray(lastPitchWheelValues); ++i)
-		lastPitchWheelValues[i] = 0x2000;
-
+    for (int i = 0; i < numElementsInArray (lastPitchWheelValues); ++i)
+        lastPitchWheelValues[i] = 0x2000;
+    
 }
 
 void BKSynthesiser::setGeneralSettings(GeneralSettings::Ptr gen)
 {
-	generalSettings = gen;
+    generalSettings = gen;
 }
 
 void BKSynthesiser::updateGeneralSettings(GeneralSettings::Ptr gen)
 {
-	for (int i = voices.size(); --i >= 0;)
-	{
-		voices.getUnchecked(i)->setGeneralSettings(gen);
-	}
+    for (int i = voices.size(); --i >= 0;)
+    {
+        voices.getUnchecked(i)->setGeneralSettings(gen);
+    }
 }
 
 BKSynthesiser::~BKSynthesiser()
@@ -118,195 +118,195 @@ BKSynthesiser::~BKSynthesiser()
 }
 
 //==============================================================================
-BKSynthesiserVoice* BKSynthesiser::getVoice(const int index) const
+BKSynthesiserVoice* BKSynthesiser::getVoice (const int index) const
 {
-	const ScopedLock sl(lock);
-	return voices[index];
+    const ScopedLock sl (lock);
+    return voices [index];
 }
 
 void BKSynthesiser::clearVoices()
 {
-	const ScopedLock sl(lock);
-	voices.clear();
+    const ScopedLock sl (lock);
+    voices.clear();
 }
 
-BKSynthesiserVoice* BKSynthesiser::addVoice(BKSynthesiserVoice* const newVoice)
+BKSynthesiserVoice* BKSynthesiser::addVoice (BKSynthesiserVoice* const newVoice)
 {
-	const ScopedLock sl(lock);
-	newVoice->setCurrentPlaybackSampleRate(sampleRate);
-	return voices.add(newVoice);
+    const ScopedLock sl (lock);
+    newVoice->setCurrentPlaybackSampleRate (sampleRate);
+    return voices.add (newVoice);
 }
 
-void BKSynthesiser::removeVoice(const int index)
+void BKSynthesiser::removeVoice (const int index)
 {
-	const ScopedLock sl(lock);
-	voices.remove(index);
+    const ScopedLock sl (lock);
+    voices.remove (index);
 }
 
 void BKSynthesiser::clearSounds()
 {
-	const ScopedLock sl(lock);
-	sounds.clear();
+    const ScopedLock sl (lock);
+    sounds.clear();
 }
 
-BKSynthesiserSound* BKSynthesiser::addSound(const BKSynthesiserSound::Ptr& newSound)
+BKSynthesiserSound* BKSynthesiser::addSound (const BKSynthesiserSound::Ptr& newSound)
 {
-	const ScopedLock sl(lock);
-	return sounds.add(newSound);
+    const ScopedLock sl (lock);
+    return sounds.add (newSound);
 }
 
-void BKSynthesiser::removeSound(const int index)
+void BKSynthesiser::removeSound (const int index)
 {
-	const ScopedLock sl(lock);
-	sounds.remove(index);
+    const ScopedLock sl (lock);
+    sounds.remove (index);
 }
 
-void BKSynthesiser::setNoteStealingEnabled(const bool shouldSteal)
+void BKSynthesiser::setNoteStealingEnabled (const bool shouldSteal)
 {
-	shouldStealNotes = shouldSteal;
+    shouldStealNotes = shouldSteal;
 }
 
-void BKSynthesiser::setMinimumRenderingSubdivisionSize(int numSamples, bool shouldBeStrict) noexcept
+void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool shouldBeStrict) noexcept
 {
-	jassert(numSamples > 0); // it wouldn't make much sense for this to be less than 1
-	minimumSubBlockSize = numSamples;
-	subBlockSubdivisionIsStrict = shouldBeStrict;
+    jassert (numSamples > 0); // it wouldn't make much sense for this to be less than 1
+    minimumSubBlockSize = numSamples;
+    subBlockSubdivisionIsStrict = shouldBeStrict;
 }
 
 //==============================================================================
-void BKSynthesiser::setCurrentPlaybackSampleRate(const double newRate)
+void BKSynthesiser::setCurrentPlaybackSampleRate (const double newRate)
 {
-	if (sampleRate != newRate)
-	{
-		const ScopedLock sl(lock);
-
-		allNotesOff(0, false);
-
-		sampleRate = newRate;
-
-		for (int i = voices.size(); --i >= 0;)
-			voices.getUnchecked(i)->setCurrentPlaybackSampleRate(newRate);
-	}
+    if (sampleRate != newRate)
+    {
+        const ScopedLock sl (lock);
+        
+        allNotesOff (0, false);
+        
+        sampleRate = newRate;
+        
+        for (int i = voices.size(); --i >= 0;)
+            voices.getUnchecked (i)->setCurrentPlaybackSampleRate (newRate);
+    }
 }
 
 template <typename floatType>
-void BKSynthesiser::processNextBlock(AudioBuffer<floatType>& outputAudio,
-	const MidiBuffer& midiData,
-	int startSample,
-	int numSamples)
+void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
+                                      const MidiBuffer& midiData,
+                                      int startSample,
+                                      int numSamples)
 {
-	// must set the sample rate before using this!
-	jassert(sampleRate != 0);
-
-	MidiBuffer::Iterator midiIterator(midiData);
-	midiIterator.setNextSamplePosition(startSample);
-
-	bool firstEvent = true;
-	int midiEventPos;
-	MidiMessage m;
-
-	const ScopedLock sl(lock);
-
-	while (numSamples > 0)
-	{
-		if (!midiIterator.getNextEvent(m, midiEventPos))
-		{
-			renderVoices(outputAudio, startSample, numSamples);
-			return;
-		}
-
-		const int samplesToNextMidiMessage = midiEventPos - startSample;
-
-		if (samplesToNextMidiMessage >= numSamples)
-		{
-			renderVoices(outputAudio, startSample, numSamples);
-			handleMidiEvent(m);
-			break;
-		}
-
-		if (samplesToNextMidiMessage < ((firstEvent && !subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
-		{
-			handleMidiEvent(m);
-			continue;
-		}
-
-		firstEvent = false;
-
-		renderVoices(outputAudio, startSample, samplesToNextMidiMessage);
-		handleMidiEvent(m);
-		startSample += samplesToNextMidiMessage;
-		numSamples -= samplesToNextMidiMessage;
-	}
-
-	while (midiIterator.getNextEvent(m, midiEventPos))
-		handleMidiEvent(m);
+    // must set the sample rate before using this!
+    jassert (sampleRate != 0);
+    
+    MidiBuffer::Iterator midiIterator (midiData);
+    midiIterator.setNextSamplePosition (startSample);
+    
+    bool firstEvent = true;
+    int midiEventPos;
+    MidiMessage m;
+    
+    const ScopedLock sl (lock);
+    
+    while (numSamples > 0)
+    {
+        if (! midiIterator.getNextEvent (m, midiEventPos))
+        {
+            renderVoices (outputAudio, startSample, numSamples);
+            return;
+        }
+        
+        const int samplesToNextMidiMessage = midiEventPos - startSample;
+        
+        if (samplesToNextMidiMessage >= numSamples)
+        {
+            renderVoices (outputAudio, startSample, numSamples);
+            handleMidiEvent (m);
+            break;
+        }
+        
+        if (samplesToNextMidiMessage < ((firstEvent && ! subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
+        {
+            handleMidiEvent (m);
+            continue;
+        }
+        
+        firstEvent = false;
+        
+        renderVoices (outputAudio, startSample, samplesToNextMidiMessage);
+        handleMidiEvent (m);
+        startSample += samplesToNextMidiMessage;
+        numSamples  -= samplesToNextMidiMessage;
+    }
+    
+    while (midiIterator.getNextEvent (m, midiEventPos))
+        handleMidiEvent (m);
 }
 
 // explicit template instantiation
-template void BKSynthesiser::processNextBlock<float>(AudioBuffer<float>& outputAudio,
-	const MidiBuffer& midiData,
-	int startSample,
-	int numSamples);
-template void BKSynthesiser::processNextBlock<double>(AudioBuffer<double>& outputAudio,
-	const MidiBuffer& midiData,
-	int startSample,
-	int numSamples);
+template void BKSynthesiser::processNextBlock<float> (AudioBuffer<float>& outputAudio,
+                                                      const MidiBuffer& midiData,
+                                                      int startSample,
+                                                      int numSamples);
+template void BKSynthesiser::processNextBlock<double> (AudioBuffer<double>& outputAudio,
+                                                       const MidiBuffer& midiData,
+                                                       int startSample,
+                                                       int numSamples);
 
-void BKSynthesiser::renderVoices(AudioBuffer<float>& buffer, int startSample, int numSamples)
+void BKSynthesiser::renderVoices (AudioBuffer<float>& buffer, int startSample, int numSamples)
 {
-	for (int i = voices.size(); --i >= 0;)
-		voices.getUnchecked(i)->renderNextBlock(buffer, startSample, numSamples);
+    for (int i = voices.size(); --i >= 0;)
+        voices.getUnchecked (i)->renderNextBlock (buffer, startSample, numSamples);
 }
 
-void BKSynthesiser::renderVoices(AudioBuffer<double>& buffer, int startSample, int numSamples)
+void BKSynthesiser::renderVoices (AudioBuffer<double>& buffer, int startSample, int numSamples)
 {
-	for (int i = voices.size(); --i >= 0;)
-		voices.getUnchecked(i)->renderNextBlock(buffer, startSample, numSamples);
+    for (int i = voices.size(); --i >= 0;)
+        voices.getUnchecked (i)->renderNextBlock (buffer, startSample, numSamples);
 }
 
-void BKSynthesiser::handleMidiEvent(const MidiMessage& m)
+void BKSynthesiser::handleMidiEvent (const MidiMessage& m)
 {
-	const int channel = m.getChannel();
-
-	if (m.isNoteOn())
-	{
-
-	}
-	else if (m.isNoteOff())
-	{
-
-	}
-	else if (m.isAllNotesOff() || m.isAllSoundOff())
-	{
-		allNotesOff(channel, true);
-	}
-	else if (m.isPitchWheel())
-	{
-		const int wheelPos = m.getPitchWheelValue();
-		lastPitchWheelValues[channel - 1] = wheelPos;
-		handlePitchWheel(channel, wheelPos);
-	}
-	else if (m.isAftertouch())
-	{
-		handleAftertouch(channel, m.getNoteNumber(), m.getAfterTouchValue());
-	}
-	else if (m.isChannelPressure())
-	{
-		handleChannelPressure(channel, m.getChannelPressureValue());
-	}
-	else if (m.isController())
-	{
-		handleController(channel, m.getControllerNumber(), m.getControllerValue());
-	}
-	else if (m.isProgramChange())
-	{
-		handleProgramChange(channel, m.getProgramChangeNumber());
-	}
+    const int channel = m.getChannel();
+    
+    if (m.isNoteOn())
+    {
+        
+    }
+    else if (m.isNoteOff())
+    {
+        
+    }
+    else if (m.isAllNotesOff() || m.isAllSoundOff())
+    {
+        allNotesOff (channel, true);
+    }
+    else if (m.isPitchWheel())
+    {
+        const int wheelPos = m.getPitchWheelValue();
+        lastPitchWheelValues [channel - 1] = wheelPos;
+        handlePitchWheel (channel, wheelPos);
+    }
+    else if (m.isAftertouch())
+    {
+        handleAftertouch (channel, m.getNoteNumber(), m.getAfterTouchValue());
+    }
+    else if (m.isChannelPressure())
+    {
+        handleChannelPressure (channel, m.getChannelPressureValue());
+    }
+    else if (m.isController())
+    {
+        handleController (channel, m.getControllerNumber(), m.getControllerValue());
+    }
+    else if (m.isProgramChange())
+    {
+        handleProgramChange (channel, m.getProgramChangeNumber());
+    }
 }
 
 //==============================================================================
 
-void BKSynthesiser::keyOn(const int midiChannel,
+BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
 	const int keyNoteNumber,
 	const int midiNoteNumber,
 	const float transp,
@@ -324,46 +324,46 @@ void BKSynthesiser::keyOn(const int midiChannel,
 	const float BlendronicLevel,
 	BKDelay::Ptr bDelay)
 {
-	keyOn(midiChannel,
-		keyNoteNumber,
-		midiNoteNumber,
-		transp,
-		velocity,
-		gain,
-		direction,
-		type,
-		bktype,
-		layer,
-		startingPositionMS,
-		lengthMS,
-		rampOnMS,
-		3.,
-		1.,
-		rampOffMS,
-		tuner,
-		BlendronicLevel,
-		bDelay);
+                return keyOn   ( midiChannel,
+                                 keyNoteNumber,
+                                 midiNoteNumber,
+                                 transp,
+                                 velocity,
+                                 gain,
+                                 direction,
+                                 type,
+                                 bktype,
+                                 layer,
+                                 startingPositionMS,
+                                 lengthMS,
+                                 rampOnMS,
+                                 3.,
+                                 1.,
+                                 rampOffMS,
+                                 tuner,
+									BlendronicLevel,
+								bDelay);
 }
-
-void BKSynthesiser::keyOn(const int midiChannel,
-	const int keyNoteNumber,
-	const int midiNoteNumber,
-	const float transp,
-	const float velocity,
-	const float gain,
-	PianoSamplerNoteDirection direction,
-	PianoSamplerNoteType type,
-	BKNoteType bktype,
-	int layer,
-	const float startingPositionMS,
-	const float lengthMS,
-	float adsrAttackMS,
-	float adsrDecayMS,
-	float adsrSustain,
-	float adsrReleaseMS,
-	TuningProcessor::Ptr tuner,
-	float BlendronicLevel,
-	BKDelay::Ptr bDelay)
+		
+BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
+                           const int keyNoteNumber,
+                           const int midiNoteNumber,
+                           const float transp,
+                           const float velocity,
+                           const float gain,
+                           PianoSamplerNoteDirection direction,
+                           PianoSamplerNoteType type,
+                           BKNoteType bktype,
+                           int layer,
+                           const float startingPositionMS,
+                           const float lengthMS,
+                           float adsrAttackMS,
+                           float adsrDecayMS,
+                           float adsrSustain,
+                           float adsrReleaseMS,
+                           TuningProcessor::Ptr tuner,
+							float BlendronicLevel,
+							BKDelay::Ptr bDelay)
 {
 	//DBG("BKSynthesiser::keyOn " + String(keyNoteNumber) + " " + String(midiNoteNumber));
 
@@ -372,7 +372,7 @@ void BKSynthesiser::keyOn(const int midiChannel,
 	int noteNumber = midiNoteNumber;
 
 	// ADDED THIS
-	if (noteNumber > 108 || noteNumber < 21) return;
+	if (noteNumber > 108 || noteNumber < 21) return nullptr;
 
 	float transposition = transp;
 
@@ -393,7 +393,7 @@ void BKSynthesiser::keyOn(const int midiChannel,
 					continue;
 				}
 			}
-
+            BKSynthesiserVoice* voice = findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes);
 			startVoice(findFreeVoice(sound, midiChannel, noteNumber, shouldStealNotes),
 				sound,
 				midiChannel,
@@ -414,9 +414,8 @@ void BKSynthesiser::keyOn(const int midiChannel,
 				tuner,
 				BlendronicLevel,
 				bDelay);
-
-			//break;
-
+			
+			return voice;
 		}
 	}
 }

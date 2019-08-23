@@ -57,7 +57,9 @@ namespace Vst2
 #endif
 
 #ifndef JUCE_VST3_EMULATE_MIDI_CC_WITH_PARAMETERS
- #define JUCE_VST3_EMULATE_MIDI_CC_WITH_PARAMETERS 1
+ #if JucePlugin_WantsMidiInput
+  #define JUCE_VST3_EMULATE_MIDI_CC_WITH_PARAMETERS 1
+ #endif
 #endif
 
 #if JUCE_VST3_CAN_REPLACE_VST2
@@ -89,7 +91,7 @@ using namespace Steinberg;
 #endif
 
 //==============================================================================
-class JuceAudioProcessor  : public FUnknown
+class JuceAudioProcessor   : public Vst::IUnitInfo
 {
 public:
     JuceAudioProcessor (AudioProcessor* source) noexcept
@@ -104,6 +106,99 @@ public:
 
     JUCE_DECLARE_VST3_COM_QUERY_METHODS
     JUCE_DECLARE_VST3_COM_REF_METHODS
+
+    //==============================================================================
+    enum InternalParameters
+    {
+        paramPreset               = 0x70727374, // 'prst'
+        paramMidiControllerOffset = 0x6d636d00, // 'mdm*'
+        paramBypass               = 0x62797073  // 'byps'
+    };
+
+    //==============================================================================
+    Steinberg::int32 PLUGIN_API getUnitCount() override
+    {
+        return parameterGroups.size() + 1;
+    }
+
+    tresult PLUGIN_API getUnitInfo (Steinberg::int32 unitIndex, Vst::UnitInfo& info) override
+    {
+        if (unitIndex == 0)
+        {
+            info.id             = Vst::kRootUnitId;
+            info.parentUnitId   = Vst::kNoParentUnitId;
+            info.programListId  = Vst::kNoProgramListId;
+
+            toString128 (info.name, TRANS("Root Unit"));
+
+            return kResultTrue;
+        }
+
+        if (auto* group = parameterGroups[unitIndex - 1])
+        {
+            info.id             = JuceAudioProcessor::getUnitID (group);
+            info.parentUnitId   = JuceAudioProcessor::getUnitID (group->getParent());
+            info.programListId  = Vst::kNoProgramListId;
+
+            toString128 (info.name, group->getName());
+
+            return kResultTrue;
+        }
+
+        return kResultFalse;
+    }
+
+    Steinberg::int32 PLUGIN_API getProgramListCount() override
+    {
+        if (audioProcessor->getNumPrograms() > 0)
+            return 1;
+
+        return 0;
+    }
+
+    tresult PLUGIN_API getProgramListInfo (Steinberg::int32 listIndex, Vst::ProgramListInfo& info) override
+    {
+        if (listIndex == 0)
+        {
+            info.id = paramPreset;
+            info.programCount = (Steinberg::int32) audioProcessor->getNumPrograms();
+
+            toString128 (info.name, TRANS("Factory Presets"));
+
+            return kResultTrue;
+        }
+
+        jassertfalse;
+        zerostruct (info);
+        return kResultFalse;
+    }
+
+    tresult PLUGIN_API getProgramName (Vst::ProgramListID listId, Steinberg::int32 programIndex, Vst::String128 name) override
+    {
+        if (listId == paramPreset
+            && isPositiveAndBelow ((int) programIndex, audioProcessor->getNumPrograms()))
+        {
+            toString128 (name, audioProcessor->getProgramName ((int) programIndex));
+            return kResultTrue;
+        }
+
+        jassertfalse;
+        toString128 (name, juce::String());
+        return kResultFalse;
+    }
+
+    tresult PLUGIN_API getProgramInfo (Vst::ProgramListID, Steinberg::int32, Vst::CString, Vst::String128) override             { return kNotImplemented; }
+    tresult PLUGIN_API hasProgramPitchNames (Vst::ProgramListID, Steinberg::int32) override                                     { return kNotImplemented; }
+    tresult PLUGIN_API getProgramPitchName (Vst::ProgramListID, Steinberg::int32, Steinberg::int16, Vst::String128) override    { return kNotImplemented; }
+    tresult PLUGIN_API selectUnit (Vst::UnitID) override                                                                        { return kNotImplemented; }
+    tresult PLUGIN_API setUnitProgramData (Steinberg::int32, Steinberg::int32, IBStream*) override                              { return kNotImplemented; }
+    Vst::UnitID PLUGIN_API getSelectedUnit() override                                                                           { return Vst::kRootUnitId; }
+
+    tresult PLUGIN_API getUnitByBus (Vst::MediaType, Vst::BusDirection, Steinberg::int32, Steinberg::int32, Vst::UnitID& unitId) override
+    {
+        zerostruct (unitId);
+        return kNotImplemented;
+    }
 
     //==============================================================================
     inline Vst::ParamID getVSTParamIDForIndex (int paramIndex) const noexcept
@@ -140,11 +235,6 @@ public:
     bool bypassIsRegularParameter = false;
 
 private:
-    enum InternalParameters
-    {
-        paramBypass               = 0x62797073 // 'byps'
-    };
-
     //==============================================================================
     bool isBypassPartOfRegularParemeters() const
     {
@@ -160,6 +250,8 @@ private:
 
     void setupParameters()
     {
+        parameterGroups = audioProcessor->getParameterTree().getSubgroups (true);
+
        #if JUCE_FORCE_USE_LEGACY_PARAM_IDS
         const bool forceLegacyParamIDs = true;
        #else
@@ -219,7 +311,7 @@ private:
 
        #if JUCE_USE_STUDIO_ONE_COMPATIBLE_PARAMETERS
         // studio one doesn't like negative parameters
-        paramHash &= ~(1 << (sizeof (Vst::ParamID) * 8 - 1));
+        paramHash &= ~(((Vst::ParamID) 1) << (sizeof (Vst::ParamID) * 8 - 1));
        #endif
 
         return paramHash;
@@ -229,12 +321,12 @@ private:
     //==============================================================================
     Atomic<int> refCount;
     std::unique_ptr<AudioProcessor> audioProcessor;
-    ScopedJuceInitialiser_GUI libraryInitialiser;
 
     //==============================================================================
     LegacyAudioParametersWrapper juceParameters;
     HashMap<int32, AudioProcessorParameter*> paramMap;
     std::unique_ptr<AudioProcessorParameter> ownedBypassParameter;
+    Array<const AudioProcessorParameterGroup*> parameterGroups;
 
     JuceAudioProcessor() = delete;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceAudioProcessor)
@@ -247,6 +339,7 @@ static ThreadLocalValue<bool> inParameterChangedCallback;
 //==============================================================================
 class JuceVST3EditController : public Vst::EditController,
                                public Vst::IMidiMapping,
+                               public Vst::IUnitInfo,
                                public Vst::ChannelContext::IInfoListener,
                                public AudioProcessorListener,
                                private AudioProcessorParameter::Listener
@@ -281,6 +374,7 @@ public:
         TEST_FOR_AND_RETURN_IF_VALID (targetIID, Vst::IEditController2)
         TEST_FOR_AND_RETURN_IF_VALID (targetIID, Vst::IConnectionPoint)
         TEST_FOR_AND_RETURN_IF_VALID (targetIID, Vst::IMidiMapping)
+        TEST_FOR_AND_RETURN_IF_VALID (targetIID, Vst::IUnitInfo)
         TEST_FOR_AND_RETURN_IF_VALID (targetIID, Vst::ChannelContext::IInfoListener)
         TEST_FOR_COMMON_BASE_AND_RETURN_IF_VALID (targetIID, IPluginBase, Vst::IEditController)
         TEST_FOR_COMMON_BASE_AND_RETURN_IF_VALID (targetIID, IDependent, Vst::IEditController)
@@ -325,12 +419,6 @@ public:
     }
 
     //==============================================================================
-    enum InternalParameters
-    {
-        paramPreset               = 0x70727374, // 'prst'
-        paramMidiControllerOffset = 0x6d636d00  // 'mdm*'
-    };
-
     struct Param  : public Vst::Parameter
     {
         Param (JuceVST3EditController& editController, AudioProcessorParameter& p,
@@ -368,7 +456,7 @@ public:
             valueNormalized = info.defaultNormalizedValue;
         }
 
-        virtual ~Param() {}
+        virtual ~Param() override = default;
 
         bool setNormalized (Vst::ParamValue v) override
         {
@@ -440,7 +528,7 @@ public:
         {
             jassert (owner.getNumPrograms() > 1);
 
-            info.id = paramPreset;
+            info.id = JuceAudioProcessor::paramPreset;
             toString128 (info.title, "Program");
             toString128 (info.shortTitle, "Program");
             toString128 (info.units, "");
@@ -451,7 +539,7 @@ public:
             info.flags = Vst::ParameterInfo::kIsProgramChange | Vst::ParameterInfo::kCanAutomate;
         }
 
-        virtual ~ProgramChangeParameter() {}
+        virtual ~ProgramChangeParameter() override = default;
 
         bool setNormalized (Vst::ParamValue v) override
         {
@@ -472,7 +560,7 @@ public:
 
         void toString (Vst::ParamValue value, Vst::String128 result) const override
         {
-            toString128 (result, owner.getProgramName (static_cast<int> (value * info.stepCount)));
+            toString128 (result, owner.getProgramName (roundToInt (value * info.stepCount)));
         }
 
         bool fromString (const Vst::TChar* text, Vst::ParamValue& outValueNormalized) const override
@@ -553,8 +641,8 @@ public:
             auto numPrograms = pluginInstance->getNumPrograms();
 
             if (numPrograms > 1)
-                setParamNormalized (paramPreset, static_cast<Vst::ParamValue> (pluginInstance->getCurrentProgram())
-                                                  / static_cast<Vst::ParamValue> (numPrograms - 1));
+                setParamNormalized (JuceAudioProcessor::paramPreset, static_cast<Vst::ParamValue> (pluginInstance->getCurrentProgram())
+                                                                         / static_cast<Vst::ParamValue> (numPrograms - 1));
         }
 
         if (auto* handler = getComponentHandler())
@@ -627,6 +715,133 @@ public:
     }
 
     //==============================================================================
+    Steinberg::int32 PLUGIN_API getUnitCount() override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->getUnitCount();
+
+        jassertfalse;
+        return 1;
+    }
+
+    tresult PLUGIN_API getUnitInfo (Steinberg::int32 unitIndex, Vst::UnitInfo& info) override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->getUnitInfo (unitIndex, info);
+
+        if (unitIndex == 0)
+        {
+            info.id             = Vst::kRootUnitId;
+            info.parentUnitId   = Vst::kNoParentUnitId;
+            info.programListId  = Vst::kNoProgramListId;
+
+            toString128 (info.name, TRANS("Root Unit"));
+
+            return kResultTrue;
+        }
+
+        jassertfalse;
+        zerostruct (info);
+        return kResultFalse;
+    }
+
+    Steinberg::int32 PLUGIN_API getProgramListCount() override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->getProgramListCount();
+
+        jassertfalse;
+        return 0;
+    }
+
+    tresult PLUGIN_API getProgramListInfo (Steinberg::int32 listIndex, Vst::ProgramListInfo& info) override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->getProgramListInfo (listIndex, info);
+
+        jassertfalse;
+        zerostruct (info);
+        return kResultFalse;
+    }
+
+    tresult PLUGIN_API getProgramName (Vst::ProgramListID listId, Steinberg::int32 programIndex, Vst::String128 name) override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->getProgramName (listId, programIndex, name);
+
+        jassertfalse;
+        toString128 (name, juce::String());
+        return kResultFalse;
+    }
+
+    tresult PLUGIN_API getProgramInfo (Vst::ProgramListID listId, Steinberg::int32 programIndex,
+                                       Vst::CString attributeId, Vst::String128 attributeValue) override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->getProgramInfo (listId, programIndex, attributeId, attributeValue);
+
+        jassertfalse;
+        return kResultFalse;
+    }
+
+    tresult PLUGIN_API hasProgramPitchNames (Vst::ProgramListID listId, Steinberg::int32 programIndex) override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->hasProgramPitchNames (listId, programIndex);
+
+        jassertfalse;
+        return kResultFalse;
+    }
+
+    tresult PLUGIN_API getProgramPitchName (Vst::ProgramListID listId, Steinberg::int32 programIndex,
+                                            Steinberg::int16 midiPitch, Vst::String128 name) override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->getProgramPitchName (listId, programIndex, midiPitch, name);
+
+        jassertfalse;
+        return kResultFalse;
+    }
+
+    tresult PLUGIN_API selectUnit (Vst::UnitID unitId) override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->selectUnit (unitId);
+
+        jassertfalse;
+        return kResultFalse;
+    }
+
+    tresult PLUGIN_API setUnitProgramData (Steinberg::int32 listOrUnitId, Steinberg::int32 programIndex,
+                                           Steinberg::IBStream* data) override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->setUnitProgramData (listOrUnitId, programIndex, data);
+
+        jassertfalse;
+        return kResultFalse;
+    }
+
+    Vst::UnitID PLUGIN_API getSelectedUnit() override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->getSelectedUnit();
+
+        jassertfalse;
+        return kResultFalse;
+    }
+
+    tresult PLUGIN_API getUnitByBus (Vst::MediaType type, Vst::BusDirection dir, Steinberg::int32 busIndex,
+                                     Steinberg::int32 channel, Vst::UnitID& unitId) override
+    {
+        if (audioProcessor != nullptr)
+            return audioProcessor->getUnitByBus (type, dir, busIndex, channel, unitId);
+
+        jassertfalse;
+        return kResultFalse;
+    }
+
+    //==============================================================================
     IPlugView* PLUGIN_API createView (const char* name) override
     {
         if (auto* pluginInstance = getPluginInstance())
@@ -669,8 +884,8 @@ public:
         if (auto* pluginInstance = getPluginInstance())
         {
             if (pluginInstance->getNumPrograms() > 1)
-                EditController::setParamNormalized (paramPreset, static_cast<Vst::ParamValue> (pluginInstance->getCurrentProgram())
-                                                               / static_cast<Vst::ParamValue> (pluginInstance->getNumPrograms() - 1));
+                EditController::setParamNormalized (JuceAudioProcessor::paramPreset, static_cast<Vst::ParamValue> (pluginInstance->getCurrentProgram())
+                                                                                         / static_cast<Vst::ParamValue> (pluginInstance->getNumPrograms() - 1));
         }
 
         if (componentHandler != nullptr)
@@ -705,7 +920,6 @@ private:
 
     //==============================================================================
     ComSmartPtr<JuceAudioProcessor> audioProcessor;
-    ScopedJuceInitialiser_GUI libraryInitialiser;
 
     struct MidiController
     {
@@ -714,7 +928,7 @@ private:
 
     enum { numMIDIChannels = 16 };
     Vst::ParamID parameterToMidiControllerOffset;
-    MidiController parameterToMidiController[numMIDIChannels * Vst::kCountCtrlNumber];
+    MidiController parameterToMidiController[(int) numMIDIChannels * (int) Vst::kCountCtrlNumber];
     Vst::ParamID midiControllerToParameter[numMIDIChannels][Vst::kCountCtrlNumber];
 
     //==============================================================================
@@ -746,7 +960,7 @@ private:
                 {
                     auto vstParamID = audioProcessor->getVSTParamIDForIndex (i);
                     auto* juceParam = audioProcessor->getParamForVSTParamID (vstParamID);
-                    auto* parameterGroup = pluginInstance->parameterTree.getGroupsForParameter (juceParam).getLast();
+                    auto* parameterGroup = pluginInstance->getParameterTree().getGroupsForParameter (juceParam).getLast();
                     auto unitID = JuceAudioProcessor::getUnitID (parameterGroup);
 
                     parameters.addParameter (new Param (*this, *juceParam, vstParamID, unitID,
@@ -758,7 +972,7 @@ private:
             }
 
            #if JUCE_VST3_EMULATE_MIDI_CC_WITH_PARAMETERS
-            parameterToMidiControllerOffset = static_cast<Vst::ParamID> (audioProcessor->isUsingManagedParameters() ? paramMidiControllerOffset
+            parameterToMidiControllerOffset = static_cast<Vst::ParamID> (audioProcessor->isUsingManagedParameters() ? JuceAudioProcessor::paramMidiControllerOffset
                                                                                                                     : parameters.getParameterCount());
 
             initialiseMidiControllerMappings();
@@ -779,7 +993,7 @@ private:
                 parameterToMidiController[p].ctrlNumber = i;
 
                 parameters.addParameter (new Vst::Parameter (toString ("MIDI CC " + String (c) + "|" + String (i)),
-                                         static_cast<Vst::ParamID> (p) + parameterToMidiControllerOffset, 0, 0, 0,
+                                         static_cast<Vst::ParamID> (p) + parameterToMidiControllerOffset, nullptr, 0, 0,
                                          0, Vst::kRootUnitId));
             }
         }
@@ -1055,8 +1269,9 @@ private:
         tresult PLUGIN_API setContentScaleFactor (Steinberg::IPlugViewContentScaleSupport::ScaleFactor factor) override
         {
            #if ! JUCE_MAC
-            // Cubase 10 doesn't support non-integer scale factors...
-            if (getHostType().type == PluginHostType::SteinbergCubase10)
+            auto hostType = getHostType().type;
+
+            if (hostType == PluginHostType::SteinbergCubase10 || hostType == PluginHostType::FruityLoops)
             {
                 if (component.get() != nullptr)
                     if (auto* peer = component->getPeer())
@@ -1129,7 +1344,7 @@ private:
                 ignoreUnused (fakeMouseGenerator);
             }
 
-            ~ContentWrapperComponent()
+            ~ContentWrapperComponent() override
             {
                 if (pluginEditor != nullptr)
                 {
@@ -1283,8 +1498,9 @@ private:
 
             void handleAsyncUpdate() override
             {
-                if (auto* peer = owner.component->getPeer())
-                    peer->updateBounds();
+                if (owner.component != nullptr)
+                    if (auto* peer = owner.component->getPeer())
+                        peer->updateBounds();
             }
 
             JuceVST3Editor& owner;
@@ -1298,8 +1514,6 @@ private:
        #if JUCE_WINDOWS
         WindowsHooks hooks;
        #endif
-
-        ScopedJuceInitialiser_GUI libraryInitialiser;
 
         //==============================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceVST3Editor)
@@ -1338,6 +1552,7 @@ public:
         short configs[][2] = { JucePlugin_PreferredChannelConfigurations };
         const int numConfigs = sizeof (configs) / sizeof (short[2]);
 
+        ignoreUnused (numConfigs);
         jassert (numConfigs > 0 && (configs[0][0] > 0 || configs[0][1] > 0));
 
         pluginInstance->setPlayConfigDetails (configs[0][0], configs[0][1], 44100.0, 1024);
@@ -1347,8 +1562,6 @@ public:
         // For example, your default layout must be mono, stereo, quadrophonic
         // and not AudioChannelSet::discreteChannels (2) etc.
         jassert (checkBusFormatsAreNotDiscrete());
-
-        parameterGroups = pluginInstance->parameterTree.getSubgroups (true);
 
         comPluginInstance = new JuceAudioProcessor (pluginInstance);
 
@@ -1362,7 +1575,7 @@ public:
         pluginInstance->setPlayHead (this);
     }
 
-    ~JuceVST3Component()
+    ~JuceVST3Component() override
     {
         if (juceVST3EditController != nullptr)
             juceVST3EditController->vst3IsPlaying = 0;
@@ -1536,7 +1749,7 @@ public:
     {
         if (pluginInstance->getBypassParameter() == nullptr)
         {
-            if (auto* bypassParam = comPluginInstance->getBypassParameter())
+            if (comPluginInstance->getBypassParameter() != nullptr)
             {
                 auto privateData = ValueTree::readFromData (data, static_cast<size_t> (sizeInBytes));
                 setBypassed (static_cast<bool> (privateData.getProperty ("Bypass", var (false))));
@@ -1694,14 +1907,13 @@ public:
     }
    #endif
 
-    bool loadStateData (const void* data, int size)
+    void loadStateData (const void* data, int size)
     {
        #if JUCE_VST3_CAN_REPLACE_VST2
-        return loadVST2CompatibleState ((const char*) data, size);
-       #else
-        setStateInformation (data, size);
-        return true;
+        if (loadVST2CompatibleState ((const char*) data, size))
+            return;
        #endif
+        setStateInformation (data, size);
     }
 
     bool readFromMemoryStream (IBStream* state)
@@ -1734,7 +1946,8 @@ public:
                 if (block.getSize() >= 5 && memcmp (block.getData(), "VC2!E", 5) == 0)
                     return false;
 
-            return loadStateData (block.getData(), (int) block.getSize());
+            loadStateData (block.getData(), (int) block.getSize());
+            return true;
         }
 
         return false;
@@ -1762,8 +1975,11 @@ public:
 
         const size_t dataSize = allData.getDataSize();
 
-        return dataSize > 0 && dataSize < 0x7fffffff
-                && loadStateData (allData.getData(), (int) dataSize);
+        if (dataSize <= 0 || dataSize >= 0x7fffffff)
+            return false;
+
+        loadStateData (allData.getData(), (int) dataSize);
+        return true;
     }
 
     tresult PLUGIN_API setState (IBStream* state) override
@@ -1840,89 +2056,22 @@ public:
     }
 
     //==============================================================================
-    Steinberg::int32 PLUGIN_API getUnitCount() override
-    {
-        return parameterGroups.size() + 1;
-    }
-
-    tresult PLUGIN_API getUnitInfo (Steinberg::int32 unitIndex, Vst::UnitInfo& info) override
-    {
-        if (unitIndex == 0)
-        {
-            info.id             = Vst::kRootUnitId;
-            info.parentUnitId   = Vst::kNoParentUnitId;
-            info.programListId  = Vst::kNoProgramListId;
-
-            toString128 (info.name, TRANS("Root Unit"));
-
-            return kResultTrue;
-        }
-
-        if (auto* group = parameterGroups[unitIndex - 1])
-        {
-            info.id             = JuceAudioProcessor::getUnitID (group);
-            info.parentUnitId   = JuceAudioProcessor::getUnitID (group->getParent());
-            info.programListId  = Vst::kNoProgramListId;
-
-            toString128 (info.name, group->getName());
-
-            return kResultTrue;
-        }
-
-        return kResultFalse;
-    }
-
-    Steinberg::int32 PLUGIN_API getProgramListCount() override
-    {
-        if (getPluginInstance().getNumPrograms() > 0)
-            return 1;
-
-        return 0;
-    }
-
-    tresult PLUGIN_API getProgramListInfo (Steinberg::int32 listIndex, Vst::ProgramListInfo& info) override
-    {
-        if (listIndex == 0)
-        {
-            info.id = JuceVST3EditController::paramPreset;
-            info.programCount = (Steinberg::int32) getPluginInstance().getNumPrograms();
-
-            toString128 (info.name, TRANS("Factory Presets"));
-
-            return kResultTrue;
-        }
-
-        jassertfalse;
-        zerostruct (info);
-        return kResultFalse;
-    }
-
-    tresult PLUGIN_API getProgramName (Vst::ProgramListID listId, Steinberg::int32 programIndex, Vst::String128 name) override
-    {
-        if (listId == JuceVST3EditController::paramPreset
-            && isPositiveAndBelow ((int) programIndex, getPluginInstance().getNumPrograms()))
-        {
-            toString128 (name, getPluginInstance().getProgramName ((int) programIndex));
-            return kResultTrue;
-        }
-
-        jassertfalse;
-        toString128 (name, juce::String());
-        return kResultFalse;
-    }
-
-    tresult PLUGIN_API getProgramInfo (Vst::ProgramListID, Steinberg::int32, Vst::CString, Vst::String128) override             { return kNotImplemented; }
-    tresult PLUGIN_API hasProgramPitchNames (Vst::ProgramListID, Steinberg::int32) override                                     { return kNotImplemented; }
-    tresult PLUGIN_API getProgramPitchName (Vst::ProgramListID, Steinberg::int32, Steinberg::int16, Vst::String128) override    { return kNotImplemented; }
-    tresult PLUGIN_API selectUnit (Vst::UnitID) override                                                                        { return kNotImplemented; }
-    tresult PLUGIN_API setUnitProgramData (Steinberg::int32, Steinberg::int32, IBStream*) override                              { return kNotImplemented; }
-    Vst::UnitID PLUGIN_API getSelectedUnit() override                                                                           { return Vst::kRootUnitId; }
-
-    tresult PLUGIN_API getUnitByBus (Vst::MediaType, Vst::BusDirection, Steinberg::int32, Steinberg::int32, Vst::UnitID& unitId) override
-    {
-        zerostruct (unitId);
-        return kNotImplemented;
-    }
+    Steinberg::int32 PLUGIN_API getUnitCount() override                                                                         { return comPluginInstance->getUnitCount(); }
+    tresult PLUGIN_API getUnitInfo (Steinberg::int32 unitIndex, Vst::UnitInfo& info) override                                   { return comPluginInstance->getUnitInfo (unitIndex, info); }
+    Steinberg::int32 PLUGIN_API getProgramListCount() override                                                                  { return comPluginInstance->getProgramListCount(); }
+    tresult PLUGIN_API getProgramListInfo (Steinberg::int32 listIndex, Vst::ProgramListInfo& info) override                     { return comPluginInstance->getProgramListInfo (listIndex, info); }
+    tresult PLUGIN_API getProgramName (Vst::ProgramListID listId, Steinberg::int32 programIndex, Vst::String128 name) override  { return comPluginInstance->getProgramName (listId, programIndex, name); }
+    tresult PLUGIN_API getProgramInfo (Vst::ProgramListID listId, Steinberg::int32 programIndex,
+                                       Vst::CString attributeId, Vst::String128 attributeValue) override                        { return comPluginInstance->getProgramInfo (listId, programIndex, attributeId, attributeValue); }
+    tresult PLUGIN_API hasProgramPitchNames (Vst::ProgramListID listId, Steinberg::int32 programIndex) override                 { return comPluginInstance->hasProgramPitchNames (listId, programIndex); }
+    tresult PLUGIN_API getProgramPitchName (Vst::ProgramListID listId, Steinberg::int32 programIndex,
+                                            Steinberg::int16 midiPitch, Vst::String128 name) override                           { return comPluginInstance->getProgramPitchName (listId, programIndex, midiPitch, name); }
+    tresult PLUGIN_API selectUnit (Vst::UnitID unitId) override                                                                 { return comPluginInstance->selectUnit (unitId); }
+    tresult PLUGIN_API setUnitProgramData (Steinberg::int32 listOrUnitId, Steinberg::int32 programIndex,
+                                           Steinberg::IBStream* data) override                                                  { return comPluginInstance->setUnitProgramData (listOrUnitId, programIndex, data); }
+    Vst::UnitID PLUGIN_API getSelectedUnit() override                                                                           { return comPluginInstance->getSelectedUnit(); }
+    tresult PLUGIN_API getUnitByBus (Vst::MediaType type, Vst::BusDirection dir, Steinberg::int32 busIndex,
+                                     Steinberg::int32 channel, Vst::UnitID& unitId) override                                    { return comPluginInstance->getUnitByBus (type, dir, busIndex, channel, unitId); }
 
     //==============================================================================
     bool getCurrentPosition (CurrentPositionInfo& info) override
@@ -2258,7 +2407,7 @@ public:
                 {
                     auto vstParamID = paramQueue->getParameterId();
 
-                    if (vstParamID == JuceVST3EditController::paramPreset)
+                    if (vstParamID == JuceAudioProcessor::paramPreset)
                     {
                         auto numPrograms  = pluginInstance->getNumPrograms();
                         auto programValue = roundToInt (value * (jmax (0, numPrograms - 1)));
@@ -2581,6 +2730,8 @@ private:
     }
 
     //==============================================================================
+    ScopedJuceInitialiser_GUI libraryInitialiser;
+
     Atomic<int> refCount { 1 };
 
     AudioProcessor* pluginInstance;
@@ -2615,10 +2766,7 @@ private:
     bool isMidiOutputBusEnabled = false;
    #endif
 
-    ScopedJuceInitialiser_GUI libraryInitialiser;
     static const char* kJucePrivateDataIdentifier;
-
-    Array<const AudioProcessorParameterGroup*> parameterGroups;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JuceVST3Component)
 };
@@ -2778,8 +2926,10 @@ struct JucePluginFactory  : public IPluginFactory3
             return false;
         }
 
-        auto* entry = classes.add (new ClassEntry (info, createFunction));
+        auto entry = std::make_unique<ClassEntry> (info, createFunction);
         entry->infoW.fromAscii (info);
+
+        classes.push_back (std::move (entry));
 
         return true;
     }
@@ -2828,7 +2978,7 @@ struct JucePluginFactory  : public IPluginFactory3
     {
         if (info != nullptr)
         {
-            if (auto* entry = classes[(int) index])
+            if (auto& entry = classes[(size_t) index])
             {
                 memcpy (info, &entry->infoW, sizeof (PClassInfoW));
                 return kResultOk;
@@ -2840,6 +2990,8 @@ struct JucePluginFactory  : public IPluginFactory3
 
     tresult PLUGIN_API createInstance (FIDString cid, FIDString sourceIid, void** obj) override
     {
+        ScopedJuceInitialiser_GUI libraryInitialiser;
+
         *obj = nullptr;
 
         TUID tuid;
@@ -2861,7 +3013,7 @@ struct JucePluginFactory  : public IPluginFactory3
         TUID iidToQuery;
         sourceFuid.toTUID (iidToQuery);
 
-        for (auto* entry : classes)
+        for (auto& entry : classes)
         {
             if (doUIDsMatch (entry->infoW.cid, cid))
             {
@@ -2897,7 +3049,6 @@ struct JucePluginFactory  : public IPluginFactory3
 
 private:
     //==============================================================================
-    ScopedJuceInitialiser_GUI libraryInitialiser;
     Atomic<int> refCount { 1 };
     const PFactoryInfo factoryInfo;
     ComSmartPtr<Vst::IHostApplication> host;
@@ -2916,10 +3067,10 @@ private:
         bool isUnicode = false;
 
     private:
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ClassEntry)
+        JUCE_DECLARE_NON_COPYABLE (ClassEntry)
     };
 
-    OwnedArray<ClassEntry> classes;
+    std::vector<std::unique_ptr<ClassEntry>> classes;
 
     //==============================================================================
     template<class PClassInfoType>
@@ -2929,7 +3080,7 @@ private:
         {
             zerostruct (*info);
 
-            if (auto* entry = classes[(int) index])
+            if (auto& entry = classes[(size_t) index])
             {
                 if (entry->isUnicode)
                     return kResultFalse;
@@ -2944,7 +3095,9 @@ private:
     }
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JucePluginFactory)
+    // no leak detector here to prevent it firing on shutdown when running in hosts that
+    // don't release the factory object correctly...
+    JUCE_DECLARE_NON_COPYABLE (JucePluginFactory)
 };
 
 } // juce namespace

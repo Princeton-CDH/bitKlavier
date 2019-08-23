@@ -14,8 +14,8 @@
 BKCircularKeyboardSlider::BKCircularKeyboardSlider(void):
 ratio(1.0)
 {
-    addAndMakeVisible (keyboardComponent =
-                       new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
+    addAndMakeVisible ((keyboardComponent =
+                       std::make_unique<BKKeymapKeyboardComponent>(keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard)).get());
 
     keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
@@ -49,11 +49,11 @@ ratio(1.0)
 #endif
     addAndMakeVisible(keyboardValueTF);
 
-    keyboardValsTextField = new BKTextEditor();
+    keyboardValsTextField = std::make_unique<BKTextEditor>();
     keyboardValsTextField->setMultiLine(true);
     keyboardValsTextField->setName("KSLIDERTXTEDITALL");
     keyboardValsTextField->addListener(this);
-    addAndMakeVisible(keyboardValsTextField);
+    addAndMakeVisible(keyboardValsTextField.get());
     keyboardValsTextField->setAlpha(0);
     keyboardValsTextField->toBack();
 

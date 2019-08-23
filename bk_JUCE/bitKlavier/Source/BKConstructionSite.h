@@ -185,7 +185,7 @@ private:
     BKItem* currentItem;
     BKItem* upperLeftest;
     
-    ScopedPointer<LassoComponent<BKItem*>> lasso;
+    std::unique_ptr<LassoComponent<BKItem*>> lasso;
     
     SelectedItemSet<BKItem*> selected;
     

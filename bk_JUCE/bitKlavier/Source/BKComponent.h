@@ -121,7 +121,7 @@ private:
     bool mouseHoldHappened;
     bool mouseDragHappened;
     bool mouseIsDown;
-    ScopedPointer<Component> mouseDownComponent;
+    Component* mouseDownComponent;
     bool onItem;
     
     

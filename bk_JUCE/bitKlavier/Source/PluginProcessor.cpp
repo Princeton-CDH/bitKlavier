@@ -53,10 +53,10 @@ public:
             
             ValueTree vt1 = processor.gallery->getState();
             
-            ScopedPointer<XmlElement> xml = vt1.createXml();
+            std::unique_ptr<XmlElement> xml = vt1.createXml();
             
             // GALLERY 2
-            processor.gallery = new Gallery(xml, processor);
+            processor.gallery = new Gallery(*xml, processor);
             processor.gallery->setName(name);
             
             ValueTree vt2 =  processor.gallery->getState();
@@ -101,7 +101,8 @@ hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
 doneWithSetStateInfo(false),
-loader(*this)
+loader(*this),
+midiOutput(nullptr)
 {
 #if BK_UNIT_TESTS
     
@@ -169,7 +170,7 @@ loader(*this)
     defaultLoaded = true;
     defaultName = "Basic_Piano_xml";
     
-    loadGalleryFromXml(XmlDocument::parse(xmlData));
+    //loadGalleryFromXml(XmlDocument::parse(xmlData).get());
 
 #if JUCE_IOS
     platform = BKIOS;
@@ -360,11 +361,11 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     
     galleryVT.setProperty("name", myFile.getFileName().upToFirstOccurrenceOf(".xml", false, false), 0);
     
-    ScopedPointer<XmlElement> myXML = galleryVT.createXml();
+    std::unique_ptr<XmlElement> myXML = galleryVT.createXml();
     
     myXML->writeToFile(myFile, String());
     
-    loadGalleryFromXml(myXML);
+    loadGalleryFromXml(myXML.get());
     
     gallery->setURL(newURL);
     
@@ -398,7 +399,7 @@ void BKAudioProcessor::deleteGalleryAtURL(String path)
 }
 
 
-void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> xml)
+void BKAudioProcessor::createNewGallery(String name, XmlElement* xml)
 {
     updateState->loadedJson = false;
     
@@ -422,7 +423,7 @@ void BKAudioProcessor::createNewGallery(String name, ScopedPointer<XmlElement> x
     if (xml == nullptr)
     {
         myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
-        xml = XmlDocument::parse(myFile);
+        xml = XmlDocument::parse(myFile).get();
         xml->setAttribute("name", galleryName);
         xml->writeToFile(myFile, "");
     }
@@ -996,7 +997,7 @@ void BKAudioProcessor::importSoundfont(void)
                          {
                              auto url = results.getReference (0);
                              
-                             ScopedPointer<InputStream> wi (url.createInputStream (false));
+                             std::unique_ptr<InputStream> wi (url.createInputStream (false));
                              
                              if (wi != nullptr)
                              {
@@ -1038,9 +1039,9 @@ void BKAudioProcessor::importCurrentGallery(void)
             
              if (url.createInputStream (false) != nullptr)
              {
-                 ScopedPointer<XmlElement> xml = url.readEntireXmlStream();
+                 std::unique_ptr<XmlElement> xml = url.readEntireXmlStream();
                 
-                 createNewGallery(url.getFileName().replace("%20", " "), xml);
+                 createNewGallery(url.getFileName().replace("%20", " "), xml.get());
              }
          }
      });
@@ -1077,8 +1078,8 @@ void BKAudioProcessor::exportCurrentGallery(void)
                          // paths, so we may as well write into those files.
                          if (! result.isEmpty())
                          {
-                             ScopedPointer<InputStream> wi (fileToSave.createInputStream());
-                             ScopedPointer<OutputStream> wo (result.createOutputStream());
+                             std::unique_ptr<InputStream> wi (fileToSave.createInputStream());
+                             std::unique_ptr<OutputStream> wo (result.createOutputStream());
                              
                              if (wi != nullptr && wo != nullptr)
                              {
@@ -1179,13 +1180,13 @@ void BKAudioProcessor::loadGalleryDialog(void)
             else                            DBG("NOT MOVED");
         }
         
-        ScopedPointer<XmlElement> xml (XmlDocument::parse (user));
+        std::unique_ptr<XmlElement> xml = XmlDocument::parse (user);
         
         if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
         {
             currentGallery = user.getFileName();
             
-            gallery = new Gallery(xml, *this);
+            gallery = new Gallery(xml.get(), *this);
             
             gallery->setURL(user.getFullPathName());
             
@@ -1197,7 +1198,7 @@ void BKAudioProcessor::loadGalleryDialog(void)
     
 }
 
-void BKAudioProcessor::loadGalleryFromXml(ScopedPointer<XmlElement> xml)
+void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
@@ -1224,15 +1225,15 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
         defaultLoaded = true;
         defaultName = "Basic_Piano_xml";
         
-        loadGalleryFromXml(XmlDocument::parse(xmlData));
+        loadGalleryFromXml(XmlDocument::parse(xmlData).get());
     }
     else
     {
         File myFile (path);
 
-        ScopedPointer<XmlElement> xml (XmlDocument::parse (myFile));
+        std::unique_ptr<XmlElement> xml = XmlDocument::parse(myFile);
 
-        loadGalleryFromXml(xml);
+        loadGalleryFromXml(xml.get());
 
         gallery->setURL(path);
     }

@@ -88,7 +88,7 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     
     DBG("sustain inversion saved: " + String((int)getSustainInversion()));
     
-    ScopedPointer<XmlElement> galleryXML = galleryVT.createXml();
+    std::unique_ptr<XmlElement> galleryXML = galleryVT.createXml();
     copyXmlToBinary (*galleryXML, destData);
 }
 
@@ -126,7 +126,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     DBG("BKAudioProcessor::setStateInformation");
     
-    ScopedPointer<XmlElement> galleryXML (getXmlFromBinary (data, sizeInBytes));
+    std::unique_ptr<XmlElement> galleryXML = getXmlFromBinary (data, sizeInBytes);
     
     DBG("galleryXML: " + galleryXML->createDocument(""));
     if (galleryXML != nullptr)
@@ -141,7 +141,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             
             String xmlData = BinaryData::getNamedResource(defaultName.toUTF8(), size);
             
-            loadGalleryFromXml(XmlDocument::parse(xmlData));
+            loadGalleryFromXml(XmlDocument::parse(xmlData).get());
         }
         else
         {
@@ -170,7 +170,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             defaultLoaded = true;
             defaultName = "Basic_Piano_xml";
             
-            loadGalleryFromXml(XmlDocument::parse(xmlData));
+            loadGalleryFromXml(XmlDocument::parse(xmlData).get());
         }
         else initializeGallery();
         

@@ -137,7 +137,7 @@ sfzero::Region *sfzero::Sound::regionAt(int index) { return regions_[index]; }
 
 int sfzero::Sound::numSubsounds() { return 1; }
 
-juce::String sfzero::Sound::subsoundName(int /*whichSubsound*/) { return juce::String::empty; }
+juce::String sfzero::Sound::subsoundName(int /*whichSubsound*/) { return juce::String(); }
 
 void sfzero::Sound::useSubsound(int /*whichSubsound*/) {}
 

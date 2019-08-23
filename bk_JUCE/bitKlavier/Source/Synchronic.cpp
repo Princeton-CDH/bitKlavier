@@ -14,12 +14,14 @@ SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TuningProcessor::Ptr tuning,
                                          TempoProcessor::Ptr tempo,
                                          BKSynthesiser* main,
-                                         GeneralSettings::Ptr general):
+                                         GeneralSettings::Ptr general,
+                                         std::shared_ptr<MidiOutput>* output):
 synth(main),
 general(general),
 synchronic(synchronic),
 tuner(tuning),
-tempo(tempo)
+tempo(tempo),
+midiOutput(output)
 {
     velocities.ensureStorageAllocated(128);
     holdTimers.ensureStorageAllocated(128);
@@ -32,6 +34,10 @@ tempo(tempo)
     inCluster = false;
     
     keysDepressed = Array<int>();
+    
+    activeSynchronicVoices = Array<BKSynthesiserVoice*>();
+    activeSynchronicVoices.resize(128);
+    activeSynchronicVoices.fill(nullptr);
 }
 
 
@@ -87,6 +93,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
         }
 
         int whichEnv = cluster->getEnvelopeCounter();
+        BKSynthesiserVoice* currentVoice =
         synth->keyOn(channel,
                      note,
                      synthNoteNumber,
@@ -104,6 +111,15 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                      prep->getSustain(whichEnv),
                      prep->getRelease(whichEnv),
                      tuner);
+        
+        if (*midiOutput != nullptr)
+        {
+            activeSynchronicVoices.set(currentVoice->getCurrentlyPlayingNote(), currentVoice);
+            const MidiMessage message = MidiMessage::noteOn(1, synthNoteNumber, velocity);
+            (*midiOutput).get()->sendMessageNow(message);
+            DBG("MIDI Message sent: Note on " + String(synthNoteNumber));
+        }
+
     }
     
 }
@@ -564,6 +580,21 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             cluster->incrementPhasor(numSamples);
         }
     }
+    
+    MidiBuffer midiBuffer = MidiBuffer();
+    int i = 0;
+    for (BKSynthesiserVoice* const voice : activeSynchronicVoices) {
+        if (voice == nullptr) continue;
+        if (!voice->isVoiceActive()) {
+            int noteNumber = activeSynchronicVoices.indexOf(voice);
+            if (noteNumber < 0) continue;
+            activeSynchronicVoices.set(noteNumber, nullptr);
+            const MidiMessage message = MidiMessage::noteOff(1, noteNumber);
+            midiBuffer.addEvent(message, i);
+            DBG("MIDI Message sent: Note off " + String(noteNumber));
+        }
+    }
+    if (!midiBuffer.isEmpty()) (*midiOutput).get()->sendBlockOfMessagesNow(midiBuffer);
 }
 
 //return time in ms to future beat, given beatsToSkip
@@ -624,7 +655,7 @@ public:
 
 			ValueTree vt1 = s1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			SynchronicPreparation::Ptr sp2 = new SynchronicPreparation();
 
@@ -663,7 +694,7 @@ public:
 
 			ValueTree vt1 = s1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			Synchronic s2(-1, true);
 
@@ -715,7 +746,7 @@ public:
 
 			ValueTree vt1 = sm1->getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			SynchronicPreparation::Ptr sp2 = new SynchronicPreparation();
 			SynchronicModification::Ptr sm2 = new SynchronicModification(sp2, 1);

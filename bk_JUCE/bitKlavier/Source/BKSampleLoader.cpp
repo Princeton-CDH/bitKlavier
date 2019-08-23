@@ -41,15 +41,15 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     
     bool isSF2 = false;
     
-    ScopedPointer<sfzero::SF2Sound>     sf2sound;
-    ScopedPointer<sfzero::SF2Reader>    sf2reader;
-    ScopedPointer<sfzero::Sound>     sfzsound;
-    ScopedPointer<sfzero::Reader>    sfzreader;
+    std::unique_ptr<sfzero::SF2Sound>     sf2sound;
+    std::unique_ptr<sfzero::SF2Reader>    sf2reader;
+    std::unique_ptr<sfzero::Sound>     sfzsound;
+    std::unique_ptr<sfzero::Reader>    sfzreader;
     
     if      (ext == ".sf2")
     {
         isSF2 = true;
-        sf2sound   = new sfzero::SF2Sound(sfzFile);
+        sf2sound   = std::make_unique<sfzero::SF2Sound>(sfzFile);
         
         sf2sound->loadRegions(processor.currentInstrument);
         sf2sound->loadSamples(&formatManager);
@@ -68,7 +68,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     }
     else if (ext == ".sfz")
     {
-        sfzsound   = new sfzero::Sound(sfzFile);
+        sfzsound   = std::make_unique<sfzero::Sound>(sfzFile);
         
         processor.currentInstrument = 0;
 
@@ -333,7 +333,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
                 {
                     String soundName = file.getFileName();
                     
-                    sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
+                    sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
                     
                     BigInteger noteRange;
                     
@@ -463,7 +463,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
                 
                 if (inputStream.openedOk()) {
                     String soundName = file.getFileName();
-                    sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
+                    sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
                     
                     //keymap assignment
                     BigInteger noteRange;
@@ -565,7 +565,7 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
         
         if (inputStream.openedOk()) {
             String soundName = file.getFileName();
-            sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
+            sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
             
             BigInteger noteRange;
             noteRange.setRange(20 + i, 1, true);
@@ -644,7 +644,7 @@ void BKSampleLoader::loadPedalSamples(void)
         
         if (inputStream.openedOk()) {
             String soundName = file.getFileName();
-            sampleReader = wavFormat.createReaderFor(new FileInputStream(file), true);
+            sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
             
             BigInteger noteRange;
             noteRange.setRange(20 + i, 1, true);

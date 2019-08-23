@@ -83,6 +83,8 @@
 
 #define SOUNDFONT_ID 1000
 
+#define MIDIOUT_ID 2000
+
 #define SF_DEFAULT_0 800
 #define SF_DEFAULT_1 801
 #define SF_DEFAULT_2 802
@@ -254,6 +256,8 @@ BKParameterDataType getBKDataType ( DirectParameterType param);
 BKParameterDataType getBKDataType ( NostalgicParameterType param);
 
 inline int layerToLayerId(BKNoteType type, int layer) { return (50*type)+layer;}
+
+inline int gainToMidiVelocity(float gain) { return sqrt(127*127*gain); }
 
 typedef enum BKTextFieldType
 {

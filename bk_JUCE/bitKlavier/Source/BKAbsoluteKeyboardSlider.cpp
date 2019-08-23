@@ -14,9 +14,9 @@ BKAbsoluteKeyboardSlider::BKAbsoluteKeyboardSlider(bool nos):
 ratio(1.0),
 needsOctaveSlider(nos)
 {
+    keyboardComponent = std::make_unique<BKKeymapKeyboardComponent>(keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     
-    addAndMakeVisible (keyboardComponent =
-                       new BKKeymapKeyboardComponent (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard));
+    addAndMakeVisible (*keyboardComponent);
 
     keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
     
@@ -64,11 +64,11 @@ needsOctaveSlider(nos)
 #endif
     addAndMakeVisible(keyboardValueTF);
 
-    keyboardValsTextField = new BKTextEditor();
+    keyboardValsTextField = std::make_unique<BKTextEditor>();
     keyboardValsTextField->setMultiLine(true);
     keyboardValsTextField->setName("KSLIDERTXTEDITALL");
     keyboardValsTextField->addListener(this);
-    addAndMakeVisible(keyboardValsTextField);
+    addAndMakeVisible(keyboardValsTextField.get());
     keyboardValsTextField->setAlpha(0);
     keyboardValsTextField->toBack();
 

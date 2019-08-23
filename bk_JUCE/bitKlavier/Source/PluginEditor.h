@@ -45,8 +45,8 @@ private:
     
     //BKButtonAndMenuLAF laf;
     
-    ScopedPointer<ComponentBoundsConstrainer> constrain;
-    ScopedPointer<ResizableCornerComponent> resizer;
+    std::unique_ptr<ComponentBoundsConstrainer> constrain;
+    std::unique_ptr<ResizableCornerComponent> resizer;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessorEditor)
 };

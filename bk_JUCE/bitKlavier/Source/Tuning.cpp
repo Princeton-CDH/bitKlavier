@@ -258,7 +258,7 @@ public:
 
 			ValueTree vt1 = t1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			TuningPreparation::Ptr tp2 = new TuningPreparation();
 
@@ -290,7 +290,7 @@ public:
 
 			ValueTree vt1 = t1.getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			Tuning t2(-1, true);
 
@@ -337,7 +337,7 @@ public:
 
 			ValueTree vt1 = tm1->getState();
 
-			ScopedPointer<XmlElement> xml = vt1.createXml();
+			XmlElement* xml = vt1.createXml();
 
 			TuningPreparation::Ptr tp2 = new TuningPreparation();
 			TuningModification::Ptr tm2 = new TuningModification(tp2, 1);

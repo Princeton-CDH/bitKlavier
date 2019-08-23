@@ -26,33 +26,33 @@ BKViewController(p, theGraph, 1)
     selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
-    transpositionSlider = new BKStackedSlider("transpositions", -12, 12, -12, 12, 0, 0.01);
+    transpositionSlider = std::make_unique<BKStackedSlider>("transpositions", -12, 12, -12, 12, 0, 0.01);
     transpositionSlider->setTooltip("Determines pitch (in semitones) of Direct notes; control-click to add another voice, double-click to edit all");
-    addAndMakeVisible(transpositionSlider);
+    addAndMakeVisible(*transpositionSlider);
     
-    gainSlider = new BKSingleSlider("gain", 0, 10, 1, 0.01);
+    gainSlider = std::make_unique<BKSingleSlider>("gain", 0, 10, 1, 0.01);
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
     gainSlider->setToolTipString("Adjusts overall volume of keyboard");
-    addAndMakeVisible(gainSlider);
+    addAndMakeVisible(*gainSlider);
     
-    resonanceGainSlider = new BKSingleSlider("resonance gain", 0, 10, 0.2, 0.01);
+    resonanceGainSlider = std::make_unique<BKSingleSlider>("resonance gain", 0, 10, 0.2, 0.01);
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(false);
     resonanceGainSlider->setToolTipString("Adjusts overall resonance/reverb based on keyOff velocity; change to keyOn velocity in Gallery>settings");
-    addAndMakeVisible(resonanceGainSlider);
+    addAndMakeVisible(*resonanceGainSlider);
     
-    hammerGainSlider = new BKSingleSlider("hammer gain", 0, 10, 1, 0.01);
+    hammerGainSlider = std::make_unique<BKSingleSlider>("hammer gain", 0, 10, 1, 0.01);
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
     hammerGainSlider->setJustifyRight(false);
     hammerGainSlider->setToolTipString("Adjusts mechanical noise sample based on keyOff velocity; change to keyOn velocity in Gallery>settings");
-    addAndMakeVisible(hammerGainSlider);
+    addAndMakeVisible(*hammerGainSlider);
     
-    ADSRSlider = new BKADSRSlider("ADSR");
+    ADSRSlider = std::make_unique<BKADSRSlider>("ADSR");
     ADSRSlider->setButtonText("edit envelope");
     ADSRSlider->setToolTip("adjust Attack, Decay, Sustain, and Release envelope parameters");
     ADSRSlider->setButtonMode(false);
-    addAndMakeVisible(ADSRSlider);
+    addAndMakeVisible(*ADSRSlider);
     setShowADSR(false);
     
     

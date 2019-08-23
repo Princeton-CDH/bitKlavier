@@ -34,8 +34,8 @@ private:
     // Sample loading.
     AudioFormatManager formatManager;
     WavAudioFormat wavFormat;
-    ScopedPointer<AudioFormatReader> sampleReader;
-    ScopedPointer<AudioSampleBuffer> sampleBuffer;
+    std::unique_ptr<AudioFormatReader> sampleReader;
+    std::unique_ptr<AudioSampleBuffer> sampleBuffer;
     
     void run(void) override;
     
