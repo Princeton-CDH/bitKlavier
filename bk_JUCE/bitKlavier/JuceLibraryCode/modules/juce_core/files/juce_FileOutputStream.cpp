@@ -79,9 +79,6 @@ bool FileOutputStream::write (const void* const src, const size_t numBytes)
 {
     jassert (src != nullptr && ((ssize_t) numBytes) >= 0);
 
-    if (! openedOk())
-        return false;
-
     if (bytesInBuffer + numBytes < bufferSize)
     {
         memcpy (buffer + bytesInBuffer, src, numBytes);

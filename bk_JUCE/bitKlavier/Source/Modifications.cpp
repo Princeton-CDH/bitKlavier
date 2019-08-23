@@ -14,7 +14,8 @@ Modifications::Modifications():
 directMods(DirectModification::PtrArr()),
 synchronicMods(SynchronicModification::PtrArr()),
 nostalgicMods(NostalgicModification::PtrArr()),
-tuningMods(TuningModification::PtrArr())
+tuningMods(TuningModification::PtrArr()),
+blendronomerMods(BlendronomerModification::PtrArr())
 {
     
 }
@@ -143,6 +144,35 @@ void Modifications::removeTuningModification(int which)
     }
 }
 
+void Modifications::addBlendronomerModification(BlendronomerModification::Ptr b)
+{
+	blendronomerMods.add(b);
+}
+
+void Modifications::removeBlendronomerModification(BlendronomerModification::Ptr b)
+{
+	for (int i = blendronomerMods.size(); --i >= 0;)
+	{
+		if (blendronomerMods[i] == b)
+		{
+			blendronomerMods.remove(i);
+			break;
+		}
+	}
+}
+
+void Modifications::removeBlendronomerModification(int which)
+{
+	for (int i = blendronomerMods.size(); --i >= 0;)
+	{
+		if (blendronomerMods[i]->getId() == which)
+		{
+			blendronomerMods.remove(i);
+			break;
+		}
+	}
+}
+
 
 void Modifications::addTempoModification(TempoModification::Ptr m)
 {
@@ -198,6 +228,11 @@ TempoModification::PtrArr Modifications::getTempoModifications(void)
     return tempoMods;
 }
 
+BlendronomerModification::PtrArr Modifications::getBlendronomerModifications(void)
+{
+	return blendronomerMods;
+}
+
 void Modifications::clearModifications(void)
 {
     synchronicMods.clear();
@@ -205,6 +240,7 @@ void Modifications::clearModifications(void)
     directMods.clear();
     tuningMods.clear();
     tempoMods.clear();
+	blendronomerMods.clear();
     
 }
 
@@ -215,5 +251,5 @@ void Modifications::clearResets(void)
     directReset.clear();
     tuningReset.clear();
     tempoReset.clear();
-    
+	blendronomerReset.clear();
 }

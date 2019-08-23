@@ -475,7 +475,7 @@ public:
         while (numSamples > 0)
         {
             auto numThisTime = jmin (8192, numSamples);
-            auto numBytes = (size_t) numThisTime * sizeof (float);
+            auto numBytes = sizeof (float) * (size_t) numThisTime;
 
             audioDataBlock.ensureSize (numBytes * numChannels, false);
             auto* data = static_cast<float*> (audioDataBlock.getData());
@@ -493,12 +493,6 @@ public:
 
             if (status != noErr)
                 return false;
-
-            if ((int) numFramesToRead < numThisTime)
-            {
-                numThisTime = (int) numFramesToRead;
-                numBytes    = (size_t) numThisTime * sizeof (float);
-            }
 
             for (int i = numDestChannels; --i >= 0;)
             {
@@ -598,8 +592,8 @@ AudioFormatWriter* CoreAudioFormat::createWriterFor (OutputStream*,
     return nullptr;
 }
 
-
 //==============================================================================
+// Unit tests for Core Audio layout conversions
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
@@ -609,9 +603,7 @@ AudioFormatWriter* CoreAudioFormat::createWriterFor (OutputStream*,
 class CoreAudioLayoutsUnitTest  : public UnitTest
 {
 public:
-    CoreAudioLayoutsUnitTest()
-        : UnitTest ("Core Audio Layout <-> JUCE channel layout conversion", UnitTestCategories::audio)
-    {}
+    CoreAudioLayoutsUnitTest() : UnitTest ("Core Audio Layout <-> JUCE channel layout conversion", "Audio") {}
 
     // some ambisonic tags which are not explicitely defined
     enum

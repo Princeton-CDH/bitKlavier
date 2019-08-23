@@ -53,7 +53,7 @@ processor(p)
 
 Gallery::Gallery(var myJson, BKAudioProcessor& p):
 processor(p),
-url(String::empty)
+url(String())
 {
     for (int i = 0; i < BKPreparationTypeNil; i++)
     {
@@ -107,6 +107,9 @@ void Gallery::resetPreparations(void)
     
     for (int i = tempo.size(); --i >= 0; )
         tempo[i]->aPrep->copy(tempo[i]->sPrep);
+
+	for (int i = blendronomer.size(); --i >= 0; )
+		blendronomer[i]->aPrep->copy(blendronomer[i]->sPrep);
 }
 
 void Gallery::randomize()
@@ -158,6 +161,12 @@ void Gallery::randomize()
             int nostalgicId = n->getId();
             NostalgicProcessor::Ptr nProc = new NostalgicProcessor(n, tProc, sProc, dummySynth);
             p->addNostalgicProcessor(nostalgicId);
+			
+			Blendronomer::Ptr b = new Blendronomer(-1, true);
+			addBlendronomer(b);
+			int blendronomerId = b->getId();
+			BlendronomerProcessor::Ptr bProc = new BlendronomerProcessor(b, tProc, mProc, nullptr, dummyGeneral, dummySynth);
+			p->addBlendronomerProcessor(blendronomerId);
 
             p->linkPreparationWithKeymap(PreparationTypeDirect, d->getId(), kp->getId());
 

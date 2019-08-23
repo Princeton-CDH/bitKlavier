@@ -430,7 +430,7 @@ public:
         The caller must delete the object that is returned.
         @see fromXml, toXmlString
     */
-    std::unique_ptr<XmlElement> createXml() const;
+    XmlElement* createXml() const;
 
     /** Tries to recreate a tree from its XML representation.
         This isn't designed to cope with random XML data - it should only be fed XML that was created
@@ -438,17 +438,11 @@ public:
     */
     static ValueTree fromXml (const XmlElement& xml);
 
-    /** Tries to recreate a tree from its XML representation.
-        This isn't designed to cope with random XML data - it should only be fed XML that was created
-        by the createXml() method.
-    */
-    static ValueTree fromXml (const String& xmlText);
-
     /** This returns a string containing an XML representation of the tree.
         This is quite handy for debugging purposes, as it provides a quick way to view a tree.
         @see createXml()
     */
-    String toXmlString (const XmlElement::TextFormat& format = {}) const;
+    String toXmlString() const;
 
     //==============================================================================
     /** Stores this tree (and all its children) in a binary format.
@@ -490,7 +484,7 @@ public:
             simply check the tree parameter in this callback to make sure it's the tree you're interested in.
         */
         virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
-                                               const Identifier& property);
+                                               const Identifier& property) = 0;
 
         /** This method is called when a child sub-tree is added.
             Note that when you register a listener to a tree, it will receive this callback for
@@ -499,7 +493,7 @@ public:
             just check the parentTree parameter to make sure it's the one that you're interested in.
         */
         virtual void valueTreeChildAdded (ValueTree& parentTree,
-                                          ValueTree& childWhichHasBeenAdded);
+                                          ValueTree& childWhichHasBeenAdded) = 0;
 
         /** This method is called when a child sub-tree is removed.
 
@@ -510,7 +504,7 @@ public:
         */
         virtual void valueTreeChildRemoved (ValueTree& parentTree,
                                             ValueTree& childWhichHasBeenRemoved,
-                                            int indexFromWhichChildWasRemoved);
+                                            int indexFromWhichChildWasRemoved) = 0;
 
         /** This method is called when a tree's children have been re-shuffled.
 
@@ -520,7 +514,7 @@ public:
             just check the parameter to make sure it's the tree that you're interested in.
         */
         virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
-                                                 int oldIndex, int newIndex);
+                                                 int oldIndex, int newIndex) = 0;
 
         /** This method is called when a tree has been added or removed from a parent.
 
@@ -528,7 +522,7 @@ public:
             removed from a parent. Unlike the other callbacks, it applies only to the tree to which
             the listener is registered, and not to any of its children.
         */
-        virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged);
+        virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) = 0;
 
         /** This method is called when a tree is made to point to a different internal shared object.
             When operator= is used to make a ValueTree refer to a different object, this callback

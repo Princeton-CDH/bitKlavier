@@ -408,7 +408,7 @@ class CommonSmoothedValueTests  : public UnitTest
 {
 public:
     CommonSmoothedValueTests()
-        : UnitTest ("CommonSmoothedValueTests", UnitTestCategories::smoothedValues)
+        : UnitTest ("CommonSmoothedValueTests", "SmoothedValues")
     {}
 
     void runTest() override

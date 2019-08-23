@@ -39,14 +39,10 @@ class JUCE_API  LADSPAPluginFormat   : public AudioPluginFormat
 {
 public:
     LADSPAPluginFormat();
-    ~LADSPAPluginFormat() override;
+    ~LADSPAPluginFormat();
 
     //==============================================================================
-    static String getFormatName()                   { return "LADSPA"; }
-    String getName() const override                 { return getFormatName(); }
-    bool canScanForPlugins() const override         { return true; }
-    bool isTrivialToScan() const override           { return false; }
-
+    String getName() const override                { return "LADSPA"; }
     void findAllTypesForFile (OwnedArray<PluginDescription>&, const String& fileOrIdentifier) override;
     bool fileMightContainThisPluginType (const String& fileOrIdentifier) override;
     String getNameOfPluginFromIdentifier (const String& fileOrIdentifier) override;
@@ -54,12 +50,16 @@ public:
     StringArray searchPathsForPlugins (const FileSearchPath&, bool recursive, bool) override;
     bool doesPluginStillExist (const PluginDescription&) override;
     FileSearchPath getDefaultLocationsToSearch() override;
+    bool canScanForPlugins() const override        { return true; }
 
 private:
     //==============================================================================
     void createPluginInstance (const PluginDescription&, double initialSampleRate,
-                               int initialBufferSize, PluginCreationCallback) override;
-    bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const override;
+                               int initialBufferSize, void* userData, PluginCreationCallback) override;
+
+    bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override;
+
+private:
     void recursiveFileSearch (StringArray&, const File&, bool recursive);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LADSPAPluginFormat)

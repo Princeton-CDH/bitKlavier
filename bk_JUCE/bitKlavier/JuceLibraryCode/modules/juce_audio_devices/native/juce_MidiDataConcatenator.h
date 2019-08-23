@@ -116,7 +116,7 @@ private:
 
         do
         {
-            if (pendingSysexSize > 0 && isStatusByte (*d))
+            if (pendingSysexSize > 0 && isInitialByte (*d))
             {
                 if (*d == 0xf7)
                 {
@@ -172,8 +172,7 @@ private:
     }
 
     static bool isRealtimeMessage (uint8 byte)  { return byte >= 0xf8 && byte <= 0xfe; }
-    static bool isStatusByte (uint8 byte)       { return byte >= 0x80; }
-    static bool isInitialByte (uint8 byte)      { return isStatusByte (byte) && byte != 0xf7; }
+    static bool isInitialByte (uint8 byte)      { return byte >= 0x80 && byte != 0xf7; }
 
     uint8 currentMessage[3];
     int currentMessageLen = 0;

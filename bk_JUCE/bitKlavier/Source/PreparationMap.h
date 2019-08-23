@@ -21,6 +21,7 @@
 #include "Nostalgic.h"
 #include "Tempo.h"
 #include "Tuning.h"
+#include "Blendronomer.h"
 
 class PreparationMap : public ReferenceCountedObject
 {
@@ -41,7 +42,7 @@ public:
     inline int getId(void)             { return Id;           }
     
     BKSampleLoadType sampleType;
-    void processBlock(int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic = false);
+    void processBlock(AudioSampleBuffer& buffer, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic = false);
     
     void keyPressed(int noteNumber, float velocity, int channel, bool soundfont = false);
     void keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false);
@@ -93,6 +94,13 @@ public:
             prep.append(String(p->getId()), 3);
             prep.append(" ",1);
         }
+
+		for (auto p : bprocessor)
+		{
+			prep.append("B", 1);
+			prep.append(String(p->getId()), 3);
+			prep.append(" ", 1);
+		}
         
         if (prep == "")
             return " ";
@@ -130,6 +138,12 @@ public:
     TempoProcessor::PtrArr      getTempoProcessors      (void);
     TempoProcessor::Ptr         getTempoProcessor       (int Id);
     bool                        contains                (TempoProcessor::Ptr);
+
+	void                        addBlendronomerProcessor(BlendronomerProcessor::Ptr);
+	void                        setBlendronomerProcessors(BlendronomerProcessor::PtrArr);
+	BlendronomerProcessor::PtrArr      getBlendronomerProcessors(void);
+	BlendronomerProcessor::Ptr         getBlendronomerProcessor(int Id);
+	bool                        contains(BlendronomerProcessor::Ptr);
     
 
     void deactivateIfNecessary();
@@ -160,6 +174,10 @@ public:
         ps.clear();
         for (auto p : mprocessor) ps.add(p->getId());
         DBG("Tempo: " + intArrayToString(ps));
+
+		ps.clear();
+		for (auto p : bprocessor) ps.add(p->getId());
+		DBG("Blendronomer: " + intArrayToString(ps));
     }
     
 private:
@@ -173,6 +191,7 @@ private:
     NostalgicProcessor::PtrArr           nprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
+	BlendronomerProcessor::PtrArr		 bprocessor;
     
     // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*              synth;

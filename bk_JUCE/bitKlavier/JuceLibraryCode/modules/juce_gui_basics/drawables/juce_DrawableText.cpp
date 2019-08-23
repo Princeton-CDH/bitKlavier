@@ -52,9 +52,9 @@ DrawableText::~DrawableText()
 {
 }
 
-std::unique_ptr<Drawable> DrawableText::createCopy() const
+Drawable* DrawableText::createCopy() const
 {
-    return std::make_unique<DrawableText> (*this);
+    return new DrawableText (*this);
 }
 
 //==============================================================================
@@ -198,15 +198,6 @@ Path DrawableText::getOutlineAsPath() const
     pathOfAllGlyphs.applyTransform (getTextTransform (w, h).followedBy (getTransform()));
 
     return pathOfAllGlyphs;
-}
-
-bool DrawableText::replaceColour (Colour originalColour, Colour replacementColour)
-{
-    if (colour != originalColour)
-        return false;
-
-    setColour (replacementColour);
-    return true;
 }
 
 } // namespace juce

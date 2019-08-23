@@ -154,16 +154,12 @@ bool GZIPCompressorOutputStream::setPosition (int64 /*newPosition*/)
     return false;
 }
 
-
-//==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
 struct GZIPTests  : public UnitTest
 {
-    GZIPTests()
-        : UnitTest ("GZIP", UnitTestCategories::compression)
-    {}
+    GZIPTests()   : UnitTest ("GZIP", "Compression") {}
 
     void runTest() override
     {

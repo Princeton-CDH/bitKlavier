@@ -185,42 +185,43 @@ static DebugFlagsInitialiser debugFlagsInitialiser;
 #endif
 
 //==============================================================================
-RTL_OSVERSIONINFOW getWindowsVersionInfo()
+static uint32 getWindowsVersion()
 {
-    RTL_OSVERSIONINFOW versionInfo = { 0 };
+    auto filename = _T("kernel32.dll");
+    DWORD handle = 0;
 
-    if (auto* moduleHandle = ::GetModuleHandleW (L"ntdll.dll"))
+    if (auto size = GetFileVersionInfoSize (filename, &handle))
     {
-        using RtlGetVersion = LONG (WINAPI*) (PRTL_OSVERSIONINFOW);
+        HeapBlock<char> data (size);
 
-        if (auto* rtlGetVersion = (RtlGetVersion) ::GetProcAddress (moduleHandle, "RtlGetVersion"))
+        if (GetFileVersionInfo (filename, handle, size, data))
         {
-            versionInfo.dwOSVersionInfoSize = sizeof (versionInfo);
-            LONG STATUS_SUCCESS = 0;
+            VS_FIXEDFILEINFO* info = nullptr;
+            UINT verSize = 0;
 
-            if (rtlGetVersion (&versionInfo) != STATUS_SUCCESS)
-                versionInfo = { 0 };
+            if (VerQueryValue (data, (LPCTSTR) _T("\\"), (void**) &info, &verSize))
+                if (size > 0 && info != nullptr && info->dwSignature == 0xfeef04bd)
+                    return (uint32) info->dwFileVersionMS;
         }
     }
 
-    return versionInfo;
+    return 0;
 }
 
 SystemStats::OperatingSystemType SystemStats::getOperatingSystemType()
 {
-    auto versionInfo = getWindowsVersionInfo();
-    auto major = versionInfo.dwMajorVersion;
-    auto minor = versionInfo.dwMinorVersion;
+    auto v = getWindowsVersion();
+    auto major = (v >> 16);
 
     jassert (major <= 10); // need to add support for new version!
 
-    if (major == 10)                 return Windows10;
-    if (major == 6 && minor == 3)    return Windows8_1;
-    if (major == 6 && minor == 2)    return Windows8_0;
-    if (major == 6 && minor == 1)    return Windows7;
-    if (major == 6 && minor == 0)    return WinVista;
-    if (major == 5 && minor == 1)    return WinXP;
-    if (major == 5 && minor == 0)    return Win2000;
+    if (major == 10)       return Windows10;
+    if (v == 0x00060003)   return Windows8_1;
+    if (v == 0x00060002)   return Windows8_0;
+    if (v == 0x00060001)   return Windows7;
+    if (v == 0x00060000)   return WinVista;
+    if (v == 0x00050000)   return Win2000;
+    if (major == 5)        return WinXP;
 
     jassertfalse;
     return UnknownOS;

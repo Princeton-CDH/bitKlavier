@@ -28,31 +28,16 @@ static inline File resolveFilename (const String& name)
     return File::getCurrentWorkingDirectory().getChildFile (name.unquoted());
 }
 
-static inline File checkFileExists (const File& f)
+static inline void checkFileExists (const File& f)
 {
     if (! f.exists())
         ConsoleApplication::fail ("Could not find file: " + f.getFullPathName());
-
-    return f;
 }
 
-static inline File checkFolderExists (const File& f)
+static inline void checkFolderExists (const File& f)
 {
     if (! f.isDirectory())
         ConsoleApplication::fail ("Could not find folder: " + f.getFullPathName());
-
-    return f;
-}
-
-static inline File resolveFilenameForOption (const ArgumentList& args, StringRef option, const String& filename)
-{
-    if (filename.isEmpty())
-    {
-        args.failIfOptionIsMissing (option);
-        ConsoleApplication::fail ("Expected a filename after the " + option + " option");
-    }
-
-    return resolveFilename (filename);
 }
 
 File ArgumentList::Argument::resolveAsFile() const
@@ -62,7 +47,9 @@ File ArgumentList::Argument::resolveAsFile() const
 
 File ArgumentList::Argument::resolveAsExistingFile() const
 {
-    return checkFileExists (resolveAsFile());
+    auto f = resolveAsFile();
+    checkFileExists (f);
+    return f;
 }
 
 File ArgumentList::Argument::resolveAsExistingFolder() const
@@ -97,12 +84,8 @@ bool ArgumentList::Argument::isLongOption (const String& option) const
 String ArgumentList::Argument::getLongOptionValue() const
 {
     if (isLongOption())
-    {
-        auto equalsIndex = text.indexOfChar ('=');
-
-        if (equalsIndex > 0)
+        if (auto equalsIndex = text.indexOfChar ('='))
             return text.substring (equalsIndex + 1);
-    }
 
     return {};
 }
@@ -111,7 +94,7 @@ bool ArgumentList::Argument::isShortOption (char option) const
 {
     jassert (option != '-'); // this is probably not what you intended to pass in
 
-    return isShortOption() && text.containsChar (String (option)[0]);
+    return isShortOption() && text.containsChar (option);
 }
 
 bool ArgumentList::Argument::operator== (StringRef wildcard) const
@@ -179,19 +162,9 @@ bool ArgumentList::containsOption (StringRef option) const
     return indexOfOption (option) >= 0;
 }
 
-bool ArgumentList::removeOptionIfFound (StringRef option)
-{
-    auto i = indexOfOption (option);
-
-    if (i >= 0)
-        arguments.remove (i);
-
-    return i >= 0;
-}
-
 void ArgumentList::failIfOptionIsMissing (StringRef option) const
 {
-    if (indexOfOption (option) < 0)
+    if (! containsOption (option))
         ConsoleApplication::fail ("Expected the option " + option);
 }
 
@@ -221,69 +194,31 @@ String ArgumentList::getValueForOption (StringRef option) const
     return {};
 }
 
-String ArgumentList::removeValueForOption (StringRef option)
-{
-    jassert (isOptionFormat (option)); // the thing you're searching for must be an option
-
-    for (int i = 0; i < arguments.size(); ++i)
-    {
-        auto& arg = arguments.getReference(i);
-
-        if (arg == option)
-        {
-            if (arg.isShortOption())
-            {
-                if (i < arguments.size() - 1 && ! arguments.getReference (i + 1).isOption())
-                {
-                    auto result = arguments.getReference (i + 1).text;
-                    arguments.removeRange (i, 2);
-                    return result;
-                }
-
-                arguments.remove (i);
-                return {};
-            }
-
-            if (arg.isLongOption())
-            {
-                auto result = arg.getLongOptionValue();
-                arguments.remove (i);
-                return result;
-            }
-        }
-    }
-
-    return {};
-}
-
 File ArgumentList::getFileForOption (StringRef option) const
 {
-    return resolveFilenameForOption (*this, option, getValueForOption (option));
-}
+    auto text = getValueForOption (option);
 
-File ArgumentList::getFileForOptionAndRemove (StringRef option)
-{
-    return resolveFilenameForOption (*this, option, removeValueForOption (option));
+    if (text.isEmpty())
+    {
+        failIfOptionIsMissing (option);
+        ConsoleApplication::fail ("Expected a filename after the " + option + " option");
+    }
+
+    return resolveFilename (text);
 }
 
 File ArgumentList::getExistingFileForOption (StringRef option) const
 {
-    return checkFileExists (getFileForOption (option));
-}
-
-File ArgumentList::getExistingFileForOptionAndRemove (StringRef option)
-{
-    return checkFileExists (getFileForOptionAndRemove (option));
+    auto file = getFileForOption (option);
+    checkFileExists (file);
+    return file;
 }
 
 File ArgumentList::getExistingFolderForOption (StringRef option) const
 {
-    return checkFolderExists (getFileForOption (option));
-}
-
-File ArgumentList::getExistingFolderForOptionAndRemove (StringRef option)
-{
-    return checkFolderExists (getFileForOptionAndRemove (option));
+    auto file = getFileForOption (option);
+    checkFolderExists (file);
+    return file;
 }
 
 //==============================================================================
@@ -333,15 +268,11 @@ const ConsoleApplication::Command* ConsoleApplication::findCommand (const Argume
 
 int ConsoleApplication::findAndRunCommand (const ArgumentList& args, bool optionMustBeFirstArg) const
 {
-    return invokeCatchingFailures ([&args, optionMustBeFirstArg, this]
-    {
-        if (auto c = findCommand (args, optionMustBeFirstArg))
-            c->command (args);
-        else
-            fail ("Unrecognised arguments");
+    if (auto c = findCommand (args, optionMustBeFirstArg))
+        return invokeCatchingFailures ([=] { c->command (args); return 0; });
 
-        return 0;
-    });
+    fail ("Unrecognised arguments");
+    return 0;
 }
 
 int ConsoleApplication::findAndRunCommand (int argc, char* argv[]) const
@@ -389,51 +320,37 @@ const std::vector<ConsoleApplication::Command>& ConsoleApplication::getCommands(
     return commands;
 }
 
-static String getExeNameAndArgs (const ArgumentList& args, const ConsoleApplication::Command& command)
+void ConsoleApplication::printCommandList (const ArgumentList& args) const
 {
     auto exeName = args.executableName.fromLastOccurrenceOf ("/", false, false)
                                       .fromLastOccurrenceOf ("\\", false, false);
 
-    return " " + exeName + " " + command.argumentDescription;
-}
-
-static void printCommandDescription (const ArgumentList& args, const ConsoleApplication::Command& command,
-                                     int descriptionIndent)
-{
-    auto nameAndArgs = getExeNameAndArgs (args, command);
-
-    if (nameAndArgs.length() > descriptionIndent)
-        std::cout << nameAndArgs << std::endl << String().paddedRight (' ', descriptionIndent);
-    else
-        std::cout << nameAndArgs.paddedRight (' ', descriptionIndent);
-
-    std::cout << command.shortDescription << std::endl;
-}
-
-void ConsoleApplication::printCommandList (const ArgumentList& args) const
-{
+    StringArray namesAndArgs;
     int descriptionIndent = 0;
 
     for (auto& c : commands)
-        descriptionIndent = std::max (descriptionIndent, getExeNameAndArgs (args, c).length());
+    {
+        auto nameAndArgs = exeName + " " + c.argumentDescription;
+        namesAndArgs.add (nameAndArgs);
+        descriptionIndent = std::max (descriptionIndent, nameAndArgs.length());
+    }
 
-    descriptionIndent = std::min (descriptionIndent + 2, 40);
+    descriptionIndent = std::min (descriptionIndent + 1, 40);
 
-    for (auto& c : commands)
-        printCommandDescription (args, c, descriptionIndent);
+    for (size_t i = 0; i < commands.size(); ++i)
+    {
+        auto nameAndArgs = namesAndArgs[(int) i];
+        std::cout << ' ';
+
+        if (nameAndArgs.length() > descriptionIndent)
+            std::cout << nameAndArgs << std::endl << String::repeatedString (" ", descriptionIndent + 1);
+        else
+            std::cout << nameAndArgs.paddedRight (' ', descriptionIndent);
+
+        std::cout << commands[i].shortDescription << std::endl;
+    }
 
     std::cout << std::endl;
 }
-
-void ConsoleApplication::printCommandDetails (const ArgumentList& args, const Command& command) const
-{
-    auto len = getExeNameAndArgs (args, command).length();
-
-    printCommandDescription (args, command, std::min (len + 3, 40));
-
-    if (command.longDescription.isNotEmpty())
-        std::cout << std::endl << command.longDescription << std::endl;
-}
-
 
 } // namespace juce

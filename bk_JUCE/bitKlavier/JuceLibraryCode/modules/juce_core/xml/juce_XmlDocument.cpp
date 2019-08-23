@@ -28,34 +28,26 @@ XmlDocument::XmlDocument (const File& file)  : inputSource (new FileInputSource 
 
 XmlDocument::~XmlDocument() {}
 
-std::unique_ptr<XmlElement> XmlDocument::parse (const File& file)
+XmlElement* XmlDocument::parse (const File& file)
 {
-    return XmlDocument (file).getDocumentElement();
+    XmlDocument doc (file);
+    return doc.getDocumentElement();
 }
 
-std::unique_ptr<XmlElement> XmlDocument::parse (const String& textToParse)
+XmlElement* XmlDocument::parse (const String& xmlData)
 {
-    return XmlDocument (textToParse).getDocumentElement();
+    XmlDocument doc (xmlData);
+    return doc.getDocumentElement();
 }
 
 std::unique_ptr<XmlElement> parseXML (const String& textToParse)
 {
-    return XmlDocument (textToParse).getDocumentElement();
+    return std::unique_ptr<XmlElement> (XmlDocument::parse (textToParse));
 }
 
-std::unique_ptr<XmlElement> parseXML (const File& file)
+std::unique_ptr<XmlElement> parseXML (const File& fileToParse)
 {
-    return XmlDocument (file).getDocumentElement();
-}
-
-std::unique_ptr<XmlElement> parseXMLIfTagMatches (const String& textToParse, StringRef requiredTag)
-{
-    return XmlDocument (textToParse).getDocumentElementIfTagMatches (requiredTag);
-}
-
-std::unique_ptr<XmlElement> parseXMLIfTagMatches (const File& file, StringRef requiredTag)
-{
-    return XmlDocument (file).getDocumentElementIfTagMatches (requiredTag);
+    return std::unique_ptr<XmlElement> (XmlDocument::parse (fileToParse));
 }
 
 void XmlDocument::setInputSource (InputSource* newSource) noexcept
@@ -80,7 +72,7 @@ namespace XmlIdentifierChars
     {
         static const uint32 legalChars[] = { 0, 0x7ff6000, 0x87fffffe, 0x7fffffe, 0 };
 
-        return ((int) c < (int) numElementsInArray (legalChars) * 32) ? ((legalChars [c >> 5] & (uint32) (1 << (c & 31))) != 0)
+        return ((int) c < (int) numElementsInArray (legalChars) * 32) ? ((legalChars [c >> 5] & (1 << (c & 31))) != 0)
                                                                       : isIdentifierCharSlow (c);
     }
 
@@ -107,7 +99,7 @@ namespace XmlIdentifierChars
     }
 }
 
-std::unique_ptr<XmlElement> XmlDocument::getDocumentElement (const bool onlyReadOuterDocumentElement)
+XmlElement* XmlDocument::getDocumentElement (const bool onlyReadOuterDocumentElement)
 {
     if (originalText.isEmpty() && inputSource != nullptr)
     {
@@ -147,15 +139,6 @@ std::unique_ptr<XmlElement> XmlDocument::getDocumentElement (const bool onlyRead
     return parseDocumentElement (originalText.getCharPointer(), onlyReadOuterDocumentElement);
 }
 
-std::unique_ptr<XmlElement> XmlDocument::getDocumentElementIfTagMatches (StringRef requiredTag)
-{
-    if (auto xml = getDocumentElement (true))
-        if (xml->hasTagName (requiredTag))
-            return getDocumentElement (false);
-
-    return {};
-}
-
 const String& XmlDocument::getLastParseError() const noexcept
 {
     return lastError;
@@ -193,8 +176,8 @@ juce_wchar XmlDocument::readNextChar() noexcept
     return c;
 }
 
-std::unique_ptr<XmlElement> XmlDocument::parseDocumentElement (String::CharPointerType textToParse,
-                                                               bool onlyReadOuterDocumentElement)
+XmlElement* XmlDocument::parseDocumentElement (String::CharPointerType textToParse,
+                                               const bool onlyReadOuterDocumentElement)
 {
     input = textToParse;
     errorOccurred = false;
@@ -219,10 +202,10 @@ std::unique_ptr<XmlElement> XmlDocument::parseDocumentElement (String::CharPoint
         std::unique_ptr<XmlElement> result (readNextElement (! onlyReadOuterDocumentElement));
 
         if (! errorOccurred)
-            return result;
+            return result.release();
     }
 
-    return {};
+    return nullptr;
 }
 
 bool XmlDocument::parseHeader()

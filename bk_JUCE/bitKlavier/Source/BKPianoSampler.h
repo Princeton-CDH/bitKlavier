@@ -100,6 +100,7 @@ private:
      */
     
     bool isSoundfont;
+
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerSound)
 };
@@ -142,7 +143,9 @@ public:
                     uint64 length,
                     uint64 voiceRampOn,
                     uint64 voiceRampOff,
-                    BKSynthesiserSound* sound
+                    BKSynthesiserSound* sound,
+					float BlendronicLevel,
+					BKDelay::Ptr bDelay
                     ) override;
     
     void startNote (int midiNoteNumber,
@@ -158,7 +161,9 @@ public:
                     uint64 adsrDecay,
                     float adsrSustain,
                     uint64 adsrRelease,
-                    BKSynthesiserSound* sound
+                    BKSynthesiserSound* sound,
+					float BlendronicLevel,
+					BKDelay::Ptr bDelay
                     ) override;
     
     void updatePitch(const BKPianoSamplerSound* const sound);
@@ -178,7 +183,7 @@ public:
     void processSoundfontNoLoop(AudioSampleBuffer& outputBuffer,
                                  int startSample, int numSamples,
                                  const BKPianoSamplerSound* playingSound);
-    
+
     void processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                                 int startSample, int numSamples,
                                 const BKPianoSamplerSound* playingSound);
@@ -231,7 +236,10 @@ private:
     
     bool inLoop;
     stk::ADSR lastIn, lastOut;
-    
+
+	float blendronicLevel;
+	BKDelay::Ptr bDelay;
+
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)
 };

@@ -624,7 +624,7 @@ void DirectPreparationEditor::fillSelectCB(int last, int current)
         
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("Direct"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
@@ -755,7 +755,7 @@ void DirectModificationEditor::fillSelectCB(int last, int current)
         int Id = prep->getId();;
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("DirectMod"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);

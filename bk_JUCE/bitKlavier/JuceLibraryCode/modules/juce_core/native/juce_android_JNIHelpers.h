@@ -31,18 +31,18 @@ template <typename JavaType>
 class LocalRef
 {
 public:
-    explicit inline LocalRef() noexcept                 : obj (nullptr) {}
+    explicit inline LocalRef() noexcept                 : obj (0) {}
     explicit inline LocalRef (JavaType o) noexcept      : obj (o) {}
     inline LocalRef (const LocalRef& other) noexcept    : obj (retain (other.obj)) {}
-    inline LocalRef (LocalRef&& other) noexcept         : obj (nullptr) { std::swap (obj, other.obj); }
+    inline LocalRef (LocalRef&& other) noexcept         : obj (0) { std::swap (obj, other.obj); }
     ~LocalRef()                                         { clear(); }
 
     void clear()
     {
-        if (obj != nullptr)
+        if (obj != 0)
         {
             getEnv()->DeleteLocalRef (obj);
-            obj = nullptr;
+            obj = 0;
         }
     }
 
@@ -69,7 +69,7 @@ private:
 
     static JavaType retain (JavaType obj)
     {
-        return obj == nullptr ? nullptr : (JavaType) getEnv()->NewLocalRef (obj);
+        return obj == 0 ? 0 : (JavaType) getEnv()->NewLocalRef (obj);
     }
 };
 
@@ -77,21 +77,21 @@ private:
 class GlobalRef
 {
 public:
-    inline GlobalRef() noexcept                             : obj (nullptr) {}
+    inline GlobalRef() noexcept                             : obj (0) {}
     inline explicit GlobalRef (const LocalRef<jobject>& o)  : obj (retain (o.get(), getEnv())) {}
     inline explicit GlobalRef (const LocalRef<jobject>& o, JNIEnv* env)  : obj (retain (o.get(), env)) {}
     inline GlobalRef (const GlobalRef& other)           : obj (retain (other.obj, getEnv())) {}
-    inline GlobalRef (GlobalRef && other) noexcept      : obj (nullptr) { std::swap (other.obj, obj); }
+    inline GlobalRef (GlobalRef && other) noexcept      : obj (0) { std::swap (other.obj, obj); }
     ~GlobalRef()                                             { clear(); }
 
 
-    inline void clear()                                 { if (obj != nullptr) clear (getEnv()); }
+    inline void clear()                                 { if (obj != 0) clear (getEnv()); }
     inline void clear (JNIEnv* env)
     {
-        if (obj != nullptr)
+        if (obj != 0)
         {
             env->DeleteGlobalRef (obj);
-            obj = nullptr;
+            obj = 0;
         }
     }
 
@@ -147,11 +147,11 @@ public:
 
 private:
     //==============================================================================
-    jobject obj = nullptr;
+    jobject obj = 0;
 
     static inline jobject retain (jobject obj, JNIEnv* env)
     {
-        return obj == nullptr ? nullptr : env->NewGlobalRef (obj);
+        return obj == 0 ? 0 : env->NewGlobalRef (obj);
     }
 };
 
@@ -193,7 +193,7 @@ private:
     size_t byteCodeSize;
 
     int minSDK;
-    jclass classRef = nullptr;
+    jclass classRef = 0;
 
     static Array<JNIClassBase*>& getClasses();
     void initialise (JNIEnv*);
@@ -523,23 +523,22 @@ DECLARE_JNI_CLASS (AndroidUri, "android/net/Uri")
 #undef JNI_CLASS_MEMBERS
 
 #define JNI_CLASS_MEMBERS(METHOD, STATICMETHOD, FIELD, STATICFIELD, CALLBACK) \
- METHOD (construct,                 "<init>",                    "(Landroid/content/Context;)V") \
- METHOD (layout,                    "layout",                    "(IIII)V") \
- METHOD (getLeft,                   "getLeft",                   "()I") \
- METHOD (getTop,                    "getTop",                    "()I") \
- METHOD (getWidth,                  "getWidth",                  "()I") \
- METHOD (getHeight,                 "getHeight",                 "()I") \
- METHOD (getLocationOnScreen,       "getLocationOnScreen",       "([I)V") \
- METHOD (getParent,                 "getParent",                 "()Landroid/view/ViewParent;") \
- METHOD (bringToFront,              "bringToFront",              "()V") \
- METHOD (requestFocus,              "requestFocus",              "()Z") \
- METHOD (hasFocus,                  "hasFocus",                  "()Z") \
- METHOD (invalidate,                "invalidate",                "(IIII)V") \
- METHOD (setVisibility,             "setVisibility",             "(I)V") \
- METHOD (setLayoutParams,           "setLayoutParams",           "(Landroid/view/ViewGroup$LayoutParams;)V") \
- METHOD (setSystemUiVisibility,     "setSystemUiVisibility",     "(I)V") \
- METHOD (findViewById,              "findViewById",              "(I)Landroid/view/View;") \
- METHOD (getRootView,               "getRootView",               "()Landroid/view/View;") \
+ METHOD (construct,           "<init>",              "(Landroid/content/Context;)V") \
+ METHOD (layout,              "layout",              "(IIII)V") \
+ METHOD (getLeft,             "getLeft",             "()I") \
+ METHOD (getTop,              "getTop",              "()I") \
+ METHOD (getWidth,            "getWidth",            "()I") \
+ METHOD (getHeight,           "getHeight",           "()I") \
+ METHOD (getLocationOnScreen, "getLocationOnScreen", "([I)V") \
+ METHOD (getParent,           "getParent",           "()Landroid/view/ViewParent;") \
+ METHOD (bringToFront,        "bringToFront",        "()V") \
+ METHOD (requestFocus,        "requestFocus",        "()Z") \
+ METHOD (hasFocus,            "hasFocus",            "()Z") \
+ METHOD (invalidate,          "invalidate",          "(IIII)V") \
+ METHOD (setVisibility,       "setVisibility",       "(I)V") \
+ METHOD (setLayoutParams,     "setLayoutParams",     "(Landroid/view/ViewGroup$LayoutParams;)V") \
+ METHOD (findViewById,        "findViewById",        "(I)Landroid/view/View;") \
+ METHOD (getRootView,         "getRootView",         "()Landroid/view/View;") \
  METHOD (addOnLayoutChangeListener, "addOnLayoutChangeListener", "(Landroid/view/View$OnLayoutChangeListener;)V")
 
 DECLARE_JNI_CLASS (AndroidView, "android/view/View")
@@ -756,7 +755,7 @@ namespace
 {
     inline String juceString (JNIEnv* env, jstring s)
     {
-        if (s == nullptr)
+        if (s == 0)
             return {};
 
         const char* const utf8 = env->GetStringUTFChars (s, nullptr);
@@ -890,7 +889,7 @@ private:
 //==============================================================================
 struct SurfaceHolderCallback    : AndroidInterfaceImplementer
 {
-    virtual ~SurfaceHolderCallback() override = default;
+    virtual ~SurfaceHolderCallback() {}
 
     virtual void surfaceChanged (LocalRef<jobject> holder, int format, int width, int height) = 0;
     virtual void surfaceCreated (LocalRef<jobject> holder) = 0;
@@ -967,7 +966,7 @@ public:
 //==============================================================================
 // Allows you to start an activity without requiring to have an activity
 void startAndroidActivityForResult (const LocalRef<jobject>& intent, int requestCode,
-                                    std::function<void(int, int, LocalRef<jobject>)> && callback);
+                                    std::function<void (int, int, LocalRef<jobject>)> && callback);
 
 //==============================================================================
 bool androidHasSystemFeature (const String& property);

@@ -522,7 +522,7 @@ public:
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
-                    if (attr == String::empty) break;
+                    if (attr == String()) break;
                     else
                     {
                         f = attr.getFloatValue();

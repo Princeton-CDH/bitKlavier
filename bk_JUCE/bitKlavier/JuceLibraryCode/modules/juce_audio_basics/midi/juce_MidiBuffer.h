@@ -177,6 +177,9 @@ public:
         /** Creates a copy of an iterator. */
         Iterator (const Iterator&) = default;
 
+        // VS2013 requires this, even if it's unused.
+        Iterator& operator= (const Iterator&) = delete;
+
         /** Destructor. */
         ~Iterator() noexcept;
 

@@ -62,7 +62,7 @@ public:
 
     //==============================================================================
     /** @internal */
-    std::unique_ptr<Drawable> createCopy() const override;
+    Drawable* createCopy() const override;
 
 private:
     Parallelogram<float> bounds;

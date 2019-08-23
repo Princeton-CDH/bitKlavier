@@ -80,17 +80,13 @@ String ChildProcess::readAllProcessOutput()
     return result.toString();
 }
 
-
-//==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
 class ChildProcessTests  : public UnitTest
 {
 public:
-    ChildProcessTests()
-        : UnitTest ("ChildProcess", UnitTestCategories::threads)
-    {}
+    ChildProcessTests() : UnitTest ("ChildProcess", "Threads") {}
 
     void runTest() override
     {
@@ -105,8 +101,8 @@ public:
         expect (p.start ("ls /"));
        #endif
 
-        auto output = p.readAllProcessOutput();
-        expect (output.isNotEmpty());
+        //String output (p.readAllProcessOutput());
+        //expect (output.isNotEmpty());
       #endif
     }
 };

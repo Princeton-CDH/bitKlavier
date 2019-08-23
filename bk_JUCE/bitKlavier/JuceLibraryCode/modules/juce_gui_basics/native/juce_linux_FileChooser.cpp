@@ -46,8 +46,7 @@ public:
         : owner (fileChooser),
           isDirectory         ((flags & FileBrowserComponent::canSelectDirectories)   != 0),
           isSave              ((flags & FileBrowserComponent::saveMode)               != 0),
-          selectMultipleFiles ((flags & FileBrowserComponent::canSelectMultipleItems) != 0),
-          warnAboutOverwrite  ((flags & FileBrowserComponent::warnAboutOverwriting)   != 0)
+          selectMultipleFiles ((flags & FileBrowserComponent::canSelectMultipleItems) != 0)
     {
         const File previousWorkingDirectory (File::getCurrentWorkingDirectory());
 
@@ -58,7 +57,7 @@ public:
             addZenityArgs();
     }
 
-    ~Native() override
+    ~Native()
     {
         finish (true);
     }
@@ -82,7 +81,7 @@ public:
 
 private:
     FileChooser& owner;
-    bool isDirectory, isSave, selectMultipleFiles, warnAboutOverwrite;
+    bool isDirectory, isSave, selectMultipleFiles;
 
     ChildProcess child;
     StringArray args;
@@ -194,9 +193,6 @@ private:
     {
         args.add ("zenity");
         args.add ("--file-selection");
-
-        if (warnAboutOverwrite)
-            args.add("--confirm-overwrite");
 
         if (owner.title.isNotEmpty())
             args.add ("--title=" + owner.title);

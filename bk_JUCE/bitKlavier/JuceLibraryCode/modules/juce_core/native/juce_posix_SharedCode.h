@@ -271,7 +271,7 @@ namespace
         return statfs (f.getFullPathName().toUTF8(), &result) == 0;
     }
 
-   #if JUCE_MAC || JUCE_IOS
+   #if (JUCE_MAC && MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5) || JUCE_IOS
     static int64 getCreationTime (const juce_statStruct& s) noexcept     { return (int64) s.st_birthtime; }
    #else
     static int64 getCreationTime (const juce_statStruct& s) noexcept     { return (int64) s.st_ctime; }
@@ -402,7 +402,7 @@ void File::getFileTimesInternal (int64& modificationTime, int64& accessTime, int
     {
         modificationTime  = (int64) info.st_mtime * 1000;
         accessTime        = (int64) info.st_atime * 1000;
-       #if JUCE_MAC || JUCE_IOS
+       #if (JUCE_MAC && MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_5) || JUCE_IOS
         creationTime      = (int64) info.st_birthtime * 1000;
        #else
         creationTime      = (int64) info.st_ctime * 1000;
@@ -887,7 +887,8 @@ void JUCE_API juce_threadEntryPoint (void*);
 extern JavaVM* androidJNIJavaVM;
 #endif
 
-static void* threadEntryProc (void* userData)
+extern "C" void* threadEntryProc (void*);
+extern "C" void* threadEntryProc (void* userData)
 {
     auto* myself = static_cast<Thread*> (userData);
 
@@ -1043,8 +1044,8 @@ void JUCE_CALLTYPE Thread::setCurrentThreadAffinityMask (uint32 affinityMask)
     CPU_ZERO (&affinity);
 
     for (int i = 0; i < 32; ++i)
-        if ((affinityMask & (uint32) (1 << i)) != 0)
-            CPU_SET ((size_t) i, &affinity);
+        if ((affinityMask & (1 << i)) != 0)
+            CPU_SET (i, &affinity);
 
    #if (! JUCE_ANDROID) && ((! JUCE_LINUX) || ((__GLIBC__ * 1000 + __GLIBC_MINOR__) >= 2004))
     pthread_setaffinity_np (pthread_self(), sizeof (cpu_set_t), &affinity);
@@ -1154,7 +1155,7 @@ public:
                 argv.add (nullptr);
 
                 execvp (exe.toRawUTF8(), argv.getRawDataPointer());
-                _exit (-1);
+                exit (-1);
             }
             else
             {
@@ -1175,24 +1176,14 @@ public:
             close (pipeHandle);
     }
 
-    bool isRunning() noexcept
+    bool isRunning() const noexcept
     {
         if (childPID == 0)
             return false;
 
         int childState;
         auto pid = waitpid (childPID, &childState, WNOHANG);
-
-        if (pid == 0)
-            return true;
-
-        if (WIFEXITED (childState))
-        {
-            exitCode = WEXITSTATUS (childState);
-            return false;
-        }
-
-        return ! WIFSIGNALED (childState);
+        return pid == 0 || ! (WIFEXITED (childState) || WIFSIGNALED (childState));
     }
 
     int read (void* dest, int numBytes) noexcept
@@ -1207,21 +1198,7 @@ public:
             readHandle = fdopen (pipeHandle, "r");
 
         if (readHandle != nullptr)
-        {
-            for (;;)
-            {
-                auto numBytesRead = (int) fread (dest, 1, (size_t) numBytes, readHandle);
-
-                if (numBytesRead > 0 || feof (readHandle))
-                    return numBytesRead;
-
-                // signal occured during fread() so try again
-                if (ferror (readHandle) && errno == EINTR)
-                    continue;
-
-                break;
-            }
-        }
+            return (int) fread (dest, 1, (size_t) numBytes, readHandle);
 
         return 0;
     }
@@ -1231,21 +1208,15 @@ public:
         return ::kill (childPID, SIGKILL) == 0;
     }
 
-    uint32 getExitCode() noexcept
+    uint32 getExitCode() const noexcept
     {
-        if (exitCode >= 0)
-            return (uint32) exitCode;
-
         if (childPID != 0)
         {
             int childState = 0;
             auto pid = waitpid (childPID, &childState, WNOHANG);
 
             if (pid >= 0 && WIFEXITED (childState))
-            {
-                exitCode = WEXITSTATUS (childState);
-                return (uint32) exitCode;
-            }
+                return WEXITSTATUS (childState);
         }
 
         return 0;
@@ -1253,7 +1224,6 @@ public:
 
     int childPID = 0;
     int pipeHandle = 0;
-    int exitCode = -1;
     FILE* readHandle = {};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ActiveProcess)
@@ -1351,7 +1321,7 @@ struct HighResolutionTimer::Pimpl
     }
 
     HighResolutionTimer& owner;
-    std::atomic<int> periodMs { 0 };
+    std::atomic<int> periodMs;
 
 private:
     pthread_t thread = {};

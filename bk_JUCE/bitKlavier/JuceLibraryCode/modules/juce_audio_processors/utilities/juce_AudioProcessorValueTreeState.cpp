@@ -32,24 +32,24 @@ AudioProcessorValueTreeState::Parameter::Parameter (const String& parameterID,
                                                     const String& parameterName,
                                                     const String& labelText,
                                                     NormalisableRange<float> valueRange,
-                                                    float defaultParameterValue,
-                                                    std::function<String(float)> valueToTextFunction,
-                                                    std::function<float(const String&)> textToValueFunction,
+                                                    float defaultValue,
+                                                    std::function<String (float)> valueToTextFunction,
+                                                    std::function<float (const String&)> textToValueFunction,
                                                     bool isMetaParameter,
                                                     bool isAutomatableParameter,
                                                     bool isDiscrete,
-                                                    AudioProcessorParameter::Category parameterCategory,
+                                                    AudioProcessorParameter::Category category,
                                                     bool isBoolean)
     : AudioParameterFloat (parameterID,
                            parameterName,
                            valueRange,
-                           defaultParameterValue,
+                           defaultValue,
                            labelText,
-                           parameterCategory,
-                           valueToTextFunction == nullptr ? std::function<String(float v, int)>()
+                           category,
+                           valueToTextFunction == nullptr ? std::function<String (float v, int)>()
                                                           : [valueToTextFunction](float v, int) { return valueToTextFunction (v); },
                            std::move (textToValueFunction)),
-      unsnappedDefault (valueRange.convertTo0to1 (defaultParameterValue)),
+      unsnappedDefault (valueRange.convertTo0to1 (defaultValue)),
       metaParameter (isMetaParameter),
       automatable (isAutomatableParameter),
       discrete (isDiscrete),
@@ -64,15 +64,6 @@ bool AudioProcessorValueTreeState::Parameter::isMetaParameter() const   { return
 bool AudioProcessorValueTreeState::Parameter::isAutomatable() const     { return automatable; }
 bool AudioProcessorValueTreeState::Parameter::isDiscrete() const        { return discrete; }
 bool AudioProcessorValueTreeState::Parameter::isBoolean() const         { return boolean; }
-
-void AudioProcessorValueTreeState::Parameter::valueChanged (float newValue)
-{
-    if (lastValue == newValue)
-        return;
-
-    lastValue = newValue;
-    sendValueChangedMessageToListeners (newValue);
-}
 
 //==============================================================================
 class AudioProcessorValueTreeState::ParameterAdapter   : private AudioProcessorParameter::Listener
@@ -261,8 +252,8 @@ RangedAudioParameter* AudioProcessorValueTreeState::createAndAddParameter (const
                                                                            const String& labelText,
                                                                            NormalisableRange<float> range,
                                                                            float defaultVal,
-                                                                           std::function<String(float)> valueToTextFunction,
-                                                                           std::function<float(const String&)> textToValueFunction,
+                                                                           std::function<String (float)> valueToTextFunction,
+                                                                           std::function<float (const String&)> textToValueFunction,
                                                                            bool isMetaParameter,
                                                                            bool isAutomatableParameter,
                                                                            bool isDiscreteParameter,
@@ -285,9 +276,6 @@ RangedAudioParameter* AudioProcessorValueTreeState::createAndAddParameter (const
 
 RangedAudioParameter* AudioProcessorValueTreeState::createAndAddParameter (std::unique_ptr<RangedAudioParameter> param)
 {
-    if (param == nullptr)
-        return nullptr;
-
     // All parameters must be created before giving this manager a ValueTree state!
     jassert (! state.isValid());
 
@@ -423,11 +411,18 @@ void AudioProcessorValueTreeState::valueTreeChildAdded (ValueTree& parent, Value
         setNewState (tree);
 }
 
+void AudioProcessorValueTreeState::valueTreeChildRemoved (ValueTree&, ValueTree&, int)
+{
+}
+
 void AudioProcessorValueTreeState::valueTreeRedirected (ValueTree& v)
 {
     if (v == state)
         updateParameterConnectionsToChildTrees();
 }
+
+void AudioProcessorValueTreeState::valueTreeChildOrderChanged (ValueTree&, int, int) {}
+void AudioProcessorValueTreeState::valueTreeParentChanged (ValueTree&) {}
 
 bool AudioProcessorValueTreeState::flushParameterValuesToValueTree()
 {
@@ -544,42 +539,46 @@ struct AudioProcessorValueTreeState::SliderAttachment::Pimpl  : private Attached
             slider.setDoubleClickReturnValue (true, range.convertFrom0to1 (param->getParameter().getDefaultValue()));
         }
 
-        auto convertFrom0To1Function = [range](double currentRangeStart,
-                                               double currentRangeEnd,
-                                               double normalisedValue) mutable
+        if (range.interval != 0.0f || range.skew != 1.0f)
         {
-            range.start = (float) currentRangeStart;
-            range.end = (float) currentRangeEnd;
-            return (double) range.convertFrom0to1 ((float) normalisedValue);
-        };
-
-        auto convertTo0To1Function = [range](double currentRangeStart,
-                                             double currentRangeEnd,
-                                             double mappedValue) mutable
+            slider.setRange (range.start, range.end, range.interval);
+            slider.setSkewFactor (range.skew, range.symmetricSkew);
+        }
+        else
         {
-            range.start = (float) currentRangeStart;
-            range.end = (float) currentRangeEnd;
-            return (double) range.convertTo0to1 ((float) mappedValue);
-        };
+            auto convertFrom0To1Function = [range](double currentRangeStart,
+                                                   double currentRangeEnd,
+                                                   double normalisedValue) mutable
+            {
+                range.start = (float) currentRangeStart;
+                range.end = (float) currentRangeEnd;
+                return (double) range.convertFrom0to1 ((float) normalisedValue);
+            };
 
-        auto snapToLegalValueFunction = [range](double currentRangeStart,
-                                                double currentRangeEnd,
-                                                double valueToSnap) mutable
-        {
-            range.start = (float) currentRangeStart;
-            range.end = (float) currentRangeEnd;
-            return (double) range.snapToLegalValue ((float) valueToSnap);
-        };
+            auto convertTo0To1Function = [range](double currentRangeStart,
+                                                 double currentRangeEnd,
+                                                 double mappedValue) mutable
+            {
+                range.start = (float) currentRangeStart;
+                range.end = (float) currentRangeEnd;
+                return (double) range.convertTo0to1 ((float) mappedValue);
+            };
 
-        NormalisableRange<double> newRange { (double) range.start,
-                                             (double) range.end,
-                                             convertFrom0To1Function,
-                                             convertTo0To1Function,
-                                             snapToLegalValueFunction };
-        newRange.interval = (double) range.interval;
-        newRange.skew = (double) range.skew;
+            auto snapToLegalValueFunction = [range](double currentRangeStart,
+                                                    double currentRangeEnd,
+                                                    double valueToSnap) mutable
+            {
+                range.start = (float) currentRangeStart;
+                range.end = (float) currentRangeEnd;
+                return (double) range.snapToLegalValue ((float) valueToSnap);
+            };
 
-        slider.setNormalisableRange (newRange);
+            slider.setNormalisableRange ({ (double) range.start,
+                                           (double) range.end,
+                                           convertFrom0To1Function,
+                                           convertTo0To1Function,
+                                           snapToLegalValueFunction });
+        }
 
         sendInitialUpdate();
         slider.addListener (this);
@@ -748,16 +747,11 @@ AudioProcessorValueTreeState::ButtonAttachment::ButtonAttachment (AudioProcessor
 
 AudioProcessorValueTreeState::ButtonAttachment::~ButtonAttachment() {}
 
-
-//==============================================================================
-//==============================================================================
 #if JUCE_UNIT_TESTS
 
-struct ParameterAdapterTests  : public UnitTest
+static struct ParameterAdapterTests final   : public UnitTest
 {
-    ParameterAdapterTests()
-        : UnitTest ("Parameter Adapter", UnitTestCategories::audioProcessorParameters)
-    {}
+    ParameterAdapterTests() : UnitTest ("Parameter Adapter") {}
 
     void runTest() override
     {
@@ -825,9 +819,7 @@ struct ParameterAdapterTests  : public UnitTest
             test ({ 0, 7.5 }, "2.5", 2.5);
         }
     }
-};
-
-static ParameterAdapterTests parameterAdapterTests;
+} parameterAdapterTests;
 
 namespace
 {
@@ -847,7 +839,7 @@ inline bool operator!= (const NormalisableRange<ValueType>& a,
 }
 } // namespace
 
-class AudioProcessorValueTreeStateTests  : public UnitTest
+static class AudioProcessorValueTreeStateTests final   : public UnitTest
 {
 private:
     using Parameter = AudioProcessorValueTreeState::Parameter;
@@ -866,7 +858,6 @@ private:
         void prepareToPlay (double, int) override {}
         void releaseResources() override {}
         void processBlock (AudioBuffer<float>&, MidiBuffer&) override {}
-        using AudioProcessor::processBlock;
         double getTailLengthSeconds() const override { return {}; }
         bool acceptsMidi() const override { return {}; }
         bool producesMidi() const override { return {}; }
@@ -896,9 +887,7 @@ private:
     };
 
 public:
-    AudioProcessorValueTreeStateTests()
-        : UnitTest ("Audio Processor Value Tree State", UnitTestCategories::audioProcessorParameters)
-    {}
+    AudioProcessorValueTreeStateTests() : UnitTest ("Audio Processor Value Tree State", "AudioProcessor parameters") {}
 
     void runTest() override
     {
@@ -1103,7 +1092,7 @@ public:
 
             TestAudioProcessor proc (std::make_unique<AudioParameterInt> (key, "", min, max, 0));
 
-            expect (proc.state.getParameterRange (key) == NormalisableRange<float> (float (min), float (max), 1.0f));
+            expect (proc.state.getParameterRange (key) == NormalisableRange<float> (float (min), float (max)));
         }
 
         beginTest ("Choice parameters retain their specified range");
@@ -1113,7 +1102,7 @@ public:
 
             TestAudioProcessor proc (std::make_unique<AudioParameterChoice> (key, "", choices, 0));
 
-            expect (proc.state.getParameterRange (key) == NormalisableRange<float> (0.0f, (float) (choices.size() - 1), 1.0f));
+            expect (proc.state.getParameterRange (key) == NormalisableRange<float> (0.0f, (float) (choices.size() - 1)));
             expect (proc.state.getParameter (key)->getNumSteps() == choices.size());
         }
 
@@ -1184,9 +1173,7 @@ public:
             expectEquals (listener.id, String (key));
         }
     }
-};
-
-static AudioProcessorValueTreeStateTests audioProcessorValueTreeStateTests;
+} audioProcessorValueTreeStateTests;
 
 #endif
 

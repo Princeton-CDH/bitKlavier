@@ -210,7 +210,7 @@ void Tuning::setState(XmlElement* e)
     
     String n = e->getStringAttribute("name");
     
-    if (n != String::empty)     name = n;
+    if (n != String())     name = n;
     else                        name = String(Id);
     
     

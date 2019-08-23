@@ -115,7 +115,7 @@ public:
         }
     }
 
-    ~Native() override
+    ~Native()
     {
         exitModalState (0);
     }

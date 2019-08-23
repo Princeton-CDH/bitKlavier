@@ -28,9 +28,7 @@ namespace juce
 class ReferenceCountedArrayTests   : public UnitTest
 {
 public:
-    ReferenceCountedArrayTests()
-        : UnitTest ("ReferenceCountedArray", UnitTestCategories::containers)
-    {}
+    ReferenceCountedArrayTests() : UnitTest ("ReferenceCountedArray", "Containers") {}
 
     //==============================================================================
     void runTest() override
@@ -84,7 +82,12 @@ public:
             expectEquals (derivedObject->getReferenceCount(), 1);
 
             baseArray.add (baseObjectPtr);
+
+           #if JUCE_STRICT_REFCOUNTEDPOINTER
+            baseArray.add (derivedObjectPtr);
+           #else
             baseArray.add (derivedObjectPtr.get());
+           #endif
 
             for (auto o : baseArray)
                 expectEquals (o->getReferenceCount(), 2);
@@ -94,34 +97,6 @@ public:
             for (auto o : derivedArray)
                 expectEquals (o->getReferenceCount(), 3);
         }
-
-        beginTest ("Iterate in destructor");
-        {
-            {
-                ReferenceCountedArray<DestructorObj> arr;
-
-                for (int i = 0; i < 2; ++i)
-                    arr.add (new DestructorObj (*this, arr));
-            }
-
-            ReferenceCountedArray<DestructorObj> arr;
-
-            for (int i = 0; i < 1025; ++i)
-                arr.add (new DestructorObj (*this, arr));
-
-            while (! arr.isEmpty())
-                arr.remove (0);
-
-            for (int i = 0; i < 1025; ++i)
-                arr.add (new DestructorObj (*this, arr));
-
-            arr.removeRange (1, arr.size() - 3);
-
-            for (int i = 0; i < 1025; ++i)
-                arr.add (new DestructorObj (*this, arr));
-
-            arr.set (500, new DestructorObj (*this, arr));
-        }
     }
 
 private:
@@ -130,8 +105,6 @@ private:
         using Ptr = ReferenceCountedObjectPtr<TestBaseObj>;
 
         TestBaseObj() = default;
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TestBaseObj)
     };
 
     struct TestDerivedObj : public TestBaseObj
@@ -139,34 +112,6 @@ private:
         using Ptr = ReferenceCountedObjectPtr<TestDerivedObj>;
 
         TestDerivedObj() = default;
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TestDerivedObj)
-    };
-
-    struct DestructorObj : public ReferenceCountedObject
-    {
-        DestructorObj (ReferenceCountedArrayTests& p,
-                       ReferenceCountedArray<DestructorObj>& arr)
-            : parent (p), objectArray (arr)
-        {}
-
-        ~DestructorObj()
-        {
-            data = 0;
-
-            for (auto* o : objectArray)
-            {
-                parent.expect (o != nullptr);
-                parent.expect (o != this);
-                parent.expectEquals (o->data, 374);
-            }
-        }
-
-        ReferenceCountedArrayTests& parent;
-        ReferenceCountedArray<DestructorObj>& objectArray;
-        int data = 374;
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DestructorObj)
     };
 };
 

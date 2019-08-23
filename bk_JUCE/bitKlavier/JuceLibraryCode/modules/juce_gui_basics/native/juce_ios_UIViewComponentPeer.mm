@@ -177,7 +177,7 @@ class UIViewComponentPeer  : public ComponentPeer,
 {
 public:
     UIViewComponentPeer (Component&, int windowStyleFlags, UIView* viewToAttachTo);
-    ~UIViewComponentPeer() override;
+    ~UIViewComponentPeer();
 
     //==============================================================================
     void* getNativeHandle() const override                  { return view; }
@@ -194,9 +194,7 @@ public:
     Rectangle<int> getBounds() const override               { return getBounds (! isSharedWindow); }
     Rectangle<int> getBounds (bool global) const;
     Point<float> localToGlobal (Point<float> relativePosition) override;
-    using ComponentPeer::localToGlobal;
     Point<float> globalToLocal (Point<float> screenPosition) override;
-    using ComponentPeer::globalToLocal;
     void setAlpha (float newAlpha) override;
     void setMinimised (bool) override                       {}
     bool isMinimised() const override                       { return false; }
@@ -902,7 +900,7 @@ void UIViewComponentPeer::handleTouches (UIEvent* event, const bool isDown, cons
 
         if (isUp || isCancel)
         {
-            handleMouseEvent (MouseInputSource::InputSourceType::touch, MouseInputSource::offscreenMousePos, modsToSend,
+            handleMouseEvent (MouseInputSource::InputSourceType::touch, Point<float> (-1.0f, -1.0f), modsToSend,
                               MouseInputSource::invalidPressure, MouseInputSource::invalidOrientation, time, {}, touchIndex);
 
             if (! isValidPeer (this))
@@ -1086,7 +1084,7 @@ void Desktop::allowedOrientationsChanged()
         jassert (i < n);
         i = jmin (n - 1, i);
 
-        NSNumber *value = [NSNumber numberWithInt: (int) Orientations::convertFromJuce (orientations[i])];
+        NSNumber *value = [NSNumber numberWithInt:Orientations::convertFromJuce (orientations[i])];
         [[UIDevice currentDevice] setValue:value forKey:@"orientation"];
         [value release];
     }

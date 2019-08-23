@@ -47,21 +47,18 @@ struct GraphRenderSequence
 
         if (numSamples > maxSamples)
         {
-            // Being asked to render more samples than our buffers have, so divide the buffer into chunks
-            int chunkStartSample = 0;
-            while (chunkStartSample < numSamples)
+            // being asked to render more samples than our buffers have, so slice things up...
+            tempMIDI.clear();
+            tempMIDI.addEvents (midiMessages, maxSamples, numSamples, -maxSamples);
+
             {
-                auto chunkSize = jmin (maxSamples, numSamples - chunkStartSample);
-
-                AudioBuffer<FloatType> audioChunk (buffer.getArrayOfWritePointers(), buffer.getNumChannels(), chunkStartSample, chunkSize);
-                midiChunk.clear();
-                midiChunk.addEvents (midiMessages, chunkStartSample, chunkSize, -chunkStartSample);
-
-                perform (audioChunk, midiChunk, audioPlayHead);
-
-                chunkStartSample += maxSamples;
+                AudioBuffer<FloatType> startAudio (buffer.getArrayOfWritePointers(), buffer.getNumChannels(), maxSamples);
+                midiMessages.clear (maxSamples, numSamples);
+                perform (startAudio, midiMessages, audioPlayHead);
             }
 
+            AudioBuffer<FloatType> endAudio (buffer.getArrayOfWritePointers(), buffer.getNumChannels(), maxSamples, numSamples - maxSamples);
+            perform (endAudio, tempMIDI, audioPlayHead);
             return;
         }
 
@@ -148,7 +145,7 @@ struct GraphRenderSequence
 
         const int defaultMIDIBufferSize = 512;
 
-        midiChunk.ensureSize (defaultMIDIBufferSize);
+        tempMIDI.ensureSize (defaultMIDIBufferSize);
 
         for (auto&& m : midiBuffers)
             m.ensureSize (defaultMIDIBufferSize);
@@ -173,7 +170,7 @@ struct GraphRenderSequence
     MidiBuffer currentMidiOutputBuffer;
 
     Array<MidiBuffer> midiBuffers;
-    MidiBuffer midiChunk;
+    MidiBuffer tempMIDI;
 
 private:
     //==============================================================================
@@ -705,7 +702,7 @@ struct RenderSequenceBuilder
     static int getFreeBuffer (Array<AssignedBuffer>& buffers)
     {
         for (int i = 1; i < buffers.size(); ++i)
-            if (buffers.getReference (i).isFree())
+            if (buffers.getReference(i).isFree())
                 return i;
 
         buffers.add (AssignedBuffer::createFree());
@@ -797,8 +794,8 @@ bool AudioProcessorGraph::Connection::operator< (const Connection& other) const 
 }
 
 //==============================================================================
-AudioProcessorGraph::Node::Node (NodeID n, std::unique_ptr<AudioProcessor> p) noexcept
-    : nodeID (n), processor (std::move (p))
+AudioProcessorGraph::Node::Node (NodeID n, AudioProcessor* p) noexcept
+    : nodeID (n), processor (p)
 {
     jassert (processor != nullptr);
 }
@@ -914,9 +911,9 @@ AudioProcessorGraph::Node* AudioProcessorGraph::getNodeForId (NodeID nodeID) con
     return {};
 }
 
-AudioProcessorGraph::Node::Ptr AudioProcessorGraph::addNode (std::unique_ptr<AudioProcessor> newProcessor, NodeID nodeID)
+AudioProcessorGraph::Node::Ptr AudioProcessorGraph::addNode (AudioProcessor* newProcessor, NodeID nodeID)
 {
-    if (newProcessor == nullptr || newProcessor.get() == this)
+    if (newProcessor == nullptr || newProcessor == this)
     {
         jassertfalse;
         return {};
@@ -927,7 +924,7 @@ AudioProcessorGraph::Node::Ptr AudioProcessorGraph::addNode (std::unique_ptr<Aud
 
     for (auto* n : nodes)
     {
-        if (n->getProcessor() == newProcessor.get() || n->nodeID == nodeID)
+        if (n->getProcessor() == newProcessor || n->nodeID == nodeID)
         {
             jassertfalse; // Cannot add two copies of the same processor, or duplicate node IDs!
             return {};
@@ -939,7 +936,7 @@ AudioProcessorGraph::Node::Ptr AudioProcessorGraph::addNode (std::unique_ptr<Aud
 
     newProcessor->setPlayHead (getPlayHead());
 
-    Node::Ptr n (new Node (nodeID, std::move (newProcessor)));
+    Node::Ptr n (new Node (nodeID, newProcessor));
     nodes.add (n.get());
     n->setParentGraph (this);
     topologyChanged();
@@ -1249,7 +1246,7 @@ void AudioProcessorGraph::prepareToPlay (double sampleRate, int estimatedSamples
     setRateAndBufferSizeDetails (sampleRate, estimatedSamplesPerBlock);
     clearRenderingSequence();
 
-    if (MessageManager::getInstance()->isThisTheMessageThread())
+    if (isNonRealtime() && MessageManager::getInstance()->isThisTheMessageThread())
         handleAsyncUpdate();
     else
         triggerAsyncUpdate();
@@ -1379,7 +1376,7 @@ void AudioProcessorGraph::AudioGraphIOProcessor::fillInPluginDescription (Plugin
     d.uid = d.name.hashCode();
     d.category = "I/O devices";
     d.pluginFormatName = "Internal";
-    d.manufacturerName = "JUCE";
+    d.manufacturerName = "ROLI Ltd.";
     d.version = "1.0";
     d.isInstrument = false;
 

@@ -62,8 +62,8 @@ public:
     */
     ToolbarButton (int itemId,
                    const String& labelText,
-                   std::unique_ptr<Drawable> normalImage,
-                   std::unique_ptr<Drawable> toggledOnImage);
+                   Drawable* normalImage,
+                   Drawable* toggledOnImage);
 
     /** Destructor. */
     ~ToolbarButton() override;
@@ -87,7 +87,7 @@ public:
 private:
     //==============================================================================
     std::unique_ptr<Drawable> normalImage, toggledOnImage;
-    Drawable* currentImage = nullptr;
+    Drawable* currentImage;
 
     void updateDrawable();
     Drawable* getImageToUse() const;

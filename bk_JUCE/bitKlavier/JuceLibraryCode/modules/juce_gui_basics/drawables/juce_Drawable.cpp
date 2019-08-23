@@ -110,11 +110,11 @@ DrawableComposite* Drawable::getParent() const
     return dynamic_cast<DrawableComposite*> (getParentComponent());
 }
 
-void Drawable::setClipPath (std::unique_ptr<Drawable> clipPath)
+void Drawable::setClipPath (Drawable* clipPath)
 {
-    if (drawableClipPath != clipPath)
+    if (drawableClipPath.get() != clipPath)
     {
-        drawableClipPath = std::move (clipPath);
+        drawableClipPath.reset (clipPath);
         repaint();
     }
 }
@@ -166,9 +166,9 @@ void Drawable::setTransformToFit (const Rectangle<float>& area, RectanglePlaceme
 }
 
 //==============================================================================
-std::unique_ptr<Drawable> Drawable::createFromImageData (const void* data, const size_t numBytes)
+Drawable* Drawable::createFromImageData (const void* data, const size_t numBytes)
 {
-    std::unique_ptr<Drawable> result;
+    Drawable* result = nullptr;
 
     auto image = ImageFileFormat::loadFrom (data, numBytes);
 
@@ -176,18 +176,28 @@ std::unique_ptr<Drawable> Drawable::createFromImageData (const void* data, const
     {
         auto* di = new DrawableImage();
         di->setImage (image);
-        result.reset (di);
+        result = di;
     }
     else
     {
-        if (auto svg = parseXMLIfTagMatches (String::createStringFromData (data, (int) numBytes), "svg"))
-            result = Drawable::createFromSVG (*svg);
+        auto asString = String::createStringFromData (data, (int) numBytes);
+
+        XmlDocument doc (asString);
+        std::unique_ptr<XmlElement> outer (doc.getDocumentElement (true));
+
+        if (outer != nullptr && outer->hasTagName ("svg"))
+        {
+            std::unique_ptr<XmlElement> svg (doc.getDocumentElement());
+
+            if (svg != nullptr)
+                result = Drawable::createFromSVG (*svg);
+        }
     }
 
     return result;
 }
 
-std::unique_ptr<Drawable> Drawable::createFromImageDataStream (InputStream& dataSource)
+Drawable* Drawable::createFromImageDataStream (InputStream& dataSource)
 {
     MemoryOutputStream mo;
     mo << dataSource;
@@ -195,14 +205,11 @@ std::unique_ptr<Drawable> Drawable::createFromImageDataStream (InputStream& data
     return createFromImageData (mo.getData(), mo.getDataSize());
 }
 
-std::unique_ptr<Drawable> Drawable::createFromImageFile (const File& file)
+Drawable* Drawable::createFromImageFile (const File& file)
 {
     FileInputStream fin (file);
 
-    if (fin.openedOk())
-        return createFromImageDataStream (fin);
-
-    return {};
+    return fin.openedOk() ? createFromImageDataStream (fin) : nullptr;
 }
 
 } // namespace juce

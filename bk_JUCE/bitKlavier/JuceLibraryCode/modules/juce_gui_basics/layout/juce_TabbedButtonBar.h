@@ -128,7 +128,6 @@ protected:
     ExtraComponentPlacement extraCompPlacement = afterText;
 
 private:
-    using Button::clicked;
     void calcAreas (Rectangle<int>&, Rectangle<int>&) const;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TabBarButton)
@@ -364,6 +363,7 @@ private:
     std::unique_ptr<Button> extraTabsButton;
 
     void showExtraItemsMenu();
+    static void extraItemsMenuCallback (int, TabbedButtonBar*);
     void updateTabPositions (bool animate);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TabbedButtonBar)

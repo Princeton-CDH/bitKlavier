@@ -131,7 +131,9 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      const uint64 length,
                                      uint64 voiceRampOn,
                                      uint64 voiceRampOff,
-                                     BKSynthesiserSound* s)
+                                     BKSynthesiserSound* s,
+									 float BlendronicLevel,
+									 BKDelay::Ptr bDelay)
 {
     
     
@@ -148,7 +150,9 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      (int)(3*getSampleRate()),
                                      1.0,
                                      voiceRampOff,
-                                     s);
+                                     s,
+									 BlendronicLevel,
+									 bDelay);
 }
 
 #define REVENV 0
@@ -217,7 +221,9 @@ void BKPianoSamplerVoice::startNote (const int midi,
                                      uint64 adsrDecay,
                                      float adsrSustain,
                                      uint64 adsrRelease,
-                                     BKSynthesiserSound* s)
+                                     BKSynthesiserSound* s,
+									 float BlendronicLevel,
+									BKDelay::Ptr bDelay)
 {
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
@@ -463,6 +469,9 @@ void BKPianoSamplerVoice::startNote (const int midi,
         }
         noteStartingPosition = sourceSamplePosition;
         noteEndPosition = playEndPosition;
+		blendronicLevel = BlendronicLevel;
+		this->bDelay = bDelay;
+
     }
     else
     {
@@ -784,6 +793,8 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
+	float delayL;
+	float delayR;
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
@@ -826,17 +837,33 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             stopNote (0.0f, false);
             break;
         }
-        
-        if (outR != nullptr)
-        {
-            *outL++ += (l * 1.0f);
-            *outR++ += (r * 1.0f);
-        }
-        else
-        {
-            *outL++ += ((l + r) * 0.5f) * 1.0f;
-        }
-        
+		if (outR != nullptr)
+		{
+			*outL++ += (l * 1.0f);
+			*outR++ += (r * 1.0f);
+		}
+		else
+		{
+			*outL++ += ((l + r) * 0.5f) * 1.0f;
+		}
+		//need to figure out how to do this with multiple delay lines
+		//delay line for blendronomer
+		if (bDelay->getActive() == true)
+		{
+			bDelay->getDSmooth().tick();
+			delayL = bDelay->getDelay().tick((stk::StkFloat)*outL);
+			if (outR != nullptr) delayR = bDelay->getDelay().tick((stk::StkFloat)*outR);
+			bDelay->updateDelayFromSmooth();
+			if (outR != nullptr)
+			{
+				*outL++ += (delayL * blendronicLevel);
+				*outR++ += (delayR * blendronicLevel);
+			}
+			else
+			{
+				*outL++ += delayL * blendronicLevel;
+			}
+		}
         if (playDirection == Forward)
         {
             sourceSamplePosition += bentRatio;

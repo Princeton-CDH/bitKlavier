@@ -82,7 +82,7 @@ struct VideoComponent::Pimpl   : public Base
         return Result::fail ("Couldn't open movie");
     }
 
-    void loadAsync (const URL& url, std::function<void(const URL&, Result)> callback)
+    void loadAsync (const URL& url, std::function<void (const URL&, Result)> callback)
     {
         if (url.isEmpty())
         {
@@ -632,21 +632,17 @@ private:
         {
            #if ! JUCE_32BIT
             if (useNativeControls)
-                [playerView setPlayer: player];
-            else
-           #endif
-                [playerLayer setPlayer: player];
-
-            if (player != nil)
             {
+                [playerView setPlayer: player];
                 attachPlayerStatusObserver();
                 attachPlaybackObserver();
+                return;
             }
-            else
-            {
-                detachPlayerStatusObserver();
-                detachPlaybackObserver();
-            }
+           #endif
+
+            [playerLayer setPlayer: player];
+            attachPlayerStatusObserver();
+            attachPlaybackObserver();
         }
 
         AVPlayer* getPlayer() const
@@ -778,7 +774,7 @@ private:
 
     PlayerController playerController;
 
-    std::function<void(const URL&, Result)> loadFinishedCallback;
+    std::function<void (const URL&, Result)> loadFinishedCallback;
 
     double playSpeedMult = 1.0;
 

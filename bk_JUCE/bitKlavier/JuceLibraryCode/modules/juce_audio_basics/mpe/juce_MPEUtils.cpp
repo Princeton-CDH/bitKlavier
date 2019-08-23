@@ -84,29 +84,15 @@ int MPEChannelAssigner::findMidiChannelForNewNote (int noteNumber) noexcept
     return midiChannelLastAssigned;
 }
 
-void MPEChannelAssigner::noteOff (int noteNumber, int midiChannel)
+void MPEChannelAssigner::noteOff (int noteNumber)
 {
-    const auto removeNote = [] (MidiChannel& ch, int noteNum)
-    {
-        if (ch.notes.removeAllInstancesOf (noteNum) > 0)
-        {
-            ch.lastNotePlayed = noteNum;
-            return true;
-        }
-
-        return false;
-    };
-
-    if (midiChannel >= 0 && midiChannel < 17)
-    {
-        removeNote (midiChannels[midiChannel], noteNumber);
-        return;
-    }
-
     for (auto& ch : midiChannels)
     {
-        if (removeNote (ch, noteNumber))
+        if (ch.notes.removeAllInstancesOf (noteNumber) > 0)
+        {
+            ch.lastNotePlayed = noteNumber;
             return;
+        }
     }
 }
 
@@ -269,7 +255,6 @@ void MPEChannelRemapper::zeroArrays()
     }
 }
 
-
 //==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
@@ -277,7 +262,7 @@ void MPEChannelRemapper::zeroArrays()
 struct MPEUtilsUnitTests  : public UnitTest
 {
     MPEUtilsUnitTests()
-        : UnitTest ("MPE Utilities", UnitTestCategories::midi)
+        : UnitTest ("MPE Utilities", "MIDI/MPE")
     {}
 
     void runTest() override
@@ -490,5 +475,4 @@ struct MPEUtilsUnitTests  : public UnitTest
 static MPEUtilsUnitTests MPEUtilsUnitTests;
 
 #endif
-
 } // namespace juce

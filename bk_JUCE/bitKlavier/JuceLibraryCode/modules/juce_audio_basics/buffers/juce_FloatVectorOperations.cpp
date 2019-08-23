@@ -1139,7 +1139,6 @@ ScopedNoDenormals::~ScopedNoDenormals() noexcept
   #endif
 }
 
-
 //==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
@@ -1147,9 +1146,7 @@ ScopedNoDenormals::~ScopedNoDenormals() noexcept
 class FloatVectorOperationsTests  : public UnitTest
 {
 public:
-    FloatVectorOperationsTests()
-        : UnitTest ("FloatVectorOperations", UnitTestCategories::audio)
-    {}
+    FloatVectorOperationsTests() : UnitTest ("FloatVectorOperations", "Audio") {}
 
     template <typename ValueType>
     struct TestRunner

@@ -459,8 +459,6 @@ public:
             if (initError.isNotEmpty())
                 JUCE_ASIO_LOG ("ASIOInit: " + initError);
 
-            setSampleRate (getSampleRate());
-
             needToReset = false;
         }
 
@@ -1075,21 +1073,11 @@ private:
         }
     }
 
-    static bool shouldReleaseObject (const String& driverName)
-    {
-        return driverName != "Yamaha Steinberg USB ASIO";
-    }
-
     void removeCurrentDriver()
     {
         if (asioObject != nullptr)
         {
-            char buffer[512] = {};
-            asioObject->getDriverName (buffer);
-
-            if (shouldReleaseObject (buffer))
-                asioObject->Release();
-
+            asioObject->Release();
             asioObject = nullptr;
         }
     }
@@ -1137,7 +1125,7 @@ private:
         if (asioObject == nullptr)
             return "No Driver";
 
-        auto initOk = (asioObject->init (juce_messageWindowHandle) > 0);
+        const bool initOk = !! asioObject->init (juce_messageWindowHandle);
         String driverError;
 
         // Get error message if init() failed, or if it's a buggy Denon driver,
@@ -1578,7 +1566,7 @@ private:
     //==============================================================================
     static bool isBlacklistedDriver (const String& driverName)
     {
-        return driverName.startsWith ("ASIO DirectX Full Duplex") || driverName == "ASIO Multimedia Driver";
+        return driverName == "ASIO DirectX Full Duplex Driver" || driverName == "ASIO Multimedia Driver";
     }
 
     void addDriverInfo (const String& keyName, HKEY hk)

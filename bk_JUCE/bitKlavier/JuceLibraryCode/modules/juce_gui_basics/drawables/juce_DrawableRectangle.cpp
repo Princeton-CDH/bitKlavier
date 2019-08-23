@@ -38,9 +38,9 @@ DrawableRectangle::DrawableRectangle (const DrawableRectangle& other)
     rebuildPath();
 }
 
-std::unique_ptr<Drawable> DrawableRectangle::createCopy() const
+Drawable* DrawableRectangle::createCopy() const
 {
-    return std::make_unique<DrawableRectangle> (*this);
+    return new DrawableRectangle (*this);
 }
 
 //==============================================================================

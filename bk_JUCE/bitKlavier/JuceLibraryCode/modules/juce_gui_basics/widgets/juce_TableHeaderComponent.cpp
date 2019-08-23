@@ -431,34 +431,37 @@ String TableHeaderComponent::toString() const
         e->setAttribute ("width", ci->width);
     }
 
-    return doc.toString (XmlElement::TextFormat().singleLine().withoutHeader());
+    return doc.createDocument ({}, true, false);
 }
 
 void TableHeaderComponent::restoreFromString (const String& storedVersion)
 {
-    if (auto storedXML = parseXMLIfTagMatches (storedVersion, "TABLELAYOUT"))
+    if (auto storedXML = parseXML (storedVersion))
     {
-        int index = 0;
-
-        forEachXmlChildElement (*storedXML, col)
+        if (storedXML->hasTagName ("TABLELAYOUT"))
         {
-            auto tabId = col->getIntAttribute ("id");
+            int index = 0;
 
-            if (auto* ci = getInfoForId (tabId))
+            forEachXmlChildElement (*storedXML, col)
             {
-                columns.move (columns.indexOf (ci), index);
-                ci->width = col->getIntAttribute ("width");
-                setColumnVisible (tabId, col->getBoolAttribute ("visible"));
+                auto tabId = col->getIntAttribute ("id");
+
+                if (auto* ci = getInfoForId (tabId))
+                {
+                    columns.move (columns.indexOf (ci), index);
+                    ci->width = col->getIntAttribute ("width");
+                    setColumnVisible (tabId, col->getBoolAttribute ("visible"));
+                }
+
+                ++index;
             }
 
-            ++index;
+            columnsResized = true;
+            sendColumnsChanged();
+
+            setSortColumnId (storedXML->getIntAttribute ("sortedCol"),
+                             storedXML->getBoolAttribute ("sortForwards", true));
         }
-
-        columnsResized = true;
-        sendColumnsChanged();
-
-        setSortColumnId (storedXML->getIntAttribute ("sortedCol"),
-                         storedXML->getBoolAttribute ("sortForwards", true));
     }
 }
 

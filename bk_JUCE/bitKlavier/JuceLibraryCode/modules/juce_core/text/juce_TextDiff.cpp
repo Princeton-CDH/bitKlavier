@@ -216,7 +216,6 @@ String TextDiff::Change::appliedTo (const String& text) const noexcept
     return text.replaceSection (start, length, insertedText);
 }
 
-
 //==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
@@ -224,9 +223,7 @@ String TextDiff::Change::appliedTo (const String& text) const noexcept
 class DiffTests  : public UnitTest
 {
 public:
-    DiffTests()
-        : UnitTest ("TextDiff class", UnitTestCategories::text)
-    {}
+    DiffTests() : UnitTest ("TextDiff class", "Text") {}
 
     static String createString (Random& r)
     {

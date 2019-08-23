@@ -775,9 +775,7 @@ public:
                 newPos = 1.0 - newPos;
         }
 
-        newPos = (isRotary() && ! rotaryParams.stopAtEnd) ? newPos - std::floor (newPos)
-                                                          : jlimit (0.0, 1.0, newPos);
-        valueWhenLastDragged = owner.proportionOfLengthToValue (newPos);
+        valueWhenLastDragged = owner.proportionOfLengthToValue (jlimit (0.0, 1.0, newPos));
     }
 
     void handleVelocityDrag (const MouseEvent& e)
@@ -808,10 +806,8 @@ public:
                  || (style == IncDecButtons && ! incDecDragDirectionIsHorizontal()))
                 speed = -speed;
 
-            auto newPos = owner.valueToProportionOfLength (valueWhenLastDragged) + speed;
-            newPos = (isRotary() && ! rotaryParams.stopAtEnd) ? newPos - std::floor (newPos)
-                                                              : jlimit (0.0, 1.0, newPos);
-            valueWhenLastDragged = owner.proportionOfLengthToValue (newPos);
+            auto currentPos = owner.valueToProportionOfLength (valueWhenLastDragged);
+            valueWhenLastDragged = owner.proportionOfLengthToValue (jlimit (0.0, 1.0, currentPos + speed));
 
             e.source.enableUnboundedMouseMovement (true, false);
         }
@@ -1055,10 +1051,7 @@ public:
 
         auto proportionDelta = wheelAmount * 0.15;
         auto currentPos = owner.valueToProportionOfLength (value);
-        auto newPos = currentPos + proportionDelta;
-        newPos = (isRotary() && ! rotaryParams.stopAtEnd) ? newPos - std::floor (newPos)
-                                                          : jlimit (0.0, 1.0, newPos);
-        return owner.proportionOfLengthToValue (newPos) - value;
+        return owner.proportionOfLengthToValue (jlimit (0.0, 1.0, currentPos + proportionDelta)) - value;
     }
 
     bool mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& wheel)
@@ -1298,7 +1291,7 @@ public:
               font (s.getLookAndFeel().getSliderPopupFont (s))
         {
             if (isOnDesktop)
-                setTransform (AffineTransform::scale (Component::getApproximateScaleFactorForComponent (&s)));
+                setTransform (AffineTransform::scale (getApproximateScaleFactor (&s)));
 
             setAlwaysOnTop (true);
             setAllowedPlacement (owner.getLookAndFeel().getSliderPopupPlacement (s));
@@ -1338,6 +1331,21 @@ public:
         }
 
     private:
+        static float getApproximateScaleFactor (Component* targetComponent)
+        {
+            AffineTransform transform;
+
+            for (Component* target = targetComponent; target != nullptr; target = target->getParentComponent())
+            {
+                transform = transform.followedBy (target->getTransform());
+
+                if (target->isOnDesktop())
+                    transform = transform.scaled (target->getDesktopScaleFactor());
+            }
+
+            return (transform.getScaleFactor() / Desktop::getInstance().getGlobalScaleFactor());
+        }
+
         //==============================================================================
         Slider& owner;
         Font font;

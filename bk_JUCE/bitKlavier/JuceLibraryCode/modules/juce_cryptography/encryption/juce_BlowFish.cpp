@@ -366,17 +366,13 @@ int BlowFish::unpad (const void* data, size_t size) noexcept
     return static_cast<int> (size - static_cast<size_t> (paddingSize));
 }
 
-
-//==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
 class BlowFishTests  : public UnitTest
 {
 public:
-    BlowFishTests()
-        : UnitTest ("BlowFish", UnitTestCategories::cryptography)
-    {}
+    BlowFishTests() : UnitTest ("BlowFish", "Cryptography") {}
 
     static void fillMemoryBlockWithRandomData (MemoryBlock& block, Random& random)
     {

@@ -73,7 +73,7 @@ public:
     AndroidAudioIODevice (const String& deviceName)
         : AudioIODevice (deviceName, javaAudioTypeName),
           Thread ("audio"),
-          minBufferSizeOut (0), minBufferSizeIn (0), callback (nullptr), sampleRate (0),
+          minBufferSizeOut (0), minBufferSizeIn (0), callback (0), sampleRate (0),
           numClientInputChannels (0), numDeviceInputChannels (0), numDeviceInputChannelsAvailable (2),
           numClientOutputChannels (0), numDeviceOutputChannels (0),
           actualBufferSize (0), isRunning (false),
@@ -100,7 +100,7 @@ public:
               << sampleRate << " Hz; input chans: " << numDeviceInputChannelsAvailable);
     }
 
-    ~AndroidAudioIODevice() override
+    ~AndroidAudioIODevice()
     {
         close();
     }
@@ -196,7 +196,7 @@ public:
                                                                         (jint) (minBufferSizeOut * numDeviceOutputChannels * static_cast<int> (sizeof (int16))), MODE_STREAM)));
 
             const bool supportsUnderrunCount = (getAndroidSDKVersion() >= 24);
-            getUnderrunCount = supportsUnderrunCount ? env->GetMethodID (AudioTrack, "getUnderrunCount", "()I") : nullptr;
+            getUnderrunCount = supportsUnderrunCount ? env->GetMethodID (AudioTrack, "getUnderrunCount", "()I") : 0;
 
             int outputDeviceState = env->CallIntMethod (outputDevice, AudioTrack.getState);
             if (outputDeviceState > 0)
@@ -282,11 +282,11 @@ public:
     BigInteger getActiveOutputChannels() const override  { return activeOutputChans; }
     BigInteger getActiveInputChannels() const override   { return activeInputChans; }
     String getLastError() override                       { return lastError; }
-    bool isPlaying() override                            { return isRunning && callback != nullptr; }
+    bool isPlaying() override                            { return isRunning && callback != 0; }
 
     int getXRunCount() const noexcept override
     {
-        if (outputDevice != nullptr && getUnderrunCount != nullptr)
+        if (outputDevice != nullptr && getUnderrunCount != 0)
             return getEnv()->CallIntMethod (outputDevice, getUnderrunCount);
 
         return -1;
@@ -337,7 +337,7 @@ public:
                     DBG ("Audio read under-run! " << numRead);
                 }
 
-                jshort* const src = env->GetShortArrayElements (audioBuffer, nullptr);
+                jshort* const src = env->GetShortArrayElements (audioBuffer, 0);
 
                 for (int chan = 0; chan < inputChannelBuffer.getNumChannels(); ++chan)
                 {
@@ -380,7 +380,7 @@ public:
                 if (threadShouldExit())
                     break;
 
-                jshort* const dest = env->GetShortArrayElements (audioBuffer, nullptr);
+                jshort* const dest = env->GetShortArrayElements (audioBuffer, 0);
 
                 for (int chan = 0; chan < numDeviceOutputChannels; ++chan)
                 {
@@ -417,7 +417,7 @@ private:
     BigInteger activeOutputChans, activeInputChans;
     GlobalRef outputDevice, inputDevice;
     AudioBuffer<float> inputChannelBuffer, outputChannelBuffer;
-    jmethodID getUnderrunCount = nullptr;
+    jmethodID getUnderrunCount = 0;
 
     void closeDevices()
     {

@@ -81,7 +81,7 @@ Colour LookAndFeel::findColour (int colourID) const noexcept
     auto index = colours.indexOf (c);
 
     if (index >= 0)
-        return colours[index].colour;
+        return colours.getReference (index).colour;
 
     jassertfalse;
     return Colours::black;
@@ -168,11 +168,10 @@ MouseCursor LookAndFeel::getMouseCursorFor (Component& component)
     return cursor;
 }
 
-std::unique_ptr<LowLevelGraphicsContext> LookAndFeel::createGraphicsContext (const Image& imageToRenderOn,
-                                                                             Point<int> origin,
-                                                                             const RectangleList<int>& initialClip)
+LowLevelGraphicsContext* LookAndFeel::createGraphicsContext (const Image& imageToRenderOn, const Point<int>& origin,
+                                                             const RectangleList<int>& initialClip)
 {
-    return std::make_unique<LowLevelGraphicsSoftwareRenderer> (imageToRenderOn, origin, initialClip);
+    return new LowLevelGraphicsSoftwareRenderer (imageToRenderOn, origin, initialClip);
 }
 
 //==============================================================================

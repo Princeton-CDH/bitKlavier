@@ -240,15 +240,7 @@ public:
     /** Returns a pointer to the first element in the array.
         This method is provided for compatibility with standard C++ iteration mechanisms.
     */
-    inline ObjectClass** begin() noexcept
-    {
-        return values.begin();
-    }
-
-    /** Returns a pointer to the first element in the array.
-        This method is provided for compatibility with standard C++ iteration mechanisms.
-    */
-    inline ObjectClass* const* begin() const noexcept
+    inline ObjectClass** begin() const noexcept
     {
         return values.begin();
     }
@@ -256,15 +248,7 @@ public:
     /** Returns a pointer to the element which follows the last element in the array.
         This method is provided for compatibility with standard C++ iteration mechanisms.
     */
-    inline ObjectClass** end() noexcept
-    {
-        return values.end();
-    }
-
-    /** Returns a pointer to the element which follows the last element in the array.
-        This method is provided for compatibility with standard C++ iteration mechanisms.
-    */
-    inline ObjectClass* const* end() const noexcept
+    inline ObjectClass** end() const noexcept
     {
         return values.end();
     }
@@ -272,15 +256,7 @@ public:
     /** Returns a pointer to the first element in the array.
         This method is provided for compatibility with the standard C++ containers.
     */
-    inline ObjectClass** data() noexcept
-    {
-        return begin();
-    }
-
-    /** Returns a pointer to the first element in the array.
-        This method is provided for compatibility with the standard C++ containers.
-    */
-    inline ObjectClass* const* data() const noexcept
+    inline ObjectClass** data() const noexcept
     {
         return begin();
     }
@@ -294,8 +270,8 @@ public:
     int indexOf (const ObjectClass* objectToLookFor) const noexcept
     {
         const ScopedLockType lock (getLock());
-        auto* e = values.begin();
-        auto* endPointer = values.end();
+        auto** e = values.begin();
+        auto** endPointer = values.end();
 
         while (e != endPointer)
         {
@@ -323,8 +299,8 @@ public:
     bool contains (const ObjectClass* objectToLookFor) const noexcept
     {
         const ScopedLockType lock (getLock());
-        auto* e = values.begin();
-        auto* endPointer = values.end();
+        auto** e = values.begin();
+        auto** endPointer = values.end();
 
         while (e != endPointer)
         {
@@ -461,9 +437,8 @@ public:
 
             if (indexToChange < values.size())
             {
-                auto* e = values[indexToChange];
+                releaseObject (values[indexToChange]);
                 values[indexToChange] = newObject;
-                releaseObject (e);
             }
             else
             {
@@ -471,20 +446,6 @@ public:
             }
         }
     }
-
-    /** Replaces an object in the array with a different one.
-
-        If the index is less than zero, this method does nothing.
-        If the index is beyond the end of the array, the new object is added to the end of the array.
-
-        The object being added has its reference count increased, and if it's replacing
-        another object, then that one has its reference count decreased, and may be deleted.
-
-        @param indexToChange        the index whose value you want to change
-        @param newObject            the new value to set for this index.
-        @see add, insert, remove
-    */
-    void set (int indexToChange, const ObjectClassPtr& newObject)       { set (indexToChange, newObject.get()); }
 
     /** Adds elements from another array to the end of this array.
 
@@ -609,9 +570,9 @@ public:
 
         if (isPositiveAndBelow (indexToRemove, values.size()))
         {
-            auto* e = *(values.begin() + indexToRemove);
+            auto** e = values.begin() + indexToRemove;
+            releaseObject (*e);
             values.removeElements (indexToRemove, 1);
-            releaseObject (e);
 
             if ((values.size() << 1) < values.capacity())
                 minimiseStorageOverheads();
@@ -634,10 +595,10 @@ public:
 
         if (isPositiveAndBelow (indexToRemove, values.size()))
         {
-            auto* e = *(values.begin() + indexToRemove);
-            removedItem = e;
+            auto** e = values.begin() + indexToRemove;
+            removedItem = *e;
+            releaseObject (*e);
             values.removeElements (indexToRemove, 1);
-            releaseObject (e);
 
             if ((values.size() << 1) < values.capacity())
                 minimiseStorageOverheads();
@@ -695,13 +656,13 @@ public:
 
         if (numberToRemove > 0)
         {
-            Array<ObjectClass*> objectsToRemove;
-            objectsToRemove.addArray (values.begin() + startIndex, numberToRemove);
+            for (int i = startIndex; i < endIndex; ++i)
+            {
+                releaseObject (values[i]);
+                values[i] = nullptr; // (in case one of the destructors accesses this array and hits a dangling pointer)
+            }
 
             values.removeElements (startIndex, numberToRemove);
-
-            for (auto& o : objectsToRemove)
-                releaseObject (o);
 
             if ((values.size() << 1) < values.capacity())
                 minimiseStorageOverheads();
@@ -829,7 +790,7 @@ public:
     */
     template <class ElementComparator>
     void sort (ElementComparator& comparator,
-               bool retainOrderOfEquivalentItems = false) noexcept
+               bool retainOrderOfEquivalentItems = false) const noexcept
     {
         // If you pass in an object with a static compareElements() method, this
         // avoids getting warning messages about the parameter being unused
@@ -887,14 +848,10 @@ private:
 
     void releaseAllObjects()
     {
-        auto i = values.size();
+        for (auto& v : values)
+            releaseObject (v);
 
-        while (--i >= 0)
-        {
-            auto* e = values[i];
-            values.removeElements (i, 1);
-            releaseObject (e);
-        }
+        values.clear();
     }
 
     static void releaseObject (ObjectClass* o)

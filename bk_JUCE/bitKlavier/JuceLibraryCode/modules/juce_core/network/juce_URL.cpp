@@ -62,8 +62,8 @@ struct FallbackDownloadTask  : public URL::DownloadTask,
             if (listener != nullptr)
                 listener->progress (this, downloaded, contentLength);
 
-            auto max = (int) jmin ((int64) bufferSize, contentLength < 0 ? std::numeric_limits<int64>::max()
-                                                                         : static_cast<int64> (contentLength - downloaded));
+            auto max = jmin ((int) bufferSize, contentLength < 0 ? std::numeric_limits<int>::max()
+                                                                 : static_cast<int> (contentLength - downloaded));
 
             auto actual = stream->read (buffer.get(), max);
 
@@ -209,6 +209,34 @@ void URL::init()
 
 URL::URL (const String& u, int)  : url (u) {}
 
+URL::URL (URL&& other)
+    : url             (std::move (other.url)),
+      postData        (std::move (other.postData)),
+      parameterNames  (std::move (other.parameterNames)),
+      parameterValues (std::move (other.parameterValues)),
+      filesToUpload   (std::move (other.filesToUpload))
+   #if JUCE_IOS
+    , bookmark        (std::move (other.bookmark))
+   #endif
+{
+}
+
+URL& URL::operator= (URL&& other)
+{
+    url             = std::move (other.url);
+    postData        = std::move (other.postData);
+    parameterNames  = std::move (other.parameterNames);
+    parameterValues = std::move (other.parameterValues);
+    filesToUpload   = std::move (other.filesToUpload);
+   #if JUCE_IOS
+    bookmark        = std::move (other.bookmark);
+   #endif
+
+    return *this;
+}
+
+URL::~URL() {}
+
 URL URL::createWithoutParsing (const String& u)
 {
     return URL (u, 0);
@@ -297,8 +325,8 @@ void URL::addParameter (const String& name, const String& value)
 
 String URL::toString (bool includeGetParameters) const
 {
-    if (includeGetParameters)
-        return url + getQueryString();
+    if (includeGetParameters && parameterNames.size() > 0)
+        return url + "?" + URLHelpers::getMangledParameters (*this);
 
     return url;
 }
@@ -319,24 +347,12 @@ String URL::getDomain() const
     return getDomainInternal (false);
 }
 
-String URL::getSubPath (bool includeGetParameters) const
+String URL::getSubPath() const
 {
     auto startOfPath = URLHelpers::findStartOfPath (url);
-    auto subPath = startOfPath <= 0 ? String()
-                                    : url.substring (startOfPath);
 
-    if (includeGetParameters)
-        subPath += getQueryString();
-
-    return subPath;
-}
-
-String URL::getQueryString() const
-{
-    if (parameterNames.size() > 0)
-        return "?" + URLHelpers::getMangledParameters (*this);
-
-    return {};
+    return startOfPath <= 0 ? String()
+        : url.substring (startOfPath);
 }
 
 String URL::getScheme() const
@@ -677,6 +693,10 @@ InputStream* URL::createInputStream (bool usePostCommand,
 
         OpenStreamProgressCallback* callback;
         void* const data;
+
+        // workaround a MSVC 2013 compiler warning
+        ProgressCallbackCaller (const ProgressCallbackCaller& o) : callback (o.callback), data (o.data) { jassertfalse; }
+        ProgressCallbackCaller& operator= (const ProgressCallbackCaller&) { jassertfalse; return *this; }
     };
 
     std::unique_ptr<ProgressCallbackCaller> callbackCaller
@@ -734,7 +754,7 @@ OutputStream* URL::createOutputStream() const
 bool URL::readEntireBinaryStream (MemoryBlock& destData, bool usePostCommand) const
 {
     const std::unique_ptr<InputStream> in (isLocalFile() ? getLocalFile().createInputStream()
-                                                         : createInputStream (usePostCommand));
+                                                         : static_cast<InputStream*> (createInputStream (usePostCommand)));
 
     if (in != nullptr)
     {
@@ -748,7 +768,7 @@ bool URL::readEntireBinaryStream (MemoryBlock& destData, bool usePostCommand) co
 String URL::readEntireTextStream (bool usePostCommand) const
 {
     const std::unique_ptr<InputStream> in (isLocalFile() ? getLocalFile().createInputStream()
-                                                         : createInputStream (usePostCommand));
+                                                         : static_cast<InputStream*> (createInputStream (usePostCommand)));
 
     if (in != nullptr)
         return in->readEntireStreamAsString();
@@ -756,23 +776,23 @@ String URL::readEntireTextStream (bool usePostCommand) const
     return {};
 }
 
-std::unique_ptr<XmlElement> URL::readEntireXmlStream (bool usePostCommand) const
+XmlElement* URL::readEntireXmlStream (bool usePostCommand) const
 {
-    return parseXML (readEntireTextStream (usePostCommand));
+    return XmlDocument::parse (readEntireTextStream (usePostCommand));
 }
 
 //==============================================================================
 URL URL::withParameter (const String& parameterName,
                         const String& parameterValue) const
 {
-    auto u = *this;
+    URL u (*this);
     u.addParameter (parameterName, parameterValue);
     return u;
 }
 
 URL URL::withParameters (const StringPairArray& parametersToAdd) const
 {
-    auto u = *this;
+    URL u (*this);
 
     for (int i = 0; i < parametersToAdd.size(); ++i)
         u.addParameter (parametersToAdd.getAllKeys()[i],
@@ -788,7 +808,7 @@ URL URL::withPOSTData (const String& newPostData) const
 
 URL URL::withPOSTData (const MemoryBlock& newPostData) const
 {
-    auto u = *this;
+    URL u (*this);
     u.postData = newPostData;
     return u;
 }
@@ -802,7 +822,7 @@ URL::Upload::Upload (const String& param, const String& name,
 
 URL URL::withUpload (Upload* const f) const
 {
-    auto u = *this;
+    URL u (*this);
 
     for (int i = u.filesToUpload.size(); --i >= 0;)
         if (u.filesToUpload.getObjectPointerUnchecked(i)->parameterName == f->parameterName)

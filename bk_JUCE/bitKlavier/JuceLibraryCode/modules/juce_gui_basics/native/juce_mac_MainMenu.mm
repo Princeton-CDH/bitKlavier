@@ -200,12 +200,6 @@ public:
     {
         if (currentModel != nullptr)
         {
-            if (item.action != nullptr)
-            {
-                MessageManager::callAsync (item.action);
-                return;
-            }
-
             if (item.customCallback != nullptr)
                 if (! item.customCallback->menuItemTriggered())
                     return;
@@ -255,10 +249,10 @@ public:
         }
         else if (i.subMenu != nullptr)
         {
-            if (recentItemsMenuName.isNotEmpty() && i.text == recentItemsMenuName)
+            if (i.text == recentItemsMenuName)
             {
                 if (recent == nullptr)
-                    recent = std::make_unique<RecentFilesMenuItem>();
+                    recent.reset (new RecentFilesMenuItem());
 
                 if (recent->recentItem != nil)
                 {
@@ -289,11 +283,7 @@ public:
 
             [item setTag: topLevelIndex];
             [item setEnabled: i.isEnabled];
-           #if defined (MAC_OS_X_VERSION_10_13) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_13
-            [item setState: i.isTicked ? NSControlStateValueOn : NSControlStateValueOff];
-           #else
             [item setState: i.isTicked ? NSOnState : NSOffState];
-           #endif
             [item setTarget: (id) callback];
 
             auto* juceItem = new PopupMenu::Item (i);
@@ -337,7 +327,13 @@ public:
         [m setAutoenablesItems: false];
 
         if (addDelegate)
+        {
+           #if defined (MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
             [m setDelegate: (id<NSMenuDelegate>) callback];
+           #else
+            [m setDelegate: callback];
+           #endif
+        }
 
         for (PopupMenu::MenuItemIterator iter (menu); iter.next();)
             addMenuItem (iter, m, topLevelMenuId, topLevelIndex);
@@ -519,7 +515,9 @@ private:
             addMethod (@selector (menuItemInvoked:),  menuItemInvoked, "v@:@");
             addMethod (@selector (menuNeedsUpdate:),  menuNeedsUpdate, "v@:@");
 
+           #if defined (MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
             addProtocol (@protocol (NSMenuDelegate));
+           #endif
 
             registerClass();
         }
@@ -578,7 +576,7 @@ public:
         : oldMenu (MenuBarModel::getMacMainMenu())
     {
         if (auto* appleMenu = MenuBarModel::getMacExtraAppleItemsMenu())
-            oldAppleMenu = std::make_unique<PopupMenu> (*appleMenu);
+            oldAppleMenu.reset (new PopupMenu (*appleMenu));
 
         if (auto* handler = JuceMainMenuHandler::instance)
             oldRecentItems = handler->recentItemsMenuName;

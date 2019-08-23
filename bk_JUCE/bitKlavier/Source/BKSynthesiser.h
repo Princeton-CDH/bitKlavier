@@ -19,6 +19,8 @@
 
 #include "Tuning.h"
 
+#include "BKSTK.h"
+
 #if 0
 class SFRegion : public ReferenceCountedObject
 {
@@ -142,7 +144,9 @@ public:
                             uint64 length,
                             uint64 voiceRampOn,
                             uint64 voiceRampOff,
-                            BKSynthesiserSound* sound) = 0;
+                            BKSynthesiserSound* sound,
+							float BlendronicLevel,
+							BKDelay::Ptr bDelay) = 0;
     
     virtual void startNote (int midiNoteNumber,
                             float offset,
@@ -157,7 +161,9 @@ public:
                             uint64 adsrDecay,
                             float adsrSustain,
                             uint64 adsrRelease,
-                            BKSynthesiserSound* sound) = 0;
+                            BKSynthesiserSound* sound,
+							float BlendronicLevel,
+							BKDelay::Ptr bDelay) = 0;
     
     /** Called to stop a note.
      
@@ -272,6 +278,7 @@ public:
     void setGeneralSettings(GeneralSettings::Ptr gen) {generalSettings = gen;}
     
     TuningProcessor::Ptr tuning;
+	BKDelay::Ptr bDelay;
     
 protected:
     /** Resets the state of this voice after a sound has finished playing.
@@ -304,6 +311,7 @@ private:
     uint32 noteOnTime;
     BKSynthesiserSound::Ptr currentlyPlayingSound;
     bool keyIsDown, sustainPedalDown, sostenutoPedalDown;
+	float blendronicLevel;
     
     AudioBuffer<float> tempBuffer;
     
@@ -441,7 +449,9 @@ public:
                         float lengthMS,
                         float rampOnMS,
                         float rampOffMS,
-                        TuningProcessor::Ptr tuner = nullptr);
+                        TuningProcessor::Ptr tuner = nullptr,
+						float BlendronicLevel = 0.,
+						BKDelay::Ptr bDelay = nullptr);
     
     virtual void keyOn (int midiChannel,
                         int keyNoteNumber,
@@ -459,7 +469,9 @@ public:
                         float adsrDecayMS,
                         float adsrSustain,
                         float adsrReleaseMS,
-                        TuningProcessor::Ptr tuner = nullptr);
+                        TuningProcessor::Ptr tuner = nullptr,
+						float BlendronicLevel = 0.,
+						BKDelay::Ptr bDelay = nullptr);
     
     /** Triggers a note-off event.
      
@@ -697,7 +709,9 @@ protected:
                      uint64 length,
                      uint64 voiceRampOn,
                      uint64 voiceRampOff,
-                     TuningProcessor::Ptr tuner);
+                     TuningProcessor::Ptr tuner,
+					float BlendronicLevel,
+					BKDelay::Ptr bDelay);
     
     void startVoice (BKSynthesiserVoice* voice,
                      BKSynthesiserSound* sound,
@@ -716,7 +730,9 @@ protected:
                      uint64 adsrDecay,
                      float adsrSustain,
                      uint64 adsrRelease,
-                     TuningProcessor::Ptr tuner);
+                     TuningProcessor::Ptr tuner,
+					float BlendronicLevel,
+					BKDelay::Ptr bDelay);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected
@@ -748,6 +764,8 @@ private:
     bool subBlockSubdivisionIsStrict;
     bool shouldStealNotes;
     BigInteger sustainPedalsDown;
+
+	Array<BKDelay::Ptr> delays;
 
     
 #if JUCE_CATCH_DEPRECATED_CODE_MISUSE

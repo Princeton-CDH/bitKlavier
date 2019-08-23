@@ -27,12 +27,6 @@
 namespace juce
 {
 
-#if JUCE_CLANG && ! (defined (MAC_OS_X_VERSION_10_16) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_16)
- #pragma clang diagnostic push
- #pragma clang diagnostic ignored "-Wdeprecated-declarations"
- #define JUCE_DEPRECATION_IGNORED 1
-#endif
-
 class OpenGLContext::NativeContext
 {
 public:
@@ -51,8 +45,10 @@ public:
         view = [cls.createInstance() initWithFrame: NSMakeRect (0, 0, 100.0f, 100.0f)
                                        pixelFormat: format];
 
+       #if defined (MAC_OS_X_VERSION_10_7) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_7)
         if ([view respondsToSelector: @selector (setWantsBestResolutionOpenGLSurface:)])
             [view setWantsBestResolutionOpenGLSurface: YES];
+       #endif
 
         [[NSNotificationCenter defaultCenter] addObserver: view
                                                  selector: @selector (_surfaceNeedsUpdate:)
@@ -211,11 +207,7 @@ public:
         minSwapTimeMs = (numFramesPerSwap * 1000) / 60;
 
         [renderContext setValues: (const GLint*) &numFramesPerSwap
-                   #if defined (MAC_OS_X_VERSION_10_12) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
-                    forParameter: NSOpenGLContextParameterSwapInterval];
-                   #else
                     forParameter: NSOpenGLCPSwapInterval];
-                   #endif
         return true;
     }
 
@@ -223,11 +215,7 @@ public:
     {
         GLint numFrames = 0;
         [renderContext getValues: &numFrames
-                   #if defined (MAC_OS_X_VERSION_10_12) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
-                    forParameter: NSOpenGLContextParameterSwapInterval];
-                   #else
                     forParameter: NSOpenGLCPSwapInterval];
-                   #endif
 
         return numFrames;
     }
@@ -265,10 +253,5 @@ bool OpenGLHelpers::isContextActive()
 {
     return CGLGetCurrentContext() != CGLContextObj();
 }
-
-#if JUCE_DEPRECATION_IGNORED
- #pragma clang diagnostic pop
- #undef JUCE_DEPRECATION_IGNORED
-#endif
 
 } // namespace juce

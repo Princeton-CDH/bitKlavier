@@ -1804,31 +1804,31 @@ static void clearOpenGLGlyphCacheCallback()
     SavedState::GlyphCacheType::getInstance().reset();
 }
 
-static std::unique_ptr<LowLevelGraphicsContext> createOpenGLContext (const Target& target)
+static LowLevelGraphicsContext* createOpenGLContext (const Target& target)
 {
     clearOpenGLGlyphCache = clearOpenGLGlyphCacheCallback;
 
     if (target.context.areShadersAvailable())
-        return std::make_unique<ShaderContext> (target);
+        return new ShaderContext (target);
 
     Image tempImage (Image::ARGB, target.bounds.getWidth(), target.bounds.getHeight(), true, SoftwareImageType());
-    return std::make_unique<NonShaderContext> (target, tempImage);
+    return new NonShaderContext (target, tempImage);
 }
 
 }
 
 //==============================================================================
-std::unique_ptr<LowLevelGraphicsContext> createOpenGLGraphicsContext (OpenGLContext& context, int width, int height)
+LowLevelGraphicsContext* createOpenGLGraphicsContext (OpenGLContext& context, int width, int height)
 {
     return createOpenGLGraphicsContext (context, context.getFrameBufferID(), width, height);
 }
 
-std::unique_ptr<LowLevelGraphicsContext> createOpenGLGraphicsContext (OpenGLContext& context, OpenGLFrameBuffer& target)
+LowLevelGraphicsContext* createOpenGLGraphicsContext (OpenGLContext& context, OpenGLFrameBuffer& target)
 {
     return OpenGLRendering::createOpenGLContext (OpenGLRendering::Target (context, target, {}));
 }
 
-std::unique_ptr<LowLevelGraphicsContext> createOpenGLGraphicsContext (OpenGLContext& context, unsigned int frameBufferID, int width, int height)
+LowLevelGraphicsContext* createOpenGLGraphicsContext (OpenGLContext& context, unsigned int frameBufferID, int width, int height)
 {
     return OpenGLRendering::createOpenGLContext (OpenGLRendering::Target (context, frameBufferID, width, height));
 }

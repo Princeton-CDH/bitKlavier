@@ -732,7 +732,7 @@ void HeaderViewController::fillPianoCB(void)
     {
         String name = piano->getName();
         
-        if (name != String::empty)  pianoCB.addItem(name,  piano->getId());
+        if (name != String())  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());
     }
 

@@ -16,7 +16,9 @@
 
 //---------------------------------------------------------------------------------------------------
 #if SMTG_OS_MACOS
-	#pragma pack(pop)
+	#if !SMTG_PLATFORM_64
+		#pragma pack(pop)
+	#endif
 #elif defined __BORLANDC__
 	#pragma -a-
 #elif SMTG_OS_WINDOWS

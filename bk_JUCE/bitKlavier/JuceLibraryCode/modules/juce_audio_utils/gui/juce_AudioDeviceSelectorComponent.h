@@ -111,7 +111,6 @@ private:
     const bool hideAdvancedOptionsWithButton;
 
     class MidiInputSelectorComponentListBox;
-    Array<MidiDeviceInfo> currentMidiOutputs;
     std::unique_ptr<MidiInputSelectorComponentListBox> midiInputsList;
     std::unique_ptr<ComboBox> midiOutputSelector;
     std::unique_ptr<Label> midiInputsLabel, midiOutputLabel;

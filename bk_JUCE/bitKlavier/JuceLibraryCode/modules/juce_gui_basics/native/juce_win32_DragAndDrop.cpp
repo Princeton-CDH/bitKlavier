@@ -243,10 +243,10 @@ namespace DragAndDropHelpers
 
     struct DragAndDropJob   : public ThreadPoolJob
     {
-        DragAndDropJob (FORMATETC f, STGMEDIUM m, DWORD d, std::function<void()>&& cb)
+        DragAndDropJob (FORMATETC f, STGMEDIUM m, DWORD d, std::function<void()> cb)
             : ThreadPoolJob ("DragAndDrop"),
               format (f), medium (m), whatToDo (d),
-              completionCallback (std::move (cb))
+              completionCallback (cb)
         {
         }
 
@@ -266,7 +266,7 @@ namespace DragAndDropHelpers
             OleUninitialize();
 
             if (completionCallback != nullptr)
-                MessageManager::callAsync (std::move (completionCallback));
+                MessageManager::callAsync (completionCallback);
 
             return jobHasFinished;
         }
@@ -317,7 +317,7 @@ bool DragAndDropContainer::performExternalDragDropOfFiles (const StringArray& fi
     auto& pool = DragAndDropHelpers::ThreadPoolHolder::getInstance()->pool;
     pool.addJob (new DragAndDropHelpers::DragAndDropJob (format, medium,
                                                          canMove ? (DROPEFFECT_COPY | DROPEFFECT_MOVE) : DROPEFFECT_COPY,
-                                                         std::move (callback)),
+                                                         callback),
                 true);
 
     return true;
@@ -345,7 +345,7 @@ bool DragAndDropContainer::performExternalDragDropOfText (const String& text, Co
     pool.addJob (new DragAndDropHelpers::DragAndDropJob (format,
                                                         medium,
                                                         DROPEFFECT_COPY | DROPEFFECT_MOVE,
-                                                        std::move (callback)),
+                                                        callback),
                  true);
 
     return true;

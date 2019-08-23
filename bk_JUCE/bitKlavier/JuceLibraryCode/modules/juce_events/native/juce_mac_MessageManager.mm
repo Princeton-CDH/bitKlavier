@@ -389,19 +389,18 @@ bool MessageManager::runDispatchLoopUntil (int millisecondsToRunFor)
     {
         JUCE_AUTORELEASEPOOL
         {
-            auto msRemaining = endTime - Time::currentTimeMillis();
+            CFRunLoopRunInMode (kCFRunLoopDefaultMode, 0.001, true);
 
-            if (msRemaining <= 0)
+            NSEvent* e = [NSApp nextEventMatchingMask: NSEventMaskAny
+                                            untilDate: [NSDate dateWithTimeIntervalSinceNow: 0.001]
+                                               inMode: NSDefaultRunLoopMode
+                                              dequeue: YES];
+
+            if (e != nil && (isEventBlockedByModalComps == nullptr || ! (*isEventBlockedByModalComps) (e)))
+                [NSApp sendEvent: e];
+
+            if (Time::currentTimeMillis() >= endTime)
                 break;
-
-            CFRunLoopRunInMode (kCFRunLoopDefaultMode, jmin (1.0, msRemaining * 0.001), true);
-
-            if (NSEvent* e = [NSApp nextEventMatchingMask: NSEventMaskAny
-                                                untilDate: [NSDate dateWithTimeIntervalSinceNow: 0.001]
-                                                   inMode: NSDefaultRunLoopMode
-                                                  dequeue: YES])
-                if (isEventBlockedByModalComps == nullptr || ! (*isEventBlockedByModalComps) (e))
-                    [NSApp sendEvent: e];
         }
     }
 

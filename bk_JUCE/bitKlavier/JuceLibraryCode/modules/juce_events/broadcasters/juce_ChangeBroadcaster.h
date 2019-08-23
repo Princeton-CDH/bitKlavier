@@ -95,8 +95,6 @@ private:
     ChangeBroadcasterCallback broadcastCallback;
     ListenerList <ChangeListener> changeListeners;
 
-    std::atomic<bool> anyListeners { false };
-
     void callListeners();
 
     JUCE_DECLARE_NON_COPYABLE (ChangeBroadcaster)

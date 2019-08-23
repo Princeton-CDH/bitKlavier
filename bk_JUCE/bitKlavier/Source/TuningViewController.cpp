@@ -1544,7 +1544,7 @@ void TuningPreparationEditor::fillSelectCB(int last, int current)
         
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("Tuning"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
@@ -2189,7 +2189,7 @@ void TuningModificationEditor::fillSelectCB(int last, int current)
         int Id = prep->getId();;
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("TuningMod"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);

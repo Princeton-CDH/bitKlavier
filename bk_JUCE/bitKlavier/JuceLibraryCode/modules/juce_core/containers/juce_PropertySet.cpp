@@ -23,7 +23,7 @@
 namespace juce
 {
 
-PropertySet::PropertySet (bool ignoreCaseOfKeyNames)
+PropertySet::PropertySet (const bool ignoreCaseOfKeyNames)
     : properties (ignoreCaseOfKeyNames),
       fallbackProperties (nullptr),
       ignoreCaseOfKeys (ignoreCaseOfKeyNames)
@@ -65,7 +65,8 @@ void PropertySet::clear()
 String PropertySet::getValue (StringRef keyName, const String& defaultValue) const noexcept
 {
     const ScopedLock sl (lock);
-    auto index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
+
+    const int index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
 
     if (index >= 0)
         return properties.getAllValues() [index];
@@ -74,10 +75,10 @@ String PropertySet::getValue (StringRef keyName, const String& defaultValue) con
                                          : defaultValue;
 }
 
-int PropertySet::getIntValue (StringRef keyName, int defaultValue) const noexcept
+int PropertySet::getIntValue (StringRef keyName, const int defaultValue) const noexcept
 {
     const ScopedLock sl (lock);
-    auto index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
+    const int index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
 
     if (index >= 0)
         return properties.getAllValues() [index].getIntValue();
@@ -86,10 +87,10 @@ int PropertySet::getIntValue (StringRef keyName, int defaultValue) const noexcep
                                          : defaultValue;
 }
 
-double PropertySet::getDoubleValue (StringRef keyName, double defaultValue) const noexcept
+double PropertySet::getDoubleValue (StringRef keyName, const double defaultValue) const noexcept
 {
     const ScopedLock sl (lock);
-    auto index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
+    const int index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
 
     if (index >= 0)
         return properties.getAllValues()[index].getDoubleValue();
@@ -98,10 +99,10 @@ double PropertySet::getDoubleValue (StringRef keyName, double defaultValue) cons
                                          : defaultValue;
 }
 
-bool PropertySet::getBoolValue (StringRef keyName, bool defaultValue) const noexcept
+bool PropertySet::getBoolValue (StringRef keyName, const bool defaultValue) const noexcept
 {
     const ScopedLock sl (lock);
-    auto index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
+    const int index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
 
     if (index >= 0)
         return properties.getAllValues() [index].getIntValue() != 0;
@@ -110,9 +111,9 @@ bool PropertySet::getBoolValue (StringRef keyName, bool defaultValue) const noex
                                          : defaultValue;
 }
 
-std::unique_ptr<XmlElement> PropertySet::getXmlValue (StringRef keyName) const
+XmlElement* PropertySet::getXmlValue (StringRef keyName) const
 {
-    return parseXML (getValue (keyName));
+    return XmlDocument::parse (getValue (keyName));
 }
 
 void PropertySet::setValue (const String& keyName, const var& v)
@@ -121,9 +122,10 @@ void PropertySet::setValue (const String& keyName, const var& v)
 
     if (keyName.isNotEmpty())
     {
-        auto value = v.toString();
+        const String value (v.toString());
         const ScopedLock sl (lock);
-        auto index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
+
+        const int index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
 
         if (index < 0 || properties.getAllValues() [index] != value)
         {
@@ -138,7 +140,7 @@ void PropertySet::removeValue (StringRef keyName)
     if (keyName.isNotEmpty())
     {
         const ScopedLock sl (lock);
-        auto index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
+        const int index = properties.getAllKeys().indexOf (keyName, ignoreCaseOfKeys);
 
         if (index >= 0)
         {
@@ -148,10 +150,10 @@ void PropertySet::removeValue (StringRef keyName)
     }
 }
 
-void PropertySet::setValue (const String& keyName, const XmlElement* xml)
+void PropertySet::setValue (const String& keyName, const XmlElement* const xml)
 {
     setValue (keyName, xml == nullptr ? var()
-                                      : var (xml->toString (XmlElement::TextFormat().singleLine().withoutHeader())));
+                                      : var (xml->createDocument ("", true)));
 }
 
 bool PropertySet::containsKey (StringRef keyName) const noexcept
@@ -175,15 +177,14 @@ void PropertySet::setFallbackPropertySet (PropertySet* fallbackProperties_) noex
     fallbackProperties = fallbackProperties_;
 }
 
-std::unique_ptr<XmlElement> PropertySet::createXml (const String& nodeName) const
+XmlElement* PropertySet::createXml (const String& nodeName) const
 {
-    auto xml = std::make_unique<XmlElement> (nodeName);
-
     const ScopedLock sl (lock);
+    XmlElement* const xml = new XmlElement (nodeName);
 
     for (int i = 0; i < properties.getAllKeys().size(); ++i)
     {
-        auto e = xml->createNewChildElement ("VALUE");
+        XmlElement* const e = xml->createNewChildElement ("VALUE");
         e->setAttribute ("name", properties.getAllKeys()[i]);
         e->setAttribute ("val", properties.getAllValues()[i]);
     }

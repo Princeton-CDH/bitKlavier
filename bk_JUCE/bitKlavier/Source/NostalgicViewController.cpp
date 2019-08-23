@@ -504,7 +504,7 @@ void NostalgicViewController::fillModeSelectCB(void)
     for (int i = 0; i < cNostalgicSyncModes.size(); i++)
     {
         String name = cNostalgicSyncModes[i];
-        if (name != String::empty)  lengthModeSelectCB.addItem(name, i+1);
+        if (name != String())  lengthModeSelectCB.addItem(name, i+1);
         else                        lengthModeSelectCB.addItem(String(i+1), i+1);
     }
     
@@ -913,7 +913,7 @@ void NostalgicPreparationEditor::fillSelectCB(int last, int current)
         
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("Nostalgic"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
@@ -1225,7 +1225,7 @@ void NostalgicModificationEditor::fillSelectCB(int last, int current)
         int Id = prep->getId();;
         String name = prep->getName();
         
-        if (name != String::empty)  selectCB.addItem(name, Id);
+        if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("NostalgicMod"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);

@@ -254,13 +254,10 @@ ApplicationCommandTarget* ApplicationCommandManager::findDefaultComponentTarget(
     {
         if (auto* activeWindow = TopLevelWindow::getActiveTopLevelWindow())
         {
-            if (auto* peer = activeWindow->getPeer())
-            {
-                c = peer->getLastFocusedSubcomponent();
+            c = activeWindow->getPeer()->getLastFocusedSubcomponent();
 
-                if (c == nullptr)
-                    c = activeWindow;
-            }
+            if (c == nullptr)
+                c = activeWindow;
         }
     }
 

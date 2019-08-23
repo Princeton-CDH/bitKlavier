@@ -33,7 +33,7 @@
  #define JUCE_SUPPORT_CARBON 0
 #endif
 
-#ifdef JUCE_CLANG
+#ifdef __clang__
  #pragma clang diagnostic push
  #pragma clang diagnostic ignored "-Wshorten-64-to-32"
  #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -42,13 +42,6 @@
  #pragma clang diagnostic ignored "-Wconversion"
  #pragma clang diagnostic ignored "-Woverloaded-virtual"
  #pragma clang diagnostic ignored "-Wextra-semi"
- #pragma clang diagnostic ignored "-Wcast-align"
- #if __has_warning("-Wzero-as-null-pointer-constant")
-  #pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
- #endif
- #if __has_warning("-Wnullable-to-nonnull-conversion")
-  #pragma clang diagnostic ignored "-Wnullable-to-nonnull-conversion"
- #endif
 #endif
 
 #include "../utility/juce_IncludeSystemHeaders.h"
@@ -76,7 +69,7 @@
  #include "CoreAudioUtilityClasses/AUCarbonViewBase.h"
 #endif
 
-#ifdef JUCE_CLANG
+#ifdef __clang__
  #pragma clang diagnostic pop
 #endif
 
@@ -186,7 +179,7 @@ public:
             jassertfalse;
     }
 
-    ~JuceAU() override
+    ~JuceAU()
     {
         if (bypassParam != nullptr)
             bypassParam->removeListener (this);
@@ -733,7 +726,7 @@ public:
         if (juceFilter != nullptr)
         {
             CFDictionaryRef dict = (CFDictionaryRef) inData;
-            CFDataRef data = nullptr;
+            CFDataRef data = 0;
 
             CFStringRef key = CFStringCreateWithCString (kCFAllocatorDefault, JUCE_STATE_DICTIONARY_KEY, kCFStringEncodingUTF8);
 
@@ -742,7 +735,7 @@ public:
 
             if (valuePresent)
             {
-                if (data != nullptr)
+                if (data != 0)
                 {
                     const int numBytes = (int) CFDataGetLength (data);
                     const juce::uint8* const rawBytes = CFDataGetBytePtr (data);
@@ -873,14 +866,9 @@ public:
 
     //==============================================================================
     // When parameters are discrete we need to use integer values.
-    float getMaximumParameterValue (AudioProcessorParameter* juceParam)
+    float getMaximumParameterValue (AudioProcessorParameter* param)
     {
-       #if JUCE_FORCE_LEGACY_PARAMETER_AUTOMATION_TYPE
-        ignoreUnused (juceParam);
-        return 1.0f;
-       #else
-        return juceParam->isDiscrete() ? (float) (juceParam->getNumSteps() - 1) : 1.0f;
-       #endif
+        return param->isDiscrete() && (! forceUseLegacyParamIDs) ? (float) (param->getNumSteps() - 1) : 1.0f;
     }
 
     ComponentResult GetParameterInfo (AudioUnitScope inScope,
@@ -924,7 +912,7 @@ public:
                 }
 
                 // Is this a meter?
-                if ((((unsigned int) param->getCategory() & 0xffff0000) >> 16) == 2)
+                if (((param->getCategory() & 0xffff0000) >> 16) == 2)
                 {
                     outParameterInfo.flags &= ~kAudioUnitParameterFlag_IsWritable;
                     outParameterInfo.flags |= kAudioUnitParameterFlag_MeterReadOnly | kAudioUnitParameterFlag_DisplayLogarithmic;
@@ -934,8 +922,12 @@ public:
                 {
                    #if ! JUCE_FORCE_LEGACY_PARAMETER_AUTOMATION_TYPE
                     if (isParameterDiscrete)
-                        outParameterInfo.unit = param->isBoolean() ? kAudioUnitParameterUnit_Boolean
-                                                                   : kAudioUnitParameterUnit_Indexed;
+                    {
+                        outParameterInfo.unit = kAudioUnitParameterUnit_Indexed;
+
+                        if (param->isBoolean())
+                            outParameterInfo.unit = kAudioUnitParameterUnit_Boolean;
+                    }
                    #endif
                 }
 
@@ -971,10 +963,10 @@ public:
 
                     if (auto* valueStrings = parameterValueStringArrays[index])
                     {
-                        *outStrings = CFArrayCreate (nullptr,
+                        *outStrings = CFArrayCreate (NULL,
                                                      (const void **) valueStrings->getRawDataPointer(),
                                                      valueStrings->size(),
-                                                     nullptr);
+                                                     NULL);
 
                         return noErr;
                     }
@@ -1132,7 +1124,7 @@ public:
     {
         auEvent.mEventType = type;
         auEvent.mArgument.mParameter.mParameterID = getAUParameterIDForIndex (juceParamIndex);
-        AUEventListenerNotify (nullptr, nullptr, &auEvent);
+        AUEventListenerNotify (0, 0, &auEvent);
     }
 
     void audioProcessorParameterChanged (AudioProcessor*, int index, float /*newValue*/) override
@@ -1405,7 +1397,7 @@ public:
             clearPresetsArray();
             presetsArray.insertMultiple (0, AUPreset(), numPrograms);
 
-            CFMutableArrayRef presetsArrayRef = CFArrayCreateMutable (nullptr, numPrograms, nullptr);
+            CFMutableArrayRef presetsArrayRef = CFArrayCreateMutable (0, numPrograms, 0);
 
             for (int i = 0; i < numPrograms; ++i)
             {
@@ -1481,7 +1473,7 @@ public:
             setBounds (getSizeToContainChild());
         }
 
-        ~EditorCompHolder() override
+        ~EditorCompHolder()
         {
             deleteAllChildren(); // note that we can't use a std::unique_ptr because the editor may
                                  // have been transferred to another parent which takes over ownership.
@@ -1567,7 +1559,7 @@ public:
                     NSWindow* hostWindow = [hostView window];
 
                     [hostWindow makeFirstResponder: hostView];
-                    [hostView keyDown: (NSEvent*) [NSApp currentEvent]];
+                    [hostView keyDown: [NSApp currentEvent]];
                     [hostWindow makeFirstResponder: view];
                 }
             }
@@ -1908,7 +1900,7 @@ private:
             {
                 const AudioUnitParameterID auParamID = generateAUParameterID (param);
 
-                // Consider yourself very unlucky if you hit this assertion. The hash codes of your
+                // Consider yourself very unlucky if you hit this assertion. The hash code of your
                 // parameter ids are not unique.
                 jassert (! paramMap.contains (static_cast<int32> (auParamID)));
 
@@ -1979,7 +1971,7 @@ private:
 
        #if JUCE_USE_STUDIO_ONE_COMPATIBLE_PARAMETERS
         // studio one doesn't like negative parameters
-        paramHash &= ~(((AudioUnitParameterID) 1) << (sizeof (AudioUnitParameterID) * 8 - 1));
+        paramHash &= ~(1 << (sizeof (AudioUnitParameterID) * 8 - 1));
        #endif
 
         return forceUseLegacyParamIDs ? static_cast<AudioUnitParameterID> (juceParamID.getIntValue())
@@ -2490,19 +2482,7 @@ JUCE_FACTORY_ENTRY   (JuceAU, JucePlugin_AUExportPrefix)
 #endif
 
 #if ! JUCE_DISABLE_AU_FACTORY_ENTRY
- #ifdef JUCE_CLANG
-  #pragma clang diagnostic push
-  #pragma clang diagnostic ignored "-Wcast-align"
-  #if __has_warning("-Wzero-as-null-pointer-constant")
-   #pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
-  #endif
- #endif
-
  #include "CoreAudioUtilityClasses/AUPlugInDispatch.cpp"
-
- #ifdef JUCE_CLANG
-  #pragma clang diagnostic push
- #endif
 #endif
 
 #endif

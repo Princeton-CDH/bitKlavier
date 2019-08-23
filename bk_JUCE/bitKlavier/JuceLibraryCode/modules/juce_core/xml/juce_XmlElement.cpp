@@ -167,46 +167,50 @@ XmlElement::~XmlElement() noexcept
 //==============================================================================
 namespace XmlOutputFunctions
 {
-    namespace LegalCharLookupTable
+   #if 0 // (These functions are just used to generate the lookup table used below)
+    bool isLegalXmlCharSlow (const juce_wchar character) noexcept
     {
-        template <int c>
-        struct Bit
-        {
-            enum { v = ((c >= 'a' && c <= 'z')
-                     || (c >= 'A' && c <= 'Z')
-                     || (c >= '0' && c <= '9')
-                     || c == ' ' || c == '.'  || c == ',' || c == ';'
-                     || c == ':' || c == '-'  || c == '(' || c == ')'
-                     || c == '_' || c == '+'  || c == '=' || c == '?'
-                     || c == '!' || c == '$'  || c == '#' || c == '@'
-                     || c == '[' || c == ']'  || c == '/' || c == '|'
-                     || c == '*' || c == '%'  || c == '~' || c == '{'
-                     || c == '}' || c == '\'' || c == '\\')
-                        ? (1 << (c & 7)) : 0 };
-        };
+        if ((character >= 'a' && character <= 'z')
+             || (character >= 'A' && character <= 'Z')
+                || (character >= '0' && character <= '9'))
+            return true;
 
-        template <int tableIndex>
-        struct Byte
-        {
-            enum { v = (int) Bit<tableIndex * 8 + 0>::v | (int) Bit<tableIndex * 8 + 1>::v
-                     | (int) Bit<tableIndex * 8 + 2>::v | (int) Bit<tableIndex * 8 + 3>::v
-                     | (int) Bit<tableIndex * 8 + 4>::v | (int) Bit<tableIndex * 8 + 5>::v
-                     | (int) Bit<tableIndex * 8 + 6>::v | (int) Bit<tableIndex * 8 + 7>::v };
-        };
+        const char* t = " .,;:-()_+=?!'#@[]/\\*%~{}$|";
 
-        static bool isLegal (uint32 c) noexcept
+        do
         {
-            static const unsigned char legalChars[] = { Byte< 0>::v, Byte< 1>::v, Byte< 2>::v, Byte< 3>::v,
-                                                        Byte< 4>::v, Byte< 5>::v, Byte< 6>::v, Byte< 7>::v,
-                                                        Byte< 8>::v, Byte< 9>::v, Byte<10>::v, Byte<11>::v,
-                                                        Byte<12>::v, Byte<13>::v, Byte<14>::v, Byte<15>::v };
-
-            return c < sizeof (legalChars) * 8
-                     && (legalChars[c >> 3] & (1 << (c & 7))) != 0;
+            if (((juce_wchar) (uint8) *t) == character)
+                return true;
         }
+        while (*++t != 0);
+
+        return false;
     }
 
-    static void escapeIllegalXmlChars (OutputStream& outputStream, const String& text, bool changeNewLines)
+    void generateLegalCharLookupTable()
+    {
+        uint8 n[32] = { 0 };
+        for (int i = 0; i < 256; ++i)
+            if (isLegalXmlCharSlow (i))
+                n[i >> 3] |= (1 << (i & 7));
+
+        String s;
+        for (int i = 0; i < 32; ++i)
+            s << (int) n[i] << ", ";
+
+        DBG (s);
+    }
+   #endif
+
+    static bool isLegalXmlChar (const uint32 c) noexcept
+    {
+        static const unsigned char legalChars[] = { 0, 0, 0, 0, 187, 255, 255, 175, 255,
+                                                    255, 255, 191, 254, 255, 255, 127 };
+        return c < sizeof (legalChars) * 8
+                 && (legalChars [c >> 3] & (1 << (c & 7))) != 0;
+    }
+
+    static void escapeIllegalXmlChars (OutputStream& outputStream, const String& text, const bool changeNewLines)
     {
         auto t = text.getCharPointer();
 
@@ -217,7 +221,7 @@ namespace XmlOutputFunctions
             if (character == 0)
                 break;
 
-            if (LegalCharLookupTable::isLegal (character))
+            if (isLegalXmlChar (character))
             {
                 outputStream << (char) character;
             }
@@ -253,12 +257,13 @@ namespace XmlOutputFunctions
 }
 
 void XmlElement::writeElementAsText (OutputStream& outputStream,
-                                     int indentationLevel,
-                                     int lineWrapLength,
-                                     const char* newLineChars) const
+                                     const int indentationLevel,
+                                     const int lineWrapLength) const
 {
+    using namespace XmlOutputFunctions;
+
     if (indentationLevel >= 0)
-        XmlOutputFunctions::writeSpaces (outputStream, (size_t) indentationLevel);
+        writeSpaces (outputStream, (size_t) indentationLevel);
 
     if (! isTextElement())
     {
@@ -273,8 +278,8 @@ void XmlElement::writeElementAsText (OutputStream& outputStream,
             {
                 if (lineLen > lineWrapLength && indentationLevel >= 0)
                 {
-                    outputStream << newLineChars;
-                    XmlOutputFunctions::writeSpaces (outputStream, attIndent);
+                    outputStream << newLine;
+                    writeSpaces (outputStream, attIndent);
                     lineLen = 0;
                 }
 
@@ -282,7 +287,7 @@ void XmlElement::writeElementAsText (OutputStream& outputStream,
                 outputStream.writeByte (' ');
                 outputStream << att->name;
                 outputStream.write ("=\"", 2);
-                XmlOutputFunctions::escapeIllegalXmlChars (outputStream, att->value, true);
+                escapeIllegalXmlChars (outputStream, att->value, true);
                 outputStream.writeByte ('"');
                 lineLen += (int) (outputStream.getPosition() - startPos);
             }
@@ -297,25 +302,24 @@ void XmlElement::writeElementAsText (OutputStream& outputStream,
             {
                 if (child->isTextElement())
                 {
-                    XmlOutputFunctions::escapeIllegalXmlChars (outputStream, child->getText(), false);
+                    escapeIllegalXmlChars (outputStream, child->getText(), false);
                     lastWasTextNode = true;
                 }
                 else
                 {
                     if (indentationLevel >= 0 && ! lastWasTextNode)
-                        outputStream << newLineChars;
+                        outputStream << newLine;
 
                     child->writeElementAsText (outputStream,
-                                               lastWasTextNode ? 0 : (indentationLevel + (indentationLevel >= 0 ? 2 : 0)), lineWrapLength,
-                                               newLineChars);
+                                               lastWasTextNode ? 0 : (indentationLevel + (indentationLevel >= 0 ? 2 : 0)), lineWrapLength);
                     lastWasTextNode = false;
                 }
             }
 
             if (indentationLevel >= 0 && ! lastWasTextNode)
             {
-                outputStream << newLineChars;
-                XmlOutputFunctions::writeSpaces (outputStream, (size_t) indentationLevel);
+                outputStream << newLine;
+                writeSpaces (outputStream, (size_t) indentationLevel);
             }
 
             outputStream.write ("</", 2);
@@ -329,84 +333,58 @@ void XmlElement::writeElementAsText (OutputStream& outputStream,
     }
     else
     {
-        XmlOutputFunctions::escapeIllegalXmlChars (outputStream, getText(), false);
+        escapeIllegalXmlChars (outputStream, getText(), false);
     }
 }
 
-XmlElement::TextFormat::TextFormat() {}
-
-XmlElement::TextFormat XmlElement::TextFormat::singleLine() const
-{
-    auto f = *this;
-    f.newLineChars = nullptr;
-    return f;
-}
-
-XmlElement::TextFormat XmlElement::TextFormat::withoutHeader() const
-{
-    auto f = *this;
-    f.addDefaultHeader = false;
-    return f;
-}
-
-String XmlElement::toString (const TextFormat& options) const
+String XmlElement::createDocument (StringRef dtdToUse,
+                                   const bool allOnOneLine,
+                                   const bool includeXmlHeader,
+                                   StringRef encodingType,
+                                   const int lineWrapLength) const
 {
     MemoryOutputStream mem (2048);
-    writeTo (mem, options);
+    writeToStream (mem, dtdToUse, allOnOneLine, includeXmlHeader, encodingType, lineWrapLength);
+
     return mem.toUTF8();
 }
 
-void XmlElement::writeTo (OutputStream& output, const TextFormat& options) const
+void XmlElement::writeToStream (OutputStream& output, StringRef dtdToUse,
+                                bool allOnOneLine, bool includeXmlHeader,
+                                StringRef encodingType, int lineWrapLength) const
 {
-    if (options.customHeader.isNotEmpty())
-    {
-        output << options.customHeader;
+    using namespace XmlOutputFunctions;
 
-        if (options.newLineChars == nullptr)
+    if (includeXmlHeader)
+    {
+        output << "<?xml version=\"1.0\" encoding=\"" << encodingType << "\"?>";
+
+        if (allOnOneLine)
             output.writeByte (' ');
         else
-            output << options.newLineChars
-                   << options.newLineChars;
+            output << newLine << newLine;
     }
-    else if (options.addDefaultHeader)
+
+    if (dtdToUse.isNotEmpty())
     {
-        output << "<?xml version=\"1.0\" encoding=\"";
+        output << dtdToUse;
 
-        if (options.customEncoding.isNotEmpty())
-            output << options.customEncoding;
-        else
-            output << "UTF-8";
-
-        output << "\"?>";
-
-        if (options.newLineChars == nullptr)
+        if (allOnOneLine)
             output.writeByte (' ');
         else
-            output << options.newLineChars
-                   << options.newLineChars;
+            output << newLine;
     }
 
-    if (options.dtd.isNotEmpty())
-    {
-        output << options.dtd;
+    writeElementAsText (output, allOnOneLine ? -1 : 0, lineWrapLength);
 
-        if (options.newLineChars == nullptr)
-            output.writeByte (' ');
-        else
-            output << options.newLineChars;
-    }
-
-    writeElementAsText (output, options.newLineChars == nullptr ? -1 : 0,
-                        options.lineWrapLength,
-                        options.newLineChars);
-
-    if (options.newLineChars != nullptr)
-        output << options.newLineChars;
+    if (! allOnOneLine)
+        output << newLine;
 }
 
-bool XmlElement::writeTo (const File& destinationFile, const TextFormat& options) const
+bool XmlElement::writeToFile (const File& file, StringRef dtdToUse,
+                              StringRef encodingType, int lineWrapLength) const
 {
-    TemporaryFile tempFile (destinationFile);
+    TemporaryFile tempFile (file);
 
     {
         FileOutputStream out (tempFile.getFile());
@@ -414,7 +392,7 @@ bool XmlElement::writeTo (const File& destinationFile, const TextFormat& options
         if (! out.openedOk())
             return false;
 
-        writeTo (out, options);
+        writeToStream (out, dtdToUse, false, true, encodingType, lineWrapLength);
         out.flush(); // (called explicitly to force an fsync on posix)
 
         if (out.getStatus().failed())
@@ -422,48 +400,6 @@ bool XmlElement::writeTo (const File& destinationFile, const TextFormat& options
     }
 
     return tempFile.overwriteTargetFileWithTemporary();
-}
-
-String XmlElement::createDocument (StringRef dtdToUse, bool allOnOneLine, bool includeXmlHeader,
-                                   StringRef encodingType, int lineWrapLength) const
-{
-    TextFormat options;
-    options.dtd = dtdToUse;
-    options.customEncoding = encodingType;
-    options.addDefaultHeader = includeXmlHeader;
-    options.lineWrapLength = lineWrapLength;
-
-    if (allOnOneLine)
-        options.newLineChars = nullptr;
-
-    return toString (options);
-}
-
-void XmlElement::writeToStream (OutputStream& output, StringRef dtdToUse,
-                                bool allOnOneLine, bool includeXmlHeader,
-                                StringRef encodingType, int lineWrapLength) const
-{
-    TextFormat options;
-    options.dtd = dtdToUse;
-    options.customEncoding = encodingType;
-    options.addDefaultHeader = includeXmlHeader;
-    options.lineWrapLength = lineWrapLength;
-
-    if (allOnOneLine)
-        options.newLineChars = nullptr;
-
-    writeTo (output, options);
-}
-
-bool XmlElement::writeToFile (const File& file, StringRef dtdToUse,
-                              StringRef encodingType, int lineWrapLength) const
-{
-    TextFormat options;
-    options.dtd = dtdToUse;
-    options.customEncoding = encodingType;
-    options.lineWrapLength = lineWrapLength;
-
-    return writeTo (file, options);
 }
 
 //==============================================================================
@@ -644,7 +580,8 @@ void XmlElement::setAttribute (const Identifier& attributeName, const int number
 
 void XmlElement::setAttribute (const Identifier& attributeName, const double number)
 {
-    setAttribute (attributeName, serialiseDouble (number));
+    String doubleString (number, 15, true);
+    setAttribute (attributeName, minimiseLengthOfFloatString (doubleString));
 }
 
 void XmlElement::removeAttribute (const Identifier& attributeName) noexcept
@@ -672,7 +609,7 @@ int XmlElement::getNumChildElements() const noexcept
 
 XmlElement* XmlElement::getChildElement (const int index) const noexcept
 {
-    return firstChildElement[index].get();
+    return firstChildElement [index].get();
 }
 
 XmlElement* XmlElement::getChildByName (StringRef childName) const noexcept
@@ -990,15 +927,12 @@ void XmlElement::deleteAllTextElements() noexcept
 }
 
 //==============================================================================
-//==============================================================================
 #if JUCE_UNIT_TESTS
 
 class XmlElementTests  : public UnitTest
 {
 public:
-    XmlElementTests()
-        : UnitTest ("XmlElement", UnitTestCategories::xml)
-    {}
+    XmlElementTests() : UnitTest ("XmlElement", "XML") {}
 
     void runTest() override
     {
@@ -1009,20 +943,15 @@ public:
             Identifier number ("number");
 
             std::map<double, String> tests;
-            tests[1] = "1.0";
+            tests[1] = "1";
             tests[1.1] = "1.1";
             tests[1.01] = "1.01";
-            tests[0.76378] = "0.76378";
-            tests[-10] = "-10.0";
-            tests[10.01] = "10.01";
-            tests[0.0123] = "0.0123";
+            tests[0.76378] = "7.6378e-1";
+            tests[-10] = "-1e1";
+            tests[10.01] = "1.001e1";
+            tests[0.0123] = "1.23e-2";
             tests[-3.7e-27] = "-3.7e-27";
-            tests[1e+40] = "1.0e40";
-            tests[-12345678901234567.0] = "-1.234567890123457e16";
-            tests[192000] = "192000.0";
-            tests[1234567] = "1.234567e6";
-            tests[0.00006] = "0.00006";
-            tests[0.000006] = "6.0e-6";
+            tests[1e+40] = "1e40";
 
             for (auto& test : tests)
             {

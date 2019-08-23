@@ -36,9 +36,15 @@ bool File::copyInternal (const File& dest) const
         NSFileManager* fm = [NSFileManager defaultManager];
 
         return [fm fileExistsAtPath: juceStringToNS (fullPath)]
+               #if defined (MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
                 && [fm copyItemAtPath: juceStringToNS (fullPath)
                                toPath: juceStringToNS (dest.getFullPathName())
                                 error: nil];
+               #else
+                && [fm copyPath: juceStringToNS (fullPath)
+                         toPath: juceStringToNS (dest.getFullPathName())
+                        handler: nil];
+               #endif
     }
 }
 
@@ -69,7 +75,7 @@ namespace MacFileHelpers
 
     static bool isHiddenFile (const String& path)
     {
-       #if JUCE_MAC
+       #if defined (MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6
         JUCE_AUTORELEASEPOOL
         {
             NSNumber* hidden = nil;
@@ -78,8 +84,15 @@ namespace MacFileHelpers
             return [createNSURLFromFile (path) getResourceValue: &hidden forKey: NSURLIsHiddenKey error: &err]
                      && [hidden boolValue];
         }
-       #else
+       #elif JUCE_IOS
         return File (path).getFileName().startsWithChar ('.');
+       #else
+        FSRef ref;
+        LSItemInfoRecord info;
+
+        return FSPathMakeRefWithOptions ((const UInt8*) path.toRawUTF8(), kFSPathMakeRefDoNotFollowLeafSymlink, &ref, 0) == noErr
+                 && LSCopyItemInfoForRef (&ref, kLSRequestBasicFlagsOnly, &info) == noErr
+                 && (info.flags & kLSItemInfoIsInvisible) != 0;
        #endif
     }
 

@@ -107,9 +107,22 @@ public:
 
     //==============================================================================
     forcedinline uint8 getAlpha() const noexcept      { return components.a; }
-    forcedinline uint8 getRed()   const noexcept      { return components.r; }
+    forcedinline uint8 getRed() const noexcept        { return components.r; }
     forcedinline uint8 getGreen() const noexcept      { return components.g; }
-    forcedinline uint8 getBlue()  const noexcept      { return components.b; }
+    forcedinline uint8 getBlue() const noexcept       { return components.b; }
+
+   #if JUCE_GCC
+    // NB these are here as a workaround because GCC refuses to bind to packed values.
+    forcedinline uint8& getAlpha() noexcept           { return comps [indexA]; }
+    forcedinline uint8& getRed() noexcept             { return comps [indexR]; }
+    forcedinline uint8& getGreen() noexcept           { return comps [indexG]; }
+    forcedinline uint8& getBlue() noexcept            { return comps [indexB]; }
+   #else
+    forcedinline uint8& getAlpha() noexcept           { return components.a; }
+    forcedinline uint8& getRed() noexcept             { return components.r; }
+    forcedinline uint8& getGreen() noexcept           { return components.g; }
+    forcedinline uint8& getBlue() noexcept            { return components.b; }
+   #endif
 
     //==============================================================================
     /** Copies another pixel colour over this one.
@@ -328,6 +341,9 @@ private:
     {
         uint32 internal;
         Components components;
+       #if JUCE_GCC
+        uint8 comps[4];  // helper struct needed because gcc does not allow references to packed union members
+       #endif
     };
 }
 #ifndef DOXYGEN
@@ -412,9 +428,13 @@ public:
 
     //==============================================================================
     forcedinline uint8 getAlpha() const noexcept    { return 0xff; }
-    forcedinline uint8 getRed()   const noexcept    { return r; }
+    forcedinline uint8 getRed() const noexcept      { return r; }
     forcedinline uint8 getGreen() const noexcept    { return g; }
-    forcedinline uint8 getBlue()  const noexcept    { return b; }
+    forcedinline uint8 getBlue() const noexcept     { return b; }
+
+    forcedinline uint8& getRed() noexcept           { return r; }
+    forcedinline uint8& getGreen() noexcept         { return g; }
+    forcedinline uint8& getBlue() noexcept          { return b; }
 
     //==============================================================================
     /** Copies another pixel colour over this one.
@@ -631,9 +651,11 @@ public:
 
     //==============================================================================
     forcedinline uint8 getAlpha() const noexcept    { return a; }
-    forcedinline uint8 getRed()   const noexcept    { return 0; }
+    forcedinline uint8& getAlpha() noexcept         { return a; }
+
+    forcedinline uint8 getRed() const noexcept      { return 0; }
     forcedinline uint8 getGreen() const noexcept    { return 0; }
-    forcedinline uint8 getBlue()  const noexcept    { return 0; }
+    forcedinline uint8 getBlue() const noexcept     { return 0; }
 
     //==============================================================================
     /** Copies another pixel colour over this one.

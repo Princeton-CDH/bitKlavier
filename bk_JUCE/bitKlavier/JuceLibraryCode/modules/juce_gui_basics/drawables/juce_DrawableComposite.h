@@ -91,7 +91,7 @@ public:
 
     //==============================================================================
     /** @internal */
-    std::unique_ptr<Drawable> createCopy() const override;
+    Drawable* createCopy() const override;
     /** @internal */
     Rectangle<float> getDrawableBounds() const override;
     /** @internal */

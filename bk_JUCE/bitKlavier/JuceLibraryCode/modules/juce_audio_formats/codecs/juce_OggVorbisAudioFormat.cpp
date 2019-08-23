@@ -49,10 +49,7 @@ namespace OggVorbisNamespace
   #endif
  #elif JUCE_GCC
   #pragma GCC diagnostic push
-  #pragma GCC diagnostic ignored "-Wconversion"
   #pragma GCC diagnostic ignored "-Wshadow"
-  #pragma GCC diagnostic ignored "-Wsign-conversion"
-  #pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
  #endif
 
  #include "oggvorbis/vorbisenc.h"
@@ -181,7 +178,7 @@ public:
                     if (destSamples[i] != nullptr)
                         memcpy (destSamples[i] + startOffsetInDestBuffer,
                                 reservoir.getReadPointer (i, (int) (startSampleInFile - reservoirStart)),
-                                (size_t) numToUse * sizeof (float));
+                                sizeof (float) * (size_t) numToUse);
 
                 startSampleInFile += numToUse;
                 numSamples -= numToUse;
@@ -216,7 +213,7 @@ public:
                     jassert (samps <= numToRead);
 
                     for (int i = jmin ((int) numChannels, reservoir.getNumChannels()); --i >= 0;)
-                        memcpy (reservoir.getWritePointer (i, offset), dataIn[i], (size_t) samps * sizeof (float));
+                        memcpy (reservoir.getWritePointer (i, offset), dataIn[i], sizeof (float) * (size_t) samps);
 
                     numToRead -= samps;
                     offset += samps;
@@ -231,7 +228,7 @@ public:
         {
             for (int i = numDestChannels; --i >= 0;)
                 if (destSamples[i] != nullptr)
-                    zeromem (destSamples[i] + startOffsetInDestBuffer, (size_t) numSamples * sizeof (int));
+                    zeromem (destSamples[i] + startOffsetInDestBuffer, sizeof (int) * (size_t) numSamples);
         }
 
         return true;

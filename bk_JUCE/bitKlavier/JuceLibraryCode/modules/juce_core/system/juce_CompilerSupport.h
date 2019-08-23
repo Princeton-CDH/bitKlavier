@@ -38,6 +38,8 @@
   #error "JUCE requires that GCC has C++11 compatibility enabled"
  #endif
 
+ #define JUCE_COMPILER_SUPPORTS_NOEXCEPT 1
+
  #if (__GNUC__ * 100 + __GNUC_MINOR__) >= 500
   #define JUCE_HAS_CONSTEXPR 1
  #endif
@@ -48,7 +50,7 @@
   #endif
  #endif
 
- #define JUCE_CXX14_IS_AVAILABLE ((__cplusplus >= 201402L) || ((__GNUC__ * 100 + __GNUC_MINOR__) >= 409 && (__cplusplus >= 201300L)))
+ #define JUCE_CXX14_IS_AVAILABLE (__cplusplus >= 201402L)
  #define JUCE_CXX17_IS_AVAILABLE (__cplusplus >= 201703L)
 
 #endif
@@ -61,6 +63,7 @@
   #error "JUCE requires Clang 3.3 or later"
  #endif
 
+ #define JUCE_COMPILER_SUPPORTS_NOEXCEPT 1
  #define JUCE_HAS_CONSTEXPR 1
 
  #ifndef JUCE_COMPILER_SUPPORTS_ARC
@@ -82,11 +85,18 @@
 // MSVC
 #if JUCE_MSVC
 
- #if _MSC_VER < 1900 // VS2015
-   #error "JUCE requires Visual Studio 2015 or later"
+ #if _MSC_VER < 1800 // VS2013
+   #error "JUCE requires Visual Studio 2013 or later"
  #endif
 
- #define JUCE_HAS_CONSTEXPR 1
+ #if _MSC_VER >= 1900 // VS2015
+  #define JUCE_COMPILER_SUPPORTS_NOEXCEPT 1
+  #define JUCE_HAS_CONSTEXPR 1
+ #else
+  #define _ALLOW_KEYWORD_MACROS 1 // prevent a warning
+  #undef  noexcept
+  #define noexcept  throw()
+ #endif
 
  #ifndef JUCE_EXCEPTIONS_DISABLED
   #if ! _CPPUNWIND
@@ -127,6 +137,5 @@ namespace std
  #define JUCE_COMPILER_SUPPORTS_OVERRIDE_AND_FINAL 1
  #define JUCE_COMPILER_SUPPORTS_VARIADIC_TEMPLATES 1
  #define JUCE_COMPILER_SUPPORTS_INITIALIZER_LISTS 1
- #define JUCE_COMPILER_SUPPORTS_NOEXCEPT 1
  #define JUCE_DELETED_FUNCTION = delete
 #endif

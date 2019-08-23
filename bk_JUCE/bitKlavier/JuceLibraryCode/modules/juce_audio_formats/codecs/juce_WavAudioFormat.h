@@ -210,7 +210,6 @@ public:
                                         int bitsPerSample,
                                         const StringPairArray& metadataValues,
                                         int qualityOptionIndex) override;
-    using AudioFormat::createWriterFor;
 
     //==============================================================================
     /** Utility function to replace the metadata in a wav file with a new set of values.

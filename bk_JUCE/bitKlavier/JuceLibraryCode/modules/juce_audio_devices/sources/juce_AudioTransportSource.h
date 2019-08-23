@@ -167,7 +167,7 @@ private:
 
     CriticalSection callbackLock;
     float gain = 1.0f, lastGain = 1.0f;
-    std::atomic<bool> playing { false }, stopped { true };
+    bool playing = false, stopped = true;
     double sampleRate = 44100.0, sourceSampleRate = 0;
     int blockSize = 128, readAheadBufferSize = 0;
     bool isPrepared = false, inputStreamEOF = false;

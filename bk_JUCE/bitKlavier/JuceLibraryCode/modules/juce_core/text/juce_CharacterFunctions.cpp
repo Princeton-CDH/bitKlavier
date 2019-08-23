@@ -179,8 +179,6 @@ juce_wchar CharacterFunctions::getUnicodeCharFromWindows1252Codepage (const uint
     return (juce_wchar) lookup[c - 0x80];
 }
 
-
-//==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
@@ -199,9 +197,7 @@ juce_wchar CharacterFunctions::getUnicodeCharFromWindows1252Codepage (const uint
 class CharacterFunctionsTests  : public UnitTest
 {
 public:
-    CharacterFunctionsTests()
-        : UnitTest ("CharacterFunctions", UnitTestCategories::text)
-    {}
+    CharacterFunctionsTests() : UnitTest ("CharacterFunctions", "Text") {}
 
     void runTest() override
     {

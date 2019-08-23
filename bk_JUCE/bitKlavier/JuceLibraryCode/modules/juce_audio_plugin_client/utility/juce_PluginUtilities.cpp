@@ -44,11 +44,15 @@ std::function<bool(AudioProcessor&)> PluginHostType::jucePlugInIsRunningInAudioS
  bool juce_isRunningInUnity()    { return PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_Unity; }
 #endif
 
-#if JUCE_MODULE_AVAILABLE_juce_opengl && JucePlugin_Build_VST
+#if JUCE_MODULE_AVAILABLE_juce_opengl
  bool juce_shouldDoubleScaleNativeGLWindow()
  {
-     return PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST
-           && getHostType().type == PluginHostType::AbletonLive10;
+     auto wrapperType = PluginHostType::getPluginLoadedAs();
+
+     if (wrapperType == AudioProcessor::wrapperType_VST || wrapperType == AudioProcessor::wrapperType_VST3)
+         return getHostType().type == PluginHostType::SteinbergCubase10;
+
+     return false;
  }
 #endif
 

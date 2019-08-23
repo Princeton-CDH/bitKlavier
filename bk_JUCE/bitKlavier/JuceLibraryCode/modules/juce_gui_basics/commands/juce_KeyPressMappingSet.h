@@ -206,7 +206,7 @@ public:
 
         @see restoreFromXml
     */
-    std::unique_ptr<XmlElement> createXml (bool saveDifferencesFromDefaultSet) const;
+    XmlElement* createXml (bool saveDifferencesFromDefaultSet) const;
 
     //==============================================================================
     /** @internal */

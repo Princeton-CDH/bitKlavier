@@ -17,6 +17,7 @@
 #include "Tempo.h"
 #include "General.h"
 #include "Keymap.h"
+#include "BKSTK.h"
 
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////BLENDRONOMER PREPARATION///////////////////////////////////
@@ -36,7 +37,7 @@ public:
 	BlendronomerPreparation(BlendronomerPreparation::Ptr p);
 	BlendronomerPreparation(String newName, Array<int> beats, Array<float> smoothTimes,
 		Array<float> feedbackCoefficients, Array<float> clickGains, float smoothValue,
-		float smoothDuration);
+		float smoothDuration, float delayMax, float delayLength, float feedbackGain);
 	BlendronomerPreparation(void);
 
 	// copy, modify, compare, randomize
@@ -53,7 +54,7 @@ public:
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
 	inline const Array<float> getClickGains() const noexcept { return bClickGains; }
 	inline const float getDelayMax() const noexcept { return bDelayMax; }
-	inline const float getDelayGain() const noexcept { return bDelayGain; }
+	inline const float getFeedbackGain() const noexcept { return bFeedbackGain; }
 	inline const float getDelayLength() const noexcept { return bDelayLength; }
 	inline const float getSmoothValue() const noexcept { return bSmoothValue; }
 	inline const float getSmoothDuration() const noexcept { return bSmoothDuration; }
@@ -64,6 +65,7 @@ public:
 	inline const int getVelocityMin() const noexcept { return velocityMin; }
 	inline const int getVelocityMax() const noexcept { return velocityMax; }
 	inline const int getNumVoices() const noexcept { return bNumVoices; }
+	inline const bool getActive() const noexcept { return isActive; }
 
 	//mutators
 	inline void setName(String n) { name = n; }
@@ -73,7 +75,7 @@ public:
 	inline void setFeedbackCoefficients(Array<float> feedbackCoefficients) { bFeedbackCoefficients.swapWith(feedbackCoefficients); }
 	inline void setClickGains(Array<float> clickGains) { bClickGains.swapWith(clickGains); }
 	inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
-	inline void setDelayGain(float delayGain) { bDelayGain = delayGain; }
+	inline void setFeedbackGain(float FeedbackGain) { bFeedbackGain = FeedbackGain; }
 	inline void setDelayLength(float delayLength) { bDelayMax = delayLength; }
 	inline void setSmoothValue(float smoothValue) { bSmoothValue = smoothValue; }
 	inline void setSmoothDuration(float smoothDuration) { bSmoothDuration = smoothDuration; }
@@ -87,6 +89,8 @@ public:
 	inline const void setVelocityMin(int min) { velocityMin = min; }
 	inline const void setVelocityMax(int max) { velocityMax = max; }
 	inline const void setNumVoices(int numVoices) { bNumVoices = numVoices; }
+	inline const void setActive(bool newActive) { isActive = newActive; }
+	inline const void toggleActive() { isActive = !isActive; }
 
 	void print(void);
 	ValueTree getState(void);
@@ -94,6 +98,7 @@ public:
 
 private:
 	String name;
+	bool isActive;
 
 	//stuff from preset
 	float bTempo;
@@ -102,14 +107,16 @@ private:
 	Array<float> bFeedbackCoefficients;
 	Array<float> bClickGains;
 
-	//stuff from signal chain, not sure if necessary
+	//d0 stuff
 	float bDelayMax;
-	float bDelayGain;
 	float bDelayLength;
 
-	//smoothing stuff
+	//dsmooth stuff
 	float bSmoothValue;
 	float bSmoothDuration;
+
+	//signal chain stk classes
+	float bFeedbackGain;
 
 	//voices? will be implemented later
 	int bNumVoices;
@@ -135,8 +142,8 @@ public:
 	typedef OwnedArray<Blendronomer, CriticalSection> CSArr;
 
 	Blendronomer(BlendronomerPreparation::Ptr prep, int Id) :
-		bPrep(new BlendronomerPreparation(prep)),
-		aPrep(new BlendronomerPreparation(bPrep)),
+		sPrep(new BlendronomerPreparation(prep)),
+		aPrep(new BlendronomerPreparation(sPrep)),
 		Id(Id),
 		name(String(Id))
 	{
@@ -147,14 +154,14 @@ public:
 		Id(Id),
 		name(String(Id))
 	{
-		aPrep = new BlendronomerPreparation();
-		aPrep = new BlendronomerPreparation(aPrep);
+		sPrep = new BlendronomerPreparation();
+		aPrep = new BlendronomerPreparation(sPrep);
 		if (random) randomize();
 	}
 
 	inline Blendronomer::Ptr duplicate()
 	{
-		BlendronomerPreparation::Ptr copyPrep = new BlendronomerPreparation(aPrep);
+		BlendronomerPreparation::Ptr copyPrep = new BlendronomerPreparation(sPrep);
 
 		Blendronomer::Ptr copy = new Blendronomer(copyPrep, -1);
 
@@ -165,20 +172,20 @@ public:
 
 	inline void clear(void)
 	{
-		aPrep = new BlendronomerPreparation();
-		aPrep = new BlendronomerPreparation(aPrep);
+		sPrep = new BlendronomerPreparation();
+		aPrep = new BlendronomerPreparation(sPrep);
 	}
 
 	inline void copy(Blendronomer::Ptr from)
 	{
-		aPrep->copy(from->aPrep);
-		aPrep->copy(aPrep);
+		sPrep->copy(from->sPrep);
+		aPrep->copy(sPrep);
 	}
 
 	inline void randomize()
 	{
 		clear();
-		aPrep->randomize();
+		sPrep->randomize();
 		aPrep->randomize();
 		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
@@ -202,7 +209,7 @@ public:
 
 		String n = e->getStringAttribute("name");
 
-		if (n != String::empty)     name = n;
+		if (n != String())     name = n;
 		else                        name = String(Id);
 
 
@@ -220,6 +227,11 @@ public:
 		aPrep->copy(aPrep);
 	}*/
 
+	inline void setState(XmlElement* e)
+	{
+		//dummy method
+	}
+
 	~Blendronomer() {};
 
 	inline int getId() { return Id; }
@@ -227,7 +239,7 @@ public:
 	inline void setName(String newName) { name = newName; }
 	inline String getName() const noexcept { return name; }
 
-	BlendronomerPreparation::Ptr bPrep;
+	BlendronomerPreparation::Ptr sPrep;
 	BlendronomerPreparation::Ptr aPrep;
 private:
 	int Id;
@@ -244,22 +256,23 @@ class BlendronomerProcessor : public ReferenceCountedObject
 {
 
 public:
-	typedef ReferenceCountedObjectPtr<Blendronomer>   Ptr;
-	typedef Array<Blendronomer::Ptr>                  PtrArr;
-	typedef Array<Blendronomer::Ptr, CriticalSection> CSPtrArr;
-	typedef OwnedArray<Blendronomer>                  Arr;
-	typedef OwnedArray<Blendronomer, CriticalSection> CSArr;
+	typedef ReferenceCountedObjectPtr<BlendronomerProcessor>   Ptr;
+	typedef Array<BlendronomerProcessor::Ptr>                  PtrArr;
+	typedef Array<BlendronomerProcessor::Ptr, CriticalSection> CSPtrArr;
+	typedef OwnedArray<BlendronomerProcessor>                  Arr;
+	typedef OwnedArray<BlendronomerProcessor, CriticalSection> CSArr;
 
-	BlendronomerProcessor(Blendronomer::Ptr blendronomer,
-		TuningProcessor::Ptr tuning,
-		TempoProcessor::Ptr tempo,
-		BKSynthesiser* main,
-		GeneralSettings::Ptr general);
+	BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
+		TuningProcessor::Ptr bTuning,
+		TempoProcessor::Ptr bTempo,
+		BKDelay::Ptr delayL,
+		GeneralSettings::Ptr bGeneral,
+		BKSynthesiser* bMain
+		);
 	~BlendronomerProcessor();
 
 	//called with every audio vector
 	BKSampleLoadType sampleType;
-	void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
 
 	float getTimeToBeatMS(float beatsToSkip);
 
@@ -271,6 +284,8 @@ public:
 
 	void postRelease(int midiNoteNumber, int midiChannel);
 
+	void prepareToPlay(double sr);
+
 	inline void attachToSynthesiser(BKSynthesiser* main)
 	{
 		synth = main;
@@ -280,17 +295,21 @@ public:
 	inline Blendronomer::Ptr getBlendronomer(void) const noexcept { return blendronomer; }
 	inline TuningProcessor::Ptr getTuner(void) const noexcept { return tuner; }
 	inline TempoProcessor::Ptr getTempo(void) const noexcept { return tempo; }
+	inline BKDelay::Ptr getDelay(void) const noexcept { return delay; }
 	inline int getId(void) const noexcept { return blendronomer->getId(); }
 	inline int getTunerId(void) const noexcept { return tuner->getId(); }
 	inline int getTempoId(void) const noexcept { return tempo->getId(); }
 	inline const uint64 getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
+
 
 	//mutators
 	inline void setBlendronomer(Blendronomer::Ptr blend) { blendronomer = blend; }
 	inline void setTuner(TuningProcessor::Ptr tune) { tuner = tune; }
 	inline void setTempo(TempoProcessor::Ptr temp) { tempo = temp; }
 	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
-	inline void reset(void) { blendronomer->aPrep->copy(blendronomer->bPrep); }
+	inline void reset(void) { blendronomer->aPrep->copy(blendronomer->sPrep); }
+
+	void processBlock(int numSamples, int midiChannel);
 
 
 private:
@@ -300,6 +319,8 @@ private:
 	Blendronomer::Ptr blendronomer;
 	TuningProcessor::Ptr tuner;
 	TempoProcessor::Ptr tempo;
+
+	BKDelay::Ptr delay;
 
 	double sampleRate;
 
@@ -312,16 +333,14 @@ private:
 
 	bool runChain;
 	bool inChain;
-	uint64 thresholdSamples;
-	uint64 thresholdTimer;
 
 	uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
 	uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
+	uint64 sampleTimer;
+	uint64 beatIndex, smoothIndex, gainIndex, clickIndex;
 
-	Array<uint64> holdTimers;
-	int lastKeyPressed;
-	float lastKeyVelocity;
+	void updateDelay();
 
-	JUCE_LEAK_DETECTOR(BlendronomerProcessor);
+	//JUCE_LEAK_DETECTOR(BlendronomerProcessor);
 };
 #endif

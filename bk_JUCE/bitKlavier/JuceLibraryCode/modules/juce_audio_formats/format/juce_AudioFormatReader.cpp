@@ -58,7 +58,7 @@ bool AudioFormatReader::read (float* const* destChannels, int numDestChannels,
     return true;
 }
 
-bool AudioFormatReader::read (int* const* destChannels,
+bool AudioFormatReader::read (int* const* destSamples,
                               int numDestChannels,
                               int64 startSampleInSource,
                               int numSamplesToRead,
@@ -74,8 +74,8 @@ bool AudioFormatReader::read (int* const* destChannels,
         auto silence = (int) jmin (-startSampleInSource, (int64) numSamplesToRead);
 
         for (int i = numDestChannels; --i >= 0;)
-            if (auto d = destChannels[i])
-                zeromem (d, (size_t) silence * sizeof (int));
+            if (auto d = destSamples[i])
+                zeromem (d, sizeof (int) * (size_t) silence);
 
         startOffsetInDestBuffer += silence;
         numSamplesToRead -= silence;
@@ -85,7 +85,7 @@ bool AudioFormatReader::read (int* const* destChannels,
     if (numSamplesToRead <= 0)
         return true;
 
-    if (! readSamples (const_cast<int**> (destChannels),
+    if (! readSamples (const_cast<int**> (destSamples),
                        jmin ((int) numChannels, numDestChannels), startOffsetInDestBuffer,
                        startSampleInSource, numSamplesToRead))
         return false;
@@ -94,26 +94,26 @@ bool AudioFormatReader::read (int* const* destChannels,
     {
         if (fillLeftoverChannelsWithCopies)
         {
-            auto lastFullChannel = destChannels[0];
+            auto lastFullChannel = destSamples[0];
 
             for (int i = (int) numChannels; --i > 0;)
             {
-                if (destChannels[i] != nullptr)
+                if (destSamples[i] != nullptr)
                 {
-                    lastFullChannel = destChannels[i];
+                    lastFullChannel = destSamples[i];
                     break;
                 }
             }
 
             if (lastFullChannel != nullptr)
                 for (int i = (int) numChannels; i < numDestChannels; ++i)
-                    if (auto d = destChannels[i])
+                    if (auto d = destSamples[i])
                         memcpy (d, lastFullChannel, sizeof (int) * originalNumSamplesToRead);
         }
         else
         {
             for (int i = (int) numChannels; i < numDestChannels; ++i)
-                if (auto d = destChannels[i])
+                if (auto d = destSamples[i])
                     zeromem (d, sizeof (int) * originalNumSamplesToRead);
         }
     }
@@ -175,7 +175,7 @@ void AudioFormatReader::read (AudioBuffer<float>* buffer,
 
             // if the target's stereo and the source is mono, dupe the first channel..
             if (numTargetChannels > 1 && (chans[0] == nullptr || chans[1] == nullptr))
-                memcpy (dests[1], dests[0], (size_t) numSamples * sizeof (float));
+                memcpy (dests[1], dests[0], sizeof (float) * (size_t) numSamples);
 
             if (! usesFloatingPointData)
                 convertFixedToFloat (dests, 2, numSamples);

@@ -145,15 +145,8 @@ private:
         {
         }
 
-        std::unique_ptr<ImageType> createType() const override
-        {
-            return std::make_unique<SoftwareImageType>();
-        }
-
-        std::unique_ptr<LowLevelGraphicsContext> createLowLevelContext() override
-        {
-            return std::make_unique<LowLevelGraphicsSoftwareRenderer> (Image (this));
-        }
+        ImageType* createType() const override                       { return new SoftwareImageType(); }
+        LowLevelGraphicsContext* createLowLevelContext() override    { return new LowLevelGraphicsSoftwareRenderer (Image (this)); }
 
         void initialiseBitmapData (Image::BitmapData& bitmap, int x, int y, Image::BitmapData::ReadWriteMode mode) override
         {

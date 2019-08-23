@@ -37,10 +37,13 @@ static NSMutableArray* createAllowedTypesArray (const StringArray& filters)
 
     for (int i = 0; i < filters.size(); ++i)
     {
+       #if defined (MAC_OS_X_VERSION_10_6) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6)
         // From OS X 10.6 you can only specify allowed extensions, so any filters containing wildcards
         // must be of the form "*.extension"
         jassert (filters[i] == "*"
                  || (filters[i].startsWith ("*.") && filters[i].lastIndexOfChar ('*') == 0));
+       #endif
+
         const String f (filters[i].replace ("*.", ""));
 
         if (f == "*")
@@ -119,8 +122,10 @@ public:
             filename = owner.startingFile.getFileName();
         }
 
+       #if defined (MAC_OS_X_VERSION_10_6) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6)
         [panel setDirectoryURL: createNSURLFromFile (startingDirectory)];
         [panel setNameFieldStringValue: juceStringToNS (filename)];
+       #endif
     }
 
     ~Native() override
@@ -173,7 +178,13 @@ public:
             tempMenu.reset (new TemporaryMainMenuWithStandardCommands());
 
         jassert (panel != nil);
+       #if defined (MAC_OS_X_VERSION_10_6) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6)
         auto result = [panel runModal];
+       #else
+        auto result = [panel runModalForDirectory: juceStringToNS (startingDirectory)
+                                             file: juceStringToNS (filename)];
+       #endif
+
         finished (result);
     }
 
@@ -187,7 +198,11 @@ public:
 
 private:
     //==============================================================================
+   #if defined (MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
     typedef NSObject<NSOpenSavePanelDelegate> DelegateType;
+   #else
+    typedef NSObject DelegateType;
+   #endif
 
     void finished (NSInteger result)
     {
@@ -238,6 +253,22 @@ private:
         for (int i = filters.size(); --i >= 0;)
             if (f.getFileName().matchesWildcard (filters[i], true))
                 return true;
+
+       #if (! defined (MAC_OS_X_VERSION_10_7)) || MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_7
+        NSError* error;
+        NSString* name = [[NSWorkspace sharedWorkspace] typeOfFile: nsFilename error: &error];
+
+        if ([name isEqualToString: nsStringLiteral ("com.apple.alias-file")])
+        {
+            FSRef ref;
+            FSPathMakeRef ((const UInt8*) [nsFilename fileSystemRepresentation], &ref, nullptr);
+
+            Boolean targetIsFolder = false, wasAliased = false;
+            FSResolveAliasFileWithMountFlags (&ref, true, &targetIsFolder, &wasAliased, 0);
+
+            return wasAliased && targetIsFolder;
+        }
+       #endif
 
         return f.isDirectory()
                  && ! [[NSWorkspace sharedWorkspace] isFilePackageAtPath: nsFilename];
@@ -291,7 +322,9 @@ private:
             addMethod (@selector (panel:shouldShowFilename:), shouldShowFilename,      "c@:@@");
             addMethod (@selector (panelSelectionDidChange:),  panelSelectionDidChange, "c@");
 
+           #if defined (MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_6
             addProtocol (@protocol (NSOpenSavePanelDelegate));
+           #endif
 
             registerClass();
         }

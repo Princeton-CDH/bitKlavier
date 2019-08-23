@@ -372,16 +372,15 @@ Array<IPAddress> IPAddress::getAllAddresses (bool includeIPv6)
     return addresses;
 }
 
-
-//==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
 struct IPAddressTests : public UnitTest
 {
     IPAddressTests()
-        : UnitTest ("IPAddress", UnitTestCategories::networking)
-    {}
+        : UnitTest ("IPAddress", "Networking")
+    {
+    }
 
     void runTest() override
     {

@@ -116,6 +116,7 @@ public:
     NostalgicProcessor::PtrArr           nprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
+	BlendronomerProcessor::PtrArr		 bprocessor;
     
     void addProcessor(BKPreparationType thisType, int thisId);
     bool containsProcessor(BKPreparationType thisType, int thisId);
@@ -125,12 +126,14 @@ public:
     SynchronicProcessor::Ptr    getSynchronicProcessor(int Id, bool add = true);
     TuningProcessor::Ptr        getTuningProcessor(int Id, bool add = true);
     TempoProcessor::Ptr         getTempoProcessor(int Id, bool add = true);
+	BlendronomerProcessor::Ptr	getBlendronomerProcessor(int Id, bool add = true);
     
     inline DirectProcessor::PtrArr        getDirectProcessors(void) const noexcept { return dprocessor; }
     inline NostalgicProcessor::PtrArr     getNostalgicProcessors(void) const noexcept { return nprocessor; }
     inline SynchronicProcessor::PtrArr    getSynchronicProcessors(void) const noexcept { return sprocessor; }
     inline TuningProcessor::PtrArr        getTuningProcessors(void) const noexcept { return tprocessor; }
     inline TempoProcessor::PtrArr         getTempoProcessors(void) const noexcept { return mprocessor; }
+	inline BlendronomerProcessor::PtrArr  getBlendronomerProcessors(void) const noexcept { return bprocessor; }
     inline PreparationMap::CSPtrArr       getPreparationMaps(void) const noexcept { return prepMaps; }
     
     NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
@@ -138,6 +141,7 @@ public:
     DirectProcessor::Ptr        addDirectProcessor(int thisId);
     TuningProcessor::Ptr        addTuningProcessor(int thisId);
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
+	BlendronomerProcessor::Ptr  addBlendronomerProcessor(int thisId);
     
     void clearOldNotes(Piano::Ptr prevPiano)
     {
@@ -255,6 +259,8 @@ public:
     void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
     
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
+
+	//TODO: figure out blendronomer linking
     
     ValueTree getState(void);
     
@@ -270,11 +276,12 @@ public:
             {
                 BKPreparationType type = item->getType();
                 
-                if (type == PreparationTypeDirect) ptype = "d";
-                else if (type == PreparationTypeNostalgic) ptype = "n";
-                else if (type == PreparationTypeSynchronic) ptype = "s";
-                else if (type == PreparationTypeTuning) ptype = "t";
-                else if (type == PreparationTypeTempo) ptype = "m";
+				if (type == PreparationTypeDirect) ptype = "d";
+				else if (type == PreparationTypeNostalgic) ptype = "n";
+				else if (type == PreparationTypeSynchronic) ptype = "s";
+				else if (type == PreparationTypeTuning) ptype = "t";
+				else if (type == PreparationTypeTempo) ptype = "m";
+				else if (type == PreparationTypeBlendronomer) ptype = "b";
                 
                 out += String(i) + ":" + ptype + String(item->getId()) + ":" + "{" + item->connectionsToString() +"} ";
                 
@@ -390,6 +397,17 @@ private:
         
         return which;
     }
+
+	inline Array<int> getAllIds(Blendronomer::PtrArr direct)
+	{
+		Array<int> which;
+		for (auto p : direct)
+		{
+			which.add(p->getId());
+		}
+
+		return which;
+	}
     
     void configureDirectModification(DirectModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     void deconfigureDirectModification(DirectModification::Ptr, Array<int> whichKeymaps);
@@ -411,6 +429,10 @@ private:
     void deconfigureTempoModification(TempoModification::Ptr, Array<int> whichKeymaps);
     void deconfigureTempoModificationForKeys(TempoModification::Ptr, Array<bool>);
     
+	void configureBlendronomerModification(BlendronomerModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
+	void deconfigureBlendronomerModification(BlendronomerModification::Ptr, Array<int> whichKeymaps);
+	void deconfigureBlendronomerModificationForKeys(BlendronomerModification::Ptr, Array<bool>);
+
     JUCE_LEAK_DETECTOR(Piano)
 };
 

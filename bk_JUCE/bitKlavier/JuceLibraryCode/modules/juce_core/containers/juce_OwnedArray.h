@@ -146,7 +146,7 @@ public:
 
         @see getUnchecked
     */
-    inline ObjectClass* operator[] (int index) const noexcept
+    inline ObjectClass* operator[] (const int index) const noexcept
     {
         const ScopedLockType lock (getLock());
         return values.getValueWithDefault (index);
@@ -157,7 +157,7 @@ public:
         This is a faster and less safe version of operator[] which doesn't check the index passed in, so
         it can be used when you're sure the index is always going to be legal.
     */
-    inline ObjectClass* getUnchecked (int index) const noexcept
+    inline ObjectClass* getUnchecked (const int index) const noexcept
     {
         const ScopedLockType lock (getLock());
         return values[index];
@@ -198,15 +198,7 @@ public:
     /** Returns a pointer to the first element in the array.
         This method is provided for compatibility with standard C++ iteration mechanisms.
     */
-    inline ObjectClass** begin() noexcept
-    {
-        return values.begin();
-    }
-
-    /** Returns a pointer to the first element in the array.
-        This method is provided for compatibility with standard C++ iteration mechanisms.
-    */
-    inline ObjectClass* const* begin() const noexcept
+    inline ObjectClass** begin() const noexcept
     {
         return values.begin();
     }
@@ -214,15 +206,7 @@ public:
     /** Returns a pointer to the element which follows the last element in the array.
         This method is provided for compatibility with standard C++ iteration mechanisms.
     */
-    inline ObjectClass** end() noexcept
-    {
-        return values.end();
-    }
-
-    /** Returns a pointer to the element which follows the last element in the array.
-        This method is provided for compatibility with standard C++ iteration mechanisms.
-    */
-    inline ObjectClass* const* end() const noexcept
+    inline ObjectClass** end() const noexcept
     {
         return values.end();
     }
@@ -230,15 +214,7 @@ public:
     /** Returns a pointer to the first element in the array.
         This method is provided for compatibility with the standard C++ containers.
     */
-    inline ObjectClass** data() noexcept
-    {
-        return begin();
-    }
-
-    /** Returns a pointer to the first element in the array.
-        This method is provided for compatibility with the standard C++ containers.
-    */
-    inline ObjectClass* const* data() const noexcept
+    inline ObjectClass** data() const noexcept
     {
         return begin();
     }
@@ -252,7 +228,7 @@ public:
     int indexOf (const ObjectClass* objectToLookFor) const noexcept
     {
         const ScopedLockType lock (getLock());
-        auto* e = values.begin();
+        auto** e = values.begin();
 
         for (; e != values.end(); ++e)
             if (objectToLookFor == *e)
@@ -269,7 +245,7 @@ public:
     bool contains (const ObjectClass* objectToLookFor) const noexcept
     {
         const ScopedLockType lock (getLock());
-        auto* e = values.begin();
+        auto** e = values.begin();
 
         for (; e != values.end(); ++e)
             if (objectToLookFor == *e)
@@ -291,30 +267,13 @@ public:
         @returns            the new object that was added
         @see set, insert, addIfNotAlreadyThere, addSorted
     */
-    ObjectClass* add (ObjectClass* newObject)
+    ObjectClass* add (ObjectClass* newObject) noexcept
     {
         const ScopedLockType lock (getLock());
         values.add (newObject);
         return newObject;
     }
 
-    /** Appends a new object to the end of the array.
-
-        Note that the this object will be deleted by the OwnedArray when it
-        is removed, so be careful not to delete it somewhere else.
-
-        Also be careful not to add the same object to the array more than once,
-        as this will obviously cause deletion of dangling pointers.
-
-        @param newObject    the new object to add to the array
-        @returns            the new object that was added
-        @see set, insert, addIfNotAlreadyThere, addSorted
-    */
-    ObjectClass* add (std::unique_ptr<ObjectClass> newObject)
-    {
-        return add (newObject.release());
-    }
-
     /** Inserts a new object into the array at the given index.
 
         Note that the this object will be deleted by the OwnedArray when it
@@ -333,34 +292,11 @@ public:
         @returns                    the new object that was added
         @see add, addSorted, addIfNotAlreadyThere, set
     */
-    ObjectClass* insert (int indexToInsertAt, ObjectClass* newObject)
+    ObjectClass* insert (int indexToInsertAt, ObjectClass* newObject) noexcept
     {
         const ScopedLockType lock (getLock());
         values.insert (indexToInsertAt, newObject, 1);
         return newObject;
-    }
-
-    /** Inserts a new object into the array at the given index.
-
-        Note that the this object will be deleted by the OwnedArray when it
-        is removed, so be careful not to delete it somewhere else.
-
-        If the index is less than 0 or greater than the size of the array, the
-        element will be added to the end of the array.
-        Otherwise, it will be inserted into the array, moving all the later elements
-        along to make room.
-
-        Be careful not to add the same object to the array more than once,
-        as this will obviously cause deletion of dangling pointers.
-
-        @param indexToInsertAt      the index at which the new element should be inserted
-        @param newObject            the new object to add to the array
-        @returns                    the new object that was added
-        @see add, addSorted, addIfNotAlreadyThere, set
-    */
-    ObjectClass* insert (int indexToInsertAt, std::unique_ptr<ObjectClass> newObject)
-    {
-        return insert (indexToInsertAt, newObject.release());
     }
 
     /** Inserts an array of values into this array at a given position.
@@ -384,6 +320,25 @@ public:
             const ScopedLockType lock (getLock());
             values.insertArray (indexToInsertAt, newObjects, numberOfElements);
         }
+    }
+
+    /** Appends a new object at the end of the array as long as the array doesn't
+        already contain it.
+
+        If the array already contains a matching object, nothing will be done.
+
+        @param newObject   the new object to add to the array
+        @returns           true if the new object was added, false otherwise
+    */
+    bool addIfNotAlreadyThere (ObjectClass* newObject) noexcept
+    {
+        const ScopedLockType lock (getLock());
+
+        if (contains (newObject))
+            return false;
+
+        add (newObject);
+        return true;
     }
 
     /** Replaces an object in the array with a different one.
@@ -433,24 +388,6 @@ public:
         }
 
         return newObject;
-    }
-
-    /** Replaces an object in the array with a different one.
-
-        If the index is less than zero, this method does nothing.
-        If the index is beyond the end of the array, the new object is added to the end of the array.
-
-        Be careful not to add the same object to the array more than once,
-        as this will obviously cause deletion of dangling pointers.
-
-        @param indexToChange        the index whose value you want to change
-        @param newObject            the new value to set for this index.
-        @param deleteOldElement     whether to delete the object that's being replaced with the new one
-        @see add, insert, remove
-    */
-    ObjectClass* set (int indexToChange, std::unique_ptr<ObjectClass> newObject, bool deleteOldElement = true)
-    {
-        return set (indexToChange, newObject.release(), deleteOldElement);
     }
 
     /** Adds elements from another array to the end of this array.
@@ -531,14 +468,14 @@ public:
         @see add, sort, indexOfSorted
     */
     template <class ElementComparator>
-    int addSorted (ElementComparator& comparator, ObjectClass* newObject) noexcept
+    int addSorted (ElementComparator& comparator, ObjectClass* const newObject) noexcept
     {
         // If you pass in an object with a static compareElements() method, this
         // avoids getting warning messages about the parameter being unused
         ignoreUnused (comparator);
 
         const ScopedLockType lock (getLock());
-        auto index = findInsertIndexInSortedArray (comparator, values.begin(), newObject, 0, values.size());
+        const int index = findInsertIndexInSortedArray (comparator, values.begin(), newObject, 0, values.size());
         insert (index, newObject);
         return index;
     }
@@ -556,7 +493,7 @@ public:
         @see addSorted, sort
     */
     template <typename ElementComparator>
-    int indexOfSorted (ElementComparator& comparator, const ObjectClass* objectToLookFor) const noexcept
+    int indexOfSorted (ElementComparator& comparator, const ObjectClass* const objectToLookFor) const noexcept
     {
         // If you pass in an object with a static compareElements() method, this
         // avoids getting warning messages about the parameter being unused
@@ -688,15 +625,16 @@ public:
 
         if (numberToRemove > 0)
         {
-            Array<ObjectClass*> objectsToDelete;
-
             if (deleteObjects)
-                objectsToDelete.addArray (values.begin() + startIndex, numberToRemove);
+            {
+                for (int i = startIndex; i < endIndex; ++i)
+                {
+                    ContainerDeletePolicy<ObjectClass>::destroy (values[i]);
+                    values[i] = nullptr; // (in case one of the destructors accesses this array and hits a dangling pointer)
+                }
+            }
 
             values.removeElements (startIndex, numberToRemove);
-
-            for (auto& o : objectsToDelete)
-                ContainerDeletePolicy<ObjectClass>::destroy (o);
 
             if ((values.size() << 1) < values.capacity())
                 minimiseStorageOverheads();
@@ -785,7 +723,7 @@ public:
         the array won't have to keep dynamically resizing itself as the elements
         are added, and it'll therefore be more efficient.
     */
-    void ensureStorageAllocated (int minNumElements) noexcept
+    void ensureStorageAllocated (const int minNumElements) noexcept
     {
         const ScopedLockType lock (getLock());
         values.ensureAllocatedSize (minNumElements);
@@ -819,7 +757,7 @@ public:
     */
     template <class ElementComparator>
     void sort (ElementComparator& comparator,
-               bool retainOrderOfEquivalentItems = false) noexcept
+               bool retainOrderOfEquivalentItems = false) const noexcept
     {
         // If you pass in an object with a static compareElements() method, this
         // avoids getting warning messages about the parameter being unused
@@ -854,14 +792,10 @@ private:
 
     void deleteAllObjects()
     {
-        auto i = values.size();
-
-        while (--i >= 0)
-        {
-            auto* e = values[i];
-            values.removeElements (i, 1);
+        for (auto& e : values)
             ContainerDeletePolicy<ObjectClass>::destroy (e);
-        }
+
+        values.clear();
     }
 
     template <class OtherObjectClass, class OtherCriticalSection>

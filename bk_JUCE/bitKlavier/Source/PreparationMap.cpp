@@ -232,7 +232,49 @@ bool PreparationMap::contains(TempoProcessor::Ptr thisOne)
         }
     }
     return false;
+
+
 }
+
+BlendronomerProcessor::PtrArr     PreparationMap::getBlendronomerProcessors(void)
+{
+	return bprocessor;
+}
+
+BlendronomerProcessor::Ptr        PreparationMap::getBlendronomerProcessor(int Id)
+{
+	for (auto p : bprocessor)
+	{
+		if (p->getId() == Id) return p;
+	}
+
+	return nullptr;
+}
+
+void PreparationMap::setBlendronomerProcessors(BlendronomerProcessor::PtrArr p)
+{
+	bprocessor = p;
+	deactivateIfNecessary();
+}
+
+void PreparationMap::addBlendronomerProcessor(BlendronomerProcessor::Ptr p)
+{
+	bprocessor.addIfNotAlreadyThere(p);
+	deactivateIfNecessary();
+}
+
+
+bool PreparationMap::contains(BlendronomerProcessor::Ptr thisOne)
+{
+	for (auto p : bprocessor)
+	{
+		if (p->getId() == thisOne->getId())
+		{
+			return true;
+		}
+	}
+	return false;
+	}
 
 void PreparationMap::deactivateIfNecessary()
 {
@@ -255,7 +297,7 @@ void PreparationMap::deactivateIfNecessary()
 }
 
 
-void PreparationMap::processBlock(int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic)
+void PreparationMap::processBlock(AudioSampleBuffer& buffer, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic)
 {
     sampleType = type;
     if(onlyNostalgic) {
@@ -285,6 +327,9 @@ void PreparationMap::processBlock(int numSamples, int midiChannel, BKSampleLoadT
         
         for (auto mproc : mprocessor)
             mproc->processBlock(numSamples, midiChannel);
+
+		for (auto bproc : bprocessor)
+			bproc->processBlock(numSamples, midiChannel);
     }
 }
 

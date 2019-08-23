@@ -113,7 +113,7 @@ public:
 
         @param keyName              the name of the property to retrieve
     */
-    std::unique_ptr<XmlElement> getXmlValue (StringRef keyName) const;
+    XmlElement* getXmlValue (StringRef keyName) const;
 
     //==============================================================================
     /** Sets a named property.
@@ -161,7 +161,7 @@ public:
         The string parameter is the tag name that should be used for the node.
         @see restoreFromXml
     */
-    std::unique_ptr<XmlElement> createXml (const String& nodeName) const;
+    XmlElement* createXml (const String& nodeName) const;
 
     /** Reloads a set of properties that were previously stored as XML.
         The node passed in must have been created by the createXml() method.

@@ -135,7 +135,7 @@ public:
                                                                 resultColumns.get()))))
     {
         // the content provider must be created first
-        jassert (contentProvider.get() != nullptr);
+        jassert (contentProvider.get() != 0);
     }
 
     jobject getNativeCursor() { return cursor.get(); }
@@ -199,7 +199,7 @@ public:
                                                                       open | access | closeWrite | closeNoWrite))))
     {
         // the content provider must be created first
-        jassert (contentProvider.get() != nullptr);
+        jassert (contentProvider.get() != 0);
 
         env->CallVoidMethod (fileObserver, JuceContentProviderFileObserver.startWatching);
     }
@@ -284,7 +284,7 @@ public:
         startThread();
     }
 
-    ~AndroidContentSharerPrepareFilesThread() override
+    ~AndroidContentSharerPrepareFilesThread()
     {
         signalThreadShouldExit();
         waitForThreadToExit (10000);
@@ -307,7 +307,7 @@ private:
 
         ~StreamCloser()
         {
-            if (stream.get() != nullptr)
+            if (stream.get() != 0)
                 getEnv()->CallVoidMethod (stream, JavaCloseable.close);
         }
 
@@ -471,7 +471,7 @@ public:
     {
     }
 
-    ~ContentSharerNativeImpl() override
+    ~ContentSharerNativeImpl()
     {
         masterReference.clear();
     }
@@ -586,7 +586,7 @@ public:
             return cursor->getNativeCursor();
 
         auto values = LocalRef<jobjectArray> (env->NewObjectArray ((jsize) resultColumns.size(),
-                                                                   JavaObject, nullptr));
+                                                                   JavaObject, 0));
 
         for (int i = 0; i < resultColumns.size(); ++i)
         {

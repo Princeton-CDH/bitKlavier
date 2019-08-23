@@ -89,7 +89,7 @@ static File getWellKnownFolder (const char* folderId)
     auto* env = getEnv();
     auto fieldId = env->GetStaticFieldID (AndroidEnvironment, folderId, "Ljava/lang/String;");
 
-    if (fieldId == nullptr)
+    if (fieldId == 0)
     {
         // unknown field in environment
         jassertfalse;
@@ -194,7 +194,7 @@ public:
         auto* env = getEnv();
         LocalRef<jobject> contentResolver (env->CallObjectMethod (getAppContext().get(), AndroidContext.getContentResolver));
 
-        if (contentResolver == nullptr)
+        if (contentResolver == 0)
             return {};
 
         auto filename = getStringUsingDataColumn ("_display_name", env, uri, contentResolver);
@@ -298,7 +298,7 @@ private:
             auto* env = getEnv();
             static jmethodID m = (env->GetMethodID (AndroidContext, "getExternalFilesDirs",
                                                     "(Ljava/lang/String;)[Ljava/io/File;"));
-            if (m == nullptr)
+            if (m == 0)
                 return {};
 
             auto paths = convertFileArray (LocalRef<jobject> (env->CallObjectMethod (getAppContext().get(), m, nullptr)));
@@ -406,7 +406,7 @@ private:
             return {};
         }
 
-        if (cursor == nullptr)
+        if (cursor == 0)
             return {};
 
         String fileName;
@@ -439,7 +439,7 @@ struct AndroidContentUriOutputStream :  public OutputStream
     {
     }
 
-    ~AndroidContentUriOutputStream() override
+    ~AndroidContentUriOutputStream()
     {
         stream.callVoidMethod (AndroidOutputStream.close);
     }
@@ -484,7 +484,7 @@ OutputStream* juce_CreateContentURIOutputStream (const URL& url)
 {
     auto stream = AndroidContentUriResolver::getStreamForContentUri (url, false);
 
-    return (stream.get() != nullptr ? new AndroidContentUriOutputStream (std::move (stream)) : nullptr);
+    return (stream.get() != 0 ? new AndroidContentUriOutputStream (std::move (stream)) : nullptr);
 }
 
 //==============================================================================
@@ -676,7 +676,7 @@ private:
 
 void FileOutputStream::flushInternal()
 {
-    if (fileHandle != nullptr)
+    if (fileHandle != 0)
     {
         if (fsync (getFD (fileHandle)) == -1)
             status = getResultForErrno();

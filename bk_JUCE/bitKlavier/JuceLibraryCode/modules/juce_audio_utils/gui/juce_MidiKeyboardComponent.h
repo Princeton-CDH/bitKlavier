@@ -67,7 +67,7 @@ public:
     /** Creates a MidiKeyboardComponent.
 
         @param state        the midi keyboard model that this component will represent
-        @param orientation  whether the keyboard is horizontal or vertical
+        @param orientation  whether the keyboard is horizonal or vertical
     */
     MidiKeyboardComponent (MidiKeyboardState& state,
                            Orientation orientation);
@@ -370,13 +370,9 @@ protected:
     virtual bool mouseDownOnKey (int midiNoteNumber, const MouseEvent& e);
 
     /** Callback when the mouse is dragged from one key onto another.
-
-        Return true if you want the drag to trigger the new note, or false if you
-        want to handle it yourself and not have the note played.
-
         @see mouseDownOnKey
     */
-    virtual bool mouseDraggedToKey (int midiNoteNumber, const MouseEvent& e);
+    virtual void mouseDraggedToKey (int midiNoteNumber, const MouseEvent& e);
 
     /** Callback when the mouse is released from a key.
         @see mouseDownOnKey
@@ -418,7 +414,7 @@ private:
 
     int rangeStart = 0, rangeEnd = 127;
     float firstKey = 12 * 4.0f;
-    bool canScroll = true, useMousePositionForVelocity = true;
+    bool canScroll = true, useMousePositionForVelocity = true, shouldCheckMousePos = false;
     std::unique_ptr<Button> scrollDown, scrollUp;
 
     Array<KeyPress> keyPresses;

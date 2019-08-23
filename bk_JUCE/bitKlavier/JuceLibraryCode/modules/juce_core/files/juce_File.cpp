@@ -1005,15 +1005,12 @@ MemoryMappedFile::MemoryMappedFile (const File& file, const Range<int64>& fileRa
 
 
 //==============================================================================
-//==============================================================================
 #if JUCE_UNIT_TESTS
 
 class FileTests  : public UnitTest
 {
 public:
-    FileTests()
-        : UnitTest ("Files", UnitTestCategories::files)
-    {}
+    FileTests() : UnitTest ("Files", "Files") {}
 
     void runTest() override
     {
@@ -1031,6 +1028,7 @@ public:
         expect (home.isDirectory());
         expect (home.exists());
         expect (! home.existsAsFile());
+        expect (File::getSpecialLocation (File::userDocumentsDirectory).isDirectory());
         expect (File::getSpecialLocation (File::userApplicationDataDirectory).isDirectory());
         expect (File::getSpecialLocation (File::currentExecutableFile).exists());
         expect (File::getSpecialLocation (File::currentApplicationFile).exists());

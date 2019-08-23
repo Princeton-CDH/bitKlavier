@@ -362,7 +362,7 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     
     ScopedPointer<XmlElement> myXML = galleryVT.createXml();
     
-    myXML->writeToFile(myFile, String::empty);
+    myXML->writeToFile(myFile, String());
     
     loadGalleryFromXml(myXML);
     
@@ -726,13 +726,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     if (currentPiano == nullptr) return;
     
     for (auto pmap : currentPiano->activePMaps)
-        pmap->processBlock(numSamples, channel, currentSampleType, false);
+        pmap->processBlock(buffer, numSamples, channel, currentSampleType, false);
     
     // OLAGON: Process all active nostalgic preps in previous piano
     if(prevPiano != currentPiano)
     {
         for (auto pmap : prevPiano->activePMaps)
-            pmap->processBlock(numSamples, channel, currentSampleType, true); // true for onlyNostalgic
+            pmap->processBlock(buffer, numSamples, channel, currentSampleType, true); // true for onlyNostalgic
     }
 
     
@@ -784,8 +784,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             else                    sustainDeactivate();
         }
     }
-    
-    //if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
+
+	//if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
     if (!allNotesOff && !noteOnCount) {

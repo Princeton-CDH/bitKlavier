@@ -164,21 +164,21 @@ public:
     bool makeActive() const noexcept
     {
         ScopedXLock xlock (display);
-        return renderContext != nullptr
+        return renderContext != 0
                  && glXMakeCurrent (display, embeddedWindow, renderContext);
     }
 
     bool isActive() const noexcept
     {
         ScopedXLock xlock (display);
-        return glXGetCurrentContext() == renderContext && renderContext != nullptr;
+        return glXGetCurrentContext() == renderContext && renderContext != 0;
     }
 
     static void deactivateCurrentContext()
     {
         ScopedXDisplay xDisplay;
         ScopedXLock xlock (xDisplay.display);
-        glXMakeCurrent (xDisplay.display, None, nullptr);
+        glXMakeCurrent (xDisplay.display, None, 0);
     }
 
     void swapBuffers()
@@ -255,7 +255,7 @@ bool OpenGLHelpers::isContextActive()
     if (xDisplay.display)
     {
         ScopedXLock xlock (xDisplay.display);
-        return glXGetCurrentContext() != nullptr;
+        return glXGetCurrentContext() != 0;
     }
 
     return false;

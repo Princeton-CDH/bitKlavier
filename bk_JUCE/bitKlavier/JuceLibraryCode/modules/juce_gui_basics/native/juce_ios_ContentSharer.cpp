@@ -38,7 +38,7 @@ public:
         popoverDelegate.reset ([cls.createInstance() init]);
     }
 
-    ~ContentSharerNativeImpl() override
+    ~ContentSharerNativeImpl()
     {
         exitModalState (0);
     }

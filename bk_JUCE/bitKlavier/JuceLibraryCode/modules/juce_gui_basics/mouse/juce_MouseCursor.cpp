@@ -53,8 +53,7 @@ public:
     }
 
     SharedCursorHandle (const Image& image, Point<int> hotSpot, float scaleFactor)
-        : info (new CustomMouseCursorInfo (image, hotSpot, scaleFactor)),
-          handle (info->create()),
+        : handle (CustomMouseCursorInfo (image, hotSpot, scaleFactor).create()),
           standardType (MouseCursor::NormalCursor),
           isStandard (false)
     {
@@ -107,15 +106,10 @@ public:
         }
     }
 
-    void* getHandle() const noexcept                            { return handle; }
-    void setHandle (void* newHandle)                            { handle = newHandle; }
-
-    MouseCursor::StandardCursorType getType() const noexcept    { return standardType; }
-    CustomMouseCursorInfo* getCustomInfo() const noexcept       { return info.get(); }
+    void* getHandle() const noexcept        { return handle; }
 
 private:
-    std::unique_ptr<CustomMouseCursorInfo> info;
-    void* handle;
+    void* const handle;
     Atomic<int> refCount { 1 };
     const MouseCursor::StandardCursorType standardType;
     const bool isStandard;

@@ -106,7 +106,6 @@ MidiBuffer MPEMessages::setZoneLayout (MPEZoneLayout layout)
     return buffer;
 }
 
-
 //==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
@@ -114,9 +113,7 @@ MidiBuffer MPEMessages::setZoneLayout (MPEZoneLayout layout)
 class MPEMessagesTests  : public UnitTest
 {
 public:
-    MPEMessagesTests()
-        : UnitTest ("MPEMessages class", UnitTestCategories::midi)
-    {}
+    MPEMessagesTests() : UnitTest ("MPEMessages class", "MIDI/MPE") {}
 
     void runTest() override
     {
@@ -236,6 +233,6 @@ private:
 
 static MPEMessagesTests MPEMessagesUnitTests;
 
-#endif
+#endif // JUCE_UNIT_TESTS
 
 } // namespace juce

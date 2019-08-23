@@ -39,7 +39,6 @@ void ChangeBroadcaster::addChangeListener (ChangeListener* const listener)
     JUCE_ASSERT_MESSAGE_MANAGER_IS_LOCKED
 
     changeListeners.add (listener);
-    anyListeners = true;
 }
 
 void ChangeBroadcaster::removeChangeListener (ChangeListener* const listener)
@@ -49,7 +48,6 @@ void ChangeBroadcaster::removeChangeListener (ChangeListener* const listener)
     JUCE_ASSERT_MESSAGE_MANAGER_IS_LOCKED
 
     changeListeners.remove (listener);
-    anyListeners = changeListeners.size() > 0;
 }
 
 void ChangeBroadcaster::removeAllChangeListeners()
@@ -59,12 +57,11 @@ void ChangeBroadcaster::removeAllChangeListeners()
     JUCE_ASSERT_MESSAGE_MANAGER_IS_LOCKED
 
     changeListeners.clear();
-    anyListeners = false;
 }
 
 void ChangeBroadcaster::sendChangeMessage()
 {
-    if (anyListeners)
+    if (changeListeners.size() > 0)
         broadcastCallback.triggerAsyncUpdate();
 }
 

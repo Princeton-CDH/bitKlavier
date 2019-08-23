@@ -253,7 +253,7 @@ bool DirectoryContentsList::addFile (const File& file, const bool isDir,
             if (files.getUnchecked(i)->filename == info->filename)
                 return false;
 
-        files.add (std::move (info));
+        files.add (info.release());
 
         std::sort (files.begin(), files.end(), [] (const FileInfo* a, const FileInfo* b)
         {

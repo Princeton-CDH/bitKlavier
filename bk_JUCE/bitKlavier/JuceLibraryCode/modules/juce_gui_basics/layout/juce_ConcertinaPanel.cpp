@@ -31,15 +31,15 @@ struct ConcertinaPanel::PanelSizes
 {
     struct Panel
     {
-        Panel() = default;
+        Panel() noexcept {}
 
-        Panel (int sz, int mn, int mx) noexcept
+        Panel (const int sz, const int mn, const int mx) noexcept
             : size (sz), minSize (mn), maxSize (mx) {}
 
-        int setSize (int newSize) noexcept
+        int setSize (const int newSize) noexcept
         {
             jassert (minSize <= maxSize);
-            auto oldSize = size;
+            const int oldSize = size;
             size = jlimit (minSize, maxSize, newSize);
             return size - oldSize;
         }
@@ -66,12 +66,11 @@ struct ConcertinaPanel::PanelSizes
 
     Array<Panel> sizes;
 
-    Panel& get (int index) noexcept               { return sizes.getReference (index); }
-    const Panel& get (int index) const noexcept   { return sizes.getReference (index); }
+    Panel& get (const int index) const noexcept    { return sizes.getReference(index); }
 
-    PanelSizes withMovedPanel (int index, int targetPosition, int totalSpace) const
+    PanelSizes withMovedPanel (const int index, int targetPosition, int totalSpace) const
     {
-        auto num = sizes.size();
+        const int num = sizes.size();
         totalSpace = jmax (totalSpace, getMinimumSize (0, num));
         targetPosition = jmax (targetPosition, totalSpace - getMaximumSize (index, num));
 
@@ -83,14 +82,14 @@ struct ConcertinaPanel::PanelSizes
 
     PanelSizes fittedInto (int totalSpace) const
     {
-        auto newSizes (*this);
-        auto num = newSizes.sizes.size();
+        PanelSizes newSizes (*this);
+        const int num = newSizes.sizes.size();
         totalSpace = jmax (totalSpace, getMinimumSize (0, num));
         newSizes.stretchRange (0, num, totalSpace - newSizes.getTotalSize (0, num), stretchAll);
         return newSizes;
     }
 
-    PanelSizes withResizedPanel (int index, int panelHeight, int totalSpace) const
+    PanelSizes withResizedPanel (const int index, int panelHeight, int totalSpace) const
     {
         PanelSizes newSizes (*this);
 
@@ -100,8 +99,8 @@ struct ConcertinaPanel::PanelSizes
         }
         else
         {
-            auto num = sizes.size();
-            auto minSize = getMinimumSize (0, num);
+            const int num = sizes.size();
+            const int minSize = getMinimumSize (0, num);
             totalSpace = jmax (totalSpace, minSize);
 
             newSizes.get(index).setSize (panelHeight);
@@ -121,21 +120,21 @@ private:
         stretchLast
     };
 
-    void growRangeFirst (int start, int end, int spaceDiff) noexcept
+    void growRangeFirst (const int start, const int end, int spaceDiff) noexcept
     {
         for (int attempts = 4; --attempts >= 0 && spaceDiff > 0;)
             for (int i = start; i < end && spaceDiff > 0; ++i)
                 spaceDiff -= get (i).expand (spaceDiff);
     }
 
-    void growRangeLast (int start, int end, int spaceDiff) noexcept
+    void growRangeLast (const int start, const int end, int spaceDiff) noexcept
     {
         for (int attempts = 4; --attempts >= 0 && spaceDiff > 0;)
             for (int i = end; --i >= start && spaceDiff > 0;)
                 spaceDiff -= get (i).expand (spaceDiff);
     }
 
-    void growRangeAll (int start, int end, int spaceDiff) noexcept
+    void growRangeAll (const int start, const int end, int spaceDiff) noexcept
     {
         Array<Panel*> expandableItems;
 
@@ -150,19 +149,20 @@ private:
         growRangeLast (start, end, spaceDiff);
     }
 
-    void shrinkRangeFirst (int start, int end, int spaceDiff) noexcept
+    void shrinkRangeFirst (const int start, const int end, int spaceDiff) noexcept
     {
         for (int i = start; i < end && spaceDiff > 0; ++i)
             spaceDiff -= get(i).reduce (spaceDiff);
     }
 
-    void shrinkRangeLast (int start, int end, int spaceDiff) noexcept
+    void shrinkRangeLast (const int start, const int end, int spaceDiff) noexcept
     {
         for (int i = end; --i >= start && spaceDiff > 0;)
             spaceDiff -= get(i).reduce (spaceDiff);
     }
 
-    void stretchRange (int start, int end, int amountToAdd, ExpandMode expandMode) noexcept
+    void stretchRange (const int start, const int end, const int amountToAdd,
+                       const ExpandMode expandMode) noexcept
     {
         if (end > start)
         {
@@ -180,28 +180,26 @@ private:
         }
     }
 
-    int getTotalSize (int start, int end) const noexcept
+    int getTotalSize (int start, const int end) const noexcept
     {
         int tot = 0;
         while (start < end)  tot += get (start++).size;
         return tot;
     }
 
-    int getMinimumSize (int start, int end) const noexcept
+    int getMinimumSize (int start, const int end) const noexcept
     {
         int tot = 0;
         while (start < end)  tot += get (start++).minSize;
         return tot;
     }
 
-    int getMaximumSize (int start, int end) const noexcept
+    int getMaximumSize (int start, const int end) const noexcept
     {
         int tot = 0;
-
         while (start < end)
         {
-            auto mx = get (start++).maxSize;
-
+            const int mx = get (start++).maxSize;
             if (mx > 0x100000)
                 return mx;
 
@@ -216,7 +214,7 @@ private:
 class ConcertinaPanel::PanelHolder  : public Component
 {
 public:
-    PanelHolder (Component* comp, bool takeOwnership)
+    PanelHolder (Component* const comp, bool takeOwnership)
         : component (comp, takeOwnership)
     {
         setRepaintsOnMouseActivity (true);
@@ -287,13 +285,13 @@ private:
     int getHeaderSize() const noexcept
     {
         ConcertinaPanel& panel = getPanel();
-        auto ourIndex = panel.holders.indexOf (this);
+        const int ourIndex = panel.holders.indexOf (this);
         return panel.currentSizes->get(ourIndex).minSize;
     }
 
     ConcertinaPanel& getPanel() const
     {
-        auto panel = dynamic_cast<ConcertinaPanel*> (getParentComponent());
+        ConcertinaPanel* const panel = dynamic_cast<ConcertinaPanel*> (getParentComponent());
         jassert (panel != nullptr);
         return *panel;
     }
@@ -328,7 +326,7 @@ void ConcertinaPanel::addPanel (int insertIndex, Component* component, bool take
     jassert (component != nullptr); // can't use a null pointer here!
     jassert (indexOfComp (component) < 0); // You can't add the same component more than once!
 
-    auto holder = new PanelHolder (component, takeOwnership);
+    PanelHolder* const holder = new PanelHolder (component, takeOwnership);
     holders.insert (insertIndex, holder);
     currentSizes->sizes.insert (insertIndex, PanelSizes::Panel (headerHeight, headerHeight, std::numeric_limits<int>::max()));
     addAndMakeVisible (holder);
@@ -337,7 +335,7 @@ void ConcertinaPanel::addPanel (int insertIndex, Component* component, bool take
 
 void ConcertinaPanel::removePanel (Component* component)
 {
-    auto index = indexOfComp (component);
+    const int index = indexOfComp (component);
 
     if (index >= 0)
     {
@@ -347,25 +345,25 @@ void ConcertinaPanel::removePanel (Component* component)
     }
 }
 
-bool ConcertinaPanel::setPanelSize (Component* panelComponent, int height, bool animate)
+bool ConcertinaPanel::setPanelSize (Component* panelComponent, int height, const bool animate)
 {
-    auto index = indexOfComp (panelComponent);
+    const int index = indexOfComp (panelComponent);
     jassert (index >= 0); // The specified component doesn't seem to have been added!
 
     height += currentSizes->get(index).minSize;
-    auto oldSize = currentSizes->get(index).size;
+    const int oldSize = currentSizes->get(index).size;
     setLayout (currentSizes->withResizedPanel (index, height, getHeight()), animate);
     return oldSize != currentSizes->get(index).size;
 }
 
-bool ConcertinaPanel::expandPanelFully (Component* component, bool animate)
+bool ConcertinaPanel::expandPanelFully (Component* component, const bool animate)
 {
     return setPanelSize (component, getHeight(), animate);
 }
 
 void ConcertinaPanel::setMaximumPanelSize (Component* component, int maximumSize)
 {
-    auto index = indexOfComp (component);
+    const int index = indexOfComp (component);
     jassert (index >= 0); // The specified component doesn't seem to have been added!
 
     if (index >= 0)
@@ -377,7 +375,7 @@ void ConcertinaPanel::setMaximumPanelSize (Component* component, int maximumSize
 
 void ConcertinaPanel::setPanelHeaderSize (Component* component, int headerSize)
 {
-    auto index = indexOfComp (component);
+    const auto index = indexOfComp (component);
     jassert (index >= 0); // The specified component doesn't seem to have been added!
 
     if (index >= 0)
@@ -394,7 +392,7 @@ void ConcertinaPanel::setCustomPanelHeader (Component* component, Component* cus
 {
     OptionalScopedPointer<Component> optional (customComponent, takeOwnership);
 
-    auto index = indexOfComp (component);
+    const auto index = indexOfComp (component);
     jassert (index >= 0); // The specified component doesn't seem to have been added!
 
     if (index >= 0)
@@ -420,20 +418,20 @@ ConcertinaPanel::PanelSizes ConcertinaPanel::getFittedSizes() const
     return currentSizes->fittedInto (getHeight());
 }
 
-void ConcertinaPanel::applyLayout (const PanelSizes& sizes, bool animate)
+void ConcertinaPanel::applyLayout (const PanelSizes& sizes, const bool animate)
 {
     if (! animate)
         animator.cancelAllAnimations (false);
 
     const int animationDuration = 150;
-    auto w = getWidth();
+    const int w = getWidth();
     int y = 0;
 
     for (int i = 0; i < holders.size(); ++i)
     {
         PanelHolder& p = *holders.getUnchecked (i);
 
-        auto h = sizes.get (i).size;
+        const int h = sizes.get (i).size;
         const Rectangle<int> pos (0, y, w, h);
 
         if (animate)
@@ -445,7 +443,7 @@ void ConcertinaPanel::applyLayout (const PanelSizes& sizes, bool animate)
     }
 }
 
-void ConcertinaPanel::setLayout (const PanelSizes& sizes, bool animate)
+void ConcertinaPanel::setLayout (const PanelSizes& sizes, const bool animate)
 {
     *currentSizes = sizes;
     applyLayout (getFittedSizes(), animate);

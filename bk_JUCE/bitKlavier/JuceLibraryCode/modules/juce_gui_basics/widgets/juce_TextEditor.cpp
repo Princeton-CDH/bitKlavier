@@ -67,18 +67,25 @@ struct TextAtom
 class TextEditor::UniformTextSection
 {
 public:
-    UniformTextSection (const String& text, const Font& f, Colour col, juce_wchar passwordCharToUse)
-        : font (f), colour (col), passwordChar (passwordCharToUse)
+    UniformTextSection (const String& text, const Font& f, Colour col, juce_wchar passwordChar)
+        : font (f), colour (col)
     {
-        initialiseAtoms (text);
+        initialiseAtoms (text, passwordChar);
     }
 
     UniformTextSection (const UniformTextSection&) = default;
-    UniformTextSection (UniformTextSection&&) = default;
+
+    // VS2013 can't default move constructors
+    UniformTextSection (UniformTextSection&& other)
+        : font (std::move (other.font)),
+          colour (other.colour),
+          atoms (std::move (other.atoms))
+    {
+    }
 
     UniformTextSection& operator= (const UniformTextSection&) = delete;
 
-    void append (UniformTextSection& other)
+    void append (UniformTextSection& other, const juce_wchar passwordChar)
     {
         if (! other.atoms.isEmpty())
         {
@@ -112,9 +119,9 @@ public:
         }
     }
 
-    UniformTextSection* split (int indexToBreakAt)
+    UniformTextSection* split (int indexToBreakAt, juce_wchar passwordChar)
     {
-        auto* section2 = new UniformTextSection ({}, font, colour, passwordChar);
+        auto* section2 = new UniformTextSection (String(), font, colour, passwordChar);
         int index = 0;
 
         for (int i = 0; i < atoms.size(); ++i)
@@ -196,12 +203,11 @@ public:
         return total;
     }
 
-    void setFont (const Font& newFont, const juce_wchar passwordCharToUse)
+    void setFont (const Font& newFont, const juce_wchar passwordChar)
     {
-        if (font != newFont || passwordChar != passwordCharToUse)
+        if (font != newFont)
         {
             font = newFont;
-            passwordChar = passwordCharToUse;
 
             for (auto& atom : atoms)
                 atom.width = newFont.getStringWidthFloat (atom.getText (passwordChar));
@@ -212,10 +218,9 @@ public:
     Font font;
     Colour colour;
     Array<TextAtom> atoms;
-    juce_wchar passwordChar;
 
 private:
-    void initialiseAtoms (const String& textToParse)
+    void initialiseAtoms (const String& textToParse, const juce_wchar passwordChar)
     {
         auto text = textToParse.getCharPointer();
 
@@ -1246,7 +1251,7 @@ void TextEditor::timerCallbackInt()
 
 void TextEditor::checkFocus()
 {
-    if (! wasFocused && hasKeyboardFocus (false) && ! isCurrentlyBlockedByAnotherModalComponent())
+    if (hasKeyboardFocus (false) && ! isCurrentlyBlockedByAnotherModalComponent())
     {
         wasFocused = true;
 
@@ -1407,7 +1412,7 @@ void TextEditor::setIndents (int newLeftIndent, int newTopIndent)
     topIndent  = newTopIndent;
 }
 
-void TextEditor::setBorder (BorderSize<int> border)
+void TextEditor::setBorder (const BorderSize<int>& border)
 {
     borderSize = border;
     resized();
@@ -2066,7 +2071,11 @@ void TextEditor::focusGained (FocusChangeType)
         moveCaretTo (getTotalNumChars(), true);
     }
 
-    checkFocus();
+    // When caret position changes, we check focus automatically, to
+    // show any native keyboard if needed. If the position does not
+    // change though, we need to check focus manually.
+    if (getTotalNumChars() == 0)
+        checkFocus();
 
     repaint();
     updateCaretPosition();
@@ -2513,7 +2522,7 @@ void TextEditor::splitSection (const int sectionIndex, const int charToSplitAt)
     jassert (sections[sectionIndex] != nullptr);
 
     sections.insert (sectionIndex + 1,
-                     sections.getUnchecked (sectionIndex)->split (charToSplitAt));
+                     sections.getUnchecked (sectionIndex)->split (charToSplitAt, passwordCharacter));
 }
 
 void TextEditor::coalesceSimilarSections()
@@ -2526,7 +2535,7 @@ void TextEditor::coalesceSimilarSections()
         if (s1->font == s2->font
              && s1->colour == s2->colour)
         {
-            s1->append (*s2);
+            s1->append (*s2, passwordCharacter);
             sections.remove (i + 1);
             --i;
         }

@@ -47,7 +47,7 @@ void DirectModification::setStateOld(XmlElement* e)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
-                if (attr == String::empty) break;
+                if (attr == String()) break;
                 else
                 {
                     f = attr.getFloatValue();
@@ -65,7 +65,7 @@ void DirectModification::setStateOld(XmlElement* e)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
-                if (attr == String::empty) break;
+                if (attr == String()) break;
                 else
                 {
                     f = attr.getFloatValue();
@@ -144,7 +144,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
-                if (attr == String::empty) break;
+                if (attr == String()) break;
                 else
                 {
                     f = attr.getFloatValue();
@@ -163,7 +163,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
-                if (attr == String::empty) break;
+                if (attr == String()) break;
                 else
                 {
                     f = attr.getFloatValue();
@@ -182,7 +182,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
-                if (attr == String::empty) break;
+                if (attr == String()) break;
                 else
                 {
                     f = attr.getFloatValue();
@@ -207,7 +207,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                     {
                         String attr = asub->getStringAttribute(ptagFloat + String(k));
                         
-                        if (attr == String::empty) break;
+                        if (attr == String()) break;
                         else
                         {
                             f = attr.getFloatValue();
@@ -235,7 +235,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                     {
                         String attr = asub->getStringAttribute(ptagFloat + String(k));
                         
-                        if (attr == String::empty) break;
+                        if (attr == String()) break;
                         else
                         {
                             f = attr.getFloatValue();
@@ -282,7 +282,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
-                if (attr == String::empty) break;
+                if (attr == String()) break;
                 else
                 {
                     f = attr.getFloatValue();
@@ -302,7 +302,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
-                if (attr == String::empty) break;
+                if (attr == String()) break;
                 else
                 {
                     f = attr.getFloatValue();
@@ -322,7 +322,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
-                if (attr == String::empty) break;
+                if (attr == String()) break;
                 else
                 {
                     f = attr.getFloatValue();
@@ -606,7 +606,7 @@ void TuningModification::setStateOld(XmlElement* e)
             for (int i = 0; i < 128; i++)
             {
                 String attr = sub->getStringAttribute("w"+String(i));
-                if (attr == String::empty)  twa.add(false);
+                if (attr == String())  twa.add(false);
                 else                        twa.add((bool)attr.getIntValue());
             }
             
@@ -618,7 +618,7 @@ void TuningModification::setStateOld(XmlElement* e)
             for (int k = 0; k < 12; k++)
             {
                 String attr = sub->getStringAttribute("w"+String(k));
-                if (attr == String::empty)  swa.add(false);
+                if (attr == String())  swa.add(false);
                 else                        swa.add((bool)attr.getIntValue());
             }
             
@@ -661,7 +661,7 @@ void TuningModification::setStateOld(XmlElement* e)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
-                if (attr == String::empty) break;
+                if (attr == String()) break;
                 else
                 {
                     f = attr.getFloatValue();

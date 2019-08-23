@@ -32,9 +32,7 @@ namespace juce
 class ValueWithDefaultTests  : public UnitTest
 {
 public:
-    ValueWithDefaultTests()
-        : UnitTest ("ValueWithDefault", UnitTestCategories::values)
-    {}
+    ValueWithDefaultTests() : UnitTest ("ValueWithDefault", "Values") {}
 
     void runTest() override
     {

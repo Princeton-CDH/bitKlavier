@@ -99,7 +99,7 @@ String StringPairArray::getValue (StringRef key, const String& defaultReturnValu
 
 bool StringPairArray::containsKey (StringRef key) const noexcept
 {
-    return keys.contains (key, ignoreCase);
+    return keys.contains (key);
 }
 
 void StringPairArray::set (const String& key, const String& value)

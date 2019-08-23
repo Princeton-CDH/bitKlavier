@@ -28,10 +28,7 @@ MemoryInputStream::MemoryInputStream (const void* sourceData, size_t sourceDataS
       dataSize (sourceDataSize)
 {
     if (keepCopy)
-    {
-        internalCopy = MemoryBlock (sourceData, sourceDataSize);
-        data = internalCopy.getData();
-    }
+        createInternalCopy();
 }
 
 MemoryInputStream::MemoryInputStream (const MemoryBlock& sourceData, bool keepCopy)
@@ -39,16 +36,14 @@ MemoryInputStream::MemoryInputStream (const MemoryBlock& sourceData, bool keepCo
       dataSize (sourceData.getSize())
 {
     if (keepCopy)
-    {
-        internalCopy = sourceData;
-        data = internalCopy.getData();
-    }
+        createInternalCopy();
 }
 
-MemoryInputStream::MemoryInputStream (MemoryBlock&& source)
-    : internalCopy (std::move (source))
+void MemoryInputStream::createInternalCopy()
 {
-    data = internalCopy.getData();
+    internalCopy.malloc (dataSize);
+    memcpy (internalCopy, data, dataSize);
+    data = internalCopy;
 }
 
 MemoryInputStream::~MemoryInputStream()
@@ -100,8 +95,6 @@ void MemoryInputStream::skipNextBytes (int64 numBytesToSkip)
         setPosition (getPosition() + numBytesToSkip);
 }
 
-
-//==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
@@ -109,7 +102,7 @@ class MemoryStreamTests  : public UnitTest
 {
 public:
     MemoryStreamTests()
-        : UnitTest ("MemoryInputStream & MemoryOutputStream", UnitTestCategories::streams)
+        : UnitTest ("MemoryInputStream & MemoryOutputStream", "Streams")
     {}
 
     void runTest() override

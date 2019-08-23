@@ -28,9 +28,7 @@ namespace juce
 class SparseSetTests  : public UnitTest
 {
 public:
-    SparseSetTests()
-        : UnitTest ("SparseSet class", UnitTestCategories::containers)
-    {}
+    SparseSetTests() : UnitTest ("SparseSet class", "Containers") {}
 
     void runTest() override
     {

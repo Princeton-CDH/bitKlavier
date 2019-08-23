@@ -105,7 +105,10 @@ public:
     operator ObjectType*() const noexcept                       { return get(); }
 
     /** Returns the object that this pointer refers to, or null if the object no longer exists. */
-    ObjectType* operator->() const noexcept                     { return get(); }
+    ObjectType* operator->() noexcept                           { return get(); }
+
+    /** Returns the object that this pointer refers to, or null if the object no longer exists. */
+    const ObjectType* operator->() const noexcept               { return get(); }
 
     /** This returns true if this reference has been pointing at an object, but that object has
         since been deleted.

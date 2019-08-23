@@ -37,7 +37,10 @@ struct AudioVisualiserComponent::ChannelInfo
 
     void clear() noexcept
     {
-        levels.fill ({});
+        // VS2013 doesn't like {} here...
+        for (auto& l : levels)
+            l = Range<float>();
+
         value = {};
         subSample = 0;
     }
@@ -52,10 +55,8 @@ struct AudioVisualiserComponent::ChannelInfo
     {
         if (--subSample <= 0)
         {
-            if (++nextSample == levels.size())
-                nextSample = 0;
-
-            levels.getReference (nextSample) = value;
+            nextSample %= levels.size();
+            levels.getReference (nextSample++) = value;
             subSample = owner.getSamplesPerBlock();
             value = Range<float> (newSample, newSample);
         }
@@ -77,7 +78,7 @@ struct AudioVisualiserComponent::ChannelInfo
     AudioVisualiserComponent& owner;
     Array<Range<float>> levels;
     Range<float> value;
-    std::atomic<int> nextSample { 0 }, subSample { 0 };
+    int nextSample = 0, subSample = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChannelInfo)
 };

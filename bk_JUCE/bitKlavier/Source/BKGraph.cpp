@@ -176,7 +176,7 @@ void BKItem::configurePianoCB(void)
         
         if (pianos[i]->getId() == getPianoTarget()) targetExists = true;
         
-        if (name != String::empty)
+        if (name != String())
         {
             menu.addItem(pianos[i]->getName(), pianos[i]->getId());
             menu.addSeparator();

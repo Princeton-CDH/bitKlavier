@@ -96,16 +96,16 @@ private:
 
 
 //==============================================================================
-void SystemTrayIconComponent::setIconImage (const Image& colourImage, const Image&)
+void SystemTrayIconComponent::setIconImage (const Image& newImage)
 {
     pimpl.reset();
 
-    if (colourImage.isValid())
+    if (newImage.isValid())
     {
         if (! isOnDesktop())
             addToDesktop (0);
 
-        pimpl.reset (new Pimpl (colourImage, (Window) getWindowHandle()));
+        pimpl.reset (new Pimpl (newImage, (Window) getWindowHandle()));
 
         setVisible (true);
         toFront (false);

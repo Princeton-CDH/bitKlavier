@@ -146,7 +146,7 @@ bool UndoManager::perform (UndoableAction* newAction)
             }
 
             totalUnitsStored += action->getSizeInUnits();
-            actionSet->actions.add (std::move (action));
+            actionSet->actions.add (action.release());
             newTransaction = false;
 
             moveFutureTransactionsToStash();

@@ -38,6 +38,40 @@ void juce_deleteKeyProxyWindow (ComponentPeer*);
 class XEmbedComponent::Pimpl  : private ComponentListener
 {
 public:
+    enum
+    {
+        maxXEmbedVersionToSupport = 0
+    };
+
+    enum Flags
+    {
+        XEMBED_MAPPED  = (1<<0)
+    };
+
+    enum
+    {
+        XEMBED_EMBEDDED_NOTIFY        = 0,
+        XEMBED_WINDOW_ACTIVATE        = 1,
+        XEMBED_WINDOW_DEACTIVATE      = 2,
+        XEMBED_REQUEST_FOCUS          = 3,
+        XEMBED_FOCUS_IN               = 4,
+        XEMBED_FOCUS_OUT              = 5,
+        XEMBED_FOCUS_NEXT             = 6,
+        XEMBED_FOCUS_PREV             = 7,
+        XEMBED_MODALITY_ON            = 10,
+        XEMBED_MODALITY_OFF           = 11,
+        XEMBED_REGISTER_ACCELERATOR   = 12,
+        XEMBED_UNREGISTER_ACCELERATOR = 13,
+        XEMBED_ACTIVATE_ACCELERATOR   = 14
+    };
+
+    enum
+    {
+        XEMBED_FOCUS_CURRENT = 0,
+        XEMBED_FOCUS_FIRST   = 1,
+        XEMBED_FOCUS_LAST    = 2
+    };
+
     //==============================================================================
     struct SharedKeyWindow : public ReferenceCountedObject
     {
@@ -117,7 +151,7 @@ public:
         owner.addComponentListener (this);
     }
 
-    ~Pimpl() override
+    ~Pimpl()
     {
         owner.removeComponentListener (this);
         setClient (0, true);
@@ -167,14 +201,7 @@ public:
                                             static_cast<unsigned int> (newBounds.getHeight()));
             }
 
-            auto eventMask = StructureNotifyMask | PropertyChangeMask | FocusChangeMask;
-
-            XWindowAttributes clientAttr;
-            XGetWindowAttributes (dpy, client, &clientAttr);
-
-            if ((eventMask & clientAttr.your_event_mask) != eventMask)
-                XSelectInput (dpy, client, clientAttr.your_event_mask | eventMask);
-
+            XSelectInput (dpy, client, StructureNotifyMask | PropertyChangeMask | FocusChangeMask);
             getXEmbedMappedFlag();
 
             if (shouldReparent)
@@ -338,7 +365,7 @@ private:
 
     Window getParentX11Window()
     {
-        if (auto* peer = owner.getPeer())
+        if (auto peer = owner.getPeer())
             return reinterpret_cast<Window> (peer->getNativeHandle());
 
         return {};
@@ -354,16 +381,12 @@ private:
         if (embedInfo.success && embedInfo.actualFormat == 32
              && embedInfo.numItems >= 2 && embedInfo.data != nullptr)
         {
-            long version;
-            memcpy (&version, embedInfo.data, sizeof (long));
+            auto* buffer = (long*) embedInfo.data;
 
             supportsXembed = true;
-            xembedVersion = jmin ((int) maxXEmbedVersionToSupport, (int) version);
+            xembedVersion = jmin ((int) maxXEmbedVersionToSupport, (int) buffer[0]);
 
-            long flags;
-            memcpy (&flags, embedInfo.data + sizeof (long), sizeof (long));
-
-            return ((flags & XEMBED_MAPPED) != 0);
+            return ((buffer[1] & XEMBED_MAPPED) != 0);
         }
         else
         {

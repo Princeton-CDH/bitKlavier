@@ -96,6 +96,14 @@ void Gallery::removeTempoModification(int Id)
     }
 }
 
+void Gallery::removeBlendronomerModification(int Id)
+{
+	for (int i = modBlendronomer.size(); --i >= 0; )
+	{
+		if (modBlendronomer[i]->getId() == Id) modBlendronomer.remove(i);
+	}
+}
+
 void Gallery::removeSynchronic(int Id)
 {
     for (int i = synchronic.size(); --i >= 0; )
@@ -136,6 +144,14 @@ void Gallery::removeTempo(int Id)
     }
 }
 
+void Gallery::removeBlendronomer(int Id)
+{
+	for (int i = blendronomer.size(); --i >= 0; )
+	{
+		if (blendronomer[i]->getId() == Id) blendronomer.remove(i);
+	}
+}
+
 void Gallery::removeKeymap(int Id)
 {
     for (int i = bkKeymaps.size(); --i >= 0; )
@@ -167,6 +183,10 @@ void Gallery::remove(BKPreparationType type, int Id)
     {
         removeTempo(Id);
     }
+	else if (type == PreparationTypeBlendronomer)
+	{
+		removeBlendronomer(Id);
+	}
     else if (type == PreparationTypeKeymap)
     {
         removeKeymap(Id);
@@ -191,6 +211,10 @@ void Gallery::remove(BKPreparationType type, int Id)
     {
         removeTempoModification(Id);
     }
+	else if (type == PreparationTypeBlendronomerMod)
+	{
+		removeBlendronomerModification(Id);
+	}
     else if (type == PreparationTypePiano)
     {
         removePiano(Id);
@@ -227,6 +251,10 @@ String Gallery::iterateName(BKPreparationType type, String name)
     {
         for (auto p : tempo)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
     }
+	else if (type == PreparationTypeBlendronomer)
+	{
+		for (auto p : blendronomer)   if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
+	}
     else if (type == PreparationTypeKeymap)
     {
         for (auto p : bkKeymaps)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
@@ -251,6 +279,10 @@ String Gallery::iterateName(BKPreparationType type, String name)
     {
         for (auto p : modTempo)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
     }
+	else if (type == PreparationTypeBlendronomerMod)
+	{
+		for (auto p : modBlendronomer)   if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
+	}
     else if (type == PreparationTypePiano)
     {
         for (auto p : bkPianos)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
@@ -291,6 +323,11 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
          name = getTempo(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : tempo)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
+	else if (type == PreparationTypeBlendronomer)
+	{
+		name = getBlendronomer(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+		for (auto p : blendronomer)   if (p->getName() == name || p->getName().startsWith(name + " ")) num++;
+	}
     else if (type == PreparationTypeKeymap)
     {
          name = getKeymap(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
@@ -324,6 +361,11 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
          name = getTempoModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modTempo)    if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
+	else if (type == PreparationTypeBlendronomerMod)
+	{
+		name = getBlendronomerModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+		for (auto p : modBlendronomer)   if (p->getName() == name || p->getName().startsWith(name + " ")) num++;
+	}
     else if (type == PreparationTypePiano)
     {
          name = getPiano(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
@@ -382,6 +424,15 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml)
         p->setId(newId);
         p->setName(iterateName(PreparationTypeTempo, p->getName()));
     }
+	else if (type == PreparationTypeBlendronomer)
+	{
+		Blendronomer::Ptr p = new Blendronomer(-1);
+		p->setState(xml);
+		addBlendronomer(p);
+		newId = getNewId(PreparationTypeBlendronomer);
+		p->setId(newId);
+		p->setName(iterateName(PreparationTypeBlendronomer, p->getName()));
+	}
     else if (type == PreparationTypeKeymap)
     {
         Keymap::Ptr p = new Keymap(-1);
@@ -436,6 +487,15 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml)
         p->setId(newId);
         p->setName(iterateName(PreparationTypeTempoMod, p->getName()));
     }
+	else if (type == PreparationTypeBlendronomerMod)
+	{
+		BlendronomerModification::Ptr p = new BlendronomerModification(-1);
+		p->setState(xml);
+		addBlendronomerMod(p);
+		newId = getNewId(PreparationTypeBlendronomerMod);
+		p->setId(newId);
+		p->setName(iterateName(PreparationTypeBlendronomerMod, p->getName()));
+	}
     else if (type == PreparationTypePiano)
     {
         Piano::Ptr p = new Piano(processor, -1);
@@ -498,6 +558,15 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTempo, newId))+")";
         newOne->setName(newName);
     }
+	else if (type == PreparationTypeBlendronomer)
+	{
+		Blendronomer::Ptr toCopy = getBlendronomer(Id);
+		Blendronomer::Ptr newOne = toCopy->duplicate();
+		addBlendronomer(newOne);
+		newId = newOne->getId();
+		String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " (" + String(numWithSameNameAs(PreparationTypeBlendronomer, newId)) + ")";
+		newOne->setName(newName);
+	}
     else if (type == PreparationTypeKeymap)
     {
         Keymap::Ptr toCopy = getKeymap(Id);
@@ -552,6 +621,15 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTempoMod, newId))+")";
         newOne->setName(newName);
     }
+	else if (type == PreparationTypeBlendronomerMod)
+	{
+		BlendronomerModification::Ptr toCopy = BlendronomerModification(Id);
+		BlendronomerModification::Ptr newOne = toCopy->duplicate();
+		addBlendronomerMod(newOne);
+		newId = newOne->getId();
+		String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " (" + String(numWithSameNameAs(PreparationTypeBlendronomerMod, newId)) + ")";
+		newOne->setName(newName);
+	}
     else if (type == PreparationTypePiano)
     {
         Piano::Ptr toCopy = getPiano(Id);
@@ -598,6 +676,11 @@ int Gallery::add(BKPreparationType type)
         addTempo();
         newId = tempo.getLast()->getId();
     }
+	else if (type == PreparationTypeBlendronomer)
+	{
+		addBlendronomer();
+		newId = tempo.getLast()->getId();
+	}
     else if (type == PreparationTypeKeymap)
     {
         addKeymap();
@@ -628,6 +711,11 @@ int Gallery::add(BKPreparationType type)
         addTempoMod();
         newId = modTempo.getLast()->getId();
     }
+	else if (type == PreparationTypeBlendronomerMod)
+	{
+		addBlendronomerMod();
+		newId = tempo.getLast()->getId();
+	}
     else if (type == PreparationTypePiano)
     {
         addPiano();
@@ -648,11 +736,13 @@ int Gallery::getNum(BKPreparationType type)
     (type == PreparationTypeSynchronic) ? synchronic.size() :
     (type == PreparationTypeTuning) ? tuning.size() :
     (type == PreparationTypeTempo) ? tempo.size() :
+	(type == PreparationTypeBlendronomer) ? blendronomer.size() :
     (type == PreparationTypeDirectMod) ? modDirect.size() :
     (type == PreparationTypeNostalgicMod) ? modNostalgic.size() :
     (type == PreparationTypeSynchronicMod) ? modSynchronic.size() :
     (type == PreparationTypeTuningMod) ? modTuning.size() :
     (type == PreparationTypeTempoMod) ? modTempo.size() :
+	(type == PreparationTypeBlendronomerMod) ? modBlendronomer.size() :
     (type == PreparationTypeKeymap) ? bkKeymaps.size() :
     -1;
     
@@ -748,6 +838,24 @@ void Gallery::addTempoMod(TempoModification::Ptr tmod)
     modTempo.add           (tmod);
 }
 
+void Gallery::addBlendronomerMod()
+{
+	int newId = getNewId(PreparationTypeBlendronomerMod);
+	modBlendronomer.add(new BlendronomerModification(newId));
+}
+
+void Gallery::addBlendronomerModWithId(int Id)
+{
+	modBlendronomer.add(new BlendronomerModification(Id));
+}
+
+void Gallery::addBlendronomerMod(BlendronomerModification::Ptr bmod)
+{
+	int newId = getNewId(PreparationTypeBlendronomerMod);
+	bmod->setId(newId);
+	modBlendronomer.add(bmod);
+}
+
 void Gallery::addKeymap(void)
 {
     int newId = getNewId(PreparationTypeKeymap);
@@ -806,6 +914,10 @@ void Gallery::copy(BKPreparationType type, int from, int to)
     {
         tempo.getUnchecked(to)->copy(tempo.getUnchecked(from));
     }
+	else if (type == PreparationTypeBlendronomer)
+	{
+		blendronomer.getUnchecked(to)->copy(blendronomer.getUnchecked(from));
+	}
     else if (type == PreparationTypeKeymap)
     {
         bkKeymaps.getUnchecked(to)->copy(bkKeymaps.getUnchecked(from));
@@ -830,6 +942,10 @@ void Gallery::copy(BKPreparationType type, int from, int to)
     {
         modTempo.getUnchecked(to)->copy(modTempo.getUnchecked(from));
     }
+	else if (type == PreparationTypeBlendronomerMod)
+	{
+		modBlendronomer.getUnchecked(to)->copy(modBlendronomer.getUnchecked(from));
+	}
 }
 
 void Gallery::addTypeWithId(BKPreparationType type, int Id)
@@ -854,6 +970,10 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
     {
         addTempoWithId(Id);
     }
+	else if (type == PreparationTypeBlendronomer)
+	{
+		addBlendronomerWithId(Id);
+	}
     else if (type == PreparationTypeKeymap)
     {
         addKeymapWithId(Id);
@@ -878,6 +998,10 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
     {
         addTempoModWithId(Id);
     }
+	else if (type == PreparationTypeBlendronomerMod)
+	{
+		addBlendronomerModWithId(Id);
+	}
     else if (type == PreparationTypePiano)
     {
         addPianoWithId(Id);
@@ -942,6 +1066,30 @@ void Gallery::addTuning(Tuning::Ptr p)
     int newId = getNewId(PreparationTypeTuning);
     p->setId(newId);
     tuning.add(p);
+}
+
+void Gallery::addBlendronomer(void)
+{
+	int newId = getNewId(PreparationTypeBlendronomer);
+	blendronomer.add(new Blendronomer(newId));
+}
+
+void Gallery::addBlendronomerWithId(int Id)
+{
+	blendronomer.add(new Blendronomer(Id));
+}
+
+void Gallery::addBlendronomer(BlendronomerPreparation::Ptr blend)
+{
+	int newId = getNewId(PreparationTypeTuning);
+	blendronomer.add(new Blendronomer(blend, newId));
+}
+
+void Gallery::addBlendronomer(Blendronomer::Ptr p)
+{
+	int newId = getNewId(PreparationTypeBlendronomer);
+	p->setId(newId);
+	blendronomer.add(p);
 }
 
 void Gallery::addTempo(void)
@@ -1044,6 +1192,12 @@ void Gallery::clean(void)
     {
         if (!thisUsed.contains(tuning[i]->getId())) tuning.remove(i);
     }
+
+	thisUsed = used.getUnchecked(PreparationTypeBlendronomer);
+	for (int i = blendronomer.size(); --i >= 0;)
+	{
+		if (!thisUsed.contains(blendronomer[i]->getId())) blendronomer.remove(i);
+	}
     
     thisUsed = used.getUnchecked(PreparationTypeKeymap);
     for (int i = bkKeymaps.size(); --i >= 0;)
@@ -1080,6 +1234,12 @@ void Gallery::clean(void)
     {
         if (!thisUsed.contains(modTuning[i]->getId())) modTuning.remove(i);
     }
+
+	thisUsed = used.getUnchecked(PreparationTypeBlendronomerMod);
+	for (int i = modBlendronomer.size(); --i >= 0;)
+	{
+		if (!thisUsed.contains(modBlendronomer[i]->getId())) modBlendronomer.remove(i);
+	}
     
     setGalleryDirty(true);
 }

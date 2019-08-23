@@ -170,6 +170,9 @@ const String ptagTuning_springWeights = "sweights";
 const String ptagTuning_intervalScale = "iscale";
 const String ptagTuning_intervalScaleFundamental = "iscalefundamental";
 
+const String vtagBlendronomer = "blendronomer";
+const String vtagModBlendronomer = "modBlendronomer";
+
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";
 const String ptagKeymap_key = "k";
@@ -243,12 +246,14 @@ typedef enum BKPreparationType {
     PreparationTypeNostalgic,
     PreparationTypeTuning,
     PreparationTypeTempo,
+	PreparationTypeBlendronomer,
     PreparationTypeKeymap,
     PreparationTypeDirectMod,
     PreparationTypeSynchronicMod,
     PreparationTypeNostalgicMod,
     PreparationTypeTuningMod,
     PreparationTypeTempoMod,
+	PreparationTypeBlendronomerMod,
     PreparationTypeGenericMod,
     PreparationTypePianoMap,
     PreparationTypeReset,
@@ -274,12 +279,14 @@ static const std::vector<std::string> cPreparationTypes = {
     "Nostalgic",
     "Tuning",
     "Tempo",
+	"Blendronomer",
     "Keymap",
     "DirectMod",
     "SynchronicMod",
     "NostalgicMod",
     "TuningMod",
     "TempoMod",
+	"BlendronomerMod",
     "GenericMod",
     "PianoMap",
     "Reset",
@@ -293,12 +300,14 @@ typedef enum BKPreparationDisplay {
     DisplayNostalgic,
     DisplayTuning,
     DisplayTempo,
+	DisplayBlendronomer,
     DisplayKeymap,
     DisplayDirectMod,
     DisplaySynchronicMod,
     DisplayNostalgicMod,
     DisplayTuningMod,
     DisplayTempoMod,
+	DisplayBlendronomerMod,
     DisplayGeneral,
     DisplayAbout,
     DisplayComment,
@@ -313,6 +322,7 @@ static const std::vector<std::string> cDisplayNames = {
     "Nostalgic",
     "Tuning",
     "Tempo",
+	"Blendronomer",
     "Keymap",
     "General"
 
@@ -709,6 +719,14 @@ typedef enum TuningParameterType
     TuningParameterTypeNil
     
 } TuningParameterType;
+
+#pragma mark - Blendronomer
+typedef enum BlendronomerParameterType
+{
+	BlendronomerNone = 0,
+	BlendronomerNormal,
+	BlendronomerParameterTypeNil
+};
 
 // ~~ ~ ! ! ! ! ! ~ ~ ~ 
 // HAVE TO INTEGRATE TETHER WEIGHT GLOBAL AND FUND SETS TETHER BUTTON PARAMS AS MODS

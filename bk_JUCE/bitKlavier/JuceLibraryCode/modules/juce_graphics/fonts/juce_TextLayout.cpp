@@ -27,11 +27,6 @@
 namespace juce
 {
 
-static String substring (const String& text, Range<int> range)
-{
-    return text.substring (range.getStart(), range.getEnd());
-}
-
 TextLayout::Glyph::Glyph (int glyph, Point<float> anch, float w) noexcept
     : glyphCode (glyph), anchor (anch), width (w)
 {
@@ -212,9 +207,9 @@ void TextLayout::ensureStorageAllocated (int numLinesNeeded)
     lines.ensureStorageAllocated (numLinesNeeded);
 }
 
-void TextLayout::addLine (std::unique_ptr<Line> line)
+void TextLayout::addLine (Line* line)
 {
-    lines.add (line.release());
+    lines.add (line);
 }
 
 void TextLayout::draw (Graphics& g, Rectangle<float> area) const
@@ -226,9 +221,9 @@ void TextLayout::draw (Graphics& g, Rectangle<float> area) const
     auto clipTop    = clip.getY()      - origin.y;
     auto clipBottom = clip.getBottom() - origin.y;
 
-    for (auto& line : *this)
+    for (auto* line : lines)
     {
-        auto lineRangeY = line.getLineBoundsY();
+        auto lineRangeY = line->getLineBoundsY();
 
         if (lineRangeY.getEnd() < clipTop)
             continue;
@@ -236,9 +231,9 @@ void TextLayout::draw (Graphics& g, Rectangle<float> area) const
         if (lineRangeY.getStart() > clipBottom)
             break;
 
-        auto lineOrigin = origin + line.lineOrigin;
+        auto lineOrigin = origin + line->lineOrigin;
 
-        for (auto* run : line.runs)
+        for (auto* run : line->runs)
         {
             context.setFont (run->font);
             context.setFill (run->colour);
@@ -368,8 +363,8 @@ namespace TextLayoutHelpers
                 Array<float> xOffsets;
                 t.font.getGlyphPositions (getTrimmedEndIfNotAllWhitespace (t.text), newGlyphs, xOffsets);
 
-                if (currentRun == nullptr)  currentRun  = std::make_unique<TextLayout::Run>();
-                if (currentLine == nullptr) currentLine = std::make_unique<TextLayout::Line>();
+                if (currentRun == nullptr)  currentRun .reset (new TextLayout::Run());
+                if (currentLine == nullptr) currentLine.reset (new TextLayout::Line());
 
                 if (newGlyphs.size() > 0)
                 {
@@ -394,10 +389,9 @@ namespace TextLayoutHelpers
 
                     charPosition += newGlyphs.size();
                 }
-                else if (t.isWhitespace || t.isNewLine)
-                {
+
+                if (t.isWhitespace || t.isNewLine)
                     ++charPosition;
-                }
 
                 if (auto* nextToken = tokens[i + 1])
                 {
@@ -410,13 +404,13 @@ namespace TextLayoutHelpers
                     if (t.line != nextToken->line)
                     {
                         if (currentRun == nullptr)
-                            currentRun = std::make_unique<TextLayout::Run>();
+                            currentRun.reset (new TextLayout::Run());
 
                         addRun (*currentLine, currentRun.release(), t, runStartPosition, charPosition);
                         currentLine->stringRange = { lineStartPosition, charPosition };
 
                         if (! needToSetLineOrigin)
-                            layout.addLine (std::move (currentLine));
+                            layout.addLine (currentLine.release());
 
                         runStartPosition = charPosition;
                         lineStartPosition = charPosition;
@@ -429,7 +423,7 @@ namespace TextLayoutHelpers
                     currentLine->stringRange = { lineStartPosition, charPosition };
 
                     if (! needToSetLineOrigin)
-                        layout.addLine (std::move (currentLine));
+                        layout.addLine (currentLine.release());
 
                     needToSetLineOrigin = true;
                 }
@@ -440,14 +434,14 @@ namespace TextLayoutHelpers
                 auto totalW = layout.getWidth();
                 bool isCentred = (text.getJustification().getFlags() & Justification::horizontallyCentred) != 0;
 
-                for (auto& line : layout)
+                for (int i = 0; i < layout.getNumLines(); ++i)
                 {
-                    auto dx = totalW - line.getLineBoundsX().getLength();
+                    auto dx = totalW - layout.getLine(i).getLineBoundsX().getLength();
 
                     if (isCentred)
                         dx /= 2.0f;
 
-                    line.lineOrigin.x += dx;
+                    layout.getLine(i).lineOrigin.x += dx;
                 }
             }
         }
@@ -566,7 +560,7 @@ namespace TextLayoutHelpers
             {
                 auto& attr = text.getAttribute (i);
 
-                appendText (substring (text.getText(), attr.range),
+                appendText (text.getText().substring (attr.range.getStart(), attr.range.getEnd()),
                             attr.font, attr.colour);
             }
         }
@@ -616,67 +610,5 @@ void TextLayout::recalculateSize()
         height = 0;
     }
 }
-
-//==============================================================================
-#if JUCE_UNIT_TESTS
-
-struct TextLayoutTests  : public UnitTest
-{
-    TextLayoutTests()
-        : UnitTest ("Text Layout", UnitTestCategories::text)
-    {}
-
-    static TextLayout createLayout (StringRef text, float width)
-    {
-        Font fontToUse (12.0f);
-
-        AttributedString string (text);
-        string.setFont (std::move (fontToUse));
-
-        TextLayout layout;
-        layout.createLayout (std::move (string), width);
-
-        return layout;
-    }
-
-    void testLineBreaks (const String& line, float width, const StringArray& expected)
-    {
-        const auto layout = createLayout (line, width);
-
-        beginTest ("A line is split into expected pieces");
-        {
-            expectEquals (layout.getNumLines(), expected.size());
-
-            const auto limit = jmin (layout.getNumLines(), expected.size());
-
-            for (int i = 0; i != limit; ++i)
-                expectEquals (substring (line, layout.getLine (i).stringRange), expected[i]);
-        }
-    }
-
-    void runTest() override
-    {
-        const String shortLine ("hello world");
-        testLineBreaks (shortLine, 1.0e7f, { shortLine });
-
-        testLineBreaks ("this line should be split",
-                        60.0f,
-                        { "this line ",
-                          "should be ",
-                          "split" });
-
-        testLineBreaks ("these\nlines \nhave\n weird  \n spacing  ",
-                        80.0f,
-                        { "these\n",
-                          "lines \n",
-                          "have\n",
-                          " weird  \n",
-                          " spacing  " });
-    }
-};
-
-static TextLayoutTests textLayoutTests;
-
-#endif
 
 } // namespace juce

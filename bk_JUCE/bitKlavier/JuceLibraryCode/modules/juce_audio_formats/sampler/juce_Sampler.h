@@ -138,7 +138,6 @@ public:
     void controllerMoved (int controllerNumber, int newValue) override;
 
     void renderNextBlock (AudioBuffer<float>&, int startSample, int numSamples) override;
-    using SynthesiserVoice::renderNextBlock;
 
 private:
     //==============================================================================

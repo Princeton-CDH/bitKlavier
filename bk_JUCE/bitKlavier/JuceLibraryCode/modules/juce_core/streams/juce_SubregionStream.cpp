@@ -78,15 +78,13 @@ bool SubregionStream::isExhausted()
     return source->isExhausted();
 }
 
-
-//==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
 struct SubregionInputStreamTests   : public UnitTest
 {
     SubregionInputStreamTests()
-        : UnitTest ("SubregionInputStream", UnitTestCategories::streams)
+        : UnitTest ("SubregionInputStream", "Streams")
     {}
 
     void runTest() override

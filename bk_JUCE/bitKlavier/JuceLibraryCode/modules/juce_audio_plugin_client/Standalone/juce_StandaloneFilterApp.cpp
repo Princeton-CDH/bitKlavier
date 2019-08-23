@@ -117,9 +117,6 @@ public:
     //==============================================================================
     void systemRequestedQuit() override
     {
-        if (mainWindow.get() != nullptr)
-            mainWindow->pluginHolder->savePluginState();
-
         if (ModalComponentManager::getInstance()->cancelAllModalComponents())
         {
             Timer::callAfterDelay (100, []()

@@ -134,7 +134,7 @@ public:
             jassertfalse; // there can only be a single file chooser
     }
 
-    ~Native() override
+    ~Native()
     {
         masterReference.clear();
         currentFileChooser = nullptr;

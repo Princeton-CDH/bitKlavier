@@ -167,15 +167,12 @@ AbstractFifo::ScopedWrite AbstractFifo::write (int numToWrite) noexcept    { ret
 
 
 //==============================================================================
-//==============================================================================
 #if JUCE_UNIT_TESTS
 
 class AbstractFifoTests  : public UnitTest
 {
 public:
-    AbstractFifoTests()
-        : UnitTest ("Abstract Fifo", UnitTestCategories::containers)
-    {}
+    AbstractFifoTests() : UnitTest ("Abstract Fifo", "Containers") {}
 
     struct WriteThread  : public Thread
     {

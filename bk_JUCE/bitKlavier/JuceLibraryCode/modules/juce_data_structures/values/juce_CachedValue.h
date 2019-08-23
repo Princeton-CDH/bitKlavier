@@ -197,6 +197,10 @@ private:
     Type getTypedValue() const;
 
     void valueTreePropertyChanged (ValueTree& changedTree, const Identifier& changedProperty) override;
+    void valueTreeChildAdded (ValueTree&, ValueTree&) override {}
+    void valueTreeChildRemoved (ValueTree&, ValueTree&, int) override {}
+    void valueTreeChildOrderChanged (ValueTree&, int, int) override {}
+    void valueTreeParentChanged (ValueTree&) override {}
 
     //==============================================================================
     JUCE_DECLARE_WEAK_REFERENCEABLE (CachedValue)

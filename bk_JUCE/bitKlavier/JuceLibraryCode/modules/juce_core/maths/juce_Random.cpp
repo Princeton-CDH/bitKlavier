@@ -58,7 +58,7 @@ void Random::combineSeed (const int64 seedValue) noexcept
 
 void Random::setSeedRandomly()
 {
-    static std::atomic<int64> globalSeed { 0 };
+    static int64 globalSeed = 0;
 
     combineSeed (globalSeed ^ (int64) (pointer_sized_int) this);
     combineSeed (Time::getMillisecondCounter());
@@ -161,17 +161,13 @@ void Random::fillBitsRandomly (BigInteger& arrayToChange, int startBit, int numB
         arrayToChange.setBit (startBit + numBits, nextBool());
 }
 
-
-//==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
 
 class RandomTests  : public UnitTest
 {
 public:
-    RandomTests()
-        : UnitTest ("Random", UnitTestCategories::maths)
-    {}
+    RandomTests() : UnitTest ("Random", "Maths") {}
 
     void runTest() override
     {

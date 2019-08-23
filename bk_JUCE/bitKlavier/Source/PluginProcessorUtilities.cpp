@@ -407,7 +407,7 @@ void BKAudioProcessor::exportPreparation(BKPreparationType type, int Id, String 
     DBG("URL: " + file.getFullPathName());
     
     XmlElement* xml = getPreparationState(type, Id).createXml();
-    xml->writeToFile(file, String::empty);
+    xml->writeToFile(file, String());
 }
 
 void BKAudioProcessor::collectPianos(void)
@@ -573,6 +573,6 @@ void BKAudioProcessor::exportPiano(int Id, String name)
    
     toExport.addChild(piano->getState(), -1, 0);
     
-    toExport.createXml()->writeToFile(file, String::empty);
+    toExport.createXml()->writeToFile(file, String());
 }
 

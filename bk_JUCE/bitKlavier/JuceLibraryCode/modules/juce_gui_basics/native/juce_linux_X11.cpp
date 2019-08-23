@@ -190,8 +190,8 @@ void XWindowSystem::initialiseXDisplay() noexcept
     // Setup input event handler
     int fd = XConnectionNumber (display);
 
-    LinuxEventLoop::registerFdCallback (fd,
-         [this](int)
+    LinuxEventLoop::setWindowSystemFd (fd,
+         [this](int /*fd*/)
          {
             do
             {
@@ -201,7 +201,7 @@ void XWindowSystem::initialiseXDisplay() noexcept
                     ScopedXLock xlock (display);
 
                     if (! XPending (display))
-                        return;
+                        return false;
 
                     XNextEvent (display, &evt);
                 }
@@ -218,6 +218,8 @@ void XWindowSystem::initialiseXDisplay() noexcept
                 }
 
             } while (display != nullptr);
+
+            return false;
         });
 }
 
@@ -227,7 +229,7 @@ void XWindowSystem::destroyXDisplay() noexcept
     XDestroyWindow (display, juce_messageWindowHandle);
     juce_messageWindowHandle = 0;
     XSync (display, True);
-    LinuxEventLoop::unregisterFdCallback (XConnectionNumber (display));
+    LinuxEventLoop::removeWindowSystemFd();
 }
 
 JUCE_IMPLEMENT_SINGLETON (XWindowSystem)

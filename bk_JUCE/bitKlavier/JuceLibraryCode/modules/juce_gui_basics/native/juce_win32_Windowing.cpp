@@ -377,7 +377,6 @@ static void setDPIAwareness()
         getThreadDPIAwarenessContext        = (GetThreadDPIAwarenessContextFunc) getUser32Function ("GetThreadDpiAwarenessContext");
         getAwarenessFromDPIAwarenessContext = (GetAwarenessFromDpiAwarenessContextFunc) getUser32Function ("GetAwarenessFromDpiAwarenessContext");
         setThreadDPIAwarenessContext        = (SetThreadDPIAwarenessContextFunc) getUser32Function ("SetThreadDpiAwarenessContext");
-        setProcessDPIAwareness              = (SetProcessDPIAwarenessFunc) GetProcAddress (shcoreModule, "SetProcessDpiAwareness");
 
         // Only set the DPI awareness context of the process if we are a standalone app
         if (! JUCEApplicationBase::isStandaloneApp())
@@ -389,6 +388,7 @@ static void setDPIAwareness()
             && SUCCEEDED (setProcessDPIAwarenessContext (DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2)))
             return;
 
+        setProcessDPIAwareness    = (SetProcessDPIAwarenessFunc) GetProcAddress (shcoreModule, "SetProcessDpiAwareness");
         enableNonClientDPIScaling = (EnableNonClientDPIScalingFunc) getUser32Function ("EnableNonClientDpiScaling");
 
         if (setProcessDPIAwareness != nullptr && enableNonClientDPIScaling != nullptr
@@ -404,9 +404,6 @@ static void setDPIAwareness()
             return;
     }
 
-    if (! JUCEApplicationBase::isStandaloneApp())
-        return;
-
     // fallback for pre Windows 8.1 - equivalent to Process_System_DPI_Aware
     setProcessDPIAware = (SetProcessDPIAwareFunc) getUser32Function ("SetProcessDPIAware");
 
@@ -414,27 +411,25 @@ static void setDPIAwareness()
         setProcessDPIAware();
 }
 
-static bool isPerMonitorDPIAwareProcess()
-{
-   #if JUCE_WIN_PER_MONITOR_DPI_AWARE
-    static bool dpiAware = []() -> bool
-    {
-        setDPIAwareness();
+#if JUCE_WIN_PER_MONITOR_DPI_AWARE
+ static bool isPerMonitorDPIAwareProcess()
+ {
+     static bool dpiAware = []() -> bool
+     {
+         setDPIAwareness();
 
-        if (getProcessDPIAwareness == nullptr)
-            return false;
+         if (getProcessDPIAwareness == nullptr)
+             return false;
 
-        DPI_Awareness context;
-        getProcessDPIAwareness (0, &context);
+         DPI_Awareness context;
+         getProcessDPIAwareness (0, &context);
 
-        return context == DPI_Awareness::DPI_Awareness_Per_Monitor_Aware;
-    }();
+         return context == DPI_Awareness::DPI_Awareness_Per_Monitor_Aware;
+     }();
 
-    return dpiAware;
-   #else
-    return false;
-   #endif
-}
+     return dpiAware;
+ }
+#endif
 
 static bool isPerMonitorDPIAwareWindow (HWND h)
 {
@@ -453,19 +448,17 @@ static bool isPerMonitorDPIAwareWindow (HWND h)
    #endif
 }
 
-static bool isPerMonitorDPIAwareThread()
-{
-   #if JUCE_WIN_PER_MONITOR_DPI_AWARE
-    setDPIAwareness();
+#if JUCE_WIN_PER_MONITOR_DPI_AWARE
+ static bool isPerMonitorDPIAwareThread()
+ {
+     setDPIAwareness();
 
-    if (getThreadDPIAwarenessContext != nullptr && getAwarenessFromDPIAwarenessContext != nullptr)
-        return getAwarenessFromDPIAwarenessContext (getThreadDPIAwarenessContext()) == DPI_Awareness::DPI_Awareness_Per_Monitor_Aware;
+     if (getThreadDPIAwarenessContext != nullptr && getAwarenessFromDPIAwarenessContext != nullptr)
+         return getAwarenessFromDPIAwarenessContext (getThreadDPIAwarenessContext()) == DPI_Awareness::DPI_Awareness_Per_Monitor_Aware;
 
-    return isPerMonitorDPIAwareProcess();
-   #else
-    return false;
-   #endif
-}
+     return isPerMonitorDPIAwareProcess();
+ }
+#endif
 
 static double getGlobalDPI()
 {
@@ -766,12 +759,12 @@ public:
         DeleteObject (hBitmap);
     }
 
-    std::unique_ptr<ImageType> createType() const override    { return std::make_unique<NativeImageType>(); }
+    ImageType* createType() const override                       { return new NativeImageType(); }
 
-    std::unique_ptr<LowLevelGraphicsContext> createLowLevelContext() override
+    LowLevelGraphicsContext* createLowLevelContext() override
     {
         sendDataChangeMessage();
-        return std::make_unique<LowLevelGraphicsSoftwareRenderer> (Image (this));
+        return new LowLevelGraphicsSoftwareRenderer (Image (this));
     }
 
     void initialiseBitmapData (Image::BitmapData& bitmap, int x, int y, Image::BitmapData::ReadWriteMode mode) override
@@ -852,32 +845,15 @@ Image createSnapshotOfNativeWindow (void* nativeWindowHandle)
 {
     auto hwnd = (HWND) nativeWindowHandle;
 
-    auto r = convertPhysicalScreenRectangleToLogical (rectangleFromRECT (getWindowRect (hwnd)), hwnd);
-    const int w = r.getWidth();
-    const int h = r.getHeight();
+    auto r = getWindowRect (hwnd);
+    const int w = r.right - r.left;
+    const int h = r.bottom - r.top;
 
     auto nativeBitmap = new WindowsBitmapImage (Image::RGB, w, h, true);
     Image bitmap (nativeBitmap);
 
     HDC dc = GetDC (hwnd);
-
-    if (isPerMonitorDPIAwareProcess())
-    {
-        auto scale = getScaleFactorForWindow (hwnd);
-        auto prevStretchMode = SetStretchBltMode (nativeBitmap->hdc, HALFTONE);
-        SetBrushOrgEx (nativeBitmap->hdc, 0, 0, NULL);
-
-        StretchBlt (nativeBitmap->hdc, 0, 0, w, h,
-                    dc, 0, 0, roundToInt (w * scale), roundToInt (h * scale),
-                    SRCCOPY);
-
-        SetStretchBltMode (nativeBitmap->hdc, prevStretchMode);
-    }
-    else
-    {
-        BitBlt (nativeBitmap->hdc, 0, 0, w, h, dc, 0, 0, SRCCOPY);
-    }
-
+    BitBlt (nativeBitmap->hdc, 0, 0, w, h, dc, 0, 0, SRCCOPY);
     ReleaseDC (hwnd, dc);
 
     return SoftwareImageType().convert (bitmap);
@@ -1415,8 +1391,6 @@ public:
 
     Point<float> localToGlobal (Point<float> relativePosition) override  { return relativePosition + getScreenPosition().toFloat(); }
     Point<float> globalToLocal (Point<float> screenPosition) override    { return screenPosition   - getScreenPosition().toFloat(); }
-    using ComponentPeer::localToGlobal;
-    using ComponentPeer::globalToLocal;
 
     void setAlpha (float newAlpha) override
     {
@@ -2446,8 +2420,8 @@ private:
                         offscreenImage.clear (i);
 
                 {
-                    auto context = component.getLookAndFeel()
-                                    .createGraphicsContext (offscreenImage, { -x, -y }, contextClip);
+                    std::unique_ptr<LowLevelGraphicsContext> context (component.getLookAndFeel()
+                                                                        .createGraphicsContext (offscreenImage, Point<int> (-x, -y), contextClip));
 
                     context->addTransform (AffineTransform::scale ((float) getPlatformScaleFactor()));
                     handlePaint (*context);
@@ -2827,7 +2801,7 @@ private:
 
         if (isUp)
         {
-            handleMouseEvent (MouseInputSource::InputSourceType::touch, MouseInputSource::offscreenMousePos, ModifierKeys::currentModifiers.withoutMouseButtons(),
+            handleMouseEvent (MouseInputSource::InputSourceType::touch, { -10.0f, -10.0f }, ModifierKeys::currentModifiers.withoutMouseButtons(),
                               pressure, orientation, time, {}, touchIndex);
 
             if (! isValidPeer (this))
@@ -2940,7 +2914,7 @@ private:
 
         if (isUp)
         {
-            handleMouseEvent (MouseInputSource::InputSourceType::pen, MouseInputSource::offscreenMousePos, ModifierKeys::currentModifiers,
+            handleMouseEvent (MouseInputSource::InputSourceType::pen, { -10.0f, -10.0f }, ModifierKeys::currentModifiers,
                               pressure, MouseInputSource::invalidOrientation, time, penDetails);
 
             if (! isValidPeer (this))
@@ -3010,7 +2984,6 @@ private:
             case VK_NUMLOCK:
             case VK_SCROLL:
             case VK_APPS:
-                used = handleKeyUpOrDown (true);
                 sendModifierKeyChangeIfNeeded();
                 break;
 
@@ -3395,7 +3368,7 @@ private:
         forceDisplayUpdate();
 
         if (fullScreen && ! isMinimised())
-            setWindowPos (hwnd, ScalingHelpers::scaledScreenPosToUnscaled (component, Desktop::getInstance().getDisplays().findDisplayForRect (component.getScreenBounds()).userArea),
+            setWindowPos (hwnd, Desktop::getInstance().getDisplays().findDisplayForRect (component.getScreenBounds()).userArea,
                           SWP_NOACTIVATE | SWP_NOOWNERZORDER | SWP_NOZORDER | SWP_NOSENDCHANGING);
     }
 
@@ -4078,23 +4051,6 @@ JUCE_API bool shouldScaleGLWindow (void* hwnd)
     return isPerMonitorDPIAwareWindow ((HWND) hwnd);
 }
 
-#if JUCE_WIN_PER_MONITOR_DPI_AWARE
- JUCE_API void setProcessDPIAwarenessIfNecessary (void* hwnd)
- {
-     if (getProcessDPIAwareness == nullptr)
-         return;
-
-     DPI_Awareness context;
-     getProcessDPIAwareness (0, &context);
-
-     if (isPerMonitorDPIAwareWindow ((HWND) hwnd) && context != DPI_Awareness::DPI_Awareness_Per_Monitor_Aware
-         && setProcessDPIAwareness != nullptr)
-     {
-         setProcessDPIAwareness (DPI_Awareness::DPI_Awareness_Per_Monitor_Aware);
-     }
- }
-#endif
-
 JUCE_IMPLEMENT_SINGLETON (HWNDComponentPeer::WindowClassHolder)
 
 //==============================================================================
@@ -4459,7 +4415,7 @@ void Desktop::allowedOrientationsChanged() {}
 //==============================================================================
 static const Displays::Display* getCurrentDisplayFromScaleFactor (HWND hwnd)
 {
-    Array<const Displays::Display*> candidateDisplays;
+    Array<Displays::Display*> candidateDisplays;
     double scaleToLookFor = -1.0;
 
     if (auto* peer = HWNDComponentPeer::getOwnerOfWindow (hwnd))
@@ -4485,7 +4441,7 @@ static const Displays::Display* getCurrentDisplayFromScaleFactor (HWND hwnd)
         else
             bounds = Desktop::getInstance().getDisplays().physicalToLogical (rectangleFromRECT (getWindowRect (hwnd)));
 
-        const Displays::Display* retVal = nullptr;
+        Displays::Display* retVal = nullptr;
         int maxArea = -1;
 
         for (auto* d : candidateDisplays)

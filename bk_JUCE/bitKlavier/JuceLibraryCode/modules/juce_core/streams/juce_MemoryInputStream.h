@@ -62,9 +62,6 @@ public:
     MemoryInputStream (const MemoryBlock& data,
                        bool keepInternalCopyOfData);
 
-    /** Creates a stream by moving from a MemoryBlock. */
-    MemoryInputStream (MemoryBlock&& blockToTake);
-
     /** Destructor. */
     ~MemoryInputStream() override;
 
@@ -86,7 +83,9 @@ private:
     //==============================================================================
     const void* data;
     size_t dataSize, position = 0;
-    MemoryBlock internalCopy;
+    HeapBlock<char> internalCopy;
+
+    void createInternalCopy();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MemoryInputStream)
 };

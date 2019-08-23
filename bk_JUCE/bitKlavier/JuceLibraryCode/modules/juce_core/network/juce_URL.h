@@ -50,14 +50,16 @@ public:
 
     URL (const URL&) = default;
     URL& operator= (const URL&) = default;
-    URL (URL&&) = default;
-    URL& operator= (URL&&) = default;
+
+    // VS2013 can't default move constructors and assignments
+    URL (URL&&);
+    URL& operator= (URL&&);
 
     /** Creates URL referring to a local file on your disk using the file:// scheme. */
     explicit URL (File);
 
     /** Destructor. */
-    ~URL() = default;
+    ~URL();
 
     /** Compares two URLs.
         All aspects of the URLs must be identical for them to match, including any parameters,
@@ -88,17 +90,8 @@ public:
 
     /** Returns the path part of the URL.
         E.g. for "http://www.xyz.com/foo/bar?x=1", this will return "foo/bar".
-
-        If includeGetParameters is true and any parameters have been set with the
-        withParameter() method, then the string will have these appended on the
-        end and url-encoded.
     */
-    String getSubPath (bool includeGetParameters = false) const;
-
-    /** If any parameters are set, returns these URL encoded, including the "?"
-     *  prefix.
-    */
-    String getQueryString() const;
+    String getSubPath() const;
 
     /** Returns the scheme of the URL.
         E.g. for "http://www.xyz.com/foobar", this will return "http". (It won't
@@ -485,7 +478,7 @@ public:
 
         @see readEntireBinaryStream, readEntireTextStream
     */
-    std::unique_ptr<XmlElement> readEntireXmlStream (bool usePostCommand = false) const;
+    XmlElement* readEntireXmlStream (bool usePostCommand = false) const;
 
     //==============================================================================
     /** Adds escape sequences to a string to encode any characters that aren't

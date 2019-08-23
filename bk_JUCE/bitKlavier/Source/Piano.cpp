@@ -69,6 +69,7 @@ void Piano::deconfigure(void)
     sprocessor.clear();
     nprocessor.clear();
     tprocessor.clear();
+	bprocessor.clear();
     
     for (int key = 0; key < 128; key++)
     {
@@ -104,7 +105,7 @@ void Piano::configure(void)
         BKPreparationType type = item->getType();
         int Id = item->getId();
         
-        
+        //TODO: figure out connecting blendronomer
         // Connect keymaps to everything
         // Connect tunings, tempos, synchronics to preparations
         // Connect mods and resets to all their targets
@@ -249,6 +250,16 @@ TempoProcessor::Ptr Piano::getTempoProcessor(int Id, bool add)
     return add ? addTempoProcessor(Id) : nullptr;
 }
 
+BlendronomerProcessor::Ptr Piano::getBlendronomerProcessor(int Id, bool add)
+{
+	for (auto proc : bprocessor)
+	{
+		if (proc->getId() == Id) return proc;
+	}
+
+	return add ? addBlendronomerProcessor(Id) : nullptr;
+}
+
 
 NostalgicProcessor::Ptr Piano::addNostalgicProcessor(int thisId)
 {
@@ -296,6 +307,15 @@ TempoProcessor::Ptr Piano::addTempoProcessor(int thisId)
     mprocessor.add(mproc);
 
     return mproc;
+}
+
+BlendronomerProcessor::Ptr Piano::addBlendronomerProcessor(int thisId)
+{
+	BlendronomerProcessor::Ptr bproc = new BlendronomerProcessor(processor.gallery->getBlendronomer(thisId), defaultT, defaultM, nullptr, processor.gallery->getGeneralSettings(), &processor.mainPianoSynth);
+	bproc->prepareToPlay(sampleRate);
+	bprocessor.add(bproc);
+
+	return bproc;
 }
 
 void Piano::reset(void)
@@ -755,6 +775,42 @@ void Piano::deconfigureTempoModificationForKeys(TempoModification::Ptr mod, Arra
     }
 }
 
+void Piano::configureBlendronomerModification(BlendronomerModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
+{
+	mod->setTargets(whichPreps);
+
+	Array<bool> otherKeys;
+	for (int i = 0; i < 128; i++) otherKeys.add(true);
+
+	for (auto keymap : whichKeymaps)
+	{
+		for (auto key : processor.gallery->getKeymap(keymap)->keys())
+		{
+			modificationMap[key]->addBlendronomerModification(mod);
+
+			otherKeys.set(key, false);
+		}
+	}
+
+	deconfigureBlendronomerModificationForKeys(mod, otherKeys);
+}
+
+void Piano::deconfigureBlendronomerModificationForKeys(BlendronomerModification::Ptr mod, Array<bool> keys)
+{
+	int whichMod = mod->getId();
+
+	for (int key = 0; key < 128; key++)
+	{
+		if (keys[key])
+		{
+			// Remove Modification from Key
+			modificationMap[key]->removeBlendronomerModification(whichMod);
+
+			//DBG("REMOVE whichmod: " + String(whichMod) + " FROM key: " +String(key));
+		}
+	}
+}
+
 void Piano::configureTuningModification(TuningModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
     mod->setTargets(whichPreps);
@@ -907,7 +963,7 @@ ValueTree Piano::getState(void)
     ValueTree pianoVT( vtagPiano);
     
     String name = getName();
-    pianoVT.setProperty("name", ((name == String::empty) ? "Piano"+String(Id) : name) , 0);
+    pianoVT.setProperty("name", ((name == String()) ? "Piano"+String(Id) : name) , 0);
     
     pianoVT.setProperty("Id", Id, 0);
     
@@ -1023,7 +1079,7 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap)
     
     String pianoName = e->getStringAttribute("name");
     
-    if (pianoName != String::empty) setName(pianoName);
+    if (pianoName != String()) setName(pianoName);
     
     BKItem::Ptr thisItem;
     BKItem::Ptr thisConnection;

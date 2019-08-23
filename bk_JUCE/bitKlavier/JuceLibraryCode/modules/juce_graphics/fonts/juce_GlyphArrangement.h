@@ -50,8 +50,10 @@ public:
 
     PositionedGlyph (const PositionedGlyph&) = default;
     PositionedGlyph& operator= (const PositionedGlyph&) = default;
-    PositionedGlyph (PositionedGlyph&&) noexcept = default;
-    PositionedGlyph& operator= (PositionedGlyph&&) noexcept = default;
+
+    // VS2013 can't default move constructors and assignments
+    PositionedGlyph (PositionedGlyph&&) noexcept;
+    PositionedGlyph& operator= (PositionedGlyph&&) noexcept;
 
     ~PositionedGlyph();
 
@@ -130,11 +132,13 @@ public:
 
     GlyphArrangement (const GlyphArrangement&) = default;
     GlyphArrangement& operator= (const GlyphArrangement&) = default;
-    GlyphArrangement (GlyphArrangement&&) = default;
-    GlyphArrangement& operator= (GlyphArrangement&&) = default;
+
+    // VS2013 can't default move constructors and assignmants
+    GlyphArrangement (GlyphArrangement&&);
+    GlyphArrangement& operator= (GlyphArrangement&&);
 
     /** Destructor. */
-    ~GlyphArrangement() = default;
+    ~GlyphArrangement();
 
     //==============================================================================
     /** Returns the total number of glyphs in the arrangement. */
@@ -190,14 +194,13 @@ public:
         between x and (x + maxLineWidth).
 
         The y coordinate is the position of the baseline of the first line of text - subsequent
-        lines will be placed below it, separated by a distance of font.getHeight() + leading.
+        lines will be placed below it, separated by a distance of font.getHeight().
     */
     void addJustifiedText (const Font& font,
                            const String& text,
                            float x, float y,
                            float maxLineWidth,
-                           Justification horizontalLayout,
-                           float leading = 0.0f);
+                           Justification horizontalLayout);
 
     /** Tries to fit some text within a given space.
 

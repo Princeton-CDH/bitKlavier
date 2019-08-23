@@ -45,28 +45,30 @@ public:
     ~AudioPluginFormatManager();
 
     //==============================================================================
-    /** Adds the set of available standard formats, e.g. VST. */
+    /** Adds any formats that it knows about, e.g. VST.
+    */
     void addDefaultFormats();
 
     //==============================================================================
     /** Returns the number of types of format that are available.
+
         Use getFormat() to get one of them.
     */
-    int getNumFormats() const;
+    int getNumFormats();
 
     /** Returns one of the available formats.
+
         @see getNumFormats
     */
-    AudioPluginFormat* getFormat (int index) const;
-
-    /** Returns a list of all the registered formats. */
-    Array<AudioPluginFormat*> getFormats() const;
+    AudioPluginFormat* getFormat (int index);
 
     //==============================================================================
     /** Adds a format to the list.
+
         The object passed in will be owned and deleted by the manager.
     */
-    void addFormat (AudioPluginFormat*);
+    void addFormat (AudioPluginFormat* format);
+
 
     //==============================================================================
     /** Tries to load the type for this description, by trying all the formats
@@ -82,9 +84,10 @@ public:
         thread other than the message thread and without blocking the message
         thread.
     */
-    std::unique_ptr<AudioPluginInstance> createPluginInstance (const PluginDescription& description,
-                                                               double initialSampleRate, int initialBufferSize,
-                                                               String& errorMessage) const;
+    AudioPluginInstance* createPluginInstance (const PluginDescription& description,
+                                               double initialSampleRate,
+                                               int initialBufferSize,
+                                               String& errorMessage) const;
 
     /** Tries to asynchronously load the type for this description, by trying
         all the formats that this manager knows about.
@@ -109,16 +112,24 @@ public:
         from an auxiliary thread.
     */
     void createPluginInstanceAsync (const PluginDescription& description,
-                                    double initialSampleRate, int initialBufferSize,
-                                    AudioPluginFormat::PluginCreationCallback callback);
+                                    double initialSampleRate,
+                                    int initialBufferSize,
+                                    AudioPluginFormat::InstantiationCompletionCallback* callback);
+
+    void createPluginInstanceAsync (const PluginDescription& description,
+                                    double initialSampleRate,
+                                    int initialBufferSize,
+                                    std::function<void (AudioPluginInstance*, const String&)> completionCallback);
 
     /** Checks that the file or component for this plugin actually still exists.
+
         (This won't try to load the plugin)
     */
-    bool doesPluginStillExist (const PluginDescription&) const;
+    bool doesPluginStillExist (const PluginDescription& description) const;
 
 private:
     //==============================================================================
+    //@internal
     AudioPluginFormat* findFormatForDescription (const PluginDescription&, String& errorMessage) const;
 
     OwnedArray<AudioPluginFormat> formats;

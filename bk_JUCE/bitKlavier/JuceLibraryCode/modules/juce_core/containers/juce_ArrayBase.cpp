@@ -113,7 +113,7 @@ class ArrayBaseTests  : public UnitTest
 
 public:
     ArrayBaseTests()
-        : UnitTest ("ArrayBase", UnitTestCategories::containers)
+        : UnitTest ("ArrayBase", "Containers")
     {}
 
     void runTest() override

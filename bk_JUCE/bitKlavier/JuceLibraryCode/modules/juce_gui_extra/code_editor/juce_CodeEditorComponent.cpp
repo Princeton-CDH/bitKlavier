@@ -550,7 +550,9 @@ void CodeEditorComponent::codeDocumentChanged (const int startIndex, const int e
     const CodeDocument::Position affectedTextStart (document, startIndex);
     const CodeDocument::Position affectedTextEnd (document, endIndex);
 
-    retokenise (startIndex, endIndex);
+    clearCachedIterators (affectedTextStart.getLineNumber());
+
+    rebuildLineTokensAsync();
 
     updateCaretPosition();
     columnToTryToMaintain = -1;
@@ -565,16 +567,6 @@ void CodeEditorComponent::codeDocumentChanged (const int startIndex, const int e
             moveCaretTo (affectedTextStart, false);
 
     updateScrollBars();
-}
-
-void CodeEditorComponent::retokenise (int startIndex, int endIndex)
-{
-    const CodeDocument::Position affectedTextStart (document, startIndex);
-    juce::ignoreUnused (endIndex); // Leave room for more efficient impl in future.
-
-    clearCachedIterators (affectedTextStart.getLineNumber());
-
-    rebuildLineTokensAsync();
 }
 
 //==============================================================================
@@ -637,7 +629,6 @@ void CodeEditorComponent::moveCaretTo (const CodeDocument::Position& newPos, con
     updateCaretPosition();
     scrollToKeepCaretOnScreen();
     updateScrollBars();
-    caretPositionMoved();
 
     if (appCommandManager != nullptr && selectionWasActive != isHighlightActive())
         appCommandManager->commandStatusChanged();
@@ -766,7 +757,6 @@ void CodeEditorComponent::insertText (const String& newText)
             document.insertText (caretPos, newText);
 
         scrollToKeepCaretOnScreen();
-        caretPositionMoved();
     }
 }
 
@@ -1234,10 +1224,6 @@ void CodeEditorComponent::editorViewportPositionChanged()
 {
 }
 
-void CodeEditorComponent::caretPositionMoved()
-{
-}
-
 //==============================================================================
 ApplicationCommandTarget* CodeEditorComponent::getNextCommandTarget()
 {
@@ -1550,7 +1536,7 @@ void CodeEditorComponent::clearCachedIterators (const int firstLineToBeInvalid)
 {
     int i;
     for (i = cachedIterators.size(); --i >= 0;)
-        if (cachedIterators.getUnchecked (i).getLine() < firstLineToBeInvalid)
+        if (cachedIterators.getUnchecked (i)->getLine() < firstLineToBeInvalid)
             break;
 
     cachedIterators.removeRange (jmax (0, i - 1), cachedIterators.size());
@@ -1562,29 +1548,29 @@ void CodeEditorComponent::updateCachedIterators (int maxLineNum)
     const int linesBetweenCachedSources = jmax (10, document.getNumLines() / maxNumCachedPositions);
 
     if (cachedIterators.size() == 0)
-        cachedIterators.add (CodeDocument::Iterator (document));
+        cachedIterators.add (new CodeDocument::Iterator (document));
 
     if (codeTokeniser != nullptr)
     {
         for (;;)
         {
-            const auto last = cachedIterators.getLast();
+            auto& last = *cachedIterators.getLast();
 
             if (last.getLine() >= maxLineNum)
                 break;
 
-            cachedIterators.add (CodeDocument::Iterator (last));
-            auto& t = cachedIterators.getReference (cachedIterators.size() - 1);
+            auto* t = new CodeDocument::Iterator (last);
+            cachedIterators.add (t);
             const int targetLine = jmin (maxLineNum, last.getLine() + linesBetweenCachedSources);
 
             for (;;)
             {
-                codeTokeniser->readNextToken (t);
+                codeTokeniser->readNextToken (*t);
 
-                if (t.getLine() >= targetLine)
+                if (t->getLine() >= targetLine)
                     break;
 
-                if (t.isEOF())
+                if (t->isEOF())
                     return;
             }
         }
@@ -1597,7 +1583,7 @@ void CodeEditorComponent::getIteratorForPosition (int position, CodeDocument::It
     {
         for (int i = cachedIterators.size(); --i >= 0;)
         {
-            auto& t = cachedIterators.getReference (i);
+            auto& t = *cachedIterators.getUnchecked (i);
 
             if (t.getPosition() <= position)
             {

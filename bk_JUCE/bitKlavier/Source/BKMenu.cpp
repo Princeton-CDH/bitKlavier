@@ -33,7 +33,7 @@ void BKEditableComboBox::textEditorReturnKeyPressed(TextEditor& textEditor)
 
     hidePopup();
     
-    if (textEditor.getText() != String::empty)
+    if (textEditor.getText() != String())
     {
         listeners.call(&BKEditableComboBoxListener::BKEditableComboBoxChanged,
                        textEditor.getText(),

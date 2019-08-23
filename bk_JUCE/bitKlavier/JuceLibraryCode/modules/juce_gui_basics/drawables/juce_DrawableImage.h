@@ -90,7 +90,7 @@ public:
     /** @internal */
     bool hitTest (int x, int y) override;
     /** @internal */
-    std::unique_ptr<Drawable> createCopy() const override;
+    Drawable* createCopy() const override;
     /** @internal */
     Rectangle<float> getDrawableBounds() const override;
     /** @internal */

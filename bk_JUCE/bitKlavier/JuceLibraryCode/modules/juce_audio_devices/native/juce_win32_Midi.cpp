@@ -20,12 +20,6 @@
   ==============================================================================
 */
 
-#ifndef DRV_QUERYDEVICEINTERFACE
- #define DRV_RESERVED                  0x0800
- #define DRV_QUERYDEVICEINTERFACE     (DRV_RESERVED + 12)
- #define DRV_QUERYDEVICEINTERFACESIZE (DRV_RESERVED + 13)
-#endif
-
 namespace juce
 {
 
@@ -35,9 +29,7 @@ struct MidiServiceType
     {
         virtual ~InputWrapper() {}
 
-        virtual String getDeviceIdentifier() = 0;
         virtual String getDeviceName() = 0;
-
         virtual void start() = 0;
         virtual void stop() = 0;
     };
@@ -46,20 +38,18 @@ struct MidiServiceType
     {
         virtual ~OutputWrapper() {}
 
-        virtual String getDeviceIdentifier() = 0;
         virtual String getDeviceName() = 0;
-
         virtual void sendMessageNow (const MidiMessage&) = 0;
     };
 
     MidiServiceType() {}
     virtual ~MidiServiceType() {}
 
-    virtual Array<MidiDeviceInfo> getAvailableDevices (bool) = 0;
-    virtual MidiDeviceInfo getDefaultDevice (bool) = 0;
+    virtual StringArray getDevices (bool) = 0;
+    virtual int getDefaultDeviceIndex (bool) = 0;
 
-    virtual InputWrapper*  createInputWrapper  (MidiInput&, const String&, MidiInputCallback&) = 0;
-    virtual OutputWrapper* createOutputWrapper (const String&) = 0;
+    virtual InputWrapper* createInputWrapper (MidiInput&, int, MidiInputCallback&) = 0;
+    virtual OutputWrapper* createOutputWrapper (int) = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiServiceType)
 };
@@ -70,26 +60,26 @@ struct Win32MidiService  : public MidiServiceType,
 {
     Win32MidiService() {}
 
-    Array<MidiDeviceInfo> getAvailableDevices (bool isInput) override
+    StringArray getDevices (bool isInput) override
     {
-        return isInput ? Win32InputWrapper::getAvailableDevices()
-                       : Win32OutputWrapper::getAvailableDevices();
+        return isInput ? Win32InputWrapper::getDevices()
+                       : Win32OutputWrapper::getDevices();
     }
 
-    MidiDeviceInfo getDefaultDevice (bool isInput) override
+    int getDefaultDeviceIndex (bool isInput) override
     {
-        return isInput ? Win32InputWrapper::getDefaultDevice()
-                       : Win32OutputWrapper::getDefaultDevice();
+        return isInput ? Win32InputWrapper::getDefaultDeviceIndex()
+                       : Win32OutputWrapper::getDefaultDeviceIndex();
     }
 
-    InputWrapper* createInputWrapper (MidiInput& input, const String& deviceIdentifier, MidiInputCallback& callback) override
+    InputWrapper* createInputWrapper (MidiInput& input, int index, MidiInputCallback& callback) override
     {
-        return new Win32InputWrapper (*this, input, deviceIdentifier, callback);
+        return new Win32InputWrapper (*this, input, index, callback);
     }
 
-    OutputWrapper* createOutputWrapper (const String& deviceIdentifier) override
+    OutputWrapper* createOutputWrapper (int index) override
     {
-        return new Win32OutputWrapper (*this, deviceIdentifier);
+        return new Win32OutputWrapper (*this, index);
     }
 
 private:
@@ -98,10 +88,7 @@ private:
     //==============================================================================
     struct MidiInCollector  : public ReferenceCountedObject
     {
-        MidiInCollector (Win32MidiService& s, MidiDeviceInfo d)
-            : deviceInfo (d), midiService (s)
-        {
-        }
+        MidiInCollector (Win32MidiService& s, const String& name)  : deviceName (name), midiService (s) {}
 
         ~MidiInCollector()
         {
@@ -229,7 +216,7 @@ private:
             }
         }
 
-        MidiDeviceInfo deviceInfo;
+        String deviceName;
         HMIDIIN deviceHandle = 0;
 
     private:
@@ -332,65 +319,13 @@ private:
     };
 
     //==============================================================================
-    template<class WrapperType>
-    struct Win32MidiDeviceQuery
+    struct Win32InputWrapper  : public InputWrapper
     {
-        static Array<MidiDeviceInfo> getAvailableDevices()
-        {
-            StringArray deviceNames, deviceIDs;
-            auto deviceCaps = WrapperType::getDeviceCaps();
-
-            for (int i = 0; i < deviceCaps.size(); ++i)
-            {
-                deviceNames.add (deviceCaps[i].szPname);
-
-                auto identifier = getInterfaceIDForDevice ((UINT) i);
-
-                if (identifier.isNotEmpty())
-                    deviceIDs.add (identifier);
-                else
-                    deviceIDs.add (deviceNames[i]);
-            }
-
-            deviceNames.appendNumbersToDuplicates (false, false, CharPointer_UTF8 ("-"), CharPointer_UTF8 (""));
-            deviceIDs  .appendNumbersToDuplicates (false, false, CharPointer_UTF8 ("-"), CharPointer_UTF8 (""));
-
-            Array<MidiDeviceInfo> devices;
-
-            for (int i = 0; i < deviceNames.size(); ++i)
-                devices.add ({ deviceNames[i], deviceIDs[i] });
-
-            return devices;
-        }
-
-    private:
-        static String getInterfaceIDForDevice (UINT id)
-        {
-            ULONG size = 0;
-
-            if (WrapperType::sendMidiMessage ((UINT_PTR) id, DRV_QUERYDEVICEINTERFACESIZE, (DWORD_PTR) &size, 0) == MMSYSERR_NOERROR)
-            {
-                WCHAR interfaceName[512] = {};
-
-                if (isPositiveAndBelow (size, sizeof (interfaceName))
-                    && WrapperType::sendMidiMessage ((UINT_PTR) id, DRV_QUERYDEVICEINTERFACE,
-                                                     (DWORD_PTR) interfaceName, sizeof (interfaceName)) == MMSYSERR_NOERROR)
-                {
-                    return interfaceName;
-                }
-            }
-
-            return {};
-        }
-    };
-
-    struct Win32InputWrapper  : public InputWrapper,
-                                public Win32MidiDeviceQuery<Win32InputWrapper>
-    {
-        Win32InputWrapper (Win32MidiService& parentService, MidiInput& midiInput, const String& deviceIdentifier, MidiInputCallback& c)
+        Win32InputWrapper (Win32MidiService& parentService,
+                           MidiInput& midiInput, int index, MidiInputCallback& c)
             : input (midiInput), callback (c)
         {
-            collector = getOrCreateCollector (parentService, deviceIdentifier);
+            collector = getOrCreateCollector (parentService, index);
             collector->addClient (this);
         }
 
@@ -399,31 +334,25 @@ private:
             collector->removeClient (this);
         }
 
-        static MidiInCollector::Ptr getOrCreateCollector (Win32MidiService& parentService, const String& deviceIdentifier)
+        static MidiInCollector::Ptr getOrCreateCollector (Win32MidiService& parentService, int index)
         {
+            auto names = getDevices();
             UINT deviceID = MIDI_MAPPER;
             String deviceName;
-            auto devices = getAvailableDevices();
 
-            for (int i = 0; i < devices.size(); ++i)
+            if (isPositiveAndBelow (index, names.size()))
             {
-                auto d = devices.getUnchecked (i);
-
-                if (d.identifier == deviceIdentifier)
-                {
-                    deviceID = i;
-                    deviceName = d.name;
-                    break;
-                }
+                deviceName = names[index];
+                deviceID = index;
             }
 
             const ScopedLock sl (parentService.activeCollectorLock);
 
             for (auto& c : parentService.activeCollectors)
-                if (c->deviceInfo.identifier == deviceIdentifier)
+                if (c->deviceName == deviceName)
                     return c;
 
-            MidiInCollector::Ptr c (new MidiInCollector (parentService, { deviceName, deviceIdentifier }));
+            MidiInCollector::Ptr c (new MidiInCollector (parentService, deviceName));
 
             HMIDIIN h;
             auto err = midiInOpen (&h, deviceID,
@@ -439,33 +368,29 @@ private:
             return c;
         }
 
-        static DWORD sendMidiMessage (UINT_PTR deviceID, UINT msg, DWORD_PTR arg1, DWORD_PTR arg2)
+        static StringArray getDevices()
         {
-            return midiInMessage ((HMIDIIN) deviceID, msg, arg1, arg2);
-        }
+            StringArray s;
+            auto num = midiInGetNumDevs();
 
-        static Array<MIDIINCAPS> getDeviceCaps()
-        {
-            Array<MIDIINCAPS> devices;
-
-            for (UINT i = 0; i < midiInGetNumDevs(); ++i)
+            for (UINT i = 0; i < num; ++i)
             {
                 MIDIINCAPS mc = { 0 };
 
                 if (midiInGetDevCaps (i, &mc, sizeof (mc)) == MMSYSERR_NOERROR)
-                    devices.add (mc);
+                    s.add (String (mc.szPname, (size_t) numElementsInArray (mc.szPname)));
             }
 
-            return devices;
+            s.appendNumbersToDuplicates (false, false, CharPointer_UTF8 ("-"), CharPointer_UTF8 (""));
+            return s;
         }
 
-        static MidiDeviceInfo getDefaultDevice()  { return getAvailableDevices().getFirst(); }
+        static int getDefaultDeviceIndex()  { return 0; }
 
         void start() override   { started = true;  concatenator.reset(); collector->startOrStop(); }
         void stop() override    { started = false; collector->startOrStop(); concatenator.reset(); }
 
-        String getDeviceIdentifier() override   { return collector->deviceInfo.identifier; }
-        String getDeviceName() override         { return collector->deviceInfo.name; }
+        String getDeviceName() override     { return collector->deviceName; }
 
         void pushMidiData (const void* inputData, int numBytes, double time)
         {
@@ -486,8 +411,8 @@ private:
     {
         using Ptr = ReferenceCountedObjectPtr<MidiOutHandle>;
 
-        MidiOutHandle (Win32MidiService& parent, MidiDeviceInfo d, HMIDIOUT h)
-            : owner (parent), deviceInfo (d), handle (h)
+        MidiOutHandle (Win32MidiService& parent, const String& name, HMIDIOUT h)
+            : owner (parent), deviceName (name), handle (h)
         {
             owner.activeOutputHandles.add (this);
         }
@@ -501,41 +426,32 @@ private:
         }
 
         Win32MidiService& owner;
-        MidiDeviceInfo deviceInfo;
+        String deviceName;
         HMIDIOUT handle;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiOutHandle)
     };
 
     //==============================================================================
-    struct Win32OutputWrapper  : public OutputWrapper,
-                                 public Win32MidiDeviceQuery<Win32OutputWrapper>
+    struct Win32OutputWrapper  : public OutputWrapper
     {
-        Win32OutputWrapper (Win32MidiService& p, const String& deviceIdentifier)
-            : parent (p)
+        Win32OutputWrapper (Win32MidiService& p, int index) : parent (p)
         {
-            auto devices = getAvailableDevices();
+            auto names = getDevices();
             UINT deviceID = MIDI_MAPPER;
-            String deviceName;
 
-            for (int i = 0; i < devices.size(); ++i)
+            if (isPositiveAndBelow (index, names.size()))
             {
-                auto d = devices.getUnchecked (i);
-
-                if (d.identifier == deviceIdentifier)
-                {
-                    deviceID = i;
-                    deviceName = d.name;
-                    break;
-                }
+                deviceName = names[index];
+                deviceID = index;
             }
 
             if (deviceID == MIDI_MAPPER)
             {
                 // use the microsoft sw synth as a default - best not to allow deviceID
                 // to be MIDI_MAPPER, or else device sharing breaks
-                for (int i = 0; i < devices.size(); ++i)
-                    if (devices[i].name.containsIgnoreCase ("microsoft"))
+                for (int i = 0; i < names.size(); ++i)
+                    if (names[i].containsIgnoreCase ("microsoft"))
                         deviceID = (UINT) i;
             }
 
@@ -543,7 +459,7 @@ private:
             {
                 auto* activeHandle = parent.activeOutputHandles.getUnchecked (i);
 
-                if (activeHandle->deviceInfo.identifier == deviceIdentifier)
+                if (activeHandle->deviceName == deviceName)
                 {
                     han = activeHandle;
                     return;
@@ -557,7 +473,7 @@ private:
 
                 if (res == MMSYSERR_NOERROR)
                 {
-                    han = new MidiOutHandle (parent, { deviceName, deviceIdentifier }, h);
+                    han = new MidiOutHandle (parent, deviceName, h);
                     return;
                 }
 
@@ -614,16 +530,12 @@ private:
             }
         }
 
-        static DWORD sendMidiMessage (UINT_PTR deviceID, UINT msg, DWORD_PTR arg1, DWORD_PTR arg2)
-        {
-            return midiOutMessage ((HMIDIOUT) deviceID, msg, arg1, arg2);
-        }
-
         static Array<MIDIOUTCAPS> getDeviceCaps()
         {
             Array<MIDIOUTCAPS> devices;
+            auto num = midiOutGetNumDevs();
 
-            for (UINT i = 0; i < midiOutGetNumDevs(); ++i)
+            for (UINT i = 0; i < num; ++i)
             {
                 MIDIOUTCAPS mc = { 0 };
 
@@ -634,26 +546,36 @@ private:
             return devices;
         }
 
-        static MidiDeviceInfo getDefaultDevice()
+        static StringArray getDevices()
         {
-            auto defaultIndex = []()
-            {
-                auto deviceCaps = getDeviceCaps();
+            StringArray s;
 
-                for (int i = 0; i < deviceCaps.size(); ++i)
-                    if ((deviceCaps[i].wTechnology & MOD_MAPPER) != 0)
-                        return i;
+            for (auto& mc : getDeviceCaps())
+                s.add (String (mc.szPname, (size_t) numElementsInArray (mc.szPname)));
 
-                return 0;
-            }();
-
-            return getAvailableDevices()[defaultIndex];
+            s.appendNumbersToDuplicates (false, false, CharPointer_UTF8 ("-"), CharPointer_UTF8 (""));
+            return s;
         }
 
-        String getDeviceIdentifier() override   { return han->deviceInfo.identifier; }
-        String getDeviceName() override         { return han->deviceInfo.name; }
+        static int getDefaultDeviceIndex()
+        {
+            int n = 0;
+
+            for (auto& mc : getDeviceCaps())
+            {
+                if ((mc.wTechnology & MOD_MAPPER) != 0)
+                    return n;
+
+                ++n;
+            }
+
+            return 0;
+        }
+
+        String getDeviceName() override    { return deviceName; }
 
         Win32MidiService& parent;
+        String deviceName;
         MidiOutHandle::Ptr han;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Win32OutputWrapper)
@@ -749,26 +671,26 @@ public:
             throw std::runtime_error ("Failed to start the midi output device watcher");
     }
 
-    Array<MidiDeviceInfo> getAvailableDevices (bool isInput) override
+    StringArray getDevices (bool isInput) override
     {
-        return isInput ? inputDeviceWatcher ->getAvailableDevices()
-                       : outputDeviceWatcher->getAvailableDevices();
+        return isInput ? inputDeviceWatcher ->getDevices()
+                       : outputDeviceWatcher->getDevices();
     }
 
-    MidiDeviceInfo getDefaultDevice (bool isInput) override
+    int getDefaultDeviceIndex (bool isInput) override
     {
-        return isInput ? inputDeviceWatcher ->getDefaultDevice()
-                       : outputDeviceWatcher->getDefaultDevice();
+        return isInput ? inputDeviceWatcher ->getDefaultDeviceIndex()
+                       : outputDeviceWatcher->getDefaultDeviceIndex();
     }
 
-    InputWrapper* createInputWrapper (MidiInput& input, const String& deviceIdentifier, MidiInputCallback& callback) override
+    InputWrapper* createInputWrapper (MidiInput& input, int index, MidiInputCallback& callback) override
     {
-        return new WinRTInputWrapper (*this, input, deviceIdentifier, callback);
+        return new WinRTInputWrapper (*this, input, index, callback);
     }
 
-    OutputWrapper* createOutputWrapper (const String& deviceIdentifier) override
+    OutputWrapper* createOutputWrapper (int index) override
     {
-        return new WinRTOutputWrapper (*this, deviceIdentifier);
+        return new WinRTOutputWrapper (*this, index);
     }
 
 private:
@@ -1176,7 +1098,7 @@ private:
     };
 
     //==============================================================================
-    struct WinRTMIDIDeviceInfo
+    struct MIDIDeviceInfo
     {
         String deviceID, containerID, name;
         bool isDefault = false;
@@ -1198,7 +1120,7 @@ private:
 
         HRESULT addDevice (IDeviceInformation* addedDeviceInfo) override
         {
-            WinRTMIDIDeviceInfo info;
+            MIDIDeviceInfo info;
 
             HSTRING deviceID;
             auto hr = addedDeviceInfo->get_Id (&deviceID);
@@ -1307,59 +1229,56 @@ private:
             return attach (deviceSelector, DeviceInformationKind::DeviceInformationKind_DeviceInterface);
         }
 
-        Array<MidiDeviceInfo> getAvailableDevices()
+        StringArray getDevices()
         {
             {
                 const ScopedLock lock (deviceChanges);
                 lastQueriedConnectedDevices = connectedDevices;
             }
 
-            StringArray deviceNames, deviceIDs;
+            StringArray result;
 
             for (auto info : lastQueriedConnectedDevices.get())
-            {
-                deviceNames.add (info.name);
-                deviceIDs  .add (info.containerID);
-            }
+                result.add (info.name);
 
-            deviceNames.appendNumbersToDuplicates (false, false, CharPointer_UTF8 ("-"), CharPointer_UTF8 (""));
-            deviceIDs  .appendNumbersToDuplicates (false, false, CharPointer_UTF8 ("-"), CharPointer_UTF8 (""));
-
-            Array<MidiDeviceInfo> devices;
-
-            for (int i = 0; i < deviceNames.size(); ++i)
-                devices.add ({ deviceNames[i], deviceIDs[i] });
-
-            return devices;
+            return result;
         }
 
-        MidiDeviceInfo getDefaultDevice()
+        int getDefaultDeviceIndex()
         {
             auto& lastDevices = lastQueriedConnectedDevices.get();
 
-            for (auto& d : lastDevices)
-                if (d.isDefault)
-                    return { d.name, d.containerID };
+            for (int i = 0; i < lastDevices.size(); ++i)
+                if (lastDevices[i].isDefault)
+                    return i;
+
+            return 0;
+        }
+
+        MIDIDeviceInfo getDeviceInfoFromIndex (int index)
+        {
+            if (isPositiveAndBelow (index, lastQueriedConnectedDevices.get().size()))
+                return lastQueriedConnectedDevices.get()[index];
 
             return {};
         }
 
-        WinRTMIDIDeviceInfo getWinRTDeviceInfoForDevice (const String& deviceIdentifier)
+        String getDeviceID (const String& name)
         {
-            auto devices = getAvailableDevices();
+            const ScopedLock lock (deviceChanges);
 
-            for (int i = 0; i < devices.size(); ++i)
-                if (devices.getUnchecked (i).identifier == deviceIdentifier)
-                    return lastQueriedConnectedDevices.get()[i];
+            for (auto info : connectedDevices)
+                if (info.name == name)
+                    return info.deviceID;
 
             return {};
         }
 
         WinRTWrapper::ComPtr<COMFactoryType>& factory;
 
-        Array<WinRTMIDIDeviceInfo> connectedDevices;
+        Array<MIDIDeviceInfo> connectedDevices;
         CriticalSection deviceChanges;
-        ThreadLocalValue<Array<WinRTMIDIDeviceInfo>> lastQueriedConnectedDevices;
+        ThreadLocalValue<Array<MIDIDeviceInfo>> lastQueriedConnectedDevices;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiIODeviceWatcher);
     };
@@ -1426,12 +1345,12 @@ private:
     public:
         WinRTIOWrapper (BLEDeviceWatcher& bleWatcher,
                         MidiIODeviceWatcher<MIDIIOStaticsType>& midiDeviceWatcher,
-                        const String& deviceIdentifier)
+                        int index)
             : bleDeviceWatcher (bleWatcher)
         {
             {
                 const ScopedLock lock (midiDeviceWatcher.deviceChanges);
-                deviceInfo = midiDeviceWatcher.getWinRTDeviceInfoForDevice (deviceIdentifier);
+                deviceInfo = midiDeviceWatcher.getDeviceInfoFromIndex (index);
             }
 
             if (deviceInfo.deviceID.isEmpty())
@@ -1498,7 +1417,7 @@ private:
     protected:
         //==============================================================================
         BLEDeviceWatcher& bleDeviceWatcher;
-        WinRTMIDIDeviceInfo deviceInfo;
+        MIDIDeviceInfo deviceInfo;
         bool isBLEDevice = false;
         WinRTWrapper::ComPtr<MIDIPort> midiPort;
     };
@@ -1508,8 +1427,8 @@ private:
                                       private WinRTIOWrapper<IMidiInPortStatics, IMidiInPort>
 
     {
-        WinRTInputWrapper (WinRTMidiService& service, MidiInput& input, const String& deviceIdentifier, MidiInputCallback& cb)
-            : WinRTIOWrapper <IMidiInPortStatics, IMidiInPort> (*service.bleDeviceWatcher, *service.inputDeviceWatcher, deviceIdentifier),
+        WinRTInputWrapper (WinRTMidiService& service, MidiInput& input, int index, MidiInputCallback& cb)
+            : WinRTIOWrapper <IMidiInPortStatics, IMidiInPort> (*service.bleDeviceWatcher, *service.inputDeviceWatcher, index),
               inputDevice (input),
               callback (cb)
         {
@@ -1565,8 +1484,7 @@ private:
             }
         }
 
-        String getDeviceIdentifier() override    { return deviceInfo.containerID; }
-        String getDeviceName() override          { return deviceInfo.name; }
+        String getDeviceName() override         { return deviceInfo.name; }
 
         //==============================================================================
         void disconnect() override
@@ -1661,8 +1579,8 @@ private:
     struct WinRTOutputWrapper final  : public OutputWrapper,
                                        private WinRTIOWrapper <IMidiOutPortStatics, IMidiOutPort>
     {
-        WinRTOutputWrapper (WinRTMidiService& service, const String& deviceIdentifier)
-            : WinRTIOWrapper <IMidiOutPortStatics, IMidiOutPort> (*service.bleDeviceWatcher, *service.outputDeviceWatcher, deviceIdentifier)
+        WinRTOutputWrapper (WinRTMidiService& service, int index)
+            : WinRTIOWrapper <IMidiOutPortStatics, IMidiOutPort> (*service.bleDeviceWatcher, *service.outputDeviceWatcher, index)
         {
             OpenMidiPortThread<IMidiOutPortStatics, IMidiOutPort, IMidiOutPort> portThread ("Open WinRT MIDI output port",
                                                                                             deviceInfo.deviceID,
@@ -1714,8 +1632,7 @@ private:
             midiPort->SendBuffer (buffer);
         }
 
-        String getDeviceIdentifier() override    { return deviceInfo.containerID; }
-        String getDeviceName() override          { return deviceInfo.name; }
+        String getDeviceName() override    { return deviceInfo.name; }
 
         //==============================================================================
         WinRTWrapper::ComPtr<IBuffer> buffer;
@@ -1739,15 +1656,33 @@ private:
 
 //==============================================================================
 //==============================================================================
-extern RTL_OSVERSIONINFOW getWindowsVersionInfo();
-
 struct MidiService :  public DeletedAtShutdown
 {
     MidiService()
     {
       #if JUCE_USE_WINRT_MIDI
        #if ! JUCE_FORCE_WINRT_MIDI
-        auto windowsVersionInfo = getWindowsVersionInfo();
+        auto windowsVersionInfo = []
+        {
+            RTL_OSVERSIONINFOW versionInfo = { 0 };
+
+            if (auto* mod = ::GetModuleHandleW (L"ntdll.dll"))
+            {
+                using RtlGetVersion = LONG (WINAPI*)(PRTL_OSVERSIONINFOW);
+
+                if (auto* rtlGetVersion = (RtlGetVersion) ::GetProcAddress (mod, "RtlGetVersion"))
+                {
+                    versionInfo.dwOSVersionInfoSize = sizeof (versionInfo);
+                    LONG STATUS_SUCCESS = 0;
+
+                    if (rtlGetVersion (&versionInfo) != STATUS_SUCCESS)
+                        versionInfo = { 0 };
+                }
+            }
+
+            return versionInfo;
+        }();
+
         if (windowsVersionInfo.dwMajorVersion >= 10 && windowsVersionInfo.dwBuildNumber >= 17763)
        #endif
         {
@@ -1783,71 +1718,40 @@ private:
 JUCE_IMPLEMENT_SINGLETON (MidiService)
 
 //==============================================================================
-static int findDefaultDeviceIndex (const Array<MidiDeviceInfo>& available, const MidiDeviceInfo& defaultDevice)
-{
-    for (int i = 0; i < available.size(); ++i)
-        if (available.getUnchecked (i) == defaultDevice)
-            return i;
-
-    return 0;
-}
-
-Array<MidiDeviceInfo> MidiInput::getAvailableDevices()
-{
-    return MidiService::getService().getAvailableDevices (true);
-}
-
-MidiDeviceInfo MidiInput::getDefaultDevice()
-{
-    return MidiService::getService().getDefaultDevice (true);
-}
-
-std::unique_ptr<MidiInput> MidiInput::openDevice (const String& deviceIdentifier, MidiInputCallback* callback)
-{
-    if (deviceIdentifier.isEmpty() || callback == nullptr)
-        return {};
-
-    std::unique_ptr<MidiInput> in (new MidiInput ({}, deviceIdentifier));
-    std::unique_ptr<MidiServiceType::InputWrapper> wrapper;
-
-    try
-    {
-        wrapper.reset (MidiService::getService().createInputWrapper (*in, deviceIdentifier, *callback));
-    }
-    catch (std::runtime_error&)
-    {
-        return {};
-    }
-
-    in->setName (wrapper->getDeviceName());
-    in->internal = wrapper.release();
-
-    return in;
-}
-
 StringArray MidiInput::getDevices()
 {
-    StringArray deviceNames;
-
-    for (auto& d : getAvailableDevices())
-        deviceNames.add (d.name);
-
-    return deviceNames;
+    return MidiService::getService().getDevices (true);
 }
 
 int MidiInput::getDefaultDeviceIndex()
 {
-    return findDefaultDeviceIndex (getAvailableDevices(), getDefaultDevice());
+    return MidiService::getService().getDefaultDeviceIndex (true);
 }
 
-std::unique_ptr<MidiInput> MidiInput::openDevice (int index, MidiInputCallback* callback)
+MidiInput::MidiInput (const String& deviceName)  : name (deviceName)
 {
-    return openDevice (getAvailableDevices()[index].identifier, callback);
 }
 
-MidiInput::MidiInput (const String& deviceName, const String& deviceIdentifier)
-    : deviceInfo (deviceName, deviceIdentifier)
+MidiInput* MidiInput::openDevice (int index, MidiInputCallback* callback)
 {
+    if (callback == nullptr)
+        return nullptr;
+
+    std::unique_ptr<MidiInput> in (new MidiInput (String()));
+    std::unique_ptr<MidiServiceType::InputWrapper> wrapper;
+
+    try
+    {
+        wrapper.reset (MidiService::getService().createInputWrapper (*in, index, *callback));
+    }
+    catch (std::runtime_error&)
+    {
+        return nullptr;
+    }
+
+    in->setName (wrapper->getDeviceName());
+    in->internal = wrapper.release();
+    return in.release();
 }
 
 MidiInput::~MidiInput()
@@ -1859,58 +1763,32 @@ void MidiInput::start()   { static_cast<MidiServiceType::InputWrapper*> (interna
 void MidiInput::stop()    { static_cast<MidiServiceType::InputWrapper*> (internal)->stop(); }
 
 //==============================================================================
-Array<MidiDeviceInfo> MidiOutput::getAvailableDevices()
-{
-    return MidiService::getService().getAvailableDevices (false);
-}
-
-MidiDeviceInfo MidiOutput::getDefaultDevice()
-{
-    return MidiService::getService().getDefaultDevice (false);
-}
-
-std::unique_ptr<MidiOutput> MidiOutput::openDevice (const String& deviceIdentifier)
-{
-    if (deviceIdentifier.isEmpty())
-        return {};
-
-    std::unique_ptr<MidiServiceType::OutputWrapper> wrapper;
-
-    try
-    {
-        wrapper.reset (MidiService::getService().createOutputWrapper (deviceIdentifier));
-    }
-    catch (std::runtime_error&)
-    {
-        return {};
-    }
-
-    std::unique_ptr<MidiOutput> out;
-    out.reset (new MidiOutput (wrapper->getDeviceName(), deviceIdentifier));
-
-    out->internal = wrapper.release();
-
-    return out;
-}
-
 StringArray MidiOutput::getDevices()
 {
-    StringArray deviceNames;
-
-    for (auto& d : getAvailableDevices())
-        deviceNames.add (d.name);
-
-    return deviceNames;
+    return MidiService::getService().getDevices (false);
 }
 
 int MidiOutput::getDefaultDeviceIndex()
 {
-    return findDefaultDeviceIndex (getAvailableDevices(), getDefaultDevice());
+    return MidiService::getService().getDefaultDeviceIndex (false);
 }
 
-std::unique_ptr<MidiOutput> MidiOutput::openDevice (int index)
+MidiOutput* MidiOutput::openDevice (int index)
 {
-    return openDevice (getAvailableDevices()[index].identifier);
+    std::unique_ptr<MidiServiceType::OutputWrapper> wrapper;
+
+    try
+    {
+        wrapper.reset (MidiService::getService().createOutputWrapper (index));
+    }
+    catch (std::runtime_error&)
+    {
+        return nullptr;
+    }
+
+    std::unique_ptr<MidiOutput> out (new MidiOutput (wrapper->getDeviceName()));
+    out->internal = wrapper.release();
+    return out.release();
 }
 
 MidiOutput::~MidiOutput()

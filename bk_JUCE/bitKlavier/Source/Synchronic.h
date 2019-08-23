@@ -725,12 +725,12 @@ public:
         
         n = e->getStringAttribute("numClusters");
         
-        if (n != String::empty)     setNumClusters(n.getIntValue());
+        if (n != String())     setNumClusters(n.getIntValue());
         else                        setNumClusters(1);
         
         n = e->getStringAttribute("onOffMode");
         
-        if (n != String::empty)     setOnOffMode((SynchronicOnOffMode) n.getIntValue());
+        if (n != String())     setOnOffMode((SynchronicOnOffMode) n.getIntValue());
         else                        setOnOffMode(KeyOn);
         
         forEachXmlChildElement (*e, sub)
@@ -742,7 +742,7 @@ public:
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
-                    if (attr == String::empty) break;
+                    if (attr == String()) break;
                     else
                     {
                         f = attr.getFloatValue();
@@ -760,7 +760,7 @@ public:
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
-                    if (attr == String::empty) break;
+                    if (attr == String()) break;
                     else
                     {
                         f = attr.getFloatValue();
@@ -778,7 +778,7 @@ public:
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
-                    if (attr == String::empty) break;
+                    if (attr == String()) break;
                     else
                     {
                         f = attr.getFloatValue();
@@ -802,7 +802,7 @@ public:
                         {
                             String attr = asub->getStringAttribute(ptagFloat + String(k));
                             
-                            if (attr == String::empty) break;
+                            if (attr == String()) break;
                             else
                             {
                                 f = attr.getFloatValue();
@@ -828,7 +828,7 @@ public:
                         {
                             String attr = asub->getStringAttribute(ptagFloat + String(k));
                             
-                            if (attr == String::empty) break;
+                            if (attr == String()) break;
                             else
                             {
                                 f = attr.getFloatValue();
@@ -961,7 +961,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     name = n;
+        if (n != String())     name = n;
         else                        name = String(Id);
         
         

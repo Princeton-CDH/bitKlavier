@@ -145,9 +145,9 @@ void ChannelRemappingAudioSource::getNextAudioBlock (const AudioSourceChannelInf
 }
 
 //==============================================================================
-std::unique_ptr<XmlElement> ChannelRemappingAudioSource::createXml() const
+XmlElement* ChannelRemappingAudioSource::createXml() const
 {
-    auto e = std::make_unique<XmlElement> ("MAPPINGS");
+    XmlElement* e = new XmlElement ("MAPPINGS");
     String ins, outs;
 
     const ScopedLock sl (lock);

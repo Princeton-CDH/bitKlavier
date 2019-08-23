@@ -90,7 +90,7 @@ public:
 
     void updateDevices()
     {
-        items = MidiInput::getAvailableDevices();
+        items = MidiInput::getDevices();
     }
 
     int getNumRows() override
@@ -107,7 +107,7 @@ public:
                                .withMultipliedAlpha (0.3f));
 
             auto item = items[row];
-            bool enabled = deviceManager.isMidiInputDeviceEnabled (item.identifier);
+            bool enabled = deviceManager.isMidiInputEnabled (item);
 
             auto x = getTickX();
             auto tickW = height * 0.75f;
@@ -117,7 +117,7 @@ public:
 
             g.setFont (height * 0.6f);
             g.setColour (findColour (ListBox::textColourId, true).withMultipliedAlpha (enabled ? 1.0f : 0.6f));
-            g.drawText (item.name, x + 5, 0, width - x - 5, height, Justification::centredLeft, true);
+            g.drawText (item, x + 5, 0, width - x - 5, height, Justification::centredLeft, true);
         }
     }
 
@@ -166,14 +166,14 @@ private:
     //==============================================================================
     AudioDeviceManager& deviceManager;
     const String noItemsMessage;
-    Array<MidiDeviceInfo> items;
+    StringArray items;
 
     void flipEnablement (const int row)
     {
         if (isPositiveAndBelow (row, items.size()))
         {
-            auto identifier = items[row].identifier;
-            deviceManager.setMidiInputDeviceEnabled (identifier, ! deviceManager.isMidiInputDeviceEnabled (identifier));
+            auto item = items[row];
+            deviceManager.setMidiInputEnabled (item, ! deviceManager.isMidiInputEnabled (item));
         }
     }
 
@@ -210,8 +210,7 @@ public:
         {
             showAdvancedSettingsButton.reset (new TextButton (TRANS("Show advanced settings...")));
             addAndMakeVisible (showAdvancedSettingsButton.get());
-            showAdvancedSettingsButton->setClickingTogglesState (true);
-            showAdvancedSettingsButton->onClick = [this] { toggleAdvancedSettings(); };
+            showAdvancedSettingsButton->onClick = [this] { showAdvanced(); };
         }
 
         type.scanForDevices();
@@ -277,37 +276,27 @@ public:
 
             r.removeFromTop (space * 2);
 
-            if (showAdvancedSettingsButton != nullptr
-                && sampleRateDropDown != nullptr && bufferSizeDropDown != nullptr)
+            if (showAdvancedSettingsButton != nullptr)
             {
-                showAdvancedSettingsButton->setBounds (r.removeFromTop (h));
-                r.removeFromTop (space);
+                showAdvancedSettingsButton->setBounds (r.withHeight (h));
                 showAdvancedSettingsButton->changeWidthToFitText();
             }
 
-            auto advancedSettingsVisible = showAdvancedSettingsButton == nullptr
-                                              || showAdvancedSettingsButton->getToggleState();
+            const bool advancedSettingsVisible = showAdvancedSettingsButton == nullptr
+                                                    || ! showAdvancedSettingsButton->isVisible();
 
             if (sampleRateDropDown != nullptr)
             {
                 sampleRateDropDown->setVisible (advancedSettingsVisible);
-
-                if (advancedSettingsVisible)
-                {
-                    sampleRateDropDown->setBounds (r.removeFromTop (h));
-                    r.removeFromTop (space);
-                }
+                sampleRateDropDown->setBounds (r.removeFromTop (h));
+                r.removeFromTop (space);
             }
 
             if (bufferSizeDropDown != nullptr)
             {
                 bufferSizeDropDown->setVisible (advancedSettingsVisible);
-
-                if (advancedSettingsVisible)
-                {
-                    bufferSizeDropDown->setBounds (r.removeFromTop (h));
-                    r.removeFromTop (space);
-                }
+                bufferSizeDropDown->setBounds (r.removeFromTop (h));
+                r.removeFromTop (space);
             }
 
             r.removeFromTop (space);
@@ -411,10 +400,9 @@ public:
         return false;
     }
 
-    void toggleAdvancedSettings()
+    void showAdvanced()
     {
-        showAdvancedSettingsButton->setButtonText ((showAdvancedSettingsButton->getToggleState() ? "Hide " : "Show ")
-                                                   + String ("advanced settings..."));
+        showAdvancedSettingsButton->setVisible (false);
         resized();
     }
 
@@ -542,7 +530,7 @@ private:
             auto* currentDevice = setup.manager->getCurrentAudioDevice();
             auto index = type.getIndexOfDevice (currentDevice, isInput);
 
-            box->setSelectedId (index < 0 ? index : index + 1, dontSendNotification);
+            box->setSelectedId (index + 1, dontSendNotification);
 
             if (testButton != nullptr && ! isInput)
                 testButton->setEnabled (index >= 0);
@@ -675,7 +663,7 @@ private:
         else
         {
             sampleRateDropDown->clear();
-            sampleRateDropDown->onChange = nullptr;
+            sampleRateDropDown->onChange = {};
         }
 
         for (auto rate : currentDevice->getAvailableSampleRates())
@@ -701,7 +689,7 @@ private:
         else
         {
             bufferSizeDropDown->clear();
-            bufferSizeDropDown->onChange = nullptr;
+            bufferSizeDropDown->onChange = {};
         }
 
         auto currentRate = currentDevice->getCurrentSampleRate();
@@ -1115,12 +1103,12 @@ void AudioDeviceSelectorComponent::updateDeviceType()
 
 void AudioDeviceSelectorComponent::updateMidiOutput()
 {
-    auto selectedId = midiOutputSelector->getSelectedId();
+    auto midiDeviceName = midiOutputSelector->getText();
 
-    if (selectedId == -1)
-        deviceManager.setDefaultMidiOutputDevice ({});
-    else
-        deviceManager.setDefaultMidiOutputDevice (currentMidiOutputs[selectedId - 1].identifier);
+    if (midiDeviceName == getNoDeviceString())
+        midiDeviceName = {};
+
+    deviceManager.setDefaultMidiOutput (midiDeviceName);
 }
 
 void AudioDeviceSelectorComponent::changeListenerCallback (ChangeBroadcaster*)
@@ -1168,23 +1156,20 @@ void AudioDeviceSelectorComponent::updateAllControls()
     {
         midiOutputSelector->clear();
 
-        currentMidiOutputs = MidiOutput::getAvailableDevices();
+        auto midiOuts = MidiOutput::getDevices();
 
         midiOutputSelector->addItem (getNoDeviceString(), -1);
         midiOutputSelector->addSeparator();
 
-        auto defaultOutputIdentifier = deviceManager.getDefaultMidiOutputIdentifier();
-        int i = 0;
+        for (int i = 0; i < midiOuts.size(); ++i)
+            midiOutputSelector->addItem (midiOuts[i], i + 1);
 
-        for (auto& out : currentMidiOutputs)
-        {
-            midiOutputSelector->addItem (out.name, i + 1);
+        int current = -1;
 
-            if (defaultOutputIdentifier.isNotEmpty() && out.identifier == defaultOutputIdentifier)
-                midiOutputSelector->setSelectedId (i + 1);
+        if (deviceManager.getDefaultMidiOutput() != nullptr)
+            current = 1 + midiOuts.indexOf (deviceManager.getDefaultMidiOutputName());
 
-            ++i;
-        }
+        midiOutputSelector->setSelectedId (current, dontSendNotification);
     }
 
     resized();

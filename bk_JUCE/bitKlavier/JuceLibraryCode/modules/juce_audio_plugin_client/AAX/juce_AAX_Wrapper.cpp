@@ -41,16 +41,6 @@
  #pragma clang diagnostic ignored "-Wnon-virtual-dtor"
  #pragma clang diagnostic ignored "-Wsign-conversion"
  #pragma clang diagnostic ignored "-Wextra-semi"
- #pragma clang diagnostic ignored "-Wshift-sign-overflow"
- #if __has_warning("-Wpragma-pack")
-  #pragma clang diagnostic ignored "-Wpragma-pack"
- #endif
- #if __has_warning("-Wzero-as-null-pointer-constant")
-  #pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
- #endif
- #if __has_warning("-Winconsistent-missing-destructor-override")
-  #pragma clang diagnostic ignored "-Winconsistent-missing-destructor-override"
- #endif
 #endif
 
 #ifdef _MSC_VER
@@ -462,8 +452,8 @@ namespace AAXClasses
                           public ModifierKeyProvider
     {
     public:
-        JuceAAX_GUI() = default;
-        ~JuceAAX_GUI() override { DeleteViewContainer(); }
+        JuceAAX_GUI() {}
+        ~JuceAAX_GUI() { DeleteViewContainer(); }
 
         static AAX_IEffectGUI* AAX_CALLBACK Create()   { return new JuceAAX_GUI(); }
 
@@ -587,7 +577,7 @@ namespace AAXClasses
                 ignoreUnused (fakeMouseGenerator);
             }
 
-            ~ContentWrapperComponent() override
+            ~ContentWrapperComponent()
             {
                 if (pluginEditor != nullptr)
                 {
@@ -688,7 +678,7 @@ namespace AAXClasses
             activeProcessors.add (this);
         }
 
-        ~JuceAAX_Processor() override
+        ~JuceAAX_Processor()
         {
             activeProcessors.removeAllInstancesOf (this);
         }
@@ -720,7 +710,7 @@ namespace AAXClasses
             if (isPrepared && pluginInstance != nullptr)
             {
                 isPrepared = false;
-                processingSidechainChange = false;
+                processingSidechainChange.set (0);
 
                 pluginInstance->releaseResources();
             }
@@ -732,7 +722,7 @@ namespace AAXClasses
         {
             cancelPendingUpdate();
             check (Controller()->GetSampleRate (&sampleRate));
-            processingSidechainChange = false;
+            processingSidechainChange.set (0);
             auto err = preparePlugin();
 
             if (err != AAX_SUCCESS)
@@ -1110,8 +1100,8 @@ namespace AAXClasses
                 case AAX_eNotificationEvent_SideChainBeingConnected:
                 case AAX_eNotificationEvent_SideChainBeingDisconnected:
                 {
-                    processingSidechainChange = true;
-                    sidechainDesired = (type == AAX_eNotificationEvent_SideChainBeingConnected);
+                    processingSidechainChange.set (1);
+                    sidechainDesired.set (type == AAX_eNotificationEvent_SideChainBeingConnected ? 1 : 0);
                     updateSidechainState();
                     break;
                 }
@@ -1139,25 +1129,23 @@ namespace AAXClasses
             auto numOuts   = pluginInstance->getTotalNumOutputChannels();
             auto numMeters = aaxMeters.size();
 
-            const ScopedLock sl (pluginInstance->getCallbackLock());
+            bool processWantsSidechain = (sideChainBufferIdx != -1);
+            bool isSuspended = pluginInstance->isSuspended();
 
-            bool isSuspended = [this, sideChainBufferIdx]
+            if (processingSidechainChange.get() == 0)
             {
-                if (processingSidechainChange)
-                    return true;
-
-                bool processWantsSidechain = (sideChainBufferIdx != -1);
-
-                if (hasSidechain && canDisableSidechain && (sidechainDesired != processWantsSidechain))
+                if (hasSidechain && canDisableSidechain && (sidechainDesired.get() != 0) != processWantsSidechain)
                 {
-                    sidechainDesired = processWantsSidechain;
-                    processingSidechainChange = true;
+                    isSuspended = true;
+                    sidechainDesired.set (processWantsSidechain ? 1 : 0);
+                    processingSidechainChange.set (1);
                     triggerAsyncUpdate();
-                    return true;
                 }
-
-                return pluginInstance->isSuspended();
-            }();
+            }
+            else
+            {
+                isSuspended = true;
+            }
 
             if (isSuspended)
             {
@@ -1382,7 +1370,7 @@ namespace AAXClasses
             AAX_CBoolean res;
             Controller()->GetIsAudioSuite (&res);
 
-            return res > 0;
+            return res;
         }
 
     private:
@@ -1430,6 +1418,8 @@ namespace AAXClasses
                         sideChainBuffer.calloc (static_cast<size_t> (maxBufferSize));
                     }
                 }
+
+                const ScopedLock sl (pluginInstance->getCallbackLock());
 
                 if (bypass)
                     pluginInstance->processBlockBypassed (buffer, midiBuffer);
@@ -1482,7 +1472,7 @@ namespace AAXClasses
         // parameter steps.
         static int32_t getSafeNumberOfParameterSteps (const AudioProcessorParameter& param)
         {
-            return jmin (param.getNumSteps(), 2048);
+            return jmax (param.getNumSteps(), 2048);
         }
 
         void addAudioProcessorParameters()
@@ -1499,10 +1489,13 @@ namespace AAXClasses
 
             juceParameters.update (audioProcessor, forceLegacyParamIDs);
 
+            bool aaxWrapperProvidedBypassParam = false;
             auto* bypassParameter = pluginInstance->getBypassParameter();
 
             if (bypassParameter == nullptr)
             {
+                aaxWrapperProvidedBypassParam = true;
+
                 ownedBypassParameter.reset (new AudioParameterBool (cDefaultMasterBypassID, "Master Bypass", false, {}, {}, {}));
                 bypassParameter = ownedBypassParameter.get();
             }
@@ -1636,7 +1629,7 @@ namespace AAXClasses
 
             if (hasSidechain)
             {
-                sidechainDesired = true;
+                sidechainDesired.set (1);
 
                 auto disabledSidechainLayout = newLayout;
                 disabledSidechainLayout.inputBuses.getReference (1) = AudioChannelSet::disabled();
@@ -1645,7 +1638,7 @@ namespace AAXClasses
 
                 if (canDisableSidechain && ! lastSideChainState)
                 {
-                    sidechainDesired = false;
+                    sidechainDesired.set (0);
                     newLayout = disabledSidechainLayout;
                 }
             }
@@ -1769,15 +1762,15 @@ namespace AAXClasses
         //==============================================================================
         void updateSidechainState()
         {
-            if (! processingSidechainChange)
+            if (processingSidechainChange.get() == 0)
                 return;
 
             auto& audioProcessor = getPluginInstance();
             bool sidechainActual = audioProcessor.getChannelCountOfBus (true, 1) > 0;
 
-            if (hasSidechain && canDisableSidechain && sidechainDesired != sidechainActual)
+            if (hasSidechain && canDisableSidechain && (sidechainDesired.get() != 0) != sidechainActual)
             {
-                lastSideChainState = sidechainDesired;
+                lastSideChainState = (sidechainDesired.get() != 0);
 
                 if (isPrepared)
                 {
@@ -1793,7 +1786,7 @@ namespace AAXClasses
                 isPrepared = true;
             }
 
-            processingSidechainChange = false;
+            processingSidechainChange.set (0);
         }
 
         void handleAsyncUpdate() override
@@ -1964,7 +1957,7 @@ namespace AAXClasses
         int lastBufferSize = 1024, maxBufferSize = 1024;
         bool hasSidechain = false, canDisableSidechain = false, lastSideChainState = false;
 
-        std::atomic<bool> processingSidechainChange, sidechainDesired;
+        Atomic<int> processingSidechainChange, sidechainDesired;
 
         HeapBlock<float> sideChainBuffer;
         Array<int> inputLayoutMap, outputLayoutMap;

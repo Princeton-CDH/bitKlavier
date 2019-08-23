@@ -20,7 +20,6 @@
   ==============================================================================
 */
 
-
 namespace juce
 {
 
@@ -104,11 +103,11 @@ int SystemStats::getPageSize()
 //==============================================================================
 String SystemStats::getLogonName()
 {
-    if (auto user = getenv ("USER"))
-        return String::fromUTF8 (user);
+    if (const char* user = getenv ("USER"))
+        return CharPointer_UTF8 (user);
 
-    if (auto pw = getpwuid (getuid()))
-        return String::fromUTF8 (pw->pw_name);
+    if (struct passwd* const pw = getpwuid (getuid()))
+        return CharPointer_UTF8 (pw->pw_name);
 
     return {};
 }
@@ -120,8 +119,7 @@ String SystemStats::getFullUserName()
 
 String SystemStats::getComputerName()
 {
-    char name[256] = {};
-
+    char name [256] = { 0 };
     if (gethostname (name, sizeof (name) - 1) == 0)
         return name;
 
@@ -130,21 +128,20 @@ String SystemStats::getComputerName()
 
 static String getLocaleValue (nl_item key)
 {
-    auto oldLocale = ::setlocale (LC_ALL, "");
-    auto result = String::fromUTF8 (nl_langinfo (key));
+    const char* oldLocale = ::setlocale (LC_ALL, "");
+    String result (String::fromUTF8 (nl_langinfo (key)));
     ::setlocale (LC_ALL, oldLocale);
     return result;
 }
 
-String SystemStats::getUserLanguage()     { return getLocaleValue (_NL_IDENTIFICATION_LANGUAGE); }
-String SystemStats::getUserRegion()       { return getLocaleValue (_NL_IDENTIFICATION_TERRITORY); }
-String SystemStats::getDisplayLanguage()  { return getUserLanguage() + "-" + getUserRegion(); }
+String SystemStats::getUserLanguage()    { return getLocaleValue (_NL_IDENTIFICATION_LANGUAGE); }
+String SystemStats::getUserRegion()      { return getLocaleValue (_NL_IDENTIFICATION_TERRITORY); }
+String SystemStats::getDisplayLanguage() { return getUserLanguage() + "-" + getUserRegion(); }
 
 //==============================================================================
 void CPUInformation::initialise() noexcept
 {
     auto flags = getCpuInfo ("flags");
-
     hasMMX             = flags.contains ("mmx");
     hasSSE             = flags.contains ("sse");
     hasSSE2            = flags.contains ("sse2");
@@ -178,18 +175,18 @@ void CPUInformation::initialise() noexcept
 //==============================================================================
 uint32 juce_millisecondsSinceStartup() noexcept
 {
-    return (uint32) (Time::getHighResolutionTicks() / 1000);
+    timespec t;
+    clock_gettime (CLOCK_MONOTONIC, &t);
+
+    return (uint32) (t.tv_sec * 1000 + t.tv_nsec / 1000000);
 }
 
 int64 Time::getHighResolutionTicks() noexcept
 {
-   #if JUCE_BELA
-    return rt_timer_read() / 1000;
-   #else
     timespec t;
     clock_gettime (CLOCK_MONOTONIC, &t);
+
     return (t.tv_sec * (int64) 1000000) + (t.tv_nsec / 1000);
-   #endif
 }
 
 int64 Time::getHighResolutionTicksPerSecond() noexcept
@@ -208,7 +205,7 @@ bool Time::setSystemTimeToThisTime() const
     t.tv_sec = millisSinceEpoch / 1000;
     t.tv_usec = (millisSinceEpoch - t.tv_sec * 1000) * 1000;
 
-    return settimeofday (&t, nullptr) == 0;
+    return settimeofday (&t, 0) == 0;
 }
 
 JUCE_API bool JUCE_CALLTYPE juce_isRunningUnderDebugger() noexcept
@@ -216,7 +213,8 @@ JUCE_API bool JUCE_CALLTYPE juce_isRunningUnderDebugger() noexcept
    #if JUCE_BSD
     return false;
    #else
-    return readPosixConfigFileValue ("/proc/self/status", "TracerPid").getIntValue() > 0;
+    return readPosixConfigFileValue ("/proc/self/status", "TracerPid")
+             .getIntValue() > 0;
    #endif
 }
 

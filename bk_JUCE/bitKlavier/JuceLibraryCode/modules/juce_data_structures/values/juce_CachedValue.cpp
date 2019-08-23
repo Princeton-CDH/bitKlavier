@@ -32,9 +32,7 @@ namespace juce
 class CachedValueTests  : public UnitTest
 {
 public:
-    CachedValueTests()
-        : UnitTest ("CachedValues", UnitTestCategories::values)
-    {}
+    CachedValueTests() : UnitTest ("CachedValues", "Values") {}
 
     void runTest() override
     {

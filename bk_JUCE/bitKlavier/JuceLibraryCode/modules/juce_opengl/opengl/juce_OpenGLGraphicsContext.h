@@ -30,20 +30,20 @@ namespace juce
 /** Creates a graphics context object that will render into the given OpenGL target.
     The caller is responsible for deleting this object when no longer needed.
 */
-std::unique_ptr<LowLevelGraphicsContext> createOpenGLGraphicsContext (OpenGLContext&, int width, int height);
+LowLevelGraphicsContext* createOpenGLGraphicsContext (OpenGLContext&, int width, int height);
 
 /** Creates a graphics context object that will render into the given OpenGL framebuffer.
     The caller is responsible for deleting this object when no longer needed.
 */
-std::unique_ptr<LowLevelGraphicsContext> createOpenGLGraphicsContext (OpenGLContext&, OpenGLFrameBuffer&);
+LowLevelGraphicsContext* createOpenGLGraphicsContext (OpenGLContext&, OpenGLFrameBuffer&);
 
 /** Creates a graphics context object that will render into the given OpenGL framebuffer,
     with the given size.
     The caller is responsible for deleting this object when no longer needed.
 */
-std::unique_ptr<LowLevelGraphicsContext> createOpenGLGraphicsContext (OpenGLContext&,
-                                                                      unsigned int frameBufferID,
-                                                                      int width, int height);
+LowLevelGraphicsContext* createOpenGLGraphicsContext (OpenGLContext&,
+                                                      unsigned int frameBufferID,
+                                                      int width, int height);
 
 
 //==============================================================================

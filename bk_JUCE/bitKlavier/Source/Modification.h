@@ -19,6 +19,7 @@
 #include "Synchronic.h"
 #include "Tuning.h"
 #include "Tempo.h"
+#include "Blendronomer.h"
 
 class Modification
 {
@@ -151,7 +152,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     setName(n);
+        if (n != String())     setName(n);
         else                        setName(String(Id));
     
         XmlElement* dirtyXml = e->getChildByName("dirty");
@@ -164,7 +165,7 @@ public:
             {
                 String attr = dirtyXml->getStringAttribute("d" + String(k));
                 
-                if (attr == String::empty) dirty.add(false);
+                if (attr == String()) dirty.add(false);
                 else
                 {
                     dirty.add((bool)attr.getIntValue());
@@ -247,7 +248,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     setName(n);
+        if (n != String())     setName(n);
         else                        setName(String(Id));
         
         XmlElement* dirtyXml = e->getChildByName("dirty");
@@ -260,7 +261,7 @@ public:
             {
                 String attr = dirtyXml->getStringAttribute("d" + String(k));
                 
-                if (attr == String::empty) dirty.add(false);
+                if (attr == String()) dirty.add(false);
                 else
                 {
                     dirty.add((bool)attr.getIntValue());
@@ -343,7 +344,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     setName(n);
+        if (n != String())     setName(n);
         else                        setName(String(Id));
         
         XmlElement* dirtyXml = e->getChildByName("dirty");
@@ -356,7 +357,7 @@ public:
             {
                 String attr = dirtyXml->getStringAttribute("d" + String(k));
                 
-                if (attr == String::empty) dirty.add(false);
+                if (attr == String()) dirty.add(false);
                 else
                 {
                     dirty.add((bool)attr.getIntValue());
@@ -445,7 +446,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     setName(n);
+        if (n != String())     setName(n);
         else                        setName(String(Id));
         
         XmlElement* dirtyXml = e->getChildByName("dirty");
@@ -458,7 +459,7 @@ public:
             {
                 String attr = dirtyXml->getStringAttribute("d" + String(k));
                 
-                if (attr == String::empty) dirty.add(false);
+                if (attr == String()) dirty.add(false);
                 else
                 {
                     dirty.add((bool)attr.getIntValue());
@@ -559,7 +560,7 @@ public:
         
         String n = e->getStringAttribute("name");
         
-        if (n != String::empty)     setName(n);
+        if (n != String())     setName(n);
         else                        setName(String(Id));
         
         XmlElement* dirtyXml = e->getChildByName("dirty");
@@ -572,7 +573,7 @@ public:
             {
                 String attr = dirtyXml->getStringAttribute("d" + String(k));
                 
-                if (attr == String::empty) dirty.add(false);
+                if (attr == String()) dirty.add(false);
                 else
                 {
                     dirty.add((bool)attr.getIntValue());
@@ -596,3 +597,100 @@ private:
 
 
 #endif  // MODIFICATION_H_INCLUDED
+
+class BlendronomerModification :
+	public Modification,
+	public BlendronomerPreparation
+{
+public:
+	typedef ReferenceCountedObjectPtr<BlendronomerModification>   Ptr;
+	typedef Array<BlendronomerModification::Ptr>                  PtrArr;
+
+	BlendronomerModification(int Id) :
+		Modification(Id, BlendronomerParameterTypeNil),
+		BlendronomerPreparation()
+	{
+	}
+
+	~BlendronomerModification(void)
+	{
+
+	}
+
+	inline BlendronomerModification::Ptr duplicate(void)
+	{
+		BlendronomerModification::Ptr mod = new BlendronomerModification(-1);
+
+		mod->copy(this);
+
+		return mod;
+	}
+
+	inline void copy(BlendronomerModification::Ptr mod)
+	{
+		setName(mod->getName() + "copy");
+
+		BlendronomerPreparation::copy(mod);
+	}
+
+	//need to figure out how to get around ValueTrees
+	inline ValueTree getState(void)
+	{
+		ValueTree prep(vtagModBlendronomer);
+
+		prep.setProperty("Id", Id, 0);
+		prep.setProperty("name", getName(), 0);
+
+		ValueTree dirtyVT("dirty");
+		int count = 0;
+		for (auto b : dirty)
+		{
+			dirtyVT.setProperty("d" + String(count++), (int)b, 0);
+		}
+		prep.addChild(dirtyVT, -1, 0);
+
+		prep.addChild(BlendronomerPreparation::getState(), -1, 0);
+
+		return prep;
+	}
+
+	inline void setState(XmlElement* e)
+	{
+		Id = e->getStringAttribute("Id").getIntValue();
+
+		String n = e->getStringAttribute("name");
+
+		if (n != String())     setName(n);
+		else                        setName(String(Id));
+
+		XmlElement* dirtyXml = e->getChildByName("dirty");
+		XmlElement* paramsXml = e->getChildByName("params");
+
+		if (dirtyXml != nullptr && paramsXml != nullptr)
+		{
+			dirty.clear();
+			for (int k = 0; k < BlendronomerParameterTypeNil; k++)
+			{
+				String attr = dirtyXml->getStringAttribute("d" + String(k));
+
+				if (attr == String()) dirty.add(false);
+				else
+				{
+					dirty.add((bool)attr.getIntValue());
+				}
+			}
+
+			BlendronomerPreparation::setState(paramsXml);
+		}
+		else
+		{
+			setStateOld(e);
+		}
+	}
+
+	void setStateOld(XmlElement* e);
+
+private:
+
+	JUCE_LEAK_DETECTOR(BlendronomerModification)
+};

@@ -139,16 +139,14 @@ public:
 
         This will break the text onto a new line where there's a new-line or
         carriage-return character, or at a word-boundary when the text becomes wider
-        than the size specified by the maximumLineWidth parameter. New-lines
-        will be vertically separated by the specified leading.
+        than the size specified by the maximumLineWidth parameter.
 
         @see setFont, drawSingleLineText, drawFittedText, GlyphArrangement::addJustifiedText
     */
     void drawMultiLineText (const String& text,
                             int startX, int baselineY,
                             int maximumLineWidth,
-                            Justification justification = Justification::left,
-                            float leading = 0.0f) const;
+                            Justification justification = Justification::left) const;
 
     /** Draws a line of text within a specified rectangle.
 
@@ -741,8 +739,8 @@ public:
 
 private:
     //==============================================================================
-    std::unique_ptr<LowLevelGraphicsContext> contextHolder;
     LowLevelGraphicsContext& context;
+    std::unique_ptr<LowLevelGraphicsContext> contextToDelete;
 
     bool saveStatePending = false;
     void saveStateIfPending();

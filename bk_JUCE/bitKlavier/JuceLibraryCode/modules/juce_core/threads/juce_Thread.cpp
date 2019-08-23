@@ -315,7 +315,7 @@ struct LambdaThread  : public Thread
     void run() override
     {
         fn();
-        fn = nullptr; // free any objects that the lambda might contain while the thread is still active
+        fn = {}; // free any objects that the lambda might contain while the thread is still active
     }
 
     std::function<void()> fn;
@@ -350,17 +350,13 @@ bool JUCE_CALLTYPE Process::isRunningUnderDebugger() noexcept
     return juce_isRunningUnderDebugger();
 }
 
-
-//==============================================================================
-//==============================================================================
 #if JUCE_UNIT_TESTS
 
+//==============================================================================
 class AtomicTests  : public UnitTest
 {
 public:
-    AtomicTests()
-        : UnitTest ("Atomics", UnitTestCategories::threads)
-    {}
+    AtomicTests() : UnitTest ("Atomics", "Threads") {}
 
     void runTest() override
     {
@@ -484,7 +480,7 @@ class ThreadLocalValueUnitTest  : public UnitTest,
 {
 public:
     ThreadLocalValueUnitTest()
-        : UnitTest ("ThreadLocalValue", UnitTestCategories::threads),
+        : UnitTest ("ThreadLocalValue", "Threads"),
           Thread ("ThreadLocalValue Thread")
     {}
 

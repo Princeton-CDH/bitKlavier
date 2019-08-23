@@ -33,80 +33,59 @@ extern NSMenu* createNSMenu (const PopupMenu&, const String& name, int topLevelM
 class SystemTrayIconComponent::Pimpl  : private Timer
 {
 public:
-    //==============================================================================
     Pimpl (SystemTrayIconComponent& iconComp, const Image& im)
         : owner (iconComp), statusIcon (imageToNSImage (im))
     {
-        static ButtonEventForwarderClass cls;
-        eventForwarder.reset ([cls.createInstance() init]);
-        ButtonEventForwarderClass::setOwner (eventForwarder.get(), this);
+        static SystemTrayViewClass cls;
+        view = [cls.createInstance() init];
+        SystemTrayViewClass::setOwner (view, this);
+        SystemTrayViewClass::setImage (view, statusIcon);
 
-        configureIcon();
+        setIconSize();
 
-        statusItem.reset ([[[NSStatusBar systemStatusBar] statusItemWithLength: NSSquareStatusItemLength] retain]);
-        auto button = [statusItem.get() button];
-        button.image = statusIcon.get();
-        button.target = eventForwarder.get();
-        button.action = @selector (handleEvent:);
-       #if defined (MAC_OS_X_VERSION_10_12) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_12
-        [button sendActionOn: NSEventMaskLeftMouseDown | NSEventMaskRightMouseDown | NSEventMaskScrollWheel];
-       #else
-        [button sendActionOn: NSLeftMouseDownMask | NSRightMouseDownMask | NSScrollWheelMask];
-       #endif
+        statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength: NSSquareStatusItemLength] retain];
+        [statusItem setView: view];
+
+        SystemTrayViewClass::frameChanged (view, SEL(), nullptr);
+
+        [[NSNotificationCenter defaultCenter]  addObserver: view
+                                                  selector: @selector (frameChanged:)
+                                                      name: NSWindowDidMoveNotification
+                                                    object: nil];
     }
 
-    //==============================================================================
+    ~Pimpl() override
+    {
+        [[NSNotificationCenter defaultCenter]  removeObserver: view];
+        [[NSStatusBar systemStatusBar] removeStatusItem: statusItem];
+        SystemTrayViewClass::setOwner (view, nullptr);
+        SystemTrayViewClass::setImage (view, nil);
+        [statusItem release];
+        [view release];
+        [statusIcon release];
+    }
+
     void updateIcon (const Image& newImage)
     {
-        statusIcon.reset (imageToNSImage (newImage));
-        configureIcon();
-        [statusItem.get() button].image = statusIcon.get();
+        [statusIcon release];
+        statusIcon = imageToNSImage (newImage);
+        setIconSize();
+        SystemTrayViewClass::setImage (view, statusIcon);
+        [statusItem setView: view];
     }
 
     void setHighlighted (bool shouldHighlight)
     {
-        [[statusItem.get() button] setHighlighted: shouldHighlight];
+        isHighlighted = shouldHighlight;
+        [view setNeedsDisplay: true];
     }
 
-    void showMenu (const PopupMenu& menu)
+    void handleStatusItemAction (NSEvent* e)
     {
-        if (NSMenu* m = createNSMenu (menu, "MenuBarItem", -2, -3, true))
-        {
-            setHighlighted (true);
-            stopTimer();
-
-            // There's currently no good alternative to this...
-           #if JUCE_CLANG && ! (defined (MAC_OS_X_VERSION_10_16) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_16)
-            #pragma clang diagnostic push
-            #pragma clang diagnostic ignored "-Wdeprecated-declarations"
-            #define JUCE_DEPRECATION_IGNORED 1
-           #endif
-
-            [statusItem.get() popUpStatusItemMenu: m];
-
-           #if JUCE_DEPRECATION_IGNORED
-            #pragma clang diagnostic pop
-            #undef JUCE_DEPRECATION_IGNORED
-           #endif
-
-            startTimer (1);
-        }
-    }
-
-    //==============================================================================
-    NSStatusItem* getStatusItem()
-    {
-        return statusItem.get();
-    }
-
-    //==============================================================================
-    void handleEvent()
-    {
-        auto e = [NSApp currentEvent];
         NSEventType type = [e type];
 
-        const bool isLeft  = (type == NSEventTypeLeftMouseDown);
-        const bool isRight = (type == NSEventTypeRightMouseDown);
+        const bool isLeft  = (type == NSEventTypeLeftMouseDown  || type == NSEventTypeLeftMouseUp);
+        const bool isRight = (type == NSEventTypeRightMouseDown || type == NSEventTypeRightMouseUp);
 
         if (owner.isCurrentlyBlockedByAnotherModalComponent())
         {
@@ -125,22 +104,22 @@ public:
             auto mouseSource = Desktop::getInstance().getMainMouseSource();
             auto pressure = (float) e.pressure;
 
-            if (isLeft || isRight)
+            if (isLeft || isRight)  // Only mouse up is sent by the OS, so simulate a down/up
             {
-                owner.mouseDown ({ mouseSource, {},
-                                   eventMods.withFlags (isLeft ? ModifierKeys::leftButtonModifier
-                                                               : ModifierKeys::rightButtonModifier),
-                                   pressure,
-                                   MouseInputSource::invalidOrientation, MouseInputSource::invalidRotation,
-                                   MouseInputSource::invalidTiltX, MouseInputSource::invalidTiltY,
-                                   &owner, &owner, now, {}, now, 1, false });
+                setHighlighted (true);
+                startTimer (150);
 
-                owner.mouseUp   ({ mouseSource, {},
-                                   eventMods.withoutMouseButtons(),
-                                   pressure,
-                                   MouseInputSource::invalidOrientation, MouseInputSource::invalidRotation,
-                                   MouseInputSource::invalidTiltX, MouseInputSource::invalidTiltY,
-                                   &owner, &owner, now, {}, now, 1, false });
+                owner.mouseDown (MouseEvent (mouseSource, {},
+                                             eventMods.withFlags (isLeft ? ModifierKeys::leftButtonModifier
+                                                                         : ModifierKeys::rightButtonModifier),
+                                             pressure, MouseInputSource::invalidOrientation, MouseInputSource::invalidRotation,
+                                             MouseInputSource::invalidTiltX, MouseInputSource::invalidTiltY,
+                                             &owner, &owner, now, {}, now, 1, false));
+
+                owner.mouseUp (MouseEvent (mouseSource, {}, eventMods.withoutMouseButtons(), pressure,
+                                           MouseInputSource::invalidOrientation, MouseInputSource::invalidRotation,
+                                           MouseInputSource::invalidTiltX, MouseInputSource::invalidTiltY,
+                                           &owner, &owner, now, {}, now, 1, false));
             }
             else if (type == NSEventTypeMouseMoved)
             {
@@ -152,12 +131,28 @@ public:
         }
     }
 
-private:
-    //==============================================================================
-    void configureIcon()
+    void showMenu (const PopupMenu& menu)
     {
-        [statusIcon.get() setSize: NSMakeSize (20.0f, 20.0f)];
-        [statusIcon.get() setTemplate: true];
+        if (NSMenu* m = createNSMenu (menu, "MenuBarItem", -2, -3, true))
+        {
+            setHighlighted (true);
+            stopTimer();
+            [statusItem popUpStatusItemMenu: m];
+            startTimer (1);
+        }
+    }
+
+    SystemTrayIconComponent& owner;
+    NSStatusItem* statusItem = nil;
+
+private:
+    NSImage* statusIcon = nil;
+    NSControl* view = nil;
+    bool isHighlighted = false;
+
+    void setIconSize()
+    {
+        [statusIcon setSize: NSMakeSize (20.0f, 20.0f)];
     }
 
     void timerCallback() override
@@ -166,49 +161,79 @@ private:
         setHighlighted (false);
     }
 
-    //==============================================================================
-    class ButtonEventForwarderClass   : public ObjCClass<NSObject>
+    struct SystemTrayViewClass : public ObjCClass<NSControl>
     {
-    public:
-        ButtonEventForwarderClass() : ObjCClass<NSObject> ("JUCEButtonEventForwarderClass_")
+        SystemTrayViewClass()  : ObjCClass<NSControl> ("JUCESystemTrayView_")
         {
             addIvar<Pimpl*> ("owner");
+            addIvar<NSImage*> ("image");
 
-            addMethod (@selector (handleEvent:), handleEvent, "v@:@");
+            addMethod (@selector (mouseDown:),      handleEventDown, "v@:@");
+            addMethod (@selector (rightMouseDown:), handleEventDown, "v@:@");
+            addMethod (@selector (drawRect:),       drawRect,        "v@:@");
+            addMethod (@selector (frameChanged:),   frameChanged,    "v@:@");
 
             registerClass();
         }
 
         static Pimpl* getOwner (id self)                { return getIvar<Pimpl*> (self, "owner"); }
+        static NSImage* getImage (id self)              { return getIvar<NSImage*> (self, "image"); }
         static void setOwner (id self, Pimpl* owner)    { object_setInstanceVariable (self, "owner", owner); }
+        static void setImage (id self, NSImage* image)  { object_setInstanceVariable (self, "image", image); }
 
-    private:
-        static void handleEvent (id self, SEL, id)
+        static void frameChanged (id self, SEL, NSNotification*)
         {
             if (auto* owner = getOwner (self))
-                owner->handleEvent();
+            {
+                NSRect r = [[[owner->statusItem view] window] frame];
+                NSRect sr = [[[NSScreen screens] objectAtIndex: 0] frame];
+                r.origin.y = sr.size.height - r.origin.y - r.size.height;
+                owner->owner.setBounds (convertToRectInt (r));
+            }
+        }
+
+    private:
+        static void handleEventDown (id self, SEL, NSEvent* e)
+        {
+            if (auto* owner = getOwner (self))
+                owner->handleStatusItemAction (e);
+        }
+
+        static void drawRect (id self, SEL, NSRect)
+        {
+            NSRect bounds = [self bounds];
+
+            if (auto* owner = getOwner (self))
+                [owner->statusItem drawStatusBarBackgroundInRect: bounds
+                                                   withHighlight: owner->isHighlighted];
+
+            if (NSImage* const im = getImage (self))
+            {
+                NSSize imageSize = [im size];
+
+                [im drawInRect: NSMakeRect (bounds.origin.x + ((bounds.size.width  - imageSize.width)  / 2.0f),
+                                            bounds.origin.y + ((bounds.size.height - imageSize.height) / 2.0f),
+                                            imageSize.width, imageSize.height)
+                      fromRect: NSZeroRect
+                     operation: NSCompositingOperationSourceOver
+                      fraction: 1.0f];
+            }
         }
     };
-
-    //==============================================================================
-    SystemTrayIconComponent& owner;
-    std::unique_ptr<NSStatusItem, NSObjectDeleter> statusItem;
-    std::unique_ptr<NSObject, NSObjectDeleter> eventForwarder;
-    std::unique_ptr<NSImage, NSObjectDeleter> statusIcon;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Pimpl)
 };
 
 
 //==============================================================================
-void SystemTrayIconComponent::setIconImage (const Image&, const Image& templateImage)
+void SystemTrayIconComponent::setIconImage (const Image& newImage)
 {
-    if (templateImage.isValid())
+    if (newImage.isValid())
     {
         if (pimpl == nullptr)
-            pimpl.reset (new Pimpl (*this, templateImage));
+            pimpl.reset (new Pimpl (*this, newImage));
         else
-            pimpl->updateIcon (templateImage);
+            pimpl->updateIcon (newImage);
     }
     else
     {
@@ -239,7 +264,7 @@ void SystemTrayIconComponent::hideInfoBubble()
 
 void* SystemTrayIconComponent::getNativeHandle() const
 {
-    return pimpl != nullptr ? pimpl->getStatusItem() : nullptr;
+    return pimpl != nullptr ? pimpl->statusItem : nullptr;
 }
 
 void SystemTrayIconComponent::showDropdownMenu (const PopupMenu& menu)

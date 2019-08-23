@@ -9,7 +9,7 @@
 //
 //-----------------------------------------------------------------------------
 // LICENSE
-// (c) 2019, Steinberg Media Technologies GmbH, All Rights Reserved
+// (c) 2018, Steinberg Media Technologies GmbH, All Rights Reserved
 //-----------------------------------------------------------------------------
 // Redistribution and use in source and binary forms, with or without modification,
 // are permitted provided that the following conditions are met:
@@ -41,9 +41,9 @@
 #include "pluginterfaces/base/fvariant.h"
 
 #include <cstdlib>
-#include <cctype>
+#include <ctype.h>
 #include <cstdio>
-#include <cstdarg>
+#include <stdarg.h>
 #include <utility>
 
 #if SMTG_OS_WINDOWS

@@ -69,7 +69,7 @@ public:
 
         @see MPESynthesiserBase, MPEInstrument
     */
-    MPESynthesiser (MPEInstrument* instrumentToUse);
+    MPESynthesiser (MPEInstrument* instrument);
 
     /** Destructor. */
     ~MPESynthesiser() override;

@@ -40,7 +40,7 @@ DrawableComposite::DrawableComposite (const DrawableComposite& other)
 {
     for (auto* c : other.getChildren())
         if (auto* d = dynamic_cast<const Drawable*> (c))
-            addAndMakeVisible (d->createCopy().release());
+            addAndMakeVisible (d->createCopy());
 }
 
 DrawableComposite::~DrawableComposite()
@@ -48,9 +48,9 @@ DrawableComposite::~DrawableComposite()
     deleteAllChildren();
 }
 
-std::unique_ptr<Drawable> DrawableComposite::createCopy() const
+Drawable* DrawableComposite::createCopy() const
 {
-    return std::make_unique<DrawableComposite> (*this);
+    return new DrawableComposite (*this);
 }
 
 //==============================================================================

@@ -164,7 +164,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (AsyncFunctionCallback)
 };
 
-void* MessageManager::callFunctionOnMessageThread (MessageCallbackFunction* func, void* parameter)
+void* MessageManager::callFunctionOnMessageThread (MessageCallbackFunction* const func, void* const parameter)
 {
     if (isThisTheMessageThread())
         return func (parameter);
@@ -182,18 +182,6 @@ void* MessageManager::callFunctionOnMessageThread (MessageCallbackFunction* func
 
     jassertfalse; // the OS message queue failed to send the message!
     return nullptr;
-}
-
-void MessageManager::callAsync (std::function<void()> fn)
-{
-    struct AsyncCallInvoker  : public MessageBase
-    {
-        AsyncCallInvoker (std::function<void()> f) : callback (std::move (f)) { post(); }
-        void messageCallback() override  { callback(); }
-        std::function<void()> callback;
-    };
-
-    new AsyncCallInvoker (std::move (fn));
 }
 
 //==============================================================================
@@ -273,8 +261,8 @@ bool MessageManager::existsAndIsCurrentThread() noexcept
 struct MessageManager::Lock::BlockingMessage   : public MessageManager::MessageBase
 {
     BlockingMessage (const MessageManager::Lock* parent) noexcept
-        : owner (parent)
-    {}
+    // need a const_cast here as VS2013 doesn't like a const pointer to be in an atomic
+        : owner (const_cast<MessageManager::Lock*> (parent)) {}
 
     void messageCallback() override
     {
@@ -289,7 +277,7 @@ struct MessageManager::Lock::BlockingMessage   : public MessageManager::MessageB
     }
 
     CriticalSection ownerCriticalSection;
-    Atomic<const MessageManager::Lock*> owner;
+    Atomic<MessageManager::Lock*> owner;
     WaitableEvent releaseEvent;
 
     JUCE_DECLARE_NON_COPYABLE (BlockingMessage)

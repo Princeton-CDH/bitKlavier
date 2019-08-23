@@ -145,7 +145,6 @@ public:
 
         virtual void drawCallOutBoxBackground (CallOutBox&, Graphics&, const Path&, Image&) = 0;
         virtual int getCallOutBoxBorderSize (const CallOutBox&) = 0;
-        virtual float getCallOutBoxCornerSize (const CallOutBox&) = 0;
     };
 
     //==============================================================================

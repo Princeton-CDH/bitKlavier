@@ -67,12 +67,12 @@ public:
     static String getAlsaMidiName()
     {
         #ifdef JUCE_ALSA_MIDI_NAME
-         return JUCE_ALSA_MIDI_NAME;
+            return JUCE_ALSA_MIDI_NAME;
         #else
-         if (auto* app = JUCEApplicationBase::getInstance())
-             return app->getApplicationName();
+            if (auto* app = JUCEApplicationBase::getInstance())
+                return app->getApplicationName();
 
-         return "JUCE";
+            return "JUCE";
         #endif
     }
 
@@ -198,8 +198,7 @@ public:
                     isInput ? (SND_SEQ_PORT_CAP_WRITE | (enableSubscription ? SND_SEQ_PORT_CAP_SUBS_WRITE : 0))
                             : (SND_SEQ_PORT_CAP_READ  | (enableSubscription ? SND_SEQ_PORT_CAP_SUBS_READ : 0));
 
-                portName = name;
-                portId = snd_seq_create_simple_port (seqHandle, portName.toUTF8(), caps,
+                portId = snd_seq_create_simple_port (seqHandle, name.toUTF8(), caps,
                                                      SND_SEQ_PORT_TYPE_MIDI_GENERIC |
                                                      SND_SEQ_PORT_TYPE_APPLICATION);
             }
@@ -216,15 +215,13 @@ public:
         }
 
         AlsaClient& client;
-
         MidiInputCallback* callback = nullptr;
         snd_midi_event_t* midiParser = nullptr;
         MidiInput* midiInput = nullptr;
-
-        String portName;
-
-        int maxEventSize = 4096, portId = -1;
-        bool callbackEnabled = false, isInput = false;
+        int maxEventSize = 4096;
+        int portId = -1;
+        bool callbackEnabled = false;
+        bool isInput = false;
     };
 
     static Ptr getInstance()
@@ -279,7 +276,7 @@ public:
 
     void deletePort (Port* port)
     {
-        ports.set (port->portId, nullptr);
+        ports.remove (port->portId);
         decReferenceCount();
     }
 
@@ -362,16 +359,11 @@ private:
 AlsaClient* AlsaClient::instance = nullptr;
 
 //==============================================================================
-static String getFormattedPortIdentifier (int clientId, int portId)
-{
-    return String (clientId) + "-" + String (portId);
-}
-
 static AlsaClient::Port* iterateMidiClient (const AlsaClient::Ptr& client,
                                             snd_seq_client_info_t* clientInfo,
                                             bool forInput,
-                                            Array<MidiDeviceInfo>& devices,
-                                            const String& deviceIdentifierToOpen)
+                                            StringArray& deviceNamesFound,
+                                            int deviceIndexToOpen)
 {
     AlsaClient::Port* port = nullptr;
 
@@ -379,7 +371,7 @@ static AlsaClient::Port* iterateMidiClient (const AlsaClient::Ptr& client,
     snd_seq_port_info_t* portInfo = nullptr;
 
     snd_seq_port_info_alloca (&portInfo);
-    jassert (portInfo != nullptr);
+    jassert (portInfo);
     auto numPorts = snd_seq_client_info_get_num_ports (clientInfo);
     auto sourceClient = snd_seq_client_info_get_client (clientInfo);
 
@@ -392,19 +384,19 @@ static AlsaClient::Port* iterateMidiClient (const AlsaClient::Ptr& client,
             && (snd_seq_port_info_get_capability (portInfo)
                 & (forInput ? SND_SEQ_PORT_CAP_SUBS_READ : SND_SEQ_PORT_CAP_SUBS_WRITE)) != 0)
         {
-            String portName (snd_seq_port_info_get_name (portInfo));
-            auto portID = snd_seq_port_info_get_port (portInfo);
+            String portName = snd_seq_port_info_get_name(portInfo);
 
-            MidiDeviceInfo device (portName, getFormattedPortIdentifier (sourceClient, portID));
-            devices.add (device);
+            deviceNamesFound.add (portName);
 
-            if (deviceIdentifierToOpen.isNotEmpty() && deviceIdentifierToOpen == device.identifier)
+            if (deviceNamesFound.size() == deviceIndexToOpen + 1)
             {
-                if (portID != -1)
+                auto sourcePort = snd_seq_port_info_get_port (portInfo);
+
+                if (sourcePort != -1)
                 {
                     port = client->createPort (portName, forInput, false);
                     jassert (port->isValid());
-                    port->connectWith (sourceClient, portID);
+                    port->connectWith (sourceClient, sourcePort);
                     break;
                 }
             }
@@ -415,8 +407,8 @@ static AlsaClient::Port* iterateMidiClient (const AlsaClient::Ptr& client,
 }
 
 static AlsaClient::Port* iterateMidiDevices (bool forInput,
-                                             Array<MidiDeviceInfo>& devices,
-                                             const String& deviceIdentifierToOpen)
+                                             StringArray& deviceNamesFound,
+                                             int deviceIndexToOpen)
 {
     AlsaClient::Port* port = nullptr;
     auto client = AlsaClient::getInstance();
@@ -440,96 +432,85 @@ static AlsaClient::Port* iterateMidiDevices (bool forInput,
             {
                 if (snd_seq_query_next_client (seqHandle, clientInfo) == 0)
                 {
-                    port = iterateMidiClient (client, clientInfo, forInput,
-                                              devices, deviceIdentifierToOpen);
+                    auto sourceClient = snd_seq_client_info_get_client (clientInfo);
 
-                    if (port != nullptr)
-                        break;
+                    if (sourceClient != client->getId() && sourceClient != SND_SEQ_CLIENT_SYSTEM)
+                    {
+                        port = iterateMidiClient (client, clientInfo, forInput,
+                                                  deviceNamesFound, deviceIndexToOpen);
+                        if (port != nullptr)
+                            break;
+                    }
                 }
             }
         }
     }
+
+    deviceNamesFound.appendNumbersToDuplicates (true, true);
 
     return port;
 }
 
 } // namespace
 
-//==============================================================================
-Array<MidiDeviceInfo> MidiInput::getAvailableDevices()
+StringArray MidiOutput::getDevices()
 {
-    Array<MidiDeviceInfo> devices;
-    iterateMidiDevices (true, devices, {});
-
+    StringArray devices;
+    iterateMidiDevices (false, devices, -1);
     return devices;
 }
 
-MidiDeviceInfo MidiInput::getDefaultDevice()
-{
-    return getAvailableDevices().getFirst();
-}
-
-std::unique_ptr<MidiInput> MidiInput::openDevice (const String& deviceIdentifier, MidiInputCallback* callback)
-{
-    if (deviceIdentifier.isEmpty())
-        return {};
-
-    Array<MidiDeviceInfo> devices;
-    auto* port = iterateMidiDevices (true, devices, deviceIdentifier);
-
-    if (port == nullptr || ! port->isValid())
-        return {};
-
-    jassert (port->isValid());
-
-    std::unique_ptr<MidiInput> midiInput (new MidiInput (port->portName, deviceIdentifier));
-
-    port->setupInput (midiInput.get(), callback);
-    midiInput->internal = port;
-
-    return midiInput;
-}
-
-std::unique_ptr<MidiInput> MidiInput::createNewDevice (const String& deviceName, MidiInputCallback* callback)
-{
-    auto client = AlsaClient::getInstance();
-    auto* port = client->createPort (deviceName, true, true);
-
-    if (port == nullptr || ! port->isValid())
-        return {};
-
-    std::unique_ptr<MidiInput> midiInput (new MidiInput (deviceName, getFormattedPortIdentifier (client->getId(), port->portId)));
-
-    port->setupInput (midiInput.get(), callback);
-    midiInput->internal = port;
-
-    return midiInput;
-}
-
-StringArray MidiInput::getDevices()
-{
-    StringArray deviceNames;
-
-    for (auto& d : getAvailableDevices())
-        deviceNames.add (d.name);
-
-    deviceNames.appendNumbersToDuplicates (true, true);
-
-    return deviceNames;
-}
-
-int MidiInput::getDefaultDeviceIndex()
+int MidiOutput::getDefaultDeviceIndex()
 {
     return 0;
 }
 
-std::unique_ptr<MidiInput> MidiInput::openDevice (int index, MidiInputCallback* callback)
+MidiOutput* MidiOutput::openDevice (int deviceIndex)
 {
-    return openDevice (getAvailableDevices()[index].identifier, callback);
+    MidiOutput* newDevice = nullptr;
+
+    StringArray devices;
+    auto* port = iterateMidiDevices (false, devices, deviceIndex);
+
+    if (port == nullptr)
+        return nullptr;
+
+    jassert (port->isValid());
+
+    newDevice = new MidiOutput (devices [deviceIndex]);
+    port->setupOutput();
+    newDevice->internal = port;
+
+    return newDevice;
 }
 
-MidiInput::MidiInput (const String& deviceName, const String& deviceIdentifier)
-    : deviceInfo (deviceName, deviceIdentifier)
+MidiOutput* MidiOutput::createNewDevice (const String& deviceName)
+{
+    MidiOutput* newDevice = nullptr;
+    auto client = AlsaClient::getInstance();
+    auto* port = client->createPort (deviceName, false, true);
+    jassert (port != nullptr && port->isValid());
+
+    newDevice = new MidiOutput (deviceName);
+    port->setupOutput();
+    newDevice->internal = port;
+
+    return newDevice;
+}
+
+MidiOutput::~MidiOutput()
+{
+    stopBackgroundThread();
+    AlsaClient::getInstance()->deletePort (static_cast<AlsaClient::Port*> (internal));
+}
+
+void MidiOutput::sendMessageNow (const MidiMessage& message)
+{
+    static_cast<AlsaClient::Port*> (internal)->sendMessageNow (message);
+}
+
+//==============================================================================
+MidiInput::MidiInput (const String& nm)  : name (nm)
 {
 }
 
@@ -549,117 +530,68 @@ void MidiInput::stop()
     static_cast<AlsaClient::Port*> (internal)->enableCallback (false);
 }
 
-//==============================================================================
-Array<MidiDeviceInfo> MidiOutput::getAvailableDevices()
-{
-    Array<MidiDeviceInfo> devices;
-    iterateMidiDevices (false, devices, {});
-
-    return devices;
-}
-
-MidiDeviceInfo MidiOutput::getDefaultDevice()
-{
-    return getAvailableDevices().getFirst();
-}
-
-std::unique_ptr<MidiOutput> MidiOutput::openDevice (const String& deviceIdentifier)
-{
-    if (deviceIdentifier.isEmpty())
-        return {};
-
-    Array<MidiDeviceInfo> devices;
-    auto* port = iterateMidiDevices (false, devices, deviceIdentifier);
-
-    if (port == nullptr || ! port->isValid())
-        return {};
-
-    std::unique_ptr<MidiOutput> midiOutput (new MidiOutput (port->portName, deviceIdentifier));
-
-    port->setupOutput();
-    midiOutput->internal = port;
-
-    return midiOutput;
-}
-
-std::unique_ptr<MidiOutput> MidiOutput::createNewDevice (const String& deviceName)
-{
-    auto client = AlsaClient::getInstance();
-    auto* port = client->createPort (deviceName, false, true);
-
-    if (port == nullptr || ! port->isValid())
-        return {};
-
-    std::unique_ptr<MidiOutput> midiOutput (new MidiOutput (deviceName, getFormattedPortIdentifier (client->getId(), port->portId)));
-
-    port->setupOutput();
-    midiOutput->internal = port;
-
-    return midiOutput;
-}
-
-StringArray MidiOutput::getDevices()
-{
-    StringArray deviceNames;
-
-    for (auto& d : getAvailableDevices())
-        deviceNames.add (d.name);
-
-    deviceNames.appendNumbersToDuplicates (true, true);
-
-    return deviceNames;
-}
-
-int MidiOutput::getDefaultDeviceIndex()
+int MidiInput::getDefaultDeviceIndex()
 {
     return 0;
 }
 
-std::unique_ptr<MidiOutput> MidiOutput::openDevice (int index)
+StringArray MidiInput::getDevices()
 {
-    return openDevice (getAvailableDevices()[index].identifier);
+    StringArray devices;
+    iterateMidiDevices (true, devices, -1);
+    return devices;
 }
 
-MidiOutput::~MidiOutput()
+MidiInput* MidiInput::openDevice (int deviceIndex, MidiInputCallback* callback)
 {
-    stopBackgroundThread();
-    AlsaClient::getInstance()->deletePort (static_cast<AlsaClient::Port*> (internal));
+    StringArray devices;
+    auto* port = iterateMidiDevices (true, devices, deviceIndex);
+
+    if (port == nullptr)
+        return nullptr;
+
+    jassert (port->isValid());
+
+    auto newDevice = new MidiInput (devices [deviceIndex]);
+    port->setupInput (newDevice, callback);
+    newDevice->internal = port;
+    return newDevice;
 }
 
-void MidiOutput::sendMessageNow (const MidiMessage& message)
+MidiInput* MidiInput::createNewDevice (const String& deviceName, MidiInputCallback* callback)
 {
-    static_cast<AlsaClient::Port*> (internal)->sendMessageNow (message);
+    auto client = AlsaClient::getInstance();
+    auto* port = client->createPort (deviceName, true, true);
+
+    jassert (port->isValid());
+
+    auto newDevice = new MidiInput (deviceName);
+    port->setupInput (newDevice, callback);
+    newDevice->internal = port;
+    return newDevice;
 }
+
 
 //==============================================================================
 #else
 
 // (These are just stub functions if ALSA is unavailable...)
-MidiInput::MidiInput (const String& deviceName, const String& deviceID)
-    : deviceInfo (deviceName, deviceID)
-{
-}
 
-MidiInput::~MidiInput()                                                                   {}
-void MidiInput::start()                                                                   {}
-void MidiInput::stop()                                                                    {}
-Array<MidiDeviceInfo> MidiInput::getAvailableDevices()                                    { return {}; }
-MidiDeviceInfo MidiInput::getDefaultDevice()                                              { return {}; }
-std::unique_ptr<MidiInput> MidiInput::openDevice (const String&, MidiInputCallback*)      { return {}; }
-std::unique_ptr<MidiInput> MidiInput::createNewDevice (const String&, MidiInputCallback*) { return {}; }
-StringArray MidiInput::getDevices()                                                       { return {}; }
-int MidiInput::getDefaultDeviceIndex()                                                    { return 0;}
-std::unique_ptr<MidiInput> MidiInput::openDevice (int, MidiInputCallback*)                { return {}; }
+StringArray MidiOutput::getDevices()                                { return {}; }
+int MidiOutput::getDefaultDeviceIndex()                             { return 0; }
+MidiOutput* MidiOutput::openDevice (int)                            { return nullptr; }
+MidiOutput* MidiOutput::createNewDevice (const String&)             { return nullptr; }
+MidiOutput::~MidiOutput()   {}
+void MidiOutput::sendMessageNow (const MidiMessage&)    {}
 
-MidiOutput::~MidiOutput()                                                                 {}
-void MidiOutput::sendMessageNow (const MidiMessage&)                                      {}
-Array<MidiDeviceInfo> MidiOutput::getAvailableDevices()                                   { return {}; }
-MidiDeviceInfo MidiOutput::getDefaultDevice()                                             { return {}; }
-std::unique_ptr<MidiOutput> MidiOutput::openDevice (const String&)                        { return {}; }
-std::unique_ptr<MidiOutput> MidiOutput::createNewDevice (const String&)                   { return {}; }
-StringArray MidiOutput::getDevices()                                                      { return {}; }
-int MidiOutput::getDefaultDeviceIndex()                                                   { return 0;}
-std::unique_ptr<MidiOutput> MidiOutput::openDevice (int)                                  { return {}; }
+MidiInput::MidiInput (const String& nm) : name (nm)  {}
+MidiInput::~MidiInput() {}
+void MidiInput::start() {}
+void MidiInput::stop()  {}
+int MidiInput::getDefaultDeviceIndex()      { return 0; }
+StringArray MidiInput::getDevices()         { return {}; }
+MidiInput* MidiInput::openDevice (int, MidiInputCallback*)                  { return nullptr; }
+MidiInput* MidiInput::createNewDevice (const String&, MidiInputCallback*)   { return nullptr; }
 
 #endif
 

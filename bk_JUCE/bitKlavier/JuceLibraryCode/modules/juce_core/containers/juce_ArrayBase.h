@@ -136,14 +136,7 @@ public:
     }
 
     //==============================================================================
-    inline ElementType& operator[] (const int index) noexcept
-    {
-        jassert (elements != nullptr);
-        jassert (isPositiveAndBelow (index, numUsed));
-        return elements[index];
-    }
-
-    inline const ElementType& operator[] (const int index) const noexcept
+    inline ElementType& operator[] (const int index) const noexcept
     {
         jassert (elements != nullptr);
         jassert (isPositiveAndBelow (index, numUsed));
@@ -166,32 +159,17 @@ public:
     }
 
     //==============================================================================
-    inline ElementType* begin() noexcept
+    inline ElementType* begin() const noexcept
     {
         return elements;
     }
 
-    inline const ElementType* begin() const noexcept
-    {
-        return elements;
-    }
-
-    inline ElementType* end() noexcept
+    inline ElementType* end() const noexcept
     {
         return elements + numUsed;
     }
 
-    inline const ElementType* end() const noexcept
-    {
-        return elements + numUsed;
-    }
-
-    inline ElementType* data() noexcept
-    {
-        return elements;
-    }
-
-    inline const ElementType* data() const noexcept
+    inline ElementType* data() const noexcept
     {
         return elements;
     }
@@ -521,13 +499,13 @@ private:
         {
             memmove (elements + currentIndex,
                      elements + currentIndex + 1,
-                     (size_t) (newIndex - currentIndex) * sizeof (ElementType));
+                     sizeof (ElementType) * (size_t) (newIndex - currentIndex));
         }
         else
         {
             memmove (elements + newIndex + 1,
                      elements + newIndex,
-                     (size_t) (currentIndex - newIndex) * sizeof (ElementType));
+                     sizeof (ElementType) * (size_t) (currentIndex - newIndex));
         }
 
         memcpy (elements + newIndex, tempCopy, sizeof (ElementType));

@@ -32,7 +32,7 @@ class SmoothedValueTests  : public UnitTest
 {
 public:
     SmoothedValueTests()
-        : UnitTest ("SmoothedValueTests", UnitTestCategories::smoothedValues)
+        : UnitTest ("SmoothedValueTests", "SmoothedValues")
     {}
 
     void runTest() override

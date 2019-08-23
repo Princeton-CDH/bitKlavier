@@ -109,7 +109,7 @@ public:
            startTimer (500);
     }
 
-    virtual ~StandalonePluginHolder() override
+    virtual ~StandalonePluginHolder()
     {
         stopTimer();
 
@@ -296,7 +296,7 @@ public:
     {
         if (settings != nullptr)
         {
-            auto xml = deviceManager.createStateXml();
+            std::unique_ptr<XmlElement> xml (deviceManager.createStateXml());
 
             settings->setValue ("audioSetup", xml.get());
 
@@ -314,7 +314,7 @@ public:
 
         if (settings != nullptr)
         {
-            savedState = settings->getXmlValue ("audioSetup");
+            savedState.reset (settings->getXmlValue ("audioSetup"));
 
            #if ! (JUCE_IOS || JUCE_ANDROID)
             shouldMuteInput.setValue (settings->getBoolValue ("shouldMuteInput", true));
@@ -411,7 +411,7 @@ public:
     bool autoOpenMidiDevices;
 
     std::unique_ptr<AudioDeviceManager::AudioDeviceSetup> options;
-    Array<MidiDeviceInfo> lastMidiDevices;
+    StringArray lastMidiDevices;
 
 private:
     //==============================================================================
@@ -526,7 +526,7 @@ private:
                             const AudioDeviceManager::AudioDeviceSetup* preferredSetupOptions)
     {
         deviceManager.addAudioCallback (this);
-        deviceManager.addMidiInputDeviceCallback ({}, &player);
+        deviceManager.addMidiInputCallback ({}, &player);
 
         reloadAudioDeviceState (enableAudioInput, preferredDefaultDeviceName, preferredSetupOptions);
     }
@@ -535,25 +535,23 @@ private:
     {
         saveAudioDeviceState();
 
-        deviceManager.removeMidiInputDeviceCallback ({}, &player);
+        deviceManager.removeMidiInputCallback ({}, &player);
         deviceManager.removeAudioCallback (this);
     }
 
     void timerCallback() override
     {
-        auto newMidiDevices = MidiInput::getAvailableDevices();
+        auto newMidiDevices = MidiInput::getDevices();
 
         if (newMidiDevices != lastMidiDevices)
         {
             for (auto& oldDevice : lastMidiDevices)
                 if (! newMidiDevices.contains (oldDevice))
-                    deviceManager.setMidiInputDeviceEnabled (oldDevice.identifier, false);
+                    deviceManager.setMidiInputEnabled (oldDevice, false);
 
             for (auto& newDevice : newMidiDevices)
                 if (! lastMidiDevices.contains (newDevice))
-                    deviceManager.setMidiInputDeviceEnabled (newDevice.identifier, true);
-
-            lastMidiDevices = newMidiDevices;
+                    deviceManager.setMidiInputEnabled (newDevice, true);
         }
     }
 
@@ -636,7 +634,7 @@ public:
        #endif
     }
 
-    ~StandaloneFilterWindow() override
+    ~StandaloneFilterWindow()
     {
        #if (! JUCE_IOS) && (! JUCE_ANDROID)
         if (auto* props = pluginHolder->settings.get())
@@ -730,8 +728,7 @@ private:
     public:
         MainContentComponent (StandaloneFilterWindow& filterWindow)
             : owner (filterWindow), notification (this),
-              editor (owner.getAudioProcessor()->hasEditor() ? owner.getAudioProcessor()->createEditorIfNeeded()
-                                                             : new GenericAudioProcessorEditor (*owner.getAudioProcessor()))
+              editor (owner.getAudioProcessor()->createEditorIfNeeded())
         {
             Value& inputMutedValue = owner.pluginHolder->getMuteInputValue();
 
@@ -754,7 +751,7 @@ private:
             inputMutedChanged (shouldShowNotification);
         }
 
-        ~MainContentComponent() override
+        ~MainContentComponent()
         {
             if (editor != nullptr)
             {
@@ -771,9 +768,7 @@ private:
             if (shouldShowNotification)
                 notification.setBounds (r.removeFromTop (NotificationArea::height));
 
-            if (editor != nullptr)
-                editor->setBounds (editor->getLocalArea (this, r)
-                                          .withPosition (r.getTopLeft().transformedBy (editor->getTransform().inverted())));
+            editor->setBounds (r);
         }
 
     private:
@@ -833,13 +828,9 @@ private:
            #if JUCE_IOS || JUCE_ANDROID
             resized();
            #else
-            if (editor != nullptr)
-            {
-                auto rect = getSizeToContainEditor();
-
-                setSize (rect.getWidth(),
-                         rect.getHeight() + (shouldShowNotification ? NotificationArea::height : 0));
-            }
+            setSize (editor->getWidth(),
+                     editor->getHeight()
+                     + (shouldShowNotification ? NotificationArea::height : 0));
            #endif
         }
 
@@ -854,23 +845,11 @@ private:
         }
 
         //==============================================================================
-        void componentMovedOrResized (Component&, bool, bool) override
+        void componentMovedOrResized (Component&, bool, bool wasResized) override
         {
-            if (editor != nullptr)
-            {
-                auto rect = getSizeToContainEditor();
-
-                setSize (rect.getWidth(),
-                         rect.getHeight() + (shouldShowNotification ? NotificationArea::height : 0));
-            }
-        }
-
-        Rectangle<int> getSizeToContainEditor() const
-        {
-            if (editor != nullptr)
-                return getLocalArea (editor.get(), editor->getLocalBounds());
-
-            return {};
+            if (wasResized && editor != nullptr)
+                setSize (editor->getWidth(),
+                         editor->getHeight() + (shouldShowNotification ? NotificationArea::height : 0));
         }
 
         //==============================================================================

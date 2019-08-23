@@ -41,7 +41,9 @@
 
 //==============================================================================
 #if JUCE_MAC
- #if JUCE_SUPPORT_CARBON && (JUCE_PLUGINHOST_VST || JUCE_PLUGINHOST_AU)
+ #if JUCE_SUPPORT_CARBON \
+      && ((JUCE_PLUGINHOST_VST || JUCE_PLUGINHOST_AU) \
+           || ! (defined (MAC_OS_X_VERSION_10_6) && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_6))
   #include <Carbon/Carbon.h>
   #include "../juce_gui_extra/native/juce_mac_CarbonViewWrapperComponent.h"
  #endif
@@ -131,9 +133,6 @@ struct AutoResizingNSViewComponentWithParent  : public AutoResizingNSViewCompone
 
 #if JUCE_CLANG
  #pragma clang diagnostic ignored "-Wdeprecated-declarations"
- #if __has_warning("-Wcast-align")
-  #pragma clang diagnostic ignored "-Wcast-align"
- #endif
 #endif
 
 #include "format/juce_AudioPluginFormat.cpp"
@@ -152,11 +151,6 @@ struct AutoResizingNSViewComponentWithParent  : public AutoResizingNSViewCompone
 #include "scanning/juce_KnownPluginList.cpp"
 #include "scanning/juce_PluginDirectoryScanner.cpp"
 #include "scanning/juce_PluginListComponent.cpp"
+#include "utilities/juce_AudioProcessorParameters.cpp"
 #include "processors/juce_AudioProcessorParameterGroup.cpp"
-#include "utilities/juce_AudioProcessorParameterWithID.cpp"
-#include "utilities/juce_RangedAudioParameter.cpp"
-#include "utilities/juce_AudioParameterFloat.cpp"
-#include "utilities/juce_AudioParameterInt.cpp"
-#include "utilities/juce_AudioParameterBool.cpp"
-#include "utilities/juce_AudioParameterChoice.cpp"
 #include "utilities/juce_AudioProcessorValueTreeState.cpp"

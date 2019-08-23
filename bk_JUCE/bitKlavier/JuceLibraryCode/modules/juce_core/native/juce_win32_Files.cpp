@@ -544,12 +544,7 @@ uint64 File::getFileIdentifier() const
 {
     uint64 result = 0;
 
-    String path = getFullPathName();
-
-    if (isRoot())
-        path += "\\";
-
-    auto h = CreateFile (path.toWideCharPointer(),
+    auto h = CreateFile (getFullPathName().toWideCharPointer(),
                          GENERIC_READ, FILE_SHARE_READ, nullptr,
                          OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, 0);
 
@@ -580,8 +575,10 @@ bool File::isOnHardDisk() const
 
     auto n = WindowsFileHelpers::getWindowsDriveType (getFullPathName());
 
-    return n != DRIVE_REMOVABLE
-        && n != DRIVE_CDROM
+    if (fullPath.toLowerCase()[0] <= 'b' && fullPath[1] == ':')
+        return n != DRIVE_REMOVABLE;
+
+    return n != DRIVE_CDROM
         && n != DRIVE_REMOTE
         && n != DRIVE_NO_ROOT_DIR;
 }

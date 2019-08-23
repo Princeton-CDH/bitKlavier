@@ -76,13 +76,12 @@ public:
 private:
     //==============================================================================
     OptionalScopedPointer<AudioSource> input;
-    double ratio = 1.0, lastRatio = 1.0;
+    double ratio, lastRatio;
     AudioBuffer<float> buffer;
-    int bufferPos = 0, sampsInBuffer = 0;
-    double subSampleOffset = 0.0;
+    int bufferPos, sampsInBuffer;
+    double subSampleOffset;
     double coefficients[6];
     SpinLock ratioLock;
-    CriticalSection callbackLock;
     const int numChannels;
     HeapBlock<float*> destBuffers;
     HeapBlock<const float*> srcBuffers;

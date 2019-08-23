@@ -374,7 +374,7 @@ public:
         {
             et = new EdgeTable (bounds);
 
-            jint* const maskDataElements = env->GetIntArrayElements ((jintArray) cachedRenderArray.get(), nullptr);
+            jint* const maskDataElements = env->GetIntArrayElements ((jintArray) cachedRenderArray.get(), 0);
             const jint* mask = maskDataElements;
 
             for (int y = bounds.getY(); y < bounds.getBottom(); ++y)
@@ -425,12 +425,12 @@ private:
         return file;
     }
 
-    static File getFontFile (const String& family, const String& fontStyle)
+    static File getFontFile (const String& family, const String& style)
     {
         String path ("/system/fonts/" + family);
 
-        if (fontStyle.isNotEmpty())
-            path << '-' << fontStyle;
+        if (style.isNotEmpty())
+            path << '-' << style;
 
         return File (path + ".ttf");
     }
@@ -494,7 +494,7 @@ private:
         String key;
         {
             LocalRef<jobject> digest (env->CallStaticObjectMethod (JavaMessageDigest, JavaMessageDigest.getInstance, javaString("MD5").get()));
-            LocalRef<jbyteArray> bytes(env->NewByteArray ((int) size));
+            LocalRef<jbyteArray> bytes(env->NewByteArray(size));
 
             jboolean ignore;
             auto* jbytes = env->GetByteArrayElements(bytes.get(), &ignore);

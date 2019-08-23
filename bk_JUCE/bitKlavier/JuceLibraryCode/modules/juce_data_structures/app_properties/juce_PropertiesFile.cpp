@@ -186,20 +186,33 @@ bool PropertiesFile::save()
 
 bool PropertiesFile::loadAsXml()
 {
-    if (auto doc = parseXMLIfTagMatches (file, PropertyFileConstants::fileTag))
-    {
-        forEachXmlChildElementWithTagName (*doc, e, PropertyFileConstants::valueTag)
-        {
-            auto name = e->getStringAttribute (PropertyFileConstants::nameAttribute);
+    XmlDocument parser (file);
+    std::unique_ptr<XmlElement> doc (parser.getDocumentElement (true));
 
-            if (name.isNotEmpty())
-                getAllProperties().set (name,
-                                        e->getFirstChildElement() != nullptr
-                                            ? e->getFirstChildElement()->toString (XmlElement::TextFormat().singleLine().withoutHeader())
-                                            : e->getStringAttribute (PropertyFileConstants::valueAttribute));
+    if (doc != nullptr && doc->hasTagName (PropertyFileConstants::fileTag))
+    {
+        doc.reset (parser.getDocumentElement());
+
+        if (doc != nullptr)
+        {
+            forEachXmlChildElementWithTagName (*doc, e, PropertyFileConstants::valueTag)
+            {
+                auto name = e->getStringAttribute (PropertyFileConstants::nameAttribute);
+
+                if (name.isNotEmpty())
+                    getAllProperties().set (name,
+                                            e->getFirstChildElement() != nullptr
+                                                ? e->getFirstChildElement()->createDocument ("", true)
+                                                : e->getStringAttribute (PropertyFileConstants::valueAttribute));
+            }
+
+            return true;
         }
 
-        return true;
+        // must be a pretty broken XML file we're trying to parse here,
+        // or a sign that this object needs an InterProcessLock,
+        // or just a failure reading the file.  This last reason is why
+        // we don't jassertfalse here.
     }
 
     return false;
@@ -216,8 +229,8 @@ bool PropertiesFile::saveAsXml()
         e->setAttribute (PropertyFileConstants::nameAttribute, props.getAllKeys() [i]);
 
         // if the value seems to contain xml, store it as such..
-        if (auto childElement = parseXML (props.getAllValues() [i]))
-            e->addChildElement (childElement.release());
+        if (auto* childElement = XmlDocument::parse (props.getAllValues() [i]))
+            e->addChildElement (childElement);
         else
             e->setAttribute (PropertyFileConstants::valueAttribute, props.getAllValues() [i]);
     }
@@ -227,7 +240,7 @@ bool PropertiesFile::saveAsXml()
     if (pl != nullptr && ! pl->isLocked())
         return false; // locking failure..
 
-    if (doc.writeTo (file, {}))
+    if (doc.writeToFile (file, {}))
     {
         needsWriting = false;
         return true;

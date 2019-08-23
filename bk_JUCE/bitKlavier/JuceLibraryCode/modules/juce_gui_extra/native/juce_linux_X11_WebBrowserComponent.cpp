@@ -427,7 +427,7 @@ public:
         : Thread ("Webview"), owner (parent)
     {}
 
-    ~Pimpl() override
+    ~Pimpl()
     {
         quit();
     }
@@ -450,7 +450,7 @@ public:
         unsigned long windowHandle;
         ssize_t actual = read (inChannel, &windowHandle, sizeof (windowHandle));
 
-        if (actual != (ssize_t) sizeof (windowHandle))
+        if (actual != sizeof (windowHandle))
         {
             killChild();
             return;
@@ -612,7 +612,7 @@ private:
             int result = 0;
 
             while (result == 0 || (result < 0 && errno == EINTR))
-                result = select (max_fd + 1, &set, nullptr, nullptr, nullptr);
+                result = select (max_fd + 1, &set, NULL, NULL, NULL);
 
             if (result < 0)
                 break;
@@ -709,9 +709,6 @@ WebBrowserComponent::WebBrowserComponent (const bool unloadPageWhenBrowserIsHidd
     : browser (new Pimpl (*this)),
       unloadPageWhenBrowserIsHidden (unloadPageWhenBrowserIsHidden_)
 {
-    ignoreUnused (blankPageShown);
-    ignoreUnused (unloadPageWhenBrowserIsHidden);
-
     setOpaque (true);
 
     browser->init();

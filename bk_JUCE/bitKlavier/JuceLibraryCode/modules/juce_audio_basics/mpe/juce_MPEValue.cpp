@@ -82,7 +82,6 @@ bool MPEValue::operator!= (const MPEValue& other) const noexcept
     return ! operator== (other);
 }
 
-
 //==============================================================================
 //==============================================================================
 #if JUCE_UNIT_TESTS
@@ -90,9 +89,7 @@ bool MPEValue::operator!= (const MPEValue& other) const noexcept
 class MPEValueTests  : public UnitTest
 {
 public:
-    MPEValueTests()
-        : UnitTest ("MPEValue class", UnitTestCategories::midi)
-    {}
+    MPEValueTests() : UnitTest ("MPEValue class", "MIDI/MPE") {}
 
     void runTest() override
     {
@@ -168,6 +165,6 @@ private:
 
 static MPEValueTests MPEValueUnitTests;
 
-#endif
+#endif // JUCE_UNIT_TESTS
 
 } // namespace juce

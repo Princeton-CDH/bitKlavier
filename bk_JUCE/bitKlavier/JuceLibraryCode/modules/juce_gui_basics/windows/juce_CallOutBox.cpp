@@ -254,7 +254,7 @@ void CallOutBox::refreshPath()
     outline.addBubble (content.getBounds().toFloat().expanded (gap, gap),
                        getLocalBounds().toFloat(),
                        targetPoint - getPosition().toFloat(),
-                       getLookAndFeel().getCallOutBoxCornerSize (*this), arrowSize * 0.7f);
+                       9.0f, arrowSize * 0.7f);
 }
 
 void CallOutBox::timerCallback()

@@ -107,10 +107,8 @@ void FilenameComponent::setDefaultBrowseTarget (const File& newDefaultDirectory)
 
 File FilenameComponent::getLocationToBrowse()
 {
-    if (lastFilename.isEmpty() && defaultBrowseFile != File())
-        return defaultBrowseFile;
-
-    return getCurrentFile();
+    return getCurrentFile() == File() ? defaultBrowseFile
+                                      : getCurrentFile();
 }
 
 void FilenameComponent::showChooser()
