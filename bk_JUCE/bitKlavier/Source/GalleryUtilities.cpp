@@ -623,7 +623,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
     }
 	else if (type == PreparationTypeBlendronomerMod)
 	{
-		BlendronomerModification::Ptr toCopy = BlendronomerModification(Id);
+		BlendronomerModification::Ptr toCopy = getBlendronomerModification(Id);
 		BlendronomerModification::Ptr newOne = toCopy->duplicate();
 		addBlendronomerMod(newOne);
 		newId = newOne->getId();

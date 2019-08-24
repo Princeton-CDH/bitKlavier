@@ -96,12 +96,6 @@ bool BlendronomerPreparation::compare(BlendronomerPreparation::Ptr b)
 	return false;
 }
 
-//assigns random values to a preparation, mainly used for unit testing
-inline void BlendronomerPreparation::randomize()
-{
-	return;
-}
-
 //prints each variable
 void BlendronomerPreparation::print(void)
 {

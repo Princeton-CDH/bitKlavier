@@ -47,7 +47,7 @@ public:
 
 	//mutators
 	inline void updateValues();
-	inline void updateDelayFromSmooth();
+    inline void updateDelayFromSmooth() { delayLinear = dSmoothValue; }
 	inline void setDelayMax(float delayMax) { dDelayMax = delayMax; }
 	inline void setDelayGain(float delayGain) { dDelayGain = delayGain; }
 	inline void setDelayLength(float delayLength) { dDelayLength = delayLength; }

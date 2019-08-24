@@ -44,7 +44,11 @@ public:
 	void copy(BlendronomerPreparation::Ptr b);
 	void performModification(BlendronomerPreparation::Ptr b, Array<bool> dirty);
 	bool compare(BlendronomerPreparation::Ptr b);
-	inline void randomize();
+    
+    inline void randomize()
+    {
+        return;
+    }
 
 	//accessors
 	inline const String getName() const noexcept { return name; }
