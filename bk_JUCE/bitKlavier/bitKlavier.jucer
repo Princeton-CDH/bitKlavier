@@ -194,6 +194,8 @@
               file="Source/GraphicsConstants.h"/>
       </GROUP>
       <GROUP id="{754B7718-DE02-827A-21E1-1FB69E01DE50}" name="Utilities">
+        <FILE id="RLR4Cp" name="BKSTK.cpp" compile="1" resource="0" file="Source/BKSTK.cpp"/>
+        <FILE id="ONrP9z" name="BKSTK.h" compile="0" resource="0" file="Source/BKSTK.h"/>
         <FILE id="N85SXV" name="BKUtilities.cpp" compile="1" resource="0" file="Source/BKUtilities.cpp"/>
         <FILE id="WL9668" name="BKUtilities.h" compile="0" resource="0" file="Source/BKUtilities.h"/>
         <FILE id="coQuvm" name="BKUpdateState.h" compile="0" resource="0" file="Source/BKUpdateState.h"/>

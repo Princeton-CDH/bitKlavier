@@ -46,8 +46,8 @@ public:
 	inline const bool getActive() const noexcept { return dBlendronicActive; }
 
 	//mutators
-	inline void updateValues();
-    inline void updateDelayFromSmooth() { delayLinear = dSmoothValue; }
+    void updateValues();
+    void updateDelayFromSmooth();
 	inline void setDelayMax(float delayMax) { dDelayMax = delayMax; }
 	inline void setDelayGain(float delayGain) { dDelayGain = delayGain; }
 	inline void setDelayLength(float delayLength) { dDelayLength = delayLength; }
