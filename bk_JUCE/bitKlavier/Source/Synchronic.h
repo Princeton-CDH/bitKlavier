@@ -17,6 +17,7 @@
 #include "Tempo.h"
 #include "General.h"
 #include "Keymap.h"
+#include "Blendronomer.h"
 
 class SynchronicPreparation : public ReferenceCountedObject
 {
@@ -1217,6 +1218,7 @@ public:
     SynchronicProcessor(Synchronic::Ptr synchronic,
                         TuningProcessor::Ptr tuning,
                         TempoProcessor::Ptr tempo,
+						BlendronomerProcessor::Ptr blender,
                         BKSynthesiser* main,
                         GeneralSettings::Ptr general,
                         std::shared_ptr<MidiOutput>* output);
@@ -1269,6 +1271,11 @@ public:
     {
         tempo = newTempo;
     }
+
+	inline void setBlendronomer(BlendronomerProcessor::Ptr newBlend)
+	{
+		blendronomer = newBlend;
+	}
     
     inline Synchronic::Ptr getSynchronic(void) const noexcept
     {
@@ -1284,6 +1291,11 @@ public:
     {
         return tempo;
     }
+
+	inline BlendronomerProcessor::Ptr getBlendronomer(void) const noexcept
+	{
+		return blendronomer;
+	}
     
     inline int getTuningId(void) const noexcept
     {
@@ -1294,6 +1306,11 @@ public:
     {
         return tempo->getId();
     }
+
+	inline int getBlendronomerId(void) const noexcept
+	{
+		return blendronomer->getId();
+	}
 
     inline void prepareToPlay(float sr, BKSynthesiser* main)
     {
@@ -1328,6 +1345,7 @@ private:
     Synchronic::Ptr synchronic;
     TuningProcessor::Ptr tuner;
     TempoProcessor::Ptr tempo;
+	BlendronomerProcessor::Ptr blendronomer;
     
     std::shared_ptr<MidiOutput>* midiOutput;
     

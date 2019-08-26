@@ -139,35 +139,35 @@ void Gallery::randomize()
             TuningProcessor::Ptr tProc = new TuningProcessor(t);
             p->addTuningProcessor(tuningId);
 
-            Direct::Ptr d = new Direct(-1, true);
-            addDirect(d);
-            int directId = d->getId();
-            DirectProcessor::Ptr dProc = new DirectProcessor(d, tProc, dummySynth, dummySynth, dummySynth);
-            p->addDirectProcessor(directId);
+			Tempo::Ptr m = new Tempo(-1, true);
+			addTempo(m);
+			int tempoId = m->getId();
+			TempoProcessor::Ptr mProc = new TempoProcessor(m);
+			p->addTempoProcessor(tempoId);
 
-            Tempo::Ptr m = new Tempo(-1, true);
-            addTempo(m);
-            int tempoId = m->getId();
-            TempoProcessor::Ptr mProc = new TempoProcessor(m);
-            p->addTempoProcessor(tempoId);
-
-            Synchronic::Ptr s = new Synchronic(-1, true);
-            addSynchronic(s);
-            int synchronicId = s->getId();
-            SynchronicProcessor::Ptr sProc = new SynchronicProcessor(s, tProc, mProc, dummySynth, dummyGeneral, dummyOutput);
-            p->addSynchronicProcessor(synchronicId);
-
-            Nostalgic::Ptr n = new Nostalgic(-1, true);
-            addNostalgic(n);
-            int nostalgicId = n->getId();
-            NostalgicProcessor::Ptr nProc = new NostalgicProcessor(n, tProc, sProc, dummySynth);
-            p->addNostalgicProcessor(nostalgicId);
-			
 			Blendronomer::Ptr b = new Blendronomer(-1, true);
 			addBlendronomer(b);
 			int blendronomerId = b->getId();
 			BlendronomerProcessor::Ptr bProc = new BlendronomerProcessor(b, tProc, mProc, nullptr, dummyGeneral, dummySynth);
 			p->addBlendronomerProcessor(blendronomerId);
+
+            Direct::Ptr d = new Direct(-1, true);
+            addDirect(d);
+            int directId = d->getId();
+            DirectProcessor::Ptr dProc = new DirectProcessor(d, tProc, bProc, dummySynth, dummySynth, dummySynth);
+            p->addDirectProcessor(directId);
+
+            Synchronic::Ptr s = new Synchronic(-1, true);
+            addSynchronic(s);
+            int synchronicId = s->getId();
+            SynchronicProcessor::Ptr sProc = new SynchronicProcessor(s, tProc, mProc, bProc, dummySynth, dummyGeneral, dummyOutput);
+            p->addSynchronicProcessor(synchronicId);
+
+            Nostalgic::Ptr n = new Nostalgic(-1, true);
+            addNostalgic(n);
+            int nostalgicId = n->getId();
+            NostalgicProcessor::Ptr nProc = new NostalgicProcessor(n, tProc, sProc, bProc, dummySynth);
+            p->addNostalgicProcessor(nostalgicId);
 
             p->linkPreparationWithKeymap(PreparationTypeDirect, d->getId(), kp->getId());
 

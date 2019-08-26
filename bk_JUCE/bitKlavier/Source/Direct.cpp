@@ -11,7 +11,8 @@
 #include "Direct.h"
 
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
-                                 TuningProcessor::Ptr tuning,
+									TuningProcessor::Ptr tuning,
+									BlendronomerProcessor::Ptr blender,
                                  BKSynthesiser *s,
                                  BKSynthesiser *res,
                                  BKSynthesiser *ham):
@@ -19,7 +20,8 @@ synth(s),
 resonanceSynth(res),
 hammerSynth(ham),
 direct(direct),
-tuner(tuning)
+tuner(tuning),
+blendronomer(blender)
 {
     
 }
@@ -45,23 +47,48 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         }
         
         //DBG("DirectProcessor::keyPressed noteNumber, synthNoteNumber, synthOffset " + String(noteNumber) + " " + String(synthNoteNumber) + " " + String(synthOffset));
-        synth->keyOn(channel,
-                     noteNumber,
-                     synthNoteNumber,
-                     synthOffset,
-                     velocity,
-                     direct->aPrep->getGain() * aGlobalGain,
-                     Forward,
-                     Normal,
-                     MainNote,
-                     direct->getId(),
-                     0,     // start
-                     0,     // length
-                     direct->aPrep->getAttack(),
-                     direct->aPrep->getDecay(),
-                     direct->aPrep->getSustain(),
-                     direct->aPrep->getRelease(),
-                     tuner);
+		if (blendronomer != nullptr)
+		{
+			synth->keyOn(channel,
+				noteNumber,
+				synthNoteNumber,
+				synthOffset,
+				velocity,
+				direct->aPrep->getGain() * aGlobalGain,
+				Forward,
+				Normal,
+				MainNote,
+				direct->getId(),
+				0,     // start
+				0,     // length
+				direct->aPrep->getAttack(),
+				direct->aPrep->getDecay(),
+				direct->aPrep->getSustain(),
+				direct->aPrep->getRelease(),
+				tuner,
+				blendronomer->getBlendronomer()->aPrep->getInputGain(),
+				blendronomer->getDelay());
+		}
+		else
+		{
+			synth->keyOn(channel,
+				noteNumber,
+				synthNoteNumber,
+				synthOffset,
+				velocity,
+				direct->aPrep->getGain() * aGlobalGain,
+				Forward,
+				Normal,
+				MainNote,
+				direct->getId(),
+				0,     // start
+				0,     // length
+				direct->aPrep->getAttack(),
+				direct->aPrep->getDecay(),
+				direct->aPrep->getSustain(),
+				direct->aPrep->getRelease(),
+				tuner);
+		}
         
         //store synthNoteNumbers by noteNumber
         keyPlayed[noteNumber].add(synthNoteNumber);

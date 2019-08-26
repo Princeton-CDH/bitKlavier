@@ -89,6 +89,8 @@ void Piano::configure(void)
     defaultM = getTempoProcessor(DEFAULT_ID);
     
     defaultS = getSynchronicProcessor(DEFAULT_ID);
+
+	defaultB = getBlendronomerProcessor(DEFAULT_ID);
     
     for (auto item : items)
     {
@@ -119,11 +121,11 @@ void Piano::configure(void)
                 BKPreparationType targetType = target->getType();
                 int targetId = target->getId();
                 
-                if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo)
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo) || targetType == PreparationTypeBlendronomer)
                 {
                     linkPreparationWithKeymap(targetType, targetId, Id);
                 }
-                else if (targetType >= PreparationTypeDirectMod && targetType <= PreparationTypeTempoMod)
+                else if ((targetType >= PreparationTypeDirectMod && targetType <= PreparationTypeTempoMod) || targetType == PreparationTypeBlendronomerMod)
                 {
                     configureModification(target);
                 }
@@ -142,13 +144,13 @@ void Piano::configure(void)
         }
         else if (type == PreparationTypeTuning)
         {
-            // Look for synchronic, direct, and nostalgic targets
+            // Look for synchronic, direct, nostalgic, and blendronomer targets
             for (auto target : item->getConnections())
             {
                 BKPreparationType targetType = target->getType();
                 int targetId = target->getId();
                 
-                if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic)
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) || targetType == PreparationTypeBlendronomer)
                 {
                     linkPreparationWithTuning(targetType, targetId, processor.gallery->getTuning(Id));
                 }
@@ -182,6 +184,21 @@ void Piano::configure(void)
                 }
             }
         }
+
+		else if (type == PreparationTypeBlendronomer)
+		{
+			//look for direct, nostalgic, and synchronic targets
+			for (auto target : item->getConnections())
+			{
+				BKPreparationType targetType = target->getType();
+				int targetId = target->getId();
+
+				if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic)
+				{
+					linkPreparationWithBlendronomer(targetType, targetId, processor.gallery->getBlendronomer(Id));
+				}
+			}
+		}
     }
     
     //processor.updateState->pianoDidChangeForGraph = true;
@@ -192,6 +209,7 @@ SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
     SynchronicProcessor::Ptr sproc = new SynchronicProcessor(processor.gallery->getSynchronic(thisId),
                                         defaultT,
                                         defaultM,
+										defaultB,
                                         &processor.mainPianoSynth,
                                         processor.gallery->getGeneralSettings(),
                                         &processor.midiOutput);
@@ -267,6 +285,7 @@ NostalgicProcessor::Ptr Piano::addNostalgicProcessor(int thisId)
     NostalgicProcessor::Ptr nproc = new NostalgicProcessor(processor.gallery->getNostalgic(thisId),
                                        defaultT,
                                        defaultS,
+										defaultB,
                                        &processor.mainPianoSynth);
     nproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
     nprocessor.add(nproc);
@@ -278,6 +297,7 @@ DirectProcessor::Ptr Piano::addDirectProcessor(int thisId)
 {
     DirectProcessor::Ptr dproc = new DirectProcessor(processor.gallery->getDirect(thisId),
                                                      defaultT,
+													defaultB,
                                                      &processor.mainPianoSynth,
                                                      &processor.resonanceReleaseSynth,
                                                      &processor.hammerReleaseSynth);
@@ -372,6 +392,10 @@ void Piano::addProcessor(BKPreparationType thisType, int thisId)
     {
         addTempoProcessor(thisId);
     }
+	else if (thisType == PreparationTypeBlendronomer)
+	{
+		addBlendronomerProcessor(thisId);
+	}
 }
 
 bool Piano::contains(BKItem::Ptr thisItem)
@@ -443,6 +467,30 @@ void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tu
     }
 }
 
+void Piano::linkPreparationWithBlendronomer(BKPreparationType thisType, int thisId, Blendronomer::Ptr thisBlend)
+{
+	BlendronomerProcessor::Ptr bproc = getBlendronomerProcessor(thisBlend->getId());
+
+	if (thisType == PreparationTypeDirect)
+	{
+		DirectProcessor::Ptr dproc = getDirectProcessor(thisId);
+		
+		dproc->setBlendronomer(bproc);
+	}
+	else if (thisType == PreparationTypeSynchronic)
+	{
+		SynchronicProcessor::Ptr sproc = getSynchronicProcessor(thisId);
+
+		sproc->setBlendronomer(bproc);
+	}
+	else if (thisType == PreparationTypeNostalgic)
+	{
+		NostalgicProcessor::Ptr nproc = getNostalgicProcessor(thisId);
+
+		nproc->setBlendronomer(bproc);
+	}
+}
+
 void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, int keymapId)
 {
     PreparationMap::Ptr thisPreparationMap = getPreparationMapWithKeymap(keymapId);
@@ -484,6 +532,12 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         
         thisPreparationMap->addTuningProcessor(tproc);
     }
+	else if (thisType == PreparationTypeBlendronomer)
+	{
+		BlendronomerProcessor::Ptr bproc = getBlendronomerProcessor(thisId);
+
+		thisPreparationMap->addBlendronomerProcessor(bproc);
+	}
     
 }
 
@@ -533,7 +587,8 @@ void Piano::configureReset(BKItem::Ptr item)
     Array<int> synchronic = item->getConnectionIdsOfType(PreparationTypeSynchronic);
     Array<int> tempo = item->getConnectionIdsOfType(PreparationTypeTempo);
     Array<int> tuning = item->getConnectionIdsOfType(PreparationTypeTuning);
-    
+	Array<int> blendronomer = item->getConnectionIdsOfType(PreparationTypeBlendronomer);
+
     for (int i = 0; i < 128; i++) otherKeys.add(true);
     
     for (auto keymap : whichKeymaps)
@@ -549,6 +604,8 @@ void Piano::configureReset(BKItem::Ptr item)
             for (auto id : tuning) modificationMap[key]->tuningReset.add(id);
             
             for (auto id : tempo) modificationMap[key]->tempoReset.add(id);
+
+			for (auto id : blendronomer) modificationMap[key]->tempoReset.add(id);
             
             otherKeys.set(key, false);
         }
@@ -566,6 +623,7 @@ void Piano::deconfigureResetForKeys(BKItem::Ptr item, Array<bool> otherKeys)
     Array<int> synchronic = item->getConnectionIdsOfType(PreparationTypeSynchronic);
     Array<int> tempo = item->getConnectionIdsOfType(PreparationTypeTempo);
     Array<int> tuning = item->getConnectionIdsOfType(PreparationTypeTuning);
+	Array<int> blendronomer = item->getConnectionIdsOfType(PreparationTypeBlendronomer);
     
     for (int key = 0; key < 128; key++)
     {
@@ -610,9 +668,15 @@ void Piano::deconfigureResetForKeys(BKItem::Ptr item, Array<bool> otherKeys)
                     if (modificationMap[key]->tempoReset[i] == id) modificationMap[key]->tempoReset.remove(i);
                 }
             }
-        }
-        
-        
+
+			for (auto id : blendronomer)
+			{
+				for (int i = modificationMap[key]->blendronomerReset.size(); --i>0;)
+				{
+					if (modificationMap[key]->blendronomerReset[i] == id) modificationMap[key]->blendronomerReset.remove(i);
+				}
+			}
+        }        
     }
 }
 
@@ -669,6 +733,10 @@ void Piano::configureModification(BKItem::Ptr map)
     {
         configureTempoModification(processor.gallery->getTempoModification(Id), whichKeymaps, whichPreps);
     }
+	else if (modType == PreparationTypeBlendronomerMod)
+	{
+		configureBlendronomerModification(processor.gallery->getBlendronomerModification(Id), whichKeymaps, whichPreps);
+	}
 
 }
 
@@ -957,6 +1025,9 @@ void Piano::prepareToPlay(double sr)
     
     for (auto tproc : tprocessor)
         tproc->prepareToPlay(sampleRate);
+
+	for (auto bproc : bprocessor)
+		bproc->prepareToPlay(sampleRate);
 }
 
 ValueTree Piano::getState(void)
@@ -991,12 +1062,12 @@ ValueTree Piano::getState(void)
         {
             itemVT.addChild(item->getState(), -1, 0);
             
-            // Look for synchronic, direct, and nostalgic targets
+            // Look for synchronic, direct, blendronomer, and nostalgic targets
             for (auto target : item->getConnections())
             {
                 BKPreparationType targetType = target->getType();
                 
-                if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic)
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) || targetType == PreparationTypeBlendronomer)
                 {
                     connectionsVT.addChild(target->getState(), -1, 0);
                 }
@@ -1041,6 +1112,22 @@ ValueTree Piano::getState(void)
             itemVT.addChild(connectionsVT, -1, 0);
             pianoVT.addChild(itemVT, -1, 0);
         }
+		else if (type == PreparationTypeBlendronomer)
+		{
+			itemVT.addChild(item->getState(), -1, 0);
+			//look for direct, nostalgic, and synchronic targets
+			for (auto target : item->getConnections())
+			{
+				BKPreparationType targetType = target->getType();
+
+				if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic))
+				{
+					connectionsVT.addChild(target->getState(), -1, 0);
+				}
+			}
+			itemVT.addChild(connectionsVT, -1, 0);
+			pianoVT.addChild(itemVT, -1, 0);
+		}
         else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeReset)
         {
             itemVT.addChild(item->getState(), -1, 0);

@@ -13,6 +13,7 @@
 SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TuningProcessor::Ptr tuning,
                                          TempoProcessor::Ptr tempo,
+										BlendronomerProcessor::Ptr blender,
                                          BKSynthesiser* main,
                                          GeneralSettings::Ptr general,
                                          std::shared_ptr<MidiOutput>* output):
@@ -93,24 +94,51 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
         }
 
         int whichEnv = cluster->getEnvelopeCounter();
-        BKSynthesiserVoice* currentVoice =
-        synth->keyOn(channel,
-                     note,
-                     synthNoteNumber,
-                     synthOffset,
-                     velocity,
-                     prep->getGain() * aGlobalGain * prep->getAccentMultipliers()[cluster->getAccentMultiplierCounter()],
-                     noteDirection,
-                     FixedLengthFixedStart,
-                     SynchronicNote,
-                     synchronic->getId(),
-                     noteStartPos,  // start
-                     noteLength,
-                     prep->getAttack(whichEnv),
-                     prep->getDecay(whichEnv),
-                     prep->getSustain(whichEnv),
-                     prep->getRelease(whichEnv),
-                     tuner);
+		BKSynthesiserVoice* currentVoice;
+		if (blendronomer != nullptr)
+		{
+			currentVoice =
+				synth->keyOn(channel,
+					note,
+					synthNoteNumber,
+					synthOffset,
+					velocity,
+					prep->getGain() * aGlobalGain * prep->getAccentMultipliers()[cluster->getAccentMultiplierCounter()],
+					noteDirection,
+					FixedLengthFixedStart,
+					SynchronicNote,
+					synchronic->getId(),
+					noteStartPos,  // start
+					noteLength,
+					prep->getAttack(whichEnv),
+					prep->getDecay(whichEnv),
+					prep->getSustain(whichEnv),
+					prep->getRelease(whichEnv),
+					tuner,
+					blendronomer->getBlendronomer()->aPrep->getInputGain(),
+					blendronomer->getDelay());
+		}
+		else
+		{
+			currentVoice =
+				synth->keyOn(channel,
+					note,
+					synthNoteNumber,
+					synthOffset,
+					velocity,
+					prep->getGain() * aGlobalGain * prep->getAccentMultipliers()[cluster->getAccentMultiplierCounter()],
+					noteDirection,
+					FixedLengthFixedStart,
+					SynchronicNote,
+					synchronic->getId(),
+					noteStartPos,  // start
+					noteLength,
+					prep->getAttack(whichEnv),
+					prep->getDecay(whichEnv),
+					prep->getSustain(whichEnv),
+					prep->getRelease(whichEnv),
+					tuner);
+		}
         
         if (*midiOutput != nullptr)
         {

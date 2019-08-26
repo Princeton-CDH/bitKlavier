@@ -62,6 +62,7 @@ sfzero::Sample *sfzero::Sound::addSample(juce::String path, juce::String default
 
 void sfzero::Sound::addError(const juce::String &message) { errors_.add(message); }
 
+
 void sfzero::Sound::addUnsupportedOpcode(const juce::String &opcode)
 {
   if (!unsupportedOpcodes_.contains(opcode))

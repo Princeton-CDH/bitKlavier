@@ -70,6 +70,7 @@ public:
 	inline const int getVelocityMax() const noexcept { return velocityMax; }
 	inline const int getNumVoices() const noexcept { return bNumVoices; }
 	inline const bool getActive() const noexcept { return isActive; }
+	inline const bool getInputGain() const noexcept { return inputGain; }
 
 	//mutators
 	inline void setName(String n) { name = n; }
@@ -95,6 +96,7 @@ public:
 	inline const void setNumVoices(int numVoices) { bNumVoices = numVoices; }
 	inline const void setActive(bool newActive) { isActive = newActive; }
 	inline const void toggleActive() { isActive = !isActive; }
+	inline const void setInputGain(float gain) { inputGain = gain; }
 
 	void print(void);
 	ValueTree getState(void);
@@ -129,6 +131,9 @@ private:
 	float bInputThresh;
 	float bInputThreshSec;
 	int holdMin, holdMax, velocityMin, velocityMax;
+
+	//needed for sampling
+	float inputGain;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////

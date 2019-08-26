@@ -15,6 +15,7 @@
 #include "BKSynthesiser.h"
 #include "Keymap.h"
 #include "Tuning.h"
+#include "Blendronomer.h"
 
 class DirectPreparation : public ReferenceCountedObject
 {
@@ -401,7 +402,7 @@ public:
     
     
     DirectProcessor(Direct::Ptr direct,
-                    TuningProcessor::Ptr tuning,
+                    TuningProcessor::Ptr tuning, BlendronomerProcessor::Ptr blender,
                     BKSynthesiser *s, BKSynthesiser *res, BKSynthesiser *ham);
     
     ~DirectProcessor();
@@ -438,6 +439,16 @@ public:
     {
         return tuner;
     }
+
+	inline void setBlendronomer(BlendronomerProcessor::Ptr blend)
+	{
+		blendronomer = blend;
+	}
+
+	inline BlendronomerProcessor::Ptr getBlendronomer(void)
+	{
+		return blendronomer;
+	}
     
 private:
     BKSynthesiser*      synth;
@@ -446,6 +457,7 @@ private:
     
     Direct::Ptr             direct;
     TuningProcessor::Ptr    tuner;
+	BlendronomerProcessor::Ptr blendronomer;
     
     //need to keep track of the actual notes played and their offsets when a particular key is pressed
     //so that they can all be turned off properly, even in the event of a preparation change

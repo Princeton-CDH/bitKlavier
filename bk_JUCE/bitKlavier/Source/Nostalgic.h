@@ -18,6 +18,7 @@
 #include "Synchronic.h"
 #include "Tuning.h"
 #include "Keymap.h"
+#include "Blendronomer.h"
 
 class NostalgicPreparation : public ReferenceCountedObject
 {
@@ -811,6 +812,7 @@ public:
     NostalgicProcessor(Nostalgic::Ptr nostalgic,
                        TuningProcessor::Ptr tuning,
                        SynchronicProcessor::Ptr synchronic,
+						BlendronomerProcessor::Ptr blender,
                        BKSynthesiser *s);
     
     virtual ~NostalgicProcessor();
@@ -856,6 +858,21 @@ public:
     {
         return synchronic->getId();
     }
+
+	inline void setBlendronomer(BlendronomerProcessor::Ptr blend)
+	{
+		blendronomer = blend;
+	}
+
+	inline BlendronomerProcessor::Ptr getBlendronomer(void) const noexcept
+	{
+		return blendronomer;
+	}
+
+	inline int getBlendronomerId(void)
+	{
+		return blendronomer->getId();
+	}
     
     inline void setTuning(TuningProcessor::Ptr p)
     {
@@ -900,6 +917,7 @@ private:
     Nostalgic::Ptr                  nostalgic;
     TuningProcessor::Ptr            tuner;
     SynchronicProcessor::Ptr        synchronic;
+	BlendronomerProcessor::Ptr		blendronomer;
     
     Array<uint64> noteLengthTimers;     // store current length of played notes here
     Array<int> activeNotes;             // table of notes currently being played by player

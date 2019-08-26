@@ -260,6 +260,8 @@ public:
     
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
 
+	void linkPreparationWithBlendronomer(BKPreparationType thisType, int thisId, Blendronomer::Ptr thisBlend);
+
 	//TODO: figure out blendronomer linking
     
     ValueTree getState(void);
@@ -342,6 +344,7 @@ private:
     TuningProcessor::Ptr defaultT;
     TempoProcessor::Ptr defaultM;
     SynchronicProcessor::Ptr defaultS;
+	BlendronomerProcessor::Ptr defaultB;
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
     {
