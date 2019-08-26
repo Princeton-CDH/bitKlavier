@@ -194,7 +194,7 @@ public:
 		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
 	}
-	/*
+	
 	inline ValueTree getState(bool active = false)
 	{
 		ValueTree prep(vtagBlendronomer);
@@ -229,11 +229,6 @@ public:
 		}
 
 		aPrep->copy(aPrep);
-	}*/
-
-	inline void setState(XmlElement* e)
-	{
-		//dummy method
 	}
 
 	~Blendronomer() {};

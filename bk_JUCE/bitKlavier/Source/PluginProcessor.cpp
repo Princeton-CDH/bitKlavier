@@ -170,7 +170,7 @@ midiOutput(nullptr)
     defaultLoaded = true;
     defaultName = "Basic_Piano_xml";
     
-    //loadGalleryFromXml(XmlDocument::parse(xmlData).get());
+    loadGalleryFromXml(XmlDocument::parse(xmlData).get());
 
 #if JUCE_IOS
     platform = BKIOS;

@@ -846,22 +846,25 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
 		}
 		//need to figure out how to do this with multiple delay lines
 		//delay line for blendronomer
-		if (bDelay->getActive() == true)
-		{
-			bDelay->getDSmooth().tick();
-			delayL = bDelay->getDelay().tick((stk::StkFloat)*outL);
-			if (outR != nullptr) delayR = bDelay->getDelay().tick((stk::StkFloat)*outR);
-			bDelay->updateDelayFromSmooth();
-			if (outR != nullptr)
-			{
-				*outL++ += (delayL * blendronicLevel);
-				*outR++ += (delayR * blendronicLevel);
-			}
-			else
-			{
-				*outL++ += delayL * blendronicLevel;
-			}
-		}
+        if (bDelay != nullptr)
+        {
+            if (bDelay->getActive() == true)
+            {
+                bDelay->getDSmooth().tick();
+                delayL = bDelay->getDelay().tick((stk::StkFloat)*outL);
+                if (outR != nullptr) delayR = bDelay->getDelay().tick((stk::StkFloat)*outR);
+                bDelay->updateDelayFromSmooth();
+                if (outR != nullptr)
+                {
+                    *outL++ += (delayL * blendronicLevel);
+                    *outR++ += (delayR * blendronicLevel);
+                }
+                else
+                {
+                    *outL++ += delayL * blendronicLevel;
+                }
+            }
+        }
         if (playDirection == Forward)
         {
             sourceSamplePosition += bentRatio;

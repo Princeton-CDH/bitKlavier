@@ -246,19 +246,19 @@ typedef enum BKPreparationType {
     PreparationTypeNostalgic,
     PreparationTypeTuning,
     PreparationTypeTempo,
-	PreparationTypeBlendronomer,
     PreparationTypeKeymap,
     PreparationTypeDirectMod,
     PreparationTypeSynchronicMod,
     PreparationTypeNostalgicMod,
     PreparationTypeTuningMod,
     PreparationTypeTempoMod,
-	PreparationTypeBlendronomerMod,
     PreparationTypeGenericMod,
     PreparationTypePianoMap,
     PreparationTypeReset,
     PreparationTypePiano,
     PreparationTypeComment,
+    PreparationTypeBlendronomer,
+    PreparationTypeBlendronomerMod,
     BKPreparationTypeNil
 } BKPreparationType;
 
@@ -279,19 +279,19 @@ static const std::vector<std::string> cPreparationTypes = {
     "Nostalgic",
     "Tuning",
     "Tempo",
-	"Blendronomer",
     "Keymap",
     "DirectMod",
     "SynchronicMod",
     "NostalgicMod",
     "TuningMod",
     "TempoMod",
-	"BlendronomerMod",
     "GenericMod",
     "PianoMap",
     "Reset",
     "Piano",
-    "Comment"
+    "Comment",
+    "Blendronomer",
+    "BlendronomerMod"
 };
 
 typedef enum BKPreparationDisplay {
@@ -300,17 +300,17 @@ typedef enum BKPreparationDisplay {
     DisplayNostalgic,
     DisplayTuning,
     DisplayTempo,
-	DisplayBlendronomer,
     DisplayKeymap,
     DisplayDirectMod,
     DisplaySynchronicMod,
     DisplayNostalgicMod,
     DisplayTuningMod,
     DisplayTempoMod,
-	DisplayBlendronomerMod,
     DisplayGeneral,
     DisplayAbout,
     DisplayComment,
+    DisplayBlendronomer,
+    DisplayBlendronomerMod,
     DisplayNil,
 } BKPreparationDisplay;
 

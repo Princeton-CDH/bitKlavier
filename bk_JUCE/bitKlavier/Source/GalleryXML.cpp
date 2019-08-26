@@ -69,6 +69,8 @@ ValueTree  Gallery::getState(void)
     
     for (int i = 0; i < nostalgic.size(); i++)              galleryVT.addChild( nostalgic[i]->getState(), -1, 0);
     
+    for (int i = 0; i < blendronomer.size(); i++)           galleryVT.addChild( blendronomer[i]->getState(), -1, 0);
+    
     for (int i = 0; i < modTempo.size(); i++)               galleryVT.addChild( modTempo[i]->getState(), -1, 0);
     
     for (int i = 0; i < modTuning.size(); i++)              galleryVT.addChild( modTuning[i]->getState(), -1, 0);
@@ -78,6 +80,8 @@ ValueTree  Gallery::getState(void)
     for (int i = 0; i < modSynchronic.size(); i++)          galleryVT.addChild( modSynchronic[i]->getState(), -1, 0);
     
     for (int i = 0; i < modNostalgic.size(); i++)           galleryVT.addChild( modNostalgic[i]->getState(), -1, 0);
+    
+    for (int i = 0; i < modBlendronomer.size(); i++)        galleryVT.addChild( modBlendronomer[i]->getState(), -1, 0);
     
     for (int i = 0; i < bkKeymaps.size(); i++)              galleryVT.addChild( bkKeymaps[i]->getState(), -1, 0);
     
@@ -260,6 +264,28 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 int newId = transformId(PreparationTypeNostalgicMod, oldId);
                 
                 modNostalgic.getLast()->setId(newId);
+            }
+            else if (e->hasTagName( vtagBlendronomer))
+            {
+                addBlendronomerWithId(0);
+                
+                blendronomer.getLast()->setState(e);
+                
+                int oldId = blendronomer.getLast()->getId();
+                int newId = transformId(PreparationTypeBlendronomer, oldId);
+                
+                blendronomer.getLast()->setId(newId);
+            }
+            else if (e->hasTagName( vtagModBlendronomer))
+            {
+                addBlendronomerModWithId(0);
+                
+                modBlendronomer.getLast()->setState(e);
+                
+                int oldId = modBlendronomer.getLast()->getId();
+                int newId = transformId(PreparationTypeBlendronomerMod, oldId);
+                
+                modBlendronomer.getLast()->setId(newId);
             }
             else if (e->hasTagName(vtagPiano))
             {
