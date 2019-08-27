@@ -45,7 +45,6 @@ private:
   double sampleRate_;
   juce::uint64 sampleLength_, loopStart_, loopEnd_;
 
-  //JUCE_HEAVYWEIGHT_LEAK_DETECTOR(Sample)
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Sample)
 };
 }

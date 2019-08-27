@@ -89,7 +89,15 @@ BKViewController(p, theGraph, 2)
     selectCB.setSelectedId(1, dontSendNotification);
     selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(&selectCB, ALL);
-    
+#if JUCE_MAC
+    midiOutputSelectCB.setName("MIDI Output");
+    midiOutputSelectCB.addSeparator();
+    midiOutputSelectCB.addListener(this);
+    midiOutputSelectCB.BKSetJustificationType(juce::Justification::centredRight);
+    midiOutputSelectCB.setSelectedItemIndex(0, dontSendNotification);
+    midiOutputSelectCB.setTooltip("Select the MIDI output device for this preparation");
+    addAndMakeVisible(&midiOutputSelectCB, ALL);
+#endif
     // MODE
     modeSelectCB.setName("Mode");
     modeSelectCB.addSeparator();
@@ -274,6 +282,11 @@ void SynchronicViewController::displayShared(void)
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
+    
+    midiOutputSelectCB.setBounds(actionButton.getRight()+gXSpacing,
+                                 actionButton.getY(),
+                                 selectCB.getWidth(),
+                                 selectCB.getHeight());
     
     comboBoxSlice.removeFromLeft(gXSpacing);
     
@@ -1113,6 +1126,33 @@ void SynchronicPreparationEditor::fillSelectCB(int last, int current)
     lastId = selectedId;
 }
 
+void SynchronicPreparationEditor::fillMidiOutputSelectCB()
+{
+//    midiOutputSelectCB.clear(dontSendNotification);
+//
+//    int Id = 0;
+//    midiOutputSelectCB.addItem("No MIDI Output Selected", Id);
+//    midiOutputSelectCB.setItemEnabled(Id++, true);
+//    for (auto device : processor->getMidiOutputDevices())
+//    {
+//        String name = device->getName();
+//
+//        if (name != String())  midiOutputSelectCB.addItem(name, Id);
+//        else                   midiOutputSelectCB.addItem("Device"+String(Id), Id);
+//
+//        midiOutputSelectCB.setItemEnabled(Id++, true);
+//
+//    }
+//
+//    int selectedId = processor.updateState->currentMidiOutputId;
+//
+//    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+//
+//    selectCB.setItemEnabled(selectedId, false);
+//
+//    lastId = selectedId;
+}
+
 
 int SynchronicPreparationEditor::addPreparation(void)
 {
@@ -1388,6 +1428,7 @@ SynchronicViewController(p, theGraph)
     
     selectCB.addListener(this);
     selectCB.addMyListener(this);
+    midiOutputSelectCB.addListener(this);
     modeSelectCB.addListener(this);
     onOffSelectCB.addListener(this);
     offsetParamStartToggle.addListener(this);
@@ -1415,6 +1456,7 @@ SynchronicViewController(p, theGraph)
 
 void SynchronicModificationEditor::greyOutAllComponents()
 {
+    midiOutputSelectCB.setAlpha(gModAlpha);
     modeSelectCB.setAlpha(gModAlpha);
     modeLabel.setAlpha(gModAlpha);
     onOffSelectCB.setAlpha(gModAlpha);
@@ -1602,6 +1644,11 @@ void SynchronicModificationEditor::update(NotificationType notify)
         }
     }
 
+}
+
+void SynchronicModificationEditor::fillMidiOutputSelectCB()
+{
+    
 }
 
 void SynchronicModificationEditor::fillModeSelectCB()

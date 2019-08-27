@@ -46,7 +46,7 @@ public:
     void loadJsonGalleryFromPath(String path);
     void saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
-    void createNewGallery(String name, XmlElement* xml = nullptr);
+    void createNewGallery(String name, std::shared_ptr<XmlElement> xml = nullptr);
     void renameGallery(String name);
     void duplicateGallery(String name);
     void deleteGallery(void);

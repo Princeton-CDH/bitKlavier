@@ -92,6 +92,9 @@ protected:
     }
     
     BKEditableComboBox selectCB;
+    
+    BKComboBox midiOutputSelectCB;
+    
     BKComboBox modeSelectCB;
     
     BKComboBox onOffSelectCB;
@@ -155,6 +158,7 @@ public:
     void timerCallback() override;
     
     void fillSelectCB(int last, int current);
+    void fillMidiOutputSelectCB(void);
     void fillModeSelectCB(void);
     
     static void actionButtonCallback(int action, SynchronicPreparationEditor*);
@@ -212,6 +216,7 @@ public:
     void timerCallback() override;
     
     void fillSelectCB(int last, int current);
+    void fillMidiOutputSelectCB(void);
     void fillModeSelectCB(void);
     
     static void actionButtonCallback(int action, SynchronicModificationEditor*);

@@ -399,7 +399,7 @@ void BKAudioProcessor::deleteGalleryAtURL(String path)
 }
 
 
-void BKAudioProcessor::createNewGallery(String name, XmlElement* xml)
+void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement> xml)
 {
     updateState->loadedJson = false;
     
@@ -423,7 +423,7 @@ void BKAudioProcessor::createNewGallery(String name, XmlElement* xml)
     if (xml == nullptr)
     {
         myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
-        xml = XmlDocument::parse(myFile).get();
+        xml = std::move(XmlDocument::parse(myFile));
         xml->setAttribute("name", galleryName);
         xml->writeToFile(myFile, "");
     }
@@ -443,7 +443,7 @@ void BKAudioProcessor::createNewGallery(String name, XmlElement* xml)
         
         DBG("new gallery: " + currentGallery);
 
-        gallery = new Gallery(xml, *this);
+        gallery = new Gallery(xml.get(), *this);
         
         gallery->setURL(myFile.getFullPathName());
         gallery->setName(currentGallery);
@@ -1039,9 +1039,9 @@ void BKAudioProcessor::importCurrentGallery(void)
             
              if (url.createInputStream (false) != nullptr)
              {
-                 std::unique_ptr<XmlElement> xml = url.readEntireXmlStream();
+                 std::shared_ptr<XmlElement> xml = std::move(url.readEntireXmlStream());
                 
-                 createNewGallery(url.getFileName().replace("%20", " "), xml.get());
+                 createNewGallery(url.getFileName().replace("%20", " "), xml);
              }
          }
      });
