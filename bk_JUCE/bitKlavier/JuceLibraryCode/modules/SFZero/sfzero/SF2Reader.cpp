@@ -43,6 +43,7 @@ void sfzero::SF2Reader::read()
     }
     chunk.seekAfter(file_);
   }
+    
   if (!hydra.isComplete())
   {
     sound_->addError("Invalid SF2 file (missing or incomplete hydra).");

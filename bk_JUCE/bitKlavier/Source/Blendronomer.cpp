@@ -139,6 +139,7 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer, Tu
 			blendronomer->aPrep->getSmoothDuration(),
 			true); //currently for testing
 	}
+	numSamplesBeat = blendronomer->aPrep->getBeats()[beatIndex] * 0.5 * 48000; //should be samplerate
 }
 
 BlendronomerProcessor::~BlendronomerProcessor()
@@ -148,8 +149,11 @@ BlendronomerProcessor::~BlendronomerProcessor()
 void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 {
 	sampleTimer += numSamples;
+	DBG("sample rate is " + String(sampleRate));
+	DBG("processing blendronomer block, timer is at " + String(sampleTimer) + "out of " + String(numSamplesBeat));
 	if (sampleTimer >= numSamplesBeat)
 	{
+		DBG("sample timer has been exceeded");
 		beatIndex++;
 		if (beatIndex > blendronomer->aPrep->getBeats().size()) beatIndex = 0;
 		smoothIndex++;
@@ -158,9 +162,11 @@ void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 		if (gainIndex > blendronomer->aPrep->getFeedbackCoefficients().size()) gainIndex = 0;
 		clickIndex++;
 		if (clickIndex > blendronomer->aPrep->getClickGains().size()) clickIndex = 0;
-		numSamplesBeat = blendronomer->aPrep->getBeats()[beatIndex];
+		//numSamplesBeat = blendronomer->aPrep->getBeats()[beatIndex] * tempo->getTempo()->aPrep->getBeatThresh() * sampleRate;
+		numSamplesBeat = blendronomer->aPrep->getBeats()[beatIndex] * 0.5 * 48000; //should be samplerate
 		sampleTimer = 0;
 	}
+	updateDelay();
 }
 
 float BlendronomerProcessor::getTimeToBeatMS(float beatsToSkip)
@@ -186,7 +192,7 @@ void BlendronomerProcessor::postRelease(int midiNoteNumber, int midiChannel)
 
 void BlendronomerProcessor::prepareToPlay(double sr)
 {
-	//TBD?
+	sampleRate = sr;
 }
 
 void BlendronomerProcessor::playNote(int channel, int note, float velocity)

@@ -1353,6 +1353,9 @@ void BKAudioProcessor::initializeGallery(void)
     
     updateGalleries();
 
+#if TESTING_BLENDRONOMER
+	gallery->createBlendronomerTest();
+#endif
 }
 
 void BKAudioProcessor::reset(BKPreparationType type, int Id)

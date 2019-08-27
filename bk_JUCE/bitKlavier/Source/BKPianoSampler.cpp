@@ -839,6 +839,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
 		//delay line for blendronomer
         if (bDelay != nullptr)
         {
+			//DBG("starting delay line stuff");
             if (bDelay->getActive() == true)
             {
                 bDelay->getDSmooth()->tick();
@@ -846,13 +847,16 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
 				{
 					delayL = bDelay->getDelay()->tick((stk::StkFloat)l);
 					delayR = bDelay->getDelay()->tick((stk::StkFloat)r);
-					l += (delayL * blendronicLevel);
-					r += (delayR * blendronicLevel);
+					//DBG("Delay left: " + String(delayL));
+					//DBG("Delay right: " + String(delayR));
+					l += (delayL * 1.0f); //should be blendronicLevel
+					r += (delayR * 1.0f); //should be blendronicLevel
 				}
 				else
 				{
 					delayL = (bDelay->getDelay()->tick((stk::StkFloat)l) + bDelay->getDelay()->tick((stk::StkFloat)r)) * 0.5f;
-					l += delayL * blendronicLevel;
+					//DBG("Delay left: " + String(delayL));
+					l += delayL * 1.0f; //should be blendronicLevel
 				}
                 bDelay->updateDelayFromSmooth();
             }

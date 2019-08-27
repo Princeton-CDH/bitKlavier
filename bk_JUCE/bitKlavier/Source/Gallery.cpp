@@ -26,10 +26,6 @@ processor(p)
     general = new GeneralSettings();
     
     addDefaultPrepIfNotThere();
-
-#if TESTING_BLENDRONOMER
-	createBlendronomerTest();
-#endif
     
     isDirty = false;
 }
