@@ -36,8 +36,8 @@ public:
 	BKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active = false);
 
 	//accessors
-	inline stk::DelayL getDelay() const noexcept { return delayLinear; }
-	inline stk::Envelope getDSmooth() const noexcept { return dSmooth; }
+    inline std::shared_ptr<stk::DelayL> getDelay() const noexcept { return delayLinear; }
+	inline std::shared_ptr<stk::Envelope> getDSmooth() const noexcept { return dSmooth; }
 	inline const float getDelayMax() const noexcept { return dDelayMax; }
 	inline const float getDelayGain() const noexcept { return dDelayGain; }
 	inline const float getDelayLength() const noexcept { return dDelayLength; }
@@ -57,8 +57,8 @@ public:
 	inline const void toggleActive() { dBlendronicActive = !dBlendronicActive; }
 
 private:
-	stk::DelayL delayLinear;
-	stk::Envelope dSmooth;
+    std::shared_ptr<stk::DelayL> delayLinear;
+	std::shared_ptr<stk::Envelope> dSmooth;
 	float dDelayLength;
 	float dDelayMax;
 	float dDelayGain;

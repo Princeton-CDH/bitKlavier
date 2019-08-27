@@ -30,24 +30,24 @@ BKDelay::BKDelay(float delayMax, float delayGain, float delayLength, float smoot
 	dSmoothDuration(smoothDuration),
 	dBlendronicActive(active)
 {
-	delayLinear = stk::DelayL(dDelayLength, dDelayMax);
-	dSmooth = stk::Envelope();
-	delayLinear.setGain(dDelayGain);
-	dSmooth.setValue(dSmoothValue);
-	dSmooth.setTime(dSmoothDuration);
+    delayLinear = std::make_shared<stk::DelayL>(dDelayLength, dDelayMax);
+	dSmooth = std::make_shared<stk::Envelope>();
+	delayLinear->setGain(dDelayGain);
+	dSmooth->setValue(dSmoothValue);
+	dSmooth->setTime(dSmoothDuration);
 }
 
 void BKDelay::updateValues()
 {
-	delayLinear.setDelay(dDelayLength);
-	delayLinear.setMaximumDelay(dDelayMax);
-	delayLinear.setGain(dDelayGain);
-	dSmooth.setValue(dSmoothValue);
-	dSmooth.setTime(dSmoothDuration);
+	delayLinear->setDelay(dDelayLength);
+	delayLinear->setMaximumDelay(dDelayMax);
+	delayLinear->setGain(dDelayGain);
+	dSmooth->setValue(dSmoothValue);
+	dSmooth->setTime(dSmoothDuration);
 }
 
 void BKDelay::updateDelayFromSmooth()
 {
 	dDelayLength = dSmoothValue;
-	delayLinear.setDelay(dSmoothValue);
+	delayLinear->setDelay(dSmoothValue);
 }
