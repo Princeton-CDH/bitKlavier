@@ -27,6 +27,9 @@ processor(p)
     
     addDefaultPrepIfNotThere();
 
+#if TESTING_BLENDRONOMER
+	createBlendronomerTest();
+#endif
     
     isDirty = false;
 }

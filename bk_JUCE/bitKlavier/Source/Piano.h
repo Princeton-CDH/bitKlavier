@@ -20,6 +20,7 @@
 #include "Modifications.h"
 
 #include "Keymap.h"
+#include "BKSTK.h"
 
 #include "PianoConfig.h"
 
@@ -261,8 +262,6 @@ public:
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
 
 	void linkPreparationWithBlendronomer(BKPreparationType thisType, int thisId, Blendronomer::Ptr thisBlend);
-
-	//TODO: figure out blendronomer linking
     
     ValueTree getState(void);
     
@@ -345,6 +344,7 @@ private:
     TempoProcessor::Ptr defaultM;
     SynchronicProcessor::Ptr defaultS;
 	BlendronomerProcessor::Ptr defaultB;
+	BKDelay::Ptr defaultD;
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
     {

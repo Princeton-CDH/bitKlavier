@@ -173,6 +173,13 @@ void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool sho
     subBlockSubdivisionIsStrict = shouldBeStrict;
 }
 
+BKDelay::Ptr BKSynthesiser::addBKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active)
+{
+	BKDelay::Ptr delay = new BKDelay(delayMax, delayGain, delayLength, smoothValue, smoothDuration, active);
+	delays.add(delay);
+	return delay;
+}
+
 //==============================================================================
 void BKSynthesiser::setCurrentPlaybackSampleRate (const double newRate)
 {

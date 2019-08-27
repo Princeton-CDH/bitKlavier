@@ -806,6 +806,8 @@ public:
     OwnedArray<HashMap<int,int>> idmap;
     
     void addPiano(XmlElement* xml, OwnedArray<HashMap<int,int>>* map);
+
+	void createBlendronomerTest();
     
     
 private:

@@ -1243,3 +1243,22 @@ void Gallery::clean(void)
     
     setGalleryDirty(true);
 }
+
+void Gallery::createBlendronomerTest()
+{
+	DBG("Starting blendronomer test creation");
+	addPianoWithId(9999);
+	addKeymapWithId(9998);
+	DBG("Piano and keymap added");
+	Piano::Ptr piano = getPiano(9999);
+	int prepMapId = piano->addPreparationMap(getKeymap(9998));
+	DirectProcessor::Ptr direct = piano->addDirectProcessor(9997);
+	TuningProcessor::Ptr tuning = piano->addTuningProcessor(9996);
+	BlendronomerProcessor::Ptr blender = piano->addBlendronomerProcessor(9995);
+	piano->linkPreparationWithKeymap(PreparationTypeDirect, 9997, 9998);
+	piano->linkPreparationWithKeymap(PreparationTypeTuning, 9996, 9998);
+	piano->linkPreparationWithKeymap(PreparationTypeBlendronomer, 9995, 9998);
+	piano->linkPreparationWithTuning(PreparationTypeBlendronomer, 9995, tuning->getTuning());
+	piano->linkPreparationWithTuning(PreparationTypeDirect, 9997, tuning->getTuning());
+	piano->linkPreparationWithBlendronomer(PreparationTypeDirect, 9997, blender->getBlendronomer());
+}

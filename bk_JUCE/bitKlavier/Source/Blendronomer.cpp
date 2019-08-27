@@ -130,6 +130,15 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer, Tu
 	gainIndex(0),
 	clickIndex(0)
 {
+	if (delayL == nullptr)
+	{
+		delay = bMain->addBKDelay(blendronomer->aPrep->getDelayMax(),
+			blendronomer->aPrep->getFeedbackGain(),
+			blendronomer->aPrep->getDelayLength(),
+			blendronomer->aPrep->getSmoothValue(),
+			blendronomer->aPrep->getSmoothDuration(),
+			true); //currently for testing
+	}
 }
 
 BlendronomerProcessor::~BlendronomerProcessor()

@@ -645,6 +645,8 @@ public:
      (this can sometimes help to avoid quantisation or phasing issues).
      */
     void setMinimumRenderingSubdivisionSize (int numSamples, bool shouldBeStrict = false) noexcept;
+
+	BKDelay::Ptr addBKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active = false);
     
     GeneralSettings::Ptr generalSettings;
     

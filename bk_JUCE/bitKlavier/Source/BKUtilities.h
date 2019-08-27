@@ -21,6 +21,8 @@
 
 #define BK_UNIT_TESTS 0
 
+#define TESTING_BLENDRONOMER 1
+
 #define NUM_EPOCHS 10
 
 #define SAVE_ID 1
