@@ -101,8 +101,7 @@ hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
 doneWithSetStateInfo(false),
-loader(*this),
-midiOutput(nullptr)
+loader(*this)
 {
 #if BK_UNIT_TESTS
     
@@ -1356,6 +1355,11 @@ void BKAudioProcessor::initializeGallery(void)
 #if TESTING_BLENDRONOMER
 	gallery->createBlendronomerTest();
 #endif
+}
+
+Array<MidiDeviceInfo> BKAudioProcessor::getMidiOutputDevices()
+{
+    return MidiOutput::getAvailableDevices();
 }
 
 void BKAudioProcessor::reset(BKPreparationType type, int Id)

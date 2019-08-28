@@ -233,19 +233,19 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
     galleryMenu.addSeparator();
     galleryMenu.addItem(SETTINGS_ID, "Settings");
-#if JUCE_MAC
-    PopupMenu midiOutputMenu;
-
-    Array<MidiDeviceInfo> availableOutputs = MidiOutput::getAvailableDevices();
-    
-    int i = 0;
-    for (MidiDeviceInfo output : availableOutputs) {
-        bool isTicked = false;
-        if (processor.midiOutput != nullptr) isTicked = output.name == (*processor.midiOutput).getName();
-        midiOutputMenu.addItem(MIDIOUT_ID + (i++), output.name, true, isTicked);
-    }
-    galleryMenu.addSubMenu("MIDI Output", midiOutputMenu);
-#endif
+//#if JUCE_MAC
+//    PopupMenu midiOutputMenu;
+//
+//    Array<MidiDeviceInfo> availableOutputs = MidiOutput::getAvailableDevices();
+//
+//    int i = 0;
+//    for (MidiDeviceInfo output : availableOutputs) {
+//        bool isTicked = false;
+//        if (processor.midiOutput != nullptr) isTicked = output.name == (*processor.midiOutput).getName();
+//        midiOutputMenu.addItem(MIDIOUT_ID + (i++), output.name, true, isTicked);
+//    }
+//    galleryMenu.addSubMenu("MIDI Output", midiOutputMenu);
+//#endif
     galleryMenu.addSeparator();
     galleryMenu.addItem(ABOUT_ID, "About bitKlavier...");
     
@@ -544,21 +544,21 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         processor.updateState->setCurrentDisplay(DisplayAbout);
     }
-    else if (result >= MIDIOUT_ID)
-    {
-        // Try to open the output selected from the Gallery menu
-        Array<MidiDeviceInfo> availableOutputs = MidiOutput::getAvailableDevices();
-        MidiDeviceInfo outputInfo = availableOutputs[result - MIDIOUT_ID];
-        std::unique_ptr<MidiOutput> output = MidiOutput::openDevice(outputInfo.identifier);
-        // If the output successfully opens
-        if (output) {
-            DBG("MIDI output set to " + outputInfo.name);
-            processor.midiOutput = std::move(output);
-        }
-        else {
-            DBG("Could not open MIDI output device");
-        }
-    }
+//    else if (result >= MIDIOUT_ID)
+//    {
+//        // Try to open the output selected from the Gallery menu
+//        Array<MidiDeviceInfo> availableOutputs = MidiOutput::getAvailableDevices();
+//        MidiDeviceInfo outputInfo = availableOutputs[result - MIDIOUT_ID];
+//        std::unique_ptr<MidiOutput> output = MidiOutput::openDevice(outputInfo.identifier);
+//        // If the output successfully opens
+//        if (output) {
+//            DBG("MIDI output set to " + outputInfo.name);
+//            processor.midiOutput = std::move(output);
+//        }
+//        else {
+//            DBG("Could not open MIDI output device");
+//        }
+//    }
 }
 
 void HeaderViewController::bkButtonClicked (Button* b)

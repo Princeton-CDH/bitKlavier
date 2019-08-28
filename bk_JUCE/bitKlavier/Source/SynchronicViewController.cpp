@@ -672,6 +672,8 @@ SynchronicViewController(p, theGraph)
     
     fillModeSelectCB();
     
+    fillMidiOutputSelectCB();
+    
 }
 
 void SynchronicPreparationEditor::fillModeSelectCB()
@@ -1128,29 +1130,30 @@ void SynchronicPreparationEditor::fillSelectCB(int last, int current)
 
 void SynchronicPreparationEditor::fillMidiOutputSelectCB()
 {
-//    midiOutputSelectCB.clear(dontSendNotification);
-//
-//    int Id = 0;
-//    midiOutputSelectCB.addItem("No MIDI Output Selected", Id);
-//    midiOutputSelectCB.setItemEnabled(Id++, true);
-//    for (auto device : processor->getMidiOutputDevices())
-//    {
-//        String name = device->getName();
-//
-//        if (name != String())  midiOutputSelectCB.addItem(name, Id);
-//        else                   midiOutputSelectCB.addItem("Device"+String(Id), Id);
-//
-//        midiOutputSelectCB.setItemEnabled(Id++, true);
-//
-//    }
-//
-//    int selectedId = processor.updateState->currentMidiOutputId;
-//
-//    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
-//
-//    selectCB.setItemEnabled(selectedId, false);
-//
-//    lastId = selectedId;
+    SynchronicPreparation::Ptr prep = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    
+    midiOutputSelectCB.clear(dontSendNotification);
+
+    int Id = 1;
+    midiOutputSelectCB.addItem("No MIDI Output Selected", Id);
+    midiOutputSelectCB.setItemEnabled(Id++, true);
+    for (auto device : processor.getMidiOutputDevices())
+    {
+        String name = device.name;
+
+        if (name != String())  midiOutputSelectCB.addItem(name, Id);
+        else                   midiOutputSelectCB.addItem("Device"+String(Id), Id);
+
+        if (prep->getMidiOutput() != nullptr)
+        {
+            if (name == prep->getMidiOutput()->getName())
+            {
+                midiOutputSelectCB.setSelectedId(Id, NotificationType::dontSendNotification);
+            }
+        }
+        else midiOutputSelectCB.setSelectedId(1, NotificationType::dontSendNotification);
+        midiOutputSelectCB.setItemEnabled(Id++, true);
+    }
 }
 
 
@@ -1321,6 +1324,24 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         fillModeSelectCB();
         
+    }
+    else if (name == "MIDI Output")
+    {
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        if (index > 0)
+        {
+            prep    ->setMidiOutput(processor.getMidiOutputDevices()[index-1]);
+            active  ->setMidiOutput(processor.getMidiOutputDevices()[index-1]);
+        }
+        else
+        {
+            prep    ->setMidiOutput(nullptr);
+            active  ->setMidiOutput(nullptr);
+        }
+        
+        fillMidiOutputSelectCB();
     }
 }
 

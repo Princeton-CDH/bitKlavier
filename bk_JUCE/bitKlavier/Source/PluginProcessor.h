@@ -117,8 +117,6 @@ public:
     
     bool                                defaultLoaded;
     String                              defaultName;
-    
-    std::shared_ptr<MidiOutput>         midiOutput;
 
     void updateGalleries(void);
     
@@ -325,6 +323,8 @@ public:
     
     void exportPiano(int Id, String name);
     void importPiano(int Id, int importId);
+    
+    Array<MidiDeviceInfo> getMidiOutputDevices();
     
 private:
     

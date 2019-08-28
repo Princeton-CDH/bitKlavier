@@ -367,7 +367,7 @@ BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
             upperLeftest = newItem;
         }
         
-        newItem->setContent(processor.getPreparationState(item->getType(), item->getId()).createXml().get());
+        newItem->setContent(std::move(processor.getPreparationState(item->getType(), item->getId()).createXml()));
         
         clipboard.add(newItem);
     }
@@ -438,7 +438,7 @@ void BKConstructionSite::paste(void)
         int oldId = item->getId();
 
         // duplicate (all we need to do is set to new Id and add to gallery)
-        int newId = processor.gallery->addCopy(type, newItem->getContent());
+        int newId = processor.gallery->addCopy(type, newItem->getContent().get());
         
         pastemap[type]->set(oldId, newId);
 

@@ -211,8 +211,7 @@ SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
                                         defaultM,
 										defaultB,
                                         &processor.mainPianoSynth,
-                                        processor.gallery->getGeneralSettings(),
-                                        &processor.midiOutput);
+                                        processor.gallery->getGeneralSettings());
     sproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
     sprocessor.add(sproc);
     

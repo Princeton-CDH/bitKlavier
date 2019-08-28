@@ -55,7 +55,8 @@ public:
     sClusterThreshSec(p->getClusterThreshSEC()),
     sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic()),
     numClusters(1),
-    onOffMode(KeyOn)
+    onOffMode(KeyOn),
+    midiOutput(p->getMidiOutput())
     {
         
     }
@@ -90,7 +91,8 @@ public:
     velocityMin(0),
     velocityMax(127),
     numClusters(1),
-    onOffMode(KeyOn)
+    onOffMode(KeyOn),
+    midiOutput(nullptr)
     {
     }
 
@@ -118,7 +120,8 @@ public:
     velocityMin(0),
     velocityMax(127),
     numClusters(1),
-    onOffMode(KeyOn)
+    onOffMode(KeyOn),
+    midiOutput(nullptr)
     {
         sTransposition.ensureStorageAllocated(1);
         sTransposition.add(Array<float>({0.0}));
@@ -156,6 +159,8 @@ public:
         
         velocityMin = s->getVelocityMin();
         velocityMax = s->getVelocityMax();
+        
+        midiOutput = s->getMidiOutput();
     }
     
     inline void performModification(SynchronicPreparation::Ptr s, Array<bool> dirty)
@@ -195,6 +200,8 @@ public:
         
         if (dirty[SynchronicVelocityMin]) velocityMin = s->getVelocityMin();
         if (dirty[SynchronicVelocityMax]) velocityMax = s->getVelocityMax();
+        
+        if (dirty[SynchronicMidiOutput]) midiOutput = s->getMidiOutput();
     }
     
     bool compare(SynchronicPreparation::Ptr s)
@@ -572,6 +579,17 @@ public:
     
     inline void setEnvelopeOn(int which, bool val)  {envelopeOn.set(which, val);}
     
+    inline const std::shared_ptr<MidiOutput> getMidiOutput() const noexcept { return midiOutput; }
+    inline const void setMidiOutput(MidiDeviceInfo device)
+    {
+        midiOutput = MidiOutput::openDevice(device.identifier);
+        if (!midiOutput) midiOutput = nullptr;
+    }
+    inline const void setMidiOutput(std::shared_ptr<MidiOutput> output)
+    {
+        midiOutput = output;
+    }
+    
     void print(void)
     {
         DBG("| - - - Synchronic Preparation - - - |");
@@ -877,6 +895,8 @@ private:
     float sClusterThreshSec;
     
     bool sReleaseVelocitySetsSynchronic;
+    
+    std::shared_ptr<MidiOutput> midiOutput;
 
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
@@ -1220,8 +1240,7 @@ public:
                         TempoProcessor::Ptr tempo,
 						BlendronomerProcessor::Ptr blender,
                         BKSynthesiser* main,
-                        GeneralSettings::Ptr general,
-                        std::shared_ptr<MidiOutput>* output);
+                        GeneralSettings::Ptr general);
     
     ~SynchronicProcessor();
     
@@ -1346,8 +1365,6 @@ private:
     TuningProcessor::Ptr tuner;
     TempoProcessor::Ptr tempo;
 	BlendronomerProcessor::Ptr blendronomer;
-    
-    std::shared_ptr<MidiOutput>* midiOutput;
     
     double sampleRate;
 

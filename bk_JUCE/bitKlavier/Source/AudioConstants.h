@@ -442,7 +442,7 @@ typedef enum SynchronicOnOffMode {
     KeyOn,
     KeyOff,
     OnOffModeNil
-};
+} SynchronicOnOffMode;
 
 typedef enum SynchronicSyncMode {
     FirstNoteOnSync = 0,
@@ -480,6 +480,7 @@ typedef enum SynchronicParameterType {
     SynchronicHoldMax,
     SynchronicVelocityMin,
     SynchronicVelocityMax,
+    SynchronicMidiOutput,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 

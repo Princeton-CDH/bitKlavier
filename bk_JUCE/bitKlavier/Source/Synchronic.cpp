@@ -15,14 +15,12 @@ SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TempoProcessor::Ptr tempo,
 										BlendronomerProcessor::Ptr blender,
                                          BKSynthesiser* main,
-                                         GeneralSettings::Ptr general,
-                                         std::shared_ptr<MidiOutput>* output):
+                                         GeneralSettings::Ptr general):
 synth(main),
 general(general),
 synchronic(synchronic),
 tuner(tuning),
-tempo(tempo),
-midiOutput(output)
+tempo(tempo)
 {
     velocities.ensureStorageAllocated(128);
     holdTimers.ensureStorageAllocated(128);
@@ -140,11 +138,11 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 					tuner);
 		}
         
-        if (*midiOutput != nullptr)
+        if (prep->getMidiOutput() != nullptr)
         {
             activeSynchronicVoices.set(currentVoice->getCurrentlyPlayingNote(), currentVoice);
             const MidiMessage message = MidiMessage::noteOn(1, synthNoteNumber, velocity);
-            (*midiOutput).get()->sendMessageNow(message);
+            prep->getMidiOutput()->sendMessageNow(message);
             DBG("MIDI Message sent: Note on " + String(synthNoteNumber));
         }
 
@@ -622,7 +620,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             DBG("MIDI Message sent: Note off " + String(noteNumber));
         }
     }
-    if (!midiBuffer.isEmpty()) (*midiOutput).get()->sendBlockOfMessagesNow(midiBuffer);
+    if (!midiBuffer.isEmpty()) prep->getMidiOutput()->sendBlockOfMessagesNow(midiBuffer);
 }
 
 //return time in ms to future beat, given beatsToSkip

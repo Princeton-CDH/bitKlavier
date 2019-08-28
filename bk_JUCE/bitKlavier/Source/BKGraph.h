@@ -254,8 +254,8 @@ public:
     void setCommentText(String text) { comment.setText(text);}
     String getCommentText(void) { return comment.getText();}
     
-    XmlElement* getContent(void) { return content;}
-    void setContent(XmlElement* xml) {content = xml;}
+    std::shared_ptr<XmlElement> getContent(void) { return content;}
+    void setContent(std::shared_ptr<XmlElement> xml) {content = xml;}
     
 private:
     
@@ -275,7 +275,7 @@ private:
     // UI stuff
     Component fullChild;
     
-    XmlElement* content;
+    std::shared_ptr<XmlElement> content;
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)
