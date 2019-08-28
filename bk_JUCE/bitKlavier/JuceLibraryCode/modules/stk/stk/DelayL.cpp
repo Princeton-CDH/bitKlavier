@@ -94,4 +94,9 @@ void DelayL :: tapIn( StkFloat value, unsigned long tapDelay )
   inputs_[tap] = value;
 }
 
+void DelayL::addSample(StkFloat sampleToAdd)
+{
+	inputs_[inPoint_] += sampleToAdd * gain_;
+}
+
 } // stk namespace

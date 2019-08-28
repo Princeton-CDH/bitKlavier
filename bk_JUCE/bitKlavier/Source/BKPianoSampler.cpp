@@ -835,30 +835,29 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             stopNote (0.0f, false);
             break;
         }
-		//need to figure out how to do this with multiple delay lines
-		//delay line for blendronomer
+		//delay line for blendronomer, much of this has been moved to BKSynthesiser::processNextBlock()
         if (bDelay != nullptr)
         {
-			//DBG("starting delay line stuff");
             if (bDelay->getActive() == true)
             {
-                bDelay->getDSmooth()->tick();
-				if (outR != nullptr)
+				//DBG("L: " + String(l) + " R: " + String(r));
+				bDelay->addSample(l);
+				bDelay->addSample(r);
+
+                //bDelay->getDSmooth()->tick();
+				/*if (outR != nullptr)
 				{
 					delayL = bDelay->getDelay()->tick((stk::StkFloat)l);
 					delayR = bDelay->getDelay()->tick((stk::StkFloat)r);
-					//DBG("Delay left: " + String(delayL));
-					//DBG("Delay right: " + String(delayR));
 					l += (delayL * 1.0f); //should be blendronicLevel
 					r += (delayR * 1.0f); //should be blendronicLevel
 				}
 				else
 				{
 					delayL = (bDelay->getDelay()->tick((stk::StkFloat)l) + bDelay->getDelay()->tick((stk::StkFloat)r)) * 0.5f;
-					//DBG("Delay left: " + String(delayL));
 					l += delayL * 1.0f; //should be blendronicLevel
-				}
-                bDelay->updateDelayFromSmooth();
+				}*/
+                //bDelay->updateDelayFromSmooth();
             }
         }
 		if (outR != nullptr)

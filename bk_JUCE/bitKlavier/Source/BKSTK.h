@@ -48,6 +48,7 @@ public:
 	//mutators
     void updateValues();
     void updateDelayFromSmooth();
+	void addSample(float sampleToAdd); //adds input sample into the delay line (first converted to stkFloat)
 	inline void setDelayMax(float delayMax) { dDelayMax = delayMax; }
 	inline void setDelayGain(float delayGain) { dDelayGain = delayGain; }
 	inline void setDelayLength(float delayLength) { dDelayLength = delayLength; }

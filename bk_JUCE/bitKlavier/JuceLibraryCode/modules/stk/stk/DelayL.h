@@ -106,6 +106,8 @@ public:
   */
   StkFrames& tick( StkFrames& iFrames, StkFrames &oFrames, unsigned int iChannel = 0, unsigned int oChannel = 0 );
 
+  void addSample(StkFloat sampleToAdd);
+
  protected:
 
   unsigned long inPoint_;

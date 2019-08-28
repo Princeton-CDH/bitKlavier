@@ -648,7 +648,10 @@ public:
 
 	BKDelay::Ptr addBKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active = false);
     
-    GeneralSettings::Ptr generalSettings;
+	void renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples);
+	void renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples);
+	
+	GeneralSettings::Ptr generalSettings;
     
 protected:
     //==============================================================================

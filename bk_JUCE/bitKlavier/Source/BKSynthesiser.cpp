@@ -180,6 +180,51 @@ BKDelay::Ptr BKSynthesiser::addBKDelay(float delayMax, float delayGain, float de
 	return delay;
 }
 
+void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples)
+{
+
+	for (int j = startSample; j < startSample + numSamples; j++)
+	{
+		float totalOutput = 0.0f;
+		for (auto d : delays)
+		{
+			//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
+			totalOutput += d->getDelay()->tick(0);
+			d->getDSmooth()->tick();
+			d->updateDelayFromSmooth();
+		}
+		for (int i = 0; i < outputAudio.getNumChannels(); i++)
+		{
+			outputAudio.addSample(i, j, totalOutput);
+		}
+	}
+	
+	//return totalOutput;
+}
+
+void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples)
+{
+
+	for (int j = startSample; j < startSample + numSamples; j++)
+	{
+		float totalOutput = 0.0f;
+		for (auto d : delays)
+		{
+			//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
+			totalOutput += d->getDelay()->tick(0);
+			d->getDSmooth()->tick();
+			d->updateDelayFromSmooth();
+		}
+		//DBG("Total output: " + String(totalOutput));
+		for (int i = 0; i < outputAudio.getNumChannels(); i++)
+		{
+			outputAudio.addSample(i, j, totalOutput);
+		}
+	}
+
+	//return totalOutput;
+}
+
 //==============================================================================
 void BKSynthesiser::setCurrentPlaybackSampleRate (const double newRate)
 {
@@ -213,6 +258,8 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
     MidiMessage m;
     
     const ScopedLock sl (lock);
+
+	renderDelays(outputAudio, startSample, numSamples);
     
     while (numSamples > 0)
     {
