@@ -650,6 +650,7 @@ public:
     
 	void renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples);
 	void renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples);
+    void scaleDelays(double coefficient, int numSamples);
 	
 	GeneralSettings::Ptr generalSettings;
     

@@ -796,6 +796,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
+    unsigned long addCounter = 0;
     while (--numSamples >= 0)
     {
 
@@ -841,8 +842,8 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             if (bDelay->getActive() == true)
             {
 				//DBG("L: " + String(l) + " R: " + String(r));
-				bDelay->addSample(l);
-				bDelay->addSample(r);
+				bDelay->addSample(l, addCounter++);
+				//bDelay->addSample(r);
 
                 //bDelay->getDSmooth()->tick();
 				/*if (outR != nullptr)

@@ -106,7 +106,9 @@ public:
   */
   StkFrames& tick( StkFrames& iFrames, StkFrames &oFrames, unsigned int iChannel = 0, unsigned int oChannel = 0 );
 
-  void addSample(StkFloat sampleToAdd);
+    void addSample(StkFloat sampleToAdd, unsigned long offset);
+    
+    void scalePrevious(StkFloat coefficient, unsigned long offset);
 
  protected:
 
@@ -137,7 +139,7 @@ inline StkFloat DelayL :: nextOut( void )
 
 inline StkFloat DelayL :: tick( StkFloat input )
 {
-  inputs_[inPoint_++] = input * gain_;
+  inputs_[inPoint_++] += input * gain_;
 
   // Increment input pointer modulo length.
   if ( inPoint_ == inputs_.size() )

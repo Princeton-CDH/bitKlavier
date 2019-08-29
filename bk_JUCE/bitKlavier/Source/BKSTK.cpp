@@ -52,7 +52,7 @@ void BKDelay::updateDelayFromSmooth()
 	delayLinear->setDelay(dSmoothValue);
 }
 
-void BKDelay::addSample(float sampleToAdd)
+void BKDelay::addSample(float sampleToAdd, unsigned long offset)
 {
-	delayLinear->addSample((stk::StkFloat) sampleToAdd);
+	delayLinear->addSample((stk::StkFloat) sampleToAdd, offset);
 }

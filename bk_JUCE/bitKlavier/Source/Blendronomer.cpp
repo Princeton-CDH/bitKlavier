@@ -149,8 +149,8 @@ BlendronomerProcessor::~BlendronomerProcessor()
 void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 {
 	sampleTimer += numSamples;
-	DBG("sample rate is " + String(sampleRate));
-	DBG("processing blendronomer block, timer is at " + String(sampleTimer) + "out of " + String(numSamplesBeat));
+	//DBG("sample rate is " + String(sampleRate));
+	//DBG("processing blendronomer block, timer is at " + String(sampleTimer) + "out of " + String(numSamplesBeat));
 	if (sampleTimer >= numSamplesBeat)
 	{
 		DBG("sample timer has been exceeded");

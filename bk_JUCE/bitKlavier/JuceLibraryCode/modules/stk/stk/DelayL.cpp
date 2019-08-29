@@ -94,9 +94,14 @@ void DelayL :: tapIn( StkFloat value, unsigned long tapDelay )
   inputs_[tap] = value;
 }
 
-void DelayL::addSample(StkFloat sampleToAdd)
+void DelayL::addSample(StkFloat sampleToAdd, unsigned long offset)
 {
-	inputs_[inPoint_] += sampleToAdd * gain_;
+	inputs_[(inPoint_ + offset) % inputs_.size()] += sampleToAdd * gain_;
+}
+    
+void DelayL::scalePrevious(StkFloat coefficient, unsigned long offset)
+{
+    inputs_[(inPoint_ + offset) % inputs_.size()] *= coefficient;
 }
 
 } // stk namespace
