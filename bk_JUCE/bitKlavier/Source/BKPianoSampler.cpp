@@ -842,7 +842,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             if (bDelay->getActive() == true)
             {
 				//DBG("L: " + String(l) + " R: " + String(r));
-				bDelay->addSample(l, addCounter++);
+				if (l > 0.0) bDelay->addSample(l, addCounter++);
 				//bDelay->addSample(r);
 
                 //bDelay->getDSmooth()->tick();

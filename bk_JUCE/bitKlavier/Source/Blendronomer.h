@@ -54,7 +54,7 @@ public:
 	inline const String getName() const noexcept { return name; }
 	inline const float getTempo() const noexcept { return bTempo; }
 	inline const Array<int> getBeats() const noexcept { return bBeats; }
-	inline const Array<float> getSmoothTimes() const noexcept { return bSmoothTimes; }
+	inline const Array<float> getSmoothDurations() const noexcept { return bSmoothDurations; }
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
 	inline const Array<float> getClickGains() const noexcept { return bClickGains; }
 	inline const float getDelayMax() const noexcept { return bDelayMax; }
@@ -76,7 +76,7 @@ public:
 	inline void setName(String n) { name = n; }
 	inline void setTempo(int tempo) { bTempo = tempo; }
 	inline void setBeats(Array<int> beats) { bBeats.swapWith(beats); }
-	inline void setSmoothTimes(Array<float> smoothTimes) { bSmoothTimes.swapWith(smoothTimes); }
+	inline void setSmoothDurations(Array<float> smoothTimes) { bSmoothDurations.swapWith(smoothTimes); }
 	inline void setFeedbackCoefficients(Array<float> feedbackCoefficients) { bFeedbackCoefficients.swapWith(feedbackCoefficients); }
 	inline void setClickGains(Array<float> clickGains) { bClickGains.swapWith(clickGains); }
 	inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
@@ -109,7 +109,7 @@ private:
 	//stuff from preset
 	float bTempo;
 	Array<int> bBeats;
-	Array<float> bSmoothTimes;
+	Array<float> bSmoothDurations;
 	Array<float> bFeedbackCoefficients;
 	Array<float> bClickGains;
 
