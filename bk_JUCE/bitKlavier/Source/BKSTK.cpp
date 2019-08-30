@@ -58,11 +58,13 @@ BKDelayL::BKDelayL() :
 	length(0.0),
 	inPoint(0),
 	outPoint(0),
+	lastFrameLeft(0),
+	lastFrameRight(0),
 	doNextOutLeft(false),
 	doNextOutRight(false)
 {
 	inputs = AudioBuffer<float>(2, max);
-	outputs = AudioBuffer<float>(2, max);
+	inputs.clear();
 	setLength(0.0);
 }
 
@@ -72,11 +74,13 @@ BKDelayL::BKDelayL(float delayLength, float delayMax, float delayGain) :
 	length(delayLength),
 	inPoint(0),
 	outPoint(0),
+	lastFrameLeft(0),
+	lastFrameRight(0),
 	doNextOutLeft(false),
 	doNextOutRight(false)
 {
 	inputs = AudioBuffer<float>(2, max);
-	outputs = AudioBuffer<float>(2, max);
+	inputs.clear();
 	setLength(delayLength);
 }
 
@@ -139,18 +143,19 @@ float* BKDelayL::tick(float input, bool stereo)
 	inputs.addSample(0, inPoint, input * gain);
 	if (stereo) inputs.addSample(1, inPoint, input * gain);
 
-	outputs.setSample(0, 0,  nextOutLeft());
+	lastFrameLeft = nextOutLeft();
 	doNextOutLeft = true;
 	if (stereo)
 	{
-		outputs.setSample(1, 0, nextOutRight());
+		lastFrameRight = nextOutRight();
 		doNextOutRight = true;
 	}
 
 	if (++outPoint == inputs.getNumSamples()) outPoint = 0;
 
-	inputs.addSample(0, inPoint, outputs.getSample(0, 0) * gain);
-	if (stereo) inputs.addSample(1, inPoint, outputs.getSample(1, 0) * gain);
+	//feedback
+	inputs.addSample(0, inPoint, lastFrameLeft * gain);
+	if (stereo) inputs.addSample(1, inPoint, lastFrameRight * gain);
 
 	inPoint++;
 	if (inPoint = inputs.getNumSamples()) inPoint = 0;
@@ -158,21 +163,21 @@ float* BKDelayL::tick(float input, bool stereo)
 	if (stereo)
 	{
 		float outs[2];
-		outs[0] = outputs.getSample(0, 0);
-		outs[1] = outputs.getSample(1, 0);
+		outs[0] = lastFrameLeft;
+		outs[1] = lastFrameRight;
 		return outs;
 	}
 	else
 	{
 		float outs[1];
-		outs[0] = outputs.getSample(0, 0);
+		outs[0] = lastFrameLeft;
 		return outs;
 	}
 }
 
 void BKDelayL::scalePrevious(float coefficient, unsigned long offset, int channel)
 {
-	inputs.setSample(channel, (inPoint + offset) % inputs.getNumSamples(), inputs.getSample(channel, inPoint + offset % inputs.getNumSamples()) * coefficient);
+	inputs.setSample(channel, (inPoint + offset) % inputs.getNumSamples(), inputs.getSample(channel, (inPoint + offset) % inputs.getNumSamples()) * coefficient);
 }
 
 

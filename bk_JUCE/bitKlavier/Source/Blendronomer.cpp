@@ -139,7 +139,7 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer, Tu
 			blendronomer->aPrep->getSmoothDuration(),
 			true); //currently for testing
 	}
-	numSamplesBeat = blendronomer->aPrep->getBeats()[beatIndex] * 0.25 * 44100; //should be samplerate
+	numSamplesBeat = (uint64)blendronomer->aPrep->getBeats()[beatIndex] * 400 * 44.1; // should be sampleRate
 }
 
 BlendronomerProcessor::~BlendronomerProcessor()

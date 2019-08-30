@@ -209,13 +209,16 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 
 		for (auto d : delays)
 		{
-			//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
-			//totalOutput += d->getDelay()->tick(0);
-			float* outputs = d->getDelay()->tick(0);
-			totalOutputL += outputs[0];
-			totalOutputR += outputs[1];
-			//d->getDSmooth()->tick();
-			//d->updateDelayFromSmooth();
+			if (d != nullptr)
+			{
+				//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
+				//totalOutput += d->getDelay()->tick(0);
+				float* outputs = d->getDelay()->tick(0);
+				totalOutputL += outputs[0];
+				totalOutputR += outputs[1];
+				//d->getDSmooth()->tick();
+				//d->updateDelayFromSmooth();
+			}
 		}
 
 		//DBG("Total output: L(" + String(totalOutputL) + "), R(" + String(totalOutputR) + ")");
@@ -248,13 +251,16 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
         
         for (auto d : delays)
         {
-            //DBG("Next delay output: " + String(d->getDelay()->nextOut()));
-            //totalOutput += d->getDelay()->tick(0);
-			float* outputs = d->getDelay()->tick(0);
-			totalOutputL += outputs[0];
-			totalOutputR += outputs[1];
-            //d->getDSmooth()->tick();
-            //d->updateDelayFromSmooth();
+			if (d != nullptr)
+			{
+				//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
+				//totalOutput += d->getDelay()->tick(0);
+				float* outputs = d->getDelay()->tick(0);
+				totalOutputL += outputs[0];
+				totalOutputR += outputs[1];
+				//d->getDSmooth()->tick();
+				//d->updateDelayFromSmooth();
+			}
         }
         
 		//if (totalOutputL > 0.0) DBG("Total output: L(" + String(totalOutputL) + "), R(" + String(totalOutputR) + ")");
@@ -304,15 +310,13 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
     MidiMessage m;
     
     const ScopedLock sl (lock);
-
-	//renderDelays(outputAudio, startSample, numSamples);
     
     while (numSamples > 0)
     {
         
         if (! midiIterator.getNextEvent (m, midiEventPos))
         {
-            scaleDelays(0., numSamples);
+            scaleDelays(0.97, numSamples);
             renderVoices (outputAudio, startSample, numSamples);
             renderDelays(outputAudio, startSample, numSamples);
             return;
@@ -322,7 +326,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         
         if (samplesToNextMidiMessage >= numSamples)
         {
-            scaleDelays(0., numSamples);
+            scaleDelays(0.97, numSamples);
             renderVoices (outputAudio, startSample, numSamples);
             renderDelays(outputAudio, startSample, numSamples);
             handleMidiEvent (m);
@@ -337,7 +341,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         
         firstEvent = false;
         
-        scaleDelays(0., samplesToNextMidiMessage);
+        scaleDelays(0.97, samplesToNextMidiMessage);
         renderVoices (outputAudio, startSample, samplesToNextMidiMessage);
         renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
         handleMidiEvent (m);

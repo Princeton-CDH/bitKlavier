@@ -38,8 +38,8 @@ public:
 	inline const float getLength() const noexcept { return length; }
 	inline const float getMax() const noexcept { return max; }
 	inline const float getGain() const noexcept { return gain; }
-	inline const float lastOutLeft() const noexcept { return outputs.getSample(0, 0); }
-	inline const float lastOutRight() const noexcept { return outputs.getSample(1, 0); }
+	inline const float lastOutLeft() const noexcept { return lastFrameLeft; }
+	inline const float lastOutRight() const noexcept { return lastFrameRight; }
 
 	//mutators
 	inline void setLength(float delayLength);
@@ -54,7 +54,8 @@ public:
 
 private:
 	AudioBuffer<float> inputs;
-	AudioBuffer<float> outputs;
+	float lastFrameLeft;
+	float lastFrameRight;
 	unsigned long inPoint;
 	unsigned long outPoint;
 	float length;
