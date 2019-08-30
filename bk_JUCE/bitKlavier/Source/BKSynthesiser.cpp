@@ -185,8 +185,11 @@ void BKSynthesiser::scaleDelays(double coefficient, int numSamples)
 {
     for (auto d : delays)
     {
-        for(int i = 0; i< numSamples; i++)
-            d->getDelay()->scalePrevious(coefficient, i);
+		for (int i = 0; i < numSamples; i++)
+		{
+			d->getDelay()->scalePrevious(coefficient, i, 0);
+			d->getDelay()->scalePrevious(coefficient, i, 1);
+		}
     }
 }
 
@@ -196,50 +199,38 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
     double* outL = outputAudio.getWritePointer (0, startSample);
     double* outR = outputAudio.getNumChannels() > 1 ? outputAudio.getWritePointer (1, startSample) : nullptr;
     
-    float totalOutput = 0.0f;
-    
-    while (--numSamples >= 0)
-    {
-        totalOutput = 0.0f;
-        
-        for (auto d : delays)
-        {
-            //DBG("Next delay output: " + String(d->getDelay()->nextOut()));
-            totalOutput += d->getDelay()->tick(0);
-            d->getDSmooth()->tick();
-            d->updateDelayFromSmooth();
-        }
-        if (outR != nullptr)
-        {
-            *outL++ += (totalOutput * 1.0f);
-            *outR++ += (totalOutput * 1.0f);
-        }
-        else
-        {
-            *outL++ += (totalOutput * 1.0f);
-        }
-    }
-}
-                    /*
-	for (int j = startSample; j < startSample + numSamples; j++)
+	float totalOutputL = 0.0f;
+	float totalOutputR = 0.0f;
+
+	while (--numSamples >= 0)
 	{
-		float totalOutput = 0.0f;
+		totalOutputL = 0.0f;
+		totalOutputR = 0.0f;
+
 		for (auto d : delays)
 		{
 			//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
-			totalOutput += d->getDelay()->tick(0);
-			d->getDSmooth()->tick();
-			d->updateDelayFromSmooth();
+			//totalOutput += d->getDelay()->tick(0);
+			float* outputs = d->getDelay()->tick(0);
+			totalOutputL += outputs[0];
+			totalOutputR += outputs[1];
+			//d->getDSmooth()->tick();
+			//d->updateDelayFromSmooth();
 		}
-		for (int i = 0; i < outputAudio.getNumChannels(); i++)
+
+		//DBG("Total output: L(" + String(totalOutputL) + "), R(" + String(totalOutputR) + ")");
+
+		if (outR != nullptr)
 		{
-			outputAudio.addSample(i, j, totalOutput);
+			*outL++ += ((double) totalOutputL) * 1.0;
+			*outR++ += ((double) totalOutputR) * 1.0;
+		}
+		else
+		{
+			*outL++ += (((double)totalOutputL) + ((double)totalOutputR)) * 0.5;
 		}
 	}
-	
-	//return totalOutput;
 }
-                     */
 
 void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples)
 {
@@ -247,54 +238,38 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
     float* outL = outputAudio.getWritePointer (0, startSample);
     float* outR = outputAudio.getNumChannels() > 1 ? outputAudio.getWritePointer (1, startSample) : nullptr;
     
-    float totalOutput = 0.0f;
+    float totalOutputL = 0.0f;
+	float totalOutputR = 0.0f;
     
     while (--numSamples >= 0)
     {
-        totalOutput = 0.0f;
+        totalOutputL = 0.0f;
+		totalOutputR = 0.0f;
         
         for (auto d : delays)
         {
             //DBG("Next delay output: " + String(d->getDelay()->nextOut()));
             //totalOutput += d->getDelay()->tick(0);
-            totalOutput += d->getDelay()->tick(0);
-            d->getDSmooth()->tick();
-            d->updateDelayFromSmooth();
+			float* outputs = d->getDelay()->tick(0);
+			totalOutputL += outputs[0];
+			totalOutputR += outputs[1];
+            //d->getDSmooth()->tick();
+            //d->updateDelayFromSmooth();
         }
         
+		//if (totalOutputL > 0.0) DBG("Total output: L(" + String(totalOutputL) + "), R(" + String(totalOutputR) + ")");
+
         if (outR != nullptr)
         {
-            *outL++ += (totalOutput * 1.0f);
-            *outR++ += (totalOutput * 1.0f);
+            *outL++ += (totalOutputL * 1.0f);
+            *outR++ += (totalOutputR * 1.0f);
         }
         else
         {
-            *outL++ += (totalOutput * 1.0f);
+            *outL++ += ((totalOutputL + totalOutputR) * 0.5f);
         }
     }
 }
-    /*
-	for (int j = startSample; j < startSample + numSamples; j++)
-	{
-		float totalOutput = 0.0f;
-		for (auto d : delays)
-		{
-			//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
-			totalOutput += d->getDelay()->tick(0);
-			d->getDSmooth()->tick();
-			d->updateDelayFromSmooth();
-		}
-		//DBG("Total output: " + String(totalOutput));
-		for (int i = 0; i < outputAudio.getNumChannels(); i++)
-		{
-			outputAudio.addSample(i, j, totalOutput);
-		}
-	}
-     
-
-	//return totalOutput;
-}
-    */
 
 //==============================================================================
 void BKSynthesiser::setCurrentPlaybackSampleRate (const double newRate)
@@ -337,7 +312,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         
         if (! midiIterator.getNextEvent (m, midiEventPos))
         {
-            scaleDelays(0.97, numSamples);
+            scaleDelays(0., numSamples);
             renderVoices (outputAudio, startSample, numSamples);
             renderDelays(outputAudio, startSample, numSamples);
             return;
@@ -347,7 +322,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         
         if (samplesToNextMidiMessage >= numSamples)
         {
-            scaleDelays(0.97, numSamples);
+            scaleDelays(0., numSamples);
             renderVoices (outputAudio, startSample, numSamples);
             renderDelays(outputAudio, startSample, numSamples);
             handleMidiEvent (m);

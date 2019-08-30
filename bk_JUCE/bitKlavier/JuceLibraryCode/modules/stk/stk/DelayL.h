@@ -136,11 +136,12 @@ namespace stk {
 
 	inline StkFloat DelayL::tick(StkFloat input)
 	{
-		inputs_[inPoint_++] += input * gain_;
+		//inputs_[inPoint_++] += input * gain_;
+		inputs_[inPoint_] += input * gain_;
 
 		// Increment input pointer modulo length.
-		if (inPoint_ == inputs_.size())
-			inPoint_ = 0;
+		//if (inPoint_ == inputs_.size())
+		//	inPoint_ = 0;
 
 		lastFrame_[0] = nextOut();
 		doNextOut_ = true;
@@ -148,6 +149,12 @@ namespace stk {
 		// Increment output pointer modulo length.
 		if (++outPoint_ == inputs_.size())
 			outPoint_ = 0;
+
+		inputs_[inPoint_++] += lastFrame_[0] * 0.5; //feedback
+
+		// Increment input pointer modulo length.
+		if (inPoint_ == inputs_.size())
+			inPoint_ = 0;
 
 		return lastFrame_[0];
 	}

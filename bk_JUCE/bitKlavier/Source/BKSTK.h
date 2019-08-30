@@ -38,21 +38,23 @@ public:
 	inline const float getLength() const noexcept { return length; }
 	inline const float getMax() const noexcept { return max; }
 	inline const float getGain() const noexcept { return gain; }
-	inline const float lastOut() const noexcept { return lastFrame[0]; }
+	inline const float lastOutLeft() const noexcept { return outputs.getSample(0, 0); }
+	inline const float lastOutRight() const noexcept { return outputs.getSample(1, 0); }
 
 	//mutators
 	inline void setLength(float delayLength);
 	inline void setMax(float delayMax) { max = delayMax; }
 	inline void setGain(float delayGain) { gain = delayGain; }
 
-	float nextOut();
-	void addSample(float input, unsigned long offset);
-	float tick(float input);
-	void scalePrevious(float coefficient, unsigned long offset);
+	float nextOutLeft();
+	float nextOutRight();
+	void addSample(float input, unsigned long offset, int channel);
+	float* tick(float input, bool stereo = true);
+	void scalePrevious(float coefficient, unsigned long offset, int channel);
 
 private:
-	Array<float> inputs;
-	Array<float> lastFrame;
+	AudioBuffer<float> inputs;
+	AudioBuffer<float> outputs;
 	unsigned long inPoint;
 	unsigned long outPoint;
 	float length;
@@ -61,7 +63,8 @@ private:
 	float alpha;
 	float omAlpha;
 	float nextOutput;
-	bool doNextOut;
+	bool doNextOutLeft;
+	bool doNextOutRight;
 };
 
 /*
@@ -137,10 +140,10 @@ public:
 	//mutators
     void updateValues();
     void updateDelayFromSmooth();
-	void addSample(float sampleToAdd, unsigned long offset); //adds input sample into the delay line (first converted to stkFloat)
+	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to stkFloat)
 	inline void setDelayMax(float delayMax) { dDelayMax = delayMax; }
 	inline void setDelayGain(float delayGain) { dDelayGain = delayGain; }
-	inline void setDelayLength(float delayLength) { dDelayLength = delayLength; }
+	inline void setDelayLength(float delayLength) { dDelayLength = delayLength; delayLinear->setLength(delayLength); }
 	inline void setSmoothValue(float smoothValue) { dSmoothValue = smoothValue; }
 	inline void setSmoothDuration(float smoothDuration) { dSmoothDuration = smoothDuration; }
 	inline const void setActive(bool newActive) { dBlendronicActive = newActive; }

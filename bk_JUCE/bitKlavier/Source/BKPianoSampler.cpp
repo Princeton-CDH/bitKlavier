@@ -842,23 +842,9 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             if (bDelay->getActive() == true)
             {
 				//DBG("L: " + String(l) + " R: " + String(r));
-				if (l > 0.0) bDelay->addSample(l, addCounter++);
-				//bDelay->addSample(r);
-
-                //bDelay->getDSmooth()->tick();
-				/*if (outR != nullptr)
-				{
-					delayL = bDelay->getDelay()->tick((stk::StkFloat)l);
-					delayR = bDelay->getDelay()->tick((stk::StkFloat)r);
-					l += (delayL * 1.0f); //should be blendronicLevel
-					r += (delayR * 1.0f); //should be blendronicLevel
-				}
-				else
-				{
-					delayL = (bDelay->getDelay()->tick((stk::StkFloat)l) + bDelay->getDelay()->tick((stk::StkFloat)r)) * 0.5f;
-					l += delayL * 1.0f; //should be blendronicLevel
-				}*/
-                //bDelay->updateDelayFromSmooth();
+				bDelay->addSample(l, addCounter, 0);
+				bDelay->addSample(r, addCounter, 1);
+				addCounter++;
             }
         }
 		if (outR != nullptr)

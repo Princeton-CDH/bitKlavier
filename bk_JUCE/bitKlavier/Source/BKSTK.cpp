@@ -55,20 +55,28 @@ float BKEnvelope::tick()
 BKDelayL::BKDelayL() :
 	max(4095),
 	gain(1.0),
+	length(0.0),
 	inPoint(0),
 	outPoint(0),
-	doNextOut(false)
+	doNextOutLeft(false),
+	doNextOutRight(false)
 {
+	inputs = AudioBuffer<float>(2, max);
+	outputs = AudioBuffer<float>(2, max);
 	setLength(0.0);
 }
 
 BKDelayL::BKDelayL(float delayLength, float delayMax, float delayGain) :
 	max(delayMax),
 	gain(delayGain),
+	length(delayLength),
 	inPoint(0),
 	outPoint(0),
-	doNextOut(false)
+	doNextOutLeft(false),
+	doNextOutRight(false)
 {
+	inputs = AudioBuffer<float>(2, max);
+	outputs = AudioBuffer<float>(2, max);
 	setLength(delayLength);
 }
 
@@ -80,52 +88,91 @@ inline void BKDelayL::setLength(float delayLength)
 {
 	float outPointer = inPoint - length;
 	length = delayLength;
-	while (outPointer < 0) outPointer += inputs.size();
+	while (outPointer < 0) outPointer += inputs.getNumSamples();
 
 	outPoint = (long)outPointer; //integer part
 	alpha = outPointer - outPoint; //fractional part
 	omAlpha = (float)1.0 - alpha;
-	if (outPoint == inputs.size()) outPoint = 0;
-	doNextOut = true;
+	if (outPoint == inputs.getNumSamples()) outPoint = 0;
+	doNextOutLeft = true;
+	doNextOutRight = true;
 }
 
-float BKDelayL::nextOut()
+float BKDelayL::nextOutLeft()
 {
-	if (doNextOut)
+	if (doNextOutLeft)
 	{
-		nextOutput = inputs[outPoint] * omAlpha;
-		if (outPoint + 1 < inputs.size())
-			nextOutput += inputs[outPoint + 1] * alpha;
+		nextOutput = inputs.getSample(0, outPoint) * omAlpha;
+		if (outPoint + 1 < inputs.getNumSamples())
+			nextOutput += inputs.getSample(0, outPoint + 1) * alpha;
 		else
-			nextOutput += inputs[0] * alpha;
-		doNextOut = false;
+			nextOutput += inputs.getSample(0, 0) * alpha;
+		doNextOutLeft = false;
+	}
+
+	return nextOutput;
+}
+
+float BKDelayL::nextOutRight()
+{
+	if (doNextOutRight)
+	{
+		nextOutput = inputs.getSample(1, outPoint) * omAlpha;
+		if (outPoint + 1 < inputs.getNumSamples())
+			nextOutput += inputs.getSample(1, outPoint + 1) * alpha;
+		else
+			nextOutput += inputs.getSample(1, 0) * alpha;
+		doNextOutRight = false;
 	}
 
 	return nextOutput;
 }
 
 //allows addition of samples without incrementing delay position value
-void BKDelayL::addSample(float input, unsigned long offset)
+void BKDelayL::addSample(float input, unsigned long offset, int channel)
 {
-	inputs.set(inPoint + offset, input * gain);
+	inputs.addSample(channel, inPoint + offset, input * gain);
 }
 
-float BKDelayL::tick(float input)
+float* BKDelayL::tick(float input, bool stereo)
 {
-	inputs.set(inPoint++, input * gain);
-	if (inPoint = inputs.size()) inPoint = 0;
+	inputs.addSample(0, inPoint, input * gain);
+	if (stereo) inputs.addSample(1, inPoint, input * gain);
 
-	lastFrame.set(0, nextOut());
-	doNextOut = true;
+	outputs.setSample(0, 0,  nextOutLeft());
+	doNextOutLeft = true;
+	if (stereo)
+	{
+		outputs.setSample(1, 0, nextOutRight());
+		doNextOutRight = true;
+	}
 
-	if (++outPoint == inputs.size()) outPoint = 0;
+	if (++outPoint == inputs.getNumSamples()) outPoint = 0;
 
-	return lastFrame[0];
+	inputs.addSample(0, inPoint, outputs.getSample(0, 0) * gain);
+	if (stereo) inputs.addSample(1, inPoint, outputs.getSample(1, 0) * gain);
+
+	inPoint++;
+	if (inPoint = inputs.getNumSamples()) inPoint = 0;
+
+	if (stereo)
+	{
+		float outs[2];
+		outs[0] = outputs.getSample(0, 0);
+		outs[1] = outputs.getSample(1, 0);
+		return outs;
+	}
+	else
+	{
+		float outs[1];
+		outs[0] = outputs.getSample(0, 0);
+		return outs;
+	}
 }
 
-void BKDelayL::scalePrevious(float coefficient, unsigned long offset)
+void BKDelayL::scalePrevious(float coefficient, unsigned long offset, int channel)
 {
-	if (inputs.size() > 0 && inPoint + offset < inputs.size()) inputs.set((inPoint + offset) % inputs.size(), inputs[inPoint + offset % inputs.size()] * coefficient);
+	inputs.setSample(channel, (inPoint + offset) % inputs.getNumSamples(), inputs.getSample(channel, inPoint + offset % inputs.getNumSamples()) * coefficient);
 }
 
 
@@ -160,7 +207,7 @@ BKDelay::~BKDelay()
 void BKDelay::updateValues()
 {
 	delayLinear->setLength(dDelayLength);
-	delayLinear->setMax(dDelayMax);
+	//delayLinear->setMax(dDelayMax);
 	delayLinear->setGain(dDelayGain);
 	dSmooth->setValue(dSmoothValue);
 	dSmooth->setDuration(dSmoothDuration);
@@ -172,7 +219,7 @@ void BKDelay::updateDelayFromSmooth()
 	delayLinear->setLength(dSmoothValue);
 }
 
-void BKDelay::addSample(float sampleToAdd, unsigned long offset)
+void BKDelay::addSample(float sampleToAdd, unsigned long offset, int channel)
 {
-	delayLinear->addSample((stk::StkFloat) sampleToAdd, offset);
+	delayLinear->addSample(sampleToAdd, offset, channel);
 }
