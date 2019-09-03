@@ -318,7 +318,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         
         if (! midiIterator.getNextEvent (m, midiEventPos))
         {
-            scaleDelays(0.97, numSamples);
+            scaleDelays(0, numSamples);
             renderVoices (outputAudio, startSample, numSamples);
             renderDelays(outputAudio, startSample, numSamples);
             return;
@@ -328,7 +328,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         
         if (samplesToNextMidiMessage >= numSamples)
         {
-            scaleDelays(0.97, numSamples);
+            scaleDelays(0, numSamples);
             renderVoices (outputAudio, startSample, numSamples);
             renderDelays(outputAudio, startSample, numSamples);
             handleMidiEvent (m);
@@ -343,7 +343,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         
         firstEvent = false;
         
-        scaleDelays(0.97, samplesToNextMidiMessage);
+        scaleDelays(0, samplesToNextMidiMessage);
         renderVoices (outputAudio, startSample, samplesToNextMidiMessage);
         renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
         handleMidiEvent (m);
