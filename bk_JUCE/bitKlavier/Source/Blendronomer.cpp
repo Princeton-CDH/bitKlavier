@@ -153,7 +153,7 @@ void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 	//DBG("processing blendronomer block, timer is at " + String(sampleTimer) + "out of " + String(numSamplesBeat));
 	if (sampleTimer >= numSamplesBeat)
 	{
-		//DBG("sample timer has been exceeded");
+        DBG("blendronomer: beat index = " + String(beatIndex + 1));
 		beatIndex++;
 		if (beatIndex > blendronomer->aPrep->getBeats().size()) beatIndex = 0;
 		smoothIndex++;

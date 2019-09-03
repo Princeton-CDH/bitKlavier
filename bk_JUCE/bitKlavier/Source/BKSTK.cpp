@@ -154,11 +154,11 @@ float* BKDelayL::tick(float input, bool stereo)
 	if (++outPoint == inputs.getNumSamples()) outPoint = 0;
 
 	//feedback
-	inputs.addSample(0, inPoint, lastFrameLeft * gain);
-	if (stereo) inputs.addSample(1, inPoint, lastFrameRight * gain);
+	inputs.addSample(0, inPoint, lastFrameLeft * 0.5);
+	if (stereo) inputs.addSample(1, inPoint, lastFrameRight * 0.5);
 
 	inPoint++;
-	if (inPoint = inputs.getNumSamples()) inPoint = 0;
+	if (inPoint == inputs.getNumSamples()) inPoint = 0;
 
 	if (stereo)
 	{

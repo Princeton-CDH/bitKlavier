@@ -213,7 +213,7 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 			{
 				//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
 				//totalOutput += d->getDelay()->tick(0);
-				float* outputs = d->getDelay()->tick(0);
+				float* outputs = d->getDelay()->tick(0, true);
 				totalOutputL += outputs[0];
 				totalOutputR += outputs[1];
 				//d->getDSmooth()->tick();
@@ -255,7 +255,7 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
 			{
 				//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
 				//totalOutput += d->getDelay()->tick(0);
-				float* outputs = d->getDelay()->tick(0);
+				float* outputs = d->getDelay()->tick(0, true);
 				totalOutputL += outputs[0];
 				totalOutputR += outputs[1];
 				//d->getDSmooth()->tick();
@@ -275,6 +275,8 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
             *outL++ += ((totalOutputL + totalOutputR) * 0.5f);
         }
     }
+    
+    //DBG("totalOutput = " + String(totalOutputL));
 }
 
 //==============================================================================
