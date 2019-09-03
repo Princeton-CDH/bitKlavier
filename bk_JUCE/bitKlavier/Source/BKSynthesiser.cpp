@@ -175,20 +175,20 @@ void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool sho
 
 BKDelay::Ptr BKSynthesiser::addBKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active)
 {
-	BKDelay::Ptr delay = new BKDelay(delayMax, delayGain, delayLength, smoothValue, smoothDuration, active);
+    BKDelay::Ptr delay = new BKDelay(delayMax, delayGain, delayLength, smoothValue, smoothDuration, active);
 	delays.add(delay);
     DBG("num BKDelays = " + String(delays.size()));
-	return delay;
+    return delay;
 }
 
-void BKSynthesiser::scaleDelays(double coefficient, int numSamples)
+void BKSynthesiser::clearNextDelayBlock(int numSamples)
 {
     for (auto d : delays)
     {
 		for (int i = 0; i < numSamples; i++)
 		{
-			d->getDelay()->scalePrevious(coefficient, i, 0);
-			d->getDelay()->scalePrevious(coefficient, i, 1);
+			d->getDelay()->scalePrevious(0, i, 0);
+			d->getDelay()->scalePrevious(0, i, 1);
 		}
     }
 }
@@ -318,7 +318,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         
         if (! midiIterator.getNextEvent (m, midiEventPos))
         {
-            scaleDelays(0, numSamples);
+            clearNextDelayBlock(numSamples);
             renderVoices (outputAudio, startSample, numSamples);
             renderDelays(outputAudio, startSample, numSamples);
             return;
@@ -328,7 +328,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         
         if (samplesToNextMidiMessage >= numSamples)
         {
-            scaleDelays(0, numSamples);
+            clearNextDelayBlock(numSamples);
             renderVoices (outputAudio, startSample, numSamples);
             renderDelays(outputAudio, startSample, numSamples);
             handleMidiEvent (m);
@@ -343,7 +343,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         
         firstEvent = false;
         
-        scaleDelays(0, samplesToNextMidiMessage);
+        clearNextDelayBlock(samplesToNextMidiMessage);
         renderVoices (outputAudio, startSample, samplesToNextMidiMessage);
         renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
         handleMidiEvent (m);

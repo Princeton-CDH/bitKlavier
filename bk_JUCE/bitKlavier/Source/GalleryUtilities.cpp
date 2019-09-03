@@ -1252,12 +1252,15 @@ void Gallery::createBlendronomerTest()
 	int pianoId = piano->getId();
 
 	int keyId = getNewId(PreparationTypeKeymap);
-	bkKeymaps.add(new Keymap(keyId));
+    Keymap::Ptr km = new Keymap(keyId);
+    km->setAll(true);
+	bkKeymaps.add(km);
 
 	DBG("Piano and keymap added");
 
 	int directId = getNewId(PreparationTypeDirect);
 	addDirectWithId(directId);
+    DirectProcessor::Ptr direct = piano->addDirectProcessor(directId);
 
 	int tuningId = getNewId(PreparationTypeTuning);
 	addTuningWithId(tuningId);

@@ -1351,9 +1351,9 @@ void BKAudioProcessor::initializeGallery(void)
     updateUI();
     
     updateGalleries();
-
+    
 #if TESTING_BLENDRONOMER
-	gallery->createBlendronomerTest();
+        gallery->createBlendronomerTest();
 #endif
 }
 

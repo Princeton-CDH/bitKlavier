@@ -522,6 +522,16 @@ void BKAudioProcessor::importPiano(int Id, int importId)
             newId = gallery->addCopy(PreparationTypeKeymap, sub);
             type = PreparationTypeKeymap;
         }
+        else if (tag == vtagBlendronomer)
+        {
+            newId = gallery->addCopy(PreparationTypeBlendronomer, sub);
+            type = PreparationTypeBlendronomer;
+        }
+        else if (tag == vtagModBlendronomer)
+        {
+            newId = gallery->addCopy(PreparationTypeBlendronomerMod, sub);
+            type = PreparationTypeBlendronomerMod;
+        }
         else continue;
         
         int oldId = sub->getStringAttribute("Id").getIntValue();

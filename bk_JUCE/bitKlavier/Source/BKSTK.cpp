@@ -135,7 +135,10 @@ float BKDelayL::nextOutRight()
 //allows addition of samples without incrementing delay position value
 void BKDelayL::addSample(float input, unsigned long offset, int channel)
 {
-	inputs.addSample(channel, inPoint + offset, input * gain);
+    unsigned long dec = 0;
+    while (inPoint + (offset - dec) >= inputs.getNumSamples()) dec += inputs.getNumSamples();
+    inputs.addSample(channel, inPoint + (offset - dec), input * gain);
+	
 }
 
 float* BKDelayL::tick(float input, bool stereo)

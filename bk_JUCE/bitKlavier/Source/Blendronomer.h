@@ -81,7 +81,7 @@ public:
 	inline void setClickGains(Array<float> clickGains) { bClickGains.swapWith(clickGains); }
 	inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
 	inline void setFeedbackGain(float FeedbackGain) { bFeedbackGain = FeedbackGain; }
-	inline void setDelayLength(float delayLength) { bDelayMax = delayLength; }
+	inline void setDelayLength(float delayLength) { bDelayLength = delayLength; }
 	inline void setSmoothValue(float smoothValue) { bSmoothValue = smoothValue; }
 	inline void setSmoothDuration(float smoothDuration) { bSmoothDuration = smoothDuration; }
 	inline void setInputThresh(float newThresh)
