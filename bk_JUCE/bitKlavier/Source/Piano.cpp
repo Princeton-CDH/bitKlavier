@@ -83,17 +83,24 @@ void Piano::deconfigure(void)
 void Piano::configure(void)
 {
     deconfigure();
+#if TESTING_BLENDRONOMER
+    processor.gallery->createBlendronomerTest();
+    BKItem::Ptr blend = (new BKItem(PreparationTypeBlendronomer, 0, processor));
+    items.addIfNotAlreadyThere(blend);
+#endif
     
     defaultT = getTuningProcessor(DEFAULT_ID);
     
     defaultM = getTempoProcessor(DEFAULT_ID);
     
     defaultS = getSynchronicProcessor(DEFAULT_ID);
-
-	defaultB = getBlendronomerProcessor(DEFAULT_ID);
     
     for (auto item : items)
     {
+#if TESTING_BLENDRONOMER
+        blend->addConnection(item);
+        item->addConnection(blend);
+#endif
         BKPreparationType thisType = item->getType();
         int thisId = item->getId();
         

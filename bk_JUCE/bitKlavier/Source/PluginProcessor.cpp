@@ -1202,7 +1202,7 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml)
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
         gallery = new Gallery(xml, *this);
-        
+
         currentGallery = gallery->getName() + ".xml";
         
         initializeGallery();
@@ -1351,10 +1351,6 @@ void BKAudioProcessor::initializeGallery(void)
     updateUI();
     
     updateGalleries();
-    
-#if TESTING_BLENDRONOMER
-        gallery->createBlendronomerTest();
-#endif
 }
 
 Array<MidiDeviceInfo> BKAudioProcessor::getMidiOutputDevices()

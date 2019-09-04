@@ -1246,34 +1246,35 @@ void Gallery::clean(void)
 
 void Gallery::createBlendronomerTest()
 {
-	DBG("Starting blendronomer test creation");
-
-	Piano::Ptr piano = bkPianos.getLast();
-	int pianoId = piano->getId();
-
-	int keyId = getNewId(PreparationTypeKeymap);
-    Keymap::Ptr km = new Keymap(keyId);
-    km->setAll(true);
-	bkKeymaps.add(km);
-
-	DBG("Piano and keymap added");
-
-	int directId = getNewId(PreparationTypeDirect);
-	addDirectWithId(directId);
-    DirectProcessor::Ptr direct = piano->addDirectProcessor(directId);
-
-	int tuningId = getNewId(PreparationTypeTuning);
-	addTuningWithId(tuningId);
-	TuningProcessor::Ptr tuning = piano->addTuningProcessor(tuningId);
-
-	int blendronomerId = getNewId(PreparationTypeBlendronomer);
-	addBlendronomerWithId(blendronomerId);
-	BlendronomerProcessor::Ptr blender = piano->addBlendronomerProcessor(blendronomerId);
-
-	piano->linkPreparationWithKeymap(PreparationTypeDirect, directId, keyId);
-	piano->linkPreparationWithKeymap(PreparationTypeTuning, tuningId, keyId);
-	piano->linkPreparationWithKeymap(PreparationTypeBlendronomer, blendronomerId, keyId);
-	piano->linkPreparationWithTuning(PreparationTypeBlendronomer, blendronomerId, tuning->getTuning());
-	piano->linkPreparationWithTuning(PreparationTypeDirect, directId, tuning->getTuning());
-	piano->linkPreparationWithBlendronomer(PreparationTypeDirect, directId, blender->getBlendronomer());
+    addBlendronomerWithId(0);
+//    DBG("Starting blendronomer test creation");
+//
+//    Piano::Ptr piano = bkPianos.getLast();
+//    int pianoId = piano->getId();
+//
+//    int keyId = getNewId(PreparationTypeKeymap);
+//    Keymap::Ptr km = new Keymap(keyId);
+//    km->setAll(true);
+//    bkKeymaps.add(km);
+//
+//    DBG("Piano and keymap added");
+//
+//    int directId = getNewId(PreparationTypeDirect);
+//    addDirectWithId(directId);
+//    DirectProcessor::Ptr direct = piano->addDirectProcessor(directId);
+//
+//    int tuningId = getNewId(PreparationTypeTuning);
+//    addTuningWithId(tuningId);
+//    TuningProcessor::Ptr tuning = piano->addTuningProcessor(tuningId);
+//
+//    int blendronomerId = getNewId(PreparationTypeBlendronomer);
+//    addBlendronomerWithId(blendronomerId);
+//    BlendronomerProcessor::Ptr blender = piano->addBlendronomerProcessor(blendronomerId);
+//
+//    piano->linkPreparationWithKeymap(PreparationTypeDirect, directId, keyId);
+//    piano->linkPreparationWithKeymap(PreparationTypeTuning, tuningId, keyId);
+//    piano->linkPreparationWithKeymap(PreparationTypeBlendronomer, blendronomerId, keyId);
+//    piano->linkPreparationWithTuning(PreparationTypeBlendronomer, blendronomerId, tuning->getTuning());
+//    piano->linkPreparationWithTuning(PreparationTypeDirect, directId, tuning->getTuning());
+//    piano->linkPreparationWithBlendronomer(PreparationTypeDirect, directId, blender->getBlendronomer());
 }
