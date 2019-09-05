@@ -435,6 +435,10 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         if (e.getModifiers().isCommandDown())   construction.selectAll();
     }
+    else if (code == 66) // B blendronomer
+    {
+        construction.addItem(PreparationTypeBlendronomer);
+    }
     else if (code == 67) // C modification
     {
         if (e.getModifiers().isCommandDown())   construction.copy();

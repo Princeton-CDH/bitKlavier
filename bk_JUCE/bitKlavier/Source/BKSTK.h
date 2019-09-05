@@ -125,7 +125,7 @@ public:
 
 	//constructors
 	BKDelay(BKDelay::Ptr d);
-	BKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active = false);
+	BKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, int Id, bool active = false);
 	~BKDelay();
 
 	//accessors
@@ -137,6 +137,7 @@ public:
 	inline const float getSmoothValue() const noexcept { return dSmoothValue; }
 	inline const float getSmoothDuration() const noexcept { return dSmoothDuration; }
 	inline const bool getActive() const noexcept { return dBlendronicActive; }
+    inline const int getId() const noexcept { return dId; }
 
 	//mutators
     void updateValues();
@@ -149,15 +150,17 @@ public:
 	inline void setSmoothDuration(float smoothDuration) { dSmoothDuration = smoothDuration; }
 	inline const void setActive(bool newActive) { dBlendronicActive = newActive; }
 	inline const void toggleActive() { dBlendronicActive = !dBlendronicActive; }
+    inline const void setId(int Id) { dId = Id; }
 
 private:
     BKDelayL::Ptr delayLinear;
 	BKEnvelope::Ptr dSmooth;
-	float dDelayLength;
 	float dDelayMax;
 	float dDelayGain;
+    float dDelayLength;
 	float dSmoothValue;
 	float dSmoothDuration;
+    int dId;
 	bool dBlendronicActive;
 };
 

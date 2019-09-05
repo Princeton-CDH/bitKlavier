@@ -192,16 +192,18 @@ BKDelay::BKDelay(BKDelay::Ptr d):
 	dDelayLength(d->getDelayLength()),
 	dSmoothValue(d->getSmoothValue()),
 	dSmoothDuration(d->getSmoothDuration()),
+    dId(d->getId()),
 	dBlendronicActive(d->getActive())
 {
 }
 
-BKDelay::BKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active) :
+BKDelay::BKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, int Id, bool active) :
 	dDelayMax(delayMax),
 	dDelayGain(delayGain),
 	dDelayLength(delayLength),
 	dSmoothValue(smoothValue),
 	dSmoothDuration(smoothDuration),
+    dId(Id),
 	dBlendronicActive(active)
 {
 	delayLinear =  new BKDelayL(dDelayLength, dDelayMax, dDelayGain);

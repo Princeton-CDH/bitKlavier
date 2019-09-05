@@ -132,7 +132,7 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer, Tu
 {
 	if (delayL == nullptr)
 	{
-		delay = bMain->addBKDelay(blendronomer->aPrep->getDelayMax(),
+		delay = synth->addBKDelay(blendronomer->aPrep->getDelayMax(),
 			blendronomer->aPrep->getFeedbackGain(),
 			blendronomer->aPrep->getDelayLength(),
 			blendronomer->aPrep->getSmoothValue(),
@@ -144,6 +144,7 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer, Tu
 
 BlendronomerProcessor::~BlendronomerProcessor()
 {
+    synth->removeBKDelay(delay);
 }
 
 void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)

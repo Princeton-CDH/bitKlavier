@@ -175,10 +175,22 @@ void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool sho
 
 BKDelay::Ptr BKSynthesiser::addBKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active)
 {
-    BKDelay::Ptr delay = new BKDelay(delayMax, delayGain, delayLength, smoothValue, smoothDuration, active);
+    BKDelay::Ptr delay = new BKDelay(delayMax, delayGain, delayLength, smoothValue, smoothDuration, delays.size(), active);
 	delays.add(delay);
     DBG("num BKDelays = " + String(delays.size()));
     return delay;
+}
+
+void BKSynthesiser::removeBKDelay(BKDelay::Ptr delay)
+{
+    for (int i = 0; i < delays.size(); ++i)
+    {
+        if (delays[i]->getId() == delay->getId()) delays.remove(i);
+    }
+    for (int i = 0; i < delays.size(); ++i)
+    {
+        delays[i]->setId(i);
+    }
 }
 
 void BKSynthesiser::clearNextDelayBlock(int numSamples)

@@ -62,6 +62,10 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     {
         setImage(ImageCache::getFromMemory(BinaryData::direct_icon_png, BinaryData::direct_icon_pngSize));
     }
+    else if (type == PreparationTypeBlendronomer)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::nostalgic_icon_png, BinaryData::nostalgic_icon_pngSize));
+    }
     else if (type == PreparationTypeKeymap)
     {
         setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
@@ -957,6 +961,10 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             type2 == PreparationTypeTempo ||
             type2 == PreparationTypeReset)
             return true;
+    }
+    else if (type1 == PreparationTypeBlendronomer)
+    {
+        return true;
     }
     else if (type1 == PreparationTypeTuning)
     {
