@@ -12,15 +12,15 @@
 
 BKEnvelope::BKEnvelope() :
 	value(0.0f),
-	duration(0.0f),
+	target(0.0f),
 	rate(0.001f)
 {
 	state = 0;
 }
 
-BKEnvelope::BKEnvelope(float bValue, float bDuration) :
+BKEnvelope::BKEnvelope(float bValue, float bTarget) :
 	value(bValue),
-	duration(bDuration),
+	target(bTarget),
 	rate(0.001f)
 {
 	state = 0;
@@ -33,17 +33,17 @@ BKEnvelope::~BKEnvelope()
 float BKEnvelope::tick()
 {
 	if (state == 1) {
-		if (duration > value) {
+		if (target > value) {
 			value += rate;
-			if (value >= duration) {
-				value = duration;
+			if (value >= target) {
+				value = target;
 				state = 0;
 			}
 		}
 		else {
 			value -= rate;
-			if (value <= duration) {
-				value = duration;
+			if (value <= target) {
+				value = target;
 				state = 0;
 			}
 		}
@@ -222,8 +222,8 @@ void BKDelay::updateValues()
 	delayLinear->setLength(dDelayLength);
 	//delayLinear->setMax(dDelayMax);
 	delayLinear->setGain(dDelayGain);
-	dSmooth->setValue(dSmoothValue);
-	dSmooth->setDuration(dSmoothDuration);
+	//dSmooth->setValue(dSmoothValue);
+	//dSmooth->setTarget(dSmoothDuration);
 }
 
 void BKDelay::updateDelayFromSmooth()

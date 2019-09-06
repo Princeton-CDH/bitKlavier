@@ -90,19 +90,19 @@ public:
 
 	//accessors
 	inline const float getValue() const noexcept { return value; }
-	inline const float getDuration() const noexcept { return duration; }
+	inline const float getTarget() const noexcept { return target; }
 	inline const int getState() const noexcept { return state; }
 
 	//mutators
 	inline void setValue(float envelopeValue) { value = envelopeValue; }
-	inline void setDuration(float envelopeDuration) { duration = envelopeDuration; if ( duration != value ) state = 1;}
+	inline void setTarget(float envelopeTarget) { target = envelopeTarget; if ( target != value ) state = 1;}
 	inline void setRate(float sr) { rate = sr; }
 
 	float tick();
 
 private:
 	float value;
-	float duration;
+	float target;
 	float rate;
 	int state;
 };
