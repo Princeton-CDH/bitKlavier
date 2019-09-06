@@ -95,7 +95,7 @@ public:
 
 	//mutators
 	inline void setValue(float envelopeValue) { value = envelopeValue; }
-	inline void setDuration(float envelopeDuration) { duration = envelopeDuration; }
+	inline void setDuration(float envelopeDuration) { duration = envelopeDuration; if ( duration != value ) state = 1;}
 	inline void setRate(float sr) { rate = sr; }
 
 	float tick();

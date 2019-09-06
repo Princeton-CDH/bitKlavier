@@ -135,12 +135,15 @@ float BKDelayL::nextOutRight()
 //allows addition of samples without incrementing delay position value
 void BKDelayL::addSample(float input, unsigned long offset, int channel)
 {
+    //simplify? why not: inputs.addSample(channel, (inPoint + offset) % inputs.getNumSamples(), input * gain); ?
     unsigned long dec = 0;
     while (inPoint + (offset - dec) >= inputs.getNumSamples()) dec += inputs.getNumSamples();
     inputs.addSample(channel, inPoint + (offset - dec), input * gain);
 	
 }
 
+//redo so it has channel argument, like addSample, also bool which indicates whether to increment inPoint
+//or, have it take float* input
 float* BKDelayL::tick(float input, bool stereo)
 {
 	inputs.addSample(0, inPoint, input * gain);
@@ -158,7 +161,7 @@ float* BKDelayL::tick(float input, bool stereo)
 
 	//feedback
 	inputs.addSample(0, inPoint, lastFrameLeft * 0.9);
-	if (stereo) inputs.addSample(1, inPoint, lastFrameRight * 0.9);
+	if (stereo) inputs.addSample(1, inPoint, lastFrameRight * 0.9); 
 
 	inPoint++;
 	if (inPoint == inputs.getNumSamples()) inPoint = 0;

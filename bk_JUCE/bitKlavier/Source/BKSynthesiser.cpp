@@ -225,7 +225,7 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 			{
 				//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
 				//totalOutput += d->getDelay()->tick(0);
-				float* outputs = d->getDelay()->tick(0, true);
+				float* outputs = d->getDelay()->tick(0, true); 
 				totalOutputL += outputs[0];
 				totalOutputR += outputs[1];
 				//d->getDSmooth()->tick();
