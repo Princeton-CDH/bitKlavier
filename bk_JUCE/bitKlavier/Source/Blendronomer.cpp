@@ -170,8 +170,10 @@ void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 		sampleTimer = 0;
         
         DBG("beat length = " + String(numSamplesBeat / 44.1));
+        
+        updateDelay();
 	}
-    updateDelay();
+    //updateDelay();
 }
 
 float BlendronomerProcessor::getTimeToBeatMS(float beatsToSkip)
