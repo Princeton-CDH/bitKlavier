@@ -255,7 +255,7 @@ public:
     
     void linkPreparationWithKeymap(BKPreparationType thisType, int thisId, int keymapId);
     
-    void linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo);
+    void linkPreparationWithTempo(BKPreparationType thisType, int thisId, Tempo::Ptr thisTempo);
     
     void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
     

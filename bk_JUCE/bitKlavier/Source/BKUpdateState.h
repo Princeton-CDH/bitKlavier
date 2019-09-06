@@ -35,12 +35,14 @@ public:
     int  currentDirectId = 1;
     int  currentSynchronicId = 1;
     int  currentNostalgicId = 1;
+    int  currentBlendronicId = 1;
     int  currentTempoId = 1;
     int  currentTuningId = 1;
     
     int  currentModDirectId = 1;
     int  currentModSynchronicId = 1;
     int  currentModNostalgicId = 1;
+    int  currentModBlendronicId = 1;
     int  currentModTempoId = 1;
     int  currentModTuningId = 1;
     
@@ -52,6 +54,7 @@ public:
     bool pianoDidChangeForGraph = false;
     bool directPreparationDidChange = false;
     bool nostalgicPreparationDidChange = false;
+    bool blendronicPreparationDidChange = false;
     bool synchronicPreparationDidChange = false;
     bool tuningPreparationDidChange = false;
     bool tempoPreparationDidChange = false;
@@ -95,6 +98,12 @@ public:
             currentNostalgicId = (Id == -1) ? currentNostalgicId : Id;
             nostalgicPreparationDidChange = true;
             setCurrentDisplay(DisplayNostalgic);
+        }
+        else if (type == PreparationTypeBlendronomer)
+        {
+            currentBlendronicId = (Id == -1) ? currentBlendronicId : Id;
+            blendronicPreparationDidChange = true;
+            setCurrentDisplay(DisplayBlendronomer);
         }
         else if (type == PreparationTypeTuning)
         {

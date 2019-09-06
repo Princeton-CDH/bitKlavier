@@ -11,8 +11,8 @@
 #include "Direct.h"
 
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
-									TuningProcessor::Ptr tuning,
-									BlendronomerProcessor::Ptr blender,
+                                 TuningProcessor::Ptr tuning,
+                                 BlendronomerProcessor::Ptr blender,
                                  BKSynthesiser *s,
                                  BKSynthesiser *res,
                                  BKSynthesiser *ham):

@@ -181,7 +181,7 @@ void Gallery::randomize()
             else if (linkType > 0.33) p->linkPreparationWithTuning(PreparationTypeSynchronic, sProc->getId(), t);
             else p->linkNostalgicWithSynchronic(n, s);
 
-            p->linkSynchronicWithTempo(s, m);
+            p->linkPreparationWithTempo(PreparationTypeSynchronic, s->getId(), m);
         }
     }
 }

@@ -146,6 +146,8 @@
                 file="Source/galleries/Exercise Constraint.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
+          <FILE id="jFt7tl" name="blendronic_icon.png" compile="0" resource="1"
+                file="Source/icons/blendronic_icon.png"/>
           <FILE id="xOwvX8" name="left-arrow.png" compile="0" resource="1" file="Source/icons/left-arrow.png"/>
           <FILE id="IksJJv" name="right-arrow.png" compile="0" resource="1" file="Source/icons/right-arrow.png"/>
           <FILE id="A1o3FE" name="icon_iOS_72.png" compile="0" resource="1" file="Source/icons/icon_iOS_72.png"/>
@@ -321,6 +323,10 @@
                 file="Source/PluginEditor.cpp"/>
         </GROUP>
         <GROUP id="{444BC2CA-5FF1-6AEB-00B9-DF5D039DBFFE}" name="PreparationVC">
+          <FILE id="KJnEpI" name="BlendronicViewController.cpp" compile="1" resource="0"
+                file="Source/BlendronicViewController.cpp"/>
+          <FILE id="eIGqlu" name="BlendronicViewController.h" compile="0" resource="0"
+                file="Source/BlendronicViewController.h"/>
           <FILE id="Iv0ln2" name="TempoViewController.cpp" compile="1" resource="0"
                 file="Source/TempoViewController.cpp"/>
           <FILE id="ePlqOW" name="TempoViewController.h" compile="0" resource="0"

@@ -204,6 +204,14 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     {
         return gallery->getSynchronicModification(Id)->getState();
     }
+    else if (type == PreparationTypeBlendronomer)
+    {
+        return gallery->getBlendronomer(Id)->getState(true);
+    }
+    else if (type == PreparationTypeBlendronomerMod)
+    {
+        return gallery->getBlendronomerModification(Id)->getState();
+    }
     else if (type == PreparationTypeTuning)
     {
         return gallery->getTuning(Id)->getState(true);

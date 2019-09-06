@@ -21,8 +21,6 @@
 
 #define BK_UNIT_TESTS 0
 
-#define TESTING_BLENDRONOMER 1
-
 #define NUM_EPOCHS 10
 
 #define SAVE_ID 1
@@ -83,6 +81,10 @@
 #define EXPORT_ID 50
 #define IMPORT_ID 51
 
+#define BLENDRONIC_ID 52 //should these defines be replaced with a typedef enum for menu items?
+#define BLENDRONIC_EDIT_ID 53
+#define BLENDRONICMOD_EDIT_ID 54
+
 #define SOUNDFONT_ID 1000
 
 #define MIDIOUT_ID 2000
@@ -104,6 +106,7 @@ inline PopupMenu getNewItemMenu(LookAndFeel* laf)
     newMenu.addItem(DIRECT_ID, "Direct (D)");
     newMenu.addItem(NOSTALGIC_ID, "Nostalgic (N)");
     newMenu.addItem(SYNCHRONIC_ID, "Synchronic (S)");
+    newMenu.addItem(BLENDRONIC_ID, "Blendronic (B)");
     newMenu.addItem(TUNING_ID, "Tuning (T)");
     newMenu.addItem(TEMPO_ID, "Tempo (M)");
     newMenu.addSeparator();
@@ -125,6 +128,7 @@ inline PopupMenu getEditItemMenu(LookAndFeel* laf)
     menu.addItem(DIRECT_EDIT_ID, "Direct");
     menu.addItem(NOSTALGIC_EDIT_ID, "Nostalgic");
     menu.addItem(SYNCHRONIC_EDIT_ID, "Synchronic");
+    menu.addItem(BLENDRONIC_EDIT_ID, "Blendronic");
     menu.addItem(TUNING_EDIT_ID, "Tuning");
     menu.addItem(TEMPO_EDIT_ID, "Tempo");
     menu.addItem(DIRECTMOD_EDIT_ID, "Direct Mod");

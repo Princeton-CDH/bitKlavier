@@ -90,6 +90,8 @@ void Piano::configure(void)
     
     defaultS = getSynchronicProcessor(DEFAULT_ID);
     
+    //defaultB = getBlendronomerProcessor(DEFAULT_ID);
+    
     for (auto item : items)
     {
         BKPreparationType thisType = item->getType();
@@ -121,6 +123,7 @@ void Piano::configure(void)
                 
                 if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo) || targetType == PreparationTypeBlendronomer)
                 {
+                    DBG(String(targetType) + " linked with keymap");
                     linkPreparationWithKeymap(targetType, targetId, Id);
                 }
                 else if ((targetType >= PreparationTypeDirectMod && targetType <= PreparationTypeTempoMod) || targetType == PreparationTypeBlendronomerMod)
@@ -162,9 +165,9 @@ void Piano::configure(void)
                 BKPreparationType targetType = target->getType();
                 int targetId = target->getId();
                 
-                if (targetType == PreparationTypeSynchronic)
+                if (targetType == PreparationTypeSynchronic || targetType == PreparationTypeBlendronomer)
                 {
-                    linkSynchronicWithTempo(processor.gallery->getSynchronic(targetId), processor.gallery->getTempo(Id));
+                    linkPreparationWithTempo(targetType, targetId, processor.gallery->getTempo(Id));
                 }
             }
         }
@@ -329,7 +332,12 @@ TempoProcessor::Ptr Piano::addTempoProcessor(int thisId)
 
 BlendronomerProcessor::Ptr Piano::addBlendronomerProcessor(int thisId)
 {
-	BlendronomerProcessor::Ptr bproc = new BlendronomerProcessor(processor.gallery->getBlendronomer(thisId), defaultT, defaultM, nullptr, processor.gallery->getGeneralSettings(), &processor.mainPianoSynth);
+	BlendronomerProcessor::Ptr bproc = new BlendronomerProcessor(processor.gallery->getBlendronomer(thisId),
+                                                                 defaultT,
+                                                                 defaultM,
+                                                                 nullptr,
+                                                                 processor.gallery->getGeneralSettings(),
+                                                                 &processor.mainPianoSynth);
 	bproc->prepareToPlay(sampleRate);
 	bprocessor.add(bproc);
 
@@ -426,11 +434,22 @@ void Piano::remove(BKItem::Ptr item)
     if (removed) configure();
 }
 
-void Piano::linkSynchronicWithTempo(Synchronic::Ptr synchronic, Tempo::Ptr thisTempo)
+void Piano::linkPreparationWithTempo(BKPreparationType thisType, int thisId, Tempo::Ptr thisTempo)
 {
-    SynchronicProcessor::Ptr proc = getSynchronicProcessor(synchronic->getId());
+    TempoProcessor::Ptr mproc = getTempoProcessor(thisTempo->getId());
     
-    proc->setTempo(getTempoProcessor(thisTempo->getId()));
+    if (thisType == PreparationTypeSynchronic)
+    {
+        SynchronicProcessor::Ptr sproc = getSynchronicProcessor(thisId);
+        
+        sproc->setTempo(mproc);
+    }
+    else if (thisType == PreparationTypeBlendronomer)
+    {
+        BlendronomerProcessor::Ptr bproc = getBlendronomerProcessor(thisId);
+        
+        bproc->setTempo(mproc);
+    }
 }
 
 void Piano::linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic)

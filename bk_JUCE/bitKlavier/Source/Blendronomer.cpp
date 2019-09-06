@@ -66,7 +66,7 @@ BlendronomerPreparation::BlendronomerPreparation(void) :
 	bClickGains(Array<float>({ 1. })),
 	bDelayMax(4000 * 44.1),
 	bFeedbackGain(0.97),
-	bDelayLength(280 * 44.1),
+	bDelayLength(800 * 44.1),
 	bSmoothValue(180. * 44.1),
 	bSmoothDuration(0),
 	bInputThresh(1),
