@@ -211,9 +211,15 @@ void BlendronomerProcessor::updateDelay()
 {
 	//delay->setDelayLength(blendronomer->aPrep->getDelayLength());
 	//delay->setDelayMax(blendronomer->aPrep->getDelayMax());
-	delay->setDelayLength(blendronomer->aPrep->getBeats()[beatIndex] * 200 * 44.1);
-	blendronomer->aPrep->setDelayLength(blendronomer->aPrep->getBeats()[beatIndex] * 200 * 44.1);
-	//delay->setDelayGain(blendronomer->aPrep->getFeedbackCoefficients()[gainIndex]);
+    
+	//delay->setDelayLength(blendronomer->aPrep->getBeats()[beatIndex] * 200 * 44.1);
+	//blendronomer->aPrep->setDelayLength(blendronomer->aPrep->getBeats()[beatIndex] * 200 * 44.1);
+	
+    //blendronomer->aPrep->getBeats()[beatIndex] * 200 * 44.1
+    delay->setDelayLength(numSamplesBeat);
+    blendronomer->aPrep->setDelayLength(numSamplesBeat);
+    
+    //delay->setDelayGain(blendronomer->aPrep->getFeedbackCoefficients()[gainIndex]);
 	//delay->setSmoothDuration(blendronomer->aPrep->getSmoothDurations()[smoothIndex]);
 	//delay->setSmoothValue(numSamplesBeat);
 	//delay->setActive(blendronomer->aPrep->getActive());
