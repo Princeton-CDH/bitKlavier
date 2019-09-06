@@ -97,6 +97,7 @@ public:
 	inline void setValue(float envelopeValue) { value = envelopeValue; }
 	inline void setTarget(float envelopeTarget) { target = envelopeTarget; if ( target != value ) state = 1;}
 	inline void setRate(float sr) { rate = sr; }
+    inline void setTime(float time) { rate_ = 1.0 / ( time * sr ); }
 
 	float tick();
 
