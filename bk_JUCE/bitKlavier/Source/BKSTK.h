@@ -97,7 +97,7 @@ public:
 	inline void setValue(float envelopeValue) { value = envelopeValue; }
 	inline void setTarget(float envelopeTarget) { target = envelopeTarget; if ( target != value ) state = 1;}
 	inline void setRate(float sr) { rate = sr; }
-    inline void setTime(float time) { rate = 1.0 / ( time * sr ); }
+    inline void setTime(float time) { rate = 1.0 / ( time * 44.1 ); } // time in ms for envelope to go from 0-1. need to update for sampleRate
 
 	float tick();
 
