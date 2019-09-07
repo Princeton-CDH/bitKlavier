@@ -1039,7 +1039,8 @@ public:
     int getLengthMultiplierCounterForDisplay()
     {
         int tempsize = prep->getLengthMultipliers().size();
-        int counter = getLengthMultiplierCounter() - 1;
+        //int counter = getLengthMultiplierCounter() - 1;
+        int counter = getLengthMultiplierCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
         if(counter >= tempsize) counter = 0;
@@ -1050,7 +1051,7 @@ public:
     int getBeatMultiplierCounterForDisplay()
     {
         int tempsize = prep->getBeatMultipliers().size();
-        int counter = getBeatMultiplierCounter() - 1;
+        int counter = getBeatMultiplierCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
         if(counter >= tempsize) counter = 0;
@@ -1061,7 +1062,7 @@ public:
     int getAccentMultiplierCounterForDisplay()
     {
         int tempsize = prep->getAccentMultipliers().size();
-        int counter = getAccentMultiplierCounter() - 1;
+        int counter = getAccentMultiplierCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
         if(counter >= tempsize) counter = 0;
@@ -1072,7 +1073,7 @@ public:
     int getTranspCounterForDisplay()
     {
         int tempsize = prep->getTransposition().size();
-        int counter = getTranspCounter() - 1;
+        int counter = getTranspCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
         if(counter >= tempsize) counter = 0;
