@@ -1096,6 +1096,7 @@ public:
         phasor += numSamples;
     }
     
+    /*
     inline void step (uint64 numSamplesBeat)
     {
         phasor -= numSamplesBeat;
@@ -1119,6 +1120,39 @@ public:
             beatMultiplierCounter = 0;
         }
 
+        if (++beatCounter >= (prep->getNumBeats() + prep->getBeatsToSkip()))
+        {
+            shouldPlay = false;
+        }
+    }
+     */
+    inline void step (uint64 numSamplesBeat)
+    {
+        phasor -= numSamplesBeat;
+        
+        //increment parameter counters
+        if (++lengthMultiplierCounter   >= prep->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
+        if (++accentMultiplierCounter   >= prep->getAccentMultipliers().size())     accentMultiplierCounter = 0;
+        if (++transpCounter             >= prep->getTransposition().size())         transpCounter = 0;
+        if (++envelopeCounter           >= prep->getEnvelopesOn().size())           envelopeCounter = 0;
+        
+        while(!prep->getEnvelopesOn()[envelopeCounter]) //skip untoggled envelopes
+        {
+            envelopeCounter++;
+            if (envelopeCounter >= prep->getEnvelopesOn().size()) envelopeCounter = 0;
+        }
+        
+    }
+    
+    inline void postStep ()
+    {
+    
+        if (++beatMultiplierCounter >= prep->getBeatMultipliers().size())
+        {
+            //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
+            beatMultiplierCounter = 0;
+        }
+        
         if (++beatCounter >= (prep->getNumBeats() + prep->getBeatsToSkip()))
         {
             shouldPlay = false;
