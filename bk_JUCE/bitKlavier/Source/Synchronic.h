@@ -1162,14 +1162,26 @@ public:
     
     inline void resetPhase()
     {
-        int skipBeats = prep->getBeatsToSkip();
-        int idx = (skipBeats < 0) ? 0 : skipBeats;
+        //int skipBeats = prep->getBeatsToSkip();
+        //int idx = (skipBeats < 0) ? 0 : skipBeats;
+        int skipBeats = prep->getBeatsToSkip() - 1;
+        int idx = (skipBeats < -1) ? -1 : skipBeats;
         
+        /*
         if(prep->getBeatMultipliers().size() > 0)   beatMultiplierCounter   = idx % prep->getBeatMultipliers().size();
         if(prep->getLengthMultipliers().size() > 0) lengthMultiplierCounter = idx % prep->getLengthMultipliers().size();
         if(prep->getAccentMultipliers().size() > 0) accentMultiplierCounter = idx % prep->getAccentMultipliers().size();
         if(prep->getTransposition().size() > 0)     transpCounter           = idx % prep->getTransposition().size();
         if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = idx % prep->getEnvelopesOn().size();
+        */
+        
+        if(prep->getBeatMultipliers().size() > 0)   beatMultiplierCounter   = mod(idx, prep->getBeatMultipliers().size());
+        if(prep->getLengthMultipliers().size() > 0) lengthMultiplierCounter = mod(idx, prep->getLengthMultipliers().size());
+        if(prep->getAccentMultipliers().size() > 0) accentMultiplierCounter = mod(idx, prep->getAccentMultipliers().size());
+        if(prep->getTransposition().size() > 0)     transpCounter           = mod(idx, prep->getTransposition().size());
+        if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = mod(idx, prep->getEnvelopesOn().size());
+
+        DBG("beatMultiplierCounter = " + String(beatMultiplierCounter));
         
         //beatCounter             = skipBeats;
         beatCounter             = 0;
