@@ -526,6 +526,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                  );
                  */
                 cluster->step(numSamplesBeat);
+                cluster->postStep();
                 
                 //figure out whether to play the cluster
                 bool passCluster = false;
@@ -558,7 +559,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                 
                 // step cluster data
                 //cluster->step(numSamplesBeat);
-                cluster->postStep();
+                //cluster->postStep();
                 
             }
             

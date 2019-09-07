@@ -1170,7 +1170,8 @@ public:
         if(prep->getTransposition().size() > 0)     transpCounter           = idx % prep->getTransposition().size();
         if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = idx % prep->getEnvelopesOn().size();
         
-        beatCounter             = skipBeats;
+        //beatCounter             = skipBeats;
+        beatCounter             = 0;
     }
     
     inline Array<int> getCluster() {return cluster;}
