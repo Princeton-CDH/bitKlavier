@@ -567,6 +567,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                  " ADSR :" + String(prep->getAttack(envelopeCounter)) + " " + String(prep->getDecay(envelopeCounter)) + " " + String(prep->getSustain(envelopeCounter)) + " " + String(prep->getRelease(envelopeCounter))
                  );
                  */
+                cluster->step(numSamplesBeat);
+                //cluster->postStep();
                 
                 //figure out whether to play the cluster
                 bool passCluster = false;
@@ -598,7 +600,8 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                 }
                 
                 // step cluster data
-                cluster->step(numSamplesBeat);
+                //cluster->step(numSamplesBeat);
+                cluster->postStep();
                 
             }
             

@@ -251,6 +251,8 @@ double          ftom(double f, double sr);
 double          dt_asymwarp(double inval, double k);
 double          dt_asymwarp_inverse(double inval, double k);
 
+int mod(int a, int b);
+
 String rectangleToString(Rectangle<int> rect);
 String rectangleToString(Rectangle<float> rect);
 

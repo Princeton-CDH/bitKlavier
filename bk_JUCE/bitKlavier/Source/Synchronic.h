@@ -1060,7 +1060,8 @@ public:
     int getLengthMultiplierCounterForDisplay()
     {
         int tempsize = prep->getLengthMultipliers().size();
-        int counter = getLengthMultiplierCounter() - 1;
+        //int counter = getLengthMultiplierCounter() - 1;
+        int counter = getLengthMultiplierCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
         if(counter >= tempsize) counter = 0;
@@ -1071,7 +1072,7 @@ public:
     int getBeatMultiplierCounterForDisplay()
     {
         int tempsize = prep->getBeatMultipliers().size();
-        int counter = getBeatMultiplierCounter() - 1;
+        int counter = getBeatMultiplierCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
         if(counter >= tempsize) counter = 0;
@@ -1082,7 +1083,7 @@ public:
     int getAccentMultiplierCounterForDisplay()
     {
         int tempsize = prep->getAccentMultipliers().size();
-        int counter = getAccentMultiplierCounter() - 1;
+        int counter = getAccentMultiplierCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
         if(counter >= tempsize) counter = 0;
@@ -1093,7 +1094,7 @@ public:
     int getTranspCounterForDisplay()
     {
         int tempsize = prep->getTransposition().size();
-        int counter = getTranspCounter() - 1;
+        int counter = getTranspCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
         if(counter >= tempsize) counter = 0;
@@ -1117,6 +1118,7 @@ public:
         phasor += numSamples;
     }
     
+    /*
     inline void step (uint64 numSamplesBeat)
     {
         phasor -= numSamplesBeat;
@@ -1145,19 +1147,65 @@ public:
             shouldPlay = false;
         }
     }
+     */
+    inline void step (uint64 numSamplesBeat)
+    {
+        phasor -= numSamplesBeat;
+        
+        //increment parameter counters
+        if (++lengthMultiplierCounter   >= prep->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
+        if (++accentMultiplierCounter   >= prep->getAccentMultipliers().size())     accentMultiplierCounter = 0;
+        if (++transpCounter             >= prep->getTransposition().size())         transpCounter = 0;
+        if (++envelopeCounter           >= prep->getEnvelopesOn().size())           envelopeCounter = 0;
+        
+        while(!prep->getEnvelopesOn()[envelopeCounter]) //skip untoggled envelopes
+        {
+            envelopeCounter++;
+            if (envelopeCounter >= prep->getEnvelopesOn().size()) envelopeCounter = 0;
+        }
+        
+    }
+    
+    inline void postStep ()
+    {
+    
+        if (++beatMultiplierCounter >= prep->getBeatMultipliers().size())
+        {
+            //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
+            beatMultiplierCounter = 0;
+        }
+        
+        if (++beatCounter >= (prep->getNumBeats() + prep->getBeatsToSkip()))
+        {
+            shouldPlay = false;
+        }
+    }
     
     inline void resetPhase()
     {
-        int skipBeats = prep->getBeatsToSkip();
-        int idx = (skipBeats < 0) ? 0 : skipBeats;
+        //int skipBeats = prep->getBeatsToSkip();
+        //int idx = (skipBeats < 0) ? 0 : skipBeats;
+        int skipBeats = prep->getBeatsToSkip() - 1;
+        int idx = (skipBeats < -1) ? -1 : skipBeats;
         
+        /*
         if(prep->getBeatMultipliers().size() > 0)   beatMultiplierCounter   = idx % prep->getBeatMultipliers().size();
         if(prep->getLengthMultipliers().size() > 0) lengthMultiplierCounter = idx % prep->getLengthMultipliers().size();
         if(prep->getAccentMultipliers().size() > 0) accentMultiplierCounter = idx % prep->getAccentMultipliers().size();
         if(prep->getTransposition().size() > 0)     transpCounter           = idx % prep->getTransposition().size();
         if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = idx % prep->getEnvelopesOn().size();
+        */
         
-        beatCounter             = skipBeats;
+        if(prep->getBeatMultipliers().size() > 0)   beatMultiplierCounter   = mod(idx, prep->getBeatMultipliers().size());
+        if(prep->getLengthMultipliers().size() > 0) lengthMultiplierCounter = mod(idx, prep->getLengthMultipliers().size());
+        if(prep->getAccentMultipliers().size() > 0) accentMultiplierCounter = mod(idx, prep->getAccentMultipliers().size());
+        if(prep->getTransposition().size() > 0)     transpCounter           = mod(idx, prep->getTransposition().size());
+        if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = mod(idx, prep->getEnvelopesOn().size());
+
+        DBG("beatMultiplierCounter = " + String(beatMultiplierCounter));
+        
+        //beatCounter             = skipBeats;
+        beatCounter             = 0;
     }
     
     inline Array<int> getCluster() {return cluster;}

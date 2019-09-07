@@ -722,6 +722,7 @@ fun float dt_symwarp(float inval, float k, int symwarp_type)
 }
 */
 
+int mod(int a, int b) { return (a % b + b) % b; }
 
 #if BK_UNIT_TESTS
 
