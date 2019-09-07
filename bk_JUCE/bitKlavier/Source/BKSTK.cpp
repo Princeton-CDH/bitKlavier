@@ -13,7 +13,7 @@
 BKEnvelope::BKEnvelope() :
 	value(0.0f),
 	target(0.0f),
-	rate(0.001f)
+	rate(1.0f)
 {
 	state = 0;
 }
@@ -21,7 +21,7 @@ BKEnvelope::BKEnvelope() :
 BKEnvelope::BKEnvelope(float bValue, float bTarget) :
 	value(bValue),
 	target(bTarget),
-	rate(0.001f)
+	rate(1.0f)
 {
 	state = 0;
 }

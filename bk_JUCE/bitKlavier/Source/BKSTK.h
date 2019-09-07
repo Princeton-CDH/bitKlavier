@@ -95,7 +95,7 @@ public:
 
 	//mutators
 	inline void setValue(float envelopeValue) { value = envelopeValue; }
-	inline void setTarget(float envelopeTarget) { target = envelopeTarget; if ( target != value ) state = 1;}
+    inline void setTarget(float envelopeTarget) { target = envelopeTarget; if ( target != value ) state = 1; DBG("new envelope target = " + String(target));}
 	inline void setRate(float sr) { rate = sr; }
     inline void setTime(float time) { rate = 1.0 / ( time * 44.1 ); } // time in ms for envelope to go from 0-1. need to update for sampleRate
 
@@ -147,8 +147,9 @@ public:
 	inline void setDelayMax(float delayMax) { dDelayMax = delayMax; }
 	inline void setDelayGain(float delayGain) { dDelayGain = delayGain; }
 	inline void setDelayLength(float delayLength) { dDelayLength = delayLength; delayLinear->setLength(delayLength); }
+    inline void setDelayTargetLength(float delayLength) { dSmooth->setTarget(delayLength); }
 	inline void setSmoothValue(float smoothValue) { dSmoothValue = smoothValue; }
-	inline void setSmoothDuration(float smoothDuration) { dSmoothDuration = smoothDuration; }
+    inline void setSmoothDuration(float smoothDuration) { dSmoothDuration = smoothDuration; }
 	inline const void setActive(bool newActive) { dBlendronicActive = newActive; }
 	inline const void toggleActive() { dBlendronicActive = !dBlendronicActive; }
     inline const void setId(int Id) { dId = Id; }

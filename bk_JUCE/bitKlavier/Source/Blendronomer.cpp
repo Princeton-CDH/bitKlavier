@@ -220,7 +220,9 @@ void BlendronomerProcessor::updateDelay()
     blendronomer->aPrep->setDelayLength(numSamplesBeat);
     
     //delay->setDelayGain(blendronomer->aPrep->getFeedbackCoefficients()[gainIndex]);
-	//delay->setSmoothDuration(blendronomer->aPrep->getSmoothDurations()[smoothIndex]);
+	//delay->setSmoothDuration(blendronomer->aPrep->getSmoothDurations()[smoothIndex] / 50.);
+    delay->setSmoothDuration(50.);
+    delay->setDelayTargetLength(numSamplesBeat);
 	//delay->setSmoothValue(numSamplesBeat);
 	//delay->setActive(blendronomer->aPrep->getActive());
 }
