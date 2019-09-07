@@ -209,6 +209,9 @@ namespace BinaryData
     extern const char*   Exercise_Constraint_xml;
     const int            Exercise_Constraint_xmlSize = 51501;
 
+    extern const char*   blendronic_icon_png;
+    const int            blendronic_icon_pngSize = 36000;
+
     extern const char*   leftarrow_png;
     const int            leftarrow_pngSize = 9722;
 
@@ -288,7 +291,7 @@ namespace BinaryData
     const int            tuning_icon_pngSize = 12404;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 93;
+    const int namedResourceListSize = 94;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

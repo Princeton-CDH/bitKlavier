@@ -5,206 +5,198 @@
 
 namespace stk {
 
-	/***************************************************/
-	/*! \class DelayL
-		\brief STK linear interpolating delay line class.
-		This class implements a fractional-length digital delay-line using
-		first-order linear interpolation.  If the delay and maximum length
-		are not specified during instantiation, a fixed maximum length of
-		4095 and a delay of zero is set.
-		Linear interpolation is an efficient technique for achieving
-		fractional delay lengths, though it does introduce high-frequency
-		signal attenuation to varying degrees depending on the fractional
-		delay setting.  The use of higher order Lagrange interpolators can
-		typically improve (minimize) this attenuation characteristic.
-		by Perry R. Cook and Gary P. Scavone, 1995-2011.
-	*/
-	/***************************************************/
+/***************************************************/
+/*! \class DelayL
+    \brief STK linear interpolating delay line class.
 
-	class DelayL : public Filter
-	{
-	public:
+    This class implements a fractional-length digital delay-line using
+    first-order linear interpolation.  If the delay and maximum length
+    are not specified during instantiation, a fixed maximum length of
+    4095 and a delay of zero is set.
 
-		//! Default constructor creates a delay-line with maximum length of 4095 samples and zero delay.
-		/*!
-		  An StkError will be thrown if the delay parameter is less than
-		  zero, the maximum delay parameter is less than one, or the delay
-		  parameter is greater than the maxDelay value.
-		 */
-		DelayL(StkFloat delay = 0.0, unsigned long maxDelay = 4095);
+    Linear interpolation is an efficient technique for achieving
+    fractional delay lengths, though it does introduce high-frequency
+    signal attenuation to varying degrees depending on the fractional
+    delay setting.  The use of higher order Lagrange interpolators can
+    typically improve (minimize) this attenuation characteristic.
 
-		//! Class destructor.
-		~DelayL();
+    by Perry R. Cook and Gary P. Scavone, 1995-2011.
+*/
+/***************************************************/
 
-		//! Get the maximum delay-line length.
-		unsigned long getMaximumDelay(void) { return inputs_.size() - 1; };
+class DelayL : public Filter
+{
+public:
 
-		//! Set the maximum delay-line length.
-		/*!
-		  This method should generally only be used during initial setup
-		  of the delay line.  If it is used between calls to the tick()
-		  function, without a call to clear(), a signal discontinuity will
-		  likely occur.  If the current maximum length is greater than the
-		  new length, no memory allocation change is made.
-		*/
-		void setMaximumDelay(unsigned long delay);
+  //! Default constructor creates a delay-line with maximum length of 4095 samples and zero delay.
+  /*!
+    An StkError will be thrown if the delay parameter is less than
+    zero, the maximum delay parameter is less than one, or the delay
+    parameter is greater than the maxDelay value.
+   */  
+  DelayL( StkFloat delay = 0.0, unsigned long maxDelay = 4095 );
 
-		//! Set the delay-line length.
-		/*!
-		  The valid range for \e delay is from 0 to the maximum delay-line length.
-		*/
-		void setDelay(StkFloat delay);
+  //! Class destructor.
+  ~DelayL();
 
-		//! Return the current delay-line length.
-		StkFloat getDelay(void) const { return delay_; };
+  //! Get the maximum delay-line length.
+  unsigned long getMaximumDelay( void ) { return inputs_.size() - 1; };
 
-		//! Return the value at \e tapDelay samples from the delay-line input.
-		/*!
-		  The tap point is determined modulo the delay-line length and is
-		  relative to the last input value (i.e., a tapDelay of zero returns
-		  the last input value).
-		*/
-		StkFloat tapOut(unsigned long tapDelay);
+  //! Set the maximum delay-line length.
+  /*!
+    This method should generally only be used during initial setup
+    of the delay line.  If it is used between calls to the tick()
+    function, without a call to clear(), a signal discontinuity will
+    likely occur.  If the current maximum length is greater than the
+    new length, no memory allocation change is made.
+  */
+  void setMaximumDelay( unsigned long delay );
 
-		//! Set the \e value at \e tapDelay samples from the delay-line input.
-		void tapIn(StkFloat value, unsigned long tapDelay);
+  //! Set the delay-line length.
+  /*!
+    The valid range for \e delay is from 0 to the maximum delay-line length.
+  */
+  void setDelay( StkFloat delay );
 
-		//! Return the last computed output value.
-		StkFloat lastOut(void) const { return lastFrame_[0]; };
+  //! Return the current delay-line length.
+  StkFloat getDelay( void ) const { return delay_; };
 
-		//! Return the value which will be output by the next call to tick().
-		/*!
-		  This method is valid only for delay settings greater than zero!
-		 */
-		StkFloat nextOut(void);
+  //! Return the value at \e tapDelay samples from the delay-line input.
+  /*!
+    The tap point is determined modulo the delay-line length and is
+    relative to the last input value (i.e., a tapDelay of zero returns
+    the last input value).
+  */
+  StkFloat tapOut( unsigned long tapDelay );
 
-		//! Input one sample to the filter and return one output.
-		StkFloat tick(StkFloat input);
+  //! Set the \e value at \e tapDelay samples from the delay-line input.
+  void tapIn( StkFloat value, unsigned long tapDelay );
 
-		//! Take a channel of the StkFrames object as inputs to the filter and replace with corresponding outputs.
-		/*!
-		  The StkFrames argument reference is returned.  The \c channel
-		  argument must be less than the number of channels in the
-		  StkFrames argument (the first channel is specified by 0).
-		  However, range checking is only performed if _STK_DEBUG_ is
-		  defined during compilation, in which case an out-of-range value
-		  will trigger an StkError exception.
-		*/
-		StkFrames& tick(StkFrames& frames, unsigned int channel = 0);
+  //! Return the last computed output value.
+  StkFloat lastOut( void ) const { return lastFrame_[0]; };
 
-		//! Take a channel of the \c iFrames object as inputs to the filter and write outputs to the \c oFrames object.
-		/*!
-		  The \c iFrames object reference is returned.  Each channel
-		  argument must be less than the number of channels in the
-		  corresponding StkFrames argument (the first channel is specified
-		  by 0).  However, range checking is only performed if _STK_DEBUG_
-		  is defined during compilation, in which case an out-of-range value
-		  will trigger an StkError exception.
-		*/
-		StkFrames& tick(StkFrames& iFrames, StkFrames& oFrames, unsigned int iChannel = 0, unsigned int oChannel = 0);
+  //! Return the value which will be output by the next call to tick().
+  /*!
+    This method is valid only for delay settings greater than zero!
+   */
+  StkFloat nextOut( void );
 
-		void addSample(StkFloat sampleToAdd, unsigned long offset);
+  //! Input one sample to the filter and return one output.
+  StkFloat tick( StkFloat input );
 
-		void scalePrevious(StkFloat coefficient, unsigned long offset);
+  //! Take a channel of the StkFrames object as inputs to the filter and replace with corresponding outputs.
+  /*!
+    The StkFrames argument reference is returned.  The \c channel
+    argument must be less than the number of channels in the
+    StkFrames argument (the first channel is specified by 0).
+    However, range checking is only performed if _STK_DEBUG_ is
+    defined during compilation, in which case an out-of-range value
+    will trigger an StkError exception.
+  */
+  StkFrames& tick( StkFrames& frames, unsigned int channel = 0 );
 
-	protected:
+  //! Take a channel of the \c iFrames object as inputs to the filter and write outputs to the \c oFrames object.
+  /*!
+    The \c iFrames object reference is returned.  Each channel
+    argument must be less than the number of channels in the
+    corresponding StkFrames argument (the first channel is specified
+    by 0).  However, range checking is only performed if _STK_DEBUG_
+    is defined during compilation, in which case an out-of-range value
+    will trigger an StkError exception.
+  */
+  StkFrames& tick( StkFrames& iFrames, StkFrames &oFrames, unsigned int iChannel = 0, unsigned int oChannel = 0 );
 
-		unsigned long inPoint_;
-		unsigned long outPoint_;
-		StkFloat delay_;
-		StkFloat alpha_;
-		StkFloat omAlpha_;
-		StkFloat nextOutput_;
-		bool doNextOut_;
-	};
+ protected:
 
-	inline StkFloat DelayL::nextOut(void)
-	{
-		if (doNextOut_) {
-			// First 1/2 of interpolation
-			nextOutput_ = inputs_[outPoint_] * omAlpha_;
-			// Second 1/2 of interpolation
-			if (outPoint_ + 1 < inputs_.size())
-				nextOutput_ += inputs_[outPoint_ + 1] * alpha_;
-			else
-				nextOutput_ += inputs_[0] * alpha_;
-			doNextOut_ = false;
-		}
+  unsigned long inPoint_;
+  unsigned long outPoint_;
+  StkFloat delay_;
+  StkFloat alpha_;
+  StkFloat omAlpha_;
+  StkFloat nextOutput_;
+  bool doNextOut_;
+};
 
-		return nextOutput_;
-	}
+inline StkFloat DelayL :: nextOut( void )
+{
+  if ( doNextOut_ ) {
+    // First 1/2 of interpolation
+    nextOutput_ = inputs_[outPoint_] * omAlpha_;
+    // Second 1/2 of interpolation
+    if (outPoint_+1 < inputs_.size())
+      nextOutput_ += inputs_[outPoint_+1] * alpha_;
+    else
+      nextOutput_ += inputs_[0] * alpha_;
+    doNextOut_ = false;
+  }
 
-	inline StkFloat DelayL::tick(StkFloat input)
-	{
-		//inputs_[inPoint_++] += input * gain_;
-		inputs_[inPoint_] += input * gain_;
+  return nextOutput_;
+}
 
-		// Increment input pointer modulo length.
-		//if (inPoint_ == inputs_.size())
-		//	inPoint_ = 0;
+inline StkFloat DelayL :: tick( StkFloat input )
+{
+  inputs_[inPoint_++] = input * gain_;
 
-		lastFrame_[0] = nextOut();
-		doNextOut_ = true;
+  // Increment input pointer modulo length.
+  if ( inPoint_ == inputs_.size() )
+    inPoint_ = 0;
 
-		// Increment output pointer modulo length.
-		if (++outPoint_ == inputs_.size())
-			outPoint_ = 0;
+  lastFrame_[0] = nextOut();
+  doNextOut_ = true;
 
-		inputs_[inPoint_++] += lastFrame_[0] * 0.5; //feedback
+  // Increment output pointer modulo length.
+  if ( ++outPoint_ == inputs_.size() )
+    outPoint_ = 0;
 
-		// Increment input pointer modulo length.
-		if (inPoint_ == inputs_.size())
-			inPoint_ = 0;
+  return lastFrame_[0];
+}
 
-		return lastFrame_[0];
-	}
-
-	inline StkFrames& DelayL::tick(StkFrames& frames, unsigned int channel)
-	{
+inline StkFrames& DelayL :: tick( StkFrames& frames, unsigned int channel )
+{
 #if defined(_STK_DEBUG_)
-		if (channel >= frames.channels()) {
-			oStream_ << "DelayL::tick(): channel and StkFrames arguments are incompatible!";
-			handleError(StkError::FUNCTION_ARGUMENT);
-		}
+  if ( channel >= frames.channels() ) {
+    oStream_ << "DelayL::tick(): channel and StkFrames arguments are incompatible!";
+    handleError( StkError::FUNCTION_ARGUMENT );
+  }
 #endif
 
-		StkFloat* samples = &frames[channel];
-		unsigned int hop = frames.channels();
-		for (unsigned int i = 0; i < frames.frames(); i++, samples += hop) {
-			inputs_[inPoint_++] = *samples * gain_;
-			if (inPoint_ == inputs_.size()) inPoint_ = 0;
-			*samples = nextOut();
-			doNextOut_ = true;
-			if (++outPoint_ == inputs_.size()) outPoint_ = 0;
-		}
+  StkFloat *samples = &frames[channel];
+  unsigned int hop = frames.channels();
+  for ( unsigned int i=0; i<frames.frames(); i++, samples += hop ) {
+    inputs_[inPoint_++] = *samples * gain_;
+    if ( inPoint_ == inputs_.size() ) inPoint_ = 0;
+    *samples = nextOut();
+    doNextOut_ = true;
+    if ( ++outPoint_ == inputs_.size() ) outPoint_ = 0;
+  }
 
-		lastFrame_[0] = *(samples - hop);
-		return frames;
-	}
+  lastFrame_[0] = *(samples-hop);
+  return frames;
+}
 
-	inline StkFrames& DelayL::tick(StkFrames& iFrames, StkFrames& oFrames, unsigned int iChannel, unsigned int oChannel)
-	{
+inline StkFrames& DelayL :: tick( StkFrames& iFrames, StkFrames& oFrames, unsigned int iChannel, unsigned int oChannel )
+{
 #if defined(_STK_DEBUG_)
-		if (iChannel >= iFrames.channels() || oChannel >= oFrames.channels()) {
-			oStream_ << "DelayL::tick(): channel and StkFrames arguments are incompatible!";
-			handleError(StkError::FUNCTION_ARGUMENT);
-		}
+  if ( iChannel >= iFrames.channels() || oChannel >= oFrames.channels() ) {
+    oStream_ << "DelayL::tick(): channel and StkFrames arguments are incompatible!";
+    handleError( StkError::FUNCTION_ARGUMENT );
+  }
 #endif
 
-		StkFloat* iSamples = &iFrames[iChannel];
-		StkFloat* oSamples = &oFrames[oChannel];
-		unsigned int iHop = iFrames.channels(), oHop = oFrames.channels();
-		for (unsigned int i = 0; i < iFrames.frames(); i++, iSamples += iHop, oSamples += oHop) {
-			inputs_[inPoint_++] = *iSamples * gain_;
-			if (inPoint_ == inputs_.size()) inPoint_ = 0;
-			*oSamples = nextOut();
-			doNextOut_ = true;
-			if (++outPoint_ == inputs_.size()) outPoint_ = 0;
-		}
+  StkFloat *iSamples = &iFrames[iChannel];
+  StkFloat *oSamples = &oFrames[oChannel];
+  unsigned int iHop = iFrames.channels(), oHop = oFrames.channels();
+  for ( unsigned int i=0; i<iFrames.frames(); i++, iSamples += iHop, oSamples += oHop ) {
+    inputs_[inPoint_++] = *iSamples * gain_;
+    if ( inPoint_ == inputs_.size() ) inPoint_ = 0;
+    *oSamples = nextOut();
+    doNextOut_ = true;
+    if ( ++outPoint_ == inputs_.size() ) outPoint_ = 0;
+  }
 
-		lastFrame_[0] = *(oSamples - oHop);
-		return iFrames;
-	}
+  lastFrame_[0] = *(oSamples-oHop);
+  return iFrames;
+}
 
 } // stk namespace
 
