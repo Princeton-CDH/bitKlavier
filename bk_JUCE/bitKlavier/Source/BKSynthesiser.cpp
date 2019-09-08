@@ -214,6 +214,8 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 	float totalOutputL = 0.0f;
 	float totalOutputR = 0.0f;
 
+    float tempEnv;
+    
 	while (--numSamples >= 0)
 	{
 		totalOutputL = 0.0f;
@@ -228,7 +230,8 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 				float* outputs = d->getDelay()->tick(0, true); 
 				totalOutputL += outputs[0];
 				totalOutputR += outputs[1];
-				d->getDSmooth()->tick();
+				tempEnv = d->getDSmooth()->tick();
+                d->setDelayLength(tempEnv);
 				//d->updateDelayFromSmooth();
 			}
 		}
@@ -245,6 +248,8 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 			*outL++ += (((double)totalOutputL) + ((double)totalOutputR)) * 0.5;
 		}
 	}
+    
+    DBG("envelope val = " + String(tempEnv));
 }
 
 void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples)
@@ -273,6 +278,7 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
 				totalOutputL += outputs[0];
 				totalOutputR += outputs[1];
 				tempEnv = d->getDSmooth()->tick();
+                d->setDelayLength(tempEnv);
 				//d->updateDelayFromSmooth();
 			}
         }
