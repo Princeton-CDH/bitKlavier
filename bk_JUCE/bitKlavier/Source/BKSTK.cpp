@@ -16,6 +16,7 @@ BKEnvelope::BKEnvelope() :
 	rate(1.0f)
 {
 	state = 0;
+    sampleRate = 44100;
 }
 
 BKEnvelope::BKEnvelope(float bValue, float bTarget) :
@@ -24,6 +25,7 @@ BKEnvelope::BKEnvelope(float bValue, float bTarget) :
 	rate(1.0f)
 {
 	state = 0;
+    sampleRate = 44100;
 }
 
 BKEnvelope::~BKEnvelope()
@@ -66,6 +68,7 @@ BKDelayL::BKDelayL() :
 	inputs = AudioBuffer<float>(2, max);
 	inputs.clear();
 	setLength(0.0);
+    sampleRate = 44100;
 }
 
 BKDelayL::BKDelayL(float delayLength, float delayMax, float delayGain) :
@@ -82,6 +85,7 @@ BKDelayL::BKDelayL(float delayLength, float delayMax, float delayGain) :
 	inputs = AudioBuffer<float>(2, max);
 	inputs.clear();
 	setLength(delayLength);
+    sampleRate = 44100;
 }
 
 BKDelayL::~BKDelayL()

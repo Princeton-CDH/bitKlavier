@@ -296,7 +296,7 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
         }
     }
     
-    DBG("envelope val = " + String(tempEnv));
+    //DBG("envelope val = " + String(tempEnv));
     //DBG("totalOutput = " + String(totalOutputL));
 }
 

@@ -837,11 +837,10 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             break;
         }
 		//delay line for blendronomer, much of this has been moved to BKSynthesiser::processNextBlock()
-        if (bDelay != nullptr)
+        if (bDelay != nullptr) //should have a bool as well, set by whatever preps blendronic is connected to
         {
             if (bDelay->getActive() == true)
             {
-				//if (l != 0.0) DBG("L: " + String(l) + " R: " + String(r));
 				bDelay->addSample(l, addCounter, 0);
 				bDelay->addSample(r, addCounter, 1);
 				addCounter++;

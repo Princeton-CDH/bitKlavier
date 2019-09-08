@@ -139,7 +139,7 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer, Tu
 			blendronomer->aPrep->getSmoothDuration(),
 			true); //currently for testing
 	}
-	numSamplesBeat = (uint64)blendronomer->aPrep->getBeats()[beatIndex] * 400 * 44.1; // should be sampleRate
+	numSamplesBeat = (uint64)blendronomer->aPrep->getBeats()[beatIndex] * 400 * sampleRate * .001; // should be sampleRate
 }
 
 BlendronomerProcessor::~BlendronomerProcessor()
@@ -166,10 +166,10 @@ void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 
 		//numSamplesBeat = blendronomer->aPrep->getBeats()[beatIndex] * tempo->getTempo()->aPrep->getBeatThresh() * sampleRate;
 		//numSamplesBeat = blendronomer->aPrep->getBeats()[beatIndex] * 0.25 * 44100; //should be samplerate
-		numSamplesBeat = (uint64) blendronomer->aPrep->getBeats()[beatIndex] * 200 * 44.1;
+		numSamplesBeat = (uint64) blendronomer->aPrep->getBeats()[beatIndex] * 200 * sampleRate * 0.001;
 		sampleTimer = 0;
         
-        DBG("beat length = " + String(numSamplesBeat / 44.1));
+        DBG("beat length = " + String(numSamplesBeat / (sampleRate * 0.001)));
         
         updateDelay();
 	}
@@ -200,6 +200,7 @@ void BlendronomerProcessor::postRelease(int midiNoteNumber, int midiChannel)
 void BlendronomerProcessor::prepareToPlay(double sr)
 {
 	sampleRate = sr;
+    //delay->setSampleRate(sr);
 }
 
 void BlendronomerProcessor::playNote(int channel, int note, float velocity)
