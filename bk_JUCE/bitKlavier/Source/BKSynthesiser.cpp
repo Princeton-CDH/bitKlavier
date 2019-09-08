@@ -277,8 +277,8 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
 				float* outputs = d->getDelay()->tick(0, true);
 				totalOutputL += outputs[0];
 				totalOutputR += outputs[1];
-				tempEnv = d->getDSmooth()->tick();
-                d->setDelayLength(tempEnv);
+				tempEnv = d->getDSmooth()->tick(); //should just be d->tick(), so need to pass through. could include both the delay and envelope tick
+                d->setDelayLength(tempEnv); //possible try running this every, say, 10 samples or so; optimization. but, maybe will have sonic effect. optimize later, or never!
 				//d->updateDelayFromSmooth();
 			}
         }
