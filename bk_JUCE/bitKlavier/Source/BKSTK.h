@@ -52,7 +52,7 @@ public:
 	float* tick(float input, bool stereo = true);
 	void scalePrevious(float coefficient, unsigned long offset, int channel);
     
-    inline void setSampleRate(int sr) { sampleRate = sr; }
+    inline void setSampleRate(double sr) { sampleRate = sr; }
 
 private:
 	AudioBuffer<float> inputs;
@@ -69,7 +69,7 @@ private:
 	bool doNextOutLeft;
 	bool doNextOutRight;
     
-    int sampleRate;
+    double sampleRate;
 };
 
 /*
@@ -102,7 +102,7 @@ public:
     inline void setTarget(float envelopeTarget) { target = envelopeTarget; if ( target != value ) state = 1; DBG("new envelope target = " + String(target));}
 	inline void setRate(float sr) { rate = sr; }
     inline void setTime(float time) { rate = 1.0 / ( time * sampleRate * 0.001 ); } // time in ms for envelope to go from 0-1. need to update for sampleRate
-    inline void setSampleRate(int sr) { sampleRate = sr; }
+    inline void setSampleRate(double sr) { sampleRate = sr; }
 
 	float tick();
 
@@ -112,7 +112,7 @@ private:
 	float rate;
 	int state;
     
-    int sampleRate;
+    double sampleRate;
 };
 
 /*
@@ -161,7 +161,7 @@ public:
 	inline const void toggleActive() { dBlendronicActive = !dBlendronicActive; }
     inline const void setId(int Id) { dId = Id; }
     
-    inline void setSampleRate(int sr) { delayLinear->setSampleRate(sr); dSmooth->setSampleRate(sr); }
+    inline void setSampleRate(double sr) { delayLinear->setSampleRate(sr); dSmooth->setSampleRate(sr); }
     
     
 

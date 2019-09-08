@@ -200,7 +200,7 @@ void BlendronomerProcessor::postRelease(int midiNoteNumber, int midiChannel)
 void BlendronomerProcessor::prepareToPlay(double sr)
 {
 	sampleRate = sr;
-    //delay->setSampleRate(sr);
+    delay->setSampleRate(sr);
 }
 
 void BlendronomerProcessor::playNote(int channel, int note, float velocity)
