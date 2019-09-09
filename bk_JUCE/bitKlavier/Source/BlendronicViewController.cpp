@@ -11,7 +11,7 @@
 #include "BlendronicViewController.h"
 
 BlendronicViewController::BlendronicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 3)
+BKViewController(p, theGraph, 2)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -21,111 +21,53 @@ BKViewController(p, theGraph, 3)
     iconImageComponent.setAlpha(0.095);
     //addAndMakeVisible(iconImageComponent);
     
+    // MultSliders
+    paramSliders = OwnedArray<BKMultiSlider>();
+    
+    int idx = 0;
+    for (int i = 0; i < cBlendronomerParameterTypes.size(); i++)
+    {
+        if (cBlendronomerDataTypes[i] == BKFloatArr || cBlendronomerDataTypes[i] == BKArrFloatArr)
+        {
+            paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
+            addAndMakeVisible(paramSliders[idx], ALL);
+            paramSliders[idx]->setName(cBlendronomerParameterTypes[idx+BlendronomerBeats]);
+            paramSliders[idx]->addMyListener(this);
+#if JUCE_IOS
+            paramSliders[idx]->addWantsBigOneListener(this);
+#endif
+            //paramSliders[idx]->setMinMaxDefaultInc(cBlendronomerDefaultRangeValuesAndInc[i]);
+            
+            if(paramSliders[idx]->getName() == "Beats")
+            {
+                paramSliders[idx]->setAllowSubSlider(true);
+                paramSliders[idx]->setSubSliderName("add beat");
+                paramSliders[idx]->setToolTipString("Determines pitch of sequenced notes or chords; control-click to add another voice, double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "Smooth Durations")
+            {
+                paramSliders[idx]->setToolTipString("Determines gain of sequenced pitches; double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "Feedback Coeffs")
+            {
+                paramSliders[idx]->setToolTipString("Determines duration of each sequenced note; double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "Click Gains")
+            {
+                paramSliders[idx]->setToolTipString("Determines length of each sequenced beat as a factor of Synchronic tempo; double-click to edit all or add additional sequence steps");
+            }
+            
+            idx++;
+        }
+        
+    }
+    
     selectCB.setName("Blendronic");
     selectCB.setTooltip("Select from available saved preparation settings");
     selectCB.addSeparator();
     selectCB.addListener(this);
     selectCB.setSelectedItemIndex(0);
     addAndMakeVisible(selectCB);
-    
-    lengthModeSelectCB.setName("Length Mode");
-    lengthModeSelectCB.setTooltip("Indicates how Blendronic calculates length of reverse wave");
-    lengthModeSelectCB.addSeparator();
-    lengthModeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
-    lengthModeSelectCB.setSelectedItemIndex(0);
-    fillModeSelectCB();
-    addAndMakeVisible(lengthModeSelectCB);
-    
-    transpositionSlider = std::make_unique<BKStackedSlider>("transpositions", -12, 12, -12, 12, 0, 0.01);
-    transpositionSlider->setTooltip("Determines pitch (in semitones) of Blendronic notes; control-click to add another voice, double-click to edit all");
-    addAndMakeVisible(*transpositionSlider);
-    
-    lengthMultiplierSlider = std::make_unique<BKSingleSlider>("note length multiplier", 0, 10, 1, 0.01);
-    lengthMultiplierSlider->setToolTipString("Changes length of Blendronic wave as a factor of note duration");
-    lengthMultiplierSlider->setSkewFactorFromMidPoint(1.);
-    addAndMakeVisible(*lengthMultiplierSlider);
-    
-    holdTimeMinMaxSlider = std::make_unique<BKRangeSlider>("hold time (ms)", 0., 12000., 0.0, 12000., 1);
-    holdTimeMinMaxSlider->setToolTipString("Sets Min and Max time (ms) held to trigger swell; Min can be greater than Max");
-    holdTimeMinMaxSlider->setJustifyRight(true);
-    addAndMakeVisible(*holdTimeMinMaxSlider);
-    
-    velocityMinMaxSlider = std::make_unique<BKRangeSlider>("velocity min/max (0-127)", 0, 127, 0, 127, 1);
-    velocityMinMaxSlider->setToolTipString("Sets Min and Max velocity (0-127) to trigger swell; Min can be greater than Max");
-    velocityMinMaxSlider->setJustifyRight(true);
-    addAndMakeVisible(*velocityMinMaxSlider);
-    
-    clusterMinSlider = std::make_unique<BKSingleSlider>("cluster min", 1, 10, 1, 1);
-    clusterMinSlider->setToolTipString("Sets Min cluster size needed to trigger swell");
-    clusterMinSlider->setJustifyRight(true);
-    addAndMakeVisible(*clusterMinSlider);
-    
-    //clusterThresholdSlider
-    clusterThresholdSlider = std::make_unique<BKSingleSlider>("cluster thresh", 0, 1000, 150, 1);
-    clusterThresholdSlider->setToolTipString("time between note releases (ms) to be included in cluster");
-    clusterThresholdSlider->setJustifyRight(true);
-    addAndMakeVisible(*clusterThresholdSlider);
-    
-    beatsToSkipSlider = std::make_unique<BKSingleSlider>("beats to skip", 0, 10, 0, 1);
-    beatsToSkipSlider->setToolTipString("Indicates how long Blendronic wave lasts with respect to linked Synchronic sequence");
-    addAndMakeVisible(*beatsToSkipSlider);
-    beatsToSkipSlider->setVisible(false);
-    
-    gainSlider = std::make_unique<BKSingleSlider>("gain", 0, 10, 1, 0.01);
-    gainSlider->setToolTipString("Volume multiplier for Blendronic notes");
-    gainSlider->setSkewFactorFromMidPoint(1.);
-    gainSlider->setJustifyRight(false);
-    addAndMakeVisible(*gainSlider);
-    
-    addAndMakeVisible(actionButton);
-    actionButton.setButtonText("Action");
-    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
-    actionButton.addListener(this);
-    
-    reverseADSRSlider = std::make_unique<BKADSRSlider>("reverseEnvelope");
-    reverseADSRSlider->setButtonText("edit reverse envelope");
-    reverseADSRSlider->setToolTip("ADSR settings for Blendronic wave");
-    reverseADSRSlider->setButtonMode(false);
-    addAndMakeVisible(*reverseADSRSlider);
-    
-    reverseADSRLabel.setText("Reverse ADSR", dontSendNotification);
-    reverseADSRLabel.setJustificationType(Justification::centred);
-    addAndMakeVisible(&reverseADSRLabel, ALL);
-    
-    undertowADSRSlider = std::make_unique<BKADSRSlider>("undertowEnvelope");
-    undertowADSRSlider->setButtonText("edit undertow envelope");
-    undertowADSRSlider->setToolTip("ADSR settings for Undertow");
-    undertowADSRSlider->setButtonMode(false);
-    addAndMakeVisible(*undertowADSRSlider);
-    
-    undertowADSRLabel.setText("Undertow ADSR", dontSendNotification);
-    undertowADSRLabel.setJustificationType(Justification::centred);
-    addAndMakeVisible(&undertowADSRLabel, ALL);
-    
-    keyOnResetToggle.setTooltip("interrupts currently sounding blendronic notes of the same pitch");
-    addAndMakeVisible(keyOnResetToggle);
-    
-    keyOnResetLabel.setText("key-on reset:", dontSendNotification);
-    keyOnResetLabel.setJustificationType(Justification::centredRight);
-    keyOnResetLabel.setTooltip("interrupts currently sounding blendronic notes of the same pitch");
-    addAndMakeVisible(keyOnResetLabel);
-    
-    
-#if JUCE_IOS
-    holdTimeMinMaxSlider->addWantsBigOneListener(this);
-    velocityMinMaxSlider->addWantsBigOneListener(this);
-    clusterMinSlider->addWantsBigOneListener(this);
-    clusterThresholdSlider->addWantsBigOneListener(this);
-    beatsToSkipSlider->addWantsBigOneListener(this);
-    gainSlider->addWantsBigOneListener(this);
-    lengthMultiplierSlider->addWantsBigOneListener(this);
-    transpositionSlider->addWantsBigOneListener(this);
-    nDisplaySlider.addWantsBigOneListener(this);
-#endif
-    
-    showADSR = false;
-    showReverseADSR = false;
-    showUndertowADSR = false;
     
     currentTab = 0;
     displayTab(currentTab);
@@ -134,21 +76,10 @@ BKViewController(p, theGraph, 3)
 
 void BlendronicViewController::invisible(void)
 {
-    gainSlider->setVisible(false);
-    lengthMultiplierSlider->setVisible(false);
-    beatsToSkipSlider->setVisible(false);
-    transpositionSlider->setVisible(false);
-    
-    
-    holdTimeMinMaxSlider->setVisible(false);
-    velocityMinMaxSlider->setVisible(false);
-    clusterMinSlider->setVisible(false);
-    clusterThresholdSlider->setVisible(false);
-    
-    reverseADSRSlider->setVisible(false);
-    undertowADSRSlider->setVisible(false);
-    reverseADSRLabel.setVisible(false);
-    undertowADSRLabel.setVisible(false);
+    for (int i = 0; i < paramSliders.size(); i++)
+    {
+        paramSliders[i]->setVisible(false);
+    }
 }
 
 void BlendronicViewController::displayShared(void)
@@ -171,19 +102,6 @@ void BlendronicViewController::displayShared(void)
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
-    
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    
-    Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-    modeSlice.removeFromRight(gXSpacing);
-    //modeSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX, 0);
-    //lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
-    lengthModeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
-    
-    float dim = lengthModeSelectCB.getHeight();
-    keyOnResetToggle.setBounds(lengthModeSelectCB.getX() - (dim + gXSpacing), lengthModeSelectCB.getY(), dim, dim);
-    keyOnResetToggle.changeWidthToFitText();
-    keyOnResetLabel.setBounds(keyOnResetToggle.getX() - 200, keyOnResetToggle.getY(), 200, dim);
     
     actionButton.toFront(false);
     
@@ -226,82 +144,23 @@ void BlendronicViewController::displayTab(int tab)
 //            lengthMultiplierSlider->setVisible(false);
 //            beatsToSkipSlider->setVisible(true);
 //        }
+        for (int i = 0; i < paramSliders.size(); i++)
+        {
+            paramSliders[i]->setVisible(true);
+        }
         
-        Rectangle<int> area (getLocalBounds());
-        area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        // SET BOUNDS
+        int sliderHeight = height * 0.225f;
+        int sliderWidth = width;
         
-        Rectangle<int> nDisplayRow = area.removeFromBottom(100 + 80 * processor.paddingScalarY);
-        nDisplayRow.reduce(0, 4);
-        nDisplayRow.removeFromLeft(gXSpacing + gPaddingConst * processor.paddingScalarX * 0.5);
-        nDisplayRow.removeFromRight(gXSpacing + gPaddingConst * processor.paddingScalarX * 0.5);
-        
-        area.removeFromBottom(gYSpacing + processor.paddingScalarY * 30);
-        area.removeFromLeft(leftArrow.getWidth());
-        area.removeFromRight(rightArrow.getWidth());
-        transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
-        
-        area.removeFromBottom(gYSpacing + processor.paddingScalarY * 30);
-        
-        Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth()* 0.5));
-        
-        leftColumn.removeFromRight(processor.paddingScalarX * 20);
-        leftColumn.removeFromLeft(processor.paddingScalarX * 20);
-        
-        area.removeFromLeft(processor.paddingScalarX * 20); //area is now right column
-        area.removeFromRight(processor.paddingScalarX * 20);
-        
-        gainSlider->setBounds(leftColumn.removeFromBottom(gComponentSingleSliderHeight + processor.paddingScalarY * 30));
-        lengthMultiplierSlider->setBounds(area.removeFromBottom(gComponentSingleSliderHeight + processor.paddingScalarY * 30));
-        beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
+        for (int i = 0; i < paramSliders.size(); i++)
+        {
+            paramSliders[i]->setBounds(x0, y0 + i * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+        }
         
     }
     else if (tab == 1)
     {
-        // SET VISIBILITY
-        holdTimeMinMaxSlider->setVisible(true);
-        velocityMinMaxSlider->setVisible(true);
-        clusterMinSlider->setVisible(true);
-        clusterThresholdSlider->setVisible(true);
-        
-        Rectangle<int> area (getBounds());
-        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
-        area.removeFromRight(rightArrow.getWidth());
-        area.removeFromLeft(leftArrow.getWidth());
-        
-        area.removeFromLeft(processor.paddingScalarX * 100);
-        area.removeFromRight(processor.paddingScalarX * 100);
-        
-        int columnHeight = area.getHeight();
-        
-        holdTimeMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
-        velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
-        clusterMinSlider->setBounds(area.removeFromTop(columnHeight / 4));
-        clusterThresholdSlider->setBounds(area.removeFromTop(columnHeight / 4));
-        
-    }
-    else if (tab == 2)
-    {
-        reverseADSRSlider->setVisible(true);
-        undertowADSRSlider->setVisible(true);
-        reverseADSRLabel.setVisible(true);
-        undertowADSRLabel.setVisible(true);
-        
-        Rectangle<int> area (getBounds());
-        Rectangle<int> areaSave (getBounds());
-        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
-        area.removeFromRight(rightArrow.getWidth());
-        area.removeFromLeft(leftArrow.getWidth());
-        
-        area.removeFromLeft(processor.paddingScalarX * 20);
-        area.removeFromRight(processor.paddingScalarX * 20);
-        
-        int columnHeight = area.getHeight();
-        
-        reverseADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.5));
-        undertowADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.5));
-        
-        reverseADSRLabel.setBounds(areaSave.removeFromTop(columnHeight * 0.5));
-        undertowADSRLabel.setBounds(areaSave.removeFromTop(columnHeight * 0.5));
         
     }
 }
@@ -309,61 +168,6 @@ void BlendronicViewController::displayTab(int tab)
 void BlendronicViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
-}
-
-void BlendronicViewController::setShowADSR(String name, bool newval)
-{
-    showADSR = newval;
-    
-    if(showADSR)
-    {
-        beatsToSkipSlider->setVisible(false);
-        gainSlider->setVisible(false);
-        lengthMultiplierSlider->setVisible(false);
-        transpositionSlider->setVisible(false);
-        lengthModeSelectCB.setVisible(false);
-        
-        if(name == reverseADSRSlider->getName()) {
-            reverseADSRSlider->setButtonText("close  reverse envelope");
-            undertowADSRSlider->setVisible(false);
-            
-            showReverseADSR = true;
-            showUndertowADSR = false;
-        }
-        else if(name == undertowADSRSlider->getName()) {
-            undertowADSRSlider->setButtonText("close undertow envelope");
-            reverseADSRSlider->setVisible(false);
-            
-            showReverseADSR = false;
-            showUndertowADSR = true;
-        }
-    }
-    else
-    {
-        if (currentTab == 0)
-        {
-            if (lengthModeSelectCB.getSelectedId() == 0)
-            {
-                lengthMultiplierSlider->setVisible(true);
-            }
-            else
-            {
-                beatsToSkipSlider->setVisible(true);
-            }
-        }
-        
-        gainSlider->setVisible(true);
-        transpositionSlider->setVisible(true);
-        lengthModeSelectCB.setVisible(true);
-        
-        reverseADSRSlider->setVisible(true);
-        undertowADSRSlider->setVisible(true);
-        
-        if(name == reverseADSRSlider->getName()) reverseADSRSlider->setButtonText("edit reverse envelope");
-        else if(name == undertowADSRSlider->getName()) undertowADSRSlider->setButtonText("edit undertow envelope");
-    }
-    
-    resized();
 }
 
 void BlendronicViewController::resized()
@@ -489,20 +293,6 @@ void BlendronicViewController::resized()
 #endif
 }
 
-void BlendronicViewController::fillModeSelectCB(void)
-{
-    
-//    lengthModeSelectCB.clear(dontSendNotification);
-//    for (int i = 0; i < cBlendronicSyncModes.size(); i++)
-//    {
-//        String name = cBlendronicSyncModes[i];
-//        if (name != String())  lengthModeSelectCB.addItem(name, i+1);
-//        else                        lengthModeSelectCB.addItem(String(i+1), i+1);
-//    }
-//
-//    lengthModeSelectCB.setSelectedItemIndex(0, NotificationType::dontSendNotification);
-}
-
 #if JUCE_IOS
 void BlendronicViewController::iWantTheBigOne(TextEditor* tf, String name)
 {
@@ -522,21 +312,6 @@ BlendronicViewController(p, theGraph)
     
     selectCB.addListener(this);
     selectCB.addMyListener(this);
-    lengthModeSelectCB.addListener(this);
-    transpositionSlider->addMyListener(this);
-    lengthMultiplierSlider->addMyListener(this);
-    holdTimeMinMaxSlider->addMyListener(this);
-    velocityMinMaxSlider->addMyListener(this);
-    clusterMinSlider->addMyListener(this);
-    clusterThresholdSlider->addMyListener(this);
-    beatsToSkipSlider->addMyListener(this);
-    
-    keyOnResetToggle.addListener(this);
-    
-    gainSlider->addMyListener(this);
-    
-    reverseADSRSlider->addMyListener(this);
-    undertowADSRSlider->addMyListener(this);
     
     startTimer(20);
 }
@@ -551,10 +326,10 @@ void BlendronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEdita
 void BlendronicPreparationEditor::update(void)
 {
     if (processor.updateState->currentBlendronicId < 0) return;
-    setShowADSR(reverseADSRSlider->getName(), false);
-    reverseADSRSlider->setIsButtonOnly(true);
-    setShowADSR(undertowADSRSlider->getName(), false);
-    undertowADSRSlider->setIsButtonOnly(true);
+//    setShowADSR(reverseADSRSlider->getName(), false);
+//    reverseADSRSlider->setIsButtonOnly(true);
+//    setShowADSR(undertowADSRSlider->getName(), false);
+//    undertowADSRSlider->setIsButtonOnly(true);
     setSubWindowInFront(false);
     
     BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
@@ -822,64 +597,6 @@ void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
 //    }
 }
 
-void BlendronicPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
-{
-    DBG("received ADSR slider " + name);
-    
-    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
-    
-//    if(name == reverseADSRSlider->getName())
-//    {
-//        prep->setReverseAttack(attack);
-//        prep->setReverseDecay(decay);
-//        prep->setReverseSustain(sustain);
-//        prep->setReverseRelease(release);
-//        active->setReverseAttack(attack);
-//        active->setReverseDecay(decay);
-//        active->setReverseSustain(sustain);
-//        active->setReverseRelease(release);
-//    }
-//    else if(name == undertowADSRSlider->getName())
-//    {
-//        prep->setUndertowAttack(attack);
-//        prep->setUndertowDecay(decay);
-//        prep->setUndertowSustain(sustain);
-//        prep->setUndertowRelease(release);
-//        active->setUndertowAttack(attack);
-//        active->setUndertowDecay(decay);
-//        active->setUndertowSustain(sustain);
-//        active->setUndertowRelease(release);
-//    }
-    
-}
-
-void BlendronicPreparationEditor::closeSubWindow()
-{
-    reverseADSRSlider->setIsButtonOnly(true);
-    undertowADSRSlider->setIsButtonOnly(true);
-    setShowADSR(reverseADSRSlider->getName(), false);
-    setShowADSR(undertowADSRSlider->getName(), false);
-    setSubWindowInFront(false);
-}
-
-
-void BlendronicPreparationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
-{
-    //DBG("BKADSRButtonStateChanged " + name);
-    setShowADSR(name, !state);
-    setSubWindowInFront(!state);
-}
-
-void BlendronicPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
-{
-    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
-    
-//    prep->setTransposition(val);
-//    active->setTransposition(val);
-}
-
 void BlendronicPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
@@ -991,11 +708,7 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
-        
-        reverseADSRSlider->setIsButtonOnly(true);
-        undertowADSRSlider->setIsButtonOnly(true);
-        setShowADSR(reverseADSRSlider->getName(), false);
-        setShowADSR(undertowADSRSlider->getName(), false);
+
         setSubWindowInFront(false);
     }
     else if (b == &actionButton)
@@ -1061,44 +774,15 @@ BlendronicViewController(p, theGraph)
     
     selectCB.addListener(this);
     selectCB.addMyListener(this);
-    lengthModeSelectCB.addListener(this);
-    transpositionSlider->addMyListener(this);
-    lengthMultiplierSlider->addMyListener(this);
-    holdTimeMinMaxSlider->addMyListener(this);
-    velocityMinMaxSlider->addMyListener(this);
-    clusterMinSlider->addMyListener(this);
-    clusterThresholdSlider->addMyListener(this);
-    beatsToSkipSlider->addMyListener(this);
-    
-    keyOnResetToggle.addListener(this);
-    
-    gainSlider->addMyListener(this);
-    
-    reverseADSRSlider->addMyListener(this);
-    undertowADSRSlider->addMyListener(this);
     
     //startTimer(20);
 }
 
 void BlendronicModificationEditor::greyOutAllComponents()
 {
-    lengthModeSelectCB.setAlpha(gModAlpha);
-    transpositionSlider->setDim(gModAlpha);
-    lengthMultiplierSlider->setDim(gModAlpha);
-    beatsToSkipSlider->setDim(gModAlpha);
     gainSlider->setDim(gModAlpha);
-    reverseADSRSlider->setDim(gModAlpha);
-    undertowADSRSlider->setDim(gModAlpha);
     holdTimeMinMaxSlider->setDim(gModAlpha);
     velocityMinMaxSlider->setDim(gModAlpha);
-    clusterMinSlider->setDim(gModAlpha);
-    clusterThresholdSlider->setDim(gModAlpha);
-    
-    keyOnResetToggle.setAlpha(gModAlpha);
-    keyOnResetLabel.setAlpha(gModAlpha);
-    
-    reverseADSRLabel.setAlpha(gModAlpha);
-    undertowADSRLabel.setAlpha(gModAlpha);
 }
 
 void BlendronicModificationEditor::highlightModedComponents()
@@ -1468,18 +1152,6 @@ void BlendronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
     updateModification();
 }
 
-void BlendronicModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
-{
-    BlendronomerModification::Ptr mod = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
-    
-//    mod->setTransposition(val);
-//    mod->setDirty(BlendronicTransposition);
-//
-//    transpositionSlider->setBright();
-//
-    updateModification();
-}
-
 void BlendronicModificationEditor::updateModification(void)
 {
     processor.updateState->modificationDidChange = true;
@@ -1523,36 +1195,6 @@ void BlendronicModificationEditor::buttonClicked (Button* b)
     }
     
     updateModification();
-}
-
-void BlendronicModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
-{
-    BlendronomerModification::Ptr mod = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
-    
-    Array<float> newvals = {(float)attack, (float)decay, sustain, (float)release};
-//    if(name == reverseADSRSlider->getName())
-//    {
-//        mod->setReverseADSRvals(newvals);
-//        mod->setDirty(BlendronicReverseADSR);
-//
-//        reverseADSRSlider->setBright();
-//    }
-//    else if(name == undertowADSRSlider->getName())
-//    {
-//        mod->setUndertowADSRvals(newvals);
-//        mod->setDirty(BlendronicUndertowADSR);
-//
-//        undertowADSRSlider->setBright();
-//    }
-    
-    
-    updateModification();
-}
-
-void BlendronicModificationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
-{
-    setShowADSR(name, !state);
-    setSubWindowInFront(!state);
 }
 
 void BlendronicModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)

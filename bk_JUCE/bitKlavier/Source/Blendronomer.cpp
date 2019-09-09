@@ -113,10 +113,9 @@ void BlendronomerPreparation::setState(XmlElement* e)
 /////////////////////////BLENDRONOMER PROCESSOR/////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer, TuningProcessor::Ptr bTuning, 
+BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
 	TempoProcessor::Ptr bTempo, BKDelay::Ptr delayL, GeneralSettings::Ptr bGeneral, BKSynthesiser* bMain):
 	blendronomer(bBlendronomer),
-	tuner(bTuning),
 	tempo(bTempo),
 	delay(delayL),
 	synth(bMain),

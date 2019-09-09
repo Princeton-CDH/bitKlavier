@@ -265,7 +265,6 @@ public:
 	typedef OwnedArray<BlendronomerProcessor, CriticalSection> CSArr;
 
 	BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
-		TuningProcessor::Ptr bTuning,
 		TempoProcessor::Ptr bTempo,
 		BKDelay::Ptr delayL,
 		GeneralSettings::Ptr bGeneral,
@@ -295,18 +294,15 @@ public:
 
 	//accessors
 	inline Blendronomer::Ptr getBlendronomer(void) const noexcept { return blendronomer; }
-	inline TuningProcessor::Ptr getTuner(void) const noexcept { return tuner; }
 	inline TempoProcessor::Ptr getTempo(void) const noexcept { return tempo; }
 	inline BKDelay::Ptr getDelay(void) const noexcept { return delay; }
 	inline int getId(void) const noexcept { return blendronomer->getId(); }
-	inline int getTunerId(void) const noexcept { return tuner->getId(); }
 	inline int getTempoId(void) const noexcept { return tempo->getId(); }
 	inline const uint64 getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
 
 
 	//mutators
 	inline void setBlendronomer(Blendronomer::Ptr blend) { blendronomer = blend; }
-	inline void setTuner(TuningProcessor::Ptr tune) { tuner = tune; }
 	inline void setTempo(TempoProcessor::Ptr temp) { tempo = temp; }
 	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
 	inline void reset(void) { blendronomer->aPrep->copy(blendronomer->sPrep); }
@@ -319,15 +315,11 @@ private:
 	GeneralSettings::Ptr general;
 
 	Blendronomer::Ptr blendronomer;
-	TuningProcessor::Ptr tuner;
 	TempoProcessor::Ptr tempo;
 
 	BKDelay::Ptr delay;
 
 	double sampleRate;
-
-	Array<float> tuningOffsets;
-	PitchClass tuningBasePitch;
 
 	void playNote(int channel, int note, float velocity);
 	Array<float> velocities;    //record of velocities

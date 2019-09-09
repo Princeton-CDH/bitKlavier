@@ -146,7 +146,7 @@ void Gallery::randomize()
 			Blendronomer::Ptr b = new Blendronomer(-1, true);
 			addBlendronomer(b);
 			int blendronomerId = b->getId();
-			BlendronomerProcessor::Ptr bProc = new BlendronomerProcessor(b, tProc, mProc, nullptr, dummyGeneral, dummySynth);
+			BlendronomerProcessor::Ptr bProc = new BlendronomerProcessor(b, mProc, nullptr, dummyGeneral, dummySynth);
 			p->addBlendronomerProcessor(blendronomerId);
 
             Direct::Ptr d = new Direct(-1, true);

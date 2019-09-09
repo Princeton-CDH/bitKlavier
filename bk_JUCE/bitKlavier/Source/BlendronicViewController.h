@@ -13,6 +13,7 @@
 #include "BKViewController.h"
 
 class BlendronicViewController :
+public BKMultiSlider::Listener,
 public BKViewController
 #if JUCE_IOS
 , public WantsBigOne::Listener
@@ -25,11 +26,22 @@ public:
         setLookAndFeel(nullptr);
     };
     
+    void paint (Graphics&) override;
+    void resized() override;
+    
+    virtual void update(void) {};
+    
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
+protected:
 //    tempo
+    
 //    beats
 //    smoothdurations
 //    feedbackcoeffs
 //    clickgains
+    
 //    delaymax
 //    feedback gain
 //    inputthresh
@@ -38,42 +50,33 @@ public:
 //    vel min
 //    vel max
 //    num voices
+    OwnedArray<BKMultiSlider> paramSliders;
+    
+    //virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
+    //virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
+    
+    inline void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override
+    {
+        //multiSliderDidChange(name, whichSlider, values);
+    }
+    
+    inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override
+    {
+        //multiSlidersDidChange(name, values);
+    }
     
     BKEditableComboBox selectCB;
-    BKComboBox lengthModeSelectCB;
+    BKComboBox smoothModeSelectCB;
     
-    std::unique_ptr<BKSingleSlider> lengthMultiplierSlider;
-    std::unique_ptr<BKSingleSlider> beatsToSkipSlider;
+    std::unique_ptr<BKSingleSlider> numVoicesSlider;
+    
+    std::unique_ptr<BKSingleSlider> feedbackGainSlider;
     std::unique_ptr<BKSingleSlider> gainSlider;
     
-    std::unique_ptr<BKStackedSlider> transpositionSlider;
+    std::unique_ptr<BKSingleSlider> inputThreshSlider;
     
-    std::unique_ptr<BKADSRSlider> reverseADSRSlider;
-    std::unique_ptr<BKADSRSlider> undertowADSRSlider;
-    
-    std::unique_ptr<BKSingleSlider> clusterMinSlider;
-    std::unique_ptr<BKSingleSlider> clusterThresholdSlider;
     std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
     std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
-    
-    ToggleButton    keyOnResetToggle;
-    BKLabel         keyOnResetLabel;
-    
-    BKLabel         reverseADSRLabel;
-    BKLabel         undertowADSRLabel;
-    
-    void paint (Graphics&) override;
-    void resized() override;
-    
-    void setShowADSR(String name, bool newval);
-    
-    virtual void update(void) {};
-    
-    void fillModeSelectCB(void);
-    
-#if JUCE_IOS
-    void iWantTheBigOne(TextEditor*, String name) override;
-#endif
     
     void displayTab(int tab) override;
     void displayShared(void) override;
@@ -81,22 +84,14 @@ public:
     
 private:
     
-    bool showADSR;
-    bool showReverseADSR;
-    bool showUndertowADSR;
-    
-    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlendronicViewController)
-    
-    
+
 };
 
 class BlendronicPreparationEditor :
 public BlendronicViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
-public BKStackedSlider::Listener,
-public BKADSRSlider::Listener,
 public BKRangeSlider::Listener,
 //public SliderListener,
 public Timer
@@ -129,10 +124,10 @@ private:
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
-    void BKStackedSliderValueChanged(String name, Array<float> val) override;
-    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
-    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    
+    //void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
+    //void multiSlidersDidChange(String name, Array<Array<float>> values) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlendronicPreparationEditor)
     
@@ -142,8 +137,6 @@ class BlendronicModificationEditor :
 public BlendronicViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
-public BKStackedSlider::Listener,
-public BKADSRSlider::Listener,
 public BKRangeSlider::Listener,
 //public SliderListener,
 public Timer
@@ -163,9 +156,6 @@ public:
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
-    void BKStackedSliderValueChanged(String name, Array<float> val) override;
-    void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
-    void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     void fillSelectCB(int last, int current);

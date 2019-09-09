@@ -333,7 +333,6 @@ TempoProcessor::Ptr Piano::addTempoProcessor(int thisId)
 BlendronomerProcessor::Ptr Piano::addBlendronomerProcessor(int thisId)
 {
 	BlendronomerProcessor::Ptr bproc = new BlendronomerProcessor(processor.gallery->getBlendronomer(thisId),
-                                                                 defaultT,
                                                                  defaultM,
                                                                  nullptr,
                                                                  processor.gallery->getGeneralSettings(),

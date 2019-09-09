@@ -684,6 +684,61 @@ static const std::vector<std::string> cTuningAdaptiveTypes = {
     "Spring Tuning"
 };
 
+#pragma mark - Blendronomer
+typedef enum BlendronomerParameterType
+{
+    BlendronomerId = 0,
+    BlendronomerBeats,
+    BlendronomerSmoothDurations,
+    BlendronomerFeedbackCoeffs,
+    BlendronomerClickGains,
+    BlendronomerFeedbackGain,
+    BlendronomerInputThresh,
+    BlendronomerGain,
+    BlendronomerHoldMin,
+    BlendronomerHoldMax,
+    BlendronomerVelMin,
+    BlendronomerVelMax,
+    BlendronomerNumVoices,
+    BlendronomerParameterTypeNil
+} BlendronomerParameterType;
+
+static const std::vector<BKParameterDataType> cBlendronomerDataTypes = {
+    BKInt,
+    BKFloatArr,
+    BKFloatArr,
+    BKFloatArr,
+    BKFloatArr,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKInt
+};
+
+static const std::vector<std::string> cBlendronomerParameterTypes = {
+    "Blendronic Id",
+    "Beats",
+    "Smooth Durations",
+    "Feedback Coeffs",
+    "Click Gains",
+    "Feedback Gain",
+    "Input Thresh",
+    "Gain",
+    "Hold Min",
+    "Hold Max",
+    "Vel Min",
+    "Vel Max",
+    "Num Voices"
+};
+
+static const std::vector<std::vector<float>> cBlendronomerDefaultRangeValuesAndInc = {
+    { 0.0f, 0.0f, 0.0f, 0.0f } //min, max, default, increment, skew
+};
+
 #pragma mark - Tuning
 typedef enum TuningParameterType
 {
@@ -720,14 +775,6 @@ typedef enum TuningParameterType
     TuningParameterTypeNil
     
 } TuningParameterType;
-
-#pragma mark - Blendronomer
-typedef enum BlendronomerParameterType
-{
-	BlendronomerNone = 0,
-	BlendronomerNormal,
-	BlendronomerParameterTypeNil
-};
 
 // ~~ ~ ! ! ! ! ! ~ ~ ~ 
 // HAVE TO INTEGRATE TETHER WEIGHT GLOBAL AND FUND SETS TETHER BUTTON PARAMS AS MODS
