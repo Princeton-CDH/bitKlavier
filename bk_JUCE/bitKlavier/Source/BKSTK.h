@@ -45,6 +45,7 @@ public:
 	inline void setLength(float delayLength);
 	inline void setMax(float delayMax) { max = delayMax; }
 	inline void setGain(float delayGain) { gain = delayGain; }
+    inline void setFeedback(float fb) { feedback = fb; }
 
 	float nextOutLeft();
 	float nextOutRight();
@@ -65,6 +66,7 @@ private:
 	float gain;
 	float alpha;
 	float omAlpha;
+    float feedback;
 	float nextOutput;
 	bool doNextOutLeft;
 	bool doNextOutRight;
@@ -157,9 +159,12 @@ public:
     inline void setDelayTargetLength(float delayLength) { dSmooth->setTarget(delayLength); }
 	inline void setSmoothValue(float smoothValue) { dSmoothValue = smoothValue; }
     inline void setSmoothDuration(float smoothDuration) { dSmoothDuration = smoothDuration; }
+    inline void setFeedback(float fb) { delayLinear->setFeedback(fb); }
 	inline const void setActive(bool newActive) { dBlendronicActive = newActive; }
 	inline const void toggleActive() { dBlendronicActive = !dBlendronicActive; }
     inline const void setId(int Id) { dId = Id; }
+    
+    float* tick();
     
     inline void setSampleRate(double sr) { delayLinear->setSampleRate(sr); dSmooth->setSampleRate(sr); }
     

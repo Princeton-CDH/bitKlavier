@@ -60,6 +60,7 @@ BKDelayL::BKDelayL() :
 	length(0.0),
 	inPoint(0),
 	outPoint(0),
+    feedback(0.9),
 	lastFrameLeft(0),
 	lastFrameRight(0),
 	doNextOutLeft(false),
@@ -86,6 +87,7 @@ BKDelayL::BKDelayL(float delayLength, float delayMax, float delayGain) :
 	inputs.clear();
 	setLength(delayLength);
     sampleRate = 44100.;
+    feedback = 0.9;
 }
 
 BKDelayL::~BKDelayL()
@@ -164,8 +166,8 @@ float* BKDelayL::tick(float input, bool stereo)
 	if (++outPoint == inputs.getNumSamples()) outPoint = 0;
 
 	//feedback
-	inputs.addSample(0, inPoint, lastFrameLeft * 0.9);
-	if (stereo) inputs.addSample(1, inPoint, lastFrameRight * 0.9); 
+	inputs.addSample(0, inPoint, lastFrameLeft * feedback);
+	if (stereo) inputs.addSample(1, inPoint, lastFrameRight * feedback);
 
 	inPoint++;
 	if (inPoint == inputs.getNumSamples()) inPoint = 0;
@@ -181,7 +183,7 @@ float* BKDelayL::tick(float input, bool stereo)
 	{
 		float outs[1];
 		outs[0] = lastFrameLeft;
-		return outs;
+		return outs; // need to address this? "Address of stack memory associated with local variable 'outs' returned"
 	}
 }
 
@@ -239,4 +241,10 @@ void BKDelay::updateDelayFromSmooth()
 void BKDelay::addSample(float sampleToAdd, unsigned long offset, int channel)
 {
 	delayLinear->addSample(sampleToAdd, offset, channel);
+}
+
+float* BKDelay::tick()
+{
+    setDelayLength(dSmooth->tick());
+    return delayLinear->tick(0, true);
 }

@@ -205,6 +205,7 @@ void BKSynthesiser::clearNextDelayBlock(int numSamples)
     }
 }
 
+
 void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples)
 {
 
@@ -225,6 +226,7 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 		{
 			if (d != nullptr)
 			{
+                /*
 				//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
 				//totalOutput += d->getDelay()->tick(0);
 				float* outputs = d->getDelay()->tick(0, true); 
@@ -233,6 +235,10 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 				tempEnv = d->getDSmooth()->tick();
                 d->setDelayLength(tempEnv);
 				//d->updateDelayFromSmooth();
+                 */
+                float* outputs = d->tick();
+                totalOutputL += outputs[0];
+                totalOutputR += outputs[1];
 			}
 		}
 
@@ -251,6 +257,7 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
     
     DBG("envelope val = " + String(tempEnv));
 }
+
 
 void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples)
 {
@@ -272,14 +279,16 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
         {
 			if (d != nullptr)
 			{
-				//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
-				//totalOutput += d->getDelay()->tick(0);
+                /*
 				float* outputs = d->getDelay()->tick(0, true);
 				totalOutputL += outputs[0];
 				totalOutputR += outputs[1];
-				tempEnv = d->getDSmooth()->tick(); //should just be d->tick(), so need to pass through. could include both the delay and envelope tick
-                d->setDelayLength(tempEnv); //possible try running this every, say, 10 samples or so; optimization. but, maybe will have sonic effect. optimize later, or never!
-				//d->updateDelayFromSmooth();
+				tempEnv = d->getDSmooth()->tick();
+                d->setDelayLength(tempEnv);
+                 */
+                float* outputs = d->tick();
+                totalOutputL += outputs[0];
+                totalOutputR += outputs[1];
 			}
         }
         
