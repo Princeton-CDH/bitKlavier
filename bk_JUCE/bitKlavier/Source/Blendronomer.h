@@ -339,7 +339,7 @@ private:
 	uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
 	uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
 	uint64 sampleTimer;
-    uint64 beatIndex, smoothIndex, gainIndex;
+    uint64 beatIndex, smoothIndex, feedbackIndex;
 
 	//JUCE_LEAK_DETECTOR(BlendronomerProcessor);
 };

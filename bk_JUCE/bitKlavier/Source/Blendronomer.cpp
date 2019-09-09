@@ -124,7 +124,7 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer, Tu
 	sampleTimer(0),
 	beatIndex(0),
 	smoothIndex(0),
-	gainIndex(0)
+	feedbackIndex(0)
 {
 	if (delayL == nullptr)
 	{
@@ -153,8 +153,8 @@ void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 		if (beatIndex >= blendronomer->aPrep->getBeats().size()) beatIndex = 0;
 		smoothIndex++;
 		if (smoothIndex >= blendronomer->aPrep->getSmoothDurations().size()) smoothIndex = 0;
-		gainIndex++;
-		if (gainIndex >= blendronomer->aPrep->getFeedbackCoefficients().size()) gainIndex = 0;
+		feedbackIndex++;
+		if (feedbackIndex >= blendronomer->aPrep->getFeedbackCoefficients().size()) feedbackIndex = 0;
 
 		numSamplesBeat = (uint64) blendronomer->aPrep->getBeats()[beatIndex] * 200 * sampleRate * 0.001;
 		sampleTimer = 0;
@@ -162,8 +162,9 @@ void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
         blendronomer->aPrep->setDelayLength(numSamplesBeat);
         delay->setDelayTargetLength(numSamplesBeat);
         
-        //need to stop through smooth and gain (feedback)
-        //delay->setSmoothDuration(50.); //need to step through these by smoothIndex
+        //need to stop through smooth and feedback vals as well
+        //delay->setSmoothDuration(50.);
+        //delay->setFeedback(....);
         
 	}
 
