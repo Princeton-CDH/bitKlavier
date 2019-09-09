@@ -223,20 +223,6 @@ BKDelay::~BKDelay()
 {
 }
 
-void BKDelay::updateValues()
-{
-	delayLinear->setLength(dDelayLength);
-	//delayLinear->setMax(dDelayMax);
-	delayLinear->setGain(dDelayGain);
-	//dSmooth->setValue(dSmoothValue);
-	//dSmooth->setTarget(dSmoothDuration);
-}
-
-void BKDelay::updateDelayFromSmooth()
-{
-	dDelayLength = dSmoothValue;
-	delayLinear->setLength(dSmoothValue);
-}
 
 void BKDelay::addSample(float sampleToAdd, unsigned long offset, int channel)
 {

@@ -36,7 +36,7 @@ public:
 	//constructors
 	BlendronomerPreparation(BlendronomerPreparation::Ptr p);
 	BlendronomerPreparation(String newName, Array<int> beats, Array<float> smoothTimes,
-		Array<float> feedbackCoefficients, Array<float> clickGains, float smoothValue,
+		Array<float> feedbackCoefficients, float smoothValue,
 		float smoothDuration, float delayMax, float delayLength, float feedbackGain);
 	BlendronomerPreparation(void);
 
@@ -56,7 +56,6 @@ public:
 	inline const Array<int> getBeats() const noexcept { return bBeats; }
 	inline const Array<float> getSmoothDurations() const noexcept { return bSmoothDurations; }
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
-	inline const Array<float> getClickGains() const noexcept { return bClickGains; }
 	inline const float getDelayMax() const noexcept { return bDelayMax; }
 	inline const float getFeedbackGain() const noexcept { return bFeedbackGain; }
 	inline const float getDelayLength() const noexcept { return bDelayLength; }
@@ -78,7 +77,6 @@ public:
 	inline void setBeats(Array<int> beats) { bBeats.swapWith(beats); }
 	inline void setSmoothDurations(Array<float> smoothTimes) { bSmoothDurations.swapWith(smoothTimes); }
 	inline void setFeedbackCoefficients(Array<float> feedbackCoefficients) { bFeedbackCoefficients.swapWith(feedbackCoefficients); }
-	inline void setClickGains(Array<float> clickGains) { bClickGains.swapWith(clickGains); }
 	inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
 	inline void setFeedbackGain(float FeedbackGain) { bFeedbackGain = FeedbackGain; }
 	inline void setDelayLength(float delayLength) { bDelayLength = delayLength; }
@@ -111,7 +109,6 @@ private:
 	Array<int> bBeats;
 	Array<float> bSmoothDurations;
 	Array<float> bFeedbackCoefficients;
-	Array<float> bClickGains;
 
 	//d0 stuff
 	float bDelayMax;
@@ -245,6 +242,7 @@ public:
 
 	BlendronomerPreparation::Ptr sPrep;
 	BlendronomerPreparation::Ptr aPrep;
+    
 private:
 	int Id;
 	String name;
@@ -341,9 +339,7 @@ private:
 	uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
 	uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
 	uint64 sampleTimer;
-	uint64 beatIndex, smoothIndex, gainIndex, clickIndex;
-
-	void updateDelay();
+    uint64 beatIndex, smoothIndex, gainIndex;
 
 	//JUCE_LEAK_DETECTOR(BlendronomerProcessor);
 };

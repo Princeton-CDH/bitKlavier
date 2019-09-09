@@ -226,23 +226,11 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 		{
 			if (d != nullptr)
 			{
-                /*
-				//DBG("Next delay output: " + String(d->getDelay()->nextOut()));
-				//totalOutput += d->getDelay()->tick(0);
-				float* outputs = d->getDelay()->tick(0, true); 
-				totalOutputL += outputs[0];
-				totalOutputR += outputs[1];
-				tempEnv = d->getDSmooth()->tick();
-                d->setDelayLength(tempEnv);
-				//d->updateDelayFromSmooth();
-                 */
                 float* outputs = d->tick();
                 totalOutputL += outputs[0];
                 totalOutputR += outputs[1];
 			}
 		}
-
-		//DBG("Total output: L(" + String(totalOutputL) + "), R(" + String(totalOutputR) + ")");
 
 		if (outR != nullptr)
 		{
@@ -254,8 +242,6 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 			*outL++ += (((double)totalOutputL) + ((double)totalOutputR)) * 0.5;
 		}
 	}
-    
-    DBG("envelope val = " + String(tempEnv));
 }
 
 
@@ -279,20 +265,11 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
         {
 			if (d != nullptr)
 			{
-                /*
-				float* outputs = d->getDelay()->tick(0, true);
-				totalOutputL += outputs[0];
-				totalOutputR += outputs[1];
-				tempEnv = d->getDSmooth()->tick();
-                d->setDelayLength(tempEnv);
-                 */
                 float* outputs = d->tick();
                 totalOutputL += outputs[0];
                 totalOutputR += outputs[1];
 			}
         }
-        
-		//if (totalOutputL > 0.0) DBG("Total output: L(" + String(totalOutputL) + "), R(" + String(totalOutputR) + ")");
 
         if (outR != nullptr)
         {
@@ -304,9 +281,6 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
             *outL++ += ((totalOutputL + totalOutputR) * 0.5f);
         }
     }
-    
-    //DBG("envelope val = " + String(tempEnv));
-    //DBG("totalOutput = " + String(totalOutputL));
 }
 
 //==============================================================================

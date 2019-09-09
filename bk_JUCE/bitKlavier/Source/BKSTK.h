@@ -150,15 +150,13 @@ public:
     inline const int getId() const noexcept { return dId; }
 
 	//mutators
-    void updateValues();
-    void updateDelayFromSmooth();
 	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to stkFloat)
 	inline void setDelayMax(float delayMax) { dDelayMax = delayMax; }
 	inline void setDelayGain(float delayGain) { dDelayGain = delayGain; }
 	inline void setDelayLength(float delayLength) { dDelayLength = delayLength; delayLinear->setLength(delayLength); }
     inline void setDelayTargetLength(float delayLength) { dSmooth->setTarget(delayLength); }
-	inline void setSmoothValue(float smoothValue) { dSmoothValue = smoothValue; }
-    inline void setSmoothDuration(float smoothDuration) { dSmoothDuration = smoothDuration; }
+	inline void setSmoothValue(float smoothValue) { dSmoothValue = smoothValue; } //doesn't do anything yet
+    inline void setSmoothDuration(float smoothDuration) { dSmoothDuration = smoothDuration; } //doesn't do anything yet
     inline void setFeedback(float fb) { delayLinear->setFeedback(fb); }
 	inline const void setActive(bool newActive) { dBlendronicActive = newActive; }
 	inline const void toggleActive() { dBlendronicActive = !dBlendronicActive; }

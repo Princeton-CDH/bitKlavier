@@ -836,7 +836,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             stopNote (0.0f, false);
             break;
         }
-		//delay line for blendronomer, much of this has been moved to BKSynthesiser::processNextBlock()
+
         if (bDelay != nullptr) 
         {
             if (bDelay->getActive() == true)
