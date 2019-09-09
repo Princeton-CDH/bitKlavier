@@ -156,7 +156,14 @@ public:
 	inline void setDelayLength(float delayLength) { dDelayLength = delayLength; delayLinear->setLength(delayLength); }
     inline void setDelayTargetLength(float delayLength) { dSmooth->setTarget(delayLength); }
 	inline void setSmoothValue(float smoothValue) { dSmoothValue = smoothValue; } //doesn't do anything yet
+    
+    //we want to be able to do this two ways:
+    //set a duration for the delay length changes that will be constant, so at the beginning of
+    //  each beat we will need to calculate a new rate dependent on this duration and the beat length (rate ~ beatLength / duration)
+    //have the rate be constant, regardless of beat length, so we'll use the length of smallest beat (1, as set by Tempo, so the pulseLength)
+    //  so rate ~ pulseLength / duration
     inline void setSmoothDuration(float smoothDuration) { dSmoothDuration = smoothDuration; } //doesn't do anything yet
+    
     inline void setFeedback(float fb) { delayLinear->setFeedback(fb); }
 	inline const void setActive(bool newActive) { dBlendronicActive = newActive; }
 	inline const void toggleActive() { dBlendronicActive = !dBlendronicActive; }
