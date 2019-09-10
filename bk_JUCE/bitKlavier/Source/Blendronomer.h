@@ -35,7 +35,7 @@ public:
 
 	//constructors
 	BlendronomerPreparation(BlendronomerPreparation::Ptr p);
-	BlendronomerPreparation(String newName, Array<int> beats, Array<float> smoothTimes,
+	BlendronomerPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
 		Array<float> feedbackCoefficients, float smoothValue,
 		float smoothDuration, float delayMax, float delayLength, float feedbackGain);
 	BlendronomerPreparation(void);
@@ -53,7 +53,7 @@ public:
 	//accessors
 	inline const String getName() const noexcept { return name; }
 	inline const float getTempo() const noexcept { return bTempo; }
-	inline const Array<int> getBeats() const noexcept { return bBeats; }
+	inline const Array<float> getBeats() const noexcept { return bBeats; }
 	inline const Array<float> getSmoothDurations() const noexcept { return bSmoothDurations; }
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
 	inline const float getDelayMax() const noexcept { return bDelayMax; }
@@ -74,9 +74,14 @@ public:
 	//mutators
 	inline void setName(String n) { name = n; }
 	inline void setTempo(int tempo) { bTempo = tempo; }
-	inline void setBeats(Array<int> beats) { bBeats.swapWith(beats); }
+	inline void setBeats(Array<float> beats) { bBeats.swapWith(beats); }
 	inline void setSmoothDurations(Array<float> smoothTimes) { bSmoothDurations.swapWith(smoothTimes); }
 	inline void setFeedbackCoefficients(Array<float> feedbackCoefficients) { bFeedbackCoefficients.swapWith(feedbackCoefficients); }
+    
+    inline void setBeat(int whichSlider, float value) { bBeats.set(whichSlider, value); }
+    inline void setSmoothDuration(int whichSlider, float value) { bSmoothDurations.set(whichSlider, value); }
+    inline void setFeedbackCoefficient(int whichSlider, float value) { bFeedbackCoefficients.set(whichSlider, value); }
+    
 	inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
 	inline void setFeedbackGain(float FeedbackGain) { bFeedbackGain = FeedbackGain; }
 	inline void setDelayLength(float delayLength) { bDelayLength = delayLength; }
@@ -106,7 +111,7 @@ private:
 
 	//stuff from preset
 	float bTempo;
-	Array<int> bBeats;
+	Array<float> bBeats;
 	Array<float> bSmoothDurations;
 	Array<float> bFeedbackCoefficients;
 

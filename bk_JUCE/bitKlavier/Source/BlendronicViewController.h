@@ -40,7 +40,6 @@ protected:
 //    beats
 //    smoothdurations
 //    feedbackcoeffs
-//    clickgains
     
 //    delaymax
 //    feedback gain
@@ -52,29 +51,27 @@ protected:
 //    num voices
     OwnedArray<BKMultiSlider> paramSliders;
     
-    //virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
-    //virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
+    virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
+    virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
     
     inline void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override
     {
-        //multiSliderDidChange(name, whichSlider, values);
+        multiSliderDidChange(name, whichSlider, values);
     }
     
     inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override
     {
-        //multiSlidersDidChange(name, values);
+        multiSlidersDidChange(name, values);
     }
     
     BKEditableComboBox selectCB;
     BKComboBox smoothModeSelectCB;
     
-    std::unique_ptr<BKSingleSlider> numVoicesSlider;
-    
     std::unique_ptr<BKSingleSlider> feedbackGainSlider;
     std::unique_ptr<BKSingleSlider> gainSlider;
     
+    std::unique_ptr<BKSingleSlider> numVoicesSlider;
     std::unique_ptr<BKSingleSlider> inputThreshSlider;
-    
     std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
     std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
     
@@ -126,8 +123,8 @@ private:
     void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
-    //void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
-    //void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
+    void multiSlidersDidChange(String name, Array<Array<float>> values) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlendronicPreparationEditor)
     
@@ -157,6 +154,9 @@ public:
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    
+    void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
+    void multiSlidersDidChange(String name, Array<Array<float>> values) override;
     
     void fillSelectCB(int last, int current);
     void greyOutAllComponents();

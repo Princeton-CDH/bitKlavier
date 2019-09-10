@@ -36,7 +36,7 @@ BKViewController(p, theGraph, 2)
 #if JUCE_IOS
             paramSliders[idx]->addWantsBigOneListener(this);
 #endif
-            //paramSliders[idx]->setMinMaxDefaultInc(cBlendronomerDefaultRangeValuesAndInc[i]);
+            paramSliders[idx]->setMinMaxDefaultInc(cBlendronomerDefaultRangeValuesAndInc[i]);
             
             if(paramSliders[idx]->getName() == "Beats")
             {
@@ -51,10 +51,6 @@ BKViewController(p, theGraph, 2)
             else if(paramSliders[idx]->getName() == "Feedback Coeffs")
             {
                 paramSliders[idx]->setToolTipString("Determines duration of each sequenced note; double-click to edit all or add additional sequence steps");
-            }
-            else if(paramSliders[idx]->getName() == "Click Gains")
-            {
-                paramSliders[idx]->setToolTipString("Determines length of each sequenced beat as a factor of Synchronic tempo; double-click to edit all or add additional sequence steps");
             }
             
             idx++;
@@ -699,6 +695,52 @@ void BlendronicPreparationEditor::timerCallback()
     }
 }
 
+void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSlider, Array<float> values)
+{
+    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    
+    if (name == "Beats")
+    {
+        prep    ->setBeat(whichSlider, values[0]);
+        active  ->setBeat(whichSlider, values[0]);
+    }
+    else if (name == "Smooth Durations")
+    {
+        prep    ->setSmoothDuration(whichSlider, values[0]);
+        active  ->setSmoothDuration(whichSlider, values[0]);
+    }
+    else if (name == "Feedback Coeffs")
+    {
+        prep    ->setFeedbackCoefficient(whichSlider, values[0]);
+        active  ->setFeedbackCoefficient(whichSlider, values[0]);
+    }
+}
+
+void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
+{
+    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    
+    Array<float> newvals = Array<float>();
+    for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
+    
+    if (name == "Beats")
+    {
+        prep    ->setBeats(newvals);
+        active  ->setBeats(newvals);
+    }
+    else if (name == "Smooth Durations")
+    {
+        prep    ->setSmoothDurations(newvals);
+        active  ->setSmoothDurations(newvals);
+    }
+    else if (name == "Feedback Coeffs")
+    {
+        prep    ->setFeedbackCoefficients(newvals);
+        active  ->setFeedbackCoefficients(newvals);
+    }
+}
 
 void BlendronicPreparationEditor::buttonClicked (Button* b)
 {
@@ -921,6 +963,50 @@ void BlendronicModificationEditor::timerCallback()
          */
     }
     
+}
+
+void BlendronicModificationEditor::multiSliderDidChange(String name, int whichSlider, Array<float> values)
+{
+//    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
+//    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+//
+//    if (name == "Beats")
+//    {
+//        prep    ->setBeats(values);
+//        active  ->setBeats(values);
+//    }
+//    else if (name == "Smooth Durations")
+//    {
+//        prep    ->setSmoothDurations(values);
+//        active  ->setSmoothDurations(values);
+//    }
+//    else if (name == "Feedback Coeffs")
+//    {
+//        prep    ->setFeedbackCoefficients(values);
+//        active  ->setFeedbackCoefficients(values);
+//    }
+}
+
+void BlendronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
+{
+    //    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    //    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    //
+    //    if (name == "Beats")
+    //    {
+    //        prep    ->setBeats(values);
+    //        active  ->setBeats(values);
+    //    }
+    //    else if (name == "Smooth Durations")
+    //    {
+    //        prep    ->setSmoothDurations(values);
+    //        active  ->setSmoothDurations(values);
+    //    }
+    //    else if (name == "Feedback Coeffs")
+    //    {
+    //        prep    ->setFeedbackCoefficients(values);
+    //        active  ->setFeedbackCoefficients(values);
+    //    }
 }
 
 void BlendronicModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)

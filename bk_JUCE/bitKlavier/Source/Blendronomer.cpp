@@ -33,7 +33,7 @@ BlendronomerPreparation::BlendronomerPreparation(BlendronomerPreparation::Ptr p)
 }
 
 //constructor with input
-BlendronomerPreparation::BlendronomerPreparation(String newName, Array<int> beats, Array<float> smoothTimes,
+BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
 	Array<float> feedbackCoefficients, float smoothValue, float smoothDuration,
 	float delayMax, float delayLength, float feedbackGain) :
 	name(newName),
@@ -58,7 +58,7 @@ BlendronomerPreparation::BlendronomerPreparation(String newName, Array<int> beat
 //empty constructor
 BlendronomerPreparation::BlendronomerPreparation(void) :
 	name("blank blendronomer"),
-	bBeats(Array<int>({ 4, 3, 2, 3 })),
+	bBeats(Array<float>({ 4, 3, 2, 3 })),
 	bSmoothDurations(Array<float>({ 50., 0. })),
 	bFeedbackCoefficients(Array<float>({ 0.97, 0.93 })),
 	bDelayMax(4000 * 44.1),
