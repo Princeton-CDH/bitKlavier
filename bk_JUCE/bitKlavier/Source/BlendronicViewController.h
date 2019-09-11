@@ -24,6 +24,7 @@ public:
     ~BlendronicViewController()
     {
         setLookAndFeel(nullptr);
+        smoothModeSelectCB.setLookAndFeel(nullptr);
     };
     
     void paint (Graphics&) override;
@@ -97,7 +98,11 @@ public Timer
 {
 public:
     BlendronicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~BlendronicPreparationEditor() {};
+    ~BlendronicPreparationEditor()
+    {
+        setLookAndFeel(nullptr);
+        smoothModeSelectCB.setLookAndFeel(nullptr);
+    };
     
     
     void update(void) override;
@@ -142,7 +147,10 @@ public Timer
 {
 public:
     BlendronicModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~BlendronicModificationEditor() {};
+    ~BlendronicModificationEditor()
+    {
+        setLookAndFeel(nullptr);
+    };
     
     
     void update(void) override;
