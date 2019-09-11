@@ -685,6 +685,16 @@ static const std::vector<std::string> cTuningAdaptiveTypes = {
 };
 
 #pragma mark - Blendronomer
+typedef enum BlendronomerSmoothMode {
+    ConstantSmooth = 0,
+    ProportionalSmooth
+} BlendronomerSmoothMode;
+
+static const std::vector<std::string> cBlendronomerSmoothModes = {
+    "Constant",
+    "Proportional"
+};
+
 typedef enum BlendronomerParameterType
 {
     BlendronomerId = 0,
@@ -719,9 +729,9 @@ static const std::vector<BKParameterDataType> cBlendronomerDataTypes = {
 
 static const std::vector<std::string> cBlendronomerParameterTypes = {
     "Blendronic Id",
-    "Beats",
-    "Smooth Durations",
-    "Feedback Coeffs",
+    "beats",
+    "smooth durations",
+    "feedback coefficients",
     "Feedback Gain",
     "Input Thresh",
     "Gain",

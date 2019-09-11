@@ -35,20 +35,19 @@ public:
     void iWantTheBigOne(TextEditor*, String name) override;
 #endif
 protected:
-//    tempo
-    
 //    beats
-//    smoothdurations
-//    feedbackcoeffs
+//    smooth durations
+//    feedback coeffs
     
-//    delaymax
-//    feedback gain
+//    smooth mode
+//    sync mode
+//    delaymax default ~5
+//    holdmin > applies to sync
+//    holdmax >
+//    vel min >
+//    vel max >
+    
 //    inputthresh
-//    holdmin
-//    holdmax
-//    vel min
-//    vel max
-//    num voices
     OwnedArray<BKMultiSlider> paramSliders;
     
     virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
@@ -65,10 +64,13 @@ protected:
     }
     
     BKEditableComboBox selectCB;
+    BKComboBox syncModeSelectCB;
     BKComboBox smoothModeSelectCB;
     
-    std::unique_ptr<BKSingleSlider> feedbackGainSlider;
-    std::unique_ptr<BKSingleSlider> gainSlider;
+    BKLabel syncModeLabel;
+    BKLabel smoothModeLabel;
+    
+    BKButtonAndMenuLAF comboBoxRightJustifyLAF;
     
     std::unique_ptr<BKSingleSlider> numVoicesSlider;
     std::unique_ptr<BKSingleSlider> inputThreshSlider;

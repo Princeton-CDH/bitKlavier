@@ -13,7 +13,7 @@
 SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TuningProcessor::Ptr tuning,
                                          TempoProcessor::Ptr tempo,
-										BlendronomerProcessor::Ptr blender,
+										 BlendronomerProcessor::Ptr blender,
                                          BKSynthesiser* main,
                                          GeneralSettings::Ptr general):
 synth(main),

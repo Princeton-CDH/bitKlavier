@@ -13,12 +13,11 @@
 //copy constructor
 BlendronomerPreparation::BlendronomerPreparation(BlendronomerPreparation::Ptr p) :
 	name(p->getName()),
-	bTempo(p->getTempo()),
 	bBeats(p->getBeats()),
 	bSmoothDurations(p->getSmoothDurations()),
 	bFeedbackCoefficients(p->getFeedbackCoefficients()),
 	bDelayMax(p->getDelayMax()),
-	bFeedbackGain(p->getFeedbackGain()),
+	bFeedbackCoefficient(p->getFeedbackCoefficient()),
 	bDelayLength(p->getDelayLength()),
 	bSmoothValue(p->getSmoothValue()),
 	bSmoothDuration(p->getSmoothDuration()),
@@ -27,21 +26,20 @@ BlendronomerPreparation::BlendronomerPreparation(BlendronomerPreparation::Ptr p)
 	holdMin(p->getHoldMin()),
 	holdMax(p->getHoldMax()),
 	velocityMin(p->getVelocityMin()),
-	velocityMax(p->getVelocityMax()),
-	bNumVoices(p->getNumVoices())
+	velocityMax(p->getVelocityMax())
 {
 }
 
 //constructor with input
 BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
 	Array<float> feedbackCoefficients, float smoothValue, float smoothDuration,
-	float delayMax, float delayLength, float feedbackGain) :
+	float delayMax, float delayLength, float feedbackCoefficient) :
 	name(newName),
 	bBeats(beats),
 	bSmoothDurations(smoothTimes),
 	bFeedbackCoefficients(feedbackCoefficients),
 	bDelayMax(delayMax),
-	bFeedbackGain(feedbackGain),
+	bFeedbackCoefficient(feedbackCoefficient),
 	bDelayLength(delayLength),
 	bSmoothValue(smoothValue),
 	bSmoothDuration(smoothDuration),
@@ -50,20 +48,19 @@ BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> be
 	holdMin(0),
 	holdMax(12000),
 	velocityMin(0),
-	velocityMax(127),
-	bNumVoices(1)
+	velocityMax(127)
 {
 }
 
 //empty constructor
 BlendronomerPreparation::BlendronomerPreparation(void) :
 	name("blank blendronomer"),
-	bBeats(Array<float>({ 4, 3, 2, 3 })),
-	bSmoothDurations(Array<float>({ 50., 0. })),
-	bFeedbackCoefficients(Array<float>({ 0.97, 0.93 })),
-	bDelayMax(4000 * 44.1),
-	bFeedbackGain(0.97),
-	bDelayLength(800 * 44.1),
+	bBeats(Array<float>({ 4. })),
+	bSmoothDurations(Array<float>({ 50. })),
+	bFeedbackCoefficients(Array<float>({ 0.95 })),
+	bDelayMax(44100. * 5.),
+	bFeedbackCoefficient(0.97),
+	bDelayLength(44100. * 2.),
 	bSmoothValue(180. * 44.1),
 	bSmoothDuration(0),
 	bInputThresh(1),
@@ -71,8 +68,7 @@ BlendronomerPreparation::BlendronomerPreparation(void) :
 	holdMin(0),
 	holdMax(12000),
 	velocityMin(0),
-	velocityMax(127),
-	bNumVoices(1)
+	velocityMax(127)
 {
 }
 
@@ -128,13 +124,15 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
 	if (delayL == nullptr)
 	{
 		delay = synth->addBKDelay(blendronomer->aPrep->getDelayMax(),
-			blendronomer->aPrep->getFeedbackGain(),
+			blendronomer->aPrep->getFeedbackCoefficient(),
 			blendronomer->aPrep->getDelayLength(),
 			blendronomer->aPrep->getSmoothValue(),
 			blendronomer->aPrep->getSmoothDuration(),
-			true); //currently for testing
+			true);
 	}
-	numSamplesBeat = (uint64)blendronomer->aPrep->getBeats()[beatIndex] * 400 * sampleRate * .001; // should be sampleRate
+	numSamplesBeat = blendronomer->aPrep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempo->getTempo()->aPrep->getSubdivisions()) / tempo->getTempo()->aPrep->getTempo());
+    blendronomer->aPrep->setDelayLength(numSamplesBeat);
+    delay->setDelayTargetLength(numSamplesBeat);
 }
 
 BlendronomerProcessor::~BlendronomerProcessor()
@@ -144,27 +142,30 @@ BlendronomerProcessor::~BlendronomerProcessor()
 
 void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 {
+    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
+    
 	sampleTimer += numSamples;
 
 	if (sampleTimer >= numSamplesBeat)
 	{
 		beatIndex++;
-		if (beatIndex >= blendronomer->aPrep->getBeats().size()) beatIndex = 0;
+		if (beatIndex >= prep->getBeats().size()) beatIndex = 0;
 		smoothIndex++;
-		if (smoothIndex >= blendronomer->aPrep->getSmoothDurations().size()) smoothIndex = 0;
+		if (smoothIndex >= prep->getSmoothDurations().size()) smoothIndex = 0;
 		feedbackIndex++;
-		if (feedbackIndex >= blendronomer->aPrep->getFeedbackCoefficients().size()) feedbackIndex = 0;
-
-		numSamplesBeat = (uint64) blendronomer->aPrep->getBeats()[beatIndex] * 200 * sampleRate * 0.001;
+		if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
+        
+        numSamplesBeat = prep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempoPrep->getSubdivisions()) / tempoPrep->getTempo());
 		sampleTimer = 0;
 
-        blendronomer->aPrep->setDelayLength(numSamplesBeat);
+        prep->setDelayLength(numSamplesBeat);
+        prep->setSmoothDuration(prep->getSmoothDurations()[smoothIndex]);
+        prep->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
+        
         delay->setDelayTargetLength(numSamplesBeat);
-        
-        //need to stop through smooth and feedback vals as well
-        //delay->setSmoothDuration(50.);
-        //delay->setFeedback(....);
-        
+        delay->setSmoothDuration(prep->getSmoothDurations()[smoothIndex]);
+        delay->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
 	}
 
 }

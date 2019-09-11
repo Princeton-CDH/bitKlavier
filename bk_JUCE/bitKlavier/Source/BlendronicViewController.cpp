@@ -38,19 +38,17 @@ BKViewController(p, theGraph, 2)
 #endif
             paramSliders[idx]->setMinMaxDefaultInc(cBlendronomerDefaultRangeValuesAndInc[i]);
             
-            if(paramSliders[idx]->getName() == "Beats")
+            if(paramSliders[idx]->getName() == "beats")
             {
-                paramSliders[idx]->setAllowSubSlider(true);
-                paramSliders[idx]->setSubSliderName("add beat");
-                paramSliders[idx]->setToolTipString("Determines pitch of sequenced notes or chords; control-click to add another voice, double-click to edit all or add additional sequence steps");
+                paramSliders[idx]->setToolTipString("Determines delay times in terms of beats; double-click to edit all or add additional sequence steps");
             }
-            else if(paramSliders[idx]->getName() == "Smooth Durations")
+            else if(paramSliders[idx]->getName() == "smooth durations")
             {
-                paramSliders[idx]->setToolTipString("Determines gain of sequenced pitches; double-click to edit all or add additional sequence steps");
+                paramSliders[idx]->setToolTipString("Determines duration of smoothing between delay times; double-click to edit all or add additional sequence steps");
             }
-            else if(paramSliders[idx]->getName() == "Feedback Coeffs")
+            else if(paramSliders[idx]->getName() == "feedback coefficients")
             {
-                paramSliders[idx]->setToolTipString("Determines duration of each sequenced note; double-click to edit all or add additional sequence steps");
+                paramSliders[idx]->setToolTipString("Determines delay feedback; double-click to edit all or add additional sequence steps");
             }
             
             idx++;
@@ -65,6 +63,37 @@ BKViewController(p, theGraph, 2)
     selectCB.setSelectedItemIndex(0);
     addAndMakeVisible(selectCB);
     
+    syncModeSelectCB.setName("Sync Mode");
+    syncModeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
+    syncModeSelectCB.setTooltip("Determines which aspect of MIDI signal triggers the Blendronic sequence");
+    syncModeSelectCB.addSeparator();
+    syncModeSelectCB.addListener(this);
+    syncModeSelectCB.setSelectedItemIndex(0);
+    addAndMakeVisible(syncModeSelectCB);
+    
+    syncModeLabel.setText("pulse triggered by", dontSendNotification);
+    syncModeLabel.setJustificationType(juce::Justification::centredRight);
+    syncModeLabel.setTooltip("Determines which aspect of MIDI signal triggers the Blendronic sequence");
+    addAndMakeVisible(&syncModeLabel, ALL);
+    
+    smoothModeSelectCB.setName("Smooth Mode");
+    smoothModeSelectCB.setTooltip("Determines whether smooth durations are constant or proportional to beat length");
+    smoothModeSelectCB.addSeparator();
+    smoothModeSelectCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+    smoothModeSelectCB.addListener(this);
+    smoothModeSelectCB.setSelectedItemIndex(0);
+    addAndMakeVisible(smoothModeSelectCB);
+    
+    smoothModeLabel.setText("smooth durations", dontSendNotification);
+    smoothModeLabel.setTooltip("Determines whether smooth durations are constant or proportional to beat length");
+    addAndMakeVisible(&smoothModeLabel, ALL);
+    
+    addAndMakeVisible(&actionButton, ALL);
+    actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
+    actionButton.addListener(this);
+    
     currentTab = 0;
     displayTab(currentTab);
     
@@ -76,6 +105,10 @@ void BlendronicViewController::invisible(void)
     {
         paramSliders[i]->setVisible(false);
     }
+    syncModeSelectCB.setVisible(false);
+    syncModeLabel.setVisible(false);
+    smoothModeSelectCB.setVisible(false);
+    smoothModeLabel.setVisible(false);
 }
 
 void BlendronicViewController::displayShared(void)
@@ -126,20 +159,10 @@ void BlendronicViewController::displayTab(int tab)
     {
         BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
         
-//        gainSlider->setVisible(true);
-//        transpositionSlider->setVisible(true);
-//        nDisplaySlider.setVisible(true);
-//
-//        if(prep->getMode() == NoteLengthSync)
-//        {
-//            lengthMultiplierSlider->setVisible(true);
-//            beatsToSkipSlider->setVisible(false);
-//        }
-//        else
-//        {
-//            lengthMultiplierSlider->setVisible(false);
-//            beatsToSkipSlider->setVisible(true);
-//        }
+        syncModeSelectCB.setVisible(true);
+        syncModeLabel.setVisible(true);
+        smoothModeSelectCB.setVisible(true);
+        smoothModeLabel.setVisible(true);
         for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setVisible(true);
@@ -149,11 +172,36 @@ void BlendronicViewController::displayTab(int tab)
         int sliderHeight = height * 0.225f;
         int sliderWidth = width;
         
+        Rectangle<int> area (getBounds());
+        area.removeFromTop(hideOrShow.getBottom() + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth() + gXSpacing);
+        area.removeFromLeft(leftArrow.getWidth() + gXSpacing);
+        
+        Rectangle<int> leftColumn (area);
+        Rectangle<int> rightColumn (leftColumn.removeFromRight(leftColumn.getWidth()* 0.5));
+        
+        leftColumn.removeFromRight(processor.paddingScalarX * 20);
+        rightColumn.removeFromLeft(processor.paddingScalarX * 20);
+        
+        leftColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+        Rectangle<int> syncModeSelectCBRect (leftColumn.removeFromTop(gComponentComboBoxHeight));
+        Rectangle<int> syncModeSelectLabel (syncModeSelectCBRect.removeFromLeft(syncModeSelectCBRect.getWidth()*0.5));
+        syncModeSelectCB.setBounds(syncModeSelectCBRect);
+        syncModeLabel.setBounds(syncModeSelectLabel);
+        
+        rightColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+        Rectangle<int> smoothModeSelectCBRect (rightColumn.removeFromTop(gComponentComboBoxHeight));
+        Rectangle<int> smoothModeLabelRect (smoothModeSelectCBRect.removeFromRight(smoothModeSelectCBRect.getWidth()*0.5));
+        smoothModeSelectCB.setBounds(smoothModeSelectCBRect);
+        smoothModeLabel.setBounds(smoothModeLabelRect);
+
+        
+        area.removeFromTop(sliderHeight + gYSpacing - gComponentComboBoxHeight);
         for (int i = 0; i < paramSliders.size(); i++)
         {
-            paramSliders[i]->setBounds(x0, y0 + i * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
+            paramSliders[i]->setBounds(area.removeFromTop(sliderHeight));
+            area.removeFromTop(gYSpacing);
         }
-        
     }
     else if (tab == 1)
     {
@@ -170,123 +218,6 @@ void BlendronicViewController::resized()
 {
     displayShared();
     displayTab(currentTab);
-    
-#if 0
-    Rectangle<int> area (getLocalBounds());
-    
-    iconImageComponent.setBounds(area);
-    area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
-    
-    Rectangle<int> areaSave = area;
-    
-    Rectangle<int> nDisplayRow = area.removeFromBottom(100 + 80 * processor.paddingScalarY);
-    nDisplayRow.reduce(0, 4);
-    nDisplayRow.removeFromLeft(gXSpacing + gPaddingConst * processor.paddingScalarX * 0.5);
-    nDisplayRow.removeFromRight(gXSpacing + gPaddingConst * processor.paddingScalarX * 0.5);
-    nDisplaySlider.setBounds(nDisplayRow);
-    
-    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
-    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    
-    actionButton.setBounds(selectCB.getRight()+gXSpacing,
-                           selectCB.getY(),
-                           selectCB.getWidth() * 0.5,
-                           selectCB.getHeight());
-    
-    /* *** above here should be generic to all prep layouts *** */
-    /* ***    below here will be specific to each prep      *** */
-    if(!showADSR)
-    {
-        Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
-        modeSlice.removeFromRight(gXSpacing);
-        //modeSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX, 0);
-        //lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
-        lengthModeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
-        
-        float dim = lengthModeSelectCB.getHeight();
-        keyOnResetToggle.setBounds(lengthModeSelectCB.getX() - (dim + gXSpacing), lengthModeSelectCB.getY(), dim, dim);
-        keyOnResetToggle.changeWidthToFitText();
-        
-        keyOnResetLabel.setBounds(keyOnResetToggle.getX() - 100, keyOnResetToggle.getY(), 100, dim);
-        
-        DBG("kt: " + rectangleToString(keyOnResetToggle.getBounds()) );
-        DBG("kl: " + rectangleToString(keyOnResetLabel.getBounds()) );
-        
-        Rectangle<int> sliderSlice = area;
-        sliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-        //sliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
-        /*
-         sliderSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX,
-         4 + 2.*gPaddingConst * processor.paddingScalarY);
-         */
-        
-        int nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.15f;
-        lengthMultiplierSlider->setBounds(sliderSlice.getX(),
-                                          nextCenter - gComponentSingleSliderHeight/2 + 8,
-                                          sliderSlice.getWidth(),
-                                          gComponentSingleSliderHeight);
-        beatsToSkipSlider->setBounds(lengthMultiplierSlider->getBounds());
-        
-        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.4f;
-        holdTimeMinMaxSlider->setBounds(sliderSlice.getX(),
-                                        nextCenter - gComponentSingleSliderHeight/2 + 4,
-                                        sliderSlice.getWidth(),
-                                        gComponentSingleSliderHeight);
-        
-        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.65f;
-        clusterMinSlider->setBounds(sliderSlice.getX(),
-                                    nextCenter - gComponentSingleSliderHeight/2 + 4,
-                                    sliderSlice.getWidth(),
-                                    gComponentSingleSliderHeight);
-        
-        
-        
-        nextCenter = sliderSlice.getY() + sliderSlice.getHeight() * 0.9f;
-        velocityMinMaxSlider->setBounds(sliderSlice.getX(),
-                                        nextCenter - gComponentSingleSliderHeight/2 + 4,
-                                        sliderSlice.getWidth(),
-                                        gComponentSingleSliderHeight);
-        
-        
-        //leftColumn.reduce(4, 0);
-        leftColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
-        leftColumn.removeFromLeft(gXSpacing);
-        transpositionSlider->setBounds(leftColumn.getX(),
-                                       lengthMultiplierSlider->getY(),
-                                       leftColumn.getWidth(),
-                                       gComponentStackedSliderHeight + processor.paddingScalarY * 30);
-        
-        reverseADSRSlider->setBounds(leftColumn.getX(),
-                                     transpositionSlider->getBottom() + gComponentComboBoxHeight * 0.5,
-                                     leftColumn.getWidth() * 0.5 - gYSpacing,
-                                     gComponentComboBoxHeight);
-        
-        undertowADSRSlider->setBounds(leftColumn.getX() + leftColumn.getWidth() * 0.5 + gYSpacing,
-                                      transpositionSlider->getBottom() + gComponentComboBoxHeight * 0.5,
-                                      leftColumn.getWidth() * 0.5 - gYSpacing,
-                                      gComponentComboBoxHeight);
-        
-        gainSlider->setBounds(leftColumn.getX(),
-                              reverseADSRSlider->getBottom() + gComponentComboBoxHeight * 0.5,
-                              leftColumn.getWidth(),
-                              gComponentStackedSliderHeight + processor.paddingScalarY * 30);
-    }
-    else
-    {
-        areaSave.removeFromTop(gYSpacing * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
-        Rectangle<int> adsrSliderSlice = areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gComponentSingleSliderHeight * 2 + gYSpacing * 3);
-        if(showReverseADSR) reverseADSRSlider->setBounds(adsrSliderSlice);
-        else undertowADSRSlider->setBounds(adsrSliderSlice);
-        
-        selectCB.toFront(false);
-    }
-#endif
 }
 
 #if JUCE_IOS
@@ -573,12 +504,6 @@ void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
 //        prep->setBeatsToSkip(val);
 //        active->setBeatsToSkip(val);
 //    }
-//    else if(name == "gain")
-//    {
-//        //DBG("gain " + String(val));
-//        prep->setGain(val);
-//        active->setGain(val);
-//    }
 //    else if (name == "cluster min")
 //    {
 //        prep->setClusterMin(val);
@@ -700,17 +625,17 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
     BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
     BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
     
-    if (name == "Beats")
+    if (name == "beats")
     {
         prep    ->setBeat(whichSlider, values[0]);
         active  ->setBeat(whichSlider, values[0]);
     }
-    else if (name == "Smooth Durations")
+    else if (name == "smooth durations")
     {
         prep    ->setSmoothDuration(whichSlider, values[0]);
         active  ->setSmoothDuration(whichSlider, values[0]);
     }
-    else if (name == "Feedback Coeffs")
+    else if (name == "feedback coefficients")
     {
         prep    ->setFeedbackCoefficient(whichSlider, values[0]);
         active  ->setFeedbackCoefficient(whichSlider, values[0]);
@@ -725,17 +650,17 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     Array<float> newvals = Array<float>();
     for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
     
-    if (name == "Beats")
+    if (name == "beats")
     {
         prep    ->setBeats(newvals);
         active  ->setBeats(newvals);
     }
-    else if (name == "Smooth Durations")
+    else if (name == "smooth durations")
     {
         prep    ->setSmoothDurations(newvals);
         active  ->setSmoothDurations(newvals);
     }
-    else if (name == "Feedback Coeffs")
+    else if (name == "feedback coefficients")
     {
         prep    ->setFeedbackCoefficients(newvals);
         active  ->setFeedbackCoefficients(newvals);
@@ -822,7 +747,6 @@ BlendronicViewController(p, theGraph)
 
 void BlendronicModificationEditor::greyOutAllComponents()
 {
-    gainSlider->setDim(gModAlpha);
     holdTimeMinMaxSlider->setDim(gModAlpha);
     velocityMinMaxSlider->setDim(gModAlpha);
 }

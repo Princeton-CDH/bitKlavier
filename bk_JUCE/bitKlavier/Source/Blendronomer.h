@@ -37,7 +37,7 @@ public:
 	BlendronomerPreparation(BlendronomerPreparation::Ptr p);
 	BlendronomerPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
 		Array<float> feedbackCoefficients, float smoothValue,
-		float smoothDuration, float delayMax, float delayLength, float feedbackGain);
+		float smoothDuration, float delayMax, float delayLength, float feedbackCoefficient);
 	BlendronomerPreparation(void);
 
 	// copy, modify, compare, randomize
@@ -52,12 +52,11 @@ public:
 
 	//accessors
 	inline const String getName() const noexcept { return name; }
-	inline const float getTempo() const noexcept { return bTempo; }
 	inline const Array<float> getBeats() const noexcept { return bBeats; }
 	inline const Array<float> getSmoothDurations() const noexcept { return bSmoothDurations; }
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
 	inline const float getDelayMax() const noexcept { return bDelayMax; }
-	inline const float getFeedbackGain() const noexcept { return bFeedbackGain; }
+	inline const float getFeedbackCoefficient() const noexcept { return bFeedbackCoefficient; }
 	inline const float getDelayLength() const noexcept { return bDelayLength; }
 	inline const float getSmoothValue() const noexcept { return bSmoothValue; }
 	inline const float getSmoothDuration() const noexcept { return bSmoothDuration; }
@@ -67,26 +66,24 @@ public:
 	inline const int getHoldMax() const noexcept { return holdMax; }
 	inline const int getVelocityMin() const noexcept { return velocityMin; }
 	inline const int getVelocityMax() const noexcept { return velocityMax; }
-	inline const int getNumVoices() const noexcept { return bNumVoices; }
 	inline const bool getActive() const noexcept { return isActive; }
 	inline const bool getInputGain() const noexcept { return inputGain; }
+    inline const int getSmoothMode() const noexcept { return bSmoothMode; }
 
 	//mutators
 	inline void setName(String n) { name = n; }
-	inline void setTempo(int tempo) { bTempo = tempo; }
 	inline void setBeats(Array<float> beats) { bBeats.swapWith(beats); }
 	inline void setSmoothDurations(Array<float> smoothTimes) { bSmoothDurations.swapWith(smoothTimes); }
 	inline void setFeedbackCoefficients(Array<float> feedbackCoefficients) { bFeedbackCoefficients.swapWith(feedbackCoefficients); }
     
+    inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
     inline void setBeat(int whichSlider, float value) { bBeats.set(whichSlider, value); }
+    inline void setDelayLength(float delayLength) { bDelayLength = delayLength; }
     inline void setSmoothDuration(int whichSlider, float value) { bSmoothDurations.set(whichSlider, value); }
+    inline void setSmoothDuration(float smoothDuration) { bSmoothDuration = smoothDuration; }
     inline void setFeedbackCoefficient(int whichSlider, float value) { bFeedbackCoefficients.set(whichSlider, value); }
-    
-	inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
-	inline void setFeedbackGain(float FeedbackGain) { bFeedbackGain = FeedbackGain; }
-	inline void setDelayLength(float delayLength) { bDelayLength = delayLength; }
+	inline void setFeedback(float FeedbackCoefficient) { bFeedbackCoefficient = FeedbackCoefficient; }
 	inline void setSmoothValue(float smoothValue) { bSmoothValue = smoothValue; }
-	inline void setSmoothDuration(float smoothDuration) { bSmoothDuration = smoothDuration; }
 	inline void setInputThresh(float newThresh)
 	{
 		bInputThresh = newThresh;
@@ -96,10 +93,10 @@ public:
 	inline const void setHoldMax(int max) { holdMax = max; }
 	inline const void setVelocityMin(int min) { velocityMin = min; }
 	inline const void setVelocityMax(int max) { velocityMax = max; }
-	inline const void setNumVoices(int numVoices) { bNumVoices = numVoices; }
 	inline const void setActive(bool newActive) { isActive = newActive; }
 	inline const void toggleActive() { isActive = !isActive; }
 	inline const void setInputGain(float gain) { inputGain = gain; }
+    inline const void setSmoothMode(int mode) { bSmoothMode = mode; }
 
 	void print(void);
 	ValueTree getState(void);
@@ -110,7 +107,6 @@ private:
 	bool isActive;
 
 	//stuff from preset
-	float bTempo;
 	Array<float> bBeats;
 	Array<float> bSmoothDurations;
 	Array<float> bFeedbackCoefficients;
@@ -122,12 +118,10 @@ private:
 	//dsmooth stuff
 	float bSmoothValue;
 	float bSmoothDuration;
+    int bSmoothMode;
 
 	//signal chain stk classes
-	float bFeedbackGain;
-
-	//voices? will be implemented later
-	int bNumVoices;
+	float bFeedbackCoefficient;
 
 	//bK stuff
 	float bInputThresh;
@@ -333,10 +327,9 @@ private:
 	bool runChain;
 	bool inChain;
 
-	uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
-	uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
+	float numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
 	uint64 sampleTimer;
-    uint64 beatIndex, smoothIndex, feedbackIndex;
+    int beatIndex, smoothIndex, feedbackIndex;
 
 	//JUCE_LEAK_DETECTOR(BlendronomerProcessor);
 };
