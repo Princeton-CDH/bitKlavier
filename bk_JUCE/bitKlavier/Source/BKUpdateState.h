@@ -213,6 +213,7 @@ public:
         currentDirectId = val;
         currentSynchronicId = val;
         currentNostalgicId = val;
+        currentBlendronicId = val;
         currentTempoId = val;
         currentTuningId = val;
         

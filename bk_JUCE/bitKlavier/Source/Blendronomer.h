@@ -36,7 +36,7 @@ public:
 	//constructors
 	BlendronomerPreparation(BlendronomerPreparation::Ptr p);
 	BlendronomerPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
-		Array<float> feedbackCoefficients, float smoothValue,
+		Array<float> feedbackCoefficients, float smoothValue, BlendronomerSmoothMode smoothMode,
 		float smoothDuration, float delayMax, float delayLength, float feedbackCoefficient);
 	BlendronomerPreparation(void);
 
@@ -60,6 +60,7 @@ public:
 	inline const float getDelayLength() const noexcept { return bDelayLength; }
 	inline const float getSmoothValue() const noexcept { return bSmoothValue; }
 	inline const float getSmoothDuration() const noexcept { return bSmoothDuration; }
+    inline const BlendronomerSmoothMode getSmoothMode() const noexcept { return bSmoothMode; }
 	inline const float getInputThreshSEC() const noexcept { return bInputThreshSec; }
 	inline const float getInputThreshMS() const noexcept { return bInputThresh; }
 	inline const int getHoldMin() const noexcept { return holdMin; }
@@ -68,7 +69,6 @@ public:
 	inline const int getVelocityMax() const noexcept { return velocityMax; }
 	inline const bool getActive() const noexcept { return isActive; }
 	inline const bool getInputGain() const noexcept { return inputGain; }
-    inline const int getSmoothMode() const noexcept { return bSmoothMode; }
 
 	//mutators
 	inline void setName(String n) { name = n; }
@@ -84,6 +84,7 @@ public:
     inline void setFeedbackCoefficient(int whichSlider, float value) { bFeedbackCoefficients.set(whichSlider, value); }
 	inline void setFeedback(float FeedbackCoefficient) { bFeedbackCoefficient = FeedbackCoefficient; }
 	inline void setSmoothValue(float smoothValue) { bSmoothValue = smoothValue; }
+    inline const void setSmoothMode(BlendronomerSmoothMode mode) { bSmoothMode = mode; }
 	inline void setInputThresh(float newThresh)
 	{
 		bInputThresh = newThresh;
@@ -96,7 +97,6 @@ public:
 	inline const void setActive(bool newActive) { isActive = newActive; }
 	inline const void toggleActive() { isActive = !isActive; }
 	inline const void setInputGain(float gain) { inputGain = gain; }
-    inline const void setSmoothMode(int mode) { bSmoothMode = mode; }
 
 	void print(void);
 	ValueTree getState(void);
@@ -118,7 +118,7 @@ private:
 	//dsmooth stuff
 	float bSmoothValue;
 	float bSmoothDuration;
-    int bSmoothMode;
+    BlendronomerSmoothMode bSmoothMode;
 
 	//signal chain stk classes
 	float bFeedbackCoefficient;

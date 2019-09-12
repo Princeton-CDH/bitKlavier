@@ -108,6 +108,7 @@ public:
     void update(void) override;
     
     void fillSelectCB(int last, int current);
+    void fillSmoothModeSelectCB(void);
     
     void timerCallback() override;
     
@@ -169,6 +170,8 @@ public:
     void multiSlidersDidChange(String name, Array<Array<float>> values) override;
     
     void fillSelectCB(int last, int current);
+    void fillSmoothModeSelectCB(void);
+    
     void greyOutAllComponents();
     void highlightModedComponents();
     

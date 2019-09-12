@@ -85,8 +85,8 @@ BKViewController(p, theGraph, 2)
     smoothModeSelectCB.setSelectedItemIndex(0);
     addAndMakeVisible(smoothModeSelectCB);
     
-    smoothModeLabel.setText("smooth durations", dontSendNotification);
-    smoothModeLabel.setTooltip("Determines whether smooth durations are constant or proportional to beat length");
+    smoothModeLabel.setText("smooth", dontSendNotification);
+    smoothModeLabel.setTooltip("Determines whether smooth durations are constant or proportional to beat length and delta");
     addAndMakeVisible(&smoothModeLabel, ALL);
     
     addAndMakeVisible(&actionButton, ALL);
@@ -236,9 +236,12 @@ BlendronicPreparationEditor::BlendronicPreparationEditor(BKAudioProcessor& p, BK
 BlendronicViewController(p, theGraph)
 {
     fillSelectCB(-1,-1);
-    
+
     selectCB.addListener(this);
     selectCB.addMyListener(this);
+    smoothModeSelectCB.addListener(this);
+    
+    fillSmoothModeSelectCB();
     
     startTimer(20);
 }
@@ -462,27 +465,15 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         setCurrentId(Id);
     }
-    else if (name == "Length Mode")
+    else if (name == "Smooth Mode")
     {
         BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
         BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
         
-//        prep    ->setMode((BlendronicSyncMode) index);
-//        active  ->setMode((BlendronicSyncMode) index);
-//
-//        if(currentTab == 0)
-//        {
-//            if(prep->getMode() == NoteLengthSync)
-//            {
-//                lengthMultiplierSlider->setVisible(true);
-//                beatsToSkipSlider->setVisible(false);
-//            }
-//            else
-//            {
-//                lengthMultiplierSlider->setVisible(false);
-//                beatsToSkipSlider->setVisible(true);
-//            }
-//        }
+        prep    ->setSmoothMode( (BlendronomerSmoothMode) index);
+        active  ->setSmoothMode( (BlendronomerSmoothMode) index);
+        
+        fillSmoothModeSelectCB();
         
     }
 }
@@ -549,6 +540,20 @@ void BlendronicPreparationEditor::fillSelectCB(int last, int current)
     
     lastId = selectedId;
     
+}
+
+void BlendronicPreparationEditor::fillSmoothModeSelectCB()
+{
+    BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    
+    smoothModeSelectCB.clear(dontSendNotification);
+    
+    smoothModeSelectCB.addItem("Constant Rate", 1);
+    smoothModeSelectCB.addItem("Constant Time", 2);
+    smoothModeSelectCB.addItem("Proportional Rate", 3);
+    smoothModeSelectCB.addItem("Proportional Time", 4);
+    
+    smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
 }
 
 void BlendronicPreparationEditor::timerCallback()
@@ -872,6 +877,20 @@ void BlendronicModificationEditor::fillSelectCB(int last, int current)
     lastId = selectedId;
 }
 
+void BlendronicModificationEditor::fillSmoothModeSelectCB()
+{
+    BlendronomerModification::Ptr prep = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+    
+    smoothModeSelectCB.clear(dontSendNotification);
+    
+    smoothModeSelectCB.addItem("Constant Rate", 1);
+    smoothModeSelectCB.addItem("Constant Time", 2);
+    smoothModeSelectCB.addItem("Proportional Rate", 3);
+    smoothModeSelectCB.addItem("Proportional Time", 4);
+    
+    smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
+}
+
 void BlendronicModificationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplayBlendronomerMod)
@@ -1084,7 +1103,7 @@ void BlendronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         setCurrentId(Id);
     }
-    else if (name == "Length Mode")
+    else if (name == "Smooth Mode")
     {
         BlendronomerModification::Ptr mod = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
         
