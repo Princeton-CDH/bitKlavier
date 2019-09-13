@@ -85,7 +85,7 @@ BKViewController(p, theGraph, 2)
     smoothModeSelectCB.setSelectedItemIndex(0);
     addAndMakeVisible(smoothModeSelectCB);
     
-    smoothModeLabel.setText("smooth", dontSendNotification);
+    smoothModeLabel.setText("smoothing", dontSendNotification);
     smoothModeLabel.setTooltip("Determines whether smooth durations are constant or proportional to beat length and delta");
     addAndMakeVisible(&smoothModeLabel, ALL);
     
