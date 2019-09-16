@@ -686,16 +686,22 @@ static const std::vector<std::string> cTuningAdaptiveTypes = {
 
 #pragma mark - Blendronomer
 typedef enum BlendronomerSmoothMode {
-    ConstantRateSmooth = 0,
-    ConstantTimeSmooth,
-    ProportionalRateSmooth,
+    ConstantTimeSmooth = 0,
+    ConstantRateSmooth,
     ProportionalTimeSmooth,
+    ProportionalRateSmooth,
     SmoothNil
 } BlendronomerSmoothMode;
 
+typedef enum BlendronomerSyncMode {
+    BlendronomerSyncModeNil = 0
+} BlendronomerSyncMode;
+
 static const std::vector<std::string> cBlendronomerSmoothModes = {
-    "Constant",
-    "Proportional"
+    "Constant Time",
+    "Constant Rate",
+    "Proportional Time",
+    "Proportional Rate"
 };
 
 typedef enum BlendronomerParameterType
@@ -704,14 +710,11 @@ typedef enum BlendronomerParameterType
     BlendronomerBeats,
     BlendronomerSmoothDurations,
     BlendronomerFeedbackCoeffs,
-    BlendronomerFeedbackGain,
     BlendronomerInputThresh,
-    BlendronomerGain,
     BlendronomerHoldMin,
     BlendronomerHoldMax,
     BlendronomerVelMin,
     BlendronomerVelMax,
-    BlendronomerNumVoices,
     BlendronomerParameterTypeNil
 } BlendronomerParameterType;
 
@@ -724,10 +727,7 @@ static const std::vector<BKParameterDataType> cBlendronomerDataTypes = {
     BKFloat,
     BKFloat,
     BKFloat,
-    BKFloat,
-    BKFloat,
-    BKFloat,
-    BKInt
+    BKFloat
 };
 
 static const std::vector<std::string> cBlendronomerParameterTypes = {
@@ -735,20 +735,17 @@ static const std::vector<std::string> cBlendronomerParameterTypes = {
     "beats",
     "smooth durations",
     "feedback coefficients",
-    "Feedback Gain",
     "Input Thresh",
-    "Gain",
     "Hold Min",
     "Hold Max",
     "Vel Min",
-    "Vel Max",
-    "Num Voices"
+    "Vel Max"
 };
 
 static const std::vector<std::vector<float>> cBlendronomerDefaultRangeValuesAndInc = {
     { 0.0f, 0.0f, 0.0f, 0.0f }, //min, max, default, increment, skew
     { 0.0f, 8.0f, 4.0f, 0.1f },
-    { 0.0f, 1000.0f, 50.0f, 0.01f },
+    { 0.0f, 1000.0f, 500.0f, 0.01f },
     { 0.0f, 1.0f, 0.95f, 0.01f }
 };
 

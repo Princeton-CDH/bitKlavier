@@ -334,7 +334,7 @@ BlendronomerProcessor::Ptr Piano::addBlendronomerProcessor(int thisId)
 {
     Blendronomer::Ptr blendronomer = processor.gallery->getBlendronomer(thisId);
     BKDelay::Ptr delay = processor.mainPianoSynth.addBKDelay(blendronomer->aPrep->getDelayMax(),
-                                  blendronomer->aPrep->getFeedbackCoefficient(),
+                                  blendronomer->aPrep->getFeedbackCoefficients()[0],
                                   blendronomer->aPrep->getDelayLength(),
                                   blendronomer->aPrep->getSmoothValue(),
                                   blendronomer->aPrep->getSmoothDuration(),

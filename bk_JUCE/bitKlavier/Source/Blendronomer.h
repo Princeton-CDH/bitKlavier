@@ -56,7 +56,6 @@ public:
 	inline const Array<float> getSmoothDurations() const noexcept { return bSmoothDurations; }
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
 	inline const float getDelayMax() const noexcept { return bDelayMax; }
-	inline const float getFeedbackCoefficient() const noexcept { return bFeedbackCoefficient; }
 	inline const float getDelayLength() const noexcept { return bDelayLength; }
 	inline const float getSmoothValue() const noexcept { return bSmoothValue; }
 	inline const float getSmoothDuration() const noexcept { return bSmoothDuration; }
@@ -69,6 +68,7 @@ public:
 	inline const int getVelocityMax() const noexcept { return velocityMax; }
 	inline const bool getActive() const noexcept { return isActive; }
 	inline const bool getInputGain() const noexcept { return inputGain; }
+    inline const BlendronomerSyncMode getSyncMode() const noexcept { return bSyncMode; }
 
 	//mutators
 	inline void setName(String n) { name = n; }
@@ -82,7 +82,6 @@ public:
     inline void setSmoothDuration(int whichSlider, float value) { bSmoothDurations.set(whichSlider, value); }
     inline void setSmoothDuration(float smoothDuration) { bSmoothDuration = smoothDuration; }
     inline void setFeedbackCoefficient(int whichSlider, float value) { bFeedbackCoefficients.set(whichSlider, value); }
-	inline void setFeedback(float FeedbackCoefficient) { bFeedbackCoefficient = FeedbackCoefficient; }
 	inline void setSmoothValue(float smoothValue) { bSmoothValue = smoothValue; }
     inline const void setSmoothMode(BlendronomerSmoothMode mode) { bSmoothMode = mode; }
 	inline void setInputThresh(float newThresh)
@@ -97,6 +96,7 @@ public:
 	inline const void setActive(bool newActive) { isActive = newActive; }
 	inline const void toggleActive() { isActive = !isActive; }
 	inline const void setInputGain(float gain) { inputGain = gain; }
+    inline const void setSyncMode(BlendronomerSyncMode mode) { bSyncMode = mode; }
 
 	void print(void);
 	ValueTree getState(void);
@@ -127,6 +127,8 @@ private:
 	float bInputThresh;
 	float bInputThreshSec;
 	int holdMin, holdMax, velocityMin, velocityMax;
+    
+    BlendronomerSyncMode bSyncMode;
 
 	//needed for sampling
 	float inputGain;
@@ -275,14 +277,17 @@ public:
 	BKSampleLoadType sampleType;
 
 	float getTimeToBeatMS(float beatsToSkip);
+    
+    bool velocityCheck(int noteNumber);
+    bool holdCheck(int noteNumber);
 
 	//begin timing played note length, called with noteOn
-	void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel);
+	void keyPressed(int noteNumber, float velocity, int midiChannel);
 
 	//begin playing reverse note, called with noteOff
-	void keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, bool post = false);
+	void keyReleased(int noteNumber, float velocity, int midiChannel, bool post = false);
 
-	void postRelease(int midiNoteNumber, int midiChannel);
+	void postRelease(int noteNumber, int midiChannel);
 
 	void prepareToPlay(double sr);
 
@@ -296,13 +301,21 @@ public:
 	inline TempoProcessor::Ptr getTempo(void) const noexcept { return tempo; }
 	inline BKDelay::Ptr getDelay(void) const noexcept { return delay; }
 	inline int getId(void) const noexcept { return blendronomer->getId(); }
-	inline int getTempoId(void) const noexcept { return tempo->getId(); }
-	inline const uint64 getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
+    inline int getTempoId(void) const noexcept { return tempo->getId(); }
+	inline const float getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
+    inline uint64 getSampleTime(void) const noexcept { return sampleTimer; }
+    inline int getBeatIndex(void) { return beatIndex; }
+    inline int getSmoothIndex(void) { return smoothIndex; }
+    inline int getFeedbackIndex(void) { return feedbackIndex; }
 
 
 	//mutators
 	inline void setBlendronomer(Blendronomer::Ptr blend) { blendronomer = blend; }
 	inline void setTempo(TempoProcessor::Ptr temp) { tempo = temp; }
+    inline void setSampleTimer(uint64 sampleTime) { sampleTimer = sampleTime; }
+    inline void setBeatIndex(int index) { beatIndex = index; }
+    inline void setSmoothIndex(int index) { smoothIndex = index; }
+    inline void setFeedbackIndex(int index) { feedbackIndex = index; }
 	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
 	inline void reset(void) { blendronomer->aPrep->copy(blendronomer->sPrep); }
 
@@ -322,6 +335,7 @@ private:
 
 	void playNote(int channel, int note, float velocity);
 	Array<float> velocities;    //record of velocities
+    Array<uint64> holdTimers;
 	Array<int> keysDepressed;   //current keys that are depressed
 
 	bool runChain;

@@ -18,7 +18,6 @@ BlendronomerPreparation::BlendronomerPreparation(BlendronomerPreparation::Ptr p)
 	bFeedbackCoefficients(p->getFeedbackCoefficients()),
 	bDelayMax(p->getDelayMax()),
 	bDelayLength(p->getDelayLength()),
-    bFeedbackCoefficient(p->getFeedbackCoefficient()),
 	bSmoothValue(p->getSmoothValue()),
 	bSmoothDuration(p->getSmoothDuration()),
     bSmoothMode(p->getSmoothMode()),
@@ -40,7 +39,6 @@ BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> be
 	bSmoothDurations(smoothTimes),
 	bFeedbackCoefficients(feedbackCoefficients),
 	bDelayMax(delayMax),
-	bFeedbackCoefficient(feedbackCoefficient),
 	bDelayLength(delayLength),
 	bSmoothValue(smoothValue),
 	bSmoothDuration(smoothDuration),
@@ -58,14 +56,13 @@ BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> be
 BlendronomerPreparation::BlendronomerPreparation(void) :
 	name("blank blendronomer"),
 	bBeats(Array<float>({ 4. })),
-	bSmoothDurations(Array<float>({ 50. })),
+	bSmoothDurations(Array<float>({ 500. })),
 	bFeedbackCoefficients(Array<float>({ 0.95 })),
 	bDelayMax(44100. * 5.),
-	bFeedbackCoefficient(0.97),
 	bDelayLength(44100. * 2.),
 	bSmoothValue(180. * 44.1),
 	bSmoothDuration(0),
-    bSmoothMode(ConstantRateSmooth),
+    bSmoothMode(ConstantTimeSmooth),
 	bInputThresh(1),
 	bInputThreshSec(0.001),
 	holdMin(0),
@@ -124,6 +121,15 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
 	smoothIndex(0),
 	feedbackIndex(0)
 {
+    velocities.ensureStorageAllocated(128);
+    holdTimers.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++)
+    {
+        velocities.insert(i, 0.);
+        holdTimers.insert(i, 0);
+    }
+    
+    keysDepressed = Array<int>();
 }
 
 BlendronomerProcessor::~BlendronomerProcessor()
@@ -174,10 +180,6 @@ void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 		sampleTimer = 0;
 
         DBG(String(smoothDuration));
-        prep->setDelayLength(numSamplesBeat);
-        prep->setSmoothDuration(smoothDuration);
-        prep->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
-        
         delay->setDelayTargetLength(numSamplesBeat);
         delay->setSmoothDuration(smoothDuration);
         delay->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
@@ -191,17 +193,88 @@ float BlendronomerProcessor::getTimeToBeatMS(float beatsToSkip)
 	return timeToReturn * 1000. / sampleRate; //will make more precise later
 }
 
-void BlendronomerProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel)
+bool BlendronomerProcessor::velocityCheck(int noteNumber)
 {
-	//may not need anything except communicating with other preparations?
+    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    
+    int velocity = (int)(velocities.getUnchecked(noteNumber) * 127.0);
+    
+    if (velocity > 127) velocity = 127;
+    if (velocity < 0)   velocity = 0;
+    
+    if(prep->getVelocityMin() <= prep->getVelocityMax())
+    {
+        if (velocity >= prep->getVelocityMin() && velocity <= prep->getVelocityMax())
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if (velocity >= prep->getVelocityMin() || velocity <= prep->getVelocityMax())
+        {
+            return true;
+        }
+    }
+    
+    DBG("failed velocity check");
+    return false;
 }
 
-void BlendronomerProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, bool post)
+bool BlendronomerProcessor::holdCheck(int noteNumber)
 {
-	//may not need anything except communicating with other preparations?
+    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    
+    uint64 hold = holdTimers.getUnchecked(noteNumber) * (1000.0 / sampleRate);
+    
+    if(prep->getHoldMin() <= prep->getHoldMax())
+    {
+        if (hold >= prep->getHoldMin() && hold <= prep->getHoldMax())
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if (hold >= prep->getHoldMin() || hold <= prep->getHoldMax())
+        {
+            return true;
+        }
+    }
+    
+    DBG("failed hold check");
+    return false;
 }
 
-void BlendronomerProcessor::postRelease(int midiNoteNumber, int midiChannel)
+void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiChannel)
+{
+    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    
+    //add note to array of depressed notes
+    keysDepressed.addIfNotAlreadyThere(noteNumber);
+    velocities.set(noteNumber, velocity);
+    holdTimers.set(noteNumber, 0);
+    
+    if (!velocityCheck(noteNumber)) return;
+    
+    setSampleTimer(0);
+    setBeatIndex(0);
+    setSmoothIndex(0);
+    setFeedbackIndex(0);
+}
+
+void BlendronomerProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, bool post)
+{
+    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    
+    //remove key from array of pressed keys
+    keysDepressed.removeAllInstancesOf(noteNumber);
+    
+    if (!velocityCheck(noteNumber)) return;
+    if (!holdCheck(noteNumber)) return;
+}
+
+void BlendronomerProcessor::postRelease(int noteNumber, int midiChannel)
 {
 	//may not need anything except communicating with other preparations?
 }

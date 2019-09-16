@@ -256,65 +256,35 @@ void BlendronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEdita
 void BlendronicPreparationEditor::update(void)
 {
     if (processor.updateState->currentBlendronicId < 0) return;
-//    setShowADSR(reverseADSRSlider->getName(), false);
-//    reverseADSRSlider->setIsButtonOnly(true);
-//    setShowADSR(undertowADSRSlider->getName(), false);
-//    undertowADSRSlider->setIsButtonOnly(true);
+
     setSubWindowInFront(false);
     
     BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
     
     if (prep != nullptr)
     {
-//        nDisplaySlider.setWaveDistance(prep->getWavedistance(), dontSendNotification);
-//        nDisplaySlider.setUndertow(prep->getUndertow(), dontSendNotification);
-//
-//        selectCB.setSelectedId(processor.updateState->currentBlendronicId, dontSendNotification);
-//        lengthModeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
-//
-//        //transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
-//        transpositionSlider->setTo(prep->getTransposition(), dontSendNotification);
-//        lengthMultiplierSlider->setValue(prep->getLengthMultiplier(), dontSendNotification);
-//
-//        holdTimeMinMaxSlider->setMinValue(prep->getHoldMin(), dontSendNotification);
-//        holdTimeMinMaxSlider->setMaxValue(prep->getHoldMax(), dontSendNotification);
-//
-//        velocityMinMaxSlider->setMinValue(prep->getVelocityMin(), dontSendNotification);
-//        velocityMinMaxSlider->setMaxValue(prep->getVelocityMax(), dontSendNotification);
-//
-//        clusterMinSlider->setValue(prep->getClusterMin(), dontSendNotification);
-//        clusterThresholdSlider->setValue(prep->getClusterThreshold(), dontSendNotification);
-//
-//        keyOnResetToggle.setToggleState(prep->getKeyOnReset(), dontSendNotification);
-//
-//        beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
-//        gainSlider->setValue(prep->getGain(), dontSendNotification);
-//
-//        if (currentTab == 0)
-//        {
-//            if(prep->getMode() == NoteLengthSync)
-//            {
-//
-//                lengthMultiplierSlider->setVisible(true);
-//                beatsToSkipSlider->setVisible(false);
-//            }
-//            else
-//            {
-//                lengthMultiplierSlider->setVisible(false);
-//                beatsToSkipSlider->setVisible(true);
-//            }
-//        }
-//
-//        reverseADSRSlider->setAttackValue(prep->getReverseAttack(), dontSendNotification);
-//        reverseADSRSlider->setDecayValue(prep->getReverseDecay(), dontSendNotification);
-//        reverseADSRSlider->setSustainValue(prep->getReverseSustain(), dontSendNotification);
-//        reverseADSRSlider->setReleaseValue(prep->getReverseRelease(), dontSendNotification);
-//
-//        undertowADSRSlider->setAttackValue(prep->getUndertowAttack(), dontSendNotification);
-//        undertowADSRSlider->setDecayValue(prep->getUndertowDecay(), dontSendNotification);
-//        undertowADSRSlider->setSustainValue(prep->getUndertowSustain(), dontSendNotification);
-//        undertowADSRSlider->setReleaseValue(prep->getUndertowRelease(), dontSendNotification);
-        
+
+        selectCB.setSelectedId(processor.updateState->currentBlendronicId, dontSendNotification);
+        smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
+        syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
+
+        for(int i = 0; i < paramSliders.size(); i++)
+        {
+            if(!paramSliders[i]->getName().compare(cBlendronomerParameterTypes[BlendronomerBeats]))
+            {
+                paramSliders[i]->setTo(prep->getBeats(), dontSendNotification);
+            }
+
+            if(!paramSliders[i]->getName().compare(cBlendronomerParameterTypes[BlendronomerSmoothDurations]))
+            {
+                paramSliders[i]->setTo(prep->getSmoothDurations(), dontSendNotification);
+            }
+
+            if(!paramSliders[i]->getName().compare(cBlendronomerParameterTypes[BlendronomerFeedbackCoeffs]))
+            {
+                paramSliders[i]->setTo(prep->getFeedbackCoefficients(), dontSendNotification);
+            }
+        }
     }
     
 }
@@ -548,10 +518,10 @@ void BlendronicPreparationEditor::fillSmoothModeSelectCB()
     
     smoothModeSelectCB.clear(dontSendNotification);
     
-    smoothModeSelectCB.addItem("Constant Rate", 1);
-    smoothModeSelectCB.addItem("Constant Time", 2);
-    smoothModeSelectCB.addItem("Proportional Rate", 3);
-    smoothModeSelectCB.addItem("Proportional Time", 4);
+    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ConstantTimeSmooth], 1);
+    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ConstantRateSmooth], 2);
+    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ProportionalTimeSmooth], 3);
+    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ProportionalRateSmooth], 4);
     
     smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
 }
@@ -883,10 +853,10 @@ void BlendronicModificationEditor::fillSmoothModeSelectCB()
     
     smoothModeSelectCB.clear(dontSendNotification);
     
-    smoothModeSelectCB.addItem("Constant Rate", 1);
-    smoothModeSelectCB.addItem("Constant Time", 2);
-    smoothModeSelectCB.addItem("Proportional Rate", 3);
-    smoothModeSelectCB.addItem("Proportional Time", 4);
+    smoothModeSelectCB.addItem("Constant Time", 1);
+    smoothModeSelectCB.addItem("Constant Rate", 2);
+    smoothModeSelectCB.addItem("Proportional Time", 3);
+    smoothModeSelectCB.addItem("Proportional Rate", 4);
     
     smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
 }
