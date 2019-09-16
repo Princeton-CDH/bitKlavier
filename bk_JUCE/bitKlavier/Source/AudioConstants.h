@@ -745,7 +745,7 @@ static const std::vector<std::string> cBlendronomerParameterTypes = {
 static const std::vector<std::vector<float>> cBlendronomerDefaultRangeValuesAndInc = {
     { 0.0f, 0.0f, 0.0f, 0.0f }, //min, max, default, increment, skew
     { 0.0f, 8.0f, 4.0f, 0.1f },
-    { 0.0f, 1000.0f, 500.0f, 0.01f },
+    { 0.0f, 1000.0f, 100.0f, 0.01f },
     { 0.0f, 1.0f, 0.95f, 0.01f }
 };
 

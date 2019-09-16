@@ -56,7 +56,7 @@ BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> be
 BlendronomerPreparation::BlendronomerPreparation(void) :
 	name("blank blendronomer"),
 	bBeats(Array<float>({ 4. })),
-	bSmoothDurations(Array<float>({ 500. })),
+	bSmoothDurations(Array<float>({ 100. })),
 	bFeedbackCoefficients(Array<float>({ 0.95 })),
 	bDelayMax(44100. * 5.),
 	bDelayLength(44100. * 2.),
