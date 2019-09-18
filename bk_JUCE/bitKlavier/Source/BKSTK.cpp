@@ -188,8 +188,13 @@ void BKDelayL::scalePrevious(float coefficient, unsigned long offset, int channe
 	inputs.setSample(channel, (inPoint + offset) % inputs.getNumSamples(), inputs.getSample(channel, (inPoint + offset) % inputs.getNumSamples()) * coefficient);
 }
 
+void BKDelayL::clear()
+{
+    inputs.clear();
+}
 
-BKDelay::BKDelay(BKDelay::Ptr d):
+
+BlendronicDelay::BlendronicDelay(BlendronicDelay::Ptr d):
 	delayLinear(d->getDelay()),
 	dSmooth(d->getDSmooth()),
 	dDelayMax(d->getDelayMax()),
@@ -202,7 +207,7 @@ BKDelay::BKDelay(BKDelay::Ptr d):
 {
 }
 
-BKDelay::BKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, int Id, bool active) :
+BlendronicDelay::BlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, int Id, bool active) :
 	dDelayMax(delayMax),
 	dDelayGain(delayGain),
 	dDelayLength(delayLength),
@@ -215,17 +220,17 @@ BKDelay::BKDelay(float delayMax, float delayGain, float delayLength, float smoot
 	dSmooth = new BKEnvelope(dSmoothValue, dSmoothDuration);
 }
 
-BKDelay::~BKDelay()
+BlendronicDelay::BlendronicDelay()
 {
 }
 
 
-void BKDelay::addSample(float sampleToAdd, unsigned long offset, int channel)
+void BlendronicDelay::addSample(float sampleToAdd, unsigned long offset, int channel)
 {
 	delayLinear->addSample(sampleToAdd, offset, channel);
 }
 
-float* BKDelay::tick()
+float* BlendronicDelay::tick()
 {
     setDelayLength(dSmooth->tick());
     return delayLinear->tick(0, true);

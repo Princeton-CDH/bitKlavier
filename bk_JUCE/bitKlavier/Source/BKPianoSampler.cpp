@@ -133,7 +133,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      uint64 voiceRampOff,
                                      BKSynthesiserSound* s,
 									 float BlendronicLevel,
-									 BKDelay::Ptr bDelay)
+									 BlendronicDelay::Ptr bDelay)
 {
     
     
@@ -223,7 +223,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                                      uint64 adsrRelease,
                                      BKSynthesiserSound* s,
 									 float BlendronicLevel,
-									BKDelay::Ptr bDelay)
+									BlendronicDelay::Ptr bDelay)
 {
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {

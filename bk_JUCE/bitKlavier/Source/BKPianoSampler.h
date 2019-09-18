@@ -145,7 +145,7 @@ public:
                     uint64 voiceRampOff,
                     BKSynthesiserSound* sound,
 					float BlendronicLevel,
-					BKDelay::Ptr bDelay
+					BlendronicDelay::Ptr bDelay
                     ) override;
     
     void startNote (int midiNoteNumber,
@@ -163,7 +163,7 @@ public:
                     uint64 adsrRelease,
                     BKSynthesiserSound* sound,
 					float BlendronicLevel,
-					BKDelay::Ptr bDelay
+					BlendronicDelay::Ptr bDelay
                     ) override;
     
     void updatePitch(const BKPianoSamplerSound* const sound);
@@ -238,7 +238,7 @@ private:
     stk::ADSR lastIn, lastOut;
 
 	float blendronicLevel;
-	BKDelay::Ptr bDelay;
+	BlendronicDelay::Ptr bDelay;
 
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)

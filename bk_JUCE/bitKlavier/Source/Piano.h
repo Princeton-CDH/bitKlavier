@@ -344,7 +344,7 @@ private:
     TempoProcessor::Ptr defaultM;
     SynchronicProcessor::Ptr defaultS;
 	BlendronomerProcessor::Ptr defaultB;
-	BKDelay::Ptr defaultD;
+	BlendronicDelay::Ptr defaultD;
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
     {

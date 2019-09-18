@@ -694,14 +694,34 @@ typedef enum BlendronomerSmoothMode {
 } BlendronomerSmoothMode;
 
 typedef enum BlendronomerSyncMode {
-    BlendronomerSyncModeNil = 0
+    BlendronomerNoteOnSync = 0,
+    BlendronomerNoteOffSync,
+    BlendronomerSyncModeNil
 } BlendronomerSyncMode;
+
+typedef enum BlendronomerClearMode {
+    BlendronomerNoteOnClear = 0,
+    BlendronomerNoteOffClear,
+    BlendronomerClearModeNil
+} BlendronomerClearMode;
 
 static const std::vector<std::string> cBlendronomerSmoothModes = {
     "Constant Time",
     "Constant Rate",
     "Proportional Time",
     "Proportional Rate"
+};
+
+static const std::vector<std::string> cBlendronomerSyncModes = {
+    "Note On",
+    "Note Off",
+    "None"
+};
+
+static const std::vector<std::string> cBlendronomerClearModes = {
+    "Note On",
+    "Note Off",
+    "None"
 };
 
 typedef enum BlendronomerParameterType

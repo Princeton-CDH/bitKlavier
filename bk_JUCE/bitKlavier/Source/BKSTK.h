@@ -52,6 +52,7 @@ public:
 	void addSample(float input, unsigned long offset, int channel);
 	float* tick(float input, bool stereo = true);
 	void scalePrevious(float coefficient, unsigned long offset, int channel);
+    void clear();
     
     inline void setSampleRate(double sr) { sampleRate = sr; }
 
@@ -124,19 +125,19 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 */
 
-class BKDelay : public ReferenceCountedObject
+class BlendronicDelay : public ReferenceCountedObject
 {
 public:
-	typedef ReferenceCountedObjectPtr<BKDelay>   Ptr;
-	typedef Array<BKDelay::Ptr>                  PtrArr;
-	typedef Array<BKDelay::Ptr, CriticalSection> CSPtrArr;
-	typedef OwnedArray<BKDelay>                  Arr;
-	typedef OwnedArray<BKDelay, CriticalSection> CSArr;
+	typedef ReferenceCountedObjectPtr<BlendronicDelay>   Ptr;
+	typedef Array<BlendronicDelay::Ptr>                  PtrArr;
+	typedef Array<BlendronicDelay::Ptr, CriticalSection> CSPtrArr;
+	typedef OwnedArray<BlendronicDelay>                  Arr;
+	typedef OwnedArray<BlendronicDelay, CriticalSection> CSArr;
 
 	//constructors
-	BKDelay(BKDelay::Ptr d);
-	BKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, int Id, bool active = false);
-	~BKDelay();
+	BlendronicDelay(BlendronicDelay::Ptr d);
+	BlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, int Id, bool active = false);
+	BlendronicDelay();
 
 	//accessors
     inline const BKDelayL::Ptr getDelay() const noexcept { return delayLinear; }
@@ -180,6 +181,8 @@ public:
     float* tick();
     
     inline void setSampleRate(double sr) { delayLinear->setSampleRate(sr); dSmooth->setSampleRate(sr); }
+    
+    inline void clear() { delayLinear->clear(); }
     
     
 

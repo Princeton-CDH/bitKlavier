@@ -25,6 +25,7 @@ public:
     {
         setLookAndFeel(nullptr);
         smoothModeSelectCB.setLookAndFeel(nullptr);
+        clearModeSelectCB.setLookAndFeel(nullptr);
     };
     
     void paint (Graphics&) override;
@@ -67,13 +68,14 @@ protected:
     BKEditableComboBox selectCB;
     BKComboBox syncModeSelectCB;
     BKComboBox smoothModeSelectCB;
+    BKComboBox clearModeSelectCB;
     
     BKLabel syncModeLabel;
     BKLabel smoothModeLabel;
+    BKLabel clearModeLabel;
     
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
-    
-    std::unique_ptr<BKSingleSlider> numVoicesSlider;
+
     std::unique_ptr<BKSingleSlider> inputThreshSlider;
     std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
     std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
@@ -109,6 +111,8 @@ public:
     
     void fillSelectCB(int last, int current);
     void fillSmoothModeSelectCB(void);
+    void fillSyncModeSelectCB(void);
+    void fillClearModeSelectCB(void);
     
     void timerCallback() override;
     
@@ -171,6 +175,8 @@ public:
     
     void fillSelectCB(int last, int current);
     void fillSmoothModeSelectCB(void);
+    void fillSyncModeSelectCB(void);
+    void fillClearModeSelectCB(void);
     
     void greyOutAllComponents();
     void highlightModedComponents();

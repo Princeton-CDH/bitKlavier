@@ -12,12 +12,13 @@
 #define BLENDRONOMER_H_INCLUDED
 
 #include "BKUtilities.h"
-#include "BKSynthesiser.h"
 #include "Tuning.h"
 #include "Tempo.h"
 #include "General.h"
 #include "Keymap.h"
 #include "BKSTK.h"
+
+class BKSynthesiser;
 
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////BLENDRONOMER PREPARATION///////////////////////////////////
@@ -36,8 +37,9 @@ public:
 	//constructors
 	BlendronomerPreparation(BlendronomerPreparation::Ptr p);
 	BlendronomerPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
-		Array<float> feedbackCoefficients, float smoothValue, BlendronomerSmoothMode smoothMode,
-		float smoothDuration, float delayMax, float delayLength, float feedbackCoefficient);
+		Array<float> feedbackCoefficients, float smoothValue, float smoothDuration, BlendronomerSmoothMode smoothMode,
+        BlendronomerSyncMode syncMode, BlendronomerClearMode clearMode,
+        float delayMax, float delayLength, float feedbackCoefficient);
 	BlendronomerPreparation(void);
 
 	// copy, modify, compare, randomize
@@ -69,6 +71,7 @@ public:
 	inline const bool getActive() const noexcept { return isActive; }
 	inline const bool getInputGain() const noexcept { return inputGain; }
     inline const BlendronomerSyncMode getSyncMode() const noexcept { return bSyncMode; }
+    inline const BlendronomerClearMode getClearMode() const noexcept { return bClearMode; }
 
 	//mutators
 	inline void setName(String n) { name = n; }
@@ -97,6 +100,7 @@ public:
 	inline const void toggleActive() { isActive = !isActive; }
 	inline const void setInputGain(float gain) { inputGain = gain; }
     inline const void setSyncMode(BlendronomerSyncMode mode) { bSyncMode = mode; }
+    inline const void setClearMode(BlendronomerClearMode mode) { bClearMode = mode; }
 
 	void print(void);
 	ValueTree getState(void);
@@ -129,6 +133,7 @@ private:
 	int holdMin, holdMax, velocityMin, velocityMax;
     
     BlendronomerSyncMode bSyncMode;
+    BlendronomerClearMode bClearMode;
 
 	//needed for sampling
 	float inputGain;
@@ -267,7 +272,7 @@ public:
 
 	BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
 		TempoProcessor::Ptr bTempo,
-		BKDelay::Ptr delayL,
+		BlendronicDelay::Ptr delayL,
 		GeneralSettings::Ptr bGeneral,
 		BKSynthesiser* bMain
 		);
@@ -291,15 +296,10 @@ public:
 
 	void prepareToPlay(double sr);
 
-	inline void attachToSynthesiser(BKSynthesiser* main)
-	{
-		synth = main;
-	}
-
 	//accessors
 	inline Blendronomer::Ptr getBlendronomer(void) const noexcept { return blendronomer; }
 	inline TempoProcessor::Ptr getTempo(void) const noexcept { return tempo; }
-	inline BKDelay::Ptr getDelay(void) const noexcept { return delay; }
+	inline BlendronicDelay::Ptr getDelay(void) const noexcept { return delay; }
 	inline int getId(void) const noexcept { return blendronomer->getId(); }
     inline int getTempoId(void) const noexcept { return tempo->getId(); }
 	inline const float getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
@@ -318,7 +318,8 @@ public:
     inline void setFeedbackIndex(int index) { feedbackIndex = index; }
 	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
 	inline void reset(void) { blendronomer->aPrep->copy(blendronomer->sPrep); }
-
+    
+    float* tick();
 	void processBlock(int numSamples, int midiChannel);
 
 
@@ -329,7 +330,7 @@ private:
 	Blendronomer::Ptr blendronomer;
 	TempoProcessor::Ptr tempo;
 
-	BKDelay::Ptr delay;
+	BlendronicDelay::Ptr delay;
 
 	double sampleRate;
 
@@ -337,9 +338,6 @@ private:
 	Array<float> velocities;    //record of velocities
     Array<uint64> holdTimers;
 	Array<int> keysDepressed;   //current keys that are depressed
-
-	bool runChain;
-	bool inChain;
 
 	float numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
 	uint64 sampleTimer;

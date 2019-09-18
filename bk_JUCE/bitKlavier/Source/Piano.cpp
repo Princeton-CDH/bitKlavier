@@ -333,12 +333,8 @@ TempoProcessor::Ptr Piano::addTempoProcessor(int thisId)
 BlendronomerProcessor::Ptr Piano::addBlendronomerProcessor(int thisId)
 {
     Blendronomer::Ptr blendronomer = processor.gallery->getBlendronomer(thisId);
-    BKDelay::Ptr delay = processor.mainPianoSynth.addBKDelay(blendronomer->aPrep->getDelayMax(),
-                                  blendronomer->aPrep->getFeedbackCoefficients()[0],
-                                  blendronomer->aPrep->getDelayLength(),
-                                  blendronomer->aPrep->getSmoothValue(),
-                                  blendronomer->aPrep->getSmoothDuration(),
-                                  true);
+    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    BlendronicDelay::Ptr delay = processor.mainPianoSynth.createBlendronicDelay(prep->getDelayMax(), prep->getFeedbackCoefficients()[0], prep->getDelayLength(), prep->getSmoothValue(), prep->getSmoothDuration(), true);
 	BlendronomerProcessor::Ptr bproc = new BlendronomerProcessor(blendronomer,
                                                                  defaultM,
                                                                  delay,

@@ -10,6 +10,8 @@
 
 #include "BKSynthesiser.h"
 
+#include "Blendronomer.h"
+
 BKSynthesiserSound::BKSynthesiserSound(void) {}
 BKSynthesiserSound::~BKSynthesiserSound() {}
 
@@ -173,23 +175,19 @@ void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool sho
     subBlockSubdivisionIsStrict = shouldBeStrict;
 }
 
-BKDelay::Ptr BKSynthesiser::addBKDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active)
+BlendronicDelay::Ptr BKSynthesiser::createBlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active)
 {
-    BKDelay::Ptr delay = new BKDelay(delayMax, delayGain, delayLength, smoothValue, smoothDuration, delays.size(), active);
+    BlendronicDelay::Ptr delay = new BlendronicDelay(delayMax, delayGain, delayLength, smoothValue, smoothDuration, delays.size(), active);
 	delays.add(delay);
-    DBG("num BKDelays = " + String(delays.size()));
+    DBG("num BlendronicDelays = " + String(delays.size()));
     return delay;
 }
 
-void BKSynthesiser::removeBKDelay(BKDelay::Ptr delay)
+void BKSynthesiser::removeBlendronicDelay(BlendronicDelay::Ptr delay)
 {
     for (int i = 0; i < delays.size(); ++i)
     {
         if (delays[i]->getId() == delay->getId()) delays.remove(i);
-    }
-    for (int i = 0; i < delays.size(); ++i)
-    {
-        delays[i]->setId(i);
     }
 }
 
@@ -253,8 +251,6 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
     
     float totalOutputL = 0.0f;
 	float totalOutputR = 0.0f;
-    
-    float tempEnv;
     
     while (--numSamples >= 0)
     {
@@ -442,7 +438,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
 	const float rampOffMS, //included in lengthMS
 	TuningProcessor::Ptr tuner,
 	const float BlendronicLevel,
-	BKDelay::Ptr bDelay)
+	BlendronicDelay::Ptr bDelay)
 {
                 return keyOn   ( midiChannel,
                                  keyNoteNumber,
@@ -483,7 +479,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                            float adsrReleaseMS,
                            TuningProcessor::Ptr tuner,
 							float BlendronicLevel,
-							BKDelay::Ptr bDelay)
+							BlendronicDelay::Ptr bDelay)
 {
 	//DBG("BKSynthesiser::keyOn " + String(keyNoteNumber) + " " + String(midiNoteNumber));
 
@@ -559,7 +555,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 	uint64 voiceRampOff,
 	TuningProcessor::Ptr tuner,
 	float BlendronicLevel,
-	BKDelay::Ptr bDelay
+	BlendronicDelay::Ptr bDelay
 )
 {
 	startVoice(voice,
@@ -604,7 +600,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 	uint64 adsrRelease,
 	TuningProcessor::Ptr tuner,
 	float BlendronicLevel,
-	BKDelay::Ptr bDelay
+	BlendronicDelay::Ptr bDelay
 )
 {
 	//DBG("BKSynthesiser::startVoice " + String(keyNoteNumber) + " " + String(midiNoteNumber));
