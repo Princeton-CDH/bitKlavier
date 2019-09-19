@@ -18,6 +18,7 @@
 #include "Keymap.h"
 #include "BKSTK.h"
 
+// Forward declaration to allow include of Blendronomer in BKSynthesiser
 class BKSynthesiser;
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -307,6 +308,7 @@ public:
     inline int getBeatIndex(void) { return beatIndex; }
     inline int getSmoothIndex(void) { return smoothIndex; }
     inline int getFeedbackIndex(void) { return feedbackIndex; }
+    inline BKSynthesiser* getSynth(void) { return synth; }
 
 
 	//mutators

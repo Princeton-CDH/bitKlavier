@@ -69,7 +69,11 @@ void Piano::deconfigure(void)
     sprocessor.clear();
     nprocessor.clear();
     tprocessor.clear();
-	bprocessor.clear();
+    for (auto b : bprocessor)
+    {
+        b->getSynth()->removeBlendronicProcessor(b->getId());
+    }
+    bprocessor.clear();
     
     for (int key = 0; key < 128; key++)
     {
@@ -342,6 +346,7 @@ BlendronomerProcessor::Ptr Piano::addBlendronomerProcessor(int thisId)
                                                                  &processor.mainPianoSynth);
 	bproc->prepareToPlay(sampleRate);
 	bprocessor.add(bproc);
+    processor.mainPianoSynth.addBlendronicProcessor(bproc);
 
 	return bproc;
 }

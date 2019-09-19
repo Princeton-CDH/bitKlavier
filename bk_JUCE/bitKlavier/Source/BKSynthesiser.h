@@ -19,10 +19,9 @@
 
 #include "Tuning.h"
 
-#include "BKSTK.h"
+#include "Blendronomer.h"
 
-// Forward declaration
-class BlendronomerProcessor;
+#include "BKSTK.h"
 
 #if 0
 class SFRegion : public ReferenceCountedObject
@@ -651,6 +650,8 @@ public:
 
 	BlendronicDelay::Ptr createBlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active = false);
     void removeBlendronicDelay(BlendronicDelay::Ptr delay);
+    void addBlendronicProcessor(BlendronomerProcessor::Ptr bproc);
+    void removeBlendronicProcessor(int Id);
     
 	void renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples);
 	void renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples);
@@ -776,7 +777,7 @@ private:
     BigInteger sustainPedalsDown;
 
 	Array<BlendronicDelay::Ptr> delays;
-    //Array<BlendronomerProcessor::Ptr> blenders;
+    Array<BlendronomerProcessor::Ptr> bprocessors;
 
     
 #if JUCE_CATCH_DEPRECATED_CODE_MISUSE

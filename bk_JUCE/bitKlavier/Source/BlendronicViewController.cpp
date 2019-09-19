@@ -84,7 +84,7 @@ BKViewController(p, theGraph, 2)
     syncModeSelectCB.setSelectedItemIndex(0);
     addAndMakeVisible(syncModeSelectCB);
     
-    syncModeLabel.setText("pulse triggered by", dontSendNotification);
+    syncModeLabel.setText("pulse reset by", dontSendNotification);
     syncModeLabel.setJustificationType(juce::Justification::centredRight);
     syncModeLabel.setTooltip("Determines which aspect of MIDI signal triggers the Blendronic sequence");
     addAndMakeVisible(&syncModeLabel, ALL);

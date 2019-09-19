@@ -10,8 +10,6 @@
 
 #include "BKSynthesiser.h"
 
-#include "Blendronomer.h"
-
 BKSynthesiserSound::BKSynthesiserSound(void) {}
 BKSynthesiserSound::~BKSynthesiserSound() {}
 
@@ -189,6 +187,23 @@ void BKSynthesiser::removeBlendronicDelay(BlendronicDelay::Ptr delay)
     {
         if (delays[i]->getId() == delay->getId()) delays.remove(i);
     }
+    for (int i = 0; i < delays.size(); ++i)
+    {
+        delays[i]->setId(i);
+    }
+}
+
+void BKSynthesiser::addBlendronicProcessor(BlendronomerProcessor::Ptr bproc)
+{
+    bprocessors.add(bproc);
+}
+
+void BKSynthesiser::removeBlendronicProcessor(int Id)
+{
+    for (int i = 0; i < bprocessors.size(); ++i)
+    {
+        if (bprocessors[i]->getId() == Id) bprocessors.remove(i);
+    }
 }
 
 void BKSynthesiser::clearNextDelayBlock(int numSamples)
@@ -220,11 +235,11 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 		totalOutputL = 0.0f;
 		totalOutputR = 0.0f;
 
-		for (auto d : delays)
+		for (auto b : bprocessors)
 		{
-			if (d != nullptr)
+			if (b != nullptr)
 			{
-                float* outputs = d->tick();
+                float* outputs = b->tick();
                 totalOutputL += outputs[0];
                 totalOutputR += outputs[1];
 			}
@@ -257,11 +272,11 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
         totalOutputL = 0.0f;
 		totalOutputR = 0.0f;
         
-        for (auto d : delays)
+        for (auto b : bprocessors)
         {
-			if (d != nullptr)
+			if (b != nullptr)
 			{
-                float* outputs = d->tick();
+                float* outputs = b->tick();
                 totalOutputL += outputs[0];
                 totalOutputR += outputs[1];
 			}

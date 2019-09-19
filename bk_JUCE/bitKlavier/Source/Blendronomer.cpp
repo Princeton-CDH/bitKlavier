@@ -193,15 +193,12 @@ float* BlendronomerProcessor::tick()
         delay->setSmoothDuration(smoothDuration);
         delay->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
     }
-    return 0;
+    return delay->tick();
 }
 
 void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 {
-    for (int i = 0; i < numSamples; ++i)
-    {
-        tick();
-    }
+
 }
 
 float BlendronomerProcessor::getTimeToBeatMS(float beatsToSkip)
