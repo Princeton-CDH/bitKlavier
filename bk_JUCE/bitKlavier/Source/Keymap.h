@@ -82,30 +82,11 @@ public:
     
     Array<int> allpc = {0};
     
-    Keymap(int Id):
-    Id(Id),
-    keymap(Array<bool>())
-    {
-        keymap.ensureStorageAllocated(128);
-        
-        for (int i = 0; i < 128; i++)
-        {
-            keymap.add(false);
-        }
-    }
-    
-    Keymap(Keymap::Ptr k):
-    Id(k->getId())
-    {
-        keymap.ensureStorageAllocated(128);
-        
-        for (int i = 0; i < 128; i++)
-        {
-            keymap.add(false);
-        }
-        
-        setKeymap(k->keys());
-    }
+    Keymap(void);
+    Keymap(int Id);
+    Keymap(Keymap::Ptr k);
+    Keymap(int Id, Keymap::Ptr k);
+    ~Keymap();
     
     inline Keymap::Ptr duplicate(void)
     {
@@ -117,37 +98,7 @@ public:
         
         return copyPrep;
     }
-    
-    Keymap(int Id, Keymap::Ptr k):
-    Id(Id)
-    {
-        keymap.ensureStorageAllocated(128);
-        
-        for (int i = 0; i < 128; i++)
-        {
-            keymap.add(false);
-        }
-        
-        setKeymap(k->keys());
-    }
-    
-    Keymap(void):
-    Id(-1)
-    {
-        keymap.ensureStorageAllocated(128);
-        
-        for (int i = 0; i < 128; i++)
-        {
-            keymap.add(false);
-        }
-    }
-    
-    
-    ~Keymap()
-    {
-        
-    }
-    
+
 
     inline bool compare(Keymap::Ptr k)
     {
@@ -194,217 +145,25 @@ public:
 
     inline int getId(void) {   return Id; }
     
-    // Returns true if added, false if removed.
-    bool toggleNote(int noteNumber)
-    {
-        bool ret = !keymap[noteNumber];
-        
-        keymap.set(noteNumber, ret);
-        
-        return ret;
-    }
+    bool toggleNote(int noteNumber);
+    bool addNote(int noteNumber);
+    bool removeNote(int noteNumber);
+    void addKeymap(Keymap::Ptr otherKeymap);
+    void removeKeymap(Keymap::Ptr otherKeymap);
+    bool containsNote(int noteNumber);
+    void clear(void);
+    Array<int> keys(void);
     
-    void setKeymap(Array<int> km)
-    {
-        clear();
-        
-        for (auto note : km)
-        {
-            keymap.set(note, true);
-        }
-    }
+    void setKeymap(Array<int> km);
+    void setAll(bool action);
+    void setWhite(bool action);
+    void setBlack(bool action);
+    void setOctatonic(OctType type, bool action);
+    void setChord(KeySet set, PitchClass root, bool action);
+    void setKeys(KeySet set, bool action, PitchClass pc = PitchClassNil);
+    void setTarget(KeymapTargetType target, KeymapTargetState state);
     
-    // Returns true if added. Returns false if not added (because it's already there).
-    bool addNote(int noteNumber)
-    {
-        bool ret = !keymap[noteNumber];
-        
-        keymap.set(noteNumber, true);
-        
-        return ret;
-    }
-    
-    // Returns true if removed. Returns false if not removed (because it's not there to begin with).
-    bool removeNote(int noteNumber)
-    {
-        bool ret = keymap[noteNumber];
-        
-        keymap.set(noteNumber, false);
-        
-        return ret;
-    }
-    
-    void addKeymap(Keymap::Ptr otherKeymap)
-    {
-        for (auto key : otherKeymap->keys())
-        {
-            keymap.set(key, true);
-        }
-    }
-    
-    void removeKeymap(Keymap::Ptr otherKeymap)
-    {
-        for (auto key : otherKeymap->keys())
-        {
-            keymap.set(key, false);
-        }
-    }
-    
-    
-    
-    bool containsNote(int noteNumber)
-    {
-        return keymap[noteNumber];
-    }
-    
-    // Clears keymap.
-    void clear(void)
-    {
-        for (int note = 0; note < 128; note++)
-        {
-            keymap.set(note, false);
-        }
-    }
-    
-    Array<int> keys(void)
-    {
-        Array<int> k = Array<int>();
-        k.ensureStorageAllocated(128);
-        
-        for (int note = 0; note < 128; note++)
-        {
-            if (keymap[note])
-            {
-                k.add(note);
-            }
-        }
-        
-        return k;
-    }
-    
-    void setAll(bool action)
-    {
-        for (int note = 0; note < 128; note++)
-        {
-            keymap.set(note, action);
-        }
-    }
-    
-    void setWhite(bool action)
-    {
-        int pc;
-        for (int note = 0; note < 128; note++)
-        {
-            pc = note % 12;
-            
-            if (white.contains(pc))
-            {
-                keymap.set(note, action);
-            }
-        }
-    }
-    
-    void setBlack(bool action)
-    {
-        int pc;
-        for (int note = 0; note < 128; note++)
-        {
-            pc = note % 12;
-            
-            if (black.contains(pc))
-            {
-                keymap.set(note, action);
-            }
-        }
-    }
-    
-    void setOctatonic(OctType type, bool action)
-    {
-        int pc;
-        Array<int> octatonic;
-        if (type == Oct1)       octatonic = octatonic1;
-        else if (type == Oct2)  octatonic = octatonic2;
-        else if (type == Oct3)  octatonic = octatonic3;
-        else                            return;
-        
-        for (int note = 0; note < 128; note++)
-        {
-            pc = note % 12;
-            
-            if (octatonic.contains(pc))
-            {
-                keymap.set(note, action);
-            }
-        }
-    }
-    
-    void setChord(KeySet set, PitchClass root, bool action)
-    {
-        int pc;
-        Array<int> chord;
-        if      (set == KeySetMajorTriad)          chord = majortriad;
-        else if (set == KeySetMinorTriad)          chord = minortriad;
-        else if (set == KeySetMajorSeven)          chord = majorseven;
-        else if (set == KeySetDomSeven)            chord = domseven;
-        else if (set == KeySetMinorSeven)          chord = minorseven;
-        else if (set == KeySetAllPC)               chord = allpc;
-        else if (set == KeySetMajor)               chord = major;
-        else if (set == KeySetNaturalMinor)        chord = naturalminor;
-        else if (set == KeySetHarmonicMinor)       chord = harmonicminor;
-        else                                       return;
-        
-        for (int note = 0; note < 128; note++)
-        {
-            pc = ((note - root) % 12);
-            
-            if (chord.contains(pc))
-            {
-                keymap.set(note, action);
-            }
-        }
-    }
-    
-    void setKeys(KeySet set, bool action, PitchClass pc = PitchClassNil)
-    {
-        if (set == KeySetAll)
-        {
-            setAll(action);
-        }
-        else if (set == KeySetAllPC)
-        {
-            setChord(set, pc, action);
-        }
-        else if (set == KeySetBlack)
-        {
-            setBlack(action);
-        }
-        else if (set == KeySetWhite)
-        {
-            setWhite(action);
-        }
-        else if (set == KeySetOctatonicOne)
-        {
-            setOctatonic(Oct1,action);
-        }
-        else if (set == KeySetOctatonicTwo)
-        {
-            setOctatonic(Oct2,action);
-        }
-        else if (set == KeySetOctatonicThree)
-        {
-            setOctatonic(Oct3,action);
-        }
-        else
-        {
-            setChord(set, pc, action);
-        }
-    }
-    
-    void print(void)
-    {
-        DBG("Id: " + String(Id));
-        DBG("Keymap: "+ intArrayToString(keys()));
-    }
+    void print(void);
     
     inline ValueTree getState(void)
     {
@@ -446,6 +205,14 @@ public:
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }
     
+    inline Array<KeymapTargetState> getTargetStates(void) const noexcept { return targetStates; }
+    
+    void enableTarget(KeymapTargetType target);
+    void disableTarget(KeymapTargetType target);
+    void removeTarget(KeymapTargetType target);
+    void removeTargetsOfType(BKPreparationType type);
+    void clearTargets(void);
+    
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
     
@@ -453,6 +220,8 @@ private:
     int Id;
     String name;
     Array<bool> keymap;
+    
+    Array<KeymapTargetState> targetStates;
     
     JUCE_LEAK_DETECTOR (Keymap)
 };

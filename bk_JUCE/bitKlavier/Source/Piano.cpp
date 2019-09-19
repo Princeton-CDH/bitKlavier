@@ -517,10 +517,11 @@ void Piano::linkPreparationWithBlendronomer(BKPreparationType thisType, int this
 void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, int keymapId)
 {
     PreparationMap::Ptr thisPreparationMap = getPreparationMapWithKeymap(keymapId);
+    Keymap::Ptr keymap = processor.gallery->getKeymap(keymapId);
     
     if (thisPreparationMap == nullptr)
     {
-        addPreparationMap(processor.gallery->getKeymap(keymapId));
+        addPreparationMap(keymap);
         
         thisPreparationMap = getPreparationMaps().getLast();
     }
@@ -528,14 +529,15 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     if (thisType == PreparationTypeDirect)
     {
         DirectProcessor::Ptr dproc = getDirectProcessor(thisId);
-        
         thisPreparationMap->addDirectProcessor(dproc);
     }
     else if (thisType == PreparationTypeSynchronic)
     {
         SynchronicProcessor::Ptr sproc = getSynchronicProcessor(thisId);
-        
         thisPreparationMap->addSynchronicProcessor(sproc);
+        
+        keymap->enableTarget(TargetTypeSynchronicSync);
+        keymap->enableTarget(TargetTypeSynchronicCluster);
     }
     else if (thisType == PreparationTypeNostalgic)
     {
@@ -558,8 +560,10 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
 	else if (thisType == PreparationTypeBlendronomer)
 	{
 		BlendronomerProcessor::Ptr bproc = getBlendronomerProcessor(thisId);
-
 		thisPreparationMap->addBlendronomerProcessor(bproc);
+        
+        keymap->enableTarget(TargetTypeBlendronicSync);
+        keymap->enableTarget(TargetTypeBlendronicClear);
 	}
     
 }

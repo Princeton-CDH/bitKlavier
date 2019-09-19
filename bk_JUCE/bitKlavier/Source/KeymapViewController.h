@@ -41,8 +41,10 @@ public:
     void update(void);
     
     void fillSelectCB(int last, int current);
+    void fillTargetSelectCB();
     
     static void actionButtonCallback(int action, KeymapViewController*);
+    static void targetsMenuCallback(int result, KeymapViewController* vc);
     static void keysMenuCallback(int result, KeymapViewController* vc);
     
     int addKeymap(void);
@@ -73,6 +75,7 @@ private:
     BKKeymapKeyboardComponent* keyboard;
     BKTextButton keyboardValsTextFieldOpen;
     
+    TextButton      targetsButton;
     TextButton      keysButton;
     TextButton      clearButton;
     BKComboBox      keysCB;
@@ -81,6 +84,7 @@ private:
     
     PopupMenu getKeysMenu(void);
     PopupMenu getPitchClassMenu(int offset);
+    PopupMenu getTargetsMenu(void);
     
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;
@@ -96,6 +100,7 @@ private:
     void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override;
     
+    void updateKeymapTargets(void);
     
     bool focusLostByEscapeKey;
     

@@ -974,6 +974,22 @@ typedef enum KeymapParameterType
     
 } KeymapParameterType;
 
+typedef enum KeymapTargetType
+{
+    TargetTypeSynchronicSync = 0,
+    TargetTypeSynchronicCluster,
+    TargetTypeBlendronicSync,
+    TargetTypeBlendronicClear,
+    TargetTypeNil
+} KeymapTargetType;
+
+typedef enum KeymapTargetState
+{
+    TargetStateEnabled = 0,
+    TargetStateDisabled,
+    TargetStateNil
+} KeymapTargetState;
+
 static const std::vector<std::string> cKeymapParameterTypes = {
     "Keymap Id",
     "Keymap"

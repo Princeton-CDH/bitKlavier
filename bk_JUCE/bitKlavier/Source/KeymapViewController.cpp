@@ -37,6 +37,12 @@ BKViewController(p, theGraph, 1)
     selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
+    targetsButton.setName("TargetsButton");
+    targetsButton.setButtonText("Targets");
+    targetsButton.setTooltip("Select which parts of connected preparations to send key information");
+    targetsButton.addListener(this);
+    addAndMakeVisible(targetsButton);
+    
     clearButton.setName("ClearButton");
     clearButton.setButtonText("Clear");
     clearButton.setTooltip("Deselect all keys");
@@ -190,6 +196,9 @@ void KeymapViewController::resized()
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
     
+    Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
+    targetsSlice.removeFromRight(gXSpacing);
+    targetsButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
 }
 
 int KeymapViewController::addKeymap(void)
@@ -392,6 +401,14 @@ PopupMenu KeymapViewController::getKeysMenu(void)
     return menu;
 }
 
+void KeymapViewController::targetsMenuCallback(int result, KeymapViewController* vc)
+{
+    if (result == 0) return;
+    
+    vc->getTargetsMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->targetsButton), ModalCallbackFunction::forComponent(targetsMenuCallback, vc));
+    DBG(String(result));
+}
+
 void KeymapViewController::keysMenuCallback(int result, KeymapViewController* vc)
 {
     BKAudioProcessor& processor = vc->processor;
@@ -411,6 +428,30 @@ void KeymapViewController::keysMenuCallback(int result, KeymapViewController* vc
     BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(vc->keyboardComponent.get());
     
     keyboard->setKeysInKeymap(keymap->keys());
+}
+
+PopupMenu KeymapViewController::getTargetsMenu()
+{
+    updateKeymapTargets();
+    
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    Array<KeymapTargetState> targetStates = keymap->getTargetStates();
+    for (int type = 0; type < TargetTypeNil; ++type)
+    {
+        if (targetStates[type] == TargetStateEnabled)
+        {
+            menu.addItem(PopupMenu::Item(String(type)).setID(type+1).setTicked(true));
+        }
+        else if (targetStates[type] == TargetStateDisabled)
+        {
+            menu.addItem(PopupMenu::Item(String(type)).setID(type+1));
+        }
+    }
+    if (menu.getNumItems() == 0) menu.addItem(-1, "No connections", false);
+    return menu;
 }
 
 void KeymapViewController::fillSelectCB(int last, int current)
@@ -466,6 +507,10 @@ void KeymapViewController::bkButtonClicked (Button* b)
     else if (b == &actionButton)
     {
         getModOptionMenu(PreparationTypeKeymap).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
+    else if (b == &targetsButton)
+    {
+        getTargetsMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&targetsButton), ModalCallbackFunction::forComponent(targetsMenuCallback, this));
     }
     else if (b == &keysButton)
     {
@@ -639,5 +684,18 @@ void KeymapViewController::sliderValueChanged     (Slider* slider)
 }
 #endif
 
+void KeymapViewController::updateKeymapTargets()
+{
+    Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    BKItem::Ptr kmItem = theGraph->get(PreparationTypeKeymap, km->getId());
+    
+    for (int type = 0; type < BKPreparationTypeNil; ++type)
+    {
+        if (kmItem->getConnectionsOfType((BKPreparationType) type).size() == 0)
+        {
+            km->removeTargetsOfType((BKPreparationType) type);
+        }
+    }
+}
 
 

@@ -233,19 +233,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
     galleryMenu.addSeparator();
     galleryMenu.addItem(SETTINGS_ID, "Settings");
-//#if JUCE_MAC
-//    PopupMenu midiOutputMenu;
-//
-//    Array<MidiDeviceInfo> availableOutputs = MidiOutput::getAvailableDevices();
-//
-//    int i = 0;
-//    for (MidiDeviceInfo output : availableOutputs) {
-//        bool isTicked = false;
-//        if (processor.midiOutput != nullptr) isTicked = output.name == (*processor.midiOutput).getName();
-//        midiOutputMenu.addItem(MIDIOUT_ID + (i++), output.name, true, isTicked);
-//    }
-//    galleryMenu.addSubMenu("MIDI Output", midiOutputMenu);
-//#endif
+
     galleryMenu.addSeparator();
     galleryMenu.addItem(ABOUT_ID, "About bitKlavier...");
     
