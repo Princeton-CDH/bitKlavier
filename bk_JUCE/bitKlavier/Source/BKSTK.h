@@ -145,7 +145,7 @@ public:
 	inline const float getDelayMax() const noexcept { return dDelayMax; }
 	inline const float getDelayGain() const noexcept { return dDelayGain; }
 	inline const float getDelayLength() const noexcept { return dDelayLength; }
-	inline const float getSmoothValue() const noexcept { return dSmoothValue; }
+	inline const float getSmoothValue() const noexcept { return dSmooth->getValue(); }
 	inline const float getSmoothDuration() const noexcept { return dSmoothDuration; }
 	inline const bool getActive() const noexcept { return dBlendronicActive; }
     inline const int getId() const noexcept { return dId; }

@@ -42,9 +42,10 @@ BKViewController(p, theGraph, 2)
             {
                 paramSliders[idx]->setToolTipString("Determines delay times in terms of beats; double-click to edit all or add additional sequence steps");
             }
-            else if(paramSliders[idx]->getName() == "smooth durations")
+            else if(paramSliders[idx]->getName() == "smooth timings")
             {
-                paramSliders[idx]->setToolTipString("Determines duration of smoothing between delay times; double-click to edit all or add additional sequence steps");
+                paramSliders[idx]->setToolTipString("Determines duration of smoothing between delay times; double-click to edit all or add additional sequence steps\nUnits: Constant Time uses pulses; Constant Rate uses beat length change per pulse; Proportional Time uses a proportion of the current beat length; Proportional Rate uses beat length change per current beat length");
+                
             }
             else if(paramSliders[idx]->getName() == "feedback coefficients")
             {
@@ -86,7 +87,7 @@ BKViewController(p, theGraph, 2)
     
     syncModeLabel.setText("pulse reset by", dontSendNotification);
     syncModeLabel.setJustificationType(juce::Justification::centredRight);
-    syncModeLabel.setTooltip("Determines which aspect of MIDI signal triggers the Blendronic sequence");
+    syncModeLabel.setTooltip("Determines which aspect of MIDI signal resets the Blendronic sequence");
     addAndMakeVisible(&syncModeLabel, ALL);
     
     clearModeSelectCB.setName("Clear Mode");
@@ -688,7 +689,7 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
         prep    ->setBeat(whichSlider, values[0]);
         active  ->setBeat(whichSlider, values[0]);
     }
-    else if (name == "smooth durations")
+    else if (name == "smooth timings")
     {
         prep    ->setSmoothDuration(whichSlider, values[0]);
         active  ->setSmoothDuration(whichSlider, values[0]);
@@ -713,7 +714,7 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
         prep    ->setBeats(newvals);
         active  ->setBeats(newvals);
     }
-    else if (name == "smooth durations")
+    else if (name == "smooth timings")
     {
         prep    ->setSmoothDurations(newvals);
         active  ->setSmoothDurations(newvals);

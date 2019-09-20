@@ -63,7 +63,7 @@ BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> be
 BlendronomerPreparation::BlendronomerPreparation(void) :
 	name("blank blendronomer"),
 	bBeats(Array<float>({ 4. })),
-	bSmoothDurations(Array<float>({ 100. })),
+	bSmoothDurations(Array<float>({ 0.1 })),
 	bFeedbackCoefficients(Array<float>({ 0.95 })),
 	bDelayMax(44100. * 5.),
 	bDelayLength(44100. * 2.),
@@ -162,35 +162,39 @@ float* BlendronomerProcessor::tick()
         feedbackIndex++;
         if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
 
-        float pulseLength = sampleRate * ((60.0 / tempoPrep->getSubdivisions()) / tempoPrep->getTempo());
-        numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength;
+        float pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+        numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
 
-        float smoothDuration = 0.0f;
+        float smoothRate = 0.0f; // samplesOfDelayLength per tick
         float currBeat = prep->getBeats()[beatIndex];
         float prevBeat = beatIndex > 0 ? prep->getBeats()[beatIndex - 1] : prep->getBeats()[prep->getBeats().size() - 1];
         float beatDelta = fabsf(prevBeat - currBeat);
         if (prep->getSmoothMode()       == ConstantRateSmooth)
         {
-            smoothDuration = pulseLength / (prep->getSmoothDurations()[smoothIndex] * 0.001 * sampleRate);
+            //smoothDuration = pulseLength / (prep->getSmoothDurations()[smoothIndex]);
+            smoothRate = prep->getSmoothDurations()[smoothIndex] / pulseLength;
         }
         else if (prep->getSmoothMode()  == ConstantTimeSmooth)
         {
-            smoothDuration = (pulseLength / (prep->getSmoothDurations()[smoothIndex] * 0.001 * sampleRate)) * beatDelta;
+            //smoothDuration = (pulseLength / (prep->getSmoothDurations()[smoothIndex])) * beatDelta;
+            smoothRate = beatDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength);
         }
         else if (prep->getSmoothMode()  == ProportionalRateSmooth)
         {
-            smoothDuration = (pulseLength / (prep->getSmoothDurations()[smoothIndex] * 0.001 * sampleRate)) / prep->getBeats()[beatIndex];
+            //smoothDuration = (pulseLength / (prep->getSmoothDurations()[smoothIndex])) / prep->getBeats()[beatIndex];
+            smoothRate = prep->getSmoothDurations()[smoothIndex] / (pulseLength * prep->getBeats()[beatIndex]);
         }
         else if (prep->getSmoothMode()  == ProportionalTimeSmooth)
         {
-            smoothDuration = ((pulseLength / (prep->getSmoothDurations()[smoothIndex] * 0.001 * sampleRate)) * beatDelta) / prep->getBeats()[beatIndex];
+            //smoothDuration = ((pulseLength / (prep->getSmoothDurations()[smoothIndex])) * beatDelta) / prep->getBeats()[beatIndex];
+            smoothRate = beatDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength * prep->getBeats()[beatIndex]);
         }
-
+        
         sampleTimer = 0;
-
-        DBG(String(smoothDuration));
+        
+        DBG(String(smoothRate));
         delay->setDelayTargetLength(numSamplesBeat);
-        delay->setSmoothDuration(smoothDuration);
+        delay->setSmoothDuration(smoothRate);
         delay->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
     }
     return delay->tick();
@@ -198,7 +202,7 @@ float* BlendronomerProcessor::tick()
 
 void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
 {
-
+    //DBG(String(delay->getSmoothValue()));
 }
 
 float BlendronomerProcessor::getTimeToBeatMS(float beatsToSkip)
