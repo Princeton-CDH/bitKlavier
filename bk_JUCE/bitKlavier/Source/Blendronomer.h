@@ -288,10 +288,10 @@ public:
     bool holdCheck(int noteNumber);
 
 	//begin timing played note length, called with noteOn
-	void keyPressed(int noteNumber, float velocity, int midiChannel);
+	void keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates);
 
 	//begin playing reverse note, called with noteOff
-	void keyReleased(int noteNumber, float velocity, int midiChannel, bool post = false);
+	void keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post = false);
 
 	void postRelease(int noteNumber, int midiChannel);
 

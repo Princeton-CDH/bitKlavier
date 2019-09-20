@@ -360,6 +360,8 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
                     sustainedNotes.remove(i);
             }
         }
+        
+        Array<KeymapTargetState> targetStates = pKeymap->getTargetStates();
 
         for (auto proc : tprocessor)
             proc->keyPressed(noteNumber);
@@ -368,13 +370,13 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
             proc->keyPressed(noteNumber, velocity, channel);
         
         for (auto proc : sprocessor)
-            proc->keyPressed(noteNumber, velocity);
+            proc->keyPressed(noteNumber, velocity, targetStates);
         
         for (auto proc : nprocessor)
             proc->keyPressed(noteNumber, velocity, channel);
         
         for (auto proc : bprocessor)
-            proc->keyPressed(noteNumber, velocity, channel);
+            proc->keyPressed(noteNumber, velocity, channel, targetStates);
         
         for (auto proc : mprocessor)
             proc->keyPressed(noteNumber, velocity);
@@ -412,6 +414,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     {
         if (pKeymap->containsNote(noteNumber))
         {
+            Array<KeymapTargetState> targetStates = pKeymap->getTargetStates();
             for (auto proc : dprocessor)
             {
                 proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
@@ -431,7 +434,12 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
             
             for (auto proc : sprocessor)
             {
-                proc->keyReleased(noteNumber, velocity, channel);
+                proc->keyReleased(noteNumber, velocity, channel, targetStates);
+            }
+            
+            for (auto proc : bprocessor)
+            {
+                proc->keyReleased(noteNumber, velocity, channel, targetStates);
             }
             
             for (auto proc : mprocessor)
@@ -446,6 +454,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
 void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool post)
 {
     sustainPedalIsDepressed = false;
+    Array<KeymapTargetState> targetStates = pKeymap->getTargetStates();
     
     //do all keyReleased calls now
     for(int n=0; n<sustainedNotes.size(); n++)
@@ -467,13 +476,18 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
         
         for (auto proc : sprocessor)
         {
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel, targetStates);
         }
         
         for (auto proc : nprocessor)
         {
             //DBG("nostalgic sustainPedalReleased " + String((int)post));
             proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
+        }
+        
+        for (auto proc : bprocessor)
+        {
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel, targetStates);
         }
     }
     
@@ -483,6 +497,7 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
 void PreparationMap::sustainPedalReleased(bool post)
 {
     sustainPedalIsDepressed = false;
+    Array<KeymapTargetState> targetStates = pKeymap->getTargetStates();
     
     //do all keyReleased calls now
     for(int n=0; n<sustainedNotes.size(); n++)
@@ -501,13 +516,18 @@ void PreparationMap::sustainPedalReleased(bool post)
         
         for (auto proc : sprocessor)
         {
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel, targetStates);
         }
         
         for (auto proc : nprocessor)
         {
             //DBG("nostalgic sustainPedalReleased " + String((int)post));
             proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
+        }
+        
+        for (auto proc : bprocessor)
+        {
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel, targetStates);
         }
     }
     

@@ -203,7 +203,7 @@ bool SynchronicProcessor::holdCheck(int noteNumber)
     return false;
 }
 
-void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
+void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<KeymapTargetState> targetStates)
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
@@ -215,22 +215,25 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
     velocities.set(noteNumber, velocity);
     holdTimers.set(noteNumber, 0);
     
+    bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled;
+    bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled;
+    
     if (!velocityCheck(noteNumber)) return;
     
     // Remove old clusters, deal with layers and NoteOffSync modes
     for (int i = clusters.size(); --i >= 0; )
     {
-        if (!clusters[i]->getShouldPlay() && !inCluster)
+        if (!clusters[i]->getShouldPlay() && !inCluster && doCluster)
         {
             clusters.remove(i);
             continue;
         }
         
-        if(   (synchronic->aPrep->getMode() == LastNoteOffSync)
-           || (synchronic->aPrep->getMode() == AnyNoteOffSync))
+        if((synchronic->aPrep->getMode() == LastNoteOffSync) ||
+           (synchronic->aPrep->getMode() == AnyNoteOffSync))
         {
-            if(clusters.size() == 1) clusters[0]->setShouldPlay(false);
-            else
+            if((clusters.size() == 1) && doSync) clusters[0]->setShouldPlay(false);
+            else if (doCluster)
             {
                 if(clusters[i]->containsNote(noteNumber))
                 {
@@ -289,11 +292,15 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         
         if (cluster == nullptr)
         {
-            cluster = new SynchronicCluster(prep);
-            clusters.add(cluster);
+            if (doCluster)
+            {
+                cluster = new SynchronicCluster(prep);
+                clusters.add(cluster);
+            }
+            else return;
         }
         
-        if(!inCluster) //we have a new cluster
+        if(!inCluster && doCluster) //we have a new cluster
         {
             // [OLD]
             //reset phasor
@@ -317,22 +324,25 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
             //now we are in a cluster!
             inCluster = true;
         }
-        else if (prep->getMode() == AnyNoteOnSync)
+        else if (doSync)
         {
-            // might be able to move this whole else block ^ out of if else, since we are in cluster
-            //reset phasor if in AnyNoteOnSync
-            //if (cluster != nullptr)
+            if (prep->getMode() == AnyNoteOnSync)
             {
-                cluster->setPhasor(0);
-                cluster->resetPhase();
-                cluster->setShouldPlay(true);
+                // might be able to move this whole else block ^ out of if else, since we are in cluster
+                //reset phasor if in AnyNoteOnSync
+                //if (cluster != nullptr)
+                {
+                    cluster->setPhasor(0);
+                    cluster->resetPhase();
+                    cluster->setShouldPlay(true);
+                }
             }
-        }
-        else if (prep->getMode() == FirstNoteOnSync)
-        {
-            //if (cluster != nullptr)
+            else if (prep->getMode() == FirstNoteOnSync)
             {
-                cluster->setShouldPlay(true);
+                //if (cluster != nullptr)
+                {
+                    cluster->setShouldPlay(true);
+                }
             }
         }
         
@@ -342,15 +352,18 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity)
         //this is different than avoiding dupes at this stage (with "addIfNotAlreadyThere") because it allows
         //repeated notes to push older notes out the back.
         //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
-        cluster->addNote(noteNumber);
+        if (doCluster)
+        {
+            cluster->addNote(noteNumber);
         
-        //reset the timer for time between notes
-        clusterThresholdTimer = 0;
+            //reset the timer for time between notes
+            clusterThresholdTimer = 0;
+        }
     }
 }
 
 
-void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel)
+void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel, Array<KeymapTargetState> targetStates)
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
@@ -359,19 +372,26 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     SynchronicCluster::Ptr cluster = clusters.getLast();
     
+    bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled;
+    bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled;
+    
     if (!velocityCheck(noteNumber)) return;
     if (!holdCheck(noteNumber)) return;
     
     if (cluster == nullptr)
     {
-        cluster = new SynchronicCluster(prep);
-        clusters.add(cluster);
+        if (doCluster)
+        {
+            cluster = new SynchronicCluster(prep);
+            clusters.add(cluster);
+        }
+        else return;
     }
     
     //cluster management
     if (synchronic->aPrep->getOnOffMode() == KeyOff)
     {
-        if(!inCluster) //we have a new cluster
+        if(!inCluster && doCluster) //we have a new cluster
         {
             if (clusters.size() >= synchronic->aPrep->getNumClusters())
             {
@@ -389,7 +409,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             //now we are in a cluster!
             inCluster = true;
         }
-        else if (synchronic->aPrep->getMode() == AnyNoteOffSync)
+        else if ((synchronic->aPrep->getMode() == AnyNoteOffSync) && doSync)
         {
             // might be able to move this whole else block ^ out of if else, since we are in cluster
             //reset phasor if in AnyNoteOnSync
@@ -408,56 +428,62 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
         //this is different than avoiding dupes at this stage (with "addIfNotAlreadyThere") because it allows
         //repeated notes to push older notes out the back.
         //later, we remove dupes so we don't inadvertently play the same note twice in a pulse
-        cluster->addNote(noteNumber);
-        DBG("cluster: " + intArrayToString(cluster->getCluster()));
+        if (doCluster)
+        {
+            cluster->addNote(noteNumber);
+            DBG("cluster: " + intArrayToString(cluster->getCluster()));
         
-        //reset the timer for time between notes
-        clusterThresholdTimer = 0;
+            //reset the timer for time between notes
+            clusterThresholdTimer = 0;
+        }
     }
     
     // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
-    if ((synchronic->aPrep->getMode() == LastNoteOffSync && keysDepressed.size() == 0) ||
-		(synchronic->aPrep->getMode() == AnyNoteOffSync))
+    if (doSync)
     {
-        
-        for (int i = clusters.size(); --i >= 0; )
+        if ((synchronic->aPrep->getMode() == LastNoteOffSync && keysDepressed.size() == 0) ||
+		(synchronic->aPrep->getMode() == AnyNoteOffSync))
         {
-            if(clusters[i]->containsNote(noteNumber))
+            
+            for (int i = clusters.size(); --i >= 0; )
             {
-                clusters[i]->resetPhase();
-                clusters[i]->setShouldPlay(true);
-                
+                if(clusters[i]->containsNote(noteNumber))
+                {
+                    clusters[i]->resetPhase();
+                    clusters[i]->setShouldPlay(true);
+                    
+                    //start right away
+                    uint64 phasor = beatThresholdSamples *
+                                    synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                                    general->getPeriodMultiplier() *
+                                    tempo->getPeriodMultiplier();
+                    
+                    clusters[i]->setPhasor(phasor);
+                    
+                    inCluster = true;
+                    
+                }
+            }
+            
+            /*
+            if (cluster != nullptr)
+            {
+                cluster->resetPhase();
+             
                 //start right away
                 uint64 phasor = beatThresholdSamples *
                                 synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
-                                general->getPeriodMultiplier() *
-                                tempo->getPeriodMultiplier();
-                
-                clusters[i]->setPhasor(phasor);
-                
+                                general->getPeriodMultiplier() * tempo->getPeriodMultiplier();
+             
+                cluster->setPhasor(phasor);
+             
+                cluster->setShouldPlay(true);
+             
                 inCluster = true;
-                
             }
+             */
         }
-        
-        /*
-        if (cluster != nullptr)
-        {
-            cluster->resetPhase();
-            
-            //start right away
-            uint64 phasor = beatThresholdSamples *
-                            synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
-                            general->getPeriodMultiplier() * tempo->getPeriodMultiplier();
-            
-            cluster->setPhasor(phasor);
-            
-            cluster->setShouldPlay(true);
-            
-            inCluster = true;
-        }
-         */
     }
 }
 

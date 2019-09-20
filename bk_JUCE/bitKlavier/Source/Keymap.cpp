@@ -295,6 +295,13 @@ void Keymap::setTarget(KeymapTargetType target, KeymapTargetState state)
     targetStates.set(target, state);
 }
 
+void Keymap::toggleTarget(KeymapTargetType target)
+{
+    if (targetStates[target] == TargetStateNil) return;
+    
+    targetStates.set(target, (targetStates[target] == TargetStateDisabled) ? TargetStateEnabled : TargetStateDisabled);
+}
+
 void Keymap::enableTarget(KeymapTargetType target)
 {
     targetStates.set(target, TargetStateEnabled);
@@ -305,10 +312,19 @@ void Keymap::disableTarget(KeymapTargetType target)
     targetStates.set(target, TargetStateDisabled);
 }
 
+void Keymap::addTarget(KeymapTargetType target)
+{
+    if (targetStates[target] == TargetStateNil)
+    {
+        targetStates.set(target, TargetStateEnabled);
+    }
+}
+
 void Keymap::removeTarget(KeymapTargetType target)
 {
     targetStates.set(target, TargetStateNil);
 }
+
 
 void Keymap::removeTargetsOfType(BKPreparationType type)
 {

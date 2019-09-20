@@ -536,8 +536,8 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         SynchronicProcessor::Ptr sproc = getSynchronicProcessor(thisId);
         thisPreparationMap->addSynchronicProcessor(sproc);
         
-        keymap->enableTarget(TargetTypeSynchronicSync);
-        keymap->enableTarget(TargetTypeSynchronicCluster);
+        keymap->addTarget(TargetTypeSynchronicSync);
+        keymap->addTarget(TargetTypeSynchronicCluster);
     }
     else if (thisType == PreparationTypeNostalgic)
     {
@@ -562,8 +562,8 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
 		BlendronomerProcessor::Ptr bproc = getBlendronomerProcessor(thisId);
 		thisPreparationMap->addBlendronomerProcessor(bproc);
         
-        keymap->enableTarget(TargetTypeBlendronicSync);
-        keymap->enableTarget(TargetTypeBlendronicClear);
+        keymap->addTarget(TargetTypeBlendronicSync);
+        keymap->addTarget(TargetTypeBlendronicClear);
 	}
     
 }

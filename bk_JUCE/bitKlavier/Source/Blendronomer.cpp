@@ -264,7 +264,7 @@ bool BlendronomerProcessor::holdCheck(int noteNumber)
     return false;
 }
 
-void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiChannel)
+void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
 {
     BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
     
@@ -286,7 +286,7 @@ void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiC
     if (prep->getClearMode() == BlendronomerNoteOnClear) delay->clear();
 }
 
-void BlendronomerProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, bool post)
+void BlendronomerProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
 {
     BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
     

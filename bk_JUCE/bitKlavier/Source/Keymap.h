@@ -161,7 +161,6 @@ public:
     void setOctatonic(OctType type, bool action);
     void setChord(KeySet set, PitchClass root, bool action);
     void setKeys(KeySet set, bool action, PitchClass pc = PitchClassNil);
-    void setTarget(KeymapTargetType target, KeymapTargetState state);
     
     void print(void);
     
@@ -205,10 +204,14 @@ public:
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }
     
+    inline KeymapTargetState getTargetState(KeymapTargetType type) const noexcept { return targetStates[type]; }
     inline Array<KeymapTargetState> getTargetStates(void) const noexcept { return targetStates; }
     
+    void setTarget(KeymapTargetType target, KeymapTargetState state);
+    void toggleTarget(KeymapTargetType target);
     void enableTarget(KeymapTargetType target);
     void disableTarget(KeymapTargetType target);
+    void addTarget(KeymapTargetType target);
     void removeTarget(KeymapTargetType target);
     void removeTargetsOfType(BKPreparationType type);
     void clearTargets(void);

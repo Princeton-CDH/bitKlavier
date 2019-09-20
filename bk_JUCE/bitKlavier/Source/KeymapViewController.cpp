@@ -403,7 +403,12 @@ PopupMenu KeymapViewController::getKeysMenu(void)
 
 void KeymapViewController::targetsMenuCallback(int result, KeymapViewController* vc)
 {
-    if (result == 0) return;
+    if (result <= 0) return;
+    
+    BKAudioProcessor& processor = vc->processor;
+    
+    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    keymap->toggleTarget((KeymapTargetType) (result - 1));
     
     vc->getTargetsMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->targetsButton), ModalCallbackFunction::forComponent(targetsMenuCallback, vc));
     DBG(String(result));
@@ -443,14 +448,14 @@ PopupMenu KeymapViewController::getTargetsMenu()
     {
         if (targetStates[type] == TargetStateEnabled)
         {
-            menu.addItem(PopupMenu::Item(String(type)).setID(type+1).setTicked(true));
+            menu.addItem(PopupMenu::Item(cKeymapTargetTypes[type]).setID(type+1).setTicked(true));
         }
         else if (targetStates[type] == TargetStateDisabled)
         {
-            menu.addItem(PopupMenu::Item(String(type)).setID(type+1));
+            menu.addItem(PopupMenu::Item(cKeymapTargetTypes[type]).setID(type+1));
         }
     }
-    if (menu.getNumItems() == 0) menu.addItem(-1, "No connections", false);
+    if (menu.getNumItems() == 0) menu.addItem(-1, "No targets available", false);
     return menu;
 }
 

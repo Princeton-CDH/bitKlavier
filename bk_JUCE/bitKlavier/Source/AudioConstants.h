@@ -990,9 +990,17 @@ typedef enum KeymapTargetState
     TargetStateNil
 } KeymapTargetState;
 
+
 static const std::vector<std::string> cKeymapParameterTypes = {
     "Keymap Id",
     "Keymap"
+};
+
+static const std::vector<std::string> cKeymapTargetTypes = {
+    "Synchronic Sync",
+    "Synchronic Cluster",
+    "Blendronic Sync",
+    "Blendronic Clear"
 };
 
 typedef enum BKSampleLoadType

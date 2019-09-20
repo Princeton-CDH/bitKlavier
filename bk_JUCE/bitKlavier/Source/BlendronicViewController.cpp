@@ -45,7 +45,6 @@ BKViewController(p, theGraph, 2)
             else if(paramSliders[idx]->getName() == "smooth timings")
             {
                 paramSliders[idx]->setToolTipString("Determines duration of smoothing between delay times; double-click to edit all or add additional sequence steps\nUnits: Constant Time uses pulses; Constant Rate uses beat length change per pulse; Proportional Time uses a proportion of the current beat length; Proportional Rate uses beat length change per current beat length");
-                
             }
             else if(paramSliders[idx]->getName() == "feedback coefficients")
             {

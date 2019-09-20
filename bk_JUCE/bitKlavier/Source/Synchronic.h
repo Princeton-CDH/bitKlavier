@@ -1298,8 +1298,8 @@ public:
     
     BKSampleLoadType sampleType;
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
-    void keyPressed(int noteNumber, float velocity);
-    void keyReleased(int noteNumber, float velocity, int channel);
+    void keyPressed(int noteNumber, float velocity, Array<KeymapTargetState> targetStates);
+    void keyReleased(int noteNumber, float velocity, int channel, Array<KeymapTargetState> targetStates);
     float getTimeToBeatMS(float beatsToSkip);
     
     
