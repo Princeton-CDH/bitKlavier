@@ -21,7 +21,8 @@ resonanceSynth(res),
 hammerSynth(ham),
 direct(direct),
 tuner(tuning),
-blendronomer(blender)
+blendronomer(blender),
+keymaps(Keymap::PtrArr())
 {
     
 }

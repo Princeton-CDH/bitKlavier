@@ -20,7 +20,8 @@ synth(main),
 general(general),
 synchronic(synchronic),
 tuner(tuning),
-tempo(tempo)
+tempo(tempo),
+keymaps(Keymap::PtrArr())
 {
     velocities.ensureStorageAllocated(128);
     holdTimers.ensureStorageAllocated(128);

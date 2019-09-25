@@ -938,8 +938,20 @@ public:
         tuning->aPrep->copy(tuning->sPrep);
     }
     
+    inline void addKeymap(Keymap::Ptr keymap)
+    {
+        keymaps.add(keymap);
+    }
+    
+    inline Keymap::PtrArr getKeymaps(void)
+    {
+        return keymaps;
+    }
+    
 private:
     Tuning::Ptr tuning;
+    
+    Keymap::PtrArr keymaps;
 
     float   globalTuningReference = 440.; //A440
     float   intervalToRatio(float interval) const noexcept {

@@ -323,7 +323,16 @@ public:
     
     float* tick();
 	void processBlock(int numSamples, int midiChannel);
-
+    
+    inline void addKeymap(Keymap::Ptr keymap)
+    {
+        keymaps.add(keymap);
+    }
+    
+    inline Keymap::PtrArr getKeymaps(void)
+    {
+        return keymaps;
+    }
 
 private:
 	BKSynthesiser* synth;
@@ -333,6 +342,8 @@ private:
 	TempoProcessor::Ptr tempo;
 
 	BlendronicDelay::Ptr delay;
+    
+    Keymap::PtrArr      keymaps;
 
 	double sampleRate;
 

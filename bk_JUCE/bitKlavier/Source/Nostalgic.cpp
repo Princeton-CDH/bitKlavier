@@ -19,7 +19,8 @@ synth(s),
 nostalgic(nostalgic),
 tuner(tuning),
 blendronomer(blender),
-synchronic(synchronic)
+synchronic(synchronic),
+keymaps(Keymap::PtrArr())
 {
     noteLengthTimers.ensureStorageAllocated(128);
     velocities.ensureStorageAllocated(128);

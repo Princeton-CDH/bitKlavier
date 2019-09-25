@@ -14,7 +14,7 @@ PreparationMap::PreparationMap(Keymap::Ptr km,
                                int Id):
 isActive(false),
 Id(Id),
-pKeymap(km),
+keymaps(Keymap::PtrArr(km)),
 sustainPedalIsDepressed(false)
 {
 
@@ -30,9 +30,108 @@ void PreparationMap::prepareToPlay (double sr)
     sampleRate = sr;
 }
 
-void PreparationMap::setKeymap(Keymap::Ptr km)
+Keymap::PtrArr     PreparationMap::getKeymaps(void)
 {
-    pKeymap = km;
+    return keymaps;
+}
+
+Keymap::Ptr        PreparationMap::getKeymap(int Id)
+{
+    for (auto p : keymaps)
+    {
+        if (p->getId() == Id) return p;
+    }
+    
+    return nullptr;
+}
+
+void PreparationMap::setKeymaps(Keymap::PtrArr p)
+{
+    keymaps = p;
+    deactivateIfNecessary();
+}
+
+void PreparationMap::addKeymap(Keymap::Ptr p)
+{
+    keymaps.addIfNotAlreadyThere(p);
+    deactivateIfNecessary();
+}
+
+void PreparationMap::linkKeymapToPreparation(int keymapId, BKPreparationType thisType, int thisId)
+{
+    if (thisType == PreparationTypeDirect)
+    {
+        for (int i = 0; i < dprocessor.size(); ++i)
+        {
+            if (dprocessor[i]->getId() == thisId)
+            {
+                dprocessor[i]->addKeymap(getKeymap(keymapId));
+            }
+        }
+    }
+    else if (thisType == PreparationTypeSynchronic)
+    {
+        for (int i = 0; i < sprocessor.size(); ++i)
+        {
+            if (sprocessor[i]->getId() == thisId)
+            {
+                sprocessor[i]->addKeymap(getKeymap(keymapId));
+            }
+        }
+    }
+    else if (thisType == PreparationTypeNostalgic)
+    {
+        for (int i = 0; i < nprocessor.size(); ++i)
+        {
+            if (nprocessor[i]->getId() == thisId)
+            {
+                nprocessor[i]->addKeymap(getKeymap(keymapId));
+            }
+        }
+    }
+    else if (thisType == PreparationTypeBlendronomer)
+    {
+        for (int i = 0; i < bprocessor.size(); ++i)
+        {
+            if (bprocessor[i]->getId() == thisId)
+            {
+                bprocessor[i]->addKeymap(getKeymap(keymapId));
+            }
+        }
+    }
+    else if (thisType == PreparationTypeTempo)
+    {
+        for (int i = 0; i < mprocessor.size(); ++i)
+        {
+            if (mprocessor[i]->getId() == thisId)
+            {
+                mprocessor[i]->addKeymap(getKeymap(keymapId));
+            }
+        }
+    }
+    else if (thisType == PreparationTypeTuning)
+    {
+        for (int i = 0; i < tprocessor.size(); ++i)
+        {
+            if (tprocessor[i]->getId() == thisId)
+            {
+                tprocessor[i]->addKeymap(getKeymap(keymapId));
+            }
+        }
+    }
+}
+
+
+bool PreparationMap::contains(Keymap::Ptr thisOne)
+{
+    for (auto p : keymaps)
+    {
+        if (p->getId() == thisOne->getId())
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 DirectProcessor::PtrArr     PreparationMap::getDirectProcessors(void)
@@ -259,7 +358,7 @@ void PreparationMap::setBlendronomerProcessors(BlendronomerProcessor::PtrArr p)
 
 void PreparationMap::addBlendronomerProcessor(BlendronomerProcessor::Ptr p)
 {
-	bprocessor.addIfNotAlreadyThere(p);
+    bprocessor.addIfNotAlreadyThere(p);
 	deactivateIfNecessary();
 }
 
@@ -278,15 +377,13 @@ bool PreparationMap::contains(BlendronomerProcessor::Ptr thisOne)
 
 void PreparationMap::deactivateIfNecessary()
 {
-    if (pKeymap == nullptr)
-    {
-        isActive = false;
-    }
-    else if(sprocessor.size() == 0 &&
-       nprocessor.size() == 0 &&
-       dprocessor.size() == 0 &&
-       tprocessor.size() == 0 &&
-       mprocessor.size() == 0)
+    if(keymaps.size() == 0 &&
+    sprocessor.size() == 0 &&
+    nprocessor.size() == 0 &&
+    dprocessor.size() == 0 &&
+    tprocessor.size() == 0 &&
+    mprocessor.size() == 0 &&
+    bprocessor.size() == 0)
     {
         isActive = false;
     }
@@ -348,41 +445,100 @@ void PreparationMap::clearKey(int noteNumber)
 //not sure why some of these have Channel and some don't; should rectify?
 void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, bool soundfont)
 {
-    if (pKeymap->containsNote(noteNumber))
+    Array<KeymapTargetState> targetStates;
+    targetStates.ensureStorageAllocated(TargetStateNil);
+    for (int i = 0; i < TargetTypeNil; i++)
     {
-        if(sustainPedalIsDepressed)
+        targetStates.add(TargetStateNil);
+    }
+    
+    for (auto km : keymaps)
+    {
+        if (km->containsNote(noteNumber))
         {
-            //DBG("removing sustained note " + String(noteNumber));
-            
-            for(int i=0; i<sustainedNotes.size(); i++)
+            reattack(noteNumber);
+            break;
+        }
+    }
+    
+    for (auto proc : tprocessor)
+    {
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNote(noteNumber))
             {
-                if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber)
-                    sustainedNotes.remove(i);
+                for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
             }
         }
-        
-        Array<KeymapTargetState> targetStates = pKeymap->getTargetStates();
-
-        for (auto proc : tprocessor)
-            proc->keyPressed(noteNumber);
-        
-        for (auto proc : dprocessor)
-            proc->keyPressed(noteNumber, velocity, channel);
-        
-        for (auto proc : sprocessor)
-            proc->keyPressed(noteNumber, velocity, targetStates);
-        
-        for (auto proc : nprocessor)
-            proc->keyPressed(noteNumber, velocity, channel);
-        
-        for (auto proc : bprocessor)
-            proc->keyPressed(noteNumber, velocity, channel, targetStates);
-        
-        for (auto proc : mprocessor)
-            proc->keyPressed(noteNumber, velocity);
-        
-        // PERFORM MODIFICATION STUFF
+        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber);
+        targetStates.fill(TargetStateNil);
     }
+    
+    for (auto proc : dprocessor)
+    {
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNote(noteNumber))
+            {
+                for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
+            }
+        }
+        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity, channel);
+        targetStates.fill(TargetStateNil);
+    }
+    
+    for (auto proc : sprocessor)
+    {
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNote(noteNumber))
+            {
+                for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
+            }
+        }
+        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity, targetStates);
+        targetStates.fill(TargetStateNil);
+    }
+    
+    for (auto proc : nprocessor)
+    {
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNote(noteNumber))
+            {
+                for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
+            }
+        }
+        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity, channel);
+        targetStates.fill(TargetStateNil);
+    }
+    
+    for (auto proc : bprocessor)
+    {
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNote(noteNumber))
+            {
+                for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
+            }
+        }
+        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity, channel, targetStates);
+        targetStates.fill(TargetStateNil);
+    }
+    
+    for (auto proc : mprocessor)
+    {
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNote(noteNumber))
+            {
+                for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
+            }
+        }
+        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity);
+        targetStates.fill(TargetStateNil);
+    }
+        // PERFORM MODIFICATION STUFF
 }
 
 
@@ -390,8 +546,22 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
 {
     
     //DBG("PreparationMap::keyReleased : " + String(noteNumber));
+    Array<KeymapTargetState> targetStates;
+    targetStates.ensureStorageAllocated(TargetStateNil);
+    for (int i = 0; i < TargetTypeNil; i++)
+    {
+        targetStates.add(TargetStateNil);
+    }
     
-    if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
+    for (auto km : keymaps)
+    {
+        if (km->containsNote(noteNumber))
+        {
+            for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
+        }
+    }
+    
+    if(sustainPedalIsDepressed && targetStates.contains(TargetStateEnabled))
     {
         SustainedNote newNote;
         newNote.noteNumber = noteNumber;
@@ -412,9 +582,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     }
     else
     {
-        if (pKeymap->containsNote(noteNumber))
+        if (targetStates.contains(TargetStateEnabled))
         {
-            Array<KeymapTargetState> targetStates = pKeymap->getTargetStates();
             for (auto proc : dprocessor)
             {
                 proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
@@ -454,7 +623,13 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
 void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool post)
 {
     sustainPedalIsDepressed = false;
-    Array<KeymapTargetState> targetStates = pKeymap->getTargetStates();
+    
+    Array<KeymapTargetState> targetStates;
+    targetStates.ensureStorageAllocated(TargetStateNil);
+    for (int i = 0; i < TargetTypeNil; i++)
+    {
+        targetStates.add(TargetStateNil);
+    }
     
     //do all keyReleased calls now
     for(int n=0; n<sustainedNotes.size(); n++)
@@ -462,6 +637,16 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
         SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
         
         DBG(releaseNote.noteNumber);
+        
+        targetStates.fill(TargetStateNil);
+        
+        for (auto km : keymaps)
+        {
+            if (km->containsNote(releaseNote.noteNumber))
+            {
+                for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
+            }
+        }
         
         for (auto proc : dprocessor)
         {
@@ -497,12 +682,28 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
 void PreparationMap::sustainPedalReleased(bool post)
 {
     sustainPedalIsDepressed = false;
-    Array<KeymapTargetState> targetStates = pKeymap->getTargetStates();
+   
+    Array<KeymapTargetState> targetStates;
+    targetStates.ensureStorageAllocated(TargetStateNil);
+    for (int i = 0; i < TargetTypeNil; i++)
+    {
+        targetStates.add(TargetStateNil);
+    }
     
     //do all keyReleased calls now
     for(int n=0; n<sustainedNotes.size(); n++)
     {
         SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
+        
+        targetStates.fill(TargetStateNil);
+        
+        for (auto km : keymaps)
+        {
+            if (km->containsNote(releaseNote.noteNumber))
+            {
+                for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
+            }
+        }
 
         for (auto proc : dprocessor)
         {
@@ -538,7 +739,22 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
 {
     DBG("PreparationMap::postRelease " + String(noteNumber));
     
-    if(sustainPedalIsDepressed && pKeymap->containsNote(noteNumber))
+    Array<KeymapTargetState> targetStates;
+    targetStates.ensureStorageAllocated(TargetStateNil);
+    for (int i = 0; i < TargetTypeNil; i++)
+    {
+        targetStates.add(TargetStateNil);
+    }
+    
+    for (auto km : keymaps)
+    {
+        if (km->containsNote(noteNumber))
+        {
+            for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
+        }
+    }
+    
+    if(sustainPedalIsDepressed && targetStates.contains(TargetStateEnabled))
     {
         SustainedNote newNote;
         newNote.noteNumber = noteNumber;
@@ -549,7 +765,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
         sustainedNotes.add(newNote);
     }
     
-    if (pKeymap->containsNote(noteNumber))
+    if (targetStates.contains(TargetStateEnabled))
     {
         for (auto proc : dprocessor)
         {
@@ -572,4 +788,29 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
             proc->keyReleased(noteNumber, velocity);
         }
     }
+}
+
+void PreparationMap::reattack(int noteNumber)
+{
+    if(sustainPedalIsDepressed)
+    {
+        //DBG("removing sustained note " + String(noteNumber));
+        
+        for(int i=0; i<sustainedNotes.size(); i++)
+        {
+            if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber)
+                sustainedNotes.remove(i);
+        }
+    }
+}
+
+void PreparationMap::merge(PreparationMap::Ptr thatMap)
+{
+    keymaps.addArray(thatMap->getKeymaps());
+    dprocessor.addArray(thatMap->getDirectProcessors());
+    sprocessor.addArray(thatMap->getSynchronicProcessors());
+    nprocessor.addArray(thatMap->getNostalgicProcessors());
+    bprocessor.addArray(thatMap->getBlendronomerProcessors());
+    mprocessor.addArray(thatMap->getTempoProcessors());
+    tprocessor.addArray(thatMap->getTuningProcessors());
 }

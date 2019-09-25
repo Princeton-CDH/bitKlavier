@@ -125,6 +125,7 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
 	delay(delayL),
 	synth(bMain),
 	general(bGeneral),
+    keymaps(Keymap::PtrArr()),
 	sampleTimer(0),
 	beatIndex(0),
 	smoothIndex(0),
@@ -273,9 +274,12 @@ void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiC
     velocities.set(noteNumber, velocity);
     holdTimers.set(noteNumber, 0);
     
+    bool doSync = targetStates[TargetTypeBlendronicSync] == TargetStateEnabled;
+    bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
+    
     if (!velocityCheck(noteNumber)) return;
     
-    if (prep->getSyncMode() == BlendronomerNoteOnSync)
+    if (prep->getSyncMode() == BlendronomerNoteOnSync && doSync)
     {
         setSampleTimer(0);
         setBeatIndex(0);
@@ -283,7 +287,10 @@ void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiC
         setFeedbackIndex(0);
     }
     
-    if (prep->getClearMode() == BlendronomerNoteOnClear) delay->clear();
+    if (prep->getClearMode() == BlendronomerNoteOnClear && doClear)
+    {
+        delay->clear();
+    }
 }
 
 void BlendronomerProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)

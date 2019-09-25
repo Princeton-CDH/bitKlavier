@@ -52,10 +52,13 @@ public:
     void sustainPedalReleased(bool post);
     void sustainPedalReleased(Array<bool> keysThatArePressed, bool post);
     void sustainPedalReleased() {sustainPedalReleased(false);};
+    void reattack(int noteNumber);
     
-    void setKeymap(Keymap::Ptr km);
-    inline Keymap::Ptr getKeymap()              { return pKeymap; }
-    inline int getKeymapId()                    { if (pKeymap) return pKeymap->getId(); else return 0; }
+    inline bool keymapsContainNote(int noteNumber) {
+        bool contains = false;
+        for (auto km : keymaps) if (km->containsNote(noteNumber)) contains = true;
+        return contains;
+    }
     
     inline String getPreparationIds()
     {
@@ -109,6 +112,14 @@ public:
         
     }
     
+    void linkKeymapToPreparation(int keymapId, BKPreparationType thisType, int thisId);
+    
+    void                        addKeymap               (Keymap::Ptr );
+    void                        setKeymaps              (Keymap::PtrArr);
+    Keymap::PtrArr              getKeymaps              (void);
+    Keymap::Ptr                 getKeymap               (int Id);
+    bool                        contains                (Keymap::Ptr);
+    
     void                        addDirectProcessor      (DirectProcessor::Ptr );
     void                        setDirectProcessors     (DirectProcessor::PtrArr);
     DirectProcessor::PtrArr     getDirectProcessors     (void);
@@ -152,10 +163,12 @@ public:
     
     void print(void)
     {
-        DBG("PrepMapId: " + String(Id));
-        DBG("Keymap: " + String(pKeymap->getId()));
-        
         Array<int> ps;
+        DBG("PrepMapId: " + String(Id));
+        for (auto p : keymaps) ps.add(p->getId());
+        DBG("Keymap: " + intArrayToString(ps));
+        
+        ps.clear();
         for (auto p : sprocessor) ps.add(p->getId());
         DBG("Synchronic: " + intArrayToString(ps));
         
@@ -180,18 +193,21 @@ public:
 		DBG("Blendronomer: " + intArrayToString(ps));
     }
     
+    void merge(PreparationMap::Ptr thatMap);
+    
 private:
     int Id;
     
-    // Keymap for this PreparationMap (one per PreparationMap)
-    Keymap::Ptr                 pKeymap;
+    // Keymaps for this PreparationMap
+    Keymap::PtrArr                       keymaps;
     
+    // Processors
     DirectProcessor::PtrArr              dprocessor;
     SynchronicProcessor::PtrArr          sprocessor;
     NostalgicProcessor::PtrArr           nprocessor;
+    BlendronomerProcessor::PtrArr        bprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
-	BlendronomerProcessor::PtrArr		 bprocessor;
     
     // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*              synth;

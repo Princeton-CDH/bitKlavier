@@ -429,10 +429,22 @@ public:
     }
     void setAdaptiveTempoPeriodMultiplier(float val) { adaptiveTempoPeriodMultiplier = val; }
     
+    inline void addKeymap(Keymap::Ptr keymap)
+    {
+        keymaps.add(keymap);
+    }
+    
+    inline Keymap::PtrArr getKeymaps(void)
+    {
+        return keymaps;
+    }
+    
 private:
     GeneralSettings::Ptr general;
     
     Tempo::Ptr tempo;
+    
+    Keymap::PtrArr keymaps;
     
     double sampleRate;
     

@@ -1405,6 +1405,16 @@ public:
     bool velocityCheck(int noteNumber);
     bool holdCheck(int noteNumber);
     
+    inline void addKeymap(Keymap::Ptr keymap)
+    {
+        keymaps.add(keymap);
+    }
+    
+    inline Keymap::PtrArr getKeymaps(void)
+    {
+        return keymaps;
+    }
+    
 private:
     BKSynthesiser* synth;
     GeneralSettings::Ptr general;
@@ -1413,6 +1423,8 @@ private:
     TuningProcessor::Ptr tuner;
     TempoProcessor::Ptr tempo;
 	BlendronomerProcessor::Ptr blendronomer;
+    
+    Keymap::PtrArr      keymaps;
     
     double sampleRate;
 

@@ -15,6 +15,7 @@
 
 TuningProcessor::TuningProcessor(Tuning::Ptr tuning):
 tuning(tuning),
+keymaps(Keymap::PtrArr()),
 lastNoteTuning(0),
 lastIntervalTuning(0)
 {

@@ -516,14 +516,39 @@ void Piano::linkPreparationWithBlendronomer(BKPreparationType thisType, int this
 
 void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, int keymapId)
 {
+    // Get the preparation map for this keymap
     PreparationMap::Ptr thisPreparationMap = getPreparationMapWithKeymap(keymapId);
+    PreparationMap::Ptr thatPreparationMap = getPreparationMapWithPreparation(thisType, thisId);
+    
     Keymap::Ptr keymap = processor.gallery->getKeymap(keymapId);
     
+    // If this keymap doesn't have a prep map
     if (thisPreparationMap == nullptr)
     {
-        addPreparationMap(keymap);
-        
-        thisPreparationMap = getPreparationMaps().getLast();
+        // If what it's connecting to doesn't have a prep map
+        if (thatPreparationMap == nullptr)
+        {
+            // Make a new preparation map
+            addPreparationMap(keymap);
+            thisPreparationMap = getPreparationMaps().getLast();
+        }
+        else
+        {   // Add this keymap to the prep map
+            thatPreparationMap->addKeymap(keymap);
+            thisPreparationMap = thatPreparationMap;
+        }
+    }
+    // else if the preparation also has a prep map
+    else if (thatPreparationMap != nullptr)
+    {
+        // and it's a different prep map
+        if (thisPreparationMap != thatPreparationMap)
+        {
+            // merge the prep maps
+            thisPreparationMap->merge(thatPreparationMap);
+            // remove one
+            removePreparationMap(thatPreparationMap->getId());
+        }
     }
     
     if (thisType == PreparationTypeDirect)
@@ -545,6 +570,14 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         
         thisPreparationMap->addNostalgicProcessor(nproc);
     }
+    else if (thisType == PreparationTypeBlendronomer)
+    {
+        BlendronomerProcessor::Ptr bproc = getBlendronomerProcessor(thisId);
+        thisPreparationMap->addBlendronomerProcessor(bproc);
+        
+        keymap->addTarget(TargetTypeBlendronicSync);
+        keymap->addTarget(TargetTypeBlendronicClear);
+    }
     else if (thisType == PreparationTypeTempo)
     {
         TempoProcessor::Ptr mproc = getTempoProcessor(thisId);
@@ -557,15 +590,7 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         
         thisPreparationMap->addTuningProcessor(tproc);
     }
-	else if (thisType == PreparationTypeBlendronomer)
-	{
-		BlendronomerProcessor::Ptr bproc = getBlendronomerProcessor(thisId);
-		thisPreparationMap->addBlendronomerProcessor(bproc);
-        
-        keymap->addTarget(TargetTypeBlendronicSync);
-        keymap->addTarget(TargetTypeBlendronicClear);
-	}
-    
+    thisPreparationMap->linkKeymapToPreparation(keymapId, thisType, thisId);
 }
 
 void Piano::configureDirectModification(DirectModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
@@ -967,11 +992,66 @@ int Piano::addPreparationMap(Keymap::Ptr keymap)
     
     thisPreparationMap->prepareToPlay(sampleRate);
     
-    thisPreparationMap->setKeymap(keymap);
-    
     activePMaps.add(thisPreparationMap);
     
     return prepMaps.size()-1;
+}
+
+PreparationMap::Ptr        Piano::getPreparationMapWithPreparation(BKPreparationType type, int Id)
+{
+    PreparationMap::Ptr thisPMap = nullptr;
+    for (auto pmap : prepMaps)
+    {
+        if (type == PreparationTypeDirect)
+        {
+            if (pmap->getDirectProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
+            }
+        }
+        else if (type == PreparationTypeSynchronic)
+        {
+            if (pmap->getSynchronicProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
+            }
+        }
+        else if (type == PreparationTypeNostalgic)
+        {
+            if (pmap->getNostalgicProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
+            }
+        }
+        else if (type == PreparationTypeBlendronomer)
+        {
+            if (pmap->getBlendronomerProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
+            }
+        }
+        else if (type == PreparationTypeTempo)
+        {
+            if (pmap->getTempoProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
+            }
+        }
+        else if (type == PreparationTypeTuning)
+        {
+            if (pmap->getTuningProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
+            }
+        }
+    }
+    return thisPMap;
 }
 
 PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(int keymapId)
@@ -979,7 +1059,7 @@ PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(int keymapId)
     PreparationMap::Ptr thisPMap = nullptr;
     for (auto pmap : prepMaps)
     {
-        if (pmap->getKeymap()->getId() == keymapId)
+        if (pmap->getKeymap(keymapId) != nullptr)
         {
             thisPMap = pmap;
             break;
@@ -988,13 +1068,11 @@ PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(int keymapId)
     return thisPMap;
 }
 
-
-// Add preparation map, return its Id.
-int Piano::removePreparationMapWithKeymap(int Id)
+int Piano::removePreparationMap(int Id)
 {
     for (int i = activePMaps.size(); --i >= 0; )
     {
-        if (activePMaps[i]->getKeymap()->getId() == Id)
+        if (activePMaps[i]->getId() == Id)
         {
             activePMaps.remove(i);
             break;
@@ -1003,7 +1081,33 @@ int Piano::removePreparationMapWithKeymap(int Id)
     
     for (int i = prepMaps.size(); --i >= 0; )
     {
-        if (prepMaps[i]->getKeymap()->getId() == Id)
+        if (prepMaps[i]->getId() == Id)
+        {
+            prepMaps.remove(i);
+            break;
+        }
+    }
+    
+    --numPMaps;
+    
+    return numPMaps;
+}
+
+// Add preparation map, return its Id.
+int Piano::removePreparationMapWithKeymap(int Id)
+{
+    for (int i = activePMaps.size(); --i >= 0; )
+    {
+        if (activePMaps[i]->getKeymap(Id) != nullptr)
+        {
+            activePMaps.remove(i);
+            break;
+        }
+    }
+    
+    for (int i = prepMaps.size(); --i >= 0; )
+    {
+        if (prepMaps[i]->getKeymap(Id) != nullptr)
         {
             prepMaps.remove(i);
             break;

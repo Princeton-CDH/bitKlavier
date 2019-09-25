@@ -324,9 +324,11 @@ public:
     
     int                         addPreparationMap(void);
     int                         addPreparationMap(Keymap::Ptr keymap);
+    PreparationMap::Ptr         getPreparationMapWithPreparation(BKPreparationType type, int Id);
     PreparationMap::Ptr         getPreparationMapWithKeymap(int keymapId);
-    int                         removeLastPreparationMap(void);
+    int                         removePreparationMap(int Id);
     int                         removePreparationMapWithKeymap(int keymapId);
+    int                         removeLastPreparationMap(void);
     
     Array<Array<int>> pianoMaps;
     

@@ -450,6 +450,16 @@ public:
 		return blendronomer;
 	}
     
+    inline void addKeymap(Keymap::Ptr keymap)
+    {
+        keymaps.add(keymap);
+    }
+    
+    inline Keymap::PtrArr getKeymaps(void)
+    {
+        return keymaps;
+    }
+    
 private:
     BKSynthesiser*      synth;
     BKSynthesiser*      resonanceSynth;
@@ -458,6 +468,8 @@ private:
     Direct::Ptr             direct;
     TuningProcessor::Ptr    tuner;
 	BlendronomerProcessor::Ptr blendronomer;
+    
+    Keymap::PtrArr      keymaps;
     
     //need to keep track of the actual notes played and their offsets when a particular key is pressed
     //so that they can all be turned off properly, even in the event of a preparation change

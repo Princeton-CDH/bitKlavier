@@ -11,7 +11,8 @@
 #include "Tempo.h"
 
 TempoProcessor::TempoProcessor(Tempo::Ptr t):
-tempo(t)
+tempo(t),
+keymaps(Keymap::PtrArr())
 {
     atTimer = 0;
     atLastTime = 0;

@@ -812,7 +812,7 @@ public:
     NostalgicProcessor(Nostalgic::Ptr nostalgic,
                        TuningProcessor::Ptr tuning,
                        SynchronicProcessor::Ptr synchronic,
-						BlendronomerProcessor::Ptr blender,
+                       BlendronomerProcessor::Ptr blender,
                        BKSynthesiser *s);
     
     virtual ~NostalgicProcessor();
@@ -911,6 +911,16 @@ public:
     inline int getCurrentClusterSize() const noexcept {return currentClusterSize;}
     inline int getClusterThresholdTimer() const noexcept {return clusterThresholdTimer * 1000. / sampleRate;}
     
+    inline void addKeymap(Keymap::Ptr keymap)
+    {
+        keymaps.add(keymap);
+    }
+    
+    inline Keymap::PtrArr getKeymaps(void)
+    {
+        return keymaps;
+    }
+    
 private:
     BKSynthesiser*              synth;
     
@@ -918,6 +928,8 @@ private:
     TuningProcessor::Ptr            tuner;
     SynchronicProcessor::Ptr        synchronic;
 	BlendronomerProcessor::Ptr		blendronomer;
+    
+    Keymap::PtrArr              keymaps;
     
     Array<uint64> noteLengthTimers;     // store current length of played notes here
     Array<int> activeNotes;             // table of notes currently being played by player
