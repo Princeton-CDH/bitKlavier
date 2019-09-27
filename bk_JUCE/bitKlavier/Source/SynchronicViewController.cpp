@@ -679,6 +679,7 @@ SynchronicViewController(p, theGraph)
 void SynchronicPreparationEditor::fillModeSelectCB()
 {
     SynchronicPreparation::Ptr prep = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+    SynchronicPreparation::Ptr stat = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     
     modeSelectCB.clear(dontSendNotification);
     
@@ -686,17 +687,24 @@ void SynchronicPreparationEditor::fillModeSelectCB()
     {
         modeSelectCB.addItem("First Note-On", 1);
         modeSelectCB.addItem("Any Note-On", 2);
-        modeSelectCB.addItem("Last Note-Off", 3);
+        modeSelectCB.addItem("First Note-Off", 3);
         modeSelectCB.addItem("Any Note-Off", 4);
+        modeSelectCB.addItem("Last Note-Off", 5);
+        modeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
     }
     else
     {
         modeSelectCB.addItem("First Note-Off", 1);
         modeSelectCB.addItem("Any Note-Off", 2);
         modeSelectCB.addItem("Last Note-Off", 3);
+        if (prep->getMode() < FirstNoteOffSync)
+        {
+            prep->setMode(FirstNoteOffSync);
+            stat->setMode(FirstNoteOffSync);
+        }
+        modeSelectCB.setSelectedItemIndex(prep->getMode()-2, dontSendNotification);
     }
     
-    modeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
 }
 
 
@@ -961,6 +969,7 @@ void SynchronicPreparationEditor::update(NotificationType notify)
     {
         
         selectCB.setSelectedId(processor.updateState->currentSynchronicId, notify);
+        fillModeSelectCB();
         modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
         onOffSelectCB.setSelectedItemIndex(prep->getOnOffMode(), notify);
         //offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
@@ -1303,9 +1312,17 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        prep    ->setMode((SynchronicSyncMode) index);
-        active  ->setMode((SynchronicSyncMode) index);
-        
+        if (prep->getOnOffMode() == KeyOn)
+        {
+            prep    ->setMode((SynchronicSyncMode) index);
+            active  ->setMode((SynchronicSyncMode) index);
+        }
+        else if (prep->getOnOffMode() == KeyOff)
+        {
+            prep    ->setMode((SynchronicSyncMode) (index+2));
+            active  ->setMode((SynchronicSyncMode) (index+2));
+        }
+            
         int toggleVal;
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;

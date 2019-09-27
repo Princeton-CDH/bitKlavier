@@ -1038,12 +1038,12 @@ public:
         envelopeCounter = 0;
         shouldPlay = false;
         
-        SynchronicSyncMode mode = prep->getMode();
-        
-        if (mode == AnyNoteOnSync || mode == FirstNoteOnSync)
-        {
-            shouldPlay = true;
-        }
+//        SynchronicSyncMode mode = prep->getMode();
+//        
+//        if (mode == AnyNoteOnSync || mode == FirstNoteOnSync)
+//        {
+//            shouldPlay = true;
+//        }
     }
     
     ~SynchronicCluster() {}

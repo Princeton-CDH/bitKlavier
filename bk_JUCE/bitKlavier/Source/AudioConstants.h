@@ -447,16 +447,18 @@ typedef enum SynchronicOnOffMode {
 typedef enum SynchronicSyncMode {
     FirstNoteOnSync = 0,
     AnyNoteOnSync,
-    LastNoteOffSync,
+    FirstNoteOffSync,
     AnyNoteOffSync,
+    LastNoteOffSync,
     SynchronicSyncModeNil
 } SynchronicSyncMode;
 
 static const std::vector<std::string> cSynchronicSyncModes = {
     "First Note-On",
     "Any Note-On",
-    "Last Note-Off",
-    "Any Note-Off"
+    "First Note-Off",
+    "Any Note-Off",
+    "Last Note-Off"
 };
 
 typedef enum SynchronicParameterType {
@@ -976,12 +978,27 @@ typedef enum KeymapParameterType
 
 typedef enum KeymapTargetType
 {
-    TargetTypeSynchronicSync = 0,
+    TargetTypeDirect = 0,
+    TargetTypeSynchronicSync,
     TargetTypeSynchronicCluster,
+    TargetTypeNostalgic,
     TargetTypeBlendronicSync,
     TargetTypeBlendronicClear,
+    TargetTypeTempo,
+    TargetTypeTuning,
     TargetTypeNil
 } KeymapTargetType;
+
+static const std::vector<std::string> cKeymapTargetTypes = {
+    "Direct",
+    "Synchronic Sync",
+    "Synchronic Cluster",
+    "Nostalgic",
+    "Blendronic Sync",
+    "Blendronic Clear",
+    "Tempo",
+    "Tuning"
+};
 
 typedef enum KeymapTargetState
 {
@@ -994,13 +1011,6 @@ typedef enum KeymapTargetState
 static const std::vector<std::string> cKeymapParameterTypes = {
     "Keymap Id",
     "Keymap"
-};
-
-static const std::vector<std::string> cKeymapTargetTypes = {
-    "Synchronic Sync",
-    "Synchronic Cluster",
-    "Blendronic Sync",
-    "Blendronic Clear"
 };
 
 typedef enum BKSampleLoadType

@@ -322,6 +322,7 @@ public:
 	inline void reset(void) { blendronomer->aPrep->copy(blendronomer->sPrep); }
     
     float* tick();
+    void updateDelayParameters();
 	void processBlock(int numSamples, int midiChannel);
     
     inline void addKeymap(Keymap::Ptr keymap)
@@ -355,6 +356,7 @@ private:
 	float numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
 	uint64 sampleTimer;
     int beatIndex, smoothIndex, feedbackIndex;
+    float prevBeat;
 
 	//JUCE_LEAK_DETECTOR(BlendronomerProcessor);
 };

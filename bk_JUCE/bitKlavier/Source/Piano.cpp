@@ -555,6 +555,8 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     {
         DirectProcessor::Ptr dproc = getDirectProcessor(thisId);
         thisPreparationMap->addDirectProcessor(dproc);
+        
+        keymap->addTarget(TargetTypeDirect);
     }
     else if (thisType == PreparationTypeSynchronic)
     {
@@ -567,8 +569,9 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     else if (thisType == PreparationTypeNostalgic)
     {
         NostalgicProcessor::Ptr nproc = getNostalgicProcessor(thisId);
-        
         thisPreparationMap->addNostalgicProcessor(nproc);
+        
+        keymap->addTarget(TargetTypeNostalgic);
     }
     else if (thisType == PreparationTypeBlendronomer)
     {
@@ -581,14 +584,16 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     else if (thisType == PreparationTypeTempo)
     {
         TempoProcessor::Ptr mproc = getTempoProcessor(thisId);
-        
         thisPreparationMap->addTempoProcessor(mproc);
+        
+        keymap->addTarget(TargetTypeTempo);
     }
     else if (thisType == PreparationTypeTuning)
     {
         TuningProcessor::Ptr tproc = getTuningProcessor(thisId);
-        
         thisPreparationMap->addTuningProcessor(tproc);
+        
+        keymap->addTarget(TargetTypeTuning);
     }
     thisPreparationMap->linkKeymapToPreparation(keymapId, thisType, thisId);
 }
