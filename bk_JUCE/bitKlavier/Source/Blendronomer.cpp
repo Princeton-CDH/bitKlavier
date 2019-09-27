@@ -256,7 +256,7 @@ void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiC
     }
     
     // Should add First Note-On / Any Note-On, Any Note-Off / Last Note-Off
-    if (prep->getClearMode() == BlendronomerNoteOnClear && doClear && keysDepressed.size() == 0)
+    if (prep->getClearMode() == BlendronomerNoteOnClear && doClear && keysDepressed.size() == 1)
     {
         delay->clear();
     }
