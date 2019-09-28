@@ -525,7 +525,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     start = playingSound->start;
     end = playingSound->end;
     loopStart = playingSound->loopStart;
-    loopEnd = playingSound->loopEnd;
+    loopEnd = playingSound->loopEnd + 1;
     
     while (--numSamples >= 0)
     {
