@@ -696,16 +696,36 @@ typedef enum BlendronomerSmoothMode {
 } BlendronomerSmoothMode;
 
 typedef enum BlendronomerSyncMode {
-    BlendronomerNoteOnSync = 0,
-    BlendronomerNoteOffSync,
+    BlendronomerFirstNoteOnSync = 0,
+    BlendronomerAnyNoteOnSync,
+    BlendronomerAnyNoteOffSync,
+    BlendronomerLastNoteOffSync,
     BlendronomerSyncModeNil
 } BlendronomerSyncMode;
 
 typedef enum BlendronomerClearMode {
-    BlendronomerNoteOnClear = 0,
-    BlendronomerNoteOffClear,
+    BlendronomerFirstNoteOnClear = 0,
+    BlendronomerAnyNoteOnClear,
+    BlendronomerAnyNoteOffClear,
+    BlendronomerLastNoteOffClear,
     BlendronomerClearModeNil
 } BlendronomerClearMode;
+
+typedef enum BlendronomerOpenMode {
+    BlendronomerFirstNoteOnOpen = 0,
+    BlendronomerAnyNoteOnOpen,
+    BlendronomerAnyNoteOffOpen,
+    BlendronomerLastNoteOffOpen,
+    BlendronomerOpenModeNil
+} BlendronomerOpenMode;
+
+typedef enum BlendronomerCloseMode {
+    BlendronomerFirstNoteOnClose = 0,
+    BlendronomerAnyNoteOnClose,
+    BlendronomerAnyNoteOffClose,
+    BlendronomerLastNoteOffClose,
+    BlendronomerCloseModeNil
+} BlendronomerCloseMode;
 
 static const std::vector<std::string> cBlendronomerSmoothModes = {
     "Constant Time",
@@ -715,14 +735,34 @@ static const std::vector<std::string> cBlendronomerSmoothModes = {
 };
 
 static const std::vector<std::string> cBlendronomerSyncModes = {
-    "Note On",
-    "Note Off",
+    "First Note-On",
+    "Any Note-On",
+    "Any Note-Off",
+    "Last Note-Off",
     "None"
 };
 
 static const std::vector<std::string> cBlendronomerClearModes = {
-    "Note On",
-    "Note Off",
+    "First Note-On",
+    "Any Note-On",
+    "Any Note-Off",
+    "Last Note-Off",
+    "None"
+};
+
+static const std::vector<std::string> cBlendronomerOpenModes = {
+    "First Note-On",
+    "Any Note-On",
+    "Any Note-Off",
+    "Last Note-Off",
+    "None"
+};
+
+static const std::vector<std::string> cBlendronomerCloseModes = {
+    "First Note-On",
+    "Any Note-On",
+    "Any Note-Off",
+    "Last Note-Off",
     "None"
 };
 
@@ -984,6 +1024,8 @@ typedef enum KeymapTargetType
     TargetTypeNostalgic,
     TargetTypeBlendronicSync,
     TargetTypeBlendronicClear,
+    TargetTypeBlendronicOpen,
+    TargetTypeBlendronicClose,
     TargetTypeTempo,
     TargetTypeTuning,
     TargetTypeNil
@@ -996,6 +1038,8 @@ static const std::vector<std::string> cKeymapTargetTypes = {
     "Nostalgic",
     "Blendronic Sync",
     "Blendronic Clear",
+    "Blendronic Open",
+    "Blendronic Close",
     "Tempo",
     "Tuning"
 };

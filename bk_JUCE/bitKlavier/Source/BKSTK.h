@@ -50,7 +50,7 @@ public:
 	float nextOutLeft();
 	float nextOutRight();
 	void addSample(float input, unsigned long offset, int channel);
-	float* tick(float input, bool stereo = true);
+	void tick(float input, float* outputs, bool stereo = true);
 	void scalePrevious(float coefficient, unsigned long offset, int channel);
     void clear();
     
@@ -142,6 +142,7 @@ public:
 	//accessors
     inline const BKDelayL::Ptr getDelay() const noexcept { return delayLinear; }
 	inline const BKEnvelope::Ptr getDSmooth() const noexcept { return dSmooth; }
+    inline const BKEnvelope::Ptr getEnvelope() const noexcept { return dEnv; }
 	inline const float getDelayMax() const noexcept { return dDelayMax; }
 	inline const float getDelayGain() const noexcept { return dDelayGain; }
 	inline const float getDelayLength() const noexcept { return dDelayLength; }
@@ -149,6 +150,7 @@ public:
 	inline const float getSmoothDuration() const noexcept { return dSmoothDuration; }
 	inline const bool getActive() const noexcept { return dBlendronicActive; }
     inline const int getId() const noexcept { return dId; }
+    inline const bool getShouldDuck() const noexcept { return shouldDuck; }
 
 	//mutators
 	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to stkFloat)
@@ -161,6 +163,7 @@ public:
         dSmoothValue = smoothValue;
         dSmooth->setValue(dSmoothValue);
     }
+    inline void setEnvelopeTarget(float t) { dEnv->setTarget(t); }
     
     //we want to be able to do this two ways:
     //set a duration for the delay length changes that will be constant, so at the beginning of
@@ -178,7 +181,9 @@ public:
 	inline const void toggleActive() { dBlendronicActive = !dBlendronicActive; }
     inline const void setId(int Id) { dId = Id; }
     
-    float* tick();
+    void tick(float* outputs);
+    
+    void duckAndClear();
     
     inline void setSampleRate(double sr) { delayLinear->setSampleRate(sr); dSmooth->setSampleRate(sr); }
     
@@ -189,6 +194,7 @@ public:
 private:
     BKDelayL::Ptr delayLinear;
 	BKEnvelope::Ptr dSmooth;
+    BKEnvelope::Ptr dEnv;
 	float dDelayMax;
 	float dDelayGain;
     float dDelayLength;
@@ -196,6 +202,7 @@ private:
 	float dSmoothDuration;
     int dId;
 	bool dBlendronicActive;
+    bool shouldDuck;
 };
 
 #endif

@@ -25,6 +25,8 @@ BlendronomerPreparation::BlendronomerPreparation(BlendronomerPreparation::Ptr p)
     bSmoothMode(p->getSmoothMode()),
     bSyncMode(p->getSyncMode()),
     bClearMode(p->getClearMode()),
+    bOpenMode(p->getOpenMode()),
+    bCloseMode(p->getCloseMode()),
 	bInputThresh(p->getInputThreshMS()),
 	bInputThreshSec(p->getInputThreshSEC()),
 	holdMin(p->getHoldMin()),
@@ -37,7 +39,7 @@ BlendronomerPreparation::BlendronomerPreparation(BlendronomerPreparation::Ptr p)
 //constructor with input
 BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
 	Array<float> feedbackCoefficients, float smoothValue, float smoothDuration, BlendronomerSmoothMode smoothMode,
-    BlendronomerSyncMode syncMode, BlendronomerClearMode clearMode,
+    BlendronomerSyncMode syncMode, BlendronomerClearMode clearMode, BlendronomerOpenMode openMode, BlendronomerCloseMode closeMode,
 	float delayMax, float delayLength, float feedbackCoefficient) :
 	name(newName),
 	bBeats(beats),
@@ -50,6 +52,8 @@ BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> be
     bSmoothMode(smoothMode),
     bSyncMode(syncMode),
     bClearMode(clearMode),
+    bOpenMode(openMode),
+    bCloseMode(closeMode),
 	bInputThresh(1),
 	bInputThreshSec(0.001),
 	holdMin(0),
@@ -70,8 +74,10 @@ BlendronomerPreparation::BlendronomerPreparation(void) :
 	bSmoothValue(180. * 44.1),
 	bSmoothDuration(0),
     bSmoothMode(ConstantTimeSmooth),
-    bSyncMode(BlendronomerNoteOnSync),
-    bClearMode(BlendronomerNoteOnClear),
+    bSyncMode(BlendronomerFirstNoteOnSync),
+    bClearMode(BlendronomerFirstNoteOnClear),
+    bOpenMode(BlendronomerFirstNoteOnOpen),
+    bCloseMode(BlendronomerFirstNoteOnClose),
 	bInputThresh(1),
 	bInputThreshSec(0.001),
 	holdMin(0),
@@ -141,6 +147,7 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
     
     keysDepressed = Array<int>();
     prevBeat = blendronomer->aPrep->getBeats()[0];
+    pulseRate = tempo->getTempo()->aPrep->getSubdivisions() * tempo->getTempo()->aPrep->getTempo();
 }
 
 BlendronomerProcessor::~BlendronomerProcessor()
@@ -148,7 +155,7 @@ BlendronomerProcessor::~BlendronomerProcessor()
     synth->removeBlendronicDelay(delay);
 }
 
-float* BlendronomerProcessor::tick()
+void BlendronomerProcessor::tick(float* outputs)
 {
     BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
     
@@ -164,8 +171,13 @@ float* BlendronomerProcessor::tick()
         if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
 
         updateDelayParameters();
+        if (clearDelayOnNextBeat)
+        {
+            delay->clear();
+            clearDelayOnNextBeat = false;
+        }
     }
-    return delay->tick();
+    delay->tick(outputs);
 }
 
 void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
@@ -243,22 +255,43 @@ void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiC
     
     bool doSync = targetStates[TargetTypeBlendronicSync] == TargetStateEnabled;
     bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
+    bool doOpen = targetStates[TargetTypeBlendronicOpen] == TargetStateEnabled;
+    bool doClose = targetStates[TargetTypeBlendronicClose] == TargetStateEnabled;
     
     if (!velocityCheck(noteNumber)) return;
     
-    if (prep->getSyncMode() == BlendronomerNoteOnSync && doSync)
+    if (doSync)
     {
-        setSampleTimer(0);
-        setBeatIndex(0);
-        setSmoothIndex(0);
-        setFeedbackIndex(0);
-        updateDelayParameters();
+        if (prep->getSyncMode() == BlendronomerAnyNoteOnSync ||
+           (prep->getSyncMode() == BlendronomerFirstNoteOnSync && keysDepressed.size() == 1))
+        {
+            setSampleTimer(0);
+            setBeatIndex(0);
+            setSmoothIndex(0);
+            setFeedbackIndex(0);
+            updateDelayParameters();
+        }
     }
-    
-    // Should add First Note-On / Any Note-On, Any Note-Off / Last Note-Off
-    if (prep->getClearMode() == BlendronomerNoteOnClear && doClear && keysDepressed.size() == 1)
+    if (doClear)
     {
-        delay->clear();
+        if (prep->getClearMode() == BlendronomerAnyNoteOnClear ||
+           (prep->getClearMode() == BlendronomerFirstNoteOnClear && keysDepressed.size() == 1))
+        {
+            delay->clear();
+            //clearDelayOnNextBeat = true;
+        }
+    }
+    if (doClose)
+    {
+        if (prep->getCloseMode() == BlendronomerAnyNoteOnClose ||
+           (prep->getCloseMode() == BlendronomerFirstNoteOnClose && keysDepressed.size() == 1))
+            delay->setActive(false);
+    }
+    if (doOpen)
+    {
+        if (prep->getOpenMode() == BlendronomerAnyNoteOnOpen ||
+           (prep->getOpenMode() == BlendronomerFirstNoteOnOpen && keysDepressed.size() == 1))
+            delay->setActive(true);
     }
 }
 
@@ -271,22 +304,47 @@ void BlendronomerProcessor::keyReleased(int noteNumber, float velocity, int midi
     
     bool doSync = targetStates[TargetTypeBlendronicSync] == TargetStateEnabled;
     bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
+    bool doOpen = targetStates[TargetTypeBlendronicOpen] == TargetStateEnabled;
+    bool doClose = targetStates[TargetTypeBlendronicClose] == TargetStateEnabled;
     
     if (!velocityCheck(noteNumber)) return;
     if (!holdCheck(noteNumber)) return;
     
-    if (prep->getSyncMode() == BlendronomerNoteOffSync && doSync)
+    if (doSync)
     {
-        setSampleTimer(0);
-        setBeatIndex(0);
-        setSmoothIndex(0);
-        setFeedbackIndex(0);
-        updateDelayParameters();
+        if (prep->getSyncMode() == BlendronomerAnyNoteOffSync ||
+           (prep->getSyncMode() == BlendronomerLastNoteOffSync && keysDepressed.size() == 0))
+        {
+            setSampleTimer(0);
+            setBeatIndex(0);
+            setSmoothIndex(0);
+            setFeedbackIndex(0);
+            updateDelayParameters();
+        }
     }
-    
-    if (prep->getClearMode() == BlendronomerNoteOffClear && doClear)
+    if (doClear)
     {
-        delay->clear();
+        if (prep->getClearMode() == BlendronomerAnyNoteOffClear)
+        {
+            delay->clear();
+        }
+        else if (prep->getClearMode() == BlendronomerLastNoteOffClear && keysDepressed.size() == 0)
+        {
+            delay->duckAndClear();
+            clearDelayOnNextBeat = true;
+        }
+    }
+    if (doClose)
+    {
+        if (prep->getCloseMode() == BlendronomerAnyNoteOffClose ||
+           (prep->getCloseMode() == BlendronomerLastNoteOffClose && keysDepressed.size() == 0))
+        delay->setActive(false);
+    }
+    if (doOpen)
+    {
+        if (prep->getOpenMode() == BlendronomerAnyNoteOffOpen ||
+           (prep->getOpenMode() == BlendronomerLastNoteOffOpen && keysDepressed.size() == 0))
+        delay->setActive(true);
     }
 }
 
@@ -322,24 +380,27 @@ void BlendronomerProcessor::updateDelayParameters()
     prevBeat = prep->getBeats()[beatIndex];
     if (prep->getSmoothMode()       == ConstantRateSmooth)
     {
-        //smoothDuration = pulseLength / (prep->getSmoothDurations()[smoothIndex]);
         smoothRate = prep->getSmoothDurations()[smoothIndex] / pulseLength;
     }
     else if (prep->getSmoothMode()  == ConstantTimeSmooth)
     {
-        //smoothDuration = (pulseLength / (prep->getSmoothDurations()[smoothIndex])) * beatDelta;
-        smoothRate = beatDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength);
+        if (pulseRate != tempoPrep->getSubdivisions() * tempoPrep->getTempo() && beatDelta == 0)
+            smoothRate = INFINITY;//prep->getSmoothDurations()[smoothIndex] / pulseLength;
+        else
+            smoothRate = beatDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength);
     }
     else if (prep->getSmoothMode()  == ProportionalRateSmooth)
     {
-        //smoothDuration = (pulseLength / (prep->getSmoothDurations()[smoothIndex])) / prep->getBeats()[beatIndex];
         smoothRate = prep->getSmoothDurations()[smoothIndex] / (pulseLength * prep->getBeats()[beatIndex]);
     }
     else if (prep->getSmoothMode()  == ProportionalTimeSmooth)
     {
-        //smoothDuration = ((pulseLength / (prep->getSmoothDurations()[smoothIndex])) * beatDelta) / prep->getBeats()[beatIndex];
-        smoothRate = beatDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength * prep->getBeats()[beatIndex]);
+        if (pulseRate != tempoPrep->getSubdivisions() * tempoPrep->getTempo() && beatDelta == 0)
+            smoothRate = INFINITY;//prep->getSmoothDurations()[smoothIndex] / (pulseLength * prep->getBeats()[beatIndex]);
+        else
+            smoothRate = beatDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength * prep->getBeats()[beatIndex]);
     }
+    pulseRate = tempoPrep->getSubdivisions() * tempoPrep->getTempo();
     
     sampleTimer = 0;
     

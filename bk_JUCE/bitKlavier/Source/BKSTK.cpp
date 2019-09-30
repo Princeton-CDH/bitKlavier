@@ -146,7 +146,7 @@ void BKDelayL::addSample(float input, unsigned long offset, int channel)
 
 //redo so it has channel argument, like addSample, also bool which indicates whether to increment inPoint
 //or, have it take float* input
-float* BKDelayL::tick(float input, bool stereo)
+void BKDelayL::tick(float input, float* outputs, bool stereo)
 {
 	inputs.addSample(0, inPoint, input * gain);
 	if (stereo) inputs.addSample(1, inPoint, input * gain);
@@ -170,17 +170,13 @@ float* BKDelayL::tick(float input, bool stereo)
 
 	if (stereo)
 	{
-		float outs[2];
-		outs[0] = lastFrameLeft;
-		outs[1] = lastFrameRight;
-		return outs;
+		outputs[0] = lastFrameLeft;
+		outputs[1] = lastFrameRight;
 	}
 	else
 	{
-		float outs[1];
-		outs[0] = lastFrameLeft;
-		return outs; // need to address this? "Address of stack memory associated with local variable 'outs' returned"
-	}
+		outputs[0] = lastFrameLeft;
+    }
 }
 
 void BKDelayL::scalePrevious(float coefficient, unsigned long offset, int channel)
@@ -197,13 +193,15 @@ void BKDelayL::clear()
 BlendronicDelay::BlendronicDelay(BlendronicDelay::Ptr d):
 	delayLinear(d->getDelay()),
 	dSmooth(d->getDSmooth()),
+    dEnv(d->getEnvelope()),
 	dDelayMax(d->getDelayMax()),
 	dDelayGain(d->getDelayGain()),
 	dDelayLength(d->getDelayLength()),
 	dSmoothValue(d->getSmoothValue()),
 	dSmoothDuration(d->getSmoothDuration()),
     dId(d->getId()),
-	dBlendronicActive(d->getActive())
+	dBlendronicActive(d->getActive()),
+    shouldDuck(d->getShouldDuck())
 {
 }
 
@@ -217,7 +215,11 @@ BlendronicDelay::BlendronicDelay(float delayMax, float delayGain, float delayLen
 	dBlendronicActive(active)
 {
 	delayLinear =  new BKDelayL(dDelayLength, dDelayMax, dDelayGain);
-	dSmooth = new BKEnvelope(dSmoothValue, dSmoothDuration);
+	dSmooth = new BKEnvelope(dSmoothValue, delayLength);
+    dSmooth->setRate(dSmoothDuration);
+    dEnv = new BKEnvelope(1.0f, 1.0f);
+    dEnv->setTime(5.0f);
+    shouldDuck = false;
 }
 
 BlendronicDelay::BlendronicDelay()
@@ -230,8 +232,23 @@ void BlendronicDelay::addSample(float sampleToAdd, unsigned long offset, int cha
 	delayLinear->addSample(sampleToAdd, offset, channel);
 }
 
-float* BlendronicDelay::tick()
+void BlendronicDelay::tick(float* outputs)
 {
     setDelayLength(dSmooth->tick());
-    return delayLinear->tick(0, true);
+    delayLinear->tick(0, outputs, true);
+    float env = dEnv->tick();
+    if (shouldDuck && env == 0.0f)
+    {
+        clear();
+        setEnvelopeTarget(1.0f);
+        shouldDuck = false;
+    }
+    outputs[0] *= env;
+    outputs[1] *= env;
+}
+
+void BlendronicDelay::duckAndClear()
+{
+    shouldDuck = true;
+    setEnvelopeTarget(0.0f);
 }

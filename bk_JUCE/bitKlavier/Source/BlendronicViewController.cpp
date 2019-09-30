@@ -102,6 +102,32 @@ BKViewController(p, theGraph, 2)
     clearModeLabel.setTooltip("Determines which aspect of MIDI signal clears the delay line");
     addAndMakeVisible(&clearModeLabel, ALL);
     
+    closeModeSelectCB.setName("Close Mode");
+    closeModeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
+    closeModeSelectCB.setTooltip("Determines which aspect of MIDI signal clears the delay line");
+    closeModeSelectCB.addSeparator();
+    closeModeSelectCB.addListener(this);
+    closeModeSelectCB.setSelectedItemIndex(0);
+    addAndMakeVisible(closeModeSelectCB);
+    
+    closeModeLabel.setText("close the delay line on", dontSendNotification);
+    closeModeLabel.setJustificationType(juce::Justification::centredRight);
+    closeModeLabel.setTooltip("Determines which aspect of MIDI signal close the delay line");
+    addAndMakeVisible(&closeModeLabel, ALL);
+    
+    openModeSelectCB.setName("Open Mode");
+    openModeSelectCB.setTooltip("Determines which aspect of MIDI signal opens the delay line");
+    openModeSelectCB.addSeparator();
+    openModeSelectCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+    openModeSelectCB.addListener(this);
+    openModeSelectCB.setSelectedItemIndex(0);
+    addAndMakeVisible(openModeSelectCB);
+    
+    openModeLabel.setText("opens the delay line", dontSendNotification);
+    openModeLabel.setTooltip("Determines which aspect of MIDI signal opens the delay line");
+    addAndMakeVisible(&openModeLabel, ALL);
+    
     addAndMakeVisible(&actionButton, ALL);
     actionButton.setButtonText("Action");
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
@@ -124,6 +150,10 @@ void BlendronicViewController::invisible(void)
     smoothModeLabel.setVisible(false);
     clearModeSelectCB.setVisible(false);
     clearModeLabel.setVisible(false);
+    closeModeSelectCB.setVisible(false);
+    closeModeLabel.setVisible(false);
+    openModeSelectCB.setVisible(false);
+    openModeLabel.setVisible(false);
 }
 
 void BlendronicViewController::displayShared(void)
@@ -213,6 +243,10 @@ void BlendronicViewController::displayTab(int tab)
         syncModeLabel.setVisible(true);
         clearModeSelectCB.setVisible(true);
         clearModeLabel.setVisible(true);
+        closeModeSelectCB.setVisible(true);
+        closeModeLabel.setVisible(true);
+        openModeSelectCB.setVisible(true);
+        openModeLabel.setVisible(true);
         
         // SET BOUNDS
         int sliderHeight = height * 0.225f;
@@ -239,6 +273,18 @@ void BlendronicViewController::displayTab(int tab)
         Rectangle<int> clearModeLabelRect (clearModeSelectCBRect.removeFromRight(clearModeSelectCBRect.getWidth()*0.5));
         clearModeSelectCB.setBounds(clearModeSelectCBRect);
         clearModeLabel.setBounds(clearModeLabelRect);
+        
+        leftColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+        Rectangle<int> closeModeSelectCBRect (leftColumn.removeFromTop(gComponentComboBoxHeight));
+        Rectangle<int> closeModeSelectLabel (closeModeSelectCBRect.removeFromLeft(closeModeSelectCBRect.getWidth()*0.5));
+        closeModeSelectCB.setBounds(closeModeSelectCBRect);
+        closeModeLabel.setBounds(closeModeSelectLabel);
+        
+        rightColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+        Rectangle<int> openModeSelectCBRect (rightColumn.removeFromTop(gComponentComboBoxHeight));
+        Rectangle<int> openModeLabelRect (openModeSelectCBRect.removeFromRight(openModeSelectCBRect.getWidth()*0.5));
+        openModeSelectCB.setBounds(openModeSelectCBRect);
+        openModeLabel.setBounds(openModeLabelRect);
     }
 }
 
@@ -277,6 +323,8 @@ BlendronicViewController(p, theGraph)
     fillSmoothModeSelectCB();
     fillSyncModeSelectCB();
     fillClearModeSelectCB();
+    fillCloseModeSelectCB();
+    fillOpenModeSelectCB();
     
     startTimer(20);
 }
@@ -503,6 +551,28 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         fillClearModeSelectCB();
         
     }
+    else if (name == "Open Mode")
+    {
+        BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        
+        prep    ->setOpenMode( (BlendronomerOpenMode) index);
+        active  ->setOpenMode( (BlendronomerOpenMode) index);
+        
+        fillOpenModeSelectCB();
+        
+    }
+    else if (name == "Close Mode")
+    {
+        BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        
+        prep    ->setCloseMode( (BlendronomerCloseMode) index);
+        active  ->setCloseMode( (BlendronomerCloseMode) index);
+        
+        fillCloseModeSelectCB();
+        
+    }
 }
 
 void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -589,9 +659,10 @@ void BlendronicPreparationEditor::fillSyncModeSelectCB()
     
     syncModeSelectCB.clear(dontSendNotification);
     
-    syncModeSelectCB.addItem(cBlendronomerSyncModes[BlendronomerNoteOnSync], 1);
-    syncModeSelectCB.addItem(cBlendronomerSyncModes[BlendronomerNoteOffSync], 2);
-    syncModeSelectCB.addItem(cBlendronomerSyncModes[BlendronomerSyncModeNil], 3);
+    for (int i = 0; i <= BlendronomerSyncModeNil; ++i)
+    {
+        syncModeSelectCB.addItem(cBlendronomerSyncModes[i], i+1);
+    }
     
     syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
 }
@@ -602,11 +673,40 @@ void BlendronicPreparationEditor::fillClearModeSelectCB()
     
     clearModeSelectCB.clear(dontSendNotification);
     
-    clearModeSelectCB.addItem(cBlendronomerClearModes[BlendronomerNoteOnClear], 1);
-    clearModeSelectCB.addItem(cBlendronomerClearModes[BlendronomerNoteOffClear], 2);
-    clearModeSelectCB.addItem(cBlendronomerClearModes[BlendronomerClearModeNil], 3);
+    for (int i = 0; i <= BlendronomerClearModeNil; ++i)
+    {
+        clearModeSelectCB.addItem(cBlendronomerClearModes[i], i+1);
+    }
     
     clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
+}
+
+void BlendronicPreparationEditor::fillOpenModeSelectCB()
+{
+    BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    
+    openModeSelectCB.clear(dontSendNotification);
+    
+    for (int i = 0; i <= BlendronomerOpenModeNil; ++i)
+    {
+        openModeSelectCB.addItem(cBlendronomerOpenModes[i], i+1);
+    }
+    
+    openModeSelectCB.setSelectedItemIndex(prep->getOpenMode(), dontSendNotification);
+}
+
+void BlendronicPreparationEditor::fillCloseModeSelectCB()
+{
+    BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    
+    closeModeSelectCB.clear(dontSendNotification);
+    
+    for (int i = 0; i <= BlendronomerCloseModeNil; ++i)
+    {
+        closeModeSelectCB.addItem(cBlendronomerCloseModes[i], i+1);
+    }
+    
+    closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
 }
 
 void BlendronicPreparationEditor::timerCallback()
@@ -950,9 +1050,10 @@ void BlendronicModificationEditor::fillSyncModeSelectCB()
     
     syncModeSelectCB.clear(dontSendNotification);
     
-    syncModeSelectCB.addItem(cBlendronomerSyncModes[BlendronomerNoteOnSync], 1);
-    syncModeSelectCB.addItem(cBlendronomerSyncModes[BlendronomerNoteOffSync], 2);
-    syncModeSelectCB.addItem(cBlendronomerSyncModes[BlendronomerSyncModeNil], 3);
+    for (int i = 0; i <= BlendronomerSyncModeNil; ++i)
+    {
+        syncModeSelectCB.addItem(cBlendronomerSyncModes[i], i+1);
+    }
     
     syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
 }
@@ -963,12 +1064,15 @@ void BlendronicModificationEditor::fillClearModeSelectCB()
     
     clearModeSelectCB.clear(dontSendNotification);
     
-    clearModeSelectCB.addItem(cBlendronomerClearModes[BlendronomerNoteOnClear], 1);
-    clearModeSelectCB.addItem(cBlendronomerClearModes[BlendronomerNoteOffClear], 2);
-    clearModeSelectCB.addItem(cBlendronomerClearModes[BlendronomerClearModeNil], 3);
+    for (int i = 0; i <= BlendronomerClearModeNil; ++i)
+    {
+        clearModeSelectCB.addItem(cBlendronomerClearModes[i], i+1);
+    }
     
     clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
 }
+
+
 
 void BlendronicModificationEditor::timerCallback()
 {

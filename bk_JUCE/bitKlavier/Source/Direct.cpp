@@ -50,6 +50,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         //DBG("DirectProcessor::keyPressed noteNumber, synthNoteNumber, synthOffset " + String(noteNumber) + " " + String(synthNoteNumber) + " " + String(synthOffset));
 		if (blendronomer != nullptr)
 		{
+            blendronomer->setClearDelayOnNextBeat(false);
 			synth->keyOn(channel,
 				noteNumber,
 				synthNoteNumber,

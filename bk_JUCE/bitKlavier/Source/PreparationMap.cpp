@@ -529,6 +529,10 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
                     targetStates.set(TargetTypeBlendronicSync, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeBlendronicClear] == TargetStateEnabled)
                     targetStates.set(TargetTypeBlendronicClear, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeBlendronicOpen] == TargetStateEnabled)
+                    targetStates.set(TargetTypeBlendronicOpen, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeBlendronicClose] == TargetStateEnabled)
+                    targetStates.set(TargetTypeBlendronicClose, TargetStateEnabled);
             }
         }
         if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity, channel, targetStates);
@@ -663,6 +667,10 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
                     targetStates.set(TargetTypeBlendronicSync, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeBlendronicClear] == TargetStateEnabled)
                     targetStates.set(TargetTypeBlendronicClear, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeBlendronicOpen] == TargetStateEnabled)
+                    targetStates.set(TargetTypeBlendronicOpen, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeBlendronicClose] == TargetStateEnabled)
+                    targetStates.set(TargetTypeBlendronicClose, TargetStateEnabled);
             }
         }
         if (targetStates.contains(TargetStateEnabled)) proc->keyReleased(noteNumber, velocity, channel, targetStates);

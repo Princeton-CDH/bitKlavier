@@ -39,7 +39,7 @@ public:
 	BlendronomerPreparation(BlendronomerPreparation::Ptr p);
 	BlendronomerPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
 		Array<float> feedbackCoefficients, float smoothValue, float smoothDuration, BlendronomerSmoothMode smoothMode,
-        BlendronomerSyncMode syncMode, BlendronomerClearMode clearMode,
+        BlendronomerSyncMode syncMode, BlendronomerClearMode clearMode, BlendronomerOpenMode openMode, BlendronomerCloseMode closeMode, 
         float delayMax, float delayLength, float feedbackCoefficient);
 	BlendronomerPreparation(void);
 
@@ -73,6 +73,8 @@ public:
 	inline const bool getInputGain() const noexcept { return inputGain; }
     inline const BlendronomerSyncMode getSyncMode() const noexcept { return bSyncMode; }
     inline const BlendronomerClearMode getClearMode() const noexcept { return bClearMode; }
+    inline const BlendronomerOpenMode getOpenMode() const noexcept { return bOpenMode; }
+    inline const BlendronomerCloseMode getCloseMode() const noexcept { return bCloseMode; }
 
 	//mutators
 	inline void setName(String n) { name = n; }
@@ -102,6 +104,8 @@ public:
 	inline const void setInputGain(float gain) { inputGain = gain; }
     inline const void setSyncMode(BlendronomerSyncMode mode) { bSyncMode = mode; }
     inline const void setClearMode(BlendronomerClearMode mode) { bClearMode = mode; }
+    inline const void setOpenMode(BlendronomerOpenMode mode) { bOpenMode = mode; }
+    inline const void setCloseMode(BlendronomerCloseMode mode) { bCloseMode = mode; }
 
 	void print(void);
 	ValueTree getState(void);
@@ -135,6 +139,8 @@ private:
     
     BlendronomerSyncMode bSyncMode;
     BlendronomerClearMode bClearMode;
+    BlendronomerOpenMode bOpenMode;
+    BlendronomerCloseMode bCloseMode;
 
 	//needed for sampling
 	float inputGain;
@@ -309,6 +315,7 @@ public:
     inline int getSmoothIndex(void) { return smoothIndex; }
     inline int getFeedbackIndex(void) { return feedbackIndex; }
     inline BKSynthesiser* getSynth(void) { return synth; }
+    inline Array<int> getKeysDepressed(void) { return keysDepressed; }
 
 
 	//mutators
@@ -319,9 +326,10 @@ public:
     inline void setSmoothIndex(int index) { smoothIndex = index; }
     inline void setFeedbackIndex(int index) { feedbackIndex = index; }
 	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
+    inline void setClearDelayOnNextBeat(bool clear) { clearDelayOnNextBeat = clear; }
 	inline void reset(void) { blendronomer->aPrep->copy(blendronomer->sPrep); }
     
-    float* tick();
+    void tick(float* outputs);
     void updateDelayParameters();
 	void processBlock(int numSamples, int midiChannel);
     
@@ -357,6 +365,8 @@ private:
 	uint64 sampleTimer;
     int beatIndex, smoothIndex, feedbackIndex;
     float prevBeat;
+    float pulseRate;
+    bool clearDelayOnNextBeat;
 
 	//JUCE_LEAK_DETECTOR(BlendronomerProcessor);
 };

@@ -580,6 +580,8 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         
         keymap->addTarget(TargetTypeBlendronicSync);
         keymap->addTarget(TargetTypeBlendronicClear);
+        keymap->addTarget(TargetTypeBlendronicOpen);
+        keymap->addTarget(TargetTypeBlendronicClose);
     }
     else if (thisType == PreparationTypeTempo)
     {

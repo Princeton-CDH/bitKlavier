@@ -26,6 +26,7 @@ public:
         setLookAndFeel(nullptr);
         smoothModeSelectCB.setLookAndFeel(nullptr);
         clearModeSelectCB.setLookAndFeel(nullptr);
+        openModeSelectCB.setLookAndFeel(nullptr);
     };
     
     void paint (Graphics&) override;
@@ -37,19 +38,7 @@ public:
     void iWantTheBigOne(TextEditor*, String name) override;
 #endif
 protected:
-//    beats
-//    smooth durations
-//    feedback coeffs
-    
-//    smooth mode
-//    sync mode
-//    delaymax default ~5
-//    holdmin > applies to sync
-//    holdmax >
-//    vel min >
-//    vel max >
-    
-//    inputthresh
+
     OwnedArray<BKMultiSlider> paramSliders;
     
     virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
@@ -66,13 +55,17 @@ protected:
     }
     
     BKEditableComboBox selectCB;
-    BKComboBox syncModeSelectCB;
     BKComboBox smoothModeSelectCB;
+    BKComboBox syncModeSelectCB;
     BKComboBox clearModeSelectCB;
+    BKComboBox openModeSelectCB;
+    BKComboBox closeModeSelectCB;
     
-    BKLabel syncModeLabel;
     BKLabel smoothModeLabel;
+    BKLabel syncModeLabel;
     BKLabel clearModeLabel;
+    BKLabel openModeLabel;
+    BKLabel closeModeLabel;
     
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
 
@@ -104,6 +97,8 @@ public:
     {
         setLookAndFeel(nullptr);
         smoothModeSelectCB.setLookAndFeel(nullptr);
+        clearModeSelectCB.setLookAndFeel(nullptr);
+        smoothModeSelectCB.setLookAndFeel(nullptr);
     };
     
     
@@ -113,6 +108,8 @@ public:
     void fillSmoothModeSelectCB(void);
     void fillSyncModeSelectCB(void);
     void fillClearModeSelectCB(void);
+    void fillOpenModeSelectCB(void);
+    void fillCloseModeSelectCB(void);
     
     void timerCallback() override;
     
@@ -177,6 +174,8 @@ public:
     void fillSmoothModeSelectCB(void);
     void fillSyncModeSelectCB(void);
     void fillClearModeSelectCB(void);
+    void fillOpenModeSelectCB(void);
+    void fillCloseModeSelectCB(void);
     
     void greyOutAllComponents();
     void highlightModedComponents();

@@ -239,7 +239,8 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 		{
 			if (b != nullptr)
 			{
-                float* outputs = b->tick();
+                float outputs[2];
+                b->tick(outputs);
                 totalOutputL += outputs[0];
                 totalOutputR += outputs[1];
 			}
@@ -276,7 +277,8 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
         {
 			if (b != nullptr)
 			{
-                float* outputs = b->tick();
+                float outputs[2];
+                b->tick(outputs);
                 totalOutputL += outputs[0];
                 totalOutputR += outputs[1];
 			}
