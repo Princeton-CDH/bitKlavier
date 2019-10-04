@@ -114,6 +114,13 @@ BKViewController(p, theGraph, 1)
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
+    invertOnOffToggle.setButtonText ("invert note on/off");
+    buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
+    invertOnOffToggle.setToggleState (false, dontSendNotification);
+    invertOnOffToggle.setTooltip("Indicates whether to Invert Note-On and Note-Off messages for this Keymap");
+    invertOnOffToggle.addListener(this);
+    addAndMakeVisible(&invertOnOffToggle, ALL);
+    
     fillSelectCB(-1,-1);
     
     
@@ -199,6 +206,9 @@ void KeymapViewController::resized()
     Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
     targetsSlice.removeFromRight(gXSpacing);
     targetsButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
+    targetsSlice.removeFromRight(gXSpacing);
+    invertOnOffToggle.setBounds(targetsSlice);
+    invertOnOffToggle.toFront(false);
 }
 
 int KeymapViewController::addKeymap(void)
@@ -517,6 +527,11 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         getTargetsMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&targetsButton), ModalCallbackFunction::forComponent(targetsMenuCallback, this));
     }
+    else if (b == &invertOnOffToggle)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setInverted(invertOnOffToggle.getToggleState());
+    }
     else if (b == &keysButton)
     {
         getKeysMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&keysButton), ModalCallbackFunction::forComponent(keysMenuCallback, this));
@@ -631,6 +646,8 @@ void KeymapViewController::update(void)
     if (km != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentKeymapId, dontSendNotification);
+        
+        invertOnOffToggle.setToggleState(km->isInverted(), dontSendNotification);
         
         keymapTF.setText( intArrayToString(km->keys()));
         

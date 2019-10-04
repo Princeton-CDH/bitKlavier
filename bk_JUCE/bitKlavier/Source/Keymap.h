@@ -207,6 +207,9 @@ public:
     inline KeymapTargetState getTargetState(KeymapTargetType type) const noexcept { return targetStates[type]; }
     inline Array<KeymapTargetState> getTargetStates(void) const noexcept { return targetStates; }
     
+    inline bool isInverted(void) const noexcept { return inverted; }
+    inline void setInverted(bool inv) { inverted = inv; }
+    
     void setTarget(KeymapTargetType target, KeymapTargetState state);
     void toggleTarget(KeymapTargetType target);
     void enableTarget(KeymapTargetType target);
@@ -225,6 +228,8 @@ private:
     Array<bool> keymap;
     
     Array<KeymapTargetState> targetStates;
+    
+    bool inverted;
     
     JUCE_LEAK_DETECTOR (Keymap)
 };

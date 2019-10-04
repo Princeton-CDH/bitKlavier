@@ -67,6 +67,8 @@ private:
     BKLabel     keymapSelectL;
     BKEditableComboBox  selectCB;
     
+    ToggleButton invertOnOffToggle;
+    
     BKLabel     keymapL;
     BKTextEditor  keymapTF;
     

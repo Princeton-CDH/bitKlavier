@@ -17,7 +17,7 @@ Id(Id),
 keymaps(Keymap::PtrArr(km)),
 sustainPedalIsDepressed(false)
 {
-
+    
 }
 
 PreparationMap::~PreparationMap()
@@ -445,21 +445,29 @@ void PreparationMap::clearKey(int noteNumber)
 //not sure why some of these have Channel and some don't; should rectify?
 void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, bool soundfont)
 {
-    Array<KeymapTargetState> targetStates;
-    targetStates.ensureStorageAllocated(TargetTypeNil);
+    Array<KeymapTargetState> pressTargetStates;
+    Array<KeymapTargetState> releaseTargetStates;
+    Array<KeymapTargetState>* targetStates;
+    pressTargetStates.ensureStorageAllocated(TargetTypeNil);
+    releaseTargetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
     {
-        targetStates.add(TargetStateNil);
+        pressTargetStates.add(TargetStateNil);
+        releaseTargetStates.add(TargetStateNil);
     }
     
+    bool foundReattack = false;
+    bool foundSustain = false;
     for (auto km : keymaps)
     {
         if (km->containsNote(noteNumber))
         {
-            reattack(noteNumber);
-            break;
+            if (km->isInverted()) foundSustain = true;
+            else foundReattack = true;
         }
     }
+    if (foundSustain) sustain(noteNumber, velocity, channel, soundfont);
+    if (foundReattack) reattack(noteNumber);
     
     for (auto proc : tprocessor)
     {
@@ -467,12 +475,19 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
         {
             if (km->containsNote(noteNumber))
             {
-               if (km->getTargetStates()[TargetTypeTuning] == TargetStateEnabled)
-                   targetStates.set(TargetTypeTuning, TargetStateEnabled);
+                targetStates = &pressTargetStates;
+                if (km->isInverted()) targetStates = &releaseTargetStates;
+                
+                if (km->getTargetStates()[TargetTypeTuning] == TargetStateEnabled)
+                   targetStates->set(TargetTypeTuning, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber);
-        targetStates.fill(TargetStateNil);
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber);
+            releaseTargetStates.fill(TargetStateNil); }
     }
     
     for (auto proc : dprocessor)
@@ -481,12 +496,20 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &pressTargetStates;
+                if (km->isInverted()) targetStates = &releaseTargetStates;
+                
                 if (km->getTargetStates()[TargetTypeDirect] == TargetStateEnabled)
-                    targetStates.set(TargetTypeDirect, TargetStateEnabled);
+                    targetStates->set(TargetTypeDirect, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity, channel);
-        targetStates.fill(TargetStateNil);
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
+            proc->keyReleased(noteNumber, velocity, channel, soundfont);
+            releaseTargetStates.fill(TargetStateNil); }
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, channel);
+            pressTargetStates.fill(TargetStateNil); }
     }
     
     for (auto proc : sprocessor)
@@ -495,14 +518,21 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &pressTargetStates;
+                if (km->isInverted()) targetStates = &releaseTargetStates;
+                
                 if (km->getTargetStates()[TargetTypeSynchronicSync] == TargetStateEnabled)
-                    targetStates.set(TargetTypeSynchronicSync, TargetStateEnabled);
+                    targetStates->set(TargetTypeSynchronicSync, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeSynchronicCluster] == TargetStateEnabled)
-                    targetStates.set(TargetTypeSynchronicCluster, TargetStateEnabled);
+                    targetStates->set(TargetTypeSynchronicCluster, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity, targetStates);
-        targetStates.fill(TargetStateNil);
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, pressTargetStates);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
+            releaseTargetStates.fill(TargetStateNil); }
     }
     
     for (auto proc : nprocessor)
@@ -511,12 +541,19 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &pressTargetStates;
+                if (km->isInverted()) targetStates = &releaseTargetStates;
+                
                 if (km->getTargetStates()[TargetTypeNostalgic] == TargetStateEnabled)
-                    targetStates.set(TargetTypeNostalgic, TargetStateEnabled);
+                    targetStates->set(TargetTypeNostalgic, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity, channel);
-        targetStates.fill(TargetStateNil);
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, channel);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber, velocity, channel);
+            releaseTargetStates.fill(TargetStateNil); }
     }
     
     for (auto proc : bprocessor)
@@ -525,18 +562,25 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &pressTargetStates;
+                if (km->isInverted()) targetStates = &releaseTargetStates;
+
                 if (km->getTargetStates()[TargetTypeBlendronicSync] == TargetStateEnabled)
-                    targetStates.set(TargetTypeBlendronicSync, TargetStateEnabled);
+                    targetStates->set(TargetTypeBlendronicSync, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeBlendronicClear] == TargetStateEnabled)
-                    targetStates.set(TargetTypeBlendronicClear, TargetStateEnabled);
+                    targetStates->set(TargetTypeBlendronicClear, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeBlendronicOpen] == TargetStateEnabled)
-                    targetStates.set(TargetTypeBlendronicOpen, TargetStateEnabled);
+                    targetStates->set(TargetTypeBlendronicOpen, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeBlendronicClose] == TargetStateEnabled)
-                    targetStates.set(TargetTypeBlendronicClose, TargetStateEnabled);
+                    targetStates->set(TargetTypeBlendronicClose, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity, channel, targetStates);
-        targetStates.fill(TargetStateNil);
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
+            releaseTargetStates.fill(TargetStateNil); }
     }
     
     for (auto proc : mprocessor)
@@ -545,12 +589,19 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &pressTargetStates;
+                if (km->isInverted()) targetStates = &releaseTargetStates;
+                
                 if (km->getTargetStates()[TargetTypeTempo] == TargetStateEnabled)
-                    targetStates.set(TargetTypeTempo, TargetStateEnabled);
+                    targetStates->set(TargetTypeTempo, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyPressed(noteNumber, velocity);
-        targetStates.fill(TargetStateNil);
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber, channel);
+            releaseTargetStates.fill(TargetStateNil); }
     }
         // PERFORM MODIFICATION STUFF
 }
@@ -561,39 +612,29 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     
     //DBG("PreparationMap::keyReleased : " + String(noteNumber));
     
-    Array<KeymapTargetState> targetStates;
-    targetStates.ensureStorageAllocated(TargetTypeNil);
+    Array<KeymapTargetState> pressTargetStates;
+    Array<KeymapTargetState> releaseTargetStates;
+    Array<KeymapTargetState>* targetStates;
+    pressTargetStates.ensureStorageAllocated(TargetTypeNil);
+    releaseTargetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
     {
-        targetStates.add(TargetStateNil);
+        pressTargetStates.add(TargetStateNil);
+        releaseTargetStates.add(TargetStateNil);
     }
     
+    bool foundReattack = false;
+    bool foundSustain = false;
     for (auto km : keymaps)
     {
         if (km->containsNote(noteNumber))
         {
-            if(sustainPedalIsDepressed)
-            {
-                SustainedNote newNote;
-                newNote.noteNumber = noteNumber;
-                newNote.velocity = velocity;
-                newNote.channel = channel;
-                //DBG("storing sustained note " + String(noteNumber));
-                
-                sustainedNotes.add(newNote);
-                
-                if (!soundfont)
-                {
-                    //play hammers and resonance when keys are released, even with pedal down
-                    for (auto proc : dprocessor)
-                    {
-                        proc->playReleaseSample(noteNumber, velocity, channel);
-                    }
-                }
-            }
-            break;
+            if (km->isInverted()) foundReattack = true;
+            else foundSustain = true;
         }
     }
+    if (foundSustain) sustain(noteNumber, velocity, channel, soundfont);
+    if (foundReattack) reattack(noteNumber);
     
     for (auto proc : dprocessor)
     {
@@ -601,16 +642,20 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &releaseTargetStates;
+                if (km->isInverted()) targetStates = &pressTargetStates;
+                
                 if (km->getTargetStates()[TargetTypeDirect] == TargetStateEnabled)
-                    targetStates.set(TargetTypeDirect, TargetStateEnabled);
+                    targetStates->set(TargetTypeDirect, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled))
-        {
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, channel);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
             proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
             proc->keyReleased(noteNumber, velocity, channel, soundfont);
-            targetStates.fill(TargetStateNil);
-        }
+            releaseTargetStates.fill(TargetStateNil); }
     }
     
     for (auto proc : tprocessor)
@@ -619,12 +664,19 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &releaseTargetStates;
+                if (km->isInverted()) targetStates = &pressTargetStates;
+                
                 if (km->getTargetStates()[TargetTypeTuning] == TargetStateEnabled)
-                    targetStates.set(TargetTypeTuning, TargetStateEnabled);
+                    targetStates->set(TargetTypeTuning, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyReleased(noteNumber);
-        targetStates.fill(TargetStateNil);
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber);
+            releaseTargetStates.fill(TargetStateNil); }
     }
     
     for (auto proc : sprocessor)
@@ -633,14 +685,21 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &releaseTargetStates;
+                if (km->isInverted()) targetStates = &pressTargetStates;
+                
                 if (km->getTargetStates()[TargetTypeSynchronicSync] == TargetStateEnabled)
-                    targetStates.set(TargetTypeSynchronicSync, TargetStateEnabled);
+                    targetStates->set(TargetTypeSynchronicSync, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeSynchronicCluster] == TargetStateEnabled)
-                    targetStates.set(TargetTypeSynchronicCluster, TargetStateEnabled);
+                    targetStates->set(TargetTypeSynchronicCluster, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyReleased(noteNumber, velocity, channel, targetStates);
-        targetStates.fill(TargetStateNil);
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, pressTargetStates);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
+            releaseTargetStates.fill(TargetStateNil); }
     }
     
     for (auto proc : nprocessor)
@@ -649,12 +708,19 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &releaseTargetStates;
+                if (km->isInverted()) targetStates = &pressTargetStates;
+                
                 if (km->getTargetStates()[TargetTypeNostalgic] == TargetStateEnabled)
-                    targetStates.set(TargetTypeNostalgic, TargetStateEnabled);
+                    targetStates->set(TargetTypeNostalgic, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyReleased(noteNumber, velocity, channel);
-        targetStates.fill(TargetStateNil);
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, channel);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber, velocity, channel);
+            releaseTargetStates.fill(TargetStateNil); }
     }
     
     for (auto proc : bprocessor)
@@ -663,18 +729,25 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &releaseTargetStates;
+                if (km->isInverted()) targetStates = &pressTargetStates;
+                
                 if (km->getTargetStates()[TargetTypeBlendronicSync] == TargetStateEnabled)
-                    targetStates.set(TargetTypeBlendronicSync, TargetStateEnabled);
+                    targetStates->set(TargetTypeBlendronicSync, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeBlendronicClear] == TargetStateEnabled)
-                    targetStates.set(TargetTypeBlendronicClear, TargetStateEnabled);
+                    targetStates->set(TargetTypeBlendronicClear, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeBlendronicOpen] == TargetStateEnabled)
-                    targetStates.set(TargetTypeBlendronicOpen, TargetStateEnabled);
+                    targetStates->set(TargetTypeBlendronicOpen, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeBlendronicClose] == TargetStateEnabled)
-                    targetStates.set(TargetTypeBlendronicClose, TargetStateEnabled);
+                    targetStates->set(TargetTypeBlendronicClose, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyReleased(noteNumber, velocity, channel, targetStates);
-        targetStates.fill(TargetStateNil);
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
+            releaseTargetStates.fill(TargetStateNil); }
     }
     
     for (auto proc : mprocessor)
@@ -683,12 +756,19 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
         {
             if (km->containsNote(noteNumber))
             {
+                targetStates = &releaseTargetStates;
+                if (km->isInverted()) targetStates = &pressTargetStates;
+                
                 if (km->getTargetStates()[TargetTypeTempo] == TargetStateEnabled)
-                    targetStates.set(TargetTypeTempo, TargetStateEnabled);
+                    targetStates->set(TargetTypeTempo, TargetStateEnabled);
             }
         }
-        if (targetStates.contains(TargetStateEnabled)) proc->keyReleased(noteNumber, velocity);
-        targetStates.fill(TargetStateNil);
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber, channel);
+            releaseTargetStates.fill(TargetStateNil); }
     }
 }
 
@@ -872,6 +952,29 @@ void PreparationMap::reattack(int noteNumber)
         {
             if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber)
                 sustainedNotes.remove(i);
+        }
+    }
+}
+
+void PreparationMap::sustain(int noteNumber, float velocity, int channel, bool soundfont)
+{
+    if(sustainPedalIsDepressed)
+    {
+        SustainedNote newNote;
+        newNote.noteNumber = noteNumber;
+        newNote.velocity = velocity;
+        newNote.channel = channel;
+        //DBG("storing sustained note " + String(noteNumber));
+        
+        sustainedNotes.add(newNote);
+        
+        if (!soundfont)
+        {
+            //play hammers and resonance when keys are released, even with pedal down
+            for (auto proc : dprocessor)
+            {
+                proc->playReleaseSample(noteNumber, velocity, channel);
+            }
         }
     }
 }

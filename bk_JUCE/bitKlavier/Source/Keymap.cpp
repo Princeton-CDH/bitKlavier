@@ -13,7 +13,8 @@
 Keymap::Keymap(int Id):
 Id(Id),
 keymap(Array<bool>()),
-targetStates(Array<KeymapTargetState>())
+targetStates(Array<KeymapTargetState>()),
+inverted(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -43,6 +44,8 @@ Id(k->getId())
     {
         targetStates.add(TargetStateNil);
     }
+    
+    inverted = k->isInverted();
 }
 
 Keymap::Keymap(int Id, Keymap::Ptr k):
@@ -60,10 +63,15 @@ Id(Id)
     {
         targetStates.add(TargetStateNil);
     }
+    
+    inverted = k->isInverted();
 }
 
 Keymap::Keymap(void):
-Id(-1)
+Id(-1),
+keymap(Array<bool>()),
+targetStates(Array<KeymapTargetState>()),
+inverted(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)

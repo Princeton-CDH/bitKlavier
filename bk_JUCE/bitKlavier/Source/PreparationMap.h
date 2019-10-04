@@ -53,6 +53,7 @@ public:
     void sustainPedalReleased(Array<bool> keysThatArePressed, bool post);
     void sustainPedalReleased() {sustainPedalReleased(false);};
     void reattack(int noteNumber);
+    void sustain(int noteNumber, float velocity, int channel, bool soundfont);
     
     inline bool keymapsContainNote(int noteNumber) {
         bool contains = false;
