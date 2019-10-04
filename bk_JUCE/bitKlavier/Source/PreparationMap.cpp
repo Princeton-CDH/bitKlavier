@@ -443,7 +443,7 @@ void PreparationMap::clearKey(int noteNumber)
 }
 
 //not sure why some of these have Channel and some don't; should rectify?
-void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, bool soundfont)
+void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, bool soundfont, String source)
 {
     Array<KeymapTargetState> pressTargetStates;
     Array<KeymapTargetState> releaseTargetStates;
@@ -607,7 +607,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
 }
 
 
-void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bool soundfont)
+void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bool soundfont, String source)
 {
     
     //DBG("PreparationMap::keyReleased : " + String(noteNumber));
@@ -887,7 +887,7 @@ void PreparationMap::sustainPedalReleased(bool post)
     sustainedNotes.clearQuick();
 }
 
-void PreparationMap::postRelease(int noteNumber, float velocity, int channel)
+void PreparationMap::postRelease(int noteNumber, float velocity, int channel, String source)
 {
     DBG("PreparationMap::postRelease " + String(noteNumber));
     

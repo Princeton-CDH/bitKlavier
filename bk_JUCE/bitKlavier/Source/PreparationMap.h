@@ -44,9 +44,9 @@ public:
     BKSampleLoadType sampleType;
     void processBlock(AudioSampleBuffer& buffer, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic = false);
     
-    void keyPressed(int noteNumber, float velocity, int channel, bool soundfont = false);
-    void keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false);
-    void postRelease(int noteNumber, float velocity, int channel);
+    void keyPressed(int noteNumber, float velocity, int channel, bool soundfont = false, String source = String("Default"));
+    void keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false, String source = String("Default"));
+    void postRelease(int noteNumber, float velocity, int channel, String source);
     void clearKey(int noteNumber);
     void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }
     void sustainPedalReleased(bool post);

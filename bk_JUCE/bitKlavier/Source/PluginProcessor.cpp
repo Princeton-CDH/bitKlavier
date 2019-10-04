@@ -491,7 +491,7 @@ void BKAudioProcessor::renameGallery(String newName)
     deleteGalleryAtURL(oldURL);
 }
 
-void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)  
+void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, String source)
 {
     int p;
     
@@ -522,7 +522,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     // Send key on to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;) {
         //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
-        currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont));
+        currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont), source);
     }
     
     //add note to springTuning, if only for Graph display
@@ -540,7 +540,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel)
     
 }
 
-void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel)
+void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, String source)
 {
     int p, pm;
     
@@ -553,7 +553,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     
     // Send key off to each pmap in current piano
     for (p = currentPiano->activePMaps.size(); --p >= 0;)
-        currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont));
+        currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont), source);
     
 
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
@@ -561,7 +561,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     for (p = prevPianos.size(); --p >= 0;) {
         if (prevPianos[p] != currentPiano) {
             for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
-                prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel);
+                prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel, source);
             }
         }
     }
@@ -1356,6 +1356,24 @@ void BKAudioProcessor::initializeGallery(void)
 Array<MidiDeviceInfo> BKAudioProcessor::getMidiOutputDevices()
 {
     return MidiOutput::getAvailableDevices();
+}
+
+Array<MidiDeviceInfo> BKAudioProcessor::getMidiInputDevices()
+{
+    return MidiOutput::getAvailableDevices();
+}
+
+std::unique_ptr<MidiInput> BKAudioProcessor::openMidiInputDevice(const String &deviceIdentifier)
+{
+    return MidiInput::openDevice(deviceIdentifier, this);
+}
+
+void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage &message)
+{
+    if (message.isNoteOn())
+        handleNoteOn(message.getNoteNumber(), message.getFloatVelocity(), message.getChannel(), source->getName());
+    else if (message.isNoteOff())
+        handleNoteOff(message.getNoteNumber(), message.getFloatVelocity(), message.getChannel(), source->getName());
 }
 
 void BKAudioProcessor::reset(BKPreparationType type, int Id)

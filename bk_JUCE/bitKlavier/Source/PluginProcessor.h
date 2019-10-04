@@ -31,7 +31,8 @@
 /**
 */
 class BKAudioProcessor  : public AudioProcessor,
-                            public ChangeListener
+                            public ChangeListener,
+                            public MidiInputCallback
 {
     
 public:
@@ -153,6 +154,7 @@ public:
     // Change listener callback implementation
     void changeListenerCallback(ChangeBroadcaster *source) override;
     
+    void handleIncomingMidiMessage(MidiInput* source, const MidiMessage &message) override;
     
     //==============================================================================
     void loadSamples(BKSampleLoadType type, String path ="", int subsound=0);
@@ -169,8 +171,8 @@ public:
     void  performModifications(int noteNumber);
     void  performResets(int noteNumber);
     
-    void handleNoteOn(int noteNumber, float velocity, int channel);
-    void handleNoteOff(int noteNumber, float velocity, int channel);
+    void handleNoteOn(int noteNumber, float velocity, int channel, String source = String("Default"));
+    void handleNoteOff(int noteNumber, float velocity, int channel, String source = String("Default"));
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
@@ -325,6 +327,9 @@ public:
     void importPiano(int Id, int importId);
     
     Array<MidiDeviceInfo> getMidiOutputDevices();
+    Array<MidiDeviceInfo> getMidiInputDevices();
+    
+    std::unique_ptr<MidiInput> openMidiInputDevice(const String& deviceIdentifier);
     
 private:
     
@@ -356,6 +361,8 @@ private:
     AudioPlayHead* playHead;
     AudioPlayHead::CurrentPositionInfo currentPositionInfo;
     double hostTempo;
+    
+    Array<MidiDeviceInfo> midiInputDevices;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)
