@@ -365,7 +365,6 @@ private:
 	uint64 sampleTimer;
     int beatIndex, smoothIndex, feedbackIndex;
     float prevBeat;
-    float pulseRate;
     bool clearDelayOnNextBeat;
 
 	//JUCE_LEAK_DETECTOR(BlendronomerProcessor);

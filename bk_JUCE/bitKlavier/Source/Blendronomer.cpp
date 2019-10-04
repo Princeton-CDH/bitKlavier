@@ -147,7 +147,6 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
     
     keysDepressed = Array<int>();
     prevBeat = blendronomer->aPrep->getBeats()[0];
-    pulseRate = tempo->getTempo()->aPrep->getSubdivisions() * tempo->getTempo()->aPrep->getTempo();
 }
 
 BlendronomerProcessor::~BlendronomerProcessor()
@@ -384,7 +383,7 @@ void BlendronomerProcessor::updateDelayParameters()
     }
     else if (prep->getSmoothMode()  == ConstantTimeSmooth)
     {
-        if (pulseRate != tempoPrep->getSubdivisions() * tempoPrep->getTempo() && beatDelta == 0)
+        if (beatDelta == 0)
             smoothRate = INFINITY;//prep->getSmoothDurations()[smoothIndex] / pulseLength;
         else
             smoothRate = beatDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength);
@@ -395,12 +394,11 @@ void BlendronomerProcessor::updateDelayParameters()
     }
     else if (prep->getSmoothMode()  == ProportionalTimeSmooth)
     {
-        if (pulseRate != tempoPrep->getSubdivisions() * tempoPrep->getTempo() && beatDelta == 0)
+        if (beatDelta == 0)
             smoothRate = INFINITY;//prep->getSmoothDurations()[smoothIndex] / (pulseLength * prep->getBeats()[beatIndex]);
         else
             smoothRate = beatDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength * prep->getBeats()[beatIndex]);
     }
-    pulseRate = tempoPrep->getSubdivisions() * tempoPrep->getTempo();
     
     sampleTimer = 0;
     
