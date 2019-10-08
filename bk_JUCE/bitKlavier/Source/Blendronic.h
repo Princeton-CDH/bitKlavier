@@ -107,9 +107,261 @@ public:
     inline const void setOpenMode(BlendronicOpenMode mode) { bOpenMode = mode; }
     inline const void setCloseMode(BlendronicCloseMode mode) { bCloseMode = mode; }
 
-	void print(void);
-	ValueTree getState(void);
-	void setState(XmlElement* e);
+    // TODO
+	void print(void)
+    {
+        ;
+    }
+    
+    // TODO
+	ValueTree getState(void)
+    {
+//        ValueTree prep("params");
+//
+//        prep.setProperty( "gain", getGain(), 0);
+//        prep.setProperty( ptagSynchronic_numBeats,            getNumBeats(), 0);
+//        prep.setProperty( ptagSynchronic_clusterMin,          getClusterMin(), 0);
+//        prep.setProperty( ptagSynchronic_clusterMax,          getClusterMax(), 0);
+//        prep.setProperty( ptagSynchronic_clusterCap,          getClusterCap(), 0);
+//        prep.setProperty( ptagSynchronic_clusterThresh,       getClusterThreshMS(), 0);
+//        prep.setProperty( ptagSynchronic_mode,                getMode(), 0);
+//        prep.setProperty( ptagSynchronic_beatsToSkip,         getBeatsToSkip(), 0);
+//
+//        prep.setProperty( "numClusters", getNumClusters(), 0);
+//        prep.setProperty( "onOffMode", getOnOffMode(), 0);
+//
+//        prep.setProperty( "holdMin", getHoldMin(), 0);
+//        prep.setProperty( "holdMax", getHoldMax(), 0);
+//
+//        prep.setProperty( "velocityMin", getVelocityMin(), 0);
+//        prep.setProperty( "velocityMax", getVelocityMax(), 0);
+//
+//        ValueTree beatMults( vtagSynchronic_beatMults);
+//        int count = 0;
+//        for (auto f : getBeatMultipliers())
+//        {
+//            beatMults.      setProperty( ptagFloat + String(count++), f, 0);
+//        }
+//        prep.addChild(beatMults, -1, 0);
+//
+//
+//        ValueTree lenMults( vtagSynchronic_lengthMults);
+//        count = 0;
+//        for (auto f : getLengthMultipliers())
+//        {
+//            lenMults.       setProperty( ptagFloat + String(count++), f, 0);
+//        }
+//        prep.addChild(lenMults, -1, 0);
+//
+//
+//        ValueTree accentMults( vtagSynchronic_accentMults);
+//        count = 0;
+//        for (auto f : getAccentMultipliers())
+//        {
+//            accentMults.    setProperty( ptagFloat + String(count++), f, 0);
+//        }
+//        prep.addChild(accentMults, -1, 0);
+//
+//
+//        ValueTree transposition( vtagSynchronic_transpOffsets);
+//
+//        int tcount = 0;
+//        for (auto arr : getTransposition())
+//        {
+//            ValueTree t("t"+String(tcount++));
+//            count = 0;
+//            for (auto f : arr)  t.setProperty( ptagFloat + String(count++), f, 0);
+//            transposition.addChild(t,-1,0);
+//        }
+//        prep.addChild(transposition, -1, 0);
+//
+//        ValueTree ADSRs( vtagSynchronic_ADSRs);
+//
+//        tcount = 0;
+//        for (auto arr : getADSRs())
+//        {
+//            ValueTree e("e"+String(tcount++));
+//            count = 0;
+//            for (auto f : arr)  e.setProperty( ptagFloat + String(count++), f, 0);
+//            ADSRs.addChild(e,-1,0);
+//        }
+//        prep.addChild(ADSRs, -1, 0);
+//
+//        return prep;
+    }
+    
+    // TODO
+	void setState(XmlElement* e)
+    {
+//        String n; int i; float f; bool b;
+//
+//        n = e->getStringAttribute("gain");
+//        if (n != "") setGain(n.getFloatValue());
+//        else         setGain(1.0);
+//
+//        i = e->getStringAttribute(ptagSynchronic_numBeats).getIntValue();
+//        setNumBeats(i);
+//
+//        i = e->getStringAttribute(ptagSynchronic_clusterMin).getIntValue();
+//        setClusterMin(i);
+//
+//        i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
+//        setClusterMax(i);
+//
+//        //i = e->getStringAttribute(ptagSynchronic_clusterCap).getIntValue();
+//        n = e->getStringAttribute(ptagSynchronic_clusterCap);
+//        if (n != "")    setClusterCap(n.getIntValue());
+//        else            setClusterCap(8);
+//
+//        n = e->getStringAttribute("holdMin");
+//
+//        if (n != "")    setHoldMin(n.getIntValue());
+//        else            setHoldMin(0);
+//
+//        n = e->getStringAttribute("holdMax");
+//
+//        if (n != "")    setHoldMax(n.getIntValue());
+//        else            setHoldMax(12000);
+//
+//        n = e->getStringAttribute("velocityMin");
+//
+//        if (n != "")    setVelocityMin(n.getIntValue());
+//        else            setVelocityMin(0);
+//
+//        n = e->getStringAttribute("velocityMax");
+//
+//        if (n != "")    setVelocityMax(n.getIntValue());
+//        else            setVelocityMax(127);
+//
+//        f = e->getStringAttribute(ptagSynchronic_clusterThresh).getFloatValue();
+//        setClusterThresh(f);
+//
+//        i = e->getStringAttribute(ptagSynchronic_mode).getIntValue();
+//        setMode((SynchronicSyncMode) i);
+//
+//        i = e->getStringAttribute(ptagSynchronic_beatsToSkip).getIntValue();
+//        setBeatsToSkip(i);
+//
+//        n = e->getStringAttribute("numClusters");
+//
+//        if (n != String())     setNumClusters(n.getIntValue());
+//        else                        setNumClusters(1);
+//
+//        n = e->getStringAttribute("onOffMode");
+//
+//        if (n != String())     setOnOffMode((SynchronicOnOffMode) n.getIntValue());
+//        else                        setOnOffMode(KeyOn);
+//
+//        forEachXmlChildElement (*e, sub)
+//        {
+//            if (sub->hasTagName(vtagSynchronic_beatMults))
+//            {
+//                Array<float> beats;
+//                for (int k = 0; k < 128; k++)
+//                {
+//                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+//
+//                    if (attr == String()) break;
+//                    else
+//                    {
+//                        f = attr.getFloatValue();
+//                        beats.add(f);
+//                    }
+//                }
+//
+//                setBeatMultipliers(beats);
+//
+//            }
+//            else  if (sub->hasTagName(vtagSynchronic_accentMults))
+//            {
+//                Array<float> accents;
+//                for (int k = 0; k < 128; k++)
+//                {
+//                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+//
+//                    if (attr == String()) break;
+//                    else
+//                    {
+//                        f = attr.getFloatValue();
+//                        accents.add(f);
+//                    }
+//                }
+//
+//                setAccentMultipliers(accents);
+//
+//            }
+//            else  if (sub->hasTagName(vtagSynchronic_lengthMults))
+//            {
+//                Array<float> lens;
+//                for (int k = 0; k < 128; k++)
+//                {
+//                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+//
+//                    if (attr == String()) break;
+//                    else
+//                    {
+//                        f = attr.getFloatValue();
+//                        lens.add(f);
+//                    }
+//                }
+//
+//                setLengthMultipliers(lens);
+//
+//            }
+//            else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
+//            {
+//                Array<Array<float>> atransp;
+//                int tcount = 0;
+//                forEachXmlChildElement (*sub, asub)
+//                {
+//                    if (asub->hasTagName("t"+String(tcount++)))
+//                    {
+//                        Array<float> transp;
+//                        for (int k = 0; k < 128; k++)
+//                        {
+//                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+//
+//                            if (attr == String()) break;
+//                            else
+//                            {
+//                                f = attr.getFloatValue();
+//                                transp.add(f);
+//                            }
+//                        }
+//                        atransp.set(tcount-1, transp);
+//                    }
+//                }
+//
+//                setTransposition(atransp);
+//            }
+//            else  if (sub->hasTagName(vtagSynchronic_ADSRs))
+//            {
+//                Array<Array<float>> aADSRs;
+//                int tcount = 0;
+//                forEachXmlChildElement (*sub, asub)
+//                {
+//                    if (asub->hasTagName("e"+String(tcount++)))
+//                    {
+//                        Array<float> singleADSR;
+//                        for (int k = 0; k < 5; k++)
+//                        {
+//                            String attr = asub->getStringAttribute(ptagFloat + String(k));
+//
+//                            if (attr == String()) break;
+//                            else
+//                            {
+//                                f = attr.getFloatValue();
+//                                singleADSR.add(f);
+//                            }
+//                        }
+//                        aADSRs.set(tcount-1, singleADSR);
+//                    }
+//                }
+//
+//                setADSRs(aADSRs);
+//            }
+//        }
+    }
 
 private:
 	String name;

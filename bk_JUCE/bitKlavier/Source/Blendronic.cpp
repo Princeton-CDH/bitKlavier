@@ -104,22 +104,6 @@ bool BlendronicPreparation::compare(BlendronicPreparation::Ptr b)
 	return false;
 }
 
-//prints each variable
-void BlendronicPreparation::print(void)
-{
-}
-
-//will do these later
-ValueTree BlendronicPreparation::getState(void)
-{
-	return ValueTree();
-}
-
-void BlendronicPreparation::setState(XmlElement* e)
-{
-}
-
-
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////BLENDRONIC PROCESSOR/////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////

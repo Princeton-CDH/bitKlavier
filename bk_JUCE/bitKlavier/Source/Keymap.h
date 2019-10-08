@@ -178,6 +178,14 @@ public:
             keysave.setProperty(ptagKeymap_key + String(count++), key, 0);
         }
         
+        count = 0;
+        for (auto state : getTargetStates())
+        {
+            keysave.setProperty(ptagKeymap_targetStates + String(count++), state, 0);
+        }
+        
+        keysave.setProperty(ptagKeymap_inverted, isInverted(), 0);
+        
         return keysave;
     }
     
@@ -193,19 +201,32 @@ public:
         clear();
         for (int k = 0; k < 128; k++)
         {
-            String attr = e->getStringAttribute("k" + String(k));
+            String attr = e->getStringAttribute(ptagKeymap_key + String(k));
             
             if (attr != String())
             {
                 keymap.setUnchecked(attr.getIntValue(), true);
             }
         }
+        for (int i = 0; i < TargetTypeNil; ++i)
+        {
+            String attr = e->getStringAttribute(ptagKeymap_targetStates + String(i));
+            
+            if (attr != String())
+            {
+                targetStates.setUnchecked(i, (KeymapTargetState) attr.getIntValue());
+            }
+        }
+        
+        inverted = e->getStringAttribute(ptagKeymap_inverted).getIntValue();
+        
     }
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }
     
     inline KeymapTargetState getTargetState(KeymapTargetType type) const noexcept { return targetStates[type]; }
     inline Array<KeymapTargetState> getTargetStates(void) const noexcept { return targetStates; }
+    inline void setTargetStates(Array<KeymapTargetState> ts) { targetStates = ts; }
     
     inline bool isInverted(void) const noexcept { return inverted; }
     inline void setInverted(bool inv) { inverted = inv; }

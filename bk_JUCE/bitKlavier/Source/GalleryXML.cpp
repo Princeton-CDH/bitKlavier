@@ -119,6 +119,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
         {
             if (e->hasTagName( vtagKeymap))
             {
+                // TODO: why not use keymap setState()?
                 addKeymap();
                 
                 String n = e->getStringAttribute("name");
@@ -146,6 +147,24 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 }
                 
                 newKeymap->setKeymap(keys);
+                
+                Array<KeymapTargetState> targetStates;
+                targetStates.ensureStorageAllocated(TargetTypeNil);
+                for (int i = 0; i < TargetTypeNil; ++i)
+                {
+                    targetStates.add(TargetStateNil);
+                    String attr = e->getStringAttribute(ptagKeymap_targetStates + String(i));
+                    
+                    if (attr != String())
+                    {
+                        targetStates.setUnchecked(i, (KeymapTargetState) attr.getIntValue());
+                    }
+                }
+                
+                newKeymap->setTargetStates(targetStates);
+                
+                String i = e->getStringAttribute(ptagKeymap_inverted);
+                if (i != String()) newKeymap->setInverted(i.getIntValue());
             }
             else if (e->hasTagName ( vtagGeneral))
             {
@@ -269,6 +288,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
             {
                 addBlendronicWithId(0);
                 
+                // TODO: write setState for Blendronic
                 blendronic.getLast()->setState(e);
                 
                 int oldId = blendronic.getLast()->getId();
