@@ -19,7 +19,7 @@
 #include "Synchronic.h"
 #include "Tuning.h"
 #include "Tempo.h"
-#include "Blendronomer.h"
+#include "Blendronic.h"
 
 class Modification
 {
@@ -598,45 +598,45 @@ private:
 
 #endif  // MODIFICATION_H_INCLUDED
 
-class BlendronomerModification :
+class BlendronicModification :
 	public Modification,
-	public BlendronomerPreparation
+	public BlendronicPreparation
 {
 public:
-	typedef ReferenceCountedObjectPtr<BlendronomerModification>   Ptr;
-	typedef Array<BlendronomerModification::Ptr>                  PtrArr;
+	typedef ReferenceCountedObjectPtr<BlendronicModification>   Ptr;
+	typedef Array<BlendronicModification::Ptr>                  PtrArr;
 
-	BlendronomerModification(int Id) :
-		Modification(Id, BlendronomerParameterTypeNil),
-		BlendronomerPreparation()
+	BlendronicModification(int Id) :
+		Modification(Id, BlendronicParameterTypeNil),
+		BlendronicPreparation()
 	{
 	}
 
-	~BlendronomerModification(void)
+	~BlendronicModification(void)
 	{
 
 	}
 
-	inline BlendronomerModification::Ptr duplicate(void)
+	inline BlendronicModification::Ptr duplicate(void)
 	{
-		BlendronomerModification::Ptr mod = new BlendronomerModification(-1);
+		BlendronicModification::Ptr mod = new BlendronicModification(-1);
 
 		mod->copy(this);
 
 		return mod;
 	}
 
-	inline void copy(BlendronomerModification::Ptr mod)
+	inline void copy(BlendronicModification::Ptr mod)
 	{
 		setName(mod->getName() + "copy");
 
-		BlendronomerPreparation::copy(mod);
+		BlendronicPreparation::copy(mod);
 	}
 
 	//need to figure out how to get around ValueTrees
 	inline ValueTree getState(void)
 	{
-		ValueTree prep(vtagModBlendronomer);
+		ValueTree prep(vtagModBlendronic);
 
 		prep.setProperty("Id", Id, 0);
 		prep.setProperty("name", getName(), 0);
@@ -649,7 +649,7 @@ public:
 		}
 		prep.addChild(dirtyVT, -1, 0);
 
-		prep.addChild(BlendronomerPreparation::getState(), -1, 0);
+		prep.addChild(BlendronicPreparation::getState(), -1, 0);
 
 		return prep;
 	}
@@ -669,7 +669,7 @@ public:
 		if (dirtyXml != nullptr && paramsXml != nullptr)
 		{
 			dirty.clear();
-			for (int k = 0; k < BlendronomerParameterTypeNil; k++)
+			for (int k = 0; k < BlendronicParameterTypeNil; k++)
 			{
 				String attr = dirtyXml->getStringAttribute("d" + String(k));
 
@@ -680,7 +680,7 @@ public:
 				}
 			}
 
-			BlendronomerPreparation::setState(paramsXml);
+			BlendronicPreparation::setState(paramsXml);
 		}
 		else
 		{
@@ -692,5 +692,5 @@ public:
 
 private:
 
-	JUCE_LEAK_DETECTOR(BlendronomerModification)
+	JUCE_LEAK_DETECTOR(BlendronicModification)
 };

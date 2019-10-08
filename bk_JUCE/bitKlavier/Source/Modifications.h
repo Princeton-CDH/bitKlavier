@@ -48,9 +48,9 @@ public:
     void removeTuningModification(TuningModification::Ptr m);
     void removeTuningModification(int which);
 
-	void addBlendronomerModification(BlendronomerModification::Ptr b);
-	void removeBlendronomerModification(BlendronomerModification::Ptr b);
-	void removeBlendronomerModification(int which);
+	void addBlendronicModification(BlendronicModification::Ptr b);
+	void removeBlendronicModification(BlendronicModification::Ptr b);
+	void removeBlendronicModification(int which);
 
     SynchronicModification::PtrArr getSynchronicModifications(void);
     
@@ -62,7 +62,7 @@ public:
     
     TempoModification::PtrArr getTempoModifications(void);
 
-	BlendronomerModification::PtrArr getBlendronomerModifications(void);
+	BlendronicModification::PtrArr getBlendronicModifications(void);
 
     
     void clearModifications(void);
@@ -73,7 +73,7 @@ public:
     Array<int> synchronicReset;
     Array<int> tuningReset;
     Array<int> tempoReset;
-	Array<int> blendronomerReset;
+	Array<int> blendronicReset;
     
 private:
     DirectModification::PtrArr      directMods;
@@ -81,7 +81,7 @@ private:
     NostalgicModification::PtrArr   nostalgicMods;
     TuningModification::PtrArr      tuningMods;
     TempoModification::PtrArr       tempoMods;
-	BlendronomerModification::PtrArr	blendronomerMods;
+	BlendronicModification::PtrArr	blendronicMods;
     
     JUCE_LEAK_DETECTOR(Modifications)
 };

@@ -17,7 +17,7 @@
 #include "Tempo.h"
 #include "General.h"
 #include "Keymap.h"
-#include "Blendronomer.h"
+#include "Blendronic.h"
 
 class SynchronicPreparation : public ReferenceCountedObject
 {
@@ -1286,7 +1286,7 @@ public:
     SynchronicProcessor(Synchronic::Ptr synchronic,
                         TuningProcessor::Ptr tuning,
                         TempoProcessor::Ptr tempo,
-						BlendronomerProcessor::Ptr blender,
+						BlendronicProcessor::Ptr blender,
                         BKSynthesiser* main,
                         GeneralSettings::Ptr general);
     
@@ -1339,9 +1339,9 @@ public:
         tempo = newTempo;
     }
 
-	inline void setBlendronomer(BlendronomerProcessor::Ptr newBlend)
+	inline void setBlendronic(BlendronicProcessor::Ptr newBlend)
 	{
-		blendronomer = newBlend;
+		blendronic = newBlend;
 	}
     
     inline Synchronic::Ptr getSynchronic(void) const noexcept
@@ -1359,9 +1359,9 @@ public:
         return tempo;
     }
 
-	inline BlendronomerProcessor::Ptr getBlendronomer(void) const noexcept
+	inline BlendronicProcessor::Ptr getBlendronic(void) const noexcept
 	{
-		return blendronomer;
+		return blendronic;
 	}
     
     inline int getTuningId(void) const noexcept
@@ -1374,9 +1374,9 @@ public:
         return tempo->getId();
     }
 
-	inline int getBlendronomerId(void) const noexcept
+	inline int getBlendronicId(void) const noexcept
 	{
-		return blendronomer->getId();
+		return blendronic->getId();
 	}
 
     inline void prepareToPlay(float sr, BKSynthesiser* main)
@@ -1422,7 +1422,7 @@ private:
     Synchronic::Ptr synchronic;
     TuningProcessor::Ptr tuner;
     TempoProcessor::Ptr tempo;
-	BlendronomerProcessor::Ptr blendronomer;
+	BlendronicProcessor::Ptr blendronic;
     
     Keymap::PtrArr      keymaps;
     

@@ -1,19 +1,19 @@
 /*
   ==============================================================================
 
-	Blendronomer.cpp
+	Blendronic.cpp
 	Created: 11 Jun 2019 2:00:53pm
 	Author:  Theodore R Trevisan
 
   ==============================================================================
 */
 
-#include "Blendronomer.h"
+#include "Blendronic.h"
 
 #include "BKSynthesiser.h"
 
 //copy constructor
-BlendronomerPreparation::BlendronomerPreparation(BlendronomerPreparation::Ptr p) :
+BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
 	name(p->getName()),
 	bBeats(p->getBeats()),
 	bSmoothDurations(p->getSmoothDurations()),
@@ -37,9 +37,9 @@ BlendronomerPreparation::BlendronomerPreparation(BlendronomerPreparation::Ptr p)
 }
 
 //constructor with input
-BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
-	Array<float> feedbackCoefficients, float smoothValue, float smoothDuration, BlendronomerSmoothMode smoothMode,
-    BlendronomerSyncMode syncMode, BlendronomerClearMode clearMode, BlendronomerOpenMode openMode, BlendronomerCloseMode closeMode,
+BlendronicPreparation::BlendronicPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
+	Array<float> feedbackCoefficients, float smoothValue, float smoothDuration, BlendronicSmoothMode smoothMode,
+    BlendronicSyncMode syncMode, BlendronicClearMode clearMode, BlendronicOpenMode openMode, BlendronicCloseMode closeMode,
 	float delayMax, float delayLength, float feedbackCoefficient) :
 	name(newName),
 	bBeats(beats),
@@ -64,8 +64,8 @@ BlendronomerPreparation::BlendronomerPreparation(String newName, Array<float> be
 }
 
 //empty constructor
-BlendronomerPreparation::BlendronomerPreparation(void) :
-	name("blank blendronomer"),
+BlendronicPreparation::BlendronicPreparation(void) :
+	name("blank blendronic"),
 	bBeats(Array<float>({ 4. })),
 	bSmoothDurations(Array<float>({ 0.1 })),
 	bFeedbackCoefficients(Array<float>({ 0.95 })),
@@ -74,10 +74,10 @@ BlendronomerPreparation::BlendronomerPreparation(void) :
 	bSmoothValue(180. * 44.1),
 	bSmoothDuration(0),
     bSmoothMode(ConstantTimeSmooth),
-    bSyncMode(BlendronomerFirstNoteOnSync),
-    bClearMode(BlendronomerFirstNoteOnClear),
-    bOpenMode(BlendronomerFirstNoteOnOpen),
-    bCloseMode(BlendronomerFirstNoteOnClose),
+    bSyncMode(BlendronicFirstNoteOnSync),
+    bClearMode(BlendronicFirstNoteOnClear),
+    bOpenMode(BlendronicFirstNoteOnOpen),
+    bCloseMode(BlendronicFirstNoteOnClose),
 	bInputThresh(1),
 	bInputThreshSec(0.001),
 	holdMin(0),
@@ -88,45 +88,45 @@ BlendronomerPreparation::BlendronomerPreparation(void) :
 }
 
 //copy
-void BlendronomerPreparation::copy(BlendronomerPreparation::Ptr b)
+void BlendronicPreparation::copy(BlendronicPreparation::Ptr b)
 {
 }
 
 //maps modification to values
-void BlendronomerPreparation::performModification(BlendronomerPreparation::Ptr b, Array<bool> dirty)
+void BlendronicPreparation::performModification(BlendronicPreparation::Ptr b, Array<bool> dirty)
 {
 }
 
-//compares two blendronomers
-bool BlendronomerPreparation::compare(BlendronomerPreparation::Ptr b)
+//compares two blendronics
+bool BlendronicPreparation::compare(BlendronicPreparation::Ptr b)
 {
 	//will do later
 	return false;
 }
 
 //prints each variable
-void BlendronomerPreparation::print(void)
+void BlendronicPreparation::print(void)
 {
 }
 
 //will do these later
-ValueTree BlendronomerPreparation::getState(void)
+ValueTree BlendronicPreparation::getState(void)
 {
 	return ValueTree();
 }
 
-void BlendronomerPreparation::setState(XmlElement* e)
+void BlendronicPreparation::setState(XmlElement* e)
 {
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////BLENDRONOMER PROCESSOR/////////////////////////////////////
+/////////////////////////BLENDRONIC PROCESSOR/////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
+BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
 	TempoProcessor::Ptr bTempo, BlendronicDelay::Ptr delayL, GeneralSettings::Ptr bGeneral, BKSynthesiser* bMain):
-	blendronomer(bBlendronomer),
+	blendronic(bBlendronic),
 	tempo(bTempo),
 	delay(delayL),
 	synth(bMain),
@@ -146,17 +146,17 @@ BlendronomerProcessor::BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
     }
     
     keysDepressed = Array<int>();
-    prevBeat = blendronomer->aPrep->getBeats()[0];
+    prevBeat = blendronic->aPrep->getBeats()[0];
 }
 
-BlendronomerProcessor::~BlendronomerProcessor()
+BlendronicProcessor::~BlendronicProcessor()
 {
     synth->removeBlendronicDelay(delay);
 }
 
-void BlendronomerProcessor::tick(float* outputs)
+void BlendronicProcessor::tick(float* outputs)
 {
-    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
     sampleTimer++;
 
@@ -179,20 +179,20 @@ void BlendronomerProcessor::tick(float* outputs)
     delay->tick(outputs);
 }
 
-void BlendronomerProcessor::processBlock(int numSamples, int midiChannel)
+void BlendronicProcessor::processBlock(int numSamples, int midiChannel)
 {
     //DBG(String(delay->getSmoothValue()));
 }
 
-float BlendronomerProcessor::getTimeToBeatMS(float beatsToSkip)
+float BlendronicProcessor::getTimeToBeatMS(float beatsToSkip)
 {
 	uint64 timeToReturn = numSamplesBeat - sampleTimer;
 	return timeToReturn * 1000. / sampleRate; //will make more precise later
 }
 
-bool BlendronomerProcessor::velocityCheck(int noteNumber)
+bool BlendronicProcessor::velocityCheck(int noteNumber)
 {
-    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
     int velocity = (int)(velocities.getUnchecked(noteNumber) * 127.0);
     
@@ -218,9 +218,9 @@ bool BlendronomerProcessor::velocityCheck(int noteNumber)
     return false;
 }
 
-bool BlendronomerProcessor::holdCheck(int noteNumber)
+bool BlendronicProcessor::holdCheck(int noteNumber)
 {
-    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
     uint64 hold = holdTimers.getUnchecked(noteNumber) * (1000.0 / sampleRate);
     
@@ -243,9 +243,9 @@ bool BlendronomerProcessor::holdCheck(int noteNumber)
     return false;
 }
 
-void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
+void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
 {
-    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
@@ -261,8 +261,8 @@ void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiC
     
     if (doSync)
     {
-        if (prep->getSyncMode() == BlendronomerAnyNoteOnSync ||
-           (prep->getSyncMode() == BlendronomerFirstNoteOnSync && keysDepressed.size() == 1))
+        if (prep->getSyncMode() == BlendronicAnyNoteOnSync ||
+           (prep->getSyncMode() == BlendronicFirstNoteOnSync && keysDepressed.size() == 1))
         {
             setSampleTimer(0);
             setBeatIndex(0);
@@ -273,8 +273,8 @@ void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiC
     }
     if (doClear)
     {
-        if (prep->getClearMode() == BlendronomerAnyNoteOnClear ||
-           (prep->getClearMode() == BlendronomerFirstNoteOnClear && keysDepressed.size() == 1))
+        if (prep->getClearMode() == BlendronicAnyNoteOnClear ||
+           (prep->getClearMode() == BlendronicFirstNoteOnClear && keysDepressed.size() == 1))
         {
             delay->clear();
             //clearDelayOnNextBeat = true;
@@ -282,21 +282,21 @@ void BlendronomerProcessor::keyPressed(int noteNumber, float velocity, int midiC
     }
     if (doClose)
     {
-        if (prep->getCloseMode() == BlendronomerAnyNoteOnClose ||
-           (prep->getCloseMode() == BlendronomerFirstNoteOnClose && keysDepressed.size() == 1))
+        if (prep->getCloseMode() == BlendronicAnyNoteOnClose ||
+           (prep->getCloseMode() == BlendronicFirstNoteOnClose && keysDepressed.size() == 1))
             delay->setActive(false);
     }
     if (doOpen)
     {
-        if (prep->getOpenMode() == BlendronomerAnyNoteOnOpen ||
-           (prep->getOpenMode() == BlendronomerFirstNoteOnOpen && keysDepressed.size() == 1))
+        if (prep->getOpenMode() == BlendronicAnyNoteOnOpen ||
+           (prep->getOpenMode() == BlendronicFirstNoteOnOpen && keysDepressed.size() == 1))
             delay->setActive(true);
     }
 }
 
-void BlendronomerProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
+void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
 {
-    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
@@ -311,8 +311,8 @@ void BlendronomerProcessor::keyReleased(int noteNumber, float velocity, int midi
     
     if (doSync)
     {
-        if (prep->getSyncMode() == BlendronomerAnyNoteOffSync ||
-           (prep->getSyncMode() == BlendronomerLastNoteOffSync && keysDepressed.size() == 0))
+        if (prep->getSyncMode() == BlendronicAnyNoteOffSync ||
+           (prep->getSyncMode() == BlendronicLastNoteOffSync && keysDepressed.size() == 0))
         {
             setSampleTimer(0);
             setBeatIndex(0);
@@ -323,11 +323,11 @@ void BlendronomerProcessor::keyReleased(int noteNumber, float velocity, int midi
     }
     if (doClear)
     {
-        if (prep->getClearMode() == BlendronomerAnyNoteOffClear)
+        if (prep->getClearMode() == BlendronicAnyNoteOffClear)
         {
             delay->clear();
         }
-        else if (prep->getClearMode() == BlendronomerLastNoteOffClear && keysDepressed.size() == 0)
+        else if (prep->getClearMode() == BlendronicLastNoteOffClear && keysDepressed.size() == 0)
         {
             delay->duckAndClear();
             clearDelayOnNextBeat = true;
@@ -335,40 +335,40 @@ void BlendronomerProcessor::keyReleased(int noteNumber, float velocity, int midi
     }
     if (doClose)
     {
-        if (prep->getCloseMode() == BlendronomerAnyNoteOffClose ||
-           (prep->getCloseMode() == BlendronomerLastNoteOffClose && keysDepressed.size() == 0))
+        if (prep->getCloseMode() == BlendronicAnyNoteOffClose ||
+           (prep->getCloseMode() == BlendronicLastNoteOffClose && keysDepressed.size() == 0))
         delay->setActive(false);
     }
     if (doOpen)
     {
-        if (prep->getOpenMode() == BlendronomerAnyNoteOffOpen ||
-           (prep->getOpenMode() == BlendronomerLastNoteOffOpen && keysDepressed.size() == 0))
+        if (prep->getOpenMode() == BlendronicAnyNoteOffOpen ||
+           (prep->getOpenMode() == BlendronicLastNoteOffOpen && keysDepressed.size() == 0))
         delay->setActive(true);
     }
 }
 
-void BlendronomerProcessor::postRelease(int noteNumber, int midiChannel)
+void BlendronicProcessor::postRelease(int noteNumber, int midiChannel)
 {
 	//may not need anything except communicating with other preparations?
 }
 
-void BlendronomerProcessor::prepareToPlay(double sr)
+void BlendronicProcessor::prepareToPlay(double sr)
 {
 	sampleRate = sr;
     delay->setSampleRate(sr);
-    numSamplesBeat = blendronomer->aPrep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempo->getTempo()->aPrep->getSubdivisions()) / tempo->getTempo()->aPrep->getTempo());
-    blendronomer->aPrep->setDelayLength(numSamplesBeat);
+    numSamplesBeat = blendronic->aPrep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempo->getTempo()->aPrep->getSubdivisions()) / tempo->getTempo()->aPrep->getTempo());
+    blendronic->aPrep->setDelayLength(numSamplesBeat);
     delay->setDelayTargetLength(numSamplesBeat);
 }
 
-void BlendronomerProcessor::playNote(int channel, int note, float velocity)
+void BlendronicProcessor::playNote(int channel, int note, float velocity)
 {
 	//may not need anything except communicating with other preparations?
 }
 
-void BlendronomerProcessor::updateDelayParameters()
+void BlendronicProcessor::updateDelayParameters()
 {
-    BlendronomerPreparation::Ptr prep = blendronomer->aPrep;
+    BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
     float pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));

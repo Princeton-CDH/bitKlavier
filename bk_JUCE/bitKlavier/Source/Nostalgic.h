@@ -18,7 +18,7 @@
 #include "Synchronic.h"
 #include "Tuning.h"
 #include "Keymap.h"
-#include "Blendronomer.h"
+#include "Blendronic.h"
 
 class NostalgicPreparation : public ReferenceCountedObject
 {
@@ -812,7 +812,7 @@ public:
     NostalgicProcessor(Nostalgic::Ptr nostalgic,
                        TuningProcessor::Ptr tuning,
                        SynchronicProcessor::Ptr synchronic,
-                       BlendronomerProcessor::Ptr blender,
+                       BlendronicProcessor::Ptr blender,
                        BKSynthesiser *s);
     
     virtual ~NostalgicProcessor();
@@ -859,19 +859,19 @@ public:
         return synchronic->getId();
     }
 
-	inline void setBlendronomer(BlendronomerProcessor::Ptr blend)
+	inline void setBlendronic(BlendronicProcessor::Ptr blend)
 	{
-		blendronomer = blend;
+		blendronic = blend;
 	}
 
-	inline BlendronomerProcessor::Ptr getBlendronomer(void) const noexcept
+	inline BlendronicProcessor::Ptr getBlendronic(void) const noexcept
 	{
-		return blendronomer;
+		return blendronic;
 	}
 
-	inline int getBlendronomerId(void)
+	inline int getBlendronicId(void)
 	{
-		return blendronomer->getId();
+		return blendronic->getId();
 	}
     
     inline void setTuning(TuningProcessor::Ptr p)
@@ -927,7 +927,7 @@ private:
     Nostalgic::Ptr                  nostalgic;
     TuningProcessor::Ptr            tuner;
     SynchronicProcessor::Ptr        synchronic;
-	BlendronomerProcessor::Ptr		blendronomer;
+	BlendronicProcessor::Ptr		blendronic;
     
     Keymap::PtrArr              keymaps;
     

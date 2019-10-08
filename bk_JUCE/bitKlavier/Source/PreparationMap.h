@@ -21,7 +21,7 @@
 #include "Nostalgic.h"
 #include "Tempo.h"
 #include "Tuning.h"
-#include "Blendronomer.h"
+#include "Blendronic.h"
 
 class PreparationMap : public ReferenceCountedObject
 {
@@ -151,11 +151,11 @@ public:
     TempoProcessor::Ptr         getTempoProcessor       (int Id);
     bool                        contains                (TempoProcessor::Ptr);
 
-	void                        addBlendronomerProcessor(BlendronomerProcessor::Ptr);
-	void                        setBlendronomerProcessors(BlendronomerProcessor::PtrArr);
-	BlendronomerProcessor::PtrArr      getBlendronomerProcessors(void);
-	BlendronomerProcessor::Ptr         getBlendronomerProcessor(int Id);
-	bool                        contains(BlendronomerProcessor::Ptr);
+	void                        addBlendronicProcessor(BlendronicProcessor::Ptr);
+	void                        setBlendronicProcessors(BlendronicProcessor::PtrArr);
+	BlendronicProcessor::PtrArr      getBlendronicProcessors(void);
+	BlendronicProcessor::Ptr         getBlendronicProcessor(int Id);
+	bool                        contains(BlendronicProcessor::Ptr);
     
 
     void deactivateIfNecessary();
@@ -191,7 +191,7 @@ public:
 
 		ps.clear();
 		for (auto p : bprocessor) ps.add(p->getId());
-		DBG("Blendronomer: " + intArrayToString(ps));
+		DBG("Blendronic: " + intArrayToString(ps));
     }
     
     void merge(PreparationMap::Ptr thatMap);
@@ -206,7 +206,7 @@ private:
     DirectProcessor::PtrArr              dprocessor;
     SynchronicProcessor::PtrArr          sprocessor;
     NostalgicProcessor::PtrArr           nprocessor;
-    BlendronomerProcessor::PtrArr        bprocessor;
+    BlendronicProcessor::PtrArr        bprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
     

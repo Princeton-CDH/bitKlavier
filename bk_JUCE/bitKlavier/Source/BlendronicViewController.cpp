@@ -25,18 +25,18 @@ BKViewController(p, theGraph, 2)
     paramSliders = OwnedArray<BKMultiSlider>();
     
     int idx = 0;
-    for (int i = 0; i < cBlendronomerParameterTypes.size(); i++)
+    for (int i = 0; i < cBlendronicParameterTypes.size(); i++)
     {
-        if (cBlendronomerDataTypes[i] == BKFloatArr || cBlendronomerDataTypes[i] == BKArrFloatArr)
+        if (cBlendronicDataTypes[i] == BKFloatArr || cBlendronicDataTypes[i] == BKArrFloatArr)
         {
             paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
             addAndMakeVisible(paramSliders[idx], ALL);
-            paramSliders[idx]->setName(cBlendronomerParameterTypes[idx+BlendronomerBeats]);
+            paramSliders[idx]->setName(cBlendronicParameterTypes[idx+BlendronicBeats]);
             paramSliders[idx]->addMyListener(this);
 #if JUCE_IOS
             paramSliders[idx]->addWantsBigOneListener(this);
 #endif
-            paramSliders[idx]->setMinMaxDefaultInc(cBlendronomerDefaultRangeValuesAndInc[i]);
+            paramSliders[idx]->setMinMaxDefaultInc(cBlendronicDefaultRangeValuesAndInc[i]);
             
             if(paramSliders[idx]->getName() == "beats")
             {
@@ -199,7 +199,7 @@ void BlendronicViewController::displayTab(int tab)
     
     if (tab == 0)
     {
-        BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
     
         smoothModeSelectCB.setVisible(true);
         smoothModeLabel.setVisible(true);
@@ -237,7 +237,7 @@ void BlendronicViewController::displayTab(int tab)
     }
     else if (tab == 1)
     {
-        BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
         
         syncModeSelectCB.setVisible(true);
         syncModeLabel.setVisible(true);
@@ -331,7 +331,7 @@ BlendronicViewController(p, theGraph)
 
 void BlendronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    Blendronomer::Ptr blendronic = processor.gallery->getBlendronomer(processor.updateState->currentBlendronicId);
+    Blendronic::Ptr blendronic = processor.gallery->getBlendronic(processor.updateState->currentBlendronicId);
     
     blendronic->setName(name);
 }
@@ -342,7 +342,7 @@ void BlendronicPreparationEditor::update(void)
 
     setSubWindowInFront(false);
     
-    BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     if (prep != nullptr)
     {
@@ -353,17 +353,17 @@ void BlendronicPreparationEditor::update(void)
 
         for(int i = 0; i < paramSliders.size(); i++)
         {
-            if(!paramSliders[i]->getName().compare(cBlendronomerParameterTypes[BlendronomerBeats]))
+            if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicBeats]))
             {
                 paramSliders[i]->setTo(prep->getBeats(), dontSendNotification);
             }
 
-            if(!paramSliders[i]->getName().compare(cBlendronomerParameterTypes[BlendronomerSmoothDurations]))
+            if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothDurations]))
             {
                 paramSliders[i]->setTo(prep->getSmoothDurations(), dontSendNotification);
             }
 
-            if(!paramSliders[i]->getName().compare(cBlendronomerParameterTypes[BlendronomerFeedbackCoeffs]))
+            if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
             {
                 paramSliders[i]->setTo(prep->getFeedbackCoefficients(), dontSendNotification);
             }
@@ -382,16 +382,16 @@ void BlendronicPreparationEditor::bkMessageReceived (const String& message)
 
 int BlendronicPreparationEditor::addPreparation(void)
 {
-    processor.gallery->add(PreparationTypeBlendronomer);
+    processor.gallery->add(PreparationTypeBlendronic);
     
-    return processor.gallery->getAllBlendronomer().getLast()->getId();
+    return processor.gallery->getAllBlendronic().getLast()->getId();
 }
 
 int BlendronicPreparationEditor::duplicatePreparation(void)
 {
-    processor.gallery->duplicate(PreparationTypeBlendronomer, processor.updateState->currentBlendronicId);
+    processor.gallery->duplicate(PreparationTypeBlendronic, processor.updateState->currentBlendronicId);
     
-    return processor.gallery->getAllBlendronomer().getLast()->getId();
+    return processor.gallery->getAllBlendronic().getLast()->getId();
 }
 
 void BlendronicPreparationEditor::deleteCurrent(void)
@@ -401,7 +401,7 @@ void BlendronicPreparationEditor::deleteCurrent(void)
     
     if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
     
-    processor.gallery->remove(PreparationTypeBlendronomer, BlendronicId);
+    processor.gallery->remove(PreparationTypeBlendronic, BlendronicId);
     
     fillSelectCB(0, 0);
     
@@ -445,12 +445,12 @@ void BlendronicPreparationEditor::actionButtonCallback(int action, BlendronicPre
     }
     else if (action == 4)
     {
-        processor.reset(PreparationTypeBlendronomer, processor.updateState->currentBlendronicId);
+        processor.reset(PreparationTypeBlendronic, processor.updateState->currentBlendronicId);
         vc->update();
     }
     else if (action == 5)
     {
-        processor.clear(PreparationTypeBlendronomer, processor.updateState->currentBlendronicId);
+        processor.clear(PreparationTypeBlendronic, processor.updateState->currentBlendronicId);
         vc->update();
     }
     else if (action == 6)
@@ -458,7 +458,7 @@ void BlendronicPreparationEditor::actionButtonCallback(int action, BlendronicPre
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentBlendronicId;
-        Blendronomer::Ptr prep = processor.gallery->getBlendronomer(Id);
+        Blendronic::Ptr prep = processor.gallery->getBlendronic(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -482,7 +482,7 @@ void BlendronicPreparationEditor::actionButtonCallback(int action, BlendronicPre
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentBlendronicId;
-        Blendronomer::Ptr prep = processor.gallery->getBlendronomer(Id);
+        Blendronic::Ptr prep = processor.gallery->getBlendronic(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -497,13 +497,13 @@ void BlendronicPreparationEditor::actionButtonCallback(int action, BlendronicPre
         
         if (result == 1)
         {
-            processor.exportPreparation(PreparationTypeBlendronomer, Id, name);
+            processor.exportPreparation(PreparationTypeBlendronic, Id, name);
         }
     }
     else if (action >= 100)
     {
         int which = action - 100;
-        processor.importPreparation(PreparationTypeBlendronomer, processor.updateState->currentBlendronicId, which);
+        processor.importPreparation(PreparationTypeBlendronic, processor.updateState->currentBlendronicId, which);
         vc->update();
     }
 }
@@ -520,55 +520,55 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == "Smooth Mode")
     {
-        BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-        BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
         
-        prep    ->setSmoothMode( (BlendronomerSmoothMode) index);
-        active  ->setSmoothMode( (BlendronomerSmoothMode) index);
+        prep    ->setSmoothMode( (BlendronicSmoothMode) index);
+        active  ->setSmoothMode( (BlendronicSmoothMode) index);
         
         fillSmoothModeSelectCB();
         
     }
     else if (name == "Sync Mode")
     {
-        BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-        BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
         
-        prep    ->setSyncMode( (BlendronomerSyncMode) index);
-        active  ->setSyncMode( (BlendronomerSyncMode) index);
+        prep    ->setSyncMode( (BlendronicSyncMode) index);
+        active  ->setSyncMode( (BlendronicSyncMode) index);
         
         fillSyncModeSelectCB();
         
     }
     else if (name == "Clear Mode")
     {
-        BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-        BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
         
-        prep    ->setClearMode( (BlendronomerClearMode) index);
-        active  ->setClearMode( (BlendronomerClearMode) index);
+        prep    ->setClearMode( (BlendronicClearMode) index);
+        active  ->setClearMode( (BlendronicClearMode) index);
         
         fillClearModeSelectCB();
         
     }
     else if (name == "Open Mode")
     {
-        BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-        BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
         
-        prep    ->setOpenMode( (BlendronomerOpenMode) index);
-        active  ->setOpenMode( (BlendronomerOpenMode) index);
+        prep    ->setOpenMode( (BlendronicOpenMode) index);
+        active  ->setOpenMode( (BlendronicOpenMode) index);
         
         fillOpenModeSelectCB();
         
     }
     else if (name == "Close Mode")
     {
-        BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-        BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
         
-        prep    ->setCloseMode( (BlendronomerCloseMode) index);
-        active  ->setCloseMode( (BlendronomerCloseMode) index);
+        prep    ->setCloseMode( (BlendronicCloseMode) index);
+        active  ->setCloseMode( (BlendronicCloseMode) index);
         
         fillCloseModeSelectCB();
         
@@ -577,8 +577,8 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
 //    if(name == "note length multiplier")
 //    {
@@ -610,7 +610,7 @@ void BlendronicPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    for (auto prep : processor.gallery->getAllBlendronomer())
+    for (auto prep : processor.gallery->getAllBlendronic())
     {
         int Id = prep->getId();
         
@@ -622,7 +622,7 @@ void BlendronicPreparationEditor::fillSelectCB(int last, int current)
         else                        selectCB.addItem("Blendronic"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
-        if (processor.currentPiano->isActive(PreparationTypeBlendronomer, Id))
+        if (processor.currentPiano->isActive(PreparationTypeBlendronic, Id))
             selectCB.setItemEnabled(Id, false);
     }
     
@@ -641,27 +641,27 @@ void BlendronicPreparationEditor::fillSelectCB(int last, int current)
 
 void BlendronicPreparationEditor::fillSmoothModeSelectCB()
 {
-    BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     smoothModeSelectCB.clear(dontSendNotification);
     
-    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ConstantTimeSmooth], 1);
-    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ConstantRateSmooth], 2);
-    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ProportionalTimeSmooth], 3);
-    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ProportionalRateSmooth], 4);
+    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantTimeSmooth], 1);
+    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantRateSmooth], 2);
+    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalTimeSmooth], 3);
+    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalRateSmooth], 4);
     
     smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
 }
 
 void BlendronicPreparationEditor::fillSyncModeSelectCB()
 {
-    BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     syncModeSelectCB.clear(dontSendNotification);
     
-    for (int i = 0; i <= BlendronomerSyncModeNil; ++i)
+    for (int i = 0; i <= BlendronicSyncModeNil; ++i)
     {
-        syncModeSelectCB.addItem(cBlendronomerSyncModes[i], i+1);
+        syncModeSelectCB.addItem(cBlendronicSyncModes[i], i+1);
     }
     
     syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
@@ -669,13 +669,13 @@ void BlendronicPreparationEditor::fillSyncModeSelectCB()
 
 void BlendronicPreparationEditor::fillClearModeSelectCB()
 {
-    BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     clearModeSelectCB.clear(dontSendNotification);
     
-    for (int i = 0; i <= BlendronomerClearModeNil; ++i)
+    for (int i = 0; i <= BlendronicClearModeNil; ++i)
     {
-        clearModeSelectCB.addItem(cBlendronomerClearModes[i], i+1);
+        clearModeSelectCB.addItem(cBlendronicClearModes[i], i+1);
     }
     
     clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
@@ -683,13 +683,13 @@ void BlendronicPreparationEditor::fillClearModeSelectCB()
 
 void BlendronicPreparationEditor::fillOpenModeSelectCB()
 {
-    BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     openModeSelectCB.clear(dontSendNotification);
     
-    for (int i = 0; i <= BlendronomerOpenModeNil; ++i)
+    for (int i = 0; i <= BlendronicOpenModeNil; ++i)
     {
-        openModeSelectCB.addItem(cBlendronomerOpenModes[i], i+1);
+        openModeSelectCB.addItem(cBlendronicOpenModes[i], i+1);
     }
     
     openModeSelectCB.setSelectedItemIndex(prep->getOpenMode(), dontSendNotification);
@@ -697,13 +697,13 @@ void BlendronicPreparationEditor::fillOpenModeSelectCB()
 
 void BlendronicPreparationEditor::fillCloseModeSelectCB()
 {
-    BlendronomerPreparation::Ptr prep = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     closeModeSelectCB.clear(dontSendNotification);
     
-    for (int i = 0; i <= BlendronomerCloseModeNil; ++i)
+    for (int i = 0; i <= BlendronicCloseModeNil; ++i)
     {
-        closeModeSelectCB.addItem(cBlendronomerCloseModes[i], i+1);
+        closeModeSelectCB.addItem(cBlendronicCloseModes[i], i+1);
     }
     
     closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
@@ -711,9 +711,9 @@ void BlendronicPreparationEditor::fillCloseModeSelectCB()
 
 void BlendronicPreparationEditor::timerCallback()
 {
-    if (processor.updateState->currentDisplay == DisplayBlendronomer)
+    if (processor.updateState->currentDisplay == DisplayBlendronic)
     {
-        BlendronomerProcessor::Ptr bProcessor = processor.currentPiano->getBlendronomerProcessor(processor.updateState->currentBlendronicId);
+        BlendronicProcessor::Ptr bProcessor = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
         
         if (bProcessor != nullptr)
         {
@@ -741,7 +741,7 @@ void BlendronicPreparationEditor::timerCallback()
             
             
             
-            BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+            BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
 //            if(active->getMode() == NoteLengthSync)
 //            {
 //                holdTimeMinMaxSlider->setBright();
@@ -780,8 +780,8 @@ void BlendronicPreparationEditor::timerCallback()
 
 void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSlider, Array<float> values)
 {
-    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     if (name == "beats")
     {
@@ -802,8 +802,8 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
 
 void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
 {
-    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     Array<float> newvals = Array<float>();
     for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
@@ -827,8 +827,8 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
 
 void BlendronicPreparationEditor::buttonClicked (Button* b)
 {
-    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     if (b == &hideOrShow)
     {
@@ -838,7 +838,7 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getPrepOptionMenu(PreparationTypeBlendronomer).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getPrepOptionMenu(PreparationTypeBlendronic).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 //    else if (b == &keyOnResetToggle)
 //    {
@@ -866,8 +866,8 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
 
 void BlendronicPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     if (name == "hold time (ms)")
     {
@@ -911,7 +911,7 @@ void BlendronicModificationEditor::greyOutAllComponents()
 
 void BlendronicModificationEditor::highlightModedComponents()
 {
-    BlendronomerModification::Ptr mod = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+    BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
     
 //    if(mod->getDirty(BlendronicWaveDistance))      nDisplaySlider.setBright();
 //    if(mod->getDirty(BlendronicUndertow))          nDisplaySlider.setBright();
@@ -936,7 +936,7 @@ void BlendronicModificationEditor::update(void)
     if (processor.updateState->currentModBlendronicId < 0) return;
     
     
-    BlendronomerModification::Ptr mod = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+    BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
     
     if (mod != nullptr)
     {
@@ -951,7 +951,7 @@ void BlendronicModificationEditor::update(void)
 //
 //        nDisplaySlider.setUndertow(mod->getUndertow(), dontSendNotification);
 //
-//        BlendronomerSyncMode mode = (BlendronicSyncMode) mod->getMode();
+//        BlendronicSyncMode mode = (BlendronicSyncMode) mod->getMode();
 //        lengthModeSelectCB.setSelectedItemIndex(mode, dontSendNotification);
 //
 //        if (currentTab == 0)
@@ -1005,7 +1005,7 @@ void BlendronicModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    for (auto prep : processor.gallery->getBlendronomerModifications())
+    for (auto prep : processor.gallery->getBlendronicModifications())
     {
         int Id = prep->getId();;
         String name = prep->getName();
@@ -1014,7 +1014,7 @@ void BlendronicModificationEditor::fillSelectCB(int last, int current)
         else                        selectCB.addItem("BlendronicMod"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
-        if (processor.currentPiano->isActive(PreparationTypeBlendronomer, Id))
+        if (processor.currentPiano->isActive(PreparationTypeBlendronic, Id))
             selectCB.setItemEnabled(Id, false);
     }
     
@@ -1032,27 +1032,27 @@ void BlendronicModificationEditor::fillSelectCB(int last, int current)
 
 void BlendronicModificationEditor::fillSmoothModeSelectCB()
 {
-    BlendronomerModification::Ptr prep = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+    BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
     
     smoothModeSelectCB.clear(dontSendNotification);
     
-    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ConstantTimeSmooth], 1);
-    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ConstantRateSmooth], 2);
-    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ProportionalTimeSmooth], 3);
-    smoothModeSelectCB.addItem(cBlendronomerSmoothModes[ProportionalRateSmooth], 4);
+    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantTimeSmooth], 1);
+    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantRateSmooth], 2);
+    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalTimeSmooth], 3);
+    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalRateSmooth], 4);
     
     smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
 }
 
 void BlendronicModificationEditor::fillSyncModeSelectCB()
 {
-    BlendronomerModification::Ptr prep = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+    BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
     
     syncModeSelectCB.clear(dontSendNotification);
     
-    for (int i = 0; i <= BlendronomerSyncModeNil; ++i)
+    for (int i = 0; i <= BlendronicSyncModeNil; ++i)
     {
-        syncModeSelectCB.addItem(cBlendronomerSyncModes[i], i+1);
+        syncModeSelectCB.addItem(cBlendronicSyncModes[i], i+1);
     }
     
     syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
@@ -1060,13 +1060,13 @@ void BlendronicModificationEditor::fillSyncModeSelectCB()
 
 void BlendronicModificationEditor::fillClearModeSelectCB()
 {
-    BlendronomerModification::Ptr prep = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+    BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
     
     clearModeSelectCB.clear(dontSendNotification);
     
-    for (int i = 0; i <= BlendronomerClearModeNil; ++i)
+    for (int i = 0; i <= BlendronicClearModeNil; ++i)
     {
-        clearModeSelectCB.addItem(cBlendronomerClearModes[i], i+1);
+        clearModeSelectCB.addItem(cBlendronicClearModes[i], i+1);
     }
     
     clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
@@ -1076,7 +1076,7 @@ void BlendronicModificationEditor::fillClearModeSelectCB()
 
 void BlendronicModificationEditor::timerCallback()
 {
-    if (processor.updateState->currentDisplay == DisplayBlendronomerMod)
+    if (processor.updateState->currentDisplay == DisplayBlendronicMod)
     {
         /*
          BlendronicProcessor::Ptr bProcessor = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
@@ -1093,8 +1093,8 @@ void BlendronicModificationEditor::timerCallback()
 
 void BlendronicModificationEditor::multiSliderDidChange(String name, int whichSlider, Array<float> values)
 {
-//    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-//    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+//    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+//    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
 //
 //    if (name == "Beats")
 //    {
@@ -1115,8 +1115,8 @@ void BlendronicModificationEditor::multiSliderDidChange(String name, int whichSl
 
 void BlendronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
 {
-    //    BlendronomerPreparation::Ptr prep = processor.gallery->getStaticBlendronomerPreparation(processor.updateState->currentBlendronicId);
-    //    BlendronomerPreparation::Ptr active = processor.gallery->getActiveBlendronomerPreparation(processor.updateState->currentBlendronicId);
+    //    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+    //    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     //
     //    if (name == "Beats")
     //    {
@@ -1137,7 +1137,7 @@ void BlendronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
 
 void BlendronicModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    BlendronomerModification::Ptr mod = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+    BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
     
     mod->setName(name);
     
@@ -1154,16 +1154,16 @@ void BlendronicModificationEditor::bkMessageReceived (const String& message)
 
 int BlendronicModificationEditor::addPreparation(void)
 {
-    processor.gallery->add(PreparationTypeBlendronomerMod);
+    processor.gallery->add(PreparationTypeBlendronicMod);
     
-    return processor.gallery->getBlendronomerModifications().getLast()->getId();
+    return processor.gallery->getBlendronicModifications().getLast()->getId();
 }
 
 int BlendronicModificationEditor::duplicatePreparation(void)
 {
-    processor.gallery->duplicate(PreparationTypeBlendronomerMod, processor.updateState->currentModBlendronicId);
+    processor.gallery->duplicate(PreparationTypeBlendronicMod, processor.updateState->currentModBlendronicId);
     
-    return processor.gallery->getBlendronomerModifications().getLast()->getId();
+    return processor.gallery->getBlendronicModifications().getLast()->getId();
 }
 
 void BlendronicModificationEditor::deleteCurrent(void)
@@ -1173,7 +1173,7 @@ void BlendronicModificationEditor::deleteCurrent(void)
     
     if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
     
-    processor.gallery->remove(PreparationTypeBlendronomerMod, oldId);
+    processor.gallery->remove(PreparationTypeBlendronicMod, oldId);
     
     fillSelectCB(0, 0);
     
@@ -1217,7 +1217,7 @@ void BlendronicModificationEditor::actionButtonCallback(int action, BlendronicMo
     }
     else if (action == 5)
     {
-        processor.clear(PreparationTypeBlendronomerMod, processor.updateState->currentModBlendronicId);
+        processor.clear(PreparationTypeBlendronicMod, processor.updateState->currentModBlendronicId);
         vc->update();
         vc->updateModification();
     }
@@ -1226,7 +1226,7 @@ void BlendronicModificationEditor::actionButtonCallback(int action, BlendronicMo
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentModBlendronicId;
-        BlendronomerModification::Ptr prep = processor.gallery->getBlendronomerModification(Id);
+        BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -1250,7 +1250,7 @@ void BlendronicModificationEditor::actionButtonCallback(int action, BlendronicMo
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentModBlendronicId;
-        BlendronomerModification::Ptr prep = processor.gallery->getBlendronomerModification(Id);
+        BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -1265,13 +1265,13 @@ void BlendronicModificationEditor::actionButtonCallback(int action, BlendronicMo
         
         if (result == 1)
         {
-            processor.exportPreparation(PreparationTypeBlendronomerMod, Id, name);
+            processor.exportPreparation(PreparationTypeBlendronicMod, Id, name);
         }
     }
     else if (action >= 100)
     {
         int which = action - 100;
-        processor.importPreparation(PreparationTypeBlendronomerMod, processor.updateState->currentModBlendronicId, which);
+        processor.importPreparation(PreparationTypeBlendronicMod, processor.updateState->currentModBlendronicId, which);
         vc->update();
     }
 }
@@ -1288,9 +1288,9 @@ void BlendronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == "Smooth Mode")
     {
-        BlendronomerModification::Ptr mod = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+        BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
         
-//        BlendronomerSyncMode mode = (BlendronicSyncMode) index;
+//        BlendronicSyncMode mode = (BlendronicSyncMode) index;
 //
 //        mod->setMode(mode);
 //        mod->setDirty(BlendronicMode);
@@ -1319,7 +1319,7 @@ void BlendronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void BlendronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    BlendronomerModification::Ptr mod = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+    BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
     
 //    if(name == "note length multiplier")
 //    {
@@ -1371,7 +1371,7 @@ void BlendronicModificationEditor::updateModification(void)
 
 void BlendronicModificationEditor::buttonClicked (Button* b)
 {
-    BlendronomerModification::Ptr mod = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+    BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
     
     if (b == &hideOrShow)
     {
@@ -1379,7 +1379,7 @@ void BlendronicModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu(PreparationTypeBlendronomerMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        getModOptionMenu(PreparationTypeBlendronicMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 //    else if (b == &keyOnResetToggle)
 //    {
@@ -1411,7 +1411,7 @@ void BlendronicModificationEditor::buttonClicked (Button* b)
 
 void BlendronicModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    BlendronomerModification::Ptr mod = processor.gallery->getBlendronomerModification(processor.updateState->currentModBlendronicId);
+    BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
     
 //    if (name == "hold time (ms)")
 //    {

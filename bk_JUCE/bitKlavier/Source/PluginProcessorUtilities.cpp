@@ -204,13 +204,13 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     {
         return gallery->getSynchronicModification(Id)->getState();
     }
-    else if (type == PreparationTypeBlendronomer)
+    else if (type == PreparationTypeBlendronic)
     {
-        return gallery->getBlendronomer(Id)->getState(true);
+        return gallery->getBlendronic(Id)->getState(true);
     }
-    else if (type == PreparationTypeBlendronomerMod)
+    else if (type == PreparationTypeBlendronicMod)
     {
-        return gallery->getBlendronomerModification(Id)->getState();
+        return gallery->getBlendronicModification(Id)->getState();
     }
     else if (type == PreparationTypeTuning)
     {
@@ -530,15 +530,15 @@ void BKAudioProcessor::importPiano(int Id, int importId)
             newId = gallery->addCopy(PreparationTypeKeymap, sub);
             type = PreparationTypeKeymap;
         }
-        else if (tag == vtagBlendronomer)
+        else if (tag == vtagBlendronic)
         {
-            newId = gallery->addCopy(PreparationTypeBlendronomer, sub);
-            type = PreparationTypeBlendronomer;
+            newId = gallery->addCopy(PreparationTypeBlendronic, sub);
+            type = PreparationTypeBlendronic;
         }
-        else if (tag == vtagModBlendronomer)
+        else if (tag == vtagModBlendronic)
         {
-            newId = gallery->addCopy(PreparationTypeBlendronomerMod, sub);
-            type = PreparationTypeBlendronomerMod;
+            newId = gallery->addCopy(PreparationTypeBlendronicMod, sub);
+            type = PreparationTypeBlendronicMod;
         }
         else continue;
         

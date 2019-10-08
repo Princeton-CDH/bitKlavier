@@ -579,7 +579,7 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     }
     else if (result == BLENDRONIC_ID)
     {
-        vc->addItem(PreparationTypeBlendronomer, true);
+        vc->addItem(PreparationTypeBlendronic, true);
     }
     else if (result == TUNING_ID)
     {
@@ -622,7 +622,7 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     }
     else if (result == BLENDRONIC_EDIT_ID)
     {
-        processor.updateState->setCurrentDisplay(PreparationTypeBlendronomer);
+        processor.updateState->setCurrentDisplay(PreparationTypeBlendronic);
     }
     else if (result == TUNING_EDIT_ID)
     {
@@ -646,7 +646,7 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     }
     else if (result == BLENDRONICMOD_EDIT_ID)
     {
-        processor.updateState->setCurrentDisplay(PreparationTypeBlendronomerMod);
+        processor.updateState->setCurrentDisplay(PreparationTypeBlendronicMod);
     }
     else if (result == TUNINGMOD_EDIT_ID)
     {

@@ -341,7 +341,7 @@ void Keymap::removeTargetsOfType(BKPreparationType type)
         removeTarget(TargetTypeSynchronicSync);
         removeTarget(TargetTypeSynchronicCluster);
     }
-    else if (type == PreparationTypeBlendronomer)
+    else if (type == PreparationTypeBlendronic)
     {
         removeTarget(TargetTypeBlendronicSync);
         removeTarget(TargetTypeBlendronicClear);

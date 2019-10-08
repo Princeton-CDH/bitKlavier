@@ -12,7 +12,7 @@
 
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
                                  TuningProcessor::Ptr tuning,
-                                 BlendronomerProcessor::Ptr blender,
+                                 BlendronicProcessor::Ptr blender,
                                  BKSynthesiser *s,
                                  BKSynthesiser *res,
                                  BKSynthesiser *ham):
@@ -21,7 +21,7 @@ resonanceSynth(res),
 hammerSynth(ham),
 direct(direct),
 tuner(tuning),
-blendronomer(blender),
+blendronic(blender),
 keymaps(Keymap::PtrArr())
 {
     
@@ -48,9 +48,9 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         }
         
         //DBG("DirectProcessor::keyPressed noteNumber, synthNoteNumber, synthOffset " + String(noteNumber) + " " + String(synthNoteNumber) + " " + String(synthOffset));
-		if (blendronomer != nullptr)
+		if (blendronic != nullptr)
 		{
-            blendronomer->setClearDelayOnNextBeat(false);
+            blendronic->setClearDelayOnNextBeat(false);
 			synth->keyOn(channel,
 				noteNumber,
 				synthNoteNumber,
@@ -68,8 +68,8 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 				direct->aPrep->getSustain(),
 				direct->aPrep->getRelease(),
 				tuner,
-				blendronomer->getBlendronomer()->aPrep->getInputGain(),
-				blendronomer->getDelay());
+				blendronic->getBlendronic()->aPrep->getInputGain(),
+				blendronic->getDelay());
 		}
 		else
 		{

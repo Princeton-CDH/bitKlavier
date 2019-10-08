@@ -15,7 +15,7 @@
 #include "BKSynthesiser.h"
 #include "Keymap.h"
 #include "Tuning.h"
-#include "Blendronomer.h"
+#include "Blendronic.h"
 
 class DirectPreparation : public ReferenceCountedObject
 {
@@ -402,7 +402,7 @@ public:
     
     
     DirectProcessor(Direct::Ptr direct,
-                    TuningProcessor::Ptr tuning, BlendronomerProcessor::Ptr blender,
+                    TuningProcessor::Ptr tuning, BlendronicProcessor::Ptr blender,
                     BKSynthesiser *s, BKSynthesiser *res, BKSynthesiser *ham);
     
     ~DirectProcessor();
@@ -440,14 +440,14 @@ public:
         return tuner;
     }
 
-	inline void setBlendronomer(BlendronomerProcessor::Ptr blend)
+	inline void setBlendronic(BlendronicProcessor::Ptr blend)
 	{
-		blendronomer = blend;
+		blendronic = blend;
 	}
 
-	inline BlendronomerProcessor::Ptr getBlendronomer(void)
+	inline BlendronicProcessor::Ptr getBlendronic(void)
 	{
-		return blendronomer;
+		return blendronic;
 	}
     
     inline void addKeymap(Keymap::Ptr keymap)
@@ -467,7 +467,7 @@ private:
     
     Direct::Ptr             direct;
     TuningProcessor::Ptr    tuner;
-	BlendronomerProcessor::Ptr blendronomer;
+	BlendronicProcessor::Ptr blendronic;
     
     Keymap::PtrArr      keymaps;
     

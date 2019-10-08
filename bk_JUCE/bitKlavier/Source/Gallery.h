@@ -56,8 +56,8 @@ public:
         s += "\ntempo";
         for (auto item : tempo) s += (" " + String(item->getId()));
 
-		s += "\nblendronomer";
-		for (auto item : blendronomer) s += (" " + String(item->getId()));
+		s += "\nblendronic";
+		for (auto item : blendronic) s += (" " + String(item->getId()));
         
         s += "\nkeymap";
         for (auto item : bkKeymaps) s += (" " + String(item->getId()));
@@ -77,8 +77,8 @@ public:
         s += "\ntempomod";
         for (auto item : modTempo) s += (" " + String(item->getId()));
 
-		s += "\nblendronomermod";
-		for (auto item : modBlendronomer) s += (" " + String(item->getId()));
+		s += "\nblendronicmod";
+		for (auto item : modBlendronic) s += (" " + String(item->getId()));
         
         DBG("\n~ ~ ~ ~ ~ GALLERY ~ ~ ~ ~ ~ ~");
         DBG(s);
@@ -120,8 +120,8 @@ public:
         if (add) addKeymapWithId(-1);
 
 		add = true;
-		for (auto p : blendronomer) { if (p->getId() == -1) { add = false; break; } }
-		if (add) addBlendronomerWithId(-1);
+		for (auto p : blendronic) { if (p->getId() == -1) { add = false; break; } }
+		if (add) addBlendronicWithId(-1);
     }
     
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
@@ -149,13 +149,13 @@ public:
     inline const int getNumDirect(void) const noexcept {return direct.size();}
     inline const int getNumTempo(void) const noexcept {return tempo.size();}
     inline const int getNumTuning(void) const noexcept {return tuning.size();}
-	inline const int getNumBlendronomer(void) const noexcept { return blendronomer.size(); }
+	inline const int getNumBlendronic(void) const noexcept { return blendronic.size(); }
     inline const int getNumSynchronicMod(void) const noexcept {return modSynchronic.size();}
     inline const int getNumNostalgicMod(void) const noexcept {return modNostalgic.size();}
     inline const int getNumDirectMod(void) const noexcept {return modDirect.size();}
     inline const int getNumTempoMod(void) const noexcept {return modTempo.size();}
     inline const int getNumTuningMod(void) const noexcept {return modTuning.size();}
-	inline const int getNumBlendronomerMod(void) const noexcept { return modBlendronomer.size(); }
+	inline const int getNumBlendronicMod(void) const noexcept { return modBlendronic.size(); }
     
     
     
@@ -206,9 +206,9 @@ public:
         return tempo;
     }
 
-	inline const Blendronomer::PtrArr getAllBlendronomer(void) const noexcept
+	inline const Blendronic::PtrArr getAllBlendronic(void) const noexcept
 	{
-		return blendronomer;
+		return blendronic;
 	}
     
     inline TuningModification::Ptr matches(TuningModification::Ptr mod)
@@ -276,9 +276,9 @@ public:
         return nullptr;
     }
 
-	inline Blendronomer::Ptr matches(BlendronomerPreparation::Ptr prep)
+	inline Blendronic::Ptr matches(BlendronicPreparation::Ptr prep)
 	{
-		for (auto p : blendronomer)
+		for (auto p : blendronic)
 		{
 			if (p->sPrep->compare(prep)) return p;
 		}
@@ -357,11 +357,11 @@ public:
         return names;
     }
 
-	inline const StringArray getAllBlendronomerNames(void) const noexcept
+	inline const StringArray getAllBlendronicNames(void) const noexcept
 	{
 		StringArray names;
 
-		for (auto prep : blendronomer)
+		for (auto prep : blendronic)
 		{
 			names.add(prep->getName());
 		}
@@ -429,11 +429,11 @@ public:
         return names;
     }
 
-	inline const StringArray getAllBlendronomerModNames(void) const noexcept
+	inline const StringArray getAllBlendronicModNames(void) const noexcept
 	{
 		StringArray names;
 
-		for (auto mod : modBlendronomer)
+		for (auto mod : modBlendronic)
 		{
 			names.add(mod->getName());
 		}
@@ -540,20 +540,20 @@ public:
         return nullptr;
     }
 
-	inline const BlendronomerPreparation::Ptr getStaticBlendronomerPreparation(int Id) const noexcept
+	inline const BlendronicPreparation::Ptr getStaticBlendronicPreparation(int Id) const noexcept
 	{
 
-		for (auto p : blendronomer)
+		for (auto p : blendronic)
 		{
 			if (p->getId() == Id)   return p->sPrep;
 		}
 		return nullptr;
 	}
 
-	inline const BlendronomerPreparation::Ptr getActiveBlendronomerPreparation(int Id) const noexcept
+	inline const BlendronicPreparation::Ptr getActiveBlendronicPreparation(int Id) const noexcept
 	{
 
-		for (auto p : blendronomer)
+		for (auto p : blendronic)
 		{
 			if (p->getId() == Id)   return p->aPrep;
 		}
@@ -610,10 +610,10 @@ public:
         return nullptr;
     }
 
-	inline const Blendronomer::Ptr getBlendronomer(int Id) const noexcept
+	inline const Blendronic::Ptr getBlendronic(int Id) const noexcept
 	{
 
-		for (auto p : blendronomer)
+		for (auto p : blendronic)
 		{
 			if (p->getId() == Id)   return p;
 		}
@@ -670,12 +670,12 @@ public:
         return nullptr;
     }
 
-	inline const BlendronomerModification::Ptr getBlendronomerModification(int Id) const noexcept
+	inline const BlendronicModification::Ptr getBlendronicModification(int Id) const noexcept
 	{
 
-		for (auto p : modBlendronomer)
+		for (auto p : modBlendronic)
 		{
-			if (p->BlendronomerModification::getId() == Id)   return p;
+			if (p->BlendronicModification::getId() == Id)   return p;
 		}
 		return nullptr;
 	}
@@ -727,9 +727,9 @@ public:
         return modTempo;
     }
 
-	inline const BlendronomerModification::PtrArr getBlendronomerModifications(void) const noexcept
+	inline const BlendronicModification::PtrArr getBlendronicModifications(void) const noexcept
 	{
-		return modBlendronomer;
+		return modBlendronic;
 	}
     
     inline const GeneralSettings::Ptr getGeneralSettings(void) const noexcept
@@ -790,7 +790,7 @@ public:
     void addTempoWithId(int Id);
     void addDirectWithId(int Id);
     void addKeymapWithId(int Id);
-	void addBlendronomerWithId(int Id);
+	void addBlendronicWithId(int Id);
     
     inline void setURL(String newURL) { url = newURL; }
     
@@ -827,14 +827,14 @@ private:
     Direct::PtrArr                      direct;
     Tuning::PtrArr                      tuning;
     Tempo::PtrArr                       tempo;
-	Blendronomer::PtrArr				blendronomer;
+	Blendronic::PtrArr				blendronic;
     
     SynchronicModification::PtrArr      modSynchronic;
     DirectModification::PtrArr          modDirect;
     NostalgicModification::PtrArr       modNostalgic;
     TuningModification::PtrArr          modTuning;
     TempoModification::PtrArr           modTempo;
-	BlendronomerModification::PtrArr	modBlendronomer;
+	BlendronicModification::PtrArr	modBlendronic;
     
     Keymap::PtrArr                      bkKeymaps;
     Piano::PtrArr                       bkPianos;
@@ -859,9 +859,9 @@ private:
     void addTempo(Tempo::Ptr);
     void addTempo(TempoPreparation::Ptr);
     
-	void addBlendronomer(void);
-	void addBlendronomer(Blendronomer::Ptr);
-	void addBlendronomer(BlendronomerPreparation::Ptr);
+	void addBlendronic(void);
+	void addBlendronic(Blendronic::Ptr);
+	void addBlendronic(BlendronicPreparation::Ptr);
 
     void addDirect(void);
     void addDirect(Direct::Ptr);
@@ -882,35 +882,35 @@ private:
     void addSynchronicMod(void);
     void addTuningMod(void);
     void addTempoMod(void);
-	void addBlendronomerMod(void);
+	void addBlendronicMod(void);
     
     void addDirectModWithId(int Id);
     void addNostalgicModWithId(int Id);
     void addSynchronicModWithId(int Id);
     void addTuningModWithId(int Id);
     void addTempoModWithId(int Id);
-	void addBlendronomerModWithId(int Id);
+	void addBlendronicModWithId(int Id);
     
     void addTuningMod(TuningModification::Ptr);
     void addTempoMod(TempoModification::Ptr);
     void addDirectMod(DirectModification::Ptr);
     void addSynchronicMod(SynchronicModification::Ptr);
     void addNostalgicMod(NostalgicModification::Ptr);
-	void addBlendronomerMod(BlendronomerModification::Ptr);
+	void addBlendronicMod(BlendronicModification::Ptr);
     
     void removeDirect(int Id);
     void removeSynchronic(int Id);
     void removeNostalgic(int Id);
     void removeTuning(int Id);
     void removeTempo(int Id);
-	void removeBlendronomer(int Id);
+	void removeBlendronic(int Id);
     void removeKeymap(int Id);
     void removeDirectModification(int Id);
     void removeNostalgicModification(int Id);
     void removeSynchronicModification(int Id);
     void removeTuningModification(int Id);
     void removeTempoModification(int Id);
-	void removeBlendronomerModification(int Id);
+	void removeBlendronicModification(int Id);
     
     int transformId(BKPreparationType type, int oldId);
     

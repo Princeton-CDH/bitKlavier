@@ -19,7 +19,7 @@
 
 #include "Tuning.h"
 
-#include "Blendronomer.h"
+#include "Blendronic.h"
 
 #include "BKSTK.h"
 
@@ -650,7 +650,7 @@ public:
 
 	BlendronicDelay::Ptr createBlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active = false);
     void removeBlendronicDelay(BlendronicDelay::Ptr delay);
-    void addBlendronicProcessor(BlendronomerProcessor::Ptr bproc);
+    void addBlendronicProcessor(BlendronicProcessor::Ptr bproc);
     void removeBlendronicProcessor(int Id);
     
 	void renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples);
@@ -777,7 +777,7 @@ private:
     BigInteger sustainPedalsDown;
 
 	Array<BlendronicDelay::Ptr> delays;
-    Array<BlendronomerProcessor::Ptr> bprocessors;
+    Array<BlendronicProcessor::Ptr> bprocessors;
 
     
 #if JUCE_CATCH_DEPRECATED_CODE_MISUSE

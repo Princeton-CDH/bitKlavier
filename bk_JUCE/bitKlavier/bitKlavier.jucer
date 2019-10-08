@@ -258,9 +258,8 @@
           <FILE id="QU7LbV" name="Nostalgic.h" compile="0" resource="0" file="Source/Nostalgic.h"/>
           <FILE id="O8HjWt" name="Synchronic.cpp" compile="1" resource="0" file="Source/Synchronic.cpp"/>
           <FILE id="FXpKMX" name="Synchronic.h" compile="0" resource="0" file="Source/Synchronic.h"/>
-          <FILE id="yrfH9O" name="Blendronomer.cpp" compile="1" resource="0"
-                file="Source/Blendronomer.cpp"/>
-          <FILE id="FFCWE6" name="Blendronomer.h" compile="0" resource="0" file="Source/Blendronomer.h"/>
+          <FILE id="yrfH9O" name="Blendronic.cpp" compile="1" resource="0" file="Source/Blendronic.cpp"/>
+          <FILE id="FFCWE6" name="Blendronic.h" compile="0" resource="0" file="Source/Blendronic.h"/>
           <FILE id="ac8QzA" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
           <FILE id="OrPhKl" name="Tuning.h" compile="0" resource="0" file="Source/Tuning.h"/>
           <GROUP id="{27D6A86B-9A4E-E13A-49DF-00E35E3972B7}" name="SpringTuning">

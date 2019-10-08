@@ -107,8 +107,8 @@ void Gallery::resetPreparations(void)
     for (int i = tempo.size(); --i >= 0; )
         tempo[i]->aPrep->copy(tempo[i]->sPrep);
 
-	for (int i = blendronomer.size(); --i >= 0; )
-		blendronomer[i]->aPrep->copy(blendronomer[i]->sPrep);
+	for (int i = blendronic.size(); --i >= 0; )
+		blendronic[i]->aPrep->copy(blendronic[i]->sPrep);
 }
 
 void Gallery::randomize()
@@ -143,11 +143,11 @@ void Gallery::randomize()
 			TempoProcessor::Ptr mProc = new TempoProcessor(m);
 			p->addTempoProcessor(tempoId);
 
-			Blendronomer::Ptr b = new Blendronomer(-1, true);
-			addBlendronomer(b);
-			int blendronomerId = b->getId();
-			BlendronomerProcessor::Ptr bProc = new BlendronomerProcessor(b, mProc, nullptr, dummyGeneral, dummySynth);
-			p->addBlendronomerProcessor(blendronomerId);
+			Blendronic::Ptr b = new Blendronic(-1, true);
+			addBlendronic(b);
+			int blendronicId = b->getId();
+			BlendronicProcessor::Ptr bProc = new BlendronicProcessor(b, mProc, nullptr, dummyGeneral, dummySynth);
+			p->addBlendronicProcessor(blendronicId);
 
             Direct::Ptr d = new Direct(-1, true);
             addDirect(d);

@@ -1,15 +1,15 @@
 /*
   ==============================================================================
 
-	Blendronomer.h
+	Blendronic.h
 	Created: 11 Jun 2019 2:00:53pm
 	Author:  Theodore R Trevisan
 
   ==============================================================================
 */
 
-#ifndef BLENDRONOMER_H_INCLUDED
-#define BLENDRONOMER_H_INCLUDED
+#ifndef BLENDRONIC_H_INCLUDED
+#define BLENDRONIC_H_INCLUDED
 
 #include "BKUtilities.h"
 #include "Tuning.h"
@@ -18,35 +18,35 @@
 #include "Keymap.h"
 #include "BKSTK.h"
 
-// Forward declaration to allow include of Blendronomer in BKSynthesiser
+// Forward declaration to allow include of Blendronic in BKSynthesiser
 class BKSynthesiser;
 
 ////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////BLENDRONOMER PREPARATION///////////////////////////////////
+/////////////////////////BLENDRONIC PREPARATION///////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-class BlendronomerPreparation : public ReferenceCountedObject
+class BlendronicPreparation : public ReferenceCountedObject
 {
 
 public:
-	typedef ReferenceCountedObjectPtr<BlendronomerPreparation>   Ptr;
-	typedef Array<BlendronomerPreparation::Ptr>                  PtrArr;
-	typedef Array<BlendronomerPreparation::Ptr, CriticalSection> CSPtrArr;
-	typedef OwnedArray<BlendronomerPreparation>                  Arr;
-	typedef OwnedArray<BlendronomerPreparation, CriticalSection> CSArr;
+	typedef ReferenceCountedObjectPtr<BlendronicPreparation>   Ptr;
+	typedef Array<BlendronicPreparation::Ptr>                  PtrArr;
+	typedef Array<BlendronicPreparation::Ptr, CriticalSection> CSPtrArr;
+	typedef OwnedArray<BlendronicPreparation>                  Arr;
+	typedef OwnedArray<BlendronicPreparation, CriticalSection> CSArr;
 
 	//constructors
-	BlendronomerPreparation(BlendronomerPreparation::Ptr p);
-	BlendronomerPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
-		Array<float> feedbackCoefficients, float smoothValue, float smoothDuration, BlendronomerSmoothMode smoothMode,
-        BlendronomerSyncMode syncMode, BlendronomerClearMode clearMode, BlendronomerOpenMode openMode, BlendronomerCloseMode closeMode, 
+	BlendronicPreparation(BlendronicPreparation::Ptr p);
+	BlendronicPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
+		Array<float> feedbackCoefficients, float smoothValue, float smoothDuration, BlendronicSmoothMode smoothMode,
+        BlendronicSyncMode syncMode, BlendronicClearMode clearMode, BlendronicOpenMode openMode, BlendronicCloseMode closeMode, 
         float delayMax, float delayLength, float feedbackCoefficient);
-	BlendronomerPreparation(void);
+	BlendronicPreparation(void);
 
 	// copy, modify, compare, randomize
-	void copy(BlendronomerPreparation::Ptr b);
-	void performModification(BlendronomerPreparation::Ptr b, Array<bool> dirty);
-	bool compare(BlendronomerPreparation::Ptr b);
+	void copy(BlendronicPreparation::Ptr b);
+	void performModification(BlendronicPreparation::Ptr b, Array<bool> dirty);
+	bool compare(BlendronicPreparation::Ptr b);
     
     inline void randomize()
     {
@@ -62,7 +62,7 @@ public:
 	inline const float getDelayLength() const noexcept { return bDelayLength; }
 	inline const float getSmoothValue() const noexcept { return bSmoothValue; }
 	inline const float getSmoothDuration() const noexcept { return bSmoothDuration; }
-    inline const BlendronomerSmoothMode getSmoothMode() const noexcept { return bSmoothMode; }
+    inline const BlendronicSmoothMode getSmoothMode() const noexcept { return bSmoothMode; }
 	inline const float getInputThreshSEC() const noexcept { return bInputThreshSec; }
 	inline const float getInputThreshMS() const noexcept { return bInputThresh; }
 	inline const int getHoldMin() const noexcept { return holdMin; }
@@ -71,10 +71,10 @@ public:
 	inline const int getVelocityMax() const noexcept { return velocityMax; }
 	inline const bool getActive() const noexcept { return isActive; }
 	inline const bool getInputGain() const noexcept { return inputGain; }
-    inline const BlendronomerSyncMode getSyncMode() const noexcept { return bSyncMode; }
-    inline const BlendronomerClearMode getClearMode() const noexcept { return bClearMode; }
-    inline const BlendronomerOpenMode getOpenMode() const noexcept { return bOpenMode; }
-    inline const BlendronomerCloseMode getCloseMode() const noexcept { return bCloseMode; }
+    inline const BlendronicSyncMode getSyncMode() const noexcept { return bSyncMode; }
+    inline const BlendronicClearMode getClearMode() const noexcept { return bClearMode; }
+    inline const BlendronicOpenMode getOpenMode() const noexcept { return bOpenMode; }
+    inline const BlendronicCloseMode getCloseMode() const noexcept { return bCloseMode; }
 
 	//mutators
 	inline void setName(String n) { name = n; }
@@ -89,7 +89,7 @@ public:
     inline void setSmoothDuration(float smoothDuration) { bSmoothDuration = smoothDuration; }
     inline void setFeedbackCoefficient(int whichSlider, float value) { bFeedbackCoefficients.set(whichSlider, value); }
 	inline void setSmoothValue(float smoothValue) { bSmoothValue = smoothValue; }
-    inline const void setSmoothMode(BlendronomerSmoothMode mode) { bSmoothMode = mode; }
+    inline const void setSmoothMode(BlendronicSmoothMode mode) { bSmoothMode = mode; }
 	inline void setInputThresh(float newThresh)
 	{
 		bInputThresh = newThresh;
@@ -102,10 +102,10 @@ public:
 	inline const void setActive(bool newActive) { isActive = newActive; }
 	inline const void toggleActive() { isActive = !isActive; }
 	inline const void setInputGain(float gain) { inputGain = gain; }
-    inline const void setSyncMode(BlendronomerSyncMode mode) { bSyncMode = mode; }
-    inline const void setClearMode(BlendronomerClearMode mode) { bClearMode = mode; }
-    inline const void setOpenMode(BlendronomerOpenMode mode) { bOpenMode = mode; }
-    inline const void setCloseMode(BlendronomerCloseMode mode) { bCloseMode = mode; }
+    inline const void setSyncMode(BlendronicSyncMode mode) { bSyncMode = mode; }
+    inline const void setClearMode(BlendronicClearMode mode) { bClearMode = mode; }
+    inline const void setOpenMode(BlendronicOpenMode mode) { bOpenMode = mode; }
+    inline const void setCloseMode(BlendronicCloseMode mode) { bCloseMode = mode; }
 
 	void print(void);
 	ValueTree getState(void);
@@ -127,7 +127,7 @@ private:
 	//dsmooth stuff
 	float bSmoothValue;
 	float bSmoothDuration;
-    BlendronomerSmoothMode bSmoothMode;
+    BlendronicSmoothMode bSmoothMode;
 
 	//signal chain stk classes
 	float bFeedbackCoefficient;
@@ -137,52 +137,52 @@ private:
 	float bInputThreshSec;
 	int holdMin, holdMax, velocityMin, velocityMax;
     
-    BlendronomerSyncMode bSyncMode;
-    BlendronomerClearMode bClearMode;
-    BlendronomerOpenMode bOpenMode;
-    BlendronomerCloseMode bCloseMode;
+    BlendronicSyncMode bSyncMode;
+    BlendronicClearMode bClearMode;
+    BlendronicOpenMode bOpenMode;
+    BlendronicCloseMode bCloseMode;
 
 	//needed for sampling
 	float inputGain;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////BLENDRONOMER///////////////////////////////////////////////
+/////////////////////////BLENDRONIC///////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-class Blendronomer : public ReferenceCountedObject
+class Blendronic : public ReferenceCountedObject
 {
 
 public:
-	typedef ReferenceCountedObjectPtr<Blendronomer>   Ptr;
-	typedef Array<Blendronomer::Ptr>                  PtrArr;
-	typedef Array<Blendronomer::Ptr, CriticalSection> CSPtrArr;
-	typedef OwnedArray<Blendronomer>                  Arr;
-	typedef OwnedArray<Blendronomer, CriticalSection> CSArr;
+	typedef ReferenceCountedObjectPtr<Blendronic>   Ptr;
+	typedef Array<Blendronic::Ptr>                  PtrArr;
+	typedef Array<Blendronic::Ptr, CriticalSection> CSPtrArr;
+	typedef OwnedArray<Blendronic>                  Arr;
+	typedef OwnedArray<Blendronic, CriticalSection> CSArr;
 
-	Blendronomer(BlendronomerPreparation::Ptr prep, int Id) :
-		sPrep(new BlendronomerPreparation(prep)),
-		aPrep(new BlendronomerPreparation(sPrep)),
+	Blendronic(BlendronicPreparation::Ptr prep, int Id) :
+		sPrep(new BlendronicPreparation(prep)),
+		aPrep(new BlendronicPreparation(sPrep)),
 		Id(Id),
 		name(String(Id))
 	{
 
 	}
 
-	Blendronomer(int Id, bool random = false) :
+	Blendronic(int Id, bool random = false) :
 		Id(Id),
 		name(String(Id))
 	{
-		sPrep = new BlendronomerPreparation();
-		aPrep = new BlendronomerPreparation(sPrep);
+		sPrep = new BlendronicPreparation();
+		aPrep = new BlendronicPreparation(sPrep);
 		if (random) randomize();
 	}
 
-	inline Blendronomer::Ptr duplicate()
+	inline Blendronic::Ptr duplicate()
 	{
-		BlendronomerPreparation::Ptr copyPrep = new BlendronomerPreparation(sPrep);
+		BlendronicPreparation::Ptr copyPrep = new BlendronicPreparation(sPrep);
 
-		Blendronomer::Ptr copy = new Blendronomer(copyPrep, -1);
+		Blendronic::Ptr copy = new Blendronic(copyPrep, -1);
 
 		copy->setName(name);
 
@@ -191,11 +191,11 @@ public:
 
 	inline void clear(void)
 	{
-		sPrep = new BlendronomerPreparation();
-		aPrep = new BlendronomerPreparation(sPrep);
+		sPrep = new BlendronicPreparation();
+		aPrep = new BlendronicPreparation(sPrep);
 	}
 
-	inline void copy(Blendronomer::Ptr from)
+	inline void copy(Blendronic::Ptr from)
 	{
 		sPrep->copy(from->sPrep);
 		aPrep->copy(sPrep);
@@ -212,7 +212,7 @@ public:
 	
 	inline ValueTree getState(bool active = false)
 	{
-		ValueTree prep(vtagBlendronomer);
+		ValueTree prep(vtagBlendronic);
 
 		prep.setProperty("Id", Id, 0);
 		prep.setProperty("name", name, 0);
@@ -246,44 +246,44 @@ public:
 		aPrep->copy(aPrep);
 	}
 
-	~Blendronomer() {};
+	~Blendronic() {};
 
 	inline int getId() { return Id; }
 	inline void setId(int newId) { Id = newId; }
 	inline void setName(String newName) { name = newName; }
 	inline String getName() const noexcept { return name; }
 
-	BlendronomerPreparation::Ptr sPrep;
-	BlendronomerPreparation::Ptr aPrep;
+	BlendronicPreparation::Ptr sPrep;
+	BlendronicPreparation::Ptr aPrep;
     
 private:
 	int Id;
 	String name;
 
-	//JUCE_LEAK_DETECTOR(Blendronomer)
+	//JUCE_LEAK_DETECTOR(Blendronic)
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////BLENDRONOMER PROCESSOR/////////////////////////////////////
+/////////////////////////BLENDRONIC PROCESSOR/////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-class BlendronomerProcessor : public ReferenceCountedObject
+class BlendronicProcessor : public ReferenceCountedObject
 {
 
 public:
-	typedef ReferenceCountedObjectPtr<BlendronomerProcessor>   Ptr;
-	typedef Array<BlendronomerProcessor::Ptr>                  PtrArr;
-	typedef Array<BlendronomerProcessor::Ptr, CriticalSection> CSPtrArr;
-	typedef OwnedArray<BlendronomerProcessor>                  Arr;
-	typedef OwnedArray<BlendronomerProcessor, CriticalSection> CSArr;
+	typedef ReferenceCountedObjectPtr<BlendronicProcessor>   Ptr;
+	typedef Array<BlendronicProcessor::Ptr>                  PtrArr;
+	typedef Array<BlendronicProcessor::Ptr, CriticalSection> CSPtrArr;
+	typedef OwnedArray<BlendronicProcessor>                  Arr;
+	typedef OwnedArray<BlendronicProcessor, CriticalSection> CSArr;
 
-	BlendronomerProcessor(Blendronomer::Ptr bBlendronomer,
+	BlendronicProcessor(Blendronic::Ptr bBlendronic,
 		TempoProcessor::Ptr bTempo,
 		BlendronicDelay::Ptr delayL,
 		GeneralSettings::Ptr bGeneral,
 		BKSynthesiser* bMain
 		);
-	~BlendronomerProcessor();
+	~BlendronicProcessor();
 
 	//called with every audio vector
 	BKSampleLoadType sampleType;
@@ -304,10 +304,10 @@ public:
 	void prepareToPlay(double sr);
 
 	//accessors
-	inline Blendronomer::Ptr getBlendronomer(void) const noexcept { return blendronomer; }
+	inline Blendronic::Ptr getBlendronic(void) const noexcept { return blendronic; }
 	inline TempoProcessor::Ptr getTempo(void) const noexcept { return tempo; }
 	inline BlendronicDelay::Ptr getDelay(void) const noexcept { return delay; }
-	inline int getId(void) const noexcept { return blendronomer->getId(); }
+	inline int getId(void) const noexcept { return blendronic->getId(); }
     inline int getTempoId(void) const noexcept { return tempo->getId(); }
 	inline const float getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
     inline uint64 getSampleTime(void) const noexcept { return sampleTimer; }
@@ -319,7 +319,7 @@ public:
 
 
 	//mutators
-	inline void setBlendronomer(Blendronomer::Ptr blend) { blendronomer = blend; }
+	inline void setBlendronic(Blendronic::Ptr blend) { blendronic = blend; }
 	inline void setTempo(TempoProcessor::Ptr temp) { tempo = temp; }
     inline void setSampleTimer(uint64 sampleTime) { sampleTimer = sampleTime; }
     inline void setBeatIndex(int index) { beatIndex = index; }
@@ -327,7 +327,7 @@ public:
     inline void setFeedbackIndex(int index) { feedbackIndex = index; }
 	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
     inline void setClearDelayOnNextBeat(bool clear) { clearDelayOnNextBeat = clear; }
-	inline void reset(void) { blendronomer->aPrep->copy(blendronomer->sPrep); }
+	inline void reset(void) { blendronic->aPrep->copy(blendronic->sPrep); }
     
     void tick(float* outputs);
     void updateDelayParameters();
@@ -347,7 +347,7 @@ private:
 	BKSynthesiser* synth;
 	GeneralSettings::Ptr general;
 
-	Blendronomer::Ptr blendronomer;
+	Blendronic::Ptr blendronic;
 	TempoProcessor::Ptr tempo;
 
 	BlendronicDelay::Ptr delay;
@@ -367,6 +367,6 @@ private:
     float prevBeat;
     bool clearDelayOnNextBeat;
 
-	//JUCE_LEAK_DETECTOR(BlendronomerProcessor);
+	//JUCE_LEAK_DETECTOR(BlendronicProcessor);
 };
 #endif

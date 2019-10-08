@@ -193,7 +193,7 @@ void BKSynthesiser::removeBlendronicDelay(BlendronicDelay::Ptr delay)
     }
 }
 
-void BKSynthesiser::addBlendronicProcessor(BlendronomerProcessor::Ptr bproc)
+void BKSynthesiser::addBlendronicProcessor(BlendronicProcessor::Ptr bproc)
 {
     bprocessors.add(bproc);
 }

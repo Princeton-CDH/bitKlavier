@@ -117,7 +117,7 @@ public:
     NostalgicProcessor::PtrArr           nprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
-	BlendronomerProcessor::PtrArr		 bprocessor;
+	BlendronicProcessor::PtrArr		 bprocessor;
     
     void addProcessor(BKPreparationType thisType, int thisId);
     bool containsProcessor(BKPreparationType thisType, int thisId);
@@ -127,14 +127,14 @@ public:
     SynchronicProcessor::Ptr    getSynchronicProcessor(int Id, bool add = true);
     TuningProcessor::Ptr        getTuningProcessor(int Id, bool add = true);
     TempoProcessor::Ptr         getTempoProcessor(int Id, bool add = true);
-	BlendronomerProcessor::Ptr	getBlendronomerProcessor(int Id, bool add = true);
+	BlendronicProcessor::Ptr	getBlendronicProcessor(int Id, bool add = true);
     
     inline DirectProcessor::PtrArr        getDirectProcessors(void) const noexcept { return dprocessor; }
     inline NostalgicProcessor::PtrArr     getNostalgicProcessors(void) const noexcept { return nprocessor; }
     inline SynchronicProcessor::PtrArr    getSynchronicProcessors(void) const noexcept { return sprocessor; }
     inline TuningProcessor::PtrArr        getTuningProcessors(void) const noexcept { return tprocessor; }
     inline TempoProcessor::PtrArr         getTempoProcessors(void) const noexcept { return mprocessor; }
-	inline BlendronomerProcessor::PtrArr  getBlendronomerProcessors(void) const noexcept { return bprocessor; }
+	inline BlendronicProcessor::PtrArr  getBlendronicProcessors(void) const noexcept { return bprocessor; }
     inline PreparationMap::CSPtrArr       getPreparationMaps(void) const noexcept { return prepMaps; }
     
     NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
@@ -142,7 +142,7 @@ public:
     DirectProcessor::Ptr        addDirectProcessor(int thisId);
     TuningProcessor::Ptr        addTuningProcessor(int thisId);
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
-	BlendronomerProcessor::Ptr  addBlendronomerProcessor(int thisId);
+	BlendronicProcessor::Ptr  addBlendronicProcessor(int thisId);
     
     void clearOldNotes(Piano::Ptr prevPiano)
     {
@@ -261,7 +261,7 @@ public:
     
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
 
-	void linkPreparationWithBlendronomer(BKPreparationType thisType, int thisId, Blendronomer::Ptr thisBlend);
+	void linkPreparationWithBlendronic(BKPreparationType thisType, int thisId, Blendronic::Ptr thisBlend);
     
     ValueTree getState(void);
     
@@ -282,7 +282,7 @@ public:
 				else if (type == PreparationTypeSynchronic) ptype = "s";
 				else if (type == PreparationTypeTuning) ptype = "t";
 				else if (type == PreparationTypeTempo) ptype = "m";
-				else if (type == PreparationTypeBlendronomer) ptype = "b";
+				else if (type == PreparationTypeBlendronic) ptype = "b";
                 
                 out += String(i) + ":" + ptype + String(item->getId()) + ":" + "{" + item->connectionsToString() +"} ";
                 
@@ -345,7 +345,7 @@ private:
     TuningProcessor::Ptr defaultT;
     TempoProcessor::Ptr defaultM;
     SynchronicProcessor::Ptr defaultS;
-	BlendronomerProcessor::Ptr defaultB;
+	BlendronicProcessor::Ptr defaultB;
 	BlendronicDelay::Ptr defaultD;
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
@@ -403,7 +403,7 @@ private:
         return which;
     }
 
-	inline Array<int> getAllIds(Blendronomer::PtrArr direct)
+	inline Array<int> getAllIds(Blendronic::PtrArr direct)
 	{
 		Array<int> which;
 		for (auto p : direct)
@@ -434,9 +434,9 @@ private:
     void deconfigureTempoModification(TempoModification::Ptr, Array<int> whichKeymaps);
     void deconfigureTempoModificationForKeys(TempoModification::Ptr, Array<bool>);
     
-	void configureBlendronomerModification(BlendronomerModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
-	void deconfigureBlendronomerModification(BlendronomerModification::Ptr, Array<int> whichKeymaps);
-	void deconfigureBlendronomerModificationForKeys(BlendronomerModification::Ptr, Array<bool>);
+	void configureBlendronicModification(BlendronicModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
+	void deconfigureBlendronicModification(BlendronicModification::Ptr, Array<int> whichKeymaps);
+	void deconfigureBlendronicModificationForKeys(BlendronicModification::Ptr, Array<bool>);
 
     JUCE_LEAK_DETECTOR(Piano)
 };

@@ -171,7 +171,7 @@ public:
         {
             dvc.arrowPressed(arrow);
         }
-        else if (display == DisplayBlendronomer)
+        else if (display == DisplayBlendronic)
         {
             bvc.arrowPressed(arrow);
         }
@@ -195,7 +195,7 @@ public:
         {
             dvcm.arrowPressed(arrow);
         }
-        else if (display == DisplayBlendronomerMod)
+        else if (display == DisplayBlendronicMod)
         {
             bvcm.arrowPressed(arrow);
         }
@@ -288,7 +288,7 @@ public:
             dvc.fillSelectCB(-1,-1);
             dvc.update();
         }
-        else if (type == DisplayBlendronomer)
+        else if (type == DisplayBlendronic)
         {
             addAndMakeVisible(&bvc);
             bvc.fillSelectCB(-1,-1);
@@ -324,7 +324,7 @@ public:
             dvcm.fillSelectCB(-1,-1);
             dvcm.update();
         }
-        else if (type == DisplayBlendronomerMod)
+        else if (type == DisplayBlendronicMod)
         {
             addAndMakeVisible(&bvcm);
             bvcm.fillSelectCB(-1,-1);

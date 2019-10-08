@@ -99,11 +99,11 @@ public:
             nostalgicPreparationDidChange = true;
             setCurrentDisplay(DisplayNostalgic);
         }
-        else if (type == PreparationTypeBlendronomer)
+        else if (type == PreparationTypeBlendronic)
         {
             currentBlendronicId = (Id == -1) ? currentBlendronicId : Id;
             blendronicPreparationDidChange = true;
-            setCurrentDisplay(DisplayBlendronomer);
+            setCurrentDisplay(DisplayBlendronic);
         }
         else if (type == PreparationTypeTuning)
         {

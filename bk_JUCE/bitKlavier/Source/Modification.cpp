@@ -691,7 +691,7 @@ void TuningModification::setStateOld(XmlElement* e)
     }
 }
 
-void BlendronomerModification::setStateOld(XmlElement* e)
+void BlendronicModification::setStateOld(XmlElement* e)
 {
     reset();
 }

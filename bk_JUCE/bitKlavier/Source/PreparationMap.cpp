@@ -89,7 +89,7 @@ void PreparationMap::linkKeymapToPreparation(int keymapId, BKPreparationType thi
             }
         }
     }
-    else if (thisType == PreparationTypeBlendronomer)
+    else if (thisType == PreparationTypeBlendronic)
     {
         for (int i = 0; i < bprocessor.size(); ++i)
         {
@@ -335,12 +335,12 @@ bool PreparationMap::contains(TempoProcessor::Ptr thisOne)
 
 }
 
-BlendronomerProcessor::PtrArr     PreparationMap::getBlendronomerProcessors(void)
+BlendronicProcessor::PtrArr     PreparationMap::getBlendronicProcessors(void)
 {
 	return bprocessor;
 }
 
-BlendronomerProcessor::Ptr        PreparationMap::getBlendronomerProcessor(int Id)
+BlendronicProcessor::Ptr        PreparationMap::getBlendronicProcessor(int Id)
 {
 	for (auto p : bprocessor)
 	{
@@ -350,20 +350,20 @@ BlendronomerProcessor::Ptr        PreparationMap::getBlendronomerProcessor(int I
 	return nullptr;
 }
 
-void PreparationMap::setBlendronomerProcessors(BlendronomerProcessor::PtrArr p)
+void PreparationMap::setBlendronicProcessors(BlendronicProcessor::PtrArr p)
 {
 	bprocessor = p;
 	deactivateIfNecessary();
 }
 
-void PreparationMap::addBlendronomerProcessor(BlendronomerProcessor::Ptr p)
+void PreparationMap::addBlendronicProcessor(BlendronicProcessor::Ptr p)
 {
     bprocessor.addIfNotAlreadyThere(p);
 	deactivateIfNecessary();
 }
 
 
-bool PreparationMap::contains(BlendronomerProcessor::Ptr thisOne)
+bool PreparationMap::contains(BlendronicProcessor::Ptr thisOne)
 {
 	for (auto p : bprocessor)
 	{
@@ -985,7 +985,7 @@ void PreparationMap::merge(PreparationMap::Ptr thatMap)
     dprocessor.addArray(thatMap->getDirectProcessors());
     sprocessor.addArray(thatMap->getSynchronicProcessors());
     nprocessor.addArray(thatMap->getNostalgicProcessors());
-    bprocessor.addArray(thatMap->getBlendronomerProcessors());
+    bprocessor.addArray(thatMap->getBlendronicProcessors());
     mprocessor.addArray(thatMap->getTempoProcessors());
     tprocessor.addArray(thatMap->getTuningProcessors());
 }

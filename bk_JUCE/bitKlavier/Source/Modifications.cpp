@@ -15,7 +15,7 @@ directMods(DirectModification::PtrArr()),
 synchronicMods(SynchronicModification::PtrArr()),
 nostalgicMods(NostalgicModification::PtrArr()),
 tuningMods(TuningModification::PtrArr()),
-blendronomerMods(BlendronomerModification::PtrArr())
+blendronicMods(BlendronicModification::PtrArr())
 {
     
 }
@@ -144,30 +144,30 @@ void Modifications::removeTuningModification(int which)
     }
 }
 
-void Modifications::addBlendronomerModification(BlendronomerModification::Ptr b)
+void Modifications::addBlendronicModification(BlendronicModification::Ptr b)
 {
-	blendronomerMods.add(b);
+	blendronicMods.add(b);
 }
 
-void Modifications::removeBlendronomerModification(BlendronomerModification::Ptr b)
+void Modifications::removeBlendronicModification(BlendronicModification::Ptr b)
 {
-	for (int i = blendronomerMods.size(); --i >= 0;)
+	for (int i = blendronicMods.size(); --i >= 0;)
 	{
-		if (blendronomerMods[i] == b)
+		if (blendronicMods[i] == b)
 		{
-			blendronomerMods.remove(i);
+			blendronicMods.remove(i);
 			break;
 		}
 	}
 }
 
-void Modifications::removeBlendronomerModification(int which)
+void Modifications::removeBlendronicModification(int which)
 {
-	for (int i = blendronomerMods.size(); --i >= 0;)
+	for (int i = blendronicMods.size(); --i >= 0;)
 	{
-		if (blendronomerMods[i]->getId() == which)
+		if (blendronicMods[i]->getId() == which)
 		{
-			blendronomerMods.remove(i);
+			blendronicMods.remove(i);
 			break;
 		}
 	}
@@ -228,9 +228,9 @@ TempoModification::PtrArr Modifications::getTempoModifications(void)
     return tempoMods;
 }
 
-BlendronomerModification::PtrArr Modifications::getBlendronomerModifications(void)
+BlendronicModification::PtrArr Modifications::getBlendronicModifications(void)
 {
-	return blendronomerMods;
+	return blendronicMods;
 }
 
 void Modifications::clearModifications(void)
@@ -240,7 +240,7 @@ void Modifications::clearModifications(void)
     directMods.clear();
     tuningMods.clear();
     tempoMods.clear();
-	blendronomerMods.clear();
+	blendronicMods.clear();
     
 }
 
@@ -251,5 +251,5 @@ void Modifications::clearResets(void)
     directReset.clear();
     tuningReset.clear();
     tempoReset.clear();
-	blendronomerReset.clear();
+	blendronicReset.clear();
 }

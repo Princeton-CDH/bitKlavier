@@ -170,8 +170,8 @@ const String ptagTuning_springWeights = "sweights";
 const String ptagTuning_intervalScale = "iscale";
 const String ptagTuning_intervalScaleFundamental = "iscalefundamental";
 
-const String vtagBlendronomer = "blendronomer";
-const String vtagModBlendronomer = "modBlendronomer";
+const String vtagBlendronic = "blendronic";
+const String vtagModBlendronic = "modBlendronic";
 
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";
@@ -257,8 +257,8 @@ typedef enum BKPreparationType {
     PreparationTypeReset,
     PreparationTypePiano,
     PreparationTypeComment,
-    PreparationTypeBlendronomer,
-    PreparationTypeBlendronomerMod,
+    PreparationTypeBlendronic,
+    PreparationTypeBlendronicMod,
     BKPreparationTypeNil
 } BKPreparationType;
 
@@ -290,8 +290,8 @@ static const std::vector<std::string> cPreparationTypes = {
     "Reset",
     "Piano",
     "Comment",
-    "Blendronomer",
-    "BlendronomerMod"
+    "Blendronic",
+    "BlendronicMod"
 };
 
 typedef enum BKPreparationDisplay {
@@ -309,8 +309,8 @@ typedef enum BKPreparationDisplay {
     DisplayGeneral,
     DisplayAbout,
     DisplayComment,
-    DisplayBlendronomer,
-    DisplayBlendronomerMod,
+    DisplayBlendronic,
+    DisplayBlendronicMod,
     DisplayNil,
 } BKPreparationDisplay;
 
@@ -322,7 +322,7 @@ static const std::vector<std::string> cDisplayNames = {
     "Nostalgic",
     "Tuning",
     "Tempo",
-	"Blendronomer",
+	"Blendronic",
     "Keymap",
     "General"
 
@@ -686,55 +686,55 @@ static const std::vector<std::string> cTuningAdaptiveTypes = {
     "Spring Tuning"
 };
 
-#pragma mark - Blendronomer
-typedef enum BlendronomerSmoothMode {
+#pragma mark - Blendronic
+typedef enum BlendronicSmoothMode {
     ConstantTimeSmooth = 0,
     ConstantRateSmooth,
     ProportionalTimeSmooth,
     ProportionalRateSmooth,
     SmoothNil
-} BlendronomerSmoothMode;
+} BlendronicSmoothMode;
 
-typedef enum BlendronomerSyncMode {
-    BlendronomerFirstNoteOnSync = 0,
-    BlendronomerAnyNoteOnSync,
-    BlendronomerAnyNoteOffSync,
-    BlendronomerLastNoteOffSync,
-    BlendronomerSyncModeNil
-} BlendronomerSyncMode;
+typedef enum BlendronicSyncMode {
+    BlendronicFirstNoteOnSync = 0,
+    BlendronicAnyNoteOnSync,
+    BlendronicAnyNoteOffSync,
+    BlendronicLastNoteOffSync,
+    BlendronicSyncModeNil
+} BlendronicSyncMode;
 
-typedef enum BlendronomerClearMode {
-    BlendronomerFirstNoteOnClear = 0,
-    BlendronomerAnyNoteOnClear,
-    BlendronomerAnyNoteOffClear,
-    BlendronomerLastNoteOffClear,
-    BlendronomerClearModeNil
-} BlendronomerClearMode;
+typedef enum BlendronicClearMode {
+    BlendronicFirstNoteOnClear = 0,
+    BlendronicAnyNoteOnClear,
+    BlendronicAnyNoteOffClear,
+    BlendronicLastNoteOffClear,
+    BlendronicClearModeNil
+} BlendronicClearMode;
 
-typedef enum BlendronomerOpenMode {
-    BlendronomerFirstNoteOnOpen = 0,
-    BlendronomerAnyNoteOnOpen,
-    BlendronomerAnyNoteOffOpen,
-    BlendronomerLastNoteOffOpen,
-    BlendronomerOpenModeNil
-} BlendronomerOpenMode;
+typedef enum BlendronicOpenMode {
+    BlendronicFirstNoteOnOpen = 0,
+    BlendronicAnyNoteOnOpen,
+    BlendronicAnyNoteOffOpen,
+    BlendronicLastNoteOffOpen,
+    BlendronicOpenModeNil
+} BlendronicOpenMode;
 
-typedef enum BlendronomerCloseMode {
-    BlendronomerFirstNoteOnClose = 0,
-    BlendronomerAnyNoteOnClose,
-    BlendronomerAnyNoteOffClose,
-    BlendronomerLastNoteOffClose,
-    BlendronomerCloseModeNil
-} BlendronomerCloseMode;
+typedef enum BlendronicCloseMode {
+    BlendronicFirstNoteOnClose = 0,
+    BlendronicAnyNoteOnClose,
+    BlendronicAnyNoteOffClose,
+    BlendronicLastNoteOffClose,
+    BlendronicCloseModeNil
+} BlendronicCloseMode;
 
-static const std::vector<std::string> cBlendronomerSmoothModes = {
+static const std::vector<std::string> cBlendronicSmoothModes = {
     "Constant Time",
     "Constant Rate",
     "Proportional Time",
     "Proportional Rate"
 };
 
-static const std::vector<std::string> cBlendronomerSyncModes = {
+static const std::vector<std::string> cBlendronicSyncModes = {
     "First Note-On",
     "Any Note-On",
     "Any Note-Off",
@@ -742,7 +742,7 @@ static const std::vector<std::string> cBlendronomerSyncModes = {
     "None"
 };
 
-static const std::vector<std::string> cBlendronomerClearModes = {
+static const std::vector<std::string> cBlendronicClearModes = {
     "First Note-On",
     "Any Note-On",
     "Any Note-Off",
@@ -750,7 +750,7 @@ static const std::vector<std::string> cBlendronomerClearModes = {
     "None"
 };
 
-static const std::vector<std::string> cBlendronomerOpenModes = {
+static const std::vector<std::string> cBlendronicOpenModes = {
     "First Note-On",
     "Any Note-On",
     "Any Note-Off",
@@ -758,7 +758,7 @@ static const std::vector<std::string> cBlendronomerOpenModes = {
     "None"
 };
 
-static const std::vector<std::string> cBlendronomerCloseModes = {
+static const std::vector<std::string> cBlendronicCloseModes = {
     "First Note-On",
     "Any Note-On",
     "Any Note-Off",
@@ -766,21 +766,21 @@ static const std::vector<std::string> cBlendronomerCloseModes = {
     "None"
 };
 
-typedef enum BlendronomerParameterType
+typedef enum BlendronicParameterType
 {
-    BlendronomerId = 0,
-    BlendronomerBeats,
-    BlendronomerSmoothDurations,
-    BlendronomerFeedbackCoeffs,
-    BlendronomerInputThresh,
-    BlendronomerHoldMin,
-    BlendronomerHoldMax,
-    BlendronomerVelMin,
-    BlendronomerVelMax,
-    BlendronomerParameterTypeNil
-} BlendronomerParameterType;
+    BlendronicId = 0,
+    BlendronicBeats,
+    BlendronicSmoothDurations,
+    BlendronicFeedbackCoeffs,
+    BlendronicInputThresh,
+    BlendronicHoldMin,
+    BlendronicHoldMax,
+    BlendronicVelMin,
+    BlendronicVelMax,
+    BlendronicParameterTypeNil
+} BlendronicParameterType;
 
-static const std::vector<BKParameterDataType> cBlendronomerDataTypes = {
+static const std::vector<BKParameterDataType> cBlendronicDataTypes = {
     BKInt,
     BKFloatArr,
     BKFloatArr,
@@ -792,7 +792,7 @@ static const std::vector<BKParameterDataType> cBlendronomerDataTypes = {
     BKFloat
 };
 
-static const std::vector<std::string> cBlendronomerParameterTypes = {
+static const std::vector<std::string> cBlendronicParameterTypes = {
     "Blendronic Id",
     "beats",
     "smooth timings",
@@ -804,7 +804,7 @@ static const std::vector<std::string> cBlendronomerParameterTypes = {
     "Vel Max"
 };
 
-static const std::vector<std::vector<float>> cBlendronomerDefaultRangeValuesAndInc = {
+static const std::vector<std::vector<float>> cBlendronicDefaultRangeValuesAndInc = {
     { 0.0f, 0.0f, 0.0f, 0.0f }, //min, max, default, increment, skew
     { 0.0f, 8.0f, 4.0f, 0.1f },
     { 0.0f, 1.0f, 0.1f, 0.0001f },

@@ -62,7 +62,7 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     {
         setImage(ImageCache::getFromMemory(BinaryData::direct_icon_png, BinaryData::direct_icon_pngSize));
     }
-    else if (type == PreparationTypeBlendronomer)
+    else if (type == PreparationTypeBlendronic)
     {
         setImage(ImageCache::getFromMemory(BinaryData::blendronic_icon_png, BinaryData::blendronic_icon_pngSize));
     }
@@ -823,7 +823,7 @@ Array<Line<int>> BKItemGraph::getLines(void)
                 }
             }
         }
-        else if (type == PreparationTypeBlendronomer)
+        else if (type == PreparationTypeBlendronic)
         {
             for (auto target : item->getConnections())
             {
@@ -953,7 +953,7 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
     {
         if (type2 == PreparationTypeKeymap ||
             type2 == PreparationTypeTuning ||
-            type2 == PreparationTypeBlendronomer ||
+            type2 == PreparationTypeBlendronic ||
             type2 == PreparationTypeDirectMod ||
             type2 == PreparationTypeGenericMod ||
             type2 == PreparationTypeReset)
@@ -963,7 +963,7 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
     {
         if (type2 == PreparationTypeKeymap ||
             type2 == PreparationTypeTuning ||
-            type2 == PreparationTypeBlendronomer ||
+            type2 == PreparationTypeBlendronic ||
             type2 == PreparationTypeNostalgicMod ||
             type2 == PreparationTypeGenericMod ||
             type2 == PreparationTypeSynchronic ||
@@ -974,7 +974,7 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
     {
         if (type2 == PreparationTypeKeymap ||
             type2 == PreparationTypeTuning ||
-            type2 == PreparationTypeBlendronomer ||
+            type2 == PreparationTypeBlendronic ||
             type2 == PreparationTypeSynchronicMod ||
             type2 == PreparationTypeGenericMod ||
             type2 == PreparationTypeNostalgic ||
@@ -982,14 +982,14 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             type2 == PreparationTypeReset)
             return true;
     }
-    else if (type1 == PreparationTypeBlendronomer)
+    else if (type1 == PreparationTypeBlendronic)
     {
         if (type2 == PreparationTypeKeymap ||
             type2 == PreparationTypeSynchronic ||
             type2 == PreparationTypeDirect ||
             type2 == PreparationTypeNostalgic ||
             type2 == PreparationTypeTempo ||
-            type2 == PreparationTypeBlendronomerMod ||
+            type2 == PreparationTypeBlendronicMod ||
             type2 == PreparationTypeGenericMod ||
             type2 == PreparationTypeReset)
             return true;
@@ -1009,7 +1009,7 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
     {
         if (type2 == PreparationTypeKeymap ||
             type2 == PreparationTypeSynchronic ||
-            type2 == PreparationTypeBlendronomer ||
+            type2 == PreparationTypeBlendronic ||
             type2 == PreparationTypeTempoMod ||
             type2 == PreparationTypeGenericMod ||
             type2 == PreparationTypeReset)

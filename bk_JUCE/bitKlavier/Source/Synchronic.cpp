@@ -13,7 +13,7 @@
 SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TuningProcessor::Ptr tuning,
                                          TempoProcessor::Ptr tempo,
-										 BlendronomerProcessor::Ptr blender,
+										 BlendronicProcessor::Ptr blender,
                                          BKSynthesiser* main,
                                          GeneralSettings::Ptr general):
 synth(main),
@@ -94,7 +94,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 
         int whichEnv = cluster->getEnvelopeCounter();
 		BKSynthesiserVoice* currentVoice;
-		if (blendronomer != nullptr)
+		if (blendronic != nullptr)
 		{
 			currentVoice =
 				synth->keyOn(channel,
@@ -114,8 +114,8 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 					prep->getSustain(whichEnv),
 					prep->getRelease(whichEnv),
 					tuner,
-					blendronomer->getBlendronomer()->aPrep->getInputGain(),
-					blendronomer->getDelay());
+					blendronic->getBlendronic()->aPrep->getInputGain(),
+					blendronic->getDelay());
 		}
 		else
 		{
