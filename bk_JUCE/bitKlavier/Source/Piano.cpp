@@ -301,7 +301,7 @@ DirectProcessor::Ptr Piano::addDirectProcessor(int thisId)
 {
     DirectProcessor::Ptr dproc = new DirectProcessor(processor.gallery->getDirect(thisId),
                                                      defaultT,
-													defaultB,
+                                                     defaultB,
                                                      &processor.mainPianoSynth,
                                                      &processor.resonanceReleaseSynth,
                                                      &processor.hammerReleaseSynth);
@@ -336,14 +336,10 @@ TempoProcessor::Ptr Piano::addTempoProcessor(int thisId)
 
 BlendronicProcessor::Ptr Piano::addBlendronicProcessor(int thisId)
 {
-    Blendronic::Ptr blendronic = processor.gallery->getBlendronic(thisId);
-    BlendronicPreparation::Ptr prep = blendronic->aPrep;
-    BlendronicDelay::Ptr delay = processor.mainPianoSynth.createBlendronicDelay(prep->getDelayMax(), prep->getFeedbackCoefficients()[0], prep->getDelayLength(), prep->getSmoothValue(), prep->getSmoothDuration(), true);
-	BlendronicProcessor::Ptr bproc = new BlendronicProcessor(blendronic,
-                                                                 defaultM,
-                                                                 delay,
-                                                                 processor.gallery->getGeneralSettings(),
-                                                                 &processor.mainPianoSynth);
+	BlendronicProcessor::Ptr bproc = new BlendronicProcessor(processor.gallery->getBlendronic(thisId),
+                                                             defaultM,
+                                                             processor.gallery->getGeneralSettings(),
+                                                             &processor.mainPianoSynth);
 	bproc->prepareToPlay(sampleRate);
 	bprocessor.add(bproc);
     processor.mainPianoSynth.addBlendronicProcessor(bproc);

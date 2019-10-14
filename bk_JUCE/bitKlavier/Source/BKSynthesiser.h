@@ -307,7 +307,7 @@ private:
         //sometimes Note and Key might be different, with non-zero transpositions, hence the need for currentlyPlayingKey
     uint32 length;
     PianoSamplerNoteType direction;
-    PianoSamplerNoteType type;
+    PianoSamplerNoteType type; 
     BKNoteType bktype;
     int layerId;
     uint32 noteOnTime;
@@ -649,7 +649,6 @@ public:
     void setMinimumRenderingSubdivisionSize (int numSamples, bool shouldBeStrict = false) noexcept;
 
 	BlendronicDelay::Ptr createBlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active = false);
-    void removeBlendronicDelay(BlendronicDelay::Ptr delay);
     void addBlendronicProcessor(BlendronicProcessor::Ptr bproc);
     void removeBlendronicProcessor(int Id);
     

@@ -102,7 +102,7 @@ public:
 
 	//mutators
 	inline void setValue(float envelopeValue) { value = envelopeValue; }
-    inline void setTarget(float envelopeTarget) { target = envelopeTarget; if ( target != value ) state = 1; DBG("new envelope target = " + String(target));}
+    inline void setTarget(float envelopeTarget) { target = envelopeTarget; if ( target != value ) state = 1; }
 	inline void setRate(float sr) { rate = sr; }
     inline void setTime(float time) { rate = 1.0 / ( time * sampleRate * 0.001 ); DBG("new rate = " + String(rate));} // time in ms for envelope to go from 0-1. need to update for sampleRate
     inline void setSampleRate(double sr) { sampleRate = sr; }

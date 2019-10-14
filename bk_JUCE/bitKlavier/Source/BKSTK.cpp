@@ -224,6 +224,7 @@ BlendronicDelay::BlendronicDelay(float delayMax, float delayGain, float delayLen
 
 BlendronicDelay::BlendronicDelay()
 {
+    DBG("Destroy bdelay");
 }
 
 

@@ -176,21 +176,7 @@ void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool sho
 BlendronicDelay::Ptr BKSynthesiser::createBlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active)
 {
     BlendronicDelay::Ptr delay = new BlendronicDelay(delayMax, delayGain, delayLength, smoothValue, smoothDuration, delays.size(), active);
-	delays.add(delay);
-    DBG("num BlendronicDelays = " + String(delays.size()));
     return delay;
-}
-
-void BKSynthesiser::removeBlendronicDelay(BlendronicDelay::Ptr delay)
-{
-    for (int i = 0; i < delays.size(); ++i)
-    {
-        if (delays[i]->getId() == delay->getId()) delays.remove(i);
-    }
-    for (int i = 0; i < delays.size(); ++i)
-    {
-        delays[i]->setId(i);
-    }
 }
 
 void BKSynthesiser::addBlendronicProcessor(BlendronicProcessor::Ptr bproc)
@@ -208,12 +194,12 @@ void BKSynthesiser::removeBlendronicProcessor(int Id)
 
 void BKSynthesiser::clearNextDelayBlock(int numSamples)
 {
-    for (auto d : delays)
+    for (auto b : bprocessors)
     {
 		for (int i = 0; i < numSamples; i++)
 		{
-			d->getDelay()->scalePrevious(0, i, 0);
-			d->getDelay()->scalePrevious(0, i, 1);
+			b->getDelay()->getDelay()->scalePrevious(0, i, 0);
+			b->getDelay()->getDelay()->scalePrevious(0, i, 1);
 		}
     }
 }

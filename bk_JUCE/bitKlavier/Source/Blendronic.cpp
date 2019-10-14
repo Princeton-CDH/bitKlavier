@@ -76,8 +76,8 @@ BlendronicPreparation::BlendronicPreparation(void) :
     bSmoothMode(ConstantTimeSmooth),
     bSyncMode(BlendronicFirstNoteOnSync),
     bClearMode(BlendronicFirstNoteOnClear),
-    bOpenMode(BlendronicFirstNoteOnOpen),
-    bCloseMode(BlendronicFirstNoteOnClose),
+    bOpenMode(BlendronicOpenModeNil),
+    bCloseMode(BlendronicCloseModeNil),
 	bInputThresh(1),
 	bInputThreshSec(0.001),
 	holdMin(0),
@@ -109,10 +109,9 @@ bool BlendronicPreparation::compare(BlendronicPreparation::Ptr b)
 ////////////////////////////////////////////////////////////////////////////////////
 
 BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
-	TempoProcessor::Ptr bTempo, BlendronicDelay::Ptr delayL, GeneralSettings::Ptr bGeneral, BKSynthesiser* bMain):
+	TempoProcessor::Ptr bTempo, GeneralSettings::Ptr bGeneral, BKSynthesiser* bMain):
 	blendronic(bBlendronic),
 	tempo(bTempo),
-	delay(delayL),
 	synth(bMain),
 	general(bGeneral),
     keymaps(Keymap::PtrArr()),
@@ -130,12 +129,15 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     }
     
     keysDepressed = Array<int>();
-    prevBeat = blendronic->aPrep->getBeats()[0];
+    
+    BlendronicPreparation::Ptr prep = blendronic->aPrep;
+    
+    delay = synth->createBlendronicDelay(prep->getDelayMax(), prep->getFeedbackCoefficients()[0], prep->getDelayLength(), prep->getSmoothValue(), prep->getSmoothDuration(), true);
 }
 
 BlendronicProcessor::~BlendronicProcessor()
 {
-    synth->removeBlendronicDelay(delay);
+    DBG("Destroy bproc");
 }
 
 void BlendronicProcessor::tick(float* outputs)
@@ -264,17 +266,21 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
             //clearDelayOnNextBeat = true;
         }
     }
-    if (doClose)
+    bool noteOnClose = prep->getCloseMode() == BlendronicAnyNoteOnClose;
+    bool firstNoteOnClose = prep->getCloseMode() == BlendronicFirstNoteOnClose && keysDepressed.size() == 1;
+    bool noteOnOpen = prep->getOpenMode() == BlendronicAnyNoteOnOpen;
+    bool firstNoteOnOpen = prep->getOpenMode() == BlendronicFirstNoteOnOpen && keysDepressed.size() == 1;
+    if (doClose && doOpen)
     {
-        if (prep->getCloseMode() == BlendronicAnyNoteOnClose ||
-           (prep->getCloseMode() == BlendronicFirstNoteOnClose && keysDepressed.size() == 1))
-            delay->setActive(false);
+        if ((noteOnClose && noteOnOpen) || (firstNoteOnClose && firstNoteOnOpen)) delay->setActive(!delay->getActive());
     }
-    if (doOpen)
+    else if (doClose)
     {
-        if (prep->getOpenMode() == BlendronicAnyNoteOnOpen ||
-           (prep->getOpenMode() == BlendronicFirstNoteOnOpen && keysDepressed.size() == 1))
-            delay->setActive(true);
+        if (noteOnClose || firstNoteOnClose) delay->setActive(false);
+    }
+    else if (doOpen)
+    {
+        if (noteOnOpen || firstNoteOnOpen) delay->setActive(true);
     }
 }
 
@@ -317,17 +323,22 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
             clearDelayOnNextBeat = true;
         }
     }
-    if (doClose)
+    
+    bool noteOffClose = prep->getCloseMode() == BlendronicAnyNoteOffClose;
+    bool firstNoteOffClose = prep->getCloseMode() == BlendronicLastNoteOffClose && keysDepressed.size() == 0;
+    bool noteOffOpen = prep->getOpenMode() == BlendronicAnyNoteOffOpen;
+    bool firstNoteOffOpen = prep->getOpenMode() == BlendronicLastNoteOffOpen && keysDepressed.size() == 0;
+    if (doClose && doOpen)
     {
-        if (prep->getCloseMode() == BlendronicAnyNoteOffClose ||
-           (prep->getCloseMode() == BlendronicLastNoteOffClose && keysDepressed.size() == 0))
-        delay->setActive(false);
+        if ((noteOffClose && noteOffOpen) || (firstNoteOffClose && firstNoteOffOpen)) delay->setActive(!delay->getActive());
     }
-    if (doOpen)
+    else if (doClose)
     {
-        if (prep->getOpenMode() == BlendronicAnyNoteOffOpen ||
-           (prep->getOpenMode() == BlendronicLastNoteOffOpen && keysDepressed.size() == 0))
-        delay->setActive(true);
+        if (noteOffClose || firstNoteOffClose) delay->setActive(false);
+    }
+    else if (doOpen)
+    {
+        if (noteOffOpen || firstNoteOffOpen) delay->setActive(true);
     }
 }
 
@@ -338,10 +349,14 @@ void BlendronicProcessor::postRelease(int noteNumber, int midiChannel)
 
 void BlendronicProcessor::prepareToPlay(double sr)
 {
+    BlendronicPreparation::Ptr prep = blendronic->aPrep;
+    prevBeat = prep->getBeats()[0];
+    
+    delay = synth->createBlendronicDelay(prep->getDelayMax(), prep->getFeedbackCoefficients()[0], prep->getDelayLength(), prep->getSmoothValue(), prep->getSmoothDuration(), true);
 	sampleRate = sr;
     delay->setSampleRate(sr);
-    numSamplesBeat = blendronic->aPrep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempo->getTempo()->aPrep->getSubdivisions()) / tempo->getTempo()->aPrep->getTempo());
-    blendronic->aPrep->setDelayLength(numSamplesBeat);
+    numSamplesBeat = prep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempo->getTempo()->aPrep->getSubdivisions()) / tempo->getTempo()->aPrep->getTempo());
+    prep->setDelayLength(numSamplesBeat);
     delay->setDelayTargetLength(numSamplesBeat);
 }
 
@@ -386,6 +401,7 @@ void BlendronicProcessor::updateDelayParameters()
     
     sampleTimer = 0;
     
+    DBG(String(getId()) + " new envelope target = " + String(numSamplesBeat));
     DBG(String(smoothRate));
     delay->setDelayTargetLength(numSamplesBeat);
     delay->setSmoothDuration(smoothRate);

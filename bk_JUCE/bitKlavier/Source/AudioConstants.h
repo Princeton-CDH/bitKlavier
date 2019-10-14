@@ -173,6 +173,14 @@ const String ptagTuning_intervalScaleFundamental = "iscalefundamental";
 const String vtagBlendronic = "blendronic";
 const String vtagModBlendronic = "modBlendronic";
 const String ptagBlendronic_id = "Id";
+const String vtagBlendronic_beats = "beats";
+const String vtagBlendronic_smoothDurations = "smoothDurations";
+const String vtagBlendronic_feedbackCoefficients = "feedbackCoefficients";
+const String ptagBlendronic_smoothMode = "smooth";
+const String ptagBlendronic_syncMode = "sync";
+const String ptagBlendronic_clearMode = "clear";
+const String ptagBlendronic_openMode = "open";
+const String ptagBlendronic_closeMode = "close";
 
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";

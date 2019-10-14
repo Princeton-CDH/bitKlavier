@@ -146,7 +146,7 @@ void Gallery::randomize()
 			Blendronic::Ptr b = new Blendronic(-1, true);
 			addBlendronic(b);
 			int blendronicId = b->getId();
-			BlendronicProcessor::Ptr bProc = new BlendronicProcessor(b, mProc, nullptr, dummyGeneral, dummySynth);
+			BlendronicProcessor::Ptr bProc = new BlendronicProcessor(b, mProc, dummyGeneral, dummySynth);
 			p->addBlendronicProcessor(blendronicId);
 
             Direct::Ptr d = new Direct(-1, true);
