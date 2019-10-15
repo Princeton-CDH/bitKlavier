@@ -136,8 +136,8 @@ public:
 
 	//constructors
 	BlendronicDelay(BlendronicDelay::Ptr d);
-	BlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, int Id, bool active = false);
-	BlendronicDelay();
+	BlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active = false);
+	~BlendronicDelay();
 
 	//accessors
     inline const BKDelayL::Ptr getDelay() const noexcept { return delayLinear; }
@@ -149,7 +149,6 @@ public:
 	inline const float getSmoothValue() const noexcept { return dSmooth->getValue(); }
 	inline const float getSmoothDuration() const noexcept { return dSmoothDuration; }
 	inline const bool getActive() const noexcept { return dBlendronicActive; }
-    inline const int getId() const noexcept { return dId; }
     inline const bool getShouldDuck() const noexcept { return shouldDuck; }
 
 	//mutators
@@ -179,7 +178,6 @@ public:
     inline void setFeedback(float fb) { delayLinear->setFeedback(fb); }
 	inline const void setActive(bool newActive) { dBlendronicActive = newActive; }
 	inline const void toggleActive() { dBlendronicActive = !dBlendronicActive; }
-    inline const void setId(int Id) { dId = Id; }
     
     void tick(float* outputs);
     
@@ -200,7 +198,6 @@ private:
     float dDelayLength;
 	float dSmoothValue;
 	float dSmoothDuration;
-    int dId;
 	bool dBlendronicActive;
     bool shouldDuck;
 };

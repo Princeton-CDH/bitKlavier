@@ -133,6 +133,8 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
     delay = synth->createBlendronicDelay(prep->getDelayMax(), prep->getFeedbackCoefficients()[0], prep->getDelayLength(), prep->getSmoothValue(), prep->getSmoothDuration(), true);
+    
+    DBG("Create bproc");
 }
 
 BlendronicProcessor::~BlendronicProcessor()
@@ -352,7 +354,6 @@ void BlendronicProcessor::prepareToPlay(double sr)
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     prevBeat = prep->getBeats()[0];
     
-    delay = synth->createBlendronicDelay(prep->getDelayMax(), prep->getFeedbackCoefficients()[0], prep->getDelayLength(), prep->getSmoothValue(), prep->getSmoothDuration(), true);
 	sampleRate = sr;
     delay->setSampleRate(sr);
     numSamplesBeat = prep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempo->getTempo()->aPrep->getSubdivisions()) / tempo->getTempo()->aPrep->getTempo());

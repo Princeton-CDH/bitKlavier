@@ -199,19 +199,18 @@ BlendronicDelay::BlendronicDelay(BlendronicDelay::Ptr d):
 	dDelayLength(d->getDelayLength()),
 	dSmoothValue(d->getSmoothValue()),
 	dSmoothDuration(d->getSmoothDuration()),
-    dId(d->getId()),
 	dBlendronicActive(d->getActive()),
     shouldDuck(d->getShouldDuck())
 {
+    DBG("Create bdelay");
 }
 
-BlendronicDelay::BlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, int Id, bool active) :
+BlendronicDelay::BlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active) :
 	dDelayMax(delayMax),
 	dDelayGain(delayGain),
 	dDelayLength(delayLength),
 	dSmoothValue(smoothValue),
 	dSmoothDuration(smoothDuration),
-    dId(Id),
 	dBlendronicActive(active)
 {
 	delayLinear =  new BKDelayL(dDelayLength, dDelayMax, dDelayGain);
@@ -220,9 +219,10 @@ BlendronicDelay::BlendronicDelay(float delayMax, float delayGain, float delayLen
     dEnv = new BKEnvelope(1.0f, 1.0f);
     dEnv->setTime(5.0f);
     shouldDuck = false;
+    DBG("Create bdelay");
 }
 
-BlendronicDelay::BlendronicDelay()
+BlendronicDelay::~BlendronicDelay()
 {
     DBG("Destroy bdelay");
 }

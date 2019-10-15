@@ -175,7 +175,7 @@ void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool sho
 
 BlendronicDelay::Ptr BKSynthesiser::createBlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active)
 {
-    BlendronicDelay::Ptr delay = new BlendronicDelay(delayMax, delayGain, delayLength, smoothValue, smoothDuration, delays.size(), active);
+    BlendronicDelay::Ptr delay = new BlendronicDelay(delayMax, delayGain, delayLength, smoothValue, smoothDuration, active);
     return delay;
 }
 

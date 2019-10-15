@@ -1201,6 +1201,9 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
+        if (currentPiano != nullptr)
+        currentPiano->deconfigure();
+        
         gallery = new Gallery(xml, *this);
 
         currentGallery = gallery->getName() + ".xml";

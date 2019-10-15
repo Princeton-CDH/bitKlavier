@@ -307,7 +307,7 @@ private:
         //sometimes Note and Key might be different, with non-zero transpositions, hence the need for currentlyPlayingKey
     uint32 length;
     PianoSamplerNoteType direction;
-    PianoSamplerNoteType type; 
+    PianoSamplerNoteType type;
     BKNoteType bktype;
     int layerId;
     uint32 noteOnTime;
@@ -775,7 +775,6 @@ private:
     bool shouldStealNotes;
     BigInteger sustainPedalsDown;
 
-	Array<BlendronicDelay::Ptr> delays;
     Array<BlendronicProcessor::Ptr> bprocessors;
 
     
