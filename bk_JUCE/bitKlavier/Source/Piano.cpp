@@ -1219,7 +1219,7 @@ ValueTree Piano::getState(void)
             {
                 BKPreparationType targetType = target->getType();
                 
-                if (targetType == PreparationTypeSynchronic)
+                if (targetType == PreparationTypeSynchronic || targetType == PreparationTypeBlendronic  )
                 {
                     connectionsVT.addChild(target->getState(), -1, 0);
                 }

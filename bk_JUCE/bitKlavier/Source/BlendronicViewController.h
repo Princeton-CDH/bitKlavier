@@ -67,6 +67,8 @@ protected:
     BKLabel openModeLabel;
     BKLabel closeModeLabel;
     
+    AudioVisualiserComponent* delayLineDisplay;
+    
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
 
     std::unique_ptr<BKSingleSlider> inputThreshSlider;

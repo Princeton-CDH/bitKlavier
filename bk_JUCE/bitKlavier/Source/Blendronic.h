@@ -434,11 +434,12 @@ public:
     inline int getTempoId(void) const noexcept { return tempo->getId(); }
 	inline const float getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
     inline uint64 getSampleTime(void) const noexcept { return sampleTimer; }
-    inline int getBeatIndex(void) { return beatIndex; }
-    inline int getSmoothIndex(void) { return smoothIndex; }
-    inline int getFeedbackIndex(void) { return feedbackIndex; }
-    inline BKSynthesiser* getSynth(void) { return synth; }
-    inline Array<int> getKeysDepressed(void) { return keysDepressed; }
+    inline int getBeatIndex(void) const noexcept { return beatIndex; }
+    inline int getSmoothIndex(void) const noexcept { return smoothIndex; }
+    inline int getFeedbackIndex(void) const noexcept { return feedbackIndex; }
+    inline BKSynthesiser* getSynth(void) const noexcept { return synth; }
+    inline Array<int> getKeysDepressed(void) const noexcept { return keysDepressed; }
+    inline AudioBuffer<float> getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
 
 
 	//mutators

@@ -133,6 +133,10 @@ BKViewController(p, theGraph, 2)
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
+    delayLineDisplay = new AudioVisualiserComponent(1);
+    delayLineDisplay->setColours(Colours::lightgrey, Colours::black);
+    addAndMakeVisible(delayLineDisplay);
+    
     currentTab = 0;
     displayTab(currentTab);
     
@@ -154,6 +158,7 @@ void BlendronicViewController::invisible(void)
     closeModeLabel.setVisible(false);
     openModeSelectCB.setVisible(false);
     openModeLabel.setVisible(false);
+    delayLineDisplay->setVisible(false);
 }
 
 void BlendronicViewController::displayShared(void)
@@ -248,6 +253,8 @@ void BlendronicViewController::displayTab(int tab)
         openModeSelectCB.setVisible(true);
         openModeLabel.setVisible(true);
         
+        delayLineDisplay->setVisible(true);
+        
         // SET BOUNDS
         int sliderHeight = height * 0.225f;
         
@@ -285,6 +292,10 @@ void BlendronicViewController::displayTab(int tab)
         Rectangle<int> openModeLabelRect (openModeSelectCBRect.removeFromRight(openModeSelectCBRect.getWidth()*0.5));
         openModeSelectCB.setBounds(openModeSelectCBRect);
         openModeLabel.setBounds(openModeLabelRect);
+        
+        area.removeFromTop(sliderHeight + 2 * gComponentComboBoxHeight);
+        Rectangle<int> delayLineDisplayRect (area.removeFromTop(sliderHeight));
+        delayLineDisplay->setBounds(delayLineDisplayRect);
     }
 }
 
@@ -717,6 +728,8 @@ void BlendronicPreparationEditor::timerCallback()
         
         if (bProcessor != nullptr)
         {
+            delayLineDisplay->pushBuffer(bProcessor->getDelayBuffer());
+
 //            Array<int> currentPlayPositions = bProcessor->getPlayPositions();
 //            Array<int> currentUndertowPositions = bProcessor->getUndertowPositions();
 //            currentPlayPositions.addArray(currentUndertowPositions);
