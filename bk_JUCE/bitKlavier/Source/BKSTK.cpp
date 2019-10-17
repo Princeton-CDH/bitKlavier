@@ -94,10 +94,10 @@ BKDelayL::~BKDelayL()
 {
 }
 
-inline void BKDelayL::setLength(float delayLength)
+void BKDelayL::setLength(float delayLength)
 {
-	float outPointer = inPoint - length;
-	length = delayLength;
+    length = delayLength;
+    float outPointer = inPoint - length;
 	while (outPointer < 0) outPointer += inputs.getNumSamples();
 
 	outPoint = (long)outPointer; //integer part
@@ -187,6 +187,21 @@ void BKDelayL::scalePrevious(float coefficient, unsigned long offset, int channe
 void BKDelayL::clear()
 {
     inputs.clear();
+}
+
+void BKDelayL::reset()
+{
+    inPoint = 0;
+    outPoint = 0;
+    float outPointer = inPoint - length;
+    while (outPointer < 0) outPointer += inputs.getNumSamples();
+    
+    outPoint = (long)outPointer; //integer part
+    alpha = outPointer - outPoint; //fractional part
+    omAlpha = (float)1.0 - alpha;
+    if (outPoint == inputs.getNumSamples()) outPoint = 0;
+    doNextOutLeft = true;
+    doNextOutRight = true;
 }
 
 

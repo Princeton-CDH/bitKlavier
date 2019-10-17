@@ -67,7 +67,7 @@ protected:
     BKLabel openModeLabel;
     BKLabel closeModeLabel;
     
-    AudioVisualiserComponent* delayLineDisplay;
+    BKBufferView delayLineDisplay;
     
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
 

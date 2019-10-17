@@ -439,7 +439,7 @@ public:
     inline int getFeedbackIndex(void) const noexcept { return feedbackIndex; }
     inline BKSynthesiser* getSynth(void) const noexcept { return synth; }
     inline Array<int> getKeysDepressed(void) const noexcept { return keysDepressed; }
-    inline AudioBuffer<float> getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
+    inline const AudioBuffer<float> getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
 
 
 	//mutators

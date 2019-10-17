@@ -133,9 +133,12 @@ BKViewController(p, theGraph, 2)
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
-    delayLineDisplay = new AudioVisualiserComponent(1);
-    delayLineDisplay->setColours(Colours::lightgrey, Colours::black);
-    addAndMakeVisible(delayLineDisplay);
+    BlendronicProcessor::Ptr bProcessor = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
+    
+    delayLineDisplay.setNumChannels(1);
+    //delayLineDisplay.setBufferSize(bProcessor->getDelayBuffer().getNumSamples());
+    delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
+    addAndMakeVisible(&delayLineDisplay);
     
     currentTab = 0;
     displayTab(currentTab);
@@ -158,7 +161,7 @@ void BlendronicViewController::invisible(void)
     closeModeLabel.setVisible(false);
     openModeSelectCB.setVisible(false);
     openModeLabel.setVisible(false);
-    delayLineDisplay->setVisible(false);
+    delayLineDisplay.setVisible(false);
 }
 
 void BlendronicViewController::displayShared(void)
@@ -253,7 +256,7 @@ void BlendronicViewController::displayTab(int tab)
         openModeSelectCB.setVisible(true);
         openModeLabel.setVisible(true);
         
-        delayLineDisplay->setVisible(true);
+        delayLineDisplay.setVisible(true);
         
         // SET BOUNDS
         int sliderHeight = height * 0.225f;
@@ -295,7 +298,7 @@ void BlendronicViewController::displayTab(int tab)
         
         area.removeFromTop(sliderHeight + 2 * gComponentComboBoxHeight);
         Rectangle<int> delayLineDisplayRect (area.removeFromTop(sliderHeight));
-        delayLineDisplay->setBounds(delayLineDisplayRect);
+        delayLineDisplay.setBounds(delayLineDisplayRect);
     }
 }
 
@@ -728,8 +731,7 @@ void BlendronicPreparationEditor::timerCallback()
         
         if (bProcessor != nullptr)
         {
-            delayLineDisplay->pushBuffer(bProcessor->getDelayBuffer());
-
+            delayLineDisplay.pushBuffer(bProcessor->getDelayBuffer());
 //            Array<int> currentPlayPositions = bProcessor->getPlayPositions();
 //            Array<int> currentUndertowPositions = bProcessor->getUndertowPositions();
 //            currentPlayPositions.addArray(currentUndertowPositions);

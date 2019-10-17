@@ -41,13 +41,14 @@ public:
 	inline const float lastOutLeft() const noexcept { return lastFrameLeft; }
 	inline const float lastOutRight() const noexcept { return lastFrameRight; }
     
-    inline AudioBuffer<float> getBuffer() const noexcept { return inputs; }
+    inline const AudioBuffer<float> getBuffer() const noexcept { return inputs; }
 
 	//mutators
-	inline void setLength(float delayLength);
+    void setLength(float delayLength);
 	inline void setMax(float delayMax) { max = delayMax; }
 	inline void setGain(float delayGain) { gain = delayGain; }
     inline void setFeedback(float fb) { feedback = fb; }
+
 
 	float nextOutLeft();
 	float nextOutRight();
@@ -55,6 +56,7 @@ public:
 	void tick(float input, float* outputs, bool stereo = true);
 	void scalePrevious(float coefficient, unsigned long offset, int channel);
     void clear();
+    void reset();
     
     inline void setSampleRate(double sr) { sampleRate = sr; }
 
@@ -152,7 +154,7 @@ public:
 	inline const float getSmoothDuration() const noexcept { return dSmoothDuration; }
 	inline const bool getActive() const noexcept { return dBlendronicActive; }
     inline const bool getShouldDuck() const noexcept { return shouldDuck; }
-    inline AudioBuffer<float> getDelayBuffer() const noexcept { return delayLinear->getBuffer(); }
+    inline const AudioBuffer<float> getDelayBuffer() const noexcept { return delayLinear->getBuffer(); }
 
 	//mutators
 	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to stkFloat)
@@ -188,7 +190,7 @@ public:
     
     inline void setSampleRate(double sr) { delayLinear->setSampleRate(sr); dSmooth->setSampleRate(sr); }
     
-    inline void clear() { delayLinear->clear(); }
+    inline void clear() { delayLinear->clear(); delayLinear->reset(); }
 
 private:
     BKDelayL::Ptr delayLinear;

@@ -373,6 +373,10 @@ void BlendronicProcessor::updateDelayParameters()
     
     float pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
     numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
+    //int offset = beatIndex % 2; //try 3 1 2 beat pattern with this
+    int offset = 0;
+    int prevBeatIndex = beatIndex - offset < 0 ? prep->getBeats().size() - 1 : beatIndex - offset;
+    float prevNumSamplesBeat = prep->getBeats()[prevBeatIndex] * pulseLength * sampleRate;
     
     float smoothRate = 0.0f; // samplesOfDelayLength per tick
     float beatDelta = fabsf(prevBeat - prep->getBeats()[beatIndex]);
@@ -404,7 +408,7 @@ void BlendronicProcessor::updateDelayParameters()
     
     DBG(String(getId()) + " new envelope target = " + String(numSamplesBeat));
     DBG(String(smoothRate));
-    delay->setDelayTargetLength(numSamplesBeat);
+    delay->setDelayTargetLength(prevNumSamplesBeat);
     delay->setSmoothDuration(smoothRate);
     delay->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
 }
