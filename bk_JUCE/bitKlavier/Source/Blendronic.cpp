@@ -268,22 +268,14 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
             //clearDelayOnNextBeat = true;
         }
     }
-    bool noteOnClose = prep->getCloseMode() == BlendronicAnyNoteOnClose;
-    bool firstNoteOnClose = prep->getCloseMode() == BlendronicFirstNoteOnClose && keysDepressed.size() == 1;
-    bool noteOnOpen = prep->getOpenMode() == BlendronicAnyNoteOnOpen;
-    bool firstNoteOnOpen = prep->getOpenMode() == BlendronicFirstNoteOnOpen && keysDepressed.size() == 1;
-    if (doClose && doOpen)
-    {
-        if ((noteOnClose && noteOnOpen) || (firstNoteOnClose && firstNoteOnOpen)) delay->setActive(!delay->getActive());
-    }
-    else if (doClose)
-    {
-        if (noteOnClose || firstNoteOnClose) delay->setActive(false);
-    }
-    else if (doOpen)
-    {
-        if (noteOnOpen || firstNoteOnOpen) delay->setActive(true);
-    }
+    bool noteOnClose = (prep->getCloseMode() == BlendronicAnyNoteOnClose) && doClose;
+    bool firstNoteOnClose = (prep->getCloseMode() == BlendronicFirstNoteOnClose && keysDepressed.size() == 1) && doClose;
+    bool noteOnOpen = (prep->getOpenMode() == BlendronicAnyNoteOnOpen) && doOpen;
+    bool firstNoteOnOpen = (prep->getOpenMode() == BlendronicFirstNoteOnOpen && keysDepressed.size() == 1) && doOpen;
+    
+    if ((noteOnClose || firstNoteOnClose) && (noteOnOpen || firstNoteOnOpen)) toggleActive();
+    else if (noteOnClose || firstNoteOnClose) setActive(false);
+    else if (noteOnOpen || firstNoteOnOpen) setActive(true);
 }
 
 void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
@@ -326,22 +318,14 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
         }
     }
     
-    bool noteOffClose = prep->getCloseMode() == BlendronicAnyNoteOffClose;
-    bool firstNoteOffClose = prep->getCloseMode() == BlendronicLastNoteOffClose && keysDepressed.size() == 0;
-    bool noteOffOpen = prep->getOpenMode() == BlendronicAnyNoteOffOpen;
-    bool firstNoteOffOpen = prep->getOpenMode() == BlendronicLastNoteOffOpen && keysDepressed.size() == 0;
-    if (doClose && doOpen)
-    {
-        if ((noteOffClose && noteOffOpen) || (firstNoteOffClose && firstNoteOffOpen)) delay->setActive(!delay->getActive());
-    }
-    else if (doClose)
-    {
-        if (noteOffClose || firstNoteOffClose) delay->setActive(false);
-    }
-    else if (doOpen)
-    {
-        if (noteOffOpen || firstNoteOffOpen) delay->setActive(true);
-    }
+    bool noteOffClose = (prep->getCloseMode() == BlendronicAnyNoteOffClose) && doClose;
+    bool firstNoteOffClose = (prep->getCloseMode() == BlendronicLastNoteOffClose && keysDepressed.size() == 0) && doClose;
+    bool noteOffOpen = (prep->getOpenMode() == BlendronicAnyNoteOffOpen) && doOpen;
+    bool firstNoteOffOpen = (prep->getOpenMode() == BlendronicLastNoteOffOpen && keysDepressed.size() == 0) && doOpen;
+    
+    if ((noteOffClose || firstNoteOffClose) && (noteOffOpen || firstNoteOffOpen)) toggleActive();
+    else if (noteOffClose || firstNoteOffClose) setActive(false);
+    else if (noteOffOpen || firstNoteOffOpen) setActive(true);
 }
 
 void BlendronicProcessor::postRelease(int noteNumber, int midiChannel)

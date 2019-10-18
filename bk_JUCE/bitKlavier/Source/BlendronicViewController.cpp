@@ -133,8 +133,6 @@ BKViewController(p, theGraph, 2)
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
-    BlendronicProcessor::Ptr bProcessor = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
-    
     delayLineDisplay.setNumChannels(1);
     //delayLineDisplay.setBufferSize(bProcessor->getDelayBuffer().getNumSamples());
     delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
@@ -727,68 +725,14 @@ void BlendronicPreparationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplayBlendronic)
     {
-        BlendronicProcessor::Ptr bProcessor = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
+        BlendronicProcessor::Ptr proc = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
         
-        if (bProcessor != nullptr)
+        if (proc != nullptr)
         {
-            delayLineDisplay.pushBuffer(bProcessor->getDelayBuffer());
-//            Array<int> currentPlayPositions = bProcessor->getPlayPositions();
-//            Array<int> currentUndertowPositions = bProcessor->getUndertowPositions();
-//            currentPlayPositions.addArray(currentUndertowPositions);
-//
-//            nDisplaySlider.updateSliderPositions(currentPlayPositions);
-//
-//            holdTimeMinMaxSlider->setDisplayValue(bProcessor->getHoldTime());
-//            if(bProcessor->getNumActiveNotes())
-//            {
-//                velocityMinMaxSlider->setDisplayValue(bProcessor->getLastVelocity() * 127.);
-//                clusterMinSlider->setDisplayValue(bProcessor->getCurrentClusterSize() + 1);
-//                //clusterThresholdSlider->setDisplayValue(bProcessor->getClusterThresholdTimer());
-//                if(bProcessor->getCurrentClusterSize()) clusterThresholdSlider->setDisplayValue(bProcessor->getClusterThresholdTimer());
-//                else clusterThresholdSlider->setDisplayValue(0);
-//            }
-//            else
-//            {
-//                velocityMinMaxSlider->setDisplayValue(0);
-//                clusterMinSlider->setDisplayValue(0);
-//                clusterThresholdSlider->setDisplayValue(0);
-//            }
-            
-            
-            
-            BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-//            if(active->getMode() == NoteLengthSync)
-//            {
-//                holdTimeMinMaxSlider->setBright();
-//                holdTimeMinMaxSlider->setEnabled(true);
-//
-//                clusterMinSlider->setBright();
-//                clusterMinSlider->setEnabled(true);
-//
-//                if(active->getClusterMin() > 1)
-//                {
-//                    clusterThresholdSlider->setBright();
-//                    clusterThresholdSlider->setEnabled(true);
-//                }
-//                else
-//                {
-//                    clusterThresholdSlider->setDim(gModAlpha);
-//                    clusterThresholdSlider->setEnabled(false);
-//                }
-//            }
-//            else
-//            {
-//                holdTimeMinMaxSlider->setDim(gModAlpha);
-//                holdTimeMinMaxSlider->setEnabled(false);
-//
-//                clusterMinSlider->setDim(gModAlpha);
-//                clusterMinSlider->setEnabled(false);
-//
-//                clusterThresholdSlider->setDim(gModAlpha);
-//                clusterThresholdSlider->setEnabled(false);
-//            }
-            
-            
+            if (proc->getActive()) delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
+            else delayLineDisplay.setColours(Colours::lightgrey.withMultipliedBrightness(0.6), Colours::darkgrey);
+            delayLineDisplay.pushBuffer(proc->getDelayBuffer());
         }
     }
 }

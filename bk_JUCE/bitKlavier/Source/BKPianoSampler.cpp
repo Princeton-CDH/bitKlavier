@@ -527,6 +527,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     loopStart = playingSound->loopStart;
     loopEnd = playingSound->loopEnd + 1;
     
+    unsigned long addCounter = 0;
     while (--numSamples >= 0)
     {
         // always increment length
@@ -637,6 +638,15 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         l = lgain * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
         r = rgain * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
         
+        if (bDelay != nullptr)
+        {
+            if (bDelay->getActive() == true)
+            {
+                bDelay->addSample(l, addCounter, 0);
+                bDelay->addSample(r, addCounter, 1);
+                addCounter++;
+            }
+        }
         if (outR != nullptr)
         {
             *outL++ += (l);
@@ -663,6 +673,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
+    unsigned long addCounter = 0;
     while (--numSamples >= 0)
     {
         // always increment length
@@ -744,6 +755,15 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         float l = lgain * adsr.tick() * (sampleL * sampleEnv.tick());
         float r = rgain * adsr.lastOut() * (sampleR * sampleEnv.lastOut());
         
+        if (bDelay != nullptr)
+        {
+            if (bDelay->getActive() == true)
+            {
+                bDelay->addSample(l, addCounter, 0);
+                bDelay->addSample(r, addCounter, 1);
+                addCounter++;
+            }
+        }
         if (outR != nullptr)
         {
             *outL++ += (l);

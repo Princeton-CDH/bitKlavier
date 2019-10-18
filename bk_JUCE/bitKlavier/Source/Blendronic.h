@@ -69,7 +69,6 @@ public:
 	inline const int getHoldMax() const noexcept { return holdMax; }
 	inline const int getVelocityMin() const noexcept { return velocityMin; }
 	inline const int getVelocityMax() const noexcept { return velocityMax; }
-	inline const bool getActive() const noexcept { return isActive; }
 	inline const bool getInputGain() const noexcept { return inputGain; }
     inline const BlendronicSyncMode getSyncMode() const noexcept { return bSyncMode; }
     inline const BlendronicClearMode getClearMode() const noexcept { return bClearMode; }
@@ -99,8 +98,6 @@ public:
 	inline const void setHoldMax(int max) { holdMax = max; }
 	inline const void setVelocityMin(int min) { velocityMin = min; }
 	inline const void setVelocityMax(int max) { velocityMax = max; }
-	inline const void setActive(bool newActive) { isActive = newActive; }
-	inline const void toggleActive() { isActive = !isActive; }
 	inline const void setInputGain(float gain) { inputGain = gain; }
     inline const void setSyncMode(BlendronicSyncMode mode) { bSyncMode = mode; }
     inline const void setClearMode(BlendronicClearMode mode) { bClearMode = mode; }
@@ -440,6 +437,7 @@ public:
     inline BKSynthesiser* getSynth(void) const noexcept { return synth; }
     inline Array<int> getKeysDepressed(void) const noexcept { return keysDepressed; }
     inline const AudioBuffer<float> getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
+    inline const bool getActive() const noexcept { return delay->getActive(); }
 
 
 	//mutators
@@ -451,6 +449,8 @@ public:
     inline void setFeedbackIndex(int index) { feedbackIndex = index; }
 	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
     inline void setClearDelayOnNextBeat(bool clear) { clearDelayOnNextBeat = clear; }
+    inline const void setActive(bool newActive) { delay->setActive(newActive); }
+    inline const void toggleActive() { delay->toggleActive(); }
 	inline void reset(void) { blendronic->aPrep->copy(blendronic->sPrep); }
     
     void tick(float* outputs);
