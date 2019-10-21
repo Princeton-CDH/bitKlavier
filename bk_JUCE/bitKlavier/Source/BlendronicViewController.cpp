@@ -141,6 +141,24 @@ BKViewController(p, theGraph, 2)
     //delayLineDisplay.setBufferSize(bProcessor->getDelayBuffer().getNumSamples());
     delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
     addAndMakeVisible(&delayLineDisplay);
+
+    beatDelayLinkButton.setButtonText("Set delays to beats");
+    beatDelayLinkButton.setTooltip("Indicates whether Blendronic delay lengths will be linked to the beat pattern at some rotation");
+    beatDelayLinkButton.addListener(this);
+    addAndMakeVisible(beatDelayLinkButton);
+    
+    rotationLabel.setText("rotated", dontSendNotification);
+    rotationLabel.setJustificationType(juce::Justification::centredRight);
+    rotationLabel.setTooltip("Determines the rotation of value if delay lengths are linked to the beat pattern");
+    addAndMakeVisible(&rotationLabel, ALL);
+    
+    rotationCB.setName("Rotation");
+    rotationCB.BKSetJustificationType(juce::Justification::centredRight);
+    rotationCB.setTooltip("Determines the rotation of value if delay lengths are linked to the beat pattern");
+    rotationCB.addSeparator();
+    rotationCB.addListener(this);
+    rotationCB.setSelectedItemIndex(0);
+    addAndMakeVisible(rotationCB);
     
     currentTab = 0;
     displayTab(currentTab);
@@ -164,6 +182,9 @@ void BlendronicViewController::invisible(void)
     openModeSelectCB.setVisible(false);
     openModeLabel.setVisible(false);
     delayLineDisplay.setVisible(false);
+    beatDelayLinkButton.setVisible(false);
+    rotationLabel.setVisible(false);
+    rotationCB.setVisible(false);
 }
 
 void BlendronicViewController::displayShared(void)
@@ -213,6 +234,9 @@ void BlendronicViewController::displayTab(int tab)
     
         smoothModeSelectCB.setVisible(true);
         smoothModeLabel.setVisible(true);
+        beatDelayLinkButton.setVisible(true);
+        rotationLabel.setVisible(true);
+        rotationCB.setVisible(true);
         for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setVisible(true);
@@ -237,6 +261,14 @@ void BlendronicViewController::displayTab(int tab)
         Rectangle<int> smoothModeLabelRect (smoothModeSelectCBRect.removeFromRight(smoothModeSelectCBRect.getWidth()*0.5));
         smoothModeSelectCB.setBounds(smoothModeSelectCBRect);
         smoothModeLabel.setBounds(smoothModeLabelRect);
+        
+        rightColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+        Rectangle<int> rotationCBRect (rightColumn.removeFromTop(gComponentComboBoxHeight));
+        Rectangle<int> rotationLabelRect (rotationCBRect.removeFromLeft(rightColumn.getWidth() * 0.7));
+        Rectangle<int> beatDelayLinkButtonRect (rotationLabelRect.removeFromLeft(rightColumn.getWidth() * 0.52));
+        rotationCB.setBounds(rotationCBRect);
+        rotationLabel.setBounds(rotationLabelRect);
+        beatDelayLinkButton.setBounds(beatDelayLinkButtonRect);
 
         area.removeFromTop(sliderHeight + gYSpacing - gComponentComboBoxHeight*1.5);
         for (int i = 0; i < paramSliders.size(); i++)
@@ -366,6 +398,10 @@ void BlendronicPreparationEditor::update(void)
         selectCB.setSelectedId(processor.updateState->currentBlendronicId, dontSendNotification);
         smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
         syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
+        clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
+        closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
+        openModeSelectCB.setSelectedItemIndex(prep->getOpenMode(), dontSendNotification);
+        rotationCB.setSelectedItemIndex(prep->getRotation(), dontSendNotification);
 
         for(int i = 0; i < paramSliders.size(); i++)
         {
@@ -594,6 +630,16 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         fillCloseModeSelectCB();
         
     }
+    else if (name == "Rotation")
+    {
+        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+        
+        prep    ->setRotation(index);
+        active  ->setRotation(index);
+        
+        fillRotationCB();
+    }
 }
 
 void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -730,12 +776,30 @@ void BlendronicPreparationEditor::fillCloseModeSelectCB()
     closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
 }
 
+void BlendronicPreparationEditor::fillRotationCB()
+{
+    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+    
+    rotationCB.clear(dontSendNotification);
+    
+    for (int i = 0; i < prep->getBeats().size(); ++i)
+    {
+        rotationCB.addItem(String(i), i+1);
+    }
+    
+    rotationCB.setSelectedItemIndex(prep->getRotation(), dontSendNotification);
+}
+
 void BlendronicPreparationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplayBlendronic)
     {
         BlendronicProcessor::Ptr proc = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
         BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+        if (prep != nullptr)
+        {
+            if (rotationCB.getNumItems() != prep->getBeats().size()) fillRotationCB();
+        }
         
         if (proc != nullptr)
         {
@@ -755,6 +819,11 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
     {
         prep    ->setBeat(whichSlider, values[0]);
         active  ->setBeat(whichSlider, values[0]);
+    }
+    else if (name == "delay length")
+    {
+        prep    ->setDelayLength(whichSlider, values[0]);
+        active  ->setDelayLength(whichSlider, values[0]);
     }
     else if (name == "smooth timings")
     {
@@ -813,12 +882,22 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     {
         getPrepOptionMenu(PreparationTypeBlendronic).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
-//    else if (b == &keyOnResetToggle)
-//    {
-//        bool state = b->getToggleState();
-//        prep->setKeyOnReset(state);
-//        active->setKeyOnReset(state);
-//    }
+    else if (b == &beatDelayLinkButton)
+    {
+        Array<float> beats (active->getBeats());
+        for (int i = 0; i < active->getBeats().size(); ++i)
+        {
+            beats.set((i + active->getRotation()) % active->getBeats().size(), active->getBeats()[i]);
+        }
+        active->setDelayLengths(beats);
+        for(int i = 0; i < paramSliders.size(); i++)
+        {
+            if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
+            {
+                paramSliders[i]->setTo(active->getDelayLengths(), dontSendNotification);
+            }
+        }
+    }
     else if (b == &rightArrow)
     {
         arrowPressed(RightArrow);

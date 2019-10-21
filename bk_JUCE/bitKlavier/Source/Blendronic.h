@@ -72,6 +72,7 @@ public:
     inline const BlendronicClearMode getClearMode() const noexcept { return bClearMode; }
     inline const BlendronicOpenMode getOpenMode() const noexcept { return bOpenMode; }
     inline const BlendronicCloseMode getCloseMode() const noexcept { return bCloseMode; }
+    inline const int getRotation() const noexcept { return bRotation; }
 
 	//mutators
 	inline void setName(String n) { name = n; }
@@ -92,6 +93,7 @@ public:
     inline const void setClearMode(BlendronicClearMode mode) { bClearMode = mode; }
     inline const void setOpenMode(BlendronicOpenMode mode) { bOpenMode = mode; }
     inline const void setCloseMode(BlendronicCloseMode mode) { bCloseMode = mode; }
+    inline const void setRotation(int rotation) { bRotation = rotation; }
     
 	inline void setInputThresh(float newThresh)
 	{
@@ -270,6 +272,8 @@ private:
     BlendronicClearMode bClearMode;
     BlendronicOpenMode bOpenMode;
     BlendronicCloseMode bCloseMode;
+    
+    int bRotation;
 
 	//signal chain stk classes
 	float bFeedbackCoefficient;

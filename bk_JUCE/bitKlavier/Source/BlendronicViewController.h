@@ -54,6 +54,10 @@ protected:
         multiSlidersDidChange(name, values);
     }
     
+    BKTextButton beatDelayLinkButton;
+    BKLabel rotationLabel;
+    BKComboBox rotationCB;
+    
     BKEditableComboBox selectCB;
     BKComboBox smoothModeSelectCB;
     BKComboBox syncModeSelectCB;
@@ -112,6 +116,7 @@ public:
     void fillClearModeSelectCB(void);
     void fillOpenModeSelectCB(void);
     void fillCloseModeSelectCB(void);
+    void fillRotationCB(void);
     
     void timerCallback() override;
     
