@@ -16,12 +16,10 @@
 BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
 	name(p->getName()),
 	bBeats(p->getBeats()),
+    bDelayLengths(p->getDelayLengths()),
 	bSmoothDurations(p->getSmoothDurations()),
 	bFeedbackCoefficients(p->getFeedbackCoefficients()),
 	bDelayMax(p->getDelayMax()),
-	bDelayLength(p->getDelayLength()),
-	bSmoothValue(p->getSmoothValue()),
-	bSmoothDuration(p->getSmoothDuration()),
     bSmoothMode(p->getSmoothMode()),
     bSyncMode(p->getSyncMode()),
     bClearMode(p->getClearMode()),
@@ -37,18 +35,14 @@ BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
 }
 
 //constructor with input
-BlendronicPreparation::BlendronicPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
-	Array<float> feedbackCoefficients, float smoothValue, float smoothDuration, BlendronicSmoothMode smoothMode,
-    BlendronicSyncMode syncMode, BlendronicClearMode clearMode, BlendronicOpenMode openMode, BlendronicCloseMode closeMode,
-	float delayMax, float delayLength, float feedbackCoefficient) :
+BlendronicPreparation::BlendronicPreparation(String newName, Array<float> beats, Array<float> delayLengths, Array<float> smoothTimes,
+	Array<float> feedbackCoefficients, BlendronicSmoothMode smoothMode, BlendronicSyncMode syncMode, BlendronicClearMode clearMode, BlendronicOpenMode openMode, BlendronicCloseMode closeMode, float delayMax) :
 	name(newName),
 	bBeats(beats),
+    bDelayLengths(delayLengths),
 	bSmoothDurations(smoothTimes),
 	bFeedbackCoefficients(feedbackCoefficients),
 	bDelayMax(delayMax),
-	bDelayLength(delayLength),
-	bSmoothValue(smoothValue),
-	bSmoothDuration(smoothDuration),
     bSmoothMode(smoothMode),
     bSyncMode(syncMode),
     bClearMode(clearMode),
@@ -66,13 +60,11 @@ BlendronicPreparation::BlendronicPreparation(String newName, Array<float> beats,
 //empty constructor
 BlendronicPreparation::BlendronicPreparation(void) :
 	name("blank blendronic"),
-	bBeats(Array<float>({ 4. })),
+	bBeats(Array<float>({ 4., 3., 2., 3.})),
+    bDelayLengths(Array<float>({ 4., 3., 2., 3.})),
 	bSmoothDurations(Array<float>({ 0.1 })),
 	bFeedbackCoefficients(Array<float>({ 0.95 })),
 	bDelayMax(44100. * 5.),
-	bDelayLength(44100. * 2.),
-	bSmoothValue(180. * 44.1),
-	bSmoothDuration(0),
     bSmoothMode(ConstantTimeSmooth),
     bSyncMode(BlendronicFirstNoteOnSync),
     bClearMode(BlendronicFirstNoteOnClear),
@@ -111,12 +103,13 @@ bool BlendronicPreparation::compare(BlendronicPreparation::Ptr b)
 BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
 	TempoProcessor::Ptr bTempo, GeneralSettings::Ptr bGeneral, BKSynthesiser* bMain):
 	blendronic(bBlendronic),
+    synth(bMain),
 	tempo(bTempo),
-	synth(bMain),
 	general(bGeneral),
     keymaps(Keymap::PtrArr()),
 	sampleTimer(0),
 	beatIndex(0),
+    delayIndex(0),
 	smoothIndex(0),
 	feedbackIndex(0)
 {
@@ -132,7 +125,8 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
-    delay = synth->createBlendronicDelay(prep->getDelayMax(), prep->getFeedbackCoefficients()[0], prep->getDelayLength(), prep->getSmoothValue(), prep->getSmoothDuration(), true);
+    delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getSmoothDurations()[0],
+                                         prep->getFeedbackCoefficients()[0], prep->getDelayMax(), true);
     
     DBG("Create bproc");
 }
@@ -145,19 +139,28 @@ BlendronicProcessor::~BlendronicProcessor()
 void BlendronicProcessor::tick(float* outputs)
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
+    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
     sampleTimer++;
 
     if (sampleTimer >= numSamplesBeat)
     {
+        pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+        
         beatIndex++;
         if (beatIndex >= prep->getBeats().size()) beatIndex = 0;
+        delayIndex++;
+        if (delayIndex >= prep->getDelayLengths().size()) delayIndex = 0;
         smoothIndex++;
         if (smoothIndex >= prep->getSmoothDurations().size()) smoothIndex = 0;
         feedbackIndex++;
         if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
-
+        
         updateDelayParameters();
+        
+        numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
+        sampleTimer = 0;
+        
         if (clearDelayOnNextBeat)
         {
             delay->clear();
@@ -254,6 +257,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
         {
             setSampleTimer(0);
             setBeatIndex(0);
+            setDelayIndex(0);
             setSmoothIndex(0);
             setFeedbackIndex(0);
             updateDelayParameters();
@@ -300,6 +304,7 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
         {
             setSampleTimer(0);
             setBeatIndex(0);
+            setDelayIndex(0);
             setSmoothIndex(0);
             setFeedbackIndex(0);
             updateDelayParameters();
@@ -337,12 +342,23 @@ void BlendronicProcessor::prepareToPlay(double sr)
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     prevBeat = prep->getBeats()[0];
+    prevDelay = prep->getDelayLengths()[0];
     
 	sampleRate = sr;
     delay->setSampleRate(sr);
+    
+    beatIndex = 0;
+    delayIndex = 0;
+    smoothIndex = 0;
+    feedbackIndex = 0;
+    
     numSamplesBeat = prep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempo->getTempo()->aPrep->getSubdivisions()) / tempo->getTempo()->aPrep->getTempo());
-    prep->setDelayLength(numSamplesBeat);
-    delay->setDelayTargetLength(numSamplesBeat);
+    numSamplesDelay = prep->getDelayLengths()[delayIndex] * sampleRate * ((60.0 / tempo->getTempo()->aPrep->getSubdivisions()) / tempo->getTempo()->aPrep->getTempo());
+    
+    delay->setDelayLength(numSamplesDelay);
+    delay->setDelayTargetLength(numSamplesDelay);
+    
+    updateDelayParameters();
 }
 
 void BlendronicProcessor::playNote(int channel, int note, float velocity)
@@ -353,28 +369,23 @@ void BlendronicProcessor::playNote(int channel, int note, float velocity)
 void BlendronicProcessor::updateDelayParameters()
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
-    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
-    float pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-    numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
-    //int offset = beatIndex % 2; //try 3 1 2 beat pattern with this
-    int offset = 0;
-    int prevBeatIndex = beatIndex - offset < 0 ? prep->getBeats().size() - 1 : beatIndex - offset;
-    float prevNumSamplesBeat = prep->getBeats()[prevBeatIndex] * pulseLength * sampleRate;
+    numSamplesDelay = prep->getDelayLengths()[delayIndex] * pulseLength * sampleRate;
     
-    float smoothRate = 0.0f; // samplesOfDelayLength per tick
-    float beatDelta = fabsf(prevBeat - prep->getBeats()[beatIndex]);
-    prevBeat = prep->getBeats()[beatIndex];
+    float delayDelta = fabsf(prevDelay - prep->getDelayLengths()[delayIndex]);
+    prevDelay = prep->getDelayLengths()[delayIndex];
+    
+    float smoothRate = 0.0f;
     if (prep->getSmoothMode()       == ConstantRateSmooth)
     {
         smoothRate = prep->getSmoothDurations()[smoothIndex] / pulseLength;
     }
     else if (prep->getSmoothMode()  == ConstantTimeSmooth)
     {
-        if (beatDelta == 0)
-            smoothRate = INFINITY;//prep->getSmoothDurations()[smoothIndex] / pulseLength;
+        if (delayDelta == 0)
+            smoothRate = INFINITY;
         else
-            smoothRate = beatDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength);
+            smoothRate = delayDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength);
     }
     else if (prep->getSmoothMode()  == ProportionalRateSmooth)
     {
@@ -382,17 +393,15 @@ void BlendronicProcessor::updateDelayParameters()
     }
     else if (prep->getSmoothMode()  == ProportionalTimeSmooth)
     {
-        if (beatDelta == 0)
+        if (delayDelta == 0)
             smoothRate = INFINITY;//prep->getSmoothDurations()[smoothIndex] / (pulseLength * prep->getBeats()[beatIndex]);
         else
-            smoothRate = beatDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength * prep->getBeats()[beatIndex]);
+            smoothRate = delayDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength * prep->getBeats()[beatIndex]);
     }
     
-    sampleTimer = 0;
-    
-    DBG(String(getId()) + " new envelope target = " + String(numSamplesBeat));
+    DBG(String(getId()) + " new envelope target = " + String(numSamplesDelay));
     DBG(String(smoothRate));
-    delay->setDelayTargetLength(prevNumSamplesBeat);
+    delay->setDelayTargetLength(numSamplesDelay);
     delay->setSmoothDuration(smoothRate);
     delay->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
 }

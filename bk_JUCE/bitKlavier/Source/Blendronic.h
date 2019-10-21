@@ -37,10 +37,9 @@ public:
 
 	//constructors
 	BlendronicPreparation(BlendronicPreparation::Ptr p);
-	BlendronicPreparation(String newName, Array<float> beats, Array<float> smoothTimes,
-		Array<float> feedbackCoefficients, float smoothValue, float smoothDuration, BlendronicSmoothMode smoothMode,
-        BlendronicSyncMode syncMode, BlendronicClearMode clearMode, BlendronicOpenMode openMode, BlendronicCloseMode closeMode, 
-        float delayMax, float delayLength, float feedbackCoefficient);
+	BlendronicPreparation(String newName, Array<float> beats, Array<float> delayLengths, Array<float> smoothTimes,
+		Array<float> feedbackCoefficients, BlendronicSmoothMode smoothMode, BlendronicSyncMode syncMode,
+        BlendronicClearMode clearMode, BlendronicOpenMode openMode, BlendronicCloseMode closeMode, float delayMax);
 	BlendronicPreparation(void);
 
 	// copy, modify, compare, randomize
@@ -56,12 +55,11 @@ public:
 	//accessors
 	inline const String getName() const noexcept { return name; }
 	inline const Array<float> getBeats() const noexcept { return bBeats; }
+    inline const Array<float> getDelayLengths() const noexcept { return bDelayLengths; }
 	inline const Array<float> getSmoothDurations() const noexcept { return bSmoothDurations; }
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
 	inline const float getDelayMax() const noexcept { return bDelayMax; }
-	inline const float getDelayLength() const noexcept { return bDelayLength; }
-	inline const float getSmoothValue() const noexcept { return bSmoothValue; }
-	inline const float getSmoothDuration() const noexcept { return bSmoothDuration; }
+	
     inline const BlendronicSmoothMode getSmoothMode() const noexcept { return bSmoothMode; }
 	inline const float getInputThreshSEC() const noexcept { return bInputThreshSec; }
 	inline const float getInputThreshMS() const noexcept { return bInputThresh; }
@@ -78,17 +76,23 @@ public:
 	//mutators
 	inline void setName(String n) { name = n; }
 	inline void setBeats(Array<float> beats) { bBeats.swapWith(beats); }
+    inline void setDelayLengths(Array<float> delayLengths) { bDelayLengths.swapWith(delayLengths); }
 	inline void setSmoothDurations(Array<float> smoothTimes) { bSmoothDurations.swapWith(smoothTimes); }
 	inline void setFeedbackCoefficients(Array<float> feedbackCoefficients) { bFeedbackCoefficients.swapWith(feedbackCoefficients); }
     
     inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
+    
     inline void setBeat(int whichSlider, float value) { bBeats.set(whichSlider, value); }
-    inline void setDelayLength(float delayLength) { bDelayLength = delayLength; }
+    inline void setDelayLength(int whichSlider, float value) { bDelayLengths.set(whichSlider, value); }
     inline void setSmoothDuration(int whichSlider, float value) { bSmoothDurations.set(whichSlider, value); }
-    inline void setSmoothDuration(float smoothDuration) { bSmoothDuration = smoothDuration; }
     inline void setFeedbackCoefficient(int whichSlider, float value) { bFeedbackCoefficients.set(whichSlider, value); }
-	inline void setSmoothValue(float smoothValue) { bSmoothValue = smoothValue; }
+    
     inline const void setSmoothMode(BlendronicSmoothMode mode) { bSmoothMode = mode; }
+    inline const void setSyncMode(BlendronicSyncMode mode) { bSyncMode = mode; }
+    inline const void setClearMode(BlendronicClearMode mode) { bClearMode = mode; }
+    inline const void setOpenMode(BlendronicOpenMode mode) { bOpenMode = mode; }
+    inline const void setCloseMode(BlendronicCloseMode mode) { bCloseMode = mode; }
+    
 	inline void setInputThresh(float newThresh)
 	{
 		bInputThresh = newThresh;
@@ -99,10 +103,6 @@ public:
 	inline const void setVelocityMin(int min) { velocityMin = min; }
 	inline const void setVelocityMax(int max) { velocityMax = max; }
 	inline const void setInputGain(float gain) { inputGain = gain; }
-    inline const void setSyncMode(BlendronicSyncMode mode) { bSyncMode = mode; }
-    inline const void setClearMode(BlendronicClearMode mode) { bClearMode = mode; }
-    inline const void setOpenMode(BlendronicOpenMode mode) { bOpenMode = mode; }
-    inline const void setCloseMode(BlendronicCloseMode mode) { bCloseMode = mode; }
 
     // TODO
 	void print(void)
@@ -116,7 +116,6 @@ public:
         ValueTree prep("params");
         
         prep.setProperty(ptagBlendronic_smoothMode, getSmoothMode(), 0);
-
         prep.setProperty(ptagBlendronic_syncMode, getSyncMode(), 0);
         prep.setProperty(ptagBlendronic_clearMode, getClearMode(), 0);
         prep.setProperty(ptagBlendronic_openMode, getOpenMode(), 0);
@@ -129,6 +128,14 @@ public:
             beats.setProperty(ptagFloat + String(count++), f, 0);
         }
         prep.addChild(beats, -1, 0);
+        
+        ValueTree delayLengths(vtagBlendronic_delayLengths);
+        count = 0;
+        for (auto f : getDelayLengths())
+        {
+            delayLengths.setProperty(ptagFloat + String(count++), f, 0);
+        }
+        prep.addChild(delayLengths, -1, 0);
         
         ValueTree smoothDurations(vtagBlendronic_smoothDurations);
         count = 0;
@@ -190,9 +197,23 @@ public:
                         beats.add(f);
                     }
                 }
-
                 setBeats(beats);
-
+            }
+            else if (sub->hasTagName(vtagBlendronic_delayLengths))
+            {
+                Array<float> lengths;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String()) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        lengths.add(f);
+                    }
+                }
+                setDelayLengths(lengths);
             }
             else if (sub->hasTagName(vtagBlendronic_smoothDurations))
             {
@@ -208,9 +229,7 @@ public:
                         durs.add(f);
                     }
                 }
-
                 setSmoothDurations(durs);
-
             }
             else if (sub->hasTagName(vtagBlendronic_feedbackCoefficients))
             {
@@ -226,7 +245,6 @@ public:
                         coeffs.add(f);
                     }
                 }
-
                 setFeedbackCoefficients(coeffs);
             }
         }
@@ -238,17 +256,20 @@ private:
 
 	//stuff from preset
 	Array<float> bBeats;
+    Array<float> bDelayLengths;
 	Array<float> bSmoothDurations;
 	Array<float> bFeedbackCoefficients;
 
 	//d0 stuff
 	float bDelayMax;
-	float bDelayLength;
 
 	//dsmooth stuff
-	float bSmoothValue;
-	float bSmoothDuration;
     BlendronicSmoothMode bSmoothMode;
+    
+    BlendronicSyncMode bSyncMode;
+    BlendronicClearMode bClearMode;
+    BlendronicOpenMode bOpenMode;
+    BlendronicCloseMode bCloseMode;
 
 	//signal chain stk classes
 	float bFeedbackCoefficient;
@@ -257,11 +278,6 @@ private:
 	float bInputThresh;
 	float bInputThreshSec;
 	int holdMin, holdMax, velocityMin, velocityMax;
-    
-    BlendronicSyncMode bSyncMode;
-    BlendronicClearMode bClearMode;
-    BlendronicOpenMode bOpenMode;
-    BlendronicCloseMode bCloseMode;
 
 	//needed for sampling
 	float inputGain;
@@ -432,6 +448,7 @@ public:
 	inline const float getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
     inline uint64 getSampleTime(void) const noexcept { return sampleTimer; }
     inline int getBeatIndex(void) const noexcept { return beatIndex; }
+    inline int getDelayIndex(void) const noexcept { return delayIndex; }
     inline int getSmoothIndex(void) const noexcept { return smoothIndex; }
     inline int getFeedbackIndex(void) const noexcept { return feedbackIndex; }
     inline BKSynthesiser* getSynth(void) const noexcept { return synth; }
@@ -445,6 +462,7 @@ public:
 	inline void setTempo(TempoProcessor::Ptr temp) { tempo = temp; }
     inline void setSampleTimer(uint64 sampleTime) { sampleTimer = sampleTime; }
     inline void setBeatIndex(int index) { beatIndex = index; }
+    inline void setDelayIndex(int index) { delayIndex = index; }
     inline void setSmoothIndex(int index) { smoothIndex = index; }
     inline void setFeedbackIndex(int index) { feedbackIndex = index; }
 	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
@@ -468,11 +486,14 @@ public:
     }
 
 private:
-	BKSynthesiser* synth;
-	GeneralSettings::Ptr general;
 
 	Blendronic::Ptr blendronic;
+    
+    BKSynthesiser* synth;
+    
 	TempoProcessor::Ptr tempo;
+
+    GeneralSettings::Ptr general;
 
 	BlendronicDelay::Ptr delay;
     
@@ -485,10 +506,12 @@ private:
     Array<uint64> holdTimers;
 	Array<int> keysDepressed;   //current keys that are depressed
 
-	float numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
+    float pulseLength;
+	float numSamplesBeat;
+    float numSamplesDelay; 
 	uint64 sampleTimer;
-    int beatIndex, smoothIndex, feedbackIndex;
-    float prevBeat;
+    int beatIndex, delayIndex, smoothIndex, feedbackIndex;
+    float prevBeat, prevDelay;
     bool clearDelayOnNextBeat;
 
 	//JUCE_LEAK_DETECTOR(BlendronicProcessor);

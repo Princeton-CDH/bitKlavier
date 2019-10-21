@@ -174,6 +174,7 @@ const String vtagBlendronic = "blendronic";
 const String vtagModBlendronic = "modBlendronic";
 const String ptagBlendronic_id = "Id";
 const String vtagBlendronic_beats = "beats";
+const String vtagBlendronic_delayLengths = "delayLengths";
 const String vtagBlendronic_smoothDurations = "smoothDurations";
 const String vtagBlendronic_feedbackCoefficients = "feedbackCoefficients";
 const String ptagBlendronic_smoothMode = "smooth";
@@ -781,6 +782,7 @@ typedef enum BlendronicParameterType
 {
     BlendronicId = 0,
     BlendronicBeats,
+    BlendronicDelayLengths,
     BlendronicSmoothDurations,
     BlendronicFeedbackCoeffs,
     BlendronicInputThresh,
@@ -796,6 +798,7 @@ static const std::vector<BKParameterDataType> cBlendronicDataTypes = {
     BKFloatArr,
     BKFloatArr,
     BKFloatArr,
+    BKFloatArr,
     BKFloat,
     BKFloat,
     BKFloat,
@@ -806,6 +809,7 @@ static const std::vector<BKParameterDataType> cBlendronicDataTypes = {
 static const std::vector<std::string> cBlendronicParameterTypes = {
     "Blendronic Id",
     "beats",
+    "delay lengths",
     "smooth timings",
     "feedback coefficients",
     "Input Thresh",
@@ -817,6 +821,7 @@ static const std::vector<std::string> cBlendronicParameterTypes = {
 
 static const std::vector<std::vector<float>> cBlendronicDefaultRangeValuesAndInc = {
     { 0.0f, 0.0f, 0.0f, 0.0f }, //min, max, default, increment, skew
+    { 0.0f, 8.0f, 4.0f, 0.1f },
     { 0.0f, 8.0f, 4.0f, 0.1f },
     { 0.0f, 1.0f, 0.1f, 0.0001f },
     { 0.0f, 1.0f, 0.95f, 0.01f }

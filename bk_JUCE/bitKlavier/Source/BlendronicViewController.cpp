@@ -40,7 +40,11 @@ BKViewController(p, theGraph, 2)
             
             if(paramSliders[idx]->getName() == "beats")
             {
-                paramSliders[idx]->setToolTipString("Determines delay times in terms of beats; double-click to edit all or add additional sequence steps");
+                paramSliders[idx]->setToolTipString("Determines the beat pattern of changing sequenced parameters; double-click to edit all or add additional sequence steps");
+            }
+            else if(paramSliders[idx]->getName() == "delay lengths")
+            {
+                paramSliders[idx]->setToolTipString("Determines the length of delay; double-click to edit all or add additional sequence steps");
             }
             else if(paramSliders[idx]->getName() == "smooth timings")
             {
@@ -215,7 +219,7 @@ void BlendronicViewController::displayTab(int tab)
         }
         
         // SET BOUNDS
-        int sliderHeight = height * 0.225f;
+        int sliderHeight = height * 0.2f;
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(hideOrShow.getBottom() + gYSpacing);
@@ -234,7 +238,7 @@ void BlendronicViewController::displayTab(int tab)
         smoothModeSelectCB.setBounds(smoothModeSelectCBRect);
         smoothModeLabel.setBounds(smoothModeLabelRect);
 
-        area.removeFromTop(sliderHeight + gYSpacing - gComponentComboBoxHeight);
+        area.removeFromTop(sliderHeight + gYSpacing - gComponentComboBoxHeight*1.5);
         for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setBounds(area.removeFromTop(sliderHeight));
@@ -368,6 +372,11 @@ void BlendronicPreparationEditor::update(void)
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicBeats]))
             {
                 paramSliders[i]->setTo(prep->getBeats(), dontSendNotification);
+            }
+            
+            if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
+            {
+                paramSliders[i]->setTo(prep->getDelayLengths(), dontSendNotification);
             }
 
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothDurations]))
@@ -771,6 +780,11 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     {
         prep    ->setBeats(newvals);
         active  ->setBeats(newvals);
+    }
+    else if (name == "delay lengths")
+    {
+        prep    ->setDelayLengths(newvals);
+        active  ->setDelayLengths(newvals);
     }
     else if (name == "smooth timings")
     {

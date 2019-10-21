@@ -220,7 +220,7 @@ BlendronicDelay::BlendronicDelay(BlendronicDelay::Ptr d):
     DBG("Create bdelay");
 }
 
-BlendronicDelay::BlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active) :
+BlendronicDelay::BlendronicDelay(float delayLength, float smoothValue, float smoothDuration, float delayGain, float delayMax, bool active) :
 	dDelayMax(delayMax),
 	dDelayGain(delayGain),
 	dDelayLength(delayLength),

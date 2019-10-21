@@ -140,7 +140,7 @@ public:
 
 	//constructors
 	BlendronicDelay(BlendronicDelay::Ptr d);
-	BlendronicDelay(float delayMax, float delayGain, float delayLength, float smoothValue, float smoothDuration, bool active = false);
+	BlendronicDelay(float delayLength, float smoothValue, float smoothDuration, float delayGain, float delayMax, bool active = false);
 	~BlendronicDelay();
 
 	//accessors
