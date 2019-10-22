@@ -48,6 +48,8 @@ struct BKBufferView::ChannelInfo
         {
             value = value.getUnionWith (newSample);
         }
+        if (newSample != 0.0f) owner.setCurrentBlock(nextSample-1 < 0 ? levels.size()-1 : nextSample-1);
+        owner.removeMarker(nextSample);
     }
     
     void setBufferSize (int newSize)
@@ -69,10 +71,15 @@ struct BKBufferView::ChannelInfo
 
 //==============================================================================
 BKBufferView::BKBufferView ()
-: numSamples (1024),
+: bufferSize(0),
+numBlocks (1024),
 inputSamplesPerBlock (256),
+invInputSamplesPerBlock (1./256.),
+lineSpacingInBlocks(256),
+verticalZoom(0.5),
 backgroundColour (Colours::black),
-waveformColour (Colours::white)
+waveformColour (Colours::white),
+markerColour (Colours::burlywood)
 {
     setOpaque (true);
     setNumChannels (1);
@@ -80,10 +87,15 @@ waveformColour (Colours::white)
 }
 
 BKBufferView::BKBufferView (int initialNumChannels)
-: numSamples (1024),
+: bufferSize(0),
+numBlocks (1024),
 inputSamplesPerBlock (256),
+invInputSamplesPerBlock (1./256.),
+lineSpacingInBlocks(256),
+verticalZoom(0.5),
 backgroundColour (Colours::black),
-waveformColour (Colours::white)
+waveformColour (Colours::white),
+markerColour (Colours::burlywood)
 {
     setOpaque (true);
     setNumChannels (initialNumChannels);
@@ -99,15 +111,15 @@ void BKBufferView::setNumChannels (int numChannels)
     channels.clear();
     
     for (int i = 0; i < numChannels; ++i)
-        channels.add (new ChannelInfo (*this, numSamples));
+        channels.add (new ChannelInfo (*this, numBlocks));
 }
 
-void BKBufferView::setBufferSize (int newNumSamples)
+void BKBufferView::setNumBlocks (int num)
 {
-    numSamples = newNumSamples;
+    numBlocks = num;
     
     for (auto* c : channels)
-        c->setBufferSize (newNumSamples);
+        c->setBufferSize (num);
 }
 
 void BKBufferView::clear()
@@ -119,6 +131,7 @@ void BKBufferView::clear()
 void BKBufferView::pushBuffer (const float** d, int numChannels, int num)
 {
     numChannels = jmin (numChannels, channels.size());
+    setNumBlocks(num*invInputSamplesPerBlock);
     
     for (int i = 0; i < numChannels; ++i)
         channels.getUnchecked(i)->pushSamples (d[i], num);
@@ -151,6 +164,7 @@ void BKBufferView::pushSample (const float* d, int numChannels)
 void BKBufferView::setSamplesPerBlock (int newSamplesPerPixel) noexcept
 {
     inputSamplesPerBlock = newSamplesPerPixel;
+    invInputSamplesPerBlock = 1. / (float) inputSamplesPerBlock;
 }
 
 void BKBufferView::setRepaintRate (int frequencyInHz)
@@ -205,15 +219,46 @@ void BKBufferView::getChannelAsPath (Path& path, const Range<float>* levels,
     path.closeSubPath();
 }
 
-void BKBufferView::paintChannel (Graphics& g, Rectangle<float> area,
-                                             const Range<float>* levels, int numLevels, int nextSample)
+void BKBufferView::paintChannel (Graphics& g, Rectangle<float> area, const Range<float>* levels, int numLevels, int nextSample)
 {
+    int i = 0;
+    g.setColour (waveformColour.withMultipliedBrightness(0.3f));
+    g.fillRect(area.getX(), area.getCentreY(), area.getWidth(), 1.0f);
+    for (float f = 0; f < numLevels; f += lineSpacingInBlocks * 0.25)
+    {
+        float x = f * (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
+        
+        if (i % 4 == 0)
+        {
+            g.setColour (waveformColour.withMultipliedBrightness(0.4f));
+            g.fillRect(x, area.getY(), 1.0f, area.getHeight());
+        }
+        else
+        {
+            g.setColour (waveformColour.withMultipliedBrightness(0.2f));
+            float inbetweenHeight = area.getHeight() * 0.125;
+            g.fillRect(x, area.getCentreY()-inbetweenHeight, 1.0f, inbetweenHeight*2.0f);
+        }
+        i++;
+    }
+    
     Path p;
     getChannelAsPath (p, levels, numLevels, nextSample);
     
-    g.fillPath (p, AffineTransform::fromTargetPoints (0.0f, -1.0f,               area.getX(), area.getY(),
-                                                      0.0f, 1.0f,                area.getX(), area.getBottom(),
-                                                      (float) numLevels, -1.0f,  area.getRight(), area.getY()));
+//    for (int i = 0; i < markers.size(); ++i)
+//    {
+//        if (markers[i] != 0)
+//        {
+//            float x = i * (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
+//            g.setColour (markerColour);
+//            g.fillRect(x, area.getY(), 1.0f, area.getHeight());
+//        }
+//    }
+    
+    g.setColour (waveformColour);
+    g.fillPath (p, AffineTransform::fromTargetPoints (0.0f, -verticalZoom,        area.getX(), area.getY(),
+                                                      0.0f, verticalZoom,         area.getX(), area.getBottom(),
+                                                      (float) numLevels, -verticalZoom, area.getRight(), area.getY()));
 }
     
 

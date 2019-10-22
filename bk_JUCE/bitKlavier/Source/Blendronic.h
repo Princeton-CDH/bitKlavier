@@ -458,8 +458,9 @@ public:
     inline BKSynthesiser* getSynth(void) const noexcept { return synth; }
     inline Array<int> getKeysDepressed(void) const noexcept { return keysDepressed; }
     inline const AudioBuffer<float> getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
+    inline const bool getBeatChanged() const noexcept { return beatChanged; }
     inline const bool getActive() const noexcept { return delay->getActive(); }
-
+    inline const float getPulseLengthInSamples() const noexcept { return pulseLength * sampleRate; }
 
 	//mutators
 	inline void setBlendronic(Blendronic::Ptr blend) { blendronic = blend; }
@@ -471,6 +472,7 @@ public:
     inline void setFeedbackIndex(int index) { feedbackIndex = index; }
 	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
     inline void setClearDelayOnNextBeat(bool clear) { clearDelayOnNextBeat = clear; }
+    inline void setBeatChanged(bool changed) { beatChanged = changed; }
     inline const void setActive(bool newActive) { delay->setActive(newActive); }
     inline const void toggleActive() { delay->toggleActive(); }
 	inline void reset(void) { blendronic->aPrep->copy(blendronic->sPrep); }
@@ -517,6 +519,7 @@ private:
     int beatIndex, delayIndex, smoothIndex, feedbackIndex;
     float prevBeat, prevDelay;
     bool clearDelayOnNextBeat;
+    bool beatChanged;
 
 	//JUCE_LEAK_DETECTOR(BlendronicProcessor);
 };

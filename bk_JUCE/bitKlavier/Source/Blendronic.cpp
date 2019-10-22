@@ -166,6 +166,7 @@ void BlendronicProcessor::tick(float* outputs)
             delay->clear();
             clearDelayOnNextBeat = false;
         }
+        beatChanged = true;
     }
     delay->tick(outputs);
 }

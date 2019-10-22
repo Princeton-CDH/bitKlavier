@@ -26,15 +26,30 @@ public:
     ~BKBufferView() override;
     
     void setNumChannels (int numChannels);
-    void setBufferSize (int bufferSize);
+    void setNumBlocks (int num);
     void setSamplesPerBlock (int newNumInputSamplesPerBlock) noexcept;
-    int getSamplesPerBlock() const noexcept                         { return inputSamplesPerBlock; }
+    int getSamplesPerBlock() const noexcept { return inputSamplesPerBlock; }
     void clear();
     void pushBuffer (const AudioBuffer<float>& bufferToPush);
     void pushBuffer (const AudioSourceChannelInfo& bufferToPush);
     void pushBuffer (const float** channelData, int numChannels, int numSamples);
     void pushSample (const float* samplesForEachChannel, int numChannels);
 
+    inline void setLineSpacing(float spacingInSamples)
+    {
+        if (spacingInSamples == 0) return;
+        lineSpacingInBlocks = spacingInSamples * invInputSamplesPerBlock;
+    }
+    inline void setVerticalZoom(float zoom) { verticalZoom = zoom; }
+    inline void setCurrentBlock(int block)
+    {
+        previousBlock = currentBlock;
+        currentBlock = block;
+    }
+    inline void addMarker(float samplePos) { markers.set((int) (samplePos * invInputSamplesPerBlock), 1); }
+    inline void addMarker() { markers.set(currentBlock, 1); }
+    inline void removeMarker(int block) { markers.set(block, 0); }
+    
     void setColours (Colour backgroundColour, Colour waveformColour) noexcept;
     void setRepaintRate (int frequencyInHz);
     virtual void paintChannel (Graphics&, Rectangle<float> bounds,
@@ -47,8 +62,14 @@ private:
     struct ChannelInfo;
     
     OwnedArray<ChannelInfo> channels;
-    int numSamples, inputSamplesPerBlock;
-    Colour backgroundColour, waveformColour;
+    int bufferSize, numBlocks, inputSamplesPerBlock;
+    float invInputSamplesPerBlock;
+    float lineSpacingInBlocks;
+    float verticalZoom;
+    
+    int currentBlock, previousBlock; //set the last non-zero block added
+    Array<int> markers; //set positions to draw markers; get rid of markers when the current block passes them
+    Colour backgroundColour, waveformColour, markerColour;
     
     void timerCallback() override;
     

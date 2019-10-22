@@ -330,8 +330,8 @@ void BlendronicViewController::displayTab(int tab)
         openModeSelectCB.setBounds(openModeSelectCBRect);
         openModeLabel.setBounds(openModeLabelRect);
         
-        area.removeFromTop(sliderHeight + 2 * gComponentComboBoxHeight);
-        Rectangle<int> delayLineDisplayRect (area.removeFromTop(sliderHeight));
+        area.removeFromTop(sliderHeight + gComponentComboBoxHeight);
+        Rectangle<int> delayLineDisplayRect (area.removeFromTop(sliderHeight*2));
         delayLineDisplay.setBounds(delayLineDisplayRect);
     }
 }
@@ -394,7 +394,6 @@ void BlendronicPreparationEditor::update(void)
     
     if (prep != nullptr)
     {
-
         selectCB.setSelectedId(processor.updateState->currentBlendronicId, dontSendNotification);
         smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
         syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
@@ -803,9 +802,16 @@ void BlendronicPreparationEditor::timerCallback()
         
         if (proc != nullptr)
         {
-            if (proc->getActive()) delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
-            else delayLineDisplay.setColours(Colours::lightgrey.withMultipliedBrightness(0.6), Colours::darkgrey);
+            if (proc->getActive()) delayLineDisplay.setColours(Colours::black, Colours::lightgrey);
+            else delayLineDisplay.setColours(Colours::darkgrey, Colours::lightgrey.withMultipliedBrightness(0.6));
+            delayLineDisplay.setLineSpacing(proc->getPulseLengthInSamples());
             delayLineDisplay.pushBuffer(proc->getDelayBuffer());
+            if (proc->getBeatChanged())
+            {
+                delayLineDisplay.addMarker();
+                proc->setBeatChanged(false);
+            }
+            
             
             int counter = 0, size = 0;
             
