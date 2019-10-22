@@ -1090,9 +1090,10 @@ void BKMultiSlider::setCurrentSlider(int activeSliderNum)
     
     int sliderNum = getActiveSlider(activeSliderNum);
     
+    highlight(sliderNum);
+    
     if(sliderNum != lastHighlightedSlider)
     {
-        highlight(sliderNum);
         deHighlight(lastHighlightedSlider);
         lastHighlightedSlider = sliderNum;
         displaySlider->setValue(sliders[sliderNum]->operator[](0)->getValue());

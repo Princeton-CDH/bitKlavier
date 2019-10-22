@@ -806,6 +806,37 @@ void BlendronicPreparationEditor::timerCallback()
             if (proc->getActive()) delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
             else delayLineDisplay.setColours(Colours::lightgrey.withMultipliedBrightness(0.6), Colours::darkgrey);
             delayLineDisplay.pushBuffer(proc->getDelayBuffer());
+            
+            int counter = 0, size = 0;
+            
+            for (int i = 0; i < paramSliders.size(); i++)
+            {
+                if(paramSliders[i]->getName() == "beats")
+                {
+                    size = paramSliders[i]->getNumVisible();
+                    counter = proc->getBeatIndex();
+                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+                }
+                else if(paramSliders[i]->getName() == "delay lengths")
+                {
+                    size = paramSliders[i]->getNumVisible();
+                    counter = proc->getDelayIndex();
+                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+                }
+                else if(paramSliders[i]->getName() == "smooth timings")
+                {
+                    size = paramSliders[i]->getNumVisible();
+                    counter = proc->getSmoothIndex();
+                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+                }
+                else if(paramSliders[i]->getName() == "feedback coefficients")
+                {
+                    size = paramSliders[i]->getNumVisible();
+                    counter = proc->getFeedbackIndex();
+                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+                    
+                }
+            }
         }
     }
 }

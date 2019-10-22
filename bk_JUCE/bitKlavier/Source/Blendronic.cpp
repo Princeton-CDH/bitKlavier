@@ -146,7 +146,7 @@ void BlendronicProcessor::tick(float* outputs)
     if (sampleTimer >= numSamplesBeat)
     {
         pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-        
+   
         beatIndex++;
         if (beatIndex >= prep->getBeats().size()) beatIndex = 0;
         delayIndex++;
@@ -237,6 +237,7 @@ bool BlendronicProcessor::holdCheck(int noteNumber)
 void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
+    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
@@ -260,6 +261,8 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
             setDelayIndex(0);
             setSmoothIndex(0);
             setFeedbackIndex(0);
+            pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+            numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
             updateDelayParameters();
         }
     }
@@ -285,6 +288,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
 void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
+    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
@@ -307,6 +311,8 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
             setDelayIndex(0);
             setSmoothIndex(0);
             setFeedbackIndex(0);
+            pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+            numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
             updateDelayParameters();
         }
     }
