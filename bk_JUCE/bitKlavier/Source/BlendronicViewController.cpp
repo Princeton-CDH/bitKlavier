@@ -138,7 +138,6 @@ BKViewController(p, theGraph, 2)
     actionButton.addListener(this);
     
     delayLineDisplay.setNumChannels(1);
-    //delayLineDisplay.setBufferSize(bProcessor->getDelayBuffer().getNumSamples());
     delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
     addAndMakeVisible(&delayLineDisplay);
 
@@ -806,13 +805,9 @@ void BlendronicPreparationEditor::timerCallback()
             else delayLineDisplay.setColours(Colours::darkgrey, Colours::lightgrey.withMultipliedBrightness(0.6));
             delayLineDisplay.setLineSpacing(proc->getPulseLengthInSamples());
             delayLineDisplay.pushBuffer(proc->getDelayBuffer());
-            if (proc->getBeatChanged())
-            {
-                delayLineDisplay.addMarker();
-                proc->setBeatChanged(false);
-            }
-            
-            
+            delayLineDisplay.setMarkers(proc->getBeatPositionsInBuffer());
+            delayLineDisplay.setPlayheads(Array<uint64>({proc->getCurrentSample(), proc->getDelayedSample()}));
+        
             int counter = 0, size = 0;
             
             for (int i = 0; i < paramSliders.size(); i++)

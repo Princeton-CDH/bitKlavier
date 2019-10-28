@@ -48,6 +48,8 @@ public:
 	inline void setMax(float delayMax) { max = delayMax; }
 	inline void setGain(float delayGain) { gain = delayGain; }
     inline void setFeedback(float fb) { feedback = fb; }
+    inline unsigned long getInPoint() { return inPoint; }
+    inline unsigned long getOutPoint() { return outPoint; }
 
 
 	float nextOutLeft();
@@ -155,6 +157,8 @@ public:
 	inline const bool getActive() const noexcept { return dBlendronicActive; }
     inline const bool getShouldDuck() const noexcept { return shouldDuck; }
     inline const AudioBuffer<float> getDelayBuffer() const noexcept { return delayLinear->getBuffer(); }
+    inline const unsigned long getCurrentSample() const noexcept { return delayLinear->getInPoint(); }
+    inline const unsigned long getDelayedSample() const noexcept { return delayLinear->getOutPoint(); }
 
 	//mutators
 	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to stkFloat)

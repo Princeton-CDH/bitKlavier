@@ -97,7 +97,7 @@ bool BlendronicPreparation::compare(BlendronicPreparation::Ptr b)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////BLENDRONIC PROCESSOR/////////////////////////////////////
+///////////////////////// BLENDRONIC PROCESSOR /////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
 BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
@@ -123,11 +123,6 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     
     keysDepressed = Array<int>();
     
-    BlendronicPreparation::Ptr prep = blendronic->aPrep;
-    
-    delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getSmoothDurations()[0],
-                                         prep->getFeedbackCoefficients()[0], prep->getDelayMax(), true);
-    
     DBG("Create bproc");
 }
 
@@ -141,8 +136,6 @@ void BlendronicProcessor::tick(float* outputs)
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
-    sampleTimer++;
-
     if (sampleTimer >= numSamplesBeat)
     {
         pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
@@ -157,6 +150,13 @@ void BlendronicProcessor::tick(float* outputs)
         if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
         
         updateDelayParameters();
+
+        if (delay->getCurrentSample() < beatPositionsInBuffer[beatPositionsIndex])
+        {
+            beatPositionsInBuffer.removeRange(beatPositionsIndex+1, beatPositionsInBuffer.size() - (beatPositionsIndex+1));
+            beatPositionsIndex = -1;
+        }
+        beatPositionsInBuffer.set(++beatPositionsIndex, delay->getCurrentSample());
         
         numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
         sampleTimer = 0;
@@ -166,8 +166,8 @@ void BlendronicProcessor::tick(float* outputs)
             delay->clear();
             clearDelayOnNextBeat = false;
         }
-        beatChanged = true;
     }
+    sampleTimer++;
     delay->tick(outputs);
 }
 
@@ -262,6 +262,9 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
             setDelayIndex(0);
             setSmoothIndex(0);
             setFeedbackIndex(0);
+            beatPositionsInBuffer.clear();
+            beatPositionsInBuffer.add(0);
+            beatPositionsIndex = 0;
             pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
             numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
             updateDelayParameters();
@@ -312,6 +315,9 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
             setDelayIndex(0);
             setSmoothIndex(0);
             setFeedbackIndex(0);
+            beatPositionsInBuffer.clear();
+            beatPositionsInBuffer.add(0);
+            beatPositionsIndex = 0;
             pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
             numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
             updateDelayParameters();
@@ -348,6 +354,15 @@ void BlendronicProcessor::postRelease(int noteNumber, int midiChannel)
 void BlendronicProcessor::prepareToPlay(double sr)
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
+    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
+    
+    delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getSmoothDurations()[0],
+                                         prep->getFeedbackCoefficients()[0], prep->getDelayMax(), true);
+    
+    beatPositionsInBuffer.ensureStorageAllocated(20);
+    beatPositionsInBuffer.add(0);
+    beatPositionsIndex = 0;
+    
     prevBeat = prep->getBeats()[0];
     prevDelay = prep->getDelayLengths()[0];
     
@@ -359,8 +374,11 @@ void BlendronicProcessor::prepareToPlay(double sr)
     smoothIndex = 0;
     feedbackIndex = 0;
     
-    numSamplesBeat = prep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempo->getTempo()->aPrep->getSubdivisions()) / tempo->getTempo()->aPrep->getTempo());
-    numSamplesDelay = prep->getDelayLengths()[delayIndex] * sampleRate * ((60.0 / tempo->getTempo()->aPrep->getSubdivisions()) / tempo->getTempo()->aPrep->getTempo());
+    pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+    numSamplesBeat = prep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempoPrep->getSubdivisions()) / tempoPrep->getTempo());
+    numSamplesDelay = prep->getDelayLengths()[delayIndex] * sampleRate * ((60.0 / tempoPrep->getSubdivisions()) / tempoPrep->getTempo());
+    
+    
     
     delay->setDelayLength(numSamplesDelay);
     delay->setDelayTargetLength(numSamplesDelay);

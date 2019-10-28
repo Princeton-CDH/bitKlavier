@@ -41,14 +41,9 @@ public:
         lineSpacingInBlocks = spacingInSamples * invInputSamplesPerBlock;
     }
     inline void setVerticalZoom(float zoom) { verticalZoom = zoom; }
-    inline void setCurrentBlock(int block)
-    {
-        previousBlock = currentBlock;
-        currentBlock = block;
-    }
-    inline void addMarker(float samplePos) { markers.set((int) (samplePos * invInputSamplesPerBlock), 1); }
-    inline void addMarker() { markers.set(currentBlock, 1); }
-    inline void removeMarker(int block) { markers.set(block, 0); }
+    inline void setMarkers(Array<uint64> m) { markers = m; }
+    inline void clearMarkers() { markers.clear(); }
+    inline void setPlayheads(Array<uint64> p) { playheads = p; }
     
     void setColours (Colour backgroundColour, Colour waveformColour) noexcept;
     void setRepaintRate (int frequencyInHz);
@@ -67,9 +62,8 @@ private:
     float lineSpacingInBlocks;
     float verticalZoom;
     
-    int currentBlock, previousBlock; //set the last non-zero block added
-    Array<int> markers; //set positions to draw markers; get rid of markers when the current block passes them
-    Colour backgroundColour, waveformColour, markerColour;
+    Array<uint64> markers, playheads;
+    Colour backgroundColour, waveformColour, markerColour, playheadColour;
     
     void timerCallback() override;
     

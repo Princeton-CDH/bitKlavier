@@ -48,8 +48,6 @@ struct BKBufferView::ChannelInfo
         {
             value = value.getUnionWith (newSample);
         }
-        if (newSample != 0.0f) owner.setCurrentBlock(nextSample-1 < 0 ? levels.size()-1 : nextSample-1);
-        owner.removeMarker(nextSample);
     }
     
     void setBufferSize (int newSize)
@@ -79,7 +77,8 @@ lineSpacingInBlocks(256),
 verticalZoom(0.5),
 backgroundColour (Colours::black),
 waveformColour (Colours::white),
-markerColour (Colours::burlywood)
+markerColour (Colours::burlywood),
+playheadColour (Colours::mediumpurple)
 {
     setOpaque (true);
     setNumChannels (1);
@@ -95,7 +94,8 @@ lineSpacingInBlocks(256),
 verticalZoom(0.5),
 backgroundColour (Colours::black),
 waveformColour (Colours::white),
-markerColour (Colours::burlywood)
+markerColour (Colours::burlywood),
+playheadColour (Colours::mediumpurple)
 {
     setOpaque (true);
     setNumChannels (initialNumChannels);
@@ -245,20 +245,28 @@ void BKBufferView::paintChannel (Graphics& g, Rectangle<float> area, const Range
     Path p;
     getChannelAsPath (p, levels, numLevels, nextSample);
     
-//    for (int i = 0; i < markers.size(); ++i)
-//    {
-//        if (markers[i] != 0)
-//        {
-//            float x = i * (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
-//            g.setColour (markerColour);
-//            g.fillRect(x, area.getY(), 1.0f, area.getHeight());
-//        }
-//    }
-    
     g.setColour (waveformColour);
     g.fillPath (p, AffineTransform::fromTargetPoints (0.0f, -verticalZoom,        area.getX(), area.getY(),
                                                       0.0f, verticalZoom,         area.getX(), area.getBottom(),
                                                       (float) numLevels, -verticalZoom, area.getRight(), area.getY()));
+    
+    for (auto m : markers)
+    {
+        float x = (m * invInputSamplesPerBlock) * (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
+        g.setColour (markerColour);
+        Path tTop, tBot;
+        tTop.addTriangle(x-2.5f, area.getY(), x+0.5f, area.getY()+4.0f, x+3.0f, area.getY());
+        tBot.addTriangle(x-2.5f, area.getHeight(), x+0.5f, area.getHeight()-4.0f, x+3.0f, area.getHeight());
+        g.fillPath(tTop);
+        g.fillPath(tBot);
+    }
+    
+    for (auto p : playheads)
+    {
+        float x = (p * invInputSamplesPerBlock) * (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
+        g.setColour (playheadColour);
+        g.fillRect(x, area.getY(), 2.0f, area.getHeight());
+    }
 }
     
 

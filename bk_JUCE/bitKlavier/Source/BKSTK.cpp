@@ -159,7 +159,7 @@ void BKDelayL::tick(float input, float* outputs, bool stereo)
 		doNextOutRight = true;
 	}
 
-	if (++outPoint == inputs.getNumSamples()) outPoint = 0;
+	if (++outPoint >= inputs.getNumSamples()) outPoint = 0;
 
 	//feedback
 	inputs.addSample(0, inPoint, lastFrameLeft * feedback);
