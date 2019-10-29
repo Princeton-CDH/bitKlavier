@@ -50,8 +50,6 @@ void BKConstructionSite::paint(Graphics& g)
     if (connect)
     {
         g.setColour(Colours::lightgrey);
-        
-        
         g.drawLine(lineOX, lineOY, lineEX, lineEY, (processor.platform == BKIOS) ? 2 : 3);
         
     }
@@ -175,6 +173,35 @@ void BKConstructionSite::align(int which)
     }
     
     repaint();
+}
+
+void BKConstructionSite::startConnection(int x, int y)
+{
+    itemSource = graph->getSelectedItems().getFirst();
+    
+    if (itemSource != nullptr)
+    {
+        connect = true;
+        
+        lineOX = x;
+        lineOY = y;
+        DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
+    }
+}
+
+void BKConstructionSite::makeConnection(int x, int y, bool doAnother)
+{
+    if (connect)
+    {
+        itemTarget = getItemAtPoint(x, y);
+        
+        if (itemTarget != nullptr)
+        {
+            graph->connect(itemSource, itemTarget);
+        }
+        
+        connect = doAnother;
+    }
 }
 
 void BKConstructionSite::itemIsBeingDragged(BKItem* thisItem, const MouseEvent& e)
@@ -514,6 +541,14 @@ void BKConstructionSite::mouseMove (const MouseEvent& eo)
     
     lastEX = e.x;
     lastEY = e.y;
+    
+    if (connect)
+    {
+        lineEX = e.getEventRelativeTo(this).x;
+        lineEY = e.getEventRelativeTo(this).y;
+        
+        repaint();
+    }
 }
 
 void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
@@ -552,6 +587,24 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     else if (result == ALIGN_HORIZONTAL)
     {
         vc->align(3);
+    }
+    else if (result == CONNECTION_ID)
+    {
+        int x = vc->currentItem->getX() + (vc->currentItem->getWidth() * 0.5f);
+        int y = vc->currentItem->getY() + (vc->currentItem->getHeight() * 0.5f);
+        vc->startConnection(x, y);
+    }
+    else if (result == CONNECT_ALL_ID) // Maximally connect selected items
+    {
+        for (int i = 0; i < vc->graph->getSelectedItems().size()-1; ++i)
+        {
+            for (int j = i+1; j < vc->graph->getSelectedItems().size(); ++j)
+            {
+                vc->graph->connect(vc->graph->getSelectedItems()[i],
+                                   vc->graph->getSelectedItems()[j]);
+            }
+        }
+        vc->repaint();
     }
     else if (result == DELETE_ID)
     {
@@ -722,6 +775,10 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     
     mouseClicked(lastX, lastY, e.eventTime);
     
+    // This must happen before the right-click menu or the menu will close
+    getParentComponent()->grabKeyboardFocus();
+    
+    // Clicking on an item
     if (itemToSelect != nullptr && !itemToSelect->resizing)
     {
         setMouseDownOnItem(true);
@@ -745,24 +802,40 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         }
         else if (e.mods.isAltDown())
         {
+            // make a connection and look to make another
+            if (connect) makeConnection(e.x, e.y, true);
+            
             // Copy and drag
-            
-            itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
-            
             if (!itemToSelect->getSelected())
             {
                 graph->deselectAll();
                 graph->select(itemToSelect);
             }
-            
-            lastX = e.x; lastY = e.y;
-            
-            
         }
-        else
+        else if (e.mods.isCommandDown())
         {
-            itemToSelect = dynamic_cast<BKItem*> (e.originalComponent->getParentComponent());
-            
+            if (!itemToSelect->getSelected())
+            {
+                graph->deselectAll();
+                graph->select(itemToSelect);
+            }
+            startConnection(e.x, e.y);
+        }
+        else if (e.mods.isRightButtonDown())
+        {
+            if (!itemToSelect->getSelected())
+            {
+                graph->deselectAll();
+                graph->select(itemToSelect);
+            }
+            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false).showMenuAsync
+            (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
+             ModalCallbackFunction::forComponent (editMenuCallback, this) );
+        }
+        else // Regular mouse click
+        {
+            if (connect) makeConnection(e.x, e.y);
+
             if (!itemToSelect->getSelected())
             {
                 graph->deselectAll();
@@ -774,30 +847,25 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
                 prepareItemDrag(item, e, true);
             }
         }
-        
-        if (e.mods.isCommandDown())
-        {
-            itemSource = itemToSelect;
-            
-            if (itemSource != nullptr)
-            {
-                connect = true;
-                
-                DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
-                lineOX = e.x;
-                lineOY = e.y;
-            }
-        }
     }
+    // Clicking on blank graph space
     else
     {
-        if (!e.mods.isShiftDown())
+        if (e.mods.isRightButtonDown())
         {
-            graph->deselectAll();
+            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true).showMenuAsync
+            (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
+             ModalCallbackFunction::forComponent (editMenuCallback, this) );
         }
-
-        selected.deselectAll();
-        
+        else
+        {
+            if (!e.mods.isShiftDown())
+            {
+                graph->deselectAll();
+            }
+            
+            selected.deselectAll();
+        }
         lasso = std::make_unique<LassoComponent<BKItem*>>();
         addAndMakeVisible(*lasso);
         
@@ -806,9 +874,10 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::antiquewhite);
         
         lasso->beginLasso(eo, this);
+        
+        // Stop trying to make a connection on blank space click
+        connect = false;
     }
-
-    getParentComponent()->grabKeyboardFocus();
 }
 
 void BKConstructionSite::mouseUp (const MouseEvent& eo)
@@ -817,9 +886,14 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     
     MouseEvent e = eo.getEventRelativeTo(this);
     
+    // Do nothing on right click mouse up
+    if (e.mods.isRightButtonDown()) return;
+    
     touches.removeObject (getTouchEvent(e.source));
     
     mouseReleased();
+    
+    getParentComponent()->grabKeyboardFocus();
 
     if (itemToSelect == nullptr) lasso->endLasso();
     
@@ -834,20 +908,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         return;
     }
     
-    if (connect)
-    {
-        int X = e.x;
-        int Y = e.y;
-        
-        itemTarget = getItemAtPoint(X, Y);
-        
-        if (itemTarget != nullptr)
-        {
-            graph->connect(itemSource, itemTarget);
-        }
-        
-        connect = false;
-    }
+    if (connect) makeConnection(e.x, e.y, e.mods.isAltDown());
+
     
     for (auto item : graph->getSelectedItems())
     {
@@ -858,14 +920,14 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     }
     
     repaint();
-    
-    getParentComponent()->grabKeyboardFocus();
-    
 }
 
 void BKConstructionSite::mouseDrag (const MouseEvent& e)
 {
     if (edittingComment) return;
+    
+    // Do nothing on right click drag
+    if (e.mods.isRightButtonDown()) return;
     
 #if JUCE_IOS
     MouseEvent eo = (e.eventComponent != this) ? e.getEventRelativeTo(this) : e;
@@ -917,6 +979,7 @@ void BKConstructionSite::idDidChange(void)
     else if (type == PreparationTypeDirect)         newId = processor.updateState->currentDirectId;
     else if (type == PreparationTypeNostalgic)      newId = processor.updateState->currentNostalgicId;
     else if (type == PreparationTypeSynchronic)     newId = processor.updateState->currentSynchronicId;
+    else if (type == PreparationTypeBlendronic)     newId = processor.updateState->currentBlendronicId;
     else if (type == PreparationTypeTempo)          newId = processor.updateState->currentTempoId;
     else if (type == PreparationTypeTuning)         newId = processor.updateState->currentTuningId;
     else if (type == PreparationTypeDirectMod)      newId = processor.updateState->currentModDirectId;
@@ -990,4 +1053,3 @@ SelectedItemSet<BKItem*>& BKConstructionSite::getLassoSelection(void)
 {
     return selected;
 }
-

@@ -363,7 +363,6 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
         int which = res - 100;
         processor.importPiano(processor.currentPiano->getId(), which);
     }
-    
 }
 
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)

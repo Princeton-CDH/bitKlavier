@@ -387,37 +387,38 @@ void BKItem::mouseDown(const MouseEvent& e)
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
     BKItem* current = cs->getCurrentItem();
     
-    if ((current == this) && !wasJustDragged)
+    if (e.mods.isLeftButtonDown())
     {
-        if (time < PHATNESS)
+        if ((current == this) && !wasJustDragged)
         {
-            if (type == PreparationTypePianoMap)
+            if (time < PHATNESS)
             {
-                menu.showPopup();
+                if (type == PreparationTypePianoMap)
+                {
+                    menu.showPopup();
+                }
+                else
+                {
+                    processor.updateState->setCurrentDisplay(type, Id);
+                }
             }
             else
             {
-                processor.updateState->setCurrentDisplay(type, Id);
+                time = 0;
             }
         }
         else
         {
+            wasJustDragged = false;
             time = 0;
         }
-    }
-    else
-    {
-        wasJustDragged = false;
-        time = 0;
+        if (isDraggable)
+        {
+            prepareDrag(e);
+        }
     }
     
     cs->setCurrentItem(this);
-    
-    if (isDraggable)
-    {
-        prepareDrag(e);
-    }
-    
 }
 
 void BKItem::keyPressedWhileSelected(const KeyPress& e)
@@ -1071,7 +1072,3 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
     
     return false;
 }
-
-
-
-

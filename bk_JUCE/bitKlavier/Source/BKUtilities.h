@@ -85,6 +85,9 @@
 #define BLENDRONIC_EDIT_ID 53
 #define BLENDRONICMOD_EDIT_ID 54
 
+#define CONNECTION_ID 55
+#define CONNECT_ALL_ID 56
+
 #define SOUNDFONT_ID 1000
 
 #define MIDIOUT_ID 2000
@@ -158,31 +161,31 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     
     if (onGraph)
     {
-        menu.addItem(PASTE_ID, "Paste");
+        menu.addItem(PASTE_ID, "Paste (CMD+V)");
         menu.addSeparator();
     }
-    else
-    {
-    
-    }
-    
+
     if (numItemsSelected)
     {
-        menu.addItem(COPY_ID, "Copy");
-        menu.addSeparator();
-        menu.addItem(CUT_ID, "Cut");
-        menu.addSeparator();
+        menu.addItem(COPY_ID, "Copy (CMD+C)");
+        menu.addItem(CUT_ID, "Cut (CMD+X)");
         menu.addItem(DELETE_ID, "Delete");
-        menu.addSeparator();
+        if (numItemsSelected == 1)
+        {
+            menu.addSeparator();
+            menu.addItem(EDIT_ID, "Edit (Double Click)");
+            menu.addSeparator();
+            menu.addItem(CONNECTION_ID, "Make Connection (CMD+Click)");
+        }
+        if (numItemsSelected > 1)
+        {
+            menu.addSeparator();
+            menu.addItem(CONNECT_ALL_ID, "Connect Selected");
+            menu.addSeparator();
+            menu.addSubMenu("Align (CMD+Arrow)", getAlignMenu(laf));
+        }
     }
-    
-    if (numItemsSelected > 1)
-    {
-        menu.addSubMenu("Align", getAlignMenu(laf));
-        menu.addSeparator();
-    }
-    
-    if (numItemsSelected == 0)
+    else if (numItemsSelected == 0)
     {
 #if JUCE_IOS
         if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
@@ -190,8 +193,6 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
         menu.addSubMenu("Add...", getNewItemMenu(laf));
 #endif
     }
-
-    
     menu.addSeparator();
     menu.addItem(OFF_ID, "All Off");
     

@@ -46,6 +46,8 @@ public:
     void paste(void);
     void cut(void);
     void selectAll(void);
+    void startConnection(int x, int y);
+    void makeConnection(int x, int y, bool doAnother = false);
     
     inline int getNumSelected(void) { return graph->getSelectedItems().size(); }
     
@@ -66,7 +68,7 @@ public:
     }
     
     bool itemOutsideBounds(Rectangle<int>);
-    
+
     static void editMenuCallback(int result, BKConstructionSite*);
     
     struct TouchEvent
@@ -170,9 +172,16 @@ private:
     
     BKItemGraph* graph;
     
+    bool connect; 
+    
+    Component clickFrame;
+    
     juce::Point<int> lastPosition;
+    
+    int lastX, lastY;
+    int lastEX,lastEY;
 
-    bool connect; int lineOX, lineOY, lineEX, lineEY;
+    int lineOX, lineOY, lineEX, lineEY;
     bool multiple;
     bool held;
 
@@ -211,11 +220,6 @@ private:
     void deleteItem (BKItem* item);
     
     BKItem* getItemAtPoint(const int X, const int Y);
-
-    int lastX, lastY;
-    int lastEX,lastEY;
-    
-    Component clickFrame;
     
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     
