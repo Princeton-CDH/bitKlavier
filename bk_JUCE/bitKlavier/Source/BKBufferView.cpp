@@ -203,9 +203,11 @@ void BKBufferView::getChannelAsPath (Path& path, const Range<float>* levels,
 {
     path.preallocateSpace (4 * numLevels + 8);
     
+    int offset = playheads[0] * invInputSamplesPerBlock;
+    
     for (int i = 0; i < numLevels; ++i)
     {
-        auto level = -(levels[(nextSample + i) % numLevels].getEnd());
+        auto level = -(levels[(nextSample + i + offset) % numLevels].getEnd());
         
         if (i == 0)
             path.startNewSubPath (0.0f, level);
@@ -214,7 +216,7 @@ void BKBufferView::getChannelAsPath (Path& path, const Range<float>* levels,
     }
     
     for (int i = numLevels; --i >= 0;)
-        path.lineTo ((float) i, -(levels[(nextSample + i) % numLevels].getStart()));
+        path.lineTo ((float) i, -(levels[(nextSample + i + offset) % numLevels].getStart()));
     
     path.closeSubPath();
 }
@@ -224,9 +226,12 @@ void BKBufferView::paintChannel (Graphics& g, Rectangle<float> area, const Range
     int i = 0;
     g.setColour (waveformColour.withMultipliedBrightness(0.3f));
     g.fillRect(area.getX(), area.getCentreY(), area.getWidth(), 1.0f);
+    
+    int offset = playheads[0] * invInputSamplesPerBlock;
+    
     for (float f = 0; f < numLevels; f += lineSpacingInBlocks * 0.25)
     {
-        float x = f * (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
+        float x = fmod(2*f - offset, numLevels) * (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
         
         if (i % 4 == 0)
         {
@@ -252,7 +257,9 @@ void BKBufferView::paintChannel (Graphics& g, Rectangle<float> area, const Range
     
     for (auto m : markers)
     {
-        float x = (m * invInputSamplesPerBlock) * (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
+        int offset = playheads[0] * invInputSamplesPerBlock;
+        float x = fmod((((m * invInputSamplesPerBlock) - offset) + numLevels), numLevels) *
+                        (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
         g.setColour (markerColour);
         Path tTop, tBot;
         tTop.addTriangle(x-2.5f, area.getY(), x+0.5f, area.getY()+4.0f, x+3.0f, area.getY());
@@ -263,7 +270,10 @@ void BKBufferView::paintChannel (Graphics& g, Rectangle<float> area, const Range
     
     for (auto p : playheads)
     {
-        float x = (p * invInputSamplesPerBlock) * (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
+        if (p == playheads[0]) continue;
+        int offset = playheads[0] * invInputSamplesPerBlock;
+        float x = fmod((((p * invInputSamplesPerBlock) - offset) + numLevels), numLevels) *
+                        (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
         g.setColour (playheadColour);
         g.fillRect(x, area.getY(), 2.0f, area.getHeight());
     }
