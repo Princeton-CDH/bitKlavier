@@ -232,11 +232,12 @@ private:
     float sBeatThreshSec;      //length of time between pulses, as set by tempo
     float sBeatThreshMS;
     
+    float subdivisions;
+    
     // Adaptive Tempo 1
     int at1History;
     float at1Min, at1Max;
     float at1Subdivisions;
-    float subdivisions;
     AdaptiveTempo1Mode at1Mode;
     
     JUCE_LEAK_DETECTOR(TempoPreparation);

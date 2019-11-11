@@ -368,10 +368,11 @@
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
         <FILE id="sM6zCj" name="BKUIComponents.h" compile="0" resource="0"
               file="Source/BKUIComponents.h"/>
-        <GROUP id="{AE933235-955C-4B29-B82E-A67897458CE4}" name="BKBufferView">
-          <FILE id="AOsPG0" name="BKBufferView.cpp" compile="1" resource="0"
-                file="Source/BKBufferView.cpp"/>
-          <FILE id="irE3Yj" name="BKBufferView.h" compile="0" resource="0" file="Source/BKBufferView.h"/>
+        <GROUP id="{AE933235-955C-4B29-B82E-A67897458CE4}" name="BlendronicDisplay">
+          <FILE id="AOsPG0" name="BlendronicDisplay.cpp" compile="1" resource="0"
+                file="Source/BlendronicDisplay.cpp"/>
+          <FILE id="irE3Yj" name="BlendronicDisplay.h" compile="0" resource="0"
+                file="Source/BlendronicDisplay.h"/>
         </GROUP>
         <GROUP id="{312ACC06-200C-E792-F54F-FC9ABB97A738}" name="BKSlider">
           <FILE id="mqhm7K" name="BKSlider.cpp" compile="1" resource="0" file="Source/BKSlider.cpp"/>

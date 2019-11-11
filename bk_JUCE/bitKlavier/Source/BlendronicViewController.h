@@ -71,7 +71,7 @@ protected:
     BKLabel openModeLabel;
     BKLabel closeModeLabel;
     
-    BKBufferView delayLineDisplay;
+    BlendronicDisplay delayLineDisplay;
     
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
 

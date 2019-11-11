@@ -138,8 +138,14 @@ void BlendronicProcessor::tick(float* outputs)
     
     if (sampleTimer >= numSamplesBeat)
     {
+        // Calculate these values each beat rather than each tick to save performance
+        float beatPatternLength = 0.0;
+        for (auto b : prep->getBeats()) beatPatternLength += b * pulseLength * sampleRate;
+        int numBeatPositions = ((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1;
+
         pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
    
+        // Step sequenced params
         beatIndex++;
         if (beatIndex >= prep->getBeats().size()) beatIndex = 0;
         delayIndex++;
@@ -149,14 +155,11 @@ void BlendronicProcessor::tick(float* outputs)
         feedbackIndex++;
         if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
         
-        updateDelayParameters();
-
-        if (delay->getCurrentSample() < beatPositionsInBuffer[beatPositionsIndex])
-        {
-            beatPositionsInBuffer.removeRange(beatPositionsIndex+1, beatPositionsInBuffer.size() - (beatPositionsIndex+1));
-            beatPositionsIndex = -1;
-        }
         beatPositionsInBuffer.set(++beatPositionsIndex, delay->getCurrentSample());
+        if (beatPositionsIndex >= numBeatPositions) beatPositionsIndex = -1;
+        
+        // Set parameters of the delay object
+        updateDelayParameters();
         
         numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
         sampleTimer = 0;

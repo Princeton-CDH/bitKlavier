@@ -25,7 +25,7 @@
 //#include "BKKeyboardSlider.h"
 #include "BKCircularKeyboardSlider.h"
 #include "BKAbsoluteKeyboardSlider.h"
-#include "BKBUfferView.h"
+#include "BlendronicDisplay.h"
 
 class BigOne : public Component, public BKListener
 {

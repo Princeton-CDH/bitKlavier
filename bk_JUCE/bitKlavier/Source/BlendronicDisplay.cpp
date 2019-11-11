@@ -1,20 +1,20 @@
 /*
 ==============================================================================
 
-BKBufferView.cpp
+BlendronicDisplay.cpp
 Created: 17 Oct 2019 12:21:14pm
 Author:  Matthew Wang
 
 ==============================================================================
 */
 
-#include "BKBufferView.h"
+#include "BlendronicDisplay.h"
 
 //==============================================================================
 
-struct BKBufferView::ChannelInfo
+struct BlendronicDisplay::ChannelInfo
 {
-    ChannelInfo (BKBufferView& o, int bufferSize) : owner (o)
+    ChannelInfo (BlendronicDisplay& o, int bufferSize) : owner (o)
     {
         setBufferSize (bufferSize);
         clear();
@@ -59,7 +59,7 @@ struct BKBufferView::ChannelInfo
             nextSample = 0;
     }
     
-    BKBufferView& owner;
+    BlendronicDisplay& owner;
     Array<Range<float>> levels;
     Range<float> value;
     std::atomic<int> nextSample { 0 }, subSample { 0 };
@@ -68,24 +68,52 @@ struct BKBufferView::ChannelInfo
 };
 
 //==============================================================================
-BKBufferView::BKBufferView ()
+BlendronicDisplay::BlendronicDisplay ()
 : bufferSize(0),
 numBlocks (1024),
 inputSamplesPerBlock (256),
 invInputSamplesPerBlock (1./256.),
 lineSpacingInBlocks(256),
-verticalZoom(0.5),
+verticalZoom(1.0),
+horizontalZoom(0.0),
+verticalZoomSliderMin(0.01),
+verticalZoomSliderMax(2.0),
+horizontalZoomSliderMin(0.0),
+horizontalZoomSliderMax(0.5),
+sliderIncrement(0.0001),
 backgroundColour (Colours::black),
 waveformColour (Colours::white),
-markerColour (Colours::burlywood),
+markerColour (Colours::goldenrod),
 playheadColour (Colours::mediumpurple)
 {
     setOpaque (true);
     setNumChannels (1);
     setRepaintRate (60);
+    
+    verticalZoomSlider = std::make_unique<Slider>();
+    verticalZoomSlider->addMouseListener(this, true);
+    verticalZoomSlider->setRange(verticalZoomSliderMin, verticalZoomSliderMax, sliderIncrement);
+    verticalZoomSlider->setSkewFactor(2.0);
+    verticalZoomSlider->setValue(verticalZoom);
+    verticalZoomSlider->setSliderStyle(Slider::SliderStyle::LinearVertical);
+    verticalZoomSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+    verticalZoomSlider->setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
+    verticalZoomSlider->addListener(this);
+    addAndMakeVisible(*verticalZoomSlider);
+    
+    horizontalZoomSlider = std::make_unique<Slider>();
+    horizontalZoomSlider->addMouseListener(this, true);
+    horizontalZoomSlider->setRange(horizontalZoomSliderMin, horizontalZoomSliderMax, sliderIncrement);
+    horizontalZoomSlider->setValue(horizontalZoom);
+    horizontalZoomSlider->setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+    horizontalZoomSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+    horizontalZoomSlider->setColour(Slider::trackColourId, Colours::black);
+    horizontalZoomSlider->setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
+    horizontalZoomSlider->addListener(this);
+    addAndMakeVisible(*horizontalZoomSlider);
 }
 
-BKBufferView::BKBufferView (int initialNumChannels)
+BlendronicDisplay::BlendronicDisplay (int initialNumChannels)
 : bufferSize(0),
 numBlocks (1024),
 inputSamplesPerBlock (256),
@@ -102,11 +130,11 @@ playheadColour (Colours::mediumpurple)
     setRepaintRate (60);
 }
 
-BKBufferView::~BKBufferView()
+BlendronicDisplay::~BlendronicDisplay()
 {
 }
 
-void BKBufferView::setNumChannels (int numChannels)
+void BlendronicDisplay::setNumChannels (int numChannels)
 {
     channels.clear();
     
@@ -114,7 +142,7 @@ void BKBufferView::setNumChannels (int numChannels)
         channels.add (new ChannelInfo (*this, numBlocks));
 }
 
-void BKBufferView::setNumBlocks (int num)
+void BlendronicDisplay::setNumBlocks (int num)
 {
     numBlocks = num;
     
@@ -122,13 +150,13 @@ void BKBufferView::setNumBlocks (int num)
         c->setBufferSize (num);
 }
 
-void BKBufferView::clear()
+void BlendronicDisplay::clear()
 {
     for (auto* c : channels)
         c->clear();
 }
 
-void BKBufferView::pushBuffer (const float** d, int numChannels, int num)
+void BlendronicDisplay::pushBuffer (const float** d, int numChannels, int num)
 {
     numChannels = jmin (numChannels, channels.size());
     setNumBlocks(num*invInputSamplesPerBlock);
@@ -137,14 +165,14 @@ void BKBufferView::pushBuffer (const float** d, int numChannels, int num)
         channels.getUnchecked(i)->pushSamples (d[i], num);
 }
 
-void BKBufferView::pushBuffer (const AudioBuffer<float>& buffer)
+void BlendronicDisplay::pushBuffer (const AudioBuffer<float>& buffer)
 {
     pushBuffer (buffer.getArrayOfReadPointers(),
                 buffer.getNumChannels(),
                 buffer.getNumSamples());
 }
 
-void BKBufferView::pushBuffer (const AudioSourceChannelInfo& buffer)
+void BlendronicDisplay::pushBuffer (const AudioSourceChannelInfo& buffer)
 {
     auto numChannels = jmin (buffer.buffer->getNumChannels(), channels.size());
     
@@ -153,7 +181,7 @@ void BKBufferView::pushBuffer (const AudioSourceChannelInfo& buffer)
                                                buffer.numSamples);
 }
 
-void BKBufferView::pushSample (const float* d, int numChannels)
+void BlendronicDisplay::pushSample (const float* d, int numChannels)
 {
     numChannels = jmin (numChannels, channels.size());
     
@@ -161,44 +189,52 @@ void BKBufferView::pushSample (const float* d, int numChannels)
         channels.getUnchecked(i)->pushSample (d[i]);
 }
 
-void BKBufferView::setSamplesPerBlock (int newSamplesPerPixel) noexcept
+void BlendronicDisplay::setSamplesPerBlock (int newSamplesPerPixel) noexcept
 {
     inputSamplesPerBlock = newSamplesPerPixel;
     invInputSamplesPerBlock = 1. / (float) inputSamplesPerBlock;
 }
 
-void BKBufferView::setRepaintRate (int frequencyInHz)
+void BlendronicDisplay::setRepaintRate (int frequencyInHz)
 {
     startTimerHz (frequencyInHz);
 }
 
-void BKBufferView::timerCallback()
+void BlendronicDisplay::timerCallback()
 {
     repaint();
 }
 
-void BKBufferView::setColours (Colour bk, Colour fg) noexcept
+void BlendronicDisplay::setColours (Colour bk, Colour fg) noexcept
 {
     backgroundColour = bk;
     waveformColour = fg;
     repaint();
 }
 
-void BKBufferView::paint (Graphics& g)
+void BlendronicDisplay::paint (Graphics& g)
 {
+    // Get bounds for display components
+    auto displayBounds = getLocalBounds();
+    auto horizontalZoomSliderBounds = displayBounds.removeFromBottom(displayBounds.getHeight()*0.1);
+    horizontalZoomSliderBounds.removeFromRight(horizontalZoomSliderBounds.getHeight());
+    auto verticalZoomSliderBounds = displayBounds.removeFromRight(horizontalZoomSliderBounds.getHeight());
+    auto channelHeight = displayBounds.getHeight() / channels.size();
+    
     g.fillAll (backgroundColour);
-    
-    auto r = getLocalBounds().toFloat();
-    auto channelHeight = r.getHeight() / channels.size();
-    
     g.setColour (waveformColour);
     
     for (auto* c : channels)
-        paintChannel (g, r.removeFromTop (channelHeight),
+        paintChannel (g, displayBounds.removeFromTop(channelHeight).toFloat(),
                       c->levels.begin(), c->levels.size(), c->nextSample);
+    
+    g.setColour (backgroundColour);
+    g.fillRect(horizontalZoomSliderBounds);
+    horizontalZoomSlider->setBounds(horizontalZoomSliderBounds);
+    verticalZoomSlider->setBounds(verticalZoomSliderBounds);
 }
 
-void BKBufferView::getChannelAsPath (Path& path, const Range<float>* levels,
+void BlendronicDisplay::getChannelAsPath (Path& path, const Range<float>* levels,
                                                  int numLevels, int nextSample)
 {
     path.preallocateSpace (4 * numLevels + 8);
@@ -207,7 +243,7 @@ void BKBufferView::getChannelAsPath (Path& path, const Range<float>* levels,
     
     for (int i = 0; i < numLevels; ++i)
     {
-        auto level = -(levels[(nextSample + i + offset) % numLevels].getEnd());
+        auto level = -(levels[(nextSample + i + offset ) % numLevels].getEnd());
         
         if (i == 0)
             path.startNewSubPath (0.0f, level);
@@ -221,7 +257,7 @@ void BKBufferView::getChannelAsPath (Path& path, const Range<float>* levels,
     path.closeSubPath();
 }
 
-void BKBufferView::paintChannel (Graphics& g, Rectangle<float> area, const Range<float>* levels, int numLevels, int nextSample)
+void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const Range<float>* levels, int numLevels, int nextSample)
 {
     int i = 0;
     g.setColour (waveformColour.withMultipliedBrightness(0.3f));
@@ -229,9 +265,12 @@ void BKBufferView::paintChannel (Graphics& g, Rectangle<float> area, const Range
     
     int offset = playheads[0] * invInputSamplesPerBlock;
     
-    for (float f = 0; f < numLevels; f += lineSpacingInBlocks * 0.25)
+    float leftLevel = numLevels*horizontalZoom;
+    
+    for (float f = 0; f < numLevels; f += lineSpacingInBlocks * 0.25f)
     {
-        float x = fmod(2*f - offset, numLevels) * (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
+        float x = (fmod(f + numLevels - offset, numLevels) - leftLevel) *
+                  (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
         
         if (i % 4 == 0)
         {
@@ -251,15 +290,16 @@ void BKBufferView::paintChannel (Graphics& g, Rectangle<float> area, const Range
     getChannelAsPath (p, levels, numLevels, nextSample);
     
     g.setColour (waveformColour);
-    g.fillPath (p, AffineTransform::fromTargetPoints (0.0f, -verticalZoom,        area.getX(), area.getY(),
-                                                      0.0f, verticalZoom,         area.getX(), area.getBottom(),
-                                                      (float) numLevels, -verticalZoom, area.getRight(), area.getY()));
+    g.fillPath (p, AffineTransform::fromTargetPoints (numLevels*horizontalZoom, -verticalZoom,  area.getX(), area.getY(),
+                                                      numLevels*horizontalZoom, verticalZoom,   area.getX(), area.getBottom(),
+                                                      (float) numLevels, -verticalZoom,         area.getRight(), area.getY()));
     
     for (auto m : markers)
     {
         int offset = playheads[0] * invInputSamplesPerBlock;
-        float x = fmod((((m * invInputSamplesPerBlock) - offset) + numLevels), numLevels) *
-                        (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
+        float markerLevel = m * invInputSamplesPerBlock;
+        float x = (fmod(((markerLevel - offset) + numLevels), numLevels) - leftLevel) *
+                  (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
         g.setColour (markerColour);
         Path tTop, tBot;
         tTop.addTriangle(x-2.5f, area.getY(), x+0.5f, area.getY()+4.0f, x+3.0f, area.getY());
@@ -272,11 +312,22 @@ void BKBufferView::paintChannel (Graphics& g, Rectangle<float> area, const Range
     {
         if (p == playheads[0]) continue;
         int offset = playheads[0] * invInputSamplesPerBlock;
-        float x = fmod((((p * invInputSamplesPerBlock) - offset) + numLevels), numLevels) *
-                        (area.getRight() - area.getX()) * (1. / numLevels) + area.getX();
+        float playheadLevel = p * invInputSamplesPerBlock;
+        float x = (fmod(((playheadLevel - offset) + numLevels), numLevels) - leftLevel) *
+                  (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
         g.setColour (playheadColour);
         g.fillRect(x, area.getY(), 2.0f, area.getHeight());
     }
 }
-    
 
+void BlendronicDisplay::sliderValueChanged(Slider *slider)
+{
+    if (slider == verticalZoomSlider.get())
+    {
+        verticalZoom = (verticalZoomSliderMin + verticalZoomSliderMax) - verticalZoomSlider->getValue();
+    }
+    else if (slider == horizontalZoomSlider.get())
+    {
+        horizontalZoom = horizontalZoomSlider->getValue();
+    }
+}

@@ -19,8 +19,8 @@ class BKSampleLoader : public Thread
 {
 public:
     BKSampleLoader(BKAudioProcessor& p):
-    processor(p),
-    Thread("sample_loader")
+    Thread("sample_loader"),
+    processor(p)
     {
         
     }
