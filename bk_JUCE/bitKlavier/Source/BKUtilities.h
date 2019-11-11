@@ -87,6 +87,8 @@
 
 #define CONNECTION_ID 55
 #define CONNECT_ALL_ID 56
+#define DISCONNECT_FROM_ID 57
+#define DISCONNECT_BETWEEN_ID 58
 
 #define SOUNDFONT_ID 1000
 
@@ -154,7 +156,7 @@ inline PopupMenu getAlignMenu(LookAndFeel* laf)
     return menu;
 }
 
-inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGraph = false)
+inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGraph = false, bool rightClick = false)
 {
     PopupMenu menu;
     menu.setLookAndFeel(laf);
@@ -176,11 +178,14 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
             menu.addItem(EDIT_ID, "Edit (Double Click)");
             menu.addSeparator();
             menu.addItem(CONNECTION_ID, "Make Connection (CMD+Click)");
+            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected");
         }
         if (numItemsSelected > 1)
         {
             menu.addSeparator();
             menu.addItem(CONNECT_ALL_ID, "Connect Selected");
+            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected");
+            menu.addItem(DISCONNECT_BETWEEN_ID, "Remove Connections Between Selected");
             menu.addSeparator();
             menu.addSubMenu("Align (CMD+Arrow)", getAlignMenu(laf));
         }
@@ -193,9 +198,12 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
         menu.addSubMenu("Add...", getNewItemMenu(laf));
 #endif
     }
-    menu.addSeparator();
-    menu.addItem(OFF_ID, "All Off");
-    
+    if (!rightClick)
+    {
+        menu.addSeparator();
+        menu.addItem(OFF_ID, "All Off");
+    }
+
     return menu;
 }
 

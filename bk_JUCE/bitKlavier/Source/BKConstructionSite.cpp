@@ -588,13 +588,15 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     {
         vc->align(3);
     }
+    // Make a connection cable
     else if (result == CONNECTION_ID)
     {
         int x = vc->currentItem->getX() + (vc->currentItem->getWidth() * 0.5f);
         int y = vc->currentItem->getY() + (vc->currentItem->getHeight() * 0.5f);
         vc->startConnection(x, y);
     }
-    else if (result == CONNECT_ALL_ID) // Maximally connect selected items
+    // Maximally connect selected items
+    else if (result == CONNECT_ALL_ID)
     {
         for (int i = 0; i < vc->graph->getSelectedItems().size()-1; ++i)
         {
@@ -602,6 +604,37 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
             {
                 vc->graph->connect(vc->graph->getSelectedItems()[i],
                                    vc->graph->getSelectedItems()[j]);
+            }
+        }
+        vc->repaint();
+    }
+    // Disconnect a single item or multiple selected items from any other connected items
+    else if (result == DISCONNECT_FROM_ID)
+    {
+        // For each selected item
+        for (BKItem::Ptr selectedItem : vc->graph->getSelectedItems())
+        {
+            // Check each connected item
+            for (BKItem::Ptr connectedItem : selectedItem->getConnections())
+            {
+                // If the connected item is not also selected, disconnect it
+                if (!vc->graph->getSelectedItems().contains(connectedItem))
+                {
+                    vc->graph->disconnect(selectedItem, connectedItem);
+                }
+            }
+        }
+        vc->repaint();
+    }
+    // Disconnect multiple selected items from each other
+    else if (result == DISCONNECT_BETWEEN_ID)
+    {
+        for (int i = 0; i < vc->graph->getSelectedItems().size()-1; ++i)
+        {
+            for (int j = i+1; j < vc->graph->getSelectedItems().size(); ++j)
+            {
+                vc->graph->disconnect(vc->graph->getSelectedItems()[i],
+                                      vc->graph->getSelectedItems()[j]);
             }
         }
         vc->repaint();
@@ -785,7 +818,31 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         
         processor.gallery->setGalleryDirty(true);
         
-        if (e.mods.isShiftDown())
+        // Right mouse click (must be first so right click overrides other mods)
+        if (e.mods.isRightButtonDown())
+        {
+            if (!itemToSelect->getSelected())
+            {
+                graph->deselectAll();
+                graph->select(itemToSelect);
+            }
+            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false, true).showMenuAsync
+            (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
+             ModalCallbackFunction::forComponent (editMenuCallback, this) );
+        }
+        // Control click (same as right click on Mac. TODO: figure out windows behavior)
+        else if (e.mods.isCtrlDown())
+        {
+            if (!itemToSelect->getSelected())
+            {
+                graph->deselectAll();
+                graph->select(itemToSelect);
+            }
+            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false, true).showMenuAsync
+            (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
+             ModalCallbackFunction::forComponent (editMenuCallback, this) );
+        }
+        else if (e.mods.isShiftDown())
         {
             // also select this item
             if (itemToSelect != nullptr)
@@ -812,6 +869,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
                 graph->select(itemToSelect);
             }
         }
+        // Command click
         else if (e.mods.isCommandDown())
         {
             if (!itemToSelect->getSelected())
@@ -821,18 +879,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
             }
             startConnection(e.x, e.y);
         }
-        else if (e.mods.isRightButtonDown())
-        {
-            if (!itemToSelect->getSelected())
-            {
-                graph->deselectAll();
-                graph->select(itemToSelect);
-            }
-            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false).showMenuAsync
-            (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
-             ModalCallbackFunction::forComponent (editMenuCallback, this) );
-        }
-        else // Regular mouse click
+        // Unmodified left mouse click
+        else
         {
             if (connect) makeConnection(e.x, e.y);
 
@@ -853,7 +901,13 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     {
         if (e.mods.isRightButtonDown())
         {
-            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true).showMenuAsync
+            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
+            (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
+             ModalCallbackFunction::forComponent (editMenuCallback, this) );
+        }
+        else if (e.mods.isCtrlDown())
+        {
+            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
             (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
              ModalCallbackFunction::forComponent (editMenuCallback, this) );
         }
@@ -888,6 +942,8 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     
     // Do nothing on right click mouse up
     if (e.mods.isRightButtonDown()) return;
+    // Do nothing on ctrl click mouse up
+    if (e.mods.isCtrlDown()) return;
     
     touches.removeObject (getTouchEvent(e.source));
     
@@ -908,7 +964,9 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
         return;
     }
     
-    if (connect) makeConnection(e.x, e.y, e.mods.isAltDown());
+    // Uncomment for press-hold-release connection behavior when using CMD shortcut
+    // Otherwise make connections with CMD+click and click on target
+//  if (connect) makeConnection(e.x, e.y, e.mods.isAltDown());
 
     
     for (auto item : graph->getSelectedItems())

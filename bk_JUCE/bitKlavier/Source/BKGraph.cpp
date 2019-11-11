@@ -618,13 +618,17 @@ void BKItemGraph::connect(BKPreparationType type1, int id1, BKPreparationType ty
 
 void BKItemGraph::connect(BKItem* item1, BKItem* item2)
 {
+    // Don't try to connect an item to itself or two already connected items
     if ((item1 == item2) || (item1->isConnectedTo(item2) && item2->isConnectedTo(item1))) return;
     
+    // Get item types
     BKPreparationType item1Type = item1->getType();
     BKPreparationType item2Type = item2->getType();
     
+    // Check if its a valid connection
     if (!(isValidConnection(item1Type, item2Type))) return;
     
+    // If connecting a modification, set its type
     if (item1Type == PreparationTypeGenericMod)
     {
         if (item2Type >= PreparationTypeDirect && item2Type <= PreparationTypeTempo)
@@ -639,6 +643,8 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
             item2->setItemType(getModType(item1Type), true);
         }
     }
+    // Remove existing connections for pairs that only allow one connection
+    // (e.g. Synchronic can only be connected to 1 Tempo)
     else if (item1Type == PreparationTypeNostalgic && item2Type == PreparationTypeSynchronic)
     {
         BKItem::PtrArr synchronics = item1->getConnectionsOfType(PreparationTypeSynchronic);
@@ -720,6 +726,7 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
         }
     }
     
+    // Add the connections
     item1->addConnection(item2);
     item2->addConnection(item1);
 
@@ -728,12 +735,15 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
 
 void BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
 {
+    // Get item types
     BKPreparationType item1Type = item1->getType();
     BKPreparationType item2Type = item2->getType();
     
+    // Remove the connections
     item1->removeConnection(item2);
     item2->removeConnection(item1);
     
+    // If disconnecting a modification, make it generic
     if (item1Type == PreparationTypeGenericMod)
     {
         if (!item1->isConnectedToAnyPreparation())
