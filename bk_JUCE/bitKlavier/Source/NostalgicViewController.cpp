@@ -205,13 +205,13 @@ void NostalgicViewController::displayTab(int tab)
     displayShared();
     
     int x0 = leftArrow.getRight() + gXSpacing;
-    int y0 = hideOrShow.getBottom() + gYSpacing;
+//    int y0 = hideOrShow.getBottom() + gYSpacing;
     int right = rightArrow.getX() - gXSpacing;
-    int width = right - x0;
-    int height = getHeight() - y0;
-    
-    int col1x = x0;
-    int col2x = x0 + width * 0.5f;
+//    int width = right - x0;
+//    int height = getHeight() - y0;
+//
+//    int col1x = x0;
+//    int col2x = x0 + width * 0.5f;
     
     if (tab == 0)
     {

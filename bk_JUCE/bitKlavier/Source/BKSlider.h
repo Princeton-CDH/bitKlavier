@@ -66,7 +66,8 @@ private:
 class BKMultiSlider :
 public Component,
 public Slider::Listener,
-public TextEditor::Listener
+public TextEditor::Listener,
+public ImageButton::Listener
 #if JUCE_IOS
 , public WantsBigOne
 #endif
@@ -178,10 +179,12 @@ private:
     
     double currentInvisibleSliderValue;
     
-    OwnedArray< OwnedArray<BKSubSlider>> sliders;
-    std::unique_ptr< BKSubSlider> displaySlider;
-    std::unique_ptr< BKSubSlider> bigInvisibleSlider;
-    std::unique_ptr< TextEditor> editValsTextField;
+    OwnedArray<OwnedArray<BKSubSlider>> sliders;
+    std::unique_ptr<BKSubSlider> displaySlider;
+    std::unique_ptr<BKSubSlider> bigInvisibleSlider;
+    std::unique_ptr<TextEditor> editValsTextField;
+    
+    std::unique_ptr<ImageButton> rotateButton;
     
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
     double sliderDefault;
@@ -205,6 +208,8 @@ private:
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorTextChanged(TextEditor&) override;
+    
+    void buttonClicked(Button* button) override;
     
     void showModifyPopupMenu(int which);
     static void sliderModifyMenuCallback (const int result, BKMultiSlider* slider, int which);

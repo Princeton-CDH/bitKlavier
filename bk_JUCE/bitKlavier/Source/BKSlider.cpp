@@ -233,6 +233,17 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     editValsTextField->setSelectAllWhenFocused(false);
 #endif
     
+    rotateButton = std::make_unique<ImageButton>();
+    rotateButton->setImages(false, true, true,
+                            ImageCache::getFromMemory(BinaryData::rotatearrow_png, BinaryData::rotatearrow_pngSize), 0.8f, Colours::transparentBlack,
+                            Image(), 1.0f, Colours::transparentBlack,
+                            Image(), 0.6, Colours::transparentBlack);
+    rotateButton->setVisible(true);
+    rotateButton->setName("ROTATE");
+    rotateButton->setTooltip("Rotate values");
+    rotateButton->addListener(this);
+    addAndMakeVisible(*rotateButton);
+    
 }
 
 BKMultiSlider::~BKMultiSlider()
@@ -736,8 +747,6 @@ void BKMultiSlider::mouseUp (const MouseEvent &event)
     }
 }
 
-
-
 int BKMultiSlider::whichSlider (const MouseEvent &e)
 {
     int x = e.x;
@@ -882,6 +891,7 @@ void BKMultiSlider::resized()
 {
     
     Rectangle<float> area (getLocalBounds().toFloat());
+    Rectangle<float> bounds = area;
     
     displaySlider->setBounds(area.removeFromLeft(displaySliderWidth).toNearestInt());
     editValsTextField->setBounds(area.toNearestInt());
@@ -909,6 +919,9 @@ void BKMultiSlider::resized()
             }
         }
     }
+    
+    Rectangle<float> rotateButtonBounds (bounds.getBottomLeft(), bounds.getBottomLeft().translated(displaySliderWidth*0.2, -displaySliderWidth*0.2));
+    rotateButton->setBounds(rotateButtonBounds.toNearestInt());
     
     bigInvisibleSlider->toFront(false);
 }
@@ -982,6 +995,26 @@ void BKMultiSlider::textEditorFocusLost(TextEditor& textEditor)
         }
     }
 #endif
+}
+
+void BKMultiSlider::buttonClicked(Button* button)
+{
+    if (button->getName() == "ROTATE")
+    {
+        Array<Array<float>> values = getAllActiveValues();
+        Array<Array<float>> rotated;
+        for (int i = numActiveSliders - 1; i < 2*numActiveSliders - 1; i++)
+        {
+            rotated.add(values[i%numActiveSliders]);
+        }
+        setTo(rotated, sendNotification);
+        resetRanges();
+        resized();
+        
+        listeners.call(&BKMultiSlider::Listener::multiSliderAllValuesChanged,
+                       getName(),
+                       getAllActiveValues());
+    }
 }
 
 

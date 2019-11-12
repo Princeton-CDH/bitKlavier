@@ -150,6 +150,8 @@
                 file="Source/icons/blendronic_icon.png"/>
           <FILE id="xOwvX8" name="left-arrow.png" compile="0" resource="1" file="Source/icons/left-arrow.png"/>
           <FILE id="IksJJv" name="right-arrow.png" compile="0" resource="1" file="Source/icons/right-arrow.png"/>
+          <FILE id="jf5jjp" name="rotate-arrow.png" compile="0" resource="1"
+                file="Source/icons/rotate-arrow.png"/>
           <FILE id="A1o3FE" name="icon_iOS_72.png" compile="0" resource="1" file="Source/icons/icon_iOS_72.png"/>
           <FILE id="iHGLGD" name="icon_iOS_300.jpg" compile="0" resource="1"
                 file="Source/icons/icon_iOS_300.jpg"/>

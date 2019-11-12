@@ -74,6 +74,7 @@ numBlocks (1024),
 inputSamplesPerBlock (256),
 invInputSamplesPerBlock (1./256.),
 lineSpacingInBlocks(256),
+pulseOffset(0.0),
 verticalZoom(1.0),
 horizontalZoom(0.0),
 verticalZoomSliderMin(0.01),
@@ -83,7 +84,7 @@ horizontalZoomSliderMax(0.5),
 sliderIncrement(0.0001),
 backgroundColour (Colours::black),
 waveformColour (Colours::white),
-markerColour (Colours::goldenrod),
+markerColour (Colours::goldenrod.withMultipliedBrightness(0.7)),
 playheadColour (Colours::mediumpurple)
 {
     setOpaque (true);
@@ -97,7 +98,8 @@ playheadColour (Colours::mediumpurple)
     verticalZoomSlider->setValue(verticalZoom);
     verticalZoomSlider->setSliderStyle(Slider::SliderStyle::LinearVertical);
     verticalZoomSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    verticalZoomSlider->setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
+    verticalZoomSlider->setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedBrightness(0.7));
+    verticalZoomSlider->setColour(Slider::backgroundColourId, Colours::white.withMultipliedBrightness(0.3));
     verticalZoomSlider->addListener(this);
     addAndMakeVisible(*verticalZoomSlider);
     
@@ -107,8 +109,8 @@ playheadColour (Colours::mediumpurple)
     horizontalZoomSlider->setValue(horizontalZoom);
     horizontalZoomSlider->setSliderStyle(Slider::SliderStyle::LinearHorizontal);
     horizontalZoomSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    horizontalZoomSlider->setColour(Slider::trackColourId, Colours::black);
-    horizontalZoomSlider->setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
+    horizontalZoomSlider->setColour(Slider::trackColourId, Colours::white.withMultipliedBrightness(0.3));
+    horizontalZoomSlider->setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedBrightness(0.7));
     horizontalZoomSlider->addListener(this);
     addAndMakeVisible(*horizontalZoomSlider);
 }
@@ -224,14 +226,20 @@ void BlendronicDisplay::paint (Graphics& g)
     g.fillAll (backgroundColour);
     g.setColour (waveformColour);
     
-    for (auto* c : channels)
-        paintChannel (g, displayBounds.removeFromTop(channelHeight).toFloat(),
-                      c->levels.begin(), c->levels.size(), c->nextSample);
+    displayBounds = displayBounds.removeFromTop(channelHeight);
     
+    for (auto* c : channels)
+        paintChannel (g, displayBounds.toFloat(),
+                      c->levels.begin(), c->levels.size(), c->nextSample);
+
     g.setColour (backgroundColour);
     g.fillRect(horizontalZoomSliderBounds);
     horizontalZoomSlider->setBounds(horizontalZoomSliderBounds);
     verticalZoomSlider->setBounds(verticalZoomSliderBounds);
+    
+    g.setColour (waveformColour);
+    g.drawHorizontalLine(displayBounds.getY(), displayBounds.getX(), displayBounds.getRight());
+    g.drawHorizontalLine(displayBounds.getBottom(), displayBounds.getX(), displayBounds.getRight());
 }
 
 void BlendronicDisplay::getChannelAsPath (Path& path, const Range<float>* levels,
@@ -262,6 +270,7 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
     int i = 0;
     g.setColour (waveformColour.withMultipliedBrightness(0.3f));
     g.fillRect(area.getX(), area.getCentreY(), area.getWidth(), 1.0f);
+
     
     int offset = playheads[0] * invInputSamplesPerBlock;
     
@@ -269,7 +278,7 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
     
     for (float f = 0; f < numLevels; f += lineSpacingInBlocks * 0.25f)
     {
-        float x = (fmod(f + numLevels - offset, numLevels) - leftLevel) *
+        float x = (fmod(f + numLevels - offset + pulseOffset, numLevels) - leftLevel) *
                   (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
         
         if (i % 4 == 0)
@@ -301,11 +310,12 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
         float x = (fmod(((markerLevel - offset) + numLevels), numLevels) - leftLevel) *
                   (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
         g.setColour (markerColour);
-        Path tTop, tBot;
-        tTop.addTriangle(x-2.5f, area.getY(), x+0.5f, area.getY()+4.0f, x+3.0f, area.getY());
-        tBot.addTriangle(x-2.5f, area.getHeight(), x+0.5f, area.getHeight()-4.0f, x+3.0f, area.getHeight());
-        g.fillPath(tTop);
-        g.fillPath(tBot);
+        g.fillRect(x, area.getY(), 1.0f, area.getHeight());
+//        Path tTop, tBot;
+//        tTop.addTriangle(x-2.5f, area.getY(), x+0.5f, area.getY()+4.0f, x+3.0f, area.getY());
+//        tBot.addTriangle(x-2.5f, area.getHeight(), x+0.5f, area.getHeight()-4.0f, x+3.0f, area.getHeight());
+//        g.fillPath(tTop);
+//        g.fillPath(tBot);
     }
     
     for (auto p : playheads)
@@ -316,7 +326,7 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
         float x = (fmod(((playheadLevel - offset) + numLevels), numLevels) - leftLevel) *
                   (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
         g.setColour (playheadColour);
-        g.fillRect(x, area.getY(), 2.0f, area.getHeight());
+        g.fillRect(x-2.0, area.getY(), 4.0, area.getHeight());
     }
 }
 

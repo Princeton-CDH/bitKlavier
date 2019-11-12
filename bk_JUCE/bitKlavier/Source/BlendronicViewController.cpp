@@ -141,23 +141,24 @@ BKViewController(p, theGraph, 2)
     delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
     addAndMakeVisible(&delayLineDisplay);
 
-    beatDelayLinkButton.setButtonText("Set delays to beats");
-    beatDelayLinkButton.setTooltip("Indicates whether Blendronic delay lengths will be linked to the beat pattern at some rotation");
-    beatDelayLinkButton.addListener(this);
-    addAndMakeVisible(beatDelayLinkButton);
-    
-    rotationLabel.setText("rotated", dontSendNotification);
-    rotationLabel.setJustificationType(juce::Justification::centredRight);
-    rotationLabel.setTooltip("Determines the rotation of value if delay lengths are linked to the beat pattern");
-    addAndMakeVisible(&rotationLabel, ALL);
-    
-    rotationCB.setName("Rotation");
-    rotationCB.BKSetJustificationType(juce::Justification::centredRight);
-    rotationCB.setTooltip("Determines the rotation of value if delay lengths are linked to the beat pattern");
-    rotationCB.addSeparator();
-    rotationCB.addListener(this);
-    rotationCB.setSelectedItemIndex(0);
-    addAndMakeVisible(rotationCB);
+    // obsolete with multislider rotate button
+//    beatDelayLinkButton.setButtonText("Set delays to beats");
+//    beatDelayLinkButton.setTooltip("Indicates whether Blendronic delay lengths will be linked to the beat pattern at some rotation");
+//    beatDelayLinkButton.addListener(this);
+//    addAndMakeVisible(beatDelayLinkButton);
+//
+//    rotationLabel.setText("rotated", dontSendNotification);
+//    rotationLabel.setJustificationType(juce::Justification::centredRight);
+//    rotationLabel.setTooltip("Determines the rotation of value if delay lengths are linked to the beat pattern");
+//    addAndMakeVisible(&rotationLabel, ALL);
+//
+//    rotationCB.setName("Rotation");
+//    rotationCB.BKSetJustificationType(juce::Justification::centredRight);
+//    rotationCB.setTooltip("Determines the rotation of value if delay lengths are linked to the beat pattern");
+//    rotationCB.addSeparator();
+//    rotationCB.addListener(this);
+//    rotationCB.setSelectedItemIndex(0);
+//    addAndMakeVisible(rotationCB);
     
     currentTab = 0;
     displayTab(currentTab);
@@ -221,10 +222,10 @@ void BlendronicViewController::displayTab(int tab)
     invisible();
     displayShared();
     
-    int x0 = leftArrow.getRight() + gXSpacing;
+//    int x0 = leftArrow.getRight() + gXSpacing;
     int y0 = hideOrShow.getBottom() + gYSpacing;
-    int right = rightArrow.getX() - gXSpacing;
-    int width = right - x0;
+//    int right = rightArrow.getX() - gXSpacing;
+//    int width = right - x0;
     int height = getHeight() - y0;
     
     if (tab == 0)
@@ -233,9 +234,9 @@ void BlendronicViewController::displayTab(int tab)
     
         smoothModeSelectCB.setVisible(true);
         smoothModeLabel.setVisible(true);
-        beatDelayLinkButton.setVisible(true);
-        rotationLabel.setVisible(true);
-        rotationCB.setVisible(true);
+//        beatDelayLinkButton.setVisible(true);
+//        rotationLabel.setVisible(true);
+//        rotationCB.setVisible(true);
         for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setVisible(true);
@@ -261,13 +262,13 @@ void BlendronicViewController::displayTab(int tab)
         smoothModeSelectCB.setBounds(smoothModeSelectCBRect);
         smoothModeLabel.setBounds(smoothModeLabelRect);
         
-        rightColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
-        Rectangle<int> rotationCBRect (rightColumn.removeFromTop(gComponentComboBoxHeight));
-        Rectangle<int> rotationLabelRect (rotationCBRect.removeFromLeft(rightColumn.getWidth() * 0.7));
-        Rectangle<int> beatDelayLinkButtonRect (rotationLabelRect.removeFromLeft(rightColumn.getWidth() * 0.52));
-        rotationCB.setBounds(rotationCBRect);
-        rotationLabel.setBounds(rotationLabelRect);
-        beatDelayLinkButton.setBounds(beatDelayLinkButtonRect);
+//        rightColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+//        Rectangle<int> rotationCBRect (rightColumn.removeFromTop(gComponentComboBoxHeight));
+//        Rectangle<int> rotationLabelRect (rotationCBRect.removeFromLeft(rightColumn.getWidth() * 0.7));
+//        Rectangle<int> beatDelayLinkButtonRect (rotationLabelRect.removeFromLeft(rightColumn.getWidth() * 0.52));
+//        rotationCB.setBounds(rotationCBRect);
+//        rotationLabel.setBounds(rotationLabelRect);
+//        beatDelayLinkButton.setBounds(beatDelayLinkButtonRect);
 
         area.removeFromTop(sliderHeight + gYSpacing - gComponentComboBoxHeight*1.5);
         for (int i = 0; i < paramSliders.size(); i++)
@@ -329,7 +330,7 @@ void BlendronicViewController::displayTab(int tab)
         openModeSelectCB.setBounds(openModeSelectCBRect);
         openModeLabel.setBounds(openModeLabelRect);
         
-        area.removeFromTop(sliderHeight + gComponentComboBoxHeight);
+        area.removeFromTop(1.5*sliderHeight + gComponentComboBoxHeight);
         Rectangle<int> delayLineDisplayRect (area.removeFromTop(sliderHeight*2));
         delayLineDisplay.setBounds(delayLineDisplayRect);
     }
@@ -802,9 +803,10 @@ void BlendronicPreparationEditor::timerCallback()
         if (proc != nullptr)
         {
             if (proc->getActive()) delayLineDisplay.setColours(Colours::black, Colours::lightgrey);
-            else delayLineDisplay.setColours(Colours::darkgrey, Colours::lightgrey.withMultipliedBrightness(0.6));
+            else delayLineDisplay.setColours(Colours::black, Colours::lightgrey.withMultipliedBrightness(0.6));
             delayLineDisplay.setLineSpacing(proc->getPulseLengthInSamples());
             delayLineDisplay.pushBuffer(proc->getDelayBuffer());
+            delayLineDisplay.setPulseOffset(proc->getPulseOffset());
             delayLineDisplay.setMarkers(proc->getBeatPositionsInBuffer());
             delayLineDisplay.setPlayheads(Array<uint64>({proc->getCurrentSample(), proc->getDelayedSample()}));
         

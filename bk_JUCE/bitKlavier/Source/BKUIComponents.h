@@ -216,8 +216,8 @@ class BKArrowButton : public TextButton
 public:
     BKArrowButton(BKArrowType type):
     TextButton(),
-    bright(true),
     type(type),
+    bright(true),
     hover(false)
     {
         placement = RectanglePlacement::centred;

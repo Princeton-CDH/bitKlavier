@@ -463,7 +463,8 @@ public:
     inline const bool getActive() const noexcept { return delay->getActive(); }
     inline const float getPulseLengthInSamples() const noexcept { return pulseLength * sampleRate; }
     inline const Array<uint64> getBeatPositionsInBuffer() const noexcept { return beatPositionsInBuffer; }
-
+    inline const float getPulseOffset() const noexcept { return pulseOffset; }
+    
 	//mutators
 	inline void setBlendronic(Blendronic::Ptr blend) { blendronic = blend; }
 	inline void setTempo(TempoProcessor::Ptr temp) { tempo = temp; }
@@ -518,7 +519,9 @@ private:
     float numSamplesDelay; 
 	uint64 sampleTimer;
     Array<uint64> beatPositionsInBuffer;
+    int numBeatPositions;
     int beatPositionsIndex;
+    float pulseOffset;
     int beatIndex, delayIndex, smoothIndex, feedbackIndex;
     float prevBeat, prevDelay;
     bool clearDelayOnNextBeat;

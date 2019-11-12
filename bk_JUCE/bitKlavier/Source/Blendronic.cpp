@@ -141,8 +141,14 @@ void BlendronicProcessor::tick(float* outputs)
         // Calculate these values each beat rather than each tick to save performance
         float beatPatternLength = 0.0;
         for (auto b : prep->getBeats()) beatPatternLength += b * pulseLength * sampleRate;
-        int numBeatPositions = ((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1;
-
+        if (numBeatPositions != (int) ((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1)
+        {
+            beatPositionsInBuffer.clear();
+            beatPositionsIndex = -1;
+            pulseOffset = delay->getCurrentSample();
+            numBeatPositions = ((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1;
+        }
+        
         pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
    
         // Step sequenced params
@@ -255,24 +261,6 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     
     if (!velocityCheck(noteNumber)) return;
     
-    if (doSync)
-    {
-        if (prep->getSyncMode() == BlendronicAnyNoteOnSync ||
-           (prep->getSyncMode() == BlendronicFirstNoteOnSync && keysDepressed.size() == 1))
-        {
-            setSampleTimer(0);
-            setBeatIndex(0);
-            setDelayIndex(0);
-            setSmoothIndex(0);
-            setFeedbackIndex(0);
-            beatPositionsInBuffer.clear();
-            beatPositionsInBuffer.add(0);
-            beatPositionsIndex = 0;
-            pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-            numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
-            updateDelayParameters();
-        }
-    }
     if (doClear)
     {
         if (prep->getClearMode() == BlendronicAnyNoteOnClear ||
@@ -280,6 +268,25 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
         {
             delay->clear();
             //clearDelayOnNextBeat = true;
+        }
+    }
+    if (doSync)
+    {
+        if (prep->getSyncMode() == BlendronicAnyNoteOnSync ||
+            (prep->getSyncMode() == BlendronicFirstNoteOnSync && keysDepressed.size() == 1))
+        {
+            setSampleTimer(0);
+            setBeatIndex(0);
+            setDelayIndex(0);
+            setSmoothIndex(0);
+            setFeedbackIndex(0);
+            beatPositionsInBuffer.clear();
+            beatPositionsInBuffer.add(delay->getCurrentSample());
+            pulseOffset = delay->getCurrentSample();
+            beatPositionsIndex = 0;
+            pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+            numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
+            updateDelayParameters();
         }
     }
     bool noteOnClose = (prep->getCloseMode() == BlendronicAnyNoteOnClose) && doClose;
@@ -308,24 +315,6 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     if (!velocityCheck(noteNumber)) return;
     if (!holdCheck(noteNumber)) return;
     
-    if (doSync)
-    {
-        if (prep->getSyncMode() == BlendronicAnyNoteOffSync ||
-           (prep->getSyncMode() == BlendronicLastNoteOffSync && keysDepressed.size() == 0))
-        {
-            setSampleTimer(0);
-            setBeatIndex(0);
-            setDelayIndex(0);
-            setSmoothIndex(0);
-            setFeedbackIndex(0);
-            beatPositionsInBuffer.clear();
-            beatPositionsInBuffer.add(0);
-            beatPositionsIndex = 0;
-            pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-            numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
-            updateDelayParameters();
-        }
-    }
     if (doClear)
     {
         if (prep->getClearMode() == BlendronicAnyNoteOffClear)
@@ -336,6 +325,25 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
         {
             delay->duckAndClear();
             clearDelayOnNextBeat = true;
+        }
+    }
+    if (doSync)
+    {
+        if (prep->getSyncMode() == BlendronicAnyNoteOffSync ||
+            (prep->getSyncMode() == BlendronicLastNoteOffSync && keysDepressed.size() == 0))
+        {
+            setSampleTimer(0);
+            setBeatIndex(0);
+            setDelayIndex(0);
+            setSmoothIndex(0);
+            setFeedbackIndex(0);
+            beatPositionsInBuffer.clear();
+            beatPositionsInBuffer.add(delay->getCurrentSample());
+            pulseOffset = delay->getCurrentSample();
+            beatPositionsIndex = 0;
+            pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+            numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
+            updateDelayParameters();
         }
     }
     
@@ -363,7 +371,9 @@ void BlendronicProcessor::prepareToPlay(double sr)
                                          prep->getFeedbackCoefficients()[0], prep->getDelayMax(), true);
     
     beatPositionsInBuffer.ensureStorageAllocated(20);
+    beatPositionsInBuffer.clear();
     beatPositionsInBuffer.add(0);
+    pulseOffset = 0;
     beatPositionsIndex = 0;
     
     prevBeat = prep->getBeats()[0];

@@ -44,6 +44,7 @@ public:
         if (spacingInSamples == 0) return;
         lineSpacingInBlocks = spacingInSamples * invInputSamplesPerBlock;
     }
+    inline void setPulseOffset(float offset) { pulseOffset = offset * invInputSamplesPerBlock; }
     inline void setVerticalZoom(float zoom) { verticalZoom = zoom; }
     inline void setHorizontalZoom(float zoom) { horizontalZoom = zoom; }
     inline void setMarkers(Array<uint64> m) { markers = m; }
@@ -67,6 +68,7 @@ private:
     int bufferSize, numBlocks, inputSamplesPerBlock;
     float invInputSamplesPerBlock;
     float lineSpacingInBlocks;
+    float pulseOffset;
     float verticalZoom, horizontalZoom;
     
     std::unique_ptr<Slider> verticalZoomSlider;
