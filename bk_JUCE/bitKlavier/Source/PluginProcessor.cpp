@@ -334,6 +334,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     #endif
         }
     }
+    
+    midiInputDevices = getMidiInputDevices();
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -714,9 +716,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         }
         DBG("DAW bpm = " + String(currentPositionInfo.bpm));
     }
- 
-    int time;
-    bool didNoteOffs = false;
     
     int numSamples = buffer.getNumSamples();
     if(numSamples != levelBuf.getNumSamples()) levelBuf.setSize(buffer.getNumChannels(), numSamples);
@@ -734,7 +733,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         for (auto pmap : prevPiano->activePMaps)
             pmap->processBlock(buffer, numSamples, channel, currentSampleType, true); // true for onlyNostalgic
     }
-
     
     for(int i=0; i<notesOnUI.size(); i++)
     {
@@ -748,43 +746,14 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         notesOffUI.remove(i);
     }
     
-    
+    int time;
+    //bool didNoteOffs = false;
     MidiMessage m;
     for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
     {
-        int noteNumber = m.getNoteNumber();
-        float velocity = m.getFloatVelocity();
-         
-        channel = m.getChannel();
-        
-        if (m.isNoteOn())
-        {
-            handleNoteOn(noteNumber, velocity, channel);
-        }
-        else if (m.isNoteOff())
-        {
-            handleNoteOff(noteNumber, velocity, channel);
-            didNoteOffs = true;
-        }
-        
-        // NEED WAY TO TRIGGER RELEASE PEDAL SAMPLE FOR SFZ
-        if (m.isSustainPedalOn())
-        {
-            //DBG("m.isSustainPedalOn()");
-            sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
-            if (sustainInverted)    sustainDeactivate();
-            else                    sustainActivate();
-               
-        }
-        else if (m.isSustainPedalOff())
-        {
-            //DBG("m.isSustainPedalOff()");
-            sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
-            if (sustainInverted)    sustainActivate();
-            else                    sustainDeactivate();
-        }
+        //handleIncomingMidiMessage(nullptr, m);
     }
-
+    
 	//if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
@@ -1363,7 +1332,7 @@ Array<MidiDeviceInfo> BKAudioProcessor::getMidiOutputDevices()
 
 Array<MidiDeviceInfo> BKAudioProcessor::getMidiInputDevices()
 {
-    return MidiOutput::getAvailableDevices();
+    return MidiInput::getAvailableDevices();
 }
 
 std::unique_ptr<MidiInput> BKAudioProcessor::openMidiInputDevice(const String &deviceIdentifier)
@@ -1371,12 +1340,45 @@ std::unique_ptr<MidiInput> BKAudioProcessor::openMidiInputDevice(const String &d
     return MidiInput::openDevice(deviceIdentifier, this);
 }
 
-void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage &message)
+void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m)
 {
-    if (message.isNoteOn())
-        handleNoteOn(message.getNoteNumber(), message.getFloatVelocity(), message.getChannel(), source->getName());
-    else if (message.isNoteOff())
-        handleNoteOff(message.getNoteNumber(), message.getFloatVelocity(), message.getChannel(), source->getName());
+    String sourceName = keymapDefaultMidiInputIdentifier;
+    if (source != nullptr)
+    {
+        sourceName = source->getName();
+    }
+    
+    int noteNumber = m.getNoteNumber();
+    float velocity = m.getFloatVelocity();
+    
+    channel = m.getChannel();
+    
+    if (m.isNoteOn())
+    {
+        handleNoteOn(noteNumber, velocity, channel, sourceName);
+    }
+    else if (m.isNoteOff())
+    {
+        handleNoteOff(noteNumber, velocity, channel, sourceName);
+        //didNoteOffs = true;
+    }
+    
+    // NEED WAY TO TRIGGER RELEASE PEDAL SAMPLE FOR SFZ
+    if (m.isSustainPedalOn())
+    {
+        //DBG("m.isSustainPedalOn()");
+        sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
+        if (sustainInverted)    sustainDeactivate();
+        else                    sustainActivate();
+        
+    }
+    else if (m.isSustainPedalOff())
+    {
+        //DBG("m.isSustainPedalOff()");
+        sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
+        if (sustainInverted)    sustainActivate();
+        else                    sustainDeactivate();
+    }
 }
 
 void BKAudioProcessor::reset(BKPreparationType type, int Id)

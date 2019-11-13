@@ -41,7 +41,9 @@ public:
     void update(void);
     
     void fillSelectCB(int last, int current);
-    void fillTargetSelectCB();
+    void fillMidiInputSelectCB(void);
+    void fillTargetSelectCB(void);
+    
     
     static void actionButtonCallback(int action, KeymapViewController*);
     static void targetsMenuCallback(int result, KeymapViewController* vc);
@@ -66,6 +68,8 @@ private:
     
     BKLabel     keymapSelectL;
     BKEditableComboBox  selectCB;
+    
+    BKComboBox midiInputSelectCB;
     
     ToggleButton invertOnOffToggle;
     

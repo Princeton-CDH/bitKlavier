@@ -171,8 +171,8 @@ public:
     void  performModifications(int noteNumber);
     void  performResets(int noteNumber);
     
-    void handleNoteOn(int noteNumber, float velocity, int channel, String source = String("Default"));
-    void handleNoteOff(int noteNumber, float velocity, int channel, String source = String("Default"));
+    void handleNoteOn(int noteNumber, float velocity, int channel, String source = String(keymapDefaultMidiInputIdentifier));
+    void handleNoteOff(int noteNumber, float velocity, int channel, String source = String(keymapDefaultMidiInputIdentifier));
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
@@ -325,6 +325,8 @@ public:
     
     void exportPiano(int Id, String name);
     void importPiano(int Id, int importId);
+    
+    void processMidiBuffer(MidiBuffer& midiMessages, String sourceName);
     
     Array<MidiDeviceInfo> getMidiOutputDevices();
     Array<MidiDeviceInfo> getMidiInputDevices();

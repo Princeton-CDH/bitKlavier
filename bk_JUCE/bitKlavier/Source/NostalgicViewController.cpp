@@ -204,9 +204,9 @@ void NostalgicViewController::displayTab(int tab)
     invisible();
     displayShared();
     
-    int x0 = leftArrow.getRight() + gXSpacing;
+//    int x0 = leftArrow.getRight() + gXSpacing;
 //    int y0 = hideOrShow.getBottom() + gYSpacing;
-    int right = rightArrow.getX() - gXSpacing;
+//    int right = rightArrow.getX() - gXSpacing;
 //    int width = right - x0;
 //    int height = getHeight() - y0;
 //

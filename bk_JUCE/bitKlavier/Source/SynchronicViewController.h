@@ -57,7 +57,6 @@ public:
         setLookAndFeel(nullptr);
         releaseVelocitySetsSynchronicToggle.setLookAndFeel(nullptr);
         onOffSelectCB.setLookAndFeel(nullptr);
-        
     };
     
     void paint (Graphics&) override;

@@ -1073,6 +1073,9 @@ static const std::vector<std::string> cKeymapParameterTypes = {
     "Keymap"
 };
 
+static const String keymapDefaultMidiInputIdentifier = "_JUCEMidiInput";
+static const String keymapDefaultMidiInputDisplay = "Default MIDI Input";
+
 typedef enum BKSampleLoadType
 {
     BKLoadLitest = 0,

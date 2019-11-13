@@ -37,6 +37,14 @@ BKViewController(p, theGraph, 1)
     selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
+    midiInputSelectCB.setName("MidiInput");
+    midiInputSelectCB.addSeparator();
+    midiInputSelectCB.addListener(this);
+    midiInputSelectCB.BKSetJustificationType(juce::Justification::centredRight);
+    midiInputSelectCB.setSelectedItemIndex(0);
+    midiInputSelectCB.setTooltip("Select from available MIDI input devices");
+    addAndMakeVisible(midiInputSelectCB);
+    
     targetsButton.setName("TargetsButton");
     targetsButton.setButtonText("Targets");
     targetsButton.setTooltip("Select which parts of connected preparations to send key information");
@@ -115,15 +123,14 @@ BKViewController(p, theGraph, 1)
     actionButton.addListener(this);
     
     invertOnOffToggle.setButtonText ("invert note on/off");
-    buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
+//    buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     invertOnOffToggle.setToggleState (false, dontSendNotification);
     invertOnOffToggle.setTooltip("Indicates whether to Invert Note-On and Note-Off messages for this Keymap");
     invertOnOffToggle.addListener(this);
     addAndMakeVisible(&invertOnOffToggle, ALL);
     
     fillSelectCB(-1,-1);
-    
-    
+    fillMidiInputSelectCB();
 
     update();
 }
@@ -137,6 +144,7 @@ KeymapViewController::~KeymapViewController()
 void KeymapViewController::reset(void)
 {
     fillSelectCB(-1,-1);
+    fillMidiInputSelectCB();
     update();
 }
 
@@ -190,6 +198,9 @@ void KeymapViewController::resized()
     
     clearButton.setBounds(keyboard->getRight() - keyboardValsTextFieldOpen.getWidth(), keyboardValsTextFieldOpen.getY(), keyboardValsTextFieldOpen.getWidth(),keyboardValsTextFieldOpen.getHeight());
     
+    invertOnOffToggle.setBounds(keysButton.getRight()+gXSpacing, keysButton.getY(), keysButton.getWidth(), keysButton.getHeight());
+    invertOnOffToggle.toFront(false);
+    
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
     comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
@@ -203,12 +214,15 @@ void KeymapViewController::resized()
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
     
+    midiInputSelectCB.setBounds(actionButton.getRight()+gXSpacing,
+                                 actionButton.getY(),
+                                 selectCB.getWidth(),
+                                 selectCB.getHeight());
+    
     Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
     targetsSlice.removeFromRight(gXSpacing);
     targetsButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
     targetsSlice.removeFromRight(gXSpacing);
-    invertOnOffToggle.setBounds(targetsSlice);
-    invertOnOffToggle.toFront(false);
 }
 
 int KeymapViewController::addKeymap(void)
@@ -337,6 +351,8 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
 
 void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
 {
+    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    
     String name = box->getName();
     int Id = box->getSelectedId();
     
@@ -363,6 +379,17 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
     {
         if (Id == SELECT_ID)        selectType = true;
         else if (Id == DESELECT_ID) selectType = false;
+    }
+    else if (box == &midiInputSelectCB)
+    {
+        if (Id == 1) keymap->setMidiInput(nullptr);
+        else
+        {
+            auto device = processor.getMidiInputDevices()[Id-2];
+            keymap->setMidiInput(std::move(processor.openMidiInputDevice(device.identifier)));
+        }
+        
+        fillMidiInputSelectCB();
     }
 }
 
@@ -499,6 +526,22 @@ void KeymapViewController::fillSelectCB(int last, int current)
     selectCB.setItemEnabled(selectedId, false);
 
     lastId = selectedId;
+}
+
+void KeymapViewController::fillMidiInputSelectCB()
+{
+    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    
+    midiInputSelectCB.clear(dontSendNotification);
+    
+    int result = 1;
+    midiInputSelectCB.addItem(keymapDefaultMidiInputDisplay, result);
+    if (keymap->getMidiInputName() == keymapDefaultMidiInputIdentifier) midiInputSelectCB.setSelectedId(result, NotificationType::dontSendNotification);
+    for (auto device : processor.getMidiInputDevices())
+    {
+        midiInputSelectCB.addItem(device.name, ++result);
+        if (keymap->getMidiInputName() == device.name) midiInputSelectCB.setSelectedId(result, NotificationType::dontSendNotification);
+    }
 }
 
 void KeymapViewController::bkButtonClicked (Button* b)

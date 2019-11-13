@@ -14,7 +14,9 @@ Keymap::Keymap(int Id):
 Id(Id),
 keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
-inverted(false)
+inverted(false),
+midiInput(nullptr),
+midiInputName(keymapDefaultMidiInputIdentifier)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -30,7 +32,9 @@ inverted(false)
 }
 
 Keymap::Keymap(Keymap::Ptr k):
-Id(k->getId())
+Id(k->getId()),
+midiInput(k->getMidiInput()),
+midiInputName(k->getMidiInputName())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -49,7 +53,9 @@ Id(k->getId())
 }
 
 Keymap::Keymap(int Id, Keymap::Ptr k):
-Id(Id)
+Id(Id),
+midiInput(k->getMidiInput()),
+midiInputName(k->getMidiInputName())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -71,7 +77,9 @@ Keymap::Keymap(void):
 Id(-1),
 keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
-inverted(false)
+inverted(false),
+midiInput(nullptr),
+midiInputName(keymapDefaultMidiInputIdentifier)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)

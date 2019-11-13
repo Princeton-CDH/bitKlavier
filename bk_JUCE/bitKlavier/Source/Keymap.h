@@ -231,6 +231,15 @@ public:
     inline bool isInverted(void) const noexcept { return inverted; }
     inline void setInverted(bool inv) { inverted = inv; }
     
+    inline const std::shared_ptr<MidiInput> getMidiInput() const noexcept { return midiInput; }
+    inline const String getMidiInputName() const noexcept { return midiInputName; }
+    inline const void setMidiInput(std::shared_ptr<MidiInput> input)
+    {
+        midiInput = input;
+        if (midiInput == nullptr) midiInputName = keymapDefaultMidiInputIdentifier;
+        else midiInputName = midiInput->getName();
+    }
+    
     void setTarget(KeymapTargetType target, KeymapTargetState state);
     void toggleTarget(KeymapTargetType target);
     void enableTarget(KeymapTargetType target);
@@ -251,6 +260,9 @@ private:
     Array<KeymapTargetState> targetStates;
     
     bool inverted;
+    
+    std::shared_ptr<MidiInput> midiInput;
+    String midiInputName;
     
     JUCE_LEAK_DETECTOR (Keymap)
 };

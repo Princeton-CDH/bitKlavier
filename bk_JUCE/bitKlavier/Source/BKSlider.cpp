@@ -729,6 +729,7 @@ void BKMultiSlider::mouseUp (const MouseEvent &event)
         {
             int which = whichSlider(event);
             if(which >= 0) {
+                if (sliders[which]->size() == 0) addSubSlider(which, false, sendNotification);
                 
                 BKSubSlider* currentSlider = sliders[which]->operator[](0);
                 if (currentSlider != nullptr)
@@ -1001,6 +1002,9 @@ void BKMultiSlider::buttonClicked(Button* button)
 {
     if (button->getName() == "ROTATE")
     {
+        editValsTextField->setText(arrayFloatArrayToString(getAllActiveValues()), dontSendNotification);
+        setTo(stringToArrayFloatArray(getTextEditor()->getText()), sendNotification);
+        
         Array<Array<float>> values = getAllActiveValues();
         Array<Array<float>> rotated;
         for (int i = numActiveSliders - 1; i < 2*numActiveSliders - 1; i++)
