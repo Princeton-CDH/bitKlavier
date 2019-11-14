@@ -16,6 +16,8 @@
 
 #include "BKUtilities.h"
 
+class BKAudioProcessor;
+
 typedef enum KeySet
 {
     KeySetAll = 1,
@@ -55,7 +57,8 @@ typedef enum ChordType
 } ChordType;
 
 
-class Keymap : public ReferenceCountedObject
+class Keymap : public ReferenceCountedObject,
+               public MidiInputCallback
 {
 public:
     typedef ReferenceCountedObjectPtr<Keymap>   Ptr;
@@ -82,15 +85,15 @@ public:
     
     Array<int> allpc = {0};
     
-    Keymap(void);
-    Keymap(int Id);
-    Keymap(Keymap::Ptr k);
-    Keymap(int Id, Keymap::Ptr k);
+    Keymap(BKAudioProcessor& processor);
+    Keymap(BKAudioProcessor& processor, int Id);
+    Keymap(BKAudioProcessor& processor, Keymap::Ptr k);
+    Keymap(BKAudioProcessor& processor, int Id, Keymap::Ptr k);
     ~Keymap();
     
     inline Keymap::Ptr duplicate(void)
     {
-        Keymap::Ptr copyPrep = new Keymap(-1);
+        Keymap::Ptr copyPrep = new Keymap(processor, -1);
         
         copyPrep->setKeymap(keys());
         
@@ -161,6 +164,8 @@ public:
     void setOctatonic(OctType type, bool action);
     void setChord(KeySet set, PitchClass root, bool action);
     void setKeys(KeySet set, bool action, PitchClass pc = PitchClassNil);
+    
+    void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
     
     void print(void);
     
@@ -253,6 +258,7 @@ public:
     inline void setName(String newName) {name = newName;}
     
 private:
+    BKAudioProcessor& processor;
     int Id;
     String name;
     Array<bool> keymap;

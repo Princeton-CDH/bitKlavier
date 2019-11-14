@@ -10,7 +10,10 @@
 
 #include "Keymap.h"
 
-Keymap::Keymap(int Id):
+#include "PluginProcessor.h"
+
+Keymap::Keymap(BKAudioProcessor& processor, int Id):
+processor(processor),
 Id(Id),
 keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
@@ -31,7 +34,8 @@ midiInputName(keymapDefaultMidiInputIdentifier)
     }
 }
 
-Keymap::Keymap(Keymap::Ptr k):
+Keymap::Keymap(BKAudioProcessor& processor, Keymap::Ptr k):
+processor(processor),
 Id(k->getId()),
 midiInput(k->getMidiInput()),
 midiInputName(k->getMidiInputName())
@@ -52,7 +56,8 @@ midiInputName(k->getMidiInputName())
     inverted = k->isInverted();
 }
 
-Keymap::Keymap(int Id, Keymap::Ptr k):
+Keymap::Keymap(BKAudioProcessor& processor, int Id, Keymap::Ptr k):
+processor(processor),
 Id(Id),
 midiInput(k->getMidiInput()),
 midiInputName(k->getMidiInputName())
@@ -73,7 +78,8 @@ midiInputName(k->getMidiInputName())
     inverted = k->isInverted();
 }
 
-Keymap::Keymap(void):
+Keymap::Keymap(BKAudioProcessor& processor):
+processor(processor),
 Id(-1),
 keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
@@ -97,7 +103,7 @@ midiInputName(keymapDefaultMidiInputIdentifier)
 
 Keymap::~Keymap()
 {
-    
+    if (getMidiInput() != nullptr) getMidiInput()->stop();
 }
 
 // Returns true if added, false if removed.
@@ -344,15 +350,33 @@ void Keymap::removeTarget(KeymapTargetType target)
 
 void Keymap::removeTargetsOfType(BKPreparationType type)
 {
+    if (type == PreparationTypeDirect)
+    {
+        removeTarget(TargetTypeDirect);
+    }
     if (type == PreparationTypeSynchronic)
     {
         removeTarget(TargetTypeSynchronicSync);
         removeTarget(TargetTypeSynchronicCluster);
     }
+    else if (type == PreparationTypeNostalgic)
+    {
+        removeTarget(TargetTypeNostalgic);
+    }
     else if (type == PreparationTypeBlendronic)
     {
         removeTarget(TargetTypeBlendronicSync);
         removeTarget(TargetTypeBlendronicClear);
+        removeTarget(TargetTypeBlendronicOpen);
+        removeTarget(TargetTypeBlendronicClose);
+    }
+    else if (type == PreparationTypeTempo)
+    {
+        removeTarget(TargetTypeTempo);
+    }
+    else if (type == PreparationTypeTuning)
+    {
+        removeTarget(TargetTypeTuning);
     }
 }
 
@@ -362,6 +386,13 @@ void Keymap::clearTargets()
     {
         targetStates.set(i, TargetStateNil);
     }
+}
+
+// Receive MIDI message in the keymap before sending to the processor
+void Keymap::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message)
+{
+    // Send the message to the processor along with the keymap it corresponds to so we can later filter out duplicate sends
+    processor.handleIncomingKeymapMidiMessage(message, source, this);
 }
 
 void Keymap::print(void)

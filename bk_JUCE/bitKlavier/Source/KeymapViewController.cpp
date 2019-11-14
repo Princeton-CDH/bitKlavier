@@ -385,8 +385,10 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
         if (Id == 1) keymap->setMidiInput(nullptr);
         else
         {
+            if (keymap->getMidiInput() != nullptr) keymap->getMidiInput()->stop();
             auto device = processor.getMidiInputDevices()[Id-2];
-            keymap->setMidiInput(std::move(processor.openMidiInputDevice(device.identifier)));
+            keymap->setMidiInput(processor.openMidiInputDevice(device.identifier, keymap));
+            keymap->getMidiInput()->start();
         }
         
         fillMidiInputSelectCB();

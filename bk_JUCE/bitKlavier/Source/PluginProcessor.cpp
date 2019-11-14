@@ -749,10 +749,22 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     int time;
     //bool didNoteOffs = false;
     MidiMessage m;
-    for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
+    int i = 0;
+    for (MidiBuffer::Iterator e (midiMessages); e.getNextEvent (m, time);)
     {
-        //handleIncomingMidiMessage(nullptr, m);
+        while (keymapMidiMessages[i].message.getTimeStamp() < time && i < keymapMidiMessages.size())
+        {
+            processMidiMessage(keymapMidiMessages[i].message, keymapMidiMessages[i].sourceName);
+            i++;
+        }
+        processMidiMessage(m, keymapDefaultMidiInputIdentifier);
     }
+    while (i < keymapMidiMessages.size())
+    {
+        processMidiMessage(keymapMidiMessages[i].message, keymapMidiMessages[i].sourceName);
+        i++;
+    }
+    keymapMidiMessages.clear();
     
 	//if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
     
@@ -1335,19 +1347,13 @@ Array<MidiDeviceInfo> BKAudioProcessor::getMidiInputDevices()
     return MidiInput::getAvailableDevices();
 }
 
-std::unique_ptr<MidiInput> BKAudioProcessor::openMidiInputDevice(const String &deviceIdentifier)
+std::unique_ptr<MidiInput> BKAudioProcessor::openMidiInputDevice(const String &deviceIdentifier, MidiInputCallback* callback)
 {
-    return MidiInput::openDevice(deviceIdentifier, this);
+    return MidiInput::openDevice(deviceIdentifier, callback);
 }
 
-void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m)
+void BKAudioProcessor::processMidiMessage(const MidiMessage& m, String sourceName)
 {
-    String sourceName = keymapDefaultMidiInputIdentifier;
-    if (source != nullptr)
-    {
-        sourceName = source->getName();
-    }
-    
     int noteNumber = m.getNoteNumber();
     float velocity = m.getFloatVelocity();
     
@@ -1378,6 +1384,36 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
         sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
         if (sustainInverted)    sustainActivate();
         else                    sustainDeactivate();
+    }
+}
+
+void BKAudioProcessor::handleIncomingKeymapMidiMessage(const MidiMessage& m, MidiInput* source, Keymap::Ptr keymap)
+{
+    // Should merge duplicate messages here but not 100% sure what we should consider duplicate
+    // For now, merging equivalent messages from the same device but different keymaps
+    // May also be an option to leave duplicate messages, which shouldn't be an issue in most use cases
+    KeymapMidiMessage kmm;
+    kmm.keymapId = keymap->getId();
+    kmm.sourceName = source->getName();
+    kmm.message = m;
+    for (auto m : keymapMidiMessages)
+    {
+        if (m.keymapId == kmm.keymapId)
+        {
+            keymapMidiMessages.add(kmm);
+        }
+        else if (m.sourceName != kmm.sourceName)
+        {
+            keymapMidiMessages.add(kmm);
+        }
+        else if (*m.message.getRawData() != *kmm.message.getRawData())
+        {
+            keymapMidiMessages.add(kmm);
+        }
+    }
+    if (keymapMidiMessages.size() == 0)
+    {
+        keymapMidiMessages.add(kmm);
     }
 }
 

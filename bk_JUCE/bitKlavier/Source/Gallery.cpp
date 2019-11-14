@@ -126,7 +126,7 @@ void Gallery::randomize()
         //each set of preparations in the piano
         for (int i = 0; i < Random::getSystemRandom().nextInt(Range<int>(1, 10)); i++)
         {
-            Keymap::Ptr kp = new Keymap();
+            Keymap::Ptr kp = new Keymap(processor);
             kp->randomize();
             addKeymap(kp);
             p->addPreparationMap(kp);

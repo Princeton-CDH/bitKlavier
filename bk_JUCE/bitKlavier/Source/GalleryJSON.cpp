@@ -404,7 +404,7 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     else
                     {
-                        Keymap::Ptr testKeymap = new Keymap();
+                        Keymap::Ptr testKeymap = new Keymap(processor);
                         for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
                         thisKeymap = matches(testKeymap);
                         
@@ -597,7 +597,7 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     else
                     {
-                        Keymap::Ptr testKeymap = new Keymap();
+                        Keymap::Ptr testKeymap = new Keymap(processor);
                         for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
                         thisKeymap = matches(testKeymap);
                         
@@ -711,7 +711,7 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     else
                     {
-                        Keymap::Ptr testKeymap = new Keymap();
+                        Keymap::Ptr testKeymap = new Keymap(processor);
                         for (int k = 0; k < keys.size(); k += 2 )   testKeymap->addNote(keys[k]);
                         thisKeymap = matches(testKeymap);
                         
@@ -774,7 +774,7 @@ void Gallery::setStateFromJson(var myJson)
                         // Make new keymap
                         Keymap::Ptr thisKeymap;
 
-                        Keymap::Ptr testKeymap = new Keymap();
+                        Keymap::Ptr testKeymap = new Keymap(processor);
                         testKeymap->addNote(key);
                         
                         thisKeymap = matches(testKeymap);
@@ -872,7 +872,7 @@ void Gallery::setStateFromJson(var myJson)
                         // Make new keymap
                         Keymap::Ptr thisKeymap;
                         
-                        Keymap::Ptr testKeymap = new Keymap();
+                        Keymap::Ptr testKeymap = new Keymap(processor);
                         testKeymap->addNote(noteNumber);
                         thisKeymap = matches(testKeymap);
                         

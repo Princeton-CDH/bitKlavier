@@ -435,7 +435,7 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml)
 	}
     else if (type == PreparationTypeKeymap)
     {
-        Keymap::Ptr p = new Keymap(-1);
+        Keymap::Ptr p = new Keymap(processor, -1);
         p->setState(xml);
         addKeymap(p);
         newId = getNewId(PreparationTypeKeymap);
@@ -859,12 +859,12 @@ void Gallery::addBlendronicMod(BlendronicModification::Ptr bmod)
 void Gallery::addKeymap(void)
 {
     int newId = getNewId(PreparationTypeKeymap);
-    bkKeymaps.add(new Keymap(newId));
+    bkKeymaps.add(new Keymap(processor, newId));
 }
 
 void Gallery::addKeymapWithId(int Id)
 {
-    bkKeymaps.add(new Keymap(Id));
+    bkKeymaps.add(new Keymap(processor, Id));
 }
 
 void Gallery::addKeymap(Keymap::Ptr k)
