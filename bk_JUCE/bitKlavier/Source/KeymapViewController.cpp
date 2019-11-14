@@ -125,12 +125,21 @@ BKViewController(p, theGraph, 1)
     invertOnOffToggle.setButtonText ("invert note on/off");
 //    buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     invertOnOffToggle.setToggleState (false, dontSendNotification);
-    invertOnOffToggle.setTooltip("Indicates whether to Invert Note-On and Note-Off messages for this Keymap");
+    invertOnOffToggle.setTooltip("Indicates whether to invert Note-On and Note-Off messages for this Keymap");
     invertOnOffToggle.addListener(this);
     addAndMakeVisible(&invertOnOffToggle, ALL);
     
+    midiEditToggle.setButtonText ("midi edit");
+    buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
+    midiEditToggle.setToggleState (false, dontSendNotification);
+    midiEditToggle.setTooltip("Indicates whether to MIDI input will edit this Keymap");
+    midiEditToggle.addListener(this);
+    addAndMakeVisible(&midiEditToggle, ALL);
+    
     fillSelectCB(-1,-1);
     fillMidiInputSelectCB();
+    
+    startTimer(20);
 
     update();
 }
@@ -200,6 +209,9 @@ void KeymapViewController::resized()
     
     invertOnOffToggle.setBounds(keysButton.getRight()+gXSpacing, keysButton.getY(), keysButton.getWidth(), keysButton.getHeight());
     invertOnOffToggle.toFront(false);
+    
+    midiEditToggle.setBounds(invertOnOffToggle.getRight()+gXSpacing, invertOnOffToggle.getY(), invertOnOffToggle.getWidth(), invertOnOffToggle.getHeight());
+    midiEditToggle.toFront(false);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -577,6 +589,11 @@ void KeymapViewController::bkButtonClicked (Button* b)
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setInverted(invertOnOffToggle.getToggleState());
     }
+    else if (b == &midiEditToggle)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setMidiEdit(midiEditToggle.getToggleState());
+    }
     else if (b == &keysButton)
     {
         getKeysMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&keysButton), ModalCallbackFunction::forComponent(keysMenuCallback, this));
@@ -694,6 +711,8 @@ void KeymapViewController::update(void)
         
         invertOnOffToggle.setToggleState(km->isInverted(), dontSendNotification);
         
+        midiEditToggle.setToggleState(km->getMidiEdit(), dontSendNotification);
+        
         keymapTF.setText( intArrayToString(km->keys()));
         
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
@@ -762,6 +781,16 @@ void KeymapViewController::updateKeymapTargets()
         {
             km->removeTargetsOfType((BKPreparationType) type);
         }
+    }
+}
+
+void KeymapViewController::timerCallback(){
+    Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    if (km->getMidiEdit())
+    {
+        BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(keyboardComponent.get());
+        
+        keyboard->setKeysInKeymap(km->keys());
     }
 }
 

@@ -23,7 +23,8 @@
 class KeymapViewController :
 public BKViewController,
 public BKKeymapKeyboardStateListener,
-public BKEditableComboBoxListener
+public BKEditableComboBoxListener,
+public Timer
 #if JUCE_IOS
 , public Slider::Listener,
 public WantsBigOne::Listener
@@ -72,6 +73,7 @@ private:
     BKComboBox midiInputSelectCB;
     
     ToggleButton invertOnOffToggle;
+    ToggleButton midiEditToggle;
     
     BKLabel     keymapL;
     BKTextEditor  keymapTF;
@@ -105,6 +107,8 @@ private:
     
     void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override;
+    
+    void timerCallback() override;
     
     void updateKeymapTargets(void);
     

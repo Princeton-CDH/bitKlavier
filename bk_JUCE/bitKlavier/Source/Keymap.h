@@ -165,6 +165,9 @@ public:
     void setChord(KeySet set, PitchClass root, bool action);
     void setKeys(KeySet set, bool action, PitchClass pc = PitchClassNil);
     
+    inline void setMidiEdit(bool edit) { midiEdit = edit; }
+    inline bool getMidiEdit() { return midiEdit; }
+    
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
     
     void print(void);
@@ -262,6 +265,9 @@ private:
     int Id;
     String name;
     Array<bool> keymap;
+    
+    // Use midi input to edit active keys 
+    bool midiEdit;
     
     Array<KeymapTargetState> targetStates;
     

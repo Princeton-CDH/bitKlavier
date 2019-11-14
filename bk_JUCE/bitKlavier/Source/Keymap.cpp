@@ -17,6 +17,7 @@ processor(processor),
 Id(Id),
 keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
+midiEdit(false),
 inverted(false),
 midiInput(nullptr),
 midiInputName(keymapDefaultMidiInputIdentifier)
@@ -37,6 +38,8 @@ midiInputName(keymapDefaultMidiInputIdentifier)
 Keymap::Keymap(BKAudioProcessor& processor, Keymap::Ptr k):
 processor(processor),
 Id(k->getId()),
+midiEdit(false),
+inverted(false),
 midiInput(k->getMidiInput()),
 midiInputName(k->getMidiInputName())
 {
@@ -59,6 +62,8 @@ midiInputName(k->getMidiInputName())
 Keymap::Keymap(BKAudioProcessor& processor, int Id, Keymap::Ptr k):
 processor(processor),
 Id(Id),
+midiEdit(false),
+inverted(false),
 midiInput(k->getMidiInput()),
 midiInputName(k->getMidiInputName())
 {
@@ -83,6 +88,7 @@ processor(processor),
 Id(-1),
 keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
+midiEdit(false),
 inverted(false),
 midiInput(nullptr),
 midiInputName(keymapDefaultMidiInputIdentifier)
@@ -388,11 +394,18 @@ void Keymap::clearTargets()
     }
 }
 
-// Receive MIDI message in the keymap before sending to the processor
+// Receive MIDI message in the keymap before sending to the processor or using to edit active keys
 void Keymap::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message)
 {
-    // Send the message to the processor along with the keymap it corresponds to so we can later filter out duplicate sends
-    processor.handleIncomingKeymapMidiMessage(message, source, this);
+    if (midiEdit)
+    {
+        if (message.isNoteOn()) toggleNote(message.getNoteNumber());
+    }
+    else
+    {
+        // Send the message to the processor along with the keymap it corresponds to so we can later filter out duplicate sends
+        processor.handleIncomingKeymapMidiMessage(message, source, this);
+    }
 }
 
 void Keymap::print(void)
