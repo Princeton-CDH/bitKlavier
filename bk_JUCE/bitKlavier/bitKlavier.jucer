@@ -15,7 +15,7 @@
               buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="Many Arrows Music"
               pluginFormats="buildAU,buildStandalone,buildVST,buildVST3,enableIAA"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
-              pluginVST3Category="Instrument">
+              pluginVST3Category="Instrument" defines="JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1">
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
@@ -211,6 +211,12 @@
               file="Source/BKReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
+        <GROUP id="{D95FF283-C159-D64C-6BE8-DFE35BF1BDDA}" name="Standalone">
+          <FILE id="jhbR79" name="BKStandaloneApp.cpp" compile="1" resource="0"
+                file="Source/BKStandaloneApp.cpp"/>
+          <FILE id="GmWq15" name="BKStandaloneWindow.h" compile="0" resource="0"
+                file="Source/BKStandaloneWindow.h"/>
+        </GROUP>
         <GROUP id="{A7EA3278-0185-F32B-52C4-0F88EA1C92D3}" name="Processor">
           <FILE id="MtCIvP" name="BKGalleryLoader.h" compile="0" resource="0"
                 file="Source/BKGalleryLoader.h"/>
