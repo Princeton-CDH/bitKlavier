@@ -394,10 +394,15 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
     }
     else if (box == &midiInputSelectCB)
     {
-        if (Id == 1) keymap->setMidiInput(nullptr);
+        if (keymap->getMidiInput() != nullptr) keymap->getMidiInput()->stop();
+        else processor.removeMidiInputDeviceCallback(keymap);
+        if (Id == 1)
+        {
+            keymap->setMidiInput(nullptr);
+            processor.addMidiInputDeviceCallback(keymap);
+        }
         else
         {
-            if (keymap->getMidiInput() != nullptr) keymap->getMidiInput()->stop();
             auto device = processor.getMidiInputDevices()[Id-2];
             keymap->setMidiInput(processor.openMidiInputDevice(device.identifier, keymap));
             keymap->getMidiInput()->start();

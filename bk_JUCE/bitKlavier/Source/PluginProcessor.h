@@ -2,6 +2,8 @@
 #ifndef PLUGINPROCESSOR_H_INCLUDED
 #define PLUGINPROCESSOR_H_INCLUDED
 
+#include "../JuceLibraryCode/JuceHeader.h"
+
 #include "BKUtilities.h"
 
 #include "BKGalleryLoader.h"
@@ -26,18 +28,29 @@
 
 #include "ItemMapper.h"
 
+class StandalonePluginHolder;
+
 
 //==============================================================================
 /**
 */
 class BKAudioProcessor : public AudioProcessor,
-                         public ChangeListener
+                         public ChangeListener,
+                         public MidiInputCallback
 {
     
 public:
     //==============================================================================
     BKAudioProcessor();
     ~BKAudioProcessor();
+    
+    StandalonePluginHolder* getPluginHolder(void);
+    AudioDeviceManager* getAudioDeviceManager(void);
+    AudioProcessorPlayer* getAudioProcessorPlayer(void);
+    void addMidiInputDeviceCallback(MidiInputCallback* callback);
+    void removeMidiInputDeviceCallback(MidiInputCallback* callback);
+    
+    void loadGalleries(void);
     
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
@@ -153,6 +166,7 @@ public:
     // Change listener callback implementation
     void changeListenerCallback(ChangeBroadcaster *source) override;
     
+    void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m) override;
     void handleIncomingKeymapMidiMessage(const MidiMessage& m, MidiInput* source, Keymap::Ptr keymap);
     
     //==============================================================================

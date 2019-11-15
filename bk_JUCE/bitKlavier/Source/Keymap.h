@@ -56,7 +56,7 @@ typedef enum ChordType
     ChordTypeNil
 } ChordType;
 
-
+// TODO: If midiInput == nullptr, midiInputName should be an array of all sources enabled in JUCE, then check sourceName against that array in keypressed/keyreleased
 class Keymap : public ReferenceCountedObject,
                public MidiInputCallback
 {
@@ -90,6 +90,8 @@ public:
     Keymap(BKAudioProcessor& processor, Keymap::Ptr k);
     Keymap(BKAudioProcessor& processor, int Id, Keymap::Ptr k);
     ~Keymap();
+    
+    void initMidiInputDevice(void);
     
     inline Keymap::Ptr duplicate(void)
     {

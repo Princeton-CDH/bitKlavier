@@ -3,6 +3,8 @@
 #include "PluginEditor.h"
 #include "BKPianoSampler.h"
 
+#include "BKStandaloneWindow.h"
+
 #if JUCE_IOS
 int fontHeight;
 
@@ -157,6 +159,11 @@ loader(*this)
     
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     
+    loadGalleries();
+}
+
+void BKAudioProcessor::loadGalleries()
+{
     collectGalleries();
     collectPianos();
     collectPreparations();
@@ -170,7 +177,7 @@ loader(*this)
     defaultName = "Basic_Piano_xml";
     
     loadGalleryFromXml(XmlDocument::parse(xmlData).get());
-
+    
 #if JUCE_IOS
     platform = BKIOS;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
@@ -745,23 +752,22 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         notesOffUI.remove(i);
     }
     
-    int time;
-    //bool didNoteOffs = false;
-    MidiMessage m;
-    int i = 0;
-    for (MidiBuffer::Iterator e (midiMessages); e.getNextEvent (m, time);)
+//    int time;
+//    bool didNoteOffs = false;
+//    MidiMessage m;
+//    int i = 0;
+//    for (MidiBuffer::Iterator e (midiMessages); e.getNextEvent (m, time);)
+//    {
+//        while (keymapMidiMessages[i].message.getTimeStamp() < time && i < keymapMidiMessages.size())
+//        {
+//            processMidiMessage(keymapMidiMessages[i].message, keymapMidiMessages[i].sourceName);
+//            i++;
+//        }
+//        processMidiMessage(m, keymapDefaultMidiInputIdentifier);
+//    }
+    for (auto kmm : keymapMidiMessages)
     {
-        while (keymapMidiMessages[i].message.getTimeStamp() < time && i < keymapMidiMessages.size())
-        {
-            processMidiMessage(keymapMidiMessages[i].message, keymapMidiMessages[i].sourceName);
-            i++;
-        }
-        processMidiMessage(m, keymapDefaultMidiInputIdentifier);
-    }
-    while (i < keymapMidiMessages.size())
-    {
-        processMidiMessage(keymapMidiMessages[i].message, keymapMidiMessages[i].sourceName);
-        i++;
+        else processMidiMessage(kmm.message, kmm.sourceName);
     }
     keymapMidiMessages.clear();
     
@@ -1386,6 +1392,29 @@ void BKAudioProcessor::processMidiMessage(const MidiMessage& m, String sourceNam
     }
 }
 
+void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m)
+{
+    KeymapMidiMessage kmm;
+    kmm.keymapId = -1;
+    kmm.sourceName = source->getName();
+    kmm.message = m;
+    for (auto m : keymapMidiMessages)
+    {
+        if (m.sourceName != kmm.sourceName)
+        {
+            keymapMidiMessages.add(kmm);
+        }
+        else if (*m.message.getRawData() != *kmm.message.getRawData())
+        {
+            keymapMidiMessages.add(kmm);
+        }
+    }
+    if (keymapMidiMessages.size() == 0)
+    {
+        keymapMidiMessages.add(kmm);
+    }
+}
+
 void BKAudioProcessor::handleIncomingKeymapMidiMessage(const MidiMessage& m, MidiInput* source, Keymap::Ptr keymap)
 {
     // Should merge duplicate messages here but not 100% sure what we should consider duplicate
@@ -1544,5 +1573,29 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     
 }
 
+StandalonePluginHolder* BKAudioProcessor::getPluginHolder()
+{
+    return StandalonePluginHolder::getInstance();
+}
+
+AudioDeviceManager* BKAudioProcessor::getAudioDeviceManager()
+{
+    return &getPluginHolder()->deviceManager;
+};
+
+AudioProcessorPlayer* BKAudioProcessor::getAudioProcessorPlayer()
+{
+    return &getPluginHolder()->player;
+};
+
+void BKAudioProcessor::addMidiInputDeviceCallback(MidiInputCallback* callback)
+{
+    getPluginHolder()->addMidiInputDeviceCallback (callback);
+}
+
+void BKAudioProcessor::removeMidiInputDeviceCallback(MidiInputCallback* callback)
+{
+    getPluginHolder()->removeMidiInputDeviceCallback(callback);
+}
 
 

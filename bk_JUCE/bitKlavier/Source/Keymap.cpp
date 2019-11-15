@@ -22,6 +22,8 @@ inverted(false),
 midiInput(nullptr),
 midiInputName(keymapDefaultMidiInputIdentifier)
 {
+    initMidiInputDevice();
+    
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
@@ -43,6 +45,8 @@ inverted(false),
 midiInput(k->getMidiInput()),
 midiInputName(k->getMidiInputName())
 {
+    initMidiInputDevice();
+    
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
@@ -67,6 +71,8 @@ inverted(false),
 midiInput(k->getMidiInput()),
 midiInputName(k->getMidiInputName())
 {
+    initMidiInputDevice();
+    
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
@@ -93,6 +99,8 @@ inverted(false),
 midiInput(nullptr),
 midiInputName(keymapDefaultMidiInputIdentifier)
 {
+    initMidiInputDevice();
+    
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
@@ -110,6 +118,15 @@ midiInputName(keymapDefaultMidiInputIdentifier)
 Keymap::~Keymap()
 {
     if (getMidiInput() != nullptr) getMidiInput()->stop();
+}
+
+void Keymap::initMidiInputDevice()
+{
+    if (midiInput != nullptr)
+    {
+        processor.openMidiInputDevice(midiInput->getIdentifier(), this);
+        midiInput->start();
+    }
 }
 
 // Returns true if added, false if removed.
