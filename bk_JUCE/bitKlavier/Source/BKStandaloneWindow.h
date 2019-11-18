@@ -88,11 +88,11 @@ public:
     void init (bool enableAudioInput, const String& preferredDefaultDeviceName)
     {
         setupAudioDevices (enableAudioInput, preferredDefaultDeviceName, options.get());
+        processor->setMidiReady(true);
         reloadPluginState();
         startPlaying();
         
-        if (autoOpenMidiDevices)
-            startTimer (500);
+        startTimer (500);
     }
     
     virtual ~StandalonePluginHolder() override
@@ -323,6 +323,12 @@ public:
                                   true,
                                   preferredDefaultDeviceName,
                                   preferredSetupOptions);
+        midiInputManager.initialise (enableAudioInput ? totalInChannels : 0,
+                                  totalOutChannels,
+                                  savedState.get(),
+                                  true,
+                                  preferredDefaultDeviceName,
+                                  preferredSetupOptions);
     }
     
     void addMidiInputDeviceCallback(MidiInputCallback* callback)
@@ -397,6 +403,7 @@ public:
     OptionalScopedPointer<PropertySet> settings;
     std::unique_ptr<BKAudioProcessor> processor;
     AudioDeviceManager deviceManager;
+    AudioDeviceManager midiInputManager;
     AudioProcessorPlayer player;
     Array<PluginInOuts> channelConfiguration;
     
@@ -522,7 +529,7 @@ private:
                             const AudioDeviceManager::AudioDeviceSetup* preferredSetupOptions)
     {
         deviceManager.addAudioCallback (this);
-        deviceManager.addMidiInputDeviceCallback ({}, processor.get());
+        midiInputManager.addMidiInputDeviceCallback ({}, processor.get());
         
         reloadAudioDeviceState (enableAudioInput, preferredDefaultDeviceName, preferredSetupOptions);
     }
@@ -531,7 +538,7 @@ private:
     {
         saveAudioDeviceState();
         
-        deviceManager.removeMidiInputDeviceCallback ({}, processor.get());
+        midiInputManager.removeMidiInputDeviceCallback ({}, processor.get());
         deviceManager.removeAudioCallback (this);
     }
     
@@ -543,14 +550,25 @@ private:
         {
             for (auto& oldDevice : lastMidiDevices)
                 if (! newMidiDevices.contains (oldDevice))
-                    deviceManager.setMidiInputDeviceEnabled (oldDevice.identifier, false);
+                    if (autoOpenMidiDevices) deviceManager.setMidiInputDeviceEnabled (oldDevice.identifier, false);
             
             for (auto& newDevice : newMidiDevices)
                 if (! lastMidiDevices.contains (newDevice))
-                    deviceManager.setMidiInputDeviceEnabled (newDevice.identifier, true);
+                {
+                    if (autoOpenMidiDevices) deviceManager.setMidiInputDeviceEnabled (newDevice.identifier, true);
+                    midiInputManager.setMidiInputDeviceEnabled (newDevice.identifier, true);
+                }
             
             lastMidiDevices = newMidiDevices;
         }
+        
+        Array<String> sources;
+        for (auto device : newMidiDevices)
+        {
+            if (deviceManager.isMidiInputDeviceEnabled(device.identifier))
+                sources.add(device.name);
+        }
+        processor->setDefaultMidiInputSources(sources);
     }
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StandalonePluginHolder)
@@ -650,6 +668,7 @@ public:
     //==============================================================================
     BKAudioProcessor* getAudioProcessor() const noexcept      { return pluginHolder->processor.get(); }
     AudioDeviceManager& getDeviceManager() const noexcept   { return pluginHolder->deviceManager; }
+    AudioDeviceManager& getMidiInputManager() const noexcept   { return pluginHolder->midiInputManager; }
     
     /** Deletes and re-creates the plugin, resetting it to its default state. */
     void resetToDefaultState()

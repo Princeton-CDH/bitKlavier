@@ -56,9 +56,7 @@ typedef enum ChordType
     ChordTypeNil
 } ChordType;
 
-// TODO: If midiInput == nullptr, midiInputName should be an array of all sources enabled in JUCE, then check sourceName against that array in keypressed/keyreleased
-class Keymap : public ReferenceCountedObject,
-               public MidiInputCallback
+class Keymap : public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<Keymap>   Ptr;
@@ -90,8 +88,6 @@ public:
     Keymap(BKAudioProcessor& processor, Keymap::Ptr k);
     Keymap(BKAudioProcessor& processor, int Id, Keymap::Ptr k);
     ~Keymap();
-    
-    void initMidiInputDevice(void);
     
     inline Keymap::Ptr duplicate(void)
     {
@@ -170,8 +166,6 @@ public:
     inline void setMidiEdit(bool edit) { midiEdit = edit; }
     inline bool getMidiEdit() { return midiEdit; }
     
-    void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message) override;
-    
     void print(void);
     
     inline ValueTree getState(void)
@@ -241,14 +235,22 @@ public:
     inline bool isInverted(void) const noexcept { return inverted; }
     inline void setInverted(bool inv) { inverted = inv; }
     
-    inline const std::shared_ptr<MidiInput> getMidiInput() const noexcept { return midiInput; }
-    inline const String getMidiInputName() const noexcept { return midiInputName; }
-    inline const void setMidiInput(std::shared_ptr<MidiInput> input)
+    
+    inline const Array<String> getMidiInputSources() const noexcept { return midiInputSources; }
+    const Array<String> getAllMidiInputSources();
+
+    inline void setMidiInputSources(Array<String> sources) { midiInputSources = sources; }
+    inline void addMidiInputSource(String source) { midiInputSources.add(source); }
+    inline void removeMidiInputSource(String source)
     {
-        midiInput = input;
-        if (midiInput == nullptr) midiInputName = keymapDefaultMidiInputIdentifier;
-        else midiInputName = midiInput->getName();
+        for (int i = 0; i < midiInputSources.size(); ++i)
+        {
+            if (source == midiInputSources[i]) midiInputSources.remove(i); break;
+        }
     }
+    
+    inline bool isDefaultSelected() { return defaultSelected; }
+    inline void setDefaultSelected(bool selected) { defaultSelected = selected; }
     
     void setTarget(KeymapTargetType target, KeymapTargetState state);
     void toggleTarget(KeymapTargetType target);
@@ -268,15 +270,16 @@ private:
     String name;
     Array<bool> keymap;
     
+    Array<KeymapTargetState> targetStates;
+    
     // Use midi input to edit active keys 
     bool midiEdit;
     
-    Array<KeymapTargetState> targetStates;
-    
     bool inverted;
     
-    std::shared_ptr<MidiInput> midiInput;
-    String midiInputName;
+    Array<String> midiInputSources;
+    
+    bool defaultSelected;
     
     JUCE_LEAK_DETECTOR (Keymap)
 };

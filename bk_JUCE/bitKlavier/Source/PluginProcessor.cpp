@@ -103,7 +103,8 @@ hammerReleaseSynth(),
 resonanceReleaseSynth(),
 pedalSynth(),
 doneWithSetStateInfo(false),
-loader(*this)
+loader(*this),
+midiReady(false)
 {
 #if BK_UNIT_TESTS
     
@@ -752,25 +753,6 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         notesOffUI.remove(i);
     }
     
-//    int time;
-//    bool didNoteOffs = false;
-//    MidiMessage m;
-//    int i = 0;
-//    for (MidiBuffer::Iterator e (midiMessages); e.getNextEvent (m, time);)
-//    {
-//        while (keymapMidiMessages[i].message.getTimeStamp() < time && i < keymapMidiMessages.size())
-//        {
-//            processMidiMessage(keymapMidiMessages[i].message, keymapMidiMessages[i].sourceName);
-//            i++;
-//        }
-//        processMidiMessage(m, keymapDefaultMidiInputIdentifier);
-//    }
-    for (auto kmm : keymapMidiMessages)
-    {
-        else processMidiMessage(kmm.message, kmm.sourceName);
-    }
-    keymapMidiMessages.clear();
-    
 	//if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
@@ -1357,10 +1339,11 @@ std::unique_ptr<MidiInput> BKAudioProcessor::openMidiInputDevice(const String &d
     return MidiInput::openDevice(deviceIdentifier, callback);
 }
 
-void BKAudioProcessor::processMidiMessage(const MidiMessage& m, String sourceName)
+void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m)
 {
     int noteNumber = m.getNoteNumber();
     float velocity = m.getFloatVelocity();
+    String sourceName = source->getName();
     
     channel = m.getChannel();
     
@@ -1389,59 +1372,6 @@ void BKAudioProcessor::processMidiMessage(const MidiMessage& m, String sourceNam
         sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
         if (sustainInverted)    sustainActivate();
         else                    sustainDeactivate();
-    }
-}
-
-void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m)
-{
-    KeymapMidiMessage kmm;
-    kmm.keymapId = -1;
-    kmm.sourceName = source->getName();
-    kmm.message = m;
-    for (auto m : keymapMidiMessages)
-    {
-        if (m.sourceName != kmm.sourceName)
-        {
-            keymapMidiMessages.add(kmm);
-        }
-        else if (*m.message.getRawData() != *kmm.message.getRawData())
-        {
-            keymapMidiMessages.add(kmm);
-        }
-    }
-    if (keymapMidiMessages.size() == 0)
-    {
-        keymapMidiMessages.add(kmm);
-    }
-}
-
-void BKAudioProcessor::handleIncomingKeymapMidiMessage(const MidiMessage& m, MidiInput* source, Keymap::Ptr keymap)
-{
-    // Should merge duplicate messages here but not 100% sure what we should consider duplicate
-    // For now, merging equivalent messages from the same device but different keymaps
-    // May also be an option to leave duplicate messages, which shouldn't be an issue in most use cases
-    KeymapMidiMessage kmm;
-    kmm.keymapId = keymap->getId();
-    kmm.sourceName = source->getName();
-    kmm.message = m;
-    for (auto m : keymapMidiMessages)
-    {
-        if (m.keymapId == kmm.keymapId)
-        {
-            keymapMidiMessages.add(kmm);
-        }
-        else if (m.sourceName != kmm.sourceName)
-        {
-            keymapMidiMessages.add(kmm);
-        }
-        else if (*m.message.getRawData() != *kmm.message.getRawData())
-        {
-            keymapMidiMessages.add(kmm);
-        }
-    }
-    if (keymapMidiMessages.size() == 0)
-    {
-        keymapMidiMessages.add(kmm);
     }
 }
 
@@ -1581,21 +1511,9 @@ StandalonePluginHolder* BKAudioProcessor::getPluginHolder()
 AudioDeviceManager* BKAudioProcessor::getAudioDeviceManager()
 {
     return &getPluginHolder()->deviceManager;
-};
+}
 
 AudioProcessorPlayer* BKAudioProcessor::getAudioProcessorPlayer()
 {
     return &getPluginHolder()->player;
-};
-
-void BKAudioProcessor::addMidiInputDeviceCallback(MidiInputCallback* callback)
-{
-    getPluginHolder()->addMidiInputDeviceCallback (callback);
 }
-
-void BKAudioProcessor::removeMidiInputDeviceCallback(MidiInputCallback* callback)
-{
-    getPluginHolder()->removeMidiInputDeviceCallback(callback);
-}
-
-

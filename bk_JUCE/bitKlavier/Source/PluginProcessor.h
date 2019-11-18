@@ -167,7 +167,9 @@ public:
     void changeListenerCallback(ChangeBroadcaster *source) override;
     
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m) override;
-    void handleIncomingKeymapMidiMessage(const MidiMessage& m, MidiInput* source, Keymap::Ptr keymap);
+    
+    inline const Array<String> getDefaultMidiInputSources(void) { return defaultMidiInputSources; }
+    inline void setDefaultMidiInputSources(Array<String> sources) { defaultMidiInputSources = sources; }
     
     //==============================================================================
     void loadSamples(BKSampleLoadType type, String path ="", int subsound=0);
@@ -339,15 +341,15 @@ public:
     void exportPiano(int Id, String name);
     void importPiano(int Id, int importId);
     
-    void processMidiMessage(const MidiMessage& m, String sourceName);
-    
     Array<MidiDeviceInfo> getMidiOutputDevices();
     Array<MidiDeviceInfo> getMidiInputDevices();
     
     std::unique_ptr<MidiInput> openMidiInputDevice(const String& deviceIdentifier, MidiInputCallback* callback);
     
-private:
+    inline bool isMidiReady(void) { return midiReady; }
+    inline void setMidiReady(bool ready) { midiReady = ready; }
     
+private:
     
     int  currentPianoId;
     
@@ -379,13 +381,8 @@ private:
     
     Array<MidiDeviceInfo> midiInputDevices;
     
-    struct KeymapMidiMessage
-    {
-        int keymapId;
-        String sourceName;
-        MidiMessage message;
-    };
-    Array<KeymapMidiMessage> keymapMidiMessages;
+    bool midiReady;
+    Array<String> defaultMidiInputSources;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

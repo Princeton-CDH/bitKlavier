@@ -37,13 +37,11 @@ BKViewController(p, theGraph, 1)
     selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
     
-    midiInputSelectCB.setName("MidiInput");
-    midiInputSelectCB.addSeparator();
-    midiInputSelectCB.addListener(this);
-    midiInputSelectCB.BKSetJustificationType(juce::Justification::centredRight);
-    midiInputSelectCB.setSelectedItemIndex(0);
-    midiInputSelectCB.setTooltip("Select from available MIDI input devices");
-    addAndMakeVisible(midiInputSelectCB);
+    midiInputSelectButton.setName("MidiInput");
+    midiInputSelectButton.setButtonText("Select MIDI Inputs");
+    midiInputSelectButton.setTooltip("Select from available MIDI input devices");
+    midiInputSelectButton.addListener(this);
+    addAndMakeVisible(midiInputSelectButton);
     
     targetsButton.setName("TargetsButton");
     targetsButton.setButtonText("Targets");
@@ -137,7 +135,6 @@ BKViewController(p, theGraph, 1)
     addAndMakeVisible(&midiEditToggle, ALL);
     
     fillSelectCB(-1,-1);
-    fillMidiInputSelectCB();
     
     startTimer(20);
 
@@ -153,7 +150,6 @@ KeymapViewController::~KeymapViewController()
 void KeymapViewController::reset(void)
 {
     fillSelectCB(-1,-1);
-    fillMidiInputSelectCB();
     update();
 }
 
@@ -226,7 +222,7 @@ void KeymapViewController::resized()
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
     
-    midiInputSelectCB.setBounds(actionButton.getRight()+gXSpacing,
+    midiInputSelectButton.setBounds(actionButton.getRight()+gXSpacing,
                                  actionButton.getY(),
                                  selectCB.getWidth(),
                                  selectCB.getHeight());
@@ -392,24 +388,6 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
         if (Id == SELECT_ID)        selectType = true;
         else if (Id == DESELECT_ID) selectType = false;
     }
-    else if (box == &midiInputSelectCB)
-    {
-        if (keymap->getMidiInput() != nullptr) keymap->getMidiInput()->stop();
-        else processor.removeMidiInputDeviceCallback(keymap);
-        if (Id == 1)
-        {
-            keymap->setMidiInput(nullptr);
-            processor.addMidiInputDeviceCallback(keymap);
-        }
-        else
-        {
-            auto device = processor.getMidiInputDevices()[Id-2];
-            keymap->setMidiInput(processor.openMidiInputDevice(device.identifier, keymap));
-            keymap->getMidiInput()->start();
-        }
-        
-        fillMidiInputSelectCB();
-    }
 }
 
 String pcs[12] = {"C","C#/Db","D","D#/Eb","E","F","F#/Gb","G","G#/Ab","A","A#/Bb","B",};
@@ -455,6 +433,28 @@ PopupMenu KeymapViewController::getKeysMenu(void)
     menu.addSubMenu("Harmonic Minor", getPitchClassMenu((KeySet) ID(KeySetHarmonicMinor)));
     
     return menu;
+}
+
+void KeymapViewController::midiInputSelectCallback(int result, KeymapViewController* vc)
+{
+    if (result <= 0) return;
+    
+    BKAudioProcessor& processor = vc->processor;
+    
+    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    
+    if (result == 1)
+    {
+        keymap->setDefaultSelected(!keymap->isDefaultSelected());
+    }
+    else
+    {
+        String deviceName = processor.getMidiInputDevices()[result-2].name;
+        if (keymap->getMidiInputSources().contains(deviceName)) keymap->removeMidiInputSource(deviceName);
+        else keymap->addMidiInputSource(deviceName);
+    }
+
+    vc->getMidiInputSelectMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->midiInputSelectButton), ModalCallbackFunction::forComponent(midiInputSelectCallback, vc));
 }
 
 void KeymapViewController::targetsMenuCallback(int result, KeymapViewController* vc)
@@ -547,20 +547,27 @@ void KeymapViewController::fillSelectCB(int last, int current)
     lastId = selectedId;
 }
 
-void KeymapViewController::fillMidiInputSelectCB()
+PopupMenu KeymapViewController::getMidiInputSelectMenu()
 {
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
     Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     
-    midiInputSelectCB.clear(dontSendNotification);
+    int id = 1;
+    if (keymap->isDefaultSelected())
+    {
+        menu.addItem(PopupMenu::Item("Default MIDI Input").setID(id).setTicked(true));
+    }
+    else menu.addItem(PopupMenu::Item("Default MIDI Input").setID(id));
     
-    int result = 1;
-    midiInputSelectCB.addItem(keymapDefaultMidiInputDisplay, result);
-    if (keymap->getMidiInputName() == keymapDefaultMidiInputIdentifier) midiInputSelectCB.setSelectedId(result, NotificationType::dontSendNotification);
     for (auto device : processor.getMidiInputDevices())
     {
-        midiInputSelectCB.addItem(device.name, ++result);
-        if (keymap->getMidiInputName() == device.name) midiInputSelectCB.setSelectedId(result, NotificationType::dontSendNotification);
+        if (keymap->getMidiInputSources().contains(device.name))
+            menu.addItem(PopupMenu::Item(device.name).setID(++id).setTicked(true));
+        else menu.addItem(PopupMenu::Item(device.name).setID(++id));
     }
+    return menu;
 }
 
 void KeymapViewController::bkButtonClicked (Button* b)
@@ -584,6 +591,10 @@ void KeymapViewController::bkButtonClicked (Button* b)
     else if (b == &actionButton)
     {
         getModOptionMenu(PreparationTypeKeymap).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
+    else if (b == &midiInputSelectButton)
+    {
+        getMidiInputSelectMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&midiInputSelectButton), ModalCallbackFunction::forComponent(midiInputSelectCallback, this));
     }
     else if (b == &targetsButton)
     {

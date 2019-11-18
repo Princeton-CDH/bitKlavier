@@ -47,6 +47,7 @@ public:
     
     
     static void actionButtonCallback(int action, KeymapViewController*);
+    static void midiInputSelectCallback(int result, KeymapViewController* vc);
     static void targetsMenuCallback(int result, KeymapViewController* vc);
     static void keysMenuCallback(int result, KeymapViewController* vc);
     
@@ -70,8 +71,6 @@ private:
     BKLabel     keymapSelectL;
     BKEditableComboBox  selectCB;
     
-    BKComboBox midiInputSelectCB;
-    
     ToggleButton invertOnOffToggle;
     ToggleButton midiEditToggle;
     
@@ -83,6 +82,7 @@ private:
     BKKeymapKeyboardComponent* keyboard;
     BKTextButton keyboardValsTextFieldOpen;
     
+    TextButton      midiInputSelectButton;
     TextButton      targetsButton;
     TextButton      keysButton;
     TextButton      clearButton;
@@ -93,6 +93,7 @@ private:
     PopupMenu getKeysMenu(void);
     PopupMenu getPitchClassMenu(int offset);
     PopupMenu getTargetsMenu(void);
+    PopupMenu getMidiInputSelectMenu(void);
     
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;

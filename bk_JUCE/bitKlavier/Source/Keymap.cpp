@@ -19,11 +19,9 @@ keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
 midiEdit(false),
 inverted(false),
-midiInput(nullptr),
-midiInputName(keymapDefaultMidiInputIdentifier)
+midiInputSources(Array<String>()),
+defaultSelected(false)
 {
-    initMidiInputDevice();
-    
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
@@ -35,6 +33,10 @@ midiInputName(keymapDefaultMidiInputIdentifier)
     {
         targetStates.add(TargetStateNil);
     }
+    
+    if (processor.isMidiReady()) {
+        defaultSelected = true;
+    }
 }
 
 Keymap::Keymap(BKAudioProcessor& processor, Keymap::Ptr k):
@@ -42,11 +44,9 @@ processor(processor),
 Id(k->getId()),
 midiEdit(false),
 inverted(false),
-midiInput(k->getMidiInput()),
-midiInputName(k->getMidiInputName())
+midiInputSources(k->getMidiInputSources()),
+defaultSelected(k->isDefaultSelected())
 {
-    initMidiInputDevice();
-    
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
@@ -68,11 +68,9 @@ processor(processor),
 Id(Id),
 midiEdit(false),
 inverted(false),
-midiInput(k->getMidiInput()),
-midiInputName(k->getMidiInputName())
+midiInputSources(k->getMidiInputSources()),
+defaultSelected(k->isDefaultSelected())
 {
-    initMidiInputDevice();
-    
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
@@ -96,11 +94,9 @@ keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
 midiEdit(false),
 inverted(false),
-midiInput(nullptr),
-midiInputName(keymapDefaultMidiInputIdentifier)
+midiInputSources(Array<String>()),
+defaultSelected(false)
 {
-    initMidiInputDevice();
-    
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
@@ -112,21 +108,15 @@ midiInputName(keymapDefaultMidiInputIdentifier)
     {
         targetStates.add(TargetStateNil);
     }
+    
+    if (processor.isMidiReady()) {
+        defaultSelected = true;
+    }
 }
-
 
 Keymap::~Keymap()
 {
-    if (getMidiInput() != nullptr) getMidiInput()->stop();
-}
-
-void Keymap::initMidiInputDevice()
-{
-    if (midiInput != nullptr)
-    {
-        processor.openMidiInputDevice(midiInput->getIdentifier(), this);
-        midiInput->start();
-    }
+    
 }
 
 // Returns true if added, false if removed.
@@ -411,18 +401,12 @@ void Keymap::clearTargets()
     }
 }
 
-// Receive MIDI message in the keymap before sending to the processor or using to edit active keys
-void Keymap::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& message)
+const Array<String> Keymap::getAllMidiInputSources()
 {
-    if (midiEdit)
-    {
-        if (message.isNoteOn()) toggleNote(message.getNoteNumber());
-    }
-    else
-    {
-        // Send the message to the processor along with the keymap it corresponds to so we can later filter out duplicate sends
-        processor.handleIncomingKeymapMidiMessage(message, source, this);
-    }
+    Array<String> sources;
+    sources.addArray(midiInputSources);
+    if (defaultSelected) sources.addArray(processor.getDefaultMidiInputSources());
+        return sources;
 }
 
 void Keymap::print(void)
