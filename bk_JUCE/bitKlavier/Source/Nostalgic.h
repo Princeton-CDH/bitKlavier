@@ -676,6 +676,16 @@ private:
 
 
 /* ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NOSTALGIC ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ */
+/*
+ 
+ This class owns two NostalgicPreparations: sPrep and aPrep
+ As with other preparation, sPrep is the static preparation, while
+ aPrep is the active preparation currently in use. sPrep and aPrep
+ remain the same unless a Modification is triggered, which will change
+ aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
+ is triggered.
+ 
+ */
 
 class Nostalgic : public ReferenceCountedObject
 {
