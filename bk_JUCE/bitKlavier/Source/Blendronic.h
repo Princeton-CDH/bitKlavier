@@ -526,6 +526,6 @@ private:
     float prevBeat, prevDelay;
     bool clearDelayOnNextBeat;
 
-	//JUCE_LEAK_DETECTOR(BlendronicProcessor);
+	JUCE_LEAK_DETECTOR(BlendronicProcessor);
 };
 #endif
