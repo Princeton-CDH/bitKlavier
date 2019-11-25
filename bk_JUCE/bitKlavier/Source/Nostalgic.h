@@ -20,6 +20,16 @@
 #include "Keymap.h"
 #include "Blendronic.h"
 
+/*
+ NostalgicPreparation holds all the state variable values for the
+ Nostalgic preparation. As with other preparation types, bK will use
+ two instantiations of NostalgicPreparation for every active
+ Nostalgic in the gallery, one to store the static state of the
+ preparation, and the other to store the active state. These will
+ be the same, unless a Modification is triggered, in which case the
+ active state will be changed (and a Reset will rever the active state
+ to the static state).
+ */
 class NostalgicPreparation : public ReferenceCountedObject
 {
 public:
@@ -572,21 +582,21 @@ private:
      --dt
      */
     
-    Array<float> nTransposition;       //transposition, in half steps
-    float nGain;                //gain multiplier
-    float nLengthMultiplier;    //note-length mode: toscale reverse playback time
-    float nBeatsToSkip;         //synchronic mode: beats to skip before reverse peak
-    NostalgicSyncMode nMode;    //which sync mode to use
+    Array<float> nTransposition;        //transposition, in half steps
+    float nGain;                        //gain multiplier
+    float nLengthMultiplier;            //note-length mode: toscale reverse playback time
+    float nBeatsToSkip;                 //synchronic mode: beats to skip before reverse peak
+    NostalgicSyncMode nMode;            //which sync mode to use
     
-    int     nReverseAttack, nReverseDecay, nReverseRelease;         //reverse ADSR, in ms
+    int     nReverseAttack, nReverseDecay, nReverseRelease;     //reverse ADSR, in ms
     float   nReverseSustain;
     
-    int     nUndertowAttack, nUndertowDecay, nUndertowRelease;      //undertow ADSR, in ms
+    int     nUndertowAttack, nUndertowDecay, nUndertowRelease;  //undertow ADSR, in ms
     float   nUndertowSustain;
     
     float holdMin, holdMax;
-    int clusterMin;
-    int clusterThreshold; //in ms
+    int clusterMin; // minimum number of notes needed to create nostalgic notes
+    int clusterThreshold; //in ms; minimum time between notes to make cluster (irrelevant if clusterMin = 1)
     int velocityMin, velocityMax;
     
     bool keyOnReset;
@@ -597,6 +607,13 @@ private:
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };
 
+
+/*
+ NostalgicNoteStuff is a class for containing a variety of information needed
+ to create Nostalgic events. This is needed since the undertow note
+ is created after the keys related to this note have been released, so
+ we need to store that information to use when the undertow note is created.
+ */
 
 class NostalgicNoteStuff : public ReferenceCountedObject
 {
@@ -675,7 +692,6 @@ private:
 };
 
 
-/* ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NOSTALGIC ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ */
 /*
  
  This class owns two NostalgicPreparations: sPrep and aPrep
@@ -808,6 +824,14 @@ private:
     
     JUCE_LEAK_DETECTOR(Nostalgic)
 };
+
+
+/*
+ NostalgicProcessor does the main work, including processing a block
+ of samples and sending it out. It connects Keymap, Tuning, Synchronic, and
+ Blendronic preparations together as needed, and gets the Nostalgic
+ values it needs to behave as expected
+ */
 
 class NostalgicProcessor : public ReferenceCountedObject
 {
