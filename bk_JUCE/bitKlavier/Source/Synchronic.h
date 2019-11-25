@@ -1048,7 +1048,7 @@ private:
  This class emables layers of Synchronic pulses by
  maintaining a set of counters moving through all the
  primary multi-parameters (accents, transpositions, etc...)
- and by updating timers for each Synchronic
+ and by updating timers for each Synchronic independently
  */
 
 class SynchronicCluster : public ReferenceCountedObject
@@ -1301,11 +1301,13 @@ private:
 
 
 /*
-SynchronicProcessor does the main work, including processing a block
-of samples and sending it out. It connects Keymap, Tuning, and
-Blendronic preparations together as needed, and gets the Synchronic
-values it needs to behave as expected
-*/
+ SynchronicProcessor does the main work, including processing a block
+ of samples and sending it out. It connects Keymap, Tuning, and
+ Blendronic preparations together as needed, and gets the Synchronic
+ values it needs to behave as expected. It also uses a SynchronicCluster
+ rather than an individual Synchronic, to enable layering of
+ multiple synchronic pulses all sharing the same settings
+ */
 
 class SynchronicProcessor  : public ReferenceCountedObject
 {
