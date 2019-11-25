@@ -27,9 +27,10 @@
  Nostalgic in the gallery, one to store the static state of the
  preparation, and the other to store the active state. These will
  be the same, unless a Modification is triggered, in which case the
- active state will be changed (and a Reset will rever the active state
+ active state will be changed (and a Reset will revert the active state
  to the static state).
  */
+
 class NostalgicPreparation : public ReferenceCountedObject
 {
 public:
@@ -693,14 +694,12 @@ private:
 
 
 /*
- 
  This class owns two NostalgicPreparations: sPrep and aPrep
  As with other preparation, sPrep is the static preparation, while
  aPrep is the active preparation currently in use. sPrep and aPrep
  remain the same unless a Modification is triggered, which will change
  aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
  is triggered.
- 
  */
 
 class Nostalgic : public ReferenceCountedObject

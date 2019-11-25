@@ -3,7 +3,7 @@
 
     Synchronic.h
     Created: 22 Nov 2016 3:46:35pm
-    Author:  Michael R Mulshine
+    Author:  Michael R Mulshine and Dan Trueman
 
   ==============================================================================
 */
@@ -18,6 +18,18 @@
 #include "General.h"
 #include "Keymap.h"
 #include "Blendronic.h"
+
+
+/*
+SynchronicPreparation holds all the state variable values for the
+Synchronic preparation. As with other preparation types, bK will use
+two instantiations of SynchronicPreparation for every active
+Nostalgic in the gallery, one to store the static state of the
+preparation, and the other to store the active state. These will
+be the same, unless a Modification is triggered, in which case the
+active state will be changed (and a Reset will revert the active state
+to the static state).
+*/
 
 class SynchronicPreparation : public ReferenceCountedObject
 {
@@ -867,7 +879,7 @@ private:
     String name;
     float sTempo;
     int sNumBeats,sClusterMin,sClusterMax;
-    int sClusterCap = 8; //max in cluster; 8 in original bK. pulseDepth?
+    int sClusterCap = 8; //max in cluster; 8 in original bK. called Cluster Thickness in v2.4 UI
     
     int numClusters;
     
@@ -901,7 +913,14 @@ private:
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
 
-/* ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SYNCHRONIC ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ */
+/*
+This class owns two SynchronicPreparations: sPrep and aPrep
+As with other preparation, sPrep is the static preparation, while
+aPrep is the active preparation currently in use. sPrep and aPrep
+remain the same unless a Modification is triggered, which will change
+aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
+is triggered.
+*/
 
 class Synchronic : public ReferenceCountedObject
 {
@@ -1023,6 +1042,14 @@ private:
     
     JUCE_LEAK_DETECTOR(Synchronic)
 };
+
+
+/*
+ This class emables layers of Synchronic pulses by
+ maintaining a set of counters moving through all the
+ primary multi-parameters (accents, transpositions, etc...)
+ and by updating timers for each Synchronic
+ */
 
 class SynchronicCluster : public ReferenceCountedObject
 {
@@ -1271,6 +1298,14 @@ private:
     
     JUCE_LEAK_DETECTOR(SynchronicCluster);
 };
+
+
+/*
+SynchronicProcessor does the main work, including processing a block
+of samples and sending it out. It connects Keymap, Tuning, and
+Blendronic preparations together as needed, and gets the Synchronic
+values it needs to behave as expected
+*/
 
 class SynchronicProcessor  : public ReferenceCountedObject
 {
