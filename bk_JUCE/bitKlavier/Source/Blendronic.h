@@ -285,6 +285,8 @@ private:
 
 	//needed for sampling
 	float inputGain;
+    
+    JUCE_LEAK_DETECTOR(BlendronicPreparation);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -401,7 +403,7 @@ private:
 	int Id;
 	String name;
 
-	//JUCE_LEAK_DETECTOR(Blendronic)
+	JUCE_LEAK_DETECTOR(Blendronic)
 };
 
 ////////////////////////////////////////////////////////////////////////////////////
