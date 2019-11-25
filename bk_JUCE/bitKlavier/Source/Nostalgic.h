@@ -3,7 +3,7 @@
 
     Nostalgic.h
     Created: 22 Nov 2016 3:46:45pm
-    Author:  Michael R Mulshine
+    Author:  Michael R Mulshine and Dan Trueman
 
   ==============================================================================
 */
