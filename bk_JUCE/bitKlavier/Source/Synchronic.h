@@ -24,7 +24,7 @@
 SynchronicPreparation holds all the state variable values for the
 Synchronic preparation. As with other preparation types, bK will use
 two instantiations of SynchronicPreparation for every active
-Nostalgic in the gallery, one to store the static state of the
+Synchronic in the gallery, one to store the static state of the
 preparation, and the other to store the active state. These will
 be the same, unless a Modification is triggered, in which case the
 active state will be changed (and a Reset will revert the active state

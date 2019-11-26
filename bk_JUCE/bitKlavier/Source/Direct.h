@@ -17,6 +17,17 @@
 #include "Tuning.h"
 #include "Blendronic.h"
 
+/*
+DirectPreparation holds all the state variable values for the
+Direct preparation. As with other preparation types, bK will use
+two instantiations of SynchronicPreparation for every active
+Direct in the gallery, one to store the static state of the
+preparation, and the other to store the active state. These will
+be the same, unless a Modification is triggered, in which case the
+active state will be changed (and a Reset will revert the active state
+to the static state).
+*/
+
 class DirectPreparation : public ReferenceCountedObject
 {
 public:
@@ -268,7 +279,14 @@ private:
 };
 
 
-/* ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DIRECT ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ */
+/*
+This class owns two DirectPreparations: sPrep and aPrep
+As with other preparation, sPrep is the static preparation, while
+aPrep is the active preparation currently in use. sPrep and aPrep
+remain the same unless a Modification is triggered, which will change
+aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
+is triggered.
+*/
 
 class Direct : public ReferenceCountedObject
 {
@@ -389,6 +407,14 @@ private:
     
     JUCE_LEAK_DETECTOR(Direct)
 };
+
+
+/*
+DirectProcessor does the main work, including processing a block
+of samples and sending it out. It connects Keymap, Tuning, and
+Blendronic preparations together as needed, and gets the Direct
+values it needs to behave as expected.
+*/
 
 class DirectProcessor : public ReferenceCountedObject
 {
