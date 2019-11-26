@@ -14,31 +14,11 @@
 Spring::Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index) :
 	a(firstPoint),
 	b(secondPoint),
+    strength(str),
 	restingLength(length),
-	strength(str),
 	intervalIndex(index)
 {
     
-}
-
-Particle* Spring::getA()
-{
-	return a;
-}
-
-Particle* Spring::getB()
-{
-	return b;
-}
-
-double Spring::getStrength()
-{
-	return strength;
-}
-
-int Spring::getIntervalIndex()
-{
-	return intervalIndex;
 }
 
 Spring::Ptr Spring::copy(void)
@@ -66,6 +46,8 @@ void Spring::print()
 void Spring::setStrength(double newStrength)
 {
 	strength = newStrength;
+    
+    // adjusted strength is scaled non-linearly to make the explosed parameter more intuitive and usable
     double warpCoeff = 100.;
     adjustedStrength = 0.6 * stiffness * (pow(warpCoeff, strength) - 1.) / (warpCoeff - 1.); //replace with dt_asymwarp, for clarity
     // > ~0.6 and the system can become unstable...
@@ -97,31 +79,4 @@ void Spring::satisfyConstraints(void)
         b->subX(diff);
     }
 
-}
-
-void Spring::update()
-{
-	/*
-	Verlet function
-	protected void update(boolean applyConstraints) {
-        Vec2D delta = b.sub(a);
-        // add minute offset to avoid div-by-zero errors
-        float dist = delta.magnitude() + EPS;
-        float normDistStrength = (dist - restLength)
-                / (dist * (a.invWeight + b.invWeight)) * strength;
-        if (!a.isLocked && !isALocked) {
-            a.addSelf(delta.scale(normDistStrength * a.invWeight));
-            if (applyConstraints) {
-                a.applyConstraints();
-            }
-        }
-        if (!b.isLocked && !isBLocked) {
-            b.addSelf(delta.scale(-normDistStrength * b.invWeight));
-            if (applyConstraints) {
-                b.applyConstraints();
-            }
-        }
-    }
-
-	*/
 }

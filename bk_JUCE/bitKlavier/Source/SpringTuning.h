@@ -3,7 +3,28 @@
 
     SpringTuning.h
     Created: 3 Aug 2018 3:43:46pm
-    Author:  Theo
+    Author:  Theo Trevisan, Mike Mulshine, Dan Trueman
+    
+    Based on the Verlet mass/spring algorithm:
+    Jakobsen, T. (2001). Advanced character physics.
+        In IN PROCEEDINGS OF THE GAME DEVELOPERS CONFERENCE 2001, page 19.
+ 
+    The main method is simulate(), which is called repeatedly in a timer()
+ 
+    in bitKlavier, we use two arrays of springs:
+        * the interval springs, which connect all active notes to one another
+            at rest lengths given by whatever interval tuning system is being used
+        * the tether springs, which connect all active notes to an array of "anchor"
+            notes, set by an "anchor" scale (usually ET), to prevent uncontrolled drift
+ 
+    The user sets the strengths of all these strings, either directly, or using some
+    automated algorithms and the system runs, adding and subtracting notes/springs
+    from these arrays as they are played.
+ 
+    For more information, see:
+        "Playing with Tuning in bitKlavier"
+        Trueman, Bhatia, Mulshine, Trevisan
+        Computer Music Journal, 2020
 
   ==============================================================================
 */
@@ -23,6 +44,16 @@ public:
     
     SpringTuning(SpringTuning::Ptr st = nullptr);
     ~SpringTuning(){stopTimer();};
+    
+    /*
+     simulate() first moves through the entire particle array and "integrates" their position,
+     moving them based on their target positions and the drag values
+     
+     it then moves through both spring arrays (the tether springs and interval springs) and
+     calls satisfyConstraints(), which updates the spring values based on the spring strengths,
+     stiffnesses, and offsets from their rest lengths. This in turn updates the target positions
+     for the two particles associated with each spring
+     */
 	void simulate();
     
     void performModification(SpringTuning::Ptr st, Array<bool> dirty);
@@ -43,7 +74,6 @@ public:
 	void updateNotes();
     void updateFreq();
     
-   
 	void addSpringsByNote(int pc);
 	void removeSpringsByNote(int removeIndex);
 	void addSpringsByInterval(double interval);
@@ -56,16 +86,8 @@ public:
         if (start)  startTimer(1000 / rate);
         else        stopTimer();
     }
-    
-    inline double getRate(void)
-    {
-        return rate;
-    }
-    
-    inline void stop(void)
-    {
-        stopTimer();
-    }
+    inline double getRate(void) { return rate; }
+    inline void stop(void) { stopTimer(); }
     
     inline void setStiffness(double stiff)
     {
@@ -101,30 +123,11 @@ public:
         }
     }
     
-    inline double getStiffness(void)
-    {
-        return stiffness;
-    }
-    
-    inline double getTetherStiffness(void)
-    {
-        return tetherStiffness;
-    }
-    
-    inline double getIntervalStiffness(void)
-    {
-        return intervalStiffness;
-    }
-    
-    inline void setDrag(double newdrag)
-    {
-        drag = newdrag;
-    }
-
-    inline double getDrag(void)
-    {
-        return drag;
-    }
+    inline double getStiffness(void) { return stiffness; }
+    inline double getTetherStiffness(void) { return tetherStiffness; }
+    inline double getIntervalStiffness(void) { return intervalStiffness; }
+    inline void setDrag(double newdrag) { drag = newdrag; }
+    inline double getDrag(void) { return drag; }
     
     inline Array<float> getTetherWeights(void)
     {
@@ -301,6 +304,7 @@ public:
         return prep;
     }
     
+    // for unit-testing
     inline void randomize()
     {
         Random::getSystemRandom().setSeedRandomly();
@@ -437,10 +441,9 @@ public:
     
 private:
     double rate, stiffness;
-    
-    //double tetherStrength, intervalStrength;
     double tetherStiffness, intervalStiffness;
     double drag;
+    int numNotes; // number of enabled notes
     
     bool active;
     bool usingFundamentalForIntervalSprings; //only false when in "none" mode
@@ -452,7 +455,6 @@ private:
     bool fundamentalSetsTether; //when true, the fundamental will be used to set tether weights
     double tetherWeightGlobal; //sets weight for tethers to fundamental, when in fundamentalSetsTether mode
     double tetherWeightSecondaryGlobal; //sets weights for tethers to non-fundamental notes
-    //int intervalSpringsFundamental;
     
     TuningSystem scaleId;
     Array<float> intervalTuning;
@@ -474,14 +476,8 @@ private:
     Spring::PtrArr      enabledParticleArray;
     
     float springWeights[13];
-    
     void addSpring(Spring::Ptr spring);
     
-    /*
-    Spring::PtrArr activeTetherSprings;
-    Spring::PtrArr activeSprings;
-    Particle::PtrArr activeParticles;
-    */
     void hiResTimerCallback(void) override
     {
         if (active)
@@ -489,8 +485,5 @@ private:
             simulate();
         }
     }
-    
-    
-    
-	int numNotes; // number of enabled notes
+
 };

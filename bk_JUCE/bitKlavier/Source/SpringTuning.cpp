@@ -3,7 +3,11 @@
 
     SpringTuning.cpp
     Created: 3 Aug 2018 3:43:46pm
-    Author:  Theo, Mike, Dan
+    Author:  Theo Trevisan, Mike Mulshine, Dan Trueman
+ 
+    Based on the Verlet mass/spring algorithm:
+    Jakobsen, T. (2001). Advanced character physics.
+     In IN PROCEEDINGS OF THE GAME DEVELOPERS CONFERENCE 2001, page 19.
 
   ==============================================================================
 */
