@@ -124,6 +124,7 @@ public:
                 (dRelease           ==      d->getRelease()         )   ;
     }
     
+    // for unit-testing
     inline void randomize(void)
     {
 		Random::getSystemRandom().setSeedRandomly();

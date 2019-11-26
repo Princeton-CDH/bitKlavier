@@ -344,6 +344,7 @@ public:
 		aPrep->copy(sPrep);
 	}
 
+    // for unit-testing
 	inline void randomize()
 	{
 		clear();

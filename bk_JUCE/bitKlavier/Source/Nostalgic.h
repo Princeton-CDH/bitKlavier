@@ -807,6 +807,7 @@ public:
         name = newName;
     }
 
+    // for unit-testing
 	inline void randomize()
 	{
 		clear();

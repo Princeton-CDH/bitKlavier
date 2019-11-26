@@ -335,6 +335,7 @@ public:
                 velocityMax == s->getVelocityMax());
     }
 
+    // for unit-testing
 	inline void randomize()
 	{
 		Random::getSystemRandom().setSeedRandomly();

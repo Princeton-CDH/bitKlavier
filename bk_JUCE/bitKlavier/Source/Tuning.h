@@ -18,6 +18,16 @@
 
 #include "SpringTuning.h"
 
+/*
+TuningPreparation holds all the state variable values for the
+Tuning. As with other preparation types, bK will use
+two instantiations of TuningPreparation for every active
+Synchronic in the gallery, one to store the static state of the
+preparation, and the other to store the active state. These will
+be the same, unless a Modification is triggered, in which case the
+active state will be changed (and a Reset will revert the active state
+to the static state).
+*/
 
 class TuningPreparation : public ReferenceCountedObject
 {
@@ -883,6 +893,12 @@ private:
     
     JUCE_LEAK_DETECTOR(Tuning)
 };
+
+
+/*
+ TuningProcessor handles events (note messages, and timing) and updates
+ values internally that other preparation can access as needed.
+ */
 
 class TuningProcessor : public ReferenceCountedObject
 {
