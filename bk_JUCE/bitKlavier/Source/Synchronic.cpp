@@ -271,6 +271,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
             //clusters.clearQuick();
             clusters.add(cluster);
             
+            // TODO: separate this out from cluster and pulseSync
             //reset parameter counters; need to account for skipBeats
             cluster->resetPhase();
             
