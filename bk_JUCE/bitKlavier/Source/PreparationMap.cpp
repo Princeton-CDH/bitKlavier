@@ -460,10 +460,17 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
     bool foundSustain = false;
     for (auto km : keymaps)
     {
-        if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
+        if (km->getAllMidiInputSources().contains(source))
         {
-            if (km->isInverted()) foundSustain = true;
-            else foundReattack = true;
+            if (km->getMidiEdit())
+            {
+                km->toggleNote(noteNumber);
+            }
+            if (km->containsNote(noteNumber))
+            {
+                if (km->isInverted()) foundSustain = true;
+                else foundReattack = true;
+            }
         }
     }
     if (foundSustain) sustain(noteNumber, velocity, channel, soundfont);

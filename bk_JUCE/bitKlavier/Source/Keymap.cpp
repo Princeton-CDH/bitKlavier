@@ -404,6 +404,7 @@ void Keymap::clearTargets()
 const Array<String> Keymap::getAllMidiInputSources()
 {
     Array<String> sources;
+    sources.add(cNoteSourceUI);
     sources.addArray(midiInputSources);
     if (defaultSelected) sources.addArray(processor.getDefaultMidiInputSources());
         return sources;

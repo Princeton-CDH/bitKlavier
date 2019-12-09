@@ -189,6 +189,8 @@ const String ptagKeymap_key = "k";
 const String ptagKeymap_targetStates = "targetStates";
 const String ptagKeymap_inverted = "inverted";
 
+const String cNoteSourceUI = "__UIKeyboard";
+
 typedef enum PitchClass {
     C = 0,
     CSharp,

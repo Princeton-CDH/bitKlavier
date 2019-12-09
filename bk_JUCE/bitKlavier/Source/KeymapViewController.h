@@ -45,7 +45,8 @@ public:
     void fillMidiInputSelectCB(void);
     void fillTargetSelectCB(void);
     
-    
+    ToggleButton* getMidiEditToggle(void) { return &midiEditToggle; }
+
     static void actionButtonCallback(int action, KeymapViewController*);
     static void midiInputSelectCallback(int result, KeymapViewController* vc);
     static void targetsMenuCallback(int result, KeymapViewController* vc);

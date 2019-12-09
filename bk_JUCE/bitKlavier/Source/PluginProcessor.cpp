@@ -743,13 +743,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     for(int i=0; i<notesOnUI.size(); i++)
     {
-        handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel);
+        handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel, cNoteSourceUI);
         notesOnUI.remove(i);
     }
     
     for(int i=0; i<notesOffUI.size(); i++)
     {
-        handleNoteOff(notesOffUI.getUnchecked(i), 0.6, channel);
+        handleNoteOff(notesOffUI.getUnchecked(i), 0.6, channel, cNoteSourceUI);
         notesOffUI.remove(i);
     }
     

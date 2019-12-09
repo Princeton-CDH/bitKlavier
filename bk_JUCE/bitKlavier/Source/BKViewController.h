@@ -257,7 +257,7 @@ public:
 protected:
     TextEditor* target;
     
-    BKTextButton neg, space, ok, lb, rb, colon;
+    BKTextButton space, ok, lb, rb, neg, colon;
     TextEditor bigOne;
     Label bigOneLabel;
     
@@ -318,24 +318,25 @@ protected:
     BKAudioProcessor& processor;
     BKItemGraph* theGraph;
     
-    BigOne bigOne;
-    
-    BKTextButton actionButton;
-    
-    BKButtonAndMenuLAF buttonsAndMenusLAF;
-    BKButtonAndMenuLAF buttonsAndMenusLAF2;
-
-    BKExitButton hideOrShow;
-    BKArrowButton leftArrow;
-    BKArrowButton rightArrow;
-    ImageComponent iconImageComponent;
-    
     bool subWindowInFront;
 
     int lastId;
     
     int numTabs;
     int currentTab;
+    
+    BigOne bigOne;
+    
+    BKTextButton actionButton;
+    
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
+    BKButtonAndMenuLAF buttonsAndMenusLAF2;
+    
+    BKExitButton hideOrShow;
+    ImageComponent iconImageComponent;
+    
+    BKArrowButton leftArrow;
+    BKArrowButton rightArrow;
     
 private:
     

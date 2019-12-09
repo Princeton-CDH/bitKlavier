@@ -130,7 +130,7 @@ BKViewController(p, theGraph, 1)
     midiEditToggle.setButtonText ("midi edit");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     midiEditToggle.setToggleState (false, dontSendNotification);
-    midiEditToggle.setTooltip("Indicates whether to MIDI input will edit this Keymap");
+    midiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap (CMD+E)");
     midiEditToggle.addListener(this);
     addAndMakeVisible(&midiEditToggle, ALL);
     
@@ -574,6 +574,8 @@ void KeymapViewController::bkButtonClicked (Button* b)
 {
     if (b == &hideOrShow)
     {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setMidiEdit(false);
         processor.updateState->setCurrentDisplay(DisplayNil);
     }
     else if(b->getName() == keyboardValsTextFieldOpen.getName())

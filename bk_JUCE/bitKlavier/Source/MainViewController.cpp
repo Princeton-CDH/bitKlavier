@@ -379,6 +379,12 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
             if(overtop.svc.getSubWindowInFront()) overtop.svc.closeSubWindow();
             else processor.updateState->setCurrentDisplay(DisplayNil);
         }
+        else if (currentDisplay == DisplayKeymap)
+        {
+            Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+            keymap->setMidiEdit(false);
+            processor.updateState->setCurrentDisplay(DisplayNil);
+        }
         else processor.updateState->setCurrentDisplay(DisplayNil);
     }
     else if (code == KeyPress::deleteKey)
@@ -496,6 +502,19 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     else if (code == 90) // Z
     {
 
+    }
+    else if (code == 69) // E
+    {
+        if (e.getModifiers().isCommandDown())
+        {
+            if (processor.updateState->currentDisplay == DisplayKeymap)
+            {
+                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+                ToggleButton* midiEditToggle = overtop.kvc.getMidiEditToggle();
+                midiEditToggle->setToggleState(!midiEditToggle->getToggleState(), dontSendNotification);
+                keymap->setMidiEdit(midiEditToggle->getToggleState());
+            }
+        }
     }
     
     return true;
