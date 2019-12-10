@@ -185,9 +185,12 @@ const String ptagBlendronic_closeMode = "close";
 
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";
+const String vtagKeymap_midiInputs = "midiInputs";
 const String ptagKeymap_key = "k";
 const String ptagKeymap_targetStates = "targetStates";
 const String ptagKeymap_inverted = "inverted";
+const String ptagKeymap_midiInput = "midiInput";
+const String ptagKeymap_defaultSelected = "defSelected";
 
 const String cNoteSourceUI = "__UIKeyboard";
 

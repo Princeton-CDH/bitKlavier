@@ -190,6 +190,16 @@ public:
         
         keysave.setProperty(ptagKeymap_inverted, isInverted(), 0);
         
+        ValueTree inputs( vtagKeymap_midiInputs);
+        count = 0;
+        for (auto midiInput : getMidiInputSources())
+        {
+            inputs.setProperty( ptagKeymap_midiInput + String(count++), midiInput, 0);
+        }
+        keysave.addChild(inputs, -1, 0);
+        
+        keysave.setProperty(ptagKeymap_defaultSelected, defaultSelected, 0);
+        
         return keysave;
     }
     
@@ -224,6 +234,23 @@ public:
         
         inverted = e->getStringAttribute(ptagKeymap_inverted).getIntValue();
         
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagKeymap_midiInputs))
+            {
+                Array<String> inputs;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagKeymap_midiInput + String(k));
+                    if (attr == String()) break;
+                    inputs.add(attr);
+                }
+                
+                setMidiInputSources(inputs);
+            }
+        }
+        
+        defaultSelected = e->getStringAttribute(ptagKeymap_defaultSelected).getIntValue();
     }
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }

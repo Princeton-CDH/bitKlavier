@@ -194,7 +194,7 @@ public:
     
     inline void setSampleRate(double sr) { delayLinear->setSampleRate(sr); dSmooth->setSampleRate(sr); }
     
-    inline void clear() { delayLinear->clear(); delayLinear->reset(); }
+    inline void clear() { delayLinear->clear(); /*delayLinear->reset();*/ }
 
 private:
     BKDelayL::Ptr delayLinear;

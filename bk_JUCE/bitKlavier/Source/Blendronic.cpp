@@ -136,11 +136,17 @@ void BlendronicProcessor::tick(float* outputs)
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
+    // Check for beat change
     if (sampleTimer >= numSamplesBeat)
     {
-        // Calculate these values each beat rather than each tick to save performance
+        // Update the pulse length in case tempo or subdiv changed
+        pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+        
+        // Calculate the length of the entire beat pattern
         float beatPatternLength = 0.0;
         for (auto b : prep->getBeats()) beatPatternLength += b * pulseLength * sampleRate;
+        
+        ///
         if (numBeatPositions != (int) ((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1)
         {
             beatPositionsInBuffer.clear();
@@ -149,7 +155,9 @@ void BlendronicProcessor::tick(float* outputs)
             numBeatPositions = ((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1;
         }
         
-        pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+        // Set the next beat position, cycle if we've reached the max number of positions for the buffer
+        beatPositionsInBuffer.set(++beatPositionsIndex, delay->getCurrentSample());
+        if (beatPositionsIndex >= numBeatPositions) beatPositionsIndex = -1;
    
         // Step sequenced params
         beatIndex++;
@@ -161,15 +169,14 @@ void BlendronicProcessor::tick(float* outputs)
         feedbackIndex++;
         if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
         
-        beatPositionsInBuffer.set(++beatPositionsIndex, delay->getCurrentSample());
-        if (beatPositionsIndex >= numBeatPositions) beatPositionsIndex = -1;
-        
         // Set parameters of the delay object
         updateDelayParameters();
         
+        // Update numSamplesBeat for the new beat and reset sampleTimer
         numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
         sampleTimer = 0;
         
+        // Clear if we need to
         if (clearDelayOnNextBeat)
         {
             delay->clear();
@@ -177,6 +184,8 @@ void BlendronicProcessor::tick(float* outputs)
         }
     }
     sampleTimer++;
+    
+    // Tick the delay
     delay->tick(outputs);
 }
 
@@ -254,6 +263,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     velocities.set(noteNumber, velocity);
     holdTimers.set(noteNumber, 0);
     
+    // Get target flags
     bool doSync = targetStates[TargetTypeBlendronicSync] == TargetStateEnabled;
     bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
     bool doOpen = targetStates[TargetTypeBlendronicOpen] == TargetStateEnabled;
@@ -266,6 +276,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
         if (prep->getClearMode() == BlendronicAnyNoteOnClear ||
            (prep->getClearMode() == BlendronicFirstNoteOnClear && keysDepressed.size() == 1))
         {
+            // Just clear the delay line
             delay->clear();
             //clearDelayOnNextBeat = true;
         }
@@ -275,6 +286,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
         if (prep->getSyncMode() == BlendronicAnyNoteOnSync ||
             (prep->getSyncMode() == BlendronicFirstNoteOnSync && keysDepressed.size() == 1))
         {
+            // Reset the phase of all params and update values
             setSampleTimer(0);
             setBeatIndex(0);
             setDelayIndex(0);
@@ -289,11 +301,13 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
             updateDelayParameters();
         }
     }
+    // Get conditions for opening/closing the delay line
     bool noteOnClose = (prep->getCloseMode() == BlendronicAnyNoteOnClose) && doClose;
     bool firstNoteOnClose = (prep->getCloseMode() == BlendronicFirstNoteOnClose && keysDepressed.size() == 1) && doClose;
     bool noteOnOpen = (prep->getOpenMode() == BlendronicAnyNoteOnOpen) && doOpen;
     bool firstNoteOnOpen = (prep->getOpenMode() == BlendronicFirstNoteOnOpen && keysDepressed.size() == 1) && doOpen;
     
+    // If the delay would be opened and closed by the same keypress, toggle it
     if ((noteOnClose || firstNoteOnClose) && (noteOnOpen || firstNoteOnOpen)) toggleActive();
     else if (noteOnClose || firstNoteOnClose) setActive(false);
     else if (noteOnOpen || firstNoteOnOpen) setActive(true);
@@ -307,6 +321,7 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
     
+    // Get target flags
     bool doSync = targetStates[TargetTypeBlendronicSync] == TargetStateEnabled;
     bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
     bool doOpen = targetStates[TargetTypeBlendronicOpen] == TargetStateEnabled;
@@ -319,11 +334,22 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     {
         if (prep->getClearMode() == BlendronicAnyNoteOffClear)
         {
-            delay->clear();
+            // Clear the delay line, but duck with an env first to prevent a click
+            // (don't know if this is necessary, Blendronic tends to have clicks as part of its sound)
+            delay->duckAndClear();
+            if (keysDepressed.size() == 0)
+            {
+                // Set flag to clear on next beat to prevent any release sound from being left in buffer,
+                // since the expected behavior of clearing on last note off is silence
+                clearDelayOnNextBeat = true;
+            }
         }
         else if (prep->getClearMode() == BlendronicLastNoteOffClear && keysDepressed.size() == 0)
         {
+            // Clear the delay line, but duck with an env first to prevent a click
             delay->duckAndClear();
+            // Set flag to clear on next beat to prevent any release sound from being left in buffer,
+            // since the expected behavior of clearing on last note off is silence
             clearDelayOnNextBeat = true;
         }
     }
@@ -332,6 +358,7 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
         if (prep->getSyncMode() == BlendronicAnyNoteOffSync ||
             (prep->getSyncMode() == BlendronicLastNoteOffSync && keysDepressed.size() == 0))
         {
+            // Reset the phase of all params and update values
             setSampleTimer(0);
             setBeatIndex(0);
             setDelayIndex(0);

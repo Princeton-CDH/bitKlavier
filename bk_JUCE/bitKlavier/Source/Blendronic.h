@@ -497,37 +497,46 @@ public:
     }
 
 private:
-
-	Blendronic::Ptr blendronic;
     
-    BKSynthesiser* synth;
-    
-	TempoProcessor::Ptr tempo;
-
-    GeneralSettings::Ptr general;
-
-	BlendronicDelay::Ptr delay;
-    
-    Keymap::PtrArr      keymaps;
-
-	double sampleRate;
+    /* Private Functions */
 
 	void playNote(int channel, int note, float velocity);
+    
+    /* Private Variables */
+    
+    Blendronic::Ptr         blendronic;
+    BKSynthesiser*          synth;
+    TempoProcessor::Ptr     tempo;
+    GeneralSettings::Ptr    general;
+    BlendronicDelay::Ptr    delay;
+    Keymap::PtrArr          keymaps;
+    
+    double sampleRate;
+    
 	Array<float> velocities;    //record of velocities
     Array<uint64> holdTimers;
 	Array<int> keysDepressed;   //current keys that are depressed
 
-    float pulseLength;
-	float numSamplesBeat;
-    float numSamplesDelay; 
-	uint64 sampleTimer;
-    Array<uint64> beatPositionsInBuffer;
-    int numBeatPositions;
-    int beatPositionsIndex;
-    float pulseOffset;
+    float pulseLength; // Length in seconds of a pulse (1.0 length beat)
+	float numSamplesBeat; // Length in samples of the current step in the beat pattern
+    float numSamplesDelay; // Length in sample of the current step in the delay pattern
+    
+	uint64 sampleTimer; // Sample count for timing param sequence steps
+    
+    // Index of sequenced param patterns
     int beatIndex, delayIndex, smoothIndex, feedbackIndex;
+    
+    // Values of previous step values for smoothing. Saved separately from param arrays to account for changes to the sequences
     float prevBeat, prevDelay;
+    
+    // Flag to clear the delay line on the next beat
     bool clearDelayOnNextBeat;
+    
+    // For access in BlendronicDisplay
+    Array<uint64> beatPositionsInBuffer; // Record of the sample position of beat changes in the delay buffer (used in display)
+    int numBeatPositions; // Number of beat positions in the buffer and to be displayed
+    int beatPositionsIndex; // Index of beat sample positions for adding/removing positions
+    float pulseOffset; // Sample offset of the pulse grid from grid aligned with buffer start (used in display)
 
 	JUCE_LEAK_DETECTOR(BlendronicProcessor);
 };

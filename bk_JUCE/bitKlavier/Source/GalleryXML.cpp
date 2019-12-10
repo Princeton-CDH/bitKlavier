@@ -165,6 +165,25 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 
                 String i = e->getStringAttribute(ptagKeymap_inverted);
                 if (i != String()) newKeymap->setInverted(i.getIntValue());
+                
+                forEachXmlChildElement (*e, sub)
+                {
+                    if (sub->hasTagName(vtagKeymap_midiInputs))
+                    {
+                        Array<String> inputs;
+                        for (int k = 0; k < 128; k++)
+                        {
+                            String attr = sub->getStringAttribute(ptagKeymap_midiInput + String(k));
+                            if (attr == String()) break;
+                            inputs.add(attr);
+                        }
+                        
+                        newKeymap->setMidiInputSources(inputs);
+                    }
+                }
+                
+                String d = e->getStringAttribute(ptagKeymap_defaultSelected);
+                if (d != String()) newKeymap->setDefaultSelected(d.getIntValue());
             }
             else if (e->hasTagName ( vtagGeneral))
             {
