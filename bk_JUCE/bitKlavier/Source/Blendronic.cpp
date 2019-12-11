@@ -464,8 +464,8 @@ void BlendronicProcessor::updateDelayParameters()
             smoothRate = delayDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength * prep->getBeats()[beatIndex]);
     }
     
-    DBG(String(getId()) + " new envelope target = " + String(numSamplesDelay));
-    DBG(String(smoothRate));
+//    DBG(String(getId()) + " new envelope target = " + String(numSamplesDelay));
+//    DBG(String(smoothRate));
     delay->setDelayTargetLength(numSamplesDelay);
     delay->setSmoothDuration(smoothRate);
     delay->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);

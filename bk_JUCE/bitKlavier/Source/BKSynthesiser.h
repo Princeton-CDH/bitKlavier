@@ -451,9 +451,9 @@ public:
                                         float lengthMS,
                                         float rampOnMS,
                                         float rampOffMS,
-                        TuningProcessor::Ptr tuner = nullptr,
-						float BlendronicLevel = 0.,
-						BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr());
+                                        TuningProcessor::Ptr tuner = nullptr,
+                                        float BlendronicLevel = 0.,
+                                        BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr());
     
     virtual BKSynthesiserVoice* keyOn ( int midiChannel,
                                         int keyNoteNumber,
@@ -471,9 +471,9 @@ public:
                                         float adsrDecayMS,
                                         float adsrSustain,
                                         float adsrReleaseMS,
-                        TuningProcessor::Ptr tuner = nullptr,
-						float BlendronicLevel = 0.,
-						BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr());
+                                        TuningProcessor::Ptr tuner = nullptr,
+                                        float BlendronicLevel = 0.,
+                                        BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr());
     
     /** Triggers a note-off event.
      
@@ -720,8 +720,8 @@ protected:
                      uint64 voiceRampOn,
                      uint64 voiceRampOff,
                      TuningProcessor::Ptr tuner,
-					float BlendronicLevel,
-					BlendronicProcessor::PtrArr blendronic);
+					 float BlendronicLevel,
+					 BlendronicProcessor::PtrArr blendronic);
     
     void startVoice (BKSynthesiserVoice* voice,
                      BKSynthesiserSound* sound,
@@ -741,8 +741,8 @@ protected:
                      float adsrSustain,
                      uint64 adsrRelease,
                      TuningProcessor::Ptr tuner,
-					float BlendronicLevel,
-					BlendronicProcessor::PtrArr blendronic);
+					 float BlendronicLevel,
+					 BlendronicProcessor::PtrArr blendronic);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected
