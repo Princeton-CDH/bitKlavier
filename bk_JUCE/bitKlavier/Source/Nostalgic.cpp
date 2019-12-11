@@ -13,12 +13,12 @@
 NostalgicProcessor::NostalgicProcessor(Nostalgic::Ptr nostalgic,
                                        TuningProcessor::Ptr tuning,
                                        SynchronicProcessor::Ptr synchronic,
-										BlendronicProcessor::Ptr blender,
+										BlendronicProcessor::PtrArr blend,
                                        BKSynthesiser *s):
 synth(s),
 nostalgic(nostalgic),
 tuner(tuning),
-blendronic(blender),
+blendronic(blend),
 synchronic(synchronic),
 keymaps(Keymap::PtrArr())
 {
@@ -93,28 +93,28 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                 DBG("reverse note on noteNum/offset " +
                     String(synthNoteNumber) + " " +
                     String(synthOffset));
-				if (blendronic != nullptr)
-				{
-					synth->keyOn(
-						midiChannel,
-						midiNoteNumber,
-						synthNoteNumber,
-						synthOffset,
-						velocities.getUnchecked(midiNoteNumber),
-						prep->getGain() * aGlobalGain,
-						Reverse,
-						FixedLengthFixedStart,
-						NostalgicNote,
-						nostalgic->getId(),
-						duration + prep->getWavedistance(),
-						duration,  // length
-						prep->getReverseAttack(),
-						prep->getReverseDecay(),
-						prep->getReverseSustain(),
-						prep->getReverseRelease(),
-						tuner,
-						blendronic->getBlendronic()->aPrep->getInputGain(),
-						blendronic->getDelay());
+                if (!blendronic.isEmpty())
+                {
+                    synth->keyOn(
+                        midiChannel,
+                        midiNoteNumber,
+                        synthNoteNumber,
+                        synthOffset,
+                        velocities.getUnchecked(midiNoteNumber),
+                        prep->getGain() * aGlobalGain,
+                        Reverse,
+                        FixedLengthFixedStart,
+                        NostalgicNote,
+                        nostalgic->getId(),
+                        duration + prep->getWavedistance(),
+                        duration,  // length
+                        prep->getReverseAttack(),
+                        prep->getReverseDecay(),
+                        prep->getReverseSustain(),
+                        prep->getReverseRelease(),
+                        tuner,
+                        1.,
+                        blendronic);
 				}
 				else
 				{
@@ -253,27 +253,27 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         DBG("Nostalgic::keyReleased note, offset : " + String(note) + " " + String(offset));
                         
                         //play nostalgic note
-						if (blendronic != nullptr)
-						{
-							synth->keyOn(midiChannel,
-								note,
-								synthNoteNumber,
-								synthOffset,
-								velocities.getUnchecked(note),
-								prep->getGain() * aGlobalGain,
-								Reverse,
-								FixedLengthFixedStart,
-								NostalgicNote,
-								nostalgic->getId(),
-								duration + prep->getWavedistance(),
-								duration,  // length
-								prep->getReverseAttack(),
-								prep->getReverseDecay(),
-								prep->getReverseSustain(),
-								prep->getReverseRelease(),
-								tuner,
-								blendronic->getBlendronic()->aPrep->getInputGain(),
-								blendronic->getDelay());
+                        if (!blendronic.isEmpty())
+                        {
+                            synth->keyOn(midiChannel,
+                                note,
+                                synthNoteNumber,
+                                synthOffset,
+                                velocities.getUnchecked(note),
+                                prep->getGain() * aGlobalGain,
+                                Reverse,
+                                FixedLengthFixedStart,
+                                NostalgicNote,
+                                nostalgic->getId(),
+                                duration + prep->getWavedistance(),
+                                duration,  // length
+                                prep->getReverseAttack(),
+                                prep->getReverseDecay(),
+                                prep->getReverseSustain(),
+                                prep->getReverseRelease(),
+                                tuner,
+                                1.,//b->getBlendronic()->aPrep->getInputGain(),
+                                blendronic);
 						}
 						else
 						{
@@ -338,27 +338,27 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                     String(synthNoteNumber) + " " +
                     String(synthOffset));
                 
-				if (blendronic != nullptr)
-				{
-					synth->keyOn(midiChannel,
-						midiNoteNumber,
-						synthNoteNumber,
-						synthOffset,
-						velocities.getUnchecked(midiNoteNumber),
-						prep->getGain() * aGlobalGain,
-						Reverse,
-						FixedLengthFixedStart,
-						NostalgicNote,
-						nostalgic->getId(),
-						duration + prep->getWavedistance(),
-						duration,  // length
-						prep->getReverseAttack(),
-						prep->getReverseDecay(),
-						prep->getReverseSustain(),
-						prep->getReverseRelease(),
-						tuner,
-						blendronic->getBlendronic()->aPrep->getInputGain(),
-						blendronic->getDelay());
+                if (!blendronic.isEmpty())
+                {
+                    synth->keyOn(midiChannel,
+                        midiNoteNumber,
+                        synthNoteNumber,
+                        synthOffset,
+                        velocities.getUnchecked(midiNoteNumber),
+                        prep->getGain() * aGlobalGain,
+                        Reverse,
+                        FixedLengthFixedStart,
+                        NostalgicNote,
+                        nostalgic->getId(),
+                        duration + prep->getWavedistance(),
+                        duration,  // length
+                        prep->getReverseAttack(),
+                        prep->getReverseDecay(),
+                        prep->getReverseSustain(),
+                        prep->getReverseRelease(),
+                        tuner,
+                        1.,//b->getBlendronic()->aPrep->getInputGain(),
+                        blendronic);
 				}
 				else
 				{
@@ -434,29 +434,29 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                     String(synthNoteNumber) + " " +
                     String(synthOffset));
                 
-				if (blendronic != nullptr)
+				if (!blendronic.isEmpty())
 				{
-					synth->keyOn(
-						midiChannel,
-						midiNoteNumber,
-						synthNoteNumber,
-						synthOffset,
-						midiNoteVelocity,
-						prep->getGain() * aGlobalGain,
-						Reverse,
-						FixedLengthFixedStart,
-						NostalgicNote,
-						nostalgic->getId(),
-						duration + prep->getWavedistance(),
-						duration,  // length
-						prep->getReverseAttack(),
-						prep->getReverseDecay(),
-						prep->getReverseSustain(),
-						prep->getReverseRelease(),
-						tuner,
-						blendronic->getBlendronic()->aPrep->getInputGain(),
-						blendronic->getDelay());
-				}
+                    synth->keyOn(
+                        midiChannel,
+                        midiNoteNumber,
+                        synthNoteNumber,
+                        synthOffset,
+                        midiNoteVelocity,
+                        prep->getGain() * aGlobalGain,
+                        Reverse,
+                        FixedLengthFixedStart,
+                        NostalgicNote,
+                        nostalgic->getId(),
+                        duration + prep->getWavedistance(),
+                        duration,  // length
+                        prep->getReverseAttack(),
+                        prep->getReverseDecay(),
+                        prep->getReverseSustain(),
+                        prep->getReverseRelease(),
+                        tuner,
+                        1.,//b->getBlendronic()->aPrep->getInputGain(),
+                        blendronic);
+                }
 				else
 				{
 					synth->keyOn(
@@ -629,27 +629,27 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                         String(synthOffset) + " " +
                         String(noteOnPrep->getUndertow()));
                      */
-					if (blendronic != nullptr)
+					if (!blendronic.isEmpty())
 					{
-						synth->keyOn(midiChannel,
-							thisNote->getNoteNumber(),
-							synthNoteNumber,
-							synthOffset,
-							thisNote->getVelocityAtKeyOn(),
-							noteOnPrep->getGain() * aGlobalGain,
-							Forward,
-							FixedLengthFixedStart,
-							NostalgicNote,
-							nostalgic->getId(),
-							noteOnPrep->getWavedistance(),                        //start position
-							noteOnPrep->getUndertow(),                            //play length
-							nostalgic->aPrep->getUndertowAttack(),
-							nostalgic->aPrep->getUndertowDecay(),
-							nostalgic->aPrep->getUndertowSustain(),
-							nostalgic->aPrep->getUndertowRelease(),
-							tuner,
-							blendronic->getBlendronic()->aPrep->getInputGain(),
-							blendronic->getDelay());
+                        synth->keyOn(midiChannel,
+                            thisNote->getNoteNumber(),
+                            synthNoteNumber,
+                            synthOffset,
+                            thisNote->getVelocityAtKeyOn(),
+                            noteOnPrep->getGain() * aGlobalGain,
+                            Forward,
+                            FixedLengthFixedStart,
+                            NostalgicNote,
+                            nostalgic->getId(),
+                            noteOnPrep->getWavedistance(),                        //start position
+                            noteOnPrep->getUndertow(),                            //play length
+                            nostalgic->aPrep->getUndertowAttack(),
+                            nostalgic->aPrep->getUndertowDecay(),
+                            nostalgic->aPrep->getUndertowSustain(),
+                            nostalgic->aPrep->getUndertowRelease(),
+                            tuner,
+                            1.,//b->getBlendronic()->aPrep->getInputGain(),
+                            blendronic);
 					}
 					else
 					{

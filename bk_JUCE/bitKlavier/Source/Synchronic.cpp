@@ -13,7 +13,7 @@
 SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TuningProcessor::Ptr tuning,
                                          TempoProcessor::Ptr tempo,
-										 BlendronicProcessor::Ptr blender,
+										 BlendronicProcessor::PtrArr blend,
                                          BKSynthesiser* main,
                                          GeneralSettings::Ptr general):
 synth(main),
@@ -94,28 +94,28 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 
         int whichEnv = cluster->getEnvelopeCounter();
 		BKSynthesiserVoice* currentVoice;
-		if (blendronic != nullptr)
+		if (!blendronic.isEmpty())
 		{
-			currentVoice =
-				synth->keyOn(channel,
-					note,
-					synthNoteNumber,
-					synthOffset,
-					velocity,
-					prep->getGain() * aGlobalGain * prep->getAccentMultipliers()[cluster->getAccentMultiplierCounter()],
-					noteDirection,
-					FixedLengthFixedStart,
-					SynchronicNote,
-					synchronic->getId(),
-					noteStartPos,  // start
-					noteLength,
-					prep->getAttack(whichEnv),
-					prep->getDecay(whichEnv),
-					prep->getSustain(whichEnv),
-					prep->getRelease(whichEnv),
-					tuner,
-					blendronic->getBlendronic()->aPrep->getInputGain(),
-					blendronic->getDelay());
+            currentVoice =
+                synth->keyOn(channel,
+                    note,
+                    synthNoteNumber,
+                    synthOffset,
+                    velocity,
+                    prep->getGain() * aGlobalGain * prep->getAccentMultipliers()[cluster->getAccentMultiplierCounter()],
+                    noteDirection,
+                    FixedLengthFixedStart,
+                    SynchronicNote,
+                    synchronic->getId(),
+                    noteStartPos,  // start
+                    noteLength,
+                    prep->getAttack(whichEnv),
+                    prep->getDecay(whichEnv),
+                    prep->getSustain(whichEnv),
+                    prep->getRelease(whichEnv),
+                    tuner,
+                    1.,//b->getBlendronic()->aPrep->getInputGain(),
+                    blendronic);
 		}
 		else
 		{

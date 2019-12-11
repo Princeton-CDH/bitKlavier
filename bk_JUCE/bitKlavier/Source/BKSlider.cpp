@@ -1174,6 +1174,15 @@ void BKMultiSlider::deHighlight(int sliderNum)
     
 }
 
+void BKMultiSlider::deHighlightCurrentSlider()
+{
+    for(int i=0; i<sliders[lastHighlightedSlider]->size(); i++)
+    {
+        sliders[lastHighlightedSlider]->operator[](i)->setLookAndFeel(&activeSliderLookAndFeel);
+    }
+    
+}
+
 
 
 // ******************************************************************************************************************** //

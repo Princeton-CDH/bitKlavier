@@ -12,7 +12,7 @@
 
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
                                  TuningProcessor::Ptr tuning,
-                                 BlendronicProcessor::Ptr blender,
+                                 BlendronicProcessor::PtrArr blend,
                                  BKSynthesiser *s,
                                  BKSynthesiser *res,
                                  BKSynthesiser *ham):
@@ -21,7 +21,7 @@ resonanceSynth(res),
 hammerSynth(ham),
 direct(direct),
 tuner(tuning),
-blendronic(blender),
+blendronic(blend),
 keymaps(Keymap::PtrArr())
 {
     
@@ -48,28 +48,33 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         }
         
         //DBG("DirectProcessor::keyPressed noteNumber, synthNoteNumber, synthOffset " + String(noteNumber) + " " + String(synthNoteNumber) + " " + String(synthOffset));
-		if (blendronic != nullptr)
+        
+		if (!blendronic.isEmpty())
 		{
-            blendronic->setClearDelayOnNextBeat(false);
-			synth->keyOn(channel,
-				noteNumber,
-				synthNoteNumber,
-				synthOffset,
-				velocity,
-				direct->aPrep->getGain() * aGlobalGain,
-				Forward,
-				Normal,
-				MainNote,
-				direct->getId(),
-				0,     // start
-				0,     // length
-				direct->aPrep->getAttack(),
-				direct->aPrep->getDecay(),
-				direct->aPrep->getSustain(),
-				direct->aPrep->getRelease(),
-				tuner,
-				blendronic->getBlendronic()->aPrep->getInputGain(),
-				blendronic->getDelay());
+            for (auto b : blendronic)
+            {
+                b->setClearDelayOnNextBeat(false);
+            }
+            synth->keyOn(channel,
+                         noteNumber,
+                         synthNoteNumber,
+                         synthOffset,
+                         velocity,
+                         direct->aPrep->getGain() * aGlobalGain,
+                         Forward,
+                         Normal,
+                         MainNote,
+                         direct->getId(),
+                         0,     // start
+                         0,     // length
+                         direct->aPrep->getAttack(),
+                         direct->aPrep->getDecay(),
+                         direct->aPrep->getSustain(),
+                         direct->aPrep->getRelease(),
+                         tuner,
+                         1.,
+                         //b->getBlendronic()->aPrep->getInputGain(),
+                         blendronic);
 		}
 		else
 		{

@@ -777,32 +777,58 @@ void SynchronicPreparationEditor::timerCallback()
         
         if (sProcessor != nullptr)
         {
-            for (int i = 0; i < paramSliders.size(); i++)
+            if (sProcessor->getPlayCluster())
             {
-                if(paramSliders[i]->getName() == "beat length multipliers")
+                for (int i = 0; i < paramSliders.size(); i++)
                 {
-                    size = paramSliders[i]->getNumVisible();
-                    counter = cluster->getBeatMultiplierCounterForDisplay(); 
-                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+                    if(paramSliders[i]->getName() == "beat length multipliers")
+                    {
+                        size = paramSliders[i]->getNumVisible();
+                        counter = cluster->getBeatMultiplierCounterForDisplay();
+                        paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+                    }
+                    else if(paramSliders[i]->getName() == "sustain length multipliers")
+                    {
+                        size = paramSliders[i]->getNumVisible();
+                        counter = cluster->getLengthMultiplierCounterForDisplay();
+                        paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+                    }
+                    else if(paramSliders[i]->getName() == "accents")
+                    {
+                        size = paramSliders[i]->getNumVisible();
+                        counter = cluster->getAccentMultiplierCounterForDisplay();
+                        paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+                    }
+                    else if(paramSliders[i]->getName() == "transpositions")
+                    {
+                        size = paramSliders[i]->getNumVisible();
+                        counter = cluster->getTranspCounterForDisplay();
+                        paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+                    }
                 }
-                else if(paramSliders[i]->getName() == "sustain length multipliers")
+            }
+            else
+            {
+                for (int i = 0; i < paramSliders.size(); i++)
                 {
-                    size = paramSliders[i]->getNumVisible();
-                    counter = cluster->getLengthMultiplierCounterForDisplay();
-                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
-                }
-                else if(paramSliders[i]->getName() == "accents")
-                {
-                    size = paramSliders[i]->getNumVisible();
-                    counter = cluster->getAccentMultiplierCounterForDisplay();
-                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
-                }
-                else if(paramSliders[i]->getName() == "transpositions")
-                {
-                    size = paramSliders[i]->getNumVisible();
-                    counter = cluster->getTranspCounterForDisplay();
-                    paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
-
+                    if(paramSliders[i]->getName() == "beat length multipliers")
+                    {
+                        size = paramSliders[i]->getNumVisible();
+                        counter = cluster->getBeatMultiplierCounterForDisplay();
+                        paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
+                    }
+                    else if(paramSliders[i]->getName() == "sustain length multipliers")
+                    {
+                        paramSliders[i]->deHighlightCurrentSlider();
+                    }
+                    else if(paramSliders[i]->getName() == "accents")
+                    {
+                        paramSliders[i]->deHighlightCurrentSlider();
+                    }
+                    else if(paramSliders[i]->getName() == "transpositions")
+                    {
+                        paramSliders[i]->deHighlightCurrentSlider();
+                    }
                 }
             }
             

@@ -1324,7 +1324,7 @@ public:
     SynchronicProcessor(Synchronic::Ptr synchronic,
                         TuningProcessor::Ptr tuning,
                         TempoProcessor::Ptr tempo,
-						BlendronicProcessor::Ptr blender,
+						BlendronicProcessor::PtrArr blend,
                         BKSynthesiser* main,
                         GeneralSettings::Ptr general);
     
@@ -1377,9 +1377,9 @@ public:
         tempo = newTempo;
     }
 
-	inline void setBlendronic(BlendronicProcessor::Ptr newBlend)
+	inline void addBlendronic(BlendronicProcessor::Ptr blend)
 	{
-		blendronic = newBlend;
+		blendronic.add(blend);
 	}
     
     inline Synchronic::Ptr getSynchronic(void) const noexcept
@@ -1397,7 +1397,7 @@ public:
         return tempo;
     }
 
-	inline BlendronicProcessor::Ptr getBlendronic(void) const noexcept
+	inline BlendronicProcessor::PtrArr getBlendronic(void) const noexcept
 	{
 		return blendronic;
 	}
@@ -1412,10 +1412,10 @@ public:
         return tempo->getId();
     }
 
-	inline int getBlendronicId(void) const noexcept
-	{
-		return blendronic->getId();
-	}
+//    inline int getBlendronicId(void) const noexcept
+//    {
+//        return blendronic->getId();
+//    }
 
     inline void prepareToPlay(float sr, BKSynthesiser* main)
     {
@@ -1460,7 +1460,7 @@ private:
     Synchronic::Ptr synchronic;
     TuningProcessor::Ptr tuner;
     TempoProcessor::Ptr tempo;
-	BlendronicProcessor::Ptr blendronic;
+	BlendronicProcessor::PtrArr blendronic;
     
     Keymap::PtrArr      keymaps;
     

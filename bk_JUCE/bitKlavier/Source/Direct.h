@@ -429,7 +429,7 @@ public:
     
     
     DirectProcessor(Direct::Ptr direct,
-                    TuningProcessor::Ptr tuning, BlendronicProcessor::Ptr blender,
+                    TuningProcessor::Ptr tuning, BlendronicProcessor::PtrArr blend,
                     BKSynthesiser *s, BKSynthesiser *res, BKSynthesiser *ham);
     
     ~DirectProcessor();
@@ -467,12 +467,12 @@ public:
         return tuner;
     }
 
-	inline void setBlendronic(BlendronicProcessor::Ptr blend)
+	inline void addBlendronic(BlendronicProcessor::Ptr blend)
 	{
-		blendronic = blend;
+		blendronic.add(blend);
 	}
 
-	inline BlendronicProcessor::Ptr getBlendronic(void)
+	inline BlendronicProcessor::PtrArr getBlendronic(void)
 	{
 		return blendronic;
 	}
@@ -494,7 +494,7 @@ private:
     
     Direct::Ptr             direct;
     TuningProcessor::Ptr    tuner;
-	BlendronicProcessor::Ptr blendronic;
+	BlendronicProcessor::PtrArr blendronic;
     
     Keymap::PtrArr      keymaps;
     

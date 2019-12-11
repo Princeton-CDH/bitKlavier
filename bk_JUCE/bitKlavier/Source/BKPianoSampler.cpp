@@ -133,7 +133,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      uint64 voiceRampOff,
                                      BKSynthesiserSound* s,
 									 float BlendronicLevel,
-									 BlendronicDelay::Ptr bDelay)
+									 BlendronicProcessor::PtrArr blendronic)
 {
     
     
@@ -152,7 +152,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      voiceRampOff,
                                      s,
 									 BlendronicLevel,
-									 bDelay);
+									 blendronic);
 }
 
 #define REVENV 0
@@ -223,7 +223,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                                      uint64 adsrRelease,
                                      BKSynthesiserSound* s,
 									 float BlendronicLevel,
-									BlendronicDelay::Ptr bDelay)
+									 BlendronicProcessor::PtrArr blendronic)
 {
     if (const BKPianoSamplerSound* const sound = dynamic_cast<const BKPianoSamplerSound*> (s))
     {
@@ -468,7 +468,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
         noteStartingPosition = sourceSamplePosition;
         noteEndPosition = playEndPosition;
 		blendronicLevel = BlendronicLevel;
-		this->bDelay = bDelay;
+		this->blendronic = blendronic;
 
     }
     else
@@ -638,14 +638,19 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         l = lgain * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
         r = rgain * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
         
-        if (bDelay != nullptr)
+        if (!blendronic.isEmpty())
         {
-            if (bDelay->getActive() == true)
+            BlendronicDelay::Ptr bDelay;
+            for (auto b : blendronic)
             {
-                bDelay->addSample(l, addCounter, 0);
-                bDelay->addSample(r, addCounter, 1);
-                addCounter++;
+                bDelay = b->getDelay();
+                if (bDelay->getActive() == true)
+                {
+                    bDelay->addSample(l, addCounter, 0);
+                    bDelay->addSample(r, addCounter, 1);
+                }
             }
+            addCounter++;
         }
         if (outR != nullptr)
         {
@@ -755,14 +760,19 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         float l = lgain * adsr.tick() * (sampleL * sampleEnv.tick());
         float r = rgain * adsr.lastOut() * (sampleR * sampleEnv.lastOut());
         
-        if (bDelay != nullptr)
+        if (!blendronic.isEmpty())
         {
-            if (bDelay->getActive() == true)
+            BlendronicDelay::Ptr bDelay;
+            for (auto b : blendronic)
             {
-                bDelay->addSample(l, addCounter, 0);
-                bDelay->addSample(r, addCounter, 1);
-                addCounter++;
+                bDelay = b->getDelay();
+                if (bDelay->getActive() == true)
+                {
+                    bDelay->addSample(l, addCounter, 0);
+                    bDelay->addSample(r, addCounter, 1);
+                }
             }
+            addCounter++;
         }
         if (outR != nullptr)
         {
@@ -857,14 +867,19 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             break;
         }
 
-        if (bDelay != nullptr) 
+        if (!blendronic.isEmpty())
         {
-            if (bDelay->getActive() == true)
+            BlendronicDelay::Ptr bDelay;
+            for (auto b : blendronic)
             {
-				bDelay->addSample(l, addCounter, 0);
-				bDelay->addSample(r, addCounter, 1);
-				addCounter++;
+                bDelay = b->getDelay();
+                if (bDelay->getActive() == true)
+                {
+                    bDelay->addSample(l, addCounter, 0);
+                    bDelay->addSample(r, addCounter, 1);
+                }
             }
+            addCounter++;
         }
 		if (outR != nullptr)
 		{

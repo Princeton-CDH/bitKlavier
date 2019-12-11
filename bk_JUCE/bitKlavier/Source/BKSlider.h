@@ -116,6 +116,8 @@ public:
     void setMinMaxDefaultInc(std::vector<float> newvals);
     void setCurrentSlider(int activeSliderNum);
     
+    void deHighlightCurrentSlider(void);
+    
     void setAllowSubSlider(bool ss) { allowSubSliders = ss; }
     void setSubSliderName(String ssname) { subSliderName = ssname; }
     void setSkewFromMidpoint(bool sfm);

@@ -214,7 +214,7 @@ SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
     SynchronicProcessor::Ptr sproc = new SynchronicProcessor(processor.gallery->getSynchronic(thisId),
                                         defaultT,
                                         defaultM,
-										defaultB,
+										defaultBA,
                                         &processor.mainPianoSynth,
                                         processor.gallery->getGeneralSettings());
     sproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
@@ -289,7 +289,7 @@ NostalgicProcessor::Ptr Piano::addNostalgicProcessor(int thisId)
     NostalgicProcessor::Ptr nproc = new NostalgicProcessor(processor.gallery->getNostalgic(thisId),
                                        defaultT,
                                        defaultS,
-										defaultB,
+										defaultBA,
                                        &processor.mainPianoSynth);
     nproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
     nprocessor.add(nproc);
@@ -301,7 +301,7 @@ DirectProcessor::Ptr Piano::addDirectProcessor(int thisId)
 {
     DirectProcessor::Ptr dproc = new DirectProcessor(processor.gallery->getDirect(thisId),
                                                      defaultT,
-                                                     defaultB,
+                                                     defaultBA,
                                                      &processor.mainPianoSynth,
                                                      &processor.resonanceReleaseSynth,
                                                      &processor.hammerReleaseSynth);
@@ -494,19 +494,19 @@ void Piano::linkPreparationWithBlendronic(BKPreparationType thisType, int thisId
 	{
 		DirectProcessor::Ptr dproc = getDirectProcessor(thisId);
 		
-		dproc->setBlendronic(bproc);
+		dproc->addBlendronic(bproc);
 	}
 	else if (thisType == PreparationTypeSynchronic)
 	{
 		SynchronicProcessor::Ptr sproc = getSynchronicProcessor(thisId);
 
-		sproc->setBlendronic(bproc);
+		sproc->addBlendronic(bproc);
 	}
 	else if (thisType == PreparationTypeNostalgic)
 	{
 		NostalgicProcessor::Ptr nproc = getNostalgicProcessor(thisId);
 
-		nproc->setBlendronic(bproc);
+		nproc->addBlendronic(bproc);
 	}
 }
 

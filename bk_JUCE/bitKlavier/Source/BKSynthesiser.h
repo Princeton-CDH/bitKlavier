@@ -148,7 +148,7 @@ public:
                             uint64 voiceRampOff,
                             BKSynthesiserSound* sound,
 							float BlendronicLevel,
-							BlendronicDelay::Ptr bDelay) = 0;
+							BlendronicProcessor::PtrArr blendronic) = 0;
     
     virtual void startNote (int midiNoteNumber,
                             float offset,
@@ -165,7 +165,7 @@ public:
                             uint64 adsrRelease,
                             BKSynthesiserSound* sound,
 							float BlendronicLevel,
-							BlendronicDelay::Ptr bDelay) = 0;
+							BlendronicProcessor::PtrArr blendronic) = 0;
     
     /** Called to stop a note.
      
@@ -280,7 +280,7 @@ public:
     void setGeneralSettings(GeneralSettings::Ptr gen) {generalSettings = gen;}
     
     TuningProcessor::Ptr tuning;
-	BlendronicDelay::Ptr bDelay;
+	BlendronicProcessor::PtrArr blendronic;
     
 protected:
     /** Resets the state of this voice after a sound has finished playing.
@@ -453,7 +453,7 @@ public:
                                         float rampOffMS,
                         TuningProcessor::Ptr tuner = nullptr,
 						float BlendronicLevel = 0.,
-						BlendronicDelay::Ptr bDelay = nullptr);
+						BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr());
     
     virtual BKSynthesiserVoice* keyOn ( int midiChannel,
                                         int keyNoteNumber,
@@ -473,7 +473,7 @@ public:
                                         float adsrReleaseMS,
                         TuningProcessor::Ptr tuner = nullptr,
 						float BlendronicLevel = 0.,
-						BlendronicDelay::Ptr bDelay = nullptr);
+						BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr());
     
     /** Triggers a note-off event.
      
@@ -721,7 +721,7 @@ protected:
                      uint64 voiceRampOff,
                      TuningProcessor::Ptr tuner,
 					float BlendronicLevel,
-					BlendronicDelay::Ptr bDelay);
+					BlendronicProcessor::PtrArr blendronic);
     
     void startVoice (BKSynthesiserVoice* voice,
                      BKSynthesiserSound* sound,
@@ -742,7 +742,7 @@ protected:
                      uint64 adsrRelease,
                      TuningProcessor::Ptr tuner,
 					float BlendronicLevel,
-					BlendronicDelay::Ptr bDelay);
+					BlendronicProcessor::PtrArr blendronic);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected
