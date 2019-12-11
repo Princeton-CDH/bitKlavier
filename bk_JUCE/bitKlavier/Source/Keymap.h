@@ -210,7 +210,7 @@ public:
         String n = e->getStringAttribute("name");
         
         if (n != String())     name = n;
-        else                        name = String(Id);
+        else                   name = String(Id);
 
         clear();
         for (int k = 0; k < 128; k++)

@@ -139,6 +139,13 @@ void BlendronicProcessor::tick(float* outputs)
     // Check for beat change
     if (sampleTimer >= numSamplesBeat)
     {
+        // Clear if we need to
+        if (clearDelayOnNextBeat)
+        {
+            delay->clear();
+            clearDelayOnNextBeat = false;
+        }
+        
         // Update the pulse length in case tempo or subdiv changed
         pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
         
@@ -175,13 +182,6 @@ void BlendronicProcessor::tick(float* outputs)
         // Update numSamplesBeat for the new beat and reset sampleTimer
         numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
         sampleTimer = 0;
-        
-        // Clear if we need to
-        if (clearDelayOnNextBeat)
-        {
-            delay->clear();
-            clearDelayOnNextBeat = false;
-        }
     }
     sampleTimer++;
     

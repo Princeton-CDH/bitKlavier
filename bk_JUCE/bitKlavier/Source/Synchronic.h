@@ -1211,10 +1211,10 @@ public:
     
     inline void resetPhase()
     {
-        int skipBeats = prep->getBeatsToSkip();
-        int idx = (skipBeats < 0) ? 0 : skipBeats;
-//        int skipBeats = prep->getBeatsToSkip() - 1;
-//        int idx = (skipBeats < -1) ? -1 : skipBeats;
+//        int skipBeats = prep->getBeatsToSkip();
+//        int idx = (skipBeats < 0) ? 0 : skipBeats;
+        int skipBeats = prep->getBeatsToSkip() - 1;
+        int idx = (skipBeats < -1) ? -1 : skipBeats;
         
         /*
         if(prep->getBeatMultipliers().size() > 0)   beatMultiplierCounter   = idx % prep->getBeatMultipliers().size();
