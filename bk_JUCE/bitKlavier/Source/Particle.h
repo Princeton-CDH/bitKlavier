@@ -9,8 +9,14 @@
     Jakobsen, T. (2001). Advanced character physics.
         In IN PROCEEDINGS OF THE GAME DEVELOPERS CONFERENCE 2001, page 19.
  
-    addX() and subX() update the TARGET positions of the particle
-    integrate() actually changes the position, based on drag
+    addX() and subX() update the position of the particle, usually to reflect the
+    force being applied to the particle (as called by satisfyConstraints()) by,
+    in this case, a virtual spring.
+    
+    integrate() also changes the position, based on the difference between
+    the new position and the old position, scaled by the drag value.
+    this is essentially velocity * time, where velocity is proportional to the
+    change in position (new - old), and time is set by the call rate (so is implicit).
 
   ==============================================================================
 */
@@ -39,14 +45,17 @@ public:
 	void print();
     
     /*
-     addX and subX adjust the TARGET position for the particle
+     addX and subX adjust the position for the particle;
+     essentially this is being used to simulate the force that is
+     being applied to the particle, called in satisfyConstraints()
      */
 	void addX(double that);
 	void subX(double that);
     
     /*
      integrate() actually changes the position of the particle,
-     based on the target position and drag value
+     based on the difference between the new position and the old position,
+     scaled by the drag value. essentially, this is velocity (diff) * time (implicit)
      */
 	void integrate(double drag);
     

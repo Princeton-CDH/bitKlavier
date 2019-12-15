@@ -9,8 +9,6 @@
     Jakobsen, T. (2001). Advanced character physics.
         In IN PROCEEDINGS OF THE GAME DEVELOPERS CONFERENCE 2001, page 19.
  
-    The main method is simulate(), which is called repeatedly in a timer()
- 
     in bitKlavier, we use two arrays of springs:
         * the interval springs, which connect all active notes to one another
             at rest lengths given by whatever interval tuning system is being used
@@ -18,13 +16,15 @@
             notes, set by an "anchor" scale (usually ET), to prevent uncontrolled drift
  
     The user sets the strengths of all these strings, either directly, or using some
-    automated algorithms and the system runs, adding and subtracting notes/springs
+    automated algorithms, and the system runs, adding and subtracting notes/springs
     from these arrays as they are played.
  
     For more information, see:
         "Playing with Tuning in bitKlavier"
         Trueman, Bhatia, Mulshine, Trevisan
         Computer Music Journal, 2020
+    
+    The main method is simulate(), which is called repeatedly in a timer()
 
   ==============================================================================
 */
@@ -47,12 +47,12 @@ public:
     
     /*
      simulate() first moves through the entire particle array and "integrates" their position,
-     moving them based on their target positions and the drag values
+     moving them based on their "velocities" and the drag values
      
      it then moves through both spring arrays (the tether springs and interval springs) and
      calls satisfyConstraints(), which updates the spring values based on the spring strengths,
      stiffnesses, and offsets from their rest lengths. This in turn updates the target positions
-     for the two particles associated with each spring
+     for the two particles associated with each spring.
      */
 	void simulate();
     
@@ -442,7 +442,7 @@ public:
 private:
     double rate, stiffness;
     double tetherStiffness, intervalStiffness;
-    double drag;
+    double drag; // actually 1 - drag; drag of 1 => no drag, drag of 0 => infinite drag
     int numNotes; // number of enabled notes
     
     bool active;

@@ -53,27 +53,39 @@ void Spring::setStrength(double newStrength)
     // > ~0.6 and the system can become unstable...
 }
 
+/*
+ This is where the action happens. The positions of the two particles attached to the spring
+ are adjusted, based on how much their separation diverges from the preset restingLength,
+ and also by the preset spring strength. Essentially this is a force factor that results
+ in a change in position, simplified from position = 0.5 * acceleration * t^2,
+ and acceleration = force/mass
+ */
 void Spring::satisfyConstraints(void)
 {
+    // difference of the particle positions; basically the current length of the spring, signed
     double diff = b->getX() - a->getX();
     
+    // length of spring; don't need this here, but other functions will need it, so we update
     length = abs(diff);
     
 	if (diff == 0.0) return;
     
+    // update the strength factor, if stiffness has changed
     if(stiffness != oldStiffness)
     {
         oldStiffness = stiffness;
         setStrength(strength);
     }
     
+    // adjust the spring length based on how far it is from the resting length, and how strong it is
     diff *= ( (diff - restingLength) / diff ) * adjustedStrength;
     
+    // send the new positions to the particles, if they are not locked
+    // we are essentially applying a force to the particles here
     if (!a->getLocked())
     {
         a->addX(diff);
     }
-
     if (!b->getLocked())
     {
         b->subX(diff);

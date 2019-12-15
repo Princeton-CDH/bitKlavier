@@ -243,8 +243,18 @@ void SpringTuning::setIntervalTuning(Array<float> tuning)
     intervalTuning = tuning;
 }
 
+/*
+simulate() first moves through the entire particle array and "integrates" their position,
+moving them based on their "velocities" and the drag values
+
+it then moves through both spring arrays (the tether springs and interval springs) and
+calls satisfyConstraints(), which updates the spring values based on the spring strengths,
+stiffnesses, and offsets from their rest lengths. This in turn updates the target positions
+for the two particles associated with each spring.
+*/
 void SpringTuning::simulate()
 {
+    // update particle positions based on current velocities
     for (auto particle : particleArray)
     {
 		if (particle->getEnabled() && !particle->getLocked())
@@ -253,6 +263,7 @@ void SpringTuning::simulate()
         }
 	}
     
+    // apply tether spring forces to all particles
     for (auto spring : tetherSpringArray)
     {
         if (spring->getEnabled())
@@ -261,6 +272,7 @@ void SpringTuning::simulate()
         }
     }
 
+    // apply interval spring forces to all particless
 	for (auto spring : enabledSpringArray)
 	{
         spring->satisfyConstraints();
