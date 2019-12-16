@@ -1065,6 +1065,7 @@ public:
         phasor = 0;
         envelopeCounter = 0;
         shouldPlay = false;
+        over = false;
         
 //        SynchronicSyncMode mode = prep->getMode();
 //        
@@ -1433,6 +1434,11 @@ public:
     {
         keysDepressed.clearQuick();
         clusters.clearQuick();
+    }
+    
+    inline SynchronicCluster::PtrArr getClusters(void)
+    {
+        return clusters;
     }
     
     inline SynchronicCluster* getCluster(int which)

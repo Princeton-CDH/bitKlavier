@@ -715,7 +715,16 @@ void SynchronicPreparationEditor::timerCallback()
         SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        SynchronicCluster::Ptr cluster = sProcessor->getCluster(0);
+        
+        SynchronicCluster::Ptr cluster = sProcessor->getClusters()[0];
+        for (int i = 0; i < sProcessor->getClusters().size(); i++)
+        {
+            if (sProcessor->getClusters()[i]->getShouldPlay())
+            {
+                cluster = sProcessor->getClusters()[i];
+                break;
+            }
+        }
         
         if (active->getOnOffMode() == KeyOn)
         {
@@ -811,24 +820,7 @@ void SynchronicPreparationEditor::timerCallback()
             {
                 for (int i = 0; i < paramSliders.size(); i++)
                 {
-                    if(paramSliders[i]->getName() == "beat length multipliers")
-                    {
-                        size = paramSliders[i]->getNumVisible();
-                        counter = cluster->getBeatMultiplierCounterForDisplay();
-                        paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
-                    }
-                    else if(paramSliders[i]->getName() == "sustain length multipliers")
-                    {
-                        paramSliders[i]->deHighlightCurrentSlider();
-                    }
-                    else if(paramSliders[i]->getName() == "accents")
-                    {
-                        paramSliders[i]->deHighlightCurrentSlider();
-                    }
-                    else if(paramSliders[i]->getName() == "transpositions")
-                    {
-                        paramSliders[i]->deHighlightCurrentSlider();
-                    }
+                    paramSliders[i]->deHighlightCurrentSlider();
                 }
             }
             
