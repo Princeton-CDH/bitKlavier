@@ -86,11 +86,11 @@ void Particle::subX(double that)
  and attenuated by a drag/friction factor
  
  newX = x + (velocity * deltatime) * dragFactor
- newX = x + (x - prevX) * deltatime * dragFactor
+ newX = x + (x - prevX) * deltatime * dragFactor; // velocity ~ deltaPosition
  
  deltatime = 1; our time unit is simply the iteration time
  
- drag is actuallythe inverse of drag; no drag if == 1, infinite drag if == 0
+ drag is actually the inverse of drag; no drag if == 1, infinite drag if == 0
  */
 
 void Particle::integrate(double drag)
