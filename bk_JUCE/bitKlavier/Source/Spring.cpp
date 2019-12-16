@@ -78,19 +78,16 @@ void Spring::satisfyConstraints(void)
     }
     
     // adjust the spring length based on how far it is from the resting length, and how strong it is
-    // diff *= ( (diff - restingLength) / diff ) * adjustedStrength;
     double increment = (diff - restingLength) * adjustedStrength;
     
     // send the new positions to the particles, if they are not locked
     // we are essentially applying a force to the particles here
     if (!a->getLocked())
     {
-        //a->addX(diff);
         a->addX(increment);
     }
     if (!b->getLocked())
     {
-        //b->subX(diff);
         b->subX(increment);
     }
 
