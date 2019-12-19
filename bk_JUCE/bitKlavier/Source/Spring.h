@@ -54,7 +54,7 @@ public:
     /*
      in setStrength(), an adjustedStrength is calculated, based on both the given Strength
      parameter and the the given Stiffness parameter. It is scaled non-linearly to make the
-     explosed parameter more intuitive and usable.
+     exposed parameter more intuitive and usable.
      */
     void setStrength(double newStrength);
     double getStrength() { return strength; }
