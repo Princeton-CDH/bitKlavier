@@ -445,9 +445,20 @@ void PreparationMap::clearKey(int noteNumber)
 //not sure why some of these have Channel and some don't; should rectify?
 void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, bool soundfont, String source)
 {
+    // These 2 arrays will represent the targets of the pressed note. They will be set
+    // by checking each keymap that contains the note and enabling each of those keymaps'
+    // targets in these arrays. Check the bprocessor loop below for further explanation.
+    // We need both pressTargetStates and releaseTargetStates because keymap inversion
+    // and the ability to connect multiple keymaps to a preparation means one keypress
+    // can result in both a press and a release being sent to a preparation.
     Array<KeymapTargetState> pressTargetStates;
     Array<KeymapTargetState> releaseTargetStates;
+    
+    // This will just act as a reference to either pressTargetStates of releaseTargetStates
+    // depending on whether a keymap is inverted
     Array<KeymapTargetState>* targetStates;
+    
+    // Initialize the target states as being disabled
     pressTargetStates.ensureStorageAllocated(TargetTypeNil);
     releaseTargetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
@@ -475,6 +486,38 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
     }
     if (foundSustain) sustain(noteNumber, velocity, channel, soundfont);
     if (foundReattack) reattack(noteNumber);
+    
+    for (auto proc : bprocessor)
+    {
+        // For each keymap
+        for (auto km : proc->getKeymaps())
+        {
+            // First check that the the keymap contain the pressed note and uses the midi source of the note
+            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
+            {
+                // targetStates will refer to press or release depending on inversion
+                targetStates = &pressTargetStates;
+                if (km->isInverted()) targetStates = &releaseTargetStates;
+                
+                // If the keymap has a target enabled, enable that target in targetStates
+                if (km->getTargetStates()[TargetTypeBlendronicSync] == TargetStateEnabled)
+                    targetStates->set(TargetTypeBlendronicSync, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeBlendronicClear] == TargetStateEnabled)
+                    targetStates->set(TargetTypeBlendronicClear, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeBlendronicOpen] == TargetStateEnabled)
+                    targetStates->set(TargetTypeBlendronicOpen, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeBlendronicClose] == TargetStateEnabled)
+                    targetStates->set(TargetTypeBlendronicClose, TargetStateEnabled);
+            }
+        }
+        // If there are any targets enabled, do the press and/or release
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
+            pressTargetStates.fill(TargetStateNil); /* reset for the next processor */}
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
+            releaseTargetStates.fill(TargetStateNil); /* reset for the next processor */}
+    }
     
     for (auto proc : tprocessor)
     {
@@ -560,33 +603,6 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
             pressTargetStates.fill(TargetStateNil); }
         if (releaseTargetStates.contains(TargetStateEnabled)) {
             proc->keyReleased(noteNumber, velocity, channel);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
-    
-    for (auto proc : bprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &pressTargetStates;
-                if (km->isInverted()) targetStates = &releaseTargetStates;
-
-                if (km->getTargetStates()[TargetTypeBlendronicSync] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicSync, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeBlendronicClear] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicClear, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeBlendronicOpen] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicOpen, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeBlendronicClose] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicClose, TargetStateEnabled);
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
             releaseTargetStates.fill(TargetStateNil); }
     }
     

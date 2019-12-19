@@ -36,6 +36,8 @@ keymaps(Keymap::PtrArr())
     firstSyncNote = false;
     
     keysDepressed = Array<int>();
+    syncKeysDepressed = Array<int>();
+    clusterKeysDepressed = Array<int>();
     
     activeSynchronicVoices = Array<BKSynthesiserVoice*>();
     activeSynchronicVoices.resize(128);
@@ -280,7 +282,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
         }
         // First note for sync can be either a sync-targeting note pressed when no other sync notes are pressed
         // or the first sync note after a new cluster has been created (does this make sense?)
-        else if (prep->getMode() == FirstNoteOnSync && (syncKeysDepressed.size() == 1 || firstSyncNote))
+        else if ((prep->getMode() == FirstNoteOnSync) && ( (!inCluster && (syncKeysDepressed.size() == 1)) || firstSyncNote))
         {
             cluster->setPhasor(0);
             cluster->resetPhase();

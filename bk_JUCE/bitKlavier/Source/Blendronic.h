@@ -516,6 +516,11 @@ private:
 	Array<float> velocities;    //record of velocities
     Array<uint64> holdTimers;
 	Array<int> keysDepressed;   //current keys that are depressed
+    
+    Array<int> syncKeysDepressed;
+    Array<int> clearKeysDepressed;
+    Array<int> openKeysDepressed;
+    Array<int> closeKeysDepressed;
 
     float pulseLength; // Length in seconds of a pulse (1.0 length beat)
 	float numSamplesBeat; // Length in samples of the current step in the beat pattern

@@ -122,6 +122,10 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     }
     
     keysDepressed = Array<int>();
+    syncKeysDepressed = Array<int>();
+    clearKeysDepressed = Array<int>();
+    openKeysDepressed = Array<int>();
+    closeKeysDepressed = Array<int>();
     
     DBG("Create bproc");
 }
@@ -269,12 +273,18 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     bool doOpen = targetStates[TargetTypeBlendronicOpen] == TargetStateEnabled;
     bool doClose = targetStates[TargetTypeBlendronicClose] == TargetStateEnabled;
     
+    if (doSync) syncKeysDepressed.addIfNotAlreadyThere(noteNumber);
+    if (doClear) clearKeysDepressed.addIfNotAlreadyThere(noteNumber);
+    if (doOpen) openKeysDepressed.addIfNotAlreadyThere(noteNumber);
+    if (doClose) closeKeysDepressed.addIfNotAlreadyThere(noteNumber);
+    
+    
     if (!velocityCheck(noteNumber)) return;
     
     if (doClear)
     {
         if (prep->getClearMode() == BlendronicAnyNoteOnClear ||
-           (prep->getClearMode() == BlendronicFirstNoteOnClear && keysDepressed.size() == 1))
+           (prep->getClearMode() == BlendronicFirstNoteOnClear && clearKeysDepressed.size() == 1))
         {
             // Just clear the delay line
             delay->clear();
@@ -284,7 +294,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     if (doSync)
     {
         if (prep->getSyncMode() == BlendronicAnyNoteOnSync ||
-            (prep->getSyncMode() == BlendronicFirstNoteOnSync && keysDepressed.size() == 1))
+            (prep->getSyncMode() == BlendronicFirstNoteOnSync && syncKeysDepressed.size() == 1))
         {
             // Reset the phase of all params and update values
             setSampleTimer(0);
@@ -303,9 +313,9 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     }
     // Get conditions for opening/closing the delay line
     bool noteOnClose = (prep->getCloseMode() == BlendronicAnyNoteOnClose) && doClose;
-    bool firstNoteOnClose = (prep->getCloseMode() == BlendronicFirstNoteOnClose && keysDepressed.size() == 1) && doClose;
+    bool firstNoteOnClose = (prep->getCloseMode() == BlendronicFirstNoteOnClose && closeKeysDepressed.size() == 1) && doClose;
     bool noteOnOpen = (prep->getOpenMode() == BlendronicAnyNoteOnOpen) && doOpen;
-    bool firstNoteOnOpen = (prep->getOpenMode() == BlendronicFirstNoteOnOpen && keysDepressed.size() == 1) && doOpen;
+    bool firstNoteOnOpen = (prep->getOpenMode() == BlendronicFirstNoteOnOpen && openKeysDepressed.size() == 1) && doOpen;
     
     // If the delay would be opened and closed by the same keypress, toggle it
     if ((noteOnClose || firstNoteOnClose) && (noteOnOpen || firstNoteOnOpen)) toggleActive();
@@ -327,6 +337,11 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     bool doOpen = targetStates[TargetTypeBlendronicOpen] == TargetStateEnabled;
     bool doClose = targetStates[TargetTypeBlendronicClose] == TargetStateEnabled;
     
+    if (doSync) syncKeysDepressed.removeAllInstancesOf(noteNumber);
+    if (doClear) clearKeysDepressed.removeAllInstancesOf(noteNumber);
+    if (doOpen) openKeysDepressed.removeAllInstancesOf(noteNumber);
+    if (doClose) closeKeysDepressed.removeAllInstancesOf(noteNumber);
+    
     if (!velocityCheck(noteNumber)) return;
     if (!holdCheck(noteNumber)) return;
     
@@ -344,19 +359,22 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
                 clearDelayOnNextBeat = true;
             }
         }
-        else if (prep->getClearMode() == BlendronicLastNoteOffClear && keysDepressed.size() == 0)
+        else if (prep->getClearMode() == BlendronicLastNoteOffClear && clearKeysDepressed.size() == 0)
         {
             // Clear the delay line, but duck with an env first to prevent a click
             delay->duckAndClear();
-            // Set flag to clear on next beat to prevent any release sound from being left in buffer,
-            // since the expected behavior of clearing on last note off is silence
-            clearDelayOnNextBeat = true;
+            if (keysDepressed.size() == 0)
+            {
+                // Set flag to clear on next beat to prevent any release sound from being left in buffer,
+                // since the expected behavior of clearing on last note off is silence
+                clearDelayOnNextBeat = true;
+            }
         }
     }
     if (doSync)
     {
         if (prep->getSyncMode() == BlendronicAnyNoteOffSync ||
-            (prep->getSyncMode() == BlendronicLastNoteOffSync && keysDepressed.size() == 0))
+            (prep->getSyncMode() == BlendronicLastNoteOffSync && syncKeysDepressed.size() == 0))
         {
             // Reset the phase of all params and update values
             setSampleTimer(0);
@@ -375,9 +393,9 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     }
     
     bool noteOffClose = (prep->getCloseMode() == BlendronicAnyNoteOffClose) && doClose;
-    bool firstNoteOffClose = (prep->getCloseMode() == BlendronicLastNoteOffClose && keysDepressed.size() == 0) && doClose;
+    bool firstNoteOffClose = (prep->getCloseMode() == BlendronicLastNoteOffClose && closeKeysDepressed.size() == 0) && doClose;
     bool noteOffOpen = (prep->getOpenMode() == BlendronicAnyNoteOffOpen) && doOpen;
-    bool firstNoteOffOpen = (prep->getOpenMode() == BlendronicLastNoteOffOpen && keysDepressed.size() == 0) && doOpen;
+    bool firstNoteOffOpen = (prep->getOpenMode() == BlendronicLastNoteOffOpen && openKeysDepressed.size() == 0) && doOpen;
     
     if ((noteOffClose || firstNoteOffClose) && (noteOffOpen || firstNoteOffOpen)) toggleActive();
     else if (noteOffClose || firstNoteOffClose) setActive(false);
