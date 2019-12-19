@@ -33,6 +33,8 @@ keymaps(Keymap::PtrArr())
 
     inCluster = false;
     
+    firstSyncNote = false;
+    
     keysDepressed = Array<int>();
     
     activeSynchronicVoices = Array<BKSynthesiserVoice*>();
@@ -220,6 +222,9 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled;
     bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled;
     
+    if (doSync) syncKeysDepressed.addIfNotAlreadyThere(noteNumber);
+    if (doCluster) clusterKeysDepressed.addIfNotAlreadyThere(noteNumber);
+    
     if (!velocityCheck(noteNumber)) return;
     
     // Remove old or untriggered clusters
@@ -251,6 +256,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
                 
                 cluster = new SynchronicCluster(prep);
                 clusters.add(cluster);
+                firstSyncNote = true;
             }
             
             cluster->addNote(noteNumber);
@@ -271,12 +277,15 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
             cluster->resetPhase();
             cluster->setShouldPlay(true);
         }
-        else if (prep->getMode() == FirstNoteOnSync && keysDepressed.size() == 1)
+        // First note for sync can be either a sync-targeting note pressed when no other sync notes are pressed
+        // or the first sync note after a new cluster has been created (does this make sense?)
+        else if (prep->getMode() == FirstNoteOnSync && (syncKeysDepressed.size() == 1 || firstSyncNote))
         {
             cluster->setPhasor(0);
             cluster->resetPhase();
             cluster->setShouldPlay(true);
         }
+        firstSyncNote = false;
     }
 }
 
@@ -290,6 +299,10 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled;
     bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled;
+    
+    if (doSync) syncKeysDepressed.removeAllInstancesOf(noteNumber);
+    if (doCluster) clusterKeysDepressed.removeAllInstancesOf(noteNumber);
+    
     
     if (!velocityCheck(noteNumber)) return;
     if (!holdCheck(noteNumber)) return;
@@ -340,7 +353,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     {
         if ((synchronic->aPrep->getMode() == FirstNoteOffSync && cluster->getShouldPlay() == false) ||
             (synchronic->aPrep->getMode() == AnyNoteOffSync) ||
-            (synchronic->aPrep->getMode() == LastNoteOffSync && keysDepressed.size() == 0))
+            (synchronic->aPrep->getMode() == LastNoteOffSync && syncKeysDepressed.size() == 0))
         {
             if (doCluster)
             {

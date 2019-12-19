@@ -1479,9 +1479,13 @@ private:
     void playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster);
     Array<float> velocities;    //record of velocities
     Array<int> keysDepressed;   //current keys that are depressed
+    Array<int> syncKeysDepressed;
+    Array<int> clusterKeysDepressed;
     bool playCluster;
     
     bool inCluster;
+    bool firstSyncNote;
+
     uint64 clusterThresholdSamples;
     uint64 clusterThresholdTimer;
     Array<int> slimCluster;     //cluster without repetitions
