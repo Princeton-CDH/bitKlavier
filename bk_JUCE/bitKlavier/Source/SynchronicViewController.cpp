@@ -683,27 +683,27 @@ void SynchronicPreparationEditor::fillModeSelectCB()
     
     modeSelectCB.clear(dontSendNotification);
     
-    if (prep->getOnOffMode() == KeyOn)
-    {
+//    if (prep->getOnOffMode() == KeyOn)
+//    {
         modeSelectCB.addItem("First Note-On", 1);
         modeSelectCB.addItem("Any Note-On", 2);
         modeSelectCB.addItem("First Note-Off", 3);
         modeSelectCB.addItem("Any Note-Off", 4);
         modeSelectCB.addItem("Last Note-Off", 5);
         modeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
-    }
-    else
-    {
-        modeSelectCB.addItem("First Note-Off", 1);
-        modeSelectCB.addItem("Any Note-Off", 2);
-        modeSelectCB.addItem("Last Note-Off", 3);
-        if (prep->getMode() < FirstNoteOffSync)
-        {
-            prep->setMode(FirstNoteOffSync);
-            stat->setMode(FirstNoteOffSync);
-        }
-        modeSelectCB.setSelectedItemIndex(prep->getMode()-2, dontSendNotification);
-    }
+//    }
+//    else
+//    {
+//        modeSelectCB.addItem("First Note-Off", 1);
+//        modeSelectCB.addItem("Any Note-Off", 2);
+//        modeSelectCB.addItem("Last Note-Off", 3);
+//        if (prep->getMode() < FirstNoteOffSync)
+//        {
+//            prep->setMode(FirstNoteOffSync);
+//            stat->setMode(FirstNoteOffSync);
+//        }
+//        modeSelectCB.setSelectedItemIndex(prep->getMode()-2, dontSendNotification);
+//    }
     
 }
 
@@ -1330,17 +1330,17 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        if (prep->getOnOffMode() == KeyOn)
-        {
+//        if (prep->getOnOffMode() == KeyOn)
+//        {
             prep    ->setMode((SynchronicSyncMode) index);
             active  ->setMode((SynchronicSyncMode) index);
-        }
-        else if (prep->getOnOffMode() == KeyOff)
-        {
-            prep    ->setMode((SynchronicSyncMode) (index+2));
-            active  ->setMode((SynchronicSyncMode) (index+2));
-        }
-            
+//        }
+//        else if (prep->getOnOffMode() == KeyOff)
+//        {
+//            prep    ->setMode((SynchronicSyncMode) (index+2));
+//            active  ->setMode((SynchronicSyncMode) (index+2));
+//        }
+        
         int toggleVal;
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;

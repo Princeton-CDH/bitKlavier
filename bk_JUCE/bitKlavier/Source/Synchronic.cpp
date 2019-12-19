@@ -266,8 +266,9 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
             //reset the timer for time between notes
             clusterThresholdTimer = 0;
         }
-        else if (cluster == nullptr) return;
     }
+    
+    if (cluster == nullptr) return;
     
     if (doSync)
     {
@@ -336,6 +337,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
                 
                 cluster = new SynchronicCluster(prep);
                 clusters.add(cluster);
+                firstSyncNote = true;
             }
             cluster->addNote(noteNumber);
             
