@@ -141,24 +141,10 @@ BKViewController(p, theGraph, 2)
     delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
     addAndMakeVisible(&delayLineDisplay);
 
-    // obsolete with multislider rotate button
-//    beatDelayLinkButton.setButtonText("Set delays to beats");
-//    beatDelayLinkButton.setTooltip("Indicates whether Blendronic delay lengths will be linked to the beat pattern at some rotation");
-//    beatDelayLinkButton.addListener(this);
-//    addAndMakeVisible(beatDelayLinkButton);
-//
-//    rotationLabel.setText("rotated", dontSendNotification);
-//    rotationLabel.setJustificationType(juce::Justification::centredRight);
-//    rotationLabel.setTooltip("Determines the rotation of value if delay lengths are linked to the beat pattern");
-//    addAndMakeVisible(&rotationLabel, ALL);
-//
-//    rotationCB.setName("Rotation");
-//    rotationCB.BKSetJustificationType(juce::Justification::centredRight);
-//    rotationCB.setTooltip("Determines the rotation of value if delay lengths are linked to the beat pattern");
-//    rotationCB.addSeparator();
-//    rotationCB.addListener(this);
-//    rotationCB.setSelectedItemIndex(0);
-//    addAndMakeVisible(rotationCB);
+    keyThreshSlider = std::make_unique< BKSingleSlider>("cluster threshold", 20, 2000, 200, 10);
+    keyThreshSlider->setToolTipString("successive notes spaced by less than this time (ms) are grouped for determining first note-on and first note-off");
+    keyThreshSlider->setJustifyRight(true);
+    addAndMakeVisible(*keyThreshSlider, ALL);
     
     currentTab = 0;
     displayTab(currentTab);
@@ -182,9 +168,7 @@ void BlendronicViewController::invisible(void)
     openModeSelectCB.setVisible(false);
     openModeLabel.setVisible(false);
     delayLineDisplay.setVisible(false);
-    beatDelayLinkButton.setVisible(false);
-    rotationLabel.setVisible(false);
-    rotationCB.setVisible(false);
+    keyThreshSlider->setVisible(false);
 }
 
 void BlendronicViewController::displayShared(void)
@@ -289,6 +273,7 @@ void BlendronicViewController::displayTab(int tab)
         closeModeLabel.setVisible(true);
         openModeSelectCB.setVisible(true);
         openModeLabel.setVisible(true);
+        keyThreshSlider->setVisible(true);
         
         delayLineDisplay.setVisible(true);
         
@@ -300,6 +285,11 @@ void BlendronicViewController::displayTab(int tab)
         area.removeFromRight(rightArrow.getWidth() + gXSpacing);
         area.removeFromLeft(leftArrow.getWidth() + gXSpacing);
         
+        area.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+        Rectangle<int> keyThreshSliderRect (area);
+        keyThreshSlider->setBounds(keyThreshSliderRect.removeFromTop(sliderHeight));
+        
+        area.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
         Rectangle<int> leftColumn (area);
         Rectangle<int> rightColumn (leftColumn.removeFromRight(leftColumn.getWidth()* 0.5));
         
@@ -330,7 +320,7 @@ void BlendronicViewController::displayTab(int tab)
         openModeSelectCB.setBounds(openModeSelectCBRect);
         openModeLabel.setBounds(openModeLabelRect);
         
-        area.removeFromTop(1.5*sliderHeight + gComponentComboBoxHeight);
+        area.removeFromTop(1.5*sliderHeight - gComponentComboBoxHeight);
         Rectangle<int> delayLineDisplayRect (area.removeFromTop(sliderHeight*2));
         delayLineDisplay.setBounds(delayLineDisplayRect);
     }
@@ -367,6 +357,12 @@ BlendronicViewController(p, theGraph)
     selectCB.addListener(this);
     selectCB.addMyListener(this);
     smoothModeSelectCB.addListener(this);
+    syncModeSelectCB.addListener(this);
+    clearModeSelectCB.addListener(this);
+    openModeSelectCB.addListener(this);
+    closeModeSelectCB.addListener(this);
+    
+    keyThreshSlider->addMyListener(this);
     
     fillSmoothModeSelectCB();
     fillSyncModeSelectCB();
@@ -400,7 +396,7 @@ void BlendronicPreparationEditor::update(void)
         clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
         closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
         openModeSelectCB.setSelectedItemIndex(prep->getOpenMode(), dontSendNotification);
-        rotationCB.setSelectedItemIndex(prep->getRotation(), dontSendNotification);
+        keyThreshSlider->setValue(prep->getClusterThreshMS(), dontSendNotification);
 
         for(int i = 0; i < paramSliders.size(); i++)
         {
@@ -646,30 +642,11 @@ void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
     BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
-//    if(name == "note length multiplier")
-//    {
-//        //DBG("note length multiplier " + String(val));
-//        prep->setLengthMultiplier(val);
-//        active->setLengthMultiplier(val);
-//    }
-//    else if(name == "beats to skip")
-//    {
-//        //DBG("beats to skip " + String(val));
-//        prep->setBeatsToSkip(val);
-//        active->setBeatsToSkip(val);
-//    }
-//    else if (name == "cluster min")
-//    {
-//        prep->setClusterMin(val);
-//        active->setClusterMin(val);
-//    }
-//    else if (name == "cluster thresh")
-//    {
-//        prep->setClusterThreshold(val);
-//        active->setClusterThreshold(val);
-//
-//        DBG("setting cluster thresh : " + String(val));
-//    }
+    if (name == "cluster threshold")
+    {
+        prep->setClusterThresh(val);
+        active->setClusterThresh(val);
+    }
 }
 
 void BlendronicPreparationEditor::fillSelectCB(int last, int current)
@@ -795,13 +772,14 @@ void BlendronicPreparationEditor::timerCallback()
     {
         BlendronicProcessor::Ptr proc = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
         BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-        if (prep != nullptr)
+        if (prep != nullptr && proc != nullptr)
         {
             if (rotationCB.getNumItems() != prep->getBeats().size()) fillRotationCB();
-        }
-        
-        if (proc != nullptr)
-        {
+            
+//            if(proc->getClusterThresholdTimer() < prep->getClusterThreshMS())
+//                keyThreshSlider->setDisplayValue(proc->getClusterThresholdTimer());
+//            else keyThreshSlider->setDisplayValue(0);
+
             if (proc->getActive()) delayLineDisplay.setColours(Colours::black, Colours::lightgrey);
             else delayLineDisplay.setColours(Colours::black, Colours::lightgrey.withMultipliedBrightness(0.6));
             delayLineDisplay.setLineSpacing(proc->getPulseLengthInSamples());

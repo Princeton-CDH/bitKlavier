@@ -32,8 +32,7 @@ keymaps(Keymap::PtrArr())
     }
 
     inCluster = false;
-    
-    firstSyncNote = false;
+    inSyncCluster = false;
     
     keysDepressed = Array<int>();
     syncKeysDepressed = Array<int>();
@@ -258,7 +257,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
                 
                 cluster = new SynchronicCluster(prep);
                 clusters.add(cluster);
-                firstSyncNote = true;
+                nextSyncOffIsFirst = true;
             }
             
             cluster->addNote(noteNumber);
@@ -282,13 +281,17 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
         }
         // First note for sync can be either a sync-targeting note pressed when no other sync notes are pressed
         // or the first sync note after a new cluster has been created (does this make sense?)
-        else if ((prep->getMode() == FirstNoteOnSync) && ( (!inCluster && (syncKeysDepressed.size() == 1)) || firstSyncNote))
+        else if ((prep->getMode() == FirstNoteOnSync) && !inSyncCluster)
         {
             cluster->setPhasor(0);
             cluster->resetPhase();
             cluster->setShouldPlay(true);
         }
-        firstSyncNote = false;
+        
+        nextSyncOffIsFirst = true;
+        inSyncCluster = true;
+        
+        syncThresholdTimer = 0;
     }
 }
 
@@ -339,7 +342,6 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
                 
                 cluster = new SynchronicCluster(prep);
                 clusters.add(cluster);
-                firstSyncNote = true;
             }
             cluster->addNote(noteNumber);
             
@@ -355,7 +357,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     //only initiate pulses if ALL keys are released
     if (doSync)
     {
-        if ((synchronic->aPrep->getMode() == FirstNoteOffSync && cluster->getShouldPlay() == false) ||
+        if ((synchronic->aPrep->getMode() == FirstNoteOffSync && nextSyncOffIsFirst) ||
             (synchronic->aPrep->getMode() == AnyNoteOffSync) ||
             (synchronic->aPrep->getMode() == LastNoteOffSync && syncKeysDepressed.size() == 0))
         {
@@ -392,6 +394,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
                 cluster->setPhasor(phasor);
             }
         }
+        nextSyncOffIsFirst = false;
     }
 }
 
@@ -408,7 +411,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     
     //do this every block, for adaptive tempo updates
     sampleType = type;
-    clusterThresholdSamples = (prep->getClusterThreshSEC() * sampleRate);
+    thresholdSamples = (prep->getClusterThreshSEC() * sampleRate);
 
     if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
     {
@@ -431,7 +434,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     if (inCluster)
     {
         //moved beyond clusterThreshold time, done with cluster
-        if (clusterThresholdTimer >= clusterThresholdSamples)
+        if (clusterThresholdTimer >= thresholdSamples)
         {
             inCluster = false;
         }
@@ -439,6 +442,18 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
         else
         {
             clusterThresholdTimer += numSamples;
+        }
+    }
+    
+    if (inSyncCluster)
+    {
+        if (syncThresholdTimer >= thresholdSamples)
+        {
+            inSyncCluster = false;
+        }
+        else
+        {
+            syncThresholdTimer += numSamples;
         }
     }
     

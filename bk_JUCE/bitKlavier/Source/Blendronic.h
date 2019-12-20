@@ -38,7 +38,7 @@ public:
 	//constructors
 	BlendronicPreparation(BlendronicPreparation::Ptr p);
 	BlendronicPreparation(String newName, Array<float> beats, Array<float> delayLengths, Array<float> smoothTimes,
-		Array<float> feedbackCoefficients, BlendronicSmoothMode smoothMode, BlendronicSyncMode syncMode,
+		Array<float> feedbackCoefficients, float clusterThresh, BlendronicSmoothMode smoothMode, BlendronicSyncMode syncMode,
         BlendronicClearMode clearMode, BlendronicOpenMode openMode, BlendronicCloseMode closeMode, float delayMax);
 	BlendronicPreparation(void);
 
@@ -68,6 +68,8 @@ public:
 	inline const int getVelocityMin() const noexcept { return velocityMin; }
 	inline const int getVelocityMax() const noexcept { return velocityMax; }
 	inline const bool getInputGain() const noexcept { return inputGain; }
+    inline const float getClusterThreshSEC() const noexcept {return bClusterThreshSec; }
+    inline const float getClusterThreshMS() const noexcept {return bClusterThresh; }
     inline const BlendronicSyncMode getSyncMode() const noexcept { return bSyncMode; }
     inline const BlendronicClearMode getClearMode() const noexcept { return bClearMode; }
     inline const BlendronicOpenMode getOpenMode() const noexcept { return bOpenMode; }
@@ -105,6 +107,12 @@ public:
 	inline const void setVelocityMin(int min) { velocityMin = min; }
 	inline const void setVelocityMax(int max) { velocityMax = max; }
 	inline const void setInputGain(float gain) { inputGain = gain; }
+    
+    inline void setClusterThresh(float clusterThresh)
+    {
+        bClusterThresh = clusterThresh;
+        bClusterThreshSec = bClusterThresh * .001;
+    }
 
     // TODO
 	void print(void)
@@ -282,6 +290,9 @@ private:
 	float bInputThresh;
 	float bInputThreshSec;
 	int holdMin, holdMax, velocityMin, velocityMax;
+    
+    float bClusterThresh;      //max time between played notes before new cluster is started, in MS
+    float bClusterThreshSec;
 
 	//needed for sampling
 	float inputGain;
@@ -521,6 +532,15 @@ private:
     Array<int> clearKeysDepressed;
     Array<int> openKeysDepressed;
     Array<int> closeKeysDepressed;
+    
+    bool inSyncCluster, inClearCluster, inOpenCluster, inCloseCluster;
+    bool nextSyncOffIsFirst, nextClearOffIsFirst, nextOpenOffIsFirst, nextCloseOffIsFirst;
+    
+    uint64 thresholdSamples;
+    uint64 syncThresholdTimer;
+    uint64 clearThresholdTimer;
+    uint64 openThresholdTimer;
+    uint64 closeThresholdTimer;
 
     float pulseLength; // Length in seconds of a pulse (1.0 length beat)
 	float numSamplesBeat; // Length in samples of the current step in the beat pattern

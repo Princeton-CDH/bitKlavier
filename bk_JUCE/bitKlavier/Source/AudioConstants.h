@@ -715,6 +715,7 @@ typedef enum BlendronicSmoothMode {
 typedef enum BlendronicSyncMode {
     BlendronicFirstNoteOnSync = 0,
     BlendronicAnyNoteOnSync,
+    BlendronicFirstNoteOffSync,
     BlendronicAnyNoteOffSync,
     BlendronicLastNoteOffSync,
     BlendronicSyncModeNil
@@ -723,6 +724,7 @@ typedef enum BlendronicSyncMode {
 typedef enum BlendronicClearMode {
     BlendronicFirstNoteOnClear = 0,
     BlendronicAnyNoteOnClear,
+    BlendronicFirstNoteOffClear,
     BlendronicAnyNoteOffClear,
     BlendronicLastNoteOffClear,
     BlendronicClearModeNil
@@ -731,6 +733,7 @@ typedef enum BlendronicClearMode {
 typedef enum BlendronicOpenMode {
     BlendronicFirstNoteOnOpen = 0,
     BlendronicAnyNoteOnOpen,
+    BlendronicFirstNoteOffOpen,
     BlendronicAnyNoteOffOpen,
     BlendronicLastNoteOffOpen,
     BlendronicOpenModeNil
@@ -739,6 +742,7 @@ typedef enum BlendronicOpenMode {
 typedef enum BlendronicCloseMode {
     BlendronicFirstNoteOnClose = 0,
     BlendronicAnyNoteOnClose,
+    BlendronicFirstNoteOffClose,
     BlendronicAnyNoteOffClose,
     BlendronicLastNoteOffClose,
     BlendronicCloseModeNil
@@ -754,6 +758,7 @@ static const std::vector<std::string> cBlendronicSmoothModes = {
 static const std::vector<std::string> cBlendronicSyncModes = {
     "First Note-On",
     "Any Note-On",
+    "First Note-Off",
     "Any Note-Off",
     "Last Note-Off",
     "None"
@@ -762,6 +767,7 @@ static const std::vector<std::string> cBlendronicSyncModes = {
 static const std::vector<std::string> cBlendronicClearModes = {
     "First Note-On",
     "Any Note-On",
+    "First Note-Off",
     "Any Note-Off",
     "Last Note-Off",
     "None"
@@ -770,6 +776,7 @@ static const std::vector<std::string> cBlendronicClearModes = {
 static const std::vector<std::string> cBlendronicOpenModes = {
     "First Note-On",
     "Any Note-On",
+    "First Note-Off",
     "Any Note-Off",
     "Last Note-Off",
     "None"
@@ -778,6 +785,7 @@ static const std::vector<std::string> cBlendronicOpenModes = {
 static const std::vector<std::string> cBlendronicCloseModes = {
     "First Note-On",
     "Any Note-On",
+    "First Note-Off",
     "Any Note-Off",
     "Last Note-Off",
     "None"

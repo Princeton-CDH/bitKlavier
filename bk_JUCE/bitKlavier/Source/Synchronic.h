@@ -1343,7 +1343,7 @@ public:
     
     
     inline const float getClusterThresholdTimer() const noexcept { return 1000. * clusterThresholdTimer / sampleRate ;}
-    inline const float getClusterThreshold() const noexcept { return 1000. * clusterThresholdSamples / sampleRate ;}
+    inline const float getClusterThreshold() const noexcept { return 1000. * thresholdSamples / sampleRate ;}
     inline const int getNumKeysDepressed() const noexcept {return keysDepressed.size(); }
     inline const bool getPlayCluster() const noexcept { return playCluster; }
     
@@ -1483,11 +1483,12 @@ private:
     Array<int> clusterKeysDepressed;
     bool playCluster;
     
-    bool inCluster;
-    bool firstSyncNote;
+    bool inCluster, inSyncCluster;
+    bool nextSyncOffIsFirst;
 
-    uint64 clusterThresholdSamples;
+    uint64 thresholdSamples;
     uint64 clusterThresholdTimer;
+    uint64 syncThresholdTimer;
     Array<int> slimCluster;     //cluster without repetitions
     
     SynchronicCluster::PtrArr clusters;

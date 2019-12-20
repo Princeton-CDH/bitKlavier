@@ -54,10 +54,6 @@ protected:
         multiSlidersDidChange(name, values);
     }
     
-    BKTextButton beatDelayLinkButton;
-    BKLabel rotationLabel;
-    BKComboBox rotationCB;
-    
     BKEditableComboBox selectCB;
     BKComboBox smoothModeSelectCB;
     BKComboBox syncModeSelectCB;
@@ -76,6 +72,7 @@ protected:
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
 
     std::unique_ptr<BKSingleSlider> inputThreshSlider;
+    std::unique_ptr<BKSingleSlider> keyThreshSlider;
     std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
     std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
     
