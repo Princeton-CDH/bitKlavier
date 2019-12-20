@@ -4,6 +4,24 @@
 	Blendronic.h
 	Created: 11 Jun 2019 2:00:53pm
 	Author:  Theodore R Trevisan
+ 
+    The original algorithm for Bledrónic was developed by Dan for the Feedback
+    movement from "neither Anvil nor Pulley," and was subsequently used in
+    Clapping Machine Music Variations, Olagón, and others. A paper describing
+    the original algorithm was presented at the International Computer Music
+    Conference in 2010 (http://www.manyarrowsmusic.com/papers/cmmv.pdf).
+ 
+    "Clapping Machine Music Variations: A Composition for Acoustic/Laptop Ensemble"
+    Dan Trueman
+    Proceedings for the International Computer Music Conference
+    SUNY Stony Brook, 2010
+ 
+    The basic idea is that the length of a delay line changes periodically, as
+    set by a sequence of beat lengths; the changes can happen instantaneously,
+    or can take place over a period of time, a "smoothing" time that creates
+    a variety of artifacts, tied to the beat pattern. The smoothing parameters
+    themselves can be sequenced in a pattern, as can a feedback coefficient,
+    which determines how much of the out of the delay line is fed back into it.
 
   ==============================================================================
 */
@@ -24,6 +42,17 @@ class BKSynthesiser;
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////BLENDRONIC PREPARATION///////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
+
+/*
+BlendronicPreparation holds all the state variable values for the
+Blendrónic preparation. As with other preparation types, bK will use
+two instantiations of BlendronicPreparation for every active
+Blendrónic in the gallery, one to store the static state of the
+preparation, and the other to store the active state. These will
+be the same, unless a Modification is triggered, in which case the
+active state will be changed (and a Reset will revert the active state
+to the static state).
+*/
 
 class BlendronicPreparation : public ReferenceCountedObject
 {
@@ -300,6 +329,15 @@ private:
 /////////////////////////BLENDRONIC///////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
+/*
+This class owns two BlendronicPreparations: sPrep and aPrep
+As with other preparation, sPrep is the static preparation, while
+aPrep is the active preparation currently in use. sPrep and aPrep
+remain the same unless a Modification is triggered, which will change
+aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
+is triggered.
+*/
+
 class Blendronic : public ReferenceCountedObject
 {
 
@@ -417,6 +455,18 @@ private:
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////BLENDRONIC PROCESSOR/////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
+
+/*
+ BlendronicProcessor has the primary function -- tick() -- that handles the delay line.
+ Unlike the other preparations, it doesn't process a block directly, because it needs
+ audio samples from whatever other preparations it is connected to. So, instead, it is
+ forward declared so BKSynthesiser::renderDelays can call tick() and send Blendronic
+ the samples it needs. The actual delay class is BlendronicDelay, a delay line with
+ linear interpolation and feedback.
+
+ It connects Keymap, and Tempo preparations together as needed, and gets the Blendrónic
+ values it needs to behave as expected.
+*/
 
 class BlendronicProcessor : public ReferenceCountedObject
 {
