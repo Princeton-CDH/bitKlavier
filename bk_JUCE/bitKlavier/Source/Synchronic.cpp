@@ -286,9 +286,9 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
             cluster->setPhasor(0);
             cluster->resetPhase();
             cluster->setShouldPlay(true);
+            
         }
-        
-        nextSyncOffIsFirst = true;
+        if (!inSyncCluster) nextSyncOffIsFirst = true;
         inSyncCluster = true;
         
         syncThresholdTimer = 0;

@@ -360,9 +360,9 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
             delay->clear();
             //clearDelayOnNextBeat = true;
         }
+        if (!inClearCluster) nextClearOffIsFirst = true;
         inClearCluster = true;
-        nextClearOffIsFirst = true;
-        
+    
         clearThresholdTimer = 0;
     }
     if (doSync)
@@ -384,8 +384,9 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
             numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
             updateDelayParameters();
         }
+        if (!inSyncCluster) nextSyncOffIsFirst = true;
         inSyncCluster = true;
-        nextSyncOffIsFirst = true;
+        
         
         syncThresholdTimer = 0;
     }
@@ -412,16 +413,16 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     
     if (doClose)
     {
+        if (!inCloseCluster) nextCloseOffIsFirst = true;
         inCloseCluster = true;
         closeThresholdTimer = 0;
-        nextCloseOffIsFirst = true;
     }
     
     if (doOpen)
     {
+        if (!inOpenCluster) nextOpenOffIsFirst = true;
         inOpenCluster = true;
         openThresholdTimer = 0;
-        nextOpenOffIsFirst = true;
     }
 }
 
