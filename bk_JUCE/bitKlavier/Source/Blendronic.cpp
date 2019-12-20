@@ -483,8 +483,8 @@ void BlendronicProcessor::updateDelayParameters()
     }
     
 //    DBG(String(getId()) + " new envelope target = " + String(numSamplesDelay));
-//    DBG(String(smoothRate));
+    DBG(String(1000. / smoothRate) + "ms"); // smooth rate is change / second
     delay->setDelayTargetLength(numSamplesDelay);
-    delay->setSmoothDuration(smoothRate);
+    delay->setSmoothDuration(smoothRate); // this is really a rate, not a duration
     delay->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
 }
