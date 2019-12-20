@@ -20,7 +20,8 @@ targetStates(Array<KeymapTargetState>()),
 midiEdit(false),
 inverted(false),
 midiInputSources(Array<String>()),
-defaultSelected(false)
+defaultSelected(false),
+onscreenSelected(true)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -45,7 +46,8 @@ Id(k->getId()),
 midiEdit(false),
 inverted(false),
 midiInputSources(k->getMidiInputSources()),
-defaultSelected(k->isDefaultSelected())
+defaultSelected(k->isDefaultSelected()),
+onscreenSelected(k->isOnscreenSelected())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -69,7 +71,8 @@ Id(Id),
 midiEdit(false),
 inverted(false),
 midiInputSources(k->getMidiInputSources()),
-defaultSelected(k->isDefaultSelected())
+defaultSelected(k->isDefaultSelected()),
+onscreenSelected(k->isOnscreenSelected())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -95,7 +98,8 @@ targetStates(Array<KeymapTargetState>()),
 midiEdit(false),
 inverted(false),
 midiInputSources(Array<String>()),
-defaultSelected(false)
+defaultSelected(false),
+onscreenSelected(true)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -404,8 +408,8 @@ void Keymap::clearTargets()
 const Array<String> Keymap::getAllMidiInputSources()
 {
     Array<String> sources;
-    sources.add(cNoteSourceUI);
     sources.addArray(midiInputSources);
+    if (onscreenSelected) sources.add(cNoteSourceUI);
     if (defaultSelected) sources.addArray(processor.getDefaultMidiInputSources());
         return sources;
 }

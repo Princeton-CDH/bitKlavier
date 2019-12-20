@@ -200,6 +200,8 @@ public:
         
         keysave.setProperty(ptagKeymap_defaultSelected, defaultSelected, 0);
         
+        keysave.setProperty(ptagKeymap_onscreenSelected, onscreenSelected, 0);
+        
         return keysave;
     }
     
@@ -251,6 +253,7 @@ public:
         }
         
         defaultSelected = e->getStringAttribute(ptagKeymap_defaultSelected).getIntValue();
+        onscreenSelected = e->getStringAttribute(ptagKeymap_defaultSelected).getIntValue();
     }
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }
@@ -278,6 +281,9 @@ public:
     
     inline bool isDefaultSelected() { return defaultSelected; }
     inline void setDefaultSelected(bool selected) { defaultSelected = selected; }
+    
+    inline bool isOnscreenSelected() { return onscreenSelected; }
+    inline void setOnscreenSelected(bool selected) { onscreenSelected = selected; }
     
     void setTarget(KeymapTargetType target, KeymapTargetState state);
     void toggleTarget(KeymapTargetType target);
@@ -307,6 +313,7 @@ private:
     Array<String> midiInputSources;
     
     bool defaultSelected;
+    bool onscreenSelected;
     
     JUCE_LEAK_DETECTOR (Keymap)
 };

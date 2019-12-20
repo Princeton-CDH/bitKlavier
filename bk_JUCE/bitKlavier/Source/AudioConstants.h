@@ -191,6 +191,7 @@ const String ptagKeymap_targetStates = "targetStates";
 const String ptagKeymap_inverted = "inverted";
 const String ptagKeymap_midiInput = "midiInput";
 const String ptagKeymap_defaultSelected = "defSelected";
+const String ptagKeymap_onscreenSelected = "osSelected";
 
 const String cNoteSourceUI = "__UIKeyboard";
 

@@ -447,9 +447,13 @@ void KeymapViewController::midiInputSelectCallback(int result, KeymapViewControl
     {
         keymap->setDefaultSelected(!keymap->isDefaultSelected());
     }
+    else if (result == 2)
+    {
+        keymap->setOnscreenSelected(!keymap->isOnscreenSelected());
+    }
     else
     {
-        String deviceName = processor.getMidiInputDevices()[result-2].name;
+        String deviceName = processor.getMidiInputDevices()[result-3].name;
         if (keymap->getMidiInputSources().contains(deviceName)) keymap->removeMidiInputSource(deviceName);
         else keymap->addMidiInputSource(deviceName);
     }
@@ -560,6 +564,13 @@ PopupMenu KeymapViewController::getMidiInputSelectMenu()
         menu.addItem(PopupMenu::Item("Default MIDI Input").setID(id).setTicked(true));
     }
     else menu.addItem(PopupMenu::Item("Default MIDI Input").setID(id));
+    
+    id++;
+    if (keymap->isOnscreenSelected())
+    {
+        menu.addItem(PopupMenu::Item("Onscreen Keyboard").setID(id).setTicked(true));
+    }
+    else menu.addItem(PopupMenu::Item("Onscreen Keyboard").setID(id));
     
     for (auto device : processor.getMidiInputDevices())
     {
