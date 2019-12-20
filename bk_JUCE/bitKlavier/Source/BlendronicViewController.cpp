@@ -38,7 +38,7 @@ BKViewController(p, theGraph, 2)
 #endif
             paramSliders[idx]->setMinMaxDefaultInc(cBlendronicDefaultRangeValuesAndInc[i]);
             
-            if(paramSliders[idx]->getName() == "beats")
+            if(paramSliders[idx]->getName() == "beat lengths") // shouldn't all these be referencing cBlendronicParameterTypes??
             {
                 paramSliders[idx]->setToolTipString("Determines the beat pattern of changing sequenced parameters; double-click to edit all or add additional sequence steps");
             }
@@ -46,9 +46,9 @@ BKViewController(p, theGraph, 2)
             {
                 paramSliders[idx]->setToolTipString("Determines the length of delay; double-click to edit all or add additional sequence steps");
             }
-            else if(paramSliders[idx]->getName() == "smooth timings")
+            else if(paramSliders[idx]->getName() == "smoothing")
             {
-                paramSliders[idx]->setToolTipString("Determines duration of smoothing between delay times; double-click to edit all or add additional sequence steps\nUnits: Constant Time uses pulses; Constant Rate uses beat length change per pulse; Proportional Time uses a proportion of the current beat length; Proportional Rate uses beat length change per current beat length");
+                paramSliders[idx]->setToolTipString("Determines duration of smoothing between delay times; double-click to edit all or add additional sequence steps\nUnits: Constant and Proportional multiply the beat length by the given value to set the smooth time; Constant uses just the first beat, Proportional changes the smooth time with every beat, based on the length of that beat; Constant and Proportional Rate do the same, except they divide the beat length by the given value to set the smooth time.");
             }
             else if(paramSliders[idx]->getName() == "feedback coefficients")
             {
@@ -792,7 +792,7 @@ void BlendronicPreparationEditor::timerCallback()
             
             for (int i = 0; i < paramSliders.size(); i++)
             {
-                if(paramSliders[i]->getName() == "beats")
+                if(paramSliders[i]->getName() == "beat lengths")
                 {
                     size = paramSliders[i]->getNumVisible();
                     counter = proc->getBeatIndex();
@@ -804,7 +804,7 @@ void BlendronicPreparationEditor::timerCallback()
                     counter = proc->getDelayIndex();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
-                else if(paramSliders[i]->getName() == "smooth timings")
+                else if(paramSliders[i]->getName() == "smoothing")
                 {
                     size = paramSliders[i]->getNumVisible();
                     counter = proc->getSmoothIndex();
@@ -827,7 +827,7 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
     BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
     BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
-    if (name == "beats")
+    if (name == "beat lengths")
     {
         prep    ->setBeat(whichSlider, values[0]);
         active  ->setBeat(whichSlider, values[0]);
@@ -837,7 +837,7 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
         prep    ->setDelayLength(whichSlider, values[0]);
         active  ->setDelayLength(whichSlider, values[0]);
     }
-    else if (name == "smooth timings")
+    else if (name == "smoothing")
     {
         prep    ->setSmoothDuration(whichSlider, values[0]);
         active  ->setSmoothDuration(whichSlider, values[0]);
@@ -857,7 +857,7 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     Array<float> newvals = Array<float>();
     for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
     
-    if (name == "beats")
+    if (name == "beat lengths")
     {
         prep    ->setBeats(newvals);
         active  ->setBeats(newvals);
@@ -867,7 +867,7 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
         prep    ->setDelayLengths(newvals);
         active  ->setDelayLengths(newvals);
     }
-    else if (name == "smooth timings")
+    else if (name == "smoothing")
     {
         prep    ->setSmoothDurations(newvals);
         active  ->setSmoothDurations(newvals);

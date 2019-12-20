@@ -821,9 +821,9 @@ static const std::vector<BKParameterDataType> cBlendronicDataTypes = {
 
 static const std::vector<std::string> cBlendronicParameterTypes = {
     "Blendronic Id",
-    "beats",
+    "beat lengths",
     "delay lengths",
-    "smooth timings",
+    "smoothing",
     "feedback coefficients",
     "Input Thresh",
     "Hold Min",
