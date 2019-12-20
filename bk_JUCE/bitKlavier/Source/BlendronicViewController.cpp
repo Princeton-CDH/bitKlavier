@@ -218,9 +218,7 @@ void BlendronicViewController::displayTab(int tab)
     
         smoothModeSelectCB.setVisible(true);
         smoothModeLabel.setVisible(true);
-//        beatDelayLinkButton.setVisible(true);
-//        rotationLabel.setVisible(true);
-//        rotationCB.setVisible(true);
+        
         for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setVisible(true);
@@ -245,14 +243,7 @@ void BlendronicViewController::displayTab(int tab)
         Rectangle<int> smoothModeLabelRect (smoothModeSelectCBRect.removeFromRight(smoothModeSelectCBRect.getWidth()*0.5));
         smoothModeSelectCB.setBounds(smoothModeSelectCBRect);
         smoothModeLabel.setBounds(smoothModeLabelRect);
-        
-//        rightColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
-//        Rectangle<int> rotationCBRect (rightColumn.removeFromTop(gComponentComboBoxHeight));
-//        Rectangle<int> rotationLabelRect (rotationCBRect.removeFromLeft(rightColumn.getWidth() * 0.7));
-//        Rectangle<int> beatDelayLinkButtonRect (rotationLabelRect.removeFromLeft(rightColumn.getWidth() * 0.52));
-//        rotationCB.setBounds(rotationCBRect);
-//        rotationLabel.setBounds(rotationLabelRect);
-//        beatDelayLinkButton.setBounds(beatDelayLinkButtonRect);
+
 
         area.removeFromTop(sliderHeight + gYSpacing - gComponentComboBoxHeight*1.5);
         for (int i = 0; i < paramSliders.size(); i++)
@@ -625,16 +616,6 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         fillCloseModeSelectCB();
         
     }
-    else if (name == "Rotation")
-    {
-        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-        
-        prep    ->setRotation(index);
-        active  ->setRotation(index);
-        
-        fillRotationCB();
-    }
 }
 
 void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -752,20 +733,6 @@ void BlendronicPreparationEditor::fillCloseModeSelectCB()
     closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
 }
 
-void BlendronicPreparationEditor::fillRotationCB()
-{
-    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-    
-    rotationCB.clear(dontSendNotification);
-    
-    for (int i = 0; i < prep->getBeats().size(); ++i)
-    {
-        rotationCB.addItem(String(i), i+1);
-    }
-    
-    rotationCB.setSelectedItemIndex(prep->getRotation(), dontSendNotification);
-}
-
 void BlendronicPreparationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplayBlendronic)
@@ -774,7 +741,6 @@ void BlendronicPreparationEditor::timerCallback()
         BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
         if (prep != nullptr && proc != nullptr)
         {
-            if (rotationCB.getNumItems() != prep->getBeats().size()) fillRotationCB();
             
 //            if(proc->getClusterThresholdTimer() < prep->getClusterThreshMS())
 //                keyThreshSlider->setDisplayValue(proc->getClusterThresholdTimer());
@@ -893,22 +859,6 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     else if (b == &actionButton)
     {
         getPrepOptionMenu(PreparationTypeBlendronic).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
-    }
-    else if (b == &beatDelayLinkButton)
-    {
-        Array<float> beats (active->getBeats());
-        for (int i = 0; i < active->getBeats().size(); ++i)
-        {
-            beats.set((i + active->getRotation()) % active->getBeats().size(), active->getBeats()[i]);
-        }
-        active->setDelayLengths(beats);
-        for(int i = 0; i < paramSliders.size(); i++)
-        {
-            if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
-            {
-                paramSliders[i]->setTo(active->getDelayLengths(), dontSendNotification);
-            }
-        }
     }
     else if (b == &rightArrow)
     {
