@@ -38,7 +38,7 @@ BKViewController(p, theGraph, 2)
 #endif
             paramSliders[idx]->setMinMaxDefaultInc(cBlendronicDefaultRangeValuesAndInc[i]);
             
-            if(paramSliders[idx]->getName() == "beat lengths")
+            if(paramSliders[idx]->getName() == "beat lengths") // shouldn't all these be referencing cBlendronicParameterTypes??
             {
                 paramSliders[idx]->setToolTipString("Determines the beat pattern of changing sequenced parameters; double-click to edit all or add additional sequence steps");
             }
@@ -48,7 +48,7 @@ BKViewController(p, theGraph, 2)
             }
             else if(paramSliders[idx]->getName() == "smoothing")
             {
-                paramSliders[idx]->setToolTipString("Determines duration of smoothing between delay times; double-click to edit all or add additional sequence steps\nUnits: Constant Time uses pulses; Constant Rate uses beat length change per pulse; Proportional Time uses a proportion of the current beat length; Proportional Rate uses beat length change per current beat length");
+                paramSliders[idx]->setToolTipString("Determines duration of smoothing between delay times; double-click to edit all or add additional sequence steps\nUnits: Constant and Proportional multiply the beat length by the given value to set the smooth time; Constant uses just the first beat, Proportional changes the smooth time with every beat, based on the length of that beat; Constant and Proportional Rate do the same, except they divide the beat length by the given value to set the smooth time.");
             }
             else if(paramSliders[idx]->getName() == "feedback coefficients")
             {
