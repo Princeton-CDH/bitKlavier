@@ -40,11 +40,11 @@ BKViewController(p, theGraph, 2)
             
             if(paramSliders[idx]->getName() == "beat lengths") // shouldn't all these be referencing cBlendronicParameterTypes??
             {
-                paramSliders[idx]->setToolTipString("Determines the beat pattern of changing sequenced parameters; double-click to edit all or add additional sequence steps");
+                paramSliders[idx]->setToolTipString("Determines the beat pattern of changing sequenced parameters, as a multiplier of the pulse length set by Tempo; double-click to edit all or add additional sequence steps");
             }
             else if(paramSliders[idx]->getName() == "delay lengths")
             {
-                paramSliders[idx]->setToolTipString("Determines the length of delay; double-click to edit all or add additional sequence steps");
+                paramSliders[idx]->setToolTipString("Determines the length of delay, as a multiplier of the pulse length set by Tempo; double-click to edit all or add additional sequence steps");
             }
             else if(paramSliders[idx]->getName() == "smoothing")
             {

@@ -207,6 +207,16 @@ bool SynchronicProcessor::holdCheck(int noteNumber)
     return false;
 }
 
+/*
+ Keymap Target modes:
+    1. Synchronic Main: current functionality; launches clusters/layers, syncs, etc....
+    2. Restart Beat: calls cluster->setPhasor(0), regardless of aPrep->getMode(), last cluster/layer
+    3. Restart Patterns: calls cluster->resetPhase(), regardless of aPrep->getMode(), last cluster/layer
+        eventually, we could allow targeting of individual patterns
+    4. Pause/Play: stop/start incrementing phasor, all clusters (could also have Pause/Play Last, for last cluster only)
+    5. Add Notes: calls cluster->addNote(noteNumber), last cluster/layer
+ */
+
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<KeymapTargetState> targetStates)
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
@@ -271,7 +281,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     
     if (cluster == nullptr) return;
     
-    if (doSync)
+    // if (doSync)
+    if (doCluster)
     {
         if (prep->getMode() == AnyNoteOnSync)
         {
@@ -293,6 +304,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
         
         syncThresholdTimer = 0;
     }
+    
+    if (doSync) cluster->setPhasor(0);
 }
 
 
