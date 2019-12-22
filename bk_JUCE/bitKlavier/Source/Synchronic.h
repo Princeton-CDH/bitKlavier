@@ -1481,6 +1481,7 @@ private:
     Array<int> keysDepressed;   //current keys that are depressed
     Array<int> syncKeysDepressed;
     Array<int> clusterKeysDepressed;
+    Array<int> patternSyncKeysDepressed;
     bool playCluster;
     
     bool inCluster, inSyncCluster;

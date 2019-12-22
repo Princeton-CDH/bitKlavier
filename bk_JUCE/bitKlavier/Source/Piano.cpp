@@ -561,6 +561,7 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         
         keymap->addTarget(TargetTypeSynchronicSync);
         keymap->addTarget(TargetTypeSynchronicCluster);
+        keymap->addTarget(TargetTypeSynchronicPatternSync);
     }
     else if (thisType == PreparationTypeNostalgic)
     {

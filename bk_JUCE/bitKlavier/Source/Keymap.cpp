@@ -375,6 +375,7 @@ void Keymap::removeTargetsOfType(BKPreparationType type)
     {
         removeTarget(TargetTypeSynchronicSync);
         removeTarget(TargetTypeSynchronicCluster);
+        removeTarget(TargetTypeSynchronicPatternSync);
     }
     else if (type == PreparationTypeNostalgic)
     {

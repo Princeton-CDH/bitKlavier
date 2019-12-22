@@ -37,6 +37,7 @@ keymaps(Keymap::PtrArr())
     keysDepressed = Array<int>();
     syncKeysDepressed = Array<int>();
     clusterKeysDepressed = Array<int>();
+    patternSyncKeysDepressed = Array<int>();
     
     activeSynchronicVoices = Array<BKSynthesiserVoice*>();
     activeSynchronicVoices.resize(128);
@@ -209,9 +210,9 @@ bool SynchronicProcessor::holdCheck(int noteNumber)
 
 /*
  Keymap Target modes:
-    1. Synchronic Main: current functionality; launches clusters/layers, syncs, etc....
-    2. Restart Beat: calls cluster->setPhasor(0), regardless of aPrep->getMode(), last cluster/layer
-    3. Restart Patterns: calls cluster->resetPhase(), regardless of aPrep->getMode(), last cluster/layer
+    1. Synchronic: current functionality; launches clusters/layers, syncs, etc....
+    2. Beat Sync: calls cluster->setPhasor(0), regardless of aPrep->getMode(), last cluster/layer
+    3. Pattern Sync: calls cluster->resetPhase(), regardless of aPrep->getMode(), last cluster/layer
         eventually, we could allow targeting of individual patterns
     4. Pause/Play: stop/start incrementing phasor, all clusters (could also have Pause/Play Last, for last cluster only)
     5. Add Notes: calls cluster->addNote(noteNumber), last cluster/layer
@@ -232,9 +233,11 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     
     bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled;
     bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled;
+    bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled;
     
     if (doSync) syncKeysDepressed.addIfNotAlreadyThere(noteNumber);
     if (doCluster) clusterKeysDepressed.addIfNotAlreadyThere(noteNumber);
+    if (doPatternSync) patternSyncKeysDepressed.addIfNotAlreadyThere(noteNumber);
     
     if (!velocityCheck(noteNumber)) return;
     
@@ -305,7 +308,12 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
         syncThresholdTimer = 0;
     }
     
-    if (doSync) cluster->setPhasor(0);
+    if (prep->getMode() == AnyNoteOnSync || prep->getMode() == FirstNoteOnSync)
+    {
+        if (doSync) cluster->setPhasor(0);
+        if (doPatternSync) cluster->resetPhase();
+    }
+    
 }
 
 
@@ -318,10 +326,11 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled;
     bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled;
+    bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled;
     
     if (doSync) syncKeysDepressed.removeAllInstancesOf(noteNumber);
     if (doCluster) clusterKeysDepressed.removeAllInstancesOf(noteNumber);
-    
+    if (doPatternSync) patternSyncKeysDepressed.addIfNotAlreadyThere(noteNumber);
     
     if (!velocityCheck(noteNumber)) return;
     if (!holdCheck(noteNumber)) return;
@@ -368,7 +377,8 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     // If AnyNoteOffSync mode, reset phasor and multiplier indices.
     //only initiate pulses if ALL keys are released
-    if (doSync)
+    //if (doSync)
+    //if (doCluster)
     {
         if ((synchronic->aPrep->getMode() == FirstNoteOffSync && nextSyncOffIsFirst) ||
             (synchronic->aPrep->getMode() == AnyNoteOffSync) ||
@@ -393,6 +403,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
                     }
                 }
             }
+            /*
             else
             {
                 cluster->resetPhase();
@@ -400,15 +411,55 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
                 
                 //start right away
                 uint64 phasor = beatThresholdSamples *
-                synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
-                general->getPeriodMultiplier() *
-                tempo->getPeriodMultiplier();
+                                synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                                general->getPeriodMultiplier() *
+                                tempo->getPeriodMultiplier();
                 
                 cluster->setPhasor(phasor);
             }
+             */
+            
         }
+        if ((synchronic->aPrep->getMode() == FirstNoteOffSync ||
+            (synchronic->aPrep->getMode() == AnyNoteOffSync)  ||
+            (synchronic->aPrep->getMode() == LastNoteOffSync) ))
+        {
+                       
+            if (doSync)
+            {
+                cluster->setShouldPlay(true);
+                
+                uint64 phasor = beatThresholdSamples *
+                                synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                                general->getPeriodMultiplier() *
+                                tempo->getPeriodMultiplier();
+                
+                cluster->setPhasor(phasor);
+            }
+            
+            if (doPatternSync)
+            {
+                cluster->setShouldPlay(true);
+                cluster->resetPhase();
+            }
+        }
+        
         nextSyncOffIsFirst = false;
     }
+    
+    /*
+    if (doSync)
+    {
+        uint64 phasor = beatThresholdSamples *
+                        synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                        general->getPeriodMultiplier() *
+                        tempo->getPeriodMultiplier();
+        
+        cluster->setPhasor(phasor);
+    }
+    
+    if (doPatternSync) cluster->resetPhase();
+     */
 }
 
 

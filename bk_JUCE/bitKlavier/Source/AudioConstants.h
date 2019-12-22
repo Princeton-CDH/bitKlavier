@@ -1051,6 +1051,7 @@ typedef enum KeymapTargetType
     TargetTypeDirect = 0,
     TargetTypeSynchronicCluster,
     TargetTypeSynchronicSync,
+    TargetTypeSynchronicPatternSync,
     TargetTypeNostalgic,
     TargetTypeBlendronicSync,
     TargetTypeBlendronicClear,
@@ -1063,8 +1064,9 @@ typedef enum KeymapTargetType
 
 static const std::vector<std::string> cKeymapTargetTypes = {
     "Direct",
-    "Synchronic Main",
-    "Synchronic Sync",
+    "Synchronic",
+    "Synchronic Beat Sync",
+    "Synchronic Pattern Sync",
     "Nostalgic",
     "Blendronic Sync",
     "Blendronic Clear",
