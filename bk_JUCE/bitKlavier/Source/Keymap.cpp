@@ -359,6 +359,14 @@ void Keymap::addTarget(KeymapTargetType target)
     }
 }
 
+void Keymap::addTarget(KeymapTargetType target, KeymapTargetState state)
+{
+    if (targetStates[target] == TargetStateNil)
+    {
+        targetStates.set(target, state);
+    }
+}
+
 void Keymap::removeTarget(KeymapTargetType target)
 {
     targetStates.set(target, TargetStateNil);

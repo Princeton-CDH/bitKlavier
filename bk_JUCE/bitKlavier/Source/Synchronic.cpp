@@ -310,7 +310,14 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     
     if (prep->getMode() == AnyNoteOnSync || prep->getMode() == FirstNoteOnSync)
     {
-        if (doSync) cluster->setPhasor(0);
+        //start right away
+        uint64 phasor = beatThresholdSamples *
+                        synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                        general->getPeriodMultiplier() *
+                        tempo->getPeriodMultiplier();
+        
+
+        if (doSync) cluster->setPhasor(phasor);
         if (doPatternSync) cluster->resetPhase();
     }
     

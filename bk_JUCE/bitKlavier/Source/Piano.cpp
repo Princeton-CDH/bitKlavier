@@ -559,9 +559,10 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         SynchronicProcessor::Ptr sproc = getSynchronicProcessor(thisId);
         thisPreparationMap->addSynchronicProcessor(sproc);
         
-        keymap->addTarget(TargetTypeSynchronicSync);
+        keymap->addTarget(TargetTypeSynchronicSync, TargetStateDisabled);
         keymap->addTarget(TargetTypeSynchronicCluster);
-        keymap->addTarget(TargetTypeSynchronicPatternSync);
+        keymap->addTarget(TargetTypeSynchronicPatternSync, TargetStateDisabled);
+
     }
     else if (thisType == PreparationTypeNostalgic)
     {

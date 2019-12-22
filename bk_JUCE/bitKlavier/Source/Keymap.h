@@ -290,6 +290,7 @@ public:
     void enableTarget(KeymapTargetType target);
     void disableTarget(KeymapTargetType target);
     void addTarget(KeymapTargetType target);
+    void addTarget(KeymapTargetType target, KeymapTargetState state);
     void removeTarget(KeymapTargetType target);
     void removeTargetsOfType(BKPreparationType type);
     void clearTargets(void);
