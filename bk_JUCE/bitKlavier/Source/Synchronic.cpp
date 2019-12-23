@@ -32,7 +32,7 @@ keymaps(Keymap::PtrArr())
     }
 
     inCluster = false;
-    // inSyncCluster = false;
+    pausePlay = false;
     
     keysDepressed = Array<int>();
     syncKeysDepressed = Array<int>();
@@ -230,15 +230,20 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
            eventually, we could allow targeting of individual patterns
        4. Pause/Play: stop/start incrementing phasor, all clusters (could also have Pause/Play Last, for last cluster only)
        5. Add Notes: calls cluster->addNote(noteNumber), last cluster/layer
-       6. Delete Oldest Layer:
-       7. Delete Newest Layer:
-       8. Rotate Layers: newest becomes oldest, next newest becomes newest
+       6. Remove Oldest Note?: call cluster->removeOldestNote(); a way of thinning a cluster
+            could combine with Add Notes to transform a cluster
+       7. Remove Newest Note?: call cluster->removeNewestNote()
+       8. Delete Oldest Layer:
+       9. Delete Newest Layer:
+       10. Rotate Layers: newest becomes oldest, next newest becomes newest
      
      too many? i can imagine these being useful though
     */
     bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled; // primary Synchronic mode
-    bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled; // only if resetting beat pahse
+    bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled; // only if resetting beat phase
     bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled; // only if resetting pattern phases
+    bool doAddNotes = targetStates[TargetTypeSynchronicAddNotes] == TargetStateEnabled; // if only adding notes to cluster
+    bool doPausePlay = targetStates[TargetTypeSynchronicPausePlay] == TargetStateEnabled; // if targeting pause/play
     
     // is this a new cluster?
     bool isNewCluster = false;
@@ -253,7 +258,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     SynchronicCluster::Ptr cluster = clusters.getLast();
     
     // do only if this note is targeted as a primary Synchronic note (TargetTypeSynchronicCluster)
-    if (doCluster)
+    if (doCluster && !pausePlay)
     {
         // OnOffMode determines whether the keyOffs or keyOns determine whether notes are within the cluster threshold
         // here, we only look at keyOns
@@ -316,6 +321,12 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
         
         if (doSync) cluster->setBeatPhasor(phasor);      // resetBeatPhasor resets beat timing
         if (doPatternSync) cluster->resetPatternPhase(); // resetPatternPhase() starts patterns over
+        if (doAddNotes) cluster->addNote(noteNumber);    // add notes to the cluster
+        if (doPausePlay)                                 // toggle pause/play
+        {
+            if (pausePlay) pausePlay = false;
+            else pausePlay = true;
+        }
     }
 }
 
@@ -330,6 +341,8 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled;
     bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled;
     bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled;
+    bool doAddNotes = targetStates[TargetTypeSynchronicAddNotes] == TargetStateEnabled;
+    bool doPausePlay = targetStates[TargetTypeSynchronicPausePlay] == TargetStateEnabled;
     
     // is this a new cluster?
     bool isNewCluster = false;
@@ -345,7 +358,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     SynchronicCluster::Ptr cluster = clusters.getLast();
     
     // do only if this note is targeted as a primary Synchronic note (TargetTypeSynchronicCluster)
-    if (doCluster)
+    if (doCluster && !pausePlay)
     {
         // cluster management
         // OnOffMode determines whether the timing of keyOffs or keyOns determine whether notes are within the cluster threshold
@@ -412,7 +425,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     // we should have a cluster now, but if not...
     if (cluster == nullptr) return;
     
-    // if in one of the noteOff modes, handle targeting
+    // if in one of the noteOff modes, handle targeting. Change this to individual noteOn/noteOff targeting
     if ((synchronic->aPrep->getMode() == FirstNoteOffSync ||
         (synchronic->aPrep->getMode() == AnyNoteOffSync)  ||
         (synchronic->aPrep->getMode() == LastNoteOffSync) ))
@@ -435,12 +448,25 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             cluster->setShouldPlay(true);
             cluster->resetPatternPhase();
         }
+        
+        // if add notes
+        if (doAddNotes) cluster->addNote(noteNumber);
+        
+        // toggle pause/play
+        if (doPausePlay)
+        {
+            if (pausePlay) pausePlay = false;
+            else pausePlay = true;
+        }
     }
 }
 
     
 void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoadType type)
 {
+    // don't do anything if we are paused!
+    if (pausePlay) return;
+    
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
@@ -461,8 +487,6 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     {
         beatThresholdSamples = (tempoPrep->getBeatThresh() / tempoPrep->getSubdivisions() * sampleRate);
     }
-    
-    
     
     for (auto key : keysDepressed)
     {
@@ -581,7 +605,6 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                 }
                 
                 // step cluster data
-                //cluster->step(numSamplesBeat);
                 cluster->postStep();
                 
             }

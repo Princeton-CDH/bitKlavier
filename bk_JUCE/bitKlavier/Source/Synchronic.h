@@ -1487,6 +1487,8 @@ private:
     bool inCluster;
     // bool inSyncCluster;
     bool nextOffIsFirst;
+    
+    bool pausePlay; // pause phasor incrementing
 
     uint64 thresholdSamples;
     uint64 clusterThresholdTimer;

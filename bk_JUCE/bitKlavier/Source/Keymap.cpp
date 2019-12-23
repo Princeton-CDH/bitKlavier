@@ -384,6 +384,8 @@ void Keymap::removeTargetsOfType(BKPreparationType type)
         removeTarget(TargetTypeSynchronicSync);
         removeTarget(TargetTypeSynchronicCluster);
         removeTarget(TargetTypeSynchronicPatternSync);
+        removeTarget(TargetTypeSynchronicAddNotes);
+        removeTarget(TargetTypeSynchronicPausePlay);
     }
     else if (type == PreparationTypeNostalgic)
     {
