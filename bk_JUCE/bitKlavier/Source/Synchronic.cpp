@@ -230,6 +230,11 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
            eventually, we could allow targeting of individual patterns
        4. Pause/Play: stop/start incrementing phasor, all clusters (could also have Pause/Play Last, for last cluster only)
        5. Add Notes: calls cluster->addNote(noteNumber), last cluster/layer
+       6. Delete Oldest Layer:
+       7. Delete Newest Layer:
+       8. Rotate Layers: newest becomes oldest, next newest becomes newest
+     
+     too many? i can imagine these being useful though
     */
     bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled; // primary Synchronic mode
     bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled; // only if resetting beat pahse
@@ -280,7 +285,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
             // reset the timer for time between notes; we do this for every note added to a cluster
             clusterThresholdTimer = 0;
             
-            // reset the beat phase and pattern phase, depending on the mode
+            // reset the beat phase and pattern phase, and start playing, depending on the mode
             if ((prep->getMode() == AnyNoteOnSync) ||
                 (prep->getMode() == FirstNoteOnSync && isNewCluster))
             {
@@ -377,7 +382,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             clusterThresholdTimer = 0;
         }
             
-        // depending on the mode, and whether this is a first or last note, reset the beat and pattern phase
+        // depending on the mode, and whether this is a first or last note, reset the beat and pattern phase and start playing
         if ((synchronic->aPrep->getMode() == FirstNoteOffSync && nextOffIsFirst) ||
             (synchronic->aPrep->getMode() == AnyNoteOffSync) ||
             (synchronic->aPrep->getMode() == LastNoteOffSync && clusterKeysDepressed.size() == 0))
@@ -407,7 +412,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     // we should have a cluster now, but if not...
     if (cluster == nullptr) return;
     
-    // if in one of the noteOff modes
+    // if in one of the noteOff modes, handle targeting
     if ((synchronic->aPrep->getMode() == FirstNoteOffSync ||
         (synchronic->aPrep->getMode() == AnyNoteOffSync)  ||
         (synchronic->aPrep->getMode() == LastNoteOffSync) ))
