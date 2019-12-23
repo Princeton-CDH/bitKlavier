@@ -1046,7 +1046,7 @@ private:
 
 
 /*
- This class emables layers of Synchronic pulses by
+ This class enables layers of Synchronic pulses by
  maintaining a set of counters moving through all the
  primary multi-parameters (accents, transpositions, etc...)
  and by updating timers for each Synchronic independently
@@ -1131,7 +1131,7 @@ public:
         return counter;
     }
     
-    inline void setPhasor(uint64 c)  { phasor = c; }
+    inline void setBeatPhasor(uint64 c)  { phasor = c; }
     inline void setBeatMultiplierCounter(int c) {  beatMultiplierCounter = c; }
     inline void setAccentMultiplierCounter(int c)  { accentMultiplierCounter = c; }
     inline void setLengthMultiplierCounter(int c)  { lengthMultiplierCounter = c; }
@@ -1210,7 +1210,7 @@ public:
         }
     }
     
-    inline void resetPhase()
+    inline void resetPatternPhase()
     {
 //        int skipBeats = prep->getBeatsToSkip();
 //        int idx = (skipBeats < 0) ? 0 : skipBeats;
@@ -1484,8 +1484,9 @@ private:
     Array<int> patternSyncKeysDepressed;
     bool playCluster;
     
-    bool inCluster, inSyncCluster;
-    bool nextSyncOffIsFirst;
+    bool inCluster;
+    // bool inSyncCluster;
+    bool nextOffIsFirst;
 
     uint64 thresholdSamples;
     uint64 clusterThresholdTimer;
