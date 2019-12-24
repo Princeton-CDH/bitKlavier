@@ -222,21 +222,23 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     // track the note's target, as set in Keymap
     /*
     Keymap Target modes:
-       1. Synchronic: current functionality; launches clusters/layers, syncs, etc.... (doCluster)
-       2. Beat Sync: calls cluster->setPhasor(0), regardless of aPrep->getMode(), last cluster/layer (doSync)
-       3. Pattern Sync: calls cluster->resetPhase(), regardless of aPrep->getMode(), last cluster/layer (doPatternSync)
-           eventually, we could allow targeting of individual patterns
-       4. Pause/Play: stop/start incrementing phasor, all clusters (could also have Pause/Play Last, for last cluster only)
-       5. Add Notes: calls cluster->addNote(noteNumber), last cluster/layer
-       6. Remove Oldest Note?: call cluster->removeOldestNote(); a way of thinning a cluster
+       01. Synchronic: current functionality; launches clusters/layers, syncs, etc.... (doCluster)
+       02. Beat Sync: calls cluster->setPhasor(0), regardless of aPrep->getMode(), last cluster/layer (doSync)
+       03. Pattern Sync: calls cluster->resetPhase(), regardless of aPrep->getMode(), last cluster/layer (doPatternSync)
+            eventually, we could allow targeting of individual patterns
+       04. Pause/Play: stop/start incrementing phasor, all clusters (could also have Pause/Play Last, for last cluster only)
+       05. Add Notes: calls cluster->addNote(noteNumber), last cluster/layer
+       06. Remove Oldest Note?: call cluster->removeOldestNote(); a way of thinning a cluster
             could combine with Add Notes to transform a cluster
-       7. Remove Newest Note?: call cluster->removeNewestNote()
-       8. Delete Oldest Layer:
-       9. Delete Newest Layer:
+       07. Remove Newest Note?: call cluster->removeNewestNote()
+       08. Delete Oldest Layer:
+       09. Delete Newest Layer:
        10. Rotate Layers: newest becomes oldest, next newest becomes newest
+       11. Remove All Layers: essentially a Stop function
      
      too many? i can imagine these being useful though
     */
+    
     bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled; // primary Synchronic mode
     bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled; // only if resetting beat phase
     bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled; // only if resetting pattern phases
@@ -305,29 +307,6 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     // since it's a new cluster, the next noteOff will be a first noteOff
     // this will be needed for keyReleased(), when in FirstNoteOffSync mode
     if (isNewCluster) nextOffIsFirst = true;
-
-    /*
-    // doSync and doPatternSync targets happen in any KeyOn state (not cluster-timing dependent)
-    // check them now, and reset the phase if note is targeted to doSync, and
-    // reset the patterns to their start if note is targeted to doPatternSync
-    if (prep->getMode() == AnyNoteOnSync || prep->getMode() == FirstNoteOnSync)
-    {
-        //start right away
-        uint64 phasor = beatThresholdSamples *
-                        synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
-                        general->getPeriodMultiplier() *
-                        tempo->getPeriodMultiplier();
-        
-        if (doSync) cluster->setBeatPhasor(phasor);      // resetBeatPhasor resets beat timing
-        if (doPatternSync) cluster->resetPatternPhase(); // resetPatternPhase() starts patterns over
-        if (doAddNotes) cluster->addNote(noteNumber);    // add notes to the cluster
-        if (doPausePlay)                                 // toggle pause/play
-        {
-            if (pausePlay) pausePlay = false;
-            else pausePlay = true;
-        }
-    }
-     */
     
     // ** now trigger behaviors set by Keymap targeting **
     //
@@ -452,44 +431,6 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     // we should have a cluster now, but if not...
     if (cluster == nullptr) return;
-    
-    /*
-    // if in one of the noteOff modes, handle targeting.
-    // Change this to individual noteOn/noteOff targeting (or both, for momentary latch behavior)
-    if ((synchronic->aPrep->getMode() == FirstNoteOffSync ||
-        (synchronic->aPrep->getMode() == AnyNoteOffSync)  ||
-        (synchronic->aPrep->getMode() == LastNoteOffSync) ))
-    {
-        // if reset the beat
-        if (doSync)
-        {
-            uint64 phasor = beatThresholdSamples *
-                            synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
-                            general->getPeriodMultiplier() *
-                            tempo->getPeriodMultiplier();
-            
-            cluster->setShouldPlay(true);
-            cluster->setBeatPhasor(phasor);
-        }
-        
-        // if reset the patterns
-        if (doPatternSync)
-        {
-            cluster->setShouldPlay(true);
-            cluster->resetPatternPhase();
-        }
-        
-        // if add notes
-        if (doAddNotes) cluster->addNote(noteNumber);
-        
-        // toggle pause/play
-        if (doPausePlay)
-        {
-            if (pausePlay) pausePlay = false;
-            else pausePlay = true;
-        }
-    }
-     */
     
     // ** now trigger behaviors set by Keymap targeting **
     //
