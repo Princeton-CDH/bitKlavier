@@ -35,9 +35,7 @@ keymaps(Keymap::PtrArr())
     pausePlay = false;
     
     keysDepressed = Array<int>();
-    syncKeysDepressed = Array<int>();
     clusterKeysDepressed = Array<int>();
-    patternSyncKeysDepressed = Array<int>();
     
     activeSynchronicVoices = Array<BKSynthesiserVoice*>();
     activeSynchronicVoices.resize(128);
@@ -308,6 +306,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     // this will be needed for keyReleased(), when in FirstNoteOffSync mode
     if (isNewCluster) nextOffIsFirst = true;
 
+    /*
     // doSync and doPatternSync targets happen in any KeyOn state (not cluster-timing dependent)
     // check them now, and reset the phase if note is targeted to doSync, and
     // reset the patterns to their start if note is targeted to doPatternSync
@@ -328,6 +327,35 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
             else pausePlay = true;
         }
     }
+     */
+    
+    // ** now trigger behaviors set by Keymap targeting **
+    //
+    // synchronize beat, if targeting beat sync on noteOn or on both noteOn/Off
+    if (doSync && (prep->getTargetTypeSynchronicSync() == NoteOn || prep->getTargetTypeSynchronicSync() == Both))
+    {
+        //start right away
+        uint64 phasor = beatThresholdSamples *
+                        synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                        general->getPeriodMultiplier() *
+                        tempo->getPeriodMultiplier();
+        
+        cluster->setBeatPhasor(phasor);      // resetBeatPhasor resets beat timing
+    }
+    
+    // resetPatternPhase() starts patterns over, if targeting beat sync on noteOn or on both noteOn/Off
+    if (doPatternSync && (prep->getTargetTypeSynchronicPatternSync() == NoteOn || prep->getTargetTypeSynchronicPatternSync() == Both))   cluster->resetPatternPhase();
+    
+    // add notes to the cluster, if targeting beat sync on noteOn or on both noteOn/Off
+    if (doAddNotes && (prep->getTargetTypeSynchronicAddNotes() == NoteOn || prep->getTargetTypeSynchronicAddNotes() == Both))      cluster->addNote(noteNumber);
+    
+    // toggle pause/play, if targeting beat sync on noteOn or on both noteOn/Off
+    if (doPausePlay && (prep->getTargetTypeSynchronicPausePlay() == NoteOn || prep->getTargetTypeSynchronicPausePlay() == Both))
+    {
+        if (pausePlay) pausePlay = false;
+        else pausePlay = true;
+    }
+    
 }
 
 void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel, Array<KeymapTargetState> targetStates)
@@ -425,7 +453,9 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     // we should have a cluster now, but if not...
     if (cluster == nullptr) return;
     
-    // if in one of the noteOff modes, handle targeting. Change this to individual noteOn/noteOff targeting
+    /*
+    // if in one of the noteOff modes, handle targeting.
+    // Change this to individual noteOn/noteOff targeting (or both, for momentary latch behavior)
     if ((synchronic->aPrep->getMode() == FirstNoteOffSync ||
         (synchronic->aPrep->getMode() == AnyNoteOffSync)  ||
         (synchronic->aPrep->getMode() == LastNoteOffSync) ))
@@ -458,6 +488,39 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
             if (pausePlay) pausePlay = false;
             else pausePlay = true;
         }
+    }
+     */
+    
+    // ** now trigger behaviors set by Keymap targeting **
+    //
+    // synchronize beat, if targeting beat sync on noteOff or on both noteOn/Off
+    if (doSync && (prep->getTargetTypeSynchronicSync() == NoteOff || prep->getTargetTypeSynchronicSync() == Both))
+    {
+        //start right away
+        uint64 phasor = beatThresholdSamples *
+                        synchronic->aPrep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                        general->getPeriodMultiplier() *
+                        tempo->getPeriodMultiplier();
+        
+        cluster->setBeatPhasor(phasor);      // resetBeatPhasor resets beat timing
+        cluster->setShouldPlay(true);
+    }
+    
+    // resetPatternPhase() starts patterns over, if targeting beat sync on noteOff or on both noteOn/Off
+    if (doPatternSync && (prep->getTargetTypeSynchronicPatternSync() == NoteOff || prep->getTargetTypeSynchronicPatternSync() == Both))
+    {
+        cluster->resetPatternPhase();
+        cluster->setShouldPlay(true);
+    }
+    
+    // add notes to the cluster, if targeting beat sync on noteOff or on both noteOn/Off
+    if (doAddNotes && (prep->getTargetTypeSynchronicAddNotes() == NoteOff || prep->getTargetTypeSynchronicAddNotes() == Both))      cluster->addNote(noteNumber);
+    
+    // toggle pause/play, if targeting beat sync on noteOff or on both noteOn/Off
+    if (doPausePlay && (prep->getTargetTypeSynchronicPausePlay() == NoteOff || prep->getTargetTypeSynchronicPausePlay() == Both))
+    {
+        if (pausePlay) pausePlay = false;
+        else pausePlay = true;
     }
 }
 

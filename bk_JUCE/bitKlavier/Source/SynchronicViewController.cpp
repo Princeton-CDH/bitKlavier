@@ -15,7 +15,7 @@
 #include "Synchronic.h"
 
 SynchronicViewController::SynchronicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 2)
+BKViewController(p, theGraph, 3) // third argument => number of tabs
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
@@ -83,6 +83,27 @@ BKViewController(p, theGraph, 2)
     showADSR = false;
     visibleADSR = 0;
     
+    // Target Control CBs
+    targetControlCBs = OwnedArray<BKComboBox>();
+    for (int i=TargetTypeSynchronicSync; i<=TargetTypeSynchronicPausePlay; i++)
+    {
+        targetControlCBs.insert(-1, new BKComboBox()); // insert at the end of the array
+        targetControlCBs.getLast()->setName(cKeymapTargetTypes[i]);
+        targetControlCBs.getLast()->addListener(this);
+        targetControlCBs.getLast()->setLookAndFeel(&comboBoxRightJustifyLAF);
+        targetControlCBs.getLast()->addItem(cTargetNoteModes[TargetNoteMode::NoteOn], TargetNoteMode::NoteOn + 1);
+        targetControlCBs.getLast()->addItem(cTargetNoteModes[TargetNoteMode::NoteOff], TargetNoteMode::NoteOff + 1);
+        targetControlCBs.getLast()->addItem(cTargetNoteModes[TargetNoteMode::Both], TargetNoteMode::Both + 1);
+        targetControlCBs.getLast()->setSelectedItemIndex(0, dontSendNotification);
+        addAndMakeVisible(targetControlCBs.getLast(), ALL);
+        
+        targetControlCBLabels.insert(-1, new BKLabel());
+        targetControlCBLabels.getLast()->setText(cKeymapTargetTypes[i], dontSendNotification);
+        addAndMakeVisible(targetControlCBLabels.getLast(), ALL);
+        
+    }
+
+    // Shared combo boxes
     selectCB.setName("Synchronic");
     selectCB.addSeparator();
     selectCB.addListener(this);
@@ -233,6 +254,12 @@ void SynchronicViewController::invisible(void)
         paramSliders[i]->setVisible(false);
     }
     
+    for (int i=0; i<targetControlCBs.size(); i++)
+    {
+        targetControlCBs[i]->setVisible(false);
+        targetControlCBLabels[i]->setVisible(false);
+    }
+    
     envelopeName.setVisible(false);
     for(int i=envelopeSliders.size() - 1; i>=0; i--)
     {
@@ -240,25 +267,16 @@ void SynchronicViewController::invisible(void)
     }
     
     clusterMinMaxSlider->setVisible(false);
-    
     clusterThreshSlider->setVisible(false);
-    
     clusterCapSlider->setVisible(false);
-    
     holdTimeMinMaxSlider->setVisible(false);
-    
     velocityMinMaxSlider->setVisible(false);
-    
     numClusterSlider->setVisible(false);
-    
     howManySlider->setVisible(false);
-    
     modeLabel.setVisible(false);
     modeSelectCB.setVisible(false);
-    
     onOffLabel.setVisible(false);
     onOffSelectCB.setVisible(false);
-    
     releaseVelocitySetsSynchronicToggle.setVisible(false);
 }
 
@@ -386,54 +404,19 @@ void SynchronicViewController::displayTab(int tab)
     {
         // SET VISIBILITY
         gainSlider->setVisible(true);
-        
         clusterMinMaxSlider->setVisible(true);
-        
         clusterThreshSlider->setVisible(true);
-        
         clusterCapSlider->setVisible(true);
-        
         holdTimeMinMaxSlider->setVisible(true);
-        
         velocityMinMaxSlider->setVisible(true);
-        
         numClusterSlider->setVisible(true);
-        
         howManySlider->setVisible(true);
-        
         modeLabel.setVisible(true);
         modeSelectCB.setVisible(true);
-        
         onOffLabel.setVisible(true);
         onOffSelectCB.setVisible(true);
-        
         iconImageComponent.toBack();
-        
-        //releaseVelocitySetsSynchronicToggle.setVisible(true);
-        
-        // SET BOUNDS
-        /*
-        int sliderHeight = height * 0.2f;
-        int sliderWidth = width * 0.5f - gXSpacing;
-        
-        int idx = 0;
-        gainSlider->setBounds(col1x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
-        clusterThreshSlider->setBounds(col1x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
-        clusterMinMaxSlider->setBounds(col1x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
-        holdTimeMinMaxSlider->setBounds(col1x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
-        velocityMinMaxSlider->setBounds(col1x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
-        
-        idx = 0;
-        howManySlider->setBounds(col2x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
-        numClusterSlider->setBounds(col2x, y0 + (idx++) * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
-        
-        
-        modeSelectCB.setBounds(col2x, numClusterSlider->getBottom() + gYSpacing, 200, 30);
-        modeLabel.setBounds(modeSelectCB.getRight()+gXSpacing, modeSelectCB.getY(), 150, 30);
-        
-        onOffSelectCB.setBounds(col2x, modeSelectCB.getBottom() + 40, 200, 30);
-        onOffLabel.setBounds(modeSelectCB.getRight()+gXSpacing, onOffSelectCB.getY(), 150, 30);
-        */
+
         Rectangle<int> area (getBounds());
         //area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
@@ -447,29 +430,6 @@ void SynchronicViewController::displayTab(int tab)
         
         area.removeFromLeft(processor.paddingScalarX * 20); //area is now right column
         area.removeFromRight(processor.paddingScalarX * 20);
-        
-        /*
-        int columnHeight = leftColumn.getHeight();
-        
-        Rectangle<int> modeSelectCBRect (leftColumn.removeFromTop(columnHeight / 4));
-        Rectangle<int> modeSelectLabel (modeSelectCBRect.removeFromRight(modeSelectCBRect.getWidth()*0.5));
-        modeSelectCB.setBounds(modeSelectCBRect.removeFromTop(gComponentComboBoxHeight));
-        modeLabel.setBounds(modeSelectLabel.removeFromTop(gComponentComboBoxHeight));
-        modeSelectCBRect.removeFromTop(gYSpacing);
-        modeSelectLabel.removeFromTop(gYSpacing);
-        onOffSelectCB.setBounds(modeSelectCBRect.removeFromTop(gComponentComboBoxHeight));
-        onOffLabel.setBounds(modeSelectLabel.removeFromTop(gComponentComboBoxHeight));
-        
-        howManySlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
-        numClusterSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
-        gainSlider->setBounds(leftColumn.removeFromTop(columnHeight / 4));
-        
-        clusterThreshSlider->setBounds(area.removeFromTop(columnHeight / 5));
-        clusterMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 5));
-        clusterCapSlider->setBounds(area.removeFromTop(columnHeight / 5));
-        holdTimeMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 5));
-        velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 5));
-        */
         
         Rectangle<int> modeSelectCBRect (leftColumn.removeFromTop(gComponentComboBoxHeight));
         Rectangle<int> modeSelectLabel (modeSelectCBRect.removeFromLeft(modeSelectCBRect.getWidth()*0.5));
@@ -497,6 +457,42 @@ void SynchronicViewController::displayTab(int tab)
         velocityMinMaxSlider->setBounds(area.removeFromTop(columnHeight / 4));
         
         releaseVelocitySetsSynchronicToggle.setVisible(true);
+    }
+    else if (tab == 2) // keymap target tab
+    {
+        // make the combo boxes visible
+        for (int i=0; i<targetControlCBs.size(); i++)
+        {
+            targetControlCBs[i]->setVisible(true);
+            targetControlCBLabels[i]->setVisible(true);
+        }
+        
+        Rectangle<int> area (getBounds());
+        area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
+    
+        Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth() * 0.5));
+        leftColumn.removeFromLeft(leftColumn.getWidth() * 0.5);
+        
+        leftColumn.removeFromRight(processor.paddingScalarX * 5);
+        leftColumn.removeFromLeft(processor.paddingScalarX * 20);
+        
+        area.removeFromLeft(processor.paddingScalarX * 5); //area is now right column
+        area.removeFromRight(processor.paddingScalarX * 20);
+        
+        int targetControlCBSection = (gComponentComboBoxHeight + gYSpacing) * targetControlCBs.size();
+        leftColumn.removeFromTop((leftColumn.getHeight() - targetControlCBSection) / 3.);
+        area.removeFromTop((area.getHeight() - targetControlCBSection) / 3.);
+        
+        for (int i=0; i<targetControlCBs.size(); i++)
+        {
+            targetControlCBs[i]->setBounds(leftColumn.removeFromTop(gComponentComboBoxHeight));
+            leftColumn.removeFromTop(gYSpacing);
+            
+            targetControlCBLabels[i]->setBounds(area.removeFromTop(gComponentComboBoxHeight));
+            area.removeFromTop(gYSpacing);
+        }
     }
 }
 
@@ -1008,6 +1004,11 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         gainSlider->setValue(prep->getGain(), notify);
         numClusterSlider->setValue(prep->getNumClusters(), notify);
         
+        targetControlCBs[0]->setSelectedItemIndex(prep->getTargetTypeSynchronicSync(), notify);
+        targetControlCBs[1]->setSelectedItemIndex(prep->getTargetTypeSynchronicPatternSync(), notify);
+        targetControlCBs[2]->setSelectedItemIndex(prep->getTargetTypeSynchronicAddNotes(), notify);
+        targetControlCBs[3]->setSelectedItemIndex(prep->getTargetTypeSynchronicPausePlay(), notify);
+        
         for(int i = 0; i < paramSliders.size(); i++)
         {
             if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
@@ -1182,7 +1183,6 @@ void SynchronicPreparationEditor::fillMidiOutputSelectCB()
         midiOutputSelectCB.setItemEnabled(Id++, true);
     }
 }
-
 
 int SynchronicPreparationEditor::addPreparation(void)
 {
@@ -1377,6 +1377,41 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         }
         
         fillMidiOutputSelectCB();
+    }
+    else // target combo boxes from tab 3
+    {
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        
+        for (int i=0; i<targetControlCBs.size(); i++)
+        {
+            if (box == targetControlCBs[i])
+            {
+                int selectedItem = targetControlCBs[i]->getSelectedId() - 1;
+                DBG(targetControlCBs[i]->getName() + " " + cTargetNoteModes[selectedItem]);
+                
+                if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicSync])
+                {
+                    prep    ->setTargetTypeSynchronicSync((TargetNoteMode)selectedItem);
+                    active  ->setTargetTypeSynchronicSync((TargetNoteMode)selectedItem);
+                }
+                else if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicPatternSync])
+                {
+                    prep    ->setTargetTypeSynchronicPatternSync((TargetNoteMode)selectedItem);
+                    active  ->setTargetTypeSynchronicPatternSync((TargetNoteMode)selectedItem);
+                }
+                else if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicAddNotes])
+                {
+                    prep    ->setTargetTypeSynchronicAddNotes((TargetNoteMode)selectedItem);
+                    active  ->setTargetTypeSynchronicAddNotes((TargetNoteMode)selectedItem);
+                }
+                else if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicPausePlay])
+                {
+                    prep    ->setTargetTypeSynchronicPausePlay((TargetNoteMode)selectedItem);
+                    active  ->setTargetTypeSynchronicPausePlay((TargetNoteMode)selectedItem);
+                }
+            }
+        }
     }
 }
 

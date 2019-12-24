@@ -454,6 +454,19 @@ static const std::vector<std::string> cGeneralParameterTypes = {
     
 };
 
+typedef enum TargetNoteMode {
+    NoteOn = 0,
+    NoteOff,
+    Both,
+    TargetNoteModeNil
+} TargetNoteMode;
+
+static const std::vector<std::string> cTargetNoteModes = {
+    "Note-On",
+    "Note-Off",
+    "Both"
+};
+
 #pragma mark - Synchronic
 
 typedef enum SynchronicOnOffMode {
@@ -1070,7 +1083,7 @@ static const std::vector<std::string> cKeymapTargetTypes = {
     "Synchronic Beat Sync",
     "Synchronic Pattern Sync",
     "Synchronic Add Notes",
-    "Synchronic Pause / Play",
+    "Synchronic Pause-Play",
     "Nostalgic",
     "Blendronic Sync",
     "Blendronic Clear",

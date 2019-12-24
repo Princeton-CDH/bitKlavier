@@ -68,6 +68,10 @@ public:
     sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic()),
     numClusters(1),
     onOffMode(KeyOn),
+    targetTypeSynchronicSync(p->getTargetTypeSynchronicSync()),
+    targetTypeSynchronicPatternSync(p->getTargetTypeSynchronicPatternSync()),
+    targetTypeSynchronicAddNotes(p->getTargetTypeSynchronicAddNotes()),
+    targetTypeSynchronicPausePlay(p->getTargetTypeSynchronicPausePlay()),
     midiOutput(p->getMidiOutput())
     {
         
@@ -104,6 +108,10 @@ public:
     velocityMax(127),
     numClusters(1),
     onOffMode(KeyOn),
+    targetTypeSynchronicSync(NoteOn),
+    targetTypeSynchronicPatternSync(NoteOn),
+    targetTypeSynchronicAddNotes(NoteOn),
+    targetTypeSynchronicPausePlay(NoteOn),
     midiOutput(nullptr)
     {
     }
@@ -133,6 +141,10 @@ public:
     velocityMax(127),
     numClusters(1),
     onOffMode(KeyOn),
+    targetTypeSynchronicSync(NoteOn),
+    targetTypeSynchronicPatternSync(NoteOn),
+    targetTypeSynchronicAddNotes(NoteOn),
+    targetTypeSynchronicPausePlay(NoteOn),
     midiOutput(nullptr)
     {
         sTransposition.ensureStorageAllocated(1);
@@ -171,6 +183,11 @@ public:
         
         velocityMin = s->getVelocityMin();
         velocityMax = s->getVelocityMax();
+        
+        targetTypeSynchronicSync = s->getTargetTypeSynchronicSync();
+        targetTypeSynchronicPatternSync = s->getTargetTypeSynchronicPatternSync();
+        targetTypeSynchronicAddNotes = s->getTargetTypeSynchronicAddNotes();
+        targetTypeSynchronicPausePlay = s->getTargetTypeSynchronicPausePlay();
         
         midiOutput = s->getMidiOutput();
     }
@@ -332,7 +349,12 @@ public:
                 holdMin == s->getHoldMin() &&
                 holdMax == s->getHoldMax() &&
                 velocityMin == s->getVelocityMin() &&
-                velocityMax == s->getVelocityMax());
+                velocityMax == s->getVelocityMax() &&
+                targetTypeSynchronicSync == s->getTargetTypeSynchronicSync() &&
+                targetTypeSynchronicPatternSync == s->getTargetTypeSynchronicPatternSync() &&
+                targetTypeSynchronicAddNotes == s->getTargetTypeSynchronicAddNotes() &&
+                targetTypeSynchronicPausePlay == s->getTargetTypeSynchronicPausePlay());
+                
     }
 
     // for unit-testing
@@ -523,6 +545,16 @@ public:
     inline const int getVelocityMin() const noexcept { return velocityMin; }
     inline const int getVelocityMax() const noexcept { return velocityMax; }
     
+    inline const TargetNoteMode getTargetTypeSynchronicSync() const noexcept { return targetTypeSynchronicSync; }
+    inline const TargetNoteMode getTargetTypeSynchronicPatternSync() const noexcept { return targetTypeSynchronicPatternSync; }
+    inline const TargetNoteMode getTargetTypeSynchronicAddNotes() const noexcept { return targetTypeSynchronicAddNotes; }
+    inline const TargetNoteMode getTargetTypeSynchronicPausePlay() const noexcept { return targetTypeSynchronicPausePlay; }
+    
+    inline void setTargetTypeSynchronicSync(TargetNoteMode nm)          { targetTypeSynchronicSync = nm; }
+    inline void setTargetTypeSynchronicPatternSync(TargetNoteMode nm)   { targetTypeSynchronicPatternSync = nm; }
+    inline void setTargetTypeSynchronicAddNotes(TargetNoteMode nm)      { targetTypeSynchronicAddNotes = nm; }
+    inline void setTargetTypeSynchronicPausePlay(TargetNoteMode nm)     { targetTypeSynchronicPausePlay = nm; }
+    
     inline const void setVelocityMin(int min)
     {
         velocityMin = min;
@@ -649,7 +681,14 @@ public:
         
         prep.setProperty( "velocityMin", getVelocityMin(), 0);
         prep.setProperty( "velocityMax", getVelocityMax(), 0);
-        
+
+
+        prep.setProperty( "targetTypeSynchronicSync", getTargetTypeSynchronicSync(), 0);
+        prep.setProperty( "targetTypeSynchronicPatternSync", getTargetTypeSynchronicPatternSync(), 0);
+        prep.setProperty( "targetTypeSynchronicAddNotes", getTargetTypeSynchronicAddNotes(), 0);
+        prep.setProperty( "targetTypeSynchronicPausePlay", getTargetTypeSynchronicPausePlay(), 0);
+
+                 
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
         for (auto f : getBeatMultipliers())
@@ -756,15 +795,25 @@ public:
         setBeatsToSkip(i);
         
         n = e->getStringAttribute("numClusters");
-        
         if (n != String())     setNumClusters(n.getIntValue());
-        else                        setNumClusters(1);
+        else                   setNumClusters(1);
         
         n = e->getStringAttribute("onOffMode");
-        
         if (n != String())     setOnOffMode((SynchronicOnOffMode) n.getIntValue());
-        else                        setOnOffMode(KeyOn);
+        else                   setOnOffMode(KeyOn);
+
+        i = e->getStringAttribute("targetTypeSynchronicSync").getIntValue();
+        setTargetTypeSynchronicSync((TargetNoteMode)i);
         
+        i = e->getStringAttribute("targetTypeSynchronicPatternSync").getIntValue();
+        setTargetTypeSynchronicPatternSync((TargetNoteMode)i);
+        
+        i = e->getStringAttribute("targetTypeSynchronicAddNotes").getIntValue();
+        setTargetTypeSynchronicAddNotes((TargetNoteMode)i);
+        
+        i = e->getStringAttribute("targetTypeSynchronicPausePlay").getIntValue();
+        setTargetTypeSynchronicPausePlay((TargetNoteMode)i);
+ 
         forEachXmlChildElement (*e, sub)
         {
             if (sub->hasTagName(vtagSynchronic_beatMults))
@@ -902,13 +951,18 @@ private:
     Array<int> sReleases;
     Array<bool> envelopeOn;
     
-
     float sGain;               //gain multiplier
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
     bool sReleaseVelocitySetsSynchronic;
     
+    // stores what kind of note event triggers targeted events (as set in Keymap)
+    TargetNoteMode targetTypeSynchronicSync;
+    TargetNoteMode targetTypeSynchronicPatternSync;
+    TargetNoteMode targetTypeSynchronicAddNotes;
+    TargetNoteMode targetTypeSynchronicPausePlay;
+
     std::shared_ptr<MidiOutput> midiOutput;
 
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
@@ -1147,36 +1201,6 @@ public:
         phasor += numSamples;
     }
     
-    /*
-    inline void step (uint64 numSamplesBeat)
-    {
-        phasor -= numSamplesBeat;
-        
-        //increment parameter counters
-        if (++lengthMultiplierCounter   >= prep->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
-        if (++accentMultiplierCounter   >= prep->getAccentMultipliers().size())     accentMultiplierCounter = 0;
-        if (++transpCounter             >= prep->getTransposition().size())         transpCounter = 0;
-        if (++envelopeCounter           >= prep->getEnvelopesOn().size())           envelopeCounter = 0;
-        
-        while(!prep->getEnvelopesOn()[envelopeCounter]) //skip untoggled envelopes
-        {
-            envelopeCounter++;
-            if (envelopeCounter >= prep->getEnvelopesOn().size()) envelopeCounter = 0;
-        }
-        
-        
-        if (++beatMultiplierCounter >= prep->getBeatMultipliers().size())
-        {
-            //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
-            beatMultiplierCounter = 0;
-        }
-
-        if (++beatCounter >= (prep->getNumBeats() + prep->getBeatsToSkip()))
-        {
-            shouldPlay = false;
-        }
-    }
-     */
     inline void step (uint64 numSamplesBeat)
     {
         phasor -= numSamplesBeat;
@@ -1212,18 +1236,8 @@ public:
     
     inline void resetPatternPhase()
     {
-//        int skipBeats = prep->getBeatsToSkip();
-//        int idx = (skipBeats < 0) ? 0 : skipBeats;
         int skipBeats = prep->getBeatsToSkip() - 1;
         int idx = (skipBeats < -1) ? -1 : skipBeats;
-        
-        /*
-        if(prep->getBeatMultipliers().size() > 0)   beatMultiplierCounter   = idx % prep->getBeatMultipliers().size();
-        if(prep->getLengthMultipliers().size() > 0) lengthMultiplierCounter = idx % prep->getLengthMultipliers().size();
-        if(prep->getAccentMultipliers().size() > 0) accentMultiplierCounter = idx % prep->getAccentMultipliers().size();
-        if(prep->getTransposition().size() > 0)     transpCounter           = idx % prep->getTransposition().size();
-        if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = idx % prep->getEnvelopesOn().size();
-        */
         
         if(prep->getBeatMultipliers().size() > 0)   beatMultiplierCounter   = mod(idx, prep->getBeatMultipliers().size());
         if(prep->getLengthMultipliers().size() > 0) lengthMultiplierCounter = mod(idx, prep->getLengthMultipliers().size());
@@ -1232,8 +1246,7 @@ public:
         if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = mod(idx, prep->getEnvelopesOn().size());
 
         DBG("beatMultiplierCounter = " + String(beatMultiplierCounter));
-        
-        //beatCounter             = skipBeats;
+
         beatCounter             = 0;
     }
     
@@ -1244,7 +1257,6 @@ public:
     inline void addNote(int note)
     {
         DBG("adding note: " + String(note));
-        //cluster.add(note);
         cluster.insert(0, note);
     }
     

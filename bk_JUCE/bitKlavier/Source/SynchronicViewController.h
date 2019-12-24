@@ -91,12 +91,12 @@ protected:
     }
     
     BKEditableComboBox selectCB;
-    
     BKComboBox midiOutputSelectCB;
-    
     BKComboBox modeSelectCB;
-    
     BKComboBox onOffSelectCB;
+    
+    OwnedArray<BKComboBox> targetControlCBs;
+    OwnedArray<BKLabel> targetControlCBLabels;
 
     ToggleButton offsetParamStartToggle;
     ToggleButton releaseVelocitySetsSynchronicToggle;
@@ -110,7 +110,6 @@ protected:
 
     std::unique_ptr<BKSingleSlider> gainSlider;
     std::unique_ptr<BKSingleSlider> numClusterSlider;
-    
     
     BKLabel modeLabel;
     BKLabel onOffLabel;
