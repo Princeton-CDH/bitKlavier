@@ -549,6 +549,14 @@ public:
     inline const TargetNoteMode getTargetTypeSynchronicPatternSync() const noexcept { return targetTypeSynchronicPatternSync; }
     inline const TargetNoteMode getTargetTypeSynchronicAddNotes() const noexcept { return targetTypeSynchronicAddNotes; }
     inline const TargetNoteMode getTargetTypeSynchronicPausePlay() const noexcept { return targetTypeSynchronicPausePlay; }
+    inline const TargetNoteMode getTargetTypeSynchronic(KeymapTargetType which)
+    {
+        if (which == TargetTypeSynchronicSync)          return targetTypeSynchronicSync;
+        if (which == TargetTypeSynchronicPatternSync)   return targetTypeSynchronicPatternSync;
+        if (which == TargetTypeSynchronicAddNotes)      return targetTypeSynchronicAddNotes;
+        if (which == TargetTypeSynchronicPausePlay)     return targetTypeSynchronicPausePlay;
+        
+    }
     
     inline void setTargetTypeSynchronicSync(TargetNoteMode nm)          { targetTypeSynchronicSync = nm; }
     inline void setTargetTypeSynchronicPatternSync(TargetNoteMode nm)   { targetTypeSynchronicPatternSync = nm; }

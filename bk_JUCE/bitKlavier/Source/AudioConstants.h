@@ -1059,6 +1059,7 @@ typedef enum KeymapParameterType
     
 } KeymapParameterType;
 
+// be sure to keep preparation types together sequentially
 typedef enum KeymapTargetType
 {
     TargetTypeDirect = 0,

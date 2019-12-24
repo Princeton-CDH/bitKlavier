@@ -87,7 +87,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     targetControlCBs = OwnedArray<BKComboBox>();
     for (int i=TargetTypeSynchronicSync; i<=TargetTypeSynchronicPausePlay; i++)
     {
-        targetControlCBs.insert(-1, new BKComboBox()); // insert at the end of the array
+        targetControlCBs.add(new BKComboBox()); // insert at the end of the array
         targetControlCBs.getLast()->setName(cKeymapTargetTypes[i]);
         targetControlCBs.getLast()->addListener(this);
         targetControlCBs.getLast()->setLookAndFeel(&comboBoxRightJustifyLAF);
@@ -97,10 +97,9 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
         targetControlCBs.getLast()->setSelectedItemIndex(0, dontSendNotification);
         addAndMakeVisible(targetControlCBs.getLast(), ALL);
         
-        targetControlCBLabels.insert(-1, new BKLabel());
+        targetControlCBLabels.add(new BKLabel());
         targetControlCBLabels.getLast()->setText(cKeymapTargetTypes[i], dontSendNotification);
         addAndMakeVisible(targetControlCBLabels.getLast(), ALL);
-        
     }
 
     // Shared combo boxes
@@ -711,7 +710,29 @@ void SynchronicPreparationEditor::timerCallback()
         SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        
+        // dim target comboboxes that aren't activated by a Keymap
+        for (int i=TargetTypeSynchronicSync; i<=TargetTypeSynchronicPausePlay; i++)
+        {
+            bool makeBright = false;
+            for (auto km : sProcessor->getKeymaps())
+                if (km->getTargetStates()[(KeymapTargetType) i] == TargetStateEnabled) makeBright = true;
+            
+            if (makeBright)
+            {
+                targetControlCBs[i - TargetTypeSynchronicSync]->setAlpha(1.);
+                targetControlCBLabels[i - TargetTypeSynchronicSync]->setAlpha(1.);
+                
+                targetControlCBs[i - TargetTypeSynchronicSync]->setEnabled(true);
+            }
+            else
+            {
+                targetControlCBs[i - TargetTypeSynchronicSync]->setAlpha(0.25);
+                targetControlCBLabels[i - TargetTypeSynchronicSync]->setAlpha(0.25);
+                
+                targetControlCBs[i - TargetTypeSynchronicSync]->setEnabled(false);
+            }
+        }
+          
         SynchronicCluster::Ptr cluster = sProcessor->getClusters()[0];
         for (int i = 0; i < sProcessor->getClusters().size(); i++)
         {
@@ -981,7 +1002,6 @@ void SynchronicPreparationEditor::update(NotificationType notify)
     
     if (prep != nullptr)
     {
-        
         selectCB.setSelectedId(processor.updateState->currentSynchronicId, notify);
         fillModeSelectCB();
         modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
@@ -1003,11 +1023,12 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         
         gainSlider->setValue(prep->getGain(), notify);
         numClusterSlider->setValue(prep->getNumClusters(), notify);
-        
-        targetControlCBs[0]->setSelectedItemIndex(prep->getTargetTypeSynchronicSync(), notify);
-        targetControlCBs[1]->setSelectedItemIndex(prep->getTargetTypeSynchronicPatternSync(), notify);
-        targetControlCBs[2]->setSelectedItemIndex(prep->getTargetTypeSynchronicAddNotes(), notify);
-        targetControlCBs[3]->setSelectedItemIndex(prep->getTargetTypeSynchronicPausePlay(), notify);
+                
+        for (int i = TargetTypeSynchronicSync; i <= TargetTypeSynchronicPausePlay; i++)
+        {
+            targetControlCBs[i - TargetTypeSynchronicSync]->setSelectedItemIndex
+                            (prep->getTargetTypeSynchronic(KeymapTargetType(i)), notify);
+        }
         
         for(int i = 0; i < paramSliders.size(); i++)
         {
