@@ -96,6 +96,8 @@ private:
     PopupMenu getTargetsMenu(void);
     PopupMenu getMidiInputSelectMenu(void);
     
+    OwnedArray<ToggleButton> targetControlTBs;
+    
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber) override;

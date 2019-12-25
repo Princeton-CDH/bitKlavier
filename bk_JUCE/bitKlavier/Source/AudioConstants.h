@@ -1060,6 +1060,9 @@ typedef enum KeymapParameterType
 } KeymapParameterType;
 
 // be sure to keep preparation types together sequentially
+// to add:
+//      SynchronicClear
+//      NostalgicClear
 typedef enum KeymapTargetType
 {
     TargetTypeDirect = 0,
@@ -1067,8 +1070,10 @@ typedef enum KeymapTargetType
     TargetTypeSynchronicSync,
     TargetTypeSynchronicPatternSync,
     TargetTypeSynchronicAddNotes,
+    TargetTypeSynchronicClear,
     TargetTypeSynchronicPausePlay,
     TargetTypeNostalgic,
+    TargetTypeNostalgicClear,
     TargetTypeBlendronicSync,
     TargetTypeBlendronicClear,
     TargetTypeBlendronicOpen,
@@ -1084,8 +1089,10 @@ static const std::vector<std::string> cKeymapTargetTypes = {
     "Synchronic Beat Sync",
     "Synchronic Pattern Sync",
     "Synchronic Add Notes",
+    "Synchronic Clear",
     "Synchronic Pause-Play",
     "Nostalgic",
+    "Nostalgic Clear",
     "Blendronic Sync",
     "Blendronic Clear",
     "Blendronic Open",

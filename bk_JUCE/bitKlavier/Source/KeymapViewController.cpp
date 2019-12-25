@@ -27,7 +27,7 @@ BKViewController(p, theGraph, 1)
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
     iconImageComponent.setAlpha(0.095);
-    addAndMakeVisible(iconImageComponent);
+    // addAndMakeVisible(iconImageComponent);
     
     selectCB.setName("Keymap");
     selectCB.addSeparator();
@@ -128,11 +128,24 @@ BKViewController(p, theGraph, 1)
     addAndMakeVisible(&invertOnOffToggle, ALL);
     
     midiEditToggle.setButtonText ("midi edit");
-    buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
+    buttonsAndMenusLAF.setToggleBoxTextToRightBool(true);
     midiEditToggle.setToggleState (false, dontSendNotification);
     midiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap (CMD+E)");
     midiEditToggle.addListener(this);
     addAndMakeVisible(&midiEditToggle, ALL);
+    
+    // Target Control TBs
+    targetControlTBs = OwnedArray<ToggleButton>();
+    buttonsAndMenusLAF2.setToggleBoxTextToRightBool(false);
+    for (int i=TargetTypeDirect; i<=TargetTypeTuning; i++)
+    {
+        targetControlTBs.add(new ToggleButton()); // insert at the end of the array
+        targetControlTBs.getLast()->setName(cKeymapTargetTypes[i]);
+        targetControlTBs.getLast()->setButtonText(cKeymapTargetTypes[i]);
+        targetControlTBs.getLast()->addListener(this);
+        addAndMakeVisible(targetControlTBs.getLast(), ALL);
+    }
+
     
     fillSelectCB(-1,-1);
     
@@ -166,9 +179,7 @@ void KeymapViewController::resized()
 
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
-    
-    
-    
+
     float keyboardHeight = 100; // + 36 * processor.paddingScalarY;
     Rectangle<int> keyboardRow = area.removeFromBottom(keyboardHeight);
     float keyWidth = keyboardRow.getWidth() / round((maxKey - minKey) * 7./12 + 1); //num white keys
@@ -231,6 +242,25 @@ void KeymapViewController::resized()
     targetsSlice.removeFromRight(gXSpacing);
     targetsButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
     targetsSlice.removeFromRight(gXSpacing);
+    
+    int targetControlTBSection = (gComponentComboBoxHeight + gYSpacing) * targetControlTBs.size() / 2;
+    leftColumn.removeFromTop((leftColumn.getHeight() - targetControlTBSection) / 3.);
+    leftColumn.removeFromRight(20 * processor.paddingScalarX);
+    area.removeFromTop((area.getHeight() - targetControlTBSection) / 3.);
+    area.removeFromLeft(20 * processor.paddingScalarX);
+    
+    for (int i=0; i<targetControlTBs.size() / 2; i++)
+    {
+        targetControlTBs[i]->setBounds(leftColumn.removeFromTop(gComponentComboBoxHeight));
+        targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
+        leftColumn.removeFromTop(gYSpacing);
+    }
+    
+    for (int i=targetControlTBs.size() / 2; i<targetControlTBs.size(); i++)
+    {
+        targetControlTBs[i]->setBounds(area.removeFromTop(gComponentComboBoxHeight));
+        area.removeFromTop(gYSpacing);
+    }
 }
 
 int KeymapViewController::addKeymap(void)
