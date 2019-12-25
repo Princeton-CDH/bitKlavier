@@ -1411,6 +1411,10 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
                 int selectedItem = targetControlCBs[i]->getSelectedId() - 1;
                 DBG(targetControlCBs[i]->getName() + " " + cTargetNoteModes[selectedItem]);
                 
+                prep    ->setTargetTypeSynchronic(KeymapTargetType(i + TargetTypeSynchronicSync), (TargetNoteMode)selectedItem);
+                active  ->setTargetTypeSynchronic(KeymapTargetType(i + TargetTypeSynchronicSync), (TargetNoteMode)selectedItem);
+                
+                /*
                 if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicSync])
                 {
                     prep    ->setTargetTypeSynchronicSync((TargetNoteMode)selectedItem);
@@ -1431,6 +1435,7 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
                     prep    ->setTargetTypeSynchronicPausePlay((TargetNoteMode)selectedItem);
                     active  ->setTargetTypeSynchronicPausePlay((TargetNoteMode)selectedItem);
                 }
+                 */
             }
         }
     }

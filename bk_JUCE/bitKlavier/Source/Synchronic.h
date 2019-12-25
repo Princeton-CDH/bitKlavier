@@ -562,6 +562,13 @@ public:
     inline void setTargetTypeSynchronicPatternSync(TargetNoteMode nm)   { targetTypeSynchronicPatternSync = nm; }
     inline void setTargetTypeSynchronicAddNotes(TargetNoteMode nm)      { targetTypeSynchronicAddNotes = nm; }
     inline void setTargetTypeSynchronicPausePlay(TargetNoteMode nm)     { targetTypeSynchronicPausePlay = nm; }
+    inline void setTargetTypeSynchronic(KeymapTargetType which, TargetNoteMode nm)
+    {
+        if (which == TargetTypeSynchronicSync)          { targetTypeSynchronicSync = nm; }
+        if (which == TargetTypeSynchronicPatternSync)   { targetTypeSynchronicPatternSync = nm; }
+        if (which == TargetTypeSynchronicAddNotes)      { targetTypeSynchronicAddNotes = nm; }
+        if (which == TargetTypeSynchronicPausePlay)     { targetTypeSynchronicPausePlay = nm; }
+    }
     
     inline const void setVelocityMin(int min)
     {
