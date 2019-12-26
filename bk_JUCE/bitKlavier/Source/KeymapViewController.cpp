@@ -1016,7 +1016,7 @@ void KeymapViewController::hideUnconnectedTargets()
                 targetControlTBs[i]->setEnabled(true);
             }
             
-            synchronicTBGroup.setAlpha(gBright);
+            synchronicTBGroup.setAlpha(gMedium);
         }
         
         if (kmItem->getConnectionsOfType(PreparationTypeBlendronic).size() == 0)
@@ -1037,7 +1037,7 @@ void KeymapViewController::hideUnconnectedTargets()
                 targetControlTBs[i]->setEnabled(true);
             }
             
-            blendronicTBGroup.setAlpha(gBright);
+            blendronicTBGroup.setAlpha(gMedium);
         }
     }
 }

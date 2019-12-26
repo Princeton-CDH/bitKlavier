@@ -101,6 +101,13 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
         targetControlCBLabels.getLast()->setText(cKeymapTargetTypes[i], dontSendNotification);
         addAndMakeVisible(targetControlCBLabels.getLast(), ALL);
     }
+    
+    // border for Target Triggers
+    targetControlsGroup.setName("targetGroup");
+    targetControlsGroup.setText("Synchronic Target Triggers");
+    targetControlsGroup.setTextLabelPosition(Justification::centred);
+    targetControlsGroup.setAlpha(0.65);
+    addAndMakeVisible(targetControlsGroup);
 
     // Shared combo boxes
     selectCB.setName("Synchronic");
@@ -258,6 +265,7 @@ void SynchronicViewController::invisible(void)
         targetControlCBs[i]->setVisible(false);
         targetControlCBLabels[i]->setVisible(false);
     }
+    targetControlsGroup.setVisible(false);
     
     envelopeName.setVisible(false);
     for(int i=envelopeSliders.size() - 1; i>=0; i--)
@@ -465,6 +473,7 @@ void SynchronicViewController::displayTab(int tab)
             targetControlCBs[i]->setVisible(true);
             targetControlCBLabels[i]->setVisible(true);
         }
+        targetControlsGroup.setVisible(true);
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
@@ -492,6 +501,11 @@ void SynchronicViewController::displayTab(int tab)
             targetControlCBLabels[i]->setBounds(area.removeFromTop(gComponentComboBoxHeight));
             area.removeFromTop(gYSpacing);
         }
+        
+        targetControlsGroup.setBounds(targetControlCBs[0]->getX() - 4 * gXSpacing,
+                                      targetControlCBs[0]->getY() - gComponentComboBoxHeight - 2 * gXSpacing,
+                                      targetControlCBs[0]->getWidth() * 2 + 8 * gXSpacing,
+                                      targetControlCBs[0]->getHeight() * targetControlCBs.size() + 2 * gComponentComboBoxHeight + 4 * gYSpacing);
     }
 }
 

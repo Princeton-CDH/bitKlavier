@@ -97,6 +97,7 @@ protected:
     
     OwnedArray<BKComboBox> targetControlCBs;
     OwnedArray<BKLabel> targetControlCBLabels;
+    GroupComponent targetControlsGroup;
 
     ToggleButton offsetParamStartToggle;
     ToggleButton releaseVelocitySetsSynchronicToggle;

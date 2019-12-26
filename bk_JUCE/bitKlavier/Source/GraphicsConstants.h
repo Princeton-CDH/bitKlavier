@@ -71,6 +71,7 @@ static const float gModAlpha = 0.4;
 
 static const float gDim = 0.25;
 static const float gBright = 1.;
+static const float gMedium = 0.65;
 
 
 
