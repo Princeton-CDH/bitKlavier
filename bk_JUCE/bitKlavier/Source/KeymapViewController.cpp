@@ -189,7 +189,7 @@ BKViewController(p, theGraph, 1)
     
     fillSelectCB(-1,-1);
     
-    startTimer(20);
+    startTimer(100); // was 20
 
     update();
 }
@@ -310,6 +310,7 @@ void KeymapViewController::resized()
     Rectangle<int> thirdColumn = area.removeFromLeft(area.getWidth() * 0.5);
     //area is now fourth column
     
+    
     /*
     // Direct Targets
     Rectangle<int> directBox = leftColumn.removeFromTop(gComponentToggleBoxHeight + 6 * gYSpacing);
@@ -352,7 +353,6 @@ void KeymapViewController::resized()
     }
      */
      
-    
     // Synchronic Targets
     // 5 * gYSpacing + numComponents * (gComponentToggleBoxHeight + gYSPacing)
     Rectangle<int> synchronicBox = secondColumn.removeFromTop((TargetTypeSynchronicPausePlay - TargetTypeSynchronic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
@@ -913,15 +913,10 @@ void KeymapViewController::update(void)
     if (km != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentKeymapId, dontSendNotification);
-        
         invertOnOffToggle.setToggleState(km->isInverted(), dontSendNotification);
-        
         midiEditToggle.setToggleState(km->getMidiEdit(), dontSendNotification);
-        
         keymapTF.setText( intArrayToString(km->keys()));
-        
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
-        
         keyboard->setKeysInKeymap(km->keys());
         
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicClose; i++)
@@ -929,6 +924,8 @@ void KeymapViewController::update(void)
             targetControlTBs[i]->setToggleState((bool)km->getTargetState((KeymapTargetType) i), dontSendNotification);
         }
     }
+    
+    hideUnconnectedTargets();
     
     km->print();
     
@@ -996,18 +993,9 @@ void KeymapViewController::updateKeymapTargets()
     }
 }
 
-void KeymapViewController::timerCallback(){
-    
+void KeymapViewController::hideUnconnectedTargets()
+{
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    
-    if (km->getMidiEdit())
-    {
-        BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(keyboardComponent.get());
-        keyboard->setKeysInKeymap(km->keys());
-    }
-
-    updateKeymapTargets(); // needed?
-    
     BKItem::Ptr kmItem = theGraph->get(PreparationTypeKeymap, km->getId());
     if(kmItem != nullptr) {
         if (kmItem->getConnectionsOfType(PreparationTypeSynchronic).size() == 0)
@@ -1052,7 +1040,65 @@ void KeymapViewController::timerCallback(){
             blendronicTBGroup.setAlpha(gBright);
         }
     }
+}
 
+void KeymapViewController::timerCallback(){
+    
+    Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    
+    if (km->getMidiEdit())
+    {
+        BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(keyboardComponent.get());
+        keyboard->setKeysInKeymap(km->keys());
+    }
+
+    //updateKeymapTargets(); // needed?
+    /*
+    BKItem::Ptr kmItem = theGraph->get(PreparationTypeKeymap, km->getId());
+    if(kmItem != nullptr) {
+        if (kmItem->getConnectionsOfType(PreparationTypeSynchronic).size() == 0)
+        {
+            for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicPausePlay; i++)
+            {
+                targetControlTBs[i]->setAlpha(gDim);
+                targetControlTBs[i]->setEnabled(false);
+            }
+            
+            synchronicTBGroup.setAlpha(gDim);
+        }
+        else
+        {
+            for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicPausePlay; i++)
+            {
+                targetControlTBs[i]->setAlpha(gBright);
+                targetControlTBs[i]->setEnabled(true);
+            }
+            
+            synchronicTBGroup.setAlpha(gBright);
+        }
+        
+        if (kmItem->getConnectionsOfType(PreparationTypeBlendronic).size() == 0)
+        {
+            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicClose; i++)
+            {
+                targetControlTBs[i]->setAlpha(gDim);
+                targetControlTBs[i]->setEnabled(false);
+            }
+            
+            blendronicTBGroup.setAlpha(gDim);
+        }
+        else
+        {
+            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicClose; i++)
+            {
+                targetControlTBs[i]->setAlpha(gBright);
+                targetControlTBs[i]->setEnabled(true);
+            }
+            
+            blendronicTBGroup.setAlpha(gBright);
+        }
+    }
+*/
 }
 
 

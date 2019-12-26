@@ -58,6 +58,7 @@ public:
     void deleteCurrent(void);
     
     void keymapUpdated(TextEditor& tf);
+    void hideUnconnectedTargets();
     
     void bkTextFieldDidChange       (TextEditor&)           override;
 
