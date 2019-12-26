@@ -1060,9 +1060,11 @@ typedef enum KeymapParameterType
 } KeymapParameterType;
 
 // be sure to keep preparation types together sequentially
-// to add:
-//      SynchronicClear
-//      NostalgicClear
+// maybe only expose Synchronic and Blendronic?
+//  none of the others are really necessary, as they either happen
+//  automaticaly or can be done with a Reset/Mod
+//  better to keep things simpler
+//  or, maybe it's confusing NOT to show the ones that are connected automatically?
 typedef enum KeymapTargetType
 {
     TargetTypeDirect = 0,
