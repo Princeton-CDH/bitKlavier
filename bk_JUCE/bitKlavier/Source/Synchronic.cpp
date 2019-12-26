@@ -239,7 +239,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
      too many? i can imagine these being useful though
     */
     
-    bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled; // primary Synchronic mode
+    bool doCluster = targetStates[TargetTypeSynchronic] == TargetStateEnabled; // primary Synchronic mode
     bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled; // only if resetting beat phase
     bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled; // only if resetting pattern phases
     bool doAddNotes = targetStates[TargetTypeSynchronicAddNotes] == TargetStateEnabled; // if only adding notes to cluster
@@ -257,7 +257,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     // always work on the most recent cluster/layer
     SynchronicCluster::Ptr cluster = clusters.getLast();
     
-    // do only if this note is targeted as a primary Synchronic note (TargetTypeSynchronicCluster)
+    // do only if this note is targeted as a primary Synchronic note (TargetTypeSynchronic)
     if (doCluster && !pausePlay)
     {
         // OnOffMode determines whether the keyOffs or keyOns determine whether notes are within the cluster threshold
@@ -346,7 +346,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     // track the note's target, as set in Keymap; save as needed
     bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled;
-    bool doCluster = targetStates[TargetTypeSynchronicCluster] == TargetStateEnabled;
+    bool doCluster = targetStates[TargetTypeSynchronic] == TargetStateEnabled;
     bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled;
     bool doAddNotes = targetStates[TargetTypeSynchronicAddNotes] == TargetStateEnabled;
     bool doPausePlay = targetStates[TargetTypeSynchronicPausePlay] == TargetStateEnabled;
@@ -364,7 +364,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     // always work on the most recent cluster/layer
     SynchronicCluster::Ptr cluster = clusters.getLast();
     
-    // do only if this note is targeted as a primary Synchronic note (TargetTypeSynchronicCluster)
+    // do only if this note is targeted as a primary Synchronic note (TargetTypeSynchronic)
     if (doCluster && !pausePlay)
     {
         // cluster management

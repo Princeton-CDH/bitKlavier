@@ -97,6 +97,12 @@ private:
     PopupMenu getMidiInputSelectMenu(void);
     
     OwnedArray<ToggleButton> targetControlTBs;
+    GroupComponent directTBGroup;
+    GroupComponent synchronicTBGroup;
+    GroupComponent nostalgicTBGroup;
+    GroupComponent blendronicTBGroup;
+    GroupComponent tuningTBGroup;
+    GroupComponent tempoTBGroup;
     
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override;

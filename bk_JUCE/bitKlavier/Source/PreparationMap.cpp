@@ -573,8 +573,8 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
                 
                 if (km->getTargetStates()[TargetTypeSynchronicSync] == TargetStateEnabled)
                     targetStates->set(TargetTypeSynchronicSync, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronicCluster] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicCluster, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeSynchronic] == TargetStateEnabled)
+                    targetStates->set(TargetTypeSynchronic, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeSynchronicPatternSync] == TargetStateEnabled)
                     targetStates->set(TargetTypeSynchronicPatternSync, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeSynchronicAddNotes] == TargetStateEnabled)
@@ -719,8 +719,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
                 
                 if (km->getTargetStates()[TargetTypeSynchronicSync] == TargetStateEnabled)
                     targetStates->set(TargetTypeSynchronicSync, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronicCluster] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicCluster, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeSynchronic] == TargetStateEnabled)
+                    targetStates->set(TargetTypeSynchronic, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeSynchronicPatternSync] == TargetStateEnabled)
                     targetStates->set(TargetTypeSynchronicPatternSync, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeSynchronicAddNotes] == TargetStateEnabled)

@@ -23,6 +23,7 @@ KeymapViewController::KeymapViewController(BKAudioProcessor& p, BKItemGraph* the
 BKViewController(p, theGraph, 1)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
+    // buttonsAndMenusLAF.drawGroupComponentOutline();
     
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
@@ -137,7 +138,8 @@ BKViewController(p, theGraph, 1)
     // Target Control TBs
     targetControlTBs = OwnedArray<ToggleButton>();
     buttonsAndMenusLAF2.setToggleBoxTextToRightBool(false);
-    for (int i=TargetTypeDirect; i<=TargetTypeTuning; i++)
+    //for (int i=TargetTypeDirect; i<=TargetTypeTuning; i++)
+    for (int i=TargetTypeDirect; i<=TargetTypeBlendronicClose; i++)
     {
         targetControlTBs.add(new ToggleButton()); // insert at the end of the array
         targetControlTBs.getLast()->setName(cKeymapTargetTypes[i]);
@@ -146,6 +148,36 @@ BKViewController(p, theGraph, 1)
         addAndMakeVisible(targetControlTBs.getLast(), ALL);
     }
 
+    // border for Direct Target Toggles
+    directTBGroup.setName("directGroup");
+    directTBGroup.setText("Direct Targets");
+    // directTBGroup.setTextLabelPosition(Justification::right);
+    addAndMakeVisible(directTBGroup);
+    
+    // border for Synchronic Target Toggles
+    synchronicTBGroup.setName("synchronicGroup");
+    synchronicTBGroup.setText("Synchronic Targets");
+    addAndMakeVisible(synchronicTBGroup);
+    
+    // border for Nostalgic Target Toggles
+    nostalgicTBGroup.setName("nostalgicGroup");
+    nostalgicTBGroup.setText("Nostalgic Targets");
+    addAndMakeVisible(nostalgicTBGroup);
+    
+    // border for Blendronic Target Toggles
+    blendronicTBGroup.setName("blendronicGroup");
+    blendronicTBGroup.setText("Blendronic Targets");
+    addAndMakeVisible(blendronicTBGroup);
+    
+    // border for Tuning Target Toggles
+    tuningTBGroup.setName("tuningGroup");
+    tuningTBGroup.setText("Tuning Targets");
+    //addAndMakeVisible(tuningTBGroup);
+    
+    // border for Tempo Target Toggles
+    tempoTBGroup.setName("tempoGroup");
+    tempoTBGroup.setText("Tempo Targets");
+    //addAndMakeVisible(tempoTBGroup);
     
     fillSelectCB(-1,-1);
     
@@ -170,8 +202,6 @@ void KeymapViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
 }
-
-
 
 void KeymapViewController::resized()
 {
@@ -243,11 +273,89 @@ void KeymapViewController::resized()
     targetsButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
     targetsSlice.removeFromRight(gXSpacing);
     
+    // height of the box for the prep with the most targets (Synchronic)
+    int maxTargetHeight =   (TargetTypeSynchronicPausePlay - TargetTypeSynchronic + 1) *
+                            (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing;
+    
+    leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
+    area.removeFromTop((area.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
+    leftColumn.removeFromLeft(50); // arrow width
+    area.removeFromRight(50); // arrow width
+    
+    Rectangle<int> secondColumn = leftColumn.removeFromRight(leftColumn.getWidth() * 0.5);
+    Rectangle<int> thirdColumn = area.removeFromLeft(area.getWidth() * 0.5);
+    //area is now fourth column
+    
+    // Direct Targets
+    Rectangle<int> directBox = leftColumn.removeFromTop(gComponentToggleBoxHeight + 6 * gYSpacing);
+    directTBGroup.setBounds(directBox);
+    directBox.removeFromTop(4 * gYSpacing);
+    directBox.removeFromLeft(gXSpacing);
+    targetControlTBs[TargetTypeDirect]->setBounds(directBox.removeFromTop(gComponentToggleBoxHeight));
+    
+    leftColumn.removeFromTop(gYSpacing + 5 * processor.paddingScalarY);
+    
+    /*
+    // Tuning Targets
+    Rectangle<int> tuningBox = leftColumn.removeFromTop(gComponentToggleBoxHeight + 6 * gYSpacing);
+    tuningTBGroup.setBounds(tuningBox);
+    tuningBox.removeFromTop(4 * gYSpacing);
+    tuningBox.removeFromLeft(gXSpacing);
+    targetControlTBs[TargetTypeTuning]->setBounds(tuningBox.removeFromTop(gComponentToggleBoxHeight));
+    
+    leftColumn.removeFromTop(gYSpacing + 5 * processor.paddingScalarY);
+    
+    // Tempo Targets
+    Rectangle<int> tempoBox = leftColumn.removeFromTop(gComponentToggleBoxHeight + 6 * gYSpacing);
+    tempoTBGroup.setBounds(tempoBox);
+    tempoBox.removeFromTop(4 * gYSpacing);
+    tempoBox.removeFromLeft(gXSpacing);
+    targetControlTBs[TargetTypeTempo]->setBounds(tempoBox.removeFromTop(gComponentToggleBoxHeight));
+    
+    leftColumn.removeFromTop(gYSpacing + 5 * processor.paddingScalarY);
+     */
+    
+    // Synchronic Targets
+    // 5 * gYSpacing + numComponents * (gComponentToggleBoxHeight + gYSPacing)
+    Rectangle<int> synchronicBox = secondColumn.removeFromTop((TargetTypeSynchronicPausePlay - TargetTypeSynchronic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+    synchronicTBGroup.setBounds(synchronicBox);
+    synchronicBox.removeFromTop(4 * gYSpacing);
+    synchronicBox.removeFromLeft(gXSpacing);
+    for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicPausePlay; i++)
+    {
+        targetControlTBs[i]->setBounds(synchronicBox.removeFromTop(gComponentToggleBoxHeight));
+        synchronicBox.removeFromTop(gYSpacing);
+    }
+    
+    // Nostalgic Targets
+    Rectangle<int> nostalgicBox = thirdColumn.removeFromTop((TargetTypeNostalgicClear - TargetTypeNostalgic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+    nostalgicTBGroup.setBounds(nostalgicBox);
+    nostalgicBox.removeFromTop(4 * gYSpacing);
+    nostalgicBox.removeFromLeft(gXSpacing);
+    for (int i=TargetTypeNostalgic; i<=TargetTypeNostalgicClear; i++)
+    {
+        targetControlTBs[i]->setBounds(nostalgicBox.removeFromTop(gComponentToggleBoxHeight));
+        nostalgicBox.removeFromTop(gYSpacing);
+    }
+    
+    // Blendronic Targets
+    Rectangle<int> blendronicBox = area.removeFromTop((TargetTypeBlendronicClose - TargetTypeBlendronicSync + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+    blendronicTBGroup.setBounds(blendronicBox);
+    blendronicBox.removeFromTop(4 * gYSpacing);
+    blendronicBox.removeFromLeft(gXSpacing);
+    for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicClose; i++)
+    {
+        targetControlTBs[i]->setBounds(blendronicBox.removeFromTop(gComponentToggleBoxHeight));
+        blendronicBox.removeFromTop(gYSpacing);
+    }
+    
+    /*
     int targetControlTBSection = (gComponentComboBoxHeight + gYSpacing) * targetControlTBs.size() / 2;
     leftColumn.removeFromTop((leftColumn.getHeight() - targetControlTBSection) / 3.);
     leftColumn.removeFromRight(20 * processor.paddingScalarX);
     area.removeFromTop((area.getHeight() - targetControlTBSection) / 3.);
     area.removeFromLeft(20 * processor.paddingScalarX);
+
     
     for (int i=0; i<targetControlTBs.size() / 2; i++)
     {
@@ -261,7 +369,48 @@ void KeymapViewController::resized()
         targetControlTBs[i]->setBounds(area.removeFromTop(gComponentComboBoxHeight));
         area.removeFromTop(gYSpacing);
     }
+    
+    directTBGroup.setBounds(targetControlTBs[0]->getBounds());
+     */
+
 }
+
+/*
+auto* group = addToList (new GroupComponent ("group", "Radio buttons"));
+group->setBounds (20, 20, 220, 140);
+
+for (int i = 0; i < 4; ++i)
+{
+    auto* tb = addToList (new ToggleButton ("Radio Button #" + String (i + 1)));
+
+    tb->setRadioGroupId (1234);
+    tb->setBounds (45, 46 + i * 22, 180, 22);
+    tb->setTooltip ("A set of mutually-exclusive radio buttons");
+
+    if (i == 0)
+        tb->setToggleState (true, dontSendNotification);
+}
+
+typedef enum KeymapTargetType
+{
+    TargetTypeDirect = 0,
+    TargetTypeSynchronic,
+    TargetTypeSynchronicSync,
+    TargetTypeSynchronicPatternSync,
+    TargetTypeSynchronicAddNotes,
+    TargetTypeSynchronicClear,
+    TargetTypeSynchronicPausePlay,
+    TargetTypeNostalgic,
+    TargetTypeNostalgicClear,
+    TargetTypeBlendronicSync,
+    TargetTypeBlendronicClear,
+    TargetTypeBlendronicOpen,
+    TargetTypeBlendronicClose,
+    TargetTypeTempo,
+    TargetTypeTuning,
+    TargetTypeNil
+} KeymapTargetType;
+*/
 
 int KeymapViewController::addKeymap(void)
 {
@@ -665,6 +814,19 @@ void KeymapViewController::bkButtonClicked (Button* b)
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(keyboardComponent.get());
 
         keyboard->setKeysInKeymap(keymap->keys());
+    }
+    else
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        
+        for (int i=0; i<targetControlTBs.size(); i++)
+        {
+            if (b == targetControlTBs[i])
+            {
+                keymap->setTarget((KeymapTargetType) i,  (KeymapTargetState) b->getToggleState());
+                DBG("Keymap toggle change: " + (String)cKeymapTargetTypes[i] + " " + String((int)b->getToggleState()));
+            }
+        }
     }
 }
 

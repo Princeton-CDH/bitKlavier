@@ -382,7 +382,7 @@ void Keymap::removeTargetsOfType(BKPreparationType type)
     if (type == PreparationTypeSynchronic)
     {
         removeTarget(TargetTypeSynchronicSync);
-        removeTarget(TargetTypeSynchronicCluster);
+        removeTarget(TargetTypeSynchronic);
         removeTarget(TargetTypeSynchronicPatternSync);
         removeTarget(TargetTypeSynchronicAddNotes);
         removeTarget(TargetTypeSynchronicPausePlay);
