@@ -563,6 +563,7 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         keymap->addTarget(TargetTypeSynchronicSync, TargetStateDisabled);
         keymap->addTarget(TargetTypeSynchronicPatternSync, TargetStateDisabled);
         keymap->addTarget(TargetTypeSynchronicAddNotes, TargetStateDisabled);
+        keymap->addTarget(TargetTypeSynchronicClear, TargetStateDisabled);
         keymap->addTarget(TargetTypeSynchronicPausePlay, TargetStateDisabled);
 
     }
@@ -578,10 +579,10 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         BlendronicProcessor::Ptr bproc = getBlendronicProcessor(thisId);
         thisPreparationMap->addBlendronicProcessor(bproc);
         
-        keymap->addTarget(TargetTypeBlendronicSync);
-        keymap->addTarget(TargetTypeBlendronicClear);
-        keymap->addTarget(TargetTypeBlendronicOpen);
-        keymap->addTarget(TargetTypeBlendronicClose);
+        keymap->addTarget(TargetTypeBlendronicSync, TargetStateDisabled);
+        keymap->addTarget(TargetTypeBlendronicClear, TargetStateDisabled);
+        keymap->addTarget(TargetTypeBlendronicOpen, TargetStateDisabled);
+        keymap->addTarget(TargetTypeBlendronicClose, TargetStateDisabled);
     }
     else if (thisType == PreparationTypeTempo)
     {

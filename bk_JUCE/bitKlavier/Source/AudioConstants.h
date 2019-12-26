@@ -1105,8 +1105,8 @@ static const std::vector<std::string> cKeymapTargetTypes = {
 
 typedef enum KeymapTargetState
 {
-    TargetStateEnabled = 0,
-    TargetStateDisabled,
+    TargetStateDisabled = 0,
+    TargetStateEnabled,
     TargetStateNil
 } KeymapTargetState;
 

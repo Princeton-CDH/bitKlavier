@@ -614,7 +614,8 @@ void KeymapViewController::targetsMenuCallback(int result, KeymapViewController*
     keymap->toggleTarget((KeymapTargetType) (result - 1));
     
     vc->getTargetsMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->targetsButton), ModalCallbackFunction::forComponent(targetsMenuCallback, vc));
-    DBG(String(result));
+    
+    DBG("KeymapViewController::targetsMenuCallback " + String(result));
 }
 
 void KeymapViewController::keysMenuCallback(int result, KeymapViewController* vc)
@@ -787,7 +788,9 @@ void KeymapViewController::bkButtonClicked (Button* b)
         {
             if (b == targetControlTBs[i])
             {
+                //state ? TargetStateDisabled : TargetStateEnabled
                 keymap->setTarget((KeymapTargetType) i,  (KeymapTargetState) b->getToggleState());
+                // keymap->setTarget((KeymapTargetType) i,  b->getToggleState() ? TargetStateDisabled : TargetStateEnabled);
                 DBG("Keymap toggle change: " + (String)cKeymapTargetTypes[i] + " " + String((int)b->getToggleState()));
             }
         }
@@ -903,6 +906,11 @@ void KeymapViewController::update(void)
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
         
         keyboard->setKeysInKeymap(km->keys());
+        
+        for (int i=TargetTypeDirect; i<=TargetTypeBlendronicClose; i++)
+        {
+            targetControlTBs[i]->setToggleState((bool)km->getTargetState((KeymapTargetType) i), dontSendNotification);
+        }
     }
     
     km->print();

@@ -71,6 +71,7 @@ public:
     targetTypeSynchronicSync(p->getTargetTypeSynchronicSync()),
     targetTypeSynchronicPatternSync(p->getTargetTypeSynchronicPatternSync()),
     targetTypeSynchronicAddNotes(p->getTargetTypeSynchronicAddNotes()),
+    targetTypeSynchronicClear(p->getTargetTypeSynchronicClear()),
     targetTypeSynchronicPausePlay(p->getTargetTypeSynchronicPausePlay()),
     midiOutput(p->getMidiOutput())
     {
@@ -111,6 +112,7 @@ public:
     targetTypeSynchronicSync(NoteOn),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
+    targetTypeSynchronicClear(NoteOn),
     targetTypeSynchronicPausePlay(NoteOn),
     midiOutput(nullptr)
     {
@@ -144,6 +146,7 @@ public:
     targetTypeSynchronicSync(NoteOn),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
+    targetTypeSynchronicClear(NoteOn),
     targetTypeSynchronicPausePlay(NoteOn),
     midiOutput(nullptr)
     {
@@ -187,6 +190,7 @@ public:
         targetTypeSynchronicSync = s->getTargetTypeSynchronicSync();
         targetTypeSynchronicPatternSync = s->getTargetTypeSynchronicPatternSync();
         targetTypeSynchronicAddNotes = s->getTargetTypeSynchronicAddNotes();
+        targetTypeSynchronicClear = s->getTargetTypeSynchronicClear();
         targetTypeSynchronicPausePlay = s->getTargetTypeSynchronicPausePlay();
         
         midiOutput = s->getMidiOutput();
@@ -353,6 +357,7 @@ public:
                 targetTypeSynchronicSync == s->getTargetTypeSynchronicSync() &&
                 targetTypeSynchronicPatternSync == s->getTargetTypeSynchronicPatternSync() &&
                 targetTypeSynchronicAddNotes == s->getTargetTypeSynchronicAddNotes() &&
+                targetTypeSynchronicClear == s->getTargetTypeSynchronicClear() &&
                 targetTypeSynchronicPausePlay == s->getTargetTypeSynchronicPausePlay());
                 
     }
@@ -548,12 +553,14 @@ public:
     inline const TargetNoteMode getTargetTypeSynchronicSync() const noexcept { return targetTypeSynchronicSync; }
     inline const TargetNoteMode getTargetTypeSynchronicPatternSync() const noexcept { return targetTypeSynchronicPatternSync; }
     inline const TargetNoteMode getTargetTypeSynchronicAddNotes() const noexcept { return targetTypeSynchronicAddNotes; }
+    inline const TargetNoteMode getTargetTypeSynchronicClear() const noexcept { return targetTypeSynchronicClear; }
     inline const TargetNoteMode getTargetTypeSynchronicPausePlay() const noexcept { return targetTypeSynchronicPausePlay; }
     inline const TargetNoteMode getTargetTypeSynchronic(KeymapTargetType which)
     {
         if (which == TargetTypeSynchronicSync)          return targetTypeSynchronicSync;
         if (which == TargetTypeSynchronicPatternSync)   return targetTypeSynchronicPatternSync;
         if (which == TargetTypeSynchronicAddNotes)      return targetTypeSynchronicAddNotes;
+        if (which == TargetTypeSynchronicClear)         return targetTypeSynchronicClear;
         if (which == TargetTypeSynchronicPausePlay)     return targetTypeSynchronicPausePlay;
         
     }
@@ -561,12 +568,14 @@ public:
     inline void setTargetTypeSynchronicSync(TargetNoteMode nm)          { targetTypeSynchronicSync = nm; }
     inline void setTargetTypeSynchronicPatternSync(TargetNoteMode nm)   { targetTypeSynchronicPatternSync = nm; }
     inline void setTargetTypeSynchronicAddNotes(TargetNoteMode nm)      { targetTypeSynchronicAddNotes = nm; }
+    inline void setTargetTypeSynchronicClear(TargetNoteMode nm)         { targetTypeSynchronicClear = nm; }
     inline void setTargetTypeSynchronicPausePlay(TargetNoteMode nm)     { targetTypeSynchronicPausePlay = nm; }
     inline void setTargetTypeSynchronic(KeymapTargetType which, TargetNoteMode nm)
     {
         if (which == TargetTypeSynchronicSync)          { targetTypeSynchronicSync = nm; }
         if (which == TargetTypeSynchronicPatternSync)   { targetTypeSynchronicPatternSync = nm; }
         if (which == TargetTypeSynchronicAddNotes)      { targetTypeSynchronicAddNotes = nm; }
+        if (which == TargetTypeSynchronicClear)         { targetTypeSynchronicClear = nm; }
         if (which == TargetTypeSynchronicPausePlay)     { targetTypeSynchronicPausePlay = nm; }
     }
     
@@ -701,6 +710,7 @@ public:
         prep.setProperty( "targetTypeSynchronicSync", getTargetTypeSynchronicSync(), 0);
         prep.setProperty( "targetTypeSynchronicPatternSync", getTargetTypeSynchronicPatternSync(), 0);
         prep.setProperty( "targetTypeSynchronicAddNotes", getTargetTypeSynchronicAddNotes(), 0);
+        prep.setProperty( "targetTypeSynchronicClear", getTargetTypeSynchronicClear(), 0);
         prep.setProperty( "targetTypeSynchronicPausePlay", getTargetTypeSynchronicPausePlay(), 0);
 
                  
@@ -825,6 +835,9 @@ public:
         
         i = e->getStringAttribute("targetTypeSynchronicAddNotes").getIntValue();
         setTargetTypeSynchronicAddNotes((TargetNoteMode)i);
+        
+        i = e->getStringAttribute("targetTypeSynchronicClear").getIntValue();
+        setTargetTypeSynchronicClear((TargetNoteMode)i);
         
         i = e->getStringAttribute("targetTypeSynchronicPausePlay").getIntValue();
         setTargetTypeSynchronicPausePlay((TargetNoteMode)i);
@@ -976,6 +989,7 @@ private:
     TargetNoteMode targetTypeSynchronicSync;
     TargetNoteMode targetTypeSynchronicPatternSync;
     TargetNoteMode targetTypeSynchronicAddNotes;
+    TargetNoteMode targetTypeSynchronicClear;
     TargetNoteMode targetTypeSynchronicPausePlay;
 
     std::shared_ptr<MidiOutput> midiOutput;

@@ -579,6 +579,8 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
                     targetStates->set(TargetTypeSynchronicPatternSync, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeSynchronicAddNotes] == TargetStateEnabled)
                     targetStates->set(TargetTypeSynchronicAddNotes, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeSynchronicClear] == TargetStateEnabled)
+                    targetStates->set(TargetTypeSynchronicClear, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeSynchronicPausePlay] == TargetStateEnabled)
                     targetStates->set(TargetTypeSynchronicPausePlay, TargetStateEnabled);
             }
@@ -725,6 +727,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
                     targetStates->set(TargetTypeSynchronicPatternSync, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeSynchronicAddNotes] == TargetStateEnabled)
                     targetStates->set(TargetTypeSynchronicAddNotes, TargetStateEnabled);
+                if (km->getTargetStates()[TargetTypeSynchronicClear] == TargetStateEnabled)
+                    targetStates->set(TargetTypeSynchronicClear, TargetStateEnabled);
                 if (km->getTargetStates()[TargetTypeSynchronicPausePlay] == TargetStateEnabled)
                     targetStates->set(TargetTypeSynchronicPausePlay, TargetStateEnabled);
             }

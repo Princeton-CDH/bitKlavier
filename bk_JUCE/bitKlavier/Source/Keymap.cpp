@@ -331,7 +331,11 @@ void Keymap::setKeys(KeySet set, bool action, PitchClass pc)
 
 void Keymap::setTarget(KeymapTargetType target, KeymapTargetState state)
 {
+    if (targetStates[target] == TargetStateNil) return;
+    
+    //targetStates.set(target, state ? TargetStateDisabled : TargetStateEnabled);
     targetStates.set(target, state);
+    DBG("Keymap::setTarget = " + String(target) + " " + String((int) getTargetState(target)));
 }
 
 void Keymap::toggleTarget(KeymapTargetType target)
@@ -339,6 +343,7 @@ void Keymap::toggleTarget(KeymapTargetType target)
     if (targetStates[target] == TargetStateNil) return;
     
     targetStates.set(target, (targetStates[target] == TargetStateDisabled) ? TargetStateEnabled : TargetStateDisabled);
+    DBG("Keymap::toggleTarget = " + String(target) + " " + String((int) getTargetState(target)));
 }
 
 void Keymap::enableTarget(KeymapTargetType target)
