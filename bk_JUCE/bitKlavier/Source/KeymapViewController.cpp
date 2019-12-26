@@ -968,23 +968,62 @@ void KeymapViewController::updateKeymapTargets()
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     BKItem::Ptr kmItem = theGraph->get(PreparationTypeKeymap, km->getId());
     
-    for (int type = 0; type < BKPreparationTypeNil; ++type)
-    {
-        if (kmItem->getConnectionsOfType((BKPreparationType) type).size() == 0)
+    if(kmItem != nullptr) {
+        for (int type = 0; type < BKPreparationTypeNil; ++type)
         {
-            km->removeTargetsOfType((BKPreparationType) type);
+            if (kmItem->getConnectionsOfType((BKPreparationType) type).size() == 0)
+            {
+                km->removeTargetsOfType((BKPreparationType) type);
+            }
         }
     }
 }
 
 void KeymapViewController::timerCallback(){
+    
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    
     if (km->getMidiEdit())
     {
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(keyboardComponent.get());
-        
         keyboard->setKeysInKeymap(km->keys());
     }
+
+    updateKeymapTargets(); // needed?
+    
+    BKItem::Ptr kmItem = theGraph->get(PreparationTypeKeymap, km->getId());
+    if(kmItem != nullptr) {
+        if (kmItem->getConnectionsOfType(PreparationTypeSynchronic).size() == 0)
+        {
+            for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicPausePlay; i++)
+                targetControlTBs[i]->setAlpha(gDim);
+            
+            synchronicTBGroup.setAlpha(gDim);
+        }
+        else
+        {
+            for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicPausePlay; i++)
+                targetControlTBs[i]->setAlpha(gBright);
+            
+            synchronicTBGroup.setAlpha(gBright);
+        }
+        
+        if (kmItem->getConnectionsOfType(PreparationTypeBlendronic).size() == 0)
+        {
+            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicClose; i++)
+                targetControlTBs[i]->setAlpha(gDim);
+            
+            blendronicTBGroup.setAlpha(gDim);
+        }
+        else
+        {
+            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicClose; i++)
+                targetControlTBs[i]->setAlpha(gBright);
+            
+            blendronicTBGroup.setAlpha(gBright);
+        }
+    }
+
 }
 
 

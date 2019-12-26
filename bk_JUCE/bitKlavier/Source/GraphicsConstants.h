@@ -69,6 +69,9 @@ static const std::vector<std::string> intervalNames = {"U", "m2", "M2", "m3", "M
 static const int gPaddingConst = 10;
 static const float gModAlpha = 0.4;
 
+static const float gDim = 0.25;
+static const float gBright = 1.;
+
 
 
 #endif  // GRAPHICSCONSTANTS_H_INCLUDED
