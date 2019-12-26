@@ -44,11 +44,11 @@ BKViewController(p, theGraph, 1)
     midiInputSelectButton.addListener(this);
     addAndMakeVisible(midiInputSelectButton);
     
-    targetsButton.setName("TargetsButton");
+    targetsButton.setName("TargetsButton"); // remove?
     targetsButton.setButtonText("Targets");
     targetsButton.setTooltip("Select which parts of connected preparations to send key information");
     targetsButton.addListener(this);
-    addAndMakeVisible(targetsButton);
+    // addAndMakeVisible(targetsButton);
     
     clearButton.setName("ClearButton");
     clearButton.setButtonText("Clear");
@@ -124,6 +124,7 @@ BKViewController(p, theGraph, 1)
     invertOnOffToggle.setButtonText ("invert note on/off");
 //    buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
     invertOnOffToggle.setToggleState (false, dontSendNotification);
+    invertOnOffToggle.setLookAndFeel(&buttonsAndMenusLAF2); // text to left
     invertOnOffToggle.setTooltip("Indicates whether to invert Note-On and Note-Off messages for this Keymap");
     invertOnOffToggle.addListener(this);
     addAndMakeVisible(&invertOnOffToggle, ALL);
@@ -246,15 +247,25 @@ void KeymapViewController::resized()
     textButtonSlab.removeFromLeft(gXSpacing);
     keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
     
+    /*
     keysCB.setBounds(keyboardValsTextFieldOpen.getRight() + gXSpacing, keyboardValsTextFieldOpen.getY(), keyboardValsTextFieldOpen.getWidth(), keyboardValsTextFieldOpen.getHeight());
     keysButton.setBounds(keysCB.getRight()+gXSpacing, keysCB.getY(), keysCB.getWidth(), keysCB.getHeight());
+     */
     
-    clearButton.setBounds(keyboard->getRight() - keyboardValsTextFieldOpen.getWidth(), keyboardValsTextFieldOpen.getY(), keyboardValsTextFieldOpen.getWidth(),keyboardValsTextFieldOpen.getHeight());
+    keysCB.setBounds(textButtonSlab.removeFromLeft(keyboardValsTextFieldOpen.getWidth()));
+    keysButton.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
+    midiEditToggle.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
+    textButtonSlab.removeFromRight(gXSpacing);
+    clearButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth()));
     
-    invertOnOffToggle.setBounds(keysButton.getRight()+gXSpacing, keysButton.getY(), keysButton.getWidth(), keysButton.getHeight());
-    invertOnOffToggle.toFront(false);
     
-    midiEditToggle.setBounds(invertOnOffToggle.getRight()+gXSpacing, invertOnOffToggle.getY(), invertOnOffToggle.getWidth(), invertOnOffToggle.getHeight());
+    //clearButton.setBounds(keyboard->getRight() - keyboardValsTextFieldOpen.getWidth(), keyboardValsTextFieldOpen.getY(), keyboardValsTextFieldOpen.getWidth(),keyboardValsTextFieldOpen.getHeight());
+    
+    //invertOnOffToggle.setBounds(keysButton.getRight()+gXSpacing, keysButton.getY(), keysButton.getWidth(), keysButton.getHeight());
+    //invertOnOffToggle.toFront(false);
+    
+    //midiEditToggle.setBounds(invertOnOffToggle.getRight()+gXSpacing, invertOnOffToggle.getY(), invertOnOffToggle.getWidth(), invertOnOffToggle.getHeight());
+
     midiEditToggle.toFront(false);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
@@ -270,15 +281,21 @@ void KeymapViewController::resized()
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
     
+    /*
     midiInputSelectButton.setBounds(actionButton.getRight()+gXSpacing,
                                  actionButton.getY(),
                                  selectCB.getWidth(),
                                  selectCB.getHeight());
+     */
     
     Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
     targetsSlice.removeFromRight(gXSpacing);
-    targetsButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
+    //targetsButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
+    midiInputSelectButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
     targetsSlice.removeFromRight(gXSpacing);
+    
+    invertOnOffToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
+    invertOnOffToggle.toFront(false);
     
     // height of the box for the prep with the most targets (Synchronic)
     int maxTargetHeight =   (TargetTypeSynchronicPausePlay - TargetTypeSynchronic + 1) *
@@ -996,14 +1013,20 @@ void KeymapViewController::timerCallback(){
         if (kmItem->getConnectionsOfType(PreparationTypeSynchronic).size() == 0)
         {
             for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicPausePlay; i++)
+            {
                 targetControlTBs[i]->setAlpha(gDim);
+                targetControlTBs[i]->setEnabled(false);
+            }
             
             synchronicTBGroup.setAlpha(gDim);
         }
         else
         {
             for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicPausePlay; i++)
+            {
                 targetControlTBs[i]->setAlpha(gBright);
+                targetControlTBs[i]->setEnabled(true);
+            }
             
             synchronicTBGroup.setAlpha(gBright);
         }
@@ -1011,14 +1034,20 @@ void KeymapViewController::timerCallback(){
         if (kmItem->getConnectionsOfType(PreparationTypeBlendronic).size() == 0)
         {
             for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicClose; i++)
+            {
                 targetControlTBs[i]->setAlpha(gDim);
+                targetControlTBs[i]->setEnabled(false);
+            }
             
             blendronicTBGroup.setAlpha(gDim);
         }
         else
         {
             for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicClose; i++)
+            {
                 targetControlTBs[i]->setAlpha(gBright);
+                targetControlTBs[i]->setEnabled(true);
+            }
             
             blendronicTBGroup.setAlpha(gBright);
         }
