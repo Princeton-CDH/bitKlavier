@@ -571,18 +571,11 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
                 targetStates = &pressTargetStates;
                 if (km->isInverted()) targetStates = &releaseTargetStates;
                 
-                if (km->getTargetStates()[TargetTypeSynchronicSync] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicSync, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronic] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronic, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronicPatternSync] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicPatternSync, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronicAddNotes] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicAddNotes, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronicClear] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicClear, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronicPausePlay] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicPausePlay, TargetStateEnabled);
+                for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
+                {
+                    if (km->getTargetStates()[i] == TargetStateEnabled)
+                        targetStates->set(i, TargetStateEnabled);
+                }
             }
         }
         if (pressTargetStates.contains(TargetStateEnabled)) {

@@ -244,6 +244,10 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled; // only if resetting pattern phases
     bool doAddNotes = targetStates[TargetTypeSynchronicAddNotes] == TargetStateEnabled; // if only adding notes to cluster
     bool doPausePlay = targetStates[TargetTypeSynchronicPausePlay] == TargetStateEnabled; // if targeting pause/play
+    bool doClear = targetStates[TargetTypeSynchronicClear] == TargetStateEnabled;
+    bool doDeleteOldest = targetStates[TargetTypeSynchronicDeleteOldest] == TargetStateEnabled;
+    bool doDeleteNewest = targetStates[TargetTypeSynchronicDeleteNewest] == TargetStateEnabled;
+    bool doRotate = targetStates[TargetTypeSynchronicRotate] == TargetStateEnabled;
     
     // is this a new cluster?
     bool isNewCluster = false;
@@ -335,6 +339,33 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
         else pausePlay = true;
     }
     
+    if (doClear && (prep->getTargetTypeSynchronicClear() == NoteOn || prep->getTargetTypeSynchronicClear() == Both))
+    {
+        clusters.clear();
+    }
+    
+    if (doDeleteOldest && (prep->getTargetTypeSynchronicDeleteOldest() == NoteOn || prep->getTargetTypeSynchronicDeleteOldest() == Both))
+    {
+        if (!clusters.isEmpty()) clusters.remove(0);
+    }
+    
+    if (doDeleteNewest && (prep->getTargetTypeSynchronicDeleteNewest() == NoteOn || prep->getTargetTypeSynchronicDeleteNewest() == Both))
+    {
+        if (!clusters.isEmpty()) clusters.remove(clusters.size() - 1);
+    }
+    
+    if (doRotate && (prep->getTargetTypeSynchronicRotate() == NoteOn || prep->getTargetTypeSynchronicRotate() == Both))
+    {
+        if (!clusters.isEmpty())
+        {
+            SynchronicCluster::Ptr tempCluster = clusters.getLast();
+            for (int i = 1; i < clusters.size(); i++)
+            {
+                clusters.set(i, cluster[i-1]);
+            }
+            clusters.set(0, tempCluster);
+        }
+    }
 }
 
 void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel, Array<KeymapTargetState> targetStates)
@@ -350,6 +381,10 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled;
     bool doAddNotes = targetStates[TargetTypeSynchronicAddNotes] == TargetStateEnabled;
     bool doPausePlay = targetStates[TargetTypeSynchronicPausePlay] == TargetStateEnabled;
+    bool doClear = targetStates[TargetTypeSynchronicClear] == TargetStateEnabled;
+    bool doDeleteOldest = targetStates[TargetTypeSynchronicDeleteOldest] == TargetStateEnabled;
+    bool doDeleteNewest = targetStates[TargetTypeSynchronicDeleteNewest] == TargetStateEnabled;
+    bool doRotate = targetStates[TargetTypeSynchronicRotate] == TargetStateEnabled;
     
     // is this a new cluster?
     bool isNewCluster = false;
@@ -462,6 +497,34 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     {
         if (pausePlay) pausePlay = false;
         else pausePlay = true;
+    }
+    
+    if (doClear && (prep->getTargetTypeSynchronicClear() == NoteOff || prep->getTargetTypeSynchronicClear() == Both))
+    {
+        clusters.clear();
+    }
+    
+    if (doDeleteOldest && (prep->getTargetTypeSynchronicDeleteOldest() == NoteOff || prep->getTargetTypeSynchronicDeleteOldest() == Both))
+    {
+        if (!clusters.isEmpty()) clusters.remove(0);
+    }
+    
+    if (doDeleteNewest && (prep->getTargetTypeSynchronicDeleteNewest() == NoteOff || prep->getTargetTypeSynchronicDeleteNewest() == Both))
+    {
+        if (!clusters.isEmpty()) clusters.remove(clusters.size() - 1);
+    }
+    
+    if (doRotate && (prep->getTargetTypeSynchronicRotate() == NoteOff || prep->getTargetTypeSynchronicRotate() == Both))
+    {
+        if (!clusters.isEmpty())
+        {
+            SynchronicCluster::Ptr tempCluster = clusters.getLast();
+            for (int i = 1; i < clusters.size(); i++)
+            {
+                clusters.set(i, cluster[i-1]);
+            }
+            clusters.set(0, tempCluster);
+        }
     }
 }
 

@@ -298,7 +298,7 @@ void KeymapViewController::resized()
     invertOnOffToggle.toFront(false);
     
     // height of the box for the prep with the most targets (Synchronic)
-    int maxTargetHeight =   (TargetTypeSynchronicPausePlay - TargetTypeSynchronic + 1) *
+    int maxTargetHeight =   (TargetTypeSynchronicRotate - TargetTypeSynchronic + 1) *
                             (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing;
     
     leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
@@ -355,11 +355,11 @@ void KeymapViewController::resized()
      
     // Synchronic Targets
     // 5 * gYSpacing + numComponents * (gComponentToggleBoxHeight + gYSPacing)
-    Rectangle<int> synchronicBox = secondColumn.removeFromTop((TargetTypeSynchronicPausePlay - TargetTypeSynchronic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+    Rectangle<int> synchronicBox = secondColumn.removeFromTop((TargetTypeSynchronicRotate - TargetTypeSynchronic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     synchronicTBGroup.setBounds(synchronicBox);
     synchronicBox.removeFromTop(4 * gYSpacing);
     synchronicBox.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicPausePlay; i++)
+    for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicRotate; i++)
     {
         targetControlTBs[i]->setBounds(synchronicBox.removeFromTop(gComponentToggleBoxHeight));
         synchronicBox.removeFromTop(gYSpacing);
@@ -921,7 +921,7 @@ void KeymapViewController::update(void)
         
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicClose; i++)
         {
-            targetControlTBs[i]->setToggleState((bool)km->getTargetState((KeymapTargetType) i), dontSendNotification);
+            targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType) i) == TargetStateEnabled, dontSendNotification);
         }
     }
     
@@ -1000,7 +1000,7 @@ void KeymapViewController::hideUnconnectedTargets()
     if(kmItem != nullptr) {
         if (kmItem->getConnectionsOfType(PreparationTypeSynchronic).size() == 0)
         {
-            for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicPausePlay; i++)
+            for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicRotate; i++)
             {
                 targetControlTBs[i]->setAlpha(gDim);
                 targetControlTBs[i]->setEnabled(false);
@@ -1010,7 +1010,7 @@ void KeymapViewController::hideUnconnectedTargets()
         }
         else
         {
-            for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicPausePlay; i++)
+            for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicRotate; i++)
             {
                 targetControlTBs[i]->setAlpha(gBright);
                 targetControlTBs[i]->setEnabled(true);

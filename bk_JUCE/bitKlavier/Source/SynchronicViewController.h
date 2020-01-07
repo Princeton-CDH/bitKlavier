@@ -57,6 +57,10 @@ public:
         setLookAndFeel(nullptr);
         releaseVelocitySetsSynchronicToggle.setLookAndFeel(nullptr);
         onOffSelectCB.setLookAndFeel(nullptr);
+        for (int i=0; i<=TargetTypeSynchronicRotate-TargetTypeSynchronicSync; i++)
+        {
+            targetControlCBs[i]->setLookAndFeel(nullptr);
+        }
     };
     
     void paint (Graphics&) override;
@@ -148,6 +152,10 @@ public:
         setLookAndFeel(nullptr);
         releaseVelocitySetsSynchronicToggle.setLookAndFeel(nullptr);
         onOffSelectCB.setLookAndFeel(nullptr);
+        for (int i=0; i<=TargetTypeSynchronicRotate-TargetTypeSynchronicSync; i++)
+        {
+            targetControlCBs[i]->setLookAndFeel(nullptr);
+        }
     }
     
     void update(void) override;

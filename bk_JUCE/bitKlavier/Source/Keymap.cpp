@@ -331,7 +331,7 @@ void Keymap::setKeys(KeySet set, bool action, PitchClass pc)
 
 void Keymap::setTarget(KeymapTargetType target, KeymapTargetState state)
 {
-    if (targetStates[target] == TargetStateNil) return;
+    //if (targetStates[target] == TargetStateNil) return;
     
     //targetStates.set(target, state ? TargetStateDisabled : TargetStateEnabled);
     targetStates.set(target, state);

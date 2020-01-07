@@ -1074,6 +1074,9 @@ typedef enum KeymapTargetType
     TargetTypeSynchronicAddNotes,
     TargetTypeSynchronicClear,
     TargetTypeSynchronicPausePlay,
+    TargetTypeSynchronicDeleteOldest,
+    TargetTypeSynchronicDeleteNewest,
+    TargetTypeSynchronicRotate,
     TargetTypeNostalgic,
     TargetTypeNostalgicClear,
     TargetTypeBlendronicSync,
@@ -1087,12 +1090,17 @@ typedef enum KeymapTargetType
 
 static const std::vector<std::string> cKeymapTargetTypes = {
     "Direct",       // Direct
+    
     "Synchronic",   // Synchronic
     "Beat Sync",    // Synchronic
     "Pattern Sync", // Synchronic
     "Add Notes",    // Synchronic
     "Clear",        // Synchronic
     "Pause-Play",   // Synchronic
+    "Delete Oldest Layer",
+    "Delete Newest Layer",
+    "Rotate Layers",
+    
     "Nostalgic",    // Nostalgic
     "Clear",        // Nostalgic
     "Sync",         // Blendronic

@@ -85,7 +85,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     
     // Target Control CBs
     targetControlCBs = OwnedArray<BKComboBox>();
-    for (int i=TargetTypeSynchronicSync; i<=TargetTypeSynchronicPausePlay; i++)
+    for (int i=TargetTypeSynchronicSync; i<=TargetTypeSynchronicRotate; i++)
     {
         targetControlCBs.add(new BKComboBox()); // insert at the end of the array
         targetControlCBs.getLast()->setName(cKeymapTargetTypes[i]);
