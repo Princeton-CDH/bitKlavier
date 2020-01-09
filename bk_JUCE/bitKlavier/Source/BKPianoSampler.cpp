@@ -644,11 +644,9 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             for (auto b : blendronic)
             {
                 bDelay = b->getDelay();
-                if (bDelay->getActive() == true)
-                {
-                    bDelay->addSample(l, addCounter, 0);
-                    bDelay->addSample(r, addCounter, 1);
-                }
+
+                bDelay->addSample(l, addCounter, 0);
+                bDelay->addSample(r, addCounter, 1);
             }
             addCounter++;
         }
@@ -766,11 +764,9 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
             for (auto b : blendronic)
             {
                 bDelay = b->getDelay();
-                if (bDelay->getActive() == true)
-                {
-                    bDelay->addSample(l, addCounter, 0);
-                    bDelay->addSample(r, addCounter, 1);
-                }
+                
+                bDelay->addSample(l, addCounter, 0);
+                bDelay->addSample(r, addCounter, 1);
             }
             addCounter++;
         }
@@ -873,11 +869,9 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             for (auto b : blendronic)
             {
                 bDelay = b->getDelay();
-                if (bDelay->getActive() == true)
-                {
-                    bDelay->addSample(l, addCounter, 0);
-                    bDelay->addSample(r, addCounter, 1);
-                }
+
+                bDelay->addSample(l, addCounter, 0);
+                bDelay->addSample(r, addCounter, 1);
             }
             addCounter++;
         }

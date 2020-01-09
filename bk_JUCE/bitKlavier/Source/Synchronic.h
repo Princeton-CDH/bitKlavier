@@ -578,11 +578,11 @@ public:
         if (which == TargetTypeSynchronicPatternSync)   return targetTypeSynchronicPatternSync;
         if (which == TargetTypeSynchronicAddNotes)      return targetTypeSynchronicAddNotes;
         if (which == TargetTypeSynchronicPausePlay)     return targetTypeSynchronicPausePlay;
-        if (which == TargetTypeSynchronicClear)          return targetTypeSynchronicClear;
+        if (which == TargetTypeSynchronicClear)         return targetTypeSynchronicClear;
         if (which == TargetTypeSynchronicDeleteOldest)  return targetTypeSynchronicDeleteOldest;
         if (which == TargetTypeSynchronicDeleteNewest)  return targetTypeSynchronicDeleteNewest;
         if (which == TargetTypeSynchronicRotate)        return targetTypeSynchronicRotate;
-        
+        return TargetNoteModeNil;
     }
     
     inline void setTargetTypeSynchronicSync(TargetNoteMode nm)          { targetTypeSynchronicSync = nm; }
@@ -798,7 +798,7 @@ public:
     
     void setState(XmlElement* e)
     {
-        String n; int i; float f; bool b;
+        String n; int i; float f;
         
         n = e->getStringAttribute("gain");
         if (n != "") setGain(n.getFloatValue());

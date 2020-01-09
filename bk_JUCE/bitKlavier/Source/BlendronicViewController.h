@@ -24,9 +24,13 @@ public:
     ~BlendronicViewController()
     {
         setLookAndFeel(nullptr);
-        smoothModeSelectCB.setLookAndFeel(nullptr);
-        clearModeSelectCB.setLookAndFeel(nullptr);
-        openModeSelectCB.setLookAndFeel(nullptr);
+//        smoothModeSelectCB.setLookAndFeel(nullptr);
+//        clearModeSelectCB.setLookAndFeel(nullptr);
+//        openModeSelectCB.setLookAndFeel(nullptr);
+        for (int i=0; i<=TargetTypeBlendronicOpenCloseOutput-TargetTypeBlendronicSync; i++)
+        {
+            targetControlCBs[i]->setLookAndFeel(nullptr);
+        }
     };
     
     void paint (Graphics&) override;
@@ -55,26 +59,36 @@ protected:
     }
     
     BKEditableComboBox selectCB;
-    BKComboBox smoothModeSelectCB;
-    BKComboBox syncModeSelectCB;
-    BKComboBox clearModeSelectCB;
-    BKComboBox openModeSelectCB;
-    BKComboBox closeModeSelectCB;
+//    BKComboBox smoothModeSelectCB;
+//    BKComboBox syncModeSelectCB;
+//    BKComboBox clearModeSelectCB;
+//    BKComboBox openModeSelectCB;
+//    BKComboBox closeModeSelectCB;
     
-    BKLabel smoothModeLabel;
-    BKLabel syncModeLabel;
-    BKLabel clearModeLabel;
-    BKLabel openModeLabel;
-    BKLabel closeModeLabel;
+//    BKLabel smoothModeLabel;
+//    BKLabel syncModeLabel;
+//    BKLabel clearModeLabel;
+//    BKLabel openModeLabel;
+//    BKLabel closeModeLabel;
+    
+    BKTextButton pulseBeatSmooth;
+    BKTextButton multiplyDivideSmooth;
+    
+    BKLabel smoothTimeLabel;
+    BKLabel smoothValueLabel;
+    
+    OwnedArray<BKComboBox> targetControlCBs;
+    OwnedArray<BKLabel> targetControlCBLabels;
+    GroupComponent targetControlsGroup;
     
     BlendronicDisplay delayLineDisplay;
     
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
 
-    std::unique_ptr<BKSingleSlider> inputThreshSlider;
-    std::unique_ptr<BKSingleSlider> keyThreshSlider;
-    std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
-    std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
+//    std::unique_ptr<BKSingleSlider> inputThreshSlider;
+//    std::unique_ptr<BKSingleSlider> keyThreshSlider;
+//    std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
+//    std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
     
     void displayTab(int tab) override;
     void displayShared(void) override;
@@ -99,21 +113,23 @@ public:
     ~BlendronicPreparationEditor()
     {
         setLookAndFeel(nullptr);
-        smoothModeSelectCB.setLookAndFeel(nullptr);
-        clearModeSelectCB.setLookAndFeel(nullptr);
-        smoothModeSelectCB.setLookAndFeel(nullptr);
+//        smoothModeSelectCB.setLookAndFeel(nullptr);
+//        clearModeSelectCB.setLookAndFeel(nullptr);
+        for (int i=0; i<=TargetTypeBlendronicOpenCloseOutput-TargetTypeBlendronicSync; i++)
+        {
+            targetControlCBs[i]->setLookAndFeel(nullptr);
+        }
     };
     
     
     void update(void) override;
     
     void fillSelectCB(int last, int current);
-    void fillSmoothModeSelectCB(void);
-    void fillSyncModeSelectCB(void);
-    void fillClearModeSelectCB(void);
-    void fillOpenModeSelectCB(void);
-    void fillCloseModeSelectCB(void);
-    void fillRotationCB(void);
+//    void fillSmoothModeSelectCB(void);
+//    void fillSyncModeSelectCB(void);
+//    void fillClearModeSelectCB(void);
+//    void fillOpenModeSelectCB(void);
+//    void fillCloseModeSelectCB(void);
     
     void timerCallback() override;
     
@@ -175,11 +191,11 @@ public:
     void multiSlidersDidChange(String name, Array<Array<float>> values) override;
     
     void fillSelectCB(int last, int current);
-    void fillSmoothModeSelectCB(void);
-    void fillSyncModeSelectCB(void);
-    void fillClearModeSelectCB(void);
-    void fillOpenModeSelectCB(void);
-    void fillCloseModeSelectCB(void);
+//    void fillSmoothModeSelectCB(void);
+//    void fillSyncModeSelectCB(void);
+//    void fillClearModeSelectCB(void);
+//    void fillOpenModeSelectCB(void);
+//    void fillCloseModeSelectCB(void);
     
     void greyOutAllComponents();
     void highlightModedComponents();

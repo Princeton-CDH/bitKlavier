@@ -11,7 +11,7 @@
 #include "BlendronicViewController.h"
 
 BlendronicViewController::BlendronicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 2)
+BKViewController(p, theGraph, 3)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -67,70 +67,116 @@ BKViewController(p, theGraph, 2)
     selectCB.setSelectedItemIndex(0);
     addAndMakeVisible(selectCB);
     
-    smoothModeSelectCB.setName("Smooth Mode");
-    smoothModeSelectCB.setTooltip("Determines whether smooth durations are constant or proportional to beat length");
-    smoothModeSelectCB.addSeparator();
-    smoothModeSelectCB.setLookAndFeel(&comboBoxRightJustifyLAF);
-    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
-    smoothModeSelectCB.addListener(this);
-    smoothModeSelectCB.setSelectedItemIndex(0);
-    addAndMakeVisible(smoothModeSelectCB);
+    pulseBeatSmooth.setName("PulseBeatSmooth");
+    pulseBeatSmooth.setButtonText("pulse length");
+    pulseBeatSmooth.setTooltip("Set base for smoothing time");
+    pulseBeatSmooth.addListener(this);
+    addAndMakeVisible(pulseBeatSmooth);
     
-    smoothModeLabel.setText("smoothing", dontSendNotification);
-    smoothModeLabel.setTooltip("Determines whether smooth durations are constant or proportional to beat length and delta");
-    addAndMakeVisible(&smoothModeLabel, ALL);
+    multiplyDivideSmooth.setName("MultipleDivideSmooth");
+    multiplyDivideSmooth.setButtonText("multiplied");
+    multiplyDivideSmooth.setTooltip("Set operation of the smoothing value");
+    multiplyDivideSmooth.addListener(this);
+    addAndMakeVisible(multiplyDivideSmooth);
     
-    syncModeSelectCB.setName("Sync Mode");
-    syncModeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
-    syncModeSelectCB.setTooltip("Determines which aspect of MIDI signal triggers the Blendronic sequence");
-    syncModeSelectCB.addSeparator();
-    syncModeSelectCB.addListener(this);
-    syncModeSelectCB.setSelectedItemIndex(0);
-    addAndMakeVisible(syncModeSelectCB);
+    smoothTimeLabel.setText("Smooth time equals", dontSendNotification);
+    smoothTimeLabel.setTooltip("Set base for smoothing time");
+    addAndMakeVisible(&smoothTimeLabel, ALL);
+
+    smoothValueLabel.setText("by smoothing value.", dontSendNotification);
+    smoothValueLabel.setTooltip("Set operation of the smoothing value");
+    addAndMakeVisible(&smoothValueLabel, ALL);
     
-    syncModeLabel.setText("pulse reset by", dontSendNotification);
-    syncModeLabel.setJustificationType(juce::Justification::centredRight);
-    syncModeLabel.setTooltip("Determines which aspect of MIDI signal resets the Blendronic sequence");
-    addAndMakeVisible(&syncModeLabel, ALL);
+//    smoothModeSelectCB.setName("Smooth Mode");
+//    smoothModeSelectCB.setTooltip("Determines whether smooth durations are constant or proportional to beat length");
+//    smoothModeSelectCB.addSeparator();
+//    smoothModeSelectCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+//    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+//    smoothModeSelectCB.addListener(this);
+//    smoothModeSelectCB.setSelectedItemIndex(0);
+//    addAndMakeVisible(smoothModeSelectCB);
+//
+//    smoothModeLabel.setText("smoothing", dontSendNotification);
+//    smoothModeLabel.setTooltip("Determines whether smooth durations are constant or proportional to beat length and delta");
+//    addAndMakeVisible(&smoothModeLabel, ALL);
+//
+//    syncModeSelectCB.setName("Sync Mode");
+//    syncModeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
+//    syncModeSelectCB.setTooltip("Determines which aspect of MIDI signal triggers the Blendronic sequence");
+//    syncModeSelectCB.addSeparator();
+//    syncModeSelectCB.addListener(this);
+//    syncModeSelectCB.setSelectedItemIndex(0);
+//    addAndMakeVisible(syncModeSelectCB);
+//
+//    syncModeLabel.setText("pulse reset by", dontSendNotification);
+//    syncModeLabel.setJustificationType(juce::Justification::centredRight);
+//    syncModeLabel.setTooltip("Determines which aspect of MIDI signal resets the Blendronic sequence");
+//    addAndMakeVisible(&syncModeLabel, ALL);
+//
+//    clearModeSelectCB.setName("Clear Mode");
+//    clearModeSelectCB.setTooltip("Determines which aspect of MIDI signal clears the delay line");
+//    clearModeSelectCB.addSeparator();
+//    clearModeSelectCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+//    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+//    clearModeSelectCB.addListener(this);
+//    clearModeSelectCB.setSelectedItemIndex(0);
+//    addAndMakeVisible(clearModeSelectCB);
+//
+//    clearModeLabel.setText("clears the delay line", dontSendNotification);
+//    clearModeLabel.setTooltip("Determines which aspect of MIDI signal clears the delay line");
+//    addAndMakeVisible(&clearModeLabel, ALL);
+//
+//    closeModeSelectCB.setName("Close Mode");
+//    closeModeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
+//    closeModeSelectCB.setTooltip("Determines which aspect of MIDI signal clears the delay line");
+//    closeModeSelectCB.addSeparator();
+//    closeModeSelectCB.addListener(this);
+//    closeModeSelectCB.setSelectedItemIndex(0);
+//    addAndMakeVisible(closeModeSelectCB);
+//
+//    closeModeLabel.setText("close the delay line on", dontSendNotification);
+//    closeModeLabel.setJustificationType(juce::Justification::centredRight);
+//    closeModeLabel.setTooltip("Determines which aspect of MIDI signal close the delay line");
+//    addAndMakeVisible(&closeModeLabel, ALL);
+//
+//    openModeSelectCB.setName("Open Mode");
+//    openModeSelectCB.setTooltip("Determines which aspect of MIDI signal opens the delay line");
+//    openModeSelectCB.addSeparator();
+//    openModeSelectCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+//    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+//    openModeSelectCB.addListener(this);
+//    openModeSelectCB.setSelectedItemIndex(0);
+//    addAndMakeVisible(openModeSelectCB);
+//
+//    openModeLabel.setText("opens the delay line", dontSendNotification);
+//    openModeLabel.setTooltip("Determines which aspect of MIDI signal opens the delay line");
+//    addAndMakeVisible(&openModeLabel, ALL);
     
-    clearModeSelectCB.setName("Clear Mode");
-    clearModeSelectCB.setTooltip("Determines which aspect of MIDI signal clears the delay line");
-    clearModeSelectCB.addSeparator();
-    clearModeSelectCB.setLookAndFeel(&comboBoxRightJustifyLAF);
-    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
-    clearModeSelectCB.addListener(this);
-    clearModeSelectCB.setSelectedItemIndex(0);
-    addAndMakeVisible(clearModeSelectCB);
+    // Target Control CBs
+    targetControlCBs = OwnedArray<BKComboBox>();
+    for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
+    {
+        targetControlCBs.add(new BKComboBox()); // insert at the end of the array
+        targetControlCBs.getLast()->setName(cKeymapTargetTypes[i]);
+        targetControlCBs.getLast()->addListener(this);
+        targetControlCBs.getLast()->setLookAndFeel(&comboBoxRightJustifyLAF);
+        targetControlCBs.getLast()->addItem(cTargetNoteModes[TargetNoteMode::NoteOn], TargetNoteMode::NoteOn + 1);
+        targetControlCBs.getLast()->addItem(cTargetNoteModes[TargetNoteMode::NoteOff], TargetNoteMode::NoteOff + 1);
+        targetControlCBs.getLast()->addItem(cTargetNoteModes[TargetNoteMode::Both], TargetNoteMode::Both + 1);
+        targetControlCBs.getLast()->setSelectedItemIndex(0, dontSendNotification);
+        addAndMakeVisible(targetControlCBs.getLast(), ALL);
+        
+        targetControlCBLabels.add(new BKLabel());
+        targetControlCBLabels.getLast()->setText(cKeymapTargetTypes[i], dontSendNotification);
+        addAndMakeVisible(targetControlCBLabels.getLast(), ALL);
+    }
     
-    clearModeLabel.setText("clears the delay line", dontSendNotification);
-    clearModeLabel.setTooltip("Determines which aspect of MIDI signal clears the delay line");
-    addAndMakeVisible(&clearModeLabel, ALL);
-    
-    closeModeSelectCB.setName("Close Mode");
-    closeModeSelectCB.BKSetJustificationType(juce::Justification::centredRight);
-    closeModeSelectCB.setTooltip("Determines which aspect of MIDI signal clears the delay line");
-    closeModeSelectCB.addSeparator();
-    closeModeSelectCB.addListener(this);
-    closeModeSelectCB.setSelectedItemIndex(0);
-    addAndMakeVisible(closeModeSelectCB);
-    
-    closeModeLabel.setText("close the delay line on", dontSendNotification);
-    closeModeLabel.setJustificationType(juce::Justification::centredRight);
-    closeModeLabel.setTooltip("Determines which aspect of MIDI signal close the delay line");
-    addAndMakeVisible(&closeModeLabel, ALL);
-    
-    openModeSelectCB.setName("Open Mode");
-    openModeSelectCB.setTooltip("Determines which aspect of MIDI signal opens the delay line");
-    openModeSelectCB.addSeparator();
-    openModeSelectCB.setLookAndFeel(&comboBoxRightJustifyLAF);
-    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
-    openModeSelectCB.addListener(this);
-    openModeSelectCB.setSelectedItemIndex(0);
-    addAndMakeVisible(openModeSelectCB);
-    
-    openModeLabel.setText("opens the delay line", dontSendNotification);
-    openModeLabel.setTooltip("Determines which aspect of MIDI signal opens the delay line");
-    addAndMakeVisible(&openModeLabel, ALL);
+    // border for Target Triggers
+    targetControlsGroup.setName("targetGroup");
+    targetControlsGroup.setText("Blendronic Target Triggers");
+    targetControlsGroup.setTextLabelPosition(Justification::centred);
+    targetControlsGroup.setAlpha(0.65);
+    addAndMakeVisible(targetControlsGroup);
     
     addAndMakeVisible(&actionButton, ALL);
     actionButton.setButtonText("Action");
@@ -141,10 +187,10 @@ BKViewController(p, theGraph, 2)
     delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
     addAndMakeVisible(&delayLineDisplay);
 
-    keyThreshSlider = std::make_unique< BKSingleSlider>("cluster threshold", 20, 2000, 200, 10);
-    keyThreshSlider->setToolTipString("successive notes spaced by less than this time (ms) are grouped for determining first note-on and first note-off");
-    keyThreshSlider->setJustifyRight(true);
-    addAndMakeVisible(*keyThreshSlider, ALL);
+//    keyThreshSlider = std::make_unique< BKSingleSlider>("cluster threshold", 20, 2000, 200, 10);
+//    keyThreshSlider->setToolTipString("successive notes spaced by less than this time (ms) are grouped for determining first note-on and first note-off");
+//    keyThreshSlider->setJustifyRight(true);
+//    addAndMakeVisible(*keyThreshSlider, ALL);
     
     currentTab = 0;
     displayTab(currentTab);
@@ -157,18 +203,31 @@ void BlendronicViewController::invisible(void)
     {
         paramSliders[i]->setVisible(false);
     }
-    syncModeSelectCB.setVisible(false);
-    syncModeLabel.setVisible(false);
-    smoothModeSelectCB.setVisible(false);
-    smoothModeLabel.setVisible(false);
-    clearModeSelectCB.setVisible(false);
-    clearModeLabel.setVisible(false);
-    closeModeSelectCB.setVisible(false);
-    closeModeLabel.setVisible(false);
-    openModeSelectCB.setVisible(false);
-    openModeLabel.setVisible(false);
+    
+    pulseBeatSmooth.setVisible(false);
+    multiplyDivideSmooth.setVisible(false);
+    smoothTimeLabel.setVisible(false);
+    smoothValueLabel.setVisible(false);
+//    smoothModeSelectCB.setVisible(false);
+//    smoothModeLabel.setVisible(false);
+//    syncModeSelectCB.setVisible(false);
+//    syncModeLabel.setVisible(false);
+//    clearModeSelectCB.setVisible(false);
+//    clearModeLabel.setVisible(false);
+//    closeModeSelectCB.setVisible(false);
+//    closeModeLabel.setVisible(false);
+//    openModeSelectCB.setVisible(false);
+//    openModeLabel.setVisible(false);
+    
+    for (int i=0; i<targetControlCBs.size(); i++)
+    {
+        targetControlCBs[i]->setVisible(false);
+        targetControlCBLabels[i]->setVisible(false);
+    }
+    targetControlsGroup.setVisible(false);
+    
     delayLineDisplay.setVisible(false);
-    keyThreshSlider->setVisible(false);
+//    keyThreshSlider->setVisible(false);
 }
 
 void BlendronicViewController::displayShared(void)
@@ -216,8 +275,14 @@ void BlendronicViewController::displayTab(int tab)
     {
         BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
     
-        smoothModeSelectCB.setVisible(true);
-        smoothModeLabel.setVisible(true);
+//        smoothModeSelectCB.setVisible(true);
+//        smoothModeLabel.setVisible(true);
+        
+        pulseBeatSmooth.setVisible(true);
+        multiplyDivideSmooth.setVisible(true);
+        
+        smoothTimeLabel.setVisible(true);
+        smoothValueLabel.setVisible(true);
         
         for (int i = 0; i < paramSliders.size(); i++)
         {
@@ -238,33 +303,41 @@ void BlendronicViewController::displayTab(int tab)
         leftColumn.removeFromRight(processor.paddingScalarX * 20);
         rightColumn.removeFromLeft(processor.paddingScalarX * 20);
         
-        leftColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
-        Rectangle<int> smoothModeSelectCBRect (leftColumn.removeFromTop(gComponentComboBoxHeight));
-        Rectangle<int> smoothModeLabelRect (smoothModeSelectCBRect.removeFromRight(smoothModeSelectCBRect.getWidth()*0.5));
-        smoothModeSelectCB.setBounds(smoothModeSelectCBRect);
-        smoothModeLabel.setBounds(smoothModeLabelRect);
+//        leftColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+//        Rectangle<int> smoothModeSelectCBRect (leftColumn.removeFromTop(gComponentComboBoxHeight));
+//        Rectangle<int> smoothModeLabelRect (smoothModeSelectCBRect.removeFromRight(smoothModeSelectCBRect.getWidth()*0.5));
+//        smoothModeSelectCB.setBounds(smoothModeSelectCBRect);
+//        smoothModeLabel.setBounds(smoothModeLabelRect);
 
-
-        area.removeFromTop(sliderHeight + gYSpacing - gComponentComboBoxHeight*1.5);
+        area.removeFromTop(gComponentComboBoxHeight);
         for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setBounds(area.removeFromTop(sliderHeight));
             area.removeFromTop(gYSpacing);
+            if (i == 1)
+            {
+                area.removeFromTop(gComponentComboBoxHeight*0.5);
+                Rectangle<int> smoothRect (area.removeFromTop(gComponentComboBoxHeight));
+                smoothTimeLabel.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.2));
+                pulseBeatSmooth.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.15));
+                multiplyDivideSmooth.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.15));
+                smoothValueLabel.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.2));
+            }
         }
     }
     else if (tab == 1)
     {
         BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
         
-        syncModeSelectCB.setVisible(true);
-        syncModeLabel.setVisible(true);
-        clearModeSelectCB.setVisible(true);
-        clearModeLabel.setVisible(true);
-        closeModeSelectCB.setVisible(true);
-        closeModeLabel.setVisible(true);
-        openModeSelectCB.setVisible(true);
-        openModeLabel.setVisible(true);
-        keyThreshSlider->setVisible(true);
+//        syncModeSelectCB.setVisible(true);
+//        syncModeLabel.setVisible(true);
+//        clearModeSelectCB.setVisible(true);
+//        clearModeLabel.setVisible(true);
+//        closeModeSelectCB.setVisible(true);
+//        closeModeLabel.setVisible(true);
+//        openModeSelectCB.setVisible(true);
+//        openModeLabel.setVisible(true);
+//        keyThreshSlider->setVisible(true);
         
         delayLineDisplay.setVisible(true);
         
@@ -276,44 +349,86 @@ void BlendronicViewController::displayTab(int tab)
         area.removeFromRight(rightArrow.getWidth() + gXSpacing);
         area.removeFromLeft(leftArrow.getWidth() + gXSpacing);
         
-        area.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
-        Rectangle<int> keyThreshSliderRect (area);
-        keyThreshSlider->setBounds(keyThreshSliderRect.removeFromTop(sliderHeight));
-        
-        area.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
-        Rectangle<int> leftColumn (area);
-        Rectangle<int> rightColumn (leftColumn.removeFromRight(leftColumn.getWidth()* 0.5));
-        
-        leftColumn.removeFromRight(processor.paddingScalarX * 20);
-        rightColumn.removeFromLeft(processor.paddingScalarX * 20);
-        
-        leftColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
-        Rectangle<int> syncModeSelectCBRect (leftColumn.removeFromTop(gComponentComboBoxHeight));
-        Rectangle<int> syncModeSelectLabel (syncModeSelectCBRect.removeFromLeft(syncModeSelectCBRect.getWidth()*0.5));
-        syncModeSelectCB.setBounds(syncModeSelectCBRect);
-        syncModeLabel.setBounds(syncModeSelectLabel);
-        
-        rightColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
-        Rectangle<int> clearModeSelectCBRect (rightColumn.removeFromTop(gComponentComboBoxHeight));
-        Rectangle<int> clearModeLabelRect (clearModeSelectCBRect.removeFromRight(clearModeSelectCBRect.getWidth()*0.5));
-        clearModeSelectCB.setBounds(clearModeSelectCBRect);
-        clearModeLabel.setBounds(clearModeLabelRect);
-        
-        leftColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
-        Rectangle<int> closeModeSelectCBRect (leftColumn.removeFromTop(gComponentComboBoxHeight));
-        Rectangle<int> closeModeSelectLabel (closeModeSelectCBRect.removeFromLeft(closeModeSelectCBRect.getWidth()*0.5));
-        closeModeSelectCB.setBounds(closeModeSelectCBRect);
-        closeModeLabel.setBounds(closeModeSelectLabel);
-        
-        rightColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
-        Rectangle<int> openModeSelectCBRect (rightColumn.removeFromTop(gComponentComboBoxHeight));
-        Rectangle<int> openModeLabelRect (openModeSelectCBRect.removeFromRight(openModeSelectCBRect.getWidth()*0.5));
-        openModeSelectCB.setBounds(openModeSelectCBRect);
-        openModeLabel.setBounds(openModeLabelRect);
+//        area.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+//        Rectangle<int> keyThreshSliderRect (area);
+//        keyThreshSlider->setBounds(keyThreshSliderRect.removeFromTop(sliderHeight));
+//
+//        area.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+//        Rectangle<int> leftColumn (area);
+//        Rectangle<int> rightColumn (leftColumn.removeFromRight(leftColumn.getWidth()* 0.5));
+//
+//        leftColumn.removeFromRight(processor.paddingScalarX * 20);
+//        rightColumn.removeFromLeft(processor.paddingScalarX * 20);
+//
+//        leftColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+//        Rectangle<int> syncModeSelectCBRect (leftColumn.removeFromTop(gComponentComboBoxHeight));
+//        Rectangle<int> syncModeSelectLabel (syncModeSelectCBRect.removeFromLeft(syncModeSelectCBRect.getWidth()*0.5));
+//        syncModeSelectCB.setBounds(syncModeSelectCBRect);
+//        syncModeLabel.setBounds(syncModeSelectLabel);
+//
+//        rightColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+//        Rectangle<int> clearModeSelectCBRect (rightColumn.removeFromTop(gComponentComboBoxHeight));
+//        Rectangle<int> clearModeLabelRect (clearModeSelectCBRect.removeFromRight(clearModeSelectCBRect.getWidth()*0.5));
+//        clearModeSelectCB.setBounds(clearModeSelectCBRect);
+//        clearModeLabel.setBounds(clearModeLabelRect);
+//
+//        leftColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+//        Rectangle<int> closeModeSelectCBRect (leftColumn.removeFromTop(gComponentComboBoxHeight));
+//        Rectangle<int> closeModeSelectLabel (closeModeSelectCBRect.removeFromLeft(closeModeSelectCBRect.getWidth()*0.5));
+//        closeModeSelectCB.setBounds(closeModeSelectCBRect);
+//        closeModeLabel.setBounds(closeModeSelectLabel);
+//
+//        rightColumn.removeFromTop(sliderHeight * 0.5 - gComponentComboBoxHeight);
+//        Rectangle<int> openModeSelectCBRect (rightColumn.removeFromTop(gComponentComboBoxHeight));
+//        Rectangle<int> openModeLabelRect (openModeSelectCBRect.removeFromRight(openModeSelectCBRect.getWidth()*0.5));
+//        openModeSelectCB.setBounds(openModeSelectCBRect);
+//        openModeLabel.setBounds(openModeLabelRect);
         
         area.removeFromTop(1.5*sliderHeight - gComponentComboBoxHeight);
         Rectangle<int> delayLineDisplayRect (area.removeFromTop(sliderHeight*2));
         delayLineDisplay.setBounds(delayLineDisplayRect);
+    }
+    else if (tab == 2) // keymap target tab
+    {
+        // make the combo boxes visible
+        for (int i=0; i<targetControlCBs.size(); i++)
+        {
+            targetControlCBs[i]->setVisible(true);
+            targetControlCBLabels[i]->setVisible(true);
+        }
+        targetControlsGroup.setVisible(true);
+        
+        Rectangle<int> area (getBounds());
+        area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
+        
+        Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth() * 0.5));
+        leftColumn.removeFromLeft(leftColumn.getWidth() * 0.5);
+        
+        leftColumn.removeFromRight(processor.paddingScalarX * 5);
+        leftColumn.removeFromLeft(processor.paddingScalarX * 20);
+        
+        area.removeFromLeft(processor.paddingScalarX * 5); //area is now right column
+        area.removeFromRight(processor.paddingScalarX * 20);
+        
+        int targetControlCBSection = (gComponentComboBoxHeight + gYSpacing) * targetControlCBs.size();
+        leftColumn.removeFromTop((leftColumn.getHeight() - targetControlCBSection) / 3.);
+        area.removeFromTop((area.getHeight() - targetControlCBSection) / 3.);
+        
+        for (int i=0; i<targetControlCBs.size(); i++)
+        {
+            targetControlCBs[i]->setBounds(leftColumn.removeFromTop(gComponentComboBoxHeight));
+            leftColumn.removeFromTop(gYSpacing);
+            
+            targetControlCBLabels[i]->setBounds(area.removeFromTop(gComponentComboBoxHeight));
+            area.removeFromTop(gYSpacing);
+        }
+        
+        targetControlsGroup.setBounds(targetControlCBs[0]->getX() - 4 * gXSpacing,
+                                      targetControlCBs[0]->getY() - gComponentComboBoxHeight - 2 * gXSpacing,
+                                      targetControlCBs[0]->getWidth() * 2 + 8 * gXSpacing,
+                                      targetControlCBs[0]->getHeight() * targetControlCBs.size() + 2 * gComponentComboBoxHeight + 4 * gYSpacing);
     }
 }
 
@@ -347,19 +462,19 @@ BlendronicViewController(p, theGraph)
 
     selectCB.addListener(this);
     selectCB.addMyListener(this);
-    smoothModeSelectCB.addListener(this);
-    syncModeSelectCB.addListener(this);
-    clearModeSelectCB.addListener(this);
-    openModeSelectCB.addListener(this);
-    closeModeSelectCB.addListener(this);
+//    smoothModeSelectCB.addListener(this);
+//    syncModeSelectCB.addListener(this);
+//    clearModeSelectCB.addListener(this);
+//    openModeSelectCB.addListener(this);
+//    closeModeSelectCB.addListener(this);
     
-    keyThreshSlider->addMyListener(this);
+//    keyThreshSlider->addMyListener(this);
     
-    fillSmoothModeSelectCB();
-    fillSyncModeSelectCB();
-    fillClearModeSelectCB();
-    fillCloseModeSelectCB();
-    fillOpenModeSelectCB();
+//    fillSmoothModeSelectCB();
+//    fillSyncModeSelectCB();
+//    fillClearModeSelectCB();
+//    fillCloseModeSelectCB();
+//    fillOpenModeSelectCB();
     
     startTimer(20);
 }
@@ -382,12 +497,19 @@ void BlendronicPreparationEditor::update(void)
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentBlendronicId, dontSendNotification);
-        smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
-        syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
-        clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
-        closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
-        openModeSelectCB.setSelectedItemIndex(prep->getOpenMode(), dontSendNotification);
-        keyThreshSlider->setValue(prep->getClusterThreshMS(), dontSendNotification);
+//        smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
+//        syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
+//        clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
+//        closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
+//        openModeSelectCB.setSelectedItemIndex(prep->getOpenMode(), dontSendNotification);
+//
+        for (int i = TargetTypeBlendronicSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+        {
+            targetControlCBs[i - TargetTypeBlendronicSync]->setSelectedItemIndex
+            (prep->getTargetTypeBlendronic(KeymapTargetType(i)), dontSendNotification);
+        }
+        
+//        keyThreshSlider->setValue(prep->getClusterThreshMS(), dontSendNotification);
 
         for(int i = 0; i < paramSliders.size(); i++)
         {
@@ -561,60 +683,77 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         setCurrentId(Id);
     }
-    else if (name == "Smooth Mode")
+//    else if (name == "Smooth Mode")
+//    {
+//        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+//        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+//        
+//        prep    ->setSmoothMode( (BlendronicSmoothMode) index);
+//        active  ->setSmoothMode( (BlendronicSmoothMode) index);
+//        
+//        fillSmoothModeSelectCB();
+//        
+//    }
+//    else if (name == "Sync Mode")
+//    {
+//        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+//        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+//
+//        prep    ->setSyncMode( (BlendronicSyncMode) index);
+//        active  ->setSyncMode( (BlendronicSyncMode) index);
+//
+//        fillSyncModeSelectCB();
+//
+//    }
+//    else if (name == "Clear Mode")
+//    {
+//        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+//        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+//
+//        prep    ->setClearMode( (BlendronicClearMode) index);
+//        active  ->setClearMode( (BlendronicClearMode) index);
+//
+//        fillClearModeSelectCB();
+//
+//    }
+//    else if (name == "Open Mode")
+//    {
+//        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+//        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+//
+//        prep    ->setOpenMode( (BlendronicOpenMode) index);
+//        active  ->setOpenMode( (BlendronicOpenMode) index);
+//
+//        fillOpenModeSelectCB();
+//
+//    }
+//    else if (name == "Close Mode")
+//    {
+//        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+//        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+//
+//        prep    ->setCloseMode( (BlendronicCloseMode) index);
+//        active  ->setCloseMode( (BlendronicCloseMode) index);
+//
+//        fillCloseModeSelectCB();
+//
+//    }
+    else // target combo boxes from tab 3
     {
         BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
         BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
         
-        prep    ->setSmoothMode( (BlendronicSmoothMode) index);
-        active  ->setSmoothMode( (BlendronicSmoothMode) index);
-        
-        fillSmoothModeSelectCB();
-        
-    }
-    else if (name == "Sync Mode")
-    {
-        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-        
-        prep    ->setSyncMode( (BlendronicSyncMode) index);
-        active  ->setSyncMode( (BlendronicSyncMode) index);
-        
-        fillSyncModeSelectCB();
-        
-    }
-    else if (name == "Clear Mode")
-    {
-        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-        
-        prep    ->setClearMode( (BlendronicClearMode) index);
-        active  ->setClearMode( (BlendronicClearMode) index);
-        
-        fillClearModeSelectCB();
-        
-    }
-    else if (name == "Open Mode")
-    {
-        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-        
-        prep    ->setOpenMode( (BlendronicOpenMode) index);
-        active  ->setOpenMode( (BlendronicOpenMode) index);
-        
-        fillOpenModeSelectCB();
-        
-    }
-    else if (name == "Close Mode")
-    {
-        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-        
-        prep    ->setCloseMode( (BlendronicCloseMode) index);
-        active  ->setCloseMode( (BlendronicCloseMode) index);
-        
-        fillCloseModeSelectCB();
-        
+        for (int i=0; i<targetControlCBs.size(); i++)
+        {
+            if (box == targetControlCBs[i])
+            {
+                int selectedItem = targetControlCBs[i]->getSelectedId() - 1;
+                DBG(targetControlCBs[i]->getName() + " " + cTargetNoteModes[selectedItem]);
+                
+                prep    ->setTargetTypeBlendronic(KeymapTargetType(i + TargetTypeBlendronicSync), (TargetNoteMode)selectedItem);
+                active  ->setTargetTypeBlendronic(KeymapTargetType(i + TargetTypeBlendronicSync), (TargetNoteMode)selectedItem);
+            }
+        }
     }
 }
 
@@ -663,75 +802,75 @@ void BlendronicPreparationEditor::fillSelectCB(int last, int current)
     
 }
 
-void BlendronicPreparationEditor::fillSmoothModeSelectCB()
-{
-    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-    
-    smoothModeSelectCB.clear(dontSendNotification);
-    
-    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantTimeSmooth], 1);
-    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantRateSmooth], 2);
-    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalTimeSmooth], 3);
-    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalRateSmooth], 4);
-    
-    smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
-}
+//void BlendronicPreparationEditor::fillSmoothModeSelectCB()
+//{
+//    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+//
+//    smoothModeSelectCB.clear(dontSendNotification);
+//
+//    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantTimeSmooth], 1);
+//    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantRateSmooth], 2);
+//    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalTimeSmooth], 3);
+//    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalRateSmooth], 4);
+//
+//    smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
+//}
 
-void BlendronicPreparationEditor::fillSyncModeSelectCB()
-{
-    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-    
-    syncModeSelectCB.clear(dontSendNotification);
-    
-    for (int i = 0; i <= BlendronicSyncModeNil; ++i)
-    {
-        syncModeSelectCB.addItem(cBlendronicSyncModes[i], i+1);
-    }
-    
-    syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
-}
-
-void BlendronicPreparationEditor::fillClearModeSelectCB()
-{
-    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-    
-    clearModeSelectCB.clear(dontSendNotification);
-    
-    for (int i = 0; i <= BlendronicClearModeNil; ++i)
-    {
-        clearModeSelectCB.addItem(cBlendronicClearModes[i], i+1);
-    }
-    
-    clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
-}
-
-void BlendronicPreparationEditor::fillOpenModeSelectCB()
-{
-    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-    
-    openModeSelectCB.clear(dontSendNotification);
-    
-    for (int i = 0; i <= BlendronicOpenModeNil; ++i)
-    {
-        openModeSelectCB.addItem(cBlendronicOpenModes[i], i+1);
-    }
-    
-    openModeSelectCB.setSelectedItemIndex(prep->getOpenMode(), dontSendNotification);
-}
-
-void BlendronicPreparationEditor::fillCloseModeSelectCB()
-{
-    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-    
-    closeModeSelectCB.clear(dontSendNotification);
-    
-    for (int i = 0; i <= BlendronicCloseModeNil; ++i)
-    {
-        closeModeSelectCB.addItem(cBlendronicCloseModes[i], i+1);
-    }
-    
-    closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
-}
+//void BlendronicPreparationEditor::fillSyncModeSelectCB()
+//{
+//    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+//
+//    syncModeSelectCB.clear(dontSendNotification);
+//
+//    for (int i = 0; i <= BlendronicSyncModeNil; ++i)
+//    {
+//        syncModeSelectCB.addItem(cBlendronicSyncModes[i], i+1);
+//    }
+//
+//    syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
+//}
+//
+//void BlendronicPreparationEditor::fillClearModeSelectCB()
+//{
+//    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+//
+//    clearModeSelectCB.clear(dontSendNotification);
+//
+//    for (int i = 0; i <= BlendronicClearModeNil; ++i)
+//    {
+//        clearModeSelectCB.addItem(cBlendronicClearModes[i], i+1);
+//    }
+//
+//    clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
+//}
+//
+//void BlendronicPreparationEditor::fillOpenModeSelectCB()
+//{
+//    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+//
+//    openModeSelectCB.clear(dontSendNotification);
+//
+//    for (int i = 0; i <= BlendronicOpenModeNil; ++i)
+//    {
+//        openModeSelectCB.addItem(cBlendronicOpenModes[i], i+1);
+//    }
+//
+//    openModeSelectCB.setSelectedItemIndex(prep->getOpenMode(), dontSendNotification);
+//}
+//
+//void BlendronicPreparationEditor::fillCloseModeSelectCB()
+//{
+//    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+//
+//    closeModeSelectCB.clear(dontSendNotification);
+//
+//    for (int i = 0; i <= BlendronicCloseModeNil; ++i)
+//    {
+//        closeModeSelectCB.addItem(cBlendronicCloseModes[i], i+1);
+//    }
+//
+//    closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
+//}
 
 void BlendronicPreparationEditor::timerCallback()
 {
@@ -753,6 +892,29 @@ void BlendronicPreparationEditor::timerCallback()
             delayLineDisplay.setPulseOffset(proc->getPulseOffset());
             delayLineDisplay.setMarkers(proc->getBeatPositionsInBuffer());
             delayLineDisplay.setPlayheads(Array<uint64>({proc->getCurrentSample(), proc->getDelayedSample()}));
+            
+            // dim target comboboxes that aren't activated by a Keymap
+            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
+            {
+                bool makeBright = false;
+                for (auto km : proc->getKeymaps())
+                    if (km->getTargetStates()[(KeymapTargetType) i] == TargetStateEnabled) makeBright = true;
+                
+                if (makeBright)
+                {
+                    targetControlCBs[i - TargetTypeBlendronicSync]->setAlpha(1.);
+                    targetControlCBLabels[i - TargetTypeBlendronicSync]->setAlpha(1.);
+                    
+                    targetControlCBs[i - TargetTypeBlendronicSync]->setEnabled(true);
+                }
+                else
+                {
+                    targetControlCBs[i - TargetTypeBlendronicSync]->setAlpha(0.25);
+                    targetControlCBLabels[i - TargetTypeBlendronicSync]->setAlpha(0.25);
+                    
+                    targetControlCBs[i - TargetTypeBlendronicSync]->setEnabled(false);
+                }
+            }
         
             int counter = 0, size = 0;
             
@@ -876,6 +1038,24 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
         
         displayTab(currentTab);
     }
+    else if (b == &pulseBeatSmooth)
+    {
+        prep->toggleSmoothBase();
+        if (prep->getSmoothMode() == ConstantTimeSmooth || prep->getSmoothMode() == ConstantRateSmooth)
+        {
+            pulseBeatSmooth.setButtonText("pulse length");
+        }
+        else pulseBeatSmooth.setButtonText("beat length");
+    }
+    else if (b == &multiplyDivideSmooth)
+    {
+        prep->toggleSmoothOperation();
+        if (prep->getSmoothMode() == ConstantTimeSmooth || prep->getSmoothMode() == ProportionalTimeSmooth)
+        {
+            multiplyDivideSmooth.setButtonText("multiplied");
+        }
+        else multiplyDivideSmooth.setButtonText("divided");
+    }
 }
 
 void BlendronicPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
@@ -919,8 +1099,8 @@ BlendronicViewController(p, theGraph)
 
 void BlendronicModificationEditor::greyOutAllComponents()
 {
-    holdTimeMinMaxSlider->setDim(gModAlpha);
-    velocityMinMaxSlider->setDim(gModAlpha);
+//    holdTimeMinMaxSlider->setDim(gModAlpha);
+//    velocityMinMaxSlider->setDim(gModAlpha);
 }
 
 void BlendronicModificationEditor::highlightModedComponents()
@@ -1044,47 +1224,47 @@ void BlendronicModificationEditor::fillSelectCB(int last, int current)
     lastId = selectedId;
 }
 
-void BlendronicModificationEditor::fillSmoothModeSelectCB()
-{
-    BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
-    
-    smoothModeSelectCB.clear(dontSendNotification);
-    
-    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantTimeSmooth], 1);
-    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantRateSmooth], 2);
-    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalTimeSmooth], 3);
-    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalRateSmooth], 4);
-    
-    smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
-}
+//void BlendronicModificationEditor::fillSmoothModeSelectCB()
+//{
+//    BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
+//    
+//    smoothModeSelectCB.clear(dontSendNotification);
+//    
+//    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantTimeSmooth], 1);
+//    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ConstantRateSmooth], 2);
+//    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalTimeSmooth], 3);
+//    smoothModeSelectCB.addItem(cBlendronicSmoothModes[ProportionalRateSmooth], 4);
+//    
+//    smoothModeSelectCB.setSelectedItemIndex(prep->getSmoothMode(), dontSendNotification);
+//}
 
-void BlendronicModificationEditor::fillSyncModeSelectCB()
-{
-    BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
-    
-    syncModeSelectCB.clear(dontSendNotification);
-    
-    for (int i = 0; i <= BlendronicSyncModeNil; ++i)
-    {
-        syncModeSelectCB.addItem(cBlendronicSyncModes[i], i+1);
-    }
-    
-    syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
-}
-
-void BlendronicModificationEditor::fillClearModeSelectCB()
-{
-    BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
-    
-    clearModeSelectCB.clear(dontSendNotification);
-    
-    for (int i = 0; i <= BlendronicClearModeNil; ++i)
-    {
-        clearModeSelectCB.addItem(cBlendronicClearModes[i], i+1);
-    }
-    
-    clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
-}
+//void BlendronicModificationEditor::fillSyncModeSelectCB()
+//{
+//    BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
+//
+//    syncModeSelectCB.clear(dontSendNotification);
+//
+//    for (int i = 0; i <= BlendronicSyncModeNil; ++i)
+//    {
+//        syncModeSelectCB.addItem(cBlendronicSyncModes[i], i+1);
+//    }
+//
+//    syncModeSelectCB.setSelectedItemIndex(prep->getSyncMode(), dontSendNotification);
+//}
+//
+//void BlendronicModificationEditor::fillClearModeSelectCB()
+//{
+//    BlendronicModification::Ptr prep = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
+//
+//    clearModeSelectCB.clear(dontSendNotification);
+//
+//    for (int i = 0; i <= BlendronicClearModeNil; ++i)
+//    {
+//        clearModeSelectCB.addItem(cBlendronicClearModes[i], i+1);
+//    }
+//
+//    clearModeSelectCB.setSelectedItemIndex(prep->getClearMode(), dontSendNotification);
+//}
 
 
 

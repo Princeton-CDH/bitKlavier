@@ -560,12 +560,10 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         thisPreparationMap->addSynchronicProcessor(sproc);
         
         keymap->addTarget(TargetTypeSynchronic);
-        keymap->addTarget(TargetTypeSynchronicSync, TargetStateDisabled);
-        keymap->addTarget(TargetTypeSynchronicPatternSync, TargetStateDisabled);
-        keymap->addTarget(TargetTypeSynchronicAddNotes, TargetStateDisabled);
-        keymap->addTarget(TargetTypeSynchronicClear, TargetStateDisabled);
-        keymap->addTarget(TargetTypeSynchronicPausePlay, TargetStateDisabled);
-
+        for (int i = TargetTypeSynchronic+1; i <= TargetTypeSynchronicRotate; i++)
+        {
+            keymap->addTarget((KeymapTargetType) i, TargetStateDisabled);
+        }
     }
     else if (thisType == PreparationTypeNostalgic)
     {
@@ -579,10 +577,10 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         BlendronicProcessor::Ptr bproc = getBlendronicProcessor(thisId);
         thisPreparationMap->addBlendronicProcessor(bproc);
         
-        keymap->addTarget(TargetTypeBlendronicSync, TargetStateDisabled);
-        keymap->addTarget(TargetTypeBlendronicClear, TargetStateDisabled);
-        keymap->addTarget(TargetTypeBlendronicOpen, TargetStateDisabled);
-        keymap->addTarget(TargetTypeBlendronicClose, TargetStateDisabled);
+        for (int i = TargetTypeBlendronicSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+        {
+            keymap->addTarget((KeymapTargetType) i, TargetStateDisabled);
+        }
     }
     else if (thisType == PreparationTypeTempo)
     {

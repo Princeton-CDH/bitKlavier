@@ -155,6 +155,8 @@ public:
 	inline const float getSmoothValue() const noexcept { return dSmooth->getValue(); }
 	inline const float getSmoothDuration() const noexcept { return dSmoothDuration; }
 	inline const bool getActive() const noexcept { return dBlendronicActive; }
+    inline const bool getInputState() const noexcept { return dInputOpen; }
+    inline const bool getOutputState() const noexcept { return dOutputOpen; }
     inline const bool getShouldDuck() const noexcept { return shouldDuck; }
     inline const AudioBuffer<float> getDelayBuffer() const noexcept { return delayLinear->getBuffer(); }
     inline const unsigned long getCurrentSample() const noexcept { return delayLinear->getInPoint(); }
@@ -188,6 +190,11 @@ public:
 	inline const void setActive(bool newActive) { dBlendronicActive = newActive; }
 	inline const void toggleActive() { dBlendronicActive = !dBlendronicActive; }
     
+    inline const void setInputState(bool inputState) { dInputOpen = inputState; }
+    inline const void toggleInput() { dInputOpen = !dInputOpen; }
+    inline const void setOutputState(bool outputState) { dOutputOpen = outputState; }
+    inline const void toggleOutput() { dOutputOpen = !dOutputOpen; }
+    
     void tick(float* outputs);
     
     void duckAndClear();
@@ -206,6 +213,8 @@ private:
 	float dSmoothValue;
 	float dSmoothDuration;
 	bool dBlendronicActive;
+    bool dInputOpen;
+    bool dOutputOpen;
     bool shouldDuck;
 };
 

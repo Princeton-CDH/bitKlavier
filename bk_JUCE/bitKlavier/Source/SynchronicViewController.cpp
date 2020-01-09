@@ -725,7 +725,7 @@ void SynchronicPreparationEditor::timerCallback()
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
         // dim target comboboxes that aren't activated by a Keymap
-        for (int i=TargetTypeSynchronicSync; i<=TargetTypeSynchronicPausePlay; i++)
+        for (int i=TargetTypeSynchronicSync; i<=TargetTypeSynchronicRotate; i++)
         {
             bool makeBright = false;
             for (auto km : sProcessor->getKeymaps())
@@ -1038,7 +1038,7 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         gainSlider->setValue(prep->getGain(), notify);
         numClusterSlider->setValue(prep->getNumClusters(), notify);
                 
-        for (int i = TargetTypeSynchronicSync; i <= TargetTypeSynchronicPausePlay; i++)
+        for (int i = TargetTypeSynchronicSync; i <= TargetTypeSynchronicRotate; i++)
         {
             targetControlCBs[i - TargetTypeSynchronicSync]->setSelectedItemIndex
                             (prep->getTargetTypeSynchronic(KeymapTargetType(i)), notify);

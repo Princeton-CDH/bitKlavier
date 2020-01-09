@@ -1068,6 +1068,7 @@ typedef enum KeymapParameterType
 typedef enum KeymapTargetType
 {
     TargetTypeDirect = 0,
+    
     TargetTypeSynchronic,
     TargetTypeSynchronicSync,
     TargetTypeSynchronicPatternSync,
@@ -1077,38 +1078,49 @@ typedef enum KeymapTargetType
     TargetTypeSynchronicDeleteOldest,
     TargetTypeSynchronicDeleteNewest,
     TargetTypeSynchronicRotate,
+    
     TargetTypeNostalgic,
     TargetTypeNostalgicClear,
+    
     TargetTypeBlendronicSync,
+    TargetTypeBlendronicPatternSync,
     TargetTypeBlendronicClear,
-    TargetTypeBlendronicOpen,
-    TargetTypeBlendronicClose,
+    TargetTypeBlendronicPausePlay,
+    TargetTypeBlendronicOpenCloseInput,
+    TargetTypeBlendronicOpenCloseOutput,
+    
     TargetTypeTempo,
     TargetTypeTuning,
     TargetTypeNil
 } KeymapTargetType;
 
 static const std::vector<std::string> cKeymapTargetTypes = {
-    "Direct",       // Direct
-    
-    "Synchronic",   // Synchronic
-    "Beat Sync",    // Synchronic
-    "Pattern Sync", // Synchronic
-    "Add Notes",    // Synchronic
-    "Clear",        // Synchronic
-    "Pause-Play",   // Synchronic
+    // Direct
+    "Direct",
+    // Synchronic
+    "Synchronic",
+    "Beat Sync",
+    "Pattern Sync",
+    "Add Notes",
+    "Clear",
+    "Pause-Play",
     "Delete Oldest Layer",
     "Delete Newest Layer",
     "Rotate Layers",
-    
-    "Nostalgic",    // Nostalgic
-    "Clear",        // Nostalgic
-    "Sync",         // Blendronic
-    "Clear",        // Blendronic
-    "Open",         // Blendronic
-    "Close",        // Blendronic
-    "Tempo",        // Tempo
-    "Tuning"        // Tuning
+    // Nostalgic
+    "Nostalgic",
+    "Clear",
+    // Blendronic
+    "Beat Sync",
+    "Pattern Sync",
+    "Clear",
+    "Pause-Play",
+    "Open-Close Input",
+    "Open-Close Output",
+    // Tempo
+    "Tempo",
+    // Tuning
+    "Tuning"
 };
 
 typedef enum KeymapTargetState

@@ -21,10 +21,16 @@ BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
 	bFeedbackCoefficients(p->getFeedbackCoefficients()),
 	bDelayMax(p->getDelayMax()),
     bSmoothMode(p->getSmoothMode()),
-    bSyncMode(p->getSyncMode()),
-    bClearMode(p->getClearMode()),
-    bOpenMode(p->getOpenMode()),
-    bCloseMode(p->getCloseMode()),
+//    bSyncMode(p->getSyncMode()),
+//    bClearMode(p->getClearMode()),
+//    bOpenMode(p->getOpenMode()),
+//    bCloseMode(p->getCloseMode()),
+    targetTypeBlendronicSync(p->getTargetTypeBlendronicSync()),
+    targetTypeBlendronicPatternSync(p->getTargetTypeBlendronicPatternSync()),
+    targetTypeBlendronicClear(p->getTargetTypeBlendronicClear()),
+    targetTypeBlendronicPausePlay(p->getTargetTypeBlendronicPausePlay()),
+    targetTypeBlendronicOpenCloseInput(p->getTargetTypeBlendronicOpenCloseInput()),
+    targetTypeBlendronicOpenCloseOutput(p->getTargetTypeBlendronicOpenCloseOutput()),
 	bInputThresh(p->getInputThreshMS()),
 	bInputThreshSec(p->getInputThreshSEC()),
 	holdMin(p->getHoldMin()),
@@ -44,10 +50,10 @@ BlendronicPreparation::BlendronicPreparation(String newName,
                                              Array<float> feedbackCoefficients,
                                              float clusterThresh,
                                              BlendronicSmoothMode smoothMode,
-                                             BlendronicSyncMode syncMode,
-                                             BlendronicClearMode clearMode,
-                                             BlendronicOpenMode openMode,
-                                             BlendronicCloseMode closeMode,
+//                                             BlendronicSyncMode syncMode,
+//                                             BlendronicClearMode clearMode,
+//                                             BlendronicOpenMode openMode,
+//                                             BlendronicCloseMode closeMode,
                                              float delayMax) :
 	name(newName),
 	bBeats(beats),
@@ -56,10 +62,16 @@ BlendronicPreparation::BlendronicPreparation(String newName,
 	bFeedbackCoefficients(feedbackCoefficients),
 	bDelayMax(delayMax),
     bSmoothMode(smoothMode),
-    bSyncMode(syncMode),
-    bClearMode(clearMode),
-    bOpenMode(openMode),
-    bCloseMode(closeMode),
+//    bSyncMode(syncMode),
+//    bClearMode(clearMode),
+//    bOpenMode(openMode),
+//    bCloseMode(closeMode),
+    targetTypeBlendronicSync(NoteOn),
+    targetTypeBlendronicPatternSync(NoteOn),
+    targetTypeBlendronicClear(NoteOn),
+    targetTypeBlendronicPausePlay(NoteOn),
+    targetTypeBlendronicOpenCloseInput(NoteOn),
+    targetTypeBlendronicOpenCloseOutput(NoteOn),
 	bInputThresh(1),
 	bInputThreshSec(0.001),
 	holdMin(0),
@@ -80,10 +92,16 @@ BlendronicPreparation::BlendronicPreparation(void) :
 	bFeedbackCoefficients(Array<float>({ 0.95 })),
 	bDelayMax(44100. * 5.),
     bSmoothMode(ConstantTimeSmooth),
-    bSyncMode(BlendronicFirstNoteOnSync),
-    bClearMode(BlendronicFirstNoteOnClear),
-    bOpenMode(BlendronicOpenModeNil),
-    bCloseMode(BlendronicCloseModeNil),
+//    bSyncMode(BlendronicFirstNoteOnSync),
+//    bClearMode(BlendronicFirstNoteOnClear),
+//    bOpenMode(BlendronicOpenModeNil),
+//    bCloseMode(BlendronicCloseModeNil),
+    targetTypeBlendronicSync(NoteOn),
+    targetTypeBlendronicPatternSync(NoteOn),
+    targetTypeBlendronicClear(NoteOn),
+    targetTypeBlendronicPausePlay(NoteOn),
+    targetTypeBlendronicOpenCloseInput(NoteOn),
+    targetTypeBlendronicOpenCloseOutput(NoteOn),
 	bInputThresh(1),
 	bInputThreshSec(0.001),
 	holdMin(0),
@@ -143,10 +161,10 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     inCloseCluster = false;
     
     keysDepressed = Array<int>();
-    syncKeysDepressed = Array<int>();
-    clearKeysDepressed = Array<int>();
-    openKeysDepressed = Array<int>();
-    closeKeysDepressed = Array<int>();
+//    syncKeysDepressed = Array<int>();
+//    clearKeysDepressed = Array<int>();
+//    openKeysDepressed = Array<int>();
+//    closeKeysDepressed = Array<int>();
     
     DBG("Create bproc");
 }
@@ -339,90 +357,72 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     
     // Get target flags
     bool doSync = targetStates[TargetTypeBlendronicSync] == TargetStateEnabled;
+    bool doPatternSync = targetStates[TargetTypeBlendronicPatternSync] == TargetStateEnabled;
     bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
-    bool doOpen = targetStates[TargetTypeBlendronicOpen] == TargetStateEnabled;
-    bool doClose = targetStates[TargetTypeBlendronicClose] == TargetStateEnabled;
-    
-    if (doSync) syncKeysDepressed.addIfNotAlreadyThere(noteNumber);
-    if (doClear) clearKeysDepressed.addIfNotAlreadyThere(noteNumber);
-    if (doOpen) openKeysDepressed.addIfNotAlreadyThere(noteNumber);
-    if (doClose) closeKeysDepressed.addIfNotAlreadyThere(noteNumber);
+    bool doPausePlay = targetStates[TargetTypeBlendronicPausePlay] == TargetStateEnabled;
+    bool doOpenCloseInput = targetStates[TargetTypeBlendronicOpenCloseInput] == TargetStateEnabled;
+    bool doOpenCloseOutput = targetStates[TargetTypeBlendronicOpenCloseOutput] == TargetStateEnabled;
+//
+//    if (doSync) syncKeysDepressed.addIfNotAlreadyThere(noteNumber);
+//    if (doPatternSync) clearKeysDepressed.addIfNotAlreadyThere(noteNumber);
+//    if (doClear) clearKeysDepressed.addIfNotAlreadyThere(noteNumber);
+//    if (doPausePlay) clearKeysDepressed.addIfNotAlreadyThere(noteNumber);
+//    if (doOpenCloseInput) openKeysDepressed.addIfNotAlreadyThere(noteNumber);
+//    if (doOpenCloseInput) closeKeysDepressed.addIfNotAlreadyThere(noteNumber);
     
     
     if (!velocityCheck(noteNumber)) return;
     
-    if (doClear)
+    if (doSync && (prep->getTargetTypeBlendronicSync() == NoteOn || prep->getTargetTypeBlendronicSync() == Both))
     {
-        if (prep->getClearMode() == BlendronicAnyNoteOnClear ||
-           (prep->getClearMode() == BlendronicFirstNoteOnClear && !inClearCluster))
-        {
-            // Just clear the delay line
-            delay->clear();
-            //clearDelayOnNextBeat = true;
-        }
-        if (!inClearCluster) nextClearOffIsFirst = true;
-        inClearCluster = true;
-    
-        clearThresholdTimer = 0;
-    }
-    if (doSync)
-    {
-        if (prep->getSyncMode() == BlendronicAnyNoteOnSync ||
-            (prep->getSyncMode() == BlendronicFirstNoteOnSync && !inSyncCluster))
-        {
-            // Reset the phase of all params and update values
-            setSampleTimer(0);
-            setBeatIndex(0);
-            setDelayIndex(0);
-            setSmoothIndex(0);
-            setFeedbackIndex(0);
-            beatPositionsInBuffer.clear();
-            beatPositionsInBuffer.add(delay->getCurrentSample());
-            pulseOffset = delay->getCurrentSample();
-            beatPositionsIndex = 0;
-            pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-            numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
-            updateDelayParameters();
-        }
-        if (!inSyncCluster) nextSyncOffIsFirst = true;
-        inSyncCluster = true;
-        
-        
-        syncThresholdTimer = 0;
+        // Sync to the next beat
+        setSampleTimer(numSamplesBeat);
+        beatPositionsInBuffer.clear();
+        beatPositionsInBuffer.add(delay->getCurrentSample());
+        pulseOffset = delay->getCurrentSample();
+        beatPositionsIndex = 0;
     }
     
-    // Get conditions for opening/closing the delay line
-    bool noteOnClose = (prep->getCloseMode() == BlendronicAnyNoteOnClose) && doClose;
-    bool firstNoteOnClose = (prep->getCloseMode() == BlendronicFirstNoteOnClose && !inCloseCluster) && doClose;
-    bool noteOnOpen = (prep->getOpenMode() == BlendronicAnyNoteOnOpen) && doOpen;
-    bool firstNoteOnOpen = (prep->getOpenMode() == BlendronicFirstNoteOnOpen && !inOpenCluster) && doOpen;
+    if (doPatternSync &&
+        (prep->getTargetTypeBlendronicPatternSync() == NoteOn || prep->getTargetTypeBlendronicPatternSync() == Both))
+    {
+        // Reset the phase of all params and update values
+        setSampleTimer(0);
+        setBeatIndex(0);
+        setDelayIndex(0);
+        setSmoothIndex(0);
+        setFeedbackIndex(0);
+        beatPositionsInBuffer.clear();
+        beatPositionsInBuffer.add(delay->getCurrentSample());
+        pulseOffset = delay->getCurrentSample();
+        beatPositionsIndex = 0;
+        pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+        numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
+        updateDelayParameters();
+    }
     
-    // If the delay would be opened and closed by the same keypress, toggle it
-    if ((noteOnClose || firstNoteOnClose) && (noteOnOpen || firstNoteOnOpen))
+    if (doClear &&
+        (prep->getTargetTypeBlendronicClear() == NoteOn || prep->getTargetTypeBlendronicClear() == Both))
+    {
+        delay->clear();
+    }
+    
+    if (doPausePlay &&
+        (prep->getTargetTypeBlendronicPausePlay() == NoteOn || prep->getTargetTypeBlendronicPausePlay() == Both))
     {
         toggleActive();
     }
-    else if (noteOnClose || firstNoteOnClose)
+    
+    if (doOpenCloseInput &&
+        (prep->getTargetTypeBlendronicOpenCloseInput() == NoteOn || prep->getTargetTypeBlendronicOpenCloseInput() == Both))
     {
-        setActive(false);
-    }
-    else if (noteOnOpen || firstNoteOnOpen)
-    {
-        setActive(true);
+        toggleInput();
     }
     
-    if (doClose)
+    if (doOpenCloseOutput &&
+        (prep->getTargetTypeBlendronicOpenCloseOutput() == NoteOn || prep->getTargetTypeBlendronicOpenCloseOutput() == Both))
     {
-        if (!inCloseCluster) nextCloseOffIsFirst = true;
-        inCloseCluster = true;
-        closeThresholdTimer = 0;
-    }
-    
-    if (doOpen)
-    {
-        if (!inOpenCluster) nextOpenOffIsFirst = true;
-        inOpenCluster = true;
-        openThresholdTimer = 0;
+        toggleOutput();
     }
 }
 
@@ -436,86 +436,70 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     
     // Get target flags
     bool doSync = targetStates[TargetTypeBlendronicSync] == TargetStateEnabled;
+    bool doPatternSync = targetStates[TargetTypeBlendronicPatternSync] == TargetStateEnabled;
     bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
-    bool doOpen = targetStates[TargetTypeBlendronicOpen] == TargetStateEnabled;
-    bool doClose = targetStates[TargetTypeBlendronicClose] == TargetStateEnabled;
-    
-    if (doSync) syncKeysDepressed.removeAllInstancesOf(noteNumber);
-    if (doClear) clearKeysDepressed.removeAllInstancesOf(noteNumber);
-    if (doOpen) openKeysDepressed.removeAllInstancesOf(noteNumber);
-    if (doClose) closeKeysDepressed.removeAllInstancesOf(noteNumber);
+    bool doPausePlay = targetStates[TargetTypeBlendronicPausePlay] == TargetStateEnabled;
+    bool doOpenCloseInput = targetStates[TargetTypeBlendronicOpenCloseInput] == TargetStateEnabled;
+    bool doOpenCloseOutput = targetStates[TargetTypeBlendronicOpenCloseOutput] == TargetStateEnabled;
+//
+//    if (doSync) syncKeysDepressed.removeAllInstancesOf(noteNumber);
+//    if (doClear) clearKeysDepressed.removeAllInstancesOf(noteNumber);
+//    if (doOpen) openKeysDepressed.removeAllInstancesOf(noteNumber);
+//    if (doClose) closeKeysDepressed.removeAllInstancesOf(noteNumber);
     
     if (!velocityCheck(noteNumber)) return;
     if (!holdCheck(noteNumber)) return;
     
-    if (doClear)
+    if (doSync && (prep->getTargetTypeBlendronicSync() == NoteOn || prep->getTargetTypeBlendronicSync() == Both))
     {
-        if ((prep->getClearMode() == BlendronicFirstNoteOffClear && nextClearOffIsFirst) ||
-            (prep->getClearMode() == BlendronicAnyNoteOffClear) ||
-            (prep->getClearMode() == BlendronicLastNoteOffClear && clearKeysDepressed.size() == 0))
-        {
-            // Clear the delay line, but duck with an env first to prevent a click
-            delay->duckAndClear();
-            if (keysDepressed.size() == 0)
-            {
-                // Set flag to clear on next beat to prevent any release sound from being left in buffer,
-                // since the expected behavior of clearing on last note off is silence
-                clearDelayOnNextBeat = true;
-            }
-        }
-        nextClearOffIsFirst = false;
-    }
-    if (doSync)
-    {
-        if ((prep->getSyncMode() == BlendronicFirstNoteOffSync && nextSyncOffIsFirst) ||
-            (prep->getSyncMode() == BlendronicAnyNoteOffSync) ||
-            (prep->getSyncMode() == BlendronicLastNoteOffSync && syncKeysDepressed.size() == 0))
-        {
-            // Reset the phase of all params and update values
-            setSampleTimer(0);
-            setBeatIndex(0);
-            setDelayIndex(0);
-            setSmoothIndex(0);
-            setFeedbackIndex(0);
-            beatPositionsInBuffer.clear();
-            beatPositionsInBuffer.add(delay->getCurrentSample());
-            pulseOffset = delay->getCurrentSample();
-            beatPositionsIndex = 0;
-            pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-            numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
-            updateDelayParameters();
-        }
-        nextSyncOffIsFirst = false;
+        // Sync to the next beat
+        setSampleTimer(numSamplesBeat);
+        beatPositionsInBuffer.clear();
+        beatPositionsInBuffer.add(delay->getCurrentSample());
+        pulseOffset = delay->getCurrentSample();
+        beatPositionsIndex = 0;
     }
     
-    bool firstNoteOffClose = (prep->getCloseMode() == BlendronicFirstNoteOffClose && nextCloseOffIsFirst) && doClose;
-    bool noteOffClose = (prep->getCloseMode() == BlendronicAnyNoteOffClose) && doClose;
-    bool lastNoteOffClose = (prep->getCloseMode() == BlendronicLastNoteOffClose && closeKeysDepressed.size() == 0) && doClose;
-    bool firstNoteOffOpen = (prep->getOpenMode() == BlendronicFirstNoteOffOpen && nextOpenOffIsFirst) && doClose;
-    bool noteOffOpen = (prep->getOpenMode() == BlendronicAnyNoteOffOpen) && doOpen;
-    bool lastNoteOffOpen = (prep->getOpenMode() == BlendronicLastNoteOffOpen && openKeysDepressed.size() == 0) && doOpen;
+    if (doPatternSync &&
+        (prep->getTargetTypeBlendronicPatternSync() == NoteOn || prep->getTargetTypeBlendronicPatternSync() == Both))
+    {
+        // Reset the phase of all params and update values
+        setSampleTimer(0);
+        setBeatIndex(0);
+        setDelayIndex(0);
+        setSmoothIndex(0);
+        setFeedbackIndex(0);
+        beatPositionsInBuffer.clear();
+        beatPositionsInBuffer.add(delay->getCurrentSample());
+        pulseOffset = delay->getCurrentSample();
+        beatPositionsIndex = 0;
+        pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+        numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
+        updateDelayParameters();
+    }
     
-    if ((firstNoteOffClose || noteOffClose || lastNoteOffClose) && (firstNoteOffOpen || noteOffOpen || lastNoteOffOpen))
+    if (doClear &&
+        (prep->getTargetTypeBlendronicClear() == NoteOn || prep->getTargetTypeBlendronicClear() == Both))
+    {
+        delay->clear();
+    }
+    
+    if (doPausePlay &&
+        (prep->getTargetTypeBlendronicPausePlay() == NoteOn || prep->getTargetTypeBlendronicPausePlay() == Both))
     {
         toggleActive();
     }
-    else if (firstNoteOffClose || noteOffClose || lastNoteOffClose)
+    
+    if (doOpenCloseInput &&
+        (prep->getTargetTypeBlendronicOpenCloseInput() == NoteOn || prep->getTargetTypeBlendronicOpenCloseInput() == Both))
     {
-        setActive(false);
-    }
-    else if (firstNoteOffOpen || noteOffOpen || lastNoteOffOpen)
-    {
-        setActive(true);
+        toggleInput();
     }
     
-    if (doClose)
+    if (doOpenCloseOutput &&
+        (prep->getTargetTypeBlendronicOpenCloseOutput() == NoteOn || prep->getTargetTypeBlendronicOpenCloseOutput() == Both))
     {
-        nextCloseOffIsFirst = false;
-    }
-    
-    if (doOpen)
-    {
-        nextOpenOffIsFirst = false;
+        toggleOutput();
     }
 }
 

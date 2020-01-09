@@ -386,11 +386,10 @@ void Keymap::removeTargetsOfType(BKPreparationType type)
     }
     if (type == PreparationTypeSynchronic)
     {
-        removeTarget(TargetTypeSynchronicSync);
-        removeTarget(TargetTypeSynchronic);
-        removeTarget(TargetTypeSynchronicPatternSync);
-        removeTarget(TargetTypeSynchronicAddNotes);
-        removeTarget(TargetTypeSynchronicPausePlay);
+        for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
+        {
+            removeTarget((KeymapTargetType) i);
+        }
     }
     else if (type == PreparationTypeNostalgic)
     {
@@ -398,10 +397,10 @@ void Keymap::removeTargetsOfType(BKPreparationType type)
     }
     else if (type == PreparationTypeBlendronic)
     {
-        removeTarget(TargetTypeBlendronicSync);
-        removeTarget(TargetTypeBlendronicClear);
-        removeTarget(TargetTypeBlendronicOpen);
-        removeTarget(TargetTypeBlendronicClose);
+        for (int i = TargetTypeBlendronicSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+        {
+            removeTarget((KeymapTargetType) i);
+        }
     }
     else if (type == PreparationTypeTempo)
     {

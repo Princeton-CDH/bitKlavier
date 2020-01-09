@@ -140,7 +140,7 @@ BKViewController(p, theGraph, 1)
     targetControlTBs = OwnedArray<ToggleButton>();
     buttonsAndMenusLAF2.setToggleBoxTextToRightBool(false);
     //for (int i=TargetTypeDirect; i<=TargetTypeTuning; i++)
-    for (int i=TargetTypeDirect; i<=TargetTypeBlendronicClose; i++)
+    for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
     {
         targetControlTBs.add(new ToggleButton()); // insert at the end of the array
         targetControlTBs.getLast()->setName(cKeymapTargetTypes[i]);
@@ -381,11 +381,11 @@ void KeymapViewController::resized()
      
     
     // Blendronic Targets
-    Rectangle<int> blendronicBox = thirdColumn.removeFromTop((TargetTypeBlendronicClose - TargetTypeBlendronicSync + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+    Rectangle<int> blendronicBox = thirdColumn.removeFromTop((TargetTypeBlendronicOpenCloseOutput - TargetTypeBlendronicSync + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     blendronicTBGroup.setBounds(blendronicBox);
     blendronicBox.removeFromTop(4 * gYSpacing);
     blendronicBox.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicClose; i++)
+    for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
     {
         targetControlTBs[i]->setBounds(blendronicBox.removeFromTop(gComponentToggleBoxHeight));
         //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
@@ -919,7 +919,7 @@ void KeymapViewController::update(void)
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
         keyboard->setKeysInKeymap(km->keys());
         
-        for (int i=TargetTypeDirect; i<=TargetTypeBlendronicClose; i++)
+        for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
         {
             targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType) i) == TargetStateEnabled, dontSendNotification);
         }
@@ -1021,7 +1021,7 @@ void KeymapViewController::hideUnconnectedTargets()
         
         if (kmItem->getConnectionsOfType(PreparationTypeBlendronic).size() == 0)
         {
-            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicClose; i++)
+            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
             {
                 targetControlTBs[i]->setAlpha(gDim);
                 targetControlTBs[i]->setEnabled(false);
@@ -1031,7 +1031,7 @@ void KeymapViewController::hideUnconnectedTargets()
         }
         else
         {
-            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicClose; i++)
+            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
             {
                 targetControlTBs[i]->setAlpha(gBright);
                 targetControlTBs[i]->setEnabled(true);

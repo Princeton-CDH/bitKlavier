@@ -215,6 +215,8 @@ BlendronicDelay::BlendronicDelay(BlendronicDelay::Ptr d):
 	dSmoothValue(d->getSmoothValue()),
 	dSmoothDuration(d->getSmoothDuration()),
 	dBlendronicActive(d->getActive()),
+    dInputOpen(d->getInputState()),
+    dOutputOpen(d->getOutputState()),
     shouldDuck(d->getShouldDuck())
 {
     DBG("Create bdelay");
@@ -226,7 +228,9 @@ BlendronicDelay::BlendronicDelay(float delayLength, float smoothValue, float smo
 	dDelayLength(delayLength),
 	dSmoothValue(smoothValue),
 	dSmoothDuration(smoothDuration),
-	dBlendronicActive(active)
+	dBlendronicActive(active),
+    dInputOpen(true),
+    dOutputOpen(true)
 {
 	delayLinear =  new BKDelayL(dDelayLength, dDelayMax, dDelayGain);
 	dSmooth = new BKEnvelope(dSmoothValue, delayLength);
@@ -245,22 +249,30 @@ BlendronicDelay::~BlendronicDelay()
 
 void BlendronicDelay::addSample(float sampleToAdd, unsigned long offset, int channel)
 {
-	delayLinear->addSample(sampleToAdd, offset, channel);
+    if (dInputOpen) delayLinear->addSample(sampleToAdd, offset, channel);
 }
 
 void BlendronicDelay::tick(float* outputs)
 {
-    setDelayLength(dSmooth->tick());
-    delayLinear->tick(0, outputs, true);
-    float env = dEnv->tick();
-    if (shouldDuck && env == 0.0f)
+    if (dBlendronicActive)
     {
-        clear();
-        setEnvelopeTarget(1.0f);
-        shouldDuck = false;
+        float dummyOut[2];
+        setDelayLength(dSmooth->tick());
+        float env = dEnv->tick();
+        if (shouldDuck && env == 0.0f)
+        {
+            clear();
+            setEnvelopeTarget(1.0f);
+            shouldDuck = false;
+        }
+        if (dOutputOpen)
+        {
+            delayLinear->tick(0, outputs, true);
+            outputs[0] *= env;
+            outputs[1] *= env;
+        }
+        else delayLinear->tick(0, dummyOut, true);
     }
-    outputs[0] *= env;
-    outputs[1] *= env;
 }
 
 void BlendronicDelay::duckAndClear()

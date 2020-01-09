@@ -500,14 +500,11 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
                 if (km->isInverted()) targetStates = &releaseTargetStates;
                 
                 // If the keymap has a target enabled, enable that target in targetStates
-                if (km->getTargetStates()[TargetTypeBlendronicSync] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicSync, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeBlendronicClear] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicClear, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeBlendronicOpen] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicOpen, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeBlendronicClose] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicClose, TargetStateEnabled);
+                for (int i = TargetTypeBlendronicSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+                {
+                    if (km->getTargetStates()[i] == TargetStateEnabled)
+                        targetStates->set(i, TargetStateEnabled);
+                }
             }
         }
         // If there are any targets enabled, do the press and/or release
@@ -712,18 +709,11 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
                 targetStates = &releaseTargetStates;
                 if (km->isInverted()) targetStates = &pressTargetStates;
                 
-                if (km->getTargetStates()[TargetTypeSynchronicSync] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicSync, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronic] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronic, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronicPatternSync] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicPatternSync, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronicAddNotes] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicAddNotes, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronicClear] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicClear, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeSynchronicPausePlay] == TargetStateEnabled)
-                    targetStates->set(TargetTypeSynchronicPausePlay, TargetStateEnabled);
+                for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
+                {
+                    if (km->getTargetStates()[i] == TargetStateEnabled)
+                        targetStates->set(i, TargetStateEnabled);
+                }
             }
         }
         if (pressTargetStates.contains(TargetStateEnabled)) {
@@ -764,14 +754,11 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
                 targetStates = &releaseTargetStates;
                 if (km->isInverted()) targetStates = &pressTargetStates;
                 
-                if (km->getTargetStates()[TargetTypeBlendronicSync] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicSync, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeBlendronicClear] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicClear, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeBlendronicOpen] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicOpen, TargetStateEnabled);
-                if (km->getTargetStates()[TargetTypeBlendronicClose] == TargetStateEnabled)
-                    targetStates->set(TargetTypeBlendronicClose, TargetStateEnabled);
+                for (int i = TargetTypeBlendronicSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+                {
+                    if (km->getTargetStates()[i] == TargetStateEnabled)
+                        targetStates->set(i, TargetStateEnabled);
+                }
             }
         }
         if (pressTargetStates.contains(TargetStateEnabled)) {
