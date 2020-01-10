@@ -521,6 +521,7 @@ void BlendronicProcessor::prepareToPlay(double sr)
     
     delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getSmoothValues()[0],
                                          prep->getFeedbackCoefficients()[0], prep->getDelayMax(), true);
+    delay->setSampleRate(sr);
     
     beatPositionsInBuffer.ensureStorageAllocated(20);
     beatPositionsInBuffer.clear();

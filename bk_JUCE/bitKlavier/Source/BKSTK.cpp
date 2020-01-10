@@ -55,14 +55,14 @@ float BKEnvelope::tick()
 }
 
 BKDelayL::BKDelayL() :
-	max(4095),
+    inPoint(0),
+    outPoint(0),
+    max(4096),
+    length(0.0),
 	gain(1.0),
-	length(0.0),
-	inPoint(0),
-	outPoint(0),
-    feedback(0.9),
 	lastFrameLeft(0),
 	lastFrameRight(0),
+    feedback(0.9),
 	doNextOutLeft(false),
 	doNextOutRight(false)
 {
@@ -73,11 +73,11 @@ BKDelayL::BKDelayL() :
 }
 
 BKDelayL::BKDelayL(float delayLength, float delayMax, float delayGain) :
-	max(delayMax),
+    inPoint(0),
+    outPoint(0),
+    max(delayMax),
+    length(delayLength),
 	gain(delayGain),
-	length(delayLength),
-	inPoint(0),
-	outPoint(0),
 	lastFrameLeft(0),
 	lastFrameRight(0),
 	doNextOutLeft(false),
@@ -100,7 +100,7 @@ void BKDelayL::setLength(float delayLength)
     float outPointer = inPoint - length;
 	while (outPointer < 0) outPointer += inputs.getNumSamples();
 
-	outPoint = (long)outPointer; //integer part
+	outPoint = outPointer; //integer part
 	alpha = outPointer - outPoint; //fractional part
 	omAlpha = (float)1.0 - alpha;
 	if (outPoint == inputs.getNumSamples()) outPoint = 0;
@@ -196,7 +196,7 @@ void BKDelayL::reset()
     float outPointer = inPoint - length;
     while (outPointer < 0) outPointer += inputs.getNumSamples();
     
-    outPoint = (long)outPointer; //integer part
+    outPoint = outPointer; //integer part
     alpha = outPointer - outPoint; //fractional part
     omAlpha = (float)1.0 - alpha;
     if (outPoint == inputs.getNumSamples()) outPoint = 0;
@@ -217,8 +217,15 @@ BlendronicDelay::BlendronicDelay(BlendronicDelay::Ptr d):
 	dBlendronicActive(d->getActive()),
     dInputOpen(d->getInputState()),
     dOutputOpen(d->getOutputState()),
-    shouldDuck(d->getShouldDuck())
+    shouldDuck(d->getShouldDuck()),
+    sampleRate(d->getSampleRate())
 {
+    delayLengthRecord.ensureStorageAllocated(dDelayMax);
+    for (int i = 0; i < dDelayMax; i++)
+    {
+        delayLengthRecord.add(0.0f);
+    }
+    delayLengthRecordInPoint = 0;
     DBG("Create bdelay");
 }
 
@@ -230,9 +237,16 @@ BlendronicDelay::BlendronicDelay(float delayLength, float smoothValue, float smo
 	dSmoothDuration(smoothDuration),
 	dBlendronicActive(active),
     dInputOpen(true),
-    dOutputOpen(true)
+    dOutputOpen(true),
+    sampleRate(44100)
 {
 	delayLinear =  new BKDelayL(dDelayLength, dDelayMax, dDelayGain);
+    delayLengthRecord.ensureStorageAllocated(dDelayMax);
+    for (int i = 0; i < dDelayMax; i++)
+    {
+        delayLengthRecord.add(0.0f);
+    }
+    delayLengthRecordInPoint = 0;
 	dSmooth = new BKEnvelope(dSmoothValue, delayLength);
     dSmooth->setRate(dSmoothDuration);
     dEnv = new BKEnvelope(1.0f, 1.0f);
@@ -273,6 +287,8 @@ void BlendronicDelay::tick(float* outputs)
         }
         else delayLinear->tick(0, dummyOut, true);
     }
+    delayLengthRecord.set(delayLengthRecordInPoint++, dDelayLength/sampleRate);
+    if (delayLengthRecordInPoint >= delayLengthRecord.size()) delayLengthRecordInPoint = 0;
 }
 
 void BlendronicDelay::duckAndClear()

@@ -590,6 +590,7 @@ public:
     inline BKSynthesiser* getSynth(void) const noexcept { return synth; }
     inline Array<int> getKeysDepressed(void) const noexcept { return keysDepressed; }
     inline const AudioBuffer<float> getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
+    inline const Array<float> getDelayLengthRecord() const noexcept { return delay->getDelayLengthRecord(); }
     inline const bool getActive() const noexcept { return delay->getActive(); }
     inline const bool getInputState() const noexcept { return delay->getInputState(); }
     inline const bool getOutputState() const noexcept { return delay->getOutputState(); }

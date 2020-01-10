@@ -64,13 +64,13 @@ public:
 
 private:
 	AudioBuffer<float> inputs;
-	float lastFrameLeft;
-	float lastFrameRight;
-	unsigned long inPoint;
-	unsigned long outPoint;
+	int inPoint;
+	int outPoint;
+    float max;
 	float length;
-	float max;
 	float gain;
+    float lastFrameLeft;
+    float lastFrameRight;
 	float alpha;
 	float omAlpha;
     float feedback;
@@ -159,6 +159,7 @@ public:
     inline const bool getOutputState() const noexcept { return dOutputOpen; }
     inline const bool getShouldDuck() const noexcept { return shouldDuck; }
     inline const AudioBuffer<float> getDelayBuffer() const noexcept { return delayLinear->getBuffer(); }
+    inline const Array<float> getDelayLengthRecord() const noexcept { return delayLengthRecord; }
     inline const unsigned long getCurrentSample() const noexcept { return delayLinear->getInPoint(); }
     inline const unsigned long getDelayedSample() const noexcept { return delayLinear->getOutPoint(); }
 
@@ -199,8 +200,8 @@ public:
     
     void duckAndClear();
     
-    inline void setSampleRate(double sr) { delayLinear->setSampleRate(sr); dSmooth->setSampleRate(sr); }
-    
+    inline void setSampleRate(double sr) { sampleRate = sr; delayLinear->setSampleRate(sr); dSmooth->setSampleRate(sr); }
+    inline double getSampleRate() { return sampleRate; }
     inline void clear() { delayLinear->clear(); /*delayLinear->reset();*/ }
 
 private:
@@ -216,6 +217,11 @@ private:
     bool dInputOpen;
     bool dOutputOpen;
     bool shouldDuck;
+    
+    double sampleRate;
+    
+    Array<float> delayLengthRecord;
+    int delayLengthRecordInPoint;
 };
 
 #endif

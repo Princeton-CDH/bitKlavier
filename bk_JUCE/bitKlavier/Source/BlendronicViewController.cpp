@@ -391,8 +391,8 @@ void BlendronicViewController::displayTab(int tab)
 //        openModeSelectCB.setBounds(openModeSelectCBRect);
 //        openModeLabel.setBounds(openModeLabelRect);
         
-        area.removeFromTop(1.5*sliderHeight - gComponentComboBoxHeight);
-        Rectangle<int> delayLineDisplayRect (area.removeFromTop(sliderHeight*2));
+        area.removeFromTop(0.5*sliderHeight - gComponentComboBoxHeight);
+        Rectangle<int> delayLineDisplayRect (area.removeFromTop(sliderHeight*4));
         delayLineDisplay.setBounds(delayLineDisplayRect);
     }
     else if (tab == 2) // keymap target tab
@@ -895,7 +895,14 @@ void BlendronicPreparationEditor::timerCallback()
             if (proc->getActive()) delayLineDisplay.setColours(Colours::black, Colours::lightgrey);
             else delayLineDisplay.setColours(Colours::black, Colours::lightgrey.withMultipliedBrightness(0.6));
             delayLineDisplay.setLineSpacing(proc->getPulseLengthInSamples());
+            float maxDelayLength = 0.0f;
+            for (auto d : prep->getDelayLengths())
+            {
+                if (d > maxDelayLength) maxDelayLength = d;
+            }
+            delayLineDisplay.setMaxDelayLength(maxDelayLength);
             delayLineDisplay.pushBuffer(proc->getDelayBuffer());
+            delayLineDisplay.pushSmoothing(proc->getDelayLengthRecord());
             delayLineDisplay.setPulseOffset(proc->getPulseOffset());
             delayLineDisplay.setMarkers(proc->getBeatPositionsInBuffer());
             delayLineDisplay.setPlayheads(Array<uint64>({proc->getCurrentSample(), proc->getDelayedSample()}));

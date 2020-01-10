@@ -36,8 +36,9 @@ public:
     void pushBuffer (const AudioSourceChannelInfo& bufferToPush);
     void pushBuffer (const float** channelData, int numChannels, int numSamples);
     void pushSample (const float* samplesForEachChannel, int numChannels);
+    void pushSmoothing (Array<float> sm);
     
-    
+    inline void setMaxDelayLength (float maxDelay) { maxDelayLength = maxDelay; }
 
     inline void setLineSpacing(float spacingInSamples)
     {
@@ -56,6 +57,9 @@ public:
     virtual void paintChannel (Graphics&, Rectangle<float> bounds,
                                const Range<float>* levels, int numLevels, int nextSample);
     void getChannelAsPath (Path& result, const Range<float>* levels, int numLevels, int nextSample);
+    virtual void paintSmoothing (Graphics&, Rectangle<float> bounds,
+                               const Range<float>* levels, int numLevels, int nextSample);
+    void getSmoothingAsPath (Path& result, const Range<float>* levels, int numLevels, int nextSample);
     
     void paint (Graphics&) override;
     
@@ -77,6 +81,13 @@ private:
     double verticalZoomSliderMin, verticalZoomSliderMax;
     double horizontalZoomSliderMin, horizontalZoomSliderMax;
     double sliderIncrement;
+    
+    OwnedArray<ChannelInfo> smoothing;
+    
+    float maxDelayLength;
+    
+    BlendronicSmoothBase smoothBase;
+    BlendronicSmoothScale smoothScale;
     
     Array<uint64> markers, playheads;
     Colour backgroundColour, waveformColour, markerColour, playheadColour;
