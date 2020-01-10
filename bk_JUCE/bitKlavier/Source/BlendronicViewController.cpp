@@ -73,18 +73,22 @@ BKViewController(p, theGraph, 3)
     pulseBeatSmooth.addListener(this);
     addAndMakeVisible(pulseBeatSmooth);
     
-    multiplyDivideSmooth.setName("MultipleDivideSmooth");
-    multiplyDivideSmooth.setButtonText("multiplied");
-    multiplyDivideSmooth.setTooltip("Set operation of the smoothing value");
-    multiplyDivideSmooth.addListener(this);
-    addAndMakeVisible(multiplyDivideSmooth);
+    constantFullSmooth.setName("MultipleDivideSmooth");
+    constantFullSmooth.setButtonText("full delay change");
+    constantFullSmooth.setTooltip("Set operation of the smoothing value");
+    constantFullSmooth.addListener(this);
+    addAndMakeVisible(constantFullSmooth);
     
-    smoothTimeLabel.setText("Smooth time equals", dontSendNotification);
-    smoothTimeLabel.setTooltip("Set base for smoothing time");
+    smoothTimeLabel.setText("Smooth time across a", dontSendNotification);
+    smoothTimeLabel.setTooltip("Set meaning for smoothing time");
     addAndMakeVisible(&smoothTimeLabel, ALL);
+    
+    smoothEqualLabel.setText("equals", dontSendNotification);
+    smoothEqualLabel.setTooltip("Set meaning of the smoothing value");
+    addAndMakeVisible(&smoothEqualLabel, ALL);
 
-    smoothValueLabel.setText("by smoothing value.", dontSendNotification);
-    smoothValueLabel.setTooltip("Set operation of the smoothing value");
+    smoothValueLabel.setText("times smoothing value.", dontSendNotification);
+    smoothValueLabel.setTooltip("Set meaning of the smoothing value");
     addAndMakeVisible(&smoothValueLabel, ALL);
     
 //    smoothModeSelectCB.setName("Smooth Mode");
@@ -205,8 +209,9 @@ void BlendronicViewController::invisible(void)
     }
     
     pulseBeatSmooth.setVisible(false);
-    multiplyDivideSmooth.setVisible(false);
+    constantFullSmooth.setVisible(false);
     smoothTimeLabel.setVisible(false);
+    smoothEqualLabel.setVisible(false);
     smoothValueLabel.setVisible(false);
 //    smoothModeSelectCB.setVisible(false);
 //    smoothModeLabel.setVisible(false);
@@ -279,9 +284,10 @@ void BlendronicViewController::displayTab(int tab)
 //        smoothModeLabel.setVisible(true);
         
         pulseBeatSmooth.setVisible(true);
-        multiplyDivideSmooth.setVisible(true);
+        constantFullSmooth.setVisible(true);
         
         smoothTimeLabel.setVisible(true);
+        smoothEqualLabel.setVisible(true);
         smoothValueLabel.setVisible(true);
         
         for (int i = 0; i < paramSliders.size(); i++)
@@ -313,16 +319,17 @@ void BlendronicViewController::displayTab(int tab)
         for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setBounds(area.removeFromTop(sliderHeight));
-            area.removeFromTop(gYSpacing);
-            if (i == 1)
+            if (i == 2)
             {
-                area.removeFromTop(gComponentComboBoxHeight*0.5);
                 Rectangle<int> smoothRect (area.removeFromTop(gComponentComboBoxHeight));
                 smoothTimeLabel.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.2));
+                constantFullSmooth.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.2));
+                smoothEqualLabel.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.075));
                 pulseBeatSmooth.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.15));
-                multiplyDivideSmooth.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.15));
-                smoothValueLabel.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.2));
+                smoothValueLabel.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.25));
+                area.removeFromTop(gComponentComboBoxHeight*0.5);
             }
+            area.removeFromTop(gYSpacing);
         }
     }
     else if (tab == 1)
@@ -523,9 +530,9 @@ void BlendronicPreparationEditor::update(void)
                 paramSliders[i]->setTo(prep->getDelayLengths(), dontSendNotification);
             }
 
-            if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothDurations]))
+            if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothValues]))
             {
-                paramSliders[i]->setTo(prep->getSmoothDurations(), dontSendNotification);
+                paramSliders[i]->setTo(prep->getSmoothValues(), dontSendNotification);
             }
 
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
@@ -967,8 +974,8 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
     }
     else if (name == "smoothing")
     {
-        prep    ->setSmoothDuration(whichSlider, values[0]);
-        active  ->setSmoothDuration(whichSlider, values[0]);
+        prep    ->setSmoothValue(whichSlider, values[0]);
+        active  ->setSmoothValue(whichSlider, values[0]);
     }
     else if (name == "feedback coefficients")
     {
@@ -997,8 +1004,8 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     }
     else if (name == "smoothing")
     {
-        prep    ->setSmoothDurations(newvals);
-        active  ->setSmoothDurations(newvals);
+        prep    ->setSmoothValues(newvals);
+        active  ->setSmoothValues(newvals);
     }
     else if (name == "feedback coefficients")
     {
@@ -1041,20 +1048,22 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     else if (b == &pulseBeatSmooth)
     {
         prep->toggleSmoothBase();
-        if (prep->getSmoothMode() == ConstantTimeSmooth || prep->getSmoothMode() == ConstantRateSmooth)
+        active->toggleSmoothBase();
+        if (active->getSmoothBase() == BlendronicSmoothPulse)
         {
             pulseBeatSmooth.setButtonText("pulse length");
         }
         else pulseBeatSmooth.setButtonText("beat length");
     }
-    else if (b == &multiplyDivideSmooth)
+    else if (b == &constantFullSmooth)
     {
-        prep->toggleSmoothOperation();
-        if (prep->getSmoothMode() == ConstantTimeSmooth || prep->getSmoothMode() == ProportionalTimeSmooth)
+        prep->toggleSmoothScale();
+        active->toggleSmoothScale();
+        if (active->getSmoothScale() == BlendronicSmoothConstant)
         {
-            multiplyDivideSmooth.setButtonText("multiplied");
+            constantFullSmooth.setButtonText("change in delay of 1");
         }
-        else multiplyDivideSmooth.setButtonText("divided");
+        else constantFullSmooth.setButtonText("full delay change");
     }
 }
 

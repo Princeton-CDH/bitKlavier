@@ -72,7 +72,7 @@ public:
                           Array<float> smoothTimes,
                           Array<float> feedbackCoefficients,
                           float clusterThresh,
-                          BlendronicSmoothMode smoothMode,
+//                          BlendronicSmoothMode smoothMode,
 //                          BlendronicSyncMode syncMode,
 //                          BlendronicClearMode clearMode,
 //                          BlendronicOpenMode openMode,
@@ -94,11 +94,13 @@ public:
 	inline const String getName() const noexcept { return name; }
 	inline const Array<float> getBeats() const noexcept { return bBeats; }
     inline const Array<float> getDelayLengths() const noexcept { return bDelayLengths; }
-	inline const Array<float> getSmoothDurations() const noexcept { return bSmoothDurations; }
+	inline const Array<float> getSmoothValues() const noexcept { return bSmoothValues; }
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
 	inline const float getDelayMax() const noexcept { return bDelayMax; }
 	
-    inline const BlendronicSmoothMode getSmoothMode() const noexcept { return bSmoothMode; }
+//    inline const BlendronicSmoothMode getSmoothMode() const noexcept { return bSmoothMode; }
+    inline const BlendronicSmoothBase getSmoothBase() const noexcept { return bSmoothBase; }
+    inline const BlendronicSmoothScale getSmoothScale() const noexcept { return bSmoothScale; }
 	inline const float getInputThreshSEC() const noexcept { return bInputThreshSec; }
 	inline const float getInputThreshMS() const noexcept { return bInputThresh; }
 	inline const int getHoldMin() const noexcept { return holdMin; }
@@ -117,30 +119,34 @@ public:
 	inline void setName(String n) { name = n; }
 	inline void setBeats(Array<float> beats) { bBeats.swapWith(beats); }
     inline void setDelayLengths(Array<float> delayLengths) { bDelayLengths.swapWith(delayLengths); }
-	inline void setSmoothDurations(Array<float> smoothTimes) { bSmoothDurations.swapWith(smoothTimes); }
+	inline void setSmoothValues(Array<float> smoothValues) { bSmoothValues.swapWith(smoothValues); }
 	inline void setFeedbackCoefficients(Array<float> feedbackCoefficients) { bFeedbackCoefficients.swapWith(feedbackCoefficients); }
     
     inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
     
     inline void setBeat(int whichSlider, float value) { bBeats.set(whichSlider, value); }
     inline void setDelayLength(int whichSlider, float value) { bDelayLengths.set(whichSlider, value); }
-    inline void setSmoothDuration(int whichSlider, float value) { bSmoothDurations.set(whichSlider, value); }
+    inline void setSmoothValue(int whichSlider, float value) { bSmoothValues.set(whichSlider, value); }
     inline void setFeedbackCoefficient(int whichSlider, float value) { bFeedbackCoefficients.set(whichSlider, value); }
     
-    inline const void setSmoothMode(BlendronicSmoothMode mode) { bSmoothMode = mode; }
+//    inline const void setSmoothMode(BlendronicSmoothMode mode) { bSmoothMode = mode; }
+    inline const void setSmoothBase(BlendronicSmoothBase base) { bSmoothBase = base; }
+    inline const void setSmoothScale(BlendronicSmoothScale scale) { bSmoothScale = scale; }
     inline const void toggleSmoothBase()
     {
-        if (bSmoothMode == ConstantTimeSmooth) bSmoothMode = ProportionalTimeSmooth;
-        else if (bSmoothMode == ConstantRateSmooth) bSmoothMode = ProportionalRateSmooth;
-        else if (bSmoothMode == ProportionalTimeSmooth) bSmoothMode = ConstantTimeSmooth;
-        else if (bSmoothMode == ProportionalRateSmooth) bSmoothMode = ConstantRateSmooth;
+        if (bSmoothBase == BlendronicSmoothPulse)
+        {
+            bSmoothBase = BlendronicSmoothBeat;
+        }
+        else bSmoothBase = BlendronicSmoothPulse;
     }
-    inline const void toggleSmoothOperation()
+    inline const void toggleSmoothScale()
     {
-        if (bSmoothMode == ConstantTimeSmooth) bSmoothMode = ConstantRateSmooth;
-        else if (bSmoothMode == ProportionalTimeSmooth) bSmoothMode = ProportionalRateSmooth;
-        else if (bSmoothMode == ConstantRateSmooth) bSmoothMode = ConstantTimeSmooth;
-        else if (bSmoothMode == ProportionalRateSmooth) bSmoothMode = ProportionalTimeSmooth;
+        if (bSmoothScale == BlendronicSmoothConstant)
+        {
+            bSmoothScale = BlendronicSmoothFull;
+        }
+        else bSmoothScale = BlendronicSmoothConstant;
     }
 //    inline const void setSyncMode(BlendronicSyncMode mode) { bSyncMode = mode; }
 //    inline const void setClearMode(BlendronicClearMode mode) { bClearMode = mode; }
@@ -208,7 +214,7 @@ public:
     {
         ValueTree prep("params");
         
-        prep.setProperty(ptagBlendronic_smoothMode, getSmoothMode(), 0);
+//        prep.setProperty(ptagBlendronic_smoothMode, getSmoothMode(), 0);
 //        prep.setProperty(ptagBlendronic_syncMode, getSyncMode(), 0);
 //        prep.setProperty(ptagBlendronic_clearMode, getClearMode(), 0);
 //        prep.setProperty(ptagBlendronic_openMode, getOpenMode(), 0);
@@ -230,13 +236,13 @@ public:
         }
         prep.addChild(delayLengths, -1, 0);
         
-        ValueTree smoothDurations(vtagBlendronic_smoothDurations);
+        ValueTree smoothValues(vtagBlendronic_smoothValues);
         count = 0;
-        for (auto f : getSmoothDurations())
+        for (auto f : getSmoothValues())
         {
-            smoothDurations.setProperty(ptagFloat + String(count++), f, 0);
+            smoothValues.setProperty(ptagFloat + String(count++), f, 0);
         }
-        prep.addChild(smoothDurations, -1, 0);
+        prep.addChild(smoothValues, -1, 0);
 
         ValueTree feedbackCoefficients(vtagBlendronic_feedbackCoefficients);
         count = 0;
@@ -254,9 +260,9 @@ public:
     {
         String n; float f;
         
-        n = e->getStringAttribute(ptagBlendronic_smoothMode);
-        if (n != String())     setSmoothMode((BlendronicSmoothMode) n.getIntValue());
-        else                   setSmoothMode(ConstantTimeSmooth);
+//        n = e->getStringAttribute(ptagBlendronic_smoothMode);
+//        if (n != String())     setSmoothMode((BlendronicSmoothMode) n.getIntValue());
+//        else                   setSmoothMode(ConstantTimeSmooth);
 
 //        n = e->getStringAttribute(ptagBlendronic_syncMode);
 //        if (n != String())     setSyncMode((BlendronicSyncMode) n.getIntValue());
@@ -308,7 +314,7 @@ public:
                 }
                 setDelayLengths(lengths);
             }
-            else if (sub->hasTagName(vtagBlendronic_smoothDurations))
+            else if (sub->hasTagName(vtagBlendronic_smoothValues))
             {
                 Array<float> durs;
                 for (int k = 0; k < 128; k++)
@@ -322,7 +328,7 @@ public:
                         durs.add(f);
                     }
                 }
-                setSmoothDurations(durs);
+                setSmoothValues(durs);
             }
             else if (sub->hasTagName(vtagBlendronic_feedbackCoefficients))
             {
@@ -350,14 +356,15 @@ private:
 	//stuff from preset
 	Array<float> bBeats;
     Array<float> bDelayLengths;
-	Array<float> bSmoothDurations;
+	Array<float> bSmoothValues;
 	Array<float> bFeedbackCoefficients;
 
 	//d0 stuff
 	float bDelayMax;
 
 	//dsmooth stuff
-    BlendronicSmoothMode bSmoothMode;
+    BlendronicSmoothBase bSmoothBase;
+    BlendronicSmoothScale bSmoothScale;
     
 //    BlendronicSyncMode bSyncMode;
 //    BlendronicClearMode bClearMode;

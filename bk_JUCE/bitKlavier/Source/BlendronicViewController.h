@@ -72,9 +72,10 @@ protected:
 //    BKLabel closeModeLabel;
     
     BKTextButton pulseBeatSmooth;
-    BKTextButton multiplyDivideSmooth;
+    BKTextButton constantFullSmooth;
     
     BKLabel smoothTimeLabel;
+    BKLabel smoothEqualLabel;
     BKLabel smoothValueLabel;
     
     OwnedArray<BKComboBox> targetControlCBs;

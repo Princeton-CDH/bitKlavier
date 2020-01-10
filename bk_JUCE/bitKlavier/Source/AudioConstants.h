@@ -175,7 +175,7 @@ const String vtagModBlendronic = "modBlendronic";
 const String ptagBlendronic_id = "Id";
 const String vtagBlendronic_beats = "beats";
 const String vtagBlendronic_delayLengths = "delayLengths";
-const String vtagBlendronic_smoothDurations = "smoothDurations";
+const String vtagBlendronic_smoothValues = "smoothValues";
 const String vtagBlendronic_feedbackCoefficients = "feedbackCoefficients";
 const String ptagBlendronic_smoothMode = "smooth";
 const String ptagBlendronic_syncMode = "sync";
@@ -718,13 +718,25 @@ static const std::vector<std::string> cTuningAdaptiveTypes = {
 };
 
 #pragma mark - Blendronic
-typedef enum BlendronicSmoothMode {
-    ConstantTimeSmooth = 0,
-    ConstantRateSmooth,
-    ProportionalTimeSmooth,
-    ProportionalRateSmooth,
-    SmoothNil
-} BlendronicSmoothMode;
+//typedef enum BlendronicSmoothMode {
+//    ConstantTimeSmooth = 0,
+//    ConstantRateSmooth,
+//    ProportionalTimeSmooth,
+//    ProportionalRateSmooth,
+//    SmoothNil
+//} BlendronicSmoothMode;
+
+typedef enum BlendronicSmoothBase {
+    BlendronicSmoothPulse = 0,
+    BlendronicSmoothBeat,
+    BlendronicSmoothBaseNil
+} BlendronicSmoothBase;
+
+typedef enum BlendronicSmoothScale {
+    BlendronicSmoothConstant = 0,
+    BlendronicSmoothFull,
+    BlendronicSmoothScaleNil
+} BlendronicSmoothScale;
 
 typedef enum BlendronicSyncMode {
     BlendronicFirstNoteOnSync = 0,
@@ -810,7 +822,7 @@ typedef enum BlendronicParameterType
     BlendronicId = 0,
     BlendronicBeats,
     BlendronicDelayLengths,
-    BlendronicSmoothDurations,
+    BlendronicSmoothValues,
     BlendronicFeedbackCoeffs,
     BlendronicInputThresh,
     BlendronicHoldMin,

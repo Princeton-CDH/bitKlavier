@@ -17,14 +17,16 @@ BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
 	name(p->getName()),
 	bBeats(p->getBeats()),
     bDelayLengths(p->getDelayLengths()),
-	bSmoothDurations(p->getSmoothDurations()),
+	bSmoothValues(p->getSmoothValues()),
 	bFeedbackCoefficients(p->getFeedbackCoefficients()),
 	bDelayMax(p->getDelayMax()),
-    bSmoothMode(p->getSmoothMode()),
+//    bSmoothMode(p->getSmoothMode()),
 //    bSyncMode(p->getSyncMode()),
 //    bClearMode(p->getClearMode()),
 //    bOpenMode(p->getOpenMode()),
 //    bCloseMode(p->getCloseMode()),
+    bSmoothBase(BlendronicSmoothPulse),
+    bSmoothScale(BlendronicSmoothFull),
     targetTypeBlendronicSync(p->getTargetTypeBlendronicSync()),
     targetTypeBlendronicPatternSync(p->getTargetTypeBlendronicPatternSync()),
     targetTypeBlendronicClear(p->getTargetTypeBlendronicClear()),
@@ -46,10 +48,10 @@ BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
 BlendronicPreparation::BlendronicPreparation(String newName,
                                              Array<float> beats,
                                              Array<float> delayLengths,
-                                             Array<float> smoothTimes,
+                                             Array<float> smoothValues,
                                              Array<float> feedbackCoefficients,
                                              float clusterThresh,
-                                             BlendronicSmoothMode smoothMode,
+//                                             BlendronicSmoothMode smoothMode,
 //                                             BlendronicSyncMode syncMode,
 //                                             BlendronicClearMode clearMode,
 //                                             BlendronicOpenMode openMode,
@@ -58,14 +60,16 @@ BlendronicPreparation::BlendronicPreparation(String newName,
 	name(newName),
 	bBeats(beats),
     bDelayLengths(delayLengths),
-	bSmoothDurations(smoothTimes),
+	bSmoothValues(smoothValues),
 	bFeedbackCoefficients(feedbackCoefficients),
 	bDelayMax(delayMax),
-    bSmoothMode(smoothMode),
+//    bSmoothMode(smoothMode),
 //    bSyncMode(syncMode),
 //    bClearMode(clearMode),
 //    bOpenMode(openMode),
 //    bCloseMode(closeMode),
+    bSmoothBase(BlendronicSmoothPulse),
+    bSmoothScale(BlendronicSmoothFull),
     targetTypeBlendronicSync(NoteOn),
     targetTypeBlendronicPatternSync(NoteOn),
     targetTypeBlendronicClear(NoteOn),
@@ -88,14 +92,16 @@ BlendronicPreparation::BlendronicPreparation(void) :
 	name("blank blendronic"),
 	bBeats(Array<float>({ 4., 3., 2., 3.})),
     bDelayLengths(Array<float>({ 4., 3., 2., 3.})),
-	bSmoothDurations(Array<float>({ 0.1 })),
+	bSmoothValues(Array<float>({ 0.1 })),
 	bFeedbackCoefficients(Array<float>({ 0.95 })),
 	bDelayMax(44100. * 5.),
-    bSmoothMode(ConstantTimeSmooth),
+//    bSmoothMode(ConstantTimeSmooth),
 //    bSyncMode(BlendronicFirstNoteOnSync),
 //    bClearMode(BlendronicFirstNoteOnClear),
 //    bOpenMode(BlendronicOpenModeNil),
 //    bCloseMode(BlendronicCloseModeNil),
+    bSmoothBase(BlendronicSmoothPulse),
+    bSmoothScale(BlendronicSmoothFull),
     targetTypeBlendronicSync(NoteOn),
     targetTypeBlendronicPatternSync(NoteOn),
     targetTypeBlendronicClear(NoteOn),
@@ -215,7 +221,7 @@ void BlendronicProcessor::tick(float* outputs)
         delayIndex++;
         if (delayIndex >= prep->getDelayLengths().size()) delayIndex = 0;
         smoothIndex++;
-        if (smoothIndex >= prep->getSmoothDurations().size()) smoothIndex = 0;
+        if (smoothIndex >= prep->getSmoothValues().size()) smoothIndex = 0;
         feedbackIndex++;
         if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
         
@@ -513,7 +519,7 @@ void BlendronicProcessor::prepareToPlay(double sr)
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
-    delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getSmoothDurations()[0],
+    delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getSmoothValues()[0],
                                          prep->getFeedbackCoefficients()[0], prep->getDelayMax(), true);
     
     beatPositionsInBuffer.ensureStorageAllocated(20);
@@ -560,27 +566,24 @@ void BlendronicProcessor::updateDelayParameters()
     prevDelay = prep->getDelayLengths()[delayIndex];
     
     float smoothRate = 0.0f;
-    if (prep->getSmoothMode()       == ConstantRateSmooth)
+    float smoothBase = 0.0f;
+    if (prep->getSmoothBase()       == BlendronicSmoothPulse)
     {
-        smoothRate = prep->getSmoothDurations()[smoothIndex] / pulseLength;
+        smoothBase = pulseLength;
     }
-    else if (prep->getSmoothMode()  == ConstantTimeSmooth)
+    else if (prep->getSmoothBase()  == BlendronicSmoothBeat)
     {
-        if (delayDelta == 0)
-            smoothRate = INFINITY;
-        else
-            smoothRate = delayDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength);
+        smoothBase = pulseLength * prep->getBeats()[beatIndex];
     }
-    else if (prep->getSmoothMode()  == ProportionalRateSmooth)
+    
+    if (prep->getSmoothScale()  == BlendronicSmoothConstant)
     {
-        smoothRate = prep->getSmoothDurations()[smoothIndex] / (pulseLength * prep->getBeats()[beatIndex]);
+        smoothRate = smoothBase / prep->getSmoothValues()[smoothIndex];
     }
-    else if (prep->getSmoothMode()  == ProportionalTimeSmooth)
+    else if (prep->getSmoothScale() == BlendronicSmoothFull)
     {
-        if (delayDelta == 0)
-            smoothRate = INFINITY;//prep->getSmoothDurations()[smoothIndex] / (pulseLength * prep->getBeats()[beatIndex]);
-        else
-            smoothRate = delayDelta / (prep->getSmoothDurations()[smoothIndex] * pulseLength * prep->getBeats()[beatIndex]);
+        smoothRate = delayDelta * (smoothBase / prep->getSmoothValues()[smoothIndex]);
+        if (delayDelta == 0) smoothRate = INFINITY;
     }
     
     // DBG(String(getId()) + " new envelope target = " + String(numSamplesDelay));
