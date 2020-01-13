@@ -188,7 +188,7 @@ BKViewController(p, theGraph, 3)
     actionButton.addListener(this);
     
     delayLineDisplay.setNumChannels(1);
-    delayLineDisplay.setColours(Colours::lightgrey, Colours::black);
+    delayLineDisplay.setColours(Colours::black, Colours::lightgrey);
     addAndMakeVisible(&delayLineDisplay);
 
 //    keyThreshSlider = std::make_unique< BKSingleSlider>("cluster threshold", 20, 2000, 200, 10);
@@ -892,8 +892,8 @@ void BlendronicPreparationEditor::timerCallback()
 //                keyThreshSlider->setDisplayValue(proc->getClusterThresholdTimer());
 //            else keyThreshSlider->setDisplayValue(0);
 
-            if (proc->getActive()) delayLineDisplay.setColours(Colours::black, Colours::lightgrey);
-            else delayLineDisplay.setColours(Colours::black, Colours::lightgrey.withMultipliedBrightness(0.6));
+//            if (proc->getActive()) delayLineDisplay.setColours(Colours::black, Colours::lightgrey);
+//            else delayLineDisplay.setColours(Colours::black, Colours::lightgrey.withMultipliedBrightness(0.6));
             delayLineDisplay.setLineSpacing(proc->getPulseLengthInSamples());
             float maxDelayLength = 0.0f;
             for (auto d : prep->getDelayLengths())

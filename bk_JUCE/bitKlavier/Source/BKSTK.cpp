@@ -214,18 +214,11 @@ BlendronicDelay::BlendronicDelay(BlendronicDelay::Ptr d):
 	dDelayLength(d->getDelayLength()),
 	dSmoothValue(d->getSmoothValue()),
 	dSmoothDuration(d->getSmoothDuration()),
-	dBlendronicActive(d->getActive()),
     dInputOpen(d->getInputState()),
     dOutputOpen(d->getOutputState()),
     shouldDuck(d->getShouldDuck()),
     sampleRate(d->getSampleRate())
 {
-    delayLengthRecord.ensureStorageAllocated(dDelayMax);
-    for (int i = 0; i < dDelayMax; i++)
-    {
-        delayLengthRecord.add(0.0f);
-    }
-    delayLengthRecordInPoint = 0;
     DBG("Create bdelay");
 }
 
@@ -235,18 +228,11 @@ BlendronicDelay::BlendronicDelay(float delayLength, float smoothValue, float smo
 	dDelayLength(delayLength),
 	dSmoothValue(smoothValue),
 	dSmoothDuration(smoothDuration),
-	dBlendronicActive(active),
     dInputOpen(true),
     dOutputOpen(true),
     sampleRate(44100)
 {
 	delayLinear =  new BKDelayL(dDelayLength, dDelayMax, dDelayGain);
-    delayLengthRecord.ensureStorageAllocated(dDelayMax);
-    for (int i = 0; i < dDelayMax; i++)
-    {
-        delayLengthRecord.add(0.0f);
-    }
-    delayLengthRecordInPoint = 0;
 	dSmooth = new BKEnvelope(dSmoothValue, delayLength);
     dSmooth->setRate(dSmoothDuration);
     dEnv = new BKEnvelope(1.0f, 1.0f);
@@ -268,27 +254,22 @@ void BlendronicDelay::addSample(float sampleToAdd, unsigned long offset, int cha
 
 void BlendronicDelay::tick(float* outputs)
 {
-    if (dBlendronicActive)
+    float dummyOut[2];
+    setDelayLength(dSmooth->tick());
+    float env = dEnv->tick();
+    if (shouldDuck && env == 0.0f)
     {
-        float dummyOut[2];
-        setDelayLength(dSmooth->tick());
-        float env = dEnv->tick();
-        if (shouldDuck && env == 0.0f)
-        {
-            clear();
-            setEnvelopeTarget(1.0f);
-            shouldDuck = false;
-        }
-        if (dOutputOpen)
-        {
-            delayLinear->tick(0, outputs, true);
-            outputs[0] *= env;
-            outputs[1] *= env;
-        }
-        else delayLinear->tick(0, dummyOut, true);
+        clear();
+        setEnvelopeTarget(1.0f);
+        shouldDuck = false;
     }
-    delayLengthRecord.set(delayLengthRecordInPoint++, dDelayLength/sampleRate);
-    if (delayLengthRecordInPoint >= delayLengthRecord.size()) delayLengthRecordInPoint = 0;
+    if (dOutputOpen)
+    {
+        delayLinear->tick(0, outputs, true);
+        outputs[0] *= env;
+        outputs[1] *= env;
+    }
+    else delayLinear->tick(0, dummyOut, true);
 }
 
 void BlendronicDelay::duckAndClear()

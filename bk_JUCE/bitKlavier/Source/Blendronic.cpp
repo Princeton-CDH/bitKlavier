@@ -147,6 +147,7 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
 	tempo(bTempo),
 	general(bGeneral),
     keymaps(Keymap::PtrArr()),
+    blendronicActive(true),
 	sampleTimer(0),
 	beatIndex(0),
     delayIndex(0),
@@ -172,6 +173,13 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
 //    openKeysDepressed = Array<int>();
 //    closeKeysDepressed = Array<int>();
     
+    delayLengthRecord.ensureStorageAllocated(blendronic->aPrep->getDelayMax());
+    for (int i = 0; i < blendronic->aPrep->getDelayMax(); i++)
+    {
+        delayLengthRecord.add(0.0f);
+    }
+    delayLengthRecordInPoint = 0;
+    
     DBG("Create bproc");
 }
 
@@ -184,6 +192,8 @@ void BlendronicProcessor::tick(float* outputs)
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
+    
+    if (!blendronicActive) return;
     
     // Check for beat change
     if (sampleTimer >= numSamplesBeat)
@@ -236,6 +246,9 @@ void BlendronicProcessor::tick(float* outputs)
     
     // Tick the delay
     delay->tick(outputs);
+    
+    delayLengthRecord.set(delayLengthRecordInPoint++, delay->getDelayLength()/(pulseLength*sampleRate));
+    if (delayLengthRecordInPoint >= delayLengthRecord.size()) delayLengthRecordInPoint = 0;
 }
 
 void BlendronicProcessor::processBlock(int numSamples, int midiChannel)
@@ -456,7 +469,7 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     if (!velocityCheck(noteNumber)) return;
     if (!holdCheck(noteNumber)) return;
     
-    if (doSync && (prep->getTargetTypeBlendronicSync() == NoteOn || prep->getTargetTypeBlendronicSync() == Both))
+    if (doSync && (prep->getTargetTypeBlendronicSync() == NoteOff || prep->getTargetTypeBlendronicSync() == Both))
     {
         // Sync to the next beat
         setSampleTimer(numSamplesBeat);
@@ -467,7 +480,7 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     }
     
     if (doPatternSync &&
-        (prep->getTargetTypeBlendronicPatternSync() == NoteOn || prep->getTargetTypeBlendronicPatternSync() == Both))
+        (prep->getTargetTypeBlendronicPatternSync() == NoteOff || prep->getTargetTypeBlendronicPatternSync() == Both))
     {
         // Reset the phase of all params and update values
         setSampleTimer(0);
@@ -485,25 +498,25 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     }
     
     if (doClear &&
-        (prep->getTargetTypeBlendronicClear() == NoteOn || prep->getTargetTypeBlendronicClear() == Both))
+        (prep->getTargetTypeBlendronicClear() == NoteOff || prep->getTargetTypeBlendronicClear() == Both))
     {
         delay->clear();
     }
     
     if (doPausePlay &&
-        (prep->getTargetTypeBlendronicPausePlay() == NoteOn || prep->getTargetTypeBlendronicPausePlay() == Both))
+        (prep->getTargetTypeBlendronicPausePlay() == NoteOff || prep->getTargetTypeBlendronicPausePlay() == Both))
     {
         toggleActive();
     }
     
     if (doOpenCloseInput &&
-        (prep->getTargetTypeBlendronicOpenCloseInput() == NoteOn || prep->getTargetTypeBlendronicOpenCloseInput() == Both))
+        (prep->getTargetTypeBlendronicOpenCloseInput() == NoteOff || prep->getTargetTypeBlendronicOpenCloseInput() == Both))
     {
         toggleInput();
     }
     
     if (doOpenCloseOutput &&
-        (prep->getTargetTypeBlendronicOpenCloseOutput() == NoteOn || prep->getTargetTypeBlendronicOpenCloseOutput() == Both))
+        (prep->getTargetTypeBlendronicOpenCloseOutput() == NoteOff || prep->getTargetTypeBlendronicOpenCloseOutput() == Both))
     {
         toggleOutput();
     }
@@ -543,8 +556,6 @@ void BlendronicProcessor::prepareToPlay(double sr)
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
     numSamplesBeat = prep->getBeats()[beatIndex] * sampleRate * ((60.0 / tempoPrep->getSubdivisions()) / tempoPrep->getTempo());
     numSamplesDelay = prep->getDelayLengths()[delayIndex] * sampleRate * ((60.0 / tempoPrep->getSubdivisions()) / tempoPrep->getTempo());
-    
-    
     
     delay->setDelayLength(numSamplesDelay);
     delay->setDelayTargetLength(numSamplesDelay);

@@ -590,8 +590,8 @@ public:
     inline BKSynthesiser* getSynth(void) const noexcept { return synth; }
     inline Array<int> getKeysDepressed(void) const noexcept { return keysDepressed; }
     inline const AudioBuffer<float> getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
-    inline const Array<float> getDelayLengthRecord() const noexcept { return delay->getDelayLengthRecord(); }
-    inline const bool getActive() const noexcept { return delay->getActive(); }
+    inline const Array<float> getDelayLengthRecord() const noexcept { return delayLengthRecord; }
+    inline const bool getActive() const noexcept { return blendronicActive; }
     inline const bool getInputState() const noexcept { return delay->getInputState(); }
     inline const bool getOutputState() const noexcept { return delay->getOutputState(); }
     inline const float getPulseLengthInSamples() const noexcept { return pulseLength * sampleRate; }
@@ -608,8 +608,8 @@ public:
     inline void setFeedbackIndex(int index) { feedbackIndex = index; }
 	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
     inline void setClearDelayOnNextBeat(bool clear) { clearDelayOnNextBeat = clear; }
-    inline const void setActive(bool newActive) { delay->setActive(newActive); }
-    inline const void toggleActive() { delay->toggleActive(); }
+    inline const void setActive(bool newActive) { blendronicActive = newActive; }
+    inline const void toggleActive() { blendronicActive = !blendronicActive; }
     inline const void setInputState(bool inputState) { delay->setInputState(inputState); }
     inline const void toggleInput() { delay->toggleInput(); }
     inline const void setOutputState(bool inputState) { delay->setOutputState(inputState); }
@@ -647,6 +647,8 @@ private:
     
     double sampleRate;
     
+    bool blendronicActive;
+    
 	Array<float> velocities;    //record of velocities
     Array<uint64> holdTimers;
 	Array<int> keysDepressed;   //current keys that are depressed
@@ -675,7 +677,7 @@ private:
     int beatIndex, delayIndex, smoothIndex, feedbackIndex;
     
     // Values of previous step values for smoothing. Saved separately from param arrays to account for changes to the sequences
-    float prevBeat, prevDelay;
+    float prevBeat, prevDelay, prevPulseLength;
     
     // Flag to clear the delay line on the next beat
     bool clearDelayOnNextBeat;
@@ -685,6 +687,9 @@ private:
     int numBeatPositions; // Number of beat positions in the buffer and to be displayed
     int beatPositionsIndex; // Index of beat sample positions for adding/removing positions
     float pulseOffset; // Sample offset of the pulse grid from grid aligned with buffer start (used in display)
+    
+    Array<float> delayLengthRecord;
+    int delayLengthRecordInPoint;
 
 	JUCE_LEAK_DETECTOR(BlendronicProcessor);
 };

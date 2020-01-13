@@ -234,7 +234,7 @@ void BlendronicDisplay::paint (Graphics& g)
     auto displayBounds = getLocalBounds();
     auto horizontalZoomSliderBounds = displayBounds.removeFromBottom(getLocalBounds().getHeight()*0.05);
     horizontalZoomSliderBounds.removeFromRight(horizontalZoomSliderBounds.getHeight());
-    auto verticalZoomSliderBounds = displayBounds.removeFromRight(horizontalZoomSliderBounds.getHeight());
+    auto verticalZoomSliderBounds = displayBounds.removeFromRight(horizontalZoomSliderBounds.getHeight()).removeFromTop(getLocalBounds().getHeight()*0.6);
     
     auto bufferBounds = displayBounds.removeFromTop(getLocalBounds().getHeight()*0.6);
     auto smoothingBounds = displayBounds.removeFromTop(getLocalBounds().getHeight()*0.35);
@@ -276,7 +276,7 @@ void BlendronicDisplay::getChannelAsPath (Path& path, const Range<float>* levels
     
     int offset = playheads[0] * invInputSamplesPerBlock;
     
-    for (int i = 4; i < numLevels-1; ++i)
+    for (int i = 4; i < numLevels-2; ++i)
     {
         auto level = -(levels[(nextSample + i + offset) % numLevels].getEnd());
         
@@ -286,7 +286,7 @@ void BlendronicDisplay::getChannelAsPath (Path& path, const Range<float>* levels
             path.lineTo ((float) i, level);
     }
     
-    for (int i = numLevels; --i >= 0;)
+    for (int i = numLevels-2; --i >= 4;)
         path.lineTo ((float) i, -(levels[(nextSample + i + offset) % numLevels].getStart()));
     
     path.closeSubPath();
@@ -336,6 +336,7 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
         float markerLevel = m * invInputSamplesPerBlock;
         float x = (fmod(((markerLevel - offset) + numLevels), numLevels) - leftLevel) *
                   (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
+        if (x < 1.0f) continue;
         g.setColour (markerColour);
         g.fillRect(x, area.getY(), 1.0f, area.getHeight());
     }
@@ -359,9 +360,10 @@ void BlendronicDisplay::getSmoothingAsPath (Path& path, const Range<float>* leve
     
     int offset = playheads[0] * invInputSamplesPerBlock;
     
-    for (int i = 4; i < numLevels-1; ++i)
+    for (int i = 4; i < numLevels-2; ++i)
     {
         auto level = -(levels[(nextSample + i + offset) % numLevels].getEnd());
+        level = fmin(level, maxDelayLength);
         
         if (i == 4)
             path.startNewSubPath (0.0f, level);
@@ -393,11 +395,11 @@ void BlendronicDisplay::paintSmoothing (Graphics& g, Rectangle<float> area, cons
     Path p;
     getSmoothingAsPath (p, levels, numLevels, nextSample);
     
-    g.setColour (waveformColour);
+    g.setColour (playheadColour);
     g.strokePath (p, PathStrokeType(2.0),
-                  AffineTransform::fromTargetPoints (numLevels*horizontalZoom, -maxDelayLength*0.625f,  area.getX(), area.getY(),
+                  AffineTransform::fromTargetPoints (numLevels*horizontalZoom, -maxDelayLength*1.25f,  area.getX(), area.getY(),
                                                      numLevels*horizontalZoom, 0.0f,  area.getX(), area.getBottom(),
-                                                     (float) numLevels, -maxDelayLength*0.625f,  area.getRight(), area.getY()));
+                                                     (float) numLevels, -maxDelayLength*1.25f,  area.getRight(), area.getY()));
     
     for (auto m : markers)
     {
@@ -405,6 +407,7 @@ void BlendronicDisplay::paintSmoothing (Graphics& g, Rectangle<float> area, cons
         float markerLevel = m * invInputSamplesPerBlock;
         float x = (fmod(((markerLevel - offset) + numLevels), numLevels) - leftLevel) *
         (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
+        if (x < 1.0f) continue;
         g.setColour (markerColour);
         g.fillRect(x, area.getY(), 1.0f, area.getHeight());
     }
