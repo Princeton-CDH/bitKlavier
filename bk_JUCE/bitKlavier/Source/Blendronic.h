@@ -72,11 +72,6 @@ public:
                           Array<float> smoothTimes,
                           Array<float> feedbackCoefficients,
                           float clusterThresh,
-//                          BlendronicSmoothMode smoothMode,
-//                          BlendronicSyncMode syncMode,
-//                          BlendronicClearMode clearMode,
-//                          BlendronicOpenMode openMode,
-//                          BlendronicCloseMode closeMode,
                           float delayMax);
 	BlendronicPreparation(void);
 
@@ -98,7 +93,6 @@ public:
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
 	inline const float getDelayMax() const noexcept { return bDelayMax; }
 	
-//    inline const BlendronicSmoothMode getSmoothMode() const noexcept { return bSmoothMode; }
     inline const BlendronicSmoothBase getSmoothBase() const noexcept { return bSmoothBase; }
     inline const BlendronicSmoothScale getSmoothScale() const noexcept { return bSmoothScale; }
 	inline const float getInputThreshSEC() const noexcept { return bInputThreshSec; }
@@ -110,10 +104,6 @@ public:
 	inline const bool getInputGain() const noexcept { return inputGain; }
     inline const float getClusterThreshSEC() const noexcept {return bClusterThreshSec; }
     inline const float getClusterThreshMS() const noexcept {return bClusterThresh; }
-//    inline const BlendronicSyncMode getSyncMode() const noexcept { return bSyncMode; }
-//    inline const BlendronicClearMode getClearMode() const noexcept { return bClearMode; }
-//    inline const BlendronicOpenMode getOpenMode() const noexcept { return bOpenMode; }
-//    inline const BlendronicCloseMode getCloseMode() const noexcept { return bCloseMode; }
 
 	//mutators
 	inline void setName(String n) { name = n; }
@@ -129,7 +119,6 @@ public:
     inline void setSmoothValue(int whichSlider, float value) { bSmoothValues.set(whichSlider, value); }
     inline void setFeedbackCoefficient(int whichSlider, float value) { bFeedbackCoefficients.set(whichSlider, value); }
     
-//    inline const void setSmoothMode(BlendronicSmoothMode mode) { bSmoothMode = mode; }
     inline const void setSmoothBase(BlendronicSmoothBase base) { bSmoothBase = base; }
     inline const void setSmoothScale(BlendronicSmoothScale scale) { bSmoothScale = scale; }
     inline const void toggleSmoothBase()
@@ -153,7 +142,7 @@ public:
 //    inline const void setOpenMode(BlendronicOpenMode mode) { bOpenMode = mode; }
 //    inline const void setCloseMode(BlendronicCloseMode mode) { bCloseMode = mode; }
     
-    inline const TargetNoteMode getTargetTypeBlendronicSync() const noexcept { return targetTypeBlendronicSync; }
+    inline const TargetNoteMode getTargetTypeBlendronicBeatSync() const noexcept { return targetTypeBlendronicBeatSync; }
     inline const TargetNoteMode getTargetTypeBlendronicPatternSync() const noexcept { return targetTypeBlendronicPatternSync; }
     inline const TargetNoteMode getTargetTypeBlendronicClear() const noexcept { return targetTypeBlendronicClear; }
     inline const TargetNoteMode getTargetTypeBlendronicPausePlay() const noexcept { return targetTypeBlendronicPausePlay; }
@@ -161,7 +150,7 @@ public:
     inline const TargetNoteMode getTargetTypeBlendronicOpenCloseOutput() const noexcept { return targetTypeBlendronicOpenCloseOutput; }
     inline const TargetNoteMode getTargetTypeBlendronic(KeymapTargetType which)
     {
-        if (which == TargetTypeBlendronicSync)          return targetTypeBlendronicSync;
+        if (which == TargetTypeBlendronicBeatSync)          return targetTypeBlendronicBeatSync;
         if (which == TargetTypeBlendronicPatternSync)   return targetTypeBlendronicPatternSync;
         if (which == TargetTypeBlendronicClear)         return targetTypeBlendronicClear;
         if (which == TargetTypeBlendronicPausePlay)     return targetTypeBlendronicPausePlay;
@@ -170,15 +159,15 @@ public:
         return TargetNoteModeNil;
     }
     
-    inline void setTargetTypeBlendronicSync(TargetNoteMode nm)          { targetTypeBlendronicSync = nm; }
     inline void setTargetTypeBlendronicPatternSync(TargetNoteMode nm)   { targetTypeBlendronicPatternSync = nm; }
+    inline void setTargetTypeBlendronicBeatSync(TargetNoteMode nm)      { targetTypeBlendronicBeatSync = nm; }
     inline void setTargetTypeBlendronicClear(TargetNoteMode nm)         { targetTypeBlendronicClear = nm; }
     inline void setTargetTypeBlendronicPausePlay(TargetNoteMode nm)     { targetTypeBlendronicPausePlay = nm; }
     inline void setTargetTypeBlendronicOpenCloseInput(TargetNoteMode nm)  { targetTypeBlendronicOpenCloseInput = nm; }
     inline void setTargetTypeBlendronicOpenCloseOutput(TargetNoteMode nm)  { targetTypeBlendronicOpenCloseOutput = nm; }
     inline void setTargetTypeBlendronic(KeymapTargetType which, TargetNoteMode nm)
     {
-        if (which == TargetTypeBlendronicSync)          { targetTypeBlendronicSync = nm; }
+        if (which == TargetTypeBlendronicBeatSync)          { targetTypeBlendronicBeatSync = nm; }
         if (which == TargetTypeBlendronicPatternSync)   { targetTypeBlendronicPatternSync = nm; }
         if (which == TargetTypeBlendronicClear)         { targetTypeBlendronicClear = nm; }
         if (which == TargetTypeBlendronicPausePlay)     { targetTypeBlendronicPausePlay = nm; }
@@ -213,12 +202,6 @@ public:
 	ValueTree getState(void)
     {
         ValueTree prep("params");
-        
-//        prep.setProperty(ptagBlendronic_smoothMode, getSmoothMode(), 0);
-//        prep.setProperty(ptagBlendronic_syncMode, getSyncMode(), 0);
-//        prep.setProperty(ptagBlendronic_clearMode, getClearMode(), 0);
-//        prep.setProperty(ptagBlendronic_openMode, getOpenMode(), 0);
-//        prep.setProperty(ptagBlendronic_closeMode, getCloseMode(), 0);
 
         ValueTree beats(vtagBlendronic_beats);
         int count = 0;
@@ -259,26 +242,6 @@ public:
 	void setState(XmlElement* e)
     {
         String n; float f;
-        
-//        n = e->getStringAttribute(ptagBlendronic_smoothMode);
-//        if (n != String())     setSmoothMode((BlendronicSmoothMode) n.getIntValue());
-//        else                   setSmoothMode(ConstantTimeSmooth);
-
-//        n = e->getStringAttribute(ptagBlendronic_syncMode);
-//        if (n != String())     setSyncMode((BlendronicSyncMode) n.getIntValue());
-//        else                   setSyncMode(BlendronicFirstNoteOnSync);
-//
-//        n = e->getStringAttribute(ptagBlendronic_clearMode);
-//        if (n != String())     setClearMode((BlendronicClearMode) n.getIntValue());
-//        else                   setClearMode(BlendronicFirstNoteOnClear);
-//
-//        n = e->getStringAttribute(ptagBlendronic_openMode);
-//        if (n != String())     setOpenMode((BlendronicOpenMode) n.getIntValue());
-//        else                   setOpenMode(BlendronicOpenModeNil);
-//
-//        n = e->getStringAttribute(ptagBlendronic_closeMode);
-//        if (n != String())     setCloseMode((BlendronicCloseMode) n.getIntValue());
-//        else                   setCloseMode(BlendronicCloseModeNil);
 
         forEachXmlChildElement (*e, sub)
         {
@@ -366,13 +329,8 @@ private:
     BlendronicSmoothBase bSmoothBase;
     BlendronicSmoothScale bSmoothScale;
     
-//    BlendronicSyncMode bSyncMode;
-//    BlendronicClearMode bClearMode;
-//    BlendronicOpenMode bOpenMode;
-//    BlendronicCloseMode bCloseMode;
-    
-    TargetNoteMode targetTypeBlendronicSync;
     TargetNoteMode targetTypeBlendronicPatternSync;
+    TargetNoteMode targetTypeBlendronicBeatSync;
     TargetNoteMode targetTypeBlendronicClear;
     TargetNoteMode targetTypeBlendronicPausePlay;
     TargetNoteMode targetTypeBlendronicOpenCloseInput;
@@ -652,11 +610,6 @@ private:
 	Array<float> velocities;    //record of velocities
     Array<uint64> holdTimers;
 	Array<int> keysDepressed;   //current keys that are depressed
-//
-//    Array<int> syncKeysDepressed;
-//    Array<int> clearKeysDepressed;
-//    Array<int> openKeysDepressed;
-//    Array<int> closeKeysDepressed;
     
     bool inSyncCluster, inClearCluster, inOpenCluster, inCloseCluster;
     bool nextSyncOffIsFirst, nextClearOffIsFirst, nextOpenOffIsFirst, nextCloseOffIsFirst;

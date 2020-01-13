@@ -57,7 +57,7 @@ public:
         setLookAndFeel(nullptr);
         releaseVelocitySetsSynchronicToggle.setLookAndFeel(nullptr);
         onOffSelectCB.setLookAndFeel(nullptr);
-        for (int i=0; i<=TargetTypeSynchronicRotate-TargetTypeSynchronicSync; i++)
+        for (int i=0; i<=TargetTypeSynchronicRotate-TargetTypeSynchronicPatternSync; i++)
         {
             targetControlCBs[i]->setLookAndFeel(nullptr);
         }
@@ -152,7 +152,7 @@ public:
         setLookAndFeel(nullptr);
         releaseVelocitySetsSynchronicToggle.setLookAndFeel(nullptr);
         onOffSelectCB.setLookAndFeel(nullptr);
-        for (int i=0; i<=TargetTypeSynchronicRotate-TargetTypeSynchronicSync; i++)
+        for (int i=0; i<=TargetTypeSynchronicRotate-TargetTypeSynchronicPatternSync; i++)
         {
             targetControlCBs[i]->setLookAndFeel(nullptr);
         }

@@ -397,7 +397,7 @@ void Keymap::removeTargetsOfType(BKPreparationType type)
     }
     else if (type == PreparationTypeBlendronic)
     {
-        for (int i = TargetTypeBlendronicSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+        for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
             removeTarget((KeymapTargetType) i);
         }

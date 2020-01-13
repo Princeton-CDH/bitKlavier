@@ -85,7 +85,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     
     // Target Control CBs
     targetControlCBs = OwnedArray<BKComboBox>();
-    for (int i=TargetTypeSynchronicSync; i<=TargetTypeSynchronicRotate; i++)
+    for (int i=TargetTypeSynchronicPatternSync; i<=TargetTypeSynchronicRotate; i++)
     {
         targetControlCBs.add(new BKComboBox()); // insert at the end of the array
         targetControlCBs.getLast()->setName(cKeymapTargetTypes[i]);
@@ -725,7 +725,7 @@ void SynchronicPreparationEditor::timerCallback()
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
         // dim target comboboxes that aren't activated by a Keymap
-        for (int i=TargetTypeSynchronicSync; i<=TargetTypeSynchronicRotate; i++)
+        for (int i=TargetTypeSynchronicPatternSync; i<=TargetTypeSynchronicRotate; i++)
         {
             bool makeBright = false;
             for (auto km : sProcessor->getKeymaps())
@@ -733,17 +733,17 @@ void SynchronicPreparationEditor::timerCallback()
             
             if (makeBright)
             {
-                targetControlCBs[i - TargetTypeSynchronicSync]->setAlpha(1.);
-                targetControlCBLabels[i - TargetTypeSynchronicSync]->setAlpha(1.);
+                targetControlCBs[i - TargetTypeSynchronicPatternSync]->setAlpha(1.);
+                targetControlCBLabels[i - TargetTypeSynchronicPatternSync]->setAlpha(1.);
                 
-                targetControlCBs[i - TargetTypeSynchronicSync]->setEnabled(true);
+                targetControlCBs[i - TargetTypeSynchronicPatternSync]->setEnabled(true);
             }
             else
             {
-                targetControlCBs[i - TargetTypeSynchronicSync]->setAlpha(0.25);
-                targetControlCBLabels[i - TargetTypeSynchronicSync]->setAlpha(0.25);
+                targetControlCBs[i - TargetTypeSynchronicPatternSync]->setAlpha(0.25);
+                targetControlCBLabels[i - TargetTypeSynchronicPatternSync]->setAlpha(0.25);
                 
-                targetControlCBs[i - TargetTypeSynchronicSync]->setEnabled(false);
+                targetControlCBs[i - TargetTypeSynchronicPatternSync]->setEnabled(false);
             }
         }
           
@@ -1038,9 +1038,9 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         gainSlider->setValue(prep->getGain(), notify);
         numClusterSlider->setValue(prep->getNumClusters(), notify);
                 
-        for (int i = TargetTypeSynchronicSync; i <= TargetTypeSynchronicRotate; i++)
+        for (int i = TargetTypeSynchronicPatternSync; i <= TargetTypeSynchronicRotate; i++)
         {
-            targetControlCBs[i - TargetTypeSynchronicSync]->setSelectedItemIndex
+            targetControlCBs[i - TargetTypeSynchronicPatternSync]->setSelectedItemIndex
                             (prep->getTargetTypeSynchronic(KeymapTargetType(i)), notify);
         }
         
@@ -1425,14 +1425,14 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
                 int selectedItem = targetControlCBs[i]->getSelectedId() - 1;
                 DBG(targetControlCBs[i]->getName() + " " + cTargetNoteModes[selectedItem]);
                 
-                prep    ->setTargetTypeSynchronic(KeymapTargetType(i + TargetTypeSynchronicSync), (TargetNoteMode)selectedItem);
-                active  ->setTargetTypeSynchronic(KeymapTargetType(i + TargetTypeSynchronicSync), (TargetNoteMode)selectedItem);
+                prep    ->setTargetTypeSynchronic(KeymapTargetType(i + TargetTypeSynchronicPatternSync), (TargetNoteMode)selectedItem);
+                active  ->setTargetTypeSynchronic(KeymapTargetType(i + TargetTypeSynchronicPatternSync), (TargetNoteMode)selectedItem);
                 
                 /*
-                if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicSync])
+                if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicPatternSync])
                 {
-                    prep    ->setTargetTypeSynchronicSync((TargetNoteMode)selectedItem);
-                    active  ->setTargetTypeSynchronicSync((TargetNoteMode)selectedItem);
+                    prep    ->setTargetTypeSynchronicPatternSync((TargetNoteMode)selectedItem);
+                    active  ->setTargetTypeSynchronicPatternSync((TargetNoteMode)selectedItem);
                 }
                 else if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicPatternSync])
                 {

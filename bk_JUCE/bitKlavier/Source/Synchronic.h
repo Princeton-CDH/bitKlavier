@@ -68,8 +68,8 @@ public:
     sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic()),
     numClusters(1),
     onOffMode(KeyOn),
-    targetTypeSynchronicSync(p->getTargetTypeSynchronicSync()),
     targetTypeSynchronicPatternSync(p->getTargetTypeSynchronicPatternSync()),
+    targetTypeSynchronicBeatSync(p->getTargetTypeSynchronicBeatSync()),
     targetTypeSynchronicAddNotes(p->getTargetTypeSynchronicAddNotes()),
     targetTypeSynchronicPausePlay(p->getTargetTypeSynchronicPausePlay()),
     targetTypeSynchronicClear(p->getTargetTypeSynchronicClear()),
@@ -112,8 +112,8 @@ public:
     velocityMax(127),
     numClusters(1),
     onOffMode(KeyOn),
-    targetTypeSynchronicSync(NoteOn),
     targetTypeSynchronicPatternSync(NoteOn),
+    targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
     targetTypeSynchronicPausePlay(NoteOn),
     targetTypeSynchronicClear(NoteOn),
@@ -149,8 +149,8 @@ public:
     velocityMax(127),
     numClusters(1),
     onOffMode(KeyOn),
-    targetTypeSynchronicSync(NoteOn),
     targetTypeSynchronicPatternSync(NoteOn),
+    targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
     targetTypeSynchronicPausePlay(NoteOn),
     targetTypeSynchronicClear(NoteOn),
@@ -196,8 +196,8 @@ public:
         velocityMin = s->getVelocityMin();
         velocityMax = s->getVelocityMax();
         
-        targetTypeSynchronicSync = s->getTargetTypeSynchronicSync();
         targetTypeSynchronicPatternSync = s->getTargetTypeSynchronicPatternSync();
+        targetTypeSynchronicBeatSync = s->getTargetTypeSynchronicBeatSync();
         targetTypeSynchronicAddNotes = s->getTargetTypeSynchronicAddNotes();
         targetTypeSynchronicPausePlay = s->getTargetTypeSynchronicPausePlay();
         targetTypeSynchronicClear = s->getTargetTypeSynchronicClear();
@@ -366,8 +366,8 @@ public:
                 holdMax == s->getHoldMax() &&
                 velocityMin == s->getVelocityMin() &&
                 velocityMax == s->getVelocityMax() &&
-                targetTypeSynchronicSync == s->getTargetTypeSynchronicSync() &&
                 targetTypeSynchronicPatternSync == s->getTargetTypeSynchronicPatternSync() &&
+                targetTypeSynchronicBeatSync == s->getTargetTypeSynchronicBeatSync() &&
                 targetTypeSynchronicAddNotes == s->getTargetTypeSynchronicAddNotes() &&
                 targetTypeSynchronicPausePlay == s->getTargetTypeSynchronicPausePlay()) &&
                 targetTypeSynchronicClear == s->getTargetTypeSynchronicClear() &&
@@ -564,8 +564,8 @@ public:
     inline const int getVelocityMin() const noexcept { return velocityMin; }
     inline const int getVelocityMax() const noexcept { return velocityMax; }
     
-    inline const TargetNoteMode getTargetTypeSynchronicSync() const noexcept { return targetTypeSynchronicSync; }
     inline const TargetNoteMode getTargetTypeSynchronicPatternSync() const noexcept { return targetTypeSynchronicPatternSync; }
+    inline const TargetNoteMode getTargetTypeSynchronicBeatSync() const noexcept { return targetTypeSynchronicBeatSync; }
     inline const TargetNoteMode getTargetTypeSynchronicAddNotes() const noexcept { return targetTypeSynchronicAddNotes; }
     inline const TargetNoteMode getTargetTypeSynchronicPausePlay() const noexcept { return targetTypeSynchronicPausePlay; }
     inline const TargetNoteMode getTargetTypeSynchronicClear() const noexcept { return targetTypeSynchronicClear; }
@@ -574,8 +574,8 @@ public:
     inline const TargetNoteMode getTargetTypeSynchronicRotate() const noexcept { return targetTypeSynchronicRotate; }
     inline const TargetNoteMode getTargetTypeSynchronic(KeymapTargetType which)
     {
-        if (which == TargetTypeSynchronicSync)          return targetTypeSynchronicSync;
         if (which == TargetTypeSynchronicPatternSync)   return targetTypeSynchronicPatternSync;
+        if (which == targetTypeSynchronicBeatSync)      return targetTypeSynchronicBeatSync;
         if (which == TargetTypeSynchronicAddNotes)      return targetTypeSynchronicAddNotes;
         if (which == TargetTypeSynchronicPausePlay)     return targetTypeSynchronicPausePlay;
         if (which == TargetTypeSynchronicClear)         return targetTypeSynchronicClear;
@@ -585,18 +585,18 @@ public:
         return TargetNoteModeNil;
     }
     
-    inline void setTargetTypeSynchronicSync(TargetNoteMode nm)          { targetTypeSynchronicSync = nm; }
     inline void setTargetTypeSynchronicPatternSync(TargetNoteMode nm)   { targetTypeSynchronicPatternSync = nm; }
+    inline void setTargetTypeSynchronicBeatSync(TargetNoteMode nm)      { targetTypeSynchronicBeatSync = nm; }
     inline void setTargetTypeSynchronicAddNotes(TargetNoteMode nm)      { targetTypeSynchronicAddNotes = nm; }
     inline void setTargetTypeSynchronicPausePlay(TargetNoteMode nm)     { targetTypeSynchronicPausePlay = nm; }
-    inline void setTargetTypeSynchronicClear(TargetNoteMode nm)          { targetTypeSynchronicClear = nm; }
+    inline void setTargetTypeSynchronicClear(TargetNoteMode nm)         { targetTypeSynchronicClear = nm; }
     inline void setTargetTypeSynchronicDeleteOldest(TargetNoteMode nm)  { targetTypeSynchronicDeleteOldest = nm; }
     inline void setTargetTypeSynchronicDeleteNewest(TargetNoteMode nm)  { targetTypeSynchronicDeleteNewest = nm; }
     inline void setTargetTypeSynchronicRotate(TargetNoteMode nm)        { targetTypeSynchronicRotate = nm; }
     inline void setTargetTypeSynchronic(KeymapTargetType which, TargetNoteMode nm)
     {
-        if (which == TargetTypeSynchronicSync)          { targetTypeSynchronicSync = nm; }
         if (which == TargetTypeSynchronicPatternSync)   { targetTypeSynchronicPatternSync = nm; }
+        if (which == targetTypeSynchronicBeatSync)          { targetTypeSynchronicBeatSync = nm; }
         if (which == TargetTypeSynchronicAddNotes)      { targetTypeSynchronicAddNotes = nm; }
         if (which == TargetTypeSynchronicPausePlay)     { targetTypeSynchronicPausePlay = nm; }
         if (which == TargetTypeSynchronicClear)          { targetTypeSynchronicClear = nm; }
@@ -732,9 +732,8 @@ public:
         prep.setProperty( "velocityMin", getVelocityMin(), 0);
         prep.setProperty( "velocityMax", getVelocityMax(), 0);
 
-
-        prep.setProperty( "targetTypeSynchronicSync", getTargetTypeSynchronicSync(), 0);
         prep.setProperty( "targetTypeSynchronicPatternSync", getTargetTypeSynchronicPatternSync(), 0);
+        prep.setProperty( "targetTypeSynchronicBeatSync", getTargetTypeSynchronicBeatSync(), 0);
         prep.setProperty( "targetTypeSynchronicAddNotes", getTargetTypeSynchronicAddNotes(), 0);
         prep.setProperty( "targetTypeSynchronicPausePlay", getTargetTypeSynchronicPausePlay(), 0);
         prep.setProperty( "targetTypeSynchronicClear", getTargetTypeSynchronicClear(), 0);
@@ -854,12 +853,12 @@ public:
         n = e->getStringAttribute("onOffMode");
         if (n != String())     setOnOffMode((SynchronicOnOffMode) n.getIntValue());
         else                   setOnOffMode(KeyOn);
-
-        i = e->getStringAttribute("targetTypeSynchronicSync").getIntValue();
-        setTargetTypeSynchronicSync((TargetNoteMode)i);
         
         i = e->getStringAttribute("targetTypeSynchronicPatternSync").getIntValue();
         setTargetTypeSynchronicPatternSync((TargetNoteMode)i);
+        
+        i = e->getStringAttribute("targetTypeSynchronicBeatSync").getIntValue();
+        setTargetTypeSynchronicBeatSync((TargetNoteMode)i);
         
         i = e->getStringAttribute("targetTypeSynchronicAddNotes").getIntValue();
         setTargetTypeSynchronicAddNotes((TargetNoteMode)i);
@@ -1023,8 +1022,8 @@ private:
     bool sReleaseVelocitySetsSynchronic;
     
     // stores what kind of note event triggers targeted events (as set in Keymap)
-    TargetNoteMode targetTypeSynchronicSync;
     TargetNoteMode targetTypeSynchronicPatternSync;
+    TargetNoteMode targetTypeSynchronicBeatSync;
     TargetNoteMode targetTypeSynchronicAddNotes;
     TargetNoteMode targetTypeSynchronicPausePlay;
     TargetNoteMode targetTypeSynchronicClear;

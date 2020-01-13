@@ -177,7 +177,8 @@ const String vtagBlendronic_beats = "beats";
 const String vtagBlendronic_delayLengths = "delayLengths";
 const String vtagBlendronic_smoothValues = "smoothValues";
 const String vtagBlendronic_feedbackCoefficients = "feedbackCoefficients";
-const String ptagBlendronic_smoothMode = "smooth";
+const String ptagBlendronic_smoothBase = "smoothBase";
+const String ptagBlendronic_smoothScale = "smoothScale";
 const String ptagBlendronic_syncMode = "sync";
 const String ptagBlendronic_clearMode = "clear";
 const String ptagBlendronic_openMode = "open";
@@ -1082,8 +1083,8 @@ typedef enum KeymapTargetType
     TargetTypeDirect = 0,
     
     TargetTypeSynchronic,
-    TargetTypeSynchronicSync,
     TargetTypeSynchronicPatternSync,
+    TargetTypeSynchronicBeatSync,
     TargetTypeSynchronicAddNotes,
     TargetTypeSynchronicClear,
     TargetTypeSynchronicPausePlay,
@@ -1094,8 +1095,8 @@ typedef enum KeymapTargetType
     TargetTypeNostalgic,
     TargetTypeNostalgicClear,
     
-    TargetTypeBlendronicSync,
     TargetTypeBlendronicPatternSync,
+    TargetTypeBlendronicBeatSync,
     TargetTypeBlendronicClear,
     TargetTypeBlendronicPausePlay,
     TargetTypeBlendronicOpenCloseInput,
@@ -1111,8 +1112,8 @@ static const std::vector<std::string> cKeymapTargetTypes = {
     "Direct",
     // Synchronic
     "Synchronic",
-    "Beat Sync",
     "Pattern Sync",
+    "Beat Sync",
     "Add Notes",
     "Clear",
     "Pause-Play",
@@ -1123,8 +1124,8 @@ static const std::vector<std::string> cKeymapTargetTypes = {
     "Nostalgic",
     "Clear",
     // Blendronic
-    "Beat Sync",
     "Pattern Sync",
+    "Beat Sync",
     "Clear",
     "Pause-Play",
     "Open-Close Input",

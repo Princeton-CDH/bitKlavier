@@ -158,7 +158,7 @@ BKViewController(p, theGraph, 3)
     
     // Target Control CBs
     targetControlCBs = OwnedArray<BKComboBox>();
-    for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
+    for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
     {
         targetControlCBs.add(new BKComboBox()); // insert at the end of the array
         targetControlCBs.getLast()->setName(cKeymapTargetTypes[i]);
@@ -510,9 +510,9 @@ void BlendronicPreparationEditor::update(void)
 //        closeModeSelectCB.setSelectedItemIndex(prep->getCloseMode(), dontSendNotification);
 //        openModeSelectCB.setSelectedItemIndex(prep->getOpenMode(), dontSendNotification);
 //
-        for (int i = TargetTypeBlendronicSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+        for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
-            targetControlCBs[i - TargetTypeBlendronicSync]->setSelectedItemIndex
+            targetControlCBs[i - TargetTypeBlendronicPatternSync]->setSelectedItemIndex
             (prep->getTargetTypeBlendronic(KeymapTargetType(i)), dontSendNotification);
         }
         
@@ -757,8 +757,8 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
                 int selectedItem = targetControlCBs[i]->getSelectedId() - 1;
                 DBG(targetControlCBs[i]->getName() + " " + cTargetNoteModes[selectedItem]);
                 
-                prep    ->setTargetTypeBlendronic(KeymapTargetType(i + TargetTypeBlendronicSync), (TargetNoteMode)selectedItem);
-                active  ->setTargetTypeBlendronic(KeymapTargetType(i + TargetTypeBlendronicSync), (TargetNoteMode)selectedItem);
+                prep    ->setTargetTypeBlendronic(KeymapTargetType(i + TargetTypeBlendronicPatternSync), (TargetNoteMode)selectedItem);
+                active  ->setTargetTypeBlendronic(KeymapTargetType(i + TargetTypeBlendronicPatternSync), (TargetNoteMode)selectedItem);
             }
         }
     }
@@ -908,7 +908,7 @@ void BlendronicPreparationEditor::timerCallback()
             delayLineDisplay.setPlayheads(Array<uint64>({proc->getCurrentSample(), proc->getDelayedSample()}));
             
             // dim target comboboxes that aren't activated by a Keymap
-            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
+            for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
             {
                 bool makeBright = false;
                 for (auto km : proc->getKeymaps())
@@ -916,17 +916,17 @@ void BlendronicPreparationEditor::timerCallback()
                 
                 if (makeBright)
                 {
-                    targetControlCBs[i - TargetTypeBlendronicSync]->setAlpha(1.);
-                    targetControlCBLabels[i - TargetTypeBlendronicSync]->setAlpha(1.);
+                    targetControlCBs[i - TargetTypeBlendronicPatternSync]->setAlpha(1.);
+                    targetControlCBLabels[i - TargetTypeBlendronicPatternSync]->setAlpha(1.);
                     
-                    targetControlCBs[i - TargetTypeBlendronicSync]->setEnabled(true);
+                    targetControlCBs[i - TargetTypeBlendronicPatternSync]->setEnabled(true);
                 }
                 else
                 {
-                    targetControlCBs[i - TargetTypeBlendronicSync]->setAlpha(0.25);
-                    targetControlCBLabels[i - TargetTypeBlendronicSync]->setAlpha(0.25);
+                    targetControlCBs[i - TargetTypeBlendronicPatternSync]->setAlpha(0.25);
+                    targetControlCBLabels[i - TargetTypeBlendronicPatternSync]->setAlpha(0.25);
                     
-                    targetControlCBs[i - TargetTypeBlendronicSync]->setEnabled(false);
+                    targetControlCBs[i - TargetTypeBlendronicPatternSync]->setEnabled(false);
                 }
             }
         

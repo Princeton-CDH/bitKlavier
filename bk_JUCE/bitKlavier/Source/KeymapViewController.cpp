@@ -381,11 +381,11 @@ void KeymapViewController::resized()
      
     
     // Blendronic Targets
-    Rectangle<int> blendronicBox = thirdColumn.removeFromTop((TargetTypeBlendronicOpenCloseOutput - TargetTypeBlendronicSync + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+    Rectangle<int> blendronicBox = thirdColumn.removeFromTop((TargetTypeBlendronicOpenCloseOutput - TargetTypeBlendronicPatternSync + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     blendronicTBGroup.setBounds(blendronicBox);
     blendronicBox.removeFromTop(4 * gYSpacing);
     blendronicBox.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
+    for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
     {
         targetControlTBs[i]->setBounds(blendronicBox.removeFromTop(gComponentToggleBoxHeight));
         //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
@@ -1021,7 +1021,7 @@ void KeymapViewController::hideUnconnectedTargets()
         
         if (kmItem->getConnectionsOfType(PreparationTypeBlendronic).size() == 0)
         {
-            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
+            for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
             {
                 targetControlTBs[i]->setAlpha(gDim);
                 targetControlTBs[i]->setEnabled(false);
@@ -1031,7 +1031,7 @@ void KeymapViewController::hideUnconnectedTargets()
         }
         else
         {
-            for (int i=TargetTypeBlendronicSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
+            for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
             {
                 targetControlTBs[i]->setAlpha(gBright);
                 targetControlTBs[i]->setEnabled(true);
