@@ -175,17 +175,21 @@ void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool sho
 
 BlendronicDelay::Ptr BKSynthesiser::createBlendronicDelay(float delayLength, float smoothDuration, float delayGain, float delayMax, bool active)
 {
+    const ScopedLock sl (lock);
     BlendronicDelay::Ptr delay = new BlendronicDelay(delayLength, delayLength, smoothDuration, delayGain, delayMax, active);
     return delay;
 }
 
 void BKSynthesiser::addBlendronicProcessor(BlendronicProcessor::Ptr bproc)
 {
+    const ScopedLock sl (lock);
     bprocessors.add(bproc);
 }
 
 void BKSynthesiser::removeBlendronicProcessor(int Id)
 {
+    const ScopedLock sl (lock);
+    
     for (int i = 0; i < bprocessors.size(); ++i)
     {
         if (bprocessors[i]->getId() == Id) bprocessors.remove(i);
