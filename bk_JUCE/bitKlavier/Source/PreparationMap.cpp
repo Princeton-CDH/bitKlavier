@@ -500,7 +500,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
                 if (km->isInverted()) targetStates = &releaseTargetStates;
                 
                 // If the keymap has a target enabled, enable that target in targetStates
-                for (int i = TargetTypeBlendronicSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+                for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
                 {
                     if (km->getTargetStates()[i] == TargetStateEnabled)
                         targetStates->set(i, TargetStateEnabled);
@@ -754,7 +754,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
                 targetStates = &releaseTargetStates;
                 if (km->isInverted()) targetStates = &pressTargetStates;
                 
-                for (int i = TargetTypeBlendronicSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+                for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
                 {
                     if (km->getTargetStates()[i] == TargetStateEnabled)
                         targetStates->set(i, TargetStateEnabled);

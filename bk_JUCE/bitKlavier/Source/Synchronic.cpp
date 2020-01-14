@@ -223,9 +223,9 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     /*
     Keymap Target modes:
        01. Synchronic: current functionality; launches clusters/layers, syncs, etc.... (doCluster)
-       02. Beat Sync: calls cluster->setPhasor(0), regardless of aPrep->getMode(), last cluster/layer (doSync)
-       03. Pattern Sync: calls cluster->resetPhase(), regardless of aPrep->getMode(), last cluster/layer (doPatternSync)
-            eventually, we could allow targeting of individual patterns
+       02. Pattern Sync: calls cluster->resetPhase(), regardless of aPrep->getMode(), last cluster/layer (doPatternSync)
+     eventually, we could allow targeting of individual patterns
+       03. Beat Sync: calls cluster->setPhasor(0), regardless of aPrep->getMode(), last cluster/layer (doSync)
        04. Pause/Play: stop/start incrementing phasor, all clusters (could also have Pause/Play Last, for last cluster only)
        05. Add Notes: calls cluster->addNote(noteNumber), last cluster/layer
        06. Remove Oldest Note?: call cluster->removeOldestNote(); a way of thinning a cluster
@@ -240,8 +240,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     */
     
     bool doCluster = targetStates[TargetTypeSynchronic] == TargetStateEnabled; // primary Synchronic mode
-    bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled; // only if resetting beat phase
     bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled; // only if resetting pattern phases
+    bool doBeatSync = targetStates[TargetTypeSynchronicBeatSync] == TargetStateEnabled; // only if resetting beat phase
     bool doAddNotes = targetStates[TargetTypeSynchronicAddNotes] == TargetStateEnabled; // if only adding notes to cluster
     bool doPausePlay = targetStates[TargetTypeSynchronicPausePlay] == TargetStateEnabled; // if targeting pause/play
     bool doClear = targetStates[TargetTypeSynchronicClear] == TargetStateEnabled;
@@ -315,7 +315,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     // ** now trigger behaviors set by Keymap targeting **
     //
     // synchronize beat, if targeting beat sync on noteOn or on both noteOn/Off
-    if (doSync && (prep->getTargetTypeSynchronicSync() == NoteOn || prep->getTargetTypeSynchronicSync() == Both))
+    if (doBeatSync && (prep->getTargetTypeSynchronicBeatSync() == NoteOn || prep->getTargetTypeSynchronicBeatSync() == Both))
     {
         //start right away
         uint64 phasor = beatThresholdSamples *
@@ -376,9 +376,9 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     keysDepressed.removeAllInstancesOf(noteNumber);
     
     // track the note's target, as set in Keymap; save as needed
-    bool doSync = targetStates[TargetTypeSynchronicSync] == TargetStateEnabled;
     bool doCluster = targetStates[TargetTypeSynchronic] == TargetStateEnabled;
     bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled;
+    bool doBeatSync = targetStates[TargetTypeSynchronicBeatSync] == TargetStateEnabled;
     bool doAddNotes = targetStates[TargetTypeSynchronicAddNotes] == TargetStateEnabled;
     bool doPausePlay = targetStates[TargetTypeSynchronicPausePlay] == TargetStateEnabled;
     bool doClear = targetStates[TargetTypeSynchronicClear] == TargetStateEnabled;
@@ -470,7 +470,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     // ** now trigger behaviors set by Keymap targeting **
     //
     // synchronize beat, if targeting beat sync on noteOff or on both noteOn/Off
-    if (doSync && (prep->getTargetTypeSynchronicSync() == NoteOff || prep->getTargetTypeSynchronicSync() == Both))
+    if (doBeatSync && (prep->getTargetTypeSynchronicBeatSync() == NoteOff || prep->getTargetTypeSynchronicBeatSync() == Both))
     {
         //start right away
         uint64 phasor = beatThresholdSamples *

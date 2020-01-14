@@ -577,7 +577,7 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
         BlendronicProcessor::Ptr bproc = getBlendronicProcessor(thisId);
         thisPreparationMap->addBlendronicProcessor(bproc);
         
-        for (int i = TargetTypeBlendronicSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+        for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
             keymap->addTarget((KeymapTargetType) i, TargetStateDisabled);
         }

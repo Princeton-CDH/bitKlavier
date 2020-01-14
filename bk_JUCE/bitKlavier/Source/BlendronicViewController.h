@@ -27,7 +27,7 @@ public:
 //        smoothModeSelectCB.setLookAndFeel(nullptr);
 //        clearModeSelectCB.setLookAndFeel(nullptr);
 //        openModeSelectCB.setLookAndFeel(nullptr);
-        for (int i=0; i<=TargetTypeBlendronicOpenCloseOutput-TargetTypeBlendronicSync; i++)
+        for (int i=0; i<=TargetTypeBlendronicOpenCloseOutput-TargetTypeBlendronicPatternSync; i++)
         {
             targetControlCBs[i]->setLookAndFeel(nullptr);
         }
@@ -114,9 +114,7 @@ public:
     ~BlendronicPreparationEditor()
     {
         setLookAndFeel(nullptr);
-//        smoothModeSelectCB.setLookAndFeel(nullptr);
-//        clearModeSelectCB.setLookAndFeel(nullptr);
-        for (int i=0; i<=TargetTypeBlendronicOpenCloseOutput-TargetTypeBlendronicSync; i++)
+        for (int i=0; i<=TargetTypeBlendronicOpenCloseOutput-TargetTypeBlendronicPatternSync; i++)
         {
             targetControlCBs[i]->setLookAndFeel(nullptr);
         }
@@ -126,11 +124,6 @@ public:
     void update(void) override;
     
     void fillSelectCB(int last, int current);
-//    void fillSmoothModeSelectCB(void);
-//    void fillSyncModeSelectCB(void);
-//    void fillClearModeSelectCB(void);
-//    void fillOpenModeSelectCB(void);
-//    void fillCloseModeSelectCB(void);
     
     void timerCallback() override;
     

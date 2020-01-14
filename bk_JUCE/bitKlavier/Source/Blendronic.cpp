@@ -20,15 +20,10 @@ BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
 	bSmoothValues(p->getSmoothValues()),
 	bFeedbackCoefficients(p->getFeedbackCoefficients()),
 	bDelayMax(p->getDelayMax()),
-//    bSmoothMode(p->getSmoothMode()),
-//    bSyncMode(p->getSyncMode()),
-//    bClearMode(p->getClearMode()),
-//    bOpenMode(p->getOpenMode()),
-//    bCloseMode(p->getCloseMode()),
     bSmoothBase(BlendronicSmoothPulse),
     bSmoothScale(BlendronicSmoothFull),
-    targetTypeBlendronicSync(p->getTargetTypeBlendronicSync()),
     targetTypeBlendronicPatternSync(p->getTargetTypeBlendronicPatternSync()),
+    targetTypeBlendronicBeatSync(p->getTargetTypeBlendronicBeatSync()),
     targetTypeBlendronicClear(p->getTargetTypeBlendronicClear()),
     targetTypeBlendronicPausePlay(p->getTargetTypeBlendronicPausePlay()),
     targetTypeBlendronicOpenCloseInput(p->getTargetTypeBlendronicOpenCloseInput()),
@@ -51,11 +46,6 @@ BlendronicPreparation::BlendronicPreparation(String newName,
                                              Array<float> smoothValues,
                                              Array<float> feedbackCoefficients,
                                              float clusterThresh,
-//                                             BlendronicSmoothMode smoothMode,
-//                                             BlendronicSyncMode syncMode,
-//                                             BlendronicClearMode clearMode,
-//                                             BlendronicOpenMode openMode,
-//                                             BlendronicCloseMode closeMode,
                                              float delayMax) :
 	name(newName),
 	bBeats(beats),
@@ -63,15 +53,10 @@ BlendronicPreparation::BlendronicPreparation(String newName,
 	bSmoothValues(smoothValues),
 	bFeedbackCoefficients(feedbackCoefficients),
 	bDelayMax(delayMax),
-//    bSmoothMode(smoothMode),
-//    bSyncMode(syncMode),
-//    bClearMode(clearMode),
-//    bOpenMode(openMode),
-//    bCloseMode(closeMode),
     bSmoothBase(BlendronicSmoothPulse),
     bSmoothScale(BlendronicSmoothFull),
-    targetTypeBlendronicSync(NoteOn),
     targetTypeBlendronicPatternSync(NoteOn),
+    targetTypeBlendronicBeatSync(NoteOn),
     targetTypeBlendronicClear(NoteOn),
     targetTypeBlendronicPausePlay(NoteOn),
     targetTypeBlendronicOpenCloseInput(NoteOn),
@@ -95,15 +80,10 @@ BlendronicPreparation::BlendronicPreparation(void) :
 	bSmoothValues(Array<float>({ 0.1 })),
 	bFeedbackCoefficients(Array<float>({ 0.95 })),
 	bDelayMax(44100. * 5.),
-//    bSmoothMode(ConstantTimeSmooth),
-//    bSyncMode(BlendronicFirstNoteOnSync),
-//    bClearMode(BlendronicFirstNoteOnClear),
-//    bOpenMode(BlendronicOpenModeNil),
-//    bCloseMode(BlendronicCloseModeNil),
     bSmoothBase(BlendronicSmoothPulse),
     bSmoothScale(BlendronicSmoothFull),
-    targetTypeBlendronicSync(NoteOn),
     targetTypeBlendronicPatternSync(NoteOn),
+    targetTypeBlendronicBeatSync(NoteOn),
     targetTypeBlendronicClear(NoteOn),
     targetTypeBlendronicPausePlay(NoteOn),
     targetTypeBlendronicOpenCloseInput(NoteOn),
@@ -168,10 +148,6 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     inCloseCluster = false;
     
     keysDepressed = Array<int>();
-//    syncKeysDepressed = Array<int>();
-//    clearKeysDepressed = Array<int>();
-//    openKeysDepressed = Array<int>();
-//    closeKeysDepressed = Array<int>();
     
     delayLengthRecord.ensureStorageAllocated(blendronic->aPrep->getDelayMax());
     for (int i = 0; i < blendronic->aPrep->getDelayMax(); i++)
@@ -375,32 +351,14 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     holdTimers.set(noteNumber, 0);
     
     // Get target flags
-    bool doSync = targetStates[TargetTypeBlendronicSync] == TargetStateEnabled;
     bool doPatternSync = targetStates[TargetTypeBlendronicPatternSync] == TargetStateEnabled;
+    bool doBeatSync = targetStates[TargetTypeBlendronicBeatSync] == TargetStateEnabled;
     bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
     bool doPausePlay = targetStates[TargetTypeBlendronicPausePlay] == TargetStateEnabled;
     bool doOpenCloseInput = targetStates[TargetTypeBlendronicOpenCloseInput] == TargetStateEnabled;
     bool doOpenCloseOutput = targetStates[TargetTypeBlendronicOpenCloseOutput] == TargetStateEnabled;
-//
-//    if (doSync) syncKeysDepressed.addIfNotAlreadyThere(noteNumber);
-//    if (doPatternSync) clearKeysDepressed.addIfNotAlreadyThere(noteNumber);
-//    if (doClear) clearKeysDepressed.addIfNotAlreadyThere(noteNumber);
-//    if (doPausePlay) clearKeysDepressed.addIfNotAlreadyThere(noteNumber);
-//    if (doOpenCloseInput) openKeysDepressed.addIfNotAlreadyThere(noteNumber);
-//    if (doOpenCloseInput) closeKeysDepressed.addIfNotAlreadyThere(noteNumber);
-    
     
     if (!velocityCheck(noteNumber)) return;
-    
-    if (doSync && (prep->getTargetTypeBlendronicSync() == NoteOn || prep->getTargetTypeBlendronicSync() == Both))
-    {
-        // Sync to the next beat
-        setSampleTimer(numSamplesBeat);
-        beatPositionsInBuffer.clear();
-        beatPositionsInBuffer.add(delay->getCurrentSample());
-        pulseOffset = delay->getCurrentSample();
-        beatPositionsIndex = 0;
-    }
     
     if (doPatternSync &&
         (prep->getTargetTypeBlendronicPatternSync() == NoteOn || prep->getTargetTypeBlendronicPatternSync() == Both))
@@ -418,6 +376,15 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
         pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
         numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
         updateDelayParameters();
+    }
+    else if (doBeatSync && (prep->getTargetTypeBlendronicBeatSync() == NoteOn || prep->getTargetTypeBlendronicBeatSync() == Both))
+    {
+        // Sync to the next beat
+        setSampleTimer(numSamplesBeat);
+        beatPositionsInBuffer.clear();
+        beatPositionsInBuffer.add(delay->getCurrentSample());
+        pulseOffset = delay->getCurrentSample();
+        beatPositionsIndex = 0;
     }
     
     if (doClear &&
@@ -454,30 +421,15 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     keysDepressed.removeAllInstancesOf(noteNumber);
     
     // Get target flags
-    bool doSync = targetStates[TargetTypeBlendronicSync] == TargetStateEnabled;
     bool doPatternSync = targetStates[TargetTypeBlendronicPatternSync] == TargetStateEnabled;
+    bool doBeatSync = targetStates[TargetTypeBlendronicBeatSync] == TargetStateEnabled;
     bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
     bool doPausePlay = targetStates[TargetTypeBlendronicPausePlay] == TargetStateEnabled;
     bool doOpenCloseInput = targetStates[TargetTypeBlendronicOpenCloseInput] == TargetStateEnabled;
     bool doOpenCloseOutput = targetStates[TargetTypeBlendronicOpenCloseOutput] == TargetStateEnabled;
-//
-//    if (doSync) syncKeysDepressed.removeAllInstancesOf(noteNumber);
-//    if (doClear) clearKeysDepressed.removeAllInstancesOf(noteNumber);
-//    if (doOpen) openKeysDepressed.removeAllInstancesOf(noteNumber);
-//    if (doClose) closeKeysDepressed.removeAllInstancesOf(noteNumber);
     
     if (!velocityCheck(noteNumber)) return;
     if (!holdCheck(noteNumber)) return;
-    
-    if (doSync && (prep->getTargetTypeBlendronicSync() == NoteOff || prep->getTargetTypeBlendronicSync() == Both))
-    {
-        // Sync to the next beat
-        setSampleTimer(numSamplesBeat);
-        beatPositionsInBuffer.clear();
-        beatPositionsInBuffer.add(delay->getCurrentSample());
-        pulseOffset = delay->getCurrentSample();
-        beatPositionsIndex = 0;
-    }
     
     if (doPatternSync &&
         (prep->getTargetTypeBlendronicPatternSync() == NoteOff || prep->getTargetTypeBlendronicPatternSync() == Both))
@@ -495,6 +447,15 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
         pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
         numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
         updateDelayParameters();
+    }
+    else if (doBeatSync && (prep->getTargetTypeBlendronicBeatSync() == NoteOff || prep->getTargetTypeBlendronicBeatSync() == Both))
+    {
+        // Sync to the next beat
+        setSampleTimer(numSamplesBeat);
+        beatPositionsInBuffer.clear();
+        beatPositionsInBuffer.add(delay->getCurrentSample());
+        pulseOffset = delay->getCurrentSample();
+        beatPositionsIndex = 0;
     }
     
     if (doClear &&
