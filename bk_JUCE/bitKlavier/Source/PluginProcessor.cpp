@@ -947,6 +947,21 @@ void BKAudioProcessor::performModifications(int noteNumber)
         
         updateState->synchronicPreparationDidChange = true;
     }
+    
+    BlendronicModification::PtrArr bMod = currentPiano->modificationMap[noteNumber]->getBlendronicModifications();
+    for (int i = bMod.size(); --i >= 0;)
+    {
+        BlendronicModification::Ptr mod = bMod[i];
+        Array<int> targets = mod->getTargets();
+        
+        for (auto target : targets)
+        {
+            BlendronicPreparation::Ptr prep = gallery->getBlendronic(target)->aPrep;
+            prep->performModification(mod, mod->getDirty());
+        }
+        
+        updateState->blendronicPreparationDidChange = true;
+    }
 }
 
 void BKAudioProcessor::importSoundfont(void)
@@ -1395,6 +1410,12 @@ void BKAudioProcessor::reset(BKPreparationType type, int Id)
         
         if (proc != nullptr) proc->reset();
     }
+    else if (type == PreparationTypeBlendronic)
+    {
+        BlendronicProcessor::Ptr proc = currentPiano->getBlendronicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
     else if (type == PreparationTypeTuning)
     {
         TuningProcessor::Ptr proc = currentPiano->getTuningProcessor(Id, false);
@@ -1422,6 +1443,10 @@ void BKAudioProcessor::reset(BKPreparationType type, int Id)
     else if (type == PreparationTypeSynchronicMod)
     {
         gallery->getSynchronicModification(Id)->reset();
+    }
+    else if (type == PreparationTypeBlendronicMod)
+    {
+        gallery->getBlendronicModification(Id)->reset();
     }
     else if (type == PreparationTypeTuningMod)
     {
@@ -1491,6 +1516,10 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     else if (type == PreparationTypeSynchronicMod)
     {
         gallery->getSynchronicModification(Id)->reset();
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+        gallery->getBlendronicModification(Id)->reset();
     }
     else if (type == PreparationTypeTuningMod)
     {

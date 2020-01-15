@@ -201,15 +201,15 @@ public:
         return nostalgic;
     }
     
+    inline const Blendronic::PtrArr getAllBlendronic(void) const noexcept
+    {
+        return blendronic;
+    }
+    
     inline const Tempo::PtrArr getAllTempo(void) const noexcept
     {
         return tempo;
     }
-
-	inline const Blendronic::PtrArr getAllBlendronic(void) const noexcept
-	{
-		return blendronic;
-	}
     
     inline TuningModification::Ptr matches(TuningModification::Ptr mod)
     {

@@ -1043,6 +1043,7 @@ void BKConstructionSite::idDidChange(void)
     else if (type == PreparationTypeDirectMod)      newId = processor.updateState->currentModDirectId;
     else if (type == PreparationTypeNostalgicMod)   newId = processor.updateState->currentModNostalgicId;
     else if (type == PreparationTypeSynchronicMod)  newId = processor.updateState->currentModSynchronicId;
+    else if (type == PreparationTypeBlendronicMod)  newId = processor.updateState->currentModBlendronicId;
     else if (type == PreparationTypeTuningMod)      newId = processor.updateState->currentModTuningId;
     else if (type == PreparationTypeTempoMod)       newId = processor.updateState->currentModTempoId;
     

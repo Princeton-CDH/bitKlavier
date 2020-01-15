@@ -575,7 +575,7 @@ public:
     inline const TargetNoteMode getTargetTypeSynchronic(KeymapTargetType which)
     {
         if (which == TargetTypeSynchronicPatternSync)   return targetTypeSynchronicPatternSync;
-        if (which == targetTypeSynchronicBeatSync)      return targetTypeSynchronicBeatSync;
+        if (which == TargetTypeSynchronicBeatSync)      return targetTypeSynchronicBeatSync;
         if (which == TargetTypeSynchronicAddNotes)      return targetTypeSynchronicAddNotes;
         if (which == TargetTypeSynchronicPausePlay)     return targetTypeSynchronicPausePlay;
         if (which == TargetTypeSynchronicClear)         return targetTypeSynchronicClear;
@@ -596,10 +596,10 @@ public:
     inline void setTargetTypeSynchronic(KeymapTargetType which, TargetNoteMode nm)
     {
         if (which == TargetTypeSynchronicPatternSync)   { targetTypeSynchronicPatternSync = nm; }
-        if (which == targetTypeSynchronicBeatSync)          { targetTypeSynchronicBeatSync = nm; }
+        if (which == TargetTypeSynchronicBeatSync)      { targetTypeSynchronicBeatSync = nm; }
         if (which == TargetTypeSynchronicAddNotes)      { targetTypeSynchronicAddNotes = nm; }
         if (which == TargetTypeSynchronicPausePlay)     { targetTypeSynchronicPausePlay = nm; }
-        if (which == TargetTypeSynchronicClear)          { targetTypeSynchronicClear = nm; }
+        if (which == TargetTypeSynchronicClear)         { targetTypeSynchronicClear = nm; }
         if (which == TargetTypeSynchronicDeleteOldest)  { targetTypeSynchronicDeleteOldest = nm; }
         if (which == TargetTypeSynchronicDeleteNewest)  { targetTypeSynchronicDeleteNewest = nm; }
         if (which == TargetTypeSynchronicRotate)        { targetTypeSynchronicRotate = nm; }
@@ -732,14 +732,14 @@ public:
         prep.setProperty( "velocityMin", getVelocityMin(), 0);
         prep.setProperty( "velocityMax", getVelocityMax(), 0);
 
-        prep.setProperty( "targetTypeSynchronicPatternSync", getTargetTypeSynchronicPatternSync(), 0);
-        prep.setProperty( "targetTypeSynchronicBeatSync", getTargetTypeSynchronicBeatSync(), 0);
-        prep.setProperty( "targetTypeSynchronicAddNotes", getTargetTypeSynchronicAddNotes(), 0);
-        prep.setProperty( "targetTypeSynchronicPausePlay", getTargetTypeSynchronicPausePlay(), 0);
-        prep.setProperty( "targetTypeSynchronicClear", getTargetTypeSynchronicClear(), 0);
-        prep.setProperty( "targetTypeSynchronicDeleteOldest", getTargetTypeSynchronicDeleteOldest(), 0);
-        prep.setProperty( "targetTypeSynchronicDeleteNewest", getTargetTypeSynchronicDeleteNewest(), 0);
-        prep.setProperty( "targetTypeSynchronicRotate", getTargetTypeSynchronicRotate(), 0);
+        prep.setProperty( ptagSynchronic_targetPatternSync, getTargetTypeSynchronicPatternSync(), 0);
+        prep.setProperty( ptagSynchronic_targetBeatSync, getTargetTypeSynchronicBeatSync(), 0);
+        prep.setProperty( ptagSynchronic_targetAddNotes, getTargetTypeSynchronicAddNotes(), 0);
+        prep.setProperty( ptagSynchronic_targetClear, getTargetTypeSynchronicClear(), 0);
+        prep.setProperty( ptagSynchronic_targetPausePlay, getTargetTypeSynchronicPausePlay(), 0);
+        prep.setProperty( ptagSynchronic_targetDeleteOldest, getTargetTypeSynchronicDeleteOldest(), 0);
+        prep.setProperty( ptagSynchronic_targetDeleteNewest, getTargetTypeSynchronicDeleteNewest(), 0);
+        prep.setProperty( ptagSynchronic_targetRotate, getTargetTypeSynchronicRotate(), 0);
                  
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
@@ -854,28 +854,28 @@ public:
         if (n != String())     setOnOffMode((SynchronicOnOffMode) n.getIntValue());
         else                   setOnOffMode(KeyOn);
         
-        i = e->getStringAttribute("targetTypeSynchronicPatternSync").getIntValue();
+        i = e->getStringAttribute(ptagSynchronic_targetPatternSync).getIntValue();
         setTargetTypeSynchronicPatternSync((TargetNoteMode)i);
         
-        i = e->getStringAttribute("targetTypeSynchronicBeatSync").getIntValue();
+        i = e->getStringAttribute(ptagSynchronic_targetBeatSync).getIntValue();
         setTargetTypeSynchronicBeatSync((TargetNoteMode)i);
         
-        i = e->getStringAttribute("targetTypeSynchronicAddNotes").getIntValue();
+        i = e->getStringAttribute(ptagSynchronic_targetAddNotes).getIntValue();
         setTargetTypeSynchronicAddNotes((TargetNoteMode)i);
         
-        i = e->getStringAttribute("targetTypeSynchronicPausePlay").getIntValue();
-        setTargetTypeSynchronicPausePlay((TargetNoteMode)i);
-        
-        i = e->getStringAttribute("targetTypeSynchronicClear").getIntValue();
+        i = e->getStringAttribute(ptagSynchronic_targetClear).getIntValue();
         setTargetTypeSynchronicClear((TargetNoteMode)i);
         
-        i = e->getStringAttribute("targetTypeSynchronicDeleteOldest").getIntValue();
+        i = e->getStringAttribute(ptagSynchronic_targetPausePlay).getIntValue();
+        setTargetTypeSynchronicPausePlay((TargetNoteMode)i);
+        
+        i = e->getStringAttribute(ptagSynchronic_targetDeleteOldest).getIntValue();
         setTargetTypeSynchronicDeleteOldest((TargetNoteMode)i);
         
-        i = e->getStringAttribute("targetTypeSynchronicDeleteNewest").getIntValue();
+        i = e->getStringAttribute(ptagSynchronic_targetDeleteNewest).getIntValue();
         setTargetTypeSynchronicDeleteNewest((TargetNoteMode)i);
         
-        i = e->getStringAttribute("targetTypeSynchronicRotate").getIntValue();
+        i = e->getStringAttribute(ptagSynchronic_targetRotate).getIntValue();
         setTargetTypeSynchronicRotate((TargetNoteMode)i);
  
         forEachXmlChildElement (*e, sub)

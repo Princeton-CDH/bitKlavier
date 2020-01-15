@@ -141,6 +141,12 @@ public:
             synchronicPreparationDidChange = true;
             setCurrentDisplay(DisplaySynchronicMod);
         }
+        else if (type == PreparationTypeBlendronicMod)
+        {
+            currentModBlendronicId = (Id == -1) ? currentModBlendronicId : Id;
+            blendronicPreparationDidChange = true;
+            setCurrentDisplay(DisplayBlendronicMod);
+        }
         else if (type == PreparationTypeTuningMod)
         {
             currentModTuningId = (Id == -1) ? currentModTuningId : Id;

@@ -86,6 +86,15 @@ const String ptagSynchronic_mode = "mode";
 const String ptagSynchronic_beatsToSkip = "beatsToSkip";
 const String ptagSynchronic_gain = "gain";
 
+const String ptagSynchronic_targetPatternSync = "targetTypeSynchronicPatternSync";
+const String ptagSynchronic_targetBeatSync = "targetTypeSynchronicBeatSync";
+const String ptagSynchronic_targetAddNotes = "targetTypeSynchronicAddNotes";
+const String ptagSynchronic_targetPausePlay = "targetTypeSynchronicPausePlay";
+const String ptagSynchronic_targetClear = "targetTypeSynchronicClear";
+const String ptagSynchronic_targetDeleteOldest = "targetTypeSynchronicDeleteOldest";
+const String ptagSynchronic_targetDeleteNewest = "targetTypeSynchronicDeleteNewest";
+const String ptagSynchronic_targetRotate = "targetTypeSynchronicRotate";
+
 const String vtagTempo= "tempo";
 const String vtagModTempo = "modTempo";
 const String ptagTempo_Id = "Id";
@@ -175,14 +184,18 @@ const String vtagModBlendronic = "modBlendronic";
 const String ptagBlendronic_id = "Id";
 const String vtagBlendronic_beats = "beats";
 const String vtagBlendronic_delayLengths = "delayLengths";
+const String vtagBlendronic_smoothLengths = "smoothLengths";
 const String vtagBlendronic_smoothValues = "smoothValues";
 const String vtagBlendronic_feedbackCoefficients = "feedbackCoefficients";
 const String ptagBlendronic_smoothBase = "smoothBase";
 const String ptagBlendronic_smoothScale = "smoothScale";
-const String ptagBlendronic_syncMode = "sync";
-const String ptagBlendronic_clearMode = "clear";
-const String ptagBlendronic_openMode = "open";
-const String ptagBlendronic_closeMode = "close";
+
+const String ptagBlendronic_targetPatternSync = "targetTypeBlendronicPatternSync";
+const String ptagBlendronic_targetBeatSync = "targetTypeBlendronicBeatSync";
+const String ptagBlendronic_targetClear = "targetTypeBlendronicClear";
+const String ptagBlendronic_targetPausePlay = "targetTypeBlendronicPausePlay";
+const String ptagBlendronic_targetOpenCloseInput = "targetTypeBlendronicOpenCloseInput";
+const String ptagBlendronic_targetOpenCloseOutput = "targetTypeBlendronicOpenCloseOutput";
 
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";
@@ -719,13 +732,6 @@ static const std::vector<std::string> cTuningAdaptiveTypes = {
 };
 
 #pragma mark - Blendronic
-//typedef enum BlendronicSmoothMode {
-//    ConstantTimeSmooth = 0,
-//    ConstantRateSmooth,
-//    ProportionalTimeSmooth,
-//    ProportionalRateSmooth,
-//    SmoothNil
-//} BlendronicSmoothMode;
 
 typedef enum BlendronicSmoothBase {
     BlendronicSmoothPulse = 0,
@@ -775,66 +781,20 @@ typedef enum BlendronicCloseMode {
     BlendronicCloseModeNil
 } BlendronicCloseMode;
 
-static const std::vector<std::string> cBlendronicSmoothModes = {
-    "Constant Time",
-    "Constant Rate",
-    "Proportional Time",
-    "Proportional Rate"
-};
-
-static const std::vector<std::string> cBlendronicSyncModes = {
-    "First Note-On",
-    "Any Note-On",
-    "First Note-Off",
-    "Any Note-Off",
-    "Last Note-Off",
-    "None"
-};
-
-static const std::vector<std::string> cBlendronicClearModes = {
-    "First Note-On",
-    "Any Note-On",
-    "First Note-Off",
-    "Any Note-Off",
-    "Last Note-Off",
-    "None"
-};
-
-static const std::vector<std::string> cBlendronicOpenModes = {
-    "First Note-On",
-    "Any Note-On",
-    "First Note-Off",
-    "Any Note-Off",
-    "Last Note-Off",
-    "None"
-};
-
-static const std::vector<std::string> cBlendronicCloseModes = {
-    "First Note-On",
-    "Any Note-On",
-    "First Note-Off",
-    "Any Note-Off",
-    "Last Note-Off",
-    "None"
-};
-
 typedef enum BlendronicParameterType
 {
     BlendronicId = 0,
     BlendronicBeats,
     BlendronicDelayLengths,
+    BlendronicSmoothLengths,
     BlendronicSmoothValues,
     BlendronicFeedbackCoeffs,
-    BlendronicInputThresh,
-    BlendronicHoldMin,
-    BlendronicHoldMax,
-    BlendronicVelMin,
-    BlendronicVelMax,
     BlendronicParameterTypeNil
 } BlendronicParameterType;
 
 static const std::vector<BKParameterDataType> cBlendronicDataTypes = {
     BKInt,
+    BKFloatArr,
     BKFloatArr,
     BKFloatArr,
     BKFloatArr,
@@ -850,19 +810,16 @@ static const std::vector<std::string> cBlendronicParameterTypes = {
     "Blendronic Id",
     "beat lengths",
     "delay lengths",
-    "smoothing",
-    "feedback coefficients",
-    "Input Thresh",
-    "Hold Min",
-    "Hold Max",
-    "Vel Min",
-    "Vel Max"
+    "smoothing (ms)",
+    "smoothing (?)",
+    "feedback coefficients"
 };
 
 static const std::vector<std::vector<float>> cBlendronicDefaultRangeValuesAndInc = {
     { 0.0f, 0.0f, 0.0f, 0.0f }, //min, max, default, increment, skew
     { 0.0f, 8.0f, 4.0f, 0.1f },
     { 0.0f, 8.0f, 4.0f, 0.1f },
+    { 0.0f, 500.0f, 50.0f, 0.01f },
     { 0.0f, 1.0f, 0.1f, 0.0001f },
     { 0.0f, 1.0f, 0.95f, 0.01f }
 };

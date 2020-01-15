@@ -663,7 +663,7 @@ void Piano::configureReset(BKItem::Ptr item)
             
             for (auto id : tempo) modificationMap[key]->tempoReset.add(id);
 
-			for (auto id : blendronic) modificationMap[key]->tempoReset.add(id);
+			for (auto id : blendronic) modificationMap[key]->blendronicReset.add(id);
             
             otherKeys.set(key, false);
         }

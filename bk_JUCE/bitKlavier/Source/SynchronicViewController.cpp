@@ -2176,8 +2176,23 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         fillModeSelectCB();
     }
-    
-    
+    else if (name == "MIDI Output")
+    {
+        SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
+        
+        if (index > 0)
+        {
+            mod->setMidiOutput(processor.getMidiOutputDevices()[index-1]);
+            mod->setDirty(SynchronicMidiOutput);
+        }
+        else
+        {
+            mod->setMidiOutput(nullptr);
+            mod->setDirty(SynchronicMidiOutput);
+        }
+        
+        fillMidiOutputSelectCB();
+    }
 }
 
 void SynchronicModificationEditor::bkTextFieldDidChange(TextEditor& tf)

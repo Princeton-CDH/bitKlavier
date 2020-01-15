@@ -142,7 +142,7 @@ public:
 
 	//constructors
 	BlendronicDelay(BlendronicDelay::Ptr d);
-	BlendronicDelay(float delayLength, float smoothValue, float smoothDuration, float delayGain, float delayMax, bool active = false);
+	BlendronicDelay(float delayLength, float smoothValue, float smoothDuration, float delayMax, bool active = false);
 	~BlendronicDelay();
 
 	//accessors
@@ -153,7 +153,7 @@ public:
 	inline const float getDelayGain() const noexcept { return dDelayGain; }
 	inline const float getDelayLength() const noexcept { return dDelayLength; }
 	inline const float getSmoothValue() const noexcept { return dSmooth->getValue(); }
-	inline const float getSmoothDuration() const noexcept { return dSmoothDuration; }
+	inline const float getSmoothRate() const noexcept { return dSmoothRate; }
     inline const bool getInputState() const noexcept { return dInputOpen; }
     inline const bool getOutputState() const noexcept { return dOutputOpen; }
     inline const bool getShouldDuck() const noexcept { return shouldDuck; }
@@ -179,10 +179,10 @@ public:
     //  each beat we will need to calculate a new rate dependent on this duration and the beat length (rate ~ beatLength / duration)
     //have the rate be constant, regardless of beat length, so we'll use the length of smallest beat (1, as set by Tempo, so the pulseLength)
     //  so rate ~ pulseLength / duration
-    inline void setSmoothDuration(float smoothDuration)
+    inline void setSmoothRate(float smoothRate)
     {
-        dSmoothDuration = smoothDuration;
-        dSmooth->setRate(smoothDuration);
+        dSmoothRate = smoothRate;
+        dSmooth->setRate(smoothRate);
     }
     
     inline void setFeedback(float fb) { delayLinear->setFeedback(fb); }
@@ -207,7 +207,7 @@ private:
 	float dDelayGain;
     float dDelayLength;
 	float dSmoothValue;
-	float dSmoothDuration;
+	float dSmoothRate;
     bool dInputOpen;
     bool dOutputOpen;
     bool shouldDuck;

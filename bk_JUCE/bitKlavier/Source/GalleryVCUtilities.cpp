@@ -115,6 +115,7 @@ String HeaderViewController::processResetMapString(const String& s)
     
     for (int i = 0; i < 128; i++)
     {
+        processor.currentPiano->modificationMap[i]->blendronicReset.clearQuick();
         processor.currentPiano->modificationMap[i]->synchronicReset.clearQuick();
         processor.currentPiano->modificationMap[i]->tuningReset.clearQuick();
         processor.currentPiano->modificationMap[i]->tempoReset.clearQuick();
@@ -157,7 +158,8 @@ String HeaderViewController::processResetMapString(const String& s)
         DBG("prepPart: " + prepPart);
         
         
-        
+        juce_wchar blendronicLC = 'b';
+        juce_wchar blendronicUC = 'B';
         juce_wchar synchronicLC = 's';
         juce_wchar synchronicUC = 'S';
         juce_wchar nostalgicLC = 'n';
@@ -169,13 +171,13 @@ String HeaderViewController::processResetMapString(const String& s)
         juce_wchar tempoLC = 'm';
         juce_wchar tempoUC = 'M';
         
+        bool isBlendronic = false, inBlendronic = false;
         bool isSynchronic = false, inSynchronic = false;
         bool isNostalgic = false, inNostalgic = false;
         bool isDirect = false, inDirect = false;
         bool isTuning = false, inTuning = false;
         bool isTempo = false, inTempo = false;
         bool isNumber = false;
-        
         
         String num = "";
         
@@ -185,6 +187,7 @@ String HeaderViewController::processResetMapString(const String& s)
         {
             juce_wchar c1 = c.getAndAdvance();
             
+            isBlendronic   = !CharacterFunctions::compare(c1, blendronicLC) ||  !CharacterFunctions::compare(c1, blendronicUC);
             isSynchronic   = !CharacterFunctions::compare(c1, synchronicLC) ||  !CharacterFunctions::compare(c1, synchronicUC);
             isNostalgic    = !CharacterFunctions::compare(c1, nostalgicLC)  ||  !CharacterFunctions::compare(c1, nostalgicUC);
             isDirect       = !CharacterFunctions::compare(c1, directLC)     ||  !CharacterFunctions::compare(c1, directUC);
@@ -200,6 +203,7 @@ String HeaderViewController::processResetMapString(const String& s)
                 else if (isDirect)       inDirect        = true;
                 else if (isTuning)       inTuning        = true;
                 else if (isTempo)        inTempo        = true;
+                else if (isBlendronic)   inBlendronic = true;
                 else if (inSynchronic)
                 {
                     int whichPrep = num.getIntValue();
@@ -261,6 +265,18 @@ String HeaderViewController::processResetMapString(const String& s)
                     num = "";
                     inTempo = false;
                 }
+                else if (inBlendronic)
+                {
+                    int whichPrep = num.getIntValue();
+                    for (auto k : keys)
+                    {
+                        out += String(k) + ":" + "m" + String(whichPrep) + " ";
+                        processor.currentPiano->modificationMap[k]->blendronicReset.add(whichPrep);
+                    }
+                    
+                    num = "";
+                    inBlendronic = false;
+                }
                 
                 num = "";
             }
@@ -286,6 +302,7 @@ String HeaderViewController::processmodificationMapString(const String& s)
     bool isSpace = false;
     bool isEndOfString = false;
     
+    bool isBlendronic = false;
     bool isSynchronic = false;
     bool isNostalgic = false;
     bool isTuning = false;
@@ -300,6 +317,7 @@ String HeaderViewController::processmodificationMapString(const String& s)
     bool itsASpace = false;
     bool itsADirect = false;
     bool itsASynchronic = false;
+    bool itsABlendronic = false;
     bool itsATuning = false;
     bool itsANostalgic = false;
     bool itsATempo = false;
@@ -309,7 +327,8 @@ String HeaderViewController::processmodificationMapString(const String& s)
     juce_wchar keymap = 'k';
     juce_wchar colon = ':';
     
-    
+    juce_wchar blendronicLC = 'b';
+    juce_wchar blendronicUC = 'B';
     juce_wchar synchronicLC = 's';
     juce_wchar synchronicUC = 'S';
     juce_wchar nostalgicLC = 'n';
@@ -352,7 +371,7 @@ String HeaderViewController::processmodificationMapString(const String& s)
     {
         juce_wchar c1 = c.getAndAdvance();
         
-        
+        isBlendronic   = !CharacterFunctions::compare(c1, blendronicLC) || !CharacterFunctions::compare(c1, synchronicUC);
         isSynchronic   = !CharacterFunctions::compare(c1, synchronicLC) || !CharacterFunctions::compare(c1, synchronicUC);
         isNostalgic    = !CharacterFunctions::compare(c1, nostalgicLC) || !CharacterFunctions::compare(c1, nostalgicUC);
         isDirect       = !CharacterFunctions::compare(c1, directLC) || !CharacterFunctions::compare(c1, directUC);
@@ -414,6 +433,7 @@ String HeaderViewController::processmodificationMapString(const String& s)
                 itsAKeymap = false;
                 itsADirect = false;
                 itsASynchronic = false;
+                itsABlendronic = false;
                 itsATuning = false;
                 itsANostalgic = false;
                 itsATempo = false;
@@ -460,6 +480,12 @@ String HeaderViewController::processmodificationMapString(const String& s)
                 itsANostalgic = true;
                 
                 type = PreparationTypeNostalgicMod;
+            }
+            else if (isBlendronic)
+            {
+                itsABlendronic = true;
+                
+                type = PreparationTypeBlendronicMod;
             }
             else
             {

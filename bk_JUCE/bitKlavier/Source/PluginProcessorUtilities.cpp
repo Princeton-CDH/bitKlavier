@@ -286,6 +286,22 @@ void BKAudioProcessor::setPreparationState(BKPreparationType type, int Id, XmlEl
         prep->setName(name);
         prep->setId(Id);
     }
+    else if (type == PreparationTypeBlendronic)
+    {
+        Blendronic::Ptr prep = gallery->getBlendronic(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+    else if (type == PreparationTypeBlendronicMod)
+    {
+        BlendronicModification::Ptr prep = gallery->getBlendronicModification(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
     else if (type == PreparationTypeTuning)
     {
         Tuning::Ptr prep = gallery->getTuning(Id);

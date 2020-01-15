@@ -213,7 +213,7 @@ BlendronicDelay::BlendronicDelay(BlendronicDelay::Ptr d):
 	dDelayGain(d->getDelayGain()),
 	dDelayLength(d->getDelayLength()),
 	dSmoothValue(d->getSmoothValue()),
-	dSmoothDuration(d->getSmoothDuration()),
+	dSmoothRate(d->getSmoothRate()),
     dInputOpen(d->getInputState()),
     dOutputOpen(d->getOutputState()),
     shouldDuck(d->getShouldDuck()),
@@ -222,19 +222,19 @@ BlendronicDelay::BlendronicDelay(BlendronicDelay::Ptr d):
     DBG("Create bdelay");
 }
 
-BlendronicDelay::BlendronicDelay(float delayLength, float smoothValue, float smoothDuration, float delayGain, float delayMax, bool active) :
+BlendronicDelay::BlendronicDelay(float delayLength, float smoothValue, float smoothRate, float delayMax, bool active) :
 	dDelayMax(delayMax),
-	dDelayGain(delayGain),
+	dDelayGain(1.0f),
 	dDelayLength(delayLength),
 	dSmoothValue(smoothValue),
-	dSmoothDuration(smoothDuration),
+	dSmoothRate(smoothRate),
     dInputOpen(true),
     dOutputOpen(true),
     sampleRate(44100)
 {
 	delayLinear =  new BKDelayL(dDelayLength, dDelayMax, dDelayGain);
 	dSmooth = new BKEnvelope(dSmoothValue, delayLength);
-    dSmooth->setRate(dSmoothDuration);
+    dSmooth->setRate(dSmoothRate);
     dEnv = new BKEnvelope(1.0f, 1.0f);
     dEnv->setTime(5.0f);
     shouldDuck = false;
