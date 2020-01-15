@@ -164,6 +164,7 @@ public:
     void setKeys(KeySet set, bool action, PitchClass pc = PitchClassNil);
     
     inline void setMidiEdit(bool edit) { midiEdit = edit; }
+    inline void toggleMidiEdit() { midiEdit = !midiEdit; }
     inline bool getMidiEdit() { return midiEdit; }
     
     void print(void);

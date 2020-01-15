@@ -109,7 +109,6 @@ public:
     inline void setName(String n){pianoName = n;}
     
     PreparationMap::Ptr         currentPMap;
-    PreparationMap::CSPtrArr    activePMaps;
     PreparationMap::CSPtrArr    prepMaps;
     
     DirectProcessor::PtrArr              dprocessor;
@@ -117,7 +116,7 @@ public:
     NostalgicProcessor::PtrArr           nprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
-	BlendronicProcessor::PtrArr		 bprocessor;
+	BlendronicProcessor::PtrArr		     bprocessor;
     
     void addProcessor(BKPreparationType thisType, int thisId);
     bool containsProcessor(BKPreparationType thisType, int thisId);

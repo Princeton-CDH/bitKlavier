@@ -28,15 +28,7 @@ BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
     targetTypeBlendronicClear(p->getTargetTypeBlendronicClear()),
     targetTypeBlendronicPausePlay(p->getTargetTypeBlendronicPausePlay()),
     targetTypeBlendronicOpenCloseInput(p->getTargetTypeBlendronicOpenCloseInput()),
-    targetTypeBlendronicOpenCloseOutput(p->getTargetTypeBlendronicOpenCloseOutput()),
-	bInputThresh(p->getInputThreshMS()),
-	bInputThreshSec(p->getInputThreshSEC()),
-	holdMin(p->getHoldMin()),
-	holdMax(p->getHoldMax()),
-	velocityMin(p->getVelocityMin()),
-	velocityMax(p->getVelocityMax()),
-    bClusterThresh(p->getClusterThreshMS()),
-    bClusterThreshSec(p->getClusterThreshSEC())
+    targetTypeBlendronicOpenCloseOutput(p->getTargetTypeBlendronicOpenCloseOutput())
 {
 }
 
@@ -63,15 +55,7 @@ BlendronicPreparation::BlendronicPreparation(String newName,
     targetTypeBlendronicClear(NoteOn),
     targetTypeBlendronicPausePlay(NoteOn),
     targetTypeBlendronicOpenCloseInput(NoteOn),
-    targetTypeBlendronicOpenCloseOutput(NoteOn),
-	bInputThresh(1),
-	bInputThreshSec(0.001),
-	holdMin(0),
-	holdMax(12000),
-	velocityMin(0),
-	velocityMax(127),
-    bClusterThresh(clusterThresh),
-    bClusterThreshSec(.001 * bClusterThresh)
+    targetTypeBlendronicOpenCloseOutput(NoteOn)
 {
 }
 
@@ -91,21 +75,27 @@ BlendronicPreparation::BlendronicPreparation(void) :
     targetTypeBlendronicClear(NoteOn),
     targetTypeBlendronicPausePlay(NoteOn),
     targetTypeBlendronicOpenCloseInput(NoteOn),
-    targetTypeBlendronicOpenCloseOutput(NoteOn),
-	bInputThresh(1),
-	bInputThreshSec(0.001),
-	holdMin(0),
-	holdMax(12000),
-	velocityMin(0),
-	velocityMax(127),
-    bClusterThresh(500),
-    bClusterThreshSec(.001 * bClusterThresh)
+    targetTypeBlendronicOpenCloseOutput(NoteOn)
 {
 }
 
 //copy
 void BlendronicPreparation::copy(BlendronicPreparation::Ptr b)
 {
+    bBeats = b->getBeats();
+    bDelayLengths = b->getDelayLengths();
+    bSmoothLengths = b->getSmoothLengths();
+    bSmoothValues = b->getSmoothValues();
+    bFeedbackCoefficients = b->getFeedbackCoefficients();
+    bDelayMax = b->getDelayMax();
+    bSmoothBase = b->getSmoothBase();
+    bSmoothScale = b->getSmoothScale();
+    targetTypeBlendronicPatternSync = b->getTargetTypeBlendronicPatternSync();
+    targetTypeBlendronicBeatSync = b->getTargetTypeBlendronicBeatSync();
+    targetTypeBlendronicClear = b->getTargetTypeBlendronicClear();
+    targetTypeBlendronicPausePlay = b->getTargetTypeBlendronicPausePlay();
+    targetTypeBlendronicOpenCloseInput = b->getTargetTypeBlendronicOpenCloseInput();
+    targetTypeBlendronicOpenCloseOutput = b->getTargetTypeBlendronicOpenCloseOutput();
 }
 
 //compares two blendronics
@@ -228,115 +218,7 @@ void BlendronicProcessor::tick(float* outputs)
 
 void BlendronicProcessor::processBlock(int numSamples, int midiChannel)
 {
-    BlendronicPreparation::Ptr prep = blendronic->aPrep;
-    thresholdSamples = (prep->getClusterThreshSEC() * sampleRate);
     
-    if (inSyncCluster)
-    {
-        if (syncThresholdTimer >= thresholdSamples)
-        {
-            inSyncCluster = false;
-        }
-        else
-        {
-            syncThresholdTimer += numSamples;
-        }
-    }
-    
-    if (inClearCluster)
-    {
-        if (clearThresholdTimer >= thresholdSamples)
-        {
-            inClearCluster = false;
-        }
-        else
-        {
-            clearThresholdTimer += numSamples;
-        }
-    }
-    
-    if (inOpenCluster)
-    {
-        if (openThresholdTimer >= thresholdSamples)
-        {
-            inOpenCluster = false;
-        }
-        else
-        {
-            openThresholdTimer += numSamples;
-        }
-    }
-    
-    if (inCloseCluster)
-    {
-        if (closeThresholdTimer >= thresholdSamples)
-        {
-            inCloseCluster = false;
-        }
-        else
-        {
-            closeThresholdTimer += numSamples;
-        }
-    }
-}
-
-float BlendronicProcessor::getTimeToBeatMS(float beatsToSkip)
-{
-	uint64 timeToReturn = numSamplesBeat - sampleTimer;
-	return timeToReturn * 1000. / sampleRate; //will make more precise later
-}
-
-bool BlendronicProcessor::velocityCheck(int noteNumber)
-{
-    BlendronicPreparation::Ptr prep = blendronic->aPrep;
-    
-    int velocity = (int)(velocities.getUnchecked(noteNumber) * 127.0);
-    
-    if (velocity > 127) velocity = 127;
-    if (velocity < 0)   velocity = 0;
-    
-    if(prep->getVelocityMin() <= prep->getVelocityMax())
-    {
-        if (velocity >= prep->getVelocityMin() && velocity <= prep->getVelocityMax())
-        {
-            return true;
-        }
-    }
-    else
-    {
-        if (velocity >= prep->getVelocityMin() || velocity <= prep->getVelocityMax())
-        {
-            return true;
-        }
-    }
-    
-    DBG("failed velocity check");
-    return false;
-}
-
-bool BlendronicProcessor::holdCheck(int noteNumber)
-{
-    BlendronicPreparation::Ptr prep = blendronic->aPrep;
-    
-    uint64 hold = holdTimers.getUnchecked(noteNumber) * (1000.0 / sampleRate);
-    
-    if(prep->getHoldMin() <= prep->getHoldMax())
-    {
-        if (hold >= prep->getHoldMin() && hold <= prep->getHoldMax())
-        {
-            return true;
-        }
-    }
-    else
-    {
-        if (hold >= prep->getHoldMin() || hold <= prep->getHoldMax())
-        {
-            return true;
-        }
-    }
-    
-    DBG("failed hold check");
-    return false;
 }
 
 void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
@@ -356,8 +238,6 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     bool doPausePlay = targetStates[TargetTypeBlendronicPausePlay] == TargetStateEnabled;
     bool doOpenCloseInput = targetStates[TargetTypeBlendronicOpenCloseInput] == TargetStateEnabled;
     bool doOpenCloseOutput = targetStates[TargetTypeBlendronicOpenCloseOutput] == TargetStateEnabled;
-    
-    if (!velocityCheck(noteNumber)) return;
     
     if (doPatternSync &&
         (prep->getTargetTypeBlendronicPatternSync() == NoteOn || prep->getTargetTypeBlendronicPatternSync() == Both))
@@ -426,10 +306,7 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
     bool doPausePlay = targetStates[TargetTypeBlendronicPausePlay] == TargetStateEnabled;
     bool doOpenCloseInput = targetStates[TargetTypeBlendronicOpenCloseInput] == TargetStateEnabled;
     bool doOpenCloseOutput = targetStates[TargetTypeBlendronicOpenCloseOutput] == TargetStateEnabled;
-    
-    if (!velocityCheck(noteNumber)) return;
-    if (!holdCheck(noteNumber)) return;
-    
+
     if (doPatternSync &&
         (prep->getTargetTypeBlendronicPatternSync() == NoteOff || prep->getTargetTypeBlendronicPatternSync() == Both))
     {

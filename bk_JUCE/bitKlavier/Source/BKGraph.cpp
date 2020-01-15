@@ -92,8 +92,7 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     }
     else if (type == PreparationTypeBlendronicMod)
     {
-        setImage(ImageCache::getFromMemory(BinaryData::mod_nostalgic_icon_png, BinaryData::mod_nostalgic_icon_pngSize));
-//        setImage(ImageCache::getFromMemory(BinaryData::mod_blendronic_icon_png, BinaryData::mod_blendronic_icon_pngSize));
+        setImage(ImageCache::getFromMemory(BinaryData::mod_blendronic_icon_png, BinaryData::mod_blendronic_icon_pngSize));
     }
     else if (type == PreparationTypeTuningMod)
     {
@@ -261,8 +260,7 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     }
     else if (type == PreparationTypeBlendronicMod)
     {
-        setImage(ImageCache::getFromMemory(BinaryData::mod_nostalgic_icon_png, BinaryData::mod_nostalgic_icon_pngSize));
-//        setImage(ImageCache::getFromMemory(BinaryData::mod_blendronic_icon_png, BinaryData::mod_blendronic_icon_pngSize));
+        setImage(ImageCache::getFromMemory(BinaryData::mod_blendronic_icon_png, BinaryData::mod_blendronic_icon_pngSize));
     }
     else if (type == PreparationTypeTuningMod)
     {

@@ -426,7 +426,7 @@ const Array<String> Keymap::getAllMidiInputSources()
     sources.addArray(midiInputSources);
     if (onscreenSelected) sources.add(cNoteSourceUI);
     if (defaultSelected) sources.addArray(processor.getDefaultMidiInputSources());
-        return sources;
+    return sources;
 }
 
 void Keymap::print(void)

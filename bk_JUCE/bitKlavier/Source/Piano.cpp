@@ -17,7 +17,6 @@
 Piano::Piano(BKAudioProcessor& p,
              int Id):
 currentPMap(PreparationMap::Ptr()),
-activePMaps(PreparationMap::CSPtrArr()),
 prepMaps(PreparationMap::CSPtrArr()),
 processor(p),
 Id(Id)
@@ -53,7 +52,6 @@ void Piano::clear(void)
 void Piano::deconfigure(void)
 {
     prepMaps.clear();
-    activePMaps.clear();
     numPMaps = 0;
     
     /*
@@ -119,6 +117,12 @@ void Piano::configure(void)
         // ... should be all configured if done in that order ...
         if (type == PreparationTypeKeymap)
         {
+            Keymap::Ptr keymap = processor.gallery->getKeymap(Id);
+            // make a prep map for the first keymap, this will be the only prep map
+            if (prepMaps.isEmpty()) addPreparationMap(keymap);
+            // add any subsequent keymaps to the same prep map (maybe we can get rid of prep maps?)
+            else prepMaps.getFirst()->addKeymap(keymap);
+            
             BKItem::PtrArr connex = item->getConnections();
             for (auto target : connex)
             {
@@ -155,7 +159,7 @@ void Piano::configure(void)
                 BKPreparationType targetType = target->getType();
                 int targetId = target->getId();
                 
-                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) || targetType == PreparationTypeBlendronic)
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic))
                 {
                     linkPreparationWithTuning(targetType, targetId, processor.gallery->getTuning(Id));
                 }
@@ -198,7 +202,8 @@ void Piano::configure(void)
 				BKPreparationType targetType = target->getType();
 				int targetId = target->getId();
 
-				if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic)
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) ||
+                    targetType == PreparationTypeBlendronicMod)
 				{
 					linkPreparationWithBlendronic(targetType, targetId, processor.gallery->getBlendronic(Id));
 				}
@@ -984,8 +989,6 @@ int Piano::addPreparationMap(void)
     
     thisPreparationMap->prepareToPlay(sampleRate);
     
-    activePMaps.add(thisPreparationMap);
-    
     return prepMaps.size() - 1;
 }
 
@@ -997,8 +1000,6 @@ int Piano::addPreparationMap(Keymap::Ptr keymap)
     prepMaps.add(thisPreparationMap);
     
     thisPreparationMap->prepareToPlay(sampleRate);
-    
-    activePMaps.add(thisPreparationMap);
     
     return prepMaps.size()-1;
 }
@@ -1076,15 +1077,6 @@ PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(int keymapId)
 
 int Piano::removePreparationMap(int Id)
 {
-    for (int i = activePMaps.size(); --i >= 0; )
-    {
-        if (activePMaps[i]->getId() == Id)
-        {
-            activePMaps.remove(i);
-            break;
-        }
-    }
-    
     for (int i = prepMaps.size(); --i >= 0; )
     {
         if (prepMaps[i]->getId() == Id)
@@ -1102,15 +1094,6 @@ int Piano::removePreparationMap(int Id)
 // Add preparation map, return its Id.
 int Piano::removePreparationMapWithKeymap(int Id)
 {
-    for (int i = activePMaps.size(); --i >= 0; )
-    {
-        if (activePMaps[i]->getKeymap(Id) != nullptr)
-        {
-            activePMaps.remove(i);
-            break;
-        }
-    }
-    
     for (int i = prepMaps.size(); --i >= 0; )
     {
         if (prepMaps[i]->getKeymap(Id) != nullptr)
@@ -1128,14 +1111,6 @@ int Piano::removePreparationMapWithKeymap(int Id)
 // Add preparation map, return its Id.
 int Piano::removeLastPreparationMap(void)
 {
-    for (int i = activePMaps.size(); --i >= 0;)
-    {
-        if (activePMaps[i]->getId() == (numPMaps-1))
-        {
-            activePMaps.remove(i);
-        }
-    }
-    
     prepMaps.remove((numPMaps-1));
     
     --numPMaps;
@@ -1204,7 +1179,7 @@ ValueTree Piano::getState(void)
             {
                 BKPreparationType targetType = target->getType();
                 
-                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) || targetType == PreparationTypeBlendronic)
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic))
                 {
                     connectionsVT.addChild(target->getState(), -1, 0);
                 }
@@ -1257,7 +1232,8 @@ ValueTree Piano::getState(void)
 			{
 				BKPreparationType targetType = target->getType();
 
-				if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic))
+				if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) ||
+                    targetType == PreparationTypeBlendronicMod)
 				{
 					connectionsVT.addChild(target->getState(), -1, 0);
 				}
@@ -1265,7 +1241,9 @@ ValueTree Piano::getState(void)
 			itemVT.addChild(connectionsVT, -1, 0);
 			pianoVT.addChild(itemVT, -1, 0);
 		}
-        else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeReset)
+        else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) ||
+                 type == PreparationTypeReset ||
+                 type == PreparationTypeBlendronicMod)
         {
             itemVT.addChild(item->getState(), -1, 0);
             

@@ -504,9 +504,19 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 {
     int p;
     
-    ++noteOnCount;
-    noteOn.set(noteNumber, true);
-    noteVelocity.set(noteNumber, velocity);
+    PreparationMap::CSPtrArr pmaps = currentPiano->getPreparationMaps();
+    for (auto pmap : pmaps)
+    {
+        for (auto km : pmap->getKeymaps())
+        {
+            if (km->getAllMidiInputSources().contains(source))
+            {
+                ++noteOnCount;
+                noteOn.set(noteNumber, true);
+                noteVelocity.set(noteNumber, velocity);
+            }
+        }
+    }
     
     if (allNotesOff)   allNotesOff = false;
     
@@ -523,15 +533,15 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     performModifications(noteNumber);
     
     //tempo
-    for (p = prevPiano->activePMaps.size(); --p >= 0;) {
+    for (p = prevPiano->prepMaps.size(); --p >= 0;) {
         if (prevPianos[p] != currentPiano)
-            prevPiano->activePMaps[p]->clearKey(noteNumber); //clears key from array of depressed notes in prevPiano so they don't get cutoff by sustain pedal release
+            prevPiano->prepMaps[p]->clearKey(noteNumber); //clears key from array of depressed notes in prevPiano so they don't get cutoff by sustain pedal release
     }
     
     // Send key on to each pmap in current piano
-    for (p = currentPiano->activePMaps.size(); --p >= 0;) {
+    for (p = currentPiano->prepMaps.size(); --p >= 0;) {
         //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
-        currentPiano->activePMaps[p]->keyPressed(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont), source);
+        currentPiano->prepMaps[p]->keyPressed(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont), source);
     }
     
     //add note to springTuning, if only for Graph display
@@ -561,16 +571,16 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
     
     // Send key off to each pmap in current piano
-    for (p = currentPiano->activePMaps.size(); --p >= 0;)
-        currentPiano->activePMaps[p]->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont), source);
+    for (p = currentPiano->prepMaps.size(); --p >= 0;)
+        currentPiano->prepMaps[p]->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont), source);
     
 
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
 
     for (p = prevPianos.size(); --p >= 0;) {
         if (prevPianos[p] != currentPiano) {
-            for (pm = prevPianos[p]->activePMaps.size(); --pm >= 0;) {
-                prevPianos[p]->activePMaps[pm]->postRelease(noteNumber, velocity, channel, source);
+            for (pm = prevPianos[p]->prepMaps.size(); --pm >= 0;) {
+                prevPianos[p]->prepMaps[pm]->postRelease(noteNumber, velocity, channel, source);
             }
         }
     }
@@ -596,11 +606,11 @@ void BKAudioProcessor::sustainActivate(void)
         sustainIsDown = true;
         DBG("SUSTAIN ON");
         
-        for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-            currentPiano->activePMaps[p]->sustainPedalPressed();
+        for (int p = currentPiano->prepMaps.size(); --p >= 0;)
+            currentPiano->prepMaps[p]->sustainPedalPressed();
         
-        for (int p = prevPiano->activePMaps.size(); --p >= 0;)
-            prevPiano->activePMaps[p]->sustainPedalPressed();
+        for (int p = prevPiano->prepMaps.size(); --p >= 0;)
+            prevPiano->prepMaps[p]->sustainPedalPressed();
         
         //play pedalDown resonance
         pedalSynth.keyOn(channel,
@@ -660,14 +670,14 @@ void BKAudioProcessor::sustainDeactivate(void)
         sustainIsDown = false;
         DBG("SUSTAIN OFF");
         
-        for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-            currentPiano->activePMaps[p]->sustainPedalReleased(noteOn, false);
+        for (int p = currentPiano->prepMaps.size(); --p >= 0;)
+            currentPiano->prepMaps[p]->sustainPedalReleased(noteOn, false);
         
         if(prevPiano != currentPiano)
         {
-            for (int p = prevPiano->activePMaps.size(); --p >= 0;)
-                //prevPiano->activePMaps[p]->sustainPedalReleased(true);
-                prevPiano->activePMaps[p]->sustainPedalReleased(noteOn, true);
+            for (int p = prevPiano->prepMaps.size(); --p >= 0;)
+                //prevPiano->prepMaps[p]->sustainPedalReleased(true);
+                prevPiano->prepMaps[p]->sustainPedalReleased(noteOn, true);
         }
         
         //turn off pedal down resonance
@@ -731,13 +741,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     if (currentPiano == nullptr) return;
     
-    for (auto pmap : currentPiano->activePMaps)
+    for (auto pmap : currentPiano->prepMaps)
         pmap->processBlock(buffer, numSamples, channel, currentSampleType, false);
     
     // OLAGON: Process all active nostalgic preps in previous piano
     if(prevPiano != currentPiano)
     {
-        for (auto pmap : prevPiano->activePMaps)
+        for (auto pmap : prevPiano->prepMaps)
             pmap->processBlock(buffer, numSamples, channel, currentSampleType, true); // true for onlyNostalgic
     }
     
@@ -760,7 +770,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         
         /*
         // Process all active prep maps in previous piano
-        for (auto pmap : prevPiano->activePMaps)
+        for (auto pmap : prevPiano->prepMaps)
             pmap->processBlock(numSamples, m.getChannel());
         */
         
@@ -834,8 +844,8 @@ void  BKAudioProcessor::setCurrentPiano(int which)
         
         if (sustainIsDown)
         {
-            for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                currentPiano->activePMaps[p]->sustainPedalPressed();
+            for (int p = currentPiano->prepMaps.size(); --p >= 0;)
+                currentPiano->prepMaps[p]->sustainPedalPressed();
         }
     }
 }
@@ -857,6 +867,11 @@ void BKAudioProcessor::performResets(int noteNumber)
     {
         currentPiano->getNostalgicProcessor(prep)->reset();
         updateState->nostalgicPreparationDidChange = true;
+    }
+    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->blendronicReset)
+    {
+        currentPiano->getBlendronicProcessor(prep)->reset();
+        updateState->blendronicPreparationDidChange = true;
     }
     for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->tuningReset)
     {

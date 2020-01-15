@@ -258,10 +258,13 @@ namespace BinaryData
     const int            mod_direct_icon_pngSize = 11541;
 
     extern const char*   mod_nostalgic_icon_png;
-    const int            mod_nostalgic_icon_pngSize = 11553;
+    const int            mod_nostalgic_icon_pngSize = 8872;
 
     extern const char*   mod_synchronic_icon_png;
     const int            mod_synchronic_icon_pngSize = 11468;
+
+    extern const char*   mod_blendronic_icon_png;
+    const int            mod_blendronic_icon_pngSize = 5339;
 
     extern const char*   mod_tempo_icon_png;
     const int            mod_tempo_icon_pngSize = 11298;
@@ -294,7 +297,7 @@ namespace BinaryData
     const int            tuning_icon_pngSize = 12404;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 95;
+    const int namedResourceListSize = 96;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

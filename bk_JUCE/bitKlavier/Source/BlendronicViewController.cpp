@@ -573,14 +573,6 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
-    
-    if (name == "cluster threshold")
-    {
-        prep->setClusterThresh(val);
-        active->setClusterThresh(val);
-    }
 }
 
 void BlendronicPreparationEditor::fillSelectCB(int last, int current)
@@ -806,28 +798,7 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
 
 void BlendronicPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
-    if (name == "hold time (ms)")
-    {
-        prep->setHoldMin(minval);
-        active->setHoldMin(minval);
-        
-        prep->setHoldMax(maxval);
-        active->setHoldMax(maxval);
-    }
-    else if (name == "velocity min/max (0-127)")
-    {
-        prep->setVelocityMin(minval);
-        active->setVelocityMin(minval);
-        
-        prep->setVelocityMax(maxval);
-        active->setVelocityMax(maxval);
-        
-        DBG("velocity min: " + String(prep->getVelocityMin()));
-        DBG("velocity max: " + String(prep->getVelocityMax()));
-    }
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BlendronicModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
@@ -835,9 +806,14 @@ void BlendronicPreparationEditor::BKRangeSliderValueChanged(String name, double 
 BlendronicModificationEditor::BlendronicModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 BlendronicViewController(p, theGraph)
 {
+    numTabs = 1;
+    
     greyOutAllComponents();
     
     fillSelectCB(-1,-1);
+    
+    rightArrow.setVisible(false);
+    leftArrow.setVisible(false);
     
     selectCB.addListener(this);
     selectCB.addMyListener(this);
@@ -1221,7 +1197,7 @@ void BlendronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
     int Id = box->getSelectedId();
-    int index = box->getSelectedItemIndex();
+//    int index = box->getSelectedItemIndex();
     
     if (name == "Blendronic")
     {
@@ -1254,22 +1230,22 @@ void BlendronicModificationEditor::buttonClicked (Button* b)
     {
         getModOptionMenu(PreparationTypeBlendronicMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
-    else if (b == &rightArrow)
-    {
-        arrowPressed(RightArrow);
-        
-        DBG("currentTab: " + String(currentTab));
-        
-        displayTab(currentTab);
-    }
-    else if (b == &leftArrow)
-    {
-        arrowPressed(LeftArrow);
-        
-        DBG("currentTab: " + String(currentTab));
-        
-        displayTab(currentTab);
-    }
+//    else if (b == &rightArrow)
+//    {
+//        arrowPressed(RightArrow);
+//
+//        DBG("currentTab: " + String(currentTab));
+//
+//        displayTab(currentTab);
+//    }
+//    else if (b == &leftArrow)
+//    {
+//        arrowPressed(LeftArrow);
+//
+//        DBG("currentTab: " + String(currentTab));
+//
+//        displayTab(currentTab);
+//    }
     
     updateModification();
 }

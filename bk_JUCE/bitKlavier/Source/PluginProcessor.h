@@ -268,14 +268,14 @@ public:
             {
                 sustainIsDown = false;
                 
-                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                    currentPiano->activePMaps[p]->sustainPedalReleased();
+                for (int p = currentPiano->prepMaps.size(); --p >= 0;)
+                    currentPiano->prepMaps[p]->sustainPedalReleased();
                 
                 if(prevPiano != currentPiano)
                 {
                     DBG("sustain inverted, sustain is now released");
-                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
-                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                    for (int p = prevPiano->prepMaps.size(); --p >= 0;)
+                        prevPiano->prepMaps[p]->sustainPedalReleased(true);
                 }
             }
             else
@@ -286,8 +286,8 @@ public:
                 if (firstTime) {firstTime = false; return;}
                 else
                 {
-                    for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                        currentPiano->activePMaps[p]->sustainPedalPressed();
+                    for (int p = currentPiano->prepMaps.size(); --p >= 0;)
+                        currentPiano->prepMaps[p]->sustainPedalPressed();
                 }
             }
         }
@@ -297,13 +297,13 @@ public:
             {
                 sustainIsDown = false;
                 
-                for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                    currentPiano->activePMaps[p]->sustainPedalReleased();
+                for (int p = currentPiano->prepMaps.size(); --p >= 0;)
+                    currentPiano->prepMaps[p]->sustainPedalReleased();
                 
                 if(prevPiano != currentPiano)
                 {
-                    for (int p = prevPiano->activePMaps.size(); --p >= 0;)
-                        prevPiano->activePMaps[p]->sustainPedalReleased(true);
+                    for (int p = prevPiano->prepMaps.size(); --p >= 0;)
+                        prevPiano->prepMaps[p]->sustainPedalReleased(true);
                 }
             }
             else
@@ -313,8 +313,8 @@ public:
                 if (firstTime) {firstTime = false; return;}
                 else
                 {
-                    for (int p = currentPiano->activePMaps.size(); --p >= 0;)
-                        currentPiano->activePMaps[p]->sustainPedalPressed();
+                    for (int p = currentPiano->prepMaps.size(); --p >= 0;)
+                        currentPiano->prepMaps[p]->sustainPedalPressed();
                 }
             }
         }

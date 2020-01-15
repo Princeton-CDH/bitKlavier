@@ -106,16 +106,7 @@ public:
 	
     inline const BlendronicSmoothBase getSmoothBase() const noexcept { return bSmoothBase; }
     inline const BlendronicSmoothScale getSmoothScale() const noexcept { return bSmoothScale; }
-	inline const float getInputThreshSEC() const noexcept { return bInputThreshSec; }
-	inline const float getInputThreshMS() const noexcept { return bInputThresh; }
-	inline const int getHoldMin() const noexcept { return holdMin; }
-	inline const int getHoldMax() const noexcept { return holdMax; }
-	inline const int getVelocityMin() const noexcept { return velocityMin; }
-	inline const int getVelocityMax() const noexcept { return velocityMax; }
-	inline const bool getInputGain() const noexcept { return inputGain; }
-    inline const float getClusterThreshSEC() const noexcept {return bClusterThreshSec; }
-    inline const float getClusterThreshMS() const noexcept {return bClusterThresh; }
-
+	
 	//mutators
 	inline void setName(String n) { name = n; }
 	inline void setBeats(Array<float> beats) { bBeats.swapWith(beats); }
@@ -186,23 +177,6 @@ public:
         if (which == TargetTypeBlendronicPausePlay)     { targetTypeBlendronicPausePlay = nm; }
         if (which == TargetTypeBlendronicOpenCloseInput)  { targetTypeBlendronicOpenCloseInput = nm; }
         if (which == TargetTypeBlendronicOpenCloseOutput)  { targetTypeBlendronicOpenCloseOutput = nm; }
-    }
-    
-	inline void setInputThresh(float newThresh)
-	{
-		bInputThresh = newThresh;
-		bInputThreshSec = bInputThresh * .001;
-	}
-	inline const void setHoldMin(int min) { holdMin = min; }
-	inline const void setHoldMax(int max) { holdMax = max; }
-	inline const void setVelocityMin(int min) { velocityMin = min; }
-	inline const void setVelocityMax(int max) { velocityMax = max; }
-	inline const void setInputGain(float gain) { inputGain = gain; }
-    
-    inline void setClusterThresh(float clusterThresh)
-    {
-        bClusterThresh = clusterThresh;
-        bClusterThreshSec = bClusterThresh * .001;
     }
 
     // TODO
@@ -403,16 +377,8 @@ private:
 	//signal chain stk classes
 	float bFeedbackCoefficient;
 
-	//bK stuff
-	float bInputThresh;
-	float bInputThreshSec;
-	int holdMin, holdMax, velocityMin, velocityMax;
-    
-    float bClusterThresh;      //max time between played notes before new cluster is started, in MS
-    float bClusterThreshSec;
-
 	//needed for sampling
-	float inputGain;
+//    float inputGain;
     
     JUCE_LEAK_DETECTOR(BlendronicPreparation);
 };
@@ -579,11 +545,6 @@ public:
 
 	//called with every audio vector
 	BKSampleLoadType sampleType;
-
-	float getTimeToBeatMS(float beatsToSkip);
-    
-    bool velocityCheck(int noteNumber);
-    bool holdCheck(int noteNumber);
 
 	//begin timing played note length, called with noteOn
 	void keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates);

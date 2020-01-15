@@ -142,7 +142,8 @@ public:
     {
         for (auto item : connections)
         {
-            if (item->getType() >= PreparationTypeDirect && item->getType() <= PreparationTypeTempo)
+            if ((item->getType() >= PreparationTypeDirect && item->getType() <= PreparationTypeTempo) ||
+                item->getType() == PreparationTypeBlendronic);
             {
                 return true;
             }

@@ -1012,12 +1012,15 @@ void SynchronicPreparationEditor::update(NotificationType notify)
     
     if (processor.updateState->currentSynchronicId < 0) return;
     
+    fillModeSelectCB();
+    
+    fillMidiOutputSelectCB();
+    
     SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentSynchronicId, notify);
-        fillModeSelectCB();
         modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
         onOffSelectCB.setSelectedItemIndex(prep->getOnOffMode(), notify);
         //offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
@@ -1427,29 +1430,6 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
                 
                 prep    ->setTargetTypeSynchronic(KeymapTargetType(i + TargetTypeSynchronicPatternSync), (TargetNoteMode)selectedItem);
                 active  ->setTargetTypeSynchronic(KeymapTargetType(i + TargetTypeSynchronicPatternSync), (TargetNoteMode)selectedItem);
-                
-                /*
-                if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicPatternSync])
-                {
-                    prep    ->setTargetTypeSynchronicPatternSync((TargetNoteMode)selectedItem);
-                    active  ->setTargetTypeSynchronicPatternSync((TargetNoteMode)selectedItem);
-                }
-                else if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicPatternSync])
-                {
-                    prep    ->setTargetTypeSynchronicPatternSync((TargetNoteMode)selectedItem);
-                    active  ->setTargetTypeSynchronicPatternSync((TargetNoteMode)selectedItem);
-                }
-                else if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicAddNotes])
-                {
-                    prep    ->setTargetTypeSynchronicAddNotes((TargetNoteMode)selectedItem);
-                    active  ->setTargetTypeSynchronicAddNotes((TargetNoteMode)selectedItem);
-                }
-                else if (targetControlCBs[i]->getName() == (String)cKeymapTargetTypes[TargetTypeSynchronicPausePlay])
-                {
-                    prep    ->setTargetTypeSynchronicPausePlay((TargetNoteMode)selectedItem);
-                    active  ->setTargetTypeSynchronicPausePlay((TargetNoteMode)selectedItem);
-                }
-                 */
             }
         }
     }
@@ -1459,9 +1439,6 @@ void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)
 {
     String text = tf.getText();
     String name = tf.getName();
-    
-    //SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
-    //SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
     if (name == "Name")
     {
@@ -1553,6 +1530,8 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
 SynchronicModificationEditor::SynchronicModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 SynchronicViewController(p, theGraph)
 {
+    numTabs = 2;
+    
     greyOutAllComponents();
     
     fillSelectCB(-1,-1);
@@ -1693,6 +1672,7 @@ void SynchronicModificationEditor::update(NotificationType notify)
     if (processor.updateState->currentModSynchronicId < 0) return;
     
     fillModeSelectCB();
+    fillMidiOutputSelectCB();
     
     greyOutAllComponents();
     highlightModedComponents();
@@ -1779,7 +1759,30 @@ void SynchronicModificationEditor::update(NotificationType notify)
 
 void SynchronicModificationEditor::fillMidiOutputSelectCB()
 {
+    SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
     
+    midiOutputSelectCB.clear(dontSendNotification);
+    
+    int Id = 1;
+    midiOutputSelectCB.addItem("No MIDI Output Selected", Id);
+    midiOutputSelectCB.setItemEnabled(Id++, true);
+    for (auto device : processor.getMidiOutputDevices())
+    {
+        String name = device.name;
+        
+        if (name != String())  midiOutputSelectCB.addItem(name, Id);
+        else                   midiOutputSelectCB.addItem("Device"+String(Id), Id);
+        
+        if (mod->getMidiOutput() != nullptr)
+        {
+            if (name == mod->getMidiOutput()->getName())
+            {
+                midiOutputSelectCB.setSelectedId(Id, NotificationType::dontSendNotification);
+            }
+        }
+        else midiOutputSelectCB.setSelectedId(1, NotificationType::dontSendNotification);
+        midiOutputSelectCB.setItemEnabled(Id++, true);
+    }
 }
 
 void SynchronicModificationEditor::fillModeSelectCB()
