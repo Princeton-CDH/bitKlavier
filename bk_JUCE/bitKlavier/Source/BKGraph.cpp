@@ -550,8 +550,8 @@ void BKItemGraph::removeItem(BKItem* item)
     for (int i = connections.size(); --i >= 0;)
     {
         BKItem* connectionItem = connections[i];
-        
-        connectionItem->removeConnection(item->getType(), item->getId());
+
+        disconnect(item, connectionItem);
     }
     
     item->clearConnections();
