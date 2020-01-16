@@ -754,20 +754,32 @@ void BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
     item2->removeConnection(item1);
     
     // If disconnecting a modification, make it generic
-    if (item1Type == PreparationTypeGenericMod)
+    if (item1Type == PreparationTypeDirectMod ||
+        item1Type == PreparationTypeNostalgicMod ||
+        item1Type == PreparationTypeBlendronicMod || 
+        item1Type == PreparationTypeSynchronicMod || 
+        item1Type == PreparationTypeTuningMod || 
+        item1Type == PreparationTypeTempoMod)
     {
         if (!item1->isConnectedToAnyPreparation())
         {
             item1->setItemType(PreparationTypeGenericMod, false);
         }
     }
-    else if (item2Type == PreparationTypeGenericMod)
+    else if (item2Type == PreparationTypeDirectMod ||
+        item2Type == PreparationTypeNostalgicMod ||
+        item2Type == PreparationTypeBlendronicMod ||
+        item2Type == PreparationTypeSynchronicMod ||
+        item2Type == PreparationTypeTuningMod ||
+        item2Type == PreparationTypeTempoMod)
     {
         if (!item2->isConnectedToAnyPreparation())
         {
             item2->setItemType(PreparationTypeGenericMod, false);
         }
     }
+
+    processor.currentPiano->configure();
 }
 
 Array<Line<int>> BKItemGraph::getLines(void)

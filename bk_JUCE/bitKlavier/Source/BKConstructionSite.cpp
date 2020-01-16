@@ -879,7 +879,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
                 graph->deselectAll();
                 graph->select(itemToSelect);
             }
-            startConnection(e.x, e.y);
+            if (connect) makeConnection(e.x, e.y);
+            else startConnection(e.x, e.y);
         }
         // Unmodified left mouse click
         else
