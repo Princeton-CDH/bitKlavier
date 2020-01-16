@@ -482,8 +482,9 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     {
         if (e.getModifiers().isCommandDown())
         {
-            if (e.getModifiers().isShiftDown()) processor.saveCurrentGalleryAs();
-            else                                processor.saveCurrentGallery();
+            if (e.getModifiers().isShiftDown() || processor.defaultLoaded) 
+                processor.saveCurrentGalleryAs();
+            else processor.saveCurrentGallery();
         }
         else                                    construction.addItem(PreparationTypeSynchronic);
     }
@@ -673,6 +674,14 @@ void MainViewController::timerCallback()
         
         overtop.svc.update();
         overtop.svcm.update();
+    }
+
+    if (state->blendronicPreparationDidChange)
+    {
+        state->blendronicPreparationDidChange = false;
+
+        overtop.bvc.update();
+        overtop.bvcm.update();
     }
     
     if (state->tuningPreparationDidChange)

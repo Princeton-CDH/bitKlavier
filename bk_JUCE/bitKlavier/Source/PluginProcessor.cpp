@@ -834,6 +834,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
         updateState->synchronicPreparationDidChange = true;
         updateState->nostalgicPreparationDidChange = true;
         updateState->directPreparationDidChange = true;
+        updateState->blendronicPreparationDidChange = true;
         updateState->tempoPreparationDidChange = true;
         updateState->tuningPreparationDidChange = true;
         

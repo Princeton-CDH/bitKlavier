@@ -305,7 +305,7 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
     
     for (float f = 0; f < numLevels; f += lineSpacingInBlocks * 0.25f)
     {
-        float x = (fmod(f + numLevels - offset + pulseOffset, numLevels) - leftLevel) *
+        float x = (fmod(f + numLevels - offset + pulseOffset, numLevels+1) - leftLevel) *
                   (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
         
         if (i % 4 == 0)

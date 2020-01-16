@@ -73,6 +73,33 @@ static const float gDim = 0.25;
 static const float gBright = 1.;
 static const float gMedium = 0.65;
 
-
+#if JUCE_MAC
+static const std::string gSaveShortcut = " (CMD+S)";
+static const std::string gSaveAsShortcut = " (CMD+SHIFT+S)";
+static const std::string gCopyShortcut = " (CMD+C)";
+static const std::string gCutShortcut = " (CMD+X)";
+static const std::string gPasteShortcut = " (CMD+V)";
+static const std::string gConnectionShortcut = " (CMD+Click)";
+static const std::string gAlignShortcut = " (CMD+Arrow)";
+static const std::string gMidiEditShortcut = " (CMD+E)";
+#elif JUCE_WINDOWS
+static const std::string gSaveShortcut = " (CTRL+S)";
+static const std::string gSaveAsShortcut = " (CTRL+SHIFT+S)";
+static const std::string gCopyShortcut = " (CTRL+C)";
+static const std::string gCutShortcut = " (CTRL+X)";
+static const std::string gPasteShortcut = " (CTRL+V)";
+static const std::string gConnectionShortcut = " (CTRL+Click)";
+static const std::string gAlignShortcut = " (CTRL+Arrow)";
+static const std::string gMidiEditShortcut = " (CTRL+E)";
+#elif JUCE_IOS
+static const std::string gSaveShortcut = "";
+static const std::string gSaveAsShortcut = "";
+static const std::string gCopyShortcut = "";
+static const std::string gCutShortcut = "";
+static const std::string gPasteShortcut = "";
+static const std::string gConnectionShortcut = "";
+static const std::string gAlignShortcut = "";
+static const std::string gMidiEditShortcut = "";
+#endif
 
 #endif  // GRAPHICSCONSTANTS_H_INCLUDED

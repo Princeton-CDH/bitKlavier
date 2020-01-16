@@ -132,7 +132,7 @@ BKViewController(p, theGraph, 1)
     midiEditToggle.setButtonText ("midi edit");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(true);
     midiEditToggle.setToggleState (false, dontSendNotification);
-    midiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap (CMD+E)");
+    midiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap" + gMidiEditShortcut);
     midiEditToggle.addListener(this);
     addAndMakeVisible(&midiEditToggle, ALL);
     

@@ -157,9 +157,14 @@ void BlendronicProcessor::tick(float* outputs)
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
+
+    // Update the pulse length in case tempo or subdiv changed
+    pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+    // Update numSamplesBeat in case pulseLength changed
+    numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
     
     if (!blendronicActive) return;
-    
+
     // Check for beat change
     if (sampleTimer >= numSamplesBeat)
     {
@@ -169,26 +174,6 @@ void BlendronicProcessor::tick(float* outputs)
             delay->clear();
             clearDelayOnNextBeat = false;
         }
-        
-        // Update the pulse length in case tempo or subdiv changed
-        pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-        
-        // Calculate the length of the entire beat pattern
-        float beatPatternLength = 0.0;
-        for (auto b : prep->getBeats()) beatPatternLength += b * pulseLength * sampleRate;
-        
-        ///
-        if (numBeatPositions != (int) ((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1)
-        {
-            beatPositionsInBuffer.clear();
-            beatPositionsIndex = -1;
-            pulseOffset = delay->getCurrentSample();
-            numBeatPositions = ((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1;
-        }
-        
-        // Set the next beat position, cycle if we've reached the max number of positions for the buffer
-        beatPositionsInBuffer.set(++beatPositionsIndex, delay->getCurrentSample());
-        if (beatPositionsIndex >= numBeatPositions) beatPositionsIndex = -1;
    
         // Step sequenced params
         beatIndex++;
@@ -199,15 +184,36 @@ void BlendronicProcessor::tick(float* outputs)
         if (smoothIndex >= prep->getSmoothLengths().size()) smoothIndex = 0;
         feedbackIndex++;
         if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
-        
-        // Set parameters of the delay object
-        updateDelayParameters();
-        
+             
         // Update numSamplesBeat for the new beat and reset sampleTimer
         numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
         sampleTimer = 0;
     }
     sampleTimer++;
+
+    if (numSamplesBeat != prevNumSamplesBeat)
+    {
+        // Calculate the length of the entire beat pattern
+        float beatPatternLength = 0.0;
+        for (auto b : prep->getBeats()) beatPatternLength += b * pulseLength * sampleRate;
+
+        if (numBeatPositions != (int)((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1)
+        {
+            beatPositionsInBuffer.clear();
+            beatPositionsIndex = -1;
+            pulseOffset = delay->getCurrentSample();
+            numBeatPositions = ((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1;
+        }
+
+        // Set the next beat position, cycle if we've reached the max number of positions for the buffer
+        beatPositionsInBuffer.set(++beatPositionsIndex, delay->getCurrentSample());
+        if (beatPositionsIndex >= numBeatPositions) beatPositionsIndex = -1;
+
+        // Set parameters of the delay object
+        updateDelayParameters();
+    }
+    prevPulseLength = pulseLength;
+    prevNumSamplesBeat = numSamplesBeat;
     
     // Tick the delay
     delay->tick(outputs);
@@ -372,7 +378,7 @@ void BlendronicProcessor::prepareToPlay(double sr)
     delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayMax(), true);
     delay->setSampleRate(sr);
     
-    beatPositionsInBuffer.ensureStorageAllocated(20);
+    beatPositionsInBuffer.ensureStorageAllocated(128);
     beatPositionsInBuffer.clear();
     beatPositionsInBuffer.add(0);
     pulseOffset = 0;

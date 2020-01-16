@@ -163,21 +163,21 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     
     if (onGraph)
     {
-        menu.addItem(PASTE_ID, "Paste (CMD+V)");
+        menu.addItem(PASTE_ID, "Paste"+gPasteShortcut);
         menu.addSeparator();
     }
 
     if (numItemsSelected)
     {
-        menu.addItem(COPY_ID, "Copy (CMD+C)");
-        menu.addItem(CUT_ID, "Cut (CMD+X)");
+        menu.addItem(COPY_ID, "Copy"+gCopyShortcut);
+        menu.addItem(CUT_ID, "Cut" + gCutShortcut);
         menu.addItem(DELETE_ID, "Delete");
         if (numItemsSelected == 1)
         {
             menu.addSeparator();
             menu.addItem(EDIT_ID, "Edit (Double Click)");
             menu.addSeparator();
-            menu.addItem(CONNECTION_ID, "Make Connection (CMD+Click)");
+            menu.addItem(CONNECTION_ID, "Make Connection" + gConnectionShortcut);
             menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected");
         }
         if (numItemsSelected > 1)
@@ -187,7 +187,7 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
             menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected");
             menu.addItem(DISCONNECT_BETWEEN_ID, "Remove Connections Between Selected");
             menu.addSeparator();
-            menu.addSubMenu("Align (CMD+Arrow)", getAlignMenu(laf));
+            menu.addSubMenu("Align" + gAlignShortcut, getAlignMenu(laf));
         }
     }
     else if (numItemsSelected == 0)

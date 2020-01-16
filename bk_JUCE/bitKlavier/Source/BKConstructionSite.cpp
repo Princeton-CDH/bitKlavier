@@ -830,7 +830,8 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
             (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
              ModalCallbackFunction::forComponent (editMenuCallback, this) );
         }
-        // Control click (same as right click on Mac. TODO: figure out windows behavior)
+        // Control click (same as right click on Mac)
+#if JUCE_MAC
         else if (e.mods.isCtrlDown())
         {
             if (!itemToSelect->getSelected())
@@ -842,6 +843,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
             (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
              ModalCallbackFunction::forComponent (editMenuCallback, this) );
         }
+#endif
         else if (e.mods.isShiftDown())
         {
             // also select this item
@@ -905,12 +907,14 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
             (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
              ModalCallbackFunction::forComponent (editMenuCallback, this) );
         }
+#if JUCE_MAC
         else if (e.mods.isCtrlDown())
         {
             getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
             (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
              ModalCallbackFunction::forComponent (editMenuCallback, this) );
         }
+#endif
         else
         {
             if (!e.mods.isShiftDown())
@@ -942,8 +946,10 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     
     // Do nothing on right click mouse up
     if (e.mods.isRightButtonDown()) return;
+#if JUCE_MAC
     // Do nothing on ctrl click mouse up
     if (e.mods.isCtrlDown()) return;
+#endif
     
     touches.removeObject (getTouchEvent(e.source));
     

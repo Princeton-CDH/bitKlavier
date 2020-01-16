@@ -185,8 +185,8 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
     galleryMenu.addItem(NEWGALLERY_ID, "New");
     
-    if (!processor.defaultLoaded)   galleryMenu.addItem(SAVE_ID, "Save " );
-    galleryMenu.addItem(SAVEAS_ID, "Save as");
+    galleryMenu.addItem(SAVE_ID, "Save" + gSaveShortcut);
+    galleryMenu.addItem(SAVEAS_ID, "Save as" + gSaveAsShortcut);
     
     if (!processor.defaultLoaded)
     {
@@ -423,7 +423,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         processor.loadSamples(BKLoadSoundfont, "default.sf" + String(result - SF_DEFAULT_0), 0);
     }
-    else if (result == SAVE_ID)
+    else if (result == SAVE_ID && !processor.defaultLoaded)
     {
         processor.saveCurrentGallery();
         
@@ -433,7 +433,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     {
         processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[result-SOUNDFONT_ID], 0);
     }
-    else if (result == SAVEAS_ID)
+    else if (result == SAVEAS_ID || (result == SAVE_ID && processor.defaultLoaded))
     {
 #if JUCE_IOS
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon, gvc);

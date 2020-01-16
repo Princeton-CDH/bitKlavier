@@ -179,6 +179,10 @@ public:
         {
             return currentNostalgicId;
         }
+        else if (type == DisplayBlendronic)
+        {
+            return currentBlendronicId;
+        }
         else if (type == DisplayTuning)
         {
             return currentTuningId;
@@ -200,6 +204,10 @@ public:
             return currentModSynchronicId;
         }
         else if (type == DisplayNostalgicMod)
+        {
+            return currentModNostalgicId;
+        }
+        else if (type == DisplayBlendronicMod)
         {
             return currentModNostalgicId;
         }
@@ -226,6 +234,7 @@ public:
         currentModDirectId = val;
         currentModSynchronicId = val;
         currentModNostalgicId = val;
+        currentModBlendronicId = val;
         currentModTempoId = val;
         currentModTuningId = val;
         
