@@ -304,8 +304,8 @@ void KeymapViewController::resized()
     
     leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
     area.removeFromTop((area.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
-    leftColumn.removeFromLeft(50); // arrow width
-    area.removeFromRight(50); // arrow width
+    // leftColumn.removeFromLeft(50); // arrow width
+    // area.removeFromRight(50); // arrow width
     
     Rectangle<int> secondColumn = leftColumn.removeFromRight(leftColumn.getWidth() * 0.5);
     Rectangle<int> thirdColumn = area.removeFromLeft(area.getWidth() * 0.5);
