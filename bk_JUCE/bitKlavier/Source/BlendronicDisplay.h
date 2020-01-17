@@ -44,6 +44,7 @@ public:
     {
         if (spacingInSamples == 0) return;
         lineSpacingInBlocks = spacingInSamples * invInputSamplesPerBlock;
+        if (spacingInSamples == INFINITY) lineSpacingInBlocks = INFINITY;
     }
     inline void setPulseOffset(float offset) { pulseOffset = offset * invInputSamplesPerBlock; }
     inline void setVerticalZoom(float zoom) { verticalZoom = zoom; }

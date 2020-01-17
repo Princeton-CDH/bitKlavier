@@ -577,7 +577,11 @@ public:
     inline const bool getActive() const noexcept { return blendronicActive; }
     inline const bool getInputState() const noexcept { return delay->getInputState(); }
     inline const bool getOutputState() const noexcept { return delay->getOutputState(); }
-    inline const float getPulseLengthInSamples() const noexcept { return pulseLength * sampleRate; }
+    inline const float getPulseLengthInSamples() const noexcept 
+    { 
+        if (pulseLength == INFINITY) return INFINITY;
+        return pulseLength * sampleRate; 
+    }
     inline const Array<uint64> getBeatPositionsInBuffer() const noexcept { return beatPositionsInBuffer; }
     inline const float getPulseOffset() const noexcept { return pulseOffset; }
     

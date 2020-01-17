@@ -303,23 +303,26 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
     
     float leftLevel = numLevels*horizontalZoom;
     
-    for (float f = 0; f < numLevels; f += lineSpacingInBlocks * 0.25f)
+    if (lineSpacingInBlocks != INFINITY)
     {
-        float x = (fmod(f + numLevels - offset + pulseOffset, numLevels) - leftLevel) *
-                  (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
-        
-        if (i % 4 == 0)
+        for (float f = 0; f < numLevels; f += lineSpacingInBlocks * 0.25f)
         {
-            g.setColour (waveformColour.withMultipliedBrightness(0.4f));
-            g.fillRect(x, area.getY(), 1.0f, area.getHeight());
+            float x = (fmod(f + numLevels - offset + pulseOffset, numLevels) - leftLevel) *
+                (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
+
+            if (i % 4 == 0)
+            {
+                g.setColour(waveformColour.withMultipliedBrightness(0.4f));
+                g.fillRect(x, area.getY(), 1.0f, area.getHeight());
+            }
+            else
+            {
+                g.setColour(waveformColour.withMultipliedBrightness(0.2f));
+                float inbetweenHeight = area.getHeight() * 0.125;
+                g.fillRect(x, area.getCentreY() - inbetweenHeight, 1.0f, inbetweenHeight * 2.0f);
+            }
+            i++;
         }
-        else
-        {
-            g.setColour (waveformColour.withMultipliedBrightness(0.2f));
-            float inbetweenHeight = area.getHeight() * 0.125;
-            g.fillRect(x, area.getCentreY()-inbetweenHeight, 1.0f, inbetweenHeight*2.0f);
-        }
-        i++;
     }
     
     Path p;
@@ -330,26 +333,29 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
                                                       numLevels*horizontalZoom, verticalZoom,   area.getX(), area.getBottom(),
                                                       (float) numLevels, -verticalZoom,         area.getRight(), area.getY()));
     
-    for (auto m : markers)
+    if (lineSpacingInBlocks != INFINITY)
     {
-        int offset = playheads[0] * invInputSamplesPerBlock;
-        float markerLevel = m * invInputSamplesPerBlock;
-        float x = (fmod(((markerLevel - offset) + numLevels), numLevels) - leftLevel) *
-                  (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
-        if (x < 1.0f) continue;
-        g.setColour (markerColour);
-        g.fillRect(x, area.getY(), 1.0f, area.getHeight());
-    }
-    
-    for (auto p : playheads)
-    {
-        if (p == playheads[0]) continue;
-        int offset = playheads[0] * invInputSamplesPerBlock;
-        float playheadLevel = p * invInputSamplesPerBlock;
-        float x = (fmod(((playheadLevel - offset) + numLevels), numLevels) - leftLevel) *
-                  (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
-        g.setColour (playheadColour);
-        g.fillRect(x-2.0, area.getY(), 4.0, area.getHeight());
+        for (auto m : markers)
+        {
+            int offset = playheads[0] * invInputSamplesPerBlock;
+            float markerLevel = m * invInputSamplesPerBlock;
+            float x = (fmod(((markerLevel - offset) + numLevels), numLevels) - leftLevel) *
+                (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
+            if (x < 1.0f) continue;
+            g.setColour(markerColour);
+            g.fillRect(x, area.getY(), 1.0f, area.getHeight());
+        }
+
+        for (auto p : playheads)
+        {
+            if (p == playheads[0]) continue;
+            int offset = playheads[0] * invInputSamplesPerBlock;
+            float playheadLevel = p * invInputSamplesPerBlock;
+            float x = (fmod(((playheadLevel - offset) + numLevels), numLevels) - leftLevel) *
+                (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
+            g.setColour(playheadColour);
+            g.fillRect(x - 2.0, area.getY(), 4.0, area.getHeight());
+        }
     }
 }
 
@@ -380,36 +386,40 @@ void BlendronicDisplay::paintSmoothing (Graphics& g, Rectangle<float> area, cons
     
     float leftLevel = numLevels*horizontalZoom;
     
-    for (float f = 0; f < numLevels; f += lineSpacingInBlocks)
+    if (lineSpacingInBlocks != INFINITY)
     {
-        float x = (fmod(f + numLevels - offset + pulseOffset, numLevels) - leftLevel) *
-        (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
-        g.fillRect(x, area.getY(), 1.0f, area.getHeight());
-    }
-    
-    for (int i = 0; (i*area.getHeight() / (maxDelayLength*1.25)) < area.getHeight(); i++)
-    {
-        g.fillRect(area.getX(), area.getBottom() - (i*area.getHeight() / (maxDelayLength*1.25)), area.getWidth(), 1.0f);
-    }
-    
-    Path p;
-    getSmoothingAsPath (p, levels, numLevels, nextSample);
-    
-    g.setColour (playheadColour);
-    g.strokePath (p, PathStrokeType(2.0),
-                  AffineTransform::fromTargetPoints (numLevels*horizontalZoom, -maxDelayLength*1.25f,  area.getX(), area.getY(),
-                                                     numLevels*horizontalZoom, 0.0f,  area.getX(), area.getBottom(),
-                                                     (float) numLevels, -maxDelayLength*1.25f,  area.getRight(), area.getY()));
-    
-    for (auto m : markers)
-    {
-        int offset = playheads[0] * invInputSamplesPerBlock;
-        float markerLevel = m * invInputSamplesPerBlock;
-        float x = (fmod(((markerLevel - offset) + numLevels), numLevels) - leftLevel) *
-        (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
-        if (x < 1.0f) continue;
-        g.setColour (markerColour);
-        g.fillRect(x, area.getY(), 1.0f, area.getHeight());
+        for (float f = 0; f < numLevels; f += lineSpacingInBlocks)
+        {
+            float x = (fmod(f + numLevels - offset + pulseOffset, numLevels) - leftLevel) *
+                (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
+            g.fillRect(x, area.getY(), 1.0f, area.getHeight());
+        }
+
+        for (int i = 0; (i * area.getHeight() / (maxDelayLength * 1.25)) < area.getHeight(); i++)
+        {
+            g.fillRect(area.getX(), area.getBottom() - (i * area.getHeight() / (maxDelayLength * 1.25)), area.getWidth(), 1.0f);
+        }
+
+
+        Path p;
+        getSmoothingAsPath(p, levels, numLevels, nextSample);
+
+        g.setColour(playheadColour);
+        g.strokePath(p, PathStrokeType(2.0),
+            AffineTransform::fromTargetPoints(numLevels * horizontalZoom, -maxDelayLength * 1.25f, area.getX(), area.getY(),
+                numLevels * horizontalZoom, 0.0f, area.getX(), area.getBottom(),
+                (float)numLevels, -maxDelayLength * 1.25f, area.getRight(), area.getY()));
+
+        for (auto m : markers)
+        {
+            int offset = playheads[0] * invInputSamplesPerBlock;
+            float markerLevel = m * invInputSamplesPerBlock;
+            float x = (fmod(((markerLevel - offset) + numLevels), numLevels) - leftLevel) *
+                (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
+            if (x < 1.0f) continue;
+            g.setColour(markerColour);
+            g.fillRect(x, area.getY(), 1.0f, area.getHeight());
+        }
     }
 }
 
