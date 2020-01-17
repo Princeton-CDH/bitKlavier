@@ -71,6 +71,8 @@ protected:
     
     BKTextButton A1reset;
     
+    BKLabel attachKeymap;
+    
     BKTextButton showSpringsButton;
     bool showSprings;
 

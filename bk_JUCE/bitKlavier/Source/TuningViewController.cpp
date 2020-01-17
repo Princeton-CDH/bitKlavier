@@ -72,6 +72,9 @@ showSprings(false)
     adaptiveSystemsCB.addItem("Adaptive 1", 2);
     adaptiveSystemsCB.addItem("Adaptive Anchored 1", 3);
     adaptiveSystemsCB.addItem("Spring", 4);
+    
+    attachKeymap.setText("Attach a Keymap for Adaptive or Spiral/Springs!", dontSendNotification);
+    addAndMakeVisible(attachKeymap);
 
     rateSlider = std::make_unique<BKSingleSlider>("rate", 5., 400., 100., 1);
     rateSlider->setJustifyRight(false);
@@ -420,6 +423,8 @@ void TuningViewController::displayTab(int tab)
         Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
         leftColumn.removeFromLeft(leftArrow.getWidth());
         
+        attachKeymap.setBounds(leftColumn);
+        
         int customKeyboardHeight = 80 + 70. * processor.paddingScalarY;
         int extraY = (area.getHeight() - (customKeyboardHeight + gComponentSingleSliderHeight + gYSpacing * 3)) * 0.25;
         
@@ -547,7 +552,15 @@ void TuningViewController::displayTab(int tab)
                 
                 tetherWeightSecondaryGlobalSlider->setVisible(true);
             }
+            
         }
+        
+        TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+        bool keymapAttached = false;
+        if (tProcessor->getKeymaps().size() > 0) keymapAttached = true;
+        
+        if (!keymapAttached) attachKeymap.setVisible(true);
+        else attachKeymap.setVisible(false);
 
         iconImageComponent.setVisible(false);
 
@@ -566,7 +579,9 @@ void TuningViewController::displayTab(int tab)
         area.removeFromLeft(processor.paddingScalarX * 20); //area is now right column
         area.removeFromRight(processor.paddingScalarX * 20);
         
-        int columnHeight = leftColumn.getHeight();
+        attachKeymap.setBounds(area);
+        
+        // int columnHeight = leftColumn.getHeight();
         
         Rectangle<float> editAllBounds = absoluteKeyboard.getEditAllBounds();
         editAllBounds.translate(absoluteKeyboard.getX(), absoluteKeyboard.getY());
@@ -979,6 +994,10 @@ void TuningViewController::updateComponentVisibility(void)
     TuningModification::Ptr mod = processor.gallery->getTuningModification(processor.updateState->currentModTuningId);
     
     TuningAdaptiveSystemType adaptiveType = active->getAdaptiveType();
+    
+    TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+    bool keymapAttached = false;
+    if (tProcessor->getKeymaps().size() > 0) keymapAttached = true;
 
     if (currentTab == 0)
     {
@@ -1001,7 +1020,18 @@ void TuningViewController::updateComponentVisibility(void)
 
         }
         
-        if (adaptiveType == AdaptiveNormal)
+        if (!keymapAttached && (adaptiveType == AdaptiveNormal ||
+                                adaptiveType == AdaptiveAnchored ||
+                                adaptiveType == AdaptiveSpring))
+        {
+            nToneRootCB.setVisible(false);
+            nToneRootOctaveCB.setVisible(false);
+            nToneSemitoneWidthSlider->setVisible(false);
+            attachKeymap.setVisible(true);
+        }
+        else attachKeymap.setVisible(false);
+        
+        if (adaptiveType == AdaptiveNormal && keymapAttached)
         {
             A1IntervalScaleCB.setVisible(true);
             A1Inversional.setVisible(true);
@@ -1018,7 +1048,7 @@ void TuningViewController::updateComponentVisibility(void)
             nToneRootOctaveCB.setVisible(false);
             nToneSemitoneWidthSlider->setVisible(false);
         }
-        else if (adaptiveType == AdaptiveAnchored)
+        else if (adaptiveType == AdaptiveAnchored && keymapAttached)
         {
             A1IntervalScaleCB.setVisible(true);
             A1Inversional.setVisible(true);
