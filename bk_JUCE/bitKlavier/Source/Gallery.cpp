@@ -80,7 +80,6 @@ url(String())
 
 void Gallery::prepareToPlay (double sampleRate)
 {
-    
     for (auto piano : bkPianos)     piano->prepareToPlay(sampleRate);
 }
 
@@ -129,7 +128,7 @@ void Gallery::randomize()
             Keymap::Ptr kp = new Keymap(processor);
             kp->randomize();
             addKeymap(kp);
-            p->addPreparationMap(kp);
+            p->addKeymap(kp);
 
             Tuning::Ptr t = new Tuning(-1, true);
             addTuning(t);

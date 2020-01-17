@@ -16,7 +16,6 @@
 
 #include "BKUtilities.h"
 
-#include "PreparationMap.h"
 #include "Modifications.h"
 
 #include "Keymap.h"
@@ -102,14 +101,11 @@ public:
     inline void setId(int newId) { Id = newId; }
     
     inline int getId(void) { return Id; }
-    
-    inline PreparationMap::CSPtrArr getPreparationMaps(void) { return prepMaps; }
-    
+
     inline const String getName() const noexcept {return pianoName;}
     inline void setName(String n){pianoName = n;}
     
-    PreparationMap::Ptr         currentPMap;
-    PreparationMap::CSPtrArr    prepMaps;
+    Keymap::PtrArr                       keymaps;
     
     DirectProcessor::PtrArr              dprocessor;
     SynchronicProcessor::PtrArr          sprocessor;
@@ -120,28 +116,41 @@ public:
     
     void addProcessor(BKPreparationType thisType, int thisId);
     bool containsProcessor(BKPreparationType thisType, int thisId);
+    bool contains(Keymap::Ptr);
+    bool contains(DirectProcessor::Ptr);
+    bool contains(NostalgicProcessor::Ptr);
+    bool contains(SynchronicProcessor::Ptr);
+    bool contains(TuningProcessor::Ptr);
+    bool contains(TempoProcessor::Ptr);
+    bool contains(BlendronicProcessor::Ptr);
     
-    DirectProcessor::Ptr        getDirectProcessor(int Id, bool add = true);
-    NostalgicProcessor::Ptr     getNostalgicProcessor(int Id, bool add = true);
-    SynchronicProcessor::Ptr    getSynchronicProcessor(int Id, bool add = true);
-    TuningProcessor::Ptr        getTuningProcessor(int Id, bool add = true);
-    TempoProcessor::Ptr         getTempoProcessor(int Id, bool add = true);
-	BlendronicProcessor::Ptr	getBlendronicProcessor(int Id, bool add = true);
+    Keymap::Ptr                         addKeymap               (Keymap::Ptr km);
+    Keymap::Ptr                         getKeymap               (int Id, bool add = true);
+    inline Keymap::PtrArr               getKeymaps              (void) const noexcept { return keymaps; }
     
-    inline DirectProcessor::PtrArr        getDirectProcessors(void) const noexcept { return dprocessor; }
-    inline NostalgicProcessor::PtrArr     getNostalgicProcessors(void) const noexcept { return nprocessor; }
-    inline SynchronicProcessor::PtrArr    getSynchronicProcessors(void) const noexcept { return sprocessor; }
-    inline TuningProcessor::PtrArr        getTuningProcessors(void) const noexcept { return tprocessor; }
-    inline TempoProcessor::PtrArr         getTempoProcessors(void) const noexcept { return mprocessor; }
-	inline BlendronicProcessor::PtrArr  getBlendronicProcessors(void) const noexcept { return bprocessor; }
-    inline PreparationMap::CSPtrArr       getPreparationMaps(void) const noexcept { return prepMaps; }
+    DirectProcessor::Ptr                addDirectProcessor      (int Id);
+    DirectProcessor::Ptr                getDirectProcessor      (int Id, bool add = true);
+    inline DirectProcessor::PtrArr      getDirectProcessors     (void) const noexcept { return dprocessor; }
     
-    NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
-    SynchronicProcessor::Ptr    addSynchronicProcessor(int thisId);
-    DirectProcessor::Ptr        addDirectProcessor(int thisId);
-    TuningProcessor::Ptr        addTuningProcessor(int thisId);
-    TempoProcessor::Ptr         addTempoProcessor(int thisId);
-	BlendronicProcessor::Ptr  addBlendronicProcessor(int thisId);
+    NostalgicProcessor::Ptr             addNostalgicProcessor   (int Id);
+    NostalgicProcessor::Ptr             getNostalgicProcessor   (int Id, bool add = true);
+    inline NostalgicProcessor::PtrArr   getNostalgicProcessors  (void) const noexcept { return nprocessor; }
+    
+    SynchronicProcessor::Ptr            addSynchronicProcessor  (int Id);
+    SynchronicProcessor::Ptr            getSynchronicProcessor  (int Id, bool add = true);
+    inline SynchronicProcessor::PtrArr  getSynchronicProcessors (void) const noexcept { return sprocessor; }
+    
+    TuningProcessor::Ptr                addTuningProcessor      (int Id);
+    TuningProcessor::Ptr                getTuningProcessor      (int Id, bool add = true);
+    inline TuningProcessor::PtrArr      getTuningProcessors     (void) const noexcept { return tprocessor; }
+    
+    TempoProcessor::Ptr                 addTempoProcessor       (int Id);
+    TempoProcessor::Ptr                 getTempoProcessor       (int Id, bool add = true);
+    inline TempoProcessor::PtrArr       getTempoProcessors      (void) const noexcept { return mprocessor; }
+    
+    BlendronicProcessor::Ptr            addBlendronicProcessor  (int Id);
+    BlendronicProcessor::Ptr            getBlendronicProcessor  (int Id, bool add = true);
+    inline BlendronicProcessor::PtrArr  getBlendronicProcessors (void) const noexcept { return bprocessor; }
     
     void clearOldNotes(Piano::Ptr prevPiano)
     {
@@ -214,7 +223,7 @@ public:
         return nullptr;
     }
     
-    inline bool contains(BKPreparationType type, int thisId)
+    inline bool containsItem(BKPreparationType type, int thisId)
     {
         for (auto item : items)
         {
@@ -261,6 +270,8 @@ public:
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
 
 	void linkPreparationWithBlendronic(BKPreparationType thisType, int thisId, Blendronic::Ptr thisBlend);
+    
+    void linkKeymapToPreparation(int keymapId, BKPreparationType thisType, int thisId);
     
     ValueTree getState(void);
     
@@ -321,13 +332,26 @@ public:
     void configureModification(BKItem::Ptr map);
     void deconfigureModification(BKItem::Ptr map);
     
-    int                         addPreparationMap(void);
-    int                         addPreparationMap(Keymap::Ptr keymap);
-    PreparationMap::Ptr         getPreparationMapWithPreparation(BKPreparationType type, int Id);
-    PreparationMap::Ptr         getPreparationMapWithKeymap(int keymapId);
-    int                         removePreparationMap(int Id);
-    int                         removePreparationMapWithKeymap(int keymapId);
-    int                         removeLastPreparationMap(void);
+    void keyPressed(int noteNumber, float velocity, int channel, bool soundfont = false, String source = String("Default"));
+    void keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false, String source = String("Default"));
+    void postRelease(int noteNumber, float velocity, int channel, String source);
+    
+    void reattack(int noteNumber);
+    void sustain(int noteNumber, float velocity, int channel, bool soundfont);
+    
+    void clearKey(int noteNumber);
+    void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }
+    void sustainPedalReleased(bool post);
+    void sustainPedalReleased(Array<bool> keysThatArePressed, bool post);
+    void sustainPedalReleased() {sustainPedalReleased(false);};
+    
+    inline bool keymapsContainNote(int noteNumber) {
+        bool contains = false;
+        for (auto km : keymaps) if (km->containsNote(noteNumber)) contains = true;
+        return contains;
+    }
+    
+     void processBlock(AudioSampleBuffer& buffer, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic = false);
     
     Array<Array<int>> pianoMaps;
     
@@ -338,6 +362,7 @@ private:
     int Id;
     String pianoName;
     
+    BKSampleLoadType sampleType;
 
     double sampleRate;
     
@@ -347,6 +372,16 @@ private:
 	BlendronicProcessor::Ptr defaultB;
     BlendronicProcessor::PtrArr defaultBA;
 	BlendronicDelay::Ptr defaultD;
+    
+    bool sustainPedalIsDepressed;
+    
+    struct SustainedNote
+    {
+        int noteNumber;
+        float velocity;
+        int channel;
+    };
+    Array<SustainedNote> sustainedNotes;
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
     {
