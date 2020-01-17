@@ -56,6 +56,8 @@ protected:
     
     BKTextButton A1reset;
     
+    BKLabel attachKeymap;
+    
     void fillModeCB(void);
     void fillA1ModeCB(void);
     

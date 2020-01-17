@@ -65,6 +65,9 @@ BKViewController(p, theGraph, 1)
     A1ModeCB.setTooltip("Indicates which aspect of performance Tempo is analyzing, using information from connected Keymap");
     addAndMakeVisible(A1ModeLabel);
     
+    attachKeymap.setText("Attach a Keymap to use Adaptive!", dontSendNotification);
+    addAndMakeVisible(attachKeymap);
+    
     addAndMakeVisible(A1AdaptedTempo);
     addAndMakeVisible(A1AdaptedPeriodMultiplier);
     A1AdaptedPeriodMultiplier.setJustificationType(juce::Justification::centredRight);
@@ -91,6 +94,7 @@ BKViewController(p, theGraph, 1)
 
 void TempoViewController::resized()
 {
+
     Rectangle<int> area (getLocalBounds());
     
     iconImageComponent.setBounds(area);
@@ -129,6 +133,7 @@ void TempoViewController::resized()
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> A1ModeCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    attachKeymap.setBounds(leftColumn);
     A1ModeCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     //A1ModeCBSlice.removeFromLeft(2 * gXSpacing + hideOrShow.getWidth());
     A1ModeCBSlice.removeFromLeft(gXSpacing);
@@ -148,6 +153,8 @@ void TempoViewController::resized()
     Rectangle<int> adaptedLabelSlice = leftColumn.removeFromTop(gComponentTextFieldHeight);
     A1AdaptedTempo.setBounds(adaptedLabelSlice.removeFromLeft(leftColumn.getWidth() / 2.));
     A1AdaptedPeriodMultiplier.setBounds(adaptedLabelSlice);
+    
+    
     
     // ********* right column
     
@@ -204,19 +211,36 @@ void TempoViewController::updateComponentVisibility()
 {
     if(modeCB.getText() == "Adaptive Tempo 1")
     {
-        AT1HistorySlider->setVisible(true);
-        AT1SubdivisionsSlider->setVisible(true);
-        AT1MinMaxSlider->setVisible(true);
+        TempoProcessor::Ptr mProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
         
-        A1ModeLabel.setVisible(true);
-        A1ModeCB.setVisible(true);
+        bool keymapAttached = false;
+        if (mProcessor->getKeymaps().size() > 0) keymapAttached = true;
         
-        A1AdaptedTempo.setVisible(true);
-        A1AdaptedPeriodMultiplier.setVisible(true);
-        
-        A1reset.setVisible(true);
-        
-        subSlider->setVisible(false);
+        if (keymapAttached)
+        {
+            // keymap needs to be attached for adaptive tempo to work
+            AT1HistorySlider->setVisible(true);
+            AT1SubdivisionsSlider->setVisible(true);
+            AT1MinMaxSlider->setVisible(true);
+            
+            A1ModeLabel.setVisible(true);
+            A1ModeCB.setVisible(true);
+            
+            A1AdaptedTempo.setVisible(true);
+            A1AdaptedPeriodMultiplier.setVisible(true);
+            
+            A1reset.setVisible(true);
+            
+            subSlider->setVisible(false);
+            
+            attachKeymap.setVisible(false);
+        }
+        else
+        {
+            // show message that keymap needs to be attached
+            attachKeymap.setVisible(true);
+        }
+
     }
     else
     {
@@ -230,6 +254,7 @@ void TempoViewController::updateComponentVisibility()
         A1AdaptedTempo.setVisible(false);
         A1AdaptedPeriodMultiplier.setVisible(false);
         
+        attachKeymap.setVisible(false);
         A1reset.setVisible(false);
         
         subSlider->setVisible(true);
