@@ -173,10 +173,10 @@ void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool sho
     subBlockSubdivisionIsStrict = shouldBeStrict;
 }
 
-BlendronicDelay::Ptr BKSynthesiser::createBlendronicDelay(float delayLength, float delayMax, bool active)
+BlendronicDelay::Ptr BKSynthesiser::createBlendronicDelay(float delayLength, float delayMax, double sr, bool active)
 {
     const ScopedLock sl (lock);
-    BlendronicDelay::Ptr delay = new BlendronicDelay(delayLength, delayLength, INFINITY, delayMax, active);
+    BlendronicDelay::Ptr delay = new BlendronicDelay(delayLength, delayLength, INFINITY, delayMax, sr, active);
     return delay;
 }
 

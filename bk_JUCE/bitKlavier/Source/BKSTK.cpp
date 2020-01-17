@@ -13,19 +13,19 @@
 BKEnvelope::BKEnvelope() :
 	value(0.0f),
 	target(0.0f),
-	rate(1.0f)
+	rate(1.0f),
+	sampleRate(44100.)
 {
 	state = 0;
-    sampleRate = 44100.;
 }
 
-BKEnvelope::BKEnvelope(float bValue, float bTarget) :
+BKEnvelope::BKEnvelope(float bValue, float bTarget, double sr) :
 	value(bValue),
 	target(bTarget),
-	rate(1.0f)
+	rate(1.0f),
+	sampleRate(sr)
 {
 	state = 0;
-    sampleRate = 44100.;
 }
 
 BKEnvelope::~BKEnvelope()
@@ -57,22 +57,22 @@ float BKEnvelope::tick()
 BKDelayL::BKDelayL() :
     inPoint(0),
     outPoint(0),
-    max(4096),
+    max(1.),
     length(0.0),
 	gain(1.0),
 	lastFrameLeft(0),
 	lastFrameRight(0),
     feedback(0.9),
 	doNextOutLeft(false),
-	doNextOutRight(false)
+	doNextOutRight(false),
+	sampleRate(44100.)
 {
-	inputs = AudioBuffer<float>(2, max);
+	inputs = AudioBuffer<float>(2, max*sampleRate);
 	inputs.clear();
 	setLength(0.0);
-    sampleRate = 44100.;
 }
 
-BKDelayL::BKDelayL(float delayLength, float delayMax, float delayGain) :
+BKDelayL::BKDelayL(float delayLength, float delayMax, float delayGain, double sr) :
     inPoint(0),
     outPoint(0),
     max(delayMax),
@@ -81,12 +81,12 @@ BKDelayL::BKDelayL(float delayLength, float delayMax, float delayGain) :
 	lastFrameLeft(0),
 	lastFrameRight(0),
 	doNextOutLeft(false),
-	doNextOutRight(false)
+	doNextOutRight(false),
+	sampleRate(sr)
 {
-	inputs = AudioBuffer<float>(2, max);
+	inputs = AudioBuffer<float>(2, max*sampleRate);
 	inputs.clear();
 	setLength(delayLength);
-    sampleRate = 44100.;
     feedback = 0.9;
 }
 
@@ -222,7 +222,7 @@ BlendronicDelay::BlendronicDelay(BlendronicDelay::Ptr d):
     DBG("Create bdelay");
 }
 
-BlendronicDelay::BlendronicDelay(float delayLength, float smoothValue, float smoothRate, float delayMax, bool active) :
+BlendronicDelay::BlendronicDelay(float delayLength, float smoothValue, float smoothRate, float delayMax, double sr, bool active) :
 	dDelayMax(delayMax),
 	dDelayGain(1.0f),
 	dDelayLength(delayLength),
@@ -230,12 +230,12 @@ BlendronicDelay::BlendronicDelay(float delayLength, float smoothValue, float smo
 	dSmoothRate(smoothRate),
     dInputOpen(true),
     dOutputOpen(true),
-    sampleRate(44100)
+    sampleRate(sr)
 {
-	delayLinear =  new BKDelayL(dDelayLength, dDelayMax, dDelayGain);
-	dSmooth = new BKEnvelope(dSmoothValue, delayLength);
+	delayLinear =  new BKDelayL(dDelayLength, dDelayMax, dDelayGain, sampleRate);
+	dSmooth = new BKEnvelope(dSmoothValue, dDelayLength, sampleRate);
     dSmooth->setRate(dSmoothRate);
-    dEnv = new BKEnvelope(1.0f, 1.0f);
+    dEnv = new BKEnvelope(1.0f, 1.0f, sampleRate);
     dEnv->setTime(5.0f);
     shouldDuck = false;
     DBG("Create bdelay");

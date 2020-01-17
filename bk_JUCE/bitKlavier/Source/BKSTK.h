@@ -31,7 +31,7 @@ public:
 
 	//constructors
 	BKDelayL();
-	BKDelayL(float delayLength, float delayMax, float delayGain);
+	BKDelayL(float delayLength, float delayMax, float delayGain, double sr);
 	~BKDelayL();
 
 	//accessors
@@ -98,7 +98,7 @@ public:
 
 	//constructors
 	BKEnvelope();
-	BKEnvelope(float bValue, float bDuration);
+	BKEnvelope(float bValue, float bDuration, double sr);
 	~BKEnvelope();
 
 	//accessors
@@ -142,7 +142,7 @@ public:
 
 	//constructors
 	BlendronicDelay(BlendronicDelay::Ptr d);
-	BlendronicDelay(float delayLength, float smoothValue, float smoothDuration, float delayMax, bool active = false);
+	BlendronicDelay(float delayLength, float smoothValue, float smoothDuration, float delayMax, double sr, bool active = false);
 	~BlendronicDelay();
 
 	//accessors

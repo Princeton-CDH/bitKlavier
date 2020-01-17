@@ -648,7 +648,7 @@ public:
      */
     void setMinimumRenderingSubdivisionSize (int numSamples, bool shouldBeStrict = false) noexcept;
 
-	BlendronicDelay::Ptr createBlendronicDelay(float delayLength, float delayMax, bool active = false);
+	BlendronicDelay::Ptr createBlendronicDelay(float delayLength, float delayMax, double sr, bool active = false);
     void addBlendronicProcessor(BlendronicProcessor::Ptr bproc);
     void removeBlendronicProcessor(int Id);
     

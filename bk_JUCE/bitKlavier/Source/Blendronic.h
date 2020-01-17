@@ -353,14 +353,14 @@ private:
 	String name;
 	bool isActive;
 
-	//stuff from preset
+	//sequenced parameters
 	Array<float> bBeats;
     Array<float> bDelayLengths;
     Array<float> bSmoothLengths;
 	Array<float> bSmoothValues;
 	Array<float> bFeedbackCoefficients;
 
-	//d0 stuff
+	//maximum delay in seconds
 	float bDelayMax;
 
 	//dsmooth stuff
