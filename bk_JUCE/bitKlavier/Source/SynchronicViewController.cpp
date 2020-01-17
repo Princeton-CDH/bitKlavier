@@ -481,7 +481,7 @@ void SynchronicViewController::displayTab(int tab)
         area.removeFromLeft(leftArrow.getWidth());
     
         Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth() * 0.5));
-        leftColumn.removeFromLeft(leftColumn.getWidth() * 0.5);
+        leftColumn.removeFromLeft(leftColumn.getWidth() * 0.5 * processor.paddingScalarX);
         
         leftColumn.removeFromRight(processor.paddingScalarX * 5);
         leftColumn.removeFromLeft(processor.paddingScalarX * 20);
