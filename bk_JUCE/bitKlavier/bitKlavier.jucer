@@ -253,6 +253,10 @@
           <FILE id="sbtYa6" name="Modifications.cpp" compile="1" resource="0"
                 file="Source/Modifications.cpp"/>
           <FILE id="jsTxEL" name="Modifications.h" compile="0" resource="0" file="Source/Modifications.h"/>
+          <FILE id="nEvMEi" name="PreparationMap.cpp" compile="1" resource="0"
+                file="Source/PreparationMap.cpp"/>
+          <FILE id="jW1Js5" name="PreparationMap.h" compile="0" resource="0"
+                file="Source/PreparationMap.h"/>
         </GROUP>
         <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparation">
           <FILE id="VFgtPR" name="Modification.cpp" compile="1" resource="0"

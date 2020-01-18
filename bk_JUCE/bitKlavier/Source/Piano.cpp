@@ -14,7 +14,10 @@
 
 #include "Gallery.h"
 
-Piano::Piano(BKAudioProcessor& p, int Id):
+Piano::Piano(BKAudioProcessor& p,
+             int Id):
+currentPMap(PreparationMap::Ptr()),
+prepMaps(PreparationMap::CSPtrArr()),
 processor(p),
 Id(Id)
 {
@@ -48,7 +51,17 @@ void Piano::clear(void)
 
 void Piano::deconfigure(void)
 {
-    keymaps.clear();
+    prepMaps.clear();
+    numPMaps = 0;
+    
+    /*
+    for (auto proc : dprocessor) proc->reset();
+    for (auto proc : mprocessor) proc->reset();
+    for (auto proc : sprocessor) proc->reset();
+    for (auto proc : nprocessor) proc->reset();
+    for (auto proc : tprocessor) proc->reset();
+    */
+    
     dprocessor.clear();
     mprocessor.clear();
     sprocessor.clear();
@@ -81,7 +94,6 @@ void Piano::configure(void)
     
     //defaultB = getBlendronicProcessor(DEFAULT_ID);
     
-    // For each item in the piano that need a processor, add the processor
     for (auto item : items)
     {
         BKPreparationType thisType = item->getType();
@@ -92,15 +104,24 @@ void Piano::configure(void)
         addProcessor(thisType, thisId);
     }
     
-    // Now handle connecting things
     for (auto item : items)
     {
         BKPreparationType type = item->getType();
         int Id = item->getId();
         
+        //TODO: figure out connecting blendronic
+        // Connect keymaps to everything
+        // Connect tunings, tempos, synchronics to preparations
+        // Connect mods and resets to all their targets
+        // Configure piano maps
+        // ... should be all configured if done in that order ...
         if (type == PreparationTypeKeymap)
         {
             Keymap::Ptr keymap = processor.gallery->getKeymap(Id);
+            // make a prep map for the first keymap, this will be the only prep map
+            if (prepMaps.isEmpty()) addPreparationMap(keymap);
+            // add any subsequent keymaps to the same prep map (maybe we can get rid of prep maps?)
+            else prepMaps.getFirst()->addKeymap(keymap);
             
             BKItem::PtrArr connex = item->getConnections();
             for (auto target : connex)
@@ -110,11 +131,8 @@ void Piano::configure(void)
                 
                 if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo) || targetType == PreparationTypeBlendronic)
                 {
-                    
                     DBG(String(targetType) + " linked with keymap");
-                    
                     linkPreparationWithKeymap(targetType, targetId, Id);
-                    
                 }
                 else if ((targetType >= PreparationTypeDirectMod && targetType <= PreparationTypeTempoMod) || targetType == PreparationTypeBlendronicMod)
                 {
@@ -210,52 +228,78 @@ SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
     return sproc;
 }
 
-Keymap::Ptr Piano::getKeymap(int Id, bool add)
-{
-    for (auto km : keymaps) if (km->getId() == Id) return km;
-    return add ? addKeymap(processor.gallery->getKeymap(Id)) : nullptr;
-}
-
 DirectProcessor::Ptr Piano::getDirectProcessor(int Id, bool add)
 {
-    for (auto proc : dprocessor) if (proc->getId() == Id) return proc;
+    for (auto proc : dprocessor)
+    {
+        if (proc->getId() == Id) return proc;
+    }
+    
     return add ? addDirectProcessor(Id) : nullptr;
 }
 
 NostalgicProcessor::Ptr Piano::getNostalgicProcessor(int Id, bool add)
 {
-    for (auto proc : nprocessor) if (proc->getId() == Id) return proc;
+    for (auto proc : nprocessor)
+    {
+        if (proc->getId() == Id) return proc;
+    }
+    
     return add ? addNostalgicProcessor(Id) : nullptr;
 }
 
 SynchronicProcessor::Ptr Piano::getSynchronicProcessor(int Id, bool add)
 {
-    for (auto proc : sprocessor) if (proc->getId() == Id) return proc;
+    for (auto proc : sprocessor)
+    {
+        if (proc->getId() == Id) return proc;
+    }
+    
     return add ? addSynchronicProcessor(Id) : nullptr;
 }
 
 TuningProcessor::Ptr Piano::getTuningProcessor(int Id, bool add)
 {
-    for (auto proc : tprocessor) if (proc->getId() == Id) return proc;
+    for (auto proc : tprocessor)
+    {
+        if (proc->getId() == Id) return proc;
+    }
+    
     return add ? addTuningProcessor(Id) : nullptr;
 }
 
 TempoProcessor::Ptr Piano::getTempoProcessor(int Id, bool add)
 {
-    for (auto proc : mprocessor) if (proc->getId() == Id) return proc;
+    for (auto proc : mprocessor)
+    {
+        if (proc->getId() == Id) return proc;
+    }
+    
     return add ? addTempoProcessor(Id) : nullptr;
 }
 
 BlendronicProcessor::Ptr Piano::getBlendronicProcessor(int Id, bool add)
 {
-	for (auto proc : bprocessor) if (proc->getId() == Id) return proc;
+	for (auto proc : bprocessor)
+	{
+		if (proc->getId() == Id) return proc;
+	}
+
 	return add ? addBlendronicProcessor(Id) : nullptr;
 }
 
-Keymap::Ptr Piano::addKeymap(Keymap::Ptr km)
+
+NostalgicProcessor::Ptr Piano::addNostalgicProcessor(int thisId)
 {
-    keymaps.add(km);
-    return km;
+    NostalgicProcessor::Ptr nproc = new NostalgicProcessor(processor.gallery->getNostalgic(thisId),
+                                       defaultT,
+                                       defaultS,
+										defaultBA,
+                                       &processor.mainPianoSynth);
+    nproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+    nprocessor.add(nproc);
+    
+    return nproc;
 }
 
 DirectProcessor::Ptr Piano::addDirectProcessor(int thisId)
@@ -266,6 +310,7 @@ DirectProcessor::Ptr Piano::addDirectProcessor(int thisId)
                                                      &processor.mainPianoSynth,
                                                      &processor.resonanceReleaseSynth,
                                                      &processor.hammerReleaseSynth);
+    
     dproc->prepareToPlay(sampleRate,
                          &processor.mainPianoSynth,
                          &processor.resonanceReleaseSynth,
@@ -274,19 +319,6 @@ DirectProcessor::Ptr Piano::addDirectProcessor(int thisId)
     dprocessor.add(dproc);
     
     return dproc;
-}
-
-NostalgicProcessor::Ptr Piano::addNostalgicProcessor(int thisId)
-{
-    NostalgicProcessor::Ptr nproc = new NostalgicProcessor(processor.gallery->getNostalgic(thisId),
-                                                           defaultT,
-                                                           defaultS,
-                                                           defaultBA,
-                                                           &processor.mainPianoSynth);
-    nproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
-    nprocessor.add(nproc);
-    
-    return nproc;
 }
 
 TuningProcessor::Ptr Piano::addTuningProcessor(int thisId)
@@ -327,11 +359,7 @@ void Piano::reset(void)
 
 bool Piano::containsProcessor(BKPreparationType thisType, int thisId)
 {
-    if (thisType == PreparationTypeKeymap)
-    {
-        return (getDirectProcessor(thisId) == nullptr) ? false : true;
-    }
-    else if (thisType == PreparationTypeDirect)
+    if (thisType == PreparationTypeDirect)
     {
         return (getDirectProcessor(thisId) == nullptr) ? false : true;
     }
@@ -352,48 +380,6 @@ bool Piano::containsProcessor(BKPreparationType thisType, int thisId)
         return (getTempoProcessor(thisId) == nullptr) ? false : true;
     }
     
-    return false;
-}
-
-bool Piano::contains(Keymap::Ptr thisOne)
-{
-    for (auto p : keymaps) if (p->getId() == thisOne->getId()) return true;
-    return false;
-}
-
-bool Piano::contains(DirectProcessor::Ptr thisOne)
-{
-    for (auto p : dprocessor) if (p->getId() == thisOne->getId()) return true;
-    return false;
-}
-
-bool Piano::contains(SynchronicProcessor::Ptr thisOne)
-{
-    for (auto p : sprocessor) if (p->getId() == thisOne->getId()) return true;
-    return false;
-}
-
-bool Piano::contains(NostalgicProcessor::Ptr thisOne)
-{
-    for (auto p : nprocessor) if (p->getId() == thisOne->getId()) return true;
-    return false;
-}
-
-bool Piano::contains(BlendronicProcessor::Ptr thisOne)
-{
-    for (auto p : bprocessor) if (p->getId() == thisOne->getId()) return true;
-    return false;
-}
-
-bool Piano::contains(TuningProcessor::Ptr thisOne)
-{
-    for (auto p : tprocessor) if (p->getId() == thisOne->getId()) return true;
-    return false;
-}
-
-bool Piano::contains(TempoProcessor::Ptr thisOne)
-{
-    for (auto p : mprocessor) if (p->getId() == thisOne->getId()) return true;
     return false;
 }
 
@@ -531,17 +517,52 @@ void Piano::linkPreparationWithBlendronic(BKPreparationType thisType, int thisId
 
 void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, int keymapId)
 {
+    // Get the preparation map for this keymap
+    PreparationMap::Ptr thisPreparationMap = getPreparationMapWithKeymap(keymapId);
+    PreparationMap::Ptr thatPreparationMap = getPreparationMapWithPreparation(thisType, thisId);
+    
     Keymap::Ptr keymap = processor.gallery->getKeymap(keymapId);
+    
+    // If this keymap doesn't have a prep map
+    if (thisPreparationMap == nullptr)
+    {
+        // If what it's connecting to doesn't have a prep map
+        if (thatPreparationMap == nullptr)
+        {
+            // Make a new preparation map
+            addPreparationMap(keymap);
+            thisPreparationMap = getPreparationMaps().getLast();
+        }
+        else
+        {   // Add this keymap to the prep map
+            thatPreparationMap->addKeymap(keymap);
+            thisPreparationMap = thatPreparationMap;
+        }
+    }
+    // else if the preparation also has a prep map
+    else if (thatPreparationMap != nullptr)
+    {
+        // and it's a different prep map
+        if (thisPreparationMap != thatPreparationMap)
+        {
+            // merge the prep maps
+            thisPreparationMap->merge(thatPreparationMap);
+            // remove one
+            removePreparationMap(thatPreparationMap->getId());
+        }
+    }
     
     if (thisType == PreparationTypeDirect)
     {
         DirectProcessor::Ptr dproc = getDirectProcessor(thisId);
+        thisPreparationMap->addDirectProcessor(dproc);
         
         keymap->addTarget(TargetTypeDirect);
     }
     else if (thisType == PreparationTypeSynchronic)
     {
         SynchronicProcessor::Ptr sproc = getSynchronicProcessor(thisId);
+        thisPreparationMap->addSynchronicProcessor(sproc);
         
         keymap->addTarget(TargetTypeSynchronic);
         for (int i = TargetTypeSynchronic+1; i <= TargetTypeSynchronicRotate; i++)
@@ -552,12 +573,14 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     else if (thisType == PreparationTypeNostalgic)
     {
         NostalgicProcessor::Ptr nproc = getNostalgicProcessor(thisId);
+        thisPreparationMap->addNostalgicProcessor(nproc);
         
         keymap->addTarget(TargetTypeNostalgic);
     }
     else if (thisType == PreparationTypeBlendronic)
     {
         BlendronicProcessor::Ptr bproc = getBlendronicProcessor(thisId);
+        thisPreparationMap->addBlendronicProcessor(bproc);
         
         for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -567,80 +590,18 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     else if (thisType == PreparationTypeTempo)
     {
         TempoProcessor::Ptr mproc = getTempoProcessor(thisId);
+        thisPreparationMap->addTempoProcessor(mproc);
         
         keymap->addTarget(TargetTypeTempo);
     }
     else if (thisType == PreparationTypeTuning)
     {
         TuningProcessor::Ptr tproc = getTuningProcessor(thisId);
+        thisPreparationMap->addTuningProcessor(tproc);
         
         keymap->addTarget(TargetTypeTuning);
     }
-    linkKeymapToPreparation(keymapId, thisType, thisId);
-}
-
-void Piano::linkKeymapToPreparation(int keymapId, BKPreparationType thisType, int thisId)
-{
-    if (thisType == PreparationTypeDirect)
-    {
-        for (int i = 0; i < dprocessor.size(); ++i)
-        {
-            if (dprocessor[i]->getId() == thisId)
-            {
-                dprocessor[i]->addKeymap(getKeymap(keymapId));
-            }
-        }
-    }
-    else if (thisType == PreparationTypeSynchronic)
-    {
-        for (int i = 0; i < sprocessor.size(); ++i)
-        {
-            if (sprocessor[i]->getId() == thisId)
-            {
-                sprocessor[i]->addKeymap(getKeymap(keymapId));
-            }
-        }
-    }
-    else if (thisType == PreparationTypeNostalgic)
-    {
-        for (int i = 0; i < nprocessor.size(); ++i)
-        {
-            if (nprocessor[i]->getId() == thisId)
-            {
-                nprocessor[i]->addKeymap(getKeymap(keymapId));
-            }
-        }
-    }
-    else if (thisType == PreparationTypeBlendronic)
-    {
-        for (int i = 0; i < bprocessor.size(); ++i)
-        {
-            if (bprocessor[i]->getId() == thisId)
-            {
-                bprocessor[i]->addKeymap(getKeymap(keymapId));
-            }
-        }
-    }
-    else if (thisType == PreparationTypeTempo)
-    {
-        for (int i = 0; i < mprocessor.size(); ++i)
-        {
-            if (mprocessor[i]->getId() == thisId)
-            {
-                mprocessor[i]->addKeymap(getKeymap(keymapId));
-            }
-        }
-    }
-    else if (thisType == PreparationTypeTuning)
-    {
-        for (int i = 0; i < tprocessor.size(); ++i)
-        {
-            if (tprocessor[i]->getId() == thisId)
-            {
-                tprocessor[i]->addKeymap(getKeymap(keymapId));
-            }
-        }
-    }
+    thisPreparationMap->linkKeymapToPreparation(keymapId, thisType, thisId);
 }
 
 void Piano::configureDirectModification(DirectModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
@@ -1019,611 +980,142 @@ void Piano::deconfigureTuningModificationForKeys(TuningModification::Ptr mod, Ar
     }
 }
 
-//not sure why some of these have Channel and some don't; should rectify?
-void Piano::keyPressed(int noteNumber, float velocity, int channel, bool soundfont, String source)
+// Add preparation map, return its Id.
+int Piano::addPreparationMap(void)
 {
-    // These 2 arrays will represent the targets of the pressed note. They will be set
-    // by checking each keymap that contains the note and enabling each of those keymaps'
-    // targets in these arrays. Check the bprocessor loop below for further explanation.
-    // We need both pressTargetStates and releaseTargetStates because keymap inversion
-    // and the ability to connect multiple keymaps to a preparation means one keypress
-    // can result in both a press and a release being sent to a preparation.
-    Array<KeymapTargetState> pressTargetStates;
-    Array<KeymapTargetState> releaseTargetStates;
+    PreparationMap::Ptr thisPreparationMap = new PreparationMap(processor.gallery->getKeymap(0), numPMaps);
     
-    // This will just act as a reference to either pressTargetStates of releaseTargetStates
-    // depending on whether a keymap is inverted
-    Array<KeymapTargetState>* targetStates;
+    prepMaps.add(thisPreparationMap);
     
-    // Initialize the target states as being disabled
-    pressTargetStates.ensureStorageAllocated(TargetTypeNil);
-    releaseTargetStates.ensureStorageAllocated(TargetTypeNil);
-    for (int i = 0; i < TargetTypeNil; i++)
-    {
-        pressTargetStates.add(TargetStateNil);
-        releaseTargetStates.add(TargetStateNil);
-    }
+    thisPreparationMap->prepareToPlay(sampleRate);
     
-    bool foundReattack = false;
-    bool foundSustain = false;
-    for (auto km : keymaps)
-    {
-        if (km->getAllMidiInputSources().contains(source))
-        {
-            if (km->getMidiEdit())
-            {
-                km->toggleNote(noteNumber);
-            }
-            if (km->containsNote(noteNumber))
-            {
-                if (km->isInverted()) foundSustain = true;
-                else foundReattack = true;
-            }
-        }
-    }
-    if (foundSustain) sustain(noteNumber, velocity, channel, soundfont);
-    if (foundReattack) reattack(noteNumber);
-    
-    for (auto proc : bprocessor)
-    {
-        // For each keymap
-        for (auto km : proc->getKeymaps())
-        {
-            // First check that the the keymap contain the pressed note and uses the midi source of the note
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                // targetStates will refer to press or release depending on inversion
-                targetStates = &pressTargetStates;
-                if (km->isInverted()) targetStates = &releaseTargetStates;
-                
-                // If the keymap has a target enabled, enable that target in targetStates
-                for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
-                {
-                    if (km->getTargetStates()[i] == TargetStateEnabled)
-                        targetStates->set(i, TargetStateEnabled);
-                }
-            }
-        }
-        // If there are any targets enabled, do the press and/or release
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
-            pressTargetStates.fill(TargetStateNil); /* reset for the next processor */}
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
-            releaseTargetStates.fill(TargetStateNil); /* reset for the next processor */}
-    }
-    
-    for (auto proc : tprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &pressTargetStates;
-                if (km->isInverted()) targetStates = &releaseTargetStates;
-                
-                if (km->getTargetStates()[TargetTypeTuning] == TargetStateEnabled)
-                    targetStates->set(TargetTypeTuning, TargetStateEnabled);
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
-    
-    for (auto proc : dprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &pressTargetStates;
-                if (km->isInverted()) targetStates = &releaseTargetStates;
-                
-                if (km->getTargetStates()[TargetTypeDirect] == TargetStateEnabled)
-                    targetStates->set(TargetTypeDirect, TargetStateEnabled);
-            }
-        }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
-            proc->keyReleased(noteNumber, velocity, channel, soundfont);
-            releaseTargetStates.fill(TargetStateNil); }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, channel);
-            pressTargetStates.fill(TargetStateNil); }
-    }
-    
-    for (auto proc : sprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &pressTargetStates;
-                if (km->isInverted()) targetStates = &releaseTargetStates;
-                
-                for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
-                {
-                    if (km->getTargetStates()[i] == TargetStateEnabled)
-                        targetStates->set(i, TargetStateEnabled);
-                }
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, pressTargetStates);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
-    
-    for (auto proc : nprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &pressTargetStates;
-                if (km->isInverted()) targetStates = &releaseTargetStates;
-                
-                if (km->getTargetStates()[TargetTypeNostalgic] == TargetStateEnabled)
-                    targetStates->set(TargetTypeNostalgic, TargetStateEnabled);
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, channel);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, velocity, channel);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
-    
-    for (auto proc : mprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &pressTargetStates;
-                if (km->isInverted()) targetStates = &releaseTargetStates;
-                
-                if (km->getTargetStates()[TargetTypeTempo] == TargetStateEnabled)
-                    targetStates->set(TargetTypeTempo, TargetStateEnabled);
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, channel);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
-    // PERFORM MODIFICATION STUFF
+    return prepMaps.size() - 1;
 }
 
-
-void Piano::keyReleased(int noteNumber, float velocity, int channel, bool soundfont, String source)
+// Add preparation map, return its Id.
+int Piano::addPreparationMap(Keymap::Ptr keymap)
 {
+    PreparationMap::Ptr thisPreparationMap = new PreparationMap(keymap, numPMaps);
     
-    //DBG("Piano::keyReleased : " + String(noteNumber));
+    prepMaps.add(thisPreparationMap);
     
-    Array<KeymapTargetState> pressTargetStates;
-    Array<KeymapTargetState> releaseTargetStates;
-    Array<KeymapTargetState>* targetStates;
-    pressTargetStates.ensureStorageAllocated(TargetTypeNil);
-    releaseTargetStates.ensureStorageAllocated(TargetTypeNil);
-    for (int i = 0; i < TargetTypeNil; i++)
-    {
-        pressTargetStates.add(TargetStateNil);
-        releaseTargetStates.add(TargetStateNil);
-    }
+    thisPreparationMap->prepareToPlay(sampleRate);
     
-    bool foundReattack = false;
-    bool foundSustain = false;
-    for (auto km : keymaps)
-    {
-        if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-        {
-            if (km->isInverted()) foundReattack = true;
-            else foundSustain = true;
-        }
-    }
-    if (foundSustain) sustain(noteNumber, velocity, channel, soundfont);
-    if (foundReattack) reattack(noteNumber);
-    
-    for (auto proc : dprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &releaseTargetStates;
-                if (km->isInverted()) targetStates = &pressTargetStates;
-                
-                if (km->getTargetStates()[TargetTypeDirect] == TargetStateEnabled)
-                    targetStates->set(TargetTypeDirect, TargetStateEnabled);
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, channel);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
-            proc->keyReleased(noteNumber, velocity, channel, soundfont);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
-    
-    for (auto proc : tprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &releaseTargetStates;
-                if (km->isInverted()) targetStates = &pressTargetStates;
-                
-                if (km->getTargetStates()[TargetTypeTuning] == TargetStateEnabled)
-                    targetStates->set(TargetTypeTuning, TargetStateEnabled);
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
-    
-    for (auto proc : sprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &releaseTargetStates;
-                if (km->isInverted()) targetStates = &pressTargetStates;
-                
-                for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
-                {
-                    if (km->getTargetStates()[i] == TargetStateEnabled)
-                        targetStates->set(i, TargetStateEnabled);
-                }
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, pressTargetStates);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
-    
-    for (auto proc : nprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &releaseTargetStates;
-                if (km->isInverted()) targetStates = &pressTargetStates;
-                
-                if (km->getTargetStates()[TargetTypeNostalgic] == TargetStateEnabled)
-                    targetStates->set(TargetTypeNostalgic, TargetStateEnabled);
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, channel);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, velocity, channel);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
-    
-    for (auto proc : bprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &releaseTargetStates;
-                if (km->isInverted()) targetStates = &pressTargetStates;
-                
-                for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
-                {
-                    if (km->getTargetStates()[i] == TargetStateEnabled)
-                        targetStates->set(i, TargetStateEnabled);
-                }
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
-    
-    for (auto proc : mprocessor)
-    {
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNote(noteNumber) && km->getAllMidiInputSources().contains(source))
-            {
-                targetStates = &releaseTargetStates;
-                if (km->isInverted()) targetStates = &pressTargetStates;
-                
-                if (km->getTargetStates()[TargetTypeTempo] == TargetStateEnabled)
-                    targetStates->set(TargetTypeTempo, TargetStateEnabled);
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, channel);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
+    return prepMaps.size()-1;
 }
 
-
-
-void Piano::postRelease(int noteNumber, float velocity, int channel, String source)
+PreparationMap::Ptr        Piano::getPreparationMapWithPreparation(BKPreparationType type, int Id)
 {
-    DBG("Piano::postRelease " + String(noteNumber));
-    
-    Array<KeymapTargetState> targetStates;
-    targetStates.ensureStorageAllocated(TargetStateNil);
-    for (int i = 0; i < TargetTypeNil; i++)
+    PreparationMap::Ptr thisPMap = nullptr;
+    for (auto pmap : prepMaps)
     {
-        targetStates.add(TargetStateNil);
-    }
-    
-    for (auto km : keymaps)
-    {
-        if (km->containsNote(noteNumber))
+        if (type == PreparationTypeDirect)
         {
-            for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
-        }
-    }
-    
-    if(sustainPedalIsDepressed && targetStates.contains(TargetStateEnabled))
-    {
-        SustainedNote newNote;
-        newNote.noteNumber = noteNumber;
-        newNote.velocity = velocity;
-        newNote.channel = channel;
-        DBG("storing sustained note " + String(noteNumber));
-        
-        sustainedNotes.add(newNote);
-    }
-    
-    if (targetStates.contains(TargetStateEnabled))
-    {
-        for (auto proc : dprocessor)
-        {
-            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel);
-            //proc->keyReleased(noteNumber, velocity, channel);
-        }
-        
-        for (auto proc : tprocessor)
-        {
-            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber);
-        }
-        
-        for (auto proc : nprocessor)
-        {
-            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, true);
-        }
-        
-        for (auto proc : mprocessor)
-        {
-            proc->keyReleased(noteNumber, velocity);
-        }
-    }
-}
-
-void Piano::reattack(int noteNumber)
-{
-    if(sustainPedalIsDepressed)
-    {
-        //DBG("removing sustained note " + String(noteNumber));
-        
-        for(int i=0; i<sustainedNotes.size(); i++)
-        {
-            if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber)
-                sustainedNotes.remove(i);
-        }
-    }
-}
-
-void Piano::sustain(int noteNumber, float velocity, int channel, bool soundfont)
-{
-    if(sustainPedalIsDepressed)
-    {
-        SustainedNote newNote;
-        newNote.noteNumber = noteNumber;
-        newNote.velocity = velocity;
-        newNote.channel = channel;
-        //DBG("storing sustained note " + String(noteNumber));
-        
-        sustainedNotes.add(newNote);
-        
-        if (!soundfont)
-        {
-            //play hammers and resonance when keys are released, even with pedal down
-            for (auto proc : dprocessor)
+            if (pmap->getDirectProcessor(Id) != nullptr)
             {
-                proc->playReleaseSample(noteNumber, velocity, channel);
+                thisPMap = pmap;
+                break;
+            }
+        }
+        else if (type == PreparationTypeSynchronic)
+        {
+            if (pmap->getSynchronicProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
+            }
+        }
+        else if (type == PreparationTypeNostalgic)
+        {
+            if (pmap->getNostalgicProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
+            }
+        }
+        else if (type == PreparationTypeBlendronic)
+        {
+            if (pmap->getBlendronicProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
+            }
+        }
+        else if (type == PreparationTypeTempo)
+        {
+            if (pmap->getTempoProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
+            }
+        }
+        else if (type == PreparationTypeTuning)
+        {
+            if (pmap->getTuningProcessor(Id) != nullptr)
+            {
+                thisPMap = pmap;
+                break;
             }
         }
     }
+    return thisPMap;
 }
 
-
-void Piano::clearKey(int noteNumber)
+PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(int keymapId)
 {
-    if(sustainPedalIsDepressed)
+    PreparationMap::Ptr thisPMap = nullptr;
+    for (auto pmap : prepMaps)
     {
-        for(int i=0; i<sustainedNotes.size(); i++)
+        if (pmap->getKeymap(keymapId) != nullptr)
         {
-            if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber)
-                sustainedNotes.remove(i);
+            thisPMap = pmap;
+            break;
         }
     }
+    return thisPMap;
 }
 
-void Piano::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool post)
+int Piano::removePreparationMap(int Id)
 {
-    sustainPedalIsDepressed = false;
-    
-    Array<KeymapTargetState> targetStates;
-    targetStates.ensureStorageAllocated(TargetStateNil);
-    for (int i = 0; i < TargetTypeNil; i++)
+    for (int i = prepMaps.size(); --i >= 0; )
     {
-        targetStates.add(TargetStateNil);
-    }
-    
-    //do all keyReleased calls now
-    for(int n=0; n<sustainedNotes.size(); n++)
-    {
-        SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
-        
-        DBG(releaseNote.noteNumber);
-        
-        targetStates.fill(TargetStateNil);
-        
-        for (auto km : keymaps)
+        if (prepMaps[i]->getId() == Id)
         {
-            if (km->containsNote(releaseNote.noteNumber))
-            {
-                for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
-            }
-        }
-        
-        for (auto proc : dprocessor)
-        {
-            if(!keysThatAreDepressed.getUnchecked(releaseNote.noteNumber)) //don't turn off note if key is down!
-                proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
-        }
-        
-        for (auto proc : tprocessor)
-        {
-            proc->keyReleased(releaseNote.noteNumber);
-        }
-        
-        for (auto proc : sprocessor)
-        {
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel, targetStates);
-        }
-        
-        for (auto proc : nprocessor)
-        {
-            //DBG("nostalgic sustainPedalReleased " + String((int)post));
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
-        }
-        
-        for (auto proc : bprocessor)
-        {
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel, targetStates);
+            prepMaps.remove(i);
+            break;
         }
     }
     
-    sustainedNotes.clearQuick();
+    --numPMaps;
+    
+    return numPMaps;
 }
 
-void Piano::sustainPedalReleased(bool post)
+// Add preparation map, return its Id.
+int Piano::removePreparationMapWithKeymap(int Id)
 {
-    sustainPedalIsDepressed = false;
-    
-    Array<KeymapTargetState> targetStates;
-    targetStates.ensureStorageAllocated(TargetStateNil);
-    for (int i = 0; i < TargetTypeNil; i++)
+    for (int i = prepMaps.size(); --i >= 0; )
     {
-        targetStates.add(TargetStateNil);
-    }
-    
-    //do all keyReleased calls now
-    for(int n=0; n<sustainedNotes.size(); n++)
-    {
-        SustainedNote releaseNote = sustainedNotes.getUnchecked(n);
-        
-        targetStates.fill(TargetStateNil);
-        
-        for (auto km : keymaps)
+        if (prepMaps[i]->getKeymap(Id) != nullptr)
         {
-            if (km->containsNote(releaseNote.noteNumber))
-            {
-                for (auto state : km->getTargetStates()) if (state == TargetStateEnabled) targetStates = state;
-            }
-        }
-        
-        for (auto proc : dprocessor)
-        {
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel);
-        }
-        
-        for (auto proc : tprocessor)
-        {
-            proc->keyReleased(releaseNote.noteNumber);
-        }
-        
-        for (auto proc : sprocessor)
-        {
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel, targetStates);
-        }
-        
-        for (auto proc : nprocessor)
-        {
-            //DBG("nostalgic sustainPedalReleased " + String((int)post));
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
-        }
-        
-        for (auto proc : bprocessor)
-        {
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel, targetStates);
+            prepMaps.remove(i);
+            break;
         }
     }
     
-    sustainedNotes.clearQuick();
+    --numPMaps;
+    
+    return numPMaps;
 }
 
-void Piano::processBlock(AudioSampleBuffer& buffer, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic)
+// Add preparation map, return its Id.
+int Piano::removeLastPreparationMap(void)
 {
-    sampleType = type;
-    if(onlyNostalgic) {
-        for (auto nproc : nprocessor)
-            nproc->processBlock(numSamples, midiChannel, sampleType);
-    }
+    prepMaps.remove((numPMaps-1));
     
-    else
-    {
-        for (auto dproc : dprocessor)
-        {
-            dproc->processBlock(numSamples, midiChannel, sampleType);
-        }
-        
-        for (auto sproc : sprocessor)
-        {
-            sproc->processBlock(numSamples, midiChannel, sampleType);
-        }
-        
-        for (auto nproc : nprocessor)
-        {
-            nproc->processBlock(numSamples, midiChannel, sampleType);
-        }
-        
-        for (auto tproc : tprocessor)
-            tproc->processBlock(numSamples);
-        
-        for (auto mproc : mprocessor)
-            mproc->processBlock(numSamples, midiChannel);
-        
-        for (auto bproc : bprocessor)
-            bproc->processBlock(numSamples, midiChannel);
-    }
+    --numPMaps;
+
+    return numPMaps;
 }
 
 
