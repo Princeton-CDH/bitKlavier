@@ -150,14 +150,14 @@ void BlendronicProcessor::tick(float* outputs)
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
+    
+    if (!blendronicActive) return;
 
     // Update the pulse length in case tempo or subdiv changed
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
     // Update numSamplesBeat in case pulseLength changed
     numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
-    if (pulseLength == INFINITY) numSamplesBeat == INFINITY;
-    
-    if (!blendronicActive) return;
+    if (pulseLength == INFINITY) numSamplesBeat = INFINITY;
 
     // Check for beat change
     if (sampleTimer >= numSamplesBeat)
@@ -240,22 +240,25 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     bool doOpenCloseInput = targetStates[TargetTypeBlendronicOpenCloseInput] == TargetStateEnabled;
     bool doOpenCloseOutput = targetStates[TargetTypeBlendronicOpenCloseOutput] == TargetStateEnabled;
     
+    // DBG("doPatternSync = " + String((int)doPatternSync) + " doBeatSync = " + String((int)doBeatSync));
+    
     if (doPatternSync &&
         (prep->getTargetTypeBlendronicPatternSync() == NoteOn || prep->getTargetTypeBlendronicPatternSync() == Both))
     {
         // Reset the phase of all params and update values
-        setSampleTimer(0);
+        // setSampleTimer(0);
         setBeatIndex(0);
         setDelayIndex(0);
         setSmoothIndex(0);
         setFeedbackIndex(0);
-        beatPositionsInBuffer.clear();
-        beatPositionsInBuffer.add(delay->getCurrentSample());
-        pulseOffset = delay->getCurrentSample();
-        beatPositionsIndex = 0;
-        updateDelayParameters();
+        // beatPositionsInBuffer.clear();
+        // beatPositionsInBuffer.add(delay->getCurrentSample());
+        // pulseOffset = delay->getCurrentSample();
+        // beatPositionsIndex = 0;
+        // updateDelayParameters();
     }
-    else if (doBeatSync && (prep->getTargetTypeBlendronicBeatSync() == NoteOn || prep->getTargetTypeBlendronicBeatSync() == Both))
+    else if (doBeatSync &&
+             (prep->getTargetTypeBlendronicBeatSync() == NoteOn || prep->getTargetTypeBlendronicBeatSync() == Both))
     {
         // Sync to the next beat
         setSampleTimer(numSamplesBeat);
@@ -310,16 +313,16 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
         (prep->getTargetTypeBlendronicPatternSync() == NoteOff || prep->getTargetTypeBlendronicPatternSync() == Both))
     {
         // Reset the phase of all params and update values
-        setSampleTimer(0);
+        // setSampleTimer(0);
         setBeatIndex(0);
         setDelayIndex(0);
         setSmoothIndex(0);
         setFeedbackIndex(0);
-        beatPositionsInBuffer.clear();
-        beatPositionsInBuffer.add(delay->getCurrentSample());
-        pulseOffset = delay->getCurrentSample();
-        beatPositionsIndex = 0;
-        updateDelayParameters();
+        // beatPositionsInBuffer.clear();
+        // beatPositionsInBuffer.add(delay->getCurrentSample());
+        // pulseOffset = delay->getCurrentSample();
+        // beatPositionsIndex = 0;
+        // updateDelayParameters();
     }
     else if (doBeatSync && (prep->getTargetTypeBlendronicBeatSync() == NoteOff || prep->getTargetTypeBlendronicBeatSync() == Both))
     {
