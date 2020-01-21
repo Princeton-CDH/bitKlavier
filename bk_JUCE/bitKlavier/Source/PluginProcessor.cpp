@@ -1341,6 +1341,9 @@ void BKAudioProcessor::initializeGallery(void)
         defPiano = gallery->getPianos().getFirst()->getId();
         currentPiano = gallery->getPiano(defPiano);
     }
+
+    // need to call before configure to ensure sampleRate is set for all pianos
+    gallery->prepareToPlay(getSampleRate()); 
     
     for (auto piano : gallery->getPianos())
     {
@@ -1348,7 +1351,8 @@ void BKAudioProcessor::initializeGallery(void)
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
     }
     
-    gallery->prepareToPlay(getSampleRate());
+    // need to call after configure to ensure prepareToPlay is called for every processor
+    gallery->prepareToPlay(getSampleRate()); 
     
     updateUI();
     
