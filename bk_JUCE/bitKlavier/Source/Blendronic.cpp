@@ -152,13 +152,12 @@ void BlendronicProcessor::tick(float* outputs)
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
     if (!blendronicActive) return;
+    if (tempoPrep->getSubdivisions() * tempoPrep->getTempo() == 0) return;
 
     // Update the pulse length in case tempo or subdiv changed
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-    // Update numSamplesBeat in case pulseLength changed
-    numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
-    if (pulseLength == INFINITY) numSamplesBeat = INFINITY;
-
+    if (pulseLength != prevPulseLength) numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
+    
     // Check for beat change
     if (sampleTimer >= numSamplesBeat)
     {
@@ -197,16 +196,17 @@ void BlendronicProcessor::tick(float* outputs)
         // Update numSamplesBeat for the new beat and reset sampleTimer
         numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
         sampleTimer = 0;
+        
+        updateDelayParameters();
     }
-    if (numSamplesBeat != INFINITY) sampleTimer++;
+    sampleTimer++;
 
-    if (numSamplesBeat != prevNumSamplesBeat)
+    if (pulseLength != prevPulseLength)
     {
         // Set parameters of the delay object
         updateDelayParameters();
     }
     prevPulseLength = pulseLength;
-    prevNumSamplesBeat = numSamplesBeat;
     
     // Tick the delay
     delay->tick(outputs);
@@ -247,10 +247,10 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     {
         // Reset the phase of all params and update values
         // setSampleTimer(0);
-        setBeatIndex(0);
-        setDelayIndex(0);
-        setSmoothIndex(0);
-        setFeedbackIndex(0);
+        setBeatIndex(prep->getBeats().size());
+        setDelayIndex(prep->getDelayLengths().size());
+        setSmoothIndex(prep->getSmoothLengths().size());
+        setFeedbackIndex(prep->getFeedbackCoefficients().size());
         // beatPositionsInBuffer.clear();
         // beatPositionsInBuffer.add(delay->getCurrentSample());
         // pulseOffset = delay->getCurrentSample();

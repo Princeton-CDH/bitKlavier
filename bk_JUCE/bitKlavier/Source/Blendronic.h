@@ -659,7 +659,7 @@ private:
     int beatIndex, delayIndex, smoothIndex, feedbackIndex;
     
     // Values of previous step values for smoothing. Saved separately from param arrays to account for changes to the sequences
-    float prevBeat, prevDelay, prevPulseLength, prevNumSamplesBeat;
+    float prevBeat, prevDelay, prevPulseLength;
     
     // Flag to clear the delay line on the next beat
     bool clearDelayOnNextBeat;
