@@ -257,7 +257,8 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
         // beatPositionsIndex = 0;
         // updateDelayParameters();
     }
-    else if (doBeatSync &&
+    //else if (doBeatSync &&
+    if (doBeatSync &&
              (prep->getTargetTypeBlendronicBeatSync() == NoteOn || prep->getTargetTypeBlendronicBeatSync() == Both))
     {
         // Sync to the next beat
@@ -324,7 +325,8 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
         // beatPositionsIndex = 0;
         // updateDelayParameters();
     }
-    else if (doBeatSync && (prep->getTargetTypeBlendronicBeatSync() == NoteOff || prep->getTargetTypeBlendronicBeatSync() == Both))
+    if (doBeatSync &&
+        (prep->getTargetTypeBlendronicBeatSync() == NoteOff || prep->getTargetTypeBlendronicBeatSync() == Both))
     {
         // Sync to the next beat
         setSampleTimer(numSamplesBeat);
