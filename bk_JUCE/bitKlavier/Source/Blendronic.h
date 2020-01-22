@@ -577,11 +577,7 @@ public:
     inline const bool getActive() const noexcept { return blendronicActive; }
     inline const bool getInputState() const noexcept { return delay->getInputState(); }
     inline const bool getOutputState() const noexcept { return delay->getOutputState(); }
-    inline const float getPulseLengthInSamples() const noexcept 
-    { 
-        if (pulseLength == INFINITY) return INFINITY;
-        return pulseLength * sampleRate; 
-    }
+    inline const float getPulseLengthInSamples() const noexcept { return pulseLength * sampleRate; }
     inline const Array<uint64> getBeatPositionsInBuffer() const noexcept { return beatPositionsInBuffer; }
     inline const float getPulseOffset() const noexcept { return pulseOffset; }
     
@@ -602,6 +598,9 @@ public:
     inline const void setOutputState(bool inputState) { delay->setOutputState(inputState); }
     inline const void toggleOutput() { delay->toggleOutput(); }
 	inline void reset(void) { blendronic->aPrep->copy(blendronic->sPrep); }
+    
+    inline const bool getResetPhase() const noexcept { return resetPhase; }
+    inline const void setResetPhase(bool reset) { resetPhase = reset; }
     
     void tick(float* outputs);
     void updateDelayParameters();
@@ -669,6 +668,7 @@ private:
     int numBeatPositions; // Number of beat positions in the buffer and to be displayed
     int beatPositionsIndex; // Index of beat sample positions for adding/removing positions
     float pulseOffset; // Sample offset of the pulse grid from grid aligned with buffer start (used in display)
+    bool resetPhase;
     
     Array<float> delayLengthRecord;
     int delayLengthRecordInPoint;

@@ -628,6 +628,11 @@ void BlendronicPreparationEditor::timerCallback()
             delayLineDisplay.setPulseOffset(proc->getPulseOffset());
             delayLineDisplay.setMarkers(proc->getBeatPositionsInBuffer());
             delayLineDisplay.setPlayheads(Array<uint64>({proc->getCurrentSample(), proc->getDelayedSample()}));
+            if (proc->getResetPhase())
+            {
+                delayLineDisplay.resetPhase();
+                proc->setResetPhase(false);
+            }
             
             // dim target comboboxes that aren't activated by a Keymap
             for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)

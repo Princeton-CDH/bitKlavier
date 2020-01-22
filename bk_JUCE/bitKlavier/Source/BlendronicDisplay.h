@@ -40,18 +40,18 @@ public:
     
     inline void setMaxDelayLength (float maxDelay) { maxDelayLength = maxDelay; }
 
-    inline void setLineSpacing(float spacingInSamples)
+    inline void setLineSpacing(uint64 spacing)
     {
-        if (spacingInSamples == 0) return;
-        lineSpacingInBlocks = spacingInSamples * invInputSamplesPerBlock;
-        if (spacingInSamples == INFINITY) lineSpacingInBlocks = INFINITY;
+        if (spacing == 0) return;
+        lineSpacingInBlocks = spacing * invInputSamplesPerBlock;
     }
-    inline void setPulseOffset(float offset) { pulseOffset = offset * invInputSamplesPerBlock; }
+    inline void setPulseOffset(float off) { pulseOffset = off * invInputSamplesPerBlock; }
     inline void setVerticalZoom(float zoom) { verticalZoom = zoom; }
     inline void setHorizontalZoom(float zoom) { horizontalZoom = zoom; }
     inline void setMarkers(Array<uint64> m) { markers = m; }
     inline void clearMarkers() { markers.clear(); }
     inline void setPlayheads(Array<uint64> p) { playheads = p; }
+    inline void resetPhase() { offset = 0.0f; prevLevel = 0.0f; }
     
     void setColours (Colour backgroundColour, Colour waveformColour) noexcept;
     void setRepaintRate (int frequencyInHz);
@@ -73,6 +73,8 @@ private:
     int bufferSize, numBlocks, inputSamplesPerBlock;
     float invInputSamplesPerBlock;
     float lineSpacingInBlocks;
+    float currentLevel, prevLevel;
+    float scroll, offset;
     float pulseOffset;
     float verticalZoom, horizontalZoom;
     
@@ -91,6 +93,7 @@ private:
     BlendronicSmoothScale smoothScale;
     
     Array<uint64> markers, playheads;
+    uint64 prevPlayhead;
     Colour backgroundColour, waveformColour, markerColour, playheadColour;
     
     void timerCallback() override;

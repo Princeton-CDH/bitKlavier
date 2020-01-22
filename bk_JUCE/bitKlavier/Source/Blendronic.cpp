@@ -138,6 +138,16 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     
     keysDepressed = Array<int>();
     
+    BlendronicPreparation::Ptr prep = blendronic->aPrep;
+    delayLengthRecord.ensureStorageAllocated(prep->getDelayMax() * sampleRate);
+    for (int i = 0; i < prep->getDelayMax() * sampleRate; i++)
+    {
+        delayLengthRecord.add(0.0f);
+    }
+    delayLengthRecordInPoint = 0;
+    
+    resetPhase = false;
+    
     DBG("Create bproc");
 }
 
@@ -205,6 +215,7 @@ void BlendronicProcessor::tick(float* outputs)
     {
         // Set parameters of the delay object
         updateDelayParameters();
+        resetPhase = true;
     }
     prevPulseLength = pulseLength;
     
@@ -266,6 +277,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
         beatPositionsInBuffer.add(delay->getCurrentSample());
         pulseOffset = delay->getCurrentSample();
         beatPositionsIndex = 0;
+        resetPhase = true;
     }
     
     if (doClear &&
