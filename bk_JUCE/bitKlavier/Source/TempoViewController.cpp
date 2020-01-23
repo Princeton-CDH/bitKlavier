@@ -649,7 +649,8 @@ void TempoModificationEditor::highlightModedComponents()
 {
     TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
     
-    if(mod->getDirty(TempoBPM))           subSlider->setBright();
+    if(mod->getDirty(TempoBPM))           tempoSlider->setBright();
+    if(mod->getDirty(TempoSubdivisions))  subSlider->setBright();
     if(mod->getDirty(TempoSystem))        modeCB.setAlpha(1);
     if(mod->getDirty(AT1History))         AT1HistorySlider->setBright();
     if(mod->getDirty(AT1Subdivisions))    AT1SubdivisionsSlider->setBright();
