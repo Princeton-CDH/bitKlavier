@@ -36,7 +36,8 @@ public:
     void pushBuffer (const AudioSourceChannelInfo& bufferToPush);
     void pushBuffer (const float** channelData, int numChannels, int numSamples);
     void pushSample (const float* samplesForEachChannel, int numChannels);
-    void pushSmoothing (Array<float> sm);
+    void pushSmoothing (const AudioBuffer<float>& buffer);
+    void pushSmoothing (const float** d, int num);
     
     inline void setMaxDelayLength (float maxDelay) { maxDelayLength = maxDelay; }
 

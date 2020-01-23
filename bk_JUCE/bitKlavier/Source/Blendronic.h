@@ -573,7 +573,7 @@ public:
     inline BKSynthesiser* getSynth(void) const noexcept { return synth; }
     inline Array<int> getKeysDepressed(void) const noexcept { return keysDepressed; }
     inline const AudioBuffer<float> getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
-    inline const Array<float> getDelayLengthRecord() const noexcept { return delayLengthRecord; }
+    inline const AudioBuffer<float> getDelayLengthRecord() const noexcept { return delayLengthRecord; }
     inline const bool getActive() const noexcept { return blendronicActive; }
     inline const bool getInputState() const noexcept { return delay->getInputState(); }
     inline const bool getOutputState() const noexcept { return delay->getOutputState(); }
@@ -670,7 +670,7 @@ private:
     float pulseOffset; // Sample offset of the pulse grid from grid aligned with buffer start (used in display)
     bool resetPhase;
     
-    Array<float> delayLengthRecord;
+    AudioBuffer<float> delayLengthRecord;
     int delayLengthRecordInPoint;
 
 	JUCE_LEAK_DETECTOR(BlendronicProcessor);

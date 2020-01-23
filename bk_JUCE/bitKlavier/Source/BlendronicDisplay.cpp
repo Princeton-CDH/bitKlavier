@@ -199,18 +199,16 @@ void BlendronicDisplay::pushBuffer (const AudioSourceChannelInfo& buffer)
                                                buffer.numSamples);
 }
 
-void BlendronicDisplay::pushSample (const float* d, int numChannels)
+void BlendronicDisplay::pushSmoothing (const float** d, int num)
 {
-    numChannels = jmin (numChannels, channels.size());
-    
-    for (int i = 0; i < numChannels; ++i)
-        channels.getUnchecked(i)->pushSample (d[i]);
+    setNumBlocks(num*invInputSamplesPerBlock);
+    smoothing.getUnchecked(0)->pushSamples (d[0], num);
 }
 
-void BlendronicDisplay::pushSmoothing (Array<float> sm)
+void BlendronicDisplay::pushSmoothing (const AudioBuffer<float>& buffer)
 {
-    for (auto s : smoothing)
-        s->pushSamples (sm.getRawDataPointer(), sm.size());
+    pushSmoothing (buffer.getArrayOfReadPointers(),
+                   buffer.getNumSamples());
 }
 
 void BlendronicDisplay::setSamplesPerBlock (int newSamplesPerPixel) noexcept

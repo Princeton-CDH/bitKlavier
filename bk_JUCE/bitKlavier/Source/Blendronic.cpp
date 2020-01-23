@@ -139,11 +139,8 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     keysDepressed = Array<int>();
     
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
-    delayLengthRecord.ensureStorageAllocated(prep->getDelayMax() * sampleRate);
-    for (int i = 0; i < prep->getDelayMax() * sampleRate; i++)
-    {
-        delayLengthRecord.add(0.0f);
-    }
+    delayLengthRecord.setSize(1, prep->getDelayMax() * sampleRate);
+    delayLengthRecord.clear();
     delayLengthRecordInPoint = 0;
     
     resetPhase = false;
@@ -224,8 +221,8 @@ void BlendronicProcessor::tick(float* outputs)
     
     float dlr = 0.0f;
     if (pulseLength != INFINITY) dlr = delay->getDelayLength() / (pulseLength * sampleRate);
-    delayLengthRecord.set(delayLengthRecordInPoint++, dlr);
-    if (delayLengthRecordInPoint >= delayLengthRecord.size()) delayLengthRecordInPoint = 0;
+    delayLengthRecord.setSample(0, delayLengthRecordInPoint++, dlr);
+    if (delayLengthRecordInPoint >= delayLengthRecord.getNumSamples()) delayLengthRecordInPoint = 0;
 }
 
 void BlendronicProcessor::processBlock(int numSamples, int midiChannel)
@@ -385,11 +382,8 @@ void BlendronicProcessor::prepareToPlay(double sr)
     
     delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayMax(), sampleRate, true);
 
-    delayLengthRecord.ensureStorageAllocated(prep->getDelayMax() * sampleRate);
-    for (int i = 0; i < prep->getDelayMax() * sampleRate; i++)
-    {
-        delayLengthRecord.add(0.0f);
-    }
+    delayLengthRecord.setSize(1, prep->getDelayMax() * sampleRate);
+    delayLengthRecord.clear();
     delayLengthRecordInPoint = 0;
     
     beatPositionsInBuffer.ensureStorageAllocated(128);

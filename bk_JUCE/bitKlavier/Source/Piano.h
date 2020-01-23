@@ -103,13 +103,12 @@ public:
     
     inline int getId(void) { return Id; }
     
-    inline PreparationMap::CSPtrArr getPreparationMaps(void) { return prepMaps; }
+    inline PreparationMap::Ptr getPreparationMap(void) { return prepMap; }
     
     inline const String getName() const noexcept {return pianoName;}
     inline void setName(String n){pianoName = n;}
     
-    PreparationMap::Ptr         currentPMap;
-    PreparationMap::CSPtrArr    prepMaps;
+    PreparationMap::Ptr         prepMap;
     
     DirectProcessor::PtrArr              dprocessor;
     SynchronicProcessor::PtrArr          sprocessor;
@@ -134,7 +133,7 @@ public:
     inline TuningProcessor::PtrArr        getTuningProcessors(void) const noexcept { return tprocessor; }
     inline TempoProcessor::PtrArr         getTempoProcessors(void) const noexcept { return mprocessor; }
 	inline BlendronicProcessor::PtrArr  getBlendronicProcessors(void) const noexcept { return bprocessor; }
-    inline PreparationMap::CSPtrArr       getPreparationMaps(void) const noexcept { return prepMaps; }
+    inline PreparationMap::Ptr       getPreparationMaps(void) const noexcept { return prepMap; }
     
     NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
     SynchronicProcessor::Ptr    addSynchronicProcessor(int thisId);
