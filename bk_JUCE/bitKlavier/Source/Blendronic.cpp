@@ -139,7 +139,11 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     keysDepressed = Array<int>();
     
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
+    
     DBG("BlendronicProcessor::BlendronicProcessor sampleRate = " + String(sampleRate) + " bMain->getSampleRate() = " + String(bMain->getSampleRate()));
+    
+    // sometimes prepareToPlay gets a spurious sampleRate; we should track this down, but we can also
+    // get the sr from the Synthesizer
     if (sampleRate > 0 && sampleRate <= 352800) delayLengthRecord.setSize(1, prep->getDelayMax() * sampleRate);
     else delayLengthRecord.setSize(1, prep->getDelayMax() * bMain->getSampleRate());
     delayLengthRecord.clear();
