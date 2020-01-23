@@ -139,8 +139,8 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     keysDepressed = Array<int>();
     
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
-    if (prep->getDelayMax() > 0) delayLengthRecord.setSize(1, prep->getDelayMax() * sampleRate);
-    else delayLengthRecord.setSize(1, 5.0 * sampleRate);
+    if (sampleRate > 0) delayLengthRecord.setSize(1, prep->getDelayMax() * sampleRate);
+    else delayLengthRecord.setSize(1, 5.0 * 44100);
     delayLengthRecord.clear();
     delayLengthRecordInPoint = 0;
     
