@@ -140,8 +140,8 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     DBG("BlendronicProcessor::BlendronicProcessor sampleRate = " + String(sampleRate) + " bMain->getSampleRate() = " + String(bMain->getSampleRate()));
-    if (sampleRate > 0) delayLengthRecord.setSize(1, prep->getDelayMax() * sampleRate);
-    else delayLengthRecord.setSize(1, 5.0 * bMain->getSampleRate());
+    if (sampleRate > 0 && sampleRate <= 352800) delayLengthRecord.setSize(1, prep->getDelayMax() * sampleRate);
+    else delayLengthRecord.setSize(1, prep->getDelayMax() * bMain->getSampleRate());
     delayLengthRecord.clear();
     delayLengthRecordInPoint = 0;
     
