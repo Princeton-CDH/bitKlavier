@@ -476,10 +476,68 @@ void SynchronicViewController::displayTab(int tab)
         targetControlsGroup.setVisible(true);
         
         Rectangle<int> area (getBounds());
+        area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+    
         area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
         area.removeFromRight(rightArrow.getWidth());
         area.removeFromLeft(leftArrow.getWidth());
+        
+        area.removeFromTop((area.getHeight() - (targetControlCBs.size() / 2) * (gComponentComboBoxHeight + gYSpacing)) / 3.);
+        
+        // make four columns
+        // textlabel | combobox | combobox | textlabel
     
+        int wideColumnWidth = area.getWidth() * 0.3;
+        int narrowColumnWidth = area.getWidth() * 0.2;
+        
+        Rectangle<int> column1 (area.removeFromLeft(wideColumnWidth));
+        column1.removeFromRight(processor.paddingScalarX * 5);
+        column1.removeFromLeft(processor.paddingScalarX * 20);
+        
+        Rectangle<int> column2 (area.removeFromLeft(narrowColumnWidth));
+        column2.removeFromRight(processor.paddingScalarX * 5);
+        column2.removeFromLeft(processor.paddingScalarX * 20);
+        
+        Rectangle<int> column4 (area.removeFromRight(wideColumnWidth));
+        column4.removeFromRight(processor.paddingScalarX * 20);
+        column4.removeFromLeft(processor.paddingScalarX * 5);
+        
+        Rectangle<int> column3 (area.removeFromRight(narrowColumnWidth));
+        column3.removeFromRight(processor.paddingScalarX * 20);
+        column3.removeFromLeft(processor.paddingScalarX * 5);
+        
+        
+        for (int i=0; i<targetControlCBs.size() / 2; i++)
+        {
+            targetControlCBs[i]->setLookAndFeel(&buttonsAndMenusLAF);
+            
+            targetControlCBs[i]->setBounds(column2.removeFromTop(gComponentComboBoxHeight));
+            column2.removeFromTop(gYSpacing);
+            
+            targetControlCBLabels[i]->setBounds(column1.removeFromTop(gComponentComboBoxHeight));
+            column1.removeFromTop(gYSpacing);
+            
+            targetControlCBLabels[i]->setJustificationType(juce::Justification::centredRight);
+        }
+        
+        for (int i=targetControlCBs.size() / 2; i<targetControlCBs.size(); i++)
+        {
+            targetControlCBs[i]->setLookAndFeel(&comboBoxRightJustifyLAF);
+            
+            targetControlCBs[i]->setBounds(column3.removeFromTop(gComponentComboBoxHeight));
+            column3.removeFromTop(gYSpacing);
+            
+            targetControlCBLabels[i]->setBounds(column4.removeFromTop(gComponentComboBoxHeight));
+            column4.removeFromTop(gYSpacing);
+        }
+        
+        targetControlsGroup.setBounds(targetControlCBLabels[0]->getX() - 4 * gXSpacing,
+                                      targetControlCBLabels[0]->getY() - gComponentComboBoxHeight - 2 * gXSpacing,
+                                      targetControlCBLabels[targetControlCBs.size() - 1]->getRight() - targetControlCBLabels[0]->getX() + 8 * gXSpacing,
+                                      //column1.getWidth() + column2.getWidth() + column3.getWidth() + column4.getWidth() + 8 * gXSpacing,
+                                      targetControlCBs[0]->getHeight() * (targetControlCBs.size() / 2) + 2 * gComponentComboBoxHeight + 4 * gYSpacing);
+        
+        /*
         Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth() * 0.5));
         leftColumn.removeFromLeft(leftColumn.getWidth() * 0.5 * processor.paddingScalarX);
         
@@ -506,6 +564,7 @@ void SynchronicViewController::displayTab(int tab)
                                       targetControlCBs[0]->getY() - gComponentComboBoxHeight - 2 * gXSpacing,
                                       targetControlCBs[0]->getWidth() * 2 + 8 * gXSpacing,
                                       targetControlCBs[0]->getHeight() * targetControlCBs.size() + 2 * gComponentComboBoxHeight + 4 * gYSpacing);
+         */
     }
 }
 
