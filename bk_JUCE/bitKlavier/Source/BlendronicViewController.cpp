@@ -429,7 +429,7 @@ BlendronicViewController(p, theGraph)
     
     gainSlider->addMyListener(this);
     
-    startTimer(20);
+    startTimer(10);
 }
 
 void BlendronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)

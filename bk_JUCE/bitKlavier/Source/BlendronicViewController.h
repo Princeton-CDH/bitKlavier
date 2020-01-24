@@ -59,17 +59,6 @@ protected:
     }
     
     BKEditableComboBox selectCB;
-//    BKComboBox smoothModeSelectCB;
-//    BKComboBox syncModeSelectCB;
-//    BKComboBox clearModeSelectCB;
-//    BKComboBox openModeSelectCB;
-//    BKComboBox closeModeSelectCB;
-    
-//    BKLabel smoothModeLabel;
-//    BKLabel syncModeLabel;
-//    BKLabel clearModeLabel;
-//    BKLabel openModeLabel;
-//    BKLabel closeModeLabel;
     
     BKTextButton pulseBeatSmooth;
     BKTextButton constantFullSmooth;

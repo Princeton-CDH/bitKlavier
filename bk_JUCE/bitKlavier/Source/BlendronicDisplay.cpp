@@ -71,9 +71,9 @@ struct BlendronicDisplay::ChannelInfo
 BlendronicDisplay::BlendronicDisplay ()
 : bufferSize(0),
 numBlocks (1024),
-inputSamplesPerBlock (256),
-invInputSamplesPerBlock (1./256.),
-lineSpacingInBlocks(256),
+inputSamplesPerBlock (512),
+invInputSamplesPerBlock (1./512),
+lineSpacingInBlocks(128),
 currentLevel(0.0),
 prevLevel(0.0),
 scroll(0.0),
@@ -123,9 +123,9 @@ playheadColour (Colours::mediumpurple)
 BlendronicDisplay::BlendronicDisplay (int initialNumChannels)
 : bufferSize(0),
 numBlocks (1024),
-inputSamplesPerBlock (256),
-invInputSamplesPerBlock (1./256.),
-lineSpacingInBlocks(256),
+inputSamplesPerBlock (512.),
+invInputSamplesPerBlock (1./512.),
+lineSpacingInBlocks(128),
 currentLevel(0.0),
 prevLevel(0.0),
 scroll(0.0),
@@ -177,6 +177,7 @@ void BlendronicDisplay::clear()
 void BlendronicDisplay::pushBuffer (const float** d, int numChannels, int num)
 {
     numChannels = jmin (numChannels, channels.size());
+    bufferSize = num;
     setNumBlocks(num*invInputSamplesPerBlock);
     
     for (int i = 0; i < numChannels; ++i)
@@ -201,6 +202,7 @@ void BlendronicDisplay::pushBuffer (const AudioSourceChannelInfo& buffer)
 
 void BlendronicDisplay::pushSmoothing (const float** d, int num)
 {
+    bufferSize = num;
     setNumBlocks(num*invInputSamplesPerBlock);
     smoothing.getUnchecked(0)->pushSamples (d[0], num);
 }
@@ -238,7 +240,7 @@ void BlendronicDisplay::setColours (Colour bk, Colour fg) noexcept
 void BlendronicDisplay::paint (Graphics& g)
 {
     // Get bounds for display components
-    auto displayBounds = getLocalBounds().toFloat();
+    auto displayBounds = getLocalBounds();
     auto horizontalZoomSliderBounds = displayBounds.removeFromBottom(getLocalBounds().getHeight()*0.05);
     horizontalZoomSliderBounds.removeFromRight(horizontalZoomSliderBounds.getHeight());
     auto verticalZoomSliderBounds = displayBounds.removeFromRight(horizontalZoomSliderBounds.getHeight()).removeFromTop(getLocalBounds().getHeight()*0.6);
@@ -251,14 +253,15 @@ void BlendronicDisplay::paint (Graphics& g)
     g.setColour (waveformColour);
     
     /*--------Drawing the pulse grid ----------*/
-    int n = channels[0]->levels.size();
+    float n = bufferSize * invInputSamplesPerBlock;
     
     currentLevel = playheads[0] * invInputSamplesPerBlock;
     if (prevLevel > currentLevel)
     {
-        offset = scroll + (n - prevLevel);
+        offset = (scroll + (n - prevLevel));
     }
     scroll = fmod(currentLevel + offset, lineSpacingInBlocks);
+    prevLevel = currentLevel;
     
     float leftLevel = n * horizontalZoom;
     float f = fmod(scroll - pulseOffset, lineSpacingInBlocks);
@@ -266,16 +269,16 @@ void BlendronicDisplay::paint (Graphics& g)
     {
         if (i >= f)
         {
-            float x = (n - 1 - i - leftLevel) * (gridBounds.getRight() - gridBounds.getX()) * (1. / (n - leftLevel)) + gridBounds.getX();
+            float x = (n - i - leftLevel) * (gridBounds.getRight() - gridBounds.getX()) * (1. / (n - leftLevel)) + gridBounds.getX();
             g.setColour(waveformColour.withMultipliedBrightness(0.4f));
-            g.fillRect(x, gridBounds.getY(), 1.0f, gridBounds.getHeight());
+            g.fillRect(x, gridBounds.toFloat().getY(), 1.0f, gridBounds.toFloat().getHeight());
             f += lineSpacingInBlocks;
         }
     }
     
     for (int i = 0; (i * smoothingBounds.getHeight() / (maxDelayLength * 1.25)) < smoothingBounds.getHeight(); i++)
     {
-        g.fillRect(smoothingBounds.getX(), smoothingBounds.getBottom() - (i * smoothingBounds.getHeight() / (maxDelayLength * 1.25)), smoothingBounds.getWidth(), 1.0f);
+        g.fillRect(smoothingBounds.toFloat().getX(), smoothingBounds.toFloat().getBottom() - (i * smoothingBounds.toFloat().getHeight() / (maxDelayLength * 1.25)), smoothingBounds.toFloat().getWidth(), 1.0f);
     }
     /*--------Drawing the markers --------------*/
     for (auto m : markers)
@@ -285,7 +288,7 @@ void BlendronicDisplay::paint (Graphics& g)
         (gridBounds.getRight() - gridBounds.getX()) * (1. / (n - leftLevel)) + gridBounds.getX();
         if (x < 1.0f) continue;
         g.setColour(markerColour);
-        g.fillRect(x, gridBounds.getY(), 1.0f, gridBounds.getHeight());
+        g.fillRect(x, gridBounds.toFloat().getY(), 1.0f, gridBounds.toFloat().getHeight());
     }
     /*------------------------------------------*/
     
@@ -311,7 +314,6 @@ void BlendronicDisplay::paint (Graphics& g)
         paintSmoothing (g, smoothingBounds.toFloat(),
                         s->levels.begin(), s->levels.size(), s->nextSample);
     }
-    prevLevel = currentLevel;
 }
 
 void BlendronicDisplay::getChannelAsPath (Path& path, const Range<float>* levels,
@@ -355,7 +357,7 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
     for (auto p : playheads)
     {
         if (p == playheads[0]) continue;
-        int offset = playheads[0] * invInputSamplesPerBlock;
+        float offset = playheads[0] * invInputSamplesPerBlock;
         float playheadLevel = p * invInputSamplesPerBlock;
         float x = (fmod(((playheadLevel - offset) + numLevels), numLevels) - leftLevel) *
             (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();

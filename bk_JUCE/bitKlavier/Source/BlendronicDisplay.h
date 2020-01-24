@@ -53,6 +53,7 @@ public:
     inline void clearMarkers() { markers.clear(); }
     inline void setPlayheads(Array<uint64> p) { playheads = p; }
     inline void resetPhase() { offset = 0.0f; prevLevel = 0.0f; }
+    inline void setDriftCorrection(float dc) { driftCorrection = dc; }
     
     void setColours (Colour backgroundColour, Colour waveformColour) noexcept;
     void setRepaintRate (int frequencyInHz);
@@ -75,7 +76,7 @@ private:
     float invInputSamplesPerBlock;
     float lineSpacingInBlocks;
     float currentLevel, prevLevel;
-    float scroll, offset;
+    float scroll, offset, driftCorrection;
     float pulseOffset;
     float verticalZoom, horizontalZoom;
     
