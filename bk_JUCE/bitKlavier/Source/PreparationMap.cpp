@@ -445,6 +445,13 @@ void PreparationMap::clearKey(int noteNumber)
 //not sure why some of these have Channel and some don't; should rectify?
 void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, bool soundfont, String source)
 {
+    Note pressedNote;
+    pressedNote.noteNumber = noteNumber;
+    pressedNote.velocity = velocity;
+    pressedNote.channel = channel;
+    pressedNote.source = source;
+    pressedNotes.add(pressedNote);
+    
     // These 2 arrays will represent the targets of the pressed note. They will be set
     // by checking each keymap that contains the note and enabling each of those keymaps'
     // targets in these arrays. Check the bprocessor loop below for further explanation.
@@ -631,9 +638,20 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
 }
 
 
-void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bool soundfont, String source)
+void PreparationMap::keyReleased(int noteNumber, float vel, int channel, bool soundfont, String source)
 {
-    
+    float velocity = vel;
+    for (int i = 0; i < pressedNotes.size(); i++)
+    {
+        if (pressedNotes.getUnchecked(i).noteNumber == noteNumber &&
+            pressedNotes.getUnchecked(i).channel == channel &&
+            pressedNotes.getUnchecked(i).source == source)
+        {
+            velocity = pressedNotes.getUnchecked(i).velocity;
+            pressedNotes.remove(i);
+            break;
+        }
+    }
     //DBG("PreparationMap::keyReleased : " + String(noteNumber));
     
     Array<KeymapTargetState> pressTargetStates;
@@ -909,7 +927,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, St
     
     if(sustainPedalIsDepressed && targetStates.contains(TargetStateEnabled))
     {
-        SustainedNote newNote;
+        Note newNote;
         newNote.noteNumber = noteNumber;
         newNote.velocity = velocity;
         newNote.channel = channel;
@@ -974,7 +992,7 @@ void PreparationMap::sustain(int noteNumber, float velocity, int channel, bool s
 {
     if(sustainPedalIsDepressed)
     {
-        SustainedNote newNote;
+        Note newNote;
         newNote.noteNumber = noteNumber;
         newNote.velocity = velocity;
         newNote.channel = channel;
