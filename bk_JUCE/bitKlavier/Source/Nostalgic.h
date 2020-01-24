@@ -121,11 +121,8 @@ public:
     clusterThreshold(150),
     velocityMin(0),
     velocityMax(127),
-<<<<<<< HEAD
+    keyOnReset(false),
     targetTypeNostalgicClear(NoteOn)
-=======
-    keyOnReset(false)
->>>>>>> 0649fa6241d2e38598dabf5f54c733aa4de55d7d
     {
 
     }
