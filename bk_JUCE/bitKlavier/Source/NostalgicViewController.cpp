@@ -1187,6 +1187,12 @@ void NostalgicModificationEditor::greyOutAllComponents()
     
     reverseADSRLabel.setAlpha(gModAlpha);
     undertowADSRLabel.setAlpha(gModAlpha);
+    
+    for (int i=0; i<targetControlCBs.size(); i++)
+    {
+        targetControlCBs[i]->setVisible(false);
+        targetControlCBLabels[i]->setVisible(false);
+    }
 }
 
 void NostalgicModificationEditor::highlightModedComponents()
