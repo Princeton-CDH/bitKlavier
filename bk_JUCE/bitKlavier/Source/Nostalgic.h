@@ -851,17 +851,20 @@ public:
     
     virtual ~NostalgicProcessor();
     
-    //called with every audio vector
+    // called with every audio vector
     BKSampleLoadType sampleType;
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
     
-    //begin timing played note length, called with noteOn
+    // begin timing played note length, called with noteOn
     void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel);
     
-    //begin playing reverse note, called with noteOff
+    // begin playing reverse note, called with noteOff
     void keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, bool post = false);
     
     void postRelease(int midiNoteNumber, int midiChannel);
+    
+    // clear all sounding Nostalgic notes
+    void clearAll();
     
     inline void attachToSynthesiser(BKSynthesiser* main)
     {

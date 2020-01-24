@@ -148,16 +148,16 @@ void BKDelayL::addSample(float input, unsigned long offset, int channel)
 
 //redo so it has channel argument, like addSample, also bool which indicates whether to increment inPoint
 //or, have it take float* input
-void BKDelayL::tick(float input, float* outputs, bool stereo)
+void BKDelayL::tick(float input, float* outputs, float outGain, bool stereo)
 {
 	inputs.addSample(0, inPoint, input * gain);
 	if (stereo) inputs.addSample(1, inPoint, input * gain);
 
-	lastFrameLeft = nextOutLeft();
+	lastFrameLeft = nextOutLeft() * outGain;
 	doNextOutLeft = true;
 	if (stereo)
 	{
-		lastFrameRight = nextOutRight();
+		lastFrameRight = nextOutRight() * outGain;
 		doNextOutRight = true;
 	}
 
@@ -254,7 +254,7 @@ void BlendronicDelay::addSample(float sampleToAdd, unsigned long offset, int cha
     if (dInputOpen) delayLinear->addSample(sampleToAdd, offset, channel);
 }
 
-void BlendronicDelay::tick(float* outputs)
+void BlendronicDelay::tick(float* outputs, float outGain)
 {
     float dummyOut[2];
     setDelayLength(dSmooth->tick());
@@ -267,11 +267,11 @@ void BlendronicDelay::tick(float* outputs)
     }
     if (dOutputOpen)
     {
-        delayLinear->tick(0, outputs, true);
+        delayLinear->tick(0, outputs, outGain, true);
         outputs[0] *= env;
         outputs[1] *= env;
     }
-    else delayLinear->tick(0, dummyOut, true);
+    else delayLinear->tick(0, dummyOut, outGain, true);
 }
 
 void BlendronicDelay::duckAndClear()

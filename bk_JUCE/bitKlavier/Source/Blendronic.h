@@ -86,6 +86,7 @@ public:
         if (dirty[BlendronicSmoothLengths]) bSmoothLengths = b->getSmoothLengths();
         if (dirty[BlendronicSmoothValues]) bSmoothValues = b->getSmoothValues();
         if (dirty[BlendronicFeedbackCoeffs]) bFeedbackCoefficients = b->getFeedbackCoefficients();
+        if (dirty[BlendronicOutGain]) outGain = b->getOutGain();
     }
     
 	bool compare(BlendronicPreparation::Ptr b);
@@ -103,6 +104,7 @@ public:
 	inline const Array<float> getSmoothValues() const noexcept { return bSmoothValues; }
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
 	inline const float getDelayMax() const noexcept { return bDelayMax; }
+    inline const float getOutGain() const noexcept { return outGain; }
 	
     inline const BlendronicSmoothBase getSmoothBase() const noexcept { return bSmoothBase; }
     inline const BlendronicSmoothScale getSmoothScale() const noexcept { return bSmoothScale; }
@@ -116,6 +118,7 @@ public:
 	inline void setFeedbackCoefficients(Array<float> feedbackCoefficients) { bFeedbackCoefficients.swapWith(feedbackCoefficients); }
     
     inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
+    inline void setOutGain(float og) { outGain = og; }
     
     inline void setBeat(int whichSlider, float value) { bBeats.set(whichSlider, value); }
     inline void setDelayLength(int whichSlider, float value) { bDelayLengths.set(whichSlider, value); }
@@ -196,6 +199,7 @@ public:
         prep.setProperty( ptagBlendronic_targetPausePlay, getTargetTypeBlendronicPausePlay(), 0);
         prep.setProperty( ptagBlendronic_targetOpenCloseInput, getTargetTypeBlendronicOpenCloseInput(), 0);
         prep.setProperty( ptagBlendronic_targetOpenCloseOutput, getTargetTypeBlendronicOpenCloseOutput(), 0);
+        prep.setProperty( ptagBlendronic_outGain, getOutGain(), 0);
 
         ValueTree beats(vtagBlendronic_beats);
         int count = 0;
@@ -262,6 +266,9 @@ public:
         
         i = e->getStringAttribute(ptagBlendronic_targetOpenCloseOutput).getIntValue();
         setTargetTypeBlendronicOpenCloseOutput((TargetNoteMode)i);
+        
+        f = e->getStringAttribute(ptagBlendronic_outGain).getFloatValue();
+        setOutGain(f);
 
         forEachXmlChildElement (*e, sub)
         {
@@ -353,17 +360,17 @@ private:
 	String name;
 	bool isActive;
 
-	//sequenced parameters
+	// sequenced parameters
 	Array<float> bBeats;
     Array<float> bDelayLengths;
     Array<float> bSmoothLengths;
 	Array<float> bSmoothValues;
 	Array<float> bFeedbackCoefficients;
 
-	//maximum delay in seconds
+	// maximum delay in seconds
 	float bDelayMax;
 
-	//dsmooth stuff
+	// dsmooth stuff
     BlendronicSmoothBase bSmoothBase;
     BlendronicSmoothScale bSmoothScale;
     
@@ -374,8 +381,11 @@ private:
     TargetNoteMode targetTypeBlendronicOpenCloseInput;
     TargetNoteMode targetTypeBlendronicOpenCloseOutput;
 
-	//signal chain stk classes
+	// signal chain stk classes
 	float bFeedbackCoefficient;
+    
+    // output gain
+    float outGain;
 
 	//needed for sampling
 //    float inputGain;

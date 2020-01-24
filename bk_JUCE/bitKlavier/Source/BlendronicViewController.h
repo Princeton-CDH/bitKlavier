@@ -91,6 +91,8 @@ protected:
 //    std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
 //    std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
     
+    std::unique_ptr<BKSingleSlider> gainSlider;
+    
     void displayTab(int tab) override;
     void displayShared(void) override;
     void invisible(void) override;

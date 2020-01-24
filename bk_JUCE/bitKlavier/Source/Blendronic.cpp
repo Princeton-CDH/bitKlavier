@@ -23,12 +23,14 @@ BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
 	bDelayMax(p->getDelayMax()),
     bSmoothBase(BlendronicSmoothPulse),
     bSmoothScale(BlendronicSmoothFull),
+    
     targetTypeBlendronicPatternSync(p->getTargetTypeBlendronicPatternSync()),
     targetTypeBlendronicBeatSync(p->getTargetTypeBlendronicBeatSync()),
     targetTypeBlendronicClear(p->getTargetTypeBlendronicClear()),
     targetTypeBlendronicPausePlay(p->getTargetTypeBlendronicPausePlay()),
     targetTypeBlendronicOpenCloseInput(p->getTargetTypeBlendronicOpenCloseInput()),
-    targetTypeBlendronicOpenCloseOutput(p->getTargetTypeBlendronicOpenCloseOutput())
+    targetTypeBlendronicOpenCloseOutput(p->getTargetTypeBlendronicOpenCloseOutput()),
+    outGain(p->getOutGain())
 {
 }
 
@@ -75,7 +77,8 @@ BlendronicPreparation::BlendronicPreparation(void) :
     targetTypeBlendronicClear(NoteOn),
     targetTypeBlendronicPausePlay(NoteOn),
     targetTypeBlendronicOpenCloseInput(NoteOn),
-    targetTypeBlendronicOpenCloseOutput(NoteOn)
+    targetTypeBlendronicOpenCloseOutput(NoteOn),
+    outGain(1.0)
 {
 }
 
@@ -96,12 +99,141 @@ void BlendronicPreparation::copy(BlendronicPreparation::Ptr b)
     targetTypeBlendronicPausePlay = b->getTargetTypeBlendronicPausePlay();
     targetTypeBlendronicOpenCloseInput = b->getTargetTypeBlendronicOpenCloseInput();
     targetTypeBlendronicOpenCloseOutput = b->getTargetTypeBlendronicOpenCloseOutput();
+    outGain = b->getOutGain();
 }
 
 //compares two blendronics
 bool BlendronicPreparation::compare(BlendronicPreparation::Ptr b)
 {
 	//will do later
+    /*
+     bool lens = true;
+     bool accents = true;
+     bool beats = true;
+     bool transp = true;
+     bool attack = true;
+     bool decay = true;
+     bool sustain = true;
+     bool release = true;
+     bool envelope = true;
+     
+     for (int i = s->getLengthMultipliers().size(); --i>=0;)
+     {
+         if (s->getLengthMultipliers()[i] != sLengthMultipliers[i])
+         {
+             lens = false;
+             break;
+             
+         }
+     }
+     
+     for (int i = s->getAccentMultipliers().size(); --i>=0;)
+     {
+         if (s->getAccentMultipliers()[i] != sAccentMultipliers[i])
+         {
+             accents = false;
+             break;
+             
+         }
+     }
+     
+     for (int i = s->getBeatMultipliers().size(); --i>=0;)
+     {
+         if (s->getBeatMultipliers()[i] != sBeatMultipliers[i])
+         {
+             beats = false;
+             break;
+             
+         }
+     }
+     
+     for (int i  = s->getTransposition().size(); --i >= 0;)
+     {
+         Array<float> transposition = s->getTransposition()[i];
+         for (int j = transposition.size(); --j >= 0;)
+         {
+             if (transposition[j] != sTransposition[i][j])
+             {
+                 transp = false;
+                 break;
+                 
+             }
+         }
+     }
+     
+     for (int i = s->getAttacks().size(); --i>=0;)
+     {
+         if (s->getAttacks()[i] != sAttacks[i])
+         {
+             attack = false;
+             break;
+         }
+     }
+     
+     for (int i = s->getDecays().size(); --i>=0;)
+     {
+         if (s->getDecays()[i] != sDecays[i])
+         {
+             decay = false;
+             break;
+         }
+     }
+     
+     for (int i = s->getSustains().size(); --i>=0;)
+     {
+         if (s->getSustains()[i] != sSustains[i])
+         {
+             sustain = false;
+             break;
+         }
+     }
+     
+     for (int i = s->getReleases().size(); --i>=0;)
+     {
+         if (s->getReleases()[i] != sReleases[i])
+         {
+             release = false;
+             break;
+         }
+     }
+     
+     for (int i = s->getEnvelopesOn().size(); --i>=0;)
+     {
+         if (s->getEnvelopesOn()[i] != envelopeOn[i])
+         {
+             envelope = false;
+             break;
+         }
+     }
+     
+     return (sNumBeats == s->getNumBeats() &&
+             sClusterMin == s->getClusterMin() &&
+             sClusterMax == s->getClusterMax() &&
+             sClusterCap == s->getClusterCap() &&
+             (sMode == s->getMode()) &&
+             transp && lens && accents && beats && attack && decay && sustain && release &&
+             sGain == s->getGain() &&
+             sClusterThresh == s->getClusterThreshMS() &&
+             sClusterThreshSec == s->getClusterThreshSEC() &&
+             sReleaseVelocitySetsSynchronic == s->getReleaseVelocitySetsSynchronic() &&
+             numClusters == s->getNumClusters() &&
+             onOffMode == s->getOnOffMode() &&
+             holdMin == s->getHoldMin() &&
+             holdMax == s->getHoldMax() &&
+             velocityMin == s->getVelocityMin() &&
+             velocityMax == s->getVelocityMax() &&
+             targetTypeSynchronicPatternSync == s->getTargetTypeSynchronicPatternSync() &&
+             targetTypeSynchronicBeatSync == s->getTargetTypeSynchronicBeatSync() &&
+             targetTypeSynchronicAddNotes == s->getTargetTypeSynchronicAddNotes() &&
+             targetTypeSynchronicPausePlay == s->getTargetTypeSynchronicPausePlay()) &&
+             targetTypeSynchronicClear == s->getTargetTypeSynchronicClear() &&
+             targetTypeSynchronicDeleteOldest == s->getTargetTypeSynchronicDeleteOldest() &&
+             targetTypeSynchronicDeleteNewest == s->getTargetTypeSynchronicDeleteNewest() &&
+             targetTypeSynchronicRotate == s->getTargetTypeSynchronicRotate() ;
+     
+     */
+    
+    
 	return false;
 }
 
@@ -156,6 +288,8 @@ BlendronicProcessor::~BlendronicProcessor()
     DBG("Destroy bproc");
 }
 
+// maybe not so important, but i see a lot of multiplies and divides in here and this
+// is called every sample, so it may be worth some effort to see if it can be streamlined
 void BlendronicProcessor::tick(float* outputs)
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
@@ -165,6 +299,7 @@ void BlendronicProcessor::tick(float* outputs)
     if (tempoPrep->getSubdivisions() * tempoPrep->getTempo() == 0) return;
 
     // Update the pulse length in case tempo or subdiv changed
+    // possible to put this behind conditional, so we aren't doing these operations ever tick?
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
     if (pulseLength != prevPulseLength) numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * synth->getSampleRate();
     
@@ -220,7 +355,7 @@ void BlendronicProcessor::tick(float* outputs)
     prevPulseLength = pulseLength;
     
     // Tick the delay
-    delay->tick(outputs);
+    delay->tick(outputs, prep->getOutGain());
     
     float dlr = 0.0f;
     if (pulseLength != INFINITY) dlr = delay->getDelayLength() / (pulseLength * synth->getSampleRate());

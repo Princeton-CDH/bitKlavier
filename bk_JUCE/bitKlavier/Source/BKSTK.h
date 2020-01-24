@@ -55,7 +55,7 @@ public:
 	float nextOutLeft();
 	float nextOutRight();
 	void addSample(float input, unsigned long offset, int channel);
-	void tick(float input, float* outputs, bool stereo = true);
+	void tick(float input, float* outputs, float outGain, bool stereo = true);
 	void scalePrevious(float coefficient, unsigned long offset, int channel);
     void clear();
     void reset();
@@ -191,7 +191,7 @@ public:
     inline const void setOutputState(bool outputState) { dOutputOpen = outputState; }
     inline const void toggleOutput() { dOutputOpen = !dOutputOpen; }
     
-    void tick(float* outputs);
+    void tick(float* outputs, float outGain);
     
     void duckAndClear();
     

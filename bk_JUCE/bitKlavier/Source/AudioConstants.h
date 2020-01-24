@@ -189,6 +189,7 @@ const String vtagBlendronic_smoothValues = "smoothValues";
 const String vtagBlendronic_feedbackCoefficients = "feedbackCoefficients";
 const String ptagBlendronic_smoothBase = "smoothBase";
 const String ptagBlendronic_smoothScale = "smoothScale";
+const String ptagBlendronic_outGain = "outGain";
 
 const String ptagBlendronic_targetPatternSync = "targetTypeBlendronicPatternSync";
 const String ptagBlendronic_targetBeatSync = "targetTypeBlendronicBeatSync";
@@ -791,6 +792,7 @@ typedef enum BlendronicParameterType
     BlendronicSmoothLengths,
     BlendronicSmoothValues,
     BlendronicFeedbackCoeffs,
+    BlendronicOutGain,
     BlendronicParameterTypeNil
 } BlendronicParameterType;
 
@@ -801,10 +803,6 @@ static const std::vector<BKParameterDataType> cBlendronicDataTypes = {
     BKFloatArr,
     BKFloatArr,
     BKFloatArr,
-    BKFloat,
-    BKFloat,
-    BKFloat,
-    BKFloat,
     BKFloat
 };
 
@@ -814,7 +812,8 @@ static const std::vector<std::string> cBlendronicParameterTypes = {
     "delay lengths",
     "smoothing (ms)",
     "smoothing (?)",
-    "feedback coefficients"
+    "feedback coefficients",
+    "output gain"
 };
 
 static const std::vector<std::vector<float>> cBlendronicDefaultRangeValuesAndInc = {
@@ -823,7 +822,8 @@ static const std::vector<std::vector<float>> cBlendronicDefaultRangeValuesAndInc
     { 0.0f, 8.0f, 4.0f, 0.1f },
     { 0.0f, 500.0f, 50.0f, 0.01f },
     { 0.0f, 1.0f, 0.1f, 0.0001f },
-    { 0.0f, 1.0f, 0.95f, 0.01f }
+    { 0.0f, 1.0f, 0.95f, 0.01f },
+    { 0.0f, 1.0f, 1.0f, 0.0001f }
 };
 
 #pragma mark - Tuning
