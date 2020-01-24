@@ -194,8 +194,6 @@ public:
 		DBG("Blendronic: " + intArrayToString(ps));
     }
     
-    void merge(PreparationMap::Ptr thatMap);
-    
 private:
     int Id;
     
@@ -217,14 +215,15 @@ private:
     
     bool sustainPedalIsDepressed;
 
-    struct SustainedNote
+    struct Note
     {
         int noteNumber;
         float velocity;
         int channel;
         String source;
     };
-    Array<SustainedNote> sustainedNotes;
+    Array<Note> sustainedNotes;
+    Array<Note> pressedNotes;
     
     
     JUCE_LEAK_DETECTOR(PreparationMap)
