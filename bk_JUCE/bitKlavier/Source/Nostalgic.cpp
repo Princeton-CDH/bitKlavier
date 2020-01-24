@@ -401,7 +401,13 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
 {
     NostalgicPreparation::Ptr prep = nostalgic->aPrep;
     
-    lastVelocity = midiNoteVelocity; 
+    lastVelocity = midiNoteVelocity;
+    
+    // for testing
+    if (midiNoteNumber == 60) {
+        clearAll();
+        return;
+    }
     
     if (prep->getMode() == SynchronicSync)
     {
@@ -565,6 +571,61 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
     noteOn.set(midiNoteNumber, true);
     velocities.set(midiNoteNumber, midiNoteVelocity);
     
+}
+
+// clear all sounding notes
+void NostalgicProcessor::clearAll()
+{
+    NostalgicPreparation::Ptr prep = nostalgic->aPrep;
+    
+    // REMOVE REVERSE NOTES
+    for (int i = reverseNotes.size(); --i >= 0;)
+    {
+        NostalgicNoteStuff* note = reverseNotes[i];
+        
+        if (note->isActive())
+        {
+            if (prep != nullptr)
+            {
+                for (auto transp : prep->getTransposition())
+                {
+                    DBG("reverse remove: " + String(note->getNoteNumber() + transp));
+                    synth->keyOff (0, //midichannel, ignore?
+                                   NostalgicNote,
+                                   nostalgic->getId(),
+                                   note->getNoteNumber(),
+                                   note->getNoteNumber()+transp,
+                                   64,
+                                   true,
+                                   true); // true for nostalgicOff
+                }
+            }
+            reverseNotes.remove(i);
+        }
+    }
+    
+    // REMOVE UNDERTOW NOTES
+    for (int i = undertowNotes.size(); --i >= 0;)
+    {
+        NostalgicNoteStuff* note = undertowNotes[i];
+        
+        if (prep != nullptr)
+        {
+            for (auto transp : prep->getTransposition())
+            {
+                DBG("undertow remove: " + String(note->getNoteNumber() + transp));
+                synth->keyOff (0, // midiChannel, ignored?
+                               NostalgicNote,
+                               nostalgic->getId(),
+                               note->getNoteNumber(),
+                               note->getNoteNumber() + transp,
+                               64,
+                               true, // THIS NEEDS TO BE FALSE ATM TO GET RID OF UNDERTOW NOTES : because our processsPiano doesn't distinguish between true keyOn/Offs from keyboard and these under the hood keyOn/Offs (which don't correspond with Off/On from keyboard)
+                               true); // true for nostalgicOff
+            }
+        }
+        undertowNotes.remove(i);
+    }
 }
 
 //main scheduling function
