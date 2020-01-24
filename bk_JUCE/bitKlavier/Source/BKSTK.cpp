@@ -98,7 +98,9 @@ void BKDelayL::setLength(float delayLength)
 {
     length = delayLength;
     float outPointer = inPoint - length;
-	while (outPointer < 0) outPointer += inputs.getNumSamples();
+    if (inputs.getNumSamples() > 0)
+        while (outPointer < 0) outPointer += inputs.getNumSamples();
+    else outPointer = 0;
 
 	outPoint = outPointer; //integer part
 	alpha = outPointer - outPoint; //fractional part

@@ -16,7 +16,7 @@
 
 void Gallery::addPiano(XmlElement* xml, OwnedArray<HashMap<int,int>>* map)
 {
-    DBG(xml->createDocument(""));
+    DBG(xml->toString(XmlElement::TextFormat()));
     addPiano();
     Piano::Ptr piano = bkPianos.getLast();
     
@@ -640,7 +640,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         newOne->setName(newName);
     }
     
-    prepareToPlay(processor.getSampleRate());
+    prepareToPlay(processor.getCurrentSampleRate());
     
     setGalleryDirty(true);
     
@@ -722,7 +722,7 @@ int Gallery::add(BKPreparationType type)
         newId = bkPianos.getLast()->getId();
     }
     
-    prepareToPlay(processor.getSampleRate());
+    prepareToPlay(processor.getCurrentSampleRate());
     
     setGalleryDirty(true);
     
@@ -1007,7 +1007,7 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
         addPianoWithId(Id);
     }
     
-    prepareToPlay(processor.getSampleRate());
+    prepareToPlay(processor.getCurrentSampleRate());
     
     setGalleryDirty(true);
 }

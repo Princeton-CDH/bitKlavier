@@ -10,10 +10,11 @@
 
 #include "Tuning.h"
 
-#include "Modification.h"
+#include "PluginProcessor.h"
 
 
-TuningProcessor::TuningProcessor(Tuning::Ptr tuning):
+TuningProcessor::TuningProcessor(BKAudioProcessor& processor, Tuning::Ptr tuning):
+processor(processor),
 tuning(tuning),
 keymaps(Keymap::PtrArr()),
 lastNoteTuning(0),
@@ -88,6 +89,11 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
     
 }
 
+int TuningProcessor::getAdaptiveClusterTimer()
+{
+     return clusterTime * (1000.0 / processor.getCurrentSampleRate());
+}
+
 
 //for keeping track of current cluster size
 void TuningProcessor::processBlock(int numSamples)
@@ -96,7 +102,7 @@ void TuningProcessor::processBlock(int numSamples)
     
     if (type == AdaptiveNormal || type == AdaptiveAnchored) {
         
-        if(clusterTime <= (tuning->aPrep->getAdaptiveClusterThresh() * sampleRate * 0.001))
+        if(clusterTime <= (tuning->aPrep->getAdaptiveClusterThresh() * processor.getCurrentSampleRate() * 0.001))
             clusterTime += numSamples;
     }
 }
@@ -119,7 +125,7 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
     if (type == AdaptiveNormal)
     {
         //if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
-        if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
+        if (clusterTime * (1000.0 / processor.getCurrentSampleRate()) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
         {
             adaptiveHistoryCounter = 0;
             adaptiveFundamentalFreq = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
@@ -131,7 +137,7 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
     else if (type == AdaptiveAnchored)
     {
         //if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
-        if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
+        if (clusterTime * (1000.0 / processor.getCurrentSampleRate()) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
         {
             adaptiveHistoryCounter = 0;
             

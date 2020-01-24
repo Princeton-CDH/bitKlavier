@@ -2702,7 +2702,7 @@ void BKADSRSlider::resized()
         
         if(!isButtonOnly)
         {
-            Rectangle<int> topSlice = area.removeFromTop(gComponentComboBoxHeight);
+            area.removeFromTop(gComponentComboBoxHeight);
             Rectangle<int> bottomSlice = area.removeFromBottom(gComponentComboBoxHeight);
             
             int midSpace = (bottomSlice.getWidth() - gComponentLabelWidth) * 0.5;

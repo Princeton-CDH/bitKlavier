@@ -61,9 +61,9 @@ public:
     holdMax(p->getHoldMax()),
     clusterMin(p->getClusterMin()),
     clusterThreshold(p->getClusterThreshold()),
-    keyOnReset(p->getKeyOnReset()),
     velocityMin(p->getVelocityMin()),
     velocityMax(p->getVelocityMax()),
+    keyOnReset(p->getKeyOnReset()),
     targetTypeNostalgicClear(p->getTargetTypeNostalgicClear())
     {
         
@@ -119,10 +119,13 @@ public:
     holdMax(12000),
     clusterMin(1),
     clusterThreshold(150),
-    keyOnReset(false),
     velocityMin(0),
     velocityMax(127),
+<<<<<<< HEAD
     targetTypeNostalgicClear(NoteOn)
+=======
+    keyOnReset(false)
+>>>>>>> 0649fa6241d2e38598dabf5f54c733aa4de55d7d
     {
 
     }
@@ -731,8 +734,8 @@ public:
               int Id):
     sPrep(new NostalgicPreparation(prep)),
     aPrep(new NostalgicPreparation(sPrep)),
-    Id(Id),
-    name(String(Id))
+    name(String(Id)),
+    Id(Id)
     {
     }
     
@@ -937,7 +940,6 @@ public:
     
     void prepareToPlay(double sr, BKSynthesiser* main)
     {
-        sampleRate = sr;
         synth = main;
     }
     
@@ -954,13 +956,13 @@ public:
     inline int getHoldTime() const noexcept
     {
         if(activeNotes.size() == 0) return 0;
-        else return 1000. * noteLengthTimers[lastKeyPlayed] / sampleRate;
+        else return 1000. * noteLengthTimers[lastKeyPlayed] / synth->getSampleRate();
     }
     
     inline float getLastVelocity() const noexcept { return lastVelocity; }
-    inline int getNumActiveNotes() const noexcept {return activeNotes.size(); }
-    inline int getCurrentClusterSize() const noexcept {return currentClusterSize;}
-    inline int getClusterThresholdTimer() const noexcept {return clusterThresholdTimer * 1000. / sampleRate;}
+    inline int getNumActiveNotes() const noexcept { return activeNotes.size(); }
+    inline int getCurrentClusterSize() const noexcept { return currentClusterSize; }
+    inline int getClusterThresholdTimer() const noexcept { return clusterThresholdTimer * 1000. / synth->getSampleRate(); }
     
     inline void addKeymap(Keymap::Ptr keymap)
     {
@@ -1002,8 +1004,6 @@ private:
     
     OwnedArray<NostalgicNoteStuff> reverseNotes;
     OwnedArray<NostalgicNoteStuff> undertowNotes;
-    
-    double sampleRate;
     
     //move timers forward by blocksize
     void incrementTimers(int numSamples);

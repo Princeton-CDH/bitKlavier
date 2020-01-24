@@ -128,7 +128,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     
     std::unique_ptr<XmlElement> galleryXML = getXmlFromBinary (data, sizeInBytes);
     
-    DBG("galleryXML: " + galleryXML->createDocument(""));
+    DBG("galleryXML: " + galleryXML->toString(XmlElement::TextFormat()));
     if (galleryXML != nullptr)
     {
         defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();

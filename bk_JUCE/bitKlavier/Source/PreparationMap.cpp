@@ -27,7 +27,7 @@ PreparationMap::~PreparationMap()
 
 void PreparationMap::prepareToPlay (double sr)
 {
-    sampleRate = sr;
+
 }
 
 Keymap::PtrArr     PreparationMap::getKeymaps(void)

@@ -817,8 +817,6 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
-	float delayL;
-	float delayR;
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     

@@ -111,7 +111,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
     for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
     {
         int t = keyPlayed[noteNumber].getUnchecked(i);
-        float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
+        //float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
         
         synth->keyOff(channel,
                       MainNote,

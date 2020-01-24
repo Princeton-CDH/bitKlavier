@@ -587,9 +587,10 @@ public:
     inline const bool getActive() const noexcept { return blendronicActive; }
     inline const bool getInputState() const noexcept { return delay->getInputState(); }
     inline const bool getOutputState() const noexcept { return delay->getOutputState(); }
-    inline const float getPulseLengthInSamples() const noexcept { return pulseLength * sampleRate; }
     inline const Array<uint64> getBeatPositionsInBuffer() const noexcept { return beatPositionsInBuffer; }
     inline const float getPulseOffset() const noexcept { return pulseOffset; }
+    
+    float getPulseLengthInSamples(); 
     
 	//mutators
 	inline void setBlendronic(Blendronic::Ptr blend) { blendronic = blend; }
@@ -599,7 +600,6 @@ public:
     inline void setDelayIndex(int index) { delayIndex = index; }
     inline void setSmoothIndex(int index) { smoothIndex = index; }
     inline void setFeedbackIndex(int index) { feedbackIndex = index; }
-	void setCurrentPlaybackSampleRate(double sr) { sampleRate = sr; }
     inline void setClearDelayOnNextBeat(bool clear) { clearDelayOnNextBeat = clear; }
     inline const void setActive(bool newActive) { blendronicActive = newActive; }
     inline const void toggleActive() { blendronicActive = !blendronicActive; }
@@ -640,8 +640,6 @@ private:
     GeneralSettings::Ptr    general;
     BlendronicDelay::Ptr    delay;
     Keymap::PtrArr          keymaps;
-    
-    double sampleRate;
     
     bool blendronicActive;
     

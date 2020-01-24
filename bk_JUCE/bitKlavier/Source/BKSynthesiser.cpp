@@ -10,6 +10,8 @@
 
 #include "BKSynthesiser.h"
 
+#include "PluginProcessor.h"
+
 BKSynthesiserSound::BKSynthesiserSound(void) {}
 BKSynthesiserSound::~BKSynthesiserSound() {}
 
@@ -73,10 +75,10 @@ void BKSynthesiserVoice::renderNextBlock (AudioBuffer<double>& outputBuffer,
 }
     
 //==============================================================================
-BKSynthesiser::BKSynthesiser(GeneralSettings::Ptr gen):
-pitchWheelValue(8192),
+BKSynthesiser::BKSynthesiser(BKAudioProcessor& processor, GeneralSettings::Ptr gen):
 generalSettings(gen),
-sampleRate (0),
+processor(processor),
+pitchWheelValue(8192),
 lastNoteOnCounter (0),
 minimumSubBlockSize (32),
 subBlockSubdivisionIsStrict (false),
@@ -87,9 +89,9 @@ shouldStealNotes (true)
     
 }
     
-BKSynthesiser::BKSynthesiser(void):
+BKSynthesiser::BKSynthesiser(BKAudioProcessor& processor):
+processor(processor),
 pitchWheelValue(8192),
-sampleRate (0),
 lastNoteOnCounter (0),
 minimumSubBlockSize (32),
 subBlockSubdivisionIsStrict (false),
@@ -133,7 +135,7 @@ void BKSynthesiser::clearVoices()
 BKSynthesiserVoice* BKSynthesiser::addVoice (BKSynthesiserVoice* const newVoice)
 {
     const ScopedLock sl (lock);
-    newVoice->setCurrentPlaybackSampleRate (sampleRate);
+    newVoice->setCurrentPlaybackSampleRate (processor.getCurrentSampleRate());
     return voices.add (newVoice);
 }
 
@@ -164,6 +166,11 @@ void BKSynthesiser::removeSound (const int index)
 void BKSynthesiser::setNoteStealingEnabled (const bool shouldSteal)
 {
     shouldStealNotes = shouldSteal;
+}
+
+double BKSynthesiser::getSampleRate() const noexcept
+{
+    return processor.getCurrentSampleRate();
 }
 
 void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool shouldBeStrict) noexcept
@@ -217,8 +224,6 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
     
 	float totalOutputL = 0.0f;
 	float totalOutputR = 0.0f;
-
-    float tempEnv;
     
 	while (--numSamples >= 0)
 	{
@@ -287,19 +292,14 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
 }
 
 //==============================================================================
-void BKSynthesiser::setCurrentPlaybackSampleRate (const double newRate)
+void BKSynthesiser::playbackSampleRateChanged ()
 {
-    if (sampleRate != newRate)
-    {
-        const ScopedLock sl (lock);
-        
-        allNotesOff (0, false);
-        
-        sampleRate = newRate;
-        
-        for (int i = voices.size(); --i >= 0;)
-            voices.getUnchecked (i)->setCurrentPlaybackSampleRate (newRate);
-    }
+    const ScopedLock sl (lock);
+    
+    allNotesOff (0, false);
+    
+    for (int i = voices.size(); --i >= 0;)
+        voices.getUnchecked (i)->setCurrentPlaybackSampleRate (processor.getCurrentSampleRate());
 }
 
 template <typename floatType>
@@ -309,7 +309,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
                                       int numSamples)
 {
     // must set the sample rate before using this!
-    jassert (sampleRate != 0);
+    jassert (processor.getCurrentSampleRate() != 0);
     
     MidiBuffer::Iterator midiIterator (midiData);
     midiIterator.setNextSamplePosition (startSample);
@@ -541,6 +541,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 			return voice;
 		}
 	}
+    return nullptr;
 }
 
 // VELOCITY IN MASTER REGIONS NEEDS TO BE APPLIED APPROPRIATELY

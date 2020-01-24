@@ -18,12 +18,13 @@
 
 BKConstructionSite::BKConstructionSite(BKAudioProcessor& p, BKItemGraph* theGraph):
 altDown(false),
+edittingComment(false),
 processor(p),
 graph(theGraph),
 connect(false),
-lastX(10), lastY(10),
-held(false),
-edittingComment(false)
+lastX(10),
+lastY(10),
+held(false)
 {
     addAndMakeVisible(clickFrame);
     clickFrame.setSize(5,5);
@@ -394,7 +395,7 @@ BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
             upperLeftest = newItem;
         }
         
-        newItem->setContent(std::move(processor.getPreparationState(item->getType(), item->getId()).createXml()));
+        newItem->setContent(processor.getPreparationState(item->getType(), item->getId()).createXml());
         
         clipboard.add(newItem);
     }

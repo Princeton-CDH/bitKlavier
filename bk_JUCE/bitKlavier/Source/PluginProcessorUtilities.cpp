@@ -431,7 +431,7 @@ void BKAudioProcessor::exportPreparation(BKPreparationType type, int Id, String 
     DBG("URL: " + file.getFullPathName());
     
     std::unique_ptr<XmlElement> xml = getPreparationState(type, Id).createXml();
-    xml->writeToFile(file, String());
+    xml->writeTo(file, XmlElement::TextFormat());
 }
 
 void BKAudioProcessor::collectPianos(void)
@@ -607,6 +607,6 @@ void BKAudioProcessor::exportPiano(int Id, String name)
    
     toExport.addChild(piano->getState(), -1, 0);
     
-    toExport.createXml()->writeToFile(file, String());
+    toExport.createXml()->writeTo(file, XmlElement::TextFormat());
 }
 

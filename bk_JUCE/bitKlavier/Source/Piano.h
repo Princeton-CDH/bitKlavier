@@ -41,54 +41,7 @@ public:
           int Id);
     ~Piano();
     
-    inline Piano::Ptr duplicate(bool withSameId = false)
-    {
-        Piano::Ptr copyPiano = new Piano(processor, withSameId ? Id : -1);
-        
-        BKItem::PtrArr newItems;
-        
-        for (auto item : items)
-        {
-            BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
-            
-            newItem->setCommentText(item->getCommentText());
-            
-            newItem->setTopLeftPosition(item->getPosition());
-            newItem->setName(item->getName());
-            
-            copyPiano->add(newItem);
-            newItems.add(newItem);
-            
-        }
-        
-        int idx = 0;
-        for (auto item : items)
-        {
-            BKItem* newItem = newItems.getUnchecked(idx++);
-            
-            BKItem::PtrArr oldConnections = item->getConnections();
-            
-            for (auto connection : item->getConnections())
-            {
-                for (auto newConnection : newItems)
-                {
-                    if ((newConnection->getType() == connection->getType()) &&
-                        (newConnection->getId() == connection->getId()))
-                    {
-                        newItem->addConnection(newConnection);
-                    }
-                }
-            }
-        }
-        
-        copyPiano->setName(pianoName );
-        
-        copyPiano->prepareToPlay(sampleRate);
-        
-        copyPiano->configure();
-        
-        return copyPiano;
-    }
+    Piano::Ptr duplicate(bool withSameId = false);
 
     void clear(void);
     
@@ -133,7 +86,7 @@ public:
     inline TuningProcessor::PtrArr        getTuningProcessors(void) const noexcept { return tprocessor; }
     inline TempoProcessor::PtrArr         getTempoProcessors(void) const noexcept { return mprocessor; }
 	inline BlendronicProcessor::PtrArr  getBlendronicProcessors(void) const noexcept { return bprocessor; }
-    inline PreparationMap::Ptr       getPreparationMaps(void) const noexcept { return prepMap; }
+    inline PreparationMap::Ptr       getPreparationMap(void) const noexcept { return prepMap; }
     
     NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
     SynchronicProcessor::Ptr    addSynchronicProcessor(int thisId);
@@ -196,6 +149,7 @@ public:
     
 
     Array<int>                  pianoMap;
+    Array<String>               pianoMapInputs;
     int                         numPMaps;
     
     int numResetMappers;
@@ -336,9 +290,6 @@ private:
     
     int Id;
     String pianoName;
-    
-
-    double sampleRate;
     
     TuningProcessor::Ptr defaultT;
     TempoProcessor::Ptr defaultM;

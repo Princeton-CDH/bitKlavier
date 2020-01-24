@@ -216,7 +216,7 @@ public:
     
     void setState(XmlElement* e)
     {
-        float f; int i;
+        float f;
         
         f = e->getStringAttribute(ptagDirect_gain).getFloatValue();
         setGain(f);
@@ -443,8 +443,6 @@ public:
     
     inline void prepareToPlay(double sr, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
     {
-        sampleRate = sr;
-        
         synth = main;
         resonanceSynth = res;
         hammerSynth = hammer;
@@ -503,8 +501,6 @@ private:
     //while the key is held
     Array<int>      keyPlayed[128];         //keep track of pitches played associated with particular key on keyboard
     Array<float>    keyPlayedOffset[128];   //and also the offsets
-    
-    double sampleRate;
     
     JUCE_LEAK_DETECTOR(DirectProcessor);
 };

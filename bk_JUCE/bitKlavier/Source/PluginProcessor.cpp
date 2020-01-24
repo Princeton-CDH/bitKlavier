@@ -96,14 +96,15 @@ public:
 
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor(void):
-firstTime(true),
 updateState(new BKUpdateState()),
-mainPianoSynth(),
-hammerReleaseSynth(),
-resonanceReleaseSynth(),
-pedalSynth(),
-doneWithSetStateInfo(false),
+mainPianoSynth(*this),
+hammerReleaseSynth(*this),
+resonanceReleaseSynth(*this),
+pedalSynth(*this),
+firstTime(true),
+currentSampleRate(44100.),
 loader(*this),
+doneWithSetStateInfo(false),
 midiReady(false)
 {
 #if BK_UNIT_TESTS
@@ -302,15 +303,16 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    currentSampleRate = sampleRate;
 #if JUCE_IOS
     stk::Stk::setSampleRate(sampleRate);
 #endif
     stk::Stk::setSampleRate(sampleRate); //crashes Logic Audio Unit Validation Tool
     
-    mainPianoSynth.setCurrentPlaybackSampleRate(sampleRate);
-    hammerReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
-    resonanceReleaseSynth.setCurrentPlaybackSampleRate(sampleRate);
-    pedalSynth.setCurrentPlaybackSampleRate(sampleRate);
+    mainPianoSynth.playbackSampleRateChanged();
+    hammerReleaseSynth.playbackSampleRateChanged();
+    resonanceReleaseSynth.playbackSampleRateChanged();
+    pedalSynth.playbackSampleRateChanged();
     
     //mainPianoSynth.setGeneralSettings(gallery->getGeneralSettings());
     resonanceReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
@@ -319,7 +321,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     levelBuf.setSize(2, 25);
     
-    gallery->prepareToPlay(sampleRate);
+    gallery->prepareToPlay(currentSampleRate);
     
     sustainIsDown = false;
     
@@ -371,7 +373,7 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     
     std::unique_ptr<XmlElement> myXML = galleryVT.createXml();
     
-    myXML->writeToFile(myFile, String());
+    myXML->writeTo(myFile, XmlElement::TextFormat());
     
     loadGalleryFromXml(myXML.get());
     
@@ -431,17 +433,17 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
     if (xml == nullptr)
     {
         myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
-        xml = std::move(XmlDocument::parse(myFile));
+        xml = XmlDocument::parse(myFile);
         xml->setAttribute("name", galleryName);
-        xml->writeToFile(myFile, "");
+        xml->writeTo(myFile, XmlElement::TextFormat());
     }
     else
     {
         xml->setAttribute("name", galleryName);
-        xml->writeToFile(myFile, "");
+        xml->writeTo(myFile, XmlElement::TextFormat());
     }
     
-    xml->writeToFile(myFile, "");
+    xml->writeTo(myFile, XmlElement::TextFormat());
     
     galleryNames.add(myFile.getFullPathName());
     
@@ -502,31 +504,34 @@ void BKAudioProcessor::renameGallery(String newName)
 
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, String source)
 {
-    int p;
-    
-    PreparationMap::CSPtrArr pmaps = currentPiano->getPreparationMaps();
-    for (auto pmap : pmaps)
+    PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
+
+    bool activeSource = false;
+    for (auto km : pmap->getKeymaps())
     {
-        for (auto km : pmap->getKeymaps())
+        if (km->getAllMidiInputSources().contains(source))
         {
-            if (km->getAllMidiInputSources().contains(source))
-            {
-                ++noteOnCount;
-                noteOn.set(noteNumber, true);
-                noteVelocity.set(noteNumber, velocity);
-            }
+            ++noteOnCount;
+            noteOn.set(noteNumber, true);
+            noteVelocity.set(noteNumber, velocity);
+            activeSource = true;
         }
     }
+    
+    if (!activeSource) return;
     
     if (allNotesOff)   allNotesOff = false;
     
     // Check PianoMap for whether piano should change due to key strike.
-    int whichPiano = currentPiano->pianoMap[noteNumber];
-    if (whichPiano > 0 && whichPiano != currentPiano->getId())
-    {
-        DBG("change piano to " + String(whichPiano));
-        setCurrentPiano(whichPiano);
-    }
+//    if (currentPiano->pianoMapInputs.contains(source))
+//    {
+        int whichPiano = currentPiano->pianoMap[noteNumber];
+        if (whichPiano > 0 && whichPiano != currentPiano->getId())
+        {
+            DBG("change piano to " + String(whichPiano));
+            setCurrentPiano(whichPiano);
+        }
+//    }
     
     // modifications
     performResets(noteNumber);
@@ -560,8 +565,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
 void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, String source)
 {
-    int p, pm;
-    
     noteOn.set(noteNumber, false);
     //DBG("noteoff velocity = " + String(velocity));
     
@@ -1021,7 +1024,7 @@ void BKAudioProcessor::importCurrentGallery(void)
             
              if (url.createInputStream (false) != nullptr)
              {
-                 std::shared_ptr<XmlElement> xml = std::move(url.readEntireXmlStream());
+                 std::shared_ptr<XmlElement> xml = url.readEntireXmlStream();
                 
                  createNewGallery(url.getFileName().replace("%20", " "), xml);
              }
@@ -1065,7 +1068,7 @@ void BKAudioProcessor::exportCurrentGallery(void)
                              
                              if (wi != nullptr && wo != nullptr)
                              {
-                                 auto numWritten = wo->writeFromInputStream (*wi, -1);
+                                 //auto numWritten = wo->writeFromInputStream (*wi, -1);
                                  wo->flush();
                              }
                          }
@@ -1325,17 +1328,13 @@ void BKAudioProcessor::initializeGallery(void)
         defPiano = gallery->getPianos().getFirst()->getId();
         currentPiano = gallery->getPiano(defPiano);
     }
-
-    // need to call before configure to ensure sampleRate is set for all pianos
-    gallery->prepareToPlay(getSampleRate()); 
     
     for (auto piano : gallery->getPianos())
     {
         piano->configure();
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
     }
-    
-    // need to call after configure to ensure prepareToPlay is called for every processor
+
     gallery->prepareToPlay(getSampleRate()); 
     
     updateUI();
@@ -1363,6 +1362,7 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     int noteNumber = m.getNoteNumber();
     float velocity = m.getFloatVelocity();
     String sourceName = source->getName();
+    
     
     channel = m.getChannel();
     
@@ -1549,4 +1549,9 @@ AudioDeviceManager* BKAudioProcessor::getAudioDeviceManager()
 AudioProcessorPlayer* BKAudioProcessor::getAudioProcessorPlayer()
 {
     return &getPluginHolder()->player;
+}
+
+double BKAudioProcessor::getCurrentSampleRate()
+{
+    return currentSampleRate;
 }

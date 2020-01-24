@@ -83,11 +83,11 @@ SpringTuning::SpringTuning(SpringTuning::Ptr st):
 rate(100),
 tetherStiffness(0.5),
 intervalStiffness(0.5),
-tetherWeightGlobal(0.5),
-tetherWeightSecondaryGlobal(0.1),
 drag(0.1),
 active(false),
 usingFundamentalForIntervalSprings(false), //should be false by default
+tetherWeightGlobal(0.5),
+tetherWeightSecondaryGlobal(0.1),
 scaleId(JustTuning)
 {
     particleArray.ensureStorageAllocated(128);

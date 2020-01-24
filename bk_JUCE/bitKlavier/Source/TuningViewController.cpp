@@ -370,15 +370,6 @@ void TuningViewController::displayTab(int tab)
     invisible();
     displayShared();
     
-    int x0 = leftArrow.getRight() + gXSpacing;
-    int y0 = hideOrShow.getBottom() + gYSpacing;
-    int right = rightArrow.getX() - gXSpacing;
-    int width = right - x0;
-    int height = getHeight() - y0;
-    
-    int col1x = x0;
-    int col2x = x0 + width * 0.5f;
-    
     if (tab == 0)
     {
         //iconImageComponent.setVisible(true);
@@ -715,7 +706,6 @@ void TuningViewController::paint (Graphics& g)
     float radius = jmin(b.getHeight() * radius_scale, b.getWidth() * radius_scale);
     float dimc_scale = 0.05;
     float dimc = jmin(b.getHeight() * dimc_scale, b.getWidth() * dimc_scale);
-    int x_offset = 0.075 * b.getWidth();
     
     float midiScale;
     

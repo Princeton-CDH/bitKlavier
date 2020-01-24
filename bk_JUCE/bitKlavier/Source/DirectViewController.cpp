@@ -119,15 +119,6 @@ void DirectViewController::displayTab(int tab)
     invisible();
     displayShared();
     
-    int x0 = leftArrow.getRight() + gXSpacing;
-    int y0 = hideOrShow.getBottom() + gYSpacing;
-    int right = rightArrow.getX() - gXSpacing;
-    int width = right - x0;
-    int height = getHeight() - y0;
-    
-    int col1x = x0;
-    int col2x = x0 + width * 0.5f;
-    
     if (tab == 0)
     {
         gainSlider->setVisible(true);
@@ -189,9 +180,6 @@ void DirectViewController::displayTab(int tab)
         
         area.removeFromLeft(processor.paddingScalarX * 100);
         area.removeFromRight(processor.paddingScalarX * 100);
-        
-        int columnHeight = area.getHeight();
-        
     }
 }
 
