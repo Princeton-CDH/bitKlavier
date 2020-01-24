@@ -46,14 +46,14 @@ public:
     
     void keyPressed(int noteNumber, float velocity, int channel, bool soundfont = false, String source = String("Default"));
     void keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false, String source = String("Default"));
-    void postRelease(int noteNumber, float velocity, int channel, String source);
+    void postRelease(int noteNumber, float velocity, int channel, String source = String("Default"));
     void clearKey(int noteNumber);
     void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }
     void sustainPedalReleased(bool post);
     void sustainPedalReleased(Array<bool> keysThatArePressed, bool post);
-    void sustainPedalReleased() {sustainPedalReleased(false);};
-    void reattack(int noteNumber);
-    void sustain(int noteNumber, float velocity, int channel, bool soundfont);
+    void sustainPedalReleased() { sustainPedalReleased(false); };
+    void reattack(int noteNumber, String source = String("Default"));
+    void sustain(int noteNumber, float velocity, int channel, bool soundfont, String source = String("Default"));
     
     inline bool keymapsContainNote(int noteNumber) {
         bool contains = false;
@@ -222,6 +222,7 @@ private:
         int noteNumber;
         float velocity;
         int channel;
+        String source;
     };
     Array<SustainedNote> sustainedNotes;
     
