@@ -164,10 +164,13 @@ void BlendronicProcessor::tick(float* outputs)
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
+    float outGain = 1.; // = prep->getOutGain;
+    
     if (!blendronicActive) return;
     if (tempoPrep->getSubdivisions() * tempoPrep->getTempo() == 0) return;
 
     // Update the pulse length in case tempo or subdiv changed
+    // possible to put this behind conditional, so we aren't doing these operations ever tick?
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
     if (pulseLength != prevPulseLength) numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
     
@@ -223,7 +226,7 @@ void BlendronicProcessor::tick(float* outputs)
     prevPulseLength = pulseLength;
     
     // Tick the delay
-    delay->tick(outputs);
+    delay->tick(outputs, outGain);
     
     float dlr = 0.0f;
     if (pulseLength != INFINITY) dlr = delay->getDelayLength() / (pulseLength * sampleRate);
