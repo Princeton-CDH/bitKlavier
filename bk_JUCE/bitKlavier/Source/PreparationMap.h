@@ -223,7 +223,6 @@ private:
         String source;
     };
     Array<Note> sustainedNotes;
-    Array<Note> pressedNotes;
     
     
     JUCE_LEAK_DETECTOR(PreparationMap)
