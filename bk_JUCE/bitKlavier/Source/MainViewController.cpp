@@ -119,7 +119,7 @@ timerCallbackCount(0)
     overtopShadow = std::make_unique<DropShadower>(myshadow);
     overtopShadow->setOwner(&overtop);
     
-    startTimerHz (50);
+    startTimerHz (10);
 }
 
 MainViewController::~MainViewController()
