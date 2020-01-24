@@ -721,7 +721,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
             pressTargetStates.fill(TargetStateNil); }
         if (releaseTargetStates.contains(TargetStateEnabled)) {
             if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
-            releaseTargetStates.fill(TargetStateNil); }
+            releaseTargetStates.fill(TargetStateNil);
+        }
     }
     
     for (auto proc : nprocessor)
@@ -832,6 +833,22 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
         
         for (auto proc : sprocessor)
         {
+            // hey Matt, i added this loop to fill targetStates, and it seems to give the right basic
+            // functionality, where releasing the sustain pedal will launch synchronic when in a noteOff mode
+            // but i'm not sure i've done this the right way, given this targetState structure
+            // which i'm a bit fuzzy on
+            for (auto km : proc->getKeymaps())
+            {
+                if (km->containsNote(releaseNote.noteNumber))
+                {
+
+                    for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
+                    {
+                        if (km->getTargetStates()[i] == TargetStateEnabled)
+                            targetStates.set(i, TargetStateEnabled);
+                    }
+                }
+            }
             proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel, targetStates);
         }
         

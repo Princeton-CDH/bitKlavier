@@ -370,6 +370,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
 
 void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel, Array<KeymapTargetState> targetStates)
 {
+    
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
     // remove key from array of pressed keys
@@ -385,6 +386,8 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     bool doDeleteOldest = targetStates[TargetTypeSynchronicDeleteOldest] == TargetStateEnabled;
     bool doDeleteNewest = targetStates[TargetTypeSynchronicDeleteNewest] == TargetStateEnabled;
     bool doRotate = targetStates[TargetTypeSynchronicRotate] == TargetStateEnabled;
+    
+    DBG("SynchronicProcessor::doCluster " + String((int)doCluster));
     
     // is this a new cluster?
     bool isNewCluster = false;
