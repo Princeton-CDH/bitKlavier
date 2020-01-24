@@ -18,6 +18,7 @@
 
 #include "SpringTuning.h"
 
+
 /*
 TuningPreparation holds all the state variable values for the
 Tuning. As with other preparation types, bK will use
@@ -918,10 +919,10 @@ public:
     typedef OwnedArray<TuningProcessor>                          Arr;
     typedef OwnedArray<TuningProcessor, CriticalSection>         CSPtrArr;
     
-    TuningProcessor(Tuning::Ptr tuning);
+    TuningProcessor(BKAudioProcessor& processor, Tuning::Ptr tuning);
     ~TuningProcessor();
     
-    inline void prepareToPlay(double sr) { sampleRate = sr; }
+    inline void prepareToPlay(double sr) { ; }
     
     //returns tuning offsets; add to integer PitchClass
     float getOffset(int midiNoteNumber, bool updateLastInterval);
@@ -948,7 +949,7 @@ public:
     int getAdaptiveFundamentalNote() { return adaptiveFundamentalNote;}
     float getAdaptiveFundamentalFreq() { return adaptiveFundamentalFreq;}
     int getAdaptiveHistoryCounter() { return adaptiveHistoryCounter;}
-    int getAdaptiveClusterTimer() { return clusterTime * (1000.0 / sampleRate); }
+    int getAdaptiveClusterTimer();
     
     void setAdaptiveFundamentalNote(int newNote) { adaptiveFundamentalNote = newNote;}
     void setAdaptiveFundamentalFreq(float newFreq) { adaptiveFundamentalFreq = newFreq;}
@@ -974,6 +975,8 @@ public:
     }
     
 private:
+    BKAudioProcessor& processor;
+    
     Tuning::Ptr tuning;
     
     Keymap::PtrArr keymaps;
@@ -996,8 +999,6 @@ private:
     int     adaptiveFundamentalNote = 60; //moves with adaptive tuning
     float   adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote);
     int     adaptiveHistoryCounter = 0;
-    
-    double sampleRate;
     
     JUCE_LEAK_DETECTOR(TuningProcessor);
 };

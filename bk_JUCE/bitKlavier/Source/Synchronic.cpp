@@ -48,13 +48,6 @@ SynchronicProcessor::~SynchronicProcessor()
 {
 }
 
-void SynchronicProcessor::setCurrentPlaybackSampleRate(double sr)
-{
-    sampleRate = sr;
-    
-}
-
-
 void SynchronicProcessor::playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster)
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
@@ -185,7 +178,7 @@ bool SynchronicProcessor::holdCheck(int noteNumber)
 {
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
-    uint64 hold = holdTimers.getUnchecked(noteNumber) * (1000.0 / sampleRate);
+    uint64 hold = holdTimers.getUnchecked(noteNumber) * (1000.0 / synth->getSampleRate());
     
     if(prep->getHoldMin() <= prep->getHoldMax())
     {
@@ -547,15 +540,15 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     
     //do this every block, for adaptive tempo updates
     sampleType = type;
-    thresholdSamples = (prep->getClusterThreshSEC() * sampleRate);
+    thresholdSamples = (prep->getClusterThreshSEC() * synth->getSampleRate());
 
     if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
     {
-        beatThresholdSamples = (tempoPrep->getBeatThresh() * sampleRate);
+        beatThresholdSamples = (tempoPrep->getBeatThresh() * synth->getSampleRate());
     }
     else
     {
-        beatThresholdSamples = (tempoPrep->getBeatThresh() / tempoPrep->getSubdivisions() * sampleRate);
+        beatThresholdSamples = (tempoPrep->getBeatThresh() / tempoPrep->getSubdivisions() * synth->getSampleRate());
     }
     
     for (auto key : keysDepressed)
@@ -713,7 +706,7 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
         int myBeat = cluster->getBeatMultiplierCounter();
         
         //tolerance: if key release happens just before beat (<100ms) then add a beatToSkip
-        if (timeToReturn < 0.100f * sampleRate) beatsToSkip++;
+        if (timeToReturn < 0.100f * synth->getSampleRate()) beatsToSkip++;
         
         while(beatsToSkip-- > 0)
         {
@@ -724,10 +717,10 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
             tempo->getPeriodMultiplier();
         }
         
-        DBG("time in ms to next beat = " + String(timeToReturn * 1000./sampleRate));
-        return timeToReturn * 1000./sampleRate; //optimize later....
+        DBG("time in ms to next beat = " + String(timeToReturn * 1000./synth->getSampleRate()));
+        return timeToReturn * 1000./synth->getSampleRate(); //optimize later....
     }
-    
+    return 0.0f;
 }
 
 #if BK_UNIT_TESTS

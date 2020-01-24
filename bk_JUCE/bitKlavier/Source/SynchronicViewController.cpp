@@ -333,9 +333,6 @@ void SynchronicViewController::displayTab(int tab)
     int width = right - x0;
     int height = getHeight() - y0;
     
-    int col1x = x0;
-    int col2x = x0 + width * 0.5f;
-    
     if (tab == 0)
     {
         if (showADSR)

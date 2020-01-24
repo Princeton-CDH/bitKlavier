@@ -43,6 +43,55 @@ Piano::~Piano()
     items.clear();
 }
 
+Piano::Ptr Piano::duplicate(bool withSameId)
+{
+    Piano::Ptr copyPiano = new Piano(processor, withSameId ? Id : -1);
+    
+    BKItem::PtrArr newItems;
+    
+    for (auto item : items)
+    {
+        BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
+        
+        newItem->setCommentText(item->getCommentText());
+        
+        newItem->setTopLeftPosition(item->getPosition());
+        newItem->setName(item->getName());
+        
+        copyPiano->add(newItem);
+        newItems.add(newItem);
+        
+    }
+    
+    int idx = 0;
+    for (auto item : items)
+    {
+        BKItem* newItem = newItems.getUnchecked(idx++);
+        
+        BKItem::PtrArr oldConnections = item->getConnections();
+        
+        for (auto connection : item->getConnections())
+        {
+            for (auto newConnection : newItems)
+            {
+                if ((newConnection->getType() == connection->getType()) &&
+                    (newConnection->getId() == connection->getId()))
+                {
+                    newItem->addConnection(newConnection);
+                }
+            }
+        }
+    }
+    
+    copyPiano->setName(pianoName );
+    
+    copyPiano->prepareToPlay(processor.getCurrentSampleRate());
+    
+    copyPiano->configure();
+    
+    return copyPiano;
+}
+
 void Piano::clear(void)
 {
     items.clear();
@@ -78,6 +127,7 @@ void Piano::deconfigure(void)
         modificationMap[key]->clearResets();
         pianoMap.set(key, -1);
     }
+    pianoMapInputs.clear();
 }
 
 #define DEFAULT_ID -1
@@ -221,7 +271,7 @@ SynchronicProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
 										defaultBA,
                                         &processor.mainPianoSynth,
                                         processor.gallery->getGeneralSettings());
-    sproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+    sproc->prepareToPlay(processor.getCurrentSampleRate(), &processor.mainPianoSynth);
     sprocessor.add(sproc);
     
     return sproc;
@@ -295,7 +345,7 @@ NostalgicProcessor::Ptr Piano::addNostalgicProcessor(int thisId)
                                        defaultS,
 										defaultBA,
                                        &processor.mainPianoSynth);
-    nproc->prepareToPlay(sampleRate, &processor.mainPianoSynth);
+    nproc->prepareToPlay(processor.getCurrentSampleRate(), &processor.mainPianoSynth);
     nprocessor.add(nproc);
     
     return nproc;
@@ -310,7 +360,7 @@ DirectProcessor::Ptr Piano::addDirectProcessor(int thisId)
                                                      &processor.resonanceReleaseSynth,
                                                      &processor.hammerReleaseSynth);
     
-    dproc->prepareToPlay(sampleRate,
+    dproc->prepareToPlay(processor.getCurrentSampleRate(),
                          &processor.mainPianoSynth,
                          &processor.resonanceReleaseSynth,
                          &processor.hammerReleaseSynth);
@@ -322,8 +372,8 @@ DirectProcessor::Ptr Piano::addDirectProcessor(int thisId)
 
 TuningProcessor::Ptr Piano::addTuningProcessor(int thisId)
 {
-    TuningProcessor::Ptr tproc = new TuningProcessor(processor.gallery->getTuning(thisId));
-    tproc->prepareToPlay(sampleRate);
+    TuningProcessor::Ptr tproc = new TuningProcessor(processor, processor.gallery->getTuning(thisId));
+    tproc->prepareToPlay(processor.getCurrentSampleRate());
     tprocessor.add(tproc);
     
     return tproc;
@@ -331,8 +381,8 @@ TuningProcessor::Ptr Piano::addTuningProcessor(int thisId)
 
 TempoProcessor::Ptr Piano::addTempoProcessor(int thisId)
 {
-    TempoProcessor::Ptr mproc = new TempoProcessor(processor.gallery->getTempo(thisId));
-    mproc->prepareToPlay(sampleRate);
+    TempoProcessor::Ptr mproc = new TempoProcessor(processor, processor.gallery->getTempo(thisId));
+    mproc->prepareToPlay(processor.getCurrentSampleRate());
     mprocessor.add(mproc);
 
     return mproc;
@@ -344,7 +394,7 @@ BlendronicProcessor::Ptr Piano::addBlendronicProcessor(int thisId)
                                                              defaultM,
                                                              processor.gallery->getGeneralSettings(),
                                                              &processor.mainPianoSynth);
-	bproc->prepareToPlay(sampleRate);
+	bproc->prepareToPlay(processor.getCurrentSampleRate());
 	bprocessor.add(bproc);
     processor.mainPianoSynth.addBlendronicProcessor(bproc);
 
@@ -642,7 +692,12 @@ void Piano::configureReset(BKItem::Ptr item)
     
     for (auto keymap : whichKeymaps)
     {
-        for (auto key : processor.gallery->getKeymap(keymap)->keys())
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
+        for (auto source : thisKeymap->getAllMidiInputSources())
+        {
+            pianoMapInputs.addIfNotAlreadyThere(source);
+        }
+        for (auto key : thisKeymap->keys())
         {
             for (auto id : direct) modificationMap[key]->directReset.add(id);
             
@@ -740,6 +795,10 @@ void Piano::configurePianoMap(BKItem::Ptr map)
     for (auto keymap : keymaps)
     {
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
+//        for (auto source : thisKeymap->getAllMidiInputSources())
+//        {
+//            pianoMapInputs.addIfNotAlreadyThere(source);
+//        }
         for (auto key : thisKeymap->keys())
         {
             pianoMap.set(key, pianoTarget);
@@ -970,7 +1029,7 @@ void Piano::deconfigureTuningModificationForKeys(TuningModification::Ptr mod, Ar
 int Piano::addPreparationMap(void)
 {
     prepMap = new PreparationMap(processor.gallery->getKeymap(0), numPMaps++);
-    prepMap->prepareToPlay(sampleRate);
+    prepMap->prepareToPlay(processor.getCurrentSampleRate());
     return 0;
 }
 
@@ -978,7 +1037,7 @@ int Piano::addPreparationMap(void)
 int Piano::addPreparationMap(Keymap::Ptr keymap)
 {
     prepMap = new PreparationMap(keymap, numPMaps++);
-    prepMap->prepareToPlay(sampleRate);
+    prepMap->prepareToPlay(processor.getCurrentSampleRate());
     return 0;
 }
 
@@ -1084,8 +1143,7 @@ int Piano::removeLastPreparationMap(void)
 
 void Piano::prepareToPlay(double sr)
 {
-    sampleRate = sr;
-
+    double sampleRate = processor.getCurrentSampleRate();
     for (auto dproc : dprocessor)
         dproc->prepareToPlay(sampleRate, &processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth);
     

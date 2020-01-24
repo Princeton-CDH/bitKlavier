@@ -47,6 +47,7 @@ public:
     StandalonePluginHolder* getPluginHolder(void);
     AudioDeviceManager* getAudioDeviceManager(void);
     AudioProcessorPlayer* getAudioProcessorPlayer(void);
+    double getCurrentSampleRate(void);
     void addMidiInputDeviceCallback(MidiInputCallback* callback);
     void removeMidiInputDeviceCallback(MidiInputCallback* callback);
     
@@ -335,6 +336,7 @@ public:
     inline void setMidiReady(bool ready) { midiReady = ready; }
     
 private:
+    double currentSampleRate;
     
     int  currentPianoId;
     

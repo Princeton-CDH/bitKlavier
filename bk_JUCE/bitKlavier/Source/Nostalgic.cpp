@@ -18,8 +18,8 @@ NostalgicProcessor::NostalgicProcessor(Nostalgic::Ptr nostalgic,
 synth(s),
 nostalgic(nostalgic),
 tuner(tuning),
-blendronic(blend),
 synchronic(synchronic),
+blendronic(blend),
 keymaps(Keymap::PtrArr())
 {
     noteLengthTimers.ensureStorageAllocated(128);
@@ -147,9 +147,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             currentNote->setPrepAtKeyOn(prep);
             currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
             currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber));
-            currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * sampleRate/1000.);
-            currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * sampleRate/1000.);
-            currentNote->setUndertowTargetLength(prep->getUndertow() * sampleRate/1000.);
+            currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * synth->getSampleRate()/1000.);
+            currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * synth->getSampleRate()/1000.);
+            currentNote->setUndertowTargetLength(prep->getUndertow() * synth->getSampleRate()/1000.);
             
         }
         else if (prep->getMode() == NoteLengthSync)
@@ -194,7 +194,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                     //int note = midiNoteNumber; //fixes repetition issue in NS_1, but breaks clusters
                     bool passHoldTest = false, passVelocityTest = false;
                     
-                    float held = noteLengthTimers.getUnchecked(note) * (1000.0 / sampleRate);
+                    float held = noteLengthTimers.getUnchecked(note) * (1000.0 / synth->getSampleRate());
                     int velocity = (int) (velocities.getUnchecked(note) * 127);
                     
                     if (prep->getHoldMin() <= prep->getHoldMax())
@@ -237,7 +237,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                     //get length of played notes, subtract wave distance to set nostalgic reverse note length
                     duration =  (noteLengthTimers.getUnchecked(note) *
                                  prep->getLengthMultiplier() +
-                                 (offRamp + 30)) * (1000.0 / sampleRate);
+                                 (offRamp + 30)) * (1000.0 / synth->getSampleRate());
                     
                     for (auto t : prep->getTransposition())
                     {
@@ -301,9 +301,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         currentNote->setPrepAtKeyOn(prep);
                         currentNote->setTuningAtKeyOn(tuner->getOffset(note, false));
                         currentNote->setVelocityAtKeyOn(velocities.getUnchecked(note));
-                        currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * sampleRate/1000.);
-                        currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * sampleRate/1000.);
-                        currentNote->setUndertowTargetLength(prep->getUndertow() * sampleRate/1000.);
+                        currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * synth->getSampleRate()/1000.);
+                        currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * synth->getSampleRate()/1000.);
+                        currentNote->setUndertowTargetLength(prep->getUndertow() * synth->getSampleRate()/1000.);
                         
                         noteLengthTimers.set(note, 0);
                     }
@@ -387,10 +387,10 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             currentNote->setPrepAtKeyOn(prep);
             currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
             currentNote->setVelocityAtKeyOn(velocities.getUnchecked(midiNoteNumber) * prep->getGain());
-            currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * sampleRate/1000.);
+            currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * synth->getSampleRate()/1000.);
             //currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
-            currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * sampleRate/1000.);
-            currentNote->setUndertowTargetLength(prep->getUndertow() * sampleRate/1000.);
+            currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * synth->getSampleRate()/1000.);
+            currentNote->setUndertowTargetLength(prep->getUndertow() * synth->getSampleRate()/1000.);
         }
     }
 
@@ -485,10 +485,10 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
             currentNote->setPrepAtKeyOn(prep);
             currentNote->setTuningAtKeyOn(tuner->getOffset(midiNoteNumber, false));
             currentNote->setVelocityAtKeyOn(midiNoteVelocity);
-            currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * sampleRate/1000.);
+            currentNote->setReverseStartPosition((duration + prep->getWavedistance()) * synth->getSampleRate()/1000.);
             //currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
-            currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * sampleRate/1000.);
-            currentNote->setUndertowTargetLength(prep->getUndertow() * sampleRate/1000.);
+            currentNote->setReverseTargetLength((duration - prep->getReverseRelease()) * synth->getSampleRate()/1000.);
+            currentNote->setUndertowTargetLength(prep->getUndertow() * synth->getSampleRate()/1000.);
         }
     }
     
@@ -576,7 +576,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
         NostalgicPreparation::Ptr prep = nostalgic->aPrep;
         //moved beyond clusterThreshold time, done with cluster
         //if (clusterThresholdTimer >= (sampleRate * 0.15)) //eventually expose this threshold
-        if (clusterThresholdTimer >= (sampleRate * .001 * prep->getClusterThreshold()))
+        if (clusterThresholdTimer >= (synth->getSampleRate() * .001 * prep->getClusterThreshold()))
         {
             inCluster = false;
             currentClusterSize = 0;
@@ -676,7 +676,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                 undertowNotes.insert(0, new NostalgicNoteStuff(thisNote->getNoteNumber()));
                 NostalgicNoteStuff* newNote = undertowNotes.getUnchecked(0);
                 newNote->setUndertowTargetLength(thisNote->getUndertowTargetLength());
-                newNote->setUndertowStartPosition(noteOnPrep->getWavedistance() * sampleRate/1000.);
+                newNote->setUndertowStartPosition(noteOnPrep->getWavedistance() * synth->getSampleRate()/1000.);
             }
             
             //remove from active notes list
@@ -717,7 +717,7 @@ Array<int> NostalgicProcessor::getPlayPositions() //return playback positions in
     for(auto note : reverseNotes)
     {
         if (note->isActive())
-            newpositions.add(note->getReversePlayPosition() * 1000./sampleRate);
+            newpositions.add(note->getReversePlayPosition() * 1000./synth->getSampleRate());
     }
     
     return newpositions;
@@ -730,7 +730,7 @@ Array<int> NostalgicProcessor::getUndertowPositions() //return playback position
     for(auto note : undertowNotes)
     {
         if (note->isActive())
-            newpositions.add(note->getUndertowPlayPosition() * 1000./sampleRate);
+            newpositions.add(note->getUndertowPlayPosition() * 1000./synth->getSampleRate());
     }
     
     return newpositions;

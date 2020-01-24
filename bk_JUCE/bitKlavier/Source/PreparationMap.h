@@ -215,8 +215,6 @@ private:
     BKSynthesiser*              resonanceSynth;
     BKSynthesiser*              hammerSynth;
     
-    double                      sampleRate;
-    
     bool sustainPedalIsDepressed;
 
     struct SustainedNote

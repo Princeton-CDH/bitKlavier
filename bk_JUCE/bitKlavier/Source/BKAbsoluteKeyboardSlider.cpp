@@ -11,8 +11,8 @@
 #include "BKAbsoluteKeyboardSlider.h"
 
 BKAbsoluteKeyboardSlider::BKAbsoluteKeyboardSlider(bool nos):
-ratio(1.0),
-needsOctaveSlider(nos)
+needsOctaveSlider(nos),
+ratio(1.0)
 {
     keyboardComponent = std::make_unique<BKKeymapKeyboardComponent>(keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     

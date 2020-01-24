@@ -115,8 +115,8 @@ void Gallery::randomize()
 {
 	Random::getSystemRandom().setSeedRandomly();
 
-    BKSynthesiser* dummySynth;
     GeneralSettings::Ptr dummyGeneral = new GeneralSettings();
+    BKSynthesiser* dummySynth = new BKSynthesiser(processor, dummyGeneral);
 
     //each piano
     for (int h = 0; h < Random::getSystemRandom().nextInt(Range<int>(1, 5)); h++)
@@ -134,13 +134,13 @@ void Gallery::randomize()
             Tuning::Ptr t = new Tuning(-1, true);
             addTuning(t);
             int tuningId = t->getId();
-            TuningProcessor::Ptr tProc = new TuningProcessor(t);
+            TuningProcessor::Ptr tProc = new TuningProcessor(processor, t);
             p->addTuningProcessor(tuningId);
 
 			Tempo::Ptr m = new Tempo(-1, true);
 			addTempo(m);
 			int tempoId = m->getId();
-			TempoProcessor::Ptr mProc = new TempoProcessor(m);
+			TempoProcessor::Ptr mProc = new TempoProcessor(processor, m);
 			p->addTempoProcessor(tempoId);
 
 			Blendronic::Ptr b = new Blendronic(-1, true);

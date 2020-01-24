@@ -408,7 +408,7 @@ public:
     typedef OwnedArray<TempoProcessor>                  Arr;
     typedef OwnedArray<TempoProcessor,CriticalSection>  CSArr;
     
-    TempoProcessor(Tempo::Ptr tempo);
+    TempoProcessor(BKAudioProcessor& processor, Tempo::Ptr tempo);
     
     ~TempoProcessor();
     
@@ -431,7 +431,7 @@ public:
     
     inline void prepareToPlay(double sr)
     {
-        sampleRate = sr;
+
     }
     
     inline void reset(void)
@@ -442,7 +442,7 @@ public:
     
     uint64 getAtTimer() { return atTimer; }
     uint64 getAtLastTime() { return atLastTime; }
-    int getAtDelta() { return atDelta = (atTimer - atLastTime) * 1000. / sampleRate; }
+    int getAtDelta();
     Array<int> getAtDeltaHistory() { return atDeltaHistory; }
     float getAdaptiveTempoPeriodMultiplier() { return adaptiveTempoPeriodMultiplier; }
     
@@ -469,13 +469,13 @@ public:
     }
     
 private:
+    BKAudioProcessor& processor;
+    
     GeneralSettings::Ptr general;
     
     Tempo::Ptr tempo;
     
     Keymap::PtrArr keymaps;
-    
-    double sampleRate;
     
     //adaptive tempo stuff
     uint64 atTimer, atLastTime; //in samples

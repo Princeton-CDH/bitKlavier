@@ -470,7 +470,7 @@ void BKRangeMinSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, i
         g.strokePath (backgroundTrack, PathStrokeType (trackWidth, PathStrokeType::curved, PathStrokeType::rounded));
         
         Path valueTrack;
-        juce::Point<float> minPoint, maxPoint, thumbPoint;
+        juce::Point<float> minPoint, maxPoint;
         
         const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
         const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;
@@ -513,7 +513,7 @@ void BKRangeMaxSliderLookAndFeel::drawLinearSlider (Graphics& g, int x, int y, i
         const juce::Point<float> endPoint (slider.isHorizontal() ? width + x : startPoint.x,
                                      slider.isHorizontal() ? startPoint.y : y);
         Path valueTrack;
-        juce::Point<float> minPoint, maxPoint, thumbPoint;
+        juce::Point<float> minPoint, maxPoint;
         
         const auto kx = slider.isHorizontal() ? sliderPos : (x + width * 0.5f);
         const auto ky = slider.isHorizontal() ? (y + height * 0.5f) : sliderPos;

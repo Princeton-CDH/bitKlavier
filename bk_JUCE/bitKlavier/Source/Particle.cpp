@@ -15,9 +15,9 @@ Particle::Particle(double xVal, int n, String s):
 x(xVal),
 restX(xVal),
 prevX(xVal),
-note(n),
 enabled(false),
 locked(false),
+note(n),
 name(s)
 {
 

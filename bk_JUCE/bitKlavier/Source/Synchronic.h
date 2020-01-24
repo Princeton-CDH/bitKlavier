@@ -46,13 +46,15 @@ public:
     sNumBeats(p->getNumBeats()),
     sClusterMin(p->getClusterMin()),
     sClusterMax(p->getClusterMax()),
+    sClusterCap(p->getClusterCap()),
+    numClusters(1),
     holdMin(p->getHoldMin()),
     holdMax(p->getHoldMax()),
     velocityMin(p->getVelocityMin()),
     velocityMax(p->getVelocityMax()),
-    sClusterCap(p->getClusterCap()),
     sMode(p->getMode()),
     sBeatsToSkip(p->getBeatsToSkip()),
+    onOffMode(KeyOn),
     sBeatMultipliers(p->getBeatMultipliers()),
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
@@ -66,8 +68,6 @@ public:
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
     sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic()),
-    numClusters(1),
-    onOffMode(KeyOn),
     targetTypeSynchronicPatternSync(p->getTargetTypeSynchronicPatternSync()),
     targetTypeSynchronicBeatSync(p->getTargetTypeSynchronicBeatSync()),
     targetTypeSynchronicAddNotes(p->getTargetTypeSynchronicAddNotes()),
@@ -97,8 +97,14 @@ public:
     sClusterMin(clusterMin),
     sClusterMax(clusterMax),
     sClusterCap(8),
+    numClusters(1),
+    holdMin(0),
+    holdMax(12000),
+    velocityMin(0),
+    velocityMax(127),
     sMode(mode),
     sBeatsToSkip(beatsToSkip),
+    onOffMode(KeyOn),
     sBeatMultipliers(beatMultipliers),
     sAccentMultipliers(accentMultipliers),
     sLengthMultipliers(lengthMultipliers),
@@ -106,12 +112,6 @@ public:
     sClusterThresh(clusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
     sReleaseVelocitySetsSynchronic(velocityMode),
-    holdMin(0),
-    holdMax(12000),
-    velocityMin(0),
-    velocityMax(127),
-    numClusters(1),
-    onOffMode(KeyOn),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
@@ -130,8 +130,14 @@ public:
     sClusterMin(1),
     sClusterMax(12),
     sClusterCap(8), //8 in original bK, but behavior is different here?
+    numClusters(1),
+    holdMin(0),
+    holdMax(12000),
+    velocityMin(0),
+    velocityMax(127),
     sMode(FirstNoteOnSync),
     sBeatsToSkip(0),
+    onOffMode(KeyOn),
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
@@ -143,12 +149,6 @@ public:
     sGain(1.0),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
-    holdMin(0),
-    holdMax(12000),
-    velocityMin(0),
-    velocityMax(127),
-    numClusters(1),
-    onOffMode(KeyOn),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
@@ -1411,7 +1411,6 @@ public:
     
     ~SynchronicProcessor();
     
-    void         setCurrentPlaybackSampleRate(double sr);
     inline const uint64 getCurrentNumSamplesBeat(void) const noexcept   { return numSamplesBeat;    }
     
     
@@ -1422,15 +1421,15 @@ public:
     float getTimeToBeatMS(float beatsToSkip);
     
     
-    inline const float getClusterThresholdTimer() const noexcept { return 1000. * clusterThresholdTimer / sampleRate ;}
-    inline const float getClusterThreshold() const noexcept { return 1000. * thresholdSamples / sampleRate ;}
+    inline const float getClusterThresholdTimer() const noexcept { return 1000. * clusterThresholdTimer / synth->getSampleRate() ;}
+    inline const float getClusterThreshold() const noexcept { return 1000. * thresholdSamples / synth->getSampleRate() ;}
     inline const int getNumKeysDepressed() const noexcept {return keysDepressed.size(); }
     inline const bool getPlayCluster() const noexcept { return playCluster; }
     
     inline const float getHoldTimer() const noexcept
     {
         if(keysDepressed.size() == 0 ) return 0;
-        return 1000. * holdTimers[lastKeyPressed] / sampleRate ;
+        return 1000. * holdTimers[lastKeyPressed] / synth->getSampleRate() ;
     }
     
     inline const float getLastVelocity() const noexcept
@@ -1501,7 +1500,6 @@ public:
     inline void prepareToPlay(float sr, BKSynthesiser* main)
     {
         synth = main;
-        sampleRate = sr;
     }
     //void  atReset();
     
@@ -1549,10 +1547,7 @@ private:
 	BlendronicProcessor::PtrArr blendronic;
     
     Keymap::PtrArr      keymaps;
-    
-    double sampleRate;
-
-    
+        
     Array<float> tuningOffsets;
     PitchClass tuningBasePitch;
     

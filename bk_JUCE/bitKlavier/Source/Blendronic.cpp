@@ -140,12 +140,9 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
-    DBG("BlendronicProcessor::BlendronicProcessor sampleRate = " + String(sampleRate) + " bMain->getSampleRate() = " + String(bMain->getSampleRate()));
-    
     // sometimes prepareToPlay gets a spurious sampleRate; we should track this down, but we can also
     // get the sr from the Synthesizer
-    if (sampleRate > 0 && sampleRate <= 352800) delayLengthRecord.setSize(1, prep->getDelayMax() * sampleRate);
-    else delayLengthRecord.setSize(1, prep->getDelayMax() * bMain->getSampleRate());
+    delayLengthRecord.setSize(1, prep->getDelayMax() * synth->getSampleRate());
     delayLengthRecord.clear();
     delayLengthRecordInPoint = 0;
     
@@ -169,7 +166,7 @@ void BlendronicProcessor::tick(float* outputs)
 
     // Update the pulse length in case tempo or subdiv changed
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-    if (pulseLength != prevPulseLength) numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
+    if (pulseLength != prevPulseLength) numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * synth->getSampleRate();
     
     // Check for beat change
     if (sampleTimer >= numSamplesBeat)
@@ -182,7 +179,7 @@ void BlendronicProcessor::tick(float* outputs)
         }
 
         float beatPatternLength = 0.0;
-        for (auto b : prep->getBeats()) beatPatternLength += b * pulseLength * sampleRate;
+        for (auto b : prep->getBeats()) beatPatternLength += b * pulseLength * synth->getSampleRate();
 
         if (numBeatPositions != (int)((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1)
         {
@@ -207,7 +204,7 @@ void BlendronicProcessor::tick(float* outputs)
         if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
              
         // Update numSamplesBeat for the new beat and reset sampleTimer
-        numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * sampleRate;
+        numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * synth->getSampleRate();
         sampleTimer = 0;
         
         updateDelayParameters();
@@ -226,7 +223,7 @@ void BlendronicProcessor::tick(float* outputs)
     delay->tick(outputs);
     
     float dlr = 0.0f;
-    if (pulseLength != INFINITY) dlr = delay->getDelayLength() / (pulseLength * sampleRate);
+    if (pulseLength != INFINITY) dlr = delay->getDelayLength() / (pulseLength * synth->getSampleRate());
     delayLengthRecord.setSample(0, delayLengthRecordInPoint++, dlr);
     if (delayLengthRecordInPoint >= delayLengthRecord.getNumSamples()) delayLengthRecordInPoint = 0;
 }
@@ -385,12 +382,10 @@ void BlendronicProcessor::prepareToPlay(double sr)
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
-
-    sampleRate = sr;
     
-    delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayMax(), sampleRate, true);
+    delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayMax(), synth->getSampleRate(), true);
 
-    delayLengthRecord.setSize(1, prep->getDelayMax() * sampleRate);
+    delayLengthRecord.setSize(1, prep->getDelayMax() * synth->getSampleRate());
     delayLengthRecord.clear();
     delayLengthRecordInPoint = 0;
     
@@ -403,7 +398,6 @@ void BlendronicProcessor::prepareToPlay(double sr)
     prevBeat = prep->getBeats()[0];
     prevDelay = prep->getDelayLengths()[0];
     
-	sampleRate = sr;
     delay->setSampleRate(sr);
     
     beatIndex = 0;
@@ -412,8 +406,8 @@ void BlendronicProcessor::prepareToPlay(double sr)
     feedbackIndex = 0;
     
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-    numSamplesBeat = prep->getBeats()[beatIndex] * sampleRate * pulseLength;
-    numSamplesDelay = prep->getDelayLengths()[delayIndex] * sampleRate * pulseLength;
+    numSamplesBeat = prep->getBeats()[beatIndex] * synth->getSampleRate() * pulseLength;
+    numSamplesDelay = prep->getDelayLengths()[delayIndex] * synth->getSampleRate() * pulseLength;
     if (pulseLength == INFINITY)
     {
         numSamplesBeat = INFINITY;
@@ -435,7 +429,7 @@ void BlendronicProcessor::updateDelayParameters()
 {
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
-    numSamplesDelay = prep->getDelayLengths()[delayIndex] * pulseLength * sampleRate;
+    numSamplesDelay = prep->getDelayLengths()[delayIndex] * pulseLength * synth->getSampleRate();
     if (pulseLength == INFINITY) numSamplesDelay = 0;
     
     float delayDelta = fabsf(prevDelay - prep->getDelayLengths()[delayIndex]);
@@ -471,4 +465,9 @@ void BlendronicProcessor::updateDelayParameters()
     delay->setDelayTargetLength(numSamplesDelay);
     delay->setSmoothRate(smoothRate); // this is really a rate, not a duration
     delay->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
+}
+
+float BlendronicProcessor::getPulseLengthInSamples()
+{
+    return pulseLength * synth->getSampleRate();
 }

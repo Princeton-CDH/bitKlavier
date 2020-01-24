@@ -119,7 +119,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         
         AudioSampleBuffer* destBuffer = buffer->getAudioSampleBuffer();
         
-        destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, sampleStart), (int)sampleLength);
+        destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, (int)sampleStart), (int)sampleLength);
         
         // WEIRD thing where sample metadata defines loop point instead of the sfz format
         if (!isSF2 && (region->loop_mode == 0))

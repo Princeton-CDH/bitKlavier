@@ -357,8 +357,8 @@ public:
     /** Creates a new BKSynthesiser.
      You'll need to add some sounds and voices before it'll make any sound.
      */
-    BKSynthesiser(GeneralSettings::Ptr);
-    BKSynthesiser(void);
+    BKSynthesiser(BKAudioProcessor& processor, GeneralSettings::Ptr);
+    BKSynthesiser(BKAudioProcessor& processor);
     
     void setGeneralSettings(GeneralSettings::Ptr gen);
     void updateGeneralSettings(GeneralSettings::Ptr gen);
@@ -590,12 +590,12 @@ public:
                                       int programNumber);
     
     //==============================================================================
-    /** Tells the BKSynthesiser what the sample rate is for the audio it's being used to render.
+    /** Tells the BKSynthesiser that the sample rate has changed.
      
-     This value is propagated to the voices so that they can use it to render the correct
+     The new sample rate is propagated to the voices so that they can use it to render the correct
      pitches.
      */
-    virtual void setCurrentPlaybackSampleRate (double sampleRate);
+    virtual void playbackSampleRateChanged ();
     
     /** Creates the next block of audio output.
      
@@ -624,7 +624,7 @@ public:
     /** Returns the current target sample rate at which rendering is being done.
      Subclasses may need to know this so that they can pitch things correctly.
      */
-    double getSampleRate() const noexcept                       { return sampleRate; }
+    double getSampleRate() const noexcept;
     
     /** Sets a minimum limit on the size to which audio sub-blocks will be divided when rendering.
      
@@ -767,8 +767,8 @@ private:
                            int numSamples);
     //==============================================================================
     
+    BKAudioProcessor& processor;
     int pitchWheelValue;
-    double sampleRate;
     uint32 lastNoteOnCounter;
     int minimumSubBlockSize;
     bool subBlockSubdivisionIsStrict;
@@ -776,7 +776,6 @@ private:
     BigInteger sustainPedalsDown;
 
     Array<BlendronicProcessor::Ptr> bprocessors;
-
     
 #if JUCE_CATCH_DEPRECATED_CODE_MISUSE
     // Note the new parameters for these methods.

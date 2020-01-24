@@ -10,7 +10,10 @@
 
 #include "Tempo.h"
 
-TempoProcessor::TempoProcessor(Tempo::Ptr t):
+#include "PluginProcessor.h"
+
+TempoProcessor::TempoProcessor(BKAudioProcessor& processor, Tempo::Ptr t):
+processor(processor),
 tempo(t),
 keymaps(Keymap::PtrArr())
 {
@@ -63,7 +66,7 @@ void TempoProcessor::atCalculatePeriodMultiplier()
     DBG("tempo system = " + String(tempo->aPrep->getTempoSystem()));
     if(tempo->aPrep->getAdaptiveTempo1History() && tempo->aPrep->getTempoSystem() == AdaptiveTempo1) {
         
-        atDelta = (atTimer - atLastTime) / (0.001 * sampleRate); //fix this? make sampleRateMS
+        atDelta = (atTimer - atLastTime) / (0.001 * processor.getCurrentSampleRate()); //fix this? make sampleRateMS
         //DBG("atTimer = " + String(atTimer) + " atLastTime = " + String(atLastTime));
         //DBG("atDelta = " + String(atDelta));
         //DBG("sampleRate = " + String(sampleRate));
@@ -98,6 +101,11 @@ void TempoProcessor::adaptiveReset()
         atDeltaHistory.insert(0, (60000.0/tempo->aPrep->getTempo()));
     }
     adaptiveTempoPeriodMultiplier = 1.;
+}
+
+int TempoProcessor::getAtDelta()
+{
+    return atDelta = (atTimer - atLastTime) * 1000. / processor.getCurrentSampleRate();
 }
 
 #if BK_UNIT_TESTS
