@@ -93,7 +93,7 @@ playheadColour (Colours::mediumpurple)
 {
     setOpaque (true);
     setNumChannels (1);
-    setRepaintRate (60);
+    setRepaintRate (40);
     prevPlayhead = 0;
     
     verticalZoomSlider = std::make_unique<Slider>();
@@ -138,7 +138,7 @@ playheadColour (Colours::mediumpurple)
 {
     setOpaque (true);
     setNumChannels (initialNumChannels);
-    setRepaintRate (60);
+    setRepaintRate (40);
 }
 
 BlendronicDisplay::~BlendronicDisplay()
