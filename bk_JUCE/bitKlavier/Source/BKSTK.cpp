@@ -153,11 +153,11 @@ void BKDelayL::tick(float input, float* outputs, float outGain, bool stereo)
 	inputs.addSample(0, inPoint, input * gain);
 	if (stereo) inputs.addSample(1, inPoint, input * gain);
 
-	lastFrameLeft = nextOutLeft() * outGain;
+	lastFrameLeft = nextOutLeft();
 	doNextOutLeft = true;
 	if (stereo)
 	{
-		lastFrameRight = nextOutRight() * outGain;
+		lastFrameRight = nextOutRight();
 		doNextOutRight = true;
 	}
 
@@ -172,12 +172,12 @@ void BKDelayL::tick(float input, float* outputs, float outGain, bool stereo)
 
 	if (stereo)
 	{
-		outputs[0] = lastFrameLeft;
-		outputs[1] = lastFrameRight;
+		outputs[0] = lastFrameLeft * outGain;
+		outputs[1] = lastFrameRight * outGain;
 	}
 	else
 	{
-		outputs[0] = lastFrameLeft;
+		outputs[0] = lastFrameLeft * outGain;
     }
 }
 
