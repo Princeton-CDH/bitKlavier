@@ -63,7 +63,8 @@ public:
     clusterThreshold(p->getClusterThreshold()),
     keyOnReset(p->getKeyOnReset()),
     velocityMin(p->getVelocityMin()),
-    velocityMax(p->getVelocityMax())
+    velocityMax(p->getVelocityMax()),
+    targetTypeNostalgicClear(p->getTargetTypeNostalgicClear())
     {
         
     }
@@ -120,7 +121,8 @@ public:
     clusterThreshold(150),
     keyOnReset(false),
     velocityMin(0),
-    velocityMax(127)
+    velocityMax(127),
+    targetTypeNostalgicClear(NoteOn)
     {
 
     }
@@ -156,6 +158,7 @@ public:
         keyOnReset = n->getKeyOnReset();
         velocityMin = n->getVelocityMin();
         velocityMax = n->getVelocityMax();
+        targetTypeNostalgicClear = n->getTargetTypeNostalgicClear();
     }
     
     inline void performModification(NostalgicPreparation::Ptr n, Array<bool> dirty)
@@ -215,7 +218,8 @@ public:
                 clusterThreshold == n->getClusterThreshold() &&
                 keyOnReset == n->getKeyOnReset() &&
                 velocityMin == n->getVelocityMin() &&
-                velocityMax == n->getVelocityMax());
+                velocityMax == n->getVelocityMax()) &&
+                targetTypeNostalgicClear == n->getTargetTypeNostalgicClear();
     }
 
 	inline void randomize()
@@ -277,6 +281,9 @@ public:
     inline const float getUndertowSustain() const noexcept                 {return nUndertowSustain;       }
     inline const int getUndertowRelease() const noexcept                   {return nUndertowRelease;       }
     inline const Array<float> getUndertowADSRvals() const noexcept         {return { (float)nUndertowAttack, (float)nUndertowDecay,(float)nUndertowSustain,(float)nUndertowRelease}; }
+    
+    inline const TargetNoteMode getTargetTypeNostalgicClear() const noexcept { return targetTypeNostalgicClear; }
+    inline void setTargetTypeNostalgicClear(TargetNoteMode nm)             { targetTypeNostalgicClear = nm; }
     
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
@@ -376,6 +383,8 @@ public:
         
         prep.setProperty( "keyOnReset", getKeyOnReset() ? 1 : 0, 0);
         
+        prep.setProperty( ptagNostalgic_targetClearAll, getTargetTypeNostalgicClear(), 0);
+        
         ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
         count = 0;
         for (auto f : getReverseADSRvals())
@@ -404,6 +413,9 @@ public:
         
         i = e->getStringAttribute(ptagNostalgic_undertow).getIntValue();
         setUndertow(i);
+        
+        i = e->getStringAttribute(ptagNostalgic_targetClearAll).getIntValue();
+        setTargetTypeNostalgicClear((TargetNoteMode)i);
         
         forEachXmlChildElement (*e, sub)
         {
@@ -601,6 +613,8 @@ private:
     int velocityMin, velocityMax;
     
     bool keyOnReset;
+    
+    TargetNoteMode targetTypeNostalgicClear;
     
     //internal keymap for resetting internal values to static
     //Keymap::Ptr resetMap = new Keymap(0);
@@ -856,15 +870,15 @@ public:
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
     
     // begin timing played note length, called with noteOn
-    void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel);
+    void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel, Array<KeymapTargetState> targetStates);
     
     // begin playing reverse note, called with noteOff
-    void keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, bool post = false);
+    void keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post = false);
     
     void postRelease(int midiNoteNumber, int midiChannel);
     
     // clear all sounding Nostalgic notes
-    void clearAll();
+    void clearAll(int midiChannel);
     
     inline void attachToSynthesiser(BKSynthesiser* main)
     {

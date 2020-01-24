@@ -597,10 +597,10 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
             }
         }
         if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, channel);
+            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
             pressTargetStates.fill(TargetStateNil); }
         if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, velocity, channel);
+            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
             releaseTargetStates.fill(TargetStateNil); }
     }
     
@@ -739,10 +739,10 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
             }
         }
         if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, channel);
+            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
             pressTargetStates.fill(TargetStateNil); }
         if (releaseTargetStates.contains(TargetStateEnabled)) {
-            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel);
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
             releaseTargetStates.fill(TargetStateNil); }
     }
     
@@ -856,7 +856,7 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
         for (auto proc : nprocessor)
         {
             //DBG("nostalgic sustainPedalReleased " + String((int)post));
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, releaseNote.channel, targetStates, post);
         }
         
         for (auto proc : bprocessor)
@@ -912,7 +912,7 @@ void PreparationMap::sustainPedalReleased(bool post)
         for (auto proc : nprocessor)
         {
             //DBG("nostalgic sustainPedalReleased " + String((int)post));
-            proc->keyReleased(releaseNote.noteNumber, releaseNote.channel, post);
+            proc->keyReleased(releaseNote.noteNumber, releaseNote.velocity, releaseNote.channel, targetStates, post);
         }
         
         for (auto proc : bprocessor)
@@ -969,7 +969,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, St
         
         for (auto proc : nprocessor)
         {
-            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, true);
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel, targetStates, true);
         }
         
         for (auto proc : mprocessor)

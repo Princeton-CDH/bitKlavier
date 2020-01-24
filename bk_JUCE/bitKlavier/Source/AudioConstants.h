@@ -128,6 +128,7 @@ const String ptagNostalgic_mode = "mode";
 const String ptagNostalgic_beatsToSkip = "beatsToSkip";
 const String ptagNostalgic_syncTarget = "syncTarget";
 const String ptagNostalgic_reset = "nostalgicReset";
+const String ptagNostalgic_targetClearAll = "targetTypeNostalgicClearAll";
 const String vtagNostalgic_reverseADSR = "reverseADSR";
 const String vtagNostalgic_undertowADSR = "undertowADSR";
 

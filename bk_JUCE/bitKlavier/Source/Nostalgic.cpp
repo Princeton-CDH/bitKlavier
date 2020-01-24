@@ -52,8 +52,14 @@ void NostalgicProcessor::postRelease(int midiNoteNumber, int midiChannel)
 }
 
 //begin reverse note; called when key is released
-void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, bool post)
+void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
 {
+    bool doNostalgic = targetStates[TargetTypeNostalgic] == TargetStateEnabled; // primary Nostalgic mode
+    bool doClear = targetStates[TargetTypeNostalgicClear] == TargetStateEnabled; // only if clearing all sounding notes
+    
+    if (doClear) clearAll(midiChannel);
+    if (!doNostalgic) return;
+    
     float duration = 0.0;
     
     NostalgicPreparation::Ptr prep = nostalgic->aPrep;
@@ -397,17 +403,18 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 }
 
 //start timer for length of a particular note; called when key is pressed
-void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel)
+void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel, Array<KeymapTargetState> targetStates)
 {
+    
+    bool doNostalgic = targetStates[TargetTypeNostalgic] == TargetStateEnabled; // primary Nostalgic mode
+    bool doClear = targetStates[TargetTypeNostalgicClear] == TargetStateEnabled; // only if clearing all sounding notes
+    
+    if (doClear) clearAll(midiChannel);
+    if (!doNostalgic) return;
+    
     NostalgicPreparation::Ptr prep = nostalgic->aPrep;
     
     lastVelocity = midiNoteVelocity;
-    
-    // for testing
-    if (midiNoteNumber == 60) {
-        clearAll();
-        return;
-    }
     
     if (prep->getMode() == SynchronicSync)
     {
@@ -574,7 +581,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
 }
 
 // clear all sounding notes
-void NostalgicProcessor::clearAll()
+void NostalgicProcessor::clearAll(int midiChannel)
 {
     NostalgicPreparation::Ptr prep = nostalgic->aPrep;
     
@@ -590,7 +597,7 @@ void NostalgicProcessor::clearAll()
                 for (auto transp : prep->getTransposition())
                 {
                     DBG("reverse remove: " + String(note->getNoteNumber() + transp));
-                    synth->keyOff (0, //midichannel, ignore?
+                    synth->keyOff (midiChannel,
                                    NostalgicNote,
                                    nostalgic->getId(),
                                    note->getNoteNumber(),
@@ -614,7 +621,7 @@ void NostalgicProcessor::clearAll()
             for (auto transp : prep->getTransposition())
             {
                 DBG("undertow remove: " + String(note->getNoteNumber() + transp));
-                synth->keyOff (0, // midiChannel, ignored?
+                synth->keyOff (midiChannel,
                                NostalgicNote,
                                nostalgic->getId(),
                                note->getNoteNumber(),
