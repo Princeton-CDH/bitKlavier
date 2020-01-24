@@ -675,7 +675,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
             pressTargetStates.fill(TargetStateNil); }
         if (releaseTargetStates.contains(TargetStateEnabled)) {
             proc->playReleaseSample(noteNumber, velocity, channel, soundfont);
-            proc->keyReleased(noteNumber, velocity, channel, soundfont);
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel, soundfont);
             releaseTargetStates.fill(TargetStateNil); }
     }
     
@@ -720,7 +720,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
             proc->keyPressed(noteNumber, velocity, pressTargetStates);
             pressTargetStates.fill(TargetStateNil); }
         if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
             releaseTargetStates.fill(TargetStateNil); }
     }
     
@@ -741,7 +741,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
             proc->keyPressed(noteNumber, velocity, channel);
             pressTargetStates.fill(TargetStateNil); }
         if (releaseTargetStates.contains(TargetStateEnabled)) {
-            proc->keyReleased(noteNumber, velocity, channel);
+            if (!sustainPedalIsDepressed) proc->keyReleased(noteNumber, velocity, channel);
             releaseTargetStates.fill(TargetStateNil); }
     }
     
