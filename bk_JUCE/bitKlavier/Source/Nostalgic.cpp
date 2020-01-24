@@ -54,15 +54,20 @@ void NostalgicProcessor::postRelease(int midiNoteNumber, int midiChannel)
 //begin reverse note; called when key is released
 void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
 {
+    NostalgicPreparation::Ptr prep = nostalgic->aPrep;
+    
     bool doNostalgic = targetStates[TargetTypeNostalgic] == TargetStateEnabled; // primary Nostalgic mode
     bool doClear = targetStates[TargetTypeNostalgicClear] == TargetStateEnabled; // only if clearing all sounding notes
     
-    if (doClear) clearAll(midiChannel);
+    if (doClear &&
+        (prep->getTargetTypeNostalgicClear() == NoteOff || prep->getTargetTypeNostalgicClear() == Both))
+    {
+        clearAll(midiChannel);
+    }
+    
     if (!doNostalgic) return;
     
     float duration = 0.0;
-    
-    NostalgicPreparation::Ptr prep = nostalgic->aPrep;
     
     if (post || noteOn[midiNoteNumber])
     {
@@ -405,14 +410,20 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 //start timer for length of a particular note; called when key is pressed
 void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel, Array<KeymapTargetState> targetStates)
 {
+    NostalgicPreparation::Ptr prep = nostalgic->aPrep;
     
     bool doNostalgic = targetStates[TargetTypeNostalgic] == TargetStateEnabled; // primary Nostalgic mode
     bool doClear = targetStates[TargetTypeNostalgicClear] == TargetStateEnabled; // only if clearing all sounding notes
     
-    if (doClear) clearAll(midiChannel);
-    if (!doNostalgic) return;
+    DBG("note = " + String(midiNoteNumber) + " channel = " + String(midiChannel) + " doClear = " + String((int)doClear));
     
-    NostalgicPreparation::Ptr prep = nostalgic->aPrep;
+    if (doClear &&
+        (prep->getTargetTypeNostalgicClear() == NoteOn || prep->getTargetTypeNostalgicClear() == Both))
+    {
+        clearAll(midiChannel);
+    }
+    
+    if (!doNostalgic) return;
     
     lastVelocity = midiNoteVelocity;
     

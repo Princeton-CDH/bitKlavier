@@ -166,7 +166,7 @@ BKViewController(p, theGraph, 1)
     nostalgicTBGroup.setName("nostalgicGroup");
     nostalgicTBGroup.setText("Nostalgic Targets");
     nostalgicTBGroup.setTextLabelPosition(Justification::centred);
-    //addAndMakeVisible(nostalgicTBGroup);
+    addAndMakeVisible(nostalgicTBGroup);
     
     // border for Blendronic Target Toggles
     blendronicTBGroup.setName("blendronicGroup");
@@ -401,9 +401,43 @@ void KeymapViewController::resized()
     }
      */
      
+    // Nostalgic Targets
+    thirdColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+    Rectangle<int> nostalgicBox = thirdColumn.removeFromTop((TargetTypeNostalgic - TargetTypeNostalgic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+    Rectangle<int> nostalgicGroup1 = nostalgicBox;
+    blendronicTBGroup.setBounds(nostalgicBox);
+    nostalgicBox.removeFromTop(4 * gYSpacing);
+    nostalgicBox.removeFromLeft(gXSpacing);
+    for (int i=TargetTypeNostalgic; i<=TargetTypeNostalgic; i++)
+    {
+        targetControlTBs[i]->setBounds(nostalgicBox.removeFromTop(gComponentToggleBoxHeight));
+        //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
+        nostalgicBox.removeFromTop(gYSpacing);
+    }
+    
+    area.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+    Rectangle<int> nostalgicBox2 = area.removeFromTop((TargetTypeNostalgicClear - TargetTypeNostalgicClear + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+    Rectangle<int> nostalgicGroup2 = nostalgicBox2;
+    blendronicTBGroup.setBounds(nostalgicBox2);
+    nostalgicBox2.removeFromTop(4 * gYSpacing);
+    nostalgicBox2.removeFromLeft(gXSpacing);
+    for (int i=TargetTypeNostalgicClear; i<=TargetTypeNostalgicClear; i++)
+    {
+        targetControlTBs[i]->setBounds(nostalgicBox2.removeFromTop(gComponentToggleBoxHeight));
+        //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
+        nostalgicBox2.removeFromTop(gYSpacing);
+    }
+    
+    nostalgicTBGroup.setBounds(nostalgicGroup1.getX(),
+    nostalgicGroup1.getY(),
+    nostalgicGroup2.getWidth() +
+    nostalgicGroup1.getWidth(),
+    nostalgicGroup1.getHeight());
+    
     
     // Blendronic Targets
-    thirdColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+    // thirdColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+    thirdColumn.removeFromTop(gYSpacing * 2);
     Rectangle<int> blendronicBox = thirdColumn.removeFromTop((TargetTypeBlendronicClear - TargetTypeBlendronicPatternSync + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     Rectangle<int> blendronicGroup1 = blendronicBox;
     blendronicTBGroup.setBounds(blendronicBox);
@@ -416,7 +450,8 @@ void KeymapViewController::resized()
         blendronicBox.removeFromTop(gYSpacing);
     }
     
-    area.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+    //area.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+    area.removeFromTop(gYSpacing * 2);
     Rectangle<int> blendronicBox2 = area.removeFromTop((TargetTypeBlendronicOpenCloseOutput - TargetTypeBlendronicPausePlay + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     Rectangle<int> blendronicGroup2 = blendronicBox2;
     blendronicTBGroup.setBounds(blendronicBox2);
@@ -1061,7 +1096,7 @@ void KeymapViewController::hideUnconnectedTargets()
             
             synchronicTBGroup.setAlpha(gMedium);
         }
-        
+       
         if (kmItem->getConnectionsOfType(PreparationTypeBlendronic).size() == 0)
         {
             for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
@@ -1081,6 +1116,27 @@ void KeymapViewController::hideUnconnectedTargets()
             }
             
             blendronicTBGroup.setAlpha(gMedium);
+        }
+        
+        if (kmItem->getConnectionsOfType(PreparationTypeNostalgic).size() == 0)
+        {
+            for (int i=TargetTypeNostalgic; i<=TargetTypeNostalgicClear; i++)
+            {
+                targetControlTBs[i]->setAlpha(gDim);
+                targetControlTBs[i]->setEnabled(false);
+            }
+            
+            nostalgicTBGroup.setAlpha(gDim);
+        }
+        else
+        {
+            for (int i=TargetTypeNostalgic; i<=TargetTypeNostalgicClear; i++)
+            {
+                targetControlTBs[i]->setAlpha(gBright);
+                targetControlTBs[i]->setEnabled(true);
+            }
+            
+            nostalgicTBGroup.setAlpha(gMedium);
         }
     }
 }

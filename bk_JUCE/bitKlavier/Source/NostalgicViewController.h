@@ -26,6 +26,8 @@ public:
         setLookAndFeel(nullptr);
     };
     
+    BKButtonAndMenuLAF comboBoxRightJustifyLAF;
+    
     BKWaveDistanceUndertowSlider nDisplaySlider;
 
     BKEditableComboBox selectCB;
@@ -50,6 +52,9 @@ public:
     
     BKLabel         reverseADSRLabel;
     BKLabel         undertowADSRLabel;
+    
+    OwnedArray<BKComboBox> targetControlCBs;
+    OwnedArray<BKLabel> targetControlCBLabels;
     
     void paint (Graphics&) override;
     void resized() override;

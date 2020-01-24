@@ -114,6 +114,26 @@ BKViewController(p, theGraph, 3)
     keyOnResetLabel.setTooltip("interrupts currently sounding nostalgic notes of the same pitch");
     addAndMakeVisible(keyOnResetLabel);
     
+    // Target Control CBs (just one for now in Nostalgic, but use same structure in case we add)
+    targetControlCBs = OwnedArray<BKComboBox>();
+    for (int i=TargetTypeNostalgicClear; i<=TargetTypeNostalgicClear; i++)
+    {
+        targetControlCBs.add(new BKComboBox()); // insert at the end of the array
+        targetControlCBs.getLast()->setName(cKeymapTargetTypes[i]);
+        targetControlCBs.getLast()->addListener(this);
+        targetControlCBs.getLast()->setLookAndFeel(&comboBoxRightJustifyLAF);
+        targetControlCBs.getLast()->addItem(cTargetNoteModes[TargetNoteMode::NoteOn], TargetNoteMode::NoteOn + 1);
+        targetControlCBs.getLast()->addItem(cTargetNoteModes[TargetNoteMode::NoteOff], TargetNoteMode::NoteOff + 1);
+        targetControlCBs.getLast()->addItem(cTargetNoteModes[TargetNoteMode::Both], TargetNoteMode::Both + 1);
+        targetControlCBs.getLast()->setSelectedItemIndex(0, dontSendNotification);
+        addAndMakeVisible(targetControlCBs.getLast(), ALL);
+        
+        targetControlCBLabels.add(new BKLabel());
+        targetControlCBLabels.getLast()->setText(cKeymapTargetTypes[i], dontSendNotification);
+        addAndMakeVisible(targetControlCBLabels.getLast(), ALL);
+    }
+    targetControlCBs[0]->setTooltip("when targeted by a Keymap, determines what kind of note message will clear all Nostalgic notes");
+    
     
 #if JUCE_IOS
     holdTimeMinMaxSlider->addWantsBigOneListener(this);
@@ -144,7 +164,6 @@ void NostalgicViewController::invisible(void)
     transpositionSlider->setVisible(false);
     nDisplaySlider.setVisible(false);
     
-    
     holdTimeMinMaxSlider->setVisible(false);
     velocityMinMaxSlider->setVisible(false);
     clusterMinSlider->setVisible(false);
@@ -154,6 +173,12 @@ void NostalgicViewController::invisible(void)
     undertowADSRSlider->setVisible(false);
     reverseADSRLabel.setVisible(false);
     undertowADSRLabel.setVisible(false);
+    
+    for (int i=0; i<targetControlCBs.size(); i++)
+    {
+        targetControlCBs[i]->setVisible(false);
+        targetControlCBLabels[i]->setVisible(false);
+    }
 }
 
 void NostalgicViewController::displayShared(void)
@@ -269,13 +294,33 @@ void NostalgicViewController::displayTab(int tab)
         clusterMinSlider->setVisible(true);
         clusterThresholdSlider->setVisible(true);
         
+        // make the combo boxes visible
+        for (int i=0; i<targetControlCBs.size(); i++)
+        {
+            targetControlCBs[i]->setVisible(true);
+            targetControlCBLabels[i]->setVisible(true);
+        }
+        
         Rectangle<int> area (getBounds());
-        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
+        area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        //area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + gYSpacing);
+        area.removeFromTop(selectCB.getHeight() + gYSpacing);
+        
+        Rectangle<int> targetSlice (area.removeFromTop(gComponentToggleBoxHeight));
+        targetSlice.removeFromLeft(targetSlice.getWidth() / 2);
+        targetSlice.removeFromRight(gXSpacing);
+        targetControlCBs[0]->setBounds(targetSlice.removeFromRight(100));
+        targetControlCBLabels[0]->setBounds(targetSlice.removeFromRight(targetSlice.getWidth() / 2));
+        targetControlCBLabels[0]->setJustificationType(juce::Justification::centredRight);
+        
         area.removeFromRight(rightArrow.getWidth());
         area.removeFromLeft(leftArrow.getWidth());
         
         area.removeFromLeft(processor.paddingScalarX * 100);
         area.removeFromRight(processor.paddingScalarX * 100);
+        
+        //area.removeFromTop(selectCB.getHeight() + 5 * processor.paddingScalarY + gYSpacing);
+        area.removeFromTop(10 * gYSpacing * processor.paddingScalarY + gYSpacing);
         
         int columnHeight = area.getHeight();
 
@@ -964,8 +1009,6 @@ void NostalgicPreparationEditor::timerCallback()
                 clusterThresholdSlider->setDisplayValue(0);
             }
             
-            
-            
             NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
             if(active->getMode() == NoteLengthSync)
             {
@@ -998,6 +1041,28 @@ void NostalgicPreparationEditor::timerCallback()
                 clusterThresholdSlider->setEnabled(false);
             }
 
+            // dim target comboboxes that aren't activated by a Keymap
+            for (int i=TargetTypeNostalgicClear; i<=TargetTypeNostalgicClear; i++)
+            {
+                bool makeBright = false;
+                for (auto km : nProcessor->getKeymaps())
+                    if (km->getTargetStates()[(KeymapTargetType) i] == TargetStateEnabled) makeBright = true;
+                
+                if (makeBright)
+                {
+                    targetControlCBs[i - TargetTypeNostalgicClear]->setAlpha(1.);
+                    targetControlCBLabels[i - TargetTypeNostalgicClear]->setAlpha(1.);
+                    
+                    targetControlCBs[i - TargetTypeNostalgicClear]->setEnabled(true);
+                }
+                else
+                {
+                    targetControlCBs[i - TargetTypeNostalgicClear]->setAlpha(0.25);
+                    targetControlCBLabels[i - TargetTypeNostalgicClear]->setAlpha(0.25);
+                    
+                    targetControlCBs[i - TargetTypeNostalgicClear]->setEnabled(false);
+                }
+            }
             
         }
     }

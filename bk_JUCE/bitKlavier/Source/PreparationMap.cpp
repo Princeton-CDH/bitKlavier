@@ -592,8 +592,11 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
                 targetStates = &pressTargetStates;
                 if (km->isInverted()) targetStates = &releaseTargetStates;
                 
-                if (km->getTargetStates()[TargetTypeNostalgic] == TargetStateEnabled)
-                    targetStates->set(TargetTypeNostalgic, TargetStateEnabled);
+                for (int i = TargetTypeNostalgic; i <= TargetTypeNostalgicClear; i++)
+                {
+                    if (km->getTargetStates()[i] == TargetStateEnabled)
+                        targetStates->set(i, TargetStateEnabled);
+                }
             }
         }
         if (pressTargetStates.contains(TargetStateEnabled)) {
