@@ -837,6 +837,7 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
             // functionality, where releasing the sustain pedal will launch synchronic when in a noteOff mode
             // but i'm not sure i've done this the right way, given this targetState structure
             // which i'm a bit fuzzy on
+            // it looks like sustainPedalReleased might need a "source" argument, no?
             for (auto km : proc->getKeymaps())
             {
                 if (km->containsNote(releaseNote.noteNumber))
