@@ -22,6 +22,12 @@ BKViewController(p, theGraph, 3)
     iconImageComponent.setAlpha(0.095);
     //addAndMakeVisible(iconImageComponent);
     
+    gainSlider = std::make_unique<BKSingleSlider>("gain", 0, 10, 1, 0.01);
+    gainSlider->setSkewFactorFromMidPoint(1.);
+    gainSlider->setJustifyRight(true);
+    gainSlider->setToolTipString("Adjusts overall volume of blendronic");
+    addAndMakeVisible(*gainSlider);
+    
     // MultSliders
     paramSliders = OwnedArray<BKMultiSlider>();
     
@@ -39,6 +45,7 @@ BKViewController(p, theGraph, 3)
             paramSliders[idx]->addMyListener(this);
 #if JUCE_IOS
             paramSliders[idx]->addWantsBigOneListener(this);
+            gainSlider->addWantsBigOneListener(this);
 #endif
             paramSliders[idx]->setMinMaxDefaultInc(cBlendronicDefaultRangeValuesAndInc[i]);
         
@@ -143,6 +150,8 @@ BKViewController(p, theGraph, 3)
 
 void BlendronicViewController::invisible(void)
 {
+    gainSlider->setVisible(false);
+    
     for (int i = 0; i < paramSliders.size(); i++)
     {
         paramSliders[i]->setVisible(false);
@@ -225,6 +234,8 @@ void BlendronicViewController::displayTab(int tab)
 //        smoothEqualLabel.setVisible(true);
 //        smoothValueLabel.setVisible(true);
 //
+        gainSlider->setVisible(true);
+        
         for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setVisible(true);
@@ -244,7 +255,11 @@ void BlendronicViewController::displayTab(int tab)
         leftColumn.removeFromRight(processor.paddingScalarX * 20);
         rightColumn.removeFromLeft(processor.paddingScalarX * 20);
 
-        area.removeFromTop(gComponentComboBoxHeight*2);
+        //area.removeFromTop(gComponentComboBoxHeight*2);
+        area.removeFromTop(gComponentRangeSliderHeight + 2 * gYSpacing);
+        rightColumn.removeFromTop(gYSpacing);
+        gainSlider->setBounds(rightColumn.removeFromTop(gComponentRangeSliderHeight));
+        
         for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setBounds(area.removeFromTop(sliderHeight));
@@ -412,6 +427,8 @@ BlendronicViewController(p, theGraph)
     selectCB.addListener(this);
     selectCB.addMyListener(this);
     
+    gainSlider->addMyListener(this);
+    
     startTimer(20);
 }
 
@@ -433,6 +450,8 @@ void BlendronicPreparationEditor::update(void)
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentBlendronicId, dontSendNotification);
+        
+        gainSlider->setValue(prep->getOutGain(), dontSendNotification);
         
         for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -632,6 +651,15 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
+    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+    
+    if(name == "gain")
+    {
+        DBG("blendronic gain " + String(val));
+        prep->setOutGain(val);
+        active->setOutGain(val);
+    }
 }
 
 void BlendronicPreparationEditor::fillSelectCB(int last, int current)
@@ -881,10 +909,14 @@ BlendronicViewController(p, theGraph)
     
     selectCB.addListener(this);
     selectCB.addMyListener(this);
+    
+    gainSlider->addMyListener(this);
 }
 
 void BlendronicModificationEditor::greyOutAllComponents()
 {
+    gainSlider->setDim(gModAlpha);
+    
     for(int i = 0; i < paramSliders.size(); i++)
     {
         paramSliders[i]->setAlpha(gModAlpha);
@@ -894,6 +926,8 @@ void BlendronicModificationEditor::greyOutAllComponents()
 void BlendronicModificationEditor::highlightModedComponents()
 {
     BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
+    
+    if(mod->getDirty(BlendronicOutGain)) gainSlider->setBright();
     
     if (mod->getDirty(BlendronicBeats))
     {
@@ -954,6 +988,8 @@ void BlendronicModificationEditor::update(void)
     
     if (mod != nullptr)
     {
+        gainSlider->setValue(mod->getOutGain(), dontSendNotification);
+        
         for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
             targetControlCBs[i - TargetTypeBlendronicPatternSync]->setSelectedItemIndex
@@ -1273,6 +1309,13 @@ void BlendronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
 {
     BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
    
+    if(name == "gain")
+    {
+        mod->setOutGain(val);
+        mod->setDirty(BlendronicOutGain);
+        
+        gainSlider->setBright();
+    }
     
     updateModification();
 }
