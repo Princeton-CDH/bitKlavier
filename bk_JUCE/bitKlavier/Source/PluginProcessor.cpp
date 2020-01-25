@@ -509,7 +509,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     bool activeSource = false;
     for (auto km : pmap->getKeymaps())
     {
-        if (km->getAllMidiInputSources().contains(source))
+        if (km->getAllMidiInputSources().contains(source) || source == "DAW")
         {
             ++noteOnCount;
             noteOn.set(noteNumber, true);
@@ -753,6 +753,20 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         notesOffUI.remove(i);
     }
     
+    // MIDI message handling for plugin wrappers
+    if(wrapperType == wrapperType_AudioUnit ||
+       wrapperType == wrapperType_VST ||
+       wrapperType == wrapperType_VST3) //check this on setup; if(isPlugIn) {...
+    {
+        int time;
+        MidiMessage m;
+        for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
+        {
+            // kludgy, but just trying to see if this works...
+            handleIncomingMidiMessage(nullptr, m);
+        }
+    }
+  
 	//if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
@@ -1361,8 +1375,10 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
 {
     int noteNumber = m.getNoteNumber();
     float velocity = m.getFloatVelocity();
-    String sourceName = source->getName();
     
+    String sourceName;
+    if(source != nullptr) sourceName = source->getName();
+    else sourceName = "DAW";
     
     channel = m.getChannel();
     

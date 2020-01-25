@@ -348,7 +348,7 @@
  #define JucePlugin_Desc                   "A prepared digital piano. "
 #endif
 #ifndef  JucePlugin_Manufacturer
- #define JucePlugin_Manufacturer           "manyarrowsmusic"
+ #define JucePlugin_Manufacturer           "Many Arrows Music"
 #endif
 #ifndef  JucePlugin_ManufacturerWebsite
  #define JucePlugin_ManufacturerWebsite    "http://manyarrowsmusic.com/"
@@ -453,7 +453,7 @@
  #define JucePlugin_IAASubType             JucePlugin_PluginCode
 #endif
 #ifndef  JucePlugin_IAAName
- #define JucePlugin_IAAName                "manyarrowsmusic: bitKlavier"
+ #define JucePlugin_IAAName                "Many Arrows Music: bitKlavier"
 #endif
 #ifndef  JucePlugin_VSTNumMidiInputs
  #define JucePlugin_VSTNumMidiInputs       16

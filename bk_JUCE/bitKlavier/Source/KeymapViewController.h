@@ -70,6 +70,8 @@ private:
     
     bool hasBigOne;
     
+    juce::AudioPluginInstance::WrapperType wrapperType;
+    
     BKLabel     keymapSelectL;
     BKEditableComboBox  selectCB;
     

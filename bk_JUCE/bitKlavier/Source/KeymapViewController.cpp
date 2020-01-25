@@ -25,6 +25,8 @@ BKViewController(p, theGraph, 1)
     setLookAndFeel(&buttonsAndMenusLAF);
     // buttonsAndMenusLAF.drawGroupComponentOutline();
     
+    wrapperType = p.wrapperType;
+    
     iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
     iconImageComponent.setAlpha(0.095);
@@ -42,8 +44,10 @@ BKViewController(p, theGraph, 1)
     midiInputSelectButton.setButtonText("Select MIDI Inputs");
     midiInputSelectButton.setTooltip("Select from available MIDI input devices");
     midiInputSelectButton.addListener(this);
-    addAndMakeVisible(midiInputSelectButton);
     
+    if(wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+        addAndMakeVisible(midiInputSelectButton);
+        
     targetsButton.setName("TargetsButton"); // remove?
     targetsButton.setButtonText("Targets");
     targetsButton.setTooltip("Select which parts of connected preparations to send key information");
@@ -292,8 +296,11 @@ void KeymapViewController::resized()
     Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
     targetsSlice.removeFromRight(gXSpacing);
     //targetsButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
-    midiInputSelectButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
-    targetsSlice.removeFromRight(gXSpacing);
+    if(wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+    {
+        midiInputSelectButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
+        targetsSlice.removeFromRight(gXSpacing);
+    }
     
     invertOnOffToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
     invertOnOffToggle.toFront(false);
