@@ -499,6 +499,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 
 	float transposition = transp;
     
+    // needed for MIDI Out; will just return the last found voice, if there are multiple voices
     BKSynthesiserVoice* voiceToReturn;
 
 	for (int i = sounds.size(); --i >= 0;)
@@ -540,10 +541,12 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 				BlendronicLevel,
 				blendronic);
 			
-			//return voice;
+			// voice to return;
             voiceToReturn = voice;
 		}
 	}
+    
+    // use for MIDI Out
     return voiceToReturn;
 }
 
