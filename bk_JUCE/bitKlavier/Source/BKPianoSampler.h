@@ -222,20 +222,24 @@ private:
     double cfSamples; // number of samples for crossfade
     
     //double beginPosition, loopPosition, endPosition;
-    stk::Envelope sampleEnv, loopEnv;
+    //stk::Envelope sampleEnv, loopEnv;
+    BKEnvelope sampleEnv, loopEnv;
 
     bool sfzEnvApplied;
     
     double samplePosition, loopPosition;
     
-    stk::ADSR adsr;
-    stk::AHDSR sfzadsr;
+    //stk::ADSR adsr;
+    //stk::AHDSR sfzadsr;
+    BKADSR adsr;
+    BKAHDSR sfzadsr;
     
     bool lastRamp;
     int numLoops;
     
     bool inLoop;
-    stk::ADSR lastIn, lastOut;
+    //stk::ADSR lastIn, lastOut;
+    BKADSR lastIn, lastOut;
 
 	float blendronicLevel;
 	BlendronicProcessor::PtrArr blendronic;

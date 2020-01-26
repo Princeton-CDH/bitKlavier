@@ -575,7 +575,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         //===========================================
         if (playDirection == Forward)
         {
-            if (adsr.getState() == stk::ADSR::IDLE)
+            if (adsr.getState() == BKADSR::IDLE)
             {
                 stopNote(0.0f, false);
                 break;
@@ -620,7 +620,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         }
         
         // Check for adsr keyOffs
-        if ((playType != Normal) && ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE)))
+        if ((playType != Normal) && ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE)))
         {
             if (lengthTracker >= (playLength - adsr.getReleaseTime() * getSampleRate()))
             {
@@ -683,7 +683,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         lengthTracker += bentRatio;
         
         //for reverse notes longer than sample length, write 0's, then continue
-        if ((adsr.getState() != stk::ADSR::IDLE) &&
+        if ((adsr.getState() != BKADSR::IDLE) &&
             (playDirection == Reverse) &&
             (samplePosition > playingSound->soundLength - 1))
         {
@@ -719,7 +719,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         //===========================================
         if (playDirection == Forward)
         {
-            if (adsr.getState() == stk::ADSR::IDLE)
+            if (adsr.getState() == BKADSR::IDLE)
             {
                 stopNote(0.0f, false);
                 break;
@@ -727,7 +727,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
             
             if (playType != Normal)
             {
-                if ((adsr.getState() != stk::ADSR::RELEASE) && (lengthTracker >= playLength))
+                if ((adsr.getState() != BKADSR::RELEASE) && (lengthTracker >= playLength))
                 {
                     adsr.keyOff();
                 }
@@ -743,7 +743,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
             
             if (playType != Normal && (lengthTracker >= playLength))
             {
-                if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
+                if ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE))
                 {
                     adsr.keyOff();
                 }
@@ -824,7 +824,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     while (--numSamples >= 0)
     {
 
-        if ((adsr.getState() != stk::ADSR::IDLE) &&
+        if ((adsr.getState() != BKADSR::IDLE) &&
             (playDirection == Reverse) &&
             (sourceSamplePosition > playingSound->soundLength - 1))
         {
@@ -855,7 +855,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         l *= (lgain * adsr.tick());
         r *= (rgain * adsr.lastOut());
         
-        if (adsr.getState() == stk::ADSR::IDLE)
+        if (adsr.getState() == BKADSR::IDLE)
         {
             stopNote (0.0f, false);
             break;
@@ -888,7 +888,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             
             if (sourceSamplePosition >= playEndPosition)
             {
-                if (adsr.getState() != stk::ADSR::RELEASE)
+                if (adsr.getState() != BKADSR::RELEASE)
                 {
                     adsr.keyOff();
                 }
@@ -906,7 +906,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             
             if (sourceSamplePosition <= playEndPosition)
             {
-                if ((adsr.getState() != stk::ADSR::RELEASE) && (adsr.getState() != stk::ADSR::IDLE))
+                if ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE))
                 {
                     adsr.keyOff();
                 }

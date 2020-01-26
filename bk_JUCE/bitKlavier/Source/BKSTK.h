@@ -112,11 +112,19 @@ public:
 	inline void setRate(float sr) { rate = sr; }
     inline void setTime(float time) { rate = 1.0 / ( time * sampleRate * 0.001 ); DBG("new rate = " + String(rate));} // time in ms for envelope to go from 0-1. need to update for sampleRate
     inline void setSampleRate(double sr) { sampleRate = sr; }
+    
+    //! Set target = 1.
+    void keyOn( void ) { this->setTarget( 1.0 ); };
+
+    //! Set target = 0.
+    void keyOff( void ) { this->setTarget( 0.0 ); };
 
 	float tick();
+    float lastOut() { return lastvalue; }
 
 private:
 	float value;
+    float lastvalue;
 	float target;
 	float rate;
 	int state;
@@ -162,7 +170,7 @@ public:
     inline const unsigned long getDelayedSample() const noexcept { return delayLinear->getOutPoint(); }
 
 	//mutators
-	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to stkFloat)
+	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to float)
 	inline void setDelayMax(float delayMax) { dDelayMax = delayMax; }
 	inline void setDelayGain(float delayGain) { dDelayGain = delayGain; }
 	inline void setDelayLength(float delayLength) { dDelayLength = delayLength; delayLinear->setLength(delayLength); }
@@ -214,5 +222,328 @@ private:
     
     double sampleRate;
 };
+
+/***************************************************/
+/*! \class ADSR
+    \brief STK ADSR envelope class.
+
+    This class implements a traditional ADSR (Attack, Decay, Sustain,
+    Release) envelope.  It responds to simple keyOn and keyOff
+    messages, keeping track of its state.  The \e state = ADSR::IDLE
+    before being triggered and after the envelope value reaches 0.0 in
+    the ADSR::RELEASE state.  All rate, target and level settings must
+    be non-negative.  All time settings must be positive.
+
+    by Perry R. Cook and Gary P. Scavone, 1995-2011.
+*/
+/***************************************************/
+
+class BKADSR
+{
+ public:
+
+  //! ADSR envelope states.
+  enum {
+    ATTACK,   /*!< Attack */
+    DECAY,    /*!< Decay */
+    SUSTAIN,  /*!< Sustain */
+    RELEASE,  /*!< Release */
+    IDLE      /*!< Before attack / after release */
+  };
+
+  //! Default constructor.
+  BKADSR( void );
+
+  //! Class destructor.
+  ~BKADSR( void );
+
+  //! Set target = 1, state = \e ADSR::ATTACK.
+  void keyOn( void );
+
+  //! Set target = 0, state = \e ADSR::RELEASE.
+  void keyOff( void );
+
+  //! Set the attack rate.
+  void setAttackRate( float rate );
+
+  //! Set the target value for the attack (default = 1.0).
+  void setAttackTarget( float target );
+
+  //! Set the decay rate.
+  void setDecayRate( float rate );
+
+  //! Set the sustain level.
+  void setSustainLevel( float level );
+
+  //! Set the release rate.
+  void setReleaseRate( float rate );
+
+  //! Set the attack rate based on a time duration.
+  void setAttackTime( float time );
+
+  //! Set the decay rate based on a time duration (seconds).
+  void setDecayTime( float time );
+
+  //! Set the release rate based on a time duration (seconds).
+  void setReleaseTime( float time );
+    float  getReleaseTime( void );
+
+  //! Set sustain level and attack, decay, and release time durations.
+  void setAllTimes( float aTime, float dTime, float sLevel, float rTime );
+
+  //! Set a sustain target value and attack or decay from current value to target.
+  void setTarget( float target );
+
+  //! Return the current envelope \e state (ATTACK, DECAY, SUSTAIN, RELEASE, IDLE).
+  int getState( void ) const { return state_; };
+
+  //! Set to state = ADSR::SUSTAIN with current and target values of \e value.
+  void setValue( float value );
+    
+    float getAttackRate() {return attackRate_; };
+    float getDecayRate() {return decayRate_; };
+    float getSustainLevel() {return sustainLevel_; };
+    float getReleaseRate() {return releaseRate_; };
+
+    //! Return the last computed output value.
+    float lastOut( void ) const { return lastvalue_; };
+
+    //! Compute and return one output sample.
+    float tick( void );
+    
+    void setSampleRate(double sr)
+    {
+        sampleRateChanged(sr, sampleRate);
+        sampleRate = sr;
+    }
+
+ protected:
+
+  void sampleRateChanged( float newRate, float oldRate );
+
+  int state_;
+  float value_;
+  float lastvalue_;
+  float target_;
+  float attackRate_;
+  float decayRate_;
+  float releaseRate_;
+  float releaseTime_;
+  float sustainLevel_;
+    
+  double sampleRate;
+};
+
+
+inline float BKADSR :: tick( void )
+{
+  switch ( state_ ) {
+
+  case ATTACK:
+    value_ += attackRate_;
+    if ( value_ >= target_ ) {
+      value_ = target_;
+      target_ = sustainLevel_;
+        state_ = DECAY;
+    }
+    lastvalue_ = value_;
+    break;
+
+  case DECAY:
+    if ( value_ > sustainLevel_ ) {
+      value_ -= decayRate_;
+      if ( value_ <= sustainLevel_ ) {
+        value_ = sustainLevel_;
+        state_ = SUSTAIN;
+      }
+    }
+    else {
+      value_ += decayRate_; // attack target < sustain level
+      if ( value_ >= sustainLevel_ ) {
+        value_ = sustainLevel_;
+        state_ = SUSTAIN;
+      }
+    }
+    lastvalue_ = value_;
+    break;
+
+  case RELEASE:
+    value_ -= releaseRate_;
+    if ( value_ <= 0.0 ) {
+      value_ = 0.0;
+      state_ = IDLE;
+    }
+    lastvalue_ = value_;
+
+  }
+
+  return value_;
+}
+
+
+/***************************************************/
+/*! \class ADHSR
+    \brief STK ADHSR envelope class.
+ */
+/***************************************************/
+
+class BKAHDSR
+{
+public:
+    
+    //! AHDSR envelope states.
+    enum {
+        ATTACK,   /*!< Attack */
+        HOLD,     /*!< Hold */
+        DECAY,    /*!< Decay */
+        SUSTAIN,  /*!< Sustain */
+        RELEASE,  /*!< Release */
+        IDLE      /*!< Before attack / after release */
+    };
+    
+    //! Default constructor.
+    BKAHDSR( void );
+    
+    //! Class destructor.
+    ~BKAHDSR( void );
+    
+    //! Set target = 1, state = \e AHDSR::ATTACK.
+    void keyOn( void );
+    
+    //! Set target = 0, state = \e AHDSR::RELEASE.
+    void keyOff( void );
+    
+    //! Set the attack rate.
+    void setAttackRate( float rate );
+    
+    //! Set the target value for the attack (default = 1.0).
+    void setAttackTarget( float target );
+    
+    //! Set the hold time.
+    void setHoldTime( float time );
+    
+    //! Set the decay rate.
+    void setDecayRate( float rate );
+    
+    //! Set the sustain level.
+    void setSustainLevel( float level );
+    
+    //! Set the release rate.
+    void setReleaseRate( float rate );
+    
+    //! Set the attack rate based on a time duration.
+    void setAttackTime( float time );
+    
+    //! Set the decay rate based on a time duration (seconds).
+    void setDecayTime( float time );
+    
+    //! Set the release rate based on a time duration (seconds).
+    void setReleaseTime( float time );
+    float  getReleaseTime( void );
+    
+    //! Set sustain level and attack, decay, and release time durations.
+    void setAllTimes( float aTime, float hTime, float dTime, float sLevel, float rTime );
+    
+    //! Set a sustain target value and attack or decay from current value to target.
+    void setTarget( float target );
+    
+    //! Return the current envelope \e state (ATTACK, HOLD, DECAY, SUSTAIN, RELEASE, IDLE).
+    int getState( void ) const { return state_; };
+    
+    //! Set to state = ADSR::SUSTAIN with current and target values of \e value.
+    void setValue( float value );
+    
+    float getAttackRate() {return attackRate_; };
+    float getHoldSamples() {return holdSamples_; };
+    float getDecayRate() {return decayRate_; };
+    float getSustainLevel() {return sustainLevel_; };
+    float getReleaseRate() {return releaseRate_; };
+    
+    //! Return the last computed output value.
+    float lastOut( void ) const { return lastvalue_; };
+    
+    //! Compute and return one output sample.
+    float tick( void );
+    
+    void setSampleRate(double sr)
+    {
+        sampleRateChanged(sr, sampleRate);
+        sampleRate = sr;
+    }
+
+    
+protected:
+    
+    void sampleRateChanged( float newRate, float oldRate );
+    
+    int state_;
+    double holdSamples_;
+    double held_;
+    float value_;
+    float lastvalue_;
+    float target_;
+    float attackRate_;
+    float decayRate_;
+    float releaseRate_;
+    float releaseTime_;
+    float sustainLevel_;
+    
+    double sampleRate;
+};
+
+inline float BKAHDSR :: tick( void )
+{
+    switch ( state_ ) {
+            
+        case ATTACK:
+            value_ += attackRate_;
+            if ( value_ >= target_ ) {
+                value_ = target_;
+                state_ = HOLD;
+                held_ = 0;
+            }
+            lastvalue_ = value_;
+            break;
+            
+        case HOLD:
+            held_ ++;
+            value_ = target_;
+            if ( held_ >= holdSamples_) {
+                    state_ = DECAY;
+                    target_ = sustainLevel_;
+            }
+            lastvalue_ = value_;
+            break;
+            
+        case DECAY:
+            if ( value_ > sustainLevel_ ) {
+                value_ -= decayRate_;
+                if ( value_ <= sustainLevel_ ) {
+                    value_ = sustainLevel_;
+                    state_ = SUSTAIN;
+                }
+            }
+            else {
+                value_ += decayRate_; // attack target < sustain level
+                if ( value_ >= sustainLevel_ ) {
+                    value_ = sustainLevel_;
+                    state_ = SUSTAIN;
+                }
+            }
+            lastvalue_ = value_;
+            break;
+            
+        case RELEASE:
+            value_ -= releaseRate_;
+            if ( value_ <= 0.0 ) {
+                value_ = 0.0;
+                state_ = IDLE;
+            }
+            lastvalue_ = value_;
+            
+    }
+    
+    return value_;
+}
 
 #endif

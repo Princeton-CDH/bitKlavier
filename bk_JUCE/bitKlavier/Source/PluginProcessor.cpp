@@ -305,7 +305,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     currentSampleRate = sampleRate;
 #if JUCE_IOS
-    stk::Stk::setSampleRate(sampleRate);
+    //stk::Stk::setSampleRate(sampleRate);
 #endif
     //stk::Stk::setSampleRate(sampleRate); //crashes Logic Audio Unit Validation Tool
     
