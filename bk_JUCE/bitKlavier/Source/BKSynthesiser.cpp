@@ -538,7 +538,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 				BlendronicLevel,
 				blendronic);
 			
-			return voice;
+			//return voice;
 		}
 	}
     return nullptr;
