@@ -498,6 +498,8 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 	if (noteNumber > 108 || noteNumber < 21) return nullptr;
 
 	float transposition = transp;
+    
+    BKSynthesiserVoice* voiceToReturn;
 
 	for (int i = sounds.size(); --i >= 0;)
 	{
@@ -539,9 +541,10 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 				blendronic);
 			
 			//return voice;
+            voiceToReturn = voice;
 		}
 	}
-    return nullptr;
+    return voiceToReturn;
 }
 
 // VELOCITY IN MASTER REGIONS NEEDS TO BE APPLIED APPROPRIATELY
