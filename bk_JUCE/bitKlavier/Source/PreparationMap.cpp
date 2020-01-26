@@ -974,7 +974,7 @@ void PreparationMap::reattack(int noteNumber, String source)
         for(int i=0; i<sustainedNotes.size(); i++)
         {
             if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber &&
-               sustainedNotes.getUnchecked(i).source == source)
+               (sustainedNotes.getUnchecked(i).source == source || source == "DAW"))
                 sustainedNotes.remove(i);
         }
     }
