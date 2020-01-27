@@ -282,6 +282,8 @@ public:
     TuningProcessor::Ptr tuning;
 	BlendronicProcessor::PtrArr blendronic;
     
+    double currentSampleRate;
+    
 protected:
     /** Resets the state of this voice after a sound has finished playing.
      
@@ -302,7 +304,6 @@ private:
     //==============================================================================
     friend class BKSynthesiser;
     
-    double currentSampleRate;
     int currentlyPlayingNote, currentPlayingMidiChannel, currentlyPlayingKey;
         //sometimes Note and Key might be different, with non-zero transpositions, hence the need for currentlyPlayingKey
     uint32 length;
@@ -648,7 +649,7 @@ public:
      */
     void setMinimumRenderingSubdivisionSize (int numSamples, bool shouldBeStrict = false) noexcept;
 
-	BlendronicDelay::Ptr createBlendronicDelay(float delayLength, float delayMax, double sr, bool active = false);
+	BlendronicDelay::Ptr createBlendronicDelay(float delayLength, int delayBufferSize, double sr, bool active = false);
     void addBlendronicProcessor(BlendronicProcessor::Ptr bproc);
     void removeBlendronicProcessor(int Id);
     

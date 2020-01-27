@@ -73,7 +73,7 @@ public:
                           Array<float> smoothValues,
                           Array<float> feedbackCoefficients,
                           float clusterThresh,
-                          float delayMax);
+                          float delayBufferSizeInSeconds);
 	BlendronicPreparation(void);
 
 	// copy, modify, compare, randomize
@@ -87,6 +87,7 @@ public:
         if (dirty[BlendronicSmoothValues]) bSmoothValues = b->getSmoothValues();
         if (dirty[BlendronicFeedbackCoeffs]) bFeedbackCoefficients = b->getFeedbackCoefficients();
         if (dirty[BlendronicOutGain]) outGain = b->getOutGain();
+        if (dirty[BlendronicDelayBufferSize]) delayBufferSizeInSeconds = b->getDelayBufferSizeInSeconds();
     }
     
 	bool compare(BlendronicPreparation::Ptr b);
@@ -103,8 +104,8 @@ public:
     inline const Array<float> getSmoothLengths() const noexcept { return bSmoothLengths; }
 	inline const Array<float> getSmoothValues() const noexcept { return bSmoothValues; }
 	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
-	inline const float getDelayMax() const noexcept { return bDelayMax; }
     inline const float getOutGain() const noexcept { return outGain; }
+    inline const float getDelayBufferSizeInSeconds() const noexcept { return delayBufferSizeInSeconds; }
 	
     inline const BlendronicSmoothBase getSmoothBase() const noexcept { return bSmoothBase; }
     inline const BlendronicSmoothScale getSmoothScale() const noexcept { return bSmoothScale; }
@@ -117,8 +118,8 @@ public:
 	inline void setSmoothValues(Array<float> smoothValues) { bSmoothValues.swapWith(smoothValues); }
 	inline void setFeedbackCoefficients(Array<float> feedbackCoefficients) { bFeedbackCoefficients.swapWith(feedbackCoefficients); }
     
-    inline void setDelayMax(float delayMax) { bDelayMax = delayMax; }
     inline void setOutGain(float og) { outGain = og; }
+    inline void setDelayBufferSizeInSeconds(float size) { delayBufferSizeInSeconds = size; }
     
     inline void setBeat(int whichSlider, float value) { bBeats.set(whichSlider, value); }
     inline void setDelayLength(int whichSlider, float value) { bDelayLengths.set(whichSlider, value); }
@@ -144,10 +145,6 @@ public:
         }
         else bSmoothScale = BlendronicSmoothConstant;
     }
-//    inline const void setSyncMode(BlendronicSyncMode mode) { bSyncMode = mode; }
-//    inline const void setClearMode(BlendronicClearMode mode) { bClearMode = mode; }
-//    inline const void setOpenMode(BlendronicOpenMode mode) { bOpenMode = mode; }
-//    inline const void setCloseMode(BlendronicCloseMode mode) { bCloseMode = mode; }
     
     inline const TargetNoteMode getTargetTypeBlendronicBeatSync() const noexcept { return targetTypeBlendronicBeatSync; }
     inline const TargetNoteMode getTargetTypeBlendronicPatternSync() const noexcept { return targetTypeBlendronicPatternSync; }
@@ -200,6 +197,7 @@ public:
         prep.setProperty( ptagBlendronic_targetOpenCloseInput, getTargetTypeBlendronicOpenCloseInput(), 0);
         prep.setProperty( ptagBlendronic_targetOpenCloseOutput, getTargetTypeBlendronicOpenCloseOutput(), 0);
         prep.setProperty( ptagBlendronic_outGain, getOutGain(), 0);
+        prep.setProperty( ptagBlendronic_delayBufferSize, getDelayBufferSizeInSeconds(), 0);
 
         ValueTree beats(vtagBlendronic_beats);
         int count = 0;
@@ -269,6 +267,9 @@ public:
         
         f = e->getStringAttribute(ptagBlendronic_outGain).getFloatValue();
         setOutGain(f);
+        
+        f = e->getStringAttribute(ptagBlendronic_delayBufferSize).getFloatValue();
+        setDelayBufferSizeInSeconds(f);
 
         forEachXmlChildElement (*e, sub)
         {
@@ -367,9 +368,6 @@ private:
 	Array<float> bSmoothValues;
 	Array<float> bFeedbackCoefficients;
 
-	// maximum delay in seconds
-	float bDelayMax;
-
 	// dsmooth stuff
     BlendronicSmoothBase bSmoothBase;
     BlendronicSmoothScale bSmoothScale;
@@ -386,6 +384,8 @@ private:
     
     // output gain
     float outGain;
+    
+    float delayBufferSizeInSeconds;
 
 	//needed for sampling
 //    float inputGain;
@@ -612,6 +612,8 @@ public:
     inline const bool getResetPhase() const noexcept { return resetPhase; }
     inline const void setResetPhase(bool reset) { resetPhase = reset; }
     
+    void setDelayBufferSizeInSeconds(float size);
+    
     void tick(float* outputs);
     void updateDelayParameters();
 	void processBlock(int numSamples, int midiChannel);
@@ -627,7 +629,7 @@ public:
     }
 
 private:
-    
+    CriticalSection lock;
     /* Private Functions */
 
 	void playNote(int channel, int note, float velocity);

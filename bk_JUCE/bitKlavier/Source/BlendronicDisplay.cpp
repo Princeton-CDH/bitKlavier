@@ -176,6 +176,7 @@ void BlendronicDisplay::clear()
 
 void BlendronicDisplay::pushBuffer (const float** d, int numChannels, int num)
 {
+    setSamplesPerBlock(num/1024);
     numChannels = jmin (numChannels, channels.size());
     bufferSize = num;
     setNumBlocks(num*invInputSamplesPerBlock);
@@ -202,6 +203,7 @@ void BlendronicDisplay::pushBuffer (const AudioSourceChannelInfo& buffer)
 
 void BlendronicDisplay::pushSmoothing (const float** d, int num)
 {
+    setSamplesPerBlock(num/1024);
     bufferSize = num;
     setNumBlocks(num*invInputSamplesPerBlock);
     smoothing.getUnchecked(0)->pushSamples (d[0], num);
@@ -215,8 +217,17 @@ void BlendronicDisplay::pushSmoothing (const AudioBuffer<float>& buffer)
 
 void BlendronicDisplay::setSamplesPerBlock (int newSamplesPerPixel) noexcept
 {
-    inputSamplesPerBlock = newSamplesPerPixel;
-    invInputSamplesPerBlock = 1. / (float) inputSamplesPerBlock;
+    if (newSamplesPerPixel > 0)
+    {
+        inputSamplesPerBlock = newSamplesPerPixel;
+        invInputSamplesPerBlock = 1. / (float) inputSamplesPerBlock;
+    }
+    else
+    {
+        inputSamplesPerBlock = 1;
+        invInputSamplesPerBlock = 1.;
+    }
+        
 }
 
 
@@ -265,7 +276,7 @@ void BlendronicDisplay::paint (Graphics& g)
     
     float leftLevel = n * horizontalZoom;
     float f = fmod(scroll - pulseOffset, lineSpacingInBlocks);
-    for (int i = 0; i < n; i++)
+    for (int i = leftLevel; i < n; i++)
     {
         if (i >= f)
         {
@@ -276,7 +287,7 @@ void BlendronicDisplay::paint (Graphics& g)
         }
     }
     
-    for (int i = 0; (i * smoothingBounds.getHeight() / (maxDelayLength * 1.25)) < smoothingBounds.getHeight(); i++)
+    for (int i = leftLevel; (i * smoothingBounds.getHeight() / (maxDelayLength * 1.25)) < smoothingBounds.getHeight(); i++)
     {
         g.fillRect(smoothingBounds.toFloat().getX(), smoothingBounds.toFloat().getBottom() - (i * smoothingBounds.toFloat().getHeight() / (maxDelayLength * 1.25)), smoothingBounds.toFloat().getWidth(), 1.0f);
     }
@@ -284,11 +295,14 @@ void BlendronicDisplay::paint (Graphics& g)
     for (auto m : markers)
     {
         float markerLevel = m * invInputSamplesPerBlock;
-        float x = (fmod((markerLevel - currentLevel) + n, n) - leftLevel) *
-        (gridBounds.getRight() - gridBounds.getX()) * (1. / (n - leftLevel)) + gridBounds.getX();
-        if (x < 1.0f) continue;
-        g.setColour(markerColour);
-        g.fillRect(x, gridBounds.toFloat().getY(), 1.0f, gridBounds.toFloat().getHeight());
+        if (markerLevel > leftLevel)
+        {
+            float x = (fmod((markerLevel - currentLevel) + n, n) - leftLevel) *
+            (gridBounds.getRight() - gridBounds.getX()) * (1. / (n - leftLevel)) + gridBounds.getX();
+            if (x < 1.0f) continue;
+            g.setColour(markerColour);
+            g.fillRect(x, gridBounds.toFloat().getY(), 1.0f, gridBounds.toFloat().getHeight());
+        }
     }
     /*------------------------------------------*/
     
@@ -323,17 +337,17 @@ void BlendronicDisplay::getChannelAsPath (Path& path, const Range<float>* levels
     
     int offset = playheads[0] * invInputSamplesPerBlock;
     
-    for (int i = 4; i < numLevels-2; ++i)
+    for (int i = 2; i < numLevels; ++i)
     {
         auto level = -(levels[(nextSample + i + offset) % numLevels].getEnd());
         
-        if (i == 4)
+        if (i == 2)
             path.startNewSubPath (0.0f, level);
         else
             path.lineTo ((float) i, level);
     }
     
-    for (int i = numLevels-2; --i >= 4;)
+    for (int i = numLevels; --i >= 2;)
         path.lineTo ((float) i, -(levels[(nextSample + i + offset) % numLevels].getStart()));
     
     path.closeSubPath();
@@ -348,9 +362,9 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
     getChannelAsPath (p, levels, numLevels, nextSample);
     
     g.setColour (waveformColour);
-    g.fillPath (p, AffineTransform::fromTargetPoints (numLevels*horizontalZoom, -verticalZoom, area.getX(), area.getY(),
-                                                      numLevels*horizontalZoom, verticalZoom,  area.getX(), area.getBottom(),
-                                                      (float) numLevels, -verticalZoom,        area.getRight(), area.getY()));
+    g.fillPath (p, AffineTransform::fromTargetPoints ((numLevels - 1) *horizontalZoom, -verticalZoom, area.getX(), area.getY(),
+                                                      (numLevels - 1) *horizontalZoom, verticalZoom,  area.getX(), area.getBottom(),
+                                                      (float) (numLevels - 1), -verticalZoom,         area.getRight(), area.getY()));
     
     float leftLevel = numLevels * horizontalZoom;
 
@@ -373,12 +387,12 @@ void BlendronicDisplay::getSmoothingAsPath (Path& path, const Range<float>* leve
     
     int offset = playheads[0] * invInputSamplesPerBlock;
     
-    for (int i = 4; i < numLevels-2; ++i)
+    for (int i = 2; i < numLevels; ++i)
     {
         auto level = -(levels[(nextSample + i + offset) % numLevels].getEnd());
         level = fmin(level, maxDelayLength);
         
-        if (i == 4)
+        if (i == 2)
             path.startNewSubPath (0.0f, level);
         else
             path.lineTo ((float) i, level);
@@ -394,9 +408,9 @@ void BlendronicDisplay::paintSmoothing (Graphics& g, Rectangle<float> area, cons
 
     g.setColour(playheadColour);
     g.strokePath(p, PathStrokeType(2.0),
-        AffineTransform::fromTargetPoints(numLevels * horizontalZoom, -maxDelayLength * 1.25f, area.getX(), area.getY(),
-            numLevels * horizontalZoom, 0.0f, area.getX(), area.getBottom(),
-            (float)numLevels, -maxDelayLength * 1.25f, area.getRight(), area.getY()));
+        AffineTransform::fromTargetPoints((numLevels - 1) * horizontalZoom, -maxDelayLength * 1.25f, area.getX(), area.getY(),
+            (numLevels - 1) * horizontalZoom, 0.0f, area.getX(), area.getBottom(),
+            (float)(numLevels - 1), -maxDelayLength * 1.25f, area.getRight(), area.getY()));
 }
 
 void BlendronicDisplay::sliderValueChanged(Slider *slider)

@@ -188,6 +188,8 @@ public:
                                 int startSample, int numSamples,
                                 const BKPianoSamplerSound* playingSound);
     
+    void setCurrentPlaybackSampleRate(const double newRate) override;
+    
     BKNoteType getNoteType(void) { return bkType; };
     
 private:

@@ -453,7 +453,6 @@
         <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
         <MODULEPATH id="SFZero" path="../../../modules"/>
-        <MODULEPATH id="stk" path="../../../modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
@@ -486,7 +485,6 @@
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
         <MODULEPATH id="SFZero" path="../../../modules"/>
-        <MODULEPATH id="stk" path="../../../modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2017 targetFolder="Builds/VisualStudio2017" bigIcon="iHGLGD" smallIcon="smHM8h"
@@ -516,7 +514,6 @@
         <MODULEPATH id="juce_audio_basics" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../../../../../Program Files/JUCE/modules"/>
         <MODULEPATH id="SFZero" path="../../../modules"/>
-        <MODULEPATH id="stk" path="../../../modules"/>
       </MODULEPATHS>
     </VS2017>
     <VS2019 targetFolder="Builds/VisualStudio2019" bigIcon="iHGLGD" windowsTargetPlatformVersion="10.0.18362.0"
@@ -542,7 +539,6 @@
         <MODULEPATH id="juce_audio_basics"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../../../../../Program Files/JUCE/modules"/>
         <MODULEPATH id="SFZero" path="../../../modules"/>
-        <MODULEPATH id="stk" path="../../../modules"/>
       </MODULEPATHS>
     </VS2019>
   </EXPORTFORMATS>
@@ -550,9 +546,9 @@
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
-    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
-            useGlobalPath="0"/>
-    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="1"
+            useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
@@ -564,7 +560,6 @@
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="SFZero" showAllCode="1" useLocalCopy="1" useGlobalPath="0"/>
-    <MODULE id="stk" showAllCode="1" useLocalCopy="1" useGlobalPath="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_QUICKTIME="disabled" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <LIVE_SETTINGS>

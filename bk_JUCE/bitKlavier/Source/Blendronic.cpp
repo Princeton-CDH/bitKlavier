@@ -20,7 +20,6 @@ BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
     bSmoothLengths(p->getSmoothLengths()),
 	bSmoothValues(p->getSmoothValues()),
 	bFeedbackCoefficients(p->getFeedbackCoefficients()),
-	bDelayMax(p->getDelayMax()),
     bSmoothBase(BlendronicSmoothPulse),
     bSmoothScale(BlendronicSmoothFull),
     
@@ -30,8 +29,10 @@ BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
     targetTypeBlendronicPausePlay(p->getTargetTypeBlendronicPausePlay()),
     targetTypeBlendronicOpenCloseInput(p->getTargetTypeBlendronicOpenCloseInput()),
     targetTypeBlendronicOpenCloseOutput(p->getTargetTypeBlendronicOpenCloseOutput()),
-    outGain(p->getOutGain())
+    outGain(p->getOutGain()),
+    delayBufferSizeInSeconds(p->getDelayBufferSizeInSeconds())
 {
+    
 }
 
 //constructor with input
@@ -42,14 +43,13 @@ BlendronicPreparation::BlendronicPreparation(String newName,
                                              Array<float> smoothValues,
                                              Array<float> feedbackCoefficients,
                                              float clusterThresh,
-                                             float delayMax) :
+                                             float delayBufferSizeInSeconds) :
 	name(newName),
 	bBeats(beats),
     bDelayLengths(delayLengths),
     bSmoothLengths(smoothLengths),
 	bSmoothValues(smoothValues),
 	bFeedbackCoefficients(feedbackCoefficients),
-	bDelayMax(delayMax),
     bSmoothBase(BlendronicSmoothPulse),
     bSmoothScale(BlendronicSmoothFull),
     targetTypeBlendronicPatternSync(NoteOn),
@@ -59,6 +59,7 @@ BlendronicPreparation::BlendronicPreparation(String newName,
     targetTypeBlendronicOpenCloseInput(NoteOn),
     targetTypeBlendronicOpenCloseOutput(NoteOn)
 {
+    
 }
 
 //empty constructor
@@ -69,7 +70,6 @@ BlendronicPreparation::BlendronicPreparation(void) :
     bSmoothLengths(Array<float>({ 50.0f })),
 	bSmoothValues(Array<float>({ 0.1f })),
 	bFeedbackCoefficients(Array<float>({ 0.95 })),
-	bDelayMax(5.f),
     bSmoothBase(BlendronicSmoothPulse),
     bSmoothScale(BlendronicSmoothFull),
     targetTypeBlendronicPatternSync(NoteOn),
@@ -78,8 +78,10 @@ BlendronicPreparation::BlendronicPreparation(void) :
     targetTypeBlendronicPausePlay(NoteOn),
     targetTypeBlendronicOpenCloseInput(NoteOn),
     targetTypeBlendronicOpenCloseOutput(NoteOn),
-    outGain(1.0)
+    outGain(1.0),
+    delayBufferSizeInSeconds(5.f)
 {
+    
 }
 
 //copy
@@ -90,7 +92,6 @@ void BlendronicPreparation::copy(BlendronicPreparation::Ptr b)
     bSmoothLengths = b->getSmoothLengths();
     bSmoothValues = b->getSmoothValues();
     bFeedbackCoefficients = b->getFeedbackCoefficients();
-    bDelayMax = b->getDelayMax();
     bSmoothBase = b->getSmoothBase();
     bSmoothScale = b->getSmoothScale();
     targetTypeBlendronicPatternSync = b->getTargetTypeBlendronicPatternSync();
@@ -100,6 +101,7 @@ void BlendronicPreparation::copy(BlendronicPreparation::Ptr b)
     targetTypeBlendronicOpenCloseInput = b->getTargetTypeBlendronicOpenCloseInput();
     targetTypeBlendronicOpenCloseOutput = b->getTargetTypeBlendronicOpenCloseOutput();
     outGain = b->getOutGain();
+    delayBufferSizeInSeconds =  b->getDelayBufferSizeInSeconds();
 }
 
 //compares two blendronics
@@ -232,8 +234,6 @@ bool BlendronicPreparation::compare(BlendronicPreparation::Ptr b)
              targetTypeSynchronicRotate == s->getTargetTypeSynchronicRotate() ;
      
      */
-    
-    
 	return false;
 }
 
@@ -272,9 +272,7 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
-    // sometimes prepareToPlay gets a spurious sampleRate; we should track this down, but we can also
-    // get the sr from the Synthesizer
-    delayLengthRecord.setSize(1, prep->getDelayMax() * synth->getSampleRate());
+    delayLengthRecord.setSize(1, prep->getDelayBufferSizeInSeconds() * synth->getSampleRate());
     delayLengthRecord.clear();
     delayLengthRecordInPoint = 0;
     
@@ -518,9 +516,9 @@ void BlendronicProcessor::prepareToPlay(double sr)
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
-    delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayMax(), synth->getSampleRate(), true);
+    delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayBufferSizeInSeconds() * synth->getSampleRate(), synth->getSampleRate(), true);
 
-    delayLengthRecord.setSize(1, prep->getDelayMax() * synth->getSampleRate());
+    delayLengthRecord.setSize(1, prep->getDelayBufferSizeInSeconds() * synth->getSampleRate());
     delayLengthRecord.clear();
     delayLengthRecordInPoint = 0;
     
@@ -605,4 +603,17 @@ void BlendronicProcessor::updateDelayParameters()
 float BlendronicProcessor::getPulseLengthInSamples()
 {
     return pulseLength * synth->getSampleRate();
+}
+
+void BlendronicProcessor::setDelayBufferSizeInSeconds(float size)
+{
+    const ScopedLock sl (lock);
+    blendronic->sPrep->setDelayBufferSizeInSeconds(size);
+    blendronic->aPrep->setDelayBufferSizeInSeconds(size);
+    delay->setBufferSize(size * synth->getSampleRate());
+    delayLengthRecord.setSize(1, size * synth->getSampleRate());
+    delayLengthRecord.clear();
+    delayLengthRecordInPoint = 0;
+    beatPositionsInBuffer.clear();
+    beatPositionsIndex = -1;
 }

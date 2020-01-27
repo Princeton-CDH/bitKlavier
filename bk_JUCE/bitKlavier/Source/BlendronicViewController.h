@@ -74,13 +74,10 @@ protected:
     BlendronicDisplay delayLineDisplay;
     
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
-
-//    std::unique_ptr<BKSingleSlider> inputThreshSlider;
-//    std::unique_ptr<BKSingleSlider> keyThreshSlider;
-//    std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
-//    std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
     
     std::unique_ptr<BKSingleSlider> gainSlider;
+    
+    std::unique_ptr<BKSingleSlider> bufferSizeSlider;
     
     void displayTab(int tab) override;
     void displayShared(void) override;

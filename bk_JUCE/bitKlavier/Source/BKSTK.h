@@ -31,12 +31,12 @@ public:
 
 	//constructors
 	BKDelayL();
-	BKDelayL(float delayLength, float delayMax, float delayGain, double sr);
+	BKDelayL(float delayLength, int bufferSize, float delayGain, double sr);
 	~BKDelayL();
 
 	//accessors
 	inline const float getLength() const noexcept { return length; }
-	inline const float getMax() const noexcept { return max; }
+	inline const float getBufferSize() const noexcept { return bufferSize; }
 	inline const float getGain() const noexcept { return gain; }
 	inline const float lastOutLeft() const noexcept { return lastFrameLeft; }
 	inline const float lastOutRight() const noexcept { return lastFrameRight; }
@@ -45,7 +45,14 @@ public:
 
 	//mutators
     void setLength(float delayLength);
-	inline void setMax(float delayMax) { max = delayMax; }
+	inline void setBufferSize(int size)
+    {
+        const ScopedLock sl (lock);
+        reset();
+        bufferSize = size;
+        inputs.setSize(2, bufferSize);
+        inputs.clear();
+    }
 	inline void setGain(float delayGain) { gain = delayGain; }
     inline void setFeedback(float fb) { feedback = fb; }
     inline unsigned long getInPoint() { return inPoint; }
@@ -63,10 +70,12 @@ public:
     inline void setSampleRate(double sr) { sampleRate = sr; }
 
 private:
+    CriticalSection lock;
+    
 	AudioBuffer<float> inputs;
 	int inPoint;
 	int outPoint;
-    float max;
+    int bufferSize;
 	float length;
 	float gain;
     float lastFrameLeft;
@@ -150,14 +159,14 @@ public:
 
 	//constructors
 	BlendronicDelay(BlendronicDelay::Ptr d);
-	BlendronicDelay(float delayLength, float smoothValue, float smoothDuration, float delayMax, double sr, bool active = false);
+	BlendronicDelay(float delayLength, float smoothValue, float smoothDuration, int delayBufferSize, double sr, bool active = false);
 	~BlendronicDelay();
 
 	//accessors
     inline const BKDelayL::Ptr getDelay() const noexcept { return delayLinear; }
 	inline const BKEnvelope::Ptr getDSmooth() const noexcept { return dSmooth; }
     inline const BKEnvelope::Ptr getEnvelope() const noexcept { return dEnv; }
-	inline const float getDelayMax() const noexcept { return dDelayMax; }
+	inline const float getBufferSize() const noexcept { return dBufferSize; }
 	inline const float getDelayGain() const noexcept { return dDelayGain; }
 	inline const float getDelayLength() const noexcept { return dDelayLength; }
 	inline const float getSmoothValue() const noexcept { return dSmooth->getValue(); }
@@ -171,7 +180,11 @@ public:
 
 	//mutators
 	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to float)
-	inline void setDelayMax(float delayMax) { dDelayMax = delayMax; }
+	inline void setBufferSize(int bufferSize)
+    {
+        dBufferSize = bufferSize;
+        delayLinear->setBufferSize(dBufferSize);
+    }
 	inline void setDelayGain(float delayGain) { dDelayGain = delayGain; }
 	inline void setDelayLength(float delayLength) { dDelayLength = delayLength; delayLinear->setLength(delayLength); }
     inline void setDelayTargetLength(float delayLength) { dSmooth->setTarget(delayLength); }
@@ -211,7 +224,7 @@ private:
     BKDelayL::Ptr delayLinear;
 	BKEnvelope::Ptr dSmooth;
     BKEnvelope::Ptr dEnv;
-	float dDelayMax;
+	float dBufferSize;
 	float dDelayGain;
     float dDelayLength;
 	float dSmoothValue;

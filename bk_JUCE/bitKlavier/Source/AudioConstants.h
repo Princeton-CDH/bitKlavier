@@ -191,6 +191,7 @@ const String vtagBlendronic_feedbackCoefficients = "feedbackCoefficients";
 const String ptagBlendronic_smoothBase = "smoothBase";
 const String ptagBlendronic_smoothScale = "smoothScale";
 const String ptagBlendronic_outGain = "outGain";
+const String ptagBlendronic_delayBufferSize = "delayBufferSize";
 
 const String ptagBlendronic_targetPatternSync = "targetTypeBlendronicPatternSync";
 const String ptagBlendronic_targetBeatSync = "targetTypeBlendronicBeatSync";
@@ -794,6 +795,7 @@ typedef enum BlendronicParameterType
     BlendronicSmoothValues,
     BlendronicFeedbackCoeffs,
     BlendronicOutGain,
+    BlendronicDelayBufferSize,
     BlendronicParameterTypeNil
 } BlendronicParameterType;
 

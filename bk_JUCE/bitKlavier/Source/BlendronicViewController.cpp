@@ -46,6 +46,7 @@ BKViewController(p, theGraph, 3)
 #if JUCE_IOS
             paramSliders[idx]->addWantsBigOneListener(this);
             gainSlider->addWantsBigOneListener(this);
+            bufferSizeSlider->addWantsBigOneListener(this);
 #endif
             paramSliders[idx]->setMinMaxDefaultInc(cBlendronicDefaultRangeValuesAndInc[i]);
         
@@ -134,6 +135,11 @@ BKViewController(p, theGraph, 3)
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
+    bufferSizeSlider = std::make_unique<BKSingleSlider>("buffer length (sec)", 1., 10., 4., 0.01);
+    bufferSizeSlider->setJustifyRight(true);
+    bufferSizeSlider->setToolTipString("Sets the size of the delay line in seconds");
+    addAndMakeVisible(*bufferSizeSlider);
+    
     delayLineDisplay.setNumChannels(1);
     delayLineDisplay.setColours(Colours::black, Colours::lightgrey);
     addAndMakeVisible(&delayLineDisplay);
@@ -179,6 +185,8 @@ void BlendronicViewController::invisible(void)
         targetControlCBLabels[i]->setVisible(false);
     }
     targetControlsGroup.setVisible(false);
+    
+    bufferSizeSlider->setVisible(false);
     
     delayLineDisplay.setVisible(false);
 //    keyThreshSlider->setVisible(false);
@@ -280,19 +288,27 @@ void BlendronicViewController::displayTab(int tab)
     {
         BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
     
+        bufferSizeSlider->setVisible(true);
         delayLineDisplay.setVisible(true);
         
         // SET BOUNDS
-        int sliderHeight = height * 0.225f;
+        int sliderHeight = height * 0.2f;
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(hideOrShow.getBottom() + gYSpacing);
         area.removeFromRight(rightArrow.getWidth() + gXSpacing);
         area.removeFromLeft(leftArrow.getWidth() + gXSpacing);
         
+        Rectangle<int> leftColumn (area);
+        Rectangle<int> rightColumn (leftColumn.removeFromRight(leftColumn.getWidth()* 0.5));
+        leftColumn.removeFromRight(processor.paddingScalarX * 20);
+        rightColumn.removeFromLeft(processor.paddingScalarX * 20);
         
-        area.removeFromTop(0.5*sliderHeight - gComponentComboBoxHeight);
-        Rectangle<int> delayLineDisplayRect (area.removeFromTop(sliderHeight*4));
+        area.removeFromTop(gComponentRangeSliderHeight + 2 * gYSpacing);
+        rightColumn.removeFromTop(gYSpacing);
+        bufferSizeSlider->setBounds(rightColumn.removeFromTop(gComponentRangeSliderHeight));
+        
+        Rectangle<int> delayLineDisplayRect (area.removeFromTop((sliderHeight + gYSpacing)*4));
         delayLineDisplay.setBounds(delayLineDisplayRect);
     }
     else if (tab == 2) // keymap target tab
@@ -428,6 +444,7 @@ BlendronicViewController(p, theGraph)
     selectCB.addMyListener(this);
     
     gainSlider->addMyListener(this);
+    bufferSizeSlider->addMyListener(this);
     
     startTimer(10);
 }
@@ -452,6 +469,7 @@ void BlendronicPreparationEditor::update(void)
         selectCB.setSelectedId(processor.updateState->currentBlendronicId, dontSendNotification);
         
         gainSlider->setValue(prep->getOutGain(), dontSendNotification);
+        bufferSizeSlider->setValue(prep->getDelayBufferSizeInSeconds(), dontSendNotification);
         
         for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -653,12 +671,17 @@ void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
 {
     BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
     BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicProcessor::Ptr proc = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
     
-    if(name == "gain")
+    if (name == "gain")
     {
         DBG("blendronic gain " + String(val));
         prep->setOutGain(val);
         active->setOutGain(val);
+    }
+    else if (name == "buffer length (sec)")
+    {
+        proc->setDelayBufferSizeInSeconds(val);
     }
 }
 
@@ -1309,7 +1332,7 @@ void BlendronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
 {
     BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
    
-    if(name == "gain")
+    if (name == "gain")
     {
         mod->setOutGain(val);
         mod->setDirty(BlendronicOutGain);

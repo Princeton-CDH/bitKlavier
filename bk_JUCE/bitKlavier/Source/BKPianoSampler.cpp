@@ -109,10 +109,19 @@ rampOffDelta (0),
 isInRampOn (false), isInRampOff (false)
 {
     generalSettings = gen;
+    adsr.setSampleRate(currentSampleRate);
+    sfzadsr.setSampleRate(currentSampleRate);
 }
 
 BKPianoSamplerVoice::~BKPianoSamplerVoice()
 {
+}
+
+void BKPianoSamplerVoice::setCurrentPlaybackSampleRate(const double newRate)
+{
+    currentSampleRate = newRate;
+    adsr.setSampleRate(currentSampleRate);
+    sfzadsr.setSampleRate(currentSampleRate);
 }
 
 bool BKPianoSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
