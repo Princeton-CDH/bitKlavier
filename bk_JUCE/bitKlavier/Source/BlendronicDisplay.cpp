@@ -276,7 +276,7 @@ void BlendronicDisplay::paint (Graphics& g)
     
     float leftLevel = n * horizontalZoom;
     float f = fmod(scroll - pulseOffset, lineSpacingInBlocks);
-    for (int i = leftLevel; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         if (i >= f)
         {
@@ -287,7 +287,7 @@ void BlendronicDisplay::paint (Graphics& g)
         }
     }
     
-    for (int i = leftLevel; (i * smoothingBounds.getHeight() / (maxDelayLength * 1.25)) < smoothingBounds.getHeight(); i++)
+    for (int i = 0; (i * smoothingBounds.getHeight() / (maxDelayLength * 1.25)) < smoothingBounds.getHeight(); i++)
     {
         g.fillRect(smoothingBounds.toFloat().getX(), smoothingBounds.toFloat().getBottom() - (i * smoothingBounds.toFloat().getHeight() / (maxDelayLength * 1.25)), smoothingBounds.toFloat().getWidth(), 1.0f);
     }
@@ -295,14 +295,11 @@ void BlendronicDisplay::paint (Graphics& g)
     for (auto m : markers)
     {
         float markerLevel = m * invInputSamplesPerBlock;
-        if (markerLevel > leftLevel)
-        {
-            float x = (fmod((markerLevel - currentLevel) + n, n) - leftLevel) *
-            (gridBounds.getRight() - gridBounds.getX()) * (1. / (n - leftLevel)) + gridBounds.getX();
-            if (x < 1.0f) continue;
-            g.setColour(markerColour);
-            g.fillRect(x, gridBounds.toFloat().getY(), 1.0f, gridBounds.toFloat().getHeight());
-        }
+        float x = (fmod((markerLevel - currentLevel) + n, n) - leftLevel) *
+        (gridBounds.getRight() - gridBounds.getX()) * (1. / (n - leftLevel)) + gridBounds.getX();
+        if (x < 1.0f) continue;
+        g.setColour(markerColour);
+        g.fillRect(x, gridBounds.toFloat().getY(), 1.0f, gridBounds.toFloat().getHeight());
     }
     /*------------------------------------------*/
     

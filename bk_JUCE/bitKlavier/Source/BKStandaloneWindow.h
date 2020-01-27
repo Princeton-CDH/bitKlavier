@@ -402,8 +402,14 @@ public:
     //==============================================================================
     OptionalScopedPointer<PropertySet> settings;
     std::unique_ptr<BKAudioProcessor> processor;
+    
+    // this manager is used for the settings ui and to determine "default" midi inputs
     AudioDeviceManager deviceManager;
+    
+    // this manager opens all midi inputs automatically and routes all midi input to the processor
+    // it is not accessible to the user
     AudioDeviceManager midiInputManager;
+    
     AudioProcessorPlayer player;
     Array<PluginInOuts> channelConfiguration;
     
@@ -529,6 +535,7 @@ private:
                             const AudioDeviceManager::AudioDeviceSetup* preferredSetupOptions)
     {
         deviceManager.addAudioCallback (this);
+        // attach this device to the midi callback of the processor
         midiInputManager.addMidiInputDeviceCallback ({}, processor.get());
         
         reloadAudioDeviceState (enableAudioInput, preferredDefaultDeviceName, preferredSetupOptions);
@@ -544,8 +551,10 @@ private:
     
     void timerCallback() override
     {
+        // get currently available midi inputs
         auto newMidiDevices = MidiInput::getAvailableDevices();
         
+        // if they've changed, disable inputs that are gone and enable new ones
         if (newMidiDevices != lastMidiDevices)
         {
             for (auto& oldDevice : lastMidiDevices)
@@ -558,10 +567,10 @@ private:
                     if (autoOpenMidiDevices) deviceManager.setMidiInputDeviceEnabled (newDevice.identifier, true);
                     midiInputManager.setMidiInputDeviceEnabled (newDevice.identifier, true);
                 }
-            
             lastMidiDevices = newMidiDevices;
         }
         
+        // update the processor's default midi input source list based on what's selected in settings
         Array<String> sources;
         for (auto device : newMidiDevices)
         {

@@ -26,8 +26,7 @@ public:
   
     Modifications(void);
     ~Modifications(void);
-
-
+    
     void addDirectModification(DirectModification::Ptr m);
     void removeDirectModification(DirectModification::Ptr m);
     void removeDirectModification(int which);
@@ -68,12 +67,17 @@ public:
     void clearModifications(void);
     void clearResets(void);
     
-    Array<int> directReset;
-    Array<int> nostalgicReset;
-    Array<int> synchronicReset;
-    Array<int> tuningReset;
-    Array<int> tempoReset;
-	Array<int> blendronicReset;
+    struct Reset
+    {
+        int prepId;
+        Array<int> keymapIds;
+    };
+    Array<Reset> directResets;
+    Array<Reset> nostalgicResets;
+    Array<Reset> synchronicResets;
+    Array<Reset> tuningResets;
+    Array<Reset> tempoResets;
+	Array<Reset> blendronicResets;
     
 private:
     DirectModification::PtrArr      directMods;

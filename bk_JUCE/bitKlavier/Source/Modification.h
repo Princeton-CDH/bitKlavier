@@ -77,11 +77,22 @@ public:
         dirty.setUnchecked(param, false);
     }
     
+    inline Keymap::PtrArr getKeymaps()
+    {
+        return keymaps;
+    }
+    
+    inline void setKeymaps(Keymap::PtrArr km)
+    {
+        keymaps = km;
+    }
+    
 protected:
     int             Id;
     
     Array<int>      targets;
     Array<bool>     dirty;
+    Keymap::PtrArr keymaps;
     
 private:
     

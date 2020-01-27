@@ -523,19 +523,19 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     if (allNotesOff)   allNotesOff = false;
     
     // Check PianoMap for whether piano should change due to key strike.
-//    if (currentPiano->pianoMapInputs.contains(source))
-//    {
+    if (currentPiano->pianoMapInputs.contains(source))
+    {
         int whichPiano = currentPiano->pianoMap[noteNumber];
         if (whichPiano > 0 && whichPiano != currentPiano->getId())
         {
             DBG("change piano to " + String(whichPiano));
             setCurrentPiano(whichPiano);
         }
-//    }
+    }
     
     // modifications
-    performResets(noteNumber);
-    performModifications(noteNumber);
+    performResets(noteNumber, source);
+    performModifications(noteNumber, source);
     
     //tempo
     for (auto piano : prevPianos)
@@ -853,131 +853,221 @@ void  BKAudioProcessor::setCurrentPiano(int which)
 }
 
 // Reset
-void BKAudioProcessor::performResets(int noteNumber)
+void BKAudioProcessor::performResets(int noteNumber, String source)
 {
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->directReset)
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->directResets)
     {
-        currentPiano->getDirectProcessor(prep)->reset();
-        updateState->directPreparationDidChange = true;
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                currentPiano->getDirectProcessor(reset.prepId)->reset();
+                updateState->directPreparationDidChange = true;
+                break;
+            }
+        }
     }
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->synchronicReset)
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->synchronicResets)
     {
-        currentPiano->getSynchronicProcessor(prep)->reset();
-        updateState->synchronicPreparationDidChange = true;
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                currentPiano->getSynchronicProcessor(reset.prepId)->reset();
+                updateState->synchronicPreparationDidChange = true;
+                break;
+            }
+        }
     }
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->nostalgicReset)
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->nostalgicResets)
     {
-        currentPiano->getNostalgicProcessor(prep)->reset();
-        updateState->nostalgicPreparationDidChange = true;
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                currentPiano->getNostalgicProcessor(reset.prepId)->reset();
+                updateState->nostalgicPreparationDidChange = true;
+                break;
+            }
+        }
     }
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->blendronicReset)
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->blendronicResets)
     {
-        currentPiano->getBlendronicProcessor(prep)->reset();
-        updateState->blendronicPreparationDidChange = true;
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                currentPiano->getBlendronicProcessor(reset.prepId)->reset();
+                updateState->blendronicPreparationDidChange = true;
+                break;
+            }
+        }
     }
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->tuningReset)
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->tuningResets)
     {
-        currentPiano->getTuningProcessor(prep)->reset();
-        updateState->tuningPreparationDidChange = true;
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                currentPiano->getTuningProcessor(reset.prepId)->reset();
+                updateState->tuningPreparationDidChange = true;
+                break;
+            }
+        }
     }
-    for (auto prep : currentPiano->modificationMap.getUnchecked(noteNumber)->tempoReset)
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->tempoResets)
     {
-        currentPiano->getTempoProcessor(prep)->reset();
-        updateState->tempoPreparationDidChange = true;
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                currentPiano->getTempoProcessor(reset.prepId)->reset();
+                updateState->tempoPreparationDidChange = true;
+                break;
+            }
+        }
     }
 }
 
 // Modification
-void BKAudioProcessor::performModifications(int noteNumber)
+void BKAudioProcessor::performModifications(int noteNumber, String source)
 {
     TuningModification::PtrArr tMod = currentPiano->modificationMap[noteNumber]->getTuningModifications();
     for (int i = tMod.size(); --i >= 0;)
     {
         TuningModification::Ptr mod = tMod[i];
-        Array<int> targets = mod->getTargets();
         
-        for (auto target : targets)
+        for (auto keymap : mod->getKeymaps())
         {
-            TuningPreparation::Ptr prep = gallery->getTuning(target)->aPrep;
-            prep->performModification(mod, mod->getDirty());
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                Array<int> targets = mod->getTargets();
+                for (auto target : targets)
+                {
+                    TuningPreparation::Ptr prep = gallery->getTuning(target)->aPrep;
+                    prep->performModification(mod, mod->getDirty());
+                }
+                updateState->tuningPreparationDidChange = true;
+                break;
+            }
         }
- 
-        updateState->tuningPreparationDidChange = true;
     }
     
     TempoModification::PtrArr mMod = currentPiano->modificationMap[noteNumber]->getTempoModifications();
     for (int i = mMod.size(); --i >= 0;)
     {
         TempoModification::Ptr mod = mMod[i];
-        Array<int> targets = mod->getTargets();
         
-        for (auto target : targets)
+        for (auto keymap : mod->getKeymaps())
         {
-            TempoPreparation::Ptr prep = gallery->getTempo(target)->aPrep;
-            prep->performModification(mod, mod->getDirty());
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                Array<int> targets = mod->getTargets();
+                for (auto target : targets)
+                {
+                    TempoPreparation::Ptr prep = gallery->getTempo(target)->aPrep;
+                    prep->performModification(mod, mod->getDirty());
+                }
+                updateState->tempoPreparationDidChange = true;
+                break;
+            }
         }
-        
-        updateState->tempoPreparationDidChange = true;
     }
     
     DirectModification::PtrArr dMod = currentPiano->modificationMap[noteNumber]->getDirectModifications();
     for (int i = dMod.size(); --i >= 0;)
     {
         DirectModification::Ptr mod = dMod[i];
-        Array<int> targets = mod->getTargets();
         
-        for (auto target : targets)
+        for (auto keymap : mod->getKeymaps())
         {
-            DirectPreparation::Ptr prep = gallery->getDirect(target)->aPrep;
-            prep->performModification(mod, mod->getDirty());
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                Array<int> targets = mod->getTargets();
+                for (auto target : targets)
+                {
+                    DirectPreparation::Ptr prep = gallery->getDirect(target)->aPrep;
+                    prep->performModification(mod, mod->getDirty());
+                }
+                updateState->directPreparationDidChange = true;
+                break;
+            }
         }
-        
-        updateState->directPreparationDidChange = true;
     }
     
     NostalgicModification::PtrArr nMod = currentPiano->modificationMap[noteNumber]->getNostalgicModifications();
     for (int i = nMod.size(); --i >= 0;)
     {
         NostalgicModification::Ptr mod = nMod[i];
-        Array<int> targets = mod->getTargets();
         
-        for (auto target : targets)
+        for (auto keymap : mod->getKeymaps())
         {
-            NostalgicPreparation::Ptr prep = gallery->getNostalgic(target)->aPrep;
-            prep->performModification(mod, mod->getDirty());
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                Array<int> targets = mod->getTargets();
+                for (auto target : targets)
+                {
+                    NostalgicPreparation::Ptr prep = gallery->getNostalgic(target)->aPrep;
+                    prep->performModification(mod, mod->getDirty());
+                }
+                updateState->nostalgicPreparationDidChange = true;
+                break;
+            }
         }
-        
-        updateState->nostalgicPreparationDidChange = true;
     }
     
     SynchronicModification::PtrArr sMod = currentPiano->modificationMap[noteNumber]->getSynchronicModifications();
     for (int i = sMod.size(); --i >= 0;)
     {
         SynchronicModification::Ptr mod = sMod[i];
-        Array<int> targets = mod->getTargets();
         
-        for (auto target : targets)
+        for (auto keymap : mod->getKeymaps())
         {
-            SynchronicPreparation::Ptr prep = gallery->getSynchronic(target)->aPrep;
-            prep->performModification(mod, mod->getDirty());
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                Array<int> targets = mod->getTargets();
+                for (auto target : targets)
+                {
+                    SynchronicPreparation::Ptr prep = gallery->getSynchronic(target)->aPrep;
+                    prep->performModification(mod, mod->getDirty());
+                }
+                updateState->synchronicPreparationDidChange = true;
+                break;
+            }
         }
-        
-        updateState->synchronicPreparationDidChange = true;
     }
     
     BlendronicModification::PtrArr bMod = currentPiano->modificationMap[noteNumber]->getBlendronicModifications();
     for (int i = bMod.size(); --i >= 0;)
     {
         BlendronicModification::Ptr mod = bMod[i];
-        Array<int> targets = mod->getTargets();
         
-        for (auto target : targets)
+        for (auto keymap : mod->getKeymaps())
         {
-            BlendronicPreparation::Ptr prep = gallery->getBlendronic(target)->aPrep;
-            prep->performModification(mod, mod->getDirty());
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                Array<int> targets = mod->getTargets();
+                for (auto target : targets)
+                {
+                    BlendronicPreparation::Ptr prep = gallery->getBlendronic(target)->aPrep;
+                    prep->performModification(mod, mod->getDirty());
+                }
+                updateState->blendronicPreparationDidChange = true;
+                break;
+            }
         }
-        
-        updateState->blendronicPreparationDidChange = true;
     }
 }
 

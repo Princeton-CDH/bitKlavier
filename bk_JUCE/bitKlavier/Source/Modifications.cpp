@@ -246,10 +246,10 @@ void Modifications::clearModifications(void)
 
 void Modifications::clearResets(void)
 {
-    synchronicReset.clear();
-    nostalgicReset.clear();
-    directReset.clear();
-    tuningReset.clear();
-    tempoReset.clear();
-	blendronicReset.clear();
+    synchronicResets.clear();
+    nostalgicResets.clear();
+    directResets.clear();
+    tuningResets.clear();
+    tempoResets.clear();
+	blendronicResets.clear();
 }

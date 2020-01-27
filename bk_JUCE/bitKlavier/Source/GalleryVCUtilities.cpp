@@ -112,15 +112,16 @@ String HeaderViewController::processResetMapString(const String& s)
     String rest = s;
     
     Array<int> keys;
+    Array<String> sources;
     
     for (int i = 0; i < 128; i++)
     {
-        processor.currentPiano->modificationMap[i]->blendronicReset.clearQuick();
-        processor.currentPiano->modificationMap[i]->synchronicReset.clearQuick();
-        processor.currentPiano->modificationMap[i]->tuningReset.clearQuick();
-        processor.currentPiano->modificationMap[i]->tempoReset.clearQuick();
-        processor.currentPiano->modificationMap[i]->nostalgicReset.clearQuick();
-        processor.currentPiano->modificationMap[i]->directReset.clearQuick();
+        processor.currentPiano->modificationMap[i]->blendronicResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->synchronicResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->tuningResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->tempoResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->nostalgicResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->directResets.clearQuick();
     }
     
     while (rest != "")
@@ -138,11 +139,13 @@ String HeaderViewController::processResetMapString(const String& s)
         String keyPart = rmap.upToFirstOccurrenceOf(":", false, true);
         DBG("keyPart: " + keyPart);
         
+        Modifications::Reset reset;
+        
         if (keyPart.contains("k"))
         {
             int whichKeymap = keyPart.fromLastOccurrenceOf("k", false, true).getIntValue();
             keys = processor.gallery->getKeymap(whichKeymap)->keys();
-            
+            reset.keymapIds.add(whichKeymap);
         }
         else
         {
@@ -209,8 +212,9 @@ String HeaderViewController::processResetMapString(const String& s)
                     int whichPrep = num.getIntValue();
                     for (auto k : keys)
                     {
+                        reset.prepId = whichPrep;
                         out += String(k) + ":" + "s" + String(whichPrep) + " ";
-                        processor.currentPiano->modificationMap[k]->synchronicReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->synchronicResets.add(reset);
                     }
                     
                     num = "";
@@ -222,8 +226,9 @@ String HeaderViewController::processResetMapString(const String& s)
                     int whichPrep = num.getIntValue();
                     for (auto k : keys)
                     {
+                        reset.prepId = whichPrep;
                         out += String(k) + ":" + "n" + String(whichPrep) + " ";
-                        processor.currentPiano->modificationMap[k]->nostalgicReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->nostalgicResets.add(reset);
                     }
                     
                     num = "";
@@ -234,8 +239,9 @@ String HeaderViewController::processResetMapString(const String& s)
                     int whichPrep = num.getIntValue();
                     for (auto k : keys)
                     {
+                        reset.prepId = whichPrep;
                         out += String(k) + ":" + "d" + String(whichPrep) + " ";
-                        processor.currentPiano->modificationMap[k]->directReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->directResets.add(reset);
                     }
                     
                     num = "";
@@ -246,8 +252,9 @@ String HeaderViewController::processResetMapString(const String& s)
                     int whichPrep = num.getIntValue();
                     for (auto k : keys)
                     {
+                        reset.prepId = whichPrep;
                         out += String(k) + ":" + "t" + String(whichPrep) + " ";
-                        processor.currentPiano->modificationMap[k]->tuningReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->tuningResets.add(reset);
                     }
                     
                     num = "";
@@ -258,8 +265,9 @@ String HeaderViewController::processResetMapString(const String& s)
                     int whichPrep = num.getIntValue();
                     for (auto k : keys)
                     {
+                        reset.prepId = whichPrep;
                         out += String(k) + ":" + "m" + String(whichPrep) + " ";
-                        processor.currentPiano->modificationMap[k]->tempoReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->tempoResets.add(reset);
                     }
                     
                     num = "";
@@ -270,8 +278,9 @@ String HeaderViewController::processResetMapString(const String& s)
                     int whichPrep = num.getIntValue();
                     for (auto k : keys)
                     {
+                        reset.prepId = whichPrep;
                         out += String(k) + ":" + "m" + String(whichPrep) + " ";
-                        processor.currentPiano->modificationMap[k]->blendronicReset.add(whichPrep);
+                        processor.currentPiano->modificationMap[k]->blendronicResets.add(reset);
                     }
                     
                     num = "";

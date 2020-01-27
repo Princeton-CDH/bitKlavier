@@ -647,6 +647,15 @@ void Piano::configureDirectModification(DirectModification::Ptr mod, Array<int> 
     Array<bool> otherKeys;
     for (int i = 0; i < 128; i++) otherKeys.add(true);
     
+    Keymap::PtrArr keymaps;
+    for (auto keymap : whichKeymaps)
+    {
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
+        keymaps.add(thisKeymap);
+    }
+    
+    mod->setKeymaps(keymaps);
+    
     for (auto keymap : whichKeymaps)
     {
         for (auto key : processor.gallery->getKeymap(keymap)->keys())
@@ -690,26 +699,55 @@ void Piano::configureReset(BKItem::Ptr item)
 
     for (int i = 0; i < 128; i++) otherKeys.add(true);
     
+    Modifications::Reset resetWithKeymaps;
+    
+    for (auto keymap : whichKeymaps)
+    {
+        resetWithKeymaps.keymapIds.addIfNotAlreadyThere(keymap);
+    }
+    
     for (auto keymap : whichKeymaps)
     {
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
-        for (auto source : thisKeymap->getAllMidiInputSources())
-        {
-            pianoMapInputs.addIfNotAlreadyThere(source);
-        }
+        
         for (auto key : thisKeymap->keys())
         {
-            for (auto id : direct) modificationMap[key]->directReset.add(id);
-            
-            for (auto id : synchronic) modificationMap[key]->synchronicReset.add(id);
-            
-            for (auto id : nostalgic) modificationMap[key]->nostalgicReset.add(id);
-        
-            for (auto id : tuning) modificationMap[key]->tuningReset.add(id);
-            
-            for (auto id : tempo) modificationMap[key]->tempoReset.add(id);
-
-			for (auto id : blendronic) modificationMap[key]->blendronicReset.add(id);
+            for (auto id : direct)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->directResets.add(resetToAdd);
+            }
+            for (auto id : synchronic)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->synchronicResets.add(resetToAdd);
+            }
+            for (auto id : nostalgic)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->nostalgicResets.add(resetToAdd);
+            }
+            for (auto id : tuning)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->tuningResets.add(resetToAdd);
+            }
+            for (auto id : tempo)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->tempoResets.add(resetToAdd);
+            }
+			for (auto id : blendronic)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->blendronicResets.add(resetToAdd);
+            }
             
             otherKeys.set(key, false);
         }
@@ -735,49 +773,49 @@ void Piano::deconfigureResetForKeys(BKItem::Ptr item, Array<bool> otherKeys)
         {
             for (auto id : direct)
             {
-                for (int i = modificationMap[key]->directReset.size(); --i>=0;)
+                for (int i = modificationMap[key]->directResets.size(); --i>=0;)
                 {
-                    if (modificationMap[key]->directReset[i] == id) modificationMap[key]->directReset.remove(i);
+                    if (modificationMap[key]->directResets[i].prepId == id) modificationMap[key]->directResets.remove(i);
                 }
             }
             
             for (auto id : synchronic)
             {
-                for (int i = modificationMap[key]->synchronicReset.size(); --i>=0;)
+                for (int i = modificationMap[key]->synchronicResets.size(); --i>=0;)
                 {
-                    if (modificationMap[key]->synchronicReset[i] == id) modificationMap[key]->synchronicReset.remove(i);
+                    if (modificationMap[key]->synchronicResets[i].prepId == id) modificationMap[key]->synchronicResets.remove(i);
                 }
             }
             
             for (auto id : nostalgic)
             {
-                for (int i = modificationMap[key]->nostalgicReset.size(); --i>=0;)
+                for (int i = modificationMap[key]->nostalgicResets.size(); --i>=0;)
                 {
-                    if (modificationMap[key]->nostalgicReset[i] == id) modificationMap[key]->nostalgicReset.remove(i);
+                    if (modificationMap[key]->nostalgicResets[i].prepId == id) modificationMap[key]->nostalgicResets.remove(i);
                 }
             }
             
             for (auto id : tuning)
             {
-                for (int i = modificationMap[key]->tuningReset.size(); --i>=0;)
+                for (int i = modificationMap[key]->tuningResets.size(); --i>=0;)
                 {
-                    if (modificationMap[key]->tuningReset[i] == id) modificationMap[key]->tuningReset.remove(i);
+                    if (modificationMap[key]->tuningResets[i].prepId == id) modificationMap[key]->tuningResets.remove(i);
                 }
             }
             
             for (auto id : tempo)
             {
-                for (int i = modificationMap[key]->tempoReset.size(); --i>=0;)
+                for (int i = modificationMap[key]->tempoResets.size(); --i>=0;)
                 {
-                    if (modificationMap[key]->tempoReset[i] == id) modificationMap[key]->tempoReset.remove(i);
+                    if (modificationMap[key]->tempoResets[i].prepId == id) modificationMap[key]->tempoResets.remove(i);
                 }
             }
 
 			for (auto id : blendronic)
 			{
-				for (int i = modificationMap[key]->blendronicReset.size(); --i>0;)
+				for (int i = modificationMap[key]->blendronicResets.size(); --i>0;)
 				{
-					if (modificationMap[key]->blendronicReset[i] == id) modificationMap[key]->blendronicReset.remove(i);
+					if (modificationMap[key]->blendronicResets[i].prepId == id) modificationMap[key]->blendronicResets.remove(i);
 				}
 			}
         }        
@@ -795,10 +833,10 @@ void Piano::configurePianoMap(BKItem::Ptr map)
     for (auto keymap : keymaps)
     {
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
-//        for (auto source : thisKeymap->getAllMidiInputSources())
-//        {
-//            pianoMapInputs.addIfNotAlreadyThere(source);
-//        }
+        for (auto source : thisKeymap->getAllMidiInputSources())
+        {
+            pianoMapInputs.addIfNotAlreadyThere(source);
+        }
         for (auto key : thisKeymap->keys())
         {
             pianoMap.set(key, pianoTarget);
@@ -855,6 +893,15 @@ void Piano::configureNostalgicModification(NostalgicModification::Ptr mod, Array
     Array<bool> otherKeys;
     for (int i = 0; i < 128; i++) otherKeys.add(true);
     
+    Keymap::PtrArr keymaps;
+    for (auto keymap : whichKeymaps)
+    {
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
+        keymaps.add(thisKeymap);
+    }
+    
+    mod->setKeymaps(keymaps);
+    
     for (auto keymap : whichKeymaps)
     {
         for (auto key : processor.gallery->getKeymap(keymap)->keys())
@@ -889,6 +936,15 @@ void Piano::configureSynchronicModification(SynchronicModification::Ptr mod, Arr
     Array<bool> otherKeys;
     for (int i = 0; i < 128; i++) otherKeys.add(true);
     
+    Keymap::PtrArr keymaps;
+    for (auto keymap : whichKeymaps)
+    {
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
+        keymaps.add(thisKeymap);
+    }
+    
+    mod->setKeymaps(keymaps);
+    
     for (auto keymap : whichKeymaps)
     {
         for (auto key : processor.gallery->getKeymap(keymap)->keys())
@@ -922,6 +978,15 @@ void Piano::configureTempoModification(TempoModification::Ptr mod, Array<int> wh
     
     Array<bool> otherKeys;
     for (int i = 0; i < 128; i++) otherKeys.add(true);
+    
+    Keymap::PtrArr keymaps;
+    for (auto keymap : whichKeymaps)
+    {
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
+        keymaps.add(thisKeymap);
+    }
+    
+    mod->setKeymaps(keymaps);
     
     for (auto keymap : whichKeymaps)
     {
@@ -958,6 +1023,15 @@ void Piano::configureBlendronicModification(BlendronicModification::Ptr mod, Arr
 
 	Array<bool> otherKeys;
 	for (int i = 0; i < 128; i++) otherKeys.add(true);
+    
+    Keymap::PtrArr keymaps;
+    for (auto keymap : whichKeymaps)
+    {
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
+        keymaps.add(thisKeymap);
+    }
+    
+    mod->setKeymaps(keymaps);
 
 	for (auto keymap : whichKeymaps)
 	{
@@ -994,6 +1068,15 @@ void Piano::configureTuningModification(TuningModification::Ptr mod, Array<int> 
     
     Array<bool> otherKeys;
     for (int i = 0; i < 128; i++) otherKeys.add(true);
+    
+    Keymap::PtrArr keymaps;
+    for (auto keymap : whichKeymaps)
+    {
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
+        keymaps.add(thisKeymap);
+    }
+    
+    mod->setKeymaps(keymaps);
     
     for (auto keymap : whichKeymaps)
     {

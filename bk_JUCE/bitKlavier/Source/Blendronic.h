@@ -269,6 +269,7 @@ public:
         setOutGain(f);
         
         f = e->getStringAttribute(ptagBlendronic_delayBufferSize).getFloatValue();
+        if (f == 0) f = 4.f;
         setDelayBufferSizeInSeconds(f);
 
         forEachXmlChildElement (*e, sub)

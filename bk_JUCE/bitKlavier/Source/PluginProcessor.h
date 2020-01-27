@@ -184,8 +184,8 @@ public:
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     
     void  setCurrentPiano(int which);
-    void  performModifications(int noteNumber);
-    void  performResets(int noteNumber);
+    void  performModifications(int noteNumber, String source);
+    void  performResets(int noteNumber, String source);
     
     void handleNoteOn(int noteNumber, float velocity, int channel, String source = String(keymapDefaultMidiInputIdentifier));
     void handleNoteOff(int noteNumber, float velocity, int channel, String source = String(keymapDefaultMidiInputIdentifier));
