@@ -272,11 +272,9 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     
-    delayLengthRecord.setSize(1, prep->getDelayBufferSizeInSeconds() * synth->getSampleRate());
-    delayLengthRecord.clear();
-    delayLengthRecordInPoint = 0;
-    
     resetPhase = false;
+    
+    display = nullptr;
     
     DBG("Create bproc");
 }
@@ -308,22 +306,23 @@ void BlendronicProcessor::tick(float* outputs)
         if (clearDelayOnNextBeat)
         {
             delay->clear();
+            if (display != nullptr) display->clearAudio();
             clearDelayOnNextBeat = false;
         }
 
         float beatPatternLength = 0.0;
         for (auto b : prep->getBeats()) beatPatternLength += b * pulseLength * synth->getSampleRate();
 
-        if (numBeatPositions != (int)((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1)
+        if (numBeatPositions != (int)((delay->getDelayBuffer()->getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1)
         {
             beatPositionsInBuffer.clear();
             beatPositionsIndex = -1;
-            pulseOffset = delay->getCurrentSample();
-            numBeatPositions = ((delay->getDelayBuffer().getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1;
+            pulseOffset = delay->getInPoint();
+            numBeatPositions = ((delay->getDelayBuffer()->getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1;
         }
 
         // Set the next beat position, cycle if we've reached the max number of positions for the buffer
-        beatPositionsInBuffer.set(++beatPositionsIndex, delay->getCurrentSample());
+        beatPositionsInBuffer.set(++beatPositionsIndex, delay->getInPoint());
         if (beatPositionsIndex >= numBeatPositions) beatPositionsIndex = -1;
    
         // Step sequenced params
@@ -357,8 +356,13 @@ void BlendronicProcessor::tick(float* outputs)
     
     float dlr = 0.0f;
     if (pulseLength != INFINITY) dlr = delay->getDelayLength() / (pulseLength * synth->getSampleRate());
-    delayLengthRecord.setSample(0, delayLengthRecordInPoint++, dlr);
-    if (delayLengthRecordInPoint >= delayLengthRecord.getNumSamples()) delayLengthRecordInPoint = 0;
+    if (display != nullptr)
+    {
+        int i = getInPoint() - 1;
+        if (i < 0) i = getDelayBuffer()->getNumSamples() - 1;
+        display->pushAudioSample(getDelayBuffer()->getSample(0, i));
+        display->pushSmoothingSample(dlr);
+    }
 }
 
 void BlendronicProcessor::processBlock(int numSamples, int midiChannel)
@@ -408,8 +412,8 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
         // Sync to the next beat
         setSampleTimer(numSamplesBeat);
         beatPositionsInBuffer.clear();
-        beatPositionsInBuffer.add(delay->getCurrentSample());
-        pulseOffset = delay->getCurrentSample();
+        beatPositionsInBuffer.add(delay->getInPoint());
+        pulseOffset = delay->getInPoint();
         beatPositionsIndex = 0;
         resetPhase = true;
     }
@@ -418,6 +422,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
         (prep->getTargetTypeBlendronicClear() == NoteOn || prep->getTargetTypeBlendronicClear() == Both))
     {
         delay->clear();
+        if (display != nullptr) display->clearAudio();
     }
     
     if (doPausePlay &&
@@ -476,8 +481,8 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
         // Sync to the next beat
         setSampleTimer(numSamplesBeat);
         beatPositionsInBuffer.clear();
-        beatPositionsInBuffer.add(delay->getCurrentSample());
-        pulseOffset = delay->getCurrentSample();
+        beatPositionsInBuffer.add(delay->getInPoint());
+        pulseOffset = delay->getInPoint();
         beatPositionsIndex = 0;
     }
     
@@ -485,6 +490,7 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
         (prep->getTargetTypeBlendronicClear() == NoteOff || prep->getTargetTypeBlendronicClear() == Both))
     {
         delay->clear();
+        if (display != nullptr) display->clearAudio();
     }
     
     if (doPausePlay &&
@@ -517,10 +523,6 @@ void BlendronicProcessor::prepareToPlay(double sr)
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
     delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayBufferSizeInSeconds() * synth->getSampleRate(), synth->getSampleRate(), true);
-
-    delayLengthRecord.setSize(1, prep->getDelayBufferSizeInSeconds() * synth->getSampleRate());
-    delayLengthRecord.clear();
-    delayLengthRecordInPoint = 0;
     
     beatPositionsInBuffer.ensureStorageAllocated(128);
     beatPositionsInBuffer.clear();
@@ -611,9 +613,6 @@ void BlendronicProcessor::setDelayBufferSizeInSeconds(float size)
     blendronic->sPrep->setDelayBufferSizeInSeconds(size);
     blendronic->aPrep->setDelayBufferSizeInSeconds(size);
     delay->setBufferSize(size * synth->getSampleRate());
-    delayLengthRecord.setSize(1, size * synth->getSampleRate());
-    delayLengthRecord.clear();
-    delayLengthRecordInPoint = 0;
     beatPositionsInBuffer.clear();
     beatPositionsIndex = -1;
 }

@@ -460,21 +460,21 @@ void BKConstructionSite::paste(void)
     {
         BKItem::Ptr newItem = item->duplicate();
         
-        newItem->print();
-        
         BKPreparationType type = newItem->getType();
         int oldId = item->getId();
-
-        // duplicate (all we need to do is set to new Id and add to gallery)
-        int newId = processor.gallery->addCopy(type, newItem->getContent().get());
         
+        // duplicate (all we need to do is set to new Id and add to gallery)
+        int newId = processor.gallery->addCopy(type, newItem->getContent().get(), oldId);
+        
+        newItem->print();
+    
         pastemap[type]->set(oldId, newId);
 
         newItem->setSelected(true);
         
         newItem->setTopLeftPosition((newItem->getX()-offsetX) + lastEX, (newItem->getY()-offsetY) + lastEY);
         
-        processor.currentPiano->add(newItem);
+        processor.currentPiano->add(newItem, false); // make sure not to configure yet or bad ids will cause a crash
         
         newItems.add(newItem);
     }
@@ -506,6 +506,7 @@ void BKConstructionSite::paste(void)
     }
     
     // NOW set new Id for item. didnt want to do it before so that
+    // ^ I'm assuming it's so that the connection ids match up
     for (auto item : newItems)
     {
         int oldId = item->getId();

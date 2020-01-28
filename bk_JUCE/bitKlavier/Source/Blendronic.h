@@ -35,6 +35,7 @@
 #include "General.h"
 #include "Keymap.h"
 #include "BKSTK.h"
+#include "BlendronicDisplay.h"
 
 // Forward declaration to allow include of Blendronic in BKSynthesiser
 class BKSynthesiser;
@@ -575,16 +576,15 @@ public:
     inline int getTempoId(void) const noexcept { return tempo->getId(); }
 	inline const float getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
     inline uint64 getSampleTime(void) const noexcept { return sampleTimer; }
-    inline const uint64 getCurrentSample() const noexcept { return delay->getCurrentSample(); }
-    inline const uint64 getDelayedSample() const noexcept { return delay->getDelayedSample(); }
+    inline const int getInPoint() const noexcept { return delay->getInPoint(); }
+    inline const int getOutPoint() const noexcept { return delay->getOutPoint(); }
     inline int getBeatIndex(void) const noexcept { return beatIndex; }
     inline int getDelayIndex(void) const noexcept { return delayIndex; }
     inline int getSmoothIndex(void) const noexcept { return smoothIndex; }
     inline int getFeedbackIndex(void) const noexcept { return feedbackIndex; }
     inline BKSynthesiser* getSynth(void) const noexcept { return synth; }
     inline Array<int> getKeysDepressed(void) const noexcept { return keysDepressed; }
-    inline const AudioBuffer<float> getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
-    inline const AudioBuffer<float> getDelayLengthRecord() const noexcept { return delayLengthRecord; }
+    inline const AudioBuffer<float>* getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
     inline const bool getActive() const noexcept { return blendronicActive; }
     inline const bool getInputState() const noexcept { return delay->getInputState(); }
     inline const bool getOutputState() const noexcept { return delay->getOutputState(); }
@@ -602,16 +602,18 @@ public:
     inline void setSmoothIndex(int index) { smoothIndex = index; }
     inline void setFeedbackIndex(int index) { feedbackIndex = index; }
     inline void setClearDelayOnNextBeat(bool clear) { clearDelayOnNextBeat = clear; }
-    inline const void setActive(bool newActive) { blendronicActive = newActive; }
-    inline const void toggleActive() { blendronicActive = !blendronicActive; }
-    inline const void setInputState(bool inputState) { delay->setInputState(inputState); }
-    inline const void toggleInput() { delay->toggleInput(); }
-    inline const void setOutputState(bool inputState) { delay->setOutputState(inputState); }
-    inline const void toggleOutput() { delay->toggleOutput(); }
+    inline void setActive(bool newActive) { blendronicActive = newActive; }
+    inline void toggleActive() { blendronicActive = !blendronicActive; }
+    inline void setInputState(bool inputState) { delay->setInputState(inputState); }
+    inline void toggleInput() { delay->toggleInput(); }
+    inline void setOutputState(bool inputState) { delay->setOutputState(inputState); }
+    inline void toggleOutput() { delay->toggleOutput(); }
 	inline void reset(void) { blendronic->aPrep->copy(blendronic->sPrep); }
     
     inline const bool getResetPhase() const noexcept { return resetPhase; }
     inline const void setResetPhase(bool reset) { resetPhase = reset; }
+    
+    inline void setDisplay(BlendronicDisplay* d) noexcept { display = d; }
     
     void setDelayBufferSizeInSeconds(float size);
     
@@ -681,8 +683,7 @@ private:
     float pulseOffset; // Sample offset of the pulse grid from grid aligned with buffer start (used in display)
     bool resetPhase;
     
-    AudioBuffer<float> delayLengthRecord;
-    int delayLengthRecordInPoint;
+    BlendronicDisplay* display;
 
 	JUCE_LEAK_DETECTOR(BlendronicProcessor);
 };

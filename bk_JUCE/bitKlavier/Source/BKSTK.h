@@ -41,7 +41,7 @@ public:
 	inline const float lastOutLeft() const noexcept { return lastFrameLeft; }
 	inline const float lastOutRight() const noexcept { return lastFrameRight; }
     
-    inline const AudioBuffer<float> getBuffer() const noexcept { return inputs; }
+    inline const AudioBuffer<float>* getBuffer() const noexcept { return &inputs; }
 
 	//mutators
     void setLength(float delayLength);
@@ -55,8 +55,8 @@ public:
     }
 	inline void setGain(float delayGain) { gain = delayGain; }
     inline void setFeedback(float fb) { feedback = fb; }
-    inline unsigned long getInPoint() { return inPoint; }
-    inline unsigned long getOutPoint() { return outPoint; }
+    inline int getInPoint() { return inPoint; }
+    inline int getOutPoint() { return outPoint; }
 
 
 	float nextOutLeft();
@@ -119,7 +119,7 @@ public:
 	inline void setValue(float envelopeValue) { value = envelopeValue; }
     inline void setTarget(float envelopeTarget) { target = envelopeTarget; if ( target != value ) state = 1; }
 	inline void setRate(float sr) { rate = sr; }
-    inline void setTime(float time) { rate = 1.0 / ( time * sampleRate * 0.001 ); DBG("new rate = " + String(rate));} // time in ms for envelope to go from 0-1. need to update for sampleRate
+    inline void setTime(float time) { rate = 1.0 / ( time * sampleRate * 0.001 ); }//DBG("new rate = " + String(rate));} // time in ms for envelope to go from 0-1. need to update for sampleRate
     inline void setSampleRate(double sr) { sampleRate = sr; }
     
     //! Set target = 1.
@@ -174,9 +174,9 @@ public:
     inline const bool getInputState() const noexcept { return dInputOpen; }
     inline const bool getOutputState() const noexcept { return dOutputOpen; }
     inline const bool getShouldDuck() const noexcept { return shouldDuck; }
-    inline const AudioBuffer<float> getDelayBuffer() const noexcept { return delayLinear->getBuffer(); }
-    inline const unsigned long getCurrentSample() const noexcept { return delayLinear->getInPoint(); }
-    inline const unsigned long getDelayedSample() const noexcept { return delayLinear->getOutPoint(); }
+    inline const AudioBuffer<float>* getDelayBuffer() const noexcept { return delayLinear->getBuffer(); }
+    inline const int getInPoint() const noexcept { return delayLinear->getInPoint(); }
+    inline const int getOutPoint() const noexcept { return delayLinear->getOutPoint(); }
 
 	//mutators
 	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to float)

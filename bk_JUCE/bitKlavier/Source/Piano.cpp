@@ -54,7 +54,6 @@ Piano::Ptr Piano::duplicate(bool withSameId)
         
         copyPiano->add(newItem);
         newItems.add(newItem);
-        
     }
     
     int idx = 0;
@@ -460,11 +459,11 @@ bool Piano::contains(BKItem::Ptr thisItem)
     return false;
 }
 
-void Piano::add(BKItem::Ptr item)
+void Piano::add(BKItem::Ptr item, bool configureIfAdded)
 {
     bool added = items.addIfNotAlreadyThere(item);
     
-    if (added)  configure();
+    if (added && configureIfAdded)  configure();
 }
 
 void Piano::remove(BKItem::Ptr item)

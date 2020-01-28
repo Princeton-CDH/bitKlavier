@@ -32,12 +32,11 @@ public:
     void setSamplesPerBlock (int newNumInputSamplesPerBlock) noexcept;
     int getSamplesPerBlock() const noexcept { return inputSamplesPerBlock; }
     void clear();
-    void pushBuffer (const AudioBuffer<float>& bufferToPush);
-    void pushBuffer (const AudioSourceChannelInfo& bufferToPush);
-    void pushBuffer (const float** channelData, int numChannels, int numSamples);
-    void pushSample (const float* samplesForEachChannel, int numChannels);
-    void pushSmoothing (const AudioBuffer<float>& buffer);
-    void pushSmoothing (const float** d, int num);
+    void clearAudio();
+    void clearSmoothing();
+    void setBufferSize (int size);
+    void pushAudioSample (float sample);
+    void pushSmoothingSample (float sample);
     
     inline void setMaxDelayLength (float maxDelay) { maxDelayLength = maxDelay; }
 
@@ -53,7 +52,6 @@ public:
     inline void clearMarkers() { markers.clear(); }
     inline void setPlayheads(Array<uint64> p) { playheads = p; }
     inline void resetPhase() { offset = 0.0f; prevLevel = 0.0f; }
-    inline void setDriftCorrection(float dc) { driftCorrection = dc; }
     
     void setColours (Colour backgroundColour, Colour waveformColour) noexcept;
     void setRepaintRate (int frequencyInHz);
@@ -76,7 +74,7 @@ private:
     float invInputSamplesPerBlock;
     float lineSpacingInBlocks;
     float currentLevel, prevLevel;
-    float scroll, offset, driftCorrection;
+    float scroll, offset;
     float pulseOffset;
     float verticalZoom, horizontalZoom;
     

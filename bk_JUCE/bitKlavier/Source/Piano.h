@@ -191,7 +191,7 @@ public:
     
     inline void clearItems(void) { items.clear(); }
     
-    void add(BKItem::Ptr item);
+    void add(BKItem::Ptr item, bool configureIfAdded=true);
     bool contains(BKItem::Ptr item);
     void remove(BKItem::Ptr item);
     void configure(void);

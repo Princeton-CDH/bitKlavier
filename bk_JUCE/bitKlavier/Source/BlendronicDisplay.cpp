@@ -168,51 +168,38 @@ void BlendronicDisplay::setNumBlocks (int num)
 
 void BlendronicDisplay::clear()
 {
+    clearAudio();
+    clearSmoothing();
+}
+
+void BlendronicDisplay::clearAudio()
+{
     for (auto* c : channels)
         c->clear();
+}
+
+void BlendronicDisplay::clearSmoothing()
+{
     for (auto* s : smoothing)
         s->clear();
 }
 
-void BlendronicDisplay::pushBuffer (const float** d, int numChannels, int num)
+void BlendronicDisplay::setBufferSize (int size)
 {
-    setSamplesPerBlock(num/1024);
-    numChannels = jmin (numChannels, channels.size());
-    bufferSize = num;
-    setNumBlocks(num*invInputSamplesPerBlock);
-    
-    for (int i = 0; i < numChannels; ++i)
-        channels.getUnchecked(i)->pushSamples (d[i], num);
+    bufferSize = size;
+    setSamplesPerBlock(bufferSize/1024);
+    setNumBlocks(bufferSize*invInputSamplesPerBlock);
 }
 
-void BlendronicDisplay::pushBuffer (const AudioBuffer<float>& buffer)
+void BlendronicDisplay::pushAudioSample (float sample)
 {
-    pushBuffer (buffer.getArrayOfReadPointers(),
-                buffer.getNumChannels(),
-                buffer.getNumSamples());
+    for (auto* c : channels)
+        c->pushSample (sample);
 }
 
-void BlendronicDisplay::pushBuffer (const AudioSourceChannelInfo& buffer)
+void BlendronicDisplay::pushSmoothingSample (float sample)
 {
-    auto numChannels = jmin (buffer.buffer->getNumChannels(), channels.size());
-    
-    for (int i = 0; i < numChannels; ++i)
-        channels.getUnchecked(i)->pushSamples (buffer.buffer->getReadPointer (i, buffer.startSample),
-                                               buffer.numSamples);
-}
-
-void BlendronicDisplay::pushSmoothing (const float** d, int num)
-{
-    setSamplesPerBlock(num/1024);
-    bufferSize = num;
-    setNumBlocks(num*invInputSamplesPerBlock);
-    smoothing.getUnchecked(0)->pushSamples (d[0], num);
-}
-
-void BlendronicDisplay::pushSmoothing (const AudioBuffer<float>& buffer)
-{
-    pushSmoothing (buffer.getArrayOfReadPointers(),
-                   buffer.getNumSamples());
+    smoothing.getUnchecked(0)->pushSample (sample);
 }
 
 void BlendronicDisplay::setSamplesPerBlock (int newSamplesPerPixel) noexcept
@@ -337,12 +324,10 @@ void BlendronicDisplay::getChannelAsPath (Path& path, const Range<float>* levels
                                                  int numLevels, int nextSample)
 {
     path.preallocateSpace (4 * numLevels + 8);
-    
-    int offset = playheads[0] * invInputSamplesPerBlock;
-    
+
     for (int i = 2; i < numLevels; ++i)
     {
-        auto level = -(levels[(nextSample + i + offset) % numLevels].getEnd());
+        auto level = -(levels[(nextSample + i) % numLevels].getEnd());
         
         if (i == 2)
             path.startNewSubPath (0.0f, level);
@@ -351,7 +336,7 @@ void BlendronicDisplay::getChannelAsPath (Path& path, const Range<float>* levels
     }
     
     for (int i = numLevels; --i >= 2;)
-        path.lineTo ((float) i, -(levels[(nextSample + i + offset) % numLevels].getStart()));
+        path.lineTo ((float) i, -(levels[(nextSample + i) % numLevels].getStart()));
     
     path.closeSubPath();
 }
@@ -388,11 +373,9 @@ void BlendronicDisplay::getSmoothingAsPath (Path& path, const Range<float>* leve
 {
     path.preallocateSpace (4 * numLevels + 8);
     
-    int offset = playheads[0] * invInputSamplesPerBlock;
-    
     for (int i = 2; i < numLevels; ++i)
     {
-        auto level = -(levels[(nextSample + i + offset) % numLevels].getEnd());
+        auto level = -(levels[(nextSample + i) % numLevels].getEnd());
         level = fmin(level, maxDelayLength);
         
         if (i == 2)

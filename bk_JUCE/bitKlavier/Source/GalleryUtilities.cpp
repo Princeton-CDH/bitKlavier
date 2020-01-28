@@ -376,136 +376,148 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
     return num;
 }
 
-int Gallery::addCopy(BKPreparationType type, XmlElement* xml)
+int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
 {
-    int newId = -1;
     if (type == PreparationTypeDirect)
     {
         Direct::Ptr p = new Direct(-1);
         p->setState(xml);
         addDirect(p);
-        newId = getNewId(PreparationTypeDirect);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeDirect, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeDirect, p->getName()));
+        return p->getId();
     }
     else if (type == PreparationTypeSynchronic)
     {
         Synchronic::Ptr p = new Synchronic(-1);
         p->setState(xml);
         addSynchronic(p);
-        newId = getNewId(PreparationTypeSynchronic);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeSynchronic, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeSynchronic, p->getName()));
+        return p->getId();
     }
     else if (type == PreparationTypeNostalgic)
     {
         Nostalgic::Ptr p = new Nostalgic(-1);
         p->setState(xml);
         addNostalgic(p);
-        newId = getNewId(PreparationTypeNostalgic);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeNostalgic, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeNostalgic, p->getName()));
+        return p->getId();
     }
     else if (type == PreparationTypeTuning)
     {
         Tuning::Ptr p = new Tuning(-1);
         p->setState(xml);
         addTuning(p);
-        newId = getNewId(PreparationTypeTuning);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeTuning, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeTuning, p->getName()));
+        return p->getId();
     }
     else if (type == PreparationTypeTempo)
     {
         Tempo::Ptr p = new Tempo(-1);
         p->setState(xml);
         addTempo(p);
-        newId = getNewId(PreparationTypeTempo);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeTempo, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeTempo, p->getName()));
+        return p->getId();
     }
 	else if (type == PreparationTypeBlendronic)
 	{
 		Blendronic::Ptr p = new Blendronic(-1);
 		p->setState(xml);
 		addBlendronic(p);
-		newId = getNewId(PreparationTypeBlendronic);
-		p->setId(newId);
-		p->setName(iterateName(PreparationTypeBlendronic, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeBlendronic, p->getName()));
+        return p->getId();
 	}
     else if (type == PreparationTypeKeymap)
     {
         Keymap::Ptr p = new Keymap(processor, -1);
         p->setState(xml);
         addKeymap(p);
-        newId = getNewId(PreparationTypeKeymap);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeKeymap, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeKeymap, p->getName()));
+        return p->getId();
     }
     if (type == PreparationTypeDirectMod)
     {
         DirectModification::Ptr p = new DirectModification(-1);
         p->setState(xml);
         addDirectMod(p);
-        newId = getNewId(PreparationTypeDirectMod);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeDirectMod, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeDirectMod, p->getName()));
+        return p->getId();
     }
     else if (type == PreparationTypeSynchronicMod)
     {
         SynchronicModification::Ptr p = new SynchronicModification(-1);
         p->setState(xml);
         addSynchronicMod(p);
-        newId = getNewId(PreparationTypeSynchronicMod);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeSynchronicMod, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeSynchronicMod, p->getName()));
+        return p->getId();
     }
     else if (type == PreparationTypeNostalgicMod)
     {
         NostalgicModification::Ptr p = new NostalgicModification(-1);
         p->setState(xml);
         addNostalgicMod(p);
-        newId = getNewId(PreparationTypeNostalgicMod);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeNostalgicMod, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeNostalgicMod, p->getName()));
+        return p->getId();
     }
     else if (type == PreparationTypeTuningMod)
     {
         TuningModification::Ptr p = new TuningModification(-1);
         p->setState(xml);
         addTuningMod(p);
-        newId = getNewId(PreparationTypeTuningMod);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeTuningMod, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeTuningMod, p->getName()));
+        return p->getId();
     }
     else if (type == PreparationTypeTempoMod)
     {
         TempoModification::Ptr p = new TempoModification(-1);
         p->setState(xml);
         addTempoMod(p);
-        newId = getNewId(PreparationTypeTempoMod);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypeTempoMod, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeTempoMod, p->getName()));
+        return p->getId();
     }
 	else if (type == PreparationTypeBlendronicMod)
 	{
 		BlendronicModification::Ptr p = new BlendronicModification(-1);
 		p->setState(xml);
 		addBlendronicMod(p);
-		newId = getNewId(PreparationTypeBlendronicMod);
-		p->setId(newId);
-		p->setName(iterateName(PreparationTypeBlendronicMod, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeBlendronicMod, p->getName()));
+        return p->getId();
 	}
     else if (type == PreparationTypePiano)
     {
         Piano::Ptr p = new Piano(processor, -1);
         p->setState(xml, &idmap);
-        newId = getNewId(PreparationTypePiano);
-        p->setId(newId);
-        p->setName(iterateName(PreparationTypePiano, p->getName()));
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypePiano, p->getName()));
+        return p->getId();
     }
-    
-    return newId;
+    return -1;
 }
 
 

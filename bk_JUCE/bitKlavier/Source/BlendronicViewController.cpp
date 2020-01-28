@@ -726,18 +726,19 @@ void BlendronicPreparationEditor::timerCallback()
         BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
         if (prep != nullptr && proc != nullptr)
         {
+            proc->setDisplay(&delayLineDisplay);
+            delayLineDisplay.setBufferSize(proc->getDelayBuffer()->getNumSamples());
             delayLineDisplay.setLineSpacing(proc->getPulseLengthInSamples());
             float maxDelayLength = 0.0f;
             for (auto d : prep->getDelayLengths())
             {
                 if (d > maxDelayLength) maxDelayLength = d;
             }
+
             delayLineDisplay.setMaxDelayLength(maxDelayLength);
-            delayLineDisplay.pushBuffer(proc->getDelayBuffer());
-            delayLineDisplay.pushSmoothing(proc->getDelayLengthRecord());
             delayLineDisplay.setPulseOffset(proc->getPulseOffset());
             delayLineDisplay.setMarkers(proc->getBeatPositionsInBuffer());
-            delayLineDisplay.setPlayheads(Array<uint64>({proc->getCurrentSample(), proc->getDelayedSample()}));
+            delayLineDisplay.setPlayheads(Array<uint64>({proc->getInPoint(), proc->getOutPoint()}));
             if (proc->getResetPhase())
             {
                 delayLineDisplay.resetPhase();

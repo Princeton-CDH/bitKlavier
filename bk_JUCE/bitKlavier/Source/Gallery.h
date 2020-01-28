@@ -127,7 +127,7 @@ public:
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
     
     int add     (BKPreparationType type);
-    int addCopy (BKPreparationType type, XmlElement* xml);
+    int addCopy (BKPreparationType type, XmlElement* xml, int oldId=-1);
     
     int numWithSameNameAs(BKPreparationType type, int Id);
     String iterateName(BKPreparationType type, String name);

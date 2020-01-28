@@ -1200,6 +1200,7 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
     }
     
     updateGalleries();
+    getPluginHolder()->savePluginState();
 }
 
 void BKAudioProcessor::saveCurrentGallery(void)
@@ -1221,6 +1222,7 @@ void BKAudioProcessor::saveCurrentGallery(void)
     {
         writeCurrentGalleryToURL(gallery->getURL());
     }
+    getPluginHolder()->savePluginState();
 }
 
 
