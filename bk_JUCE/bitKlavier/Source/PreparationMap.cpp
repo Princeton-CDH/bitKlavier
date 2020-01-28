@@ -461,8 +461,6 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
     // Initialize the target states as being disabled
     pressTargetStates.ensureStorageAllocated(TargetTypeNil);
     releaseTargetStates.ensureStorageAllocated(TargetTypeNil);
-    bool dawHost = false;
-    if (source == "DAW") dawHost = true;
     
     for (int i = 0; i < TargetTypeNil; i++)
     {
@@ -475,7 +473,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
     
     for (auto km : keymaps)
     {
-        if (km->getAllMidiInputSources().contains(source) || dawHost)
+        if (km->getAllMidiInputSources().contains(source))
         {
             if (km->getMidiEdit())
             {
@@ -497,7 +495,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
         for (auto km : proc->getKeymaps())
         {
             // First check that the the keymap contain the pressed note and uses the midi source of the note
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 // targetStates will refer to press or release depending on inversion
                 targetStates = &pressTargetStates;
@@ -524,7 +522,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &pressTargetStates;
                 if (km->isInverted()) targetStates = &releaseTargetStates;
@@ -545,7 +543,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &pressTargetStates;
                 if (km->isInverted()) targetStates = &releaseTargetStates;
@@ -567,7 +565,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &pressTargetStates;
                 if (km->isInverted()) targetStates = &releaseTargetStates;
@@ -591,7 +589,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &pressTargetStates;
                 if (km->isInverted()) targetStates = &releaseTargetStates;
@@ -615,7 +613,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &pressTargetStates;
                 if (km->isInverted()) targetStates = &releaseTargetStates;
@@ -652,12 +650,10 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     
     bool foundReattack = false;
     bool foundSustain = false;
-    bool dawHost = false;
-    if (source == "DAW") dawHost = true;
     
     for (auto km : keymaps)
     {
-        if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+        if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
         {
             if (km->isInverted()) foundReattack = true;
             else foundSustain = true;
@@ -670,7 +666,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &releaseTargetStates;
                 if (km->isInverted()) targetStates = &pressTargetStates;
@@ -692,7 +688,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &releaseTargetStates;
                 if (km->isInverted()) targetStates = &pressTargetStates;
@@ -713,7 +709,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &releaseTargetStates;
                 if (km->isInverted()) targetStates = &pressTargetStates;
@@ -738,7 +734,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &releaseTargetStates;
                 if (km->isInverted()) targetStates = &pressTargetStates;
@@ -762,7 +758,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &releaseTargetStates;
                 if (km->isInverted()) targetStates = &pressTargetStates;
@@ -786,7 +782,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 targetStates = &releaseTargetStates;
                 if (km->isInverted()) targetStates = &pressTargetStates;
@@ -823,9 +819,6 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
         int channel = sustainedNotes.getUnchecked(n).channel;
         String source = sustainedNotes.getUnchecked(n).source;
         
-        bool dawHost = false;
-        if (source == "DAW") dawHost = true;
-        
         for (auto proc : dprocessor)
         {
             if(!keysThatAreDepressed.getUnchecked(noteNumber)) //don't turn off note if key is down!
@@ -841,7 +834,7 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
         {
             for (auto km : proc->getKeymaps())
             {
-                if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+                if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
                 {
                     for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
                     {
@@ -859,7 +852,7 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
         {
             for (auto km : proc->getKeymaps())
             {
-                if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+                if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
                 {
                     for (int i = TargetTypeNostalgic; i <= TargetTypeNostalgicClear; i++)
                     {
@@ -877,7 +870,7 @@ void PreparationMap::sustainPedalReleased(Array<bool> keysThatAreDepressed, bool
         {
             for (auto km : proc->getKeymaps())
             {
-                if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+                if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
                 {
                     for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
                     {
@@ -907,9 +900,6 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, St
 {
     // DBG("PreparationMap::postRelease " + String(noteNumber));
     
-    bool dawHost = false;
-    if (source == "DAW") dawHost = true;
-    
     Array<KeymapTargetState> targetStates;
     targetStates.ensureStorageAllocated(TargetStateNil);
     for (int i = 0; i < TargetTypeNil; i++)
@@ -917,7 +907,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, St
         targetStates.add(TargetStateNil);
     }
     
-    if(sustainPedalIsDepressed && targetStates.contains(TargetStateEnabled))
+    if (sustainPedalIsDepressed)
     {
         Note newNote;
         newNote.noteNumber = noteNumber;
@@ -945,7 +935,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, St
     {
         for (auto km : proc->getKeymaps())
         {
-            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source) || dawHost))
+            if (km->containsNote(noteNumber) && (km->getAllMidiInputSources().contains(source)))
             {
                 for (int i = TargetTypeNostalgic; i <= TargetTypeNostalgicClear; i++)
                 {
@@ -974,7 +964,7 @@ void PreparationMap::reattack(int noteNumber, String source)
         for(int i=0; i<sustainedNotes.size(); i++)
         {
             if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber &&
-               (sustainedNotes.getUnchecked(i).source == source || source == "DAW"))
+               (sustainedNotes.getUnchecked(i).source == source))
                 sustainedNotes.remove(i);
         }
     }

@@ -424,7 +424,8 @@ const Array<String> Keymap::getAllMidiInputSources()
 {
     Array<String> sources;
     sources.addArray(midiInputSources);
-    if (onscreenSelected) sources.add(cNoteSourceUI);
+    sources.add(cMidiInputDAW);
+    if (onscreenSelected) sources.add(cMidiInputUI);
     if (defaultSelected) sources.addArray(processor.getDefaultMidiInputSources());
     return sources;
 }

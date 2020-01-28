@@ -147,11 +147,7 @@ public:
         }
     }
     
-
-    Array<int>                  pianoMap;
-    Array<String>               pianoMapInputs;
     int                         numPMaps;
-    
     int numResetMappers;
     
     OwnedArray<Modifications> modificationMap;
@@ -266,13 +262,10 @@ public:
     void                        prepareToPlay(double sampleRate);
     
     void configurePianoMap(BKItem::Ptr map);
-    void deconfigurePianoMap(BKItem::Ptr map);
     
     void configureReset(BKItem::Ptr item);
-    void deconfigureResetForKeys(BKItem::Ptr item, Array<bool> otherKeys);
 
     void configureModification(BKItem::Ptr map);
-    void deconfigureModification(BKItem::Ptr map);
     
     int                         addPreparationMap(void);
     int                         addPreparationMap(Keymap::Ptr keymap);
@@ -281,8 +274,6 @@ public:
     int                         removePreparationMap(int Id);
     int                         removePreparationMapWithKeymap(int keymapId);
     int                         removeLastPreparationMap(void);
-    
-    Array<Array<int>> pianoMaps;
     
     void reset(void);
 private:
@@ -365,28 +356,16 @@ private:
 	}
     
     void configureDirectModification(DirectModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
-    void deconfigureDirectModification(DirectModification::Ptr, Array<int> whichKeymaps);
-    void deconfigureDirectModificationForKeys(DirectModification::Ptr, Array<bool>);
     
     void configureSynchronicModification(SynchronicModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
-    void deconfigureSynchronicModification(SynchronicModification::Ptr, Array<int> whichKeymaps);
-    void deconfigureSynchronicModificationForKeys(SynchronicModification::Ptr, Array<bool>);
     
     void configureNostalgicModification(NostalgicModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
-    void deconfigureNostalgicModification(NostalgicModification::Ptr, Array<int> whichKeymaps);
-    void deconfigureNostalgicModificationForKeys(NostalgicModification::Ptr, Array<bool>);
     
     void configureTuningModification(TuningModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
-    void deconfigureTuningModification(TuningModification::Ptr, Array<int> whichKeymaps);
-    void deconfigureTuningModificationForKeys(TuningModification::Ptr, Array<bool>);
     
     void configureTempoModification(TempoModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
-    void deconfigureTempoModification(TempoModification::Ptr, Array<int> whichKeymaps);
-    void deconfigureTempoModificationForKeys(TempoModification::Ptr, Array<bool>);
     
 	void configureBlendronicModification(BlendronicModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
-	void deconfigureBlendronicModification(BlendronicModification::Ptr, Array<int> whichKeymaps);
-	void deconfigureBlendronicModificationForKeys(BlendronicModification::Ptr, Array<bool>);
 
     JUCE_LEAK_DETECTOR(Piano)
 };

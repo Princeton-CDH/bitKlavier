@@ -79,6 +79,13 @@ public:
     Array<Reset> tempoResets;
 	Array<Reset> blendronicResets;
     
+    struct PianoMap
+    {
+        int pianoTarget;
+        Keymap::PtrArr keymaps;
+    };
+    Array<PianoMap>             pianoMaps;
+    
 private:
     DirectModification::PtrArr      directMods;
     SynchronicModification::PtrArr  synchronicMods;

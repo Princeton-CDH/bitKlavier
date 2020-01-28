@@ -81,7 +81,7 @@ offset(0.0),
 pulseOffset(0.0),
 verticalZoom(1.0),
 horizontalZoom(0.0),
-verticalZoomSliderMin(0.01),
+verticalZoomSliderMin(0.05),
 verticalZoomSliderMax(2.0),
 horizontalZoomSliderMin(0.0),
 horizontalZoomSliderMax(0.5),
@@ -307,8 +307,11 @@ void BlendronicDisplay::paint (Graphics& g)
     for (auto* c : channels)
     {
         channelBounds = channelBounds.removeFromTop(channelHeight);
+        g.saveState();
+        g.reduceClipRegion(channelBounds);
         paintChannel (g, channelBounds.toFloat(),
                       c->levels.begin(), c->levels.size(), c->nextSample);
+        g.restoreState();
     }
 
     g.setColour (backgroundColour);
@@ -322,8 +325,11 @@ void BlendronicDisplay::paint (Graphics& g)
     
     for (auto* s : smoothing)
     {
+        g.saveState();
+        g.reduceClipRegion(smoothingBounds);
         paintSmoothing (g, smoothingBounds.toFloat(),
                         s->levels.begin(), s->levels.size(), s->nextSample);
+        g.restoreState();
     }
 }
 

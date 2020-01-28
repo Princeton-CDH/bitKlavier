@@ -241,7 +241,6 @@ void Modifications::clearModifications(void)
     tuningMods.clear();
     tempoMods.clear();
 	blendronicMods.clear();
-    
 }
 
 void Modifications::clearResets(void)

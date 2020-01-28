@@ -578,6 +578,8 @@ private:
                 sources.add(device.name);
         }
         processor->setDefaultMidiInputSources(sources);
+        
+        saveAudioDeviceState();
     }
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StandalonePluginHolder)

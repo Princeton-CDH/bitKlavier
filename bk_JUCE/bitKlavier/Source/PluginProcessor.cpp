@@ -505,15 +505,16 @@ void BKAudioProcessor::renameGallery(String newName)
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, String source)
 {
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
+    
+    ++noteOnCount;
+    noteOn.set(noteNumber, true);
+    noteVelocity.set(noteNumber, velocity);
 
     bool activeSource = false;
     for (auto km : pmap->getKeymaps())
     {
-        if (km->getAllMidiInputSources().contains(source) || source == "DAW")
+        if (km->getAllMidiInputSources().contains(source))
         {
-            ++noteOnCount;
-            noteOn.set(noteNumber, true);
-            noteVelocity.set(noteNumber, velocity);
             activeSource = true;
         }
     }
@@ -523,13 +524,20 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     if (allNotesOff)   allNotesOff = false;
     
     // Check PianoMap for whether piano should change due to key strike.
-    if (currentPiano->pianoMapInputs.contains(source))
+    for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
     {
-        int whichPiano = currentPiano->pianoMap[noteNumber];
-        if (whichPiano > 0 && whichPiano != currentPiano->getId())
+        for (auto keymap : pmap.keymaps)
         {
-            DBG("change piano to " + String(whichPiano));
-            setCurrentPiano(whichPiano);
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            {
+                int whichPiano = pmap.pianoTarget;
+                if (whichPiano > 0 && whichPiano != currentPiano->getId())
+                {
+                    DBG("change piano to " + String(whichPiano));
+                    setCurrentPiano(whichPiano);
+                }
+                break;
+            }
         }
     }
     
@@ -743,13 +751,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     for(int i=0; i<notesOnUI.size(); i++)
     {
-        handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel, cNoteSourceUI);
+        handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel, cMidiInputUI);
         notesOnUI.remove(i);
     }
     
     for(int i=0; i<notesOffUI.size(); i++)
     {
-        handleNoteOff(notesOffUI.getUnchecked(i), 0.6, channel, cNoteSourceUI);
+        handleNoteOff(notesOffUI.getUnchecked(i), 0.6, channel, cMidiInputUI);
         notesOffUI.remove(i);
     }
     
@@ -770,7 +778,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 	//if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
-    if (!allNotesOff && !noteOnCount) {
+    if (!noteOnCount) {
         
         /*
         // Process all active prep maps in previous piano
@@ -779,7 +787,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         */
         
         prevPianos.clearQuick();
-        allNotesOff = true;
+        if (!allNotesOff) allNotesOff = true;
     }
 
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
@@ -1468,7 +1476,7 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     
     String sourceName;
     if(source != nullptr) sourceName = source->getName();
-    else sourceName = "DAW";
+    else sourceName = cMidiInputDAW;
     
     channel = m.getChannel();
     

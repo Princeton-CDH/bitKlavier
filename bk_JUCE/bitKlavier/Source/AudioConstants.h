@@ -210,7 +210,7 @@ const String ptagKeymap_midiInput = "midiInput";
 const String ptagKeymap_defaultSelected = "defSelected";
 const String ptagKeymap_onscreenSelected = "osSelected";
 
-const String cNoteSourceUI = "__UIKeyboard";
+
 
 typedef enum PitchClass {
     C = 0,
@@ -1111,8 +1111,12 @@ static const std::vector<std::string> cKeymapParameterTypes = {
     "Keymap"
 };
 
-static const String keymapDefaultMidiInputIdentifier = "_JUCEMidiInput";
-static const String keymapDefaultMidiInputDisplay = "Default MIDI Input";
+static const String cMidiInputDefault = "_MidiInputJUCE";
+static const String cMidiInputDefaultDisplay = "Default MIDI Input";
+
+static const String cMidiInputDAW = "_MidiInputDAW";
+
+static const String cMidiInputUI = "_MidiInputUI";
 
 typedef enum BKSampleLoadType
 {
