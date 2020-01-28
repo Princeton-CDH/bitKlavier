@@ -806,6 +806,8 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
     BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
     BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
+    DBG("BlendronicPreparationEditor::multiSliderDidChange " + name + " " + String(whichSlider) + " " + String(values[0]));
+    
     if (name == "beat lengths")
     {
         prep    ->setBeat(whichSlider, values[0]);
@@ -818,8 +820,10 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
     }
     else if (name == "smoothing (ms)")
     {
-        prep    ->setSmoothValue(whichSlider, values[0]);
-        active  ->setSmoothValue(whichSlider, values[0]);
+        //prep    ->setSmoothValue(whichSlider, values[0]);
+        //active  ->setSmoothValue(whichSlider, values[0]);
+        prep    ->setSmoothLengths(whichSlider, values[0]);
+        active  ->setSmoothLengths(whichSlider, values[0]);
     }
     else if (name == "feedback coefficients")
     {
@@ -835,6 +839,8 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     
     Array<float> newvals = Array<float>();
     for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
+    
+    DBG("BlendronicPreparationEditor::multiSlidersDidChange " + name);
     
     if (name == "beat lengths")
     {
