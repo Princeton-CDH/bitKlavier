@@ -45,8 +45,6 @@ BKViewController(p, theGraph, 3)
             paramSliders[idx]->addMyListener(this);
 #if JUCE_IOS
             paramSliders[idx]->addWantsBigOneListener(this);
-            gainSlider->addWantsBigOneListener(this);
-            bufferSizeSlider->addWantsBigOneListener(this);
 #endif
             paramSliders[idx]->setMinMaxDefaultInc(cBlendronicDefaultRangeValuesAndInc[i]);
         
@@ -143,6 +141,11 @@ BKViewController(p, theGraph, 3)
     delayLineDisplay.setNumChannels(1);
     delayLineDisplay.setColours(Colours::black, Colours::lightgrey);
     addAndMakeVisible(&delayLineDisplay);
+    
+#if JUCE_IOS
+    gainSlider->addWantsBigOneListener(this);
+    bufferSizeSlider->addWantsBigOneListener(this);
+#endif
 
 //    keyThreshSlider = std::make_unique< BKSingleSlider>("cluster threshold", 20, 2000, 200, 10);
 //    keyThreshSlider->setToolTipString("successive notes spaced by less than this time (ms) are grouped for determining first note-on and first note-off");
