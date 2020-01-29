@@ -809,7 +809,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 
 double BKAudioProcessor::getLevelL()
 {
-    if(didLoadMainPianoSamples) return levelBuf.getRMSLevel(0, 0, levelBuf.getNumSamples());
+    if(didLoadMainPianoSamples && levelBuf.getNumSamples() > 0) return levelBuf.getRMSLevel(0, 0, levelBuf.getNumSamples());
     else return 0.;
 }
 
