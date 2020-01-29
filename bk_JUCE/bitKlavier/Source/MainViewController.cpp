@@ -518,6 +518,18 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
             }
         }
     }
+    else if (code == 85) // U
+    {
+        construction.connectAllSelected();
+    }
+    else if (code == 73) // I
+    {
+        construction.removeConnectionsBetween();
+    }
+    else if (code == 79) // O
+    {
+        construction.removeConnectionsTo();
+    }
     
     return true;
 }

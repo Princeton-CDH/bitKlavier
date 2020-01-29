@@ -284,6 +284,10 @@ public:
     
     inline const TargetNoteMode getTargetTypeNostalgicClear() const noexcept { return targetTypeNostalgicClear; }
     inline void setTargetTypeNostalgicClear(TargetNoteMode nm)             { targetTypeNostalgicClear = nm; }
+    inline void setTargetTypeNostalgic(KeymapTargetType which, TargetNoteMode nm)
+    {
+        if (which == TargetTypeNostalgicClear)   { targetTypeNostalgicClear = nm; }
+    }
     
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }

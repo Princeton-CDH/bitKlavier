@@ -178,14 +178,14 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
             menu.addItem(EDIT_ID, "Edit (Double Click)");
             menu.addSeparator();
             menu.addItem(CONNECTION_ID, "Make Connection" + gConnectionShortcut);
-            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected");
+            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected (O)");
         }
         if (numItemsSelected > 1)
         {
             menu.addSeparator();
-            menu.addItem(CONNECT_ALL_ID, "Connect Selected");
-            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected");
-            menu.addItem(DISCONNECT_BETWEEN_ID, "Remove Connections Between Selected");
+            menu.addItem(CONNECT_ALL_ID, "Connect Selected (U)");
+            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected (O)");
+            menu.addItem(DISCONNECT_BETWEEN_ID, "Remove Connections Between Selected (I)");
             menu.addSeparator();
             menu.addSubMenu("Align" + gAlignShortcut, getAlignMenu(laf));
         }

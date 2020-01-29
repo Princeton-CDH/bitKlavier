@@ -205,6 +205,50 @@ void BKConstructionSite::makeConnection(int x, int y, bool doAnother)
     }
 }
 
+void BKConstructionSite::connectAllSelected()
+{
+    for (int i = 0; i < graph->getSelectedItems().size()-1; ++i)
+    {
+        for (int j = i+1; j < graph->getSelectedItems().size(); ++j)
+        {
+            graph->connect(graph->getSelectedItems()[i],
+                               graph->getSelectedItems()[j]);
+        }
+    }
+    repaint();
+}
+
+void BKConstructionSite::removeConnectionsTo()
+{
+    // For each selected item
+    for (BKItem::Ptr selectedItem : graph->getSelectedItems())
+    {
+        // Check each connected item
+        for (BKItem::Ptr connectedItem : selectedItem->getConnections())
+        {
+            // If the connected item is not also selected, disconnect it
+            if (!graph->getSelectedItems().contains(connectedItem))
+            {
+                graph->disconnect(selectedItem, connectedItem);
+            }
+        }
+    }
+    repaint();
+}
+
+void BKConstructionSite::removeConnectionsBetween()
+{
+    for (int i = 0; i < graph->getSelectedItems().size()-1; ++i)
+    {
+        for (int j = i+1; j < graph->getSelectedItems().size(); ++j)
+        {
+            graph->disconnect(graph->getSelectedItems()[i],
+                                  graph->getSelectedItems()[j]);
+        }
+    }
+    repaint();
+}
+
 void BKConstructionSite::itemIsBeingDragged(BKItem* thisItem, const MouseEvent& e)
 {
     repaint();
@@ -600,46 +644,17 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     // Maximally connect selected items
     else if (result == CONNECT_ALL_ID)
     {
-        for (int i = 0; i < vc->graph->getSelectedItems().size()-1; ++i)
-        {
-            for (int j = i+1; j < vc->graph->getSelectedItems().size(); ++j)
-            {
-                vc->graph->connect(vc->graph->getSelectedItems()[i],
-                                   vc->graph->getSelectedItems()[j]);
-            }
-        }
-        vc->repaint();
+        vc->connectAllSelected();
     }
     // Disconnect a single item or multiple selected items from any other connected items
     else if (result == DISCONNECT_FROM_ID)
     {
-        // For each selected item
-        for (BKItem::Ptr selectedItem : vc->graph->getSelectedItems())
-        {
-            // Check each connected item
-            for (BKItem::Ptr connectedItem : selectedItem->getConnections())
-            {
-                // If the connected item is not also selected, disconnect it
-                if (!vc->graph->getSelectedItems().contains(connectedItem))
-                {
-                    vc->graph->disconnect(selectedItem, connectedItem);
-                }
-            }
-        }
-        vc->repaint();
+        vc->removeConnectionsTo();
     }
     // Disconnect multiple selected items from each other
     else if (result == DISCONNECT_BETWEEN_ID)
     {
-        for (int i = 0; i < vc->graph->getSelectedItems().size()-1; ++i)
-        {
-            for (int j = i+1; j < vc->graph->getSelectedItems().size(); ++j)
-            {
-                vc->graph->disconnect(vc->graph->getSelectedItems()[i],
-                                      vc->graph->getSelectedItems()[j]);
-            }
-        }
-        vc->repaint();
+        vc->removeConnectionsBetween();
     }
     else if (result == DELETE_ID)
     {

@@ -847,7 +847,23 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
                 beatsToSkipSlider->setVisible(true);
             }
         }
-
+    }
+    else
+    {
+        NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(processor.updateState->currentNostalgicId);
+        NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(processor.updateState->currentNostalgicId);
+        
+        for (int i=0; i<targetControlCBs.size(); i++)
+        {
+            if (box == targetControlCBs[i])
+            {
+                int selectedItem = targetControlCBs[i]->getSelectedId() - 1;
+                DBG(targetControlCBs[i]->getName() + " " + cTargetNoteModes[selectedItem]);
+                
+                prep    ->setTargetTypeNostalgic(KeymapTargetType(i + TargetTypeNostalgicClear), (TargetNoteMode)selectedItem);
+                active  ->setTargetTypeNostalgic(KeymapTargetType(i + TargetTypeNostalgicClear), (TargetNoteMode)selectedItem);
+            }
+        }
     }
 }
 

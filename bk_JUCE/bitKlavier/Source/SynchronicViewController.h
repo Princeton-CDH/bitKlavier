@@ -147,16 +147,7 @@ public Timer
 {
 public:
     SynchronicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~SynchronicPreparationEditor()
-    {
-        setLookAndFeel(nullptr);
-        releaseVelocitySetsSynchronicToggle.setLookAndFeel(nullptr);
-        onOffSelectCB.setLookAndFeel(nullptr);
-        for (int i=0; i<=TargetTypeSynchronicRotate-TargetTypeSynchronicPatternSync; i++)
-        {
-            targetControlCBs[i]->setLookAndFeel(nullptr);
-        }
-    }
+    ~SynchronicPreparationEditor() {}
     
     void update(void) override;
     

@@ -24,6 +24,10 @@ public:
     ~NostalgicViewController()
     {
         setLookAndFeel(nullptr);
+        for (int i=0; i<=TargetTypeNostalgicClear-TargetTypeNostalgicClear; i++)
+        {
+            targetControlCBs[i]->setLookAndFeel(nullptr);
+        }
     };
     
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;

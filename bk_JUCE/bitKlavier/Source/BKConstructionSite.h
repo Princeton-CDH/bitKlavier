@@ -48,6 +48,9 @@ public:
     void selectAll(void);
     void startConnection(int x, int y);
     void makeConnection(int x, int y, bool doAnother = false);
+    void connectAllSelected();
+    void removeConnectionsTo();
+    void removeConnectionsBetween();
     
     inline int getNumSelected(void) { return graph->getSelectedItems().size(); }
     
