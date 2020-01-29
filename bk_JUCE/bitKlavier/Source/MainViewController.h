@@ -141,6 +141,7 @@ private:
     Slider mainSlider;
     std::unique_ptr<BKLevelMeterComponent> levelMeterComponentL;
     std::unique_ptr<BKLevelMeterComponent> levelMeterComponentR;
+    BKLevelMeterComponent testmeterComponent;
     
     std::unique_ptr<PreparationPanel> preparationPanel;
     

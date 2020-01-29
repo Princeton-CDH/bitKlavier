@@ -656,7 +656,7 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
 #if JUCE_IOS
     hasBigOne = true;
     editValsTextField->setText(arrayFloatArrayToString(getAllActiveValues()), dontSendNotification);
-    WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField, sliderName);
+    WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField.get(), sliderName);
 #else
 //#endif
     int which = whichSlider(e);
@@ -2307,7 +2307,7 @@ void BKStackedSlider::mouseDoubleClick (const MouseEvent &e)
 #if JUCE_IOS
     hasBigOne = true;
     editValsTextField->setText(floatArrayToString(getAllActiveValues()), dontSendNotification);
-    WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField, sliderName);
+    WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField.get(), sliderName);
 #else
     StringArray tokens;
     tokens.addTokens(floatArrayToString(getAllActiveValues()), false); //arrayFloatArrayToString

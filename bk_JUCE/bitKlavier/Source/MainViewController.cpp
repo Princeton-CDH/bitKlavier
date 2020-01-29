@@ -288,7 +288,8 @@ void MainViewController::mouseDown(const MouseEvent &event)
     else
     {
 #if JUCE_IOS
-        if (event.eventComponent == levelMeterComponentL)
+        if (event.eventComponent == levelMeterComponentL.get())
+        //if (event.originalComponent == &testmeterComponent)
         {
             toggleDisplay();
         }

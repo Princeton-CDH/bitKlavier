@@ -271,7 +271,7 @@ void BKCircularKeyboardSlider::bkButtonClicked (Button* b)
         
 #if JUCE_IOS
         hasBigOne = true;
-        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, keyboardValsTextField, "scale offsets");
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, keyboardValsTextField.get(), "scale offsets");
 #else
         
         focusLostByEscapeKey = false;
