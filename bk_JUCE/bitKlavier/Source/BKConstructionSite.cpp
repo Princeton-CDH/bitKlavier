@@ -764,6 +764,7 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
 void BKConstructionSite::mouseHold(Component* frame, bool onItem)
 {
 #if JUCE_IOS
+    processor.noteOnUI(60);
     frame->setTopLeftPosition(frame->getX()+20, frame->getY());
     
     if (onItem)

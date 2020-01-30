@@ -107,23 +107,24 @@ inline PopupMenu getNewItemMenu(LookAndFeel* laf)
     PopupMenu newMenu;
     newMenu.setLookAndFeel(laf);
     
-    newMenu.addItem(KEYMAP_ID, "Keymap (K)");
-    newMenu.addItem(DIRECT_ID, "Direct (D)");
-    newMenu.addItem(NOSTALGIC_ID, "Nostalgic (N)");
-    newMenu.addItem(SYNCHRONIC_ID, "Synchronic (S)");
-    newMenu.addItem(BLENDRONIC_ID, "Blendronic (B)");
-    newMenu.addItem(TUNING_ID, "Tuning (T)");
-    newMenu.addItem(TEMPO_ID, "Tempo (M)");
+    newMenu.addItem(KEYMAP_ID, "Keymap" + gKeymapShortcut);
+    newMenu.addItem(DIRECT_ID, "Direct" + gDirectShortcut);
+    newMenu.addItem(NOSTALGIC_ID, "Nostalgic" + gNostalgicShortcut);
+    newMenu.addItem(SYNCHRONIC_ID, "Synchronic" + gSynchronicShortcut);
+    newMenu.addItem(BLENDRONIC_ID, "Blendronic" + gBlendronicShortcut);
+    newMenu.addItem(TUNING_ID, "Tuning" + gTuningShortcut);
+    newMenu.addItem(TEMPO_ID, "Tempo" + gTempoShortcut);
     newMenu.addSeparator();
-    newMenu.addItem(MODIFICATION_ID, "Modification (C)");
-    newMenu.addItem(PIANOMAP_ID, "Piano Map (P)");
-    newMenu.addItem(RESET_ID, "Reset (R)");
+    newMenu.addItem(MODIFICATION_ID, "Modification" + gModificationShortcut);
+    newMenu.addItem(PIANOMAP_ID, "Piano Map" + gPianoMapShortcut);
+    newMenu.addItem(RESET_ID, "Reset" + gResetShortcut);
     newMenu.addSeparator();
-    newMenu.addItem(COMMENT_ID, "Comment (Q)");
+    newMenu.addItem(COMMENT_ID, "Comment" + gCommentShortcut);
     
     return newMenu;
 }
 
+// What is this for?
 inline PopupMenu getEditItemMenu(LookAndFeel* laf)
 {
     PopupMenu menu;
@@ -163,29 +164,29 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     
     if (onGraph)
     {
-        menu.addItem(PASTE_ID, "Paste"+gPasteShortcut);
+        menu.addItem(PASTE_ID, "Paste" + gPasteShortcut);
         menu.addSeparator();
     }
 
     if (numItemsSelected)
     {
-        menu.addItem(COPY_ID, "Copy"+gCopyShortcut);
+        menu.addItem(COPY_ID, "Copy" + gCopyShortcut);
         menu.addItem(CUT_ID, "Cut" + gCutShortcut);
         menu.addItem(DELETE_ID, "Delete");
         if (numItemsSelected == 1)
         {
             menu.addSeparator();
-            menu.addItem(EDIT_ID, "Edit (Double Click)");
+            menu.addItem(EDIT_ID, "Edit" + gEditShortcut);
             menu.addSeparator();
             menu.addItem(CONNECTION_ID, "Make Connection" + gConnectionShortcut);
-            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected (O)");
+            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected" + gDisconnectFromShortcut);
         }
         if (numItemsSelected > 1)
         {
             menu.addSeparator();
-            menu.addItem(CONNECT_ALL_ID, "Connect Selected (U)");
-            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected (O)");
-            menu.addItem(DISCONNECT_BETWEEN_ID, "Remove Connections Between Selected (I)");
+            menu.addItem(CONNECT_ALL_ID, "Connect Selected" + gConnectAllShortcut);
+            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected" + gDisconnectFromShortcut);
+            menu.addItem(DISCONNECT_BETWEEN_ID, "Remove Connections Between Selected" + gDisconnectBetweenShortcut);
             menu.addSeparator();
             menu.addSubMenu("Align" + gAlignShortcut, getAlignMenu(laf));
         }

@@ -323,12 +323,14 @@ public:
                                   true,
                                   preferredDefaultDeviceName,
                                   preferredSetupOptions);
+#if ! (JUCE_IOS || JUCE_ANDROID)
         midiInputManager.initialise (enableAudioInput ? totalInChannels : 0,
                                   totalOutChannels,
                                   savedState.get(),
                                   true,
                                   preferredDefaultDeviceName,
                                   preferredSetupOptions);
+#endif
     }
     
     void addMidiInputDeviceCallback(MidiInputCallback* callback)
@@ -535,9 +537,12 @@ private:
                             const AudioDeviceManager::AudioDeviceSetup* preferredSetupOptions)
     {
         deviceManager.addAudioCallback (this);
+#if ! (JUCE_IOS || JUCE_ANDROID)
         // attach this device to the midi callback of the processor
         midiInputManager.addMidiInputDeviceCallback ({}, processor.get());
-        
+#else
+        deviceManager.addMidiInputDeviceCallback ({}, processor.get());
+#endif
         reloadAudioDeviceState (enableAudioInput, preferredDefaultDeviceName, preferredSetupOptions);
     }
     
@@ -545,7 +550,11 @@ private:
     {
         saveAudioDeviceState();
         
+#if ! (JUCE_IOS || JUCE_ANDROID)
         midiInputManager.removeMidiInputDeviceCallback ({}, processor.get());
+#else
+        deviceManager.removeMidiInputDeviceCallback ({}, processor.get());
+#endif
         deviceManager.removeAudioCallback (this);
     }
     
@@ -565,7 +574,9 @@ private:
                 if (! lastMidiDevices.contains (newDevice))
                 {
                     if (autoOpenMidiDevices) deviceManager.setMidiInputDeviceEnabled (newDevice.identifier, true);
+#if ! (JUCE_IOS || JUCE_ANDROID)
                     midiInputManager.setMidiInputDeviceEnabled (newDevice.identifier, true);
+#endif
                 }
             lastMidiDevices = newMidiDevices;
         }
