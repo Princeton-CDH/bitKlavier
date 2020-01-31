@@ -239,7 +239,11 @@ void BKSampleLoader::run(void)
             type = BKLoadLite;
         }
         
+//#if JUCE_IOS
+        //loadMainPianoSamples(BKLoadLitest); // to avoid iOS memory issues; user should be able to load heavier if they want
+//#else
         loadMainPianoSamples(type);
+//#endif
         
         EXIT_CHECK;
         
