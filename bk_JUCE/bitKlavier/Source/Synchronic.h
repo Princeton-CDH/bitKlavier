@@ -460,7 +460,6 @@ public:
 		{
 			envelopeOn.add(i, Random::getSystemRandom().nextBool());
 		}
-		
 	}
     
     //inline const float getTempo() const noexcept                       {return sTempo;               }

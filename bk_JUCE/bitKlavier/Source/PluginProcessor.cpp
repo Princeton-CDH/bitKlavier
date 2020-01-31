@@ -512,22 +512,27 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 {
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
-    ++noteOnCount;
-    noteOn.set(noteNumber, true);
-    noteVelocity.set(noteNumber, velocity);
-
     bool activeSource = false;
-    for (auto km : pmap->getKeymaps())
+    if (pmap != nullptr)
     {
-        if (km->getAllMidiInputSources().contains(source))
+        for (auto km : pmap->getKeymaps())
         {
-            activeSource = true;
+            if (km->getAllMidiInputSources().contains(source))
+            {
+                activeSource = true;
+            }
         }
     }
     
-    if (!activeSource) return;
+    if (activeSource || getDefaultMidiInputSources().contains(source))
+    {
+        ++noteOnCount;
+        noteOn.set(noteNumber, true);
+        noteVelocity.set(noteNumber, velocity);
+        if (allNotesOff)   allNotesOff = false;
+    }
     
-    if (allNotesOff)   allNotesOff = false;
+    if (!activeSource) return;
     
     // Check PianoMap for whether piano should change due to key strike.
     for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
@@ -579,36 +584,60 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
 void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, String source)
 {
-    noteOn.set(noteNumber, false);
-    //DBG("noteoff velocity = " + String(velocity));
+    PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
-    noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
-    if(noteOnSetsNoteOffVelocity) velocity = noteVelocity.getUnchecked(noteNumber);
-    else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
     
-    // Send key off to each pmap in current piano
-    currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont), source);
+        
+    bool activeSource = false;
     
-
+    if (pmap != nullptr)
+    {
+        for (auto km : pmap->getKeymaps())
+        {
+            if (km->getAllMidiInputSources().contains(source))
+            {
+                activeSource = true;
+            }
+        }
+    }
+    
+    if (activeSource || getDefaultMidiInputSources().contains(source))
+    {
+        noteOn.set(noteNumber, false);
+        --noteOnCount;
+        if(noteOnCount < 0) noteOnCount = 0;
+    }
+    
+    if (activeSource)
+    {
+        //DBG("noteoff velocity = " + String(velocity));
+        
+        noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
+        if(noteOnSetsNoteOffVelocity) velocity = noteVelocity.getUnchecked(noteNumber);
+        else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
+        
+        // Send key off to each pmap in current piano
+        currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont), source);
+    }
+    
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
-
     for (auto piano : prevPianos)
     {
-        if (piano != currentPiano)
-            piano->prepMap->postRelease(noteNumber, velocity, channel, source);
+        pmap  = piano->getPreparationMap();
+        
+        activeSource = false;
+        for (auto km : pmap->getKeymaps())
+        {
+            if (km->getAllMidiInputSources().contains(source))
+            {
+                activeSource = true;
+            }
+        }
+        
+        if (activeSource)
+            if (piano != currentPiano)
+                piano->prepMap->postRelease(noteNumber, velocity, channel, source);
     }
-
-    /*
-     //do this in the PreparationMap, not here; springs should be turned on/off by Keymap
-    for ( auto t : currentPiano->getTuningProcessors())
-    {
-        t->getTuning()->getCurrentSpringTuning()->removeNote(noteNumber);
-    }
-    */
-    
-    --noteOnCount;
-    if(noteOnCount < 0) noteOnCount = 0;
-    
 }
 
 void BKAudioProcessor::sustainActivate(void)
@@ -740,7 +769,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     }
     
     int numSamples = buffer.getNumSamples();
-    if(numSamples != levelBuf.getNumSamples()) levelBuf.setSize(buffer.getNumChannels(), numSamples);
+    if (numSamples != levelBuf.getNumSamples()) levelBuf.setSize(buffer.getNumChannels(), numSamples);
     
     // Process all active prep maps in current piano
     
@@ -784,7 +813,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 	//if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
     
     // Sets some flags to determine whether to send noteoffs to previous pianos.
-    if (!noteOnCount) {
+    if (!noteOnCount && !sustainIsDown) {
         
         /*
         // Process all active prep maps in previous piano
