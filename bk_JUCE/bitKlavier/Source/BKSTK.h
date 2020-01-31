@@ -41,6 +41,12 @@ public:
 	inline const float lastOutLeft() const noexcept { return lastFrameLeft; }
 	inline const float lastOutRight() const noexcept { return lastFrameRight; }
     
+    inline const float getSample(int c, int i) const noexcept
+    {
+        if (loading) return 0.0f;
+        return inputs.getSample(c, i);
+    }
+    
     inline const AudioBuffer<float>* getBuffer() const noexcept { return &inputs; }
 
 	//mutators
@@ -80,6 +86,7 @@ private:
 	bool doNextOutLeft;
 	bool doNextOutRight;
     
+    bool loading;
     double sampleRate;
 };
 
@@ -170,6 +177,7 @@ public:
     inline const AudioBuffer<float>* getDelayBuffer() const noexcept { return delayLinear->getBuffer(); }
     inline const int getInPoint() const noexcept { return delayLinear->getInPoint(); }
     inline const int getOutPoint() const noexcept { return delayLinear->getOutPoint(); }
+    inline const float getSample(int c, int i) const noexcept { return delayLinear->getSample(c, i); }
 
 	//mutators
 	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to float)

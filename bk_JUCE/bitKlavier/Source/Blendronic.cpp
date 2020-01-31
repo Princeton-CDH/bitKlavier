@@ -206,7 +206,7 @@ void BlendronicProcessor::tick(float* outputs)
     {
         int i = getInPoint() - 1;
         if (i < 0) i = getDelayBuffer()->getNumSamples() - 1;
-        display->pushAudioSample(getDelayBuffer()->getSample(0, i));
+        display->pushAudioSample(delay->getSample(0, i));
         display->pushSmoothingSample(dlr);
     }
 }

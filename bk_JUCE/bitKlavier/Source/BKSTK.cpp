@@ -66,6 +66,7 @@ BKDelayL::BKDelayL() :
     feedback(0.9),
 	doNextOutLeft(false),
 	doNextOutRight(false),
+    loading(false),
 	sampleRate(44100.)
 {
 	inputs = AudioBuffer<float>(2, bufferSize);
@@ -83,6 +84,7 @@ BKDelayL::BKDelayL(float delayLength, int bufferSize, float delayGain, double sr
 	lastFrameRight(0),
 	doNextOutLeft(false),
 	doNextOutRight(false),
+    loading(false),
 	sampleRate(sr)
 {
 	inputs = AudioBuffer<float>(2, bufferSize);
@@ -114,10 +116,12 @@ void BKDelayL::setLength(float delayLength)
 void BKDelayL::setBufferSize(int size)
 {
     const ScopedLock sl (lock);
+    loading = true;
     inputs.setSize(2, bufferSize);
     reset();
     bufferSize = size;
     inputs.clear();
+    loading = false;
 }
 
 float BKDelayL::nextOutLeft()
@@ -161,6 +165,7 @@ void BKDelayL::addSample(float input, unsigned long offset, int channel)
 //or, have it take float* input
 void BKDelayL::tick(float input, float* outputs, float outGain, bool stereo)
 {
+    if (loading) return;
     if (inPoint >= inputs.getNumSamples()) inPoint = 0;
 	inputs.addSample(0, inPoint, input * gain);
 	if (stereo) inputs.addSample(1, inPoint, input * gain);
@@ -195,6 +200,7 @@ void BKDelayL::tick(float input, float* outputs, float outGain, bool stereo)
 
 void BKDelayL::scalePrevious(float coefficient, unsigned long offset, int channel)
 {
+    if (loading) return;
 	inputs.setSample(channel, (inPoint + offset) % inputs.getNumSamples(), inputs.getSample(channel, (inPoint + offset) % inputs.getNumSamples()) * coefficient);
 }
 
