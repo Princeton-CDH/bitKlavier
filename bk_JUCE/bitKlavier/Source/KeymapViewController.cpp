@@ -373,9 +373,11 @@ void KeymapViewController::resized()
     nostalgicGroup1.getWidth(),
     nostalgicGroup1.getHeight());
     
-    
     // Blendronic Targets
     // thirdColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+#if JUCE_IOS
+    thirdColumn.removeFromTop(gYSpacing * 1.5);
+#endif
     thirdColumn.removeFromTop(gYSpacing * 2);
     Rectangle<int> blendronicBox = thirdColumn.removeFromTop((TargetTypeBlendronicClear - TargetTypeBlendronicPatternSync + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     Rectangle<int> blendronicGroup1 = blendronicBox;
@@ -390,6 +392,9 @@ void KeymapViewController::resized()
     }
     
     //area.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+#if JUCE_IOS
+    area.removeFromTop(gYSpacing * 1.5);
+#endif
     area.removeFromTop(gYSpacing * 2);
     Rectangle<int> blendronicBox2 = area.removeFromTop((TargetTypeBlendronicOpenCloseOutput - TargetTypeBlendronicPausePlay + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     Rectangle<int> blendronicGroup2 = blendronicBox2;

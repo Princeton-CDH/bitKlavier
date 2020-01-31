@@ -239,11 +239,15 @@ void BKSampleLoader::run(void)
             type = BKLoadLite;
         }
         
-//#if JUCE_IOS
-        //loadMainPianoSamples(BKLoadLitest); // to avoid iOS memory issues; user should be able to load heavier if they want
-//#else
-        loadMainPianoSamples(type);
-//#endif
+        // device type
+        DBG("device type = " + SystemStats::getDeviceDescription());
+        String deviceType = SystemStats::getDeviceDescription();
+        if (deviceType.contains("iPhone")) DBG("is iPhone");
+        if (deviceType.contains("iPad")) DBG("is iPad");
+        
+        // older iPhones can't handle memory of lots of samples...
+        if (deviceType.contains("iPhone")) loadMainPianoSamples(BKLoadLitest);
+        else loadMainPianoSamples(type);
         
         EXIT_CHECK;
         
