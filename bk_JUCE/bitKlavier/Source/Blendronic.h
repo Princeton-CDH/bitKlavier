@@ -78,7 +78,24 @@ public:
 	BlendronicPreparation(void);
 
 	// copy, modify, compare, randomize
-	void copy(BlendronicPreparation::Ptr b);
+	inline void copy(BlendronicPreparation::Ptr b)
+    {
+        bBeats = b->getBeats();
+        bDelayLengths = b->getDelayLengths();
+        bSmoothLengths = b->getSmoothLengths();
+        bSmoothValues = b->getSmoothValues();
+        bFeedbackCoefficients = b->getFeedbackCoefficients();
+        bSmoothBase = b->getSmoothBase();
+        bSmoothScale = b->getSmoothScale();
+        targetTypeBlendronicPatternSync = b->getTargetTypeBlendronicPatternSync();
+        targetTypeBlendronicBeatSync = b->getTargetTypeBlendronicBeatSync();
+        targetTypeBlendronicClear = b->getTargetTypeBlendronicClear();
+        targetTypeBlendronicPausePlay = b->getTargetTypeBlendronicPausePlay();
+        targetTypeBlendronicOpenCloseInput = b->getTargetTypeBlendronicOpenCloseInput();
+        targetTypeBlendronicOpenCloseOutput = b->getTargetTypeBlendronicOpenCloseOutput();
+        outGain = b->getOutGain();
+        delayBufferSizeInSeconds =  b->getDelayBufferSizeInSeconds();
+    }
     
 	inline void performModification(BlendronicPreparation::Ptr b, Array<bool> dirty)
     {
@@ -91,11 +108,97 @@ public:
         if (dirty[BlendronicDelayBufferSize]) delayBufferSizeInSeconds = b->getDelayBufferSizeInSeconds();
     }
     
-	bool compare(BlendronicPreparation::Ptr b);
+	inline bool compare(BlendronicPreparation::Ptr b)
+    {
+        bool beats = true;
+        bool delays = true;
+        bool smooths = true;
+        bool feedbacks = true;
+        
+        for (int i = b->getBeats().size(); --i>=0;)
+        {
+            if (b->getBeats()[i] != bBeats[i])
+            {
+                beats = false;
+                break;
+            }
+        }
+        
+        for (int i = b->getDelayLengths().size(); --i>=0;)
+        {
+            if (b->getDelayLengths()[i] != bDelayLengths[i])
+            {
+                delays = false;
+                break;
+            }
+        }
+        
+        for (int i = b->getSmoothLengths().size(); --i>=0;)
+        {
+            if (b->getSmoothLengths()[i] != bSmoothLengths[i])
+            {
+                smooths = false;
+                break;
+            }
+        }
+        
+        for (int i  = b->getFeedbackCoefficients().size(); --i >= 0;)
+        {
+            if (b->getFeedbackCoefficients()[i] != bFeedbackCoefficients[i])
+            {
+                feedbacks = false;
+                break;
+            }
+        }
+        
+        return  beats && delays && smooths && feedbacks &&
+                bSmoothBase == b->getSmoothBase() &&
+                bSmoothScale == b->getSmoothScale() &&
+                targetTypeBlendronicPatternSync == b->getTargetTypeBlendronicPatternSync() &&
+                targetTypeBlendronicBeatSync == b->getTargetTypeBlendronicBeatSync() &&
+                targetTypeBlendronicClear == b->getTargetTypeBlendronicClear() &&
+                targetTypeBlendronicPausePlay == b->getTargetTypeBlendronicPausePlay() &&
+                targetTypeBlendronicOpenCloseInput == b->getTargetTypeBlendronicOpenCloseInput() &&
+                targetTypeBlendronicOpenCloseOutput == b->getTargetTypeBlendronicOpenCloseOutput() &&
+                outGain == b->getOutGain() &&
+                delayBufferSizeInSeconds == b->getDelayBufferSizeInSeconds() ;
+    }
     
     inline void randomize()
     {
-        return;
+        Random::getSystemRandom().setSeedRandomly();
+        
+        float r[100];
+        
+        for (int i = 0; i < 100; i++)  r[i] = (Random::getSystemRandom().nextFloat());
+        int idx = 0;
+        
+        bSmoothBase = (BlendronicSmoothBase)(int)(r[idx++] * BlendronicSmoothBaseNil);
+        bSmoothScale = (BlendronicSmoothScale)(int)(r[idx++] * BlendronicSmoothScaleNil);
+        
+        bBeats.clear();
+        for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+        {
+            bBeats.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+        }
+        bDelayLengths.clear();
+        for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+        {
+            bDelayLengths.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+        }
+        bSmoothLengths.clear();
+        for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+        {
+            bSmoothLengths.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+        }
+        bFeedbackCoefficients.clear();
+        for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+        {
+            bFeedbackCoefficients.add(i, (Random::getSystemRandom().nextFloat()));
+        }
+        
+        outGain = r[idx++];
+        delayBufferSizeInSeconds = r[idx++] * 4;
     }
 
 	//accessors
@@ -183,7 +286,13 @@ public:
     // TODO
 	void print(void)
     {
-        ;
+        DBG("| - - - Blendronic Preparation - - - |");
+        DBG("bBeats: " + floatArrayToString(bBeats));
+        DBG("bDelayLengths: " + floatArrayToString(bDelayLengths));
+        DBG("bSmoothLengths: " + floatArrayToString(bSmoothLengths));
+        DBG("bFeedbackCoefficients: " + floatArrayToString(bFeedbackCoefficients));
+        DBG("outGain: " + String(outGain));
+        DBG("delayBufferSizeInSeconds: " + String(delayBufferSizeInSeconds));
     }
     
     // TODO
