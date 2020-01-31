@@ -15,6 +15,8 @@ int gComponentTextFieldHeight;
 int gComponentRangeSliderHeight;
 int gComponentSingleSliderHeight;
 int gComponentStackedSliderHeight;
+
+int gComponentToggleBoxHeight;
 #endif
 
 class BKUnitTestRunner : public UnitTestRunner
@@ -144,6 +146,10 @@ midiReady(false)
     
     //gComponentComboBoxHeight = heightUnit;
     gComponentComboBoxHeight = heightUnit * 0.85;
+    gComponentToggleBoxHeight = heightUnit * 0.65;;
+    
+    DBG("JUCE_IOS: gComponentToggleBoxHeight = " + String(gComponentToggleBoxHeight));
+    
     gComponentLabelHeight = heightUnit * 0.75f;
     //gComponentTextFieldHeight = heightUnit * 0.75f;
     gComponentTextFieldHeight = heightUnit * 0.6f;

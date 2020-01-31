@@ -252,29 +252,17 @@ void KeymapViewController::resized()
     textButtonSlab.removeFromLeft(gXSpacing);
     keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
     
-    /*
-    keysCB.setBounds(keyboardValsTextFieldOpen.getRight() + gXSpacing, keyboardValsTextFieldOpen.getY(), keyboardValsTextFieldOpen.getWidth(), keyboardValsTextFieldOpen.getHeight());
-    keysButton.setBounds(keysCB.getRight()+gXSpacing, keysCB.getY(), keysCB.getWidth(), keysCB.getHeight());
-     */
-    
     keysCB.setBounds(textButtonSlab.removeFromLeft(keyboardValsTextFieldOpen.getWidth()));
     keysButton.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
     midiEditToggle.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
     textButtonSlab.removeFromRight(gXSpacing);
     clearButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth()));
-    
-    
-    //clearButton.setBounds(keyboard->getRight() - keyboardValsTextFieldOpen.getWidth(), keyboardValsTextFieldOpen.getY(), keyboardValsTextFieldOpen.getWidth(),keyboardValsTextFieldOpen.getHeight());
-    
-    //invertOnOffToggle.setBounds(keysButton.getRight()+gXSpacing, keysButton.getY(), keysButton.getWidth(), keysButton.getHeight());
-    //invertOnOffToggle.toFront(false);
-    
-    //midiEditToggle.setBounds(invertOnOffToggle.getRight()+gXSpacing, invertOnOffToggle.getY(), invertOnOffToggle.getWidth(), invertOnOffToggle.getHeight());
 
     midiEditToggle.toFront(false);
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    
     comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
@@ -286,16 +274,8 @@ void KeymapViewController::resized()
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
     
-    /*
-    midiInputSelectButton.setBounds(actionButton.getRight()+gXSpacing,
-                                 actionButton.getY(),
-                                 selectCB.getWidth(),
-                                 selectCB.getHeight());
-     */
-    
     Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
     targetsSlice.removeFromRight(gXSpacing);
-    //targetsButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
     if(wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
     {
         midiInputSelectButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
@@ -309,76 +289,39 @@ void KeymapViewController::resized()
     int maxTargetHeight =   (TargetTypeSynchronicRotate - TargetTypeSynchronic + 1) *
                             (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing;
     
+#if JUCE_IOS
+    leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.25);
+    area.removeFromTop((area.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.25);
+#else
     leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
     area.removeFromTop((area.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
-    // leftColumn.removeFromLeft(50); // arrow width
-    // area.removeFromRight(50); // arrow width
+#endif
+
     
     Rectangle<int> secondColumn = leftColumn.removeFromRight(leftColumn.getWidth() * 0.5);
     Rectangle<int> thirdColumn = area.removeFromLeft(area.getWidth() * 0.5);
     //area is now fourth column
     
-    
-    /*
-    // Direct Targets
-    Rectangle<int> directBox = leftColumn.removeFromTop(gComponentToggleBoxHeight + 6 * gYSpacing);
-    directTBGroup.setBounds(directBox);
-    directBox.removeFromTop(4 * gYSpacing);
-    directBox.removeFromLeft(gXSpacing);
-    targetControlTBs[TargetTypeDirect]->setBounds(directBox.removeFromTop(gComponentToggleBoxHeight));
-    
-    leftColumn.removeFromTop(gYSpacing + 5 * processor.paddingScalarY);
-        
-    // Tuning Targets
-    Rectangle<int> tuningBox = leftColumn.removeFromTop(gComponentToggleBoxHeight + 6 * gYSpacing);
-    tuningTBGroup.setBounds(tuningBox);
-    tuningBox.removeFromTop(4 * gYSpacing);
-    tuningBox.removeFromLeft(gXSpacing);
-    targetControlTBs[TargetTypeTuning]->setBounds(tuningBox.removeFromTop(gComponentToggleBoxHeight));
-    
-    leftColumn.removeFromTop(gYSpacing + 5 * processor.paddingScalarY);
-    
-    // Tempo Targets
-    Rectangle<int> tempoBox = leftColumn.removeFromTop(gComponentToggleBoxHeight + 6 * gYSpacing);
-    tempoTBGroup.setBounds(tempoBox);
-    tempoBox.removeFromTop(4 * gYSpacing);
-    tempoBox.removeFromLeft(gXSpacing);
-    targetControlTBs[TargetTypeTempo]->setBounds(tempoBox.removeFromTop(gComponentToggleBoxHeight));
-     
-    
-    leftColumn.removeFromTop(gYSpacing + 5 * processor.paddingScalarY);
-    
-    // Nostalgic Targets
-    Rectangle<int> nostalgicBox = leftColumn.removeFromTop(gComponentToggleBoxHeight + 6 * gYSpacing);
-    nostalgicTBGroup.setBounds(nostalgicBox);
-    nostalgicBox.removeFromTop(4 * gYSpacing);
-    nostalgicBox.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeNostalgic; i<=TargetTypeNostalgic; i++)
-    {
-        targetControlTBs[i]->setBounds(nostalgicBox.removeFromTop(gComponentToggleBoxHeight));
-        //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
-        nostalgicBox.removeFromTop(gYSpacing);
-    }
-     */
-     
+  
     // Synchronic Targets
-    // 5 * gYSpacing + numComponents * (gComponentToggleBoxHeight + gYSPacing)
     leftColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
     Rectangle<int> synchronicBox1 = leftColumn.removeFromTop((TargetTypeSynchronicClear - TargetTypeSynchronic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
-    Rectangle<int> synchronicGroup1 = synchronicBox1;
-    synchronicTBGroup.setBounds(synchronicBox1);
+    
+    Rectangle<int> synchronicGroup1(synchronicBox1);
+    
     synchronicBox1.removeFromTop(4 * gYSpacing);
     synchronicBox1.removeFromLeft(gXSpacing);
     for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicClear; i++)
     {
         targetControlTBs[i]->setBounds(synchronicBox1.removeFromTop(gComponentToggleBoxHeight));
+        targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
         synchronicBox1.removeFromTop(gYSpacing);
     }
     
     secondColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
     Rectangle<int> synchronicBox2 = secondColumn.removeFromTop((TargetTypeSynchronicRotate - TargetTypeSynchronicPausePlay + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     Rectangle<int> synchronicGroup2 = synchronicBox2;
-    synchronicTBGroup.setBounds(synchronicBox2);
+    //synchronicTBGroup.setBounds(synchronicBox2);
     synchronicBox2.removeFromTop(4 * gYSpacing);
     synchronicBox2.removeFromLeft(gXSpacing);
     for (int i=TargetTypeSynchronicPausePlay; i<=TargetTypeSynchronicRotate; i++)
@@ -387,45 +330,34 @@ void KeymapViewController::resized()
         synchronicBox2.removeFromTop(gYSpacing);
     }
     
+    
     synchronicTBGroup.setBounds(synchronicGroup1.getX(),
                                 synchronicGroup1.getY(),
                                 synchronicGroup2.getWidth() +
                                 synchronicGroup1.getWidth(),
                                 synchronicGroup1.getHeight());
+     
                                 
     
-    /*
-    // Nostalgic Targets
-    Rectangle<int> nostalgicBox = area.removeFromTop((TargetTypeNostalgicClear - TargetTypeNostalgic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
-    nostalgicTBGroup.setBounds(nostalgicBox);
-    nostalgicBox.removeFromTop(4 * gYSpacing);
-    nostalgicBox.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeNostalgic; i<=TargetTypeNostalgicClear; i++)
-    {
-        targetControlTBs[i]->setBounds(nostalgicBox.removeFromTop(gComponentToggleBoxHeight));
-        //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
-        nostalgicBox.removeFromTop(gYSpacing);
-    }
-     */
      
     // Nostalgic Targets
     thirdColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
     Rectangle<int> nostalgicBox = thirdColumn.removeFromTop((TargetTypeNostalgic - TargetTypeNostalgic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     Rectangle<int> nostalgicGroup1 = nostalgicBox;
-    blendronicTBGroup.setBounds(nostalgicBox);
+    //blendronicTBGroup.setBounds(nostalgicBox);
     nostalgicBox.removeFromTop(4 * gYSpacing);
     nostalgicBox.removeFromLeft(gXSpacing);
     for (int i=TargetTypeNostalgic; i<=TargetTypeNostalgic; i++)
     {
         targetControlTBs[i]->setBounds(nostalgicBox.removeFromTop(gComponentToggleBoxHeight));
-        //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
+        targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
         nostalgicBox.removeFromTop(gYSpacing);
     }
     
     area.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
     Rectangle<int> nostalgicBox2 = area.removeFromTop((TargetTypeNostalgicClear - TargetTypeNostalgicClear + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     Rectangle<int> nostalgicGroup2 = nostalgicBox2;
-    blendronicTBGroup.setBounds(nostalgicBox2);
+    //blendronicTBGroup.setBounds(nostalgicBox2);
     nostalgicBox2.removeFromTop(4 * gYSpacing);
     nostalgicBox2.removeFromLeft(gXSpacing);
     for (int i=TargetTypeNostalgicClear; i<=TargetTypeNostalgicClear; i++)
@@ -447,13 +379,13 @@ void KeymapViewController::resized()
     thirdColumn.removeFromTop(gYSpacing * 2);
     Rectangle<int> blendronicBox = thirdColumn.removeFromTop((TargetTypeBlendronicClear - TargetTypeBlendronicPatternSync + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     Rectangle<int> blendronicGroup1 = blendronicBox;
-    blendronicTBGroup.setBounds(blendronicBox);
+    //blendronicTBGroup.setBounds(blendronicBox);
     blendronicBox.removeFromTop(4 * gYSpacing);
     blendronicBox.removeFromLeft(gXSpacing);
     for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicClear; i++)
     {
         targetControlTBs[i]->setBounds(blendronicBox.removeFromTop(gComponentToggleBoxHeight));
-        //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
+        targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
         blendronicBox.removeFromTop(gYSpacing);
     }
     
@@ -461,7 +393,7 @@ void KeymapViewController::resized()
     area.removeFromTop(gYSpacing * 2);
     Rectangle<int> blendronicBox2 = area.removeFromTop((TargetTypeBlendronicOpenCloseOutput - TargetTypeBlendronicPausePlay + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
     Rectangle<int> blendronicGroup2 = blendronicBox2;
-    blendronicTBGroup.setBounds(blendronicBox2);
+    //blendronicTBGroup.setBounds(blendronicBox2);
     blendronicBox2.removeFromTop(4 * gYSpacing);
     blendronicBox2.removeFromLeft(gXSpacing);
     for (int i=TargetTypeBlendronicPausePlay; i<=TargetTypeBlendronicOpenCloseOutput; i++)

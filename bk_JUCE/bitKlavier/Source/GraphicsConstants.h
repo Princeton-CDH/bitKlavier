@@ -42,6 +42,8 @@ extern int gComponentRangeSliderHeight;
 extern int gComponentSingleSliderHeight;
 extern int gComponentStackedSliderHeight;
 
+extern int gComponentToggleBoxHeight;
+
 #else
 static const int fontHeight = 15;
 
@@ -52,10 +54,12 @@ static const int gComponentTextFieldHeight = 17;
 static const int gComponentRangeSliderHeight = 40;
 static const int gComponentSingleSliderHeight = 40;
 static const int gComponentStackedSliderHeight = 40;
+
+//static const int gComponentToggleBoxWidth  = gComponentComboBoxHeight;
+static const int gComponentToggleBoxHeight  = 24;
 #endif
 
 static const int gComponentToggleBoxWidth  = gComponentComboBoxHeight;
-static const int gComponentToggleBoxHeight  = gComponentToggleBoxWidth;
 
 static const int gComponentSingleSliderXOffset  = 8;
 

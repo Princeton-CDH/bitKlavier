@@ -146,10 +146,12 @@ public:
     
     void updateUI(void);
     
+    /*
     void memoryWarningReceived() override
     {
         DBG("using too much memory!");
     }
+     */
     
     Array<bool>                         noteOn; //which notes are on, for the UI
     Array<bool>                         getNoteOns() { return noteOn; }
