@@ -715,7 +715,6 @@ void KeymapViewController::fillSelectCB(int last, int current)
         String name = prep->getName();
         
         if (name != String())  selectCB.addItem(name, Id);
-        else                        selectCB.addItem("Keymap"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
         if (processor.currentPiano->isActive(PreparationTypeKeymap, Id))

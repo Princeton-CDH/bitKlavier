@@ -281,14 +281,14 @@ public:
     sPrep(new TempoPreparation(prep)),
     aPrep(new TempoPreparation(sPrep)),
     Id(Id),
-    name(String(Id))
+    name("Tempo "+String(Id))
     {
         
     }
     
     Tempo(int Id, bool random = false):
     Id(Id),
-    name(String(Id))
+    name("Tempo "+String(Id))
     {
 		sPrep = new TempoPreparation();
 		aPrep = new TempoPreparation(sPrep);

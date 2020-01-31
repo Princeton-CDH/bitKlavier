@@ -64,7 +64,6 @@ BlendronicPreparation::BlendronicPreparation(String newName,
 
 //empty constructor
 BlendronicPreparation::BlendronicPreparation(void) :
-	name("blank blendronic"),
 	bBeats(Array<float>({ 4., 3., 2., 3.})),
     bDelayLengths(Array<float>({ 4., 3., 2., 3.})),
     bSmoothLengths(Array<float>({ 50.0f })),

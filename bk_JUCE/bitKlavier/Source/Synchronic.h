@@ -1059,14 +1059,14 @@ public:
     sPrep(new SynchronicPreparation(prep)),
     aPrep(new SynchronicPreparation(sPrep)),
     Id(Id),
-    name(String(Id))
+    name("Synchronic "+String(Id))
     {
         
     }
     
 	Synchronic(int Id, bool random = false) :
     Id(Id),
-    name(String(Id))
+    name("Synchronic "+String(Id))
     {
 		sPrep = new SynchronicPreparation();
 		aPrep = new SynchronicPreparation(sPrep);

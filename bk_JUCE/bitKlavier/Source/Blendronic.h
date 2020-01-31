@@ -531,14 +531,14 @@ public:
 		sPrep(new BlendronicPreparation(prep)),
 		aPrep(new BlendronicPreparation(sPrep)),
 		Id(Id),
-		name(String(Id))
+		name("Blendronic "+String(Id))
 	{
 
 	}
 
 	Blendronic(int Id, bool random = false) :
 		Id(Id),
-		name(String(Id))
+		name("Blendronic "+String(Id))
 	{
 		sPrep = new BlendronicPreparation();
 		aPrep = new BlendronicPreparation(sPrep);

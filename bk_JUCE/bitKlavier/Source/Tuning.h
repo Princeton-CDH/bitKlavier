@@ -281,7 +281,7 @@ public:
         tCustomCents.ensureStorageAllocated(12);
         for(int i=0; i<tCustom.size(); i++)
         {
-            tCustomCents.set(i, tCustom.getUnchecked(i) * 100.0);
+            tCustomCents.set(i, tCustom.getUnchecked(i));
         }
         return tCustomCents;
     }
@@ -631,7 +631,7 @@ public:
     sPrep(new TuningPreparation(prep)),
     aPrep(new TuningPreparation(sPrep)),
     Id(Id),
-    name(String(Id))
+    name("Tuning "+String(Id))
     {
         tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
         for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
@@ -643,7 +643,7 @@ public:
     
 	Tuning(int Id, bool random = false) :
     Id(Id),
-    name(String(Id))
+    name("Tuning "+String(Id))
     {
 		sPrep = new TuningPreparation();
 		aPrep = new TuningPreparation(sPrep);

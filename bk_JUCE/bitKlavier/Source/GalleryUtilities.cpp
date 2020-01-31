@@ -383,8 +383,8 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         Direct::Ptr p = new Direct(-1);
         p->setState(xml);
         addDirect(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
+        if (p->getName() == "Direct " + String(oldId))
+            p->setName("Direct " + String(p->getId()));
         else p->setName(iterateName(PreparationTypeDirect, p->getName()));
         return p->getId();
     }
@@ -393,8 +393,8 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         Synchronic::Ptr p = new Synchronic(-1);
         p->setState(xml);
         addSynchronic(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
+        if (p->getName() == "Synchronic " + String(oldId))
+            p->setName("Synchronic " + String(p->getId()));
         else p->setName(iterateName(PreparationTypeSynchronic, p->getName()));
         return p->getId();
     }
@@ -403,8 +403,8 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         Nostalgic::Ptr p = new Nostalgic(-1);
         p->setState(xml);
         addNostalgic(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
+        if (p->getName() == "Nostalgic " + String(oldId))
+            p->setName("Nostalgic " + String(p->getId()));
         else p->setName(iterateName(PreparationTypeNostalgic, p->getName()));
         return p->getId();
     }
@@ -413,8 +413,8 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         Tuning::Ptr p = new Tuning(-1);
         p->setState(xml);
         addTuning(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
+        if (p->getName() == "Tuning " + String(oldId))
+            p->setName("Tuning " + String(p->getId()));
         else p->setName(iterateName(PreparationTypeTuning, p->getName()));
         return p->getId();
     }
@@ -423,8 +423,8 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         Tempo::Ptr p = new Tempo(-1);
         p->setState(xml);
         addTempo(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
+        if (p->getName() == "Tempo " + String(oldId))
+            p->setName("Tempo " + String(p->getId()));
         else p->setName(iterateName(PreparationTypeTempo, p->getName()));
         return p->getId();
     }
@@ -433,8 +433,8 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
 		Blendronic::Ptr p = new Blendronic(-1);
 		p->setState(xml);
 		addBlendronic(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
+        if (p->getName() == "Blendronic " + String(oldId))
+            p->setName("Blendronic " + String(p->getId()));
         else p->setName(iterateName(PreparationTypeBlendronic, p->getName()));
         return p->getId();
 	}
@@ -443,8 +443,8 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         Keymap::Ptr p = new Keymap(processor, -1);
         p->setState(xml);
         addKeymap(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
+        if (p->getName() == "Keymap " + String(oldId))
+            p->setName("Keymap " + String(p->getId()));
         else p->setName(iterateName(PreparationTypeKeymap, p->getName()));
         return p->getId();
     }

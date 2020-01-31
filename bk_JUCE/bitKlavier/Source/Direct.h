@@ -305,14 +305,14 @@ public:
     sPrep(new DirectPreparation(d)),
     aPrep(new DirectPreparation(sPrep)),
     Id(Id),
-    name(String(Id))
+    name("Direct "+String(Id))
     {
         
     }
     
     Direct(int Id, bool random = false):
     Id(Id),
-    name(String(Id))
+    name("Direct "+String(Id))
     {
 		sPrep = new DirectPreparation();
 		aPrep = new DirectPreparation(sPrep);

@@ -111,6 +111,15 @@ void BKDelayL::setLength(float delayLength)
 	doNextOutRight = true;
 }
 
+void BKDelayL::setBufferSize(int size)
+{
+    const ScopedLock sl (lock);
+    inputs.setSize(2, bufferSize);
+    reset();
+    bufferSize = size;
+    inputs.clear();
+}
+
 float BKDelayL::nextOutLeft()
 {
 	if (doNextOutLeft)
@@ -144,6 +153,7 @@ float BKDelayL::nextOutRight()
 //allows addition of samples without incrementing delay position value
 void BKDelayL::addSample(float input, unsigned long offset, int channel)
 {
+    if (inPoint >= inputs.getNumSamples()) inPoint = 0;
     inputs.addSample(channel, (inPoint + offset) % inputs.getNumSamples(), input * gain);
 }
 
@@ -151,6 +161,7 @@ void BKDelayL::addSample(float input, unsigned long offset, int channel)
 //or, have it take float* input
 void BKDelayL::tick(float input, float* outputs, float outGain, bool stereo)
 {
+    if (inPoint >= inputs.getNumSamples()) inPoint = 0;
 	inputs.addSample(0, inPoint, input * gain);
 	if (stereo) inputs.addSample(1, inPoint, input * gain);
 

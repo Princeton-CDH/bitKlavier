@@ -15,6 +15,7 @@
 Keymap::Keymap(BKAudioProcessor& processor, int Id):
 processor(processor),
 Id(Id),
+name("Keymap "+String(Id)),
 keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
 midiEdit(false),
@@ -43,6 +44,7 @@ onscreenSelected(true)
 Keymap::Keymap(BKAudioProcessor& processor, Keymap::Ptr k):
 processor(processor),
 Id(k->getId()),
+name("Keymap "+String(Id)),
 midiEdit(false),
 inverted(false),
 midiInputSources(k->getMidiInputSources()),
@@ -68,6 +70,7 @@ onscreenSelected(k->isOnscreenSelected())
 Keymap::Keymap(BKAudioProcessor& processor, int Id, Keymap::Ptr k):
 processor(processor),
 Id(Id),
+name("Keymap "+String(Id)),
 midiEdit(false),
 inverted(false),
 midiInputSources(k->getMidiInputSources()),
@@ -93,6 +96,7 @@ onscreenSelected(k->isOnscreenSelected())
 Keymap::Keymap(BKAudioProcessor& processor):
 processor(processor),
 Id(-1),
+name("Keymap "+String(Id)),
 keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
 midiEdit(false),

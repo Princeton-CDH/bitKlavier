@@ -735,14 +735,14 @@ public:
               int Id):
     sPrep(new NostalgicPreparation(prep)),
     aPrep(new NostalgicPreparation(sPrep)),
-    name(String(Id)),
+    name("Nostalgic "+String(Id)),
     Id(Id)
     {
     }
     
     
     Nostalgic(int Id, bool random = false):
-    name("Nostalgic"+String(Id)),
+    name("Nostalgic "+String(Id)),
     Id(Id)
     {
 		sPrep = new NostalgicPreparation();

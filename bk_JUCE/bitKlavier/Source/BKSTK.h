@@ -45,14 +45,7 @@ public:
 
 	//mutators
     void setLength(float delayLength);
-	inline void setBufferSize(int size)
-    {
-        const ScopedLock sl (lock);
-        reset();
-        bufferSize = size;
-        inputs.setSize(2, bufferSize);
-        inputs.clear();
-    }
+    void setBufferSize(int size);
 	inline void setGain(float delayGain) { gain = delayGain; }
     inline void setFeedback(float fb) { feedback = fb; }
     inline int getInPoint() { return inPoint; }
