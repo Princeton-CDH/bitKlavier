@@ -134,6 +134,7 @@ BKViewController(p, theGraph, 3)
     actionButton.addListener(this);
     
     bufferSizeSlider = std::make_unique<BKSingleSlider>("buffer length (sec)", 1., 10., 4., 0.01);
+    bufferSizeSlider->setChangeNotificationOnlyOnRelease(true);
     bufferSizeSlider->setJustifyRight(true);
     bufferSizeSlider->setToolTipString("Sets the size of the delay line in seconds");
     addAndMakeVisible(*bufferSizeSlider);

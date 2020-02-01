@@ -258,6 +258,8 @@ public:
     
     BKTextEditor valueTF;
     
+    void setChangeNotificationOnlyOnRelease(bool yn) { thisSlider.setChangeNotificationOnlyOnRelease(yn);}
+    
     inline String getText(void) { return valueTF.getText(); }
     inline void setText(String text, NotificationType notify = dontSendNotification) { valueTF.setText(text, notify);}
     
