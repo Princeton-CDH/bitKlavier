@@ -544,6 +544,7 @@ void BlendronicPreparationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentBlendronicId = -1;
+    setCurrentId(-1);
 }
 
 void BlendronicPreparationEditor::setCurrentId(int Id)
@@ -882,7 +883,8 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getPrepOptionMenu(PreparationTypeBlendronic).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getAllBlendronic().size() == 2;
+        getPrepOptionMenu(PreparationTypeBlendronic, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
     {
@@ -1233,6 +1235,7 @@ void BlendronicModificationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentModBlendronicId = -1;
+    setCurrentId(-1);
 }
 
 void BlendronicModificationEditor::setCurrentId(int Id)
@@ -1369,7 +1372,8 @@ void BlendronicModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu(PreparationTypeBlendronicMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getBlendronicModifications().size() == 2;
+        getModOptionMenu(PreparationTypeBlendronicMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 //    else if (b == &rightArrow)
 //    {

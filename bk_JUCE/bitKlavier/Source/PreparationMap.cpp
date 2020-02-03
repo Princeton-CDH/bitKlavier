@@ -10,11 +10,8 @@
 
 #include "PreparationMap.h"
 
-PreparationMap::PreparationMap(Keymap::Ptr km,
-                               int Id):
+PreparationMap::PreparationMap():
 isActive(false),
-Id(Id),
-keymaps(Keymap::PtrArr(km)),
 sustainPedalIsDepressed(false)
 {
     

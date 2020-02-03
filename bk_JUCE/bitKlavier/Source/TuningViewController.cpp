@@ -1260,6 +1260,7 @@ void TuningPreparationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentTuningId = -1;
+    setCurrentId(-1);
 }
 
 void TuningPreparationEditor::setCurrentId(int Id)
@@ -1863,7 +1864,8 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getPrepOptionMenu(PreparationTypeTuning).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getAllTuning().size() == 2;
+        getPrepOptionMenu(PreparationTypeTuning, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
     {
@@ -2259,6 +2261,7 @@ void TuningModificationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentModTuningId = -1;
+    setCurrentId(-1);
 }
 
 void TuningModificationEditor::setCurrentId(int Id)
@@ -2703,7 +2706,8 @@ void TuningModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu(PreparationTypeTuningMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getTuningModifications().size() == 2;
+        getModOptionMenu(PreparationTypeTuningMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &showSpringsButton)
     {

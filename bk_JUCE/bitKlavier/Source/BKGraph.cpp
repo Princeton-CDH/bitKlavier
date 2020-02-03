@@ -560,7 +560,6 @@ void BKItemGraph::removeItem(BKItem* item)
     item->setSelected(false);
     
     processor.currentPiano->remove(item);
-    
 }
 
 

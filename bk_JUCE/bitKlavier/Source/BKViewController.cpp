@@ -64,7 +64,7 @@ PopupMenu BKViewController::getExportedPrepsMenu(BKPreparationType type)
     return menu;
 }
 
-PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type)
+PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type, bool singlePrep)
 {
     PopupMenu optionMenu;
     optionMenu.setLookAndFeel(&buttonsAndMenusLAF);
@@ -72,7 +72,7 @@ PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type)
     optionMenu.addItem(1, "New");
     optionMenu.addItem(2, "Duplicate");
     optionMenu.addItem(6, "Rename");
-    optionMenu.addItem(3, "Delete");
+    optionMenu.addItem(3, "Delete", !singlePrep);
     optionMenu.addSeparator();
     optionMenu.addItem(7, "Export");
     
@@ -86,7 +86,7 @@ PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type)
     return optionMenu;
 }
 
-PopupMenu BKViewController::getModOptionMenu(BKPreparationType type)
+PopupMenu BKViewController::getModOptionMenu(BKPreparationType type, bool singleMod)
 {
     PopupMenu optionMenu;
     optionMenu.setLookAndFeel(&buttonsAndMenusLAF);
@@ -94,7 +94,7 @@ PopupMenu BKViewController::getModOptionMenu(BKPreparationType type)
     optionMenu.addItem(1, "New");
     optionMenu.addItem(2, "Duplicate");
     optionMenu.addItem(6, "Rename");
-    optionMenu.addItem(3, "Delete");
+    optionMenu.addItem(3, "Delete", !singleMod);
     optionMenu.addSeparator();
     optionMenu.addItem(7, "Export");
     optionMenu.addSubMenu("Import...", getExportedPrepsMenu(type));

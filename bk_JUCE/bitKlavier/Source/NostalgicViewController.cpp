@@ -718,6 +718,7 @@ void NostalgicPreparationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentNostalgicId = -1;
+    setCurrentId(-1);
 }
 
 void NostalgicPreparationEditor::setCurrentId(int Id)
@@ -1102,7 +1103,8 @@ void NostalgicPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getPrepOptionMenu(PreparationTypeNostalgic).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getAllNostalgic().size() == 2;
+        getPrepOptionMenu(PreparationTypeNostalgic, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &keyOnResetToggle)
     {
@@ -1411,6 +1413,7 @@ void NostalgicModificationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentModNostalgicId = -1;
+    setCurrentId(-1);
 }
 
 void NostalgicModificationEditor::setCurrentId(int Id)
@@ -1620,7 +1623,8 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu(PreparationTypeNostalgicMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getNostalgicModifications().size() == 2;
+        getModOptionMenu(PreparationTypeNostalgicMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &keyOnResetToggle)
     {

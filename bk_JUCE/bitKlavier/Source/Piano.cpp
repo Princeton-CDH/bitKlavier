@@ -16,11 +16,11 @@
 
 Piano::Piano(BKAudioProcessor& p,
              int Id):
-prepMap(PreparationMap::Ptr()),
+prepMap(new PreparationMap()),
 processor(p),
 Id(Id)
 {
-    numPMaps = 0;
+    prepMap->prepareToPlay(processor.getCurrentSampleRate());
     
     modificationMap = OwnedArray<Modifications>();
     modificationMap.ensureStorageAllocated(128);
@@ -92,7 +92,7 @@ void Piano::clear(void)
 
 void Piano::deconfigure(void)
 {
-    prepMap = nullptr;
+    prepMap = new PreparationMap();
     numPMaps = 0;
     
     /*
@@ -159,10 +159,7 @@ void Piano::configure(void)
         if (type == PreparationTypeKeymap)
         {
             Keymap::Ptr keymap = processor.gallery->getKeymap(Id);
-            // make a prep map for the first keymap, this will be the only prep map
-            if (prepMap == nullptr) addPreparationMap(keymap);
-            // add any subsequent keymaps to the same prep map (maybe we can get rid of prep maps?)
-            else prepMap->addKeymap(keymap);
+            prepMap->addKeymap(keymap);
             
             BKItem::PtrArr connex = item->getConnections();
             for (auto target : connex)
@@ -558,39 +555,21 @@ void Piano::linkPreparationWithBlendronic(BKPreparationType thisType, int thisId
 
 void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, int keymapId)
 {
-    // Get the preparation map for this keymap
-    PreparationMap::Ptr thisPreparationMap = getPreparationMapWithKeymap(keymapId);
-    PreparationMap::Ptr thatPreparationMap = getPreparationMapWithPreparation(thisType, thisId);
-    
     Keymap::Ptr keymap = processor.gallery->getKeymap(keymapId);
     
-    // If this keymap doesn't have a prep map
-    if (thisPreparationMap == nullptr)
-    {
-        // If what it's connecting to doesn't have a prep map
-        if (thatPreparationMap == nullptr)
-        {
-            // Make a new preparation map
-            addPreparationMap(keymap);
-        }
-        else
-        {   // Add this keymap to the prep map
-            thatPreparationMap->addKeymap(keymap);
-            thisPreparationMap = thatPreparationMap;
-        }
-    }
+    prepMap->addKeymap(keymap);
     
     if (thisType == PreparationTypeDirect)
     {
         DirectProcessor::Ptr dproc = getDirectProcessor(thisId);
-        thisPreparationMap->addDirectProcessor(dproc);
+        prepMap->addDirectProcessor(dproc);
         
         keymap->addTarget(TargetTypeDirect);
     }
     else if (thisType == PreparationTypeSynchronic)
     {
         SynchronicProcessor::Ptr sproc = getSynchronicProcessor(thisId);
-        thisPreparationMap->addSynchronicProcessor(sproc);
+        prepMap->addSynchronicProcessor(sproc);
         
         keymap->addTarget(TargetTypeSynchronic);
         for (int i = TargetTypeSynchronic+1; i <= TargetTypeSynchronicRotate; i++)
@@ -601,14 +580,14 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     else if (thisType == PreparationTypeNostalgic)
     {
         NostalgicProcessor::Ptr nproc = getNostalgicProcessor(thisId);
-        thisPreparationMap->addNostalgicProcessor(nproc);
+        prepMap->addNostalgicProcessor(nproc);
         
         keymap->addTarget(TargetTypeNostalgic);
     }
     else if (thisType == PreparationTypeBlendronic)
     {
         BlendronicProcessor::Ptr bproc = getBlendronicProcessor(thisId);
-        thisPreparationMap->addBlendronicProcessor(bproc);
+        prepMap->addBlendronicProcessor(bproc);
         
         for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -618,18 +597,18 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     else if (thisType == PreparationTypeTempo)
     {
         TempoProcessor::Ptr mproc = getTempoProcessor(thisId);
-        thisPreparationMap->addTempoProcessor(mproc);
+        prepMap->addTempoProcessor(mproc);
         
         keymap->addTarget(TargetTypeTempo);
     }
     else if (thisType == PreparationTypeTuning)
     {
         TuningProcessor::Ptr tproc = getTuningProcessor(thisId);
-        thisPreparationMap->addTuningProcessor(tproc);
+        prepMap->addTuningProcessor(tproc);
         
         keymap->addTarget(TargetTypeTuning);
     }
-    thisPreparationMap->linkKeymapToPreparation(keymapId, thisType, thisId);
+    prepMap->linkKeymapToPreparation(keymapId, thisType, thisId);
 }
 
 void Piano::configureDirectModification(DirectModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
@@ -898,122 +877,6 @@ void Piano::configureTuningModification(TuningModification::Ptr mod, Array<int> 
         }
     }
 }
-
-// Add preparation map, return its Id.
-int Piano::addPreparationMap(void)
-{
-    prepMap = new PreparationMap(processor.gallery->getKeymap(0), numPMaps++);
-    prepMap->prepareToPlay(processor.getCurrentSampleRate());
-    return 0;
-}
-
-// Add preparation map, return its Id.
-int Piano::addPreparationMap(Keymap::Ptr keymap)
-{
-    prepMap = new PreparationMap(keymap, numPMaps++);
-    prepMap->prepareToPlay(processor.getCurrentSampleRate());
-    return 0;
-}
-
-PreparationMap::Ptr        Piano::getPreparationMapWithPreparation(BKPreparationType type, int Id)
-{
-    PreparationMap::Ptr thisPMap = nullptr;
-
-    if (type == PreparationTypeDirect)
-    {
-        if (prepMap->getDirectProcessor(Id) != nullptr)
-        {
-            thisPMap = prepMap;
-        }
-    }
-    else if (type == PreparationTypeSynchronic)
-    {
-        if (prepMap->getSynchronicProcessor(Id) != nullptr)
-        {
-            thisPMap = prepMap;
-        }
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        if (prepMap->getNostalgicProcessor(Id) != nullptr)
-        {
-            thisPMap = prepMap;
-        }
-    }
-    else if (type == PreparationTypeBlendronic)
-    {
-        if (prepMap->getBlendronicProcessor(Id) != nullptr)
-        {
-            thisPMap = prepMap;
-        }
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        if (prepMap->getTempoProcessor(Id) != nullptr)
-        {
-            thisPMap = prepMap;
-        }
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        if (prepMap->getTuningProcessor(Id) != nullptr)
-        {
-            thisPMap = prepMap;
-        }
-    }
-    
-    return thisPMap;
-}
-
-PreparationMap::Ptr        Piano::getPreparationMapWithKeymap(int keymapId)
-{
-    PreparationMap::Ptr thisPMap = nullptr;
-
-    if (prepMap->getKeymap(keymapId) != nullptr)
-    {
-        thisPMap = prepMap;
-    }
-    
-    return thisPMap;
-}
-
-int Piano::removePreparationMap(int Id)
-{
-    if (prepMap == nullptr) return 0;
-    
-    if (prepMap->getId() == Id)
-        prepMap = nullptr;
-    
-    --numPMaps;
-    
-    return numPMaps;
-}
-
-// Add preparation map, return its Id.
-int Piano::removePreparationMapWithKeymap(int Id)
-{
-    if (prepMap == nullptr) return 0;
-    
-    if (prepMap->getKeymap(Id) != nullptr)
-        prepMap = nullptr;
-    
-    --numPMaps;
-    
-    return numPMaps;
-}
-
-// Add preparation map, return its Id.
-int Piano::removeLastPreparationMap(void)
-{
-    if (prepMap == nullptr) return 0;
-    
-    prepMap = nullptr;
-    
-    --numPMaps;
-
-    return numPMaps;
-}
-
 
 void Piano::prepareToPlay(double sr)
 {
