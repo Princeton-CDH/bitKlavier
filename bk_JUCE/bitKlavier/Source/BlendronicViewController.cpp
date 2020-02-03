@@ -818,7 +818,7 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
         prep    ->setBeat(whichSlider, values[0]);
         active  ->setBeat(whichSlider, values[0]);
     }
-    else if (name == "delay length")
+    else if (name == "delay lengths")
     {
         prep    ->setDelayLength(whichSlider, values[0]);
         active  ->setDelayLength(whichSlider, values[0]);
