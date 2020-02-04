@@ -248,6 +248,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     // check velocity filtering
     if (!velocityCheck(noteNumber)) return;
     
+    
     // add note to clusterKeysDepressed (keys targeting the main synchronic functionality)
     if (doCluster) clusterKeysDepressed.addIfNotAlreadyThere(noteNumber);
 
@@ -257,6 +258,32 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     // do only if this note is targeted as a primary Synchronic note (TargetTypeSynchronic)
     if (doCluster && !pausePlay)
     {
+        
+        // Remove old clusters, deal with layers and NoteOffSync modes
+        for (int i = clusters.size(); --i >= 0; )
+        {
+            if (!clusters[i]->getShouldPlay() && !inCluster)
+            {
+                clusters.remove(i);
+                continue;
+            }
+            
+            if(   (synchronic->aPrep->getMode() == LastNoteOffSync)
+               || (synchronic->aPrep->getMode() == AnyNoteOffSync))
+            {
+                if(clusters.size() == 1) clusters[0]->setShouldPlay(false);
+                else
+                {
+                    if(clusters[i]->containsNote(noteNumber))
+                    {
+                        clusters[i]->removeNote(noteNumber);
+                    }
+                    
+                }
+            }
+        }
+         
+        
         // OnOffMode determines whether the keyOffs or keyOns determine whether notes are within the cluster threshold
         // here, we only look at keyOns
         if (prep->getOnOffMode() == KeyOn) // getOnOffMode() is set by the "determines cluster"
@@ -304,6 +331,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     // since it's a new cluster, the next noteOff will be a first noteOff
     // this will be needed for keyReleased(), when in FirstNoteOffSync mode
     if (isNewCluster) nextOffIsFirst = true;
+    
     
     // ** now trigger behaviors set by Keymap targeting **
     //
