@@ -91,6 +91,16 @@ public:
     
     inline Rectangle<float> getEditAllBounds(void) { return keyboardValsTextFieldOpen.getBounds().toFloat();}
     
+    void setDim(float newalpha)
+    {
+        showName.setAlpha(newalpha);
+        keyboard->setAlpha(newalpha);
+        keyboardValsTextFieldOpen.setAlpha(newalpha);
+        keyboardValueTF.setAlpha(newalpha);
+    }
+    
+    void setBright() { setDim(1.); }
+    
 private:
     
     String sliderName;

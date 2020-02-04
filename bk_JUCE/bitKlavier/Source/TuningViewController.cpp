@@ -2006,8 +2006,10 @@ void TuningModificationEditor::greyOutAllComponents()
     A1FundamentalCB.setAlpha(gModAlpha);
     A1ClusterThresh->setDim(gModAlpha);
     A1ClusterMax->setDim(gModAlpha);
-    absoluteKeyboard.setAlpha(gModAlpha);
-    customKeyboard.setAlpha(gModAlpha);
+    //absoluteKeyboard.setAlpha(gModAlpha);
+    absoluteKeyboard.setDim(gModAlpha);
+    //customKeyboard.setAlpha(gModAlpha);
+    customKeyboard.setDim(gModAlpha);
     offsetSlider->setDim(gModAlpha);
     A1IntervalScaleLabel.setAlpha(gModAlpha);
     A1AnchorScaleLabel.setAlpha(gModAlpha);
@@ -2017,6 +2019,10 @@ void TuningModificationEditor::greyOutAllComponents()
     nToneSemitoneWidthSlider->setDim(gModAlpha);
     
     springScaleFundamentalCB.setAlpha(gModAlpha);
+    
+    lastNote.setAlpha(gModAlpha);
+    lastInterval.setAlpha(gModAlpha);
+    
     
     for (int i = 0; i < 12; i++)
     {
@@ -2060,8 +2066,10 @@ void TuningModificationEditor::highlightModedComponents()
     if(mod->getDirty(TuningA1AnchorFundamental))  A1FundamentalCB.setAlpha(1);
     if(mod->getDirty(TuningA1ClusterThresh))      A1ClusterThresh->setBright();;
     if(mod->getDirty(TuningA1History))            A1ClusterMax->setBright();;
-    if(mod->getDirty(TuningAbsoluteOffsets))      absoluteKeyboard.setAlpha(1);
-    if(mod->getDirty(TuningCustomScale))          customKeyboard.setAlpha(1);
+    //if(mod->getDirty(TuningAbsoluteOffsets))      absoluteKeyboard.setAlpha(1);
+    if(mod->getDirty(TuningAbsoluteOffsets))      absoluteKeyboard.setBright();
+    //if(mod->getDirty(TuningCustomScale))          customKeyboard.setAlpha(1);
+    if(mod->getDirty(TuningCustomScale))          customKeyboard.setBright();
     if(mod->getDirty(TuningOffset))               offsetSlider->setBright();
     if(mod->getDirty(TuningNToneRootCB))          nToneRootCB.setAlpha(1);
     if(mod->getDirty(TuningNToneRootOctaveCB))    nToneRootOctaveCB.setAlpha(1);
