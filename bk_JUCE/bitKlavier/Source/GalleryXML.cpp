@@ -46,14 +46,15 @@ ValueTree  Gallery::getState(void)
     galleryVT.setProperty("soundfontURL", processor.currentSoundfont, 0);
     galleryVT.setProperty("soundfontInst", processor.currentInstrument, 0);
     
-    ValueTree idCountVT( "idcounts");
-    
-    for (int i = 0; i < BKPreparationTypeNil; i++)
-    {
-        idCountVT.setProperty( "i"+String(i), idcounts[i], 0);
-    }
-    
-    galleryVT.addChild(idCountVT, -1, 0);
+    // We don't do anything with these on loading so don't see why we should save them
+//    ValueTree idCountVT( "idcounts");
+//
+//    for (int i = 0; i < BKPreparationTypeNil; i++)
+//    {
+//        idCountVT.setProperty( "i"+String(i), idcounts[i], 0);
+//    }
+//
+//    galleryVT.addChild(idCountVT, -1, 0);
     
     galleryVT.addChild(general->getState(), -1, 0);
     
@@ -120,7 +121,8 @@ void Gallery::setStateFromXML(XmlElement* xml)
             if (e->hasTagName( vtagKeymap))
             {
                 // TODO: why not use keymap setState()?
-                addKeymap();
+                
+                addKeymapWithId(0);
                 
                 String n = e->getStringAttribute("name");
                 

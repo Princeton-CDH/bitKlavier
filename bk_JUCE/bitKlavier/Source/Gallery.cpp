@@ -129,7 +129,6 @@ void Gallery::randomize()
             Keymap::Ptr kp = new Keymap(processor);
             kp->randomize();
             addKeymap(kp);
-            p->addPreparationMap(kp);
 
             Tuning::Ptr t = new Tuning(-1, true);
             addTuning(t);

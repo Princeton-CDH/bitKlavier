@@ -55,9 +55,7 @@ public:
     inline void setId(int newId) { Id = newId; }
     
     inline int getId(void) { return Id; }
-    
-    inline PreparationMap::Ptr getPreparationMap(void) { return prepMap; }
-    
+
     inline const String getName() const noexcept {return pianoName;}
     inline void setName(String n){pianoName = n;}
     
@@ -266,14 +264,6 @@ public:
     void configureReset(BKItem::Ptr item);
 
     void configureModification(BKItem::Ptr map);
-    
-    int                         addPreparationMap(void);
-    int                         addPreparationMap(Keymap::Ptr keymap);
-    PreparationMap::Ptr         getPreparationMapWithPreparation(BKPreparationType type, int Id);
-    PreparationMap::Ptr         getPreparationMapWithKeymap(int keymapId);
-    int                         removePreparationMap(int Id);
-    int                         removePreparationMapWithKeymap(int keymapId);
-    int                         removeLastPreparationMap(void);
     
     void reset(void);
 private:

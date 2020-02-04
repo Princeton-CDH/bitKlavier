@@ -746,13 +746,11 @@ public:
 
     inline int getNewId(BKPreparationType type)
     {
-        int oldId = idcounts[type];
+        int newId = idcounts[type];
         
         //DBG("OLD: " + String(oldId));
         
-        int newId = oldId + 1;
-        
-        idcounts[type] = newId;
+        idcounts[type]++;;
         
         //DBG("NEW: " + String(newId));
         

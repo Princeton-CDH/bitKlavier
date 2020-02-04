@@ -279,9 +279,9 @@ public:
     
     ~BKViewController();
     
-    PopupMenu getPrepOptionMenu(BKPreparationType type);
+    PopupMenu getPrepOptionMenu(BKPreparationType type, bool singlePrep);
     
-    PopupMenu getModOptionMenu(BKPreparationType type);
+    PopupMenu getModOptionMenu(BKPreparationType type, bool singleMod);
     
     PopupMenu getExportedPrepsMenu(BKPreparationType type);
     

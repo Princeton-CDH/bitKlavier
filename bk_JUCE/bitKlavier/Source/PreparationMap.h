@@ -32,14 +32,10 @@ public:
     typedef OwnedArray<PreparationMap>                   Arr;
     typedef OwnedArray<PreparationMap, CriticalSection>  CSArr;
     
-    PreparationMap(Keymap::Ptr keymap,
-                   int Id);
+    PreparationMap();
     ~PreparationMap();
     
     void prepareToPlay (double sampleRate);
-    
-    inline void setId(int val)         { Id = val; print();   }
-    inline int getId(void)             { return Id;           }
     
     BKSampleLoadType sampleType;
     void processBlock(AudioSampleBuffer& buffer, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic = false);
@@ -165,7 +161,7 @@ public:
     void print(void)
     {
         Array<int> ps;
-        DBG("PrepMapId: " + String(Id));
+
         for (auto p : keymaps) ps.add(p->getId());
         DBG("Keymap: " + intArrayToString(ps));
         
@@ -195,8 +191,6 @@ public:
     }
     
 private:
-    int Id;
-    
     // Keymaps for this PreparationMap
     Keymap::PtrArr                       keymaps;
     
@@ -204,7 +198,7 @@ private:
     DirectProcessor::PtrArr              dprocessor;
     SynchronicProcessor::PtrArr          sprocessor;
     NostalgicProcessor::PtrArr           nprocessor;
-    BlendronicProcessor::PtrArr        bprocessor;
+    BlendronicProcessor::PtrArr          bprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
     

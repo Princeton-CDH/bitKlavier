@@ -445,6 +445,7 @@ void KeymapViewController::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentKeymapId = -1;
+    setCurrentId(-1);
 }
 
 void KeymapViewController::setCurrentId(int Id)
@@ -785,7 +786,8 @@ void KeymapViewController::bkButtonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu(PreparationTypeKeymap).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getKeymaps().size() == 2;
+        getModOptionMenu(PreparationTypeKeymap, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &midiInputSelectButton)
     {

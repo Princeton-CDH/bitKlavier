@@ -389,6 +389,7 @@ void TempoPreparationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentTempoId = -1;
+    setCurrentId(-1);
 }
 
 void TempoPreparationEditor::setCurrentId(int Id)
@@ -604,7 +605,8 @@ void TempoPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getPrepOptionMenu(PreparationTypeTempo).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getAllTempo().size() == 2;
+        getPrepOptionMenu(PreparationTypeTempo, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     
 }
@@ -754,6 +756,7 @@ void TempoModificationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentModTempoId = -1;
+    setCurrentId(-1);
 }
 
 void TempoModificationEditor::setCurrentId(int Id)
@@ -958,7 +961,8 @@ void TempoModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu(PreparationTypeTempoMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getTempoModifications().size() == 2;
+        getModOptionMenu(PreparationTypeTempoMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     
 }

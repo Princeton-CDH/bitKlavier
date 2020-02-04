@@ -1308,6 +1308,7 @@ void SynchronicPreparationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentSynchronicId = -1;
+    setCurrentId(-1);
 }
 
 void SynchronicPreparationEditor::setCurrentId(int Id)
@@ -1576,7 +1577,8 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getPrepOptionMenu(PreparationTypeSynchronic).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getAllSynchronic().size() == 2;
+        getPrepOptionMenu(PreparationTypeSynchronic, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
 }
 
@@ -2098,6 +2100,7 @@ void SynchronicModificationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentModSynchronicId = -1;
+    setCurrentId(-1);
 }
 
 void SynchronicModificationEditor::setCurrentId(int Id)
@@ -2318,7 +2321,8 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu(PreparationTypeSynchronicMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getSynchronicModifications().size() == 2;
+        getModOptionMenu(PreparationTypeSynchronicMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
     {

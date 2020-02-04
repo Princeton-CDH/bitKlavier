@@ -114,6 +114,7 @@ void DirectViewController::displayShared(void)
 
 void DirectViewController::displayTab(int tab)
 {
+    DBG(String(processor.updateState->currentDirectId));
     currentTab = tab;
     
     invisible();
@@ -418,6 +419,7 @@ void DirectPreparationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentDirectId = -1;
+    setCurrentId(-1);
 }
 
 void DirectPreparationEditor::setCurrentId(int Id)
@@ -540,6 +542,8 @@ void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
     DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
     
+    if (prep == nullptr || active == nullptr) return;
+    
     if(name == "resonance gain")
     {
         //DBG("note length multiplier " + String(val));
@@ -645,7 +649,8 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getPrepOptionMenu(PreparationTypeDirect).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getAllDirect().size() == 2;
+        getPrepOptionMenu(PreparationTypeDirect, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
     {
@@ -802,6 +807,7 @@ void DirectModificationEditor::deleteCurrent(void)
     selectCB.setSelectedId(newId, dontSendNotification);
     
     processor.updateState->currentDirectId = -1;
+    setCurrentId(-1);
 }
 
 void DirectModificationEditor::setCurrentId(int Id)
@@ -995,7 +1001,8 @@ void DirectModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        getModOptionMenu(PreparationTypeDirectMod).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getDirectModifications().size() == 2;
+        getModOptionMenu(PreparationTypeDirectMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
     {
