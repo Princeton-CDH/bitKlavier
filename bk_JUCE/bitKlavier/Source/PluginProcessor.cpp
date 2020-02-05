@@ -1242,7 +1242,7 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
     }
     
     updateGalleries();
-    getPluginHolder()->savePluginState();
+    if (wrapperType == wrapperType_Standalone) getPluginHolder()->savePluginState();
 }
 
 void BKAudioProcessor::saveCurrentGallery(void)
@@ -1264,7 +1264,7 @@ void BKAudioProcessor::saveCurrentGallery(void)
     {
         writeCurrentGalleryToURL(gallery->getURL());
     }
-    getPluginHolder()->savePluginState();
+    if (wrapperType == wrapperType_Standalone) getPluginHolder()->savePluginState();
 }
 
 
