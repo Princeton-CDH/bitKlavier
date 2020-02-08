@@ -166,7 +166,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     pianoMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     pianoMenu.addItem(1, "New");
-    pianoMenu.addItem(2, "Duplicate");
+    pianoMenu.addItem(2, "Linked Copy"); // add another called Duplicate that is like copy/paste?
     pianoMenu.addItem(4, "Rename");
     pianoMenu.addItem(3, "Remove");
     pianoMenu.addSeparator();
