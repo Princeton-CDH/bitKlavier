@@ -172,6 +172,7 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     {
         menu.addItem(COPY_ID, "Copy" + gCopyShortcut);
         menu.addItem(CUT_ID, "Cut" + gCutShortcut);
+        menu.addItem(PASTE_ID, "Paste" + gPasteShortcut);
         menu.addItem(DELETE_ID, "Delete");
         if (numItemsSelected == 1)
         {
@@ -198,6 +199,7 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
 #else
         menu.addSubMenu("Add...", getNewItemMenu(laf));
 #endif
+        menu.addItem(PASTE_ID, "Paste" + gPasteShortcut);
     }
     if (!rightClick)
     {
