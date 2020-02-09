@@ -314,13 +314,19 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
             // reset the timer for time between notes; we do this for every note added to a cluster
             clusterThresholdTimer = 0;
             
+            //if (prep->getMode() == FirstNoteOnSync) cluster->setShouldPlay(true);
+            
             // reset the beat phase and pattern phase, and start playing, depending on the mode
-            if ((prep->getMode() == AnyNoteOnSync) ||
-                (prep->getMode() == FirstNoteOnSync && isNewCluster))
+            if ((prep->getMode() == AnyNoteOnSync) || (prep->getMode() == FirstNoteOnSync))
+                //(prep->getMode() == FirstNoteOnSync && isNewCluster))
             {
-                cluster->setBeatPhasor(0);
-                cluster->resetPatternPhase();
                 cluster->setShouldPlay(true);
+                
+                if (isNewCluster)
+                {
+                    cluster->setBeatPhasor(0);
+                    cluster->resetPatternPhase();
+                }
             }
         }
     }
