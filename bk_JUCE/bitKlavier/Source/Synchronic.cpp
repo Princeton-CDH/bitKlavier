@@ -202,6 +202,9 @@ bool SynchronicProcessor::holdCheck(int noteNumber)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<KeymapTargetState> targetStates)
 {
+    // check velocity filtering
+    if (!velocityCheck(noteNumber)) return;
+    
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
     lastKeyPressed = noteNumber;
@@ -244,10 +247,6 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     
     // is this a new cluster?
     bool isNewCluster = false;
-    
-    // check velocity filtering
-    if (!velocityCheck(noteNumber)) return;
-    
     
     // add note to clusterKeysDepressed (keys targeting the main synchronic functionality)
     if (doCluster) clusterKeysDepressed.addIfNotAlreadyThere(noteNumber);
@@ -414,6 +413,9 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
 
 void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel, Array<KeymapTargetState> targetStates)
 {
+    // do velocity and hold-time filtering (how long the key was held down)
+    if (!velocityCheck(noteNumber)) return;
+    if (!holdCheck(noteNumber)) return;
     
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
@@ -435,10 +437,6 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     
     // is this a new cluster?
     bool isNewCluster = false;
-    
-    // do velocity and hold-time filtering (how long the key was held down)
-    if (!velocityCheck(noteNumber)) return;
-    if (!holdCheck(noteNumber)) return;
 
     // remove key from cluster-targeted keys
     if (doCluster) clusterKeysDepressed.removeAllInstancesOf(noteNumber);
