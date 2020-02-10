@@ -53,7 +53,7 @@ namespace ProjectInfo
 {
     const char* const  projectName    = "bitKlavier";
     const char* const  companyName    = "Many Arrows Music";
-    const char* const  versionString  = "2.5b1";
+    const char* const  versionString  = "2.5";
     const int          versionNumber  = 0x20500;
 }
 #endif
