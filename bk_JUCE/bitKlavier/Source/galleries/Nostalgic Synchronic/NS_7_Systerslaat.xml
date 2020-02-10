@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="NS_7_Systerslaat" sampleType="3" soundfontURL="" soundfontInst="1025531170"
-         defaultPiano="1">
+<gallery name="NS_7_Systerslaat" sampleType="3" soundfontURL="/Applications/bitKlavier/soundfonts/Orgue de salon.sf2"
+         soundfontInst="5" defaultPiano="1">
   <idcounts i0="2" i1="4" i2="2" i3="8" i4="2" i5="53" i6="1" i7="1" i8="1"
-            i9="24" i10="1" i11="1" i12="38" i13="1" i14="8" i15="1"/>
+            i9="24" i10="1" i11="1" i12="38" i13="1" i14="8" i15="1" i16="1"
+            i17="1"/>
   <general globalGain="1.0" tempoMultiplier="1.0" tuningFund="440.0" invertSustain="0"
            noteOnSetsNoteOffVelocity="0"/>
   <tempo Id="1" name="18">
@@ -727,8 +728,12 @@
   </direct>
   <synchronic Id="1" name="20">
     <params gain="1.0" numBeats="100000000" clusterMin="2" clusterMax="100"
-            clusterThresh="1000.0" mode="0" beatsToSkip="-1" numClusters="1"
-            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127">
+            clusterCap="8" clusterThresh="1000.0" mode="0" beatsToSkip="-1"
+            numClusters="1" onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0"
+            velocityMax="127" targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.200000047683716" f1="1.200000047683716"/>
       <lengthMultipliers f0="0.1900001019239426" f1="0.5700001120567322" f2="0.1420001089572906"
                          f3="0.1420001089572906" f4="0.5700001120567322" f5="1.045000195503235"/>
@@ -755,8 +760,12 @@
   </synchronic>
   <synchronic Id="2" name="21">
     <params gain="1.0" numBeats="100000000" clusterMin="1" clusterMax="100000"
-            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
-            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127">
+            clusterCap="8" clusterThresh="500.0" mode="0" beatsToSkip="1"
+            numClusters="1" onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0"
+            velocityMax="127" targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.200000047683716" f1="1.0" f2="0.699999988079071" f3="0.699999988079071"
                        f4="1.0" f5="1.200000047683716"/>
       <lengthMultipliers f0="0.1900001019239426" f1="0.5700001120567322" f2="0.2000001072883606"
@@ -784,8 +793,12 @@
   </synchronic>
   <synchronic Id="3" name="22">
     <params gain="1.0" numBeats="100000000" clusterMin="2" clusterMax="100"
-            clusterThresh="600.0" mode="0" beatsToSkip="0" numClusters="1"
-            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127">
+            clusterCap="8" clusterThresh="600.0" mode="0" beatsToSkip="1"
+            numClusters="1" onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0"
+            velocityMax="127" targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="0.699999988079071"/>
       <lengthMultipliers f0="0.1900001019239426" f1="0.5700001120567322" f2="0.2000001072883606"
                          f3="0.2000001072883606" f4="0.5700001120567322" f5="1.045000195503235"/>
@@ -811,9 +824,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -837,9 +854,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -863,9 +884,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -889,9 +914,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -915,9 +944,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -941,9 +974,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -967,9 +1004,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -993,9 +1034,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -1021,7 +1066,8 @@
   <nostalgic Id="1" name="NS1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -1030,7 +1076,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -1039,7 +1086,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -1048,7 +1096,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -1057,7 +1106,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -1066,7 +1116,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -1075,7 +1126,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -1084,7 +1136,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -1093,12 +1146,24 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
     </params>
   </nostalgic>
+  <blendronic Id="-1" name="-1">
+    <params targetTypeBlendronicPatternSync="0" targetTypeBlendronicBeatSync="0"
+            targetTypeBlendronicClear="0" targetTypeBlendronicPausePlay="0"
+            targetTypeBlendronicOpenCloseInput="0" targetTypeBlendronicOpenCloseOutput="0"
+            outGain="1.0">
+      <beats f0="4.0" f1="3.0" f2="2.0" f3="3.0"/>
+      <delayLengths f0="4.0" f1="3.0" f2="2.0" f3="3.0"/>
+      <smoothLengths f0="50.0"/>
+      <feedbackCoefficients f0="0.949999988079071"/>
+    </params>
+  </blendronic>
   <modTuning Id="1" name="21">
     <dirty d0="0" d1="1" d2="1" d3="0" d4="0" d5="0" d6="0" d7="0" d8="0"
            d9="0" d10="0" d11="0" d12="0" d13="0" d14="1" d15="1" d16="0"
@@ -2129,41 +2194,258 @@
           k105="105" k106="106" k107="107" k108="108" k109="109" k110="110"
           k111="111" k112="112" k113="113" k114="114" k115="115" k116="116"
           k117="117" k118="118" k119="119" k120="120" k121="121" k122="122"
-          k123="123" k124="124" k125="125" k126="126" k127="127"/>
+          k123="123" k124="124" k125="125" k126="126" k127="127" targetStates0="1"
+          targetStates1="2" targetStates2="2" targetStates3="2" targetStates4="2"
+          targetStates5="2" targetStates6="2" targetStates7="2" targetStates8="2"
+          targetStates9="2" targetStates10="1" targetStates11="2" targetStates12="2"
+          targetStates13="2" targetStates14="2" targetStates15="2" targetStates16="2"
+          targetStates17="2" targetStates18="2" targetStates19="2" inverted="0"
+          defSelected="1" osSelected="1">
+    <midiInputs/>
+  </keymap>
   <keymap Id="4" name="S7-1" k0="35" k1="42" k2="47" k3="67" k4="77" k5="80"
-          k6="87"/>
+          k6="87" targetStates0="2" targetStates1="1" targetStates2="0"
+          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
+          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="1" osSelected="1">
+    <midiInputs/>
+  </keymap>
   <keymap Id="6" name="S7-2" k0="22" k1="24" k2="29" k3="31" k4="33" k5="34"
           k6="35" k7="36" k8="37" k9="38" k10="41" k11="43" k12="45" k13="47"
-          k14="48" k15="50" k16="101" k17="108"/>
-  <keymap Id="8" name="G2" k0="43"/>
+          k14="48" k15="50" k16="101" k17="108" targetStates0="2" targetStates1="1"
+          targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
+          targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="8" name="G2" k0="43" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
   <keymap Id="10" name="S7-3" k0="24" k1="28" k2="31" k3="35" k4="40" k5="100"
-          k6="107"/>
-  <keymap Id="12" name="N7-4" k0="67" k1="77" k2="80" k3="87"/>
+          k6="107" targetStates0="2" targetStates1="1" targetStates2="0"
+          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
+          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="1" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="12" name="N7-4" k0="67" k1="77" k2="80" k3="87" targetStates0="2"
+          targetStates1="2" targetStates2="2" targetStates3="2" targetStates4="2"
+          targetStates5="2" targetStates6="2" targetStates7="2" targetStates8="2"
+          targetStates9="2" targetStates10="1" targetStates11="2" targetStates12="2"
+          targetStates13="2" targetStates14="2" targetStates15="2" targetStates16="2"
+          targetStates17="2" targetStates18="2" targetStates19="2" inverted="0"
+          defSelected="1" osSelected="1">
+    <midiInputs/>
+  </keymap>
   <keymap Id="14" name="S7-4" k0="24" k1="28" k2="31" k3="35" k4="40" k5="67"
-          k6="77" k7="80" k8="87" k9="100" k10="107"/>
+          k6="77" k7="80" k8="87" k9="100" k10="107" targetStates0="2"
+          targetStates1="1" targetStates2="0" targetStates3="0" targetStates4="0"
+          targetStates5="0" targetStates6="0" targetStates7="0" targetStates8="0"
+          targetStates9="0" targetStates10="2" targetStates11="2" targetStates12="2"
+          targetStates13="2" targetStates14="2" targetStates15="2" targetStates16="2"
+          targetStates17="2" targetStates18="2" targetStates19="2" inverted="0"
+          defSelected="1" osSelected="1">
+    <midiInputs/>
+  </keymap>
   <keymap Id="16" name="S7-5" k0="21" k1="28" k2="29" k3="43" k4="45" k5="47"
           k6="49" k7="52" k8="54" k9="55" k10="59" k11="61" k12="67" k13="101"
-          k14="108"/>
-  <keymap Id="18" name="B2" k0="47"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="23" name="C#4" k0="61"/>
-  <keymap Id="25" name="D2" k0="38"/>
-  <keymap Id="27" name="F1" k0="29"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="30" name="G1" k0="31"/>
-  <keymap Id="32" name="A1" k0="33"/>
-  <keymap Id="34" name="B1" k0="35"/>
-  <keymap Id="36" name="C2" k0="36"/>
-  <keymap Id="38" name="F2" k0="41"/>
-  <keymap Id="40" name="B7" k0="107"/>
-  <keymap Id="42" name="Es" k0="28" k1="68" k2="100" k3="107"/>
-  <keymap Id="44" name="G4" k0="67"/>
-  <keymap Id="46" name="B3" k0="59"/>
-  <keymap Id="48" name="F4" k0="65"/>
-  <keymap Id="50" name="A0" k0="21"/>
-  <keymap Id="52" name="C8" k0="108"/>
+          k14="108" targetStates0="2" targetStates1="1" targetStates2="0"
+          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
+          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="1" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="18" name="B2" k0="47" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="2" targetStates1="2" targetStates2="2"
+          targetStates3="2" targetStates4="2" targetStates5="2" targetStates6="2"
+          targetStates7="2" targetStates8="2" targetStates9="2" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="0" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="2" targetStates1="2" targetStates2="2"
+          targetStates3="2" targetStates4="2" targetStates5="2" targetStates6="2"
+          targetStates7="2" targetStates8="2" targetStates9="2" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="0" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="2" targetStates1="2" targetStates2="2"
+          targetStates3="2" targetStates4="2" targetStates5="2" targetStates6="2"
+          targetStates7="2" targetStates8="2" targetStates9="2" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="0" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="23" name="C#4" k0="61" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="25" name="D2" k0="38" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="27" name="F1" k0="29" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="2" targetStates1="2" targetStates2="2"
+          targetStates3="2" targetStates4="2" targetStates5="2" targetStates6="2"
+          targetStates7="2" targetStates8="2" targetStates9="2" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="0" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="30" name="G1" k0="31" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="32" name="A1" k0="33" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="34" name="B1" k0="35" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="36" name="C2" k0="36" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="38" name="F2" k0="41" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="40" name="B7" k0="107" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="42" name="Es" k0="28" k1="68" k2="100" k3="107" targetStates0="2"
+          targetStates1="2" targetStates2="2" targetStates3="2" targetStates4="2"
+          targetStates5="2" targetStates6="2" targetStates7="2" targetStates8="2"
+          targetStates9="2" targetStates10="2" targetStates11="2" targetStates12="2"
+          targetStates13="2" targetStates14="2" targetStates15="2" targetStates16="2"
+          targetStates17="2" targetStates18="2" targetStates19="2" inverted="0"
+          defSelected="1" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="44" name="G4" k0="67" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="46" name="B3" k0="59" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="48" name="F4" k0="65" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="50" name="A0" k0="21" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="52" name="C8" k0="108" targetStates0="2" targetStates1="2"
+          targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
+          targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
+          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
+          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
+          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
+          osSelected="1">
+    <midiInputs/>
+  </keymap>
   <piano name="Etude7-1" Id="1">
     <item>
       <item name="Tuning28" type="3" Id="2" piano="-1" active="1" X="369.5"

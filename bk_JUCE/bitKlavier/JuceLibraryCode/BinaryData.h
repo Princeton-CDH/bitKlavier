@@ -150,13 +150,13 @@ namespace BinaryData
     const int            for_Bill_D_xmlSize = 50692;
 
     extern const char*   Gigue_Interrupted_xml;
-    const int            Gigue_Interrupted_xmlSize = 24106;
+    const int            Gigue_Interrupted_xmlSize = 30997;
 
     extern const char*   Houseboat_xml;
-    const int            Houseboat_xmlSize = 46856;
+    const int            Houseboat_xmlSize = 56953;
 
     extern const char*   Hurra_xml;
-    const int            Hurra_xmlSize = 20351;
+    const int            Hurra_xmlSize = 23966;
 
     extern const char*   Juxtaposed_Weather_xml;
     const int            Juxtaposed_Weather_xmlSize = 41284;
@@ -183,7 +183,7 @@ namespace BinaryData
     const int            Quickie_xmlSize = 29279;
 
     extern const char*   Scales_within_Sliding_Scales_xml;
-    const int            Scales_within_Sliding_Scales_xmlSize = 19682;
+    const int            Scales_within_Sliding_Scales_xmlSize = 23301;
 
     extern const char*   Slow_To_Come_Back_xml;
     const int            Slow_To_Come_Back_xmlSize = 26113;
@@ -198,16 +198,16 @@ namespace BinaryData
     const int            Worm_xmlSize = 18502;
 
     extern const char*   NS_1_Prelude_xml;
-    const int            NS_1_Prelude_xmlSize = 59383;
+    const int            NS_1_Prelude_xmlSize = 65826;
 
     extern const char*   NS_2_Undertow_xml;
     const int            NS_2_Undertow_xmlSize = 61095;
 
     extern const char*   NS_3_Song_xml;
-    const int            NS_3_Song_xmlSize = 59366;
+    const int            NS_3_Song_xmlSize = 65823;
 
     extern const char*   NS_4_Marbles_xml;
-    const int            NS_4_Marbles_xmlSize = 68813;
+    const int            NS_4_Marbles_xmlSize = 77225;
 
     extern const char*   NS_5_Wallumrod_xml;
     const int            NS_5_Wallumrod_xmlSize = 103183;
@@ -216,7 +216,7 @@ namespace BinaryData
     const int            NS_6_PointsAmongLines_xmlSize = 58183;
 
     extern const char*   NS_7_Systerslaat_xml;
-    const int            NS_7_Systerslaat_xmlSize = 176928;
+    const int            NS_7_Systerslaat_xmlSize = 196107;
 
     extern const char*   NS_8_ItIsEnough_xml;
     const int            NS_8_ItIsEnough_xmlSize = 65783;

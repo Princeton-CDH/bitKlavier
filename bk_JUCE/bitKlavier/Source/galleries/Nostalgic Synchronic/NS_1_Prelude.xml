@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="NS_1_Prelude" sampleType="3" soundfontURL="" soundfontInst="1025531170"
+<gallery name="NS_1_Prelude" sampleType="3" soundfontURL="" soundfontInst="0"
          defaultPiano="1">
-  <idcounts i0="2" i1="2" i2="2" i3="4" i4="2" i5="7" i6="1" i7="1" i8="1"
-            i9="1" i10="1" i11="1" i12="1" i13="1" i14="3" i15="1"/>
   <general globalGain="1.0" tempoMultiplier="1.0" tuningFund="440.0" invertSustain="0"
            noteOnSetsNoteOffVelocity="0"/>
   <tempo Id="1" name="NS1">
@@ -554,9 +552,13 @@
     </params>
   </direct>
   <synchronic Id="1" name="NS1">
-    <params gain="0.75" numBeats="16" clusterMin="2" clusterMax="10000" clusterThresh="500.0"
-            mode="2" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="0.75" numBeats="16" clusterMin="2" clusterMax="10000" clusterCap="8"
+            clusterThresh="500.0" mode="4" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0" f1="0.6666666865348816" f2="0.6666666865348816" f3="0.6666666865348816"/>
       <accentMultipliers f0="0.800000011920929" f1="0.6000000238418579" f2="0.4000000059604645"
@@ -581,9 +583,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -607,9 +613,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -633,9 +643,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -659,9 +673,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -685,9 +703,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -711,9 +733,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -737,9 +763,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -763,9 +793,13 @@
     </params>
   </synchronic>
   <synchronic Id="-1" name="-1">
-    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterThresh="500.0"
-            mode="0" beatsToSkip="0" numClusters="1" onOffMode="0" holdMin="0"
-            holdMax="12000" velocityMin="0" velocityMax="127">
+    <params gain="1.0" numBeats="0" clusterMin="1" clusterMax="100" clusterCap="8"
+            clusterThresh="500.0" mode="0" beatsToSkip="0" numClusters="1"
+            onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0" velocityMax="127"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0">
       <beatMultipliers f0="1.0"/>
       <lengthMultipliers f0="1.0"/>
       <accentMultipliers f0="1.0"/>
@@ -791,7 +825,8 @@
   <nostalgic Id="1" name="NS1">
     <params waveDistance="0" undertow="0" gain="0.75" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="120000.0" clusterMin="1"
-            clusterMax="12" velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -800,7 +835,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            clusterMax="12" velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -809,7 +845,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            clusterMax="12" velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -818,7 +855,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            clusterMax="12" velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -827,7 +865,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            clusterMax="12" velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -836,7 +875,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            clusterMax="12" velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -845,7 +885,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            clusterMax="12" velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -854,7 +895,8 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            clusterMax="12" velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -863,13 +905,25 @@
   <nostalgic Id="-1" name="-1">
     <params waveDistance="0" undertow="0" gain="1.0" lengthMultiplier="1.0"
             beatsToSkip="0.0" mode="0" holdMin="0.0" holdMax="12000.0" clusterMin="1"
-            clusterMax="12" velocityMin="0" velocityMax="127" keyOnReset="0">
+            clusterThreshold="150" velocityMin="0" velocityMax="127" keyOnReset="0"
+            targetTypeNostalgicClearAll="0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="50.0"/>
       <undertowADSR f0="50.0" f1="3.0" f2="1.0" f3="2000.0"/>
     </params>
   </nostalgic>
-  <keymap Id="2" name="All" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5" k6="6"
+  <blendronic Id="-1" name="Blendronic -1">
+    <params targetTypeBlendronicPatternSync="0" targetTypeBlendronicBeatSync="0"
+            targetTypeBlendronicClear="0" targetTypeBlendronicPausePlay="0"
+            targetTypeBlendronicOpenCloseInput="0" targetTypeBlendronicOpenCloseOutput="0"
+            outGain="1.0" delayBufferSize="5.0">
+      <beats f0="4.0" f1="3.0" f2="2.0" f3="3.0"/>
+      <delayLengths f0="4.0" f1="3.0" f2="2.0" f3="3.0"/>
+      <smoothLengths f0="50.0"/>
+      <feedbackCoefficients f0="0.949999988079071"/>
+    </params>
+  </blendronic>
+  <keymap Id="1" name="All" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5" k6="6"
           k7="7" k8="8" k9="9" k10="10" k11="11" k12="12" k13="13" k14="14"
           k15="15" k16="16" k17="17" k18="18" k19="19" k20="20" k21="21"
           k22="22" k23="23" k24="24" k25="25" k26="26" k27="27" k28="28"
@@ -887,11 +941,47 @@
           k105="105" k106="106" k107="107" k108="108" k109="109" k110="110"
           k111="111" k112="112" k113="113" k114="114" k115="115" k116="116"
           k117="117" k118="118" k119="119" k120="120" k121="121" k122="122"
-          k123="123" k124="124" k125="125" k126="126" k127="127"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
-  <keymap Id="-1" name="-1"/>
+          k123="123" k124="124" k125="125" k126="126" k127="127" targetStates0="1"
+          targetStates1="1" targetStates2="0" targetStates3="0" targetStates4="0"
+          targetStates5="0" targetStates6="0" targetStates7="0" targetStates8="0"
+          targetStates9="0" targetStates10="1" targetStates11="2" targetStates12="2"
+          targetStates13="2" targetStates14="2" targetStates15="2" targetStates16="2"
+          targetStates17="2" targetStates18="2" targetStates19="2" inverted="0"
+          defSelected="1" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="2" targetStates1="2" targetStates2="2"
+          targetStates3="2" targetStates4="2" targetStates5="2" targetStates6="2"
+          targetStates7="2" targetStates8="2" targetStates9="2" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="0" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="2" targetStates1="2" targetStates2="2"
+          targetStates3="2" targetStates4="2" targetStates5="2" targetStates6="2"
+          targetStates7="2" targetStates8="2" targetStates9="2" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="0" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="2" targetStates1="2" targetStates2="2"
+          targetStates3="2" targetStates4="2" targetStates5="2" targetStates6="2"
+          targetStates7="2" targetStates8="2" targetStates9="2" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="0" osSelected="1">
+    <midiInputs/>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="2" targetStates1="2" targetStates2="2"
+          targetStates3="2" targetStates4="2" targetStates5="2" targetStates6="2"
+          targetStates7="2" targetStates8="2" targetStates9="2" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="0" osSelected="1">
+    <midiInputs/>
+  </keymap>
   <piano name="Etude1-Prelude" Id="1">
     <item>
       <item name="Tuning12" type="3" Id="1" piano="-1" active="1" X="294.5"
@@ -902,7 +992,7 @@
       </connections>
     </item>
     <item>
-      <item name="Keymap11" type="5" Id="2" piano="-1" active="1" X="423.0"
+      <item name="Keymap11" type="5" Id="1" piano="-1" active="1" X="423.0"
             Y="394.0" W="106.0" H="72.0"/>
       <connections>
         <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="253.0"
@@ -953,7 +1043,7 @@
       </connections>
     </item>
     <item>
-      <item name="Keymap11" type="5" Id="2" piano="-1" active="1" X="429.0"
+      <item name="Keymap11" type="5" Id="1" piano="-1" active="1" X="429.0"
             Y="390.0" W="106.0" H="72.0"/>
       <connections>
         <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="412.0"
