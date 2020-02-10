@@ -225,10 +225,10 @@ namespace BinaryData
     const int            Basic_Piano_xmlSize = 4112;
 
     extern const char*   Mikes_Gallery_xml;
-    const int            Mikes_Gallery_xmlSize = 35226;
+    const int            Mikes_Gallery_xmlSize = 35191;
 
     extern const char*   Exercise_Constraint_xml;
-    const int            Exercise_Constraint_xmlSize = 51501;
+    const int            Exercise_Constraint_xmlSize = 51355;
 
     extern const char*   blendronic_icon_png;
     const int            blendronic_icon_pngSize = 36000;
