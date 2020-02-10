@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <gallery name="Basic Piano" sampleType="3" defaultPiano="1">
-  <idCount i0="16" i1="28" i2="24" i3="20" i4="16" i5="1533" i6="10" i7="10"
-           i8="10" i9="12" i10="10" i11="10" i12="10" i13="12" i14="30"
-           i15="0"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
            resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
            resAndHammer="1" invertSustain="0" tuningFund="440"/>
@@ -27,9 +24,6 @@
     <transposition f0="0"/>
   </direct>
   <direct Id="-1" name="-1" gain="1" resGain="1" hammerGain="1">
-    <transposition f0="0"/>
-  </direct>
-  <direct Id="16" name="16" gain="1" resGain="1" hammerGain="1">
     <transposition f0="0"/>
   </direct>
   <synchronic Id="-1" name="-1" gain="1" numBeats="0" clusterMin="1" clusterMax="100"

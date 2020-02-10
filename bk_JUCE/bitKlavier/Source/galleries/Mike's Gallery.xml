@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <gallery name="Mike's Gallery" defaultPiano="1">
-  <idCount i0="22" i1="32" i2="45" i3="30" i4="19" i5="1682" i6="10" i7="10"
-           i8="10" i9="12" i10="10" i11="10" i12="16" i13="11" i14="36"/>
   <general globalGain="1" directGain="1" synchronicGain="1" nostalgicGain="1"
            resonanceGain="1" hammerGain="0.0099999997764825820923" tempoMultiplier="1"
            resAndHammer="1" invertSustain="0" tuningFund="440"/>
@@ -363,7 +361,6 @@
           k5="81" k6="93" k7="105"/>
   <keymap Id="1636" name="AllCs" k0="24" k1="36" k2="48" k3="60" k4="72"
           k5="84" k6="96" k7="108"/>
-  <keymap Id="1653" name="1653"/>
   <keymap Id="1672" name="AllDs" k0="26" k1="38" k2="50" k3="62" k4="74"
           k5="86" k6="98"/>
   <piano name="whatever-you-do-dont-play-any-key" Id="1">

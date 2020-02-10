@@ -858,7 +858,7 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
     
-    if (box == selectCB.getName())
+    if (name == selectCB.getName())
     {
         setCurrentId(Id);
     }
