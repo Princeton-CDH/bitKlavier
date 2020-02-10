@@ -104,26 +104,26 @@ namespace BinaryData
     extern const char*   _32__Spring_Tuning_5_xml;
     const int            _32__Spring_Tuning_5_xmlSize = 10777;
 
-    extern const char*   _33__Blendronic_Example_1_xml;
-    const int            _33__Blendronic_Example_1_xmlSize = 22463;
+    extern const char*   _33__Blendronic_1_xml;
+    const int            _33__Blendronic_1_xmlSize = 22455;
 
-    extern const char*   _34__Blendronic_Example_2_xml;
-    const int            _34__Blendronic_Example_2_xmlSize = 22675;
+    extern const char*   _34__Blendronic_2_xml;
+    const int            _34__Blendronic_2_xmlSize = 22667;
 
-    extern const char*   _35__Blendronic_Example_3_xml;
-    const int            _35__Blendronic_Example_3_xmlSize = 22440;
+    extern const char*   _35__Blendronic_3_xml;
+    const int            _35__Blendronic_3_xmlSize = 22432;
 
-    extern const char*   _36__Blendronic_Example_4_xml;
-    const int            _36__Blendronic_Example_4_xmlSize = 23557;
+    extern const char*   _36__Blendronic_4_xml;
+    const int            _36__Blendronic_4_xmlSize = 23549;
 
-    extern const char*   _37__Blendronic_Example_5_xml;
-    const int            _37__Blendronic_Example_5_xmlSize = 25036;
+    extern const char*   _37__Blendronic_5_xml;
+    const int            _37__Blendronic_5_xmlSize = 25028;
 
-    extern const char*   _38__Blendronic_Example_6_xml;
-    const int            _38__Blendronic_Example_6_xmlSize = 38378;
+    extern const char*   _38__Blendronic_6_xml;
+    const int            _38__Blendronic_6_xmlSize = 38370;
 
-    extern const char*   _39__Blendronic_Example_7_xml;
-    const int            _39__Blendronic_Example_7_xmlSize = 23277;
+    extern const char*   _39__Blendronic_7_xml;
+    const int            _39__Blendronic_7_xmlSize = 23269;
 
     extern const char*   And_So_xml;
     const int            And_So_xmlSize = 15871;

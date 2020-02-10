@@ -244,13 +244,13 @@ void BKAudioProcessor::loadGalleries()
         "30. Spring Tuning 3",
         "31. Spring Tuning 4",
         "32. Spring Tuning 5",
-        "33. Blendronic Example 1",
-        "34. Blendronic Example 2",
-        "35. Blendronic Example 3",
-        "36. Blendronic Example 4",
-        "37. Blendronic Example 5",
-        "38. Blendronic Example 6",
-        "39. Blendronic Example 7",
+        "33. Blendronic 1",
+        "34. Blendronic 2",
+        "35. Blendronic 3",
+        "36. Blendronic 4",
+        "37. Blendronic 5",
+        "38. Blendronic 6",
+        "39. Blendronic 7",
         
     });
     
