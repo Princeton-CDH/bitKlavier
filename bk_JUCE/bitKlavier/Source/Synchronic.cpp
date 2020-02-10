@@ -315,6 +315,25 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
             clusterThresholdTimer = 0;
             
             // reset the beat phase and pattern phase, and start playing, depending on the mode
+            if (prep->getMode() == AnyNoteOnSync)
+            {
+                cluster->setShouldPlay(true);
+                cluster->setBeatPhasor(0);
+                cluster->resetPatternPhase();
+            }
+            else if (prep->getMode() == FirstNoteOnSync)
+            {
+                cluster->setShouldPlay(true);
+                
+                if (isNewCluster)
+                {
+                    cluster->setBeatPhasor(0);
+                    cluster->resetPatternPhase();
+                }
+            }
+            
+            /*
+            // reset the beat phase and pattern phase, and start playing, depending on the mode
             if ((prep->getMode() == AnyNoteOnSync) || (prep->getMode() == FirstNoteOnSync))
             {
                 cluster->setShouldPlay(true);
@@ -325,6 +344,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
                     cluster->resetPatternPhase();
                 }
             }
+             */
         }
     }
     
