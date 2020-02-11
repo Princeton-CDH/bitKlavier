@@ -161,12 +161,6 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
 {
     PopupMenu menu;
     menu.setLookAndFeel(laf);
-    
-    if (onGraph)
-    {
-        menu.addItem(PASTE_ID, "Paste" + gPasteShortcut);
-        menu.addSeparator();
-    }
 
     if (numItemsSelected)
     {
@@ -199,6 +193,7 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
 #else
         menu.addSubMenu("Add...", getNewItemMenu(laf));
 #endif
+        menu.addSeparator();
         menu.addItem(PASTE_ID, "Paste" + gPasteShortcut);
     }
     if (!rightClick)
