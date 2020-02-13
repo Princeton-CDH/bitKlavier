@@ -39,6 +39,9 @@ onscreenSelected(true)
     if (processor.isMidiReady()) {
         defaultSelected = true;
     }
+#if JUCE_IOS
+    defaultSelected = true;
+#endif
 }
 
 Keymap::Keymap(BKAudioProcessor& processor, Keymap::Ptr k):
