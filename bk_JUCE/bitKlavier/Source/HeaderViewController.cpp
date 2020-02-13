@@ -555,7 +555,7 @@ void HeaderViewController::bkButtonClicked (Button* b)
     if (b == &editB)
     {
          getEditMenu(&buttonsAndMenusLAF, construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent (b),
-         ModalCallbackFunction::forComponent (construction->editMenuCallback, construction) );
+         ModalCallbackFunction::forComponent (BKConstructionSite::editMenuCallback, construction) );
     }
     else if (b == &pianoB)
     {
