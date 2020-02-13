@@ -120,7 +120,7 @@ namespace BinaryData
     const int            _37__Blendronic_5_xmlSize = 25028;
 
     extern const char*   _38__Blendronic_6_xml;
-    const int            _38__Blendronic_6_xmlSize = 38370;
+    const int            _38__Blendronic_6_xmlSize = 38218;
 
     extern const char*   _39__Blendronic_7_xml;
     const int            _39__Blendronic_7_xmlSize = 23269;

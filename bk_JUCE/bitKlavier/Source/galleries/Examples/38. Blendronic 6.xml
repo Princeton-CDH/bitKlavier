@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="38. Blendronic 6" sampleType="3" soundfontURL=""
+<gallery name="38. Blendronic 6" sampleType="3" soundfontURL="/Applications/bitKlavier/soundfonts/CMMV.sf2"
          soundfontInst="0" defaultPiano="1">
-  <idcounts i0="4" i1="2" i2="1" i3="2" i4="2" i5="32" i6="1" i7="1" i8="1"
-            i9="1" i10="1" i11="1" i12="1" i13="1" i14="2" i15="1" i16="3"
-            i17="8"/>
   <general globalGain="1.0" tempoMultiplier="1.0" tuningFund="440.0" invertSustain="0"
            noteOnSetsNoteOffVelocity="0"/>
   <tempo Id="-1" name="-1">
@@ -310,7 +307,7 @@
       <feedbackCoefficients f0="0.949999988079071"/>
     </params>
   </modBlendronic>
-  <keymap Id="2" name="Full" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5"
+  <keymap Id="1" name="Full" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5"
           k6="6" k7="7" k8="8" k9="9" k10="10" k11="11" k12="12" k13="13"
           k14="14" k15="15" k16="16" k17="17" k18="18" k19="19" k20="20"
           k21="21" k22="22" k23="23" k24="24" k25="25" k26="26" k27="27"
@@ -345,7 +342,7 @@
           targetStates19="2" inverted="0" defSelected="1" osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="5" name="Keymap 5" k0="60" targetStates0="2" targetStates1="2"
+  <keymap Id="2" name="Keymap 5" k0="60" targetStates0="2" targetStates1="2"
           targetStates2="2" targetStates3="2" targetStates4="0" targetStates5="1"
           targetStates6="1" targetStates7="1" targetStates8="2" targetStates9="2"
           targetStates10="2" targetStates11="2" targetStates12="1" targetStates13="1"
@@ -354,7 +351,7 @@
           osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="7" name="Keymap 7" k0="21" k1="22" k2="23" targetStates0="2"
+  <keymap Id="3" name="Keymap 7" k0="21" k1="22" k2="23" targetStates0="2"
           targetStates1="2" targetStates2="2" targetStates3="2" targetStates4="1"
           targetStates5="0" targetStates6="1" targetStates7="1" targetStates8="2"
           targetStates9="2" targetStates10="2" targetStates11="2" targetStates12="1"
@@ -363,7 +360,7 @@
           defSelected="1" osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="9" name="Keymap 9" targetStates0="2" targetStates1="2" targetStates2="2"
+  <keymap Id="4" name="Keymap 9" targetStates0="2" targetStates1="2" targetStates2="2"
           targetStates3="2" targetStates4="0" targetStates5="0" targetStates6="0"
           targetStates7="0" targetStates8="2" targetStates9="2" targetStates10="2"
           targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
@@ -371,16 +368,15 @@
           targetStates19="2" inverted="0" defSelected="1" osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="11" name="Keymap 11" targetStates0="2" targetStates1="2"
-          targetStates2="2" targetStates3="2" targetStates4="0" targetStates5="0"
-          targetStates6="0" targetStates7="0" targetStates8="2" targetStates9="2"
-          targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
-          targetStates14="2" targetStates15="2" targetStates16="2" targetStates17="2"
-          targetStates18="2" targetStates19="2" inverted="0" defSelected="1"
-          osSelected="1">
+  <keymap Id="5" name="Keymap 11" targetStates0="2" targetStates1="2" targetStates2="2"
+          targetStates3="2" targetStates4="0" targetStates5="0" targetStates6="0"
+          targetStates7="0" targetStates8="2" targetStates9="2" targetStates10="2"
+          targetStates11="2" targetStates12="2" targetStates13="2" targetStates14="2"
+          targetStates15="2" targetStates16="2" targetStates17="2" targetStates18="2"
+          targetStates19="2" inverted="0" defSelected="1" osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="13" name="Keymap 13" k0="25" targetStates0="0" targetStates1="2"
+  <keymap Id="6" name="Keymap 13" k0="25" targetStates0="0" targetStates1="2"
           targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
           targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
           targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
@@ -389,7 +385,7 @@
           osSelected="1">
     <midiInputs midiInput0="nanoKEY KEYBOARD"/>
   </keymap>
-  <keymap Id="15" name="Keymap 15" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5"
+  <keymap Id="7" name="Keymap 15" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5"
           k6="6" k7="7" k8="8" k9="9" k10="10" k11="11" k12="12" k13="13"
           k14="14" k15="15" k16="16" k17="17" k18="18" k19="19" k20="20"
           k21="24" k22="26" k23="28" k24="29" k25="31" k26="33" k27="35"
@@ -414,7 +410,7 @@
           targetStates19="2" inverted="0" defSelected="1" osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="17" name="Keymap 17" k0="108" targetStates0="2" targetStates1="2"
+  <keymap Id="8" name="Keymap 17" k0="108" targetStates0="2" targetStates1="2"
           targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
           targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
           targetStates10="2" targetStates11="2" targetStates12="1" targetStates13="1"
@@ -423,7 +419,7 @@
           osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="19" name="Keymap 19" k0="27" targetStates0="2" targetStates1="2"
+  <keymap Id="9" name="Keymap 19" k0="27" targetStates0="2" targetStates1="2"
           targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
           targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
           targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
@@ -432,7 +428,7 @@
           osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="21" name="Keymap 21" k0="30" targetStates0="2" targetStates1="2"
+  <keymap Id="10" name="Keymap 21" k0="30" targetStates0="2" targetStates1="2"
           targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
           targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
           targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
@@ -441,7 +437,7 @@
           osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="23" name="Keymap 23" k0="32" targetStates0="2" targetStates1="2"
+  <keymap Id="11" name="Keymap 23" k0="32" targetStates0="2" targetStates1="2"
           targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
           targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
           targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
@@ -450,7 +446,7 @@
           osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="25" name="Keymap 25" k0="34" targetStates0="2" targetStates1="2"
+  <keymap Id="12" name="Keymap 25" k0="34" targetStates0="2" targetStates1="2"
           targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
           targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
           targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
@@ -459,7 +455,7 @@
           osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="27" name="Keymap 27" k0="37" targetStates0="2" targetStates1="2"
+  <keymap Id="13" name="Keymap 27" k0="37" targetStates0="2" targetStates1="2"
           targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
           targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
           targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
@@ -468,7 +464,7 @@
           osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="29" name="Keymap 29" k0="39" targetStates0="2" targetStates1="2"
+  <keymap Id="14" name="Keymap 29" k0="39" targetStates0="2" targetStates1="2"
           targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
           targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
           targetStates10="2" targetStates11="2" targetStates12="2" targetStates13="2"
@@ -477,7 +473,7 @@
           osSelected="1">
     <midiInputs/>
   </keymap>
-  <keymap Id="31" name="Keymap 31" k0="21" targetStates0="2" targetStates1="2"
+  <keymap Id="15" name="Keymap 31" k0="21" targetStates0="2" targetStates1="2"
           targetStates2="2" targetStates3="2" targetStates4="2" targetStates5="2"
           targetStates6="2" targetStates7="2" targetStates8="2" targetStates9="2"
           targetStates10="2" targetStates11="2" targetStates12="0" targetStates13="0"
@@ -582,7 +578,7 @@
       </connections>
     </item>
     <item>
-      <item name="" type="5" Id="7" piano="0" active="1" X="282.0" Y="408.0"
+      <item name="" type="5" Id="3" piano="0" active="1" X="282.0" Y="408.0"
             W="106.0" H="72.0"/>
       <connections>
         <item name="" type="16" Id="1" piano="0" active="1" X="397.0" Y="265.0"
@@ -590,7 +586,7 @@
       </connections>
     </item>
     <item>
-      <item name="" type="5" Id="13" piano="0" active="1" X="628.0" Y="480.0"
+      <item name="" type="5" Id="6" piano="0" active="1" X="628.0" Y="480.0"
             W="106.0" H="72.0"/>
       <connections>
         <item name="" type="17" Id="1" piano="0" active="1" X="534.5" Y="480.0"
@@ -598,7 +594,7 @@
       </connections>
     </item>
     <item>
-      <item name="" type="5" Id="15" piano="0" active="1" X="60.0" Y="78.0"
+      <item name="" type="5" Id="7" piano="0" active="1" X="60.0" Y="78.0"
             W="106.0" H="72.0"/>
       <connections>
         <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="200.0"
@@ -606,7 +602,7 @@
       </connections>
     </item>
     <item>
-      <item name="" type="5" Id="17" piano="0" active="1" X="397.0" Y="408.0"
+      <item name="" type="5" Id="8" piano="0" active="1" X="397.0" Y="408.0"
             W="106.0" H="72.0"/>
       <connections>
         <item name="" type="16" Id="1" piano="0" active="1" X="397.0" Y="265.0"
@@ -626,7 +622,7 @@
             W="131.0" H="25.0"/>
     </item>
     <item>
-      <item name="" type="5" Id="19" piano="0" active="1" X="628.0" Y="408.0"
+      <item name="" type="5" Id="9" piano="0" active="1" X="628.0" Y="408.0"
             W="106.0" H="72.0"/>
       <connections>
         <item name="" type="17" Id="2" piano="0" active="1" X="534.5" Y="408.0"
@@ -638,7 +634,7 @@
             W="131.0" H="25.0"/>
     </item>
     <item>
-      <item name="" type="5" Id="21" piano="0" active="1" X="628.0" Y="336.0"
+      <item name="" type="5" Id="10" piano="0" active="1" X="628.0" Y="336.0"
             W="106.0" H="72.0"/>
       <connections>
         <item name="" type="17" Id="3" piano="0" active="1" X="534.5" Y="336.0"
@@ -650,7 +646,7 @@
             W="131.0" H="25.0"/>
     </item>
     <item>
-      <item name="" type="5" Id="23" piano="0" active="1" X="628.0" Y="264.0"
+      <item name="" type="5" Id="11" piano="0" active="1" X="628.0" Y="264.0"
             W="106.0" H="72.0"/>
       <connections>
         <item name="" type="17" Id="4" piano="0" active="1" X="534.5" Y="264.0"
@@ -662,7 +658,7 @@
             W="131.0" H="25.0"/>
     </item>
     <item>
-      <item name="" type="5" Id="25" piano="0" active="1" X="628.0" Y="193.0"
+      <item name="" type="5" Id="12" piano="0" active="1" X="628.0" Y="193.0"
             W="106.0" H="72.0"/>
       <connections>
         <item name="" type="17" Id="5" piano="0" active="1" X="534.5" Y="193.0"
@@ -674,7 +670,7 @@
             W="131.0" H="25.0"/>
     </item>
     <item>
-      <item name="" type="5" Id="27" piano="0" active="1" X="628.0" Y="121.0"
+      <item name="" type="5" Id="13" piano="0" active="1" X="628.0" Y="121.0"
             W="106.0" H="72.0"/>
       <connections>
         <item name="" type="17" Id="6" piano="0" active="1" X="534.5" Y="121.0"
@@ -682,11 +678,11 @@
       </connections>
     </item>
     <item>
-      <item name="Comment" type="15" text="C#1: 65" X="754.5" Y="121.5" W="131.0"
+      <item name="Comment" type="15" text="C#2: 65" X="754.5" Y="121.5" W="131.0"
             H="25.0"/>
     </item>
     <item>
-      <item name="" type="5" Id="29" piano="0" active="1" X="628.0" Y="50.0"
+      <item name="" type="5" Id="14" piano="0" active="1" X="628.0" Y="50.0"
             W="106.0" H="72.0"/>
       <connections>
         <item name="" type="17" Id="7" piano="0" active="1" X="534.5" Y="50.0"
