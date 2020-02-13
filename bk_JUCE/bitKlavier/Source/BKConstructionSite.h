@@ -28,7 +28,7 @@ public:
     BKConstructionSite(BKAudioProcessor& p, /*Viewport* viewPort, */ BKItemGraph* theGraph);
     
     ~BKConstructionSite(void);
-    
+
     void redraw(void);
 
     void paint(Graphics& g) override;
@@ -57,6 +57,7 @@ public:
     void addItemsFromClipboard(void);
     
     void addItem(BKPreparationType type, bool center = false);
+    void addExistingItem(BKItem* toAdd);
     
     inline void setCurrentItem(BKItem* item) { currentItem = item;}
     inline BKItem* getCurrentItem(void) { return currentItem;}
@@ -176,9 +177,7 @@ private:
     BKItemGraph* graph;
     
     bool connect; 
-    
-    Component clickFrame;
-    
+
     juce::Point<int> lastPosition;
     
     int lastX, lastY;

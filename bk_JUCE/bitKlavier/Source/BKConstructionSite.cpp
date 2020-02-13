@@ -26,12 +26,7 @@ lastX(10),
 lastY(10),
 held(false)
 {
-    addAndMakeVisible(clickFrame);
-    clickFrame.setSize(5,5);
-    
     setWantsKeyboardFocus(false);
-    
-    addMouseListener(this, true);
 }
 
 BKConstructionSite::~BKConstructionSite(void)
@@ -261,7 +256,10 @@ void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 
 void BKConstructionSite::draw(void)
 {
-    for (auto item : processor.currentPiano->getItems()) addAndMakeVisible(item);
+    for (auto item : processor.currentPiano->getItems())
+    {
+        addExistingItem(item);
+    }
         
     if (processor.updateState->loadedJson)
     {
@@ -371,6 +369,7 @@ void BKConstructionSite::deleteItem (BKItem* item)
     removeChildComponent(item);
 }
 
+// This is used for adding an item to the gallery and piano through the UI
 void BKConstructionSite::addItem(BKPreparationType type, bool center)
 {
     int thisId = -1;
@@ -412,6 +411,14 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     graph->addItem(toAdd);
     
     addAndMakeVisible(toAdd);
+    toAdd->addMouseListener(this, true);
+}
+
+// This is for adding items that exist in the gallery to the UI
+void BKConstructionSite::addExistingItem(BKItem* toAdd)
+{
+    addAndMakeVisible(toAdd);
+    toAdd->addMouseListener(this, true);
 }
 
 BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
@@ -845,8 +852,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
                 graph->select(itemToSelect);
             }
             getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false, true).showMenuAsync
-            (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
-             ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
         }
         // Control click (same as right click on Mac)
 #if JUCE_MAC
@@ -858,8 +864,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
                 graph->select(itemToSelect);
             }
             getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false, true).showMenuAsync
-            (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
-             ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
         }
 #endif
         else if (e.mods.isShiftDown())
@@ -923,15 +928,13 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
         if (e.mods.isRightButtonDown())
         {
             getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
-            (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
-             ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            (PopupMenu::Options(), ModalCallbackFunction::forComponent(editMenuCallback, this));
         }
 #if JUCE_MAC
         else if (e.mods.isCtrlDown())
         {
             getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
-            (PopupMenu::Options().withTargetScreenArea(Rectangle<int>(Desktop::getMousePosition(), Desktop::getMousePosition())),
-             ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            (PopupMenu::Options(), ModalCallbackFunction::forComponent(editMenuCallback, this) );
         }
 #endif
         else

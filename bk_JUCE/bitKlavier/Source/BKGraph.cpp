@@ -36,10 +36,6 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     comment.setScrollbarsShown(false);
     comment.setEnabled(false);
     
-#if !JUCE_IOS
-    comment.addMouseListener(this, true);
-#endif
-    
     setPianoTarget(0);
     
     if (type == PreparationTypeTuning)

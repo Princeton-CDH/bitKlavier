@@ -111,6 +111,7 @@ timerCallbackCount(0)
     addAndMakeVisible(header);
     
     addAndMakeVisible(construction);
+
     
     addChildComponent(overtop);
     
