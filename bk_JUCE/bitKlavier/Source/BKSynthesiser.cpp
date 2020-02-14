@@ -501,6 +501,8 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     
     // needed for MIDI Out; will just return the last found voice, if there are multiple voices
     BKSynthesiserVoice* voiceToReturn;
+    
+    float sampleRateMS = 0.001f * getSampleRate();
 
 	for (int i = sounds.size(); --i >= 0;)
 	{
@@ -519,6 +521,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 					continue;
 				}
 			}
+            
             BKSynthesiserVoice* voice = findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes);
 			startVoice(findFreeVoice(sound, midiChannel, noteNumber, shouldStealNotes),
 				sound,
@@ -531,12 +534,12 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 				type,
 				bktype,
 				layer,
-				(uint64)((startingPositionMS * 0.001f) * getSampleRate()),
-				(uint64)(lengthMS * 0.001f * getSampleRate()),
-				adsrAttackMS * 0.001f * getSampleRate(),
-				adsrDecayMS * 0.001f * getSampleRate(),
+				(uint64)((startingPositionMS * sampleRateMS)),
+				(uint64)(lengthMS * sampleRateMS),
+				adsrAttackMS * sampleRateMS,
+				adsrDecayMS * sampleRateMS,
 				adsrSustain,
-				adsrReleaseMS * 0.001f * getSampleRate(),
+				adsrReleaseMS * sampleRateMS,
 				tuner,
 				BlendronicLevel,
 				blendronic);
