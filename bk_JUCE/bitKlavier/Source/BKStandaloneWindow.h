@@ -10,6 +10,14 @@
 
 #pragma once
 
+#if JUCE_WINDOWS
+#ifdef _DEBUG
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+#endif
+#endif 
+
 #include "PluginProcessor.h"
 
 #if JUCE_MODULE_AVAILABLE_juce_audio_plugin_client
@@ -67,6 +75,11 @@ public:
     shouldMuteInput (! isInterAppAudioConnected()),
     autoOpenMidiDevices (shouldAutoOpenMidiDevices)
     {
+#if JUCE_WINDOWS
+#ifdef _DEBUG
+        _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+#endif
         createPlugin();
         
         auto inChannels = (channelConfiguration.size() > 0 ? channelConfiguration[0].numIns

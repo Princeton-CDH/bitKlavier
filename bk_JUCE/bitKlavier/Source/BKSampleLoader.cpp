@@ -133,9 +133,9 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
             }
         }
         
-        DBG("~ ~ ~ ~ region " + String(count++) + " ~ ~ ~ ~ ~ ~");
-        DBG("sample: " + region->sample->getShortName());
-        DBG("offset: " + String(region->offset));
+        //DBG("~ ~ ~ ~ region " + String(count++) + " ~ ~ ~ ~ ~ ~");
+        //DBG("sample: " + region->sample->getShortName());
+        //DBG("offset: " + String(region->offset));
         region->end             -= region->offset;
         region->loop_start      -= region->offset;
         region->loop_end        -= region->offset;
@@ -152,12 +152,12 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         }
     
         
-        DBG("transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
+        //DBG("transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
         
-        DBG("end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
+        //DBG("end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
         
-        DBG("trigger: " +String(region->trigger));
-        DBG("pedal needed: " + String((int)region->pedal));
+        //DBG("trigger: " +String(region->trigger));
+        //DBG("pedal needed: " + String((int)region->pedal));
         
         
         

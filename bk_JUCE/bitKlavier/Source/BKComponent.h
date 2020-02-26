@@ -60,9 +60,9 @@ public:
     
     MouseHoldListener()
     {
-        mouseDownComponent = new Component();
+        mouseDownComponent = std::make_unique<Component>();
         mouseDownComponent->setSize(5,5);
-        addAndMakeVisible(mouseDownComponent);
+        addAndMakeVisible(mouseDownComponent.get());
         
         startTimer(50);
     }
@@ -99,7 +99,7 @@ public:
     
     Component* getMouseFrame(void)
     {
-        return mouseDownComponent;
+        return mouseDownComponent.get();
     }
     
 private:
@@ -112,7 +112,7 @@ private:
         {
             mouseHoldHappened = true;
             
-            mouseHold(mouseDownComponent, onItem);
+            mouseHold(mouseDownComponent.get(), onItem);
         }
     }
 
@@ -121,7 +121,7 @@ private:
     bool mouseHoldHappened;
     bool mouseDragHappened;
     bool mouseIsDown;
-    Component* mouseDownComponent;
+    std::unique_ptr<Component> mouseDownComponent;
     bool onItem;
     
     
