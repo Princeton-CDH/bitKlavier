@@ -317,8 +317,11 @@ namespace BinaryData
     extern const char*   tuning_icon_png;
     const int            tuning_icon_pngSize = 12404;
 
+    extern const char*   LICENSE;
+    const int            LICENSESize = 1152;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 103;
+    const int namedResourceListSize = 104;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

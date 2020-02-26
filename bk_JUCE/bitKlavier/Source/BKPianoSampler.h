@@ -49,7 +49,7 @@ public:
                          int rootMidiNote,
                          int transpose,
                          const BigInteger& midiVelocities,
-                         sfzero::Region* region = nullptr,
+                         sfzero::Region::Ptr region = nullptr,
                          bool isSF2 = true);
 
     

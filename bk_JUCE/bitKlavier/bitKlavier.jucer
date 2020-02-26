@@ -214,6 +214,55 @@
               file="Source/GraphicsConstants.h"/>
       </GROUP>
       <GROUP id="{754B7718-DE02-827A-21E1-1FB69E01DE50}" name="Utilities">
+        <GROUP id="{AEA67C46-9692-A274-A2D7-A2EB6AC3B59C}" name="SFZero">
+          <GROUP id="{80C7D4AF-BB5C-5D82-478E-61C64C63A6C5}" name="sfzero">
+            <GROUP id="{8E36F982-060A-7579-8948-70E7E76427F7}" name="sf2-chunks">
+              <FILE id="NVRmoU" name="generators.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/generators.h"/>
+              <FILE id="PmWks3" name="ibag.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/ibag.h"/>
+              <FILE id="fNTX57" name="igen.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/igen.h"/>
+              <FILE id="L3ejqx" name="imod.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/imod.h"/>
+              <FILE id="lK4muQ" name="inst.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/inst.h"/>
+              <FILE id="oPug79" name="iver.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/iver.h"/>
+              <FILE id="pwQXv9" name="pbag.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/pbag.h"/>
+              <FILE id="WY4Kat" name="pgen.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/pgen.h"/>
+              <FILE id="rGuPnW" name="phdr.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/phdr.h"/>
+              <FILE id="pXGiPR" name="pmod.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/pmod.h"/>
+              <FILE id="sCVLTt" name="shdr.h" compile="0" resource="0" file="Source/SFZero/sfzero/sf2-chunks/shdr.h"/>
+            </GROUP>
+            <FILE id="ag6xw8" name="RIFF.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/RIFF.cpp"/>
+            <FILE id="OnTA4A" name="RIFF.h" compile="0" resource="0" file="Source/SFZero/sfzero/RIFF.h"/>
+            <FILE id="GZE11Q" name="SF2.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SF2.cpp"/>
+            <FILE id="rmGE71" name="SF2.h" compile="0" resource="0" file="Source/SFZero/sfzero/SF2.h"/>
+            <FILE id="NTaO3t" name="SF2Generator.cpp" compile="1" resource="0"
+                  file="Source/SFZero/sfzero/SF2Generator.cpp"/>
+            <FILE id="sBceKN" name="SF2Generator.h" compile="0" resource="0" file="Source/SFZero/sfzero/SF2Generator.h"/>
+            <FILE id="Wem73f" name="SF2Reader.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SF2Reader.cpp"/>
+            <FILE id="g0RnbN" name="SF2Reader.h" compile="0" resource="0" file="Source/SFZero/sfzero/SF2Reader.h"/>
+            <FILE id="wGqyt9" name="SF2Sound.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SF2Sound.cpp"/>
+            <FILE id="X21LZY" name="SF2Sound.h" compile="0" resource="0" file="Source/SFZero/sfzero/SF2Sound.h"/>
+            <FILE id="wW9vJn" name="SF2WinTypes.h" compile="0" resource="0" file="Source/SFZero/sfzero/SF2WinTypes.h"/>
+            <FILE id="vNNuIN" name="SFZCommon.h" compile="0" resource="0" file="Source/SFZero/sfzero/SFZCommon.h"/>
+            <FILE id="RCnGxI" name="SFZDebug.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SFZDebug.cpp"/>
+            <FILE id="y3jasW" name="SFZDebug.h" compile="0" resource="0" file="Source/SFZero/sfzero/SFZDebug.h"/>
+            <FILE id="r1SgBz" name="SFZEG.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SFZEG.cpp"/>
+            <FILE id="N6k0Ak" name="SFZEG.h" compile="0" resource="0" file="Source/SFZero/sfzero/SFZEG.h"/>
+            <FILE id="l4Ysf6" name="SFZReader.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SFZReader.cpp"/>
+            <FILE id="onWp8q" name="SFZReader.h" compile="0" resource="0" file="Source/SFZero/sfzero/SFZReader.h"/>
+            <FILE id="jjdpoi" name="SFZRegion.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SFZRegion.cpp"/>
+            <FILE id="Qu0ZMw" name="SFZRegion.h" compile="0" resource="0" file="Source/SFZero/sfzero/SFZRegion.h"/>
+            <FILE id="YM3dmx" name="SFZSample.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SFZSample.cpp"/>
+            <FILE id="PYsjCX" name="SFZSample.h" compile="0" resource="0" file="Source/SFZero/sfzero/SFZSample.h"/>
+            <FILE id="ktiDpN" name="SFZSound.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SFZSound.cpp"/>
+            <FILE id="LMt3rF" name="SFZSound.h" compile="0" resource="0" file="Source/SFZero/sfzero/SFZSound.h"/>
+            <FILE id="c8x0ZS" name="SFZSynth.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SFZSynth.cpp"/>
+            <FILE id="VruqAK" name="SFZSynth.h" compile="0" resource="0" file="Source/SFZero/sfzero/SFZSynth.h"/>
+            <FILE id="CWyprg" name="SFZVoice.cpp" compile="1" resource="0" file="Source/SFZero/sfzero/SFZVoice.cpp"/>
+            <FILE id="ylVIju" name="SFZVoice.h" compile="0" resource="0" file="Source/SFZero/sfzero/SFZVoice.h"/>
+          </GROUP>
+          <FILE id="OrV37d" name="LICENSE" compile="0" resource="1" file="Source/SFZero/LICENSE"/>
+          <FILE id="jbqoKw" name="SFZero.cpp" compile="1" resource="0" file="Source/SFZero/SFZero.cpp"/>
+          <FILE id="dvId0B" name="SFZero.h" compile="0" resource="0" file="Source/SFZero/SFZero.h"/>
+        </GROUP>
         <FILE id="RLR4Cp" name="BKSTK.cpp" compile="1" resource="0" file="Source/BKSTK.cpp"/>
         <FILE id="ONrP9z" name="BKSTK.h" compile="0" resource="0" file="Source/BKSTK.h"/>
         <FILE id="N85SXV" name="BKUtilities.cpp" compile="1" resource="0" file="Source/BKUtilities.cpp"/>
@@ -466,7 +515,6 @@
         <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="SFZero" path="../../../modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
@@ -498,7 +546,6 @@
         <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
-        <MODULEPATH id="SFZero" path="../../../modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2017 targetFolder="Builds/VisualStudio2017" bigIcon="iHGLGD" smallIcon="smHM8h"
@@ -527,7 +574,6 @@
         <MODULEPATH id="juce_audio_devices" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="SFZero" path="../../../modules"/>
       </MODULEPATHS>
     </VS2017>
     <VS2019 targetFolder="Builds/VisualStudio2019" bigIcon="iHGLGD" windowsTargetPlatformVersion="10.0.18362.0"
@@ -553,7 +599,6 @@
         <MODULEPATH id="juce_audio_devices"/>
         <MODULEPATH id="juce_audio_basics"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../../../../../Program Files/JUCE/modules"/>
-        <MODULEPATH id="SFZero" path="../../../modules"/>
       </MODULEPATHS>
     </VS2019>
   </EXPORTFORMATS>
@@ -574,7 +619,6 @@
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
-    <MODULE id="SFZero" showAllCode="1" useLocalCopy="1" useGlobalPath="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_QUICKTIME="disabled" JUCE_VST3_CAN_REPLACE_VST2="0"/>
   <LIVE_SETTINGS>

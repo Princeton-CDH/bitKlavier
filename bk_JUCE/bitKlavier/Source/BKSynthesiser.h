@@ -13,6 +13,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
+#include "SFZero/SFZero.h"
+
 #include "AudioConstants.h"
 
 #include "General.h"
@@ -29,12 +31,12 @@ class SFRegion : public ReferenceCountedObject
 public:
     typedef ReferenceCountedObjectPtr<SFRegion>   Ptr;
     typedef Array<SFRegion::Ptr>                  PtrArr;
-    SFRegion(sfzero::Region* r):
+    SFRegion(sfzero::Region::Ptr r):
     region(r){}
     
     ~SFRegion(){}
     
-    sfzero::Region* region;
+    sfzero::Region::Ptr region;
     
 private:
     
@@ -78,7 +80,7 @@ public:
     /** The class is reference-counted, so this is a handy pointer class for it. */
     typedef ReferenceCountedObjectPtr<BKSynthesiserSound> Ptr;
     
-    sfzero::Region* region_;
+    sfzero::Region::Ptr region_;
     uint64 sampleLength;
     sfzero::Region::Trigger trigger;
     bool pedal;
@@ -755,7 +757,7 @@ protected:
     /** Can be overridden to do custom handling of incoming midi events. */
     virtual void handleMidiEvent (const MidiMessage&);
     
-    juce::Array<sfzero::Region *> regions_;
+    juce::Array<sfzero::Region::Ptr > regions_;
     
 private:
     

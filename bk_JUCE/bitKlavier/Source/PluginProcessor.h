@@ -89,7 +89,7 @@ public:
     
     void openSoundfont(void);
     
-    Array<sfzero::Region*> regions;
+    sfzero::Region::PtrArr regions;
     
     AudioFormatManager formatManager;
     std::unique_ptr<AudioFormatReader> sampleReader;

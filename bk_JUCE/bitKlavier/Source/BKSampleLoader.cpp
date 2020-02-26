@@ -41,15 +41,15 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     
     bool isSF2 = false;
     
-    std::unique_ptr<sfzero::SF2Sound>     sf2sound;
-    std::unique_ptr<sfzero::SF2Reader>    sf2reader;
-    std::unique_ptr<sfzero::Sound>     sfzsound;
-    std::unique_ptr<sfzero::Reader>    sfzreader;
+    sfzero::SF2Sound::Ptr     sf2sound;
+    sfzero::SF2Reader::Ptr    sf2reader;
+    sfzero::Sound::Ptr        sfzsound;
+    sfzero::Reader::Ptr       sfzreader;
     
     if      (ext == ".sf2")
     {
         isSF2 = true;
-        sf2sound   = std::make_unique<sfzero::SF2Sound>(sfzFile);
+        sf2sound   = new sfzero::SF2Sound(sfzFile);
         
         sf2sound->loadRegions(processor.currentInstrument);
         sf2sound->loadSamples(&formatManager);
@@ -68,7 +68,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     }
     else if (ext == ".sfz")
     {
-        sfzsound   = std::make_unique<sfzero::Sound>(sfzFile);
+        sfzsound   = new sfzero::Sound(sfzFile);
         
         processor.currentInstrument = 0;
 
@@ -91,7 +91,6 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     }
     else    return;
 
-    int count = 0;
     for (auto region : processor.regions)
     {
         processor.progress += processor.progressInc;

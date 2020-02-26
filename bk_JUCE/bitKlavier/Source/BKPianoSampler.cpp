@@ -21,7 +21,7 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const int rootMidiNote,
                                           const int transp,
                                           const BigInteger& velocities,
-                                          sfzero::Region* reg, bool isSF2)
+                                          sfzero::Region::Ptr reg, bool isSF2)
 :
 name (soundName),
 data(buffer),
@@ -38,7 +38,7 @@ transpose(transp)
     if (reg != nullptr)
     {
         region_ = new sfzero::Region();
-        *region_ = *reg;
+        *region_ = std::move(*reg);
         
         isSoundfont = true;
         
