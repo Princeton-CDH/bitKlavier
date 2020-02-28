@@ -32,11 +32,9 @@ public:
     inline void timerCallback(void) override
     {
         time++;
-        if (type == PreparationTypeKeymap)
-        {
-            repaint();
-        }
-        else if (type == PreparationTypeSynchronic)
+        if (type == PreparationTypeKeymap ||
+            type == PreparationTypeSynchronic ||
+            type == PreparationTypeNostalgic)
         {
             repaint();
         }

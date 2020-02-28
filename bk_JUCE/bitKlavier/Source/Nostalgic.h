@@ -962,6 +962,7 @@ public:
     
     inline float getLastVelocity() const noexcept { return lastVelocity; }
     inline int getNumActiveNotes() const noexcept { return activeNotes.size(); }
+    inline int getNumReverseNotes() const noexcept { return reverseNotes.size(); }
     inline int getCurrentClusterSize() const noexcept { return currentClusterSize; }
     inline int getClusterThresholdTimer() const noexcept { return clusterThresholdTimer * 1000. / synth->getSampleRate(); }
     

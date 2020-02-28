@@ -325,6 +325,14 @@ void BKItem::paint(Graphics& g)
             synchronicNotePlayTime--;
         }
     }
+    else if (type == PreparationTypeNostalgic)
+    {
+        if (processor.currentPiano->getNostalgicProcessor(Id)->getNumReverseNotes() > 0)
+        {
+            g.setColour(Colours::blue.withAlpha(0.4f));
+            g.fillRect(getLocalBounds());
+        }
+    }
 }
 
 
