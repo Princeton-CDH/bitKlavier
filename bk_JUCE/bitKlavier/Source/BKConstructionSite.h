@@ -53,6 +53,7 @@ public:
     void removeConnectionsBetween();
     
     inline int getNumSelected(void) { return graph->getSelectedItems().size(); }
+    inline BKItem::PtrArr getSelectedItems(void) { return graph->getSelectedItems(); }
     
     void addItemsFromClipboard(void);
     

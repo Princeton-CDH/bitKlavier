@@ -21,7 +21,8 @@ general(general),
 synchronic(synchronic),
 tuner(tuning),
 tempo(tempo),
-keymaps(Keymap::PtrArr())
+keymaps(Keymap::PtrArr()),
+notePlayed(false)
 {
     velocities.ensureStorageAllocated(128);
     holdTimers.ensureStorageAllocated(128);
@@ -41,8 +42,6 @@ keymaps(Keymap::PtrArr())
     activeSynchronicVoices.resize(128);
     activeSynchronicVoices.fill(nullptr);
 }
-
-
 
 SynchronicProcessor::~SynchronicProcessor()
 {
@@ -134,6 +133,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 					tuner);
 		}
         
+        notePlayed = true;
         if (prep->getMidiOutput() != nullptr)
         {
             activeSynchronicVoices.set(currentVoice->getCurrentlyPlayingNote(), currentVoice);

@@ -114,6 +114,7 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
         comment.setName("Comment");
     }
     startTimerHz(20);
+    synchronicNotePlayTime = 0;
 }
 
 BKItem::~BKItem()
@@ -309,6 +310,19 @@ void BKItem::paint(Graphics& g)
         {
             g.setColour(Colours::yellow.withAlpha(0.4f));
             g.fillRect(getLocalBounds());
+        }
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+        if (processor.currentPiano->getSynchronicProcessor(Id)->noteDidPlay())
+        {
+            synchronicNotePlayTime = 4;
+        }
+        if (synchronicNotePlayTime > 0)
+        {
+            g.setColour(Colours::red.withAlpha(0.4f));
+            g.fillRect(getLocalBounds());
+            synchronicNotePlayTime--;
         }
     }
 }

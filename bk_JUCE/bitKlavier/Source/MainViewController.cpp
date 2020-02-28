@@ -620,6 +620,14 @@ void MainViewController::timerCallback()
     
     Array<bool> noteOns = processor.getNoteOns();
     keyboardState.setKeymap(noteOns);
+    if (construction.getNumSelected() == 1)
+    {
+        BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
+        if (item->getType() == PreparationTypeKeymap)
+        {
+            keyboardState.setKeymap(processor.gallery->getKeymap(item->getId())->getKeymap());
+        }
+    }
     keyboard->repaint();
     
     if (state->pianoSamplesAreLoading)

@@ -1536,6 +1536,17 @@ public:
         return keymaps;
     }
     
+    // Trying out graph indication for synchronic, bit crude for now
+    inline bool noteDidPlay(void)
+    {
+        if (notePlayed)
+        {
+            notePlayed = false;
+            return true;
+        }
+        return notePlayed;
+    }
+    
 private:
     BKSynthesiser* synth;
     GeneralSettings::Ptr general;
@@ -1577,6 +1588,8 @@ private:
     Array<uint64> holdTimers;
     int lastKeyPressed;
     float lastKeyVelocity;
+    
+    bool notePlayed;
     
     BKSynthesiserVoice** asv;
     Array<BKSynthesiserVoice*> activeSynchronicVoices;
