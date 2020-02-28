@@ -157,7 +157,7 @@ inline PopupMenu getAlignMenu(LookAndFeel* laf)
     return menu;
 }
 
-inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGraph = false, bool rightClick = false)
+inline PopupMenu getEditMenuStandalone(LookAndFeel* laf, int numItemsSelected, bool onGraph = false, bool rightClick = false)
 {
     PopupMenu menu;
     menu.setLookAndFeel(laf);
@@ -202,6 +202,54 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
         menu.addItem(OFF_ID, "All Off");
     }
 
+    return menu;
+}
+
+inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGraph = false, bool rightClick = false)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(laf);
+    
+    if (numItemsSelected)
+    {
+        menu.addItem(COPY_ID, "Copy");
+        menu.addItem(CUT_ID, "Cut");
+        menu.addItem(PASTE_ID, "Paste");
+        menu.addItem(DELETE_ID, "Delete");
+        if (numItemsSelected == 1)
+        {
+            menu.addSeparator();
+            menu.addItem(EDIT_ID, "Edit" + gEditShortcut);
+            menu.addSeparator();
+            menu.addItem(CONNECTION_ID, "Make Connection" + gConnectionShortcut);
+            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected" + gDisconnectFromShortcut);
+        }
+        if (numItemsSelected > 1)
+        {
+            menu.addSeparator();
+            menu.addItem(CONNECT_ALL_ID, "Connect Selected" + gConnectAllShortcut);
+            menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected" + gDisconnectFromShortcut);
+            menu.addItem(DISCONNECT_BETWEEN_ID, "Remove Connections Between Selected" + gDisconnectBetweenShortcut);
+            menu.addSeparator();
+            menu.addSubMenu("Align" + gAlignShortcut, getAlignMenu(laf));
+        }
+    }
+    else if (numItemsSelected == 0)
+    {
+#if JUCE_IOS
+        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
+#else
+        menu.addSubMenu("Add...", getNewItemMenu(laf));
+#endif
+        menu.addSeparator();
+        menu.addItem(PASTE_ID, "Paste");
+    }
+    if (!rightClick)
+    {
+        menu.addSeparator();
+        menu.addItem(OFF_ID, "All Off");
+    }
+    
     return menu;
 }
 

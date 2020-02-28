@@ -18,7 +18,7 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ BKItem ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 ItemMapper(type, Id),
-BKDraggableComponent(true,false,true, 50, 50, 50, 50),
+BKDraggableComponent(true, false, true, 50, 50, 50, 50),
 processor(p),
 constrain(new ComponentBoundsConstrainer()),
 resizer(new ResizableCornerComponent (this, constrain.get()))
@@ -289,7 +289,6 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
 
 void BKItem::paint(Graphics& g)
 {
-    
     g.setOpacity (1.0f);
     g.drawImage (image, getLocalBounds().toFloat(), placement);
     
@@ -304,7 +303,14 @@ void BKItem::paint(Graphics& g)
         g.drawRect(getLocalBounds(),0);
     }
     
-    
+    if (type == PreparationTypeKeymap)
+    {
+        if (processor.gallery->getKeymap(Id)->getTriggeredKeys().contains(true))
+        {
+            g.setColour(Colours::yellow.withAlpha(0.4f));
+            g.fillRect(getLocalBounds());
+        }
+    }
 }
 
 

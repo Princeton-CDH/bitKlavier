@@ -90,16 +90,16 @@ void sfzero::SF2::Hydra::readFrom(juce::InputStream *file, juce::int64 pdtaChunk
 {
     int i, numItems;
     
-#define HandleChunk(chunkName)                                                                                                  \
+#define HandleChunk(chunkName)                                                                                                 \
 if (FourCCEquals(chunk.id, #chunkName))                                                                                        \
 {                                                                                                                              \
-numItems = chunk.size / SF2::chunkName::sizeInFile;                                                                          \
-chunkName##NumItems = numItems;                                                                                              \
-chunkName##Items = new SF2::chunkName[numItems];                                                                             \
-for (i = 0; i < numItems; ++i)                                                                                               \
-{                                                                                                                            \
-chunkName##Items[i].readFrom(file);                                                                                        \
-}                                                                                                                            \
+numItems = (int) (chunk.size / SF2::chunkName::sizeInFile);                                                                    \
+chunkName##NumItems = numItems;                                                                                                \
+chunkName##Items = new SF2::chunkName[numItems];                                                                               \
+for (i = 0; i < numItems; ++i)                                                                                                 \
+{                                                                                                                              \
+chunkName##Items[i].readFrom(file);                                                                                            \
+}                                                                                                                              \
 }                                                                                                                              \
 else
     

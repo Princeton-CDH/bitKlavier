@@ -798,8 +798,16 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
     }
     else
     {
-        getEditMenu(&buttonsAndMenusLAF, 0, true).showMenuAsync(PopupMenu::Options().withTargetComponent(getMouseFrame()),
-                                                                ModalCallbackFunction::forComponent(editMenuCallback, this));
+        if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+        {
+            getEditMenuStandalone(&buttonsAndMenusLAF, 0, true).showMenuAsync(PopupMenu::Options().withTargetComponent(getMouseFrame()),
+                                                                    ModalCallbackFunction::forComponent(editMenuCallback, this));
+        }
+        else
+        {
+            getEditMenu(&buttonsAndMenusLAF, 0, true).showMenuAsync(PopupMenu::Options().withTargetComponent(getMouseFrame()),
+                                                                    ModalCallbackFunction::forComponent(editMenuCallback, this));
+        }
     }
     
 #endif
@@ -851,8 +859,16 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
                 graph->deselectAll();
                 graph->select(itemToSelect);
             }
-            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false, true).showMenuAsync
-            (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+            {
+                getEditMenuStandalone(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false, true).showMenuAsync
+                (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            }
+            else
+            {
+                getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false, true).showMenuAsync
+                (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            }
         }
         // Control click (same as right click on Mac)
 #if JUCE_MAC
@@ -863,8 +879,16 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
                 graph->deselectAll();
                 graph->select(itemToSelect);
             }
-            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false, true).showMenuAsync
-            (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+            {
+                getEditMenuStandalone(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false, true).showMenuAsync
+                (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            }
+            else
+            {
+                getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), false, true).showMenuAsync
+                (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            }
         }
 #endif
         else if (e.mods.isShiftDown())
@@ -927,14 +951,30 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
     {
         if (e.mods.isRightButtonDown())
         {
-            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
-            (PopupMenu::Options(), ModalCallbackFunction::forComponent(editMenuCallback, this));
+            if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+            {
+                getEditMenuStandalone(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
+                (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            }
+            else
+            {
+                getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
+                (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            }
         }
 #if JUCE_MAC
         else if (e.mods.isCtrlDown())
         {
-            getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
-            (PopupMenu::Options(), ModalCallbackFunction::forComponent(editMenuCallback, this) );
+            if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+            {
+                getEditMenuStandalone(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
+                (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            }
+            else
+            {
+                getEditMenu(&buttonsAndMenusLAF, graph->getSelectedItems().size(), true, true).showMenuAsync
+                (PopupMenu::Options(), ModalCallbackFunction::forComponent (editMenuCallback, this) );
+            }
         }
 #endif
         else

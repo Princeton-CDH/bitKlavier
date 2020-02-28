@@ -20,6 +20,7 @@ keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
 midiEdit(false),
 inverted(false),
+triggered(false),
 midiInputSources(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true)
@@ -28,6 +29,12 @@ onscreenSelected(true)
     for (int i = 0; i < 128; i++)
     {
         keymap.add(false);
+    }
+    
+    triggered.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++)
+    {
+        triggered.add(false);
     }
     
     targetStates.ensureStorageAllocated(TargetTypeNil);

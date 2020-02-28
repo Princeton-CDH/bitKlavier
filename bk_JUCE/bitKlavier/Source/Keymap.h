@@ -266,6 +266,8 @@ public:
     inline bool isInverted(void) const noexcept { return inverted; }
     inline void setInverted(bool inv) { inverted = inv; }
     
+    inline Array<bool> getTriggeredKeys() const noexcept { return triggered; }
+    inline void setTriggered(int key, bool trig) { triggered.set(key, trig); }
     
     inline const Array<String> getMidiInputSources() const noexcept { return midiInputSources; }
     const Array<String> getAllMidiInputSources();
@@ -311,6 +313,8 @@ private:
     bool midiEdit;
     
     bool inverted;
+    
+    Array<bool> triggered;
     
     Array<String> midiInputSources;
     

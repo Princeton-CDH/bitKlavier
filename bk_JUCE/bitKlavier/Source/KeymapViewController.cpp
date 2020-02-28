@@ -136,7 +136,10 @@ BKViewController(p, theGraph, 1)
     midiEditToggle.setButtonText ("midi edit");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(true);
     midiEditToggle.setToggleState (false, dontSendNotification);
-    midiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap" + gMidiEditShortcut);
+    if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+        midiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap" + gMidiEditShortcut);
+    else
+        midiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap");
     midiEditToggle.addListener(this);
     addAndMakeVisible(&midiEditToggle, ALL);
     

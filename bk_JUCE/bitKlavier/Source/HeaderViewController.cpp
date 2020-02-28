@@ -185,8 +185,16 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     
     galleryMenu.addItem(NEWGALLERY_ID, "New");
     
-    galleryMenu.addItem(SAVE_ID, "Save" + gSaveShortcut);
-    galleryMenu.addItem(SAVEAS_ID, "Save as" + gSaveAsShortcut);
+    if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+    {
+        galleryMenu.addItem(SAVE_ID, "Save" + gSaveShortcut);
+        galleryMenu.addItem(SAVEAS_ID, "Save as" + gSaveAsShortcut);
+    }
+    else
+    {
+        galleryMenu.addItem(SAVE_ID, "Save");
+        galleryMenu.addItem(SAVEAS_ID, "Save as");
+    }
     
     if (!processor.defaultLoaded)
     {
@@ -554,8 +562,14 @@ void HeaderViewController::bkButtonClicked (Button* b)
     
     if (b == &editB)
     {
-         getEditMenu(&buttonsAndMenusLAF, construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent (b),
-         ModalCallbackFunction::forComponent (BKConstructionSite::editMenuCallback, construction) );
+        if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+        {
+             getEditMenuStandalone(&buttonsAndMenusLAF, construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent (b), ModalCallbackFunction::forComponent(BKConstructionSite::editMenuCallback, construction) );
+        }
+        else
+        {
+            getEditMenu(&buttonsAndMenusLAF, construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent(b), ModalCallbackFunction::forComponent(BKConstructionSite::editMenuCallback, construction) );
+        }
     }
     else if (b == &pianoB)
     {

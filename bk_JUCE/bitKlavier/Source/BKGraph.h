@@ -32,7 +32,11 @@ public:
     inline void timerCallback(void) override
     {
         time++;
-    };
+        if (type == PreparationTypeKeymap)
+        {
+            repaint();
+        }
+    }
     
     ~BKItem(void);
 
