@@ -198,8 +198,8 @@ private:
     BKItem* upperLeftest;
     
     std::unique_ptr<LassoComponent<BKItem*>> lasso;
-    
-    SelectedItemSet<BKItem*> selected;
+    bool inLasso;
+    SelectedItemSet<BKItem*> lassoSelection;
     
     void findLassoItemsInArea (Array <BKItem*>& itemsFound,
                                                    const Rectangle<int>& area) override;

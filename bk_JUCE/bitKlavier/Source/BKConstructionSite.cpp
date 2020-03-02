@@ -24,7 +24,8 @@ graph(theGraph),
 connect(false),
 lastX(10),
 lastY(10),
-held(false)
+held(false),
+inLasso(false)
 {
     setWantsKeyboardFocus(false);
 }
@@ -124,7 +125,7 @@ void BKConstructionSite::deleteSelected(void)
         deleteItem(selectedItems[i]);
     }
     
-    selected.deselectAll();
+    lassoSelection.deselectAll();
     
     selectedItems.clear();
     
@@ -482,9 +483,9 @@ BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
 
 void BKConstructionSite::copy(void)
 {
-    BKItem::PtrArr selected = graph->getSelectedItems();
+    BKItem::PtrArr selectedItems = graph->getSelectedItems();
 
-    processor.setClipboard(duplicate(selected));
+    processor.setClipboard(duplicate(selectedItems));
     
     getParentComponent()->grabKeyboardFocus();
 }
@@ -983,18 +984,18 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
             {
                 graph->deselectAll();
             }
+            lassoSelection.deselectAll();
             
-            selected.deselectAll();
+            lasso = std::make_unique<LassoComponent<BKItem*>>();
+            addAndMakeVisible(*lasso);
+            
+            lasso->setAlpha(0.5);
+            lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoFillColourId, Colours::lightgrey);
+            lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::antiquewhite);
+            
+            lasso->beginLasso(eo, this);
+            inLasso = true;
         }
-        lasso = std::make_unique<LassoComponent<BKItem*>>();
-        addAndMakeVisible(*lasso);
-        
-        lasso->setAlpha(0.5);
-        lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoFillColourId, Colours::lightgrey);
-        lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::antiquewhite);
-        
-        lasso->beginLasso(eo, this);
-        
         // Stop trying to make a connection on blank space click
         connect = false;
     }
@@ -1002,6 +1003,7 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
 
 void BKConstructionSite::mouseUp (const MouseEvent& eo)
 {
+    inLasso = false;
     if (edittingComment) return;
     
     MouseEvent e = eo.getEventRelativeTo(this);
@@ -1019,15 +1021,19 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     
     getParentComponent()->grabKeyboardFocus();
 
-    if (itemToSelect == nullptr) lasso->endLasso();
-    
-    if (selected.getNumSelected())
+    if (itemToSelect == nullptr)
     {
-        if (!eo.mods.isShiftDown()) graph->deselectAll();
+        lasso->endLasso();
+    }
+    
+    if (lassoSelection.getNumSelected())
+    {
+        for (auto item : lassoSelection)
+        {
+            graph->select(item);
+        }
         
-        for (auto item : selected)  graph->select(item);
-        
-        selected.deselectAll();
+        lassoSelection.deselectAll();
         
         return;
     }
@@ -1076,7 +1082,7 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
     
     if (itemToSelect == nullptr) lasso->dragLasso(e);
     
-    if (!connect && !e.mods.isShiftDown())
+    if (!connect && !e.mods.isShiftDown() && !inLasso)
     {
         for (auto item : graph->getSelectedItems())
         {
@@ -1178,5 +1184,5 @@ void BKConstructionSite::findLassoItemsInArea (Array <BKItem*>& itemsFound,
 
 SelectedItemSet<BKItem*>& BKConstructionSite::getLassoSelection(void)
 {
-    return selected;
+    return lassoSelection;
 }
