@@ -72,6 +72,15 @@ public:
     bool appliesToChannel (int midiChannel) override;
     bool isSoundfontSound(void);
     
+    inline void setAllTimes(float a, float h, float d, float s, float r)
+    {
+        attack = a;
+        hold = h;
+        decay = d;
+        sustain = s;
+        release = r;
+    }
+    
 private:
     //==============================================================================
     friend class BKPianoSamplerVoice;
