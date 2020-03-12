@@ -348,13 +348,13 @@ void BKPianoSamplerVoice::startNote (const int midi,
             else if (playType == FixedLengthFixedStart)
             {
                 sourceSamplePosition = startingPosition * pitchRatio;
-                if (playLength >= sourceSamplePosition)
+                if (totalLength * pitchRatio > sourceSamplePosition)
                 {
-                    playEndPosition = (double)adsrRelease * pitchRatio;
+                    playEndPosition = (double)(sourceSamplePosition - playLength);
                 }
                 else
                 {
-                    playEndPosition = (double)(sourceSamplePosition - playLength);
+                    playEndPosition = (double)adsrRelease * pitchRatio;
                 }
             }
             else
@@ -446,26 +446,25 @@ void BKPianoSamplerVoice::startNote (const int midi,
                     loopPosition = sound->loopStart;
 //#if REVENV
                     // total length of sound minus the length of the AHDR should be how long sample was sustained (hold in reverse)
-                    double totalLen = (totalLength * pitchRatio);
-                    double envLen = ((sound->release + sound->decay + sound->hold + sound->attack) * getSampleRate());
+                    double totalLen = totalLength;// * pitchRatio;
+                    double envLen = ((sound->release + sound->decay + sound->attack) * getSampleRate());
 //                    double envLenNoRelease = ((sound->release + sound->decay + sound->hold + sound->attack) * getSampleRate());
 
-                    if (totalLen > envLen)
+//                    if (totalLen > envLen)
                     {
-                        double holdSamples = totalLen - envLen;
+                        double holdSamples = 0;//totalLen - envLen;
                         sfzadsr.setAttackTarget(sound->sustain);
-                        sfzadsr.setAllTimes(sound->release,
+                        sfzadsr.setAllTimes(sound->attack,
                                             (holdSamples / getSampleRate()), // hold length in seconds
                                             sound->decay,
                                             1.0f,
-                                            sound->attack);
+                                            sound->release);
                     }
 //                    else
-//#endif
 //                    {
-//                        sfzadsr.setAttackTarget(1.0f);
+//                        sfzadsr.setAttackTarget(sound->sustain);
 //                        sfzadsr.setAllTimes(0.001f,
-//                                            0.001f,
+//                                            totalLen / getSampleRate(),
 //                                            0.001f,
 //                                            1.0f,
 //                                            0.001f);
@@ -623,9 +622,9 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                 inLoop = false;
 
                 samplePosition = reversePosition;  //was original code
-                
+
                 loopEnv.keyOff(); //DT: should be keyOff/On or setTarget, set setValue
-                
+
                 sampleEnv.keyOn();
             }
         }
@@ -650,8 +649,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         float l,r;
         
-        l = lgain * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
-        r = rgain * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
+        l = lgain * adsr.tick()     * sfzadsr.tick()    * loopL;// * loopEnv.tick()    ;//   + sampleL * sampleEnv.tick());
+        r = rgain * adsr.lastOut()  * sfzadsr.lastOut() * loopR;// * loopEnv.lastOut() ;//   + sampleR * sampleEnv.lastOut());
         
         if (!blendronic.isEmpty())
         {
