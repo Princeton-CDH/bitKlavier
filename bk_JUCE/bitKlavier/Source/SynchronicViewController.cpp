@@ -1074,6 +1074,18 @@ void SynchronicPreparationEditor::update(NotificationType notify)
     
     SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
+    // DEAL WITH ENVELOPE
+    for(int i=0; i<envelopeSliders.size(); i++)
+    {
+        envelopeSliders[i]->setVisible(true);
+        envelopeSliders[i]->setAlpha(0.5);
+        envelopeSliders[i]->setButtonText(String(""));
+        envelopeSliders[i]->resized();
+    }
+    //envelopeName.setVisible(true);
+    
+    if(envelopeSliders[visibleADSR]->isEnabled()) envelopeSliders[visibleADSR]->setActive();
+    
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentSynchronicId, notify);
