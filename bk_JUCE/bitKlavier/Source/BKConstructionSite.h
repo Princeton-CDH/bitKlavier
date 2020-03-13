@@ -190,12 +190,12 @@ private:
 
     
     
-    BKItem* itemSource;
-    BKItem* itemTarget;
-    BKItem* itemToSelect;
-    BKItem* lastItem;
-    BKItem* currentItem;
-    BKItem* upperLeftest;
+    BKItem::Ptr itemSource;
+    BKItem::Ptr itemTarget;
+    BKItem::Ptr itemToSelect;
+    BKItem::Ptr lastItem;
+    BKItem::Ptr currentItem;
+    BKItem::Ptr upperLeftest;
     
     std::unique_ptr<LassoComponent<BKItem*>> lasso;
     bool inLasso;

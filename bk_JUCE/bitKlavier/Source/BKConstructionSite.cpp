@@ -524,7 +524,12 @@ void BKConstructionSite::paste(void)
 
         newItem->setSelected(true);
         
-        newItem->setTopLeftPosition((newItem->getX()-offsetX) + lastEX, (newItem->getY()-offsetY) + lastEY);
+        int newX = (newItem->getX()-offsetX) + lastEX;
+        int newY = (newItem->getY()-offsetY) + lastEY;
+        if (newX > this->getWidth() - newItem->getWidth()) newX = this->getWidth() - newItem->getWidth();
+        if (newY > this->getHeight() - newItem->getHeight()) newY = this->getHeight() - newItem->getHeight();
+        
+        newItem->setTopLeftPosition(newX, newY);
         
         processor.currentPiano->add(newItem, false); // make sure not to configure yet or bad ids will cause a crash
         
@@ -1100,7 +1105,7 @@ void BKConstructionSite::mouseDrag (const MouseEvent& e)
 
 void BKConstructionSite::idDidChange(void)
 {
-    if (currentItem == NULL) return;
+    if (currentItem == nullptr) return;
     
     BKPreparationType type = currentItem->getType();
     

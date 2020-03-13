@@ -446,8 +446,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
                     loopPosition = sound->loopStart;
 //#if REVENV
                     // total length of sound minus the length of the AHDR should be how long sample was sustained (hold in reverse)
-                    double totalLen = totalLength;// * pitchRatio;
-                    double envLen = ((sound->release + sound->decay + sound->attack) * getSampleRate());
+//                    double totalLen = totalLength;// * pitchRatio;
+//                    double envLen = ((sound->release + sound->decay + sound->attack) * getSampleRate());
 //                    double envLenNoRelease = ((sound->release + sound->decay + sound->hold + sound->attack) * getSampleRate());
 
 //                    if (totalLen > envLen)
