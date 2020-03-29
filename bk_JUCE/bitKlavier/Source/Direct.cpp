@@ -38,30 +38,31 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
     
     for (auto t : direct->aPrep->getTransposition())
     {
+        // synthNoteNumber is what determines what sample is chosen
+        // without transposition or extreme tuning, this will be the same as noteNumber
+        // we need to keep track of both, for noteOff messages, since with transpositions
+        // we may have multiple synthNotes associated with one key/noteNumber
         int synthNoteNumber = noteNumber;
         
-        float offset;
-        float synthOffset;
+        float offset; // offset from integer, but may be greater than 1
+        float synthOffset; // offset from actual sample played, always less than 1.
         
+        // tune the transposition
         bool useTuningForTransp = 0;
-        if (useTuningForTransp) {
+        if (useTuningForTransp) { // use the Tuning setting
             offset = t + tuner->getOffset((int)t + noteNumber, false);
             synthOffset = offset;
         }
-        else {
+        else { // or set it absolutely, tuning only the note that is played (default, and original behavior)
             offset = t + tuner->getOffset(noteNumber, false);
             synthOffset = offset;
         }
         
+        // if offset is greater than 1, we change the synthNoteNumber and reset the offSet accordingly
+        synthNoteNumber += (int)offset;
+        synthOffset     -= (int)offset;
         
-        //if (sampleType < BKLoadSoundfont)
-        {
-            synthNoteNumber += (int)offset;
-            synthOffset     -= (int)offset;
-        }
-        
-        //DBG("DirectProcessor::keyPressed noteNumber, synthNoteNumber, synthOffset " + String(noteNumber) + " " + String(synthNoteNumber) + " " + String(synthOffset));
-        
+        // blendronic stuff, or not
 		if (!blendronic.isEmpty())
 		{
             for (auto b : blendronic)
