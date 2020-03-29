@@ -49,14 +49,12 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         
         // tune the transposition
         bool useTuningForTransp = 0;
-        if (useTuningForTransp) { // use the Tuning setting
+        if (useTuningForTransp) // use the Tuning setting
             offset = t + tuner->getOffset((int)t + noteNumber, false);
-            synthOffset = offset;
-        }
-        else { // or set it absolutely, tuning only the note that is played (default, and original behavior)
+        else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
             offset = t + tuner->getOffset(noteNumber, false);
-            synthOffset = offset;
-        }
+        
+        synthOffset = offset;
         
         // if offset is greater than 1, we change the synthNoteNumber and reset the offSet accordingly
         synthNoteNumber += (int)offset;
