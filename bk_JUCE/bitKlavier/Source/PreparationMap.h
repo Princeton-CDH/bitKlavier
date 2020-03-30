@@ -48,8 +48,8 @@ public:
     void sustainPedalReleased(bool post);
     void sustainPedalReleased(Array<bool> keysThatArePressed, bool post);
     void sustainPedalReleased() { sustainPedalReleased(false); };
-    void reattack(int noteNumber, String source = String("Default"));
-    void sustain(int noteNumber, float velocity, int channel, bool soundfont, String source = String("Default"));
+    void attemptReattack(int noteNumber, String source = String("Default"));
+    void attemptSustain(int noteNumber, float velocity, int channel, bool soundfont, String source = String("Default"));
     
     inline bool keymapsContainNote(int noteNumber) {
         bool contains = false;

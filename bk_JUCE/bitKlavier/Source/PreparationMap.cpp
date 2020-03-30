@@ -465,8 +465,8 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
         releaseTargetStates.add(TargetStateNil);
     }
     
-    bool foundReattack = false;
-    bool foundSustain = false;
+    bool checkForReattack = false;
+    bool checkForSustain = false;
     
     for (auto km : keymaps)
     {
@@ -480,19 +480,19 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
             {
                 if (km->isInverted())
                 {
-                    foundSustain = true;
+                    checkForSustain = true;
                     km->setTriggered(noteNumber, false);
                 }
                 else
                 {
-                    foundReattack = true;
+                    checkForReattack = true;
                     km->setTriggered(noteNumber, true);
                 }
             }
         }
     }
-    if (foundSustain) sustain(noteNumber, velocity, channel, soundfont, source);
-    if (foundReattack) reattack(noteNumber, source);
+    if (checkForSustain) attemptSustain(noteNumber, velocity, channel, soundfont, source);
+    if (checkForReattack) attemptReattack(noteNumber, source);
     
     for (auto proc : bprocessor)
     {
@@ -672,8 +672,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
             }
         }
     }
-    if (foundSustain) sustain(noteNumber, velocity, channel, soundfont, source);
-    if (foundReattack) reattack(noteNumber, source);
+    if (foundSustain) attemptSustain(noteNumber, velocity, channel, soundfont, source);
+    if (foundReattack) attemptReattack(noteNumber, source);
     
     for (auto proc : dprocessor)
     {
@@ -968,7 +968,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, St
     }
 }
 
-void PreparationMap::reattack(int noteNumber, String source)
+void PreparationMap::attemptReattack(int noteNumber, String source)
 {
     if(sustainPedalIsDepressed)
     {
@@ -983,7 +983,7 @@ void PreparationMap::reattack(int noteNumber, String source)
     }
 }
 
-void PreparationMap::sustain(int noteNumber, float velocity, int channel, bool soundfont, String source)
+void PreparationMap::attemptSustain(int noteNumber, float velocity, int channel, bool soundfont, String source)
 {
     if(sustainPedalIsDepressed)
     {
