@@ -90,14 +90,26 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             
             for (auto t : prep->getTransposition())
             {
-                float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
-                int synthNoteNumber = midiNoteNumber;
                 
-                //if (sampleType < BKLoadSoundfont)
-                {
-                    synthNoteNumber += (int)offset;
-                    synthOffset     -= (int)offset;
-                }
+                /*
+                float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
+                 */
+                
+                int synthNoteNumber = midiNoteNumber;
+                float offset; // offset from integer, but may be greater than 1
+                float synthOffset; // offset from actual sample played, always less than 1.
+                
+                // tune the transposition
+                bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
+                if (useTuningForTransp) // use the Tuning setting
+                    offset = t + tuner->getOffset((int)(t + 0.5) + midiNoteNumber, false);
+                else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
+                    offset = t + tuner->getOffset(midiNoteNumber, false);
+               
+                synthOffset = offset;
+
+                synthNoteNumber += (int)offset;
+                synthOffset     -= (int)offset;
                 
                 //play nostalgic note
 
@@ -252,14 +264,26 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                     
                     for (auto t : prep->getTransposition())
                     {
+                        /*
                         float offset = t + tuner->getOffset(note, false), synthOffset = offset;
                         int synthNoteNumber = note;
+                         */
                         
-                        //if (sampleType < BKLoadSoundfont)
-                        {
-                            synthNoteNumber += (int)offset;
-                            synthOffset     -= (int)offset;
-                        }
+                        int synthNoteNumber = midiNoteNumber;
+                        float offset; // offset from integer, but may be greater than 1
+                        float synthOffset; // offset from actual sample played, always less than 1.
+                         
+                        // tune the transposition
+                        bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
+                        if (useTuningForTransp) // use the Tuning setting
+                             offset = t + tuner->getOffset((int)(t + 0.5)  + midiNoteNumber, false);
+                        else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
+                             offset = t + tuner->getOffset(midiNoteNumber, false);
+                        
+                        synthOffset = offset;
+                        
+                        synthNoteNumber += (int)offset;
+                        synthOffset     -= (int)offset;
                         
                         DBG("Nostalgic::keyReleased note, offset : " + String(note) + " " + String(offset));
                         
@@ -335,14 +359,26 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
             
             for (auto t : prep->getTransposition())
             {
+                /*
                 float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
                 int synthNoteNumber = midiNoteNumber;
+                 */
                 
-                //if (sampleType < BKLoadSoundfont)
-                {
-                    synthNoteNumber += (int)offset;
-                    synthOffset     -= (int)offset;
-                }
+                int synthNoteNumber = midiNoteNumber;
+                float offset; // offset from integer, but may be greater than 1
+                float synthOffset; // offset from actual sample played, always less than 1.
+                 
+                 // tune the transposition
+                bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
+                if (useTuningForTransp) // use the Tuning setting
+                     offset = t + tuner->getOffset((int)(t + 0.5) + midiNoteNumber, false);
+                else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
+                     offset = t + tuner->getOffset(midiNoteNumber, false);
+                
+                synthOffset = offset;
+                
+                synthNoteNumber += (int)offset;
+                synthOffset     -= (int)offset;
                 
                 //play nostalgic note
                 DBG("reverse note on noteNum/offset " +
@@ -444,15 +480,27 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
             
             for (auto t : prep->getTransposition())
             {
+                /*
                 float offset = t + tuner->getOffset(midiNoteNumber, false), synthOffset = offset;
                 int synthNoteNumber = midiNoteNumber;
+                 */
                 
-                //if (sampleType < BKLoadSoundfont)
-                {
-                    synthNoteNumber += (int)offset;
-                    synthOffset     -= (int)offset;
-                }
-
+                int synthNoteNumber = midiNoteNumber;
+                float offset; // offset from integer, but may be greater than 1
+                float synthOffset; // offset from actual sample played, always less than 1.
+                 
+                // tune the transposition
+                bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
+                if (useTuningForTransp) // use the Tuning setting
+                     offset = t + tuner->getOffset((int)(t + 0.5) + midiNoteNumber, false);
+                else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
+                     offset = t + tuner->getOffset(midiNoteNumber, false);
+                
+                synthOffset = offset;
+                
+                synthNoteNumber += (int)offset;
+                synthOffset     -= (int)offset;
+                
                 //play nostalgic note
                 DBG("reverse note on noteNum/offset " +
                     String(synthNoteNumber) + " " +
@@ -692,14 +740,29 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
             {
                 for (auto t : noteOnPrep->getTransposition())
                 {
-                    float offset = t + thisNote->getTuningAtKeyOn(), synthOffset = offset;
-                    int synthNoteNumber = thisNote->getNoteNumber();
+                    /*
+                    float offset = t + thisNote->getTuningAtKeyOn();
+                    float synthOffset = offset;
+                     */
                     
-                    //if (sampleType < BKLoadSoundfont)
-                    {
-                        synthNoteNumber += (int)offset;
-                        synthOffset     -= (int)offset;
-                    }
+                    int synthNoteNumber = thisNote->getNoteNumber();
+                    int midiNoteNumber = synthNoteNumber;
+                    
+                    float offset; // offset from integer, but may be greater than 1
+                    float synthOffset; // offset from actual sample played, always less than 1.
+                      
+                    // tune the transposition
+                    bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
+                    if (useTuningForTransp) // use the Tuning setting
+                          offset = t + tuner->getOffset((int)(t + 0.5) + midiNoteNumber, false);
+                    else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
+                          offset = t + tuner->getOffset(midiNoteNumber, false);
+                     
+                    synthOffset = offset;
+                     
+                    
+                    synthNoteNumber += (int)offset;
+                    synthOffset     -= (int)offset;
                     
                     /*
                      DBG("undertow note on note/noteNum/offset/duration " +

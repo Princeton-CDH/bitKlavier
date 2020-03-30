@@ -54,7 +54,6 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
     
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
-    
     float noteLength = 0.0;
     
  
@@ -66,8 +65,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
     {
         noteLength = (fabs(prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()]) * tempoPrep->getBeatThreshMS() / tempoPrep->getSubdivisions());
     }
-    
-    
+        
     if (prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()] < 0)
     {
         noteDirection = Reverse;
@@ -77,14 +75,25 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
     for (auto t : prep->getTransposition()[cluster->getTranspCounter()])
     {
 
+        /*
         float offset = t + tuner->getOffset(note, false), synthOffset = offset;
-        int synthNoteNumber = (float)note;
+        */
         
-        //if (sampleType < BKLoadSoundfont)
-        {
-            synthNoteNumber += (int)offset;
-            synthOffset     -= (int)offset;
-        }
+        int synthNoteNumber = note;
+        float offset; // offset from integer, but may be greater than 1
+        float synthOffset; // offset from actual sample played, always less than 1.
+       
+        // tune the transposition
+        bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
+        if (useTuningForTransp) // use the Tuning setting
+           offset = t + tuner->getOffset((int)(t + 0.5) + note, false);
+        else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
+           offset = t + tuner->getOffset(note, false);
+       
+        synthOffset = offset;
+
+        synthNoteNumber += (int)offset;
+        synthOffset     -= (int)offset;
 
         int whichEnv = cluster->getEnvelopeCounter();
 		BKSynthesiserVoice* currentVoice;
