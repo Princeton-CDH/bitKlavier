@@ -102,7 +102,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                 // tune the transposition
                 bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
                 if (useTuningForTransp) // use the Tuning setting
-                    offset = t + tuner->getOffset((int)(t + 0.5) + midiNoteNumber, false);
+                    offset = t + tuner->getOffset(round(t) + midiNoteNumber, false);
                 else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                     offset = t + tuner->getOffset(midiNoteNumber, false);
                
@@ -276,7 +276,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         // tune the transposition
                         bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
                         if (useTuningForTransp) // use the Tuning setting
-                             offset = t + tuner->getOffset((int)(t + 0.5)  + midiNoteNumber, false);
+                             offset = t + tuner->getOffset(round(t)  + midiNoteNumber, false);
                         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                              offset = t + tuner->getOffset(midiNoteNumber, false);
                         
@@ -371,7 +371,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                  // tune the transposition
                 bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
                 if (useTuningForTransp) // use the Tuning setting
-                     offset = t + tuner->getOffset((int)(t + 0.5) + midiNoteNumber, false);
+                     offset = t + tuner->getOffset(round(t) + midiNoteNumber, false);
                 else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                      offset = t + tuner->getOffset(midiNoteNumber, false);
                 
@@ -492,7 +492,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                 // tune the transposition
                 bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
                 if (useTuningForTransp) // use the Tuning setting
-                     offset = t + tuner->getOffset((int)(t + 0.5) + midiNoteNumber, false);
+                     offset = t + tuner->getOffset(round(t) + midiNoteNumber, false);
                 else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                      offset = t + tuner->getOffset(midiNoteNumber, false);
                 
@@ -754,7 +754,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                     // tune the transposition
                     bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
                     if (useTuningForTransp) // use the Tuning setting
-                          offset = t + tuner->getOffset((int)(t + 0.5) + midiNoteNumber, false);
+                          offset = t + tuner->getOffset(round(t) + midiNoteNumber, false);
                     else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                           offset = t + tuner->getOffset(midiNoteNumber, false);
                      
