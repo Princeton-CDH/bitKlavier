@@ -48,8 +48,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         float synthOffset; // offset from actual sample played, always less than 1.
         
         // tune the transposition
-        bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
-        if (useTuningForTransp) // use the Tuning setting
+        if (direct->aPrep->getTranspUsesTuning()) // use the Tuning setting
             offset = t + tuner->getOffset(round(t) + noteNumber, false);
         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
             offset = t + tuner->getOffset(noteNumber, false);
