@@ -138,6 +138,7 @@ const String vtagModDirect = "modDirect";
 const String ptagDirect_id ="Id";
 const String ptagDirect_tuning = "tuning";
 const String vtagDirect_transposition = "transposition";
+const String ptagDirect_transpUsesTuning = "transpUsesTuning";
 const String ptagDirect_gain = "gain";
 const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";
@@ -694,6 +695,7 @@ typedef enum DirectParameterType
     DirectHammerGain,
     DirectTuning,
     DirectADSR,
+    DirectTranspUsesTuning,
     DirectParameterTypeNil,
     
 } DirectParameterType;
@@ -706,6 +708,7 @@ static const std::vector<BKParameterDataType> cDirectDataTypes = {
     BKFloat,
     BKFloat,
     BKInt,
+    BKBool,
     BKFloatArr
 };
 

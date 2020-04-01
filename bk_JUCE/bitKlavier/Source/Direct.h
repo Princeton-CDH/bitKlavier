@@ -65,6 +65,7 @@ public:
     
     DirectPreparation(void):
     dTransposition(Array<float>({0.0})),
+    dTranspUsesTuning(false),
     dGain(1.0),
     dResonanceGain(0.5),
     dHammerGain(0.5),
@@ -94,6 +95,7 @@ public:
         dDecay = d->getDecay();
         dSustain = d->getSustain();
         dRelease = d->getRelease();
+        dTranspUsesTuning = d->getTranspUsesTuning();
     }
     
     inline void performModification(DirectPreparation::Ptr d, Array<bool> dirty)
@@ -102,6 +104,7 @@ public:
         if (dirty[DirectGain]) dGain = d->getGain();
         if (dirty[DirectResGain]) dResonanceGain = d->getResonanceGain();
         if (dirty[DirectHammerGain]) dHammerGain = d->getHammerGain();
+        if (dirty[DirectTranspUsesTuning]) dTranspUsesTuning = d->getTranspUsesTuning();
         if (dirty[DirectADSR])
         {
             dAttack = d->getAttack();
@@ -115,6 +118,7 @@ public:
     inline bool compare(DirectPreparation::Ptr d)
     {
         return  (dTransposition     ==      d->getTransposition()   )   &&
+                (dTranspUsesTuning  ==      d->getTranspUsesTuning())   &&
                 (dGain              ==      d->getGain()            )   &&
                 (dResonanceGain     ==      d->getResonanceGain()   )   &&
                 (dHammerGain        ==      d->getHammerGain()      )   &&
@@ -153,6 +157,7 @@ public:
     inline void setName(String n){name = n;}
     
     inline Array<float> getTransposition() const noexcept               {return dTransposition; }
+    inline const bool getTranspUsesTuning() const noexcept              {return dTranspUsesTuning;}
     inline const float getGain() const noexcept                         {return dGain;          }
     inline const float getResonanceGain() const noexcept                {return dResonanceGain; }
     inline const float getHammerGain() const noexcept                   {return dHammerGain;    }
@@ -163,6 +168,7 @@ public:
     inline const Array<float> getADSRvals() const noexcept              {return {(float) dAttack, (float) dDecay,(float) dSustain, (float)dRelease}; }
     
     inline void setTransposition(Array<float> val)                      {dTransposition = val;  }
+    inline void setTranspUsesTuning(bool val)                           {dTranspUsesTuning = val;}
     inline void setGain(float val)                                      {dGain = val;           }
     inline void setResonanceGain(float val)                             {dResonanceGain = val;  }
     inline void setHammerGain(float val)                                {dHammerGain = val;     }
@@ -198,6 +204,7 @@ public:
         prep.setProperty( ptagDirect_gain,              getGain(), 0);
         prep.setProperty( ptagDirect_resGain,           getResonanceGain(), 0);
         prep.setProperty( ptagDirect_hammerGain,        getHammerGain(), 0);
+        prep.setProperty( ptagDirect_transpUsesTuning,  getTranspUsesTuning() ? 1 : 0, 0);
         
         ValueTree transp( vtagDirect_transposition);
         Array<float> m = getTransposition();
@@ -226,6 +233,10 @@ public:
         
         f = e->getStringAttribute(ptagDirect_resGain).getFloatValue();
         setResonanceGain(f);
+        
+        String str = e->getStringAttribute(ptagDirect_transpUsesTuning);
+        if (str != "") setTranspUsesTuning((bool) str.getIntValue());
+        else setTranspUsesTuning(false);
         
         forEachXmlChildElement (*e, sub)
         {
@@ -269,12 +280,28 @@ public:
     }
 
 private:
+    
+    //* Instance Variables *//
+    
+    // name of this one
     String  name;
-    Array<float>   dTransposition;          //transposition, in half steps
-    float   dGain;                          //gain multiplier
-    float   dResonanceGain, dHammerGain;
-    int     dAttack, dDecay, dRelease;      //ADSR, in ms
-    float   dSustain;
+    
+    // transposition, in half steps
+    Array<float> dTransposition;
+    
+    // are Transposition values filtered by the attached Tuning?
+    // original/default = false
+    bool dTranspUsesTuning;
+    
+    // output gain multiplier
+    float dGain;
+    
+    // gain multipliers for release resonance and hammer
+    float dResonanceGain, dHammerGain;
+    
+    // ADSR, in ms, or gain multiplier for sustain
+    int dAttack, dDecay, dRelease;
+    float dSustain;
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
