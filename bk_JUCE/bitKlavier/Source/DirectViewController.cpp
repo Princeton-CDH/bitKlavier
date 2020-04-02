@@ -1019,6 +1019,7 @@ void DirectModificationEditor::buttonClicked (Button* b)
         DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
         mod->setTranspUsesTuning(transpUsesTuning.getToggleState());
         mod->setDirty(DirectTranspUsesTuning);
+        transpUsesTuning.setAlpha(1.);
     }
 }
 
