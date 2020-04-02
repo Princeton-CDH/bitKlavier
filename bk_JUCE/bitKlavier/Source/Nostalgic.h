@@ -45,6 +45,7 @@ public:
     nWaveDistance(p->getWavedistance()),
     nUndertow(p->getUndertow()),
     nTransposition(p->getTransposition()),
+    nTranspUsesTuning(p->getTranspUsesTuning()),
     nGain(p->getGain()),
     nLengthMultiplier(p->getLengthMultiplier()),
     nBeatsToSkip(p->getBeatsToSkip()),
@@ -97,12 +98,15 @@ public:
         velocityMax = 127;
         
         keyOnReset = false;
+        
+        nTranspUsesTuning = false;
     }
     
     NostalgicPreparation(void):
     nWaveDistance(0),
     nUndertow(0),
     nTransposition(Array<float>({0.0})),
+    nTranspUsesTuning(false),
     nGain(1.0),
     nLengthMultiplier(1.0),
     nBeatsToSkip(0.0),
@@ -139,6 +143,7 @@ public:
         nWaveDistance = n->getWavedistance();
         nUndertow = n->getUndertow();
         nTransposition = n->getTransposition();
+        nTranspUsesTuning = n->getTranspUsesTuning();
         nGain = n->getGain();
         nLengthMultiplier = n->getLengthMultiplier();
         nBeatsToSkip = n->getBeatsToSkip();
@@ -166,6 +171,7 @@ public:
         if (dirty[NostalgicWaveDistance]) nWaveDistance = n->getWavedistance();
         if (dirty[NostalgicUndertow]) nUndertow = n->getUndertow();
         if (dirty[NostalgicTransposition]) nTransposition = n->getTransposition();
+        if (dirty[NostalgicTranspUsesTuning]) nTranspUsesTuning = n->getTranspUsesTuning();
         if (dirty[NostalgicGain]) nGain = n->getGain();
         if (dirty[NostalgicLengthMultiplier]) nLengthMultiplier = n->getLengthMultiplier();
         if (dirty[NostalgicBeatsToSkip]) nBeatsToSkip = n->getBeatsToSkip();
@@ -200,6 +206,7 @@ public:
         return (nWaveDistance == n->getWavedistance() &&
                 nUndertow == n->getUndertow() &&
                 nTransposition == n->getTransposition() &&
+                nTranspUsesTuning == n->getTranspUsesTuning() &&
                 nGain == n->getGain() &&
                 nLengthMultiplier == n->getLengthMultiplier() &&
                 nBeatsToSkip == n->getBeatsToSkip() &&
@@ -264,6 +271,7 @@ public:
     inline const int getWavedistance() const noexcept                      {return nWaveDistance;      }
     inline const int getUndertow() const noexcept                          {return nUndertow;          }
     inline const Array<float> getTransposition() const noexcept            {return nTransposition;     }
+    inline const bool getTranspUsesTuning() const noexcept                 {return nTranspUsesTuning;}
     inline const float getGain() const noexcept                            {return nGain;              }
     inline const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
@@ -292,6 +300,7 @@ public:
     inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
     inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
     inline void setTransposition(Array<float> transposition)               {nTransposition = transposition;        }
+    inline void setTranspUsesTuning(bool val)                              {nTranspUsesTuning = val;}
     inline void setGain(float gain)                                        {nGain = gain;                          }
     inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;  }
     inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
@@ -370,6 +379,7 @@ public:
             transp.      setProperty( ptagFloat + String(count++), f, 0);
         }
         prep.addChild(transp, -1, 0);
+        prep.setProperty( ptagNostalgic_transpUsesTuning,  getTranspUsesTuning() ? 1 : 0, 0);
         
         prep.setProperty( ptagNostalgic_gain,               getGain(), 0);
         prep.setProperty( ptagNostalgic_lengthMultiplier,   getLengthMultiplier(), 0);
@@ -492,9 +502,13 @@ public:
         i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
         setMode((NostalgicSyncMode)i);
         
+        String str = e->getStringAttribute(ptagNostalgic_transpUsesTuning);
+        if (str != "") setTranspUsesTuning((bool) str.getIntValue());
+        else setTranspUsesTuning(false);
+        
         
         // HOLD MIN / MAX
-        String str = e->getStringAttribute("holdMin");
+        str = e->getStringAttribute("holdMin");
         
         if (str != "")
         {
@@ -599,29 +613,30 @@ private:
      --dt
      */
     
-    Array<float> nTransposition;        //transposition, in half steps
-    float nGain;                        //gain multiplier
-    float nLengthMultiplier;            //note-length mode: toscale reverse playback time
-    float nBeatsToSkip;                 //synchronic mode: beats to skip before reverse peak
-    NostalgicSyncMode nMode;            //which sync mode to use
+    Array<float> nTransposition;        // transposition, in half steps
+    bool nTranspUsesTuning;             // are transposition values in nTransposition filtered via attached Tuning?
+    float nGain;                        // gain multiplier
+    float nLengthMultiplier;            // note-length mode: toscale reverse playback time
+    float nBeatsToSkip;                 // synchronic mode: beats to skip before reverse peak
+    NostalgicSyncMode nMode;            // which sync mode to use
     
-    int     nReverseAttack, nReverseDecay, nReverseRelease;     //reverse ADSR, in ms
+    int     nReverseAttack, nReverseDecay, nReverseRelease;     // reverse ADSR, in ms
     float   nReverseSustain;
     
-    int     nUndertowAttack, nUndertowDecay, nUndertowRelease;  //undertow ADSR, in ms
+    int     nUndertowAttack, nUndertowDecay, nUndertowRelease;  // undertow ADSR, in ms
     float   nUndertowSustain;
     
     float holdMin, holdMax;
     int clusterMin; // minimum number of notes needed to create nostalgic notes
-    int clusterThreshold; //in ms; minimum time between notes to make cluster (irrelevant if clusterMin = 1)
+    int clusterThreshold; // in ms; minimum time between notes to make cluster (irrelevant if clusterMin = 1)
     int velocityMin, velocityMax;
     
     bool keyOnReset;
     
     TargetNoteMode targetTypeNostalgicClear;
     
-    //internal keymap for resetting internal values to static
-    //Keymap::Ptr resetMap = new Keymap(0);
+    // internal keymap for resetting internal values to static
+    // Keymap::Ptr resetMap = new Keymap(0);
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };

@@ -100,8 +100,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                 float synthOffset; // offset from actual sample played, always less than 1.
                 
                 // tune the transposition
-                bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
-                if (useTuningForTransp) // use the Tuning setting
+                if (prep->getTranspUsesTuning()) // use the Tuning setting
                     offset = t + tuner->getOffset(round(t) + midiNoteNumber, false);
                 else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                     offset = t + tuner->getOffset(midiNoteNumber, false);
@@ -274,8 +273,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         float synthOffset; // offset from actual sample played, always less than 1.
                          
                         // tune the transposition
-                        bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
-                        if (useTuningForTransp) // use the Tuning setting
+                        if (prep->getTranspUsesTuning()) // use the Tuning setting
                              offset = t + tuner->getOffset(round(t)  + midiNoteNumber, false);
                         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                              offset = t + tuner->getOffset(midiNoteNumber, false);
@@ -369,8 +367,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                 float synthOffset; // offset from actual sample played, always less than 1.
                  
                  // tune the transposition
-                bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
-                if (useTuningForTransp) // use the Tuning setting
+                if (prep->getTranspUsesTuning()) // use the Tuning setting
                      offset = t + tuner->getOffset(round(t) + midiNoteNumber, false);
                 else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                      offset = t + tuner->getOffset(midiNoteNumber, false);
@@ -490,8 +487,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                 float synthOffset; // offset from actual sample played, always less than 1.
                  
                 // tune the transposition
-                bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
-                if (useTuningForTransp) // use the Tuning setting
+                if (prep->getTranspUsesTuning()) // use the Tuning setting
                      offset = t + tuner->getOffset(round(t) + midiNoteNumber, false);
                 else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                      offset = t + tuner->getOffset(midiNoteNumber, false);
@@ -752,8 +748,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                     float synthOffset; // offset from actual sample played, always less than 1.
                       
                     // tune the transposition
-                    bool useTuningForTransp = 1; // this will need to be a preparation variable the user can set and modify
-                    if (useTuningForTransp) // use the Tuning setting
+                    if (noteOnPrep->getTranspUsesTuning()) // use the Tuning setting
                           offset = t + tuner->getOffset(round(t) + midiNoteNumber, false);
                     else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                           offset = t + tuner->getOffset(midiNoteNumber, false);

@@ -122,6 +122,7 @@ const String ptagNostalgic_tuning = "tuning";
 const String ptagNostalgic_waveDistance = "waveDistance";
 const String ptagNostalgic_undertow = "undertow";
 const String vtagNostalgic_transposition = "transposition";
+const String ptagNostalgic_transpUsesTuning = "transpUsesTuning";
 const String ptagNostalgic_gain = "gain";
 const String ptagNostalgic_lengthMultiplier = "lengthMultiplier";
 const String ptagNostalgic_mode = "mode";
@@ -635,6 +636,7 @@ typedef enum NostalgicParameterType {
     NostalgicKeyOnReset,
     NostalgicVelocityMin,
     NostalgicVelocityMax,
+    NostalgicTranspUsesTuning,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -659,6 +661,7 @@ static const std::vector<BKParameterDataType> cNostalgicDataTypes =
     BKInt,
     BKInt,
     BKInt,
+    BKBool,
     BKInt
 };
 

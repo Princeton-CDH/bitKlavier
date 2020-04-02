@@ -42,6 +42,7 @@ public:
     std::unique_ptr<BKSingleSlider> gainSlider;
     
     std::unique_ptr<BKStackedSlider> transpositionSlider;
+    ToggleButton transpUsesTuning;
 
     std::unique_ptr<BKADSRSlider> reverseADSRSlider;
     std::unique_ptr<BKADSRSlider> undertowADSRSlider;
