@@ -37,6 +37,8 @@ public:
     
     std::unique_ptr<BKADSRSlider> ADSRSlider;
     
+    ToggleButton transpUsesTuning;
+    
     void paint (Graphics&) override;
     void resized() override;
     

@@ -55,6 +55,11 @@ BKViewController(p, theGraph, 1)
     addAndMakeVisible(*ADSRSlider);
     setShowADSR(false);
     
+    transpUsesTuning.setButtonText ("use Tuning?");
+    transpUsesTuning.setTooltip("transposition will be tuned using attached Tuning");
+    buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
+    transpUsesTuning.setToggleState (false, dontSendNotification);
+    addAndMakeVisible(&transpUsesTuning, ALL);
     
 #if JUCE_IOS
     transpositionSlider->addWantsBigOneListener(this);
@@ -81,6 +86,7 @@ void DirectViewController::invisible(void)
     ADSRSlider->setVisible(false);
     
     transpositionSlider->setVisible(false);
+    transpUsesTuning.setVisible(false);
     //etc...
 }
 
@@ -127,6 +133,7 @@ void DirectViewController::displayTab(int tab)
         hammerGainSlider->setVisible(true);
         ADSRSlider->setVisible(true);
         transpositionSlider->setVisible(true);
+        transpUsesTuning.setVisible(true);
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
@@ -148,23 +155,9 @@ void DirectViewController::displayTab(int tab)
         hammerGainSlider->setBounds(leftColumn.removeFromBottom(columnHeight / 3));
     
         area.removeFromBottom(gainSlider->getHeight());
+        transpUsesTuning.setBounds(area.removeFromBottom(gComponentToggleBoxHeight));
         transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
-        
-        /*
-        area.removeFromBottom(gYSpacing + 100 * processor.paddingScalarY);
-        ADSRSlider->setBounds(area.removeFromBottom(area.getHeight() * 0.35));
-        
-        area.removeFromLeft(processor.paddingScalarX * 100); //area is now right column
-        area.removeFromRight(processor.paddingScalarX * 100);
-        area.removeFromBottom(8*gYSpacing * processor.paddingScalarY);
-        
-        int columnHeight = area.getHeight();
-        
-        gainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
-        resonanceGainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
-        hammerGainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
-         */
-        
+
     }
     else if (tab == 1)
     {
@@ -345,14 +338,11 @@ DirectViewController(p, theGraph)
     fillSelectCB(-1,-1);
     
     transpositionSlider->addMyListener(this);
-    
     gainSlider->addMyListener(this);
-    
     resonanceGainSlider->addMyListener(this);
-    
     hammerGainSlider->addMyListener(this);
-    
     ADSRSlider->addMyListener(this);
+    transpUsesTuning.addListener(this);
     
     
 }
@@ -378,6 +368,7 @@ void DirectPreparationEditor::update(void)
         ADSRSlider->setDecayValue(prep->getDecay(), dontSendNotification);
         ADSRSlider->setSustainValue(prep->getSustain(), dontSendNotification);
         ADSRSlider->setReleaseValue(prep->getRelease(), dontSendNotification);
+        transpUsesTuning.setToggleState(prep->getTranspUsesTuning(), dontSendNotification);
     }
 }
 
@@ -668,6 +659,15 @@ void DirectPreparationEditor::buttonClicked (Button* b)
         
         displayTab(currentTab);
     }
+    else if (b == &transpUsesTuning)
+    {
+        DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
+        DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+        DBG("Direct transpUsesTuning = " + String((int)b->getToggleState()));
+        prep->setTranspUsesTuning(b->getToggleState());
+        active->setTranspUsesTuning(b->getToggleState());
+        
+    }
 }
 
 
@@ -682,14 +682,11 @@ DirectViewController(p, theGraph)
     fillSelectCB(-1,-1);
     
     transpositionSlider->addMyListener(this);
-    
     gainSlider->addMyListener(this);
-    
     resonanceGainSlider->addMyListener(this);
-    
     hammerGainSlider->addMyListener(this);
-    
     ADSRSlider->addMyListener(this);
+    transpUsesTuning.addListener(this);
 }
 
 void DirectModificationEditor::greyOutAllComponents()
@@ -699,6 +696,7 @@ void DirectModificationEditor::greyOutAllComponents()
     transpositionSlider->setDim(gModAlpha);
     gainSlider->setDim(gModAlpha);
     ADSRSlider->setDim(gModAlpha);
+    transpUsesTuning.setAlpha(gModAlpha);
 }
 
 void DirectModificationEditor::highlightModedComponents()
@@ -710,6 +708,7 @@ void DirectModificationEditor::highlightModedComponents()
     if(mod->getDirty(DirectResGain))          resonanceGainSlider->setBright();
     if(mod->getDirty(DirectHammerGain))       hammerGainSlider->setBright();
     if(mod->getDirty(DirectADSR))             ADSRSlider->setBright();
+    if(mod->getDirty(DirectTranspUsesTuning)) transpUsesTuning.setAlpha(1.);
 }
 
 void DirectModificationEditor::update(void)
@@ -726,17 +725,12 @@ void DirectModificationEditor::update(void)
         highlightModedComponents();
         
         transpositionSlider->setValue(mod->getTransposition(), dontSendNotification);
-        
         resonanceGainSlider->setValue(mod->getResonanceGain(), dontSendNotification);
-        
         hammerGainSlider->setValue(mod->getHammerGain(), dontSendNotification);
-        
         gainSlider->setValue(mod->getGain(), dontSendNotification);
-        
         ADSRSlider->setValue(mod->getADSRvals(), dontSendNotification);
+        transpUsesTuning.setToggleState(mod->getTranspUsesTuning(), dontSendNotification);
     }
-    
-    
 }
 
 void DirectModificationEditor::fillSelectCB(int last, int current)
@@ -1019,6 +1013,12 @@ void DirectModificationEditor::buttonClicked (Button* b)
         DBG("currentTab: " + String(currentTab));
         
         displayTab(currentTab);
+    }
+    else if (b == &transpUsesTuning)
+    {
+        DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+        mod->setTranspUsesTuning(transpUsesTuning.getToggleState());
+        mod->setDirty(DirectTranspUsesTuning);
     }
 }
 

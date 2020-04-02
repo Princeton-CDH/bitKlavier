@@ -265,6 +265,9 @@ void BKButtonAndMenuLAF::drawToggleButton (Graphics& g, ToggleButton& button,
         
         g.setColour (button.findColour (ToggleButton::textColourId));
         g.setFont (fontSize);
+        Font toggleFont;
+        toggleFont.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
+        g.setFont (toggleFont);
         
         if (! button.isEnabled())
             g.setOpacity (0.5f);
@@ -292,6 +295,9 @@ void BKButtonAndMenuLAF::drawToggleButton (Graphics& g, ToggleButton& button,
         
         g.setColour (button.findColour (ToggleButton::textColourId));
         g.setFont (fontSize);
+        Font toggleFont;
+        toggleFont.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
+        g.setFont (toggleFont);
         
         if (! button.isEnabled())
             g.setOpacity (0.5f);
