@@ -279,7 +279,13 @@ void NostalgicViewController::displayTab(int tab)
         area.removeFromRight(rightArrow.getWidth());
         transpUsesTuning.setBounds(area.removeFromBottom(gComponentToggleBoxHeight));
         transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
-        
+        /*
+        transpUsesTuning.setBounds(transpositionSlider->getRight() - 120,
+                                   transpositionSlider->getBottom() - gComponentToggleBoxHeight,
+                                   120, 30);
+        transpUsesTuning.toFront(false);
+         */
+   
         area.removeFromBottom(gYSpacing + processor.paddingScalarY * 30);
         
         Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth()* 0.5));

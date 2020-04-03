@@ -382,7 +382,7 @@ void SynchronicViewController::displayTab(int tab)
             {
                 paramSliders[i]->setVisible(true);
             }
-            
+
             //envelopeName.setVisible(true);
             for(int i=envelopeSliders.size() - 1; i>=0; i--)
             {
@@ -398,6 +398,11 @@ void SynchronicViewController::displayTab(int tab)
                 paramSliders[i]->setBounds(x0, y0 + i * sliderHeight, sliderWidth, sliderHeight - gYSpacing);
             }
             
+            transpUsesTuning.setBounds(paramSliders[0]->getRight() - 120,
+                                       paramSliders[0]->getBottom() - gComponentToggleBoxHeight,
+                                       120, 30);
+            transpUsesTuning.toFront(false);
+            
             int envelopeWidth = (sliderWidth - 50) / 12;
             int envelopeHeight = height * 0.1f;
             
@@ -408,7 +413,7 @@ void SynchronicViewController::displayTab(int tab)
             }
             
             offsetParamStartToggle.setBounds(right - 100, selectCB.getY(), 100, 30);
-            transpUsesTuning.setBounds(offsetParamStartToggle.getX() - 4 * gXSpacing - 120, selectCB.getY(), 120, 30);
+            // transpUsesTuning.setBounds(offsetParamStartToggle.getX() - 4 * gXSpacing - 120, selectCB.getY(), 120, 30);
         }
         
         
