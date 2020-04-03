@@ -408,7 +408,7 @@ void SynchronicViewController::displayTab(int tab)
             }
             
             offsetParamStartToggle.setBounds(right - 100, selectCB.getY(), 100, 30);
-            transpUsesTuning.setBounds(offsetParamStartToggle.getX() - 2 * gXSpacing - 120, selectCB.getY(), 120, 30);
+            transpUsesTuning.setBounds(offsetParamStartToggle.getX() - 4 * gXSpacing - 120, selectCB.getY(), 120, 30);
         }
         
         
