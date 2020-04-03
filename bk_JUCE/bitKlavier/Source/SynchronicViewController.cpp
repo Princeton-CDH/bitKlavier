@@ -208,6 +208,12 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     numClusterSlider->setJustifyRight(false);
     addAndMakeVisible(*numClusterSlider, ALL);
     
+    transpUsesTuning.setButtonText ("use Tuning?");
+    transpUsesTuning.setTooltip("non-zero transpositions will be tuned using attached Tuning");
+    buttonsAndMenusLAF.setToggleBoxTextToRightBool(false);
+    transpUsesTuning.setToggleState (false, dontSendNotification);
+    addAndMakeVisible(&transpUsesTuning, ALL);
+    
 #if JUCE_IOS
     numClusterSlider->addWantsBigOneListener(this);
     howManySlider->addWantsBigOneListener(this);
@@ -285,6 +291,7 @@ void SynchronicViewController::invisible(void)
     onOffLabel.setVisible(false);
     onOffSelectCB.setVisible(false);
     releaseVelocitySetsSynchronicToggle.setVisible(false);
+    transpUsesTuning.setVisible(false);
 }
 
 void SynchronicViewController::displayShared(void)
@@ -369,6 +376,7 @@ void SynchronicViewController::displayTab(int tab)
             
             // SET VISIBILITY
             offsetParamStartToggle.setVisible(true);
+            transpUsesTuning.setVisible(true);
             
             for (int i = 0; i < paramSliders.size(); i++)
             {
@@ -400,7 +408,10 @@ void SynchronicViewController::displayTab(int tab)
             }
             
             offsetParamStartToggle.setBounds(right - 100, selectCB.getY(), 100, 30);
+            transpUsesTuning.setBounds(offsetParamStartToggle.getX() - 2 * gXSpacing - 120, selectCB.getY(), 120, 30);
         }
+        
+        
         
         iconImageComponent.toBack();
     }
@@ -720,6 +731,7 @@ SynchronicViewController(p, theGraph)
     clusterMinMaxSlider->addMyListener(this);
     holdTimeMinMaxSlider->addMyListener(this);
     velocityMinMaxSlider->addMyListener(this);
+    transpUsesTuning.addListener(this);
     
     for (auto slider : paramSliders) slider->addMyListener(this);
 
@@ -1082,7 +1094,8 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         envelopeSliders[i]->setButtonText(String(""));
         envelopeSliders[i]->resized();
     }
-    //envelopeName.setVisible(true);
+    
+    transpUsesTuning.setToggleState(prep->getTranspUsesTuning(), notify);
     
     if(envelopeSliders[visibleADSR]->isEnabled()) envelopeSliders[visibleADSR]->setActive();
     
@@ -1592,6 +1605,15 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
         bool single = processor.gallery->getAllSynchronic().size() == 2;
         getPrepOptionMenu(PreparationTypeSynchronic, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
+    else if (b == &transpUsesTuning)
+    {
+        SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
+        SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
+        DBG("Synchronic transpUsesTuning = " + String((int)b->getToggleState()));
+        prep->setTranspUsesTuning(b->getToggleState());
+        active->setTranspUsesTuning(b->getToggleState());
+        
+    }
 }
 
 
@@ -1620,6 +1642,7 @@ SynchronicViewController(p, theGraph)
     velocityMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
     numClusterSlider->addMyListener(this);
+    transpUsesTuning.addListener(this);
     
     for (auto slider : paramSliders) slider->addMyListener(this);
     
@@ -1641,6 +1664,7 @@ void SynchronicModificationEditor::greyOutAllComponents()
     modeLabel.setAlpha(gModAlpha);
     onOffSelectCB.setAlpha(gModAlpha);
     onOffLabel.setAlpha(gModAlpha);
+    transpUsesTuning.setAlpha(gModAlpha);
     
     offsetParamStartToggle.setAlpha(gModAlpha);
     
@@ -1685,6 +1709,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     if(mod->getDirty(SynchronicBeatsToSkip))      offsetParamStartToggle.setAlpha(1.);
     if(mod->getDirty(SynchronicGain))             gainSlider->setBright();
     if(mod->getDirty(SynchronicNumClusters))      numClusterSlider->setBright();
+    if(mod->getDirty(SynchronicTranspUsesTuning)) transpUsesTuning.setAlpha(1.);
 
     if (mod->getDirty(SynchronicBeatMultipliers))
     {
@@ -1754,35 +1779,24 @@ void SynchronicModificationEditor::update(NotificationType notify)
     if (mod != nullptr)
     {
         modeSelectCB.setSelectedItemIndex(mod->getMode(), notify);
-        
         onOffSelectCB.setSelectedItemIndex(mod->getOnOffMode(), notify);
         
         //FIXIT offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
         //SynchronicBeatsToSkip determines whether to set this toggle
         //offsetParamStartToggle.setToggleState(mod->getBeatsToSkip() + 1, notify);
         offsetParamStartToggle.setToggleState(mod->getBeatsToSkip(), notify);
-
         howManySlider->setValue(mod->getNumBeats(), notify);
-        
         clusterThreshSlider->setValue(mod->getClusterThreshMS(), notify);
-        
         clusterCapSlider->setValue(mod->getClusterCap(), notify);
-        
         clusterMinMaxSlider->setMinValue(mod->getClusterMin(), notify);
-        
         clusterMinMaxSlider->setMaxValue(mod->getClusterMax(), notify);
-        
         holdTimeMinMaxSlider->setMinValue(mod->getHoldMin(), notify);
-        
         holdTimeMinMaxSlider->setMaxValue(mod->getHoldMax(), notify);
-        
         velocityMinMaxSlider->setMinValue(mod->getVelocityMin(), notify);
-        
         velocityMinMaxSlider->setMaxValue(mod->getVelocityMax(), notify);
-        
         gainSlider->setValue(mod->getGain(), notify);
-
         numClusterSlider->setValue(mod->getNumClusters(), notify);
+        transpUsesTuning.setToggleState(mod->getTranspUsesTuning(), notify);
         
         for (int i = 0; i < paramSliders.size(); i++)
         {
@@ -2351,6 +2365,13 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
         DBG("currentTab: " + String(currentTab));
         
         displayTab(currentTab);
+    }
+    else if (b == &transpUsesTuning)
+    {
+        SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
+        mod->setTranspUsesTuning(transpUsesTuning.getToggleState());
+        mod->setDirty(SynchronicTranspUsesTuning);
+        transpUsesTuning.setAlpha(1.);
     }
     
     updateModification();

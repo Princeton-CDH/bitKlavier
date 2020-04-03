@@ -82,6 +82,7 @@ const String ptagSynchronic_clusterMin = "clusterMin";
 const String ptagSynchronic_clusterMax = "clusterMax";
 const String ptagSynchronic_clusterCap = "clusterCap";
 const String ptagSynchronic_clusterThresh = "clusterThresh";
+const String ptagSynchronic_transpUsesTuning = "transpUsesTuning";
 const String ptagSynchronic_mode = "mode";
 const String ptagSynchronic_beatsToSkip = "beatsToSkip";
 const String ptagSynchronic_gain = "gain";
@@ -535,6 +536,7 @@ typedef enum SynchronicParameterType {
     SynchronicVelocityMin,
     SynchronicVelocityMax,
     SynchronicMidiOutput,
+    SynchronicTranspUsesTuning,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -559,6 +561,7 @@ static const std::vector<BKParameterDataType> cSynchronicDataTypes = {
     BKInt,
     BKInt,
     BKInt,
+    BKBool,
     BKInt
 };
 

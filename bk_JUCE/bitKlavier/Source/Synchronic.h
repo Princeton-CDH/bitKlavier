@@ -59,6 +59,7 @@ public:
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
     sTransposition(p->getTransposition()),
+    sTranspUsesTuning(p->getTranspUsesTuning()),
     sAttacks(p->getAttacks()),
     sDecays(p->getDecays()),
     sSustains(p->getSustains()),
@@ -109,6 +110,7 @@ public:
     sAccentMultipliers(accentMultipliers),
     sLengthMultipliers(lengthMultipliers),
     sTransposition(transp),
+    sTranspUsesTuning(false),
     sClusterThresh(clusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
     sReleaseVelocitySetsSynchronic(velocityMode),
@@ -141,6 +143,7 @@ public:
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
+    sTranspUsesTuning(false),
     sAttacks(Array<int>({3,3,3,3,3,3,3,3,3,3,3,3})),
     sDecays(Array<int>({3,3,3,3,3,3,3,3,3,3,3,3})),
     sSustains(Array<float>({1.,1,1,1,1,1,1,1,1,1,1,1})),
@@ -176,6 +179,7 @@ public:
         sLengthMultipliers = s->getLengthMultipliers();
         sGain = s->getGain();
         sTransposition = s->getTransposition();
+        sTranspUsesTuning = s->getTranspUsesTuning();
         sClusterThresh = s->getClusterThreshMS();
         sClusterThreshSec = s->getClusterThreshSEC();
         sReleaseVelocitySetsSynchronic = s->getReleaseVelocitySetsSynchronic();
@@ -221,6 +225,7 @@ public:
         if (dirty[SynchronicLengthMultipliers]) sLengthMultipliers = s->getLengthMultipliers();
         if (dirty[SynchronicGain]) sGain = s->getGain();
         if (dirty[SynchronicTranspOffsets]) sTransposition = s->getTransposition();
+        if (dirty[SynchronicTranspUsesTuning]) sTranspUsesTuning = s->getTranspUsesTuning();
         if (dirty[SynchronicClusterThresh])
         {
             sClusterThresh = s->getClusterThreshMS();
@@ -357,6 +362,7 @@ public:
                 (sMode == s->getMode()) &&
                 transp && lens && accents && beats && attack && decay && sustain && release &&
                 sGain == s->getGain() &&
+                sTranspUsesTuning == s->getTranspUsesTuning() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
                 sReleaseVelocitySetsSynchronic == s->getReleaseVelocitySetsSynchronic() &&
@@ -481,6 +487,7 @@ public:
     inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
     inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
     inline const Array<Array<float>> getTransposition() const noexcept {return sTransposition;         }
+    inline const bool getTranspUsesTuning() const noexcept             {return sTranspUsesTuning;}
     inline const bool getReleaseVelocitySetsSynchronic() const noexcept{return sReleaseVelocitySetsSynchronic; }
     inline const float getGain() const noexcept                        {return sGain;                   }
     
@@ -535,6 +542,7 @@ public:
     inline void setBeatMultipliers(Array<float> beatMultipliers)       {sBeatMultipliers.swapWith(beatMultipliers);        }
     inline void setAccentMultipliers(Array<float> accentMultipliers)   {sAccentMultipliers.swapWith(accentMultipliers);    }
     inline void setTransposition(Array<Array<float>> transp)           {sTransposition.swapWith(transp);                   }
+    inline void setTranspUsesTuning(bool val)                          {sTranspUsesTuning = val;                           }
     inline void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
     
     inline void setBeatMultiplier(int whichSlider, float value)        {sBeatMultipliers.set(whichSlider, value);           }
@@ -721,6 +729,7 @@ public:
         prep.setProperty( ptagSynchronic_clusterThresh,       getClusterThreshMS(), 0);
         prep.setProperty( ptagSynchronic_mode,                getMode(), 0);
         prep.setProperty( ptagSynchronic_beatsToSkip,         getBeatsToSkip(), 0);
+        prep.setProperty( ptagSynchronic_transpUsesTuning,    getTranspUsesTuning() ? 1 : 0, 0);
         
         prep.setProperty( "numClusters", getNumClusters(), 0);
         prep.setProperty( "onOffMode", getOnOffMode(), 0);
@@ -876,6 +885,10 @@ public:
         
         i = e->getStringAttribute(ptagSynchronic_targetRotate).getIntValue();
         setTargetTypeSynchronicRotate((TargetNoteMode)i);
+        
+        String str = e->getStringAttribute(ptagSynchronic_transpUsesTuning);
+        if (str != "") setTranspUsesTuning((bool) str.getIntValue());
+        else setTranspUsesTuning(false);
  
         forEachXmlChildElement (*e, sub)
         {
@@ -1007,6 +1020,8 @@ private:
     Array<float> sAccentMultipliers;    //multiply velocities by these
     Array<float> sLengthMultipliers;    //multiply note duration by these
     Array<Array<float>> sTransposition; //transpose by these
+    
+    bool sTranspUsesTuning;
     
     Array<int> sAttacks;
     Array<int> sDecays;
