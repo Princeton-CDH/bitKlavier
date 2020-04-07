@@ -290,6 +290,17 @@ inline void BKMultiSlider::dismissTextEditor(bool setValue)
 
 void BKMultiSlider::setTo(Array<float> newvals, NotificationType newnotify)
 {
+    /*
+    sliderVals.clearQuick();
+    if (newvals.size() < numDefaultSliders) sliderVals.ensureStorageAllocated(numDefaultSliders);
+    else sliderVals.ensureStorageAllocated(newvals.size());
+    for (int i = 0; i < newvals.size(); i++)
+    {
+        sliderVals[i].set(0, newvals[i]);
+        DBG("BKMultiSlider::setTo " + String(i) + " " + String(newvals[i]));
+    }
+     */
+    
     numActiveSliders = newvals.size();
     if(numActiveSliders < 1) numActiveSliders = 1;
     
@@ -332,6 +343,16 @@ void BKMultiSlider::setTo(Array<float> newvals, NotificationType newnotify)
 
 void BKMultiSlider::setTo(Array<Array<float>> newvals, NotificationType newnotify)
 {
+    /*
+    sliderVals = newvals;
+    for (int i = 0; i < newvals.size(); i++)
+    {
+        for (int j = 0; j < newvals[i].size(); j++) {
+        DBG("BKMultiSlider::setTo DoubleArray " + String(i) + " " + String(newvals[i][j]));
+        }
+    }
+     */
+    
     numActiveSliders = newvals.size();
     if(numActiveSliders < 1) numActiveSliders = 1;
     

@@ -139,6 +139,7 @@ public:
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     
     // setTo takes an array of values for active sliders and updates the multislider accordingly
+    // this one has only one value per slider, so no subSliders
     void setTo(Array<float> newvals, NotificationType newnotify);
     
     // takes and array of arrays, each subarray corresponding to active values at a single slider position
@@ -187,6 +188,9 @@ public:
     }
     
 private:
+    
+    // holds all the current values, including for sub sliders (hence the double array)
+    //Array<Array<float>> sliderVals;
     
     BKMultiSliderLookAndFeel activeSliderLookAndFeel;
     BKMultiSliderLookAndFeel passiveSliderLookAndFeel;
