@@ -62,6 +62,8 @@ public:
         
         toggleTextToRight = true;
         
+        tooltipsEnabled = true;
+        
         //setColour(juce::LookAndFeel_V4::ColourScheme::outline, Colours::black);
         //getCurrentColourScheme().setUIColour(juce::LookAndFeel_V4::ColourScheme::widgetBackground, Colours::yellow);
         
@@ -102,11 +104,14 @@ public:
     Font getTextButtonFont (TextButton&, int buttonHeight)  override;
     Font getLabelFont (Label&) override;
     int getDefaultMenuBarHeight() override;
+    void drawTooltip(Graphics& g, const String& text, int width, int height) override;
     
+    inline void setTooltipsEnabled(bool enabled) { tooltipsEnabled = enabled; }
     
 private:
     Justification comboBoxJustification;
     bool toggleTextToRight;
+    bool tooltipsEnabled;
 };
 
 class BKMultiSliderLookAndFeel : public BKButtonAndMenuLAF

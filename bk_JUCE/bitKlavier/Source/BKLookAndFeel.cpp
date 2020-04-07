@@ -75,6 +75,31 @@ Font BKButtonAndMenuLAF::getLabelFont (Label& label)
     return font;
 }
 
+void BKButtonAndMenuLAF::drawTooltip(Graphics& g, const String& text, int width, int height)
+{
+    Rectangle<int> bounds (width, height);
+    auto cornerSize = 5.0f;
+    
+    g.setColour (findColour (TooltipWindow::backgroundColourId));
+    g.setOpacity(0.0f);
+    g.fillRoundedRectangle (bounds.toFloat(), cornerSize);
+    
+    g.setColour (findColour (TooltipWindow::outlineColourId));
+    g.setOpacity(0.0f);
+    g.drawRoundedRectangle (bounds.toFloat().reduced (0.5f, 0.5f), cornerSize, 1.0f);
+    
+    const float tooltipFontSize = 13.0f;
+    const int maxToolTipWidth = 400;
+    
+    AttributedString s;
+    s.setJustification (Justification::centred);
+    s.append (text, Font (tooltipFontSize, Font::bold), findColour (TooltipWindow::textColourId));
+    
+    TextLayout tl;
+    tl.createLayoutWithBalancedLineLengths (s, (float) maxToolTipWidth);
+    tl.draw (g, { static_cast<float> (width), static_cast<float> (height) });
+}
+
 
 #define MENUBARHEIGHT_IOS 40
 #define MENUBARHEIGHT  25

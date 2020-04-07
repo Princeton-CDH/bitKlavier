@@ -188,7 +188,7 @@ private:
     BKButtonAndMenuLAF laf;
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
     
-    TooltipWindow tipwindow;
+    std::unique_ptr<TooltipWindow> tipwindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)
 };

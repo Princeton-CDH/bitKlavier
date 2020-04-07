@@ -282,6 +282,51 @@ public:
                                                    maxNumOutputs));
         o.content->setSize (500, 550);
         
+        o.dialogTitle                   = TRANS("bitKlavier Settings");
+        o.dialogBackgroundColour        = o.content->getLookAndFeel().findColour (ResizableWindow::backgroundColourId);
+        o.escapeKeyTriggersCloseButton  = true;
+        o.useNativeTitleBar             = true;
+        o.resizable                     = false;
+        
+        o.launchAsync();
+    }
+    
+    void showBKSettingsDialog()
+    {
+        DialogWindow::LaunchOptions o;
+        
+        int minNumInputs  = std::numeric_limits<int>::max(), maxNumInputs  = 0,
+        minNumOutputs = std::numeric_limits<int>::max(), maxNumOutputs = 0;
+        
+        auto updateMinAndMax = [] (int newValue, int& minValue, int& maxValue)
+        {
+            minValue = jmin (minValue, newValue);
+            maxValue = jmax (maxValue, newValue);
+        };
+        
+        if (channelConfiguration.size() > 0)
+        {
+            auto defaultConfig = channelConfiguration.getReference (0);
+            updateMinAndMax ((int) defaultConfig.numIns,  minNumInputs,  maxNumInputs);
+            updateMinAndMax ((int) defaultConfig.numOuts, minNumOutputs, maxNumOutputs);
+        }
+        
+        if (auto* bus = processor->getBus (true, 0))
+            updateMinAndMax (bus->getDefaultLayout().size(), minNumInputs, maxNumInputs);
+        
+        if (auto* bus = processor->getBus (false, 0))
+            updateMinAndMax (bus->getDefaultLayout().size(), minNumOutputs, maxNumOutputs);
+        
+        minNumInputs  = jmin (minNumInputs,  maxNumInputs);
+        minNumOutputs = jmin (minNumOutputs, maxNumOutputs);
+        
+        o.content.setOwned (new SettingsComponent (*this, deviceManager,
+                                                   minNumInputs,
+                                                   maxNumInputs,
+                                                   minNumOutputs,
+                                                   maxNumOutputs));
+        o.content->setSize (500, 550);
+        
         o.dialogTitle                   = TRANS("Audio/MIDI Settings");
         o.dialogBackgroundColour        = o.content->getLookAndFeel().findColour (ResizableWindow::backgroundColourId);
         o.escapeKeyTriggersCloseButton  = true;
@@ -737,6 +782,8 @@ public:
         m.addItem (3, TRANS("Load a saved state..."));
         m.addSeparator();
         m.addItem (4, TRANS("Reset to default state"));
+//        m.addSeparator();
+//        m.addItem (5, TRANS("bitKlavier settings"));
         
         m.showMenuAsync (PopupMenu::Options(),
                          ModalCallbackFunction::forComponent (menuCallback, this));
@@ -750,6 +797,7 @@ public:
             case 2:  pluginHolder->askUserToSaveState(); break;
             case 3:  pluginHolder->askUserToLoadState(); break;
             case 4:  resetToDefaultState(); break;
+            case 5:  pluginHolder->showBKSettingsDialog(); break;
             default: break;
         }
     }

@@ -120,6 +120,12 @@ timerCallbackCount(0)
     overtopShadow = std::make_unique<DropShadower>(myshadow);
     overtopShadow->setOwner(&overtop);
     
+//    tipwindow.setLookAndFeel(&laf); // this plus changing drawTooltip() in BKButtonAndMenuLAF will customize tooltip appearance
+    
+    tipwindow = std::make_unique<TooltipWindow>(); // this will enable tooltips
+//    tipwindow = nullptr; // this will disable tooltips
+    // just need to figure out setting ui and how to access these from wherever that happens
+    
     startTimerHz (10);
 }
 
@@ -360,7 +366,6 @@ void MainViewController::handleNoteOff(BKKeymapKeyboardState* source, int midiNo
 
 bool MainViewController::keyPressed (const KeyPress& e, Component*)
 {
-    
     int code = e.getKeyCode();
     
     if (code == KeyPress::escapeKey)
