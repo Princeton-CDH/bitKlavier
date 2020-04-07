@@ -64,12 +64,11 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
             
             idx++;
         }
-        
     }
     
     //Envelope Sliders
     envelopeSliders = OwnedArray<BKADSRSlider>();
-    for(int i=0; i<12; i++)
+    for(int i = 0; i < 12; i++)
     {
         envelopeSliders.insert(i, new BKADSRSlider("e"+String(i)));
         envelopeSliders[i]->setToolTip("Provides ADSR settings for up to 12 sequenced steps");
@@ -85,7 +84,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     
     // Target Control CBs
     targetControlCBs = OwnedArray<BKComboBox>();
-    for (int i=TargetTypeSynchronicPatternSync; i<=TargetTypeSynchronicRotate; i++)
+    for (int i = TargetTypeSynchronicPatternSync; i <= TargetTypeSynchronicRotate; i++)
     {
         targetControlCBs.add(new BKComboBox()); // insert at the end of the array
         targetControlCBs.getLast()->setName(cKeymapTargetTypes[i]);
@@ -157,9 +156,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     onOffLabel.setText("determines cluster", dontSendNotification);
     onOffLabel.setTooltip("Determines whether MIDI note On or note Off is used to measure cluster");
     addAndMakeVisible(&onOffLabel, ALL);
-    
-    
-    
+     
     //offsetParamStartToggle = new BKSingleSlider("skip first", 0, 1, 0, 1);
     offsetParamStartToggle.setButtonText ("skip first");
     offsetParamStartToggle.setTooltip("Indicates whether Synchronic will skip first column of sequenced parameters for first cycle");
@@ -249,6 +246,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     displayTab(currentTab);
 
 }
+
 void SynchronicViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
@@ -345,7 +343,7 @@ void SynchronicViewController::displayTab(int tab)
         if (showADSR)
         {
             // DEAL WITH ENVELOPE; MOVE THIS TO NEW TAB, include the buttons as well
-            for(int i=0; i<envelopeSliders.size(); i++)
+            for(int i = 0; i < envelopeSliders.size(); i++)
             {
                 if(i == visibleADSR)    envelopeSliders[i]->setVisible(true);
                 else                    envelopeSliders[i]->setVisible(false);
@@ -363,7 +361,7 @@ void SynchronicViewController::displayTab(int tab)
         else
         {
             // DEAL WITH ENVELOPE
-            for(int i=0; i<envelopeSliders.size(); i++)
+            for(int i = 0; i < envelopeSliders.size(); i++)
             {
                 envelopeSliders[i]->setVisible(true);
                 envelopeSliders[i]->setAlpha(0.5);
@@ -384,7 +382,7 @@ void SynchronicViewController::displayTab(int tab)
             }
 
             //envelopeName.setVisible(true);
-            for(int i=envelopeSliders.size() - 1; i>=0; i--)
+            for(int i = envelopeSliders.size() - 1; i >= 0; i--)
             {
                 envelopeSliders[i]->setVisible(true);
             }
@@ -481,11 +479,12 @@ void SynchronicViewController::displayTab(int tab)
     else if (tab == 2) // keymap target tab
     {
         // make the combo boxes visible
-        for (int i=0; i<targetControlCBs.size(); i++)
+        for (int i = 0; i < targetControlCBs.size(); i++)
         {
             targetControlCBs[i]->setVisible(true);
             targetControlCBLabels[i]->setVisible(true);
         }
+        
         targetControlsGroup.setVisible(true);
         
         Rectangle<int> area (getBounds());
@@ -519,8 +518,7 @@ void SynchronicViewController::displayTab(int tab)
         column3.removeFromRight(processor.paddingScalarX * 20);
         column3.removeFromLeft(processor.paddingScalarX * 5);
         
-        
-        for (int i=0; i<targetControlCBs.size() / 2; i++)
+        for (int i = 0; i < targetControlCBs.size() / 2; i++)
         {
             targetControlCBs[i]->setLookAndFeel(&buttonsAndMenusLAF);
             
@@ -533,7 +531,7 @@ void SynchronicViewController::displayTab(int tab)
             targetControlCBLabels[i]->setJustificationType(juce::Justification::centredRight);
         }
         
-        for (int i=targetControlCBs.size() / 2; i<targetControlCBs.size(); i++)
+        for (int i = targetControlCBs.size() / 2; i < targetControlCBs.size(); i++)
         {
             targetControlCBs[i]->setLookAndFeel(&comboBoxRightJustifyLAF);
             
@@ -617,7 +615,7 @@ void SynchronicViewController::resized()
         envelopeName.setBounds(envelopeSlice.toNearestInt());
         
         float envWidth = (float)(paramSliders[0]->getWidth() - 50) / 12.;
-        for(int i=envelopeSliders.size() - 1; i>=0; i--)
+        for(int i = envelopeSliders.size() - 1; i >= 0; i--)
         {
             Rectangle<float> envArea (envelopeSlice.removeFromRight(envWidth));
             envelopeSliders[i]->setBounds(envArea.toNearestInt());
@@ -659,7 +657,6 @@ void SynchronicViewController::resized()
         modeSlice2.removeFromRight(modeSlice2Chunk);
         modeLabel.setBounds(modeSlice2.removeFromRight(modeSlice2Chunk));
         modeSelectCB.setBounds(modeSlice2);
-        
 
         Rectangle<int> slice3 = leftColumn.removeFromBottom(1.5*gComponentComboBoxHeight);
         slice3 = slice3.removeFromTop(gComponentComboBoxHeight);
@@ -668,7 +665,6 @@ void SynchronicViewController::resized()
         slice3.removeFromRight(slice3Chunk);
         onOffLabel.setBounds(slice3.removeFromRight(slice3Chunk));
         onOffSelectCB.setBounds(slice3);
-        
         
         Rectangle<int> releaseToggleSlice = gainSlider->getBounds().removeFromTop(gComponentTextFieldHeight);
         releaseToggleSlice.removeFromRight(gYSpacing);
@@ -694,7 +690,7 @@ void SynchronicViewController::setShowADSR(String name, bool newval)
 {
     showADSR = newval;
     
-    for(int i=0; i<envelopeSliders.size(); i++)
+    for(int i =  0; i < envelopeSliders.size(); i++)
     {
         if(envelopeSliders[i]->getName() == name) visibleADSR = i;
     }
@@ -710,8 +706,6 @@ void SynchronicViewController::iWantTheBigOne(TextEditor* tf, String name)
     rightArrow.setAlwaysOnTop(false);
     leftArrow.setAlwaysOnTop(false);
     bigOne.display(tf, name, getBounds());
-    
-    
 }
 #endif
 
@@ -798,7 +792,7 @@ void SynchronicPreparationEditor::timerCallback()
         SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
         
         // dim target comboboxes that aren't activated by a Keymap
-        for (int i=TargetTypeSynchronicPatternSync; i<=TargetTypeSynchronicRotate; i++)
+        for (int i = TargetTypeSynchronicPatternSync; i <= TargetTypeSynchronicRotate; i++)
         {
             bool makeBright = false;
             for (auto km : sProcessor->getKeymaps())
@@ -865,8 +859,6 @@ void SynchronicPreparationEditor::timerCallback()
         //DBG("sProcessor->getOldestHoldTimer() = " + String(sProcessor->getHoldTimer()));
         velocityMinMaxSlider->setDisplayValue(sProcessor->getLastVelocity() * 127.);
         //DBG("sProcessor->getLastVelocity() = " + String(sProcessor->getLastVelocity()));
-        
-        
         
         int maxTemp = 12; //arbitrary
         if(active->getClusterMax() > active->getClusterMin()) maxTemp = active->getClusterMax();
@@ -986,7 +978,7 @@ void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     
     //only transposition allows multiple simultaneous vals, so trim down to 1D array
     Array<float> newvals = Array<float>();
-    for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
+    for(int i = 0; i < values.size(); i++) newvals.add(values[i][0]);
 
     //if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
     if (!name.compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
@@ -1092,7 +1084,7 @@ void SynchronicPreparationEditor::update(NotificationType notify)
     SynchronicPreparation::Ptr prep   = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
     // DEAL WITH ENVELOPE
-    for(int i=0; i<envelopeSliders.size(); i++)
+    for(int i = 0; i < envelopeSliders.size(); i++)
     {
         envelopeSliders[i]->setVisible(true);
         envelopeSliders[i]->setAlpha(0.5);

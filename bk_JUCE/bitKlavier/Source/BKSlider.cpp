@@ -80,7 +80,7 @@ void BKSubSlider::setSkewFromMidpoint(bool sfm)
 
 
 
-double BKSubSlider::getValueFromText    (const String & text )
+double BKSubSlider::getValueFromText(const String & text )
 {
     double newval = text.getDoubleValue();
     
@@ -105,7 +105,10 @@ double BKSubSlider::getValueFromText    (const String & text )
 
 BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
 {
+    // *** at the moment, only type HorizontalMultiBarSlider is implemented!!
+    if(which != HorizontalMultiBarSlider) DBG("only HorizontalMultiBarSlider currently implemented!");
     
+    /*
     if(which == VerticalMultiSlider || which == VerticalMultiBarSlider) sliderIsVertical = true;
     else sliderIsVertical = false;
     
@@ -114,9 +117,13 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     
     if(which == HorizontalMultiSlider || which == HorizontalMultiBarSlider) arrangedHorizontally = true;
     else arrangedHorizontally = false;
+     */
+    
+    sliderIsVertical = false;
+    arrangedHorizontally = true;
+    sliderIsBar = true;
     
     passiveSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
-    //highlightedSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::fromRGBA(250, 10, 50, 50));
     highlightedSliderLookAndFeel.setColour(Slider::thumbColourId, Colours::red.withSaturation(1.));
     activeSliderLookAndFeel.setColour(Slider::thumbColourId, Colours::goldenrod.withMultipliedAlpha(0.75));
     displaySliderLookAndFeel.setColour(Slider::thumbColourId, Colours::red.withMultipliedAlpha(0.5));
@@ -134,6 +141,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     allowSubSliders = false;
     subSliderName = "add subslider";
     
+    /*
     if(sliderIsVertical) {
         sliderWidth = 80;
         sliderHeight = 20;
@@ -143,12 +151,15 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
         sliderWidth = 20;
         sliderHeight = 60;
     }
+     */
     
+    sliderWidth = 20;
+    sliderHeight = 60;
     displaySliderWidth = 80;
-    
     clickedHeight = 0.;
     
     //subslider is oriented perpendicular to multislider orientation
+    /*
     if(sliderIsVertical) {
         if(sliderIsBar) subsliderStyle = Slider::LinearBar;
         else subsliderStyle = Slider::LinearHorizontal;
@@ -158,6 +169,8 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
         if(sliderIsBar) subsliderStyle = Slider::LinearBarVertical;
         else subsliderStyle = Slider::LinearVertical;
     }
+     */
+    subsliderStyle = Slider::LinearBarVertical;
     
     //create the default sliders, with one active
     for(int i = 0; i<numDefaultSliders; i++)
@@ -166,6 +179,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
         else addSlider(-1, false, dontSendNotification);
     }
     
+    /*
     if(arrangedHorizontally)
     {
         int tempheight = sliderHeight;
@@ -200,6 +214,23 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
                                              tempwidth,
                                              numActiveSliders * sliderHeight);
     }
+     */
+
+    bigInvisibleSlider = std::make_unique<BKSubSlider>(Slider::LinearBarVertical,
+                                         sliderMin,
+                                         sliderMax,
+                                         sliderDefault,
+                                         sliderIncrement,
+                                         numActiveSliders * 20,
+                                         sliderHeight);
+    
+    displaySlider = std::make_unique<BKSubSlider>(Slider::LinearBarVertical,
+                                    sliderMin,
+                                    sliderMax,
+                                    sliderDefault,
+                                    sliderIncrement,
+                                    displaySliderWidth,
+                                    sliderHeight);
     
     bigInvisibleSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0,0);
     bigInvisibleSlider->setAlpha(0.0);
@@ -251,6 +282,11 @@ BKMultiSlider::~BKMultiSlider()
     
 }
 
+inline void BKMultiSlider::dismissTextEditor(bool setValue)
+{
+    if (setValue)   textEditorReturnKeyPressed(*editValsTextField);
+    else            textEditorEscapeKeyPressed(*editValsTextField);
+}
 
 void BKMultiSlider::setTo(Array<float> newvals, NotificationType newnotify)
 {
@@ -262,14 +298,14 @@ void BKMultiSlider::setTo(Array<float> newvals, NotificationType newnotify)
     
     deactivateAll(newnotify);
     
-    for(int i=0; i<numVisibleSliders; i++)
+    for(int i = 0; i < numVisibleSliders; i++)
     {
-        if(i >= sliders.size()) addSlider(-1, true, newnotify);
+        if(i >= sliders.size()) addSlider(-1, false, newnotify);
         
         BKSubSlider* refSlider = sliders[i]->operator[](0);
         if(refSlider != nullptr)
         {
-            if(i<numActiveSliders)
+            if(i < numActiveSliders)
             {
                 if(refSlider->getMaximum() < newvals[i]) refSlider->setRange(sliderMin, newvals[i], sliderIncrement);
                 if(refSlider->getMinimum() > newvals[i]) refSlider->setRange(newvals[i], sliderMax, sliderIncrement);
@@ -304,11 +340,11 @@ void BKMultiSlider::setTo(Array<Array<float>> newvals, NotificationType newnotif
     
     deactivateAll(newnotify);
     
-    for(int i=0; i<numVisibleSliders; i++)
+    for(int i = 0; i < numVisibleSliders; i++)
     {
         if(i >= sliders.size()) addSlider(-1, false, newnotify);
         
-        for(int j=0; j<newvals[i].size(); j++)
+        for(int j = 0; j < newvals[i].size(); j++)
         {
             
             if(j >= sliders[i]->size()) addSubSlider(i, false, newnotify);
@@ -316,7 +352,7 @@ void BKMultiSlider::setTo(Array<Array<float>> newvals, NotificationType newnotif
             BKSubSlider* refSlider = sliders[i]->operator[](j);
             if(refSlider != nullptr)
             {
-                if(i<numActiveSliders)
+                if(i < numActiveSliders)
                 {
                     if(refSlider->getMaximum() < newvals[i][j]) refSlider->setRange(sliderMin, newvals[i][j], sliderIncrement);
                     if(refSlider->getMinimum() > newvals[i][j]) refSlider->setRange(newvals[i][j], sliderMax, sliderIncrement);
@@ -350,12 +386,12 @@ void BKMultiSlider::cleanupSliderArray()
     //not sure if we should do that or not.
     //not sure if we have to do any locking at all, because it looks like OwnedArray does so for remove
     
-    for(int i=sliders.size() - 1; i>=0; i--)
+    for(int i = sliders.size() - 1; i >= 0; i--)
     {
         //remove sliders above numVisibleSliders
         if(i >= numVisibleSliders)
         {
-            for(int j=sliders[i]->size() - 1; j>=0; j--)
+            for(int j = sliders[i]->size() - 1; j >= 0; j--)
             {
                 BKSubSlider* refSlider = sliders[i]->operator[](j);
                 if(refSlider != nullptr)
@@ -367,7 +403,7 @@ void BKMultiSlider::cleanupSliderArray()
         }
         
         //remove inactive subsliders; will only do anything if the parent slider still exists
-        for(int j=sliders[i]->size() - 1; j>=1; j--) //only remove subsliders....
+        for(int j = sliders[i]->size() - 1; j >= 1; j--) //only remove subsliders....
         {
             BKSubSlider* refSlider = sliders[i]->operator[](j);
             if(refSlider != nullptr)
@@ -392,9 +428,9 @@ void BKMultiSlider::setMinMaxDefaultInc(std::vector<float> newvals)
     sliderDefault = newvals[2];
     sliderIncrement = newvals[3];
     
-    for(int i=0; i<sliders.size(); i++)
+    for(int i = 0; i < sliders.size(); i++)
     {
-        for(int j = 0; j<sliders[i]->size(); j++)
+        for(int j = 0; j < sliders[i]->size(); j++)
         {
             BKSubSlider* refSlider = sliders[i]->operator[](j);
             if(refSlider != nullptr)
@@ -415,9 +451,9 @@ void BKMultiSlider::setSkewFromMidpoint(bool sfm)
 {
     skewFromMidpoint = sfm;
     
-    for(int i=0; i<sliders.size(); i++)
+    for(int i = 0; i < sliders.size(); i++)
     {
-        for(int j = 0; j<sliders[i]->size(); j++)
+        for(int j = 0; j < sliders[i]->size(); j++)
         {
             BKSubSlider* refSlider = sliders[i]->operator[](j);
             if(refSlider != nullptr)
@@ -565,7 +601,7 @@ void BKMultiSlider::deactivateSlider(int where, NotificationType notify)
 
 void BKMultiSlider::deactivateAll(NotificationType notify)
 {
-    for(int i=0; i<sliders.size(); i++ )
+    for(int i = 0; i < sliders.size(); i++ )
     {
         deactivateSlider(i, notify);
     }
@@ -574,7 +610,7 @@ void BKMultiSlider::deactivateAll(NotificationType notify)
 
 void BKMultiSlider::deactivateAllAfter(int where, NotificationType notify)
 {
-    for(int i=where+1; i<sliders.size(); i++ )
+    for(int i = where+1; i < sliders.size(); i++ )
     {
         deactivateSlider(i, notify);
     }
@@ -583,7 +619,7 @@ void BKMultiSlider::deactivateAllAfter(int where, NotificationType notify)
 void BKMultiSlider::deactivateAllBefore(int where, NotificationType notify)
 {
     if (where > sliders.size()) where = sliders.size();
-    for(int i=0; i<where; i++ )
+    for(int i = 0; i < where; i++ )
     {
         deactivateSlider(i, notify);
     }
@@ -781,7 +817,7 @@ int BKMultiSlider::whichSubSlider (int which)
     }
     
     if(arrangedHorizontally) {
-        for(int i=0; i<sliders[which]->size(); i++)
+        for(int i = 0; i < sliders[which]->size(); i++)
         {
             BKSubSlider* currentSlider = sliders[which]->operator[](i);
             if(currentSlider != nullptr) {
@@ -812,7 +848,7 @@ int BKMultiSlider::whichSubSlider (int which, const MouseEvent &e)
     }
     
     if(arrangedHorizontally) {
-        for(int i=0; i<sliders[which]->size(); i++)
+        for(int i = 0; i < sliders[which]->size(); i++)
         {
             BKSubSlider* currentSlider = sliders[which]->operator[](i);
             if(currentSlider != nullptr) {
@@ -834,13 +870,12 @@ int BKMultiSlider::whichActiveSlider (int which)
     int counter = 0;
     if(which > sliders.size()) which = sliders.size();
     
-    for(int i=0; i<which; i++)
+    for(int i = 0; i < which; i++)
     {
         BKSubSlider* currentSlider = sliders[i]->operator[](0);
         if(currentSlider != nullptr)
             if(currentSlider->isActive()) counter++;
     }
-    
     
     return counter;
 }
@@ -852,31 +887,30 @@ void BKMultiSlider::resetRanges()
     double sliderMinTemp = sliderMinDefault;
     double sliderMaxTemp = sliderMaxDefault;
     
-    for(int i = 0; i<sliders.size(); i++)
+    for (int i = 0; i < sliders.size(); i++)
     {
-        for(int j = 0; j<sliders[i]->size(); j++)
+        for (int j = 0; j < sliders[i]->size(); j++)
         {
             BKSubSlider* currentSlider = sliders[i]->operator[](j);
-            if(currentSlider != nullptr)
+            if (currentSlider != nullptr)
             {
-                if(currentSlider->getValue() > sliderMaxTemp) sliderMaxTemp = currentSlider->getValue();
-                if(currentSlider->getValue() < sliderMinTemp) sliderMinTemp = currentSlider->getValue();
+                if (currentSlider->getValue() > sliderMaxTemp) sliderMaxTemp = currentSlider->getValue();
+                if (currentSlider->getValue() < sliderMinTemp) sliderMinTemp = currentSlider->getValue();
             }
-            
         }
     }
     
-    if( (sliderMax != sliderMaxTemp) || sliderMin != sliderMinTemp)
+    if ((sliderMax != sliderMaxTemp) || sliderMin != sliderMinTemp)
     {
         sliderMax = sliderMaxTemp;
         sliderMin = sliderMinTemp;
         
-        for(int i = 0; i<sliders.size(); i++)
+        for (int i = 0; i < sliders.size(); i++)
         {
-            for(int j = 0; j<sliders[i]->size(); j++)
+            for (int j = 0; j < sliders[i]->size(); j++)
             {
                 BKSubSlider* currentSlider = sliders[i]->operator[](j);
-                if(currentSlider != nullptr)
+                if (currentSlider != nullptr)
                 {
                     currentSlider->setRange(sliderMin, sliderMax, sliderIncrement);
                 }
@@ -908,10 +942,10 @@ void BKMultiSlider::resized()
     
     sliderWidth = (float)area.getWidth() / numVisibleSliders;
     
-    for (int i=0; i<numVisibleSliders; i++)
+    for (int i = 0; i < numVisibleSliders; i++)
     {
         Rectangle<float> sliderArea (area.removeFromLeft(sliderWidth));
-        for(int j=0; j<sliders[i]->size(); j++)
+        for(int j = 0; j < sliders[i]->size(); j++)
         {
             BKSubSlider* currentSlider = sliders[i]->operator[](j);
             if(currentSlider != nullptr)
@@ -1026,11 +1060,11 @@ Array<Array<float>> BKMultiSlider::getAllValues()
 {
     Array<Array<float>> currentvals;
     
-    for(int i=0; i<sliders.size(); i++)
+    for(int i = 0; i < sliders.size(); i++)
     {
         Array<float> toAdd;
         
-        for(int j=0; j<sliders[i]->size(); j++)
+        for(int j = 0; j < sliders[i]->size(); j++)
         {
             BKSubSlider* currentSlider = sliders[i]->operator[](j);
             if(currentSlider != nullptr)
@@ -1050,11 +1084,11 @@ Array<Array<float>> BKMultiSlider::getAllActiveValues()
 {
     Array<Array<float>> currentvals;
     
-    for(int i=0; i<sliders.size(); i++)
+    for(int i = 0; i < sliders.size(); i++)
     {
         Array<float> toAdd;
         
-        for(int j=0; j<sliders[i]->size(); j++)
+        for(int j = 0; j < sliders[i]->size(); j++)
         {
             BKSubSlider* currentSlider = sliders[i]->operator[](j);
             if(currentSlider != nullptr)
@@ -1077,7 +1111,7 @@ Array<Array<float>> BKMultiSlider::getAllActiveValues()
 Array<float> BKMultiSlider::getOneSliderBank(int which)
 {
     Array<float> newvals;
-    for(int i=0; i<sliders[which]->size(); i++)
+    for(int i = 0; i < sliders[which]->size(); i++)
     {
         BKSubSlider* currentSlider = sliders[which]->operator[](i);
         if(currentSlider != nullptr)

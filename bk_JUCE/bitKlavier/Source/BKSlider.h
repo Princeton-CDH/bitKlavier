@@ -63,6 +63,24 @@ private:
 // **************************************************  BKMultiSlider ************************************************** //
 // ******************************************************************************************************************** //
 
+/*
+ 
+ BKMultiSlider is a horizontal array of sliders.
+ 
+ Each "slider" can have multiple sliders, facilitating, for instance, multiple transposition values
+ The user can drag across the sliders to quickly set values
+ The user can also enter sliderr values directly via a text editor:
+    "1 [-1, -2, -3] 2 3" will create three sliders, and the second will have three overlaid sliders
+ By default it has 12 sliders, but that can be increased by adding additional values via text entry.
+ 
+ The API includes functions for setting the slider, either all at once (via text) or by individual slider (via mouse)
+ and for deactivating individual sliders or sections of sliders.
+ 
+ Note that at the moment when the user activates a slider that has inactive sliders that precede it, so there is a gap,
+ the UI will close that gap on re-opening; we could/should change that, but have not yet.
+ 
+*/
+
 class BKMultiSlider :
 public Component,
 public Slider::Listener,
@@ -75,35 +93,44 @@ public ImageButton::Listener
     
 public:
     
+    // constructor: at the moment, only type HorizontalMultiBarSlider is implemented
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
     
+    // inserts a slider into the multislider
     void addSlider(int where, bool active, NotificationType newnotify);
+    
+    // adds an additional slider at a particular index; it's possible to have multiple
+    // sliders at one location, facilitating, for instance, multiple transpositions at one time
     void addSubSlider(int where, bool active, NotificationType newnotify);
     
+    // these methods clear currently active sliders
+    // exception: you can't clear the FIRST slider, as we need at least one active slider
     void deactivateSlider(int where, NotificationType notify);
     void deactivateAll(NotificationType notify);
     void deactivateAllAfter(int where, NotificationType notify);
     void deactivateAllBefore(int where, NotificationType notify);
     
+    // slider values can be edited directly via a text editor
+    // values in brackets will be collected at one index
+    // for example: "0 [1 2 3] 4" will have three active sliders, and the second one will have three subsliders
     inline void setText(String text) { editValsTextField->setText(text, dontSendNotification); }
+    inline TextEditor* getTextEditor(void) { return editValsTextField.get();}
+    inline void dismissTextEditor(bool setValue = false);
     
-    inline TextEditor* getTextEditor(void)
-    {
-        return editValsTextField.get();
-    }
-    
-    inline void dismissTextEditor(bool setValue = false)
-    {
-        if (setValue)   textEditorReturnKeyPressed(*editValsTextField);
-        else            textEditorEscapeKeyPressed(*editValsTextField);
-    }
-    
+    // identify which slider is mouseDowned
     int whichSlider (const MouseEvent &e);
+    
+    // identify which subSlider is closest to cursor after mouseDown on a particular slider
     int whichSubSlider (int which);
+    
+    // identify which subSlider is closest on mouseOver
     int whichSubSlider (int which, const MouseEvent &e);
+    
+    // update which slider is active after mouseDrag and mouseUp; to support dragging across multiple sliders
     int whichActiveSlider (int which);
     
+    // mouse/text events
     void mouseDrag(const MouseEvent &e) override;
     void mouseMove(const MouseEvent& e) override;
     void mouseDoubleClick (const MouseEvent &e) override;
@@ -111,8 +138,13 @@ public:
     void mouseUp (const MouseEvent &event) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     
+    // setTo takes an array of values for active sliders and updates the multislider accordingly
     void setTo(Array<float> newvals, NotificationType newnotify);
+    
+    // takes and array of arrays, each subarray corresponding to active values at a single slider position
+    // developed originally to support having multiple transposition values at a single slider position
     void setTo(Array<Array<float>> newvals, NotificationType newnotify);
+    
     void setMinMaxDefaultInc(std::vector<float> newvals);
     void setCurrentSlider(int activeSliderNum);
     
@@ -122,10 +154,6 @@ public:
     void setSubSliderName(String ssname) { subSliderName = ssname; }
     void setSkewFromMidpoint(bool sfm);
     
-    void cleanupSliderArray();
-    void resetRanges();
-    
-    inline int getNumActive(void) const noexcept { return numActiveSliders;}
     inline int getNumVisible(void) const noexcept { return numVisibleSliders;}
     
     void resized() override;
@@ -200,8 +228,13 @@ private:
     bool allowSubSliders;
     String subSliderName;
     
+    // the number of sliders will values actually set; always >= 1
     int numActiveSliders;
+    
+    // by default, how many sliders to show (12)
     int numDefaultSliders;
+    
+    // how many are actually visible; will be == numActiveSliders OR numDefaultSliders, whichever one is greater
     int numVisibleSliders;
     
     float clickedHeight;
@@ -219,6 +252,11 @@ private:
     void highlight(int activeSliderNum);
     void deHighlight(int sliderNum);
     int getActiveSlider(int sliderNum);
+    
+    void cleanupSliderArray();
+    void resetRanges();
+    
+    inline int getNumActive(void) const noexcept { return numActiveSliders;}
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
 };
