@@ -129,7 +129,7 @@ public:
         jassert (processor != nullptr); // Your createPluginFilter() function must return a valid object!
         
         processor->disableNonMainBuses();
-        processor->setRateAndBufferSizeDetails (44100, 512);
+        processor->setRateAndBufferSizeDetails (44100, 128);
         
         int inChannels = (channelConfiguration.size() > 0 ? channelConfiguration[0].numIns
                           : processor->getMainBusNumInputChannels());
@@ -157,6 +157,8 @@ public:
     //==============================================================================
     Value& getMuteInputValue()                           { return shouldMuteInput; }
     bool getProcessorHasPotentialFeedbackLoop() const    { return processorHasPotentialFeedbackLoop; }
+    
+    Value& getTooltipsEnabledValue()                     { return tooltipsEnabled; }
     
     //==============================================================================
     File getLastFile() const
@@ -246,10 +248,8 @@ public:
     
     //==============================================================================
     /** Shows an audio properties dialog box modally. */
-    void showAudioSettingsDialog()
+    void showAudioSettingsDialog(Button* button)
     {
-        DialogWindow::LaunchOptions o;
-        
         int minNumInputs  = std::numeric_limits<int>::max(), maxNumInputs  = 0,
         minNumOutputs = std::numeric_limits<int>::max(), maxNumOutputs = 0;
         
@@ -275,26 +275,19 @@ public:
         minNumInputs  = jmin (minNumInputs,  maxNumInputs);
         minNumOutputs = jmin (minNumOutputs, maxNumOutputs);
         
-        o.content.setOwned (new SettingsComponent (*this, deviceManager,
+        Component* settings = new AudioSettingsComponent (*this, deviceManager,
                                                    minNumInputs,
                                                    maxNumInputs,
                                                    minNumOutputs,
-                                                   maxNumOutputs));
-        o.content->setSize (500, 550);
+                                                   maxNumOutputs);
+        settings->setSize(450, 300);
         
-        o.dialogTitle                   = TRANS("bitKlavier Settings");
-        o.dialogBackgroundColour        = o.content->getLookAndFeel().findColour (ResizableWindow::backgroundColourId);
-        o.escapeKeyTriggersCloseButton  = true;
-        o.useNativeTitleBar             = true;
-        o.resizable                     = false;
-        
-        o.launchAsync();
+        CallOutBox& box = CallOutBox::launchAsynchronously (settings, button->getScreenBounds(), nullptr);
+        box.setLookAndFeel(&laf);
     }
     
-    void showBKSettingsDialog()
+    void showBKSettingsDialog(Button* button)
     {
-        DialogWindow::LaunchOptions o;
-        
         int minNumInputs  = std::numeric_limits<int>::max(), maxNumInputs  = 0,
         minNumOutputs = std::numeric_limits<int>::max(), maxNumOutputs = 0;
         
@@ -320,20 +313,11 @@ public:
         minNumInputs  = jmin (minNumInputs,  maxNumInputs);
         minNumOutputs = jmin (minNumOutputs, maxNumOutputs);
         
-        o.content.setOwned (new SettingsComponent (*this, deviceManager,
-                                                   minNumInputs,
-                                                   maxNumInputs,
-                                                   minNumOutputs,
-                                                   maxNumOutputs));
-        o.content->setSize (500, 550);
+        Component* settings = new PreferencesComponent (*this);
+        settings->setSize(200, 50);
         
-        o.dialogTitle                   = TRANS("Audio/MIDI Settings");
-        o.dialogBackgroundColour        = o.content->getLookAndFeel().findColour (ResizableWindow::backgroundColourId);
-        o.escapeKeyTriggersCloseButton  = true;
-        o.useNativeTitleBar             = true;
-        o.resizable                     = false;
-        
-        o.launchAsync();
+        CallOutBox& box = CallOutBox::launchAsynchronously (settings, button->getScreenBounds(), nullptr);
+        box.setLookAndFeel(&laf);
     }
     
     void saveAudioDeviceState()
@@ -343,7 +327,7 @@ public:
             auto xml = deviceManager.createStateXml();
             
             settings->setValue ("audioSetup", xml.get());
-            
+            settings->setValue ("tooltipsEnabled", (bool) shouldMuteInput.getValue());
 #if ! (JUCE_IOS || JUCE_ANDROID)
             settings->setValue ("shouldMuteInput", (bool) shouldMuteInput.getValue());
 #endif
@@ -359,7 +343,7 @@ public:
         if (settings != nullptr)
         {
             savedState = settings->getXmlValue ("audioSetup");
-            
+            tooltipsEnabled.setValue (settings->getBoolValue ("tooltipsEnabled", true));
 #if ! (JUCE_IOS || JUCE_ANDROID)
             shouldMuteInput.setValue (settings->getBoolValue ("shouldMuteInput", true));
 #endif
@@ -482,12 +466,15 @@ public:
     std::unique_ptr<AudioDeviceManager::AudioDeviceSetup> options;
     Array<MidiDeviceInfo> lastMidiDevices;
     
+    BKWindowLAF laf;
+    Value tooltipsEnabled;
+    
 private:
     //==============================================================================
-    class SettingsComponent : public Component
+    class AudioSettingsComponent : public Component
     {
     public:
-        SettingsComponent (StandalonePluginHolder& pluginHolder,
+        AudioSettingsComponent (StandalonePluginHolder& pluginHolder,
                            AudioDeviceManager& deviceManagerToUse,
                            int minAudioInputChannels,
                            int maxAudioInputChannels,
@@ -508,6 +495,7 @@ private:
             shouldMuteButton.setClickingTogglesState (true);
             shouldMuteButton.getToggleStateValue().referTo (owner.shouldMuteInput);
             
+            deviceSelector.setLookAndFeel(&owner.laf);
             addAndMakeVisible (deviceSelector);
             
             if (owner.getProcessorHasPotentialFeedbackLoop())
@@ -551,8 +539,64 @@ private:
         ToggleButton shouldMuteButton;
         
         //==============================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SettingsComponent)
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioSettingsComponent)
     };
+    
+    
+    
+    
+    
+    
+    
+    class PreferencesComponent : public Component
+    {
+    public:
+        PreferencesComponent (StandalonePluginHolder& pluginHolder)
+        : owner (pluginHolder),
+        tooltipsLabel  ("Show tooltips", "Show tooltips"),
+        tooltipsButton ("")
+        {
+            setOpaque (true);
+            
+            tooltipsButton.setClickingTogglesState (true);
+            tooltipsButton.getToggleStateValue().referTo (owner.tooltipsEnabled);
+            
+            addAndMakeVisible (tooltipsButton);
+            addAndMakeVisible (tooltipsLabel);
+            
+            tooltipsLabel.attachToComponent (&tooltipsButton, true);
+        }
+        
+        void paint (Graphics& g) override
+        {
+            g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+        }
+        
+        void resized() override
+        {
+            auto r = getLocalBounds();
+            
+            r.removeFromTop(8);
+            r.removeFromLeft(r.getWidth() * 0.5);
+            r.removeFromRight(8);
+            tooltipsButton.setBounds (r.removeFromTop(24));
+        }
+        
+    private:
+        //==============================================================================
+        StandalonePluginHolder& owner;
+        Label tooltipsLabel;
+        ToggleButton tooltipsButton;
+        
+        //==============================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreferencesComponent)
+    };
+    
+    
+    
+    
+    
+    
     
     //==============================================================================
     void audioDeviceIOCallback (const float** inputChannelData,
@@ -691,16 +735,21 @@ public:
 #endif
     )
     : DocumentWindow (title, backgroundColour, DocumentWindow::minimiseButton | DocumentWindow::closeButton),
-    optionsButton ("Options")
+    preferencesButton ("User Preferences"),
+    audioMidiButton ("Audio/MIDI Settings")
     {
 #if JUCE_IOS || JUCE_ANDROID
         setTitleBarHeight (0);
 #else
         setTitleBarButtonsRequired (DocumentWindow::minimiseButton | DocumentWindow::closeButton, false);
         
-        Component::addAndMakeVisible (optionsButton);
-        optionsButton.addListener (this);
-        optionsButton.setTriggeredOnMouseDown (true);
+        Component::addAndMakeVisible (preferencesButton);
+        preferencesButton.addListener (this);
+        preferencesButton.setTriggeredOnMouseDown (true);
+        
+        Component::addAndMakeVisible (audioMidiButton);
+        audioMidiButton.addListener (this);
+        audioMidiButton.setTriggeredOnMouseDown (true);
 #endif
         
         pluginHolder.reset (new StandalonePluginHolder (settingsToUse, takeOwnershipOfSettings,
@@ -773,45 +822,23 @@ public:
         JUCEApplicationBase::quit();
     }
     
-    void buttonClicked (Button*) override
+    void buttonClicked (Button* button) override
     {
-        PopupMenu m;
-        m.addItem (1, TRANS("Audio/MIDI Settings..."));
-        m.addSeparator();
-        m.addItem (2, TRANS("Save current state..."));
-        m.addItem (3, TRANS("Load a saved state..."));
-        m.addSeparator();
-        m.addItem (4, TRANS("Reset to default state"));
-//        m.addSeparator();
-//        m.addItem (5, TRANS("bitKlavier settings"));
-        
-        m.showMenuAsync (PopupMenu::Options(),
-                         ModalCallbackFunction::forComponent (menuCallback, this));
-    }
-    
-    void handleMenuResult (int result)
-    {
-        switch (result)
+        if (button == &preferencesButton)
         {
-            case 1:  pluginHolder->showAudioSettingsDialog(); break;
-            case 2:  pluginHolder->askUserToSaveState(); break;
-            case 3:  pluginHolder->askUserToLoadState(); break;
-            case 4:  resetToDefaultState(); break;
-            case 5:  pluginHolder->showBKSettingsDialog(); break;
-            default: break;
+            pluginHolder->showBKSettingsDialog(button);
         }
-    }
-    
-    static void menuCallback (int result, StandaloneFilterWindow* button)
-    {
-        if (button != nullptr && result != 0)
-            button->handleMenuResult (result);
+        else if (button == &audioMidiButton)
+        {
+            pluginHolder->showAudioSettingsDialog(button);
+        }
     }
     
     void resized() override
     {
         DocumentWindow::resized();
-        optionsButton.setBounds (8, 6, 60, getTitleBarHeight() - 8);
+        preferencesButton.setBounds (6, 6, 80, getTitleBarHeight() - 8);
+        audioMidiButton.setBounds (6 + preferencesButton.getRight(), 6, 100, getTitleBarHeight() - 8);
     }
     
     virtual StandalonePluginHolder* getPluginHolder()    { return pluginHolder.get(); }
@@ -942,12 +969,19 @@ private:
         }
         
         void valueChanged (Value& value) override     { inputMutedChanged (value.getValue()); }
-        void buttonClicked (Button*) override
+        void buttonClicked (Button* button) override
         {
 #if JUCE_IOS || JUCE_ANDROID
             owner.pluginHolder->getMuteInputValue().setValue (false);
 #else
-            owner.pluginHolder->showAudioSettingsDialog();
+            if (button == &owner.preferencesButton)
+            {
+                owner.pluginHolder->showBKSettingsDialog(button);
+            }
+            else if (button == &owner.audioMidiButton)
+            {
+                owner.pluginHolder->showAudioSettingsDialog(button);
+            }
 #endif
         }
         
@@ -981,7 +1015,10 @@ private:
     };
     
     //==============================================================================
-    TextButton optionsButton;
+    TextButton preferencesButton;
+    TextButton audioMidiButton;
+    
+    BKButtonAndMenuLAF buttonsAndMenusLAF;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StandaloneFilterWindow)
 };

@@ -609,6 +609,15 @@ void MainViewController::timerCallback()
 {
     BKUpdateState::Ptr state = processor.updateState;
     
+    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
+    {
+        tipwindow = std::make_unique<TooltipWindow>();
+    }
+    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
+    {
+        tipwindow = nullptr;
+    }
+    
     if (++timerCallbackCount >= 25)
     {
         timerCallbackCount = 0;

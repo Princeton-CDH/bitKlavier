@@ -24,6 +24,7 @@ public:
         setColour(TextEditor::backgroundColourId,   Colours::goldenrod);
         setColour(TextEditor::textColourId,         Colours::black);
         
+        
     }
 };
 
@@ -106,13 +107,40 @@ public:
     int getDefaultMenuBarHeight() override;
     void drawTooltip(Graphics& g, const String& text, int width, int height) override;
     
-    inline void setTooltipsEnabled(bool enabled) { tooltipsEnabled = enabled; }
-    
 private:
     Justification comboBoxJustification;
     bool toggleTextToRight;
     bool tooltipsEnabled;
 };
+
+class BKWindowLAF : public BKButtonAndMenuLAF
+{
+public:
+    
+    BKWindowLAF()
+    {
+        setColour(ResizableWindow::backgroundColourId,   Colours::black);
+        
+        setColour(ListBox::textColourId, Colours::antiquewhite);
+        setColour(ListBox::backgroundColourId, Colours::black);
+        setColour(ListBox::outlineColourId, Colours::antiquewhite.withAlpha(0.6f));
+        
+    }
+    
+    Button* createDocumentWindowButton (int buttonType) override;
+    void drawDocumentWindowTitleBar (DocumentWindow& window, Graphics& g,
+                                     int w, int h, int titleSpaceX, int titleSpaceW,
+                                     const Image* icon, bool drawTitleTextOnLeft) override;
+    
+    Font getComboBoxFont (ComboBox&) override;
+    Font getPopupMenuFont (void) override;
+    Font getTextButtonFont (TextButton&, int buttonHeight)  override;
+    Font getLabelFont (Label&) override;
+    
+    void drawCallOutBoxBackground (CallOutBox& box, Graphics& g,
+                                   const Path& path, Image& cachedImage) override;
+};
+
 
 class BKMultiSliderLookAndFeel : public BKButtonAndMenuLAF
 {

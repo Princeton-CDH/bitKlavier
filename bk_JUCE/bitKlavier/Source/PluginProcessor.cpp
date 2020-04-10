@@ -1713,3 +1713,8 @@ double BKAudioProcessor::getCurrentSampleRate()
 {
     return currentSampleRate;
 }
+
+bool BKAudioProcessor::areTooltipsEnabled()
+{
+    return getPluginHolder()->getTooltipsEnabledValue().getValue();
+}
