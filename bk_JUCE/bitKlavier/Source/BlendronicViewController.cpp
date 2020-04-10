@@ -838,6 +838,21 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
     }
 }
 
+void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states)
+{
+    for (int i = 0; i < values.size(); i++)
+    {
+        for (int j = 0; j < values[i].size(); j++)
+            DBG("BlendronicPreparationEditor::multiSlidersDidChange: val " + String(i) + "" + String(j) + "" + String(values[i].getUnchecked(j)));
+    }
+    
+    for (int i = 0; i < states.size(); i++)
+    {
+        DBG("BlendronicPreparationEditor::multiSlidersDidChange: state " + String((int)states.getUnchecked(i)));
+    }
+}
+
+/*
 void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
 {
     BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
@@ -869,6 +884,7 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
         active  ->setFeedbackCoefficients(newvals);
     }
 }
+ */
 
 void BlendronicPreparationEditor::buttonClicked (Button* b)
 {
@@ -1146,6 +1162,21 @@ void BlendronicModificationEditor::multiSliderDidChange(String name, int whichSl
     
 }
 
+void BlendronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states)
+{
+    for (int i = 0; i < values.size(); i++)
+    {
+        for (int j = 0; j < values[i].size(); j++)
+            DBG("BlendronicModificationEditor::multiSlidersDidChange: val " + String(i) + " " + String(j) + " " + String(values[i].getUnchecked(j)));
+    }
+    
+    for (int i = 0; i < states.size(); i++)
+    {
+        DBG("BlendronicModificationEditor::multiSlidersDidChange: state " + String((int)states.getUnchecked(i)));
+    }
+}
+
+/*
 void BlendronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
 {
     BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
@@ -1187,6 +1218,7 @@ void BlendronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     
     updateModification();
 }
+ */
 
 void BlendronicModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {

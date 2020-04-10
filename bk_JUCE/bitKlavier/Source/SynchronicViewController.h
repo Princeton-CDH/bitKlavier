@@ -82,16 +82,25 @@ protected:
     OwnedArray<BKADSRSlider> envelopeSliders;
     
     virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
-    virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
+    
+    //virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
+    virtual void multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states) = 0;
     
     inline void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override
     {
         multiSliderDidChange(name, whichSlider, values);
     }
     
+    /*
     inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override
     {
         multiSlidersDidChange(name, values);
+    }
+     */
+    
+    inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values, Array<bool> states) override
+    {
+        multiSlidersDidChange(name, values, states);
     }
     
     BKEditableComboBox selectCB;
@@ -186,7 +195,8 @@ private:
     void buttonClicked (Button* b) override;
     
     void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
-    void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    // void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    void multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SynchronicPreparationEditor)
 };
@@ -239,7 +249,8 @@ private:
     void buttonClicked (Button* b) override;
     
     void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
-    void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    //void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    void multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states) override;
     
     void greyOutAllComponents();
     void highlightModedComponents();

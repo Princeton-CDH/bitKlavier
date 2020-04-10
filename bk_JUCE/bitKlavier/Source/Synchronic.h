@@ -59,6 +59,10 @@ public:
     sAccentMultipliers(p->getAccentMultipliers()),
     sLengthMultipliers(p->getLengthMultipliers()),
     sTransposition(p->getTransposition()),
+    sBeatMultipliersStates(p->getBeatMultipliersStates()),
+    sAccentMultipliersStates(p->getAccentMultipliersStates()),
+    sLengthMultipliersStates(p->getLengthMultipliersStates()),
+    sTranspositionStates(p->getTranspositionStates()),
     sTranspUsesTuning(p->getTranspUsesTuning()),
     sAttacks(p->getAttacks()),
     sDecays(p->getDecays()),
@@ -110,6 +114,10 @@ public:
     sAccentMultipliers(accentMultipliers),
     sLengthMultipliers(lengthMultipliers),
     sTransposition(transp),
+    sBeatMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sAccentMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sLengthMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sTranspositionStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
     sTranspUsesTuning(false),
     sClusterThresh(clusterThresh),
     sClusterThreshSec(.001 * sClusterThresh),
@@ -124,6 +132,7 @@ public:
     targetTypeSynchronicRotate(NoteOn),
     midiOutput(nullptr)
     {
+        
     }
 
     
@@ -143,6 +152,10 @@ public:
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
+    sBeatMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sAccentMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sLengthMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sTranspositionStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
     sTranspUsesTuning(false),
     sAttacks(Array<int>({3,3,3,3,3,3,3,3,3,3,3,3})),
     sDecays(Array<int>({3,3,3,3,3,3,3,3,3,3,3,3})),
@@ -178,11 +191,18 @@ public:
         sAccentMultipliers = s->getAccentMultipliers();
         sLengthMultipliers = s->getLengthMultipliers();
         sGain = s->getGain();
+        
         sTransposition = s->getTransposition();
-        sTranspUsesTuning = s->getTranspUsesTuning();
         sClusterThresh = s->getClusterThreshMS();
         sClusterThreshSec = s->getClusterThreshSEC();
         sReleaseVelocitySetsSynchronic = s->getReleaseVelocitySetsSynchronic();
+        
+        sBeatMultipliersStates = s->getBeatMultipliersStates();
+        sAccentMultipliersStates = s->getAccentMultipliersStates();
+        sLengthMultipliersStates = s->getLengthMultipliersStates();
+        sTranspositionStates = s->getTranspositionStates();
+        
+        sTranspUsesTuning = s->getTranspUsesTuning();
         
         sAttacks = s->getAttacks();
         sDecays = s->getDecays();
@@ -214,18 +234,34 @@ public:
     
     inline void performModification(SynchronicPreparation::Ptr s, Array<bool> dirty)
     {
+        if (dirty[SynchronicGain]) sGain = s->getGain();
         if (dirty[SynchronicNumPulses]) sNumBeats = s->getNumBeats();
         if (dirty[SynchronicClusterMin]) sClusterMin = s->getClusterMin();
         if (dirty[SynchronicClusterMax]) sClusterMax = s->getClusterMax();
         if (dirty[SynchronicClusterCap]) sClusterCap = s->getClusterCap();
         if (dirty[SynchronicMode]) sMode = s->getMode();
+        
         if (dirty[SynchronicBeatsToSkip]) sBeatsToSkip = s->getBeatsToSkip();
-        if (dirty[SynchronicBeatMultipliers]) sBeatMultipliers = s->getBeatMultipliers();
-        if (dirty[SynchronicAccentMultipliers]) sAccentMultipliers = s->getAccentMultipliers();
-        if (dirty[SynchronicLengthMultipliers]) sLengthMultipliers = s->getLengthMultipliers();
-        if (dirty[SynchronicGain]) sGain = s->getGain();
-        if (dirty[SynchronicTranspOffsets]) sTransposition = s->getTransposition();
+        
+        if (dirty[SynchronicBeatMultipliers]) {
+            sBeatMultipliers = s->getBeatMultipliers();
+            sBeatMultipliersStates = s->getBeatMultipliersStates();
+        }
+        if (dirty[SynchronicAccentMultipliers]) {
+            sAccentMultipliers = s->getAccentMultipliers();
+            sAccentMultipliersStates = s->getAccentMultipliersStates();
+        }
+        if (dirty[SynchronicLengthMultipliers]) {
+            sLengthMultipliers = s->getLengthMultipliers();
+            sLengthMultipliersStates = s->getLengthMultipliersStates();
+        }
+        if (dirty[SynchronicTranspOffsets]) {
+            sTransposition = s->getTransposition();
+            sTranspositionStates = s->getTranspositionStates();
+        }
+        
         if (dirty[SynchronicTranspUsesTuning]) sTranspUsesTuning = s->getTranspUsesTuning();
+        
         if (dirty[SynchronicClusterThresh])
         {
             sClusterThresh = s->getClusterThreshMS();
@@ -265,6 +301,10 @@ public:
         bool sustain = true;
         bool release = true;
         bool envelope = true;
+        bool lensStates = true;
+        bool accentsStates = true;
+        bool beatsStates = true;
+        bool transpStates = true;
         
         for (int i = s->getLengthMultipliers().size(); --i>=0;)
         {
@@ -272,7 +312,6 @@ public:
             {
                 lens = false;
                 break;
-                
             }
         }
         
@@ -282,7 +321,6 @@ public:
             {
                 accents = false;
                 break;
-                
             }
         }
         
@@ -292,7 +330,6 @@ public:
             {
                 beats = false;
                 break;
-                
             }
         }
         
@@ -305,8 +342,43 @@ public:
                 {
                     transp = false;
                     break;
-                    
                 }
+            }
+        }
+        
+        for (int i = s->getLengthMultipliersStates().size(); --i>=0;)
+        {
+            if (s->getLengthMultipliersStates()[i] != sLengthMultipliersStates[i])
+            {
+                lensStates = false;
+                break;
+            }
+        }
+        
+        for (int i = s->getAccentMultipliersStates().size(); --i>=0;)
+        {
+            if (s->getAccentMultipliersStates()[i] != sAccentMultipliersStates[i])
+            {
+                accentsStates = false;
+                break;
+            }
+        }
+        
+        for (int i = s->getBeatMultipliersStates().size(); --i>=0;)
+        {
+            if (s->getBeatMultipliersStates()[i] != sBeatMultipliersStates[i])
+            {
+                beatsStates = false;
+                break;
+            }
+        }
+        
+        for (int i = s->getTranspositionStates().size(); --i>=0;)
+        {
+            if (s->getTranspositionStates()[i] != sTranspositionStates[i])
+            {
+                transpStates = false;
+                break;
             }
         }
         
@@ -361,6 +433,7 @@ public:
                 sClusterCap == s->getClusterCap() &&
                 (sMode == s->getMode()) &&
                 transp && lens && accents && beats && attack && decay && sustain && release &&
+                transpStates && lensStates && accentsStates && beatsStates &&
                 sGain == s->getGain() &&
                 sTranspUsesTuning == s->getTranspUsesTuning() &&
                 sClusterThresh == s->getClusterThreshMS() &&
@@ -491,6 +564,11 @@ public:
     inline const bool getReleaseVelocitySetsSynchronic() const noexcept{return sReleaseVelocitySetsSynchronic; }
     inline const float getGain() const noexcept                        {return sGain;                   }
     
+    inline const Array<bool> getAccentMultipliersStates() const noexcept {return sAccentMultipliersStates; }
+    inline const Array<bool> getBeatMultipliersStates() const noexcept {return sBeatMultipliersStates; }
+    inline const Array<bool> getLengthMultipliersStates() const noexcept {return sLengthMultipliersStates; }
+    inline const Array<bool> getTranspositionStates() const noexcept {return sTranspositionStates; }
+    
     inline const Array<int> getAttacks() const noexcept         {return sAttacks;   }
     inline const Array<int> getDecays() const noexcept          {return sDecays;    }
     inline const Array<float> getSustains() const noexcept      {return sSustains;  }
@@ -529,7 +607,6 @@ public:
         sClusterThreshSec = sClusterThresh * .001;
     }
     
-    
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
@@ -544,6 +621,11 @@ public:
     inline void setTransposition(Array<Array<float>> transp)           {sTransposition.swapWith(transp);                   }
     inline void setTranspUsesTuning(bool val)                          {sTranspUsesTuning = val;                           }
     inline void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
+    
+    inline void setBeatMultipliersStates(Array<bool> beatMultipliers)       {sBeatMultipliersStates.swapWith(beatMultipliers);        }
+    inline void setAccentMultipliersStates(Array<bool> accentMultipliers)   {sAccentMultipliersStates.swapWith(accentMultipliers);    }
+    inline void setTranspositionStates(Array<bool> transp)                  {sTranspositionStates.swapWith(transp);                   }
+    inline void setLengthMultipliersStates(Array<bool> lengthMultipliers)   {sLengthMultipliersStates.swapWith(lengthMultipliers);    }
     
     inline void setBeatMultiplier(int whichSlider, float value)        {sBeatMultipliers.set(whichSlider, value);           }
     inline void setAccentMultiplier(int whichSlider, float value)      {sAccentMultipliers.set(whichSlider, value);         }
@@ -753,27 +835,51 @@ public:
         int count = 0;
         for (auto f : getBeatMultipliers())
         {
-            beatMults.      setProperty( ptagFloat + String(count++), f, 0);
+            beatMults.setProperty( ptagFloat + String(count++), f, 0);
         }
         prep.addChild(beatMults, -1, 0);
+        
+        ValueTree beatMultsStates( vtagSynchronic_beatMultsStates);
+        count = 0;
+        for (auto f : getBeatMultipliersStates())
+        {
+            beatMultsStates.setProperty( ptagBool + String(count++), f ? 1 : 0, 0);
+        }
+        prep.addChild(beatMultsStates, -1, 0);
         
         
         ValueTree lenMults( vtagSynchronic_lengthMults);
         count = 0;
         for (auto f : getLengthMultipliers())
         {
-            lenMults.       setProperty( ptagFloat + String(count++), f, 0);
+            lenMults.setProperty( ptagFloat + String(count++), f, 0);
         }
         prep.addChild(lenMults, -1, 0);
+        
+        ValueTree lenMultsStates( vtagSynchronic_lengthMultsStates);
+        count = 0;
+        for (auto f : getLengthMultipliersStates())
+        {
+            lenMultsStates.setProperty( ptagBool + String(count++), f ? 1 : 0, 0);
+        }
+        prep.addChild(lenMultsStates, -1, 0);
         
         
         ValueTree accentMults( vtagSynchronic_accentMults);
         count = 0;
         for (auto f : getAccentMultipliers())
         {
-            accentMults.    setProperty( ptagFloat + String(count++), f, 0);
+            accentMults.setProperty( ptagFloat + String(count++), f, 0);
         }
         prep.addChild(accentMults, -1, 0);
+        
+        ValueTree accentMultsStates( vtagSynchronic_accentMultsStates);
+        count = 0;
+        for (auto f : getAccentMultipliersStates())
+        {
+            accentMultsStates.setProperty( ptagBool + String(count++), f ? 1 : 0, 0);
+        }
+        prep.addChild(accentMultsStates, -1, 0);
         
         
         ValueTree transposition( vtagSynchronic_transpOffsets);
@@ -788,8 +894,16 @@ public:
         }
         prep.addChild(transposition, -1, 0);
         
-        ValueTree ADSRs( vtagSynchronic_ADSRs);
+        ValueTree transpositionStates( vtagSynchronic_transpOffsetsStates);
+        count = 0;
+        for (auto f : getTranspositionStates())
+        {
+            transpositionStates.setProperty( ptagBool + String(count++), f ? 1 : 0, 0);
+        }
+        prep.addChild(transpositionStates, -1, 0);
+
         
+        ValueTree ADSRs( vtagSynchronic_ADSRs);
         tcount = 0;
         for (auto arr : getADSRs())
         {
@@ -895,6 +1009,7 @@ public:
             if (sub->hasTagName(vtagSynchronic_beatMults))
             {
                 Array<float> beats;
+                Array<bool> beatstates;
                 for (int k = 0; k < 128; k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -904,15 +1019,36 @@ public:
                     {
                         f = attr.getFloatValue();
                         beats.add(f);
+                        beatstates.add(true); // for pre-v.2.5.2, when we didn't save beatstates
                     }
                 }
                 
                 setBeatMultipliers(beats);
+                setBeatMultipliersStates(beatstates);
+                
+            }
+            else if (sub->hasTagName(vtagSynchronic_beatMultsStates))
+            {
+                Array<bool> beatstates;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagBool + String(k));
+                    
+                    if (attr == String()) break;
+                    else
+                    {
+                        f = (bool)attr.getIntValue();
+                        beatstates.add(f);
+                    }
+                }
+                
+                setBeatMultipliersStates(beatstates);
                 
             }
             else  if (sub->hasTagName(vtagSynchronic_accentMults))
             {
                 Array<float> accents;
+                Array<bool> accentsstates;
                 for (int k = 0; k < 128; k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -922,15 +1058,36 @@ public:
                     {
                         f = attr.getFloatValue();
                         accents.add(f);
+                        accentsstates.add(true);
                     }
                 }
                 
                 setAccentMultipliers(accents);
+                setAccentMultipliersStates(accentsstates);
+                
+            }
+            else if (sub->hasTagName(vtagSynchronic_accentMultsStates))
+            {
+                Array<bool> accentsstates;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagBool + String(k));
+                    
+                    if (attr == String()) break;
+                    else
+                    {
+                        f = (bool)attr.getIntValue();
+                        accentsstates.add(f);
+                    }
+                }
+                
+                setAccentMultipliersStates(accentsstates);
                 
             }
             else  if (sub->hasTagName(vtagSynchronic_lengthMults))
             {
                 Array<float> lens;
+                Array<bool> lengthstates;
                 for (int k = 0; k < 128; k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -940,19 +1097,40 @@ public:
                     {
                         f = attr.getFloatValue();
                         lens.add(f);
+                        lengthstates.add(true);
                     }
                 }
                 
                 setLengthMultipliers(lens);
+                setLengthMultipliersStates(lengthstates);
+                
+            }
+            else if (sub->hasTagName(vtagSynchronic_lengthMultsStates))
+            {
+                Array<bool> lengthstates;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagBool + String(k));
+                    
+                    if (attr == String()) break;
+                    else
+                    {
+                        f = (bool)attr.getIntValue();
+                        lengthstates.add(f);
+                    }
+                }
+                
+                setLengthMultipliersStates(lengthstates);
                 
             }
             else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
             {
                 Array<Array<float>> atransp;
+                Array<bool> transpsstates;
                 int tcount = 0;
                 forEachXmlChildElement (*sub, asub)
                 {
-                    if (asub->hasTagName("t"+String(tcount++)))
+                    if (asub->hasTagName("t" + String(tcount++)))
                     {
                         Array<float> transp;
                         for (int k = 0; k < 128; k++)
@@ -966,11 +1144,32 @@ public:
                                 transp.add(f);
                             }
                         }
-                        atransp.set(tcount-1, transp);
+                        atransp.set(tcount - 1, transp);
+                        transpsstates.set(tcount -1 , true);
                     }
                 }
                 
                 setTransposition(atransp);
+                setTranspositionStates(transpsstates);
+                
+            }
+            else if (sub->hasTagName(vtagSynchronic_transpOffsetsStates))
+            {
+                Array<bool> transpsstates;
+                for (int k = 0; k < 128; k++)
+                {
+                    String attr = sub->getStringAttribute(ptagBool + String(k));
+                    
+                    if (attr == String()) break;
+                    else
+                    {
+                        f = (bool)attr.getIntValue();
+                        transpsstates.add(f);
+                    }
+                }
+                
+                setTranspositionStates(transpsstates);
+                
             }
             else  if (sub->hasTagName(vtagSynchronic_ADSRs))
             {
@@ -1016,13 +1215,23 @@ private:
     int sBeatsToSkip;
     SynchronicOnOffMode onOffMode;
     
-    Array<float> sBeatMultipliers;      //multiply pulse lengths by these
-    Array<float> sAccentMultipliers;    //multiply velocities by these
-    Array<float> sLengthMultipliers;    //multiply note duration by these
-    Array<Array<float>> sTransposition; //transpose by these
+    // arrays of step sequencer values
+    Array<float> sBeatMultipliers;      // multiply pulse lengths by these
+    Array<float> sAccentMultipliers;    // multiply velocities by these
+    Array<float> sLengthMultipliers;    // multiply note duration by these
+    Array<Array<float>> sTransposition; // transpose by these
     
+    // to remember which sliders are active in the UI
+    // true => slider is active, false => slider is inactive
+    Array<bool> sBeatMultipliersStates;
+    Array<bool> sAccentMultipliersStates;
+    Array<bool> sLengthMultipliersStates;
+    Array<bool> sTranspositionStates;
+    
+    // do the transposition values use the Tuning system, or are they relative to the main played note?
     bool sTranspUsesTuning;
     
+    // ADSR vals
     Array<int> sAttacks;
     Array<int> sDecays;
     Array<float> sSustains;

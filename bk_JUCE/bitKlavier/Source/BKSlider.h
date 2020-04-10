@@ -97,6 +97,86 @@ public:
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
     
+    // this is the main function for setting the multislider
+    // the array of arrays is the slider values, with the inner array for subsliders (multiple sliders at one position
+    // the array of bools sets which of the sliders is actually active
+    void setTo(Array<Array<float>> newvals, Array<bool> newactives, NotificationType newnotify);
+    
+    // when the client sends an array of only the active slider values, this will construct the complete array
+    // of slider values, including inactive sliders, and then call setTo
+    void setToOnlyActive(Array<Array<float>> newActiveVals, Array<bool> newactives, NotificationType newnotify);
+    void setToOnlyActive(Array<float> newActiveVals, Array<bool> newactives, NotificationType newnotify);
+    
+    void setName(String newName){
+        sliderName = newName;
+        showName.setText(sliderName, dontSendNotification);
+    }
+    
+    String getName() { return sliderName; }
+    void setToolTipString(String newTip) { showName.setTooltip(newTip); bigInvisibleSlider->setTooltip(newTip); }
+    
+    // setTo takes an array of values for active sliders and updates the multislider accordingly
+    // this one has only one value per slider, so no subSliders
+    void setTo(Array<float> newvals, NotificationType newnotify);
+    
+    // takes and array of arrays, each subarray corresponding to active values at a single slider position
+    // developed originally to support having multiple transposition values at a single slider position
+    void setTo(Array<Array<float>> newvals, NotificationType newnotify);
+    
+    void setMinMaxDefaultInc(std::vector<float> newvals);
+    void setCurrentSlider(int activeSliderNum);
+    void deHighlightCurrentSlider(void);
+    void setAllowSubSlider(bool ss) { allowSubSliders = ss; }
+    void setSubSliderName(String ssname) { subSliderName = ssname; }
+    void setSkewFromMidpoint(bool sfm);
+    inline int getNumVisible(void) const noexcept { return numVisibleSliders;}
+    
+    class Listener
+    {
+        public:
+            
+        virtual ~Listener() {};
+        virtual void multiSliderValueChanged(String name, int whichSlider, Array<float> values) = 0;
+        // virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
+        virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values, Array<bool> states) = 0;
+    };
+    
+    ListenerList<Listener> listeners;
+    void addMyListener(Listener* listener)     { listeners.add(listener);      }
+    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+
+    Array<Array<float>> getAllValues();
+    Array<Array<float>> getAllActiveValues();
+    Array<float> getOneSliderBank(int which);
+    
+    /*
+    inline String getText(void){
+        return editValsTextField->getText();
+    }
+     */
+    
+private:
+    
+    // holds all the current values, including for sub sliders (hence the double array)
+    Array<Array<float>> allSliderVals;
+    
+    // which of these sliders is active; the first is always true
+    Array<bool> whichSlidersActive;
+    
+    // initialize the slider; it should have no less than numDefaultSliders, all set to sliderDefault value
+    void initializeSliderVals(int howmany);
+    
+    // update and activate a particular slider
+    void updateSliderVal(int which, int whichSub, float val);
+    
+    // print out the current vals, for debugging
+    void printSliderVals();
+    
+    // draw the actual sliders
+    void drawSliders(NotificationType newnotify);
+    
+    void resized() override;
+    
     // inserts a slider into the multislider
     void addSlider(int where, bool active, NotificationType newnotify);
     
@@ -137,60 +217,6 @@ public:
     void mouseDown (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
-    
-    // setTo takes an array of values for active sliders and updates the multislider accordingly
-    // this one has only one value per slider, so no subSliders
-    void setTo(Array<float> newvals, NotificationType newnotify);
-    
-    // takes and array of arrays, each subarray corresponding to active values at a single slider position
-    // developed originally to support having multiple transposition values at a single slider position
-    void setTo(Array<Array<float>> newvals, NotificationType newnotify);
-    
-    void setMinMaxDefaultInc(std::vector<float> newvals);
-    void setCurrentSlider(int activeSliderNum);
-    
-    void deHighlightCurrentSlider(void);
-    
-    void setAllowSubSlider(bool ss) { allowSubSliders = ss; }
-    void setSubSliderName(String ssname) { subSliderName = ssname; }
-    void setSkewFromMidpoint(bool sfm);
-    
-    inline int getNumVisible(void) const noexcept { return numVisibleSliders;}
-    
-    void resized() override;
-    
-    class Listener
-    {
-        
-    public:
-        
-        //BKMultiSlider::Listener() {}
-        virtual ~Listener() {};
-        
-        virtual void multiSliderValueChanged(String name, int whichSlider, Array<float> values) = 0;
-        virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
-    };
-    
-    ListenerList<Listener> listeners;
-    void addMyListener(Listener* listener)     { listeners.add(listener);      }
-    void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
-    
-    void setName(String newName)                            { sliderName = newName; showName.setText(sliderName, dontSendNotification);        }
-    String getName()                                        { return sliderName; }
-    void setToolTipString(String newTip) { showName.setTooltip(newTip); bigInvisibleSlider->setTooltip(newTip); }
-    
-    Array<Array<float>> getAllValues();
-    Array<Array<float>> getAllActiveValues();
-    Array<float> getOneSliderBank(int which);
-    
-    inline String getText(void){
-        return editValsTextField->getText();
-    }
-    
-private:
-    
-    // holds all the current values, including for sub sliders (hence the double array)
-    //Array<Array<float>> sliderVals;
     
     BKMultiSliderLookAndFeel activeSliderLookAndFeel;
     BKMultiSliderLookAndFeel passiveSliderLookAndFeel;

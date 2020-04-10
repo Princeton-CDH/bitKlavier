@@ -282,10 +282,12 @@ String          intArrayToString(Array<int> arr);
 
 String          floatArrayToString(Array<float> arr);
 String          arrayFloatArrayToString(Array<Array<float>> arr);
+String          arrayActiveFloatArrayToString(Array<Array<float>> afarr, Array<bool> act);
 
 String          arrayIntArrayToString(Array<Array<int>> arr);
 Array<float>    stringToFloatArray(String s);
 Array<Array<float>> stringToArrayFloatArray(String s);
+Array<bool>     slashToFalse(String s);
 
 String          offsetArrayToString(Array<float> arr);
 String          offsetArrayToString2(Array<float> arr);

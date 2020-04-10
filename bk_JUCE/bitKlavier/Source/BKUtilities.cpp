@@ -311,6 +311,39 @@ String arrayFloatArrayToString(Array<Array<float>> afarr)
     return s;
 }
 
+String arrayActiveFloatArrayToString(Array<Array<float>> afarr, Array<bool> act)
+{
+    String s = "";
+    
+    int boolCtr = 0;
+    
+    for (auto arr : afarr)
+    {
+        if (arr.size() > 1)
+        {
+            s += "[";
+            for (auto f : arr)
+            {
+                s += String(f) + " ";
+            }
+            s += "] ";
+        }
+        else
+        {
+            if (act[boolCtr]) {
+                s += String(arr[0]) + " ";
+            }
+            else
+            {
+                s +=  "/ ";
+            }
+        }
+        
+        boolCtr++;
+    }
+    return s;
+}
+
 String floatArrayToString(Array<float> arr)
 {
     String s = "";
@@ -455,7 +488,7 @@ Array<Array<float>> stringToArrayFloatArray(String s)
             afarr.add(arr);
         }
         
-        if (sub == rest) break;
+        if (sub == rest) break; // no [ in s
         
         rest = rest.substring(sub.length()+1);
         
@@ -474,6 +507,55 @@ Array<Array<float>> stringToArrayFloatArray(String s)
     return afarr;
 }
 
+// reads through string: single whitespaces = true, slashes = false
+// assume whitespaces follow values that we want, so all single whitespaces
+// set to true, and otherwise set slashes to false
+// need to ignore []
+Array<bool> slashToFalse(String s)
+{
+    Array<bool> arr = Array<bool>();
+    s.append(" ", 1); // to get the last value
+    
+    String::CharPointerType c = s.getCharPointer();
+    juce_wchar slash = '/'; // blank: put a zero in
+    juce_wchar leftbracket = '[';
+    juce_wchar rightbracket = ']';
+    
+    bool precedingIsSpace = true;
+    bool precedingIsSlash = false;
+    bool inBracket = false;
+
+    for (int i = 0; i < (s.length() + 1); i++)
+    {
+        juce_wchar c1 = c.getAndAdvance();
+        
+        if (!CharacterFunctions::compare(c1, leftbracket))
+            inBracket = true;
+        
+        if (!inBracket) {
+            if (!CharacterFunctions::compare(c1, slash)) {
+                arr.add(false);
+                precedingIsSlash = true;
+            }
+            else if(CharacterFunctions::isWhitespace(c1)) {
+                if (!precedingIsSlash && !precedingIsSpace) arr.add(true);
+                precedingIsSpace = true;
+            }
+            else {
+                precedingIsSpace = false;
+                precedingIsSlash = false;
+            }
+        }
+        else if (!CharacterFunctions::compare(c1, rightbracket))
+        {
+            inBracket = false;
+            precedingIsSpace = false;
+            precedingIsSlash = false;
+        }
+    }
+    
+    return arr;
+}
 
 Array<float> stringToFloatArray(String s)
 {
@@ -486,6 +568,7 @@ Array<float> stringToFloatArray(String s)
     
     juce_wchar prd = '.';
     juce_wchar dash = '-';
+    juce_wchar slash = '/'; // blank: put a zero in
     
     int prdCnt = 0;
     
@@ -496,6 +579,7 @@ Array<float> stringToFloatArray(String s)
         
         bool isPrd = !CharacterFunctions::compare(c1, prd);
         bool isDash = !CharacterFunctions::compare(c1, dash);
+        bool isSlash = !CharacterFunctions::compare(c1, slash);
         
         if (isPrd) prdCnt += 1;
         
@@ -506,6 +590,12 @@ Array<float> stringToFloatArray(String s)
             if (inNumber)
             {
                 arr.add(temp.getFloatValue());
+                temp = "";
+            }
+            
+            // slash indicates a zero slot
+            if (isSlash) {
+                arr.add(0.);
                 temp = "";
             }
             

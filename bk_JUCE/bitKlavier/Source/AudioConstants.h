@@ -111,6 +111,10 @@ const String vtagSynchronic_beatMults = "beatMultipliers";
 const String vtagSynchronic_lengthMults = "lengthMultipliers";
 const String vtagSynchronic_accentMults = "accentMultipliers";
 const String vtagSynchronic_transpOffsets = "transpOffsets";
+const String vtagSynchronic_beatMultsStates = "beatMultipliersStates";
+const String vtagSynchronic_lengthMultsStates = "lengthMultipliersStates";
+const String vtagSynchronic_accentMultsStates = "accentMultipliersStates";
+const String vtagSynchronic_transpOffsetsStates = "transpOffsetsStates";
 const String ptagSynchronic_reset = "synchronicReset";
 const String vtagSynchronic_ADSRs = "ADSRs";
 

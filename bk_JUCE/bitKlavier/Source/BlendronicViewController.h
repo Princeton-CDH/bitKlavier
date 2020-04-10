@@ -46,16 +46,24 @@ protected:
     OwnedArray<BKMultiSlider> paramSliders;
     
     virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
-    virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
+    //virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
+    virtual void multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states) = 0;
     
     inline void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override
     {
         multiSliderDidChange(name, whichSlider, values);
     }
     
+    /*
     inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override
     {
         multiSlidersDidChange(name, values);
+    }
+     */
+    
+    inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values, Array<bool> states) override
+    {
+        multiSlidersDidChange(name, values, states);
     }
     
     BKEditableComboBox selectCB;
@@ -135,7 +143,8 @@ private:
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
-    void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    //void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    void multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BlendronicPreparationEditor)
     
@@ -170,7 +179,8 @@ public:
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
     
     void multiSliderDidChange(String name, int whichSlider, Array<float> values) override;
-    void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    //void multiSlidersDidChange(String name, Array<Array<float>> values) override;
+    void multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states) override;
     
     void fillSelectCB(int last, int current);
 //    void fillSmoothModeSelectCB(void);
