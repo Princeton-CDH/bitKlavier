@@ -45,6 +45,7 @@ protected:
 
     OwnedArray<BKMultiSlider> paramSliders;
     
+    /*
     virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
     //virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
     virtual void multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states) = 0;
@@ -54,12 +55,14 @@ protected:
         multiSliderDidChange(name, whichSlider, values);
     }
     
-    /*
-    inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override
+   */
+    virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
+    virtual void multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states) = 0;
+    
+    inline void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override
     {
-        multiSlidersDidChange(name, values);
+        multiSliderDidChange(name, whichSlider, values);
     }
-     */
     
     inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values, Array<bool> states) override
     {

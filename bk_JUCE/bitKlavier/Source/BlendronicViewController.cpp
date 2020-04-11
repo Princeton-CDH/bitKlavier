@@ -485,22 +485,25 @@ void BlendronicPreparationEditor::update(void)
         {
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicBeats]))
             {
-                // paramSliders[i]->setTo(prep->getBeats(), dontSendNotification);
+                paramSliders[i]->setToOnlyActive(prep->getBeats(), prep->getBeatsStates(), dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
             {
                 // paramSliders[i]->setTo(prep->getDelayLengths(), dontSendNotification);
+                paramSliders[i]->setToOnlyActive(prep->getDelayLengths(), prep->getDelayLengthsStates(), dontSendNotification);
             }
 
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
             {
                 // paramSliders[i]->setTo(prep->getSmoothLengths(), dontSendNotification);
+                paramSliders[i]->setToOnlyActive(prep->getSmoothLengths(), prep->getSmoothLengthsStates(), dontSendNotification);
             }
 
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
             {
                 // paramSliders[i]->setTo(prep->getFeedbackCoefficients(), dontSendNotification);
+                paramSliders[i]->setToOnlyActive(prep->getFeedbackCoefficients(), prep->getFeedbackCoefficientsStates(), dontSendNotification);
             }
         }
     }
@@ -840,15 +843,45 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
 
 void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states)
 {
-    for (int i = 0; i < values.size(); i++)
-    {
-        for (int j = 0; j < values[i].size(); j++)
-            DBG("BlendronicPreparationEditor::multiSlidersDidChange: val " + String(i) + "" + String(j) + "" + String(values[i].getUnchecked(j)));
-    }
+    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
     
-    for (int i = 0; i < states.size(); i++)
+    Array<float> newvals = Array<float>();
+    for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
+    
+    DBG("BlendronicPreparationEditor::multiSlidersDidChange " + name);
+    
+    if (name == "beat lengths")
     {
-        DBG("BlendronicPreparationEditor::multiSlidersDidChange: state " + String((int)states.getUnchecked(i)));
+        prep    ->setBeats(newvals);
+        active  ->setBeats(newvals);
+        
+        prep    ->setBeatsStates(states);
+        active  ->setBeatsStates(states);
+    }
+    else if (name == "delay lengths")
+    {
+        prep    ->setDelayLengths(newvals);
+        active  ->setDelayLengths(newvals);
+        
+        prep    ->setDelayLengthsStates(states);
+        active  ->setDelayLengthsStates(states);
+    }
+    else if (name == "smoothing (ms)")
+    {
+        prep    ->setSmoothLengths(newvals);
+        active  ->setSmoothLengths(newvals);
+        
+        prep    ->setSmoothLengthsStates(states);
+        active  ->setSmoothLengthsStates(states);
+    }
+    else if (name == "feedback coefficients")
+    {
+        prep    ->setFeedbackCoefficients(newvals);
+        active  ->setFeedbackCoefficients(newvals);
+        
+        prep    ->setFeedbackCoefficientsStates(states);
+        active  ->setFeedbackCoefficientsStates(states);
     }
 }
 
@@ -1053,21 +1086,25 @@ void BlendronicModificationEditor::update(void)
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicBeats]))
             {
                 // paramSliders[i]->setTo(mod->getBeats(), dontSendNotification);
+                paramSliders[i]->setToOnlyActive(mod->getBeats(), mod->getBeatsStates(), dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
             {
                 // paramSliders[i]->setTo(mod->getDelayLengths(), dontSendNotification);
+                paramSliders[i]->setToOnlyActive(mod->getDelayLengths(), mod->getDelayLengthsStates(), dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
             {
                 // paramSliders[i]->setTo(mod->getSmoothLengths(), dontSendNotification);
+                paramSliders[i]->setToOnlyActive(mod->getSmoothLengths(), mod->getSmoothLengthsStates(), dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
             {
                 // paramSliders[i]->setTo(mod->getFeedbackCoefficients(), dontSendNotification);
+                paramSliders[i]->setToOnlyActive(mod->getFeedbackCoefficients(), mod->getFeedbackCoefficientsStates(), dontSendNotification);
             }
         }
     }
@@ -1164,16 +1201,49 @@ void BlendronicModificationEditor::multiSliderDidChange(String name, int whichSl
 
 void BlendronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states)
 {
-    for (int i = 0; i < values.size(); i++)
+    BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
+    
+    //only transposition allows multiple simultaneous vals, so trim down to 1D array
+    Array<float> newvals = Array<float>();
+    for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
+    
+    if (!name.compare(cBlendronicParameterTypes[BlendronicBeats]))
     {
-        for (int j = 0; j < values[i].size(); j++)
-            DBG("BlendronicModificationEditor::multiSlidersDidChange: val " + String(i) + " " + String(j) + " " + String(values[i].getUnchecked(j)));
+        mod->setBeats(newvals);
+        mod->setBeatsStates(states);
+        mod->setDirty(BlendronicBeats);
+    }
+    else if (!name.compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
+    {
+        mod->setDelayLengths(newvals);
+        mod->setDelayLengthsStates(states);
+        mod->setDirty(BlendronicDelayLengths);
+    }
+    else if (!name.compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
+    {
+        mod->setSmoothLengths(newvals);
+        mod->setSmoothLengthsStates(states);
+        mod->setDirty(BlendronicSmoothLengths);
+    }
+    else if (!name.compare(cBlendronicParameterTypes[BlendronicSmoothValues]))
+    {
+        mod->setSmoothValues(newvals);
+        mod->setSmoothValuesStates(states);
+        mod->setDirty(BlendronicSmoothValues);
+    }
+    else if (!name.compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
+    {
+        mod->setFeedbackCoefficients(newvals);
+        mod->setFeedbackCoefficientsStates(states);
+        mod->setDirty(BlendronicFeedbackCoeffs);
     }
     
-    for (int i = 0; i < states.size(); i++)
+    for(int i = 0; i < paramSliders.size(); i++)
     {
-        DBG("BlendronicModificationEditor::multiSlidersDidChange: state " + String((int)states.getUnchecked(i)));
+        if(paramSliders[i]->getName() == name) paramSliders[i]->setAlpha(1.);
     }
+    
+    updateModification();
 }
 
 /*

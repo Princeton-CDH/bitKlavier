@@ -418,6 +418,16 @@ public:
         }
         prep.addChild(delayLengthsStates, -1, 0);
         
+        /*
+         ValueTree beatMultsStates( vtagSynchronic_beatMultsStates);
+         count = 0;
+         for (auto f : getBeatMultipliersStates())
+         {
+             beatMultsStates.setProperty( ptagBool + String(count++), f ? 1 : 0, 0);
+         }
+         prep.addChild(beatMultsStates, -1, 0);
+         */
+        
         
         ValueTree smoothLengths(vtagBlendronic_smoothLengths);
         count = 0;
