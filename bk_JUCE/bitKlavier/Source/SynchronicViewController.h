@@ -166,8 +166,6 @@ public:
     void setCurrentId(int Id);
     void deleteCurrent(void);
     
-    
-    
 private:
 
     void bkTextFieldDidChange       (TextEditor&)           override;
