@@ -276,11 +276,9 @@ void BKMultiSlider::drawSliders(NotificationType newnotify)
                 
                 if (whichSlidersActive[i]) {
                     refSlider->setValue(allSliderVals[i][j], newnotify);
-                    refSlider->isActive(true); // make this conditional an new "active" boolean array
                     refSlider->setLookAndFeel(&activeSliderLookAndFeel);
                 }
                 else {
-                    refSlider->isActive(false);
                     refSlider->setLookAndFeel(&passiveSliderLookAndFeel);
                 }
                 
@@ -292,7 +290,8 @@ void BKMultiSlider::drawSliders(NotificationType newnotify)
     
     resetRanges();
     resized();
-    displaySlider->setValue(sliders[0]->operator[](0)->getValue());
+    displaySlider->setValue(allSliderVals[0][0]);
+
 }
 
 
@@ -425,8 +424,6 @@ void BKMultiSlider::addSlider(int where, bool active, NotificationType newnotify
     else
         newslider->setLookAndFeel(&passiveSliderLookAndFeel);
     
-    newslider->isActive(active);
-    
     if(newnotify == sendNotification)
     {
         listeners.call(&BKMultiSlider::Listener::multiSliderAllValuesChanged,
@@ -437,19 +434,43 @@ void BKMultiSlider::addSlider(int where, bool active, NotificationType newnotify
     
 }
 
+void  BKMultiSlider::addActiveSubSlider(int which, NotificationType newnotify)
+{
+    
+    if (which < allSliderVals.size() && which >= 0)
+    {
+        // get current array of values for this slider
+        Array<float> stemp = allSliderVals.getUnchecked(which);
+        
+        // find slot for next one
+        int whichSub = stemp.size();
+        
+        // calculate the value to set it at, based on where clicked
+        float newval = bigInvisibleSlider->proportionOfLengthToValue( 1. - (clickedHeight / this->getHeight()));
+        
+        // update the state arrays
+        stemp.set(whichSub, newval);
+        allSliderVals.set(which, stemp);
+        whichSlidersActive.set(which, true);
+        
+        // make the subSlider
+        addSubSlider(which, true, newnotify);
+    }
+    
+}
 
 void BKMultiSlider::addSubSlider(int where, bool active, NotificationType newnotify)
 {
     BKSubSlider* newslider;
     
-    newslider     = new BKSubSlider(subsliderStyle,
-                                                             sliderMin,
-                                                             sliderMax,
-                                                             sliderDefault,
-                                                             sliderIncrement,
-                                                             sliderWidth,
-                                                             sliderHeight);
-    
+    newslider = new BKSubSlider(subsliderStyle,
+                                sliderMin,
+                                sliderMax,
+                                sliderDefault,
+                                sliderIncrement,
+                                sliderWidth,
+                                sliderHeight);
+        
     newslider->setRange(sliderMin, sliderMax, sliderIncrement);
     newslider->setValue(newslider->proportionOfLengthToValue( 1. - (clickedHeight / this->getHeight())), dontSendNotification);
     newslider->addListener(this);
@@ -464,8 +485,6 @@ void BKMultiSlider::addSubSlider(int where, bool active, NotificationType newnot
         newslider->setLookAndFeel(&activeSliderLookAndFeel);
     else
         newslider->setLookAndFeel(&passiveSliderLookAndFeel);
-    
-    newslider->isActive(active);
     
     if(newnotify == sendNotification)
     {
@@ -539,8 +558,7 @@ void BKMultiSlider::mouseDrag(const MouseEvent& e)
                     displaySlider->setValue(currentInvisibleSliderValue);
                 }
                 
-                if(!currentSlider->isActive()){
-                    currentSlider->isActive(true);
+                if(whichSlidersActive[which]){
                     currentSlider->setLookAndFeel(&activeSliderLookAndFeel);
                     listeners.call(&BKMultiSlider::Listener::multiSliderAllValuesChanged,
                                    getName(),
@@ -568,13 +586,11 @@ void BKMultiSlider::mouseMove(const MouseEvent& e)
         int which = whichSlider(e);
         int whichSub = whichSubSlider(which, e);
         
-        if(which >= 0 && whichSub >= 0)
+        if (which < allSliderVals.size() && which >= 0)
         {
-            BKSubSlider* currentSlider = sliders[which]->operator[](whichSub);
-            if (currentSlider != nullptr)
+            if (whichSub < allSliderVals[which].size() && whichSub >= 0)
             {
-                if(currentSlider->isActive())
-                    displaySlider->setValue(currentSlider->getValue());
+                if (whichSlidersActive[which]) displaySlider->setValue(allSliderVals[which][whichSub]);
             }
         }
     }
@@ -586,7 +602,7 @@ void BKMultiSlider::mouseDoubleClick (const MouseEvent &e)
 {
 #if JUCE_IOS
     hasBigOne = true;
-    editValsTextField->setText(arrayFloatArrayToString(getAllActiveValues()), dontSendNotification);
+    editValsTextField->setText(arrayActiveFloatArrayToString(allSliderVals, whichSlidersActive), dontSendNotification);
     WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, editValsTextField.get(), sliderName);
 #else
 //#endif
@@ -762,17 +778,16 @@ int BKMultiSlider::whichSubSlider (int which, const MouseEvent &e)
     return whichSub;
 }
 
-
+// given a slider location 'which', how many active sliders
+// are there up to and including 'which'
 int BKMultiSlider::whichActiveSlider (int which)
 {
     int counter = 0;
-    if(which > sliders.size()) which = sliders.size();
+    if(which > whichSlidersActive.size()) which = whichSlidersActive.size();
     
     for(int i = 0; i < which; i++)
     {
-        BKSubSlider* currentSlider = sliders[i]->operator[](0);
-        if(currentSlider != nullptr)
-            if(currentSlider->isActive()) counter++;
+        if(whichSlidersActive[which]) counter++;
     }
     
     return counter;
@@ -781,7 +796,6 @@ int BKMultiSlider::whichActiveSlider (int which)
 
 void BKMultiSlider::resetRanges()
 {
-    
     double sliderMinTemp = sliderMinDefault;
     double sliderMaxTemp = sliderMaxDefault;
     
@@ -962,17 +976,12 @@ Array<Array<float>> BKMultiSlider::getAllActiveValues()
 
 Array<float> BKMultiSlider::getOneSliderBank(int which)
 {
-    Array<float> newvals;
-    for(int i = 0; i < sliders[which]->size(); i++)
+    if (which < allSliderVals.size() && which >= 0)
     {
-        BKSubSlider* currentSlider = sliders[which]->operator[](i);
-        if(currentSlider != nullptr)
-        {
-            newvals.add(currentSlider->getValue());
-        }
+        return allSliderVals[which];
     }
     
-    return newvals;
+    return {0};
 }
 
 
@@ -997,10 +1006,19 @@ void BKMultiSlider::sliderModifyMenuCallback (const int result, BKMultiSlider* m
     {
         switch (result)
         {
-            case 1:   ms->deactivateSlider(which, sendNotification); break;
-            case 2:   ms->deactivateAllAfter(which, sendNotification); break;
-            case 3:   ms->deactivateAllBefore(which, sendNotification); break;
-            case 4:   ms->addSubSlider(which, true, sendNotification); ms->resized(); break;
+            case 1: ms->deactivateSlider(which, sendNotification);
+                    break;
+                
+            case 2: ms->deactivateAllAfter(which, sendNotification);
+                    break;
+                
+            case 3: ms->deactivateAllBefore(which, sendNotification);
+                    break;
+                
+            case 4: ms->addActiveSubSlider(which, sendNotification);
+                    //ms->addSubSlider(which, true, sendNotification);
+                    ms->resized();
+                    break;
                 
             default:  break;
         }
@@ -1028,18 +1046,13 @@ int BKMultiSlider::getActiveSlider(int sliderNum)
 {
     int sliderCount = 0;
     
-    for(int i = 0; i < sliders.size(); i++)
+    for (int i = 0; i < whichSlidersActive.size(); i++)
     {
-        if(sliders[i]->operator[](0) != nullptr)
-        {
-            if(sliderCount == sliderNum && sliders[i]->operator[](0)->isActive())
-                return i;
-            
-            if(sliders[i]->operator[](0)->isActive())
-                sliderCount++;
+        if (whichSlidersActive[i]) {
+            if (sliderCount == sliderNum) return i;
+            sliderCount++;
         }
     }
-    
     return 0;
 }
 

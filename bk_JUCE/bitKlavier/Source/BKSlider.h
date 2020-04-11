@@ -188,6 +188,9 @@ private:
     // sliders at one location, facilitating, for instance, multiple transpositions at one time
     void addSubSlider(int where, bool active, NotificationType newnotify);
     
+    // as above, but updates the allSliderVals and whichSlidersActive first
+    void addActiveSubSlider(int where, NotificationType newnotify);
+    
     // these methods clear currently active sliders
     // exception: you can't clear the FIRST slider, as we need at least one active slider
     void deactivateSlider(int where, NotificationType notify);

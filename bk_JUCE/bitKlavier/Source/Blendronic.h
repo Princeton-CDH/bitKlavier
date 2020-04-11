@@ -507,6 +507,7 @@ public:
             if (sub->hasTagName(vtagBlendronic_beats))
             {
                 Array<float> beats;
+                Array<bool> beatsstates;
                 for (int k = 0; k < 128; k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -516,9 +517,11 @@ public:
                     {
                         f = attr.getFloatValue();
                         beats.add(f);
+                        beatsstates.add(true);
                     }
                 }
                 setBeats(beats);
+                setBeatsStates(beatsstates);
             }
             else if (sub->hasTagName(vtagBlendronic_beatsStates))
             {
@@ -539,6 +542,7 @@ public:
             else if (sub->hasTagName(vtagBlendronic_delayLengths))
             {
                 Array<float> lengths;
+                Array<bool> lengthsstates;
                 for (int k = 0; k < 128; k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -548,9 +552,11 @@ public:
                     {
                         f = attr.getFloatValue();
                         lengths.add(f);
+                        lengthsstates.add(true);
                     }
                 }
                 setDelayLengths(lengths);
+                setDelayLengthsStates(lengthsstates);
             }
             else if (sub->hasTagName(vtagBlendronic_delayLengthsStates))
             {
@@ -571,6 +577,7 @@ public:
             else if (sub->hasTagName(vtagBlendronic_smoothLengths))
             {
                 Array<float> durs;
+                Array<bool> dursstates;
                 for (int k = 0; k < 128; k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -580,9 +587,11 @@ public:
                     {
                         f = attr.getFloatValue();
                         durs.add(f);
+                        dursstates.add(true);
                     }
                 }
                 setSmoothLengths(durs);
+                setSmoothLengthsStates(dursstates);
             }
             else if (sub->hasTagName(vtagBlendronic_smoothLengthsStates))
             {
@@ -619,6 +628,7 @@ public:
             else if (sub->hasTagName(vtagBlendronic_feedbackCoefficients))
             {
                 Array<float> coeffs;
+                Array<bool> coeffsstates;
                 for (int k = 0; k < 128; k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -628,9 +638,11 @@ public:
                     {
                         f = attr.getFloatValue();
                         coeffs.add(f);
+                        coeffsstates.add(true);
                     }
                 }
                 setFeedbackCoefficients(coeffs);
+                setFeedbackCoefficientsStates(coeffsstates);
             }
             else if (sub->hasTagName(vtagBlendronic_feedbackCoefficientsStates))
             {
