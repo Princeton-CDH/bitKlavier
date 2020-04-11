@@ -68,16 +68,18 @@ private:
  BKMultiSlider is a horizontal array of sliders.
  
  Each "slider" can have multiple sliders, facilitating, for instance, multiple transposition values
+ 
  The user can drag across the sliders to quickly set values
+ 
  The user can also enter sliderr values directly via a text editor:
     "1 [-1, -2, -3] 2 3" will create three sliders, and the second will have three overlaid sliders
+ 
  By default it has 12 sliders, but that can be increased by adding additional values via text entry.
+ 
+ Gaps in the slider array are possible, and indicated by a forward slash '/' in the text editor
  
  The API includes functions for setting the slider, either all at once (via text) or by individual slider (via mouse)
  and for deactivating individual sliders or sections of sliders.
- 
- Note that at the moment when the user activates a slider that has inactive sliders that precede it, so there is a gap,
- the UI will close that gap on re-opening; we could/should change that, but have not yet.
  
 */
 
@@ -96,64 +98,56 @@ public:
     // constructor: at the moment, only type HorizontalMultiBarSlider is implemented
     BKMultiSlider(BKMultiSliderType which);
     ~BKMultiSlider();
-    
-    // this is the main function for setting the multislider
-    // the array of arrays is the slider values, with the inner array for subsliders (multiple sliders at one position
-    // the array of bools sets which of the sliders is actually active
-    void setTo(Array<Array<float>> newvals, Array<bool> newactives, NotificationType newnotify);
-    
+        
     // when the client sends an array of only the active slider values, this will construct the complete array
-    // of slider values, including inactive sliders, and then call setTo
+    // of slider values, including inactive sliders, and then call setTo. So
+    //      newActiveVals = {1, 2, 3}
+    //      newactives = {true, false, false, true, true, false....... false}
+    // will result in [1 / / 2 3 / / / / / / /], where / represents and inactive slider (gap)
     void setToOnlyActive(Array<Array<float>> newActiveVals, Array<bool> newactives, NotificationType newnotify);
+    
+    // as above, but takes a 1d array, for sliders that don't use subSliders
     void setToOnlyActive(Array<float> newActiveVals, Array<bool> newactives, NotificationType newnotify);
     
+    // identifiers
     void setName(String newName){
         sliderName = newName;
         showName.setText(sliderName, dontSendNotification);
     }
-    
     String getName() { return sliderName; }
     void setToolTipString(String newTip) { showName.setTooltip(newTip); bigInvisibleSlider->setTooltip(newTip); }
-    
-    // setTo takes an array of values for active sliders and updates the multislider accordingly
-    // this one has only one value per slider, so no subSliders
-    void setTo(Array<float> newvals, NotificationType newnotify);
-    
-    // takes and array of arrays, each subarray corresponding to active values at a single slider position
-    // developed originally to support having multiple transposition values at a single slider position
-    void setTo(Array<Array<float>> newvals, NotificationType newnotify);
-    
+
+    // slider range and skew
     void setMinMaxDefaultInc(std::vector<float> newvals);
+    void setSkewFromMidpoint(bool sfm);
+    
+    // highlight whichever slider is currently active in bK
     void setCurrentSlider(int activeSliderNum);
     void deHighlightCurrentSlider(void);
-    void setAllowSubSlider(bool ss) { allowSubSliders = ss; }
-    void setSubSliderName(String ssname) { subSliderName = ssname; }
-    void setSkewFromMidpoint(bool sfm);
-    inline int getNumVisible(void) const noexcept { return numVisibleSliders;}
+    inline int getNumVisible(void) const noexcept { return allSliderVals.size(); } //return numVisibleSliders;}
     
+    // should this slider allow subsliders? (multiple transpositions, for instance)
+    void setAllowSubSlider(bool ss) { allowSubSliders = ss; }
+    
+    // name of the subslider (add transposition, for instance)
+    void setSubSliderName(String ssname) { subSliderName = ssname; }
+    
+    // listeners overrride these functions so they can get what they need from MultiSlider
+    // Multislider will call these when values change, so the clients can update
     class Listener
     {
         public:
             
         virtual ~Listener() {};
         virtual void multiSliderValueChanged(String name, int whichSlider, Array<float> values) = 0;
-        // virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values) = 0;
         virtual void multiSliderAllValuesChanged(String name, Array<Array<float>> values, Array<bool> states) = 0;
     };
     
+    // listeners
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
-
-    Array<Array<float>> getAllValues();
-    Array<Array<float>> getAllActiveValues();
-    Array<float> getOneSliderBank(int which);
-    
-    /*
-    inline String getText(void){
-        return editValsTextField->getText();
-    }
-     */
+  
     
 private:
     
@@ -162,6 +156,11 @@ private:
     
     // which of these sliders is active; the first is always true
     Array<bool> whichSlidersActive;
+    
+    // this is the main function for setting the multislider
+    // the array of arrays is the slider values, with the inner array for subsliders (multiple sliders at one position
+    // the array of bools sets which of the sliders is actually active
+    void setTo(Array<Array<float>> newvals, Array<bool> newactives, NotificationType newnotify);
     
     // initialize the slider; it should have no less than numDefaultSliders, all set to sliderDefault value
     void initializeSliderVals(int howmany);
@@ -175,7 +174,14 @@ private:
     // draw the actual sliders
     void drawSliders(NotificationType newnotify);
     
-    void resized() override;
+    // return all values, including inactive sliders
+    Array<Array<float>> getAllValues() { return allSliderVals; }
+    
+    // return only those sliders that are active
+    Array<Array<float>> getAllActiveValues();
+    
+    // return the values for one slider
+    Array<float> getOneSliderBank(int which);
     
     // inserts a slider into the multislider
     void addSlider(int where, bool active, NotificationType newnotify);
@@ -210,6 +216,14 @@ private:
     // update which slider is active after mouseDrag and mouseUp; to support dragging across multiple sliders
     int whichActiveSlider (int which);
     
+    // for highlighting text related to sliders
+    void highlight(int activeSliderNum);
+    void deHighlight(int sliderNum);
+    int getActiveSlider(int sliderNum);
+    
+    // rescale/normalize slider ranges
+    void resetRanges();
+    
     // mouse/text events
     void mouseDrag(const MouseEvent &e) override;
     void mouseMove(const MouseEvent& e) override;
@@ -217,6 +231,18 @@ private:
     void mouseDown (const MouseEvent &event) override;
     void mouseUp (const MouseEvent &event) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
+    void sliderValueChanged (Slider *slider) override;
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
+    void textEditorFocusLost(TextEditor& textEditor) override;
+    void textEditorTextChanged(TextEditor&) override;
+    void buttonClicked(Button* button) override;
+    void showModifyPopupMenu(int which);
+    static void sliderModifyMenuCallback (const int result, BKMultiSlider* slider, int which);
+    
+    void resized() override;
+    
+
+    // *** Instance Variables *** //
     
     BKMultiSliderLookAndFeel activeSliderLookAndFeel;
     BKMultiSliderLookAndFeel passiveSliderLookAndFeel;
@@ -259,34 +285,15 @@ private:
     String subSliderName;
     
     // the number of sliders will values actually set; always >= 1
-    int numActiveSliders;
+    // int numActiveSliders;
     
     // by default, how many sliders to show (12)
     int numDefaultSliders;
     
     // how many are actually visible; will be == numActiveSliders OR numDefaultSliders, whichever one is greater
-    int numVisibleSliders;
+    // int numVisibleSliders;
     
     float clickedHeight;
-    
-    void sliderValueChanged (Slider *slider) override;
-    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
-    void textEditorFocusLost(TextEditor& textEditor) override;
-    void textEditorTextChanged(TextEditor&) override;
-    
-    void buttonClicked(Button* button) override;
-    
-    void showModifyPopupMenu(int which);
-    static void sliderModifyMenuCallback (const int result, BKMultiSlider* slider, int which);
-    
-    void highlight(int activeSliderNum);
-    void deHighlight(int sliderNum);
-    int getActiveSlider(int sliderNum);
-    
-    void cleanupSliderArray();
-    void resetRanges();
-    
-    inline int getNumActive(void) const noexcept { return numActiveSliders;}
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
 };

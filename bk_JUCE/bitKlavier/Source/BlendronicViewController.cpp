@@ -485,22 +485,22 @@ void BlendronicPreparationEditor::update(void)
         {
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicBeats]))
             {
-                paramSliders[i]->setTo(prep->getBeats(), dontSendNotification);
+                // paramSliders[i]->setTo(prep->getBeats(), dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
             {
-                paramSliders[i]->setTo(prep->getDelayLengths(), dontSendNotification);
+                // paramSliders[i]->setTo(prep->getDelayLengths(), dontSendNotification);
             }
 
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
             {
-                paramSliders[i]->setTo(prep->getSmoothLengths(), dontSendNotification);
+                // paramSliders[i]->setTo(prep->getSmoothLengths(), dontSendNotification);
             }
 
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
             {
-                paramSliders[i]->setTo(prep->getFeedbackCoefficients(), dontSendNotification);
+                // paramSliders[i]->setTo(prep->getFeedbackCoefficients(), dontSendNotification);
             }
         }
     }
@@ -1052,22 +1052,22 @@ void BlendronicModificationEditor::update(void)
         {
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicBeats]))
             {
-                paramSliders[i]->setTo(mod->getBeats(), dontSendNotification);
+                // paramSliders[i]->setTo(mod->getBeats(), dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
             {
-                paramSliders[i]->setTo(mod->getDelayLengths(), dontSendNotification);
+                // paramSliders[i]->setTo(mod->getDelayLengths(), dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
             {
-                paramSliders[i]->setTo(mod->getSmoothLengths(), dontSendNotification);
+                // paramSliders[i]->setTo(mod->getSmoothLengths(), dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
             {
-                paramSliders[i]->setTo(mod->getFeedbackCoefficients(), dontSendNotification);
+                // paramSliders[i]->setTo(mod->getFeedbackCoefficients(), dontSendNotification);
             }
         }
     }

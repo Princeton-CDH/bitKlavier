@@ -973,19 +973,6 @@ void SynchronicPreparationEditor::multiSliderDidChange(String name, int whichSli
 
 void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states)
 {
-    /*
-    for (int i = 0; i < values.size(); i++)
-    {
-        for (int j = 0; j < values[i].size(); j++)
-            DBG("SynchronicPreparationEditor::multiSlidersDidChange: val " + String(i) + " " + String(j) + " " + String(values[i].getUnchecked(j)));
-    }
-    
-    for (int i = 0; i < states.size(); i++)
-    {
-        DBG("SynchronicPreparationEditor::multiSlidersDidChange: state " + String((int)states.getUnchecked(i)));
-    }
-     */
-    
     SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(processor.updateState->currentSynchronicId);
     SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(processor.updateState->currentSynchronicId);
     
@@ -993,7 +980,6 @@ void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     Array<float> newvals = Array<float>();
     for(int i = 0; i < values.size(); i++) newvals.add(values[i][0]);
 
-    //if (name == cSynchronicParameterTypes[SynchronicAccentMultipliers])
     if (!name.compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
     {
         prep    ->setAccentMultipliers(newvals);

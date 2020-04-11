@@ -73,30 +73,17 @@ public:
 #endif
     
 protected:
-    
-    //OwnedArray<BKLabel> synchronicL;
-    //OwnedArray<BKTextField> synchronicTF;
-    //OwnedArray<BKTextField> modSynchronicTF;
-    
+
     OwnedArray<BKMultiSlider> paramSliders;
     OwnedArray<BKADSRSlider> envelopeSliders;
     
     virtual void multiSliderDidChange(String name, int whichSlider, Array<float> values) = 0;
-    
-    //virtual void multiSlidersDidChange(String name, Array<Array<float>> values) = 0;
     virtual void multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states) = 0;
     
     inline void multiSliderValueChanged(String name, int whichSlider, Array<float> values) override
     {
         multiSliderDidChange(name, whichSlider, values);
     }
-    
-    /*
-    inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values) override
-    {
-        multiSlidersDidChange(name, values);
-    }
-     */
     
     inline void multiSliderAllValuesChanged(String name, Array<Array<float>> values, Array<bool> states) override
     {
