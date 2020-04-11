@@ -34,7 +34,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     {
         if ((cSynchronicDataTypes[i] == BKFloatArr || cSynchronicDataTypes[i] == BKArrFloatArr) && cSynchronicParameterTypes[i] != "ADSRs")
         {
-            paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
+            paramSliders.insert(idx, new BKMultiSlider());
             addAndMakeVisible(paramSliders[idx], ALL);
             paramSliders[idx]->setName(cSynchronicParameterTypes[idx+SynchronicTranspOffsets]);
             paramSliders[idx]->addMyListener(this);

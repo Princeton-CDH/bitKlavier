@@ -39,7 +39,7 @@ BKViewController(p, theGraph, 3)
             // skip over the alternate smoothing param, not using it for now
             if (cBlendronicParameterTypes[idx+BlendronicBeats] == "smoothing (?)") { o++; i++; }
             
-            paramSliders.insert(idx, new BKMultiSlider(HorizontalMultiBarSlider));
+            paramSliders.insert(idx, new BKMultiSlider());
             addAndMakeVisible(paramSliders[idx], ALL);
             paramSliders[idx]->setName(cBlendronicParameterTypes[o+idx+BlendronicBeats]);
             paramSliders[idx]->addMyListener(this);

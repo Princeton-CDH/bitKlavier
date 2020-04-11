@@ -71,10 +71,10 @@ private:
  
  The user can drag across the sliders to quickly set values
  
- The user can also enter sliderr values directly via a text editor:
+ The user can also enter slider values directly via a text editor:
     "1 [-1, -2, -3] 2 3" will create three sliders, and the second will have three overlaid sliders
  
- By default it has 12 sliders, but that can be increased by adding additional values via text entry.
+ By default it has 12 sliders, but that can be increased by adding additional values via text entry
  
  Gaps in the slider array are possible, and indicated by a forward slash '/' in the text editor
  
@@ -95,15 +95,17 @@ public ImageButton::Listener
     
 public:
     
-    // constructor: at the moment, only type HorizontalMultiBarSlider is implemented
-    BKMultiSlider(BKMultiSliderType which);
+// *** Public Instance Methods *** //
+    
+    // constructor
+    BKMultiSlider();
     ~BKMultiSlider();
         
     // when the client sends an array of only the active slider values, this will construct the complete array
     // of slider values, including inactive sliders, and then call setTo. So
     //      newActiveVals = {1, 2, 3}
     //      newactives = {true, false, false, true, true, false....... false}
-    // will result in [1 / / 2 3 / / / / / / /], where / represents and inactive slider (gap)
+    // will result in [1 / / 2 3 / / / / / / /], where / represents an inactive slider (gap)
     void setToOnlyActive(Array<Array<float>> newActiveVals, Array<bool> newactives, NotificationType newnotify);
     
     // as above, but takes a 1d array, for sliders that don't use subSliders
@@ -151,12 +153,8 @@ public:
     
 private:
     
-    // holds all the current values, including for sub sliders (hence the double array)
-    Array<Array<float>> allSliderVals;
-    
-    // which of these sliders is active; the first is always true
-    Array<bool> whichSlidersActive;
-    
+// *** Private Instance Methods *** //
+
     // this is the main function for setting the multislider
     // the array of arrays is the slider values, with the inner array for subsliders (multiple sliders at one position
     // the array of bools sets which of the sliders is actually active
@@ -242,58 +240,58 @@ private:
     void resized() override;
     
 
-    // *** Instance Variables *** //
+// *** Instance Variables *** //
     
-    BKMultiSliderLookAndFeel activeSliderLookAndFeel;
-    BKMultiSliderLookAndFeel passiveSliderLookAndFeel;
-    BKMultiSliderLookAndFeel highlightedSliderLookAndFeel;
-    BKMultiSliderLookAndFeel displaySliderLookAndFeel;
+    // holds all the current values, including for sub sliders (hence the double array)
+    Array<Array<float>> allSliderVals;
     
-    String sliderName;
-    BKLabel showName;
+    // which of these sliders is active; the first is always true
+    Array<bool> whichSlidersActive;
     
-    bool dragging;
-    bool arrangedHorizontally;
-    bool sliderIsVertical;
-    bool sliderIsBar;
+    // the invisible slider lays on top of all the sliders, its value
+    // is used to set the values of the individual slider that the mouse is nearest
+    double currentInvisibleSliderValue;
+    
+    // allow sliders to have multiple values
+    bool allowSubSliders;
+    
+    // if allowSubSliders, what to call it "add [subSliderName]"
+    String subSliderName;
+    
+    // to keep track of stuff
     int currentSubSlider;
     int lastHighlightedSlider;
     bool focusLostByEscapeKey;
     bool skewFromMidpoint;
+    float clickedHeight;
     
-    Slider::SliderStyle subsliderStyle;
-    
-    double currentInvisibleSliderValue;
-    
-    OwnedArray<OwnedArray<BKSubSlider>> sliders;
-    std::unique_ptr<BKSubSlider> displaySlider;
-    std::unique_ptr<BKSubSlider> bigInvisibleSlider;
-    std::unique_ptr<TextEditor> editValsTextField;
-    
-    std::unique_ptr<ImageButton> rotateButton;
-    
+    // default values
     double sliderMin, sliderMax, sliderMinDefault, sliderMaxDefault;
     double sliderDefault;
     double sliderIncrement;
     
+    // dimensions
     int totalWidth;
     int sliderHeight;
     float sliderWidth;
     int displaySliderWidth;
-    
-    bool allowSubSliders;
-    String subSliderName;
-    
-    // the number of sliders will values actually set; always >= 1
-    // int numActiveSliders;
-    
+
     // by default, how many sliders to show (12)
     int numDefaultSliders;
-    
-    // how many are actually visible; will be == numActiveSliders OR numDefaultSliders, whichever one is greater
-    // int numVisibleSliders;
-    
-    float clickedHeight;
+        
+    // UI elements
+    BKMultiSliderLookAndFeel activeSliderLookAndFeel;
+    BKMultiSliderLookAndFeel passiveSliderLookAndFeel;
+    BKMultiSliderLookAndFeel highlightedSliderLookAndFeel;
+    BKMultiSliderLookAndFeel displaySliderLookAndFeel;
+    String sliderName;
+    BKLabel showName;
+    Slider::SliderStyle subsliderStyle;
+    OwnedArray<OwnedArray<BKSubSlider>> sliders;
+    std::unique_ptr<BKSubSlider> displaySlider;
+    std::unique_ptr<BKSubSlider> bigInvisibleSlider;
+    std::unique_ptr<TextEditor> editValsTextField;
+    std::unique_ptr<ImageButton> rotateButton;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKMultiSlider)
 };

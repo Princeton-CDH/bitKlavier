@@ -100,15 +100,10 @@ double BKSubSlider::getValueFromText(const String & text )
 // **************************************************  BKMultiSlider ************************************************** //
 // ******************************************************************************************************************** //
 
-BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
+BKMultiSlider::BKMultiSlider()
 {
-    // *** at the moment, only type HorizontalMultiBarSlider is implemented!!
-    if(which != HorizontalMultiBarSlider) DBG("only HorizontalMultiBarSlider currently implemented!");
 
-    sliderIsVertical = false;
-    arrangedHorizontally = true;
-    sliderIsBar = true;
-    
+    // initialize stuff
     passiveSliderLookAndFeel.setColour(Slider::thumbColourId, Colour::greyLevel (0.8f).contrasting().withAlpha (0.13f));
     highlightedSliderLookAndFeel.setColour(Slider::thumbColourId, Colours::red.withSaturation(1.));
     activeSliderLookAndFeel.setColour(Slider::thumbColourId, Colours::goldenrod.withMultipliedAlpha(0.75));
@@ -128,6 +123,8 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     clickedHeight = 0.;
     subsliderStyle = Slider::LinearBarVertical;
     
+    // the bigInvisibleSlider sits on top of the individual sliders
+    // it's used to set the values of the slider that the mouse is nearest
     bigInvisibleSlider = std::make_unique<BKSubSlider>(Slider::LinearBarVertical,
                                          sliderMin,
                                          sliderMax,
@@ -136,6 +133,8 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
                                          20,
                                          sliderHeight);
     
+    // this displays the current value of whatever slider the mouse is nearest
+    // is placed to the left of the array of sliders
     displaySlider = std::make_unique<BKSubSlider>(Slider::LinearBarVertical,
                                     sliderMin,
                                     sliderMax,
@@ -163,6 +162,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     showName.setInterceptsMouseClicks(false, true);
     addAndMakeVisible(showName);
     
+    // for editing the slider values by text
     editValsTextField = std::make_unique<TextEditor>();
     editValsTextField->setMultiLine(true);
     editValsTextField->setName("PARAMTXTEDIT");
@@ -176,6 +176,7 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     editValsTextField->setSelectAllWhenFocused(false);
 #endif
     
+    // for rotating the slider values
     rotateButton = std::make_unique<ImageButton>();
     rotateButton->setImages(false, true, true,
                             ImageCache::getFromMemory(BinaryData::rotatearrow_png, BinaryData::rotatearrow_pngSize), 0.8f, Colours::transparentBlack,
@@ -189,6 +190,8 @@ BKMultiSlider::BKMultiSlider(BKMultiSliderType which)
     
     //create the default sliders, with one active
     initializeSliderVals(numDefaultSliders);
+    
+    // draw them! ready to go....
     drawSliders(dontSendNotification);
     
 }
@@ -203,20 +206,19 @@ void BKMultiSlider::initializeSliderVals(int howmany)
 {
     if (howmany < numDefaultSliders) howmany = numDefaultSliders;
     
+    // slider values
     allSliderVals.clear();
     allSliderVals.ensureStorageAllocated(howmany);
     for (int i = 0; i < howmany; i++)
-    {
         allSliderVals.insert(i, {sliderDefault});
-    }
     
+    // slider states (whether they are active or not (passive))
     whichSlidersActive.clearQuick();
     whichSlidersActive.ensureStorageAllocated(howmany);
     whichSlidersActive.set(0, true);
     for (int i = 1; i < howmany; i++)
-    {
         whichSlidersActive.set(i, false);
-    }
+
 }
 
 
@@ -229,8 +231,6 @@ void BKMultiSlider::updateSliderVal(int which, int whichSub, float val)
         allSliderVals.set(which, stemp);
         whichSlidersActive.set(which, true);
     }
-
-    // printSliderVals();
 }
 
 
@@ -395,20 +395,13 @@ void BKMultiSlider::addSlider(int where, bool active, NotificationType newnotify
 {
     BKSubSlider* newslider;
     
-    if(arrangedHorizontally) newslider     = new BKSubSlider(subsliderStyle,
-                                                             sliderMin,
-                                                             sliderMax,
-                                                             sliderDefault,
-                                                             sliderIncrement,
-                                                             sliderWidth,
-                                                             sliderHeight);
-    else newslider                         = new BKSubSlider(subsliderStyle,
-                                                             sliderMin,
-                                                             sliderMax,
-                                                             sliderDefault,
-                                                             sliderIncrement,
-                                                             sliderWidth,
-                                                             sliderHeight);
+    newslider      = new BKSubSlider(subsliderStyle,
+                                     sliderMin,
+                                     sliderMax,
+                                     sliderDefault,
+                                     sliderIncrement,
+                                     sliderWidth,
+                                     sliderHeight);
     
     newslider->setRange(sliderMin, sliderMax, sliderIncrement);
     newslider->setValue(sliderDefault, dontSendNotification);
@@ -449,14 +442,7 @@ void BKMultiSlider::addSubSlider(int where, bool active, NotificationType newnot
 {
     BKSubSlider* newslider;
     
-    if(arrangedHorizontally) newslider     = new BKSubSlider(subsliderStyle,
-                                                             sliderMin,
-                                                             sliderMax,
-                                                             sliderDefault,
-                                                             sliderIncrement,
-                                                             sliderWidth,
-                                                             sliderHeight);
-    else newslider                         = new BKSubSlider(subsliderStyle,
+    newslider     = new BKSubSlider(subsliderStyle,
                                                              sliderMin,
                                                              sliderMax,
                                                              sliderDefault,
