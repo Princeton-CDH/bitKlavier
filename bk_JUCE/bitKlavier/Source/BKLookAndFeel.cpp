@@ -10,6 +10,181 @@
 
 #include "BKLookAndFeel.h"
 
+class BKDocumentWindowButton   : public Button
+{
+public:
+    BKDocumentWindowButton (const String& name, Colour c, const Path& normal, const Path& toggled)
+    : Button (name), colour (c), normalShape (normal), toggledShape (toggled)
+    {
+    }
+    
+    void paintButton (Graphics& g, bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override
+    {
+        auto background = Colours::grey;
+        
+        if (auto* rw = findParentComponentOfClass<ResizableWindow>())
+            if (auto lf = dynamic_cast<LookAndFeel_V4*> (&rw->getLookAndFeel()))
+                background = Colours::black;
+        
+        g.fillAll (background);
+        
+        g.setColour ((! isEnabled() || shouldDrawButtonAsDown) ? colour.withAlpha (0.6f)
+                     : colour);
+        
+        if (shouldDrawButtonAsHighlighted)
+        {
+            g.fillAll();
+            g.setColour (background);
+        }
+        
+        auto& p = getToggleState() ? toggledShape : normalShape;
+        
+        auto reducedRect = Justification (Justification::centred)
+        .appliedToRectangle (Rectangle<int> (getHeight(), getHeight()), getLocalBounds())
+        .toFloat()
+        .reduced (getHeight() * 0.3f);
+        
+        g.fillPath (p, p.getTransformToScaleToFit (reducedRect, true));
+    }
+    
+private:
+    Colour colour;
+    Path normalShape, toggledShape;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKDocumentWindowButton)
+};
+
+Button* BKWindowLAF::createDocumentWindowButton (int buttonType)
+{
+    Path shape;
+    auto crossThickness = 0.15f;
+    
+    if (buttonType == DocumentWindow::closeButton)
+    {
+        shape.addLineSegment ({ 0.0f, 0.0f, 1.0f, 1.0f }, crossThickness);
+        shape.addLineSegment ({ 1.0f, 0.0f, 0.0f, 1.0f }, crossThickness);
+        
+        return new BKDocumentWindowButton ("close", Colour (0xffb11621), shape, shape);
+    }
+    
+    if (buttonType == DocumentWindow::minimiseButton)
+    {
+        shape.addLineSegment ({ 0.0f, 0.5f, 1.0f, 0.5f }, crossThickness);
+        
+        return new BKDocumentWindowButton ("minimise", Colour (0xffc19b13), shape, shape);
+    }
+    
+    if (buttonType == DocumentWindow::maximiseButton)
+    {
+        shape.addLineSegment ({ 0.5f, 0.0f, 0.5f, 1.0f }, crossThickness);
+        shape.addLineSegment ({ 0.0f, 0.5f, 1.0f, 0.5f }, crossThickness);
+        
+        Path fullscreenShape;
+        fullscreenShape.startNewSubPath (45.0f, 100.0f);
+        fullscreenShape.lineTo (0.0f, 100.0f);
+        fullscreenShape.lineTo (0.0f, 0.0f);
+        fullscreenShape.lineTo (100.0f, 0.0f);
+        fullscreenShape.lineTo (100.0f, 45.0f);
+        fullscreenShape.addRectangle (45.0f, 45.0f, 100.0f, 100.0f);
+        PathStrokeType (30.0f).createStrokedPath (fullscreenShape, fullscreenShape);
+        
+        return new BKDocumentWindowButton ("maximise", Colour (0xff0A830A), shape, fullscreenShape);
+    }
+    
+    jassertfalse;
+    return nullptr;
+}
+
+void BKWindowLAF::drawDocumentWindowTitleBar (DocumentWindow& window, Graphics& g,
+                                              int w, int h, int titleSpaceX, int titleSpaceW,
+                                              const Image* icon, bool drawTitleTextOnLeft)
+{
+    if (w * h == 0)
+        return;
+    
+    auto isActive = window.isActiveWindow();
+    
+    g.setColour (Colours::black);
+    g.fillAll();
+    
+    Font font (h * 0.65f, Font::plain);
+    g.setFont (font);
+    
+    auto textW = font.getStringWidth (window.getName());
+    auto iconW = 0;
+    auto iconH = 0;
+    
+    if (icon != nullptr)
+    {
+        iconH = static_cast<int> (font.getHeight());
+        iconW = icon->getWidth() * iconH / icon->getHeight() + 4;
+    }
+    
+    textW = jmin (titleSpaceW, textW + iconW);
+    auto textX = drawTitleTextOnLeft ? titleSpaceX
+    : jmax (titleSpaceX, (w - textW) / 2);
+    
+    if (textX + textW > titleSpaceX + titleSpaceW)
+        textX = titleSpaceX + titleSpaceW - textW;
+    
+    if (icon != nullptr)
+    {
+        g.setOpacity (isActive ? 1.0f : 0.6f);
+        g.drawImageWithin (*icon, textX, (h - iconH) / 2, iconW, iconH,
+                           RectanglePlacement::centred, false);
+        textX += iconW;
+        textW -= iconW;
+    }
+    
+    if (window.isColourSpecified (DocumentWindow::textColourId) || isColourSpecified (DocumentWindow::textColourId))
+        g.setColour (window.findColour (DocumentWindow::textColourId));
+    else
+        g.setColour (getCurrentColourScheme().getUIColour (ColourScheme::defaultText));
+    
+    g.drawText (window.getName(), textX, 0, textW, h, Justification::centredLeft, true);
+}
+
+Font BKWindowLAF::getComboBoxFont (ComboBox& box)
+{
+    return { jmin (16.0f, box.getHeight() * 0.85f) };
+}
+
+Font BKWindowLAF::getPopupMenuFont (void)
+{
+     return Font (17.0f);
+}
+
+Font BKWindowLAF::getTextButtonFont (TextButton&, int buttonHeight)
+{
+    return { jmin (16.0f, buttonHeight * 0.6f) };
+}
+
+Font BKWindowLAF::getLabelFont (Label& label)
+{
+    return label.getFont();
+}
+
+void BKWindowLAF::drawCallOutBoxBackground (CallOutBox& box, Graphics& g,
+                                               const Path& path, Image& cachedImage)
+{
+    if (cachedImage.isNull())
+    {
+        cachedImage = { Image::ARGB, box.getWidth(), box.getHeight(), true };
+        Graphics g2 (cachedImage);
+        
+        DropShadow (Colours::black.withAlpha (0.7f), 8, { 0, 2 }).drawForPath (g2, path);
+    }
+    
+    g.setColour (Colours::black);
+    g.drawImageAt (cachedImage, 0, 0);
+    
+    g.setColour (Colours::black);
+    g.fillPath (path);
+    
+    g.setColour (Colours::antiquewhite);
+    g.strokePath (path, PathStrokeType (1.0f));
+}
+
 void BKButtonAndMenuLAF::positionComboBoxText (ComboBox& box, Label& label)
 {
     label.setFont (getComboBoxFont (box));
@@ -73,6 +248,31 @@ Font BKButtonAndMenuLAF::getLabelFont (Label& label)
     font.setSizeAndStyle(fontHeight, STYLE, HORIZONTAL, KERNING);
     
     return font;
+}
+
+void BKButtonAndMenuLAF::drawTooltip(Graphics& g, const String& text, int width, int height)
+{
+    Rectangle<int> bounds (width, height);
+    auto cornerSize = 0.0f;
+    
+    g.setColour (findColour (TooltipWindow::backgroundColourId));
+    g.setOpacity(0.0f);
+    g.fillRoundedRectangle (bounds.toFloat(), cornerSize);
+    
+    g.setColour (findColour (TooltipWindow::outlineColourId));
+    g.setOpacity(0.0f);
+    g.drawRoundedRectangle (bounds.toFloat().reduced (0.5f, 0.5f), cornerSize, 1.0f);
+    
+    const float tooltipFontSize = 13.0f;
+    const int maxToolTipWidth = 400;
+    
+    AttributedString s;
+    s.setJustification (Justification::centred);
+    s.append (text, Font (tooltipFontSize, Font::bold), findColour (TooltipWindow::textColourId));
+    
+    TextLayout tl;
+    tl.createLayoutWithBalancedLineLengths (s, (float) maxToolTipWidth);
+    tl.draw (g, { static_cast<float> (width), static_cast<float> (height) });
 }
 
 

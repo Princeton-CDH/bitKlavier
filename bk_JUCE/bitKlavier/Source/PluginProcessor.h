@@ -48,6 +48,8 @@ public:
     AudioDeviceManager* getAudioDeviceManager(void);
     AudioProcessorPlayer* getAudioProcessorPlayer(void);
     double getCurrentSampleRate(void);
+    bool areTooltipsEnabled(void);
+    
     void addMidiInputDeviceCallback(MidiInputCallback* callback);
     void removeMidiInputDeviceCallback(MidiInputCallback* callback);
     

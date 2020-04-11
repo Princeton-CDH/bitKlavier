@@ -51,7 +51,7 @@ namespace juce
 #endif
             
             return new StandaloneFilterWindow (getApplicationName(),
-                                               LookAndFeel::getDefaultLookAndFeel().findColour (ResizableWindow::backgroundColourId),
+                                               laf.findColour (ResizableWindow::backgroundColourId),
                                                appProperties.getUserSettings(),
                                                false, {}, nullptr
 #ifdef JucePlugin_PreferredChannelConfigurations
@@ -73,7 +73,7 @@ namespace juce
 #if JUCE_STANDALONE_FILTER_WINDOW_USE_KIOSK_MODE
             Desktop::getInstance().setKioskModeComponent (mainWindow.get(), false);
 #endif
-            
+            mainWindow->setLookAndFeel(&laf);
             mainWindow->setVisible (true);
         }
         
@@ -106,6 +106,8 @@ namespace juce
     protected:
         ApplicationProperties appProperties;
         std::unique_ptr<StandaloneFilterWindow> mainWindow;
+        
+        BKWindowLAF laf;
     };
     
 } // namespace juce
