@@ -291,7 +291,6 @@ void BKMultiSlider::drawSliders(NotificationType newnotify)
     resetRanges();
     resized();
     displaySlider->setValue(allSliderVals[0][0]);
-
 }
 
 
@@ -309,7 +308,6 @@ void  BKMultiSlider::setTo(Array<Array<float>> newvals, Array<bool> newactives, 
     }
 
     drawSliders(newnotify);
-    
 }
 
 
@@ -1026,14 +1024,22 @@ void BKMultiSlider::sliderModifyMenuCallback (const int result, BKMultiSlider* m
 }
 
 
-//find activeSliderNum, highlight it as current, dehighlight all the others...
+// find activeSliderNum, highlight it as current, dehighlight all the others...
 void BKMultiSlider::setCurrentSlider(int activeSliderNum)
 {
+    // dim all inactive sliders
+    for (int i = 1; i < allSliderVals.size(); i++)
+    {
+        for(int j = 0; j < sliders[i]->size(); j++)
+        {
+            if (!whichSlidersActive[i]) sliders[i]->operator[](j)->setLookAndFeel(&passiveSliderLookAndFeel);
+        }
+    }
+
     int sliderNum = getActiveSlider(activeSliderNum);
-    
     highlight(sliderNum);
     
-    if(sliderNum != lastHighlightedSlider)
+    if (sliderNum != lastHighlightedSlider)
     {
         deHighlight(lastHighlightedSlider);
         lastHighlightedSlider = sliderNum;
@@ -1060,7 +1066,7 @@ int BKMultiSlider::getActiveSlider(int sliderNum)
 void BKMultiSlider::highlight(int activeSliderNum)
 {
     //need to count through depth, but for now just the first one...
-    for(int i=0; i<sliders[activeSliderNum]->size(); i++)
+    for(int i = 0; i < sliders[activeSliderNum]->size(); i++)
     {
         sliders[activeSliderNum]->operator[](i)->setLookAndFeel(&highlightedSliderLookAndFeel);
     }
@@ -1069,7 +1075,7 @@ void BKMultiSlider::highlight(int activeSliderNum)
 
 void BKMultiSlider::deHighlight(int sliderNum)
 {
-    for(int i=0; i<sliders[sliderNum]->size(); i++)
+    for(int i = 0; i < sliders[sliderNum]->size(); i++)
     {
         sliders[sliderNum]->operator[](i)->setLookAndFeel(&activeSliderLookAndFeel);
     }
@@ -1078,7 +1084,7 @@ void BKMultiSlider::deHighlight(int sliderNum)
 
 void BKMultiSlider::deHighlightCurrentSlider()
 {
-    for(int i=0; i<sliders[lastHighlightedSlider]->size(); i++)
+    for(int i = 0; i < sliders[lastHighlightedSlider]->size(); i++)
     {
         sliders[lastHighlightedSlider]->operator[](i)->setLookAndFeel(&activeSliderLookAndFeel);
     }

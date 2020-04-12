@@ -732,6 +732,7 @@ void BlendronicPreparationEditor::timerCallback()
     {
         BlendronicProcessor::Ptr proc = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
         BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+        
         if (prep != nullptr && proc != nullptr)
         {
             proc->setDisplay(&delayLineDisplay);
@@ -754,7 +755,7 @@ void BlendronicPreparationEditor::timerCallback()
             }
             
             // dim target comboboxes that aren't activated by a Keymap
-            for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
+            for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
             {
                 bool makeBright = false;
                 for (auto km : proc->getKeymaps())
@@ -780,30 +781,30 @@ void BlendronicPreparationEditor::timerCallback()
             
             for (int i = 0; i < paramSliders.size(); i++)
             {
-                if(paramSliders[i]->getName() == "beat lengths")
+                //if (paramSliders[i]->getName() == "beat lengths")
+                if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicBeats]))
                 {
                     size = paramSliders[i]->getNumVisible();
                     counter = proc->getBeatIndex();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
-                else if(paramSliders[i]->getName() == "delay lengths")
+                else if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
                 {
                     size = paramSliders[i]->getNumVisible();
                     counter = proc->getDelayIndex();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
-                else if(paramSliders[i]->getName() == "smoothing")
+                else if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
                 {
                     size = paramSliders[i]->getNumVisible();
                     counter = proc->getSmoothIndex();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
-                else if(paramSliders[i]->getName() == "feedback coefficients")
+                else if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
                 {
                     size = paramSliders[i]->getNumVisible();
                     counter = proc->getFeedbackIndex();
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
-                    
                 }
             }
         }
