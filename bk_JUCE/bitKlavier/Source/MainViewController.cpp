@@ -608,15 +608,22 @@ void MainViewController::fillInstrumentCB()
 void MainViewController::timerCallback()
 {
     BKUpdateState::Ptr state = processor.updateState;
-    
-    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
+
+#if !JUCE_IOS
+    if(processor.wrapperType != juce::AudioPluginInstance::wrapperType_AudioUnit &&
+       processor.wrapperType != juce::AudioPluginInstance::wrapperType_VST &&
+       processor.wrapperType != juce::AudioPluginInstance::wrapperType_VST3)
     {
-        tipwindow = std::make_unique<TooltipWindow>();
+        if (processor.areTooltipsEnabled() && tipwindow == nullptr)
+        {
+            tipwindow = std::make_unique<TooltipWindow>();
+        }
+        else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
+        {
+            tipwindow = nullptr;
+        }
     }
-    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
-    {
-        tipwindow = nullptr;
-    }
+#endif
     
     if (++timerCallbackCount >= 25)
     {
