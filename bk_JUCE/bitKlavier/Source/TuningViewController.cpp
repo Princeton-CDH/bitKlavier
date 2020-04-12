@@ -1623,6 +1623,7 @@ void TuningPreparationEditor::update(void)
         //DBG("offsets: " + floatArrayToString(prep->getAbsoluteOffsets()));
         absoluteKeyboard.setValues(prep->getAbsoluteOffsetsCents());
         customKeyboard.setValues(tuning->getCurrentScaleCents());
+        customKeyboard.setFundamental(prep->getFundamental());
         
         A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
         A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
