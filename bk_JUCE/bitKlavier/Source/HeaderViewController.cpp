@@ -18,6 +18,19 @@ processor (p),
 construction(c)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
+    
+    addAndMakeVisible (preferencesButton);
+    preferencesButton.addListener (this);
+    preferencesButton.setTriggeredOnMouseDown (true);
+    
+    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
+    {
+        tipwindow = std::make_unique<TooltipWindow>();
+    }
+    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
+    {
+        tipwindow = nullptr;
+    }
 
     addAndMakeVisible(galleryB);
     galleryB.setButtonText("Gallery");
@@ -67,6 +80,7 @@ construction(c)
     fillPianoCB();
     processor.updateState->pianoDidChangeForGraph = true;
     
+    startTimerHz (10);
 }
 
 HeaderViewController::~HeaderViewController()
@@ -88,10 +102,13 @@ void HeaderViewController::paint (Graphics& g)
 
 void HeaderViewController::resized()
 {
-    float width = getWidth() / 7;
-    
     Rectangle<int> area (getLocalBounds());
     area.reduce(0, gYSpacing);
+    
+    area.removeFromLeft(2);
+    preferencesButton.setBounds(area.removeFromLeft(area.getHeight()));
+    
+    float width = area.getWidth() / 7;
     
     area.removeFromLeft(gXSpacing);
     galleryB.setBounds(area.removeFromLeft(width));
@@ -579,6 +596,10 @@ void HeaderViewController::bkButtonClicked (Button* b)
     {
         getGalleryMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&galleryB), ModalCallbackFunction::forComponent (galleryMenuCallback, this) );
     }
+    else if (b == &preferencesButton)
+    {
+        processor.showBKSettingsDialog(b);
+    }
     
     
 }
@@ -910,6 +931,18 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         {
             cb->setSelectedId(lastGalleryCBId, dontSendNotification);
         }
+    }
+}
+
+void HeaderViewController::timerCallback()
+{
+    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
+    {
+        tipwindow = std::make_unique<TooltipWindow>();
+    }
+    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
+    {
+        tipwindow = nullptr;
     }
 }
 

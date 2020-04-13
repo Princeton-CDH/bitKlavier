@@ -26,7 +26,9 @@
 #include "ShareBot.h"
 #endif
 
-class HeaderViewController : public BKComponent, public BKListener
+class HeaderViewController : public BKComponent,
+public BKListener,
+private Timer
 {
 public:
     HeaderViewController(BKAudioProcessor& p, BKConstructionSite* construction);
@@ -58,6 +60,8 @@ private:
     void bkMessageReceived          (const String& message) override{};
     void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override;
+    
+    void timerCallback() override;
     
     static void pianoMenuCallback(int result, HeaderViewController*);
     static void galleryMenuCallback(int result, HeaderViewController*);
@@ -93,6 +97,10 @@ private:
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
     BKButtonAndMenuLAF comboBoxLeftJustifyLAF;
     BKButtonAndMenuLAF buttonsAndMenusLAF;
+    
+    TextButton preferencesButton;
+    
+    std::unique_ptr<TooltipWindow> tipwindow;
     
     JUCE_LEAK_DETECTOR(HeaderViewController)
 };

@@ -62,9 +62,7 @@ public:
     
         
         toggleTextToRight = true;
-        
-        tooltipsEnabled = true;
-        
+    
         //setColour(juce::LookAndFeel_V4::ColourScheme::outline, Colours::black);
         //getCurrentColourScheme().setUIColour(juce::LookAndFeel_V4::ColourScheme::widgetBackground, Colours::yellow);
         
@@ -110,7 +108,6 @@ public:
 private:
     Justification comboBoxJustification;
     bool toggleTextToRight;
-    bool tooltipsEnabled;
 };
 
 class BKWindowLAF : public BKButtonAndMenuLAF

@@ -167,6 +167,8 @@ midiReady(false)
     
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     
+    tooltipsEnabled.setValue(true);
+    
     loadGalleries();
 }
 
@@ -1716,5 +1718,5 @@ double BKAudioProcessor::getCurrentSampleRate()
 
 bool BKAudioProcessor::areTooltipsEnabled()
 {
-    return getPluginHolder()->getTooltipsEnabledValue().getValue();
+    return tooltipsEnabled.getValue();
 }
