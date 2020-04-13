@@ -120,12 +120,6 @@ timerCallbackCount(0)
     overtopShadow = std::make_unique<DropShadower>(myshadow);
     overtopShadow->setOwner(&overtop);
     
-//    tipwindow.setLookAndFeel(&laf); // this plus changing drawTooltip() in BKButtonAndMenuLAF will customize tooltip appearance
-    
-    tipwindow = std::make_unique<TooltipWindow>(); // this will enable tooltips
-//    tipwindow = nullptr; // this will disable tooltips
-    // just need to figure out setting ui and how to access these from wherever that happens
-    
     startTimerHz (10);
 }
 
@@ -180,7 +174,7 @@ void MainViewController::toggleDisplay(void)
 void MainViewController::resized()
 {
     int headerHeight,sidebarWidth,footerHeight;
-    
+
     splash.setBounds(getLocalBounds());
     
 #if JUCE_IOS
@@ -333,7 +327,6 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
 void MainViewController::bkButtonClicked (Button* b)
 {
     String name = b->getName();
-
 }
 
 void MainViewController::sliderValueChanged (Slider* slider)
@@ -608,15 +601,6 @@ void MainViewController::fillInstrumentCB()
 void MainViewController::timerCallback()
 {
     BKUpdateState::Ptr state = processor.updateState;
-    
-    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
-    {
-        tipwindow = std::make_unique<TooltipWindow>();
-    }
-    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
-    {
-        tipwindow = nullptr;
-    }
     
     if (++timerCallbackCount >= 25)
     {

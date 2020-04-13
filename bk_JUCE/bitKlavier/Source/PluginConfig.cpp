@@ -67,7 +67,9 @@ AudioProcessorEditor* BKAudioProcessor::createEditor()
 //==============================================================================
 void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
+    ValueTree settingsVT("userSettings");
     
+    settingsVT.setProperty("tooltipsEnabled", (int)tooltipsEnabled.getValue(), 0);
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
@@ -87,6 +89,8 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     galleryVT.setProperty("invertSustain", getSustainInversion(), 0);
     
     DBG("sustain inversion saved: " + String((int)getSustainInversion()));
+    
+    galleryVT.addChild(settingsVT, 0, 0);
     
     std::unique_ptr<XmlElement> galleryXML = galleryVT.createXml();
     copyXmlToBinary (*galleryXML, destData);
@@ -131,6 +135,10 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     DBG("galleryXML: " + galleryXML->toString(XmlElement::TextFormat()));
     if (galleryXML != nullptr)
     {
+        XmlElement* userSettings = galleryXML->getChildElement(0);
+        if (userSettings != nullptr)
+            tooltipsEnabled.setValue((bool) userSettings->getStringAttribute("tooltipsEnabled").getIntValue());
+        
         defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
         
         if (defaultLoaded)

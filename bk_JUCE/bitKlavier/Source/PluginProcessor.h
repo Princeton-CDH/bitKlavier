@@ -344,6 +344,15 @@ public:
     inline bool isMidiReady(void) { return midiReady; }
     inline void setMidiReady(bool ready) { midiReady = ready; }
     
+    void showBKSettingsDialog(Button* button)
+    {
+        Component* settings = new PreferencesComponent (*this);
+        settings->setSize(200, 40);
+        
+        CallOutBox& box = CallOutBox::launchAsynchronously (settings, button->getScreenBounds(), nullptr);
+        box.setLookAndFeel(&laf);
+    }
+    
 private:
     double currentSampleRate;
     
@@ -379,6 +388,54 @@ private:
     
     bool midiReady;
     Array<String> defaultMidiInputSources;
+    
+    Value tooltipsEnabled;
+    
+    BKWindowLAF laf;
+    
+    class PreferencesComponent : public Component
+    {
+    public:
+        PreferencesComponent (BKAudioProcessor& processor)
+        : owner (processor),
+        tooltipsLabel  ("Show tooltips", "Show tooltips"),
+        tooltipsButton ("")
+        {
+            setOpaque (true);
+            
+            tooltipsButton.setClickingTogglesState (true);
+            tooltipsButton.getToggleStateValue().referTo (owner.tooltipsEnabled);
+            
+            addAndMakeVisible (tooltipsButton);
+            addAndMakeVisible (tooltipsLabel);
+            
+            tooltipsLabel.attachToComponent (&tooltipsButton, true);
+        }
+        
+        void paint (Graphics& g) override
+        {
+            g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+        }
+        
+        void resized() override
+        {
+            auto r = getLocalBounds();
+            
+            r.removeFromTop(8);
+            r.removeFromLeft(r.getWidth() * 0.5);
+            r.removeFromRight(8);
+            tooltipsButton.setBounds (r.removeFromTop(24));
+        }
+        
+    private:
+        //==============================================================================
+        BKAudioProcessor& owner;
+        Label tooltipsLabel;
+        ToggleButton tooltipsButton;
+        
+        //==============================================================================
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreferencesComponent)
+    };
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)
