@@ -20,7 +20,9 @@ header(p, &construction),
 construction(p, &theGraph),
 overtop(p, &theGraph),
 splash(p),
-timerCallbackCount(0)
+timerCallbackCount(0),
+preferencesButton ("Preferences"),
+audioMidiButton ("Audio/MIDI Settings")
 {
     if (processor.platform == BKIOS)    display = DisplayConstruction;
     else                                display = DisplayDefault;
@@ -79,6 +81,7 @@ timerCallbackCount(0)
     sampleCB.addListener(this);
     instrumentCB.addListener(this);
     
+    sampleCB.setLookAndFeel(&comboBoxRightJustifyLAF);
     instrumentCB.setLookAndFeel(&comboBoxRightJustifyLAF);
     comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
     
@@ -120,6 +123,28 @@ timerCallbackCount(0)
     overtopShadow = std::make_unique<DropShadower>(myshadow);
     overtopShadow->setOwner(&overtop);
     
+    preferencesButton.addListener (this);
+    preferencesButton.setTriggeredOnMouseDown (true);
+    preferencesButton.setLookAndFeel(&windowLAF);
+    addAndMakeVisible (preferencesButton);
+    
+    if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+    {
+        audioMidiButton.addListener (this);
+        audioMidiButton.setTriggeredOnMouseDown (true);
+        audioMidiButton.setLookAndFeel(&windowLAF);
+        addAndMakeVisible (audioMidiButton);
+    }
+    
+    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
+    {
+        tipwindow = std::make_unique<TooltipWindow>();
+    }
+    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
+    {
+        tipwindow = nullptr;
+    }
+    
     startTimerHz (10);
 }
 
@@ -131,6 +156,8 @@ MainViewController::~MainViewController()
     octaveSlider.setLookAndFeel(nullptr);
     mainSlider.setLookAndFeel(nullptr);
     overtop.setLookAndFeel(nullptr);
+    audioMidiButton.setLookAndFeel(nullptr);
+    preferencesButton.setLookAndFeel(nullptr);
     keyboardComponent = nullptr;
     removeKeyListener(this);
 }
@@ -210,16 +237,20 @@ void MainViewController::resized()
     
     overtop.setBounds(overtopSlice);
     
+    
     if (display == DisplayDefault)
     {
         Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * processor.paddingScalarY + gYSpacing);
         
         footerSlice.reduce(gXSpacing, gYSpacing);
         
+        preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
+        audioMidiButton.setBounds (preferencesButton.getRight()+gXSpacing, footerSlice.getY(), 100, 20);
+        
         float unit = footerSlice.getWidth() * 0.25;
         
-        sampleCB.setBounds(unit, footerSlice.getY(), unit-0.5*gXSpacing, 20);
-        instrumentCB.setBounds(2*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
+        sampleCB.setBounds(unit*2, footerSlice.getY(), unit-0.5*gXSpacing, 20);
+        instrumentCB.setBounds(3*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
         
         float keyWidth = footerSlice.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
@@ -327,6 +358,14 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
 void MainViewController::bkButtonClicked (Button* b)
 {
     String name = b->getName();
+    if (b == &preferencesButton)
+    {
+        processor.showBKSettingsDialog(b);
+    }
+    else if (b == &audioMidiButton)
+    {
+        processor.showAudioSettingsDialog(b);
+    }
 }
 
 void MainViewController::sliderValueChanged (Slider* slider)
@@ -601,6 +640,15 @@ void MainViewController::fillInstrumentCB()
 void MainViewController::timerCallback()
 {
     BKUpdateState::Ptr state = processor.updateState;
+    
+    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
+    {
+        tipwindow = std::make_unique<TooltipWindow>();
+    }
+    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
+    {
+        tipwindow = nullptr;
+    }
     
     if (++timerCallbackCount >= 25)
     {

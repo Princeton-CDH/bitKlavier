@@ -18,19 +18,6 @@ processor (p),
 construction(c)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
-    
-    addAndMakeVisible (preferencesButton);
-    preferencesButton.addListener (this);
-    preferencesButton.setTriggeredOnMouseDown (true);
-    
-    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
-    {
-        tipwindow = std::make_unique<TooltipWindow>();
-    }
-    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
-    {
-        tipwindow = nullptr;
-    }
 
     addAndMakeVisible(galleryB);
     galleryB.setButtonText("Gallery");
@@ -104,9 +91,6 @@ void HeaderViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
     area.reduce(0, gYSpacing);
-    
-    area.removeFromLeft(2);
-    preferencesButton.setBounds(area.removeFromLeft(area.getHeight()));
     
     float width = area.getWidth() / 7;
     
@@ -596,12 +580,6 @@ void HeaderViewController::bkButtonClicked (Button* b)
     {
         getGalleryMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&galleryB), ModalCallbackFunction::forComponent (galleryMenuCallback, this) );
     }
-    else if (b == &preferencesButton)
-    {
-        processor.showBKSettingsDialog(b);
-    }
-    
-    
 }
 
 void HeaderViewController::addGalleriesFromFolder(File folder)
@@ -936,13 +914,6 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
 
 void HeaderViewController::timerCallback()
 {
-    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
-    {
-        tipwindow = std::make_unique<TooltipWindow>();
-    }
-    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
-    {
-        tipwindow = nullptr;
-    }
+
 }
 

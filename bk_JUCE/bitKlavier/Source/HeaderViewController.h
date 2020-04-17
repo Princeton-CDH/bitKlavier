@@ -98,10 +98,6 @@ private:
     BKButtonAndMenuLAF comboBoxLeftJustifyLAF;
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     
-    TextButton preferencesButton;
-    
-    std::unique_ptr<TooltipWindow> tipwindow;
-    
     JUCE_LEAK_DETECTOR(HeaderViewController)
 };
 

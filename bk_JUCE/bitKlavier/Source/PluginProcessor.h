@@ -344,14 +344,9 @@ public:
     inline bool isMidiReady(void) { return midiReady; }
     inline void setMidiReady(bool ready) { midiReady = ready; }
     
-    void showBKSettingsDialog(Button* button)
-    {
-        Component* settings = new PreferencesComponent (*this);
-        settings->setSize(200, 40);
-        
-        CallOutBox& box = CallOutBox::launchAsynchronously (settings, button->getScreenBounds(), nullptr);
-        box.setLookAndFeel(&laf);
-    }
+    void showBKSettingsDialog(Button* button);
+    
+    void showAudioSettingsDialog(Button* button);
     
 private:
     double currentSampleRate;

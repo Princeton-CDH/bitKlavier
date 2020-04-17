@@ -185,8 +185,14 @@ private:
     
     bool isAddingFromMidiInput;
     
+    TextButton preferencesButton;
+    TextButton audioMidiButton;
+    
     BKButtonAndMenuLAF laf;
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
+    BKWindowLAF windowLAF;
+    
+    std::unique_ptr<TooltipWindow> tipwindow;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainViewController)
 };
