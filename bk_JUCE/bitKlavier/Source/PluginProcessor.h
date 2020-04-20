@@ -427,6 +427,11 @@ private:
         BKAudioProcessor& owner;
         Label tooltipsLabel;
         ToggleButton tooltipsButton;
+        // Other ideas for preferences
+        // - Show keyboard contents when selected
+        // - Preparation activity indicators
+        // - UI Keyboard behavior (toggle / press)
+        // - Colors
         
         //==============================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreferencesComponent)

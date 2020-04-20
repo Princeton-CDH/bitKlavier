@@ -81,7 +81,6 @@ audioMidiButton ("Audio/MIDI Settings")
     sampleCB.addListener(this);
     instrumentCB.addListener(this);
     
-    sampleCB.setLookAndFeel(&comboBoxRightJustifyLAF);
     instrumentCB.setLookAndFeel(&comboBoxRightJustifyLAF);
     comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
     
@@ -244,13 +243,14 @@ void MainViewController::resized()
         
         footerSlice.reduce(gXSpacing, gYSpacing);
         
-        preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
-        audioMidiButton.setBounds (preferencesButton.getRight()+gXSpacing, footerSlice.getY(), 100, 20);
+        audioMidiButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
+        preferencesButton.setBounds (footerSlice.getRight()-100, footerSlice.getY(), 100, 20);
+        
         
         float unit = footerSlice.getWidth() * 0.25;
         
-        sampleCB.setBounds(unit*2, footerSlice.getY(), unit-0.5*gXSpacing, 20);
-        instrumentCB.setBounds(3*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
+        sampleCB.setBounds(unit, footerSlice.getY(), unit-0.5*gXSpacing, 20);
+        instrumentCB.setBounds(2*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
         
         float keyWidth = footerSlice.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
