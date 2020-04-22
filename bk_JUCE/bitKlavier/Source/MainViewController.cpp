@@ -9,12 +9,14 @@
 */
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "PluginEditor.h"
 #include "MainViewController.h"
 #include "BKConstructionSite.h"
 
 //==============================================================================
-MainViewController::MainViewController (BKAudioProcessor& p):
+MainViewController::MainViewController (BKAudioProcessor& p, BKAudioProcessorEditor& e):
 processor (p),
+editor (e),
 theGraph(p),
 header(p, &construction),
 construction(p, &theGraph),
@@ -135,11 +137,11 @@ audioMidiButton ("Audio/MIDI Settings")
         addAndMakeVisible (audioMidiButton);
     }
     
-    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
+    if (editor.areTooltipsEnabled() && tipwindow == nullptr)
     {
         tipwindow = std::make_unique<TooltipWindow>();
     }
-    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
+    else if (!editor.areTooltipsEnabled() && tipwindow != nullptr)
     {
         tipwindow = nullptr;
     }
@@ -360,11 +362,11 @@ void MainViewController::bkButtonClicked (Button* b)
     String name = b->getName();
     if (b == &preferencesButton)
     {
-        processor.showBKSettingsDialog(b);
+        editor.showBKSettingsDialog(b);
     }
     else if (b == &audioMidiButton)
     {
-        processor.showAudioSettingsDialog(b);
+        editor.showAudioSettingsDialog(b);
     }
 }
 
@@ -641,11 +643,11 @@ void MainViewController::timerCallback()
 {
     BKUpdateState::Ptr state = processor.updateState;
     
-    if (processor.areTooltipsEnabled() && tipwindow == nullptr)
+    if (editor.areTooltipsEnabled() && tipwindow == nullptr)
     {
         tipwindow = std::make_unique<TooltipWindow>();
     }
-    else if (!processor.areTooltipsEnabled() && tipwindow != nullptr)
+    else if (!editor.areTooltipsEnabled() && tipwindow != nullptr)
     {
         tipwindow = nullptr;
     }

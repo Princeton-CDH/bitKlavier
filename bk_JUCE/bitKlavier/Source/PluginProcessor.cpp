@@ -167,8 +167,6 @@ midiReady(false)
     
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     
-    tooltipsEnabled.setValue(true);
-    
     loadGalleries();
 }
 
@@ -1716,21 +1714,4 @@ double BKAudioProcessor::getCurrentSampleRate()
     return currentSampleRate;
 }
 
-bool BKAudioProcessor::areTooltipsEnabled()
-{
-    return tooltipsEnabled.getValue();
-}
 
-void BKAudioProcessor::showBKSettingsDialog(Button* button)
-{
-    Component* settings = new PreferencesComponent (*this);
-    settings->setSize(200, 40);
-    
-    CallOutBox& box = CallOutBox::launchAsynchronously (settings, button->getScreenBounds(), nullptr);
-    box.setLookAndFeel(&laf);
-}
-
-void BKAudioProcessor::showAudioSettingsDialog(Button* button)
-{
-    getPluginHolder()->showAudioSettingsDialog(button);
-}

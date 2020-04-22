@@ -252,6 +252,12 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
 
 void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
 {
+    if (hvc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = hvc->processor;
     
     if (res == 1) // New piano
@@ -376,6 +382,12 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
 
 void HeaderViewController::galleryMenuCallback(int result, HeaderViewController* gvc)
 {
+    if (gvc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
 	BKAudioProcessor& processor = gvc->processor;
 
 	if (result == RENAME_ID)

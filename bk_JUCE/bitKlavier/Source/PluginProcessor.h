@@ -29,6 +29,7 @@
 #include "ItemMapper.h"
 
 class StandalonePluginHolder;
+class BKAudioProcessorEditor;
 
 
 //==============================================================================
@@ -48,7 +49,6 @@ public:
     AudioDeviceManager* getAudioDeviceManager(void);
     AudioProcessorPlayer* getAudioProcessorPlayer(void);
     double getCurrentSampleRate(void);
-    bool areTooltipsEnabled(void);
     
     void addMidiInputDeviceCallback(MidiInputCallback* callback);
     void removeMidiInputDeviceCallback(MidiInputCallback* callback);
@@ -202,6 +202,7 @@ public:
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
+    AudioProcessorEditor* getEditor();
 
     //==============================================================================
     const String getName() const override;
@@ -344,9 +345,9 @@ public:
     inline bool isMidiReady(void) { return midiReady; }
     inline void setMidiReady(bool ready) { midiReady = ready; }
     
-    void showBKSettingsDialog(Button* button);
-    
-    void showAudioSettingsDialog(Button* button);
+    inline bool areTooltipsEnabled(void) { return tooltipsEnabled.getValue(); }
+    inline Value getTooltipsEnabled(void) { return tooltipsEnabled; }
+    inline void setTooltipsEnabled(bool enabled) { tooltipsEnabled.setValue(enabled); }
     
 private:
     double currentSampleRate;
@@ -384,58 +385,9 @@ private:
     bool midiReady;
     Array<String> defaultMidiInputSources;
     
+    BKAudioProcessorEditor* editor;
+    
     Value tooltipsEnabled;
-    
-    BKWindowLAF laf;
-    
-    class PreferencesComponent : public Component
-    {
-    public:
-        PreferencesComponent (BKAudioProcessor& processor)
-        : owner (processor),
-        tooltipsLabel  ("Show tooltips", "Show tooltips"),
-        tooltipsButton ("")
-        {
-            setOpaque (true);
-            
-            tooltipsButton.setClickingTogglesState (true);
-            tooltipsButton.getToggleStateValue().referTo (owner.tooltipsEnabled);
-            
-            addAndMakeVisible (tooltipsButton);
-            addAndMakeVisible (tooltipsLabel);
-            
-            tooltipsLabel.attachToComponent (&tooltipsButton, true);
-        }
-        
-        void paint (Graphics& g) override
-        {
-            g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
-        }
-        
-        void resized() override
-        {
-            auto r = getLocalBounds();
-            
-            r.removeFromTop(8);
-            r.removeFromLeft(r.getWidth() * 0.5);
-            r.removeFromRight(8);
-            tooltipsButton.setBounds (r.removeFromTop(24));
-        }
-        
-    private:
-        //==============================================================================
-        BKAudioProcessor& owner;
-        Label tooltipsLabel;
-        ToggleButton tooltipsButton;
-        // Other ideas for preferences
-        // - Show keyboard contents when selected
-        // - Preparation activity indicators
-        // - UI Keyboard behavior (toggle / press)
-        // - Colors
-        
-        //==============================================================================
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreferencesComponent)
-    };
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)
