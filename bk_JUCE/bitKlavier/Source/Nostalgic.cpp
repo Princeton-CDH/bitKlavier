@@ -129,7 +129,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         NostalgicNote,
                         nostalgic->getId(),
                         duration + prep->getWavedistance(),
-                        duration,  // length
+                        // duration,  // length
+                        duration + prep->getReverseAttack() + prep->getReverseDecay() + prep->getReverseRelease(),
                         prep->getReverseAttack(),
                         prep->getReverseDecay(),
                         prep->getReverseSustain(),
@@ -151,7 +152,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 						NostalgicNote,
 						nostalgic->getId(),
 						duration + prep->getWavedistance(),
-						duration,  // length
+						// duration,  // length
+                        duration + prep->getReverseAttack() + prep->getReverseDecay() + prep->getReverseRelease(),
 						prep->getReverseAttack(),
 						prep->getReverseDecay(),
 						prep->getReverseSustain(),
@@ -299,7 +301,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                                 NostalgicNote,
                                 nostalgic->getId(),
                                 duration + prep->getWavedistance(),
-                                duration,  // length
+                                // duration,  // length
+                                duration + prep->getReverseAttack() + prep->getReverseDecay() + prep->getReverseRelease(),
                                 prep->getReverseAttack(),
                                 prep->getReverseDecay(),
                                 prep->getReverseSustain(),
@@ -321,7 +324,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 								NostalgicNote,
 								nostalgic->getId(),
 								duration + prep->getWavedistance(),
-								duration,  // length
+								// duration,  // length
+                                duration + prep->getReverseAttack() + prep->getReverseDecay() + prep->getReverseRelease(),
 								prep->getReverseAttack(),
 								prep->getReverseDecay(),
 								prep->getReverseSustain(),
@@ -395,7 +399,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         NostalgicNote,
                         nostalgic->getId(),
                         duration + prep->getWavedistance(),
-                        duration,  // length
+                        // duration,  // length
+                        duration + prep->getReverseAttack() + prep->getReverseDecay() + prep->getReverseRelease(),
                         prep->getReverseAttack(),
                         prep->getReverseDecay(),
                         prep->getReverseSustain(),
@@ -417,7 +422,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 						NostalgicNote,
 						nostalgic->getId(),
 						duration + prep->getWavedistance(),
-						duration,  // length
+						// duration,  // length
+                        duration + prep->getReverseAttack() + prep->getReverseDecay() + prep->getReverseRelease(),
 						prep->getReverseAttack(),
 						prep->getReverseDecay(),
 						prep->getReverseSustain(),
@@ -516,7 +522,8 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                         NostalgicNote,
                         nostalgic->getId(),
                         duration + prep->getWavedistance(),
-                        duration,  // length
+                        // duration,  // length
+                        duration + prep->getReverseAttack() + prep->getReverseDecay() + prep->getReverseRelease(),
                         prep->getReverseAttack(),
                         prep->getReverseDecay(),
                         prep->getReverseSustain(),
@@ -539,7 +546,8 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
 						NostalgicNote,
 						nostalgic->getId(),
 						duration + prep->getWavedistance(),
-						duration,  // length
+						// duration,  // length
+                        duration + prep->getReverseAttack() + prep->getReverseDecay() + prep->getReverseRelease(),
 						prep->getReverseAttack(),
 						prep->getReverseDecay(),
 						prep->getReverseSustain(),

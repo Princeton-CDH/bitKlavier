@@ -658,9 +658,7 @@ public:
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
-    
-    
-    
+
     void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;

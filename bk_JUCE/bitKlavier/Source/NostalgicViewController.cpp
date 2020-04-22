@@ -218,7 +218,7 @@ void NostalgicViewController::displayShared(void)
     lengthModeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
     
     float dim = lengthModeSelectCB.getHeight();
-    keyOnResetToggle.setBounds(lengthModeSelectCB.getX() - (dim + gXSpacing), lengthModeSelectCB.getY(), dim, dim);
+    keyOnResetToggle.setBounds(lengthModeSelectCB.getX() - (dim + 2 * gXSpacing), lengthModeSelectCB.getY(), dim, dim);
     keyOnResetToggle.changeWidthToFitText();
     keyOnResetLabel.setBounds(keyOnResetToggle.getX() - 200, keyOnResetToggle.getY(), 200, dim);
     

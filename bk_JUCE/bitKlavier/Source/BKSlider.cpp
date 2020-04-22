@@ -1699,8 +1699,10 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     wavedistanceSlider->addMouseListener(this, true);
     wavedistanceSlider->setRange(sliderMin, sliderMax, sliderIncrement);
     wavedistanceSlider->setSliderStyle(Slider::SliderStyle::LinearBar);
+    wavedistanceSlider->setLookAndFeel(&displaySliderLookAndFeel);
     wavedistanceSlider->setTextBoxIsEditable(false);
     wavedistanceSlider->setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
+    displaySliderLookAndFeel.setColour(Slider::thumbColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
     wavedistanceSlider->addListener(this);
     wavedistanceSlider->setSkewFactor(skewFactor);
     addAndMakeVisible(*wavedistanceSlider);
@@ -1709,6 +1711,7 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
     undertowSlider->addMouseListener(this, true);
     undertowSlider->setRange(sliderMin, sliderMax, sliderIncrement);
     undertowSlider->setSliderStyle(Slider::SliderStyle::LinearBar);
+    undertowSlider->setLookAndFeel(&displaySliderLookAndFeel);
     undertowSlider->setTextBoxIsEditable(false);
     undertowSlider->setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
     undertowSlider->addListener(this);
@@ -1723,7 +1726,8 @@ BKWaveDistanceUndertowSlider::BKWaveDistanceUndertowSlider()
         newSlider->setRange(sliderMin, sliderMax, sliderIncrement);
         newSlider->setLookAndFeel(&displaySliderLookAndFeel);
         newSlider->setSliderStyle(BKSubSlider::SliderStyle::LinearBar);
-        displaySliderLookAndFeel.setColour(Slider::thumbColourId, Colours::deepskyblue.withMultipliedAlpha(0.75));
+        newSlider->setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.5));
+        // displaySliderLookAndFeel.setColour(Slider::thumbColourId, Colours::deepskyblue.withMultipliedAlpha(0.75));
         newSlider->setTextBoxStyle(Slider::NoTextBox, false, 0, 0);
         newSlider->setInterceptsMouseClicks(false, false);
         newSlider->setSkewFactor(skewFactor);
