@@ -1000,26 +1000,29 @@ void BKMultiSlider::showModifyPopupMenu(int which)
 
 void BKMultiSlider::sliderModifyMenuCallback (const int result, BKMultiSlider* ms, int which)
 {
-    if (ms != nullptr)
+    if (ms == nullptr)
     {
-        switch (result)
-        {
-            case 1: ms->deactivateSlider(which, sendNotification);
-                    break;
-                
-            case 2: ms->deactivateAllAfter(which, sendNotification);
-                    break;
-                
-            case 3: ms->deactivateAllBefore(which, sendNotification);
-                    break;
-                
-            case 4: ms->addActiveSubSlider(which, sendNotification);
-                    //ms->addSubSlider(which, true, sendNotification);
-                    ms->resized();
-                    break;
-                
-            default:  break;
-        }
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
+    switch (result)
+    {
+        case 1: ms->deactivateSlider(which, sendNotification);
+                break;
+            
+        case 2: ms->deactivateAllAfter(which, sendNotification);
+                break;
+            
+        case 3: ms->deactivateAllBefore(which, sendNotification);
+                break;
+            
+        case 4: ms->addActiveSubSlider(which, sendNotification);
+                //ms->addSubSlider(which, true, sendNotification);
+                ms->resized();
+                break;
+            
+        default:  break;
     }
 }
 
@@ -2415,14 +2418,17 @@ void BKStackedSlider::showModifyPopupMenu()
 
 void BKStackedSlider::sliderModifyMenuCallback (const int result, BKStackedSlider* ss)
 {
-    if (ss != nullptr)
+    if (ss == nullptr)
     {
-        switch (result)
-        {
-            case 1:   ss->addSlider(sendNotification); break;
-                
-            default:  break;
-        }
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
+    switch (result)
+    {
+        case 1:   ss->addSlider(sendNotification); break;
+            
+        default:  break;
     }
 }
 

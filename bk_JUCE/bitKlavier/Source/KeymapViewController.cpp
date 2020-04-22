@@ -649,6 +649,12 @@ void KeymapViewController::midiInputSelectCallback(int result, KeymapViewControl
 
 void KeymapViewController::targetsMenuCallback(int result, KeymapViewController* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     if (result <= 0) return;
     
     BKAudioProcessor& processor = vc->processor;
@@ -663,6 +669,12 @@ void KeymapViewController::targetsMenuCallback(int result, KeymapViewController*
 
 void KeymapViewController::keysMenuCallback(int result, KeymapViewController* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     // get old keys to send to update

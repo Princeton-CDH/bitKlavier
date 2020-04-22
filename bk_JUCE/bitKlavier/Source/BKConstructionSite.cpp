@@ -28,8 +28,6 @@ held(false),
 inLasso(false)
 {
     setWantsKeyboardFocus(false);
-    
-    addMouseListener(this, true);
 }
 
 BKConstructionSite::~BKConstructionSite(void)
@@ -414,14 +412,14 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     graph->addItem(toAdd);
     
     addAndMakeVisible(toAdd);
-//    toAdd->addMouseListener(this, true);
+    toAdd->addMouseListener(this, true);
 }
 
 // This is for adding items that exist in the gallery to the UI
 void BKConstructionSite::addExistingItem(BKItem* toAdd)
 {
     addAndMakeVisible(toAdd);
-//    toAdd->addMouseListener(this, true);
+    toAdd->addMouseListener(this, true);
 }
 
 BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
@@ -614,6 +612,12 @@ void BKConstructionSite::mouseMove (const MouseEvent& eo)
 
 void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (result == OFF_ID)

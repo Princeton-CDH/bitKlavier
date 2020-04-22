@@ -8,6 +8,7 @@
   ==============================================================================
 */
 
+#include "BKStandaloneWindow.h"
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "GraphicsConstants.h"
@@ -16,7 +17,7 @@
 BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p):
 AudioProcessorEditor (&p),
 processor (p),
-mvc(p),
+mvc(p, *this),
 constrain(new ComponentBoundsConstrainer()),
 resizer(new ResizableCornerComponent (this, constrain.get()))
 {
@@ -37,7 +38,6 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     addAndMakeVisible(*resizer);
     resizer->setAlwaysOnTop(true);
 #endif
-    
     //processor.updateState->pianoDidChangeForGraph = true;
 }
 
@@ -66,6 +66,36 @@ void BKAudioProcessorEditor::resized()
     resizer->setBounds(getWidth()-16, getHeight()-16, 16, 16);
 #endif
 
+}
+
+void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
+{
+    Component* settings = new PreferencesComponent (*this);
+    settings->setSize(200, 40);
+    
+    CallOutBox* preferences = &CallOutBox::launchAsynchronously (settings, button->getScreenBounds(), nullptr);
+    preferences->setLookAndFeel(&laf);
+}
+
+void BKAudioProcessorEditor::showAudioSettingsDialog(Button* button)
+{
+    processor.getPluginHolder()->showAudioSettingsDialog(button);
+}
+
+bool BKAudioProcessorEditor::areTooltipsEnabled()
+{
+    return processor.areTooltipsEnabled();
+}
+
+Value BKAudioProcessorEditor::getTooltipsEnabled()
+{
+    return processor.getTooltipsEnabled();
+}
+
+bool BKAudioProcessorEditor::setTooltipsEnabled(bool enabled)
+{
+    processor.setTooltipsEnabled(enabled);
+    return processor.areTooltipsEnabled();
 }
 
 

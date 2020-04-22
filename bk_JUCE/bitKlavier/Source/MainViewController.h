@@ -20,6 +20,7 @@
 
 #include "PreparationPanel.h"
 
+class BKAudioProcessorEditor;
 class BKConstructionSite;
 
 #include "BKGraph.h"
@@ -97,7 +98,7 @@ private BKKeymapKeyboardStateListener
 {
     
 public:
-    MainViewController (BKAudioProcessor&);
+    MainViewController (BKAudioProcessor&, BKAudioProcessorEditor&);
     ~MainViewController();
     
     //==============================================================================
@@ -120,6 +121,7 @@ private:
     // access the processor object that created it
     
     BKAudioProcessor& processor;
+    BKAudioProcessorEditor& editor;
     
     GeneralSettings::Ptr gen;
     
