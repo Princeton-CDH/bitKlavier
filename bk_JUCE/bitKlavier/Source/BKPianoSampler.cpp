@@ -348,7 +348,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
             else if (playType == FixedLengthFixedStart)
             {
                 sourceSamplePosition = startingPosition * pitchRatio;
-                playEndPosition = (double)(sourceSamplePosition - (playLength + adsrRelease));
+                playEndPosition = (double)(sourceSamplePosition - (playLength + adsrRelease * pitchRatio));
+                if (playEndPosition < adsrRelease * pitchRatio) playEndPosition = (double)adsrRelease * pitchRatio;
                 /*
                 if (totalLength * pitchRatio > sourceSamplePosition)
                 {
