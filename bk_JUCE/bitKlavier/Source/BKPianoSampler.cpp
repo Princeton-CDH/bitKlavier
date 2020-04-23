@@ -348,6 +348,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
             else if (playType == FixedLengthFixedStart)
             {
                 sourceSamplePosition = startingPosition * pitchRatio;
+                playEndPosition = (double)(sourceSamplePosition - (playLength + adsrRelease));
+                /*
                 if (totalLength * pitchRatio > sourceSamplePosition)
                 {
                     playEndPosition = (double)(sourceSamplePosition - playLength);
@@ -356,6 +358,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
                 {
                     playEndPosition = (double)adsrRelease * pitchRatio;
                 }
+                 */
+                // DBG("startnote reverse, playEndPosition, startingPosition " + String(playEndPosition/getSampleRate()) + " " + String (sourceSamplePosition/getSampleRate()));
             }
             else
             {
@@ -382,6 +386,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                          adsrSustain,
                          adsrRelease / getSampleRate());
         
+        DBG("startNote, direction = " + String((int)playDirection));
         adsr.keyOn();
         
         if (sound->isSoundfont)
@@ -922,6 +927,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             {
                 if ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE))
                 {
+                    // DBG("reverse sample adsr.keyOff");
                     adsr.keyOff();
                 }
             }
