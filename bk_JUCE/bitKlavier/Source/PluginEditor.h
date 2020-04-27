@@ -38,7 +38,6 @@ public:
     bool setTooltipsEnabled(bool enabled);
     
     void showBKSettingsDialog(Button* button);
-    void showAudioSettingsDialog(Button* button);
     
 private:
     // This reference is provided as a quick way for your editor to

@@ -78,7 +78,7 @@ public:
 #if JUCE_WINDOWS
 #ifdef _DEBUG
         _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
+#endif 
 #endif
         createPlugin();
         
@@ -640,12 +640,17 @@ public:
                             bool autoOpenMidiDevices = false
 #endif
     )
-    : DocumentWindow (title, backgroundColour, DocumentWindow::minimiseButton | DocumentWindow::closeButton)
+    : DocumentWindow (title, backgroundColour, DocumentWindow::minimiseButton | DocumentWindow::closeButton),
+        audioMidiButton("Audio/MIDI Settings")
     {
 #if JUCE_IOS || JUCE_ANDROID
         setTitleBarHeight (0);
 #else
         setTitleBarButtonsRequired (DocumentWindow::minimiseButton | DocumentWindow::closeButton, false);
+
+        Component::addAndMakeVisible(audioMidiButton);
+        audioMidiButton.addListener(this);
+        audioMidiButton.setTriggeredOnMouseDown(true);
 #endif
         
         pluginHolder.reset (new StandalonePluginHolder (settingsToUse, takeOwnershipOfSettings,
@@ -720,12 +725,16 @@ public:
     
     void buttonClicked (Button* button) override
     {
-
+        if (button == &audioMidiButton)
+        {
+            pluginHolder->showAudioSettingsDialog(button);
+        }
     }
     
     void resized() override
     {
         DocumentWindow::resized();
+        audioMidiButton.setBounds(3, 6, 100, getTitleBarHeight() - 6);
     }
     
     virtual StandalonePluginHolder* getPluginHolder()    { return pluginHolder.get(); }
@@ -894,8 +903,9 @@ private:
     
     //==============================================================================
 
-    
-    BKButtonAndMenuLAF buttonsAndMenusLAF;
+    TextButton audioMidiButton;
+
+    BKWindowLAF laf;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StandaloneFilterWindow)
 };

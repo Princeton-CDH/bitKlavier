@@ -188,7 +188,8 @@ private:
     bool isAddingFromMidiInput;
     
     TextButton preferencesButton;
-    TextButton audioMidiButton;
+
+    ToggleButton tooltipsButton;
     
     BKButtonAndMenuLAF laf;
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;

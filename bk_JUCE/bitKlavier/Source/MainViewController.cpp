@@ -23,11 +23,16 @@ construction(p, &theGraph),
 overtop(p, &theGraph),
 splash(p),
 timerCallbackCount(0),
-preferencesButton ("Preferences"),
-audioMidiButton ("Audio/MIDI Settings")
+tooltipsButton("Show tooltips")
+//preferencesButton ("Preferences")
 {
     if (processor.platform == BKIOS)    display = DisplayConstruction;
     else                                display = DisplayDefault;
+
+    tooltipsButton.setClickingTogglesState(true);
+    tooltipsButton.getToggleStateValue().referTo(editor.getTooltipsEnabled());
+
+    addAndMakeVisible(tooltipsButton);
     
     addAndMakeVisible(splash);
     splash.setAlwaysOnTop(true);
@@ -124,18 +129,10 @@ audioMidiButton ("Audio/MIDI Settings")
     overtopShadow = std::make_unique<DropShadower>(myshadow);
     overtopShadow->setOwner(&overtop);
     
-    preferencesButton.addListener (this);
-    preferencesButton.setTriggeredOnMouseDown (true);
-    preferencesButton.setLookAndFeel(&windowLAF);
-    addAndMakeVisible (preferencesButton);
-    
-    if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
-    {
-        audioMidiButton.addListener (this);
-        audioMidiButton.setTriggeredOnMouseDown (true);
-        audioMidiButton.setLookAndFeel(&windowLAF);
-        addAndMakeVisible (audioMidiButton);
-    }
+    //preferencesButton.addListener (this);
+    //preferencesButton.setTriggeredOnMouseDown (true);
+    //preferencesButton.setLookAndFeel(&windowLAF);
+    //addAndMakeVisible (preferencesButton);
     
     if (editor.areTooltipsEnabled() && tipwindow == nullptr)
     {
@@ -157,8 +154,8 @@ MainViewController::~MainViewController()
     octaveSlider.setLookAndFeel(nullptr);
     mainSlider.setLookAndFeel(nullptr);
     overtop.setLookAndFeel(nullptr);
-    audioMidiButton.setLookAndFeel(nullptr);
-    preferencesButton.setLookAndFeel(nullptr);
+    tooltipsButton.setLookAndFeel(nullptr);
+    //preferencesButton.setLookAndFeel(nullptr);
     keyboardComponent = nullptr;
     removeKeyListener(this);
 }
@@ -244,12 +241,11 @@ void MainViewController::resized()
         Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * processor.paddingScalarY + gYSpacing);
         
         footerSlice.reduce(gXSpacing, gYSpacing);
-        
-        audioMidiButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
-        preferencesButton.setBounds (footerSlice.getRight()-100, footerSlice.getY(), 100, 20);
-        
-        
+
         float unit = footerSlice.getWidth() * 0.25;
+        
+        //preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
+        tooltipsButton.setBounds(footerSlice.getX(), footerSlice.getY(), 120, 20);
         
         sampleCB.setBounds(unit, footerSlice.getY(), unit-0.5*gXSpacing, 20);
         instrumentCB.setBounds(2*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
@@ -360,14 +356,10 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
 void MainViewController::bkButtonClicked (Button* b)
 {
     String name = b->getName();
-    if (b == &preferencesButton)
-    {
-        editor.showBKSettingsDialog(b);
-    }
-    else if (b == &audioMidiButton)
-    {
-        editor.showAudioSettingsDialog(b);
-    }
+    //if (b == &preferencesButton)
+    //{
+    //    editor.showBKSettingsDialog(b);
+    //}
 }
 
 void MainViewController::sliderValueChanged (Slider* slider)

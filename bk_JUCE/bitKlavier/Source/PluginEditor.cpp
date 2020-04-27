@@ -77,11 +77,6 @@ void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
     preferences->setLookAndFeel(&laf);
 }
 
-void BKAudioProcessorEditor::showAudioSettingsDialog(Button* button)
-{
-    processor.getPluginHolder()->showAudioSettingsDialog(button);
-}
-
 bool BKAudioProcessorEditor::areTooltipsEnabled()
 {
     return processor.areTooltipsEnabled();
