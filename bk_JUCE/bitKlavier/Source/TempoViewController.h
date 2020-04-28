@@ -44,9 +44,9 @@ protected:
     std::unique_ptr<BKSingleSlider> tempoSlider;
     std::unique_ptr<BKSingleSlider> subSlider;
     
-    std::unique_ptr<BKSingleSlider> AT1HistorySlider;
-    std::unique_ptr<BKSingleSlider> AT1SubdivisionsSlider;
-    std::unique_ptr<BKRangeSlider> AT1MinMaxSlider; //need to have "MinAlwaysLessThanMax" mode
+    std::unique_ptr<BKSingleSlider> ATHistorySlider;
+    std::unique_ptr<BKSingleSlider> ATSubdivisionsSlider;
+    std::unique_ptr<BKRangeSlider> ATMinMaxSlider; //need to have "MinAlwaysLessThanMax" mode
     
     BKLabel A1ModeLabel;
     BKComboBox A1ModeCB;
@@ -57,6 +57,10 @@ protected:
     BKTextButton A1reset;
     
     BKLabel attachKeymap;
+    
+    ToggleButton exponentialToggle;
+    std::unique_ptr<BKSingleSlider> emaAlphaSlider;
+    
     
     void fillModeCB(void);
     void fillA1ModeCB(void);

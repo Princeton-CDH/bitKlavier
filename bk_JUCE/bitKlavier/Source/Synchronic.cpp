@@ -57,7 +57,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
     float noteLength = 0.0;
     
  
-    if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
+    if (tempoPrep->getTempoSystem() == AdaptiveTempo)
     {
         noteLength = (fabs(prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()]) * tempoPrep->getBeatThreshMS());
     }
@@ -599,7 +599,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     sampleType = type;
     thresholdSamples = (prep->getClusterThreshSEC() * synth->getSampleRate());
 
-    if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
+    if (tempoPrep->getTempoSystem() == AdaptiveTempo)
     {
         beatThresholdSamples = (tempoPrep->getBeatThresh() * synth->getSampleRate());
     }

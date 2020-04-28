@@ -53,14 +53,17 @@ public:
     sWhichTempoSystem(ConstantTempo),
     sTempo(120),
     subdivisions(1.),
-    at1History(4),
-    at1Min(100),
-    at1Max(2000),
-    at1Subdivisions(1.0f),
-    at1Mode(TimeBetweenNotes)
+    atDeltaHistorySize(4),
+    atMinPulse(100),
+    atMaxPulse(2000),
+    atSubdivisions(1.0f),
+    atMode(TimeBetweenNotes)
     {
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
+        useExponential.setValue(false);
+        useWeights.setValue(false);
+        emaAlpha.setValue(0.5);
     }
     
     inline void copy(TempoPreparation::Ptr s)
@@ -68,11 +71,11 @@ public:
         sTempo = s->getTempo();
         subdivisions = s->getSubdivisions();
         sWhichTempoSystem = s->getTempoSystem();
-        at1History = s->getAdaptiveTempo1History();
-        at1Min = s->getAdaptiveTempo1Min();
-        at1Max = s->getAdaptiveTempo1Max();
-        at1Subdivisions = s->getAdaptiveTempo1Subdivisions();
-        at1Mode = s->getAdaptiveTempo1Mode();
+        atDeltaHistorySize = s->getAdaptiveTempoHistorySize();
+        atMinPulse = s->getAdaptiveTempoMin();
+        atMaxPulse = s->getAdaptiveTempoMax();
+        atSubdivisions = s->getAdaptiveTempoSubdivisions();
+        atMode = s->getAdaptiveTempoMode();
         
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
@@ -83,11 +86,11 @@ public:
         if (dirty[TempoBPM]) sTempo = s->getTempo();
         if (dirty[TempoSubdivisions]) subdivisions = s->getSubdivisions();
         if (dirty[TempoSystem]) sWhichTempoSystem = s->getTempoSystem();
-        if (dirty[AT1History]) at1History = s->getAdaptiveTempo1History();
-        if (dirty[AT1Min]) at1Min = s->getAdaptiveTempo1Min();
-        if (dirty[AT1Max]) at1Max = s->getAdaptiveTempo1Max();
-        if (dirty[AT1Subdivisions]) at1Subdivisions = s->getAdaptiveTempo1Subdivisions();
-        if (dirty[AT1Mode]) at1Mode = s->getAdaptiveTempo1Mode();
+        if (dirty[ATHistory]) atDeltaHistorySize = s->getAdaptiveTempoHistorySize();
+        if (dirty[ATMin]) atMinPulse = s->getAdaptiveTempoMin();
+        if (dirty[ATMax]) atMaxPulse = s->getAdaptiveTempoMax();
+        if (dirty[ATSubdivisions]) atSubdivisions = s->getAdaptiveTempoSubdivisions();
+        if (dirty[ATMode]) atMode = s->getAdaptiveTempoMode();
         
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
@@ -99,11 +102,11 @@ public:
         return (sTempo == s->getTempo() &&
                 subdivisions == s->getSubdivisions() &&
                 sWhichTempoSystem == s->getTempoSystem() &&
-                at1History == s->getAdaptiveTempo1History() &&
-                at1Min == s->getAdaptiveTempo1Min() &&
-                at1Max == s->getAdaptiveTempo1Max() &&
-                at1Subdivisions == s->getAdaptiveTempo1Subdivisions() &&
-                at1Mode == s->getAdaptiveTempo1Mode());
+                atDeltaHistorySize == s->getAdaptiveTempoHistorySize() &&
+                atMinPulse == s->getAdaptiveTempoMin() &&
+                atMaxPulse == s->getAdaptiveTempoMax() &&
+                atSubdivisions == s->getAdaptiveTempoSubdivisions() &&
+                atMode == s->getAdaptiveTempoMode());
     }
 
     // for unit-testing
@@ -119,11 +122,11 @@ public:
 		sTempo = r[idx++];
         subdivisions = r[idx++] * 10.0;
 		sWhichTempoSystem = (TempoType)(int)(r[idx++] * TempoSystemNil);
-		at1History = r[idx++];
-		at1Min = r[idx++];
-		at1Max = r[idx++];
-		at1Subdivisions = r[idx++];
-		at1Mode = (AdaptiveTempo1Mode)(int)(r[idx++] * AdaptiveTempo1ModeNil);
+		atDeltaHistorySize = r[idx++];
+		atMinPulse = r[idx++];
+		atMaxPulse = r[idx++];
+		atSubdivisions = r[idx++];
+		atMode = (AdaptiveTempoMode)(int)(r[idx++] * AdaptiveTempoModeNil);
 	}
     
     inline const TempoType getTempoSystem() const noexcept      {return sWhichTempoSystem; }
@@ -132,11 +135,11 @@ public:
     inline const float getBeatThreshMS() const noexcept         {return sBeatThreshMS; }
   
     //Adaptive Tempo 1
-    inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)       {return at1Mode;   }
-    inline int getAdaptiveTempo1History(void)                   {return at1History;}
-    inline float getAdaptiveTempo1Subdivisions(void)            {return at1Subdivisions;}
-    inline float getAdaptiveTempo1Min(void)                     {return at1Min;}
-    inline float getAdaptiveTempo1Max(void)                     {return at1Max;}
+    inline AdaptiveTempoMode getAdaptiveTempoMode(void)       {return atMode;   }
+    inline int getAdaptiveTempoHistorySize(void)                   {return atDeltaHistorySize;}
+    inline float getAdaptiveTempoSubdivisions(void)            {return atSubdivisions;}
+    inline float getAdaptiveTempoMin(void)                     {return atMinPulse;}
+    inline float getAdaptiveTempoMax(void)                     {return atMaxPulse;}
 
     inline const String getName() const noexcept                {return name;}
     inline void setName(String n)                               {name = n;}
@@ -176,11 +179,11 @@ public:
     }
     
     //Adaptive Tempo 1
-    inline void setAdaptiveTempo1Mode(AdaptiveTempo1Mode mode)          {at1Mode = mode;}
-    inline void setAdaptiveTempo1History(int hist)                      {at1History = hist;}
-    inline void setAdaptiveTempo1Subdivisions(float sub)                {at1Subdivisions = sub;}
-    inline void setAdaptiveTempo1Min(float min)                         {at1Min = min;}
-    inline void setAdaptiveTempo1Max(float max)                         {at1Max = max;}
+    inline void setAdaptiveTempoMode(AdaptiveTempoMode mode)          {atMode = mode;}
+    inline void setAdaptiveTempoHistory(int hist)                      {atDeltaHistorySize = hist;}
+    inline void setAdaptiveTempoSubdivisions(float sub)                {atSubdivisions = sub;}
+    inline void setAdaptiveTempoMin(float min)                         {atMinPulse = min;}
+    inline void setAdaptiveTempoMax(float max)                         {atMaxPulse = max;}
     
     void print(void)
     {
@@ -195,11 +198,11 @@ public:
         
         prep.setProperty( ptagTempo_tempo,                 getTempo(), 0);
         prep.setProperty( ptagTempo_system,                getTempoSystem(), 0);
-        prep.setProperty( ptagTempo_at1Mode,               getAdaptiveTempo1Mode(), 0 );
-        prep.setProperty( ptagTempo_at1History,            getAdaptiveTempo1History(), 0 );
-        prep.setProperty( ptagTempo_at1Subdivisions,       getAdaptiveTempo1Subdivisions(), 0 );
-        prep.setProperty( ptagTempo_at1Min,                getAdaptiveTempo1Min(), 0 );
-        prep.setProperty( ptagTempo_at1Max,                getAdaptiveTempo1Max(), 0 );
+        prep.setProperty( ptagTempo_atMode,                getAdaptiveTempoMode(), 0 );
+        prep.setProperty( ptagTempo_atHistory,             getAdaptiveTempoHistorySize(), 0 );
+        prep.setProperty( ptagTempo_atSubdivisions,        getAdaptiveTempoSubdivisions(), 0 );
+        prep.setProperty( ptagTempo_atMin,                 getAdaptiveTempoMin(), 0 );
+        prep.setProperty( ptagTempo_atMax,                 getAdaptiveTempoMax(), 0 );
         prep.setProperty( "subdivisions",                  getSubdivisions(), 0);
         
         return prep;
@@ -214,20 +217,20 @@ public:
         i = e->getStringAttribute(ptagTempo_system).getIntValue();
         setTempoSystem((TempoType)i);
         
-        i = e->getStringAttribute(ptagTempo_at1Mode).getIntValue();
-        setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
+        i = e->getStringAttribute(ptagTempo_atMode).getIntValue();
+        setAdaptiveTempoMode((AdaptiveTempoMode)i);
         
-        i = e->getStringAttribute(ptagTempo_at1History).getIntValue();
-        setAdaptiveTempo1History(i);
+        i = e->getStringAttribute(ptagTempo_atHistory).getIntValue();
+        setAdaptiveTempoHistory(i);
         
-        f = e->getStringAttribute(ptagTempo_at1Subdivisions).getFloatValue();
-        setAdaptiveTempo1Subdivisions(f);
+        f = e->getStringAttribute(ptagTempo_atSubdivisions).getFloatValue();
+        setAdaptiveTempoSubdivisions(f);
         
-        f = e->getStringAttribute(ptagTempo_at1Min).getFloatValue();
-        setAdaptiveTempo1Min(f);
+        f = e->getStringAttribute(ptagTempo_atMin).getFloatValue();
+        setAdaptiveTempoMin(f);
         
-        f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
-        setAdaptiveTempo1Max(f);
+        f = e->getStringAttribute(ptagTempo_atMax).getFloatValue();
+        setAdaptiveTempoMax(f);
         
         String s = e->getStringAttribute("subdivisions");
         
@@ -235,6 +238,9 @@ public:
         else            setSubdivisions(s.getFloatValue());
     }
     
+    Value emaAlpha;
+    Value useExponential;
+    Value useWeights;
     
 private:
     String name;
@@ -246,11 +252,14 @@ private:
     
     float subdivisions;
     
-    // Adaptive Tempo 1
-    int at1History;
-    float at1Min, at1Max;
-    float at1Subdivisions;
-    AdaptiveTempo1Mode at1Mode;
+    // Adaptive Tempo 
+    int atDeltaHistorySize;
+    int atOnsetHistorySize;
+    float atMinPulse, atMaxPulse;
+    float atSubdivisions;
+    AdaptiveTempoMode atMode;
+
+    Array<float> metricWeights;
     
     JUCE_LEAK_DETECTOR(TempoPreparation);
 };
@@ -417,7 +426,7 @@ public:
     void keyReleased(int noteNumber, int channel);
     inline float getPeriodMultiplier(void)
     {
-        return ((tempo->aPrep->getTempoSystem() == AdaptiveTempo1) ? adaptiveTempoPeriodMultiplier : 1.0);
+        return ((tempo->aPrep->getTempoSystem() == AdaptiveTempo) ? adaptiveTempoPeriodMultiplier : 1.0);
         
     }
     inline float getAdaptedTempo(void)                  {return tempo->aPrep->getTempo() / adaptiveTempoPeriodMultiplier;}
@@ -443,12 +452,12 @@ public:
     uint64 getAtTimer() { return atTimer; }
     uint64 getAtLastTime() { return atLastTime; }
     int getAtDelta();
-    Array<int> getAtDeltaHistory() { return atDeltaHistory; }
+    Array<float> getAtDeltaHistory() { return atDeltaHistory; }
     float getAdaptiveTempoPeriodMultiplier() { return adaptiveTempoPeriodMultiplier; }
     
     void setAtTimer(uint64 newval) { atTimer = newval; }
     void setAtLastTime(uint64 newval) { atLastTime = newval; }
-    void setAtDeltaHistory(Array<int> newvals)
+    void setAtDeltaHistory(Array<float> newvals)
     {
         atDeltaHistory.clearQuick();
         for(int i=0; i<newvals.size(); i++)
@@ -479,8 +488,13 @@ private:
     
     //adaptive tempo stuff
     uint64 atTimer, atLastTime; //in samples
-    int atDelta;                //in ms
-    Array<int> atDeltaHistory;  //in ms
+    float atDelta;                //in ms
+    Array<float> atDeltaHistory;  //in ms
+    float emaSum;
+    float emaCount;
+    float exponentialMovingAverage;
+    Array<float> atOnsetHistory;
+    
     void atNewNote();
     void atNewNoteOff();
     void atCalculatePeriodMultiplier();

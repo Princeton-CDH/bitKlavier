@@ -383,39 +383,39 @@ void TempoModification::setStateOld(XmlElement* e)
         setDirty(TempoSystem);
     }
     
-    p = e->getStringAttribute(ptagTempo_at1Mode);
+    p = e->getStringAttribute(ptagTempo_atMode);
     if (p != "")
     {
-        setAdaptiveTempo1Mode((AdaptiveTempo1Mode) p.getIntValue());
-        setDirty(AT1Mode);
+        setAdaptiveTempoMode((AdaptiveTempoMode) p.getIntValue());
+        setDirty(ATMode);
     }
     
-    p = e->getStringAttribute(ptagTempo_at1History);
+    p = e->getStringAttribute(ptagTempo_atHistory);
     if (p != "")
     {
-        setAdaptiveTempo1History(p.getIntValue());
-        setDirty(AT1History);
+        setAdaptiveTempoHistory(p.getIntValue());
+        setDirty(ATHistory);
     }
     
-    p = e->getStringAttribute(ptagTempo_at1Subdivisions);
+    p = e->getStringAttribute(ptagTempo_atSubdivisions);
     if (p != "")
     {
-        setAdaptiveTempo1Subdivisions(p.getFloatValue());
-        setDirty(AT1Subdivisions);
+        setAdaptiveTempoSubdivisions(p.getFloatValue());
+        setDirty(ATSubdivisions);
     }
     
-    p = e->getStringAttribute(ptagTempo_at1Min);
+    p = e->getStringAttribute(ptagTempo_atMin);
     if (p != "")
     {
-        setAdaptiveTempo1Min(p.getFloatValue());
-        setDirty(AT1Min);
+        setAdaptiveTempoMin(p.getFloatValue());
+        setDirty(ATMin);
     }
     
-    p = e->getStringAttribute(ptagTempo_at1Max);
+    p = e->getStringAttribute(ptagTempo_atMax);
     if (p != "")
     {
-        setAdaptiveTempo1Max(p.getFloatValue());
-        setDirty(AT1Max);
+        setAdaptiveTempoMax(p.getFloatValue());
+        setDirty(ATMax);
     }
 }
 

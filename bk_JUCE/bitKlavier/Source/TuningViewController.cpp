@@ -69,8 +69,8 @@ showSprings(false)
     addAndMakeVisible(adaptiveSystemsCB);
     
     adaptiveSystemsCB.addItem("None", 1);
-    adaptiveSystemsCB.addItem("Adaptive 1", 2);
-    adaptiveSystemsCB.addItem("Adaptive Anchored 1", 3);
+    adaptiveSystemsCB.addItem("Adaptive", 2);
+    adaptiveSystemsCB.addItem("Adaptive Anchored", 3);
     adaptiveSystemsCB.addItem("Spring", 4);
     
     attachKeymap.setText("Attach a Keymap for Adaptive or Spiral/Springs!", dontSendNotification);

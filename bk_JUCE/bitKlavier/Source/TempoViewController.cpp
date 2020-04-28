@@ -42,23 +42,23 @@ BKViewController(p, theGraph, 1)
     subSlider->setToolTipString("Number of pulses per beat");
     addAndMakeVisible(*subSlider);
     
-    AT1HistorySlider = std::make_unique<BKSingleSlider>("History", 1, 10, 4, 1);
-    AT1HistorySlider->setJustifyRight(false);
-    AT1HistorySlider->setToolTipString("Indicates how many notes Tempo is using to determine and generate an average pulse ");
-    addAndMakeVisible(*AT1HistorySlider);
+    ATHistorySlider = std::make_unique<BKSingleSlider>("History", 1, 10, 4, 1);
+    ATHistorySlider->setJustifyRight(false);
+    ATHistorySlider->setToolTipString("Indicates how many notes Tempo is using to determine and generate an average pulse ");
+    addAndMakeVisible(*ATHistorySlider);
     
-    AT1SubdivisionsSlider = std::make_unique<BKSingleSlider>("Subdivisions", 0., 12, 1, 0.01);
-    AT1SubdivisionsSlider->setJustifyRight(false);
-    AT1SubdivisionsSlider->setToolTipString("Multiplies tempo by interpreting rhythmic value of played notes; values less than 1 will result in tempos slower than what is played, values greater than 1 will result in tempos faster than what is played");
-    addAndMakeVisible(*AT1SubdivisionsSlider);
+    ATSubdivisionsSlider = std::make_unique<BKSingleSlider>("Subdivisions", 0., 12, 1, 0.01);
+    ATSubdivisionsSlider->setJustifyRight(false);
+    ATSubdivisionsSlider->setToolTipString("Multiplies tempo by interpreting rhythmic value of played notes; values less than 1 will result in tempos slower than what is played, values greater than 1 will result in tempos faster than what is played");
+    addAndMakeVisible(*ATSubdivisionsSlider);
     
-    AT1MinMaxSlider = std::make_unique<BKRangeSlider>("Min/Max (ms)", 1, 2000, 100, 500, 10);
-    AT1MinMaxSlider->setJustifyRight(false);
-    AT1MinMaxSlider->setIsMinAlwaysLessThanMax(true);
-    AT1MinMaxSlider->setToolTipString("Time within which Tempo will consider notes to be part of a constant pulse; any notes played futher apart than Max, or closer together than Min, will be ignored");
-    addAndMakeVisible(*AT1MinMaxSlider);
+    ATMinMaxSlider = std::make_unique<BKRangeSlider>("Min/Max (ms)", 1, 2000, 100, 500, 10);
+    ATMinMaxSlider->setJustifyRight(false);
+    ATMinMaxSlider->setIsMinAlwaysLessThanMax(true);
+    ATMinMaxSlider->setToolTipString("Time within which Tempo will consider notes to be part of a constant pulse; any notes played futher apart than Max, or closer together than Min, will be ignored");
+    addAndMakeVisible(*ATMinMaxSlider);
     
-    A1ModeCB.setName("AT1Mode");
+    A1ModeCB.setName("ATMode");
     addAndMakeVisible(A1ModeCB);
     fillA1ModeCB();
     A1ModeLabel.setText("Mode", dontSendNotification);
@@ -81,12 +81,25 @@ BKViewController(p, theGraph, 1)
     actionButton.addListener(this);
     
 #if JUCE_IOS
-    AT1MinMaxSlider->addWantsBigOneListener(this);
-    AT1HistorySlider->addWantsBigOneListener(this);
-    AT1SubdivisionsSlider->addWantsBigOneListener(this);
+    ATMinMaxSlider->addWantsBigOneListener(this);
+    ATHistorySlider->addWantsBigOneListener(this);
+    ATSubdivisionsSlider->addWantsBigOneListener(this);
     tempoSlider->addWantsBigOneListener(this);
     subSlider->addWantsBigOneListener(this);
 #endif
+    
+    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    
+    emaAlphaSlider = std::make_unique<BKSingleSlider>("Alpha", 0, 1, 0.5, 0.01);
+    emaAlphaSlider->getValueObject().referTo(active->emaAlpha);
+    addAndMakeVisible(*emaAlphaSlider);
+    
+    exponentialToggle.setButtonText("Exponential MA");
+    exponentialToggle.setClickingTogglesState(true);
+    exponentialToggle.getToggleStateValue().referTo(active->useExponential);
+    
+    addAndMakeVisible(exponentialToggle);
+    
 
     updateComponentVisibility();
 }
@@ -141,13 +154,13 @@ void TempoViewController::resized()
     A1ModeLabel.setBounds(A1ModeCBSlice);
     
     leftColumn.removeFromTop(extraY + gYSpacing);
-    AT1HistorySlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+    ATHistorySlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
     
     leftColumn.removeFromTop(extraY + gYSpacing);
-    AT1SubdivisionsSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
+    ATSubdivisionsSlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
     
     leftColumn.removeFromTop(extraY + gYSpacing);
-    AT1MinMaxSlider->setBounds(leftColumn.removeFromTop(gComponentRangeSliderHeight));
+    ATMinMaxSlider->setBounds(leftColumn.removeFromTop(gComponentRangeSliderHeight));
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     Rectangle<int> adaptedLabelSlice = leftColumn.removeFromTop(gComponentTextFieldHeight);
@@ -167,6 +180,19 @@ void TempoViewController::resized()
     tempoSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     tempoSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     tempoSlider->setBounds(tempoSliderSlice);
+    
+    area.removeFromTop(A1ModeCB.getY() - selectCB.getBottom());
+    Rectangle<int> expToggleSlice = area.removeFromTop(gComponentSingleSliderHeight);
+    expToggleSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
+    expToggleSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+    exponentialToggle.setBounds(expToggleSlice);
+    
+    area.removeFromTop(A1ModeCB.getY() - selectCB.getBottom());
+    Rectangle<int> alphaSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
+    alphaSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
+    alphaSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+    emaAlphaSlider->setBounds(alphaSliderSlice);
+    
     
     subSlider->setBounds(tempoSlider->getX(), tempoSlider->getBottom() + gYSpacing,
                          tempoSlider->getWidth(), tempoSlider->getHeight());
@@ -209,7 +235,7 @@ void TempoViewController::fillA1ModeCB(void)
 
 void TempoViewController::updateComponentVisibility()
 {
-    if(modeCB.getText() == "Adaptive Tempo 1")
+    if(modeCB.getText() == "Adaptive Tempo")
     {
         TempoProcessor::Ptr mProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
         
@@ -219,9 +245,9 @@ void TempoViewController::updateComponentVisibility()
         if (keymapAttached)
         {
             // keymap needs to be attached for adaptive tempo to work
-            AT1HistorySlider->setVisible(true);
-            AT1SubdivisionsSlider->setVisible(true);
-            AT1MinMaxSlider->setVisible(true);
+            ATHistorySlider->setVisible(true);
+            ATSubdivisionsSlider->setVisible(true);
+            ATMinMaxSlider->setVisible(true);
             
             A1ModeLabel.setVisible(true);
             A1ModeCB.setVisible(true);
@@ -234,6 +260,9 @@ void TempoViewController::updateComponentVisibility()
             subSlider->setVisible(false);
             
             attachKeymap.setVisible(false);
+            
+            exponentialToggle.setVisible(true);
+            emaAlphaSlider->setVisible(true);
         }
         else
         {
@@ -244,9 +273,9 @@ void TempoViewController::updateComponentVisibility()
     }
     else
     {
-        AT1HistorySlider->setVisible(false);
-        AT1SubdivisionsSlider->setVisible(false);;
-        AT1MinMaxSlider->setVisible(false);
+        ATHistorySlider->setVisible(false);
+        ATSubdivisionsSlider->setVisible(false);;
+        ATMinMaxSlider->setVisible(false);
         
         A1ModeLabel.setVisible(false);
         A1ModeCB.setVisible(false);
@@ -258,6 +287,9 @@ void TempoViewController::updateComponentVisibility()
         A1reset.setVisible(false);
         
         subSlider->setVisible(true);
+        
+        exponentialToggle.setVisible(false);
+        emaAlphaSlider->setVisible(false);
     }
     
 }
@@ -289,9 +321,9 @@ TempoViewController(p, theGraph)
     subSlider->addMyListener(this);
     A1ModeCB.addListener(this);
     A1reset.addListener(this);
-    AT1HistorySlider->addMyListener(this);
-    AT1SubdivisionsSlider->addMyListener(this);
-    AT1MinMaxSlider->addMyListener(this);
+    ATHistorySlider->addMyListener(this);
+    ATSubdivisionsSlider->addMyListener(this);
+    ATMinMaxSlider->addMyListener(this);
     
     startTimer(50);
     
@@ -317,10 +349,10 @@ void TempoPreparationEditor::timerCallback()
                 A1AdaptedPeriodMultiplier.setText("Period Multiplier = " + String(mProcessor->getPeriodMultiplier()), dontSendNotification);
             }
             
-            if(mProcessor->getAtDelta() < active->getAdaptiveTempo1Max())
-                AT1MinMaxSlider->setDisplayValue(mProcessor->getAtDelta());
+            if(mProcessor->getAtDelta() < active->getAdaptiveTempoMax())
+                ATMinMaxSlider->setDisplayValue(mProcessor->getAtDelta());
             else
-                AT1MinMaxSlider->setDisplayValue(0);
+                ATMinMaxSlider->setDisplayValue(0);
         }
         
     }
@@ -510,8 +542,8 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     else if (name == A1ModeCB.getName())
     {
         DBG("A1ModeCB = " + String(index));
-        prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
-        active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
+        prep->setAdaptiveTempoMode((AdaptiveTempoMode) index);
+        active->setAdaptiveTempoMode((AdaptiveTempoMode) index);
     }
 }
 
@@ -527,12 +559,12 @@ void TempoPreparationEditor::BKRangeSliderValueChanged(String name, double minva
     TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
     TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
     
-    if(name == AT1MinMaxSlider->getName()) {
+    if(name == ATMinMaxSlider->getName()) {
         DBG("got new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
-        prep->setAdaptiveTempo1Min(minval);
-        prep->setAdaptiveTempo1Max(maxval);
-        active->setAdaptiveTempo1Min(minval);
-        active->setAdaptiveTempo1Max(maxval);
+        prep->setAdaptiveTempoMin(minval);
+        prep->setAdaptiveTempoMax(maxval);
+        active->setAdaptiveTempoMin(minval);
+        active->setAdaptiveTempoMax(maxval);
     }
 }
 
@@ -551,11 +583,11 @@ void TempoPreparationEditor::update(void)
         DBG("tempoSlider set to " + String(prep->getTempo()));
         DBG("subSlider set to " + String(prep->getSubdivisions()));
         
-        A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
-        AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
-        AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
-        AT1MinMaxSlider->setMinValue(prep->getAdaptiveTempo1Min(), dontSendNotification);
-        AT1MinMaxSlider->setMaxValue(prep->getAdaptiveTempo1Max(), dontSendNotification);
+        A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempoMode(), dontSendNotification);
+        ATHistorySlider->setValue(prep->getAdaptiveTempoHistorySize(), dontSendNotification);
+        ATSubdivisionsSlider->setValue(prep->getAdaptiveTempoSubdivisions(), dontSendNotification);
+        ATMinMaxSlider->setMinValue(prep->getAdaptiveTempoMin(), dontSendNotification);
+        ATMinMaxSlider->setMaxValue(prep->getAdaptiveTempoMax(), dontSendNotification);
         
         updateComponentVisibility();
     }
@@ -577,15 +609,15 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, 
         prep->setSubdivisions(val);
         active->setSubdivisions(val);
     }
-    else if(slider == AT1HistorySlider.get()) {
+    else if(slider == ATHistorySlider.get()) {
         DBG("got A1History " + String(val));
-        prep->setAdaptiveTempo1History(val);
-        active->setAdaptiveTempo1History(val);
+        prep->setAdaptiveTempoHistory(val);
+        active->setAdaptiveTempoHistory(val);
     }
-    else if(slider == AT1SubdivisionsSlider.get()) {
+    else if(slider == ATSubdivisionsSlider.get()) {
         DBG("got A1Subdivisions " + String(val));
-        prep->setAdaptiveTempo1Subdivisions(val);
-        active->setAdaptiveTempo1Subdivisions(val);
+        prep->setAdaptiveTempoSubdivisions(val);
+        active->setAdaptiveTempoSubdivisions(val);
     }
     
 }
@@ -625,9 +657,9 @@ TempoViewController(p, theGraph)
     modeCB.addListener(this);
     tempoSlider->addMyListener(this);
     subSlider->addMyListener(this);
-    AT1HistorySlider->addMyListener(this);
-    AT1SubdivisionsSlider->addMyListener(this);
-    AT1MinMaxSlider->addMyListener(this);
+    ATHistorySlider->addMyListener(this);
+    ATSubdivisionsSlider->addMyListener(this);
+    ATMinMaxSlider->addMyListener(this);
     A1ModeCB.addListener(this);
 
     update();
@@ -642,9 +674,9 @@ void TempoModificationEditor::greyOutAllComponents()
     A1ModeCB.setAlpha(gModAlpha);
     tempoSlider->setDim(gModAlpha);
     subSlider->setDim(gModAlpha);
-    AT1HistorySlider->setDim(gModAlpha);
-    AT1SubdivisionsSlider->setDim(gModAlpha);
-    AT1MinMaxSlider->setDim(gModAlpha);
+    ATHistorySlider->setDim(gModAlpha);
+    ATSubdivisionsSlider->setDim(gModAlpha);
+    ATMinMaxSlider->setDim(gModAlpha);
 }
 
 void TempoModificationEditor::highlightModedComponents()
@@ -654,11 +686,11 @@ void TempoModificationEditor::highlightModedComponents()
     if(mod->getDirty(TempoBPM))           tempoSlider->setBright();
     if(mod->getDirty(TempoSubdivisions))  subSlider->setBright();
     if(mod->getDirty(TempoSystem))        modeCB.setAlpha(1);
-    if(mod->getDirty(AT1History))         AT1HistorySlider->setBright();
-    if(mod->getDirty(AT1Subdivisions))    AT1SubdivisionsSlider->setBright();
-    if(mod->getDirty(AT1Min))             AT1MinMaxSlider->setBright();
-    if(mod->getDirty(AT1Max))             AT1MinMaxSlider->setBright();
-    if(mod->getDirty(AT1Mode))            { A1ModeCB.setAlpha(1.);  A1ModeLabel.setAlpha(1.); }
+    if(mod->getDirty(ATHistory))         ATHistorySlider->setBright();
+    if(mod->getDirty(ATSubdivisions))    ATSubdivisionsSlider->setBright();
+    if(mod->getDirty(ATMin))             ATMinMaxSlider->setBright();
+    if(mod->getDirty(ATMax))             ATMinMaxSlider->setBright();
+    if(mod->getDirty(ATMode))            { A1ModeCB.setAlpha(1.);  A1ModeLabel.setAlpha(1.); }
 
 }
 
@@ -710,15 +742,15 @@ void TempoModificationEditor::update(void)
         
         subSlider->setValue(mod->getSubdivisions(), dontSendNotification);
         
-        A1ModeCB.setSelectedItemIndex(mod->getAdaptiveTempo1Mode(), dontSendNotification);
+        A1ModeCB.setSelectedItemIndex(mod->getAdaptiveTempoMode(), dontSendNotification);
         
-        AT1HistorySlider->setValue(mod->getAdaptiveTempo1History(), dontSendNotification);
+        ATHistorySlider->setValue(mod->getAdaptiveTempoHistorySize(), dontSendNotification);
         
-        AT1SubdivisionsSlider->setValue(mod->getAdaptiveTempo1Subdivisions(), dontSendNotification);
+        ATSubdivisionsSlider->setValue(mod->getAdaptiveTempoSubdivisions(), dontSendNotification);
         
-        AT1MinMaxSlider->setMinValue(mod->getAdaptiveTempo1Min(), dontSendNotification);
+        ATMinMaxSlider->setMinValue(mod->getAdaptiveTempoMin(), dontSendNotification);
         
-        AT1MinMaxSlider->setMaxValue(mod->getAdaptiveTempo1Max(), dontSendNotification);
+        ATMinMaxSlider->setMaxValue(mod->getAdaptiveTempoMax(), dontSendNotification);
         
         updateComponentVisibility();
     }
@@ -872,8 +904,8 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (name == A1ModeCB.getName())
     {
-        mod->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
-        mod->setDirty(AT1Mode);
+        mod->setAdaptiveTempoMode((AdaptiveTempoMode) index);
+        mod->setDirty(ATMode);
         
         A1ModeCB.setAlpha(1.);
         A1ModeLabel.setAlpha(1.);
@@ -895,15 +927,15 @@ void TempoModificationEditor::BKRangeSliderValueChanged(String name, double minv
 {
     TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
 
-    if(name == AT1MinMaxSlider->getName())
+    if(name == ATMinMaxSlider->getName())
     {
-        mod->setAdaptiveTempo1Min(minval);
-        mod->setDirty(AT1Min);
+        mod->setAdaptiveTempoMin(minval);
+        mod->setDirty(ATMin);
         
-        mod->setAdaptiveTempo1Max(maxval);
-        mod->setDirty(AT1Max);
+        mod->setAdaptiveTempoMax(maxval);
+        mod->setDirty(ATMax);
         
-        AT1MinMaxSlider->setBright();
+        ATMinMaxSlider->setBright();
     }
     
     updateModification();
@@ -927,17 +959,17 @@ void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
         mod->setDirty(TempoSubdivisions);
         subSlider->setBright();
     }
-    else if(slider == AT1HistorySlider.get())
+    else if(slider == ATHistorySlider.get())
     {
-        mod->setAdaptiveTempo1History(val);
-        mod->setDirty(AT1History);
-        AT1HistorySlider->setBright();
+        mod->setAdaptiveTempoHistory(val);
+        mod->setDirty(ATHistory);
+        ATHistorySlider->setBright();
     }
-    else if(slider == AT1SubdivisionsSlider.get())
+    else if(slider == ATSubdivisionsSlider.get())
     {
-        mod->setAdaptiveTempo1Subdivisions(val);
-        mod->setDirty(AT1Subdivisions);
-        AT1SubdivisionsSlider->setBright();
+        mod->setAdaptiveTempoSubdivisions(val);
+        mod->setDirty(ATSubdivisions);
+        ATSubdivisionsSlider->setBright();
     }
     
     updateModification();

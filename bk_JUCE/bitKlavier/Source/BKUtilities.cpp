@@ -34,8 +34,8 @@ BKParameterDataType getBKDataType ( SynchronicParameterType type)
         (type == SynchronicClusterThresh) ||
         (type == SynchronicMode) ||
         (type == SynchronicBeatsToSkip)) /*||
-        (type == AT1Mode) ||
-        (type == AT1History)) */
+        (type == ATMode) ||
+        (type == ATHistory)) */
         return BKInt;
     
     if((type == SynchronicBeatMultipliers) ||
@@ -165,15 +165,15 @@ BKParameterDataType getBKDataType ( DirectParameterType param)
         (type == SynchronicClusterThresh) ||
         (type == SynchronicMode) ||
         (type == SynchronicBeatsToSkip) ||
-        (type == AT1Mode) ||
-        (type == AT1History))
+        (type == ATMode) ||
+        (type == ATHistory))
         return BKInt;
     
     
     if ((type == SynchronicTempo) ||
-        (type == AT1Subdivisions) ||
-        (type == AT1Min) ||
-        (type == AT1Max))
+        (type == ATSubdivisions) ||
+        (type == ATMin) ||
+        (type == ATMax))
         return BKFloat;
     
     if((type == SynchronicBeatMultipliers) ||
@@ -194,15 +194,15 @@ BKParameterDataType getBKDataType ( NostalgicParameterType param)
         (type == SynchronicClusterThresh) ||
         (type == SynchronicMode) ||
         (type == SynchronicBeatsToSkip) ||
-        (type == AT1Mode) ||
-        (type == AT1History))
+        (type == ATMode) ||
+        (type == ATHistory))
         return BKInt;
     
     
     if ((type == SynchronicTempo) ||
-        (type == AT1Subdivisions) ||
-        (type == AT1Min) ||
-        (type == AT1Max))
+        (type == ATSubdivisions) ||
+        (type == ATMin) ||
+        (type == ATMax))
         return BKFloat;
 }
 */

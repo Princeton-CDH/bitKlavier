@@ -309,7 +309,7 @@ private:
 //basic horizontal slider with its own text box and label
 //entering values in the text box will reset the range as needed
 class BKSingleSlider :
-public Component,
+public Slider,
 public Slider::Listener,
 public TextEditor::Listener
 #if JUCE_IOS

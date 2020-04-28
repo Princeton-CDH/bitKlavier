@@ -101,11 +101,11 @@ const String vtagModTempo = "modTempo";
 const String ptagTempo_Id = "Id";
 const String ptagTempo_system = "system";
 const String ptagTempo_tempo = "tempo";
-const String ptagTempo_at1Mode = "at1Mode";
-const String ptagTempo_at1History = "at1History";
-const String ptagTempo_at1Subdivisions = "at1Subdivisions";
-const String ptagTempo_at1Min = "at1Min";
-const String ptagTempo_at1Max = "at1Max";
+const String ptagTempo_atMode = "at1Mode";
+const String ptagTempo_atHistory = "at1History";
+const String ptagTempo_atSubdivisions = "at1Subdivisions";
+const String ptagTempo_atMin = "at1Min";
+const String ptagTempo_atMax = "at1Max";
 
 const String vtagSynchronic_beatMults = "beatMultipliers";
 const String vtagSynchronic_lengthMults = "lengthMultipliers";
@@ -958,7 +958,7 @@ static const std::vector<std::string> cTuningParameterTypes = {
 
 typedef enum TempoType {
     ConstantTempo = 0,
-    AdaptiveTempo1,
+    AdaptiveTempo,
     HostTempo,
     TempoSystemNil
     
@@ -966,15 +966,15 @@ typedef enum TempoType {
 
 static const std::vector<std::string> cTempoModeTypes = {
     "Constant Tempo",
-    "Adaptive Tempo 1",
+    "Adaptive Tempo",
     "Host Tempo"
 };
 
-typedef enum AdaptiveTempo1Mode {
+typedef enum AdaptiveTempoMode {
     TimeBetweenNotes = 0,
     NoteLength,
-    AdaptiveTempo1ModeNil
-} AdaptiveTempo1Mode;
+    AdaptiveTempoModeNil
+} AdaptiveTempoMode;
 
 static const std::vector<std::string> cAdaptiveTempoModeTypes = {
     "Time Between Notes",
@@ -986,11 +986,11 @@ typedef enum TempoParameterType
     TempoId = 0,
     TempoBPM,
     TempoSystem,
-    AT1History,
-    AT1Subdivisions,
-    AT1Min,
-    AT1Max,
-    AT1Mode,
+    ATHistory,
+    ATSubdivisions,
+    ATMin,
+    ATMax,
+    ATMode,
     TempoSubdivisions,
     TempoParameterTypeNil
     
@@ -1012,11 +1012,11 @@ static const std::vector<std::string> cTempoParameterTypes = {
     "Tempo Id",
     "Tempo",
     "TempoMode",
-    "AT1History",
-    "AT1Subdivs",
-    "AT1Min",
-    "AT1Max",
-    "AT1Mode",
+    "ATHistory",
+    "ATSubdivs",
+    "ATMin",
+    "ATMax",
+    "ATMode",
     "Subdivisions"
 };
 
