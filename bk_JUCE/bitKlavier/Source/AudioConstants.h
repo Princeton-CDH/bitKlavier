@@ -971,14 +971,16 @@ static const std::vector<std::string> cTempoModeTypes = {
 };
 
 typedef enum AdaptiveTempoMode {
-    TimeBetweenNotes = 0,
+    TimeBetweenOnsets = 0,
     NoteLength,
+    TimeBetweenReleases,
     AdaptiveTempoModeNil
 } AdaptiveTempoMode;
 
 static const std::vector<std::string> cAdaptiveTempoModeTypes = {
-    "Time Between Notes",
-    "Note Sustain Length"
+    "Time Between Onsets",
+    "Note Sustain Length",
+    "Time Between Releases"
 };
 
 typedef enum TempoParameterType

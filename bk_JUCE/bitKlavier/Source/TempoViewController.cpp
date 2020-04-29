@@ -58,12 +58,12 @@ BKViewController(p, theGraph, 1)
     ATMinMaxSlider->setToolTipString("Time within which Tempo will consider notes to be part of a constant pulse; any notes played futher apart than Max, or closer together than Min, will be ignored");
     addAndMakeVisible(*ATMinMaxSlider);
     
-    A1ModeCB.setName("ATMode");
-    addAndMakeVisible(A1ModeCB);
-    fillA1ModeCB();
-    A1ModeLabel.setText("Mode", dontSendNotification);
-    A1ModeCB.setTooltip("Indicates which aspect of performance Tempo is analyzing, using information from connected Keymap");
-    addAndMakeVisible(A1ModeLabel);
+    atModeButton.setName("ATMode");
+    atModeButton.setButtonText("Select tempo measures");
+    addAndMakeVisible(atModeButton);
+    atModeLabel.setText("Mode", dontSendNotification);
+    atModeButton.setTooltip("Indicates which aspects of performance Tempo is analyzing, using information from connected Keymap");
+//    addAndMakeVisible(atModeLabel);
     
     attachKeymap.setText("Attach a Keymap to use Adaptive!", dontSendNotification);
     addAndMakeVisible(attachKeymap);
@@ -145,13 +145,13 @@ void TempoViewController::resized()
     //DBG("extraY = " + String(extraY));
     
     leftColumn.removeFromTop(extraY + gYSpacing);
-    Rectangle<int> A1ModeCBSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+    Rectangle<int> atModeButtonSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
     attachKeymap.setBounds(leftColumn);
-    A1ModeCBSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+    atModeButtonSlice.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
     //A1ModeCBSlice.removeFromLeft(2 * gXSpacing + hideOrShow.getWidth());
-    A1ModeCBSlice.removeFromLeft(gXSpacing);
-    A1ModeCB.setBounds(A1ModeCBSlice.removeFromLeft(selectCB.getWidth() + gXSpacing + hideOrShow.getWidth()));
-    A1ModeLabel.setBounds(A1ModeCBSlice);
+    atModeButtonSlice.removeFromLeft(gXSpacing);
+    atModeButton.setBounds(atModeButtonSlice.removeFromLeft(selectCB.getWidth() + gXSpacing + hideOrShow.getWidth()));
+    atModeLabel.setBounds(atModeButtonSlice);
     
     leftColumn.removeFromTop(extraY + gYSpacing);
     ATHistorySlider->setBounds(leftColumn.removeFromTop(gComponentSingleSliderHeight));
@@ -175,19 +175,19 @@ void TempoViewController::resized()
     modeSlice.removeFromRight(gXSpacing);
     modeCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
     
-    area.removeFromTop(A1ModeCB.getY() - selectCB.getBottom());
+    area.removeFromTop(atModeButton.getY() - selectCB.getBottom());
     Rectangle<int> tempoSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
     tempoSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     tempoSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     tempoSlider->setBounds(tempoSliderSlice);
     
-    area.removeFromTop(A1ModeCB.getY() - selectCB.getBottom());
+    area.removeFromTop(atModeButton.getY() - selectCB.getBottom());
     Rectangle<int> expToggleSlice = area.removeFromTop(gComponentSingleSliderHeight);
     expToggleSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     expToggleSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     exponentialToggle.setBounds(expToggleSlice);
     
-    area.removeFromTop(A1ModeCB.getY() - selectCB.getBottom());
+    area.removeFromTop(atModeButton.getY() - selectCB.getBottom());
     Rectangle<int> alphaSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
     alphaSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     alphaSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
@@ -218,21 +218,6 @@ void TempoViewController::fillModeCB(void)
     modeCB.setSelectedItemIndex(0, dontSendNotification);
 }
 
-
-void TempoViewController::fillA1ModeCB(void)
-{
-    
-    A1ModeCB.clear(dontSendNotification);
-    
-    for (int i = 0; i < cAdaptiveTempoModeTypes.size(); i++)
-    {
-        String name = cAdaptiveTempoModeTypes[i];
-        A1ModeCB.addItem(name, i+1);
-    }
-    
-    A1ModeCB.setSelectedItemIndex(0, dontSendNotification);
-}
-
 void TempoViewController::updateComponentVisibility()
 {
     if(modeCB.getText() == "Adaptive Tempo")
@@ -249,8 +234,8 @@ void TempoViewController::updateComponentVisibility()
             ATSubdivisionsSlider->setVisible(true);
             ATMinMaxSlider->setVisible(true);
             
-            A1ModeLabel.setVisible(true);
-            A1ModeCB.setVisible(true);
+            atModeLabel.setVisible(true);
+            atModeButton.setVisible(true);
             
             A1AdaptedTempo.setVisible(true);
             A1AdaptedPeriodMultiplier.setVisible(true);
@@ -277,8 +262,8 @@ void TempoViewController::updateComponentVisibility()
         ATSubdivisionsSlider->setVisible(false);;
         ATMinMaxSlider->setVisible(false);
         
-        A1ModeLabel.setVisible(false);
-        A1ModeCB.setVisible(false);
+        atModeLabel.setVisible(false);
+        atModeButton.setVisible(false);
         
         A1AdaptedTempo.setVisible(false);
         A1AdaptedPeriodMultiplier.setVisible(false);
@@ -319,7 +304,7 @@ TempoViewController(p, theGraph)
     
     tempoSlider->addMyListener(this);
     subSlider->addMyListener(this);
-    A1ModeCB.addListener(this);
+    atModeButton.addListener(this);
     A1reset.addListener(this);
     ATHistorySlider->addMyListener(this);
     ATSubdivisionsSlider->addMyListener(this);
@@ -437,6 +422,23 @@ void TempoPreparationEditor::setCurrentId(int Id)
     lastId = Id;
 }
 
+PopupMenu TempoPreparationEditor::getATModeMenu(void)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    TempoPreparation::Ptr prep = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    
+    int id = 1;
+    for (int mode = TimeBetweenOnsets; mode < AdaptiveTempoModeNil; mode++)
+    {
+        if (prep->getAdaptiveTempoMode().getUnchecked(mode))
+            menu.addItem(PopupMenu::Item(cAdaptiveTempoModeTypes[mode]).setID(id++).setTicked(true));
+        else menu.addItem(PopupMenu::Item(cAdaptiveTempoModeTypes[mode]).setID(id++));
+    }
+    return menu;
+}
+
 void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEditor* vc)
 {
     BKAudioProcessor& processor = vc->processor;
@@ -519,6 +521,29 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
     }
 }
 
+void TempoPreparationEditor::atModeCallback(int result, TempoPreparationEditor* vc)
+{
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
+    BKAudioProcessor& processor = vc->processor;
+    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    
+    if (result <= 0) return;
+    
+    Array<bool> modes(active->getAdaptiveTempoMode());
+    modes.set(result-1, !modes.getUnchecked(result-1));
+    
+    prep->setAdaptiveTempoMode(modes);
+    active->setAdaptiveTempoMode(modes);
+    
+    vc->getATModeMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->atModeButton), ModalCallbackFunction::forComponent(atModeCallback, vc));
+}
+
 
 void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 {
@@ -538,12 +563,6 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->setTempoSystem(TempoType(index));
         active->setTempoSystem(TempoType(index));
         updateComponentVisibility();
-    }
-    else if (name == A1ModeCB.getName())
-    {
-        DBG("A1ModeCB = " + String(index));
-        prep->setAdaptiveTempoMode((AdaptiveTempoMode) index);
-        active->setAdaptiveTempoMode((AdaptiveTempoMode) index);
     }
 }
 
@@ -583,7 +602,6 @@ void TempoPreparationEditor::update(void)
         DBG("tempoSlider set to " + String(prep->getTempo()));
         DBG("subSlider set to " + String(prep->getSubdivisions()));
         
-        A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempoMode(), dontSendNotification);
         ATHistorySlider->setValue(prep->getAdaptiveTempoHistorySize(), dontSendNotification);
         ATSubdivisionsSlider->setValue(prep->getAdaptiveTempoSubdivisions(), dontSendNotification);
         ATMinMaxSlider->setMinValue(prep->getAdaptiveTempoMin(), dontSendNotification);
@@ -640,6 +658,10 @@ void TempoPreparationEditor::buttonClicked (Button* b)
         bool single = processor.gallery->getAllTempo().size() == 2;
         getPrepOptionMenu(PreparationTypeTempo, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
+    else if (b == &atModeButton)
+    {
+        getATModeMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(atModeButton), ModalCallbackFunction::forComponent(atModeCallback, this));
+    }
     
 }
 
@@ -660,7 +682,8 @@ TempoViewController(p, theGraph)
     ATHistorySlider->addMyListener(this);
     ATSubdivisionsSlider->addMyListener(this);
     ATMinMaxSlider->addMyListener(this);
-    A1ModeCB.addListener(this);
+    
+    atModeButton.addListener(this);
 
     update();
 }
@@ -669,9 +692,9 @@ void TempoModificationEditor::greyOutAllComponents()
 {
     A1reset.setVisible(false);
     
-    A1ModeLabel.setAlpha(gModAlpha);
+    atModeLabel.setAlpha(gModAlpha);
     modeCB.setAlpha(gModAlpha);
-    A1ModeCB.setAlpha(gModAlpha);
+    atModeButton.setAlpha(gModAlpha);
     tempoSlider->setDim(gModAlpha);
     subSlider->setDim(gModAlpha);
     ATHistorySlider->setDim(gModAlpha);
@@ -690,7 +713,7 @@ void TempoModificationEditor::highlightModedComponents()
     if(mod->getDirty(ATSubdivisions))    ATSubdivisionsSlider->setBright();
     if(mod->getDirty(ATMin))             ATMinMaxSlider->setBright();
     if(mod->getDirty(ATMax))             ATMinMaxSlider->setBright();
-    if(mod->getDirty(ATMode))            { A1ModeCB.setAlpha(1.);  A1ModeLabel.setAlpha(1.); }
+    if(mod->getDirty(ATMode))            { atModeButton.setAlpha(1.);  atModeLabel.setAlpha(1.); }
 
 }
 
@@ -741,8 +764,6 @@ void TempoModificationEditor::update(void)
         tempoSlider->setValue(mod->getTempo(), dontSendNotification);
         
         subSlider->setValue(mod->getSubdivisions(), dontSendNotification);
-        
-        A1ModeCB.setSelectedItemIndex(mod->getAdaptiveTempoMode(), dontSendNotification);
         
         ATHistorySlider->setValue(mod->getAdaptiveTempoHistorySize(), dontSendNotification);
         
@@ -802,6 +823,23 @@ void TempoModificationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+}
+
+PopupMenu TempoModificationEditor::getATModeMenu(void)
+{
+    PopupMenu menu;
+    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    
+    TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
+    
+    int id = 1;
+    for (int mode = TimeBetweenOnsets; mode < AdaptiveTempoModeNil; mode++)
+    {
+        if (mod->getAdaptiveTempoMode().getUnchecked(mode))
+            menu.addItem(PopupMenu::Item(cAdaptiveTempoModeTypes[mode]).setID(id++).setTicked(true));
+        else menu.addItem(PopupMenu::Item(cAdaptiveTempoModeTypes[mode]).setID(id++));
+    }
+    return menu;
 }
 
 void TempoModificationEditor::actionButtonCallback(int action, TempoModificationEditor* vc)
@@ -882,6 +920,33 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
     }
 }
 
+void TempoModificationEditor::atModeCallback(int result, TempoModificationEditor* vc)
+{
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
+    BKAudioProcessor& processor = vc->processor;
+    TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
+    
+    if (result <= 0) return;
+    
+    Array<bool> modes(mod->getAdaptiveTempoMode());
+    modes.set(result-1, !modes.getUnchecked(result-1));
+    
+    mod->setAdaptiveTempoMode(modes);
+    mod->setDirty(ATMode);
+    
+    vc->atModeButton.setAlpha(1.);
+    vc->atModeLabel.setAlpha(1.);
+    
+    vc->getATModeMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->atModeButton), ModalCallbackFunction::forComponent(atModeCallback, vc));
+}
+
+
+
 void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
 {
     String name = box->getName();
@@ -901,14 +966,6 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         modeCB.setAlpha(1.);
         updateComponentVisibility();
-    }
-    else if (name == A1ModeCB.getName())
-    {
-        mod->setAdaptiveTempoMode((AdaptiveTempoMode) index);
-        mod->setDirty(ATMode);
-        
-        A1ModeCB.setAlpha(1.);
-        A1ModeLabel.setAlpha(1.);
     }
     
     if (name != selectCB.getName()) updateModification();
@@ -995,6 +1052,10 @@ void TempoModificationEditor::buttonClicked (Button* b)
     {
         bool single = processor.gallery->getTempoModifications().size() == 2;
         getModOptionMenu(PreparationTypeTempoMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
+    else if (b == &atModeButton)
+    {
+        getATModeMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(atModeButton), ModalCallbackFunction::forComponent(atModeCallback, this));
     }
     
 }

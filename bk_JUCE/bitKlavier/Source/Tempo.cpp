@@ -53,13 +53,14 @@ void TempoProcessor::keyReleased(int noteNumber, int channel)
 //adaptive tempo functions
 void TempoProcessor::atNewNote()
 {
-    if(tempo->aPrep->getAdaptiveTempoMode() == TimeBetweenNotes) atCalculatePeriodMultiplier();
+    if(tempo->aPrep->getAdaptiveTempoMode().contains(TimeBetweenOnsets)) atCalculatePeriodMultiplier();
     atLastTime = atTimer;
 }
 
 void TempoProcessor::atNewNoteOff()
 {
-    if(tempo->aPrep->getAdaptiveTempoMode() == NoteLength) atCalculatePeriodMultiplier();
+    if(tempo->aPrep->getAdaptiveTempoMode().contains(NoteLength) ||
+       tempo->aPrep->getAdaptiveTempoMode().contains(TimeBetweenReleases)) atCalculatePeriodMultiplier();
 }
 
 //really basic, using constrained moving average of time-between-notes (or note-length)

@@ -53,17 +53,20 @@ public:
     sWhichTempoSystem(ConstantTempo),
     sTempo(120),
     subdivisions(1.),
-    atDeltaHistorySize(4),
     atMinPulse(100),
     atMaxPulse(2000),
     atSubdivisions(1.0f),
-    atMode(TimeBetweenNotes)
+    atDeltaHistorySize(4)
     {
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
         useExponential.setValue(false);
         useWeights.setValue(false);
         emaAlpha.setValue(0.5);
+        atMode.ensureStorageAllocated(AdaptiveTempoModeNil);
+        atMode.set(TimeBetweenOnsets, true);
+        atMode.set(NoteLength, false);
+        atMode.set(TimeBetweenReleases, false);
     }
     
     inline void copy(TempoPreparation::Ptr s)
@@ -126,7 +129,7 @@ public:
 		atMinPulse = r[idx++];
 		atMaxPulse = r[idx++];
 		atSubdivisions = r[idx++];
-		atMode = (AdaptiveTempoMode)(int)(r[idx++] * AdaptiveTempoModeNil);
+		atMode.set((r[idx++] * AdaptiveTempoModeNil), true);
 	}
     
     inline const TempoType getTempoSystem() const noexcept      {return sWhichTempoSystem; }
@@ -135,8 +138,8 @@ public:
     inline const float getBeatThreshMS() const noexcept         {return sBeatThreshMS; }
   
     //Adaptive Tempo 1
-    inline AdaptiveTempoMode getAdaptiveTempoMode(void)       {return atMode;   }
-    inline int getAdaptiveTempoHistorySize(void)                   {return atDeltaHistorySize;}
+    inline Array<bool> getAdaptiveTempoMode(void)               {return atMode;   }
+    inline int getAdaptiveTempoHistorySize(void)                {return atDeltaHistorySize;}
     inline float getAdaptiveTempoSubdivisions(void)            {return atSubdivisions;}
     inline float getAdaptiveTempoMin(void)                     {return atMinPulse;}
     inline float getAdaptiveTempoMax(void)                     {return atMaxPulse;}
@@ -179,7 +182,7 @@ public:
     }
     
     //Adaptive Tempo 1
-    inline void setAdaptiveTempoMode(AdaptiveTempoMode mode)          {atMode = mode;}
+    inline void setAdaptiveTempoMode(Array<bool> mode)                 {atMode = mode;}
     inline void setAdaptiveTempoHistory(int hist)                      {atDeltaHistorySize = hist;}
     inline void setAdaptiveTempoSubdivisions(float sub)                {atSubdivisions = sub;}
     inline void setAdaptiveTempoMin(float min)                         {atMinPulse = min;}
@@ -198,7 +201,12 @@ public:
         
         prep.setProperty( ptagTempo_tempo,                 getTempo(), 0);
         prep.setProperty( ptagTempo_system,                getTempoSystem(), 0);
-        prep.setProperty( ptagTempo_atMode,                getAdaptiveTempoMode(), 0 );
+        
+        for (int i = TimeBetweenOnsets; i < AdaptiveTempoModeNil; i++)
+        {
+            prep.setProperty(ptagTempo_atMode + String(i), atMode.getUnchecked(i) ? 1 : 0, 0);
+        }
+        
         prep.setProperty( ptagTempo_atHistory,             getAdaptiveTempoHistorySize(), 0 );
         prep.setProperty( ptagTempo_atSubdivisions,        getAdaptiveTempoSubdivisions(), 0 );
         prep.setProperty( ptagTempo_atMin,                 getAdaptiveTempoMin(), 0 );
@@ -217,8 +225,18 @@ public:
         i = e->getStringAttribute(ptagTempo_system).getIntValue();
         setTempoSystem((TempoType)i);
         
-        i = e->getStringAttribute(ptagTempo_atMode).getIntValue();
-        setAdaptiveTempoMode((AdaptiveTempoMode)i);
+        Array<bool> mode;
+        mode.ensureStorageAllocated(AdaptiveTempoModeNil);
+        for (int j = 0; j < AdaptiveTempoModeNil; j++)
+        {
+            mode.set(j, false);
+            String attr = e->getStringAttribute(ptagTempo_atMode + String(j));
+            if (attr != String()) mode.set(j, (bool) attr.getIntValue());
+        }
+        // to stay compatible with old xmls
+        String attr = e->getStringAttribute(ptagTempo_atMode);
+        if (attr != String()) mode.set(attr.getIntValue(), true);
+        setAdaptiveTempoMode(mode);
         
         i = e->getStringAttribute(ptagTempo_atHistory).getIntValue();
         setAdaptiveTempoHistory(i);
@@ -249,15 +267,18 @@ private:
     float sTempo;
     float sBeatThreshSec;      //length of time between pulses, as set by tempo
     float sBeatThreshMS;
-    
     float subdivisions;
     
-    // Adaptive Tempo 
-    int atDeltaHistorySize;
-    int atOnsetHistorySize;
+    // Adaptive Tempo
     float atMinPulse, atMaxPulse;
     float atSubdivisions;
-    AdaptiveTempoMode atMode;
+    Array<bool> atMode;
+    
+    // Stuff for basic moving average
+    int atDeltaHistorySize;
+    
+    
+    int atOnsetHistorySize;
 
     Array<float> metricWeights;
     

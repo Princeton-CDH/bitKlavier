@@ -48,8 +48,8 @@ protected:
     std::unique_ptr<BKSingleSlider> ATSubdivisionsSlider;
     std::unique_ptr<BKRangeSlider> ATMinMaxSlider; //need to have "MinAlwaysLessThanMax" mode
     
-    BKLabel A1ModeLabel;
-    BKComboBox A1ModeCB;
+    BKLabel atModeLabel;
+    BKTextButton atModeButton;
     
     BKLabel A1AdaptedTempo;
     BKLabel A1AdaptedPeriodMultiplier;
@@ -63,7 +63,6 @@ protected:
     
     
     void fillModeCB(void);
-    void fillA1ModeCB(void);
     
     void updateComponentVisibility();
     
@@ -92,7 +91,10 @@ public:
     
     void fillSelectCB(int last, int current);
     
+    PopupMenu getATModeMenu(void);
+    
     static void actionButtonCallback(int action, TempoPreparationEditor*);
+    static void atModeCallback(int result, TempoPreparationEditor*);
     
     int addPreparation(void);
     int duplicatePreparation(void);
@@ -130,14 +132,17 @@ public:
     void update(void) override;
     void updateModification(void);
     
-    void fillSelectCB(int last, int current);
-    
     void timerCallback(void) override
     {
 
     }
     
+    void fillSelectCB(int last, int current);
+    
+    PopupMenu getATModeMenu(void);
+    
     static void actionButtonCallback(int action, TempoModificationEditor*);
+    static void atModeCallback(int result, TempoModificationEditor*);
     
     int addPreparation(void);
     int duplicatePreparation(void);

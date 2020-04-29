@@ -623,11 +623,16 @@ PopupMenu KeymapViewController::getKeysMenu(void)
 
 void KeymapViewController::midiInputSelectCallback(int result, KeymapViewController* vc)
 {
-    if (result <= 0) return;
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
     
     BKAudioProcessor& processor = vc->processor;
-    
     Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    
+    if (result <= 0) return;
     
     if (result == 1)
     {

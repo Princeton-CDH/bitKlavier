@@ -86,10 +86,10 @@ private:
     BKKeymapKeyboardComponent* keyboard;
     BKTextButton keyboardValsTextFieldOpen;
     
-    TextButton      midiInputSelectButton;
-    TextButton      targetsButton;
-    TextButton      keysButton;
-    TextButton      clearButton;
+    BKTextButton      midiInputSelectButton;
+    BKTextButton      targetsButton;
+    BKTextButton      keysButton;
+    BKTextButton      clearButton;
     BKComboBox      keysCB;
     
     bool selectType;
