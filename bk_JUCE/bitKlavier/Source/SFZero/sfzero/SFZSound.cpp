@@ -19,10 +19,10 @@ sfzero::Sound::~Sound()
         regions_.set(i, nullptr);
     }
     
-    for (juce::HashMap<juce::String, sfzero::Sample::Ptr>::Iterator i(samples_); i.next();)
-    {
-        delete i.getValue();
-    }
+//    for (juce::HashMap<juce::String, sfzero::Sample::Ptr>::Iterator i(samples_); i.next();)
+//    {
+//        delete i.getValue();
+//    }
     
     samples_.clear();
 }
