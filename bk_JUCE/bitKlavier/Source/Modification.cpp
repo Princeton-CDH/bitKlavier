@@ -203,7 +203,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 if (asub->hasTagName("t"+String(tcount++)))
                 {
                     Array<float> transp;
-                    for (int k = 0; k < sub->getNumAttributes(); k++)
+                    for (int k = 0; k < asub->getNumAttributes(); k++)
                     {
                         String attr = asub->getStringAttribute(ptagFloat + String(k));
                         
@@ -231,7 +231,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 if (asub->hasTagName("e"+String(tcount++)))
                 {
                     Array<float> envs;
-                    for (int k = 0; k < sub->getNumAttributes(); k++)
+                    for (int k = 0; k < asub->getNumAttributes(); k++)
                     {
                         String attr = asub->getStringAttribute(ptagFloat + String(k));
                         
