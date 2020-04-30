@@ -136,7 +136,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 if (n != String())     newKeymap->setName(n);
                 
                 Array<int> keys;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
+                for (int k = 0; k < e->getNumAttributes(); k++)
                 {
                     String attr = e->getStringAttribute(ptagKeymap_key + String(k));
                     
