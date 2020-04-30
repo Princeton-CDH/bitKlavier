@@ -508,7 +508,7 @@ public:
             {
                 Array<float> beats;
                 Array<bool> beatsstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
 
@@ -526,7 +526,7 @@ public:
             else if (sub->hasTagName(vtagBlendronic_beatsStates))
             {
                 Array<bool> beatsstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagBool + String(k));
 
@@ -543,7 +543,7 @@ public:
             {
                 Array<float> lengths;
                 Array<bool> lengthsstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
@@ -561,7 +561,7 @@ public:
             else if (sub->hasTagName(vtagBlendronic_delayLengthsStates))
             {
                 Array<bool> nstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagBool + String(k));
 
@@ -578,7 +578,7 @@ public:
             {
                 Array<float> durs;
                 Array<bool> dursstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
 
@@ -596,7 +596,7 @@ public:
             else if (sub->hasTagName(vtagBlendronic_smoothLengthsStates))
             {
                 Array<bool> nstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagBool + String(k));
 
@@ -629,7 +629,7 @@ public:
             {
                 Array<float> coeffs;
                 Array<bool> coeffsstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
 
@@ -647,7 +647,7 @@ public:
             else if (sub->hasTagName(vtagBlendronic_feedbackCoefficientsStates))
             {
                 Array<bool> nstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagBool + String(k));
 

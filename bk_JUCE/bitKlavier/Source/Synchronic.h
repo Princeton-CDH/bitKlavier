@@ -1010,7 +1010,7 @@ public:
             {
                 Array<float> beats;
                 Array<bool> beatstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
@@ -1030,7 +1030,7 @@ public:
             else if (sub->hasTagName(vtagSynchronic_beatMultsStates))
             {
                 Array<bool> beatstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagBool + String(k));
                     
@@ -1049,7 +1049,7 @@ public:
             {
                 Array<float> accents;
                 Array<bool> accentsstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
@@ -1069,7 +1069,7 @@ public:
             else if (sub->hasTagName(vtagSynchronic_accentMultsStates))
             {
                 Array<bool> accentsstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagBool + String(k));
                     
@@ -1088,7 +1088,7 @@ public:
             {
                 Array<float> lens;
                 Array<bool> lengthstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
@@ -1108,7 +1108,7 @@ public:
             else if (sub->hasTagName(vtagSynchronic_lengthMultsStates))
             {
                 Array<bool> lengthstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagBool + String(k));
                     
@@ -1133,7 +1133,7 @@ public:
                     if (asub->hasTagName("t" + String(tcount++)))
                     {
                         Array<float> transp;
-                        for (int k = 0; k < 128; k++)
+                        for (int k = 0; k < sub->getNumAttributes(); k++)
                         {
                             String attr = asub->getStringAttribute(ptagFloat + String(k));
                             
@@ -1156,7 +1156,7 @@ public:
             else if (sub->hasTagName(vtagSynchronic_transpOffsetsStates))
             {
                 Array<bool> transpsstates;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagBool + String(k));
                     
@@ -1180,7 +1180,7 @@ public:
                     if (asub->hasTagName("e"+String(tcount++)))
                     {
                         Array<float> singleADSR;
-                        for (int k = 0; k < 5; k++)
+                        for (int k = 0; k < sub->getNumAttributes(); k++)
                         {
                             String attr = asub->getStringAttribute(ptagFloat + String(k));
                             

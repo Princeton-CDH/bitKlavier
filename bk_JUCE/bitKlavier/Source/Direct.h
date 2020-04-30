@@ -243,7 +243,7 @@ public:
             if (sub->hasTagName(vtagDirect_transposition))
             {
                 Array<float> transp;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
@@ -261,7 +261,7 @@ public:
             else  if (sub->hasTagName(vtagDirect_ADSR))
             {
                 Array<float> envVals;
-                for (int k = 0; k < 4; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     
