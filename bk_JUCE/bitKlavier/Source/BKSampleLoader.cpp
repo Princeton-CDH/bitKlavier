@@ -42,9 +42,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     bool isSF2 = false;
     
     sfzero::SF2Sound::Ptr     sf2sound;
-    sfzero::SF2Reader::Ptr    sf2reader;
     sfzero::Sound::Ptr        sfzsound;
-    sfzero::Reader::Ptr       sfzreader;
     
     if      (ext == ".sf2")
     {
@@ -104,6 +102,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         }
         else
         {
+            if (region->sample == nullptr) continue;
             sampleStart = 0;
             sampleLength = region->sample->getSampleLength();
         }

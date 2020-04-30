@@ -568,6 +568,8 @@ public:
     BKWaveDistanceUndertowSlider();
     ~BKWaveDistanceUndertowSlider()
     {
+        wavedistanceSlider->setLookAndFeel(nullptr);
+        undertowSlider->setLookAndFeel(nullptr);
         for(int i=0; i<maxSliders; i++)
         {
             Slider* newSlider = displaySliders.getUnchecked(i);

@@ -399,8 +399,9 @@ void BKPianoSamplerVoice::startNote (const int midi,
             
             //cfSamples = 10.0;  //DT: 10 samples too small...
             cfSamples = getSampleRate() / 50.; //20ms; possibly an issue if the loop length is really small, but 20ms is a typical ramp length
-            sampleEnv.setTime(cfSamples / getSampleRate());
-            loopEnv.setTime(cfSamples / getSampleRate());
+                                               //
+            sampleEnv.setTime(20.0f);
+            loopEnv.setTime(20.0f);
             
             sound->setAllTimes(adsrAttack / getSampleRate(),
                                (sound->hold > 0.0f) ? sound->hold : 0.001f,
@@ -559,18 +560,19 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         loopPosition += bentRatio;
         if (loopPosition >= loopEnd)
         {
-            loopPosition = loopStart;
+            loopPosition -= loopEnd - loopStart;
         }
         
         float loopL, loopR;
         
         if(loopPosition < 0) loopPosition = 0;
-        if(loopPosition > playingSound->soundLength - 2) loopPosition = playingSound->soundLength - 2;
+        if(loopPosition > playingSound->soundLength - 1) loopPosition = playingSound->soundLength - 1;
         
         int pos = (int) loopPosition;
         float alpha = (float) (loopPosition - pos);
         float invAlpha = 1.0f - alpha;
         int next = pos + 1;
+        if(next > playingSound->soundLength - 1) next -= loopEnd - loopStart;;
         
         loopL = (inL [pos] * invAlpha + inL [next] * alpha);
         loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : loopL;
@@ -582,12 +584,13 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         else                            samplePosition -= bentRatio;
         
         if(samplePosition < 0) samplePosition = 0;
-        if(samplePosition > playingSound->soundLength - 2) samplePosition = playingSound->soundLength - 2;
+        if(samplePosition > playingSound->soundLength - 1) samplePosition = playingSound->soundLength - 1;
         
         pos = (int) samplePosition;
         alpha = (float) (samplePosition - pos);
         invAlpha = 1.0f - alpha;
         next = pos + 1;
+        if(next > playingSound->soundLength - 1) next -= loopEnd - loopStart;;
 
         sampleL = (inL [pos] * invAlpha + inL [next] * alpha);
         sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : sampleL;
@@ -655,8 +658,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         float l,r;
         
-        l = lgain * adsr.tick()     * sfzadsr.tick()    * loopL;// * loopEnv.tick()    ;//   + sampleL * sampleEnv.tick());
-        r = rgain * adsr.lastOut()  * sfzadsr.lastOut() * loopR;// * loopEnv.lastOut() ;//   + sampleR * sampleEnv.lastOut());
+        l = lgain * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
+        r = rgain * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
         
         if (!blendronic.isEmpty())
         {

@@ -329,12 +329,8 @@ public:
                                   preferredDefaultDeviceName,
                                   preferredSetupOptions);
 #if ! (JUCE_IOS || JUCE_ANDROID)
-        midiInputManager.initialise (enableAudioInput ? totalInChannels : 0,
-                                  totalOutChannels,
-                                  savedState.get(),
-                                  true,
-                                  preferredDefaultDeviceName,
-                                  preferredSetupOptions);
+        // this should be empty concerning for audio purposes. we're only using it for midi
+        midiInputManager.initialise (0, 0, nullptr, true, String(), nullptr);
 #endif
     }
     
