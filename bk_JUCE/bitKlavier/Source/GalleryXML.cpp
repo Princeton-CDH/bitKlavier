@@ -136,7 +136,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 if (n != String())     newKeymap->setName(n);
                 
                 Array<int> keys;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < e->getNumAttributes(); k++)
                 {
                     String attr = e->getStringAttribute(ptagKeymap_key + String(k));
                     
@@ -173,7 +173,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
                     if (sub->hasTagName(vtagKeymap_midiInputs))
                     {
                         Array<String> inputs;
-                        for (int k = 0; k < 128; k++)
+                        for (int k = 0; k < sub->getNumAttributes(); k++)
                         {
                             String attr = sub->getStringAttribute(ptagKeymap_midiInput + String(k));
                             if (attr == String()) break;

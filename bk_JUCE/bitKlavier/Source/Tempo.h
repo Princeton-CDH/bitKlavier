@@ -67,6 +67,12 @@ public:
         atMode.set(TimeBetweenOnsets, true);
         atMode.set(NoteLength, false);
         atMode.set(TimeBetweenReleases, false);
+        
+        metricWeights.ensureStorageAllocated(28);
+        for (int i = 0; i <= 27; i++)
+        {
+            metricWeights.add(0);
+        }
     }
     
     inline void copy(TempoPreparation::Ptr s)
@@ -79,6 +85,8 @@ public:
         atMaxPulse = s->getAdaptiveTempoMax();
         atSubdivisions = s->getAdaptiveTempoSubdivisions();
         atMode = s->getAdaptiveTempoMode();
+        
+        metricWeights = s->getAdaptiveTempoWeights();
         
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
@@ -143,6 +151,8 @@ public:
     inline float getAdaptiveTempoSubdivisions(void)            {return atSubdivisions;}
     inline float getAdaptiveTempoMin(void)                     {return atMinPulse;}
     inline float getAdaptiveTempoMax(void)                     {return atMaxPulse;}
+    
+    inline Array<float> getAdaptiveTempoWeights(void)           {return metricWeights;}
 
     inline const String getName() const noexcept                {return name;}
     inline void setName(String n)                               {name = n;}
@@ -188,6 +198,8 @@ public:
     inline void setAdaptiveTempoMin(float min)                         {atMinPulse = min;}
     inline void setAdaptiveTempoMax(float max)                         {atMaxPulse = max;}
     
+    inline void setAdaptiveTempoWeights(Array<float> weights)          {metricWeights = weights;}
+    
     void print(void)
     {
         DBG("| - - - Tempo Preparation - - - |");
@@ -213,6 +225,14 @@ public:
         prep.setProperty( ptagTempo_atMax,                 getAdaptiveTempoMax(), 0 );
         prep.setProperty( "subdivisions",                  getSubdivisions(), 0);
         
+        ValueTree weights( vtagTempo_atWeights);
+        int count = 0;
+        for (auto w : getAdaptiveTempoWeights())
+        {
+            weights.setProperty( ptagFloat + String(count++), w, 0);
+        }
+        prep.addChild(weights, -1, 0);
+        
         return prep;
     }
     
@@ -233,6 +253,9 @@ public:
             String attr = e->getStringAttribute(ptagTempo_atMode + String(j));
             if (attr != String()) mode.set(j, (bool) attr.getIntValue());
         }
+        
+        
+        
         // to stay compatible with old xmls
         String attr = e->getStringAttribute(ptagTempo_atMode);
         if (attr != String()) mode.set(attr.getIntValue(), true);
@@ -254,6 +277,26 @@ public:
         
         if (s == "")    setSubdivisions(1.0);
         else            setSubdivisions(s.getFloatValue());
+        
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(vtagTempo_atWeights))
+            {
+                Array<float> weights;
+                for (int k = 0; k < sub->getNumAttributes(); k++)
+                {
+                    String attr = sub->getStringAttribute(ptagFloat + String(k));
+                    
+                    if (attr == String()) break;
+                    else
+                    {
+                        f = attr.getFloatValue();
+                        weights.add(f);
+                    }
+                }
+                setAdaptiveTempoWeights(weights);
+            }
+        }
     }
     
     Value emaAlpha;
@@ -276,8 +319,6 @@ private:
     
     // Stuff for basic moving average
     int atDeltaHistorySize;
-    
-    
     int atOnsetHistorySize;
 
     Array<float> metricWeights;

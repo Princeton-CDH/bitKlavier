@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "BKUtilities.h"
 #include "BKViewController.h"
 
 class TempoViewController : public BKViewController
@@ -48,6 +49,8 @@ protected:
     std::unique_ptr<BKSingleSlider> ATSubdivisionsSlider;
     std::unique_ptr<BKRangeSlider> ATMinMaxSlider; //need to have "MinAlwaysLessThanMax" mode
     
+    std::unique_ptr<BKMultiSlider> weightsSlider;
+    
     BKLabel atModeLabel;
     BKTextButton atModeButton;
     
@@ -60,6 +63,8 @@ protected:
     
     ToggleButton exponentialToggle;
     std::unique_ptr<BKSingleSlider> emaAlphaSlider;
+    
+    TextEditor weightsText;
     
     
     void fillModeCB(void);
@@ -109,6 +114,7 @@ private:
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TempoPreparationEditor)
     
@@ -151,10 +157,11 @@ public:
     
 private:
     void bkComboBoxDidChange (ComboBox* box) override;
-    void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    void buttonClicked (Button* b) override;
+    void textEditorReturnKeyPressed(TextEditor& textEditor) override;
     
     void greyOutAllComponents();
     void highlightModedComponents();

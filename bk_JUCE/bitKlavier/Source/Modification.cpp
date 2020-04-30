@@ -43,7 +43,7 @@ void DirectModification::setStateOld(XmlElement* e)
         {
             Array<float> transp;
             
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
@@ -61,7 +61,7 @@ void DirectModification::setStateOld(XmlElement* e)
         else if (sub->hasTagName(vtagDirect_ADSR))
         {
             Array<float> envelope;
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
@@ -140,7 +140,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         {
             Array<float> beats;
             
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
@@ -159,7 +159,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         else  if (sub->hasTagName(vtagSynchronic_accentMults))
         {
             Array<float> accents;
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
@@ -178,7 +178,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         else  if (sub->hasTagName(vtagSynchronic_lengthMults))
         {
             Array<float> lens;
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
@@ -203,7 +203,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 if (asub->hasTagName("t"+String(tcount++)))
                 {
                     Array<float> transp;
-                    for (int k = 0; k < 128; k++)
+                    for (int k = 0; k < sub->getNumAttributes(); k++)
                     {
                         String attr = asub->getStringAttribute(ptagFloat + String(k));
                         
@@ -231,7 +231,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 if (asub->hasTagName("e"+String(tcount++)))
                 {
                     Array<float> envs;
-                    for (int k = 0; k < 128; k++)
+                    for (int k = 0; k < sub->getNumAttributes(); k++)
                     {
                         String attr = asub->getStringAttribute(ptagFloat + String(k));
                         
@@ -278,7 +278,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
         if (sub->hasTagName(vtagNostalgic_transposition))
         {
             Array<float> transp;
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
@@ -298,7 +298,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
         if (sub->hasTagName(vtagNostalgic_reverseADSR))
         {
             Array<float> revADSR;
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
@@ -318,7 +318,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
         if (sub->hasTagName(vtagNostalgic_undertowADSR))
         {
             Array<float> undADSR;
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 
@@ -603,7 +603,7 @@ void TuningModification::setStateOld(XmlElement* e)
         if (sub->hasTagName("twa"))
         {
             Array<bool> twa;
-            for (int i = 0; i < 128; i++)
+            for (int i = 0; i < sub->getNumAttributes(); i++)
             {
                 String attr = sub->getStringAttribute("w"+String(i));
                 if (attr == String())  twa.add(false);
@@ -615,7 +615,7 @@ void TuningModification::setStateOld(XmlElement* e)
         else if (sub->hasTagName("swa"))
         {
             Array<bool> swa;
-            for (int k = 0; k < 12; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute("w"+String(k));
                 if (attr == String())  swa.add(false);
@@ -628,7 +628,7 @@ void TuningModification::setStateOld(XmlElement* e)
         {
             Array<bool> tw;
             Array<float> weights;
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute("w"+String(k));
                 float val = attr.getFloatValue();
@@ -643,7 +643,7 @@ void TuningModification::setStateOld(XmlElement* e)
         {
             Array<bool> sw;
             Array<float> weights;
-            for (int k = 0; k < 12; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute("w"+String(k));
                 float val = attr.getFloatValue();
@@ -657,7 +657,7 @@ void TuningModification::setStateOld(XmlElement* e)
         else if (sub->hasTagName(vtagTuning_customScale))
         {
             Array<float> scale;
-            for (int k = 0; k < 128; k++)
+            for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
                 

@@ -529,7 +529,7 @@ public:
             else if (sub->hasTagName(vtagTuning_customScale))
             {
                 Array<float> scale;
-                for (int k = 0; k < 128; k++)
+                for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
                     String attr = sub->getStringAttribute(ptagFloat + String(k));
                     

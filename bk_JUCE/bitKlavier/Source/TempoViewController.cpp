@@ -100,6 +100,8 @@ BKViewController(p, theGraph, 1)
     
     addAndMakeVisible(exponentialToggle);
     
+    weightsText.setText(floatArrayToString(active->getAdaptiveTempoWeights()));
+    addAndMakeVisible(weightsText);
 
     updateComponentVisibility();
 }
@@ -181,17 +183,23 @@ void TempoViewController::resized()
     tempoSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     tempoSlider->setBounds(tempoSliderSlice);
     
-    area.removeFromTop(atModeButton.getY() - selectCB.getBottom());
+    area.removeFromTop(extraY + gYSpacing);
     Rectangle<int> expToggleSlice = area.removeFromTop(gComponentSingleSliderHeight);
     expToggleSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     expToggleSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     exponentialToggle.setBounds(expToggleSlice);
     
-    area.removeFromTop(atModeButton.getY() - selectCB.getBottom());
+    area.removeFromTop(extraY + gYSpacing);
     Rectangle<int> alphaSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
     alphaSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     alphaSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     emaAlphaSlider->setBounds(alphaSliderSlice);
+    
+    area.removeFromTop(extraY + gYSpacing);
+    Rectangle<int> weightsTextSlice = area.removeFromTop(gComponentSingleSliderHeight);
+    weightsTextSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
+    weightsTextSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+    weightsText.setBounds(weightsTextSlice);
     
     
     subSlider->setBounds(tempoSlider->getX(), tempoSlider->getBottom() + gYSpacing,
@@ -607,6 +615,8 @@ void TempoPreparationEditor::update(void)
         ATMinMaxSlider->setMinValue(prep->getAdaptiveTempoMin(), dontSendNotification);
         ATMinMaxSlider->setMaxValue(prep->getAdaptiveTempoMax(), dontSendNotification);
         
+        weightsText.setText(floatArrayToString(prep->getAdaptiveTempoWeights()));
+        
         updateComponentVisibility();
     }
 }
@@ -663,6 +673,18 @@ void TempoPreparationEditor::buttonClicked (Button* b)
         getATModeMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(atModeButton), ModalCallbackFunction::forComponent(atModeCallback, this));
     }
     
+}
+
+void TempoPreparationEditor::textEditorReturnKeyPressed(TextEditor& textEditor)
+{
+    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    
+    if(textEditor.getName() == weightsText.getName())
+    {
+        prep  ->setAdaptiveTempoWeights(stringToFloatArray(weightsText.getText()));
+        active->setAdaptiveTempoWeights(stringToFloatArray(weightsText.getText()));
+    }
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TempoModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
@@ -1058,5 +1080,14 @@ void TempoModificationEditor::buttonClicked (Button* b)
         getATModeMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(atModeButton), ModalCallbackFunction::forComponent(atModeCallback, this));
     }
     
+}
+
+void TempoModificationEditor::textEditorReturnKeyPressed(TextEditor& textEditor)
+{
+    if(textEditor.getName() == weightsText.getName())
+    {
+        
+        
+    }
 }
 

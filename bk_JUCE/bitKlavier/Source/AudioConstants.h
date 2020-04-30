@@ -106,6 +106,7 @@ const String ptagTempo_atHistory = "at1History";
 const String ptagTempo_atSubdivisions = "at1Subdivisions";
 const String ptagTempo_atMin = "at1Min";
 const String ptagTempo_atMax = "at1Max";
+const String vtagTempo_atWeights = "atWeights";
 
 const String vtagSynchronic_beatMults = "beatMultipliers";
 const String vtagSynchronic_lengthMults = "lengthMultipliers";
