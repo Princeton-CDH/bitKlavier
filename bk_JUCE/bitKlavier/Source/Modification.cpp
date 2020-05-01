@@ -603,7 +603,7 @@ void TuningModification::setStateOld(XmlElement* e)
         if (sub->hasTagName("twa"))
         {
             Array<bool> twa;
-            for (int i = 0; i < sub->getNumAttributes(); i++)
+            for (int i = 0; i < 128; i++)
             {
                 String attr = sub->getStringAttribute("w"+String(i));
                 if (attr == String())  twa.add(false);
@@ -615,7 +615,7 @@ void TuningModification::setStateOld(XmlElement* e)
         else if (sub->hasTagName("swa"))
         {
             Array<bool> swa;
-            for (int k = 0; k < sub->getNumAttributes(); k++)
+            for (int k = 0; k < 12; k++)
             {
                 String attr = sub->getStringAttribute("w"+String(k));
                 if (attr == String())  swa.add(false);
@@ -628,7 +628,7 @@ void TuningModification::setStateOld(XmlElement* e)
         {
             Array<bool> tw;
             Array<float> weights;
-            for (int k = 0; k < sub->getNumAttributes(); k++)
+            for (int k = 0; k < 128; k++)
             {
                 String attr = sub->getStringAttribute("w"+String(k));
                 float val = attr.getFloatValue();
@@ -643,7 +643,7 @@ void TuningModification::setStateOld(XmlElement* e)
         {
             Array<bool> sw;
             Array<float> weights;
-            for (int k = 0; k < sub->getNumAttributes(); k++)
+            for (int k = 0; k < 12; k++)
             {
                 String attr = sub->getStringAttribute("w"+String(k));
                 float val = attr.getFloatValue();

@@ -362,7 +362,7 @@ public:
             if (sub->hasTagName("intervalScale"))
             {
                 Array<float> scale;
-                for (int i = 0; i < sub->getNumAttributes(); i++)
+                for (int i = 0; i < 12; i++)
                 {
                     String attr = sub->getStringAttribute("s" + String(i));
                     
@@ -375,7 +375,7 @@ public:
             else if (sub->hasTagName("tethers"))
             {
                 Array<float> scale;
-                for (int i = 0; i < sub->getNumAttributes(); i++)
+                for (int i = 0; i < 128; i++)
                 {
                     String attr = sub->getStringAttribute("t" + String(i));
                     
@@ -391,7 +391,7 @@ public:
             }
             else if (sub->hasTagName("springs"))
             {
-                for (int i = 0; i < sub->getNumAttributes(); i++)
+                for (int i = 0; i < 12; i++)
                 {
                     String attr = sub->getStringAttribute("s" + String(i));
                     
@@ -407,7 +407,7 @@ public:
             }
             else if (sub->hasTagName("springMode"))
             {
-                for (int i = 0; i < sub->getNumAttributes(); i++)
+                for (int i = 0; i < 12; i++)
                 {
                     String attr = sub->getStringAttribute("s" + String(i));
                     
