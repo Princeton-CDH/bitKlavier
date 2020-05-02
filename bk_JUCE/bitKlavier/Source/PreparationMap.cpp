@@ -402,19 +402,13 @@ void PreparationMap::processBlock(AudioSampleBuffer& buffer, int numSamples, int
     else
     {
         for (auto dproc : dprocessor)
-        {
             dproc->processBlock(numSamples, midiChannel, sampleType);
-        }
         
         for (auto sproc : sprocessor)
-        {
             sproc->processBlock(numSamples, midiChannel, sampleType);
-        }
         
         for (auto nproc : nprocessor)
-        {
             nproc->processBlock(numSamples, midiChannel, sampleType);
-        }
         
         for (auto tproc : tprocessor)
             tproc->processBlock(numSamples);

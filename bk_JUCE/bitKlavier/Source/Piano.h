@@ -91,14 +91,14 @@ public:
     DirectProcessor::Ptr        addDirectProcessor(int thisId);
     TuningProcessor::Ptr        addTuningProcessor(int thisId);
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
-	BlendronicProcessor::Ptr  addBlendronicProcessor(int thisId);
+	BlendronicProcessor::Ptr    addBlendronicProcessor(int thisId);
     
     void clearOldNotes(Piano::Ptr prevPiano)
     {
         SynchronicProcessor::PtrArr sprocessors = getSynchronicProcessors();
         SynchronicProcessor::PtrArr prevSprocessors = prevPiano->getSynchronicProcessors();
         
-        for(int i=0; i<sprocessors.size(); i++)
+        for(int i = 0; i < sprocessors.size(); i++)
         {
             bool inPrevSproc = false;
             for(int j=0; j<prevSprocessors.size(); j++)
@@ -106,7 +106,11 @@ public:
                 if(sprocessors.getUnchecked(i) == prevSprocessors.getUnchecked(j))
                     inPrevSproc = true;
             }
-            if(!inPrevSproc) sprocessors.getUnchecked(i)->clearOldNotes(); //want to keep oldNotes if sProc is in previous piano
+            
+            if(!inPrevSproc) {
+                DBG("clearing old Synchronic notes");
+                sprocessors.getUnchecked(i)->clearOldNotes(); //want to keep oldNotes if sProc is in previous piano
+            }
         }
     }
     
@@ -145,7 +149,22 @@ public:
         }
     }
     
-    int                         numPMaps;
+    void copySynchronicState (Piano::Ptr prevPiano)
+    {
+        SynchronicProcessor::PtrArr prevSynchronicProcessors = prevPiano->getSynchronicProcessors();
+        for(int i = 0; i < prevSynchronicProcessors.size(); i++)
+        {
+            for(int j = 0; j < sprocessor.size(); j++)
+            {
+                if(sprocessor.getUnchecked(j)->getId() == prevSynchronicProcessors.getUnchecked(i)->getId())
+                {
+                    sprocessor.getUnchecked(j)->setClusters(prevSynchronicProcessors.getUnchecked(i)->getClusters()); 
+                }
+            }
+        }
+    }
+    
+    int numPMaps;
     int numResetMappers;
     
     OwnedArray<Modifications> modificationMap;

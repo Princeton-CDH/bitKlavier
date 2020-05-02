@@ -1747,6 +1747,11 @@ public:
         return clusters[which];
     }
     
+    void setClusters(SynchronicCluster::PtrArr nclusters)
+    {
+        clusters = nclusters;
+    }
+    
     bool velocityCheck(int noteNumber);
     bool holdCheck(int noteNumber);
     
