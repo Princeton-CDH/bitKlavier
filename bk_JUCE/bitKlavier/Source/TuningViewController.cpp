@@ -2533,7 +2533,7 @@ void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> v
     
     if(name == absoluteKeyboard.getName())
     {
-        mod->setAbsoluteOffsets(values);
+        mod->setAbsoluteOffsetCents(values);
         mod->setDirty(TuningAbsoluteOffsets);
         
         absoluteKeyboard.setAlpha(1.);
@@ -2543,7 +2543,7 @@ void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> v
     {
         scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
         
-        mod->setCustomScale(values);
+        mod->setCustomScaleCents(values);
         mod->setDirty(TuningCustomScale);
         
         mod->setScaleByName(scaleCB.getItemText(customIndex));

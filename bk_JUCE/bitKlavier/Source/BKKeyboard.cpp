@@ -941,7 +941,7 @@ Array<float> BKKeymapKeyboardComponent::getValues()
         //valsToSend.set(i - rangeStart, keyValues.getUnchecked(index));
         valsToSend.set(i, keyValues.getUnchecked(index));
         //DBG("keyValues GET ROTATED " + String(i - rangeStart) + " " + String(keyValues.getUnchecked(index)));
-        DBG("keyValues GET ROTATED " + String(i) + " " + String(keyValues.getUnchecked(index)));
+        //DBG("keyValues GET ROTATED " + String(i) + " " + String(keyValues.getUnchecked(index)));
     }
 
     return valsToSend;
@@ -952,13 +952,13 @@ void BKKeymapKeyboardComponent::setValues(Array<float> vals)
 {
     for(int i=rangeStart; i<vals.size(); i++)
     {
-        DBG("keyValues SET DIRECT " + String(i) + " " + String(i) + " " + String(vals.getUnchecked(i)));
+        //DBG("keyValues SET DIRECT " + String(i) + " " + String(i) + " " + String(vals.getUnchecked(i)));
         keyValues.set(i, vals.getUnchecked(i));
     }
     
     for (int i = vals.size(); i<=rangeEnd;i++)
     {
-        DBG("keyValues SET DIRECT " + String(i) + " " + String(i) + " 0");
+        //DBG("keyValues SET DIRECT " + String(i) + " " + String(i) + " 0");
         keyValues.set(i, 0);
     }
 }
