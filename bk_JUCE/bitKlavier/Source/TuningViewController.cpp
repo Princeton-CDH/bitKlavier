@@ -1680,7 +1680,7 @@ void TuningPreparationEditor::update(void)
             springSliders[i]->setValue(intervalWeights[i], dontSendNotification);
             
             //update springModeButtons;
-            DBG("TuningPreparationEditor::update::getSpringMode = " + String(i) + " " + String((int)prep->getSpringTuning()->getSpringMode(i)));
+            //DBG("TuningPreparationEditor::update::getSpringMode = " + String(i) + " " + String((int)prep->getSpringTuning()->getSpringMode(i)));
             if(prep->getSpringTuning()->getSpringMode(i))
             {
                 springModeButtons[i]->setToggleState(true, dontSendNotification);
@@ -1719,8 +1719,11 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         //DBG("updating custom tuning vals");
         scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
         
-        prep->setScaleByName(scaleCB.getItemText(customIndex));
-        active->setScaleByName(scaleCB.getItemText(customIndex));
+        //prep->setScaleByName(scaleCB.getItemText(customIndex));
+        //active->setScaleByName(scaleCB.getItemText(customIndex));
+        
+        prep->setScale(CustomTuning);
+        active->setScale(CustomTuning);
         
         //DBG("keyboardSliderChanged values.size() = " + String(values.size()));
         prep->setCustomScaleCents(values);

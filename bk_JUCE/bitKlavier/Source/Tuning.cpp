@@ -29,6 +29,7 @@ TuningProcessor::~TuningProcessor()
 //returns offsets; main callback
 float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
 {
+        
     float lastNoteTuningTemp = lastNoteTuning;
     float lastNoteOffset;
  
@@ -57,9 +58,9 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
         if(tuning->aPrep->getScale() == CustomTuning) currentTuning = tuning->aPrep->getCustomScale();
         else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getScale());
         
-        lastNoteOffset += (currentTuning[(midiNoteNumberTemp - tuning->aPrep->getFundamental()) % currentTuning.size()] +
-                          + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
-                          tuning->aPrep->getFundamentalOffset());
+        lastNoteOffset += (currentTuning[(midiNoteNumberTemp - tuning->aPrep->getFundamental()) % currentTuning.size()]
+                          + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                          + tuning->aPrep->getFundamentalOffset());
         
         if(updateLastInterval)
         {
@@ -75,10 +76,10 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
     if(tuning->aPrep->getScale() == CustomTuning) currentTuning = tuning->aPrep->getCustomScale();
     else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getScale());
     
-    lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->aPrep->getFundamental()) % currentTuning.size()] +
-                      + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber) +
-                      tuning->aPrep->getFundamentalOffset());
-    
+    lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->aPrep->getFundamental()) % currentTuning.size()]
+                      + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                      + tuning->aPrep->getFundamentalOffset());
+
     if(updateLastInterval)
     {
         lastNoteTuning = midiNoteNumber + lastNoteOffset;

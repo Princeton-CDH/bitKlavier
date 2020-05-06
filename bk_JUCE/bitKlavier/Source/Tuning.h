@@ -99,7 +99,10 @@ public:
         if (dirty[TuningA1History]) tAdaptiveHistory = p->getAdaptiveHistory();
         if (dirty[TuningCustomScale])
         {
-            tCustom = p->getCustomScale();
+            
+            // tCustom = p->getCustomScale();
+            Array<float> temp = p->getCustomScale();
+            for (int i = 0; i < tCustom.size(); i++) tCustom.set(i, temp[i]);
             tScale = CustomTuning;
         }
         if (dirty[TuningAbsoluteOffsets]) tAbsolute = p->getAbsoluteOffsets();
@@ -532,7 +535,7 @@ public:
             }
             else if (sub->hasTagName(vtagTuning_customScale))
             {
-                DBG("TuningModification::setState");
+                // DBG("TuningModification::setState");
                 Array<float> scale;
                 for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
@@ -544,7 +547,7 @@ public:
                         
                         f = attr.getFloatValue();
                         scale.add(f);
-                        if (f != 0) DBG("TuningModification::setState Val = " + String(f));
+                        // if (f != 0) DBG("TuningModification::setState Val = " + String(f));
                     }
                 }
                 setCustomScale(scale);
