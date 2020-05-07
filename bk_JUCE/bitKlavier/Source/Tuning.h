@@ -99,10 +99,10 @@ public:
         if (dirty[TuningA1History]) tAdaptiveHistory = p->getAdaptiveHistory();
         if (dirty[TuningCustomScale])
         {
-            
             // tCustom = p->getCustomScale();
             Array<float> temp = p->getCustomScale();
             for (int i = 0; i < tCustom.size(); i++) tCustom.set(i, temp[i]);
+            //tCustom = Array<float>(p->getCustomScale());
             tScale = CustomTuning;
         }
         if (dirty[TuningAbsoluteOffsets]) tAbsolute = p->getAbsoluteOffsets();
