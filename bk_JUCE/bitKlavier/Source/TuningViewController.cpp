@@ -2146,8 +2146,9 @@ void TuningModificationEditor::update(void)
         offsetSlider->setValue(mod->getFundamentalOffset() * 100., dontSendNotification);
         
         absoluteKeyboard.setValues(mod->getAbsoluteOffsetsCents());
-        
         customKeyboard.setValues(mod->getCustomScaleCents());
+        //absoluteKeyboard.setValues(mod->getAbsoluteOffsets());
+        //customKeyboard.setValues(mod->getCustomScale());
         
         scaleIndex = mod->getAdaptiveIntervalScale();
         scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;

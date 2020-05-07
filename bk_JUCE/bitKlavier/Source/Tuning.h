@@ -288,7 +288,7 @@ public:
         tCustomCents.ensureStorageAllocated(12);
         for(int i=0; i<tCustom.size(); i++)
         {
-            tCustomCents.set(i, tCustom.getUnchecked(i));
+            tCustomCents.set(i, tCustom.getUnchecked(i) * 100.);
         }
         return tCustomCents;
     }
