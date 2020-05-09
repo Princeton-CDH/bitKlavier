@@ -469,7 +469,7 @@ Array<int> stringToIntArray(String s)
     return arr;
 }
 
-Array<Array<float>> stringToArrayFloat(String s)
+Array<Array<float>> stringToArrayFloatArray(String s)
 {
     Array<Array<float>> afarr;
 
