@@ -176,7 +176,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
                         for (int k = 0; k < sub->getNumAttributes(); k++)
                         {
                             String attr = sub->getStringAttribute(ptagKeymap_midiInput + String(k));
-                            if (attr == String()) break;
+                            if (attr == String()) continue;
                             inputs.add(attr);
                         }
                         

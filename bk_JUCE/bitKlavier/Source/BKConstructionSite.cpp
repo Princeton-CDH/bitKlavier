@@ -566,9 +566,9 @@ void BKConstructionSite::paste(void)
     // ^ I'm assuming it's so that the connection ids match up
     for (auto item : newItems)
     {
-        int oldId = item->getId();
+        // int oldId = item->getId();
         int newId = pastemap[item->getType()]->getReference(item->getId());
-        DBG(String(cPreparationTypes[item->getType()]) + " old: " + String(oldId) + " new: " + String(newId));
+        //DBG(String(cPreparationTypes[item->getType()]) + " old: " + String(oldId) + " new: " + String(newId));
         item->setId(newId);
     }
 

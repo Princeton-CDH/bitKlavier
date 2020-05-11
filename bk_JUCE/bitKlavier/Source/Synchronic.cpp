@@ -646,7 +646,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             
             //cap size of slimCluster, removing oldest notes
             Array<int> tempCluster;
-            for(int i = 0; i< clusterNotes.size(); i++) tempCluster.set(i, clusterNotes.getUnchecked(i));
+            for(int i = 0; i < clusterNotes.size(); i++) tempCluster.set(i, clusterNotes.getUnchecked(i));
             if(tempCluster.size() > prep->getClusterCap()) tempCluster.resize(prep->getClusterCap());
             
             //why not use clusterMax for this? the intent is different:
@@ -661,7 +661,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             
             //remove duplicates from cluster, so we don't play the same note twice in a single pulse
             slimCluster.clearQuick();
-            for(int i = 0; i< tempCluster.size(); i++)
+            for(int i = 0; i < tempCluster.size(); i++)
             {
                 slimCluster.addIfNotAlreadyThere(tempCluster.getUnchecked(i));
             }

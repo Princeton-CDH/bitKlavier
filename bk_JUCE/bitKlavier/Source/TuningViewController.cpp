@@ -1680,7 +1680,7 @@ void TuningPreparationEditor::update(void)
             springSliders[i]->setValue(intervalWeights[i], dontSendNotification);
             
             //update springModeButtons;
-            DBG("TuningPreparationEditor::update::getSpringMode = " + String(i) + " " + String((int)prep->getSpringTuning()->getSpringMode(i)));
+            //DBG("TuningPreparationEditor::update::getSpringMode = " + String(i) + " " + String((int)prep->getSpringTuning()->getSpringMode(i)));
             if(prep->getSpringTuning()->getSpringMode(i))
             {
                 springModeButtons[i]->setToggleState(true, dontSendNotification);
@@ -1719,8 +1719,11 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         //DBG("updating custom tuning vals");
         scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
         
-        prep->setScaleByName(scaleCB.getItemText(customIndex));
-        active->setScaleByName(scaleCB.getItemText(customIndex));
+        //prep->setScaleByName(scaleCB.getItemText(customIndex));
+        //active->setScaleByName(scaleCB.getItemText(customIndex));
+        
+        prep->setScale(CustomTuning);
+        active->setScale(CustomTuning);
         
         //DBG("keyboardSliderChanged values.size() = " + String(values.size()));
         prep->setCustomScaleCents(values);
@@ -2143,8 +2146,9 @@ void TuningModificationEditor::update(void)
         offsetSlider->setValue(mod->getFundamentalOffset() * 100., dontSendNotification);
         
         absoluteKeyboard.setValues(mod->getAbsoluteOffsetsCents());
-        
         customKeyboard.setValues(mod->getCustomScaleCents());
+        //absoluteKeyboard.setValues(mod->getAbsoluteOffsets());
+        //customKeyboard.setValues(mod->getCustomScale());
         
         scaleIndex = mod->getAdaptiveIntervalScale();
         scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
@@ -2533,7 +2537,7 @@ void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> v
     
     if(name == absoluteKeyboard.getName())
     {
-        mod->setAbsoluteOffsets(values);
+        mod->setAbsoluteOffsetCents(values);
         mod->setDirty(TuningAbsoluteOffsets);
         
         absoluteKeyboard.setAlpha(1.);
@@ -2543,7 +2547,7 @@ void TuningModificationEditor::keyboardSliderChanged(String name, Array<float> v
     {
         scaleCB.setSelectedItemIndex(customIndex, dontSendNotification);
         
-        mod->setCustomScale(values);
+        mod->setCustomScaleCents(values);
         mod->setDirty(TuningCustomScale);
         
         mod->setScaleByName(scaleCB.getItemText(customIndex));

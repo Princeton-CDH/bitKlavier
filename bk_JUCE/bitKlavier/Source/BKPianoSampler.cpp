@@ -387,7 +387,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                          adsrSustain,
                          adsrRelease / getSampleRate());
         
-        DBG("startNote, direction = " + String((int)playDirection));
+        // DBG("startNote, direction = " + String((int)playDirection));
         adsr.keyOn();
         
         if (sound->isSoundfont)

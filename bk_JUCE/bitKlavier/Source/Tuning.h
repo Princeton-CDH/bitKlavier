@@ -97,7 +97,14 @@ public:
         if (dirty[TuningA1AnchorFundamental]) tAdaptiveAnchorFundamental = p->getAdaptiveAnchorFundamental();
         if (dirty[TuningA1ClusterThresh]) tAdaptiveClusterThresh = p->getAdaptiveClusterThresh();
         if (dirty[TuningA1History]) tAdaptiveHistory = p->getAdaptiveHistory();
-        if (dirty[TuningCustomScale]) tCustom = p->getCustomScale();
+        if (dirty[TuningCustomScale])
+        {
+            // tCustom = p->getCustomScale();
+            Array<float> temp = p->getCustomScale();
+            for (int i = 0; i < tCustom.size(); i++) tCustom.set(i, temp[i]);
+            //tCustom = Array<float>(p->getCustomScale());
+            tScale = CustomTuning;
+        }
         if (dirty[TuningAbsoluteOffsets]) tAbsolute = p->getAbsoluteOffsets();
         if (dirty[TuningNToneSemitoneWidth]) nToneSemitoneWidth = p->getNToneSemitoneWidth();
         if (dirty[TuningNToneRootCB]) nToneRoot = p->getNToneRoot();
@@ -281,7 +288,7 @@ public:
         tCustomCents.ensureStorageAllocated(12);
         for(int i=0; i<tCustom.size(); i++)
         {
-            tCustomCents.set(i, tCustom.getUnchecked(i));
+            tCustomCents.set(i, tCustom.getUnchecked(i) * 100.);
         }
         return tCustomCents;
     }
@@ -528,6 +535,7 @@ public:
             }
             else if (sub->hasTagName(vtagTuning_customScale))
             {
+                // DBG("TuningModification::setState");
                 Array<float> scale;
                 for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
@@ -536,8 +544,10 @@ public:
                     if (attr == String()) break;
                     else
                     {
+                        
                         f = attr.getFloatValue();
                         scale.add(f);
+                        // if (f != 0) DBG("TuningModification::setState Val = " + String(f));
                     }
                 }
                 setCustomScale(scale);

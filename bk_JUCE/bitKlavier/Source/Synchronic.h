@@ -1133,7 +1133,7 @@ public:
                     if (asub->hasTagName("t" + String(tcount++)))
                     {
                         Array<float> transp;
-                        for (int k = 0; k < sub->getNumAttributes(); k++)
+                        for (int k = 0; k < asub->getNumAttributes(); k++)
                         {
                             String attr = asub->getStringAttribute(ptagFloat + String(k));
                             
@@ -1180,7 +1180,7 @@ public:
                     if (asub->hasTagName("e"+String(tcount++)))
                     {
                         Array<float> singleADSR;
-                        for (int k = 0; k < sub->getNumAttributes(); k++)
+                        for (int k = 0; k < asub->getNumAttributes(); k++)
                         {
                             String attr = asub->getStringAttribute(ptagFloat + String(k));
                             
@@ -1745,6 +1745,11 @@ public:
     inline SynchronicCluster* getCluster(int which)
     {
         return clusters[which];
+    }
+    
+    void setClusters(SynchronicCluster::PtrArr nclusters)
+    {
+        clusters = nclusters;
     }
     
     bool velocityCheck(int noteNumber);

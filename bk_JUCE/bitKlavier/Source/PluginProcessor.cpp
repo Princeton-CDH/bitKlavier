@@ -563,11 +563,11 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     performResets(noteNumber, source);
     performModifications(noteNumber, source);
     
-    //tempo
+    // clears key from array of depressed notes in prevPiano so they don't get cutoff by sustain pedal release
     for (auto piano : prevPianos)
     {
         if (piano != currentPiano)
-            piano->prepMap->clearKey(noteNumber); //clears key from array of depressed notes in prevPiano so they don't get cutoff by sustain pedal release
+            piano->prepMap->clearKey(noteNumber);
     }
     
     // Send key on to each pmap in current piano
@@ -592,9 +592,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, String source)
 {
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
-    
-    
-        
+     
     bool activeSource = false;
     
     if (pmap != nullptr)
@@ -766,13 +764,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         playHead->getCurrentPosition (currentPositionInfo);
         hostTempo = currentPositionInfo.bpm;
 
-        //hostTempo = 113; //confirmed that the following is working...
+        // hostTempo
         Tempo::PtrArr allTempoPreps = gallery->getAllTempo();
         for (auto p : allTempoPreps)
         {
             p->aPrep->setHostTempo(hostTempo);
         }
-        DBG("DAW bpm = " + String(currentPositionInfo.bpm));
+        // DBG("DAW bpm = " + String(currentPositionInfo.bpm));
     }
     
     int numSamples = buffer.getNumSamples();
@@ -786,7 +784,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     {
         currentPiano->prepMap->processBlock(buffer, numSamples, channel, currentSampleType, false);
         
-        // OLAGON: Process all active nostalgic preps in previous piano
+        // Process all active nostalgic preps in previous piano
         if(prevPiano != currentPiano)
             prevPiano->prepMap->processBlock(buffer, numSamples, channel, currentSampleType, true); // true for onlyNostalgic
     }
@@ -867,22 +865,22 @@ double BKAudioProcessor::getLevelR()
 // Piano
 void  BKAudioProcessor::setCurrentPiano(int which)
 {
-    updateState->setCurrentDisplay(DisplayNil);
     
-    //gallery->resetPreparations(); //modded preps should remain modded across piano changes; user can Reset if desired
+    updateState->setCurrentDisplay(DisplayNil);
 
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);
 
     prevPiano = currentPiano;
 
     currentPiano = gallery->getPiano(which);
+
     if(currentPiano != nullptr)
     {
         currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
         currentPiano->configure();
+        currentPiano->copySynchronicState(prevPiano);
         currentPiano->copyAdaptiveTuningState(prevPiano);
         currentPiano->copyAdaptiveTempoState(prevPiano);
-        //currentPiano->configure();
         
         updateState->pianoDidChangeForGraph = true;
         updateState->synchronicPreparationDidChange = true;
