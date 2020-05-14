@@ -48,8 +48,7 @@ protected:
     std::unique_ptr<BKSingleSlider> ATHistorySlider;
     std::unique_ptr<BKSingleSlider> ATSubdivisionsSlider;
     std::unique_ptr<BKRangeSlider> ATMinMaxSlider; //need to have "MinAlwaysLessThanMax" mode
-    
-    std::unique_ptr<BKMultiSlider> weightsSlider;
+
     
     BKLabel atModeLabel;
     BKTextButton atModeButton;
@@ -62,6 +61,7 @@ protected:
     BKLabel attachKeymap;
     
     ToggleButton exponentialToggle;
+    ToggleButton weightsToggle;
     std::unique_ptr<BKSingleSlider> emaAlphaSlider;
     
     TextEditor weightsText;

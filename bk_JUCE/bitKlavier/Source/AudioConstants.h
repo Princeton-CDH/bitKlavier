@@ -995,6 +995,9 @@ typedef enum TempoParameterType
     ATMax,
     ATMode,
     TempoSubdivisions,
+    ATAlpha,
+    ATExponential,
+    ATWeighted,
     TempoParameterTypeNil
     
 } TempoParameterType;

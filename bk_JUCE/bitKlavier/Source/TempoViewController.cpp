@@ -87,20 +87,27 @@ BKViewController(p, theGraph, 1)
     tempoSlider->addWantsBigOneListener(this);
     subSlider->addWantsBigOneListener(this);
 #endif
-    
-    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
-    
+
     emaAlphaSlider = std::make_unique<BKSingleSlider>("Alpha", 0, 1, 0.5, 0.01);
-    emaAlphaSlider->getValueObject().referTo(active->emaAlpha);
     addAndMakeVisible(*emaAlphaSlider);
     
     exponentialToggle.setButtonText("Exponential MA");
     exponentialToggle.setClickingTogglesState(true);
-    exponentialToggle.getToggleStateValue().referTo(active->useExponential);
+    exponentialToggle.addListener(this);
     
     addAndMakeVisible(exponentialToggle);
     
+    weightsToggle.setButtonText("Use weights");
+    weightsToggle.setClickingTogglesState(true);
+    weightsToggle.addListener(this);
+    
+    addAndMakeVisible(weightsToggle);
+    
+    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    
     weightsText.setText(floatArrayToString(active->getAdaptiveTempoWeights()));
+    weightsText.setMultiLine(true);
+    weightsText.addListener(this);
     addAndMakeVisible(weightsText);
 
     updateComponentVisibility();
@@ -183,20 +190,26 @@ void TempoViewController::resized()
     tempoSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     tempoSlider->setBounds(tempoSliderSlice);
     
-    area.removeFromTop(extraY + gYSpacing);
+    area.removeFromTop(extraY * 0.5 + gYSpacing);
     Rectangle<int> expToggleSlice = area.removeFromTop(gComponentSingleSliderHeight);
     expToggleSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     expToggleSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     exponentialToggle.setBounds(expToggleSlice);
     
-    area.removeFromTop(extraY + gYSpacing);
+    area.removeFromTop(extraY * 0.5 + gYSpacing);
     Rectangle<int> alphaSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
     alphaSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     alphaSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     emaAlphaSlider->setBounds(alphaSliderSlice);
     
-    area.removeFromTop(extraY + gYSpacing);
-    Rectangle<int> weightsTextSlice = area.removeFromTop(gComponentSingleSliderHeight);
+    area.removeFromTop(extraY * 0.5 + gYSpacing);
+    Rectangle<int> weightsToggleSlice = area.removeFromTop(gComponentSingleSliderHeight);
+    weightsToggleSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
+    weightsToggleSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+    weightsToggle.setBounds(weightsToggleSlice);
+    
+    area.removeFromTop(extraY * 0.5 + gYSpacing);
+    Rectangle<int> weightsTextSlice = area.removeFromTop(gComponentSingleSliderHeight*3);
     weightsTextSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     weightsTextSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
     weightsText.setBounds(weightsTextSlice);
@@ -255,6 +268,7 @@ void TempoViewController::updateComponentVisibility()
             attachKeymap.setVisible(false);
             
             exponentialToggle.setVisible(true);
+            weightsToggle.setVisible(true);
             emaAlphaSlider->setVisible(true);
         }
         else
@@ -282,6 +296,7 @@ void TempoViewController::updateComponentVisibility()
         subSlider->setVisible(true);
         
         exponentialToggle.setVisible(false);
+        weightsToggle.setVisible(false);
         emaAlphaSlider->setVisible(false);
     }
     
@@ -317,6 +332,8 @@ TempoViewController(p, theGraph)
     ATHistorySlider->addMyListener(this);
     ATSubdivisionsSlider->addMyListener(this);
     ATMinMaxSlider->addMyListener(this);
+    
+    emaAlphaSlider->addMyListener(this);
     
     startTimer(50);
     
@@ -617,6 +634,10 @@ void TempoPreparationEditor::update(void)
         
         weightsText.setText(floatArrayToString(prep->getAdaptiveTempoWeights()));
         
+        emaAlphaSlider->setValue(prep->getAdaptiveTempoAlpha(), dontSendNotification);
+        exponentialToggle.setToggleState(prep->getUseExponential(), dontSendNotification);
+        weightsToggle.setToggleState(prep->getUseWeights(), dontSendNotification);
+        
         updateComponentVisibility();
     }
 }
@@ -647,11 +668,19 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, 
         prep->setAdaptiveTempoSubdivisions(val);
         active->setAdaptiveTempoSubdivisions(val);
     }
+    else if (slider == emaAlphaSlider.get())
+    {
+        prep->setAdaptiveTempoAlpha(val);
+        active->setAdaptiveTempoAlpha(val);
+    }
     
 }
 
 void TempoPreparationEditor::buttonClicked (Button* b)
 {
+    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    
     if (b == &A1reset)
     {
         DBG("resetting A1 tempo multiplier");
@@ -671,6 +700,16 @@ void TempoPreparationEditor::buttonClicked (Button* b)
     else if (b == &atModeButton)
     {
         getATModeMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(atModeButton), ModalCallbackFunction::forComponent(atModeCallback, this));
+    }
+    else if (b == &exponentialToggle)
+    {
+        prep->setUseExponential(exponentialToggle.getToggleState());
+        active->setUseExponential(exponentialToggle.getToggleState());
+    }
+    else if (b == &weightsToggle)
+    {
+        prep->setUseWeights(weightsToggle.getToggleState());
+        active->setUseWeights(weightsToggle.getToggleState());
     }
     
 }
@@ -704,6 +743,8 @@ TempoViewController(p, theGraph)
     ATHistorySlider->addMyListener(this);
     ATSubdivisionsSlider->addMyListener(this);
     ATMinMaxSlider->addMyListener(this);
+    
+    emaAlphaSlider->addMyListener(this);
     
     atModeButton.addListener(this);
 
@@ -794,6 +835,12 @@ void TempoModificationEditor::update(void)
         ATMinMaxSlider->setMinValue(mod->getAdaptiveTempoMin(), dontSendNotification);
         
         ATMinMaxSlider->setMaxValue(mod->getAdaptiveTempoMax(), dontSendNotification);
+        
+        weightsText.setText(floatArrayToString(mod->getAdaptiveTempoWeights()));
+        
+        emaAlphaSlider->setValue(mod->getAdaptiveTempoAlpha(), dontSendNotification);
+        exponentialToggle.setToggleState(mod->getUseExponential(), dontSendNotification);
+        weightsToggle.setToggleState(mod->getUseWeights(), dontSendNotification);
         
         updateComponentVisibility();
     }
@@ -1050,6 +1097,12 @@ void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
         mod->setDirty(ATSubdivisions);
         ATSubdivisionsSlider->setBright();
     }
+    else if (slider == emaAlphaSlider.get())
+    {
+        mod->setAdaptiveTempoAlpha(val);
+        mod->setDirty(ATAlpha);
+        emaAlphaSlider->setBright();
+    }
     
     updateModification();
     
@@ -1062,6 +1115,8 @@ void TempoModificationEditor::updateModification(void)
 
 void TempoModificationEditor::buttonClicked (Button* b)
 {
+    TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
+    
     if (b == &A1reset)
     {
         
@@ -1078,6 +1133,18 @@ void TempoModificationEditor::buttonClicked (Button* b)
     else if (b == &atModeButton)
     {
         getATModeMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(atModeButton), ModalCallbackFunction::forComponent(atModeCallback, this));
+    }
+    else if (b == &exponentialToggle)
+    {
+        mod->setUseExponential(exponentialToggle.getToggleState());
+        mod->setDirty(ATExponential);
+//        exponentialToggle.setBright();
+    }
+    else if (b == &weightsToggle)
+    {
+        mod->setUseWeights(weightsToggle.getToggleState());
+        mod->setDirty(ATWeighted);
+//        weightsToggle.setBright();
     }
     
 }

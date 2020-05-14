@@ -78,41 +78,65 @@ void TempoProcessor::atCalculatePeriodMultiplier()
         //DBG("atDelta = " + String(atDelta));
         //DBG("sampleRate = " + String(sampleRate));
         
-        //constrain be min and max times between notes
-        if(atDelta > tempo->aPrep->getAdaptiveTempoMin() && atDelta < tempo->aPrep->getAdaptiveTempoMax()) {
-            
+        //constrain between min and max times between notes
+        
+        float beatMS = tempo->aPrep->getBeatThreshMS();
+        float pulseMS = beatMS / tempo->aPrep->getAdaptiveTempoSubdivisions();
+        float quant = roundf(atDelta / pulseMS) * pulseMS;
+//            float error = atDelta - quant;
+        int val = fmax(beatMS / quant, quant / beatMS);
+        if (quant > tempo->aPrep->getAdaptiveTempoMin() && quant < tempo->aPrep->getAdaptiveTempoMax()
+            && val < tempo->aPrep->getAdaptiveTempoWeights().size())
+        {
             atDelta /= tempo->aPrep->getBeatThreshMS() * tempo->aPrep->getAdaptiveTempoSubdivisions();
-            int round = roundf(atDelta);
-            if (round > 0)
-            {
-                atDelta = atDelta / round;
-                //insert delta at beginning of history
-                atDeltaHistory.insert(0, atDelta);
-                
-                //eliminate oldest time difference
-                atDeltaHistory.resize(tempo->aPrep->getAdaptiveTempoHistorySize());
-                
-                //calculate moving average and then tempo period multiplier
-                float totalDeltas = 0;
-                for(int i = 0; i < atDeltaHistory.size(); i++) totalDeltas += atDeltaHistory.getUnchecked(i);
-                float movingAverage = totalDeltas / tempo->aPrep->getAdaptiveTempoHistorySize();
+            atDelta = atDelta / roundf(atDelta);
+            //insert delta at beginning of history
+            atDeltaHistory.insert(0, atDelta);
+            //eliminate oldest time difference
+            atDeltaHistory.resize(tempo->aPrep->getAdaptiveTempoHistorySize());
             
-                adaptiveTempoPeriodMultiplier = movingAverage;
-                
-                float alpha = (float)tempo->aPrep->emaAlpha.getValue();
-                emaSum = atDelta + (1 - alpha) * emaSum;
-                emaCount = 1 + (1 - alpha) * emaCount;
+            float weight = tempo->aPrep->getAdaptiveTempoWeights().getUnchecked(val);
+            atWeightHistory.insert(0, weight);
+            atWeightHistory.resize(tempo->aPrep->getAdaptiveTempoHistorySize());
+            
+            //calculate moving average and then tempo period multiplier
+            
+            // MA
+            float totalDeltas = 0;
+            float totalWeights = 0;
+            for(int i = 0; i < atDeltaHistory.size(); i++)
+            {
+                float delta = atDeltaHistory.getUnchecked(i);
+                if (tempo->aPrep->getUseWeights()) delta *= atWeightHistory.getUnchecked(i);
+                totalDeltas += delta;
+                totalWeights += atWeightHistory.getUnchecked(i);
+            }
+            float movingAverage;
+            if (tempo->aPrep->getUseWeights()) movingAverage = totalDeltas / totalWeights;
+            else movingAverage = totalDeltas / tempo->aPrep->getAdaptiveTempoHistorySize();
+        
+            adaptiveTempoPeriodMultiplier = movingAverage;
+            
+            // EMA
+            float alpha = tempo->aPrep->getAdaptiveTempoAlpha();
+            if (!tempo->aPrep->getUseWeights())
+            {
+                weight = 1.0f;
+            }
+            if (weight > 0)
+            {
+                emaSum = weight * atDelta + (1 - alpha) * emaSum;
+                emaCount = weight + (1 - alpha) * emaCount;
                 exponentialMovingAverage = emaSum / emaCount;
                 
-                if ((bool)tempo->aPrep->useExponential.getValue())
+                if (tempo->aPrep->getUseExponential())
                 {
                     adaptiveTempoPeriodMultiplier = exponentialMovingAverage;
                 }
             }
-            
-            
-            DBG("adaptiveTempoPeriodMultiplier = " + String(adaptiveTempoPeriodMultiplier));
         }
+        
+        DBG("adaptiveTempoPeriodMultiplier = " + String(adaptiveTempoPeriodMultiplier));
     }
 }
 

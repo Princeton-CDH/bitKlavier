@@ -56,23 +56,28 @@ public:
     atMinPulse(100),
     atMaxPulse(2000),
     atSubdivisions(1.0f),
-    atDeltaHistorySize(4)
+    atDeltaHistorySize(4),
+    metricWeights({0.0, 1.0, 0.8, 0.8, 0.6, 0.0, 0.6, 0.0, 0.4,
+        0.6, 0.0, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        0.0, 0.0, 0.4}),
+    emaAlpha(0.5f),
+    useExponential(false),
+    useWeights(false)
     {
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
-        useExponential.setValue(false);
-        useWeights.setValue(false);
-        emaAlpha.setValue(0.5);
         atMode.ensureStorageAllocated(AdaptiveTempoModeNil);
         atMode.set(TimeBetweenOnsets, true);
         atMode.set(NoteLength, false);
         atMode.set(TimeBetweenReleases, false);
         
-        metricWeights.ensureStorageAllocated(28);
-        for (int i = 0; i <= 27; i++)
-        {
-            metricWeights.add(0);
-        }
+//        metricWeights.ensureStorageAllocated(28);
+//        for (int i = 0; i <= 27; i++)
+//        {
+//            metricWeights.add(0);
+//        }
+        
     }
     
     inline void copy(TempoPreparation::Ptr s)
@@ -87,6 +92,7 @@ public:
         atMode = s->getAdaptiveTempoMode();
         
         metricWeights = s->getAdaptiveTempoWeights();
+        emaAlpha = s->getAdaptiveTempoAlpha();
         
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
@@ -140,23 +146,26 @@ public:
 		atMode.set((r[idx++] * AdaptiveTempoModeNil), true);
 	}
     
-    inline const TempoType getTempoSystem() const noexcept      {return sWhichTempoSystem; }
-    inline const float getTempo() const noexcept                {return sTempo; }
-    inline const float getBeatThresh() const noexcept           {return sBeatThreshSec; }
-    inline const float getBeatThreshMS() const noexcept         {return sBeatThreshMS; }
+    inline const TempoType getTempoSystem() const noexcept      { return sWhichTempoSystem; }
+    inline const float getTempo() const noexcept                { return sTempo; }
+    inline const float getBeatThresh() const noexcept           { return sBeatThreshSec; }
+    inline const float getBeatThreshMS() const noexcept         { return sBeatThreshMS; }
   
     //Adaptive Tempo 1
-    inline Array<bool> getAdaptiveTempoMode(void)               {return atMode;   }
-    inline int getAdaptiveTempoHistorySize(void)                {return atDeltaHistorySize;}
-    inline float getAdaptiveTempoSubdivisions(void)            {return atSubdivisions;}
-    inline float getAdaptiveTempoMin(void)                     {return atMinPulse;}
-    inline float getAdaptiveTempoMax(void)                     {return atMaxPulse;}
+    inline Array<bool> getAdaptiveTempoMode(void)               { return atMode;   }
+    inline int getAdaptiveTempoHistorySize(void)                { return atDeltaHistorySize; }
+    inline float getAdaptiveTempoSubdivisions(void)             { return atSubdivisions; }
+    inline float getAdaptiveTempoMin(void)                      { return atMinPulse; }
+    inline float getAdaptiveTempoMax(void)                      { return atMaxPulse; }
     
-    inline Array<float> getAdaptiveTempoWeights(void)           {return metricWeights;}
+    inline Array<float> getAdaptiveTempoWeights(void)           { return metricWeights;}
+    inline float getAdaptiveTempoAlpha(void)                    { return emaAlpha; }
+    inline bool getUseExponential(void)                         { return useExponential; }
+    inline bool getUseWeights(void)                             { return useWeights; }
 
-    inline const String getName() const noexcept                {return name;}
-    inline void setName(String n)                               {name = n;}
-    inline void setTempoSystem(TempoType ts)                    {sWhichTempoSystem = ts;}
+    inline const String getName() const noexcept                { return name;}
+    inline void setName(String n)                               { name = n; }
+    inline void setTempoSystem(TempoType ts)                    { sWhichTempoSystem = ts; }
     inline void setTempo(float tempo)
     {
         sTempo = tempo;
@@ -192,13 +201,16 @@ public:
     }
     
     //Adaptive Tempo 1
-    inline void setAdaptiveTempoMode(Array<bool> mode)                 {atMode = mode;}
-    inline void setAdaptiveTempoHistory(int hist)                      {atDeltaHistorySize = hist;}
-    inline void setAdaptiveTempoSubdivisions(float sub)                {atSubdivisions = sub;}
-    inline void setAdaptiveTempoMin(float min)                         {atMinPulse = min;}
-    inline void setAdaptiveTempoMax(float max)                         {atMaxPulse = max;}
+    inline void setAdaptiveTempoMode(Array<bool> mode)                 { atMode = mode; }
+    inline void setAdaptiveTempoHistory(int hist)                      { atDeltaHistorySize = hist; }
+    inline void setAdaptiveTempoSubdivisions(float sub)                { atSubdivisions = sub; }
+    inline void setAdaptiveTempoMin(float min)                         { atMinPulse = min; }
+    inline void setAdaptiveTempoMax(float max)                         { atMaxPulse = max; }
     
-    inline void setAdaptiveTempoWeights(Array<float> weights)          {metricWeights = weights;}
+    inline void setAdaptiveTempoWeights(Array<float> weights)          { metricWeights = weights; }
+    inline void setAdaptiveTempoAlpha(float alpha)                     { emaAlpha = alpha; }
+    inline void setUseExponential(bool use)                            { useExponential = use; }
+    inline void setUseWeights(bool use)                                { useWeights = use; }
     
     void print(void)
     {
@@ -299,9 +311,7 @@ public:
         }
     }
     
-    Value emaAlpha;
-    Value useExponential;
-    Value useWeights;
+
     
 private:
     String name;
@@ -322,6 +332,10 @@ private:
     int atOnsetHistorySize;
 
     Array<float> metricWeights;
+    
+    float emaAlpha;
+    bool useExponential;
+    bool useWeights;
     
     JUCE_LEAK_DETECTOR(TempoPreparation);
 };
@@ -552,6 +566,7 @@ private:
     uint64 atTimer, atLastTime; //in samples
     float atDelta;                //in ms
     Array<float> atDeltaHistory;  //in ms
+    Array<float> atWeightHistory;
     float emaSum;
     float emaCount;
     float exponentialMovingAverage;
