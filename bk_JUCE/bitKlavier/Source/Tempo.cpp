@@ -83,13 +83,12 @@ void TempoProcessor::atCalculatePeriodMultiplier()
         float beatMS = tempo->aPrep->getBeatThreshMS();
         float pulseMS = beatMS / tempo->aPrep->getAdaptiveTempoSubdivisions();
         float quant = roundf(atDelta / pulseMS) * pulseMS;
-//            float error = atDelta - quant;
+//        float error = atDelta - quant;
         int val = fmax(beatMS / quant, quant / beatMS);
         if (quant > tempo->aPrep->getAdaptiveTempoMin() && quant < tempo->aPrep->getAdaptiveTempoMax()
             && val < tempo->aPrep->getAdaptiveTempoWeights().size())
         {
-            atDelta /= tempo->aPrep->getBeatThreshMS() * tempo->aPrep->getAdaptiveTempoSubdivisions();
-            atDelta = atDelta / roundf(atDelta);
+            atDelta /= quant;
             //insert delta at beginning of history
             atDeltaHistory.insert(0, atDelta);
             //eliminate oldest time difference
