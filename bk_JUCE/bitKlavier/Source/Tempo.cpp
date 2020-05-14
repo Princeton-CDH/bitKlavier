@@ -112,7 +112,11 @@ void TempoProcessor::atCalculatePeriodMultiplier()
                 totalWeights += atWeightHistory.getUnchecked(i);
             }
             float movingAverage;
-            if (tempo->aPrep->getUseWeights()) movingAverage = totalDeltas / totalWeights;
+            if (tempo->aPrep->getUseWeights())
+            {
+                if (totalWeights > 0) movingAverage = totalDeltas / totalWeights;
+                else movingAverage = adaptiveTempoPeriodMultiplier;
+            }
             else movingAverage = totalDeltas / tempo->aPrep->getAdaptiveTempoHistorySize();
         
             adaptiveTempoPeriodMultiplier = movingAverage;
