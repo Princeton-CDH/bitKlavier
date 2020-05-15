@@ -56,6 +56,8 @@ public:
     atMinPulse(100),
     atMaxPulse(2000),
     atSubdivisions(1.0f),
+    iterationDepth(4),
+    maxIterationDepth(32),
     atDeltaHistorySize(4),
     metricWeights({0.0, 1.0, 0.8, 0.8, 0.6, 0.0, 0.6, 0.0, 0.4,
         0.6, 0.0, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0,
@@ -96,6 +98,9 @@ public:
         
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
+        
+        iterationDepth = s->iterationDepth;
+        maxIterationDepth = s->maxIterationDepth;
     }
     
     inline void performModification(TempoPreparation::Ptr s, Array<bool> dirty)
@@ -312,7 +317,8 @@ public:
     }
     
 
-    
+    int iterationDepth;
+    int maxIterationDepth;
 private:
     String name;
     TempoType sWhichTempoSystem;
@@ -329,7 +335,7 @@ private:
     
     // Stuff for basic moving average
     int atDeltaHistorySize;
-    int atOnsetHistorySize;
+    
 
     Array<float> metricWeights;
     
@@ -526,13 +532,11 @@ public:
     }
     
     uint64 getAtTimer() { return atTimer; }
-    uint64 getAtLastTime() { return atLastTime; }
     int getAtDelta();
     Array<float> getAtDeltaHistory() { return atDeltaHistory; }
     float getAdaptiveTempoPeriodMultiplier() { return adaptiveTempoPeriodMultiplier; }
     
     void setAtTimer(uint64 newval) { atTimer = newval; }
-    void setAtLastTime(uint64 newval) { atLastTime = newval; }
     void setAtDeltaHistory(Array<float> newvals)
     {
         atDeltaHistory.clearQuick();
@@ -563,17 +567,20 @@ private:
     Keymap::PtrArr keymaps;
     
     //adaptive tempo stuff
-    uint64 atTimer, atLastTime; //in samples
+    uint64 atTimer; //in samples
     float atDelta;                //in ms
     Array<float> atDeltaHistory;  //in ms
     Array<float> atWeightHistory;
     float emaSum;
     float emaCount;
     float exponentialMovingAverage;
-    Array<float> atOnsetHistory;
+    Array<uint64> atOnsetHistory;
+    Array<uint64> atReleaseHistory;
     
-    void atNewNote();
-    void atNewNoteOff();
+    Array<uint64> lastNoteOnsets;
+    
+    void atNewNote(int noteNumber);
+    void atNewNoteOff(int noteNumber);
     void atCalculatePeriodMultiplier();
     float adaptiveTempoPeriodMultiplier;
     
