@@ -87,6 +87,9 @@ BKViewController(p, theGraph, 1)
     tempoSlider->addWantsBigOneListener(this);
     subSlider->addWantsBigOneListener(this);
 #endif
+    
+    iterationsSlider = std::make_unique<BKSingleSlider>("Iterations", 1, 32, 4, 1);
+    addAndMakeVisible(*iterationsSlider);
 
     emaAlphaSlider = std::make_unique<BKSingleSlider>("Alpha", 0, 1, 0.5, 0.01);
     addAndMakeVisible(*emaAlphaSlider);
@@ -191,6 +194,12 @@ void TempoViewController::resized()
     tempoSlider->setBounds(tempoSliderSlice);
     
     area.removeFromTop(extraY * 0.5 + gYSpacing);
+    Rectangle<int> iterationsSliderSlice = area.removeFromTop(gComponentSingleSliderHeight);
+    iterationsSliderSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
+    iterationsSliderSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
+    iterationsSlider->setBounds(iterationsSliderSlice);
+    
+    area.removeFromTop(extraY * 0.5 + gYSpacing);
     Rectangle<int> expToggleSlice = area.removeFromTop(gComponentSingleSliderHeight);
     expToggleSlice.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX - gComponentSingleSliderXOffset);
     expToggleSlice.removeFromRight(gXSpacing - gComponentSingleSliderXOffset);
@@ -270,6 +279,8 @@ void TempoViewController::updateComponentVisibility()
             exponentialToggle.setVisible(true);
             weightsToggle.setVisible(true);
             emaAlphaSlider->setVisible(true);
+            
+            iterationsSlider->setVisible(true);
         }
         else
         {
@@ -298,6 +309,8 @@ void TempoViewController::updateComponentVisibility()
         exponentialToggle.setVisible(false);
         weightsToggle.setVisible(false);
         emaAlphaSlider->setVisible(false);
+        
+        iterationsSlider->setVisible(false);
     }
     
 }
@@ -334,6 +347,8 @@ TempoViewController(p, theGraph)
     ATMinMaxSlider->addMyListener(this);
     
     emaAlphaSlider->addMyListener(this);
+    
+    iterationsSlider->addMyListener(this);
     
     startTimer(50);
     
@@ -634,6 +649,7 @@ void TempoPreparationEditor::update(void)
         
         weightsText.setText(floatArrayToString(prep->getAdaptiveTempoWeights()));
         
+        iterationsSlider->setValue(prep->getAdaptiveTempoIterations(), dontSendNotification);
         emaAlphaSlider->setValue(prep->getAdaptiveTempoAlpha(), dontSendNotification);
         exponentialToggle.setToggleState(prep->getUseExponential(), dontSendNotification);
         weightsToggle.setToggleState(prep->getUseWeights(), dontSendNotification);
@@ -672,6 +688,11 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, 
     {
         prep->setAdaptiveTempoAlpha(val);
         active->setAdaptiveTempoAlpha(val);
+    }
+    else if (slider == iterationsSlider.get())
+    {
+        prep->setAdaptiveTempoIterations(val);
+        active->setAdaptiveTempoIterations(val);
     }
     
 }
@@ -745,6 +766,8 @@ TempoViewController(p, theGraph)
     ATMinMaxSlider->addMyListener(this);
     
     emaAlphaSlider->addMyListener(this);
+    
+    iterationsSlider->addMyListener(this);
     
     atModeButton.addListener(this);
 
@@ -838,6 +861,7 @@ void TempoModificationEditor::update(void)
         
         weightsText.setText(floatArrayToString(mod->getAdaptiveTempoWeights()));
         
+        iterationsSlider->setValue(mod->getAdaptiveTempoIterations(), dontSendNotification);
         emaAlphaSlider->setValue(mod->getAdaptiveTempoAlpha(), dontSendNotification);
         exponentialToggle.setToggleState(mod->getUseExponential(), dontSendNotification);
         weightsToggle.setToggleState(mod->getUseWeights(), dontSendNotification);
@@ -1102,6 +1126,12 @@ void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
         mod->setAdaptiveTempoAlpha(val);
         mod->setDirty(ATAlpha);
         emaAlphaSlider->setBright();
+    }
+    else if (slider == iterationsSlider.get())
+    {
+        mod->setAdaptiveTempoIterations(val);
+        mod->setDirty(ATIterations);
+        iterationsSlider->setBright();
     }
     
     updateModification();

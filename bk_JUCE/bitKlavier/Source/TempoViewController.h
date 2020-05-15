@@ -64,6 +64,8 @@ protected:
     ToggleButton weightsToggle;
     std::unique_ptr<BKSingleSlider> emaAlphaSlider;
     
+    std::unique_ptr<BKSingleSlider> iterationsSlider;
+    
     TextEditor weightsText;
     
     

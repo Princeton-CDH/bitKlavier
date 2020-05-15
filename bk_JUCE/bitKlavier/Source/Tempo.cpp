@@ -34,13 +34,13 @@ keymaps(Keymap::PtrArr())
     atDeltaHistory.ensureStorageAllocated(10);
     for (int i = 0; i < 10; i++)
     {
-        atDeltaHistory.add(1.);
+        atDeltaHistory.add(0);
     }
     
     lastNoteOnsets.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
-        atDeltaHistory.add(1);
+        lastNoteOnsets.add(1);
     }
     
     adaptiveTempoPeriodMultiplier = 1.;
@@ -78,18 +78,17 @@ void TempoProcessor::atNewNote(int noteNumber)
     {
         if(tempo->aPrep->getAdaptiveTempoMode().getUnchecked(TimeBetweenOnsets))
         {
+            float mult = adaptiveTempoPeriodMultiplier;
             // How many onsets are we looking back at?
-            for (int i = 0; i < tempo->aPrep->iterationDepth; i++)
+            for (int i = 0; i < tempo->aPrep->getAdaptiveTempoIterations(); i++)
             {
                 uint64 pastOnset = atOnsetHistory.getUnchecked(i);
                 if (pastOnset > 0)
                 {
                     atDelta = (atTimer - pastOnset) / (0.001 * processor.getCurrentSampleRate());
-                    atCalculatePeriodMultiplier();
+                    atCalculatePeriodMultiplier(mult);
                 }
             }
-            
-            tempo->aPrep->setTempo(tempo->aPrep->getTempo() / adaptiveTempoPeriodMultiplier);
         }
         
     }
@@ -112,59 +111,60 @@ void TempoProcessor::atNewNoteOff(int noteNumber)
             if (onset > 0)
             {
                 atDelta = (atTimer - onset) / (0.001 * processor.getCurrentSampleRate());
-                atCalculatePeriodMultiplier();
+                atCalculatePeriodMultiplier(adaptiveTempoPeriodMultiplier);
             }
         }
         if (tempo->aPrep->getAdaptiveTempoMode().getUnchecked(TimeBetweenReleases))
         {
+             float mult = adaptiveTempoPeriodMultiplier;
             // How many releases are we looking back at?
-            for (int i = 0; i < tempo->aPrep->iterationDepth; i++)
+            for (int i = 0; i < tempo->aPrep->getAdaptiveTempoIterations(); i++)
             {
                 uint64 pastRelease = atReleaseHistory.getUnchecked(i);
                 if (pastRelease > 0)
                 {
                     atDelta = (atTimer - pastRelease) / (0.001 * processor.getCurrentSampleRate());
-                    atCalculatePeriodMultiplier();
+                    atCalculatePeriodMultiplier(mult);
                 }
             }
         }
-        tempo->aPrep->setTempo(tempo->aPrep->getTempo() / adaptiveTempoPeriodMultiplier);
-
     }
     atReleaseHistory.insert(0, atTimer);
     atReleaseHistory.resize(tempo->aPrep->maxIterationDepth);
     lastNoteOnsets.set(noteNumber, 0);
 }
 
-//really basic, using constrained moving average of time-between-notes (or note-length)
-void TempoProcessor::atCalculatePeriodMultiplier()
+// More things to add:
+// Gaussian function to measure error and weight/threshold based on error
+// Velocity stuff
+void TempoProcessor::atCalculatePeriodMultiplier(float currentMult)
 {
     // Should think about what subdivisions actually mean for this system...
     
     // Get the beat duration (corresponds to tempo)
-    float beatMS = tempo->aPrep->getBeatThreshMS();
+    float beatMS = tempo->aPrep->getBeatThreshMS() * currentMult;
     
     // Get the pulse duration (corresponds to tempo times subdivisions)
     float pulseMS = beatMS / tempo->aPrep->getAdaptiveTempoSubdivisions();
     
     // Quantize the delta to the nearest subdivision
     float quant = roundf(atDelta / pulseMS) * pulseMS;
+    
 //        float error = atDelta - quant;
     
     
     // If the quantized delta is within the set range then we can adjust the tempo
-    if (quant > tempo->aPrep->getAdaptiveTempoMin() && quant < tempo->aPrep->getAdaptiveTempoMax())
+    if (atDelta > tempo->aPrep->getAdaptiveTempoMin() && atDelta < tempo->aPrep->getAdaptiveTempoMax()
+        && quant > 0)
     {
-        // Turn the delta into a multiplier
-        float multiplier = atDelta / quant;
         
         // Insert delta at beginning of history
-        atDeltaHistory.insert(0, multiplier);
+        atDeltaHistory.insert(0, atDelta);
         // Eliminate oldest time difference
-        atDeltaHistory.resize(tempo->aPrep->getAdaptiveTempoHistorySize() * tempo->aPrep->iterationDepth);
+        atDeltaHistory.resize(tempo->aPrep->getAdaptiveTempoHistorySize() * tempo->aPrep->getAdaptiveTempoIterations());
         
         
-        // Get the metric value of the delta (if quarter == 1 then half == eighth == 2, dotted half == triplet == 3)
+        // Get the metric value of the delta (if quarter == 1 then half == eighth == 2, dotted quarter == triplet == 3)
         // This will probably result in weird behavior with non-whole number subdivisions (should we even allow for that?)
         int val = fmax(beatMS / quant, quant / beatMS);
         // Get the corresponding weight and keep a history of weights in parallel to the deltas
@@ -174,30 +174,15 @@ void TempoProcessor::atCalculatePeriodMultiplier()
             weight = tempo->aPrep->getAdaptiveTempoWeights().getUnchecked(val);
         }
         atWeightHistory.insert(0, weight);
-        atWeightHistory.resize(tempo->aPrep->getAdaptiveTempoHistorySize() * tempo->aPrep->iterationDepth);
+        atWeightHistory.resize(tempo->aPrep->getAdaptiveTempoHistorySize() * tempo->aPrep->getAdaptiveTempoIterations());
+    
         
-        
+        // Multiplier relative to the quantized length
+        float multiplier = atDelta / quant;
+        // Or relative to the pulse length if we're not using weights (old behavior)
+        if (!tempo->aPrep->getUseWeights()) multiplier = atDelta / pulseMS;
         
         // Calculate an exponential moving average or regular moving average
-        
-        // Always calculate the EMA if we're not set to use it
-        // EMA
-        
-        if (!tempo->aPrep->getUseWeights())
-        {
-            weight = 1.0f;
-        }
-
-        // Not sure if this is right for a weighted EMA
-        // Should be good for when weight is 0 or 1 but the curve might be weird?
-        float alpha = tempo->aPrep->getAdaptiveTempoAlpha();
-        emaSum = weight * multiplier + (1 - alpha * weight) * emaSum;
-        emaCount = weight + (1 - alpha * weight) * emaCount;
-        exponentialMovingAverage = emaSum / emaCount;
-    
-        adaptiveTempoPeriodMultiplier = exponentialMovingAverage;
-        
-        
         
         // Only calculate the regular moving average if we're not using the exponential
         // MA
@@ -221,11 +206,33 @@ void TempoProcessor::atCalculatePeriodMultiplier()
             }
             
             float movingAverage;
-            if (totalWeights > 0) movingAverage = totalDeltas / totalWeights;
-            else movingAverage = adaptiveTempoPeriodMultiplier;
-        
-            adaptiveTempoPeriodMultiplier = movingAverage;
+            if (totalWeights > 0)
+            {
+                movingAverage = totalDeltas / totalWeights;
+                
+                if (!tempo->aPrep->getUseWeights()) adaptiveTempoPeriodMultiplier = movingAverage / pulseMS;
+                else adaptiveTempoPeriodMultiplier = movingAverage / quant;
+            }
+            return;
         }
+        
+        
+        // Always calculate the EMA even if we're not set to use it
+        // EMA
+        
+        if (!tempo->aPrep->getUseWeights())
+        {
+            weight = 1.0f;
+        }
+
+        // Not sure if this is right for a weighted EMA
+        // Should be good for when weight is 0 or 1 but the curve might be weird?
+        float alpha = tempo->aPrep->getAdaptiveTempoAlpha();
+        emaSum = weight * multiplier + (1 - alpha * weight) * emaSum;
+        emaCount = weight + (1 - alpha * weight) * emaCount;
+        exponentialMovingAverage = emaSum / emaCount;
+        
+        adaptiveTempoPeriodMultiplier = exponentialMovingAverage;
     }
     
     DBG("adaptiveTempoPeriodMultiplier = " + String(adaptiveTempoPeriodMultiplier));
@@ -233,7 +240,7 @@ void TempoProcessor::atCalculatePeriodMultiplier()
 
 void TempoProcessor::adaptiveReset()
 {
-    for (int i = 0; i < tempo->aPrep->getAdaptiveTempoHistorySize() * tempo->aPrep->iterationDepth; i++)
+    for (int i = 0; i < tempo->aPrep->getAdaptiveTempoHistorySize() * tempo->aPrep->getAdaptiveTempoIterations(); i++)
     {
         atDeltaHistory.insert(0, 0.0f);
     }

@@ -996,6 +996,7 @@ typedef enum TempoParameterType
     ATMode,
     TempoSubdivisions,
     ATAlpha,
+    ATIterations,
     ATExponential,
     ATWeighted,
     TempoParameterTypeNil

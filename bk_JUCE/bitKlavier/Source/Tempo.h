@@ -56,9 +56,9 @@ public:
     atMinPulse(100),
     atMaxPulse(2000),
     atSubdivisions(1.0f),
+    atDeltaHistorySize(4),
     iterationDepth(4),
     maxIterationDepth(32),
-    atDeltaHistorySize(4),
     metricWeights({0.0, 1.0, 0.8, 0.8, 0.6, 0.0, 0.6, 0.0, 0.4,
         0.6, 0.0, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0,
         0.0, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -99,8 +99,8 @@ public:
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
         
-        iterationDepth = s->iterationDepth;
-        maxIterationDepth = s->maxIterationDepth;
+        iterationDepth = s->getAdaptiveTempoIterations();
+        maxIterationDepth = 32;
     }
     
     inline void performModification(TempoPreparation::Ptr s, Array<bool> dirty)
@@ -167,6 +167,8 @@ public:
     inline float getAdaptiveTempoAlpha(void)                    { return emaAlpha; }
     inline bool getUseExponential(void)                         { return useExponential; }
     inline bool getUseWeights(void)                             { return useWeights; }
+    
+    inline int getAdaptiveTempoIterations(void)                 { return iterationDepth; }
 
     inline const String getName() const noexcept                { return name;}
     inline void setName(String n)                               { name = n; }
@@ -216,6 +218,8 @@ public:
     inline void setAdaptiveTempoAlpha(float alpha)                     { emaAlpha = alpha; }
     inline void setUseExponential(bool use)                            { useExponential = use; }
     inline void setUseWeights(bool use)                                { useWeights = use; }
+    
+    inline void setAdaptiveTempoIterations(int iter)                   { iterationDepth = iter; }
     
     void print(void)
     {
@@ -316,9 +320,8 @@ public:
         }
     }
     
-
-    int iterationDepth;
     int maxIterationDepth;
+
 private:
     String name;
     TempoType sWhichTempoSystem;
@@ -335,6 +338,9 @@ private:
     
     // Stuff for basic moving average
     int atDeltaHistorySize;
+    
+    // How far back do we look on each new event
+    int iterationDepth;
     
 
     Array<float> metricWeights;
@@ -581,7 +587,7 @@ private:
     
     void atNewNote(int noteNumber);
     void atNewNoteOff(int noteNumber);
-    void atCalculatePeriodMultiplier();
+    void atCalculatePeriodMultiplier(float currentMult);
     float adaptiveTempoPeriodMultiplier;
     
     
