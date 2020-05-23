@@ -75,6 +75,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          Forward,
                          Normal,
                          MainNote,
+                         direct->aPrep->getSoundSet(), //set
                          direct->getId(),
                          0,     // start
                          0,     // length
@@ -98,6 +99,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 				Forward,
 				Normal,
 				MainNote,
+                direct->aPrep->getSoundSet(), //set
 				direct->getId(),
 				0,     // start
 				0,     // length
@@ -126,6 +128,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
         
         synth->keyOff(channel,
                       MainNote,
+                      direct->aPrep->getSoundSet(), //set
                       direct->getId(),
                       noteNumber,
                       t,
@@ -173,6 +176,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
                                        Forward,
                                        Normal,
                                        HammerNote,
+                                       direct->aPrep->getSoundSet(), //set
                                        direct->getId(),
                                        0,
                                        2000,
@@ -194,6 +198,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
                                       Forward,
                                       Normal,
                                       ResonanceNote,
+                                      direct->aPrep->getSoundSet(), //set
                                       direct->getId(),
                                       0,
                                       2000,

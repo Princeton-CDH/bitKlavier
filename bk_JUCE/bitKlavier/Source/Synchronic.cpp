@@ -108,6 +108,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                     noteDirection,
                     FixedLengthFixedStart,
                     SynchronicNote,
+                    0, //set
                     synchronic->getId(),
                     noteStartPos,  // start
                     noteLength,
@@ -131,6 +132,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 					noteDirection,
 					FixedLengthFixedStart,
 					SynchronicNote,
+                    0, //set
 					synchronic->getId(),
 					noteStartPos,  // start
 					noteLength,
@@ -142,7 +144,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 		}
         
         notePlayed = true;
-        if (prep->getMidiOutput() != nullptr)
+        if (prep->getMidiOutput() != nullptr && currentVoice != nullptr)
         {
             activeSynchronicVoices.set(currentVoice->getCurrentlyPlayingNote(), currentVoice);
             const MidiMessage message = MidiMessage::noteOn(1, synthNoteNumber, velocity);

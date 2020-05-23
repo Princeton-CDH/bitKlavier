@@ -145,22 +145,29 @@ void BKSynthesiser::removeVoice (const int index)
     voices.remove (index);
 }
 
-void BKSynthesiser::clearSounds()
+void BKSynthesiser::clearSounds(int set)
 {
     const ScopedLock sl (lock);
-    sounds.clear();
+    if (soundSets.size() - 1 < set) return;
+    soundSets.getUnchecked(set)->clear();
 }
 
-BKSynthesiserSound* BKSynthesiser::addSound (const BKSynthesiserSound::Ptr& newSound)
+BKSynthesiserSound* BKSynthesiser::addSound (int set, const BKSynthesiserSound::Ptr& newSound)
 {
     const ScopedLock sl (lock);
-    return sounds.add (newSound);
+    while (soundSets.size() - 1 < set)
+    {
+//        soundSets.insertMultiple(soundSets.size(), ReferenceCountedArray<BKSynthesiserSound>(), set - (soundSets.size() - 1));
+        soundSets.ensureStorageAllocated(set + 1);
+        soundSets.add(new ReferenceCountedArray<BKSynthesiserSound>());
+    }
+    return soundSets.getUnchecked(set)->add (newSound);
 }
 
-void BKSynthesiser::removeSound (const int index)
+void BKSynthesiser::removeSound (int set, const int index)
 {
     const ScopedLock sl (lock);
-    sounds.remove (index);
+    soundSets.getUnchecked(set)->remove (index);
 }
 
 void BKSynthesiser::setNoteStealingEnabled (const bool shouldSteal)
@@ -438,6 +445,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
 	PianoSamplerNoteDirection direction,
 	PianoSamplerNoteType type,
 	BKNoteType bktype,
+    int set,
 	int layer,
 	const float startingPositionMS,
 	const float lengthMS,
@@ -456,6 +464,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
                                  direction,
                                  type,
                                  bktype,
+                                 set,
                                  layer,
                                  startingPositionMS,
                                  lengthMS,
@@ -477,6 +486,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                            PianoSamplerNoteDirection direction,
                            PianoSamplerNoteType type,
                            BKNoteType bktype,
+                           int set,
                            int layer,
                            const float startingPositionMS,
                            const float lengthMS,
@@ -503,10 +513,14 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     BKSynthesiserVoice* voiceToReturn;
     
     float sampleRateMS = 0.001f * getSampleRate();
+    
+    int soundSetId = (set < 0) ? processor.globalSoundSetId : set;
+    if (soundSets.size() - 1 < soundSetId) return nullptr;
+    if (soundSets.getUnchecked(soundSetId) == nullptr) return nullptr;
 
-	for (int i = sounds.size(); --i >= 0;)
+	for (int i = soundSets.getUnchecked(soundSetId)->size(); --i >= 0;)
 	{
-		BKSynthesiserSound* const sound = sounds.getUnchecked(i);
+		BKSynthesiserSound* const sound = soundSets.getUnchecked(soundSetId)->getUnchecked(i);
 
 		// Check if sound applies to note, velocity, and channel.
 		if (sound->appliesToNote(noteNumber) &&
@@ -682,6 +696,7 @@ void BKSynthesiser::stopVoice(BKSynthesiserVoice* voice, float velocity, const b
 
 void BKSynthesiser::keyOff(const int midiChannel,
 	const BKNoteType type,
+    const int set,
 	const int layerId,
 	const int keyNoteNumber,
 	const int midiNoteNumber,
@@ -736,10 +751,14 @@ void BKSynthesiser::keyOff(const int midiChannel,
 	int noteNumber = midiNoteNumber;
 
 	if (noteNumber > 108 || noteNumber < 21) return;
+    
+    int soundSetId = (set < 0) ? processor.globalSoundSetId : set;
+    if (soundSets.size() - 1 < soundSetId) return;
+    if (soundSets.getUnchecked(soundSetId) == nullptr) return;
 
-	for (int i = sounds.size(); --i >= 0;)
+	for (int i = soundSets.getUnchecked(soundSetId)->size(); --i >= 0;)
 	{
-		BKSynthesiserSound* const sound = sounds.getUnchecked(i);
+		BKSynthesiserSound* const sound = soundSets.getUnchecked(soundSetId)->getUnchecked(i);
 
 		// Check if sound applies to note, velocity, and channel.
 

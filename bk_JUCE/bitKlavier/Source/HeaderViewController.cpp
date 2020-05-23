@@ -117,10 +117,10 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
     
     
-    loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.currentSampleType != BKLoadLitest, processor.currentSampleType == BKLoadLitest);
-    loadMenu.addItem(LOAD_LITE,     "Light", processor.currentSampleType != BKLoadLite, processor.currentSampleType == BKLoadLite);
-    loadMenu.addItem(LOAD_MEDIUM,   "Medium", processor.currentSampleType != BKLoadMedium, processor.currentSampleType == BKLoadMedium);
-    loadMenu.addItem(LOAD_HEAVY,    "Heavy", processor.currentSampleType != BKLoadHeavy, processor.currentSampleType == BKLoadHeavy);
+    loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.globalSampleType != BKLoadLitest, processor.globalSampleType == BKLoadLitest);
+    loadMenu.addItem(LOAD_LITE,     "Light", processor.globalSampleType != BKLoadLite, processor.globalSampleType == BKLoadLite);
+    loadMenu.addItem(LOAD_MEDIUM,   "Medium", processor.globalSampleType != BKLoadMedium, processor.globalSampleType == BKLoadMedium);
+    loadMenu.addItem(LOAD_HEAVY,    "Heavy", processor.globalSampleType != BKLoadHeavy, processor.globalSampleType == BKLoadHeavy);
     
     loadMenu.addSeparator();
     

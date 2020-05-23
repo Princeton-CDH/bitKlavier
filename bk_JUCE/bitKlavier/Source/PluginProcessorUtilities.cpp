@@ -25,17 +25,13 @@ void BKAudioProcessor::updateUI(void)
     updateState->keymapDidChange = true;
 }
 
-void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound)
+int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound, bool updateGlobalSet)
 {
     didLoadMainPianoSamples = false;
     
     // Check if path isn't valid and load BKLoadLite if it is not
     if (type == BKLoadSoundfont)
     {
-        if ((currentSampleType == BKLoadSoundfont) &&
-            (lastSoundfont == path) &&
-            (lastInstrument == subsound)) return;
-        
         if (!path.startsWith("default.sf"))
         {
             File file(path);
@@ -50,18 +46,25 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
     
     if (type == BKLoadSoundfont)
     {
-        currentSampleType = BKLoadSoundfont;
+        loadingSampleType = type;
+        loadingSoundfont = path;
+        loadingInstrument = subsound;
         
-        currentSoundfont = path;
-        currentInstrument = subsound;
+        loadingSoundSet = path + ".subsound" + String(subsound);
         
-        loader.startThread();
+        if (!loadedSoundSets.contains(loadingSoundSet))
+        {
+            loadingSoundSetId = loadedSoundSets.size();
+            loader.startThread();
+        }
+        else
+        {
+            didLoadMainPianoSamples = true;
+        }
     }
     else if (type < BKLoadSoundfont)
     {
-        if (lastSampleType == type) return;
-        
-        currentSampleType = type;
+        loadingSampleType = type;
         
         int numSamplesPerLayer = 29;
         int numHarmSamples = 69;
@@ -73,12 +76,29 @@ void BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subso
                               (type == BKLoadLite)   ? (numSamplesPerLayer * 2) :
                               (type == BKLoadLitest) ? (numSamplesPerLayer * 1) : 1.0);
         
-        loader.startThread();
+        loadingSoundSet = cBKSampleLoadTypes[type];
+        
+        if (!loadedSoundSets.contains(loadingSoundSet))
+        {
+            loadingSoundSetId = loadedSoundSets.size();
+            loader.startThread();
+        }
+        else
+        {
+            didLoadMainPianoSamples = true;
+        }
     }
     
-    lastSampleType = currentSampleType;
-    lastSoundfont = currentSoundfont;
-    lastInstrument = currentInstrument;
+    loadedSoundSets.addIfNotAlreadyThere(loadingSoundSet);
+    if (updateGlobalSet)
+    {
+        globalSoundSetId = loadedSoundSets.indexOf(loadingSoundSet);
+        globalSampleType = loadingSampleType;
+        globalSoundfont = loadingSoundfont;
+        globalInstrument = loadingInstrument;
+    }
+    
+    return loadedSoundSets.indexOf(loadingSoundSet);
 }
 
 

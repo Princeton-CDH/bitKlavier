@@ -91,7 +91,7 @@ public:
     
     void openSoundfont(void);
     
-    sfzero::Region::PtrArr regions;
+    Array<sfzero::Region::PtrArr> regions;
     
     AudioFormatManager formatManager;
     std::unique_ptr<AudioFormatReader> sampleReader;
@@ -115,21 +115,26 @@ public:
     String                              currentGallery;
     
     StringArray                         soundfontNames;
-    StringArray                         instrumentNames;
-    String                              currentInstrumentName;
+    OwnedArray<StringArray>             instrumentNames;
     
     OwnedArray<StringArray>             exportedPreparations;
     StringArray                         exportedPianos;
+        
+    BKSampleLoadType                    loadingSampleType;
+    String                              loadingSoundfont;
+    int                                 loadingInstrument;
     
-    BKSampleLoadType                    currentSampleType;
-    String                              currentSoundfont;
-    int                                 currentInstrument;
+    BKSampleLoadType                    globalSampleType;
+    String                              globalSoundfont;
+    int                                 globalInstrument;
+    
+    String                              loadingSoundSet;
+    int                                 loadingSoundSetId;
+    StringArray                         loadedSoundSets;
+    
+    int                                 globalSoundSetId;
     
     bool firstTime;
-    
-    BKSampleLoadType                    lastSampleType;
-    String                              lastSoundfont;
-    int                                 lastInstrument;
     
     bool                                defaultLoaded;
     String                              defaultName;
@@ -182,7 +187,7 @@ public:
     inline void setDefaultMidiInputSources(Array<String> sources) { defaultMidiInputSources = sources; }
     
     //==============================================================================
-    void loadSamples(BKSampleLoadType type, String path ="", int subsound=0);
+    int loadSamples(BKSampleLoadType type, String path ="", int subsound=0, bool updateGlobalSet=true);
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -318,15 +323,6 @@ public:
 
     
     inline bool getSustainInversion(void) { return sustainInverted; }
-    
-    inline String getCurrentSoundfontName(void)
-    {
-#if JUCE_WINDOWS
-        return (currentSoundfont.fromLastOccurrenceOf("\\", false, true).upToFirstOccurrenceOf(".sf", false, true));
-#else
-		return (currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true));
-#endif
-    }
     
     ValueTree getPreparationState(BKPreparationType type, int Id);
     void setPreparationState(BKPreparationType type, int Id, XmlElement* xml);

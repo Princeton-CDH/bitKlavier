@@ -1148,10 +1148,10 @@ typedef enum BKSampleLoadType
 }BKSampleLoadType;
 
 static const std::vector<std::string> cBKSampleLoadTypes = {
-    "Load Very Light",
-    "Load Light",
-    "Load Medium",
-    "Load Heavy"
+    "Piano (litest)",
+    "Piano (lite)",
+    "Piano (medium)",
+    "Piano (heavy)"
 };
 
 

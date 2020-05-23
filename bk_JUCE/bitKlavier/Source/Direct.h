@@ -58,7 +58,9 @@ public:
     dAttack(atk),
     dDecay(dca),
     dRelease(rel),
-    dSustain(sust)
+    dSustain(sust),
+    dUseGlobalSoundSet(true),
+    dSoundSet(-1)
     {
         
     }
@@ -72,7 +74,9 @@ public:
     dAttack(3),
     dDecay(3),
     dRelease(30),
-    dSustain(1.)
+    dSustain(1.),
+    dUseGlobalSoundSet(true),
+    dSoundSet(-1)
     {
         
     }
@@ -96,6 +100,8 @@ public:
         dSustain = d->getSustain();
         dRelease = d->getRelease();
         dTranspUsesTuning = d->getTranspUsesTuning();
+        dUseGlobalSoundSet = d->getUseGlobalSoundSet();
+        dSoundSet = d->getSoundSet();
     }
     
     inline void performModification(DirectPreparation::Ptr d, Array<bool> dirty)
@@ -278,6 +284,13 @@ public:
             }
         }
     }
+    
+    inline void setUseGlobalSoundSet(bool use) { dUseGlobalSoundSet = use; }
+    inline void setSoundSet(int Id) { dSoundSet = Id; }
+    
+    inline bool getUseGlobalSoundSet(void) { return dUseGlobalSoundSet; }
+    inline int getSoundSet(void) { return dUseGlobalSoundSet ? -1 : dSoundSet; }
+    
 
 private:
     
@@ -302,6 +315,9 @@ private:
     // ADSR, in ms, or gain multiplier for sustain
     int dAttack, dDecay, dRelease;
     float dSustain;
+    
+    bool dUseGlobalSoundSet;
+    int dSoundSet;
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
@@ -511,7 +527,7 @@ public:
     {
         return keymaps;
     }
-    
+
 private:
     BKSynthesiser*      synth;
     BKSynthesiser*      resonanceSynth;

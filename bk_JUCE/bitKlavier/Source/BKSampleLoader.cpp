@@ -24,7 +24,6 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     BKSynthesiser* synth = &processor.mainPianoSynth;
     
     processor.progress = 0.0;
-    processor.currentSoundfont = sfzFile.getFullPathName();
     
     AudioFormatManager formatManager;
     formatManager.registerBasicFormats();
@@ -32,7 +31,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     String ext = sfzFile.getFileExtension();
     
     synth->clearVoices();
-    synth->clearSounds();
+//    synth->clearSounds(0);
     
     for (int i = 0; i < 300; ++i)
     {
@@ -49,47 +48,45 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         isSF2 = true;
         sf2sound   = new sfzero::SF2Sound(sfzFile);
         
-        sf2sound->loadRegions(processor.currentInstrument);
+        sf2sound->loadRegions(processor.loadingInstrument);
         sf2sound->loadSamples(&formatManager);
         
-        processor.currentInstrumentName = sf2sound->subsoundName(processor.currentInstrument);
-        
-        processor.instrumentNames.clear();
+        processor.instrumentNames.add(new StringArray());
         for (int i = 0; i < sf2sound->numSubsounds(); i++)
         {
-            processor.instrumentNames.add(sf2sound->subsoundName(i));
+            processor.instrumentNames.getUnchecked(processor.instrumentNames.size()-1)->add(sf2sound->subsoundName(i));
         }
         
-        processor.regions.clear();
-        processor.regions = sf2sound->getRegions();
-        processor.progressInc = 1.0 / processor.regions.size();
+//        processor.regions.clear();
+//        processor.regions.ensureStorageAllocated(processor.regions.size()+1);
+        processor.regions.add(sf2sound->getRegions());
+        processor.progressInc = 1.0 / processor.regions[processor.loadingSoundSetId].size();
     }
     else if (ext == ".sfz")
     {
         sfzsound   = new sfzero::Sound(sfzFile);
         
-        processor.currentInstrument = 0;
+        processor.loadingInstrument = 0;
 
         // POSSIBLY STILL DOUBLE LOADING SAMPLES? 
-        sfzsound->loadRegions(processor.currentInstrument);
+        sfzsound->loadRegions(processor.loadingInstrument);
         sfzsound->loadSamples(&formatManager, &processor.progress);
         
-        processor.currentInstrumentName = sfzsound->subsoundName(processor.currentInstrument);
-        
-        processor.instrumentNames.clear();
+        processor.instrumentNames.add(new StringArray());
         for (int i = 0; i < sfzsound->numSubsounds(); i++)
         {
-            processor.instrumentNames.add(sfzsound->subsoundName(i));
+            processor.instrumentNames.getUnchecked(processor.instrumentNames.size()-1)->add(sfzsound->subsoundName(i));
         }
     
-        processor.regions.clear();
-        processor.regions = sfzsound->getRegions();
+//        processor.regions.clear();
+//        processor.regions.ensureStorageAllocated(processor.regions.size()+1);
+        processor.regions.add(sfzsound->getRegions());
         processor.progress = 0.0;
-        processor.progressInc = 1.0 / processor.regions.size();
+        processor.progressInc = 1.0 / processor.regions[processor.loadingSoundSetId].size();
     }
     else    return;
 
-    for (auto region : processor.regions)
+    for (auto region : processor.regions.getUnchecked(processor.regions.size()-1))
     {
         processor.progress += processor.progressInc;
         
@@ -164,7 +161,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         BigInteger nrange; nrange.setRange(region->lokey, nbits+1, true);
         BigInteger vrange; vrange.setRange(region->lovel, vbits+1, true);
         
-        synth->addSound(new BKPianoSamplerSound(region->sample->getShortName(),
+        synth->addSound(processor.loadingSoundSetId, new BKPianoSamplerSound(region->sample->getShortName(),
                                                         buffer,
                                                         sampleLength,
                                                         sourceSampleRate,
@@ -183,11 +180,11 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
 
 void BKSampleLoader::run(void)
 {
-    BKSampleLoadType type = processor.currentSampleType;
+    BKSampleLoadType type = processor.loadingSampleType;
     
     processor.updateState->pianoSamplesAreLoading = true;
     
-    String soundfont = processor.currentSoundfont;
+    String soundfont = processor.loadingSoundfont;
     
     EXIT_CHECK;
     
@@ -230,10 +227,11 @@ void BKSampleLoader::run(void)
     }
     else
     {
-    
-        if (processor.currentSampleType == BKLoadSoundfont)
+        processor.instrumentNames.add(new StringArray());
+        
+        if (type == BKLoadSoundfont)
         {
-            processor.currentSampleType = BKLoadLite;
+            processor.loadingSampleType = BKLoadLite;
             type = BKLoadLite;
         }
         
@@ -292,7 +290,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
     else if (type == BKLoadHeavy)       numLayers = 8;
     
     synth->clearVoices();
-    synth->clearSounds();
+//    synth->clearSounds(0);
     
     // 88 or more seems to work well
     for (int i = 0; i < 300; i++)   synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
@@ -396,7 +394,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
                         BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),(int)maxLength);
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
 
-                        synth->addSound(new BKPianoSamplerSound(soundName,
+                        synth->addSound(processor.loadingSoundSetId, new BKPianoSamplerSound(soundName,
                                                                         newBuffer,
                                                                         maxLength,
                                                                         sourceSampleRate,
@@ -441,7 +439,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
 #endif
     
     synth->clearVoices();
-    synth->clearSounds();
+//    synth->clearSounds(0);
     
     for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
 
@@ -515,7 +513,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
                         BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
 
-                        synth->addSound(new BKPianoSamplerSound(soundName,
+                        synth->addSound(processor.loadingSoundSetId, new BKPianoSamplerSound(soundName,
                                                                 newBuffer,
                                                                 maxLength,
                                                                 sourceSampleRate,
@@ -553,7 +551,7 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
 #endif
     
     synth->clearVoices();
-    synth->clearSounds();
+//    synth->clearSounds(0);
     
     for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
     
@@ -594,7 +592,7 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
                 BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
                 sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
                 
-                synth->addSound(new BKPianoSamplerSound(soundName,
+                synth->addSound(processor.loadingSoundSetId, new BKPianoSamplerSound(soundName,
                                                                     newBuffer,
                                                                     maxLength,
                                                                     sourceSampleRate,
@@ -629,7 +627,7 @@ void BKSampleLoader::loadPedalSamples(void)
 #endif
     
     synth->clearVoices();
-    synth->clearSounds();
+//    synth->clearSounds(0);
     
     for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
     
@@ -673,7 +671,7 @@ void BKSampleLoader::loadPedalSamples(void)
                 BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
                 sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
                 
-                synth->addSound(new BKPianoSamplerSound(soundName,
+                synth->addSound(processor.loadingSoundSetId, new BKPianoSamplerSound(soundName,
                                                         newBuffer,
                                                         maxLength,
                                                         sourceSampleRate,

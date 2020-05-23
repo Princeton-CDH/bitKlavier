@@ -394,23 +394,23 @@ public:
     
     //==============================================================================
     /** Deletes all sounds. */
-    void clearSounds();
+    void clearSounds(int set);
     
     /** Returns the number of sounds that have been added to the synth. */
-    int getNumSounds() const noexcept                               { return sounds.size(); }
+    int getNumSounds(int set) const noexcept                               { return soundSets.getUnchecked(set)->size(); }
     
     /** Returns one of the sounds. */
-    BKSynthesiserSound* getSound (int index) const noexcept           { return sounds [index]; }
+    BKSynthesiserSound* getSound (int set, int index) const noexcept           { return soundSets.getUnchecked(set)->getUnchecked(index); }
     
     /** Adds a new sound to the BKSynthesiser.
      
      The object passed in is reference counted, so will be deleted when the
      BKSynthesiser and all voices are no longer using it.
      */
-    BKSynthesiserSound* addSound (const BKSynthesiserSound::Ptr& newSound);
+    BKSynthesiserSound* addSound (int set, const BKSynthesiserSound::Ptr& newSound);
     
     /** Removes and deletes one of the sounds. */
-    void removeSound (int index);
+    void removeSound (int set, int index);
     
     //==============================================================================
     /** If set to true, then the synth will try to take over an existing voice if
@@ -449,6 +449,7 @@ public:
                                         PianoSamplerNoteDirection direction,
                                         PianoSamplerNoteType type,
                                         BKNoteType bktype,
+                                        int set,
                                         int layer,
                                         float startingPositionMS,
                                         float lengthMS,
@@ -467,6 +468,7 @@ public:
                                         PianoSamplerNoteDirection direction,
                                         PianoSamplerNoteType type,
                                         BKNoteType bktype,
+                                        int set,
                                         int layer,
                                         float startingPositionMS,
                                         float lengthMS,
@@ -492,6 +494,7 @@ public:
      */
     virtual void keyOff (int midiChannel,
                          BKNoteType type,
+                         int set, 
                          int layerId,
                          int keyNoteNumber,
                          int midiNoteNumber,
@@ -667,7 +670,7 @@ protected:
     CriticalSection lock;
     
     OwnedArray<BKSynthesiserVoice> voices;
-    ReferenceCountedArray<BKSynthesiserSound> sounds;
+    OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> soundSets;
     
     /** The last pitch-wheel values for each midi channel. */
     int lastPitchWheelValues [16];

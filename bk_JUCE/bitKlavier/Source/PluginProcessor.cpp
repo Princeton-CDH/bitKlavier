@@ -306,7 +306,7 @@ void BKAudioProcessor::openSoundfont(void)
     {
         File sfzFile (myChooser.getResult());
         
-        currentSoundfont = sfzFile.getFullPathName();
+        loadingSoundfont = sfzFile.getFullPathName();
         
         loadSamples(BKLoadSoundfont, sfzFile.getFullPathName());
     }
@@ -572,7 +572,9 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     
     // Send key on to each pmap in current piano
     //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
-    currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont), source);
+    
+    // TODO : for multi sample set support, remove soundfont argument from this chain of functions
+    currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
     
     //add note to springTuning, if only for Graph display
     //this could be a bad idea, in that a user may want to have only some keys (via a keymap) go to Spring tuning
@@ -622,7 +624,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
         
         // Send key off to each pmap in current piano
-        currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, (currentSampleType == BKLoadSoundfont), source);
+        currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
     }
     
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
@@ -668,6 +670,7 @@ void BKAudioProcessor::sustainActivate(void)
                            Forward,
                            Normal, //FixedLength,
                            PedalNote,
+                           0, 
                            0,
                            0,
                            20000,
@@ -721,12 +724,13 @@ void BKAudioProcessor::sustainDeactivate(void)
         
         //turn off pedal down resonance
         pedalSynth.keyOff(channel,
-                      PedalNote,
-                      0,
-                      21,
-                      21,
-                      1.,
-                      true);
+                          PedalNote,
+                          0,
+                          0,
+                          21,
+                          21,
+                          1.,
+                          true);
         
         //play pedalUp sample
         pedalSynth.keyOn(channel,
@@ -739,6 +743,7 @@ void BKAudioProcessor::sustainDeactivate(void)
                          Forward,
                          Normal, //FixedLength,
                          PedalNote,
+                         0,
                          0,
                          0,
                          2000,
@@ -782,11 +787,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     if (currentPiano->prepMap != nullptr)
     {
-        currentPiano->prepMap->processBlock(buffer, numSamples, channel, currentSampleType, false);
+        currentPiano->prepMap->processBlock(buffer, numSamples, channel, loadingSampleType, false);
         
         // Process all active nostalgic preps in previous piano
         if(prevPiano != currentPiano)
-            prevPiano->prepMap->processBlock(buffer, numSamples, channel, currentSampleType, true); // true for onlyNostalgic
+            prevPiano->prepMap->processBlock(buffer, numSamples, channel, loadingSampleType, true); // true for onlyNostalgic
     }
     
     for(int i=0; i<notesOnUI.size(); i++)
