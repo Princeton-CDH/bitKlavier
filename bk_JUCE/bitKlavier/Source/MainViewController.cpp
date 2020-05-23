@@ -148,6 +148,9 @@ tooltipsButton("Show tooltips")
 
 MainViewController::~MainViewController()
 {
+    removeMouseListener(this);
+    keyboard->removeMouseListener(this);
+    
     setLookAndFeel(nullptr);
     sampleCB.setLookAndFeel(nullptr);
     instrumentCB.setLookAndFeel(nullptr);
