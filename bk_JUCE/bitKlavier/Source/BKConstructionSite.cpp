@@ -32,6 +32,10 @@ inLasso(false)
 
 BKConstructionSite::~BKConstructionSite(void)
 {
+    for (auto item : graph->getItems())
+    {
+        item->removeMouseListener(this);
+    }
 }
 
 void BKConstructionSite::resized()
