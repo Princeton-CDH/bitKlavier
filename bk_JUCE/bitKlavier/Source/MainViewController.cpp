@@ -715,7 +715,7 @@ void MainViewController::timerCallback()
     //check to see if General Settings globalGain has changed, update slider accordingly
     float globalGain = processor.gallery->getGeneralSettings()->getGlobalGain();
     float genGain = Decibels::gainToDecibels(globalGain);
-    if (genGain != mainSlider.getValue())
+    if(genGain != mainSlider.getValue())
         mainSlider.setValue(Decibels::gainToDecibels(globalGain), dontSendNotification);
     
     if (state->modificationDidChange)
@@ -794,6 +794,7 @@ void MainViewController::timerCallback()
         state->commentDidChange = false;
         construction.getCurrentItem()->setCommentText(state->comment);
     }
+    
     
     if (state->keymapDidChange)
     {
