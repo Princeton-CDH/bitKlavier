@@ -647,7 +647,7 @@ void MainViewController::timerCallback()
         tipwindow = nullptr;
     }
     
-    if (++timerCallbackCount >= 2)
+    if (++timerCallbackCount >= 10)
     {
         timerCallbackCount = 0;
         processor.collectGalleries();
