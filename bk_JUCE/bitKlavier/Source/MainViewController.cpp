@@ -38,11 +38,6 @@ tooltipsButton("Show tooltips")
     splash.setAlwaysOnTop(true);
     
     initial = true;
-    addMouseListener(this, true);
-    
-    setWantsKeyboardFocus(true);
-
-    addKeyListener(this);
     
     gen = processor.gallery->getGeneralSettings();
     
@@ -142,6 +137,21 @@ tooltipsButton("Show tooltips")
     {
         tipwindow = nullptr;
     }
+    
+    // fill menus
+    processor.collectGalleries();
+    processor.collectPreparations();
+    processor.collectPianos();
+    processor.collectSoundfonts();
+    
+    header.fillGalleryCB();
+    
+    fillSampleCB();
+    fillInstrumentCB();
+    
+    addMouseListener(this, true);
+    // setWantsKeyboardFocus(true);
+    addKeyListener(this);
     
     startTimerHz (10);
 }
@@ -647,6 +657,7 @@ void MainViewController::timerCallback()
         tipwindow = nullptr;
     }
     
+    // update menu contents periodically
     if (++timerCallbackCount >= 10)
     {
         timerCallbackCount = 0;
@@ -661,8 +672,11 @@ void MainViewController::timerCallback()
         fillInstrumentCB();
     }
     
+    // display active noteOns on main keyboard
     Array<bool> noteOns = processor.getNoteOns();
     keyboardState.setKeymap(noteOns);
+    
+    // set main keyboard to display active keys in selected keymap (if there is a selected keymap)
     if (construction.getNumSelected() == 1)
     {
         BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
@@ -671,6 +685,7 @@ void MainViewController::timerCallback()
             keyboardState.setKeymap(processor.gallery->getKeymap(item->getId())->getKeymap());
         }
     }
+    
     keyboard->repaint();
     
     if (state->pianoSamplesAreLoading)
@@ -700,7 +715,7 @@ void MainViewController::timerCallback()
     //check to see if General Settings globalGain has changed, update slider accordingly
     float globalGain = processor.gallery->getGeneralSettings()->getGlobalGain();
     float genGain = Decibels::gainToDecibels(globalGain);
-    if(genGain != mainSlider.getValue())
+    if (genGain != mainSlider.getValue())
         mainSlider.setValue(Decibels::gainToDecibels(globalGain), dontSendNotification);
     
     if (state->modificationDidChange)
@@ -779,7 +794,6 @@ void MainViewController::timerCallback()
         state->commentDidChange = false;
         construction.getCurrentItem()->setCommentText(state->comment);
     }
-    
     
     if (state->keymapDidChange)
     {
