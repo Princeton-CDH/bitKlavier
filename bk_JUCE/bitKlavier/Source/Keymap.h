@@ -253,7 +253,11 @@ public:
             }
         }
         
-        defaultSelected = e->getStringAttribute(ptagKeymap_defaultSelected).getIntValue();
+        n = e->getStringAttribute(ptagKeymap_defaultSelected);
+        if (n != "") defaultSelected = n.getIntValue();
+        else defaultSelected = true;
+        
+        // defaultSelected = e->getStringAttribute(ptagKeymap_defaultSelected).getIntValue();
         onscreenSelected = e->getStringAttribute(ptagKeymap_defaultSelected).getIntValue();
     }
     
