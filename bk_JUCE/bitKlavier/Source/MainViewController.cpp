@@ -45,11 +45,6 @@ globalSoundSetButton("Use global samples")
     splash.setAlwaysOnTop(true);
     
     initial = true;
-    addMouseListener(this, true);
-    
-    setWantsKeyboardFocus(true);
-
-    addKeyListener(this);
     
     gen = processor.gallery->getGeneralSettings();
     
@@ -150,11 +145,29 @@ globalSoundSetButton("Use global samples")
         tipwindow = nullptr;
     }
     
+    // fill menus
+    processor.collectGalleries();
+    processor.collectPreparations();
+    processor.collectPianos();
+    processor.collectSoundfonts();
+    
+    header.fillGalleryCB();
+    
+    fillSampleCB();
+    fillInstrumentCB();
+    
+    addMouseListener(this, true);
+    // setWantsKeyboardFocus(true);
+    addKeyListener(this);
+    
     startTimerHz (10);
 }
 
 MainViewController::~MainViewController()
 {
+    removeMouseListener(this);
+    keyboard->removeMouseListener(this);
+    
     setLookAndFeel(nullptr);
     sampleCB.setLookAndFeel(nullptr);
     instrumentCB.setLookAndFeel(nullptr);
@@ -726,7 +739,8 @@ void MainViewController::timerCallback()
         tipwindow = nullptr;
     }
     
-    if (++timerCallbackCount >= 2)
+    // update menu contents periodically
+    if (++timerCallbackCount >= 10)
     {
         timerCallbackCount = 0;
         processor.collectGalleries();
@@ -740,10 +754,13 @@ void MainViewController::timerCallback()
         fillInstrumentCB();
     }
     
+    // display active noteOns on main keyboard
     Array<bool> noteOns = processor.getNoteOns();
     keyboardState.setKeymap(noteOns);
-    
+
     bool soundItemSelected = false;
+
+    // set main keyboard to display active keys in selected keymap (if there is a selected keymap)
     if (construction.getNumSelected() == 1)
     {
         BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);

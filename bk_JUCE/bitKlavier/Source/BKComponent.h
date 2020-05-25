@@ -153,7 +153,7 @@ public:
     
     ~BKDraggableComponent()
     {
-        
+        removeMouseListener(this);
     }
     
     inline void setConstrainer(int top, int left, int bottom, int right)
