@@ -754,6 +754,12 @@ void NostalgicPreparationEditor::setCurrentId(int Id)
 
 void NostalgicPreparationEditor::actionButtonCallback(int action, NostalgicPreparationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)
@@ -1451,6 +1457,12 @@ void NostalgicModificationEditor::setCurrentId(int Id)
 
 void NostalgicModificationEditor::actionButtonCallback(int action, NostalgicModificationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)

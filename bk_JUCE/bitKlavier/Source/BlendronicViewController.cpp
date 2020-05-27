@@ -564,6 +564,12 @@ void BlendronicPreparationEditor::setCurrentId(int Id)
 
 void BlendronicPreparationEditor::actionButtonCallback(int action, BlendronicPreparationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)
@@ -1355,6 +1361,12 @@ void BlendronicModificationEditor::setCurrentId(int Id)
 
 void BlendronicModificationEditor::actionButtonCallback(int action, BlendronicModificationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)
