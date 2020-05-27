@@ -164,6 +164,12 @@ inline PopupMenu getEditMenuStandalone(LookAndFeel* laf, int numItemsSelected, b
 
     if (numItemsSelected)
     {
+#if JUCE_IOS
+        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
+#else
+        menu.addSubMenu("Add...", getNewItemMenu(laf));
+#endif
+        menu.addSeparator();
         menu.addItem(COPY_ID, "Copy" + gCopyShortcut);
         menu.addItem(CUT_ID, "Cut" + gCutShortcut);
         menu.addItem(PASTE_ID, "Paste" + gPasteShortcut);
@@ -212,6 +218,12 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     
     if (numItemsSelected)
     {
+#if JUCE_IOS
+        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
+#else
+        menu.addSubMenu("Add...", getNewItemMenu(laf));
+#endif
+        menu.addSeparator();
         menu.addItem(COPY_ID, "Copy");
         menu.addItem(CUT_ID, "Cut");
         menu.addItem(PASTE_ID, "Paste");

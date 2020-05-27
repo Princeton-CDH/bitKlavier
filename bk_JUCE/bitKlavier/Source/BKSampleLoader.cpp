@@ -113,11 +113,22 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     
         if (sourceBuffer == NULL) continue;
         
+        // Only get the first channel of the sample because individual sample of soundfonts should supposedly
+        // always be mono, but I've found some soundfont formatted as a stereo sample with audio only in the first channel
+        // and if we get both channels (as in the commented block below) the audio only be in the left channel in output.
         BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), 1, (int)sampleLength);
         
         AudioSampleBuffer* destBuffer = buffer->getAudioSampleBuffer();
         
         destBuffer->copyFrom(0, 0, sourceBuffer->getReadPointer(0, (int)sampleStart), (int)sampleLength);
+        
+        //        BKReferenceCountedBuffer::Ptr buffer = new BKReferenceCountedBuffer(region->sample->getShortName(), sourceBuffer->getNumChannels(), (int)sampleLength);
+        //
+        //        AudioSampleBuffer* destBuffer = buffer->getAudioSampleBuffer();
+        //
+        //        for (int i = 0; i < destBuffer->getNumChannels(); i++)
+        //            destBuffer->copyFrom(i, 0, sourceBuffer->getReadPointer(i, (int)sampleStart), (int)sampleLength);
+
         
         // WEIRD thing where sample metadata defines loop point instead of the sfz format
         if (!isSF2 && (region->loop_mode == 0))
@@ -165,14 +176,14 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         BigInteger vrange; vrange.setRange(region->lovel, vbits+1, true);
         
         synth->addSound(new BKPianoSamplerSound(region->sample->getShortName(),
-                                                        buffer,
-                                                        sampleLength,
-                                                        sourceSampleRate,
-                                                        nrange,
-                                                        region->pitch_keycenter,
-                                                        region->transpose,
-                                                        vrange,
-                                                        region,isSF2));
+                                                buffer,
+                                                sampleLength,
+                                                sourceSampleRate,
+                                                nrange,
+                                                region->pitch_keycenter,
+                                                region->transpose,
+                                                vrange,
+                                                region,isSF2));
         
     }
     
