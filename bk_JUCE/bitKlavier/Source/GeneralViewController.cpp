@@ -117,7 +117,7 @@ AboutViewController::~AboutViewController()
 {
     setLookAndFeel(nullptr);
 }
-
+    
 void AboutViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);
