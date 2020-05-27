@@ -139,7 +139,6 @@ BKViewController(p, theGraph, 3)
     bufferSizeSlider->setToolTipString("Sets the size of the delay line in seconds");
     addAndMakeVisible(*bufferSizeSlider);
     
-    delayLineDisplay.setNumChannels(1);
     delayLineDisplay.setColours(Colours::black, Colours::lightgrey);
     addAndMakeVisible(&delayLineDisplay);
     
@@ -735,8 +734,8 @@ void BlendronicPreparationEditor::timerCallback()
         
         if (prep != nullptr && proc != nullptr)
         {
-            proc->setDisplay(&delayLineDisplay);
-            delayLineDisplay.setBufferSize(proc->getDelayBuffer()->getNumSamples());
+            delayLineDisplay.setAudio(proc->getAudioDisplayData());
+            delayLineDisplay.setSmoothing(proc->getSmoothingDisplayData());
             delayLineDisplay.setLineSpacing(proc->getPulseLengthInSamples());
             float maxDelayLength = 0.0f;
             for (auto d : prep->getDelayLengths())
