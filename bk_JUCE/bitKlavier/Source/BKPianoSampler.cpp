@@ -775,17 +775,25 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         }
         else if (playDirection == Reverse)
         {
+            /*
             if(lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
             {
                 clearCurrentNote(); break;
             }
+             */
             
-            if (playType != Normal && (lengthTracker >= playLength))
+            if (lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
+            //if (playType != Normal && (lengthTracker >= playLength))
             {
                 if ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE))
                 {
                     adsr.keyOff();
                 }
+            }
+            
+            if (sourceSamplePosition <= 0)
+            {
+                clearCurrentNote();
             }
             
         }
