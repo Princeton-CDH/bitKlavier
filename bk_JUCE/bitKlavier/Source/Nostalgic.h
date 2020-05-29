@@ -65,7 +65,9 @@ public:
     velocityMin(p->getVelocityMin()),
     velocityMax(p->getVelocityMax()),
     keyOnReset(p->getKeyOnReset()),
-    targetTypeNostalgicClear(p->getTargetTypeNostalgicClear())
+    targetTypeNostalgicClear(p->getTargetTypeNostalgicClear()),
+    nUseGlobalSoundSet(p->getUseGlobalSoundSet()),
+    nSoundSet(p->getSoundSet())
     {
         
     }
@@ -86,7 +88,9 @@ public:
     nGain(gain),
     nLengthMultiplier(lengthMultiplier),
     nBeatsToSkip(beatsToSkip),
-    nMode(mode)
+    nMode(mode),
+    nUseGlobalSoundSet(true),
+    nSoundSet(-1)
     {
         holdMin = 0;
         holdMax = 12000;
@@ -126,7 +130,9 @@ public:
     velocityMin(0),
     velocityMax(127),
     keyOnReset(false),
-    targetTypeNostalgicClear(NoteOn)
+    targetTypeNostalgicClear(NoteOn),
+    nUseGlobalSoundSet(true),
+    nSoundSet(-1)
     {
 
     }
@@ -164,6 +170,8 @@ public:
         velocityMin = n->getVelocityMin();
         velocityMax = n->getVelocityMax();
         targetTypeNostalgicClear = n->getTargetTypeNostalgicClear();
+        nUseGlobalSoundSet = n->getUseGlobalSoundSet();
+        nSoundSet = n->getSoundSet();
     }
     
     inline void performModification(NostalgicPreparation::Ptr n, Array<bool> dirty)
@@ -599,6 +607,12 @@ public:
         
     }
     
+    inline void setUseGlobalSoundSet(bool use) { nUseGlobalSoundSet = use; }
+    inline void setSoundSet(int Id) { nSoundSet = Id; }
+    
+    inline bool getUseGlobalSoundSet(void) { return nUseGlobalSoundSet; }
+    inline int getSoundSet(void) { return nUseGlobalSoundSet ? -1 : nSoundSet; }
+    
     
 private:
     String name;
@@ -637,6 +651,9 @@ private:
     
     // internal keymap for resetting internal values to static
     // Keymap::Ptr resetMap = new Keymap(0);
+    
+    bool nUseGlobalSoundSet;
+    int nSoundSet;
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };

@@ -108,7 +108,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                     noteDirection,
                     FixedLengthFixedStart,
                     SynchronicNote,
-                    0, //set
+                    prep->getSoundSet(), //set
                     synchronic->getId(),
                     noteStartPos,  // start
                     noteLength,
@@ -132,7 +132,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 					noteDirection,
 					FixedLengthFixedStart,
 					SynchronicNote,
-                    0, //set
+                    prep->getSoundSet(), //set
 					synchronic->getId(),
 					noteStartPos,  // start
 					noteLength,

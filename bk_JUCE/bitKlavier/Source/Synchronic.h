@@ -81,7 +81,9 @@ public:
     targetTypeSynchronicDeleteOldest(p->getTargetTypeSynchronicDeleteOldest()),
     targetTypeSynchronicDeleteNewest(p->getTargetTypeSynchronicDeleteNewest()),
     targetTypeSynchronicRotate(p->getTargetTypeSynchronicRotate()),
-    midiOutput(p->getMidiOutput())
+    midiOutput(p->getMidiOutput()),
+    sUseGlobalSoundSet(p->getUseGlobalSoundSet()),
+    sSoundSet(p->getSoundSet())
     {
         
     }
@@ -130,7 +132,9 @@ public:
     targetTypeSynchronicDeleteOldest(NoteOn),
     targetTypeSynchronicDeleteNewest(NoteOn),
     targetTypeSynchronicRotate(NoteOn),
-    midiOutput(nullptr)
+    midiOutput(nullptr),
+    sUseGlobalSoundSet(true),
+    sSoundSet(-1)
     {
         
     }
@@ -173,7 +177,9 @@ public:
     targetTypeSynchronicDeleteOldest(NoteOn),
     targetTypeSynchronicDeleteNewest(NoteOn),
     targetTypeSynchronicRotate(NoteOn),
-    midiOutput(nullptr)
+    midiOutput(nullptr),
+    sUseGlobalSoundSet(true),
+    sSoundSet(-1)
     {
         sTransposition.ensureStorageAllocated(1);
         sTransposition.add(Array<float>({0.0}));
@@ -230,6 +236,9 @@ public:
         targetTypeSynchronicRotate = s->getTargetTypeSynchronicRotate();
         
         midiOutput = s->getMidiOutput();
+        
+        sUseGlobalSoundSet = s->getUseGlobalSoundSet();
+        sSoundSet = s->getSoundSet();
     }
     
     inline void performModification(SynchronicPreparation::Ptr s, Array<bool> dirty)
@@ -1200,6 +1209,12 @@ public:
         }
     }
     
+    inline void setUseGlobalSoundSet(bool use) { sUseGlobalSoundSet = use; }
+    inline void setSoundSet(int Id) { sSoundSet = Id; }
+    
+    inline bool getUseGlobalSoundSet(void) { return sUseGlobalSoundSet; }
+    inline int getSoundSet(void) { return sUseGlobalSoundSet ? -1 : sSoundSet; }
+    
 private:
     String name;
     float sTempo;
@@ -1255,6 +1270,9 @@ private:
     TargetNoteMode targetTypeSynchronicRotate;
 
     std::shared_ptr<MidiOutput> midiOutput;
+    
+    bool sUseGlobalSoundSet;
+    int sSoundSet;
 
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };

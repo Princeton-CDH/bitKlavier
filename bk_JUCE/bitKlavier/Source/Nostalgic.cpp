@@ -127,7 +127,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         Reverse,
                         FixedLengthFixedStart,
                         NostalgicNote,
-                        0, //set
+                        prep->getSoundSet(), //set
                         nostalgic->getId(),
                         duration + prep->getWavedistance(),
                         duration,  // length
@@ -151,7 +151,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 						Reverse,
 						FixedLengthFixedStart,
 						NostalgicNote,
-                        0, //set
+                        prep->getSoundSet(), //set
 						nostalgic->getId(),
 						duration + prep->getWavedistance(),
 						duration,  // length
@@ -301,7 +301,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                                 Reverse,
                                 FixedLengthFixedStart,
                                 NostalgicNote,
-                                0, //set
+                                prep->getSoundSet(), //set
                                 nostalgic->getId(),
                                 duration + prep->getWavedistance(),
                                 duration,  // length
@@ -325,7 +325,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 								Reverse,
 								FixedLengthFixedStart,
 								NostalgicNote,
-                                0, //set
+                                prep->getSoundSet(), //set
 								nostalgic->getId(),
 								duration + prep->getWavedistance(),
 								duration,  // length
@@ -401,7 +401,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         Reverse,
                         FixedLengthFixedStart,
                         NostalgicNote,
-                        0, //set
+                        prep->getSoundSet(), //set
                         nostalgic->getId(),
                         duration + prep->getWavedistance(),
                         duration,  // length
@@ -425,7 +425,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 						Reverse,
 						FixedLengthFixedStart,
 						NostalgicNote,
-                        0, //set
+                        prep->getSoundSet(), //set
 						nostalgic->getId(),
 						duration + prep->getWavedistance(),
 						duration,  // length
@@ -526,7 +526,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                         Reverse,
                         FixedLengthFixedStart,
                         NostalgicNote,
-                        0, //set
+                        prep->getSoundSet(), //set
                         nostalgic->getId(),
                         duration + prep->getWavedistance(),
                         duration,  // length
@@ -551,7 +551,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
 						Reverse,
 						FixedLengthFixedStart,
 						NostalgicNote,
-                        0, //set
+                        prep->getSoundSet(), //set
 						nostalgic->getId(),
 						duration + prep->getWavedistance(),
 						duration,  // length
@@ -793,7 +793,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                             Forward,
                             FixedLengthFixedStart,
                             NostalgicNote,
-                            0, //set
+                            nostalgic->aPrep->getSoundSet(), //set
                             nostalgic->getId(),
                             noteOnPrep->getWavedistance(),                        //start position
                             noteOnPrep->getUndertow(),                            //play length
@@ -816,7 +816,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
 							Forward,
 							FixedLengthFixedStart,
 							NostalgicNote,
-                            0, //set
+                            nostalgic->aPrep->getSoundSet(), //set
 							nostalgic->getId(),
 							noteOnPrep->getWavedistance(),                        //start position
 							noteOnPrep->getUndertow(),                            //play length
