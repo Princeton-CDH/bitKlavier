@@ -1278,6 +1278,12 @@ void TuningPreparationEditor::setCurrentId(int Id)
 
 void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     if (action == 1)
     {
@@ -2292,6 +2298,12 @@ void TuningModificationEditor::setCurrentId(int Id)
 
 void TuningModificationEditor::actionButtonCallback(int action, TuningModificationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)

@@ -135,7 +135,10 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     
     resetPhase = false;
     
-    display = nullptr;
+    for (int i = 0; i < 1/*numChannels*/; ++i)
+        audio.add (new BlendronicDisplay::ChannelInfo (44100, 512));
+    
+    smoothing = std::make_unique<BlendronicDisplay::ChannelInfo>(44100, 512);
     
     DBG("Create bproc");
 }
@@ -167,7 +170,8 @@ void BlendronicProcessor::tick(float* outputs)
         if (clearDelayOnNextBeat)
         {
             delay->clear();
-            if (display != nullptr) display->clearAudio();
+            for (auto channel : audio)
+                channel->clear();
             clearDelayOnNextBeat = false;
         }
 
@@ -217,13 +221,15 @@ void BlendronicProcessor::tick(float* outputs)
     
     float dlr = 0.0f;
     if (pulseLength != INFINITY) dlr = delay->getDelayLength() / (pulseLength * synth->getSampleRate());
-    if (display != nullptr)
-    {
-        int i = getInPoint() - 1;
-        if (i < 0) i = getDelayBuffer()->getNumSamples() - 1;
-        display->pushAudioSample(delay->getSample(0, i));
-        display->pushSmoothingSample(dlr);
-    }
+
+    
+    int i = getInPoint() - 1;
+    if (i < 0) i = getDelayBuffer()->getNumSamples() - 1;
+    
+    for (auto channel : audio)
+        channel->pushSample (delay->getSample(0, i));
+    
+    smoothing->pushSample(dlr);
 }
 
 void BlendronicProcessor::processBlock(int numSamples, int midiChannel)
@@ -283,7 +289,8 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
         (prep->getTargetTypeBlendronicClear() == NoteOn || prep->getTargetTypeBlendronicClear() == Both))
     {
         delay->clear();
-        if (display != nullptr) display->clearAudio();
+        for (auto channel : audio)
+            channel->clear();
     }
     
     if (doPausePlay &&
@@ -351,7 +358,8 @@ void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiCh
         (prep->getTargetTypeBlendronicClear() == NoteOff || prep->getTargetTypeBlendronicClear() == Both))
     {
         delay->clear();
-        if (display != nullptr) display->clearAudio();
+        for (auto channel : audio)
+            channel->clear();
     }
     
     if (doPausePlay &&
@@ -384,6 +392,13 @@ void BlendronicProcessor::prepareToPlay(double sr)
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
     delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayBufferSizeInSeconds() * synth->getSampleRate(), synth->getSampleRate(), true);
+    
+    for (int i = 0; i < 1/*numChannels*/; ++i)
+    {
+        audio.getUnchecked(i)->setBufferSize(delay->getDelayBuffer()->getNumSamples());
+    }
+    
+    smoothing->setBufferSize(delay->getDelayBuffer()->getNumSamples());
     
     beatPositionsInBuffer.ensureStorageAllocated(128);
     beatPositionsInBuffer.clear();
@@ -476,4 +491,11 @@ void BlendronicProcessor::setDelayBufferSizeInSeconds(float size)
     delay->setBufferSize(size * synth->getSampleRate());
     beatPositionsInBuffer.clear();
     beatPositionsIndex = -1;
+    
+    for (int i = 0; i < 1/*numChannels*/; ++i)
+    {
+        audio.getUnchecked(i)->setBufferSize(delay->getDelayBuffer()->getNumSamples());
+    }
+    
+    smoothing->setBufferSize(delay->getDelayBuffer()->getNumSamples());
 }

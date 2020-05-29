@@ -27,25 +27,87 @@ public:
 
     ~BlendronicDisplay() override;
     
-    void setNumChannels (int numChannels);
-    void setNumBlocks (int num);
-    void setSamplesPerBlock (int newNumInputSamplesPerBlock) noexcept;
-    int getSamplesPerBlock() const noexcept { return inputSamplesPerBlock; }
-    void clear();
-    void clearAudio();
-    void clearSmoothing();
-    void setBufferSize (int size);
-    void pushAudioSample (float sample);
-    void pushSmoothingSample (float sample);
+    struct ChannelInfo
+    {
+        ChannelInfo (int bufferSize, int numBlocks) :
+        bufferSize(bufferSize),
+        numBlocks(numBlocks),
+        samplesPerBlock(bufferSize/numBlocks)
+        {
+            setNumBlocks (numBlocks);
+            clear();
+        }
+        
+        void clear() noexcept
+        {
+            levels.fill ({});
+            value = {};
+            subSample = 0;
+        }
+        
+        void pushSamples (const float* inputSamples, int num) noexcept
+        {
+            for (int i = 0; i < num; ++i)
+                pushSample (inputSamples[i]);
+        }
+        
+        void pushSample (float newSample) noexcept
+        {
+            if (--subSample <= 0)
+            {
+                if (++nextSample == levels.size())
+                    nextSample = 0;
+                
+                levels.getReference (nextSample) = value;
+                subSample = samplesPerBlock;
+                value = Range<float> (newSample, newSample);
+            }
+            else
+            {
+                value = value.getUnionWith (newSample);
+            }
+        }
+        
+        void setNumBlocks (int newSize)
+        {
+            levels.removeRange (newSize, levels.size());
+            levels.insertMultiple (-1, {}, newSize - levels.size());
+            
+            if (nextSample >= newSize)
+                nextSample = 0;
+        }
+        
+        void setBufferSize (int size)
+        {
+            bufferSize = size;
+            samplesPerBlock = bufferSize / numBlocks;
+        }
+        
+        int getBufferSize (void) { return bufferSize; }
+    
+        int getSamplesPerBlock (void) { return samplesPerBlock; }
+        
+        Array<Range<float>> levels;
+        Range<float> value;
+        std::atomic<int> nextSample { 0 }, subSample { 0 };
+        int bufferSize;
+        int numBlocks;
+        int samplesPerBlock;
+        
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChannelInfo)
+    };
+    
+    void setAudio(OwnedArray<ChannelInfo>* audio) { channels = audio; }
+    void setSmoothing(ChannelInfo* smooth) { smoothing = smooth; }
     
     inline void setMaxDelayLength (float maxDelay) { maxDelayLength = maxDelay; }
 
     inline void setLineSpacing(uint64 spacing)
     {
         if (spacing == 0) return;
-        lineSpacingInBlocks = spacing * invInputSamplesPerBlock;
+        lineSpacingInBlocks = spacing * (1.0f / smoothing->getSamplesPerBlock());
     }
-    inline void setPulseOffset(float off) { pulseOffset = off * invInputSamplesPerBlock; }
+    inline void setPulseOffset(float off) { pulseOffset = off * (1.0f / smoothing->getSamplesPerBlock()); }
     inline void setVerticalZoom(float zoom) { verticalZoom = zoom; }
     inline void setHorizontalZoom(float zoom) { horizontalZoom = zoom; }
     inline void setMarkers(Array<uint64> m) { markers = m; }
@@ -67,11 +129,10 @@ public:
     void sliderValueChanged (Slider *slider) override;
     
 private:
-    struct ChannelInfo;
     
-    OwnedArray<ChannelInfo> channels;
-    int bufferSize, numBlocks, inputSamplesPerBlock;
-    float invInputSamplesPerBlock;
+    OwnedArray<ChannelInfo>* channels;
+    ChannelInfo* smoothing;
+    
     float lineSpacingInBlocks;
     float currentLevel, prevLevel;
     float scroll, offset;
@@ -84,8 +145,6 @@ private:
     double verticalZoomSliderMin, verticalZoomSliderMax;
     double horizontalZoomSliderMin, horizontalZoomSliderMax;
     double sliderIncrement;
-    
-    OwnedArray<ChannelInfo> smoothing;
     
     float maxDelayLength;
     

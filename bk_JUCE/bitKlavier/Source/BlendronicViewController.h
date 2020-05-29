@@ -110,14 +110,7 @@ public Timer
 {
 public:
     BlendronicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~BlendronicPreparationEditor()
-    {
-        setLookAndFeel(nullptr);
-        for (int i=0; i<=TargetTypeBlendronicOpenCloseOutput-TargetTypeBlendronicPatternSync; i++)
-        {
-            targetControlCBs[i]->setLookAndFeel(nullptr);
-        }
-    };
+    ~BlendronicPreparationEditor() {};
     
     
     void update(void) override;
@@ -163,10 +156,7 @@ public Timer
 {
 public:
     BlendronicModificationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~BlendronicModificationEditor()
-    {
-        setLookAndFeel(nullptr);
-    };
+    ~BlendronicModificationEditor() {};
     
     
     void update(void) override;

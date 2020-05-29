@@ -466,6 +466,12 @@ void KeymapViewController::setCurrentId(int Id)
 
 void KeymapViewController::actionButtonCallback(int action, KeymapViewController* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)

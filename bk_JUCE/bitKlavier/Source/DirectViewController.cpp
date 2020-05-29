@@ -428,6 +428,12 @@ void DirectPreparationEditor::setCurrentId(int Id)
 
 void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)
@@ -819,6 +825,12 @@ void DirectModificationEditor::setCurrentId(int Id)
 
 void DirectModificationEditor::actionButtonCallback(int action, DirectModificationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)

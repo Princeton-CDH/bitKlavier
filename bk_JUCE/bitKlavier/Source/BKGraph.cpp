@@ -119,7 +119,8 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
 
 BKItem::~BKItem()
 {
-
+    if (getParentComponent() != nullptr)
+        getParentComponent()->removeChildComponent(this);
 }
 
 BKItem* BKItem::duplicate(void)

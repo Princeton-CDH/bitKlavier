@@ -407,6 +407,12 @@ void TempoPreparationEditor::setCurrentId(int Id)
 
 void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     if (action == 1)
     {
@@ -774,6 +780,12 @@ void TempoModificationEditor::setCurrentId(int Id)
 
 void TempoModificationEditor::actionButtonCallback(int action, TempoModificationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     if (action == 1)
     {

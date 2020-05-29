@@ -925,8 +925,6 @@ public:
     inline const bool getResetPhase() const noexcept { return resetPhase; }
     inline const void setResetPhase(bool reset) { resetPhase = reset; }
     
-    inline void setDisplay(BlendronicDisplay* d) noexcept { display = d; }
-    
     void setDelayBufferSizeInSeconds(float size);
     
     void tick(float* outputs);
@@ -942,6 +940,10 @@ public:
     {
         return keymaps;
     }
+    
+    inline OwnedArray<BlendronicDisplay::ChannelInfo>* getAudioDisplayData(void) { return &audio; }
+    
+    inline BlendronicDisplay::ChannelInfo* getSmoothingDisplayData(void) { return smoothing.get(); }
 
 private:
     CriticalSection lock;
@@ -995,7 +997,8 @@ private:
     float pulseOffset; // Sample offset of the pulse grid from grid aligned with buffer start (used in display)
     bool resetPhase;
     
-    BlendronicDisplay* display;
+    OwnedArray<BlendronicDisplay::ChannelInfo> audio;
+    std::unique_ptr<BlendronicDisplay::ChannelInfo> smoothing;
 
 	JUCE_LEAK_DETECTOR(BlendronicProcessor);
 };

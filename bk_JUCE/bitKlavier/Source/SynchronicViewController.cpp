@@ -1395,6 +1395,12 @@ void SynchronicPreparationEditor::setCurrentId(int Id)
 
 void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPreparationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)
@@ -2245,6 +2251,12 @@ void SynchronicModificationEditor::setCurrentId(int Id)
 
 void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicModificationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)
