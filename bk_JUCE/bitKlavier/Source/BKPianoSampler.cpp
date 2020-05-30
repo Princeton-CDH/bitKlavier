@@ -791,7 +791,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
                 }
             }
             
-            if (sourceSamplePosition <= 0)
+            if (sourceSamplePosition <= 0 || (adsr.getState() == BKADSR::IDLE))
             {
                 clearCurrentNote();
             }
