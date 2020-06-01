@@ -348,7 +348,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
             {
                 Piano::Ptr thisPiano = bkPianos[which++];
                 
-                thisPiano->setState(e, &idmap);
+                thisPiano->setState(e, &idmap, idcounts);
             }
         }
     }
