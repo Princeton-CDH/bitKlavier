@@ -150,7 +150,7 @@ tooltipsButton("Show tooltips")
     fillInstrumentCB();
     
     addMouseListener(this, true);
-    // setWantsKeyboardFocus(true);
+    setWantsKeyboardFocus(true);
     addKeyListener(this);
     
     startTimerHz (10);
