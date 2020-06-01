@@ -157,7 +157,7 @@ globalSoundSetButton("Use global samples")
     fillInstrumentCB();
     
     addMouseListener(this, true);
-    // setWantsKeyboardFocus(true);
+    setWantsKeyboardFocus(true);
     addKeyListener(this);
     
     startTimerHz (10);

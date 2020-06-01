@@ -1031,7 +1031,7 @@ ValueTree Piano::getState(void)
 }
 #define LOAD_VERSION 0
 
-void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap)
+void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap, int* idcounts)
 {
     int i = 0;
     
@@ -1139,10 +1139,16 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap)
                     
                     i = connection->getStringAttribute("Id").getIntValue();
                     int cId = i;
+                    int oldId = cId;
                     
-                    if (idmap->getUnchecked(cType)->contains(cId))
+                    if (idmap->getUnchecked(cType)->contains(oldId))
                     {
-                        cId = idmap->getUnchecked(cType)->getReference(cId);
+                        cId = idmap->getUnchecked(cType)->getReference(oldId);
+                    }
+                    else
+                    {
+                        cId = idcounts[cType]++;
+                        idmap->getUnchecked(cType)->set(oldId, cId);
                     }
                     
                     i = connection->getStringAttribute("piano").getIntValue();
@@ -1160,6 +1166,7 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap)
                     
                     if (thisConnection == nullptr)
                     {
+                        
                         thisConnection = new BKItem(cType, cId, processor);
                         
                         thisConnection->setItemName(connection->getStringAttribute("name"));

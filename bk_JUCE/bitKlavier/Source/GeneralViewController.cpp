@@ -107,7 +107,7 @@ BKViewController(p, theGraph, 1)
     about.setJustification(Justification::centredTop);
     about.setMultiLine(true);
     about.setText("Welcome to bitKlavier v2.5.3b1! www.bitKlavier.com\n--\nbitKlavier was created by\nDan Trueman\n Mike Mulshine\nMatt Wang");
-    
+
     image = ImageCache::getFromMemory(BinaryData::icon_png, BinaryData::icon_pngSize);
     
     placement = RectanglePlacement::centred;
