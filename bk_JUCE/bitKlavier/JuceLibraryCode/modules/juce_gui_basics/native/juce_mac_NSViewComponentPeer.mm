@@ -24,23 +24,6 @@
   ==============================================================================
 */
 
-//==============================================================================
-#if defined (MAC_OS_X_VERSION_10_8) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8) \
-  && USE_COREGRAPHICS_RENDERING && JUCE_COREGRAPHICS_DRAW_ASYNC
-static const juce::Identifier disableAsyncLayerBackedViewIdentifier { "disableAsyncLayerBackedView" };
-
-void setComponentAsyncLayerBackedViewDisabled (juce::Component& comp, bool shouldDisableAsyncLayerBackedView)
-{
-    comp.getProperties().set (disableAsyncLayerBackedViewIdentifier, shouldDisableAsyncLayerBackedView);
-}
-
-bool getComponentAsyncLayerBackedViewDisabled (juce::Component& comp)
-{
-    return comp.getProperties()[disableAsyncLayerBackedViewIdentifier];
-}
-#endif
-
-//==============================================================================
 namespace juce
 {
     typedef void (*AppFocusChangeCallback)();
@@ -102,15 +85,6 @@ public:
 
         [view setPostsFrameChangedNotifications: YES];
 
-       #if defined (MAC_OS_X_VERSION_10_8) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_8) \
-        && USE_COREGRAPHICS_RENDERING && JUCE_COREGRAPHICS_DRAW_ASYNC
-        if (! getComponentAsyncLayerBackedViewDisabled (component))
-        {
-            [view setWantsLayer: YES];
-            [[view layer] setDrawsAsynchronously: YES];
-        }
-       #endif
-
         if (isSharedWindow)
         {
             window = [viewToAttachTo window];
@@ -132,11 +106,13 @@ public:
 
             [window setOpaque: component.isOpaque()];
 
+          #if defined (MAC_OS_X_VERSION_10_14) && (MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_14)
             if (! [window isOpaque])
                 [window setBackgroundColor: [NSColor clearColor]];
 
-           #if defined (MAC_OS_X_VERSION_10_9) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9)
-            [view setAppearance: [NSAppearance appearanceNamed: NSAppearanceNameAqua]];
+            #if defined (MAC_OS_X_VERSION_10_9) && (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_9)
+             [view setAppearance: [NSAppearance appearanceNamed: NSAppearanceNameAqua]];
+            #endif
            #endif
 
             [window setHasShadow: ((windowStyleFlags & windowHasDropShadow) != 0)];
@@ -947,7 +923,7 @@ public:
 
         // When windows are being resized, artificially throttling high-frequency repaints helps
         // to stop the event queue getting clogged, and keeps everything working smoothly.
-        // For some reason Logic also needs this throttling to record parameter events correctly.
+        // For some reason Logic also needs this throttling to recored parameter events correctly.
         if (msSinceLastRepaint < minimumRepaintInterval && shouldThrottleRepaint())
         {
             startTimer (static_cast<int> (minimumRepaintInterval - msSinceLastRepaint));
@@ -997,7 +973,7 @@ public:
     }
 
     //==============================================================================
-    bool isBlockedByModalComponent()
+    bool sendModalInputAttemptIfBlocked()
     {
         if (auto* modal = Component::getCurrentlyModalComponent())
         {
@@ -1005,6 +981,7 @@ public:
                  && (! getComponent().isParentOf (modal))
                  && getComponent().isCurrentlyBlockedByAnotherModalComponent())
             {
+                modal->inputAttemptWhenModal();
                 return true;
             }
         }
@@ -1012,21 +989,14 @@ public:
         return false;
     }
 
-    void sendModalInputAttemptIfBlocked()
-    {
-        if (isBlockedByModalComponent())
-            if (auto* modal = Component::getCurrentlyModalComponent())
-                modal->inputAttemptWhenModal();
-    }
-
     bool canBecomeKeyWindow()
     {
-        return component.isVisible() && (getStyleFlags() & juce::ComponentPeer::windowIgnoresKeyPresses) == 0;
+        return (getStyleFlags() & juce::ComponentPeer::windowIgnoresKeyPresses) == 0;
     }
 
     bool canBecomeMainWindow()
     {
-        return component.isVisible() && dynamic_cast<ResizableWindow*> (&component) != nullptr;
+        return dynamic_cast<ResizableWindow*> (&component) != nullptr;
     }
 
     bool worksWhenModal() const
@@ -1988,7 +1958,7 @@ private:
 
         return owner != nullptr
                 && owner->canBecomeKeyWindow()
-                && ! owner->isBlockedByModalComponent();
+                && ! owner->sendModalInputAttemptIfBlocked();
     }
 
     static BOOL canBecomeMainWindow (id self, SEL)
@@ -1997,7 +1967,7 @@ private:
 
         return owner != nullptr
                 && owner->canBecomeMainWindow()
-                && ! owner->isBlockedByModalComponent();
+                && ! owner->sendModalInputAttemptIfBlocked();
     }
 
     static void becomeKeyWindow (id self, SEL)
@@ -2005,17 +1975,7 @@ private:
         sendSuperclassMessage (self, @selector (becomeKeyWindow));
 
         if (auto* owner = getOwner (self))
-        {
-            if (owner->canBecomeKeyWindow())
-            {
-                owner->becomeKeyWindow();
-                return;
-            }
-
-            // this fixes a bug causing hidden windows to sometimes become visible when the app regains focus
-            if (! owner->getComponent().isVisible())
-                [(NSWindow*) self orderOut: nil];
-        }
+            owner->becomeKeyWindow();
     }
 
     static BOOL windowShouldClose (id self, SEL, id /*window*/)

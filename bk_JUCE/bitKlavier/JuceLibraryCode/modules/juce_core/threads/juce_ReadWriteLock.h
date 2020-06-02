@@ -126,7 +126,7 @@ public:
 private:
     //==============================================================================
     SpinLock accessLock;
-    WaitableEvent readWaitEvent, writeWaitEvent;
+    WaitableEvent waitEvent;
     mutable int numWaitingWriters = 0, numWriters = 0;
     mutable Thread::ThreadID writerThreadId = {};
 

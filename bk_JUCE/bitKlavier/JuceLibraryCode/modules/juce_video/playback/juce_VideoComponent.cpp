@@ -51,12 +51,29 @@ VideoComponent::~VideoComponent()
 
 Result VideoComponent::load (const File& file)
 {
-    return loadInternal (file, false);
+   #if JUCE_ANDROID || JUCE_IOS
+    ignoreUnused (file);
+    jassertfalse;
+    return Result::fail ("load() is not supported on this platform. Use loadAsync() instead.");
+   #else
+    auto r = pimpl->load (file);
+    resized();
+    return r;
+   #endif
 }
 
 Result VideoComponent::load (const URL& url)
 {
-    return loadInternal (url, false);
+   #if JUCE_ANDROID || JUCE_IOS
+    // You need to use loadAsync on Android & iOS.
+    ignoreUnused (url);
+    jassertfalse;
+    return Result::fail ("load() is not supported on this platform. Use loadAsync() instead.");
+   #else
+    auto r = pimpl->load (url);
+    resized();
+    return r;
+   #endif
 }
 
 void VideoComponent::loadAsync (const URL& url, std::function<void(const URL&, Result)> callback)
@@ -70,7 +87,7 @@ void VideoComponent::loadAsync (const URL& url, std::function<void(const URL&, R
    #if JUCE_ANDROID || JUCE_IOS || JUCE_MAC
     pimpl->loadAsync (url, callback);
    #else
-    auto result = loadInternal (url, true);
+    auto result = load (url);
     callback (url, result);
    #endif
 }
@@ -139,27 +156,6 @@ void VideoComponent::resized()
 void VideoComponent::timerCallback()
 {
     resized();
-}
-
-template<class FileOrURL>
-Result VideoComponent::loadInternal (const FileOrURL& fileOrUrl, bool loadAsync)
-{
-   #if JUCE_ANDROID || JUCE_IOS
-    ignoreUnused (fileOrUrl, loadAsync);
-
-    // You need to use loadAsync on Android & iOS.
-    jassertfalse;
-    return Result::fail ("load() is not supported on this platform. Use loadAsync() instead.");
-   #else
-    auto result = pimpl->load (fileOrUrl);
-
-    if (loadAsync)
-        startTimer (50);
-    else
-       resized();
-
-    return result;
-   #endif
 }
 
 #endif

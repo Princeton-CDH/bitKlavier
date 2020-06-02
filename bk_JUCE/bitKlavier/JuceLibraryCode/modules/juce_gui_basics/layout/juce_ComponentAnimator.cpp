@@ -32,11 +32,6 @@ class ComponentAnimator::AnimationTask
 public:
     AnimationTask (Component* c) noexcept  : component (c) {}
 
-    ~AnimationTask()
-    {
-        proxy.deleteAndZero();
-    }
-
     void reset (const Rectangle<int>& finalBounds,
                 float finalAlpha,
                 int millisecondsToSpendMoving,
@@ -63,17 +58,17 @@ public:
         midSpeed = invTotalDistance;
         endSpeed = jmax (0.0, endSpd * invTotalDistance);
 
-        proxy.deleteAndZero();
-
         if (useProxyComponent)
-            proxy = new ProxyComponent (*component);
+            proxy.reset (new ProxyComponent (*component));
+        else
+            proxy.reset();
 
         component->setVisible (! useProxyComponent);
     }
 
     bool useTimeslice (const int elapsed)
     {
-        if (auto* c = proxy != nullptr ? proxy.getComponent()
+        if (auto* c = proxy != nullptr ? proxy.get()
                                        : component.get())
         {
             msElapsed += elapsed;
@@ -164,8 +159,7 @@ public:
             else
                 jassertfalse; // seem to be trying to animate a component that's not visible..
 
-            auto scale = (float) Desktop::getInstance().getDisplays().findDisplayForRect (getScreenBounds()).scale
-                           * Component::getApproximateScaleFactorForComponent (&c);
+            auto scale = (float) Desktop::getInstance().getDisplays().findDisplayForRect (getScreenBounds()).scale;
 
             image = c.createComponentSnapshot (c.getLocalBounds(), false, scale);
 
@@ -187,7 +181,7 @@ public:
     };
 
     WeakReference<Component> component;
-    Component::SafePointer<Component> proxy;
+    std::unique_ptr<Component> proxy;
 
     Rectangle<int> destination;
     double destAlpha;

@@ -716,17 +716,15 @@ public:
     //==============================================================================
     WinRTMidiService()
     {
-        auto* wrtWrapper = WinRTWrapper::getInstance();
-
-        if (! wrtWrapper->isInitialised())
+        if (! WinRTWrapper::getInstance()->isInitialised())
             throw std::runtime_error ("Failed to initialise the WinRT wrapper");
 
-        midiInFactory = wrtWrapper->getWRLFactory<IMidiInPortStatics> (&RuntimeClass_Windows_Devices_Midi_MidiInPort[0]);
+        midiInFactory = WinRTWrapper::getInstance()->getWRLFactory<IMidiInPortStatics> (&RuntimeClass_Windows_Devices_Midi_MidiInPort[0]);
 
         if (midiInFactory == nullptr)
             throw std::runtime_error ("Failed to create midi in factory");
 
-        midiOutFactory = wrtWrapper->getWRLFactory<IMidiOutPortStatics> (&RuntimeClass_Windows_Devices_Midi_MidiOutPort[0]);
+        midiOutFactory = WinRTWrapper::getInstance()->getWRLFactory<IMidiOutPortStatics> (&RuntimeClass_Windows_Devices_Midi_MidiOutPort[0]);
 
         if (midiOutFactory == nullptr)
             throw std::runtime_error ("Failed to create midi out factory");
@@ -786,24 +784,16 @@ private:
 
         bool attach (HSTRING deviceSelector, DeviceInformationKind infoKind)
         {
-            auto* wrtWrapper = WinRTWrapper::getInstanceWithoutCreating();
-
-            if (wrtWrapper == nullptr)
-            {
-                JUCE_WINRT_MIDI_LOG ("Failed to get the WinRTWrapper singleton!");
-                return false;
-            }
-
-            auto deviceInfoFactory = wrtWrapper->getWRLFactory<IDeviceInformationStatics2> (&RuntimeClass_Windows_Devices_Enumeration_DeviceInformation[0]);
+            auto deviceInfoFactory = WinRTWrapper::getInstance()->getWRLFactory<IDeviceInformationStatics2> (&RuntimeClass_Windows_Devices_Enumeration_DeviceInformation[0]);
 
             if (deviceInfoFactory == nullptr)
                 return false;
 
             // A quick way of getting an IVector<HSTRING>...
-            auto requestedProperties = [wrtWrapper]
+            auto requestedProperties = []
             {
-                auto devicePicker = wrtWrapper->activateInstance<IDevicePicker> (&RuntimeClass_Windows_Devices_Enumeration_DevicePicker[0],
-                                                                                 __uuidof (IDevicePicker));
+                auto devicePicker = WinRTWrapper::getInstance()->activateInstance<IDevicePicker> (&RuntimeClass_Windows_Devices_Enumeration_DevicePicker[0],
+                                                                                                  __uuidof (IDevicePicker));
                 jassert (devicePicker != nullptr);
 
                 IVector<HSTRING>* result;
@@ -816,9 +806,9 @@ private:
                 return result;
             }();
 
-            StringArray propertyKeys ("System.Devices.ContainerId",
-                                      "System.Devices.Aep.ContainerId",
-                                      "System.Devices.Aep.IsConnected");
+            StringArray propertyKeys = { "System.Devices.ContainerId",
+                                         "System.Devices.Aep.ContainerId",
+                                         "System.Devices.Aep.IsConnected" };
 
             for (auto& key : propertyKeys)
             {
@@ -1004,7 +994,7 @@ private:
                     Callback<ITypedEventHandler<DeviceWatcher*, DeviceInformationUpdate*>> (
                         [handlerPtr](IDeviceWatcher*, IDeviceInformationUpdate* infoUpdate) { return handlerPtr->updateDevice (infoUpdate); }
                     ).Get(),
-                    &deviceUpdatedToken);
+                    &deviceRemovedToken);
 
                 watcher->Start();
             }
@@ -1055,15 +1045,7 @@ private:
                 return S_OK;
             }
 
-            auto* wrtWrapper = WinRTWrapper::getInstanceWithoutCreating();
-
-            if (wrtWrapper == nullptr)
-            {
-                JUCE_WINRT_MIDI_LOG ("Failed to get the WinRTWrapper singleton!");
-                return false;
-            }
-
-            auto deviceID = wrtWrapper->hStringToString (deviceIDHst);
+            auto deviceID = WinRTWrapper::getInstance()->hStringToString (deviceIDHst);
             JUCE_WINRT_MIDI_LOG ("Detected paired BLE device: " << deviceID);
 
             if (auto* containerIDValue = getValueFromDeviceInfo ("System.Devices.Aep.ContainerId", addedDeviceInfo))
@@ -1100,15 +1082,7 @@ private:
                 return S_OK;
             }
 
-            auto* wrtWrapper = WinRTWrapper::getInstanceWithoutCreating();
-
-            if (wrtWrapper == nullptr)
-            {
-                JUCE_WINRT_MIDI_LOG ("Failed to get the WinRTWrapper singleton!");
-                return false;
-            }
-
-            auto removedDeviceId = wrtWrapper->hStringToString (removedDeviceIdHstr);
+            auto removedDeviceId = WinRTWrapper::getInstance()->hStringToString (removedDeviceIdHstr);
 
             JUCE_WINRT_MIDI_LOG ("Removing BLE device: " << removedDeviceId);
 
@@ -1138,15 +1112,7 @@ private:
                 return S_OK;
             }
 
-            auto* wrtWrapper = WinRTWrapper::getInstanceWithoutCreating();
-
-            if (wrtWrapper == nullptr)
-            {
-                JUCE_WINRT_MIDI_LOG ("Failed to get the WinRTWrapper singleton!");
-                return false;
-            }
-
-            auto updatedDeviceId = wrtWrapper->hStringToString (updatedDeviceIdHstr);
+            auto updatedDeviceId = WinRTWrapper::getInstance()->hStringToString (updatedDeviceIdHstr);
 
             JUCE_WINRT_MIDI_LOG ("Updating BLE device: " << updatedDeviceId);
 
@@ -1243,15 +1209,7 @@ private:
                 return S_OK;
             }
 
-            auto* wrtWrapper = WinRTWrapper::getInstanceWithoutCreating();
-
-            if (wrtWrapper == nullptr)
-            {
-                JUCE_WINRT_MIDI_LOG ("Failed to get the WinRTWrapper singleton!");
-                return false;
-            }
-
-            info.deviceID = wrtWrapper->hStringToString (deviceID);
+            info.deviceID = WinRTWrapper::getInstance()->hStringToString (deviceID);
 
             JUCE_WINRT_MIDI_LOG ("Detected MIDI device: " << info.deviceID);
 
@@ -1277,7 +1235,7 @@ private:
                 return S_OK;
             }
 
-            info.name = wrtWrapper->hStringToString (name);
+            info.name = WinRTWrapper::getInstance()->hStringToString (name);
 
             boolean isDefault = false;
             hr = addedDeviceInfo->get_IsDefault (&isDefault);
@@ -1311,15 +1269,7 @@ private:
                 return S_OK;
             }
 
-            auto* wrtWrapper = WinRTWrapper::getInstanceWithoutCreating();
-
-            if (wrtWrapper == nullptr)
-            {
-                JUCE_WINRT_MIDI_LOG ("Failed to get the WinRTWrapper singleton!");
-                return false;
-            }
-
-            auto removedDeviceId = wrtWrapper->hStringToString (removedDeviceIdHstr);
+            auto removedDeviceId = WinRTWrapper::getInstance()->hStringToString (removedDeviceIdHstr);
 
             JUCE_WINRT_MIDI_LOG ("Removing MIDI device: " << removedDeviceId);
 
@@ -1458,8 +1408,8 @@ private:
                 }
             ).Get());
 
-            // We need to use a timeout here, rather than waiting indefinitely, as the
-            // WinRT API can occasionally hang!
+            // We need to use a timout here, rather than waiting indefinitely, as the
+            // WinRT API can occaisonally hang!
             portOpened.wait (2000);
         }
 
@@ -1724,12 +1674,7 @@ private:
             if (midiPort == nullptr)
                 throw std::runtime_error ("Timed out waiting for midi output port creation");
 
-            auto* wrtWrapper = WinRTWrapper::getInstanceWithoutCreating();
-
-            if (wrtWrapper == nullptr)
-                throw std::runtime_error ("Failed to get the WinRTWrapper singleton!");
-
-            auto bufferFactory = wrtWrapper->getWRLFactory<IBufferFactory> (&RuntimeClass_Windows_Storage_Streams_Buffer[0]);
+            auto bufferFactory = WinRTWrapper::getInstance()->getWRLFactory<IBufferFactory> (&RuntimeClass_Windows_Storage_Streams_Buffer[0]);
 
             if (bufferFactory == nullptr)
                 throw std::runtime_error ("Failed to create output buffer factory");
@@ -1794,15 +1739,13 @@ private:
 
 //==============================================================================
 //==============================================================================
-#if ! JUCE_MINGW
- extern RTL_OSVERSIONINFOW getWindowsVersionInfo();
-#endif
+extern RTL_OSVERSIONINFOW getWindowsVersionInfo();
 
 struct MidiService :  public DeletedAtShutdown
 {
     MidiService()
     {
-      #if JUCE_USE_WINRT_MIDI && ! JUCE_MINGW
+      #if JUCE_USE_WINRT_MIDI
        #if ! JUCE_FORCE_WINRT_MIDI
         auto windowsVersionInfo = getWindowsVersionInfo();
         if (windowsVersionInfo.dwMajorVersion >= 10 && windowsVersionInfo.dwBuildNumber >= 17763)

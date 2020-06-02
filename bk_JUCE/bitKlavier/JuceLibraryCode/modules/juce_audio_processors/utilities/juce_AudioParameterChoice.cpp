@@ -55,13 +55,7 @@ AudioParameterChoice::AudioParameterChoice (const String& idToUse, const String&
         indexFromStringFunction = [this] (const String& text) { return choices.indexOf (text); };
 }
 
-AudioParameterChoice::~AudioParameterChoice()
-{
-    #if __cpp_lib_atomic_is_always_lock_free
-     static_assert (std::atomic<float>::is_always_lock_free,
-                    "AudioParameterChoice requires a lock-free std::atomic<float>");
-    #endif
-}
+AudioParameterChoice::~AudioParameterChoice() {}
 
 float AudioParameterChoice::getValue() const                             { return convertTo0to1 (value); }
 void AudioParameterChoice::setValue (float newValue)                     { value = convertFrom0to1 (newValue); valueChanged (getIndex()); }

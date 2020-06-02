@@ -566,12 +566,7 @@ public:
         }
 
         juce::MemoryBlock state;
-
-       #if JUCE_AU_WRAPPERS_SAVE_PROGRAM_STATES
         getAudioProcessor().getCurrentProgramStateInformation (state);
-       #else
-        getAudioProcessor().getStateInformation (state);
-       #endif
 
         if (state.getSize() > 0)
         {
@@ -617,13 +612,7 @@ public:
                 const juce::uint8* const rawBytes = reinterpret_cast< const juce::uint8* const> ([data bytes]);
 
                 if (numBytes > 0)
-                {
-                   #if JUCE_AU_WRAPPERS_SAVE_PROGRAM_STATES
                     getAudioProcessor().setCurrentProgramStateInformation (rawBytes, numBytes);
-                   #else
-                    getAudioProcessor().setStateInformation (rawBytes, numBytes);
-                   #endif
-                }
             }
         }
 
@@ -1178,9 +1167,8 @@ private:
                                                   | kAudioUnitParameterFlag_HasCFNameString
                                                   | kAudioUnitParameterFlag_ValuesHaveStrings);
 
-       #if ! JUCE_FORCE_LEGACY_PARAMETER_AUTOMATION_TYPE
-        flags |= (UInt32) kAudioUnitParameterFlag_IsHighResolution;
-       #endif
+        if (! forceLegacyParamIDs)
+            flags |= (UInt32) kAudioUnitParameterFlag_IsHighResolution;
 
         // Set whether the param is automatable (unnamed parameters aren't allowed to be automated).
         if (name.isEmpty() || ! parameter->isAutomatable())
@@ -1205,23 +1193,24 @@ private:
         }
         else
         {
-           #if ! JUCE_FORCE_LEGACY_PARAMETER_AUTOMATION_TYPE
-            if (parameter->isDiscrete())
+            if (! forceLegacyParamIDs)
             {
-                unit = parameter->isBoolean() ? kAudioUnitParameterUnit_Boolean : kAudioUnitParameterUnit_Indexed;
-                auto maxValue = getMaximumParameterValue (parameter);
-                auto numSteps = parameter->getNumSteps();
+                if (parameter->isDiscrete())
+                {
+                    unit = parameter->isBoolean() ? kAudioUnitParameterUnit_Boolean : kAudioUnitParameterUnit_Indexed;
+                    auto maxValue = getMaximumParameterValue (parameter);
+                    auto numSteps = parameter->getNumSteps();
 
-                // Some hosts can't handle the huge numbers of discrete parameter values created when
-                // using the default number of steps.
-                jassert (numSteps != AudioProcessor::getDefaultNumParameterSteps());
+                    // Some hosts can't handle the huge numbers of discrete parameter values created when
+                    // using the default number of steps.
+                    jassert (numSteps != AudioProcessor::getDefaultNumParameterSteps());
 
-                valueStrings.reset ([NSMutableArray new]);
+                    valueStrings.reset ([NSMutableArray new]);
 
-                for (int i = 0; i < numSteps; ++i)
-                    [valueStrings.get() addObject: juceStringToNS (parameter->getText ((float) i / maxValue, 0))];
+                    for (int i = 0; i < numSteps; ++i)
+                        [valueStrings.get() addObject: juceStringToNS (parameter->getText ((float) i / maxValue, 0))];
+                }
             }
-           #endif
         }
 
         AUParameterAddress address = generateAUParameterAddress (parameter);

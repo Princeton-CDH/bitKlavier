@@ -206,17 +206,10 @@ public:
     virtual void memoryWarningReceived()     { jassertfalse; }
 
     //==============================================================================
-    /** This will be called when the back button on a device is pressed. The return value
-        should be used to indicate whether the back button event has been handled by
-        the application, for example if you want to implement custom navigation instead
-        of the standard behaviour on Android.
-
+    /** Override this method to be informed when the back button is pressed on a device.
         This is currently only implemented on Android devices.
-
-        @returns  true if the event has been handled, or false if the default OS
-                  behaviour should happen
      */
-    virtual bool backButtonPressed() { return false; }
+    virtual void backButtonPressed() {}
 
     //==============================================================================
     /** Signals that the main message loop should stop and the application should terminate.

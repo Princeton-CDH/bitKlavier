@@ -143,17 +143,9 @@ public:
         addChild (std::forward<Args> (remainingChildren)...);
     }
 
-    /** Once a group has been added to an AudioProcessor don't try to mutate it by
-        moving or swapping it - this will crash most hosts.
-    */
     AudioProcessorParameterGroup (AudioProcessorParameterGroup&&);
-
-    /** Once a group has been added to an AudioProcessor don't try to mutate it by
-        moving or swapping it - this will crash most hosts.
-    */
     AudioProcessorParameterGroup& operator= (AudioProcessorParameterGroup&&);
 
-    /** Destructor. */
     ~AudioProcessorParameterGroup();
 
     //==============================================================================
@@ -166,15 +158,8 @@ public:
     /** Returns the group's separator string. */
     String getSeparator() const;
 
-    /** Returns the parent of the group, or nullptr if this is a top-level group. */
+    /** Returns the parent of the group, or nullptr if this is a top-levle group. */
     const AudioProcessorParameterGroup* getParent() const noexcept;
-
-    //==============================================================================
-    /** Changes the name of the group. If you do this after the group has been added
-        to an AudioProcessor, call updateHostDisplay() to inform the host of the
-        change. Not all hosts support dynamic group name changes.
-    */
-    void setName (String newName);
 
     //==============================================================================
     const AudioProcessorParameterNode* const* begin() const noexcept;
@@ -201,11 +186,7 @@ public:
     Array<const AudioProcessorParameterGroup*> getGroupsForParameter (AudioProcessorParameter*) const;
 
     //==============================================================================
-    /** Adds a child to the group.
-
-        Do not add children to a group which has itself already been added to the
-        AudioProcessor - the new elements will be ignored.
-    */
+    /** Adds a child to the group. */
     template <typename ParameterOrGroup>
     void addChild (std::unique_ptr<ParameterOrGroup> child)
     {
@@ -215,11 +196,7 @@ public:
         append (std::move (child));
     }
 
-    /** Adds multiple parameters or sub-groups to this group.
-
-        Do not add children to a group which has itself already been added to the
-        AudioProcessor - the new elements will be ignored.
-    */
+    /** Adds multiple parameters or sub-groups to this group. */
     template <typename ParameterOrGroup, typename... Args>
     void addChild (std::unique_ptr<ParameterOrGroup> firstChild, Args&&... remainingChildren)
     {
@@ -228,10 +205,8 @@ public:
     }
 
    #ifndef DOXYGEN
-    // This class now has a move operator, so if you're trying to move them around, you
-    // should use that, or if you really need to swap two groups, just call std::swap.
-    // However, remember that swapping a group that's already owned by an AudioProcessor
-    // will most likely crash the host, so don't do that.
+    // This class now has a move operator, so if you're try to move them around, you should
+    // use that, or if you really need to swap two groups, just call std::swap
     JUCE_DEPRECATED_WITH_BODY (void swapWith (AudioProcessorParameterGroup& other), { std::swap (*this, other); })
    #endif
 

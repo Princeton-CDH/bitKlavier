@@ -63,7 +63,7 @@ public:
     ~AudioParameterChoice() override;
 
     /** Returns the current index of the selected item. */
-    int getIndex() const noexcept                   { return roundToInt (value.load()); }
+    int getIndex() const noexcept                   { return roundToInt (value); }
 
     /** Returns the current index of the selected item. */
     operator int() const noexcept                   { return getIndex(); }
@@ -100,7 +100,7 @@ private:
     float getValueForText (const String&) const override;
 
     const NormalisableRange<float> range;
-    std::atomic<float> value;
+    float value;
     const float defaultValue;
     std::function<String(int, int)> stringFromIndexFunction;
     std::function<int(const String&)> indexFromStringFunction;

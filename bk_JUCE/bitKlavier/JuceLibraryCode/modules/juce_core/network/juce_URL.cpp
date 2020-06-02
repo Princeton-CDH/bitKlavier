@@ -82,7 +82,7 @@ struct FallbackDownloadTask  : public URL::DownloadTask,
                 break;
         }
 
-        fileStream.reset();
+        fileStream->flush();
 
         if (threadShouldExit() || stream->isError())
             error = true;
@@ -97,7 +97,7 @@ struct FallbackDownloadTask  : public URL::DownloadTask,
     }
 
     //==============================================================================
-    std::unique_ptr<FileOutputStream> fileStream;
+    const std::unique_ptr<FileOutputStream> fileStream;
     const std::unique_ptr<WebInputStream> stream;
     const size_t bufferSize;
     HeapBlock<char> buffer;
@@ -135,7 +135,7 @@ URL::DownloadTask::DownloadTask() {}
 URL::DownloadTask::~DownloadTask() {}
 
 //==============================================================================
-URL::URL() {}
+URL::URL() noexcept {}
 
 URL::URL (const String& u)  : url (u)
 {
@@ -170,6 +170,7 @@ URL::URL (File localFile)
         if (! url.startsWithChar (L'/'))
             url = "/" + url;
     }
+
 
     url = "file://" + url;
 
@@ -286,20 +287,6 @@ namespace URLHelpers
         else
             path += suffix;
     }
-
-    static String removeLastPathSection (const String& url)
-    {
-        auto startOfPath = findStartOfPath (url);
-        auto lastSlash = url.lastIndexOfChar ('/');
-
-        if (lastSlash > startOfPath && lastSlash == url.length() - 1)
-            return removeLastPathSection (url.dropLastCharacters (1));
-
-        if (lastSlash < 0)
-            return url;
-
-        return url.substring (0, std::max (startOfPath, lastSlash));
-    }
 }
 
 void URL::addParameter (const String& name, const String& value)
@@ -357,10 +344,10 @@ String URL::getScheme() const
     return url.substring (0, URLHelpers::findEndOfScheme (url) - 1);
 }
 
-#if ! JUCE_ANDROID
+#ifndef JUCE_ANDROID
 bool URL::isLocalFile() const
 {
-    return getScheme() == "file";
+    return (getScheme() == "file");
 }
 
 File URL::getLocalFile() const
@@ -384,7 +371,7 @@ File URL::fileFromFileSchemeURL (const URL& fileURL)
 
     auto path = removeEscapeChars (fileURL.getDomainInternal (true)).replace ("+", "%2B");
 
-   #if JUCE_WINDOWS
+   #ifdef JUCE_WINDOWS
     bool isUncPath = (! fileURL.url.startsWith ("file:///"));
    #else
     path = File::getSeparatorString() + path;
@@ -395,7 +382,7 @@ File URL::fileFromFileSchemeURL (const URL& fileURL)
     for (auto urlElement : urlElements)
         path += File::getSeparatorString() + removeEscapeChars (urlElement.replace ("+", "%2B"));
 
-   #if JUCE_WINDOWS
+   #ifdef JUCE_WINDOWS
     if (isUncPath)
         path = "\\\\" + path;
    #endif
@@ -419,21 +406,14 @@ URL URL::withNewDomainAndPath (const String& newURL) const
 
 URL URL::withNewSubPath (const String& newPath) const
 {
-    URL u (*this);
+    const int startOfPath = URLHelpers::findStartOfPath (url);
 
-    auto startOfPath = URLHelpers::findStartOfPath (url);
+    URL u (*this);
 
     if (startOfPath > 0)
         u.url = url.substring (0, startOfPath);
 
     URLHelpers::concatenatePaths (u.url, newPath);
-    return u;
-}
-
-URL URL::getParentURL() const
-{
-    URL u (*this);
-    u.url = URLHelpers::removeLastPathSection (u.url);
     return u;
 }
 
@@ -502,15 +482,18 @@ void URL::createHeadersAndPostData (String& headers, MemoryBlock& postDataToWrit
 //==============================================================================
 bool URL::isProbablyAWebsiteURL (const String& possibleURL)
 {
-    for (auto* protocol : { "http:", "https:", "ftp:" })
+    static const char* validProtocols[] = { "http:", "ftp:", "https:" };
+
+    for (auto* protocol : validProtocols)
         if (possibleURL.startsWithIgnoreCase (protocol))
             return true;
 
-    if (possibleURL.containsChar ('@') || possibleURL.containsChar (' '))
+    if (possibleURL.containsChar ('@')
+        || possibleURL.containsChar (' '))
         return false;
 
-    auto topLevelDomain = possibleURL.upToFirstOccurrenceOf ("/", false, false)
-                                     .fromLastOccurrenceOf (".", false, false);
+    const String topLevelDomain (possibleURL.upToFirstOccurrenceOf ("/", false, false)
+                                 .fromLastOccurrenceOf (".", false, false));
 
     return topLevelDomain.isNotEmpty() && topLevelDomain.length() <= 3;
 }
@@ -537,7 +520,8 @@ String URL::getDomainInternal (bool ignorePort) const
 }
 
 #if JUCE_IOS
-URL::Bookmark::Bookmark (void* bookmarkToUse) : data (bookmarkToUse)
+URL::Bookmark::Bookmark (void* bookmarkToUse)
+    : data (bookmarkToUse)
 {
 }
 
@@ -628,10 +612,12 @@ private:
 
                 return urlToUse.getLocalFile();
             }
-
-            auto desc = [error localizedDescription];
-            ignoreUnused (desc);
-            jassertfalse;
+            else
+            {
+                auto desc = [error localizedDescription];
+                ignoreUnused (desc);
+                jassertfalse;
+            }
         }
 
         return urlToUse.getLocalFile();
@@ -673,9 +659,10 @@ InputStream* URL::createInputStream (bool usePostCommand,
        #else
         return getLocalFile().createInputStream();
        #endif
+
     }
 
-    auto wi = std::make_unique<WebInputStream> (*this, usePostCommand);
+    std::unique_ptr<WebInputStream> wi (new WebInputStream (*this, usePostCommand));
 
     struct ProgressCallbackCaller  : public WebInputStream::Listener
     {

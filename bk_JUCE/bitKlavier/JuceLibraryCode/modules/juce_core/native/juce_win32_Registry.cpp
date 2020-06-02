@@ -49,7 +49,7 @@ struct RegistryKeyWrapper
 
     ~RegistryKeyWrapper()
     {
-        if (key != nullptr)
+        if (key != 0)
             RegCloseKey (key);
     }
 
@@ -73,7 +73,7 @@ struct RegistryKeyWrapper
     {
         const RegistryKeyWrapper key (regValuePath, true, wow64Flags);
 
-        return key.key != nullptr
+        return key.key != 0
                 && RegSetValueEx (key.key, key.wideCharValueName, 0, type,
                                   reinterpret_cast<const BYTE*> (data),
                                   (DWORD) dataSize) == ERROR_SUCCESS;
@@ -83,7 +83,7 @@ struct RegistryKeyWrapper
     {
         const RegistryKeyWrapper key (regValuePath, false, wow64Flags);
 
-        if (key.key != nullptr)
+        if (key.key != 0)
         {
             for (unsigned long bufferSize = 1024; ; bufferSize *= 2)
             {
@@ -121,16 +121,16 @@ struct RegistryKeyWrapper
         return defaultValue;
     }
 
-    static bool keyExists (const String& regKeyPath, const DWORD wow64Flags)
+    static bool keyExists (const String& regValuePath, const DWORD wow64Flags)
     {
-        return RegistryKeyWrapper (regKeyPath + "\\", false, wow64Flags).key != nullptr;
+        return RegistryKeyWrapper (regValuePath, false, wow64Flags).key != 0;
     }
 
     static bool valueExists (const String& regValuePath, const DWORD wow64Flags)
     {
         const RegistryKeyWrapper key (regValuePath, false, wow64Flags);
 
-        if (key.key == nullptr)
+        if (key.key == 0)
             return false;
 
         unsigned char buffer [512];
@@ -143,7 +143,7 @@ struct RegistryKeyWrapper
         return result == ERROR_SUCCESS || result == ERROR_MORE_DATA;
     }
 
-    HKEY key = nullptr;
+    HKEY key = 0;
     const wchar_t* wideCharValueName = nullptr;
     String valueName;
 
@@ -186,23 +186,23 @@ bool JUCE_CALLTYPE WindowsRegistry::valueExists (const String& regValuePath, WoW
     return RegistryKeyWrapper::valueExists (regValuePath, (DWORD) mode);
 }
 
-bool JUCE_CALLTYPE WindowsRegistry::keyExists (const String& regKeyPath, WoW64Mode mode)
+bool JUCE_CALLTYPE WindowsRegistry::keyExists (const String& regValuePath, WoW64Mode mode)
 {
-    return RegistryKeyWrapper::keyExists (regKeyPath, (DWORD) mode);
+    return RegistryKeyWrapper::keyExists (regValuePath, (DWORD) mode);
 }
 
 bool JUCE_CALLTYPE WindowsRegistry::deleteValue (const String& regValuePath, WoW64Mode mode)
 {
     const RegistryKeyWrapper key (regValuePath, true, (DWORD) mode);
 
-    return key.key != nullptr && RegDeleteValue (key.key, key.wideCharValueName) == ERROR_SUCCESS;
+    return key.key != 0 && RegDeleteValue (key.key, key.wideCharValueName) == ERROR_SUCCESS;
 }
 
 static bool deleteKeyNonRecursive (const String& regKeyPath, WindowsRegistry::WoW64Mode mode)
 {
     const RegistryKeyWrapper key (regKeyPath, true, (DWORD) mode);
 
-    return key.key != nullptr && RegDeleteKey (key.key, key.wideCharValueName) == ERROR_SUCCESS;
+    return key.key != 0 && RegDeleteKey (key.key, key.wideCharValueName) == ERROR_SUCCESS;
 }
 
 bool JUCE_CALLTYPE WindowsRegistry::deleteKey (const String& regKeyPath, WoW64Mode mode)

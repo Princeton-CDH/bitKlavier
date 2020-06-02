@@ -87,6 +87,8 @@ public:
     {
         if (browser != nullptr)
         {
+            LPSAFEARRAY sa = nullptr;
+
             VARIANT headerFlags, frame, postDataVar, headersVar;  // (_variant_t isn't available in all compilers)
             VariantInit (&headerFlags);
             VariantInit (&frame);
@@ -101,7 +103,7 @@ public:
 
             if (postData != nullptr && postData->getSize() > 0)
             {
-                auto sa = SafeArrayCreateVector (VT_UI1, 0, (ULONG) postData->getSize());
+                sa = SafeArrayCreateVector (VT_UI1, 0, (ULONG) postData->getSize());
 
                 if (sa != nullptr)
                 {
@@ -119,12 +121,7 @@ public:
                         V_VT (&postDataVar2) = VT_ARRAY | VT_UI1;
                         V_ARRAY (&postDataVar2) = sa;
 
-                        sa = nullptr;
                         postDataVar = postDataVar2;
-                    }
-                    else
-                    {
-                        SafeArrayDestroy (sa);
                     }
                 }
             }
@@ -132,6 +129,9 @@ public:
             auto urlBSTR = SysAllocString ((const OLECHAR*) url.toWideCharPointer());
             browser->Navigate (urlBSTR, &headerFlags, &frame, &postDataVar, &headersVar);
             SysFreeString (urlBSTR);
+
+            if (sa != nullptr)
+                SafeArrayDestroy (sa);
 
             VariantClear (&headerFlags);
             VariantClear (&frame);
@@ -153,12 +153,12 @@ private:
     {
         EventHandler (WebBrowserComponent& w)  : ComponentMovementWatcher (&w), owner (w) {}
 
-        JUCE_COMRESULT GetTypeInfoCount (UINT*) override                                 { return E_NOTIMPL; }
-        JUCE_COMRESULT GetTypeInfo (UINT, LCID, ITypeInfo**) override                    { return E_NOTIMPL; }
-        JUCE_COMRESULT GetIDsOfNames (REFIID, LPOLESTR*, UINT, LCID, DISPID*) override   { return E_NOTIMPL; }
+        JUCE_COMRESULT GetTypeInfoCount (UINT*)                                  { return E_NOTIMPL; }
+        JUCE_COMRESULT GetTypeInfo (UINT, LCID, ITypeInfo**)                     { return E_NOTIMPL; }
+        JUCE_COMRESULT GetIDsOfNames (REFIID, LPOLESTR*, UINT, LCID, DISPID*)    { return E_NOTIMPL; }
 
         JUCE_COMRESULT Invoke (DISPID dispIdMember, REFIID /*riid*/, LCID /*lcid*/, WORD /*wFlags*/, DISPPARAMS* pDispParams,
-                               VARIANT* /*pVarResult*/, EXCEPINFO* /*pExcepInfo*/, UINT* /*puArgErr*/) override
+                               VARIANT* /*pVarResult*/, EXCEPINFO* /*pExcepInfo*/, UINT* /*puArgErr*/)
         {
             if (dispIdMember == DISPID_BEFORENAVIGATE2)
             {
@@ -187,7 +187,7 @@ private:
                 *pDispParams->rgvarg[0].pboolVal = VARIANT_FALSE;
 
                 // IWebBrowser2 also reports http status codes here, we need
-                // report only network errors
+                // report only network erros
                 if (statusCode < 0)
                 {
                     LPTSTR messageBuffer = nullptr;

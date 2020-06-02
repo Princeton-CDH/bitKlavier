@@ -285,7 +285,7 @@ public:
         Note that calling this method from within AudioProcessorValueTreeState::Listener::parameterChanged()
         is not guaranteed to return an up-to-date value for the parameter.
     */
-    std::atomic<float>* getRawParameterValue (StringRef parameterID) const noexcept;
+    float* getRawParameterValue (StringRef parameterID) const noexcept;
 
     //==============================================================================
     /** A listener class that can be attached to an AudioProcessorValueTreeState.
@@ -362,10 +362,6 @@ public:
     UndoManager* const undoManager;
 
     //==============================================================================
-private:
-    class ParameterAdapter;
-
-public:
     /** A parameter class that maintains backwards compatibility with deprecated
         AudioProcessorValueTreeState functionality.
 
@@ -420,13 +416,9 @@ public:
     private:
         void valueChanged (float) override;
 
-        std::function<void()> onValueChanged;
-
         const float unsnappedDefault;
         const bool metaParameter, automatable, discrete, boolean;
-        float lastValue = -1.0f;
-
-        friend class AudioProcessorValueTreeState::ParameterAdapter;
+        float lastValue = 0.0f;
     };
 
     //==============================================================================
@@ -531,6 +523,8 @@ private:
                                                                             bool, bool, bool, AudioProcessorParameter::Category, bool));
 
     //==============================================================================
+    class ParameterAdapter;
+
    #if JUCE_UNIT_TESTS
     friend struct ParameterAdapterTests;
    #endif

@@ -236,52 +236,35 @@ namespace AudioUnitFormatHelpers
                 UseResFile (resFileId);
 
                 const OSType thngType = stringToOSType ("thng");
-                auto numResources = Count1Resources (thngType);
 
-                if (numResources > 0)
+                for (ResourceIndex i = 1; i <= Count1Resources (thngType); ++i)
                 {
-                    for (ResourceIndex i = 1; i <= numResources; ++i)
+                    if (Handle h = Get1IndResource (thngType, i))
                     {
-                        if (Handle h = Get1IndResource (thngType, i))
+                        HLock (h);
+                        const uint32* const types = (const uint32*) *h;
+
+                        if (types[0] == kAudioUnitType_MusicDevice
+                             || types[0] == kAudioUnitType_MusicEffect
+                             || types[0] == kAudioUnitType_Effect
+                             || types[0] == kAudioUnitType_Generator
+                             || types[0] == kAudioUnitType_Panner
+                             || types[0] == kAudioUnitType_Mixer
+                             || types[0] == kAudioUnitType_MIDIProcessor)
                         {
-                            HLock (h);
-                            const uint32* const types = (const uint32*) *h;
+                            desc.componentType = types[0];
+                            desc.componentSubType = types[1];
+                            desc.componentManufacturer = types[2];
 
-                            if (types[0] == kAudioUnitType_MusicDevice
-                                 || types[0] == kAudioUnitType_MusicEffect
-                                 || types[0] == kAudioUnitType_Effect
-                                 || types[0] == kAudioUnitType_Generator
-                                 || types[0] == kAudioUnitType_Panner
-                                 || types[0] == kAudioUnitType_Mixer
-                                 || types[0] == kAudioUnitType_MIDIProcessor)
-                            {
-                                desc.componentType = types[0];
-                                desc.componentSubType = types[1];
-                                desc.componentManufacturer = types[2];
+                            if (AudioComponent comp = AudioComponentFindNext (nullptr, &desc))
+                                getNameAndManufacturer (comp, name, manufacturer);
 
-                                if (AudioComponent comp = AudioComponentFindNext (nullptr, &desc))
-                                    getNameAndManufacturer (comp, name, manufacturer);
-
-                                break;
-                            }
-
-                            HUnlock (h);
-                            ReleaseResource (h);
+                            break;
                         }
+
+                        HUnlock (h);
+                        ReleaseResource (h);
                     }
-                }
-                else
-                {
-                    NSBundle* bundle = [[NSBundle alloc] initWithPath: (NSString*) fileOrIdentifier.toCFString()];
-
-                    NSArray* audioComponents = [bundle objectForInfoDictionaryKey: @"AudioComponents"];
-                    NSDictionary* dict = audioComponents[0];
-
-                    desc.componentManufacturer = stringToOSType (nsStringToJuce ((NSString*) [dict valueForKey: @"manufacturer"]));
-                    desc.componentType         = stringToOSType (nsStringToJuce ((NSString*) [dict valueForKey: @"type"]));
-                    desc.componentSubType      = stringToOSType (nsStringToJuce ((NSString*) [dict valueForKey: @"subtype"]));
-
-                    [bundle release];
                 }
 
                 CFBundleCloseBundleResourceMap (bundleRef, resFileId);
@@ -798,19 +781,19 @@ public:
 
                         // try to convert the layout into a tag
                         actualTag = CoreAudioLayouts::toCoreAudio (CoreAudioLayouts::fromCoreAudio (layout));
+                    }
 
-                        if (actualTag != requestedTag)
-                        {
-                            zerostruct (layout);
-                            layout.mChannelLayoutTag = requestedTag;
+                    if (actualTag != requestedTag)
+                    {
+                        zerostruct (layout);
+                        layout.mChannelLayoutTag = requestedTag;
 
-                            err = AudioUnitSetProperty (audioUnit, kAudioUnitProperty_AudioChannelLayout, scope, static_cast<UInt32> (i), &layout, minDataSize);
+                        err = AudioUnitSetProperty (audioUnit, kAudioUnitProperty_AudioChannelLayout, scope, static_cast<UInt32> (i), &layout, minDataSize);
 
-                            // only bail out if the plug-in claims to support layouts
-                            // See AudioUnit headers on kAudioUnitProperty_AudioChannelLayout
-                            if (err != noErr && supportsLayouts && isInitialized)
-                                return false;
-                        }
+                        // only bail out if the plug-in claims to support layouts
+                        // See AudioUnit headers on kAudioUnitProperty_AudioChannelLayout
+                        if (err != noErr && supportsLayouts && isInitialized)
+                            return false;
                     }
                 }
             }
@@ -1230,11 +1213,8 @@ public:
         if (AudioUnitGetProperty (audioUnit, kAudioUnitProperty_FactoryPresets,
                                   kAudioUnitScope_Global, 0, &presets, &sz) == noErr)
         {
-            if (presets != nullptr)
-            {
-                num = (int) CFArrayGetCount (presets);
-                CFRelease (presets);
-            }
+            num = (int) CFArrayGetCount (presets);
+            CFRelease (presets);
         }
 
         return num;
@@ -1256,18 +1236,7 @@ public:
     {
         AUPreset current;
         current.presetNumber = newIndex;
-
-        CFArrayRef presets;
-        UInt32 sz = sizeof (CFArrayRef);
-
-        if (AudioUnitGetProperty (audioUnit, kAudioUnitProperty_FactoryPresets,
-                                  kAudioUnitScope_Global, 0, &presets, &sz) == noErr)
-        {
-            if (auto* p = (const AUPreset*) CFArrayGetValueAtIndex (presets, newIndex))
-                current.presetName = p->presetName;
-
-            CFRelease (presets);
-        }
+        current.presetName = CFSTR("");
 
         AudioUnitSetProperty (audioUnit, kAudioUnitProperty_PresentPreset,
                               kAudioUnitScope_Global, 0, &current, sizeof (AUPreset));
@@ -1281,25 +1250,12 @@ public:
         CFArrayRef presets;
         UInt32 sz = sizeof (CFArrayRef);
 
-        if (index == -1)
-        {
-            AUPreset current;
-            current.presetNumber = -1;
-            current.presetName = CFSTR("");
-
-            UInt32 prstsz = sizeof (AUPreset);
-
-            AudioUnitGetProperty (audioUnit, kAudioUnitProperty_PresentPreset,
-                                  kAudioUnitScope_Global, 0, &current, &prstsz);
-
-            s = String::fromCFString (current.presetName);
-        }
-        else if (AudioUnitGetProperty (audioUnit, kAudioUnitProperty_FactoryPresets,
-                                       kAudioUnitScope_Global, 0, &presets, &sz) == noErr)
+        if (AudioUnitGetProperty (audioUnit, kAudioUnitProperty_FactoryPresets,
+                                  kAudioUnitScope_Global, 0, &presets, &sz) == noErr)
         {
             for (CFIndex i = 0; i < CFArrayGetCount (presets); ++i)
             {
-                if (auto* p = (const AUPreset*) CFArrayGetValueAtIndex (presets, i))
+                if (const AUPreset* p = (const AUPreset*) CFArrayGetValueAtIndex (presets, i))
                 {
                     if (p->presetNumber == index)
                     {
@@ -1832,23 +1788,14 @@ private:
 
             default:
                 if (event.mArgument.mProperty.mPropertyID == kAudioUnitProperty_ParameterList)
-                {
                     updateHostDisplay();
-                }
                 else if (event.mArgument.mProperty.mPropertyID == kAudioUnitProperty_PresentPreset)
-                {
                     sendAllParametersChangedEvents();
-                    updateHostDisplay();
-                }
                 else if (event.mArgument.mProperty.mPropertyID == kAudioUnitProperty_Latency)
-                {
                     updateLatency();
-                }
                 else if (event.mArgument.mProperty.mPropertyID == kAudioUnitProperty_BypassEffect)
-                {
                     if (bypassParam != nullptr)
                         bypassParam->setValueNotifyingHost (bypassParam->getValue());
-                }
 
                 break;
         }

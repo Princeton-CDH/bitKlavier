@@ -255,13 +255,10 @@ public:
 
     void mouseDrag (const MouseEvent& e) override
     {
-        if (e.mouseWasDraggedSinceMouseDown())
-        {
-            auto& panel = getPanel();
-            panel.setLayout (dragStartSizes.withMovedPanel (panel.holders.indexOf (this),
-                                                            mouseDownY + e.getDistanceFromDragStartY(),
-                                                            panel.getHeight()), false);
-        }
+        ConcertinaPanel& panel = getPanel();
+        panel.setLayout (dragStartSizes.withMovedPanel (panel.holders.indexOf (this),
+                                                        mouseDownY + e.getDistanceFromDragStartY(),
+                                                        panel.getHeight()), false);
     }
 
     void mouseDoubleClick (const MouseEvent&) override

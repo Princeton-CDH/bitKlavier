@@ -60,16 +60,7 @@ namespace CoreMidiHelpers
         SInt32 objectID = 0;
 
         if (CHECK_ERROR (MIDIObjectGetIntegerProperty (entity, kMIDIPropertyUniqueID, &objectID)))
-        {
             info.identifier = String (objectID);
-        }
-        else
-        {
-            ScopedCFString str;
-
-            if (CHECK_ERROR (MIDIObjectGetStringProperty (entity, kMIDIPropertyUniqueID, &str.cfString)))
-                info.identifier = String::fromCFString (str.cfString);
-        }
 
         return info;
     }
@@ -220,22 +211,9 @@ namespace CoreMidiHelpers
 
         if (! hasEnabledNetworkSession)
         {
-            auto iOSVersion = nsStringToJuce ([[UIDevice currentDevice] systemVersion]);
-            auto majorVersion = StringArray::fromTokens (iOSVersion, ".", {})[0].getIntValue();
-
-            if (majorVersion == 13)
-            {
-                // From the Xcode 11 release notes known issues:
-                // Attempting to create an MIDINetworkSession in a simulated device running
-                // iOS 13 won’t succeed. (54484923)
-                jassertfalse;
-            }
-            else
-            {
-                MIDINetworkSession* session = [MIDINetworkSession defaultSession];
-                session.enabled = YES;
-                session.connectionPolicy = MIDINetworkConnectionPolicy_Anyone;
-            }
+            MIDINetworkSession* session = [MIDINetworkSession defaultSession];
+            session.enabled = YES;
+            session.connectionPolicy = MIDINetworkConnectionPolicy_Anyone;
 
             hasEnabledNetworkSession = true;
         }
@@ -397,7 +375,7 @@ namespace CoreMidiHelpers
     static Array<MIDIEndpointRef> getEndpoints (bool isInput)
     {
         Array<MIDIEndpointRef> endpoints;
-        auto numDevices = (isInput ? MIDIGetNumberOfSources() : MIDIGetNumberOfDestinations());
+        auto numDevices = (isInput ? MIDIGetNumberOfSources() : MIDIGetNumberOfDevices());
 
         for (ItemCount i = 0; i < numDevices; ++i)
             endpoints.add (isInput ? MIDIGetSource (i) : MIDIGetDestination (i));
@@ -499,7 +477,7 @@ std::unique_ptr<MidiInput> MidiInput::createNewDevice (const String& deviceName,
 
             if (CHECK_ERROR (MIDIObjectSetIntegerProperty (endpoint, kMIDIPropertyUniqueID, (SInt32) deviceIdentifier)))
             {
-                mpc->portAndEndpoint = std::make_unique<MidiPortAndEndpoint> ((UInt32) 0, endpoint);
+                mpc->portAndEndpoint = std::make_unique<MidiPortAndEndpoint> (0, endpoint);
 
                 std::unique_ptr<MidiInput> midiInput (new MidiInput (deviceName, String (deviceIdentifier)));
 
@@ -630,7 +608,7 @@ std::unique_ptr<MidiOutput> MidiOutput::createNewDevice (const String& deviceNam
 
         if (CHECK_ERROR (err))
         {
-            auto deviceIdentifier = createUniqueIDForMidiPort (deviceName, false);
+            auto deviceIdentifier = createUniqueIDForMidiPort (deviceName, true);
 
             if (CHECK_ERROR (MIDIObjectSetIntegerProperty (endpoint, kMIDIPropertyUniqueID, (SInt32) deviceIdentifier)))
             {

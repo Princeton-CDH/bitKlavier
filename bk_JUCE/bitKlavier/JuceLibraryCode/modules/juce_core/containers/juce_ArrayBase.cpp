@@ -304,7 +304,7 @@ public:
             checkEqual (copyableContainer, noncopyableContainer, referenceContainer);
         }
 
-        beginTest ("add array from initializer_list");
+        beginTest ("add array from initilizer list");
         {
             std::vector<CopyableType> referenceContainer;
             ArrayBase<CopyableType,    DummyCriticalSection> copyableContainer;

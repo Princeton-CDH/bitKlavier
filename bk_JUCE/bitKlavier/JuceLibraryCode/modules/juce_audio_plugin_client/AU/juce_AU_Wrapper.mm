@@ -43,7 +43,6 @@
  #pragma clang diagnostic ignored "-Woverloaded-virtual"
  #pragma clang diagnostic ignored "-Wextra-semi"
  #pragma clang diagnostic ignored "-Wcast-align"
- #pragma clang diagnostic ignored "-Wshadow"
  #if __has_warning("-Wzero-as-null-pointer-constant")
   #pragma clang diagnostic ignored "-Wzero-as-null-pointer-constant"
  #endif
@@ -702,12 +701,7 @@ public:
         if (juceFilter != nullptr)
         {
             juce::MemoryBlock state;
-
-           #if JUCE_AU_WRAPPERS_SAVE_PROGRAM_STATES
             juceFilter->getCurrentProgramStateInformation (state);
-           #else
-            juceFilter->getStateInformation (state);
-           #endif
 
             if (state.getSize() > 0)
             {
@@ -754,13 +748,7 @@ public:
                     const juce::uint8* const rawBytes = CFDataGetBytePtr (data);
 
                     if (numBytes > 0)
-                    {
-                       #if JUCE_AU_WRAPPERS_SAVE_PROGRAM_STATES
                         juceFilter->setCurrentProgramStateInformation (rawBytes, numBytes);
-                       #else
-                        juceFilter->setStateInformation (rawBytes, numBytes);
-                       #endif
-                    }
                 }
             }
         }

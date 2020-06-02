@@ -56,7 +56,7 @@ extern void juce_repeatLastProcessPriority();
 extern void juce_checkCurrentlyFocusedTopLevelWindow();  // in juce_TopLevelWindow.cpp
 extern bool juce_isRunningInWine();
 
-using CheckEventBlockedByModalComps = bool (*)(const MSG&);
+typedef bool (*CheckEventBlockedByModalComps) (const MSG&);
 extern CheckEventBlockedByModalComps isEventBlockedByModalComps;
 
 static bool shouldDeactivateTitleBar = true;
@@ -496,7 +496,7 @@ static double getGlobalDPI()
 #endif
 
 //==============================================================================
-using SettingChangeCallbackFunc = void (*)(void);
+typedef void (*SettingChangeCallbackFunc) (void);
 extern SettingChangeCallbackFunc settingChangeCallback;
 
 //==============================================================================
@@ -1632,8 +1632,8 @@ public:
             scale = 1.0 / Desktop::getInstance().getDisplays().getMainDisplay().scale;
        #endif
 
-        auto scaled = area.toDouble() * scale;
-        auto r = RECTFromRectangle (scaled.getSmallestIntegerContainer());
+        const RECT r = { roundToInt (area.getX()     * scale), roundToInt (area.getY()      * scale),
+                         roundToInt (area.getRight() * scale), roundToInt (area.getBottom() * scale) };
 
         InvalidateRect (hwnd, &r, FALSE);
     }
@@ -2241,7 +2241,7 @@ private:
         }
     }
 
-    void setIcon (const Image& newIcon) override
+    void setIcon (const Image& newIcon)
     {
         if (auto hicon = IconConverters::createHICONFromImage (newIcon, TRUE, 0, 0))
         {

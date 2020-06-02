@@ -23,11 +23,6 @@
 namespace juce
 {
 
-#if JUCE_ANDROID
- extern void acquireMulticastLock();
- extern void releaseMulticastLock();
-#endif
-
 NetworkServiceDiscovery::Advertiser::Advertiser (const String& serviceTypeUID,
                                                  const String& serviceDescription,
                                                  int broadcastPortToUse, int connectionPort,
@@ -78,10 +73,6 @@ void NetworkServiceDiscovery::Advertiser::sendBroadcast()
 NetworkServiceDiscovery::AvailableServiceList::AvailableServiceList (const String& serviceType, int broadcastPort)
     : Thread ("Discovery_listen"), serviceTypeUID (serviceType)
 {
-   #if JUCE_ANDROID
-    acquireMulticastLock();
-   #endif
-
     socket.bindToPort (broadcastPort);
     startThread (2);
 }
@@ -90,10 +81,6 @@ NetworkServiceDiscovery::AvailableServiceList::~AvailableServiceList()
 {
     socket.shutdown();
     stopThread (2000);
-
-    #if JUCE_ANDROID
-     releaseMulticastLock();
-    #endif
 }
 
 void NetworkServiceDiscovery::AvailableServiceList::run()

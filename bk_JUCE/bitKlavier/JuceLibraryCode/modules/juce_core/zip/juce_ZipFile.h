@@ -82,12 +82,6 @@ public:
 
         /** True if the zip entry is a symbolic link. */
         bool isSymbolicLink;
-
-        /** Platform specific data. Depending on how the zip file was created this
-            may contain macOS and Linux file types, permissions and
-            setuid/setgid/sticky bits.
-        */
-        uint32 externalFileAttributes;
     };
 
     //==============================================================================

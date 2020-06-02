@@ -63,7 +63,7 @@ AlertWindow::~AlertWindow()
     for (auto* t : textBoxes)
         t->setWantsKeyboardFocus (false);
 
-    // Give away focus before removing the editors, so that any TextEditor
+    // Giveaway focus before removing the editors, so that any TextEditor
     // with focus has a chance to dismiss native keyboard if shown.
     if (hasKeyboardFocus (true))
         Component::unfocusAllComponents();

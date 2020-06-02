@@ -38,20 +38,22 @@ ReadWriteLock::~ReadWriteLock() noexcept
 void ReadWriteLock::enterRead() const noexcept
 {
     while (! tryEnterRead())
-        readWaitEvent.wait (100);
+        waitEvent.wait (100);
 }
 
 bool ReadWriteLock::tryEnterRead() const noexcept
 {
-    auto threadId = Thread::getCurrentThreadId();
+    const Thread::ThreadID threadId = Thread::getCurrentThreadId();
 
     const SpinLock::ScopedLockType sl (accessLock);
 
-    for (auto& readerThread : readerThreads)
+    for (int i = 0; i < readerThreads.size(); ++i)
     {
-        if (readerThread.threadID == threadId)
+        ThreadRecursionCount& trc = readerThreads.getReference(i);
+
+        if (trc.threadID == threadId)
         {
-            readerThread.count++;
+            trc.count++;
             return true;
         }
     }
@@ -59,7 +61,8 @@ bool ReadWriteLock::tryEnterRead() const noexcept
     if (numWriters + numWaitingWriters == 0
          || (threadId == writerThreadId && numWriters > 0))
     {
-        readerThreads.add ({ threadId, 1 });
+        ThreadRecursionCount trc = { threadId, 1 };
+        readerThreads.add (trc);
         return true;
     }
 
@@ -68,21 +71,19 @@ bool ReadWriteLock::tryEnterRead() const noexcept
 
 void ReadWriteLock::exitRead() const noexcept
 {
-    auto threadId = Thread::getCurrentThreadId();
+    const Thread::ThreadID threadId = Thread::getCurrentThreadId();
     const SpinLock::ScopedLockType sl (accessLock);
 
     for (int i = 0; i < readerThreads.size(); ++i)
     {
-        auto& readerThread = readerThreads.getReference (i);
+        ThreadRecursionCount& trc = readerThreads.getReference(i);
 
-        if (readerThread.threadID == threadId)
+        if (trc.threadID == threadId)
         {
-            if (--(readerThread.count) == 0)
+            if (--(trc.count) == 0)
             {
                 readerThreads.remove (i);
-
-                readWaitEvent.signal();
-                writeWaitEvent.signal();
+                waitEvent.signal();
             }
 
             return;
@@ -95,14 +96,14 @@ void ReadWriteLock::exitRead() const noexcept
 //==============================================================================
 void ReadWriteLock::enterWrite() const noexcept
 {
-    auto threadId = Thread::getCurrentThreadId();
+    const Thread::ThreadID threadId = Thread::getCurrentThreadId();
     const SpinLock::ScopedLockType sl (accessLock);
 
     while (! tryEnterWriteInternal (threadId))
     {
         ++numWaitingWriters;
         accessLock.exit();
-        writeWaitEvent.wait (100);
+        waitEvent.wait (100);
         accessLock.enter();
         --numWaitingWriters;
     }
@@ -118,7 +119,7 @@ bool ReadWriteLock::tryEnterWriteInternal (Thread::ThreadID threadId) const noex
 {
     if (readerThreads.size() + numWriters == 0
          || threadId == writerThreadId
-         || (readerThreads.size() == 1 && readerThreads.getReference (0).threadID == threadId))
+         || (readerThreads.size() == 1 && readerThreads.getReference(0).threadID == threadId))
     {
         writerThreadId = threadId;
         ++numWriters;
@@ -138,9 +139,7 @@ void ReadWriteLock::exitWrite() const noexcept
     if (--numWriters == 0)
     {
         writerThreadId = {};
-
-        readWaitEvent.signal();
-        writeWaitEvent.signal();
+        waitEvent.signal();
     }
 }
 

@@ -132,8 +132,6 @@ public:
     private:
         //==============================================================================
         friend class AudioProcessorGraph;
-        template <typename Float>
-        friend struct GraphRenderSequence;
 
         struct Connection
         {
@@ -145,30 +143,13 @@ public:
 
         const std::unique_ptr<AudioProcessor> processor;
         Array<Connection> inputs, outputs;
-        bool isPrepared = false;
-        std::atomic<bool> bypassed { false };
+        bool isPrepared = false, bypassed = false;
 
         Node (NodeID, std::unique_ptr<AudioProcessor>) noexcept;
 
         void setParentGraph (AudioProcessorGraph*) const;
         void prepare (double newSampleRate, int newBlockSize, AudioProcessorGraph*, ProcessingPrecision);
         void unprepare();
-
-        template <typename Sample>
-        void processBlock (AudioBuffer<Sample>& audio, MidiBuffer& midi)
-        {
-            const ScopedLock lock (processorLock);
-            processor->processBlock (audio, midi);
-        }
-
-        template <typename Sample>
-        void processBlockBypassed (AudioBuffer<Sample>& audio, MidiBuffer& midi)
-        {
-            const ScopedLock lock (processorLock);
-            processor->processBlockBypassed (audio, midi);
-        }
-
-        CriticalSection processorLock;
 
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Node)
     };
@@ -181,7 +162,6 @@ public:
     struct JUCE_API  Connection
     {
         //==============================================================================
-        Connection() = default;
         Connection (NodeAndChannel source, NodeAndChannel destination) noexcept;
 
         Connection (const Connection&) = default;
@@ -193,10 +173,10 @@ public:
 
         //==============================================================================
         /** The channel and node which is the input source for this connection. */
-        NodeAndChannel source { {}, 0 };
+        NodeAndChannel source;
 
         /** The channel and node which is the input source for this connection. */
-        NodeAndChannel destination { {}, 0 };
+        NodeAndChannel destination;
     };
 
     //==============================================================================
@@ -229,8 +209,8 @@ public:
         added a processor to the graph, the graph owns it and will delete it later when
         it is no longer needed.
 
-        The optional nodeId parameter lets you specify a unique ID to use for the node.
-        If the value is already in use, this method will fail and return an empty node.
+        The optional nodeId parameter lets you specify an ID to use for the node, but
+        if the value is already in use, this new node will overwrite the old one.
 
         If this succeeds, it returns a pointer to the newly-created node.
     */
@@ -415,7 +395,7 @@ private:
 
     friend class AudioGraphIOProcessor;
 
-    std::atomic<bool> isPrepared { false };
+    Atomic<int> isPrepared { 0 };
 
     void topologyChanged();
     void handleAsyncUpdate() override;

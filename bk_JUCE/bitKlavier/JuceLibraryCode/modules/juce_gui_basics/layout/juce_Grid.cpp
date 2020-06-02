@@ -29,13 +29,13 @@ namespace juce
 
 struct Grid::SizeCalculation
 {
-    static float getTotalAbsoluteSize (const Array<Grid::TrackInfo>& tracks, Px gapSize) noexcept
+    static float getTotalAbsoluteSize (const juce::Array<Grid::TrackInfo>& tracks, Px gapSize) noexcept
     {
         float totalCellSize = 0.0f;
 
         for (const auto& trackInfo : tracks)
-            if (! trackInfo.isFractional() || trackInfo.isAuto())
-                totalCellSize += trackInfo.getSize();
+            if (! trackInfo.isFraction || trackInfo.hasKeyword)
+                totalCellSize += trackInfo.size;
 
         float totalGap = tracks.size() > 1 ? static_cast<float> ((tracks.size() - 1) * gapSize.pixels)
                                            : 0.0f;
@@ -43,45 +43,45 @@ struct Grid::SizeCalculation
         return totalCellSize + totalGap;
     }
 
-    static float getRelativeUnitSize (float size, float totalAbsolute, const Array<Grid::TrackInfo>& tracks) noexcept
+    static float getRelativeUnitSize (float size, float totalAbsolute, const juce::Array<Grid::TrackInfo>& tracks) noexcept
     {
-        const float totalRelative = jlimit (0.0f, size, size - totalAbsolute);
+        const float totalRelative = juce::jlimit (0.0f, size, size - totalAbsolute);
         float factorsSum = 0.0f;
 
         for (const auto& trackInfo : tracks)
-            if (trackInfo.isFractional())
-                factorsSum += trackInfo.getSize();
+            if (trackInfo.isFraction)
+                factorsSum += trackInfo.size;
 
         jassert (factorsSum != 0.0f);
         return totalRelative / factorsSum;
     }
 
     //==============================================================================
-    static float getTotalAbsoluteHeight (const Array<Grid::TrackInfo>& rowTracks, Px rowGap)
+    static float getTotalAbsoluteHeight (const juce::Array<Grid::TrackInfo>& rowTracks, Px rowGap)
     {
         return getTotalAbsoluteSize (rowTracks, rowGap);
     }
 
-    static float getTotalAbsoluteWidth (const Array<Grid::TrackInfo>& columnTracks, Px columnGap)
+    static float getTotalAbsoluteWidth (const juce::Array<Grid::TrackInfo>& columnTracks, Px columnGap)
     {
         return getTotalAbsoluteSize (columnTracks, columnGap);
     }
 
-    static float getRelativeWidthUnit (float gridWidth, Px columnGap, const Array<Grid::TrackInfo>& columnTracks)
+    static float getRelativeWidthUnit (float gridWidth, Px columnGap, const juce::Array<Grid::TrackInfo>& columnTracks)
     {
         return getRelativeUnitSize (gridWidth, getTotalAbsoluteWidth (columnTracks, columnGap), columnTracks);
     }
 
-    static float getRelativeHeightUnit (float gridHeight, Px rowGap, const Array<Grid::TrackInfo>& rowTracks)
+    static float getRelativeHeightUnit (float gridHeight, Px rowGap, const juce::Array<Grid::TrackInfo>& rowTracks)
     {
         return getRelativeUnitSize (gridHeight, getTotalAbsoluteHeight (rowTracks, rowGap), rowTracks);
     }
 
     //==============================================================================
-    static bool hasAnyFractions (const Array<Grid::TrackInfo>& tracks)
+    static bool hasAnyFractions (const juce::Array<Grid::TrackInfo>& tracks)
     {
         for (auto& t : tracks)
-            if (t.isFractional())
+            if (t.isFraction)
                 return true;
 
         return false;
@@ -89,8 +89,8 @@ struct Grid::SizeCalculation
 
     void computeSizes (float gridWidth, float gridHeight,
                        Px columnGapToUse, Px rowGapToUse,
-                       const Array<Grid::TrackInfo>& columnTracks,
-                       const Array<Grid::TrackInfo>& rowTracks)
+                       const juce::Array<Grid::TrackInfo>& columnTracks,
+                       const juce::Array<Grid::TrackInfo>& rowTracks)
     {
         if (hasAnyFractions (columnTracks))
             relativeWidthUnit = getRelativeWidthUnit (gridWidth, columnGapToUse, columnTracks);
@@ -118,19 +118,19 @@ struct Grid::PlacementHelpers
     //==============================================================================
     struct LineRange { int start, end; };
     struct LineArea  { LineRange column, row; };
-    struct LineInfo  { StringArray lineNames; };
+    struct LineInfo  { juce::StringArray lineNames; };
 
     struct NamedArea
     {
-        String name;
+        juce::String name;
         LineArea lines;
     };
 
     //==============================================================================
-    static Array<LineInfo> getArrayOfLinesFromTracks (const Array<Grid::TrackInfo>& tracks)
+    static juce::Array<LineInfo> getArrayOfLinesFromTracks (const juce::Array<Grid::TrackInfo>& tracks)
     {
         // fill line info array
-        Array<LineInfo> lines;
+        juce::Array<LineInfo> lines;
 
         for (int i = 1; i <= tracks.size(); ++i)
         {
@@ -139,7 +139,7 @@ struct Grid::PlacementHelpers
             if (i == 1) // start line
             {
                 LineInfo li;
-                li.lineNames.add (currentTrack.getStartLineName());
+                li.lineNames.add (currentTrack.startLineName);
                 lines.add (li);
             }
 
@@ -148,8 +148,8 @@ struct Grid::PlacementHelpers
                 const auto& prevTrack = tracks.getReference (i - 2);
 
                 LineInfo li;
-                li.lineNames.add (prevTrack.getEndLineName());
-                li.lineNames.add (currentTrack.getStartLineName());
+                li.lineNames.add (prevTrack.endLineName);
+                li.lineNames.add (currentTrack.startLineName);
 
                 lines.add (li);
             }
@@ -157,7 +157,7 @@ struct Grid::PlacementHelpers
             if (i == tracks.size()) // end line
             {
                 LineInfo li;
-                li.lineNames.add (currentTrack.getEndLineName());
+                li.lineNames.add (currentTrack.endLineName);
                 lines.add (li);
             }
         }
@@ -169,7 +169,7 @@ struct Grid::PlacementHelpers
 
     //==============================================================================
     static int deduceAbsoluteLineNumberFromLineName (GridItem::Property prop,
-                                                     const Array<Grid::TrackInfo>& tracks)
+                                                     const juce::Array<Grid::TrackInfo>& tracks)
     {
         jassert (prop.hasAbsolute());
 
@@ -180,14 +180,14 @@ struct Grid::PlacementHelpers
         {
             for (const auto& name : lines.getReference (i).lineNames)
             {
-                if (prop.getName() == name)
+                if (prop.name == name)
                 {
                     ++count;
                     break;
                 }
             }
 
-            if (count == prop.getNumber())
+            if (count == prop.number)
                 return i + 1;
         }
 
@@ -196,19 +196,19 @@ struct Grid::PlacementHelpers
     }
 
     static int deduceAbsoluteLineNumber (GridItem::Property prop,
-                                         const Array<Grid::TrackInfo>& tracks)
+                                         const juce::Array<Grid::TrackInfo>& tracks)
     {
         jassert (prop.hasAbsolute());
 
         if (prop.hasName())
             return deduceAbsoluteLineNumberFromLineName (prop, tracks);
 
-        return prop.getNumber() > 0 ? prop.getNumber() : tracks.size() + 2 + prop.getNumber();
+        return prop.number > 0 ? prop.number : tracks.size() + 2 + prop.number;
     }
 
     static int deduceAbsoluteLineNumberFromNamedSpan (int startLineNumber,
                                                       GridItem::Property propertyWithSpan,
-                                                      const Array<Grid::TrackInfo>& tracks)
+                                                      const juce::Array<Grid::TrackInfo>& tracks)
     {
         jassert (propertyWithSpan.hasSpan());
 
@@ -219,14 +219,14 @@ struct Grid::PlacementHelpers
         {
             for (const auto& name : lines.getReference (i).lineNames)
             {
-                if (propertyWithSpan.getName() == name)
+                if (propertyWithSpan.name == name)
                 {
                     ++count;
                     break;
                 }
             }
 
-            if (count == propertyWithSpan.getNumber())
+            if (count == propertyWithSpan.number)
                 return i + 1;
         }
 
@@ -236,18 +236,18 @@ struct Grid::PlacementHelpers
 
     static int deduceAbsoluteLineNumberBasedOnSpan (int startLineNumber,
                                                     GridItem::Property propertyWithSpan,
-                                                    const Array<Grid::TrackInfo>& tracks)
+                                                    const juce::Array<Grid::TrackInfo>& tracks)
     {
         jassert (propertyWithSpan.hasSpan());
 
         if (propertyWithSpan.hasName())
             return deduceAbsoluteLineNumberFromNamedSpan (startLineNumber, propertyWithSpan, tracks);
 
-        return startLineNumber + propertyWithSpan.getNumber();
+        return startLineNumber + propertyWithSpan.number;
     }
 
     //==============================================================================
-    static LineRange deduceLineRange (GridItem::StartAndEndProperty prop, const Array<Grid::TrackInfo>& tracks)
+    static LineRange deduceLineRange (GridItem::StartAndEndProperty prop, const juce::Array<Grid::TrackInfo>& tracks)
     {
         LineRange s;
 
@@ -295,7 +295,7 @@ struct Grid::PlacementHelpers
 
     static LineArea deduceLineArea (const GridItem& item,
                                     const Grid& grid,
-                                    const std::map<String, LineArea>& namedAreas)
+                                    const std::map<juce::String, LineArea>& namedAreas)
     {
         if (item.area.isNotEmpty() && ! grid.templateAreas.isEmpty())
         {
@@ -310,12 +310,12 @@ struct Grid::PlacementHelpers
     }
 
     //==============================================================================
-    static Array<StringArray> parseAreasProperty (const StringArray& areasStrings)
+    static juce::Array<juce::StringArray> parseAreasProperty (const juce::StringArray& areasStrings)
     {
-        Array<StringArray> strings;
+        juce::Array<juce::StringArray> strings;
 
         for (const auto& areaString : areasStrings)
-            strings.add (StringArray::fromTokens (areaString, false));
+            strings.add (juce::StringArray::fromTokens (areaString, false));
 
         if (strings.size() > 0)
         {
@@ -328,7 +328,7 @@ struct Grid::PlacementHelpers
         return strings;
     }
 
-    static NamedArea findArea (Array<StringArray>& stringsArrays)
+    static NamedArea findArea (juce::Array<juce::StringArray>& stringsArrays)
     {
         NamedArea area;
 
@@ -370,11 +370,11 @@ struct Grid::PlacementHelpers
     }
 
     //==============================================================================
-    static std::map<String, LineArea> deduceNamedAreas (const StringArray& areasStrings)
+    static std::map<juce::String, LineArea> deduceNamedAreas (const juce::StringArray& areasStrings)
     {
         auto stringsArrays = parseAreasProperty (areasStrings);
 
-        std::map<String, LineArea> areas;
+        std::map<juce::String, LineArea> areas;
 
         for (auto area = findArea (stringsArrays); area.name.isNotEmpty(); area = findArea (stringsArrays))
         {
@@ -389,19 +389,19 @@ struct Grid::PlacementHelpers
     }
 
     //==============================================================================
-    static float getCoord (int trackNumber, float relativeUnit, Px gap, const Array<Grid::TrackInfo>& tracks)
+    static float getCoord (int trackNumber, float relativeUnit, Px gap, const juce::Array<Grid::TrackInfo>& tracks)
     {
         float c = 0;
 
         for (const auto* it = tracks.begin(); it != tracks.begin() + trackNumber - 1; ++it)
-            c += it->getAbsoluteSize (relativeUnit) + static_cast<float> (gap.pixels);
+            c += (it->isFraction ? it->size * relativeUnit : it->size) + static_cast<float> (gap.pixels);
 
         return c;
     }
 
-    static Rectangle<float> getCellBounds (int columnNumber, int rowNumber,
-                                                 const Array<Grid::TrackInfo>& columnTracks,
-                                                 const Array<Grid::TrackInfo>& rowTracks,
+    static juce::Rectangle<float> getCellBounds (int columnNumber, int rowNumber,
+                                                 const juce::Array<Grid::TrackInfo>& columnTracks,
+                                                 const juce::Array<Grid::TrackInfo>& rowTracks,
                                                  Grid::SizeCalculation calculation,
                                                  Px columnGap, Px rowGap)
     {
@@ -412,15 +412,17 @@ struct Grid::PlacementHelpers
         const auto y = getCoord (rowNumber, calculation.relativeHeightUnit, rowGap, rowTracks);
 
         const auto& columnTrackInfo = columnTracks.getReference (columnNumber - 1);
-        const float width = columnTrackInfo.getAbsoluteSize (calculation.relativeWidthUnit);
+        const float width = columnTrackInfo.isFraction ? columnTrackInfo.size * calculation.relativeWidthUnit
+                                                       : columnTrackInfo.size;
 
         const auto& rowTrackInfo = rowTracks.getReference (rowNumber - 1);
-        const float height = rowTrackInfo.getAbsoluteSize (calculation.relativeHeightUnit);
+        const float height = rowTrackInfo.isFraction ? rowTrackInfo.size * calculation.relativeHeightUnit
+                                                     : rowTrackInfo.size;
 
         return { x, y, width, height };
     }
 
-    static Rectangle<float> alignCell (Rectangle<float> area,
+    static juce::Rectangle<float> alignCell (juce::Rectangle<float> area,
                                              int columnNumber, int rowNumber,
                                              int numberOfColumns, int numberOfRows,
                                              Grid::SizeCalculation calculation,
@@ -484,10 +486,10 @@ struct Grid::PlacementHelpers
         return area;
     }
 
-    static Rectangle<float> getAreaBounds (int columnLineNumberStart, int columnLineNumberEnd,
+    static juce::Rectangle<float> getAreaBounds (int columnLineNumberStart, int columnLineNumberEnd,
                                                  int rowLineNumberStart, int rowLineNumberEnd,
-                                                 const Array<Grid::TrackInfo>& columnTracks,
-                                                 const Array<Grid::TrackInfo>& rowTracks,
+                                                 const juce::Array<Grid::TrackInfo>& columnTracks,
+                                                 const juce::Array<Grid::TrackInfo>& rowTracks,
                                                  Grid::SizeCalculation calculation,
                                                  Grid::AlignContent alignContent,
                                                  Grid::JustifyContent justifyContent,
@@ -527,7 +529,7 @@ struct Grid::PlacementHelpers
 //==============================================================================
 struct Grid::AutoPlacement
 {
-    using ItemPlacementArray = Array<std::pair<GridItem*, Grid::PlacementHelpers::LineArea>>;
+    using ItemPlacementArray = juce::Array<std::pair<GridItem*, Grid::PlacementHelpers::LineArea>>;
 
     //==============================================================================
     struct OccupancyPlane
@@ -720,10 +722,10 @@ struct Grid::AutoPlacement
     static int getSpanFromAuto (GridItem::StartAndEndProperty prop)
     {
         if (prop.end.hasSpan())
-            return prop.end.getNumber();
+            return prop.end.number;
 
         if (prop.start.hasSpan())
-            return prop.start.getNumber();
+            return prop.start.number;
 
         return 1;
     }
@@ -733,12 +735,12 @@ struct Grid::AutoPlacement
     {
         const auto namedAreas = Grid::PlacementHelpers::deduceNamedAreas (grid.templateAreas);
 
-        OccupancyPlane plane (jmax (grid.templateColumns.size() + 1, 2),
-                              jmax (grid.templateRows.size() + 1, 2),
+        OccupancyPlane plane (juce::jmax (grid.templateColumns.size() + 1, 2),
+                              juce::jmax (grid.templateRows.size() + 1, 2),
                               isColumnAutoFlow (grid.autoFlow));
 
         ItemPlacementArray itemPlacementArray;
-        Array<GridItem*> sortedItems;
+        juce::Array<GridItem*> sortedItems;
 
         for (auto& item : grid.items)
             sortedItems.add (&item);
@@ -834,12 +836,12 @@ struct Grid::AutoPlacement
         return { columnEndLine, rowEndLine };
     }
 
-    static std::pair<Array<TrackInfo>, Array<TrackInfo>> createImplicitTracks (const Grid& grid,
+    static std::pair<juce::Array<TrackInfo>, juce::Array<TrackInfo>> createImplicitTracks (const Grid& grid,
                                                                                            const ItemPlacementArray& items)
     {
         const auto columnAndRowLineEnds = getHighestEndLinesNumbers (items);
 
-        Array<TrackInfo> implicitColumnTracks, implicitRowTracks;
+        juce::Array<TrackInfo> implicitColumnTracks, implicitRowTracks;
 
         for (int i = grid.templateColumns.size() + 1; i < columnAndRowLineEnds.first; i++)
             implicitColumnTracks.add (grid.autoColumns);
@@ -851,8 +853,8 @@ struct Grid::AutoPlacement
     }
 
     //==============================================================================
-    static void applySizeForAutoTracks (Array<Grid::TrackInfo>& columns,
-                                        Array<Grid::TrackInfo>& rows,
+    static void applySizeForAutoTracks (juce::Array<Grid::TrackInfo>& columns,
+                                        juce::Array<Grid::TrackInfo>& rows,
                                         const ItemPlacementArray& itemPlacementArray)
     {
         auto isSpan = [](Grid::PlacementHelpers::LineRange r) -> bool { return std::abs (r.end - r.start) > 1; };
@@ -879,11 +881,11 @@ struct Grid::AutoPlacement
         };
 
         for (int i = 0; i < rows.size(); i++)
-            if (rows.getReference (i).isAuto())
+            if (rows.getReference (i).hasKeyword)
                 rows.getReference (i).size = getHighestItemOnRow (i + 1, itemPlacementArray);
 
         for (int i = 0; i < columns.size(); i++)
-            if (columns.getReference (i).isAuto())
+            if (columns.getReference (i).hasKeyword)
                 columns.getReference (i).size = getHighestItemOnColumn (i + 1, itemPlacementArray);
     }
 };
@@ -891,9 +893,9 @@ struct Grid::AutoPlacement
 //==============================================================================
 struct Grid::BoxAlignment
 {
-    static Rectangle<float> alignItem (const GridItem& item,
+    static juce::Rectangle<float> alignItem (const GridItem& item,
                                              const Grid& grid,
-                                             Rectangle<float> area)
+                                             juce::Rectangle<float> area)
     {
         // if item align is auto, inherit value from grid
         Grid::AlignItems alignType = Grid::AlignItems::start;
@@ -910,26 +912,32 @@ struct Grid::BoxAlignment
             justifyType = static_cast<Grid::JustifyItems> (item.justifySelf);
 
         // subtract margin from area
-        area = BorderSize<float> (item.margin.top, item.margin.left, item.margin.bottom, item.margin.right)
+        area = juce::BorderSize<float> (item.margin.top, item.margin.left, item.margin.bottom, item.margin.right)
                   .subtractedFrom (area);
 
         // align and justify
         auto r = area;
 
-        if (item.width     != (float) GridItem::notAssigned)  r.setWidth  (item.width);
-        if (item.height    != (float) GridItem::notAssigned)  r.setHeight (item.height);
-        if (item.maxWidth  != (float) GridItem::notAssigned)  r.setWidth  (jmin (item.maxWidth,  r.getWidth()));
-        if (item.minWidth  > 0.0f)                            r.setWidth  (jmax (item.minWidth,  r.getWidth()));
-        if (item.maxHeight != (float) GridItem::notAssigned)  r.setHeight (jmin (item.maxHeight, r.getHeight()));
-        if (item.minHeight > 0.0f)                            r.setHeight (jmax (item.minHeight, r.getHeight()));
+        if (item.width != (float) GridItem::notAssigned)
+            r.setWidth (item.width);
+
+        if (item.height != (float) GridItem::notAssigned)
+            r.setHeight (item.height);
 
         if (alignType == Grid::AlignItems::start && justifyType == Grid::JustifyItems::start)
             return r;
 
-        if (alignType   == Grid::AlignItems::end)       r.setY (r.getY() + (area.getHeight() - r.getHeight()));
-        if (justifyType == Grid::JustifyItems::end)     r.setX (r.getX() + (area.getWidth()  - r.getWidth()));
-        if (alignType   == Grid::AlignItems::center)    r.setCentre (r.getCentreX(),    area.getCentreY());
-        if (justifyType == Grid::JustifyItems::center)  r.setCentre (area.getCentreX(), r.getCentreY());
+        if (alignType == Grid::AlignItems::end)
+            r.setY (r.getY() + (area.getHeight() - r.getHeight()));
+
+        if (justifyType == Grid::JustifyItems::end)
+            r.setX (r.getX() + (area.getWidth() - r.getWidth()));
+
+        if (alignType == Grid::AlignItems::center)
+            r.setCentre (r.getCentreX(), area.getCentreY());
+
+        if (justifyType == Grid::JustifyItems::center)
+            r.setCentre (area.getCentreX(), r.getCentreY());
 
         return r;
     }
@@ -942,44 +950,36 @@ Grid::TrackInfo::TrackInfo (Px sizeInPixels) noexcept : size (static_cast<float>
 
 Grid::TrackInfo::TrackInfo (Fr fractionOfFreeSpace) noexcept : size ((float)fractionOfFreeSpace.fraction), isFraction (true) {}
 
-Grid::TrackInfo::TrackInfo (Px sizeInPixels, const String& endLineNameToUse) noexcept : Grid::TrackInfo (sizeInPixels)
+Grid::TrackInfo::TrackInfo (Px sizeInPixels, const juce::String& endLineNameToUse) noexcept : Grid::TrackInfo (sizeInPixels)
 {
     endLineName = endLineNameToUse;
 }
 
-Grid::TrackInfo::TrackInfo (Fr fractionOfFreeSpace, const String& endLineNameToUse) noexcept : Grid::TrackInfo (fractionOfFreeSpace)
+Grid::TrackInfo::TrackInfo (Fr fractionOfFreeSpace, const juce::String& endLineNameToUse) noexcept : Grid::TrackInfo (fractionOfFreeSpace)
 {
     endLineName = endLineNameToUse;
 }
 
-Grid::TrackInfo::TrackInfo (const String& startLineNameToUse, Px sizeInPixels) noexcept : Grid::TrackInfo (sizeInPixels)
+Grid::TrackInfo::TrackInfo (const juce::String& startLineNameToUse, Px sizeInPixels) noexcept : Grid::TrackInfo (sizeInPixels)
 {
     startLineName = startLineNameToUse;
 }
 
-Grid::TrackInfo::TrackInfo (const String& startLineNameToUse, Fr fractionOfFreeSpace) noexcept : Grid::TrackInfo (fractionOfFreeSpace)
+Grid::TrackInfo::TrackInfo (const juce::String& startLineNameToUse, Fr fractionOfFreeSpace) noexcept : Grid::TrackInfo (fractionOfFreeSpace)
 {
     startLineName = startLineNameToUse;
 }
 
-Grid::TrackInfo::TrackInfo (const String& startLineNameToUse, Px sizeInPixels, const String& endLineNameToUse) noexcept
+Grid::TrackInfo::TrackInfo (const juce::String& startLineNameToUse, Px sizeInPixels, const juce::String& endLineNameToUse) noexcept
   : Grid::TrackInfo (startLineNameToUse, sizeInPixels)
 {
     endLineName = endLineNameToUse;
 }
 
-Grid::TrackInfo::TrackInfo (const String& startLineNameToUse, Fr fractionOfFreeSpace, const String& endLineNameToUse) noexcept
+Grid::TrackInfo::TrackInfo (const juce::String& startLineNameToUse, Fr fractionOfFreeSpace, const juce::String& endLineNameToUse) noexcept
   : Grid::TrackInfo (startLineNameToUse, fractionOfFreeSpace)
 {
     endLineName = endLineNameToUse;
-}
-
-float Grid::TrackInfo::getAbsoluteSize (float relativeFractionalUnit) const
-{
-    if (isFractional())
-        return size * relativeFractionalUnit;
-    else
-        return size;
 }
 
 //==============================================================================
@@ -987,7 +987,7 @@ Grid::Grid() noexcept {}
 Grid::~Grid() noexcept {}
 
 //==============================================================================
-void Grid::performLayout (Rectangle<int> targetArea)
+void Grid::performLayout (juce::Rectangle<int> targetArea)
 {
     const auto itemsAndAreas = Grid::AutoPlacement().deduceAllItems (*this);
 
