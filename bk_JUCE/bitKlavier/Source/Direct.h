@@ -60,7 +60,8 @@ public:
     dRelease(rel),
     dSustain(sust),
     dUseGlobalSoundSet(true),
-    dSoundSet(-1)
+    dSoundSet(-1),
+    dSoundSetName(String())
     {
         
     }
@@ -76,7 +77,8 @@ public:
     dRelease(30),
     dSustain(1.),
     dUseGlobalSoundSet(true),
-    dSoundSet(-1)
+    dSoundSet(-1),
+    dSoundSetName(String())
     {
         
     }
@@ -102,6 +104,7 @@ public:
         dTranspUsesTuning = d->getTranspUsesTuning();
         dUseGlobalSoundSet = d->getUseGlobalSoundSet();
         dSoundSet = d->getSoundSet();
+        dSoundSetName = d->getSoundSetName();
     }
     
     inline void performModification(DirectPreparation::Ptr d, Array<bool> dirty)
@@ -224,6 +227,9 @@ public:
         for (auto f : m) ADSRvals.setProperty( ptagFloat + String(count++), f, 0);
         prep.addChild(ADSRvals, -1, 0);
         
+        prep.setProperty( ptagDirect_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
+        prep.setProperty( ptagDirect_soundSet, getSoundSetName(), 0);
+        
         return prep;
     }
     
@@ -243,6 +249,13 @@ public:
         String str = e->getStringAttribute(ptagDirect_transpUsesTuning);
         if (str != "") setTranspUsesTuning((bool) str.getIntValue());
         else setTranspUsesTuning(false);
+        
+        str = e->getStringAttribute(ptagDirect_useGlobalSoundSet);
+        if (str == String()) setUseGlobalSoundSet(true);
+        else setUseGlobalSoundSet((bool) str.getIntValue());
+        
+        str = e->getStringAttribute(ptagDirect_soundSet);
+        setSoundSetName(str);
         
         forEachXmlChildElement (*e, sub)
         {
@@ -287,10 +300,11 @@ public:
     
     inline void setUseGlobalSoundSet(bool use) { dUseGlobalSoundSet = use; }
     inline void setSoundSet(int Id) { dSoundSet = Id; }
+    inline void setSoundSetName(String name) { dSoundSetName = name; }
     
     inline bool getUseGlobalSoundSet(void) { return dUseGlobalSoundSet; }
     inline int getSoundSet(void) { return dUseGlobalSoundSet ? -1 : dSoundSet; }
-    
+    inline String getSoundSetName(void) { return dSoundSetName; }
 
 private:
     
@@ -318,6 +332,7 @@ private:
     
     bool dUseGlobalSoundSet;
     int dSoundSet;
+    String dSoundSetName;
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };

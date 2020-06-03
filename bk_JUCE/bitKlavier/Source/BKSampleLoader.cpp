@@ -17,7 +17,7 @@
 
 String notes[4] = {"A","C","D#","F#"};
 
-#define EXIT_CHECK if (threadShouldExit()) { processor.updateState->pianoSamplesAreLoading = false; return; }
+#define EXIT_CHECK if (shouldExit()) { processor.updateState->pianoSamplesAreLoading = false; return jobHasFinished; }
 
 void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
 {
@@ -48,47 +48,47 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         isSF2 = true;
         sf2sound   = new sfzero::SF2Sound(sfzFile);
         
-        sf2sound->loadRegions(processor.loadingInstrument);
+        sf2sound->loadRegions(loadingInstrument);
         sf2sound->loadSamples(&formatManager);
         
-        processor.instrumentNames.add(new StringArray());
+        processor.instrumentNames.set(loadingSoundSetId, StringArray());
         for (int i = 0; i < sf2sound->numSubsounds(); i++)
         {
-            processor.instrumentNames.getUnchecked(processor.instrumentNames.size()-1)->add(sf2sound->subsoundName(i));
+            processor.instrumentNames.getReference(loadingSoundSetId).add(sf2sound->subsoundName(i));
         }
         
 //        processor.regions.clear();
 //        processor.regions.ensureStorageAllocated(processor.regions.size()+1);
-        processor.regions.add(sf2sound->getRegions());
-        processor.progressInc = 1.0 / processor.regions[processor.loadingSoundSetId].size();
+        processor.regions.set(loadingSoundSetId, sf2sound->getRegions());
+        progressInc = 1.0 / processor.regions.getReference(loadingSoundSetId).size();
     }
     else if (ext == ".sfz")
     {
         sfzsound   = new sfzero::Sound(sfzFile);
         
-        processor.loadingInstrument = 0;
+        loadingInstrument = 0;
 
         // POSSIBLY STILL DOUBLE LOADING SAMPLES? 
-        sfzsound->loadRegions(processor.loadingInstrument);
-        sfzsound->loadSamples(&formatManager, &processor.progress);
+        sfzsound->loadRegions(loadingInstrument);
+        sfzsound->loadSamples(&formatManager);
         
-        processor.instrumentNames.add(new StringArray());
+        processor.instrumentNames.set(loadingSoundSetId, StringArray());
         for (int i = 0; i < sfzsound->numSubsounds(); i++)
         {
-            processor.instrumentNames.getUnchecked(processor.instrumentNames.size()-1)->add(sfzsound->subsoundName(i));
+            processor.instrumentNames.getReference(loadingSoundSetId).add(sfzsound->subsoundName(i));
         }
     
 //        processor.regions.clear();
 //        processor.regions.ensureStorageAllocated(processor.regions.size()+1);
-        processor.regions.add(sfzsound->getRegions());
+        processor.regions.set(loadingSoundSetId, sfzsound->getRegions());
         processor.progress = 0.0;
-        processor.progressInc = 1.0 / processor.regions[processor.loadingSoundSetId].size();
+        progressInc = 1.0 / processor.regions.getReference(loadingSoundSetId).size();
     }
     else    return;
 
-    for (auto region : processor.regions.getUnchecked(processor.regions.size()-1))
+    for (auto region : processor.regions.getReference(loadingSoundSetId))
     {
-        processor.progress += processor.progressInc;
+        processor.progress += progressInc;
         
         int64 sampleStart, sampleLength;
         
@@ -172,7 +172,7 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         BigInteger nrange; nrange.setRange(region->lokey, nbits+1, true);
         BigInteger vrange; vrange.setRange(region->lovel, vbits+1, true);
         
-        synth->addSound(processor.loadingSoundSetId, new BKPianoSamplerSound(region->sample->getShortName(),
+        synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(region->sample->getShortName(),
                                                         buffer,
                                                         sampleLength,
                                                         sourceSampleRate,
@@ -188,15 +188,15 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
 
 
 
-void BKSampleLoader::run(void)
+BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
 {
-    BKSampleLoadType type = processor.loadingSampleType;
+    BKSampleLoadType type = loadingSampleType;
     
     processor.updateState->pianoSamplesAreLoading = true;
     
-    String soundfont = processor.loadingSoundfont;
+    String soundfont = loadingSoundfont;
     
-    EXIT_CHECK;
+//    EXIT_CHECK;
     
     if (type == BKLoadSoundfont)
     {
@@ -237,11 +237,11 @@ void BKSampleLoader::run(void)
     }
     else
     {
-        processor.instrumentNames.add(new StringArray());
+        processor.instrumentNames.set(loadingSoundSetId, StringArray());
         
         if (type == BKLoadSoundfont)
         {
-            processor.loadingSampleType = BKLoadLite;
+            loadingSampleType = BKLoadLite;
             type = BKLoadLite;
         }
         
@@ -255,7 +255,7 @@ void BKSampleLoader::run(void)
         if (deviceType.contains("iPhone")) loadMainPianoSamples(BKLoadLitest);
         else loadMainPianoSamples(type);
         
-        EXIT_CHECK;
+//        EXIT_CHECK;
         
         processor.didLoadMainPianoSamples = true;
         
@@ -264,7 +264,7 @@ void BKSampleLoader::run(void)
             processor.didLoadHammersAndRes = true;
             loadHammerReleaseSamples();
             
-            EXIT_CHECK;
+//            EXIT_CHECK;
             
             loadResonanceReleaseSamples();
             
@@ -272,7 +272,10 @@ void BKSampleLoader::run(void)
         }
     }
     
+    processor.progress -= 1.0f;
     processor.updateState->pianoSamplesAreLoading = false;
+    
+    return jobHasFinished;
 }
 
 void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
@@ -404,7 +407,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
                         BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),(int)maxLength);
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
 
-                        synth->addSound(processor.loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                        synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
                                                                         newBuffer,
                                                                         maxLength,
                                                                         sourceSampleRate,
@@ -414,7 +417,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
                                                                         velocityRange));
                     }
                     
-                    processor.progress += processor.progressInc;
+                    processor.progress += progressInc;
                     //DBG(soundName+": " + String(processor.progress));
                     
                 }
@@ -523,7 +526,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
                         BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
                         sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
 
-                        synth->addSound(processor.loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                        synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
                                                                 newBuffer,
                                                                 maxLength,
                                                                 sourceSampleRate,
@@ -532,7 +535,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
                                                                 velocityRange));
                     }
                     
-                    processor.progress += processor.progressInc;
+                    processor.progress += progressInc;
                     //DBG(soundName+": " + String(processor.progress));
                 }
                 else
@@ -602,7 +605,7 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
                 BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
                 sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
                 
-                synth->addSound(processor.loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
                                                                     newBuffer,
                                                                     maxLength,
                                                                     sourceSampleRate,
@@ -610,7 +613,7 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
                                                                     root, 0,
                                                                     velocityRange));
             }
-            processor.progress += processor.progressInc;
+            processor.progress += progressInc;
             //DBG(soundName+": " + String(processor.progress));
         }
         else
@@ -681,7 +684,7 @@ void BKSampleLoader::loadPedalSamples(void)
                 BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
                 sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
                 
-                synth->addSound(processor.loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
                                                         newBuffer,
                                                         maxLength,
                                                         sourceSampleRate,
@@ -690,7 +693,7 @@ void BKSampleLoader::loadPedalSamples(void)
                                                         0,
                                                         velocityRange));
             }
-            processor.progress += processor.progressInc;
+            processor.progress += progressInc;
             //DBG(soundName+": " + String(processor.progress));
         }
         else

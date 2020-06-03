@@ -923,6 +923,9 @@ public:
         }
         prep.addChild(ADSRs, -1, 0);
         
+        prep.setProperty( ptagSynchronic_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
+        prep.setProperty( ptagSynchronic_soundSet, getSoundSetName(), 0);
+        
         return prep;
     }
     
@@ -1012,6 +1015,14 @@ public:
         String str = e->getStringAttribute(ptagSynchronic_transpUsesTuning);
         if (str != "") setTranspUsesTuning((bool) str.getIntValue());
         else setTranspUsesTuning(false);
+        
+        str = e->getStringAttribute(ptagSynchronic_useGlobalSoundSet);
+        if (str != "") setUseGlobalSoundSet((bool) str.getIntValue());
+        else setUseGlobalSoundSet(true);
+        
+        str = e->getStringAttribute(ptagSynchronic_soundSet);
+        setSoundSetName(str);
+        
  
         forEachXmlChildElement (*e, sub)
         {
@@ -1211,9 +1222,11 @@ public:
     
     inline void setUseGlobalSoundSet(bool use) { sUseGlobalSoundSet = use; }
     inline void setSoundSet(int Id) { sSoundSet = Id; }
+    inline void setSoundSetName(String name) { sSoundSetName = name; }
     
     inline bool getUseGlobalSoundSet(void) { return sUseGlobalSoundSet; }
     inline int getSoundSet(void) { return sUseGlobalSoundSet ? -1 : sSoundSet; }
+    inline String getSoundSetName(void) { return sSoundSetName; }
     
 private:
     String name;
@@ -1273,6 +1286,7 @@ private:
     
     bool sUseGlobalSoundSet;
     int sSoundSet;
+    String sSoundSetName;
 
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };

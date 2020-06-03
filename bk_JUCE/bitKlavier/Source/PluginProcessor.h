@@ -91,7 +91,9 @@ public:
     
     void openSoundfont(void);
     
-    Array<sfzero::Region::PtrArr> regions;
+    ThreadPool loader;
+    
+    HashMap<int, sfzero::Region::PtrArr> regions;
     
     AudioFormatManager formatManager;
     std::unique_ptr<AudioFormatReader> sampleReader;
@@ -114,8 +116,11 @@ public:
     StringArray                         galleryNames;
     String                              currentGallery;
     
+    // Full path names of soundfonts in no particular order
     StringArray                         soundfontNames;
-    OwnedArray<StringArray>             instrumentNames;
+    
+    // Names of soundfont instruments keyed by sound set ids
+    HashMap<int, StringArray>           instrumentNames;
     
     OwnedArray<StringArray>             exportedPreparations;
     StringArray                         exportedPianos;
@@ -358,8 +363,6 @@ private:
     void sustainDeactivate(void);
     
     double pitchbendVal;
-    
-    BKSampleLoader loader;
     
     bool doneWithSetStateInfo;
     

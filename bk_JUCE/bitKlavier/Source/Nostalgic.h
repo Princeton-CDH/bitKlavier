@@ -423,6 +423,9 @@ public:
         }
         prep.addChild(undertowADSRvals, -1, 0);
         
+        prep.setProperty( ptagNostalgic_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
+        prep.setProperty( ptagNostalgic_soundSet, getSoundSetName(), 0);
+        
         return prep;
     }
     
@@ -513,6 +516,13 @@ public:
         String str = e->getStringAttribute(ptagNostalgic_transpUsesTuning);
         if (str != "") setTranspUsesTuning((bool) str.getIntValue());
         else setTranspUsesTuning(false);
+        
+        str = e->getStringAttribute(ptagNostalgic_useGlobalSoundSet);
+        if (str != "") setUseGlobalSoundSet((bool) str.getIntValue());
+        else setUseGlobalSoundSet(true);
+        
+        str = e->getStringAttribute(ptagNostalgic_soundSet);
+        setSoundSetName(str);
         
         
         // HOLD MIN / MAX
@@ -609,9 +619,11 @@ public:
     
     inline void setUseGlobalSoundSet(bool use) { nUseGlobalSoundSet = use; }
     inline void setSoundSet(int Id) { nSoundSet = Id; }
+    inline void setSoundSetName(String name) { nSoundSetName = name; }
     
     inline bool getUseGlobalSoundSet(void) { return nUseGlobalSoundSet; }
     inline int getSoundSet(void) { return nUseGlobalSoundSet ? -1 : nSoundSet; }
+    inline String getSoundSetName(void) { return nSoundSetName; }
     
     
 private:
@@ -654,6 +666,7 @@ private:
     
     bool nUseGlobalSoundSet;
     int nSoundSet;
+    String nSoundSetName;
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };

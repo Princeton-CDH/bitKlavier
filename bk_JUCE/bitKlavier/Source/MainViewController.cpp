@@ -352,9 +352,9 @@ void MainViewController::mouseDown(const MouseEvent &event)
 
 void MainViewController::bkComboBoxDidChange(ComboBox* cb)
 {
-    DirectPreparation::Ptr dPrep;
-    SynchronicPreparation::Ptr sPrep;
-    NostalgicPreparation::Ptr nPrep;
+    DirectPreparation::Ptr dPrep, dActive;
+    SynchronicPreparation::Ptr sPrep, sActive;
+    NostalgicPreparation::Ptr nPrep, nActive;
     bool directSelected = false;
     bool synchronicSelected = false;
     bool nostalgicSelected = false;
@@ -363,17 +363,20 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
-            dPrep = processor.gallery->getActiveDirectPreparation(item->getId());
+            dPrep = processor.gallery->getStaticDirectPreparation(item->getId());
+            dActive = processor.gallery->getActiveDirectPreparation(item->getId());
             directSelected = true;
         }
         else if (item->getType() == PreparationTypeSynchronic)
         {
-            sPrep = processor.gallery->getActiveSynchronicPreparation(item->getId());
+            sPrep = processor.gallery->getStaticSynchronicPreparation(item->getId());
+            sActive = processor.gallery->getActiveSynchronicPreparation(item->getId());
             synchronicSelected = true;
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
-            nPrep = processor.gallery->getActiveNostalgicPreparation(item->getId());
+            nPrep = processor.gallery->getStaticNostalgicPreparation(item->getId());
+            nActive = processor.gallery->getActiveNostalgicPreparation(item->getId());
             nostalgicSelected = true;
         }
         
@@ -398,9 +401,27 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             soundSetId = processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[index], 0, globalSoundSetButton.getToggleState());
         }
         
-        if (directSelected) dPrep->setSoundSet(soundSetId);
-        else if (synchronicSelected) sPrep->setSoundSet(soundSetId);
-        else if (nostalgicSelected) nPrep->setSoundSet(soundSetId);
+        if (directSelected)
+        {
+            dPrep->setSoundSet(soundSetId);
+            dPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            dActive->setSoundSet(soundSetId);
+            dActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+        }
+        else if (synchronicSelected)
+        {
+            sPrep->setSoundSet(soundSetId);
+            sPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            sActive->setSoundSet(soundSetId);
+            sActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+        }
+        else if (nostalgicSelected)
+        {
+            nPrep->setSoundSet(soundSetId);
+            nPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            nActive->setSoundSet(soundSetId);
+            nActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+        }
     }
     else if (cb == &instrumentCB)
     {
@@ -409,18 +430,27 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             String sfname = processor.loadedSoundSets[dPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             dPrep->setSoundSet(soundSetId);
+            dPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            dActive->setSoundSet(soundSetId);
+            dActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
         }
         else if (synchronicSelected)
         {
             String sfname = processor.loadedSoundSets[sPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             sPrep->setSoundSet(soundSetId);
+            sPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            sActive->setSoundSet(soundSetId);
+            sActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
         }
         else if (nostalgicSelected)
         {
             String sfname = processor.loadedSoundSets[nPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             nPrep->setSoundSet(soundSetId);
+            nPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            nActive->setSoundSet(soundSetId);
+            nActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
         }
         else
         {
@@ -441,18 +471,27 @@ void MainViewController::bkButtonClicked (Button* b)
         BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
-            DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(item->getId());
-            prep->setUseGlobalSoundSet(!prep->getUseGlobalSoundSet());
+            DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(item->getId());
+            DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(item->getId());
+            bool toggle = !active->getUseGlobalSoundSet();
+            prep->setUseGlobalSoundSet(toggle);
+            active->setUseGlobalSoundSet(toggle);
         }
         else if (item->getType() == PreparationTypeSynchronic)
         {
-            SynchronicPreparation::Ptr prep = processor.gallery->getActiveSynchronicPreparation(item->getId());
-            prep->setUseGlobalSoundSet(!prep->getUseGlobalSoundSet());
+            SynchronicPreparation::Ptr prep = processor.gallery->getStaticSynchronicPreparation(item->getId());
+            SynchronicPreparation::Ptr active = processor.gallery->getActiveSynchronicPreparation(item->getId());
+            bool toggle = !active->getUseGlobalSoundSet();
+            prep->setUseGlobalSoundSet(toggle);
+            active->setUseGlobalSoundSet(toggle);
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
-            NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(item->getId());
-            prep->setUseGlobalSoundSet(!prep->getUseGlobalSoundSet());
+            NostalgicPreparation::Ptr prep = processor.gallery->getStaticNostalgicPreparation(item->getId());
+            NostalgicPreparation::Ptr active = processor.gallery->getActiveNostalgicPreparation(item->getId());
+            bool toggle = !active->getUseGlobalSoundSet();
+            prep->setUseGlobalSoundSet(toggle);
+            active->setUseGlobalSoundSet(toggle);
         }
     }
 }
@@ -769,9 +808,9 @@ void MainViewController::fillInstrumentCB()
         instrumentCB.setEnabled(true);
         
         int i = 1;
-        if (processor.instrumentNames.size() > idx)
+        if (processor.instrumentNames.contains(idx))
         {
-            for (auto inst : *processor.instrumentNames.getUnchecked(idx))
+            for (auto inst : processor.instrumentNames.getReference(idx))
             {
                 if (inst == "") inst = "Instrument " + String(i);
                 instrumentCB.addItem(inst, i++);
@@ -859,11 +898,11 @@ void MainViewController::timerCallback()
     
     keyboard->repaint();
     
-    if (state->pianoSamplesAreLoading)
+    if (processor.loader.getNumJobs() > 0)
     {
         splash.setVisible(true);
         
-        splash.setProgress(processor.progress);
+        splash.setProgress(processor.progress / processor.loader.getNumJobs());
     }
     else
     {

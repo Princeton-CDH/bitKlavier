@@ -205,7 +205,6 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         globalSoundfont = galleryXML->getStringAttribute("soundfontURL");
         globalInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
         
-        loader.stopThread(1000);
         loadSamplesStartup();
     }
     

@@ -661,6 +661,8 @@ public:
 	void renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples);
 	void renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples);
     void clearNextDelayBlock(int numSamples);
+    
+    int loadSamples(BKSampleLoadType type, String path ="", int subsound=0, bool updateGlobalSet=true);
 	
 	GeneralSettings::Ptr generalSettings;
     

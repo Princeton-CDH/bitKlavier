@@ -24,7 +24,28 @@ tuner(tuning),
 blendronic(blend),
 keymaps(Keymap::PtrArr())
 {
-    
+    if (!direct->sPrep->getUseGlobalSoundSet())
+    {
+        String name = direct->sPrep->getSoundSetName();
+        BKSampleLoadType type = BKLoadSoundfont;
+        String path = String();
+        int subsound = 0;
+        for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
+        {
+            if (name == String(cBKSampleLoadTypes[i]))
+            {
+                type = (BKSampleLoadType) i;
+            }
+        }
+        if (type == BKLoadSoundfont)
+        {
+            path = name.upToLastOccurrenceOf(".subsound", false, false);
+            subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+        }
+        int Id = synth->loadSamples(type, path, subsound, false);
+        direct->sPrep->setSoundSet(Id);
+        direct->aPrep->setSoundSet(Id);
+    }
 }
 
 DirectProcessor::~DirectProcessor(void)

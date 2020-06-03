@@ -120,6 +120,12 @@ BKSynthesiser::~BKSynthesiser()
 }
 
 //==============================================================================
+int BKSynthesiser::loadSamples(BKSampleLoadType type, String path, int subsound, bool updateGlobalSet)
+{
+    return processor.loadSamples(type, path, subsound, updateGlobalSet);
+}
+
+
 BKSynthesiserVoice* BKSynthesiser::getVoice (const int index) const
 {
     const ScopedLock sl (lock);

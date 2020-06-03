@@ -117,6 +117,8 @@ const String vtagSynchronic_accentMultsStates = "accentMultipliersStates";
 const String vtagSynchronic_transpOffsetsStates = "transpOffsetsStates";
 const String ptagSynchronic_reset = "synchronicReset";
 const String vtagSynchronic_ADSRs = "ADSRs";
+const String ptagSynchronic_useGlobalSoundSet = "synchronicUseGlobalSoundSet";
+const String ptagSynchronic_soundSet = "synchronicSoundSet";
 
 
 #define ABSOLUTE_OFFSET_SIZE 256
@@ -137,6 +139,8 @@ const String ptagNostalgic_reset = "nostalgicReset";
 const String ptagNostalgic_targetClearAll = "targetTypeNostalgicClearAll";
 const String vtagNostalgic_reverseADSR = "reverseADSR";
 const String vtagNostalgic_undertowADSR = "undertowADSR";
+const String ptagNostalgic_useGlobalSoundSet = "nostalgicUseGlobalSoundSet";
+const String ptagNostalgic_soundSet = "nostalgicSoundSet";
 
 
 const String vtagDirect = "direct";
@@ -150,6 +154,8 @@ const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";
 const String ptagDirect_reset = "directReset";
 const String vtagDirect_ADSR = "ADSR";
+const String ptagDirect_useGlobalSoundSet = "directUseGlobalSoundSet";
+const String ptagDirect_soundSet = "directSoundSet";
 
 
 const String vtagTuning = "tuning";

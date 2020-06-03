@@ -104,8 +104,9 @@ hammerReleaseSynth(*this),
 resonanceReleaseSynth(*this),
 pedalSynth(*this),
 firstTime(true),
+
+loader(),
 currentSampleRate(44100.),
-loader(*this),
 doneWithSetStateInfo(false),
 midiReady(false)
 {
@@ -340,7 +341,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     
     if (!didLoadMainPianoSamples)
     {
-        if (!loader.isThreadRunning())
+        if (loader.getNumJobs() == 0)
         {
     #if JUCE_IOS
             loadSamples(BKLoadLite);
@@ -574,6 +575,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
     
     // TODO : for multi sample set support, remove soundfont argument from this chain of functions
+    // UPDATE: actually seems like that argument isn't really used so it doesn't matter. still should clean this up
     currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
     
     //add note to springTuning, if only for Graph display

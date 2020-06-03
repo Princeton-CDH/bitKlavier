@@ -55,7 +55,7 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         if (!loadedSoundSets.contains(loadingSoundSet))
         {
             loadingSoundSetId = loadedSoundSets.size();
-            loader.startThread();
+            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId), true);
         }
         else
         {
@@ -66,22 +66,14 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
     {
         loadingSampleType = type;
         
-        int numSamplesPerLayer = 29;
-        int numHarmSamples = 69;
-        int numResSamples = 88;
-        
-        progress = 0.0;
-        progressInc = 1.0f / ((type == BKLoadHeavy)  ? (numSamplesPerLayer * 8 + (numResSamples + numHarmSamples)) :
-                              (type == BKLoadMedium) ? (numSamplesPerLayer * 4) :
-                              (type == BKLoadLite)   ? (numSamplesPerLayer * 2) :
-                              (type == BKLoadLitest) ? (numSamplesPerLayer * 1) : 1.0);
+//        progress = 0.0;
         
         loadingSoundSet = cBKSampleLoadTypes[type];
         
         if (!loadedSoundSets.contains(loadingSoundSet))
         {
             loadingSoundSetId = loadedSoundSets.size();
-            loader.startThread();
+            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId), true);
         }
         else
         {
