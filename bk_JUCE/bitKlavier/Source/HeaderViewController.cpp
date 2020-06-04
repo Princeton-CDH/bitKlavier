@@ -72,6 +72,7 @@ construction(c)
 
 HeaderViewController::~HeaderViewController()
 {
+    PopupMenu::dismissAllActiveMenus();
     galleryCB.setLookAndFeel(nullptr);
     pianoCB.setLookAndFeel(nullptr);
     
