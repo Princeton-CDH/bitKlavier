@@ -55,10 +55,7 @@ struct HeaderItemComponent  : public PopupMenu::CustomComponent
         setName (name);
     }
 
-    void paint (Graphics& g) override
-    {
-        getLookAndFeel().drawPopupMenuSectionHeader (g, getLocalBounds(), getName());
-    }
+    void paint (Graphics& g) override;
 
     void getIdealSize (int& idealWidth, int& idealHeight) override
     {
@@ -80,7 +77,10 @@ struct ItemComponent  : public Component
             customComp = *new HeaderItemComponent (item.text);
 
         if (customComp != nullptr)
+        {
+            setItem (*customComp, &item);
             addAndMakeVisible (*customComp);
+        }
 
         parent.addAndMakeVisible (this);
 
@@ -94,10 +94,7 @@ struct ItemComponent  : public Component
         addMouseListener (&parent, false);
     }
 
-    ~ItemComponent() override
-    {
-        removeChildComponent (customComp.get());
-    }
+    ~ItemComponent() override;
 
     void getIdealSize (int& idealWidth, int& idealHeight, const int standardItemHeight)
     {
@@ -267,13 +264,7 @@ struct MenuWindow  : public Component
         getMouseState (Desktop::getInstance().getMainMouseSource()); // forces creation of a mouse source watcher for the main mouse
     }
 
-    ~MenuWindow() override
-    {
-        getActiveWindows().removeFirstMatchingValue (this);
-        Desktop::getInstance().removeGlobalMouseListener (this);
-        activeSubMenu.reset();
-        items.clear();
-    }
+    ~MenuWindow() override;
 
     //==============================================================================
     void paint (Graphics& g) override
@@ -458,7 +449,7 @@ struct MenuWindow  : public Component
 
                 if (componentAttachedTo->reallyContains (mousePos, true))
                 {
-                    postCommandMessage (PopupMenuSettings::dismissCommandId); // dismiss asynchrounously
+                    postCommandMessage (PopupMenuSettings::dismissCommandId); // dismiss asynchronously
                     return;
                 }
             }
@@ -604,7 +595,7 @@ struct MenuWindow  : public Component
         if (relativeTo != nullptr)
             targetPoint = relativeTo->localPointToGlobal (targetPoint);
 
-        auto parentArea = Desktop::getInstance().getDisplays().findDisplayForPoint (targetPoint)
+        auto parentArea = Desktop::getInstance().getDisplays().findDisplayForPoint (targetPoint * scaleFactor)
                               #if JUCE_MAC || JUCE_ANDROID
                                .userArea;
                               #else
@@ -1007,14 +998,7 @@ public:
         startTimerHz (20);
     }
 
-    void handleMouseEvent (const MouseEvent& e)
-    {
-        if (! window.windowIsStillValid())
-            return;
-
-        startTimerHz (20);
-        handleMousePosition (e.getScreenPosition());
-    }
+    void handleMouseEvent (const MouseEvent& e);
 
     void timerCallback() override
     {
@@ -1244,11 +1228,7 @@ struct NormalComponentWrapper : public PopupMenu::CustomComponent
         addAndMakeVisible (comp);
     }
 
-    void getIdealSize (int& idealWidth, int& idealHeight) override
-    {
-        idealWidth = width;
-        idealHeight = height;
-    }
+    void getIdealSize (int& idealWidth, int& idealHeight) override;
 
     void resized() override
     {
@@ -1262,6 +1242,44 @@ struct NormalComponentWrapper : public PopupMenu::CustomComponent
 };
 
 };
+
+// The following implementations are outside of the class definitions to avoid spurious
+// warning messages when dynamically loading libraries at runtime on macOS
+void PopupMenu::HelperClasses::HeaderItemComponent::paint (Graphics& g)
+{
+    getLookAndFeel().drawPopupMenuSectionHeader (g, getLocalBounds(), getName());
+}
+
+PopupMenu::HelperClasses::ItemComponent::~ItemComponent()
+{
+    if (customComp != nullptr)
+        setItem (*customComp, nullptr);
+
+    removeChildComponent (customComp.get());
+}
+
+PopupMenu::HelperClasses::MenuWindow::~MenuWindow()
+{
+    getActiveWindows().removeFirstMatchingValue (this);
+    Desktop::getInstance().removeGlobalMouseListener (this);
+    activeSubMenu.reset();
+    items.clear();
+}
+
+void PopupMenu::HelperClasses::MouseSourceState::handleMouseEvent (const MouseEvent& e)
+{
+    if (! window.windowIsStillValid())
+        return;
+
+    startTimerHz (20);
+    handleMousePosition (e.getScreenPosition());
+}
+
+void PopupMenu::HelperClasses::NormalComponentWrapper::getIdealSize (int& idealWidth, int& idealHeight)
+{
+    idealWidth = width;
+    idealHeight = height;
+}
 
 //==============================================================================
 PopupMenu::PopupMenu()
@@ -1385,6 +1403,12 @@ PopupMenu::Item& PopupMenu::Item::setCustomComponent (ReferenceCountedObjectPtr<
     return *this;
 }
 
+PopupMenu::Item& PopupMenu::Item::setImage (std::unique_ptr<Drawable> newImage) & noexcept
+{
+    image = std::move (newImage);
+    return *this;
+}
+
 PopupMenu::Item&& PopupMenu::Item::setTicked (bool shouldBeTicked) && noexcept
 {
     isTicked = shouldBeTicked;
@@ -1418,6 +1442,12 @@ PopupMenu::Item&& PopupMenu::Item::setColour (Colour newColour) && noexcept
 PopupMenu::Item&& PopupMenu::Item::setCustomComponent (ReferenceCountedObjectPtr<CustomComponent> comp) && noexcept
 {
     customComponent = comp;
+    return std::move (*this);
+}
+
+PopupMenu::Item&& PopupMenu::Item::setImage (std::unique_ptr<Drawable> newImage) && noexcept
+{
+    image = std::move (newImage);
     return std::move (*this);
 }
 
@@ -1589,6 +1619,7 @@ void PopupMenu::addSeparator()
 void PopupMenu::addSectionHeader (String title)
 {
     Item i (std::move (title));
+    i.itemID = 0;
     i.isSectionHeader = true;
     addItem (std::move (i));
 }
@@ -1890,6 +1921,12 @@ bool PopupMenu::containsAnyActiveItems() const noexcept
 void PopupMenu::setLookAndFeel (LookAndFeel* const newLookAndFeel)
 {
     lookAndFeel = newLookAndFeel;
+}
+
+void PopupMenu::setItem (CustomComponent& c, const Item* itemToUse)
+{
+    c.item = itemToUse;
+    c.repaint();
 }
 
 //==============================================================================
