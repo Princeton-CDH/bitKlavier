@@ -222,6 +222,8 @@ void TextLayout::draw (Graphics& g, Rectangle<float> area) const
     auto origin = justification.appliedToRectangle (Rectangle<float> (width, getHeight()), area).getPosition();
 
     auto& context   = g.getInternalContext();
+    context.saveState();
+
     auto clip       = context.getClipBounds();
     auto clipTop    = clip.getY()      - origin.y;
     auto clipBottom = clip.getBottom() - origin.y;
@@ -257,6 +259,8 @@ void TextLayout::draw (Graphics& g, Rectangle<float> area) const
             }
         }
     }
+
+    context.restoreState();
 }
 
 void TextLayout::createLayout (const AttributedString& text, float maxWidth)
@@ -616,67 +620,5 @@ void TextLayout::recalculateSize()
         height = 0;
     }
 }
-
-//==============================================================================
-#if JUCE_UNIT_TESTS
-
-struct TextLayoutTests  : public UnitTest
-{
-    TextLayoutTests()
-        : UnitTest ("Text Layout", UnitTestCategories::text)
-    {}
-
-    static TextLayout createLayout (StringRef text, float width)
-    {
-        Font fontToUse (12.0f);
-
-        AttributedString string (text);
-        string.setFont (std::move (fontToUse));
-
-        TextLayout layout;
-        layout.createLayout (std::move (string), width);
-
-        return layout;
-    }
-
-    void testLineBreaks (const String& line, float width, const StringArray& expected)
-    {
-        const auto layout = createLayout (line, width);
-
-        beginTest ("A line is split into expected pieces");
-        {
-            expectEquals (layout.getNumLines(), expected.size());
-
-            const auto limit = jmin (layout.getNumLines(), expected.size());
-
-            for (int i = 0; i != limit; ++i)
-                expectEquals (substring (line, layout.getLine (i).stringRange), expected[i]);
-        }
-    }
-
-    void runTest() override
-    {
-        const String shortLine ("hello world");
-        testLineBreaks (shortLine, 1.0e7f, { shortLine });
-
-        testLineBreaks ("this line should be split",
-                        60.0f,
-                        { "this line ",
-                          "should be ",
-                          "split" });
-
-        testLineBreaks ("these\nlines \nhave\n weird  \n spacing  ",
-                        80.0f,
-                        { "these\n",
-                          "lines \n",
-                          "have\n",
-                          " weird  \n",
-                          " spacing  " });
-    }
-};
-
-static TextLayoutTests textLayoutTests;
-
-#endif
 
 } // namespace juce
