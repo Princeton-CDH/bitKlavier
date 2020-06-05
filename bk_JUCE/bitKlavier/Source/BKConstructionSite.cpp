@@ -831,7 +831,7 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
-    DBG("mousedown");
+    // DBG("mousedown");
     MouseEvent e = eo.getEventRelativeTo(this);
     
 #if JUCE_IOS

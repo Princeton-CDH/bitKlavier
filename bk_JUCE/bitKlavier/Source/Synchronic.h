@@ -735,7 +735,7 @@ public:
     inline void setNumClusters(int c)
     {
         numClusters = c;
-        DBG("setNumClusters = " + String(c));
+        // DBG("setNumClusters = " + String(c));
     }
     
     inline int getNumClusters(void)
@@ -766,7 +766,7 @@ public:
         setRelease(which, oneADSR[3]);
         if(oneADSR[4] > 0 || which==0) setEnvelopeOn(which, true);
         else setEnvelopeOn(which, false);
-        DBG("ADSR envelopeOn = " + String(which) + " " + String((int)getEnvelopeOn(which)));
+        // DBG("ADSR envelopeOn = " + String(which) + " " + String((int)getEnvelopeOn(which)));
         
     }
     
@@ -1568,7 +1568,7 @@ public:
         if(prep->getTransposition().size() > 0)     transpCounter           = mod(idx, prep->getTransposition().size());
         if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = mod(idx, prep->getEnvelopesOn().size());
 
-        DBG("beatMultiplierCounter = " + String(beatMultiplierCounter));
+        // DBG("beatMultiplierCounter = " + String(beatMultiplierCounter));
 
         beatCounter             = 0;
     }
@@ -1579,7 +1579,7 @@ public:
     
     inline void addNote(int note)
     {
-        DBG("adding note: " + String(note));
+        // DBG("adding note: " + String(note));
         cluster.insert(0, note);
     }
     

@@ -30,7 +30,7 @@ int Gallery::transformId(BKPreparationType type, int oldId)
         newId = idcounts[type]++;
         idmap[type]->set(oldId, newId);
         
-        DBG("TRANS " + String(cPreparationTypes[type]) + " old: " + String(oldId) + " new: " + String(newId));
+        // DBG("TRANS " + String(cPreparationTypes[type]) + " old: " + String(oldId) + " new: " + String(newId));
     }
     
     return newId;

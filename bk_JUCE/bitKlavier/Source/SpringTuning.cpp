@@ -19,7 +19,7 @@ using namespace std;
 
 void SpringTuning::copy(SpringTuning::Ptr st)
 {
-    DBG("SpringTuning::copy called!!");
+    // DBG("SpringTuning::copy called!!");
     rate = st->getRate();
     stiffness = st->getStiffness();
     active = st->getActive();
@@ -59,7 +59,7 @@ void SpringTuning::copy(SpringTuning::Ptr st)
 
 void SpringTuning::performModification(SpringTuning::Ptr st, Array<bool> dirty)
 {
-    DBG("SpringTuning::performModification called!!");
+    // DBG("SpringTuning::performModification called!!");
     if (dirty[TuningSpringRate]) rate = st->getRate();
     if (dirty[TuningSpringStiffness]) stiffness = st->getStiffness();
     if (dirty[TuningSpringActive]) active = st->getActive();
@@ -291,7 +291,7 @@ void SpringTuning::setSpringWeight(int which, double weight)
         {
             spring->setStrength(weight);
             
-            DBG("reweighting interval " + String(which) +  " to " + String(weight));
+            // DBG("reweighting interval " + String(which) +  " to " + String(weight));
         }
     }
 }
@@ -306,7 +306,7 @@ double SpringTuning::getSpringWeight(int which)
 void SpringTuning::setTetherWeight(int which, double weight)
 {
 
-    DBG("SpringTuning::setTetherWeight " + String(which) + " " + String(weight));
+    // DBG("SpringTuning::setTetherWeight " + String(which) + " " + String(weight));
     Spring* spring = tetherSpringArray[which];
     
     spring->setStrength(weight);
@@ -373,25 +373,25 @@ void SpringTuning::removeParticle(int note)
 void SpringTuning::addNote(int note)
 {
     addParticle(note);
-    DBG("SpringTuning::addNote, useAutomaticFundamental " + String((int)useAutomaticFundamental));
+    // DBG("SpringTuning::addNote, useAutomaticFundamental " + String((int)useAutomaticFundamental));
     
     if(useLowestNoteForFundamental)
     {
-        DBG("lowest current note = " + String(getLowestActiveParticle()));
+        // DBG("lowest current note = " + String(getLowestActiveParticle()));
         intervalFundamentalActive = (PitchClass)(getLowestActiveParticle() % 12);
         
         if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
     }
     else if(useHighestNoteForFundamental)
     {
-        DBG("highest current note = " + String(getHighestActiveParticle()));
+        // DBG("highest current note = " + String(getHighestActiveParticle()));
         intervalFundamentalActive = (PitchClass)(getHighestActiveParticle() % 12);
         
         if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
     }
     else if(useLastNoteForFundamental)
     {
-        DBG("last note = " + String(note));
+        // DBG("last note = " + String(note));
         intervalFundamentalActive = (PitchClass)(note % 12);
         
         if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
@@ -413,12 +413,12 @@ void SpringTuning::removeNote(int note)
     
     if(useLowestNoteForFundamental)
     {
-        DBG("lowest current note = " + String(getLowestActiveParticle()));
+        // DBG("lowest current note = " + String(getLowestActiveParticle()));
         intervalFundamentalActive = (PitchClass)(getLowestActiveParticle() % 12);
     }
     else if(useHighestNoteForFundamental)
     {
-        DBG("highest current note = " + String(getHighestActiveParticle()));
+        // DBG("highest current note = " + String(getHighestActiveParticle()));
         intervalFundamentalActive = (PitchClass)(getHighestActiveParticle() % 12);
     }
     else if(useAutomaticFundamental)
@@ -511,18 +511,18 @@ void SpringTuning::findFundamental()
         
         if(fundamental_57 > -1)
         {
-            DBG("CHOICE = " + String(fundamental_57));
+            // DBG("CHOICE = " + String(fundamental_57));
             intervalFundamentalActive = (PitchClass(fundamental_57));
         }
         else if(fundamental_48 > -1)
         {
-            DBG("CHOICE = " + String(fundamental_48));
+            // DBG("CHOICE = " + String(fundamental_48));
             intervalFundamentalActive = (PitchClass(fundamental_48));
             
         }
         else if(fundamental_39 > -1)
         {
-            DBG("CHOICE = " + String(fundamental_39));
+            // DBG("CHOICE = " + String(fundamental_39));
             intervalFundamentalActive = (PitchClass(fundamental_39));
             
         }
@@ -583,7 +583,7 @@ void SpringTuning::addSpringsByNote(int note)
 
                 if(tnoteA % 12 == getTetherFundamental() || tnoteB % 12 == getTetherFundamental())
                 {
-                    DBG("SpringTuning::addSpringsByNote getTetherWeightGlobal = " + String((int)getTetherWeightGlobal()));
+                    // DBG("SpringTuning::addSpringsByNote getTetherWeightGlobal = " + String((int)getTetherWeightGlobal()));
                     setTetherWeight(tnoteA, getTetherWeightGlobal());
                 }
                 else{

@@ -1119,7 +1119,7 @@ void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double 
 
 void SynchronicPreparationEditor::update(NotificationType notify)
 {
-    DBG("SynchronicPreparationEditor::update " + String((int)notify));
+    // DBG("SynchronicPreparationEditor::update " + String((int)notify));
     
     if (processor.updateState->currentSynchronicId < 0) return;
     
@@ -1812,7 +1812,7 @@ void SynchronicModificationEditor::timerCallback()
 
 void SynchronicModificationEditor::update(NotificationType notify)
 {
-    DBG("SynchronicModificationEditor::update " + String((int)notify));
+    // DBG("SynchronicModificationEditor::update " + String((int)notify));
     
     if (processor.updateState->currentModSynchronicId < 0) return;
     

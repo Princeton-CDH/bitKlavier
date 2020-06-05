@@ -896,7 +896,7 @@ bool HeaderViewController::handleGalleryChange(void)
     }
     else if(galleryIsDirtyAlertResult == 2)
     {
-        DBG("not saving");
+        // DBG("not saving");
         shouldSwitch = true;
     }
     

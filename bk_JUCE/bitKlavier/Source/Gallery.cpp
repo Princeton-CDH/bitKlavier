@@ -21,7 +21,7 @@ processor(p)
         idmap.add(new HashMap<int,int>());
     }
     
-    DBG("idmap size: " + String(idmap.size()));
+    // DBG("idmap size: " + String(idmap.size()));
     
     general = new GeneralSettings();
     
@@ -39,7 +39,7 @@ processor(p)
         idmap.add(new HashMap<int,int>());
     }
     
-    DBG("idmap size: " + String(idmap.size()));
+    // DBG("idmap size: " + String(idmap.size()));
     
     general = new GeneralSettings();
 
@@ -60,7 +60,7 @@ url(String())
         idmap.add(new HashMap<int,int>());
     }
     
-    DBG("idmap size: " + String(idmap.size()));
+    // DBG("idmap size: " + String(idmap.size()));
     
     general = new GeneralSettings();
 
