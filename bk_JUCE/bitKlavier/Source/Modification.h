@@ -112,7 +112,7 @@ public:
     Modification(Id, DirectParameterTypeNil),
     DirectPreparation()
     {
-        DBG("dirtysize: " + String(dirty.size()));
+        // DBG("dirtysize: " + String(dirty.size()));
     }
 
     ~DirectModification(void)

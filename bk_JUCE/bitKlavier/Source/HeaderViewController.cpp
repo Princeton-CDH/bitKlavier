@@ -670,7 +670,7 @@ void HeaderViewController::fillGalleryCB(void)
         StringArray submenuNames;
         OwnedArray<PopupMenu> submenus;
 
-		processor.galleryNames.sortNatural();
+		// processor.galleryNames.sortNatural();
         /*
 		DBG("Gallery Names:");
 		for (auto name : processor.galleryNames)
@@ -945,13 +945,25 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 index = index - numberOfDefaultGalleryItems;
                 String path = processor.galleryNames[index];
                 
+                /*
+                // ok this kludge at least makes it work, but not the best, as duplicate names or substrings could get mismapped
+                for (auto tpath : processor.galleryNames)
+                {
+                    if (tpath.contains(galleryCB.getText()))
+                        path = tpath;
+                }
+                 */
+                
                 processor.defaultLoaded = false;
                 processor.defaultName = "";
          
                 if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
                 else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
                 
-                DBG("HeaderViewController::bkComboBoxDidChange combobox text = " + galleryCB.getText());
+                DBG("HeaderViewController::bkComboBoxDidChange combobox text / id / path = "
+                    + galleryCB.getText() + " "
+                    + String(index) + " "
+                    + path);
             }
             
         }
