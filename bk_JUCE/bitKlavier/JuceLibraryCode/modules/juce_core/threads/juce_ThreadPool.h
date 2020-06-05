@@ -76,7 +76,7 @@ public:
                                      again when a thread is free. */
     };
 
-    /** Performs the actual work that this job needs to do.
+    /** Peforms the actual work that this job needs to do.
 
         Your subclass must implement this method, in which is does its work.
 

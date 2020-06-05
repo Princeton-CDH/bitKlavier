@@ -482,7 +482,6 @@ void DragAndDropContainer::startDragging (const var& sourceDescription,
         }
     }
 
-    dragImageComponent->sourceDetails.localPosition = sourceComponent->getLocalPoint (nullptr, lastMouseDown);
     dragImageComponent->updateLocation (false, lastMouseDown);
 
    #if JUCE_WINDOWS

@@ -68,7 +68,7 @@ public:
     
     ~BKButtonAndMenuLAF()
     {
-        // setDefaultLookAndFeel(nullptr);
+//         setDefaultLookAndFeel(nullptr);
     }
     
     void drawButtonBackground (Graphics&, Button&, const Colour& backgroundColour,

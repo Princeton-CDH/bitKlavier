@@ -104,7 +104,6 @@
  #include <objc/runtime.h>
  #include <objc/objc.h>
  #include <objc/message.h>
- #include <poll.h>
 
 //==============================================================================
 #elif JUCE_WINDOWS
@@ -176,7 +175,7 @@
   #pragma warning (4: 4511 4512 4100)
  #endif
 
- #if ! JUCE_MINGW && ! JUCE_DONT_AUTOLINK_TO_WIN32_LIBRARIES
+ #if JUCE_MSVC && ! JUCE_DONT_AUTOLINK_TO_WIN32_LIBRARIES
   #pragma comment (lib, "kernel32.lib")
   #pragma comment (lib, "user32.lib")
   #pragma comment (lib, "wininet.lib")
@@ -242,7 +241,6 @@
  #include <sys/vfs.h>
  #include <sys/wait.h>
  #include <utime.h>
- #include <poll.h>
 
 //==============================================================================
 #elif JUCE_BSD
@@ -271,7 +269,6 @@
  #include <sys/types.h>
  #include <sys/wait.h>
  #include <utime.h>
- #include <poll.h>
 
 //==============================================================================
 #elif JUCE_ANDROID
@@ -293,7 +290,6 @@
  #include <fnmatch.h>
  #include <sys/wait.h>
  #include <android/api-level.h>
- #include <poll.h>
 
  // If you are getting include errors here, then you to re-build the Projucer
  // and re-save your .jucer file.

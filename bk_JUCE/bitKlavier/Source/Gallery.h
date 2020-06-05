@@ -166,7 +166,12 @@ public:
     
     inline const Piano::PtrArr getPianos(void) const noexcept
     {
-        return bkPianos;
+		return bkPianos;
+
+		/*PianoComparator pianoComp = PianoComparator();
+		Piano::PtrArr copySortPianos = Piano::PtrArr(bkPianos);
+		copySortPianos.Array::sort(pianoComp, true);
+        return copySortPianos;*/
     }
     
     inline const StringArray getPianoNames(void) const noexcept

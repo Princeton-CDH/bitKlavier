@@ -42,8 +42,7 @@ namespace juce
     @tags{Audio}
 */
 class StandalonePluginHolder    : private AudioIODeviceCallback,
-                                  private Timer,
-                                  private Value::Listener
+                                  private Timer
 {
 public:
     //==============================================================================
@@ -79,11 +78,9 @@ public:
 
         : settings (settingsToUse, takeOwnershipOfSettings),
           channelConfiguration (channels),
+          shouldMuteInput (! isInterAppAudioConnected()),
           autoOpenMidiDevices (shouldAutoOpenMidiDevices)
     {
-        shouldMuteInput.addListener (this);
-        shouldMuteInput = ! isInterAppAudioConnected();
-
         createPlugin();
 
         auto inChannels = (channelConfiguration.size() > 0 ? channelConfiguration[0].numIns
@@ -161,7 +158,6 @@ public:
     //==============================================================================
     Value& getMuteInputValue()                           { return shouldMuteInput; }
     bool getProcessorHasPotentialFeedbackLoop() const    { return processorHasPotentialFeedbackLoop; }
-    void valueChanged (Value& value) override            { muteInput = (bool) value.getValue(); }
 
     //==============================================================================
     File getLastFile() const
@@ -255,23 +251,36 @@ public:
     {
         DialogWindow::LaunchOptions o;
 
-        int maxNumInputs = 0, maxNumOutputs = 0;
+        int minNumInputs  = std::numeric_limits<int>::max(), maxNumInputs  = 0,
+            minNumOutputs = std::numeric_limits<int>::max(), maxNumOutputs = 0;
+
+        auto updateMinAndMax = [] (int newValue, int& minValue, int& maxValue)
+        {
+            minValue = jmin (minValue, newValue);
+            maxValue = jmax (maxValue, newValue);
+        };
 
         if (channelConfiguration.size() > 0)
         {
-            auto& defaultConfig = channelConfiguration.getReference (0);
-
-            maxNumInputs  = jmax (0, (int) defaultConfig.numIns);
-            maxNumOutputs = jmax (0, (int) defaultConfig.numOuts);
+            auto defaultConfig = channelConfiguration.getReference (0);
+            updateMinAndMax ((int) defaultConfig.numIns,  minNumInputs,  maxNumInputs);
+            updateMinAndMax ((int) defaultConfig.numOuts, minNumOutputs, maxNumOutputs);
         }
 
         if (auto* bus = processor->getBus (true, 0))
-            maxNumInputs = jmax (0, bus->getDefaultLayout().size());
+            updateMinAndMax (bus->getDefaultLayout().size(), minNumInputs, maxNumInputs);
 
         if (auto* bus = processor->getBus (false, 0))
-            maxNumOutputs = jmax (0, bus->getDefaultLayout().size());
+            updateMinAndMax (bus->getDefaultLayout().size(), minNumOutputs, maxNumOutputs);
 
-        o.content.setOwned (new SettingsComponent (*this, deviceManager, maxNumInputs, maxNumOutputs));
+        minNumInputs  = jmin (minNumInputs,  maxNumInputs);
+        minNumOutputs = jmin (minNumOutputs, maxNumOutputs);
+
+        o.content.setOwned (new SettingsComponent (*this, deviceManager,
+                                                          minNumInputs,
+                                                          maxNumInputs,
+                                                          minNumOutputs,
+                                                          maxNumOutputs));
         o.content->setSize (500, 550);
 
         o.dialogTitle                   = TRANS("Audio/MIDI Settings");
@@ -397,7 +406,6 @@ public:
 
     // avoid feedback loop by default
     bool processorHasPotentialFeedbackLoop = true;
-    std::atomic<bool> muteInput { true };
     Value shouldMuteInput;
     AudioBuffer<float> emptyBuffer;
     bool autoOpenMidiDevices;
@@ -412,12 +420,14 @@ private:
     public:
         SettingsComponent (StandalonePluginHolder& pluginHolder,
                            AudioDeviceManager& deviceManagerToUse,
+                           int minAudioInputChannels,
                            int maxAudioInputChannels,
+                           int minAudioOutputChannels,
                            int maxAudioOutputChannels)
             : owner (pluginHolder),
               deviceSelector (deviceManagerToUse,
-                              0, maxAudioInputChannels,
-                              0, maxAudioOutputChannels,
+                              minAudioInputChannels, maxAudioInputChannels,
+                              minAudioOutputChannels, maxAudioOutputChannels,
                               true,
                               (pluginHolder.processor.get() != nullptr && pluginHolder.processor->producesMidi()),
                               true, false),
@@ -482,7 +492,9 @@ private:
                                 int numOutputChannels,
                                 int numSamples) override
     {
-        if (muteInput)
+        const bool inputMuted = shouldMuteInput.getValue();
+
+        if (inputMuted)
         {
             emptyBuffer.clear();
             inputChannelData = emptyBuffer.getArrayOfReadPointers();

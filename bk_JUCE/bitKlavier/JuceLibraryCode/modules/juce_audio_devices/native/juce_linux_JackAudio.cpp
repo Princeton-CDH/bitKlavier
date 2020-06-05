@@ -105,11 +105,7 @@ namespace
 
 //==============================================================================
 #ifndef JUCE_JACK_CLIENT_NAME
- #ifdef JucePlugin_Name
-  #define JUCE_JACK_CLIENT_NAME JucePlugin_Name
- #else
-  #define JUCE_JACK_CLIENT_NAME "JUCEJack"
- #endif
+ #define JUCE_JACK_CLIENT_NAME "JUCEJack"
 #endif
 
 struct JackPortIterator

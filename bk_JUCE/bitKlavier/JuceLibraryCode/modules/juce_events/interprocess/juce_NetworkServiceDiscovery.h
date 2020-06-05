@@ -28,8 +28,6 @@ namespace juce
     Contains classes that implement a simple protocol for broadcasting the availability
     and location of a discoverable service on the local network, and for maintaining a
     list of known services.
-
-    @tags{Events}
 */
 struct NetworkServiceDiscovery
 {
@@ -38,8 +36,6 @@ struct NetworkServiceDiscovery
 
         To use, simply create an instance of an Advertiser and it'll broadcast until
         you delete it.
-
-        @tags{Events}
     */
     struct Advertiser  : private Thread
     {
@@ -72,10 +68,7 @@ struct NetworkServiceDiscovery
     //==============================================================================
     /**
         Contains information about a service that has been found on the network.
-
         @see AvailableServiceList, Advertiser
-
-        @tags{Events}
     */
     struct Service
     {
@@ -94,10 +87,7 @@ struct NetworkServiceDiscovery
         Just create an instance of AvailableServiceList and it will start listening - you
         can register a callback with its onChange member to find out when services
         appear/disappear, and you can call getServices() to find out the current list.
-
         @see Service, Advertiser
-
-        @tags{Events}
     */
     struct AvailableServiceList  : private Thread,
                                    private AsyncUpdater
@@ -113,7 +103,7 @@ struct NetworkServiceDiscovery
         /** Destructor */
         ~AvailableServiceList() override;
 
-        /** A lambda that can be set to receive a callback when the list changes */
+        /** A lambda that can be set to recieve a callback when the list changes */
         std::function<void()> onChange;
 
         /** Returns a list of the currently known services. */

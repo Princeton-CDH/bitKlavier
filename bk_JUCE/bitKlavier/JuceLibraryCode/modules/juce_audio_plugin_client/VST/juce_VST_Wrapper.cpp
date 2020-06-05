@@ -38,21 +38,21 @@
 
 #if JucePlugin_VersionCode < 0x010000   // Major < 0
 
- #if (JucePlugin_VersionCode & 0x00FF00) > (9 * 0x100) // check if Minor number exceeds 9
+ #if (JucePlugin_VersionCode & 0x00FF00) > (9 * 0x100) // check if Minor number exceeeds 9
   JUCE_COMPILER_WARNING ("When version has 'major' = 0, VST2 has trouble displaying 'minor' exceeding 9")
  #endif
 
- #if (JucePlugin_VersionCode & 0xFF) > 9   // check if Bugfix number exceeds 9
+ #if (JucePlugin_VersionCode & 0xFF) > 9   // check if Bugfix number exceeeds 9
   JUCE_COMPILER_WARNING ("When version has 'major' = 0, VST2 has trouble displaying 'bugfix' exceeding 9")
  #endif
 
 #elif JucePlugin_VersionCode >= 0x650000   // Major >= 101
 
- #if (JucePlugin_VersionCode & 0x00FF00) > (99 * 0x100) // check if Minor number exceeds 99
+ #if (JucePlugin_VersionCode & 0x00FF00) > (99 * 0x100) // check if Minor number exceeeds 99
   JUCE_COMPILER_WARNING ("When version has 'major' > 100, VST2 has trouble displaying 'minor' exceeding 99")
  #endif
 
- #if (JucePlugin_VersionCode & 0xFF) > 99  // check if Bugfix number exceeds 99
+ #if (JucePlugin_VersionCode & 0xFF) > 99  // check if Bugfix number exceeeds 99
   JUCE_COMPILER_WARNING ("When version has 'major' > 100, VST2 has trouble displaying 'bugfix' exceeding 99")
  #endif
 
@@ -835,16 +835,17 @@ public:
     void audioProcessorChanged (AudioProcessor*) override
     {
         vstEffect.initialDelay = processor->getLatencySamples();
+
+        if (hostCallback != nullptr)
+            hostCallback (&vstEffect, Vst2::audioMasterUpdateDisplay, 0, 0, nullptr, 0);
+
         triggerAsyncUpdate();
     }
 
     void handleAsyncUpdate() override
     {
         if (hostCallback != nullptr)
-        {
-            hostCallback (&vstEffect, Vst2::audioMasterUpdateDisplay, 0, 0, nullptr, 0);
-            hostCallback (&vstEffect, Vst2::audioMasterIOChanged,     0, 0, nullptr, 0);
-        }
+            hostCallback (&vstEffect, Vst2::audioMasterIOChanged, 0, 0, nullptr, 0);
     }
 
     bool getPinProperties (Vst2::VstPinProperties& properties, bool direction, int index) const
@@ -1109,33 +1110,16 @@ public:
             deleteEditor (true);
         }
 
+        if (chunkMemoryTime > 0
+             && chunkMemoryTime < juce::Time::getApproximateMillisecondCounter() - 2000
+             && ! recursionCheck)
         {
-            ScopedLock lock (stateInformationLock);
-
-            if (chunkMemoryTime > 0
-                 && chunkMemoryTime < juce::Time::getApproximateMillisecondCounter() - 2000
-                 && ! recursionCheck)
-            {
-                chunkMemory.reset();
-                chunkMemoryTime = 0;
-            }
+            chunkMemory.reset();
+            chunkMemoryTime = 0;
         }
 
         if (editorComp != nullptr)
             editorComp->checkVisibility();
-    }
-
-    void setHasEditorFlag (bool shouldSetHasEditor)
-    {
-        auto hasEditor = (vstEffect.flags & Vst2::effFlagsHasEditor) != 0;
-
-        if (shouldSetHasEditor == hasEditor)
-            return;
-
-        if (shouldSetHasEditor)
-            vstEffect.flags |= Vst2::effFlagsHasEditor;
-        else
-            vstEffect.flags &= ~Vst2::effFlagsHasEditor;
     }
 
     void createEditorComp()
@@ -1147,12 +1131,12 @@ public:
         {
             if (auto* ed = processor->createEditorIfNeeded())
             {
-                setHasEditorFlag (true);
+                vstEffect.flags |= Vst2::effFlagsHasEditor;
                 editorComp.reset (new EditorCompWrapper (*this, *ed));
             }
             else
             {
-                setHasEditorFlag (false);
+                vstEffect.flags &= ~Vst2::effFlagsHasEditor;
             }
         }
 
@@ -1718,7 +1702,10 @@ private:
     pointer_sized_int handleOpen (VstOpCodeArguments)
     {
         // Note: most hosts call this on the UI thread, but wavelab doesn't, so be careful in here.
-        setHasEditorFlag (processor->hasEditor());
+        if (processor->hasEditor())
+            vstEffect.flags |= Vst2::effFlagsHasEditor;
+        else
+            vstEffect.flags &= ~Vst2::effFlagsHasEditor;
 
         return 0;
     }
@@ -1870,9 +1857,7 @@ private:
         auto data = (void**) args.ptr;
         bool onlyStoreCurrentProgramData = (args.index != 0);
 
-        ScopedLock lock (stateInformationLock);
         chunkMemory.reset();
-
         if (onlyStoreCurrentProgramData)
             processor->getCurrentProgramStateInformation (chunkMemory);
         else
@@ -1895,19 +1880,15 @@ private:
             int32 byteSize = (int32) args.value;
             bool onlyRestoreCurrentProgramData = (args.index != 0);
 
+            chunkMemory.reset();
+            chunkMemoryTime = 0;
+
+            if (byteSize > 0 && data != nullptr)
             {
-                ScopedLock lock (stateInformationLock);
-
-                chunkMemory.reset();
-                chunkMemoryTime = 0;
-
-                if (byteSize > 0 && data != nullptr)
-                {
-                    if (onlyRestoreCurrentProgramData)
-                        processor->setCurrentProgramStateInformation (data, byteSize);
-                    else
-                        processor->setStateInformation (data, byteSize);
-                }
+                if (onlyRestoreCurrentProgramData)
+                    processor->setCurrentProgramStateInformation (data, byteSize);
+                else
+                    processor->setStateInformation (data, byteSize);
             }
         }
 
@@ -2291,9 +2272,8 @@ private:
     double sampleRate = 44100.0;
     int32 blockSize = 1024;
     Vst2::AEffect vstEffect;
-    CriticalSection stateInformationLock;
     juce::MemoryBlock chunkMemory;
-    uint32 chunkMemoryTime = 0;
+    juce::uint32 chunkMemoryTime = 0;
     std::unique_ptr<EditorCompWrapper> editorComp;
     Vst2::ERect editorBounds;
     MidiBuffer midiEvents;

@@ -352,9 +352,9 @@ public:
 
         auto status = AudioFileOpenWithCallbacks (this,
                                                   &readCallback,
-                                                  nullptr,  // write needs to be null to avoid permissions errors
+                                                  nullptr,  // write needs to be null to avoid permisisions errors
                                                   &getSizeCallback,
-                                                  nullptr,  // setSize needs to be null to avoid permissions errors
+                                                  nullptr,  // setSize needs to be null to avoid permisisions errors
                                                   0,        // AudioFileTypeID inFileTypeHint
                                                   &audioFileID);
         if (status == noErr)
@@ -494,9 +494,6 @@ public:
             if (status != noErr)
                 return false;
 
-            if (numFramesToRead == 0)
-                break;
-
             if ((int) numFramesToRead < numThisTime)
             {
                 numThisTime = (int) numFramesToRead;
@@ -616,7 +613,7 @@ public:
         : UnitTest ("Core Audio Layout <-> JUCE channel layout conversion", UnitTestCategories::audio)
     {}
 
-    // some ambisonic tags which are not explicitly defined
+    // some ambisonic tags which are not explicitely defined
     enum
     {
         kAudioChannelLayoutTag_HOA_ACN_SN3D_0Order = (190U<<16) | 1,

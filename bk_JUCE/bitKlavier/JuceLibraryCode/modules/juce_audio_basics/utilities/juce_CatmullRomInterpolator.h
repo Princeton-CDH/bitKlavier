@@ -42,9 +42,6 @@ public:
     CatmullRomInterpolator() noexcept;
     ~CatmullRomInterpolator() noexcept;
 
-    CatmullRomInterpolator (CatmullRomInterpolator&&) noexcept = default;
-    CatmullRomInterpolator& operator= (CatmullRomInterpolator&&) noexcept = default;
-
     /** Resets the state of the interpolator.
         Call this when there's a break in the continuity of the input data stream.
     */

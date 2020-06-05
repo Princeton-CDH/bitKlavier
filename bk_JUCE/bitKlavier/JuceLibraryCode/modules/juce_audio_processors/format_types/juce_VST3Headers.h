@@ -65,12 +65,6 @@
  #if __has_warning("-Wcast-align")
   #pragma clang diagnostic ignored "-Wcast-align"
  #endif
- #if __has_warning("-Wignored-qualifiers")
-  #pragma clang diagnostic ignored "-Wignored-qualifiers"
- #endif
- #if __has_warning("-Wmissing-field-initializers")
-  #pragma clang diagnostic ignored "-Wmissing-field-initializers"
- #endif
 #endif
 
 #undef DEVELOPMENT

@@ -600,6 +600,7 @@ UIViewComponentPeer::UIViewComponentPeer (Component& comp, const int windowStyle
         window.rootViewController = controller;
 
         window.hidden = true;
+        window.autoresizesSubviews = NO;
         window.transform = Orientations::getCGTransformFor (Desktop::getInstance().getCurrentOrientation());
         window.opaque = component.isOpaque();
         window.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent: 0];

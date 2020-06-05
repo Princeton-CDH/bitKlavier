@@ -1004,12 +1004,7 @@ namespace AAXClasses
             info.timeInSeconds = info.timeInSamples / sampleRate;
 
             int64_t ticks = 0;
-
-            if (info.isPlaying)
-                check (transport.GetCustomTickPosition (&ticks, info.timeInSamples));
-            else
-                check (transport.GetCurrentTickPosition (&ticks));
-
+            check (transport.GetCurrentTickPosition (&ticks));
             info.ppqPosition = ticks / 960000.0;
 
             info.isLooping = false;
@@ -1526,7 +1521,7 @@ namespace AAXClasses
                                                   : juceParameters.getParamID (audioProcessor, parameterIndex);
 
                 aaxParamIDs.add (paramID);
-                auto* aaxParamID = aaxParamIDs.getReference (parameterIndex++).toRawUTF8();
+                auto aaxParamID = aaxParamIDs.getReference (parameterIndex++).getCharPointer();
 
                 paramMap.set (AAXClasses::getAAXParamHash (aaxParamID), juceParam);
 
@@ -1657,7 +1652,7 @@ namespace AAXClasses
 
             if (isInAudioSuite())
             {
-                // AudioSuite doesn't support multiple output buses
+                // AudioSuite doesnt support multiple output buses
                 for (int i = 1; i < newLayout.outputBuses.size(); ++i)
                     newLayout.outputBuses.getReference (i) = AudioChannelSet::disabled();
 
@@ -1828,7 +1823,7 @@ namespace AAXClasses
                 if (LegacyAudioParameter::getParamID (aaxMeters[idx], false) == paramID)
                     break;
 
-            // you specified a parameter id in your curve but the parameter does not have the meter
+            // you sepecified a parameter id in your curve but the parameter does not have the meter
             // category
             jassert (idx < aaxMeters.size());
             return 'Metr' + static_cast<AAX_CTypeID> (idx);
@@ -1915,7 +1910,7 @@ namespace AAXClasses
         inline AAX_CParamID getAAXParamIDFromJuceIndex (int index) const noexcept
         {
             if (isPositiveAndBelow (index, aaxParamIDs.size()))
-                return aaxParamIDs.getReference (index).toRawUTF8();
+                return aaxParamIDs.getReference (index).getCharPointer();
 
             return nullptr;
         }

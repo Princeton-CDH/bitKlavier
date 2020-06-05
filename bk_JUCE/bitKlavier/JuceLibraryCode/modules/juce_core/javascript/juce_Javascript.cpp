@@ -816,8 +816,7 @@ struct JavascriptEngine::RootObject   : public DynamicObject
             for (int i = 0; i < values.size(); ++i)
                 a.add (values.getUnchecked(i)->getResult (s));
 
-            // std::move() needed here for older compilers
-            return std::move (a);
+            return a;
         }
 
         OwnedArray<Expression> values;
@@ -1626,8 +1625,7 @@ struct JavascriptEngine::RootObject   : public DynamicObject
                 for (int i = 2; i < a.numArguments; ++i)
                     array->insert (start++, get (a, i));
 
-                // std::move() needed here for older compilers
-                return std::move (itemsRemoved);
+                return itemsRemoved;
             }
 
             return var::undefined();

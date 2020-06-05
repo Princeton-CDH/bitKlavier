@@ -74,6 +74,7 @@ construction(c)
 
 HeaderViewController::~HeaderViewController()
 {
+    PopupMenu::dismissAllActiveMenus();
     galleryCB.setLookAndFeel(nullptr);
     pianoCB.setLookAndFeel(nullptr);
     
@@ -668,10 +669,23 @@ void HeaderViewController::fillGalleryCB(void)
         
         StringArray submenuNames;
         OwnedArray<PopupMenu> submenus;
+
+		/*DBG("Gallery Names:");
+		for (auto name : processor.galleryNames)
+		{
+			DBG(name + "\n");
+		}*/
+		StringArray orderedNames = StringArray(processor.galleryNames);
+		orderedNames.sortNatural();
+		/*DBG("Ordered Names:");
+		for (auto name : orderedNames)
+		{
+			DBG(name + "\n");
+		}*/
         
-        for (int i = 0; i < processor.galleryNames.size(); i++)
+        for (int i = 0; i < orderedNames.size(); i++)
         {
-            File thisFile(processor.galleryNames[i]);
+            File thisFile(orderedNames[i]);
             
             String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
             
@@ -763,13 +777,37 @@ void HeaderViewController::fillPianoCB(void)
     
     pianoCB.clear(dontSendNotification);
 
-    for (auto piano : processor.gallery->getPianos())
+	//now alphabetizes the list (turning into string) before putting it into the combo box
+	StringArray nameIDStrings = StringArray();
+
+	//concatenate name and ID into a single string using the newline character (something a user couldn't type) as a separator, then sorts the list of strings
+	for (auto piano : processor.gallery->getPianos())
+	{
+		String name = piano->getName();
+		String idString = String(piano->getId());
+		if (name != String()) nameIDStrings.add(name + char(10) + idString);
+		else nameIDStrings.add("Piano" + String(idString) + char(10) + idString);
+	}
+
+	nameIDStrings.sort(false);
+
+	//separates the combined string into name and ID parts, then adds to the combo box
+	for (auto combo : nameIDStrings)
+	{
+		int separatorIndex = combo.indexOfChar(char(10));
+		String name = combo.substring(0, separatorIndex);
+		int id = combo.substring(separatorIndex + 1).getIntValue();
+		pianoCB.addItem(name, id);
+	}
+
+	//old code
+    /*for (auto piano : processor.gallery->getPianos())
     {
         String name = piano->getName();
         
         if (name != String())  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());
-    }
+    }*/
 
     pianoCB.setSelectedId(processor.currentPiano->getId(), dontSendNotification);
 }

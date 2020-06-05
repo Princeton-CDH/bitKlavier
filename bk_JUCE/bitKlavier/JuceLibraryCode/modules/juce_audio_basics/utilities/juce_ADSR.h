@@ -30,8 +30,6 @@ namespace juce
     To use it, call setSampleRate() with the current sample rate and give it some parameters
     with setParameters() then call getNextSample() to get the envelope value to be applied
     to each audio sample or applyEnvelopeToBuffer() to apply the envelope to a whole buffer.
-
-    @tags{Audio}
 */
 class ADSR
 {
@@ -44,11 +42,7 @@ public:
     }
 
     //==============================================================================
-    /**
-        Holds the parameters being used by an ADSR object.
-
-        @tags{Audio}
-    */
+    /** Holds the parameters being used by an ADSR object. */
     struct Parameters
     {
         /** Attack time in seconds. */
@@ -108,6 +102,12 @@ public:
     {
         envelopeVal = 0.0f;
         currentState = State::idle;
+
+        if (resetReleaseRate)
+        {
+            releaseRate = static_cast<float> (sustainLevel / (currentParameters.release * sr));
+            resetReleaseRate = false;
+        }
     }
 
     /** Starts the attack phase of the envelope. */
@@ -133,9 +133,14 @@ public:
     {
         if (currentState != State::idle)
         {
-            if (currentParameters.release > 0.0f)
+            if (releaseRate > 0.0f)
             {
-                releaseRate = static_cast<float> (envelopeVal / (currentParameters.release * sr));
+                if (currentState != State::sustain)
+                {
+                    releaseRate = static_cast<float> (envelopeVal / (currentParameters.release * sr));
+                    resetReleaseRate = true;
+                }
+
                 currentState = State::release;
             }
             else
@@ -226,6 +231,7 @@ private:
 
         attackRate  = (parameters.attack  > 0.0f ? static_cast<float> (1.0f                  / (parameters.attack * sr))  : -1.0f);
         decayRate   = (parameters.decay   > 0.0f ? static_cast<float> ((1.0f - sustainLevel) / (parameters.decay * sr))   : -1.0f);
+        releaseRate = (parameters.release > 0.0f ? static_cast<float> (sustainLevel          / (parameters.release * sr)) : -1.0f);
     }
 
     void checkCurrentState()
@@ -243,6 +249,7 @@ private:
 
     double sr = 0.0;
     float envelopeVal = 0.0f, sustainLevel = 0.0f, attackRate = 0.0f, decayRate = 0.0f, releaseRate = 0.0f;
+    bool resetReleaseRate = false;
 };
 
 } // namespace juce

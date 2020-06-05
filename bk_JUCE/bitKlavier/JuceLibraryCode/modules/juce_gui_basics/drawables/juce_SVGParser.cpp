@@ -365,19 +365,18 @@ public:
                 if (parseCoordsOrSkip (d, p1, false))
                 {
                     String num;
-                    bool flagValue = false;
 
                     if (parseNextNumber (d, num, false))
                     {
-                        auto angle = degreesToRadians (num.getFloatValue());
+                        const float angle = degreesToRadians (num.getFloatValue());
 
-                        if (parseNextFlag (d, flagValue))
+                        if (parseNextNumber (d, num, false))
                         {
-                            auto largeArc = flagValue;
+                            const bool largeArc = num.getIntValue() != 0;
 
-                            if (parseNextFlag (d, flagValue))
+                            if (parseNextNumber (d, num, false))
                             {
-                                auto sweep = flagValue;
+                                const bool sweep = num.getIntValue() != 0;
 
                                 if (parseCoordsOrSkip (d, p2, false))
                                 {
@@ -1065,7 +1064,7 @@ private:
         if (xml->hasTagName ("use"))
             return useText (xml);
 
-        if (! xml->hasTagName ("text") && ! xml->hasTagNameIgnoringNamespace ("tspan"))
+        if (! xml->hasTagName ("text"))
             return nullptr;
 
         Array<float> xCoords, yCoords, dxCoords, dyCoords;
@@ -1499,22 +1498,6 @@ private:
             ++s;
 
         text = s;
-        return true;
-    }
-
-    static bool parseNextFlag (String::CharPointerType& text, bool& value)
-    {
-        while (text.isWhitespace() || *text == ',')
-            ++text;
-
-        if (*text != '0' && *text != '1')
-            return false;
-
-        value = *(text++) != '0';
-
-        while (text.isWhitespace() || *text == ',')
-             ++text;
-
         return true;
     }
 

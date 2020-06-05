@@ -89,7 +89,7 @@ public:
                 if (context != nil)
                 {
                     // I'd prefer to put this stuff in the initialiseOnRenderThread() call, but doing
-                    // so causes mysterious timing-related failures.
+                    // so causes myserious timing-related failures.
                     [EAGLContext setCurrentContext: context];
                     createGLBuffers();
                     deactivateCurrentContext();

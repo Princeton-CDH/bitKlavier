@@ -174,7 +174,7 @@ namespace PushNotificationsDelegateDetails
         }
 
         // request
-        // each notification on iOS 10 needs to have an identifier, otherwise it will not show up
+        // each notification on iOS 10 needs to have an identifer, otherwise it will not show up
         jassert (n.identifier.isNotEmpty());
         UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier: juceStringToNS (n.identifier)
                                                                               content: content
@@ -300,9 +300,7 @@ namespace PushNotificationsDelegateDetails
         if (n.fireDate != nil)
         {
             NSDate* dateNow = [NSDate date];
-            NSDate* fireDate = n.fireDate;
-
-            notif.triggerIntervalSec = [dateNow timeIntervalSinceDate: fireDate];
+            notif.triggerIntervalSec = [dateNow timeIntervalSinceDate: n.fireDate];
         }
 
         notif.soundToPlay = URL (nsStringToJuce (n.soundName));
@@ -843,22 +841,12 @@ struct PushNotifications::Pimpl : private PushNotificationsDelegate
 
     void registeredForRemoteNotifications (NSData* deviceTokenToUse) override
     {
-        deviceToken = [deviceTokenToUse]() -> String
-        {
-            auto length = deviceTokenToUse.length;
+        NSString* deviceTokenString = [[[[deviceTokenToUse description]
+                                          stringByReplacingOccurrencesOfString: nsStringLiteral ("<") withString: nsStringLiteral ("")]
+                                          stringByReplacingOccurrencesOfString: nsStringLiteral (">") withString: nsStringLiteral ("")]
+                                          stringByReplacingOccurrencesOfString: nsStringLiteral (" ") withString: nsStringLiteral ("")];
 
-            if (auto* buffer = (const unsigned char*) deviceTokenToUse.bytes)
-            {
-                NSMutableString* hexString = [NSMutableString stringWithCapacity: (length * 2)];
-
-                for (NSUInteger i = 0; i < length; ++i)
-                    [hexString appendFormat:@"%02x", buffer[i]];
-
-                return nsStringToJuce ([hexString copy]);
-            }
-
-            return {};
-        }();
+        deviceToken = nsStringToJuce (deviceTokenString);
 
         initialised = true;
 

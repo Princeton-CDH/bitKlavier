@@ -196,6 +196,10 @@ static const uint8 javaComponentPeerView[] =
  extern void juce_firebaseRemoteMessageSendError (void*, void*);
 #endif
 
+#if JUCE_IN_APP_PURCHASES && JUCE_MODULE_AVAILABLE_juce_product_unlocking
+ extern void juce_inAppPurchaseCompleted (void*);
+#endif
+
 extern void juce_contentSharingCompleted (int);
 
 //==============================================================================
@@ -673,29 +677,12 @@ public:
 
     void handleBackButtonCallback()
     {
-        bool handled = false;
-
         if (auto* app = JUCEApplicationBase::getInstance())
-            handled = app->backButtonPressed();
+            app->backButtonPressed();
 
         if (Component* kiosk = Desktop::getInstance().getKioskModeComponent())
             if (kiosk->getPeer() == this)
                 setNavBarsHidden (navBarsHidden);
-
-        if (! handled)
-        {
-            auto* env = getEnv();
-            LocalRef<jobject> activity (getCurrentActivity());
-
-            if (activity != nullptr)
-            {
-                jmethodID finishMethod = env->GetMethodID (AndroidActivity, "finish", "()V");
-
-                if (finishMethod != nullptr)
-                    env->CallVoidMethod (activity.get(), finishMethod);
-            }
-        }
-
     }
 
     void handleKeyboardHiddenCallback()

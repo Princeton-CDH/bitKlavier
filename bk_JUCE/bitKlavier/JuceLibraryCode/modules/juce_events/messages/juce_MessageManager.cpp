@@ -184,16 +184,16 @@ void* MessageManager::callFunctionOnMessageThread (MessageCallbackFunction* func
     return nullptr;
 }
 
-bool MessageManager::callAsync (std::function<void()> fn)
+void MessageManager::callAsync (std::function<void()> fn)
 {
     struct AsyncCallInvoker  : public MessageBase
     {
-        AsyncCallInvoker (std::function<void()> f) : callback (std::move (f)) {}
+        AsyncCallInvoker (std::function<void()> f) : callback (std::move (f)) { post(); }
         void messageCallback() override  { callback(); }
         std::function<void()> callback;
     };
 
-    return (new AsyncCallInvoker (std::move (fn)))->post();
+    new AsyncCallInvoker (std::move (fn));
 }
 
 //==============================================================================

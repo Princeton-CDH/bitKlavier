@@ -31,8 +31,6 @@ namespace juce
 /**
     Maintains an ongoing measurement of the proportion of time which is being
     spent inside an audio callback.
-
-    @tags{Audio}
 */
 class JUCE_API  AudioProcessLoadMeasurer
 {
@@ -70,8 +68,6 @@ public:
             myCallback->doTheCallback();
         }
         @endcode
-
-        @tags{Audio}
     */
     struct JUCE_API  ScopedTimer
     {

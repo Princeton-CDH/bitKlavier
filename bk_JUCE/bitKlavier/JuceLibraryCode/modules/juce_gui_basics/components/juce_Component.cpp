@@ -1845,9 +1845,6 @@ void Component::internalRepaintUnchecked (Rectangle<int> area, bool isEntireComp
                                      : cachedImage->invalidate (area)))
                 return;
 
-        if (area.isEmpty())
-            return;
-
         if (flags.hasHeavyweightPeerFlag)
         {
             if (auto* peer = getPeer())
@@ -1902,10 +1899,12 @@ void Component::paintComponentAndChildren (Graphics& g)
     }
     else
     {
-        Graphics::ScopedSaveState ss (g);
+        g.saveState();
 
         if (! (ComponentHelpers::clipObscuredRegions (*this, g, clipBounds, {}) && g.isClipEmpty()))
             paint (g);
+
+        g.restoreState();
     }
 
     for (int i = 0; i < childComponentList.size(); ++i)
@@ -1916,16 +1915,17 @@ void Component::paintComponentAndChildren (Graphics& g)
         {
             if (child.affineTransform != nullptr)
             {
-                Graphics::ScopedSaveState ss (g);
-
+                g.saveState();
                 g.addTransform (*child.affineTransform);
 
                 if ((child.flags.dontClipGraphicsFlag && ! g.isClipEmpty()) || g.reduceClipRegion (child.getBounds()))
                     child.paintWithinParentContext (g);
+
+                g.restoreState();
             }
             else if (clipBounds.intersects (child.getBounds()))
             {
-                Graphics::ScopedSaveState ss (g);
+                g.saveState();
 
                 if (child.flags.dontClipGraphicsFlag)
                 {
@@ -1949,12 +1949,15 @@ void Component::paintComponentAndChildren (Graphics& g)
                     if (nothingClipped || ! g.isClipEmpty())
                         child.paintWithinParentContext (g);
                 }
+
+                g.restoreState();
             }
         }
     }
 
-    Graphics::ScopedSaveState ss (g);
+    g.saveState();
     paintOverChildren (g);
+    g.restoreState();
 }
 
 void Component::paintEntireComponent (Graphics& g, bool ignoreAlphaLevel)
@@ -1986,10 +1989,10 @@ void Component::paintEntireComponent (Graphics& g, bool ignoreAlphaLevel)
             paintComponentAndChildren (g2);
         }
 
-        Graphics::ScopedSaveState ss (g);
-
+        g.saveState();
         g.addTransform (AffineTransform::scale (1.0f / scale));
         effect->applyEffect (effectImage, g, scale, ignoreAlphaLevel ? 1.0f : getAlpha());
+        g.restoreState();
     }
     else if (componentTransparency > 0 && ! ignoreAlphaLevel)
     {

@@ -84,14 +84,12 @@ globalSoundSetButton("Use global samples")
     sampleCB.setLookAndFeel(&laf);
     sampleCB.setTooltip("Choose and load sample set from your soundfonts folder");
     
-    instrumentCB.setLookAndFeel(&laf);
+    instrumentCB.setLookAndFeel(&comboBoxRightJustifyLAF);
+    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
     instrumentCB.setTooltip("Load specific instrument from selected soundfont (if available)");
     
     sampleCB.addListener(this);
     instrumentCB.addListener(this);
-    
-    instrumentCB.setLookAndFeel(&comboBoxRightJustifyLAF);
-    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
     
     addAndMakeVisible(sampleCB);
     addAndMakeVisible(instrumentCB);
@@ -163,6 +161,7 @@ globalSoundSetButton("Use global samples")
 
 MainViewController::~MainViewController()
 {
+    PopupMenu::dismissAllActiveMenus();
     removeMouseListener(this);
     keyboard->removeMouseListener(this);
     

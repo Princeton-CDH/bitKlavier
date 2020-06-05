@@ -69,13 +69,7 @@ AudioParameterBool::AudioParameterBool (const String& idToUse, const String& nam
     }
 }
 
-AudioParameterBool::~AudioParameterBool()
-{
-    #if __cpp_lib_atomic_is_always_lock_free
-     static_assert (std::atomic<float>::is_always_lock_free,
-                    "AudioParameterBool requires a lock-free std::atomic<float>");
-    #endif
-}
+AudioParameterBool::~AudioParameterBool() {}
 
 float AudioParameterBool::getValue() const                               { return value; }
 void AudioParameterBool::setValue (float newValue)                       { value = newValue; valueChanged (get()); }
