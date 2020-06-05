@@ -670,22 +670,23 @@ void HeaderViewController::fillGalleryCB(void)
         StringArray submenuNames;
         OwnedArray<PopupMenu> submenus;
 
-		/*DBG("Gallery Names:");
+		processor.galleryNames.sortNatural();
+		DBG("Gallery Names:");
 		for (auto name : processor.galleryNames)
 		{
 			DBG(name + "\n");
-		}*/
-		StringArray orderedNames = StringArray(processor.galleryNames);
+		}
+		/*StringArray orderedNames = StringArray(processor.galleryNames);
 		orderedNames.sortNatural();
-		/*DBG("Ordered Names:");
+		DBG("Ordered Names:");
 		for (auto name : orderedNames)
 		{
 			DBG(name + "\n");
 		}*/
         
-        for (int i = 0; i < orderedNames.size(); i++)
+        for (int i = 0; i < processor.galleryNames.size(); i++)
         {
-            File thisFile(orderedNames[i]);
+            File thisFile(processor.galleryNames[i]);
             
             String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
             
