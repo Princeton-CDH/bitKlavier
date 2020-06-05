@@ -671,11 +671,13 @@ void HeaderViewController::fillGalleryCB(void)
         OwnedArray<PopupMenu> submenus;
 
 		processor.galleryNames.sortNatural();
+        /*
 		DBG("Gallery Names:");
 		for (auto name : processor.galleryNames)
 		{
 			DBG(name + "\n");
 		}
+         */
 		/*StringArray orderedNames = StringArray(processor.galleryNames);
 		orderedNames.sortNatural();
 		DBG("Ordered Names:");
