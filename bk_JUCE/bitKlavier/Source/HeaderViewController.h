@@ -94,10 +94,6 @@ private:
     
     BKConstructionSite* construction;
     
-    BKButtonAndMenuLAF comboBoxRightJustifyLAF;
-    BKButtonAndMenuLAF comboBoxLeftJustifyLAF;
-    BKButtonAndMenuLAF buttonsAndMenusLAF;
-    
     JUCE_LEAK_DETECTOR(HeaderViewController)
 };
 

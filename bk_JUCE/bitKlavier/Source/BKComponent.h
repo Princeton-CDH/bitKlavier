@@ -13,14 +13,6 @@
 
 #include "BKUtilities.h"
 
-#include "BKTextField.h"
-
-#include "BKLabel.h"
-
-#include "BKMenu.h"
-
-#include "BKLookAndFeel.h"
-
 //==============================================================================
 
 class BKComponent    : public Component

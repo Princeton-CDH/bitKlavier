@@ -151,8 +151,6 @@ globalSoundSetButton("Use global samples")
     processor.collectPianos();
     processor.collectSoundfonts();
     
-    header.fillGalleryCB();
-    
     fillSampleCB();
     fillInstrumentCB();
     
@@ -845,8 +843,6 @@ void MainViewController::timerCallback()
         processor.collectPreparations();
         processor.collectPianos();
         processor.collectSoundfonts();
-        
-        header.fillGalleryCB();
     }
     
     fillSampleCB();

@@ -12,12 +12,29 @@
 #define BKMENU_H_INCLUDED
 
 #include "BKLookAndFeel.h"
-#include "BKUtilities.h"
-#include "BKComponent.h"
+#include "BKTextField.h"
 
 //==============================================================================
 /*
 */
+class BKPopupMenu : public PopupMenu
+{
+public:
+    BKPopupMenu()
+    {
+        setLookAndFeel(new BKButtonAndMenuLAF());
+    }
+    
+    ~BKPopupMenu()
+    {
+        setLookAndFeel(nullptr);
+    }
+    
+private:
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKPopupMenu)
+};
+
 class BKComboBox : public ComboBox
 {
 public:

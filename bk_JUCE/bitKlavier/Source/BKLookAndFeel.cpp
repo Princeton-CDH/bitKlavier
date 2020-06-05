@@ -9,6 +9,7 @@
 */
 
 #include "BKLookAndFeel.h"
+#include "GraphicsConstants.h"
 
 class BKDocumentWindowButton   : public Button
 {

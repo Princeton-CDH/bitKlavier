@@ -17,7 +17,7 @@ HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionS
 processor (p),
 construction(c)
 {
-    setLookAndFeel(&buttonsAndMenusLAF);
+    setLookAndFeel(new BKButtonAndMenuLAF());
 
     addAndMakeVisible(galleryB);
     galleryB.setButtonText("Gallery");
@@ -40,7 +40,8 @@ construction(c)
     galleryCB.setTooltip("Select and load saved bitKlavier Galleries. Indicates currently loaded Gallery");
     galleryCB.addListener(this);
     //galleryCB.BKSetJustificationType(juce::Justification::centredRight);
-    galleryCB.setLookAndFeel(&comboBoxLeftJustifyLAF);
+    BKButtonAndMenuLAF* comboBoxLeftJustifyLAF = new BKButtonAndMenuLAF();
+    galleryCB.setLookAndFeel(comboBoxLeftJustifyLAF);
     galleryCB.setSelectedId(0, dontSendNotification);
     
     // Piano CB
@@ -54,8 +55,9 @@ construction(c)
     addAndMakeVisible(bot);
 #endif
     
-    pianoCB.setLookAndFeel(&comboBoxRightJustifyLAF);
-    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+    BKButtonAndMenuLAF* comboBoxRightJustifyLAF = new BKButtonAndMenuLAF();
+    pianoCB.setLookAndFeel(comboBoxRightJustifyLAF);
+    comboBoxRightJustifyLAF->setComboBoxJustificationType(juce::Justification::centredRight);
 
     pianoCB.setSelectedId(0, dontSendNotification);
     
@@ -67,7 +69,7 @@ construction(c)
     fillPianoCB();
     processor.updateState->pianoDidChangeForGraph = true;
     
-    startTimerHz (10);
+    startTimerHz (5);
 }
 
 HeaderViewController::~HeaderViewController()
@@ -113,9 +115,7 @@ void HeaderViewController::resized()
 
 PopupMenu HeaderViewController::getLoadMenu(void)
 {
-    PopupMenu loadMenu;
-    loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
-    
+    BKPopupMenu loadMenu;
     
     loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.globalSampleType != BKLoadLitest, processor.globalSampleType == BKLoadLitest);
     loadMenu.addItem(LOAD_LITE,     "Light", processor.globalSampleType != BKLoadLite, processor.globalSampleType == BKLoadLite);
@@ -149,8 +149,7 @@ PopupMenu HeaderViewController::getLoadMenu(void)
 
 PopupMenu HeaderViewController::getExportedPianoMenu(void)
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     StringArray names = processor.exportedPianos;
     for (int i = 0; i < names.size(); i++)
@@ -163,8 +162,7 @@ PopupMenu HeaderViewController::getExportedPianoMenu(void)
 
 PopupMenu HeaderViewController::getPianoMenu(void)
 {
-    PopupMenu pianoMenu;
-    pianoMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu pianoMenu;
     
     pianoMenu.addItem(1, "New");
     pianoMenu.addItem(2, "Linked Copy"); // add another called Duplicate that is like copy/paste?
@@ -181,8 +179,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
 
 PopupMenu HeaderViewController::getGalleryMenu(void)
 {
-    PopupMenu galleryMenu;
-    galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu galleryMenu;
     
     galleryMenu.addItem(NEWGALLERY_ID, "New");
     
@@ -224,7 +221,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     if (!processor.defaultLoaded)
     {
 #if JUCE_MAC
-    PopupMenu shareMenu;
+    BKPopupMenu shareMenu;
     
     shareMenu.addItem(SHARE_EMAIL_ID, "Email");
     galleryMenu.addSeparator();
@@ -577,11 +574,11 @@ void HeaderViewController::bkButtonClicked (Button* b)
     {
         if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
         {
-             getEditMenuStandalone(&buttonsAndMenusLAF, construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent (b), ModalCallbackFunction::forComponent(BKConstructionSite::editMenuCallback, construction) );
+             getEditMenuStandalone(new BKButtonAndMenuLAF(), construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent (b), ModalCallbackFunction::forComponent(BKConstructionSite::editMenuCallback, construction) );
         }
         else
         {
-            getEditMenu(&buttonsAndMenusLAF, construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent(b), ModalCallbackFunction::forComponent(BKConstructionSite::editMenuCallback, construction) );
+            getEditMenu(new BKButtonAndMenuLAF(), construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent(b), ModalCallbackFunction::forComponent(BKConstructionSite::editMenuCallback, construction) );
         }
     }
     else if (b == &pianoB)
@@ -926,6 +923,9 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
 
 void HeaderViewController::timerCallback()
 {
-
+    if (!galleryCB.isPopupActive())
+    {
+        fillGalleryCB();
+    }
 }
 

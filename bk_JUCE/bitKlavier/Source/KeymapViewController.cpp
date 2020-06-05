@@ -588,8 +588,7 @@ PopupMenu KeymapViewController::getPitchClassMenu(int offset)
 {
     int Id;
     
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     for (int i = 0; i < 12; i++)
     {
@@ -603,8 +602,7 @@ PopupMenu KeymapViewController::getPitchClassMenu(int offset)
 
 PopupMenu KeymapViewController::getKeysMenu(void)
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     menu.addItem(ID(KeySetAll), "All");
     menu.addSubMenu("All...",  getPitchClassMenu((KeySet) ID(KeySetAllPC)));
@@ -704,8 +702,7 @@ PopupMenu KeymapViewController::getTargetsMenu()
 {
     updateKeymapTargets();
     
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     Array<KeymapTargetState> targetStates = keymap->getTargetStates();
@@ -757,8 +754,7 @@ void KeymapViewController::fillSelectCB(int last, int current)
 
 PopupMenu KeymapViewController::getMidiInputSelectMenu()
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     
