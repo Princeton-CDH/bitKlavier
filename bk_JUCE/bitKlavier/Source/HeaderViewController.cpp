@@ -658,9 +658,11 @@ void HeaderViewController::fillGalleryCB(void)
         
 #if (JUCE_MAC)
         bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+		char divChar = '/';
 #endif
 #if (JUCE_WINDOWS || JUCE_LINUX)
         bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+		char divChar = '\\';
 #endif
         
         PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
@@ -669,8 +671,38 @@ void HeaderViewController::fillGalleryCB(void)
         bool creatingSubmenu = false;
         String submenuName;
         
-        StringArray submenuNames;
-        OwnedArray<PopupMenu> submenus;
+		StringArray nameStack;
+		//OwnedArray submenus
+        Array<PopupMenu> submenus;
+
+		StringArray submenuNames;
+
+		/*
+		Pseudocode for revised fillGalleryCB:
+		declare stuff
+		Sort processor.galleryNames
+		Make a stack subMenus which will store the lowest current submenu
+		for (int i = 0; i < processor.galleryNames.size(); i++)
+			get file/gallery name
+			split the string into StringArray folders (substring by '/'?)
+			if (subMenus != empty):
+				while subMenus.peek isn't in the current string:
+					subMenus.pop();
+			if folders.length > 1:
+				for (int j = 0; j < folders.length - 1; j++): //use length - 1 to not include filename
+					if folder isn't in the stack:
+						PopupMenu menu = new PopupMenu();
+						if (subMenus = empty):
+							galleryCBPopUp->addSubMenu(galleryNames[i], menu)
+						else:
+							subMenus.peek()->addSubMenu(galleryNames[i], menu);
+						stack.push(menu);
+				subMenus.peek.addItem(++id, galleryNames[i]);
+			else:
+				galleryCB.addItem(galleryName, ++id);
+		set name of galllery displayed	
+		*/
+
 
 		processor.galleryNames.sortNatural();
 		DBG("Gallery Names:");
@@ -678,6 +710,71 @@ void HeaderViewController::fillGalleryCB(void)
 		{
 			DBG(name + "\n");
 		}
+
+		for (int i = 0; i < processor.galleryNames.size(); i++)
+		{
+			File thisFile(processor.galleryNames[i]);
+			String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
+			String galleryPath = String(thisFile.getFullPathName());
+			int gallerySplitIndex = galleryPath.indexOf("\galleries") + 10;
+			StringArray galleryFolders;
+			int divIndex = galleryPath.indexOfChar(gallerySplitIndex, divChar);
+			//split the filename into individual strings for folders
+			while (divIndex != -1)
+			{
+				//DBG("Adding " + galleryPath.substring(gallerySplitIndex, divIndex) + " to galleryFolders");
+				galleryFolders.add(galleryPath.substring(gallerySplitIndex, divIndex));
+				gallerySplitIndex = divIndex + 1;
+				divIndex = galleryPath.indexOfChar(gallerySplitIndex, divChar);
+			}
+			if (!submenus.isEmpty())
+			{
+				StringRef poppedMenuName = nameStack[nameStack.size() - 1];
+				while ((!galleryFolders.contains(poppedMenuName)) && (!submenus.isEmpty()))
+				{
+					nameStack.remove(nameStack.size() - 1);
+					submenus.remove(submenus.size() - 1);
+					poppedMenuName = nameStack[nameStack.size() - 1];
+				}
+			}
+			if (galleryFolders.size() > 1) 
+			{
+				for (int j = 0; j < galleryFolders.size(); j++)
+				{
+					if (!submenuNames.contains(galleryFolders[j]))
+					{
+						PopupMenu menu;
+						if (submenus.isEmpty())
+						{
+							galleryCBPopUp->addSubMenu(galleryFolders[j], menu);
+							DBG("Adding " + galleryFolders[j] + " submenu to the parent menu");
+						}
+						else
+						{
+							submenus.getLast().addSubMenu(galleryFolders[j], menu);
+							DBG("Adding " + galleryFolders[j] + " submenu to " + nameStack[nameStack.size() - 1] + " menu");
+						}
+						submenus.add(menu);
+						nameStack.add(galleryFolders[j]);
+						submenuNames.add(galleryFolders[j]);
+					}
+				}
+				submenus.getLast().addItem(++id, galleryName);
+				DBG("Successfully added " + galleryName + " to submenu " + nameStack[nameStack.size() - 1]);
+			}
+			else
+			{
+				galleryCB.addItem(galleryName, ++id);
+				DBG("Successfully added " + galleryName + " to main menu");
+			}
+			if (thisFile.getFileName() == processor.currentGallery)
+			{
+				index = i;
+				lastGalleryCBId = id;
+			}
+		}
+		//still using original last two lines of this method
+
 		/*StringArray orderedNames = StringArray(processor.galleryNames);
 		orderedNames.sortNatural();
 		DBG("Ordered Names:");
@@ -686,7 +783,9 @@ void HeaderViewController::fillGalleryCB(void)
 			DBG(name + "\n");
 		}*/
         
-        for (int i = 0; i < processor.galleryNames.size(); i++)
+        //old code
+		/*
+		for (int i = 0; i < processor.galleryNames.size(); i++)
         {
             File thisFile(processor.galleryNames[i]);
             
@@ -742,10 +841,13 @@ void HeaderViewController::fillGalleryCB(void)
             creatingSubmenu = false;
         }
         
+		*/
+
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
         galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
     }
+	DBG("who am I, how did I get here (aka made it to the end)");
 }
 
 void HeaderViewController::update(void)
