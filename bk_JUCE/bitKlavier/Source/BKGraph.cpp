@@ -119,8 +119,12 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
 
 BKItem::~BKItem()
 {
+    DBG("item deleted");
     if (getParentComponent() != nullptr)
+    {
+        removeMouseListener(getParentComponent());
         getParentComponent()->removeChildComponent(this);
+    }
 }
 
 BKItem* BKItem::duplicate(void)
