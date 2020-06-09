@@ -370,6 +370,7 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
 }
 void BKConstructionSite::deleteItem (BKItem* item)
 {
+    item->removeMouseListener(this);
     graph->removeItem(item);
     removeChildComponent(item);
 }
