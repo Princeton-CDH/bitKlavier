@@ -77,8 +77,6 @@ private:
     PopupMenu getGalleryMenu(void);
     
     PopupMenu getExportedPianoMenu(void);
-
-	void sortStringArrayReverseNatural(StringArray strings);
     
     //OwnedArray<PopupMenu> submenus;
     //StringArray submenuNames;

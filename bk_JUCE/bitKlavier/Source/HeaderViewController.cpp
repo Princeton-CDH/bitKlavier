@@ -678,39 +678,6 @@ void HeaderViewController::fillGalleryCB(void)
 		StringArray submenuNames;
 		StringArray submenuParents;
 
-		/*
-		Pseudocode for revised fillGalleryCB:
-		declare stuff
-		Sort processor.galleryNames
-		Make a stack subMenus which will store the lowest current submenu
-		for (int i = 0; i < processor.galleryNames.size(); i++)
-			get file/gallery name
-			split the string into StringArray folders (substring by '/'?)
-			if (subMenus != empty):
-				while nameStack.peek isn't in the current string:
-					nameStack.pop();
-			if folders.length >= 1:
-				for (int j = 0; j < folders.length; j++):
-					if folder isn't in the stack:
-						PopupMenu menu = new PopupMenu();
-						add menu to the list of menus
-				subMenus.peek.addItem(++id, galleryNames[i]);
-			else:
-				galleryCB.addItem(galleryName, ++id);
-		
-						
-		//have to do a second pass through because menus need to be complete before they're added
-		for (int i = 0; i < processor.galleryNames.size(); i++)
-			if folders.length >= 1:
-				if (nameStack = empty):
-							galleryCBPopUp->addSubMenu(galleryNames[i], menu)
-						else:
-							subMenus[get index from submenuNames]->addSubMenu(galleryNames[i], menu);
-						nameStack.push(name);
-		set name of galllery displayed
-		*/
-
-
 		processor.galleryNames.sortNatural();
 		/*DBG("Gallery Names:");
 		for (auto name : processor.galleryNames)
