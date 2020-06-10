@@ -1792,6 +1792,7 @@ private:
     
     void playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster);
     Array<float> velocities;    //record of velocities
+    Array<float> velocitiesActive;
     Array<int> keysDepressed;   //current keys that are depressed
     Array<int> syncKeysDepressed;
     Array<int> clusterKeysDepressed;
