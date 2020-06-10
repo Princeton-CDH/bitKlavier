@@ -1651,13 +1651,13 @@ public:
     
     inline const float getHoldTimer() const noexcept
     {
-        if(keysDepressed.size() == 0 ) return 0;
+        // if(keysDepressed.size() == 0 ) return 0;
         return 1000. * holdTimers[lastKeyPressed] / synth->getSampleRate() ;
     }
     
     inline const float getLastVelocity() const noexcept
     {
-        if(keysDepressed.size() == 0 ) return 0;
+        // if(keysDepressed.size() == 0 ) return 0;
         return lastKeyVelocity;
     }
     

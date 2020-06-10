@@ -210,17 +210,24 @@ bool SynchronicProcessor::holdCheck(int noteNumber)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<KeymapTargetState> targetStates)
 {
-    // check velocity filtering
-    if (!velocityCheck(noteNumber)) return;
     
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
     lastKeyPressed = noteNumber;
     lastKeyVelocity = velocity;
     
+    // check velocity filtering
+    //  need to save old velocity, in case this new velocity failes the velocity test
+    float velocitySave = velocities.getUnchecked(noteNumber);
+    velocities.set(noteNumber, velocity);
+    if (!velocityCheck(noteNumber))
+    {
+        velocities.set(noteNumber, velocitySave);
+        return;
+    }
+    
     // add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
-    velocities.set(noteNumber, velocity);
     holdTimers.set(noteNumber, 0);
     
     // track the note's target, as set in Keymap
