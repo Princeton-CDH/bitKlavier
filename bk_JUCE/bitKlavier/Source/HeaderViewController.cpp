@@ -728,12 +728,12 @@ void HeaderViewController::fillGalleryCB(void)
 						if (j == 0)
 						{
 							parentIds[j]->add(-1);
-							DBG("Assigning submenu " + galleryFolders[j] + " to main menu parent");
+							//DBG("Assigning submenu " + galleryFolders[j] + " to main menu parent");
 						}
 						else
 						{
 							parentIds[j]->add(submenuNames.indexOf(galleryFolders[j - 1]));
-							DBG("Assigning submenu " + galleryFolders[j] + " to parent menu " + galleryFolders[j - 1]);
+							//DBG("Assigning submenu " + galleryFolders[j] + " to parent menu " + galleryFolders[j - 1]);
 						}
 					}
 				}
@@ -776,6 +776,7 @@ void HeaderViewController::fillGalleryCB(void)
 			}
 		}
 		///diagnostics for why submenus aren't showing
+		/*
 		DBG("Number of items in main menu: " + String(galleryCB.getNumItems()));
 		DBG("Items: ");
 		for (int i = 0; i < galleryCB.getNumItems(); i++)
@@ -806,6 +807,7 @@ void HeaderViewController::fillGalleryCB(void)
 				}
 			}
 		}
+		*/
 
 
 		//still using original last two lines of this method
@@ -874,7 +876,6 @@ void HeaderViewController::fillGalleryCB(void)
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
         galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
     }
-	DBG("who am I, how did I get here (aka made it to the end)");
 }
 
 void HeaderViewController::update(void)
