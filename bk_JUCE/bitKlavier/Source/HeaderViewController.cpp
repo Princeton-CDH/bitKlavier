@@ -656,9 +656,11 @@ void HeaderViewController::fillGalleryCB(void)
         
 #if (JUCE_MAC)
         bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+		char divChar = '/';
 #endif
 #if (JUCE_WINDOWS || JUCE_LINUX)
         bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+		char divChar = '\\';
 #endif
         
         PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
@@ -667,26 +669,149 @@ void HeaderViewController::fillGalleryCB(void)
         bool creatingSubmenu = false;
         String submenuName;
         
-        StringArray submenuNames;
+		StringArray nameStack;
         OwnedArray<PopupMenu> submenus;
+		StringArray submenuNames;
+		OwnedArray<Array<int>> parentIds;
+		OwnedArray<Array<int>> childIds;
 
-		// processor.galleryNames.sortNatural();
-        /*
-		DBG("Gallery Names:");
-		for (auto name : processor.galleryNames)
+		processor.galleryNames.sortNatural();
+
+		//first pass through the list: create menus and add galleries to them
+		for (int i = 0; i < processor.galleryNames.size(); i++)
 		{
-			DBG(name + "\n");
+			File thisFile(processor.galleryNames[i]);
+			String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
+			String galleryPath = String(thisFile.getFullPathName());
+			int gallerySplitIndex = galleryPath.indexOf("\galleries") + 10;
+			StringArray galleryFolders;
+			int divIndex = galleryPath.indexOfChar(gallerySplitIndex, divChar);
+			//split the filename into individual strings for folders
+			while (divIndex != -1)
+			{
+				//DBG("Adding " + galleryPath.substring(gallerySplitIndex, divIndex) + " to galleryFolders");
+				galleryFolders.add(galleryPath.substring(gallerySplitIndex, divIndex));
+				gallerySplitIndex = divIndex + 1;
+				divIndex = galleryPath.indexOfChar(gallerySplitIndex, divChar);
+			}
+			if (!submenus.isEmpty())
+			{
+				StringRef poppedMenuName = nameStack[nameStack.size() - 1];
+				while ((!galleryFolders.contains(poppedMenuName)) && (!nameStack.isEmpty()))
+				{
+					nameStack.remove(nameStack.size() - 1);
+					poppedMenuName = nameStack[nameStack.size() - 1];
+				}
+			}
+			//submenu creation for nested folders
+			if (galleryFolders.size() >= 1) 
+			{
+				//iterate through the folder names and create submenus if they don't exist
+				for (int j = 0; j < galleryFolders.size(); j++)
+				{
+					if (!submenuNames.contains(galleryFolders[j]))
+					{
+						if (parentIds.size() <= j)
+						{
+							parentIds.add(new Array<int>());
+							childIds.add(new Array<int>());
+						}
+						submenus.add(new PopupMenu());
+						PopupMenu* menu = submenus.getLast();
+						nameStack.add(galleryFolders[j]);
+						submenuNames.add(galleryFolders[j]);
+						int childIdToBeAdded = submenus.size() - 1;
+						childIds[j]->add(childIdToBeAdded); //guaranteed to be the last index in the list because it was just added
+						//adds a composite string containing the parent name and the index of the parent in submenus
+						if (j == 0)
+						{
+							parentIds[j]->add(-1);
+							//DBG("Assigning submenu " + galleryFolders[j] + " to main menu parent");
+						}
+						else
+						{
+							parentIds[j]->add(submenuNames.indexOf(galleryFolders[j - 1]));
+							//DBG("Assigning submenu " + galleryFolders[j] + " to parent menu " + galleryFolders[j - 1]);
+						}
+					}
+				}
+				//add gallery to its appropriate submenu
+				int submenuIndex = submenuNames.indexOf(galleryFolders[galleryFolders.size() - 1]);
+				submenus[submenuIndex]->addItem(++id, galleryName);
+				DBG("Successfully added " + galleryName + " to submenu " + galleryFolders[galleryFolders.size() - 1]);
+			}
+			//if there are no submenus, just add the gallery to the main menu
+			else
+			{
+				galleryCB.addItem(galleryName, ++id);
+				DBG("Successfully added " + galleryName + " to main menu");
+			}
+			if (thisFile.getFileName() == processor.currentGallery)
+			{
+				index = i;
+				lastGalleryCBId = id;
+			}
 		}
-         */
-		/*StringArray orderedNames = StringArray(processor.galleryNames);
-		orderedNames.sortNatural();
-		DBG("Ordered Names:");
-		for (auto name : orderedNames)
+
+		//pass through the submenus to add the nested submenus to their parent menus
+		for (int i = parentIds.size() - 1; i >= 0; i--)
 		{
-			DBG(name + "\n");
-		}*/
+			for (int j = 0; j < parentIds[i]->size(); j++)
+			{
+				int childId = childIds[i]->getReference(j);
+				int parentId = parentIds[i]->getReference(j);
+				if (i == 0)
+				{
+					galleryCBPopUp->addSubMenu(submenuNames[childId], *submenus[childId]);
+					DBG("Adding " + submenuNames[childId] + " submenu to the main menu");
+				}
+				else
+				{
+					submenus[parentId]->addSubMenu(submenuNames[childId], *submenus[childId]);
+					DBG("Adding " + submenuNames[childId] + " submenu to parent menu " + submenuNames[parentId]);
+				}
+				
+			}
+		}
+		///diagnostics for why submenus aren't showing
+		DBG("Number of items in main menu: " + String(galleryCB.getNumItems()));
+		DBG("Items: ");
+		for (int i = 0; i < galleryCB.getNumItems(); i++)
+		{
+			DBG("Item " + String(i) + " id: " + String(galleryCB.getItemId(i)) + ", text: " + galleryCB.getItemText(i));
+		}
+
+		DBG("Is popup active? " << (galleryCB.isPopupActive() ? "true" : "false"));
+		DBG("GalleryCB root menu number of items: " + String(galleryCB.getRootMenu()->getNumItems()));
+		DBG("Does GalleryCB root menu have any active items? " << (galleryCB.getRootMenu()->containsAnyActiveItems() ? "true" : "false"));
+		DBG("Using MenuIterators to go through everything");
+		for (int i = 0; i < submenus.size(); i++)
+
+		{
+			DBG("Menu name: " + submenuNames[i] + ", number of items: " + String(submenus[i]->getNumItems()));
+			PopupMenu::MenuItemIterator menuIterator(*submenus[i]);
+			bool isNext = true;
+			for (int j = 0; isNext == true; j++)
+			{
+				isNext = menuIterator.next();
+				if (isNext)
+				{
+					String itemName = menuIterator.getItem().text;
+					DBG("Item " + String(j) + ": " + itemName);
+					std::unique_ptr< PopupMenu >& submenuPtr = menuIterator.getItem().subMenu;
+					if (submenuPtr != nullptr)
+					{
+						DBG("Number of items in its nested submenu: " + String(submenuPtr->getNumItems()));
+					}
+				}
+			}
+		}
+
+		//still using original last two lines of this method
         
-        for (int i = 0; i < processor.galleryNames.size(); i++)
+        //old code
+		/*
+		for (int i = 0; i < processor.galleryNames.size(); i++)
         {
             File thisFile(processor.galleryNames[i]);
             
@@ -742,6 +867,8 @@ void HeaderViewController::fillGalleryCB(void)
             creatingSubmenu = false;
         }
         
+		*/
+
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
         galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
@@ -978,7 +1105,7 @@ void HeaderViewController::timerCallback()
 {
     if (!galleryCB.isPopupActive())
     {
-        fillGalleryCB();
+        // fillGalleryCB();
     }
 }
 
