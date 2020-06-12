@@ -320,6 +320,7 @@ void MainViewController::resized()
 
 void MainViewController::mouseDown(const MouseEvent &event)
 {
+	header.fillGalleryCB();
     if(event.eventComponent == &construction)
     {
         if (overtop.getCurrentDisplay() != DisplayNil)
@@ -666,7 +667,7 @@ void MainViewController::timerCallback()
         processor.collectPianos();
         processor.collectSoundfonts();
         
-        header.fillGalleryCB();
+        //header.fillGalleryCB();
         
         fillSampleCB();
         fillInstrumentCB();
