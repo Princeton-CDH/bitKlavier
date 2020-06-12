@@ -672,18 +672,12 @@ void HeaderViewController::fillGalleryCB(void)
         String submenuName;
         
 		StringArray nameStack;
-		//OwnedArray submenus
         OwnedArray<PopupMenu> submenus;
-
 		StringArray submenuNames;
-		StringArray submenuParents;
+		OwnedArray<Array<int>> parentIds;
+		OwnedArray<Array<int>> childIds;
 
 		processor.galleryNames.sortNatural();
-		/*DBG("Gallery Names:");
-		for (auto name : processor.galleryNames)
-		{
-			DBG(name + "\n");
-		}*/
 
 		//first pass through the list: create menus and add galleries to them
 		for (int i = 0; i < processor.galleryNames.size(); i++)
@@ -711,32 +705,44 @@ void HeaderViewController::fillGalleryCB(void)
 					poppedMenuName = nameStack[nameStack.size() - 1];
 				}
 			}
+			//submenu creation for nested folders
 			if (galleryFolders.size() >= 1) 
 			{
-				for (int j = galleryFolders.size() - 1; j >= 0; j--)
+				//iterate through the folder names and create submenus if they don't exist
+				for (int j = 0; j < galleryFolders.size(); j++)
 				{
 					if (!submenuNames.contains(galleryFolders[j]))
 					{
+						if (parentIds.size() <= j)
+						{
+							parentIds.add(new Array<int>());
+							childIds.add(new Array<int>());
+						}
 						submenus.add(new PopupMenu());
 						PopupMenu* menu = submenus.getLast();
 						nameStack.add(galleryFolders[j]);
 						submenuNames.add(galleryFolders[j]);
+						int childIdToBeAdded = submenus.size() - 1;
+						childIds[j]->add(childIdToBeAdded); //guaranteed to be the last index in the list because it was just added
+						//adds a composite string containing the parent name and the index of the parent in submenus
 						if (j == 0)
 						{
-							submenuParents.add("main");
+							parentIds[j]->add(-1);
 							DBG("Assigning submenu " + galleryFolders[j] + " to main menu parent");
 						}
 						else
 						{
-							submenuParents.add(galleryFolders[j - 1]);
+							parentIds[j]->add(submenuNames.indexOf(galleryFolders[j - 1]));
 							DBG("Assigning submenu " + galleryFolders[j] + " to parent menu " + galleryFolders[j - 1]);
 						}
 					}
 				}
+				//add gallery to its appropriate submenu
 				int submenuIndex = submenuNames.indexOf(galleryFolders[galleryFolders.size() - 1]);
 				submenus[submenuIndex]->addItem(++id, galleryName);
 				DBG("Successfully added " + galleryName + " to submenu " + galleryFolders[galleryFolders.size() - 1]);
 			}
+			//if there are no submenus, just add the gallery to the main menu
 			else
 			{
 				galleryCB.addItem(galleryName, ++id);
@@ -750,26 +756,25 @@ void HeaderViewController::fillGalleryCB(void)
 		}
 
 		//pass through the submenus to add the nested submenus to their parent menus
-		for (int i = 0; i < submenuParents.size(); i++)
+		for (int i = parentIds.size() - 1; i >= 0; i--)
 		{
-			if (submenuParents[i].compare("main") != 0)
+			for (int j = 0; j < parentIds[i]->size(); j++)
 			{
-				int parentIndex = submenuNames.indexOf(submenuParents[i]);
-				submenus[parentIndex]->addSubMenu(submenuNames[i], *submenus[i]);
-				DBG("Adding " + submenuNames[i] + " submenu to parent menu " + submenuParents[parentIndex]);
+				int childId = childIds[i]->getReference(j);
+				int parentId = parentIds[i]->getReference(j);
+				if (i == 0)
+				{
+					galleryCBPopUp->addSubMenu(submenuNames[childId], *submenus[childId]);
+					DBG("Adding " + submenuNames[childId] + " submenu to the main menu");
+				}
+				else
+				{
+					submenus[parentId]->addSubMenu(submenuNames[childId], *submenus[childId]);
+					DBG("Adding " + submenuNames[childId] + " submenu to parent menu " + submenuNames[parentId]);
+				}
+				
 			}
 		}
-
-		//2nd pass through the submenus to add the non-nested submenus to the main menu
-		for (int i = 0; i < submenuParents.size(); i++)
-		{
-			if (submenuParents[i].compare("main") == 0)
-			{
-				galleryCBPopUp->addSubMenu(submenuNames[i], *submenus[i]);
-				DBG("Adding " + submenuNames[i] + " submenu to the main menu");
-			}
-		}
-
 		///diagnostics for why submenus aren't showing
 		DBG("Number of items in main menu: " + String(galleryCB.getNumItems()));
 		DBG("Items: ");
