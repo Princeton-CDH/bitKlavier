@@ -413,7 +413,7 @@ public:
         String n = e->getStringAttribute("name");
         
         if (n != String())     name = n;
-        else                        name = String(Id);
+        else                   name = String(Id);
         
         
         XmlElement* params = e->getChildByName("params");
@@ -509,6 +509,7 @@ public:
     inline void reset(void)
     {
         direct->aPrep->copy(direct->sPrep);
+        DBG("synchronic reset called"); 
     }
     
     inline int getId(void) const noexcept { return direct->getId(); }

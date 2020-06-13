@@ -118,6 +118,13 @@ private:
                 
                 processor.updateState->currentDisplay = DisplayNostalgic;
             }
+            else if (type == PreparationTypeBlendronic)
+            {
+                processor.updateState->currentBlendronicId = which;
+                processor.updateState->blendronicPreparationDidChange = true;
+                
+                processor.updateState->currentDisplay = DisplayBlendronic;
+            }
             else if (type == PreparationTypeTuning)
             {
                 processor.updateState->currentTuningId = which;
