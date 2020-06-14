@@ -123,6 +123,8 @@ void BKAudioProcessor::collectGalleriesFromFolder(File folder)
         
         galleryNames.add(galleryFile.getFullPathName());
     }
+
+	galleryNames.sortNatural();
 }
 
 void BKAudioProcessor::collectGalleries(void)

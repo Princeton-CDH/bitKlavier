@@ -675,7 +675,7 @@ void HeaderViewController::fillGalleryCB(void)
 		OwnedArray<Array<int>> parentIds;
 		OwnedArray<Array<int>> childIds;
 
-		processor.galleryNames.sortNatural();
+		//processor.galleryNames.sortNatural();
 
 		//first pass through the list: create menus and add galleries to them
 		for (int i = 0; i < processor.galleryNames.size(); i++)
@@ -776,9 +776,10 @@ void HeaderViewController::fillGalleryCB(void)
 		///diagnostics for why submenus aren't showing
 		DBG("Number of items in main menu: " + String(galleryCB.getNumItems()));
 		DBG("Items: ");
-		for (int i = 0; i < galleryCB.getNumItems(); i++)
+		for (int i = numberOfDefaultGalleryItems; i < galleryCB.getNumItems(); i++)
 		{
 			DBG("Item " + String(i) + " id: " + String(galleryCB.getItemId(i)) + ", text: " + galleryCB.getItemText(i));
+			DBG("Corresponding galleryNames path: " + processor.galleryNames[i - numberOfDefaultGalleryItems]);
 		}
 
 		DBG("Is popup active? " << (galleryCB.isPopupActive() ? "true" : "false"));
@@ -806,68 +807,6 @@ void HeaderViewController::fillGalleryCB(void)
 				}
 			}
 		}
-
-		//still using original last two lines of this method
-        
-        //old code
-		/*
-		for (int i = 0; i < processor.galleryNames.size(); i++)
-        {
-            File thisFile(processor.galleryNames[i]);
-            
-            String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
-            
-            //moving on to new submenu, if there is one, add add last submenu to popup now that it's done
-            if(creatingSubmenu && thisFile.getParentDirectory().getFileName() != submenuName)
-            {
-                galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
-                creatingSubmenu = false;
-            }
-            
-            //add toplevel item, if there is one
-            if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName() ||
-               thisFile.getParentDirectory().getFileName() == moreGalleries.getFileName() ||
-               thisFile.getParentDirectory().getFileName() == moreGalleries.getChildFile("Inbox").getFileName()) //if the file is in the main galleries directory....
-            {
-                galleryCB.addItem(galleryName, ++id); //add to toplevel popup
-            }
-            
-            //otherwise add to or create submenu with name of subfolder
-            else
-            {
-                creatingSubmenu = true;
-                
-                submenuName = thisFile.getParentDirectory().getFileName(); //name of submenu
-                
-                if(submenuNames.contains(submenuName)) //add to existing submenu
-                {
-                    PopupMenu* existingMenu = submenus.getUnchecked(submenuNames.indexOf(submenuName));
-                    existingMenu->addItem(++id, galleryName);
-                }
-                else
-                {
-                    submenus.add(new PopupMenu());
-                    submenuNames.add(submenuName);
-                    
-                    submenus.getLast()->addItem(++id, galleryName);;
-                }
-            }
-            
-            if (thisFile.getFileName() == processor.currentGallery)
-            {
-                index = i;
-                lastGalleryCBId = id;
-            }
-        }
-        
-        //add last submenu to popup, if there is one
-        if(creatingSubmenu)
-        {
-            galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
-            creatingSubmenu = false;
-        }
-        
-		*/
 
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
@@ -1070,6 +1009,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
             else
             {
                 index = index - numberOfDefaultGalleryItems;
+				//processor.galleryNames.sortNatural();
                 String path = processor.galleryNames[index];
                 
                 /*

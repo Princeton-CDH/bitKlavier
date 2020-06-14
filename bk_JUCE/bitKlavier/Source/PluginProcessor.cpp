@@ -460,6 +460,7 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
     xml->writeTo(myFile, XmlElement::TextFormat());
     
     galleryNames.add(myFile.getFullPathName());
+	galleryNames.sortNatural();
     
     if (xml != nullptr)
     {
