@@ -24,7 +24,8 @@ public:
     loadingSampleType(sampleType),
     loadingSoundfont(soundfont),
     loadingInstrument(instrument),
-    loadingSoundSetId(soundSetId)
+    loadingSoundSetId(soundSetId),
+    jobStatus(jobNeedsRunningAgain)
     {
         int numSamplesPerLayer = 29;
         int numHarmSamples = 69;
@@ -55,15 +56,17 @@ private:
     int loadingInstrument;
     int loadingSoundSetId;
     
+    JobStatus jobStatus;
+    
     double progressInc;
     
     JobStatus runJob(void) override;
     
-    void loadSoundfontFromFile(File sfzFile);
-    void loadMainPianoSamples(BKSampleLoadType type);
-    void loadResonanceReleaseSamples(void);
-    void loadHammerReleaseSamples(void);
-    void loadPedalSamples(void);
+    JobStatus loadSoundfontFromFile(File sfzFile);
+    JobStatus loadMainPianoSamples(BKSampleLoadType type);
+    JobStatus loadResonanceReleaseSamples(void);
+    JobStatus loadHammerReleaseSamples(void);
+    JobStatus loadPedalSamples(void);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BKSampleLoader)
 };

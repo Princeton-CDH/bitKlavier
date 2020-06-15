@@ -17,9 +17,9 @@
 
 String notes[4] = {"A","C","D#","F#"};
 
-#define EXIT_CHECK if (shouldExit()) { processor.updateState->pianoSamplesAreLoading = false; return jobHasFinished; }
+#define EXIT_CHECK if (shouldExit()) { processor.updateState->pianoSamplesAreLoading = false; return jobStatus; }
 
-void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
+BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
 {
     BKSynthesiser* synth = &processor.mainPianoSynth;
     
@@ -37,6 +37,8 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     {
         synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
     }
+    
+    EXIT_CHECK;
     
     bool isSF2 = false;
     
@@ -84,10 +86,11 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         processor.progress = 0.0;
         progressInc = 1.0 / processor.regions.getReference(loadingSoundSetId).size();
     }
-    else    return;
+    else    return jobStatus;
 
     for (auto region : processor.regions.getReference(loadingSoundSetId))
     {
+        EXIT_CHECK;
         processor.progress += progressInc;
         
         int64 sampleStart, sampleLength;
@@ -184,6 +187,8 @@ void BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     }
     
     processor.didLoadMainPianoSamples = true;
+    
+    return jobStatus;
 }
 
 
@@ -196,7 +201,7 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
     
     String soundfont = loadingSoundfont;
     
-//    EXIT_CHECK;
+    EXIT_CHECK;
     
     if (type == BKLoadSoundfont)
     {
@@ -255,7 +260,7 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
         if (deviceType.contains("iPhone")) loadMainPianoSamples(BKLoadLitest);
         else loadMainPianoSamples(type);
         
-//        EXIT_CHECK;
+        EXIT_CHECK;
         
         processor.didLoadMainPianoSamples = true;
         
@@ -264,7 +269,7 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
             processor.didLoadHammersAndRes = true;
             loadHammerReleaseSamples();
             
-//            EXIT_CHECK;
+            EXIT_CHECK;
             
             loadResonanceReleaseSamples();
             
@@ -274,11 +279,12 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
     
     processor.progress -= 1.0f;
     processor.updateState->pianoSamplesAreLoading = false;
+    jobStatus = jobHasFinished;
     
     return jobHasFinished;
 }
 
-void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
+BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.mainPianoSynth;
@@ -315,6 +321,7 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
             
             for (int k = 0; k < numLayers; k++)
             {
+                EXIT_CHECK;
                 
                 //String temp = path;
                 String temp;
@@ -432,9 +439,11 @@ void BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
     }
     
     processor.didLoadMainPianoSamples = true;
+    
+    return jobStatus;
 }
 
-void BKSampleLoader::loadResonanceReleaseSamples(void)
+BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.resonanceReleaseSynth;
@@ -465,6 +474,7 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
             
             for (int k = 0; k < 3; k++) //k => velocity layer
             {
+                EXIT_CHECK;
                 String temp;
                 temp += "harm";
                 if(k==0) temp += "V3";
@@ -545,9 +555,10 @@ void BKSampleLoader::loadResonanceReleaseSamples(void)
             }
         }
     }
+    return jobStatus;
 }
 
-void BKSampleLoader::loadHammerReleaseSamples(void)
+BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.hammerReleaseSynth;
@@ -570,7 +581,7 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
     
     //load hammer release samples
     for (int i = 1; i <= 88; i++) {
-        
+        EXIT_CHECK;
         String temp;
         temp += "rel";
         temp += String(i);
@@ -621,9 +632,10 @@ void BKSampleLoader::loadHammerReleaseSamples(void)
             DBG("file not opened OK: " + temp);
         }
     }
+    return jobStatus;
 }
 
-void BKSampleLoader::loadPedalSamples(void)
+BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.pedalSynth;
@@ -646,7 +658,7 @@ void BKSampleLoader::loadPedalSamples(void)
     
     //load hammer release samples
     for (int i = 0; i < 4; i++) {
-        
+        EXIT_CHECK;
         String temp;
         
         if(i==0) temp = "pedalD1.wav";
@@ -701,4 +713,5 @@ void BKSampleLoader::loadPedalSamples(void)
             DBG("file not opened OK: " + temp);
         }
     }
+    return jobStatus;
 }
