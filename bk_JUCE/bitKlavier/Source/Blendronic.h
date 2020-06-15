@@ -788,7 +788,8 @@ public:
 		prep.setProperty("Id", Id, 0);
 		prep.setProperty("name", name, 0);
 
-		prep.addChild(active ? aPrep->getState() : aPrep->getState(), -1, 0);
+		prep.addChild(active ? aPrep->getState() : sPrep->getState(), -1, 0);
+        // prep.addChild(active ? aPrep->getState() : sPrep->getState(), -1, 0);
 
 		return prep;
 	}
@@ -800,21 +801,21 @@ public:
 		String n = e->getStringAttribute("name");
 
 		if (n != String())     name = n;
-		else                        name = String(Id);
+		else                   name = String(Id);
 
 
 		XmlElement* params = e->getChildByName("params");
 
 		if (params != nullptr)
 		{
-			aPrep->setState(params);
+			sPrep->setState(params);
 		}
 		else
 		{
-			aPrep->setState(e);
+			sPrep->setState(e);
 		}
 
-		aPrep->copy(aPrep);
+		aPrep->copy(sPrep);
 	}
 
 	~Blendronic() {};
@@ -920,7 +921,7 @@ public:
     inline void toggleInput() { delay->toggleInput(); }
     inline void setOutputState(bool inputState) { delay->setOutputState(inputState); }
     inline void toggleOutput() { delay->toggleOutput(); }
-	inline void reset(void) { blendronic->aPrep->copy(blendronic->sPrep); }
+    inline void reset(void) { blendronic->aPrep->copy(blendronic->sPrep); DBG("blendronic reset called"); }
     
     inline const bool getResetPhase() const noexcept { return resetPhase; }
     inline const void setResetPhase(bool reset) { resetPhase = reset; }

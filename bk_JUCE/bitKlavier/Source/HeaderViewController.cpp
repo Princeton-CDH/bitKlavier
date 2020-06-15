@@ -675,8 +675,6 @@ void HeaderViewController::fillGalleryCB(void)
 		OwnedArray<Array<int>> parentIds;
 		OwnedArray<Array<int>> childIds;
 
-		//processor.galleryNames.sortNatural();
-
 		//first pass through the list: create menus and add galleries to them
 		for (int i = 0; i < processor.galleryNames.size(); i++)
 		{
