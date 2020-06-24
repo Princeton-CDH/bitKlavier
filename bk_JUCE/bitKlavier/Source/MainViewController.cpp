@@ -162,6 +162,7 @@ globalSoundSetButton("Use global samples")
 MainViewController::~MainViewController()
 {
     PopupMenu::dismissAllActiveMenus();
+    
     removeMouseListener(this);
     keyboard->removeMouseListener(this);
     keyboardState.removeListener(this);
@@ -170,6 +171,7 @@ MainViewController::~MainViewController()
     mainSlider.removeListener(this);
     sampleCB.removeListener(this);
     instrumentCB.removeListener(this);
+    removeKeyListener(this);
     
     setLookAndFeel(nullptr);
     sampleCB.setLookAndFeel(nullptr);
@@ -181,7 +183,7 @@ MainViewController::~MainViewController()
     globalSoundSetButton.setLookAndFeel(nullptr);
     //preferencesButton.setLookAndFeel(nullptr);
     keyboardComponent = nullptr;
-    removeKeyListener(this);
+    
 }
 
 /*
@@ -333,7 +335,7 @@ void MainViewController::resized()
 
 void MainViewController::mouseDown(const MouseEvent &event)
 {
-	header.fillGalleryCB();
+	// header.fillGalleryCB();
     if(event.eventComponent == &construction)
     {
         if (overtop.getCurrentDisplay() != DisplayNil)

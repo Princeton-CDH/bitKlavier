@@ -60,6 +60,7 @@ private:
     void bkMessageReceived          (const String& message) override{};
     void bkComboBoxDidChange        (ComboBox* box)         override;
     void bkButtonClicked            (Button* b)             override;
+    void mouseDown (const MouseEvent &event) override;
     
     void timerCallback() override;
     

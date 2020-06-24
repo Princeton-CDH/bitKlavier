@@ -69,6 +69,8 @@ construction(c)
     fillPianoCB();
     processor.updateState->pianoDidChangeForGraph = true;
     
+    addMouseListener(this, true);
+    
     startTimerHz (5);
 }
 
@@ -89,6 +91,8 @@ HeaderViewController::~HeaderViewController()
     editB.removeListener(this);
     galleryCB.removeListener(this);
     pianoCB.removeListener(this);
+    
+    removeMouseListener(this);
 }
 
 void HeaderViewController::paint (Graphics& g)
@@ -118,6 +122,11 @@ void HeaderViewController::resized()
     
     area.removeFromLeft(gXSpacing);
     editB.setBounds(area);
+}
+
+void HeaderViewController::mouseDown(const MouseEvent &event)
+{
+    fillGalleryCB();
 }
 
 PopupMenu HeaderViewController::getLoadMenu(void)
