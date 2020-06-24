@@ -672,14 +672,12 @@ void HeaderViewController::fillGalleryCB(void)
         PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
         
         int id = numberOfDefaultGalleryItems, index = 0;
-        bool creatingSubmenu = false;
-        String submenuName;
         
-		StringArray nameStack;
-        OwnedArray<PopupMenu> submenus;
-		StringArray submenuNames;
-		OwnedArray<Array<int>> parentIds;
-		OwnedArray<Array<int>> childIds;
+		StringArray nameStack; // used for naviagting between levels of submenu during loading
+		OwnedArray<PopupMenu> submenus; //2d arrray of submenus modelling the recursive depth of submenu connections
+		StringArray submenuNames; //lists the submenu names so far; used to check against 
+		OwnedArray<Array<int>> parentIds; //2d int array used to record recursive depth of indices for parent menus
+		OwnedArray<Array<int>> childIds; //2d int array used to record recursive depth of indices for child menus
 
 		//first pass through the list: create menus and add galleries to them
 		for (int i = 0; i < processor.galleryNames.size(); i++)
@@ -725,8 +723,9 @@ void HeaderViewController::fillGalleryCB(void)
 						nameStack.add(galleryFolders[j]);
 						submenuNames.add(galleryFolders[j]);
 						int childIdToBeAdded = submenus.size() - 1;
-						childIds[j]->add(childIdToBeAdded); //guaranteed to be the last index in the list because it was just added
-						//adds a composite string containing the parent name and the index of the parent in submenus
+						childIds[j]->add(childIdToBeAdded); // adds the current submenu id to the childids list
+
+						//adds the id of the current submenu's parent menu to the list of parent ids
 						if (j == 0)
 						{
 							parentIds[j]->add(-1);
@@ -767,47 +766,12 @@ void HeaderViewController::fillGalleryCB(void)
 				if (i == 0)
 				{
 					galleryCBPopUp->addSubMenu(submenuNames[childId], *submenus[childId]);
-					DBG("Adding " + submenuNames[childId] + " submenu to the main menu");
+					//DBG("Adding " + submenuNames[childId] + " submenu to the main menu");
 				}
 				else
 				{
 					submenus[parentId]->addSubMenu(submenuNames[childId], *submenus[childId]);
-					DBG("Adding " + submenuNames[childId] + " submenu to parent menu " + submenuNames[parentId]);
-				}
-				
-			}
-		}
-		///diagnostics for why submenus aren't showing
-		DBG("Number of items in main menu: " + String(galleryCB.getNumItems()));
-		DBG("Items: ");
-		for (int i = numberOfDefaultGalleryItems; i < galleryCB.getNumItems(); i++)
-		{
-			DBG("Item " + String(i) + " id: " + String(galleryCB.getItemId(i)) + ", text: " + galleryCB.getItemText(i));
-			DBG("Corresponding galleryNames path: " + processor.galleryNames[i - numberOfDefaultGalleryItems]);
-		}
-
-		DBG("Is popup active? " << (galleryCB.isPopupActive() ? "true" : "false"));
-		DBG("GalleryCB root menu number of items: " + String(galleryCB.getRootMenu()->getNumItems()));
-		DBG("Does GalleryCB root menu have any active items? " << (galleryCB.getRootMenu()->containsAnyActiveItems() ? "true" : "false"));
-		DBG("Using MenuIterators to go through everything");
-		for (int i = 0; i < submenus.size(); i++)
-
-		{
-			DBG("Menu name: " + submenuNames[i] + ", number of items: " + String(submenus[i]->getNumItems()));
-			PopupMenu::MenuItemIterator menuIterator(*submenus[i]);
-			bool isNext = true;
-			for (int j = 0; isNext == true; j++)
-			{
-				isNext = menuIterator.next();
-				if (isNext)
-				{
-					String itemName = menuIterator.getItem().text;
-					DBG("Item " + String(j) + ": " + itemName);
-					std::unique_ptr< PopupMenu >& submenuPtr = menuIterator.getItem().subMenu;
-					if (submenuPtr != nullptr)
-					{
-						DBG("Number of items in its nested submenu: " + String(submenuPtr->getNumItems()));
-					}
+					//DBG("Adding " + submenuNames[childId] + " submenu to parent menu " + submenuNames[parentId]);
 				}
 			}
 		}
