@@ -295,15 +295,18 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         int synthNoteNumber = note;
                          */
                         
-                        int synthNoteNumber = midiNoteNumber;
+                        // int synthNoteNumber = midiNoteNumber;
+                        int synthNoteNumber = note;
                         float offset; // offset from integer, but may be greater than 1
                         float synthOffset; // offset from actual sample played, always less than 1.
                          
                         // tune the transposition
                         if (prep->getTranspUsesTuning()) // use the Tuning setting
-                             offset = t + tuner->getOffset(round(t)  + midiNoteNumber, false);
+                             // offset = t + tuner->getOffset(round(t)  + midiNoteNumber, false);
+                            offset = t + tuner->getOffset(round(t)  + note, false);
                         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
-                             offset = t + tuner->getOffset(midiNoteNumber, false);
+                             // offset = t + tuner->getOffset(midiNoteNumber, false);
+                            offset = t + tuner->getOffset(note, false);
                         
                         synthOffset = offset;
                         
@@ -744,7 +747,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
             currentClusterSize = 0;
             //clusterNotesPlayed.clearQuick();
         }
-        //otherwise incrument cluster timer
+        //otherwise increment cluster timer
         else
         {
             clusterThresholdTimer += numSamples;
