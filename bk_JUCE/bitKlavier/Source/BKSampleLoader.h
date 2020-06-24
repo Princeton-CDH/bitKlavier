@@ -25,7 +25,7 @@ public:
     loadingSoundfont(soundfont),
     loadingInstrument(instrument),
     loadingSoundSetId(soundSetId),
-    jobStatus(jobNeedsRunningAgain)
+    jobStatus(jobHasFinished)
     {
         int numSamplesPerLayer = 29;
         int numHarmSamples = 69;
