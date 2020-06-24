@@ -164,6 +164,12 @@ MainViewController::~MainViewController()
     PopupMenu::dismissAllActiveMenus();
     removeMouseListener(this);
     keyboard->removeMouseListener(this);
+    keyboardState.removeListener(this);
+    octaveSlider.removeListener(this);
+    globalSoundSetButton.removeListener(this);
+    mainSlider.removeListener(this);
+    sampleCB.removeListener(this);
+    instrumentCB.removeListener(this);
     
     setLookAndFeel(nullptr);
     sampleCB.setLookAndFeel(nullptr);

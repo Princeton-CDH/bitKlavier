@@ -83,6 +83,12 @@ HeaderViewController::~HeaderViewController()
     editB.setLookAndFeel(nullptr);
     
     setLookAndFeel(nullptr);
+    
+    galleryB.removeListener(this);
+    pianoB.removeListener(this);
+    editB.removeListener(this);
+    galleryCB.removeListener(this);
+    pianoCB.removeListener(this);
 }
 
 void HeaderViewController::paint (Graphics& g)
