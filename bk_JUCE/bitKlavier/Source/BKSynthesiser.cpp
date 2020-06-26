@@ -238,12 +238,18 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 	float totalOutputL = 0.0f;
 	float totalOutputR = 0.0f;
     
+    BlendronicProcessor::PtrArr activebprocessors;
+    for (auto b : bprocessors)
+    {
+        if (b->getActive()) activebprocessors.add(b);
+    }
+    
 	while (--numSamples >= 0)
 	{
 		totalOutputL = 0.0f;
 		totalOutputR = 0.0f;
 
-		for (auto b : bprocessors)
+		for (auto b : activebprocessors)
 		{
 			if (b != nullptr)
 			{
@@ -276,12 +282,18 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
     float totalOutputL = 0.0f;
 	float totalOutputR = 0.0f;
     
+    BlendronicProcessor::PtrArr activebprocessors;
+    for (auto b : bprocessors)
+    {
+        if (b->getActive()) activebprocessors.add(b);
+    }
+    
     while (--numSamples >= 0)
     {
         totalOutputL = 0.0f;
 		totalOutputR = 0.0f;
         
-        for (auto b : bprocessors)
+        for (auto b : activebprocessors)
         {
 			if (b != nullptr)
 			{

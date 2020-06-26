@@ -109,7 +109,7 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
 	tempo(bTempo),
 	general(bGeneral),
     keymaps(Keymap::PtrArr()),
-    blendronicActive(true),
+    blendronicActive(false),
 	sampleTimer(0),
 	beatIndex(0),
     delayIndex(0),
@@ -391,7 +391,10 @@ void BlendronicProcessor::prepareToPlay(double sr)
     BlendronicPreparation::Ptr prep = blendronic->aPrep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->aPrep;
     
-    delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayBufferSizeInSeconds() * synth->getSampleRate(), synth->getSampleRate(), true);
+    if (delay == nullptr)
+    {
+        delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayBufferSizeInSeconds() * synth->getSampleRate(), synth->getSampleRate(), true);
+    }
     
     for (int i = 0; i < 1/*numChannels*/; ++i)
     {

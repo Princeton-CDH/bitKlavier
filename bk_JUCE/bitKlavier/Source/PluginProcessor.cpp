@@ -877,15 +877,22 @@ void  BKAudioProcessor::setCurrentPiano(int which)
     updateState->setCurrentDisplay(DisplayNil);
 
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);
-
+    
     prevPiano = currentPiano;
 
     currentPiano = gallery->getPiano(which);
 
     if(currentPiano != nullptr)
     {
+        for (auto bprocessor : prevPiano->getBlendronicProcessors())
+            bprocessor->setActive(false);
+        
         currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
         currentPiano->configure();
+        
+        for (auto bprocessor : currentPiano->getBlendronicProcessors())
+            bprocessor->setActive(true);
+        
         currentPiano->copySynchronicState(prevPiano);
         currentPiano->copyAdaptiveTuningState(prevPiano);
         currentPiano->copyAdaptiveTempoState(prevPiano);
@@ -1362,6 +1369,9 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml)
     }
     
     currentPiano->configure();
+    
+    for (auto bprocessor : currentPiano->getBlendronicProcessors())
+        bprocessor->setActive(true);
 }
 
 void BKAudioProcessor::loadGalleryFromPath(String path)
@@ -1496,6 +1506,9 @@ void BKAudioProcessor::initializeGallery(void)
         piano->configure();
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
     }
+    
+    for (auto bprocessor : currentPiano->getBlendronicProcessors())
+        bprocessor->setActive(true);
 
     gallery->prepareToPlay(getSampleRate()); 
     
