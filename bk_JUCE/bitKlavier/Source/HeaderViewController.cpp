@@ -694,7 +694,7 @@ void HeaderViewController::fillGalleryCB(void)
 			File thisFile(processor.galleryNames[i]);
 			String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
 			String galleryPath = String(thisFile.getFullPathName());
-			int gallerySplitIndex = galleryPath.indexOf("\galleries") + 10;
+			int gallerySplitIndex = galleryPath.indexOf("galleries") + 10;
 			StringArray galleryFolders;
 			int divIndex = galleryPath.indexOfChar(gallerySplitIndex, divChar);
 			//split the filename into individual strings for folders
@@ -728,7 +728,6 @@ void HeaderViewController::fillGalleryCB(void)
 							childIds.add(new Array<int>());
 						}
 						submenus.add(new PopupMenu());
-						PopupMenu* menu = submenus.getLast();
 						nameStack.add(galleryFolders[j]);
 						submenuNames.add(galleryFolders[j]);
 						int childIdToBeAdded = submenus.size() - 1;

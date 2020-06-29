@@ -99,13 +99,12 @@ public:
 //==============================================================================
 BKAudioProcessor::BKAudioProcessor(void):
 updateState(new BKUpdateState()),
+loader(),
 mainPianoSynth(*this),
 hammerReleaseSynth(*this),
 resonanceReleaseSynth(*this),
 pedalSynth(*this),
 firstTime(true),
-
-loader(),
 currentSampleRate(44100.),
 doneWithSetStateInfo(false),
 midiReady(false)

@@ -336,54 +336,47 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
     // must set the sample rate before using this!
     jassert (processor.getCurrentSampleRate() != 0);
     
-    bool firstEvent = true;
-    
     const ScopedLock sl (lock);
     
-    if (midiData.isEmpty())
-    {
-        clearNextDelayBlock(numSamples);
-        renderVoices (outputAudio, startSample, numSamples);
-        renderDelays(outputAudio, startSample, numSamples);
-        return;
-    }
+    bool firstEvent = true;
     
     for (MidiMessageMetadata m : midiData)
     {
-        const int samplesToNextMidiMessage = m.samplePosition - startSample;
-        
-        if (numSamples <= 0)
+        if (numSamples >= 0)
         {
+            const int samplesToNextMidiMessage = m.samplePosition - startSample;
+        
+            if (samplesToNextMidiMessage >= numSamples)
+            {
+                clearNextDelayBlock(numSamples);
+                renderVoices (outputAudio, startSample, numSamples);
+                renderDelays(outputAudio, startSample, numSamples);
+                handleMidiEvent (m.getMessage());
+                break;
+            }
+            
+            if (samplesToNextMidiMessage < ((firstEvent && ! subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
+            {
+                handleMidiEvent (m.getMessage());
+                continue;
+            }
+            
+            firstEvent = false;
+            
+            clearNextDelayBlock(samplesToNextMidiMessage);
+            renderVoices (outputAudio, startSample, samplesToNextMidiMessage);
+            renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
             handleMidiEvent (m.getMessage());
-            continue;
+            
+            startSample += samplesToNextMidiMessage;
+            numSamples  -= samplesToNextMidiMessage;
         }
-    
-        if (samplesToNextMidiMessage >= numSamples)
-        {
-            clearNextDelayBlock(numSamples);
-            renderVoices (outputAudio, startSample, numSamples);
-            renderDelays(outputAudio, startSample, numSamples);
-            handleMidiEvent (m.getMessage());
-            break;
-        }
-        
-        if (samplesToNextMidiMessage < ((firstEvent && ! subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
-        {
-            handleMidiEvent (m.getMessage());
-            continue;
-        }
-        
-        firstEvent = false;
-        
-        clearNextDelayBlock(samplesToNextMidiMessage);
-        renderVoices (outputAudio, startSample, samplesToNextMidiMessage);
-        renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
-        handleMidiEvent (m.getMessage());
-        
-        startSample += samplesToNextMidiMessage;
-        numSamples  -= samplesToNextMidiMessage;
+        else handleMidiEvent (m.getMessage());
     }
     
+    clearNextDelayBlock(numSamples);
+    renderVoices (outputAudio, startSample, numSamples);
+    renderDelays(outputAudio, startSample, numSamples);
     return;
 }
 
