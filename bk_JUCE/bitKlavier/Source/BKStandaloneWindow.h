@@ -19,11 +19,6 @@
 #endif 
 
 #include "PluginProcessor.h"
-
-#if JUCE_MODULE_AVAILABLE_juce_audio_plugin_client
-extern juce::AudioProcessor* JUCE_API JUCE_CALLTYPE createPluginFilterOfType (juce::AudioProcessor::WrapperType type);
-#endif
-
     
 //==============================================================================
 /**
@@ -119,13 +114,10 @@ public:
     //==============================================================================
     virtual void createPlugin()
     {
-#if JUCE_MODULE_AVAILABLE_juce_audio_plugin_client
-        processor.reset ((BKAudioProcessor*)::createPluginFilterOfType (AudioProcessor::wrapperType_Standalone));
-#else
         AudioProcessor::setTypeOfNextNewPlugin (AudioProcessor::wrapperType_Standalone);
-        processor.reset (createPluginFilter());
+        processor.reset (new BKAudioProcessor());
         AudioProcessor::setTypeOfNextNewPlugin (AudioProcessor::wrapperType_Undefined);
-#endif
+
         jassert (processor != nullptr); // Your createPluginFilter() function must return a valid object!
         
         processor->disableNonMainBuses();

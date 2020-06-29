@@ -814,12 +814,10 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
        wrapperType == wrapperType_VST ||
        wrapperType == wrapperType_VST3) //check this on setup; if(isPlugIn) {...
     {
-        int time;
-        MidiMessage m;
-        for (MidiBuffer::Iterator i (midiMessages); i.getNextEvent (m, time);)
+        for (const MidiMessageMetadata m : midiMessages)
         {
             // kludgy, but just trying to see if this works...
-            handleIncomingMidiMessage(nullptr, m);
+            handleIncomingMidiMessage(nullptr, m.getMessage());
         }
     }
   

@@ -517,12 +517,13 @@
         <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="landscape" keepCustomXcodeSchemes="1"
-                  customXcodeResourceFolders="/Applications/bitKlavier/samples/&#10;./Source/soundfonts/&#10;&#10;"
+    <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="UIInterfaceOrientationLandscapeLeft,UIInterfaceOrientationLandscapeRight"
+                  keepCustomXcodeSchemes="1" customXcodeResourceFolders="/Applications/bitKlavier/samples/&#10;./Source/soundfonts/&#10;&#10;"
                   iosBackgroundAudio="1" iosDevelopmentTeamID="" UIFileSharingEnabled="1"
                   smallIcon="A1o3FE" bigIcon="iHGLGD" customPList="&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&#10;&lt;plist&gt;&#10;&#9;&lt;dict&gt;&#10;&#9;&#9;&lt;key&gt;CFBundleDocumentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&lt;dict&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;CFBundleTypeName&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;XML&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSHandlerRank&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;Alternate&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&lt;key&gt;LSItemContentTypes&lt;/key&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;array&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&#9;&lt;string&gt;public.xml&lt;/string&gt;&#10;&#9;&#9;&#9;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&#9;&#9;&#9;&lt;/dict&gt;&#10;&#9;&#9;&#9;&lt;/array&gt;&#10;&#9;&lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
-                  iPadScreenOrientation="landscape" iosDeviceFamily="1,2" PListPreprocess="1"
-                  iosBackgroundBle="1" iCloudPermissions="1" UISupportsDocumentBrowser="1">
+                  iPadScreenOrientation="UIInterfaceOrientationLandscapeLeft,UIInterfaceOrientationLandscapeRight"
+                  iosDeviceFamily="1,2" PListPreprocess="1" iosBackgroundBle="1"
+                  iCloudPermissions="1" UISupportsDocumentBrowser="1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        plistPreprocessorDefinitions="" iosCompatibility="9.0" enablePluginBinaryCopyStep="1"

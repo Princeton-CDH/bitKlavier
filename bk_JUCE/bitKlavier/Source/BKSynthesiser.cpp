@@ -336,40 +336,40 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
     // must set the sample rate before using this!
     jassert (processor.getCurrentSampleRate() != 0);
     
-    MidiBuffer::Iterator midiIterator (midiData);
-    midiIterator.setNextSamplePosition (startSample);
-    
     bool firstEvent = true;
-    int midiEventPos;
-    MidiMessage m;
     
     const ScopedLock sl (lock);
     
-    while (numSamples > 0)
+    if (midiData.isEmpty())
     {
+        clearNextDelayBlock(numSamples);
+        renderVoices (outputAudio, startSample, numSamples);
+        renderDelays(outputAudio, startSample, numSamples);
+        return;
+    }
+    
+    for (MidiMessageMetadata m : midiData)
+    {
+        const int samplesToNextMidiMessage = m.samplePosition - startSample;
         
-        if (! midiIterator.getNextEvent (m, midiEventPos))
+        if (numSamples <= 0)
         {
-            clearNextDelayBlock(numSamples);
-            renderVoices (outputAudio, startSample, numSamples);
-            renderDelays(outputAudio, startSample, numSamples);
-            return;
+            handleMidiEvent (m.getMessage());
+            continue;
         }
-        
-        const int samplesToNextMidiMessage = midiEventPos - startSample;
-        
+    
         if (samplesToNextMidiMessage >= numSamples)
         {
             clearNextDelayBlock(numSamples);
             renderVoices (outputAudio, startSample, numSamples);
             renderDelays(outputAudio, startSample, numSamples);
-            handleMidiEvent (m);
+            handleMidiEvent (m.getMessage());
             break;
         }
         
         if (samplesToNextMidiMessage < ((firstEvent && ! subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
         {
-            handleMidiEvent (m);
+            handleMidiEvent (m.getMessage());
             continue;
         }
         
@@ -378,16 +378,13 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         clearNextDelayBlock(samplesToNextMidiMessage);
         renderVoices (outputAudio, startSample, samplesToNextMidiMessage);
         renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
-        handleMidiEvent (m);
+        handleMidiEvent (m.getMessage());
         
         startSample += samplesToNextMidiMessage;
         numSamples  -= samplesToNextMidiMessage;
     }
     
-    while (midiIterator.getNextEvent (m, midiEventPos))
-        handleMidiEvent (m);
-    
-    
+    return;
 }
 
 // explicit template instantiation

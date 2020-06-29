@@ -97,28 +97,25 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
 
 void BKAudioProcessor::collectSoundfontsFromFolder(File folder)
 {
-    DirectoryIterator iter (File (folder), true, "*.sf2;*.sfz");
-    while (iter.next())
+    for (auto iter : RangedDirectoryIterator (File (folder), true, "*.sf2;*.sfz"))
     {
-        File soundfontFile (iter.getFile());
-
+        File soundfontFile = iter.getFile();
+        
         soundfontNames.add(soundfontFile.getFullPathName());
     }
 }
 
 void BKAudioProcessor::collectGalleriesFromFolder(File folder)
 {
-    DirectoryIterator xmlIter (File (folder), true, "*.xml");
-    while (xmlIter.next())
+    for (auto xmlIter : RangedDirectoryIterator (File (folder), true, "*.xml"))
     {
         File galleryFile (xmlIter.getFile());
-        
+
         galleryNames.add(galleryFile.getFullPathName());
     }
     
     
-    DirectoryIterator jsonIter (File (folder), true, "*.json");
-    while (jsonIter.next())
+    for (auto jsonIter : RangedDirectoryIterator (File (folder), true, "*.json"))
     {
         File galleryFile (jsonIter.getFile());
         
@@ -386,10 +383,8 @@ void BKAudioProcessor::collectPreparations(void)
     for (int i = 0; i < BKPreparationTypeNil; i++ )
     {
         File preps = file.getChildFile(cPreparationTypes[i]);
-
-        DirectoryIterator xmlIter (File(preps), true, "*.xml");
         
-        while (xmlIter.next())
+        for (auto xmlIter : RangedDirectoryIterator (File(preps), true, "*.xml"))
         {
             exportedPreparations[i]->add(xmlIter.getFile().getFileName());
         }
@@ -468,8 +463,7 @@ void BKAudioProcessor::collectPianos(void)
     
     file = file.getChildFile("pianos");
     
-    DirectoryIterator iter (File(file), true, "*.xml");
-    while (iter.next())
+    for (auto iter : RangedDirectoryIterator (File(file), true, "*.xml"))
     {
         File piano (iter.getFile());
         
