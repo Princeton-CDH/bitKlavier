@@ -83,6 +83,14 @@ bool BKConstructionSite::itemOutsideBounds(Rectangle<int> bounds)
 
 void BKConstructionSite::redraw(void)
 {
+    if (processor.prevPiano != nullptr)
+    {
+        for (auto item : processor.prevPiano->getItems())
+        {
+            item->removeMouseListener(this);
+        }
+    }
+    
     removeAllChildren();
     
     graph->deselectAll();
