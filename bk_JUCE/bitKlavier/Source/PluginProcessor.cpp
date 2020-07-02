@@ -796,11 +796,14 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
             prevPiano->prepMap->processBlock(buffer, numSamples, channel, loadingSampleType, true); // true for onlyNostalgic
     }
     
-    for(int i=0; i<notesOnUI.size(); i++)
-    {
-        handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel, cMidiInputUI);
-        notesOnUI.remove(i);
-    }
+	
+	//{
+		for (int i = 0; i < notesOnUI.size(); i++)
+		{
+			if (keystrokesEnabled) handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel, cMidiInputUI);
+			notesOnUI.remove(i);
+		}
+	//}
     
     for(int i=0; i<notesOffUI.size(); i++)
     {
@@ -1547,7 +1550,7 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     
     channel = m.getChannel();
     
-    if (m.isNoteOn())
+    if (m.isNoteOn() && keystrokesEnabled)
     {
         handleNoteOn(noteNumber, velocity, channel, sourceName);
     }

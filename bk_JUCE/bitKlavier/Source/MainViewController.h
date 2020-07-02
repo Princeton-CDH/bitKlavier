@@ -186,6 +186,9 @@ private:
     bool keyPressed (const KeyPress& e, Component*) override;
     
     bool isAddingFromMidiInput;
+
+	bool hotkeysEnabled;
+	bool keystrokesEnabled;
     
     TextButton preferencesButton;
 

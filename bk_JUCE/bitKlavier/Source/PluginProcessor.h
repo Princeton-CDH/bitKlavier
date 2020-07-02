@@ -349,6 +349,8 @@ public:
     inline bool areTooltipsEnabled(void) { return tooltipsEnabled.getValue(); }
     inline Value getTooltipsEnabled(void) { return tooltipsEnabled; }
     inline void setTooltipsEnabled(bool enabled) { tooltipsEnabled.setValue(enabled); }
+
+	inline void setKeystrokeEnabled(bool enabled) { keystrokesEnabled = enabled; }
     
 private:
     double currentSampleRate;
@@ -387,6 +389,8 @@ private:
     BKAudioProcessorEditor* editor;
     
     Value tooltipsEnabled;
+
+	bool keystrokesEnabled;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

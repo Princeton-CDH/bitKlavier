@@ -24,7 +24,9 @@ overtop(p, &theGraph),
 splash(p),
 timerCallbackCount(0),
 tooltipsButton("Show tooltips"),
-globalSoundSetButton("Use global samples")
+globalSoundSetButton("Use global samples"),
+hotkeysEnabled(true),
+keystrokesEnabled(true)
 //preferencesButton ("Preferences")
 {
     if (processor.platform == BKIOS)    display = DisplayConstruction;
@@ -533,176 +535,190 @@ void MainViewController::handleNoteOff(BKKeymapKeyboardState* source, int midiNo
 bool MainViewController::keyPressed (const KeyPress& e, Component*)
 {
     int code = e.getKeyCode();
-    
-    if (code == KeyPress::escapeKey)
-    {
-        BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
-        if(currentDisplay == DisplayDirect)
-        {
-            if(overtop.dvc.getSubWindowInFront()) overtop.dvc.closeSubWindow();
-            else processor.updateState->setCurrentDisplay(DisplayNil);
-        }
-        else if(currentDisplay == DisplayNostalgic)
-        {
-            if(overtop.nvc.getSubWindowInFront()) overtop.nvc.closeSubWindow();
-            else processor.updateState->setCurrentDisplay(DisplayNil);
-        }
-        else if(currentDisplay == DisplaySynchronic)
-        {
-            if(overtop.svc.getSubWindowInFront()) overtop.svc.closeSubWindow();
-            else processor.updateState->setCurrentDisplay(DisplayNil);
-        }
-        else if (currentDisplay == DisplayKeymap)
-        {
-            Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-            keymap->setMidiEdit(false);
-            processor.updateState->setCurrentDisplay(DisplayNil);
-        }
-        else processor.updateState->setCurrentDisplay(DisplayNil);
-    }
-    else if (code == KeyPress::deleteKey)
-    {
-        construction.deleteSelected();
-    }
-    else if (code == KeyPress::backspaceKey)
-    {
-        construction.deleteSelected();
-    }
-    else if (code == KeyPress::upKey)
-    {
-        if (e.getModifiers().isCommandDown())   construction.align(0);
-        else                                    construction.move(0, e.getModifiers().isShiftDown());
-    }
-    else if (code == KeyPress::rightKey)
-    {
-        if (processor.updateState->currentDisplay == DisplayNil)
-        {
-            if (e.getModifiers().isCommandDown())   construction.align(1);
-            else                                    construction.move(1, e.getModifiers().isShiftDown());
-        }
-        else
-        {
-            overtop.arrowPressed(RightArrow);
-        }
-    }
-    else if (code == KeyPress::downKey)
-    {
-        
-            if (e.getModifiers().isCommandDown())   construction.align(2);
-            else                                    construction.move(2, e.getModifiers().isShiftDown());
-        
-        
-    }
-    else if (code == KeyPress::leftKey)
-    {
-        if (processor.updateState->currentDisplay == DisplayNil)
-        {
-            
-            if (e.getModifiers().isCommandDown())   construction.align(3);
-            else                                    construction.move(3, e.getModifiers().isShiftDown());
-        }
-        else
-        {
-            overtop.arrowPressed(LeftArrow);
-        }
-    }
-    else if (code == KeyPress::tabKey)
-    {
-        
-    }
-    else if (code == 65) // A all
-    {
-        if (e.getModifiers().isCommandDown())   construction.selectAll();
-    }
-    else if (code == 66) // B blendronic
-    {
-        construction.addItem(PreparationTypeBlendronic);
-    }
-    else if (code == 67) // C modification
-    {
-        if (e.getModifiers().isCommandDown())   construction.copy();
-        else                                    construction.addItem(PreparationTypeGenericMod);
-    }
-    else if (code == 68) // D direct
-    {
-        construction.addItem(PreparationTypeDirect);
-    }
-    else if (code == 75) // K keymap
-    {
-        construction.addItem(PreparationTypeKeymap);
-    }
-    else if (code == 77) // M tempo
-    {
-        construction.addItem(PreparationTypeTempo);
-    }
-    else if (code == 78) // N nostalgic
-    {
-        construction.addItem(PreparationTypeNostalgic);
-    }
-    else if (code == 80) // P piano
-    {
-        construction.addItem(PreparationTypePianoMap);
-    }
-    else if (code == 81) // Q comment
-    {
-        construction.addItem(PreparationTypeComment);
-    }
-    else if (code == 82) // R reset
-    {
-        construction.addItem(PreparationTypeReset);
-    }
-    else if (code == 83) // S synchronic
-    {
-        if (e.getModifiers().isCommandDown())
-        {
-            if (e.getModifiers().isShiftDown() || processor.defaultLoaded) 
-                processor.saveCurrentGalleryAs();
-            else processor.saveCurrentGallery();
-        }
-        else                                    construction.addItem(PreparationTypeSynchronic);
-    }
-    else if (code == 84) // T tuning
-    {
-        construction.addItem(PreparationTypeTuning);
-    }
-    else if (code == 86) // V
-    {
-        if (e.getModifiers().isCommandDown())   construction.paste();
-    }
-    else if (code == 88) // X
-    {
-        if (e.getModifiers().isCommandDown())   construction.cut();
-    }
-    else if (code == 90) // Z
-    {
 
-    }
-    else if (code == 69) // E
-    {
-        if (e.getModifiers().isCommandDown())
-        {
-            if (processor.updateState->currentDisplay == DisplayKeymap)
-            {
-                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-                ToggleButton* midiEditToggle = overtop.kvc.getMidiEditToggle();
-                midiEditToggle->setToggleState(!midiEditToggle->getToggleState(), dontSendNotification);
-                keymap->setMidiEdit(midiEditToggle->getToggleState());
-            }
-        }
-    }
-    else if (code == 85) // U
-    {
-        construction.connectAllSelected();
-    }
-    else if (code == 73) // I
-    {
-        construction.removeConnectionsBetween();
-    }
-    else if (code == 79) // O
-    {
-        construction.removeConnectionsTo();
-    }
-    
+	if (hotkeysEnabled)
+	{
+
+		if (code == KeyPress::escapeKey)
+		{
+			BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
+			if (currentDisplay == DisplayDirect)
+			{
+				if (overtop.dvc.getSubWindowInFront()) overtop.dvc.closeSubWindow();
+				else processor.updateState->setCurrentDisplay(DisplayNil);
+			}
+			else if (currentDisplay == DisplayNostalgic)
+			{
+				if (overtop.nvc.getSubWindowInFront()) overtop.nvc.closeSubWindow();
+				else processor.updateState->setCurrentDisplay(DisplayNil);
+			}
+			else if (currentDisplay == DisplaySynchronic)
+			{
+				if (overtop.svc.getSubWindowInFront()) overtop.svc.closeSubWindow();
+				else processor.updateState->setCurrentDisplay(DisplayNil);
+			}
+			else if (currentDisplay == DisplayKeymap)
+			{
+				Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+				keymap->setMidiEdit(false);
+				processor.updateState->setCurrentDisplay(DisplayNil);
+			}
+			else processor.updateState->setCurrentDisplay(DisplayNil);
+		}
+		else if (code == KeyPress::deleteKey)
+		{
+			construction.deleteSelected();
+		}
+		else if (code == KeyPress::backspaceKey)
+		{
+			construction.deleteSelected();
+		}
+		else if (code == KeyPress::upKey)
+		{
+			if (e.getModifiers().isCommandDown())   construction.align(0);
+			else                                    construction.move(0, e.getModifiers().isShiftDown());
+		}
+		else if (code == KeyPress::rightKey)
+		{
+			if (processor.updateState->currentDisplay == DisplayNil)
+			{
+				if (e.getModifiers().isCommandDown())   construction.align(1);
+				else                                    construction.move(1, e.getModifiers().isShiftDown());
+			}
+			else
+			{
+				overtop.arrowPressed(RightArrow);
+			}
+		}
+		else if (code == KeyPress::downKey)
+		{
+
+			if (e.getModifiers().isCommandDown())   construction.align(2);
+			else                                    construction.move(2, e.getModifiers().isShiftDown());
+
+
+		}
+		else if (code == KeyPress::leftKey)
+		{
+			if (processor.updateState->currentDisplay == DisplayNil)
+			{
+
+				if (e.getModifiers().isCommandDown())   construction.align(3);
+				else                                    construction.move(3, e.getModifiers().isShiftDown());
+			}
+			else
+			{
+				overtop.arrowPressed(LeftArrow);
+			}
+		}
+		else if (code == KeyPress::tabKey)
+		{
+
+		}
+		else if (code == 65) // A all
+		{
+			if (e.getModifiers().isCommandDown())   construction.selectAll();
+		}
+		else if (code == 66) // B blendronic
+		{
+			construction.addItem(PreparationTypeBlendronic);
+		}
+		else if (code == 67) // C modification
+		{
+			if (e.getModifiers().isCommandDown())   construction.copy();
+			else                                    construction.addItem(PreparationTypeGenericMod);
+		}
+		else if (code == 68) // D direct
+		{
+			construction.addItem(PreparationTypeDirect);
+		}
+		else if (code == 75) // K keymap
+		{
+			if (e.getModifiers().isCommandDown()) 
+			{
+				keystrokesEnabled = !keystrokesEnabled; //maybe don't even both keeping track of it here and just move the toggling into pluginProcessor?
+				processor.setKeystrokeEnabled(keystrokesEnabled);
+			}
+			else construction.addItem(PreparationTypeKeymap); //check that command isn't down because CTRL+K will enable/disable keystrokes eventually
+		}
+		else if (code == 77) // M tempo
+		{
+			construction.addItem(PreparationTypeTempo);
+		}
+		else if (code == 78) // N nostalgic
+		{
+			construction.addItem(PreparationTypeNostalgic);
+		}
+		else if (code == 80) // P piano
+		{
+			construction.addItem(PreparationTypePianoMap);
+		}
+		else if (code == 81) // Q comment
+		{
+			construction.addItem(PreparationTypeComment);
+		}
+		else if (code == 82) // R reset
+		{
+			construction.addItem(PreparationTypeReset);
+		}
+		else if (code == 83) // S synchronic
+		{
+			if (e.getModifiers().isCommandDown())
+			{
+				if (e.getModifiers().isShiftDown() || processor.defaultLoaded)
+					processor.saveCurrentGalleryAs();
+				else processor.saveCurrentGallery();
+			}
+			else                                    construction.addItem(PreparationTypeSynchronic);
+		}
+		else if (code == 84) // T tuning
+		{
+			construction.addItem(PreparationTypeTuning);
+		}
+		else if (code == 86) // V
+		{
+			if (e.getModifiers().isCommandDown())   construction.paste();
+		}
+		else if (code == 88) // X
+		{
+			if (e.getModifiers().isCommandDown())   construction.cut();
+		}
+		else if (code == 90) // Z
+		{
+
+		}
+		else if (code == 69) // E
+		{
+			if (e.getModifiers().isCommandDown())
+			{
+				if (processor.updateState->currentDisplay == DisplayKeymap)
+				{
+					Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+					ToggleButton* midiEditToggle = overtop.kvc.getMidiEditToggle();
+					midiEditToggle->setToggleState(!midiEditToggle->getToggleState(), dontSendNotification);
+					keymap->setMidiEdit(midiEditToggle->getToggleState());
+				}
+			}
+		}
+		else if (code == 85) // U
+		{
+			construction.connectAllSelected();
+		}
+		else if (code == 73) // I
+		{
+			construction.removeConnectionsBetween();
+		}
+		else if (code == 79) // O
+		{
+			construction.removeConnectionsTo();
+		}
+	}
+
+	if (code == 72) //CTRL + H toggles hotkeys on or off
+	{
+		if (e.getModifiers().isCommandDown()) hotkeysEnabled = !hotkeysEnabled;
+	}
+
     return true;
 }
 
