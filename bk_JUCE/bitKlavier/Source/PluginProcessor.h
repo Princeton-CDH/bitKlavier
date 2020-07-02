@@ -188,8 +188,14 @@ public:
     
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m) override;
     
-    inline const Array<String> getDefaultMidiInputSources(void) { return defaultMidiInputSources; }
-    inline void setDefaultMidiInputSources(Array<String> sources) { defaultMidiInputSources = sources; }
+//    inline const Array<MidiDeviceInfo> getDefaultMidiInputDevices(void) { return defaultMidiInputDevices; }
+//    inline void setDefaultMidiInputDevices(Array<MidiDeviceInfo> sources) { defaultMidiInputDevices = sources; }
+    
+    inline const Array<String> getDefaultMidiInputNames(void) { return defaultMidiInputNames; }
+    inline void setDefaultMidiInputNames(Array<String> names) { defaultMidiInputNames = names; }
+    
+    inline const Array<String> getDefaultMidiInputIdentifiers(void) { return defaultMidiInputIdentifiers; }
+    inline void setDefaultMidiInputIdentifiers(Array<String> identifiers) { defaultMidiInputIdentifiers = identifiers; }
     
     //==============================================================================
     int loadSamples(BKSampleLoadType type, String path ="", int subsound=0, bool updateGlobalSet=true);
@@ -379,10 +385,9 @@ private:
     AudioPlayHead::CurrentPositionInfo currentPositionInfo;
     double hostTempo;
     
-    Array<MidiDeviceInfo> midiInputDevices;
-    
     bool midiReady;
-    Array<String> defaultMidiInputSources;
+    Array<String> defaultMidiInputNames;
+    Array<String> defaultMidiInputIdentifiers;
     
     BKAudioProcessorEditor* editor;
     

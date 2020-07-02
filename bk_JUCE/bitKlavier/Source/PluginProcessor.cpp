@@ -356,8 +356,6 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     #endif
         }
     }
-    
-    midiInputDevices = getMidiInputDevices();
 }
 
 BKAudioProcessor::~BKAudioProcessor()
@@ -525,14 +523,14 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     {
         for (auto km : pmap->getKeymaps())
         {
-            if (km->getAllMidiInputSources().contains(source))
+            if (km->getAllMidiInputIdentifiers().contains(source))
             {
                 activeSource = true;
             }
         }
     }
     
-    if (activeSource || getDefaultMidiInputSources().contains(source))
+    if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
     {
         ++noteOnCount;
         noteOn.set(noteNumber, true);
@@ -547,7 +545,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     {
         for (auto keymap : pmap.keymaps)
         {
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 int whichPiano = pmap.pianoTarget;
                 if (whichPiano > 0 && whichPiano != currentPiano->getId())
@@ -603,14 +601,14 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     {
         for (auto km : pmap->getKeymaps())
         {
-            if (km->getAllMidiInputSources().contains(source))
+            if (km->getAllMidiInputIdentifiers().contains(source))
             {
                 activeSource = true;
             }
         }
     }
     
-    if (activeSource || getDefaultMidiInputSources().contains(source))
+    if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
     {
         noteOn.set(noteNumber, false);
         --noteOnCount;
@@ -637,7 +635,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         activeSource = false;
         for (auto km : pmap->getKeymaps())
         {
-            if (km->getAllMidiInputSources().contains(source))
+            if (km->getAllMidiInputIdentifiers().contains(source))
             {
                 activeSource = true;
             }
@@ -921,7 +919,7 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
         {
             Keymap::Ptr keymap = gallery->getKeymap(Id);
             
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 currentPiano->getDirectProcessor(reset.prepId)->reset();
                 updateState->directPreparationDidChange = true;
@@ -935,7 +933,7 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
         {
             Keymap::Ptr keymap = gallery->getKeymap(Id);
             
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 currentPiano->getSynchronicProcessor(reset.prepId)->reset();
                 updateState->synchronicPreparationDidChange = true;
@@ -949,7 +947,7 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
         {
             Keymap::Ptr keymap = gallery->getKeymap(Id);
             
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 currentPiano->getNostalgicProcessor(reset.prepId)->reset();
                 updateState->nostalgicPreparationDidChange = true;
@@ -963,7 +961,7 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
         {
             Keymap::Ptr keymap = gallery->getKeymap(Id);
             
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 currentPiano->getBlendronicProcessor(reset.prepId)->reset();
                 updateState->blendronicPreparationDidChange = true;
@@ -977,7 +975,7 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
         {
             Keymap::Ptr keymap = gallery->getKeymap(Id);
             
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 currentPiano->getTuningProcessor(reset.prepId)->reset();
                 updateState->tuningPreparationDidChange = true;
@@ -991,7 +989,7 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
         {
             Keymap::Ptr keymap = gallery->getKeymap(Id);
             
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 currentPiano->getTempoProcessor(reset.prepId)->reset();
                 updateState->tempoPreparationDidChange = true;
@@ -1011,7 +1009,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
         
         for (auto keymap : mod->getKeymaps())
         {
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
@@ -1032,7 +1030,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
         
         for (auto keymap : mod->getKeymaps())
         {
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
@@ -1053,7 +1051,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
         
         for (auto keymap : mod->getKeymaps())
         {
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
@@ -1074,7 +1072,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
         
         for (auto keymap : mod->getKeymaps())
         {
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
@@ -1095,7 +1093,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
         
         for (auto keymap : mod->getKeymaps())
         {
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
@@ -1116,7 +1114,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
         
         for (auto keymap : mod->getKeymaps())
         {
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
@@ -1541,19 +1539,19 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     int noteNumber = m.getNoteNumber();
     float velocity = m.getFloatVelocity();
     
-    String sourceName;
-    if(source != nullptr) sourceName = source->getName();
-    else sourceName = cMidiInputDAW;
+    String sourceIdentifier;
+    if(source != nullptr) sourceIdentifier = source->getIdentifier();
+    else sourceIdentifier = cMidiInputDAW;
     
     channel = m.getChannel();
     
     if (m.isNoteOn())
     {
-        handleNoteOn(noteNumber, velocity, channel, sourceName);
+        handleNoteOn(noteNumber, velocity, channel, sourceIdentifier);
     }
     else if (m.isNoteOff())
     {
-        handleNoteOff(noteNumber, velocity, channel, sourceName);
+        handleNoteOff(noteNumber, velocity, channel, sourceIdentifier);
         //didNoteOffs = true;
     }
     
