@@ -669,7 +669,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
         
-#if (JUCE_MAC)
+#if (JUCE_MAC || JUCE_IOS)
         bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 		char divChar = '/';
 #endif
@@ -682,7 +682,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         int id = numberOfDefaultGalleryItems, index = 0;
         
-		StringArray nameStack; // used for naviagting between levels of submenu during loading
+		StringArray nameStack; //used for naviagting between levels of submenu during loading
 		OwnedArray<PopupMenu> submenus; //2d arrray of submenus modelling the recursive depth of submenu connections
 		StringArray submenuNames; //lists the submenu names so far; used to check against 
 		OwnedArray<Array<int>> parentIds; //2d int array used to record recursive depth of indices for parent menus
