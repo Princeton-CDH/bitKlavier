@@ -48,10 +48,12 @@ notePlayed(false)
     }
     
     velocities.ensureStorageAllocated(128);
+    velocitiesActive.ensureStorageAllocated(128);
     holdTimers.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
         velocities.insert(i, 0.);
+        velocitiesActive.insert(i, 0);
         holdTimers.insert(i, 0);
     }
 
@@ -235,18 +237,35 @@ bool SynchronicProcessor::holdCheck(int noteNumber)
 
 void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<KeymapTargetState> targetStates)
 {
-    // check velocity filtering
-    if (!velocityCheck(noteNumber)) return;
     
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
     lastKeyPressed = noteNumber;
     lastKeyVelocity = velocity;
     
+    // reset the timer for hold time checks
+    holdTimers.set(noteNumber, 0);
+    
+    // check velocity filtering
+    //  need to save old velocity, in case this new velocity failes the velocity test
+    float velocitySave = velocitiesActive.getUnchecked(noteNumber);
+    
+    // save this velocity, for velocity checks, here and in keyRelease()
+    velocities.set(noteNumber, velocity); // used for velocity checks
+    
+    // save this as the active velocity, for playback as well
+    velocitiesActive.set(noteNumber, velocity); // used for actual note playback velocity
+    
+    // check the velocity
+    if (!velocityCheck(noteNumber))
+    {
+        // need to set the active velocity back to what it was, since we're going to ignore this one
+        velocitiesActive.set(noteNumber, velocitySave);
+        return;
+    }
+    
     // add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
-    velocities.set(noteNumber, velocity);
-    holdTimers.set(noteNumber, 0);
     
     // track the note's target, as set in Keymap
     /*
@@ -446,10 +465,6 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
 
 void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel, Array<KeymapTargetState> targetStates)
 {
-    // do velocity and hold-time filtering (how long the key was held down)
-    if (!velocityCheck(noteNumber)) return;
-    if (!holdCheck(noteNumber)) return;
-    
     SynchronicPreparation::Ptr prep = synchronic->aPrep;
     
     // remove key from array of pressed keys
@@ -473,6 +488,10 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
 
     // remove key from cluster-targeted keys
     if (doCluster) clusterKeysDepressed.removeAllInstancesOf(noteNumber);
+    
+    // do velocity and hold-time filtering (how long the key was held down)
+    if (!velocityCheck(noteNumber)) return;
+    if (!holdCheck(noteNumber)) return;
     
     // always work on the most recent cluster/layer
     SynchronicCluster::Ptr cluster = clusters.getLast();
@@ -744,7 +763,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                     {
                         playNote(channel,
                                  slimCluster[n],
-                                 velocities.getUnchecked(slimCluster[n]),
+                                 velocitiesActive.getUnchecked(slimCluster[n]),
                                  cluster);
                     }
                 }

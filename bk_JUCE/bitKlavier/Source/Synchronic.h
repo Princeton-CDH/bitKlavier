@@ -1683,13 +1683,13 @@ public:
     
     inline const float getHoldTimer() const noexcept
     {
-        if(keysDepressed.size() == 0 ) return 0;
+        // if(keysDepressed.size() == 0 ) return 0;
         return 1000. * holdTimers[lastKeyPressed] / synth->getSampleRate() ;
     }
     
     inline const float getLastVelocity() const noexcept
     {
-        if(keysDepressed.size() == 0 ) return 0;
+        // if(keysDepressed.size() == 0 ) return 0;
         return lastKeyVelocity;
     }
     
@@ -1824,6 +1824,7 @@ private:
     
     void playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster);
     Array<float> velocities;    //record of velocities
+    Array<float> velocitiesActive;
     Array<int> keysDepressed;   //current keys that are depressed
     Array<int> syncKeysDepressed;
     Array<int> clusterKeysDepressed;
