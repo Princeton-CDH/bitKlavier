@@ -191,6 +191,8 @@ private:
 
     ToggleButton tooltipsButton;
     
+    ToggleButton globalSoundSetButton;
+    
     BKButtonAndMenuLAF laf;
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
     BKWindowLAF windowLAF;

@@ -169,7 +169,7 @@ void Piano::configure(void)
                 
                 if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo) || targetType == PreparationTypeBlendronic)
                 {
-                    DBG(String(targetType) + " linked with keymap");
+                    // DBG(String(targetType) + " linked with keymap");
                     linkPreparationWithKeymap(targetType, targetId, Id);
                 }
                 else if ((targetType >= PreparationTypeDirectMod && targetType <= PreparationTypeTempoMod) || targetType == PreparationTypeBlendronicMod)
@@ -738,7 +738,7 @@ void Piano::configureModification(BKItem::Ptr map)
     
     Array<int> whichKeymaps = map->getConnectionIdsOfType(PreparationTypeKeymap);
     
-    DBG("keymaps: " + intArrayToString(whichKeymaps) + " preps: " + intArrayToString(whichPreps));
+    // DBG("keymaps: " + intArrayToString(whichKeymaps) + " preps: " + intArrayToString(whichPreps));
     
     if (modType == BKPreparationTypeNil) return;
     else if (modType == PreparationTypeDirectMod)
@@ -1031,7 +1031,7 @@ ValueTree Piano::getState(void)
 }
 #define LOAD_VERSION 0
 
-void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap)
+void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap, int* idcounts)
 {
     int i = 0;
     
@@ -1139,27 +1139,34 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap)
                     
                     i = connection->getStringAttribute("Id").getIntValue();
                     int cId = i;
+                    int oldId = cId;
                     
-                    if (idmap->getUnchecked(cType)->contains(cId))
+                    if (idmap->getUnchecked(cType)->contains(oldId))
                     {
-                        cId = idmap->getUnchecked(cType)->getReference(cId);
+                        cId = idmap->getUnchecked(cType)->getReference(oldId);
+                    }
+                    else
+                    {
+                        cId = idcounts[cType]++;
+                        idmap->getUnchecked(cType)->set(oldId, cId);
                     }
                     
                     i = connection->getStringAttribute("piano").getIntValue();
                     int cPiano = i;
-                    DBG("conn piano target old: " + String(cPiano));
+                    // DBG("conn piano target old: " + String(cPiano));
                     
                     if (idmap->getUnchecked(PreparationTypePiano)->contains(cPiano))
                     {
                         cPiano = idmap->getUnchecked(PreparationTypePiano)->getReference(cPiano);
                     }
                     
-                    DBG("conn piano target new: " + String(cPiano));
+                    // DBG("conn piano target new: " + String(cPiano));
                     
                     thisConnection = itemWithTypeAndId(cType, cId);
                     
                     if (thisConnection == nullptr)
                     {
+                        
                         thisConnection = new BKItem(cType, cId, processor);
                         
                         thisConnection->setItemName(connection->getStringAttribute("name"));

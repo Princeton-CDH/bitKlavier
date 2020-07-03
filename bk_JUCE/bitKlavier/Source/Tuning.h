@@ -293,7 +293,7 @@ public:
         return tCustomCents;
     }
     
-    inline void setName(String n)                                           {name = n; DBG("set tuning name " + name);}
+    inline void setName(String n)                                           {name = n; } // DBG("set tuning name " + name);}
     inline void setScale(TuningSystem tuning)
     {
         if (tuning != AdaptiveTuning && tuning != AdaptiveAnchoredTuning)

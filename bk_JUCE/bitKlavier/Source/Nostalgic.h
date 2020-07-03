@@ -65,7 +65,9 @@ public:
     velocityMin(p->getVelocityMin()),
     velocityMax(p->getVelocityMax()),
     keyOnReset(p->getKeyOnReset()),
-    targetTypeNostalgicClear(p->getTargetTypeNostalgicClear())
+    targetTypeNostalgicClear(p->getTargetTypeNostalgicClear()),
+    nUseGlobalSoundSet(p->getUseGlobalSoundSet()),
+    nSoundSet(p->getSoundSet())
     {
         
     }
@@ -86,7 +88,9 @@ public:
     nGain(gain),
     nLengthMultiplier(lengthMultiplier),
     nBeatsToSkip(beatsToSkip),
-    nMode(mode)
+    nMode(mode),
+    nUseGlobalSoundSet(true),
+    nSoundSet(-1)
     {
         holdMin = 0;
         holdMax = 12000;
@@ -126,7 +130,9 @@ public:
     velocityMin(0),
     velocityMax(127),
     keyOnReset(false),
-    targetTypeNostalgicClear(NoteOn)
+    targetTypeNostalgicClear(NoteOn),
+    nUseGlobalSoundSet(true),
+    nSoundSet(-1)
     {
 
     }
@@ -164,6 +170,8 @@ public:
         velocityMin = n->getVelocityMin();
         velocityMax = n->getVelocityMax();
         targetTypeNostalgicClear = n->getTargetTypeNostalgicClear();
+        nUseGlobalSoundSet = n->getUseGlobalSoundSet();
+        nSoundSet = n->getSoundSet();
     }
     
     inline void performModification(NostalgicPreparation::Ptr n, Array<bool> dirty)
@@ -415,6 +423,9 @@ public:
         }
         prep.addChild(undertowADSRvals, -1, 0);
         
+        prep.setProperty( ptagNostalgic_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
+        prep.setProperty( ptagNostalgic_soundSet, getSoundSetName(), 0);
+        
         return prep;
     }
     
@@ -505,6 +516,13 @@ public:
         String str = e->getStringAttribute(ptagNostalgic_transpUsesTuning);
         if (str != "") setTranspUsesTuning((bool) str.getIntValue());
         else setTranspUsesTuning(false);
+        
+        str = e->getStringAttribute(ptagNostalgic_useGlobalSoundSet);
+        if (str != "") setUseGlobalSoundSet((bool) str.getIntValue());
+        else setUseGlobalSoundSet(true);
+        
+        str = e->getStringAttribute(ptagNostalgic_soundSet);
+        setSoundSetName(str);
         
         
         // HOLD MIN / MAX
@@ -599,6 +617,14 @@ public:
         
     }
     
+    inline void setUseGlobalSoundSet(bool use) { nUseGlobalSoundSet = use; }
+    inline void setSoundSet(int Id) { nSoundSet = Id; }
+    inline void setSoundSetName(String name) { nSoundSetName = name; }
+    
+    inline bool getUseGlobalSoundSet(void) { return nUseGlobalSoundSet; }
+    inline int getSoundSet(void) { return nUseGlobalSoundSet ? -1 : nSoundSet; }
+    inline String getSoundSetName(void) { return nSoundSetName; }
+    
     
 private:
     String name;
@@ -637,6 +663,10 @@ private:
     
     // internal keymap for resetting internal values to static
     // Keymap::Ptr resetMap = new Keymap(0);
+    
+    bool nUseGlobalSoundSet;
+    int nSoundSet;
+    String nSoundSetName;
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };

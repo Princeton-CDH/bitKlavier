@@ -52,8 +52,7 @@ BKViewController::~BKViewController()
 
 PopupMenu BKViewController::getExportedPrepsMenu(BKPreparationType type)
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     StringArray* names = processor.exportedPreparations[type];
     for (int i = 0; i < names->size(); i++)
@@ -66,8 +65,7 @@ PopupMenu BKViewController::getExportedPrepsMenu(BKPreparationType type)
 
 PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type, bool singlePrep)
 {
-    PopupMenu optionMenu;
-    optionMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu optionMenu;
     
     optionMenu.addItem(1, "New");
     optionMenu.addItem(2, "Duplicate");
@@ -88,8 +86,7 @@ PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type, bool singl
 
 PopupMenu BKViewController::getModOptionMenu(BKPreparationType type, bool singleMod)
 {
-    PopupMenu optionMenu;
-    optionMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu optionMenu;
     
     optionMenu.addItem(1, "New");
     optionMenu.addItem(2, "Duplicate");

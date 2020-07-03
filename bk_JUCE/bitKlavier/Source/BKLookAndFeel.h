@@ -11,9 +11,7 @@
 #ifndef BKLOOKANDFEEL_H_INCLUDED
 #define BKLOOKANDFEEL_H_INCLUDED
 
-#include "BKUtilities.h"
-
-
+#include "../JuceLibraryCode/JuceHeader.h"
 
 class BKTextFieldLAF : public LookAndFeel_V3
 {
@@ -70,7 +68,7 @@ public:
     
     ~BKButtonAndMenuLAF()
     {
-        setDefaultLookAndFeel(nullptr);
+//         setDefaultLookAndFeel(nullptr);
     }
     
     void drawButtonBackground (Graphics&, Button&, const Colour& backgroundColour,

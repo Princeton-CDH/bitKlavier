@@ -81,7 +81,9 @@ public:
     targetTypeSynchronicDeleteOldest(p->getTargetTypeSynchronicDeleteOldest()),
     targetTypeSynchronicDeleteNewest(p->getTargetTypeSynchronicDeleteNewest()),
     targetTypeSynchronicRotate(p->getTargetTypeSynchronicRotate()),
-    midiOutput(p->getMidiOutput())
+    midiOutput(p->getMidiOutput()),
+    sUseGlobalSoundSet(p->getUseGlobalSoundSet()),
+    sSoundSet(p->getSoundSet())
     {
         
     }
@@ -130,7 +132,9 @@ public:
     targetTypeSynchronicDeleteOldest(NoteOn),
     targetTypeSynchronicDeleteNewest(NoteOn),
     targetTypeSynchronicRotate(NoteOn),
-    midiOutput(nullptr)
+    midiOutput(nullptr),
+    sUseGlobalSoundSet(true),
+    sSoundSet(-1)
     {
         
     }
@@ -173,7 +177,9 @@ public:
     targetTypeSynchronicDeleteOldest(NoteOn),
     targetTypeSynchronicDeleteNewest(NoteOn),
     targetTypeSynchronicRotate(NoteOn),
-    midiOutput(nullptr)
+    midiOutput(nullptr),
+    sUseGlobalSoundSet(true),
+    sSoundSet(-1)
     {
         sTransposition.ensureStorageAllocated(1);
         sTransposition.add(Array<float>({0.0}));
@@ -230,6 +236,9 @@ public:
         targetTypeSynchronicRotate = s->getTargetTypeSynchronicRotate();
         
         midiOutput = s->getMidiOutput();
+        
+        sUseGlobalSoundSet = s->getUseGlobalSoundSet();
+        sSoundSet = s->getSoundSet();
     }
     
     inline void performModification(SynchronicPreparation::Ptr s, Array<bool> dirty)
@@ -726,7 +735,7 @@ public:
     inline void setNumClusters(int c)
     {
         numClusters = c;
-        DBG("setNumClusters = " + String(c));
+        // DBG("setNumClusters = " + String(c));
     }
     
     inline int getNumClusters(void)
@@ -757,7 +766,7 @@ public:
         setRelease(which, oneADSR[3]);
         if(oneADSR[4] > 0 || which==0) setEnvelopeOn(which, true);
         else setEnvelopeOn(which, false);
-        DBG("ADSR envelopeOn = " + String(which) + " " + String((int)getEnvelopeOn(which)));
+        // DBG("ADSR envelopeOn = " + String(which) + " " + String((int)getEnvelopeOn(which)));
         
     }
     
@@ -914,6 +923,9 @@ public:
         }
         prep.addChild(ADSRs, -1, 0);
         
+        prep.setProperty( ptagSynchronic_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
+        prep.setProperty( ptagSynchronic_soundSet, getSoundSetName(), 0);
+        
         return prep;
     }
     
@@ -1003,6 +1015,14 @@ public:
         String str = e->getStringAttribute(ptagSynchronic_transpUsesTuning);
         if (str != "") setTranspUsesTuning((bool) str.getIntValue());
         else setTranspUsesTuning(false);
+        
+        str = e->getStringAttribute(ptagSynchronic_useGlobalSoundSet);
+        if (str != "") setUseGlobalSoundSet((bool) str.getIntValue());
+        else setUseGlobalSoundSet(true);
+        
+        str = e->getStringAttribute(ptagSynchronic_soundSet);
+        setSoundSetName(str);
+        
  
         forEachXmlChildElement (*e, sub)
         {
@@ -1200,6 +1220,14 @@ public:
         }
     }
     
+    inline void setUseGlobalSoundSet(bool use) { sUseGlobalSoundSet = use; }
+    inline void setSoundSet(int Id) { sSoundSet = Id; }
+    inline void setSoundSetName(String name) { sSoundSetName = name; }
+    
+    inline bool getUseGlobalSoundSet(void) { return sUseGlobalSoundSet; }
+    inline int getSoundSet(void) { return sUseGlobalSoundSet ? -1 : sSoundSet; }
+    inline String getSoundSetName(void) { return sSoundSetName; }
+    
 private:
     String name;
     float sTempo;
@@ -1255,6 +1283,10 @@ private:
     TargetNoteMode targetTypeSynchronicRotate;
 
     std::shared_ptr<MidiOutput> midiOutput;
+    
+    bool sUseGlobalSoundSet;
+    int sSoundSet;
+    String sSoundSetName;
 
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
@@ -1536,7 +1568,7 @@ public:
         if(prep->getTransposition().size() > 0)     transpCounter           = mod(idx, prep->getTransposition().size());
         if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = mod(idx, prep->getEnvelopesOn().size());
 
-        DBG("beatMultiplierCounter = " + String(beatMultiplierCounter));
+        // DBG("beatMultiplierCounter = " + String(beatMultiplierCounter));
 
         beatCounter             = 0;
     }
@@ -1547,7 +1579,7 @@ public:
     
     inline void addNote(int note)
     {
-        DBG("adding note: " + String(note));
+        // DBG("adding note: " + String(note));
         cluster.insert(0, note);
     }
     

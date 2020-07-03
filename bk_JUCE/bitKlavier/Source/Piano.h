@@ -229,7 +229,7 @@ public:
     
     ValueTree getState(void);
     
-    void setState(XmlElement* e, OwnedArray<HashMap<int,int>> *idmap);
+    void setState(XmlElement* e, OwnedArray<HashMap<int,int>> *idmap, int* idcounts);
     
     String modificationMapsToString(void)
     {
@@ -282,6 +282,7 @@ public:
     void configureReset(BKItem::Ptr item);
 
     void configureModification(BKItem::Ptr map);
+
     
     void reset(void);
 private:
@@ -377,6 +378,19 @@ private:
 
     JUCE_LEAK_DETECTOR(Piano)
 };
+
+/*class PianoComparator : public ReferenceCountedObject
+{
+public:
+	//currently compares by name as to enable "reodering" by changing name
+	int compareElements(Piano::Ptr first, Piano::Ptr second)
+	{
+		int compareResult = first->getName().compare(second->getName());
+		if (compareResult > 1) return 1;
+		else if (compareResult < 1) return -1;
+		else return 0;
+	}
+};*/
 
 
 #endif  // Piano_H_INCLUDED

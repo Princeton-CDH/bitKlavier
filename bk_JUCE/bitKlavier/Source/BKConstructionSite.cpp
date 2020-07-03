@@ -32,6 +32,10 @@ inLasso(false)
 
 BKConstructionSite::~BKConstructionSite(void)
 {
+    for (auto item : graph->getItems())
+    {
+        item->removeMouseListener(this);
+    }
 }
 
 void BKConstructionSite::resized()
@@ -79,6 +83,14 @@ bool BKConstructionSite::itemOutsideBounds(Rectangle<int> bounds)
 
 void BKConstructionSite::redraw(void)
 {
+    if (processor.prevPiano != nullptr)
+    {
+        for (auto item : processor.prevPiano->getItems())
+        {
+            item->removeMouseListener(this);
+        }
+    }
+    
     removeAllChildren();
     
     graph->deselectAll();
@@ -366,6 +378,7 @@ void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool
 }
 void BKConstructionSite::deleteItem (BKItem* item)
 {
+    item->removeMouseListener(this);
     graph->removeItem(item);
     removeChildComponent(item);
 }
@@ -827,7 +840,7 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
 
 void BKConstructionSite::mouseDown (const MouseEvent& eo)
 {
-    DBG("mousedown");
+    // DBG("mousedown");
     MouseEvent e = eo.getEventRelativeTo(this);
     
 #if JUCE_IOS

@@ -119,7 +119,13 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
 
 BKItem::~BKItem()
 {
-
+    DBG("~BKItem");
+    
+    if (getParentComponent() != nullptr)
+    {
+        removeMouseListener(getParentComponent());
+        getParentComponent()->removeChildComponent(this);
+    }
 }
 
 BKItem* BKItem::duplicate(void)
@@ -306,31 +312,40 @@ void BKItem::paint(Graphics& g)
     
     if (type == PreparationTypeKeymap)
     {
-        if (processor.gallery->getKeymap(Id)->getTriggeredKeys().contains(true))
+        if (processor.gallery->getKeymap(Id) != nullptr)
         {
-            g.setColour(Colours::yellow.withAlpha(0.4f));
-            g.fillRect(getLocalBounds());
+            if (processor.gallery->getKeymap(Id)->getTriggeredKeys().contains(true))
+            {
+                g.setColour(Colours::yellow.withAlpha(0.4f));
+                g.fillRect(getLocalBounds());
+            }
         }
     }
     else if (type == PreparationTypeSynchronic)
     {
-        if (processor.currentPiano->getSynchronicProcessor(Id)->noteDidPlay())
+        if (processor.currentPiano->getSynchronicProcessor(Id, false) != nullptr)
         {
-            synchronicNotePlayTime = 4;
-        }
-        if (synchronicNotePlayTime > 0)
-        {
-            g.setColour(Colours::red.withAlpha(0.4f));
-            g.fillRect(getLocalBounds());
-            synchronicNotePlayTime--;
+            if (processor.currentPiano->getSynchronicProcessor(Id, false)->noteDidPlay())
+            {
+                synchronicNotePlayTime = 4;
+            }
+            if (synchronicNotePlayTime > 0)
+            {
+                g.setColour(Colours::red.withAlpha(0.4f));
+                g.fillRect(getLocalBounds());
+                synchronicNotePlayTime--;
+            }
         }
     }
     else if (type == PreparationTypeNostalgic)
     {
-        if (processor.currentPiano->getNostalgicProcessor(Id)->getNumReverseNotes() > 0)
+        if (processor.currentPiano->getNostalgicProcessor(Id, false) != nullptr)
         {
-            g.setColour(Colours::blue.withAlpha(0.4f));
-            g.fillRect(getLocalBounds());
+            if (processor.currentPiano->getNostalgicProcessor(Id, false)->getNumReverseNotes() > 0)
+            {
+                g.setColour(Colours::blue.withAlpha(0.4f));
+                g.fillRect(getLocalBounds());
+            }
         }
     }
 }

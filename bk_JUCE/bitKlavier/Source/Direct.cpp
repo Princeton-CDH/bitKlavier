@@ -24,7 +24,28 @@ tuner(tuning),
 blendronic(blend),
 keymaps(Keymap::PtrArr())
 {
-    
+    if (!direct->sPrep->getUseGlobalSoundSet())
+    {
+        String name = direct->sPrep->getSoundSetName();
+        BKSampleLoadType type = BKLoadSoundfont;
+        String path = String();
+        int subsound = 0;
+        for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
+        {
+            if (name == String(cBKSampleLoadTypes[i]))
+            {
+                type = (BKSampleLoadType) i;
+            }
+        }
+        if (type == BKLoadSoundfont)
+        {
+            path = name.upToLastOccurrenceOf(".subsound", false, false);
+            subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+        }
+        int Id = synth->loadSamples(type, path, subsound, false);
+        direct->sPrep->setSoundSet(Id);
+        direct->aPrep->setSoundSet(Id);
+    }
 }
 
 DirectProcessor::~DirectProcessor(void)
@@ -75,6 +96,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          Forward,
                          Normal,
                          MainNote,
+                         direct->aPrep->getSoundSet(), //set
                          direct->getId(),
                          0,     // start
                          0,     // length
@@ -98,6 +120,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 				Forward,
 				Normal,
 				MainNote,
+                direct->aPrep->getSoundSet(), //set
 				direct->getId(),
 				0,     // start
 				0,     // length
@@ -126,6 +149,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
         
         synth->keyOff(channel,
                       MainNote,
+                      direct->aPrep->getSoundSet(), //set
                       direct->getId(),
                       noteNumber,
                       t,
@@ -173,6 +197,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
                                        Forward,
                                        Normal,
                                        HammerNote,
+                                       direct->aPrep->getSoundSet(), //set
                                        direct->getId(),
                                        0,
                                        2000,
@@ -194,6 +219,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
                                       Forward,
                                       Normal,
                                       ResonanceNote,
+                                      direct->aPrep->getSoundSet(), //set
                                       direct->getId(),
                                       0,
                                       2000,

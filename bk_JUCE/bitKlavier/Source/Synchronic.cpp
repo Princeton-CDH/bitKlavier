@@ -24,6 +24,29 @@ tempo(tempo),
 keymaps(Keymap::PtrArr()),
 notePlayed(false)
 {
+    if (!synchronic->sPrep->getUseGlobalSoundSet())
+    {
+        String name = synchronic->sPrep->getSoundSetName();
+        BKSampleLoadType type = BKLoadSoundfont;
+        String path = String();
+        int subsound = 0;
+        for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
+        {
+            if (name == String(cBKSampleLoadTypes[i]))
+            {
+                type = (BKSampleLoadType) i;
+            }
+        }
+        if (type == BKLoadSoundfont)
+        {
+            path = name.upToLastOccurrenceOf(".subsound", false, false);
+            subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+        }
+        int Id = synth->loadSamples(type, path, subsound, false);
+        synchronic->sPrep->setSoundSet(Id);
+        synchronic->aPrep->setSoundSet(Id);
+    }
+    
     velocities.ensureStorageAllocated(128);
     holdTimers.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -108,6 +131,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                     noteDirection,
                     FixedLengthFixedStart,
                     SynchronicNote,
+                    prep->getSoundSet(), //set
                     synchronic->getId(),
                     noteStartPos,  // start
                     noteLength,
@@ -131,6 +155,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 					noteDirection,
 					FixedLengthFixedStart,
 					SynchronicNote,
+                    prep->getSoundSet(), //set
 					synchronic->getId(),
 					noteStartPos,  // start
 					noteLength,
@@ -142,7 +167,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 		}
         
         notePlayed = true;
-        if (prep->getMidiOutput() != nullptr)
+        if (prep->getMidiOutput() != nullptr && currentVoice != nullptr)
         {
             activeSynchronicVoices.set(currentVoice->getCurrentlyPlayingNote(), currentVoice);
             const MidiMessage message = MidiMessage::noteOn(1, synthNoteNumber, velocity);

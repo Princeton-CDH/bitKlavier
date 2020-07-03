@@ -118,6 +118,8 @@ const String vtagSynchronic_accentMultsStates = "accentMultipliersStates";
 const String vtagSynchronic_transpOffsetsStates = "transpOffsetsStates";
 const String ptagSynchronic_reset = "synchronicReset";
 const String vtagSynchronic_ADSRs = "ADSRs";
+const String ptagSynchronic_useGlobalSoundSet = "synchronicUseGlobalSoundSet";
+const String ptagSynchronic_soundSet = "synchronicSoundSet";
 
 
 #define ABSOLUTE_OFFSET_SIZE 256
@@ -138,6 +140,8 @@ const String ptagNostalgic_reset = "nostalgicReset";
 const String ptagNostalgic_targetClearAll = "targetTypeNostalgicClearAll";
 const String vtagNostalgic_reverseADSR = "reverseADSR";
 const String vtagNostalgic_undertowADSR = "undertowADSR";
+const String ptagNostalgic_useGlobalSoundSet = "nostalgicUseGlobalSoundSet";
+const String ptagNostalgic_soundSet = "nostalgicSoundSet";
 
 
 const String vtagDirect = "direct";
@@ -151,6 +155,8 @@ const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";
 const String ptagDirect_reset = "directReset";
 const String vtagDirect_ADSR = "ADSR";
+const String ptagDirect_useGlobalSoundSet = "directUseGlobalSoundSet";
+const String ptagDirect_soundSet = "directSoundSet";
 
 
 const String vtagTuning = "tuning";
@@ -215,11 +221,13 @@ const String ptagBlendronic_targetOpenCloseOutput = "targetTypeBlendronicOpenClo
 
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";
-const String vtagKeymap_midiInputs = "midiInputs";
+const String vtagKeymap_midiInputNames = "midiInputs";
+const String vtagKeymap_midiInputIdentifiers = "midiInputIdentifiers";
 const String ptagKeymap_key = "k";
 const String ptagKeymap_targetStates = "targetStates";
 const String ptagKeymap_inverted = "inverted";
-const String ptagKeymap_midiInput = "midiInput";
+const String ptagKeymap_midiInputName = "midiInput";
+const String ptagKeymap_midiInputIdentifier = "midiInputIdentifier";
 const String ptagKeymap_defaultSelected = "defSelected";
 const String ptagKeymap_onscreenSelected = "osSelected";
 
@@ -1155,10 +1163,10 @@ typedef enum BKSampleLoadType
 }BKSampleLoadType;
 
 static const std::vector<std::string> cBKSampleLoadTypes = {
-    "Load Very Light",
-    "Load Light",
-    "Load Medium",
-    "Load Heavy"
+    "Piano (litest)",
+    "Piano (lite)",
+    "Piano (medium)",
+    "Piano (heavy)"
 };
 
 

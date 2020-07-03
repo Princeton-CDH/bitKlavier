@@ -58,7 +58,10 @@ public:
     dAttack(atk),
     dDecay(dca),
     dRelease(rel),
-    dSustain(sust)
+    dSustain(sust),
+    dUseGlobalSoundSet(true),
+    dSoundSet(-1),
+    dSoundSetName(String())
     {
         
     }
@@ -72,7 +75,10 @@ public:
     dAttack(3),
     dDecay(3),
     dRelease(30),
-    dSustain(1.)
+    dSustain(1.),
+    dUseGlobalSoundSet(true),
+    dSoundSet(-1),
+    dSoundSetName(String())
     {
         
     }
@@ -96,6 +102,9 @@ public:
         dSustain = d->getSustain();
         dRelease = d->getRelease();
         dTranspUsesTuning = d->getTranspUsesTuning();
+        dUseGlobalSoundSet = d->getUseGlobalSoundSet();
+        dSoundSet = d->getSoundSet();
+        dSoundSetName = d->getSoundSetName();
     }
     
     inline void performModification(DirectPreparation::Ptr d, Array<bool> dirty)
@@ -218,6 +227,9 @@ public:
         for (auto f : m) ADSRvals.setProperty( ptagFloat + String(count++), f, 0);
         prep.addChild(ADSRvals, -1, 0);
         
+        prep.setProperty( ptagDirect_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
+        prep.setProperty( ptagDirect_soundSet, getSoundSetName(), 0);
+        
         return prep;
     }
     
@@ -237,6 +249,13 @@ public:
         String str = e->getStringAttribute(ptagDirect_transpUsesTuning);
         if (str != "") setTranspUsesTuning((bool) str.getIntValue());
         else setTranspUsesTuning(false);
+        
+        str = e->getStringAttribute(ptagDirect_useGlobalSoundSet);
+        if (str == String()) setUseGlobalSoundSet(true);
+        else setUseGlobalSoundSet((bool) str.getIntValue());
+        
+        str = e->getStringAttribute(ptagDirect_soundSet);
+        setSoundSetName(str);
         
         forEachXmlChildElement (*e, sub)
         {
@@ -278,6 +297,14 @@ public:
             }
         }
     }
+    
+    inline void setUseGlobalSoundSet(bool use) { dUseGlobalSoundSet = use; }
+    inline void setSoundSet(int Id) { dSoundSet = Id; }
+    inline void setSoundSetName(String name) { dSoundSetName = name; }
+    
+    inline bool getUseGlobalSoundSet(void) { return dUseGlobalSoundSet; }
+    inline int getSoundSet(void) { return dUseGlobalSoundSet ? -1 : dSoundSet; }
+    inline String getSoundSetName(void) { return dSoundSetName; }
 
 private:
     
@@ -302,6 +329,10 @@ private:
     // ADSR, in ms, or gain multiplier for sustain
     int dAttack, dDecay, dRelease;
     float dSustain;
+    
+    bool dUseGlobalSoundSet;
+    int dSoundSet;
+    String dSoundSetName;
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
@@ -382,7 +413,7 @@ public:
         String n = e->getStringAttribute("name");
         
         if (n != String())     name = n;
-        else                        name = String(Id);
+        else                   name = String(Id);
         
         
         XmlElement* params = e->getChildByName("params");
@@ -478,6 +509,7 @@ public:
     inline void reset(void)
     {
         direct->aPrep->copy(direct->sPrep);
+        DBG("synchronic reset called"); 
     }
     
     inline int getId(void) const noexcept { return direct->getId(); }
@@ -511,7 +543,7 @@ public:
     {
         return keymaps;
     }
-    
+
 private:
     BKSynthesiser*      synth;
     BKSynthesiser*      resonanceSynth;

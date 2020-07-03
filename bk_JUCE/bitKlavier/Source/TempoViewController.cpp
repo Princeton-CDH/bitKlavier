@@ -481,6 +481,12 @@ PopupMenu TempoPreparationEditor::getATModeMenu(void)
 
 void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     if (action == 1)
     {
@@ -937,6 +943,12 @@ PopupMenu TempoModificationEditor::getATModeMenu(void)
 
 void TempoModificationEditor::actionButtonCallback(int action, TempoModificationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     if (action == 1)
     {

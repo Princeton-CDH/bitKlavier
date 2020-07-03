@@ -106,8 +106,12 @@ BKViewController(p, theGraph, 1)
     about.setEnabled(false);
     about.setJustification(Justification::centredTop);
     about.setMultiLine(true);
-    about.setText("Welcome to bitKlavier v2.5.2! www.bitKlavier.com\n--\nbitKlavier was created by\nDan Trueman\n Mike Mulshine\nMatt Wang");
-    
+    String astring = "Welcome to bitKlavier v";
+    astring.append(JucePlugin_VersionString, 8);
+    astring += "! www.bitKlavier.com\n--\nbitKlavier was created by\nDan Trueman\n Mike Mulshine\nMatt Wang";
+    about.setText(astring);
+    // about.setText("Welcome to bitKlavier v" + JucePlugin_VersionString +"! www.bitKlavier.com\n--\nbitKlavier was created by\nDan Trueman\n Mike Mulshine\nMatt Wang");
+
     image = ImageCache::getFromMemory(BinaryData::icon_png, BinaryData::icon_pngSize);
     
     placement = RectanglePlacement::centred;
@@ -117,7 +121,7 @@ AboutViewController::~AboutViewController()
 {
     setLookAndFeel(nullptr);
 }
-
+    
 void AboutViewController::paint (Graphics& g)
 {
     g.fillAll(Colours::black);

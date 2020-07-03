@@ -1119,7 +1119,7 @@ void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double 
 
 void SynchronicPreparationEditor::update(NotificationType notify)
 {
-    DBG("SynchronicPreparationEditor::update " + String((int)notify));
+    // DBG("SynchronicPreparationEditor::update " + String((int)notify));
     
     if (processor.updateState->currentSynchronicId < 0) return;
     
@@ -1395,6 +1395,12 @@ void SynchronicPreparationEditor::setCurrentId(int Id)
 
 void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPreparationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)
@@ -1806,7 +1812,7 @@ void SynchronicModificationEditor::timerCallback()
 
 void SynchronicModificationEditor::update(NotificationType notify)
 {
-    DBG("SynchronicModificationEditor::update " + String((int)notify));
+    // DBG("SynchronicModificationEditor::update " + String((int)notify));
     
     if (processor.updateState->currentModSynchronicId < 0) return;
     
@@ -2245,6 +2251,12 @@ void SynchronicModificationEditor::setCurrentId(int Id)
 
 void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicModificationEditor* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)

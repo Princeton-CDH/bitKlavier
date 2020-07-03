@@ -91,7 +91,9 @@ public:
     
     void openSoundfont(void);
     
-    sfzero::Region::PtrArr regions;
+    ThreadPool loader;
+    
+    HashMap<int, sfzero::Region::PtrArr> regions;
     
     AudioFormatManager formatManager;
     std::unique_ptr<AudioFormatReader> sampleReader;
@@ -114,22 +116,30 @@ public:
     StringArray                         galleryNames;
     String                              currentGallery;
     
+    // Full path names of soundfonts in no particular order
     StringArray                         soundfontNames;
-    StringArray                         instrumentNames;
-    String                              currentInstrumentName;
+    
+    // Names of soundfont instruments keyed by sound set ids
+    HashMap<int, StringArray>           instrumentNames;
     
     OwnedArray<StringArray>             exportedPreparations;
     StringArray                         exportedPianos;
+        
+    BKSampleLoadType                    loadingSampleType;
+    String                              loadingSoundfont;
+    int                                 loadingInstrument;
     
-    BKSampleLoadType                    currentSampleType;
-    String                              currentSoundfont;
-    int                                 currentInstrument;
+    BKSampleLoadType                    globalSampleType;
+    String                              globalSoundfont;
+    int                                 globalInstrument;
+    
+    String                              loadingSoundSet;
+    int                                 loadingSoundSetId;
+    StringArray                         loadedSoundSets;
+    
+    int                                 globalSoundSetId;
     
     bool firstTime;
-    
-    BKSampleLoadType                    lastSampleType;
-    String                              lastSoundfont;
-    int                                 lastInstrument;
     
     bool                                defaultLoaded;
     String                              defaultName;
@@ -178,11 +188,17 @@ public:
     
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m) override;
     
-    inline const Array<String> getDefaultMidiInputSources(void) { return defaultMidiInputSources; }
-    inline void setDefaultMidiInputSources(Array<String> sources) { defaultMidiInputSources = sources; }
+//    inline const Array<MidiDeviceInfo> getDefaultMidiInputDevices(void) { return defaultMidiInputDevices; }
+//    inline void setDefaultMidiInputDevices(Array<MidiDeviceInfo> sources) { defaultMidiInputDevices = sources; }
+    
+    inline const Array<String> getDefaultMidiInputNames(void) { return defaultMidiInputNames; }
+    inline void setDefaultMidiInputNames(Array<String> names) { defaultMidiInputNames = names; }
+    
+    inline const Array<String> getDefaultMidiInputIdentifiers(void) { return defaultMidiInputIdentifiers; }
+    inline void setDefaultMidiInputIdentifiers(Array<String> identifiers) { defaultMidiInputIdentifiers = identifiers; }
     
     //==============================================================================
-    void loadSamples(BKSampleLoadType type, String path ="", int subsound=0);
+    int loadSamples(BKSampleLoadType type, String path ="", int subsound=0, bool updateGlobalSet=true);
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
@@ -319,15 +335,6 @@ public:
     
     inline bool getSustainInversion(void) { return sustainInverted; }
     
-    inline String getCurrentSoundfontName(void)
-    {
-#if JUCE_WINDOWS
-        return (currentSoundfont.fromLastOccurrenceOf("\\", false, true).upToFirstOccurrenceOf(".sf", false, true));
-#else
-		return (currentSoundfont.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true));
-#endif
-    }
-    
     ValueTree getPreparationState(BKPreparationType type, int Id);
     void setPreparationState(BKPreparationType type, int Id, XmlElement* xml);
     
@@ -363,8 +370,6 @@ private:
     
     double pitchbendVal;
     
-    BKSampleLoader loader;
-    
     bool doneWithSetStateInfo;
     
     AudioSampleBuffer levelBuf; //for storing samples for metering/RMS calculation
@@ -380,10 +385,9 @@ private:
     AudioPlayHead::CurrentPositionInfo currentPositionInfo;
     double hostTempo;
     
-    Array<MidiDeviceInfo> midiInputDevices;
-    
     bool midiReady;
-    Array<String> defaultMidiInputSources;
+    Array<String> defaultMidiInputNames;
+    Array<String> defaultMidiInputIdentifiers;
     
     BKAudioProcessorEditor* editor;
     

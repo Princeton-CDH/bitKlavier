@@ -20,6 +20,8 @@
 
 // [END_USER_CODE_SECTION]
 
+#include "JucePluginDefines.h"
+
 /*
   ==============================================================================
 
@@ -39,15 +41,11 @@
  #define JUCE_DISPLAY_SPLASH_SCREEN 1
 #endif
 
-#ifndef JUCE_REPORT_APP_USAGE
- #define JUCE_REPORT_APP_USAGE 1
-#endif
-
 // END SECTION A
 
 #define JUCE_USE_DARK_SPLASH_SCREEN 0
 
-#define JUCE_PROJUCER_VERSION 0x50407
+#define JUCE_PROJUCER_VERSION 0x60000
 
 //==============================================================================
 #define JUCE_MODULE_AVAILABLE_juce_audio_basics             1
@@ -104,7 +102,11 @@
 #endif
 
 #ifndef    JUCE_USE_ANDROID_OBOE
- //#define JUCE_USE_ANDROID_OBOE 0
+ //#define JUCE_USE_ANDROID_OBOE 1
+#endif
+
+#ifndef    JUCE_USE_OBOE_STABILIZED_CALLBACK
+ //#define JUCE_USE_OBOE_STABILIZED_CALLBACK 0
 #endif
 
 #ifndef    JUCE_USE_ANDROID_OPENSLES
@@ -184,6 +186,10 @@
  //#define JUCE_PLUGINHOST_LADSPA 0
 #endif
 
+#ifndef    JUCE_CUSTOM_VST3_SDK
+ //#define JUCE_CUSTOM_VST3_SDK 0
+#endif
+
 //==============================================================================
 // juce_audio_utils flags:
 
@@ -236,6 +242,10 @@
 
 #ifndef    JUCE_STRICT_REFCOUNTEDPOINTER
  //#define JUCE_STRICT_REFCOUNTEDPOINTER 0
+#endif
+
+#ifndef    JUCE_ENABLE_ALLOCATION_HOOKS
+ //#define JUCE_ENABLE_ALLOCATION_HOOKS 0
 #endif
 
 //==============================================================================
@@ -298,6 +308,10 @@
  //#define JUCE_WEB_BROWSER 1
 #endif
 
+#ifndef    JUCE_USE_WIN_WEBVIEW2
+ //#define JUCE_USE_WIN_WEBVIEW2 0
+#endif
+
 #ifndef    JUCE_ENABLE_LIVE_CONSTANT_EDITOR
  //#define JUCE_ENABLE_LIVE_CONSTANT_EDITOR 0
 #endif
@@ -311,166 +325,6 @@
 
 #ifndef    JUCE_SYNC_VIDEO_VOLUME_WITH_OS_MEDIA_VOLUME
  //#define JUCE_SYNC_VIDEO_VOLUME_WITH_OS_MEDIA_VOLUME 1
-#endif
-
-//==============================================================================
-// Audio plugin settings..
-
-#ifndef  JucePlugin_Build_VST
- #define JucePlugin_Build_VST              1
-#endif
-#ifndef  JucePlugin_Build_VST3
- #define JucePlugin_Build_VST3             1
-#endif
-#ifndef  JucePlugin_Build_AU
- #define JucePlugin_Build_AU               1
-#endif
-#ifndef  JucePlugin_Build_AUv3
- #define JucePlugin_Build_AUv3             0
-#endif
-#ifndef  JucePlugin_Build_RTAS
- #define JucePlugin_Build_RTAS             0
-#endif
-#ifndef  JucePlugin_Build_AAX
- #define JucePlugin_Build_AAX              0
-#endif
-#ifndef  JucePlugin_Build_Standalone
- #define JucePlugin_Build_Standalone       1
-#endif
-#ifndef  JucePlugin_Build_Unity
- #define JucePlugin_Build_Unity            0
-#endif
-#ifndef  JucePlugin_Enable_IAA
- #define JucePlugin_Enable_IAA             1
-#endif
-#ifndef  JucePlugin_Name
- #define JucePlugin_Name                   "bitKlavier"
-#endif
-#ifndef  JucePlugin_Desc
- #define JucePlugin_Desc                   "A prepared digital piano. "
-#endif
-#ifndef  JucePlugin_Manufacturer
- #define JucePlugin_Manufacturer           "Many Arrows Music"
-#endif
-#ifndef  JucePlugin_ManufacturerWebsite
- #define JucePlugin_ManufacturerWebsite    "http://manyarrowsmusic.com/"
-#endif
-#ifndef  JucePlugin_ManufacturerEmail
- #define JucePlugin_ManufacturerEmail      "dtrueman@princeton.edu"
-#endif
-#ifndef  JucePlugin_ManufacturerCode
- #define JucePlugin_ManufacturerCode       0x4d616e75 // 'Manu'
-#endif
-#ifndef  JucePlugin_PluginCode
- #define JucePlugin_PluginCode             0x624b326d // 'bK2m'
-#endif
-#ifndef  JucePlugin_IsSynth
- #define JucePlugin_IsSynth                1
-#endif
-#ifndef  JucePlugin_WantsMidiInput
- #define JucePlugin_WantsMidiInput         1
-#endif
-#ifndef  JucePlugin_ProducesMidiOutput
- #define JucePlugin_ProducesMidiOutput     1
-#endif
-#ifndef  JucePlugin_IsMidiEffect
- #define JucePlugin_IsMidiEffect           0
-#endif
-#ifndef  JucePlugin_EditorRequiresKeyboardFocus
- #define JucePlugin_EditorRequiresKeyboardFocus  1
-#endif
-#ifndef  JucePlugin_Version
- #define JucePlugin_Version                2.5.2.1
-#endif
-#ifndef  JucePlugin_VersionCode
- #define JucePlugin_VersionCode            0x2050201
-#endif
-#ifndef  JucePlugin_VersionString
- #define JucePlugin_VersionString          "2.5.2.1"
-#endif
-#ifndef  JucePlugin_VSTUniqueID
- #define JucePlugin_VSTUniqueID            JucePlugin_PluginCode
-#endif
-#ifndef  JucePlugin_VSTCategory
- #define JucePlugin_VSTCategory            kPlugCategSynth
-#endif
-#ifndef  JucePlugin_Vst3Category
- #define JucePlugin_Vst3Category           "Instrument"
-#endif
-#ifndef  JucePlugin_AUMainType
- #define JucePlugin_AUMainType             'aumu'
-#endif
-#ifndef  JucePlugin_AUSubType
- #define JucePlugin_AUSubType              JucePlugin_PluginCode
-#endif
-#ifndef  JucePlugin_AUExportPrefix
- #define JucePlugin_AUExportPrefix         BKAU
-#endif
-#ifndef  JucePlugin_AUExportPrefixQuoted
- #define JucePlugin_AUExportPrefixQuoted   "BKAU"
-#endif
-#ifndef  JucePlugin_AUManufacturerCode
- #define JucePlugin_AUManufacturerCode     JucePlugin_ManufacturerCode
-#endif
-#ifndef  JucePlugin_CFBundleIdentifier
- #define JucePlugin_CFBundleIdentifier     com.manyarrowsmusic.bitKlavier
-#endif
-#ifndef  JucePlugin_RTASCategory
- #define JucePlugin_RTASCategory           0
-#endif
-#ifndef  JucePlugin_RTASManufacturerCode
- #define JucePlugin_RTASManufacturerCode   JucePlugin_ManufacturerCode
-#endif
-#ifndef  JucePlugin_RTASProductId
- #define JucePlugin_RTASProductId          JucePlugin_PluginCode
-#endif
-#ifndef  JucePlugin_RTASDisableBypass
- #define JucePlugin_RTASDisableBypass      0
-#endif
-#ifndef  JucePlugin_RTASDisableMultiMono
- #define JucePlugin_RTASDisableMultiMono   0
-#endif
-#ifndef  JucePlugin_AAXIdentifier
- #define JucePlugin_AAXIdentifier          com.manyarrowsmusic.bitKlavier
-#endif
-#ifndef  JucePlugin_AAXManufacturerCode
- #define JucePlugin_AAXManufacturerCode    JucePlugin_ManufacturerCode
-#endif
-#ifndef  JucePlugin_AAXProductId
- #define JucePlugin_AAXProductId           JucePlugin_PluginCode
-#endif
-#ifndef  JucePlugin_AAXCategory
- #define JucePlugin_AAXCategory            2
-#endif
-#ifndef  JucePlugin_AAXDisableBypass
- #define JucePlugin_AAXDisableBypass       0
-#endif
-#ifndef  JucePlugin_AAXDisableMultiMono
- #define JucePlugin_AAXDisableMultiMono    0
-#endif
-#ifndef  JucePlugin_IAAType
- #define JucePlugin_IAAType                0x61757269 // 'auri'
-#endif
-#ifndef  JucePlugin_IAASubType
- #define JucePlugin_IAASubType             JucePlugin_PluginCode
-#endif
-#ifndef  JucePlugin_IAAName
- #define JucePlugin_IAAName                "Many Arrows Music: bitKlavier"
-#endif
-#ifndef  JucePlugin_VSTNumMidiInputs
- #define JucePlugin_VSTNumMidiInputs       16
-#endif
-#ifndef  JucePlugin_VSTNumMidiOutputs
- #define JucePlugin_VSTNumMidiOutputs      16
-#endif
-#ifndef  JucePlugin_MaxNumInputChannels
- #define JucePlugin_MaxNumInputChannels    0
-#endif
-#ifndef  JucePlugin_MaxNumOutputChannels
- #define JucePlugin_MaxNumOutputChannels   2
-#endif
-#ifndef  JucePlugin_PreferredChannelConfigurations
- #define JucePlugin_PreferredChannelConfigurations  {0,2}
 #endif
 
 //==============================================================================

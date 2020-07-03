@@ -11,69 +11,8 @@ Author:  Matthew Wang
 #include "BlendronicDisplay.h"
 
 //==============================================================================
-
-struct BlendronicDisplay::ChannelInfo
-{
-    ChannelInfo (BlendronicDisplay& o, int bufferSize) : owner (o)
-    {
-        setBufferSize (bufferSize);
-        clear();
-    }
-    
-    void clear() noexcept
-    {
-        levels.fill ({});
-        value = {};
-        subSample = 0;
-    }
-    
-    void pushSamples (const float* inputSamples, int num) noexcept
-    {
-        for (int i = 0; i < num; ++i)
-            pushSample (inputSamples[i]);
-    }
-    
-    void pushSample (float newSample) noexcept
-    {
-        if (--subSample <= 0)
-        {
-            if (++nextSample == levels.size())
-                nextSample = 0;
-            
-            levels.getReference (nextSample) = value;
-            subSample = owner.getSamplesPerBlock();
-            value = Range<float> (newSample, newSample);
-        }
-        else
-        {
-            value = value.getUnionWith (newSample);
-        }
-    }
-    
-    void setBufferSize (int newSize)
-    {
-        levels.removeRange (newSize, levels.size());
-        levels.insertMultiple (-1, {}, newSize - levels.size());
-        
-        if (nextSample >= newSize)
-            nextSample = 0;
-    }
-    
-    BlendronicDisplay& owner;
-    Array<Range<float>> levels;
-    Range<float> value;
-    std::atomic<int> nextSample { 0 }, subSample { 0 };
-    
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ChannelInfo)
-};
-
-//==============================================================================
 BlendronicDisplay::BlendronicDisplay ()
-: bufferSize(0),
-numBlocks (1024),
-inputSamplesPerBlock (512),
-invInputSamplesPerBlock (1./512),
-lineSpacingInBlocks(128),
+: lineSpacingInBlocks(128),
 currentLevel(0.0),
 prevLevel(0.0),
 scroll(0.0),
@@ -92,7 +31,6 @@ markerColour (Colours::goldenrod.withMultipliedBrightness(0.7)),
 playheadColour (Colours::mediumpurple)
 {
     setOpaque (true);
-    setNumChannels (1);
     setRepaintRate (40);
     prevPlayhead = 0;
     
@@ -121,11 +59,7 @@ playheadColour (Colours::mediumpurple)
 }
 
 BlendronicDisplay::BlendronicDisplay (int initialNumChannels)
-: bufferSize(0),
-numBlocks (1024),
-inputSamplesPerBlock (512.),
-invInputSamplesPerBlock (1./512.),
-lineSpacingInBlocks(128),
+: lineSpacingInBlocks(128),
 currentLevel(0.0),
 prevLevel(0.0),
 scroll(0.0),
@@ -137,86 +71,12 @@ markerColour (Colours::burlywood),
 playheadColour (Colours::mediumpurple)
 {
     setOpaque (true);
-    setNumChannels (initialNumChannels);
     setRepaintRate (40);
 }
 
 BlendronicDisplay::~BlendronicDisplay()
 {
 }
-
-void BlendronicDisplay::setNumChannels (int numChannels)
-{
-    channels.clear();
-    
-    for (int i = 0; i < numChannels; ++i)
-        channels.add (new ChannelInfo (*this, numBlocks));
-    
-    smoothing.clear();
-    smoothing.add (new ChannelInfo (*this, numBlocks));
-}
-
-void BlendronicDisplay::setNumBlocks (int num)
-{
-    numBlocks = num;
-    
-    for (auto* c : channels)
-        c->setBufferSize (num);
-    for (auto* s : smoothing)
-        s->setBufferSize (num);
-}
-
-void BlendronicDisplay::clear()
-{
-    clearAudio();
-    clearSmoothing();
-}
-
-void BlendronicDisplay::clearAudio()
-{
-    for (auto* c : channels)
-        c->clear();
-}
-
-void BlendronicDisplay::clearSmoothing()
-{
-    for (auto* s : smoothing)
-        s->clear();
-}
-
-void BlendronicDisplay::setBufferSize (int size)
-{
-    bufferSize = size;
-    setSamplesPerBlock(bufferSize/1024);
-    setNumBlocks(bufferSize*invInputSamplesPerBlock);
-}
-
-void BlendronicDisplay::pushAudioSample (float sample)
-{
-    for (auto* c : channels)
-        c->pushSample (sample);
-}
-
-void BlendronicDisplay::pushSmoothingSample (float sample)
-{
-    smoothing.getUnchecked(0)->pushSample (sample);
-}
-
-void BlendronicDisplay::setSamplesPerBlock (int newSamplesPerPixel) noexcept
-{
-    if (newSamplesPerPixel > 0)
-    {
-        inputSamplesPerBlock = newSamplesPerPixel;
-        invInputSamplesPerBlock = 1. / (float) inputSamplesPerBlock;
-    }
-    else
-    {
-        inputSamplesPerBlock = 1;
-        invInputSamplesPerBlock = 1.;
-    }
-        
-}
-
 
 void BlendronicDisplay::setRepaintRate (int frequencyInHz)
 {
@@ -245,15 +105,15 @@ void BlendronicDisplay::paint (Graphics& g)
     auto gridBounds = displayBounds;
     auto bufferBounds = displayBounds.removeFromTop(getLocalBounds().getHeight()*0.6);
     auto smoothingBounds = displayBounds.removeFromTop(getLocalBounds().getHeight()*0.35);
-    auto channelHeight = bufferBounds.getHeight() / channels.size();
+    auto channelHeight = bufferBounds.getHeight() / channels->size();
     
     g.fillAll (backgroundColour);
     g.setColour (waveformColour);
     
     /*--------Drawing the pulse grid ----------*/
-    float n = bufferSize * invInputSamplesPerBlock;
+    float n = smoothing->getBufferSize() * (1.0f / smoothing->getSamplesPerBlock());
     
-    currentLevel = playheads[0] * invInputSamplesPerBlock;
+    currentLevel = playheads[0] * (1.0f / smoothing->getSamplesPerBlock());
     if (prevLevel > currentLevel)
     {
         offset = (scroll + (n - prevLevel));
@@ -281,7 +141,7 @@ void BlendronicDisplay::paint (Graphics& g)
     /*--------Drawing the markers --------------*/
     for (auto m : markers)
     {
-        float markerLevel = m * invInputSamplesPerBlock;
+        float markerLevel = m * (1.0f / smoothing->getSamplesPerBlock());
         float x = (fmod((markerLevel - currentLevel) + n, n) - leftLevel) *
         (gridBounds.getRight() - gridBounds.getX()) * (1. / (n - leftLevel)) + gridBounds.getX();
         if (x < 1.0f) continue;
@@ -291,7 +151,7 @@ void BlendronicDisplay::paint (Graphics& g)
     /*------------------------------------------*/
     
     auto channelBounds = bufferBounds;
-    for (auto* c : channels)
+    for (auto* c : *channels)
     {
         channelBounds = channelBounds.removeFromTop(channelHeight);
         g.saveState();
@@ -310,14 +170,11 @@ void BlendronicDisplay::paint (Graphics& g)
     g.drawHorizontalLine(bufferBounds.getY(), bufferBounds.getX(), bufferBounds.getRight());
     g.drawHorizontalLine(bufferBounds.getBottom(), bufferBounds.getX(), bufferBounds.getRight());
     
-    for (auto* s : smoothing)
-    {
-        g.saveState();
-        g.reduceClipRegion(smoothingBounds);
-        paintSmoothing (g, smoothingBounds.toFloat(),
-                        s->levels.begin(), s->levels.size(), s->nextSample);
-        g.restoreState();
-    }
+    g.saveState();
+    g.reduceClipRegion(smoothingBounds);
+    paintSmoothing (g, smoothingBounds.toFloat(),
+                    smoothing->levels.begin(), smoothing->levels.size(), smoothing->nextSample);
+    g.restoreState();
 }
 
 void BlendronicDisplay::getChannelAsPath (Path& path, const Range<float>* levels,
@@ -359,8 +216,8 @@ void BlendronicDisplay::paintChannel (Graphics& g, Rectangle<float> area, const 
     for (auto p : playheads)
     {
         if (p == playheads[0]) continue;
-        float offset = playheads[0] * invInputSamplesPerBlock;
-        float playheadLevel = p * invInputSamplesPerBlock;
+        float offset = playheads[0] * (1.0f / smoothing->getSamplesPerBlock());
+        float playheadLevel = p * (1.0f / smoothing->getSamplesPerBlock());
         float x = (fmod(((playheadLevel - offset) + numLevels), numLevels) - leftLevel) *
             (area.getRight() - area.getX()) * (1. / (numLevels - leftLevel)) + area.getX();
         g.setColour(playheadColour);

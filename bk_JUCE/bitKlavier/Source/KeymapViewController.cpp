@@ -466,6 +466,12 @@ void KeymapViewController::setCurrentId(int Id)
 
 void KeymapViewController::actionButtonCallback(int action, KeymapViewController* vc)
 {
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
     BKAudioProcessor& processor = vc->processor;
     
     if (action == 1)
@@ -582,8 +588,7 @@ PopupMenu KeymapViewController::getPitchClassMenu(int offset)
 {
     int Id;
     
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     for (int i = 0; i < 12; i++)
     {
@@ -597,8 +602,7 @@ PopupMenu KeymapViewController::getPitchClassMenu(int offset)
 
 PopupMenu KeymapViewController::getKeysMenu(void)
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     menu.addItem(ID(KeySetAll), "All");
     menu.addSubMenu("All...",  getPitchClassMenu((KeySet) ID(KeySetAllPC)));
@@ -644,9 +648,12 @@ void KeymapViewController::midiInputSelectCallback(int result, KeymapViewControl
     }
     else
     {
-        String deviceName = processor.getMidiInputDevices()[result-3].name;
-        if (keymap->getMidiInputSources().contains(deviceName)) keymap->removeMidiInputSource(deviceName);
-        else keymap->addMidiInputSource(deviceName);
+        MidiDeviceInfo device = processor.getMidiInputDevices()[result-3];
+        if (keymap->getMidiInputIdentifiers().contains(device.identifier))
+        {
+            keymap->removeMidiInputSource(device);
+        }
+        else keymap->addMidiInputSource(device);
     }
 
     vc->getMidiInputSelectMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->midiInputSelectButton), ModalCallbackFunction::forComponent(midiInputSelectCallback, vc));
@@ -703,8 +710,7 @@ PopupMenu KeymapViewController::getTargetsMenu()
 {
     updateKeymapTargets();
     
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     Array<KeymapTargetState> targetStates = keymap->getTargetStates();
@@ -756,8 +762,7 @@ void KeymapViewController::fillSelectCB(int last, int current)
 
 PopupMenu KeymapViewController::getMidiInputSelectMenu()
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     
@@ -777,7 +782,7 @@ PopupMenu KeymapViewController::getMidiInputSelectMenu()
     
     for (auto device : processor.getMidiInputDevices())
     {
-        if (keymap->getMidiInputSources().contains(device.name))
+        if (keymap->getMidiInputIdentifiers().contains(device.identifier))
             menu.addItem(PopupMenu::Item(device.name).setID(++id).setTicked(true));
         else menu.addItem(PopupMenu::Item(device.name).setID(++id));
     }

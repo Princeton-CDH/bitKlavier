@@ -30,7 +30,7 @@ int Gallery::transformId(BKPreparationType type, int oldId)
         newId = idcounts[type]++;
         idmap[type]->set(oldId, newId);
         
-        DBG("TRANS " + String(cPreparationTypes[type]) + " old: " + String(oldId) + " new: " + String(newId));
+        // DBG("TRANS " + String(cPreparationTypes[type]) + " old: " + String(oldId) + " new: " + String(newId));
     }
     
     return newId;
@@ -42,9 +42,9 @@ ValueTree  Gallery::getState(void)
     
     galleryVT.setProperty("name", name, 0);
     
-    galleryVT.setProperty("sampleType", processor.currentSampleType, 0);
-    galleryVT.setProperty("soundfontURL", processor.currentSoundfont, 0);
-    galleryVT.setProperty("soundfontInst", processor.currentInstrument, 0);
+    galleryVT.setProperty("sampleType", processor.globalSampleType, 0);
+    galleryVT.setProperty("soundfontURL", processor.globalSoundfont, 0);
+    galleryVT.setProperty("soundfontInst", processor.globalInstrument, 0);
     
     // We don't do anything with these on loading so don't see why we should save them
 //    ValueTree idCountVT( "idcounts");
@@ -120,15 +120,11 @@ void Gallery::setStateFromXML(XmlElement* xml)
         {
             if (e->hasTagName( vtagKeymap))
             {
-                // TODO: why not use keymap setState()?
-                
                 addKeymapWithId(0);
                 
-                String n = e->getStringAttribute("name");
+                bkKeymaps.getLast()->setState(e);
                 
-                Keymap::Ptr newKeymap = bkKeymaps.getLast();
-                
-                int oldId = e->getStringAttribute("Id").getIntValue();
+                int oldId = bkKeymaps.getLast()->getId();
                 int newId = transformId(PreparationTypeKeymap, oldId);
                 
                 newKeymap->setId(newId);
@@ -186,6 +182,8 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 
                 String d = e->getStringAttribute(ptagKeymap_defaultSelected);
                 if (d != String()) newKeymap->setDefaultSelected(d.getIntValue());
+
+                bkKeymaps.getLast()->setId(newId);
             }
             else if (e->hasTagName ( vtagGeneral))
             {
@@ -348,7 +346,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
             {
                 Piano::Ptr thisPiano = bkPianos[which++];
                 
-                thisPiano->setState(e, &idmap);
+                thisPiano->setState(e, &idmap, idcounts);
             }
         }
     }

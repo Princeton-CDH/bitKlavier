@@ -17,7 +17,7 @@ HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionS
 processor (p),
 construction(c)
 {
-    setLookAndFeel(&buttonsAndMenusLAF);
+    setLookAndFeel(new BKButtonAndMenuLAF());
 
     addAndMakeVisible(galleryB);
     galleryB.setButtonText("Gallery");
@@ -40,7 +40,8 @@ construction(c)
     galleryCB.setTooltip("Select and load saved bitKlavier Galleries. Indicates currently loaded Gallery");
     galleryCB.addListener(this);
     //galleryCB.BKSetJustificationType(juce::Justification::centredRight);
-    galleryCB.setLookAndFeel(&comboBoxLeftJustifyLAF);
+    BKButtonAndMenuLAF* comboBoxLeftJustifyLAF = new BKButtonAndMenuLAF();
+    galleryCB.setLookAndFeel(comboBoxLeftJustifyLAF);
     galleryCB.setSelectedId(0, dontSendNotification);
     
     // Piano CB
@@ -54,8 +55,9 @@ construction(c)
     addAndMakeVisible(bot);
 #endif
     
-    pianoCB.setLookAndFeel(&comboBoxRightJustifyLAF);
-    comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
+    BKButtonAndMenuLAF* comboBoxRightJustifyLAF = new BKButtonAndMenuLAF();
+    pianoCB.setLookAndFeel(comboBoxRightJustifyLAF);
+    comboBoxRightJustifyLAF->setComboBoxJustificationType(juce::Justification::centredRight);
 
     pianoCB.setSelectedId(0, dontSendNotification);
     
@@ -67,11 +69,14 @@ construction(c)
     fillPianoCB();
     processor.updateState->pianoDidChangeForGraph = true;
     
-    startTimerHz (10);
+    addMouseListener(this, true);
+    
+    startTimerHz (5);
 }
 
 HeaderViewController::~HeaderViewController()
 {
+    PopupMenu::dismissAllActiveMenus();
     galleryCB.setLookAndFeel(nullptr);
     pianoCB.setLookAndFeel(nullptr);
     
@@ -80,6 +85,14 @@ HeaderViewController::~HeaderViewController()
     editB.setLookAndFeel(nullptr);
     
     setLookAndFeel(nullptr);
+    
+    galleryB.removeListener(this);
+    pianoB.removeListener(this);
+    editB.removeListener(this);
+    galleryCB.removeListener(this);
+    pianoCB.removeListener(this);
+    
+    removeMouseListener(this);
 }
 
 void HeaderViewController::paint (Graphics& g)
@@ -111,16 +124,19 @@ void HeaderViewController::resized()
     editB.setBounds(area);
 }
 
+void HeaderViewController::mouseDown(const MouseEvent &event)
+{
+    fillGalleryCB();
+}
+
 PopupMenu HeaderViewController::getLoadMenu(void)
 {
-    PopupMenu loadMenu;
-    loadMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu loadMenu;
     
-    
-    loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.currentSampleType != BKLoadLitest, processor.currentSampleType == BKLoadLitest);
-    loadMenu.addItem(LOAD_LITE,     "Light", processor.currentSampleType != BKLoadLite, processor.currentSampleType == BKLoadLite);
-    loadMenu.addItem(LOAD_MEDIUM,   "Medium", processor.currentSampleType != BKLoadMedium, processor.currentSampleType == BKLoadMedium);
-    loadMenu.addItem(LOAD_HEAVY,    "Heavy", processor.currentSampleType != BKLoadHeavy, processor.currentSampleType == BKLoadHeavy);
+    loadMenu.addItem(LOAD_LITEST,   "Lightest", processor.globalSampleType != BKLoadLitest, processor.globalSampleType == BKLoadLitest);
+    loadMenu.addItem(LOAD_LITE,     "Light", processor.globalSampleType != BKLoadLite, processor.globalSampleType == BKLoadLite);
+    loadMenu.addItem(LOAD_MEDIUM,   "Medium", processor.globalSampleType != BKLoadMedium, processor.globalSampleType == BKLoadMedium);
+    loadMenu.addItem(LOAD_HEAVY,    "Heavy", processor.globalSampleType != BKLoadHeavy, processor.globalSampleType == BKLoadHeavy);
     
     loadMenu.addSeparator();
     
@@ -149,8 +165,7 @@ PopupMenu HeaderViewController::getLoadMenu(void)
 
 PopupMenu HeaderViewController::getExportedPianoMenu(void)
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu menu;
     
     StringArray names = processor.exportedPianos;
     for (int i = 0; i < names.size(); i++)
@@ -163,8 +178,7 @@ PopupMenu HeaderViewController::getExportedPianoMenu(void)
 
 PopupMenu HeaderViewController::getPianoMenu(void)
 {
-    PopupMenu pianoMenu;
-    pianoMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu pianoMenu;
     
     pianoMenu.addItem(1, "New");
     pianoMenu.addItem(2, "Linked Copy"); // add another called Duplicate that is like copy/paste?
@@ -181,8 +195,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
 
 PopupMenu HeaderViewController::getGalleryMenu(void)
 {
-    PopupMenu galleryMenu;
-    galleryMenu.setLookAndFeel(&buttonsAndMenusLAF);
+    BKPopupMenu galleryMenu;
     
     galleryMenu.addItem(NEWGALLERY_ID, "New");
     
@@ -224,7 +237,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     if (!processor.defaultLoaded)
     {
 #if JUCE_MAC
-    PopupMenu shareMenu;
+    BKPopupMenu shareMenu;
     
     shareMenu.addItem(SHARE_EMAIL_ID, "Email");
     galleryMenu.addSeparator();
@@ -577,11 +590,11 @@ void HeaderViewController::bkButtonClicked (Button* b)
     {
         if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
         {
-             getEditMenuStandalone(&buttonsAndMenusLAF, construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent (b), ModalCallbackFunction::forComponent(BKConstructionSite::editMenuCallback, construction) );
+             getEditMenuStandalone(new BKButtonAndMenuLAF(), construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent (b), ModalCallbackFunction::forComponent(BKConstructionSite::editMenuCallback, construction) );
         }
         else
         {
-            getEditMenu(&buttonsAndMenusLAF, construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent(b), ModalCallbackFunction::forComponent(BKConstructionSite::editMenuCallback, construction) );
+            getEditMenu(new BKButtonAndMenuLAF(), construction->getNumSelected()).showMenuAsync(PopupMenu::Options().withTargetComponent(b), ModalCallbackFunction::forComponent(BKConstructionSite::editMenuCallback, construction) );
         }
     }
     else if (b == &pianoB)
@@ -656,78 +669,121 @@ void HeaderViewController::fillGalleryCB(void)
         
         File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
         
-#if (JUCE_MAC)
+#if (JUCE_MAC || JUCE_IOS)
         bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+		char divChar = '/';
 #endif
 #if (JUCE_WINDOWS || JUCE_LINUX)
         bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+		char divChar = '\\';
 #endif
         
         PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
         
         int id = numberOfDefaultGalleryItems, index = 0;
-        bool creatingSubmenu = false;
-        String submenuName;
         
-        StringArray submenuNames;
-        OwnedArray<PopupMenu> submenus;
-        
-        for (int i = 0; i < processor.galleryNames.size(); i++)
-        {
-            File thisFile(processor.galleryNames[i]);
-            
-            String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
-            
-            //moving on to new submenu, if there is one, add add last submenu to popup now that it's done
-            if(creatingSubmenu && thisFile.getParentDirectory().getFileName() != submenuName)
-            {
-                galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
-                creatingSubmenu = false;
-            }
-            
-            //add toplevel item, if there is one
-            if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName() ||
-               thisFile.getParentDirectory().getFileName() == moreGalleries.getFileName() ||
-               thisFile.getParentDirectory().getFileName() == moreGalleries.getChildFile("Inbox").getFileName()) //if the file is in the main galleries directory....
-            {
-                galleryCB.addItem(galleryName, ++id); //add to toplevel popup
-            }
-            
-            //otherwise add to or create submenu with name of subfolder
-            else
-            {
-                creatingSubmenu = true;
-                
-                submenuName = thisFile.getParentDirectory().getFileName(); //name of submenu
-                
-                if(submenuNames.contains(submenuName)) //add to existing submenu
-                {
-                    PopupMenu* existingMenu = submenus.getUnchecked(submenuNames.indexOf(submenuName));
-                    existingMenu->addItem(++id, galleryName);
-                }
-                else
-                {
-                    submenus.add(new PopupMenu());
-                    submenuNames.add(submenuName);
-                    
-                    submenus.getLast()->addItem(++id, galleryName);;
-                }
-            }
-            
-            if (thisFile.getFileName() == processor.currentGallery)
-            {
-                index = i;
-                lastGalleryCBId = id;
-            }
-        }
-        
-        //add last submenu to popup, if there is one
-        if(creatingSubmenu)
-        {
-            galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
-            creatingSubmenu = false;
-        }
-        
+		StringArray nameStack; //used for naviagting between levels of submenu during loading
+		OwnedArray<PopupMenu> submenus; //2d arrray of submenus modelling the recursive depth of submenu connections
+		StringArray submenuNames; //lists the submenu names so far; used to check against 
+		OwnedArray<Array<int>> parentIds; //2d int array used to record recursive depth of indices for parent menus
+		OwnedArray<Array<int>> childIds; //2d int array used to record recursive depth of indices for child menus
+
+		//first pass through the list: create menus and add galleries to them
+		for (int i = 0; i < processor.galleryNames.size(); i++)
+		{
+			File thisFile(processor.galleryNames[i]);
+			String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
+			String galleryPath = String(thisFile.getFullPathName());
+			int gallerySplitIndex = galleryPath.indexOf("galleries") + 10;
+			StringArray galleryFolders;
+			int divIndex = galleryPath.indexOfChar(gallerySplitIndex, divChar);
+			//split the filename into individual strings for folders
+			while (divIndex != -1)
+			{
+				//DBG("Adding " + galleryPath.substring(gallerySplitIndex, divIndex) + " to galleryFolders");
+				galleryFolders.add(galleryPath.substring(gallerySplitIndex, divIndex));
+				gallerySplitIndex = divIndex + 1;
+				divIndex = galleryPath.indexOfChar(gallerySplitIndex, divChar);
+			}
+			if (!submenus.isEmpty())
+			{
+				StringRef poppedMenuName = nameStack[nameStack.size() - 1];
+				while ((!galleryFolders.contains(poppedMenuName)) && (!nameStack.isEmpty()))
+				{
+					nameStack.remove(nameStack.size() - 1);
+					poppedMenuName = nameStack[nameStack.size() - 1];
+				}
+			}
+			//submenu creation for nested folders
+			if (galleryFolders.size() >= 1) 
+			{
+				//iterate through the folder names and create submenus if they don't exist
+				for (int j = 0; j < galleryFolders.size(); j++)
+				{
+					if (!submenuNames.contains(galleryFolders[j]))
+					{
+						if (parentIds.size() <= j)
+						{
+							parentIds.add(new Array<int>());
+							childIds.add(new Array<int>());
+						}
+						submenus.add(new PopupMenu());
+						nameStack.add(galleryFolders[j]);
+						submenuNames.add(galleryFolders[j]);
+						int childIdToBeAdded = submenus.size() - 1;
+						childIds[j]->add(childIdToBeAdded); // adds the current submenu id to the childids list
+
+						//adds the id of the current submenu's parent menu to the list of parent ids
+						if (j == 0)
+						{
+							parentIds[j]->add(-1);
+							//DBG("Assigning submenu " + galleryFolders[j] + " to main menu parent");
+						}
+						else
+						{
+							parentIds[j]->add(submenuNames.indexOf(galleryFolders[j - 1]));
+							//DBG("Assigning submenu " + galleryFolders[j] + " to parent menu " + galleryFolders[j - 1]);
+						}
+					}
+				}
+				//add gallery to its appropriate submenu
+				int submenuIndex = submenuNames.indexOf(galleryFolders[galleryFolders.size() - 1]);
+				submenus[submenuIndex]->addItem(++id, galleryName);
+				DBG("Successfully added " + galleryName + " to submenu " + galleryFolders[galleryFolders.size() - 1]);
+			}
+			//if there are no submenus, just add the gallery to the main menu
+			else
+			{
+				galleryCB.addItem(galleryName, ++id);
+				DBG("Successfully added " + galleryName + " to main menu");
+			}
+			if (thisFile.getFileName() == processor.currentGallery)
+			{
+				index = i;
+				lastGalleryCBId = id;
+			}
+		}
+
+		//pass through the submenus to add the nested submenus to their parent menus
+		for (int i = parentIds.size() - 1; i >= 0; i--)
+		{
+			for (int j = 0; j < parentIds[i]->size(); j++)
+			{
+				int childId = childIds[i]->getReference(j);
+				int parentId = parentIds[i]->getReference(j);
+				if (i == 0)
+				{
+					galleryCBPopUp->addSubMenu(submenuNames[childId], *submenus[childId]);
+					//DBG("Adding " + submenuNames[childId] + " submenu to the main menu");
+				}
+				else
+				{
+					submenus[parentId]->addSubMenu(submenuNames[childId], *submenus[childId]);
+					//DBG("Adding " + submenuNames[childId] + " submenu to parent menu " + submenuNames[parentId]);
+				}
+			}
+		}
+
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
         galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
@@ -766,13 +822,37 @@ void HeaderViewController::fillPianoCB(void)
     
     pianoCB.clear(dontSendNotification);
 
-    for (auto piano : processor.gallery->getPianos())
+	//now alphabetizes the list (turning into string) before putting it into the combo box
+	StringArray nameIDStrings = StringArray();
+
+	//concatenate name and ID into a single string using the newline character (something a user couldn't type) as a separator, then sorts the list of strings
+	for (auto piano : processor.gallery->getPianos())
+	{
+		String name = piano->getName();
+		String idString = String(piano->getId());
+		if (name != String()) nameIDStrings.add(name + char(10) + idString);
+		else nameIDStrings.add("Piano" + String(idString) + char(10) + idString);
+	}
+
+	nameIDStrings.sort(false);
+
+	//separates the combined string into name and ID parts, then adds to the combo box
+	for (auto combo : nameIDStrings)
+	{
+		int separatorIndex = combo.indexOfChar(char(10));
+		String name = combo.substring(0, separatorIndex);
+		int id = combo.substring(separatorIndex + 1).getIntValue();
+		pianoCB.addItem(name, id);
+	}
+
+	//old code
+    /*for (auto piano : processor.gallery->getPianos())
     {
         String name = piano->getName();
         
         if (name != String())  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());
-    }
+    }*/
 
     pianoCB.setSelectedId(processor.currentPiano->getId(), dontSendNotification);
 }
@@ -858,7 +938,7 @@ bool HeaderViewController::handleGalleryChange(void)
     }
     else if(galleryIsDirtyAlertResult == 2)
     {
-        DBG("not saving");
+        // DBG("not saving");
         shouldSwitch = true;
     }
     
@@ -905,7 +985,17 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
             else
             {
                 index = index - numberOfDefaultGalleryItems;
+				//processor.galleryNames.sortNatural();
                 String path = processor.galleryNames[index];
+                
+                /*
+                // ok this kludge at least makes it work, but not the best, as duplicate names or substrings could get mismapped
+                for (auto tpath : processor.galleryNames)
+                {
+                    if (tpath.contains(galleryCB.getText()))
+                        path = tpath;
+                }
+                 */
                 
                 processor.defaultLoaded = false;
                 processor.defaultName = "";
@@ -913,7 +1003,10 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
                 else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
                 
-                DBG("HeaderViewController::bkComboBoxDidChange combobox text = " + galleryCB.getText());
+                DBG("HeaderViewController::bkComboBoxDidChange combobox text / id / path = "
+                    + galleryCB.getText() + " "
+                    + String(index) + " "
+                    + path);
             }
             
         }
@@ -926,6 +1019,9 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
 
 void HeaderViewController::timerCallback()
 {
-
+    if (!galleryCB.isPopupActive())
+    {
+        // fillGalleryCB();
+    }
 }
 
