@@ -36,6 +36,14 @@ public:
     bool areTooltipsEnabled(void);
     Value getTooltipsEnabled(void);
     bool setTooltipsEnabled(bool enabled);
+
+	bool areKeystrokesEnabled(void);
+	Value getKeystrokesEnabled(void);
+	bool setKeystrokesEnabled(bool enabled);
+
+	bool areHotkeysEnabled(void);
+	Value getHotkeysEnabled(void);
+	bool setHotkeysEnabled(bool enabled);
     
     void showBKSettingsDialog(Button* button);
     

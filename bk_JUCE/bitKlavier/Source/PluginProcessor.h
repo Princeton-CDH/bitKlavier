@@ -350,7 +350,14 @@ public:
     inline Value getTooltipsEnabled(void) { return tooltipsEnabled; }
     inline void setTooltipsEnabled(bool enabled) { tooltipsEnabled.setValue(enabled); }
 
-	inline void setKeystrokeEnabled(bool enabled) { keystrokesEnabled = enabled; }
+	inline bool areKeystrokesEnabled(void) { return keystrokesEnabled.getValue(); }
+	inline Value getKeystrokesEnabled(void) { return keystrokesEnabled; }
+	inline void setKeystrokesEnabled(bool enabled) { keystrokesEnabled.setValue(enabled); }
+
+	inline bool areHotkeysEnabled(void) { return hotkeysEnabled.getValue(); }
+	inline Value getHotkeysEnabled(void) { return hotkeysEnabled; }
+	inline void setHotkeysEnabled(bool enabled) { hotkeysEnabled.setValue(enabled); }
+
     
 private:
     double currentSampleRate;
@@ -390,7 +397,9 @@ private:
     
     Value tooltipsEnabled;
 
-	bool keystrokesEnabled;
+	Value keystrokesEnabled;
+
+	Value hotkeysEnabled;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

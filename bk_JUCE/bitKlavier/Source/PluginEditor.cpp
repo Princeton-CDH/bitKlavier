@@ -93,6 +93,37 @@ bool BKAudioProcessorEditor::setTooltipsEnabled(bool enabled)
     return processor.areTooltipsEnabled();
 }
 
+bool BKAudioProcessorEditor::areKeystrokesEnabled()
+{
+	return processor.areKeystrokesEnabled();
+}
+
+Value BKAudioProcessorEditor::getKeystrokesEnabled(void)
+{
+	return processor.getKeystrokesEnabled();
+}
+
+bool BKAudioProcessorEditor::setKeystrokesEnabled(bool enabled)
+{
+	processor.setKeystrokesEnabled(enabled);
+	return processor.areKeystrokesEnabled();
+}
+
+bool BKAudioProcessorEditor::areHotkeysEnabled()
+{
+	return processor.areHotkeysEnabled();
+}
+
+Value BKAudioProcessorEditor::getHotkeysEnabled(void)
+{
+	return processor.getHotkeysEnabled();
+}
+
+bool BKAudioProcessorEditor::setHotkeysEnabled(bool enabled)
+{
+	processor.setHotkeysEnabled(enabled);
+	return processor.areHotkeysEnabled();
+}
 
 //==============================================================================
 

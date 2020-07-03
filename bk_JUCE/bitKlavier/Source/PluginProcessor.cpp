@@ -800,7 +800,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 	//{
 		for (int i = 0; i < notesOnUI.size(); i++)
 		{
-			if (keystrokesEnabled) handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel, cMidiInputUI);
+			if (keystrokesEnabled.getValue()) handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel, cMidiInputUI);
 			notesOnUI.remove(i);
 		}
 	//}
@@ -1550,7 +1550,7 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     
     channel = m.getChannel();
     
-    if (m.isNoteOn() && keystrokesEnabled)
+    if (m.isNoteOn() && keystrokesEnabled.getValue())
     {
         handleNoteOn(noteNumber, velocity, channel, sourceName);
     }

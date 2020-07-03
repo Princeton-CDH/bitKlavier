@@ -24,6 +24,8 @@ overtop(p, &theGraph),
 splash(p),
 timerCallbackCount(0),
 tooltipsButton("Show tooltips"),
+keystrokesButton("Enable keystrokes"),
+hotkeysButton("Enable hotkeys"),
 globalSoundSetButton("Use global samples"),
 hotkeysEnabled(true),
 keystrokesEnabled(true)
@@ -34,13 +36,19 @@ keystrokesEnabled(true)
 
     tooltipsButton.setClickingTogglesState(true);
     tooltipsButton.getToggleStateValue().referTo(editor.getTooltipsEnabled());
-
     addAndMakeVisible(tooltipsButton);
     
     globalSoundSetButton.setClickingTogglesState(true);
     globalSoundSetButton.addListener(this);
     addAndMakeVisible(globalSoundSetButton);
     
+	keystrokesButton.setClickingTogglesState(true);
+	keystrokesButton.getToggleStateValue().referTo(editor.getKeystrokesEnabled());
+	addAndMakeVisible(keystrokesButton);
+
+	hotkeysButton.setClickingTogglesState(true);
+	hotkeysButton.getToggleStateValue().referTo(editor.getHotkeysEnabled());
+	addAndMakeVisible(hotkeysButton);
     
     
     addAndMakeVisible(splash);
@@ -182,6 +190,8 @@ MainViewController::~MainViewController()
     mainSlider.setLookAndFeel(nullptr);
     overtop.setLookAndFeel(nullptr);
     tooltipsButton.setLookAndFeel(nullptr);
+	keystrokesButton.setLookAndFeel(nullptr);
+	hotkeysButton.setLookAndFeel(nullptr);
     globalSoundSetButton.setLookAndFeel(nullptr);
     //preferencesButton.setLookAndFeel(nullptr);
     keyboardComponent = nullptr;
@@ -274,9 +284,17 @@ void MainViewController::resized()
         
         //preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
         tooltipsButton.setBounds(footerSlice.getX(), footerSlice.getY(), 120, 20);
+
+		keystrokesButton.setBounds(unit/2 + gXSpacing, footerSlice.getY(), 120, 20);
+
+		hotkeysButton.setBounds(unit + 1.5 * gXSpacing, footerSlice.getY(), 120, 20);
         
-        sampleCB.setBounds(unit, footerSlice.getY(), unit-0.5*gXSpacing, 20);
-        instrumentCB.setBounds(2*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
+        sampleCB.setBounds(1.6 * unit, footerSlice.getY(), unit-0.5*gXSpacing, 20);
+        instrumentCB.setBounds(2.6*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
+
+		//original spacing to restore once tooltips/keystrokes/hotkeys get moved to a separate menu
+		//sampleCB.setBounds(unit, footerSlice.getY(), unit - 0.5 * gXSpacing, 20);
+		//instrumentCB.setBounds(2 * unit + 0.5 * gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
         
         globalSoundSetButton.setBounds(instrumentCB.getRight()+0.5*gXSpacing, sampleCB.getY(), 120, 20);
         
@@ -536,7 +554,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 {
     int code = e.getKeyCode();
 
-	if (hotkeysEnabled)
+	if (processor.areHotkeysEnabled())
 	{
 
 		if (code == KeyPress::escapeKey)
@@ -636,8 +654,8 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 		{
 			if (e.getModifiers().isCommandDown()) 
 			{
-				keystrokesEnabled = !keystrokesEnabled; //maybe don't even both keeping track of it here and just move the toggling into pluginProcessor?
-				processor.setKeystrokeEnabled(keystrokesEnabled);
+				//keystrokesEnabled = !keystrokesEnabled; //maybe don't even both keeping track of it here and just move the toggling into pluginProcessor?
+				processor.setKeystrokesEnabled(keystrokesEnabled);
 			}
 			else construction.addItem(PreparationTypeKeymap); //check that command isn't down because CTRL+K will enable/disable keystrokes eventually
 		}
@@ -716,7 +734,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 
 	if (code == 72) //CTRL + H toggles hotkeys on or off
 	{
-		if (e.getModifiers().isCommandDown()) hotkeysEnabled = !hotkeysEnabled;
+		if (e.getModifiers().isCommandDown()) processor.setHotkeysEnabled(!processor.areHotkeysEnabled());
 	}
 
     return true;

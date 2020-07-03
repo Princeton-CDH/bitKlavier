@@ -193,6 +193,8 @@ private:
     TextButton preferencesButton;
 
     ToggleButton tooltipsButton;
+	ToggleButton keystrokesButton;
+	ToggleButton hotkeysButton;
     
     ToggleButton globalSoundSetButton;
     
