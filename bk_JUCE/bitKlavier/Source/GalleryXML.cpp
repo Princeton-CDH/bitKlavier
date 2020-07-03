@@ -127,62 +127,6 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 int oldId = bkKeymaps.getLast()->getId();
                 int newId = transformId(PreparationTypeKeymap, oldId);
                 
-                newKeymap->setId(newId);
-                
-                if (n != String())     newKeymap->setName(n);
-                
-                Array<int> keys;
-                for (int k = 0; k < e->getNumAttributes(); k++)
-                {
-                    String attr = e->getStringAttribute(ptagKeymap_key + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        i = attr.getIntValue();
-                        keys.add(i);
-                    }
-                }
-                
-                newKeymap->setKeymap(keys);
-                
-                Array<KeymapTargetState> targetStates;
-                targetStates.ensureStorageAllocated(TargetTypeNil);
-                for (int i = 0; i < TargetTypeNil; ++i)
-                {
-                    targetStates.add(TargetStateNil);
-                    String attr = e->getStringAttribute(ptagKeymap_targetStates + String(i));
-                    
-                    if (attr != String())
-                    {
-                        targetStates.setUnchecked(i, (KeymapTargetState) attr.getIntValue());
-                    }
-                }
-                
-                newKeymap->setTargetStates(targetStates);
-                
-                String i = e->getStringAttribute(ptagKeymap_inverted);
-                if (i != String()) newKeymap->setInverted(i.getIntValue());
-                
-                forEachXmlChildElement (*e, sub)
-                {
-                    if (sub->hasTagName(vtagKeymap_midiInputs))
-                    {
-                        Array<String> inputs;
-                        for (int k = 0; k < sub->getNumAttributes(); k++)
-                        {
-                            String attr = sub->getStringAttribute(ptagKeymap_midiInput + String(k));
-                            if (attr == String()) continue;
-                            inputs.add(attr);
-                        }
-                        
-                        newKeymap->setMidiInputSources(inputs);
-                    }
-                }
-                
-                String d = e->getStringAttribute(ptagKeymap_defaultSelected);
-                if (d != String()) newKeymap->setDefaultSelected(d.getIntValue());
-
                 bkKeymaps.getLast()->setId(newId);
             }
             else if (e->hasTagName ( vtagGeneral))
