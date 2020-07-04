@@ -28,8 +28,8 @@ keystrokesButton("Enable keystrokes"),
 hotkeysButton("Enable hotkeys"),
 globalSoundSetButton("Use global samples"),
 hotkeysEnabled(true),
-keystrokesEnabled(true)
-//preferencesButton ("Preferences")
+keystrokesEnabled(true),
+preferencesButton("Preferences")
 {
     if (processor.platform == BKIOS)    display = DisplayConstruction;
     else                                display = DisplayDefault;
@@ -139,10 +139,10 @@ keystrokesEnabled(true)
     overtopShadow = std::make_unique<DropShadower>(myshadow);
     overtopShadow->setOwner(&overtop);
     
-    //preferencesButton.addListener (this);
-    //preferencesButton.setTriggeredOnMouseDown (true);
-    //preferencesButton.setLookAndFeel(&windowLAF);
-    //addAndMakeVisible (preferencesButton);
+    preferencesButton.addListener (this);
+    preferencesButton.setTriggeredOnMouseDown (true);
+    preferencesButton.setLookAndFeel(&windowLAF);
+    addAndMakeVisible (preferencesButton);
     
     if (editor.areTooltipsEnabled() && tipwindow == nullptr)
     {
@@ -193,7 +193,7 @@ MainViewController::~MainViewController()
 	keystrokesButton.setLookAndFeel(nullptr);
 	hotkeysButton.setLookAndFeel(nullptr);
     globalSoundSetButton.setLookAndFeel(nullptr);
-    //preferencesButton.setLookAndFeel(nullptr);
+    preferencesButton.setLookAndFeel(nullptr);
     keyboardComponent = nullptr;
     
 }
@@ -282,8 +282,10 @@ void MainViewController::resized()
 
         float unit = footerSlice.getWidth() * 0.25;
         
-        //preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
-        tooltipsButton.setBounds(footerSlice.getX(), footerSlice.getY(), 120, 20);
+        preferencesButton.setBounds (footerSlice.getX() + gXSpacing, footerSlice.getY(), 100, 20);
+        
+		/* SPACING WITHOUT PREFERENCES MENU
+		tooltipsButton.setBounds(footerSlice.getX(), footerSlice.getY(), 120, 20);
 
 		keystrokesButton.setBounds(unit/2 + gXSpacing, footerSlice.getY(), 120, 20);
 
@@ -291,10 +293,11 @@ void MainViewController::resized()
         
         sampleCB.setBounds(1.6 * unit, footerSlice.getY(), unit-0.5*gXSpacing, 20);
         instrumentCB.setBounds(2.6*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
+		*/
 
 		//original spacing to restore once tooltips/keystrokes/hotkeys get moved to a separate menu
-		//sampleCB.setBounds(unit, footerSlice.getY(), unit - 0.5 * gXSpacing, 20);
-		//instrumentCB.setBounds(2 * unit + 0.5 * gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
+		sampleCB.setBounds(unit, footerSlice.getY(), unit - 0.5 * gXSpacing, 20);
+		instrumentCB.setBounds(2 * unit + 0.5 * gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
         
         globalSoundSetButton.setBounds(instrumentCB.getRight()+0.5*gXSpacing, sampleCB.getY(), 120, 20);
         
@@ -488,10 +491,10 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
 void MainViewController::bkButtonClicked (Button* b)
 {
     String name = b->getName();
-    //if (b == &preferencesButton)
-    //{
-    //    editor.showBKSettingsDialog(b);
-    //}
+    if (b == &preferencesButton)
+    {
+        editor.showBKSettingsDialog(b);
+    }
     if (b == &globalSoundSetButton)
     {
         BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);

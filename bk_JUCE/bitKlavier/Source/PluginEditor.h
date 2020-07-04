@@ -70,7 +70,11 @@ private:
         PreferencesComponent (BKAudioProcessorEditor& editor)
         : owner (editor),
         tooltipsLabel  ("Show tooltips", "Show tooltips"),
-        tooltipsButton ("")
+		keystrokesLabel("Enable keystrokes", "Enable keystrokes"),
+		hotkeysLabel("Enable hotkeys", "Enable hotkeys"),
+        tooltipsButton (""),
+		keystrokesButton(""),
+		hotkeysButton("")
         {
             setOpaque (true);
             
@@ -81,6 +85,22 @@ private:
             addAndMakeVisible (tooltipsLabel);
             
             tooltipsLabel.attachToComponent (&tooltipsButton, true);
+
+			keystrokesButton.setClickingTogglesState(true);
+			keystrokesButton.getToggleStateValue().referTo(owner.getKeystrokesEnabled());
+
+			addAndMakeVisible(keystrokesButton);
+			addAndMakeVisible(keystrokesLabel);
+
+			keystrokesLabel.attachToComponent(&keystrokesButton, true);
+
+			hotkeysButton.setClickingTogglesState(true);
+			hotkeysButton.getToggleStateValue().referTo(owner.getHotkeysEnabled());
+
+			addAndMakeVisible(hotkeysButton);
+			addAndMakeVisible(hotkeysLabel);
+
+			hotkeysLabel.attachToComponent(&hotkeysButton, true);
         }
         
         void paint (Graphics& g) override
@@ -96,6 +116,8 @@ private:
             r.removeFromLeft(r.getWidth() * 0.5);
             r.removeFromRight(8);
             tooltipsButton.setBounds (r.removeFromTop(24));
+			keystrokesButton.setBounds(r.removeFromTop(24));
+			hotkeysButton.setBounds(r.removeFromTop(24));
         }
         
     private:
@@ -103,7 +125,12 @@ private:
         BKAudioProcessorEditor& owner;
         
         Label tooltipsLabel;
+		Label keystrokesLabel;
+		Label hotkeysLabel;
         ToggleButton tooltipsButton;
+		ToggleButton keystrokesButton;
+		ToggleButton hotkeysButton;
+
         // Other ideas for preferences
         // - Show keyboard contents when selected
         // - Preparation activity indicators

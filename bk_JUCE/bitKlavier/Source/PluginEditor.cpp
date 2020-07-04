@@ -71,7 +71,7 @@ void BKAudioProcessorEditor::resized()
 void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
 {
     Component* settings = new PreferencesComponent (*this);
-    settings->setSize(200, 40);
+    settings->setSize(200, 120);
     
     CallOutBox* preferences = &CallOutBox::launchAsynchronously (settings, button->getScreenBounds(), nullptr);
     preferences->setLookAndFeel(&laf);
