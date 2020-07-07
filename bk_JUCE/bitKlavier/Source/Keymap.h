@@ -304,6 +304,10 @@ public:
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
+
+    inline void setAllNotesOff(bool newValue) { allNotesOff = newValue; }
+    inline void toggleAllNotesOff() { allNotesOff = !allNotesOff; }
+    inline bool getAllNotesOff() { return allNotesOff; }
     
 private:
     BKAudioProcessor& processor;
@@ -325,6 +329,8 @@ private:
     bool defaultSelected;
     bool onscreenSelected;
     
+    bool allNotesOff;
+
     JUCE_LEAK_DETECTOR (Keymap)
 };
 

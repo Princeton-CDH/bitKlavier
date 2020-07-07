@@ -128,6 +128,10 @@ private:
     bool focusLostByEscapeKey;
     
     bool needsOctaveSlider;
+
+    ToggleButton endKeystrokesToggle;
+
+
 #if JUCE_IOS
     Slider octaveSlider;
     void sliderValueChanged     (Slider* slider)                override;

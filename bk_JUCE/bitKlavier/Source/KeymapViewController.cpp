@@ -193,6 +193,15 @@ BKViewController(p, theGraph, 1)
     tempoTBGroup.setText("Tempo Targets");
     tempoTBGroup.setTextLabelPosition(Justification::centred);
     //addAndMakeVisible(tempoTBGroup);
+
+
+    endKeystrokesToggle.setButtonText("End Keystrokes");
+    endKeystrokesToggle.setToggleState(false, dontSendNotification);
+    endKeystrokesToggle.setLookAndFeel(&buttonsAndMenusLAF2); // text to left
+    endKeystrokesToggle.setTooltip("Indicates whether to end all keystrokes whenever a note is played.");
+    endKeystrokesToggle.addListener(this);
+    addAndMakeVisible(&endKeystrokesToggle, ALL);
+
     
     fillSelectCB(-1,-1);
     
@@ -287,6 +296,9 @@ void KeymapViewController::resized()
     
     invertOnOffToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
     invertOnOffToggle.toFront(false);
+
+    endKeystrokesToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
+    endKeystrokesToggle.toFront(false);
     
     // height of the box for the prep with the most targets (Synchronic)
     int maxTargetHeight =   (TargetTypeSynchronicRotate - TargetTypeSynchronic + 1) *
@@ -837,6 +849,11 @@ void KeymapViewController::bkButtonClicked (Button* b)
 
         keyboard->setKeysInKeymap(keymap->keys());
     }
+    else if (b == &endKeystrokesToggle)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setAllNotesOff(endKeystrokesToggle.getToggleState());
+    }
     else
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
@@ -955,6 +972,7 @@ void KeymapViewController::update(void)
         selectCB.setSelectedId(processor.updateState->currentKeymapId, dontSendNotification);
         invertOnOffToggle.setToggleState(km->isInverted(), dontSendNotification);
         midiEditToggle.setToggleState(km->getMidiEdit(), dontSendNotification);
+        endKeystrokesToggle.setToggleState(km->getAllNotesOff(), dontSendNotification);
         keymapTF.setText( intArrayToString(km->keys()));
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
         keyboard->setKeysInKeymap(km->keys());

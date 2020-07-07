@@ -358,6 +358,8 @@ public:
 	inline Value getHotkeysEnabled(void) { return hotkeysEnabled; }
 	inline void setHotkeysEnabled(bool enabled) { hotkeysEnabled.setValue(enabled); }
 
+    void handleAllNotesOff();
+
     
 private:
     double currentSampleRate;

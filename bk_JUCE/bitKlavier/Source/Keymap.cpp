@@ -23,7 +23,8 @@ inverted(false),
 triggered(false),
 midiInputSources(Array<String>()),
 defaultSelected(false),
-onscreenSelected(true)
+onscreenSelected(true),
+allNotesOff(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -59,7 +60,8 @@ midiEdit(false),
 inverted(false),
 midiInputSources(k->getMidiInputSources()),
 defaultSelected(k->isDefaultSelected()),
-onscreenSelected(k->isOnscreenSelected())
+onscreenSelected(k->isOnscreenSelected()),
+allNotesOff(k->getAllNotesOff())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -85,7 +87,8 @@ midiEdit(false),
 inverted(false),
 midiInputSources(k->getMidiInputSources()),
 defaultSelected(k->isDefaultSelected()),
-onscreenSelected(k->isOnscreenSelected())
+onscreenSelected(k->isOnscreenSelected()),
+allNotesOff(k->getAllNotesOff())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -113,7 +116,8 @@ midiEdit(false),
 inverted(false),
 midiInputSources(Array<String>()),
 defaultSelected(false),
-onscreenSelected(true)
+onscreenSelected(true),
+allNotesOff(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)

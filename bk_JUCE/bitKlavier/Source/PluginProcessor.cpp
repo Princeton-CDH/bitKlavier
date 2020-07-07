@@ -399,14 +399,7 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
 
 void BKAudioProcessor::clearBitKlavier(void)
 {
-    for (int i = 0; i < 15; i++)
-    {
-        hammerReleaseSynth.allNotesOff(i, true);
-        resonanceReleaseSynth.allNotesOff(i, true);
-        mainPianoSynth.allNotesOff(i, true);
-        pedalSynth.allNotesOff(i, true);
-    }
-    sustainDeactivate();
+    handleAllNotesOff();
     
     for (auto piano : gallery->getPianos())
     {
@@ -521,6 +514,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
     bool activeSource = false;
+    bool allNotesOff = false;
     if (pmap != nullptr)
     {
         for (auto km : pmap->getKeymaps())
@@ -528,16 +522,19 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             if (km->getAllMidiInputSources().contains(source))
             {
                 activeSource = true;
+                if (km->getAllNotesOff())
+                {
+                    allNotesOff = true;
+                }
             }
         }
     }
     
-    if (activeSource || getDefaultMidiInputSources().contains(source))
+    if ((activeSource || getDefaultMidiInputSources().contains(source)) && !allNotesOff)
     {
         ++noteOnCount;
         noteOn.set(noteNumber, true);
         noteVelocity.set(noteNumber, velocity);
-        if (allNotesOff)   allNotesOff = false;
     }
     
     if (!activeSource) return;
@@ -547,50 +544,63 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     {
         for (auto keymap : pmap.keymaps)
         {
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
             {
-                int whichPiano = pmap.pianoTarget;
-                if (whichPiano > 0 && whichPiano != currentPiano->getId())
+                if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputSources().contains(source))
                 {
-                    DBG("change piano to " + String(whichPiano));
-                    setCurrentPiano(whichPiano);
+                    int whichPiano = pmap.pianoTarget;
+                    if (whichPiano > 0 && whichPiano != currentPiano->getId())
+                    {
+                        DBG("change piano to " + String(whichPiano));
+                        setCurrentPiano(whichPiano);
+                    }
+                    break;
                 }
-                break;
             }
         }
+
+        // modifications
+        performResets(noteNumber, source);
+        performModifications(noteNumber, source);
+
+        // clears key from array of depressed notes in prevPiano so they don't get cutoff by sustain pedal release
+        for (auto piano : prevPianos)
+        {
+            if (piano != currentPiano)
+                piano->prepMap->clearKey(noteNumber);
+        }
+
+        // Send key on to each pmap in current piano
+        //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
+
+        // TODO : for multi sample set support, remove soundfont argument from this chain of functions
+        // UPDATE: actually seems like that argument isn't really used so it doesn't matter. still should clean this up
+        currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
+
+        //add note to springTuning, if only for Graph display
+        //this could be a bad idea, in that a user may want to have only some keys (via a keymap) go to Spring tuning
+        /*
+        for ( auto t : currentPiano->getTuningProcessors())
+        {
+            t->getTuning()->getCurrentSpringTuning()->addNote(noteNumber);
+            //t->getTuning()->getSpringTuning()->addNote(noteNumber);
+        }
+        */
+        //keeping out for now; I just think it's better to be consistent, and even though it can be easy to forget
+        //that you need to connect a Keymap to Tuning to get adaptive/spring tunings, it also allows you
+        //control over which keys are going to spring tuning, which i can imagine being useful sometimes.
     }
-    
-    // modifications
-    performResets(noteNumber, source);
-    performModifications(noteNumber, source);
-    
-    // clears key from array of depressed notes in prevPiano so they don't get cutoff by sustain pedal release
-    for (auto piano : prevPianos)
+}
+
+void BKAudioProcessor::handleAllNotesOff()
+{
+    for (int i = 0; i < 15; i++)
     {
-        if (piano != currentPiano)
-            piano->prepMap->clearKey(noteNumber);
+        hammerReleaseSynth.allNotesOff(i, true);
+        resonanceReleaseSynth.allNotesOff(i, true);
+        mainPianoSynth.allNotesOff(i, true);
+        pedalSynth.allNotesOff(i, true);
     }
-    
-    // Send key on to each pmap in current piano
-    //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
-    
-    // TODO : for multi sample set support, remove soundfont argument from this chain of functions
-    // UPDATE: actually seems like that argument isn't really used so it doesn't matter. still should clean this up
-    currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
-    
-    //add note to springTuning, if only for Graph display
-    //this could be a bad idea, in that a user may want to have only some keys (via a keymap) go to Spring tuning
-    /*
-    for ( auto t : currentPiano->getTuningProcessors())
-    {
-        t->getTuning()->getCurrentSpringTuning()->addNote(noteNumber);
-        //t->getTuning()->getSpringTuning()->addNote(noteNumber);
-    }
-    */
-    //keeping out for now; I just think it's better to be consistent, and even though it can be easy to forget
-    //that you need to connect a Keymap to Tuning to get adaptive/spring tunings, it also allows you
-    //control over which keys are going to spring tuning, which i can imagine being useful sometimes.
-    
+    sustainDeactivate();
 }
 
 void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, String source)
@@ -797,13 +807,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     }
     
 	
-	//{
-		for (int i = 0; i < notesOnUI.size(); i++)
-		{
-			if (keystrokesEnabled.getValue()) handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel, cMidiInputUI);
-			notesOnUI.remove(i);
-		}
-	//}
+	for (int i = 0; i < notesOnUI.size(); i++)
+	{
+		if (keystrokesEnabled.getValue()) handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel, cMidiInputUI);
+		notesOnUI.remove(i);
+	}
     
     for(int i=0; i<notesOffUI.size(); i++)
     {
