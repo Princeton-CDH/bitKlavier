@@ -529,8 +529,12 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             }
         }
     }
-    
-    if ((activeSource || getDefaultMidiInputSources().contains(source)) && !allNotesOff)
+
+    if (allNotesOff)
+    {
+        handleAllNotesOff();
+    }
+    else if ((activeSource || getDefaultMidiInputSources().contains(source)))
     {
         ++noteOnCount;
         noteOn.set(noteNumber, true);
