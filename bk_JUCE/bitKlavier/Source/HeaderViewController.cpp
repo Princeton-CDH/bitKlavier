@@ -626,7 +626,7 @@ void HeaderViewController::loadDefaultGalleries(void)
         
         int size;
         
-        PopupMenu mikroetudes_menu, ns_etudes_menu, bk_examples_menu;
+        PopupMenu mikroetudes_menu, ns_etudes_menu, bk_examples_menu, machines_menu;
         
         //data = BinaryData::Basic_Piano_xml;
         for (int i = 0; i < BinaryData::namedResourceListSize; i++)
@@ -639,10 +639,11 @@ void HeaderViewController::loadDefaultGalleries(void)
                 
                 name = data.fromFirstOccurrenceOf("<gallery name=\"", false, true).upToFirstOccurrenceOf("\"", false, true);
 
-                if (processor.mikroetudes.contains(name))       mikroetudes_menu.addItem(id++, name);
-                else if (processor.ns_etudes.contains(name))    ns_etudes_menu.addItem(id++, name);
-                else if (processor.bk_examples.contains(name))  bk_examples_menu.addItem(id++, name);
-                else                                            galleryCB.addItem(name, id++);
+                if (processor.mikroetudes.contains(name))                   mikroetudes_menu.addItem(id++, name);
+                else if (processor.ns_etudes.contains(name))                ns_etudes_menu.addItem(id++, name);
+                else if (processor.bk_examples.contains(name))              bk_examples_menu.addItem(id++, name);
+                else if (processor.machines_for_listening.contains(name))   machines_menu.addItem(id++, name);
+                else                                                        galleryCB.addItem(name, id++);
                 
             }
         }
@@ -650,6 +651,7 @@ void HeaderViewController::loadDefaultGalleries(void)
         popupRoot->addSubMenu("Examples", bk_examples_menu);
         popupRoot->addSubMenu("Nostalgic Synchronic", ns_etudes_menu);
         popupRoot->addSubMenu("Mikroetudes", mikroetudes_menu);
+        popupRoot->addSubMenu("Machines for Listening", machines_menu);
         
         galleryCB.addSeparator();
         

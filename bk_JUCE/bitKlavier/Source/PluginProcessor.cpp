@@ -291,6 +291,11 @@ void BKAudioProcessor::loadGalleries()
         "NS_7_Systerslaat",
         "NS_8_ItIsEnough"
     });
+    
+    machines_for_listening = StringArray({
+        "Machines for Listening (49key)",
+        "Machines for Listening"
+    });
 }
 
 void BKAudioProcessor::openSoundfont(void)
