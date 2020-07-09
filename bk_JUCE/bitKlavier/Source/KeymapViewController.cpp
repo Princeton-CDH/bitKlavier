@@ -197,7 +197,7 @@ BKViewController(p, theGraph, 1)
 
     endKeystrokesToggle.setButtonText("End Keystrokes");
     endKeystrokesToggle.setToggleState(false, dontSendNotification);
-    endKeystrokesToggle.setLookAndFeel(&buttonsAndMenusLAF2); // text to left
+    endKeystrokesToggle.setLookAndFeel(&buttonsAndMenusLAF2); // text to right?
     endKeystrokesToggle.setTooltip("Indicates whether to end all keystrokes whenever a note is played.");
     endKeystrokesToggle.addListener(this);
     addAndMakeVisible(&endKeystrokesToggle, ALL);
@@ -279,7 +279,7 @@ void KeymapViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
-    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2));
     
     actionButton.setBounds(selectCB.getRight()+gXSpacing,
                            selectCB.getY(),
@@ -296,6 +296,7 @@ void KeymapViewController::resized()
     
     invertOnOffToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
     invertOnOffToggle.toFront(false);
+    targetsSlice.removeFromRight(gXSpacing);
 
     endKeystrokesToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
     endKeystrokesToggle.toFront(false);

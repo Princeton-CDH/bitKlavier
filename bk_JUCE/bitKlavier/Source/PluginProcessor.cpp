@@ -534,18 +534,21 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                 activeSource = true;
                 if (km->getAllNotesOff())
                 {
-                    keystrokesEnding = true;
+                    clearBitKlavier();
+                    //keystrokesEnding = true;
                 }
             }
+            
         }
     }
 
-    if (keystrokesEnding)
-    {
+    //if (keystrokesEnding)
+    //{
         //handleAllNotesOff();
-        sustainDeactivate();
-    }
-    else if ((activeSource || getDefaultMidiInputSources().contains(source)))
+        //sustainDeactivate();
+        //clear(PreparationTypeKeymap, updateState->currentKeymapId);
+    //}
+    if ((activeSource || getDefaultMidiInputSources().contains(source)))
     {
         ++noteOnCount;
         noteOn.set(noteNumber, true);
@@ -590,7 +593,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
     // TODO : for multi sample set support, remove soundfont argument from this chain of functions
     // UPDATE: actually seems like that argument isn't really used so it doesn't matter. still should clean this up
-    if (!keystrokesEnding) currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
+    currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
 
     //add note to springTuning, if only for Graph display
     //this could be a bad idea, in that a user may want to have only some keys (via a keymap) go to Spring tuning
