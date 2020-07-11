@@ -24,11 +24,11 @@ overtop(p, &theGraph),
 splash(p),
 timerCallbackCount(0),
 tooltipsButton("Show tooltips"),
-keystrokesButton("Enable keystrokes"),
+//keystrokesButton("Enable keystrokes"),
 hotkeysButton("Enable hotkeys"),
 globalSoundSetButton("Use global samples"),
 hotkeysEnabled(true),
-keystrokesEnabled(true),
+//keystrokesEnabled(true),
 preferencesButton("Preferences")
 {
     if (processor.platform == BKIOS)    display = DisplayConstruction;
@@ -42,9 +42,9 @@ preferencesButton("Preferences")
     globalSoundSetButton.addListener(this);
     addAndMakeVisible(globalSoundSetButton);
     
-	keystrokesButton.setClickingTogglesState(true);
+	/*keystrokesButton.setClickingTogglesState(true);
 	keystrokesButton.getToggleStateValue().referTo(editor.getKeystrokesEnabled());
-	addAndMakeVisible(keystrokesButton);
+	addAndMakeVisible(keystrokesButton);*/
 
 	hotkeysButton.setClickingTogglesState(true);
 	hotkeysButton.getToggleStateValue().referTo(editor.getHotkeysEnabled());
@@ -190,7 +190,7 @@ MainViewController::~MainViewController()
     mainSlider.setLookAndFeel(nullptr);
     overtop.setLookAndFeel(nullptr);
     tooltipsButton.setLookAndFeel(nullptr);
-	keystrokesButton.setLookAndFeel(nullptr);
+	//keystrokesButton.setLookAndFeel(nullptr);
 	hotkeysButton.setLookAndFeel(nullptr);
     globalSoundSetButton.setLookAndFeel(nullptr);
     preferencesButton.setLookAndFeel(nullptr);
@@ -655,12 +655,12 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 		}
 		else if (code == 75) // K keymap
 		{
-			if (e.getModifiers().isCommandDown()) 
-			{
-				//keystrokesEnabled = !keystrokesEnabled; //maybe don't even both keeping track of it here and just move the toggling into pluginProcessor?
-				processor.setKeystrokesEnabled(keystrokesEnabled);
-			}
-			else construction.addItem(PreparationTypeKeymap); //check that command isn't down because CTRL+K will enable/disable keystrokes eventually
+			//if (e.getModifiers().isCommandDown()) 
+			//{
+				//processor.setKeystrokesEnabled(keystrokesEnabled);
+			//}
+			//else //check that command isn't down because CTRL+K will enable/disable keystrokes eventually
+            construction.addItem(PreparationTypeKeymap); 
 		}
 		else if (code == 77) // M tempo
 		{

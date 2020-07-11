@@ -350,9 +350,11 @@ public:
     inline Value getTooltipsEnabled(void) { return tooltipsEnabled; }
     inline void setTooltipsEnabled(bool enabled) { tooltipsEnabled.setValue(enabled); }
 
+    /*
 	inline bool areKeystrokesEnabled(void) { return keystrokesEnabled.getValue(); }
 	inline Value getKeystrokesEnabled(void) { return keystrokesEnabled; }
 	inline void setKeystrokesEnabled(bool enabled) { keystrokesEnabled.setValue(enabled); }
+    */
 
 	inline bool areHotkeysEnabled(void) { return hotkeysEnabled.getValue(); }
 	inline Value getHotkeysEnabled(void) { return hotkeysEnabled; }
@@ -399,7 +401,7 @@ private:
     
     Value tooltipsEnabled;
 
-	Value keystrokesEnabled;
+	//Value keystrokesEnabled;
 
 	Value hotkeysEnabled;
 

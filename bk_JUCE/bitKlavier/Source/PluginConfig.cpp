@@ -76,6 +76,7 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     ValueTree settingsVT("userSettings");
     
     settingsVT.setProperty("tooltipsEnabled", (int)areTooltipsEnabled(), 0);
+    settingsVT.setProperty("hotkeysEnabled", (int)areHotkeysEnabled(), 0);
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
@@ -143,7 +144,10 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
     {
         XmlElement* userSettings = galleryXML->getChildElement(0);
         if (userSettings != nullptr)
-            setTooltipsEnabled((bool) userSettings->getStringAttribute("tooltipsEnabled").getIntValue());
+        {
+            setTooltipsEnabled((bool)userSettings->getStringAttribute("tooltipsEnabled").getIntValue());
+            setHotkeysEnabled((bool)userSettings->getStringAttribute("hotkeysEnabled").getIntValue());
+        }
         
         defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
         

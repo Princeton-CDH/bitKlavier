@@ -37,9 +37,11 @@ public:
     Value getTooltipsEnabled(void);
     bool setTooltipsEnabled(bool enabled);
 
+    /*
 	bool areKeystrokesEnabled(void);
 	Value getKeystrokesEnabled(void);
 	bool setKeystrokesEnabled(bool enabled);
+    */
 
 	bool areHotkeysEnabled(void);
 	Value getHotkeysEnabled(void);
@@ -70,10 +72,10 @@ private:
         PreferencesComponent (BKAudioProcessorEditor& editor)
         : owner (editor),
         tooltipsLabel  ("Show tooltips", "Show tooltips"),
-		keystrokesLabel("Enable keystrokes", "Enable keystrokes"),
+		//keystrokesLabel("Enable keystrokes", "Enable keystrokes"),
 		hotkeysLabel("Enable hotkeys", "Enable hotkeys"),
         tooltipsButton (""),
-		keystrokesButton(""),
+		//keystrokesButton(""),
 		hotkeysButton("")
         {
             setOpaque (true);
@@ -86,6 +88,7 @@ private:
             
             tooltipsLabel.attachToComponent (&tooltipsButton, true);
 
+            /*
 			keystrokesButton.setClickingTogglesState(true);
 			keystrokesButton.getToggleStateValue().referTo(owner.getKeystrokesEnabled());
 
@@ -93,6 +96,7 @@ private:
 			addAndMakeVisible(keystrokesLabel);
 
 			keystrokesLabel.attachToComponent(&keystrokesButton, true);
+            */
 
 			hotkeysButton.setClickingTogglesState(true);
 			hotkeysButton.getToggleStateValue().referTo(owner.getHotkeysEnabled());
@@ -116,7 +120,7 @@ private:
             r.removeFromLeft(r.getWidth() * 0.5);
             r.removeFromRight(8);
             tooltipsButton.setBounds (r.removeFromTop(24));
-			keystrokesButton.setBounds(r.removeFromTop(24));
+			//keystrokesButton.setBounds(r.removeFromTop(24));
 			hotkeysButton.setBounds(r.removeFromTop(24));
         }
         
@@ -125,10 +129,10 @@ private:
         BKAudioProcessorEditor& owner;
         
         Label tooltipsLabel;
-		Label keystrokesLabel;
+		//Label keystrokesLabel;
 		Label hotkeysLabel;
         ToggleButton tooltipsButton;
-		ToggleButton keystrokesButton;
+		//ToggleButton keystrokesButton;
 		ToggleButton hotkeysButton;
 
         // Other ideas for preferences

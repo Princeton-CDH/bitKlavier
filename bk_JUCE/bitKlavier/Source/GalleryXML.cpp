@@ -45,11 +45,6 @@ ValueTree  Gallery::getState(void)
     galleryVT.setProperty("sampleType", processor.globalSampleType, 0);
     galleryVT.setProperty("soundfontURL", processor.globalSoundfont, 0);
     galleryVT.setProperty("soundfontInst", processor.globalInstrument, 0);
-
-	//attempting to save tooltip/keystroke/hotkey
-	galleryVT.setProperty("tooltipToggle", processor.areTooltipsEnabled(), 0);
-	galleryVT.setProperty("keystrokeToggle", processor.areKeystrokesEnabled(), 0);
-	galleryVT.setProperty("hotkeyToggle", processor.areHotkeysEnabled(), 0);
     
     // We don't do anything with these on loading so don't see why we should save them
 //    ValueTree idCountVT( "idcounts");
@@ -119,10 +114,6 @@ void Gallery::setStateFromXML(XmlElement* xml)
         name = xml->getStringAttribute("name");
         
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
-
-		processor.setTooltipsEnabled(xml->getBoolAttribute("tooltipToggle"));
-		processor.setKeystrokesEnabled(xml->getBoolAttribute("keystrokeToggle"));
-		processor.setHotkeysEnabled(xml->getBoolAttribute("hotkeyToggle"));
         
         // iterate through its sub-elements
         forEachXmlChildElement (*xml, e)

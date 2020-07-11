@@ -93,6 +93,7 @@ bool BKAudioProcessorEditor::setTooltipsEnabled(bool enabled)
     return processor.areTooltipsEnabled();
 }
 
+/*
 bool BKAudioProcessorEditor::areKeystrokesEnabled()
 {
 	return processor.areKeystrokesEnabled();
@@ -108,6 +109,7 @@ bool BKAudioProcessorEditor::setKeystrokesEnabled(bool enabled)
 	processor.setKeystrokesEnabled(enabled);
 	return processor.areKeystrokesEnabled();
 }
+*/
 
 bool BKAudioProcessorEditor::areHotkeysEnabled()
 {
