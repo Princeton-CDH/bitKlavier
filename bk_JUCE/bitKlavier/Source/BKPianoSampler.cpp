@@ -773,6 +773,26 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
             }
             
         }
+        /*
+         else if (playDirection == Reverse)
+                {
+                    sourceSamplePosition -= bentRatio;
+                    
+                    if (sourceSamplePosition <= playEndPosition)
+                    {
+                        if ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE))
+                        {
+                            // DBG("reverse sample adsr.keyOff");
+                            adsr.keyOff();
+                        }
+                    }
+                    
+                    if(sourceSamplePosition <= 0)
+                    {
+                        clearCurrentNote();
+                    }
+                }
+        */
         else if (playDirection == Reverse)
         {
             /*
@@ -781,8 +801,10 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
                 clearCurrentNote(); break;
             }
              */
+            sourceSamplePosition -= bentRatio;
             
-            if (lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
+            if (sourceSamplePosition <= playEndPosition)
+            // if (lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
             //if (playType != Normal && (lengthTracker >= playLength))
             {
                 if ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE))
