@@ -29,16 +29,7 @@ public:
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
     
     uint64 time, synchronicNotePlayTime;
-    inline void timerCallback(void) override
-    {
-        time++;
-        if (type == PreparationTypeKeymap ||
-            type == PreparationTypeSynchronic ||
-            type == PreparationTypeNostalgic)
-        {
-            repaint();
-        }
-    }
+    void timerCallback(void) override;
     
     ~BKItem(void);
 

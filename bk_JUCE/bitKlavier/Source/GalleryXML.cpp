@@ -96,7 +96,6 @@ ValueTree  Gallery::getState(void)
 
 void Gallery::setStateFromXML(XmlElement* xml)
 {
-    int i;
     Array<float> fa;
     Array<int> fi;
     
@@ -143,7 +142,6 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 int newId = transformId(PreparationTypeTuning, oldId);
                 
                 tuning.getLast()->setId(newId);
-                
             }
             else if (e->hasTagName( vtagModTuning))
             {

@@ -186,6 +186,7 @@ void BKAudioProcessor::loadGalleries()
     
     loadGalleryFromXml(XmlDocument::parse(xmlData).get());
     
+
 #if JUCE_IOS
     platform = BKIOS;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
@@ -202,6 +203,7 @@ void BKAudioProcessor::loadGalleries()
     platform = BKLinux;
     lastGalleryPath = lastGalleryPath.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
+
     
     noteOn.ensureStorageAllocated(128);
     noteVelocity.ensureStorageAllocated(128);

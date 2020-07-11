@@ -33,7 +33,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     synth->clearVoices();
 //    synth->clearSounds(0);
     
-    for (int i = 0; i < 300; ++i)
+    for (int i = 0; i < 128; ++i)
     {
         synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
     }
@@ -312,7 +312,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
 //    synth->clearSounds(0);
     
     // 88 or more seems to work well
-    for (int i = 0; i < 300; i++)   synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
+    for (int i = 0; i < 128; i++)   synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
     
     
     for (int i = 0; i < 8; i++) {
@@ -463,7 +463,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
     synth->clearVoices();
 //    synth->clearSounds(0);
     
-    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
+    for (int i = 0; i < 128; i++)    synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
 
     //load release resonance samples
     for (int i = 0; i < 7; i++) {       //i => octave
