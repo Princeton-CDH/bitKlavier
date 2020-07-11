@@ -188,20 +188,20 @@ void BKAudioProcessor::loadGalleries()
     
 
 #if JUCE_IOS
-    platform = BKIOS;
-    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
+        platform = BKIOS;
+        lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory);
 #endif
 #if JUCE_MAC
-    platform = BKOSX;
-    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+        platform = BKOSX;
+        lastGalleryPath = lastGalleryPath.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 #if JUCE_WINDOWS
-    platform = BKWindows;
-    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+        platform = BKWindows;
+        lastGalleryPath = lastGalleryPath.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 #if JUCE_LINUX
-    platform = BKLinux;
-    lastGalleryPath = lastGalleryPath.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+        platform = BKLinux;
+        lastGalleryPath = lastGalleryPath.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 #endif
 
     
