@@ -140,7 +140,7 @@ void BKSynthesiser::clearVoices()
 
 BKSynthesiserVoice* BKSynthesiser::addVoice (BKSynthesiserVoice* const newVoice)
 {
-    const ScopedLock sl (lock);
+//    const ScopedLock sl (lock);
     newVoice->setCurrentPlaybackSampleRate (processor.getCurrentSampleRate());
     return voices.add (newVoice);
 }
@@ -160,7 +160,7 @@ void BKSynthesiser::clearSounds(int set)
 
 BKSynthesiserSound* BKSynthesiser::addSound (int set, const BKSynthesiserSound::Ptr& newSound)
 {
-    const ScopedLock sl (lock);
+//    const ScopedLock sl (lock);
     while (soundSets.size() - 1 < set)
     {
 //        soundSets.insertMultiple(soundSets.size(), ReferenceCountedArray<BKSynthesiserSound>(), set - (soundSets.size() - 1));
