@@ -102,9 +102,10 @@ private:
  
  @see BKSynthesiser, BKSynthesiserSound
  */
-class  BKSynthesiserVoice
+class  BKSynthesiserVoice : public ReferenceCountedObject
 {
 public:
+    typedef ReferenceCountedObjectPtr<BKSynthesiserVoice>   Ptr;
     //==============================================================================
     /** Creates a voice. */
     BKSynthesiserVoice();
@@ -387,7 +388,7 @@ public:
      it later on when no longer needed. The caller should not retain a pointer to the
      voice.
      */
-    BKSynthesiserVoice* addVoice (BKSynthesiserVoice* newVoice);
+    BKSynthesiserVoice* addVoice (const BKSynthesiserVoice::Ptr& newVoice);
     
     /** Deletes one of the voices. */
     void removeVoice (int index);
@@ -671,7 +672,7 @@ protected:
     /** This is used to control access to the rendering callback and the note trigger methods. */
     CriticalSection lock;
     
-    OwnedArray<BKSynthesiserVoice> voices;
+    ReferenceCountedArray<BKSynthesiserVoice> voices;
     OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> soundSets;
     
     /** The last pitch-wheel values for each midi channel. */

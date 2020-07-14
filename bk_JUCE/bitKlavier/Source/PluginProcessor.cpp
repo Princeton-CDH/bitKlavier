@@ -338,6 +338,23 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     resonanceReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
     hammerReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
     pedalSynth.setGeneralSettings(gallery->getGeneralSettings());
+
+    mainPianoSynth.clearVoices();
+    resonanceReleaseSynth.clearVoices();
+    hammerReleaseSynth.clearVoices();
+    pedalSynth.clearVoices();
+
+    // 88 or more seems to work well
+    for (int i = 0; i < 300; i++)
+    {
+        mainPianoSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
+    }
+    for (int i = 0; i < 128; i++)
+    {
+        resonanceReleaseSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
+        hammerReleaseSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
+        pedalSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
+    }
     
     levelBuf.setSize(2, 25);
     
@@ -352,7 +369,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     #if JUCE_IOS
             loadSamples(BKLoadLite);
     #else
-            if (wrapperType == wrapperType_AudioUnit)
+            if (wrapperType == wrapperType_AudioUnit || wrapperType == wrapperType_VST || wrapperType == wrapperType_VST3)
             {
                 loadSamples(BKLoadLite);
             }
