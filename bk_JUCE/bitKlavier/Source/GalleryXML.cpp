@@ -42,11 +42,16 @@ ValueTree  Gallery::getState(void)
     
     galleryVT.setProperty("name", name, 0);
     
+    // Do we want to be saving global soundfont info to the gallery? We're not loading it for galleries...
     galleryVT.setProperty("sampleType", processor.globalSampleType, 0);
-    galleryVT.setProperty("soundfontURL", processor.globalSoundfont, 0);
+
+    File soundfont(processor.globalSoundfont);
+    if (soundfont.exists()) galleryVT.setProperty("soundfontURL", soundfont.getFileName(), 0);
+    else galleryVT.setProperty("soundfontURL", processor.globalSoundfont, 0);
+
     galleryVT.setProperty("soundfontInst", processor.globalInstrument, 0);
     
-    // We don't do anything with these on loading so don't see why we should save them
+    // We don't do anything with these on loading so don't see why should we save them?
 //    ValueTree idCountVT( "idcounts");
 //
 //    for (int i = 0; i < BKPreparationTypeNil; i++)

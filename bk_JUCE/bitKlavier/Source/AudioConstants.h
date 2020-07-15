@@ -157,7 +157,6 @@ const String vtagDirect_ADSR = "ADSR";
 const String ptagDirect_useGlobalSoundSet = "directUseGlobalSoundSet";
 const String ptagDirect_soundSet = "directSoundSet";
 
-
 const String vtagTuning = "tuning";
 const String vtagModTuning = "modTuning";
 const String ptagTuning_Id = "Id";

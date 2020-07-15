@@ -35,24 +35,8 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
     {
         if (!path.startsWith("default.sf"))
         {
-            File bkSoundfonts;
-
-#if JUCE_IOS
-            bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory);
-#endif
-#if JUCE_MAC
-            bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
-#endif
-#if JUCE_WINDOWS || JUCE_LINUX
-            bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
-#endif
-            File file = bkSoundfonts.getChildFile(path.removeCharacters("/\\").fromLastOccurrenceOf(String("bitKlaviersoundfonts"), false, false));
-            
-            if (file.exists())
-            {
-                path = file.getFullPathName();
-            }
-            else
+            File file(path);
+            if (!file.exists())
             {
                 type = BKLoadLite;
             }
