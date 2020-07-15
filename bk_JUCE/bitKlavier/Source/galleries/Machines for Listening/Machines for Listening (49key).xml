@@ -1340,14 +1340,14 @@
   </direct>
   <direct Id="2" name="Plain (2)">
     <params gain="0.5" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/jRhodes3b-stereo.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="jRhodes3b-stereo.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="3" name="Direct 4">
     <params gain="0.5" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/jRhodes3b-stereo.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="jRhodes3b-stereo.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
@@ -1361,126 +1361,126 @@
   </direct>
   <direct Id="5" name="Direct 8">
     <params gain="0.5" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="6" name="Plain (4)">
     <params gain="1.5" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Orgue de salon.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Orgue de salon.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="7" name="Direct 8 (2)">
     <params gain="0.5" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="8" name="Plain (5)">
     <params gain="2.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="1" directSoundSet="/Applications/bitKlavier/soundfonts/Orgue de salon.sf2.subsound0">
+            directUseGlobalSoundSet="1" directSoundSet="Orgue de salon.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="9" name="Direct 8 (3)">
     <params gain="2.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="1" directSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            directUseGlobalSoundSet="1" directSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="10" name="Plain (6)">
     <params gain="1.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Orgue de salon.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Orgue de salon.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="11" name="Direct 8 (4)">
     <params gain="1.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="12" name="Direct 12">
     <params gain="1.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/acoust_kits_1-4.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="acoust_kits_1-4.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="13" name="Plain (7)">
     <params gain="0.5" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/jRhodes3b-stereo.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="jRhodes3b-stereo.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="14" name="Direct 8 (5)">
     <params gain="0.5" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/jRhodes3b-stereo.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="jRhodes3b-stereo.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="15" name="Plain (8)">
     <params gain="2.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Orgue de salon.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Orgue de salon.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="16" name="Direct 8 (6)">
     <params gain="1.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="17" name="Plain (9)">
     <params gain="1.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="18" name="Direct 8 (7)">
     <params gain="2.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Orgue de salon.sf2.subsound7">
+            directUseGlobalSoundSet="0" directSoundSet="Orgue de salon.sf2.subsound7">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="2.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="19" name="Direct 22">
     <params gain="2.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/acoust_kits_1-4.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="acoust_kits_1-4.sf2.subsound0">
       <transposition f0="0.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="20" name="Direct 23">
     <params gain="1.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/jRhodes3b-stereo.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="jRhodes3b-stereo.sf2.subsound0">
       <transposition f0="-12.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="21" name="Direct 24">
     <params gain="1.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/jRhodes3b-stereo.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="jRhodes3b-stereo.sf2.subsound0">
       <transposition f0="12.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="22" name="Direct 25">
     <params gain="1.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="-12.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
@@ -1494,14 +1494,14 @@
   </direct>
   <direct Id="24" name="Direct 27">
     <params gain="1.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="-24.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
   </direct>
   <direct Id="25" name="Direct 28">
     <params gain="1.0" resGain="0.5" hammerGain="0.5" transpUsesTuning="0"
-            directUseGlobalSoundSet="0" directSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            directUseGlobalSoundSet="0" directSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="-12.0"/>
       <ADSR f0="3.0" f1="3.0" f2="1.0" f3="30.0"/>
     </params>
@@ -2192,7 +2192,7 @@
             lengthMultiplier="1.0" beatsToSkip="0.0" mode="0" holdMin="0.0"
             holdMax="120000.0" clusterMin="1" clusterThreshold="150" velocityMin="0"
             velocityMax="127" keyOnReset="0" targetTypeNostalgicClearAll="0"
-            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="500.0"/>
       <undertowADSR f0="500.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -2390,7 +2390,7 @@
             lengthMultiplier="1.0" beatsToSkip="0.0" mode="0" holdMin="0.0"
             holdMax="120000.0" clusterMin="1" clusterThreshold="150" velocityMin="0"
             velocityMax="127" keyOnReset="0" targetTypeNostalgicClearAll="0"
-            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="500.0"/>
       <undertowADSR f0="500.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -2401,7 +2401,7 @@
             lengthMultiplier="1.0" beatsToSkip="0.0" mode="0" holdMin="0.0"
             holdMax="120000.0" clusterMin="1" clusterThreshold="150" velocityMin="0"
             velocityMax="127" keyOnReset="0" targetTypeNostalgicClearAll="0"
-            nostalgicUseGlobalSoundSet="1" nostalgicSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            nostalgicUseGlobalSoundSet="1" nostalgicSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="500.0"/>
       <undertowADSR f0="500.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -2423,7 +2423,7 @@
             lengthMultiplier="1.0" beatsToSkip="0.0" mode="0" holdMin="0.0"
             holdMax="120000.0" clusterMin="1" clusterThreshold="150" velocityMin="0"
             velocityMax="127" keyOnReset="0" targetTypeNostalgicClearAll="0"
-            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="500.0"/>
       <undertowADSR f0="500.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -2445,7 +2445,7 @@
             lengthMultiplier="1.0" beatsToSkip="0.0" mode="0" holdMin="0.0"
             holdMax="12000.0" clusterMin="1" clusterThreshold="150" velocityMin="0"
             velocityMax="127" keyOnReset="0" targetTypeNostalgicClearAll="0"
-            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="500.0"/>
       <undertowADSR f0="500.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -2467,7 +2467,7 @@
             lengthMultiplier="1.0" beatsToSkip="0.0" mode="0" holdMin="0.0"
             holdMax="120000.0" clusterMin="1" clusterThreshold="150" velocityMin="0"
             velocityMax="127" keyOnReset="0" targetTypeNostalgicClearAll="0"
-            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="0.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="500.0"/>
       <undertowADSR f0="500.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -2478,7 +2478,7 @@
             lengthMultiplier="1.0" beatsToSkip="0.0" mode="0" holdMin="0.0"
             holdMax="120000.0" clusterMin="1" clusterThreshold="150" velocityMin="0"
             velocityMax="127" keyOnReset="0" targetTypeNostalgicClearAll="0"
-            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="-12.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="500.0"/>
       <undertowADSR f0="500.0" f1="3.0" f2="1.0" f3="2000.0"/>
@@ -2489,7 +2489,7 @@
             lengthMultiplier="1.0" beatsToSkip="0.0" mode="0" holdMin="0.0"
             holdMax="120000.0" clusterMin="1" clusterThreshold="150" velocityMin="0"
             velocityMax="127" keyOnReset="0" targetTypeNostalgicClearAll="0"
-            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="/Applications/bitKlavier/soundfonts/Blanchet-1720.sf2.subsound0">
+            nostalgicUseGlobalSoundSet="0" nostalgicSoundSet="Blanchet-1720.sf2.subsound0">
       <transposition f0="12.0"/>
       <reverseADSR f0="30.0" f1="3.0" f2="1.0" f3="500.0"/>
       <undertowADSR f0="500.0" f1="3.0" f2="1.0" f3="2000.0"/>
