@@ -222,10 +222,10 @@ namespace BinaryData
     const int            NS_8_ItIsEnough_xmlSize = 65783;
 
     extern const char*   Machines_for_Listening_49key_xml;
-    const int            Machines_for_Listening_49key_xmlSize = 265559;
+    const int            Machines_for_Listening_49key_xmlSize = 264479;
 
     extern const char*   Machines_for_Listening_xml;
-    const int            Machines_for_Listening_xmlSize = 264165;
+    const int            Machines_for_Listening_xmlSize = 263157;
 
     extern const char*   Basic_Piano_xml;
     const int            Basic_Piano_xmlSize = 4112;
