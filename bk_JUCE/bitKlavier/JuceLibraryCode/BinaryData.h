@@ -221,6 +221,12 @@ namespace BinaryData
     extern const char*   NS_8_ItIsEnough_xml;
     const int            NS_8_ItIsEnough_xmlSize = 65783;
 
+    extern const char*   Machines_for_Listening_49key_xml;
+    const int            Machines_for_Listening_49key_xmlSize = 264479;
+
+    extern const char*   Machines_for_Listening_xml;
+    const int            Machines_for_Listening_xmlSize = 263157;
+
     extern const char*   Basic_Piano_xml;
     const int            Basic_Piano_xmlSize = 4112;
 
@@ -321,7 +327,7 @@ namespace BinaryData
     const int            LICENSESize = 1152;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 104;
+    const int namedResourceListSize = 106;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

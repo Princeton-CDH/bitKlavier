@@ -120,47 +120,60 @@ BKSynthesiser::~BKSynthesiser()
 }
 
 //==============================================================================
+int BKSynthesiser::loadSamples(BKSampleLoadType type, String path, int subsound, bool updateGlobalSet)
+{
+    return processor.loadSamples(type, path, subsound, updateGlobalSet);
+}
+
+
 BKSynthesiserVoice* BKSynthesiser::getVoice (const int index) const
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     return voices [index];
 }
 
 void BKSynthesiser::clearVoices()
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     voices.clear();
 }
 
-BKSynthesiserVoice* BKSynthesiser::addVoice (BKSynthesiserVoice* const newVoice)
+BKSynthesiserVoice* BKSynthesiser::addVoice (const BKSynthesiserVoice::Ptr& newVoice)
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     newVoice->setCurrentPlaybackSampleRate (processor.getCurrentSampleRate());
     return voices.add (newVoice);
 }
 
 void BKSynthesiser::removeVoice (const int index)
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     voices.remove (index);
 }
 
-void BKSynthesiser::clearSounds()
+void BKSynthesiser::clearSounds(int set)
 {
-    const ScopedLock sl (lock);
-    sounds.clear();
+    //const ScopedLock sl (lock);
+    if (soundSets.size() - 1 < set) return;
+    soundSets.getUnchecked(set)->clear();
 }
 
-BKSynthesiserSound* BKSynthesiser::addSound (const BKSynthesiserSound::Ptr& newSound)
+BKSynthesiserSound* BKSynthesiser::addSound (int set, const BKSynthesiserSound::Ptr& newSound)
 {
-    const ScopedLock sl (lock);
-    return sounds.add (newSound);
+    //const ScopedLock sl (lock);
+    while (soundSets.size() - 1 < set)
+    {
+//        soundSets.insertMultiple(soundSets.size(), ReferenceCountedArray<BKSynthesiserSound>(), set - (soundSets.size() - 1));
+        soundSets.ensureStorageAllocated(set + 1);
+        soundSets.add(new ReferenceCountedArray<BKSynthesiserSound>());
+    }
+    return soundSets.getUnchecked(set)->add (newSound);
 }
 
-void BKSynthesiser::removeSound (const int index)
+void BKSynthesiser::removeSound (int set, const int index)
 {
-    const ScopedLock sl (lock);
-    sounds.remove (index);
+    //const ScopedLock sl (lock);
+    soundSets.getUnchecked(set)->remove (index);
 }
 
 void BKSynthesiser::setNoteStealingEnabled (const bool shouldSteal)
@@ -225,12 +238,18 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 	float totalOutputL = 0.0f;
 	float totalOutputR = 0.0f;
     
+    BlendronicProcessor::PtrArr activebprocessors;
+    for (auto b : bprocessors)
+    {
+        if (b->getActive()) activebprocessors.add(b);
+    }
+    
 	while (--numSamples >= 0)
 	{
 		totalOutputL = 0.0f;
 		totalOutputR = 0.0f;
 
-		for (auto b : bprocessors)
+		for (auto b : activebprocessors)
 		{
 			if (b != nullptr)
 			{
@@ -263,12 +282,18 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
     float totalOutputL = 0.0f;
 	float totalOutputR = 0.0f;
     
+    BlendronicProcessor::PtrArr activebprocessors;
+    for (auto b : bprocessors)
+    {
+        if (b->getActive()) activebprocessors.add(b);
+    }
+    
     while (--numSamples >= 0)
     {
         totalOutputL = 0.0f;
 		totalOutputR = 0.0f;
         
-        for (auto b : bprocessors)
+        for (auto b : activebprocessors)
         {
 			if (b != nullptr)
 			{
@@ -311,58 +336,48 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
     // must set the sample rate before using this!
     jassert (processor.getCurrentSampleRate() != 0);
     
-    MidiBuffer::Iterator midiIterator (midiData);
-    midiIterator.setNextSamplePosition (startSample);
-    
-    bool firstEvent = true;
-    int midiEventPos;
-    MidiMessage m;
-    
     const ScopedLock sl (lock);
     
-    while (numSamples > 0)
+    bool firstEvent = true;
+    
+    for (MidiMessageMetadata m : midiData)
     {
-        
-        if (! midiIterator.getNextEvent (m, midiEventPos))
+        if (numSamples >= 0)
         {
-            clearNextDelayBlock(numSamples);
-            renderVoices (outputAudio, startSample, numSamples);
-            renderDelays(outputAudio, startSample, numSamples);
-            return;
+            const int samplesToNextMidiMessage = m.samplePosition - startSample;
+        
+            if (samplesToNextMidiMessage >= numSamples)
+            {
+                clearNextDelayBlock(numSamples);
+                renderVoices (outputAudio, startSample, numSamples);
+                renderDelays(outputAudio, startSample, numSamples);
+                handleMidiEvent (m.getMessage());
+                break;
+            }
+            
+            if (samplesToNextMidiMessage < ((firstEvent && ! subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
+            {
+                handleMidiEvent (m.getMessage());
+                continue;
+            }
+            
+            firstEvent = false;
+            
+            clearNextDelayBlock(samplesToNextMidiMessage);
+            renderVoices (outputAudio, startSample, samplesToNextMidiMessage);
+            renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
+            handleMidiEvent (m.getMessage());
+            
+            startSample += samplesToNextMidiMessage;
+            numSamples  -= samplesToNextMidiMessage;
         }
-        
-        const int samplesToNextMidiMessage = midiEventPos - startSample;
-        
-        if (samplesToNextMidiMessage >= numSamples)
-        {
-            clearNextDelayBlock(numSamples);
-            renderVoices (outputAudio, startSample, numSamples);
-            renderDelays(outputAudio, startSample, numSamples);
-            handleMidiEvent (m);
-            break;
-        }
-        
-        if (samplesToNextMidiMessage < ((firstEvent && ! subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
-        {
-            handleMidiEvent (m);
-            continue;
-        }
-        
-        firstEvent = false;
-        
-        clearNextDelayBlock(samplesToNextMidiMessage);
-        renderVoices (outputAudio, startSample, samplesToNextMidiMessage);
-        renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
-        handleMidiEvent (m);
-        
-        startSample += samplesToNextMidiMessage;
-        numSamples  -= samplesToNextMidiMessage;
+        else handleMidiEvent (m.getMessage());
     }
     
-    while (midiIterator.getNextEvent (m, midiEventPos))
-        handleMidiEvent (m);
-    
-    
+    clearNextDelayBlock(numSamples);
+    renderVoices (outputAudio, startSample, numSamples);
+    renderDelays(outputAudio, startSample, numSamples);
+    return;
 }
 
 // explicit template instantiation
@@ -438,6 +453,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
 	PianoSamplerNoteDirection direction,
 	PianoSamplerNoteType type,
 	BKNoteType bktype,
+    int set,
 	int layer,
 	const float startingPositionMS,
 	const float lengthMS,
@@ -456,6 +472,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
                                  direction,
                                  type,
                                  bktype,
+                                 set,
                                  layer,
                                  startingPositionMS,
                                  lengthMS,
@@ -477,6 +494,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                            PianoSamplerNoteDirection direction,
                            PianoSamplerNoteType type,
                            BKNoteType bktype,
+                           int set,
                            int layer,
                            const float startingPositionMS,
                            const float lengthMS,
@@ -503,10 +521,14 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     BKSynthesiserVoice* voiceToReturn;
     
     float sampleRateMS = 0.001f * getSampleRate();
+    
+    int soundSetId = (set < 0) ? processor.globalSoundSetId : set;
+    if (soundSets.size() - 1 < soundSetId) return nullptr;
+    if (soundSets.getUnchecked(soundSetId) == nullptr) return nullptr;
 
-	for (int i = sounds.size(); --i >= 0;)
+	for (int i = soundSets.getUnchecked(soundSetId)->size(); --i >= 0;)
 	{
-		BKSynthesiserSound* const sound = sounds.getUnchecked(i);
+		BKSynthesiserSound* const sound = soundSets.getUnchecked(soundSetId)->getUnchecked(i);
 
 		// Check if sound applies to note, velocity, and channel.
 		if (sound->appliesToNote(noteNumber) &&
@@ -682,6 +704,7 @@ void BKSynthesiser::stopVoice(BKSynthesiserVoice* voice, float velocity, const b
 
 void BKSynthesiser::keyOff(const int midiChannel,
 	const BKNoteType type,
+    const int set,
 	const int layerId,
 	const int keyNoteNumber,
 	const int midiNoteNumber,
@@ -736,10 +759,14 @@ void BKSynthesiser::keyOff(const int midiChannel,
 	int noteNumber = midiNoteNumber;
 
 	if (noteNumber > 108 || noteNumber < 21) return;
+    
+    int soundSetId = (set < 0) ? processor.globalSoundSetId : set;
+    if (soundSets.size() - 1 < soundSetId) return;
+    if (soundSets.getUnchecked(soundSetId) == nullptr) return;
 
-	for (int i = sounds.size(); --i >= 0;)
+	for (int i = soundSets.getUnchecked(soundSetId)->size(); --i >= 0;)
 	{
-		BKSynthesiserSound* const sound = sounds.getUnchecked(i);
+		BKSynthesiserSound* const sound = soundSets.getUnchecked(soundSetId)->getUnchecked(i);
 
 		// Check if sound applies to note, velocity, and channel.
 

@@ -22,7 +22,7 @@ void Gallery::addPiano(XmlElement* xml, OwnedArray<HashMap<int,int>>* map)
     
     int Id = piano->getId();
     
-    piano->setState(xml, map);
+    piano->setState(xml, map, idcounts);
     
     piano->setId(Id);
     
@@ -511,7 +511,7 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
     else if (type == PreparationTypePiano)
     {
         Piano::Ptr p = new Piano(processor, -1);
-        p->setState(xml, &idmap);
+        p->setState(xml, &idmap, idcounts);
         if (p->getName() == String(oldId))
             p->setName(String(p->getId()));
         else p->setName(iterateName(PreparationTypePiano, p->getName()));

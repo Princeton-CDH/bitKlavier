@@ -19,6 +19,8 @@
 
 #include "AudioConstants.h"
 
+#include "BKMenu.h"
+
 #define BK_UNIT_TESTS 0
 
 #define NUM_EPOCHS 10
@@ -104,8 +106,7 @@
 
 inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 {
-    PopupMenu newMenu;
-    newMenu.setLookAndFeel(laf);
+    BKPopupMenu newMenu;
     
     newMenu.addItem(KEYMAP_ID, "Keymap" + gKeymapShortcut);
     newMenu.addItem(DIRECT_ID, "Direct" + gDirectShortcut);
@@ -127,8 +128,7 @@ inline PopupMenu getNewItemMenu(LookAndFeel* laf)
 // What is this for?
 inline PopupMenu getEditItemMenu(LookAndFeel* laf)
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(laf);
+    BKPopupMenu menu;
     
     menu.addItem(KEYMAP_EDIT_ID, "Keymap");
     menu.addItem(DIRECT_EDIT_ID, "Direct");
@@ -148,8 +148,7 @@ inline PopupMenu getEditItemMenu(LookAndFeel* laf)
 
 inline PopupMenu getAlignMenu(LookAndFeel* laf)
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(laf);
+    BKPopupMenu menu;
     
     menu.addItem(ALIGN_VERTICAL, "Row");
     menu.addItem(ALIGN_HORIZONTAL, "Column");
@@ -159,11 +158,16 @@ inline PopupMenu getAlignMenu(LookAndFeel* laf)
 
 inline PopupMenu getEditMenuStandalone(LookAndFeel* laf, int numItemsSelected, bool onGraph = false, bool rightClick = false)
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(laf);
+    BKPopupMenu menu;
 
     if (numItemsSelected)
     {
+#if JUCE_IOS
+        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
+#else
+        menu.addSubMenu("Add...", getNewItemMenu(laf));
+#endif
+        menu.addSeparator();
         menu.addItem(COPY_ID, "Copy" + gCopyShortcut);
         menu.addItem(CUT_ID, "Cut" + gCutShortcut);
         menu.addItem(PASTE_ID, "Paste" + gPasteShortcut);
@@ -207,11 +211,16 @@ inline PopupMenu getEditMenuStandalone(LookAndFeel* laf, int numItemsSelected, b
 
 inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGraph = false, bool rightClick = false)
 {
-    PopupMenu menu;
-    menu.setLookAndFeel(laf);
+    BKPopupMenu menu;
     
     if (numItemsSelected)
     {
+#if JUCE_IOS
+        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
+#else
+        menu.addSubMenu("Add...", getNewItemMenu(laf));
+#endif
+        menu.addSeparator();
         menu.addItem(COPY_ID, "Copy");
         menu.addItem(CUT_ID, "Cut");
         menu.addItem(PASTE_ID, "Paste");

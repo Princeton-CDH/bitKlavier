@@ -191,13 +191,23 @@ public:
         
         keysave.setProperty(ptagKeymap_inverted, isInverted(), 0);
         
-        ValueTree inputs( vtagKeymap_midiInputs);
+        ValueTree inputs( vtagKeymap_midiInputNames);
         count = 0;
-        for (auto midiInput : getMidiInputSources())
+        for (auto name : getMidiInputNames())
         {
-            inputs.setProperty( ptagKeymap_midiInput + String(count++), midiInput, 0);
+            inputs.setProperty( ptagKeymap_midiInputName + String(count++), name, 0);
         }
+        
+        ValueTree inputIdentifiers( vtagKeymap_midiInputIdentifiers);
+        count = 0;
+        for (auto identifier : getMidiInputIdentifiers())
+        {
+            inputIdentifiers.setProperty( ptagKeymap_midiInputIdentifier + String(count++), identifier, 0);
+        }
+        
         keysave.addChild(inputs, -1, 0);
+        
+        keysave.addChild(inputIdentifiers, -1, 0);
         
         keysave.setProperty(ptagKeymap_defaultSelected, defaultSelected, 0);
         
@@ -239,22 +249,40 @@ public:
         
         forEachXmlChildElement (*e, sub)
         {
-            if (sub->hasTagName(vtagKeymap_midiInputs))
+            if (sub->hasTagName(vtagKeymap_midiInputNames))
             {
                 Array<String> inputs;
                 for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
-                    String attr = sub->getStringAttribute(ptagKeymap_midiInput + String(k));
+                    String attr = sub->getStringAttribute(ptagKeymap_midiInputName + String(k));
                     if (attr == String()) continue;
                     inputs.add(attr);
                 }
                 
-                setMidiInputSources(inputs);
+                setMidiInputNames(inputs);
+            }
+            
+            if (sub->hasTagName(vtagKeymap_midiInputIdentifiers))
+            {
+                Array<String> inputs;
+                for (int k = 0; k < sub->getNumAttributes(); k++)
+                {
+                    String attr = sub->getStringAttribute(ptagKeymap_midiInputIdentifier + String(k));
+                    if (attr == String()) continue;
+                    inputs.add(attr);
+                }
+                
+                setMidiInputIdentifiers(inputs);
             }
         }
         
-        defaultSelected = e->getStringAttribute(ptagKeymap_defaultSelected).getIntValue();
-        onscreenSelected = e->getStringAttribute(ptagKeymap_defaultSelected).getIntValue();
+        n = e->getStringAttribute(ptagKeymap_defaultSelected);
+        if (n != "") defaultSelected = n.getIntValue();
+        else defaultSelected = true;
+        
+        n = e->getStringAttribute(ptagKeymap_onscreenSelected);
+        if (n != "") onscreenSelected = n.getIntValue();
+        else onscreenSelected = true;
     }
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }
@@ -268,18 +296,26 @@ public:
     
     inline Array<bool> getTriggeredKeys() const noexcept { return triggered; }
     inline void setTriggered(int key, bool trig) { triggered.set(key, trig); }
-    
-    inline const Array<String> getMidiInputSources() const noexcept { return midiInputSources; }
-    const Array<String> getAllMidiInputSources();
 
-    inline void setMidiInputSources(Array<String> sources) { midiInputSources = sources; }
-    inline void addMidiInputSource(String source) { midiInputSources.add(source); }
-    inline void removeMidiInputSource(String source)
+    const Array<String> getAllMidiInputNames();
+    const Array<String> getAllMidiInputIdentifiers();
+    
+    inline Array<String> getMidiInputNames(void) { return midiInputNames; }
+    inline Array<String> getMidiInputIdentifiers(void) { return midiInputIdentifiers; }
+
+    inline void setMidiInputNames(Array<String> names) { midiInputNames = names; }
+    inline void setMidiInputIdentifiers(Array<String> identifiers) { midiInputIdentifiers = identifiers; }
+    inline void addMidiInputSource(MidiDeviceInfo source)
     {
-        for (int i = 0; i < midiInputSources.size(); ++i)
-        {
-            if (source == midiInputSources[i]) midiInputSources.remove(i); break;
-        }
+        midiInputNames.add(source.name);
+        midiInputIdentifiers.add(source.identifier);
+    }
+    inline void removeMidiInputSource(MidiDeviceInfo source)
+    {
+        int i = midiInputIdentifiers.indexOf(source.identifier);
+        if (i < 0) return;
+        midiInputNames.remove(i);
+        midiInputIdentifiers.remove(i);
     }
     
     inline bool isDefaultSelected() { return defaultSelected; }
@@ -316,7 +352,8 @@ private:
     
     Array<bool> triggered;
     
-    Array<String> midiInputSources;
+    Array<String> midiInputNames;
+    Array<String> midiInputIdentifiers;
     
     bool defaultSelected;
     bool onscreenSelected;

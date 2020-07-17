@@ -102,9 +102,10 @@ private:
  
  @see BKSynthesiser, BKSynthesiserSound
  */
-class  BKSynthesiserVoice
+class  BKSynthesiserVoice : public ReferenceCountedObject
 {
 public:
+    typedef ReferenceCountedObjectPtr<BKSynthesiserVoice>   Ptr;
     //==============================================================================
     /** Creates a voice. */
     BKSynthesiserVoice();
@@ -387,30 +388,30 @@ public:
      it later on when no longer needed. The caller should not retain a pointer to the
      voice.
      */
-    BKSynthesiserVoice* addVoice (BKSynthesiserVoice* newVoice);
+    BKSynthesiserVoice* addVoice (const BKSynthesiserVoice::Ptr& newVoice);
     
     /** Deletes one of the voices. */
     void removeVoice (int index);
     
     //==============================================================================
     /** Deletes all sounds. */
-    void clearSounds();
+    void clearSounds(int set);
     
     /** Returns the number of sounds that have been added to the synth. */
-    int getNumSounds() const noexcept                               { return sounds.size(); }
+    int getNumSounds(int set) const noexcept                               { return soundSets.getUnchecked(set)->size(); }
     
     /** Returns one of the sounds. */
-    BKSynthesiserSound* getSound (int index) const noexcept           { return sounds [index]; }
+    BKSynthesiserSound* getSound (int set, int index) const noexcept           { return soundSets.getUnchecked(set)->getUnchecked(index); }
     
     /** Adds a new sound to the BKSynthesiser.
      
      The object passed in is reference counted, so will be deleted when the
      BKSynthesiser and all voices are no longer using it.
      */
-    BKSynthesiserSound* addSound (const BKSynthesiserSound::Ptr& newSound);
+    BKSynthesiserSound* addSound (int set, const BKSynthesiserSound::Ptr& newSound);
     
     /** Removes and deletes one of the sounds. */
-    void removeSound (int index);
+    void removeSound (int set, int index);
     
     //==============================================================================
     /** If set to true, then the synth will try to take over an existing voice if
@@ -449,6 +450,7 @@ public:
                                         PianoSamplerNoteDirection direction,
                                         PianoSamplerNoteType type,
                                         BKNoteType bktype,
+                                        int set,
                                         int layer,
                                         float startingPositionMS,
                                         float lengthMS,
@@ -467,6 +469,7 @@ public:
                                         PianoSamplerNoteDirection direction,
                                         PianoSamplerNoteType type,
                                         BKNoteType bktype,
+                                        int set,
                                         int layer,
                                         float startingPositionMS,
                                         float lengthMS,
@@ -492,6 +495,7 @@ public:
      */
     virtual void keyOff (int midiChannel,
                          BKNoteType type,
+                         int set, 
                          int layerId,
                          int keyNoteNumber,
                          int midiNoteNumber,
@@ -658,6 +662,8 @@ public:
 	void renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples);
 	void renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples);
     void clearNextDelayBlock(int numSamples);
+    
+    int loadSamples(BKSampleLoadType type, String path ="", int subsound=0, bool updateGlobalSet=true);
 	
 	GeneralSettings::Ptr generalSettings;
     
@@ -666,8 +672,8 @@ protected:
     /** This is used to control access to the rendering callback and the note trigger methods. */
     CriticalSection lock;
     
-    OwnedArray<BKSynthesiserVoice> voices;
-    ReferenceCountedArray<BKSynthesiserSound> sounds;
+    ReferenceCountedArray<BKSynthesiserVoice> voices;
+    OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> soundSets;
     
     /** The last pitch-wheel values for each midi channel. */
     int lastPitchWheelValues [16];

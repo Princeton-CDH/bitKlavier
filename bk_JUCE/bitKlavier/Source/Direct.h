@@ -58,7 +58,10 @@ public:
     dAttack(atk),
     dDecay(dca),
     dRelease(rel),
-    dSustain(sust)
+    dSustain(sust),
+    dUseGlobalSoundSet(true),
+    dSoundSet(-1),
+    dSoundSetName(String())
     {
         
     }
@@ -72,7 +75,10 @@ public:
     dAttack(3),
     dDecay(3),
     dRelease(30),
-    dSustain(1.)
+    dSustain(1.),
+    dUseGlobalSoundSet(true),
+    dSoundSet(-1),
+    dSoundSetName(String())
     {
         
     }
@@ -96,6 +102,9 @@ public:
         dSustain = d->getSustain();
         dRelease = d->getRelease();
         dTranspUsesTuning = d->getTranspUsesTuning();
+        dUseGlobalSoundSet = d->getUseGlobalSoundSet();
+        dSoundSet = d->getSoundSet();
+        dSoundSetName = d->getSoundSetName();
     }
     
     inline void performModification(DirectPreparation::Ptr d, Array<bool> dirty)
@@ -218,6 +227,17 @@ public:
         for (auto f : m) ADSRvals.setProperty( ptagFloat + String(count++), f, 0);
         prep.addChild(ADSRvals, -1, 0);
         
+        prep.setProperty( ptagDirect_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
+
+        // Find the corresponding File for our soundfont so we can get just the name and let JUCE handle crossplatform pathing
+        // Need to remove the subsound substring first. In retrospect the subsound should probably just be a separate element rather than part of this String, 
+        // but it's too ingrained to feel worth changing right now
+        File soundfont(getSoundSetName().upToLastOccurrenceOf(".subsound", false, false));
+        // If we have the file then set the property to just the filename with the subsound substring added back on
+        if (soundfont.exists()) prep.setProperty(ptagDirect_soundSet, soundfont.getFileName() + getSoundSetName().fromLastOccurrenceOf(".subsound", true, false), 0);
+        // Otherwise set to an empty String
+        else prep.setProperty( ptagDirect_soundSet, String(), 0);
+        
         return prep;
     }
     
@@ -237,6 +257,30 @@ public:
         String str = e->getStringAttribute(ptagDirect_transpUsesTuning);
         if (str != "") setTranspUsesTuning((bool) str.getIntValue());
         else setTranspUsesTuning(false);
+        
+        str = e->getStringAttribute(ptagDirect_useGlobalSoundSet);
+        if (str == String()) setUseGlobalSoundSet(true);
+        else setUseGlobalSoundSet((bool) str.getIntValue());
+        
+        str = e->getStringAttribute(ptagDirect_soundSet);
+
+        // Get the path for soundfonts based on platform
+        File bkSoundfonts;
+#if JUCE_IOS
+        bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory);
+#endif
+#if JUCE_MAC
+        bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+        bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+        // Search for the soundfont based on the saved filename, making sure to remove subsound substring first
+        Array<File> files = bkSoundfonts.findChildFiles(File::findFiles, true, str.upToLastOccurrenceOf(".subsound", false, false));
+        // If we find any files, use the first one, and set soundSetName to the full path with the subsound substring added
+        if (!files.isEmpty()) setSoundSetName(files.getUnchecked(0).getFullPathName() + str.fromLastOccurrenceOf(".subsound", true, false));
+        // Otherwise set it to an empty String
+        else setSoundSetName(String());
         
         forEachXmlChildElement (*e, sub)
         {
@@ -278,6 +322,14 @@ public:
             }
         }
     }
+    
+    inline void setUseGlobalSoundSet(bool use) { dUseGlobalSoundSet = use; }
+    inline void setSoundSet(int Id) { dSoundSet = Id; }
+    inline void setSoundSetName(String name) { dSoundSetName = name; }
+    
+    inline bool getUseGlobalSoundSet(void) { return dUseGlobalSoundSet; }
+    inline int getSoundSet(void) { return dUseGlobalSoundSet ? -1 : dSoundSet; }
+    inline String getSoundSetName(void) { return dSoundSetName; }
 
 private:
     
@@ -302,6 +354,10 @@ private:
     // ADSR, in ms, or gain multiplier for sustain
     int dAttack, dDecay, dRelease;
     float dSustain;
+    
+    bool dUseGlobalSoundSet;
+    int dSoundSet;
+    String dSoundSetName;
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
@@ -382,7 +438,7 @@ public:
         String n = e->getStringAttribute("name");
         
         if (n != String())     name = n;
-        else                        name = String(Id);
+        else                   name = String(Id);
         
         
         XmlElement* params = e->getChildByName("params");
@@ -478,6 +534,7 @@ public:
     inline void reset(void)
     {
         direct->aPrep->copy(direct->sPrep);
+        DBG("synchronic reset called"); 
     }
     
     inline int getId(void) const noexcept { return direct->getId(); }
@@ -511,7 +568,7 @@ public:
     {
         return keymaps;
     }
-    
+
 private:
     BKSynthesiser*      synth;
     BKSynthesiser*      resonanceSynth;

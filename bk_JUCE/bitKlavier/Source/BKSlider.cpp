@@ -985,8 +985,7 @@ Array<float> BKMultiSlider::getOneSliderBank(int which)
 
 void BKMultiSlider::showModifyPopupMenu(int which)
 {
-    PopupMenu m;
-    m.setLookAndFeel (&getLookAndFeel());
+    BKPopupMenu m;
     m.addItem (1, translate ("deactivate slider"), true, false);
     m.addItem (2, translate ("deactivate all after this"), true, false);
     m.addItem (3, translate ("deactivate all before this"), true, false);
@@ -2411,8 +2410,7 @@ int BKStackedSlider::whichSlider(const MouseEvent& e)
 
 void BKStackedSlider::showModifyPopupMenu()
 {
-    PopupMenu m;
-    m.setLookAndFeel (&getLookAndFeel());
+    BKPopupMenu m;
     m.addItem (1, translate ("add transposition"), true, false);
     m.addSeparator();
     

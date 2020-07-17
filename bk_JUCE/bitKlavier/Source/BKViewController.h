@@ -215,8 +215,8 @@ public:
     void setText(String text)
     {
         int len = text.length();
-        float size = 300.0f/len;
-        DBG("len size: " + String(len) + " " + String(size));
+        //float size = 300.0f/len;
+        //DBG("len size: " + String(len) + " " + String(size));
         
         //bigOne.setFont(Font(size > 15.0f ? size : 15.0f));
         

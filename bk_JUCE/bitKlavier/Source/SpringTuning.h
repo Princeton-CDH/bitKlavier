@@ -178,7 +178,7 @@ public:
     
     double getTetherWeightGlobal() { return tetherWeightGlobal; }
     double getTetherWeightSecondaryGlobal() { return tetherWeightSecondaryGlobal; }
-    void setTetherWeightGlobal(double s) { tetherWeightGlobal = s; DBG("setTetherWeightGlobal :" + String(tetherWeightGlobal)); }
+    void setTetherWeightGlobal(double s) { tetherWeightGlobal = s; } // DBG("setTetherWeightGlobal :" + String(tetherWeightGlobal)); }
     void setTetherWeightSecondaryGlobal(double s) { tetherWeightSecondaryGlobal = s; }
     
     bool getSpringMode(int which) {return springMode.getUnchecked(which);}
@@ -221,7 +221,7 @@ public:
         
         if(newfundamental < 12) intervalFundamentalActive = newfundamental;
         
-        DBG("setIntervalFundamental " + String(newfundamental));
+        // DBG("setIntervalFundamental " + String(newfundamental));
         
         if(newfundamental == 12) setUsingFundamentalForIntervalSprings(false);
         else setUsingFundamentalForIntervalSprings(true);
@@ -338,7 +338,7 @@ public:
     
     void setState(XmlElement* e)
     {
-        DBG("SpringTuning::setState called!!");
+        // DBG("SpringTuning::setState called!!");
         active = (bool) e->getStringAttribute("active").getIntValue();
         
         setRate(e->getStringAttribute("rate").getDoubleValue());
@@ -418,7 +418,7 @@ public:
                     else
                     {
                         setSpringMode(i, (bool)attr.getIntValue());
-                        DBG("setState::setSpringMode " + String(attr.getIntValue()));
+                        // DBG("setState::setSpringMode " + String(attr.getIntValue()));
                     }
                 }
             }

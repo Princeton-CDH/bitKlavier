@@ -188,25 +188,20 @@ void BKKeymapKeyboardState::processNextMidiBuffer (MidiBuffer& buffer,
                                                const int numSamples,
                                                const bool injectIndirectEvents)
 {
-    MidiBuffer::Iterator i (buffer);
-    MidiMessage message;
-    int time;
-    
     const ScopedLock sl (lock);
     
-    while (i.getNextEvent (message, time))
-        processNextMidiEvent (message);
+    for (MidiMessageMetadata m : buffer)
+        processNextMidiEvent (m.getMessage());
     
     if (injectIndirectEvents)
     {
-        MidiBuffer::Iterator i2 (eventsToAdd);
         const int firstEventToAdd = eventsToAdd.getFirstEventTime();
         const double scaleFactor = numSamples / (double) (eventsToAdd.getLastEventTime() + 1 - firstEventToAdd);
         
-        while (i2.getNextEvent (message, time))
+        for (MidiMessageMetadata m : eventsToAdd)
         {
-            const int pos = jlimit (0, numSamples - 1, roundToInt ((time - firstEventToAdd) * scaleFactor));
-            buffer.addEvent (message, startSample + pos);
+            const int pos = jlimit (0, numSamples - 1, roundToInt ((m.samplePosition - firstEventToAdd) * scaleFactor));
+            buffer.addEvent (m.getMessage(), startSample + pos);
         }
     }
     

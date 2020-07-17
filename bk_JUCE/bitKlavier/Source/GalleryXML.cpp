@@ -30,7 +30,7 @@ int Gallery::transformId(BKPreparationType type, int oldId)
         newId = idcounts[type]++;
         idmap[type]->set(oldId, newId);
         
-        DBG("TRANS " + String(cPreparationTypes[type]) + " old: " + String(oldId) + " new: " + String(newId));
+        // DBG("TRANS " + String(cPreparationTypes[type]) + " old: " + String(oldId) + " new: " + String(newId));
     }
     
     return newId;
@@ -42,11 +42,16 @@ ValueTree  Gallery::getState(void)
     
     galleryVT.setProperty("name", name, 0);
     
-    galleryVT.setProperty("sampleType", processor.currentSampleType, 0);
-    galleryVT.setProperty("soundfontURL", processor.currentSoundfont, 0);
-    galleryVT.setProperty("soundfontInst", processor.currentInstrument, 0);
+    // Do we want to be saving global soundfont info to the gallery? We're not loading it for galleries...
+    galleryVT.setProperty("sampleType", processor.globalSampleType, 0);
+
+    File soundfont(processor.globalSoundfont);
+    if (soundfont.exists()) galleryVT.setProperty("soundfontURL", soundfont.getFileName(), 0);
+    else galleryVT.setProperty("soundfontURL", processor.globalSoundfont, 0);
+
+    galleryVT.setProperty("soundfontInst", processor.globalInstrument, 0);
     
-    // We don't do anything with these on loading so don't see why we should save them
+    // We don't do anything with these on loading so don't see why should we save them?
 //    ValueTree idCountVT( "idcounts");
 //
 //    for (int i = 0; i < BKPreparationTypeNil; i++)
@@ -96,7 +101,6 @@ ValueTree  Gallery::getState(void)
 
 void Gallery::setStateFromXML(XmlElement* xml)
 {
-    int i;
     Array<float> fa;
     Array<int> fi;
     
@@ -120,72 +124,14 @@ void Gallery::setStateFromXML(XmlElement* xml)
         {
             if (e->hasTagName( vtagKeymap))
             {
-                // TODO: why not use keymap setState()?
-                
                 addKeymapWithId(0);
                 
-                String n = e->getStringAttribute("name");
+                bkKeymaps.getLast()->setState(e);
                 
-                Keymap::Ptr newKeymap = bkKeymaps.getLast();
-                
-                int oldId = e->getStringAttribute("Id").getIntValue();
+                int oldId = bkKeymaps.getLast()->getId();
                 int newId = transformId(PreparationTypeKeymap, oldId);
                 
-                newKeymap->setId(newId);
-                
-                if (n != String())     newKeymap->setName(n);
-                
-                Array<int> keys;
-                for (int k = 0; k < 128; k++)
-                {
-                    String attr = e->getStringAttribute(ptagKeymap_key + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        i = attr.getIntValue();
-                        keys.add(i);
-                    }
-                }
-                
-                newKeymap->setKeymap(keys);
-                
-                Array<KeymapTargetState> targetStates;
-                targetStates.ensureStorageAllocated(TargetTypeNil);
-                for (int i = 0; i < TargetTypeNil; ++i)
-                {
-                    targetStates.add(TargetStateNil);
-                    String attr = e->getStringAttribute(ptagKeymap_targetStates + String(i));
-                    
-                    if (attr != String())
-                    {
-                        targetStates.setUnchecked(i, (KeymapTargetState) attr.getIntValue());
-                    }
-                }
-                
-                newKeymap->setTargetStates(targetStates);
-                
-                String i = e->getStringAttribute(ptagKeymap_inverted);
-                if (i != String()) newKeymap->setInverted(i.getIntValue());
-                
-                forEachXmlChildElement (*e, sub)
-                {
-                    if (sub->hasTagName(vtagKeymap_midiInputs))
-                    {
-                        Array<String> inputs;
-                        for (int k = 0; k < sub->getNumAttributes(); k++)
-                        {
-                            String attr = sub->getStringAttribute(ptagKeymap_midiInput + String(k));
-                            if (attr == String()) continue;
-                            inputs.add(attr);
-                        }
-                        
-                        newKeymap->setMidiInputSources(inputs);
-                    }
-                }
-                
-                String d = e->getStringAttribute(ptagKeymap_defaultSelected);
-                if (d != String()) newKeymap->setDefaultSelected(d.getIntValue());
+                bkKeymaps.getLast()->setId(newId);
             }
             else if (e->hasTagName ( vtagGeneral))
             {
@@ -201,7 +147,6 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 int newId = transformId(PreparationTypeTuning, oldId);
                 
                 tuning.getLast()->setId(newId);
-                
             }
             else if (e->hasTagName( vtagModTuning))
             {
@@ -348,7 +293,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
             {
                 Piano::Ptr thisPiano = bkPianos[which++];
                 
-                thisPiano->setState(e, &idmap);
+                thisPiano->setState(e, &idmap, idcounts);
             }
         }
     }

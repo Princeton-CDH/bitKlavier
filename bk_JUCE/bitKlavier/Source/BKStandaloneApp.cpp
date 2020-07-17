@@ -10,8 +10,6 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 
-extern juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter();
-
 #include "BKStandaloneWindow.h"
 
 namespace juce

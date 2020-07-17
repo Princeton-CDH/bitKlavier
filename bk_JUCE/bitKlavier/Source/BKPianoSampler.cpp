@@ -62,6 +62,8 @@ transpose(transp)
         
         sampleName = soundName;
         sampleLength = region_->sample->getSampleLength();
+        
+        pan = region_->pan;
     }
     else
     {
@@ -576,6 +578,11 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         loopL = (inL [pos] * invAlpha + inL [next] * alpha);
         loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : loopL;
+        
+        float pan = (playingSound->pan * 0.01f) + 1.0f;
+        
+        loopL = loopL * (2.0f - pan);
+        loopR = loopR * pan;
         //===========================================
         
         //==============SAMPLE STUFF=================
@@ -594,6 +601,9 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
 
         sampleL = (inL [pos] * invAlpha + inL [next] * alpha);
         sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : sampleL;
+        
+        sampleL = sampleL * (2.0f - pan);
+        sampleR = sampleR * pan;
 
         //===========================================
         if (playDirection == Forward)
@@ -694,6 +704,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
     ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
     : nullptr;
     
+    
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
     
@@ -731,13 +742,19 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         if(samplePosition < 0) samplePosition = 0;
         if(samplePosition > playingSound->soundLength - 2) samplePosition = playingSound->soundLength - 2;
         
+        
         const int pos = (int) samplePosition;
         const float alpha = (float) (samplePosition - pos);
         const float invAlpha = 1.0f - alpha;
         int next = pos + 1;
-
+        
         sampleL = (inL [pos] * invAlpha + inL [next] * alpha);
         sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : sampleL;
+        
+        float pan = (playingSound->pan * 0.01f) + 1.0f;
+        
+        sampleL = sampleL * (2.0f - pan);
+        sampleR = sampleR * pan;
 
         //===========================================
         if (playDirection == Forward)
@@ -757,19 +774,49 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
             }
             
         }
+        /*
+         else if (playDirection == Reverse)
+                {
+                    sourceSamplePosition -= bentRatio;
+                    
+                    if (sourceSamplePosition <= playEndPosition)
+                    {
+                        if ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE))
+                        {
+                            // DBG("reverse sample adsr.keyOff");
+                            adsr.keyOff();
+                        }
+                    }
+                    
+                    if(sourceSamplePosition <= 0)
+                    {
+                        clearCurrentNote();
+                    }
+                }
+        */
         else if (playDirection == Reverse)
         {
+            /*
             if(lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
             {
                 clearCurrentNote(); break;
             }
+             */
+            // samplePosition -= bentRatio;
             
-            if (playType != Normal && (lengthTracker >= playLength))
+            if (samplePosition <= playEndPosition)
+            // if (lengthTracker >= playLength + adsr.getReleaseTime() * getSampleRate())
+            //if (playType != Normal && (lengthTracker >= playLength))
             {
                 if ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE))
                 {
                     adsr.keyOff();
                 }
+            }
+            
+            if (samplePosition <= 0 || (adsr.getState() == BKADSR::IDLE))
+            {
+                clearCurrentNote();
             }
             
         }

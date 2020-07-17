@@ -84,9 +84,11 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     galleryVT.setProperty("defaultLoaded", (int)defaultLoaded, 0);
     galleryVT.setProperty("defaultName", defaultName, 0);
     
-    galleryVT.setProperty("sampleType", (int)currentSampleType, 0);
-    galleryVT.setProperty("soundfontURL", currentSoundfont, 0);
-    galleryVT.setProperty("soundfontInst", currentInstrument, 0);
+    galleryVT.setProperty("sampleType", (int)globalSampleType, 0);
+    File soundfont(globalSoundfont);
+    if (soundfont.exists()) galleryVT.setProperty("soundfontURL", soundfont.getFileName(), 0);
+    else galleryVT.setProperty("soundfontURL", globalSoundfont, 0);
+    galleryVT.setProperty("soundfontInst", globalInstrument, 0);
     
     galleryVT.setProperty("galleryPath", gallery->getURL(), 0);
     
@@ -105,20 +107,20 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
 void BKAudioProcessor::loadSamplesStartup(void)
 {
     // LOAD SAMPLES
-    if (currentSampleType < BKLoadSoundfont)
+    if (globalSampleType < BKLoadSoundfont)
     {
-        loadSamples(currentSampleType);
+        loadSamples(globalSampleType);
     }
-    else if (currentSampleType == BKLoadSoundfont)
+    else if (globalSampleType == BKLoadSoundfont)
     {
-        File file (currentSoundfont);
+        File file (globalSoundfont);
         if (file.existsAsFile())
         {
-            loadSamples(BKLoadSoundfont, currentSoundfont, currentInstrument);
+            loadSamples(BKLoadSoundfont, globalSoundfont, globalInstrument);
         }
         else
         {
-            currentSampleType = BKLoadLite;
+            globalSampleType = BKLoadLite;
             loadSamples(BKLoadLite);
         }
     }
@@ -201,15 +203,24 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             sampleType = (BKSampleLoadType) sampleString.getIntValue();
         }
         
-        lastSampleType = BKLoadNil;
-        lastSoundfont = "nil";
-        lastInstrument = -1;
+        globalSampleType = sampleType;
+
+        globalSoundfont = galleryXML->getStringAttribute("soundfontURL");
+        File bkSoundfonts;
+#if JUCE_IOS
+        bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory);
+#endif
+#if JUCE_MAC
+        bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+        bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+        Array<File> files = bkSoundfonts.findChildFiles(File::findFiles, true, globalSoundfont);
+        if (!files.isEmpty()) globalSoundfont = files.getUnchecked(0).getFullPathName();
+
+        globalInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
         
-        currentSampleType = sampleType;
-        currentSoundfont = galleryXML->getStringAttribute("soundfontURL");
-        currentInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
-        
-        loader.stopThread(1000);
         loadSamplesStartup();
     }
     
