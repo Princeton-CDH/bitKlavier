@@ -208,17 +208,21 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
             switch (which)
             {
                 case 0:
-                    file = file.getChildFile("rhodes.sf2"); break;
+                    file = file.getChildFile("jRhodes3b-stereo.sf2"); break;
                 case 1:
-                    file = file.getChildFile("harpsichord.sf2"); break;
+                    file = file.getChildFile("Blanchet-1720.sf2"); break;
                 case 2:
-                    file = file.getChildFile("kikazdrums.sf2"); break;
+                    file = file.getChildFile("1276-The KiKaZ DrUmZ.sf2"); break;
                 case 3:
-                    file = file.getChildFile("saw.sf2"); break;
+                    file = file.getChildFile("SCC Saw 1.sf2"); break;
                 case 4:
                     file = file.getChildFile("ebass").getChildFile("Electric Bass.sfz"); break;
+                case 5 :
+                    file = file.getChildFile("acoust_kits_1-4.sf2"); break;
+                case 6 :
+                    file = file.getChildFile("Orgue de salon.sf2"); break;
                 default:
-                    file = file.getChildFile("saw.sf2"); break;
+                    file = file.getChildFile("SCC Saw 1.sf2"); break;
             }
             
             loadSoundfontFromFile(file);

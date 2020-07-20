@@ -267,7 +267,7 @@ public:
         // Get the path for soundfonts based on platform
         File bkSoundfonts;
 #if JUCE_IOS
-        bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory);
+        bkSoundfonts = File::getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
 #endif
 #if JUCE_MAC
         bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
@@ -277,6 +277,15 @@ public:
 #endif
         // Search for the soundfont based on the saved filename, making sure to remove subsound substring first
         Array<File> files = bkSoundfonts.findChildFiles(File::findFiles, true, str.upToLastOccurrenceOf(".subsound", false, false));
+        
+#if JUCE_IOS
+        if (files.isEmpty())
+        {
+            bkSoundfonts = File::getSpecialLocation (File::userDocumentsDirectory);
+            files = bkSoundfonts.findChildFiles(File::findFiles, true, str.upToLastOccurrenceOf(".subsound", false, false));
+        }
+#endif
+        
         // If we find any files, use the first one, and set soundSetName to the full path with the subsound substring added
         if (!files.isEmpty()) setSoundSetName(files.getUnchecked(0).getFullPathName() + str.fromLastOccurrenceOf(".subsound", true, false));
         // Otherwise set it to an empty String

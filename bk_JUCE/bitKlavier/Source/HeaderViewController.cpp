@@ -147,6 +147,8 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     loadMenu.addItem(SF_DEFAULT_2, "Drums", true, false);
     loadMenu.addItem(SF_DEFAULT_3, "Saw", true, false);
     loadMenu.addItem(SF_DEFAULT_4, "Electric Bass", true, false);
+    loadMenu.addItem(SF_DEFAULT_5, "Acoustic Kit", true, false);
+    loadMenu.addItem(SF_DEFAULT_6, "Organ", true, false);
     
     loadMenu.addSeparator();
     

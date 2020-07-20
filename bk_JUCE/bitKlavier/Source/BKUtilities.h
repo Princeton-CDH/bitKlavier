@@ -101,6 +101,8 @@
 #define SF_DEFAULT_2 802
 #define SF_DEFAULT_3 803
 #define SF_DEFAULT_4 804
+#define SF_DEFAULT_5 805
+#define SF_DEFAULT_6 806
 
 
 

@@ -1025,7 +1025,7 @@ public:
         str = e->getStringAttribute(ptagSynchronic_soundSet);
         File bkSoundfonts;
 #if JUCE_IOS
-        bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory);
+        bkSoundfonts = File::getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
 #endif
 #if JUCE_MAC
         bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
@@ -1034,6 +1034,15 @@ public:
         bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
 #endif
         Array<File> files = bkSoundfonts.findChildFiles(File::findFiles, true, str.upToLastOccurrenceOf(".subsound", false, false));
+        
+#if JUCE_IOS
+        if (files.isEmpty())
+        {
+            bkSoundfonts = File::getSpecialLocation (File::userDocumentsDirectory);
+            files = bkSoundfonts.findChildFiles(File::findFiles, true, str.upToLastOccurrenceOf(".subsound", false, false));
+        }
+#endif
+            
         if (!files.isEmpty()) setSoundSetName(files.getUnchecked(0).getFullPathName() + str.fromLastOccurrenceOf(".subsound", true, false));
         else setSoundSetName(String());
  

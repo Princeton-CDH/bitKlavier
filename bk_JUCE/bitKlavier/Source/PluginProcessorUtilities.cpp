@@ -151,6 +151,8 @@ void BKAudioProcessor::collectSoundfonts(void)
     File bkSoundfonts;
     
 #if JUCE_IOS
+    bkSoundfonts = File::getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
+    collectSoundfontsFromFolder(bkSoundfonts);
     bkSoundfonts = File::getSpecialLocation (File::userDocumentsDirectory);
 #endif
 #if JUCE_MAC
