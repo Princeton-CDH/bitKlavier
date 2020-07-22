@@ -453,12 +453,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     {
         if (!clusters.isEmpty())
         {
-            SynchronicCluster::Ptr tempCluster = clusters.getLast();
-            for (int i = 1; i < clusters.size(); i++)
-            {
-                clusters.set(i, cluster[i-1]);
-            }
-            clusters.set(0, tempCluster);
+            clusters.move(clusters.size() - 1, 0);
         }
     }
 }
@@ -615,12 +610,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     {
         if (!clusters.isEmpty())
         {
-            SynchronicCluster::Ptr tempCluster = clusters.getLast();
-            for (int i = 1; i < clusters.size(); i++)
-            {
-                clusters.set(i, cluster[i-1]);
-            }
-            clusters.set(0, tempCluster);
+            clusters.move(clusters.size() - 1, 0);
         }
     }
 }
