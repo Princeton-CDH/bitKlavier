@@ -685,7 +685,16 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 90) // Z
     {
-
+        if (display == DisplayDefault)
+        {
+            if (e.getModifiers().isCommandDown())
+            {
+                if (e.getModifiers().isShiftDown())
+                    processor.redoGallery();
+                else
+                    processor.undoGallery();
+            }
+        }
     }
     else if (code == 69) // E
     {

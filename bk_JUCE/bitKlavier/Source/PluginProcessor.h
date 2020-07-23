@@ -356,6 +356,32 @@ public:
     inline Value getTooltipsEnabled(void) { return tooltipsEnabled; }
     inline void setTooltipsEnabled(bool enabled) { tooltipsEnabled.setValue(enabled); }
     
+    Array<ValueTree> galleryHistory;
+    int undoDepth;
+    
+    inline void saveGalleryToHistory()
+    {
+        int start = galleryHistory.size() - undoDepth;
+        galleryHistory.removeRange(start, undoDepth);
+        galleryHistory.add(gallery->getState());
+        if (galleryHistory.size() > 5) galleryHistory.remove(0);
+        undoDepth = 0;
+    }
+    
+    inline void undoGallery()
+    {
+        if (undoDepth >= galleryHistory.size() - 1) return;
+        undoDepth++;
+        loadGalleryFromXml(galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).createXml().get());
+    }
+    
+    inline void redoGallery()
+    {
+        if (undoDepth == 0) return;
+        undoDepth--;
+        loadGalleryFromXml(galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).createXml().get());
+    }
+    
 private:
     double currentSampleRate;
     

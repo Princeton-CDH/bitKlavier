@@ -95,6 +95,7 @@ void BKConstructionSite::redraw(void)
     
     graph->deselectAll();
     graph->reconstruct();
+    getParentComponent()->grabKeyboardFocus();
     
     draw();
 }
@@ -426,6 +427,8 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     
     addAndMakeVisible(toAdd);
     toAdd->addMouseListener(this, true);
+    
+    processor.saveGalleryToHistory();
 }
 
 // This is for adding items that exist in the gallery to the UI
