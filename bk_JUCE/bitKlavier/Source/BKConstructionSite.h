@@ -43,7 +43,7 @@ public:
     void copy(void);
     BKItem::PtrArr duplicate(BKItem::PtrArr these);
     bool inPaste, inCopyDrag, inCut;
-    void paste(void);
+    void paste(bool cursorBasedOffset = true);
     void cut(void);
     void selectAll(void);
     void startConnection(int x, int y);

@@ -183,7 +183,8 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     BKPopupMenu pianoMenu;
     
     pianoMenu.addItem(1, "New");
-    pianoMenu.addItem(2, "Linked Copy"); // add another called Duplicate that is like copy/paste?
+    pianoMenu.addItem(6, "Duplicate");
+    pianoMenu.addItem(2, "Linked Copy");
     pianoMenu.addItem(4, "Rename");
     pianoMenu.addItem(3, "Remove");
     pianoMenu.addSeparator();
@@ -301,11 +302,11 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
             processor.setCurrentPiano(newId);
         }
     }
-    else if (res == 2) // Duplicate
+    else if (res == 2) // Linked Copy
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        prompt.addTextEditor("name", processor.currentPiano->getName() + " (2)");
+        prompt.addTextEditor("name", processor.currentPiano->getName() + " Linked Copy");
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -364,6 +365,38 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
         }
         
         hvc->fillPianoCB();
+    }
+    else if (res == 6) // Duplicate
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addTextEditor("name", processor.currentPiano->getName() + " Copy");
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            BKItem::PtrArr clipboard = processor.getClipboard();
+            
+            BKConstructionSite* construction = hvc->construction;
+            construction->selectAll();
+            construction->copy();
+
+            int newId = processor.gallery->getNewId(PreparationTypePiano);
+            processor.gallery->addTypeWithId(PreparationTypePiano, newId);
+            processor.gallery->getPianos().getLast()->setName(name);
+            hvc->fillPianoCB();
+            processor.setCurrentPiano(newId);
+            
+            construction->paste(false);
+            
+            processor.setClipboard(clipboard);
+        }
     }
     else if (res == 7)
     {

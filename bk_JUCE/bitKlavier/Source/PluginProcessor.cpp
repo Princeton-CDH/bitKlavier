@@ -1371,7 +1371,7 @@ void BKAudioProcessor::loadGalleryDialog(void)
     
 }
 
-void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml)
+void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
@@ -1398,6 +1398,8 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml)
     
     for (auto bprocessor : currentPiano->getBlendronicProcessors())
         bprocessor->setActive(true);
+    
+    if (resetHistory) resetGalleryHistory();
 }
 
 void BKAudioProcessor::loadGalleryFromPath(String path)

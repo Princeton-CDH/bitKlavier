@@ -143,6 +143,8 @@ void BKConstructionSite::deleteSelected(void)
     selectedItems.clear();
     
     redraw();
+    
+    processor.saveGalleryToHistory();
 }
 
 void BKConstructionSite::align(int which)
@@ -211,6 +213,8 @@ void BKConstructionSite::makeConnection(int x, int y, bool doAnother)
         }
         
         connect = doAnother;
+        
+        processor.saveGalleryToHistory();
     }
 }
 
@@ -506,7 +510,7 @@ void BKConstructionSite::copy(void)
     getParentComponent()->grabKeyboardFocus();
 }
 
-void BKConstructionSite::paste(void)
+void BKConstructionSite::paste(bool cursorBasedOffset)
 {
     BKItem::PtrArr clipboard = processor.getClipboard();
     
@@ -523,6 +527,7 @@ void BKConstructionSite::paste(void)
     graph->deselectAll();
     
     int offsetX = upperLeftest->getX(); int offsetY = upperLeftest->getY();
+    if (!cursorBasedOffset) offsetX = offsetY = 0;
     
     for (auto item : clipboard)
     {
@@ -540,8 +545,8 @@ void BKConstructionSite::paste(void)
 
         newItem->setSelected(true);
         
-        int newX = (newItem->getX()-offsetX) + lastEX;
-        int newY = (newItem->getY()-offsetY) + lastEY;
+        int newX = (newItem->getX()-offsetX) + (cursorBasedOffset ? lastEX : 0);
+        int newY = (newItem->getY()-offsetY) + (cursorBasedOffset ? lastEY : 0);
         if (newX > this->getWidth() - newItem->getWidth()) newX = this->getWidth() - newItem->getWidth();
         if (newY > this->getHeight() - newItem->getHeight()) newY = this->getHeight() - newItem->getHeight();
         
@@ -599,7 +604,7 @@ void BKConstructionSite::cut(void)
 {
     copy();
     
-    for (auto item : graph->getSelectedItems()) deleteItem(item);
+    deleteSelected();
     
     graph->deselectAll();
     

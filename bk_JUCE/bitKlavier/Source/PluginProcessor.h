@@ -58,7 +58,7 @@ public:
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
     void loadGalleryFromPath(String path);
-    void loadGalleryFromXml(XmlElement* xml);
+    void loadGalleryFromXml(XmlElement* xml, bool resetHistory = true);
     void loadJsonGalleryFromPath(String path);
     void saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
@@ -359,27 +359,35 @@ public:
     Array<ValueTree> galleryHistory;
     int undoDepth;
     
+#define UNDO_HISTORY_SIZE 20
+    
     inline void saveGalleryToHistory()
     {
         int start = galleryHistory.size() - undoDepth;
         galleryHistory.removeRange(start, undoDepth);
         galleryHistory.add(gallery->getState());
-        if (galleryHistory.size() > 5) galleryHistory.remove(0);
+        if (galleryHistory.size() > UNDO_HISTORY_SIZE) galleryHistory.remove(0);
         undoDepth = 0;
+    }
+    
+    inline void resetGalleryHistory()
+    {
+        galleryHistory.clear();
+        saveGalleryToHistory();
     }
     
     inline void undoGallery()
     {
         if (undoDepth >= galleryHistory.size() - 1) return;
         undoDepth++;
-        loadGalleryFromXml(galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).createXml().get());
+        loadGalleryFromXml(galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).createXml().get(), false);
     }
     
     inline void redoGallery()
     {
         if (undoDepth == 0) return;
         undoDepth--;
-        loadGalleryFromXml(galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).createXml().get());
+        loadGalleryFromXml(galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).createXml().get(), false);
     }
     
 private:
