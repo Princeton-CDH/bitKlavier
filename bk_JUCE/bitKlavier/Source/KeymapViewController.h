@@ -91,7 +91,30 @@ private:
     TextButton      keysButton;
     TextButton      clearButton;
     BKComboBox      keysCB;
-    
+
+    ToggleButton endKeystrokesToggle;
+
+    //stuff for trap/mirror/harmonizer tab - TRT
+    BKLabel harKeymapL;
+    BKTextEditor harKeymapTF;
+
+    BKKeymapKeyboardState harKeyboardState;
+    std::unique_ptr<Component> harKeyboardComponent;
+    BKKeymapKeyboardComponent* harKeyboard;
+    BKTextButton harKeyboardValsTextFieldOpen;
+
+    BKLabel harArrayKeymapL;
+    BKTextEditor harArrayKeymapTF;
+
+    BKKeymapKeyboardState harArrayKeyboardState;
+    std::unique_ptr<Component> harArrayKeyboardComponent;
+    BKKeymapKeyboardComponent* harArrayKeyboard;
+    BKTextButton harArrayKeyboardValsTextFieldOpen;
+
+    int harKey; //for rendering harmonizer array stuff for now
+
+    //end
+
     bool selectType;
     
     PopupMenu getKeysMenu(void);
@@ -129,13 +152,19 @@ private:
     
     bool needsOctaveSlider;
 
-    ToggleButton endKeystrokesToggle;
+    void displayTab(int tab) override;
+    void displayShared(void) override;
+    void invisible(void) override;
 
 
 #if JUCE_IOS
     Slider octaveSlider;
     void sliderValueChanged     (Slider* slider)                override;
     BKButtonAndMenuLAF laf;
+
+    Slider harOctaveSlider;
+    //BKButtonAndMenuLAF harlaf;
+    Slider harArrayOctaveSlider;
 #endif
     
     int minKey, maxKey;

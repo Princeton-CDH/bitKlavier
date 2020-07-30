@@ -24,7 +24,8 @@ triggered(false),
 midiInputSources(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true),
-allNotesOff(false)
+allNotesOff(false),
+harmonizerEnabled(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -47,6 +48,12 @@ allNotesOff(false)
     if (processor.isMidiReady()) {
         defaultSelected = true;
     }
+
+    harmonizerKeys.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++)
+    {
+        harmonizerKeys.add(Array<int>(i)); //"default" harmonizer for each key is to just play itself
+    }
 #if JUCE_IOS
     defaultSelected = true;
 #endif
@@ -61,7 +68,8 @@ inverted(false),
 midiInputSources(k->getMidiInputSources()),
 defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
-allNotesOff(k->getAllNotesOff())
+allNotesOff(k->getAllNotesOff()),
+harmonizerEnabled(k->getHarmonizerEnabled())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -77,6 +85,21 @@ allNotesOff(k->getAllNotesOff())
     }
     
     inverted = k->isInverted();
+
+    harmonizerKeys.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++)
+    {
+        if (k->getHarmonizationForKey(i)->size() == 0) harmonizerKeys.add(Array<int>(i));
+        else
+        {
+            harmonizerKeys.add(Array<int>({})); //"default" harmonizer for each key is to just play itself
+            Array<int>* otherArr = k->getHarmonizationForKey(i);
+            for (int j = 0; j < otherArr->size(); j++)
+            {
+                harmonizerKeys[i].add(otherArr->getUnchecked(j));
+            }
+        }
+    }
 }
 
 Keymap::Keymap(BKAudioProcessor& processor, int Id, Keymap::Ptr k):
@@ -88,7 +111,8 @@ inverted(false),
 midiInputSources(k->getMidiInputSources()),
 defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
-allNotesOff(k->getAllNotesOff())
+allNotesOff(k->getAllNotesOff()),
+harmonizerEnabled(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -104,6 +128,22 @@ allNotesOff(k->getAllNotesOff())
     }
     
     inverted = k->isInverted();
+
+    harmonizerKeys.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++)
+    {
+        if (k->getHarmonizationForKey(i)->size() == 0) harmonizerKeys.add(Array<int>(i));
+        else
+        {
+            harmonizerKeys.add(Array<int>({})); //"default" harmonizer for each key is to just play itself
+            Array<int>* otherArr = k->getHarmonizationForKey(i);
+            for (int j = 0; j < otherArr->size(); j++)
+            {
+                harmonizerKeys[i].add(otherArr->getUnchecked(j));
+            }
+        }
+    }
+    //setHarmonizerKeys(k->getHarmonizerKeys());
 }
 
 Keymap::Keymap(BKAudioProcessor& processor):
@@ -117,7 +157,8 @@ inverted(false),
 midiInputSources(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true),
-allNotesOff(false)
+allNotesOff(false),
+harmonizerEnabled(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -133,6 +174,12 @@ allNotesOff(false)
     
     if (processor.isMidiReady()) {
         defaultSelected = true;
+    }
+
+    harmonizerKeys.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++)
+    {
+        harmonizerKeys.add(Array<int>(i)); //"default" harmonizer for each key is to just play itself
     }
 }
 
@@ -452,4 +499,36 @@ void Keymap::print(void)
 {
     DBG("Id: " + String(Id));
     DBG("Keymap: "+ intArrayToString(keys()));
+}
+
+void Keymap::trapKey(int keyToTrap)
+{
+    for (int i = 0; i < 128; i++)
+    {
+        harmonizerKeys.insert(i, Array<int>({ keyToTrap }));
+    }
+}
+
+void Keymap::mirrorKey(int keyCenter)
+{
+    if (keyCenter < 64)
+    {
+        int j = keyCenter + 1;
+        for (int i = keyCenter - 1; i >= 0; i--)
+        {
+            harmonizerKeys.insert(i, Array<int>({ i, j }));
+            harmonizerKeys.insert(j, Array<int>({ i, j }));
+            j++;
+        }
+    }
+    else
+    {
+        int i = keyCenter - 1;
+        for (int j = keyCenter + 1; j < 128; j++)
+        {
+            harmonizerKeys.insert(i, Array<int>({ i, j }));
+            harmonizerKeys.insert(j, Array<int>({ i, j }));
+            i--;
+        }
+    }
 }

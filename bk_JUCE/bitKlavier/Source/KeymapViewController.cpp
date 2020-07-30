@@ -20,7 +20,7 @@
 
 //==============================================================================
 KeymapViewController::KeymapViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 1)
+BKViewController(p, theGraph, 2)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     // buttonsAndMenusLAF.drawGroupComponentOutline();
@@ -119,6 +119,91 @@ BKViewController(p, theGraph, 1)
     addAndMakeVisible(keyboardValsTextFieldOpen);
     keymapTF.setVisible(false);
     keymapTF.toBack();
+
+
+    //second tab stuff - TRT
+    addAndMakeVisible(harKeymapTF);
+    harKeymapTF.addListener(this);
+    harKeymapTF.setName("HarmonizerKeymapMidi");
+    harKeymapTF.setTooltip("Select or deselect all keys by individually clicking or click-dragging, or press 'edit all' to type or copy/paste MIDI notes to be selected in Keymap");
+    harKeymapTF.setMultiLine(true);
+
+    harKeyboardComponent = std::make_unique<BKKeymapKeyboardComponent>(harKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+
+    // Harmonizer Keyboard
+    addAndMakeVisible(*harKeyboardComponent);
+
+    harKeyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
+    harKeyboard->setScrollButtonsVisible(false);
+
+#if JUCE_IOS
+
+    harOctaveSlider.setRange(0, 6, 1);
+    harOctaveSlider.addListener(this);
+    harOctaveSlider.setLookAndFeel(&laf);
+    harOctaveSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+    harOctaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    harOctaveSlider.setValue(3);
+
+    addAndMakeVisible(harOctaveSlider);
+#endif
+
+    harKeyboard->setAvailableRange(minKey, maxKey);
+
+    harKeyboard->setAllowDrag(true);
+    harKeyboard->setOctaveForMiddleC(4);
+    harKeyboardState.addListener(this);
+
+    harKeyboardValsTextFieldOpen.setName("HKSLIDERTXTEDITALLBUTTON");
+    harKeyboardValsTextFieldOpen.addListener(this);
+    harKeyboardValsTextFieldOpen.setButtonText("edit all");
+    addAndMakeVisible(harKeyboardValsTextFieldOpen);
+    harKeymapTF.setVisible(false);
+    harKeymapTF.toBack();
+
+    //Harmonizer Array stuff
+
+    addAndMakeVisible(harArrayKeymapTF);
+    harArrayKeymapTF.addListener(this);
+    harArrayKeymapTF.setName("HarmonizerArrayKeymapMidi");
+    harArrayKeymapTF.setTooltip("Select or deselect all keys by individually clicking or click-dragging, or press 'edit all' to type or copy/paste MIDI notes to be selected in Keymap");
+    harArrayKeymapTF.setMultiLine(true);
+
+    harArrayKeyboardComponent = std::make_unique<BKKeymapKeyboardComponent>(harArrayKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+
+    // Harmonizer Array Keyboard
+    addAndMakeVisible(*harArrayKeyboardComponent);
+
+    harArrayKeyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
+    harArrayKeyboard->setScrollButtonsVisible(false);
+
+#if JUCE_IOS
+
+    harArrayOctaveSlider.setRange(0, 6, 1);
+    harArrayOctaveSlider.addListener(this);
+    harArrayOctaveSlider.setLookAndFeel(&laf);
+    harArrayOctaveSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+    harArrayOctaveSlider.setTextBoxStyle(Slider::NoTextBox, true, 0, 0);
+    harArrayOctaveSlider.setValue(3);
+
+    addAndMakeVisible(harArrayOctaveSlider);
+#endif
+
+    harArrayKeyboard->setAvailableRange(minKey, maxKey);
+
+    harArrayKeyboard->setAllowDrag(true);
+    harArrayKeyboard->setOctaveForMiddleC(4);
+    harArrayKeyboardState.addListener(this);
+
+    harArrayKeyboardValsTextFieldOpen.setName("HAKSLIDERTXTEDITALLBUTTON");
+    harArrayKeyboardValsTextFieldOpen.addListener(this);
+    harArrayKeyboardValsTextFieldOpen.setButtonText("edit all");
+    addAndMakeVisible(harArrayKeyboardValsTextFieldOpen);
+    harArrayKeymapTF.setVisible(false);
+    harArrayKeymapTF.toBack();
+
+    // end second tab stuff
+
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
@@ -202,6 +287,9 @@ BKViewController(p, theGraph, 1)
     endKeystrokesToggle.addListener(this);
     addAndMakeVisible(&endKeystrokesToggle, ALL);
 
+    currentTab = 0;
+    //displayTab(currentTab);
+
     
     fillSelectCB(-1,-1);
     
@@ -229,7 +317,280 @@ void KeymapViewController::paint (Graphics& g)
 
 void KeymapViewController::resized()
 {
-    Rectangle<int> area (getLocalBounds());
+    displayShared();
+    displayTab(currentTab);
+    repaint();
+}
+
+void KeymapViewController::displayTab(int tab)
+{
+    currentTab = tab;
+    invisible();
+    displayShared();
+
+    int x0 = leftArrow.getRight() + gXSpacing;
+    int y0 = hideOrShow.getBottom() + gYSpacing;
+    int right = rightArrow.getX() - gXSpacing;
+    int width = right - x0;
+    int height = getHeight() - y0;
+
+    Rectangle<int> area(getLocalBounds());
+
+    if (tab == 0)
+    {
+        //iconImageComponent.setBounds(area);
+        area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        //area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
+        Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
+        Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
+
+        comboBoxSlice.removeFromRight(4 + 2. * gPaddingConst * processor.paddingScalarX);
+        comboBoxSlice.removeFromLeft(gXSpacing);
+        hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
+        comboBoxSlice.removeFromLeft(gXSpacing);
+        selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2));
+        selectCB.setVisible(true);
+
+        actionButton.setBounds(selectCB.getRight() + gXSpacing,
+            selectCB.getY(),
+            selectCB.getWidth() * 0.5,
+            selectCB.getHeight());
+        actionButton.setVisible(true);
+
+        Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
+        targetsSlice.removeFromRight(gXSpacing);
+        if (wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+        {
+            midiInputSelectButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
+            targetsSlice.removeFromRight(gXSpacing);
+            midiInputSelectButton.setVisible(true);
+        }
+
+        invertOnOffToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
+        invertOnOffToggle.toFront(false);
+        invertOnOffToggle.setVisible(true);
+        targetsSlice.removeFromRight(gXSpacing);
+
+        endKeystrokesToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
+       // endKeystrokesToggle.toFront(false);
+        endKeystrokesToggle.setVisible(true);
+
+        // height of the box for the prep with the most targets (Synchronic)
+        int maxTargetHeight = (TargetTypeSynchronicRotate - TargetTypeSynchronic + 1) *
+            (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing;
+
+#if JUCE_IOS
+        leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.25);
+        area.removeFromTop((area.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.25);
+#else
+        leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
+        area.removeFromTop((area.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
+#endif
+
+
+        Rectangle<int> secondColumn = leftColumn.removeFromRight(leftColumn.getWidth() * 0.5);
+        Rectangle<int> thirdColumn = area.removeFromLeft(area.getWidth() * 0.5);
+        //area is now fourth column
+
+
+        // Synchronic Targets
+        leftColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+        Rectangle<int> synchronicBox1 = leftColumn.removeFromTop((TargetTypeSynchronicClear - TargetTypeSynchronic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+
+        Rectangle<int> synchronicGroup1(synchronicBox1);
+
+        synchronicBox1.removeFromTop(4 * gYSpacing);
+        synchronicBox1.removeFromLeft(gXSpacing);
+        for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicClear; i++)
+        {
+            targetControlTBs[i]->setBounds(synchronicBox1.removeFromTop(gComponentToggleBoxHeight));
+            targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
+            targetControlTBs[i]->setVisible(true);
+            synchronicBox1.removeFromTop(gYSpacing);
+        }
+
+        secondColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+        Rectangle<int> synchronicBox2 = secondColumn.removeFromTop((TargetTypeSynchronicRotate - TargetTypeSynchronicPausePlay + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+        Rectangle<int> synchronicGroup2 = synchronicBox2;
+        //synchronicTBGroup.setBounds(synchronicBox2);
+        synchronicBox2.removeFromTop(4 * gYSpacing);
+        synchronicBox2.removeFromLeft(gXSpacing);
+        for (int i = TargetTypeSynchronicPausePlay; i <= TargetTypeSynchronicRotate; i++)
+        {
+            targetControlTBs[i]->setBounds(synchronicBox2.removeFromTop(gComponentToggleBoxHeight));
+            targetControlTBs[i]->setVisible(true);
+            synchronicBox2.removeFromTop(gYSpacing);
+        }
+
+
+        synchronicTBGroup.setBounds(synchronicGroup1.getX(),
+            synchronicGroup1.getY(),
+            synchronicGroup2.getWidth() +
+            synchronicGroup1.getWidth(),
+            synchronicGroup1.getHeight());
+        synchronicTBGroup.setVisible(true);
+
+
+
+        // Nostalgic Targets
+        thirdColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+        Rectangle<int> nostalgicBox = thirdColumn.removeFromTop((TargetTypeNostalgic - TargetTypeNostalgic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+        Rectangle<int> nostalgicGroup1 = nostalgicBox;
+        //blendronicTBGroup.setBounds(nostalgicBox);
+        nostalgicBox.removeFromTop(4 * gYSpacing);
+        nostalgicBox.removeFromLeft(gXSpacing);
+        for (int i = TargetTypeNostalgic; i <= TargetTypeNostalgic; i++)
+        {
+            targetControlTBs[i]->setBounds(nostalgicBox.removeFromTop(gComponentToggleBoxHeight));
+            targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
+            targetControlTBs[i]->setVisible(true);
+            nostalgicBox.removeFromTop(gYSpacing);
+        }
+
+        area.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+        Rectangle<int> nostalgicBox2 = area.removeFromTop((TargetTypeNostalgicClear - TargetTypeNostalgicClear + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+        Rectangle<int> nostalgicGroup2 = nostalgicBox2;
+        //blendronicTBGroup.setBounds(nostalgicBox2);
+        nostalgicBox2.removeFromTop(4 * gYSpacing);
+        nostalgicBox2.removeFromLeft(gXSpacing);
+        for (int i = TargetTypeNostalgicClear; i <= TargetTypeNostalgicClear; i++)
+        {
+            targetControlTBs[i]->setBounds(nostalgicBox2.removeFromTop(gComponentToggleBoxHeight));
+            //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
+            targetControlTBs[i]->setVisible(true);
+            nostalgicBox2.removeFromTop(gYSpacing);
+        }
+
+        nostalgicTBGroup.setBounds(nostalgicGroup1.getX(),
+            nostalgicGroup1.getY(),
+            nostalgicGroup2.getWidth() +
+            nostalgicGroup1.getWidth(),
+            nostalgicGroup1.getHeight());
+        nostalgicTBGroup.setVisible(true);
+
+        // Blendronic Targets
+        // thirdColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+#if JUCE_IOS
+        thirdColumn.removeFromTop(gYSpacing * 1.5);
+#endif
+        thirdColumn.removeFromTop(gYSpacing * 2);
+        Rectangle<int> blendronicBox = thirdColumn.removeFromTop((TargetTypeBlendronicClear - TargetTypeBlendronicPatternSync + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+        Rectangle<int> blendronicGroup1 = blendronicBox;
+        //blendronicTBGroup.setBounds(blendronicBox);
+        blendronicBox.removeFromTop(4 * gYSpacing);
+        blendronicBox.removeFromLeft(gXSpacing);
+        for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicClear; i++)
+        {
+            targetControlTBs[i]->setBounds(blendronicBox.removeFromTop(gComponentToggleBoxHeight));
+            targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
+            targetControlTBs[i]->setVisible(true);
+            blendronicBox.removeFromTop(gYSpacing);
+        }
+
+        //area.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
+#if JUCE_IOS
+        area.removeFromTop(gYSpacing * 1.5);
+#endif
+        area.removeFromTop(gYSpacing * 2);
+        Rectangle<int> blendronicBox2 = area.removeFromTop((TargetTypeBlendronicOpenCloseOutput - TargetTypeBlendronicPausePlay + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+        Rectangle<int> blendronicGroup2 = blendronicBox2;
+        //blendronicTBGroup.setBounds(blendronicBox2);
+        blendronicBox2.removeFromTop(4 * gYSpacing);
+        blendronicBox2.removeFromLeft(gXSpacing);
+        for (int i = TargetTypeBlendronicPausePlay; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+        {
+            targetControlTBs[i]->setBounds(blendronicBox2.removeFromTop(gComponentToggleBoxHeight));
+            //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
+            targetControlTBs[i]->setVisible(true);
+            blendronicBox2.removeFromTop(gYSpacing);
+        }
+
+        blendronicTBGroup.setBounds(blendronicGroup1.getX(),
+            blendronicGroup1.getY(),
+            blendronicGroup2.getWidth() +
+            blendronicGroup1.getWidth(),
+            blendronicGroup1.getHeight());
+        blendronicTBGroup.setVisible(true);
+    }
+
+	else if (tab == 1)
+	{
+        iconImageComponent.setBounds(area);
+        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+
+	    DBG("hello plz show arrow");
+        float harKeyboardHeight = 50 + 50 * processor.paddingScalarY;
+        area.removeFromBottom(harKeyboardHeight + gYSpacing * 15);
+        Rectangle<int> harkeyboardRow = area.removeFromBottom(harKeyboardHeight);
+        float keyWidth = harkeyboardRow.getWidth() / round((maxKey - minKey) * 7. / 12 + 1); //num white keys
+
+        harKeyboard->setKeyWidth(keyWidth);
+        harKeyboard->setBlackNoteLengthProportion(0.6);
+        harkeyboardRow.reduce(gXSpacing, 0);
+
+#if JUCE_IOS
+        float sliderHeight = 15;
+        Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
+
+        harOctaveSlider.setBounds(sliderArea);
+#endif
+
+        harKeyboard->setBounds(harkeyboardRow);
+        harKeyboard->setVisible(true);
+
+#if JUCE_IOS
+        harKeymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
+        harKeymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
+
+#else
+        harKeymapTF.setBounds(harkeyboardRow);
+        harKeymapTF.setVisible(true);
+#endif
+
+        area.removeFromBottom(gYSpacing);
+        Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
+        textButtonSlab.removeFromLeft(gXSpacing);
+        harKeyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
+        harKeyboardValsTextFieldOpen.setVisible(true);
+
+
+        //harmonizer array keyboard
+
+        area.removeFromBottom(gYSpacing * 10);
+        harkeyboardRow = area.removeFromBottom(harKeyboardHeight);
+        harArrayKeyboard->setKeyWidth(keyWidth);
+        harArrayKeyboard->setBlackNoteLengthProportion(0.6);
+        harkeyboardRow.reduce(gXSpacing, 0);
+
+#if JUCE_IOS
+        harArrayOctaveSlider.setBounds(sliderArea);
+#endif
+
+        harArrayKeyboard->setBounds(harkeyboardRow);
+        harArrayKeyboard->setVisible(true);
+
+#if JUCE_IOS
+        harArrayKeymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
+        harArrayKeymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
+
+#else
+        harArrayKeymapTF.setBounds(harkeyboardRow);
+        harArrayKeymapTF.setVisible(true);
+#endif
+
+        area.removeFromBottom(gYSpacing);
+        textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
+        textButtonSlab.removeFromLeft(gXSpacing);
+        harArrayKeyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
+        harArrayKeyboardValsTextFieldOpen.setVisible(true);
+	}
+}
+
+void KeymapViewController::displayShared()
+{
+    Rectangle<int> area(getLocalBounds());
 
     iconImageComponent.setBounds(area);
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
@@ -237,198 +598,96 @@ void KeymapViewController::resized()
     // float keyboardHeight = 100; // + 36 * processor.paddingScalarY;
     float keyboardHeight = 50 + 50 * processor.paddingScalarY;
     Rectangle<int> keyboardRow = area.removeFromBottom(keyboardHeight);
-    float keyWidth = keyboardRow.getWidth() / round((maxKey - minKey) * 7./12 + 1); //num white keys
+    float keyWidth = keyboardRow.getWidth() / round((maxKey - minKey) * 7. / 12 + 1); //num white keys
     keyboard->setKeyWidth(keyWidth);
     keyboard->setBlackNoteLengthProportion(0.6);
     keyboardRow.reduce(gXSpacing, 0);
-    
+
 #if JUCE_IOS
     float sliderHeight = 15;
     Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
-    
+
     octaveSlider.setBounds(sliderArea);
 #endif
-    
+
     keyboard->setBounds(keyboardRow);
-    
+    keyboard->setVisible(true);
+
 #if JUCE_IOS
     keymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
     keymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
 
 #else
     keymapTF.setBounds(keyboardRow);
+    keymapTF.setVisible(true);
 #endif
-    
+
     area.removeFromBottom(gYSpacing);
     Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
     textButtonSlab.removeFromLeft(gXSpacing);
     keyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
-    
+    keyboardValsTextFieldOpen.setVisible(true);
+
     keysCB.setBounds(textButtonSlab.removeFromLeft(keyboardValsTextFieldOpen.getWidth()));
+    keysCB.setVisible(true);
     keysButton.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
+    keysButton.setVisible(true);
     midiEditToggle.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
+    midiEditToggle.setVisible(true);
     textButtonSlab.removeFromRight(gXSpacing);
     clearButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth()));
+    clearButton.setVisible(true);
 
     midiEditToggle.toFront(false);
-    
-    Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
-    Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
-    
-    comboBoxSlice.removeFromRight(4 + 2.*gPaddingConst * processor.paddingScalarX);
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
-    comboBoxSlice.removeFromLeft(gXSpacing);
-    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2));
-    
-    actionButton.setBounds(selectCB.getRight()+gXSpacing,
-                           selectCB.getY(),
-                           selectCB.getWidth() * 0.5,
-                           selectCB.getHeight());
-    
-    Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
-    targetsSlice.removeFromRight(gXSpacing);
-    if(wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
-    {
-        midiInputSelectButton.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
-        targetsSlice.removeFromRight(gXSpacing);
-    }
-    
-    invertOnOffToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
-    invertOnOffToggle.toFront(false);
-    targetsSlice.removeFromRight(gXSpacing);
 
-    endKeystrokesToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
-    endKeystrokesToggle.toFront(false);
-    
-    // height of the box for the prep with the most targets (Synchronic)
-    int maxTargetHeight =   (TargetTypeSynchronicRotate - TargetTypeSynchronic + 1) *
-                            (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing;
-    
-#if JUCE_IOS
-    leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.25);
-    area.removeFromTop((area.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.25);
-#else
-    leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
-    area.removeFromTop((area.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
-#endif
+    leftArrow.setBounds(0, getHeight() * 0.4, 50, 50);
+    rightArrow.setBounds(getRight() - 50, getHeight() * 0.4, 50, 50);
 
+}
+
+void KeymapViewController::invisible()
+{
+    keymapSelectL.setVisible(false);
+    selectCB.setVisible(false);
+    invertOnOffToggle.setVisible(false);
+    midiEditToggle.setVisible(false);
+    keymapL.setVisible(false);
+    keymapTF.setVisible(false);
     
-    Rectangle<int> secondColumn = leftColumn.removeFromRight(leftColumn.getWidth() * 0.5);
-    Rectangle<int> thirdColumn = area.removeFromLeft(area.getWidth() * 0.5);
-    //area is now fourth column
-    
-  
-    // Synchronic Targets
-    leftColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
-    Rectangle<int> synchronicBox1 = leftColumn.removeFromTop((TargetTypeSynchronicClear - TargetTypeSynchronic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
-    
-    Rectangle<int> synchronicGroup1(synchronicBox1);
-    
-    synchronicBox1.removeFromTop(4 * gYSpacing);
-    synchronicBox1.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeSynchronic; i<=TargetTypeSynchronicClear; i++)
+    keyboardComponent->setVisible(false);
+    keyboardValsTextFieldOpen.setVisible(false);
+
+    harKeymapL.setVisible(false);
+    harKeymapTF.setVisible(false);
+    harKeyboardComponent->setVisible(false);
+    harKeyboardValsTextFieldOpen.setVisible(false);
+
+    harArrayKeymapL.setVisible(false);
+    harArrayKeymapTF.setVisible(false);
+    harArrayKeyboardComponent->setVisible(false);
+    harArrayKeyboardValsTextFieldOpen.setVisible(false);
+
+    midiInputSelectButton.setVisible(false);
+    targetsButton.setVisible(false);
+    keysButton.setVisible(false);
+    clearButton.setVisible(false);
+    keysCB.setVisible(false);
+
+    for (ToggleButton* button : targetControlTBs)
     {
-        targetControlTBs[i]->setBounds(synchronicBox1.removeFromTop(gComponentToggleBoxHeight));
-        targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
-        synchronicBox1.removeFromTop(gYSpacing);
+        button->setVisible(false);
     }
-    
-    secondColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
-    Rectangle<int> synchronicBox2 = secondColumn.removeFromTop((TargetTypeSynchronicRotate - TargetTypeSynchronicPausePlay + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
-    Rectangle<int> synchronicGroup2 = synchronicBox2;
-    //synchronicTBGroup.setBounds(synchronicBox2);
-    synchronicBox2.removeFromTop(4 * gYSpacing);
-    synchronicBox2.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeSynchronicPausePlay; i<=TargetTypeSynchronicRotate; i++)
-    {
-        targetControlTBs[i]->setBounds(synchronicBox2.removeFromTop(gComponentToggleBoxHeight));
-        synchronicBox2.removeFromTop(gYSpacing);
-    }
-    
-    
-    synchronicTBGroup.setBounds(synchronicGroup1.getX(),
-                                synchronicGroup1.getY(),
-                                synchronicGroup2.getWidth() +
-                                synchronicGroup1.getWidth(),
-                                synchronicGroup1.getHeight());
-     
-                                
-    
-     
-    // Nostalgic Targets
-    thirdColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
-    Rectangle<int> nostalgicBox = thirdColumn.removeFromTop((TargetTypeNostalgic - TargetTypeNostalgic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
-    Rectangle<int> nostalgicGroup1 = nostalgicBox;
-    //blendronicTBGroup.setBounds(nostalgicBox);
-    nostalgicBox.removeFromTop(4 * gYSpacing);
-    nostalgicBox.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeNostalgic; i<=TargetTypeNostalgic; i++)
-    {
-        targetControlTBs[i]->setBounds(nostalgicBox.removeFromTop(gComponentToggleBoxHeight));
-        targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
-        nostalgicBox.removeFromTop(gYSpacing);
-    }
-    
-    area.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
-    Rectangle<int> nostalgicBox2 = area.removeFromTop((TargetTypeNostalgicClear - TargetTypeNostalgicClear + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
-    Rectangle<int> nostalgicGroup2 = nostalgicBox2;
-    //blendronicTBGroup.setBounds(nostalgicBox2);
-    nostalgicBox2.removeFromTop(4 * gYSpacing);
-    nostalgicBox2.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeNostalgicClear; i<=TargetTypeNostalgicClear; i++)
-    {
-        targetControlTBs[i]->setBounds(nostalgicBox2.removeFromTop(gComponentToggleBoxHeight));
-        //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
-        nostalgicBox2.removeFromTop(gYSpacing);
-    }
-    
-    nostalgicTBGroup.setBounds(nostalgicGroup1.getX(),
-    nostalgicGroup1.getY(),
-    nostalgicGroup2.getWidth() +
-    nostalgicGroup1.getWidth(),
-    nostalgicGroup1.getHeight());
-    
-    // Blendronic Targets
-    // thirdColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
-#if JUCE_IOS
-    thirdColumn.removeFromTop(gYSpacing * 1.5);
-#endif
-    thirdColumn.removeFromTop(gYSpacing * 2);
-    Rectangle<int> blendronicBox = thirdColumn.removeFromTop((TargetTypeBlendronicClear - TargetTypeBlendronicPatternSync + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
-    Rectangle<int> blendronicGroup1 = blendronicBox;
-    //blendronicTBGroup.setBounds(blendronicBox);
-    blendronicBox.removeFromTop(4 * gYSpacing);
-    blendronicBox.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicClear; i++)
-    {
-        targetControlTBs[i]->setBounds(blendronicBox.removeFromTop(gComponentToggleBoxHeight));
-        targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
-        blendronicBox.removeFromTop(gYSpacing);
-    }
-    
-    //area.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
-#if JUCE_IOS
-    area.removeFromTop(gYSpacing * 1.5);
-#endif
-    area.removeFromTop(gYSpacing * 2);
-    Rectangle<int> blendronicBox2 = area.removeFromTop((TargetTypeBlendronicOpenCloseOutput - TargetTypeBlendronicPausePlay + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
-    Rectangle<int> blendronicGroup2 = blendronicBox2;
-    //blendronicTBGroup.setBounds(blendronicBox2);
-    blendronicBox2.removeFromTop(4 * gYSpacing);
-    blendronicBox2.removeFromLeft(gXSpacing);
-    for (int i=TargetTypeBlendronicPausePlay; i<=TargetTypeBlendronicOpenCloseOutput; i++)
-    {
-        targetControlTBs[i]->setBounds(blendronicBox2.removeFromTop(gComponentToggleBoxHeight));
-        //targetControlTBs[i]->setLookAndFeel(&buttonsAndMenusLAF2);
-        blendronicBox2.removeFromTop(gYSpacing);
-    }
-    
-    blendronicTBGroup.setBounds(blendronicGroup1.getX(),
-                                blendronicGroup1.getY(),
-                                blendronicGroup2.getWidth() +
-                                blendronicGroup1.getWidth(),
-                                blendronicGroup1.getHeight());
+    directTBGroup.setVisible(false);
+    synchronicTBGroup.setVisible(false);
+    nostalgicTBGroup.setVisible(false);
+    blendronicTBGroup.setVisible(false);
+    tuningTBGroup.setVisible(false);
+    tempoTBGroup.setVisible(false);
+
+    actionButton.setVisible(false);
+
+    endKeystrokesToggle.setVisible(false);
+
 }
 
 int KeymapViewController::addKeymap(void)
@@ -855,6 +1114,22 @@ void KeymapViewController::bkButtonClicked (Button* b)
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setAllNotesOff(endKeystrokesToggle.getToggleState());
     }
+    else if (b == &rightArrow)
+    {
+        arrowPressed(RightArrow);
+
+        DBG("currentTab: " + String(currentTab));
+
+        displayTab(currentTab);
+    }
+    else if (b == &leftArrow)
+    {
+        arrowPressed(LeftArrow);
+
+        DBG("currentTab: " + String(currentTab));
+
+        displayTab(currentTab);
+    }
     else
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
@@ -1008,16 +1283,48 @@ void KeymapViewController::handleKeymapNoteOff (BKKeymapKeyboardState* source, i
 void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber)
 {
     Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    
-    Array<int> oldKeys = thisKeymap->keys();
-    
-    thisKeymap->toggleNote(midiNoteNumber);
-    
-    update();
-    
-    BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
-    
-    keyboard->setKeysInKeymap(thisKeymap->keys());
+    if (source == &keyboardState)
+    {
+
+        Array<int> oldKeys = thisKeymap->keys();
+
+        thisKeymap->toggleNote(midiNoteNumber);
+
+        update();
+
+        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
+
+        keyboard->setKeysInKeymap(thisKeymap->keys());
+    }
+    else if (source == &harKeyboardState)
+    {
+        update();
+
+        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
+        keyboard->setKeysInKeymap(Array<int>({ midiNoteNumber }));
+        harKey = midiNoteNumber;
+    }
+    else if (source == &harArrayKeyboardState)
+    {
+        thisKeymap->addToHarmonizerList(harKey, midiNoteNumber);
+        Array<int> harmonizationArray = *(thisKeymap->getHarmonizationForKey(harKey));
+
+        DBG("Harmonization for key " + String(harKey) + " before update: ");
+        for (int i : harmonizationArray)
+        {
+            DBG(String(i));
+        }
+
+        update();
+
+        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
+        keyboard->setKeysInKeymap(harmonizationArray);
+        DBG("Harmonization for key " + String(harKey) + " after update: ");
+        for (int i : harmonizationArray)
+        {
+            DBG(String(i));
+        }
+    }
     
     processor.currentPiano->configure();
 }

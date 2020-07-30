@@ -533,7 +533,7 @@ void BKAudioProcessor::renameGallery(String newName)
     deleteGalleryAtURL(oldURL);
 }
 
-void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, String source)
+void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, String source, bool harmonizer)
 {
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
@@ -546,6 +546,14 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             if (km->getAllMidiInputSources().contains(source))
             {
                 activeSource = true;
+                if (harmonizer == false && km->shouldHarmonize(noteNumber))
+                {
+                    Array<int> harmonizer = *km->getHarmonizationForKey(noteNumber);
+                    for (int i = 0; i < harmonizer.size(); i++)
+                    {
+                        if (harmonizer[i] != noteNumber) handleNoteOn(harmonizer[i], velocity, channel, source, true);
+                    }
+                }
                 if (km->getAllNotesOff())
                 {
                     clearBitKlavier();

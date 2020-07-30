@@ -308,6 +308,50 @@ public:
     inline void setAllNotesOff(bool newValue) { allNotesOff = newValue; }
     inline void toggleAllNotesOff() { allNotesOff = !allNotesOff; }
     inline bool getAllNotesOff() { return allNotesOff; }
+
+    //inline OwnedArray<Array<int>>* getHarmonizerKeys() { return &harmonizerKeys; }
+    inline Array<Array<int>>* getHarmonizerKeys() { return &harmonizerKeys; }
+    //inline Array<int>* getHarmonizationForKey(int key) { return harmonizerKeys[key]; }
+    inline Array<int>* getHarmonizationForKey(int key) { return &harmonizerKeys[key]; }
+    inline void addToHarmonizerList(int keyPressed, int keyHarmonized) 
+    { 
+        harmonizerKeys[keyPressed].addIfNotAlreadyThere(keyHarmonized);
+        DBG("Harmonizer array size: " + String(harmonizerKeys[keyPressed].size()));
+        DBG("List of harmonizer keys for " + String(keyPressed) + ":");
+        for (int i = 0; i < harmonizerKeys[keyPressed].size(); i++)
+        {
+            DBG(String(harmonizerKeys[keyPressed][i]));
+        }
+    }
+    inline void setHarmonizerList(int keyPressed, Array<int> harmonization) { harmonizerKeys.insert(keyPressed, harmonization); }
+    /*inline void setHarmonizerKeys(OwnedArray<Array<int>>* harmonizer) 
+    {
+        for (int i = 0; i < harmonizerKeys.size(); i++)
+        {
+            for (int j = 0; j < harmonizerKeys[i].size(); j++)
+            {
+                harmonizerKeys[i][j] = harmonizer[i][j];
+            }
+            //harmonizerKeys.set(i, harmonizer->getUnchecked(i));
+        }
+    }*/
+
+    void trapKey(int keyToTrap);
+    void mirrorKey(int keyCenter);
+
+    inline bool getHarmonizerEnabled() { return harmonizerEnabled; }
+    inline bool setHarmonizerEnabled(bool toSet) { harmonizerEnabled = toSet; }
+    inline bool toggleHarmonizerEnabled() { harmonizerEnabled = !harmonizerEnabled; }
+
+    inline bool shouldHarmonize(int key)
+    {
+        if (harmonizerEnabled == false) return false;
+        if (harmonizerKeys[key].size() == 1)
+        {
+            if (harmonizerKeys[key][0] == key) return false;
+        }
+        return true;
+    }
     
 private:
     BKAudioProcessor& processor;
@@ -325,6 +369,10 @@ private:
     Array<bool> triggered;
     
     Array<String> midiInputSources;
+
+    //OwnedArray<Array<int>> harmonizerKeys;
+    Array<Array<int>> harmonizerKeys;
+    bool harmonizerEnabled;
     
     bool defaultSelected;
     bool onscreenSelected;
