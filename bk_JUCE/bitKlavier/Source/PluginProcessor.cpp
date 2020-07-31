@@ -538,7 +538,8 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
     bool activeSource = false;
-    bool keystrokesEnding = false;
+    //bool keystrokesEnding = false;
+
     if (pmap != nullptr)
     {
         for (auto km : pmap->getKeymaps())
@@ -546,24 +547,23 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             if (km->getAllMidiInputSources().contains(source))
             {
                 activeSource = true;
-                if (harmonizer == false && km->shouldHarmonize(noteNumber))
-                {
+                if (harmonizer == false)
+				{
                     Array<int> harmonizer = km->getHarmonizationForKey(noteNumber);
                     for (int i = 0; i < harmonizer.size(); i++)
                     {
-                        if (harmonizer[i] != noteNumber) handleNoteOn(harmonizer[i], velocity, channel, source, true);
+                        handleNoteOn(harmonizer[i], velocity, channel, source, true);
                     }
-                    if (!km->shouldPlayOriginalHarNote(noteNumber)) return;
                 }
                 if (km->getAllNotesOff())
                 {
+                    //keystrokesEnding = true
                     clearBitKlavier();
-                    //keystrokesEnding = true;
                 }
-            }
-            
+            }   
         }
     }
+    if (harmonizer == false) return;
 
     //if (keystrokesEnding)
     //{

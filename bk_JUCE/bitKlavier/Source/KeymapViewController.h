@@ -111,7 +111,7 @@ private:
     BKKeymapKeyboardComponent* harArrayKeyboard;
     BKTextButton harArrayKeyboardValsTextFieldOpen;
 
-    ToggleButton enableHarmonizerToggle;
+    ToggleButton enableHarmonizerToggle; //currently commented out, probably not necessary
 
     TextButton trapButton;
     TextButton mirrorButton;

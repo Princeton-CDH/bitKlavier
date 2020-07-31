@@ -372,7 +372,7 @@ public:
 
     inline bool shouldHarmonize(int key)
     {
-        if (harmonizerEnabled == false) return false;
+        //if (harmonizerEnabled == false) return false;
         if (harmonizerKeys[key].size() == 1)
         {
             if (harmonizerKeys[key].getUnchecked(0) == key) return false;

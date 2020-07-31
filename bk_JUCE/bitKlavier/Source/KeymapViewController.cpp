@@ -202,11 +202,13 @@ BKViewController(p, theGraph, 2)
     harArrayKeymapTF.setVisible(false);
     harArrayKeymapTF.toBack();
 
+    /*
     enableHarmonizerToggle.setButtonText("Play harmonizer notes");
     enableHarmonizerToggle.setLookAndFeel(&buttonsAndMenusLAF2); // text to left
     enableHarmonizerToggle.setTooltip("Indicates whether notes outlined by the harmonizer will play");
     enableHarmonizerToggle.addListener(this);
     addAndMakeVisible(&enableHarmonizerToggle, ALL);
+    */
 
     trapButton.setName("TrapButton");
     trapButton.setButtonText("Trap");
@@ -628,9 +630,11 @@ void KeymapViewController::displayTab(int tab)
         Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
         targetsSlice.removeFromRight(gXSpacing);
 
+        /*
         enableHarmonizerToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
         enableHarmonizerToggle.toFront(false);
         enableHarmonizerToggle.setVisible(true);
+        */
 	}
 }
 
@@ -713,7 +717,7 @@ void KeymapViewController::invisible()
     harArrayKeyboardComponent->setVisible(false);
     harArrayKeyboardValsTextFieldOpen.setVisible(false);
 
-    enableHarmonizerToggle.setVisible(false);
+    //enableHarmonizerToggle.setVisible(false);
 
     midiInputSelectButton.setVisible(false);
     targetsButton.setVisible(false);
@@ -1141,12 +1145,13 @@ void KeymapViewController::bkButtonClicked (Button* b)
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setInverted(invertOnOffToggle.getToggleState());
     }
+    /*
     else if (b == &enableHarmonizerToggle)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setHarmonizerEnabled(enableHarmonizerToggle.getToggleState());
-        //keymap->toggleHarmonizerEnabled();
     }
+    */
     else if (b == &midiEditToggle)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
