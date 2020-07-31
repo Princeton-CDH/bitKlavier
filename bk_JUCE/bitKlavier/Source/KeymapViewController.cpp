@@ -210,25 +210,11 @@ BKViewController(p, theGraph, 2)
     addAndMakeVisible(&enableHarmonizerToggle, ALL);
     */
 
-    trapButton.setName("TrapButton");
-    trapButton.setButtonText("Trap");
-    trapButton.setTooltip("Set all keys to play this note");
-    trapButton.addListener(this);
-    addAndMakeVisible(trapButton);
-
-    mirrorButton.setName("MirrorButton");
-    mirrorButton.setButtonText("Mirror");
-    //I need a better tooltip, this is unintelligible
-    mirrorButton.setTooltip("Using current note as an axis, set all notes within range to also play the note equidistant from the axis");
-    mirrorButton.addListener(this);
-    addAndMakeVisible(mirrorButton);
-
-    clearHarButton.setName("ClearHarmonizerButton");
-    clearHarButton.setButtonText("Clear");
-    //I need a better tooltip, this is unintelligible
-    clearHarButton.setTooltip("Reset all harmonizations.");
-    clearHarButton.addListener(this);
-    addAndMakeVisible(clearHarButton);
+    harmonizerMenuButton.setName("HarmonizerCommands");
+    harmonizerMenuButton.setButtonText("Harmonizer Commands");
+    harmonizerMenuButton.setTooltip("Select ways to alter the harmonizer keyboard");
+    harmonizerMenuButton.addListener(this);
+    addAndMakeVisible(harmonizerMenuButton);
 
     harKey = 60;
 
@@ -550,9 +536,17 @@ void KeymapViewController::displayTab(int tab)
         iconImageComponent.setBounds(area);
         area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
 
-	    DBG("hello plz show arrow");
-        float harKeyboardHeight = 50 + 50 * processor.paddingScalarY;
+        float harKeyboardHeight = 50 + 30 * processor.paddingScalarY;
         area.removeFromBottom(harKeyboardHeight + gYSpacing * 15);
+
+        area.removeFromBottom(gYSpacing);
+        Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
+        textButtonSlab.removeFromLeft(gXSpacing);
+
+        textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
+        harmonizerMenuButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth() * 2));
+        harmonizerMenuButton.setVisible(true);
+
         Rectangle<int> harkeyboardRow = area.removeFromBottom(harKeyboardHeight);
         float keyWidth = harkeyboardRow.getWidth() / round((maxKey - minKey) * 7. / 12 + 1); //num white keys
 
@@ -579,27 +573,14 @@ void KeymapViewController::displayTab(int tab)
         harKeymapTF.setVisible(true);
 #endif
 
-        area.removeFromBottom(gYSpacing);
-        Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
+        textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
         textButtonSlab.removeFromLeft(gXSpacing);
         harKeyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
         harKeyboardValsTextFieldOpen.setVisible(true);
 
-        textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
-        trapButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth()));
-        trapButton.setVisible(true);
-
-        textButtonSlab.removeFromRight(gXSpacing);
-        mirrorButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth()));
-        mirrorButton.setVisible(true);
-
-        textButtonSlab.removeFromRight(gXSpacing);
-        clearHarButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth()));
-        clearHarButton.setVisible(true);
-
         //harmonizer array keyboard
 
-        area.removeFromBottom(gYSpacing * 10);
+        area.removeFromBottom(gYSpacing * 1.5);
         harkeyboardRow = area.removeFromBottom(harKeyboardHeight);
         harArrayKeyboard->setKeyWidth(keyWidth);
         harArrayKeyboard->setBlackNoteLengthProportion(0.6);
@@ -635,6 +616,15 @@ void KeymapViewController::displayTab(int tab)
         enableHarmonizerToggle.toFront(false);
         enableHarmonizerToggle.setVisible(true);
         */
+
+        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
+        keyboard->setKeysInKeymap(Array<int>({ harKey }));
+
+        keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+
+        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(harKey));
+        keyboard->setKeysInKeymap(harmonizationArray);
 	}
 }
 
@@ -739,9 +729,8 @@ void KeymapViewController::invisible()
     actionButton.setVisible(false);
 
     endKeystrokesToggle.setVisible(false);
-    trapButton.setVisible(false);
-    mirrorButton.setVisible(false);
-    clearHarButton.setVisible(false);
+
+    harmonizerMenuButton.setVisible(false);
 }
 
 int KeymapViewController::addKeymap(void)
@@ -951,6 +940,48 @@ PopupMenu KeymapViewController::getKeysMenu(void)
     return menu;
 }
 
+PopupMenu KeymapViewController::getHarmonizerMenu(void)
+{
+    BKPopupMenu menu;
+
+    menu.addItem(1, "Clear");
+    menu.addItem(2, "Default");
+    menu.addItem(3, "Mirror");
+    menu.addItem(4, "Trap");
+
+    return menu;
+}
+
+void KeymapViewController::harmonizerMenuCallback(int result, KeymapViewController* vc)
+{
+    BKAudioProcessor& processor = vc->processor;
+
+    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    
+    if (result <= 0) return;
+    else if (result == 1)
+    {
+        keymap->clearHarmonizations();
+    }
+    else if (result == 2)
+    {
+        keymap->defaultHarmonizations();
+    }
+    else if (result == 3)
+    {
+        keymap->mirrorKey(vc->harKey);
+    }
+    else if (result == 4)
+    {
+        keymap->trapKey(vc->harKey);
+    }
+
+    BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)(vc->harArrayKeyboardComponent.get());
+    keyboard->setKeysInKeymap(keymap->getHarmonizationForKey(vc->harKey));
+
+    //vc->getHarmonizerMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->harmonizerMenuButton), ModalCallbackFunction::forComponent(harmonizerMenuCallback, vc));
+}
+
 void KeymapViewController::midiInputSelectCallback(int result, KeymapViewController* vc)
 {
     if (result <= 0) return;
@@ -1136,6 +1167,10 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         getMidiInputSelectMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&midiInputSelectButton), ModalCallbackFunction::forComponent(midiInputSelectCallback, this));
     }
+    else if (b == &harmonizerMenuButton)
+    {
+        getHarmonizerMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&harmonizerMenuButton), ModalCallbackFunction::forComponent(harmonizerMenuCallback, this));
+    }
     else if (b == &targetsButton)
     {
         getTargetsMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&targetsButton), ModalCallbackFunction::forComponent(targetsMenuCallback, this));
@@ -1174,30 +1209,6 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setAllNotesOff(endKeystrokesToggle.getToggleState());
-    }
-    else if (b == &trapButton)
-    {
-        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        keymap->trapKey(harKey);
-
-        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)(harArrayKeyboardComponent.get());
-        keyboard->setKeysInKeymap(keymap->getHarmonizationForKey(harKey));
-    }
-    else if (b == &mirrorButton)
-    {
-        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        keymap->mirrorKey(harKey);
-
-        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)(harArrayKeyboardComponent.get());
-        keyboard->setKeysInKeymap(keymap->getHarmonizationForKey(harKey));
-    }
-    else if (b == &clearHarButton)
-    {
-        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        keymap->resetHarmonizations();
-
-        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)(harArrayKeyboardComponent.get());
-        keyboard->setKeysInKeymap(keymap->getHarmonizationForKey(harKey));
     }
     else if (b == &rightArrow)
     {
@@ -1398,28 +1409,10 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
         thisKeymap->toggleHarmonizerList(harKey, midiNoteNumber);
         Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(harKey));
 
-        DBG("Harmonization for key " + String(harKey) + " with size " + String(harmonizationArray.size()) + " before update: ");
-        //for (int i : harmonizationArray)
-        for (int i = 0; i < harmonizationArray.size(); i++)
-        {
-            DBG(String(i) + ": " + String(harmonizationArray.getUnchecked(i)));
-            //DBG(String(i));
-        }
-        DBG("done before");
-
         update();
 
         BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
         keyboard->setKeysInKeymap(harmonizationArray);
-        DBG("Harmonization for key " + String(harKey) + " with size " + String(harmonizationArray.size()) + " after update: ");
-        //for (int i : harmonizationArray)
-        //for (int i : harmonizationArray)
-        for (int i = 0; i < harmonizationArray.size(); i++)
-        {
-            DBG(String(harmonizationArray.getUnchecked(i)));
-            //DBG(String(i));
-        }
-        DBG("done after");
     }
     
     processor.currentPiano->configure();

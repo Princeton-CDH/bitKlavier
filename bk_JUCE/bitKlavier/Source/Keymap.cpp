@@ -505,7 +505,9 @@ void Keymap::trapKey(int keyToTrap)
 {
     for (int i = 0; i < 128; i++)
     {
-        harmonizerKeys.set(i, Array<int>(keyToTrap));
+        Array<int> tempArray = harmonizerKeys[i];
+        tempArray.addIfNotAlreadyThere(keyToTrap);
+        harmonizerKeys.set(i, tempArray);
     }
 }
 
@@ -517,10 +519,14 @@ void Keymap::mirrorKey(int keyCenter)
         int j = keyCenter + 1;
         for (int i = keyCenter - 1; i >= 0; i--)
         {
-            harmonizerKeys.set(i, Array<int>({ i, j }));
-            harmonizerKeys.set(j, Array<int>({ i, j }));
+            Array<int> tempArray = harmonizerKeys[i];
+            tempArray.addIfNotAlreadyThere(j);
+            harmonizerKeys.set(i, tempArray);
+
+            tempArray = harmonizerKeys[j];
+            tempArray.addIfNotAlreadyThere(i);
+            harmonizerKeys.set(j, tempArray);
             j++;
-            DBG("i = " + String(i) + ", j = " + String(j));
         }
     }
     else
@@ -528,17 +534,32 @@ void Keymap::mirrorKey(int keyCenter)
         int i = keyCenter - 1;
         for (int j = keyCenter + 1; j < 128; j++)
         {
-            harmonizerKeys.set(i, Array<int>({ i, j }));
-            harmonizerKeys.set(j, Array<int>({ i, j }));
+            Array<int> tempArray = harmonizerKeys[i];
+            tempArray.addIfNotAlreadyThere(j);
+            harmonizerKeys.set(i, tempArray);
+
+            tempArray = harmonizerKeys[j];
+            tempArray.addIfNotAlreadyThere(i);
+            harmonizerKeys.set(j, tempArray);
             i--;
         }
     }
 }
 
-void Keymap::resetHarmonizations()
+void Keymap::defaultHarmonizations()
 {
     for (int i = 0; i < 128; i++)
     {
-        harmonizerKeys.set(i, Array<int>(i));
+        Array<int> tempArray = harmonizerKeys[i];
+        tempArray.addIfNotAlreadyThere(i);
+        harmonizerKeys.set(i, tempArray);
+    }
+}
+
+void Keymap::clearHarmonizations()
+{
+    for (int i = 0; i < 128; i++)
+    {
+        harmonizerKeys.set(i, Array<int>());
     }
 }

@@ -51,6 +51,7 @@ public:
     static void midiInputSelectCallback(int result, KeymapViewController* vc);
     static void targetsMenuCallback(int result, KeymapViewController* vc);
     static void keysMenuCallback(int result, KeymapViewController* vc);
+    static void harmonizerMenuCallback(int result, KeymapViewController* vc);
     
     int addKeymap(void);
     int duplicateKeymap(void);
@@ -92,6 +93,8 @@ private:
     TextButton      clearButton;
     BKComboBox      keysCB;
 
+    TextButton      harmonizerMenuButton;
+
     ToggleButton endKeystrokesToggle;
 
     //stuff for trap/mirror/harmonizer tab - TRT
@@ -113,10 +116,6 @@ private:
 
     ToggleButton enableHarmonizerToggle; //currently commented out, probably not necessary
 
-    TextButton trapButton;
-    TextButton mirrorButton;
-    TextButton clearHarButton;
-
     int harKey; //for rendering harmonizer array stuff for now
 
     //end
@@ -127,6 +126,7 @@ private:
     PopupMenu getPitchClassMenu(int offset);
     PopupMenu getTargetsMenu(void);
     PopupMenu getMidiInputSelectMenu(void);
+    PopupMenu getHarmonizerMenu(void);
     
     OwnedArray<ToggleButton> targetControlTBs;
     GroupComponent directTBGroup;

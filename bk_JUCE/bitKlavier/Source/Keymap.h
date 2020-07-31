@@ -310,8 +310,6 @@ public:
     inline bool getAllNotesOff() { return allNotesOff; }
 
     inline Array<Array<int>> getHarmonizerKeys() { return harmonizerKeys; }
-    //inline OwnedArray<Array<int>>* getHarmonizerKeys() { return harmonizerKeys; }
-    //inline Array<int>* getHarmonizationForKey(int key) { return harmonizerKeys[key]; }
     Array<int> getHarmonizationForKey(int key) 
     { 
         Array<int> h = Array<int>();
@@ -323,69 +321,32 @@ public:
         }
 
         return h;
-        //return (harmonizerKeys[key]); 
     }
     inline void toggleHarmonizerList(int keyPressed, int keyHarmonized) 
     { 
-        //debug print statements
-        DBG("List of " + String(harmonizerKeys[keyPressed].size()) + " harmonizer keys for " + String(keyPressed) + " before toggling:");
-        for (int i = 0; i < harmonizerKeys[keyPressed].size(); i++)
-        {
-            DBG(String(harmonizerKeys[keyPressed].getUnchecked(i)));
-        }
-
         Array<int> singleHar = harmonizerKeys[keyPressed];
 
         if (harmonizerKeys[keyPressed].contains(keyHarmonized))
         {
-            DBG("removing note from harmonization");
             singleHar.removeAllInstancesOf(keyHarmonized);
-            DBG("separate array size: " + String(singleHar.size()) + " last element " + String(singleHar[singleHar.size() - 1]));
-            //harmonizerKeys[keyPressed].removeAllInstancesOf(keyHarmonized);
         }
         else
         {
-            DBG("adding note to harmonization");
             singleHar.add(keyHarmonized);
-            DBG("separate array size: " + String(singleHar.size()) + " last element " + String(singleHar[singleHar.size() - 1]));
-            //harmonizerKeys[keyPressed].add(keyHarmonized);
         }
 
         harmonizerKeys.set(keyPressed, singleHar);
-
-        //more debug print statements
-        DBG("List of " + String(harmonizerKeys[keyPressed].size()) + " harmonizer keys for " + String(keyPressed) + " after toggling:");
-        for (int i = 0; i < harmonizerKeys[keyPressed].size(); i++)
-        {
-            DBG(String(harmonizerKeys[keyPressed].getUnchecked(i)));
-        }
     }
     inline void setHarmonizerList(int keyPressed, Array<int> harmonization) { harmonizerKeys.insert(keyPressed, harmonization); }
 
     void trapKey(int keyToTrap);
     void mirrorKey(int keyCenter);
-    void resetHarmonizations();
+    void defaultHarmonizations();
+    void clearHarmonizations();
 
     inline bool getHarmonizerEnabled() { return harmonizerEnabled; }
     inline void setHarmonizerEnabled(bool toSet) { harmonizerEnabled = toSet; }
     inline void toggleHarmonizerEnabled() { harmonizerEnabled = !harmonizerEnabled; }
-
-    inline bool shouldHarmonize(int key)
-    {
-        //if (harmonizerEnabled == false) return false;
-        if (harmonizerKeys[key].size() == 1)
-        {
-            if (harmonizerKeys[key].getUnchecked(0) == key) return false;
-        }
-        return true;
-    }
-    //for corner case scenario where original note is not included in transposition, should only be called when harmonizerEnabled is true
-    inline bool shouldPlayOriginalHarNote(int key)
-    {
-        if (harmonizerEnabled == false) return true;
-        if (harmonizerKeys[key].contains(key)) return true;
-        return false;
-    }
     
 private:
     BKAudioProcessor& processor;
