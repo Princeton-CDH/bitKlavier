@@ -202,6 +202,12 @@ BKViewController(p, theGraph, 2)
     harArrayKeymapTF.setVisible(false);
     harArrayKeymapTF.toBack();
 
+    enableHarmonizerToggle.setButtonText("Play harmonizer notes");
+    enableHarmonizerToggle.setLookAndFeel(&buttonsAndMenusLAF2); // text to left
+    enableHarmonizerToggle.setTooltip("Indicates whether notes outlined by the harmonizer will play");
+    enableHarmonizerToggle.addListener(this);
+    addAndMakeVisible(&enableHarmonizerToggle, ALL);
+
     // end second tab stuff
 
     
@@ -585,6 +591,13 @@ void KeymapViewController::displayTab(int tab)
         textButtonSlab.removeFromLeft(gXSpacing);
         harArrayKeyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
         harArrayKeyboardValsTextFieldOpen.setVisible(true);
+
+        Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
+        targetsSlice.removeFromRight(gXSpacing);
+
+        enableHarmonizerToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
+        enableHarmonizerToggle.toFront(false);
+        enableHarmonizerToggle.setVisible(true);
 	}
 }
 
@@ -666,6 +679,8 @@ void KeymapViewController::invisible()
     harArrayKeymapTF.setVisible(false);
     harArrayKeyboardComponent->setVisible(false);
     harArrayKeyboardValsTextFieldOpen.setVisible(false);
+
+    enableHarmonizerToggle.setVisible(false);
 
     midiInputSelectButton.setVisible(false);
     targetsButton.setVisible(false);
@@ -1091,6 +1106,12 @@ void KeymapViewController::bkButtonClicked (Button* b)
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setInverted(invertOnOffToggle.getToggleState());
     }
+    else if (b == &enableHarmonizerToggle)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setHarmonizerEnabled(enableHarmonizerToggle.getToggleState());
+        //keymap->toggleHarmonizerEnabled();
+    }
     else if (b == &midiEditToggle)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
@@ -1303,27 +1324,38 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
         BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
         keyboard->setKeysInKeymap(Array<int>({ midiNoteNumber }));
         harKey = midiNoteNumber;
+
+        keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
+        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(harKey));
+        keyboard->setKeysInKeymap(harmonizationArray);
     }
     else if (source == &harArrayKeyboardState)
     {
-        thisKeymap->addToHarmonizerList(harKey, midiNoteNumber);
-        Array<int> harmonizationArray = *(thisKeymap->getHarmonizationForKey(harKey));
+        thisKeymap->toggleHarmonizerList(harKey, midiNoteNumber);
+        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(harKey));
 
-        DBG("Harmonization for key " + String(harKey) + " before update: ");
-        for (int i : harmonizationArray)
+        DBG("Harmonization for key " + String(harKey) + " with size " + String(harmonizationArray.size()) + " before update: ");
+        //for (int i : harmonizationArray)
+        for (int i = 0; i < harmonizationArray.size(); i++)
         {
-            DBG(String(i));
+            DBG(String(i) + ": " + String(harmonizationArray.getUnchecked(i)));
+            //DBG(String(i));
         }
+        DBG("done before");
 
         update();
 
         BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
         keyboard->setKeysInKeymap(harmonizationArray);
-        DBG("Harmonization for key " + String(harKey) + " after update: ");
-        for (int i : harmonizationArray)
+        DBG("Harmonization for key " + String(harKey) + " with size " + String(harmonizationArray.size()) + " after update: ");
+        //for (int i : harmonizationArray)
+        //for (int i : harmonizationArray)
+        for (int i = 0; i < harmonizationArray.size(); i++)
         {
-            DBG(String(i));
+            DBG(String(harmonizationArray.getUnchecked(i)));
+            //DBG(String(i));
         }
+        DBG("done after");
     }
     
     processor.currentPiano->configure();

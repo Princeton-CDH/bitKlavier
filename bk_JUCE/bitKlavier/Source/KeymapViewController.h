@@ -111,6 +111,8 @@ private:
     BKKeymapKeyboardComponent* harArrayKeyboard;
     BKTextButton harArrayKeyboardValsTextFieldOpen;
 
+    ToggleButton enableHarmonizerToggle;
+
     int harKey; //for rendering harmonizer array stuff for now
 
     //end

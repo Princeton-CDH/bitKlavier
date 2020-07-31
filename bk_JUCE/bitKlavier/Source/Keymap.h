@@ -309,18 +309,55 @@ public:
     inline void toggleAllNotesOff() { allNotesOff = !allNotesOff; }
     inline bool getAllNotesOff() { return allNotesOff; }
 
-    //inline OwnedArray<Array<int>>* getHarmonizerKeys() { return &harmonizerKeys; }
-    inline Array<Array<int>>* getHarmonizerKeys() { return &harmonizerKeys; }
+    inline Array<Array<int>> getHarmonizerKeys() { return harmonizerKeys; }
+    //inline OwnedArray<Array<int>>* getHarmonizerKeys() { return harmonizerKeys; }
     //inline Array<int>* getHarmonizationForKey(int key) { return harmonizerKeys[key]; }
-    inline Array<int>* getHarmonizationForKey(int key) { return &harmonizerKeys[key]; }
-    inline void addToHarmonizerList(int keyPressed, int keyHarmonized) 
+    Array<int> getHarmonizationForKey(int key) 
     { 
-        harmonizerKeys[keyPressed].addIfNotAlreadyThere(keyHarmonized);
-        DBG("Harmonizer array size: " + String(harmonizerKeys[keyPressed].size()));
-        DBG("List of harmonizer keys for " + String(keyPressed) + ":");
+        Array<int> h = Array<int>();
+        h.ensureStorageAllocated(128);
+
+        for (int i = 0; i < harmonizerKeys[key].size(); i++)
+        {
+            h.add(harmonizerKeys[key][i]);
+        }
+
+        return h;
+        //return (harmonizerKeys[key]); 
+    }
+    inline void toggleHarmonizerList(int keyPressed, int keyHarmonized) 
+    { 
+        //debug print statements
+        DBG("List of " + String(harmonizerKeys[keyPressed].size()) + " harmonizer keys for " + String(keyPressed) + " before toggling:");
         for (int i = 0; i < harmonizerKeys[keyPressed].size(); i++)
         {
-            DBG(String(harmonizerKeys[keyPressed][i]));
+            DBG(String(harmonizerKeys[keyPressed].getUnchecked(i)));
+        }
+
+        Array<int> singleHar = harmonizerKeys[keyPressed];
+
+        if (harmonizerKeys[keyPressed].contains(keyHarmonized))
+        {
+            DBG("removing note from harmonization");
+            singleHar.removeAllInstancesOf(keyHarmonized);
+            DBG("separate array size: " + String(singleHar.size()) + " last element " + String(singleHar[singleHar.size() - 1]));
+            //harmonizerKeys[keyPressed].removeAllInstancesOf(keyHarmonized);
+        }
+        else
+        {
+            DBG("adding note to harmonization");
+            singleHar.add(keyHarmonized);
+            DBG("separate array size: " + String(singleHar.size()) + " last element " + String(singleHar[singleHar.size() - 1]));
+            //harmonizerKeys[keyPressed].add(keyHarmonized);
+        }
+
+        harmonizerKeys.set(keyPressed, singleHar);
+
+        //more debug print statements
+        DBG("List of " + String(harmonizerKeys[keyPressed].size()) + " harmonizer keys for " + String(keyPressed) + " after toggling:");
+        for (int i = 0; i < harmonizerKeys[keyPressed].size(); i++)
+        {
+            DBG(String(harmonizerKeys[keyPressed].getUnchecked(i)));
         }
     }
     inline void setHarmonizerList(int keyPressed, Array<int> harmonization) { harmonizerKeys.insert(keyPressed, harmonization); }
@@ -340,15 +377,15 @@ public:
     void mirrorKey(int keyCenter);
 
     inline bool getHarmonizerEnabled() { return harmonizerEnabled; }
-    inline bool setHarmonizerEnabled(bool toSet) { harmonizerEnabled = toSet; }
-    inline bool toggleHarmonizerEnabled() { harmonizerEnabled = !harmonizerEnabled; }
+    inline void setHarmonizerEnabled(bool toSet) { harmonizerEnabled = toSet; }
+    inline void toggleHarmonizerEnabled() { harmonizerEnabled = !harmonizerEnabled; }
 
     inline bool shouldHarmonize(int key)
     {
         if (harmonizerEnabled == false) return false;
         if (harmonizerKeys[key].size() == 1)
         {
-            if (harmonizerKeys[key][0] == key) return false;
+            if (harmonizerKeys[key].getUnchecked(0) == key) return false;
         }
         return true;
     }

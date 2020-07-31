@@ -89,14 +89,14 @@ harmonizerEnabled(k->getHarmonizerEnabled())
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
-        if (k->getHarmonizationForKey(i)->size() == 0) harmonizerKeys.add(Array<int>(i));
+        if (k->getHarmonizationForKey(i).size() == 0) harmonizerKeys.add(Array<int>(i));
         else
         {
             harmonizerKeys.add(Array<int>({})); //"default" harmonizer for each key is to just play itself
-            Array<int>* otherArr = k->getHarmonizationForKey(i);
-            for (int j = 0; j < otherArr->size(); j++)
+            Array<int> otherArr = k->getHarmonizationForKey(i);
+            for (int j = 0; j < otherArr.size(); j++)
             {
-                harmonizerKeys[i].add(otherArr->getUnchecked(j));
+                harmonizerKeys[i].add(otherArr.getUnchecked(j));
             }
         }
     }
@@ -132,14 +132,14 @@ harmonizerEnabled(false)
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
-        if (k->getHarmonizationForKey(i)->size() == 0) harmonizerKeys.add(Array<int>(i));
+        if (k->getHarmonizationForKey(i).size() == 0) harmonizerKeys.add(Array<int>(i));
         else
         {
             harmonizerKeys.add(Array<int>({})); //"default" harmonizer for each key is to just play itself
-            Array<int>* otherArr = k->getHarmonizationForKey(i);
-            for (int j = 0; j < otherArr->size(); j++)
+            Array<int> otherArr = k->getHarmonizationForKey(i);
+            for (int j = 0; j < otherArr.size(); j++)
             {
-                harmonizerKeys[i].add(otherArr->getUnchecked(j));
+                harmonizerKeys[i].add(otherArr.getUnchecked(j));
             }
         }
     }
@@ -503,14 +503,17 @@ void Keymap::print(void)
 
 void Keymap::trapKey(int keyToTrap)
 {
-    for (int i = 0; i < 128; i++)
+    //need to clear stuff first I presume, also deal with OwnedArray stuff
+    /*for (int i = 0; i < 128; i++)
     {
         harmonizerKeys.insert(i, Array<int>({ keyToTrap }));
-    }
+    }*/
 }
 
 void Keymap::mirrorKey(int keyCenter)
 {
+    //need to clear stuff first I presume, also deal with OwnedArray stuff
+    /*
     if (keyCenter < 64)
     {
         int j = keyCenter + 1;
@@ -531,4 +534,5 @@ void Keymap::mirrorKey(int keyCenter)
             i--;
         }
     }
+    */
 }
