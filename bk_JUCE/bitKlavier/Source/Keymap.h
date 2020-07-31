@@ -361,20 +361,10 @@ public:
         }
     }
     inline void setHarmonizerList(int keyPressed, Array<int> harmonization) { harmonizerKeys.insert(keyPressed, harmonization); }
-    /*inline void setHarmonizerKeys(OwnedArray<Array<int>>* harmonizer) 
-    {
-        for (int i = 0; i < harmonizerKeys.size(); i++)
-        {
-            for (int j = 0; j < harmonizerKeys[i].size(); j++)
-            {
-                harmonizerKeys[i][j] = harmonizer[i][j];
-            }
-            //harmonizerKeys.set(i, harmonizer->getUnchecked(i));
-        }
-    }*/
 
     void trapKey(int keyToTrap);
     void mirrorKey(int keyCenter);
+    void resetHarmonizations();
 
     inline bool getHarmonizerEnabled() { return harmonizerEnabled; }
     inline void setHarmonizerEnabled(bool toSet) { harmonizerEnabled = toSet; }
@@ -388,6 +378,13 @@ public:
             if (harmonizerKeys[key].getUnchecked(0) == key) return false;
         }
         return true;
+    }
+    //for corner case scenario where original note is not included in transposition, should only be called when harmonizerEnabled is true
+    inline bool shouldPlayOriginalHarNote(int key)
+    {
+        if (harmonizerEnabled == false) return true;
+        if (harmonizerKeys[key].contains(key)) return true;
+        return false;
     }
     
 private:

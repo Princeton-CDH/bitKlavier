@@ -113,6 +113,10 @@ private:
 
     ToggleButton enableHarmonizerToggle;
 
+    TextButton trapButton;
+    TextButton mirrorButton;
+    TextButton clearHarButton;
+
     int harKey; //for rendering harmonizer array stuff for now
 
     //end

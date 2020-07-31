@@ -553,6 +553,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                     {
                         if (harmonizer[i] != noteNumber) handleNoteOn(harmonizer[i], velocity, channel, source, true);
                     }
+                    if (!km->shouldPlayOriginalHarNote(noteNumber)) return;
                 }
                 if (km->getAllNotesOff())
                 {

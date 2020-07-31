@@ -208,6 +208,28 @@ BKViewController(p, theGraph, 2)
     enableHarmonizerToggle.addListener(this);
     addAndMakeVisible(&enableHarmonizerToggle, ALL);
 
+    trapButton.setName("TrapButton");
+    trapButton.setButtonText("Trap");
+    trapButton.setTooltip("Set all keys to play this note");
+    trapButton.addListener(this);
+    addAndMakeVisible(trapButton);
+
+    mirrorButton.setName("MirrorButton");
+    mirrorButton.setButtonText("Mirror");
+    //I need a better tooltip, this is unintelligible
+    mirrorButton.setTooltip("Using current note as an axis, set all notes within range to also play the note equidistant from the axis");
+    mirrorButton.addListener(this);
+    addAndMakeVisible(mirrorButton);
+
+    clearHarButton.setName("ClearHarmonizerButton");
+    clearHarButton.setButtonText("Clear");
+    //I need a better tooltip, this is unintelligible
+    clearHarButton.setTooltip("Reset all harmonizations.");
+    clearHarButton.addListener(this);
+    addAndMakeVisible(clearHarButton);
+
+    harKey = 60;
+
     // end second tab stuff
 
     
@@ -561,6 +583,17 @@ void KeymapViewController::displayTab(int tab)
         harKeyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
         harKeyboardValsTextFieldOpen.setVisible(true);
 
+        textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
+        trapButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth()));
+        trapButton.setVisible(true);
+
+        textButtonSlab.removeFromRight(gXSpacing);
+        mirrorButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth()));
+        mirrorButton.setVisible(true);
+
+        textButtonSlab.removeFromRight(gXSpacing);
+        clearHarButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth()));
+        clearHarButton.setVisible(true);
 
         //harmonizer array keyboard
 
@@ -702,7 +735,9 @@ void KeymapViewController::invisible()
     actionButton.setVisible(false);
 
     endKeystrokesToggle.setVisible(false);
-
+    trapButton.setVisible(false);
+    mirrorButton.setVisible(false);
+    clearHarButton.setVisible(false);
 }
 
 int KeymapViewController::addKeymap(void)
@@ -1134,6 +1169,30 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setAllNotesOff(endKeystrokesToggle.getToggleState());
+    }
+    else if (b == &trapButton)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->trapKey(harKey);
+
+        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)(harArrayKeyboardComponent.get());
+        keyboard->setKeysInKeymap(keymap->getHarmonizationForKey(harKey));
+    }
+    else if (b == &mirrorButton)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->mirrorKey(harKey);
+
+        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)(harArrayKeyboardComponent.get());
+        keyboard->setKeysInKeymap(keymap->getHarmonizationForKey(harKey));
+    }
+    else if (b == &clearHarButton)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->resetHarmonizations();
+
+        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)(harArrayKeyboardComponent.get());
+        keyboard->setKeysInKeymap(keymap->getHarmonizationForKey(harKey));
     }
     else if (b == &rightArrow)
     {

@@ -503,25 +503,24 @@ void Keymap::print(void)
 
 void Keymap::trapKey(int keyToTrap)
 {
-    //need to clear stuff first I presume, also deal with OwnedArray stuff
-    /*for (int i = 0; i < 128; i++)
+    for (int i = 0; i < 128; i++)
     {
-        harmonizerKeys.insert(i, Array<int>({ keyToTrap }));
-    }*/
+        harmonizerKeys.set(i, Array<int>(keyToTrap));
+    }
 }
 
 void Keymap::mirrorKey(int keyCenter)
 {
-    //need to clear stuff first I presume, also deal with OwnedArray stuff
-    /*
+    harmonizerKeys.set(keyCenter, Array<int>(keyCenter));
     if (keyCenter < 64)
     {
         int j = keyCenter + 1;
         for (int i = keyCenter - 1; i >= 0; i--)
         {
-            harmonizerKeys.insert(i, Array<int>({ i, j }));
-            harmonizerKeys.insert(j, Array<int>({ i, j }));
+            harmonizerKeys.set(i, Array<int>({ i, j }));
+            harmonizerKeys.set(j, Array<int>({ i, j }));
             j++;
+            DBG("i = " + String(i) + ", j = " + String(j));
         }
     }
     else
@@ -529,10 +528,17 @@ void Keymap::mirrorKey(int keyCenter)
         int i = keyCenter - 1;
         for (int j = keyCenter + 1; j < 128; j++)
         {
-            harmonizerKeys.insert(i, Array<int>({ i, j }));
-            harmonizerKeys.insert(j, Array<int>({ i, j }));
+            harmonizerKeys.set(i, Array<int>({ i, j }));
+            harmonizerKeys.set(j, Array<int>({ i, j }));
             i--;
         }
     }
-    */
+}
+
+void Keymap::resetHarmonizations()
+{
+    for (int i = 0; i < 128; i++)
+    {
+        harmonizerKeys.set(i, Array<int>(i));
+    }
 }
