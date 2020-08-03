@@ -163,6 +163,11 @@ public:
     {
         getKeymap(Id)->setKeymap(keys);
     }
+
+    inline const void setKeymapHarmonization(int Id, int harKey, Array<int> harArray) const noexcept
+    {
+        getKeymap(Id)->setHarmonizerList(harKey, harArray);
+    }
     
     inline const Piano::PtrArr getPianos(void) const noexcept
     {

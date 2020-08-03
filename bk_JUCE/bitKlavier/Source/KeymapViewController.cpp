@@ -1158,6 +1158,30 @@ void KeymapViewController::bkButtonClicked (Button* b)
         focusLostByEscapeKey = false;
 #endif
     }
+    else if (b->getName() == harKeyboardValsTextFieldOpen.getName())
+    {
+#if JUCE_IOS
+        hasBigOne = true;
+        iWantTheBigOne(&keymapTF, "keymap");
+#else
+        harKeymapTF.setVisible(true);
+        harKeymapTF.toFront(true);
+
+        focusLostByEscapeKey = false;
+#endif
+    }
+    else if (b->getName() == harArrayKeyboardValsTextFieldOpen.getName())
+    {
+#if JUCE_IOS
+        hasBigOne = true;
+        iWantTheBigOne(&keymapTF, "keymap");
+#else
+        harArrayKeymapTF.setVisible(true);
+        harArrayKeymapTF.toFront(true);
+
+        focusLostByEscapeKey = false;
+#endif
+    }
     else if (b == &actionButton)
     {
         bool single = processor.gallery->getKeymaps().size() == 2;
@@ -1257,7 +1281,7 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String name = tf.getName();
     
-    if (name == "KeymapMidi")
+    if (name == "KeymapMidi" || name == "HarmonizerKeymapMidi" || name == "HarmonizerArrayKeymapMidi")
     {
         keymapUpdated(tf);
     }
@@ -1279,20 +1303,41 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
 {
     String text = tf.getText();
     Array<int> keys = keymapStringToIntArray(text);
-    
-    keymapTF.setText(intArrayToString(keys));
-    
-    // get old keys to send to update
-    Array<int> oldKeys = processor.gallery->getKeymap(processor.updateState->currentKeymapId)->keys();
-    
-    processor.gallery->setKeymap(processor.updateState->currentKeymapId, keys);
-    
-    BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
-    
+    String name = tf.getName();
+    BKTextEditor* textEditor = &keymapTF;
+    BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
+
+    if (name == "HarmonizerKeymapMidi")
+    {
+        textEditor = &harKeymapTF;
+        keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
+    }
+    else if (name == "HarmonizerArrayKeymapMidi")
+    {
+        textEditor = &harArrayKeymapTF;
+        keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
+    }
+
+    textEditor->setText(intArrayToString(keys));
+       
+    if (name == "KeymapMidi")
+    {
+        // get old keys to send to update
+        Array<int> oldKeys = processor.gallery->getKeymap(processor.updateState->currentKeymapId)->keys();
+        processor.gallery->setKeymap(processor.updateState->currentKeymapId, keys);
+    }
+    else if (name == "HarmonizerKeymapMidi")
+    {
+        harKey = keys[0];
+        //processor.gallery->setKeymapHarmonization(processor.updateState->currentKeymapId, harKey, keys)
+    }
+    else if (name == "HarmonizerArrayKeymapMidi") processor.gallery->setKeymapHarmonization(processor.updateState->currentKeymapId, harKey, keys);
+
     keyboard->setKeysInKeymap(keys);
     
-    keymapTF.setVisible(false);
-    keymapTF.toBack();
+    
+    textEditor->setVisible(false);
+    textEditor->toBack();
 
 }
 
@@ -1310,8 +1355,8 @@ void KeymapViewController::textEditorFocusLost(TextEditor& tf)
 void KeymapViewController::textEditorEscapeKeyPressed (TextEditor& textEditor)
 {
     focusLostByEscapeKey = true;
-    keymapTF.setVisible(false);
-    keymapTF.toBack();
+    textEditor.setVisible(false);
+    textEditor.toBack();
     unfocusAllComponents();
 }
 
@@ -1326,7 +1371,7 @@ void KeymapViewController::textEditorTextChanged(TextEditor& tf)
 
 void KeymapViewController::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
-    if(textEditor.getName() == keymapTF.getName())
+    if(textEditor.getName() == keymapTF.getName() || textEditor.getName() == harKeymapTF.getName() || textEditor.getName() == harArrayKeymapTF.getName())
     {
         keymapUpdated(textEditor);
     }
@@ -1346,8 +1391,12 @@ void KeymapViewController::update(void)
         midiEditToggle.setToggleState(km->getMidiEdit(), dontSendNotification);
         endKeystrokesToggle.setToggleState(km->getAllNotesOff(), dontSendNotification);
         keymapTF.setText( intArrayToString(km->keys()));
+        harKeymapTF.setText(String(harKey));
+        harArrayKeymapTF.setText(intArrayToString(km->getHarmonizationForKey(harKey)));
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
         keyboard->setKeysInKeymap(km->keys());
+        keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
+        keyboard->setKeysInKeymap(km->getHarmonizationForKey(harKey));
         
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -1394,11 +1443,12 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     }
     else if (source == &harKeyboardState)
     {
+        harKey = midiNoteNumber;
+
         update();
 
         BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
-        keyboard->setKeysInKeymap(Array<int>({ midiNoteNumber }));
-        harKey = midiNoteNumber;
+        keyboard->setKeysInKeymap(Array<int>({ harKey }));
 
         keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
         Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(harKey));

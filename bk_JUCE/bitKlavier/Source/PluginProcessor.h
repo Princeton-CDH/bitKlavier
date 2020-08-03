@@ -207,7 +207,7 @@ public:
     void  performResets(int noteNumber, String source);
     
     void handleNoteOn(int noteNumber, float velocity, int channel, String source, bool harmonizer = false);
-    void handleNoteOff(int noteNumber, float velocity, int channel, String source);
+    void handleNoteOff(int noteNumber, float velocity, int channel, String source, bool harmonizer = false);
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;

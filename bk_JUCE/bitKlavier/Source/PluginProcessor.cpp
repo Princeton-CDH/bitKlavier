@@ -538,7 +538,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
     bool activeSource = false;
-    //bool keystrokesEnding = false;
 
     if (pmap != nullptr)
     {
@@ -557,7 +556,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                 }
                 if (km->getAllNotesOff())
                 {
-                    //keystrokesEnding = true
                     clearBitKlavier();
                 }
             }   
@@ -565,12 +563,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     }
     if (harmonizer == false) return;
 
-    //if (keystrokesEnding)
-    //{
-        //handleAllNotesOff();
-        //sustainDeactivate();
-        //clear(PreparationTypeKeymap, updateState->currentKeymapId);
-    //}
     if ((activeSource || getDefaultMidiInputSources().contains(source)))
     {
         ++noteOnCount;
@@ -637,7 +629,7 @@ void BKAudioProcessor::handleAllNotesOff()
     
 }
 
-void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, String source)
+void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, String source, bool harmonizer)
 {
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
      
@@ -650,9 +642,19 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
             if (km->getAllMidiInputSources().contains(source))
             {
                 activeSource = true;
+                if (harmonizer == false)
+                {
+                    Array<int> harmonizer = km->getHarmonizationForKey(noteNumber);
+                    for (int i = 0; i < harmonizer.size(); i++)
+                    {
+                        handleNoteOff(harmonizer[i], velocity, channel, source, true);
+                    }
+                }
             }
         }
     }
+
+    if (harmonizer == false) return;
     
     if (activeSource || getDefaultMidiInputSources().contains(source))
     {

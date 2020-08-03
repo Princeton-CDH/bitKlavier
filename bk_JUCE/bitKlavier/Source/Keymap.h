@@ -337,7 +337,7 @@ public:
 
         harmonizerKeys.set(keyPressed, singleHar);
     }
-    inline void setHarmonizerList(int keyPressed, Array<int> harmonization) { harmonizerKeys.insert(keyPressed, harmonization); }
+    inline void setHarmonizerList(int keyPressed, Array<int> harmonization) { harmonizerKeys.set(keyPressed, harmonization); }
 
     void trapKey(int keyToTrap);
     void mirrorKey(int keyCenter);

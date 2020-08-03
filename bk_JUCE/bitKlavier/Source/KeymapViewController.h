@@ -162,6 +162,9 @@ private:
     void displayShared(void) override;
     void invisible(void) override;
 
+    void harmonizerKeymapUpdated();
+    void harmonizerArrayKeymapUpdated();
+
 
 #if JUCE_IOS
     Slider octaveSlider;
