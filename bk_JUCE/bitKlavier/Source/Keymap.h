@@ -166,6 +166,14 @@ public:
     inline void setMidiEdit(bool edit) { midiEdit = edit; }
     inline void toggleMidiEdit() { midiEdit = !midiEdit; }
     inline bool getMidiEdit() { return midiEdit; }
+
+    inline void setHarMidiEdit(bool edit) { harMidiEdit = edit; }
+    inline void toggleHarMidiEdit() { midiEdit = !harMidiEdit; }
+    inline bool getHarMidiEdit() { return harMidiEdit; }
+
+    inline void setHarArrayMidiEdit(bool edit) { harArrayMidiEdit = edit; }
+    inline void toggleHarArrayMidiEdit() { midiEdit = !harArrayMidiEdit; }
+    inline bool getHarArrayMidiEdit() { return harArrayMidiEdit; }
     
     void print(void);
     
@@ -322,11 +330,25 @@ public:
 
         return h;
     }
-    inline void toggleHarmonizerList(int keyPressed, int keyHarmonized) 
-    { 
-        Array<int> singleHar = harmonizerKeys[keyPressed];
 
-        if (harmonizerKeys[keyPressed].contains(keyHarmonized))
+    //overloaded to default to harKey, this saves function calls in KeymapViewController
+    Array<int> getHarmonizationForKey()
+    {
+        Array<int> h = Array<int>();
+        h.ensureStorageAllocated(128);
+
+        for (int i = 0; i < harmonizerKeys[harKey].size(); i++)
+        {
+            h.add(harmonizerKeys[harKey][i]);
+        }
+
+        return h;
+    }
+    inline void toggleHarmonizerList(int index, int keyHarmonized) 
+    { 
+        Array<int> singleHar = harmonizerKeys[index];
+
+        if (harmonizerKeys[index].contains(keyHarmonized))
         {
             singleHar.removeAllInstancesOf(keyHarmonized);
         }
@@ -335,18 +357,46 @@ public:
             singleHar.add(keyHarmonized);
         }
 
-        harmonizerKeys.set(keyPressed, singleHar);
+        harmonizerKeys.set(index, singleHar);
     }
-    inline void setHarmonizerList(int keyPressed, Array<int> harmonization) { harmonizerKeys.set(keyPressed, harmonization); }
+
+    //overloaded to default to harKey, this saves function calls in KeymapViewController
+    inline void toggleHarmonizerList(int keyHarmonized)
+    {
+        Array<int> singleHar = harmonizerKeys[harKey];
+
+        if (harmonizerKeys[harKey].contains(keyHarmonized))
+        {
+            singleHar.removeAllInstancesOf(keyHarmonized);
+        }
+        else
+        {
+            singleHar.add(keyHarmonized);
+        }
+
+        harmonizerKeys.set(harKey, singleHar);
+    }
+    inline void setHarmonizerList(int index, Array<int> harmonization) { harmonizerKeys.set(index, harmonization); }
+    // overloaded to default to harKey; this avoids pointless function calls
+    inline void setHarmonizerList(Array<int> harmonization) { harmonizerKeys.set(harKey, harmonization); }
 
     void trapKey(int keyToTrap);
+    //overloaded to default to harKey, this saves function calls in KeymapViewController
+    void trapKey();
+
     void mirrorKey(int keyCenter);
+    //overloaded to default to harKey, this saves function calls in KeymapViewController
+    void mirrorKey();
+
     void defaultHarmonizations();
     void clearHarmonizations();
 
     inline bool getHarmonizerEnabled() { return harmonizerEnabled; }
     inline void setHarmonizerEnabled(bool toSet) { harmonizerEnabled = toSet; }
     inline void toggleHarmonizerEnabled() { harmonizerEnabled = !harmonizerEnabled; }
+
+    inline int getHarKey() { return harKey; }
+    inline void setHarKey(int toSet) {harKey = toSet;}
     
 private:
     BKAudioProcessor& processor;
@@ -358,6 +408,9 @@ private:
     
     // Use midi input to edit active keys 
     bool midiEdit;
+
+    bool harMidiEdit;
+    bool harArrayMidiEdit;
     
     bool inverted;
     
@@ -368,6 +421,8 @@ private:
     //OwnedArray<Array<int>> harmonizerKeys;
     Array<Array<int>> harmonizerKeys;
     bool harmonizerEnabled;
+
+    int harKey;
     
     bool defaultSelected;
     bool onscreenSelected;

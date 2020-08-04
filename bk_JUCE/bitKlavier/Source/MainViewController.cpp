@@ -638,7 +638,15 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 		}
 		else if (code == 65) // A all
 		{
-			if (e.getModifiers().isCommandDown())   construction.selectAll();
+            BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
+            if (currentDisplay == DisplayKeymap)
+            {
+                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+                keymap->setMidiEdit(false);
+                keymap->setHarMidiEdit(true);
+                keymap->setHarArrayMidiEdit(false);
+            }
+			else if (e.getModifiers().isCommandDown())   construction.selectAll();
 		}
 		else if (code == 66) // B blendronic
 		{
@@ -676,7 +684,15 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 		}
 		else if (code == 81) // Q comment
 		{
-			construction.addItem(PreparationTypeComment);
+            BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
+            if (currentDisplay == DisplayKeymap)
+            {
+                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+                keymap->setMidiEdit(false);
+                keymap->setHarMidiEdit(false);
+                keymap->setHarArrayMidiEdit(true);
+            }
+			else construction.addItem(PreparationTypeComment);
 		}
 		else if (code == 82) // R reset
 		{
@@ -706,7 +722,14 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 		}
 		else if (code == 90) // Z
 		{
-
+            BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
+            if (currentDisplay == DisplayKeymap)
+            {
+                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+                keymap->setMidiEdit(true);
+                keymap->setHarMidiEdit(false);
+                keymap->setHarArrayMidiEdit(false);
+            }
 		}
 		else if (code == 69) // E
 		{

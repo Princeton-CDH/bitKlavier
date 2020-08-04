@@ -19,13 +19,16 @@ name("Keymap "+String(Id)),
 keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
 midiEdit(false),
+harMidiEdit(false),
+harArrayMidiEdit(false),
 inverted(false),
 triggered(false),
 midiInputSources(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true),
 allNotesOff(false),
-harmonizerEnabled(false)
+harmonizerEnabled(false),
+harKey(60)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -64,12 +67,15 @@ processor(processor),
 Id(k->getId()),
 name("Keymap "+String(Id)),
 midiEdit(false),
+harMidiEdit(false),
+harArrayMidiEdit(false),
 inverted(false),
 midiInputSources(k->getMidiInputSources()),
 defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
 allNotesOff(k->getAllNotesOff()),
-harmonizerEnabled(k->getHarmonizerEnabled())
+harmonizerEnabled(k->getHarmonizerEnabled()),
+harKey(k->getHarKey())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -107,12 +113,15 @@ processor(processor),
 Id(Id),
 name("Keymap "+String(Id)),
 midiEdit(false),
+harMidiEdit(false),
+harArrayMidiEdit(false),
 inverted(false),
 midiInputSources(k->getMidiInputSources()),
 defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
 allNotesOff(k->getAllNotesOff()),
-harmonizerEnabled(false)
+harmonizerEnabled(false),
+harKey(k->getHarKey())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -153,12 +162,15 @@ name("Keymap "+String(Id)),
 keymap(Array<bool>()),
 targetStates(Array<KeymapTargetState>()),
 midiEdit(false),
+harMidiEdit(false),
+harArrayMidiEdit(false),
 inverted(false),
 midiInputSources(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true),
 allNotesOff(false),
-harmonizerEnabled(false)
+harmonizerEnabled(false),
+harKey(60)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -511,6 +523,16 @@ void Keymap::trapKey(int keyToTrap)
     }
 }
 
+void Keymap::trapKey()
+{
+    for (int i = 0; i < 128; i++)
+    {
+        Array<int> tempArray = harmonizerKeys[i];
+        tempArray.addIfNotAlreadyThere(harKey);
+        harmonizerKeys.set(i, tempArray);
+    }
+}
+
 void Keymap::mirrorKey(int keyCenter)
 {
     harmonizerKeys.set(keyCenter, Array<int>(keyCenter));
@@ -533,6 +555,41 @@ void Keymap::mirrorKey(int keyCenter)
     {
         int i = keyCenter - 1;
         for (int j = keyCenter + 1; j < 128; j++)
+        {
+            Array<int> tempArray = harmonizerKeys[i];
+            tempArray.addIfNotAlreadyThere(j);
+            harmonizerKeys.set(i, tempArray);
+
+            tempArray = harmonizerKeys[j];
+            tempArray.addIfNotAlreadyThere(i);
+            harmonizerKeys.set(j, tempArray);
+            i--;
+        }
+    }
+}
+
+void Keymap::mirrorKey()
+{
+    harmonizerKeys.set(harKey, Array<int>(harKey));
+    if (harKey < 64)
+    {
+        int j = harKey + 1;
+        for (int i = harKey - 1; i >= 0; i--)
+        {
+            Array<int> tempArray = harmonizerKeys[i];
+            tempArray.addIfNotAlreadyThere(j);
+            harmonizerKeys.set(i, tempArray);
+
+            tempArray = harmonizerKeys[j];
+            tempArray.addIfNotAlreadyThere(i);
+            harmonizerKeys.set(j, tempArray);
+            j++;
+        }
+    }
+    else
+    {
+        int i = harKey - 1;
+        for (int j = harKey + 1; j < 128; j++)
         {
             Array<int> tempArray = harmonizerKeys[i];
             tempArray.addIfNotAlreadyThere(j);

@@ -470,7 +470,15 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, boo
             {
                 km->toggleNote(noteNumber);
             }
-            if (km->containsNote(noteNumber))
+            else if (km->getHarMidiEdit())
+            {
+                km->setHarKey(noteNumber);
+            }
+            else if (km->getHarArrayMidiEdit())
+            {
+                km->toggleHarmonizerList(km->getHarKey(), noteNumber);
+            }
+            else if (km->containsNote(noteNumber))
             {
                 if (km->isInverted())
                 {

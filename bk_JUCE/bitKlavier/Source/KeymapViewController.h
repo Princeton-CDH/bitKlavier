@@ -24,6 +24,7 @@ class KeymapViewController :
 public BKViewController,
 public BKKeymapKeyboardStateListener,
 public BKEditableComboBoxListener,
+//private KeyListener,
 public Timer
 #if JUCE_IOS
 , public Slider::Listener,
@@ -78,6 +79,8 @@ private:
     
     ToggleButton invertOnOffToggle;
     ToggleButton midiEditToggle;
+    ToggleButton harMidiEditToggle;
+    ToggleButton harArrayMidiEditToggle;
     
     BKLabel     keymapL;
     BKTextEditor  keymapTF;
@@ -164,6 +167,8 @@ private:
 
     void harmonizerKeymapUpdated();
     void harmonizerArrayKeymapUpdated();
+
+    //bool keyPressed(const KeyPress& e, Component*) override;
 
 
 #if JUCE_IOS

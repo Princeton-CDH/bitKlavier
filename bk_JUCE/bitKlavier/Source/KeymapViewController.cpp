@@ -243,6 +243,26 @@ BKViewController(p, theGraph, 2)
         midiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap");
     midiEditToggle.addListener(this);
     addAndMakeVisible(&midiEditToggle, ALL);
+
+    harMidiEditToggle.setButtonText("midi edit");
+    buttonsAndMenusLAF.setToggleBoxTextToRightBool(true);
+    harMidiEditToggle.setToggleState(false, dontSendNotification);
+    if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+        harMidiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap" + gMidiEditShortcut);
+    else
+        harMidiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap");
+    harMidiEditToggle.addListener(this);
+    addAndMakeVisible(&harMidiEditToggle, ALL);
+
+    harArrayMidiEditToggle.setButtonText("midi edit");
+    buttonsAndMenusLAF.setToggleBoxTextToRightBool(true);
+    harArrayMidiEditToggle.setToggleState(false, dontSendNotification);
+    if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+        harArrayMidiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap" + gMidiEditShortcut);
+    else
+        harArrayMidiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap");
+    harArrayMidiEditToggle.addListener(this);
+    addAndMakeVisible(&harArrayMidiEditToggle, ALL);
     
     // Target Control TBs
     targetControlTBs = OwnedArray<ToggleButton>();
@@ -578,6 +598,9 @@ void KeymapViewController::displayTab(int tab)
         harKeyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
         harKeyboardValsTextFieldOpen.setVisible(true);
 
+        harMidiEditToggle.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
+        harMidiEditToggle.setVisible(true);
+
         //harmonizer array keyboard
 
         area.removeFromBottom(gYSpacing * 1.5);
@@ -608,22 +631,29 @@ void KeymapViewController::displayTab(int tab)
         harArrayKeyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
         harArrayKeyboardValsTextFieldOpen.setVisible(true);
 
+        harArrayMidiEditToggle.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
+        harArrayMidiEditToggle.setVisible(true);
+
+        /*
         Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
         targetsSlice.removeFromRight(gXSpacing);
 
-        /*
+        
         enableHarmonizerToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
         enableHarmonizerToggle.toFront(false);
         enableHarmonizerToggle.setVisible(true);
         */
 
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        int tempHarKey = thisKeymap->getHarKey();
+
         BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
-        keyboard->setKeysInKeymap(Array<int>({ harKey }));
+        keyboard->setKeysInKeymap(Array<int>({ tempHarKey }));
 
         keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        
 
-        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(harKey));
+        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(tempHarKey));
         keyboard->setKeysInKeymap(harmonizationArray);
 	}
 }
@@ -691,6 +721,8 @@ void KeymapViewController::invisible()
     selectCB.setVisible(false);
     invertOnOffToggle.setVisible(false);
     midiEditToggle.setVisible(false);
+    harMidiEditToggle.setVisible(false);
+    harArrayMidiEditToggle.setVisible(false);
     keymapL.setVisible(false);
     keymapTF.setVisible(false);
     
@@ -969,15 +1001,15 @@ void KeymapViewController::harmonizerMenuCallback(int result, KeymapViewControll
     }
     else if (result == 3)
     {
-        keymap->mirrorKey(vc->harKey);
+        keymap->mirrorKey();
     }
     else if (result == 4)
     {
-        keymap->trapKey(vc->harKey);
+        keymap->trapKey();
     }
 
     BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)(vc->harArrayKeyboardComponent.get());
-    keyboard->setKeysInKeymap(keymap->getHarmonizationForKey(vc->harKey));
+    keyboard->setKeysInKeymap(keymap->getHarmonizationForKey());
 
     //vc->getHarmonizerMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->harmonizerMenuButton), ModalCallbackFunction::forComponent(harmonizerMenuCallback, vc));
 }
@@ -1213,8 +1245,33 @@ void KeymapViewController::bkButtonClicked (Button* b)
     */
     else if (b == &midiEditToggle)
     {
+        harMidiEditToggle.setToggleState(false, dontSendNotification);
+        harArrayMidiEditToggle.setToggleState(false, dontSendNotification);
+
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setMidiEdit(midiEditToggle.getToggleState());
+        keymap->setHarMidiEdit(false);
+        keymap->setHarArrayMidiEdit(false);
+    }
+    else if (b == &harMidiEditToggle)
+    {
+        midiEditToggle.setToggleState(false, dontSendNotification);
+        harArrayMidiEditToggle.setToggleState(false, dontSendNotification);
+
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setHarMidiEdit(harMidiEditToggle.getToggleState());
+        keymap->setMidiEdit(false);
+        keymap->setHarArrayMidiEdit(false);
+    }
+    else if (b == &harArrayMidiEditToggle)
+    {
+        midiEditToggle.setToggleState(false, dontSendNotification);
+        harMidiEditToggle.setToggleState(false, dontSendNotification);
+
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setHarArrayMidiEdit(harArrayMidiEditToggle.getToggleState());
+        keymap->setHarMidiEdit(false);
+        keymap->setMidiEdit(false);
     }
     else if (b == &keysButton)
     {
@@ -1328,10 +1385,11 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
     }
     else if (name == "HarmonizerKeymapMidi")
     {
-        harKey = keys[0];
+        //harKey = keys[0];
+        processor.gallery->getKeymap(processor.updateState->currentKeymapId)->setHarKey(keys[0]);
         //processor.gallery->setKeymapHarmonization(processor.updateState->currentKeymapId, harKey, keys)
     }
-    else if (name == "HarmonizerArrayKeymapMidi") processor.gallery->setKeymapHarmonization(processor.updateState->currentKeymapId, harKey, keys);
+    else if (name == "HarmonizerArrayKeymapMidi") processor.gallery->setKeymapHarmonization(processor.updateState->currentKeymapId, keys);
 
     keyboard->setKeysInKeymap(keys);
     
@@ -1386,17 +1444,24 @@ void KeymapViewController::update(void)
     
     if (km != nullptr)
     {
+        //harKey = km->getHarKey();
+
         selectCB.setSelectedId(processor.updateState->currentKeymapId, dontSendNotification);
         invertOnOffToggle.setToggleState(km->isInverted(), dontSendNotification);
         midiEditToggle.setToggleState(km->getMidiEdit(), dontSendNotification);
+        harMidiEditToggle.setToggleState(km->getHarMidiEdit(), dontSendNotification);
+        harArrayMidiEditToggle.setToggleState(km->getHarArrayMidiEdit(), dontSendNotification);
         endKeystrokesToggle.setToggleState(km->getAllNotesOff(), dontSendNotification);
         keymapTF.setText( intArrayToString(km->keys()));
-        harKeymapTF.setText(String(harKey));
-        harArrayKeymapTF.setText(intArrayToString(km->getHarmonizationForKey(harKey)));
+        harKeymapTF.setText(String(km->getHarKey()));
+        harArrayKeymapTF.setText(intArrayToString(km->getHarmonizationForKey()));
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
         keyboard->setKeysInKeymap(km->keys());
+        keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
+        keyboard->setKeysInKeymap(Array<int>(km->getHarKey()));
         keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
-        keyboard->setKeysInKeymap(km->getHarmonizationForKey(harKey));
+        keyboard->setKeysInKeymap(km->getHarmonizationForKey());
+        
         
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -1444,6 +1509,7 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     else if (source == &harKeyboardState)
     {
         harKey = midiNoteNumber;
+        thisKeymap->setHarKey(harKey);
 
         update();
 
@@ -1571,11 +1637,28 @@ void KeymapViewController::hideUnconnectedTargets()
 void KeymapViewController::timerCallback(){
     
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    BKKeymapKeyboardComponent* keyboard;
+
+    midiEditToggle.setToggleState(km->getMidiEdit(), dontSendNotification);
+    harMidiEditToggle.setToggleState(km->getHarMidiEdit(), dontSendNotification);
+    harArrayMidiEditToggle.setToggleState(km->getHarArrayMidiEdit(), dontSendNotification);
     
     if (km->getMidiEdit())
     {
-        BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(keyboardComponent.get());
+        keyboard = (BKKeymapKeyboardComponent*)(keyboardComponent.get());
         keyboard->setKeysInKeymap(km->keys());
+    }
+    else if (km->getHarMidiEdit())
+    {
+        keyboard = (BKKeymapKeyboardComponent*)(harKeyboardComponent.get());
+        keyboard->setKeysInKeymap(Array<int>(km->getHarKey()));
+        keyboard = (BKKeymapKeyboardComponent*)(harArrayKeyboardComponent.get());
+        keyboard->setKeysInKeymap(km->getHarmonizationForKey());
+    }
+    else if (km->getHarArrayMidiEdit())
+    {
+        keyboard = (BKKeymapKeyboardComponent*)(harArrayKeyboardComponent.get());
+        keyboard->setKeysInKeymap(km->getHarmonizationForKey());
     }
 
     //updateKeymapTargets(); // needed?
@@ -1628,3 +1711,28 @@ void KeymapViewController::timerCallback(){
 }
 
 
+/*bool KeymapViewController::keyPressed(const KeyPress& e, Component*)
+{
+    int code = e.getKeyCode();
+
+    if (code == 65) // A all
+    {
+        bkButtonClicked(&harMidiEditToggle);
+    }
+    else if (code == 81) // Q
+    {
+        harMidiEditToggle.setToggleState(false, dontSendNotification);
+        harArrayMidiEditToggle.setToggleState(false, dontSendNotification);
+
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setMidiEdit(midiEditToggle.getToggleState());
+        keymap->setHarMidiEdit(false);
+        keymap->setHarArrayMidiEdit(false);
+        //bkButtonClicked(&harArrayMidiEditToggle);
+    }
+    else if (code == 90) // Z
+    {
+        bkButtonClicked(&midiEditToggle);
+    }
+    return true;
+}*/
