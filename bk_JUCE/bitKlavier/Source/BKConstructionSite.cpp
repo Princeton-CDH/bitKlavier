@@ -119,6 +119,8 @@ void BKConstructionSite::move(int which, bool fine)
     for (auto item : graph->getSelectedItems())
         item->setTopLeftPosition(item->getX() + changeX, item->getY() + changeY);
     
+    if (!graph->getSelectedItems().isEmpty()) processor.saveGalleryToHistory();
+    
     repaint();
 }
 
@@ -144,7 +146,7 @@ void BKConstructionSite::deleteSelected(void)
     
     redraw();
     
-    processor.saveGalleryToHistory();
+    if (!graph->getSelectedItems().isEmpty()) processor.saveGalleryToHistory();
 }
 
 void BKConstructionSite::align(int which)
@@ -176,13 +178,21 @@ void BKConstructionSite::align(int which)
     else if (which == 2)    bottom = true;
     else if (which == 3)    left = true;
     
+    bool changed = false;
     for (auto item : graph->getSelectedItems())
     {
         float X = (left ? mostLeft : (right ? mostRight : item->getX() + item->getWidth() / 2));
         float Y = (top ? mostTop : (bottom ? mostBottom : item->getY() + item->getHeight() / 2));
         
+        int oldX = item->getX();
+        int oldY = item->getY();
+        
         item->setCentrePosition(X, Y);
+        
+        if (oldX != item->getX() || oldY != item->getY()) changed = true;
     }
+
+    if (changed) processor.saveGalleryToHistory();
     
     repaint();
 }
@@ -207,32 +217,38 @@ void BKConstructionSite::makeConnection(int x, int y, bool doAnother)
     {
         itemTarget = getItemAtPoint(x, y);
         
+        bool changed = false;
         if (itemTarget != nullptr)
         {
-            graph->connect(itemSource, itemTarget);
+            changed = graph->connect(itemSource, itemTarget);
         }
         
         connect = doAnother;
         
-        processor.saveGalleryToHistory();
+        if (changed) processor.saveGalleryToHistory();
     }
 }
 
 void BKConstructionSite::connectAllSelected()
 {
+    bool changed = false;
     for (int i = 0; i < graph->getSelectedItems().size()-1; ++i)
     {
         for (int j = i+1; j < graph->getSelectedItems().size(); ++j)
         {
-            graph->connect(graph->getSelectedItems()[i],
-                               graph->getSelectedItems()[j]);
+            if (graph->connect(graph->getSelectedItems()[i], graph->getSelectedItems()[j]))
+                changed = true;
         }
     }
+    
+    if (changed) processor.saveGalleryToHistory();
+    
     repaint();
 }
 
 void BKConstructionSite::removeConnectionsTo()
 {
+    bool changed = false;
     // For each selected item
     for (BKItem::Ptr selectedItem : graph->getSelectedItems())
     {
@@ -242,23 +258,31 @@ void BKConstructionSite::removeConnectionsTo()
             // If the connected item is not also selected, disconnect it
             if (!graph->getSelectedItems().contains(connectedItem))
             {
-                graph->disconnect(selectedItem, connectedItem);
+                if (graph->disconnect(selectedItem, connectedItem))
+                    changed = true;
             }
         }
     }
+    
+    if (changed) processor.saveGalleryToHistory();
+    
     repaint();
 }
 
 void BKConstructionSite::removeConnectionsBetween()
 {
+    bool changed = false;
     for (int i = 0; i < graph->getSelectedItems().size()-1; ++i)
     {
         for (int j = i+1; j < graph->getSelectedItems().size(); ++j)
         {
-            graph->disconnect(graph->getSelectedItems()[i],
-                                  graph->getSelectedItems()[j]);
+            if (graph->disconnect(graph->getSelectedItems()[i], graph->getSelectedItems()[j]))
+                changed = true;
         }
     }
+    
+    if (changed) processor.saveGalleryToHistory();
+    
     repaint();
 }
 
@@ -595,6 +619,8 @@ void BKConstructionSite::paste(bool cursorBasedOffset)
 
     processor.currentPiano->configure();
     
+    processor.saveGalleryToHistory();
+    
     redraw();
     
     getParentComponent()->grabKeyboardFocus();
@@ -602,7 +628,11 @@ void BKConstructionSite::paste(bool cursorBasedOffset)
 
 void BKConstructionSite::cut(void)
 {
+    if (graph->getSelectedItems().isEmpty()) return;
+        
     copy();
+    
+    processor.saveGalleryToHistory();
     
     deleteSelected();
     
@@ -743,7 +773,14 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     else if (result == RESET_ID)
     {
         vc->addItem(PreparationTypeReset, true);
-        
+    }
+    else if (result == UNDO_ID)
+    {
+        processor.undoGallery();
+    }
+    else if (result == REDO_ID)
+    {
+        processor.redoGallery();
     }
     
     // EDIT
@@ -1074,14 +1111,16 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
     // Otherwise make connections with CMD+click and click on target
 //  if (connect) makeConnection(e.x, e.y, e.mods.isAltDown());
 
-    
+    bool shouldStore = false;
     for (auto item : graph->getSelectedItems())
     {
         if (item->isDragging)
         {
             item->isDragging = false;
+            shouldStore = true;
         }
     }
+    if (shouldStore && e.getDistanceFromDragStart() > 0) processor.saveGalleryToHistory();
     
     repaint();
 }

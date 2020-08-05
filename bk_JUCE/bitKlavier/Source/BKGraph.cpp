@@ -673,23 +673,23 @@ void BKItemGraph::clearItems(void)
     processor.currentPiano->clearItems();
 }
 
-void BKItemGraph::connect(BKPreparationType type1, int id1, BKPreparationType type2, int id2)
+bool BKItemGraph::connect(BKPreparationType type1, int id1, BKPreparationType type2, int id2)
 {
     BKItem* item1 = get(type1,id1); BKItem* item2 = get(type2,id2);
-    connect(item1,item2);
+    return connect(item1,item2);
 }
 
-void BKItemGraph::connect(BKItem* item1, BKItem* item2)
+bool BKItemGraph::connect(BKItem* item1, BKItem* item2)
 {
     // Don't try to connect an item to itself or two already connected items
-    if ((item1 == item2) || (item1->isConnectedTo(item2) && item2->isConnectedTo(item1))) return;
+    if ((item1 == item2) || (item1->isConnectedTo(item2) && item2->isConnectedTo(item1))) return false;
     
     // Get item types
     BKPreparationType item1Type = item1->getType();
     BKPreparationType item2Type = item2->getType();
     
     // Check if its a valid connection
-    if (!(isValidConnection(item1Type, item2Type))) return;
+    if (!(isValidConnection(item1Type, item2Type))) return false;
     
     // If connecting a modification, set its type
     if (item1Type == PreparationTypeGenericMod)
@@ -796,17 +796,20 @@ void BKItemGraph::connect(BKItem* item1, BKItem* item2)
     item2->addConnection(item1);
 
     processor.currentPiano->configure();
+    
+    return true;
 }
 
-void BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
+bool BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
 {
     // Get item types
     BKPreparationType item1Type = item1->getType();
     BKPreparationType item2Type = item2->getType();
     
+    bool changed = false;
     // Remove the connections
-    item1->removeConnection(item2);
-    item2->removeConnection(item1);
+    if (item1->removeConnection(item2) || item2->removeConnection(item1))
+        changed = true;
     
     // If disconnecting a modification, make it generic
     if (item1Type == PreparationTypeDirectMod ||
@@ -835,6 +838,8 @@ void BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
     }
 
     processor.currentPiano->configure();
+    
+    return changed;
 }
 
 Array<Line<int>> BKItemGraph::getLines(void)

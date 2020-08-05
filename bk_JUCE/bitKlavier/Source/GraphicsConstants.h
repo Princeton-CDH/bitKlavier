@@ -101,6 +101,8 @@ static const std::string gDisconnectFromShortcut = " (O)";
 static const std::string gDisconnectBetweenShortcut = " (I)";
 static const std::string gAlignShortcut = " (CMD+Arrow)";
 static const std::string gMidiEditShortcut = " (CMD+E)";
+static const std::string gUndoShortcut = " (CMD+Z)";
+static const std::string gRedoShortcut = " (CMD+SHIFT+Z)";
 #elif JUCE_WINDOWS
 static const std::string gKeymapShortcut = " (K)";
 static const std::string gDirectShortcut = " (D)";
@@ -125,6 +127,8 @@ static const std::string gDisconnectFromShortcut = " (O)";
 static const std::string gDisconnectBetweenShortcut = " (I)";
 static const std::string gAlignShortcut = " (CTRL+Arrow)";
 static const std::string gMidiEditShortcut = " (CTRL+E)";
+static const std::string gUndoShortcut = " (CTRL+Z)";
+static const std::string gRedoShortcut = " (CTRL+SHIFT+Z)";
 #elif JUCE_IOS
 static const std::string gKeymapShortcut = "";
 static const std::string gDirectShortcut = "";

@@ -74,27 +74,33 @@ public:
     }
     
     
-    inline void removeConnection(BKPreparationType type, int Id)
+    inline bool removeConnection(BKPreparationType type, int Id)
     {
         for (int i = connections.size(); --i >= 0;)
         {
             if ((connections.getUnchecked(i)->getType() == type) && (connections.getUnchecked(i)->getId() == Id))
             {
                 connections.remove(i);
-                break;
+                return true;
             }
         }
+        return false;
     }
     
-    inline void removeConnection(BKItem::Ptr thisItem)
+    inline bool removeConnection(BKItem::Ptr thisItem)
     {
         int index = 0;
         for (auto item : connections)
         {
-            if (item == (BKItem *)thisItem) connections.remove(index);
+            if (item == (BKItem *)thisItem)
+            {
+                connections.remove(index);
+                return true;
+            }
             
             index++;
         }
+        return false;
     }
     
     inline bool isConnectedTo(BKPreparationType type, int Id)
@@ -297,9 +303,9 @@ public:
     void clear(void);
     void clearItems(void);
     
-    void connect(BKPreparationType type1, int id1, BKPreparationType type2, int id2);
-    void connect(BKItem* item1, BKItem* item2);
-    void disconnect(BKItem* item1, BKItem* item2);
+    bool connect(BKPreparationType type1, int id1, BKPreparationType type2, int id2);
+    bool connect(BKItem* item1, BKItem* item2);
+    bool disconnect(BKItem* item1, BKItem* item2);
     
     bool isValidConnection(BKPreparationType type1, BKPreparationType type2);
     

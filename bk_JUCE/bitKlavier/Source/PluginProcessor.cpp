@@ -410,7 +410,7 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     
     myXML->writeTo(myFile, XmlElement::TextFormat());
     
-    loadGalleryFromXml(myXML.get());
+    loadGalleryFromXml(myXML.get(), false);
     
     gallery->setURL(newURL);
     
