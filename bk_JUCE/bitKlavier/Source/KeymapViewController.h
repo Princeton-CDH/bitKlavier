@@ -24,10 +24,10 @@ class KeymapViewController :
 public BKViewController,
 public BKKeymapKeyboardStateListener,
 public BKEditableComboBoxListener,
-//private KeyListener,
+public Slider::Listener,
 public Timer
 #if JUCE_IOS
-, public Slider::Listener,
+, 
 public WantsBigOne::Listener
 #endif
 {
@@ -117,9 +117,13 @@ private:
     BKKeymapKeyboardComponent* harArrayKeyboard;
     BKTextButton harArrayKeyboardValsTextFieldOpen;
 
-    ToggleButton enableHarmonizerToggle; //currently commented out, probably not necessary
+    //ToggleButton enableHarmonizerToggle; // functionality currently commented out, probably not necessary
 
-    int harKey; //for rendering harmonizer array stuff for now
+    Slider harTranspositionSlider;
+    void sliderValueChanged(Slider* slider)                override;
+    BKButtonAndMenuLAF transpositionLaf;
+
+    //int harKey; //for rendering harmonizer array stuff for now
 
     //end
 
@@ -167,8 +171,6 @@ private:
 
     void harmonizerKeymapUpdated();
     void harmonizerArrayKeymapUpdated();
-
-    //bool keyPressed(const KeyPress& e, Component*) override;
 
 
 #if JUCE_IOS

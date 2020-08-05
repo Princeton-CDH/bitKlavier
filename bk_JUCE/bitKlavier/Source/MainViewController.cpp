@@ -643,7 +643,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
             {
                 Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
                 keymap->setMidiEdit(false);
-                keymap->setHarMidiEdit(true);
+                keymap->toggleHarMidiEdit();
                 keymap->setHarArrayMidiEdit(false);
             }
 			else if (e.getModifiers().isCommandDown())   construction.selectAll();
@@ -690,7 +690,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                 Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
                 keymap->setMidiEdit(false);
                 keymap->setHarMidiEdit(false);
-                keymap->setHarArrayMidiEdit(true);
+                keymap->toggleHarArrayMidiEdit();
             }
 			else construction.addItem(PreparationTypeComment);
 		}
@@ -726,7 +726,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
             if (currentDisplay == DisplayKeymap)
             {
                 Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-                keymap->setMidiEdit(true);
+                keymap->toggleMidiEdit();
                 keymap->setHarMidiEdit(false);
                 keymap->setHarArrayMidiEdit(false);
             }

@@ -168,11 +168,11 @@ public:
     inline bool getMidiEdit() { return midiEdit; }
 
     inline void setHarMidiEdit(bool edit) { harMidiEdit = edit; }
-    inline void toggleHarMidiEdit() { midiEdit = !harMidiEdit; }
+    inline void toggleHarMidiEdit() { harMidiEdit = !harMidiEdit; }
     inline bool getHarMidiEdit() { return harMidiEdit; }
 
     inline void setHarArrayMidiEdit(bool edit) { harArrayMidiEdit = edit; }
-    inline void toggleHarArrayMidiEdit() { midiEdit = !harArrayMidiEdit; }
+    inline void toggleHarArrayMidiEdit() { harArrayMidiEdit = !harArrayMidiEdit; }
     inline bool getHarArrayMidiEdit() { return harArrayMidiEdit; }
     
     void print(void);
@@ -318,28 +318,30 @@ public:
     inline bool getAllNotesOff() { return allNotesOff; }
 
     inline Array<Array<int>> getHarmonizerKeys() { return harmonizerKeys; }
-    Array<int> getHarmonizationForKey(int key) 
+    Array<int> getHarmonizationForKey(int key, bool useShift = false)
     { 
         Array<int> h = Array<int>();
         h.ensureStorageAllocated(128);
 
         for (int i = 0; i < harmonizerKeys[key].size(); i++)
         {
-            h.add(harmonizerKeys[key][i]);
+            if (useShift) h.add(harmonizerKeys[key][i] + harShift);
+            else h.add(harmonizerKeys[key][i]);
         }
 
         return h;
     }
 
     //overloaded to default to harKey, this saves function calls in KeymapViewController
-    Array<int> getHarmonizationForKey()
+    Array<int> getHarmonizationForKey(bool useShift = false)
     {
         Array<int> h = Array<int>();
         h.ensureStorageAllocated(128);
 
         for (int i = 0; i < harmonizerKeys[harKey].size(); i++)
         {
-            h.add(harmonizerKeys[harKey][i]);
+            if (useShift) h.add(harmonizerKeys[harKey][i] + harShift);
+            else h.add(harmonizerKeys[harKey][i]);
         }
 
         return h;
@@ -397,6 +399,9 @@ public:
 
     inline int getHarKey() { return harKey; }
     inline void setHarKey(int toSet) {harKey = toSet;}
+
+    inline int getHarShift() { return harShift; }
+    inline void setHarShift(int toSet) { harShift = toSet; }
     
 private:
     BKAudioProcessor& processor;
@@ -423,6 +428,7 @@ private:
     bool harmonizerEnabled;
 
     int harKey;
+    int harShift;
     
     bool defaultSelected;
     bool onscreenSelected;

@@ -548,10 +548,28 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                 activeSource = true;
                 if (harmonizer == false)
 				{
-                    Array<int> harmonizer = km->getHarmonizationForKey(noteNumber);
-                    for (int i = 0; i < harmonizer.size(); i++)
+                    if (km->getMidiEdit())
                     {
-                        handleNoteOn(harmonizer[i], velocity, channel, source, true);
+                        km->toggleNote(noteNumber);
+                        //return;
+                    }
+                    else if (km->getHarMidiEdit())
+                    {
+                        km->setHarKey(noteNumber);
+                        //return;
+                    }
+                    else if (km->getHarArrayMidiEdit())
+                    {
+                        km->toggleHarmonizerList(noteNumber);
+                        //return;
+                    }
+                    else
+                    {
+                        Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true);
+                        for (int i = 0; i < harmonizer.size(); i++)
+                        {
+                            handleNoteOn(harmonizer[i], velocity, channel, source, true);
+                        }
                     }
                 }
                 if (km->getAllNotesOff())
@@ -644,7 +662,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
                 activeSource = true;
                 if (harmonizer == false)
                 {
-                    Array<int> harmonizer = km->getHarmonizationForKey(noteNumber);
+                    Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true);
                     for (int i = 0; i < harmonizer.size(); i++)
                     {
                         handleNoteOff(harmonizer[i], velocity, channel, source, true);

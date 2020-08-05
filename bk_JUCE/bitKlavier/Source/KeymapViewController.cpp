@@ -216,7 +216,19 @@ BKViewController(p, theGraph, 2)
     harmonizerMenuButton.addListener(this);
     addAndMakeVisible(harmonizerMenuButton);
 
-    harKey = 60;
+    harTranspositionSlider.setRange(-12, 12, 1);
+    harTranspositionSlider.addListener(this);
+    harTranspositionSlider.setLookAndFeel(&transpositionLaf);
+    harTranspositionSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+    harTranspositionSlider.setTextBoxStyle(Slider::TextBoxLeft, false, 30, 60);
+    harTranspositionSlider.setDoubleClickReturnValue(true, 0); // double-clicking this slider will set it to 0
+    harTranspositionSlider.setValue(0);
+    harTranspositionSlider.setName("HarmonizerShift");
+    harTranspositionSlider.setTooltip("Automatically transpose the harmonization by half-steps");
+
+    addAndMakeVisible(harTranspositionSlider);
+
+    //harKey = 60;
 
     // end second tab stuff
 
@@ -634,6 +646,12 @@ void KeymapViewController::displayTab(int tab)
         harArrayMidiEditToggle.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
         harArrayMidiEditToggle.setVisible(true);
 
+        float harSliderLength = 750;
+        Rectangle<int> harSliderArea = textButtonSlab.removeFromLeft(harSliderLength);
+
+        harTranspositionSlider.setBounds(harSliderArea);
+        harTranspositionSlider.setVisible(true);
+
         /*
         Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
         targetsSlice.removeFromRight(gXSpacing);
@@ -763,6 +781,8 @@ void KeymapViewController::invisible()
     endKeystrokesToggle.setVisible(false);
 
     harmonizerMenuButton.setVisible(false);
+
+    harTranspositionSlider.setVisible(false);
 }
 
 int KeymapViewController::addKeymap(void)
@@ -1508,22 +1528,22 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     }
     else if (source == &harKeyboardState)
     {
-        harKey = midiNoteNumber;
-        thisKeymap->setHarKey(harKey);
+        //harKey = midiNoteNumber;
+        thisKeymap->setHarKey(midiNoteNumber);
 
         update();
 
         BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
-        keyboard->setKeysInKeymap(Array<int>({ harKey }));
+        keyboard->setKeysInKeymap(Array<int>({ midiNoteNumber }));
 
         keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
-        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(harKey));
+        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(midiNoteNumber));
         keyboard->setKeysInKeymap(harmonizationArray);
     }
     else if (source == &harArrayKeyboardState)
     {
-        thisKeymap->toggleHarmonizerList(harKey, midiNoteNumber);
-        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(harKey));
+        thisKeymap->toggleHarmonizerList(midiNoteNumber);
+        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey());
 
         update();
 
@@ -1535,9 +1555,16 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
 }
 
 
-#if JUCE_IOS
+
 void KeymapViewController::sliderValueChanged     (Slider* slider)
 {
+    if (slider == &harTranspositionSlider)
+    {
+        int transposition = (int) harTranspositionSlider.getValue();
+        Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        km->setHarShift(transposition);
+    }
+#if JUCE_IOS
     if (slider == &octaveSlider)
     {
         int octave = (int) octaveSlider.getValue();
@@ -1545,8 +1572,9 @@ void KeymapViewController::sliderValueChanged     (Slider* slider)
         if (octave == 0)    keyboard->setAvailableRange(21, 45);
         else                keyboard->setAvailableRange(12+octave*12, 36+octave*12);
     }
-}
 #endif
+}
+
 
 void KeymapViewController::updateKeymapTargets()
 {
@@ -1709,30 +1737,3 @@ void KeymapViewController::timerCallback(){
     }
 */
 }
-
-
-/*bool KeymapViewController::keyPressed(const KeyPress& e, Component*)
-{
-    int code = e.getKeyCode();
-
-    if (code == 65) // A all
-    {
-        bkButtonClicked(&harMidiEditToggle);
-    }
-    else if (code == 81) // Q
-    {
-        harMidiEditToggle.setToggleState(false, dontSendNotification);
-        harArrayMidiEditToggle.setToggleState(false, dontSendNotification);
-
-        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        keymap->setMidiEdit(midiEditToggle.getToggleState());
-        keymap->setHarMidiEdit(false);
-        keymap->setHarArrayMidiEdit(false);
-        //bkButtonClicked(&harArrayMidiEditToggle);
-    }
-    else if (code == 90) // Z
-    {
-        bkButtonClicked(&midiEditToggle);
-    }
-    return true;
-}*/

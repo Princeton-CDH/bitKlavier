@@ -28,7 +28,8 @@ defaultSelected(false),
 onscreenSelected(true),
 allNotesOff(false),
 harmonizerEnabled(false),
-harKey(60)
+harKey(60),
+harShift(0)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -75,7 +76,8 @@ defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
 allNotesOff(k->getAllNotesOff()),
 harmonizerEnabled(k->getHarmonizerEnabled()),
-harKey(k->getHarKey())
+harKey(k->getHarKey()),
+harShift(k->getHarShift())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -121,7 +123,8 @@ defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
 allNotesOff(k->getAllNotesOff()),
 harmonizerEnabled(false),
-harKey(k->getHarKey())
+harKey(k->getHarKey()),
+harShift(k->getHarShift())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -170,7 +173,8 @@ defaultSelected(false),
 onscreenSelected(true),
 allNotesOff(false),
 harmonizerEnabled(false),
-harKey(60)
+harKey(60),
+harShift(0)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
