@@ -221,12 +221,14 @@ const String ptagBlendronic_targetOpenCloseOutput = "targetTypeBlendronicOpenClo
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";
 const String vtagKeymap_midiInputs = "midiInputs";
+const String vtagKeymap_harmonizer = "harmonizer";
 const String ptagKeymap_key = "k";
 const String ptagKeymap_targetStates = "targetStates";
 const String ptagKeymap_inverted = "inverted";
 const String ptagKeymap_midiInput = "midiInput";
 const String ptagKeymap_defaultSelected = "defSelected";
 const String ptagKeymap_onscreenSelected = "osSelected";
+const String ptagKeymap_harmonizerShift = "harmonizerShift";
 
 
 

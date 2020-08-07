@@ -207,6 +207,19 @@ public:
         }
         keysave.addChild(inputs, -1, 0);
         
+        ValueTree harmonizer(vtagKeymap_harmonizer);
+        int hCount = 0;
+        for (auto arr : getHarmonizerKeys())
+        {
+            ValueTree t("t" + String(hCount++));
+            count = 0;
+            for (auto f : arr) t.setProperty(ptagInt + String(count++), f, 0);
+            harmonizer.addChild(t, -1, 0);
+        }
+        keysave.addChild(harmonizer, -1, 0);
+
+        keysave.setProperty(ptagKeymap_harmonizerShift, harShift, 0);
+        
         keysave.setProperty(ptagKeymap_defaultSelected, defaultSelected, 0);
         
         keysave.setProperty(ptagKeymap_onscreenSelected, onscreenSelected, 0);
@@ -259,8 +272,40 @@ public:
                 
                 setMidiInputSources(inputs);
             }
+            
+            else if (sub->hasTagName(vtagKeymap_harmonizer))
+            {
+                Array<Array<int>> loadedHarmonizer;
+                int hCount = 0;
+                forEachXmlChildElement(*sub, asub)
+                {
+                    if (asub->hasTagName("t" + String(hCount++)))
+                    {
+                        Array<int> harKeys;
+                        int i;
+                        for (int k = 0; k < asub->getNumAttributes(); k++)
+                        {
+                            String attr = asub->getStringAttribute(ptagInt + String(k));
+
+                            if (attr == String()) break;
+                            else
+                            {
+                                i = attr.getIntValue();
+                                harKeys.add(i);
+                            }
+                        }
+                        loadedHarmonizer.set(hCount - 1, harKeys);
+                    }
+                }
+                setHarmonizerKeys(loadedHarmonizer);
+            }
+            
         }
         
+        n = e->getStringAttribute(ptagKeymap_harmonizerShift);
+        if (n != "") harShift = n.getIntValue();
+        else harShift = 0;
+
         n = e->getStringAttribute(ptagKeymap_defaultSelected);
         if (n != "") defaultSelected = n.getIntValue();
         else defaultSelected = true;
@@ -318,6 +363,8 @@ public:
     inline bool getAllNotesOff() { return allNotesOff; }
 
     inline Array<Array<int>> getHarmonizerKeys() { return harmonizerKeys; }
+    inline void setHarmonizerKeys(Array<Array<int>> toSet) { harmonizerKeys = toSet; }
+
     Array<int> getHarmonizationForKey(int key, bool useShift = false)
     { 
         Array<int> h = Array<int>();
@@ -393,9 +440,11 @@ public:
     void defaultHarmonizations();
     void clearHarmonizations();
 
+    /*
     inline bool getHarmonizerEnabled() { return harmonizerEnabled; }
     inline void setHarmonizerEnabled(bool toSet) { harmonizerEnabled = toSet; }
     inline void toggleHarmonizerEnabled() { harmonizerEnabled = !harmonizerEnabled; }
+    */
 
     inline int getHarKey() { return harKey; }
     inline void setHarKey(int toSet) {harKey = toSet;}
@@ -423,9 +472,8 @@ private:
     
     Array<String> midiInputSources;
 
-    //OwnedArray<Array<int>> harmonizerKeys;
     Array<Array<int>> harmonizerKeys;
-    bool harmonizerEnabled;
+    //bool harmonizerEnabled; //functionality has largely been commented out
 
     int harKey;
     int harShift;

@@ -27,7 +27,7 @@ midiInputSources(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true),
 allNotesOff(false),
-harmonizerEnabled(false),
+//harmonizerEnabled(false),
 harKey(60),
 harShift(0)
 {
@@ -75,7 +75,7 @@ midiInputSources(k->getMidiInputSources()),
 defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
 allNotesOff(k->getAllNotesOff()),
-harmonizerEnabled(k->getHarmonizerEnabled()),
+//harmonizerEnabled(k->getHarmonizerEnabled()),
 harKey(k->getHarKey()),
 harShift(k->getHarShift())
 {
@@ -122,7 +122,7 @@ midiInputSources(k->getMidiInputSources()),
 defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
 allNotesOff(k->getAllNotesOff()),
-harmonizerEnabled(false),
+//harmonizerEnabled(false),
 harKey(k->getHarKey()),
 harShift(k->getHarShift())
 {
@@ -172,7 +172,7 @@ midiInputSources(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true),
 allNotesOff(false),
-harmonizerEnabled(false),
+//harmonizerEnabled(false),
 harKey(60),
 harShift(0)
 {
