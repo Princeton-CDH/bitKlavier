@@ -1475,6 +1475,7 @@ void KeymapViewController::update(void)
         keymapTF.setText( intArrayToString(km->keys()));
         harKeymapTF.setText(String(km->getHarKey()));
         harArrayKeymapTF.setText(intArrayToString(km->getHarmonizationForKey()));
+        harTranspositionSlider.setValue(km->getHarShift());
         BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
         keyboard->setKeysInKeymap(km->keys());
         keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();

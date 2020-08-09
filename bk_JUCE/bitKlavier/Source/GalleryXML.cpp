@@ -123,6 +123,15 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 // TODO: why not use keymap setState()?
                 
                 addKeymapWithId(0);
+
+                bkKeymaps.getLast()->setState(e);
+
+                int oldId = bkKeymaps.getLast()->getId();
+                int newId = transformId(PreparationTypeKeymap, oldId);
+
+                bkKeymaps.getLast()->setId(newId);
+
+                /*addKeymapWithId(0);
                 
                 String n = e->getStringAttribute("name");
                 
@@ -186,6 +195,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 
                 String d = e->getStringAttribute(ptagKeymap_defaultSelected);
                 if (d != String()) newKeymap->setDefaultSelected(d.getIntValue());
+                */
             }
             else if (e->hasTagName ( vtagGeneral))
             {

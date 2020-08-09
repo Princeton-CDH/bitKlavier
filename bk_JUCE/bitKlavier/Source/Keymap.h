@@ -209,11 +209,11 @@ public:
         
         ValueTree harmonizer(vtagKeymap_harmonizer);
         int hCount = 0;
-        for (auto arr : getHarmonizerKeys())
+        for (int a = 0; a < 128; a++)
         {
             ValueTree t("t" + String(hCount++));
             count = 0;
-            for (auto f : arr) t.setProperty(ptagInt + String(count++), f, 0);
+            for (auto f : getHarmonizationForKey(a)) t.setProperty(ptagInt + String(count++), f, 0);
             harmonizer.addChild(t, -1, 0);
         }
         keysave.addChild(harmonizer, -1, 0);
@@ -275,7 +275,6 @@ public:
             
             else if (sub->hasTagName(vtagKeymap_harmonizer))
             {
-                Array<Array<int>> loadedHarmonizer;
                 int hCount = 0;
                 forEachXmlChildElement(*sub, asub)
                 {
@@ -294,17 +293,22 @@ public:
                                 harKeys.add(i);
                             }
                         }
-                        loadedHarmonizer.set(hCount - 1, harKeys);
+                        setHarmonizerList(hCount - 1, harKeys);
                     }
                 }
-                setHarmonizerKeys(loadedHarmonizer);
             }
             
         }
         
         n = e->getStringAttribute(ptagKeymap_harmonizerShift);
-        if (n != "") harShift = n.getIntValue();
-        else harShift = 0;
+        if (n != "")
+        {
+            harShift = n.getIntValue();
+        }
+        else
+        {
+            harShift = 0;
+        }
 
         n = e->getStringAttribute(ptagKeymap_defaultSelected);
         if (n != "") defaultSelected = n.getIntValue();
