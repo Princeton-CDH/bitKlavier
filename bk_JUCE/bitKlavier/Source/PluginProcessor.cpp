@@ -1528,12 +1528,10 @@ void BKAudioProcessor::initializeGallery(void)
     {
         piano->configure();
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
-        for (auto bprocessor : piano->getBlendronicProcessors())
-            bprocessor->setActive(false);
+        if (piano != currentPiano)
+            for (auto bprocessor : piano->getBlendronicProcessors())
+                bprocessor->setActive(false);
     }
-    
-    for (auto bprocessor : currentPiano->getBlendronicProcessors())
-        bprocessor->setActive(true);
 
     gallery->prepareToPlay(getSampleRate()); 
     
