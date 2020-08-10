@@ -968,7 +968,7 @@ void SynchronicPreparationEditor::multiSliderDidChange(String name, int whichSli
     }
     
     //processor.updateState->synchronicPreparationDidChange = true;
-
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states)
@@ -1013,6 +1013,8 @@ void SynchronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
         prep    ->setTranspositionStates(states);
         active  ->setTranspositionStates(states);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 /*
@@ -1087,6 +1089,8 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         prep->setNumClusters(val);
         active->setNumClusters(val);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
@@ -1115,6 +1119,8 @@ void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double 
         active->setVelocityMin(minval);
         active->setVelocityMax(maxval);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicPreparationEditor::update(NotificationType notify)
@@ -1237,6 +1243,7 @@ void SynchronicPreparationEditor::BKADSRSliderValueChanged(String name, int atta
     active->setEnvelopeOn(which, true);
     envelopeSliders[which]->setBright();
     
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicPreparationEditor::BKADSRButtonStateChanged(String name, bool shift, bool state)
@@ -1268,6 +1275,8 @@ void SynchronicPreparationEditor::BKADSRButtonStateChanged(String name, bool shi
             envelopeSliders[0]->setButtonToggle(true);
             envelopeSliders[0]->setBright();
         }
+        
+        processor.updateState->editsMade = true;
     }
     else
     {
@@ -1391,6 +1400,8 @@ void SynchronicPreparationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+    
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPreparationEditor* vc)
@@ -1565,6 +1576,8 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             }
         }
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)
@@ -1582,6 +1595,8 @@ void SynchronicPreparationEditor::bkTextFieldDidChange(TextEditor& tf)
         if (selected != selectCB.getNumItems()) selectCB.changeItemText(selected, text);
         selectCB.setSelectedId(selected, dontSendNotification );
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
@@ -1589,6 +1604,8 @@ void SynchronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEdita
     Synchronic::Ptr synchronic = processor.gallery->getSynchronic(processor.updateState->currentSynchronicId);
     
     synchronic->setName(name);
+    
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicPreparationEditor::bkMessageReceived (const String& message)
@@ -1633,6 +1650,7 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
             setShowADSR(envelopeSliders[i]->getName(), false);
         }
         setSubWindowInFront(false);
+        
     }
     else if (b == &rightArrow)
     {
@@ -2021,7 +2039,6 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
     }
     
     updateModification();
-    
 }
 
 void SynchronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states)
@@ -2247,6 +2264,8 @@ void SynchronicModificationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+    
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicModificationEditor* vc)
@@ -2394,6 +2413,8 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         fillMidiOutputSelectCB();
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicModificationEditor::bkTextFieldDidChange(TextEditor& tf)
@@ -2457,6 +2478,7 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {
@@ -2493,6 +2515,8 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
 void SynchronicModificationEditor::updateModification(void)
 {
     processor.updateState->modificationDidChange = true;
+    
+    processor.updateState->editsMade = true;
 }
 
 void SynchronicModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
@@ -2525,7 +2549,3 @@ void SynchronicModificationEditor::BKADSRButtonStateChanged(String name, bool mo
     setShowADSR(name, !state);
     setSubWindowInFront(!state);
 }
-
-
-
-

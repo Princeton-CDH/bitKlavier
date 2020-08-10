@@ -457,6 +457,8 @@ void BlendronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEdita
     Blendronic::Ptr blendronic = processor.gallery->getBlendronic(processor.updateState->currentBlendronicId);
     
     blendronic->setName(name);
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicPreparationEditor::update(void)
@@ -560,6 +562,8 @@ void BlendronicPreparationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicPreparationEditor::actionButtonCallback(int action, BlendronicPreparationEditor* vc)
@@ -677,6 +681,7 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
                 active  ->setTargetTypeBlendronic(KeymapTargetType(i + TargetTypeBlendronicPatternSync), (TargetNoteMode)selectedItem);
             }
         }
+        processor.updateState->editsMade = true;
     }
 }
 
@@ -696,6 +701,8 @@ void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     {
         proc->setDelayBufferSizeInSeconds(val);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicPreparationEditor::fillSelectCB(int last, int current)
@@ -845,6 +852,8 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
         prep    ->setFeedbackCoefficient(whichSlider, values[0]);
         active  ->setFeedbackCoefficient(whichSlider, values[0]);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states)
@@ -889,6 +898,8 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
         prep    ->setFeedbackCoefficientsStates(states);
         active  ->setFeedbackCoefficientsStates(states);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 /*
@@ -933,8 +944,8 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
-
         setSubWindowInFront(false);
+        
     }
     else if (b == &actionButton)
     {
@@ -1317,12 +1328,16 @@ int BlendronicModificationEditor::addPreparation(void)
 {
     processor.gallery->add(PreparationTypeBlendronicMod);
     
+    processor.updateState->editsMade = true;
+    
     return processor.gallery->getBlendronicModifications().getLast()->getId();
 }
 
 int BlendronicModificationEditor::duplicatePreparation(void)
 {
     processor.gallery->duplicate(PreparationTypeBlendronicMod, processor.updateState->currentModBlendronicId);
+    
+    processor.updateState->editsMade = true;
     
     return processor.gallery->getBlendronicModifications().getLast()->getId();
 }
@@ -1344,6 +1359,8 @@ void BlendronicModificationEditor::deleteCurrent(void)
     
     processor.updateState->currentModBlendronicId = -1;
     setCurrentId(-1);
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicModificationEditor::setCurrentId(int Id)
@@ -1357,6 +1374,8 @@ void BlendronicModificationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicModificationEditor::actionButtonCallback(int action, BlendronicModificationEditor* vc)
@@ -1453,6 +1472,8 @@ void BlendronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     if (name == "Blendronic")
     {
         setCurrentId(Id);
+        
+        processor.updateState->editsMade = true;
     }
 }
 
@@ -1466,6 +1487,8 @@ void BlendronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
         mod->setDirty(BlendronicOutGain);
         
         gainSlider->setBright();
+        
+        processor.updateState->editsMade = true;
     }
     
     updateModification();
@@ -1474,6 +1497,8 @@ void BlendronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
 void BlendronicModificationEditor::updateModification(void)
 {
     processor.updateState->modificationDidChange = true;
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicModificationEditor::buttonClicked (Button* b)

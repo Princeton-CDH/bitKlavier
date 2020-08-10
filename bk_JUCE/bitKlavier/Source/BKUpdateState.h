@@ -71,6 +71,7 @@ public:
     
     BKPreparationDisplay currentDisplay = DisplayNil;
     bool displayDidChange;
+    bool editsMade = false;
     
     bool loadedJson = false;
 

@@ -119,7 +119,7 @@ void BKConstructionSite::move(int which, bool fine)
     for (auto item : graph->getSelectedItems())
         item->setTopLeftPosition(item->getX() + changeX, item->getY() + changeY);
     
-    if (!graph->getSelectedItems().isEmpty()) processor.saveGalleryToHistory();
+    if (!graph->getSelectedItems().isEmpty()) processor.saveGalleryToHistory("Move");
     
     repaint();
 }
@@ -146,7 +146,7 @@ void BKConstructionSite::deleteSelected(void)
     
     redraw();
     
-    if (!graph->getSelectedItems().isEmpty()) processor.saveGalleryToHistory();
+    if (!graph->getSelectedItems().isEmpty()) processor.saveGalleryToHistory("Delete");
 }
 
 void BKConstructionSite::align(int which)
@@ -192,7 +192,7 @@ void BKConstructionSite::align(int which)
         if (oldX != item->getX() || oldY != item->getY()) changed = true;
     }
 
-    if (changed) processor.saveGalleryToHistory();
+    if (changed) processor.saveGalleryToHistory("Align");
     
     repaint();
 }
@@ -225,7 +225,7 @@ void BKConstructionSite::makeConnection(int x, int y, bool doAnother)
         
         connect = doAnother;
         
-        if (changed) processor.saveGalleryToHistory();
+        if (changed) processor.saveGalleryToHistory("Connect");
     }
 }
 
@@ -241,7 +241,7 @@ void BKConstructionSite::connectAllSelected()
         }
     }
     
-    if (changed) processor.saveGalleryToHistory();
+    if (changed) processor.saveGalleryToHistory("Connect");
     
     repaint();
 }
@@ -264,7 +264,7 @@ void BKConstructionSite::removeConnectionsTo()
         }
     }
     
-    if (changed) processor.saveGalleryToHistory();
+    if (changed) processor.saveGalleryToHistory("Disconnect");
     
     repaint();
 }
@@ -281,7 +281,7 @@ void BKConstructionSite::removeConnectionsBetween()
         }
     }
     
-    if (changed) processor.saveGalleryToHistory();
+    if (changed) processor.saveGalleryToHistory("Disconnect");
     
     repaint();
 }
@@ -456,7 +456,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     addAndMakeVisible(toAdd);
     toAdd->addMouseListener(this, true);
     
-    processor.saveGalleryToHistory();
+    processor.saveGalleryToHistory("Add");
 }
 
 // This is for adding items that exist in the gallery to the UI
@@ -619,7 +619,7 @@ void BKConstructionSite::paste(bool cursorBasedOffset)
 
     processor.currentPiano->configure();
     
-    processor.saveGalleryToHistory();
+    processor.saveGalleryToHistory("Paste");
     
     redraw();
     
@@ -632,7 +632,7 @@ void BKConstructionSite::cut(void)
         
     copy();
     
-    processor.saveGalleryToHistory();
+    processor.saveGalleryToHistory("Cut");
     
     deleteSelected();
     
@@ -1120,7 +1120,7 @@ void BKConstructionSite::mouseUp (const MouseEvent& eo)
             shouldStore = true;
         }
     }
-    if (shouldStore && e.getDistanceFromDragStart() > 0) processor.saveGalleryToHistory();
+    if (shouldStore && e.getDistanceFromDragStart() > 0) processor.saveGalleryToHistory("Move");
     
     repaint();
 }

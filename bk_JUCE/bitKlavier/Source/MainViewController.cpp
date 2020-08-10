@@ -1042,6 +1042,16 @@ void MainViewController::timerCallback()
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
         
         header.update();
+        
+        if (processor.updateState->currentDisplay != DisplayNil)
+        {
+            processor.updateState->editsMade = false;
+        }
+        else if (processor.updateState->editsMade)
+        {
+            processor.saveGalleryToHistory("Preparation edits");
+        }
+            
     }
     
     levelMeterComponentL->updateLevel(processor.getLevelL());

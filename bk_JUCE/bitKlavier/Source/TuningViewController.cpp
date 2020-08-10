@@ -1274,6 +1274,8 @@ void TuningPreparationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparationEditor* vc)
@@ -1556,6 +1558,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     
     processor.gallery->setGalleryDirty(true);
+    
+    processor.updateState->editsMade = true;
 }
 
 
@@ -1599,6 +1603,8 @@ void TuningPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
     tuning->setName(name);
     
     processor.gallery->setGalleryDirty(true);
+    
+    processor.updateState->editsMade = true;
 }
 
 
@@ -1740,6 +1746,8 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         
     }
     processor.gallery->setGalleryDirty(true);
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningPreparationEditor::sliderValueChanged (Slider* slider)
@@ -1768,6 +1776,8 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
             break;
         }
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -1836,6 +1846,8 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     }
     
     processor.gallery->setGalleryDirty(true);
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningPreparationEditor::buttonClicked (Button* b)
@@ -1871,6 +1883,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {
@@ -2294,6 +2307,8 @@ void TuningModificationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningModificationEditor::actionButtonCallback(int action, TuningModificationEditor* vc)
@@ -2534,6 +2549,8 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     updateComponentVisibility();
     A1reset.setVisible(false);
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
@@ -2708,6 +2725,8 @@ void TuningModificationEditor::updateModification(void)
     highlightModedComponents();
     
     processor.updateState->modificationDidChange = true;
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningModificationEditor::buttonClicked (Button* b)
@@ -2728,6 +2747,7 @@ void TuningModificationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {

@@ -424,6 +424,8 @@ void DirectPreparationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+    
+    processor.updateState->editsMade = true;
 }
 
 void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparationEditor* vc)
@@ -524,6 +526,8 @@ void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         setCurrentId(Id);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
@@ -532,6 +536,8 @@ void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
     direct->setName(name);
     
     fillSelectCB(0, processor.updateState->currentDirectId);
+    
+    processor.updateState->editsMade = true;
 }
 
 void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -559,6 +565,8 @@ void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
         prep->setGain(val);
         active->setGain(val);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
@@ -568,6 +576,8 @@ void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<flo
     
     prep->setTransposition(val);
     active->setTransposition(val);
+    
+    processor.updateState->editsMade = true;
 }
 
 void DirectPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
@@ -585,6 +595,8 @@ void DirectPreparationEditor::BKADSRSliderValueChanged(String name, int attack, 
     active->setSustain(sustain);
     prep->setRelease(release);
     active->setRelease(release);
+    
+    processor.updateState->editsMade = true;
 }
 
 void DirectPreparationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
@@ -643,6 +655,7 @@ void DirectPreparationEditor::buttonClicked (Button* b)
         ADSRSlider->setIsButtonOnly(true);
         setShowADSR(false);
         setSubWindowInFront(false);
+        
     }
     else if (b == &actionButton)
     {
@@ -821,6 +834,8 @@ void DirectModificationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+    
+    processor.updateState->editsMade = true;
 }
 
 void DirectModificationEditor::actionButtonCallback(int action, DirectModificationEditor* vc)
@@ -918,6 +933,8 @@ void DirectModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         setCurrentId(Id);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void DirectModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
@@ -927,6 +944,8 @@ void DirectModificationEditor::BKEditableComboBoxChanged(String name, BKEditable
     mod->setName(name);
     
     updateModification();
+    
+    processor.updateState->editsMade = true;
 }
 
 
@@ -971,7 +990,6 @@ void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<fl
     transpositionSlider->setBright();
     
     updateModification();
-    
 }
 
 void DirectModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
@@ -997,6 +1015,8 @@ void DirectModificationEditor::BKADSRButtonStateChanged(String name, bool mod, b
 void DirectModificationEditor::updateModification(void)
 {
     processor.updateState->modificationDidChange = true;
+    
+    processor.updateState->editsMade = true;
 }
 
 void DirectModificationEditor::buttonClicked (Button* b)
@@ -1004,6 +1024,7 @@ void DirectModificationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {

@@ -60,7 +60,7 @@ PopupMenu BKViewController::getExportedPrepsMenu(BKPreparationType type)
         menu.addItem(i+100, names->getReference(i));
     }
     
-    return menu;
+    return std::move(menu);
 }
 
 PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type, bool singlePrep)
@@ -81,7 +81,7 @@ PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type, bool singl
     optionMenu.addItem(4, "Reset");
     optionMenu.addItem(5, "Clear");
     
-    return optionMenu;
+    return std::move(optionMenu);
 }
 
 PopupMenu BKViewController::getModOptionMenu(BKPreparationType type, bool singleMod)
@@ -98,6 +98,6 @@ PopupMenu BKViewController::getModOptionMenu(BKPreparationType type, bool single
     optionMenu.addSeparator();
     optionMenu.addItem(5, "Reset");
 
-    return optionMenu;
+    return std::move(optionMenu);
 }
 

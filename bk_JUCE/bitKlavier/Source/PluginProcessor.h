@@ -361,7 +361,7 @@ public:
     
 #define UNDO_HISTORY_SIZE 20
     
-    inline void saveGalleryToHistory()
+    inline void saveGalleryToHistory(String actionDesc = String())
     {
         int start = galleryHistory.size() - undoDepth;
         galleryHistory.removeRange(start, undoDepth);
@@ -373,7 +373,7 @@ public:
     inline void resetGalleryHistory()
     {
         galleryHistory.clear();
-        saveGalleryToHistory();
+        saveGalleryToHistory("Root");
     }
     
     inline void undoGallery()

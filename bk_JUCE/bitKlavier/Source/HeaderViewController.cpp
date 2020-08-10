@@ -162,7 +162,7 @@ PopupMenu HeaderViewController::getLoadMenu(void)
         loadMenu.addItem(SOUNDFONT_ID + (i++), sfName);
     }
     
-    return loadMenu;
+    return std::move(loadMenu);
 }
 
 PopupMenu HeaderViewController::getExportedPianoMenu(void)
@@ -175,7 +175,7 @@ PopupMenu HeaderViewController::getExportedPianoMenu(void)
         menu.addItem(i+100, names[i]);
     }
     
-    return menu;
+    return std::move(menu);
 }
 
 PopupMenu HeaderViewController::getPianoMenu(void)
@@ -193,7 +193,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     PopupMenu exported = getExportedPianoMenu();
     pianoMenu.addSubMenu("Import...", exported);
     
-    return pianoMenu;
+    return std::move(pianoMenu);
 }
 
 PopupMenu HeaderViewController::getGalleryMenu(void)
@@ -262,7 +262,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(ABOUT_ID, "About bitKlavier...");
     
-    return galleryMenu;
+    return std::move(galleryMenu);
     
 }
 

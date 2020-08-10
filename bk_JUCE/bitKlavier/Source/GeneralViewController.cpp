@@ -293,6 +293,7 @@ void GeneralViewController::bkButtonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &invertSustainB)
     {

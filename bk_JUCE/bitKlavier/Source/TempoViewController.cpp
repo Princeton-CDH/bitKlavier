@@ -403,6 +403,8 @@ void TempoPreparationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+    
+    processor.updateState->editsMade = true;
 }
 
 void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEditor* vc)
@@ -519,6 +521,8 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
         active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 
@@ -526,6 +530,8 @@ void TempoPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableCo
 {
     Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
     tempo->setName(name);
+    
+    processor.updateState->editsMade = true;
 }
 
 void TempoPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
@@ -540,6 +546,8 @@ void TempoPreparationEditor::BKRangeSliderValueChanged(String name, double minva
         active->setAdaptiveTempo1Min(minval);
         active->setAdaptiveTempo1Max(maxval);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void TempoPreparationEditor::update(void)
@@ -594,6 +602,7 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, 
         active->setAdaptiveTempo1Subdivisions(val);
     }
     
+    processor.updateState->editsMade = true;
 }
 
 void TempoPreparationEditor::buttonClicked (Button* b)
@@ -608,6 +617,7 @@ void TempoPreparationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {
@@ -776,6 +786,8 @@ void TempoModificationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
+    
+    processor.updateState->editsMade = true;
 }
 
 void TempoModificationEditor::actionButtonCallback(int action, TempoModificationEditor* vc)
@@ -893,6 +905,7 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name != selectCB.getName()) updateModification();
     
+    processor.updateState->editsMade = true;
 }
 
 
@@ -959,6 +972,7 @@ void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
 void TempoModificationEditor::updateModification(void)
 {
     processor.updateState->modificationDidChange = true;
+    processor.updateState->editsMade = true;
 }
 
 void TempoModificationEditor::buttonClicked (Button* b)
@@ -970,6 +984,7 @@ void TempoModificationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {

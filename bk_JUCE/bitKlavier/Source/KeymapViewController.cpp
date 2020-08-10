@@ -597,7 +597,7 @@ PopupMenu KeymapViewController::getPitchClassMenu(int offset)
         menu.addItem(Id, pcs[i]);
     }
     
-    return menu;
+    return std::move(menu);
 }
 
 PopupMenu KeymapViewController::getKeysMenu(void)
@@ -622,7 +622,7 @@ PopupMenu KeymapViewController::getKeysMenu(void)
     menu.addSubMenu("Natural Minor", getPitchClassMenu((KeySet) ID(KeySetNaturalMinor)));
     menu.addSubMenu("Harmonic Minor", getPitchClassMenu((KeySet) ID(KeySetHarmonicMinor)));
     
-    return menu;
+    return std::move(menu);
 }
 
 void KeymapViewController::midiInputSelectCallback(int result, KeymapViewController* vc)
@@ -721,7 +721,7 @@ PopupMenu KeymapViewController::getTargetsMenu()
         }
     }
     if (menu.getNumItems() == 0) menu.addItem(-1, "No targets available", false);
-    return menu;
+    return std::move(menu);
 }
 
 void KeymapViewController::fillSelectCB(int last, int current)
@@ -781,7 +781,7 @@ PopupMenu KeymapViewController::getMidiInputSelectMenu()
             menu.addItem(PopupMenu::Item(device.name).setID(++id).setTicked(true));
         else menu.addItem(PopupMenu::Item(device.name).setID(++id));
     }
-    return menu;
+    return std::move(menu);
 }
 
 void KeymapViewController::bkButtonClicked (Button* b)
@@ -791,6 +791,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setMidiEdit(false);
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
