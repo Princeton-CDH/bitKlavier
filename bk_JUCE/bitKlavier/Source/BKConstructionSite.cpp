@@ -140,13 +140,14 @@ void BKConstructionSite::deleteSelected(void)
         deleteItem(selectedItems[i]);
     }
     
+    if (selectedItems.size() == 1) processor.saveGalleryToHistory("Delete " + cPreparationNames[selectedItems[0]->getType()]);
+    else if (selectedItems.size() > 1) processor.saveGalleryToHistory("Delete Multiple");
+    
     lassoSelection.deselectAll();
     
     selectedItems.clear();
     
     redraw();
-    
-    if (!graph->getSelectedItems().isEmpty()) processor.saveGalleryToHistory("Delete");
 }
 
 void BKConstructionSite::align(int which)
@@ -225,7 +226,8 @@ void BKConstructionSite::makeConnection(int x, int y, bool doAnother)
         
         connect = doAnother;
         
-        if (changed) processor.saveGalleryToHistory("Connect");
+        if (changed) processor.saveGalleryToHistory("Connect " + cPreparationNames[itemSource->getType()] +
+                                                    " to " + cPreparationNames[itemTarget->getType()]);
     }
 }
 
@@ -241,7 +243,7 @@ void BKConstructionSite::connectAllSelected()
         }
     }
     
-    if (changed) processor.saveGalleryToHistory("Connect");
+    if (changed) processor.saveGalleryToHistory("Connect Selected");
     
     repaint();
 }
@@ -264,7 +266,7 @@ void BKConstructionSite::removeConnectionsTo()
         }
     }
     
-    if (changed) processor.saveGalleryToHistory("Disconnect");
+    if (changed) processor.saveGalleryToHistory("Remove Connections To Selected");
     
     repaint();
 }
@@ -281,7 +283,7 @@ void BKConstructionSite::removeConnectionsBetween()
         }
     }
     
-    if (changed) processor.saveGalleryToHistory("Disconnect");
+    if (changed) processor.saveGalleryToHistory("Remove Connections Between Selected");
     
     repaint();
 }
@@ -456,7 +458,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
     addAndMakeVisible(toAdd);
     toAdd->addMouseListener(this, true);
     
-    processor.saveGalleryToHistory("Add");
+    processor.saveGalleryToHistory("Add " + cPreparationNames[type]);
 }
 
 // This is for adding items that exist in the gallery to the UI
@@ -776,11 +778,11 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     }
     else if (result == UNDO_ID)
     {
-        processor.undoGallery();
+        ((MainViewController*)vc->getParentComponent())->performUndo();
     }
     else if (result == REDO_ID)
     {
-        processor.redoGallery();
+        ((MainViewController*)vc->getParentComponent())->performRedo();
     }
     
     // EDIT

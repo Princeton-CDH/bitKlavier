@@ -86,6 +86,8 @@ void CommentViewController::bkButtonClicked (Button* b)
 {
     if (b == &ok)
     {
+        if (processor.updateState->comment != comment.getText())
+            processor.updateState->editsMade = true;
         processor.updateState->comment = comment.getText();
         processor.updateState->commentDidChange = true;
         processor.updateState->setCurrentDisplay(DisplayNil);

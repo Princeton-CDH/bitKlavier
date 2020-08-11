@@ -350,6 +350,27 @@ static const std::vector<std::string> cPreparationTypes = {
     "BlendronicMod"
 };
 
+static const std::vector<std::string> cPreparationNames = {
+    "Direct",
+    "Synchronic",
+    "Nostalgic",
+    "Tuning",
+    "Tempo",
+    "Keymap",
+    "Direct Mod",
+    "Synchronic Mod",
+    "Nostalgic Mod",
+    "Tuning Mod",
+    "Tempo Mod",
+    "Generic Mod",
+    "Piano Map",
+    "Reset",
+    "Piano",
+    "Comment",
+    "Blendronic",
+    "Blendronic Mod"
+};
+
 typedef enum BKPreparationDisplay {
     DisplayDirect = 0,
     DisplaySynchronic,
@@ -378,10 +399,17 @@ static const std::vector<std::string> cDisplayNames = {
     "Nostalgic",
     "Tuning",
     "Tempo",
-	"Blendronic",
     "Keymap",
-    "General"
-
+    "Direct Mod",
+    "Synchronic Mod",
+    "Nostalgic Mod",
+    "Tuning Mod",
+    "Tempo Mod",
+    "General",
+    "About",
+    "Comment",
+	"Blendronic",
+    "Blendronic Mod"
 };
 
 

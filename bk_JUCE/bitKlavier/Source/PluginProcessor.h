@@ -359,13 +359,15 @@ public:
     Array<ValueTree> galleryHistory;
     int undoDepth;
     
-#define UNDO_HISTORY_SIZE 20
+#define UNDO_HISTORY_SIZE 100
     
     inline void saveGalleryToHistory(String actionDesc = String())
     {
         int start = galleryHistory.size() - undoDepth;
         galleryHistory.removeRange(start, undoDepth);
-        galleryHistory.add(gallery->getState());
+        ValueTree galleryVT = gallery->getState();
+        galleryVT.setProperty("actionDesc", actionDesc, 0);
+        galleryHistory.add(galleryVT);
         if (galleryHistory.size() > UNDO_HISTORY_SIZE) galleryHistory.remove(0);
         undoDepth = 0;
     }
@@ -376,18 +378,23 @@ public:
         saveGalleryToHistory("Root");
     }
     
-    inline void undoGallery()
+    inline String undoGallery()
     {
-        if (undoDepth >= galleryHistory.size() - 1) return;
+        if (undoDepth >= galleryHistory.size() - 1) return String();
+        ValueTree prevGalleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth);
         undoDepth++;
-        loadGalleryFromXml(galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).createXml().get(), false);
+        ValueTree galleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth);
+        loadGalleryFromXml(galleryVT.createXml().get(), false);
+        return "Undo " + prevGalleryVT.getProperty("actionDesc").toString();
     }
     
-    inline void redoGallery()
+    inline String redoGallery()
     {
-        if (undoDepth == 0) return;
+        if (undoDepth == 0) return String();
         undoDepth--;
+        ValueTree galleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth);
         loadGalleryFromXml(galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).createXml().get(), false);
+        return "Redo " + galleryVT.getProperty("actionDesc").toString();
     }
     
 private:

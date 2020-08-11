@@ -400,6 +400,8 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
             setPianoTarget(pianoId);
             
             processor.currentPiano->configure();
+            
+            processor.saveGalleryToHistory("Piano Map Selection");
         }
     }
 }

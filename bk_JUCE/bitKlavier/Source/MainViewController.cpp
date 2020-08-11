@@ -143,6 +143,10 @@ globalSoundSetButton("Use global samples")
         tipwindow = nullptr;
     }
     
+//    undoStatus.setLookAndFeel(&laf);
+    addChildComponent(undoStatus);
+    undoStatusCount = 0;
+    
     // fill menus
     processor.collectGalleries();
     processor.collectPreparations();
@@ -156,7 +160,7 @@ globalSoundSetButton("Use global samples")
     setWantsKeyboardFocus(true);
     addKeyListener(this);
     
-    startTimerHz (10);
+    startTimerHz (MVC_REFRESH_RATE);
 }
 
 MainViewController::~MainViewController()
@@ -180,6 +184,7 @@ MainViewController::~MainViewController()
     mainSlider.setLookAndFeel(nullptr);
     overtop.setLookAndFeel(nullptr);
     tooltipsButton.setLookAndFeel(nullptr);
+    undoStatus.setLookAndFeel(nullptr);
     globalSoundSetButton.setLookAndFeel(nullptr);
     //preferencesButton.setLookAndFeel(nullptr);
     keyboardComponent = nullptr;
@@ -302,7 +307,8 @@ void MainViewController::resized()
     area.reduce(2, 2);
     construction.setBounds(area);
     
-    
+    undoStatus.setFont(undoStatus.getFont().withHeight(area.getHeight() * 0.05f));
+    undoStatus.setBounds(area.getX() + gXSpacing, area.getY() + gXSpacing, area.getWidth() * 0.5,  undoStatus.getFont().getHeight());
 
     if (display == DisplayKeyboard)
     {
@@ -685,14 +691,14 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
     }
     else if (code == 90) // Z
     {
-        if (display == DisplayDefault)
+        if (processor.updateState->currentDisplay == DisplayNil)
         {
             if (e.getModifiers().isCommandDown())
             {
                 if (e.getModifiers().isShiftDown())
-                    processor.redoGallery();
+                    performRedo();
                 else
-                    processor.undoGallery();
+                    performUndo();
             }
         }
     }
@@ -841,6 +847,22 @@ void MainViewController::fillInstrumentCB()
     
 }
 
+void MainViewController::performUndo()
+{
+    String action = processor.undoGallery();
+    if (action == String()) return;
+    undoStatus.setText(action, dontSendNotification);
+    undoStatusCount = MVC_REFRESH_RATE * 2;
+}
+
+void MainViewController::performRedo()
+{
+    String action = processor.redoGallery();
+    if (action == String()) return;
+    undoStatus.setText(action, dontSendNotification);
+    undoStatusCount = MVC_REFRESH_RATE * 2;
+}
+
 
 void MainViewController::timerCallback()
 {
@@ -855,8 +877,16 @@ void MainViewController::timerCallback()
         tipwindow = nullptr;
     }
     
+    if (undoStatusCount > 0)
+    {
+        undoStatus.setVisible(true);
+        undoStatus.setAlpha(undoStatusCount / (float) MVC_REFRESH_RATE);
+        undoStatusCount--;
+    }
+    else undoStatus.setVisible(false);
+    
     // update menu contents periodically
-    if (++timerCallbackCount >= 10)
+    if (++timerCallbackCount >= MVC_REFRESH_RATE)
     {
         timerCallbackCount = 0;
         processor.collectGalleries();
@@ -1039,6 +1069,8 @@ void MainViewController::timerCallback()
     {
         state->displayDidChange = false;
         
+        BKPreparationDisplay prevDisplay = overtop.getCurrentDisplay();
+        
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
         
         header.update();
@@ -1049,7 +1081,7 @@ void MainViewController::timerCallback()
         }
         else if (processor.updateState->editsMade)
         {
-            processor.saveGalleryToHistory("Preparation edits");
+            processor.saveGalleryToHistory(cDisplayNames[prevDisplay] + " Edits");
         }
             
     }

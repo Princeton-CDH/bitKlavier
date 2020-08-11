@@ -1031,7 +1031,9 @@ ValueTree Piano::getState(void)
             itemVT.addChild(connectionsVT, -1, 0);
             pianoVT.addChild(itemVT, -1, 0);
         }
-        else if (type == PreparationTypeComment)
+        else if (type == PreparationTypeComment ||
+                 type == PreparationTypeGenericMod ||
+                 type == PreparationTypePianoMap)
         {
             itemVT.addChild(item->getState(), -1, 0);
             
