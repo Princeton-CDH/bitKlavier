@@ -350,6 +350,16 @@ void MainViewController::resized()
     {
         construction.setVisible(true);
         
+        Rectangle<int> sampleCBSlice = area.removeFromBottom(area.getHeight() * 0.1);
+        int width = sampleCBSlice.getWidth() * 0.25;
+        sampleCBSlice.removeFromLeft(width);
+        sampleCB.setBounds(sampleCBSlice.removeFromLeft(width));
+        instrumentCB.setBounds(sampleCBSlice.removeFromLeft(width));
+        globalSoundSetButton.setBounds(sampleCBSlice.removeFromLeft(width*0.5));
+        sampleCB.toFront(false);
+        instrumentCB.toFront(false);
+        globalSoundSetButton.toFront(false);
+        
         octaveSlider.setVisible(false);
         keyboardComponent->setVisible(false);
     }
@@ -791,12 +801,8 @@ void MainViewController::fillSampleCB()
     if (idx < 0) idx = processor.globalSoundSetId;
     
     String name;
-#if JUCE_WINDOWS
-    name = processor.loadedSoundSets[idx].fromLastOccurrenceOf("\\", false, true).upToFirstOccurrenceOf(".sf", false, true);
-#else
-    name = processor.loadedSoundSets[idx].fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
-#endif
 
+    name = processor.loadedSoundSets[idx].fromLastOccurrenceOf(File::getSeparatorString(), false, true).upToFirstOccurrenceOf(".sf", false, true);
     
     sampleCB.clear(dontSendNotification);
 
@@ -818,13 +824,10 @@ void MainViewController::fillSampleCB()
     int id = 5;
     for (auto sf : processor.soundfontNames)
     {
-		//windows paths
 		String sfname;
-#if JUCE_WINDOWS
-		sfname = sf.fromLastOccurrenceOf("\\", false, true).upToFirstOccurrenceOf(".sf", false, true);
-#else
-        sfname = sf.fromLastOccurrenceOf("/", false, true).upToFirstOccurrenceOf(".sf", false, true);
-#endif
+
+		sfname = sf.fromLastOccurrenceOf(File::getSeparatorString(), false, true).upToFirstOccurrenceOf(".sf", false, true);
+
         sampleCB.addItem(sfname, id);
         
         if (sfname == name)

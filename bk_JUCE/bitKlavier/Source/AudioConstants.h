@@ -157,7 +157,6 @@ const String vtagDirect_ADSR = "ADSR";
 const String ptagDirect_useGlobalSoundSet = "directUseGlobalSoundSet";
 const String ptagDirect_soundSet = "directSoundSet";
 
-
 const String vtagTuning = "tuning";
 const String vtagModTuning = "modTuning";
 const String ptagTuning_Id = "Id";
@@ -220,12 +219,14 @@ const String ptagBlendronic_targetOpenCloseOutput = "targetTypeBlendronicOpenClo
 
 const String vtagKeymaps = "keymaps";
 const String vtagKeymap =  "keymap";
-const String vtagKeymap_midiInputs = "midiInputs";
 const String vtagKeymap_harmonizer = "harmonizer";
+const String vtagKeymap_midiInputNames = "midiInputs";
+const String vtagKeymap_midiInputIdentifiers = "midiInputIdentifiers";
 const String ptagKeymap_key = "k";
 const String ptagKeymap_targetStates = "targetStates";
 const String ptagKeymap_inverted = "inverted";
-const String ptagKeymap_midiInput = "midiInput";
+const String ptagKeymap_midiInputName = "midiInput";
+const String ptagKeymap_midiInputIdentifier = "midiInputIdentifier";
 const String ptagKeymap_defaultSelected = "defSelected";
 const String ptagKeymap_onscreenSelected = "osSelected";
 const String ptagKeymap_harmonizerShift = "harmonizerShift";

@@ -578,13 +578,19 @@ private:
         }
         
         // update the processor's default midi input source list based on what's selected in settings
-        Array<String> sources;
+        Array<String> names;
+        Array<String> identifiers;
+        
         for (auto device : newMidiDevices)
         {
             if (deviceManager.isMidiInputDeviceEnabled(device.identifier))
-                sources.add(device.name);
+            {
+                names.add(device.name);
+                identifiers.add(device.identifier);
+            }
         }
-        processor->setDefaultMidiInputSources(sources);
+        processor->setDefaultMidiInputNames(names);
+        processor->setDefaultMidiInputIdentifiers(identifiers);
         
         saveAudioDeviceState();
     }

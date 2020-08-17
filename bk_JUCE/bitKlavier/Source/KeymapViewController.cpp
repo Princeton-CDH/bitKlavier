@@ -1052,9 +1052,12 @@ void KeymapViewController::midiInputSelectCallback(int result, KeymapViewControl
     }
     else
     {
-        String deviceName = processor.getMidiInputDevices()[result-3].name;
-        if (keymap->getMidiInputSources().contains(deviceName)) keymap->removeMidiInputSource(deviceName);
-        else keymap->addMidiInputSource(deviceName);
+        MidiDeviceInfo device = processor.getMidiInputDevices()[result-3];
+        if (keymap->getMidiInputIdentifiers().contains(device.identifier))
+        {
+            keymap->removeMidiInputSource(device);
+        }
+        else keymap->addMidiInputSource(device);
     }
 
     vc->getMidiInputSelectMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->midiInputSelectButton), ModalCallbackFunction::forComponent(midiInputSelectCallback, vc));
@@ -1183,7 +1186,7 @@ PopupMenu KeymapViewController::getMidiInputSelectMenu()
     
     for (auto device : processor.getMidiInputDevices())
     {
-        if (keymap->getMidiInputSources().contains(device.name))
+        if (keymap->getMidiInputIdentifiers().contains(device.identifier))
             menu.addItem(PopupMenu::Item(device.name).setID(++id).setTicked(true));
         else menu.addItem(PopupMenu::Item(device.name).setID(++id));
     }

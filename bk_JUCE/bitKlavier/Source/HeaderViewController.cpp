@@ -147,6 +147,8 @@ PopupMenu HeaderViewController::getLoadMenu(void)
     loadMenu.addItem(SF_DEFAULT_2, "Drums", true, false);
     loadMenu.addItem(SF_DEFAULT_3, "Saw", true, false);
     loadMenu.addItem(SF_DEFAULT_4, "Electric Bass", true, false);
+    loadMenu.addItem(SF_DEFAULT_5, "Acoustic Kit", true, false);
+    loadMenu.addItem(SF_DEFAULT_6, "Organ", true, false);
     
     loadMenu.addSeparator();
     
@@ -626,7 +628,7 @@ void HeaderViewController::loadDefaultGalleries(void)
         
         int size;
         
-        PopupMenu mikroetudes_menu, ns_etudes_menu, bk_examples_menu;
+        PopupMenu mikroetudes_menu, ns_etudes_menu, bk_examples_menu, machines_menu;
         
         //data = BinaryData::Basic_Piano_xml;
         for (int i = 0; i < BinaryData::namedResourceListSize; i++)
@@ -639,10 +641,11 @@ void HeaderViewController::loadDefaultGalleries(void)
                 
                 name = data.fromFirstOccurrenceOf("<gallery name=\"", false, true).upToFirstOccurrenceOf("\"", false, true);
 
-                if (processor.mikroetudes.contains(name))       mikroetudes_menu.addItem(id++, name);
-                else if (processor.ns_etudes.contains(name))    ns_etudes_menu.addItem(id++, name);
-                else if (processor.bk_examples.contains(name))  bk_examples_menu.addItem(id++, name);
-                else                                            galleryCB.addItem(name, id++);
+                if (processor.mikroetudes.contains(name))                   mikroetudes_menu.addItem(id++, name);
+                else if (processor.ns_etudes.contains(name))                ns_etudes_menu.addItem(id++, name);
+                else if (processor.bk_examples.contains(name))              bk_examples_menu.addItem(id++, name);
+                else if (processor.machines_for_listening.contains(name))   machines_menu.addItem(id++, name);
+                else                                                        galleryCB.addItem(name, id++);
                 
             }
         }
@@ -650,13 +653,14 @@ void HeaderViewController::loadDefaultGalleries(void)
         popupRoot->addSubMenu("Examples", bk_examples_menu);
         popupRoot->addSubMenu("Nostalgic Synchronic", ns_etudes_menu);
         popupRoot->addSubMenu("Mikroetudes", mikroetudes_menu);
+        popupRoot->addSubMenu("Machines for Listening", machines_menu);
         
         galleryCB.addSeparator();
         
         numberOfDefaultGalleryItems = galleryCB.getNumItems();
     }
 }
-
+#if (!JUCE_IOS)
 void HeaderViewController::fillGalleryCB(void)
 {
     if (processor.gallery == nullptr) return;
@@ -665,16 +669,16 @@ void HeaderViewController::fillGalleryCB(void)
     {
         loadDefaultGalleries();
         
-        File bkGalleries;
+        // File bkGalleries;
         
-        File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
+        // File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
         
 #if (JUCE_MAC)
-        bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+        // bkGalleries = bkGalleries.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 		char divChar = '/';
 #endif
 #if (JUCE_WINDOWS || JUCE_LINUX)
-        bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
+        // bkGalleries = bkGalleries.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
 		char divChar = '\\';
 #endif
         
@@ -682,7 +686,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         int id = numberOfDefaultGalleryItems, index = 0;
         
-		StringArray nameStack; // used for naviagting between levels of submenu during loading
+		StringArray nameStack; //used for naviagting between levels of submenu during loading
 		OwnedArray<PopupMenu> submenus; //2d arrray of submenus modelling the recursive depth of submenu connections
 		StringArray submenuNames; //lists the submenu names so far; used to check against 
 		OwnedArray<Array<int>> parentIds; //2d int array used to record recursive depth of indices for parent menus
@@ -789,6 +793,90 @@ void HeaderViewController::fillGalleryCB(void)
         galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
     }
 }
+
+#else //now IOS
+void HeaderViewController::fillGalleryCB(void)
+{
+    if (processor.gallery == nullptr) return;
+    
+    if(!galleryModalCallBackIsOpen)
+    {
+        loadDefaultGalleries();
+        
+        File bkGalleries;
+        File moreGalleries = File::getSpecialLocation(File::userDocumentsDirectory);
+ 
+        PopupMenu* galleryCBPopUp = galleryCB.getRootMenu();
+        
+        int id = numberOfDefaultGalleryItems, index = 0;
+        bool creatingSubmenu = false;
+        String submenuName;
+        
+        StringArray submenuNames;
+        OwnedArray<PopupMenu> submenus;
+        
+        for (int i = 0; i < processor.galleryNames.size(); i++)
+        {
+            File thisFile(processor.galleryNames[i]);
+            
+            String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
+            
+            //moving on to new submenu, if there is one, add add last submenu to popup now that it's done
+            if(creatingSubmenu && thisFile.getParentDirectory().getFileName() != submenuName)
+            {
+                galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
+                creatingSubmenu = false;
+            }
+            
+            //add toplevel item, if there is one
+            if(thisFile.getParentDirectory().getFileName() == bkGalleries.getFileName() ||
+               thisFile.getParentDirectory().getFileName() == moreGalleries.getFileName() ||
+               thisFile.getParentDirectory().getFileName() == moreGalleries.getChildFile("Inbox").getFileName()) //if the file is in the main galleries directory....
+            {
+                galleryCB.addItem(galleryName, ++id); //add to toplevel popup
+            }
+            
+            //otherwise add to or create submenu with name of subfolder
+            else
+            {
+                creatingSubmenu = true;
+                
+                submenuName = thisFile.getParentDirectory().getFileName(); //name of submenu
+                
+                if(submenuNames.contains(submenuName)) //add to existing submenu
+                {
+                    PopupMenu* existingMenu = submenus.getUnchecked(submenuNames.indexOf(submenuName));
+                    existingMenu->addItem(++id, galleryName);
+                }
+                else
+                {
+                    submenus.add(new PopupMenu());
+                    submenuNames.add(submenuName);
+                    
+                    submenus.getLast()->addItem(++id, galleryName);;
+                }
+            }
+            
+            if (thisFile.getFileName() == processor.currentGallery)
+            {
+                index = i;
+                lastGalleryCBId = id;
+            }
+        }
+        
+        //add last submenu to popup, if there is one
+        if(creatingSubmenu)
+        {
+            galleryCBPopUp->addSubMenu(submenuName, *submenus.getLast());
+            creatingSubmenu = false;
+        }
+        
+        // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
+        galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
+        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
+    }
+}
+#endif
 
 void HeaderViewController::update(void)
 {

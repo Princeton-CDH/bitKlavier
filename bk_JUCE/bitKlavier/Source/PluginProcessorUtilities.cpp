@@ -36,7 +36,6 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         if (!path.startsWith("default.sf"))
         {
             File file(path);
-            
             if (!file.exists())
             {
                 type = BKLoadLite;
@@ -152,6 +151,8 @@ void BKAudioProcessor::collectSoundfonts(void)
     File bkSoundfonts;
     
 #if JUCE_IOS
+    bkSoundfonts = File::getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
+    collectSoundfontsFromFolder(bkSoundfonts);
     bkSoundfonts = File::getSpecialLocation (File::userDocumentsDirectory);
 #endif
 #if JUCE_MAC

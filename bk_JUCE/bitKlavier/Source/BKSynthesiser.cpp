@@ -128,39 +128,39 @@ int BKSynthesiser::loadSamples(BKSampleLoadType type, String path, int subsound,
 
 BKSynthesiserVoice* BKSynthesiser::getVoice (const int index) const
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     return voices [index];
 }
 
 void BKSynthesiser::clearVoices()
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     voices.clear();
 }
 
-BKSynthesiserVoice* BKSynthesiser::addVoice (BKSynthesiserVoice* const newVoice)
+BKSynthesiserVoice* BKSynthesiser::addVoice (const BKSynthesiserVoice::Ptr& newVoice)
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     newVoice->setCurrentPlaybackSampleRate (processor.getCurrentSampleRate());
     return voices.add (newVoice);
 }
 
 void BKSynthesiser::removeVoice (const int index)
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     voices.remove (index);
 }
 
 void BKSynthesiser::clearSounds(int set)
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     if (soundSets.size() - 1 < set) return;
     soundSets.getUnchecked(set)->clear();
 }
 
 BKSynthesiserSound* BKSynthesiser::addSound (int set, const BKSynthesiserSound::Ptr& newSound)
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     while (soundSets.size() - 1 < set)
     {
 //        soundSets.insertMultiple(soundSets.size(), ReferenceCountedArray<BKSynthesiserSound>(), set - (soundSets.size() - 1));
@@ -172,7 +172,7 @@ BKSynthesiserSound* BKSynthesiser::addSound (int set, const BKSynthesiserSound::
 
 void BKSynthesiser::removeSound (int set, const int index)
 {
-    const ScopedLock sl (lock);
+    //const ScopedLock sl (lock);
     soundSets.getUnchecked(set)->remove (index);
 }
 

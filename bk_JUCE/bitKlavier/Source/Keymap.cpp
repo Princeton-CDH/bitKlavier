@@ -23,7 +23,8 @@ harMidiEdit(false),
 harArrayMidiEdit(false),
 inverted(false),
 triggered(false),
-midiInputSources(Array<String>()),
+midiInputNames(Array<String>()),
+midiInputIdentifiers(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true),
 allNotesOff(false),
@@ -71,7 +72,8 @@ midiEdit(false),
 harMidiEdit(false),
 harArrayMidiEdit(false),
 inverted(false),
-midiInputSources(k->getMidiInputSources()),
+midiInputNames(k->getMidiInputNames()),
+midiInputIdentifiers(k->getMidiInputIdentifiers()),
 defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
 allNotesOff(k->getAllNotesOff()),
@@ -118,7 +120,8 @@ midiEdit(false),
 harMidiEdit(false),
 harArrayMidiEdit(false),
 inverted(false),
-midiInputSources(k->getMidiInputSources()),
+midiInputNames(k->getMidiInputNames()),
+midiInputIdentifiers(k->getMidiInputIdentifiers()),
 defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
 allNotesOff(k->getAllNotesOff()),
@@ -168,7 +171,8 @@ midiEdit(false),
 harMidiEdit(false),
 harArrayMidiEdit(false),
 inverted(false),
-midiInputSources(Array<String>()),
+midiInputNames(Array<String>()),
+midiInputIdentifiers(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true),
 allNotesOff(false),
@@ -501,13 +505,23 @@ void Keymap::clearTargets()
     }
 }
 
-const Array<String> Keymap::getAllMidiInputSources()
+const Array<String> Keymap::getAllMidiInputNames()
 {
     Array<String> sources;
-    sources.addArray(midiInputSources);
+    sources.addArray(midiInputNames);
     sources.add(cMidiInputDAW);
     if (onscreenSelected) sources.add(cMidiInputUI);
-    if (defaultSelected) sources.addArray(processor.getDefaultMidiInputSources());
+    if (defaultSelected) sources.addArray(processor.getDefaultMidiInputNames());
+    return sources;
+}
+
+const Array<String> Keymap::getAllMidiInputIdentifiers()
+{
+    Array<String> sources;
+    sources.addArray(midiInputIdentifiers);
+    sources.add(cMidiInputDAW);
+    if (onscreenSelected) sources.add(cMidiInputUI);
+    if (defaultSelected) sources.addArray(processor.getDefaultMidiInputIdentifiers());
     return sources;
 }
 

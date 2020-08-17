@@ -29,15 +29,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     formatManager.registerBasicFormats();
     
     String ext = sfzFile.getFileExtension();
-    
-    synth->clearVoices();
-//    synth->clearSounds(0);
-    
-    for (int i = 0; i < 300; ++i)
-    {
-        synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
-    }
-    
+   
     EXIT_CHECK;
     
     bool isSF2 = false;
@@ -216,17 +208,21 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
             switch (which)
             {
                 case 0:
-                    file = file.getChildFile("rhodes.sf2"); break;
+                    file = file.getChildFile("jRhodes3b-stereo.sf2"); break;
                 case 1:
-                    file = file.getChildFile("harpsichord.sf2"); break;
+                    file = file.getChildFile("Blanchet-1720.sf2"); break;
                 case 2:
-                    file = file.getChildFile("kikazdrums.sf2"); break;
+                    file = file.getChildFile("1276-The KiKaZ DrUmZ.sf2"); break;
                 case 3:
-                    file = file.getChildFile("saw.sf2"); break;
+                    file = file.getChildFile("SCC Saw 1.sf2"); break;
                 case 4:
                     file = file.getChildFile("ebass").getChildFile("Electric Bass.sfz"); break;
+                case 5 :
+                    file = file.getChildFile("acoust_kits_1-4.sf2"); break;
+                case 6 :
+                    file = file.getChildFile("Orgue de salon.sf2"); break;
                 default:
-                    file = file.getChildFile("saw.sf2"); break;
+                    file = file.getChildFile("SCC Saw 1.sf2"); break;
             }
             
             loadSoundfontFromFile(file);
@@ -288,9 +284,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.mainPianoSynth;
-    
+
     File bkSamples;
-    
+
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
 #endif
@@ -300,20 +296,13 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
 #if JUCE_LINUX || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
 #endif
-    
+
     int numLayers = 0;
-    
-    if      (type == BKLoadLitest)      numLayers = 1;
+
+    if (type == BKLoadLitest)      numLayers = 1;
     else if (type == BKLoadLite)        numLayers = 2;
     else if (type == BKLoadMedium)      numLayers = 4;
-    else if (type == BKLoadHeavy)       numLayers = 8;
-    
-    synth->clearVoices();
-//    synth->clearSounds(0);
-    
-    // 88 or more seems to work well
-    for (int i = 0; i < 300; i++)   synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
-    
+    else if (type == BKLoadHeavy)       numLayers = 8;    
     
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
@@ -459,11 +448,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
 #if JUCE_LINUX || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
 #endif
-    
-    synth->clearVoices();
-//    synth->clearSounds(0);
-    
-    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
 
     //load release resonance samples
     for (int i = 0; i < 7; i++) {       //i => octave
@@ -574,11 +558,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
 #endif
     
-    synth->clearVoices();
-//    synth->clearSounds(0);
-    
-    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
-    
     //load hammer release samples
     for (int i = 1; i <= 88; i++) {
         EXIT_CHECK;
@@ -650,11 +629,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
 #if JUCE_WINDOWS || JUCE_LINUX
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
 #endif
-    
-    synth->clearVoices();
-//    synth->clearSounds(0);
-    
-    for (int i = 0; i < 88; i++)    synth->addVoice(new BKPianoSamplerVoice(synth->generalSettings));
     
     //load hammer release samples
     for (int i = 0; i < 4; i++) {

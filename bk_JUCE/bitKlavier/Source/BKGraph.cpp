@@ -26,16 +26,6 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
     
-    comment.setColour(TextEditor::ColourIds::backgroundColourId, Colours::antiquewhite.withAlpha(0.4f));
-    comment.setColour(TextEditor::ColourIds::textColourId, Colours::antiquewhite);
-    
-    comment.setText("Text here...");
-    comment.setMultiLine(true);
-    comment.setName("comment");
-    comment.setSize(150, 75);
-    comment.setScrollbarsShown(false);
-    comment.setEnabled(false);
-    
     setPianoTarget(0);
     
     if (type == PreparationTypeTuning)
@@ -104,6 +94,16 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     }
     else if (type == PreparationTypeComment)
     {
+        const MessageManagerLock mmLock;
+        comment.setColour(TextEditor::ColourIds::backgroundColourId, Colours::antiquewhite.withAlpha(0.4f));
+        comment.setColour(TextEditor::ColourIds::textColourId, Colours::antiquewhite);
+        
+        comment.setText("Text here...");
+        comment.setMultiLine(true);
+        comment.setSize(150, 75);
+        comment.setScrollbarsShown(false);
+        comment.setEnabled(false);
+        
         setSize(150*processor.uiScaleFactor,75*processor.uiScaleFactor);
         comment.setSize(150*processor.uiScaleFactor,75*processor.uiScaleFactor);
         constrain->setSizeLimits(50,25,500,500);
@@ -310,41 +310,44 @@ void BKItem::paint(Graphics& g)
         g.drawRect(getLocalBounds(),0);
     }
     
-    if (type == PreparationTypeKeymap)
+    if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
     {
-        if (processor.gallery->getKeymap(Id) != nullptr)
+        if (type == PreparationTypeKeymap)
         {
-            if (processor.gallery->getKeymap(Id)->getTriggeredKeys().contains(true))
+            if (processor.gallery->getKeymap(Id) != nullptr)
             {
-                g.setColour(Colours::yellow.withAlpha(0.4f));
-                g.fillRect(getLocalBounds());
+                if (processor.gallery->getKeymap(Id)->getTriggeredKeys().contains(true))
+                {
+                    g.setColour(Colours::yellow.withAlpha(0.4f));
+                    g.fillRect(getLocalBounds());
+                }
             }
         }
-    }
-    else if (type == PreparationTypeSynchronic)
-    {
-        if (processor.currentPiano->getSynchronicProcessor(Id, false) != nullptr)
+        else if (type == PreparationTypeSynchronic)
         {
-            if (processor.currentPiano->getSynchronicProcessor(Id, false)->noteDidPlay())
+            if (processor.currentPiano->getSynchronicProcessor(Id, false) != nullptr)
             {
-                synchronicNotePlayTime = 4;
-            }
-            if (synchronicNotePlayTime > 0)
-            {
-                g.setColour(Colours::red.withAlpha(0.4f));
-                g.fillRect(getLocalBounds());
-                synchronicNotePlayTime--;
+                if (processor.currentPiano->getSynchronicProcessor(Id, false)->noteDidPlay())
+                {
+                    synchronicNotePlayTime = 4;
+                }
+                if (synchronicNotePlayTime > 0)
+                {
+                    g.setColour(Colours::red.withAlpha(0.4f));
+                    g.fillRect(getLocalBounds());
+                    synchronicNotePlayTime--;
+                }
             }
         }
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        if (processor.currentPiano->getNostalgicProcessor(Id, false) != nullptr)
+        else if (type == PreparationTypeNostalgic)
         {
-            if (processor.currentPiano->getNostalgicProcessor(Id, false)->getNumReverseNotes() > 0)
+            if (processor.currentPiano->getNostalgicProcessor(Id, false) != nullptr)
             {
-                g.setColour(Colours::blue.withAlpha(0.4f));
-                g.fillRect(getLocalBounds());
+                if (processor.currentPiano->getNostalgicProcessor(Id, false)->getNumReverseNotes() > 0)
+                {
+                    g.setColour(Colours::blue.withAlpha(0.4f));
+                    g.fillRect(getLocalBounds());
+                }
             }
         }
     }
@@ -552,7 +555,21 @@ void BKItem::setState(XmlElement* e)
         setCommentText(s);
     }
 }
-    
+
+void BKItem::timerCallback()
+{
+    time++;
+    if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
+    {
+        if (type == PreparationTypeKeymap ||
+            type == PreparationTypeSynchronic ||
+            type == PreparationTypeNostalgic)
+        {
+            
+            repaint();
+        }
+    }
+}
 
 
 

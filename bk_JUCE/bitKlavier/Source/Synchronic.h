@@ -924,7 +924,9 @@ public:
         prep.addChild(ADSRs, -1, 0);
         
         prep.setProperty( ptagSynchronic_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
-        prep.setProperty( ptagSynchronic_soundSet, getSoundSetName(), 0);
+        File soundfont(getSoundSetName().upToLastOccurrenceOf(".subsound", false, false));
+        if (soundfont.exists()) prep.setProperty(ptagSynchronic_soundSet, soundfont.getFileName() + getSoundSetName().fromLastOccurrenceOf(".subsound", true, false), 0);
+        else prep.setProperty(ptagSynchronic_soundSet, String(), 0);
         
         return prep;
     }
@@ -1021,8 +1023,28 @@ public:
         else setUseGlobalSoundSet(true);
         
         str = e->getStringAttribute(ptagSynchronic_soundSet);
-        setSoundSetName(str);
+        File bkSoundfonts;
+#if JUCE_IOS
+        bkSoundfonts = File::getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
+#endif
+#if JUCE_MAC
+        bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+        bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+        Array<File> files = bkSoundfonts.findChildFiles(File::findFiles, true, str.upToLastOccurrenceOf(".subsound", false, false));
         
+#if JUCE_IOS
+        if (files.isEmpty())
+        {
+            bkSoundfonts = File::getSpecialLocation (File::userDocumentsDirectory);
+            files = bkSoundfonts.findChildFiles(File::findFiles, true, str.upToLastOccurrenceOf(".subsound", false, false));
+        }
+#endif
+            
+        if (!files.isEmpty()) setSoundSetName(files.getUnchecked(0).getFullPathName() + str.fromLastOccurrenceOf(".subsound", true, false));
+        else setSoundSetName(String());
  
         forEachXmlChildElement (*e, sub)
         {
@@ -1683,13 +1705,13 @@ public:
     
     inline const float getHoldTimer() const noexcept
     {
-        if(keysDepressed.size() == 0 ) return 0;
+        // if(keysDepressed.size() == 0 ) return 0;
         return 1000. * holdTimers[lastKeyPressed] / synth->getSampleRate() ;
     }
     
     inline const float getLastVelocity() const noexcept
     {
-        if(keysDepressed.size() == 0 ) return 0;
+        // if(keysDepressed.size() == 0 ) return 0;
         return lastKeyVelocity;
     }
     
@@ -1824,6 +1846,7 @@ private:
     
     void playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster);
     Array<float> velocities;    //record of velocities
+    Array<float> velocitiesActive;
     Array<int> keysDepressed;   //current keys that are depressed
     Array<int> syncKeysDepressed;
     Array<int> clusterKeysDepressed;

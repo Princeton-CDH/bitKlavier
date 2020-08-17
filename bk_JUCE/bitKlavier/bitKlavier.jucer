@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.5.3b11"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.6.1"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -9,13 +9,14 @@
               pluginWantsMidiIn="1" pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="1" pluginAUExportPrefix="BKAU" pluginRTASCategory=""
               aaxIdentifier="com.manyarrowsmusic.bitKlavier" pluginAAXCategory="2"
-              jucerVersion="5.4.7" companyName="Many Arrows Music" companyEmail="dtrueman@princeton.edu"
+              companyName="Many Arrows Music" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
               buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="Many Arrows Music"
               pluginFormats="buildAU,buildStandalone,buildVST,buildVST3,enableIAA"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
-              pluginVST3Category="Instrument" defines="JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1">
+              pluginVST3Category="Instrument" defines="JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1"
+              jucerFormatVersion="1">
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
@@ -152,6 +153,12 @@
                   file="Source/galleries/Nostalgic Synchronic/NS_7_Systerslaat.xml"/>
             <FILE id="NyhWGm" name="NS_8_ItIsEnough.xml" compile="0" resource="1"
                   file="Source/galleries/Nostalgic Synchronic/NS_8_ItIsEnough.xml"/>
+          </GROUP>
+          <GROUP id="{01E0753B-E32C-22EF-F46F-F8CC14A05586}" name="Machines for Listening">
+            <FILE id="DCayf6" name="Machines for Listening (49key).xml" compile="0"
+                  resource="1" file="Source/galleries/Machines for Listening/Machines for Listening (49key).xml"/>
+            <FILE id="opVdLm" name="Machines for Listening.xml" compile="0" resource="1"
+                  file="Source/galleries/Machines for Listening/Machines for Listening.xml"/>
           </GROUP>
           <FILE id="askqrZ" name="Basic Piano.xml" compile="0" resource="1" file="Source/galleries/Basic Piano.xml"/>
           <FILE id="wtEnXB" name="Mike's Gallery.xml" compile="0" resource="1"
