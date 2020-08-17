@@ -808,17 +808,13 @@ public:
     
     OwnedArray<HashMap<int,int>> idmap;
     
+    int idcounts[BKPreparationTypeNil];
+    
     void addPiano(XmlElement* xml, OwnedArray<HashMap<int,int>>* map);
     
     
 private:
     BKAudioProcessor& processor;
-    
-    
-    int idcounts[BKPreparationTypeNil];
-    
-    
-    
     
     String url;
     String name;

@@ -298,5 +298,3 @@ void Gallery::setStateFromXML(XmlElement* xml)
         }
     }
 }
-
-

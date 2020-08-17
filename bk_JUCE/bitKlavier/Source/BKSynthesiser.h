@@ -667,6 +667,8 @@ public:
 	
 	GeneralSettings::Ptr generalSettings;
     
+    BKAudioProcessor& processor;
+    
 protected:
     //==============================================================================
     /** This is used to control access to the rendering callback and the note trigger methods. */
@@ -776,7 +778,6 @@ private:
                            int numSamples);
     //==============================================================================
     
-    BKAudioProcessor& processor;
     int pitchWheelValue;
     uint32 lastNoteOnCounter;
     int minimumSubBlockSize;

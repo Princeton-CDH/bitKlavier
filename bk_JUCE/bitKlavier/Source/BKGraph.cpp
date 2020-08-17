@@ -220,11 +220,17 @@ void BKItem::setImage(Image newImage)
     val *= processor.uiScaleFactor;
 #endif
     
-    while (!(image.getWidth() < val || image.getHeight() < val))
-        image = image.rescaled(image.getWidth() * 0.9, image.getHeight() * 0.9);
+    int width = image.getWidth();
+    int height = image.getHeight();
     
-    if (type != PreparationTypePianoMap)    setSize(image.getWidth(), image.getHeight());
-    else                                    setSize(image.getWidth(), image.getHeight() + 25);
+    while (!(width < val || height < val))
+    {
+        width *= 0.9f;
+        height *= 0.9f;
+    }
+    
+    if (type != PreparationTypePianoMap)    setSize(width, height);
+    else                                    setSize(width, height + 25);
 
 }
 
@@ -364,7 +370,8 @@ void BKItem::resized(void)
     
     if (type == PreparationTypePianoMap)
     {
-        menu.setBounds(0, image.getHeight(), getWidth(), (processor.platform == BKIOS) ? 15 : 25);
+        int height = (processor.platform == BKIOS) ? 15 : 25;
+        menu.setBounds(0, getHeight() - height, getWidth(), height);
     }
     else if (type == PreparationTypeComment)
     {

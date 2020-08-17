@@ -67,6 +67,7 @@ public:
     void duplicateGallery(String name);
     void deleteGallery(void);
     
+    void updateGalleryFromXml(XmlElement* xml);
     
     void importCurrentGallery(void);
     void exportCurrentGallery(void);
@@ -356,7 +357,7 @@ public:
     inline Value getTooltipsEnabled(void) { return tooltipsEnabled; }
     inline void setTooltipsEnabled(bool enabled) { tooltipsEnabled.setValue(enabled); }
     
-    Array<ValueTree> galleryHistory;
+    Array<std::shared_ptr<XmlElement>> galleryHistory;
     int undoDepth;
     
 #define UNDO_HISTORY_SIZE 100
@@ -365,9 +366,15 @@ public:
     {
         int start = galleryHistory.size() - undoDepth;
         galleryHistory.removeRange(start, undoDepth);
+        
         ValueTree galleryVT = gallery->getState();
+        
+        // Maybe should do this by piano instead of gallery
+        // Loading some galleries is very slow
+//        ValueTree galleryVT = currentPiano->getState();
+        
         galleryVT.setProperty("actionDesc", actionDesc, 0);
-        galleryHistory.add(galleryVT);
+        galleryHistory.add(galleryVT.createXml());
         if (galleryHistory.size() > UNDO_HISTORY_SIZE) galleryHistory.remove(0);
         undoDepth = 0;
     }
@@ -381,20 +388,30 @@ public:
     inline String undoGallery()
     {
         if (undoDepth >= galleryHistory.size() - 1) return String();
-        ValueTree prevGalleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth);
+        XmlElement* prevGalleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).get();
         undoDepth++;
-        ValueTree galleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth);
-        loadGalleryFromXml(galleryVT.createXml().get(), false);
-        return "Undo " + prevGalleryVT.getProperty("actionDesc").toString();
+        XmlElement* galleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).get();
+        
+        loadGalleryFromXml(galleryVT, false);
+        
+//        currentPiano->setState(galleryVT.createXml().get(), &gallery->idmap, gallery->idcounts);
+//        currentPiano->configure();
+        
+        return "Undo " + prevGalleryVT->getStringAttribute("actionDesc");
     }
     
     inline String redoGallery()
     {
         if (undoDepth == 0) return String();
         undoDepth--;
-        ValueTree galleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth);
-        loadGalleryFromXml(galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).createXml().get(), false);
-        return "Redo " + galleryVT.getProperty("actionDesc").toString();
+        XmlElement* galleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).get();
+        
+        loadGalleryFromXml(galleryVT, false);
+        
+//        currentPiano->setState(galleryVT.createXml().get(), &gallery->idmap, gallery->idcounts);
+//        currentPiano->configure();
+        
+        return "Redo " + galleryVT->getStringAttribute("actionDesc");
     }
     
 private:

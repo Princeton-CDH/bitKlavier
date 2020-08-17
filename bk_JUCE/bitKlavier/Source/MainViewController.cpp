@@ -423,56 +423,61 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             soundSetId = processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[index], 0, globalSoundSetButton.getToggleState());
         }
         
+        String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
         if (directSelected)
         {
             dPrep->setSoundSet(soundSetId);
-            dPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            dPrep->setSoundSetName(soundSetName);
             dActive->setSoundSet(soundSetId);
-            dActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            dActive->setSoundSetName(soundSetName);
         }
         else if (synchronicSelected)
         {
             sPrep->setSoundSet(soundSetId);
-            sPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            sPrep->setSoundSetName(soundSetName);
             sActive->setSoundSet(soundSetId);
-            sActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            sActive->setSoundSetName(soundSetName);
         }
         else if (nostalgicSelected)
         {
             nPrep->setSoundSet(soundSetId);
-            nPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            nPrep->setSoundSetName(soundSetName);
             nActive->setSoundSet(soundSetId);
-            nActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            nActive->setSoundSetName(soundSetName);
         }
     }
     else if (cb == &instrumentCB)
     {
+        
         if (directSelected)
         {
             String sfname = processor.loadedSoundSets[dPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
             dPrep->setSoundSet(soundSetId);
-            dPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            dPrep->setSoundSetName(soundSetName);
             dActive->setSoundSet(soundSetId);
-            dActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            dActive->setSoundSetName(soundSetName);
         }
         else if (synchronicSelected)
         {
             String sfname = processor.loadedSoundSets[sPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
             sPrep->setSoundSet(soundSetId);
-            sPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            sPrep->setSoundSetName(soundSetName);
             sActive->setSoundSet(soundSetId);
-            sActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            sActive->setSoundSetName(soundSetName);
         }
         else if (nostalgicSelected)
         {
             String sfname = processor.loadedSoundSets[nPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
             nPrep->setSoundSet(soundSetId);
-            nPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            nPrep->setSoundSetName(soundSetName);
             nActive->setSoundSet(soundSetId);
-            nActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            nActive->setSoundSetName(soundSetName);
         }
         else
         {

@@ -145,7 +145,14 @@ scaleId(JustTuning)
         tetherSpringArray.add(s);
 	}
 
-    springArray.ensureStorageAllocated(1000);
+    springArray.ensureStorageAllocated(10000);
+    
+    // Converting std::string to juce::String takes time so
+    // convert before the look
+    // (was happening implicitly at spring->setName() and costing a lot of time
+    Array<String> labels;
+    for (auto label : intervalLabels)
+        labels.add(String(label));
     
     if(!usingFundamentalForIntervalSprings)
     {
@@ -170,7 +177,7 @@ scaleId(JustTuning)
                                             interval);
                 
                 spring->setEnabled(false);
-                spring->setName(intervalLabels[interval]);
+                spring->setName(labels.getUnchecked(interval));
                 springArray.add(spring);
             }
         }
@@ -204,7 +211,7 @@ scaleId(JustTuning)
                                             interval);
                 
                 spring->setEnabled(false);
-                spring->setName(intervalLabels[interval]);
+                spring->setName(labels.getUnchecked(interval));
                 springArray.add(spring);
             }
         }
