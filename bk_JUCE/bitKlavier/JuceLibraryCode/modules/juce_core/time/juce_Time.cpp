@@ -277,7 +277,7 @@ void Time::waitForMillisecondCounter (uint32 targetTime) noexcept
 //==============================================================================
 double Time::highResolutionTicksToSeconds (const int64 ticks) noexcept
 {
-    return (double) ticks / (double) getHighResolutionTicksPerSecond();
+    return ticks / (double) getHighResolutionTicksPerSecond();
 }
 
 int64 Time::secondsToHighResolutionTicks (const double seconds) noexcept

@@ -560,6 +560,9 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
     bool activeSource = false;
+    bool doIgnoreSustain = false;
+    int noteOffThreshold = 1;
+    Keymap::PtrArr toIgnore;
 
     if (pmap != nullptr)
     {
@@ -592,6 +595,15 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                         {
                             handleNoteOn(harmonizer[i], velocity, channel, source, true);
                         }
+                    }
+                }
+                if (km->getIgnoreSustain())
+                {
+                    doIgnoreSustain = true;
+                    if (km->getIgnoreSustainCount() < noteOffThreshold)
+                    {
+                        km->addToIgnoreSustainCount(1);
+                        if (km->getIgnoreSustainCount() >= noteOffThreshold) toIgnore.addIfNotAlreadyThere(km);
                     }
                 }
                 if (km->getAllNotesOff())
@@ -648,6 +660,11 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     // UPDATE: actually seems like that argument isn't really used so it doesn't matter. still should clean this up
     currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
 
+    //if (doIgnoreSustain)
+    //{
+    //    currentPiano->prepMap->keyPartReleased(noteNumber, velocity, channel, toIgnore, (loadingSampleType == BKLoadSoundfont), source);
+    //}
+
     //add note to springTuning, if only for Graph display
     //this could be a bad idea, in that a user may want to have only some keys (via a keymap) go to Spring tuning
     /*
@@ -672,6 +689,9 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
      
     bool activeSource = false;
+
+    bool doIgnoreSustain = false;
+    Keymap::PtrArr affectedKeymaps;
     
     if (pmap != nullptr)
     {
@@ -687,6 +707,14 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
                     {
                         handleNoteOff(harmonizer[i], velocity, channel, source, true);
                     }
+                }
+                if (km->getIgnoreSustain())
+                {
+                    doIgnoreSustain = true;
+                }
+                else
+                {
+                    affectedKeymaps.addIfNotAlreadyThere(km);
                 }
             }
         }
@@ -710,7 +738,14 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
         
         // Send key off to each pmap in current piano
+        //if (doIgnoreSustain == false)
+        //{
         currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
+        //}
+        //else
+        //{
+        //    currentPiano->prepMap->keyPartReleased(noteNumber, velocity, channel, affectedKeymaps, (loadingSampleType == BKLoadSoundfont), source);
+        //}
     }
     
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.

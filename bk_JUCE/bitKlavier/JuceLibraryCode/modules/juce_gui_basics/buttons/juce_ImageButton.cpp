@@ -133,18 +133,18 @@ void ImageButton::paintButton (Graphics& g,
             if (preserveProportions)
             {
                 int newW, newH;
-                const float imRatio = (float) ih / (float) iw;
-                const float destRatio = (float) h / (float) w;
+                const float imRatio = ih / (float) iw;
+                const float destRatio = h / (float) w;
 
                 if (imRatio > destRatio)
                 {
-                    newW = roundToInt ((float) h / imRatio);
+                    newW = roundToInt (h / imRatio);
                     newH = h;
                 }
                 else
                 {
                     newW = w;
-                    newH = roundToInt ((float) w * imRatio);
+                    newH = roundToInt (w * imRatio);
                 }
 
                 x = (w - newW) / 2;

@@ -54,8 +54,7 @@ private:
 
         static forcedinline float valueAtOffset (const float* const inputs, const float offset, int indexBuffer) noexcept
         {
-            const int numCrossings = 100;
-            const float floatCrossings = (float) numCrossings;
+            int numCrossings = 100;
             float result = 0.0f;
 
             auto samplePosition = indexBuffer;
@@ -70,15 +69,14 @@ private:
                 if (i == -numCrossings || (sincPosition >= 0 && lastSincPosition < 0))
                 {
                     auto indexFloat = (sincPosition >= 0.f ? sincPosition : -sincPosition) * 100.0f;
-                    auto indexFloored = std::floor (indexFloat);
-                    index = (int) indexFloored;
-                    firstFrac = indexFloat - indexFloored;
+                    index = (int) std::floor (indexFloat);
+                    firstFrac = indexFloat - index;
                     sign = (sincPosition < 0 ? -1 : 1);
                 }
 
                 if (sincPosition == 0.0f)
                     result += inputs[samplePosition];
-                else if (sincPosition < floatCrossings && sincPosition > -floatCrossings)
+                else if (sincPosition < numCrossings && sincPosition > -numCrossings)
                     result += inputs[samplePosition] * windowedSinc (firstFrac, index);
 
                 if (++samplePosition == numCrossings * 2)

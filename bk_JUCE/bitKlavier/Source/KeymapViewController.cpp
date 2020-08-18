@@ -212,13 +212,13 @@ BKViewController(p, theGraph, 2)
 
     harmonizerMenuButton.setName("HarmonizerCommands");
     harmonizerMenuButton.setButtonText("Harmonizer Commands");
-    harmonizerMenuButton.setTooltip("Select ways to alter the harmonizer keyboard");
+    harmonizerMenuButton.setTooltip("Select ways to add to or clear the harmonizer keyboard");
     harmonizerMenuButton.addListener(this);
     addAndMakeVisible(harmonizerMenuButton);
 
     harTranspositionSlider.setRange(-12, 12, 1);
     harTranspositionSlider.addListener(this);
-    harTranspositionSlider.setLookAndFeel(&transpositionLaf);
+    harTranspositionSlider.setLookAndFeel(&buttonsAndMenusLAF);
     harTranspositionSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
     harTranspositionSlider.setTextBoxStyle(Slider::TextBoxLeft, false, 30, 60);
     harTranspositionSlider.setDoubleClickReturnValue(true, 0); // double-clicking this slider will set it to 0
@@ -335,6 +335,13 @@ BKViewController(p, theGraph, 2)
     endKeystrokesToggle.addListener(this);
     addAndMakeVisible(&endKeystrokesToggle, ALL);
 
+    ignoreSustainToggle.setButtonText("Ignore Sustain Pedal");
+    ignoreSustainToggle.setToggleState(false, dontSendNotification);
+    ignoreSustainToggle.setLookAndFeel(&buttonsAndMenusLAF2);
+    ignoreSustainToggle.setTooltip("Indicates whether to ignore the sustain pedal for this keymap.");
+    ignoreSustainToggle.addListener(this);
+    addAndMakeVisible(&ignoreSustainToggle, ALL);
+
     currentTab = 0;
     //displayTab(currentTab);
 
@@ -349,7 +356,11 @@ BKViewController(p, theGraph, 2)
 KeymapViewController::~KeymapViewController()
 {
     keyboard = nullptr;
+    harKeyboard = nullptr;
+    harArrayKeyboard = nullptr;
     setLookAndFeel(nullptr);
+    //transpositionLaf 
+    //need to set some null pointer stuff - transposition?
 }
 
 void KeymapViewController::reset(void)
@@ -421,9 +432,23 @@ void KeymapViewController::displayTab(int tab)
         invertOnOffToggle.setVisible(true);
         targetsSlice.removeFromRight(gXSpacing);
 
-        endKeystrokesToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
-       // endKeystrokesToggle.toFront(false);
+        Rectangle<int> settingsBox = area.removeFromTop((gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+        Rectangle<int> settingsGroup(settingsBox);
+        //settingsBox.removeFromTop(4 * gYSpacing);
+        settingsBox.removeFromRight(gXSpacing);
+
+        endKeystrokesToggle.setBounds(settingsBox.removeFromRight(selectCB.getWidth()));
         endKeystrokesToggle.setVisible(true);
+        settingsBox.removeFromTop(gYSpacing);
+
+        ignoreSustainToggle.setBounds(settingsBox.removeFromRight(selectCB.getWidth()));
+        ignoreSustainToggle.setVisible(true);
+
+        //endKeystrokesToggle.setBounds(area.removeFromTop(selectCB.getWidth()));
+        //endKeystrokesToggle.setVisible(true);
+
+        //ignoreSustainToggle.setBounds(area.removeFromTop(selectCB.getWidth()));
+        //ignoreSustainToggle.setVisible(true);
 
         // height of the box for the prep with the most targets (Synchronic)
         int maxTargetHeight = (TargetTypeSynchronicRotate - TargetTypeSynchronic + 1) *
@@ -779,6 +804,7 @@ void KeymapViewController::invisible()
     actionButton.setVisible(false);
 
     endKeystrokesToggle.setVisible(false);
+    ignoreSustainToggle.setVisible(false);
 
     harmonizerMenuButton.setVisible(false);
 
@@ -1314,6 +1340,11 @@ void KeymapViewController::bkButtonClicked (Button* b)
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setAllNotesOff(endKeystrokesToggle.getToggleState());
     }
+    else if (b == &ignoreSustainToggle)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setIgnoreSustain(ignoreSustainToggle.getToggleState());
+    }
     else if (b == &rightArrow)
     {
         arrowPressed(RightArrow);
@@ -1475,6 +1506,7 @@ void KeymapViewController::update(void)
         harMidiEditToggle.setToggleState(km->getHarMidiEdit(), dontSendNotification);
         harArrayMidiEditToggle.setToggleState(km->getHarArrayMidiEdit(), dontSendNotification);
         endKeystrokesToggle.setToggleState(km->getAllNotesOff(), dontSendNotification);
+        ignoreSustainToggle.setToggleState(km->getIgnoreSustain(), dontSendNotification);
         keymapTF.setText( intArrayToString(km->keys()));
         harKeymapTF.setText(String(km->getHarKey()));
         harArrayKeymapTF.setText(intArrayToString(km->getHarmonizationForKey()));

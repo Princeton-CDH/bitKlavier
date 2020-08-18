@@ -108,10 +108,8 @@ bool AudioFormatWriter::writeFromAudioReader (AudioFormatReader& reader,
             {
                 void* const b = *bufferChan++;
 
-                constexpr auto scaleFactor = 1.0f / static_cast<float> (0x7fffffff);
-
                 if (isFloatingPoint())
-                    FloatVectorOperations::convertFixedToFloat ((float*) b, (int*) b, scaleFactor, numToDo);
+                    FloatVectorOperations::convertFixedToFloat ((float*) b, (int*) b, 1.0f / 0x7fffffff, numToDo);
                 else
                     convertFloatsToInts ((int*) b, (float*) b, numToDo);
             }

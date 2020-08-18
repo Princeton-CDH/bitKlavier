@@ -1177,7 +1177,7 @@ private:
         else
         {
             oldGlobalPos += Point<int> (2, 0);
-            subX += (float) itemScreenBounds.getWidth();
+            subX += itemScreenBounds.getWidth();
         }
 
         Path areaTowardsSubMenu;

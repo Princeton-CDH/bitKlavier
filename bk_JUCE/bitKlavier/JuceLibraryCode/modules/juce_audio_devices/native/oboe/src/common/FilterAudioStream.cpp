@@ -21,25 +21,6 @@
 using namespace oboe;
 using namespace flowgraph;
 
-// Output callback uses FixedBlockReader::read()
-//                <= SourceFloatCaller::onProcess()
-//                <=== DataConversionFlowGraph::read()
-//                <== FilterAudioStream::onAudioReady()
-//
-// Output blocking uses no block adapter because AAudio can accept
-// writes of any size. It uses DataConversionFlowGraph::read() <== FilterAudioStream::write() <= app
-//
-// Input callback uses FixedBlockWriter::write()
-//                <= DataConversionFlowGraph::write()
-//                <= FilterAudioStream::onAudioReady()
-//
-// Input blocking uses FixedBlockReader::read() // TODO may not need block adapter
-//                <= SourceFloatCaller::onProcess()
-//                <=== SinkFloat::read()
-//                <= DataConversionFlowGraph::read()
-//                <== FilterAudioStream::read()
-//                <= app
-
 Result FilterAudioStream::configureFlowGraph() {
     mFlowGraph = std::make_unique<DataConversionFlowGraph>();
     bool isOutput = getDirection() == Direction::Output;
@@ -89,4 +70,3 @@ ResultWithValue<int32_t> FilterAudioStream::read(void *buffer,
     int32_t framesRead = mFlowGraph->read(buffer, numFrames, timeoutNanoseconds);
     return ResultWithValue<int32_t>::createBasedOnSign(framesRead);
 }
-

@@ -223,7 +223,7 @@ Result AudioOutputStreamOpenSLES::open() {
         goto error;
     }
 
-    oboeResult = configureBufferSizes(mSampleRate);
+    oboeResult = configureBufferSizes();
     if (Result::OK != oboeResult) {
         goto error;
     }
@@ -271,7 +271,7 @@ Result AudioOutputStreamOpenSLES::setPlayState_l(SLuint32 newState) {
 
     SLresult slResult = (*mPlayInterface)->SetPlayState(mPlayInterface, newState);
     if (SL_RESULT_SUCCESS != slResult) {
-        LOGW("AudioOutputStreamOpenSLES(): %s() returned %s", __func__, getSLErrStr(slResult));
+        LOGD("AudioOutputStreamOpenSLES(): %s() returned %s", __func__, getSLErrStr(slResult));
         result = Result::ErrorInternal; // TODO convert slResult to Result::Error
     }
     return result;
@@ -312,6 +312,7 @@ Result AudioOutputStreamOpenSLES::requestStart() {
         setState(initialState);
         mLock.unlock();
     }
+    LOGD("AudioOutputStreamOpenSLES(): %s() returning %d", __func__, result);
     return result;
 }
 
@@ -342,6 +343,7 @@ Result AudioOutputStreamOpenSLES::requestPause() {
     } else {
         setState(initialState);
     }
+    LOGD("AudioOutputStreamOpenSLES(): %s() returning %d", __func__, result);
     return result;
 }
 
@@ -369,6 +371,7 @@ Result AudioOutputStreamOpenSLES::requestFlush_l() {
             result = Result::ErrorInternal;
         }
     }
+    LOGD("AudioOutputStreamOpenSLES(): %s() returning %d", __func__, result);
     return result;
 }
 
@@ -407,6 +410,7 @@ Result AudioOutputStreamOpenSLES::requestStop() {
     } else {
         setState(initialState);
     }
+    LOGD("AudioOutputStreamOpenSLES(): %s() returning %d", __func__, result);
     return result;
 }
 
@@ -436,7 +440,7 @@ Result AudioOutputStreamOpenSLES::updateServiceFrameCounter() {
         SLmillisecond msec = 0;
         SLresult slResult = (*mPlayInterface)->GetPosition(mPlayInterface, &msec);
         if (SL_RESULT_SUCCESS != slResult) {
-            LOGW("%s(): GetPosition() returned %s", __func__, getSLErrStr(slResult));
+            LOGD("%s(): GetPosition() returned %s", __func__, getSLErrStr(slResult));
             // set result based on SLresult
             result = Result::ErrorInternal;
         } else {

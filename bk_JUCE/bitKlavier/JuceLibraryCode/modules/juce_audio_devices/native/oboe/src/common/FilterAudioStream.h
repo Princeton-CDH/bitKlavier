@@ -187,19 +187,9 @@ public:
                 : mFlowGraph->getDataCallbackResult();
     }
 
-    void onErrorBeforeClose(AudioStream *oboeStream, Result error) override {
-        if (mStreamCallback != nullptr) {
-            mStreamCallback->onErrorBeforeClose(this, error);
-        }
-    }
+    void onErrorBeforeClose(AudioStream *oboeStream, Result error) override {}
 
-    void onErrorAfterClose(AudioStream *oboeStream, Result error) override {
-        // Close this parent stream because the callback will only close the child.
-        AudioStream::close();
-        if (mStreamCallback != nullptr) {
-            mStreamCallback->onErrorAfterClose(this, error);
-        }
-    }
+    void onErrorAfterClose(AudioStream *oboeStream, Result error) override {}
 
 private:
 

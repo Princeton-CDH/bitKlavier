@@ -345,7 +345,7 @@ namespace
 
                         const auto& e = synth.events;
                         expectWithinAbsoluteError (float (e.blocks.size()),
-                                                   std::ceil ((float) blockSize / (float) subblockSize),
+                                                   std::ceil (float (blockSize) / subblockSize),
                                                    1.0f);
                         expect (e.messages.size() == blockSize);
                         expect (std::is_sorted (e.blocks.begin(), e.blocks.end()));

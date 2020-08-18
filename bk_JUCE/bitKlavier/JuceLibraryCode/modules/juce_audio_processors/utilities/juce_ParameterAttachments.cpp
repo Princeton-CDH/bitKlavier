@@ -191,7 +191,6 @@ ComboBoxParameterAttachment::ComboBoxParameterAttachment (RangedAudioParameter& 
                                                           ComboBox& c,
                                                           UndoManager* um)
     : comboBox (c),
-      storedParameter (param),
       attachment (param, [this] (float f) { setValue (f); }, um)
 {
     sendInitialUpdate();
@@ -210,8 +209,7 @@ void ComboBoxParameterAttachment::sendInitialUpdate()
 
 void ComboBoxParameterAttachment::setValue (float newValue)
 {
-    const auto normValue = storedParameter.convertTo0to1 (newValue);
-    const auto index = roundToInt (normValue * (float) (comboBox.getNumItems() - 1));
+    const auto index = roundToInt (newValue);
 
     if (index == comboBox.getSelectedItemIndex())
         return;
@@ -225,12 +223,7 @@ void ComboBoxParameterAttachment::comboBoxChanged (ComboBox*)
     if (ignoreCallbacks)
         return;
 
-    const auto numItems = comboBox.getNumItems();
-    const auto selected = (float) comboBox.getSelectedItemIndex();
-    const auto newValue = numItems > 1 ? selected / (float) (numItems - 1)
-                                       : 0.0f;
-
-    attachment.setValueAsCompleteGesture (storedParameter.convertFrom0to1 (newValue));
+    attachment.setValueAsCompleteGesture ((float) comboBox.getSelectedItemIndex());
 }
 
 //==============================================================================

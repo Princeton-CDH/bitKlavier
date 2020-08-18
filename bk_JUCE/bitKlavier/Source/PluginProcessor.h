@@ -285,6 +285,18 @@ public:
     
     void loadSamplesStartup(void);
 
+    inline void setSustainFromMenu(bool toSet)
+    {
+        if (toSet)
+        {
+            sustainActivate();
+        }
+        else
+        {
+            sustainDeactivate();
+        }
+    }
+
     inline void setSustainInversion(bool sus)
     {
         sustainInverted = sus;

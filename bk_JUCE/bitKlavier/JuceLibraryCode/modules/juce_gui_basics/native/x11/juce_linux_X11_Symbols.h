@@ -578,19 +578,19 @@ private:
     }
 
     //==============================================================================
-    DynamicLibrary xLib { "libX11.so.6" }, xextLib { "libXext.so.6" };
+    DynamicLibrary xLib { "libX11.so" }, xextLib { "libXext.so" };
 
    #if JUCE_USE_XCURSOR
-    DynamicLibrary xcursorLib  { "libXcursor.so.1" };
+    DynamicLibrary xcursorLib  { "libXcursor.so" };
    #endif
    #if JUCE_USE_XINERAMA
-    DynamicLibrary xineramaLib { "libXinerama.so.1" };
+    DynamicLibrary xineramaLib { "libXinerama.so" };
    #endif
    #if JUCE_USE_XRENDER
-    DynamicLibrary xrenderLib  { "libXrender.so.1" };
+    DynamicLibrary xrenderLib  { "libXrender.so" };
    #endif
    #if JUCE_USE_XRANDR
-    DynamicLibrary xrandrLib   { "libXrandr.so.2" };
+    DynamicLibrary xrandrLib   { "libXrandr.so" };
    #endif
 
     //==============================================================================

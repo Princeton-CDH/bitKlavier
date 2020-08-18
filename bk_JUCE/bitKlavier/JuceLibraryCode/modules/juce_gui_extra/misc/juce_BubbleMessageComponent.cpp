@@ -97,7 +97,7 @@ void BubbleMessageComponent::paintContent (Graphics& g, int w, int h)
     g.setColour (findColour (TooltipWindow::textColourId));
 
     textLayout.draw (g, Rectangle<float> (bubblePaddingX / 2.0f, bubblePaddingY / 2.0f,
-                                          (float) w - bubblePaddingX, (float) h - bubblePaddingY));
+                                          w - bubblePaddingX, h - bubblePaddingY));
 }
 
 void BubbleMessageComponent::timerCallback()

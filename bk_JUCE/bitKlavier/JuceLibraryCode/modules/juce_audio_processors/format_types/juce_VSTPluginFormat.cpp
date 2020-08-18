@@ -2945,8 +2945,8 @@ public:
 
         if (pluginRespondsToDPIChanges)
             dispatch (Vst2::effVendorSpecific,
-                      (int) ByteOrder::bigEndianInt ("PreS"),
-                      (int) ByteOrder::bigEndianInt ("AeCs"),
+                      JUCE_MULTICHAR_CONSTANT ('P', 'r', 'e', 'S'),
+                      JUCE_MULTICHAR_CONSTANT ('A', 'e', 'C', 's'),
                       nullptr, nativeScaleFactor);
     }
    #endif

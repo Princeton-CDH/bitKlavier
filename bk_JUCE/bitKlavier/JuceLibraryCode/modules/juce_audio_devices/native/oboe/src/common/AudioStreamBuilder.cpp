@@ -26,8 +26,6 @@
 #include "opensles/AudioStreamOpenSLES.h"
 #include "QuirksManager.h"
 
-bool oboe::OboeGlobals::mWorkaroundsEnabled = true;
-
 namespace oboe {
 
 /**
@@ -87,7 +85,7 @@ bool AudioStreamBuilder::isCompatible(AudioStreamBase &other) {
 
 Result AudioStreamBuilder::openStream(AudioStream **streamPP) {
     Result result = Result::OK;
-    LOGI("%s() %s -------- %s --------",
+    LOGD("%s() %s -------- %s --------",
          __func__, getDirection() == Direction::Input ? "INPUT" : "OUTPUT", getVersionText());
 
     if (streamPP == nullptr) {
@@ -128,7 +126,7 @@ Result AudioStreamBuilder::openStream(AudioStream **streamPP) {
             }
 
             // Use childStream in a FilterAudioStream.
-            LOGI("%s() create a FilterAudioStream for data conversion.", __func__);
+            LOGD("%s() create a FilterAudioStream for data conversion.", __func__);
             FilterAudioStream *filterStream = new FilterAudioStream(parentBuilder, tempStream);
             result = filterStream->configureFlowGraph();
             if (result !=  Result::OK) {
@@ -183,18 +181,6 @@ Result AudioStreamBuilder::openManagedStream(oboe::ManagedStream &stream) {
     AudioStream *streamptr;
     auto result = openStream(&streamptr);
     stream.reset(streamptr);
-    return result;
-}
-
-Result AudioStreamBuilder::openStream(std::shared_ptr<AudioStream> &sharedStream) {
-    sharedStream.reset();
-    AudioStream *streamptr;
-    auto result = openStream(&streamptr);
-    if (result == Result::OK) {
-        sharedStream.reset(streamptr);
-        // Save a weak_ptr in the stream for use with callbacks.
-        streamptr->setWeakThis(sharedStream);
-    }
     return result;
 }
 

@@ -19,7 +19,6 @@
 
 #include <memory>
 #include <stdint.h>
-#include <sys/types.h>
 
 /**
  * Interface for a class that needs fixed-size blocks.

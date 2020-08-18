@@ -197,6 +197,8 @@ private:
 	ToggleButton hotkeysButton;
     
     ToggleButton globalSoundSetButton;
+
+    ToggleButton sustainPedalButton;
     
     BKButtonAndMenuLAF laf;
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;

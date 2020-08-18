@@ -100,7 +100,7 @@ protected:
     PerformanceMode convertPerformanceMode(SLuint32 openslMode) const;
     SLuint32 convertPerformanceMode(PerformanceMode oboeMode) const;
 
-    Result configureBufferSizes(int32_t sampleRate);
+    Result configureBufferSizes();
 
     void logUnsupportedAttributes();
 
@@ -112,7 +112,7 @@ protected:
         mState.store(state);
     }
 
-    int64_t getFramesProcessedByServer();
+    int64_t getFramesProcessedByServer() const;
 
     // OpenSLES stuff
     SLObjectItf                   mObjectInterface = nullptr;

@@ -42,6 +42,7 @@ public:
     
     void keyPressed(int noteNumber, float velocity, int channel, bool soundfont = false, String source = String("Default"));
     void keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false, String source = String("Default"));
+    //void keyPartReleased(int noteNumber, float velocity, int channel, Keymap::PtrArr affectedKeymaps, bool soundfont = false, String source = String("Default"));
     void postRelease(int noteNumber, float velocity, int channel, String source = String("Default"));
     void clearKey(int noteNumber);
     void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }

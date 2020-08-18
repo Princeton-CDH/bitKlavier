@@ -71,11 +71,12 @@ static void destroyObject (SLObjectType object)
         (*object)->Destroy (object);
 }
 
-struct SLObjectItfFree
+template <>
+struct ContainerDeletePolicy<const SLObjectItf_* const>
 {
-    void operator() (SLObjectItf obj) const noexcept
+    static void destroy (SLObjectItf object)
     {
-        destroyObject (obj);
+        destroyObject (object);
     }
 };
 
@@ -111,7 +112,7 @@ private:
         ControlBlock() = default;
         ControlBlock (SLObjectItf o) : ptr (o) {}
 
-        std::unique_ptr<const SLObjectItf_* const, SLObjectItfFree> ptr;
+        std::unique_ptr<const SLObjectItf_* const> ptr;
     };
 
     ReferenceCountedObjectPtr<ControlBlock> cb;

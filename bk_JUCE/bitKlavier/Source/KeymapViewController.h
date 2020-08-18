@@ -99,6 +99,7 @@ private:
     TextButton      harmonizerMenuButton;
 
     ToggleButton endKeystrokesToggle;
+    ToggleButton ignoreSustainToggle;
 
     //stuff for trap/mirror/harmonizer tab - TRT
     BKLabel harKeymapL;
@@ -121,7 +122,7 @@ private:
 
     Slider harTranspositionSlider;
     void sliderValueChanged(Slider* slider)                override;
-    BKButtonAndMenuLAF transpositionLaf;
+    //BKButtonAndMenuLAF transpositionLaf;
 
     //int harKey; //for rendering harmonizer array stuff for now
 

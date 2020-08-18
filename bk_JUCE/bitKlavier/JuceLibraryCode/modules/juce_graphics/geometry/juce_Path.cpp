@@ -615,11 +615,11 @@ void Path::addPolygon (Point<float> centre, int numberOfSides,
 
     if (numberOfSides > 1)
     {
-        auto angleBetweenPoints = MathConstants<float>::twoPi / (float) numberOfSides;
+        auto angleBetweenPoints = MathConstants<float>::twoPi / numberOfSides;
 
         for (int i = 0; i < numberOfSides; ++i)
         {
-            auto angle = startAngle + (float) i * angleBetweenPoints;
+            auto angle = startAngle + i * angleBetweenPoints;
             auto p = centre.getPointOnCircumference (radius, angle);
 
             if (i == 0)
@@ -639,11 +639,11 @@ void Path::addStar (Point<float> centre, int numberOfPoints, float innerRadius,
 
     if (numberOfPoints > 1)
     {
-        auto angleBetweenPoints = MathConstants<float>::twoPi / (float) numberOfPoints;
+        auto angleBetweenPoints = MathConstants<float>::twoPi / numberOfPoints;
 
         for (int i = 0; i < numberOfPoints; ++i)
         {
-            auto angle = startAngle + (float) i * angleBetweenPoints;
+            auto angle = startAngle + i * angleBetweenPoints;
             auto p = centre.getPointOnCircumference (outerRadius, angle);
 
             if (i == 0)

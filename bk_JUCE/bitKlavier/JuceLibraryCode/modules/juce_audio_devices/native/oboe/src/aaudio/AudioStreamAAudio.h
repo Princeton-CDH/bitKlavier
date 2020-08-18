@@ -91,8 +91,6 @@ public:
                                                    void *audioData,
                                                    int32_t numFrames);
 
-    bool                 isMMapUsed();
-
 protected:
     static void internalErrorCallback(
             AAudioStream *stream,
@@ -109,6 +107,8 @@ protected:
     void logUnsupportedAttributes();
 
 private:
+
+    bool                 isMMapUsed();
 
     std::atomic<bool>    mCallbackThreadEnabled;
 

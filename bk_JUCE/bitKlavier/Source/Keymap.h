@@ -486,6 +486,14 @@ public:
 
     inline int getHarShift() { return harShift; }
     inline void setHarShift(int toSet) { harShift = toSet; }
+
+    inline bool getIgnoreSustain() { return ignoreSustain; }
+    inline void setIgnoreSustain(bool toSet) { ignoreSustain = toSet; }
+    inline void toggleIgnoreSustain() { ignoreSustain = !ignoreSustain; }
+
+    inline int getIgnoreSustainCount() { return ignoreSustainCount; }
+    inline void addToIgnoreSustainCount(int toAdd) { ignoreSustainCount += toAdd; }
+    inline void setIgnoreSustainCount(int toSet) { ignoreSustainCount = toSet; }
     
 private:
     BKAudioProcessor& processor;
@@ -518,6 +526,9 @@ private:
     bool onscreenSelected;
     
     bool allNotesOff;
+
+    bool ignoreSustain;
+    int ignoreSustainCount;
 
     JUCE_LEAK_DETECTOR (Keymap)
 };

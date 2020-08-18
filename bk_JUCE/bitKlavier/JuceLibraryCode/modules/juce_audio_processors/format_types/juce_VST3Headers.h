@@ -52,7 +52,6 @@ JUCE_BEGIN_IGNORE_WARNINGS_GCC_LIKE ("-Wnon-virtual-dtor",
                                      "-Wignored-qualifiers",
                                      "-Wmissing-field-initializers",
                                      "-Wformat=",
-                                     "-Wformat",
                                      "-Wpedantic",
                                      "-Wextra",
                                      "-Wclass-memaccess")

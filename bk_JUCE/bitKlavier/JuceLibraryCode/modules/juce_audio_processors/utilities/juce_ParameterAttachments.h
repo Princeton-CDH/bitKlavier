@@ -203,7 +203,6 @@ private:
     void comboBoxChanged (ComboBox*) override;
 
     ComboBox& comboBox;
-    RangedAudioParameter& storedParameter;
     ParameterAttachment attachment;
     bool ignoreCallbacks = false;
 };

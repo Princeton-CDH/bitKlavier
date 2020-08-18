@@ -27,6 +27,7 @@ tooltipsButton("Show tooltips"),
 //keystrokesButton("Enable keystrokes"),
 hotkeysButton("Enable hotkeys"),
 globalSoundSetButton("Use global samples"),
+sustainPedalButton("Sustain Pedal"),
 hotkeysEnabled(true),
 //keystrokesEnabled(true),
 preferencesButton("Preferences")
@@ -41,6 +42,10 @@ preferencesButton("Preferences")
     globalSoundSetButton.setClickingTogglesState(true);
     globalSoundSetButton.addListener(this);
     addAndMakeVisible(globalSoundSetButton);
+
+    sustainPedalButton.setClickingTogglesState(true);
+    sustainPedalButton.addListener(this);
+    addAndMakeVisible(sustainPedalButton);
     
 	/*keystrokesButton.setClickingTogglesState(true);
 	keystrokesButton.getToggleStateValue().referTo(editor.getKeystrokesEnabled());
@@ -178,6 +183,8 @@ MainViewController::~MainViewController()
     keyboardState.removeListener(this);
     octaveSlider.removeListener(this);
     globalSoundSetButton.removeListener(this);
+    sustainPedalButton.removeListener(this);
+    preferencesButton.removeListener(this);
     mainSlider.removeListener(this);
     sampleCB.removeListener(this);
     instrumentCB.removeListener(this);
@@ -193,6 +200,7 @@ MainViewController::~MainViewController()
 	//keystrokesButton.setLookAndFeel(nullptr);
 	hotkeysButton.setLookAndFeel(nullptr);
     globalSoundSetButton.setLookAndFeel(nullptr);
+    //sustainPedalButton.setLookAndFeel(nullptr);
     preferencesButton.setLookAndFeel(nullptr);
     keyboardComponent = nullptr;
     
@@ -300,7 +308,9 @@ void MainViewController::resized()
 		instrumentCB.setBounds(2 * unit + 0.5 * gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
         
         globalSoundSetButton.setBounds(instrumentCB.getRight()+0.5*gXSpacing, sampleCB.getY(), 120, 20);
-        
+
+        sustainPedalButton.setBounds(globalSoundSetButton.getRight() + 0.4 * gXSpacing, sampleCB.getY(), 120, 20);
+            
         float keyWidth = footerSlice.getWidth() / round((keyEnd - keyStart) * 7./12 + 1); //num white keys
         keyboard->setKeyWidth(keyWidth);
         keyboard->setBlackNoteLengthProportion(0.65);
@@ -356,9 +366,11 @@ void MainViewController::resized()
         sampleCB.setBounds(sampleCBSlice.removeFromLeft(width));
         instrumentCB.setBounds(sampleCBSlice.removeFromLeft(width));
         globalSoundSetButton.setBounds(sampleCBSlice.removeFromLeft(width*0.5));
+        sustainPedalButton.setBounds(sampleCBSlice.removeFromLeft(width * 0.4));
         sampleCB.toFront(false);
         instrumentCB.toFront(false);
         globalSoundSetButton.toFront(false);
+        sustainPedalButton.toFront(false);
         
         octaveSlider.setVisible(false);
         keyboardComponent->setVisible(false);
@@ -532,6 +544,10 @@ void MainViewController::bkButtonClicked (Button* b)
             prep->setUseGlobalSoundSet(toggle);
             active->setUseGlobalSoundSet(toggle);
         }
+    }
+    if (b == &sustainPedalButton)
+    {
+        processor.setSustainFromMenu(sustainPedalButton.getToggleState());
     }
 }
 
