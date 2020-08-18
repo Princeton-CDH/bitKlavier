@@ -305,6 +305,7 @@ void MainViewController::resized()
                           levelMeterSlice.getHeight());
     
     area.reduce(2, 2);
+    area.removeFromLeft(1);
     construction.setBounds(area);
     
     undoStatus.setFont(undoStatus.getFont().withHeight(area.getHeight() * 0.05f));

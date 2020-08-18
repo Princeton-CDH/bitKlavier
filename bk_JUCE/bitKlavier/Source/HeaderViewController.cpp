@@ -103,17 +103,16 @@ void HeaderViewController::paint (Graphics& g)
 void HeaderViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    area.reduce(0, gYSpacing);
+    area.reduce(2, gYSpacing);
     
     float width = area.getWidth() / 7;
     
-    area.removeFromLeft(gXSpacing);
     galleryB.setBounds(area.removeFromLeft(width));
     
     area.removeFromLeft(gXSpacing);
     galleryCB.setBounds(area.removeFromLeft(2*width));
     
-    area.removeFromRight(gXSpacing);
+    area.removeFromRight(1);
     pianoB.setBounds(area.removeFromRight(width));
     
     area.removeFromRight(gXSpacing);
