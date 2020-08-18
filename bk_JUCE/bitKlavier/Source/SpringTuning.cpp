@@ -486,9 +486,10 @@ void SpringTuning::addSpringsByNote(int note)
 {
     for (auto p : particleArray)
     {
+        int otherNote = p->getNote();
+        if (otherNote == note) continue;
         if (p->getEnabled())
         {
-            int otherNote = p->getNote();
             int upperNote = note > otherNote ? note : otherNote;
             int lowerNote = note < otherNote ? note : otherNote;
             int hash = (upperNote << 16 | lowerNote);
