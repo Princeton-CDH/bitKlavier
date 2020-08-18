@@ -1510,7 +1510,7 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
 }
 
 
-void BKAudioProcessor::initializeGallery(void)
+void BKAudioProcessor::initializeGallery()
 {
     prevPiano = gallery->getPianos().getFirst();
     

@@ -816,9 +816,11 @@ bool BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
     BKPreparationType item2Type = item2->getType();
     
     bool changed = false;
+    bool removed1, removed2;
     // Remove the connections
-    if (item1->removeConnection(item2) || item2->removeConnection(item1))
-        changed = true;
+    removed1 = item1->removeConnection(item2);
+    removed2 = item2->removeConnection(item1);
+    changed = removed1 || removed2;
     
     // If disconnecting a modification, make it generic
     if (item1Type == PreparationTypeDirectMod ||

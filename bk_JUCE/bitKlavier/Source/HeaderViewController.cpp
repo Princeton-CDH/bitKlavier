@@ -300,6 +300,8 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
             hvc->fillPianoCB();
             
             processor.setCurrentPiano(newId);
+            
+            processor.saveGalleryToHistory("Add Piano");
         }
     }
     else if (res == 2) // Linked Copy
@@ -324,6 +326,8 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
             processor.currentPiano->setName(name);
             
             hvc->fillPianoCB();
+            
+            processor.saveGalleryToHistory("Linked Copy Piano");
         }
     }
     else if (res == 3) // Remove piano
@@ -345,6 +349,8 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
         hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
         
         processor.setCurrentPiano(newPianoId);
+        
+        processor.saveGalleryToHistory("Remove Piano");
     }
     else if (res == 4) // Rename
     {
@@ -396,6 +402,8 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
             construction->paste(false);
             
             processor.setClipboard(clipboard);
+            
+            processor.saveGalleryToHistory("Duplicate Piano");
         }
     }
     else if (res == 7)
@@ -1082,6 +1090,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         
         update();
         
+        processor.saveGalleryToHistory("Change Piano");
     }
     else if (name == "galleryCB")
     {
