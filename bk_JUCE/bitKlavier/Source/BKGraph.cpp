@@ -220,8 +220,8 @@ void BKItem::setImage(Image newImage)
     val *= processor.uiScaleFactor;
 #endif
     
-    int width = image.getWidth();
-    int height = image.getHeight();
+    float width = image.getWidth();
+    float height = image.getHeight();
     
     while (!(width < val || height < val))
     {

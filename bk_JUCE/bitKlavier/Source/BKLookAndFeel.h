@@ -57,7 +57,7 @@ public:
         setColour(Slider::backgroundColourId, Colours::black);
         setColour(Slider::textBoxOutlineColourId, Colours::transparentWhite);
         
-    
+        
         
         toggleTextToRight = true;
     
