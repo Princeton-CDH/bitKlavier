@@ -478,20 +478,24 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
     {
         int Id = vc->addKeymap();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Keymap Preparation");
     }
     else if (action == 2)
     {
         int Id = vc->duplicateKeymap();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Keymap Preparation");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Keymap Preparation");
     }
     else if (action == 5)
     {
         processor.clear(PreparationTypeKeymap, processor.updateState->currentKeymapId);
         vc->update();
+        processor.saveGalleryToHistory("Clear Keymap Preparation");
     }
     else if (action == 6)
     {
@@ -513,6 +517,7 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Keymap Preparation");
         }
         
         vc->update();
@@ -545,6 +550,7 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
         int which = action - 100;
         processor.importPreparation(PreparationTypeKeymap, processor.updateState->currentKeymapId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Keymap Preparation");
     }
 }
 

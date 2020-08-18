@@ -424,8 +424,6 @@ void DirectPreparationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
-    
-    processor.updateState->editsMade = true;
 }
 
 void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparationEditor* vc)
@@ -442,15 +440,18 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Direct Preparation");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Direct Preparation");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Direct Preparation");
     }
     else if (action == 4)
     {
@@ -461,6 +462,7 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
     {
         processor.clear(PreparationTypeDirect, processor.updateState->currentDirectId);
         vc->update();
+        processor.saveGalleryToHistory("Clear Direct Preparation");
     }
     else if (action == 6)
     {
@@ -482,6 +484,7 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Direct Preparation");
         }
         
         vc->update();
@@ -514,6 +517,7 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
         int which = action - 100;
         processor.importPreparation(PreparationTypeDirect, processor.updateState->currentDirectId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Direct Preparation");
     }
 }
 
@@ -834,8 +838,6 @@ void DirectModificationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
-    
-    processor.updateState->editsMade = true;
 }
 
 void DirectModificationEditor::actionButtonCallback(int action, DirectModificationEditor* vc)
@@ -852,21 +854,25 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Direct Modification");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Direct Modification");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Direct Modification");
     }
     else if (action == 5)
     {
         processor.clear(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
         vc->update();
         vc->updateModification();
+        processor.saveGalleryToHistory("Clear Direct Modification");
     }
     else if (action == 6)
     {
@@ -888,6 +894,7 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Direct Modification");
         }
         
         vc->update();
@@ -920,6 +927,7 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
         int which = action - 100;
         processor.importPreparation(PreparationTypeDirectMod, processor.updateState->currentModDirectId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Direct Modification");
     }
     
 }

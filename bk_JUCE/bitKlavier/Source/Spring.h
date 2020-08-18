@@ -29,7 +29,7 @@ public:
     typedef ReferenceCountedObjectPtr<Spring> Ptr;
     typedef Array<Spring::Ptr> PtrArr;
     
-	Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index);
+	Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index, String name, bool enabled);
 	    
     Spring::Ptr copy();
 	bool compare(Spring* that);
@@ -79,9 +79,9 @@ private:
     double oldStiffness;
     
 	double restingLength, length;
-    bool enabled;
 	int intervalIndex;
     String name;
+    bool enabled;
 };
 
 #pragma once

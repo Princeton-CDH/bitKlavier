@@ -1694,6 +1694,14 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
         
         if (proc != nullptr) proc->reset();
     }
+    else if (type == PreparationTypeBlendronic)
+    {
+        gallery->getBlendronic(Id)->clear();
+        
+        BlendronicProcessor::Ptr proc = currentPiano->getBlendronicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
     else if (type == PreparationTypeTuning)
     {
         gallery->getTuning(Id)->clear();
@@ -1726,7 +1734,7 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     {
         gallery->getSynchronicModification(Id)->reset();
     }
-    else if (type == PreparationTypeSynchronicMod)
+    else if (type == PreparationTypeBlendronicMod)
     {
         gallery->getBlendronicModification(Id)->reset();
     }

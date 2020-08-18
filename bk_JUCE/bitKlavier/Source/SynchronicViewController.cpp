@@ -1400,8 +1400,6 @@ void SynchronicPreparationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
-    
-    processor.updateState->editsMade = true;
 }
 
 void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPreparationEditor* vc)
@@ -1418,15 +1416,18 @@ void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPre
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Synchronic Preparation");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Synchronic Preparation");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Synchronic Preparation");
     }
     else if (action == 4)
     {
@@ -1437,6 +1438,7 @@ void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPre
     {
         processor.clear(PreparationTypeSynchronic, processor.updateState->currentSynchronicId);
         vc->update();
+        processor.saveGalleryToHistory("Clear Synchronic Preparation");
     }
     else if (action == 6)
     {
@@ -1458,6 +1460,7 @@ void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPre
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Synchronic Preparation");
         }
         
         vc->update();
@@ -1490,6 +1493,7 @@ void SynchronicPreparationEditor::actionButtonCallback(int action, SynchronicPre
         int which = action - 100;
         processor.importPreparation(PreparationTypeSynchronic, processor.updateState->currentSynchronicId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Synchronic Preparation");
     }
 }
 
@@ -2264,8 +2268,6 @@ void SynchronicModificationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
-    
-    processor.updateState->editsMade = true;
 }
 
 void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicModificationEditor* vc)
@@ -2282,21 +2284,25 @@ void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicMo
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Synchronic Modification");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Synchronic Modification");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Synchronic Modification");
     }
     else if (action == 5)
     {
         processor.clear(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId);
         vc->update();
         vc->updateModification();
+        processor.saveGalleryToHistory("Clear Synchronic Modification");
     }
     else if (action == 6)
     {
@@ -2318,6 +2324,7 @@ void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicMo
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Synchronic Modification");
         }
         
         vc->update();
@@ -2350,6 +2357,7 @@ void SynchronicModificationEditor::actionButtonCallback(int action, SynchronicMo
         int which = action - 100;
         processor.importPreparation(PreparationTypeSynchronicMod, processor.updateState->currentModSynchronicId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Synchronic Modification");
     }
 }
 

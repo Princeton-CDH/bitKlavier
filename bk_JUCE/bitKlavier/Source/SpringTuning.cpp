@@ -118,6 +118,13 @@ scaleId(JustTuning)
     
     for (int i = 0; i < 13; i++) springWeights[i] = 0.5;
     
+    // Converting std::string to juce::String takes time so
+    // convert before the look
+    // (was happening implicitly at spring->setName() and costing a lot of time
+    Array<String> labels;
+    for (auto label : intervalLabels)
+        labels.add(String(label));
+    
 	for (int i = 0; i < 128; i++)
 	{
         // Active particle
@@ -139,20 +146,11 @@ scaleId(JustTuning)
         p2->setNote(i);
         tetherParticleArray.add(p2);
         
-        Spring* s = new Spring(p1, p2, 0.0, 0.5, 0);
-        s->setEnabled(false);
-        s->setName(intervalLabels[0]);
+        Spring* s = new Spring(p1, p2, 0.0, 0.5, 0, labels.getUnchecked(0), false);
         tetherSpringArray.add(s);
 	}
 
     springArray.ensureStorageAllocated(10000);
-    
-    // Converting std::string to juce::String takes time so
-    // convert before the look
-    // (was happening implicitly at spring->setName() and costing a lot of time
-    Array<String> labels;
-    for (auto label : intervalLabels)
-        labels.add(String(label));
     
     if(!usingFundamentalForIntervalSprings)
     {
@@ -174,10 +172,9 @@ scaleId(JustTuning)
                                             particleArray[i],
                                             diff * 100 + intervalTuning[interval] * 100, //rest length in cents
                                             0.5,
-                                            interval);
-                
-                spring->setEnabled(false);
-                spring->setName(labels.getUnchecked(interval));
+                                            interval,
+                                            labels.getUnchecked(interval),
+                                            false);
                 springArray.add(spring);
             }
         }
@@ -208,10 +205,9 @@ scaleId(JustTuning)
                                             particleArray[i],
                                             fabs(diff), //rest length in cents
                                             0.5,
-                                            interval);
-                
-                spring->setEnabled(false);
-                spring->setName(labels.getUnchecked(interval));
+                                            interval,
+                                            labels.getUnchecked(interval),
+                                            false);
                 springArray.add(spring);
             }
         }

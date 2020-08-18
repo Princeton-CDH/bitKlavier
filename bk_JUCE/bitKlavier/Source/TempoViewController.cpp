@@ -403,8 +403,6 @@ void TempoPreparationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
-    
-    processor.updateState->editsMade = true;
 }
 
 void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEditor* vc)
@@ -420,15 +418,18 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Tempo Preparation");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Tempo Preparation");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Tempo Preparation");
     }
     else if (action == 4)
     {
@@ -439,6 +440,7 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
     {
         processor.clear(PreparationTypeTempo, processor.updateState->currentTempoId);
         vc->update();
+        processor.saveGalleryToHistory("Clear Tempo Preparation");
     }
     else if (action == 6)
     {
@@ -460,6 +462,7 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Tempo Preparation");
         }
         
         vc->update();
@@ -492,6 +495,7 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
         int which = action - 100;
         processor.importPreparation(PreparationTypeTempo, processor.updateState->currentTempoId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Tempo Preparation");
     }
 }
 
@@ -786,8 +790,6 @@ void TempoModificationEditor::setCurrentId(int Id)
     fillSelectCB(lastId, Id);
     
     lastId = Id;
-    
-    processor.updateState->editsMade = true;
 }
 
 void TempoModificationEditor::actionButtonCallback(int action, TempoModificationEditor* vc)
@@ -803,21 +805,25 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Tempo Modification");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Tempo Modification");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Tempo Modification");
     }
     else if (action == 5)
     {
         processor.clear(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
         vc->update();
         vc->updateModification();
+        processor.saveGalleryToHistory("Clear Tempo Modification");
     }
     else if (action == 6)
     {
@@ -839,6 +845,7 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Tempo Modification");
         }
         
         vc->update();
@@ -871,6 +878,7 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
         int which = action - 100;
         processor.importPreparation(PreparationTypeTempoMod, processor.updateState->currentModTempoId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Tempo Modification");
     }
 }
 
