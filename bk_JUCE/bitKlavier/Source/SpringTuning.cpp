@@ -149,70 +149,6 @@ scaleId(JustTuning)
         Spring* s = new Spring(p1, p2, 0.0, 0.5, 0, labels.getUnchecked(0), false);
         tetherSpringArray.add(s);
 	}
-
-    springArray.ensureStorageAllocated(10000);
-    
-    if(!usingFundamentalForIntervalSprings)
-    {
-        for (int i = 0; i < 128; i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                int diff = i - j;
-                
-                int interval = diff % 12;
-                
-                if (diff != 0 && interval == 0)
-                {
-                    interval = 12;
-                }
-                
-                //DBG("spring: " + String(i) + " " + String(j) + " " + String(diff * 100 + intervalTuning[interval] * 100));
-                Spring* spring = new Spring(particleArray[j],
-                                            particleArray[i],
-                                            diff * 100 + intervalTuning[interval] * 100, //rest length in cents
-                                            0.5,
-                                            interval,
-                                            labels.getUnchecked(interval),
-                                            false);
-                springArray.add(spring);
-            }
-        }
-    }
-    else
-    {
-        //usingFundamentalForIntervalSprings
-        for (int i = 0; i < 128; i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                float diff = i - j;
-                int interval = (int)diff % 12;
-                if (diff != 0 && interval == 0)
-                {
-                    interval = 12;
-                }
-                
-                int scaleDegree1 = particleArray[i]->getNote();
-                int scaleDegree2 = particleArray[j]->getNote();;
-                //int intervalFundamental = 0; //temporary, will set in preparation
-                
-                diff =  100. * ((scaleDegree1 + intervalTuning[(scaleDegree1 - (int)intervalFundamentalActive) % 12]) -
-                                (scaleDegree2 + intervalTuning[(scaleDegree2 - (int)intervalFundamentalActive) % 12]));
-                
-                //DBG("setting new spring " + String(scaleDegree1) + " " + String(scaleDegree2) + " length = " + String(fabs(diff)));
-                Spring* spring = new Spring(particleArray[j],
-                                            particleArray[i],
-                                            fabs(diff), //rest length in cents
-                                            0.5,
-                                            interval,
-                                            labels.getUnchecked(interval),
-                                            false);
-                springArray.add(spring);
-            }
-        }
-    }
-	
     
     setStiffness(1.0);
 	numNotes = 0;
@@ -534,6 +470,7 @@ void SpringTuning::findFundamental()
 
 void SpringTuning::addSpring(Spring::Ptr spring)
 {
+    if (enabledSpringArray.contains(spring)) return;
     int interval = spring->getIntervalIndex();
     
     spring->setEnabled(true);
@@ -547,31 +484,51 @@ void SpringTuning::addSpring(Spring::Ptr spring)
 
 void SpringTuning::addSpringsByNote(int note)
 {
-    Particle* p = particleArray[note];
-    for (auto spring : springArray)
+    for (auto p : particleArray)
     {
-        Particle* a = spring->getA();
-        Particle* b = spring->getB();
-        
-		if (!spring->getEnabled())
+        if (p->getEnabled())
         {
-			// sets the spring to enabled if one spring matches the index and the other is enabled
-			if (a == p)
-			{
-				if (b->getEnabled())
+            int otherNote = p->getNote();
+            int upperNote = note > otherNote ? note : otherNote;
+            int lowerNote = note < otherNote ? note : otherNote;
+            int hash = (upperNote << 16 | lowerNote);
+            if (!springArray.contains(hash))
+            {
+                float diff = upperNote - lowerNote;
+                
+                int interval = (int)diff % 12;
+                int octInterval = interval;
+                
+                if (diff != 0 && interval == 0)
                 {
-                    addSpring(spring);
+                    octInterval = 12;
                 }
-			}
-			else if (b == p)
-			{
-				if (a->getEnabled())
+                
+                if (usingFundamentalForIntervalSprings)
                 {
-                    addSpring(spring);
+                    int scaleDegree1 = particleArray.getUnchecked(upperNote)->getNote();
+                    int scaleDegree2 = particleArray.getUnchecked(lowerNote)->getNote();;
+                    //int intervalFundamental = 0; //temporary, will set in preparation
+                    
+                    diff = fabs(100. *
+                    ((scaleDegree1 +
+                      intervalTuning.getUnchecked((scaleDegree1 - (int)intervalFundamentalActive) % 12)) -
+                    (scaleDegree2 +
+                     intervalTuning.getUnchecked((scaleDegree2 - (int)intervalFundamentalActive) % 12))));
                 }
-			}
+                else diff = diff * 100 + intervalTuning.getUnchecked(interval) * 100;
+
+                springArray.set(hash, new Spring(particleArray.getUnchecked(lowerNote),
+                                                 particleArray.getUnchecked(upperNote),
+                                                 diff, //rest length in cents
+                                                 0.5,
+                                                 octInterval,
+                                                 intervalLabels[octInterval],
+                                                 false));
+            }
+            addSpring(springArray[hash]);
         }
-	}
+    }
 
     tetherSpringArray[note]->setEnabled(true);
     

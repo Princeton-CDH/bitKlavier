@@ -11,7 +11,7 @@
 #include "Spring.h"
 #include "../JuceLibraryCode/JuceHeader.h"
 
-Spring::Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index, String name, bool enabled) :
+Spring::Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index, const String& name, bool enabled) :
 	a(firstPoint),
 	b(secondPoint),
     strength(str),

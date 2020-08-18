@@ -198,7 +198,7 @@ public:
     Spring::PtrArr& getTetherSprings(void) { return tetherSpringArray;}
     
     Particle::PtrArr& getParticles(void) { return particleArray;}
-    Spring::PtrArr& getSprings(void) { return springArray;}
+    Spring::PtrMap& getSprings(void) { return springArray; }
     
     Spring::PtrArr& getEnabledSprings(void) { return enabledSpringArray;}
     
@@ -467,7 +467,7 @@ private:
     PitchClass tetherFundamental;
 
     Particle::PtrArr    particleArray;
-    Spring::PtrArr      springArray; // efficiency fix: make this ordered by spring interval
+    Spring::PtrMap      springArray; // efficiency fix: make this ordered by spring interval
     
     Particle::PtrArr    tetherParticleArray;
     Spring::PtrArr      tetherSpringArray;
