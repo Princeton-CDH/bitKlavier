@@ -228,6 +228,9 @@ public:
         keysave.addChild(harmonizer, -1, 0);
 
         keysave.setProperty(ptagKeymap_harmonizerShift, harShift, 0);
+
+        keysave.setProperty(ptagKeymap_endKeystrokes, allNotesOff ? 1 : 0, 0);
+        keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
         
         keysave.setProperty(ptagKeymap_defaultSelected, defaultSelected, 0);
         
@@ -331,6 +334,14 @@ public:
         {
             harShift = 0;
         }
+
+        n = e->getStringAttribute(ptagKeymap_endKeystrokes);
+        if (n != "") setAllNotesOff((bool)n.getIntValue());
+        else setAllNotesOff(false);
+
+        n = e->getStringAttribute(ptagKeymap_ignoreSustain);
+        if (n != "") setIgnoreSustain((bool)n.getIntValue());
+        else setIgnoreSustain(false);
 
         n = e->getStringAttribute(ptagKeymap_defaultSelected);
         if (n != "") defaultSelected = n.getIntValue();
@@ -490,10 +501,6 @@ public:
     inline bool getIgnoreSustain() { return ignoreSustain; }
     inline void setIgnoreSustain(bool toSet) { ignoreSustain = toSet; }
     inline void toggleIgnoreSustain() { ignoreSustain = !ignoreSustain; }
-
-    inline int getIgnoreSustainCount() { return ignoreSustainCount; }
-    inline void addToIgnoreSustainCount(int toAdd) { ignoreSustainCount += toAdd; }
-    inline void setIgnoreSustainCount(int toSet) { ignoreSustainCount = toSet; }
     
 private:
     BKAudioProcessor& processor;
@@ -528,7 +535,6 @@ private:
     bool allNotesOff;
 
     bool ignoreSustain;
-    int ignoreSustainCount;
 
     JUCE_LEAK_DETECTOR (Keymap)
 };

@@ -230,6 +230,8 @@ const String ptagKeymap_midiInputIdentifier = "midiInputIdentifier";
 const String ptagKeymap_defaultSelected = "defSelected";
 const String ptagKeymap_onscreenSelected = "osSelected";
 const String ptagKeymap_harmonizerShift = "harmonizerShift";
+const String ptagKeymap_endKeystrokes = "endKeystrokes";
+const String ptagKeymap_ignoreSustain = "ignoreSustain";
 
 
 

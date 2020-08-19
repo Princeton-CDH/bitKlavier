@@ -560,9 +560,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
     bool activeSource = false;
-    bool doIgnoreSustain = false;
-    int noteOffThreshold = 1;
-    Keymap::PtrArr toIgnore;
 
     if (pmap != nullptr)
     {
@@ -595,15 +592,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                         {
                             handleNoteOn(harmonizer[i], velocity, channel, source, true);
                         }
-                    }
-                }
-                if (km->getIgnoreSustain())
-                {
-                    doIgnoreSustain = true;
-                    if (km->getIgnoreSustainCount() < noteOffThreshold)
-                    {
-                        km->addToIgnoreSustainCount(1);
-                        if (km->getIgnoreSustainCount() >= noteOffThreshold) toIgnore.addIfNotAlreadyThere(km);
                     }
                 }
                 if (km->getAllNotesOff())

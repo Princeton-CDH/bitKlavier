@@ -31,8 +31,7 @@ allNotesOff(false),
 //harmonizerEnabled(false),
 harKey(60),
 harShift(0),
-ignoreSustain(false),
-ignoreSustainCount(0)
+ignoreSustain(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -82,8 +81,7 @@ allNotesOff(k->getAllNotesOff()),
 //harmonizerEnabled(k->getHarmonizerEnabled()),
 harKey(k->getHarKey()),
 harShift(k->getHarShift()),
-ignoreSustain(k->getIgnoreSustain()),
-ignoreSustainCount(0)
+ignoreSustain(k->getIgnoreSustain())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -132,8 +130,7 @@ allNotesOff(k->getAllNotesOff()),
 //harmonizerEnabled(false),
 harKey(k->getHarKey()),
 harShift(k->getHarShift()),
-ignoreSustain(k->getIgnoreSustain()),
-ignoreSustainCount(0)
+ignoreSustain(k->getIgnoreSustain())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -185,8 +182,7 @@ allNotesOff(false),
 //harmonizerEnabled(false),
 harKey(60),
 harShift(0),
-ignoreSustain(false),
-ignoreSustainCount(0)
+ignoreSustain(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
