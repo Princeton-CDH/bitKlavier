@@ -411,6 +411,53 @@ public:
     inline Array<Array<int>> getHarmonizerKeys() { return harmonizerKeys; }
     inline void setHarmonizerKeys(Array<Array<int>> toSet) { harmonizerKeys = toSet; }
 
+    String getHarmonizerTextForDisplay()
+    {
+        String compositeString = "";
+        for (int i = 0; i < harmonizerKeys.size(); i++)
+        {
+            if (harmonizerKeys[i].size() > 1)
+            {
+                compositeString += (String(i) + ": [");
+                for (int j = 0; j < harmonizerKeys[i].size(); j++)
+                {
+                    compositeString += (String(harmonizerKeys[i][j] - i) + " "); //using the half step offset rather than the absoute midi value
+                }
+                compositeString += "] ";
+            }
+        }
+
+        return compositeString;
+    }
+
+    void setHarmonizerFromDisplayText(String textToSet)
+    {
+        int substringIndex = 0;
+        int substringHarIndex = textToSet.indexOfChar(substringIndex, ':');
+        int substringStartIndex = textToSet.indexOfChar(substringIndex, '[');
+        int substringEndIndex = textToSet.indexOfChar(substringIndex, ']');
+        String noteArrayString = textToSet.substring(substringStartIndex, substringEndIndex);
+        while (substringEndIndex != -1 && substringHarIndex != -1 && substringIndex != -1)
+        {
+            int harEntry = textToSet.substring(substringIndex, substringHarIndex).getIntValue();
+            Array<int> arrayToSet;
+            int localIndex = 0;
+            int localEndIndex = noteArrayString.indexOfAnyOf(" ]", localIndex);
+            while (localEndIndex != -1)
+            {
+                arrayToSet.addIfNotAlreadyThere(noteArrayString.substring(localIndex, localEndIndex).getIntValue() + harEntry); //using the half step offset rather than the absoute midi value
+                localIndex = localEndIndex + 1;
+                localEndIndex = noteArrayString.indexOfAnyOf(" ]", localIndex);
+            }
+            harmonizerKeys.set(harEntry, arrayToSet);
+            substringIndex = substringEndIndex + 2;
+            substringHarIndex = textToSet.indexOfChar(substringIndex, ':');
+            substringStartIndex = textToSet.indexOfChar(substringIndex, '[');
+            substringEndIndex = textToSet.indexOfChar(substringIndex, ']');
+            noteArrayString = textToSet.substring(substringStartIndex, substringEndIndex);
+        }
+    }
+
     Array<int> getHarmonizationForKey(int key, bool useShift = false)
     { 
         Array<int> h = Array<int>();

@@ -109,9 +109,12 @@ private:
     std::unique_ptr<Component> harKeyboardComponent;
     BKKeymapKeyboardComponent* harKeyboard;
     BKTextButton harKeyboardValsTextFieldOpen;
+    BKTextButton harKeyboardAllValsTextFieldOpen;
 
     BKLabel harArrayKeymapL;
     BKTextEditor harArrayKeymapTF;
+    
+    BKTextEditor harAllKeymapTF;
 
     BKKeymapKeyboardState harArrayKeyboardState;
     std::unique_ptr<Component> harArrayKeyboardComponent;

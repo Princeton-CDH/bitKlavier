@@ -173,6 +173,10 @@ public:
     {
         getKeymap(Id)->setHarmonizerList(harArray);
     }
+    inline const void setKeymapHarmonizersFromString(int Id, String useToSet) const noexcept
+    {
+        getKeymap(Id)->setHarmonizerFromDisplayText(useToSet);
+    }
     
     inline const Piano::PtrArr getPianos(void) const noexcept
     {
