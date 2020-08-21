@@ -58,7 +58,7 @@ public:
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
     void loadGalleryFromPath(String path);
-    void loadGalleryFromXml(XmlElement* xml);
+    void loadGalleryFromXml(XmlElement* xml, bool resetHistory = true);
     void loadJsonGalleryFromPath(String path);
     void saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
@@ -67,6 +67,7 @@ public:
     void duplicateGallery(String name);
     void deleteGallery(void);
     
+    void updateGalleryFromXml(XmlElement* xml);
     
     void importCurrentGallery(void);
     void exportCurrentGallery(void);
@@ -380,6 +381,63 @@ public:
 
     void handleAllNotesOff();
 
+    
+    Array<std::shared_ptr<XmlElement>> galleryHistory;
+    int undoDepth;
+    
+#define UNDO_HISTORY_SIZE 100
+    
+    inline void saveGalleryToHistory(String actionDesc = String())
+    {
+        int start = galleryHistory.size() - undoDepth;
+        galleryHistory.removeRange(start, undoDepth);
+        
+        ValueTree galleryVT = gallery->getState();
+        
+        // Maybe should do this by piano instead of gallery
+        // Loading some galleries is very slow
+//        ValueTree galleryVT = currentPiano->getState();
+        
+        galleryVT.setProperty("actionDesc", actionDesc, 0);
+        galleryHistory.add(galleryVT.createXml());
+        if (galleryHistory.size() > UNDO_HISTORY_SIZE) galleryHistory.remove(0);
+        undoDepth = 0;
+    }
+    
+    inline void resetGalleryHistory()
+    {
+        galleryHistory.clear();
+        saveGalleryToHistory("Root");
+    }
+    
+    inline String undoGallery()
+    {
+        if (undoDepth >= galleryHistory.size() - 1) return String();
+        XmlElement* prevGalleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).get();
+        undoDepth++;
+        XmlElement* galleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).get();
+        
+        loadGalleryFromXml(galleryVT, false);
+        
+//        currentPiano->setState(galleryVT.createXml().get(), &gallery->idmap, gallery->idcounts);
+//        currentPiano->configure();
+        
+        return "Undo " + prevGalleryVT->getStringAttribute("actionDesc");
+    }
+    
+    inline String redoGallery()
+    {
+        if (undoDepth == 0) return String();
+        undoDepth--;
+        XmlElement* galleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).get();
+        
+        loadGalleryFromXml(galleryVT, false);
+        
+//        currentPiano->setState(galleryVT.createXml().get(), &gallery->idmap, gallery->idcounts);
+//        currentPiano->configure();
+        
+        return "Redo " + galleryVT->getStringAttribute("actionDesc");
+    }
     
 private:
     double currentSampleRate;

@@ -11,19 +11,21 @@
 #include "Spring.h"
 #include "../JuceLibraryCode/JuceHeader.h"
 
-Spring::Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index) :
+Spring::Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index, const String& name, bool enabled) :
 	a(firstPoint),
 	b(secondPoint),
     strength(str),
 	restingLength(length),
-	intervalIndex(index)
+	intervalIndex(index),
+    name(name),
+    enabled(enabled)
 {
     
 }
 
 Spring::Ptr Spring::copy(void)
 {
-    Spring::Ptr copySpring = new Spring(a, b, restingLength, strength, intervalIndex);
+    Spring::Ptr copySpring = new Spring(a, b, restingLength, strength, intervalIndex, name, enabled);
 	return copySpring;
 }
 

@@ -28,8 +28,9 @@ class Spring : public ReferenceCountedObject
 public:
     typedef ReferenceCountedObjectPtr<Spring> Ptr;
     typedef Array<Spring::Ptr> PtrArr;
+    typedef HashMap<int, Spring::Ptr> PtrMap;
     
-	Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index);
+	Spring(Particle* firstPoint, Particle* secondPoint, double length, double str, int index, const String& name, bool enabled);
 	    
     Spring::Ptr copy();
 	bool compare(Spring* that);
@@ -79,9 +80,9 @@ private:
     double oldStiffness;
     
 	double restingLength, length;
-    bool enabled;
 	int intervalIndex;
     String name;
+    bool enabled;
 };
 
 #pragma once

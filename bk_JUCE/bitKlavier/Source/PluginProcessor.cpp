@@ -410,7 +410,7 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     
     myXML->writeTo(myFile, XmlElement::TextFormat());
     
-    loadGalleryFromXml(myXML.get());
+    loadGalleryFromXml(myXML.get(), false);
     
     gallery->setURL(newURL);
     
@@ -1458,7 +1458,7 @@ void BKAudioProcessor::loadGalleryDialog(void)
     
 }
 
-void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml)
+void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
@@ -1482,6 +1482,11 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml)
     }
     
     currentPiano->configure();
+
+    for (auto bprocessor : currentPiano->getBlendronicProcessors())
+        bprocessor->setActive(true);
+    
+    if (resetHistory) resetGalleryHistory();
 }
 
 void BKAudioProcessor::loadGalleryFromPath(String path)
@@ -1592,7 +1597,7 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
 }
 
 
-void BKAudioProcessor::initializeGallery(void)
+void BKAudioProcessor::initializeGallery()
 {
     prevPiano = gallery->getPianos().getFirst();
     
@@ -1776,6 +1781,14 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
         
         if (proc != nullptr) proc->reset();
     }
+    else if (type == PreparationTypeBlendronic)
+    {
+        gallery->getBlendronic(Id)->clear();
+        
+        BlendronicProcessor::Ptr proc = currentPiano->getBlendronicProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
     else if (type == PreparationTypeTuning)
     {
         gallery->getTuning(Id)->clear();
@@ -1808,7 +1821,7 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     {
         gallery->getSynchronicModification(Id)->reset();
     }
-    else if (type == PreparationTypeSynchronicMod)
+    else if (type == PreparationTypeBlendronicMod)
     {
         gallery->getBlendronicModification(Id)->reset();
     }

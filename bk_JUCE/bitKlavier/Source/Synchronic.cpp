@@ -9,6 +9,7 @@
 */
 
 #include "Synchronic.h"
+#include "PluginProcessor.h"
 
 SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TuningProcessor::Ptr tuning,
@@ -26,10 +27,10 @@ notePlayed(false)
 {
     if (!synchronic->sPrep->getUseGlobalSoundSet())
     {
+        // comes in as "soundfont.sf2.subsound1"
         String name = synchronic->sPrep->getSoundSetName();
         BKSampleLoadType type = BKLoadSoundfont;
-        String path = String();
-        int subsound = 0;
+        
         for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
         {
             if (name == String(cBKSampleLoadTypes[i]))
@@ -37,9 +38,21 @@ notePlayed(false)
                 type = (BKSampleLoadType) i;
             }
         }
+        
+        String path = name.upToLastOccurrenceOf(".subsound", false, false);
+        int subsound = 0;
+        
         if (type == BKLoadSoundfont)
         {
-            path = name.upToLastOccurrenceOf(".subsound", false, false);
+            for (auto sf : synth->processor.soundfontNames)
+            {
+                if (sf.contains(path))
+                {
+                    path = sf;
+                    break;
+                }
+            }
+
             subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
         }
         int Id = synth->loadSamples(type, path, subsound, false);
@@ -453,12 +466,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     {
         if (!clusters.isEmpty())
         {
-            SynchronicCluster::Ptr tempCluster = clusters.getLast();
-            for (int i = 1; i < clusters.size(); i++)
-            {
-                clusters.set(i, cluster[i-1]);
-            }
-            clusters.set(0, tempCluster);
+            clusters.move(clusters.size() - 1, 0);
         }
     }
 }
@@ -615,12 +623,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     {
         if (!clusters.isEmpty())
         {
-            SynchronicCluster::Ptr tempCluster = clusters.getLast();
-            for (int i = 1; i < clusters.size(); i++)
-            {
-                clusters.set(i, cluster[i-1]);
-            }
-            clusters.set(0, tempCluster);
+            clusters.move(clusters.size() - 1, 0);
         }
     }
 }

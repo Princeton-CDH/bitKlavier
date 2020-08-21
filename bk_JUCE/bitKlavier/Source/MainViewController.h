@@ -112,6 +112,8 @@ public:
     
     /*inline Viewport* getViewport(void) { return &viewPort;}*/
     void toggleDisplay(void);
+    void performUndo(void);
+    void performRedo(void);
     
     Slider octaveSlider;
     //void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
@@ -119,6 +121,7 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it
+#define MVC_REFRESH_RATE 20
     
     BKAudioProcessor& processor;
     BKAudioProcessorEditor& editor;
@@ -199,6 +202,9 @@ private:
     ToggleButton globalSoundSetButton;
 
     ToggleButton sustainPedalButton;
+    
+    Label undoStatus;
+    int undoStatusCount;
     
     BKButtonAndMenuLAF laf;
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;

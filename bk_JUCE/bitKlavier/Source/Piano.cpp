@@ -964,6 +964,18 @@ ValueTree Piano::getState(void)
             itemVT.addChild(connectionsVT, -1, 0);
             pianoVT.addChild(itemVT, -1, 0);
         }
+        // Adding these in so they don't disappear on save/load, but we don't need to get their connections
+        else if (type == PreparationTypeDirect)
+        {
+            itemVT.addChild(item->getState(), -1, 0);
+            pianoVT.addChild(itemVT, -1, 0);
+        }
+        else if (type == PreparationTypeNostalgic)
+        {
+            itemVT.addChild(item->getState(), -1, 0);
+            pianoVT.addChild(itemVT, -1, 0);
+        }
+        //
         else if (type == PreparationTypeSynchronic)
         {
             itemVT.addChild(item->getState(), -1, 0);
@@ -1019,7 +1031,9 @@ ValueTree Piano::getState(void)
             itemVT.addChild(connectionsVT, -1, 0);
             pianoVT.addChild(itemVT, -1, 0);
         }
-        else if (type == PreparationTypeComment)
+        else if (type == PreparationTypeComment ||
+                 type == PreparationTypeGenericMod ||
+                 type == PreparationTypePianoMap)
         {
             itemVT.addChild(item->getState(), -1, 0);
             

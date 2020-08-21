@@ -210,6 +210,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         globalSampleType = sampleType;
 
         globalSoundfont = galleryXML->getStringAttribute("soundfontURL");
+        
         File bkSoundfonts;
 #if JUCE_IOS
         bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory);

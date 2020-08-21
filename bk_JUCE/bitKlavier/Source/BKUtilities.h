@@ -124,7 +124,7 @@ inline PopupMenu getNewItemMenu(LookAndFeel* laf)
     newMenu.addSeparator();
     newMenu.addItem(COMMENT_ID, "Comment" + gCommentShortcut);
     
-    return newMenu;
+    return std::move(newMenu);
 }
 
 // What is this for?
@@ -145,7 +145,7 @@ inline PopupMenu getEditItemMenu(LookAndFeel* laf)
     menu.addItem(TUNINGMOD_EDIT_ID, "Tuning Mod");
     menu.addItem(TEMPOMOD_EDIT_ID, "Tempo Mod");
     
-    return menu;
+    return std::move(menu);
 }
 
 inline PopupMenu getAlignMenu(LookAndFeel* laf)
@@ -155,25 +155,31 @@ inline PopupMenu getAlignMenu(LookAndFeel* laf)
     menu.addItem(ALIGN_VERTICAL, "Row");
     menu.addItem(ALIGN_HORIZONTAL, "Column");
     
-    return menu;
+    return std::move(menu);
 }
 
 inline PopupMenu getEditMenuStandalone(LookAndFeel* laf, int numItemsSelected, bool onGraph = false, bool rightClick = false)
 {
     BKPopupMenu menu;
 
+#if JUCE_IOS
+    if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
+#else
+    menu.addSubMenu("Add...", getNewItemMenu(laf));
+#endif
+    
     if (numItemsSelected)
     {
-#if JUCE_IOS
-        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
-#else
-        menu.addSubMenu("Add...", getNewItemMenu(laf));
-#endif
         menu.addSeparator();
         menu.addItem(COPY_ID, "Copy" + gCopyShortcut);
         menu.addItem(CUT_ID, "Cut" + gCutShortcut);
         menu.addItem(PASTE_ID, "Paste" + gPasteShortcut);
         menu.addItem(DELETE_ID, "Delete");
+        
+        menu.addSeparator();
+        menu.addItem(UNDO_ID, "Undo" + gUndoShortcut);
+        menu.addItem(REDO_ID, "Redo" + gRedoShortcut);
+        
         if (numItemsSelected == 1)
         {
             menu.addSeparator();
@@ -182,6 +188,7 @@ inline PopupMenu getEditMenuStandalone(LookAndFeel* laf, int numItemsSelected, b
             menu.addItem(CONNECTION_ID, "Make Connection" + gConnectionShortcut);
             menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected" + gDisconnectFromShortcut);
         }
+        
         if (numItemsSelected > 1)
         {
             menu.addSeparator();
@@ -194,39 +201,45 @@ inline PopupMenu getEditMenuStandalone(LookAndFeel* laf, int numItemsSelected, b
     }
     else if (numItemsSelected == 0)
     {
-#if JUCE_IOS
-        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
-#else
-        menu.addSubMenu("Add...", getNewItemMenu(laf));
-#endif
         menu.addSeparator();
         menu.addItem(PASTE_ID, "Paste" + gPasteShortcut);
+        
+        menu.addSeparator();
+        menu.addItem(UNDO_ID, "Undo" + gUndoShortcut);
+        menu.addItem(REDO_ID, "Redo" + gRedoShortcut);
     }
+    
     if (!rightClick)
     {
         menu.addSeparator();
         menu.addItem(OFF_ID, "All Off");
     }
 
-    return menu;
+    return std::move(menu);
 }
 
 inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGraph = false, bool rightClick = false)
 {
     BKPopupMenu menu;
     
+    #if JUCE_IOS
+            if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
+    #else
+            menu.addSubMenu("Add...", getNewItemMenu(laf));
+    #endif
+    
     if (numItemsSelected)
     {
-#if JUCE_IOS
-        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
-#else
-        menu.addSubMenu("Add...", getNewItemMenu(laf));
-#endif
         menu.addSeparator();
         menu.addItem(COPY_ID, "Copy");
         menu.addItem(CUT_ID, "Cut");
         menu.addItem(PASTE_ID, "Paste");
         menu.addItem(DELETE_ID, "Delete");
+        
+        menu.addSeparator();
+        menu.addItem(UNDO_ID, "Undo");
+        menu.addItem(REDO_ID, "Redo");
+        
         if (numItemsSelected == 1)
         {
             menu.addSeparator();
@@ -235,6 +248,7 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
             menu.addItem(CONNECTION_ID, "Make Connection" + gConnectionShortcut);
             menu.addItem(DISCONNECT_FROM_ID, "Remove Connections To Selected" + gDisconnectFromShortcut);
         }
+        
         if (numItemsSelected > 1)
         {
             menu.addSeparator();
@@ -247,13 +261,12 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     }
     else if (numItemsSelected == 0)
     {
-#if JUCE_IOS
-        if (!onGraph) menu.addSubMenu("Add...", getNewItemMenu(laf));
-#else
-        menu.addSubMenu("Add...", getNewItemMenu(laf));
-#endif
         menu.addSeparator();
         menu.addItem(PASTE_ID, "Paste");
+        
+        menu.addSeparator();
+        menu.addItem(UNDO_ID, "Undo");
+        menu.addItem(REDO_ID, "Redo");
     }
     if (!rightClick)
     {
@@ -261,7 +274,7 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
         menu.addItem(OFF_ID, "All Off");
     }
     
-    return menu;
+    return std::move(menu);
 }
 
 

@@ -895,20 +895,24 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
     {
         int Id = vc->addKeymap();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Keymap Preparation");
     }
     else if (action == 2)
     {
         int Id = vc->duplicateKeymap();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Keymap Preparation");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Keymap Preparation");
     }
     else if (action == 5)
     {
         processor.clear(PreparationTypeKeymap, processor.updateState->currentKeymapId);
         vc->update();
+        processor.saveGalleryToHistory("Clear Keymap Preparation");
     }
     else if (action == 6)
     {
@@ -930,6 +934,7 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Keymap Preparation");
         }
         
         vc->update();
@@ -962,6 +967,7 @@ void KeymapViewController::actionButtonCallback(int action, KeymapViewController
         int which = action - 100;
         processor.importPreparation(PreparationTypeKeymap, processor.updateState->currentKeymapId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Keymap Preparation");
     }
 }
 
@@ -1014,7 +1020,7 @@ PopupMenu KeymapViewController::getPitchClassMenu(int offset)
         menu.addItem(Id, pcs[i]);
     }
     
-    return menu;
+    return std::move(menu);
 }
 
 PopupMenu KeymapViewController::getKeysMenu(void)
@@ -1039,7 +1045,7 @@ PopupMenu KeymapViewController::getKeysMenu(void)
     menu.addSubMenu("Natural Minor", getPitchClassMenu((KeySet) ID(KeySetNaturalMinor)));
     menu.addSubMenu("Harmonic Minor", getPitchClassMenu((KeySet) ID(KeySetHarmonicMinor)));
     
-    return menu;
+    return std::move(menu);
 }
 
 PopupMenu KeymapViewController::getHarmonizerMenu(void)
@@ -1178,7 +1184,7 @@ PopupMenu KeymapViewController::getTargetsMenu()
         }
     }
     if (menu.getNumItems() == 0) menu.addItem(-1, "No targets available", false);
-    return menu;
+    return std::move(menu);
 }
 
 void KeymapViewController::fillSelectCB(int last, int current)
@@ -1238,7 +1244,7 @@ PopupMenu KeymapViewController::getMidiInputSelectMenu()
             menu.addItem(PopupMenu::Item(device.name).setID(++id).setTicked(true));
         else menu.addItem(PopupMenu::Item(device.name).setID(++id));
     }
-    return menu;
+    return std::move(menu);
 }
 
 void KeymapViewController::bkButtonClicked (Button* b)
@@ -1248,6 +1254,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setMidiEdit(false);
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if(b->getName() == keyboardValsTextFieldOpen.getName())
     {

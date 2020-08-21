@@ -424,9 +424,8 @@ public:
         prep.addChild(undertowADSRvals, -1, 0);
         
         prep.setProperty( ptagNostalgic_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
-        File soundfont(getSoundSetName().upToLastOccurrenceOf(".subsound", false, false));
-        if (soundfont.exists()) prep.setProperty(ptagNostalgic_soundSet, soundfont.getFileName() + getSoundSetName().fromLastOccurrenceOf(".subsound", true, false), 0);
-        else prep.setProperty(ptagNostalgic_soundSet, String(), 0);
+        
+        prep.setProperty(ptagNostalgic_soundSet, getSoundSetName(), 0);
         
         return prep;
     }
@@ -524,28 +523,7 @@ public:
         else setUseGlobalSoundSet(true);
         
         str = e->getStringAttribute(ptagNostalgic_soundSet);
-        File bkSoundfonts;
-#if JUCE_IOS
-        bkSoundfonts = File::getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
-#endif
-#if JUCE_MAC
-        bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
-#endif
-#if JUCE_WINDOWS || JUCE_LINUX
-        bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
-#endif
-        Array<File> files = bkSoundfonts.findChildFiles(File::findFiles, true, str.upToLastOccurrenceOf(".subsound", false, false));
-        
-#if JUCE_IOS
-        if (files.isEmpty())
-        {
-            bkSoundfonts = File::getSpecialLocation (File::userDocumentsDirectory);
-            files = bkSoundfonts.findChildFiles(File::findFiles, true, str.upToLastOccurrenceOf(".subsound", false, false));
-        }
-#endif
-        
-        if (!files.isEmpty()) setSoundSetName(files.getUnchecked(0).getFullPathName() + str.fromLastOccurrenceOf(".subsound", true, false));
-        else setSoundSetName(String());
+        setSoundSetName(str);
         
         // HOLD MIN / MAX
         str = e->getStringAttribute("holdMin");

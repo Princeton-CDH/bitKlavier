@@ -578,6 +578,8 @@ void BKAudioProcessor::importPiano(int Id, int importId)
     gallery->addPiano(pianoxml, &importmap);
     
     setCurrentPiano(gallery->getPianos().getLast()->getId());
+    
+    saveGalleryToHistory("Import Piano");
 }
 
 void BKAudioProcessor::exportPiano(int Id, String name)

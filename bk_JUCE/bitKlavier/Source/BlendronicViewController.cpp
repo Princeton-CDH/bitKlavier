@@ -457,6 +457,8 @@ void BlendronicPreparationEditor::BKEditableComboBoxChanged(String name, BKEdita
     Blendronic::Ptr blendronic = processor.gallery->getBlendronic(processor.updateState->currentBlendronicId);
     
     blendronic->setName(name);
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicPreparationEditor::update(void)
@@ -576,15 +578,18 @@ void BlendronicPreparationEditor::actionButtonCallback(int action, BlendronicPre
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Blendronic Preparation");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Blendronic Preparation");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Blendronic Preparation");
     }
     else if (action == 4)
     {
@@ -595,6 +600,7 @@ void BlendronicPreparationEditor::actionButtonCallback(int action, BlendronicPre
     {
         processor.clear(PreparationTypeBlendronic, processor.updateState->currentBlendronicId);
         vc->update();
+        processor.saveGalleryToHistory("Clear Blendronic Preparation");
     }
     else if (action == 6)
     {
@@ -616,6 +622,7 @@ void BlendronicPreparationEditor::actionButtonCallback(int action, BlendronicPre
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Blendronic Preparation");
         }
         
         vc->update();
@@ -648,6 +655,8 @@ void BlendronicPreparationEditor::actionButtonCallback(int action, BlendronicPre
         int which = action - 100;
         processor.importPreparation(PreparationTypeBlendronic, processor.updateState->currentBlendronicId, which);
         vc->update();
+        
+        processor.saveGalleryToHistory("Import Blendronic Preparation");
     }
 }
 
@@ -677,6 +686,7 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
                 active  ->setTargetTypeBlendronic(KeymapTargetType(i + TargetTypeBlendronicPatternSync), (TargetNoteMode)selectedItem);
             }
         }
+        processor.updateState->editsMade = true;
     }
 }
 
@@ -696,6 +706,8 @@ void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     {
         proc->setDelayBufferSizeInSeconds(val);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicPreparationEditor::fillSelectCB(int last, int current)
@@ -845,6 +857,8 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
         prep    ->setFeedbackCoefficient(whichSlider, values[0]);
         active  ->setFeedbackCoefficient(whichSlider, values[0]);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states)
@@ -889,6 +903,8 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
         prep    ->setFeedbackCoefficientsStates(states);
         active  ->setFeedbackCoefficientsStates(states);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 /*
@@ -933,8 +949,8 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
-
         setSubWindowInFront(false);
+        
     }
     else if (b == &actionButton)
     {
@@ -1317,12 +1333,16 @@ int BlendronicModificationEditor::addPreparation(void)
 {
     processor.gallery->add(PreparationTypeBlendronicMod);
     
+    processor.updateState->editsMade = true;
+    
     return processor.gallery->getBlendronicModifications().getLast()->getId();
 }
 
 int BlendronicModificationEditor::duplicatePreparation(void)
 {
     processor.gallery->duplicate(PreparationTypeBlendronicMod, processor.updateState->currentModBlendronicId);
+    
+    processor.updateState->editsMade = true;
     
     return processor.gallery->getBlendronicModifications().getLast()->getId();
 }
@@ -1344,6 +1364,8 @@ void BlendronicModificationEditor::deleteCurrent(void)
     
     processor.updateState->currentModBlendronicId = -1;
     setCurrentId(-1);
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicModificationEditor::setCurrentId(int Id)
@@ -1373,21 +1395,25 @@ void BlendronicModificationEditor::actionButtonCallback(int action, BlendronicMo
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Blendronic Modification");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Blendronic Modification");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Blendronic Modification");
     }
     else if (action == 5)
     {
         processor.clear(PreparationTypeBlendronicMod, processor.updateState->currentModBlendronicId);
         vc->update();
         vc->updateModification();
+        processor.saveGalleryToHistory("Clear Blendronic Modification");
     }
     else if (action == 6)
     {
@@ -1409,6 +1435,7 @@ void BlendronicModificationEditor::actionButtonCallback(int action, BlendronicMo
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Blendronic Modification");
         }
         
         vc->update();
@@ -1441,6 +1468,7 @@ void BlendronicModificationEditor::actionButtonCallback(int action, BlendronicMo
         int which = action - 100;
         processor.importPreparation(PreparationTypeBlendronicMod, processor.updateState->currentModBlendronicId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Blendronic Modification");
     }
 }
 
@@ -1453,6 +1481,8 @@ void BlendronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     if (name == "Blendronic")
     {
         setCurrentId(Id);
+        
+        processor.updateState->editsMade = true;
     }
 }
 
@@ -1466,6 +1496,8 @@ void BlendronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
         mod->setDirty(BlendronicOutGain);
         
         gainSlider->setBright();
+        
+        processor.updateState->editsMade = true;
     }
     
     updateModification();
@@ -1474,6 +1506,8 @@ void BlendronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
 void BlendronicModificationEditor::updateModification(void)
 {
     processor.updateState->modificationDidChange = true;
+    
+    processor.updateState->editsMade = true;
 }
 
 void BlendronicModificationEditor::buttonClicked (Button* b)

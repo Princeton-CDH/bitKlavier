@@ -376,7 +376,7 @@ public:
     
     inline Particle::PtrArr getParticles(void) { return getSpringTuning()->getParticles(); }
     inline Particle::PtrArr getTetherParticles(void) { return getSpringTuning()->getTetherParticles(); }
-    inline Spring::PtrArr getSprings(void) { return getSpringTuning()->getSprings(); }
+//    inline Spring::PtrArr getSprings(void) { return getSpringTuning()->getSprings(); }
     inline Spring::PtrArr getTetherSprings(void) { return getSpringTuning()->getTetherSprings(); }
     
     inline Spring::PtrArr getEnabledSprings(void) { return getSpringTuning()->getEnabledSprings(); }

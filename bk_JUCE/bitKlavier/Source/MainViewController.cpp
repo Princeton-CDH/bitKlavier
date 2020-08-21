@@ -158,6 +158,10 @@ preferencesButton("Preferences")
         tipwindow = nullptr;
     }
     
+//    undoStatus.setLookAndFeel(&laf);
+    addChildComponent(undoStatus);
+    undoStatusCount = 0;
+    
     // fill menus
     processor.collectGalleries();
     processor.collectPreparations();
@@ -171,7 +175,7 @@ preferencesButton("Preferences")
     setWantsKeyboardFocus(true);
     addKeyListener(this);
     
-    startTimerHz (10);
+    startTimerHz (MVC_REFRESH_RATE);
 }
 
 MainViewController::~MainViewController()
@@ -199,6 +203,7 @@ MainViewController::~MainViewController()
     tooltipsButton.setLookAndFeel(nullptr);
 	//keystrokesButton.setLookAndFeel(nullptr);
 	hotkeysButton.setLookAndFeel(nullptr);
+    undoStatus.setLookAndFeel(nullptr);
     globalSoundSetButton.setLookAndFeel(nullptr);
     //sustainPedalButton.setLookAndFeel(nullptr);
     preferencesButton.setLookAndFeel(nullptr);
@@ -333,9 +338,11 @@ void MainViewController::resized()
                           levelMeterSlice.getHeight());
     
     area.reduce(2, 2);
+    area.removeFromLeft(1);
     construction.setBounds(area);
     
-    
+    undoStatus.setFont(undoStatus.getFont().withHeight(area.getHeight() * 0.05f));
+    undoStatus.setBounds(area.getX() + gXSpacing, area.getY() + gXSpacing, area.getWidth() * 0.5,  undoStatus.getFont().getHeight());
 
     if (display == DisplayKeyboard)
     {
@@ -452,56 +459,61 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             soundSetId = processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[index], 0, globalSoundSetButton.getToggleState());
         }
         
+        String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
         if (directSelected)
         {
             dPrep->setSoundSet(soundSetId);
-            dPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            dPrep->setSoundSetName(soundSetName);
             dActive->setSoundSet(soundSetId);
-            dActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            dActive->setSoundSetName(soundSetName);
         }
         else if (synchronicSelected)
         {
             sPrep->setSoundSet(soundSetId);
-            sPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            sPrep->setSoundSetName(soundSetName);
             sActive->setSoundSet(soundSetId);
-            sActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            sActive->setSoundSetName(soundSetName);
         }
         else if (nostalgicSelected)
         {
             nPrep->setSoundSet(soundSetId);
-            nPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            nPrep->setSoundSetName(soundSetName);
             nActive->setSoundSet(soundSetId);
-            nActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            nActive->setSoundSetName(soundSetName);
         }
     }
     else if (cb == &instrumentCB)
     {
+        
         if (directSelected)
         {
             String sfname = processor.loadedSoundSets[dPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
             dPrep->setSoundSet(soundSetId);
-            dPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            dPrep->setSoundSetName(soundSetName);
             dActive->setSoundSet(soundSetId);
-            dActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            dActive->setSoundSetName(soundSetName);
         }
         else if (synchronicSelected)
         {
             String sfname = processor.loadedSoundSets[sPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
             sPrep->setSoundSet(soundSetId);
-            sPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            sPrep->setSoundSetName(soundSetName);
             sActive->setSoundSet(soundSetId);
-            sActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            sActive->setSoundSetName(soundSetName);
         }
         else if (nostalgicSelected)
         {
             String sfname = processor.loadedSoundSets[nPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
             nPrep->setSoundSet(soundSetId);
-            nPrep->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            nPrep->setSoundSetName(soundSetName);
             nActive->setSoundSet(soundSetId);
-            nActive->setSoundSetName(processor.loadedSoundSets[soundSetId]);
+            nActive->setSoundSetName(soundSetName);
         }
         else
         {
@@ -585,95 +597,172 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
 
 	if (processor.areHotkeysEnabled())
 	{
-
-		if (code == KeyPress::escapeKey)
-		{
-			BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
-			if (currentDisplay == DisplayDirect)
-			{
-				if (overtop.dvc.getSubWindowInFront()) overtop.dvc.closeSubWindow();
-				else processor.updateState->setCurrentDisplay(DisplayNil);
-			}
-			else if (currentDisplay == DisplayNostalgic)
-			{
-				if (overtop.nvc.getSubWindowInFront()) overtop.nvc.closeSubWindow();
-				else processor.updateState->setCurrentDisplay(DisplayNil);
-			}
-			else if (currentDisplay == DisplaySynchronic)
-			{
-				if (overtop.svc.getSubWindowInFront()) overtop.svc.closeSubWindow();
-				else processor.updateState->setCurrentDisplay(DisplayNil);
-			}
-			else if (currentDisplay == DisplayKeymap)
-			{
-				Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-				keymap->setMidiEdit(false);
-				processor.updateState->setCurrentDisplay(DisplayNil);
-			}
-			else processor.updateState->setCurrentDisplay(DisplayNil);
-		}
-		else if (code == KeyPress::deleteKey)
-		{
-			construction.deleteSelected();
-		}
-		else if (code == KeyPress::backspaceKey)
-		{
-			construction.deleteSelected();
-		}
-		else if (code == KeyPress::upKey)
-		{
-			if (e.getModifiers().isCommandDown())   construction.align(0);
-			else                                    construction.move(0, e.getModifiers().isShiftDown());
-		}
-		else if (code == KeyPress::rightKey)
-		{
-			if (processor.updateState->currentDisplay == DisplayNil)
-			{
-				if (e.getModifiers().isCommandDown())   construction.align(1);
-				else                                    construction.move(1, e.getModifiers().isShiftDown());
-			}
-			else
-			{
-				overtop.arrowPressed(RightArrow);
-			}
-		}
-		else if (code == KeyPress::downKey)
-		{
-
-			if (e.getModifiers().isCommandDown())   construction.align(2);
-			else                                    construction.move(2, e.getModifiers().isShiftDown());
-
-
-		}
-		else if (code == KeyPress::leftKey)
-		{
-			if (processor.updateState->currentDisplay == DisplayNil)
-			{
-
-				if (e.getModifiers().isCommandDown())   construction.align(3);
-				else                                    construction.move(3, e.getModifiers().isShiftDown());
-			}
-			else
-			{
-				overtop.arrowPressed(LeftArrow);
-			}
-		}
-		else if (code == KeyPress::tabKey)
-		{
-
-		}
-		else if (code == 65) // A all
-		{
+        if (code == KeyPress::escapeKey)
+        {
             BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
-            if (currentDisplay == DisplayKeymap)
+            if(currentDisplay == DisplayDirect)
+            {
+                if(overtop.dvc.getSubWindowInFront()) overtop.dvc.closeSubWindow();
+                else processor.updateState->setCurrentDisplay(DisplayNil);
+            }
+            else if(currentDisplay == DisplayNostalgic)
+            {
+                if(overtop.nvc.getSubWindowInFront()) overtop.nvc.closeSubWindow();
+                else processor.updateState->setCurrentDisplay(DisplayNil);
+            }
+            else if(currentDisplay == DisplaySynchronic)
+            {
+                if(overtop.svc.getSubWindowInFront()) overtop.svc.closeSubWindow();
+                else processor.updateState->setCurrentDisplay(DisplayNil);
+            }
+            else if (currentDisplay == DisplayKeymap)
             {
                 Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
                 keymap->setMidiEdit(false);
-                keymap->toggleHarMidiEdit();
-                keymap->setHarArrayMidiEdit(false);
+                processor.updateState->setCurrentDisplay(DisplayNil);
             }
-			else if (e.getModifiers().isCommandDown())   construction.selectAll();
-		}
+            else processor.updateState->setCurrentDisplay(DisplayNil);
+        }
+        else if (code == KeyPress::deleteKey)
+        {
+            construction.deleteSelected();
+        }
+        else if (code == KeyPress::backspaceKey)
+        {
+            construction.deleteSelected();
+        }
+        else if (code == KeyPress::upKey)
+        {
+            if (e.getModifiers().isCommandDown())   construction.align(0);
+            else                                    construction.move(0, e.getModifiers().isShiftDown());
+        }
+        else if (code == KeyPress::rightKey)
+        {
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                if (e.getModifiers().isCommandDown())   construction.align(1);
+                else                                    construction.move(1, e.getModifiers().isShiftDown());
+            }
+            else
+            {
+                overtop.arrowPressed(RightArrow);
+            }
+        }
+        else if (code == KeyPress::downKey)
+        {
+            
+                if (e.getModifiers().isCommandDown())   construction.align(2);
+                else                                    construction.move(2, e.getModifiers().isShiftDown());
+            
+            
+        }
+        else if (code == KeyPress::leftKey)
+        {
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                
+                if (e.getModifiers().isCommandDown())   construction.align(3);
+                else                                    construction.move(3, e.getModifiers().isShiftDown());
+            }
+            else
+            {
+                overtop.arrowPressed(LeftArrow);
+            }
+        }
+        else if (code == KeyPress::tabKey)
+        {
+            
+        }
+        else if (code == 65) // A all
+        {
+            if (e.getModifiers().isCommandDown())   construction.selectAll();
+        }
+        else if (code == 66) // B blendronic
+        {
+            construction.addItem(PreparationTypeBlendronic);
+        }
+        else if (code == 67) // C modification
+        {
+            if (e.getModifiers().isCommandDown())   construction.copy();
+            else                                    construction.addItem(PreparationTypeGenericMod);
+        }
+        else if (code == 68) // D direct
+        {
+            construction.addItem(PreparationTypeDirect);
+        }
+        else if (code == 75) // K keymap
+        {
+            construction.addItem(PreparationTypeKeymap);
+        }
+        else if (code == 77) // M tempo
+        {
+            construction.addItem(PreparationTypeTempo);
+        }
+        else if (code == 78) // N nostalgic
+        {
+            construction.addItem(PreparationTypeNostalgic);
+        }
+        else if (code == 80) // P piano
+        {
+            construction.addItem(PreparationTypePianoMap);
+        }
+        else if (code == 81) // Q comment
+        {
+            construction.addItem(PreparationTypeComment);
+        }
+        else if (code == 82) // R reset
+        {
+            construction.addItem(PreparationTypeReset);
+        }
+        else if (code == 83) // S synchronic
+        {
+            if (e.getModifiers().isCommandDown())
+            {
+                if (e.getModifiers().isShiftDown() || processor.defaultLoaded)
+                    processor.saveCurrentGalleryAs();
+                else processor.saveCurrentGallery();
+            }
+            else                                    construction.addItem(PreparationTypeSynchronic);
+        }
+        else if (code == 84) // T tuning
+        {
+            construction.addItem(PreparationTypeTuning);
+        }
+        else if (code == 86) // V
+        {
+            if (e.getModifiers().isCommandDown())   construction.paste();
+        }
+        else if (code == 88) // X
+        {
+            if (e.getModifiers().isCommandDown())   construction.cut();
+        }
+        else if (code == 90) // Z
+        {
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                if (e.getModifiers().isCommandDown())
+                {
+                    if (e.getModifiers().isShiftDown())
+                        performRedo();
+                    else
+                        performUndo();
+                }
+            }
+        }
+        else if (code == 69) // E
+        {
+            if (e.getModifiers().isCommandDown())
+            {
+                if (processor.updateState->currentDisplay == DisplayKeymap)
+                {
+                    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+                    keymap->setMidiEdit(false);
+                    keymap->toggleHarMidiEdit();
+                    keymap->setHarArrayMidiEdit(false);
+                }
+                else if (e.getModifiers().isCommandDown())   construction.selectAll();
+            }
+        }
 		else if (code == 66) // B blendronic
 		{
 			construction.addItem(PreparationTypeBlendronic);
@@ -908,6 +997,22 @@ void MainViewController::fillInstrumentCB()
     
 }
 
+void MainViewController::performUndo()
+{
+    String action = processor.undoGallery();
+    if (action == String()) return;
+    undoStatus.setText(action, dontSendNotification);
+    undoStatusCount = MVC_REFRESH_RATE * 2;
+}
+
+void MainViewController::performRedo()
+{
+    String action = processor.redoGallery();
+    if (action == String()) return;
+    undoStatus.setText(action, dontSendNotification);
+    undoStatusCount = MVC_REFRESH_RATE * 2;
+}
+
 
 void MainViewController::timerCallback()
 {
@@ -922,8 +1027,16 @@ void MainViewController::timerCallback()
         tipwindow = nullptr;
     }
     
+    if (undoStatusCount > 0)
+    {
+        undoStatus.setVisible(true);
+        undoStatus.setAlpha(undoStatusCount / (float) MVC_REFRESH_RATE);
+        undoStatusCount--;
+    }
+    else undoStatus.setVisible(false);
+    
     // update menu contents periodically
-    if (++timerCallbackCount >= 10)
+    if (++timerCallbackCount >= MVC_REFRESH_RATE)
     {
         timerCallbackCount = 0;
         processor.collectGalleries();
@@ -1106,9 +1219,21 @@ void MainViewController::timerCallback()
     {
         state->displayDidChange = false;
         
+        BKPreparationDisplay prevDisplay = overtop.getCurrentDisplay();
+        
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
         
         header.update();
+        
+        if (processor.updateState->currentDisplay != DisplayNil)
+        {
+            processor.updateState->editsMade = false;
+        }
+        else if (processor.updateState->editsMade)
+        {
+            processor.saveGalleryToHistory(cDisplayNames[prevDisplay] + " Edits");
+        }
+            
     }
     
     levelMeterComponentL->updateLevel(processor.getLevelL());

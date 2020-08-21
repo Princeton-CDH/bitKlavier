@@ -324,7 +324,7 @@ protected:
     
     int numTabs;
     int currentTab;
-    
+
     BigOne bigOne;
     
     BKTextButton actionButton;

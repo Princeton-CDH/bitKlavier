@@ -418,15 +418,18 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Tempo Preparation");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Tempo Preparation");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Tempo Preparation");
     }
     else if (action == 4)
     {
@@ -437,6 +440,7 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
     {
         processor.clear(PreparationTypeTempo, processor.updateState->currentTempoId);
         vc->update();
+        processor.saveGalleryToHistory("Clear Tempo Preparation");
     }
     else if (action == 6)
     {
@@ -458,6 +462,7 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Tempo Preparation");
         }
         
         vc->update();
@@ -490,6 +495,7 @@ void TempoPreparationEditor::actionButtonCallback(int action, TempoPreparationEd
         int which = action - 100;
         processor.importPreparation(PreparationTypeTempo, processor.updateState->currentTempoId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Tempo Preparation");
     }
 }
 
@@ -519,6 +525,8 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
         active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 
@@ -526,6 +534,8 @@ void TempoPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableCo
 {
     Tempo::Ptr tempo = processor.gallery->getTempo(processor.updateState->currentTempoId);
     tempo->setName(name);
+    
+    processor.updateState->editsMade = true;
 }
 
 void TempoPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
@@ -540,6 +550,8 @@ void TempoPreparationEditor::BKRangeSliderValueChanged(String name, double minva
         active->setAdaptiveTempo1Min(minval);
         active->setAdaptiveTempo1Max(maxval);
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void TempoPreparationEditor::update(void)
@@ -594,6 +606,7 @@ void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, 
         active->setAdaptiveTempo1Subdivisions(val);
     }
     
+    processor.updateState->editsMade = true;
 }
 
 void TempoPreparationEditor::buttonClicked (Button* b)
@@ -608,6 +621,7 @@ void TempoPreparationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {
@@ -791,21 +805,25 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Tempo Modification");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Tempo Modification");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Tempo Modification");
     }
     else if (action == 5)
     {
         processor.clear(PreparationTypeTempoMod, processor.updateState->currentModTempoId);
         vc->update();
         vc->updateModification();
+        processor.saveGalleryToHistory("Clear Tempo Modification");
     }
     else if (action == 6)
     {
@@ -827,6 +845,7 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Tempo Modification");
         }
         
         vc->update();
@@ -859,6 +878,7 @@ void TempoModificationEditor::actionButtonCallback(int action, TempoModification
         int which = action - 100;
         processor.importPreparation(PreparationTypeTempoMod, processor.updateState->currentModTempoId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Tempo Modification");
     }
 }
 
@@ -893,6 +913,7 @@ void TempoModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     if (name != selectCB.getName()) updateModification();
     
+    processor.updateState->editsMade = true;
 }
 
 
@@ -959,6 +980,7 @@ void TempoModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
 void TempoModificationEditor::updateModification(void)
 {
     processor.updateState->modificationDidChange = true;
+    processor.updateState->editsMade = true;
 }
 
 void TempoModificationEditor::buttonClicked (Button* b)
@@ -970,6 +992,7 @@ void TempoModificationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {

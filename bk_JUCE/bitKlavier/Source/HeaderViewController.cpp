@@ -103,17 +103,16 @@ void HeaderViewController::paint (Graphics& g)
 void HeaderViewController::resized()
 {
     Rectangle<int> area (getLocalBounds());
-    area.reduce(0, gYSpacing);
+    area.reduce(2, gYSpacing);
     
     float width = area.getWidth() / 7;
     
-    area.removeFromLeft(gXSpacing);
     galleryB.setBounds(area.removeFromLeft(width));
     
     area.removeFromLeft(gXSpacing);
     galleryCB.setBounds(area.removeFromLeft(2*width));
     
-    area.removeFromRight(gXSpacing);
+    area.removeFromRight(1);
     pianoB.setBounds(area.removeFromRight(width));
     
     area.removeFromRight(gXSpacing);
@@ -162,7 +161,7 @@ PopupMenu HeaderViewController::getLoadMenu(void)
         loadMenu.addItem(SOUNDFONT_ID + (i++), sfName);
     }
     
-    return loadMenu;
+    return std::move(loadMenu);
 }
 
 PopupMenu HeaderViewController::getExportedPianoMenu(void)
@@ -175,7 +174,7 @@ PopupMenu HeaderViewController::getExportedPianoMenu(void)
         menu.addItem(i+100, names[i]);
     }
     
-    return menu;
+    return std::move(menu);
 }
 
 PopupMenu HeaderViewController::getPianoMenu(void)
@@ -183,7 +182,8 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     BKPopupMenu pianoMenu;
     
     pianoMenu.addItem(1, "New");
-    pianoMenu.addItem(2, "Linked Copy"); // add another called Duplicate that is like copy/paste?
+    pianoMenu.addItem(6, "Duplicate");
+    pianoMenu.addItem(2, "Linked Copy");
     pianoMenu.addItem(4, "Rename");
     pianoMenu.addItem(3, "Remove");
     pianoMenu.addSeparator();
@@ -192,7 +192,7 @@ PopupMenu HeaderViewController::getPianoMenu(void)
     PopupMenu exported = getExportedPianoMenu();
     pianoMenu.addSubMenu("Import...", exported);
     
-    return pianoMenu;
+    return std::move(pianoMenu);
 }
 
 PopupMenu HeaderViewController::getGalleryMenu(void)
@@ -261,7 +261,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     galleryMenu.addItem(ABOUT_ID, "About bitKlavier...");
     
-    return galleryMenu;
+    return std::move(galleryMenu);
     
 }
 
@@ -299,13 +299,15 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
             hvc->fillPianoCB();
             
             processor.setCurrentPiano(newId);
+            
+            processor.saveGalleryToHistory("Add Piano");
         }
     }
-    else if (res == 2) // Duplicate
+    else if (res == 2) // Linked Copy
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        prompt.addTextEditor("name", processor.currentPiano->getName() + " (2)");
+        prompt.addTextEditor("name", processor.currentPiano->getName() + " Linked Copy");
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -323,6 +325,8 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
             processor.currentPiano->setName(name);
             
             hvc->fillPianoCB();
+            
+            processor.saveGalleryToHistory("Linked Copy Piano");
         }
     }
     else if (res == 3) // Remove piano
@@ -344,6 +348,8 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
         hvc->pianoCB.setSelectedId(newPianoId, dontSendNotification);
         
         processor.setCurrentPiano(newPianoId);
+        
+        processor.saveGalleryToHistory("Remove Piano");
     }
     else if (res == 4) // Rename
     {
@@ -364,6 +370,40 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
         }
         
         hvc->fillPianoCB();
+    }
+    else if (res == 6) // Duplicate
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        prompt.addTextEditor("name", processor.currentPiano->getName() + " Copy");
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            BKItem::PtrArr clipboard = processor.getClipboard();
+            
+            BKConstructionSite* construction = hvc->construction;
+            construction->selectAll();
+            construction->copy();
+
+            int newId = processor.gallery->getNewId(PreparationTypePiano);
+            processor.gallery->addTypeWithId(PreparationTypePiano, newId);
+            processor.gallery->getPianos().getLast()->setName(name);
+            hvc->fillPianoCB();
+            processor.setCurrentPiano(newId);
+            
+            construction->paste(false);
+            
+            processor.setClipboard(clipboard);
+            
+            processor.saveGalleryToHistory("Duplicate Piano");
+        }
     }
     else if (res == 7)
     {
@@ -1049,6 +1089,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         
         update();
         
+        processor.saveGalleryToHistory("Change Piano");
     }
     else if (name == "galleryCB")
     {

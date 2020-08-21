@@ -210,6 +210,8 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
                 case 0:
                     file = file.getChildFile("jRhodes3b-stereo.sf2"); break;
                 case 1:
+                    // This is not actually the Blanchet-1720 sf that is installed with the desktop version
+                    // It is a much smaller harpsichord sf, but named the same for loading purposes
                     file = file.getChildFile("Blanchet-1720.sf2"); break;
                 case 2:
                     file = file.getChildFile("1276-The KiKaZ DrUmZ.sf2"); break;

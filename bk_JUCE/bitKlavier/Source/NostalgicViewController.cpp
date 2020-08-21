@@ -621,6 +621,7 @@ void NostalgicPreparationEditor::BKWaveDistanceUndertowSliderValueChanged(String
     prep    ->setUndertow(undertow);
     active  ->setUndertow(undertow);
     
+    processor.updateState->editsMade = true;
 }
 
 void NostalgicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
@@ -628,6 +629,8 @@ void NostalgicPreparationEditor::BKEditableComboBoxChanged(String name, BKEditab
     Nostalgic::Ptr nostalgic = processor.gallery->getNostalgic(processor.updateState->currentNostalgicId);
     
     nostalgic->setName(name);
+    
+    processor.updateState->editsMade = true;
 }
 
 void NostalgicPreparationEditor::update(void)
@@ -766,15 +769,18 @@ void NostalgicPreparationEditor::actionButtonCallback(int action, NostalgicPrepa
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Nostalgic Preparation");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Nostalgic Preparation");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Nostalgic Preparation");
     }
     else if (action == 4)
     {
@@ -785,6 +791,7 @@ void NostalgicPreparationEditor::actionButtonCallback(int action, NostalgicPrepa
     {
         processor.clear(PreparationTypeNostalgic, processor.updateState->currentNostalgicId);
         vc->update();
+        processor.saveGalleryToHistory("Clear Nostalgic Preparation");
     }
     else if (action == 6)
     {
@@ -806,6 +813,7 @@ void NostalgicPreparationEditor::actionButtonCallback(int action, NostalgicPrepa
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Nostalgic Preparation");
         }
         
         vc->update();
@@ -838,6 +846,7 @@ void NostalgicPreparationEditor::actionButtonCallback(int action, NostalgicPrepa
         int which = action - 100;
         processor.importPreparation(PreparationTypeNostalgic, processor.updateState->currentNostalgicId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Nostalgic Preparation");
     }
 }
 
@@ -890,6 +899,8 @@ void NostalgicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             }
         }
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void NostalgicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -927,6 +938,8 @@ void NostalgicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
         
         DBG("setting cluster thresh : " + String(val));
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void NostalgicPreparationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
@@ -959,6 +972,7 @@ void NostalgicPreparationEditor::BKADSRSliderValueChanged(String name, int attac
         active->setUndertowRelease(release);
     }
 
+    processor.updateState->editsMade = true;
 }
 
 void NostalgicPreparationEditor::closeSubWindow()
@@ -985,6 +999,8 @@ void NostalgicPreparationEditor::BKStackedSliderValueChanged(String name, Array<
 
     prep->setTransposition(val);
     active->setTransposition(val);
+    
+    processor.updateState->editsMade = true;
 }
 
 void NostalgicPreparationEditor::fillSelectCB(int last, int current)
@@ -1124,6 +1140,7 @@ void NostalgicPreparationEditor::buttonClicked (Button* b)
         setShowADSR(reverseADSRSlider->getName(), false);
         setShowADSR(undertowADSRSlider->getName(), false);
         setSubWindowInFront(false);
+        
     }
     else if (b == &actionButton)
     {
@@ -1187,6 +1204,8 @@ void NostalgicPreparationEditor::BKRangeSliderValueChanged(String name, double m
         DBG("velocity min: " + String(prep->getVelocityMin()));
         DBG("velocity max: " + String(prep->getVelocityMax()));
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ NostalgicModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
@@ -1469,21 +1488,25 @@ void NostalgicModificationEditor::actionButtonCallback(int action, NostalgicModi
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Nostalgic Modification");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Nostalgic Modification");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Nostalgic Modification");
     }
     else if (action == 5)
     {
         processor.clear(PreparationTypeNostalgicMod, processor.updateState->currentModNostalgicId);
         vc->update();
         vc->updateModification();
+        processor.saveGalleryToHistory("Clear Nostalgic Modification");
     }
     else if (action == 6)
     {
@@ -1505,6 +1528,7 @@ void NostalgicModificationEditor::actionButtonCallback(int action, NostalgicModi
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Nostalgic Modification");
         }
         
         vc->update();
@@ -1537,6 +1561,7 @@ void NostalgicModificationEditor::actionButtonCallback(int action, NostalgicModi
         int which = action - 100;
         processor.importPreparation(PreparationTypeNostalgicMod, processor.updateState->currentModNostalgicId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Nostalgic Modification");
     }
 }
 
@@ -1578,7 +1603,7 @@ void NostalgicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
     }
     
-    
+    processor.updateState->editsMade = true;
 }
 
 void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -1643,6 +1668,8 @@ void NostalgicModificationEditor::BKStackedSliderValueChanged(String name, Array
 void NostalgicModificationEditor::updateModification(void)
 {
     processor.updateState->modificationDidChange = true;
+    
+    processor.updateState->editsMade = true;
 }
 
 void NostalgicModificationEditor::buttonClicked (Button* b)
@@ -1652,6 +1679,7 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {
@@ -1712,7 +1740,6 @@ void NostalgicModificationEditor::BKADSRSliderValueChanged(String name, int atta
         undertowADSRSlider->setBright();
     }
 
-    
     updateModification();
 }
 
@@ -1746,4 +1773,6 @@ void NostalgicModificationEditor::BKRangeSliderValueChanged(String name, double 
         
         velocityMinMaxSlider->setBright();
     }
+    
+    processor.updateState->editsMade = true;
 }

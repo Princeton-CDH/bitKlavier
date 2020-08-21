@@ -1289,15 +1289,18 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Tuning Preparation");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Tuning Preparation");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Tuning Preparation");
     }
     else if (action == 4)
     {
@@ -1308,6 +1311,7 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
     {
         processor.clear(PreparationTypeTuning, processor.updateState->currentTuningId);
         vc->update();
+        processor.saveGalleryToHistory("Clear Tuning Preparation");
     }
     else if (action == 6)
     {
@@ -1329,6 +1333,7 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Tuning Preparation");
         }
         
         vc->update();
@@ -1361,6 +1366,7 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
         int which = action - 100;
         processor.importPreparation(PreparationTypeTuning, processor.updateState->currentTuningId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Tuning Preparation");
     }
 }
 
@@ -1556,6 +1562,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     
     processor.gallery->setGalleryDirty(true);
+    
+    processor.updateState->editsMade = true;
 }
 
 
@@ -1599,6 +1607,8 @@ void TuningPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
     tuning->setName(name);
     
     processor.gallery->setGalleryDirty(true);
+    
+    processor.updateState->editsMade = true;
 }
 
 
@@ -1740,6 +1750,8 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         
     }
     processor.gallery->setGalleryDirty(true);
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningPreparationEditor::sliderValueChanged (Slider* slider)
@@ -1768,6 +1780,8 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
             break;
         }
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -1836,6 +1850,8 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     }
     
     processor.gallery->setGalleryDirty(true);
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningPreparationEditor::buttonClicked (Button* b)
@@ -1871,6 +1887,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {
@@ -2310,15 +2327,18 @@ void TuningModificationEditor::actionButtonCallback(int action, TuningModificati
     {
         int Id = vc->addPreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Tuning Modification");
     }
     else if (action == 2)
     {
         int Id = vc->duplicatePreparation();
         vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Tuning Modification");
     }
     else if (action == 3)
     {
         vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Tuning Modification");
     }
     else if (action == 5)
     {
@@ -2328,6 +2348,7 @@ void TuningModificationEditor::actionButtonCallback(int action, TuningModificati
     
         vc->update();
         vc->updateModification();
+        processor.saveGalleryToHistory("Clear Tuning Modification");
     }
     else if (action == 6)
     {
@@ -2349,6 +2370,7 @@ void TuningModificationEditor::actionButtonCallback(int action, TuningModificati
         {
             prep->setName(name);
             vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Tuning Modification");
         }
         
         vc->update();
@@ -2381,6 +2403,7 @@ void TuningModificationEditor::actionButtonCallback(int action, TuningModificati
         int which = action - 100;
         processor.importPreparation(PreparationTypeTuningMod, processor.updateState->currentModTuningId, which);
         vc->update();
+        processor.saveGalleryToHistory("Import Tuning Modification");
     }
 }
 
@@ -2534,6 +2557,8 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     
     updateComponentVisibility();
     A1reset.setVisible(false);
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
@@ -2708,6 +2733,8 @@ void TuningModificationEditor::updateModification(void)
     highlightModedComponents();
     
     processor.updateState->modificationDidChange = true;
+    
+    processor.updateState->editsMade = true;
 }
 
 void TuningModificationEditor::buttonClicked (Button* b)
@@ -2728,6 +2755,7 @@ void TuningModificationEditor::buttonClicked (Button* b)
     else if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
+        
     }
     else if (b == &actionButton)
     {
