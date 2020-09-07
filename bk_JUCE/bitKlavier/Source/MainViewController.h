@@ -204,7 +204,7 @@ private:
     ToggleButton sustainPedalButton;
     
     Label undoStatus;
-    int undoStatusCount;
+    int undoStatusCountdown;
     
     BKButtonAndMenuLAF laf;
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;

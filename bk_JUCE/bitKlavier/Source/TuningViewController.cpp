@@ -1255,12 +1255,10 @@ void TuningPreparationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
     
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentTuningId = -1;
-    setCurrentId(-1);
+    setCurrentId(newId);
 }
 
 void TuningPreparationEditor::setCurrentId(int Id)
@@ -2292,12 +2290,10 @@ void TuningModificationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
     
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentModTuningId = -1;
-    setCurrentId(-1);
+    setCurrentId(newId);
 }
 
 void TuningModificationEditor::setCurrentId(int Id)

@@ -23,14 +23,12 @@ construction(p, &theGraph),
 overtop(p, &theGraph),
 splash(p),
 timerCallbackCount(0),
+hotkeysEnabled(true),
+preferencesButton("Preferences"),
 tooltipsButton("Show tooltips"),
-//keystrokesButton("Enable keystrokes"),
 hotkeysButton("Enable hotkeys"),
 globalSoundSetButton("Use global samples"),
-sustainPedalButton("Sustain Pedal"),
-hotkeysEnabled(true),
-//keystrokesEnabled(true),
-preferencesButton("Preferences")
+sustainPedalButton("Sustain Pedal")
 {
     if (processor.platform == BKIOS)    display = DisplayConstruction;
     else                                display = DisplayDefault;
@@ -160,7 +158,7 @@ preferencesButton("Preferences")
     
 //    undoStatus.setLookAndFeel(&laf);
     addChildComponent(undoStatus);
-    undoStatusCount = 0;
+    undoStatusCountdown = 0;
     
     // fill menus
     processor.collectGalleries();
@@ -890,17 +888,17 @@ void MainViewController::fillSampleCB()
         if (item->getType() == PreparationTypeDirect)
         {
             DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(item->getId());
-            idx = prep->getSoundSet();
+            if (prep != nullptr) idx = prep->getSoundSet();
         }
         else if (item->getType() == PreparationTypeSynchronic)
         {
             SynchronicPreparation::Ptr prep = processor.gallery->getActiveSynchronicPreparation(item->getId());
-            idx = prep->getSoundSet();
+            if (prep != nullptr) idx = prep->getSoundSet();
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
             NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(item->getId());
-            idx = prep->getSoundSet();
+            if (prep != nullptr) idx = prep->getSoundSet();
         }
     }
     if (idx < 0) idx = processor.globalSoundSetId;
@@ -953,17 +951,17 @@ void MainViewController::fillInstrumentCB()
         if (item->getType() == PreparationTypeDirect)
         {
             DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(item->getId());
-            idx = prep->getSoundSet();
+            if (prep != nullptr) idx = prep->getSoundSet();
         }
         else if (item->getType() == PreparationTypeSynchronic)
         {
             SynchronicPreparation::Ptr prep = processor.gallery->getActiveSynchronicPreparation(item->getId());
-            idx = prep->getSoundSet();
+            if (prep != nullptr) idx = prep->getSoundSet();
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
             NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(item->getId());
-            idx = prep->getSoundSet();
+            if (prep != nullptr) idx = prep->getSoundSet();
         }
     }
     if (idx < 0) idx = processor.globalSoundSetId;
@@ -1002,7 +1000,7 @@ void MainViewController::performUndo()
     String action = processor.undoGallery();
     if (action == String()) return;
     undoStatus.setText(action, dontSendNotification);
-    undoStatusCount = MVC_REFRESH_RATE * 2;
+    undoStatusCountdown = MVC_REFRESH_RATE * 2;
 }
 
 void MainViewController::performRedo()
@@ -1010,7 +1008,7 @@ void MainViewController::performRedo()
     String action = processor.redoGallery();
     if (action == String()) return;
     undoStatus.setText(action, dontSendNotification);
-    undoStatusCount = MVC_REFRESH_RATE * 2;
+    undoStatusCountdown = MVC_REFRESH_RATE * 2;
 }
 
 
@@ -1027,11 +1025,11 @@ void MainViewController::timerCallback()
         tipwindow = nullptr;
     }
     
-    if (undoStatusCount > 0)
+    if (undoStatusCountdown > 0)
     {
         undoStatus.setVisible(true);
-        undoStatus.setAlpha(undoStatusCount / (float) MVC_REFRESH_RATE);
-        undoStatusCount--;
+        undoStatus.setAlpha(undoStatusCountdown / (float) MVC_REFRESH_RATE);
+        undoStatusCountdown--;
     }
     else undoStatus.setVisible(false);
     
@@ -1074,21 +1072,24 @@ void MainViewController::timerCallback()
             soundItemSelected = true;
             globalSoundSetButton.setVisible(true);
             DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(item->getId());
-            globalSoundSetButton.setToggleState(prep->getUseGlobalSoundSet(), dontSendNotification);
+            if (prep != nullptr)
+                globalSoundSetButton.setToggleState(prep->getUseGlobalSoundSet(), dontSendNotification);
         }
         else if (item->getType() == PreparationTypeSynchronic)
         {
             soundItemSelected = true;
             globalSoundSetButton.setVisible(true);
             SynchronicPreparation::Ptr prep = processor.gallery->getActiveSynchronicPreparation(item->getId());
-            globalSoundSetButton.setToggleState(prep->getUseGlobalSoundSet(), dontSendNotification);
+            if (prep != nullptr)
+                globalSoundSetButton.setToggleState(prep->getUseGlobalSoundSet(), dontSendNotification);
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
             soundItemSelected = true;
             globalSoundSetButton.setVisible(true);
             NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(item->getId());
-            globalSoundSetButton.setToggleState(prep->getUseGlobalSoundSet(), dontSendNotification);
+            if (prep != nullptr)
+                globalSoundSetButton.setToggleState(prep->getUseGlobalSoundSet(), dontSendNotification);
         }
     }
     

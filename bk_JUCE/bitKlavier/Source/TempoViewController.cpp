@@ -384,12 +384,10 @@ void TempoPreparationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
-    
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentTempoId = -1;
-    setCurrentId(-1);
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
+
+    setCurrentId(newId);
 }
 
 void TempoPreparationEditor::setCurrentId(int Id)
@@ -771,12 +769,10 @@ void TempoModificationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
-    
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentModTempoId = -1;
-    setCurrentId(-1);
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
+
+    setCurrentId(newId);
 }
 
 void TempoModificationEditor::setCurrentId(int Id)

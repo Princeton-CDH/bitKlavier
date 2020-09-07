@@ -27,11 +27,11 @@ midiInputNames(Array<String>()),
 midiInputIdentifiers(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true),
-allNotesOff(false),
 //harmonizerEnabled(false),
 harKey(60),
 harShift(0),
-ignoreSustain(false)
+ignoreSustain(false),
+allNotesOff(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -77,11 +77,11 @@ midiInputNames(k->getMidiInputNames()),
 midiInputIdentifiers(k->getMidiInputIdentifiers()),
 defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
-allNotesOff(k->getAllNotesOff()),
 //harmonizerEnabled(k->getHarmonizerEnabled()),
 harKey(k->getHarKey()),
 harShift(k->getHarShift()),
-ignoreSustain(k->getIgnoreSustain())
+ignoreSustain(k->getIgnoreSustain()),
+allNotesOff(k->getAllNotesOff())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -126,11 +126,11 @@ midiInputNames(k->getMidiInputNames()),
 midiInputIdentifiers(k->getMidiInputIdentifiers()),
 defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
-allNotesOff(k->getAllNotesOff()),
 //harmonizerEnabled(false),
 harKey(k->getHarKey()),
 harShift(k->getHarShift()),
-ignoreSustain(k->getIgnoreSustain())
+ignoreSustain(k->getIgnoreSustain()),
+allNotesOff(k->getAllNotesOff())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -178,11 +178,11 @@ midiInputNames(Array<String>()),
 midiInputIdentifiers(Array<String>()),
 defaultSelected(false),
 onscreenSelected(true),
-allNotesOff(false),
 //harmonizerEnabled(false),
 harKey(60),
 harShift(0),
-ignoreSustain(false)
+ignoreSustain(false),
+allNotesOff(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)

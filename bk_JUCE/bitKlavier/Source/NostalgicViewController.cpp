@@ -734,12 +734,10 @@ void NostalgicPreparationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
     
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentNostalgicId = -1;
-    setCurrentId(-1);
+    setCurrentId(newId);
 }
 
 void NostalgicPreparationEditor::setCurrentId(int Id)
@@ -1453,12 +1451,10 @@ void NostalgicModificationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
     
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentModNostalgicId = -1;
-    setCurrentId(-1);
+    setCurrentId(newId);
 }
 
 void NostalgicModificationEditor::setCurrentId(int Id)

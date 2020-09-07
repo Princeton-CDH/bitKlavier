@@ -405,12 +405,10 @@ void DirectPreparationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
     
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentDirectId = -1;
-    setCurrentId(-1);
+    setCurrentId(newId);
 }
 
 void DirectPreparationEditor::setCurrentId(int Id)
@@ -819,12 +817,10 @@ void DirectModificationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
     
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentDirectId = -1;
-    setCurrentId(-1);
+    setCurrentId(newId);
 }
 
 void DirectModificationEditor::setCurrentId(int Id)

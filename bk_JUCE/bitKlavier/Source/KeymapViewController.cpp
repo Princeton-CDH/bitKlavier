@@ -401,10 +401,10 @@ void KeymapViewController::displayTab(int tab)
     displayShared();
 
     int x0 = leftArrow.getRight() + gXSpacing;
-    int y0 = hideOrShow.getBottom() + gYSpacing;
-    int right = rightArrow.getX() - gXSpacing;
-    int width = right - x0;
-    int height = getHeight() - y0;
+//    int y0 = hideOrShow.getBottom() + gYSpacing;
+//    int right = rightArrow.getX() - gXSpacing;
+//    int width = right - x0;
+//    int height = getHeight() - y0;
 
     Rectangle<int> area(getLocalBounds());
 
@@ -446,7 +446,6 @@ void KeymapViewController::displayTab(int tab)
         targetsSlice.removeFromRight(gXSpacing);
 
         Rectangle<int> settingsBox = area.removeFromTop((gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
-        Rectangle<int> settingsGroup(settingsBox);
         //settingsBox.removeFromTop(4 * gYSpacing);
         settingsBox.removeFromRight(gXSpacing);
 
@@ -860,12 +859,10 @@ void KeymapViewController::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
     
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentKeymapId = -1;
-    setCurrentId(-1);
+    setCurrentId(newId);
 }
 
 void KeymapViewController::setCurrentId(int Id)
@@ -1057,7 +1054,7 @@ PopupMenu KeymapViewController::getHarmonizerMenu(void)
     menu.addItem(3, "Mirror");
     menu.addItem(4, "Trap");
 
-    return menu;
+    return std::move(menu);
 }
 
 void KeymapViewController::harmonizerMenuCallback(int result, KeymapViewController* vc)

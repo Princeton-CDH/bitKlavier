@@ -570,18 +570,18 @@ private:
     Array<Array<int>> harmonizerKeys;
     //bool harmonizerEnabled; //functionality has largely been commented out
 
-    int harKey;
-    int harShift;
-
     Array<String> midiInputNames;
     Array<String> midiInputIdentifiers;
     
     bool defaultSelected;
     bool onscreenSelected;
     
-    bool allNotesOff;
+    int harKey;
+    int harShift;
 
     bool ignoreSustain;
+    
+    bool allNotesOff;
 
     JUCE_LEAK_DETECTOR (Keymap)
 };

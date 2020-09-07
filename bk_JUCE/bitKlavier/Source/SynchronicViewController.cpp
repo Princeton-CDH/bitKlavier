@@ -1381,12 +1381,10 @@ void SynchronicPreparationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
     
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentSynchronicId = -1;
-    setCurrentId(-1);
+    setCurrentId(newId);
 }
 
 void SynchronicPreparationEditor::setCurrentId(int Id)
@@ -2249,12 +2247,10 @@ void SynchronicModificationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
     
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentModSynchronicId = -1;
-    setCurrentId(-1);
+    setCurrentId(newId);
 }
 
 void SynchronicModificationEditor::setCurrentId(int Id)

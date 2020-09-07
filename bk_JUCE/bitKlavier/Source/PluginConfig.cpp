@@ -147,8 +147,8 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         XmlElement* userSettings = galleryXML->getChildElement(0);
         if (userSettings != nullptr)
         {
-            setTooltipsEnabled((bool)userSettings->getStringAttribute("tooltipsEnabled").getIntValue());
-            setHotkeysEnabled((bool)userSettings->getStringAttribute("hotkeysEnabled").getIntValue());
+            setTooltipsEnabled((bool)userSettings->getIntAttribute("tooltipsEnabled", 1));
+            setHotkeysEnabled((bool)userSettings->getIntAttribute("hotkeysEnabled", 1));
         }
         
         defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();

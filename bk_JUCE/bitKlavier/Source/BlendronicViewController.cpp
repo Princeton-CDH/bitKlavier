@@ -543,12 +543,10 @@ void BlendronicPreparationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
     
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentBlendronicId = -1;
-    setCurrentId(-1);
+    setCurrentId(newId);
 }
 
 void BlendronicPreparationEditor::setCurrentId(int Id)
@@ -1358,14 +1356,10 @@ void BlendronicModificationEditor::deleteCurrent(void)
     
     fillSelectCB(0, 0);
     
-    int newId = 0;
-    
-    selectCB.setSelectedId(newId, dontSendNotification);
-    
-    processor.updateState->currentModBlendronicId = -1;
-    setCurrentId(-1);
-    
-    processor.updateState->editsMade = true;
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
+
+    setCurrentId(newId);
 }
 
 void BlendronicModificationEditor::setCurrentId(int Id)
