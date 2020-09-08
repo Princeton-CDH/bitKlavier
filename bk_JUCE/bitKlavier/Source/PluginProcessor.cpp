@@ -386,6 +386,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 BKAudioProcessor::~BKAudioProcessor()
 {
+    for (auto item : clipboard)
+        item->clearConnections();
     clipboard.clear();
 }
 
@@ -1671,7 +1673,7 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     }
     
     // NEED WAY TO TRIGGER RELEASE PEDAL SAMPLE FOR SFZ
-    if (m.isSustainPedalOn())
+    else if (m.isSustainPedalOn())
     {
         //DBG("m.isSustainPedalOn()");
         sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
@@ -1685,6 +1687,13 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
         sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
         if (sustainInverted)    sustainActivate();
         else                    sustainDeactivate();
+    }
+    else
+    {
+        mainPianoSynth.handleMidiEvent(m);
+        hammerReleaseSynth.handleMidiEvent(m);
+        resonanceReleaseSynth.handleMidiEvent(m);
+        pedalSynth.handleMidiEvent(m);
     }
 }
 

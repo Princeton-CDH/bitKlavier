@@ -663,6 +663,9 @@ public:
 	void renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples);
     void clearNextDelayBlock(int numSamples);
     
+    /** Can be overridden to do custom handling of incoming midi events. */
+    virtual void handleMidiEvent (const MidiMessage&);
+    
     int loadSamples(BKSampleLoadType type, String path ="", int subsound=0, bool updateGlobalSet=true);
 	
 	GeneralSettings::Ptr generalSettings;
@@ -761,9 +764,6 @@ protected:
      BKSynthesiserVoice::stopNote(), and has some assertions to sanity-check a few things.
      */
     void stopVoice (BKSynthesiserVoice*, float velocity, bool allowTailOff);
-    
-    /** Can be overridden to do custom handling of incoming midi events. */
-    virtual void handleMidiEvent (const MidiMessage&);
     
     juce::Array<sfzero::Region::Ptr > regions_;
     

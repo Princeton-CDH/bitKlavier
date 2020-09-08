@@ -246,6 +246,10 @@ public:
     
     inline void setClipboard(BKItem::PtrArr items)
     {
+        // Clear connections in the existing clipboard to avoid
+        // reference between items which would cause leaks
+        for (auto item : clipboard)
+            item->clearConnections();
         clipboard = items;
     }
     

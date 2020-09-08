@@ -171,7 +171,7 @@ public:
     
     inline BKItem::PtrArr getItems(void) const noexcept { return items; }
     
-    inline BKItem* itemWithTypeAndId(BKPreparationType type, int thisId)
+    inline BKItem::Ptr itemWithTypeAndId(BKPreparationType type, int thisId)
     {
         for (auto item : items)
         {

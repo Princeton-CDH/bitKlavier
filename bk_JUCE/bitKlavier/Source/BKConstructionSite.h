@@ -22,7 +22,7 @@
 
 #include "BKViewController.h"
 
-class BKConstructionSite : public LassoSource<BKItem*>, public MouseHoldListener
+class BKConstructionSite : public LassoSource<BKItem::Ptr>, public MouseHoldListener
 {
 public:
     BKConstructionSite(BKAudioProcessor& p, /*Viewport* viewPort, */ BKItemGraph* theGraph);
@@ -33,9 +33,9 @@ public:
 
     void paint(Graphics& g) override;
     
-    void itemIsBeingDragged(BKItem* thisItem, const MouseEvent& e);
+    void itemIsBeingDragged(BKItem::Ptr thisItem, const MouseEvent& e);
     
-    void pianoMapDidChange(BKItem* thisItem);
+    void pianoMapDidChange(BKItem::Ptr thisItem);
     
     void move(int which, bool fine);
     void deleteSelected(void);
@@ -58,10 +58,10 @@ public:
     void addItemsFromClipboard(void);
     
     void addItem(BKPreparationType type, bool center = false);
-    void addExistingItem(BKItem* toAdd);
+    void addExistingItem(BKItem::Ptr toAdd);
     
-    inline void setCurrentItem(BKItem* item) { currentItem = item;}
-    inline BKItem* getCurrentItem(void) { return currentItem;}
+    inline void setCurrentItem(BKItem::Ptr item) { currentItem = item;}
+    inline BKItem::Ptr getCurrentItem(void) { return currentItem;}
 
     void idDidChange(void);
     
@@ -197,18 +197,18 @@ private:
     BKItem::Ptr currentItem;
     BKItem::Ptr upperLeftest;
     
-    std::unique_ptr<LassoComponent<BKItem*>> lasso;
+    std::unique_ptr<LassoComponent<BKItem::Ptr>> lasso;
     bool inLasso;
-    SelectedItemSet<BKItem*> lassoSelection;
+    SelectedItemSet<BKItem::Ptr> lassoSelection;
     
-    void findLassoItemsInArea (Array <BKItem*>& itemsFound,
+    void findLassoItemsInArea (Array <BKItem::Ptr>& itemsFound,
                                                    const Rectangle<int>& area) override;
     
-    SelectedItemSet<BKItem*>& getLassoSelection(void) override;
+    SelectedItemSet<BKItem::Ptr>& getLassoSelection(void) override;
 
     void draw(void);
     
-    void prepareItemDrag(BKItem* item, const MouseEvent& e, bool center);
+    void prepareItemDrag(BKItem::Ptr item, const MouseEvent& e, bool center);
     
     void resized() override;
     
@@ -220,9 +220,9 @@ private:
     
     void mouseMove (const MouseEvent& e) override;
     
-    void deleteItem (BKItem* item);
+    void deleteItem (BKItem::Ptr item);
     
-    BKItem* getItemAtPoint(const int X, const int Y);
+    BKItem::Ptr getItemAtPoint(const int X, const int Y);
     
     BKButtonAndMenuLAF buttonsAndMenusLAF;
     

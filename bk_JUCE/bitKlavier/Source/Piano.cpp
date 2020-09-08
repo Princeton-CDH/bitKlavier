@@ -45,7 +45,7 @@ Piano::Ptr Piano::duplicate(bool withSameId)
     
     for (auto item : items)
     {
-        BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
+        BKItem::Ptr newItem = new BKItem(item->getType(), item->getId(), processor);
         
         newItem->setCommentText(item->getCommentText());
         
@@ -59,7 +59,7 @@ Piano::Ptr Piano::duplicate(bool withSameId)
     int idx = 0;
     for (auto item : items)
     {
-        BKItem* newItem = newItems.getUnchecked(idx++);
+        BKItem::Ptr newItem = newItems.getUnchecked(idx++);
         
         BKItem::PtrArr oldConnections = item->getConnections();
         
