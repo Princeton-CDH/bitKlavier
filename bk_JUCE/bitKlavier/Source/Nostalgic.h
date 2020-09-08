@@ -207,6 +207,14 @@ public:
         if (dirty[NostalgicKeyOnReset]) keyOnReset = n->getKeyOnReset();
         if (dirty[NostalgicVelocityMin]) velocityMin = n->getVelocityMin();
         if (dirty[NostalgicVelocityMax]) velocityMax = n->getVelocityMax();
+        
+        if (dirty[NostalgicUseGlobalSoundSet]) nUseGlobalSoundSet = n->getUseGlobalSoundSet();
+        
+        if (dirty[NostalgicSoundSet])
+        {
+            nSoundSet = n->getSoundSet();
+            nSoundSetName = n->getSoundSetName();
+        }
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)

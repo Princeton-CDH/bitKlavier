@@ -297,6 +297,15 @@ public:
         if (dirty[SynchronicVelocityMax]) velocityMax = s->getVelocityMax();
         
         if (dirty[SynchronicMidiOutput]) midiOutput = s->getMidiOutput();
+        
+        if (dirty[SynchronicUseGlobalSoundSet]) sUseGlobalSoundSet = s->getUseGlobalSoundSet();
+        
+        if (dirty[SynchronicSoundSet])
+        {
+            sSoundSet = s->getSoundSet();
+            sSoundSetName = s->getSoundSetName();
+        }
+        
     }
     
     bool compare(SynchronicPreparation::Ptr s)

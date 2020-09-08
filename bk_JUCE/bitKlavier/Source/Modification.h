@@ -24,7 +24,8 @@
 class Modification
 {
 public:
-    Modification(int Id, int numParams):
+    Modification(BKAudioProcessor& processor, int Id, int numParams):
+    processor(processor),
     Id(Id)
     {
         dirty.ensureStorageAllocated(numParams);
@@ -89,6 +90,8 @@ public:
     }
     
 protected:
+    BKAudioProcessor& processor;
+    
     int             Id;
     
     Array<int>      targets;
@@ -109,13 +112,7 @@ public:
     typedef ReferenceCountedObjectPtr<DirectModification>   Ptr;
     typedef Array<DirectModification::Ptr>                  PtrArr;
     
-    DirectModification(int Id):
-    Modification(Id, DirectParameterTypeNil),
-    DirectPreparation()
-    {
-        // DBG("dirtysize: " + String(dirty.size()));
-    }
-
+    DirectModification(BKAudioProcessor& processor, int Id);
     ~DirectModification(void)
     {
         
@@ -123,7 +120,7 @@ public:
     
     inline DirectModification::Ptr duplicate(void)
     {
-        DirectModification::Ptr mod = new DirectModification(-1);
+        DirectModification::Ptr mod = new DirectModification(processor, -1);
         
         mod->copy(this);
         
@@ -137,61 +134,8 @@ public:
         DirectPreparation::copy(mod);
     }
     
-    inline ValueTree getState(void)
-    {
-        ValueTree prep(vtagModDirect);
-        
-        prep.setProperty( "Id", Id, 0);
-        prep.setProperty( "name", getName(), 0);
-        
-        ValueTree dirtyVT( "dirty");
-        int count = 0;
-        for (auto b : dirty)
-        {
-            dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
-        }
-        prep.addChild(dirtyVT, -1, 0);
-        
-        prep.addChild(DirectPreparation::getState(), -1, 0);
-        
-        return prep;
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        
-        Id = e->getStringAttribute("Id").getIntValue();
-        
-        String n = e->getStringAttribute("name");
-        
-        if (n != String())     setName(n);
-        else                        setName(String(Id));
-    
-        XmlElement* dirtyXml = e->getChildByName("dirty");
-        XmlElement* paramsXml = e->getChildByName("params");
-        
-        if (dirtyXml != nullptr && paramsXml != nullptr)
-        {
-            dirty.clear();
-            for (int k = 0; k < DirectParameterTypeNil; k++)
-            {
-                String attr = dirtyXml->getStringAttribute("d" + String(k));
-                
-                if (attr == String()) dirty.add(false);
-                else
-                {
-                    dirty.add((bool)attr.getIntValue());
-                }
-            }
-            
-            DirectPreparation::setState(paramsXml);
-        }
-        else
-        {
-            setStateOld(e);
-        }
-    }
-    
+    ValueTree getState(void);
+    void setState(XmlElement* e);
     void setStateOld(XmlElement* e);
     
 private:
@@ -207,12 +151,7 @@ public:
     typedef ReferenceCountedObjectPtr<SynchronicModification>   Ptr;
     typedef Array<SynchronicModification::Ptr>                  PtrArr;
     
-    SynchronicModification(int Id):
-    Modification(Id, SynchronicParameterTypeNil),
-    SynchronicPreparation()
-    {
-    }
-    
+    SynchronicModification(BKAudioProcessor& processor, int Id);
     ~SynchronicModification(void)
     {
         
@@ -220,7 +159,7 @@ public:
     
     inline SynchronicModification::Ptr duplicate(void)
     {
-        SynchronicModification::Ptr mod = new SynchronicModification(-1);
+        SynchronicModification::Ptr mod = new SynchronicModification(processor, -1);
         
         mod->copy(this);
         
@@ -234,60 +173,8 @@ public:
         SynchronicPreparation::copy(mod);
     }
     
-    inline ValueTree getState(void)
-    {
-        ValueTree prep(vtagModSynchronic);
-        
-        prep.setProperty( "Id", Id, 0);
-        prep.setProperty( "name", getName(), 0);
-        
-        ValueTree dirtyVT( "dirty");
-        int count = 0;
-        for (auto b : dirty)
-        {
-            dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
-        }
-        prep.addChild(dirtyVT, -1, 0);
-        
-        prep.addChild(SynchronicPreparation::getState(), -1, 0);
-        
-        return prep;
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        Id = e->getStringAttribute("Id").getIntValue();
-        
-        String n = e->getStringAttribute("name");
-        
-        if (n != String())     setName(n);
-        else                        setName(String(Id));
-        
-        XmlElement* dirtyXml = e->getChildByName("dirty");
-        XmlElement* paramsXml = e->getChildByName("params");
-        
-        if (dirtyXml != nullptr && paramsXml != nullptr)
-        {
-            dirty.clear();
-            for (int k = 0; k < SynchronicParameterTypeNil; k++)
-            {
-                String attr = dirtyXml->getStringAttribute("d" + String(k));
-                
-                if (attr == String()) dirty.add(false);
-                else
-                {
-                    dirty.add((bool)attr.getIntValue());
-                }
-            }
-            
-            SynchronicPreparation::setState(paramsXml);
-        }
-        else
-        {
-            setStateOld(e);
-        }
-    }
-    
+    ValueTree getState(void);
+    void setState(XmlElement* e);
     void setStateOld(XmlElement* e);
     
 private:
@@ -303,12 +190,7 @@ public:
     typedef ReferenceCountedObjectPtr<NostalgicModification>   Ptr;
     typedef Array<NostalgicModification::Ptr>                  PtrArr;
     
-    NostalgicModification(int Id):
-    Modification(Id, NostalgicParameterTypeNil),
-    NostalgicPreparation()
-    {
-    }
-    
+    NostalgicModification(BKAudioProcessor& processor, int Id);
     ~NostalgicModification(void)
     {
         
@@ -316,7 +198,7 @@ public:
     
     inline NostalgicModification::Ptr duplicate(void)
     {
-        NostalgicModification::Ptr mod = new NostalgicModification(-1);
+        NostalgicModification::Ptr mod = new NostalgicModification(processor, -1);
         
         mod->copy(this);
         
@@ -330,60 +212,8 @@ public:
         NostalgicPreparation::copy(mod);
     }
     
-    inline ValueTree getState(void)
-    {
-        ValueTree prep(vtagModNostalgic);
-        
-        prep.setProperty( "Id", Id, 0);
-        prep.setProperty( "name", getName(), 0);
-        
-        ValueTree dirtyVT( "dirty");
-        int count = 0;
-        for (auto b : dirty)
-        {
-            dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
-        }
-        prep.addChild(dirtyVT, -1, 0);
-        
-        prep.addChild(NostalgicPreparation::getState(), -1, 0);
-        
-        return prep;
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        Id = e->getStringAttribute("Id").getIntValue();
-        
-        String n = e->getStringAttribute("name");
-        
-        if (n != String())     setName(n);
-        else                        setName(String(Id));
-        
-        XmlElement* dirtyXml = e->getChildByName("dirty");
-        XmlElement* paramsXml = e->getChildByName("params");
-        
-        if (dirtyXml != nullptr && paramsXml != nullptr)
-        {
-            dirty.clear();
-            for (int k = 0; k < NostalgicParameterTypeNil; k++)
-            {
-                String attr = dirtyXml->getStringAttribute("d" + String(k));
-                
-                if (attr == String()) dirty.add(false);
-                else
-                {
-                    dirty.add((bool)attr.getIntValue());
-                }
-            }
-            
-            NostalgicPreparation::setState(paramsXml);
-        }
-        else
-        {
-            setStateOld(e);
-        }
-    }
-    
+    ValueTree getState(void);
+    void setState(XmlElement* e);
     void setStateOld(XmlElement* e);
     
 private:
@@ -400,17 +230,7 @@ public:
     typedef ReferenceCountedObjectPtr<TuningModification>   Ptr;
     typedef Array<TuningModification::Ptr>                  PtrArr;
     
-    TuningModification(int Id):
-    Modification(Id, TuningParameterTypeNil),
-    TuningPreparation()
-    {
-        //Array<bool> tetherWeightsActive;
-        //Array<bool> springWeightsActive;
-        
-        for(int i=0; i<128; i++) tetherWeightsActive.insert(i, false);
-        for(int i=0; i<12; i++) springWeightsActive.insert(i, false);
-    }
-    
+    TuningModification(BKAudioProcessor& processor, int Id);
     ~TuningModification(void)
     {
         
@@ -418,7 +238,7 @@ public:
     
     inline TuningModification::Ptr duplicate(void)
     {
-        TuningModification::Ptr mod = new TuningModification(-1);
+        TuningModification::Ptr mod = new TuningModification(processor, -1);
         
         mod->copy(this);
         
@@ -518,13 +338,7 @@ public:
     typedef ReferenceCountedObjectPtr<TempoModification>   Ptr;
     typedef Array<TempoModification::Ptr>                  PtrArr;
     
-    TempoModification(int Id):
-    Modification(Id, TempoParameterTypeNil),
-    TempoPreparation()
-    {
-        
-    }
-    
+    TempoModification(BKAudioProcessor& processor, int Id);
     ~TempoModification(void)
     {
         
@@ -532,7 +346,7 @@ public:
     
     inline TempoModification::Ptr duplicate(void)
     {
-        TempoModification::Ptr mod = new TempoModification(-1);
+        TempoModification::Ptr mod = new TempoModification(processor, -1);
         
         mod->copy(this);
         
@@ -607,9 +421,6 @@ private:
     JUCE_LEAK_DETECTOR(TempoModification)
 };
 
-
-#endif  // MODIFICATION_H_INCLUDED
-
 class BlendronicModification :
 	public Modification,
 	public BlendronicPreparation
@@ -618,12 +429,7 @@ public:
 	typedef ReferenceCountedObjectPtr<BlendronicModification>   Ptr;
 	typedef Array<BlendronicModification::Ptr>                  PtrArr;
 
-	BlendronicModification(int Id) :
-		Modification(Id, BlendronicParameterTypeNil),
-		BlendronicPreparation()
-	{
-	}
-
+    BlendronicModification(BKAudioProcessor& processor, int Id);
 	~BlendronicModification(void)
 	{
 
@@ -631,7 +437,7 @@ public:
 
 	inline BlendronicModification::Ptr duplicate(void)
 	{
-		BlendronicModification::Ptr mod = new BlendronicModification(-1);
+		BlendronicModification::Ptr mod = new BlendronicModification(processor, -1);
 
 		mod->copy(this);
 
@@ -706,3 +512,5 @@ private:
 
 	JUCE_LEAK_DETECTOR(BlendronicModification)
 };
+
+#endif  // MODIFICATION_H_INCLUDED

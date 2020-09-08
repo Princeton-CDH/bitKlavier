@@ -322,34 +322,15 @@ public:
                     }
                 }
             }
-            
         }
         
-        n = e->getStringAttribute(ptagKeymap_harmonizerShift);
-        if (n != "")
-        {
-            harShift = n.getIntValue();
-        }
-        else
-        {
-            harShift = 0;
-        }
+        harShift = e->getIntAttribute(ptagKeymap_harmonizerShift, 0);
 
-        n = e->getStringAttribute(ptagKeymap_endKeystrokes);
-        if (n != "") setAllNotesOff((bool)n.getIntValue());
-        else setAllNotesOff(false);
+        setAllNotesOff((bool) e->getIntAttribute(ptagKeymap_endKeystrokes, 0));
+        setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
 
-        n = e->getStringAttribute(ptagKeymap_ignoreSustain);
-        if (n != "") setIgnoreSustain((bool)n.getIntValue());
-        else setIgnoreSustain(false);
-
-        n = e->getStringAttribute(ptagKeymap_defaultSelected);
-        if (n != "") defaultSelected = n.getIntValue();
-        else defaultSelected = true;
-        
-        n = e->getStringAttribute(ptagKeymap_onscreenSelected);
-        if (n != "") onscreenSelected = n.getIntValue();
-        else onscreenSelected = true;
+        setDefaultSelected((bool) e->getIntAttribute(ptagKeymap_defaultSelected, 1));
+        setOnscreenSelected((bool) e->getIntAttribute(ptagKeymap_onscreenSelected, 1));
     }
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }
@@ -386,10 +367,10 @@ public:
     }
     
     inline bool isDefaultSelected() { return defaultSelected; }
-    inline void setDefaultSelected(bool selected) { defaultSelected = selected; }
+    void setDefaultSelected(bool selected);
     
     inline bool isOnscreenSelected() { return onscreenSelected; }
-    inline void setOnscreenSelected(bool selected) { onscreenSelected = selected; }
+    void setOnscreenSelected(bool selected);
     
     void setTarget(KeymapTargetType target, KeymapTargetState state);
     void toggleTarget(KeymapTargetType target);

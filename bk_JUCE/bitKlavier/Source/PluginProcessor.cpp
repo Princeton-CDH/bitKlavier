@@ -107,7 +107,9 @@ pedalSynth(*this),
 firstTime(true),
 currentSampleRate(44100.),
 doneWithSetStateInfo(false),
-midiReady(false)
+midiReady(false),
+tooltipsEnabled(true),
+hotkeysEnabled(true)
 {
 #if BK_UNIT_TESTS
     

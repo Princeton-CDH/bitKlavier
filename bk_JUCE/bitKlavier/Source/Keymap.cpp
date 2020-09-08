@@ -25,7 +25,7 @@ inverted(false),
 triggered(false),
 midiInputNames(Array<String>()),
 midiInputIdentifiers(Array<String>()),
-defaultSelected(false),
+defaultSelected(true),
 onscreenSelected(true),
 //harmonizerEnabled(false),
 harKey(60),
@@ -50,19 +50,12 @@ allNotesOff(false)
     {
         targetStates.add(TargetStateNil);
     }
-    
-    if (processor.isMidiReady()) {
-        defaultSelected = true;
-    }
 
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
         harmonizerKeys.add(Array<int>(i)); //"default" harmonizer for each key is to just play itself
     }
-#if JUCE_IOS
-    defaultSelected = true;
-#endif
 }
 
 Keymap::Keymap(BKAudioProcessor& processor, Keymap::Ptr k):
@@ -176,7 +169,7 @@ harArrayMidiEdit(false),
 inverted(false),
 midiInputNames(Array<String>()),
 midiInputIdentifiers(Array<String>()),
-defaultSelected(false),
+defaultSelected(true),
 onscreenSelected(true),
 //harmonizerEnabled(false),
 harKey(60),
@@ -194,10 +187,6 @@ allNotesOff(false)
     for (int i = 0; i < TargetTypeNil; i++)
     {
         targetStates.add(TargetStateNil);
-    }
-    
-    if (processor.isMidiReady()) {
-        defaultSelected = true;
     }
 
     harmonizerKeys.ensureStorageAllocated(128);
@@ -641,4 +630,26 @@ void Keymap::clearHarmonizations()
     {
         harmonizerKeys.set(i, Array<int>());
     }
+}
+
+void Keymap::setDefaultSelected(bool selected)
+{
+    if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_AudioUnit ||
+        processor.wrapperType == juce::AudioPluginInstance::wrapperType_VST ||
+        processor.wrapperType == juce::AudioPluginInstance::wrapperType_VST3)
+    {
+        defaultSelected = true;
+    }
+    else defaultSelected = selected;
+}
+
+void Keymap::setOnscreenSelected(bool selected)
+{
+    if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_AudioUnit ||
+        processor.wrapperType == juce::AudioPluginInstance::wrapperType_VST ||
+        processor.wrapperType == juce::AudioPluginInstance::wrapperType_VST3)
+    {
+        onscreenSelected = true;
+    }
+    else onscreenSelected = selected;
 }

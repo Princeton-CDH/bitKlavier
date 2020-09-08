@@ -150,6 +150,11 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             setTooltipsEnabled((bool)userSettings->getIntAttribute("tooltipsEnabled", 1));
             setHotkeysEnabled((bool)userSettings->getIntAttribute("hotkeysEnabled", 1));
         }
+        else
+        {
+            setTooltipsEnabled(true);
+            setHotkeysEnabled(true);
+        }
         
         defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
         

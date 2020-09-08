@@ -450,7 +450,7 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
     }
     if (type == PreparationTypeDirectMod)
     {
-        DirectModification::Ptr p = new DirectModification(-1);
+        DirectModification::Ptr p = new DirectModification(processor, -1);
         p->setState(xml);
         addDirectMod(p);
         if (p->getName() == String(oldId))
@@ -460,7 +460,7 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
     }
     else if (type == PreparationTypeSynchronicMod)
     {
-        SynchronicModification::Ptr p = new SynchronicModification(-1);
+        SynchronicModification::Ptr p = new SynchronicModification(processor, -1);
         p->setState(xml);
         addSynchronicMod(p);
         if (p->getName() == String(oldId))
@@ -470,7 +470,7 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
     }
     else if (type == PreparationTypeNostalgicMod)
     {
-        NostalgicModification::Ptr p = new NostalgicModification(-1);
+        NostalgicModification::Ptr p = new NostalgicModification(processor, -1);
         p->setState(xml);
         addNostalgicMod(p);
         if (p->getName() == String(oldId))
@@ -480,7 +480,7 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
     }
     else if (type == PreparationTypeTuningMod)
     {
-        TuningModification::Ptr p = new TuningModification(-1);
+        TuningModification::Ptr p = new TuningModification(processor, -1);
         p->setState(xml);
         addTuningMod(p);
         if (p->getName() == String(oldId))
@@ -490,7 +490,7 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
     }
     else if (type == PreparationTypeTempoMod)
     {
-        TempoModification::Ptr p = new TempoModification(-1);
+        TempoModification::Ptr p = new TempoModification(processor, -1);
         p->setState(xml);
         addTempoMod(p);
         if (p->getName() == String(oldId))
@@ -500,7 +500,7 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
     }
 	else if (type == PreparationTypeBlendronicMod)
 	{
-		BlendronicModification::Ptr p = new BlendronicModification(-1);
+		BlendronicModification::Ptr p = new BlendronicModification(processor, -1);
 		p->setState(xml);
 		addBlendronicMod(p);
         if (p->getName() == String(oldId))
@@ -763,12 +763,12 @@ int Gallery::getNum(BKPreparationType type)
 void Gallery::addDirectMod()
 {
     int newId = getNewId(PreparationTypeDirectMod);
-    modDirect.add           (new DirectModification(newId));
+    modDirect.add           (new DirectModification(processor, newId));
 }
 
 void Gallery::addDirectModWithId(int Id)
 {
-    modDirect.add           (new DirectModification(Id));
+    modDirect.add           (new DirectModification(processor, Id));
 }
 
 void Gallery::addDirectMod(DirectModification::Ptr mod)
@@ -781,12 +781,12 @@ void Gallery::addDirectMod(DirectModification::Ptr mod)
 void Gallery::addSynchronicMod()
 {
     int newId = getNewId(PreparationTypeSynchronicMod);
-    modSynchronic.add       (new SynchronicModification(newId));
+    modSynchronic.add       (new SynchronicModification(processor, newId));
 }
 
 void Gallery::addSynchronicModWithId(int Id)
 {
-    modSynchronic.add       (new SynchronicModification(Id));
+    modSynchronic.add       (new SynchronicModification(processor, Id));
 }
 
 void Gallery::addSynchronicMod(SynchronicModification::Ptr mod)
@@ -799,12 +799,12 @@ void Gallery::addSynchronicMod(SynchronicModification::Ptr mod)
 void Gallery::addNostalgicMod()
 {
     int newId = getNewId(PreparationTypeNostalgicMod);
-    modNostalgic.add        (new NostalgicModification(newId));
+    modNostalgic.add        (new NostalgicModification(processor, newId));
 }
 
 void Gallery::addNostalgicModWithId(int Id)
 {
-    modNostalgic.add        (new NostalgicModification(Id));
+    modNostalgic.add        (new NostalgicModification(processor, Id));
 }
 
 void Gallery::addNostalgicMod(NostalgicModification::Ptr mod)
@@ -817,7 +817,7 @@ void Gallery::addNostalgicMod(NostalgicModification::Ptr mod)
 void Gallery::addTuningMod()
 {
     int newId = getNewId(PreparationTypeTuningMod);
-    modTuning.add           (new TuningModification(newId));
+    modTuning.add           (new TuningModification(processor, newId));
 }
 
 void Gallery::addTuningMod(TuningModification::Ptr tmod)
@@ -829,18 +829,18 @@ void Gallery::addTuningMod(TuningModification::Ptr tmod)
 
 void Gallery::addTuningModWithId(int Id)
 {
-    modTuning.add           (new TuningModification(Id));
+    modTuning.add           (new TuningModification(processor, Id));
 }
 
 void Gallery::addTempoMod()
 {
     int newId = getNewId(PreparationTypeTempoMod);
-    modTempo.add           (new TempoModification(newId));
+    modTempo.add           (new TempoModification(processor, newId));
 }
 
 void Gallery::addTempoModWithId(int Id)
 {
-    modTempo.add           (new TempoModification(Id));
+    modTempo.add           (new TempoModification(processor, Id));
 }
 
 void Gallery::addTempoMod(TempoModification::Ptr tmod)
@@ -853,12 +853,12 @@ void Gallery::addTempoMod(TempoModification::Ptr tmod)
 void Gallery::addBlendronicMod()
 {
 	int newId = getNewId(PreparationTypeBlendronicMod);
-	modBlendronic.add(new BlendronicModification(newId));
+	modBlendronic.add(new BlendronicModification(processor, newId));
 }
 
 void Gallery::addBlendronicModWithId(int Id)
 {
-	modBlendronic.add(new BlendronicModification(Id));
+	modBlendronic.add(new BlendronicModification(processor, Id));
 }
 
 void Gallery::addBlendronicMod(BlendronicModification::Ptr bmod)

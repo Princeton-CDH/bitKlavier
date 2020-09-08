@@ -585,6 +585,8 @@ typedef enum SynchronicParameterType {
     SynchronicVelocityMax,
     SynchronicMidiOutput,
     SynchronicTranspUsesTuning,
+    SynchronicUseGlobalSoundSet,
+    SynchronicSoundSet,
     SynchronicParameterTypeNil
 } SynchronicParameterType;
 
@@ -688,6 +690,8 @@ typedef enum NostalgicParameterType {
     NostalgicVelocityMin,
     NostalgicVelocityMax,
     NostalgicTranspUsesTuning,
+    NostalgicUseGlobalSoundSet,
+    NostalgicSoundSet,
     NostalgicParameterTypeNil
     
 } NostalgicParameterType;
@@ -750,6 +754,8 @@ typedef enum DirectParameterType
     DirectTuning,
     DirectADSR,
     DirectTranspUsesTuning,
+    DirectUseGlobalSoundSet,
+    DirectSoundSet,
     DirectParameterTypeNil,
     
 } DirectParameterType;

@@ -122,6 +122,13 @@ public:
             dRelease = d->getRelease();
         }
        
+        if (dirty[DirectUseGlobalSoundSet]) dUseGlobalSoundSet = d->getUseGlobalSoundSet();
+        
+        if (dirty[DirectSoundSet])
+        {
+            dSoundSet = d->getSoundSet();
+            dSoundSetName = d->getSoundSetName();
+        }
     }
     
     inline bool compare(DirectPreparation::Ptr d)

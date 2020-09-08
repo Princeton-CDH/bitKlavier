@@ -856,7 +856,7 @@ void Gallery::setStateFromJson(var myJson)
                         int noteNumber = notenum.getIntValue();
                         
                         
-                        TuningModification::Ptr testMod = new TuningModification(-1);
+                        TuningModification::Ptr testMod = new TuningModification(processor, -1);
                         
                         testMod->setFundamental(fund);
                         testMod->setScale(tscale);

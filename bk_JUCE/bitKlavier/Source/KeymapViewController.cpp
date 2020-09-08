@@ -1224,9 +1224,9 @@ PopupMenu KeymapViewController::getMidiInputSelectMenu()
     int id = 1;
     if (keymap->isDefaultSelected())
     {
-        menu.addItem(PopupMenu::Item("Default MIDI Input").setID(id).setTicked(true));
+        menu.addItem(PopupMenu::Item(cMidiInputDefaultDisplay).setID(id).setTicked(true));
     }
-    else menu.addItem(PopupMenu::Item("Default MIDI Input").setID(id));
+    else menu.addItem(PopupMenu::Item(cMidiInputDefaultDisplay).setID(id));
     
     id++;
     if (keymap->isOnscreenSelected())

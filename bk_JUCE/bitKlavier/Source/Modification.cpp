@@ -9,6 +9,101 @@
 */
 
 #include "Modification.h"
+#include "PluginProcessor.h"
+
+DirectModification::DirectModification(BKAudioProcessor& processor, int Id):
+Modification(processor, Id, DirectParameterTypeNil),
+DirectPreparation()
+{
+    
+}
+
+ValueTree DirectModification::getState(void)
+{
+    ValueTree prep(vtagModDirect);
+    
+    prep.setProperty( "Id", Id, 0);
+    prep.setProperty( "name", getName(), 0);
+    
+    ValueTree dirtyVT( "dirty");
+    int count = 0;
+    for (auto b : dirty)
+    {
+        dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
+    }
+    prep.addChild(dirtyVT, -1, 0);
+    
+    prep.addChild(DirectPreparation::getState(), -1, 0);
+    
+    return prep;
+}
+
+void DirectModification::setState(XmlElement* e)
+{
+    Id = e->getStringAttribute("Id").getIntValue();
+    
+    String n = e->getStringAttribute("name");
+    
+    if (n != String())     setName(n);
+    else                        setName(String(Id));
+    
+    XmlElement* dirtyXml = e->getChildByName("dirty");
+    XmlElement* paramsXml = e->getChildByName("params");
+    
+    if (dirtyXml != nullptr && paramsXml != nullptr)
+    {
+        dirty.clear();
+        for (int k = 0; k < DirectParameterTypeNil; k++)
+        {
+            String attr = dirtyXml->getStringAttribute("d" + String(k));
+            
+            if (attr == String()) dirty.add(false);
+            else
+            {
+                dirty.add((bool)attr.getIntValue());
+            }
+        }
+        
+        DirectPreparation::setState(paramsXml);
+        if (!getUseGlobalSoundSet())
+        {
+            // comes in as "soundfont.sf2.subsound1"
+            String name = getSoundSetName();
+            BKSampleLoadType type = BKLoadSoundfont;
+            
+            for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
+            {
+                if (name == String(cBKSampleLoadTypes[i]))
+                {
+                    type = (BKSampleLoadType) i;
+                }
+            }
+            
+            String path = name.upToLastOccurrenceOf(".subsound", false, false);
+            int subsound = 0;
+            
+            if (type == BKLoadSoundfont)
+            {
+                for (auto sf : processor.soundfontNames)
+                {
+                    if (sf.contains(path))
+                    {
+                        path = sf;
+                        break;
+                    }
+                }
+                
+                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+            }
+            int Id = processor.loadSamples(type, path, subsound, false);
+            setSoundSet(Id);
+        }
+    }
+    else
+    {
+        setStateOld(e);
+    }
+}
 
 void DirectModification::setStateOld(XmlElement* e)
 {
@@ -76,6 +171,101 @@ void DirectModification::setStateOld(XmlElement* e)
             setADSRvals(envelope);
             setDirty(DirectADSR);
         }
+    }
+}
+
+
+SynchronicModification::SynchronicModification(BKAudioProcessor& processor, int Id):
+Modification(processor, Id, SynchronicParameterTypeNil),
+SynchronicPreparation()
+{
+
+}
+
+ValueTree SynchronicModification::getState(void)
+{
+    ValueTree prep(vtagModSynchronic);
+    
+    prep.setProperty( "Id", Id, 0);
+    prep.setProperty( "name", getName(), 0);
+    
+    ValueTree dirtyVT( "dirty");
+    int count = 0;
+    for (auto b : dirty)
+    {
+        dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
+    }
+    prep.addChild(dirtyVT, -1, 0);
+    
+    prep.addChild(SynchronicPreparation::getState(), -1, 0);
+    
+    return prep;
+}
+
+void SynchronicModification::setState(XmlElement* e)
+{
+    Id = e->getStringAttribute("Id").getIntValue();
+    
+    String n = e->getStringAttribute("name");
+    
+    if (n != String())     setName(n);
+    else                        setName(String(Id));
+    
+    XmlElement* dirtyXml = e->getChildByName("dirty");
+    XmlElement* paramsXml = e->getChildByName("params");
+    
+    if (dirtyXml != nullptr && paramsXml != nullptr)
+    {
+        dirty.clear();
+        for (int k = 0; k < SynchronicParameterTypeNil; k++)
+        {
+            String attr = dirtyXml->getStringAttribute("d" + String(k));
+            
+            if (attr == String()) dirty.add(false);
+            else
+            {
+                dirty.add((bool)attr.getIntValue());
+            }
+        }
+        
+        SynchronicPreparation::setState(paramsXml);
+        if (!getUseGlobalSoundSet())
+        {
+            // comes in as "soundfont.sf2.subsound1"
+            String name = getSoundSetName();
+            BKSampleLoadType type = BKLoadSoundfont;
+            
+            for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
+            {
+                if (name == String(cBKSampleLoadTypes[i]))
+                {
+                    type = (BKSampleLoadType) i;
+                }
+            }
+            
+            String path = name.upToLastOccurrenceOf(".subsound", false, false);
+            int subsound = 0;
+            
+            if (type == BKLoadSoundfont)
+            {
+                for (auto sf : processor.soundfontNames)
+                {
+                    if (sf.contains(path))
+                    {
+                        path = sf;
+                        break;
+                    }
+                }
+                
+                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+            }
+            int Id = processor.loadSamples(type, path, subsound, false);
+            setSoundSet(Id);
+        }
+    }
+    else
+    {
+        setStateOld(e);
     }
 }
 
@@ -250,7 +440,100 @@ void SynchronicModification::setStateOld(XmlElement* e)
             setDirty(SynchronicADSRs);
         }
     }
+}
+
+NostalgicModification::NostalgicModification(BKAudioProcessor& processor, int Id):
+Modification(processor, Id, NostalgicParameterTypeNil),
+NostalgicPreparation()
+{
+
+}
+
+ValueTree NostalgicModification::getState(void)
+{
+    ValueTree prep(vtagModNostalgic);
     
+    prep.setProperty( "Id", Id, 0);
+    prep.setProperty( "name", getName(), 0);
+    
+    ValueTree dirtyVT( "dirty");
+    int count = 0;
+    for (auto b : dirty)
+    {
+        dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
+    }
+    prep.addChild(dirtyVT, -1, 0);
+    
+    prep.addChild(NostalgicPreparation::getState(), -1, 0);
+    
+    return prep;
+}
+
+void NostalgicModification::setState(XmlElement* e)
+{
+    Id = e->getStringAttribute("Id").getIntValue();
+    
+    String n = e->getStringAttribute("name");
+    
+    if (n != String())     setName(n);
+    else                        setName(String(Id));
+    
+    XmlElement* dirtyXml = e->getChildByName("dirty");
+    XmlElement* paramsXml = e->getChildByName("params");
+    
+    if (dirtyXml != nullptr && paramsXml != nullptr)
+    {
+        dirty.clear();
+        for (int k = 0; k < NostalgicParameterTypeNil; k++)
+        {
+            String attr = dirtyXml->getStringAttribute("d" + String(k));
+            
+            if (attr == String()) dirty.add(false);
+            else
+            {
+                dirty.add((bool)attr.getIntValue());
+            }
+        }
+        
+        NostalgicPreparation::setState(paramsXml);
+        if (!getUseGlobalSoundSet())
+        {
+            // comes in as "soundfont.sf2.subsound1"
+            String name = getSoundSetName();
+            BKSampleLoadType type = BKLoadSoundfont;
+            
+            for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
+            {
+                if (name == String(cBKSampleLoadTypes[i]))
+                {
+                    type = (BKSampleLoadType) i;
+                }
+            }
+            
+            String path = name.upToLastOccurrenceOf(".subsound", false, false);
+            int subsound = 0;
+            
+            if (type == BKLoadSoundfont)
+            {
+                for (auto sf : processor.soundfontNames)
+                {
+                    if (sf.contains(path))
+                    {
+                        path = sf;
+                        break;
+                    }
+                }
+                
+                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+            }
+            int Id = processor.loadSamples(type, path, subsound, false);
+            setSoundSet(Id);
+        }
+    }
+    else
+    {
+        setStateOld(e);
+    }
 }
 
 void NostalgicModification::setStateOld(XmlElement* e)
@@ -365,6 +648,15 @@ void NostalgicModification::setStateOld(XmlElement* e)
     }
 }
 
+
+
+TempoModification::TempoModification(BKAudioProcessor& processor, int Id):
+Modification(processor, Id, TempoParameterTypeNil),
+TempoPreparation()
+{
+    
+}
+
 void TempoModification::setStateOld(XmlElement* e)
 {
     reset();
@@ -417,6 +709,19 @@ void TempoModification::setStateOld(XmlElement* e)
         setAdaptiveTempo1Max(p.getFloatValue());
         setDirty(AT1Max);
     }
+}
+
+
+
+TuningModification::TuningModification(BKAudioProcessor& processor, int Id):
+Modification(processor, Id, TuningParameterTypeNil),
+TuningPreparation()
+{
+    //Array<bool> tetherWeightsActive;
+    //Array<bool> springWeightsActive;
+    
+    for(int i=0; i<128; i++) tetherWeightsActive.insert(i, false);
+    for(int i=0; i<12; i++) springWeightsActive.insert(i, false);
 }
 
 void TuningModification::setStateOld(XmlElement* e)
@@ -689,6 +994,14 @@ void TuningModification::setStateOld(XmlElement* e)
             setDirty(TuningAbsoluteOffsets);
         }
     }
+}
+
+
+BlendronicModification::BlendronicModification(BKAudioProcessor& processor, int Id) :
+Modification(processor, Id, BlendronicParameterTypeNil),
+BlendronicPreparation()
+{
+    
 }
 
 void BlendronicModification::setStateOld(XmlElement* e)

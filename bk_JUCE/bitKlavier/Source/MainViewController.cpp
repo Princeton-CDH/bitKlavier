@@ -44,6 +44,7 @@ sustainPedalButton("Sustain Pedal")
     sustainPedalButton.setClickingTogglesState(true);
     sustainPedalButton.addListener(this);
     addAndMakeVisible(sustainPedalButton);
+    sustainPedalButton.setVisible(false);
     
 	/*keystrokesButton.setClickingTogglesState(true);
 	keystrokesButton.getToggleStateValue().referTo(editor.getKeystrokesEnabled());
@@ -289,11 +290,11 @@ void MainViewController::resized()
     {
         Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * processor.paddingScalarY + gYSpacing);
         
-        footerSlice.reduce(gXSpacing, gYSpacing);
+        footerSlice.reduce(gXSpacing * 0.5f, gYSpacing);
 
         float unit = footerSlice.getWidth() * 0.25;
         
-        preferencesButton.setBounds (footerSlice.getX() + gXSpacing, footerSlice.getY(), 100, 20);
+        preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
         
 		/* SPACING WITHOUT PREFERENCES MENU
 		tooltipsButton.setBounds(footerSlice.getX(), footerSlice.getY(), 120, 20);
@@ -380,7 +381,6 @@ void MainViewController::resized()
         octaveSlider.setVisible(false);
         keyboardComponent->setVisible(false);
     }
-    
 }
 
 void MainViewController::mouseDown(const MouseEvent &event)
@@ -411,9 +411,12 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
     DirectPreparation::Ptr dPrep, dActive;
     SynchronicPreparation::Ptr sPrep, sActive;
     NostalgicPreparation::Ptr nPrep, nActive;
-    bool directSelected = false;
-    bool synchronicSelected = false;
-    bool nostalgicSelected = false;
+    DirectModification::Ptr dMod;
+    SynchronicModification::Ptr sMod;
+    NostalgicModification::Ptr nMod;
+    bool directSelected, directModSelected = false;
+    bool synchronicSelected, synchronicModSelected = false;
+    bool nostalgicSelected, nostalgicModSelected = false;
     if (!globalSoundSetButton.getToggleState() && construction.getNumSelected() == 1)
     {
         BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
@@ -435,7 +438,22 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             nActive = processor.gallery->getActiveNostalgicPreparation(item->getId());
             nostalgicSelected = true;
         }
-        
+        // Modifications
+        else if (item->getType() == PreparationTypeDirectMod)
+        {
+            dMod = processor.gallery->getDirectModification(item->getId());
+            directModSelected = true;
+        }
+        else if (item->getType() == PreparationTypeSynchronicMod)
+        {
+            sMod = processor.gallery->getSynchronicModification(item->getId());
+            synchronicModSelected = true;
+        }
+        else if (item->getType() == PreparationTypeNostalgicMod)
+        {
+            nMod = processor.gallery->getNostalgicModification(item->getId());
+            nostalgicModSelected = true;
+        }
     }
     
     if (cb == &sampleCB)
@@ -479,6 +497,24 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             nActive->setSoundSet(soundSetId);
             nActive->setSoundSetName(soundSetName);
         }
+        else if (directModSelected)
+        {
+            dMod->setSoundSet(soundSetId);
+            dMod->setSoundSetName(soundSetName);
+            dMod->setDirty(DirectSoundSet);
+        }
+        else if (synchronicModSelected)
+        {
+            sMod->setSoundSet(soundSetId);
+            sMod->setSoundSetName(soundSetName);
+            sMod->setDirty(SynchronicSoundSet);
+        }
+        else if (nostalgicModSelected)
+        {
+            nMod->setSoundSet(soundSetId);
+            nMod->setSoundSetName(soundSetName);
+            nMod->setDirty(NostalgicSoundSet);
+        }
     }
     else if (cb == &instrumentCB)
     {
@@ -512,6 +548,34 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             nPrep->setSoundSetName(soundSetName);
             nActive->setSoundSet(soundSetId);
             nActive->setSoundSetName(soundSetName);
+        }
+        // Modifications
+        else if (directModSelected)
+        {
+            String sfname = processor.loadedSoundSets[dMod->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
+            int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
+            dMod->setSoundSet(soundSetId);
+            dMod->setSoundSetName(soundSetName);
+            dMod->setDirty(DirectSoundSet);
+        }
+        else if (synchronicModSelected)
+        {
+            String sfname = processor.loadedSoundSets[sMod->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
+            int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
+            sMod->setSoundSet(soundSetId);
+            sMod->setSoundSetName(soundSetName);
+            sMod->setDirty(SynchronicSoundSet);
+        }
+        else if (nostalgicModSelected)
+        {
+            String sfname = processor.loadedSoundSets[nMod->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
+            int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
+            nMod->setSoundSet(soundSetId);
+            nMod->setSoundSetName(soundSetName);
+            nMod->setDirty(NostalgicSoundSet);
         }
         else
         {
@@ -553,6 +617,28 @@ void MainViewController::bkButtonClicked (Button* b)
             bool toggle = !active->getUseGlobalSoundSet();
             prep->setUseGlobalSoundSet(toggle);
             active->setUseGlobalSoundSet(toggle);
+        }
+        // Modifications
+        else if (item->getType() == PreparationTypeDirectMod)
+        {
+            DirectModification::Ptr mod = processor.gallery->getDirectModification(item->getId());
+            bool toggle = !mod->getUseGlobalSoundSet();
+            mod->setUseGlobalSoundSet(toggle);
+            mod->setDirty(DirectUseGlobalSoundSet);
+        }
+        else if (item->getType() == PreparationTypeSynchronicMod)
+        {
+            SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(item->getId());
+            bool toggle = !mod->getUseGlobalSoundSet();
+            mod->setUseGlobalSoundSet(toggle);
+            mod->setDirty(SynchronicUseGlobalSoundSet);
+        }
+        else if (item->getType() == PreparationTypeNostalgicMod)
+        {
+            NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(item->getId());
+            bool toggle = !mod->getUseGlobalSoundSet();
+            mod->setUseGlobalSoundSet(toggle);
+            mod->setDirty(NostalgicUseGlobalSoundSet);
         }
     }
     if (b == &sustainPedalButton)
@@ -900,6 +986,22 @@ void MainViewController::fillSampleCB()
             NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(item->getId());
             if (prep != nullptr) idx = prep->getSoundSet();
         }
+        // Modifications
+        else if (item->getType() == PreparationTypeDirectMod)
+        {
+            DirectModification::Ptr mod = processor.gallery->getDirectModification(item->getId());
+            if (mod != nullptr) idx = mod->getSoundSet();
+        }
+        else if (item->getType() == PreparationTypeSynchronicMod)
+        {
+            SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(item->getId());
+            if (mod != nullptr) idx = mod->getSoundSet();
+        }
+        else if (item->getType() == PreparationTypeNostalgicMod)
+        {
+            NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(item->getId());
+            if (mod != nullptr) idx = mod->getSoundSet();
+        }
     }
     if (idx < 0) idx = processor.globalSoundSetId;
     
@@ -962,6 +1064,22 @@ void MainViewController::fillInstrumentCB()
         {
             NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(item->getId());
             if (prep != nullptr) idx = prep->getSoundSet();
+        }
+        // Modifications
+        else if (item->getType() == PreparationTypeDirectMod)
+        {
+            DirectModification::Ptr mod = processor.gallery->getDirectModification(item->getId());
+            if (mod != nullptr) idx = mod->getSoundSet();
+        }
+        else if (item->getType() == PreparationTypeSynchronicMod)
+        {
+            SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(item->getId());
+            if (mod != nullptr) idx = mod->getSoundSet();
+        }
+        else if (item->getType() == PreparationTypeNostalgicMod)
+        {
+            NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(item->getId());
+            if (mod != nullptr) idx = mod->getSoundSet();
         }
     }
     if (idx < 0) idx = processor.globalSoundSetId;
@@ -1043,12 +1161,8 @@ void MainViewController::timerCallback()
         processor.collectSoundfonts();
         
         //header.fillGalleryCB();
-        
-        fillSampleCB();
-        fillInstrumentCB();
-
     }
-    
+
     fillSampleCB();
     fillInstrumentCB();
     
@@ -1057,8 +1171,10 @@ void MainViewController::timerCallback()
     keyboardState.setKeymap(noteOns);
 
     bool soundItemSelected = false;
-
     // set main keyboard to display active keys in selected keymap (if there is a selected keymap)
+    sampleCB.setAlpha(1.);
+    instrumentCB.setAlpha(1.);
+    globalSoundSetButton.setAlpha(1.);
     if (construction.getNumSelected() == 1)
     {
         BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
@@ -1090,6 +1206,46 @@ void MainViewController::timerCallback()
             NostalgicPreparation::Ptr prep = processor.gallery->getActiveNostalgicPreparation(item->getId());
             if (prep != nullptr)
                 globalSoundSetButton.setToggleState(prep->getUseGlobalSoundSet(), dontSendNotification);
+        }
+        // Modifications
+        else if (item->getType() == PreparationTypeDirectMod)
+        {
+            soundItemSelected = true;
+            globalSoundSetButton.setVisible(true);
+            DirectModification::Ptr mod = processor.gallery->getDirectModification(item->getId());
+            if (mod != nullptr)
+            {
+                globalSoundSetButton.setToggleState(mod->getUseGlobalSoundSet(), dontSendNotification);
+                globalSoundSetButton.setAlpha(mod->getDirty(DirectUseGlobalSoundSet) ? 1. : gModAlpha);
+                sampleCB.setAlpha(mod->getDirty(DirectSoundSet) ? 1. : gModAlpha);
+                instrumentCB.setAlpha(mod->getDirty(DirectSoundSet) ? 1. : gModAlpha);
+            }
+        }
+        else if (item->getType() == PreparationTypeSynchronicMod)
+        {
+            soundItemSelected = true;
+            globalSoundSetButton.setVisible(true);
+            SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(item->getId());
+            if (mod != nullptr)
+            {
+                globalSoundSetButton.setToggleState(mod->getUseGlobalSoundSet(), dontSendNotification);
+                globalSoundSetButton.setAlpha(mod->getDirty(SynchronicUseGlobalSoundSet) ? 1. : gModAlpha);
+                sampleCB.setAlpha(mod->getDirty(SynchronicSoundSet) ? 1. : gModAlpha);
+                instrumentCB.setAlpha(mod->getDirty(SynchronicSoundSet) ? 1. : gModAlpha);
+            }
+        }
+        else if (item->getType() == PreparationTypeNostalgicMod)
+        {
+            soundItemSelected = true;
+            globalSoundSetButton.setVisible(true);
+            NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(item->getId());
+            if (mod != nullptr)
+            {
+                globalSoundSetButton.setToggleState(mod->getUseGlobalSoundSet(), dontSendNotification);
+                globalSoundSetButton.setAlpha(mod->getDirty(NostalgicUseGlobalSoundSet) ? 1. : gModAlpha);
+                sampleCB.setAlpha(mod->getDirty(NostalgicSoundSet) ? 1. : gModAlpha);
+                instrumentCB.setAlpha(mod->getDirty(NostalgicSoundSet) ? 1. : gModAlpha);
+            }
         }
     }
     
