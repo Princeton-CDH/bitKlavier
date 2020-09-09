@@ -419,7 +419,7 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
     bool nostalgicSelected, nostalgicModSelected = false;
     if (!globalSoundSetButton.getToggleState() && construction.getNumSelected() == 1)
     {
-        BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
+        BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
             dPrep = processor.gallery->getStaticDirectPreparation(item->getId());
@@ -593,7 +593,7 @@ void MainViewController::bkButtonClicked (Button* b)
     }
     if (b == &globalSoundSetButton)
     {
-        BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
+        BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
             DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(item->getId());
@@ -774,6 +774,20 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         {
             construction.addItem(PreparationTypeDirect);
         }
+        else if (code == 69) // E
+        {
+            if (processor.updateState->currentDisplay == DisplayKeymap)
+            {
+                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+                keymap->toggleMidiEdit();
+                keymap->setHarMidiEdit(false);
+                keymap->setHarArrayMidiEdit(false);
+            }
+        }
+        else if (code == 73) // I
+        {
+            construction.removeConnectionsBetween();
+        }
         else if (code == 75) // K keymap
         {
             construction.addItem(PreparationTypeKeymap);
@@ -786,13 +800,24 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         {
             construction.addItem(PreparationTypeNostalgic);
         }
+        else if (code == 79) // O
+        {
+            construction.removeConnectionsTo();
+        }
         else if (code == 80) // P piano
         {
             construction.addItem(PreparationTypePianoMap);
         }
         else if (code == 81) // Q comment
         {
-            construction.addItem(PreparationTypeComment);
+            if (processor.updateState->currentDisplay == DisplayKeymap)
+            {
+                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+                keymap->setMidiEdit(false);
+                keymap->setHarMidiEdit(false);
+                keymap->toggleHarArrayMidiEdit();
+            }
+            else construction.addItem(PreparationTypeComment);
         }
         else if (code == 82) // R reset
         {
@@ -812,9 +837,24 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         {
             construction.addItem(PreparationTypeTuning);
         }
+        
+        else if (code == 85) // U
+        {
+            construction.connectAllSelected();
+        }
         else if (code == 86) // V
         {
             if (e.getModifiers().isCommandDown())   construction.paste();
+        }
+        else if (code == 87) // W
+        {
+            if (processor.updateState->currentDisplay == DisplayKeymap)
+            {
+                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+                keymap->setMidiEdit(false);
+                keymap->toggleHarMidiEdit();
+                keymap->setHarArrayMidiEdit(false);
+            }
         }
         else if (code == 88) // X
         {
@@ -832,129 +872,14 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                         performUndo();
                 }
             }
-        }
-        else if (code == 69) // E
-        {
-            if (e.getModifiers().isCommandDown())
-            {
-                if (processor.updateState->currentDisplay == DisplayKeymap)
-                {
-                    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-                    keymap->setMidiEdit(false);
-                    keymap->toggleHarMidiEdit();
-                    keymap->setHarArrayMidiEdit(false);
-                }
-                else if (e.getModifiers().isCommandDown())   construction.selectAll();
-            }
-        }
-		else if (code == 66) // B blendronic
-		{
-			construction.addItem(PreparationTypeBlendronic);
-		}
-		else if (code == 67) // C modification
-		{
-			if (e.getModifiers().isCommandDown())   construction.copy();
-			else                                    construction.addItem(PreparationTypeGenericMod);
-		}
-		else if (code == 68) // D direct
-		{
-			construction.addItem(PreparationTypeDirect);
-		}
-		else if (code == 75) // K keymap
-		{
-			//if (e.getModifiers().isCommandDown()) 
-			//{
-				//processor.setKeystrokesEnabled(keystrokesEnabled);
-			//}
-			//else //check that command isn't down because CTRL+K will enable/disable keystrokes eventually
-            construction.addItem(PreparationTypeKeymap); 
-		}
-		else if (code == 77) // M tempo
-		{
-			construction.addItem(PreparationTypeTempo);
-		}
-		else if (code == 78) // N nostalgic
-		{
-			construction.addItem(PreparationTypeNostalgic);
-		}
-		else if (code == 80) // P piano
-		{
-			construction.addItem(PreparationTypePianoMap);
-		}
-		else if (code == 81) // Q comment
-		{
-            BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
-            if (currentDisplay == DisplayKeymap)
-            {
-                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-                keymap->setMidiEdit(false);
-                keymap->setHarMidiEdit(false);
-                keymap->toggleHarArrayMidiEdit();
-            }
-			else construction.addItem(PreparationTypeComment);
-		}
-		else if (code == 82) // R reset
-		{
-			construction.addItem(PreparationTypeReset);
-		}
-		else if (code == 83) // S synchronic
-		{
-			if (e.getModifiers().isCommandDown())
-			{
-				if (e.getModifiers().isShiftDown() || processor.defaultLoaded)
-					processor.saveCurrentGalleryAs();
-				else processor.saveCurrentGallery();
-			}
-			else                                    construction.addItem(PreparationTypeSynchronic);
-		}
-		else if (code == 84) // T tuning
-		{
-			construction.addItem(PreparationTypeTuning);
-		}
-		else if (code == 86) // V
-		{
-			if (e.getModifiers().isCommandDown())   construction.paste();
-		}
-		else if (code == 88) // X
-		{
-			if (e.getModifiers().isCommandDown())   construction.cut();
-		}
-		else if (code == 90) // Z
-		{
-            BKPreparationDisplay currentDisplay = overtop.getCurrentDisplay();
-            if (currentDisplay == DisplayKeymap)
+            else if (processor.updateState->currentDisplay == DisplayKeymap)
             {
                 Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
                 keymap->toggleMidiEdit();
                 keymap->setHarMidiEdit(false);
                 keymap->setHarArrayMidiEdit(false);
             }
-		}
-		else if (code == 69) // E
-		{
-			if (e.getModifiers().isCommandDown())
-			{
-				if (processor.updateState->currentDisplay == DisplayKeymap)
-				{
-					Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-					ToggleButton* midiEditToggle = overtop.kvc.getMidiEditToggle();
-					midiEditToggle->setToggleState(!midiEditToggle->getToggleState(), dontSendNotification);
-					keymap->setMidiEdit(midiEditToggle->getToggleState());
-				}
-			}
-		}
-		else if (code == 85) // U
-		{
-			construction.connectAllSelected();
-		}
-		else if (code == 73) // I
-		{
-			construction.removeConnectionsBetween();
-		}
-		else if (code == 79) // O
-		{
-			construction.removeConnectionsTo();
-		}
+        }
 	}
 
 	if (code == 72) //CTRL + H toggles hotkeys on or off
@@ -970,7 +895,7 @@ void MainViewController::fillSampleCB()
     int idx = -1;
     if (construction.getNumSelected() == 1)
     {
-        BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
+        BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
             DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(item->getId());
@@ -1049,7 +974,7 @@ void MainViewController::fillInstrumentCB()
     int idx = -1;
     if (construction.getNumSelected() == 1)
     {
-        BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
+        BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
             DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(item->getId());
@@ -1177,8 +1102,8 @@ void MainViewController::timerCallback()
     globalSoundSetButton.setAlpha(1.);
     if (construction.getNumSelected() == 1)
     {
-        BKItem::Ptr item = construction.getSelectedItems().getUnchecked(0);
-        if (item->getType() == PreparationTypeKeymap)
+        BKItem* item = construction.getSelectedItems().getUnchecked(0);
+        if (item->getType() == PreparationTypeKeymap && processor.updateState->currentDisplay != DisplayKeymap)
         {
             keyboardState.setKeymap(processor.gallery->getKeymap(item->getId())->getKeymap());
         }

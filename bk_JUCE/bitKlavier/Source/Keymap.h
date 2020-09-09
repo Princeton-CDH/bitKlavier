@@ -227,7 +227,8 @@ public:
         }
         keysave.addChild(harmonizer, -1, 0);
 
-        keysave.setProperty(ptagKeymap_harmonizerShift, harShift, 0);
+        keysave.setProperty(ptagKeymap_harmonizerPreTranspose, harPreTranspose, 0);
+        keysave.setProperty(ptagKeymap_harmonizerPostTranspose, harPostTranspose, 0);
 
         keysave.setProperty(ptagKeymap_endKeystrokes, allNotesOff ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
@@ -324,7 +325,8 @@ public:
             }
         }
         
-        harShift = e->getIntAttribute(ptagKeymap_harmonizerShift, 0);
+        harPreTranspose = e->getIntAttribute(ptagKeymap_harmonizerPreTranspose, 0);
+        harPostTranspose = e->getIntAttribute(ptagKeymap_harmonizerPostTranspose, 0);
 
         setAllNotesOff((bool) e->getIntAttribute(ptagKeymap_endKeystrokes, 0));
         setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
@@ -397,14 +399,19 @@ public:
         String compositeString = "";
         for (int i = 0; i < harmonizerKeys.size(); i++)
         {
-            if (harmonizerKeys[i].size() > 1)
+            if (harmonizerKeys[i].size() > 0)
             {
-                compositeString += (String(i) + ": [");
-                for (int j = 0; j < harmonizerKeys[i].size(); j++)
+                if (harmonizerKeys[i].size() > 1 ||
+                    (harmonizerKeys[i].size() == 1 && harmonizerKeys[i][0] != i))
                 {
-                    compositeString += (String(harmonizerKeys[i][j] - i) + " "); //using the half step offset rather than the absoute midi value
+                    compositeString += (String(i) + ": [");
+                    for (int j = 0; j < harmonizerKeys[i].size(); j++)
+                    {
+                        compositeString += (String(harmonizerKeys[i][j] - i)); //using the half step offset rather than the absoute midi value
+                        if (j < harmonizerKeys[i].size() - 1) compositeString += " ";
+                    }
+                    compositeString += "] ";
                 }
-                compositeString += "] ";
             }
         }
 
@@ -443,10 +450,12 @@ public:
     { 
         Array<int> h = Array<int>();
         h.ensureStorageAllocated(128);
+        
+        key = (key + harPreTranspose) % harmonizerKeys.size();
 
         for (int i = 0; i < harmonizerKeys[key].size(); i++)
         {
-            if (useShift) h.add(harmonizerKeys[key][i] + harShift);
+            if (useShift) h.add(harmonizerKeys[key][i] + harPostTranspose);
             else h.add(harmonizerKeys[key][i]);
         }
 
@@ -459,9 +468,9 @@ public:
         Array<int> h = Array<int>();
         h.ensureStorageAllocated(128);
 
-        for (int i = 0; i < harmonizerKeys[harKey].size(); i++)
+        for (int i = harPreTranspose; i < harmonizerKeys[harKey].size(); i++)
         {
-            if (useShift) h.add(harmonizerKeys[harKey][i] + harShift);
+            if (useShift) h.add(harmonizerKeys[harKey][i] + harPostTranspose);
             else h.add(harmonizerKeys[harKey][i]);
         }
 
@@ -522,9 +531,12 @@ public:
 
     inline int getHarKey() { return harKey; }
     inline void setHarKey(int toSet) {harKey = toSet;}
+    
+    inline int getHarPreTranspose() { return harPreTranspose; }
+    inline void setHarPreTranspose(int toSet) { harPreTranspose = toSet; }
 
-    inline int getHarShift() { return harShift; }
-    inline void setHarShift(int toSet) { harShift = toSet; }
+    inline int getHarPostTranspose() { return harPostTranspose; }
+    inline void setHarPostTranspose(int toSet) { harPostTranspose = toSet; }
 
     inline bool getIgnoreSustain() { return ignoreSustain; }
     inline void setIgnoreSustain(bool toSet) { ignoreSustain = toSet; }
@@ -558,7 +570,8 @@ private:
     bool onscreenSelected;
     
     int harKey;
-    int harShift;
+    int harPreTranspose;
+    int harPostTranspose;
 
     bool ignoreSustain;
     

@@ -102,18 +102,14 @@ private:
     ToggleButton ignoreSustainToggle;
 
     //stuff for trap/mirror/harmonizer tab - TRT
-    BKLabel harKeymapL;
-    BKTextEditor harKeymapTF;
 
     BKKeymapKeyboardState harKeyboardState;
     std::unique_ptr<Component> harKeyboardComponent;
     BKKeymapKeyboardComponent* harKeyboard;
-    BKTextButton harKeyboardValsTextFieldOpen;
     BKTextButton harKeyboardAllValsTextFieldOpen;
 
     BKLabel harArrayKeymapL;
     BKTextEditor harArrayKeymapTF;
-    
     BKTextEditor harAllKeymapTF;
 
     BKKeymapKeyboardState harArrayKeyboardState;
@@ -123,7 +119,8 @@ private:
 
     //ToggleButton enableHarmonizerToggle; // functionality currently commented out, probably not necessary
 
-    Slider harTranspositionSlider;
+    Slider harPostTranspositionSlider;
+    Slider harPreTranspositionSlider;
     void sliderValueChanged(Slider* slider)                override;
     //BKButtonAndMenuLAF transpositionLaf;
 

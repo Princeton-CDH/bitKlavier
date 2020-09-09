@@ -253,10 +253,10 @@ void BKConstructionSite::removeConnectionsTo()
 {
     bool changed = false;
     // For each selected item
-    for (BKItem::Ptr selectedItem : graph->getSelectedItems())
+    for (BKItem* selectedItem : graph->getSelectedItems())
     {
         // Check each connected item
-        for (BKItem::Ptr connectedItem : selectedItem->getConnections())
+        for (BKItem* connectedItem : selectedItem->getConnections())
         {
             // If the connected item is not also selected, disconnect it
             if (!graph->getSelectedItems().contains(connectedItem))
@@ -289,12 +289,12 @@ void BKConstructionSite::removeConnectionsBetween()
     repaint();
 }
 
-void BKConstructionSite::itemIsBeingDragged(BKItem::Ptr thisItem, const MouseEvent& e)
+void BKConstructionSite::itemIsBeingDragged(BKItem* thisItem, const MouseEvent& e)
 {
     repaint();
 }
 
-void BKConstructionSite::pianoMapDidChange(BKItem::Ptr thisItem)
+void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 {
     processor.currentPiano->configure();
 }
@@ -392,7 +392,7 @@ void BKConstructionSite::draw(void)
 }
 
 
-void BKConstructionSite::prepareItemDrag(BKItem::Ptr item, const MouseEvent& e, bool center)
+void BKConstructionSite::prepareItemDrag(BKItem* item, const MouseEvent& e, bool center)
 {
     if (center)
     {
@@ -408,7 +408,7 @@ void BKConstructionSite::prepareItemDrag(BKItem::Ptr item, const MouseEvent& e, 
         item->prepareDrag(e);
     }
 }
-void BKConstructionSite::deleteItem (BKItem::Ptr item)
+void BKConstructionSite::deleteItem (BKItem* item)
 {
     item->removeMouseListener(this);
     graph->removeItem(item);
@@ -427,7 +427,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
         processor.gallery->addTypeWithId(type, thisId);
     }
     
-    BKItem::Ptr toAdd = new BKItem(type, thisId, processor);
+    BKItem* toAdd = new BKItem(type, thisId, processor);
     
     if (type == PreparationTypePianoMap)
     {
@@ -463,7 +463,7 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
 }
 
 // This is for adding items that exist in the gallery to the UI
-void BKConstructionSite::addExistingItem(BKItem::Ptr toAdd)
+void BKConstructionSite::addExistingItem(BKItem* toAdd)
 {
     addAndMakeVisible(toAdd);
     toAdd->addMouseListener(this, true);
@@ -478,7 +478,7 @@ BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
     // SHOULD ALSO SAVE VALUE TREE OF STATE WITH ITEMs in CLIPBOARD
     for (auto item : these)
     {
-        BKItem::Ptr newItem = new BKItem(item->getType(), item->getId(), processor);
+        BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
         
         // relying on mouse anyway
         newItem->setBounds(item->getX(),
@@ -501,15 +501,15 @@ BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
     
     for (int i = 0; i < these.size(); i++)
     {
-        BKItem::Ptr thisItem = these[i];
-        BKItem::Ptr clipboardItem = clipboard[i];
+        BKItem* thisItem = these[i];
+        BKItem* clipboardItem = clipboard[i];
         
         for (auto connection : thisItem->getConnections())
         {
             BKPreparationType connectionType = connection->getType();
             int connectionId = connection->getId();
             
-            BKItem::Ptr connectionItem = nullptr;
+            BKItem* connectionItem = nullptr;
             
             for (auto item : clipboard)
             {
@@ -557,7 +557,7 @@ void BKConstructionSite::paste(bool cursorBasedOffset)
     
     for (auto item : clipboard)
     {
-        BKItem::Ptr newItem = item->duplicate();
+        BKItem* newItem = item->duplicate();
         
         BKPreparationType type = newItem->getType();
         int oldId = item->getId();
@@ -585,15 +585,15 @@ void BKConstructionSite::paste(bool cursorBasedOffset)
     
     for (int i = 0; i < newItems.size(); i++)
     {
-        BKItem::Ptr oldItem = clipboard[i];
-        BKItem::Ptr newItem = newItems[i];
+        BKItem* oldItem = clipboard[i];
+        BKItem* newItem = newItems[i];
         
         for (auto connection : oldItem->getConnections())
         {
             BKPreparationType connectionType = connection->getType();
             int connectionId = connection->getId();
             
-            BKItem::Ptr connectionItem = nullptr;
+            BKItem* connectionItem = nullptr;
             
             for (auto item : newItems)
             {
@@ -1057,12 +1057,12 @@ void BKConstructionSite::mouseDown (const MouseEvent& eo)
             }
             lassoSelection.deselectAll();
             
-            lasso = std::make_unique<LassoComponent<BKItem::Ptr>>();
+            lasso = std::make_unique<LassoComponent<BKItem*>>();
             addAndMakeVisible(*lasso);
             
             lasso->setAlpha(0.5);
-            lasso->setColour(LassoComponent<BKItem::Ptr>::ColourIds::lassoFillColourId, Colours::lightgrey);
-            lasso->setColour(LassoComponent<BKItem::Ptr>::ColourIds::lassoOutlineColourId, Colours::antiquewhite);
+            lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoFillColourId, Colours::lightgrey);
+            lasso->setColour(LassoComponent<BKItem*>::ColourIds::lassoOutlineColourId, Colours::antiquewhite);
             
             lasso->beginLasso(eo, this);
             inLasso = true;
@@ -1199,9 +1199,9 @@ void BKConstructionSite::idDidChange(void)
     processor.currentPiano->configure();
 }
 
-BKItem::Ptr BKConstructionSite::getItemAtPoint(const int X, const int Y)
+BKItem* BKConstructionSite::getItemAtPoint(const int X, const int Y)
 {
-    BKItem::Ptr theItem = nullptr;
+    BKItem* theItem = nullptr;
     
     if (itemSource != nullptr)
     {
@@ -1225,7 +1225,7 @@ BKItem::Ptr BKConstructionSite::getItemAtPoint(const int X, const int Y)
     return theItem;
 }
 
-void BKConstructionSite::findLassoItemsInArea (Array <BKItem::Ptr>& itemsFound,
+void BKConstructionSite::findLassoItemsInArea (Array <BKItem*>& itemsFound,
                                   const Rectangle<int>& area)
 {
     int areaX = area.getX(); int areaY = area.getY(); int areaWidth = area.getWidth(); int areaHeight = area.getHeight();
@@ -1247,7 +1247,7 @@ void BKConstructionSite::findLassoItemsInArea (Array <BKItem::Ptr>& itemsFound,
     {
         for (int y = area.getY(); y < area.getBottom(); y++)
         {
-            BKItem::Ptr item = getItemAtPoint(x,y);
+            BKItem* item = getItemAtPoint(x,y);
             
             if (item != nullptr) itemsFound.add(item);
         }
@@ -1255,7 +1255,7 @@ void BKConstructionSite::findLassoItemsInArea (Array <BKItem::Ptr>& itemsFound,
      */
 }
 
-SelectedItemSet<BKItem::Ptr>& BKConstructionSite::getLassoSelection(void)
+SelectedItemSet<BKItem*>& BKConstructionSite::getLassoSelection(void)
 {
     return lassoSelection;
 }

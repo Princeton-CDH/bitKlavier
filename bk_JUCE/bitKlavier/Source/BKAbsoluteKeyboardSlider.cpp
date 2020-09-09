@@ -10,7 +10,7 @@
 
 #include "BKAbsoluteKeyboardSlider.h"
 
-BKAbsoluteKeyboardSlider::BKAbsoluteKeyboardSlider(bool nos):
+BKAbsoluteKeyboardSlider::BKAbsoluteKeyboardSlider(bool toggles, bool nos):
 needsOctaveSlider(nos),
 ratio(1.0)
 {
@@ -45,7 +45,7 @@ ratio(1.0)
     keyboard->setAvailableRange(minKey, maxKey);
     keyboard->setOctaveForMiddleC(4);
     keyboard->setAllowDrag(false);
-    keyboard->doKeysToggle(false);
+    keyboard->doKeysToggle(toggles);
     keyboard->addMouseListener(this, true);
     keyboardState.addListener(this);
     lastKeyPressed = 0;

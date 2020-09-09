@@ -32,7 +32,7 @@ public WantsBigOne
     
 public:
     
-    BKAbsoluteKeyboardSlider(bool needsOctaveSlider = false);
+    BKAbsoluteKeyboardSlider(bool toggles, bool needsOctaveSlider = false);
     ~BKAbsoluteKeyboardSlider()
     {
         keyboard = nullptr;

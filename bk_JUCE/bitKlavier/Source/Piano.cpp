@@ -45,7 +45,7 @@ Piano::Ptr Piano::duplicate(bool withSameId)
     
     for (auto item : items)
     {
-        BKItem::Ptr newItem = new BKItem(item->getType(), item->getId(), processor);
+        BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
         
         newItem->setCommentText(item->getCommentText());
         

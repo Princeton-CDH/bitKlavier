@@ -20,8 +20,8 @@ BKItem::BKItem(BKPreparationType type, int Id, BKAudioProcessor& p):
 ItemMapper(type, Id),
 BKDraggableComponent(true, false, true, 50, 50, 50, 50),
 processor(p),
-constrain(new ComponentBoundsConstrainer())
-//resizer(new ResizableCornerComponent (this, constrain.get()))
+constrain(new ComponentBoundsConstrainer()),
+resizer(new ResizableCornerComponent (this, constrain.get()))
 {
     fullChild.setAlwaysOnTop(true);
     addAndMakeVisible(fullChild);
@@ -108,8 +108,8 @@ constrain(new ComponentBoundsConstrainer())
         comment.setSize(150*processor.uiScaleFactor,75*processor.uiScaleFactor);
         constrain->setSizeLimits(50,25,500,500);
         
-//        addAndMakeVisible (*resizer);
-//        resizer->setAlwaysOnTop(true);
+        addAndMakeVisible (*resizer);
+        resizer->setAlwaysOnTop(true);
         
         comment.setName("Comment");
     }
@@ -362,11 +362,11 @@ void BKItem::paint(Graphics& g)
 
 void BKItem::resized(void)
 {
-//#if JUCE_IOS
-//    resizer->setBounds(getWidth()-18, getHeight()-18, 18, 18);
-//#else
-//    resizer->setBounds(getWidth()-10, getHeight()-10, 10, 10);
-//#endif
+#if JUCE_IOS
+    resizer->setBounds(getWidth()-18, getHeight()-18, 18, 18);
+#else
+    resizer->setBounds(getWidth()-10, getHeight()-10, 10, 10);
+#endif
     
     if (type == PreparationTypePianoMap)
     {
@@ -440,8 +440,8 @@ void BKItem::mouseDoubleClick(const MouseEvent& e)
 
 void BKItem::mouseDown(const MouseEvent& e)
 {
-//    if (e.originalComponent == resizer.get())   resizing = true;
-//    else                                        resizing = false;
+    if (e.originalComponent == resizer.get())   resizing = true;
+    else                                        resizing = false;
         
     BKConstructionSite* cs = ((BKConstructionSite*)getParentComponent());
     BKItem* current = cs->getCurrentItem();
@@ -601,14 +601,14 @@ void BKItemGraph::clear()
     processor.currentPiano->clearItems();
 }
 
-void BKItemGraph::addItem(BKItem::Ptr thisItem)
+void BKItemGraph::addItem(BKItem* thisItem)
 {
     thisItem->setActive(true);
     processor.currentPiano->add(thisItem);
 }
 
 
-void BKItemGraph::removeItem(BKItem::Ptr item)
+void BKItemGraph::removeItem(BKItem* item)
 {
     BKItem::PtrArr connections = item->getConnections();
     
@@ -628,7 +628,7 @@ void BKItemGraph::removeItem(BKItem::Ptr item)
 }
 
 
-bool BKItemGraph::contains(BKItem::Ptr thisItem)
+bool BKItemGraph::contains(BKItem* thisItem)
 {
     bool alreadyThere = false;
     for (auto item : getItems())
@@ -688,7 +688,7 @@ bool BKItemGraph::connect(BKPreparationType type1, int id1, BKPreparationType ty
     return connect(item1,item2);
 }
 
-bool BKItemGraph::connect(BKItem::Ptr item1, BKItem::Ptr item2)
+bool BKItemGraph::connect(BKItem* item1, BKItem* item2)
 {
     // Don't try to connect an item to itself or two already connected items
     if ((item1 == item2) || (item1->isConnectedTo(item2) && item2->isConnectedTo(item1))) return false;
@@ -809,7 +809,7 @@ bool BKItemGraph::connect(BKItem::Ptr item1, BKItem::Ptr item2)
     return true;
 }
 
-bool BKItemGraph::disconnect(BKItem::Ptr item1, BKItem::Ptr item2)
+bool BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
 {
     // Get item types
     BKPreparationType item1Type = item1->getType();
@@ -991,12 +991,12 @@ BKPreparationType BKItemGraph::getModType(BKPreparationType type)
     return (BKPreparationType)(type+6);
 }
 
-void BKItemGraph::select(BKItem::Ptr item)
+void BKItemGraph::select(BKItem* item)
 {
     item->setSelected(true);
 }
 
-void BKItemGraph::deselect(BKItem::Ptr item)
+void BKItemGraph::deselect(BKItem* item)
 {
     item->setSelected(false);
 }

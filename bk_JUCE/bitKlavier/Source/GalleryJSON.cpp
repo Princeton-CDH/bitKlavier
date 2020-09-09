@@ -74,9 +74,9 @@ void Gallery::setStateFromJson(var myJson)
             Tuning::Ptr nostalgicTuning;
             Synchronic::Ptr synchronicTarget;
             Nostalgic::Ptr nostalgicTarget;
-            BKItem::Ptr directTuningItem;
-            BKItem::Ptr nostalgicTuningItem;
-            BKItem::Ptr synchronicTuningItem;
+            BKItem* directTuningItem;
+            BKItem* nostalgicTuningItem;
+            BKItem* synchronicTuningItem;
             
             addPianoWithId(i);
             Piano::Ptr thisPiano = bkPianos.getLast();
@@ -152,7 +152,7 @@ void Gallery::setStateFromJson(var myJson)
                 thisPiano->items.add(directTuningItem);
             }
             
-            BKItem::Ptr directItem = thisPiano->itemWithTypeAndId(PreparationTypeDirect, defaultDirect->getId());
+            BKItem* directItem = thisPiano->itemWithTypeAndId(PreparationTypeDirect, defaultDirect->getId());
             
             if (directItem == nullptr)
             {
@@ -169,7 +169,7 @@ void Gallery::setStateFromJson(var myJson)
                 thisPiano->items.add(directItem);
             }
             
-            BKItem::Ptr keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, defaultKeymap->getId());
+            BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, defaultKeymap->getId());
             
             if (keymapItem == nullptr)
             {
@@ -345,7 +345,7 @@ void Gallery::setStateFromJson(var myJson)
                     synchronicTarget = thisSynchronic;
                     sId = thisSynchronic->getId();
                     
-                    BKItem::Ptr synchronicItem = thisPiano->itemWithTypeAndId(PreparationTypeSynchronic, thisSynchronic->getId());
+                    BKItem* synchronicItem = thisPiano->itemWithTypeAndId(PreparationTypeSynchronic, thisSynchronic->getId());
                     
                     if (synchronicItem == nullptr)
                     {
@@ -379,7 +379,7 @@ void Gallery::setStateFromJson(var myJson)
                         thisPiano->items.add(synchronicTuningItem);
                     }
                     
-                    BKItem::Ptr tempoItem = thisPiano->itemWithTypeAndId(PreparationTypeTempo, thisTempo->getId());
+                    BKItem* tempoItem = thisPiano->itemWithTypeAndId(PreparationTypeTempo, thisTempo->getId());
                     
                     if (tempoItem == nullptr)
                     {
@@ -419,7 +419,7 @@ void Gallery::setStateFromJson(var myJson)
                         }
                     }
                     
-                    BKItem::Ptr keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
+                    BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
                     
                     if (keymapItem == nullptr)
                     {
@@ -538,7 +538,7 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     nId = thisNostalgic->getId();
                     
-                    BKItem::Ptr nostalgicItem = thisPiano->itemWithTypeAndId(PreparationTypeNostalgic, thisNostalgic->getId());
+                    BKItem* nostalgicItem = thisPiano->itemWithTypeAndId(PreparationTypeNostalgic, thisNostalgic->getId());
                     
                     if (nostalgicItem == nullptr)
                     {
@@ -572,7 +572,7 @@ void Gallery::setStateFromJson(var myJson)
                         thisPiano->items.add(nostalgicTuningItem);
                     }
                     
-                    BKItem::Ptr synchronicItem = thisPiano->itemWithTypeAndId(PreparationTypeSynchronic, thisSynchronic->getId());
+                    BKItem* synchronicItem = thisPiano->itemWithTypeAndId(PreparationTypeSynchronic, thisSynchronic->getId());
                     
                     if (synchronicItem == nullptr)
                     {
@@ -612,7 +612,7 @@ void Gallery::setStateFromJson(var myJson)
                         }
                     }
                 
-                    BKItem::Ptr keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
+                    BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
                     
                     if (keymapItem == nullptr)
                     {
@@ -686,7 +686,7 @@ void Gallery::setStateFromJson(var myJson)
                         
                     }
                     
-                    BKItem::Ptr directItem = thisPiano->itemWithTypeAndId(PreparationTypeDirect, thisDirect->getId());
+                    BKItem* directItem = thisPiano->itemWithTypeAndId(PreparationTypeDirect, thisDirect->getId());
                     
                     if (directItem == nullptr)
                     {
@@ -726,7 +726,7 @@ void Gallery::setStateFromJson(var myJson)
                         }
                     }
                     
-                    BKItem::Ptr keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
+                    BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
                     
                     if (keymapItem == nullptr)
                     {
@@ -790,7 +790,7 @@ void Gallery::setStateFromJson(var myJson)
                         
                         int thisPianoMapId = pianoMapId++;
                         
-                        BKItem::Ptr pianoMapItem = thisPiano->itemWithTypeAndId(PreparationTypePianoMap, thisPianoMapId);
+                        BKItem* pianoMapItem = thisPiano->itemWithTypeAndId(PreparationTypePianoMap, thisPianoMapId);
                         
                         if (pianoMapItem == nullptr)
                         {
@@ -807,7 +807,7 @@ void Gallery::setStateFromJson(var myJson)
                             thisPiano->items.add(pianoMapItem);
                         }
             
-                        BKItem::Ptr keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
+                        BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
                         
                         if (keymapItem == nullptr)
                         {
@@ -883,7 +883,7 @@ void Gallery::setStateFromJson(var myJson)
                         }
                         
                         
-                        BKItem::Ptr modItem = thisPiano->itemWithTypeAndId(PreparationTypeTuningMod, thisTuningMod->getId());
+                        BKItem* modItem = thisPiano->itemWithTypeAndId(PreparationTypeTuningMod, thisTuningMod->getId());
                         
                         if (modItem == nullptr)
                         {
@@ -900,7 +900,7 @@ void Gallery::setStateFromJson(var myJson)
                             thisPiano->items.add(modItem);
                         }
                         
-                        BKItem::Ptr keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
+                        BKItem* keymapItem = thisPiano->itemWithTypeAndId(PreparationTypeKeymap, thisKeymap->getId());
                         
                         if (keymapItem == nullptr)
                         {

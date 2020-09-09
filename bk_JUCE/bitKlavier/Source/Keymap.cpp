@@ -29,7 +29,8 @@ defaultSelected(true),
 onscreenSelected(true),
 //harmonizerEnabled(false),
 harKey(60),
-harShift(0),
+harPreTranspose(0),
+harPostTranspose(0),
 ignoreSustain(false),
 allNotesOff(false)
 {
@@ -72,7 +73,8 @@ defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
 //harmonizerEnabled(k->getHarmonizerEnabled()),
 harKey(k->getHarKey()),
-harShift(k->getHarShift()),
+harPreTranspose(k->getHarPreTranspose()),
+harPostTranspose(k->getHarPostTranspose()),
 ignoreSustain(k->getIgnoreSustain()),
 allNotesOff(k->getAllNotesOff())
 {
@@ -121,7 +123,8 @@ defaultSelected(k->isDefaultSelected()),
 onscreenSelected(k->isOnscreenSelected()),
 //harmonizerEnabled(false),
 harKey(k->getHarKey()),
-harShift(k->getHarShift()),
+harPreTranspose(k->getHarPreTranspose()),
+harPostTranspose(k->getHarPostTranspose()),
 ignoreSustain(k->getIgnoreSustain()),
 allNotesOff(k->getAllNotesOff())
 {
@@ -173,7 +176,8 @@ defaultSelected(true),
 onscreenSelected(true),
 //harmonizerEnabled(false),
 harKey(60),
-harShift(0),
+harPreTranspose(0),
+harPostTranspose(0),
 ignoreSustain(false),
 allNotesOff(false)
 {

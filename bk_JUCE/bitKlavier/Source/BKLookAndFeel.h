@@ -57,8 +57,6 @@ public:
         setColour(Slider::backgroundColourId, Colours::black);
         setColour(Slider::textBoxOutlineColourId, Colours::transparentWhite);
         
-        
-        
         toggleTextToRight = true;
     
         //setColour(juce::LookAndFeel_V4::ColourScheme::outline, Colours::black);

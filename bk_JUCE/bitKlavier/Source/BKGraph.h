@@ -268,7 +268,7 @@ private:
     
     std::unique_ptr<ComponentBoundsConstrainer> constrain;
     
-//    std::unique_ptr<ResizableCornerComponent> resizer;
+    std::unique_ptr<ResizableCornerComponent> resizer;
     
     // Piano menu
     BKComboBox menu;
@@ -294,18 +294,18 @@ public:
 
     BKItem::Ptr get(BKPreparationType type, int Id);
 
-    void addItem(BKItem::Ptr thisItem);
-    void removeItem(BKItem::Ptr thisItem);
+    void addItem(BKItem* thisItem);
+    void removeItem(BKItem* thisItem);
     
-    bool contains(BKItem::Ptr thisItem);
+    bool contains(BKItem* thisItem);
     bool contains(BKPreparationType type, int Id);
     
     void clear(void);
     void clearItems(void);
     
     bool connect(BKPreparationType type1, int id1, BKPreparationType type2, int id2);
-    bool connect(BKItem::Ptr item1, BKItem::Ptr item2);
-    bool disconnect(BKItem::Ptr item1, BKItem::Ptr item2);
+    bool connect(BKItem* item1, BKItem* item2);
+    bool disconnect(BKItem* item1, BKItem* item2);
     
     bool isValidConnection(BKPreparationType type1, BKPreparationType type2);
     
@@ -314,9 +314,9 @@ public:
     
     BKPreparationType getModType(BKPreparationType type);
     
-    void select(BKItem::Ptr item);
+    void select(BKItem* item);
     
-    void deselect(BKItem::Ptr item);
+    void deselect(BKItem* item);
     
     void deselectAll(void);
     
