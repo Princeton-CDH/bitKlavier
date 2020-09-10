@@ -26,7 +26,7 @@ void BKAudioProcessor::updateUI(void)
     updateState->keymapDidChange = true;
 }
 
-Array<HashMap<String, int>*> BKAudioProcessor::getNoteOns()
+OwnedArray<HashMap<String, int>>& BKAudioProcessor::getNoteOns()
 {
     return noteOn;
 }

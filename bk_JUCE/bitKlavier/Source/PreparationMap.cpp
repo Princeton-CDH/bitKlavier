@@ -847,7 +847,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, bo
     }
 }
 
-void PreparationMap::sustainPedalReleased(Array<HashMap<String, int>*> keysThatAreDepressed, bool post)
+void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatAreDepressed, bool post)
 {
     sustainPedalIsDepressed = false;
     
@@ -972,9 +972,10 @@ void PreparationMap::sustainPedalReleased(Array<HashMap<String, int>*> keysThatA
 
 void PreparationMap::sustainPedalReleased(bool post)
 {
-    Array<HashMap<String, int>*> keysThatAreDepressed;
+    OwnedArray<HashMap<String, int>> keysThatAreDepressed;
     keysThatAreDepressed.ensureStorageAllocated(128);
-    keysThatAreDepressed.fill(new HashMap<String, int>);
+    for (int i = 0; i < 128; ++i)
+        keysThatAreDepressed.set(i, new HashMap<String, int>);
     sustainPedalReleased(keysThatAreDepressed, post);
 }
 

@@ -1093,7 +1093,7 @@ void MainViewController::timerCallback()
     
     // display active noteOns on main keyboard
     Array<bool> noteOns;
-    Array<HashMap<String, int>*> map = processor.getNoteOns();
+    OwnedArray<HashMap<String, int>>& map = processor.getNoteOns();
     noteOns.ensureStorageAllocated(128);
     for (int i = 0; i < 128; ++i)
     {
