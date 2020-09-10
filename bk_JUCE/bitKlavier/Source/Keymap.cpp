@@ -221,7 +221,7 @@ void Keymap::setKeymap(Array<int> km)
     
     for (auto note : km)
     {
-        keymap.set(note, true);
+        if (note > 0) keymap.set(note, true);
     }
 }
 

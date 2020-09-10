@@ -26,6 +26,11 @@ void BKAudioProcessor::updateUI(void)
     updateState->keymapDidChange = true;
 }
 
+Array<HashMap<String, int>*> BKAudioProcessor::getNoteOns()
+{
+    return noteOn;
+}
+
 int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound, bool updateGlobalSet)
 {
     didLoadMainPianoSamples = false;

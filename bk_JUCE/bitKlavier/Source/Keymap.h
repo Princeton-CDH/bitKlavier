@@ -404,7 +404,7 @@ public:
                 if (harmonizerKeys[i].size() > 1 ||
                     (harmonizerKeys[i].size() == 1 && harmonizerKeys[i][0] != i))
                 {
-                    compositeString += (String(i) + ": [");
+                    compositeString += (String(i) + "[");
                     for (int j = 0; j < harmonizerKeys[i].size(); j++)
                     {
                         compositeString += (String(harmonizerKeys[i][j] - i)); //using the half step offset rather than the absoute midi value
@@ -418,31 +418,51 @@ public:
         return compositeString;
     }
 
-    void setHarmonizerFromDisplayText(String textToSet)
+    void setHarmonizerFromDisplayText(String s)
     {
-        int substringIndex = 0;
-        int substringHarIndex = textToSet.indexOfChar(substringIndex, ':');
-        int substringStartIndex = textToSet.indexOfChar(substringIndex, '[');
-        int substringEndIndex = textToSet.indexOfChar(substringIndex, ']');
-        String noteArrayString = textToSet.substring(substringStartIndex, substringEndIndex);
-        while (substringEndIndex != -1 && substringHarIndex != -1 && substringIndex != -1)
+        String temp = "";
+        
+        bool inBracket = false;
+        
+        String::CharPointerType c = s.getCharPointer();
+        
+        juce_wchar dash = '-';
+        juce_wchar open = '[';
+        juce_wchar close = ']';
+        
+        int harIndex;
+        
+        for (int i = 0; i < (s.length()+1); i++)
         {
-            int harEntry = textToSet.substring(substringIndex, substringHarIndex).getIntValue();
-            Array<int> arrayToSet;
-            int localIndex = 0;
-            int localEndIndex = noteArrayString.indexOfAnyOf(" ]", localIndex);
-            while (localEndIndex != -1)
+            juce_wchar c1 = c.getAndAdvance();
+            
+            bool isOpen = !CharacterFunctions::compare(c1, open);
+            bool isClose = !CharacterFunctions::compare(c1, close);
+            bool isNumChar = CharacterFunctions::isDigit(c1) || !CharacterFunctions::compare(c1, dash);
+            
+            if (inBracket)
             {
-                arrayToSet.addIfNotAlreadyThere(noteArrayString.substring(localIndex, localEndIndex).getIntValue() + harEntry); //using the half step offset rather than the absoute midi value
-                localIndex = localEndIndex + 1;
-                localEndIndex = noteArrayString.indexOfAnyOf(" ]", localIndex);
+                if (isClose)
+                {
+                    Array<int> arr = keymapStringToIntArray(temp);
+                    for (int i = 0; i < arr.size(); ++i)
+                        arr.setUnchecked(i, arr.getUnchecked(i) + harIndex);
+                    harmonizerKeys.set(harIndex, arr);
+                    temp = "";
+                    inBracket = false;
+                }
+                else temp += c1;
             }
-            harmonizerKeys.set(harEntry, arrayToSet);
-            substringIndex = substringEndIndex + 2;
-            substringHarIndex = textToSet.indexOfChar(substringIndex, ':');
-            substringStartIndex = textToSet.indexOfChar(substringIndex, '[');
-            substringEndIndex = textToSet.indexOfChar(substringIndex, ']');
-            noteArrayString = textToSet.substring(substringStartIndex, substringEndIndex);
+            else if (isNumChar)
+            {
+                temp += c1;
+            }
+            else if (isOpen)
+            {
+                harIndex = temp.getIntValue();
+                temp = "";
+                inBracket = true;
+            }
         }
     }
 

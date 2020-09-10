@@ -166,9 +166,9 @@ public:
     }
      */
     
-    Array<bool>                         noteOn; //which notes are on, for the UI
-    Array<bool>                         getNoteOns() { return noteOn; }
-    Array<float>                        noteVelocity;
+    Array<HashMap<String, int>*>    noteOn;
+    Array<HashMap<String, int>*>    getNoteOns();
+    Array<HashMap<String, float>*>  noteVelocity;
     
     void                                noteOnUI (int noteNumber) { if(didLoadMainPianoSamples) notesOnUI.add(noteNumber); }
     void                                noteOffUI(int noteNumber) { if(didLoadMainPianoSamples) notesOffUI.add(noteNumber); }
@@ -213,8 +213,8 @@ public:
     void  performModifications(int noteNumber, String source);
     void  performResets(int noteNumber, String source);
     
-    void handleNoteOn(int noteNumber, float velocity, int channel, String source, bool harmonizer = false);
-    void handleNoteOff(int noteNumber, float velocity, int channel, String source, bool harmonizer = false);
+    void handleNoteOn(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool harmonizer = false);
+    void handleNoteOff(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool harmonizer = false);
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;

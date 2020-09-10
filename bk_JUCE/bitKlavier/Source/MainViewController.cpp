@@ -1092,7 +1092,15 @@ void MainViewController::timerCallback()
     fillInstrumentCB();
     
     // display active noteOns on main keyboard
-    Array<bool> noteOns = processor.getNoteOns();
+    Array<bool> noteOns;
+    Array<HashMap<String, int>*> map = processor.getNoteOns();
+    noteOns.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; ++i)
+    {
+        if (map.getUnchecked(i)->size() > 0)
+            noteOns.set(i, true);
+        else noteOns.set(i, false);
+    }
     keyboardState.setKeymap(noteOns);
 
     bool soundItemSelected = false;

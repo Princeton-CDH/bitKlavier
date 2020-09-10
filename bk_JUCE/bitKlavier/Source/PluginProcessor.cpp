@@ -209,10 +209,10 @@ void BKAudioProcessor::loadGalleries()
     
     noteOn.ensureStorageAllocated(128);
     noteVelocity.ensureStorageAllocated(128);
-    for(int i=0; i< 128; i++)
+    for(int i = 0; i < 128; i++)
     {
-        noteOn.set(i, false);
-        noteVelocity.set(i, 0.);
+        noteOn.set(i, new HashMap<String, int> ());
+        noteVelocity.set(i, new HashMap<String, float> ());
     }
     
     bk_examples = StringArray({
@@ -559,7 +559,7 @@ void BKAudioProcessor::renameGallery(String newName)
     deleteGalleryAtURL(oldURL);
 }
 
-void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, String source, bool harmonizer)
+void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool harmonizer)
 {
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
@@ -594,7 +594,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                         Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true);
                         for (int i = 0; i < harmonizer.size(); i++)
                         {
-                            handleNoteOn(harmonizer[i], velocity, channel, source, true);
+                            handleNoteOn(harmonizer[i], velocity, channel, noteNumber, source, true);
                         }
                     }
                 }
@@ -607,11 +607,14 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     }
     if (harmonizer == false) return;
     
+    String key = source + String(mappedFrom);
+    bool noteDown = noteOn.getUnchecked(noteNumber)->size() > 0;
+    
     if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
     {
         ++noteOnCount;
-        noteOn.set(noteNumber, true);
-        noteVelocity.set(noteNumber, velocity);
+        noteOn.getUnchecked(noteNumber)->set(key, noteNumber);
+        noteVelocity.getUnchecked(noteNumber)->set(key, velocity);
     }
     
     if (!activeSource) return;
@@ -650,7 +653,8 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
     // TODO : for multi sample set support, remove soundfont argument from this chain of functions
     // UPDATE: actually seems like that argument isn't really used so it doesn't matter. still should clean this up
-    currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
+    currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, noteDown,
+                                      (loadingSampleType == BKLoadSoundfont), source);
 
     //if (doIgnoreSustain)
     //{
@@ -676,7 +680,7 @@ void BKAudioProcessor::handleAllNotesOff()
     
 }
 
-void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, String source, bool harmonizer)
+void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool harmonizer)
 {
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
      
@@ -697,7 +701,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
                     Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true);
                     for (int i = 0; i < harmonizer.size(); i++)
                     {
-                        handleNoteOff(harmonizer[i], velocity, channel, source, true);
+                        handleNoteOff(harmonizer[i], velocity, channel, noteNumber, source, true);
                     }
                 }
                 if (km->getIgnoreSustain())
@@ -714,9 +718,12 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
 
     if (harmonizer == false) return;
     
+    String key = source + String(mappedFrom);
+    
     if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
     {
-        noteOn.set(noteNumber, false);
+        noteOn.getUnchecked(noteNumber)->remove(key);
+        noteVelocity.getUnchecked(noteNumber)->remove(key);
         --noteOnCount;
         if(noteOnCount < 0) noteOnCount = 0;
     }
@@ -726,13 +733,12 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         //DBG("noteoff velocity = " + String(velocity));
         
         noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
-        if(noteOnSetsNoteOffVelocity) velocity = noteVelocity.getUnchecked(noteNumber);
+        if(noteOnSetsNoteOffVelocity) velocity = (*noteVelocity.getUnchecked(noteNumber))[key];
         else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
         
-        // Send key off to each pmap in current piano
-        //if (doIgnoreSustain == false)
-        //{
-        currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, (loadingSampleType == BKLoadSoundfont), source);
+        bool noteDown = noteOn.getUnchecked(noteNumber)->size() > 0;
+        currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, noteDown,
+                                           (loadingSampleType == BKLoadSoundfont), source);
         //}
         //else
         //{
@@ -910,14 +916,16 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 	
 	for (int i = 0; i < notesOnUI.size(); i++)
 	{
-		//if (keystrokesEnabled.getValue()) 
-        handleNoteOn(notesOnUI.getUnchecked(i), 0.6, channel, cMidiInputUI);
+		//if (keystrokesEnabled.getValue())
+        int note = notesOnUI.getUnchecked(i);
+        handleNoteOn(note, 0.6, channel, note, cMidiInputUI);
 		notesOnUI.remove(i);
 	}
     
     for(int i=0; i<notesOffUI.size(); i++)
     {
-        handleNoteOff(notesOffUI.getUnchecked(i), 0.6, channel, cMidiInputUI);
+        int note = notesOffUI.getUnchecked(i);
+        handleNoteOff(note, 0.6, channel, note, cMidiInputUI);
         notesOffUI.remove(i);
     }
     
@@ -1664,11 +1672,11 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     
     if (m.isNoteOn()) //&& keystrokesEnabled.getValue())
     {
-        handleNoteOn(noteNumber, velocity, channel, sourceIdentifier);
+        handleNoteOn(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
     }
     else if (m.isNoteOff())
     {
-        handleNoteOff(noteNumber, velocity, channel, sourceIdentifier);
+        handleNoteOff(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
         //didNoteOffs = true;
     }
     

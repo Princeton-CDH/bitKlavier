@@ -124,6 +124,7 @@ public:
     bool isInKeymap(int midiNoteNumber);
     
     void setKeymap(Array<bool> midiNoteNumber);
+    void setKeymap(Array<int> midiNoteNumber);
     
     /** This will turn off any currently-down notes for the given midi channel.
      

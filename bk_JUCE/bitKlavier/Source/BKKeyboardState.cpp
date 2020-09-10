@@ -38,8 +38,6 @@ bool BKKeymapKeyboardState::isInKeymap(int midiNoteNumber)
     return inKeymap[midiNoteNumber];
 }
 
-
-
 void BKKeymapKeyboardState::setKeymap(Array<bool> keymap)
 {
     for (int i = 0; i < 128; i++)
@@ -48,9 +46,17 @@ void BKKeymapKeyboardState::setKeymap(Array<bool> keymap)
     }
 }
 
+void BKKeymapKeyboardState::setKeymap(Array<int> keymap)
+{
+    for (int i = 0; i < 128; i++)
+    {
+        inKeymap[i] = keymap[i] > 0;
+    }
+}
+
 void BKKeymapKeyboardState::addToKeymap(int midiNoteNumber)
 {
-    inKeymap[midiNoteNumber]=true;
+    inKeymap[midiNoteNumber] = true;
     
     for (int i = listeners.size(); --i >= 0;)
         listeners.getUnchecked(i)->handleKeymapNoteOn(this, midiNoteNumber);

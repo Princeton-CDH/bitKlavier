@@ -894,7 +894,10 @@ void BKKeymapKeyboardComponent::setKeysInKeymap(Array<int> keys)
 
     for (int i = 0; i < 128; i++) keymap.add(false);
     
-    for (auto key : keys) keymap.set(key, true);
+    for (auto key : keys)
+    {
+        if (key >= 0) keymap.set(key, true);
+    }
     
     state.setKeymap(keymap);
     
