@@ -866,7 +866,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
         int channel = sustainedNotes.getUnchecked(n).channel;
         String source = sustainedNotes.getUnchecked(n).source;
         
-        bool keyNotDepressed = keysThatAreDepressed.getUnchecked(noteNumber) == 0;
+        bool keyNotDepressed = keysThatAreDepressed.getUnchecked(noteNumber)->size() > 0;
 
         /*for each processor loop, add a keymap loop
         if the keymap contains the note and the source, if any aren't ignoring sustain, for that note/source, set flag to true

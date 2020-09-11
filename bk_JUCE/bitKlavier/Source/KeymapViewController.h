@@ -44,13 +44,11 @@ public:
     
     void fillSelectCB(int last, int current);
     void fillMidiInputSelectCB(void);
-    void fillTargetSelectCB(void);
     
     ToggleButton* getMidiEditToggle(void) { return &midiEditToggle; }
 
     static void actionButtonCallback(int action, KeymapViewController*);
     static void midiInputSelectCallback(int result, KeymapViewController* vc);
-    static void targetsMenuCallback(int result, KeymapViewController* vc);
     static void keysMenuCallback(int result, KeymapViewController* vc);
     static void harmonizerMenuCallback(int result, KeymapViewController* vc);
     
@@ -91,7 +89,6 @@ private:
     BKTextButton keyboardValsTextFieldOpen;
     
     TextButton      midiInputSelectButton;
-    TextButton      targetsButton;
     TextButton      keysButton;
     TextButton      clearButton;
     BKComboBox      keysCB;
@@ -132,9 +129,8 @@ private:
     
     PopupMenu getKeysMenu(void);
     PopupMenu getPitchClassMenu(int offset);
-    PopupMenu getTargetsMenu(void);
     PopupMenu getMidiInputSelectMenu(void);
-    PopupMenu getHarmonizerMenu(void);
+    PopupMenu getHarmonizerMenu(Array<int> keyHarmonization);
     
     OwnedArray<ToggleButton> targetControlTBs;
     GroupComponent directTBGroup;

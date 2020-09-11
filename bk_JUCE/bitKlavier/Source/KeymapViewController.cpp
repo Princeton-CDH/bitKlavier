@@ -47,12 +47,6 @@ BKViewController(p, theGraph, 2)
     
     if(wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
         addAndMakeVisible(midiInputSelectButton);
-        
-    targetsButton.setName("TargetsButton"); // remove?
-    targetsButton.setButtonText("Targets");
-    targetsButton.setTooltip("Select which parts of connected preparations to send key information");
-    targetsButton.addListener(this);
-    // addAndMakeVisible(targetsButton);
     
     clearButton.setName("ClearButton");
     clearButton.setButtonText("Clear");
@@ -790,7 +784,6 @@ void KeymapViewController::invisible()
     //enableHarmonizerToggle.setVisible(false);
 
     midiInputSelectButton.setVisible(false);
-    targetsButton.setVisible(false);
     keysButton.setVisible(false);
     clearButton.setVisible(false);
     keysCB.setVisible(false);
@@ -983,6 +976,8 @@ void KeymapViewController::bkComboBoxDidChange        (ComboBox* box)
         if (Id == SELECT_ID)        selectType = true;
         else if (Id == DESELECT_ID) selectType = false;
     }
+    
+    processor.updateState->editsMade = true;
 }
 
 String pcs[12] = {"C","C#/Db","D","D#/Eb","E","F","F#/Gb","G","G#/Ab","A","A#/Bb","B",};
@@ -1028,14 +1023,17 @@ PopupMenu KeymapViewController::getKeysMenu(void)
     return std::move(menu);
 }
 
-PopupMenu KeymapViewController::getHarmonizerMenu(void)
+// Passing in harmonization for the current key in case we have some options that
+// depend on that and display more detail
+PopupMenu KeymapViewController::getHarmonizerMenu(Array<int> keyHarmonization)
 {
     BKPopupMenu menu;
 
     menu.addItem(1, "Clear");
     menu.addItem(2, "Default");
-    menu.addItem(3, "Mirror");
-    menu.addItem(4, "Trap");
+    menu.addItem(3, "Spread Mapping");
+    menu.addItem(4, "Spread Pattern");
+    menu.addItem(5, "Mirror");
 
     return std::move(menu);
 }
@@ -1045,6 +1043,7 @@ void KeymapViewController::harmonizerMenuCallback(int result, KeymapViewControll
     BKAudioProcessor& processor = vc->processor;
 
     Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    int harKey = keymap->getHarKey();
     
     if (result <= 0) return;
     else if (result == 1)
@@ -1057,15 +1056,21 @@ void KeymapViewController::harmonizerMenuCallback(int result, KeymapViewControll
     }
     else if (result == 3)
     {
-        keymap->mirrorKey();
+        keymap->copyKeyMappingToAll(harKey);
     }
     else if (result == 4)
     {
-        keymap->trapKey();
+        keymap->copyKeyPatternToAll(harKey);
+    }
+    else if (result == 5)
+    {
+        keymap->mirrorKey(harKey);
     }
 
     BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)(vc->harArrayKeyboardComponent.get());
     keyboard->setKeysInKeymap(keymap->getHarmonizationForKey());
+    
+    processor.updateState->editsMade = true;
 }
 
 void KeymapViewController::midiInputSelectCallback(int result, KeymapViewController* vc)
@@ -1095,26 +1100,8 @@ void KeymapViewController::midiInputSelectCallback(int result, KeymapViewControl
     }
 
     vc->getMidiInputSelectMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->midiInputSelectButton), ModalCallbackFunction::forComponent(midiInputSelectCallback, vc));
-}
-
-void KeymapViewController::targetsMenuCallback(int result, KeymapViewController* vc)
-{
-    if (vc == nullptr)
-    {
-        PopupMenu::dismissAllActiveMenus();
-        return;
-    }
     
-    if (result <= 0) return;
-    
-    BKAudioProcessor& processor = vc->processor;
-    
-    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    keymap->toggleTarget((KeymapTargetType) (result - 1));
-    
-    vc->getTargetsMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->targetsButton), ModalCallbackFunction::forComponent(targetsMenuCallback, vc));
-    
-    DBG("KeymapViewController::targetsMenuCallback " + String(result));
+    processor.updateState->editsMade = true;
 }
 
 void KeymapViewController::keysMenuCallback(int result, KeymapViewController* vc)
@@ -1142,29 +1129,8 @@ void KeymapViewController::keysMenuCallback(int result, KeymapViewController* vc
     BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(vc->keyboardComponent.get());
     
     keyboard->setKeysInKeymap(keymap->keys());
-}
-
-PopupMenu KeymapViewController::getTargetsMenu()
-{
-    updateKeymapTargets();
     
-    BKPopupMenu menu;
-    
-    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    Array<KeymapTargetState> targetStates = keymap->getTargetStates();
-    for (int type = 0; type < TargetTypeNil; ++type)
-    {
-        if (targetStates[type] == TargetStateEnabled)
-        {
-            menu.addItem(PopupMenu::Item(cKeymapTargetTypes[type]).setID(type+1).setTicked(true));
-        }
-        else if (targetStates[type] == TargetStateDisabled)
-        {
-            menu.addItem(PopupMenu::Item(cKeymapTargetTypes[type]).setID(type+1));
-        }
-    }
-    if (menu.getNumItems() == 0) menu.addItem(-1, "No targets available", false);
-    return std::move(menu);
+    processor.updateState->editsMade = true;
 }
 
 void KeymapViewController::fillSelectCB(int last, int current)
@@ -1233,6 +1199,8 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setMidiEdit(false);
+        keymap->setHarMidiEdit(false);
+        keymap->setHarArrayMidiEdit(false);
         processor.updateState->setCurrentDisplay(DisplayNil);
         
     }
@@ -1283,17 +1251,15 @@ void KeymapViewController::bkButtonClicked (Button* b)
     }
     else if (b == &harmonizerMenuButton)
     {
-        getHarmonizerMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&harmonizerMenuButton), ModalCallbackFunction::forComponent(harmonizerMenuCallback, this));
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        getHarmonizerMenu(keymap->getHarmonizationForKey(keymap->getHarKey())).showMenuAsync(PopupMenu::Options().withTargetComponent(&harmonizerMenuButton), ModalCallbackFunction::forComponent(harmonizerMenuCallback, this));
         update();
-    }
-    else if (b == &targetsButton)
-    {
-        getTargetsMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&targetsButton), ModalCallbackFunction::forComponent(targetsMenuCallback, this));
     }
     else if (b == &invertOnOffToggle)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setInverted(invertOnOffToggle.getToggleState());
+        processor.updateState->editsMade = true;
     }
     /*
     else if (b == &enableHarmonizerToggle)
@@ -1349,11 +1315,13 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setAllNotesOff(endKeystrokesToggle.getToggleState());
+        processor.updateState->editsMade = true;
     }
     else if (b == &ignoreSustainToggle)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setIgnoreSustain(ignoreSustainToggle.getToggleState());
+        processor.updateState->editsMade = true;
     }
     else if (b == &rightArrow)
     {
@@ -1385,6 +1353,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
                 DBG("Keymap toggle change: " + (String)cKeymapTargetTypes[i] + " " + String((int)b->getToggleState()));
             }
         }
+        processor.updateState->editsMade = true;
     }
 }
 
@@ -1394,9 +1363,9 @@ void KeymapViewController::BKEditableComboBoxChanged(String name, BKEditableComb
     Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     
     thisKeymap->setName(name);
+    
+    processor.updateState->editsMade = true;
 }
-
-
 
 void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
 {
@@ -1422,6 +1391,8 @@ void KeymapViewController::iWantTheBigOne(TextEditor* tf, String name)
 
 void KeymapViewController::keymapUpdated(TextEditor& tf)
 {
+    Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    
     String text = tf.getText();
     Array<int> keys = keymapStringToIntArray(text);
     String name = tf.getName();
@@ -1455,7 +1426,7 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
         {
             processor.gallery->getKeymap(processor.updateState->currentKeymapId)->setHarKey(keys[0]);
         }
-        else if (name == "HarmonizerArrayKeymapMidi") processor.gallery->setKeymapHarmonization(processor.updateState->currentKeymapId, keys);
+        else if (name == "HarmonizerArrayKeymapMidi") processor.gallery->setKeymapHarmonization(processor.updateState->currentKeymapId, keymap->getHarKey(), keys);
 
         keyboard->setKeysInKeymap(keys);
     }
@@ -1463,6 +1434,7 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
     textEditor->setVisible(false);
     textEditor->toBack();
 
+    processor.updateState->editsMade = true;
 }
 
 void KeymapViewController::textEditorFocusLost(TextEditor& tf)
@@ -1600,6 +1572,10 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
         keyboard->setKeysInKeymap(harmonizationArray);
     }
     
+    processor.updateState->editsMade = true;
+    
+    // We call configure here to reconfigure any mods, reset, and pianomaps
+    // for newly selected/deselected keys
     processor.currentPiano->configure();
 }
 
@@ -1628,6 +1604,7 @@ void KeymapViewController::sliderValueChanged     (Slider* slider)
         else                keyboard->setAvailableRange(12+octave*12, 36+octave*12);
     }
 #endif
+    processor.updateState->editsMade = true;
 }
 
 

@@ -528,22 +528,24 @@ void Keymap::print(void)
     DBG("Keymap: "+ intArrayToString(keys()));
 }
 
-void Keymap::trapKey(int keyToTrap)
+void Keymap::copyKeyPatternToAll(int keyToCopy)
 {
     for (int i = 0; i < 128; i++)
     {
         Array<int> tempArray = harmonizerKeys[i];
-        tempArray.addIfNotAlreadyThere(keyToTrap);
+        for (auto key : harmonizerKeys[keyToCopy])
+            tempArray.addIfNotAlreadyThere(key - keyToCopy + i);
         harmonizerKeys.set(i, tempArray);
     }
 }
 
-void Keymap::trapKey()
+void Keymap::copyKeyMappingToAll(int keyToTrap)
 {
     for (int i = 0; i < 128; i++)
     {
         Array<int> tempArray = harmonizerKeys[i];
-        tempArray.addIfNotAlreadyThere(harKey);
+        for (auto key : harmonizerKeys[keyToTrap])
+            tempArray.addIfNotAlreadyThere(key);
         harmonizerKeys.set(i, tempArray);
     }
 }
@@ -570,41 +572,6 @@ void Keymap::mirrorKey(int keyCenter)
     {
         int i = keyCenter - 1;
         for (int j = keyCenter + 1; j < 128; j++)
-        {
-            Array<int> tempArray = harmonizerKeys[i];
-            tempArray.addIfNotAlreadyThere(j);
-            harmonizerKeys.set(i, tempArray);
-
-            tempArray = harmonizerKeys[j];
-            tempArray.addIfNotAlreadyThere(i);
-            harmonizerKeys.set(j, tempArray);
-            i--;
-        }
-    }
-}
-
-void Keymap::mirrorKey()
-{
-    harmonizerKeys.set(harKey, Array<int>(harKey));
-    if (harKey < 64)
-    {
-        int j = harKey + 1;
-        for (int i = harKey - 1; i >= 0; i--)
-        {
-            Array<int> tempArray = harmonizerKeys[i];
-            tempArray.addIfNotAlreadyThere(j);
-            harmonizerKeys.set(i, tempArray);
-
-            tempArray = harmonizerKeys[j];
-            tempArray.addIfNotAlreadyThere(i);
-            harmonizerKeys.set(j, tempArray);
-            j++;
-        }
-    }
-    else
-    {
-        int i = harKey - 1;
-        for (int j = harKey + 1; j < 128; j++)
         {
             Array<int> tempArray = harmonizerKeys[i];
             tempArray.addIfNotAlreadyThere(j);

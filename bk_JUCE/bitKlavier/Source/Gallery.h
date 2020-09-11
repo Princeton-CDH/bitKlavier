@@ -168,11 +168,7 @@ public:
     {
         getKeymap(Id)->setHarmonizerList(harKey, harArray);
     }
-
-    inline const void setKeymapHarmonization(int Id, Array<int> harArray) const noexcept
-    {
-        getKeymap(Id)->setHarmonizerList(harArray);
-    }
+    
     inline const void setKeymapHarmonizersFromString(int Id, String useToSet) const noexcept
     {
         getKeymap(Id)->setHarmonizerFromDisplayText(useToSet);

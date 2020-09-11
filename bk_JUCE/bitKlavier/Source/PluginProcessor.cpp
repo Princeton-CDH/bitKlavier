@@ -449,6 +449,20 @@ void BKAudioProcessor::clearBitKlavier(void)
     
     //handleAllNotesOff();
 
+    for (auto map : noteOn)
+    {
+        for (HashMap<String, int>::Iterator i (*map); i.next();)
+        {
+            currentPiano->prepMap->keyReleased(i.getValue(), 0, 0, false,
+                                               (loadingSampleType == BKLoadSoundfont),
+                                               i.getKey().upToLastOccurrenceOf("n", false, false));
+        }
+        map->clear();
+    }
+    
+    for (auto map : noteVelocity)
+        map->clear();
+    
     sustainDeactivate();
     
     for (auto piano : gallery->getPianos())
@@ -607,7 +621,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     }
     if (harmonizer == false) return;
     
-    String key = source + String(mappedFrom);
+    String key = source + "n" + String(mappedFrom);
     bool noteDown = noteOn.getUnchecked(noteNumber)->size() > 0;
     
     if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
@@ -718,7 +732,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
 
     if (harmonizer == false) return;
     
-    String key = source + String(mappedFrom);
+    String key = source + "n" + String(mappedFrom);
     
     if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
     {

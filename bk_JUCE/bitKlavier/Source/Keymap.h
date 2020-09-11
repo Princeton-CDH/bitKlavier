@@ -529,16 +529,10 @@ public:
         harmonizerKeys.set(harKey, singleHar);
     }
     inline void setHarmonizerList(int index, Array<int> harmonization) { harmonizerKeys.set(index, harmonization); }
-    // overloaded to default to harKey; this avoids pointless function calls
-    inline void setHarmonizerList(Array<int> harmonization) { harmonizerKeys.set(harKey, harmonization); }
 
-    void trapKey(int keyToTrap);
-    //overloaded to default to harKey, this saves function calls in KeymapViewController
-    void trapKey();
-
+    void copyKeyPatternToAll(int keyToCopy);
+    void copyKeyMappingToAll(int keyToTrap);
     void mirrorKey(int keyCenter);
-    //overloaded to default to harKey, this saves function calls in KeymapViewController
-    void mirrorKey();
 
     void defaultHarmonizations();
     void clearHarmonizations();
