@@ -20,7 +20,7 @@
 
 //==============================================================================
 KeymapViewController::KeymapViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 2)
+BKViewController(p, theGraph, 3)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     // buttonsAndMenusLAF.drawGroupComponentOutline();
@@ -211,6 +211,9 @@ BKViewController(p, theGraph, 2)
     harPreTranspositionSlider.addListener(this);
     harPreTranspositionSlider.setLookAndFeel(&buttonsAndMenusLAF);
     harPreTranspositionSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+    harPreTranspositionSlider.setColour(Slider::thumbColourId, Colours::goldenrod);
+    harPreTranspositionSlider.setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.25));
+    harPreTranspositionSlider.setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.1));
     harPreTranspositionSlider.setTextBoxStyle(Slider::TextBoxRight, false, 30, 60);
     harPreTranspositionSlider.setDoubleClickReturnValue(true, 0); // double-clicking this slider will set it to 0
     harPreTranspositionSlider.setValue(0);
@@ -222,6 +225,9 @@ BKViewController(p, theGraph, 2)
     harPostTranspositionSlider.addListener(this);
     harPostTranspositionSlider.setLookAndFeel(&buttonsAndMenusLAF);
     harPostTranspositionSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
+    harPostTranspositionSlider.setColour(Slider::thumbColourId, Colours::goldenrod);
+    harPostTranspositionSlider.setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.25));
+    harPostTranspositionSlider.setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.1));
     harPostTranspositionSlider.setTextBoxStyle(Slider::TextBoxRight, false, 30, 60);
     harPostTranspositionSlider.setDoubleClickReturnValue(true, 0); // double-clicking this slider will set it to 0
     harPostTranspositionSlider.setValue(0);
@@ -324,10 +330,10 @@ BKViewController(p, theGraph, 2)
     invertOnOffToggle.addListener(this);
     addAndMakeVisible(&invertOnOffToggle, ALL);
 
-    endKeystrokesToggle.setButtonText("End Keystrokes");
+    endKeystrokesToggle.setButtonText("All Notes Off!");
     endKeystrokesToggle.setToggleState(false, dontSendNotification);
     endKeystrokesToggle.setLookAndFeel(&buttonsAndMenusLAF); // text to right?
-    endKeystrokesToggle.setTooltip("Indicates whether to end all keystrokes whenever a note is played.");
+    endKeystrokesToggle.setTooltip("Indicates whether to end all keystrokes whenever a note in this Keymap is played.");
     endKeystrokesToggle.addListener(this);
     addAndMakeVisible(&endKeystrokesToggle, ALL);
 
@@ -393,8 +399,11 @@ void KeymapViewController::displayTab(int tab)
 
     if (tab == 0)
     {
+        
         area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         area.removeFromTop(gComponentComboBoxHeight*1.5);
+        area.removeFromTop(gComponentComboBoxHeight);
+        /*
         Rectangle<int> togglesSlice = area.removeFromTop(gComponentComboBoxHeight);
         togglesSlice.reduce(togglesSlice.getWidth()*0.1f, 0);
         int toggleWidth = togglesSlice.getWidth() * 0.33f;
@@ -407,6 +416,7 @@ void KeymapViewController::displayTab(int tab)
 
         ignoreSustainToggle.setBounds(togglesSlice);
         ignoreSustainToggle.setVisible(true);
+         */
         
         area.removeFromTop(gComponentComboBoxHeight*0.5f);
         
@@ -414,10 +424,12 @@ void KeymapViewController::displayTab(int tab)
         area.removeFromBottom(harKeyboardHeight + gYSpacing * 12);
         
         area.removeFromBottom(gYSpacing);
+        area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY + gYSpacing);
         Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
-        textButtonSlab.removeFromLeft(gXSpacing);
+        textButtonSlab.removeFromRight(gXSpacing);
+        // textButtonSlab.removeFromLeft(gXSpacing);
         
-        textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
+        // textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
         harmonizerMenuButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth() * 2));
         harmonizerMenuButton.setVisible(true);
         
@@ -670,6 +682,23 @@ void KeymapViewController::displayTab(int tab)
                                     blendronicGroup1.getHeight());
         blendronicTBGroup.setVisible(true);
 	}
+    
+    else if (tab == 2)
+    {
+        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        area.removeFromTop(gComponentComboBoxHeight);
+        
+        area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.25f * processor.paddingScalarY);
+        
+        invertOnOffToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
+        invertOnOffToggle.setVisible(true);
+
+        ignoreSustainToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
+        ignoreSustainToggle.setVisible(true);
+        
+        endKeystrokesToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
+        endKeystrokesToggle.setVisible(true);
+    }
 }
 
 void KeymapViewController::displayShared()
