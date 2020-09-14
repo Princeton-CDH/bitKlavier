@@ -83,8 +83,6 @@ void NostalgicProcessor::postRelease(int midiNoteNumber, int midiChannel)
     activeNotes.removeFirstMatchingValue(midiNoteNumber);
     noteOn.set(midiNoteNumber, false);
     noteLengthTimers.set(midiNoteNumber, 0);
-    
-
 }
 
 //begin reverse note; called when key is released

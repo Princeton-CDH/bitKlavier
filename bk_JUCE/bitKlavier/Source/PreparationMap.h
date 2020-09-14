@@ -40,17 +40,17 @@ public:
     BKSampleLoadType sampleType;
     void processBlock(AudioSampleBuffer& buffer, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic = false);
     
-    void keyPressed(int noteNumber, float velocity, int channel, bool noteDown, bool soundfont = false, String source = String("Default"));
-    void keyReleased(int noteNumber, float velocity, int channel, bool noteDown, bool soundfont = false, String source = String("Default"));
+    void keyPressed(int noteNumber, float velocity, int channel, int mappedFrom, bool noteDown, bool soundfont = false, String source = String("Default"));
+    void keyReleased(int noteNumber, float velocity, int channel, int mappedFrom, bool noteDown, bool soundfont = false, String source = String("Default"));
     //void keyPartReleased(int noteNumber, float velocity, int channel, Keymap::PtrArr affectedKeymaps, bool soundfont = false, String source = String("Default"));
-    void postRelease(int noteNumber, float velocity, int channel, String source = String("Default"));
+    void postRelease(int noteNumber, float velocity, int channel, int mappedFrom, String source = String("Default"));
     void clearKey(int noteNumber);
     void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }
     void sustainPedalReleased(bool post);
     void sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post);
     void sustainPedalReleased() { sustainPedalReleased(false); };
-    void attemptReattack(int noteNumber, String source = String("Default"));
-    void attemptSustain(int noteNumber, float velocity, int channel, bool soundfont, String source = String("Default"));
+    void attemptReattack(int noteNumber, int mappedFrom, String source = String("Default"));
+    void attemptSustain(int noteNumber, float velocity, int channel, int mappedFrom, bool soundfont, String source = String("Default"));
     
     inline bool keymapsContainNote(int noteNumber) {
         bool contains = false;
@@ -215,6 +215,7 @@ private:
         int noteNumber;
         float velocity;
         int channel;
+        int mappedFrom;
         String source;
     };
     Array<Note> sustainedNotes;

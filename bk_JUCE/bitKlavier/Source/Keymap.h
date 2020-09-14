@@ -152,6 +152,7 @@ public:
     void addKeymap(Keymap::Ptr otherKeymap);
     void removeKeymap(Keymap::Ptr otherKeymap);
     bool containsNote(int noteNumber);
+    bool containsNoteMapping(int noteNumber, int mappedFrom);
     void clear(void);
     Array<int> keys(void);
     

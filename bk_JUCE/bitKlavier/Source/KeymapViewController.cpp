@@ -326,21 +326,21 @@ BKViewController(p, theGraph, 3)
     invertOnOffToggle.setButtonText ("Invert Note On/Off");
     invertOnOffToggle.setToggleState (false, dontSendNotification);
     invertOnOffToggle.setLookAndFeel(&buttonsAndMenusLAF); // text to left
-    invertOnOffToggle.setTooltip("Indicates whether to invert Note-On and Note-Off messages for this Keymap");
+    invertOnOffToggle.setTooltip("Toggle whether to invert Note-On and Note-Off messages for this Keymap");
     invertOnOffToggle.addListener(this);
     addAndMakeVisible(&invertOnOffToggle, ALL);
 
     endKeystrokesToggle.setButtonText("All Notes Off!");
     endKeystrokesToggle.setToggleState(false, dontSendNotification);
     endKeystrokesToggle.setLookAndFeel(&buttonsAndMenusLAF); // text to right?
-    endKeystrokesToggle.setTooltip("Indicates whether to end all keystrokes whenever a note in this Keymap is played.");
+    endKeystrokesToggle.setTooltip("Toggle whether to end all notes whenever a key in this Keymap is played. The Keymap does not need to be connected to anything for this feature. Inverting note on/offs will cause this to activate on note offs.");
     endKeystrokesToggle.addListener(this);
     addAndMakeVisible(&endKeystrokesToggle, ALL);
 
     ignoreSustainToggle.setButtonText("Ignore Sustain Pedal");
     ignoreSustainToggle.setToggleState(false, dontSendNotification);
     ignoreSustainToggle.setLookAndFeel(&buttonsAndMenusLAF);
-    ignoreSustainToggle.setTooltip("Indicates whether to ignore the sustain pedal for this keymap.");
+    ignoreSustainToggle.setTooltip("Toggle whether to ignore the sustain pedal for this keymap");
     ignoreSustainToggle.addListener(this);
     addAndMakeVisible(&ignoreSustainToggle, ALL);
 

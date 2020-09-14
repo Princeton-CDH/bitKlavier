@@ -453,9 +453,12 @@ void BKAudioProcessor::clearBitKlavier(void)
     {
         for (HashMap<String, int>::Iterator i (*map); i.next();)
         {
-            currentPiano->prepMap->keyReleased(i.getValue(), 0, 0, false,
+            String key = i.getKey();
+            currentPiano->prepMap->keyReleased(i.getValue(), 0, 0,
+                                               key.getTrailingIntValue(),
+                                               false,
                                                (loadingSampleType == BKLoadSoundfont),
-                                               i.getKey().upToLastOccurrenceOf("n", false, false));
+                                               key.upToLastOccurrenceOf("n", false, false));
         }
         map->clear();
     }
@@ -612,7 +615,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                         }
                     }
                 }
-                if (km->getAllNotesOff())
+                if (!km->isInverted() && km->containsNote(noteNumber) && km->getAllNotesOff())
                 {
                     clearBitKlavier();
                 }
@@ -667,13 +670,8 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
     // TODO : for multi sample set support, remove soundfont argument from this chain of functions
     // UPDATE: actually seems like that argument isn't really used so it doesn't matter. still should clean this up
-    currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, noteDown,
+    currentPiano->prepMap->keyPressed(noteNumber, velocity, channel, mappedFrom, noteDown,
                                       (loadingSampleType == BKLoadSoundfont), source);
-
-    //if (doIgnoreSustain)
-    //{
-    //    currentPiano->prepMap->keyPartReleased(noteNumber, velocity, channel, toIgnore, (loadingSampleType == BKLoadSoundfont), source);
-    //}
 
     //add note to springTuning, if only for Graph display
     //this could be a bad idea, in that a user may want to have only some keys (via a keymap) go to Spring tuning
@@ -699,9 +697,6 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
      
     bool activeSource = false;
-
-    bool doIgnoreSustain = false;
-    Keymap::PtrArr affectedKeymaps;
     
     if (pmap != nullptr)
     {
@@ -718,13 +713,9 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
                         handleNoteOff(harmonizer[i], velocity, channel, noteNumber, source, true);
                     }
                 }
-                if (km->getIgnoreSustain())
+                if (km->isInverted() && km->containsNote(noteNumber) && km->getAllNotesOff())
                 {
-                    doIgnoreSustain = true;
-                }
-                else
-                {
-                    affectedKeymaps.addIfNotAlreadyThere(km);
+                    clearBitKlavier();
                 }
             }
         }
@@ -751,13 +742,8 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
         
         bool noteDown = noteOn.getUnchecked(noteNumber)->size() > 0;
-        currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, noteDown,
+        currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, mappedFrom, noteDown,
                                            (loadingSampleType == BKLoadSoundfont), source);
-        //}
-        //else
-        //{
-        //    currentPiano->prepMap->keyPartReleased(noteNumber, velocity, channel, affectedKeymaps, (loadingSampleType == BKLoadSoundfont), source);
-        //}
     }
     
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
@@ -776,7 +762,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         
         if (activeSource)
             if (piano != currentPiano)
-                piano->prepMap->postRelease(noteNumber, velocity, channel, source);
+                piano->prepMap->postRelease(noteNumber, velocity, mappedFrom, channel, source);
     }
 }
 

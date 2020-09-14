@@ -261,11 +261,15 @@ void Keymap::removeKeymap(Keymap::Ptr otherKeymap)
     }
 }
 
-
-
 bool Keymap::containsNote(int noteNumber)
 {
     return keymap[noteNumber];
+}
+
+bool Keymap::containsNoteMapping(int noteNumber, int mappedFrom)
+{
+    if (!keymap.getUnchecked(mappedFrom)) return false;
+    return harmonizerKeys.getUnchecked(mappedFrom).contains(noteNumber);
 }
 
 // Clears keymap.
