@@ -554,6 +554,28 @@ void Keymap::copyKeyMappingToAll(int keyToTrap)
     }
 }
 
+void Keymap::copyKeyPatternToOctaves(int keyToCopy)
+{
+    for (int i = keyToCopy % 12; i < 128; i += 12)
+    {
+        Array<int> tempArray = harmonizerKeys[i];
+        for (auto key : harmonizerKeys[keyToCopy])
+            tempArray.addIfNotAlreadyThere(key - keyToCopy + i);
+        harmonizerKeys.set(i, tempArray);
+    }
+}
+
+void Keymap::copyKeyMappingToOctaves(int keyToTrap)
+{
+    for (int i = keyToTrap % 12; i < 128; i += 12)
+    {
+        Array<int> tempArray = harmonizerKeys[i];
+        for (auto key : harmonizerKeys[keyToTrap])
+            tempArray.addIfNotAlreadyThere(key);
+        harmonizerKeys.set(i, tempArray);
+    }
+}
+
 void Keymap::mirrorKey(int keyCenter)
 {
     harmonizerKeys.set(keyCenter, Array<int>(keyCenter));

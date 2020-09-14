@@ -75,12 +75,10 @@ BKViewController(p, theGraph, 3)
     keymapTF.setTooltip("Select or deselect all keys by individually clicking or click-dragging, or press 'edit all' to type or copy/paste MIDI notes to be selected in Keymap");
     keymapTF.setMultiLine(true);
     
-    keyboardComponent = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    keyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     
     // Keyboard
-    addAndMakeVisible(*keyboardComponent);
-    
-    keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
+    addAndMakeVisible(*keyboard);
     keyboard->setScrollButtonsVisible(false);
     
 #if JUCE_IOS
@@ -114,12 +112,14 @@ BKViewController(p, theGraph, 3)
     keymapTF.setVisible(false);
     keymapTF.toBack();
 
-    harKeyboardComponent = std::make_unique<BKKeymapKeyboardComponent>(harKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
-
+    harKeyboardLabel.setText("Key to harmonize", dontSendNotification);
+    harKeyboardLabel.setBorderSize(BorderSize<int>(1, 0, 1, 5));
+    harKeyboardLabel.setJustificationType(Justification::bottomLeft);
+    addAndMakeVisible(&harKeyboardLabel, ALL);
+    
+    harKeyboard = std::make_unique<BKKeymapKeyboardComponent>(harKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     // Harmonizer Keyboard
-    addAndMakeVisible(*harKeyboardComponent);
-
-    harKeyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
+    addAndMakeVisible(*harKeyboard);
     harKeyboard->setScrollButtonsVisible(false);
 
 #if JUCE_IOS
@@ -159,13 +159,15 @@ BKViewController(p, theGraph, 3)
     harArrayKeymapTF.setName("HarmonizerArrayKeymapMidi");
     harArrayKeymapTF.setTooltip("Select or deselect all keys by individually clicking or click-dragging, or press 'edit key mapping' to type or copy/paste MIDI notes to be selected in Keymap");
     harArrayKeymapTF.setMultiLine(true);
-
-    harArrayKeyboardComponent = std::make_unique<BKKeymapKeyboardComponent>(harArrayKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
-
+    
+        
+    
+    harArrayKeyboardLabel.setText("Key harmonization", dontSendNotification);
+    addAndMakeVisible(&harArrayKeyboardLabel, ALL);
+    
+    harArrayKeyboard = std::make_unique<BKKeymapKeyboardComponent>(harArrayKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     // Harmonizer Array Keyboard
-    addAndMakeVisible(*harArrayKeyboardComponent);
-
-    harArrayKeyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
+    addAndMakeVisible(*harArrayKeyboard);
     harArrayKeyboard->setScrollButtonsVisible(false);
 
 #if JUCE_IOS
@@ -207,38 +209,15 @@ BKViewController(p, theGraph, 3)
     harmonizerMenuButton.addListener(this);
     addAndMakeVisible(harmonizerMenuButton);
 
-    harPreTranspositionSlider.setRange(-12, 12, 1);
-    harPreTranspositionSlider.addListener(this);
-    harPreTranspositionSlider.setLookAndFeel(&buttonsAndMenusLAF);
-    harPreTranspositionSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
-    harPreTranspositionSlider.setColour(Slider::thumbColourId, Colours::goldenrod);
-    harPreTranspositionSlider.setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.25));
-    harPreTranspositionSlider.setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.1));
-    harPreTranspositionSlider.setTextBoxStyle(Slider::TextBoxRight, false, 30, 60);
-    harPreTranspositionSlider.setDoubleClickReturnValue(true, 0); // double-clicking this slider will set it to 0
-    harPreTranspositionSlider.setValue(0);
-    harPreTranspositionSlider.setName("HarmonizerPreShift");
-    harPreTranspositionSlider.setTooltip("Transpose all input into this Keymap before harmonization");
-    addAndMakeVisible(harPreTranspositionSlider);
+    harPreTranspositionSlider = std::make_unique<BKSingleSlider>("Transpose input", -12, 12, 0, 1);
     
-    harPostTranspositionSlider.setRange(-12, 12, 1);
-    harPostTranspositionSlider.addListener(this);
-    harPostTranspositionSlider.setLookAndFeel(&buttonsAndMenusLAF);
-    harPostTranspositionSlider.setSliderStyle(Slider::SliderStyle::LinearHorizontal);
-    harPostTranspositionSlider.setColour(Slider::thumbColourId, Colours::goldenrod);
-    harPostTranspositionSlider.setColour(Slider::trackColourId, Colours::goldenrod.withMultipliedAlpha(0.25));
-    harPostTranspositionSlider.setColour(Slider::backgroundColourId, Colours::goldenrod.withMultipliedAlpha(0.1));
-    harPostTranspositionSlider.setTextBoxStyle(Slider::TextBoxRight, false, 30, 60);
-    harPostTranspositionSlider.setDoubleClickReturnValue(true, 0); // double-clicking this slider will set it to 0
-    harPostTranspositionSlider.setValue(0);
-    harPostTranspositionSlider.setName("HarmonizerPostShift");
-    harPostTranspositionSlider.setTooltip("Transpose all output of this Keymap after harmonization");
-    addAndMakeVisible(harPostTranspositionSlider);
-
-    //harKey = 60;
-
-    // end second tab stuff
-
+    harPreTranspositionSlider->setToolTipString("Transpose all input into this Keymap before harmonization");
+    addAndMakeVisible(*harPreTranspositionSlider);
+    
+    harPostTranspositionSlider = std::make_unique<BKSingleSlider>("Transpose output", -12, 12, 0, 1);
+    
+    harPostTranspositionSlider->setToolTipString("Transpose all output of this Keymap after harmonization");
+    addAndMakeVisible(*harPostTranspositionSlider);
     
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
@@ -347,7 +326,6 @@ BKViewController(p, theGraph, 3)
     currentTab = 0;
     //displayTab(currentTab);
 
-    
     fillSelectCB(-1,-1);
     
     startTimer(100); // was 20
@@ -357,9 +335,6 @@ BKViewController(p, theGraph, 3)
 
 KeymapViewController::~KeymapViewController()
 {
-    keyboard = nullptr;
-    harKeyboard = nullptr;
-    harArrayKeyboard = nullptr;
     setLookAndFeel(nullptr);
     //transpositionLaf 
     //need to set some null pointer stuff - transposition?
@@ -399,46 +374,25 @@ void KeymapViewController::displayTab(int tab)
 
     if (tab == 0)
     {
-        
         area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
-        area.removeFromTop(gComponentComboBoxHeight*1.5);
         area.removeFromTop(gComponentComboBoxHeight);
-        /*
-        Rectangle<int> togglesSlice = area.removeFromTop(gComponentComboBoxHeight);
-        togglesSlice.reduce(togglesSlice.getWidth()*0.1f, 0);
-        int toggleWidth = togglesSlice.getWidth() * 0.33f;
         
-        invertOnOffToggle.setBounds(togglesSlice.removeFromLeft(toggleWidth));
-        invertOnOffToggle.setVisible(true);
-
-        endKeystrokesToggle.setBounds(togglesSlice.removeFromLeft(toggleWidth));
-        endKeystrokesToggle.setVisible(true);
-
-        ignoreSustainToggle.setBounds(togglesSlice);
-        ignoreSustainToggle.setVisible(true);
-         */
+        float harKeyboardHeight = 80 * processor.paddingScalarY;
         
-        area.removeFromTop(gComponentComboBoxHeight*0.5f);
-        
-        float harKeyboardHeight = 50 + 30 * processor.paddingScalarY;
-        area.removeFromBottom(harKeyboardHeight + gYSpacing * 12);
-        
-        area.removeFromBottom(gYSpacing);
+        area.removeFromBottom(50 + 30 * processor.paddingScalarY + gYSpacing * 6);
+        area.removeFromBottom(gComponentComboBoxHeight);
         area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY + gYSpacing);
-        Rectangle<int> textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
-        textButtonSlab.removeFromRight(gXSpacing);
-        // textButtonSlab.removeFromLeft(gXSpacing);
         
-        // textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
-        harmonizerMenuButton.setBounds(textButtonSlab.removeFromRight(keysCB.getWidth() * 2));
-        harmonizerMenuButton.setVisible(true);
+        Rectangle<int> harKeyboardSlice = area.removeFromBottom(harKeyboardHeight);
+        area.removeFromBottom(gYSpacing);
+        Rectangle<int> sliderSlice = area.removeFromBottom(gComponentComboBoxHeight);
+        area.removeFromBottom(gYSpacing);
+        Rectangle<int> labelSlice = area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY);
         
-        Rectangle<int> harkeyboardRow = area.removeFromBottom(harKeyboardHeight);
-        float keyWidth = harkeyboardRow.getWidth() / round((maxKey - minKey) * 7. / 12 + 1); //num white keys
+        float keyWidth = harKeyboardSlice.getWidth() / round((maxKey - minKey) * 7. / 12 + 1); //num white keys
         
         harKeyboard->setKeyWidth(keyWidth);
         harKeyboard->setBlackNoteLengthProportion(0.6);
-        harkeyboardRow.reduce(gXSpacing, 0);
         
 #if JUCE_IOS
         float sliderHeight = 15;
@@ -447,44 +401,50 @@ void KeymapViewController::displayTab(int tab)
         harOctaveSlider.setBounds(sliderArea);
 #endif
         
-        harKeyboard->setBounds(harkeyboardRow);
+        harKeyboard->setBounds(harKeyboardSlice);
         harKeyboard->setVisible(true);
         
 #if JUCE_IOS
 
 #else
-        harAllKeymapTF.setBounds(harkeyboardRow);
+        harAllKeymapTF.setBounds(harKeyboardSlice);
         harAllKeymapTF.setVisible(true);
 #endif
-        area.removeFromBottom(gYSpacing);
-        textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
-        textButtonSlab.removeFromLeft(gXSpacing);
-
-        harKeyboardAllValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
+        harKeyboardAllValsTextFieldOpen.setBounds(sliderSlice.removeFromLeft(getWidth() * 0.15f));
         harKeyboardAllValsTextFieldOpen.setVisible(true);
         
-        harMidiEditToggle.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
+        harMidiEditToggle.setBounds(sliderSlice.removeFromLeft(harKeyboardAllValsTextFieldOpen.getWidth()));
         harMidiEditToggle.setVisible(true);
         
-        float harSliderLength = 750;
-        Rectangle<int> harSliderArea = textButtonSlab.removeFromLeft(harSliderLength);
+        harPreTranspositionSlider->setBounds(sliderSlice.withTop(sliderSlice.getY() - sliderSlice.getHeight() * 0.5f * processor.paddingScalarY));
+        harPreTranspositionSlider->setVisible(true);
         
-        harPreTranspositionSlider.setBounds(harSliderArea);
-        harPreTranspositionSlider.setVisible(true);
-        
+        harKeyboardLabel.setBounds(labelSlice.removeFromLeft(harKeyboardAllValsTextFieldOpen.getWidth()*2));
+        harKeyboardLabel.setVisible(true);
+
         //harmonizer array keyboard
         
-        area.removeFromBottom(gYSpacing * 1.5);
-        harkeyboardRow = area.removeFromBottom(harKeyboardHeight);
+        Rectangle<int> textButtonSlice = area.removeFromBottom(gComponentComboBoxHeight - gYSpacing * 2).expanded(0, gYSpacing);
+        harmonizerMenuButton.setBounds(textButtonSlice.removeFromRight(keysCB.getWidth() * 2));
+        harmonizerMenuButton.setVisible(true);
+    
+//        area = area.removeFromTop(harKeyboardHeight + gComponentComboBoxHeight + gComponentComboBoxHeight * processor.paddingScalarY + gYSpacing + gYSpacing);
+        
+        area.removeFromBottom(gYSpacing);
+        harKeyboardSlice = area.removeFromBottom(harKeyboardHeight);
+        area.removeFromBottom(gYSpacing);
+        sliderSlice = area.removeFromBottom(gComponentComboBoxHeight);
+        area.removeFromBottom(gYSpacing);
+        labelSlice = area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY);
+        
         harArrayKeyboard->setKeyWidth(keyWidth);
         harArrayKeyboard->setBlackNoteLengthProportion(0.6);
-        harkeyboardRow.reduce(gXSpacing, 0);
         
 #if JUCE_IOS
         harArrayOctaveSlider.setBounds(sliderArea);
 #endif
         
-        harArrayKeyboard->setBounds(harkeyboardRow);
+        harArrayKeyboard->setBounds(harKeyboardSlice);
         harArrayKeyboard->setVisible(true);
         
 #if JUCE_IOS
@@ -492,48 +452,33 @@ void KeymapViewController::displayTab(int tab)
         harArrayKeymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
         
 #else
-        harArrayKeymapTF.setBounds(harkeyboardRow);
+        harArrayKeymapTF.setBounds(harKeyboardSlice);
         harArrayKeymapTF.setVisible(true);
         
         
 #endif
         
-        area.removeFromBottom(gYSpacing);
-        textButtonSlab = area.removeFromBottom(gComponentComboBoxHeight);
-        textButtonSlab.removeFromLeft(gXSpacing);
-        harArrayKeyboardValsTextFieldOpen.setBounds(textButtonSlab.removeFromLeft(getWidth() * 0.15));
+        harArrayKeyboardValsTextFieldOpen.setBounds(sliderSlice.removeFromLeft(getWidth() * 0.15f));
         harArrayKeyboardValsTextFieldOpen.setVisible(true);
         
-        harArrayMidiEditToggle.setBounds(textButtonSlab.removeFromLeft(keysCB.getWidth()));
+        harArrayMidiEditToggle.setBounds(sliderSlice.removeFromLeft(harArrayKeyboardValsTextFieldOpen.getWidth()));
         harArrayMidiEditToggle.setVisible(true);
         
-        harSliderLength = 750;
-        harSliderArea = textButtonSlab.removeFromLeft(harSliderLength);
+        harPostTranspositionSlider->setBounds(sliderSlice.withTop(sliderSlice.getY() - sliderSlice.getHeight() * 0.5f * processor.paddingScalarY));
+        harPostTranspositionSlider->setVisible(true);
         
-        harPostTranspositionSlider.setBounds(harSliderArea);
-        harPostTranspositionSlider.setVisible(true);
-        
-        /*
-         Rectangle<int> targetsSlice = area.removeFromTop(gComponentComboBoxHeight);
-         targetsSlice.removeFromRight(gXSpacing);
-         
-         
-         enableHarmonizerToggle.setBounds(targetsSlice.removeFromRight(selectCB.getWidth()));
-         enableHarmonizerToggle.toFront(false);
-         enableHarmonizerToggle.setVisible(true);
-         */
+        harArrayKeyboardLabel.setBounds(labelSlice.removeFromLeft(harArrayKeyboardValsTextFieldOpen.getWidth()*2));
+        harArrayKeyboardLabel.setBorderSize(BorderSize<int>(1, 0, 1, 5));
+        harArrayKeyboardLabel.setJustificationType(Justification::bottomLeft);
+        harArrayKeyboardLabel.setVisible(true);
         
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         int tempHarKey = thisKeymap->getHarKey();
         
-        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
-        keyboard->setKeysInKeymap(Array<int>({ tempHarKey }));
-        
-        keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
-        
+        harKeyboard->setKeysInKeymap(Array<int>({ tempHarKey }));
         
         Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(tempHarKey));
-        keyboard->setKeysInKeymap(harmonizationArray);
+        harArrayKeyboard->setKeysInKeymap(harmonizationArray);
     }
 
 	else if (tab == 1)
@@ -798,16 +743,17 @@ void KeymapViewController::invisible()
     keymapL.setVisible(false);
     keymapTF.setVisible(false);
     
-    keyboardComponent->setVisible(false);
+    keyboard->setVisible(false);
     keyboardValsTextFieldOpen.setVisible(false);
 
-    harKeyboardComponent->setVisible(false);
+    harKeyboardLabel.setVisible(false);
+    harKeyboard->setVisible(false);
     harKeyboardAllValsTextFieldOpen.setVisible(false);
     harAllKeymapTF.setVisible(false);
 
-    harArrayKeymapL.setVisible(false);
+    harArrayKeyboardLabel.setVisible(false);
     harArrayKeymapTF.setVisible(false);
-    harArrayKeyboardComponent->setVisible(false);
+    harArrayKeyboard->setVisible(false);
     harArrayKeyboardValsTextFieldOpen.setVisible(false);
 
     //enableHarmonizerToggle.setVisible(false);
@@ -835,8 +781,8 @@ void KeymapViewController::invisible()
 
     harmonizerMenuButton.setVisible(false);
 
-    harPreTranspositionSlider.setVisible(false);
-    harPostTranspositionSlider.setVisible(false);
+    harPreTranspositionSlider->setVisible(false);
+    harPostTranspositionSlider->setVisible(false);
 }
 
 int KeymapViewController::addKeymap(void)
@@ -1060,9 +1006,11 @@ PopupMenu KeymapViewController::getHarmonizerMenu(Array<int> keyHarmonization)
 
     menu.addItem(1, "Clear");
     menu.addItem(2, "Default");
-    menu.addItem(3, "Spread Mapping");
-    menu.addItem(4, "Spread Pattern");
-    menu.addItem(5, "Mirror");
+    menu.addItem(3, "Copy Mapping to All");
+    menu.addItem(4, "Copy Pattern to All");
+    menu.addItem(5, "Copy Mapping to Octaves");
+    menu.addItem(6, "Copy Pattern to Octaves");
+    menu.addItem(7, "Mirror");
 
     return std::move(menu);
 }
@@ -1093,11 +1041,18 @@ void KeymapViewController::harmonizerMenuCallback(int result, KeymapViewControll
     }
     else if (result == 5)
     {
+        keymap->copyKeyMappingToOctaves(harKey);
+    }
+    else if (result == 6)
+    {
+        keymap->copyKeyPatternToOctaves(harKey);
+    }
+    else if (result == 7)
+    {
         keymap->mirrorKey(harKey);
     }
 
-    BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)(vc->harArrayKeyboardComponent.get());
-    keyboard->setKeysInKeymap(keymap->getHarmonizationForKey());
+    vc->harArrayKeyboard->setKeysInKeymap(keymap->getHarmonizationForKey());
     
     processor.updateState->editsMade = true;
 }
@@ -1155,9 +1110,7 @@ void KeymapViewController::keysMenuCallback(int result, KeymapViewController* vc
         keymap->setKeys((KeySet)set, vc->selectType, (PitchClass)pc);
     }
     
-    BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(vc->keyboardComponent.get());
-    
-    keyboard->setKeysInKeymap(keymap->keys());
+    vc->keyboard->setKeysInKeymap(keymap->keys());
     
     processor.updateState->editsMade = true;
 }
@@ -1335,9 +1288,6 @@ void KeymapViewController::bkButtonClicked (Button* b)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setKeys(KeySetAll, false);
-        
-        BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)(keyboardComponent.get());
-
         keyboard->setKeysInKeymap(keymap->keys());
     }
     else if (b == &endKeystrokesToggle)
@@ -1426,7 +1376,7 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
     Array<int> keys = keymapStringToIntArray(text);
     String name = tf.getName();
     BKTextEditor* textEditor = &keymapTF;
-    BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
+    BKKeymapKeyboardComponent* thisKeyboard = keyboard.get();
 
     if (name == "HarmonizerAllKeymapMidi")
     {
@@ -1441,7 +1391,7 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
         if (name == "HarmonizerArrayKeymapMidi")
         {
             textEditor = &harArrayKeymapTF;
-            keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
+            thisKeyboard = harArrayKeyboard.get();
         }
         textEditor->setText(intArrayToString(keys));
 
@@ -1523,15 +1473,11 @@ void KeymapViewController::update(void)
         keymapTF.setText( intArrayToString(km->keys()));
         harAllKeymapTF.setText(km->getHarmonizerTextForDisplay());
         harArrayKeymapTF.setText(intArrayToString(km->getHarmonizationForKey()));
-        harPreTranspositionSlider.setValue(km->getHarPreTranspose());
-        harPostTranspositionSlider.setValue(km->getHarPostTranspose());
-        BKKeymapKeyboardComponent* keyboard =  (BKKeymapKeyboardComponent*)keyboardComponent.get();
+        harPreTranspositionSlider->setValue(km->getHarPreTranspose(), dontSendNotification);
+        harPostTranspositionSlider->setValue(km->getHarPostTranspose(), dontSendNotification);
         keyboard->setKeysInKeymap(km->keys());
-        keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
-        keyboard->setKeysInKeymap(Array<int>(km->getHarKey()));
-        keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
-        keyboard->setKeysInKeymap(km->getHarmonizationForKey());
-        
+        harKeyboard->setKeysInKeymap(Array<int>(km->getHarKey()));
+        harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey());
         
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -1572,8 +1518,6 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
 
         update();
 
-        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)keyboardComponent.get();
-
         keyboard->setKeysInKeymap(thisKeymap->keys());
     }
     else if (source == &harKeyboardState)
@@ -1583,12 +1527,10 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
 
         update();
 
-        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harKeyboardComponent.get();
-        keyboard->setKeysInKeymap(Array<int>({ midiNoteNumber }));
+        harKeyboard->setKeysInKeymap(Array<int>({ midiNoteNumber }));
 
-        keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
         Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(midiNoteNumber));
-        keyboard->setKeysInKeymap(harmonizationArray);
+        harArrayKeyboard->setKeysInKeymap(harmonizationArray);
     }
     else if (source == &harArrayKeyboardState)
     {
@@ -1596,9 +1538,8 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
         Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey());
 
         update();
-
-        BKKeymapKeyboardComponent* keyboard = (BKKeymapKeyboardComponent*)harArrayKeyboardComponent.get();
-        keyboard->setKeysInKeymap(harmonizationArray);
+        
+        harArrayKeyboard->setKeysInKeymap(harmonizationArray);
     }
     
     processor.updateState->editsMade = true;
@@ -1612,15 +1553,15 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
 
 void KeymapViewController::sliderValueChanged     (Slider* slider)
 {
-    if (slider == &harPreTranspositionSlider)
+    if (slider->getName() == harPreTranspositionSlider->getName())
     {
-        int transposition = (int) harPreTranspositionSlider.getValue();
+        int transposition = (int) harPreTranspositionSlider->getValue();
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setHarPreTranspose(transposition);
     }
-    else if (slider == &harPostTranspositionSlider)
+    else if (slider->getName() == harPostTranspositionSlider->getName())
     {
-        int transposition = (int) harPostTranspositionSlider.getValue();
+        int transposition = (int) harPostTranspositionSlider->getValue();
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setHarPostTranspose(transposition);
     }
@@ -1726,7 +1667,6 @@ void KeymapViewController::hideUnconnectedTargets()
 void KeymapViewController::timerCallback(){
     
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    BKKeymapKeyboardComponent* keyboard;
 
     midiEditToggle.setToggleState(km->getMidiEdit(), dontSendNotification);
     harMidiEditToggle.setToggleState(km->getHarMidiEdit(), dontSendNotification);
@@ -1734,19 +1674,15 @@ void KeymapViewController::timerCallback(){
     
     if (km->getMidiEdit())
     {
-        keyboard = (BKKeymapKeyboardComponent*)(keyboardComponent.get());
         keyboard->setKeysInKeymap(km->keys());
     }
     else if (km->getHarMidiEdit())
     {
-        keyboard = (BKKeymapKeyboardComponent*)(harKeyboardComponent.get());
-        keyboard->setKeysInKeymap(Array<int>(km->getHarKey()));
-        keyboard = (BKKeymapKeyboardComponent*)(harArrayKeyboardComponent.get());
-        keyboard->setKeysInKeymap(km->getHarmonizationForKey());
+        harKeyboard->setKeysInKeymap(Array<int>(km->getHarKey()));
+        harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey());
     }
     else if (km->getHarArrayMidiEdit())
     {
-        keyboard = (BKKeymapKeyboardComponent*)(harArrayKeyboardComponent.get());
         keyboard->setKeysInKeymap(km->getHarmonizationForKey());
     }
 

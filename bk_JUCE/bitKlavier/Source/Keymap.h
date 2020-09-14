@@ -533,6 +533,8 @@ public:
 
     void copyKeyPatternToAll(int keyToCopy);
     void copyKeyMappingToAll(int keyToTrap);
+    void copyKeyPatternToOctaves(int keyToCopy);
+    void copyKeyMappingToOctaves(int keyToTrap);
     void mirrorKey(int keyCenter);
 
     void defaultHarmonizations();

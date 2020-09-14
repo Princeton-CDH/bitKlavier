@@ -39,6 +39,8 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     resizer->setAlwaysOnTop(true);
 #endif
     //processor.updateState->pianoDidChangeForGraph = true;
+    
+    resized();
 }
 
 BKAudioProcessorEditor::~BKAudioProcessorEditor()
@@ -54,8 +56,8 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 
 void BKAudioProcessorEditor::resized()
 {
-    processor.paddingScalarX = (float)(getTopLevelComponent()->getWidth() - DEFAULT_MIN_WIDTH) / (DEFAULT_WIDTH - DEFAULT_MIN_WIDTH);
-    processor.paddingScalarY = (float)(getTopLevelComponent()->getHeight() - DEFAULT_MIN_HEIGHT) / (DEFAULT_HEIGHT - DEFAULT_MIN_HEIGHT);
+    processor.paddingScalarX = (float)(getWidth() - DEFAULT_MIN_WIDTH) / (DEFAULT_WIDTH - DEFAULT_MIN_WIDTH);
+    processor.paddingScalarY = (float)(getHeight() - DEFAULT_MIN_HEIGHT) / (DEFAULT_HEIGHT - DEFAULT_MIN_HEIGHT);
     
     viewPort.setBoundsRelative(0.0f,0.0f,1.0f,1.0f);
     

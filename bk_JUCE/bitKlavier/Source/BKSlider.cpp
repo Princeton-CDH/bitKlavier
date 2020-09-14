@@ -1143,7 +1143,7 @@ sliderIncrement(increment)
     displaySlider->setSliderStyle(juce::Slider::SliderStyle::LinearBar);
     displaySlider->setLookAndFeel(&displaySliderLookAndFeel);
     displaySlider->setInterceptsMouseClicks(false, false);
-    addAndMakeVisible(*displaySlider);
+//    addAndMakeVisible(*displaySlider);
     
     sliderTextResolution = -1;
 

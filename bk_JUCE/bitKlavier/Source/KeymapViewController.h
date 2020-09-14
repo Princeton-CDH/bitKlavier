@@ -84,8 +84,8 @@ private:
     BKTextEditor  keymapTF;
     
     BKKeymapKeyboardState keyboardState;
-    std::unique_ptr<Component> keyboardComponent;
-    BKKeymapKeyboardComponent* keyboard;
+//    std::unique_ptr<Component> keyboardComponent;
+    std::unique_ptr<BKKeymapKeyboardComponent> keyboard;
     BKTextButton keyboardValsTextFieldOpen;
     
     TextButton      midiInputSelectButton;
@@ -100,24 +100,25 @@ private:
 
     //stuff for trap/mirror/harmonizer tab - TRT
 
+    BKLabel harKeyboardLabel;
     BKKeymapKeyboardState harKeyboardState;
-    std::unique_ptr<Component> harKeyboardComponent;
-    BKKeymapKeyboardComponent* harKeyboard;
+//    std::unique_ptr<Component> harKeyboardComponent;
+    std::unique_ptr<BKKeymapKeyboardComponent> harKeyboard;
     BKTextButton harKeyboardAllValsTextFieldOpen;
 
-    BKLabel harArrayKeymapL;
     BKTextEditor harArrayKeymapTF;
     BKTextEditor harAllKeymapTF;
 
+    BKLabel harArrayKeyboardLabel;
     BKKeymapKeyboardState harArrayKeyboardState;
-    std::unique_ptr<Component> harArrayKeyboardComponent;
-    BKKeymapKeyboardComponent* harArrayKeyboard;
+//    std::unique_ptr<Component> harArrayKeyboardComponent;/
+    std::unique_ptr<BKKeymapKeyboardComponent> harArrayKeyboard;
     BKTextButton harArrayKeyboardValsTextFieldOpen;
 
     //ToggleButton enableHarmonizerToggle; // functionality currently commented out, probably not necessary
 
-    Slider harPostTranspositionSlider;
-    Slider harPreTranspositionSlider;
+    std::unique_ptr<BKSingleSlider> harPostTranspositionSlider;
+    std::unique_ptr<BKSingleSlider> harPreTranspositionSlider;
     void sliderValueChanged(Slider* slider)                override;
     //BKButtonAndMenuLAF transpositionLaf;
 
