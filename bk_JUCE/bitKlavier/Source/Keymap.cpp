@@ -96,11 +96,11 @@ allNotesOff(k->getAllNotesOff())
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
-        if (k->getHarmonizationForKey(i).size() == 0) harmonizerKeys.add(Array<int>(i));
+        Array<int> otherArr = k->getHarmonizationForKey(i, false, false);
+        if (otherArr.size() == 0) harmonizerKeys.add(Array<int>(i));
         else
         {
             harmonizerKeys.add(Array<int>({})); //"default" harmonizer for each key is to just play itself
-            Array<int> otherArr = k->getHarmonizationForKey(i);
             for (int j = 0; j < otherArr.size(); j++)
             {
                 harmonizerKeys[i].add(otherArr.getUnchecked(j));
@@ -146,11 +146,11 @@ allNotesOff(k->getAllNotesOff())
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
-        if (k->getHarmonizationForKey(i).size() == 0) harmonizerKeys.add(Array<int>(i));
+        Array<int> otherArr = k->getHarmonizationForKey(i, false, false);
+        if (otherArr.size() == 0) harmonizerKeys.add(Array<int>(i));
         else
         {
             harmonizerKeys.add(Array<int>({})); //"default" harmonizer for each key is to just play itself
-            Array<int> otherArr = k->getHarmonizationForKey(i);
             for (int j = 0; j < otherArr.size(); j++)
             {
                 harmonizerKeys[i].add(otherArr.getUnchecked(j));
@@ -269,7 +269,7 @@ bool Keymap::containsNote(int noteNumber)
 bool Keymap::containsNoteMapping(int noteNumber, int mappedFrom)
 {
     if (!keymap.getUnchecked(mappedFrom)) return false;
-    return harmonizerKeys.getUnchecked(mappedFrom).contains(noteNumber);
+    return harmonizerKeys.getUnchecked(mappedFrom + harPreTranspose).contains(noteNumber - harPostTranspose);
 }
 
 // Clears keymap.

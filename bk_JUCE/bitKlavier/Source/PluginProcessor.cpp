@@ -608,7 +608,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                     }
                     else
                     {
-                        Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true);
+                        Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true, true);
                         for (int i = 0; i < harmonizer.size(); i++)
                         {
                             handleNoteOn(harmonizer[i], velocity, channel, noteNumber, source, true);
@@ -707,7 +707,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
                 activeSource = true;
                 if (harmonizer == false)
                 {
-                    Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true);
+                    Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true, true);
                     for (int i = 0; i < harmonizer.size(); i++)
                     {
                         handleNoteOff(harmonizer[i], velocity, channel, noteNumber, source, true);

@@ -223,7 +223,7 @@ public:
         {
             ValueTree t("t" + String(hCount++));
             count = 0;
-            for (auto f : getHarmonizationForKey(a)) t.setProperty(ptagInt + String(count++), f, 0);
+            for (auto f : getHarmonizationForKey(a, false, false)) t.setProperty(ptagInt + String(count++), f, 0);
             harmonizer.addChild(t, -1, 0);
         }
         keysave.addChild(harmonizer, -1, 0);
@@ -467,16 +467,18 @@ public:
         }
     }
 
-    Array<int> getHarmonizationForKey(int key, bool useShift = false)
+    Array<int> getHarmonizationForKey(int key, bool withPreTranspose, bool withPostTranspose)
     { 
         Array<int> h = Array<int>();
         h.ensureStorageAllocated(128);
         
-        key = (key + harPreTranspose) % harmonizerKeys.size();
+        if (withPreTranspose) key += harPreTranspose;
+        
+        if (key > harmonizerKeys.size()) return h;
 
         for (int i = 0; i < harmonizerKeys[key].size(); i++)
         {
-            if (useShift) h.add(harmonizerKeys[key][i] + harPostTranspose);
+            if (withPostTranspose) h.add(harmonizerKeys[key][i] + harPostTranspose);
             else h.add(harmonizerKeys[key][i]);
         }
 
@@ -484,15 +486,21 @@ public:
     }
 
     //overloaded to default to harKey, this saves function calls in KeymapViewController
-    Array<int> getHarmonizationForKey(bool useShift = false)
+    Array<int> getHarmonizationForKey(bool withPreTranspose, bool withPostTranspose)
     {
         Array<int> h = Array<int>();
         h.ensureStorageAllocated(128);
+        
+        int tempHarKey = harKey;
+        
+        if (withPreTranspose) tempHarKey += harPreTranspose;
+        
+        if (tempHarKey > harmonizerKeys.size()) return h;
 
-        for (int i = harPreTranspose; i < harmonizerKeys[harKey].size(); i++)
+        for (int i = 0; i < harmonizerKeys[tempHarKey].size(); i++)
         {
-            if (useShift) h.add(harmonizerKeys[harKey][i] + harPostTranspose);
-            else h.add(harmonizerKeys[harKey][i]);
+            if (withPostTranspose) h.add(harmonizerKeys[tempHarKey][i] + harPostTranspose);
+            else h.add(harmonizerKeys[tempHarKey][i]);
         }
 
         return h;
@@ -516,9 +524,12 @@ public:
     //overloaded to default to harKey, this saves function calls in KeymapViewController
     inline void toggleHarmonizerList(int keyHarmonized)
     {
-        Array<int> singleHar = harmonizerKeys[harKey];
+        int tempHarKey = harKey + harPreTranspose;
+        if (tempHarKey < 0) return;
+            
+        Array<int> singleHar = harmonizerKeys[tempHarKey];
 
-        if (harmonizerKeys[harKey].contains(keyHarmonized))
+        if (harmonizerKeys[tempHarKey].contains(keyHarmonized))
         {
             singleHar.removeAllInstancesOf(keyHarmonized);
         }
@@ -527,7 +538,7 @@ public:
             singleHar.add(keyHarmonized);
         }
 
-        harmonizerKeys.set(harKey, singleHar);
+        harmonizerKeys.set(tempHarKey, singleHar);
     }
     inline void setHarmonizerList(int index, Array<int> harmonization) { harmonizerKeys.set(index, harmonization); }
 

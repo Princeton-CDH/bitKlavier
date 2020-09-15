@@ -115,6 +115,7 @@ BKViewController(p, theGraph, 3)
     harKeyboardLabel.setText("Key to harmonize", dontSendNotification);
     harKeyboardLabel.setBorderSize(BorderSize<int>(1, 0, 1, 5));
     harKeyboardLabel.setJustificationType(Justification::bottomLeft);
+    harKeyboardLabel.setTooltip("Select a key to create a harmonization for");
     addAndMakeVisible(&harKeyboardLabel, ALL);
     
     harKeyboard = std::make_unique<BKKeymapKeyboardComponent>(harKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
@@ -163,6 +164,9 @@ BKViewController(p, theGraph, 3)
         
     
     harArrayKeyboardLabel.setText("Key harmonization", dontSendNotification);
+    harArrayKeyboardLabel.setBorderSize(BorderSize<int>(1, 0, 1, 5));
+    harArrayKeyboardLabel.setJustificationType(Justification::bottomLeft);
+    harArrayKeyboardLabel.setTooltip("Select the harmonization for the key to harmonize. The key highlighting and text representation here do reflect the input transposition but not the output transposition.");
     addAndMakeVisible(&harArrayKeyboardLabel, ALL);
     
     harArrayKeyboard = std::make_unique<BKKeymapKeyboardComponent>(harArrayKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
@@ -468,17 +472,16 @@ void KeymapViewController::displayTab(int tab)
         harPostTranspositionSlider->setVisible(true);
         
         harArrayKeyboardLabel.setBounds(labelSlice.removeFromLeft(harArrayKeyboardValsTextFieldOpen.getWidth()*2));
-        harArrayKeyboardLabel.setBorderSize(BorderSize<int>(1, 0, 1, 5));
-        harArrayKeyboardLabel.setJustificationType(Justification::bottomLeft);
         harArrayKeyboardLabel.setVisible(true);
         
-        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        int tempHarKey = thisKeymap->getHarKey();
-        
-        harKeyboard->setKeysInKeymap(Array<int>({ tempHarKey }));
-        
-        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(tempHarKey));
-        harArrayKeyboard->setKeysInKeymap(harmonizationArray);
+//        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+//        int tempHarKey = thisKeymap->getHarKey();
+//
+//        harKeyboard->setKeysInKeymap(Array<int>({ tempHarKey }));
+//
+//        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(tempHarKey));
+//        harArrayKeyboard->setKeysInKeymap(harmonizationArray);
+        update(); //update() does all this ^
     }
 
 	else if (tab == 1)
@@ -1052,7 +1055,7 @@ void KeymapViewController::harmonizerMenuCallback(int result, KeymapViewControll
         keymap->mirrorKey(harKey);
     }
 
-    vc->harArrayKeyboard->setKeysInKeymap(keymap->getHarmonizationForKey());
+    vc->update();
     
     processor.updateState->editsMade = true;
 }
@@ -1234,7 +1237,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
     else if (b == &harmonizerMenuButton)
     {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        getHarmonizerMenu(keymap->getHarmonizationForKey(keymap->getHarKey())).showMenuAsync(PopupMenu::Options().withTargetComponent(&harmonizerMenuButton), ModalCallbackFunction::forComponent(harmonizerMenuCallback, this));
+        getHarmonizerMenu(keymap->getHarmonizationForKey(keymap->getHarKey(), false, false)).showMenuAsync(PopupMenu::Options().withTargetComponent(&harmonizerMenuButton), ModalCallbackFunction::forComponent(harmonizerMenuCallback, this));
         update();
     }
     else if (b == &invertOnOffToggle)
@@ -1350,9 +1353,9 @@ void KeymapViewController::bkTextFieldDidChange(TextEditor& tf)
 {
     String name = tf.getName();
 
-    if (name == "KeymapMidi" || name == "HarmonizerKeymapMidi" || name == "HarmonizerArrayKeymapMidi" || name == "HarmonizerAllKeymapMidi")
+    if (name == "KeymapMidi" || name == "HarmonizerArrayKeymapMidi" || name == "HarmonizerAllKeymapMidi")
     {
-        keymapUpdated(tf);
+        update();
     }
     else
     {
@@ -1373,45 +1376,39 @@ void KeymapViewController::keymapUpdated(TextEditor& tf)
     Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     
     String text = tf.getText();
-    Array<int> keys = keymapStringToIntArray(text);
     String name = tf.getName();
-    BKTextEditor* textEditor = &keymapTF;
-    BKKeymapKeyboardComponent* thisKeyboard = keyboard.get();
+    BKTextEditor* textEditor;
 
-    if (name == "HarmonizerAllKeymapMidi")
+    if (name == "KeymapMidi")
+    {
+        textEditor = &keymapTF;
+        Array<int> keys = keymapStringToIntArray(text);
+        
+        processor.gallery->setKeymap(processor.updateState->currentKeymapId, keys);
+        keyboard->setKeysInKeymap(keys);
+    }
+    else if (name == "HarmonizerAllKeymapMidi")
     {
         textEditor = &harAllKeymapTF;
+        Array<int> keys = keymapStringToIntArray(text);
+        textEditor->setText(processor.gallery->getKeymap(processor.updateState->currentKeymapId)->getHarmonizerTextForDisplay());
         
         processor.gallery->setKeymapHarmonizersFromString(processor.updateState->currentKeymapId, text);
-
-        textEditor->setText(processor.gallery->getKeymap(processor.updateState->currentKeymapId)->getHarmonizerTextForDisplay());
     }
-    else
+    else // if (name == "HarmonizerArrayKeymapMidi")
     {
-        if (name == "HarmonizerArrayKeymapMidi")
-        {
-            textEditor = &harArrayKeymapTF;
-            thisKeyboard = harArrayKeyboard.get();
-        }
+        textEditor = &harArrayKeymapTF;
+        Array<int> keys = keymapStringToIntArray(text);
         textEditor->setText(intArrayToString(keys));
-
-        if (name == "KeymapMidi")
-        {
-            // get old keys to send to update
-            Array<int> oldKeys = processor.gallery->getKeymap(processor.updateState->currentKeymapId)->keys();
-            processor.gallery->setKeymap(processor.updateState->currentKeymapId, keys);
-        }
-        else if (name == "HarmonizerKeymapMidi")
-        {
-            processor.gallery->getKeymap(processor.updateState->currentKeymapId)->setHarKey(keys[0]);
-        }
-        else if (name == "HarmonizerArrayKeymapMidi") processor.gallery->setKeymapHarmonization(processor.updateState->currentKeymapId, keymap->getHarKey(), keys);
-
-        keyboard->setKeysInKeymap(keys);
+        
+        processor.gallery->setKeymapHarmonization(processor.updateState->currentKeymapId, keymap->getHarKey() + keymap->getHarPreTranspose(), keys);
+        harArrayKeyboard->setKeysInKeymap(keys);
     }
     
     textEditor->setVisible(false);
     textEditor->toBack();
+    
+    update();
 
     processor.updateState->editsMade = true;
 }
@@ -1472,12 +1469,12 @@ void KeymapViewController::update(void)
         ignoreSustainToggle.setToggleState(km->getIgnoreSustain(), dontSendNotification);
         keymapTF.setText( intArrayToString(km->keys()));
         harAllKeymapTF.setText(km->getHarmonizerTextForDisplay());
-        harArrayKeymapTF.setText(intArrayToString(km->getHarmonizationForKey()));
+        harArrayKeymapTF.setText(intArrayToString(km->getHarmonizationForKey(true, false)));
         harPreTranspositionSlider->setValue(km->getHarPreTranspose(), dontSendNotification);
         harPostTranspositionSlider->setValue(km->getHarPostTranspose(), dontSendNotification);
         keyboard->setKeysInKeymap(km->keys());
         harKeyboard->setKeysInKeymap(Array<int>(km->getHarKey()));
-        harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey());
+        harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey(true, false));
         
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -1511,9 +1508,6 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     if (source == &keyboardState)
     {
-
-        Array<int> oldKeys = thisKeymap->keys();
-
         thisKeymap->toggleNote(midiNoteNumber);
 
         update();
@@ -1524,22 +1518,12 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
     {
         //harKey = midiNoteNumber;
         thisKeymap->setHarKey(midiNoteNumber);
-
         update();
-
-        harKeyboard->setKeysInKeymap(Array<int>({ midiNoteNumber }));
-
-        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(midiNoteNumber));
-        harArrayKeyboard->setKeysInKeymap(harmonizationArray);
     }
     else if (source == &harArrayKeyboardState)
     {
         thisKeymap->toggleHarmonizerList(midiNoteNumber);
-        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey());
-
         update();
-        
-        harArrayKeyboard->setKeysInKeymap(harmonizationArray);
     }
     
     processor.updateState->editsMade = true;
@@ -1567,19 +1551,23 @@ void KeymapViewController::sliderValueChanged (Slider* slider)
 
 void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    if (slider->getName() == harPreTranspositionSlider->getName())
+    if (slider == harPreTranspositionSlider.get())
     {
         int transposition = (int) harPreTranspositionSlider->getValue();
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setHarPreTranspose(transposition);
         DBG("harPreTranspositionSlider = " + String(transposition));
+        
+        update();
     }
-    else if (slider->getName() == harPostTranspositionSlider->getName())
+    else if (slider == harPostTranspositionSlider.get())
     {
         int transposition = (int) harPostTranspositionSlider->getValue();
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setHarPostTranspose(transposition);
         DBG("harPostTranspositionSlider = " + String(transposition));
+        
+        update();
     }
 
     processor.updateState->editsMade = true;
@@ -1688,11 +1676,11 @@ void KeymapViewController::timerCallback(){
     else if (km->getHarMidiEdit())
     {
         harKeyboard->setKeysInKeymap(Array<int>(km->getHarKey()));
-        harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey());
+        harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey(true, false));
     }
     else if (km->getHarArrayMidiEdit())
     {
-        keyboard->setKeysInKeymap(km->getHarmonizationForKey());
+        harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey(true, false));
     }
 
     //updateKeymapTargets(); // needed?

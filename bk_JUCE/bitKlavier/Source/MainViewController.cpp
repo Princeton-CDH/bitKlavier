@@ -753,9 +753,9 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                 overtop.arrowPressed(LeftArrow);
             }
         }
-        else if (code == KeyPress::tabKey)
+        else if (code == KeyPress::spaceKey)
         {
-            
+            processor.clearBitKlavier();
         }
         else if (code == 65) // A all
         {
