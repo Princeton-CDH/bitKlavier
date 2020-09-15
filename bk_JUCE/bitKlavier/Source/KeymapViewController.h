@@ -25,6 +25,7 @@ public BKViewController,
 public BKKeymapKeyboardStateListener,
 public BKEditableComboBoxListener,
 public Slider::Listener,
+public BKSingleSlider::Listener,
 public Timer
 #if JUCE_IOS
 , 
@@ -119,7 +120,8 @@ private:
 
     std::unique_ptr<BKSingleSlider> harPostTranspositionSlider;
     std::unique_ptr<BKSingleSlider> harPreTranspositionSlider;
-    void sliderValueChanged(Slider* slider)                override;
+    void sliderValueChanged(Slider* slider) override;
+    void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override; 
     //BKButtonAndMenuLAF transpositionLaf;
 
     //int harKey; //for rendering harmonizer array stuff for now

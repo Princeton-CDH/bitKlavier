@@ -210,13 +210,13 @@ BKViewController(p, theGraph, 3)
     addAndMakeVisible(harmonizerMenuButton);
 
     harPreTranspositionSlider = std::make_unique<BKSingleSlider>("Transpose input", -12, 12, 0, 1);
-    
     harPreTranspositionSlider->setToolTipString("Transpose all input into this Keymap before harmonization");
+    harPreTranspositionSlider->addMyListener(this);
     addAndMakeVisible(*harPreTranspositionSlider);
     
     harPostTranspositionSlider = std::make_unique<BKSingleSlider>("Transpose output", -12, 12, 0, 1);
-    
     harPostTranspositionSlider->setToolTipString("Transpose all output of this Keymap after harmonization");
+    harPostTranspositionSlider->addMyListener(this);
     addAndMakeVisible(*harPostTranspositionSlider);
     
     addAndMakeVisible(actionButton);
@@ -1551,20 +1551,8 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
 
 
 
-void KeymapViewController::sliderValueChanged     (Slider* slider)
+void KeymapViewController::sliderValueChanged (Slider* slider)
 {
-    if (slider->getName() == harPreTranspositionSlider->getName())
-    {
-        int transposition = (int) harPreTranspositionSlider->getValue();
-        Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        km->setHarPreTranspose(transposition);
-    }
-    else if (slider->getName() == harPostTranspositionSlider->getName())
-    {
-        int transposition = (int) harPostTranspositionSlider->getValue();
-        Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        km->setHarPostTranspose(transposition);
-    }
 #if JUCE_IOS
     else if (slider == &octaveSlider)
     {
@@ -1576,6 +1564,27 @@ void KeymapViewController::sliderValueChanged     (Slider* slider)
 #endif
     processor.updateState->editsMade = true;
 }
+
+void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
+{
+    if (slider->getName() == harPreTranspositionSlider->getName())
+    {
+        int transposition = (int) harPreTranspositionSlider->getValue();
+        Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        km->setHarPreTranspose(transposition);
+        DBG("harPreTranspositionSlider = " + String(transposition));
+    }
+    else if (slider->getName() == harPostTranspositionSlider->getName())
+    {
+        int transposition = (int) harPostTranspositionSlider->getValue();
+        Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        km->setHarPostTranspose(transposition);
+        DBG("harPostTranspositionSlider = " + String(transposition));
+    }
+
+    processor.updateState->editsMade = true;
+}
+
 
 
 void KeymapViewController::updateKeymapTargets()
