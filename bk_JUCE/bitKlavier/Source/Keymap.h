@@ -233,6 +233,7 @@ public:
 
         keysave.setProperty(ptagKeymap_endKeystrokes, allNotesOff ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
+        keysave.setProperty(ptagKeymap_sustainPedalKeys, sustainPedalKeys ? 1 : 0, 0);
         
         keysave.setProperty(ptagKeymap_defaultSelected, defaultSelected, 0);
         
@@ -331,6 +332,7 @@ public:
 
         setAllNotesOff((bool) e->getIntAttribute(ptagKeymap_endKeystrokes, 0));
         setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
+        setSustainPedalKeys((bool) e->getIntAttribute(ptagKeymap_sustainPedalKeys, 0));
 
         setDefaultSelected((bool) e->getIntAttribute(ptagKeymap_defaultSelected, 1));
         setOnscreenSelected((bool) e->getIntAttribute(ptagKeymap_onscreenSelected, 1));
@@ -405,7 +407,9 @@ public:
                 if (harmonizerKeys[i].size() > 1 ||
                     (harmonizerKeys[i].size() == 1 && harmonizerKeys[i][0] != i))
                 {
-                    compositeString += (String(i) + "[");
+                    int transposed = i - harPreTranspose;
+                    if (transposed < 0 || harmonizerKeys.size() <= transposed) continue;
+                    compositeString += (String(transposed) + "[");
                     for (int j = 0; j < harmonizerKeys[i].size(); j++)
                     {
                         compositeString += (String(harmonizerKeys[i][j] - i)); //using the half step offset rather than the absoute midi value
@@ -445,10 +449,13 @@ public:
             {
                 if (isClose)
                 {
-                    Array<int> arr = keymapStringToIntArray(temp);
-                    for (int i = 0; i < arr.size(); ++i)
-                        arr.setUnchecked(i, arr.getUnchecked(i) + harIndex);
-                    harmonizerKeys.set(harIndex, arr);
+                    if (0 <= harIndex && harIndex < harmonizerKeys.size())
+                    {
+                        Array<int> arr = keymapStringToIntArray(temp);
+                        for (int i = 0; i < arr.size(); ++i)
+                            arr.setUnchecked(i, arr.getUnchecked(i) + harIndex);
+                        harmonizerKeys.set(harIndex, arr);
+                    }
                     temp = "";
                     inBracket = false;
                 }
@@ -460,7 +467,7 @@ public:
             }
             else if (isOpen)
             {
-                harIndex = temp.getIntValue();
+                harIndex = temp.getIntValue() + harPreTranspose;
                 temp = "";
                 inBracket = true;
             }
@@ -570,6 +577,10 @@ public:
     inline void setIgnoreSustain(bool toSet) { ignoreSustain = toSet; }
     inline void toggleIgnoreSustain() { ignoreSustain = !ignoreSustain; }
     
+    inline bool getSustainPedalKeys() { return sustainPedalKeys; }
+    inline void setSustainPedalKeys(bool toSet) { sustainPedalKeys = toSet; }
+    inline void toggleSustainPedalKeys() { sustainPedalKeys = !sustainPedalKeys; }
+    
 private:
     BKAudioProcessor& processor;
     int Id;
@@ -604,6 +615,8 @@ private:
     bool ignoreSustain;
     
     bool allNotesOff;
+    
+    bool sustainPedalKeys;
 
     JUCE_LEAK_DETECTOR (Keymap)
 };

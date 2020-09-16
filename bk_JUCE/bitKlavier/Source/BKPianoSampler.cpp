@@ -532,7 +532,6 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
                                                int startSample, int numSamples,
                                                const BKPianoSamplerSound* playingSound)
 {
-    
     const float* const inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
     const float* const inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1
     ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
@@ -541,7 +540,12 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
     
-    int64 loopStart, loopEnd, start, end;
+    int64 loopStart, loopEnd, start, end, soundLengthMinus1;
+    
+    int numBlendronics = blendronic.size();
+    BKDelayL* blendronicDelays[numBlendronics];
+    for (int i = 0; i < numBlendronics; ++i)
+        blendronicDelays[i] = blendronic.getUnchecked(i)->getDelay()->getDelay().get();
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
@@ -549,8 +553,11 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     end = playingSound->end;
     loopStart = playingSound->loopStart;
     loopEnd = playingSound->loopEnd + 1;
-    
-    unsigned long addCounter = 0;
+    // Trying to save as much time as possible...
+    soundLengthMinus1 = playingSound->soundLength - 1;
+    const float pan = (playingSound->pan * 0.01f) + 1.0f;
+
+    int addCounter = 0;
     while (--numSamples >= 0)
     {
         // always increment length
@@ -565,42 +572,36 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             loopPosition -= loopEnd - loopStart;
         }
         
-        float loopL, loopR;
-        
         if(loopPosition < 0) loopPosition = 0;
-        if(loopPosition > playingSound->soundLength - 1) loopPosition = playingSound->soundLength - 1;
+        if(loopPosition > soundLengthMinus1) loopPosition = soundLengthMinus1;
         
-        int pos = (int) loopPosition;
-        float alpha = (float) (loopPosition - pos);
-        float invAlpha = 1.0f - alpha;
-        int next = pos + 1;
-        if(next > playingSound->soundLength - 1) next -= loopEnd - loopStart;;
+        const int posL = (int) loopPosition;
+        const float alphaL = (float) (loopPosition - posL);
+        const float invAlphaL = 1.0f - alphaL;
+        const int nextL = posL + 1 - (int)(posL >= soundLengthMinus1 ? loopEnd - loopStart : 0);
         
-        loopL = (inL [pos] * invAlpha + inL [next] * alpha);
-        loopR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : loopL;
-        
-        float pan = (playingSound->pan * 0.01f) + 1.0f;
+        float loopL = (inL [posL] * invAlphaL + inL [nextL] * alphaL);
+        float loopR = (inR != nullptr) ? (inR [posL] * invAlphaL + inR [nextL] * alphaL) : loopL;
         
         loopL = loopL * (2.0f - pan);
         loopR = loopR * pan;
+
         //===========================================
         
         //==============SAMPLE STUFF=================
-        float sampleL, sampleR;
         if (playDirection == Forward)   samplePosition += bentRatio;
         else                            samplePosition -= bentRatio;
         
         if(samplePosition < 0) samplePosition = 0;
-        if(samplePosition > playingSound->soundLength - 1) samplePosition = playingSound->soundLength - 1;
+        if(samplePosition > soundLengthMinus1) samplePosition = soundLengthMinus1;
         
-        pos = (int) samplePosition;
-        alpha = (float) (samplePosition - pos);
-        invAlpha = 1.0f - alpha;
-        next = pos + 1;
-        if(next > playingSound->soundLength - 1) next -= loopEnd - loopStart;;
+        const int posS = (int) samplePosition;
+        const float alphaS = (float) (samplePosition - posS);
+        const float invAlphaS = 1.0f - alphaS;
+        const int nextS = posS + 1 - (int)(posS >= soundLengthMinus1 ? loopEnd - loopStart : 0);
 
-        sampleL = (inL [pos] * invAlpha + inL [next] * alpha);
-        sampleR = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : sampleL;
+        float sampleL = (inL [posS] * invAlphaS + inL [nextS] * alphaS);
+        float sampleR = (inR != nullptr) ? (inR [posS] * invAlphaS + inR [nextS] * alphaS) : sampleL;
         
         sampleL = sampleL * (2.0f - pan);
         sampleR = sampleR * pan;
@@ -666,32 +667,25 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             }
         }
         
-        float l,r;
-        
-        l = lgain * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
-        r = rgain * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
-        
-        if (!blendronic.isEmpty())
-        {
-            BlendronicDelay::Ptr bDelay;
-            for (auto b : blendronic)
-            {
-                bDelay = b->getDelay();
+        const float l = lgain * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
+        const float r = rgain * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
 
-                bDelay->addSample(l, addCounter, 0);
-                bDelay->addSample(r, addCounter, 1);
-            }
-            addCounter++;
-        }
         if (outR != nullptr)
         {
-            *outL++ += (l);
-            *outR++ += (r);
+            *outL++ += l;
+            *outR++ += r;
         }
         else
         {
             *outL++ += ((l + r) * 0.5f);
         }
+        
+        for (int i = 0; i < numBlendronics; ++i)
+        {
+            blendronicDelays[i]->addSample(l, addCounter, 0);
+            blendronicDelays[i]->addSample(r, addCounter, 1);
+        }
+        addCounter++;
     }
 }
 
@@ -704,13 +698,17 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
     ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
     : nullptr;
     
-    
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
+   
+    int numBlendronics = blendronic.size();
+    BKDelayL* blendronicDelays[numBlendronics];
+    for (int i = 0; i < numBlendronics; ++i)
+        blendronicDelays[i] = blendronic.getUnchecked(i)->getDelay()->getDelay().get();
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
-    
-    unsigned long addCounter = 0;
+
+    int addCounter = 0;
     while (--numSamples >= 0)
     {
         // always increment length
@@ -721,16 +719,25 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
             (playDirection == Reverse) &&
             (samplePosition > playingSound->soundLength - 1))
         {
+            const float l = 0.0f;
+            const float r = 0.0f;
             if (outR != nullptr)
             {
-                *outL++ += 0;
-                *outR++ += 0;
+                *outL++ += 0.0f;
+                *outR++ += 0.0f;
             }
             else
             {
-                *outL++ += 0;
+                *outL++ += 0.0f;
             }
             samplePosition -= bentRatio;
+            
+            for (int i = 0; i < numBlendronics; ++i)
+            {
+                blendronicDelays[i]->addSample(l, addCounter, 0);
+                blendronicDelays[i]->addSample(r, addCounter, 1);
+            }
+            addCounter++;
             continue;
         }
         
@@ -825,30 +832,25 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
             DBG("Invalid note direction.");
         }
         
-        float l = lgain * adsr.tick() * (sampleL * sampleEnv.tick());
-        float r = rgain * adsr.lastOut() * (sampleR * sampleEnv.lastOut());
-        
-        if (!blendronic.isEmpty())
-        {
-            BlendronicDelay::Ptr bDelay;
-            for (auto b : blendronic)
-            {
-                bDelay = b->getDelay();
-                
-                bDelay->addSample(l, addCounter, 0);
-                bDelay->addSample(r, addCounter, 1);
-            }
-            addCounter++;
-        }
+        const float l = lgain * adsr.tick() * (sampleL * sampleEnv.tick());
+        const float r = rgain * adsr.lastOut() * (sampleR * sampleEnv.lastOut());
+
         if (outR != nullptr)
         {
-            *outL++ += (l);
-            *outR++ += (r);
+            *outL++ += l;
+            *outR++ += r;
         }
         else
         {
             *outL++ += ((l + r) * 0.5f);
         }
+        
+        for (int i = 0; i < numBlendronics; ++i)
+        {
+            blendronicDelays[i]->addSample(l, addCounter, 0);
+            blendronicDelays[i]->addSample(r, addCounter, 1);
+        }
+        addCounter++;
     }
 }
 
@@ -887,10 +889,15 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
+
+    int numBlendronics = blendronic.size();
+    BKDelayL* blendronicDelays[numBlendronics];
+    for (int i = 0; i < numBlendronics; ++i)
+        blendronicDelays[i] = blendronic.getUnchecked(i)->getDelay()->getDelay().get();
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
-    unsigned long addCounter = 0;
+    int addCounter = 0;
     while (--numSamples >= 0)
     {
 
@@ -898,16 +905,25 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             (playDirection == Reverse) &&
             (sourceSamplePosition > playingSound->soundLength - 1))
         {
+            const float l = 0.0f;
+            const float r = 0.0f;
             if (outR != nullptr)
             {
-                *outL++ += 0;
-                *outR++ += 0;
+                *outL++ += 0.0f;
+                *outR++ += 0.0f;
             }
             else
             {
-                *outL++ += 0;
+                *outL++ += 0.0f;
             }
             sourceSamplePosition -= bentRatio;
+            
+            for (int i = 0; i < numBlendronics; ++i)
+            {
+                blendronicDelays[i]->addSample(l, addCounter, 0);
+                blendronicDelays[i]->addSample(r, addCounter, 1);
+            }
+            addCounter++;
             continue;
         }
         
@@ -919,11 +935,8 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         const float invAlpha = 1.0f - alpha;
         int next = pos + 1;
 
-        float l = (inL [pos] * invAlpha + inL [next] * alpha);
-        float r = (inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : l;
-        
-        l *= (lgain * adsr.tick());
-        r *= (rgain * adsr.lastOut());
+        const float l = (inL [pos] * invAlpha + inL [next] * alpha) * lgain * adsr.tick();
+        const float r = ((inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : l) * rgain * adsr.lastOut();
         
         if (adsr.getState() == BKADSR::IDLE)
         {
@@ -931,18 +944,6 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             break;
         }
 
-        if (!blendronic.isEmpty())
-        {
-            BlendronicDelay::Ptr bDelay;
-            for (auto b : blendronic)
-            {
-                bDelay = b->getDelay();
-
-                bDelay->addSample(l, addCounter, 0);
-                bDelay->addSample(r, addCounter, 1);
-            }
-            addCounter++;
-        }
 		if (outR != nullptr)
 		{
 			*outL++ += (l * 1.0f);
@@ -992,6 +993,13 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         {
             DBG("Invalid note direction.");
         }
+        
+        for (int i = 0; i < numBlendronics; ++i)
+        {
+            blendronicDelays[i]->addSample(l, addCounter, 0);
+            blendronicDelays[i]->addSample(r, addCounter, 1);
+        }
+        addCounter++;
     }
 }
 

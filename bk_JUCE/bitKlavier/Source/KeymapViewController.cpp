@@ -115,7 +115,7 @@ BKViewController(p, theGraph, 3)
     harKeyboardLabel.setText("Key to harmonize", dontSendNotification);
     harKeyboardLabel.setBorderSize(BorderSize<int>(1, 0, 1, 5));
     harKeyboardLabel.setJustificationType(Justification::bottomLeft);
-    harKeyboardLabel.setTooltip("Select a key to create a harmonization for");
+    harKeyboardLabel.setTooltip("Select a key to create a harmonization for, or press 'edit full mapping' for an editable text representation of the full keyboard mapping. The text representation reflect the input transposition but not the output transposition.");
     addAndMakeVisible(&harKeyboardLabel, ALL);
     
     harKeyboard = std::make_unique<BKKeymapKeyboardComponent>(harKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
@@ -144,7 +144,6 @@ BKViewController(p, theGraph, 3)
     addAndMakeVisible(harAllKeymapTF);
     harAllKeymapTF.addListener(this);
     harAllKeymapTF.setName("HarmonizerAllKeymapMidi");
-    harAllKeymapTF.setTooltip("Select or deselect all keys by individually clicking or click-dragging, or press 'edit full mapping' to type or copy/paste MIDI notes to be selected in Keymap");
     harAllKeymapTF.setMultiLine(true);
     harKeyboardAllValsTextFieldOpen.setName("HKSLIDERTXTEDITALLBUTTON");
     harKeyboardAllValsTextFieldOpen.addListener(this);
@@ -158,7 +157,7 @@ BKViewController(p, theGraph, 3)
     addAndMakeVisible(harArrayKeymapTF);
     harArrayKeymapTF.addListener(this);
     harArrayKeymapTF.setName("HarmonizerArrayKeymapMidi");
-    harArrayKeymapTF.setTooltip("Select or deselect all keys by individually clicking or click-dragging, or press 'edit key mapping' to type or copy/paste MIDI notes to be selected in Keymap");
+//    harArrayKeymapTF.setTooltip("Select or deselect all keys by individually clicking or click-dragging, or press 'edit key mapping' to type or copy/paste MIDI notes to be selected in Keymap");
     harArrayKeymapTF.setMultiLine(true);
     
         
@@ -166,7 +165,7 @@ BKViewController(p, theGraph, 3)
     harArrayKeyboardLabel.setText("Key harmonization", dontSendNotification);
     harArrayKeyboardLabel.setBorderSize(BorderSize<int>(1, 0, 1, 5));
     harArrayKeyboardLabel.setJustificationType(Justification::bottomLeft);
-    harArrayKeyboardLabel.setTooltip("Select the harmonization for the key to harmonize. The key highlighting and text representation here do reflect the input transposition but not the output transposition.");
+    harArrayKeyboardLabel.setTooltip("Select the harmonization for the key to harmonize, or press 'edit key mapping' for an editable text representation of the harmonization. The key highlighting and text representation here reflect the input transposition but not the output transposition.");
     addAndMakeVisible(&harArrayKeyboardLabel, ALL);
     
     harArrayKeyboard = std::make_unique<BKKeymapKeyboardComponent>(harArrayKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
@@ -233,7 +232,7 @@ BKViewController(p, theGraph, 3)
     else midiEditToggle.setButtonText ("midi edit");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(true);
     midiEditToggle.setToggleState (false, dontSendNotification);
-    midiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap");
+    midiEditToggle.setTooltip("Toggle whether MIDI input will edit this Keymap");
     midiEditToggle.addListener(this);
     addAndMakeVisible(&midiEditToggle, ALL);
 
@@ -242,7 +241,7 @@ BKViewController(p, theGraph, 3)
     else midiEditToggle.setButtonText ("midi edit");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(true);
     harMidiEditToggle.setToggleState(false, dontSendNotification);
-    harMidiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap");
+    harMidiEditToggle.setTooltip("Toggle whether MIDI input will edit this Keymap");
     harMidiEditToggle.addListener(this);
     addAndMakeVisible(&harMidiEditToggle, ALL);
 
@@ -251,7 +250,7 @@ BKViewController(p, theGraph, 3)
     else midiEditToggle.setButtonText ("midi edit");
     buttonsAndMenusLAF.setToggleBoxTextToRightBool(true);
     harArrayMidiEditToggle.setToggleState(false, dontSendNotification);
-    harArrayMidiEditToggle.setTooltip("Indicates whether MIDI input will edit this Keymap");
+    harArrayMidiEditToggle.setTooltip("Toggle whether MIDI input will edit this Keymap");
     harArrayMidiEditToggle.addListener(this);
     addAndMakeVisible(&harArrayMidiEditToggle, ALL);
     
@@ -326,6 +325,13 @@ BKViewController(p, theGraph, 3)
     ignoreSustainToggle.setTooltip("Toggle whether to ignore the sustain pedal for this keymap");
     ignoreSustainToggle.addListener(this);
     addAndMakeVisible(&ignoreSustainToggle, ALL);
+    
+    sustainPedalKeysToggle.setButtonText("Use as Sustain Pedal");
+    sustainPedalKeysToggle.setToggleState(false, dontSendNotification);
+    sustainPedalKeysToggle.setLookAndFeel(&buttonsAndMenusLAF);
+    sustainPedalKeysToggle.setTooltip("Toggle whether the keys of this Keymap should function as a sustain pedals");
+    sustainPedalKeysToggle.addListener(this);
+    addAndMakeVisible(&sustainPedalKeysToggle, ALL);
 
     currentTab = 0;
     //displayTab(currentTab);
@@ -636,7 +642,7 @@ void KeymapViewController::displayTab(int tab)
         area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         area.removeFromTop(gComponentComboBoxHeight);
         
-        area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.25f * processor.paddingScalarY);
+        area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.2f * processor.paddingScalarY);
         
         invertOnOffToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
         invertOnOffToggle.setVisible(true);
@@ -646,6 +652,9 @@ void KeymapViewController::displayTab(int tab)
         
         endKeystrokesToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
         endKeystrokesToggle.setVisible(true);
+        
+        sustainPedalKeysToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
+        sustainPedalKeysToggle.setVisible(true);
     }
 }
 
@@ -781,6 +790,7 @@ void KeymapViewController::invisible()
 
     endKeystrokesToggle.setVisible(false);
     ignoreSustainToggle.setVisible(false);
+    sustainPedalKeysToggle.setVisible(false);
 
     harmonizerMenuButton.setVisible(false);
 
@@ -1305,6 +1315,12 @@ void KeymapViewController::bkButtonClicked (Button* b)
         keymap->setIgnoreSustain(ignoreSustainToggle.getToggleState());
         processor.updateState->editsMade = true;
     }
+    else if (b == &sustainPedalKeysToggle)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setSustainPedalKeys(sustainPedalKeysToggle.getToggleState());
+        processor.updateState->editsMade = true;
+    }
     else if (b == &rightArrow)
     {
         arrowPressed(RightArrow);
@@ -1467,6 +1483,7 @@ void KeymapViewController::update(void)
         harArrayMidiEditToggle.setToggleState(km->getHarArrayMidiEdit(), dontSendNotification);
         endKeystrokesToggle.setToggleState(km->getAllNotesOff(), dontSendNotification);
         ignoreSustainToggle.setToggleState(km->getIgnoreSustain(), dontSendNotification);
+        sustainPedalKeysToggle.setToggleState(km->getSustainPedalKeys(), dontSendNotification);
         keymapTF.setText( intArrayToString(km->keys()));
         harAllKeymapTF.setText(km->getHarmonizerTextForDisplay());
         harArrayKeymapTF.setText(intArrayToString(km->getHarmonizationForKey(true, false)));

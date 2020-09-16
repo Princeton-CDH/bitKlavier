@@ -466,19 +466,10 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
     {
         if (km->getAllMidiInputIdentifiers().contains(source))
         {
-            
             if (km->containsNoteMapping(noteNumber, mappedFrom))
             {
-                if (km->isInverted())
-                {
-                    checkForSustain = true;
-                    km->setTriggered(noteNumber, false);
-                }
-                else
-                {
-                    checkForReattack = true;
-                    km->setTriggered(noteNumber, true);
-                }
+                if (km->isInverted()) checkForSustain = true;
+                else checkForReattack = true;
             }
         }
     }
@@ -676,16 +667,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
     {
         if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
         {
-            if (km->isInverted())
-            {
-                foundReattack = true;
-                km->setTriggered(noteNumber, true);
-            }
-            else
-            {
-                foundSustain = true;
-                km->setTriggered(noteNumber, false);
-            }
+            if (km->isInverted()) foundReattack = true;
+            else foundSustain = true;
         }
     }
     if (foundSustain) attemptSustain(noteNumber, velocity, channel, mappedFrom, soundfont, source);

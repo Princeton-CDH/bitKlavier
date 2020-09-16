@@ -589,7 +589,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             if (km->getAllMidiInputIdentifiers().contains(source))
             {
                 activeSource = true;
-                if (harmonizer == false)
+                if (!harmonizer)
 				{
                     if (km->getMidiEdit())
                     {
@@ -606,35 +606,46 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                         km->toggleHarmonizerList(noteNumber);
                         //return;
                     }
-                    else
+                    else if (km->containsNote(noteNumber))
                     {
                         Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true, true);
                         for (int i = 0; i < harmonizer.size(); i++)
                         {
                             handleNoteOn(harmonizer[i], velocity, channel, noteNumber, source, true);
                         }
+                        if (!km->isInverted())
+                        {
+                            if (km->getAllNotesOff())
+                                clearBitKlavier();
+                            
+                            if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
+                                sustainActivate();
+                            
+                            km->setTriggered(noteNumber, true);
+                        }
+                        else
+                        {
+                            km->setTriggered(noteNumber, false);
+                            if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
+                                sustainDeactivate();
+                        }
                     }
-                }
-                if (!km->isInverted() && km->containsNote(noteNumber) && km->getAllNotesOff())
-                {
-                    clearBitKlavier();
                 }
             }   
         }
     }
-    if (harmonizer == false) return;
+    if (!harmonizer) return;
+    if (!activeSource) return;
     
     String key = source + "n" + String(mappedFrom);
     bool noteDown = noteOn.getUnchecked(noteNumber)->size() > 0;
     
-    if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
+    if (getDefaultMidiInputIdentifiers().contains(source))
     {
         ++noteOnCount;
         noteOn.getUnchecked(noteNumber)->set(key, noteNumber);
         noteVelocity.getUnchecked(noteNumber)->set(key, velocity);
     }
-    
-    if (!activeSource) return;
     
     // Check PianoMap for whether piano should change due to key strike.
     for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
@@ -705,17 +716,29 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
             if (km->getAllMidiInputIdentifiers().contains(source))
             {
                 activeSource = true;
-                if (harmonizer == false)
+                if (harmonizer == false && km->containsNote(noteNumber))
                 {
                     Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true, true);
                     for (int i = 0; i < harmonizer.size(); i++)
                     {
                         handleNoteOff(harmonizer[i], velocity, channel, noteNumber, source, true);
                     }
-                }
-                if (km->isInverted() && km->containsNote(noteNumber) && km->getAllNotesOff())
-                {
-                    clearBitKlavier();
+                    if (km->isInverted())
+                    {
+                        if (km->getAllNotesOff())
+                            clearBitKlavier();
+                        
+                        if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
+                            sustainActivate();
+                        
+                        km->setTriggered(noteNumber, true);
+                    }
+                    else
+                    {
+                        km->setTriggered(noteNumber, false);
+                        if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
+                            sustainDeactivate();
+                    }
                 }
             }
         }

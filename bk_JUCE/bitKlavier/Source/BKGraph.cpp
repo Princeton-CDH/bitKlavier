@@ -574,7 +574,6 @@ void BKItem::timerCallback()
             type == PreparationTypeSynchronic ||
             type == PreparationTypeNostalgic)
         {
-            
             repaint();
         }
     }

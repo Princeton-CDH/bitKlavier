@@ -32,7 +32,8 @@ harKey(60),
 harPreTranspose(0),
 harPostTranspose(0),
 ignoreSustain(false),
-allNotesOff(false)
+allNotesOff(false),
+sustainPedalKeys(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -76,7 +77,8 @@ harKey(k->getHarKey()),
 harPreTranspose(k->getHarPreTranspose()),
 harPostTranspose(k->getHarPostTranspose()),
 ignoreSustain(k->getIgnoreSustain()),
-allNotesOff(k->getAllNotesOff())
+allNotesOff(k->getAllNotesOff()),
+sustainPedalKeys(k->getSustainPedalKeys())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -126,7 +128,8 @@ harKey(k->getHarKey()),
 harPreTranspose(k->getHarPreTranspose()),
 harPostTranspose(k->getHarPostTranspose()),
 ignoreSustain(k->getIgnoreSustain()),
-allNotesOff(k->getAllNotesOff())
+allNotesOff(k->getAllNotesOff()),
+sustainPedalKeys(k->getSustainPedalKeys())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -179,7 +182,8 @@ harKey(60),
 harPreTranspose(0),
 harPostTranspose(0),
 ignoreSustain(false),
-allNotesOff(false)
+allNotesOff(false),
+sustainPedalKeys(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -534,6 +538,8 @@ void Keymap::print(void)
 
 void Keymap::copyKeyPatternToAll(int keyToCopy)
 {
+    keyToCopy += harPreTranspose;
+    if (keyToCopy < 0 || harmonizerKeys.size() <= keyToCopy) return;
     for (int i = 0; i < 128; i++)
     {
         Array<int> tempArray = harmonizerKeys[i];
@@ -545,6 +551,8 @@ void Keymap::copyKeyPatternToAll(int keyToCopy)
 
 void Keymap::copyKeyMappingToAll(int keyToTrap)
 {
+    keyToTrap += harPreTranspose;
+    if (keyToTrap < 0 || harmonizerKeys.size() <= keyToTrap) return;
     for (int i = 0; i < 128; i++)
     {
         Array<int> tempArray = harmonizerKeys[i];
@@ -556,6 +564,8 @@ void Keymap::copyKeyMappingToAll(int keyToTrap)
 
 void Keymap::copyKeyPatternToOctaves(int keyToCopy)
 {
+    keyToCopy += harPreTranspose;
+    if (keyToCopy < 0 || harmonizerKeys.size() <= keyToCopy) return;
     for (int i = keyToCopy % 12; i < 128; i += 12)
     {
         Array<int> tempArray = harmonizerKeys[i];
@@ -567,6 +577,8 @@ void Keymap::copyKeyPatternToOctaves(int keyToCopy)
 
 void Keymap::copyKeyMappingToOctaves(int keyToTrap)
 {
+    keyToTrap += harPreTranspose;
+    if (keyToTrap < 0 || harmonizerKeys.size() <= keyToTrap) return;
     for (int i = keyToTrap % 12; i < 128; i += 12)
     {
         Array<int> tempArray = harmonizerKeys[i];
@@ -578,6 +590,8 @@ void Keymap::copyKeyMappingToOctaves(int keyToTrap)
 
 void Keymap::mirrorKey(int keyCenter)
 {
+    keyCenter += harPreTranspose;
+    if (keyCenter < 0 || harmonizerKeys.size() <= keyCenter) return;
     harmonizerKeys.set(keyCenter, Array<int>(keyCenter));
     if (keyCenter < 64)
     {

@@ -98,6 +98,7 @@ private:
 
     ToggleButton endKeystrokesToggle;
     ToggleButton ignoreSustainToggle;
+    ToggleButton sustainPedalKeysToggle;
 
     //stuff for trap/mirror/harmonizer tab - TRT
 

@@ -394,6 +394,8 @@ void BKSynthesiser::renderVoices (AudioBuffer<float>& buffer, int startSample, i
 {
     for (int i = voices.size(); --i >= 0;)
         voices.getUnchecked (i)->renderNextBlock (buffer, startSample, numSamples);
+    
+    
 }
 
 void BKSynthesiser::renderVoices (AudioBuffer<double>& buffer, int startSample, int numSamples)

@@ -155,10 +155,16 @@ float BKDelayL::nextOutRight()
 }
 
 //allows addition of samples without incrementing delay position value
-void BKDelayL::addSample(float input, unsigned long offset, int channel)
+void BKDelayL::addSample(float input, int offset, int channel)
 {
-    if (inPoint >= inputs.getNumSamples()) inPoint = 0;
-    inputs.addSample(channel, (inPoint + offset) % inputs.getNumSamples(), input * gain);
+    inputs.addSample(channel, (inPoint + offset) % inputs.getNumSamples(), input);
+}
+
+void BKDelayL::addSamples(float* input, int numSamples, int offset, int channel)
+{
+//    inputs.addFrom(channel, (inPoint + offset) % inputs.getNumSamples(), input, numSamples);
+    for (int i = 0; i < numSamples; ++i)
+        inputs.addSample(channel, (inPoint + offset + i) % inputs.getNumSamples(), input[i]);
 }
 
 //redo so it has channel argument, like addSample, also bool which indicates whether to increment inPoint
@@ -198,7 +204,7 @@ void BKDelayL::tick(float input, float* outputs, float outGain, bool stereo)
     }
 }
 
-void BKDelayL::scalePrevious(float coefficient, unsigned long offset, int channel)
+void BKDelayL::scalePrevious(float coefficient, int offset, int channel)
 {
     if (loading) return;
 	inputs.setSample(channel, (inPoint + offset) % inputs.getNumSamples(), inputs.getSample(channel, (inPoint + offset) % inputs.getNumSamples()) * coefficient);
@@ -266,10 +272,14 @@ BlendronicDelay::~BlendronicDelay()
     DBG("Destroy bdelay");
 }
 
-
-void BlendronicDelay::addSample(float sampleToAdd, unsigned long offset, int channel)
+void BlendronicDelay::addSample(float sampleToAdd, int offset, int channel)
 {
     if (dInputOpen) delayLinear->addSample(sampleToAdd, offset, channel);
+}
+
+void BlendronicDelay::addSamples(float* samplesToAdd, int numSamples, int offset, int channel)
+{
+    if (dInputOpen) delayLinear->addSamples(samplesToAdd, numSamples, offset, channel);
 }
 
 void BlendronicDelay::tick(float* outputs, float outGain)

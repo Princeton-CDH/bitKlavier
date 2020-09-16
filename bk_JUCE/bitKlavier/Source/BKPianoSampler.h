@@ -255,7 +255,6 @@ private:
 
 	float blendronicLevel;
 	BlendronicProcessor::PtrArr blendronic;
-
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)
 };

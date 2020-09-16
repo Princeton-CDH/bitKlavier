@@ -60,18 +60,19 @@ public:
 
 	float nextOutLeft();
 	float nextOutRight();
-	void addSample(float input, unsigned long offset, int channel);
+	void addSample(float input, int offset, int channel);
+    void addSamples(float* input, int numSamples, int offset, int channel);
 	void tick(float input, float* outputs, float outGain, bool stereo = true);
-	void scalePrevious(float coefficient, unsigned long offset, int channel);
+	void scalePrevious(float coefficient, int offset, int channel);
     void clear();
     void reset();
     
     inline void setSampleRate(double sr) { sampleRate = sr; }
 
+    AudioBuffer<float> inputs;
 private:
     CriticalSection lock;
     
-	AudioBuffer<float> inputs;
 	int inPoint;
 	int outPoint;
     int bufferSize;
@@ -180,7 +181,9 @@ public:
     inline const float getSample(int c, int i) const noexcept { return delayLinear->getSample(c, i); }
 
 	//mutators
-	void addSample(float sampleToAdd, unsigned long offset, int channel); //adds input sample into the delay line (first converted to float)
+	void addSample(float sampleToAdd, int offset, int channel); //adds input sample into the delay line (first converted to float)
+    void addSamples(float* samplesToAdd, int numSamples, int offset, int channel);
+        
 	inline void setBufferSize(int bufferSize)
     {
         dBufferSize = bufferSize;

@@ -884,7 +884,7 @@ public:
 	//accessors
 	inline Blendronic::Ptr getBlendronic(void) const noexcept { return blendronic; }
 	inline TempoProcessor::Ptr getTempo(void) const noexcept { return tempo; }
-	inline BlendronicDelay::Ptr getDelay(void) const noexcept { return delay; }
+	inline BlendronicDelay* getDelay(void) const noexcept { return delay; }
 	inline int getId(void) const noexcept { return blendronic->getId(); }
     inline int getTempoId(void) const noexcept { return tempo->getId(); }
 	inline const float getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
