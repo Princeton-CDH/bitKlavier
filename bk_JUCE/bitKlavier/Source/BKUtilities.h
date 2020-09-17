@@ -212,7 +212,7 @@ inline PopupMenu getEditMenuStandalone(LookAndFeel* laf, int numItemsSelected, b
     if (!rightClick)
     {
         menu.addSeparator();
-        menu.addItem(OFF_ID, "All Off");
+        menu.addItem(OFF_ID, "All Off" + gAllOffShortcut);
     }
 
     return std::move(menu);
@@ -271,7 +271,7 @@ inline PopupMenu getEditMenu(LookAndFeel* laf, int numItemsSelected, bool onGrap
     if (!rightClick)
     {
         menu.addSeparator();
-        menu.addItem(OFF_ID, "All Off");
+        menu.addItem(OFF_ID, "All Off" + gAllOffShortcut);
     }
     
     return std::move(menu);

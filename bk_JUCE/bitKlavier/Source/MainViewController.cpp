@@ -414,9 +414,12 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
     DirectModification::Ptr dMod;
     SynchronicModification::Ptr sMod;
     NostalgicModification::Ptr nMod;
-    bool directSelected, directModSelected = false;
-    bool synchronicSelected, synchronicModSelected = false;
-    bool nostalgicSelected, nostalgicModSelected = false;
+    bool directSelected = false;
+    bool directModSelected = false;
+    bool synchronicSelected = false;
+    bool synchronicModSelected = false;
+    bool nostalgicSelected = false;
+    bool nostalgicModSelected = false;
     if (!globalSoundSetButton.getToggleState() && construction.getNumSelected() == 1)
     {
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
@@ -1321,7 +1324,8 @@ void MainViewController::timerCallback()
         }
         else if (processor.updateState->editsMade)
         {
-            processor.saveGalleryToHistory(cDisplayNames[prevDisplay] + " Edits");
+            if (0 < prevDisplay && prevDisplay < DisplayNil)
+                processor.saveGalleryToHistory(cDisplayNames[prevDisplay] + " Edits");
         }
             
     }

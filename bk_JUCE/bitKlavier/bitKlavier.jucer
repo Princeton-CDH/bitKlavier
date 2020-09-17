@@ -585,7 +585,7 @@
       </MODULEPATHS>
     </VS2017>
     <VS2019 targetFolder="Builds/VisualStudio2019" bigIcon="iHGLGD" windowsTargetPlatformVersion="10.0.18362.0"
-            vstLegacyFolder="C:\Users\theot\Desktop\Work\Summer work\bitKlavier\bk_JUCE\bitKlavier\Builds\VisualStudio2019"
+            vstLegacyFolder="..\..\..\..\Desktop\vstsdk365_12_11_2015_build_67\VST3 SDK"
             vst3Folder="C:\Users\theot\Desktop\Work\Summer work\bitKlavier\bk_JUCE\bitKlavier\Builds\VisualStudio2019">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug"/>

@@ -75,7 +75,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
 //        processor.regions.clear();
 //        processor.regions.ensureStorageAllocated(processor.regions.size()+1);
         processor.regions.set(loadingSoundSetId, sfzsound->getRegions());
-        processor.progress = 0.0;
         progressInc = 1.0 / processor.regions.getReference(loadingSoundSetId).size();
     }
     else    return jobStatus;

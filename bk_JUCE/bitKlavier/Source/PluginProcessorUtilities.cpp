@@ -24,6 +24,8 @@ void BKAudioProcessor::updateUI(void)
     
     updateState->directDidChange = true;
     updateState->keymapDidChange = true;
+
+    updateState->editsMade = false;
 }
 
 OwnedArray<HashMap<String, int>>& BKAudioProcessor::getNoteOns()

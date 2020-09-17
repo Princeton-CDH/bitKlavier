@@ -103,6 +103,7 @@ static const std::string gAlignShortcut = " (CMD+Arrow)";
 static const std::string gMidiEditShortcut = " (CMD+E)";
 static const std::string gUndoShortcut = " (CMD+Z)";
 static const std::string gRedoShortcut = " (CMD+SHIFT+Z)";
+static const std::string gAllOffShortcut = " (Space)";
 #elif JUCE_WINDOWS
 static const std::string gKeymapShortcut = " (K)";
 static const std::string gDirectShortcut = " (D)";
@@ -129,6 +130,7 @@ static const std::string gAlignShortcut = " (CTRL+Arrow)";
 static const std::string gMidiEditShortcut = " (CTRL+E)";
 static const std::string gUndoShortcut = " (CTRL+Z)";
 static const std::string gRedoShortcut = " (CTRL+SHIFT+Z)";
+static const std::string gAllOffShortcut = " (Space)";
 #elif JUCE_IOS
 static const std::string gKeymapShortcut = "";
 static const std::string gDirectShortcut = "";
@@ -153,6 +155,7 @@ static const std::string gDisconnectFromShortcut = "";
 static const std::string gDisconnectBetweenShortcut = "";
 static const std::string gAlignShortcut = "";
 static const std::string gMidiEditShortcut = "";
+static const std::string gAllOffShortcut = "";
 #endif
 
 #endif  // GRAPHICSCONSTANTS_H_INCLUDED
