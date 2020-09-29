@@ -25,6 +25,14 @@ tuner(tuning),
 blendronic(blend),
 keymaps(Keymap::PtrArr())
 {
+    velocities.ensureStorageAllocated(128);
+    velocitiesActive.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++)
+    {
+        velocities.insert(i, 0.);
+        velocitiesActive.insert(i, 0);
+    }
+    
     if (!direct->sPrep->getUseGlobalSoundSet())
     {
         // comes in as "soundfont.sf2.subsound1"
@@ -70,7 +78,29 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 {
     tuner->getOffset(noteNumber, true);
     
-    for (auto t : direct->aPrep->getTransposition())
+    lastVelocity = velocity;
+    
+    DirectPreparation::Ptr prep = direct->aPrep;
+    
+    // check velocity filtering
+    //  need to save old velocity, in case this new velocity failes the velocity test
+    float velocitySave = velocitiesActive.getUnchecked(noteNumber);
+    
+    // save this velocity, for velocity checks, here and in keyRelease()
+    velocities.set(noteNumber, velocity); // used for velocity checks
+    
+    // save this as the active velocity, for playback as well
+    velocitiesActive.set(noteNumber, velocity); // used for actual note playback velocity
+    
+    // check the velocity
+    if (!velocityCheck(noteNumber))
+    {
+        // need to set the active velocity back to what it was, since we're going to ignore this one
+        velocitiesActive.set(noteNumber, velocitySave);
+        return;
+    }
+    
+    for (auto t : prep->getTransposition())
     {
         // synthNoteNumber is what determines what sample is chosen
         // without transposition or extreme tuning, this will be the same as noteNumber
@@ -82,7 +112,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         float synthOffset; // offset from actual sample played, always less than 1.
         
         // tune the transposition
-        if (direct->aPrep->getTranspUsesTuning()) // use the Tuning setting
+        if (prep->getTranspUsesTuning()) // use the Tuning setting
             offset = t + tuner->getOffset(round(t) + noteNumber, false);
         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
             offset = t + tuner->getOffset(noteNumber, false);
@@ -104,8 +134,8 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          noteNumber,
                          synthNoteNumber,
                          synthOffset,
-                         velocity,
-                         direct->aPrep->getGain() * aGlobalGain,
+                         velocitiesActive.getUnchecked(noteNumber),
+                         prep->getGain() * aGlobalGain,
                          Forward,
                          Normal,
                          MainNote,
@@ -113,10 +143,10 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          direct->getId(),
                          0,     // start
                          0,     // length
-                         direct->aPrep->getAttack(),
-                         direct->aPrep->getDecay(),
-                         direct->aPrep->getSustain(),
-                         direct->aPrep->getRelease(),
+                         prep->getAttack(),
+                         prep->getDecay(),
+                         prep->getSustain(),
+                         prep->getRelease(),
                          tuner,
                          1.,
                          //b->getBlendronic()->aPrep->getInputGain(),
@@ -125,23 +155,23 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 		else
 		{
 			synth->keyOn(channel,
-				noteNumber,
-				synthNoteNumber,
-				synthOffset,
-				velocity,
-				direct->aPrep->getGain() * aGlobalGain,
-				Forward,
-				Normal,
-				MainNote,
-                direct->aPrep->getSoundSet(), //set
-				direct->getId(),
-				0,     // start
-				0,     // length
-				direct->aPrep->getAttack(),
-				direct->aPrep->getDecay(),
-				direct->aPrep->getSustain(),
-				direct->aPrep->getRelease(),
-				tuner);
+                         noteNumber,
+                         synthNoteNumber,
+                         synthOffset,
+                         velocitiesActive.getUnchecked(noteNumber),
+                         prep->getGain() * aGlobalGain,
+                         Forward,
+                         Normal,
+                         MainNote,
+                         prep->getSoundSet(), //set
+                         direct->getId(),
+                         0,     // start
+                         0,     // length
+                         prep->getAttack(),
+                         prep->getDecay(),
+                         prep->getSustain(),
+                         prep->getRelease(),
+                         tuner);
 		}
         
         //store synthNoteNumbers by noteNumber
@@ -155,6 +185,8 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 #define RES_GAIN_SCALE 0.2f
 void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, bool soundfont)
 {
+    if (!velocityCheck(noteNumber)) return;
+    
     for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
     {
         int t = keyPlayed[noteNumber].getUnchecked(i);
@@ -166,7 +198,8 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
                       direct->getId(),
                       noteNumber,
                       t,
-                      velocity,
+                      velocitiesActive.getUnchecked(noteNumber),
+                      direct->aPrep->getGain() * aGlobalGain,
                       true);
     }
 
@@ -205,7 +238,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
                                        noteNumber,
                                        t,
                                        0,
-                                       velocity,
+                                       velocitiesActive.getUnchecked(noteNumber),
                                        hGain * HAMMER_GAIN_SCALE,
                                        Forward,
                                        Normal,
@@ -227,7 +260,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
                                       noteNumber,
                                       t,
                                       t_offset,
-                                      velocity,
+                                      velocitiesActive.getUnchecked(noteNumber),
                                       rGain * RES_GAIN_SCALE,
                                       Forward,
                                       Normal,
@@ -243,6 +276,34 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
             }
         }
     }
+}
+
+bool DirectProcessor::velocityCheck(int noteNumber)
+{
+    DirectPreparation::Ptr prep = direct->aPrep;
+    
+    int velocity = (int)(velocities.getUnchecked(noteNumber) * 127.0);
+    
+    if (velocity > 127) velocity = 127;
+    if (velocity < 0)   velocity = 0;
+    
+    if(prep->getVelocityMin() <= prep->getVelocityMax())
+    {
+        if (velocity >= prep->getVelocityMin() && velocity <= prep->getVelocityMax())
+        {
+            return true;
+        }
+    }
+    else
+    {
+        if (velocity >= prep->getVelocityMin() || velocity <= prep->getVelocityMax())
+        {
+            return true;
+        }
+    }
+    
+    DBG("failed velocity check");
+    return false;
 }
 
 void DirectProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoadType type)

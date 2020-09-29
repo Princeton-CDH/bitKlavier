@@ -100,6 +100,8 @@ public:
 BKAudioProcessor::BKAudioProcessor(void):
 updateState(new BKUpdateState()),
 loader(),
+progress(0),
+progressInc(0),
 mainPianoSynth(*this),
 hammerReleaseSynth(*this),
 resonanceReleaseSynth(*this),
@@ -109,9 +111,7 @@ currentSampleRate(44100.),
 doneWithSetStateInfo(false),
 midiReady(false),
 tooltipsEnabled(true),
-hotkeysEnabled(true),
-progress(0),
-progressInc(0)
+hotkeysEnabled(true)
 {
 #if BK_UNIT_TESTS
     
@@ -874,6 +874,7 @@ void BKAudioProcessor::sustainDeactivate(void)
                           0,
                           21,
                           21,
+                          1.,
                           1.,
                           true);
         

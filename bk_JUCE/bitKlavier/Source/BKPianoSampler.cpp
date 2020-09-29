@@ -135,6 +135,7 @@ bool BKPianoSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
 void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      const float offset,
                                      const float gain,
+                                     const float velocity,
                                      PianoSamplerNoteDirection direction,
                                      PianoSamplerNoteType type,
                                      BKNoteType bktype,
@@ -152,6 +153,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      offset,
                                      64,
                                      gain,
+                                     velocity,
                                      direction,
                                      type,
                                      bktype,
@@ -223,6 +225,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                                      const float pitchoffset,
                                      const int pitchWheelValue,
                                      const float gain,
+                                     const float velocity,
                                      PianoSamplerNoteDirection direction,
                                      PianoSamplerNoteType type,
                                      BKNoteType bktype,
@@ -378,6 +381,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
         lgain = gain;
         rgain = gain;
         
+        noteVelocity = velocity;
+        
         lengthTracker = 0.0;
         
         inLoop = false;
@@ -396,8 +401,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
         {
             samplePosition = sourceSamplePosition; //DT addition
             
-            lgain *= 0.5;
-            rgain *= 0.5;
+            noteVelocity *= 0.5;
             
             //cfSamples = 10.0;  //DT: 10 samples too small...
             cfSamples = getSampleRate() / 50.; //20ms; possibly an issue if the loop length is really small, but 20ms is a typical ramp length
@@ -667,23 +671,23 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             }
         }
         
-        const float l = lgain * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
-        const float r = rgain * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
+        const float l = noteVelocity * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
+        const float r = noteVelocity * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
 
         if (outR != nullptr)
         {
-            *outL++ += l;
-            *outR++ += r;
+            *outL++ += l * lgain;
+            *outR++ += r * rgain;
         }
         else
         {
-            *outL++ += ((l + r) * 0.5f);
+            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f;
         }
         
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain, addCounter, 1);
         }
         addCounter++;
     }
@@ -832,23 +836,23 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
             DBG("Invalid note direction.");
         }
         
-        const float l = lgain * adsr.tick() * (sampleL * sampleEnv.tick());
-        const float r = rgain * adsr.lastOut() * (sampleR * sampleEnv.lastOut());
+        const float l = noteVelocity * adsr.tick() * (sampleL * sampleEnv.tick());
+        const float r = noteVelocity * adsr.lastOut() * (sampleR * sampleEnv.lastOut());
 
         if (outR != nullptr)
         {
-            *outL++ += l;
-            *outR++ += r;
+            *outL++ += l * lgain;
+            *outR++ += r * rgain;
         }
         else
         {
-            *outL++ += ((l + r) * 0.5f);
+            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f;
         }
         
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain, addCounter, 1);
         }
         addCounter++;
     }
@@ -937,8 +941,8 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         const float invAlpha = 1.0f - alpha;
         int next = pos + 1;
 
-        const float l = (inL [pos] * invAlpha + inL [next] * alpha) * lgain * adsr.tick();
-        const float r = ((inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : l) * rgain * adsr.lastOut();
+        const float l = (inL [pos] * invAlpha + inL [next] * alpha) * noteVelocity * adsr.tick();
+        const float r = ((inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : l) * noteVelocity * adsr.lastOut();
         
         if (adsr.getState() == BKADSR::IDLE)
         {
@@ -948,12 +952,12 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
 
 		if (outR != nullptr)
 		{
-			*outL++ += (l * 1.0f);
-			*outR++ += (r * 1.0f);
+			*outL++ += (l * lgain);
+			*outR++ += (r * rgain);
 		}
 		else
 		{
-			*outL++ += ((l + r) * 0.5f) * 1.0f;
+            *outL++ += (l * lgain) + (r * rgain) * 0.5f;
 		}
         if (playDirection == Forward)
         {
@@ -998,8 +1002,8 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain, addCounter, 1);
         }
         addCounter++;
     }

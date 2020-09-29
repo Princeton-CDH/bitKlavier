@@ -553,7 +553,8 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 				keyNoteNumber,
 				noteNumber,
 				transposition,
-				velocity * gain,
+				gain,
+                velocity,
 				direction,
 				type,
 				bktype,
@@ -585,7 +586,8 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 	const int keyNoteNumber,
 	const int midiNoteNumber,
 	const float midiNoteNumberOffset,
-	const float volume,
+	const float gain,
+    const float velocity,
 	PianoSamplerNoteDirection direction,
 	PianoSamplerNoteType type,
 	BKNoteType bktype,
@@ -605,7 +607,8 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 		keyNoteNumber,
 		midiNoteNumber,
 		midiNoteNumberOffset,
-		volume,
+		gain,
+        velocity,
 		direction,
 		type,
 		bktype,
@@ -628,7 +631,8 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 	const int keyNoteNumber,
 	const int midiNoteNumber,
 	const float midiNoteNumberOffset,
-	const float volume,
+	const float gain,
+    const float velocity,
 	PianoSamplerNoteDirection direction,
 	PianoSamplerNoteType type,
 	BKNoteType bktype,
@@ -668,17 +672,18 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 		voice->blendronic = blendronic;
 
 
-		float gain = volume;
+		float g = gain;
 
 		if (sound->region_ != nullptr)
 		{
-			gain *= Decibels::decibelsToGain(sound->region_->volume);
+			g *= Decibels::decibelsToGain(sound->region_->volume);
 		}
 
 		voice->startNote(midiNoteNumber,
 			midiNoteNumberOffset,
 			pitchWheelValue,
-			gain,
+			g,
+            velocity,
 			direction,
 			type,
 			bktype,
@@ -711,6 +716,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
 	const int keyNoteNumber,
 	const int midiNoteNumber,
 	const float velocity,
+    const float gain,
 	bool allowTailOff,
 	bool nostalgicOff)
 {
@@ -787,6 +793,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
 				keyNoteNumber,
 				noteNumber,
 				0, // might need to deal with this
+                gain,
 				velocity,
 				Forward,
 				FixedLengthFixedStart,

@@ -34,6 +34,7 @@ public:
     std::unique_ptr<BKSingleSlider> gainSlider;
     std::unique_ptr<BKSingleSlider> resonanceGainSlider;
     std::unique_ptr<BKSingleSlider> hammerGainSlider;
+    std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
     
     std::unique_ptr<BKADSRSlider> ADSRSlider;
     
@@ -66,7 +67,9 @@ public DirectViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
 public BKStackedSlider::Listener,
-public BKADSRSlider::Listener
+public BKADSRSlider::Listener,
+public BKRangeSlider::Listener,
+public Timer
 {
 public:
     
@@ -81,10 +84,12 @@ public:
     void buttonClicked (Button* b) override;
     void BKEditableComboBoxChanged(String name, BKEditableComboBox* cb) override;
     void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
-    
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
     void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
+    void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    
+    void timerCallback() override;
     
     void closeSubWindow();
     
@@ -107,7 +112,9 @@ public DirectViewController,
 public BKEditableComboBoxListener,
 public BKSingleSlider::Listener,
 public BKStackedSlider::Listener,
-public BKADSRSlider::Listener
+public BKADSRSlider::Listener,
+public BKRangeSlider::Listener,
+public Timer
 {
 public:
     
@@ -129,6 +136,9 @@ public:
     void BKStackedSliderValueChanged(String name, Array<float> val) override;
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
     void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
+    void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    
+    void timerCallback() override;
     
     void greyOutAllComponents();
     void highlightModedComponents();

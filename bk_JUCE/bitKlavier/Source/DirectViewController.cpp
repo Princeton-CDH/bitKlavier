@@ -48,6 +48,11 @@ BKViewController(p, theGraph, 1)
     hammerGainSlider->setToolTipString("Adjusts mechanical noise sample based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*hammerGainSlider);
     
+    velocityMinMaxSlider = std::make_unique<BKRangeSlider>("velocity min/max", 0, 127, 0, 127, 1);
+    velocityMinMaxSlider->setToolTipString("Sets Min and Max velocity (0-127) to trigger this Direct; Min can be greater than Max");
+    velocityMinMaxSlider->setJustifyRight(true);
+    addAndMakeVisible(*velocityMinMaxSlider, ALL);
+    
     ADSRSlider = std::make_unique<BKADSRSlider>("ADSR");
     ADSRSlider->setButtonText("edit envelope");
     ADSRSlider->setToolTip("adjust Attack, Decay, Sustain, and Release envelope parameters");
@@ -66,6 +71,7 @@ BKViewController(p, theGraph, 1)
     gainSlider->addWantsBigOneListener(this);
     resonanceGainSlider->addWantsBigOneListener(this);
     hammerGainSlider->addWantsBigOneListener(this);
+    velocityMinMaxSlider->addWantsBigOneListener(this);s
 #endif
     
     addAndMakeVisible(actionButton);
@@ -87,6 +93,8 @@ void DirectViewController::invisible(void)
     
     transpositionSlider->setVisible(false);
     transpUsesTuning.setVisible(false);
+    
+    velocityMinMaxSlider->setVisible(false);
     //etc...
 }
 
@@ -134,9 +142,10 @@ void DirectViewController::displayTab(int tab)
         ADSRSlider->setVisible(true);
         transpositionSlider->setVisible(true);
         transpUsesTuning.setVisible(true);
+        velocityMinMaxSlider->setVisible(true);
         
         Rectangle<int> area (getBounds());
-        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromTop(selectCB.getHeight() + 70 * processor.paddingScalarY + 4 + gYSpacing);
         area.removeFromBottom(gYSpacing + 30 * processor.paddingScalarY);
         area.removeFromLeft(processor.paddingScalarX * 20);
         area.removeFromRight(processor.paddingScalarX * 20);
@@ -154,10 +163,10 @@ void DirectViewController::displayTab(int tab)
         resonanceGainSlider->setBounds(leftColumn.removeFromBottom(columnHeight / 3));
         hammerGainSlider->setBounds(leftColumn.removeFromBottom(columnHeight / 3));
     
-        area.removeFromBottom(gainSlider->getHeight());
+        velocityMinMaxSlider->setBounds(area.removeFromBottom(gainSlider->getHeight() + 9 * processor.paddingScalarY));
+        area.removeFromBottom(21 * processor.paddingScalarY);
         transpUsesTuning.setBounds(area.removeFromBottom(gComponentToggleBoxHeight));
         transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
-
     }
     else if (tab == 1)
     {
@@ -343,8 +352,9 @@ DirectViewController(p, theGraph)
     hammerGainSlider->addMyListener(this);
     ADSRSlider->addMyListener(this);
     transpUsesTuning.addListener(this);
+    velocityMinMaxSlider->addMyListener(this);
     
-    
+    startTimer(30);
 }
 
 void DirectPreparationEditor::update(void)
@@ -369,6 +379,9 @@ void DirectPreparationEditor::update(void)
         ADSRSlider->setSustainValue(prep->getSustain(), dontSendNotification);
         ADSRSlider->setReleaseValue(prep->getRelease(), dontSendNotification);
         transpUsesTuning.setToggleState(prep->getTranspUsesTuning(), dontSendNotification);
+        
+        velocityMinMaxSlider->setMinValue(prep->getVelocityMin(), dontSendNotification);
+        velocityMinMaxSlider->setMaxValue(prep->getVelocityMax(), dontSendNotification);
     }
 }
 
@@ -571,6 +584,22 @@ void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     processor.updateState->editsMade = true;
 }
 
+void DirectPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    
+    if(name == "velocity min/max") {
+        DBG("got new velocity min/max " + String(minval) + " " + String(maxval));
+        prep->setVelocityMin(minval);
+        prep->setVelocityMax(maxval);
+        active->setVelocityMin(minval);
+        active->setVelocityMax(maxval);
+    }
+    
+    processor.updateState->editsMade = true;
+}
+
 void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
     DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
@@ -605,6 +634,17 @@ void DirectPreparationEditor::BKADSRButtonStateChanged(String name, bool mod, bo
 {
     setShowADSR(!state);
     setSubWindowInFront(!state);
+}
+
+void DirectPreparationEditor::timerCallback()
+{
+    if (processor.updateState->currentDisplay == DisplayDirect)
+    {
+        DirectProcessor::Ptr dProcessor = processor.currentPiano->getDirectProcessor(processor.updateState->currentDirectId);
+        DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+        velocityMinMaxSlider->setDisplayValue(dProcessor->getLastVelocity() * 127.);
+        DBG("sProcessor->getLastVelocity() = " + String(dProcessor->getLastVelocity()));
+    }
 }
 
 void DirectPreparationEditor::closeSubWindow()
@@ -708,6 +748,9 @@ DirectViewController(p, theGraph)
     hammerGainSlider->addMyListener(this);
     ADSRSlider->addMyListener(this);
     transpUsesTuning.addListener(this);
+    velocityMinMaxSlider->addMyListener(this);
+    
+    velocityMinMaxSlider->displaySliderVisible(false);
 }
 
 void DirectModificationEditor::greyOutAllComponents()
@@ -718,6 +761,7 @@ void DirectModificationEditor::greyOutAllComponents()
     gainSlider->setDim(gModAlpha);
     ADSRSlider->setDim(gModAlpha);
     transpUsesTuning.setAlpha(gModAlpha);
+    velocityMinMaxSlider->setDim(gModAlpha);
 }
 
 void DirectModificationEditor::highlightModedComponents()
@@ -730,6 +774,8 @@ void DirectModificationEditor::highlightModedComponents()
     if(mod->getDirty(DirectHammerGain))       hammerGainSlider->setBright();
     if(mod->getDirty(DirectADSR))             ADSRSlider->setBright();
     if(mod->getDirty(DirectTranspUsesTuning)) transpUsesTuning.setAlpha(1.);
+    if(mod->getDirty(DirectVelocityMin))      velocityMinMaxSlider->setBright();
+    if(mod->getDirty(DirectVelocityMax))      velocityMinMaxSlider->setBright();
 }
 
 void DirectModificationEditor::update(void)
@@ -751,6 +797,8 @@ void DirectModificationEditor::update(void)
         gainSlider->setValue(mod->getGain(), dontSendNotification);
         ADSRSlider->setValue(mod->getADSRvals(), dontSendNotification);
         transpUsesTuning.setToggleState(mod->getTranspUsesTuning(), dontSendNotification);
+        velocityMinMaxSlider->setMinValue(mod->getVelocityMin(), dontSendNotification);
+        velocityMinMaxSlider->setMaxValue(mod->getVelocityMax(), dontSendNotification);
     }
 }
 
@@ -982,6 +1030,24 @@ void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
     updateModification();
 }
 
+void DirectModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    
+    if (name == "velocity min/max")
+    {
+        mod->setVelocityMin(minval);
+        mod->setDirty(DirectVelocityMin);
+        
+        mod->setVelocityMax(maxval);
+        mod->setDirty(DirectVelocityMax);
+        
+        velocityMinMaxSlider->setBright();
+    }
+    
+    updateModification();
+}
+
 
 void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
@@ -1060,3 +1126,7 @@ void DirectModificationEditor::buttonClicked (Button* b)
     }
 }
 
+void DirectModificationEditor::timerCallback()
+{
+    
+}

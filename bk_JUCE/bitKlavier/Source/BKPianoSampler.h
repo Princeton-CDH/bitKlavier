@@ -145,6 +145,7 @@ public:
     
     void startNote (int midiNoteNumber,
                     float offset,
+                    float gain,
                     float velocity,
                     PianoSamplerNoteDirection direction,
                     PianoSamplerNoteType type,
@@ -161,6 +162,7 @@ public:
     void startNote (int midiNoteNumber,
                     float offset,
                     int pitchWheelValue,
+                    float gain,
                     float velocity,
                     PianoSamplerNoteDirection direction,
                     PianoSamplerNoteType type,

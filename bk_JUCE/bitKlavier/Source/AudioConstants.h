@@ -156,6 +156,8 @@ const String ptagDirect_reset = "directReset";
 const String vtagDirect_ADSR = "ADSR";
 const String ptagDirect_useGlobalSoundSet = "directUseGlobalSoundSet";
 const String ptagDirect_soundSet = "directSoundSet";
+const String ptagDirect_velocityMin = "velocityMin";
+const String ptagDirect_velocityMax = "velocityMax";
 
 const String vtagTuning = "tuning";
 const String vtagModTuning = "modTuning";
@@ -756,6 +758,8 @@ typedef enum DirectParameterType
     DirectTranspUsesTuning,
     DirectUseGlobalSoundSet,
     DirectSoundSet,
+    DirectVelocityMin,
+    DirectVelocityMax,
     DirectParameterTypeNil,
     
 } DirectParameterType;
@@ -1207,7 +1211,7 @@ static const int aMaxTotalPreparations = 5; // arbitrary, should be dynamic
 static const int aMaxTuningPreparations = 5; // arbitrary, should be dynamic
 static const int aMaxTempoPreparations = 5; // arbitrary, should be dynamic
 
-static const float aGlobalGain = 0.5; //make this user settable
+static const float aGlobalGain = 0.5f; //make this user settable
 
 static const float aMaxSampleLengthSec = 30.0f;
 static const float aRampOnTimeSec = 0.004f;

@@ -20,7 +20,7 @@
 /*
 DirectPreparation holds all the state variable values for the
 Direct preparation. As with other preparation types, bK will use
-two instantiations of SynchronicPreparation for every active
+two instantiations of DirectPreparation for every active
 Direct in the gallery, one to store the static state of the
 preparation, and the other to store the active state. These will
 be the same, unless a Modification is triggered, in which case the
@@ -61,7 +61,9 @@ public:
     dSustain(sust),
     dUseGlobalSoundSet(true),
     dSoundSet(-1),
-    dSoundSetName(String())
+    dSoundSetName(String()),
+    velocityMin(0),
+    velocityMax(127)
     {
         
     }
@@ -78,7 +80,9 @@ public:
     dSustain(1.),
     dUseGlobalSoundSet(true),
     dSoundSet(-1),
-    dSoundSetName(String())
+    dSoundSetName(String()),
+    velocityMin(0),
+    velocityMax(127)
     {
         
     }
@@ -105,6 +109,8 @@ public:
         dUseGlobalSoundSet = d->getUseGlobalSoundSet();
         dSoundSet = d->getSoundSet();
         dSoundSetName = d->getSoundSetName();
+        velocityMin = d->getVelocityMin();
+        velocityMax = d->getVelocityMax();
     }
     
     inline void performModification(DirectPreparation::Ptr d, Array<bool> dirty)
@@ -129,6 +135,9 @@ public:
             dSoundSet = d->getSoundSet();
             dSoundSetName = d->getSoundSetName();
         }
+        
+        if (dirty[DirectVelocityMin]) velocityMin = d->getVelocityMin();
+        if (dirty[DirectVelocityMax]) velocityMax = d->getVelocityMax();
     }
     
     inline bool compare(DirectPreparation::Ptr d)
@@ -200,6 +209,12 @@ public:
         dRelease = vals[3];
     }
     
+    inline const int getVelocityMin() const noexcept { return velocityMin; }
+    inline const int getVelocityMax() const noexcept { return velocityMax; }
+    
+    inline const void setVelocityMin(int min)  { velocityMin = min; }
+    inline const void setVelocityMax(int max)  { velocityMax = max; }
+    
     
     void print(void)
     {
@@ -238,6 +253,9 @@ public:
 
         prep.setProperty( ptagDirect_soundSet, getSoundSetName(), 0);
         
+        prep.setProperty( ptagDirect_velocityMin, getVelocityMin(), 0);
+        prep.setProperty( ptagDirect_velocityMax, getVelocityMax(), 0);
+        
         return prep;
     }
     
@@ -264,6 +282,9 @@ public:
         
         str = e->getStringAttribute(ptagDirect_soundSet);
         setSoundSetName(str);
+        
+        setVelocityMin(e->getIntAttribute(ptagDirect_velocityMin, 0));
+        setVelocityMax(e->getIntAttribute(ptagDirect_velocityMax, 127));
         
         forEachXmlChildElement (*e, sub)
         {
@@ -341,6 +362,8 @@ private:
     bool dUseGlobalSoundSet;
     int dSoundSet;
     String dSoundSetName;
+    
+    int velocityMin, velocityMax;
     
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
@@ -517,7 +540,7 @@ public:
     inline void reset(void)
     {
         direct->aPrep->copy(direct->sPrep);
-        DBG("synchronic reset called"); 
+        DBG("direct reset called"); 
     }
     
     inline int getId(void) const noexcept { return direct->getId(); }
@@ -551,6 +574,10 @@ public:
     {
         return keymaps;
     }
+    
+    inline float getLastVelocity() const noexcept { return lastVelocity; }
+    
+    bool velocityCheck(int noteNumber);
 
 private:
     BKSynthesiser*      synth;
@@ -568,6 +595,11 @@ private:
     //while the key is held
     Array<int>      keyPlayed[128];         //keep track of pitches played associated with particular key on keyboard
     Array<float>    keyPlayedOffset[128];   //and also the offsets
+    
+    Array<float> velocities;
+    Array<float> velocitiesActive;
+    
+    float lastVelocity;
     
     JUCE_LEAK_DETECTOR(DirectProcessor);
 };
