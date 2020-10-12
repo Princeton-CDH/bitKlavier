@@ -11,7 +11,7 @@
 #include "NostalgicViewController.h"
 
 NostalgicViewController::NostalgicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 3)
+BKViewController(p, theGraph, 4)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -83,6 +83,12 @@ BKViewController(p, theGraph, 3)
     gainSlider->setJustifyRight(false);
     addAndMakeVisible(*gainSlider);
     
+    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", 0, 10, 1, 0.01);
+    blendronicGainSlider->setToolTipString("Volume multiplier for Nostalgic output to connected Blendronics");
+    blendronicGainSlider->setSkewFactorFromMidPoint(1.);
+    blendronicGainSlider->setJustifyRight(false);
+    addAndMakeVisible(*blendronicGainSlider);
+    
     addAndMakeVisible(actionButton);
     actionButton.setButtonText("Action");
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
@@ -148,6 +154,7 @@ BKViewController(p, theGraph, 3)
     clusterThresholdSlider->addWantsBigOneListener(this);
     beatsToSkipSlider->addWantsBigOneListener(this);
     gainSlider->addWantsBigOneListener(this);
+    blendronicGainSlider->addWantsBigOneListener(this);
     lengthMultiplierSlider->addWantsBigOneListener(this);
     transpositionSlider->addWantsBigOneListener(this);
     nDisplaySlider.addWantsBigOneListener(this);
@@ -165,6 +172,7 @@ BKViewController(p, theGraph, 3)
 void NostalgicViewController::invisible(void)
 {
     gainSlider->setVisible(false);
+    blendronicGainSlider->setVisible(false);
     lengthMultiplierSlider->setVisible(false);
     beatsToSkipSlider->setVisible(false);
     transpositionSlider->setVisible(false);
@@ -369,6 +377,19 @@ void NostalgicViewController::displayTab(int tab)
         reverseADSRLabel.setBounds(areaSave.removeFromTop(columnHeight * 0.5));
         undertowADSRLabel.setBounds(areaSave.removeFromTop(columnHeight * 0.5));
 
+    }
+    else if (tab == 3)
+    {
+        blendronicGainSlider->setVisible(true);
+        
+        Rectangle<int> area (getBounds());
+        area.removeFromTop(selectCB.getHeight() + 70 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
+        area.removeFromRight(processor.paddingScalarX * 20);
+        
+        area.removeFromTop(processor.paddingScalarY * 30);
+        blendronicGainSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
     }
 }
 
@@ -605,6 +626,8 @@ NostalgicViewController(p, theGraph)
     
     gainSlider->addMyListener(this);
     
+    blendronicGainSlider->addMyListener(this);
+    
     reverseADSRSlider->addMyListener(this);
     undertowADSRSlider->addMyListener(this);
     
@@ -669,6 +692,8 @@ void NostalgicPreparationEditor::update(void)
         
         beatsToSkipSlider->setValue(prep->getBeatsToSkip(), dontSendNotification);
         gainSlider->setValue(prep->getGain(), dontSendNotification);
+        
+        blendronicGainSlider->setValue(prep->getBlendronicGain(), dontSendNotification);
         
         if (currentTab == 0)
         {
@@ -923,6 +948,12 @@ void NostalgicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
         //DBG("gain " + String(val));
         prep->setGain(val);
         active->setGain(val);
+    }
+    else if(name == "blendronic gain")
+    {
+        //DBG("gain " + String(val));
+        prep->setBlendronicGain(val);
+        active->setBlendronicGain(val);
     }
     else if (name == "cluster min")
     {
@@ -1230,6 +1261,8 @@ NostalgicViewController(p, theGraph)
     
     gainSlider->addMyListener(this);
     
+    blendronicGainSlider->addMyListener(this);
+    
     reverseADSRSlider->addMyListener(this);
     undertowADSRSlider->addMyListener(this);
     
@@ -1245,6 +1278,7 @@ void NostalgicModificationEditor::greyOutAllComponents()
     lengthMultiplierSlider->setDim(gModAlpha);
     beatsToSkipSlider->setDim(gModAlpha);
     gainSlider->setDim(gModAlpha);
+    blendronicGainSlider->setDim(gModAlpha);
     reverseADSRSlider->setDim(gModAlpha);
     undertowADSRSlider->setDim(gModAlpha);
     holdTimeMinMaxSlider->setDim(gModAlpha);
@@ -1277,6 +1311,7 @@ void NostalgicModificationEditor::highlightModedComponents()
     if(mod->getDirty(NostalgicBeatsToSkip))       beatsToSkipSlider->setBright();
     if(mod->getDirty(NostalgicMode))              lengthModeSelectCB.setAlpha(1.);
     if(mod->getDirty(NostalgicGain))              gainSlider->setBright();
+    if(mod->getDirty(NostalgicBlendronicGain))    blendronicGainSlider->setBright();
     if(mod->getDirty(NostalgicReverseADSR))       reverseADSRSlider->setBright();
     if(mod->getDirty(NostalgicUndertowADSR))      undertowADSRSlider->setBright();
     if(mod->getDirty(NostalgicHoldMin))           holdTimeMinMaxSlider->setBright();
@@ -1331,6 +1366,8 @@ void NostalgicModificationEditor::update(void)
         lengthMultiplierSlider->setValue(mod->getLengthMultiplier(), dontSendNotification);
         beatsToSkipSlider->setValue(mod->getBeatsToSkip(), dontSendNotification);
         gainSlider->setValue(mod->getGain(), dontSendNotification);
+        
+        blendronicGainSlider->setValue(mod->getBlendronicGain(), dontSendNotification);
 
         reverseADSRSlider->setValue(mod->getReverseADSRvals(), dontSendNotification);
         undertowADSRSlider->setValue(mod->getUndertowADSRvals(), dontSendNotification);
@@ -1626,6 +1663,13 @@ void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         mod->setDirty(NostalgicGain);
         
         gainSlider->setBright();
+    }
+    else if (name == "blendronic gain")
+    {
+        mod->setBlendronicGain(val);
+        mod->setDirty(NostalgicBlendronicGain);
+        
+        blendronicGainSlider->setBright();
     }
     else if (name == "cluster min")
     {

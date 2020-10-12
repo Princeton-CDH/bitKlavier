@@ -47,6 +47,7 @@ public:
                       bool resAndHammer,
                       float resGain,
                       float hamGain,
+                      float blendGain,
                       int atk,
                       int dca,
                       float sust,
@@ -55,6 +56,7 @@ public:
     dGain(gain),
     dResonanceGain(resGain),
     dHammerGain(hamGain),
+    dBlendronicGain(blendGain),
     dAttack(atk),
     dDecay(dca),
     dRelease(rel),
@@ -74,6 +76,7 @@ public:
     dGain(1.0),
     dResonanceGain(0.5),
     dHammerGain(0.5),
+    dBlendronicGain(1.0f),
     dAttack(3),
     dDecay(3),
     dRelease(30),
@@ -101,6 +104,7 @@ public:
         dGain = d->getGain();
         dResonanceGain = d->getResonanceGain();
         dHammerGain = d->getHammerGain();
+        dBlendronicGain = d->getBlendronicGain();
         dAttack = d->getAttack();
         dDecay = d->getDecay();
         dSustain = d->getSustain();
@@ -119,6 +123,7 @@ public:
         if (dirty[DirectGain]) dGain = d->getGain();
         if (dirty[DirectResGain]) dResonanceGain = d->getResonanceGain();
         if (dirty[DirectHammerGain]) dHammerGain = d->getHammerGain();
+        if (dirty[DirectBlendronicGain]) dBlendronicGain = d->getBlendronicGain();
         if (dirty[DirectTranspUsesTuning]) dTranspUsesTuning = d->getTranspUsesTuning();
         if (dirty[DirectADSR])
         {
@@ -147,6 +152,7 @@ public:
                 (dGain              ==      d->getGain()            )   &&
                 (dResonanceGain     ==      d->getResonanceGain()   )   &&
                 (dHammerGain        ==      d->getHammerGain()      )   &&
+                (dBlendronicGain    ==      d->getBlendronicGain()  )   &&
                 (dAttack            ==      d->getAttack()          )   &&
                 (dDecay             ==      d->getDecay()           )   &&
                 (dSustain           ==      d->getSustain()         )   &&
@@ -172,6 +178,7 @@ public:
         dGain = r[idx++];
         dResonanceGain = r[idx++];
         dHammerGain = r[idx++];
+        dBlendronicGain = r[idx++];
         dAttack = r[idx++] * 2000.0f + 1.0f;
         dDecay = r[idx++] * 2000.0f + 1.0f;
         dSustain = r[idx++];
@@ -186,6 +193,7 @@ public:
     inline const float getGain() const noexcept                         {return dGain;          }
     inline const float getResonanceGain() const noexcept                {return dResonanceGain; }
     inline const float getHammerGain() const noexcept                   {return dHammerGain;    }
+    inline const float getBlendronicGain() const noexcept               {return dBlendronicGain; }
     inline const int getAttack() const noexcept                         {return dAttack;        }
     inline const int getDecay() const noexcept                          {return dDecay;         }
     inline const float getSustain() const noexcept                      {return dSustain;       }
@@ -197,6 +205,7 @@ public:
     inline void setGain(float val)                                      {dGain = val;           }
     inline void setResonanceGain(float val)                             {dResonanceGain = val;  }
     inline void setHammerGain(float val)                                {dHammerGain = val;     }
+    inline void setBlendronicGain(float val)                            {dBlendronicGain = val;  }
     inline void setAttack(int val)                                      {dAttack = val;         }
     inline void setDecay(int val)                                       {dDecay = val;          }
     inline void setSustain(float val)                                   {dSustain = val;        }
@@ -222,6 +231,7 @@ public:
         DBG("dGain: "           + String(dGain));
         DBG("dResGain: "        + String(dResonanceGain));
         DBG("dHammerGain: "     + String(dHammerGain));
+        DBG("dBlendronicGain: " + String(dBlendronicGain));
         DBG("dAttack: "         + String(dAttack));
         DBG("dDecay: "          + String(dDecay));
         DBG("dSustain: "        + String(dSustain));
@@ -235,6 +245,7 @@ public:
         prep.setProperty( ptagDirect_gain,              getGain(), 0);
         prep.setProperty( ptagDirect_resGain,           getResonanceGain(), 0);
         prep.setProperty( ptagDirect_hammerGain,        getHammerGain(), 0);
+        prep.setProperty( ptagDirect_blendronicGain,    getBlendronicGain(), 0);
         prep.setProperty( ptagDirect_transpUsesTuning,  getTranspUsesTuning() ? 1 : 0, 0);
         
         ValueTree transp( vtagDirect_transposition);
@@ -271,6 +282,8 @@ public:
         
         f = e->getStringAttribute(ptagDirect_resGain).getFloatValue();
         setResonanceGain(f);
+
+        setBlendronicGain(e->getDoubleAttribute(ptagDirect_blendronicGain, 1.0f));
         
         String str = e->getStringAttribute(ptagDirect_transpUsesTuning);
         if (str != "") setTranspUsesTuning((bool) str.getIntValue());
@@ -354,6 +367,8 @@ private:
     
     // gain multipliers for release resonance and hammer
     float dResonanceGain, dHammerGain;
+    
+    float dBlendronicGain;
     
     // ADSR, in ms, or gain multiplier for sustain
     int dAttack, dDecay, dRelease;

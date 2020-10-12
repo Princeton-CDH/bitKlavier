@@ -112,6 +112,8 @@ protected:
     std::unique_ptr<BKSingleSlider> gainSlider;
     std::unique_ptr<BKSingleSlider> numClusterSlider;
     
+    std::unique_ptr<BKSingleSlider> blendronicGainSlider;
+    
     ToggleButton transpUsesTuning;
     
     BKLabel modeLabel;

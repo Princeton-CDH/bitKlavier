@@ -86,6 +86,7 @@ const String ptagSynchronic_transpUsesTuning = "transpUsesTuning";
 const String ptagSynchronic_mode = "mode";
 const String ptagSynchronic_beatsToSkip = "beatsToSkip";
 const String ptagSynchronic_gain = "gain";
+const String ptagSynchronic_blendronicGain = "blendronicGain";
 
 const String ptagSynchronic_targetPatternSync = "targetTypeSynchronicPatternSync";
 const String ptagSynchronic_targetBeatSync = "targetTypeSynchronicBeatSync";
@@ -131,6 +132,7 @@ const String ptagNostalgic_undertow = "undertow";
 const String vtagNostalgic_transposition = "transposition";
 const String ptagNostalgic_transpUsesTuning = "transpUsesTuning";
 const String ptagNostalgic_gain = "gain";
+const String ptagNostalgic_blendronicGain = "blendronicGain";
 const String ptagNostalgic_lengthMultiplier = "lengthMultiplier";
 const String ptagNostalgic_mode = "mode";
 const String ptagNostalgic_beatsToSkip = "beatsToSkip";
@@ -152,6 +154,7 @@ const String ptagDirect_transpUsesTuning = "transpUsesTuning";
 const String ptagDirect_gain = "gain";
 const String ptagDirect_resGain = "resGain";
 const String ptagDirect_hammerGain = "hammerGain";
+const String ptagDirect_blendronicGain = "blendronicGain";
 const String ptagDirect_reset = "directReset";
 const String vtagDirect_ADSR = "ADSR";
 const String ptagDirect_useGlobalSoundSet = "directUseGlobalSoundSet";
@@ -587,6 +590,7 @@ typedef enum SynchronicParameterType {
     SynchronicVelocityMax,
     SynchronicMidiOutput,
     SynchronicTranspUsesTuning,
+    SynchronicBlendronicGain,
     SynchronicUseGlobalSoundSet,
     SynchronicSoundSet,
     SynchronicParameterTypeNil
@@ -677,6 +681,7 @@ typedef enum NostalgicParameterType {
     NostalgicUndertow,
     NostalgicTransposition,
     NostalgicGain,
+    NostalgicBlendronicGain, 
     NostalgicLengthMultiplier,
     NostalgicBeatsToSkip,
     NostalgicMode,
@@ -753,6 +758,7 @@ typedef enum DirectParameterType
     DirectGain,
     DirectResGain,
     DirectHammerGain,
+    DirectBlendronicGain,
     DirectTuning,
     DirectADSR,
     DirectTranspUsesTuning,

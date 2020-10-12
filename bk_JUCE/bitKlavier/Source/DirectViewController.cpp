@@ -11,7 +11,7 @@
 #include "DirectViewController.h"
 
 DirectViewController::DirectViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 1)
+BKViewController(p, theGraph, 2)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
@@ -48,6 +48,12 @@ BKViewController(p, theGraph, 1)
     hammerGainSlider->setToolTipString("Adjusts mechanical noise sample based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*hammerGainSlider);
     
+    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", 0, 10, 1, 0.01);
+    blendronicGainSlider->setSkewFactorFromMidPoint(1.);
+    blendronicGainSlider->setJustifyRight(false);
+    blendronicGainSlider->setToolTipString("Adjusts volume of Direct output to connected Blendronics");
+    addAndMakeVisible(*blendronicGainSlider);
+    
     velocityMinMaxSlider = std::make_unique<BKRangeSlider>("velocity min/max", 0, 127, 0, 127, 1);
     velocityMinMaxSlider->setToolTipString("Sets Min and Max velocity (0-127) to trigger this Direct; Min can be greater than Max");
     velocityMinMaxSlider->setJustifyRight(true);
@@ -71,7 +77,8 @@ BKViewController(p, theGraph, 1)
     gainSlider->addWantsBigOneListener(this);
     resonanceGainSlider->addWantsBigOneListener(this);
     hammerGainSlider->addWantsBigOneListener(this);
-    velocityMinMaxSlider->addWantsBigOneListener(this);s
+    velocityMinMaxSlider->addWantsBigOneListener(this);
+    blendronicGainSlider->addWantsBigOneListener(this);
 #endif
     
     addAndMakeVisible(actionButton);
@@ -90,6 +97,7 @@ void DirectViewController::invisible(void)
     resonanceGainSlider->setVisible(false);
     hammerGainSlider->setVisible(false);
     ADSRSlider->setVisible(false);
+    blendronicGainSlider->setVisible(false);
     
     transpositionSlider->setVisible(false);
     transpUsesTuning.setVisible(false);
@@ -119,11 +127,10 @@ void DirectViewController::displayShared(void)
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
     
-    //leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
-    //rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
-    leftArrow.setVisible(false); //use one tab for now
-    rightArrow.setVisible(false);
-    
+    leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
+    rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
+    leftArrow.setVisible(true);
+    rightArrow.setVisible(true);
 }
 
 void DirectViewController::displayTab(int tab)
@@ -146,8 +153,8 @@ void DirectViewController::displayTab(int tab)
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(selectCB.getHeight() + 70 * processor.paddingScalarY + 4 + gYSpacing);
-        area.removeFromBottom(gYSpacing + 30 * processor.paddingScalarY);
-        area.removeFromLeft(processor.paddingScalarX * 20);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
         area.removeFromRight(processor.paddingScalarX * 20);
         
         ADSRSlider->setBounds(area.removeFromBottom(area.getHeight() * 0.35));
@@ -168,21 +175,34 @@ void DirectViewController::displayTab(int tab)
         transpUsesTuning.setBounds(area.removeFromBottom(gComponentToggleBoxHeight));
         transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
     }
+//    else if (tab == 1)
+//    {
+//        // SET VISIBILITY
+//        transpositionSlider->setVisible(true);
+//
+//        Rectangle<int> area (getBounds());
+//        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
+//        area.removeFromRight(rightArrow.getWidth());
+//        area.removeFromLeft(leftArrow.getWidth());
+//        area.removeFromBottom(area.getHeight() * 0.3);
+//
+//        transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+//
+//        area.removeFromLeft(processor.paddingScalarX * 100);
+//        area.removeFromRight(processor.paddingScalarX * 100);
+//    }
     else if (tab == 1)
     {
-        // SET VISIBILITY
-        transpositionSlider->setVisible(true);
+        blendronicGainSlider->setVisible(true);
         
         Rectangle<int> area (getBounds());
-        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromTop(selectCB.getHeight() + 70 * processor.paddingScalarY + 4 + gYSpacing);
         area.removeFromRight(rightArrow.getWidth());
         area.removeFromLeft(leftArrow.getWidth());
-        area.removeFromBottom(area.getHeight() * 0.3);
+        area.removeFromRight(processor.paddingScalarX * 20);
         
-        transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
-        
-        area.removeFromLeft(processor.paddingScalarX * 100);
-        area.removeFromRight(processor.paddingScalarX * 100);
+        area.removeFromTop(processor.paddingScalarY * 30);
+        blendronicGainSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
     }
 }
 
@@ -354,6 +374,8 @@ DirectViewController(p, theGraph)
     transpUsesTuning.addListener(this);
     velocityMinMaxSlider->addMyListener(this);
     
+    blendronicGainSlider->addMyListener(this);
+    
     startTimer(30);
 }
 
@@ -382,6 +404,8 @@ void DirectPreparationEditor::update(void)
         
         velocityMinMaxSlider->setMinValue(prep->getVelocityMin(), dontSendNotification);
         velocityMinMaxSlider->setMaxValue(prep->getVelocityMax(), dontSendNotification);
+        
+        blendronicGainSlider->setValue(prep->getBlendronicGain(), dontSendNotification);
     }
 }
 
@@ -580,6 +604,12 @@ void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
         prep->setGain(val);
         active->setGain(val);
     }
+    else if(name == "blendronic gain")
+    {
+        //DBG("gain " + String(val));
+        prep->setBlendronicGain(val);
+        active->setBlendronicGain(val);
+    }
     
     processor.updateState->editsMade = true;
 }
@@ -644,6 +674,24 @@ void DirectPreparationEditor::timerCallback()
         DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
         velocityMinMaxSlider->setDisplayValue(dProcessor->getLastVelocity() * 127.);
         DBG("sProcessor->getLastVelocity() = " + String(dProcessor->getLastVelocity()));
+        
+//        BKItem::Ptr item = theGraph->get(PreparationTypeDirect, dProcessor->getId());
+//
+//        if(item != nullptr) {
+//            if (item->getConnectionsOfType(PreparationTypeBlendronic).size() > 0)
+//            {
+//                numTabs = 2;
+//                leftArrow.setVisible(true);
+//                rightArrow.setVisible(true);
+//            }
+//            else
+//            {
+//                numTabs = 1;
+//                leftArrow.setVisible(false);
+//                rightArrow.setVisible(false);
+//            }
+//        }
+//        if (currentTab > numTabs - 1) currentTab = numTabs - 1;
     }
 }
 
@@ -750,6 +798,8 @@ DirectViewController(p, theGraph)
     transpUsesTuning.addListener(this);
     velocityMinMaxSlider->addMyListener(this);
     
+    blendronicGainSlider->addMyListener(this);
+    
     velocityMinMaxSlider->displaySliderVisible(false);
 }
 
@@ -762,6 +812,7 @@ void DirectModificationEditor::greyOutAllComponents()
     ADSRSlider->setDim(gModAlpha);
     transpUsesTuning.setAlpha(gModAlpha);
     velocityMinMaxSlider->setDim(gModAlpha);
+    blendronicGainSlider->setDim(gModAlpha);
 }
 
 void DirectModificationEditor::highlightModedComponents()
@@ -776,6 +827,7 @@ void DirectModificationEditor::highlightModedComponents()
     if(mod->getDirty(DirectTranspUsesTuning)) transpUsesTuning.setAlpha(1.);
     if(mod->getDirty(DirectVelocityMin))      velocityMinMaxSlider->setBright();
     if(mod->getDirty(DirectVelocityMax))      velocityMinMaxSlider->setBright();
+    if(mod->getDirty(DirectBlendronicGain))   blendronicGainSlider->setBright();
 }
 
 void DirectModificationEditor::update(void)
@@ -799,6 +851,7 @@ void DirectModificationEditor::update(void)
         transpUsesTuning.setToggleState(mod->getTranspUsesTuning(), dontSendNotification);
         velocityMinMaxSlider->setMinValue(mod->getVelocityMin(), dontSendNotification);
         velocityMinMaxSlider->setMaxValue(mod->getVelocityMax(), dontSendNotification);
+        blendronicGainSlider->setValue(mod->getBlendronicGain(), dontSendNotification);
     }
 }
 
@@ -1025,6 +1078,13 @@ void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
         mod->setDirty(DirectGain);
         
         gainSlider->setBright();
+    }
+    else if(name == "blendronic gain")
+    {
+        mod->setBlendronicGain(val);
+        mod->setDirty(DirectBlendronicGain);
+        
+        blendronicGainSlider->setBright();
     }
     
     updateModification();

@@ -41,6 +41,8 @@ public:
     std::unique_ptr<BKSingleSlider> beatsToSkipSlider;
     std::unique_ptr<BKSingleSlider> gainSlider;
     
+    std::unique_ptr<BKSingleSlider> blendronicGainSlider;
+    
     std::unique_ptr<BKStackedSlider> transpositionSlider;
     ToggleButton transpUsesTuning;
 

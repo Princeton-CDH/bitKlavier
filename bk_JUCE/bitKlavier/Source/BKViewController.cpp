@@ -30,18 +30,21 @@ rightArrow(RightArrow)
     addChildComponent(bigOne);
     
     subWindowInFront = false;
+    
+    addAndMakeVisible(leftArrow);
+    leftArrow.setAlwaysOnTop(true);
+    leftArrow.setName("leftArrow");
+    leftArrow.addListener(this);
+    
+    addAndMakeVisible(rightArrow);
+    rightArrow.setAlwaysOnTop(true);
+    rightArrow.setName("rightArrow");
+    rightArrow.addListener(this);
 
-    if (numTabs > 1)
+    if (numTabs == 1)
     {
-        addAndMakeVisible(leftArrow);
-        leftArrow.setAlwaysOnTop(true);
-        leftArrow.setName("leftArrow");
-        leftArrow.addListener(this);
-        
-        addAndMakeVisible(rightArrow);
-        rightArrow.setAlwaysOnTop(true);
-        rightArrow.setName("rightArrow");
-        rightArrow.addListener(this);
+        leftArrow.setVisible(false);
+        rightArrow.setVisible(false);
     }
 }
 

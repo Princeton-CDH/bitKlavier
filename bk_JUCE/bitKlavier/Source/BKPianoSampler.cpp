@@ -144,7 +144,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      uint64 voiceRampOn,
                                      uint64 voiceRampOff,
                                      BKSynthesiserSound* s,
-									 float BlendronicLevel,
+									 float blendronicGain,
 									 BlendronicProcessor::PtrArr blendronic)
 {
     
@@ -164,7 +164,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      1.0,
                                      voiceRampOff,
                                      s,
-									 BlendronicLevel,
+									 blendronicGain,
 									 blendronic);
 }
 
@@ -236,7 +236,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                                      float adsrSustain,
                                      uint64 adsrRelease,
                                      BKSynthesiserSound* s,
-									 float BlendronicLevel,
+									 float blendGain,
 									 BlendronicProcessor::PtrArr blendronic)
 {
     if (BKPianoSamplerSound* const sound = dynamic_cast<BKPianoSamplerSound*> (s))
@@ -494,7 +494,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
         }
         noteStartingPosition = sourceSamplePosition;
         noteEndPosition = playEndPosition;
-		blendronicLevel = BlendronicLevel;
+		blendronicGain = blendGain;
 		this->blendronic = blendronic;
 
     }
@@ -686,8 +686,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain * blendronicGain, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain * blendronicGain, addCounter, 1);
         }
         addCounter++;
     }
@@ -851,8 +851,8 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain * blendronicGain, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain * blendronicGain, addCounter, 1);
         }
         addCounter++;
     }
@@ -1002,8 +1002,8 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain * blendronicGain, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain * blendronicGain, addCounter, 1);
         }
         addCounter++;
     }

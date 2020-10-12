@@ -148,8 +148,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          prep->getSustain(),
                          prep->getRelease(),
                          tuner,
-                         1.,
-                         //b->getBlendronic()->aPrep->getInputGain(),
+                         prep->getBlendronicGain(),
                          blendronic);
 		}
 		else

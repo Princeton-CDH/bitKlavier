@@ -40,6 +40,8 @@ public:
     
     ToggleButton transpUsesTuning;
     
+    std::unique_ptr<BKSingleSlider> blendronicGainSlider;
+    
     void paint (Graphics&) override;
     void resized() override;
     

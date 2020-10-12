@@ -47,6 +47,7 @@ public:
     nTransposition(p->getTransposition()),
     nTranspUsesTuning(p->getTranspUsesTuning()),
     nGain(p->getGain()),
+    nBlendronicGain(p->getBlendronicGain()),
     nLengthMultiplier(p->getLengthMultiplier()),
     nBeatsToSkip(p->getBeatsToSkip()),
     nMode(p->getMode()),
@@ -76,6 +77,7 @@ public:
                          int undertow,
                          Array<float> transposition,
                          float gain,
+                         float blendGain,
                          float lengthMultiplier,
                          float beatsToSkip,
                          NostalgicSyncMode mode,
@@ -86,6 +88,7 @@ public:
     nUndertow(undertow),
     nTransposition(transposition),
     nGain(gain),
+    nBlendronicGain(blendGain),
     nLengthMultiplier(lengthMultiplier),
     nBeatsToSkip(beatsToSkip),
     nMode(mode),
@@ -112,6 +115,7 @@ public:
     nTransposition(Array<float>({0.0})),
     nTranspUsesTuning(false),
     nGain(1.0),
+    nBlendronicGain(1.0f),
     nLengthMultiplier(1.0),
     nBeatsToSkip(0.0),
     nMode(NoteLengthSync),
@@ -151,6 +155,7 @@ public:
         nTransposition = n->getTransposition();
         nTranspUsesTuning = n->getTranspUsesTuning();
         nGain = n->getGain();
+        nBlendronicGain = n->getBlendronicGain();
         nLengthMultiplier = n->getLengthMultiplier();
         nBeatsToSkip = n->getBeatsToSkip();
         nMode = n->getMode();
@@ -181,6 +186,7 @@ public:
         if (dirty[NostalgicTransposition]) nTransposition = n->getTransposition();
         if (dirty[NostalgicTranspUsesTuning]) nTranspUsesTuning = n->getTranspUsesTuning();
         if (dirty[NostalgicGain]) nGain = n->getGain();
+        if (dirty[NostalgicBlendronicGain]) nBlendronicGain = n->getBlendronicGain();
         if (dirty[NostalgicLengthMultiplier]) nLengthMultiplier = n->getLengthMultiplier();
         if (dirty[NostalgicBeatsToSkip]) nBeatsToSkip = n->getBeatsToSkip();
         if (dirty[NostalgicMode]) nMode = n->getMode();
@@ -224,6 +230,7 @@ public:
                 nTransposition == n->getTransposition() &&
                 nTranspUsesTuning == n->getTranspUsesTuning() &&
                 nGain == n->getGain() &&
+                nBlendronicGain == n->getBlendronicGain() &&
                 nLengthMultiplier == n->getLengthMultiplier() &&
                 nBeatsToSkip == n->getBeatsToSkip() &&
                 nReverseAttack == n->getReverseAttack() &&
@@ -262,6 +269,7 @@ public:
 			nTransposition.add(i, (Random::getSystemRandom().nextFloat()) * 48.0f - 24.0f);
 		}
 		nGain = r[idx++] * 10.0f;
+        nBlendronicGain = r[idx++] * 2.0f;
 		nLengthMultiplier = r[idx++] * 10.0f;
 		nBeatsToSkip = r[idx++] * 10.0f;
 		nMode = (NostalgicSyncMode)(int)(r[idx++] * NostalgicSyncModeNil);
@@ -289,6 +297,7 @@ public:
     inline const Array<float> getTransposition() const noexcept            {return nTransposition;     }
     inline const bool getTranspUsesTuning() const noexcept                 {return nTranspUsesTuning;}
     inline const float getGain() const noexcept                            {return nGain;              }
+    inline const float getBlendronicGain() const noexcept                  {return nBlendronicGain;              }
     inline const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
@@ -313,14 +322,15 @@ public:
         if (which == TargetTypeNostalgicClear)   { targetTypeNostalgicClear = nm; }
     }
     
-    inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;          }
-    inline void setUndertow(int undertow)                                  {nUndertow = undertow;                  }
-    inline void setTransposition(Array<float> transposition)               {nTransposition = transposition;        }
+    inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;  }
+    inline void setUndertow(int undertow)                                  {nUndertow = undertow;  }
+    inline void setTransposition(Array<float> transposition)               {nTransposition = transposition;  }
     inline void setTranspUsesTuning(bool val)                              {nTranspUsesTuning = val;}
-    inline void setGain(float gain)                                        {nGain = gain;                          }
-    inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;  }
-    inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip;            }
-    inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;                          }
+    inline void setGain(float gain)                                        {nGain = gain; }
+    inline void setBlendronicGain(float gain)                              {nBlendronicGain = gain;  }
+    inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;}
+    inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip; }
+    inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;   }
     
     inline void setReverseAttack(int val)                                  {nReverseAttack = val;         }
     inline void setReverseDecay(int val)                                   {nReverseDecay = val;          }
@@ -376,6 +386,7 @@ public:
         DBG("nUndertow: " + String(nUndertow));
         DBG("nTransposition: " + floatArrayToString(nTransposition));
         DBG("nGain: " + String(nGain));
+        DBG("nBlendronicGain: " + String(nBlendronicGain));
         DBG("nLengthMultiplier: " + String(nLengthMultiplier));
         DBG("nBeatsToSkip: " + String(nBeatsToSkip));
         DBG("nMode: " + String(nMode));
@@ -398,6 +409,7 @@ public:
         prep.setProperty( ptagNostalgic_transpUsesTuning,  getTranspUsesTuning() ? 1 : 0, 0);
         
         prep.setProperty( ptagNostalgic_gain,               getGain(), 0);
+        prep.setProperty( ptagNostalgic_blendronicGain,     getBlendronicGain(), 0);
         prep.setProperty( ptagNostalgic_lengthMultiplier,   getLengthMultiplier(), 0);
         prep.setProperty( ptagNostalgic_beatsToSkip,        getBeatsToSkip(), 0);
         prep.setProperty( ptagNostalgic_mode,               getMode(), 0);
@@ -518,6 +530,8 @@ public:
         
         f = e->getStringAttribute(ptagNostalgic_gain).getFloatValue();
         setGain(f);
+        
+        setBlendronicGain(e->getDoubleAttribute(ptagNostalgic_blendronicGain, 1.0f));
         
         i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
         setMode((NostalgicSyncMode)i);
@@ -650,6 +664,7 @@ private:
     Array<float> nTransposition;        // transposition, in half steps
     bool nTranspUsesTuning;             // are transposition values in nTransposition filtered via attached Tuning?
     float nGain;                        // gain multiplier
+    float nBlendronicGain;
     float nLengthMultiplier;            // note-length mode: toscale reverse playback time
     float nBeatsToSkip;                 // synchronic mode: beats to skip before reverse peak
     NostalgicSyncMode nMode;            // which sync mode to use

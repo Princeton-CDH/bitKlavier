@@ -155,7 +155,7 @@ public:
                     uint64 voiceRampOn,
                     uint64 voiceRampOff,
                     BKSynthesiserSound* sound,
-					float BlendronicLevel,
+					float blendronicGain,
 					BlendronicProcessor::PtrArr blendronic
                     ) override;
     
@@ -174,7 +174,7 @@ public:
                     float adsrSustain,
                     uint64 adsrRelease,
                     BKSynthesiserSound* sound,
-					float BlendronicLevel,
+					float blendronicGain,
 					BlendronicProcessor::PtrArr blendronic
                     ) override;
     
@@ -255,7 +255,7 @@ private:
     //stk::ADSR lastIn, lastOut;
     BKADSR lastIn, lastOut;
 
-	float blendronicLevel;
+	float blendronicGain;
 	BlendronicProcessor::PtrArr blendronic;
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)

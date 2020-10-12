@@ -15,7 +15,7 @@
 #include "Synchronic.h"
 
 SynchronicViewController::SynchronicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 3) // third argument => number of tabs
+BKViewController(p, theGraph, 4) // third argument => number of tabs
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
@@ -211,6 +211,12 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     transpUsesTuning.setToggleState (false, dontSendNotification);
     addAndMakeVisible(&transpUsesTuning, ALL);
     
+    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", 0, 10, 1, 0.0001);
+    blendronicGainSlider->setToolTipString("Volume of Synchronic output to connected Blendronics");
+    blendronicGainSlider->setJustifyRight(false);
+    blendronicGainSlider->setSkewFactorFromMidPoint(1.);
+    addAndMakeVisible(*blendronicGainSlider, ALL);
+    
 #if JUCE_IOS
     numClusterSlider->addWantsBigOneListener(this);
     howManySlider->addWantsBigOneListener(this);
@@ -220,7 +226,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     clusterMinMaxSlider->addWantsBigOneListener(this);
     holdTimeMinMaxSlider->addWantsBigOneListener(this);
     velocityMinMaxSlider->addWantsBigOneListener(this);
-    
+    blendronicGainSlider->addWantsBigOneListener(this);
 #endif
     
     releaseVelocitySetsSynchronicToggle.addListener(this);
@@ -290,6 +296,7 @@ void SynchronicViewController::invisible(void)
     onOffSelectCB.setVisible(false);
     releaseVelocitySetsSynchronicToggle.setVisible(false);
     transpUsesTuning.setVisible(false);
+    blendronicGainSlider->setVisible(false);
 }
 
 void SynchronicViewController::displayShared(void)
@@ -577,6 +584,19 @@ void SynchronicViewController::displayTab(int tab)
                                       targetControlCBs[0]->getHeight() * targetControlCBs.size() + 2 * gComponentComboBoxHeight + 4 * gYSpacing);
          */
     }
+    else if (tab == 3)
+    {
+        blendronicGainSlider->setVisible(true);
+        
+        Rectangle<int> area (getBounds());
+        area.removeFromTop(selectCB.getHeight() + 70 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
+        area.removeFromRight(processor.paddingScalarX * 20);
+        
+        area.removeFromTop(processor.paddingScalarY * 30);
+        blendronicGainSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+    }
 }
 
 void SynchronicViewController::resized()
@@ -736,6 +756,8 @@ SynchronicViewController(p, theGraph)
 
     gainSlider->addMyListener(this);
     numClusterSlider->addMyListener(this);
+    
+    blendronicGainSlider->addMyListener(this);
     
     for(int i=0; i<envelopeSliders.size(); i++)
     {
@@ -1082,6 +1104,11 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         prep->setGain(val);
         active->setGain(val);
     }
+    else if(name == "blendronic gain")
+    {
+        prep->setBlendronicGain(val);
+        active->setBlendronicGain(val);
+    }
     //else if(name == "num layers")
     else if(slider == numClusterSlider.get())
     {
@@ -1170,6 +1197,8 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         
         gainSlider->setValue(prep->getGain(), notify);
         numClusterSlider->setValue(prep->getNumClusters(), notify);
+        
+        blendronicGainSlider->setValue(prep->getBlendronicGain(), notify);
                 
         for (int i = TargetTypeSynchronicPatternSync; i <= TargetTypeSynchronicRotate; i++)
         {
@@ -1712,6 +1741,7 @@ SynchronicViewController(p, theGraph)
     velocityMinMaxSlider->addMyListener(this);
     gainSlider->addMyListener(this);
     numClusterSlider->addMyListener(this);
+    blendronicGainSlider->addMyListener(this);
     transpUsesTuning.addListener(this);
     
     for (auto slider : paramSliders) slider->addMyListener(this);
@@ -1743,6 +1773,8 @@ void SynchronicModificationEditor::greyOutAllComponents()
     clusterCapSlider->setDim(gModAlpha);
     gainSlider->setDim(gModAlpha);
     numClusterSlider->setDim(gModAlpha);
+    
+    blendronicGainSlider->setDim(gModAlpha);
     
     clusterMinMaxSlider->setDim(gModAlpha);
     holdTimeMinMaxSlider->setDim(gModAlpha);
@@ -1780,6 +1812,7 @@ void SynchronicModificationEditor::highlightModedComponents()
     if(mod->getDirty(SynchronicGain))             gainSlider->setBright();
     if(mod->getDirty(SynchronicNumClusters))      numClusterSlider->setBright();
     if(mod->getDirty(SynchronicTranspUsesTuning)) transpUsesTuning.setAlpha(1.);
+    if(mod->getDirty(SynchronicBlendronicGain))   blendronicGainSlider->setBright();
 
     if (mod->getDirty(SynchronicBeatMultipliers))
     {
@@ -1867,6 +1900,7 @@ void SynchronicModificationEditor::update(NotificationType notify)
         gainSlider->setValue(mod->getGain(), notify);
         numClusterSlider->setValue(mod->getNumClusters(), notify);
         transpUsesTuning.setToggleState(mod->getTranspUsesTuning(), notify);
+        blendronicGainSlider->setValue(mod->getBlendronicGain(), notify);
         
         for (int i = 0; i < paramSliders.size(); i++)
         {
@@ -2178,6 +2212,13 @@ void SynchronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
         mod->setDirty(SynchronicNumClusters);
         
         numClusterSlider->setBright();
+    }
+    else if(name == "blendronic gain")
+    {
+        mod->setBlendronicGain(val);
+        mod->setDirty(SynchronicBlendronicGain);
+        
+        blendronicGainSlider->setBright();
     }
     
     updateModification();

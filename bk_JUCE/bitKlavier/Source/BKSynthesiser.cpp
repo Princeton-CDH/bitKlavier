@@ -462,7 +462,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
 	const float rampOnMS, //included in lengthMS
 	const float rampOffMS, //included in lengthMS
 	TuningProcessor::Ptr tuner,
-	const float BlendronicLevel,
+	const float blendronicGain,
 	BlendronicProcessor::PtrArr blendronic)
 {
                 return keyOn   ( midiChannel,
@@ -483,7 +483,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
                                  1.,
                                  rampOffMS,
                                  tuner,
-                                 BlendronicLevel,
+                                 blendronicGain,
 								 blendronic);
 }
 		
@@ -505,7 +505,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                            float adsrSustain,
                            float adsrReleaseMS,
                            TuningProcessor::Ptr tuner,
-							float BlendronicLevel,
+							float blendronicGain,
 							BlendronicProcessor::PtrArr blendronic)
 {
 	//DBG("BKSynthesiser::keyOn " + String(keyNoteNumber) + " " + String(midiNoteNumber));
@@ -566,7 +566,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 				adsrSustain,
 				adsrReleaseMS * sampleRateMS,
 				tuner,
-				BlendronicLevel,
+				blendronicGain,
 				blendronic);
 			
 			// voice to return;
@@ -597,7 +597,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 	uint64 voiceRampOn,
 	uint64 voiceRampOff,
 	TuningProcessor::Ptr tuner,
-	float BlendronicLevel,
+	float blendronicGain,
 	BlendronicProcessor::PtrArr blendronic
 )
 {
@@ -620,7 +620,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 		1.,
 		30. * 0.001f * getSampleRate(),
 		tuner,
-		BlendronicLevel,
+		blendronicGain,
 		blendronic);
 }
 
@@ -644,7 +644,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 	float adsrSustain,
 	uint64 adsrRelease,
 	TuningProcessor::Ptr tuner,
-	float BlendronicLevel,
+	float blendronicGain,
 	BlendronicProcessor::PtrArr blendronic
 )
 {
@@ -668,7 +668,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 		voice->sostenutoPedalDown = false;
 		voice->sustainPedalDown = sustainPedalsDown[midiChannel];
 		voice->tuning = tuner;
-		voice->blendronicLevel = BlendronicLevel;
+		voice->blendronicGain = blendronicGain;
 		voice->blendronic = blendronic;
 
 
@@ -694,7 +694,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 			adsrSustain,
 			adsrRelease,
 			sound,
-			BlendronicLevel,
+			blendronicGain,
 			blendronic);
 	}
 }

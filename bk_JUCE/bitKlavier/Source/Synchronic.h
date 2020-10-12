@@ -70,6 +70,7 @@ public:
     sReleases(p->getReleases()),
     envelopeOn(p->getEnvelopesOn()),
     sGain(p->getGain()),
+    sBlendronicGain(p->getBlendronicGain()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
     sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic()),
@@ -167,6 +168,7 @@ public:
     sReleases(Array<int>({30,30,30,30,30,30,30,30,30,30,30,30})),
     envelopeOn(Array<bool>({true,false,false,false,false,false,false,false,false,false,false,false})),
     sGain(1.0),
+    sBlendronicGain(1.0f),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
     targetTypeSynchronicPatternSync(NoteOn),
@@ -197,6 +199,7 @@ public:
         sAccentMultipliers = s->getAccentMultipliers();
         sLengthMultipliers = s->getLengthMultipliers();
         sGain = s->getGain();
+        sBlendronicGain = s->getBlendronicGain();
         
         sTransposition = s->getTransposition();
         sClusterThresh = s->getClusterThreshMS();
@@ -244,6 +247,7 @@ public:
     inline void performModification(SynchronicPreparation::Ptr s, Array<bool> dirty)
     {
         if (dirty[SynchronicGain]) sGain = s->getGain();
+        if (dirty[SynchronicBlendronicGain]) sBlendronicGain = s->getBlendronicGain();
         if (dirty[SynchronicNumPulses]) sNumBeats = s->getNumBeats();
         if (dirty[SynchronicClusterMin]) sClusterMin = s->getClusterMin();
         if (dirty[SynchronicClusterMax]) sClusterMax = s->getClusterMax();
@@ -453,6 +457,7 @@ public:
                 transp && lens && accents && beats && attack && decay && sustain && release &&
                 transpStates && lensStates && accentsStates && beatsStates &&
                 sGain == s->getGain() &&
+                sBlendronicGain == s->getBlendronicGain() &&
                 sTranspUsesTuning == s->getTranspUsesTuning() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
@@ -514,6 +519,7 @@ public:
 			sLengthMultipliers.add(i, (Random::getSystemRandom().nextFloat() * 4.0f - 2.0f));
 		}
 		sGain = r[idx++] * 10;
+        sBlendronicGain = r[idx++] * 2;
 		sTransposition.clear();
 		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
 		{
@@ -581,6 +587,7 @@ public:
     inline const bool getTranspUsesTuning() const noexcept             {return sTranspUsesTuning;}
     inline const bool getReleaseVelocitySetsSynchronic() const noexcept{return sReleaseVelocitySetsSynchronic; }
     inline const float getGain() const noexcept                        {return sGain;                   }
+    inline const float getBlendronicGain() const noexcept              {return sBlendronicGain;         }
     
     inline const Array<bool> getAccentMultipliersStates() const noexcept {return sAccentMultipliersStates; }
     inline const Array<bool> getBeatMultipliersStates() const noexcept {return sBeatMultipliersStates; }
@@ -650,7 +657,8 @@ public:
     inline void setLengthMultiplier(int whichSlider, float value)      {sLengthMultipliers.set(whichSlider, value);         }
     inline void setSingleTransposition(int whichSlider, Array<float> values) {sTransposition.set(whichSlider, values); }
     inline void setReleaseVelocitySetsSynchronic(bool rvss)            {sReleaseVelocitySetsSynchronic = rvss;          }
-    inline void setGain(float gain)                                    {sGain = gain;                          }
+    inline void setGain(float gain)                                    {sGain = gain;               }
+    inline void setBlendronicGain(float gain)                          {sBlendronicGain = gain;     }
     
     inline void setAttacks(Array<int> attacks)      {sAttacks.swapWith(attacks);    }
     inline void setDecays(Array<int> decays)        {sDecays.swapWith(decays);      }
@@ -821,7 +829,8 @@ public:
     {
         ValueTree prep("params");
         
-        prep.setProperty( "gain", getGain(), 0);
+        prep.setProperty( ptagSynchronic_gain,                getGain(), 0);
+        prep.setProperty( ptagSynchronic_blendronicGain,      getBlendronicGain(), 0);
         prep.setProperty( ptagSynchronic_numBeats,            getNumBeats(), 0);
         prep.setProperty( ptagSynchronic_clusterMin,          getClusterMin(), 0);
         prep.setProperty( ptagSynchronic_clusterMax,          getClusterMax(), 0);
@@ -942,9 +951,9 @@ public:
     {
         String n; int i; float f;
         
-        n = e->getStringAttribute("gain");
-        if (n != "") setGain(n.getFloatValue());
-        else         setGain(1.0);
+        setGain(e->getDoubleAttribute(ptagSynchronic_gain, 1.0));
+        
+        setBlendronicGain(e->getDoubleAttribute(ptagSynchronic_blendronicGain, 1.0));
         
         i = e->getStringAttribute(ptagSynchronic_numBeats).getIntValue();
         setNumBeats(i);
@@ -1275,6 +1284,7 @@ private:
     Array<bool> envelopeOn;
     
     float sGain;               //gain multiplier
+    float sBlendronicGain;
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
