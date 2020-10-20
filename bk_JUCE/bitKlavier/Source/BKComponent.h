@@ -235,5 +235,39 @@ private:
     JUCE_LEAK_DETECTOR (BKDraggableComponent)
 };
 
+class ModdableComponent
+{
+public:
+    ModdableComponent(String name, bool enabled):
+    name(name),
+    enabled(enabled)
+    {
+    }
+    
+    ~ModdableComponent()
+    {
+    }
+    
+    String& getName() { return name; }
+    
+    class Listener
+    {
+    public:
+        
+        virtual ~Listener() {};
+        virtual void moddableComponentEditorOpened(ModdableComponent* me) {};
+    };
+    
+    ListenerList<Listener> listeners;
+    void addModdableComponentListener(Listener* listener)     { listeners.add(listener);      }
+    void removeModdableComponentListener(Listener* listener)  { listeners.remove(listener);   }
+    
+private:
+    String name;
+    bool enabled;
+    float time;
+    float resolution;
+};
+
 
 #endif  // BKCOMPONENT_H_INCLUDED

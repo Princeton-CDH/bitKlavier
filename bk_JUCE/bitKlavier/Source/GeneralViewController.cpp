@@ -312,3 +312,151 @@ void GeneralViewController::bkButtonClicked (Button* b)
         gen->setNoteOnSetsNoteOffVelocity(newstate);
     }
 }
+
+
+
+//==============================================================================
+ModdableViewController::ModdableViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
+BKViewController(p, theGraph, 1)
+{
+    
+    setLookAndFeel(&buttonsAndMenusLAF);
+    
+    timeSlider = std::make_unique<BKSingleSlider>("mod time", 0, 2000, 0, 1);
+    timeSlider->setJustifyRight(false);
+    timeSlider->addMyListener(this);
+    addAndMakeVisible(*timeSlider);
+    
+    resolutionSlider = std::make_unique<BKSingleSlider>("mod resolution", 0.0, 4., 0.0, 0.01);
+    resolutionSlider->setJustifyRight(false);
+    resolutionSlider->addMyListener(this);
+    addAndMakeVisible(*resolutionSlider);
+
+#if JUCE_IOS
+    timeSlider->addWantsBigOneListener(this);
+    resolutionSlider->addWantsBigOneListener(this);
+#endif
+}
+
+#if JUCE_IOS
+void ModdableViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
+
+ModdableViewController::~ModdableViewController()
+{
+    setLookAndFeel(nullptr);
+}
+
+void ModdableViewController::paint (Graphics& g)
+{
+    g.fillAll(Colours::black.withAlpha(0.6f));
+    
+    Rectangle<int> area (getLocalBounds());
+    area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.2f);
+    
+    g.setColour(Colours::black);
+    g.fillRect(area);
+    
+    g.setColour(Colours::antiquewhite.withAlpha(0.6f));
+    g.drawRect(area, 1);
+}
+
+void ModdableViewController::resized()
+{
+    Rectangle<int> area (getLocalBounds());
+    area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.2f);
+    
+    Rectangle<int> hideOrShowBounds = area.reduced(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4).removeFromLeft(area.getWidth() * 0.5);
+    hideOrShowBounds = hideOrShowBounds.removeFromTop(gComponentComboBoxHeight);
+    hideOrShowBounds.removeFromRight(4 + 2.0f * gPaddingConst * processor .paddingScalarX);
+    hideOrShowBounds.removeFromLeft(gXSpacing);
+    hideOrShow.setBounds(hideOrShowBounds.removeFromLeft(gComponentComboBoxHeight));
+    
+    area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.2f);
+    
+    Rectangle<int> topSlice = area.removeFromTop(area.getHeight() * 0.5);
+    
+    timeSlider->setBounds(topSlice);
+    resolutionSlider->setBounds(area);
+}
+
+
+void ModdableViewController::bkTextFieldDidChange(TextEditor& tf)
+{
+    
+}
+
+void ModdableViewController::update(void)
+{
+    ModdableBase* mod = getCurrentModdable();
+    if (mod == nullptr) return;
+    
+    timeSlider->setValue(mod->getTime(), dontSendNotification);
+    
+//    A4tuningReferenceFrequencySlider->setValue(gen->getTuningFundamental(), dontSendNotification);
+//    tempoMultiplierSlider->setValue(gen->getTempoMultiplier(), dontSendNotification);
+//    invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
+}
+
+void ModdableViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
+{
+    ModdableBase* mod = getCurrentModdable();
+    if (mod == nullptr) return;
+    
+    if (name == timeSlider->getName())
+    {
+        mod->setTime(int(val));
+    }
+    
+//    else if(name == tempoMultiplierSlider->getName())
+//    {
+//        DBG("general tempo multiplier " + String(val));
+//        gen->setTempoMultiplier(val);
+//    }
+}
+
+void ModdableViewController::bkButtonClicked (Button* b)
+{
+//    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
+//
+    if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(processor.updateState->previousDisplay);
+
+    }
+//    else if (b == &invertSustainB)
+//    {
+//        //bool inversion =  (bool) b->getToggleStateValue().toString().getIntValue();
+//        bool inversion =  b->getToggleState();
+//        DBG("invert sustain button = " + String((int)inversion));
+//        processor.setSustainInversion(inversion);
+//        gen->setInvertSustain(inversion);
+//    }
+//    else if (b == &noteOnSetsNoteOffVelocityB)
+//    {
+//        bool newstate =  b->getToggleState();
+//        DBG("invert noteOnSetsNoteOffVelocity = " + String((int)newstate));
+//        gen->setNoteOnSetsNoteOffVelocity(newstate);
+//    }
+}
+
+ModdableBase* ModdableViewController::getCurrentModdable()
+{
+    // Might be a good idea to standardize the naming/organization of preparations parameters
+    // and sliders, etc so this could be streamlined. Or at least use constants for component names
+    if (processor.updateState->previousDisplay == DisplayDirectMod)
+    {
+        DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+        
+        if (processor.updateState->currentModdableName == "gain")
+            return &mod->dGain;
+        else
+            ; // continue branching for each parameter and component
+    }
+    
+    return nullptr;
+}

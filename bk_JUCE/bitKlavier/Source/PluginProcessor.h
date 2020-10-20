@@ -37,7 +37,8 @@ class BKAudioProcessorEditor;
 */
 class BKAudioProcessor : public AudioProcessor,
                          public ChangeListener,
-                         public MidiInputCallback
+                         public MidiInputCallback,
+                         public HighResolutionTimer
 {
     
 public:
@@ -188,6 +189,8 @@ public:
     void changeListenerCallback(ChangeBroadcaster *source) override;
     
     void handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m) override;
+    
+    void hiResTimerCallback() override;
     
 //    inline const Array<MidiDeviceInfo> getDefaultMidiInputDevices(void) { return defaultMidiInputDevices; }
 //    inline void setDefaultMidiInputDevices(Array<MidiDeviceInfo> sources) { defaultMidiInputDevices = sources; }

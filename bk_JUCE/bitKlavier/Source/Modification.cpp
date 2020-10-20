@@ -12,8 +12,7 @@
 #include "PluginProcessor.h"
 
 DirectModification::DirectModification(BKAudioProcessor& processor, int Id):
-Modification(processor, Id, DirectParameterTypeNil),
-DirectPreparation()
+Modification(processor, Id, DirectParameterTypeNil)
 {
     
 }
@@ -114,7 +113,10 @@ void DirectModification::setStateOld(XmlElement* e)
     String p = e->getStringAttribute(ptagDirect_gain);
     if (p != "")
     {
-        setGain(p.getFloatValue());
+        // Assuming everything in here is for backwards compatibility
+        // should be fine to always set mod time to 0
+        dGain.setMod(p.getFloatValue());
+        dGain.setTime(0);
         setDirty(DirectGain);
     }
     

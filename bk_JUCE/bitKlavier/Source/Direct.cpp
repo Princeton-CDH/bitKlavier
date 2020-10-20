@@ -33,10 +33,10 @@ keymaps(Keymap::PtrArr())
         velocitiesActive.insert(i, 0);
     }
     
-    if (!direct->sPrep->getUseGlobalSoundSet())
+    if (!direct->prep->getUseGlobalSoundSet())
     {
         // comes in as "soundfont.sf2.subsound1"
-        String name = direct->sPrep->getSoundSetName();
+        String name = direct->prep->getSoundSetName();
         BKSampleLoadType type = BKLoadSoundfont;
         
         for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
@@ -64,8 +64,8 @@ keymaps(Keymap::PtrArr())
             subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
         }
         int Id = synth->loadSamples(type, path, subsound, false);
-        direct->sPrep->setSoundSet(Id);
-        direct->aPrep->setSoundSet(Id);
+        direct->prep->setSoundSet(Id);
+        direct->prep->setSoundSet(Id);
     }
 }
 
@@ -80,7 +80,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
     
     lastVelocity = velocity;
     
-    DirectPreparation::Ptr prep = direct->aPrep;
+    DirectPreparation::Ptr prep = direct->prep;
     
     // check velocity filtering
     //  need to save old velocity, in case this new velocity failes the velocity test
@@ -139,7 +139,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          Forward,
                          Normal,
                          MainNote,
-                         direct->aPrep->getSoundSet(), //set
+                         direct->prep->getSoundSet(), //set
                          direct->getId(),
                          0,     // start
                          0,     // length
@@ -193,12 +193,12 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
         
         synth->keyOff(channel,
                       MainNote,
-                      direct->aPrep->getSoundSet(), //set
+                      direct->prep->getSoundSet(), //set
                       direct->getId(),
                       noteNumber,
                       t,
                       velocitiesActive.getUnchecked(noteNumber),
-                      direct->aPrep->getGain() * aGlobalGain,
+                      direct->prep->getGain() * aGlobalGain,
                       true);
     }
 
@@ -218,8 +218,8 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
         //only play hammers/resonance for first note in layers of transpositions
         if(i==0)
         {
-            float hGain = direct->aPrep->getHammerGain();
-            float rGain = direct->aPrep->getResonanceGain();
+            float hGain = direct->prep->getHammerGain();
+            float rGain = direct->prep->getResonanceGain();
             
             if (hGain > 0.0f)
             {
@@ -242,7 +242,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
                                        Forward,
                                        Normal,
                                        HammerNote,
-                                       direct->aPrep->getSoundSet(), //set
+                                       direct->prep->getSoundSet(), //set
                                        direct->getId(),
                                        0,
                                        2000,
@@ -264,7 +264,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
                                       Forward,
                                       Normal,
                                       ResonanceNote,
-                                      direct->aPrep->getSoundSet(), //set
+                                      direct->prep->getSoundSet(), //set
                                       direct->getId(),
                                       0,
                                       2000,
@@ -279,7 +279,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
 
 bool DirectProcessor::velocityCheck(int noteNumber)
 {
-    DirectPreparation::Ptr prep = direct->aPrep;
+    DirectPreparation::Ptr prep = direct->prep;
     
     int velocity = (int)(velocities.getUnchecked(noteNumber) * 127.0);
     

@@ -37,6 +37,7 @@ public:
     gvc(p, theGraph),
     avc(p,theGraph),
     cvc(p,theGraph),
+    movc(p,theGraph),
     kvc(p, theGraph),
     tvc(p, theGraph),
     ovc(p, theGraph),
@@ -57,6 +58,7 @@ public:
         addChildComponent(avc);
         addChildComponent(kvc);
         addChildComponent(cvc);
+        addChildComponent(movc);
 
         addChildComponent(tvc);
         addChildComponent(ovc);
@@ -127,6 +129,8 @@ public:
                       area.getWidth() * 0.6,
                       area.getHeight() * 0.6);
 #endif
+        
+        movc.setBounds(area);
 
     }
     
@@ -150,6 +154,10 @@ public:
         else if (display == DisplayComment)
         {
             cvc.arrowPressed(arrow);
+        }
+        else if (display == DisplayModdable)
+        {
+            movc.arrowPressed(arrow);
         }
         else if (display == DisplayTuning)
         {
@@ -222,6 +230,7 @@ public:
         removeChildComponent(&gvc);
         removeChildComponent(&avc);
         removeChildComponent(&cvc);
+        removeChildComponent(&movc);
         
         removeChildComponent(&tvc);
         removeChildComponent(&dvc);
@@ -257,6 +266,12 @@ public:
             addAndMakeVisible(&cvc);
             cvc.grabKeyboardFocus();
             cvc.update();
+        }
+        else if (type == DisplayModdable)
+        {
+            addAndMakeVisible(&movc);
+            movc.grabKeyboardFocus();
+            movc.update();
         }
         else if (type == DisplayTuning)
         {
@@ -343,9 +358,8 @@ public:
     GeneralViewController gvc;
     AboutViewController avc;
     CommentViewController cvc;
+    ModdableViewController movc;
     KeymapViewController kvc;
-    
-    
     
     TuningPreparationEditor tvc;
     TempoPreparationEditor ovc;

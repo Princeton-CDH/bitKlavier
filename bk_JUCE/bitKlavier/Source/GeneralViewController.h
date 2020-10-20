@@ -113,3 +113,40 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GeneralViewController)
 };
 
+
+class ModdableViewController :
+public BKViewController,
+public BKSingleSlider::Listener
+#if JUCE_IOS
+, public WantsBigOne::Listener
+#endif
+{
+public:
+    ModdableViewController(BKAudioProcessor&, BKItemGraph* theGraph);
+    ~ModdableViewController();
+    
+    void paint (Graphics&) override;
+    
+    void resized() override;
+    
+    void update();
+    
+#if JUCE_IOS
+    void iWantTheBigOne(TextEditor*, String name) override;
+#endif
+    
+private:
+    
+    std::unique_ptr<BKSingleSlider> timeSlider;
+    std::unique_ptr<BKSingleSlider> resolutionSlider;
+    
+    void bkTextFieldDidChange       (TextEditor&)               override;
+    void bkComboBoxDidChange        (ComboBox* box)             override {};
+    void bkButtonClicked            (Button* b)                 override;
+    void bkMessageReceived          (const String& message)     override {};
+    void BKSingleSliderValueChanged (BKSingleSlider* slider, String name, double val)   override;
+    
+    ModdableBase* getCurrentModdable();
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ModdableViewController)
+};

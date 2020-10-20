@@ -397,6 +397,7 @@ typedef enum BKPreparationDisplay {
     DisplayComment,
     DisplayBlendronic,
     DisplayBlendronicMod,
+    DisplayModdable,
     DisplayNil,
 } BKPreparationDisplay;
 

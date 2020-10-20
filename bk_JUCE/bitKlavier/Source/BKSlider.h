@@ -311,6 +311,7 @@ private:
 //entering values in the text box will reset the range as needed
 class BKSingleSlider :
 public Component,
+public ModdableComponent,
 public Slider::Listener,
 public TextEditor::Listener
 #if JUCE_IOS
@@ -389,7 +390,6 @@ public:
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
-
     
     void setDim(float newAlpha);
     void setBright();

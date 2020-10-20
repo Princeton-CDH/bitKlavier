@@ -1165,7 +1165,6 @@ void SynchronicPreparationEditor::update(NotificationType notify)
     // DEAL WITH ENVELOPE
     for(int i = 0; i < envelopeSliders.size(); i++)
     {
-        envelopeSliders[i]->setVisible(true);
         envelopeSliders[i]->setAlpha(0.5);
         envelopeSliders[i]->setButtonText(String(""));
         envelopeSliders[i]->resized();

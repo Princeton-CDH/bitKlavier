@@ -386,7 +386,7 @@ void DirectPreparationEditor::update(void)
     setSubWindowInFront(false);
     ADSRSlider->setIsButtonOnly(true);
     
-    DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
 
     if (prep != nullptr)
     {
@@ -581,34 +581,29 @@ void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
 
 void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
-    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
     
-    if (prep == nullptr || active == nullptr) return;
+    if (prep == nullptr) return;
     
     if(name == "resonance gain")
     {
         //DBG("note length multiplier " + String(val));
         prep->setResonanceGain(val);
-        active->setResonanceGain(val);
     }
     else if(name == "hammer gain")
     {
         //DBG("beats to skip " + String(val));
         prep->setHammerGain(val);
-        active->setHammerGain(val);
     }
     else if(name == "gain")
     {
         //DBG("gain " + String(val));
-        prep->setGain(val);
-        active->setGain(val);
+        prep->dGain.set(val);
     }
     else if(name == "blendronic gain")
     {
         //DBG("gain " + String(val));
         prep->setBlendronicGain(val);
-        active->setBlendronicGain(val);
     }
     
     processor.updateState->editsMade = true;
@@ -616,15 +611,12 @@ void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
 
 void DirectPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
-    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
     
     if(name == "velocity min/max") {
         DBG("got new velocity min/max " + String(minval) + " " + String(maxval));
         prep->setVelocityMin(minval);
         prep->setVelocityMax(maxval);
-        active->setVelocityMin(minval);
-        active->setVelocityMax(maxval);
     }
     
     processor.updateState->editsMade = true;
@@ -632,11 +624,9 @@ void DirectPreparationEditor::BKRangeSliderValueChanged(String name, double minv
 
 void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
-    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
-    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
     
     prep->setTransposition(val);
-    active->setTransposition(val);
     
     processor.updateState->editsMade = true;
 }
@@ -645,17 +635,12 @@ void DirectPreparationEditor::BKADSRSliderValueChanged(String name, int attack, 
 {
     DBG("BKADSRSliderValueChanged received");
     
-    DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
-    DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
     
     prep->setAttack(attack);
-    active->setAttack(attack);
     prep->setDecay(decay);
-    active->setDecay(decay);
     prep->setSustain(sustain);
-    active->setSustain(sustain);
     prep->setRelease(release);
-    active->setRelease(release);
     
     processor.updateState->editsMade = true;
 }
@@ -671,10 +656,12 @@ void DirectPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayDirect)
     {
         DirectProcessor::Ptr dProcessor = processor.currentPiano->getDirectProcessor(processor.updateState->currentDirectId);
-        DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
         velocityMinMaxSlider->setDisplayValue(dProcessor->getLastVelocity() * 127.);
         DBG("sProcessor->getLastVelocity() = " + String(dProcessor->getLastVelocity()));
         
+        update();
+        
+        // Stuff for hiding blendronic tab, not sure if should use
 //        BKItem::Ptr item = theGraph->get(PreparationTypeDirect, dProcessor->getId());
 //
 //        if(item != nullptr) {
@@ -770,11 +757,9 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &transpUsesTuning)
     {
-        DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(processor.updateState->currentDirectId);
-        DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(processor.updateState->currentDirectId);
+        DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
         DBG("Direct transpUsesTuning = " + String((int)b->getToggleState()));
         prep->setTranspUsesTuning(b->getToggleState());
-        active->setTranspUsesTuning(b->getToggleState());
         
     }
 }
@@ -801,6 +786,17 @@ DirectViewController(p, theGraph)
     blendronicGainSlider->addMyListener(this);
     
     velocityMinMaxSlider->displaySliderVisible(false);
+    
+//    transpositionSlider->addModdableComponentListener(this);
+    gainSlider->addModdableComponentListener(this);
+    resonanceGainSlider->addModdableComponentListener(this);
+    hammerGainSlider->addModdableComponentListener(this);
+//    ADSRSlider->addModdableComponentListener(this);
+//    transpUsesTuning.addModdableComponentListener(this);
+//    velocityMinMaxSlider->addModdableComponentListener(this);
+    
+    blendronicGainSlider->addMyListener(this);
+    
 }
 
 void DirectModificationEditor::greyOutAllComponents()
@@ -846,7 +842,7 @@ void DirectModificationEditor::update(void)
         transpositionSlider->setValue(mod->getTransposition(), dontSendNotification);
         resonanceGainSlider->setValue(mod->getResonanceGain(), dontSendNotification);
         hammerGainSlider->setValue(mod->getHammerGain(), dontSendNotification);
-        gainSlider->setValue(mod->getGain(), dontSendNotification);
+        gainSlider->setValue(mod->dGain.getMod(), dontSendNotification);
         ADSRSlider->setValue(mod->getADSRvals(), dontSendNotification);
         transpUsesTuning.setToggleState(mod->getTranspUsesTuning(), dontSendNotification);
         velocityMinMaxSlider->setMinValue(mod->getVelocityMin(), dontSendNotification);
@@ -1074,7 +1070,7 @@ void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
     }
     else if(name == "gain")
     {
-        mod->setGain(val);
+        mod->dGain.setMod(val);
         mod->setDirty(DirectGain);
         
         gainSlider->setBright();

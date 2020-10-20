@@ -172,6 +172,8 @@ hotkeysEnabled(true)
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     
     loadGalleries();
+    
+    startTimer(1);
 }
 
 void BKAudioProcessor::loadGalleries()
@@ -1206,7 +1208,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    DirectPreparation::Ptr prep = gallery->getDirect(target)->aPrep;
+                    DirectPreparation::Ptr prep = gallery->getDirect(target)->prep;
                     prep->performModification(mod, mod->getDirty());
                 }
                 updateState->directPreparationDidChange = true;
@@ -1729,6 +1731,14 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
         hammerReleaseSynth.handleMidiEvent(m);
         resonanceReleaseSynth.handleMidiEvent(m);
         pedalSynth.handleMidiEvent(m);
+    }
+}
+
+void BKAudioProcessor::hiResTimerCallback()
+{
+    for (auto d : gallery->getAllDirect())
+    {
+        d->prep->stepModdables();
     }
 }
 

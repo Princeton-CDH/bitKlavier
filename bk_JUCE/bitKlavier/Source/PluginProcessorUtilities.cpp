@@ -203,7 +203,7 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
 {
     if (type == PreparationTypeDirect)
     {
-        return gallery->getDirect(Id)->getState(true);
+        return gallery->getDirect(Id)->getState();
     }
     else if (type == PreparationTypeDirectMod)
     {

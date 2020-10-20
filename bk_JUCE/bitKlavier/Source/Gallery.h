@@ -259,7 +259,7 @@ public:
     {
         for (auto p : direct)
         {
-            if (p->sPrep->compare(prep)) return p;
+            if (p->prep->compare(prep)) return p;
         }
         return nullptr;
     }
@@ -495,22 +495,12 @@ public:
         return nullptr;
     }
     
-    inline const DirectPreparation::Ptr getStaticDirectPreparation(int Id) const noexcept
+    inline const DirectPreparation::Ptr getDirectPreparation(int Id) const noexcept
     {
 
         for (auto p : direct)
         {
-            if (p->getId() == Id)   return p->sPrep;
-        }
-        return nullptr;
-    }
-    
-    inline const DirectPreparation::Ptr getActiveDirectPreparation(int Id) const noexcept
-    {
- 
-        for (auto p : direct)
-        {
-            if (p->getId() == Id)   return p->aPrep;
+            if (p->getId() == Id)   return p->prep;
         }
         return nullptr;
     }

@@ -62,6 +62,8 @@ public:
     bool keymapDidChange = false;
     bool modificationDidChange = false;
     
+    String currentModdableName = String();
+    
     String comment;
     bool commentDidChange = false;
     
@@ -70,6 +72,7 @@ public:
     
     
     BKPreparationDisplay currentDisplay = DisplayNil;
+    BKPreparationDisplay previousDisplay = DisplayNil;
     bool displayDidChange;
     bool editsMade = false;
     

@@ -658,7 +658,7 @@ void Gallery::setStateFromJson(var myJson)
                         // float dOverlay  = jsonGetValue(dx+"directOverlay");
                         float dTransp   = jsonGetValue(dx+"directTransp");
                         
-                        dPrep->setGain(dGain);
+                        dPrep->dGain.set(dGain);
                         
                         Array<float> transp;
                         transp.add(dTransp);
@@ -672,7 +672,7 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     else
                     {
-                        dPrep->setGain(0.0f);
+                        dPrep->dGain.set(0.0f);
                         
                         DBG("keys: " + intArrayToString(keys) +
                             " OFF");

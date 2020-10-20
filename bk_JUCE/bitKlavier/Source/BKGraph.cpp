@@ -210,7 +210,6 @@ void BKItem::setImage(Image newImage)
     placement = RectanglePlacement::centred;
     
     int val =
-    (type == PreparationTypeGenericMod || type == PreparationTypeReset) ? 80 :
     (type == PreparationTypePianoMap) ? 120 :
     (type == PreparationTypeKeymap) ? 80 :
     (type == PreparationTypeTempo || type == PreparationTypeTuning) ? 60 :

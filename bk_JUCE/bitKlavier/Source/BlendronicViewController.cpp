@@ -948,7 +948,6 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
         setSubWindowInFront(false);
-        
     }
     else if (b == &actionButton)
     {

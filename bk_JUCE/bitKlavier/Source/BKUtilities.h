@@ -354,13 +354,162 @@ typedef enum BKTextFieldType
     BKModification,
     BKTFNil
     
-}BKTextFieldType;
+} BKTextFieldType;
 
 typedef enum BKEditorType
 {
     BKPreparationEditor,
     BKModificationEditor,
     BKEditorTypeNil
-}BKEditorType;
+} BKEditorType;
+
+
+class ModdableBase
+{
+public:
+    ModdableBase() {}
+    virtual ~ModdableBase() {}
+    
+    virtual void setTime(int ms) {}
+    virtual int getTime() { return 0; }
+    
+    // tag dispatch pattern
+    template <class T>
+    struct tag {};
+
+    virtual void step(tag<float>) {}
+};
+
+
+template <typename ValueType>
+class Moddable : public ModdableBase
+{
+public:
+    Moddable () = default;
+    
+    Moddable (ValueType v, ValueType m, int t, bool a):
+    value(v),
+    base(v),
+    mod(m),
+    time(t),
+    dv((m - v) * 0.001f * t),
+    active(a) {};
+    
+    Moddable (ValueType v, int t):
+    Moddable (v, v, t, false) {}
+    
+    Moddable (ValueType v):
+    Moddable (v, v, 0, false) {}
+    
+    Moddable (const Moddable& m):
+    Moddable (m.base, m.mod, m.time, m.active) {}
+    
+    Moddable& operator= (const Moddable&) = default;
+    
+    Moddable& operator= (ValueType v)
+    {
+        value = v;
+        base = v;
+        if (!active) mod = v;
+        return *this;
+    }
+
+    ~Moddable() {};
+
+    operator ValueType() { return value; }
+    operator ValueType() const noexcept { return value; }
+
+    bool operator== (ValueType v)
+    {
+        return value == v;
+    }
+    
+    // Main control functions
+    void modTo(const Moddable& m)
+    {
+        mod = m.mod;
+        time = m.time;
+        dv = (mod - base) / time;
+        active = true; //active = m.active;
+    }
+    
+    void set(ValueType v)
+    {
+        value = v;
+        base = v;
+        active = false;
+//        dv = (mod - base) * 0.001f * time;
+    }
+    
+    void reset()
+    {
+        value = base;
+        active = false;
+    }
+    
+    // Setters
+    void setValue(ValueType v) { value = v; }
+    
+    void setBase(ValueType v)
+    {
+        base = v;
+        dv = (mod - base) / time;
+    }
+    
+    void setMod(ValueType v)
+    {
+        mod = v;
+        dv = (mod - base) / time;
+    }
+    
+    void setTime(int ms) override
+    {
+        time = ms;
+        dv = (mod - base) / time;
+    }
+    void setActive(bool a) { active = a; }
+    
+    // Getters
+    ValueType getValue() { return value; }
+    ValueType getBase() { return base; }
+    ValueType getMod() { return mod; }
+    
+    int getTime() override { return time; }
+    
+    // Step
+    void step() { step(tag<ValueType>{}); }
+    
+    void step(tag<float>) override
+    {
+        if (!active) return;
+        if (dv > 0)
+        {
+            if (value < mod) value += dv;
+            if (value > mod)
+            {
+                value = mod;
+                active = false;
+            }
+        }
+        else if (dv < 0)
+        {
+            if (value > mod) value += dv;
+            if (value < mod)
+            {
+                value = mod;
+                active = false;
+            }
+        }
+    }
+
+private:
+    
+    ValueType value;
+    ValueType base;
+    ValueType mod;
+    int time;
+    ValueType dv;
+    bool active;
+};
 
 #endif  // BKUTILITIES_H_INCLUDED

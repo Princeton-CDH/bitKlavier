@@ -408,7 +408,7 @@ void MainViewController::mouseDown(const MouseEvent &event)
 
 void MainViewController::bkComboBoxDidChange(ComboBox* cb)
 {
-    DirectPreparation::Ptr dPrep, dActive;
+    DirectPreparation::Ptr dPrep;
     SynchronicPreparation::Ptr sPrep, sActive;
     NostalgicPreparation::Ptr nPrep, nActive;
     DirectModification::Ptr dMod;
@@ -425,8 +425,7 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
-            dPrep = processor.gallery->getStaticDirectPreparation(item->getId());
-            dActive = processor.gallery->getActiveDirectPreparation(item->getId());
+            dPrep = processor.gallery->getDirectPreparation(item->getId());
             directSelected = true;
         }
         else if (item->getType() == PreparationTypeSynchronic)
@@ -483,8 +482,6 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         {
             dPrep->setSoundSet(soundSetId);
             dPrep->setSoundSetName(soundSetName);
-            dActive->setSoundSet(soundSetId);
-            dActive->setSoundSetName(soundSetName);
         }
         else if (synchronicSelected)
         {
@@ -529,8 +526,6 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
             dPrep->setSoundSet(soundSetId);
             dPrep->setSoundSetName(soundSetName);
-            dActive->setSoundSet(soundSetId);
-            dActive->setSoundSetName(soundSetName);
         }
         else if (synchronicSelected)
         {
@@ -599,11 +594,9 @@ void MainViewController::bkButtonClicked (Button* b)
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
-            DirectPreparation::Ptr prep = processor.gallery->getStaticDirectPreparation(item->getId());
-            DirectPreparation::Ptr active = processor.gallery->getActiveDirectPreparation(item->getId());
-            bool toggle = !active->getUseGlobalSoundSet();
+            DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(item->getId());
+            bool toggle = !prep->getUseGlobalSoundSet();
             prep->setUseGlobalSoundSet(toggle);
-            active->setUseGlobalSoundSet(toggle);
         }
         else if (item->getType() == PreparationTypeSynchronic)
         {
@@ -901,7 +894,7 @@ void MainViewController::fillSampleCB()
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
-            DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(item->getId());
+            DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(item->getId());
             if (prep != nullptr) idx = prep->getSoundSet();
         }
         else if (item->getType() == PreparationTypeSynchronic)
@@ -980,7 +973,7 @@ void MainViewController::fillInstrumentCB()
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
-            DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(item->getId());
+            DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(item->getId());
             if (prep != nullptr) idx = prep->getSoundSet();
         }
         else if (item->getType() == PreparationTypeSynchronic)
@@ -1123,7 +1116,7 @@ void MainViewController::timerCallback()
         {
             soundItemSelected = true;
             globalSoundSetButton.setVisible(true);
-            DirectPreparation::Ptr prep = processor.gallery->getActiveDirectPreparation(item->getId());
+            DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(item->getId());
             if (prep != nullptr)
                 globalSoundSetButton.setToggleState(prep->getUseGlobalSoundSet(), dontSendNotification);
         }
@@ -1312,7 +1305,8 @@ void MainViewController::timerCallback()
     {
         state->displayDidChange = false;
         
-        BKPreparationDisplay prevDisplay = overtop.getCurrentDisplay();
+        processor.updateState->previousDisplay = overtop.getCurrentDisplay();
+        BKPreparationDisplay prevDisplay = processor.updateState->previousDisplay;
         
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
         

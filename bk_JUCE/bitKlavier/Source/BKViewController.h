@@ -272,7 +272,7 @@ private:
 
 #define ALL 0
 
-class BKViewController    : public BKComponent, public BKListener, public BigOne::Listener
+class BKViewController : public BKComponent, public BKListener, public BigOne::Listener, public ModdableComponent::Listener
 {
 public:
     BKViewController(BKAudioProcessor& p, BKItemGraph* theGraph, int nt);
@@ -290,12 +290,15 @@ public:
         hideOrShow.setAlwaysOnTop(true);
     }
     
+    void moddableComponentEditorOpened(ModdableComponent* mc) override;
+    
     bool getSubWindowInFront(void)      {   return subWindowInFront;    }
     void setSubWindowInFront(bool f)    {   subWindowInFront = f;       }
     
     virtual void displayTab(int tab) {};
     virtual void displayShared(void) {};
     virtual void invisible(void) {};
+    
     
     inline void arrowPressed(BKArrowType type)
     {

@@ -93,7 +93,7 @@ void Gallery::resetPreparations(void)
 {
     // Optimizations can be made here. Don't need to iterate through EVERY preparation.
     for (int i = direct.size(); --i >= 0; )
-        direct[i]->aPrep->copy(direct[i]->sPrep);
+        direct[i]->prep->resetModdables();
     
     for (int i = nostalgic.size(); --i >= 0; )
         nostalgic[i]->aPrep->copy(nostalgic[i]->sPrep);

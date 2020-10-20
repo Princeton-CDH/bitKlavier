@@ -1100,6 +1100,7 @@ void BKMultiSlider::deHighlightCurrentSlider()
 // ******************************************************************************************************************** //
 
 BKSingleSlider::BKSingleSlider (String name, double min, double max, double def, double increment):
+ModdableComponent(name, false),
 sliderName(name),
 sliderMin(min),
 sliderMax(max),
@@ -1253,8 +1254,11 @@ void BKSingleSlider::mouseDown(const MouseEvent& e)
         WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &valueTF, sliderName);
     }
 #endif
-    
+
+    if (e.mods.isAltDown())
+        ModdableComponent::listeners.call(&ModdableComponent::Listener::moddableComponentEditorOpened, this);
 }
+
 
 void BKSingleSlider::mouseUp(const MouseEvent &event)
 {
