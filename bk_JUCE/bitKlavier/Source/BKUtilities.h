@@ -429,8 +429,16 @@ public:
     {
         mod = m.mod;
         time = m.time;
-        dv = (mod - base) / time;
-        active = true; //active = m.active;
+        if (time > 0)
+        {
+            dv = (mod - base) / time;
+            active = true; //active = m.active;
+        }
+        else
+        {
+            value = m.mod;
+            active = false;
+        }
     }
     
     void set(ValueType v)

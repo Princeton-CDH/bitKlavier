@@ -620,7 +620,7 @@ private:
     Array<float> velocities;
     Array<float> velocitiesActive;
     
-    float lastVelocity;
+    float lastVelocity = 0.0f;
     
     JUCE_LEAK_DETECTOR(DirectProcessor);
 };
