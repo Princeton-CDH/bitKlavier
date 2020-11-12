@@ -151,6 +151,7 @@ public:
                             uint64 voiceRampOn,
                             uint64 voiceRampOff,
                             BKSynthesiserSound* sound,
+                            float* dynamicGain,
 							float blendronicGain,
 							BlendronicProcessor::PtrArr blendronic) = 0;
     
@@ -169,6 +170,7 @@ public:
                             float adsrSustain,
                             uint64 adsrRelease,
                             BKSynthesiserSound* sound,
+                            float* dynamicGain,
 							float blendronicGain,
 							BlendronicProcessor::PtrArr blendronic) = 0;
     
@@ -459,6 +461,7 @@ public:
                                         float rampOnMS,
                                         float rampOffMS,
                                         TuningProcessor::Ptr tuner = nullptr,
+                                        float* dynamicGain = nullptr,
                                         float blendronicGain = 0.,
                                         BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr());
     
@@ -480,8 +483,10 @@ public:
                                         float adsrSustain,
                                         float adsrReleaseMS,
                                         TuningProcessor::Ptr tuner = nullptr,
+                                        float* dynamicGain = nullptr,
                                         float blendronicGain = 0.,
-                                        BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr());
+                                        BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr()
+                                        );
     
     /** Triggers a note-off event.
      
@@ -738,6 +743,7 @@ protected:
                      uint64 voiceRampOn,
                      uint64 voiceRampOff,
                      TuningProcessor::Ptr tuner,
+                     float* dynamicGain,
 					 float blendronicGain,
 					 BlendronicProcessor::PtrArr blendronic);
     
@@ -760,6 +766,7 @@ protected:
                      float adsrSustain,
                      uint64 adsrRelease,
                      TuningProcessor::Ptr tuner,
+                     float* dynamicGain,
 					 float blendronicGain,
 					 BlendronicProcessor::PtrArr blendronic);
     

@@ -297,7 +297,8 @@ public:
     inline const Array<float> getTransposition() const noexcept            {return nTransposition;     }
     inline const bool getTranspUsesTuning() const noexcept                 {return nTranspUsesTuning;}
     inline const float getGain() const noexcept                            {return nGain;              }
-    inline const float getBlendronicGain() const noexcept                  {return nBlendronicGain;              }
+    inline float* getGainPtr() {return &nGain;             }
+    inline const float getBlendronicGain() const noexcept                  {return nBlendronicGain;    }
     inline const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
@@ -306,9 +307,13 @@ public:
     inline const int getReverseDecay() const noexcept                      {return nReverseDecay;         }
     inline const float getReverseSustain() const noexcept                  {return nReverseSustain;       }
     inline const int getReverseRelease() const noexcept                    {return nReverseRelease;       }
-    inline const Array<float> getReverseADSRvals() const noexcept         {return { (float) nReverseAttack, (float)nReverseDecay,(float)nReverseSustain, (float)nReverseRelease}; }
-    
-    
+    inline const Array<float> getReverseADSRvals() const noexcept
+    {
+        return
+        {
+            (float) nReverseAttack, (float)nReverseDecay,(float)nReverseSustain, (float)nReverseRelease
+        };
+    }
     inline const int getUndertowAttack() const noexcept                    {return nUndertowAttack;        }
     inline const int getUndertowDecay() const noexcept                     {return nUndertowDecay;         }
     inline const float getUndertowSustain() const noexcept                 {return nUndertowSustain;       }

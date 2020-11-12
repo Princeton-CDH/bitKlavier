@@ -395,7 +395,7 @@ void DirectPreparationEditor::update(void)
         transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
         resonanceGainSlider->setValue(prep->getResonanceGain(), dontSendNotification);
         hammerGainSlider->setValue(prep->getHammerGain(), dontSendNotification);
-        gainSlider->setValue(prep->getGain(), dontSendNotification);
+        gainSlider->setValue(prep->dGain.value, dontSendNotification);
         ADSRSlider->setAttackValue(prep->getAttack(), dontSendNotification);
         ADSRSlider->setDecayValue(prep->getDecay(), dontSendNotification);
         ADSRSlider->setSustainValue(prep->getSustain(), dontSendNotification);
@@ -1071,7 +1071,7 @@ void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
     }
     else if(name == "gain")
     {
-        mod->dGain.setMod(val);
+        mod->dGain.set(val);
         mod->setDirty(DirectGain);
         
         gainSlider->setBright();

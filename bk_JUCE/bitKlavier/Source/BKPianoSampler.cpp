@@ -144,6 +144,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      uint64 voiceRampOn,
                                      uint64 voiceRampOff,
                                      BKSynthesiserSound* s,
+                                     float* dynamicGain,
 									 float blendronicGain,
 									 BlendronicProcessor::PtrArr blendronic)
 {
@@ -164,6 +165,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      1.0,
                                      voiceRampOff,
                                      s,
+                                     dynamicGain,
 									 blendronicGain,
 									 blendronic);
 }
@@ -236,6 +238,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                                      float adsrSustain,
                                      uint64 adsrRelease,
                                      BKSynthesiserSound* s,
+                                     float* dynamicGain,
 									 float blendGain,
 									 BlendronicProcessor::PtrArr blendronic)
 {
@@ -380,6 +383,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
         
         lgain = gain;
         rgain = gain;
+        
+        dgain = dynamicGain;
         
         noteVelocity = velocity;
         
@@ -673,21 +678,24 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         
         const float l = noteVelocity * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
         const float r = noteVelocity * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
+        
+        float d = 1.0f;
+        if (dgain != nullptr) d = *dgain;
 
         if (outR != nullptr)
         {
-            *outL++ += l * lgain;
-            *outR++ += r * rgain;
+            *outL++ += l * lgain * d;
+            *outR++ += r * rgain * d;
         }
         else
         {
-            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f;
+            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f * d;
         }
         
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain * blendronicGain, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain * blendronicGain, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain * blendronicGain * d, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain * blendronicGain * d, addCounter, 1);
         }
         addCounter++;
     }

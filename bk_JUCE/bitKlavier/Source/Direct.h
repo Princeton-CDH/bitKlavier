@@ -101,7 +101,7 @@ public:
     inline void copy(DirectPreparation::Ptr d)
     {
         dTransposition = d->getTransposition();
-        dGain = d->getGain();
+        dGain = d->dGain;
         dResonanceGain = d->getResonanceGain();
         dHammerGain = d->getHammerGain();
         dBlendronicGain = d->getBlendronicGain();
@@ -159,7 +159,7 @@ public:
     {
         return  (dTransposition     ==      d->getTransposition()   )   &&
                 (dTranspUsesTuning  ==      d->getTranspUsesTuning())   &&
-                (dGain              ==      d->getGain()            )   &&
+                (dGain.base         ==      d->dGain.base           )   &&
                 (dResonanceGain     ==      d->getResonanceGain()   )   &&
                 (dHammerGain        ==      d->getHammerGain()      )   &&
                 (dBlendronicGain    ==      d->getBlendronicGain()  )   &&
@@ -200,10 +200,13 @@ public:
     
     inline Array<float> getTransposition() const noexcept               { return dTransposition; }
     inline const bool getTranspUsesTuning() const noexcept              { return dTranspUsesTuning;}
-    inline const float getGain() const noexcept                         { return dGain;          }
     inline const float getResonanceGain() const noexcept                { return dResonanceGain; }
     inline const float getHammerGain() const noexcept                   { return dHammerGain;    }
     inline const float getBlendronicGain() const noexcept               { return dBlendronicGain; }
+    inline float* getGainPtr() { return &dGain.value;          }
+//    inline float* getResonanceGainPtr() { return &(dResonanceGain.value); }
+//    inline float* getHammerGainPtr() { return &(dHammerGain.value);    }
+//    inline float* getBlendronicGainPtr() { return &(dBlendronicGain.value); }
     inline const int getAttack() const noexcept                         { return dAttack;        }
     inline const int getDecay() const noexcept                          { return dDecay;         }
     inline const float getSustain() const noexcept                      { return dSustain;       }
@@ -238,7 +241,7 @@ public:
     void print(void)
     {
         DBG("dTransposition: "  + floatArrayToString(dTransposition));
-        DBG("dGain: "           + String(dGain));
+        DBG("dGain: "           + String(dGain.value));
         DBG("dResGain: "        + String(dResonanceGain));
         DBG("dHammerGain: "     + String(dHammerGain));
         DBG("dBlendronicGain: " + String(dBlendronicGain));
@@ -252,7 +255,7 @@ public:
     {
         ValueTree prep( "params" );
     
-        prep.setProperty( ptagDirect_gain,              getGain(), 0);
+        dGain.getState(prep, ptagDirect_gain);
         prep.setProperty( ptagDirect_resGain,           getResonanceGain(), 0);
         prep.setProperty( ptagDirect_hammerGain,        getHammerGain(), 0);
         prep.setProperty( ptagDirect_blendronicGain,    getBlendronicGain(), 0);
@@ -284,9 +287,7 @@ public:
     {
         float f;
         
-        dGain.set(e->getDoubleAttribute(ptagDirect_gain, 1.0f));
-//        dGain.setMod(e->getDoubleAttribute(ptagDirect_gain + cModdableModSuffix, 1.0f));
-//        dGain.setTime(e->getIntAttribute(ptagDirect_gain + cModdableTimeSuffix, 0));
+        dGain.setState(e, ptagDirect_gain, 1.0f);
                      
         f = e->getStringAttribute(ptagDirect_hammerGain).getFloatValue();
         setHammerGain(f);

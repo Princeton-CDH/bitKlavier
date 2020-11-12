@@ -157,7 +157,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         synthNoteNumber,
                         synthOffset,
                         velocities.getUnchecked(midiNoteNumber),
-                        prep->getGain() * aGlobalGain,
+                        aGlobalGain,
                         Reverse,
                         FixedLengthFixedStart,
                         NostalgicNote,
@@ -171,6 +171,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         prep->getReverseSustain(),
                         prep->getReverseRelease(),
                         tuner,
+                                 prep->getGainPtr(),
                         prep->getBlendronicGain(),
                         blendronic);
 				}
@@ -181,7 +182,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 						synthNoteNumber,
 						synthOffset,
 						velocities.getUnchecked(midiNoteNumber),
-						prep->getGain() * aGlobalGain,
+						aGlobalGain,
 						Reverse,
 						FixedLengthFixedStart,
 						NostalgicNote,
@@ -194,7 +195,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 						prep->getReverseDecay(),
 						prep->getReverseSustain(),
 						prep->getReverseRelease(),
-						tuner);
+                        
+						tuner,
+                                 prep->getGainPtr());
 				}
             }
             
@@ -334,7 +337,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                                 synthNoteNumber,
                                 synthOffset,
                                 velocities.getUnchecked(note),
-                                prep->getGain() * aGlobalGain,
+                                aGlobalGain,
                                 Reverse,
                                 FixedLengthFixedStart,
                                 NostalgicNote,
@@ -347,7 +350,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                                 prep->getReverseDecay(),
                                 prep->getReverseSustain(),
                                 prep->getReverseRelease(),
+                                       
                                 tuner,
+                                         prep->getGainPtr(),
                                 1.,//b->getBlendronic()->aPrep->getInputGain(),
                                 blendronic);
 						}
@@ -371,7 +376,8 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 								prep->getReverseDecay(),
 								prep->getReverseSustain(),
 								prep->getReverseRelease(),
-								tuner);
+								tuner,
+                                         prep->getGainPtr());
 						}
                         
                         reverseNotes.insert(0, new NostalgicNoteStuff(note));
@@ -448,6 +454,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
                         prep->getReverseSustain(),
                         prep->getReverseRelease(),
                         tuner,
+                                 prep->getGainPtr(),
                         1.,//b->getBlendronic()->aPrep->getInputGain(),
                         blendronic);
 				}
@@ -471,7 +478,9 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
 						prep->getReverseDecay(),
 						prep->getReverseSustain(),
 						prep->getReverseRelease(),
-						tuner);
+						tuner,
+                                 prep->getGainPtr());
+                    
 				}
             }
             
@@ -573,6 +582,7 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
                         prep->getReverseSustain(),
                         prep->getReverseRelease(),
                         tuner,
+                                 prep->getGainPtr(),
                         prep->getBlendronicGain(),
                         blendronic);
                 }
@@ -597,7 +607,8 @@ void NostalgicProcessor::keyPressed(int midiNoteNumber, float midiNoteVelocity, 
 						prep->getReverseDecay(),
 						prep->getReverseSustain(),
 						prep->getReverseRelease(),
-						tuner);
+						tuner,
+                                 prep->getGainPtr());
 				}
             }
             
@@ -843,6 +854,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                             nostalgic->aPrep->getUndertowSustain(),
                             nostalgic->aPrep->getUndertowRelease(),
                             tuner,
+                                     nostalgic->aPrep->getGainPtr(),
                             nostalgic->aPrep->getBlendronicGain(),
                             blendronic);
 					}
@@ -866,6 +878,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
 							nostalgic->aPrep->getUndertowSustain(),
 							nostalgic->aPrep->getUndertowRelease(),
 							tuner,
+                                     nostalgic->aPrep->getGainPtr(),
                             nostalgic->aPrep->getBlendronicGain(),
                             blendronic);
 					}

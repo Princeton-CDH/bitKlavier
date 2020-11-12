@@ -155,6 +155,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                     prep->getSustain(whichEnv),
                     prep->getRelease(whichEnv),
                     tuner,
+                    nullptr, 
                     prep->getBlendronicGain(),
                     blendronic);
 		}

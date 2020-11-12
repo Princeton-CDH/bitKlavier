@@ -135,7 +135,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          synthNoteNumber,
                          synthOffset,
                          velocitiesActive.getUnchecked(noteNumber),
-                         prep->getGain() * aGlobalGain,
+                         aGlobalGain,
                          Forward,
                          Normal,
                          MainNote,
@@ -148,6 +148,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          prep->getSustain(),
                          prep->getRelease(),
                          tuner,
+                         prep->getGainPtr(),
                          prep->getBlendronicGain(),
                          blendronic);
 		}
@@ -158,7 +159,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          synthNoteNumber,
                          synthOffset,
                          velocitiesActive.getUnchecked(noteNumber),
-                         prep->getGain() * aGlobalGain,
+                         aGlobalGain,
                          Forward,
                          Normal,
                          MainNote,
@@ -170,7 +171,8 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          prep->getDecay(),
                          prep->getSustain(),
                          prep->getRelease(),
-                         tuner);
+                         tuner,
+                         prep->getGainPtr());
 		}
         
         //store synthNoteNumbers by noteNumber
@@ -198,7 +200,7 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
                       noteNumber,
                       t,
                       velocitiesActive.getUnchecked(noteNumber),
-                      direct->prep->getGain() * aGlobalGain,
+                      direct->prep->dGain.value * aGlobalGain,
                       true);
     }
 

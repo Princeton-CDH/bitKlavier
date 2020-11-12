@@ -155,6 +155,7 @@ public:
                     uint64 voiceRampOn,
                     uint64 voiceRampOff,
                     BKSynthesiserSound* sound,
+                    float* dynamicGain,
 					float blendronicGain,
 					BlendronicProcessor::PtrArr blendronic
                     ) override;
@@ -174,6 +175,7 @@ public:
                     float adsrSustain,
                     uint64 adsrRelease,
                     BKSynthesiserSound* sound,
+                    float* dynamicGain,
 					float blendronicGain,
 					BlendronicProcessor::PtrArr blendronic
                     ) override;
@@ -230,6 +232,7 @@ private:
     PianoSamplerNoteDirection playDirection;
     bool revRamped;
     float lgain, rgain, rampOnOffLevel, rampOnDelta, rampOffDelta;
+    float* dgain;
     bool isInRampOn, isInRampOff;
     
     double offset;

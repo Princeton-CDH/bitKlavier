@@ -462,6 +462,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
 	const float rampOnMS, //included in lengthMS
 	const float rampOffMS, //included in lengthMS
 	TuningProcessor::Ptr tuner,
+    float* dynamicGain,
 	const float blendronicGain,
 	BlendronicProcessor::PtrArr blendronic)
 {
@@ -482,7 +483,9 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
                                  3.,
                                  1.,
                                  rampOffMS,
+                               
                                  tuner,
+                                 dynamicGain,
                                  blendronicGain,
 								 blendronic);
 }
@@ -505,6 +508,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                            float adsrSustain,
                            float adsrReleaseMS,
                            TuningProcessor::Ptr tuner,
+                                          float* dynamicGain,
 							float blendronicGain,
 							BlendronicProcessor::PtrArr blendronic)
 {
@@ -566,6 +570,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 				adsrSustain,
 				adsrReleaseMS * sampleRateMS,
 				tuner,
+                       dynamicGain,
 				blendronicGain,
 				blendronic);
 			
@@ -597,6 +602,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 	uint64 voiceRampOn,
 	uint64 voiceRampOff,
 	TuningProcessor::Ptr tuner,
+                               float* dynamicGain,
 	float blendronicGain,
 	BlendronicProcessor::PtrArr blendronic
 )
@@ -620,6 +626,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 		1.,
 		30. * 0.001f * getSampleRate(),
 		tuner,
+               dynamicGain,
 		blendronicGain,
 		blendronic);
 }
@@ -644,6 +651,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 	float adsrSustain,
 	uint64 adsrRelease,
 	TuningProcessor::Ptr tuner,
+    float* dynamicGain,
 	float blendronicGain,
 	BlendronicProcessor::PtrArr blendronic
 )
@@ -694,6 +702,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 			adsrSustain,
 			adsrRelease,
 			sound,
+                         dynamicGain,
 			blendronicGain,
 			blendronic);
 	}
@@ -806,6 +815,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
 				1.0f,                   //  S
 				0.001f,                 // R
 				nullptr,
+                       nullptr,
 				0.,
                 BlendronicProcessor::PtrArr());
 

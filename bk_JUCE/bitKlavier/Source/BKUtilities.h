@@ -378,8 +378,14 @@ public:
     struct tag {};
 
     virtual void step(tag<float>) {}
+    virtual void increment(tag<float>) {}
 };
 
+typedef enum ModdableMode
+{
+    ModdableModeOneWay = 0,
+    ModdableModeAlternate
+} ModdableMode;
 
 template <typename ValueType>
 class Moddable : public ModdableBase
@@ -392,8 +398,9 @@ public:
     base(v),
     mod(m),
     time(t),
-    dv((m - v) * 0.001f * t),
-    active(a) {};
+    dv((m - v) / t),
+    active(a) ,
+    mode(ModdableModeOneWay) {};
     
     Moddable (ValueType v, int t):
     Moddable (v, v, t, false) {}
@@ -415,23 +422,15 @@ public:
     }
 
     ~Moddable() {};
-
-    operator ValueType() { return value; }
-    operator ValueType() const noexcept { return value; }
-
-    bool operator== (ValueType v)
-    {
-        return value == v;
-    }
     
     // Main control functions
     void modTo(const Moddable& m)
     {
         mod = m.mod;
         time = m.time;
-        if (time > 0)
+        if (time > 0 && (mod - value) != 0)
         {
-            dv = (mod - base) / time;
+            dv = (mod - value) / time;
             active = true; //active = m.active;
         }
         else
@@ -445,8 +444,8 @@ public:
     {
         value = v;
         base = v;
-        active = false;
-//        dv = (mod - base) * 0.001f * time;
+        mod = v;
+        dv = (mod - value) / time;
     }
     
     void reset()
@@ -461,21 +460,23 @@ public:
     void setBase(ValueType v)
     {
         base = v;
-        dv = (mod - base) / time;
     }
     
     void setMod(ValueType v)
     {
         mod = v;
-        dv = (mod - base) / time;
+        dv = (mod - value) / time;
     }
     
     void setTime(int ms) override
     {
         time = ms;
-        dv = (mod - base) / time;
+        dv = (mod - value) / time;
     }
+    
     void setActive(bool a) { active = a; }
+    
+    void setMode(ModdableMode m) { mode = m; }
     
     // Getters
     ValueType getValue() { return value; }
@@ -509,12 +510,43 @@ public:
             }
         }
     }
-
-private:
+    
+    // Increment
+    void increment() { step(tag<ValueType>{}); }
+    
+    void increment(tag<float>) override
+    {
+        mod += inc;
+    }
     
     ValueType value;
     ValueType base;
     ValueType mod;
+    ValueType inc;
+    
+    // Doing getState and setState a bit different than elsewhere
+    // (passing in reference of tree instead of returning a sub tree)
+    // because it works out better for backwards compatibility while
+    // avoids a lot of extra code in preparations
+    // getState and setState functions
+    void getState(ValueTree& vt, String tag)
+    {
+        vt.setProperty(tag, base, 0);
+        vt.setProperty(tag + "_mod", mod, 0);
+        vt.setProperty(tag + "_time", time, 0);
+    }
+    
+    void setState(XmlElement* e, String tag, ValueType defaultValue)
+    {
+        base = e->getDoubleAttribute(tag, defaultValue);
+        value = base;
+        mod = e->getDoubleAttribute(tag + "_mod", base);
+        time = e->getIntAttribute(tag + "_time", 0);
+    }
+
+private:
+
+    ModdableMode mode;
     int time;
     ValueType dv;
     bool active;
