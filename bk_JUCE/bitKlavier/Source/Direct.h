@@ -17,6 +17,8 @@
 #include "Tuning.h"
 #include "Blendronic.h"
 
+class DirectModification;
+
 /*
 DirectPreparation holds all the state variable values for the
 Direct preparation. As with other preparation types, bK will use
@@ -52,6 +54,7 @@ public:
                       int dca,
                       float sust,
                       int rel):
+    modded(false),
     dGain(gain),
     dTransposition(transp),
     dResonanceGain(resGain),
@@ -71,6 +74,7 @@ public:
     }
     
     DirectPreparation(void):
+    modded(false),
     dGain(1.0),
     dTransposition(Array<float>({0.0})),
     dTranspUsesTuning(false),
@@ -117,33 +121,9 @@ public:
         velocityMax = d->getVelocityMax();
     }
     
-    inline void performModification(DirectPreparation::Ptr d, Array<bool> dirty)
-    {
-        if (dirty[DirectTransposition]) dTransposition = d->getTransposition();
-        if (dirty[DirectGain]) dGain.modTo(d->dGain);
-        if (dirty[DirectResGain]) dResonanceGain = d->getResonanceGain();
-        if (dirty[DirectHammerGain]) dHammerGain = d->getHammerGain();
-        if (dirty[DirectBlendronicGain]) dBlendronicGain = d->getBlendronicGain();
-        if (dirty[DirectTranspUsesTuning]) dTranspUsesTuning = d->getTranspUsesTuning();
-        if (dirty[DirectADSR])
-        {
-            dAttack = d->getAttack();
-            dDecay = d->getDecay();
-            dSustain = d->getSustain();
-            dRelease = d->getRelease();
-        }
-       
-        if (dirty[DirectUseGlobalSoundSet]) dUseGlobalSoundSet = d->getUseGlobalSoundSet();
-        
-        if (dirty[DirectSoundSet])
-        {
-            dSoundSet = d->getSoundSet();
-            dSoundSetName = d->getSoundSetName();
-        }
-        
-        if (dirty[DirectVelocityMin]) velocityMin = d->getVelocityMin();
-        if (dirty[DirectVelocityMax]) velocityMax = d->getVelocityMax();
-    }
+    // Using a raw pointer here instead of ReferenceCountedObjectPtr (Ptr)
+    // so we can use forwarded declared DirectModification
+    void performModification(DirectModification* d, Array<bool> dirty);
     
     inline void stepModdables()
     {
@@ -360,6 +340,7 @@ public:
     inline int getSoundSet(void) { return dUseGlobalSoundSet ? -1 : dSoundSet; }
     inline String getSoundSetName(void) { return dSoundSetName; }
 
+    bool modded;
     // output gain multiplier
     Moddable<float> dGain;
     

@@ -10,6 +10,7 @@
 
 #include "Direct.h"
 #include "PluginProcessor.h"
+#include "Modification.h"
 
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
                                  TuningProcessor::Ptr tuning,
@@ -311,6 +312,43 @@ void DirectProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoad
 {
     sampleType = type;
     //tuner->processor->incrementAdaptiveClusterTime(numSamples);
+}
+
+void DirectPreparation::performModification(DirectModification* d, Array<bool> dirty)
+{
+    if (d->altMod && modded)
+    {
+        if (dirty[DirectGain]) dGain.unmodFrom(d->dGain);
+        modded = false;
+    }
+    else
+    {
+        if (dirty[DirectTransposition]) dTransposition = d->getTransposition();
+        if (dirty[DirectGain]) dGain.modTo(d->dGain);
+        if (dirty[DirectResGain]) dResonanceGain = d->getResonanceGain();
+        if (dirty[DirectHammerGain]) dHammerGain = d->getHammerGain();
+        if (dirty[DirectBlendronicGain]) dBlendronicGain = d->getBlendronicGain();
+        if (dirty[DirectTranspUsesTuning]) dTranspUsesTuning = d->getTranspUsesTuning();
+        if (dirty[DirectADSR])
+        {
+            dAttack = d->getAttack();
+            dDecay = d->getDecay();
+            dSustain = d->getSustain();
+            dRelease = d->getRelease();
+        }
+        
+        if (dirty[DirectUseGlobalSoundSet]) dUseGlobalSoundSet = d->getUseGlobalSoundSet();
+        
+        if (dirty[DirectSoundSet])
+        {
+            dSoundSet = d->getSoundSet();
+            dSoundSetName = d->getSoundSetName();
+        }
+        
+        if (dirty[DirectVelocityMin]) velocityMin = d->getVelocityMin();
+        if (dirty[DirectVelocityMax]) velocityMax = d->getVelocityMax();
+        modded = true;
+    }
 }
 
 

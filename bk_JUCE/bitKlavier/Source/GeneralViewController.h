@@ -138,7 +138,7 @@ public:
 private:
     
     std::unique_ptr<BKSingleSlider> timeSlider;
-    std::unique_ptr<BKSingleSlider> resolutionSlider;
+    std::unique_ptr<BKSingleSlider> incSlider;
     
     void bkTextFieldDidChange       (TextEditor&)               override;
     void bkComboBoxDidChange        (ComboBox* box)             override {};

@@ -327,14 +327,14 @@ BKViewController(p, theGraph, 1)
     timeSlider->addMyListener(this);
     addAndMakeVisible(*timeSlider);
     
-    resolutionSlider = std::make_unique<BKSingleSlider>("mod resolution", 0.0, 4., 0.0, 0.01);
-    resolutionSlider->setJustifyRight(false);
-    resolutionSlider->addMyListener(this);
-    addAndMakeVisible(*resolutionSlider);
+    incSlider = std::make_unique<BKSingleSlider>("mod increment", -2.0f, 2.0f, 0.0, 0.001);
+    incSlider->setJustifyRight(false);
+    incSlider->addMyListener(this);
+    addAndMakeVisible(*incSlider);
 
 #if JUCE_IOS
     timeSlider->addWantsBigOneListener(this);
-    resolutionSlider->addWantsBigOneListener(this);
+    incSlider->addWantsBigOneListener(this);
 #endif
 }
 
@@ -381,7 +381,7 @@ void ModdableViewController::resized()
     Rectangle<int> topSlice = area.removeFromTop(area.getHeight() * 0.5);
     
     timeSlider->setBounds(topSlice);
-    resolutionSlider->setBounds(area);
+    incSlider->setBounds(area);
 }
 
 
@@ -396,10 +396,7 @@ void ModdableViewController::update(void)
     if (mod == nullptr) return;
     
     timeSlider->setValue(mod->getTime(), dontSendNotification);
-    
-//    A4tuningReferenceFrequencySlider->setValue(gen->getTuningFundamental(), dontSendNotification);
-//    tempoMultiplierSlider->setValue(gen->getTempoMultiplier(), dontSendNotification);
-//    invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
+    incSlider->setValue(mod->getInc(), dontSendNotification);
 }
 
 void ModdableViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -411,12 +408,11 @@ void ModdableViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, 
     {
         mod->setTime(int(val));
     }
-    
-//    else if(name == tempoMultiplierSlider->getName())
-//    {
-//        DBG("general tempo multiplier " + String(val));
-//        gen->setTempoMultiplier(val);
-//    }
+    if (name == incSlider->getName())
+    {
+        mod->setInc(val);
+    }
+
 }
 
 void ModdableViewController::bkButtonClicked (Button* b)

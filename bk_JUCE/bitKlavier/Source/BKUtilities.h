@@ -373,19 +373,13 @@ public:
     virtual void setTime(int ms) {}
     virtual int getTime() { return 0; }
     
+    virtual void setInc(float v) {}
+    virtual float getInc() { return 0.0f; }
+    
     // tag dispatch pattern
     template <class T>
     struct tag {};
-
-    virtual void step(tag<float>) {}
-    virtual void increment(tag<float>) {}
 };
-
-typedef enum ModdableMode
-{
-    ModdableModeOneWay = 0,
-    ModdableModeAlternate
-} ModdableMode;
 
 template <typename ValueType>
 class Moddable : public ModdableBase
@@ -399,8 +393,8 @@ public:
     mod(m),
     time(t),
     dv((m - v) / t),
-    active(a) ,
-    mode(ModdableModeOneWay) {};
+    active(a),
+    n(0) {};
     
     Moddable (ValueType v, int t):
     Moddable (v, v, t, false) {}
@@ -424,10 +418,13 @@ public:
     ~Moddable() {};
     
     // Main control functions
-    void modTo(const Moddable& m)
+    void modTo(Moddable& m)
     {
-        mod = m.mod;
+        mod = m.mod + (m.inc * m.n);
+        m.n++;
+        
         time = m.time;
+        
         if (time > 0 && (mod - value) != 0)
         {
             dv = (mod - value) / time;
@@ -435,26 +432,44 @@ public:
         }
         else
         {
-            value = m.mod;
+            value = mod;
             active = false;
         }
     }
     
-    void set(ValueType v)
+    void unmodFrom(const Moddable& m)
     {
-        value = v;
-        base = v;
-        mod = v;
-        dv = (mod - value) / time;
+        mod = base;
+        time = m.time;
+        
+        if (time > 0 && (mod - value) != 0)
+        {
+            dv = (mod - value) / time;
+            active = true; //active = m.active;
+        }
+        else
+        {
+            value = mod;
+            active = false;
+        }
     }
     
     void reset()
     {
         value = base;
+        n = 0;
         active = false;
     }
     
     // Setters
+    void set(ValueType v)
+    {
+        value = v;
+        base = v;
+        mod = v;
+        //        dv = (mod - value) / time;
+    }
+    
     void setValue(ValueType v) { value = v; }
     
     void setBase(ValueType v)
@@ -465,18 +480,24 @@ public:
     void setMod(ValueType v)
     {
         mod = v;
-        dv = (mod - value) / time;
+        n = 0;
+//        dv = (mod - value) / time;
     }
     
     void setTime(int ms) override
     {
         time = ms;
-        dv = (mod - value) / time;
+//        dv = (mod - value) / time;
     }
     
     void setActive(bool a) { active = a; }
     
-    void setMode(ModdableMode m) { mode = m; }
+    void setInc(float v) override { setInc(tag<ValueType>{}, v); }
+    void setInc(tag<float>, float v)
+    {
+        inc = v;
+        n = 0;
+    }
     
     // Getters
     ValueType getValue() { return value; }
@@ -485,10 +506,13 @@ public:
     
     int getTime() override { return time; }
     
+    float getInc() override { return getInc(tag<ValueType>{}); }
+    float getInc(tag<float>) { return inc; }
+
     // Step
     void step() { step(tag<ValueType>{}); }
     
-    void step(tag<float>) override
+    void step(tag<float>)
     {
         if (!active) return;
         if (dv > 0)
@@ -511,19 +535,6 @@ public:
         }
     }
     
-    // Increment
-    void increment() { step(tag<ValueType>{}); }
-    
-    void increment(tag<float>) override
-    {
-        mod += inc;
-    }
-    
-    ValueType value;
-    ValueType base;
-    ValueType mod;
-    ValueType inc;
-    
     // Doing getState and setState a bit different than elsewhere
     // (passing in reference of tree instead of returning a sub tree)
     // because it works out better for backwards compatibility while
@@ -533,23 +544,47 @@ public:
     {
         vt.setProperty(tag, base, 0);
         vt.setProperty(tag + "_mod", mod, 0);
+        vt.setProperty(tag + "_inc", inc, 0);
         vt.setProperty(tag + "_time", time, 0);
     }
     
     void setState(XmlElement* e, String tag, ValueType defaultValue)
     {
         base = e->getDoubleAttribute(tag, defaultValue);
-        value = base;
         mod = e->getDoubleAttribute(tag + "_mod", base);
+        inc = e->getDoubleAttribute(tag + "_inc", 0.0);
         time = e->getIntAttribute(tag + "_time", 0);
+        value = base;
     }
+    
+    // Moddables are used in pairs, with one existing in a preparation that is being modded
+    // and one in a modification that contains mod info. Some of these members function differently
+    // depending on which of the pair the Moddable is.
+    
+    // Current value being used by a prep Moddable, irrelevant in mod Moddable
+    ValueType value;
+    
+    // Initial value of a prep Moddable, irrelevant in mod Moddable
+    ValueType base;
+    
+    // Mod value of a prep Moddable which changes to match the mod value of a mod Moddable
+    ValueType mod;
+    
+    // Irrelevant in prep Moddable, increment amount of mod Moddable
+    ValueType inc;
 
 private:
-
-    ModdableMode mode;
+    // Time to mod  of a prep Moddable which changes to match the time of a mod Moddable
     int time;
+    
+    // Amount of change to <value> per step() to reach <mod> in <time>. Calculated when Moddable is activated
     ValueType dv;
+    
+    // Whether a prep Moddable is in the process of modding, irrelevant in mod Moddable
     bool active;
+    
+    // Irrelevant in prep Moddable, increment count of mod Moddable
+    int n;
 };
 
 #endif  // BKUTILITIES_H_INCLUDED

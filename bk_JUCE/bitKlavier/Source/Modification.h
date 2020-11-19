@@ -13,7 +13,6 @@
 
 
 #include "BKUtilities.h"
-
 #include "Direct.h"
 #include "Nostalgic.h"
 #include "Synchronic.h"
@@ -25,6 +24,7 @@ class Modification
 {
 public:
     Modification(BKAudioProcessor& processor, int Id, int numParams):
+    altMod(false),
     processor(processor),
     Id(Id)
     {
@@ -89,6 +89,8 @@ public:
         keymaps = km;
     }
     
+    bool altMod;
+    
 protected:
     BKAudioProcessor& processor;
     
@@ -99,7 +101,6 @@ protected:
     Keymap::PtrArr keymaps;
     
 private:
-    
     
     JUCE_LEAK_DETECTOR(Modification)
 };
@@ -130,7 +131,7 @@ public:
     inline void copy (DirectModification::Ptr mod)
     {
         setName(mod->getName() + "copy");
-        
+        altMod = mod->altMod;
         DirectPreparation::copy(mod);
     }
     
@@ -169,7 +170,7 @@ public:
     inline void copy (SynchronicModification::Ptr mod)
     {
         setName(mod->getName() + "copy");
-        
+        altMod = mod->altMod;
         SynchronicPreparation::copy(mod);
     }
     
@@ -208,7 +209,7 @@ public:
     inline void copy (NostalgicModification::Ptr mod)
     {
         setName(mod->getName() + "copy");
-        
+        altMod = mod->altMod;
         NostalgicPreparation::copy(mod);
     }
     
@@ -248,7 +249,7 @@ public:
     inline void copy (TuningModification::Ptr mod)
     {
         setName(mod->getName() + "copy");
-        
+        altMod = mod->altMod;
         TuningPreparation::copy(mod);
     }
     
@@ -258,7 +259,7 @@ public:
         
         prep.setProperty( "Id", Id, 0);
         prep.setProperty( "name", getName(), 0);
-        
+        prep.setProperty("alt", altMod, 0);
         ValueTree dirtyVT( "dirty");
         int count = 0;
         for (auto b : dirty)
@@ -277,6 +278,8 @@ public:
         Id = e->getStringAttribute("Id").getIntValue();
         
         String n = e->getStringAttribute("name");
+        
+        altMod = e->getBoolAttribute("alt", false);
         
         if (n != String())     setName(n);
         else                        setName(String(Id));
@@ -356,7 +359,7 @@ public:
     inline void copy (TempoModification::Ptr mod)
     {
         setName(mod->getName() + "copy");
-        
+        altMod = mod->altMod;
         TempoPreparation::copy(mod);
     }
     
@@ -366,7 +369,7 @@ public:
         
         prep.setProperty( "Id", Id, 0);
         prep.setProperty( "name", getName(), 0);
-        
+        prep.setProperty("alt", altMod, 0);
         ValueTree dirtyVT( "dirty");
         int count = 0;
         for (auto b : dirty)
@@ -385,6 +388,8 @@ public:
         Id = e->getStringAttribute("Id").getIntValue();
         
         String n = e->getStringAttribute("name");
+        
+        altMod = e->getBoolAttribute("alt", false);
         
         if (n != String())     setName(n);
         else                        setName(String(Id));
@@ -447,7 +452,7 @@ public:
 	inline void copy(BlendronicModification::Ptr mod)
 	{
 		setName(mod->getName() + "copy");
-
+        altMod = mod->altMod;
 		BlendronicPreparation::copy(mod);
 	}
 
@@ -458,7 +463,7 @@ public:
 
 		prep.setProperty("Id", Id, 0);
 		prep.setProperty("name", getName(), 0);
-
+        prep.setProperty("alt", altMod, 0);
 		ValueTree dirtyVT("dirty");
 		int count = 0;
 		for (auto b : dirty)
@@ -478,8 +483,10 @@ public:
 
 		String n = e->getStringAttribute("name");
 
+        altMod = e->getBoolAttribute("alt", false);
+        
 		if (n != String())     setName(n);
-		else                        setName(String(Id));
+		else                   setName(String(Id));
 
 		XmlElement* dirtyXml = e->getChildByName("dirty");
 		XmlElement* paramsXml = e->getChildByName("params");

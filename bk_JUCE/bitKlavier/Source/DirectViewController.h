@@ -25,6 +25,7 @@ public:
     DirectViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~DirectViewController()
     {
+        alternateMod.setLookAndFeel(nullptr);
         setLookAndFeel(nullptr);
     };
     
@@ -39,6 +40,7 @@ public:
     std::unique_ptr<BKADSRSlider> ADSRSlider;
     
     ToggleButton transpUsesTuning;
+    ToggleButton alternateMod;
     
     std::unique_ptr<BKSingleSlider> blendronicGainSlider;
     

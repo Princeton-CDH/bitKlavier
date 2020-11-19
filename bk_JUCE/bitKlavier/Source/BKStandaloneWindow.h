@@ -266,14 +266,14 @@ public:
         minNumInputs  = jmin (minNumInputs,  maxNumInputs);
         minNumOutputs = jmin (minNumOutputs, maxNumOutputs);
         
-        Component* settings = new AudioSettingsComponent (*this, deviceManager,
+        std::unique_ptr<Component> settings = std::make_unique<AudioSettingsComponent>(*this, deviceManager,
                                                    minNumInputs,
                                                    maxNumInputs,
                                                    minNumOutputs,
                                                    maxNumOutputs);
         settings->setSize(450, 500);
         
-        CallOutBox& box = CallOutBox::launchAsynchronously (settings, button->getScreenBounds(), nullptr);
+        CallOutBox& box = CallOutBox::launchAsynchronously (std::move(settings), button->getScreenBounds(), nullptr);
         box.setLookAndFeel(&laf);
     }
     

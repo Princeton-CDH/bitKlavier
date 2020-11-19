@@ -11,6 +11,7 @@
 #include "Modification.h"
 #include "PluginProcessor.h"
 
+
 DirectModification::DirectModification(BKAudioProcessor& processor, int Id):
 Modification(processor, Id, DirectParameterTypeNil)
 {
@@ -23,7 +24,7 @@ ValueTree DirectModification::getState(void)
     
     prep.setProperty( "Id", Id, 0);
     prep.setProperty( "name", getName(), 0);
-    
+    prep.setProperty("alt", altMod, 0);
     ValueTree dirtyVT( "dirty");
     int count = 0;
     for (auto b : dirty)
@@ -42,6 +43,8 @@ void DirectModification::setState(XmlElement* e)
     Id = e->getStringAttribute("Id").getIntValue();
     
     String n = e->getStringAttribute("name");
+    
+    altMod = e->getBoolAttribute("alt", false);
     
     if (n != String())     setName(n);
     else                        setName(String(Id));
@@ -190,7 +193,7 @@ ValueTree SynchronicModification::getState(void)
     
     prep.setProperty( "Id", Id, 0);
     prep.setProperty( "name", getName(), 0);
-    
+    prep.setProperty("alt", altMod, 0);
     ValueTree dirtyVT( "dirty");
     int count = 0;
     for (auto b : dirty)
@@ -209,6 +212,8 @@ void SynchronicModification::setState(XmlElement* e)
     Id = e->getStringAttribute("Id").getIntValue();
     
     String n = e->getStringAttribute("name");
+    
+    altMod = e->getBoolAttribute("alt", false);
     
     if (n != String())     setName(n);
     else                        setName(String(Id));
@@ -457,7 +462,7 @@ ValueTree NostalgicModification::getState(void)
     
     prep.setProperty( "Id", Id, 0);
     prep.setProperty( "name", getName(), 0);
-    
+    prep.setProperty("alt", altMod, 0);
     ValueTree dirtyVT( "dirty");
     int count = 0;
     for (auto b : dirty)
@@ -476,6 +481,8 @@ void NostalgicModification::setState(XmlElement* e)
     Id = e->getStringAttribute("Id").getIntValue();
     
     String n = e->getStringAttribute("name");
+    
+    altMod = e->getBoolAttribute("alt", false);
     
     if (n != String())     setName(n);
     else                        setName(String(Id));

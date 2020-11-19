@@ -72,6 +72,12 @@ BKViewController(p, theGraph, 2)
     transpUsesTuning.setToggleState (false, dontSendNotification);
     addAndMakeVisible(&transpUsesTuning, ALL);
     
+    alternateMod.setButtonText ("alternate mod");
+    alternateMod.setTooltip("activating this mod will alternate between modding and reseting attached preparations");
+    alternateMod.setToggleState (false, dontSendNotification);
+    addChildComponent(&alternateMod, ALL);
+    alternateMod.setLookAndFeel(&buttonsAndMenusLAF2);
+    
 #if JUCE_IOS
     transpositionSlider->addWantsBigOneListener(this);
     gainSlider->addWantsBigOneListener(this);
@@ -126,6 +132,11 @@ void DirectViewController::displayShared(void)
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
+    
+    alternateMod.setBounds(actionButton.getRight()+gXSpacing,
+                           actionButton.getY(),
+                           selectCB.getWidth(),
+                           actionButton.getHeight());
     
     leftArrow.setBounds (0, getHeight() * 0.4, 50, 50);
     rightArrow.setBounds (getRight() - 50, getHeight() * 0.4, 50, 50);
@@ -770,7 +781,6 @@ void DirectPreparationEditor::buttonClicked (Button* b)
 DirectModificationEditor::DirectModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 DirectViewController(p, theGraph)
 {
-    
     selectCB.addListener(this);
     selectCB.addMyListener(this);
     
@@ -798,6 +808,8 @@ DirectViewController(p, theGraph)
     
     blendronicGainSlider->addMyListener(this);
     
+    alternateMod.addListener(this);
+    alternateMod.setVisible(true);
 }
 
 void DirectModificationEditor::greyOutAllComponents()
@@ -846,6 +858,7 @@ void DirectModificationEditor::update(void)
         gainSlider->setValue(mod->dGain.getMod(), dontSendNotification);
         ADSRSlider->setValue(mod->getADSRvals(), dontSendNotification);
         transpUsesTuning.setToggleState(mod->getTranspUsesTuning(), dontSendNotification);
+        alternateMod.setToggleState(mod->altMod, dontSendNotification);
         velocityMinMaxSlider->setMinValue(mod->getVelocityMin(), dontSendNotification);
         velocityMinMaxSlider->setMaxValue(mod->getVelocityMax(), dontSendNotification);
         blendronicGainSlider->setValue(mod->getBlendronicGain(), dontSendNotification);
@@ -1180,6 +1193,11 @@ void DirectModificationEditor::buttonClicked (Button* b)
         mod->setTranspUsesTuning(transpUsesTuning.getToggleState());
         mod->setDirty(DirectTranspUsesTuning);
         transpUsesTuning.setAlpha(1.);
+    }
+    else if (b == &alternateMod)
+    {
+        DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+        mod->altMod = alternateMod.getToggleState();
     }
 }
 

@@ -72,10 +72,10 @@ void BKAudioProcessorEditor::resized()
 
 void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
 {
-    Component* settings = new PreferencesComponent (*this);
+    std::unique_ptr<Component> settings = std::make_unique<PreferencesComponent> (*this);
     settings->setSize(200, 120);
     
-    CallOutBox* preferences = &CallOutBox::launchAsynchronously (settings, button->getScreenBounds(), nullptr);
+    CallOutBox* preferences = &CallOutBox::launchAsynchronously (std::move(settings), button->getScreenBounds(), nullptr);
     preferences->setLookAndFeel(&laf);
 }
 
