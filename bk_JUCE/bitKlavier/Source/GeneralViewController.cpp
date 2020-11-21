@@ -322,20 +322,31 @@ BKViewController(p, theGraph, 1)
     
     setLookAndFeel(&buttonsAndMenusLAF);
     
-    timeSlider = std::make_unique<BKSingleSlider>("mod time", 0, 2000, 0, 1);
+    timeSlider = std::make_unique<BKSingleSlider>("mod time (ms)", 0, 2000, 0, 1);
+    timeSlider->setToolTipString("how long it will take to ramp to this mod value");
     timeSlider->setJustifyRight(false);
     timeSlider->addMyListener(this);
     addAndMakeVisible(*timeSlider);
     
     incSlider = std::make_unique<BKSingleSlider>("mod increment", -2.0f, 2.0f, 0.0, 0.001);
+    incSlider->setToolTipString("how much to increment the mod value on each time the mod is triggered");
     incSlider->setJustifyRight(false);
     incSlider->addMyListener(this);
     addAndMakeVisible(*incSlider);
+    
+    maxIncSlider = std::make_unique<BKSingleSlider>("max times to increment", 0, 10, 0, 1);
+    maxIncSlider->setToolTipString("how many times maximum to increment the mod value");
+    maxIncSlider->setJustifyRight(false);
+    maxIncSlider->addMyListener(this);
+    addAndMakeVisible(*maxIncSlider);
 
 #if JUCE_IOS
     timeSlider->addWantsBigOneListener(this);
     incSlider->addWantsBigOneListener(this);
+    maxIncSlider->addWantsBigOneListener(this);
 #endif
+    
+    startTimerHz(10);
 }
 
 #if JUCE_IOS
@@ -378,10 +389,11 @@ void ModdableViewController::resized()
     
     area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.2f);
     
-    Rectangle<int> topSlice = area.removeFromTop(area.getHeight() * 0.5);
+    int h = area.getHeight();
     
-    timeSlider->setBounds(topSlice);
-    incSlider->setBounds(area);
+    timeSlider->setBounds(area.removeFromTop(h * 0.3f));
+    incSlider->setBounds(area.removeFromTop(h * 0.3f));
+    maxIncSlider->setBounds(area);
 }
 
 
@@ -397,6 +409,7 @@ void ModdableViewController::update(void)
     
     timeSlider->setValue(mod->getTime(), dontSendNotification);
     incSlider->setValue(mod->getInc(), dontSendNotification);
+    maxIncSlider->setValue(mod->getMaxNumberOfInc(), dontSendNotification);
 }
 
 void ModdableViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -412,32 +425,19 @@ void ModdableViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, 
     {
         mod->setInc(val);
     }
-
+    if (name == maxIncSlider->getName())
+    {
+        mod->setMaxNumberOfInc(val);
+    }
 }
 
 void ModdableViewController::bkButtonClicked (Button* b)
 {
-//    GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
-//
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(processor.updateState->previousDisplay);
 
     }
-//    else if (b == &invertSustainB)
-//    {
-//        //bool inversion =  (bool) b->getToggleStateValue().toString().getIntValue();
-//        bool inversion =  b->getToggleState();
-//        DBG("invert sustain button = " + String((int)inversion));
-//        processor.setSustainInversion(inversion);
-//        gen->setInvertSustain(inversion);
-//    }
-//    else if (b == &noteOnSetsNoteOffVelocityB)
-//    {
-//        bool newstate =  b->getToggleState();
-//        DBG("invert noteOnSetsNoteOffVelocity = " + String((int)newstate));
-//        gen->setNoteOnSetsNoteOffVelocity(newstate);
-//    }
 }
 
 ModdableBase* ModdableViewController::getCurrentModdable()
@@ -450,9 +450,21 @@ ModdableBase* ModdableViewController::getCurrentModdable()
         
         if (processor.updateState->currentModdableName == "gain")
             return &mod->dGain;
+        else if (processor.updateState->currentModdableName == "resonance gain")
+            return &mod->dResonanceGain;
+        else if (processor.updateState->currentModdableName == "hammer gain")
+            return &mod->dHammerGain;
+        else if (processor.updateState->currentModdableName == "blendronic gain")
+            return &mod->dBlendronicGain;
         else
             ; // continue branching for each parameter and component
     }
     
     return nullptr;
+}
+
+
+void ModdableViewController::timerCallback()
+{
+//    ModdableBase* mod = getCurrentModdable();
 }

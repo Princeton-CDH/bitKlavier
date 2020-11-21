@@ -250,7 +250,7 @@ public:
     {
         for (auto p : tuning)
         {
-            if (p->sPrep->compare(prep)) return p;
+            if (p->prep->compare(prep)) return p;
         }
         return nullptr;
     }
@@ -268,7 +268,7 @@ public:
     {
         for (auto p : synchronic)
         {
-            if (p->sPrep->compare(prep)) return p;
+            if (p->prep->compare(prep)) return p;
         }
         return nullptr;
     }
@@ -277,7 +277,7 @@ public:
     {
         for (auto p : nostalgic)
         {
-            if (p->sPrep->compare(prep)) return p;
+            if (p->prep->compare(prep)) return p;
         }
         return nullptr;
     }
@@ -286,7 +286,7 @@ public:
     {
         for (auto p : tempo)
         {
-            if (p->sPrep->compare(prep)) return p;
+            if (p->prep->compare(prep)) return p;
         }
         return nullptr;
     }
@@ -295,7 +295,7 @@ public:
 	{
 		for (auto p : blendronic)
 		{
-			if (p->sPrep->compare(prep)) return p;
+			if (p->prep->compare(prep)) return p;
 		}
 		return nullptr;
 	}
@@ -456,48 +456,9 @@ public:
 		return names;
 	}
     
-    inline const SynchronicPreparation::Ptr getStaticSynchronicPreparation(int Id) const noexcept
-    {
-        for (auto p : synchronic)
-        {
-            if (p->getId() == Id)   return p->sPrep;
-        }
-        return nullptr;
-    }
-    
-    inline const SynchronicPreparation::Ptr getActiveSynchronicPreparation(int Id) const noexcept
-    {
-
-        for (auto p : synchronic)
-        {
-            if (p->getId() == Id)   return p->aPrep;
-        }
-        return nullptr;
-    }
-    
-    inline const NostalgicPreparation::Ptr getStaticNostalgicPreparation(int Id) const noexcept
-    {
-
-        for (auto p : nostalgic)
-        {
-            if (p->getId() == Id)   return p->sPrep;
-        }
-        return nullptr;
-    }
-    
-    inline const NostalgicPreparation::Ptr getActiveNostalgicPreparation(int Id) const noexcept
-    {
- 
-        for (auto p : nostalgic)
-        {
-            if (p->getId() == Id)   return p->aPrep;
-        }
-        return nullptr;
-    }
-    
     inline const DirectPreparation::Ptr getDirectPreparation(int Id) const noexcept
     {
-
+        
         for (auto p : direct)
         {
             if (p->getId() == Id)   return p->prep;
@@ -505,62 +466,53 @@ public:
         return nullptr;
     }
     
-    inline const TuningPreparation::Ptr getStaticTuningPreparation(int Id) const noexcept
+    
+    inline const SynchronicPreparation::Ptr getSynchronicPreparation(int Id) const noexcept
+    {
+        for (auto p : synchronic)
+        {
+            if (p->getId() == Id)   return p->prep;
+        }
+        return nullptr;
+    }
+    
+    
+    inline const NostalgicPreparation::Ptr getNostalgicPreparation(int Id) const noexcept
+    {
+ 
+        for (auto p : nostalgic)
+        {
+            if (p->getId() == Id)   return p->prep;
+        }
+        return nullptr;
+    }
+    
+    inline const TuningPreparation::Ptr getTuningPreparation(int Id) const noexcept
     {
 
         for (auto p : tuning)
         {
-            if (p->getId() == Id)   return p->sPrep;
+            if (p->getId() == Id)   return p->prep;
         }
         return nullptr;
     }
     
-    inline const TuningPreparation::Ptr getActiveTuningPreparation(int Id) const noexcept
-    {
-
-        for (auto p : tuning)
-        {
-            if (p->getId() == Id)   return p->aPrep;
-        }
-        return nullptr;
-    }
-    
-    inline const TempoPreparation::Ptr getStaticTempoPreparation(int Id) const noexcept
+    inline const TempoPreparation::Ptr getTempoPreparation(int Id) const noexcept
     {
 
         for (auto p : tempo)
         {
-            if (p->getId() == Id)   return p->sPrep;
-        }
-        return nullptr;
-    }
-    
-    inline const TempoPreparation::Ptr getActiveTempoPreparation(int Id) const noexcept
-    {
-
-        for (auto p : tempo)
-        {
-            if (p->getId() == Id)   return p->aPrep;
+            if (p->getId() == Id)   return p->prep;
         }
         return nullptr;
     }
 
-	inline const BlendronicPreparation::Ptr getStaticBlendronicPreparation(int Id) const noexcept
+	inline const BlendronicPreparation::Ptr getBlendronicPreparation(int Id) const noexcept
 	{
 
 		for (auto p : blendronic)
 		{
-			if (p->getId() == Id)   return p->sPrep;
-		}
-		return nullptr;
-	}
-
-	inline const BlendronicPreparation::Ptr getActiveBlendronicPreparation(int Id) const noexcept
-	{
-
-		for (auto p : blendronic)
-		{
-			if (p->getId() == Id)   return p->aPrep;
+			if (p->getId() == Id)   return p->prep;
 		}
 		return nullptr;
 	}
@@ -826,14 +778,14 @@ private:
     Direct::PtrArr                      direct;
     Tuning::PtrArr                      tuning;
     Tempo::PtrArr                       tempo;
-	Blendronic::PtrArr				blendronic;
+	Blendronic::PtrArr				    blendronic;
     
     SynchronicModification::PtrArr      modSynchronic;
     DirectModification::PtrArr          modDirect;
     NostalgicModification::PtrArr       modNostalgic;
     TuningModification::PtrArr          modTuning;
     TempoModification::PtrArr           modTempo;
-	BlendronicModification::PtrArr	modBlendronic;
+	BlendronicModification::PtrArr	    modBlendronic;
     
     Keymap::PtrArr                      bkKeymaps;
     Piano::PtrArr                       bkPianos;

@@ -463,7 +463,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
 	const float rampOffMS, //included in lengthMS
 	TuningProcessor::Ptr tuner,
     float* dynamicGain,
-	const float blendronicGain,
+	float* blendronicGain,
 	BlendronicProcessor::PtrArr blendronic)
 {
                 return keyOn   ( midiChannel,
@@ -483,7 +483,6 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
                                  3.,
                                  1.,
                                  rampOffMS,
-                               
                                  tuner,
                                  dynamicGain,
                                  blendronicGain,
@@ -491,26 +490,26 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
 }
 		
 BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
-                           const int keyNoteNumber,
-                           const int midiNoteNumber,
-                           const float transp,
-                           const float velocity,
-                           const float gain,
-                           PianoSamplerNoteDirection direction,
-                           PianoSamplerNoteType type,
-                           BKNoteType bktype,
-                           int set,
-                           int layer,
-                           const float startingPositionMS,
-                           const float lengthMS,
-                           float adsrAttackMS,
-                           float adsrDecayMS,
-                           float adsrSustain,
-                           float adsrReleaseMS,
-                           TuningProcessor::Ptr tuner,
+                                          const int keyNoteNumber,
+                                          const int midiNoteNumber,
+                                          const float transp,
+                                          const float velocity,
+                                          const float gain,
+                                          PianoSamplerNoteDirection direction,
+                                          PianoSamplerNoteType type,
+                                          BKNoteType bktype,
+                                          int set,
+                                          int layer,
+                                          const float startingPositionMS,
+                                          const float lengthMS,
+                                          float adsrAttackMS,
+                                          float adsrDecayMS,
+                                          float adsrSustain,
+                                          float adsrReleaseMS,
+                                          TuningProcessor::Ptr tuner,
                                           float* dynamicGain,
-							float blendronicGain,
-							BlendronicProcessor::PtrArr blendronic)
+                                          float* blendronicGain,
+                                          BlendronicProcessor::PtrArr blendronic)
 {
 	//DBG("BKSynthesiser::keyOn " + String(keyNoteNumber) + " " + String(midiNoteNumber));
 
@@ -551,28 +550,28 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 			}
             
             BKSynthesiserVoice* voice = findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes);
-			startVoice(findFreeVoice(sound, midiChannel, noteNumber, shouldStealNotes),
-				sound,
-				midiChannel,
-				keyNoteNumber,
-				noteNumber,
-				transposition,
-				gain,
-                velocity,
-				direction,
-				type,
-				bktype,
-				layer,
-				(uint64)((startingPositionMS * sampleRateMS)),
-				(uint64)(lengthMS * sampleRateMS),
-				adsrAttackMS * sampleRateMS,
-				adsrDecayMS * sampleRateMS,
-				adsrSustain,
-				adsrReleaseMS * sampleRateMS,
-				tuner,
+            startVoice(findFreeVoice(sound, midiChannel, noteNumber, shouldStealNotes),
+                       sound,
+                       midiChannel,
+                       keyNoteNumber,
+                       noteNumber,
+                       transposition,
+                       gain,
+                       velocity,
+                       direction,
+                       type,
+                       bktype,
+                       layer,
+                       (uint64)((startingPositionMS * sampleRateMS)),
+                       (uint64)(lengthMS * sampleRateMS),
+                       adsrAttackMS * sampleRateMS,
+                       adsrDecayMS * sampleRateMS,
+                       adsrSustain,
+                       adsrReleaseMS * sampleRateMS,
+                       tuner,
                        dynamicGain,
-				blendronicGain,
-				blendronic);
+                       blendronicGain,
+                       blendronic);
 			
 			// voice to return;
             voiceToReturn = voice;
@@ -586,74 +585,74 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 // VELOCITY IN MASTER REGIONS NEEDS TO BE APPLIED APPROPRIATELY
 
 void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
-	BKSynthesiserSound* const sound,
-	const int midiChannel,
-	const int keyNoteNumber,
-	const int midiNoteNumber,
-	const float midiNoteNumberOffset,
-	const float gain,
-    const float velocity,
-	PianoSamplerNoteDirection direction,
-	PianoSamplerNoteType type,
-	BKNoteType bktype,
-	int layer,
-	const uint64 startingPosition,
-	const uint64 length,
-	uint64 voiceRampOn,
-	uint64 voiceRampOff,
-	TuningProcessor::Ptr tuner,
+                               BKSynthesiserSound* const sound,
+                               const int midiChannel,
+                               const int keyNoteNumber,
+                               const int midiNoteNumber,
+                               const float midiNoteNumberOffset,
+                               const float gain,
+                               const float velocity,
+                               PianoSamplerNoteDirection direction,
+                               PianoSamplerNoteType type,
+                               BKNoteType bktype,
+                               int layer,
+                               const uint64 startingPosition,
+                               const uint64 length,
+                               uint64 voiceRampOn,
+                               uint64 voiceRampOff,
+                               TuningProcessor::Ptr tuner,
                                float* dynamicGain,
-	float blendronicGain,
-	BlendronicProcessor::PtrArr blendronic
+                               float* blendronicGain,
+                               BlendronicProcessor::PtrArr blendronic
 )
 {
-	startVoice(voice,
-		sound,
-		midiChannel,
-		keyNoteNumber,
-		midiNoteNumber,
-		midiNoteNumberOffset,
-		gain,
-        velocity,
-		direction,
-		type,
-		bktype,
-		layer,
-		startingPosition,
-		length,
-		voiceRampOn,
-		3. * 0.001f * getSampleRate(),
-		1.,
-		30. * 0.001f * getSampleRate(),
-		tuner,
+    startVoice(voice,
+               sound,
+               midiChannel,
+               keyNoteNumber,
+               midiNoteNumber,
+               midiNoteNumberOffset,
+               gain,
+               velocity,
+               direction,
+               type,
+               bktype,
+               layer,
+               startingPosition,
+               length,
+               voiceRampOn,
+               3. * 0.001f * getSampleRate(),
+               1.,
+               30. * 0.001f * getSampleRate(),
+               tuner,
                dynamicGain,
-		blendronicGain,
-		blendronic);
+               blendronicGain,
+               blendronic);
 }
 
 
 void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
-	BKSynthesiserSound* const sound,
-	const int midiChannel,
-	const int keyNoteNumber,
-	const int midiNoteNumber,
-	const float midiNoteNumberOffset,
-	const float gain,
-    const float velocity,
-	PianoSamplerNoteDirection direction,
-	PianoSamplerNoteType type,
-	BKNoteType bktype,
-	int layer,
-	const uint64 startingPosition,
-	const uint64 length,
-	uint64 adsrAttack,
-	uint64 adsrDecay,
-	float adsrSustain,
-	uint64 adsrRelease,
-	TuningProcessor::Ptr tuner,
-    float* dynamicGain,
-	float blendronicGain,
-	BlendronicProcessor::PtrArr blendronic
+                               BKSynthesiserSound* const sound,
+                               const int midiChannel,
+                               const int keyNoteNumber,
+                               const int midiNoteNumber,
+                               const float midiNoteNumberOffset,
+                               const float gain,
+                               const float velocity,
+                               PianoSamplerNoteDirection direction,
+                               PianoSamplerNoteType type,
+                               BKNoteType bktype,
+                               int layer,
+                               const uint64 startingPosition,
+                               const uint64 length,
+                               uint64 adsrAttack,
+                               uint64 adsrDecay,
+                               float adsrSustain,
+                               uint64 adsrRelease,
+                               TuningProcessor::Ptr tuner,
+                               float* dynamicGain,
+                               float* blendronicGain,
+                               BlendronicProcessor::PtrArr blendronic
 )
 {
 	//DBG("BKSynthesiser::startVoice " + String(keyNoteNumber) + " " + String(midiNoteNumber));
@@ -676,7 +675,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 		voice->sostenutoPedalDown = false;
 		voice->sustainPedalDown = sustainPedalsDown[midiChannel];
 		voice->tuning = tuner;
-		voice->blendronicGain = blendronicGain;
+        voice->blendronicGain = blendronicGain;
 		voice->blendronic = blendronic;
 
 
@@ -687,24 +686,24 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 			g *= Decibels::decibelsToGain(sound->region_->volume);
 		}
 
-		voice->startNote(midiNoteNumber,
-			midiNoteNumberOffset,
-			pitchWheelValue,
-			g,
-            velocity,
-			direction,
-			type,
-			bktype,
-			startingPosition,
-			length,
-			adsrAttack,
-			adsrDecay,
-			adsrSustain,
-			adsrRelease,
-			sound,
+        voice->startNote(midiNoteNumber,
+                         midiNoteNumberOffset,
+                         pitchWheelValue,
+                         g,
+                         velocity,
+                         direction,
+                         type,
+                         bktype,
+                         startingPosition,
+                         length,
+                         adsrAttack,
+                         adsrDecay,
+                         adsrSustain,
+                         adsrRelease,
+                         sound,
                          dynamicGain,
-			blendronicGain,
-			blendronic);
+                         blendronicGain,
+                         blendronic);
 	}
 }
 
@@ -719,15 +718,16 @@ void BKSynthesiser::stopVoice(BKSynthesiserVoice* voice, float velocity, const b
 }
 
 void BKSynthesiser::keyOff(const int midiChannel,
-	const BKNoteType type,
-    const int set,
-	const int layerId,
-	const int keyNoteNumber,
-	const int midiNoteNumber,
-	const float velocity,
-    const float gain,
-	bool allowTailOff,
-	bool nostalgicOff)
+                           const BKNoteType type,
+                           const int set,
+                           const int layerId,
+                           const int keyNoteNumber,
+                           const int midiNoteNumber,
+                           const float velocity,
+                           const float gain,
+                           float* dynamicGain,
+                           bool allowTailOff,
+                           bool nostalgicOff)
 {
 
 	//DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber));
@@ -796,28 +796,28 @@ void BKSynthesiser::keyOff(const int midiChannel,
 
 		if (appliesToNote && appliesToVel && isRelease && pedalStatesMatch)
 		{
-			startVoice(findFreeVoice(sound, midiChannel, noteNumber, shouldStealNotes),
-				sound,
-				midiChannel,
-				keyNoteNumber,
-				noteNumber,
-				0, // might need to deal with this
-                gain,
-				velocity,
-				Forward,
-				FixedLengthFixedStart,
-				DirectNote,             // 
-				0,                      //
-				0,                      //
-				sound->sampleLength,    //  len
-				0.001f,                 //  A
-				0.001f,                 //  D
-				1.0f,                   //  S
-				0.001f,                 // R
-				nullptr,
+            startVoice(findFreeVoice(sound, midiChannel, noteNumber, shouldStealNotes),
+                       sound,
+                       midiChannel,
+                       keyNoteNumber,
+                       noteNumber,
+                       0, // might need to deal with this
+                       gain,
+                       velocity,
+                       Forward,
+                       FixedLengthFixedStart,
+                       DirectNote,             //
+                       0,                      //
+                       0,                      //
+                       sound->sampleLength,    //  len
+                       0.001f,                 //  A
+                       0.001f,                 //  D
+                       1.0f,                   //  S
+                       0.001f,                 // R
                        nullptr,
-				0.,
-                BlendronicProcessor::PtrArr());
+                       dynamicGain,
+                       nullptr,
+                       BlendronicProcessor::PtrArr());
 
 			// break;
 

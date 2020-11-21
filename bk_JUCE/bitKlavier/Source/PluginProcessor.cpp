@@ -878,6 +878,7 @@ void BKAudioProcessor::sustainDeactivate(void)
                           21,
                           1.,
                           1.,
+                          nullptr,
                           true);
         
         //play pedalUp sample
@@ -921,7 +922,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         Tempo::PtrArr allTempoPreps = gallery->getAllTempo();
         for (auto p : allTempoPreps)
         {
-            p->aPrep->setHostTempo(hostTempo);
+            p->prep->setHostTempo(hostTempo);
         }
         // DBG("DAW bpm = " + String(currentPositionInfo.bpm));
     }
@@ -1166,7 +1167,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    TuningPreparation::Ptr prep = gallery->getTuning(target)->aPrep;
+                    TuningPreparation::Ptr prep = gallery->getTuning(target)->prep;
                     prep->performModification(mod, mod->getDirty());
                 }
                 updateState->tuningPreparationDidChange = true;
@@ -1187,7 +1188,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    TempoPreparation::Ptr prep = gallery->getTempo(target)->aPrep;
+                    TempoPreparation::Ptr prep = gallery->getTempo(target)->prep;
                     prep->performModification(mod, mod->getDirty());
                 }
                 updateState->tempoPreparationDidChange = true;
@@ -1229,7 +1230,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    NostalgicPreparation::Ptr prep = gallery->getNostalgic(target)->aPrep;
+                    NostalgicPreparation::Ptr prep = gallery->getNostalgic(target)->prep;
                     prep->performModification(mod, mod->getDirty());
                 }
                 updateState->nostalgicPreparationDidChange = true;
@@ -1250,7 +1251,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    SynchronicPreparation::Ptr prep = gallery->getSynchronic(target)->aPrep;
+                    SynchronicPreparation::Ptr prep = gallery->getSynchronic(target)->prep;
                     prep->performModification(mod, mod->getDirty());
                 }
                 updateState->synchronicPreparationDidChange = true;
@@ -1271,7 +1272,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    BlendronicPreparation::Ptr prep = gallery->getBlendronic(target)->aPrep;
+                    BlendronicPreparation::Ptr prep = gallery->getBlendronic(target)->prep;
                     prep->performModification(mod, mod->getDirty());
                 }
                 updateState->blendronicPreparationDidChange = true;

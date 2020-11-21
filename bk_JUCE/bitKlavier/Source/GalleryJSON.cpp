@@ -282,7 +282,7 @@ void Gallery::setStateFromJson(var myJson)
                     
                     for (int i = 0; i < tempo.size(); i++)
                     {
-                        if (tempo[i]->sPrep->getTempo() == tmp)
+                        if (tempo[i]->prep->getTempo() == tmp)
                         {
                             tmpId = i;
                             break;
@@ -663,7 +663,7 @@ void Gallery::setStateFromJson(var myJson)
                         Array<float> transp;
                         transp.add(dTransp);
                         
-                        dPrep->setTransposition(transp);
+                        dPrep->dTransposition.set(transp);
                         
                         DBG("keys: " + intArrayToString(keys) +
                             " dgain: " + String(dGain) +
@@ -980,7 +980,7 @@ if (!(tm.size() % 3))
             whichTMod = modTuning.size()-1;
         }
         
-        int whichPrep = nostalgic[nId]->aPrep->getTuning()->getId();
+        int whichPrep = nostalgic[nId]->prep->getTuning()->getId();
         thisPiano->modificationMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), whichTMod);
     }
 }
@@ -1020,7 +1020,7 @@ if (!(tm.size() % 3))
             whichTMod = modTuning.size()-1;
         }
         
-        int whichPrep = synchronic[sId]->aPrep->getTuning()->getId();
+        int whichPrep = synchronic[sId]->prep->getTuning()->getId();
         
         thisPiano->modificationMap[noteNumber]->addTuningModification(new TuningModification(noteNumber, whichPrep, TuningFundamental, String(fund), whichTMod));
         

@@ -56,7 +56,6 @@ public:
                       int rel):
     modded(false),
     dGain(gain),
-    dTransposition(transp),
     dResonanceGain(resGain),
     dHammerGain(hamGain),
     dBlendronicGain(blendGain),
@@ -64,6 +63,7 @@ public:
     dDecay(dca),
     dRelease(rel),
     dSustain(sust),
+    dTransposition(transp),
     dUseGlobalSoundSet(true),
     dSoundSet(-1),
     dSoundSetName(String()),
@@ -76,8 +76,6 @@ public:
     DirectPreparation(void):
     modded(false),
     dGain(1.0),
-    dTransposition(Array<float>({0.0})),
-    dTranspUsesTuning(false),
     dResonanceGain(0.5),
     dHammerGain(0.5),
     dBlendronicGain(1.0f),
@@ -85,6 +83,8 @@ public:
     dDecay(3),
     dRelease(30),
     dSustain(1.),
+    dTransposition(Moddable<Array<float>>(Array<float>(0.0f))),
+    dTranspUsesTuning(false),
     dUseGlobalSoundSet(true),
     dSoundSet(-1),
     dSoundSetName(String()),
@@ -104,49 +104,55 @@ public:
     
     inline void copy(DirectPreparation::Ptr d)
     {
-        dTransposition = d->getTransposition();
         dGain = d->dGain;
-        dResonanceGain = d->getResonanceGain();
-        dHammerGain = d->getHammerGain();
-        dBlendronicGain = d->getBlendronicGain();
-        dAttack = d->getAttack();
-        dDecay = d->getDecay();
-        dSustain = d->getSustain();
-        dRelease = d->getRelease();
-        dTranspUsesTuning = d->getTranspUsesTuning();
-        dUseGlobalSoundSet = d->getUseGlobalSoundSet();
+        dResonanceGain = d->dResonanceGain;
+        dHammerGain = d->dHammerGain;
+        dBlendronicGain = d->dBlendronicGain;
+        dAttack = d->dAttack;
+        dDecay = d->dDecay;
+        dSustain = d->dSustain;
+        dRelease = d->dRelease;
+        dTransposition = d->dTransposition;
+        dTranspUsesTuning = d->dTranspUsesTuning;
+        dUseGlobalSoundSet = d->dUseGlobalSoundSet;
         dSoundSet = d->getSoundSet();
-        dSoundSetName = d->getSoundSetName();
-        velocityMin = d->getVelocityMin();
-        velocityMax = d->getVelocityMax();
+        dSoundSetName = d->dSoundSetName;
+        velocityMin = d->velocityMin;
+        velocityMax = d->velocityMax;
     }
     
     // Using a raw pointer here instead of ReferenceCountedObjectPtr (Ptr)
     // so we can use forwarded declared DirectModification
     void performModification(DirectModification* d, Array<bool> dirty);
     
-    inline void stepModdables()
+    void stepModdables()
     {
         dGain.step();
+        dResonanceGain.step();
+        dHammerGain.step();
+        dBlendronicGain.step();
     }
     
-    inline void resetModdables()
+    void resetModdables()
     {
         dGain.reset();
+        dResonanceGain.reset();
+        dHammerGain.reset();
+        dBlendronicGain.reset();
     }
     
     inline bool compare(DirectPreparation::Ptr d)
     {
-        return  (dTransposition     ==      d->getTransposition()   )   &&
-                (dTranspUsesTuning  ==      d->getTranspUsesTuning())   &&
-                (dGain.base         ==      d->dGain.base           )   &&
-                (dResonanceGain     ==      d->getResonanceGain()   )   &&
-                (dHammerGain        ==      d->getHammerGain()      )   &&
-                (dBlendronicGain    ==      d->getBlendronicGain()  )   &&
-                (dAttack            ==      d->getAttack()          )   &&
-                (dDecay             ==      d->getDecay()           )   &&
-                (dSustain           ==      d->getSustain()         )   &&
-                (dRelease           ==      d->getRelease()         )   ;
+        return  (dTransposition         ==      d->dTransposition       )   &&
+                (dTranspUsesTuning      ==      d->dTranspUsesTuning    )   &&
+                (dGain                  ==      d->dGain           )   &&
+                (dResonanceGain         ==      d->dResonanceGain  )   &&
+                (dHammerGain            ==      d->dHammerGain     )   &&
+                (dBlendronicGain        ==      d->dBlendronicGain )   &&
+                (dAttack                ==      d->dAttack         )   &&
+                (dDecay                 ==      d->dDecay          )   &&
+                (dSustain               ==      d->dSustain        )   &&
+                (dRelease               ==      d->dRelease        )   ;
     }
     
     // for unit-testing
@@ -159,11 +165,12 @@ public:
         for (int i = 0; i < 20; i++)    r[i] = (Random::getSystemRandom().nextFloat());
         int idx = 0;
         
-        dTransposition.clear();
+        Array<float> dt;
         for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
         {
-			dTransposition.add(i, (Random::getSystemRandom().nextFloat() * 48.0f - 24.0f));
+			dt.add(i, (Random::getSystemRandom().nextFloat() * 48.0f - 24.0f));
         }
+        dTransposition.set(dt);
         
         dGain = r[idx++];
         dResonanceGain = r[idx++];
@@ -178,57 +185,33 @@ public:
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
-    inline Array<float> getTransposition() const noexcept               { return dTransposition; }
-    inline const bool getTranspUsesTuning() const noexcept              { return dTranspUsesTuning;}
-    inline const float getResonanceGain() const noexcept                { return dResonanceGain; }
-    inline const float getHammerGain() const noexcept                   { return dHammerGain;    }
-    inline const float getBlendronicGain() const noexcept               { return dBlendronicGain; }
     inline float* getGainPtr() { return &dGain.value;          }
-//    inline float* getResonanceGainPtr() { return &(dResonanceGain.value); }
-//    inline float* getHammerGainPtr() { return &(dHammerGain.value);    }
-//    inline float* getBlendronicGainPtr() { return &(dBlendronicGain.value); }
-    inline const int getAttack() const noexcept                         { return dAttack;        }
-    inline const int getDecay() const noexcept                          { return dDecay;         }
-    inline const float getSustain() const noexcept                      { return dSustain;       }
-    inline const int getRelease() const noexcept                        { return dRelease;       }
-    inline const Array<float> getADSRvals() const noexcept              { return {(float) dAttack, (float) dDecay,(float) dSustain, (float)dRelease}; }
+    inline float* getResonanceGainPtr() { return &(dResonanceGain.value); }
+    inline float* getHammerGainPtr() { return &(dHammerGain.value);    }
+    inline float* getBlendronicGainPtr() { return &(dBlendronicGain.value); }
     
-    inline void setTransposition(Array<float> val)                      { dTransposition = val;  }
-    inline void setTranspUsesTuning(bool val)                           { dTranspUsesTuning = val;}
-//    inline void setGain(float val)                                      { dGain = val;           }
-    inline void setResonanceGain(float val)                             { dResonanceGain = val;  }
-    inline void setHammerGain(float val)                                { dHammerGain = val;     }
-    inline void setBlendronicGain(float val)                            { dBlendronicGain = val;  }
-    inline void setAttack(int val)                                      { dAttack = val;         }
-    inline void setDecay(int val)                                       { dDecay = val;          }
-    inline void setSustain(float val)                                   { dSustain = val;        }
-    inline void setRelease(int val)                                     { dRelease = val;      DBG("setting Direct Release time :" + String(val));  }
+    inline const Array<float> getADSRvals() const noexcept { return {(float) dAttack.value, (float) dDecay.value,(float) dSustain.value, (float)dRelease.value}; }
+
+    inline void setTranspUsesTuning(bool val)         { dTranspUsesTuning = val;}
     inline void setADSRvals(Array<float> vals)
     {
         dAttack = vals[0];
         dDecay = vals[1];
         dSustain = vals[2];
         dRelease = vals[3];
-    }
-    
-    inline const int getVelocityMin() const noexcept { return velocityMin; }
-    inline const int getVelocityMax() const noexcept { return velocityMax; }
-    
-    inline const void setVelocityMin(int min)  { velocityMin = min; }
-    inline const void setVelocityMax(int max)  { velocityMax = max; }
-    
+    }    
     
     void print(void)
     {
-        DBG("dTransposition: "  + floatArrayToString(dTransposition));
+        DBG("dTransposition: "  + floatArrayToString(dTransposition.value));
         DBG("dGain: "           + String(dGain.value));
-        DBG("dResGain: "        + String(dResonanceGain));
-        DBG("dHammerGain: "     + String(dHammerGain));
-        DBG("dBlendronicGain: " + String(dBlendronicGain));
-        DBG("dAttack: "         + String(dAttack));
-        DBG("dDecay: "          + String(dDecay));
-        DBG("dSustain: "        + String(dSustain));
-        DBG("dRelease: "        + String(dRelease));
+        DBG("dResGain: "        + String(dResonanceGain.value));
+        DBG("dHammerGain: "     + String(dHammerGain.value));
+        DBG("dBlendronicGain: " + String(dBlendronicGain.value));
+        DBG("dAttack: "         + String(dAttack.value));
+        DBG("dDecay: "          + String(dDecay.value));
+        DBG("dSustain: "        + String(dSustain.value));
+        DBG("dRelease: "        + String(dRelease.value));
     }
     
     ValueTree getState(void)
@@ -236,158 +219,101 @@ public:
         ValueTree prep( "params" );
     
         dGain.getState(prep, ptagDirect_gain);
-        prep.setProperty( ptagDirect_resGain,           getResonanceGain(), 0);
-        prep.setProperty( ptagDirect_hammerGain,        getHammerGain(), 0);
-        prep.setProperty( ptagDirect_blendronicGain,    getBlendronicGain(), 0);
-        prep.setProperty( ptagDirect_transpUsesTuning,  getTranspUsesTuning() ? 1 : 0, 0);
+        dResonanceGain.getState(prep, ptagDirect_resGain);
+        dHammerGain.getState(prep, ptagDirect_hammerGain);
+        dBlendronicGain.getState(prep, ptagDirect_blendronicGain);
         
-        ValueTree transp( vtagDirect_transposition);
-        Array<float> m = getTransposition();
-        int count = 0;
-        for (auto f : m)    transp.setProperty( ptagFloat + String(count++), f, 0);
+        dTranspUsesTuning.getState(prep, ptagDirect_transpUsesTuning);
+        
+        ValueTree transp(vtagDirect_transposition);
+        dTransposition.getState(transp, ptagFloat);
         prep.addChild(transp, -1, 0);
         
         ValueTree ADSRvals( vtagDirect_ADSR);
-        m = getADSRvals();
-        count = 0;
-        for (auto f : m) ADSRvals.setProperty( ptagFloat + String(count++), f, 0);
+        int count = 0;
+        dAttack.getState(ADSRvals, ptagFloat + String(count++));
+        dDecay.getState(ADSRvals, ptagFloat + String(count++));
+        dSustain.getState(ADSRvals, ptagFloat + String(count++));
+        dRelease.getState(ADSRvals, ptagFloat + String(count));
         prep.addChild(ADSRvals, -1, 0);
         
-        prep.setProperty( ptagDirect_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
-
-        prep.setProperty( ptagDirect_soundSet, getSoundSetName(), 0);
+        dUseGlobalSoundSet.getState(prep, ptagDirect_useGlobalSoundSet);
+        dSoundSetName.getState(prep, ptagDirect_soundSet);
         
-        prep.setProperty( ptagDirect_velocityMin, getVelocityMin(), 0);
-        prep.setProperty( ptagDirect_velocityMax, getVelocityMax(), 0);
+        velocityMin.getState(prep, ptagDirect_velocityMin);
+        velocityMax.getState(prep, ptagDirect_velocityMax);
         
         return prep;
     }
     
     void setState(XmlElement* e)
     {
-        float f;
-        
         dGain.setState(e, ptagDirect_gain, 1.0f);
-                     
-        f = e->getStringAttribute(ptagDirect_hammerGain).getFloatValue();
-        setHammerGain(f);
+        dResonanceGain.setState(e, ptagDirect_resGain, 1.0f);
+        dHammerGain.setState(e, ptagDirect_hammerGain, 1.0f);
+        dBlendronicGain.setState(e, ptagDirect_blendronicGain, 1.0f);
         
-        f = e->getStringAttribute(ptagDirect_resGain).getFloatValue();
-        setResonanceGain(f);
-
-        setBlendronicGain(e->getDoubleAttribute(ptagDirect_blendronicGain, 1.0f));
+        dTranspUsesTuning.setState(e, ptagDirect_transpUsesTuning, false);
         
-        String str = e->getStringAttribute(ptagDirect_transpUsesTuning);
-        if (str != "") setTranspUsesTuning((bool) str.getIntValue());
-        else setTranspUsesTuning(false);
+        dUseGlobalSoundSet.setState(e, ptagDirect_useGlobalSoundSet, true);
+        dSoundSetName.setState(e, ptagDirect_soundSet, String());
         
-        str = e->getStringAttribute(ptagDirect_useGlobalSoundSet);
-        if (str == String()) setUseGlobalSoundSet(true);
-        else setUseGlobalSoundSet((bool) str.getIntValue());
-        
-        str = e->getStringAttribute(ptagDirect_soundSet);
-        setSoundSetName(str);
-        
-        setVelocityMin(e->getIntAttribute(ptagDirect_velocityMin, 0));
-        setVelocityMax(e->getIntAttribute(ptagDirect_velocityMax, 127));
+        velocityMin.setState(e, ptagDirect_velocityMin, 0);
+        velocityMax.setState(e, ptagDirect_velocityMax, 127);
         
         forEachXmlChildElement (*e, sub)
         {
             if (sub->hasTagName(vtagDirect_transposition))
             {
-                Array<float> transp;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        transp.add(f);
-                    }
-                }
-                
-                setTransposition(transp);
-                
+                dTransposition.setState(sub, ptagFloat, Array<float>());
             }
-            else  if (sub->hasTagName(vtagDirect_ADSR))
+            else if (sub->hasTagName(vtagDirect_ADSR))
             {
-                Array<float> envVals;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        envVals.add(f);
-                    }
-                }
-                
-                setADSRvals(envVals);
-                
+                int count = 0;
+                dAttack.setState(sub, ptagFloat + String(count++), 3);
+                dDecay.setState(sub, ptagFloat + String(count++), 3);
+                dSustain.setState(sub, ptagFloat + String(count++), 1.);
+                dRelease.setState(sub, ptagFloat + String(count), 30);
             }
         }
     }
     
-    inline void setUseGlobalSoundSet(bool use) { dUseGlobalSoundSet = use; }
-    inline void setSoundSet(int Id) { dSoundSet = Id; }
-    inline void setSoundSetName(String name) { dSoundSetName = name; }
-    
-    inline bool getUseGlobalSoundSet(void) { return dUseGlobalSoundSet; }
-    inline int getSoundSet(void) { return dUseGlobalSoundSet ? -1 : dSoundSet; }
-    inline String getSoundSetName(void) { return dSoundSetName; }
+    void setSoundSet(int Id) { dSoundSet = Id; }
+    int getSoundSet(void) { return dUseGlobalSoundSet.value ? -1 : dSoundSet.value; }
 
     bool modded;
     // output gain multiplier
     Moddable<float> dGain;
+    // gain multipliers for release resonance and hammer
+    Moddable<float> dResonanceGain, dHammerGain;
+    Moddable<float> dBlendronicGain;
     
+    // ADSR, in ms, or gain multiplier for sustain
+    Moddable<int> dAttack, dDecay, dRelease;
+    Moddable<float> dSustain;
+    
+    // transposition, in half steps
+    Moddable<Array<float>> dTransposition;
+    
+    // are Transposition values filtered by the attached Tuning?
+    // original/default = false
+    Moddable<bool> dTranspUsesTuning;
+    
+    Moddable<bool> dUseGlobalSoundSet;
+    
+    Moddable<int> dSoundSet;
+    Moddable<String> dSoundSetName;
+    
+    Moddable<int> velocityMin, velocityMax;
 private:
-    
     //* Instance Variables *//
     
     // name of this one
     String  name;
     
-    // transposition, in half steps
-    Array<float> dTransposition;
-    
-    // are Transposition values filtered by the attached Tuning?
-    // original/default = false
-    bool dTranspUsesTuning;
-    
-//    // output gain multiplier
-//    Moddable<float> dGain;
-    
-    // gain multipliers for release resonance and hammer
-    float dResonanceGain, dHammerGain;
-    
-    float dBlendronicGain;
-    
-    // ADSR, in ms, or gain multiplier for sustain
-    int dAttack, dDecay, dRelease;
-    float dSustain;
-    
-    bool dUseGlobalSoundSet;
-    int dSoundSet;
-    String dSoundSetName;
-    
-    int velocityMin, velocityMax;
-    
     JUCE_LEAK_DETECTOR(DirectPreparation);
 };
 
-
-/*
-This class owns two DirectPreparations: sPrep and aPrep
-As with other preparation, sPrep is the static preparation, while
-aPrep is the active preparation currently in use. sPrep and aPrep
-remain the same unless a Modification is triggered, which will change
-aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
-is triggered.
-*/
 
 class Direct : public ReferenceCountedObject
 {

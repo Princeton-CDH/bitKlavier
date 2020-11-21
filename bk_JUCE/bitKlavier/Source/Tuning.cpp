@@ -34,9 +34,9 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
     float lastNoteOffset;
  
     //do adaptive tunings if using
-    if(tuning->aPrep->getAdaptiveType() == AdaptiveNormal || tuning->aPrep->getAdaptiveType() == AdaptiveAnchored)
+    if(tuning->prep->getAdaptiveType() == AdaptiveNormal || tuning->prep->getAdaptiveType() == AdaptiveAnchored)
     {
-        float lastNoteOffset = adaptiveCalculate(midiNoteNumber) + tuning->aPrep->getFundamentalOffset(); // added getFundamentalOffset()
+        float lastNoteOffset = adaptiveCalculate(midiNoteNumber) + tuning->prep->getFundamentalOffset(); // added getFundamentalOffset()
         
         if(updateLastInterval)
         {
@@ -49,18 +49,18 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
     
     
     //do nTone tuning if nToneSemitoneWidth != 100cents
-    if(tuning->aPrep->getNToneSemitoneWidth() != 100)
+    if(tuning->prep->getNToneSemitoneWidth() != 100)
     {
-        lastNoteOffset = .01 * (midiNoteNumber - tuning->aPrep->getNToneRoot()) * (tuning->aPrep->getNToneSemitoneWidth() - 100);
+        lastNoteOffset = .01 * (midiNoteNumber - tuning->prep->getNToneRoot()) * (tuning->prep->getNToneSemitoneWidth() - 100);
         int midiNoteNumberTemp = round(midiNoteNumber + lastNoteOffset);
         
         Array<float> currentTuning;
-        if(tuning->aPrep->getScale() == CustomTuning) currentTuning = tuning->aPrep->getCustomScale();
-        else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getScale());
+        if(tuning->prep->getScale() == CustomTuning) currentTuning = tuning->prep->getCustomScale();
+        else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->prep->getScale());
         
-        lastNoteOffset += (currentTuning[(midiNoteNumberTemp - tuning->aPrep->getFundamental()) % currentTuning.size()]
-                          + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
-                          + tuning->aPrep->getFundamentalOffset());
+        lastNoteOffset += (currentTuning[(midiNoteNumberTemp - tuning->prep->getFundamental()) % currentTuning.size()]
+                          + tuning->prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                          + tuning->prep->getFundamentalOffset());
         
         if(updateLastInterval)
         {
@@ -73,12 +73,12 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
 
     //else do regular tunings
     Array<float> currentTuning;
-    if(tuning->aPrep->getScale() == CustomTuning) currentTuning = tuning->aPrep->getCustomScale();
-    else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getScale());
+    if(tuning->prep->getScale() == CustomTuning) currentTuning = tuning->prep->getCustomScale();
+    else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->prep->getScale());
     
-    lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->aPrep->getFundamental()) % currentTuning.size()]
-                      + tuning->aPrep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
-                      + tuning->aPrep->getFundamentalOffset());
+    lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->prep->getFundamental()) % currentTuning.size()]
+                      + tuning->prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                      + tuning->prep->getFundamentalOffset());
 
     if(updateLastInterval)
     {
@@ -99,18 +99,18 @@ int TuningProcessor::getAdaptiveClusterTimer()
 //for keeping track of current cluster size
 void TuningProcessor::processBlock(int numSamples)
 {
-    TuningAdaptiveSystemType type = tuning->aPrep->getAdaptiveType();
+    TuningAdaptiveSystemType type = tuning->prep->getAdaptiveType();
     
     if (type == AdaptiveNormal || type == AdaptiveAnchored) {
         
-        if(clusterTime <= (tuning->aPrep->getAdaptiveClusterThresh() * processor.getCurrentSampleRate() * 0.001))
+        if(clusterTime <= (tuning->prep->getAdaptiveClusterThresh() * processor.getCurrentSampleRate() * 0.001))
             clusterTime += numSamples;
     }
 }
 
 void TuningProcessor::keyReleased(int midiNoteNumber)
 {
-    tuning->aPrep->getSpringTuning()->removeNote(midiNoteNumber);
+    tuning->prep->getSpringTuning()->removeNote(midiNoteNumber);
 }
 
 
@@ -121,12 +121,12 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
     
     adaptiveHistoryCounter++;
     
-    TuningAdaptiveSystemType type = tuning->aPrep->getAdaptiveType();
+    TuningAdaptiveSystemType type = tuning->prep->getAdaptiveType();
 
     if (type == AdaptiveNormal)
     {
         //if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
-        if (clusterTime * (1000.0 / processor.getCurrentSampleRate()) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
+        if (clusterTime * (1000.0 / processor.getCurrentSampleRate()) > tuning->prep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->prep->getAdaptiveHistory())
         {
             adaptiveHistoryCounter = 0;
             adaptiveFundamentalFreq = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
@@ -138,13 +138,13 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
     else if (type == AdaptiveAnchored)
     {
         //if(clusterTime * (1000.0 / sampleRate) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory() - 1)
-        if (clusterTime * (1000.0 / processor.getCurrentSampleRate()) > tuning->aPrep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->aPrep->getAdaptiveHistory())
+        if (clusterTime * (1000.0 / processor.getCurrentSampleRate()) > tuning->prep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->prep->getAdaptiveHistory())
         {
             adaptiveHistoryCounter = 0;
             
-            const Array<float> anchorTuning = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getAdaptiveAnchorScale());
+            const Array<float> anchorTuning = tuning->tuningLibrary.getUnchecked(tuning->prep->getAdaptiveAnchorScale());
             adaptiveFundamentalFreq = mtof(midiNoteNumber +
-                                           anchorTuning[(midiNoteNumber + tuning->aPrep->getAdaptiveAnchorFundamental()) % anchorTuning.size()],
+                                           anchorTuning[(midiNoteNumber + tuning->prep->getAdaptiveAnchorFundamental()) % anchorTuning.size()],
                                            globalTuningReference
                                            );
             adaptiveFundamentalNote = midiNoteNumber;
@@ -153,7 +153,7 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
         //else adaptiveHistoryCounter++;
     }
     
-    tuning->aPrep->getSpringTuning()->addNote(midiNoteNumber);
+    tuning->prep->getSpringTuning()->addNote(midiNoteNumber);
     
     clusterTime = 0;
     
@@ -165,9 +165,9 @@ float TuningProcessor::adaptiveCalculateRatio(const int midiNoteNumber) const
     float newnote;
     float newratio;
     
-    const Array<float> intervalScale = tuning->tuningLibrary.getUnchecked(tuning->aPrep->getAdaptiveIntervalScale());
+    const Array<float> intervalScale = tuning->tuningLibrary.getUnchecked(tuning->prep->getAdaptiveIntervalScale());
     
-    if(!tuning->aPrep->getAdaptiveInversional() || tempnote >= adaptiveFundamentalNote)
+    if(!tuning->prep->getAdaptiveInversional() || tempnote >= adaptiveFundamentalNote)
     {
         
         while((tempnote - adaptiveFundamentalNote) < 0) tempnote += 12;
@@ -193,7 +193,7 @@ float TuningProcessor::adaptiveCalculate(int midiNoteNumber) const
 
 void TuningProcessor::adaptiveReset()
 {
-    adaptiveFundamentalNote = tuning->aPrep->getFundamental();
+    adaptiveFundamentalNote = tuning->prep->getFundamental();
     adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote, globalTuningReference);
     adaptiveHistoryCounter = 0;
     
@@ -202,14 +202,14 @@ void TuningProcessor::adaptiveReset()
 
 ValueTree Tuning::getState(bool active)
 {
-    ValueTree prep(vtagTuning);
+    ValueTree vt(vtagTuning);
     
-    prep.setProperty( "Id", Id, 0);
-    prep.setProperty( "name", name, 0);
+    vt.setProperty( "Id", Id, 0);
+    vt.setProperty( "name", name, 0);
     
-    prep.addChild(active ? aPrep->getState() : sPrep->getState(), -1, 0);
+    vt.addChild(prep->getState(), -1, 0);
     
-    return prep;
+    return vt;
 }
 
 void Tuning::setState(XmlElement* e)
@@ -226,14 +226,12 @@ void Tuning::setState(XmlElement* e)
     
     if (params != nullptr)
     {
-        sPrep->setState(params);
+        prep->setState(params);
     }
     else
     {
-        sPrep->setState(e);
+        prep->setState(e);
     }
-    
-    aPrep->copy(sPrep);
 }
 
 

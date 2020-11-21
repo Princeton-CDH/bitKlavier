@@ -96,19 +96,19 @@ void Gallery::resetPreparations(void)
         direct[i]->prep->resetModdables();
     
     for (int i = nostalgic.size(); --i >= 0; )
-        nostalgic[i]->aPrep->copy(nostalgic[i]->sPrep);
+        nostalgic[i]->prep->resetModdables();
     
     for (int i = synchronic.size(); --i >= 0; )
-        synchronic[i]->aPrep->copy(synchronic[i]->sPrep);
+        synchronic[i]->prep->resetModdables();
     
     for (int i = tuning.size(); --i >= 0; )
-        tuning[i]->aPrep->copy(tuning[i]->sPrep);
+        tuning[i]->prep->resetModdables();
     
     for (int i = tempo.size(); --i >= 0; )
-        tempo[i]->aPrep->copy(tempo[i]->sPrep);
+        tempo[i]->prep->resetModdables();
 
 	for (int i = blendronic.size(); --i >= 0; )
-		blendronic[i]->aPrep->copy(blendronic[i]->sPrep);
+        blendronic[i]->prep->resetModdables();
 }
 
 void Gallery::randomize()

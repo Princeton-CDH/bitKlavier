@@ -152,7 +152,7 @@ public:
                             uint64 voiceRampOff,
                             BKSynthesiserSound* sound,
                             float* dynamicGain,
-							float blendronicGain,
+							float* blendronicGain,
 							BlendronicProcessor::PtrArr blendronic) = 0;
     
     virtual void startNote (int midiNoteNumber,
@@ -171,7 +171,7 @@ public:
                             uint64 adsrRelease,
                             BKSynthesiserSound* sound,
                             float* dynamicGain,
-							float blendronicGain,
+							float* blendronicGain,
 							BlendronicProcessor::PtrArr blendronic) = 0;
     
     /** Called to stop a note.
@@ -321,7 +321,7 @@ private:
     uint32 noteOnTime;
     BKSynthesiserSound::Ptr currentlyPlayingSound;
     bool keyIsDown, sustainPedalDown, sostenutoPedalDown;
-	float blendronicGain;
+	float* blendronicGain;
     
     AudioBuffer<float> tempBuffer;
     
@@ -462,7 +462,7 @@ public:
                                         float rampOffMS,
                                         TuningProcessor::Ptr tuner = nullptr,
                                         float* dynamicGain = nullptr,
-                                        float blendronicGain = 0.,
+                                        float* blendronicGain = nullptr,
                                         BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr());
     
     virtual BKSynthesiserVoice* keyOn ( int midiChannel,
@@ -484,7 +484,7 @@ public:
                                         float adsrReleaseMS,
                                         TuningProcessor::Ptr tuner = nullptr,
                                         float* dynamicGain = nullptr,
-                                        float blendronicGain = 0.,
+                                        float* blendronicGain = nullptr,
                                         BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr()
                                         );
     
@@ -508,6 +508,7 @@ public:
                          int midiNoteNumber,
                          float velocity,
                          float gain,
+                         float* dynamicGain,
                          bool allowTailOff,
                          bool nostalgicOff = false);
     
@@ -744,7 +745,7 @@ protected:
                      uint64 voiceRampOff,
                      TuningProcessor::Ptr tuner,
                      float* dynamicGain,
-					 float blendronicGain,
+					 float* blendronicGain,
 					 BlendronicProcessor::PtrArr blendronic);
     
     void startVoice (BKSynthesiserVoice* voice,
@@ -767,7 +768,7 @@ protected:
                      uint64 adsrRelease,
                      TuningProcessor::Ptr tuner,
                      float* dynamicGain,
-					 float blendronicGain,
+					 float* blendronicGain,
 					 BlendronicProcessor::PtrArr blendronic);
     
     /** Stops a given voice.

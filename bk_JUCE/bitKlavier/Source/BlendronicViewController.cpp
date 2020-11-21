@@ -235,16 +235,6 @@ void BlendronicViewController::displayTab(int tab)
     
     if (tab == 0)
     {
-        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-        
-        
-//        pulseBeatSmooth.setVisible(true);
-//        constantFullSmooth.setVisible(true);
-//
-//        smoothTimeLabel.setVisible(true);
-//        smoothEqualLabel.setVisible(true);
-//        smoothValueLabel.setVisible(true);
-//
         gainSlider->setVisible(true);
         
         for (int i = 0; i < paramSliders.size(); i++)
@@ -289,8 +279,6 @@ void BlendronicViewController::displayTab(int tab)
     }
     else if (tab == 1)
     {
-        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-    
         bufferSizeSlider->setVisible(true);
         delayLineDisplay.setVisible(true);
         
@@ -467,13 +455,13 @@ void BlendronicPreparationEditor::update(void)
 
     setSubWindowInFront(false);
     
-    BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentBlendronicId, dontSendNotification);
         
-        gainSlider->setValue(prep->getOutGain(), dontSendNotification);
+        gainSlider->setValue(prep->outGain.value, dontSendNotification);
         bufferSizeSlider->setValue(prep->getDelayBufferSizeInSeconds(), dontSendNotification);
         
         for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
@@ -670,8 +658,7 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else // target combo boxes from tab 3
     {
-        BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-        BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr prep = processor.gallery->getBlendronicPreparation(processor.updateState->currentBlendronicId);
         
         for (int i=0; i<targetControlCBs.size(); i++)
         {
@@ -681,7 +668,6 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
                 DBG(targetControlCBs[i]->getName() + " " + cTargetNoteModes[selectedItem]);
                 
                 prep    ->setTargetTypeBlendronic(KeymapTargetType(i + TargetTypeBlendronicPatternSync), (TargetNoteMode)selectedItem);
-                active  ->setTargetTypeBlendronic(KeymapTargetType(i + TargetTypeBlendronicPatternSync), (TargetNoteMode)selectedItem);
             }
         }
         processor.updateState->editsMade = true;
@@ -690,15 +676,12 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getBlendronicPreparation(processor.updateState->currentBlendronicId);
     BlendronicProcessor::Ptr proc = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
     
     if (name == "gain")
     {
-        DBG("blendronic gain " + String(val));
-        prep->setOutGain(val);
-        active->setOutGain(val);
+        prep->outGain.set(val);
     }
     else if (name == "buffer length (sec)")
     {
@@ -746,7 +729,7 @@ void BlendronicPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayBlendronic)
     {
         BlendronicProcessor::Ptr proc = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
-        BlendronicPreparation::Ptr prep = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+        BlendronicPreparation::Ptr prep = processor.gallery->getBlendronicPreparation(processor.updateState->currentBlendronicId);
         
         if (prep != nullptr && proc != nullptr)
         {
@@ -828,32 +811,27 @@ void BlendronicPreparationEditor::timerCallback()
 
 void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSlider, Array<float> values)
 {
-    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     DBG("BlendronicPreparationEditor::multiSliderDidChange " + name + " " + String(whichSlider) + " " + String(values[0]));
     
     if (name == "beat lengths")
     {
         prep    ->setBeat(whichSlider, values[0]);
-        active  ->setBeat(whichSlider, values[0]);
     }
     else if (name == "delay lengths")
     {
         prep    ->setDelayLength(whichSlider, values[0]);
-        active  ->setDelayLength(whichSlider, values[0]);
     }
     else if (name == "smoothing (ms)")
     {
         //prep    ->setSmoothValue(whichSlider, values[0]);
         //active  ->setSmoothValue(whichSlider, values[0]);
         prep    ->setSmoothLengths(whichSlider, values[0]);
-        active  ->setSmoothLengths(whichSlider, values[0]);
     }
     else if (name == "feedback coefficients")
     {
         prep    ->setFeedbackCoefficient(whichSlider, values[0]);
-        active  ->setFeedbackCoefficient(whichSlider, values[0]);
     }
     
     processor.updateState->editsMade = true;
@@ -861,8 +839,7 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
 
 void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array<float>> values, Array<bool> states)
 {
-    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     Array<float> newvals = Array<float>();
     for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
@@ -872,34 +849,22 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     if (name == "beat lengths")
     {
         prep    ->setBeats(newvals);
-        active  ->setBeats(newvals);
-        
         prep    ->setBeatsStates(states);
-        active  ->setBeatsStates(states);
     }
     else if (name == "delay lengths")
     {
         prep    ->setDelayLengths(newvals);
-        active  ->setDelayLengths(newvals);
-        
         prep    ->setDelayLengthsStates(states);
-        active  ->setDelayLengthsStates(states);
     }
     else if (name == "smoothing (ms)")
     {
         prep    ->setSmoothLengths(newvals);
-        active  ->setSmoothLengths(newvals);
-        
         prep    ->setSmoothLengthsStates(states);
-        active  ->setSmoothLengthsStates(states);
     }
     else if (name == "feedback coefficients")
     {
         prep    ->setFeedbackCoefficients(newvals);
-        active  ->setFeedbackCoefficients(newvals);
-        
         prep    ->setFeedbackCoefficientsStates(states);
-        active  ->setFeedbackCoefficientsStates(states);
     }
     
     processor.updateState->editsMade = true;
@@ -941,8 +906,7 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
 
 void BlendronicPreparationEditor::buttonClicked (Button* b)
 {
-    BlendronicPreparation::Ptr prep = processor.gallery->getStaticBlendronicPreparation(processor.updateState->currentBlendronicId);
-    BlendronicPreparation::Ptr active = processor.gallery->getActiveBlendronicPreparation(processor.updateState->currentBlendronicId);
+    BlendronicPreparation::Ptr prep = processor.gallery->getBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     if (b == &hideOrShow)
     {
@@ -973,8 +937,7 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     else if (b == &pulseBeatSmooth)
     {
         prep->toggleSmoothBase();
-        active->toggleSmoothBase();
-        if (active->getSmoothBase() == BlendronicSmoothPulse)
+        if (prep->getSmoothBase() == BlendronicSmoothPulse)
         {
             pulseBeatSmooth.setButtonText("pulse length");
         }
@@ -983,8 +946,7 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
     else if (b == &constantFullSmooth)
     {
         prep->toggleSmoothScale();
-        active->toggleSmoothScale();
-        if (active->getSmoothScale() == BlendronicSmoothConstant)
+        if (prep->getSmoothScale() == BlendronicSmoothConstant)
         {
             constantFullSmooth.setButtonText("change in delay of 1");
         }
@@ -1092,7 +1054,7 @@ void BlendronicModificationEditor::update(void)
     
     if (mod != nullptr)
     {
-        gainSlider->setValue(mod->getOutGain(), dontSendNotification);
+        gainSlider->setValue(mod->outGain.value, dontSendNotification);
         
         for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -1485,7 +1447,7 @@ void BlendronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
    
     if (name == "gain")
     {
-        mod->setOutGain(val);
+        mod->outGain.set(val);
         mod->setDirty(BlendronicOutGain);
         
         gainSlider->setBright();

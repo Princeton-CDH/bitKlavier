@@ -56,9 +56,9 @@ void AudioProcessorPlayer::setProcessor (AudioProcessor* const processorToPlay)
 
         {
             const ScopedLock sl (lock);
-            oldOne = isPrepared ? processor : nullptr;
+            oldOne = iprepared ? processor : nullptr;
             processor = processorToPlay;
-            isPrepared = true;
+            iprepared = true;
         }
 
         if (oldOne != nullptr)
@@ -213,7 +213,7 @@ void AudioProcessorPlayer::audioDeviceAboutToStart (AudioIODevice* const device)
 
     if (processor != nullptr)
     {
-        if (isPrepared)
+        if (iprepared)
             processor->releaseResources();
 
         auto* oldProcessor = processor;
@@ -226,12 +226,12 @@ void AudioProcessorPlayer::audioDeviceStopped()
 {
     const ScopedLock sl (lock);
 
-    if (processor != nullptr && isPrepared)
+    if (processor != nullptr && iprepared)
         processor->releaseResources();
 
     sampleRate = 0.0;
     blockSize = 0;
-    isPrepared = false;
+    iprepared = false;
     tempBuffer.setSize (1, 1);
 }
 

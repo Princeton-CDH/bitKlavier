@@ -43,6 +43,8 @@ public:
     
     // Copy Constructor
     SynchronicPreparation(SynchronicPreparation::Ptr p):
+    sGain(p->sGain),
+    sBlendronicGain(p->sBlendronicGain),
     sNumBeats(p->getNumBeats()),
     sClusterMin(p->getClusterMin()),
     sClusterMax(p->getClusterMax()),
@@ -69,8 +71,6 @@ public:
     sSustains(p->getSustains()),
     sReleases(p->getReleases()),
     envelopeOn(p->getEnvelopesOn()),
-    sGain(p->getGain()),
-    sBlendronicGain(p->getBlendronicGain()),
     sClusterThresh(p->getClusterThreshMS()),
     sClusterThreshSec(p->getClusterThreshSEC()),
     sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic()),
@@ -142,6 +142,8 @@ public:
 
     
     SynchronicPreparation(void):
+    sGain(1.0),
+    sBlendronicGain(1.0f),
     sNumBeats(20),
     sClusterMin(1),
     sClusterMax(12),
@@ -167,8 +169,6 @@ public:
     sSustains(Array<float>({1.,1,1,1,1,1,1,1,1,1,1,1})),
     sReleases(Array<int>({30,30,30,30,30,30,30,30,30,30,30,30})),
     envelopeOn(Array<bool>({true,false,false,false,false,false,false,false,false,false,false,false})),
-    sGain(1.0),
-    sBlendronicGain(1.0f),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh),
     targetTypeSynchronicPatternSync(NoteOn),
@@ -198,8 +198,8 @@ public:
         sBeatMultipliers = s->getBeatMultipliers();
         sAccentMultipliers = s->getAccentMultipliers();
         sLengthMultipliers = s->getLengthMultipliers();
-        sGain = s->getGain();
-        sBlendronicGain = s->getBlendronicGain();
+        sGain = s->sGain;
+        sBlendronicGain = s->sBlendronicGain;
         
         sTransposition = s->getTransposition();
         sClusterThresh = s->getClusterThreshMS();
@@ -244,10 +244,10 @@ public:
         sSoundSet = s->getSoundSet();
     }
     
-    inline void performModification(SynchronicPreparation::Ptr s, Array<bool> dirty)
+    void performModification(SynchronicPreparation::Ptr s, Array<bool> dirty)
     {
-        if (dirty[SynchronicGain]) sGain = s->getGain();
-        if (dirty[SynchronicBlendronicGain]) sBlendronicGain = s->getBlendronicGain();
+        if (dirty[SynchronicGain]) sGain.modTo(s->sGain);
+        if (dirty[SynchronicBlendronicGain]) sBlendronicGain.modTo(s->sBlendronicGain);
         if (dirty[SynchronicNumPulses]) sNumBeats = s->getNumBeats();
         if (dirty[SynchronicClusterMin]) sClusterMin = s->getClusterMin();
         if (dirty[SynchronicClusterMax]) sClusterMax = s->getClusterMax();
@@ -309,7 +309,18 @@ public:
             sSoundSet = s->getSoundSet();
             sSoundSetName = s->getSoundSetName();
         }
+    }
         
+    void stepModdables()
+    {
+        sGain.step();
+        sBlendronicGain.step();
+    }
+    
+    void resetModdables()
+    {
+        sGain.reset();
+        sBlendronicGain.reset();
     }
     
     bool compare(SynchronicPreparation::Ptr s)
@@ -456,8 +467,8 @@ public:
                 (sMode == s->getMode()) &&
                 transp && lens && accents && beats && attack && decay && sustain && release &&
                 transpStates && lensStates && accentsStates && beatsStates &&
-                sGain == s->getGain() &&
-                sBlendronicGain == s->getBlendronicGain() &&
+                sGain == s->sGain &&
+                sBlendronicGain == s->sBlendronicGain &&
                 sTranspUsesTuning == s->getTranspUsesTuning() &&
                 sClusterThresh == s->getClusterThreshMS() &&
                 sClusterThreshSec == s->getClusterThreshSEC() &&
@@ -586,8 +597,8 @@ public:
     inline const Array<Array<float>> getTransposition() const noexcept {return sTransposition;         }
     inline const bool getTranspUsesTuning() const noexcept             {return sTranspUsesTuning;}
     inline const bool getReleaseVelocitySetsSynchronic() const noexcept{return sReleaseVelocitySetsSynchronic; }
-    inline const float getGain() const noexcept                        {return sGain;                   }
-    inline const float getBlendronicGain() const noexcept              {return sBlendronicGain;         }
+    inline float* getGainPtr() { return &sGain.value; }
+    inline float* getBlendronicGainPtr() { return &sBlendronicGain.value; }
     
     inline const Array<bool> getAccentMultipliersStates() const noexcept {return sAccentMultipliersStates; }
     inline const Array<bool> getBeatMultipliersStates() const noexcept {return sBeatMultipliersStates; }
@@ -829,8 +840,8 @@ public:
     {
         ValueTree prep("params");
         
-        prep.setProperty( ptagSynchronic_gain,                getGain(), 0);
-        prep.setProperty( ptagSynchronic_blendronicGain,      getBlendronicGain(), 0);
+        sGain.getState(prep, ptagSynchronic_gain);
+        sBlendronicGain.getState(prep, ptagSynchronic_blendronicGain);
         prep.setProperty( ptagSynchronic_numBeats,            getNumBeats(), 0);
         prep.setProperty( ptagSynchronic_clusterMin,          getClusterMin(), 0);
         prep.setProperty( ptagSynchronic_clusterMax,          getClusterMax(), 0);
@@ -951,9 +962,8 @@ public:
     {
         String n; int i; float f;
         
-        setGain(e->getDoubleAttribute(ptagSynchronic_gain, 1.0));
-        
-        setBlendronicGain(e->getDoubleAttribute(ptagSynchronic_blendronicGain, 1.0));
+        sGain.setState(e, ptagSynchronic_gain, 1.0f);
+        sBlendronicGain.setState(e, ptagSynchronic_blendronicGain, 1.0f);
         
         i = e->getStringAttribute(ptagSynchronic_numBeats).getIntValue();
         setNumBeats(i);
@@ -1245,6 +1255,9 @@ public:
     inline int getSoundSet(void) { return sUseGlobalSoundSet ? -1 : sSoundSet; }
     inline String getSoundSetName(void) { return sSoundSetName; }
     
+    Moddable<float> sGain;
+    Moddable<float> sBlendronicGain;
+    
 private:
     String name;
     float sTempo;
@@ -1283,8 +1296,6 @@ private:
     Array<int> sReleases;
     Array<bool> envelopeOn;
     
-    float sGain;               //gain multiplier
-    float sBlendronicGain;
     float sClusterThresh;      //max time between played notes before new cluster is started, in MS
     float sClusterThreshSec;
     
@@ -1309,14 +1320,6 @@ private:
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
 
-/*
-This class owns two SynchronicPreparations: sPrep and aPrep
-As with other preparation, sPrep is the static preparation, while
-aPrep is the active preparation currently in use. sPrep and aPrep
-remain the same unless a Modification is triggered, which will change
-aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
-is triggered.
-*/
 
 class Synchronic : public ReferenceCountedObject
 {
@@ -1330,8 +1333,7 @@ public:
     
     Synchronic(SynchronicPreparation::Ptr prep,
                int Id):
-    sPrep(new SynchronicPreparation(prep)),
-    aPrep(new SynchronicPreparation(sPrep)),
+    prep(new SynchronicPreparation(prep)),
     Id(Id),
     name("Synchronic "+String(Id))
     {
@@ -1342,14 +1344,13 @@ public:
     Id(Id),
     name("Synchronic "+String(Id))
     {
-		sPrep = new SynchronicPreparation();
-		aPrep = new SynchronicPreparation(sPrep);
+		prep = new SynchronicPreparation();
 		if (random) randomize();
     }
     
     inline Synchronic::Ptr duplicate()
     {
-        SynchronicPreparation::Ptr copyPrep = new SynchronicPreparation(sPrep);
+        SynchronicPreparation::Ptr copyPrep = new SynchronicPreparation(prep);
         
         Synchronic::Ptr copy = new Synchronic(copyPrep, -1);
         
@@ -1360,35 +1361,32 @@ public:
     
     inline void clear(void)
     {
-        sPrep       = new SynchronicPreparation();
-        aPrep       = new SynchronicPreparation(sPrep);
+        prep       = new SynchronicPreparation();
     }
 
     inline void copy(Synchronic::Ptr from)
     {
-        sPrep->copy(from->sPrep);
-        aPrep->copy(sPrep);
+        prep->copy(from->prep);
     }
 
 	inline void randomize()
 	{
 		clear();
-		sPrep->randomize();
-		aPrep->randomize();
+		prep->randomize();
 		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
 	}
 
     inline ValueTree getState(bool active = false)
     {
-        ValueTree prep(vtagSynchronic);
+        ValueTree vt(vtagSynchronic);
         
-        prep.setProperty( "Id",Id, 0);
-        prep.setProperty( "name",                          name, 0);
+        vt.setProperty( "Id",Id, 0);
+        vt.setProperty( "name", name, 0);
         
-        prep.addChild(active ? aPrep->getState() : sPrep->getState(), -1, 0);
+        vt.addChild(prep->getState(), -1, 0);
         
-        return prep;
+        return vt;
     }
     
     inline void setState(XmlElement* e)
@@ -1405,14 +1403,12 @@ public:
         
         if (params != nullptr)
         {
-            sPrep->setState(params);
+            prep->setState(params);
         }
         else
         {
-            sPrep->setState(e);
+            prep->setState(e);
         }
-        
-        aPrep->copy(sPrep);
     }
     
     ~Synchronic() {};
@@ -1420,10 +1416,8 @@ public:
     inline int getId() {return Id;}
     inline void setId(int newId) { Id = newId;}
     
-    SynchronicPreparation::Ptr      sPrep;
-    SynchronicPreparation::Ptr      aPrep;
+    SynchronicPreparation::Ptr      prep;
 
-    
     inline String getName(void) const noexcept {return name;}
     
     inline void setName(String newName)
@@ -1711,7 +1705,7 @@ public:
         return lastKeyVelocity;
     }
     
-    inline const SynchronicSyncMode getMode() const noexcept {return synchronic->aPrep->getMode(); }
+    inline const SynchronicSyncMode getMode() const noexcept {return synchronic->prep->getMode(); }
 
     inline int getId(void) const noexcept { return synchronic->getId(); }
     
@@ -1778,7 +1772,7 @@ public:
     
     inline void reset(void)
     {
-        synchronic->aPrep->copy(synchronic->sPrep);
+        synchronic->prep->resetModdables();
     }
     
     void clearOldNotes()

@@ -53,11 +53,11 @@ void BufferingAudioSource::prepareToPlay (int samplesPerBlockExpected, double ne
 
     if (newSampleRate != sampleRate
          || bufferSizeNeeded != buffer.getNumSamples()
-         || ! isPrepared)
+         || ! iprepared)
     {
         backgroundThread.removeTimeSliceClient (this);
 
-        isPrepared = true;
+        iprepared = true;
         sampleRate = newSampleRate;
 
         source->prepareToPlay (samplesPerBlockExpected, newSampleRate);
@@ -82,7 +82,7 @@ void BufferingAudioSource::prepareToPlay (int samplesPerBlockExpected, double ne
 
 void BufferingAudioSource::releaseResources()
 {
-    isPrepared = false;
+    iprepared = false;
     backgroundThread.removeTimeSliceClient (this);
 
     buffer.setSize (numberOfChannels, 0);

@@ -106,7 +106,7 @@ private:
     CriticalSection lock;
     double sampleRate = 0;
     int blockSize = 0;
-    bool isPrepared = false, isDoublePrecision = false;
+    bool iprepared = false, isDoublePrecision = false;
 
     int numInputChans = 0, numOutputChans = 0;
     HeapBlock<float*> channels;

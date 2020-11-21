@@ -34,10 +34,10 @@ keymaps(Keymap::PtrArr())
         velocitiesActive.insert(i, 0);
     }
     
-    if (!direct->prep->getUseGlobalSoundSet())
+    if (!direct->prep->dUseGlobalSoundSet.value)
     {
         // comes in as "soundfont.sf2.subsound1"
-        String name = direct->prep->getSoundSetName();
+        String name = direct->prep->dSoundSetName.value;
         BKSampleLoadType type = BKLoadSoundfont;
         
         for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
@@ -101,7 +101,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         return;
     }
     
-    for (auto t : prep->getTransposition())
+    for (auto t : prep->dTransposition.value)
     {
         // synthNoteNumber is what determines what sample is chosen
         // without transposition or extreme tuning, this will be the same as noteNumber
@@ -113,7 +113,7 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
         float synthOffset; // offset from actual sample played, always less than 1.
         
         // tune the transposition
-        if (prep->getTranspUsesTuning()) // use the Tuning setting
+        if (prep->dTranspUsesTuning.value) // use the Tuning setting
             offset = t + tuner->getOffset(round(t) + noteNumber, false);
         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
             offset = t + tuner->getOffset(noteNumber, false);
@@ -144,13 +144,13 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          direct->getId(),
                          0,     // start
                          0,     // length
-                         prep->getAttack(),
-                         prep->getDecay(),
-                         prep->getSustain(),
-                         prep->getRelease(),
+                         prep->dAttack.value,
+                         prep->dDecay.value,
+                         prep->dSustain.value,
+                         prep->dRelease.value,
                          tuner,
                          prep->getGainPtr(),
-                         prep->getBlendronicGain(),
+                         prep->getBlendronicGainPtr(),
                          blendronic);
 		}
 		else
@@ -168,10 +168,10 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
                          direct->getId(),
                          0,     // start
                          0,     // length
-                         prep->getAttack(),
-                         prep->getDecay(),
-                         prep->getSustain(),
-                         prep->getRelease(),
+                         prep->dAttack.value,
+                         prep->dDecay.value,
+                         prep->dSustain.value,
+                         prep->dRelease.value,
                          tuner,
                          prep->getGainPtr());
 		}
@@ -201,7 +201,8 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
                       noteNumber,
                       t,
                       velocitiesActive.getUnchecked(noteNumber),
-                      direct->prep->dGain.value * aGlobalGain,
+                      aGlobalGain,
+                      direct->prep->getGainPtr(),
                       true);
     }
 
@@ -221,61 +222,51 @@ void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int chan
         //only play hammers/resonance for first note in layers of transpositions
         if(i==0)
         {
-            float hGain = direct->prep->getHammerGain();
-            float rGain = direct->prep->getResonanceGain();
-            
-            if (hGain > 0.0f)
+            /*
+             if (soundfont)
+             {
+             synth->keyOff(channel, HammerNote, direct->getId(), noteNumber, noteNumber, velocity, true);
+             }
+             else
+             */
+            if (!soundfont)
             {
-                
-                /*
-                if (soundfont)
-                {
-                    synth->keyOff(channel, HammerNote, direct->getId(), noteNumber, noteNumber, velocity, true);
-                }
-                else
-                 */
-                if (!soundfont)
-                {
-                    hammerSynth->keyOn  (channel,
-                                       noteNumber,
-                                       t,
-                                       0,
-                                       velocitiesActive.getUnchecked(noteNumber),
-                                       hGain * HAMMER_GAIN_SCALE,
-                                       Forward,
-                                       Normal,
-                                       HammerNote,
-                                       direct->prep->getSoundSet(), //set
-                                       direct->getId(),
-                                       0,
-                                       2000,
-                                       3,
-                                       3,
-                                       tuner);
-                }
-                
+                hammerSynth->keyOn  (channel,
+                                     noteNumber,
+                                     t,
+                                     0,
+                                     velocitiesActive.getUnchecked(noteNumber),
+                                     HAMMER_GAIN_SCALE,
+                                     Forward,
+                                     Normal,
+                                     HammerNote,
+                                     direct->prep->getSoundSet(), //set
+                                     direct->getId(),
+                                     0,
+                                     2000,
+                                     3,
+                                     3,
+                                     tuner,
+                                     direct->prep->getHammerGainPtr());
             }
             
-            if (rGain > 0.0f)
-            {
-                resonanceSynth->keyOn(channel,
-                                      noteNumber,
-                                      t,
-                                      t_offset,
-                                      velocitiesActive.getUnchecked(noteNumber),
-                                      rGain * RES_GAIN_SCALE,
-                                      Forward,
-                                      Normal,
-                                      ResonanceNote,
-                                      direct->prep->getSoundSet(), //set
-                                      direct->getId(),
-                                      0,
-                                      2000,
-                                      3,
-                                      3,
-                                      tuner);
-                
-            }
+            resonanceSynth->keyOn(channel,
+                                  noteNumber,
+                                  t,
+                                  t_offset,
+                                  velocitiesActive.getUnchecked(noteNumber),
+                                  RES_GAIN_SCALE,
+                                  Forward,
+                                  Normal,
+                                  ResonanceNote,
+                                  direct->prep->getSoundSet(), //set
+                                  direct->getId(),
+                                  0,
+                                  2000,
+                                  3,
+                                  3,
+                                  tuner,
+                                  direct->prep->getResonanceGainPtr());
         }
     }
 }
@@ -289,16 +280,16 @@ bool DirectProcessor::velocityCheck(int noteNumber)
     if (velocity > 127) velocity = 127;
     if (velocity < 0)   velocity = 0;
     
-    if(prep->getVelocityMin() <= prep->getVelocityMax())
+    if(prep->velocityMin.value <= prep->velocityMax.value)
     {
-        if (velocity >= prep->getVelocityMin() && velocity <= prep->getVelocityMax())
+        if (velocity >= prep->velocityMin.value && velocity <= prep->velocityMax.value)
         {
             return true;
         }
     }
     else
     {
-        if (velocity >= prep->getVelocityMin() || velocity <= prep->getVelocityMax())
+        if (velocity >= prep->velocityMin.value || velocity <= prep->velocityMax.value)
         {
             return true;
         }
@@ -319,34 +310,51 @@ void DirectPreparation::performModification(DirectModification* d, Array<bool> d
     if (d->altMod && modded)
     {
         if (dirty[DirectGain]) dGain.unmodFrom(d->dGain);
+        if (dirty[DirectResGain]) dResonanceGain.unmodFrom(d->dResonanceGain);
+        if (dirty[DirectHammerGain]) dHammerGain.unmodFrom(d->dHammerGain);
+        if (dirty[DirectBlendronicGain]) dBlendronicGain.unmodFrom(d->dBlendronicGain);
+        if (dirty[DirectTransposition]) dTransposition.unmodFrom(d->dTransposition);
+        if (dirty[DirectTranspUsesTuning]) dTranspUsesTuning.unmodFrom(d->dTranspUsesTuning);
+        if (dirty[DirectADSR])
+        {
+            dAttack.unmodFrom(d->dAttack);
+            dDecay.unmodFrom(d->dDecay);
+            dSustain.unmodFrom(d->dSustain);
+            dRelease.unmodFrom(d->dRelease);
+        }
+        if (dirty[DirectUseGlobalSoundSet]) dUseGlobalSoundSet.unmodFrom(d->dUseGlobalSoundSet);
+        if (dirty[DirectSoundSet])
+        {
+            dSoundSet.unmodFrom(d->dSoundSet);
+            dSoundSetName.unmodFrom(d->dSoundSetName);
+        }
+        if (dirty[DirectVelocityMin]) velocityMin.unmodFrom(d->velocityMin);
+        if (dirty[DirectVelocityMax]) velocityMax.unmodFrom(d->velocityMax);
         modded = false;
     }
     else
     {
-        if (dirty[DirectTransposition]) dTransposition = d->getTransposition();
         if (dirty[DirectGain]) dGain.modTo(d->dGain);
-        if (dirty[DirectResGain]) dResonanceGain = d->getResonanceGain();
-        if (dirty[DirectHammerGain]) dHammerGain = d->getHammerGain();
-        if (dirty[DirectBlendronicGain]) dBlendronicGain = d->getBlendronicGain();
-        if (dirty[DirectTranspUsesTuning]) dTranspUsesTuning = d->getTranspUsesTuning();
+        if (dirty[DirectResGain]) dResonanceGain.modTo(d->dResonanceGain);
+        if (dirty[DirectHammerGain]) dHammerGain.modTo(d->dHammerGain);
+        if (dirty[DirectBlendronicGain]) dBlendronicGain.modTo(d->dBlendronicGain);
+        if (dirty[DirectTransposition]) dTransposition.modTo(d->dTransposition);
+        if (dirty[DirectTranspUsesTuning]) dTranspUsesTuning.modTo(d->dTranspUsesTuning);
         if (dirty[DirectADSR])
         {
-            dAttack = d->getAttack();
-            dDecay = d->getDecay();
-            dSustain = d->getSustain();
-            dRelease = d->getRelease();
+            dAttack.modTo(d->dAttack);
+            dDecay.modTo(d->dDecay);
+            dSustain.modTo(d->dSustain);
+            dRelease.modTo(d->dRelease);
         }
-        
-        if (dirty[DirectUseGlobalSoundSet]) dUseGlobalSoundSet = d->getUseGlobalSoundSet();
-        
+        if (dirty[DirectUseGlobalSoundSet]) dUseGlobalSoundSet.modTo(d->dUseGlobalSoundSet);
         if (dirty[DirectSoundSet])
         {
-            dSoundSet = d->getSoundSet();
-            dSoundSetName = d->getSoundSetName();
+            dSoundSet.modTo(d->dSoundSet);
+            dSoundSetName.modTo(d->dSoundSetName);
         }
-        
-        if (dirty[DirectVelocityMin]) velocityMin = d->getVelocityMin();
-        if (dirty[DirectVelocityMax]) velocityMax = d->getVelocityMax();
+        if (dirty[DirectVelocityMin]) velocityMin.modTo(d->velocityMin);
+        if (dirty[DirectVelocityMax]) velocityMax.modTo(d->velocityMax);
         modded = true;
     }
 }

@@ -144,7 +144,7 @@ public:
 
         std::unique_ptr<AudioProcessor> processor;
         Array<Connection> inputs, outputs;
-        bool isPrepared = false;
+        bool iprepared = false;
         std::atomic<bool> bypassed { false };
 
         Node (NodeID, std::unique_ptr<AudioProcessor>) noexcept;
@@ -414,7 +414,7 @@ private:
 
     friend class AudioGraphIOProcessor;
 
-    std::atomic<bool> isPrepared { false };
+    std::atomic<bool> iprepared { false };
 
     void topologyChanged();
     void handleAsyncUpdate() override;

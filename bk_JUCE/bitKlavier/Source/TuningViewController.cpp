@@ -492,7 +492,7 @@ void TuningViewController::displayTab(int tab)
     {
         // SET VISIBILITY
         Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-        TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+        TuningPreparation::Ptr prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
         TuningPreparation::Ptr mod = processor.gallery->getTuningModification(processor.updateState->currentModTuningId);
         
         bool isMod = (processor.updateState->currentDisplay == DisplayTuningMod);
@@ -673,7 +673,7 @@ void TuningViewController::paint (Graphics& g)
     if (currentTab != 1) return;
     
     TuningProcessor::Ptr tuning;
-    TuningPreparation::Ptr active;
+    TuningPreparation::Ptr prep;
     TuningModification::Ptr mod;
     
     if (processor.updateState->currentDisplay == DisplayTuningMod)
@@ -687,15 +687,15 @@ void TuningViewController::paint (Graphics& g)
         else                  tuningId = -1;
         
         tuning = processor.currentPiano->getTuningProcessor(tuningId);
-        active = processor.gallery->getActiveTuningPreparation(tuningId);
+        prep = processor.gallery->getTuningPreparation(tuningId);
     }
     else
     {
         tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
-        active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+        prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
     }
     
-    bool springsOn = (active->getAdaptiveType() == AdaptiveSpring);
+    bool springsOn = (prep->getAdaptiveType() == AdaptiveSpring);
     
     Rectangle<int> b = getLocalBounds();
     b.removeFromTop(selectCB.getBottom());
@@ -711,9 +711,9 @@ void TuningViewController::paint (Graphics& g)
     
     float midiScale;
     
-    Particle::PtrArr particles = active->getTetherParticles();
+    Particle::PtrArr particles = prep->getTetherParticles();
 
-    for (auto s : active->getEnabledSprings())
+    for (auto s : prep->getEnabledSprings())
     {
         if (s != nullptr && s->getEnabled())
         {
@@ -786,7 +786,7 @@ void TuningViewController::paint (Graphics& g)
         }
     }
     
-    for (auto p : active->getParticles())
+    for (auto p : prep->getParticles())
     {
         if (p != nullptr && p->getEnabled())
         {
@@ -980,12 +980,11 @@ void TuningViewController::fillFundamentalCB(void)
 
 void TuningViewController::updateComponentVisibility(void)
 {
-    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
-    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     TuningModification::Ptr mod = processor.gallery->getTuningModification(processor.updateState->currentModTuningId);
     
-    TuningAdaptiveSystemType adaptiveType = active->getAdaptiveType();
+    TuningAdaptiveSystemType adaptiveType = prep->getAdaptiveType();
     
     TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
     bool keymapAttached = false;
@@ -1076,7 +1075,7 @@ void TuningViewController::timerCallback(void)
     //if (processor.updateState->currentDisplay == DisplayTuning)
     {
         TuningProcessor::Ptr tProcessor;
-        TuningPreparation::Ptr active;
+        TuningPreparation::Ptr prep;
         Tuning::Ptr tuning;
         TuningModification::Ptr mod;
         
@@ -1095,11 +1094,11 @@ void TuningViewController::timerCallback(void)
         }
         
         tProcessor = processor.currentPiano->getTuningProcessor(tuningId);
-        active = processor.gallery->getActiveTuningPreparation(tuningId);
+        prep = processor.gallery->getTuningPreparation(tuningId);
         tuning = processor.gallery->getTuning(tuningId);
         
         if ((tProcessor != nullptr) &&
-            (active != nullptr) &&
+            (prep != nullptr) &&
             (tuning != nullptr))
         {
             if (tProcessor->getLastNoteTuning() != lastNoteTuningSave)
@@ -1112,11 +1111,11 @@ void TuningViewController::timerCallback(void)
                                                                                  tProcessor->getGlobalTuningReference()), 3), dontSendNotification);
             }
             
-            if(active->getAdaptiveType() == AdaptiveNormal || active->getAdaptiveType() == AdaptiveAnchored )
+            if(prep->getAdaptiveType() == AdaptiveNormal || prep->getAdaptiveType() == AdaptiveAnchored )
             {
                 A1ClusterMax->setDisplayValue(tProcessor->getAdaptiveHistoryCounter() + 1);
                 
-                if(tProcessor->getAdaptiveClusterTimer() < active->getAdaptiveClusterThresh())
+                if(tProcessor->getAdaptiveClusterTimer() < prep->getAdaptiveClusterThresh())
                     A1ClusterThresh->setDisplayValue(tProcessor->getAdaptiveClusterTimer());
                 else
                 {
@@ -1133,16 +1132,16 @@ void TuningViewController::timerCallback(void)
             float sliderHeight = springSliders.getUnchecked(0)->getHeight();
             
             Tuning::Ptr tuning = tProcessor->getTuning();
-            Spring::PtrArr tetherSprings =  active->getTetherSprings();
+            Spring::PtrArr tetherSprings =  prep->getTetherSprings();
             //Array<bool> locked = active->getSpringTuning()->getTethersLocked();
             
-            if(active->getSpringTuning()->getUsingFundamentalForIntervalSprings())
-                currentFundamental.setText("current fundamental " + cFundamentalNames[active->getSpringTuning()->getIntervalFundamentalActive()], dontSendNotification);
+            if(prep->getSpringTuning()->getUsingFundamentalForIntervalSprings())
+                currentFundamental.setText("current fundamental " + cFundamentalNames[prep->getSpringTuning()->getIntervalFundamentalActive()], dontSendNotification);
             
             for (auto s : tetherSliders)        s->setVisible(false);
             for (auto s : tetherLabels)         s->setVisible(false);
     
-            if(!active->getSpringTuning()->getFundamentalSetsTether())
+            if(!prep->getSpringTuning()->getFundamentalSetsTether())
             {
                 int count = 0;
                 for (int i = 0; i < 128; i++)
@@ -1161,7 +1160,7 @@ void TuningViewController::timerCallback(void)
                                                     sliderHeight);
                         
                         if (!isMod) tetherSliders[i]->setValue(tetherSprings[i]->getStrength(), dontSendNotification);
-                        if(active->getAdaptiveType() == AdaptiveSpring) tetherSliders[i]->setVisible(true);
+                        if(prep->getAdaptiveType() == AdaptiveSpring) tetherSliders[i]->setVisible(true);
                         
                         tetherLabels[i]->setBounds(tetherSliders[i]->getRight() + gXSpacing,
                                                    tetherSliders[i]->getY(),
@@ -1169,7 +1168,7 @@ void TuningViewController::timerCallback(void)
                                                    sliderHeight);
                         
                         tetherLabels[i]->setText(Utilities::getNoteString(i), dontSendNotification);
-                        if(active->getAdaptiveType() == AdaptiveSpring) tetherLabels[i]->setVisible(true);
+                        if(prep->getAdaptiveType() == AdaptiveSpring) tetherLabels[i]->setVisible(true);
                         count++;
                         
                     }
@@ -1377,8 +1376,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     int index = box->getSelectedItemIndex();
     int Id = box->getSelectedId();
     
-    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
-    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     
     if (box == &selectCB)
@@ -1391,20 +1389,17 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
         prep->setScaleByName(box->getItemText(index));
-        active->setScaleByName(box->getItemText(index));
-
+        
         DBG("current TuningSystem " + prep->getScaleName());
         customKeyboard.setValues(tuning->getCurrentScaleCents());
         
-        if (active->getAdaptiveType() == AdaptiveSpring)
+        if (prep->getAdaptiveType() == AdaptiveSpring)
         {
             prep->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
-            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
         }
         else
         {
             prep->getSpringTuning()->setTetherTuning(EqualTemperament); //use ET as background when not in Spring Tuning
-            active->getSpringTuning()->setTetherTuning(EqualTemperament);
         }
         
         //updateComponentVisibility();
@@ -1415,7 +1410,6 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         TuningAdaptiveSystemType type = (TuningAdaptiveSystemType) index;
         
         prep->setAdaptiveType(type);
-        active->setAdaptiveType(type);
         
         // SpringTuning selected
         if (type == AdaptiveSpring)
@@ -1423,16 +1417,12 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             showSprings = true;
             
             prep->getSpringTuning()->setActive(true);
-            active->getSpringTuning()->setActive(true);
-            
             prep->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
-            active->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
             
             //need to make sure the interval scale is also set; i'm finding that sometimes i have to manually change away from just and back to get the system to work
             TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
             Array<float> scale = tuning->getScaleCents(springScaleId);
             prep->getSpringTuning()->setIntervalTuning(scale);
-            active->getSpringTuning()->setIntervalTuning(scale);
             
             displayTab(currentTab);
             
@@ -1442,10 +1432,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             showSprings = false;
             
             prep->getSpringTuning()->setActive(false);
-            active->getSpringTuning()->setActive(false);
-            
             prep->getSpringTuning()->setTetherTuning(EqualTemperament);
-            active->getSpringTuning()->setTetherTuning(EqualTemperament);
             
             displayTab(currentTab);
         }
@@ -1455,7 +1442,6 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         {
             //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
             prep->setScaleByName(scaleCB.getText());
-            active->setScaleByName(scaleCB.getText());
         }
         
         customKeyboard.setValues(tuning->getCurrentScaleCents());
@@ -1465,7 +1451,6 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     else if (box == &fundamentalCB)
     {
         prep->setFundamental((PitchClass) index);
-        active->setFundamental((PitchClass) index);
         
         customKeyboard.setFundamental(index);
         
@@ -1475,37 +1460,27 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     else if (box == &A1IntervalScaleCB)
     {
         prep->setAdaptiveIntervalScale((TuningSystem) index);
-        active->setAdaptiveIntervalScale((TuningSystem) index);
-        
         //updateComponentVisibility();
     }
     else if (box == &A1AnchorScaleCB)
     {
         prep->setAdaptiveAnchorScale((TuningSystem) index);
-        active->setAdaptiveAnchorScale((TuningSystem) index);
-        
         //updateComponentVisibility();
     }
     else if (box == &A1FundamentalCB)
     {
         prep->setAdaptiveAnchorFundamental((PitchClass) index);
-        active->setAdaptiveAnchorFundamental((PitchClass) index);
-        
         //updateComponentVisibility();
         
     }
     else if (box == &nToneRootCB)
     {
         prep->setNToneRootPC(index);
-        active->setNToneRootPC(index);
-        
         //updateComponentVisibility();
     }
     else if (box == &nToneRootOctaveCB)
     {
         prep->setNToneRootOctave(index);
-        active->setNToneRootOctave(index);
-        
         //updateComponentVisibility();
     }
     else if (box == &springScaleCB)
@@ -1515,22 +1490,16 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         if (springScaleId >= AdaptiveTuning) springScaleId = (TuningSystem)((int)springScaleId + 2);
         
         prep->getSpringTuning()->setScaleId(springScaleId);
-        active->getSpringTuning()->setScaleId(springScaleId);
-        
         //TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
         
         Array<float> scale = tuning->getScaleCents(springScaleId);
         
         prep->getSpringTuning()->setIntervalTuning(scale);
-        active->getSpringTuning()->setIntervalTuning(scale);
-        
         DBG("current springTuningSystem " + String(prep->getSpringTuning()->getScaleId()));
     }
     else if (box == &springScaleFundamentalCB)
     {
         prep->getSpringTuning()->setIntervalFundamental((PitchClass)index);
-        active->getSpringTuning()->setIntervalFundamental((PitchClass)index);
-        
         Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         
         if(tuning->getCurrentSpringTuning()->getUsingFundamentalForIntervalSprings())
@@ -1550,7 +1519,6 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             for (auto b : springModeButtons)    b->setVisible(false);
             fundamentalSetsTether.setVisible(false);
             prep->getSpringTuning()->setFundamentalSetsTether(false);
-            active->getSpringTuning()->setFundamentalSetsTether(false);
             tetherWeightGlobalSlider->setVisible(false);
             tetherWeightSecondaryGlobalSlider->setVisible(false);
             currentFundamental.setVisible(false);
@@ -1617,7 +1585,7 @@ void TuningPreparationEditor::update(void)
     if (processor.updateState->currentTuningId < 0) return;
     
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    TuningPreparation::Ptr prep = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
     
     if (prep != nullptr)
     {
@@ -1688,7 +1656,7 @@ void TuningPreparationEditor::update(void)
         Array<float> intervalWeights = prep->getSpringTuning()->getSpringWeights();
         if (intervalWeights.size() < 12)
         {
-            intervalWeights = tuning->getStaticSpringTuning()->getSpringWeights();
+            intervalWeights = tuning->getCurrentSpringTuning()->getSpringWeights();
         }
         
         for (int i = 0; i < 12; i++)
@@ -1721,14 +1689,12 @@ void TuningPreparationEditor::update(void)
 void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
-    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
  
     if(name == absoluteKeyboard.getName())
     {
         //DBG("updating absolute tuning vals");
         prep->setAbsoluteOffsetCents(values);
-        active->setAbsoluteOffsetCents(values);
     }
     else if(name == customKeyboard.getName())
     {
@@ -1739,14 +1705,11 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         //active->setScaleByName(scaleCB.getItemText(customIndex));
         
         prep->setScale(CustomTuning);
-        active->setScale(CustomTuning);
         
         //DBG("keyboardSliderChanged values.size() = " + String(values.size()));
         prep->setCustomScaleCents(values);
-        active->setCustomScaleCents(values);
         
         prep->getSpringTuning()->setIntervalTuning(values);
-        active->getSpringTuning()->setIntervalTuning(values);
         
     }
     processor.gallery->setGalleryDirty(true);
@@ -1758,8 +1721,7 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
 {
     
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
-    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
     
     double value = slider->getValue();
     
@@ -1770,13 +1732,11 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
         if (slider == tetherSliders[i])
         {
             prep->getSpringTuning()->setTetherWeight(i, value);
-            active->getSpringTuning()->setTetherWeight(i, value);
             break;
         }
         else if (slider == springSliders[i])
         {
             prep->getSpringTuning()->setSpringWeight(i, value);
-            active->getSpringTuning()->setSpringWeight(i, value);
             break;
         }
     }
@@ -1786,35 +1746,29 @@ void TuningPreparationEditor::sliderValueChanged (Slider* slider)
 
 void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
-    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     
     if (slider == offsetSlider.get()) {
         DBG("got offset " + String(val));
         prep->setFundamentalOffset(val * 0.01);
-        active->setFundamentalOffset(val * 0.01);
     }
     else if(slider == A1ClusterThresh.get()) {
         DBG("got A1ClusterThresh " + String(val));
         prep->setAdaptiveClusterThresh(val);
-        active->setAdaptiveClusterThresh(val);
     }
     else if(slider == A1ClusterMax.get()) {
         DBG("got A1ClusterMax " + String(val));
         prep->setAdaptiveHistory(val);
-        active->setAdaptiveHistory(val);
     }
     else if(slider == nToneSemitoneWidthSlider.get()) {
         DBG("got nToneSemiToneSliderWidth " + String(val));
         prep->setNToneSemitoneWidth(val);
-        active->setNToneSemitoneWidth(val);
     }
     else if (slider == rateSlider.get())
     {
         DBG("got rateSlider " + String(val));
-        prep->getSpringTuning()->setRate(val, false);
-        active->getSpringTuning()->setRate(val);
+        prep->getSpringTuning()->setRate(val);
     }
     else if (slider == dragSlider.get())
     {
@@ -1822,31 +1776,26 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
         double newval = dt_asymwarp(val, 100.);
         //DBG("warped = " + String(newval) + " inverted = " + String(dt_asymwarp_inverse(newval, 100.)));
         prep->getSpringTuning()->setDrag(1. - newval);
-        active->getSpringTuning()->setDrag(1. - newval);
     }
     else if (slider == tetherStiffnessSlider.get())
     {
         DBG("got tetherStiffnessSlider " + String(val));
         prep->getSpringTuning()->setTetherStiffness(val);
-        active->getSpringTuning()->setTetherStiffness(val);
     }
     else if (slider == intervalStiffnessSlider.get())
     {
         DBG("got intervalStiffnessSlider " + String(val));
         prep->getSpringTuning()->setIntervalStiffness(val);
-        active->getSpringTuning()->setIntervalStiffness(val);
     }
     else if (slider == tetherWeightGlobalSlider.get())
     {
         DBG("got tetherWeightGlobalSlider " + String(val));
         prep->getSpringTuning()->setTetherWeightGlobal(val);
-        active->getSpringTuning()->setTetherWeightGlobal(val);
     }
     else if (slider == tetherWeightSecondaryGlobalSlider.get())
     {
         DBG("got tetherWeightGlobalSlider " + String(val));
         prep->getSpringTuning()->setTetherWeightSecondaryGlobal(val);
-        active->getSpringTuning()->setTetherWeightSecondaryGlobal(val);
     }
     
     processor.gallery->setGalleryDirty(true);
@@ -1856,8 +1805,7 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
 
 void TuningPreparationEditor::buttonClicked (Button* b)
 {
-    TuningPreparation::Ptr prep = processor.gallery->getStaticTuningPreparation(processor.updateState->currentTuningId);
-    TuningPreparation::Ptr active = processor.gallery->getActiveTuningPreparation(processor.updateState->currentTuningId);
+    TuningPreparation::Ptr prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
     Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
     
     if (b == &A1Inversional)
@@ -1865,7 +1813,6 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         DBG("setting A1Inversional " + String((int)A1Inversional.getToggleState()));
 
         prep->setAdaptiveInversional(A1Inversional.getToggleState());
-        active->setAdaptiveInversional(A1Inversional.getToggleState());
         
         processor.gallery->setGalleryDirty(true);
     }
@@ -1915,8 +1862,6 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         DBG("fundamentalSetsTether " + String((int)fundamentalSetsTether.getToggleState()));
 
         prep->getSpringTuning()->setFundamentalSetsTether(fundamentalSetsTether.getToggleState());
-        active->getSpringTuning()->setFundamentalSetsTether(fundamentalSetsTether.getToggleState());
-        
         
         if(fundamentalSetsTether.getToggleState() && tuning->getCurrentSpringTuning()->getUsingFundamentalForIntervalSprings())
         {
@@ -1944,14 +1889,12 @@ void TuningPreparationEditor::buttonClicked (Button* b)
                 {
                     springModeButtons[i]->setButtonText("F");
                     prep->setSpringMode(i, true);
-                    active->setSpringMode(i, true);
                     DBG("springModeButton TRUE: " + String(i));
                 }
                 else
                 {
                     springModeButtons[i]->setButtonText("L");
                     prep->setSpringMode(i, false);
-                    active->setSpringMode(i, false);
                     DBG("springModeButton FALSE: " + String(i));
                 }
                 break;
@@ -2687,12 +2630,12 @@ void TuningModificationEditor::sliderValueChanged (Slider* slider)
     
     if (tetherWeights.size() < 128)
     {
-        tetherWeights = tuning->getStaticSpringTuning()->getTetherWeights();
+        tetherWeights = tuning->getCurrentSpringTuning()->getTetherWeights();
     }
     
     if (intervalWeights.size() < 12)
     {
-        intervalWeights = tuning->getStaticSpringTuning()->getSpringWeights();
+        intervalWeights = tuning->getCurrentSpringTuning()->getSpringWeights();
     }
     
     for (int i = 0; i < 128; i++)

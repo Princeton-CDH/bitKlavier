@@ -122,6 +122,15 @@ public:
         }
     }
 
+    void stepModdables()
+    {
+//        dGain.step();
+    }
+    
+    void resetModdables()
+    {
+//        dGain.reset();
+    }
 
     inline bool compare (TuningPreparation::Ptr p)
     {
@@ -615,15 +624,6 @@ private:
 };
 
 
-/*
-This class owns two TuningPreparations: sPrep and aPrep
-As with other preparation, sPrep is the static preparation, while
-aPrep is the active preparation currently in use. sPrep and aPrep
-remain the same unless a Modification is triggered, which will change
-aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
-is triggered.
-*/
-
 class Tuning : public ReferenceCountedObject
 {
     
@@ -638,8 +638,7 @@ public:
     Tuning(TuningPreparation::Ptr prep,
            int Id,
            SpringTuning::Ptr st = nullptr):
-    sPrep(new TuningPreparation(prep)),
-    aPrep(new TuningPreparation(sPrep)),
+    prep(new TuningPreparation(prep)),
     Id(Id),
     name("Tuning "+String(Id))
     {
@@ -648,15 +647,14 @@ public:
         
         setupTuningLibrary();
         
-        sPrep->getSpringTuning()->stop();
+        prep->getSpringTuning()->stop();
     }
     
 	Tuning(int Id, bool random = false) :
     Id(Id),
     name("Tuning "+String(Id))
     {
-		sPrep = new TuningPreparation();
-		aPrep = new TuningPreparation(sPrep);
+		prep = new TuningPreparation();
         
 		if (random) randomize();
         
@@ -665,16 +663,16 @@ public:
         
         setupTuningLibrary();
         
-        sPrep->getSpringTuning()->stop();
+        prep->getSpringTuning()->stop();
     }
     
     inline Tuning::Ptr duplicate()
     {
-        TuningPreparation::Ptr copyPrep = new TuningPreparation(sPrep);
+        TuningPreparation::Ptr copyPrep = new TuningPreparation(prep);
         
         Tuning::Ptr copy = new Tuning(copyPrep, -1);
         
-        copy->sPrep->getSpringTuning()->stop();
+        copy->prep->getSpringTuning()->stop();
         
         copy->setName(name );
         
@@ -683,8 +681,7 @@ public:
     
     inline void clear(void)
     {
-        sPrep       = new TuningPreparation();
-        aPrep       = new TuningPreparation(sPrep);
+        prep       = new TuningPreparation();
     }
     
     void setupTuningLibrary()
@@ -743,26 +740,23 @@ public:
     inline int getId() {return Id;}
     inline void setId(int newId) { Id = newId;}
     
-    TuningPreparation::Ptr      sPrep;
-    TuningPreparation::Ptr      aPrep;
+    TuningPreparation::Ptr      prep;
     
     void reset()
     {
-        aPrep->copy(sPrep);
+        prep->resetModdables();
         DBG("resetting tuning");
     }
     
     inline void copy(Tuning::Ptr from)
     {
-        sPrep->copy(from->sPrep);
-        aPrep->copy(sPrep);
+        prep->copy(from->prep);
     }
 
 	inline void randomize()
 	{
 		clear();
-		sPrep->randomize();
-		aPrep->randomize();
+		prep->randomize();
         
 		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
@@ -770,19 +764,13 @@ public:
     
     inline TuningSystem getCurrentScaleId(void)
     {
-        return aPrep->getScale();
+        return prep->getScale();
     }
     
     inline SpringTuning::Ptr getCurrentSpringTuning(void)
     {
-        return aPrep->getSpringTuning();
+        return prep->getSpringTuning();
     }
-    
-    inline SpringTuning::Ptr getStaticSpringTuning(void)
-    {
-        return sPrep->getSpringTuning();
-    }
-
     
     inline String getName(void) const noexcept {return name;}
     
@@ -793,22 +781,12 @@ public:
     
     Array<float> getCurrentScale()
     {
-        if(aPrep->getScale() == CustomTuning)
+        if(prep->getScale() == CustomTuning)
         {
-            return aPrep->getCustomScale();
+            return prep->getCustomScale();
         }
         
-        return getTuningOffsets(aPrep->getScale());
-    }
-    
-    Array<float> getStaticScale()
-    {
-        if(sPrep->getScale() == CustomTuning)
-        {
-            return sPrep->getCustomScale();
-        }
-        
-        return getTuningOffsets(sPrep->getScale());
+        return getTuningOffsets(prep->getScale());
     }
     
     Array<float> getScale(int which)
@@ -817,7 +795,7 @@ public:
         
         if (tuning == CustomTuning)
         {
-            return aPrep->getCustomScale();
+            return prep->getCustomScale();
         }
         
         return getTuningOffsets(tuning);
@@ -971,7 +949,7 @@ public:
     inline void reset(void)
     {
         adaptiveReset();
-        tuning->aPrep->copy(tuning->sPrep);
+        tuning->prep->resetModdables();
     }
     
     inline void addKeymap(Keymap::Ptr keymap)

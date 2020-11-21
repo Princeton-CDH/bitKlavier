@@ -145,7 +145,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      uint64 voiceRampOff,
                                      BKSynthesiserSound* s,
                                      float* dynamicGain,
-									 float blendronicGain,
+									 float* blendronicGain,
 									 BlendronicProcessor::PtrArr blendronic)
 {
     
@@ -178,9 +178,9 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
 {
     pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/6.0f); //whole-step range for pitchbend
     
-    if (tuning != nullptr && tuning->getTuning()->aPrep->getSpringsActive())
+    if (tuning != nullptr && tuning->getTuning()->prep->getSpringsActive())
     {
-        Particle::PtrArr particles = tuning->getTuning()->aPrep->getParticles();
+        Particle::PtrArr particles = tuning->getTuning()->prep->getParticles();
  
         /*
         double x = particles[currentMidiNoteNumber]->getX();
@@ -203,8 +203,8 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
                                               tuning->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
         //need to update centsToFreq to be movable to other As, non-440
         
-        midi += (tuning->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
-                 tuning->getTuning()->aPrep->getFundamentalOffset());
+        midi += (tuning->getTuning()->prep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
+                 tuning->getTuning()->prep->getFundamentalOffset());
         
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
@@ -239,7 +239,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                                      uint64 adsrRelease,
                                      BKSynthesiserSound* s,
                                      float* dynamicGain,
-									 float blendGain,
+									 float* blendGain,
 									 BlendronicProcessor::PtrArr blendronic)
 {
     if (BKPianoSamplerSound* const sound = dynamic_cast<BKPianoSamplerSound*> (s))
@@ -692,10 +692,12 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
             *outL++ += ((l * lgain) + (r * rgain)) * 0.5f * d;
         }
         
+        float b = aGlobalGain * d;
+        if (blendronicGain != nullptr) b *= *blendronicGain;
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain * blendronicGain * d, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain * blendronicGain * d, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * b, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * b, addCounter, 1);
         }
         addCounter++;
     }
@@ -857,10 +859,12 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
             *outL++ += ((l * lgain) + (r * rgain)) * 0.5f;
         }
         
+        float b = aGlobalGain;
+        if (blendronicGain != nullptr) b *= *blendronicGain;
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain * blendronicGain, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain * blendronicGain, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * b, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * b, addCounter, 1);
         }
         addCounter++;
     }
@@ -1008,10 +1012,12 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             DBG("Invalid note direction.");
         }
         
+        float b = aGlobalGain;
+        if (blendronicGain != nullptr) b *= *blendronicGain;
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l * aGlobalGain * blendronicGain, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r * aGlobalGain * blendronicGain, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * b, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * b, addCounter, 1);
         }
         addCounter++;
     }

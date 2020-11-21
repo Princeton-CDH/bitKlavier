@@ -80,6 +80,7 @@ public:
 	// copy, modify, compare, randomize
 	inline void copy(BlendronicPreparation::Ptr b)
     {
+        outGain = b->outGain;
         bBeats = b->getBeats();
         bDelayLengths = b->getDelayLengths();
         bSmoothLengths = b->getSmoothLengths();
@@ -98,12 +99,12 @@ public:
         targetTypeBlendronicPausePlay = b->getTargetTypeBlendronicPausePlay();
         targetTypeBlendronicOpenCloseInput = b->getTargetTypeBlendronicOpenCloseInput();
         targetTypeBlendronicOpenCloseOutput = b->getTargetTypeBlendronicOpenCloseOutput();
-        outGain = b->getOutGain();
         delayBufferSizeInSeconds =  b->getDelayBufferSizeInSeconds();
     }
     
-	inline void performModification(BlendronicPreparation::Ptr b, Array<bool> dirty)
+    void performModification(BlendronicPreparation::Ptr b, Array<bool> dirty)
     {
+        if (dirty[BlendronicOutGain]) outGain.modTo(b->outGain);
         if (dirty[BlendronicBeats]) {
             bBeats = b->getBeats();
             bBeatsStates = b->getBeatsStates();
@@ -124,9 +125,17 @@ public:
             bFeedbackCoefficients = b->getFeedbackCoefficients();
             bFeedbackCoefficientsStates = b->getFeedbackCoefficientsStates();
         }
-        
-        if (dirty[BlendronicOutGain]) outGain = b->getOutGain();
         if (dirty[BlendronicDelayBufferSize]) delayBufferSizeInSeconds = b->getDelayBufferSizeInSeconds();
+    }
+    
+    void stepModdables()
+    {
+        outGain.step();
+    }
+    
+    void resetModdables()
+    {
+        outGain.reset();
     }
     
 	inline bool compare(BlendronicPreparation::Ptr b)
@@ -214,6 +223,7 @@ public:
         
         return  beats && delays && smooths && feedbacks &&
                 beatsStates && delaysStates && smoothsStates && feedbacksStates &&
+                outGain == b->outGain &&
                 bSmoothBase == b->getSmoothBase() &&
                 bSmoothScale == b->getSmoothScale() &&
                 targetTypeBlendronicPatternSync == b->getTargetTypeBlendronicPatternSync() &&
@@ -222,7 +232,6 @@ public:
                 targetTypeBlendronicPausePlay == b->getTargetTypeBlendronicPausePlay() &&
                 targetTypeBlendronicOpenCloseInput == b->getTargetTypeBlendronicOpenCloseInput() &&
                 targetTypeBlendronicOpenCloseOutput == b->getTargetTypeBlendronicOpenCloseOutput() &&
-                outGain == b->getOutGain() &&
                 delayBufferSizeInSeconds == b->getDelayBufferSizeInSeconds() ;
     }
     
@@ -259,7 +268,7 @@ public:
             bFeedbackCoefficients.add(i, (Random::getSystemRandom().nextFloat()));
         }
         
-        outGain = r[idx++];
+        outGain.set(r[idx++]);
         delayBufferSizeInSeconds = r[idx++] * 4;
     }
 
@@ -278,7 +287,6 @@ public:
     inline const Array<bool> getSmoothValuesStates() const noexcept { return bSmoothValuesStates; }
     inline const Array<bool> getFeedbackCoefficientsStates() const noexcept { return bFeedbackCoefficientsStates; }
     
-    inline const float getOutGain() const noexcept { return outGain; }
     inline const float getDelayBufferSizeInSeconds() const noexcept { return delayBufferSizeInSeconds; }
 	
     inline const BlendronicSmoothBase getSmoothBase() const noexcept { return bSmoothBase; }
@@ -297,8 +305,7 @@ public:
     inline void setSmoothLengthsStates(Array<bool> smoothLengths) { bSmoothLengthsStates.swapWith(smoothLengths); }
     inline void setSmoothValuesStates(Array<bool> smoothValues) { bSmoothValuesStates.swapWith(smoothValues); }
     inline void setFeedbackCoefficientsStates(Array<bool> feedbackCoefficients) { bFeedbackCoefficientsStates.swapWith(feedbackCoefficients); }
-    
-    inline void setOutGain(float og) { outGain = og; }
+
     inline void setDelayBufferSizeInSeconds(float size) { delayBufferSizeInSeconds = size; }
     
     inline void setBeat(int whichSlider, float value) { bBeats.set(whichSlider, value); }
@@ -367,7 +374,7 @@ public:
         DBG("bDelayLengths: " + floatArrayToString(bDelayLengths));
         DBG("bSmoothLengths: " + floatArrayToString(bSmoothLengths));
         DBG("bFeedbackCoefficients: " + floatArrayToString(bFeedbackCoefficients));
-        DBG("outGain: " + String(outGain));
+        DBG("outGain: " + String(outGain.value));
         DBG("delayBufferSizeInSeconds: " + String(delayBufferSizeInSeconds));
     }
     
@@ -376,13 +383,13 @@ public:
     {
         ValueTree prep("params");
         
+        outGain.getState(prep, ptagBlendronic_outGain);
         prep.setProperty( ptagBlendronic_targetPatternSync, getTargetTypeBlendronicPatternSync(), 0);
         prep.setProperty( ptagBlendronic_targetBeatSync, getTargetTypeBlendronicBeatSync(), 0);
         prep.setProperty( ptagBlendronic_targetClear, getTargetTypeBlendronicClear(), 0);
         prep.setProperty( ptagBlendronic_targetPausePlay, getTargetTypeBlendronicPausePlay(), 0);
         prep.setProperty( ptagBlendronic_targetOpenCloseInput, getTargetTypeBlendronicOpenCloseInput(), 0);
         prep.setProperty( ptagBlendronic_targetOpenCloseOutput, getTargetTypeBlendronicOpenCloseOutput(), 0);
-        prep.setProperty( ptagBlendronic_outGain, getOutGain(), 0);
         prep.setProperty( ptagBlendronic_delayBufferSize, getDelayBufferSizeInSeconds(), 0);
 
         ValueTree beats(vtagBlendronic_beats);
@@ -477,6 +484,8 @@ public:
     {
         String n; float f; int i;
         
+        outGain.setState(e, ptagBlendronic_outGain, 1.0f);
+        
         i = e->getStringAttribute(ptagBlendronic_targetPatternSync).getIntValue();
         setTargetTypeBlendronicPatternSync((TargetNoteMode)i);
         
@@ -494,9 +503,6 @@ public:
         
         i = e->getStringAttribute(ptagBlendronic_targetOpenCloseOutput).getIntValue();
         setTargetTypeBlendronicOpenCloseOutput((TargetNoteMode)i);
-        
-        f = e->getStringAttribute(ptagBlendronic_outGain).getFloatValue();
-        setOutGain(f);
         
         f = e->getStringAttribute(ptagBlendronic_delayBufferSize).getFloatValue();
         if (f == 0) f = 4.f;
@@ -662,6 +668,9 @@ public:
             }
         }
     }
+    
+    // output gain
+    Moddable<float> outGain;
 
 private:
     
@@ -696,9 +705,6 @@ private:
 	// signal chain stk classes
 	float bFeedbackCoefficient;
     
-    // output gain
-    float outGain;
-    
     float delayBufferSizeInSeconds;
 
 	//needed for sampling
@@ -711,14 +717,6 @@ private:
 /////////////////////////BLENDRONIC///////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-/*
-This class owns two BlendronicPreparations: sPrep and aPrep
-As with other preparation, sPrep is the static preparation, while
-aPrep is the active preparation currently in use. sPrep and aPrep
-remain the same unless a Modification is triggered, which will change
-aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
-is triggered.
-*/
 
 class Blendronic : public ReferenceCountedObject
 {
@@ -731,8 +729,7 @@ public:
 	typedef OwnedArray<Blendronic, CriticalSection> CSArr;
 
 	Blendronic(BlendronicPreparation::Ptr prep, int Id) :
-		sPrep(new BlendronicPreparation(prep)),
-		aPrep(new BlendronicPreparation(sPrep)),
+        prep(new BlendronicPreparation(prep)),
 		Id(Id),
 		name("Blendronic "+String(Id))
 	{
@@ -743,14 +740,13 @@ public:
 		Id(Id),
 		name("Blendronic "+String(Id))
 	{
-		sPrep = new BlendronicPreparation();
-		aPrep = new BlendronicPreparation(sPrep);
+		prep = new BlendronicPreparation();
 		if (random) randomize();
 	}
 
 	inline Blendronic::Ptr duplicate()
 	{
-		BlendronicPreparation::Ptr copyPrep = new BlendronicPreparation(sPrep);
+		BlendronicPreparation::Ptr copyPrep = new BlendronicPreparation(prep);
 
 		Blendronic::Ptr copy = new Blendronic(copyPrep, -1);
 
@@ -761,37 +757,33 @@ public:
 
 	inline void clear(void)
 	{
-		sPrep = new BlendronicPreparation();
-		aPrep = new BlendronicPreparation(sPrep);
-	}
+		prep = new BlendronicPreparation();	}
 
 	inline void copy(Blendronic::Ptr from)
 	{
-		sPrep->copy(from->sPrep);
-		aPrep->copy(sPrep);
+		prep->copy(from->prep);
 	}
 
     // for unit-testing
 	inline void randomize()
 	{
 		clear();
-		sPrep->randomize();
-		aPrep->randomize();
+		prep->randomize();
 		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
 	}
 	
 	inline ValueTree getState(bool active = false)
 	{
-		ValueTree prep(vtagBlendronic);
+		ValueTree vt(vtagBlendronic);
 
-		prep.setProperty("Id", Id, 0);
-		prep.setProperty("name", name, 0);
+		vt.setProperty("Id", Id, 0);
+		vt.setProperty("name", name, 0);
 
-		prep.addChild(active ? aPrep->getState() : sPrep->getState(), -1, 0);
-        // prep.addChild(active ? aPrep->getState() : sPrep->getState(), -1, 0);
+		vt.addChild(prep->getState(), -1, 0);
+        // prep.addChild(active ? aPrep->getState() : prep->getState(), -1, 0);
 
-		return prep;
+		return vt;
 	}
 
 	inline void setState(XmlElement* e)
@@ -808,14 +800,12 @@ public:
 
 		if (params != nullptr)
 		{
-			sPrep->setState(params);
+			prep->setState(params);
 		}
 		else
 		{
-			sPrep->setState(e);
+			prep->setState(e);
 		}
-
-		aPrep->copy(sPrep);
 	}
 
 	~Blendronic() {};
@@ -825,8 +815,7 @@ public:
 	inline void setName(String newName) { name = newName; }
 	inline String getName() const noexcept { return name; }
 
-	BlendronicPreparation::Ptr sPrep;
-	BlendronicPreparation::Ptr aPrep;
+	BlendronicPreparation::Ptr prep;
     
 private:
 	int Id;
@@ -921,7 +910,12 @@ public:
     inline void toggleInput() { delay->toggleInput(); }
     inline void setOutputState(bool inputState) { delay->setOutputState(inputState); }
     inline void toggleOutput() { delay->toggleOutput(); }
-    inline void reset(void) { blendronic->aPrep->copy(blendronic->sPrep); DBG("blendronic reset called"); }
+    
+    inline void reset(void)
+    {
+        blendronic->prep->resetModdables();
+        DBG("blendronic reset called");
+    }
     
     inline const bool getResetPhase() const noexcept { return resetPhase; }
     inline const void setResetPhase(bool reset) { resetPhase = reset; }

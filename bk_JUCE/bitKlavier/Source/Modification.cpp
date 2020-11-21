@@ -67,10 +67,10 @@ void DirectModification::setState(XmlElement* e)
         }
         
         DirectPreparation::setState(paramsXml);
-        if (!getUseGlobalSoundSet())
+        if (!dUseGlobalSoundSet.value)
         {
             // comes in as "soundfont.sf2.subsound1"
-            String name = getSoundSetName();
+            String name = dSoundSetName.value;
             BKSampleLoadType type = BKLoadSoundfont;
             
             for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
@@ -126,14 +126,16 @@ void DirectModification::setStateOld(XmlElement* e)
     p = e->getStringAttribute(ptagDirect_hammerGain);
     if (p != "")
     {
-        setHammerGain(p.getFloatValue());
+        dHammerGain.setMod(p.getFloatValue());
+        dHammerGain.setTime(0);
         setDirty(DirectHammerGain);
     }
     
     p = e->getStringAttribute(ptagDirect_resGain);
     if (p != "")
     {
-        setResonanceGain(p.getFloatValue());
+        dResonanceGain.setMod(p.getFloatValue());
+        dResonanceGain.setTime(0);
         setDirty(DirectResGain);
     }
     
@@ -155,7 +157,7 @@ void DirectModification::setStateOld(XmlElement* e)
                 }
             }
             
-            setTransposition(transp);
+            dTransposition.set(transp);
             setDirty(DirectTransposition);
         }
         else if (sub->hasTagName(vtagDirect_ADSR))

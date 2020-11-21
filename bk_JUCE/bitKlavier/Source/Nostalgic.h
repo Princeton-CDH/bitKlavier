@@ -42,12 +42,12 @@ public:
     
     
     NostalgicPreparation(NostalgicPreparation::Ptr p):
+    nGain(p->nGain),
+    nBlendronicGain(p->nBlendronicGain),
     nWaveDistance(p->getWavedistance()),
     nUndertow(p->getUndertow()),
     nTransposition(p->getTransposition()),
     nTranspUsesTuning(p->getTranspUsesTuning()),
-    nGain(p->getGain()),
-    nBlendronicGain(p->getBlendronicGain()),
     nLengthMultiplier(p->getLengthMultiplier()),
     nBeatsToSkip(p->getBeatsToSkip()),
     nMode(p->getMode()),
@@ -84,11 +84,11 @@ public:
                          TuningSystem tuning,
                          PitchClass basePitch,
                          Tuning::Ptr t):
+    nGain(gain),
+    nBlendronicGain(blendGain),
     nWaveDistance(waveDistance),
     nUndertow(undertow),
     nTransposition(transposition),
-    nGain(gain),
-    nBlendronicGain(blendGain),
     nLengthMultiplier(lengthMultiplier),
     nBeatsToSkip(beatsToSkip),
     nMode(mode),
@@ -110,12 +110,12 @@ public:
     }
     
     NostalgicPreparation(void):
+    nGain(1.0),
+    nBlendronicGain(1.0f),
     nWaveDistance(0),
     nUndertow(0),
     nTransposition(Array<float>({0.0})),
     nTranspUsesTuning(false),
-    nGain(1.0),
-    nBlendronicGain(1.0f),
     nLengthMultiplier(1.0),
     nBeatsToSkip(0.0),
     nMode(NoteLengthSync),
@@ -154,8 +154,8 @@ public:
         nUndertow = n->getUndertow();
         nTransposition = n->getTransposition();
         nTranspUsesTuning = n->getTranspUsesTuning();
-        nGain = n->getGain();
-        nBlendronicGain = n->getBlendronicGain();
+        nGain = n->nGain;
+        nBlendronicGain = n->nBlendronicGain;
         nLengthMultiplier = n->getLengthMultiplier();
         nBeatsToSkip = n->getBeatsToSkip();
         nMode = n->getMode();
@@ -179,14 +179,14 @@ public:
         nSoundSet = n->getSoundSet();
     }
     
-    inline void performModification(NostalgicPreparation::Ptr n, Array<bool> dirty)
+    void performModification(NostalgicPreparation::Ptr n, Array<bool> dirty)
     {
+        if (dirty[NostalgicGain]) nGain.modTo(n->nGain);
+        if (dirty[NostalgicBlendronicGain]) nBlendronicGain.modTo(n->nBlendronicGain);
         if (dirty[NostalgicWaveDistance]) nWaveDistance = n->getWavedistance();
         if (dirty[NostalgicUndertow]) nUndertow = n->getUndertow();
         if (dirty[NostalgicTransposition]) nTransposition = n->getTransposition();
         if (dirty[NostalgicTranspUsesTuning]) nTranspUsesTuning = n->getTranspUsesTuning();
-        if (dirty[NostalgicGain]) nGain = n->getGain();
-        if (dirty[NostalgicBlendronicGain]) nBlendronicGain = n->getBlendronicGain();
         if (dirty[NostalgicLengthMultiplier]) nLengthMultiplier = n->getLengthMultiplier();
         if (dirty[NostalgicBeatsToSkip]) nBeatsToSkip = n->getBeatsToSkip();
         if (dirty[NostalgicMode]) nMode = n->getMode();
@@ -223,14 +223,26 @@ public:
         }
     }
     
+    void stepModdables()
+    {
+        nGain.step();
+        nBlendronicGain.step();
+    }
+    
+    void resetModdables()
+    {
+        nGain.reset();
+        nBlendronicGain.reset();
+    }
+    
     inline bool compare (NostalgicPreparation::Ptr n)
     {
         return (nWaveDistance == n->getWavedistance() &&
                 nUndertow == n->getUndertow() &&
                 nTransposition == n->getTransposition() &&
                 nTranspUsesTuning == n->getTranspUsesTuning() &&
-                nGain == n->getGain() &&
-                nBlendronicGain == n->getBlendronicGain() &&
+                nGain == n->nGain &&
+                nBlendronicGain == n->nBlendronicGain &&
                 nLengthMultiplier == n->getLengthMultiplier() &&
                 nBeatsToSkip == n->getBeatsToSkip() &&
                 nReverseAttack == n->getReverseAttack() &&
@@ -296,12 +308,12 @@ public:
     inline const int getUndertow() const noexcept                          {return nUndertow;          }
     inline const Array<float> getTransposition() const noexcept            {return nTransposition;     }
     inline const bool getTranspUsesTuning() const noexcept                 {return nTranspUsesTuning;}
-    inline const float getGain() const noexcept                            {return nGain;              }
-    inline float* getGainPtr() {return &nGain;             }
-    inline const float getBlendronicGain() const noexcept                  {return nBlendronicGain;    }
     inline const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
     inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
     inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
+    
+    inline float* getGainPtr()                                             {return &nGain.value;       }
+    inline float* getBlendronicGainPtr()                                   {return &nBlendronicGain.value;}
     
     inline const int getReverseAttack() const noexcept                     {return nReverseAttack;        }
     inline const int getReverseDecay() const noexcept                      {return nReverseDecay;         }
@@ -390,8 +402,10 @@ public:
         DBG("nWaveDistance: " + String(nWaveDistance));
         DBG("nUndertow: " + String(nUndertow));
         DBG("nTransposition: " + floatArrayToString(nTransposition));
-        DBG("nGain: " + String(nGain));
-        DBG("nBlendronicGain: " + String(nBlendronicGain));
+        DBG("nGain: " + String(nGain.value));
+        DBG("nBlendronicGain: " + String(nBlendronicGain.value));
+        DBG("nGain: " + String(nGain.value));
+        DBG("nBlendronicGain: " + String(nBlendronicGain.value));
         DBG("nLengthMultiplier: " + String(nLengthMultiplier));
         DBG("nBeatsToSkip: " + String(nBeatsToSkip));
         DBG("nMode: " + String(nMode));
@@ -400,6 +414,10 @@ public:
     ValueTree getState(void)
     {
         ValueTree prep("params");
+        
+
+        nGain.getState(prep, ptagNostalgic_gain);
+        nBlendronicGain.getState(prep, ptagNostalgic_blendronicGain);
         
         prep.setProperty( ptagNostalgic_waveDistance,       getWavedistance(), 0);
         prep.setProperty( ptagNostalgic_undertow,           getUndertow(), 0);
@@ -413,8 +431,6 @@ public:
         prep.addChild(transp, -1, 0);
         prep.setProperty( ptagNostalgic_transpUsesTuning,  getTranspUsesTuning() ? 1 : 0, 0);
         
-        prep.setProperty( ptagNostalgic_gain,               getGain(), 0);
-        prep.setProperty( ptagNostalgic_blendronicGain,     getBlendronicGain(), 0);
         prep.setProperty( ptagNostalgic_lengthMultiplier,   getLengthMultiplier(), 0);
         prep.setProperty( ptagNostalgic_beatsToSkip,        getBeatsToSkip(), 0);
         prep.setProperty( ptagNostalgic_mode,               getMode(), 0);
@@ -458,6 +474,9 @@ public:
     void setState(XmlElement* e)
     {
         int i; float f;
+        
+        nGain.setState(e, ptagNostalgic_gain, 1.0f);
+        nBlendronicGain.setState(e, ptagNostalgic_blendronicGain, 1.0f);
         
         i = e->getStringAttribute(ptagNostalgic_waveDistance).getIntValue();
         setWaveDistance(i);
@@ -532,11 +551,6 @@ public:
         
         f = e->getStringAttribute(ptagNostalgic_beatsToSkip).getFloatValue();
         setBeatsToSkip(f);
-        
-        f = e->getStringAttribute(ptagNostalgic_gain).getFloatValue();
-        setGain(f);
-        
-        setBlendronicGain(e->getDoubleAttribute(ptagNostalgic_blendronicGain, 1.0f));
         
         i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
         setMode((NostalgicSyncMode)i);
@@ -652,6 +666,8 @@ public:
     inline int getSoundSet(void) { return nUseGlobalSoundSet ? -1 : nSoundSet; }
     inline String getSoundSetName(void) { return nSoundSetName; }
     
+    Moddable<float> nGain;                        // gain multiplier
+    Moddable<float> nBlendronicGain;
     
 private:
     String name;
@@ -668,8 +684,6 @@ private:
     
     Array<float> nTransposition;        // transposition, in half steps
     bool nTranspUsesTuning;             // are transposition values in nTransposition filtered via attached Tuning?
-    float nGain;                        // gain multiplier
-    float nBlendronicGain;
     float nLengthMultiplier;            // note-length mode: toscale reverse playback time
     float nBeatsToSkip;                 // synchronic mode: beats to skip before reverse peak
     NostalgicSyncMode nMode;            // which sync mode to use
@@ -784,14 +798,6 @@ private:
 };
 
 
-/*
- This class owns two NostalgicPreparations: sPrep and aPrep
- As with other preparation, sPrep is the static preparation, while
- aPrep is the active preparation currently in use. sPrep and aPrep
- remain the same unless a Modification is triggered, which will change
- aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
- is triggered.
- */
 
 class Nostalgic : public ReferenceCountedObject
 {
@@ -806,8 +812,7 @@ public:
     
     Nostalgic(NostalgicPreparation::Ptr prep,
               int Id):
-    sPrep(new NostalgicPreparation(prep)),
-    aPrep(new NostalgicPreparation(sPrep)),
+    prep(new NostalgicPreparation(prep)),
     name("Nostalgic "+String(Id)),
     Id(Id)
     {
@@ -818,20 +823,18 @@ public:
     name("Nostalgic "+String(Id)),
     Id(Id)
     {
-		sPrep = new NostalgicPreparation();
-		aPrep = new NostalgicPreparation(sPrep);
+        prep = new NostalgicPreparation();
 		if (random) randomize();
     }
     
     inline void clear(void)
     {
-        sPrep       = new NostalgicPreparation();
-        aPrep       = new NostalgicPreparation(sPrep);
+        prep       = new NostalgicPreparation();
     }
     
     inline Nostalgic::Ptr duplicate()
     {
-        NostalgicPreparation::Ptr copyPrep = new NostalgicPreparation(sPrep);
+        NostalgicPreparation::Ptr copyPrep = new NostalgicPreparation(prep);
         
         Nostalgic::Ptr copy = new Nostalgic(copyPrep, -1);
         
@@ -844,20 +847,19 @@ public:
     
     inline void copy(Nostalgic::Ptr from)
     {
-        sPrep->copy(from->sPrep);
-        aPrep->copy(sPrep);
+        prep->copy(from->prep);
     }
     
     inline ValueTree getState(bool active = false)
     {
-        ValueTree prep(vtagNostalgic);
+        ValueTree vt(vtagNostalgic);
         
-        prep.setProperty( "Id",Id, 0);
-        prep.setProperty( "name",                          name, 0);
+        vt.setProperty( "Id",Id, 0);
+        vt.setProperty( "name",                          name, 0);
         
-        prep.addChild(active ? aPrep->getState() : sPrep->getState(), -1, 0);
+        vt.addChild(prep->getState(), -1, 0);
         
-        return prep;
+        return vt;
     }
     
     inline void setState(XmlElement* e)
@@ -874,22 +876,18 @@ public:
         
         if (params != nullptr)
         {
-            sPrep->setState(params);
+            prep->setState(params);
         }
         else
         {
-            sPrep->setState(e);
+            prep->setState(e);
         }
-        
-        aPrep->copy(sPrep);
     }
     
     inline int getId() {return Id;}
     inline void setId(int newId) { Id = newId;}
     
-    NostalgicPreparation::Ptr      sPrep;
-    NostalgicPreparation::Ptr      aPrep;
-    
+    NostalgicPreparation::Ptr      prep;
     
     inline String getName(void) const noexcept {return name;}
     
@@ -902,8 +900,7 @@ public:
 	inline void randomize()
 	{
 		clear();
-		sPrep->randomize();
-		aPrep->randomize();
+		prep->randomize();
 		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
 		name = "random";
 	}
@@ -1017,9 +1014,9 @@ public:
         synth = main;
     }
     
-    inline void reset(void)
+    void reset(void)
     {
-        nostalgic->aPrep->copy(nostalgic->sPrep);
+        nostalgic->prep->resetModdables();
     }
     
     inline int getId(void) const noexcept { return nostalgic->getId(); }

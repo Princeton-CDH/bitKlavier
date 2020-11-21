@@ -303,11 +303,11 @@ void TempoPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayTempo)
     {
         TempoProcessor::Ptr mProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
-        TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+        TempoPreparation::Ptr prep = processor.gallery->getTempoPreparation(processor.updateState->currentTempoId);
         
         if (mProcessor != nullptr)
         {
-            if(active->getHostTempo()) tempoSlider->setValue(active->getTempo(), dontSendNotification);
+            if(prep->getHostTempo()) tempoSlider->setValue(prep->getTempo(), dontSendNotification);
             
             if(mProcessor->getPeriodMultiplier() != lastPeriodMultiplier)
             {
@@ -317,7 +317,7 @@ void TempoPreparationEditor::timerCallback()
                 A1AdaptedPeriodMultiplier.setText("Period Multiplier = " + String(mProcessor->getPeriodMultiplier()), dontSendNotification);
             }
             
-            if(mProcessor->getAtDelta() < active->getAdaptiveTempo1Max())
+            if(mProcessor->getAtDelta() < prep->getAdaptiveTempo1Max())
                 AT1MinMaxSlider->setDisplayValue(mProcessor->getAtDelta());
             else
                 AT1MinMaxSlider->setDisplayValue(0);
@@ -504,8 +504,7 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     int index = box->getSelectedItemIndex();
     int Id = box->getSelectedId();
     
-    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
-    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr prep = processor.gallery->getTempoPreparation(processor.updateState->currentTempoId);
     
     if (name == selectCB.getName())
     {
@@ -514,14 +513,12 @@ void TempoPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     else if (name == modeCB.getName())
     {
         prep->setTempoSystem(TempoType(index));
-        active->setTempoSystem(TempoType(index));
         updateComponentVisibility();
     }
     else if (name == A1ModeCB.getName())
     {
         DBG("A1ModeCB = " + String(index));
         prep->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
-        active->setAdaptiveTempo1Mode((AdaptiveTempo1Mode) index);
     }
     
     processor.updateState->editsMade = true;
@@ -538,15 +535,12 @@ void TempoPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableCo
 
 void TempoPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
-    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr prep = processor.gallery->getTempoPreparation(processor.updateState->currentTempoId);
     
     if(name == AT1MinMaxSlider->getName()) {
         DBG("got new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
         prep->setAdaptiveTempo1Min(minval);
         prep->setAdaptiveTempo1Max(maxval);
-        active->setAdaptiveTempo1Min(minval);
-        active->setAdaptiveTempo1Max(maxval);
     }
     
     processor.updateState->editsMade = true;
@@ -556,7 +550,7 @@ void TempoPreparationEditor::update(void)
 {
     if (processor.updateState->currentTempoId < 0) return;
     
-    TempoPreparation::Ptr prep = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);
+    TempoPreparation::Ptr prep = processor.gallery->getTempoPreparation(processor.updateState->currentTempoId);
     
     if (prep != nullptr)
     {
@@ -580,28 +574,23 @@ void TempoPreparationEditor::update(void)
 
 void TempoPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    TempoPreparation::Ptr prep = processor.gallery->getStaticTempoPreparation(processor.updateState->currentTempoId);
-    TempoPreparation::Ptr active = processor.gallery->getActiveTempoPreparation(processor.updateState->currentTempoId);;
+    TempoPreparation::Ptr prep = processor.gallery->getTempoPreparation(processor.updateState->currentTempoId);
     
     if(slider == tempoSlider.get()) {
         DBG("got tempo " + String(val));
         prep->setTempo(val);
-        active->setTempo(val);
     }
     if(slider == subSlider.get()) {
         DBG("got sub " + String(val));
         prep->setSubdivisions(val);
-        active->setSubdivisions(val);
     }
     else if(slider == AT1HistorySlider.get()) {
         DBG("got A1History " + String(val));
         prep->setAdaptiveTempo1History(val);
-        active->setAdaptiveTempo1History(val);
     }
     else if(slider == AT1SubdivisionsSlider.get()) {
         DBG("got A1Subdivisions " + String(val));
         prep->setAdaptiveTempo1Subdivisions(val);
-        active->setAdaptiveTempo1Subdivisions(val);
     }
     
     processor.updateState->editsMade = true;

@@ -815,7 +815,7 @@ void AudioProcessorGraph::Node::prepare (double newSampleRate, int newBlockSize,
 {
     const ScopedLock lock (processorLock);
 
-    if (! isPrepared)
+    if (! iprepared)
     {
         setParentGraph (graph);
 
@@ -828,7 +828,7 @@ void AudioProcessorGraph::Node::prepare (double newSampleRate, int newBlockSize,
 
         // This may be checked from other threads that haven't taken the processorLock,
         // so we need to leave it until the processor has been completely prepared
-        isPrepared = true;
+        iprepared = true;
     }
 }
 
@@ -836,9 +836,9 @@ void AudioProcessorGraph::Node::unprepare()
 {
     const ScopedLock lock (processorLock);
 
-    if (isPrepared)
+    if (iprepared)
     {
-        isPrepared = false;
+        iprepared = false;
         processor->releaseResources();
     }
 }
@@ -907,7 +907,7 @@ void AudioProcessorGraph::topologyChanged()
 {
     sendChangeMessage();
 
-    if (isPrepared)
+    if (iprepared)
         updateOnMessageThread (*this);
 }
 
@@ -1219,7 +1219,7 @@ void AudioProcessorGraph::clearRenderingSequence()
 bool AudioProcessorGraph::anyNodesNeedPreparing() const noexcept
 {
     for (auto* node : nodes)
-        if (! node->isPrepared)
+        if (! node->iprepared)
             return true;
 
     return false;
@@ -1248,7 +1248,7 @@ void AudioProcessorGraph::buildRenderingSequence()
             node->prepare (getSampleRate(), currentBlockSize, this, getProcessingPrecision());
     }
 
-    isPrepared = 1;
+    iprepared = 1;
 
     std::swap (renderSequenceFloat,  newSequenceF);
     std::swap (renderSequenceDouble, newSequenceD);
@@ -1283,7 +1283,7 @@ void AudioProcessorGraph::releaseResources()
 
     cancelPendingUpdate();
 
-    isPrepared = 0;
+    iprepared = 0;
 
     for (auto* n : nodes)
         n->unprepare();
@@ -1323,11 +1323,11 @@ template <typename FloatType, typename SequenceType>
 static void processBlockForBuffer (AudioBuffer<FloatType>& buffer, MidiBuffer& midiMessages,
                                    AudioProcessorGraph& graph,
                                    std::unique_ptr<SequenceType>& renderSequence,
-                                   std::atomic<bool>& isPrepared)
+                                   std::atomic<bool>& iprepared)
 {
     if (graph.isNonRealtime())
     {
-        while (! isPrepared)
+        while (! iprepared)
             Thread::sleep (1);
 
         const ScopedLock sl (graph.getCallbackLock());
@@ -1339,7 +1339,7 @@ static void processBlockForBuffer (AudioBuffer<FloatType>& buffer, MidiBuffer& m
     {
         const ScopedLock sl (graph.getCallbackLock());
 
-        if (isPrepared)
+        if (iprepared)
         {
             if (renderSequence != nullptr)
                 renderSequence->perform (buffer, midiMessages, graph.getPlayHead());
@@ -1354,18 +1354,18 @@ static void processBlockForBuffer (AudioBuffer<FloatType>& buffer, MidiBuffer& m
 
 void AudioProcessorGraph::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
-    if ((! isPrepared) && MessageManager::getInstance()->isThisTheMessageThread())
+    if ((! iprepared) && MessageManager::getInstance()->isThisTheMessageThread())
         handleAsyncUpdate();
 
-    processBlockForBuffer<float> (buffer, midiMessages, *this, renderSequenceFloat, isPrepared);
+    processBlockForBuffer<float> (buffer, midiMessages, *this, renderSequenceFloat, iprepared);
 }
 
 void AudioProcessorGraph::processBlock (AudioBuffer<double>& buffer, MidiBuffer& midiMessages)
 {
-    if ((! isPrepared) && MessageManager::getInstance()->isThisTheMessageThread())
+    if ((! iprepared) && MessageManager::getInstance()->isThisTheMessageThread())
         handleAsyncUpdate();
 
-    processBlockForBuffer<double> (buffer, midiMessages, *this, renderSequenceDouble, isPrepared);
+    processBlockForBuffer<double> (buffer, midiMessages, *this, renderSequenceDouble, iprepared);
 }
 
 //==============================================================================

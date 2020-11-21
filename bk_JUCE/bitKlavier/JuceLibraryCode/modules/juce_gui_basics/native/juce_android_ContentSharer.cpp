@@ -655,10 +655,10 @@ private:
         if (prepareFilesThread == nullptr)
             return;
 
-        filesPrepared (prepareFilesThread->getResultFileUris(), prepareFilesThread->getMimeTypes());
+        fileprepared (prepareFilesThread->getResultFileUris(), prepareFilesThread->getMimeTypes());
     }
 
-    void filesPrepared (jobject fileUris, const StringArray& mimeTypes)
+    void fileprepared (jobject fileUris, const StringArray& mimeTypes)
     {
         auto* env = getEnv();
 

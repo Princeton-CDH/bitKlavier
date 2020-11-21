@@ -78,7 +78,7 @@ public:
         sBeatThreshMS = sBeatThreshSec * 1000.;
     }
     
-    inline void performModification(TempoPreparation::Ptr s, Array<bool> dirty)
+    void performModification(TempoPreparation::Ptr s, Array<bool> dirty)
     {
         if (dirty[TempoBPM]) sTempo = s->getTempo();
         if (dirty[TempoSubdivisions]) subdivisions = s->getSubdivisions();
@@ -91,6 +91,16 @@ public:
         
         sBeatThreshSec = (60.0/sTempo);
         sBeatThreshMS = sBeatThreshSec * 1000.;
+    }
+    
+    void stepModdables()
+    {
+//        dGain.step();
+    }
+    
+    void resetModdables()
+    {
+//        dGain.reset();
     }
     
     bool compare(TempoPreparation::Ptr s)
@@ -256,15 +266,6 @@ private:
 };
 
 
-/*
-This class owns two TempoPreparations: sPrep and aPrep
-As with other preparation, sPrep is the static preparation, while
-aPrep is the active preparation currently in use. sPrep and aPrep
-remain the same unless a Modification is triggered, which will change
-aPrep but not sPrep. aPrep will be restored to sPrep when a Reset
-is triggered.
-*/
-
 class Tempo : public ReferenceCountedObject
 {
     
@@ -278,8 +279,7 @@ public:
     
     Tempo(TempoPreparation::Ptr prep,
           int Id):
-    sPrep(new TempoPreparation(prep)),
-    aPrep(new TempoPreparation(sPrep)),
+    prep(new TempoPreparation(prep)),
     Id(Id),
     name("Tempo "+String(Id))
     {
@@ -290,20 +290,18 @@ public:
     Id(Id),
     name("Tempo "+String(Id))
     {
-		sPrep = new TempoPreparation();
-		aPrep = new TempoPreparation(sPrep);
+		prep = new TempoPreparation();
 		if (random) randomize();
     }
     
     inline void clear(void)
     {
-        sPrep       = new TempoPreparation();
-        aPrep       = new TempoPreparation(sPrep);
+        prep       = new TempoPreparation();
     }
     
     inline Tempo::Ptr duplicate()
     {
-        TempoPreparation::Ptr copyPrep = new TempoPreparation(sPrep);
+        TempoPreparation::Ptr copyPrep = new TempoPreparation(prep);
         
         Tempo::Ptr copy = new Tempo(copyPrep, -1);
         
@@ -314,14 +312,14 @@ public:
     
     inline ValueTree getState(bool active = false)
     {
-        ValueTree prep(vtagTempo);
+        ValueTree vt(vtagTempo);
         
-        prep.setProperty( "Id",Id, 0);
-        prep.setProperty( "name",                          name, 0);
+        vt.setProperty( "Id",Id, 0);
+        vt.setProperty( "name",                          name, 0);
         
-        prep.addChild(active ? aPrep->getState() : sPrep->getState(), -1, 0);
+        vt.addChild(prep->getState(), -1, 0);
     
-        return prep;
+        return vt;
     }
     
     inline void setState(XmlElement* e)
@@ -338,14 +336,12 @@ public:
         
         if (params != nullptr)
         {
-            sPrep->setState(params);
+            prep->setState(params);
         }
         else
         {
-            sPrep->setState(e);
+            prep->setState(e);
         }
-        
-        aPrep->copy(sPrep);
     }
     
     ~Tempo() {};
@@ -353,27 +349,22 @@ public:
     inline int getId() {return Id;}
     inline void setId(int newId) { Id = newId;}
     
-    
-    TempoPreparation::Ptr      sPrep;
-    TempoPreparation::Ptr      aPrep;
-    
+    TempoPreparation::Ptr      prep;
     
     void reset()
     {
-        aPrep->copy(sPrep);
+//        aPrep->copy(prep);
     }
     
     inline void copy(Tempo::Ptr from)
     {
-        sPrep->copy(from->sPrep);
-        aPrep->copy(sPrep);
+        prep->copy(from->prep);
     }
 
 	inline void randomize()
 	{
 		clear();
-		sPrep->randomize();
-		aPrep->randomize();
+		prep->randomize();
 		name = "random";
 	}
     
@@ -417,10 +408,10 @@ public:
     void keyReleased(int noteNumber, int channel);
     inline float getPeriodMultiplier(void)
     {
-        return ((tempo->aPrep->getTempoSystem() == AdaptiveTempo1) ? adaptiveTempoPeriodMultiplier : 1.0);
+        return ((tempo->prep->getTempoSystem() == AdaptiveTempo1) ? adaptiveTempoPeriodMultiplier : 1.0);
         
     }
-    inline float getAdaptedTempo(void)                  {return tempo->aPrep->getTempo() / adaptiveTempoPeriodMultiplier;}
+    inline float getAdaptedTempo(void)                  {return tempo->prep->getTempo() / adaptiveTempoPeriodMultiplier;}
     
     void  adaptiveReset();
 
@@ -436,7 +427,7 @@ public:
     
     inline void reset(void)
     {
-        tempo->aPrep->copy(tempo->sPrep);
+        tempo->prep->resetModdables();
         adaptiveReset();
     }
     

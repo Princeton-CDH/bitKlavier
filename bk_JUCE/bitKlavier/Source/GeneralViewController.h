@@ -116,7 +116,8 @@ private:
 
 class ModdableViewController :
 public BKViewController,
-public BKSingleSlider::Listener
+public BKSingleSlider::Listener,
+public Timer
 #if JUCE_IOS
 , public WantsBigOne::Listener
 #endif
@@ -128,6 +129,7 @@ public:
     void paint (Graphics&) override;
     
     void resized() override;
+    void timerCallback() override;
     
     void update();
     
@@ -139,6 +141,7 @@ private:
     
     std::unique_ptr<BKSingleSlider> timeSlider;
     std::unique_ptr<BKSingleSlider> incSlider;
+    std::unique_ptr<BKSingleSlider> maxIncSlider;
     
     void bkTextFieldDidChange       (TextEditor&)               override;
     void bkComboBoxDidChange        (ComboBox* box)             override {};
