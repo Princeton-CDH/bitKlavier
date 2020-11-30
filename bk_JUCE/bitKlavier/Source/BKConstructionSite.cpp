@@ -557,7 +557,7 @@ void BKConstructionSite::paste(bool cursorBasedOffset)
     
     for (auto item : clipboard)
     {
-        BKItem* newItem = item->duplicate();
+        BKItem::Ptr newItem = item->duplicate();
         
         BKPreparationType type = newItem->getType();
         int oldId = item->getId();

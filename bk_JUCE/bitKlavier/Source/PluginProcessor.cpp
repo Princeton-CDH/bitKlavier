@@ -580,66 +580,82 @@ void BKAudioProcessor::renameGallery(String newName)
     deleteGalleryAtURL(oldURL);
 }
 
-void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool harmonizer)
+void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool postHarmonizer)
 {
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
     bool activeSource = false;
 
-    if (pmap != nullptr)
+    if (pmap == nullptr) return;
+    
+    // This array will hold all the notes to play based on harmonization without duplicates
+    Array<int> reducedHarm;
+    // Go through all the keymaps
+    for (auto km : pmap->getKeymaps())
     {
-        for (auto km : pmap->getKeymaps())
+        // Ignore the keymap if it doesn't use the midi source
+        if (km->getAllMidiInputIdentifiers().contains(source))
         {
-            if (km->getAllMidiInputIdentifiers().contains(source))
+            activeSource = true;
+            if (!postHarmonizer) // First pass, haven't resolved harmonization yet
             {
-                activeSource = true;
-                if (!harmonizer)
-				{
-                    if (km->getMidiEdit())
+                // Handle keymap midi editing preharmonization and without checking keymap notes
+                if (km->getMidiEdit())
+                {
+                    km->toggleNote(noteNumber);
+                    //return;
+                }
+                else if (km->getHarMidiEdit())
+                {
+                    km->setHarKey(noteNumber);
+                    //return;
+                }
+                else if (km->getHarArrayMidiEdit())
+                {
+                    km->toggleHarmonizerList(noteNumber);
+                    //return;
+                }
+                // Now check if the keymap contains the played note
+                else if (km->containsNote(noteNumber))
+                {
+                    // Get harmonization
+                    Array<int> harm = km->getHarmonizationForKey(noteNumber, true, true);
+                    for (auto h : harm)
                     {
-                        km->toggleNote(noteNumber);
-                        //return;
+                        reducedHarm.addIfNotAlreadyThere(h);
                     }
-                    else if (km->getHarMidiEdit())
+                    // Toggleable keymap behaviors
+                    if (!km->isInverted())
                     {
-                        km->setHarKey(noteNumber);
-                        //return;
+                        if (km->getAllNotesOff())
+                            clearBitKlavier();
+                        
+                        if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
+                            sustainActivate();
+                        
+                        km->setTriggered(noteNumber, true);
                     }
-                    else if (km->getHarArrayMidiEdit())
+                    else
                     {
-                        km->toggleHarmonizerList(noteNumber);
-                        //return;
-                    }
-                    else if (km->containsNote(noteNumber))
-                    {
-                        Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true, true);
-                        for (int i = 0; i < harmonizer.size(); i++)
-                        {
-                            handleNoteOn(harmonizer[i], velocity, channel, noteNumber, source, true);
-                        }
-                        if (!km->isInverted())
-                        {
-                            if (km->getAllNotesOff())
-                                clearBitKlavier();
-                            
-                            if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
-                                sustainActivate();
-                            
-                            km->setTriggered(noteNumber, true);
-                        }
-                        else
-                        {
-                            km->setTriggered(noteNumber, false);
-                            if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
-                                sustainDeactivate();
-                        }
+                        km->setTriggered(noteNumber, false);
+                        if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
+                            sustainDeactivate();
                     }
                 }
-            }   
+            }
         }
     }
-    if (!harmonizer) return;
+    if (!postHarmonizer)
+    {
+        // Now call this function for each post harmonization note
+        for (auto h : reducedHarm)
+        {
+            handleNoteOn(h, velocity, channel, noteNumber, source, true);
+        }
+        return; // Done with the first pass
+    }
     
+    // Second pass, post harmonization
     String key = source + "n" + String(mappedFrom);
     bool noteDown = noteOn.getUnchecked(noteNumber)->size() > 0;
     
@@ -669,7 +685,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             }
         }
     }
-
+    
     // modifications
     performResets(noteNumber, source);
     performModifications(noteNumber, source);
@@ -680,9 +696,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
         if (piano != currentPiano)
             piano->prepMap->clearKey(noteNumber);
     }
-
-    // Send key on to each pmap in current piano
-    //DBG("noteon: " +String(noteNumber) + " pmap: " + String(p));
 
     // TODO : for multi sample set support, remove soundfont argument from this chain of functions
     // UPDATE: actually seems like that argument isn't really used so it doesn't matter. still should clean this up
@@ -708,48 +721,55 @@ void BKAudioProcessor::handleAllNotesOff()
     
 }
 
-void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool harmonizer)
+void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool postHarmonizer)
 {
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
      
     bool activeSource = false;
     
-    if (pmap != nullptr)
+    if (pmap == nullptr) return;
+    
+    Array<int> reducedHarm;
+    for (auto km : pmap->getKeymaps())
     {
-        for (auto km : pmap->getKeymaps())
+        if (km->getAllMidiInputIdentifiers().contains(source))
         {
-            if (km->getAllMidiInputIdentifiers().contains(source))
+            activeSource = true;
+            if (!postHarmonizer && km->containsNote(noteNumber))
             {
-                activeSource = true;
-                if (!harmonizer && km->containsNote(noteNumber))
+                Array<int> harm = km->getHarmonizationForKey(noteNumber, true, true);
+                for (auto h : harm)
                 {
-                    Array<int> harmonizer = km->getHarmonizationForKey(noteNumber, true, true);
-                    for (int i = 0; i < harmonizer.size(); i++)
-                    {
-                        handleNoteOff(harmonizer[i], velocity, channel, noteNumber, source, true);
-                    }
-                    if (km->isInverted())
-                    {
-                        if (km->getAllNotesOff())
-                            clearBitKlavier();
-                        
-                        if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
-                            sustainActivate();
-                        
-                        km->setTriggered(noteNumber, true);
-                    }
-                    else
-                    {
-                        km->setTriggered(noteNumber, false);
-                        if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
-                            sustainDeactivate();
-                    }
+                    reducedHarm.addIfNotAlreadyThere(h);
+                }
+                if (km->isInverted())
+                {
+                    if (km->getAllNotesOff())
+                        clearBitKlavier();
+                    
+                    if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
+                        sustainActivate();
+                    
+                    km->setTriggered(noteNumber, true);
+                }
+                else
+                {
+                    km->setTriggered(noteNumber, false);
+                    if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
+                        sustainDeactivate();
                 }
             }
         }
     }
-
-    if (harmonizer == false) return;
+    if (!postHarmonizer)
+    {
+        // Now call this function for each post harmonization note
+        for (auto h : reducedHarm)
+        {
+            handleNoteOff(h, velocity, channel, noteNumber, source, true);
+        }
+        return; // Done with the first pass
+    }
     
     String key = source + "n" + String(mappedFrom);
     
