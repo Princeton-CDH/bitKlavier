@@ -849,17 +849,20 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         const float l = noteVelocity * adsr.tick() * (sampleL * sampleEnv.tick());
         const float r = noteVelocity * adsr.lastOut() * (sampleR * sampleEnv.lastOut());
 
+        float d = 1.0f;
+        if (dgain != nullptr) d = *dgain;
+        
         if (outR != nullptr)
         {
-            *outL++ += l * lgain;
-            *outR++ += r * rgain;
+            *outL++ += l * lgain * d;
+            *outR++ += r * rgain * d;
         }
         else
         {
-            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f;
+            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f * d;
         }
         
-        float b = aGlobalGain;
+        float b = aGlobalGain * d;
         if (blendronicGain != nullptr) b *= *blendronicGain;
         for (int i = 0; i < numBlendronics; ++i)
         {
@@ -961,16 +964,20 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             stopNote (0.0f, false);
             break;
         }
-
-		if (outR != nullptr)
-		{
-			*outL++ += (l * lgain);
-			*outR++ += (r * rgain);
-		}
-		else
-		{
-            *outL++ += (l * lgain) + (r * rgain) * 0.5f;
-		}
+        
+        float d = 1.0f;
+        if (dgain != nullptr) d = *dgain;
+        
+        if (outR != nullptr)
+        {
+            *outL++ += l * lgain * d;
+            *outR++ += r * rgain * d;
+        }
+        else
+        {
+            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f * d;
+        }
+        
         if (playDirection == Forward)
         {
             sourceSamplePosition += bentRatio;
@@ -1012,7 +1019,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             DBG("Invalid note direction.");
         }
         
-        float b = aGlobalGain;
+        float b = aGlobalGain * d;
         if (blendronicGain != nullptr) b *= *blendronicGain;
         for (int i = 0; i < numBlendronics; ++i)
         {

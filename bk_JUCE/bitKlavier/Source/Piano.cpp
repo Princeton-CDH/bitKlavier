@@ -172,22 +172,8 @@ void Piano::configure(void)
                     // DBG(String(targetType) + " linked with keymap");
                     linkPreparationWithKeymap(targetType, targetId, Id);
                 }
-                else if ((targetType >= PreparationTypeDirectMod && targetType <= PreparationTypeTempoMod) || targetType == PreparationTypeBlendronicMod)
-                {
-                    configureModification(target);
-                }
-                else if (targetType == PreparationTypePianoMap)
-                {
-                    configurePianoMap(target);
-                }
-                else if (targetType == PreparationTypeReset)
-                {
-                    configureReset(target);
-                }
             }
-            
             connex.clear();
-
         }
         else if (type == PreparationTypeTuning)
         {
@@ -231,7 +217,6 @@ void Piano::configure(void)
                 }
             }
         }
-
 		else if (type == PreparationTypeBlendronic)
 		{
 			//look for direct, nostalgic, and synchronic targets
@@ -247,6 +232,21 @@ void Piano::configure(void)
 				}
 			}
 		}
+        
+        // These three cases used to be handling in the keymap case as keymap connections, but
+        // they handle all connected keymaps internally so that was redundant. Should be fine here.
+        else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeBlendronicMod)
+        {
+            configureModification(item);
+        }
+        else if (type == PreparationTypePianoMap)
+        {
+            configurePianoMap(item);
+        }
+        else if (type == PreparationTypeReset)
+        {
+            configureReset(item);
+        }
     }
     
     //processor.updateState->pianoDidChangeForGraph = true;
