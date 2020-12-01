@@ -507,10 +507,10 @@ void NostalgicModification::setState(XmlElement* e)
         }
         
         NostalgicPreparation::setState(paramsXml);
-        if (!getUseGlobalSoundSet())
+        if (!nUseGlobalSoundSet.value)
         {
             // comes in as "soundfont.sf2.subsound1"
-            String name = getSoundSetName();
+            String name = nSoundSetName.value;
             BKSampleLoadType type = BKLoadSoundfont;
             
             for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
@@ -556,14 +556,14 @@ void NostalgicModification::setStateOld(XmlElement* e)
     String p = e->getStringAttribute(ptagNostalgic_waveDistance);
     if (p != "")
     {
-        setWaveDistance(p.getIntValue());
+        nWaveDistance.set(p.getIntValue());
         setDirty(NostalgicWaveDistance);
     }
     
     p = e->getStringAttribute(ptagNostalgic_undertow);
     if (p != "")
     {
-        setUndertow(p.getIntValue());
+        nUndertow.set(p.getIntValue());
         setDirty(NostalgicUndertow);
     }
     
@@ -584,7 +584,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
                 }
             }
             
-            setTransposition(transp);
+            nTransposition.set(transp);
             setDirty(NostalgicTransposition);
             
         }
@@ -633,28 +633,28 @@ void NostalgicModification::setStateOld(XmlElement* e)
     p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
     if (p != "")
     {
-        setLengthMultiplier(p.getFloatValue());
+        nLengthMultiplier.set(p.getFloatValue());
         setDirty(NostalgicLengthMultiplier);
     }
     
     p = e->getStringAttribute(ptagNostalgic_beatsToSkip);
     if (p != "")
     {
-        setBeatsToSkip(p.getFloatValue());
+        nBeatsToSkip.set(p.getFloatValue());
         setDirty(NostalgicBeatsToSkip);
     }
     
     p = e->getStringAttribute(ptagNostalgic_gain);
     if (p != "")
     {
-        setGain(p.getFloatValue());
+        nGain.set(p.getFloatValue());
         setDirty(NostalgicGain);
     }
     
     p = e->getStringAttribute(ptagNostalgic_mode);
     if (p != "")
     {
-        setMode((NostalgicSyncMode) p.getIntValue());
+        nMode.set((NostalgicSyncMode) p.getIntValue());
         setDirty(NostalgicMode);
     }
 }

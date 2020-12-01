@@ -459,6 +459,22 @@ ModdableBase* ModdableViewController::getCurrentModdable()
         else
             ; // continue branching for each parameter and component
     }
+    if (processor.updateState->previousDisplay == DisplayNostalgicMod)
+    {
+        NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
+        
+        if (processor.updateState->currentModdableName == "gain")
+            return &mod->nGain;
+        else if (processor.updateState->currentModdableName == "blendronic gain")
+            return &mod->nBlendronicGain;
+        else if (processor.updateState->currentModdableName == "note length multiplier")
+            return &mod->nLengthMultiplier;
+        else if (processor.updateState->currentModdableName == "cluster min")
+            return &mod->clusterMin;
+        else if (processor.updateState->currentModdableName == "cluster thresh")
+            return &mod->clusterThreshold;
+            ; // continue branching for each parameter and component
+    }
     
     return nullptr;
 }

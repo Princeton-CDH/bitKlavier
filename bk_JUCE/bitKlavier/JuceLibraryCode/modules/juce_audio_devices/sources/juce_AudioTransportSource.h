@@ -170,7 +170,7 @@ private:
     std::atomic<bool> playing { false }, stopped { true };
     double sampleRate = 44100.0, sourceSampleRate = 0;
     int blockSize = 128, readAheadBufferSize = 0;
-    bool iprepared = false, inputStreamEOF = false;
+    bool isPrepared = false, inputStreamEOF = false;
 
     void releaseMasterResources();
 

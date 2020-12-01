@@ -489,28 +489,28 @@ void Gallery::setStateFromJson(var myJson)
                     
                     float gain = jsonGetValue(nx+"gain");
                     
-                    nostPrep->setGain(gain);
+                    nostPrep->nGain.set(gain);
                     
                     float memoryMult = jsonGetValue(nx+"memoryMult");
                     
-                    nostPrep->setLengthMultiplier(memoryMult);
+                    nostPrep->nLengthMultiplier.set(memoryMult);
                     
                     float undertow = jsonGetValue(nx+"undertow");
                     
-                    nostPrep->setUndertow(undertow);
+                    nostPrep->nUndertow.set(undertow);
                     
                     float wavedistance = jsonGetValue(nx+"wavedistance");
                     
-                    nostPrep->setWaveDistance(wavedistance);
+                    nostPrep->nWaveDistance.set(wavedistance);
                     
                     float transp = jsonGetValue(nx+"transposition");
                     
                     Array<float> transps; transps.add(transp);
-                    nostPrep->setTransposition(transps);
+                    nostPrep->nTransposition.set(transps);
                     
                     float beatsToSkip = jsonGetValue(nx+"revBeatsToSkip");
                     
-                    nostPrep->setBeatsToSkip(beatsToSkip);
+                    nostPrep->nBeatsToSkip.set(beatsToSkip);
                     
                     int reverseSyncMode = jsonGetValue(nx+"reverseSyncMode");
                     

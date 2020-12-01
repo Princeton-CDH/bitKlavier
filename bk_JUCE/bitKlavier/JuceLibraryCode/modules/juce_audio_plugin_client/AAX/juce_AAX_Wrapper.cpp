@@ -406,7 +406,7 @@ namespace AAXClasses
        #endif
 
         PluginInstanceInfo* pluginInstance;
-        int32_t* iprepared;
+        int32_t* isPrepared;
         float* const* meterTapBuffers;
         int32_t* sideChainBuffers;
     };
@@ -429,7 +429,7 @@ namespace AAXClasses
            #endif
 
             pluginInstance    = AAX_FIELD_INDEX (JUCEAlgorithmContext, pluginInstance),
-            preparedFlag      = AAX_FIELD_INDEX (JUCEAlgorithmContext, iprepared),
+            preparedFlag      = AAX_FIELD_INDEX (JUCEAlgorithmContext, isPrepared),
 
             meterTapBuffers   = AAX_FIELD_INDEX (JUCEAlgorithmContext, meterTapBuffers),
 
@@ -738,9 +738,9 @@ namespace AAXClasses
             cancelPendingUpdate();
             juceParameters.clear();
 
-            if (iprepared && pluginInstance != nullptr)
+            if (isPrepared && pluginInstance != nullptr)
             {
-                iprepared = false;
+                isPrepared = false;
                 processingSidechainChange = false;
 
                 pluginInstance->releaseResources();
@@ -1632,9 +1632,9 @@ namespace AAXClasses
 
             if (! getMainBusFormats (inputSet, outputSet))
             {
-                if (iprepared)
+                if (isPrepared)
                 {
-                    iprepared = false;
+                    isPrepared = false;
                     audioProcessor.releaseResources();
                 }
 
@@ -1645,9 +1645,9 @@ namespace AAXClasses
 
             if (! fullBusesLayoutFromMainLayout (audioProcessor, inputSet, outputSet, newLayout))
             {
-                if (iprepared)
+                if (isPrepared)
                 {
-                    iprepared = false;
+                    isPrepared = false;
                     audioProcessor.releaseResources();
                 }
 
@@ -1683,9 +1683,9 @@ namespace AAXClasses
                     // your plug-in needs to support a single output bus if running in AudioSuite
                     jassertfalse;
 
-                    if (iprepared)
+                    if (isPrepared)
                     {
-                        iprepared = false;
+                        isPrepared = false;
                         audioProcessor.releaseResources();
                     }
 
@@ -1699,9 +1699,9 @@ namespace AAXClasses
             {
                 if (! audioProcessor.setBusesLayout (newLayout))
                 {
-                    if (iprepared)
+                    if (isPrepared)
                     {
-                        iprepared = false;
+                        isPrepared = false;
                         audioProcessor.releaseResources();
                     }
 
@@ -1711,11 +1711,11 @@ namespace AAXClasses
                 rebuildChannelMapArrays();
             }
 
-            if (layoutChanged || (! iprepared))
+            if (layoutChanged || (! isPrepared))
             {
-                if (iprepared)
+                if (isPrepared)
                 {
-                    iprepared = false;
+                    isPrepared = false;
                     audioProcessor.releaseResources();
                 }
 
@@ -1730,7 +1730,7 @@ namespace AAXClasses
             }
 
             check (Controller()->SetSignalLatency (audioProcessor.getLatencySamples()));
-            iprepared = true;
+            isPrepared = true;
 
             return AAX_SUCCESS;
         }
@@ -1801,9 +1801,9 @@ namespace AAXClasses
             {
                 lastSideChainState = sidechainDesired;
 
-                if (iprepared)
+                if (isPrepared)
                 {
-                    iprepared = false;
+                    isPrepared = false;
                     audioProcessor.releaseResources();
                 }
 
@@ -1812,7 +1812,7 @@ namespace AAXClasses
                                                               : AudioChannelSet::disabled());
 
                 audioProcessor.prepareToPlay (audioProcessor.getSampleRate(), audioProcessor.getBlockSize());
-                iprepared = true;
+                isPrepared = true;
             }
 
             processingSidechainChange = false;
@@ -1978,7 +1978,7 @@ namespace AAXClasses
 
         std::unique_ptr<AudioProcessor> pluginInstance;
 
-        bool iprepared = false;
+        bool isPrepared = false;
         MidiBuffer midiBuffer;
         Array<float*> channelList;
         int32_t juceChunkIndex = 0;

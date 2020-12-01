@@ -107,7 +107,7 @@ private:
     WaitableEvent bufferReadyEvent;
     std::atomic<int64> bufferValidStart { 0 }, bufferValidEnd { 0 }, nextPlayPos { 0 };
     double sampleRate = 0;
-    bool wasSourceLooping = false, iprepared = false, prefillBuffer;
+    bool wasSourceLooping = false, isPrepared = false, prefillBuffer;
 
     bool readNextBufferChunk();
     void readBufferSection (int64 start, int length, int bufferOffset);

@@ -1761,6 +1761,10 @@ void BKAudioProcessor::hiResTimerCallback()
     {
         d->prep->stepModdables();
     }
+    for (auto n : gallery->getAllNostalgic())
+    {
+        n->prep->stepModdables();
+    }
 }
 
 void BKAudioProcessor::reset(BKPreparationType type, int Id)

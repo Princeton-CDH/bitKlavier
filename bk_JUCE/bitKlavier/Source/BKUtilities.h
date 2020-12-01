@@ -435,13 +435,39 @@ public:
     {
         mod = m.mod;
         time = m.time;
-        modTo(tag<ValueType>{}, m);
+        modTo(tag<ValueType>{}, m, true);
     }
     
-    void modTo(tag<double>, Moddable& m)
+    void unmodFrom(Moddable& m)
     {
-        mod += (m.inc * m.n);
-        if (m.n < m.maxN) m.n++;
+        mod = base;
+        time = m.time;
+        modTo(tag<ValueType>{}, m, false);
+    }
+    
+    // The minimal behavior for modTo
+    // For special behaviors overload this below with a specific tag
+    // as has been done for double, int, and float
+    template<class T = ValueType>
+    void modTo(tag<T>, Moddable& m, bool shouldInc)
+    {
+        if (time > 0)
+        {
+            active = true;
+            timeElapsed = 0;
+            return;
+        }
+        value = mod;
+        active = false;
+    }
+    
+    void modTo(tag<double>, Moddable& m, bool shouldInc)
+    {
+        if (shouldInc)
+        {
+            mod += (m.inc * m.n);
+            if (m.n < m.maxN) m.n++;
+        }
         
         if (time > 0 && (mod - value) != 0)
         {
@@ -453,58 +479,8 @@ public:
         value = mod;
         active = false;
     }
-    void modTo(tag<int>, Moddable& m) { modTo(tag<double>{}, m); }
-    void modTo(tag<float>, Moddable& m) { modTo(tag<double>{}, m); }
-    void modTo(tag<bool>, Moddable& m)
-    {
-        if (time > 0)
-        {
-            active = true;
-            timeElapsed = 0;
-            return;
-        }
-        value = mod;
-        active = false;
-    }
-    void modTo(tag<String>, Moddable& m) { modTo(tag<bool>{}, m); }
-    void modTo(tag<Array<float>>, Moddable& m) { modTo(tag<bool>{}, m); }
-    
-    //==============================================================================
-    
-    void unmodFrom(Moddable& m)
-    {
-        mod = base;
-        time = m.time;
-        unmodFrom(tag<ValueType>{}, m);
-    }
-    
-    void unmodFrom(tag<double>, Moddable& m)
-    {
-        if (time > 0 && (mod - value) != 0)
-        {
-            calcDV(tag<ValueType>{});
-            active = true; //active = m.active;
-            timeElapsed = 0;
-            return;
-        }
-        value = mod;
-        active = false;
-    }
-    void unmodFrom(tag<int>, Moddable& m) { unmodFrom(tag<double>{}, m); }
-    void unmodFrom(tag<float>, Moddable& m) { unmodFrom(tag<double>{}, m); }
-    void unmodFrom(tag<bool>, Moddable& m)
-    {
-        if (time > 0)
-        {
-            active = true;
-            timeElapsed = 0;
-            return;
-        }
-        value = mod;
-        active = false;
-    }
-    void unmodFrom(tag<String>, Moddable& m) { unmodFrom(tag<bool>{}, m); }
-    void unmodFrom(tag<Array<float>>, Moddable& m) { unmodFrom(tag<bool>{}, m); }
+    void modTo(tag<float>, Moddable& m, bool shouldInc) { modTo(tag<double>{}, m, shouldInc); }
+    void modTo(tag<int>, Moddable& m, bool shouldInc) { modTo(tag<double>{}, m, shouldInc); }
     
     //==============================================================================
     
@@ -529,13 +505,17 @@ public:
         mod = v;
         n = 0;
     }
+    
+    // This use a double arg instead of ValueType so it's usable from the ModdableBase class
     void setInc(double v) override { setInc(tag<ValueType>{}, v); }
+    
+    template<class T = ValueType>
+    void setInc(tag<T>, double v) { ; }
+    
     void setInc(tag<int>, int v) { inc = v; n = 0; }
     void setInc(tag<float>, float v) { inc = v; n = 0; }
     void setInc(tag<double>, double v) { inc = v; n = 0; }
-    void setInc(tag<bool>, double v) { ; }
-    void setInc(tag<String>, double v) { ; }
-    void setInc(tag<Array<float>>, double v) { ; }
+
     void setTime(int ms) override { time = ms; }
     void setActive(bool a) { active = a; }
     void setMaxNumberOfInc(int mn) override
@@ -546,58 +526,37 @@ public:
     
     // Getters
     double getInc() override { return getInc(tag<ValueType>{}); }
+    
+    template<class T = ValueType>
+    double getInc(tag<T>) { return 0.0; }
+    
     double getInc(tag<int>) { return inc; }
     double getInc(tag<float>) { return inc; }
     double getInc(tag<double>) { return inc; }
-    double getInc(tag<bool>) { return 0.0; }
-    double getInc(tag<String>) { return 0.0; }
-    double getInc(tag<Array<float>>) { return 0.0f; }
+
     int getTime() override { return time; }
     int getNumberOfInc() override { return n; }
     int getMaxNumberOfInc() override { return maxN; }
     
+    //==============================================================================
     // Step
     void step()
     {
         if (!active) return;
-        if(std::is_same<ValueType,int>::value ||
-           std::is_same<ValueType,double>::value ||
-           std::is_same<ValueType,float>::value)
-        {
-            step(tag<ValueType>{});
-        }
-        else
-        {
-            if (time - timeElapsed <= 0)
-            {
-                value = mod;
-                active = false;
-            }
-        }
+        step(tag<ValueType>{});
         timeElapsed++;
     }
-    void step(tag<int>)
+    
+    template<class T = ValueType>
+    void step(tag<T>)
     {
-        float p = 1.0f - (float(timeElapsed) / float(time));
-        if (dv > 0)
+        if (time - timeElapsed <= 0)
         {
-            if (value < mod) value = mod - int(dv * p);
-            else
-            {
-                value = mod;
-                active = false;
-            }
-        }
-        else if (dv < 0)
-        {
-            if (value > mod) value += dv;
-            else
-            {
-                value = mod;
-                active = false;
-            }
+            value = mod;
+            active = false;
         }
     }
+    
     void step(tag<double>)
     {
         if (dv > 0)
@@ -620,37 +579,53 @@ public:
         }
     }
     void step(tag<float>) { step(tag<double>{}); }
+    void step(tag<int>)
+    {
+        float p = 1.0f - (float(timeElapsed) / float(time));
+        if (dv > 0)
+        {
+            if (value < mod) value = mod - int(dv * p);
+            else
+            {
+                value = mod;
+                active = false;
+            }
+        }
+        else if (dv < 0)
+        {
+            if (value > mod) value += dv;
+            else
+            {
+                value = mod;
+                active = false;
+            }
+        }
+    }
     
+    //==============================================================================
     // Doing getState and setState a bit different than elsewhere
     // (passing in reference of tree instead of returning a sub tree)
     // because it works out better for backwards compatibility while
-    // avoids a lot of extra code in preparations
+    // avoiding a lot of extra code in preparations'
     // getState and setState functions
-    void getState(ValueTree& vt, String s)
-    { getState(tag<ValueType>{}, vt, s); }
-    void getState(tag<int>, ValueTree& vt, String s)
-    { getState(tag<double>{}, vt, s); }
-    void getState(tag<float>, ValueTree& vt, String s)
-    { getState(tag<double>{}, vt, s); }
+    void getState(ValueTree& vt, String s) { getState(tag<ValueType>{}, vt, s); }
+    
+    template<class T = ValueType>
+    void getState(tag<T>, ValueTree& vt, String s)
+    {
+        vt.setProperty(s, base, 0);
+        vt.setProperty(s + "_mod", mod, 0);
+        vt.setProperty(s + "_time", time, 0);
+        vt.setProperty(s + "_maxN", maxN, 0);
+    }
+    
+    void getState(tag<int>, ValueTree& vt, String s) { getState(tag<double>{}, vt, s); }
+    void getState(tag<float>, ValueTree& vt, String s) { getState(tag<double>{}, vt, s); }
     void getState(tag<double>, ValueTree& vt, String s)
     {
         vt.setProperty(s, base, 0);
         vt.setProperty(s + "_mod", mod, 0);
         vt.setProperty(s + "_inc", inc, 0);
-        vt.setProperty(s + "_time", time, 0);
-        vt.setProperty(s + "_maxN", maxN, 0);
-    }
-    void getState(tag<bool>, ValueTree& vt, String s)
-    {
-        vt.setProperty(s, base, 0);
-        vt.setProperty(s + "_mod", mod, 0);
-        vt.setProperty(s + "_time", time, 0);
-        vt.setProperty(s + "_maxN", maxN, 0);
-    }
-    void getState(tag<String>, ValueTree& vt, String s)
-    {
-        vt.setProperty(s, base, 0);
-        vt.setProperty(s + "_mod", mod, 0);
         vt.setProperty(s + "_time", time, 0);
         vt.setProperty(s + "_maxN", maxN, 0);
     }
@@ -666,8 +641,21 @@ public:
         vt.setProperty(s + "_maxN", maxN, 0);
     }
     
+    //==============================================================================
+    
     void setState(XmlElement* e, String s, ValueType defaultValue)
     { setState(tag<ValueType>{}, e, s, defaultValue); }
+    
+    template<class T = ValueType>
+    void setState(tag<T>, XmlElement* e, String s, T defaultValue)
+    {
+        base = T(e->getIntAttribute(s, defaultValue));
+        mod = T(e->getIntAttribute(s + "_mod", base));
+        time = e->getIntAttribute(s + "_time", 0);
+        maxN = e->getIntAttribute(s + "_maxN", 0);
+        value = base;
+    }
+    
     void setState(tag<int>, XmlElement* e, String s, ValueType defaultValue)
     { setState(tag<double>{}, e, s, defaultValue); }
     void setState(tag<float>, XmlElement* e, String s, ValueType defaultValue)
@@ -719,6 +707,7 @@ public:
         maxN = e->getIntAttribute(s + "_maxN", 0);
         value = base;
     }
+    //==============================================================================
     
     // Moddables are used in pairs, with one existing in a preparation that is being modded
     // and one in a modification that contains mod info. Some of these members function differently

@@ -41,36 +41,9 @@ public:
     typedef OwnedArray<NostalgicPreparation, CriticalSection> CSArr;
     
     
-    NostalgicPreparation(NostalgicPreparation::Ptr p):
-    nGain(p->nGain),
-    nBlendronicGain(p->nBlendronicGain),
-    nWaveDistance(p->getWavedistance()),
-    nUndertow(p->getUndertow()),
-    nTransposition(p->getTransposition()),
-    nTranspUsesTuning(p->getTranspUsesTuning()),
-    nLengthMultiplier(p->getLengthMultiplier()),
-    nBeatsToSkip(p->getBeatsToSkip()),
-    nMode(p->getMode()),
-    nReverseAttack(p->getReverseAttack()),
-    nReverseDecay(p->getReverseDecay()),
-    nReverseRelease(p->getReverseRelease()),
-    nReverseSustain(p->getReverseSustain()),
-    nUndertowAttack(p->getUndertowAttack()),
-    nUndertowDecay(p->getUndertowDecay()),
-    nUndertowRelease(p->getUndertowRelease()),
-    nUndertowSustain(p->getUndertowSustain()),
-    holdMin(p->getHoldMin()),
-    holdMax(p->getHoldMax()),
-    clusterMin(p->getClusterMin()),
-    clusterThreshold(p->getClusterThreshold()),
-    velocityMin(p->getVelocityMin()),
-    velocityMax(p->getVelocityMax()),
-    keyOnReset(p->getKeyOnReset()),
-    targetTypeNostalgicClear(p->getTargetTypeNostalgicClear()),
-    nUseGlobalSoundSet(p->getUseGlobalSoundSet()),
-    nSoundSet(p->getSoundSet())
+    NostalgicPreparation(NostalgicPreparation::Ptr p)
     {
-        
+        copy(p);
     }
     
     NostalgicPreparation(int waveDistance,
@@ -84,6 +57,7 @@ public:
                          TuningSystem tuning,
                          PitchClass basePitch,
                          Tuning::Ptr t):
+    modded(false),
     nGain(gain),
     nBlendronicGain(blendGain),
     nWaveDistance(waveDistance),
@@ -110,6 +84,7 @@ public:
     }
     
     NostalgicPreparation(void):
+    modded(false),
     nGain(1.0),
     nBlendronicGain(1.0f),
     nWaveDistance(0),
@@ -150,76 +125,76 @@ public:
     
     inline void copy(NostalgicPreparation::Ptr n)
     {
-        nWaveDistance = n->getWavedistance();
-        nUndertow = n->getUndertow();
-        nTransposition = n->getTransposition();
-        nTranspUsesTuning = n->getTranspUsesTuning();
+        nWaveDistance = n->nWaveDistance;
+        nUndertow = n->nUndertow;
+        nTransposition = n->nTransposition;
+        nTranspUsesTuning = n->nTranspUsesTuning;
         nGain = n->nGain;
         nBlendronicGain = n->nBlendronicGain;
-        nLengthMultiplier = n->getLengthMultiplier();
-        nBeatsToSkip = n->getBeatsToSkip();
-        nMode = n->getMode();
-        nReverseAttack = n->getReverseAttack();
-        nReverseDecay = n->getReverseDecay();
-        nReverseSustain = n->getReverseSustain();
-        nReverseRelease = n->getReverseRelease();
-        nUndertowAttack = n->getUndertowAttack();
-        nUndertowDecay = n->getUndertowDecay();
-        nUndertowSustain = n->getUndertowSustain();
-        nUndertowRelease = n->getUndertowRelease();
-        holdMin = n->getHoldMin();
-        holdMax = n->getHoldMax();
-        clusterMin = n->getClusterMin();
-        clusterThreshold = n->getClusterThreshold();
-        keyOnReset = n->getKeyOnReset();
-        velocityMin = n->getVelocityMin();
-        velocityMax = n->getVelocityMax();
-        targetTypeNostalgicClear = n->getTargetTypeNostalgicClear();
-        nUseGlobalSoundSet = n->getUseGlobalSoundSet();
-        nSoundSet = n->getSoundSet();
+        nLengthMultiplier = n->nLengthMultiplier;
+        nBeatsToSkip = n->nBeatsToSkip;
+        nMode = n->nMode;
+        nReverseAttack = n->nReverseAttack;
+        nReverseDecay = n->nReverseDecay;
+        nReverseSustain = n->nReverseSustain;
+        nReverseRelease = n->nReverseRelease;
+        nUndertowAttack = n->nUndertowAttack;
+        nUndertowDecay = n->nUndertowDecay;
+        nUndertowSustain = n->nUndertowSustain;
+        nUndertowRelease = n->nUndertowRelease;
+        holdMin = n->holdMin;
+        holdMax = n->holdMax;
+        clusterMin = n->clusterMin;
+        clusterThreshold = n->clusterThreshold;
+        keyOnReset = n->keyOnReset;
+        velocityMin = n->velocityMin;
+        velocityMax = n->velocityMax;
+        targetTypeNostalgicClear = n->targetTypeNostalgicClear;
+        nUseGlobalSoundSet = n->nUseGlobalSoundSet;
+        nSoundSet = n->nSoundSet;
     }
     
     void performModification(NostalgicPreparation::Ptr n, Array<bool> dirty)
     {
         if (dirty[NostalgicGain]) nGain.modTo(n->nGain);
         if (dirty[NostalgicBlendronicGain]) nBlendronicGain.modTo(n->nBlendronicGain);
-        if (dirty[NostalgicWaveDistance]) nWaveDistance = n->getWavedistance();
-        if (dirty[NostalgicUndertow]) nUndertow = n->getUndertow();
-        if (dirty[NostalgicTransposition]) nTransposition = n->getTransposition();
-        if (dirty[NostalgicTranspUsesTuning]) nTranspUsesTuning = n->getTranspUsesTuning();
-        if (dirty[NostalgicLengthMultiplier]) nLengthMultiplier = n->getLengthMultiplier();
-        if (dirty[NostalgicBeatsToSkip]) nBeatsToSkip = n->getBeatsToSkip();
-        if (dirty[NostalgicMode]) nMode = n->getMode();
+        if (dirty[NostalgicWaveDistance]) nWaveDistance.modTo(n->nWaveDistance);
+        if (dirty[NostalgicUndertow]) nUndertow.modTo(n->nUndertow);
+        if (dirty[NostalgicTransposition]) nTransposition.modTo(n->nTransposition);
+        if (dirty[NostalgicTranspUsesTuning]) nTranspUsesTuning.modTo(n->nTranspUsesTuning);
+        if (dirty[NostalgicLengthMultiplier]) nLengthMultiplier.modTo(n->nLengthMultiplier);
+        if (dirty[NostalgicBeatsToSkip]) nBeatsToSkip.modTo(n->nBeatsToSkip);
+        if (dirty[NostalgicMode]) nMode.modTo(n->nMode);
         if (dirty[NostalgicReverseADSR])
         {
-            nReverseAttack = n->getReverseAttack();
-            nReverseDecay = n->getReverseDecay();
-            nReverseSustain = n->getReverseSustain();
-            nReverseRelease = n->getReverseRelease();
+            nReverseAttack.modTo(n->nReverseAttack);
+            nReverseDecay.modTo(n->nReverseDecay);
+            nReverseSustain.modTo(n->nReverseSustain);
+            nReverseRelease.modTo(n->nReverseRelease);
         }
         
         if (dirty[NostalgicUndertowADSR])
         {
-            nUndertowAttack = n->getUndertowAttack();
-            nUndertowDecay = n->getUndertowDecay();
-            nUndertowSustain = n->getUndertowSustain();
-            nUndertowRelease = n->getUndertowRelease();
+            nUndertowAttack.modTo(n->nUndertowAttack);
+            nUndertowDecay.modTo(n->nUndertowDecay);
+            nUndertowSustain.modTo(n->nUndertowSustain);
+            nUndertowRelease.modTo(n->nUndertowRelease);
         }
         
-        if (dirty[NostalgicHoldMin]) holdMin = n->getHoldMin();
-        if (dirty[NostalgicHoldMax]) holdMax = n->getHoldMax();
-        if (dirty[NostalgicClusterMin]) clusterMin = n->getClusterMin();
-        if (dirty[NostalgicClusterThreshold]) clusterThreshold = n->getClusterThreshold();
-        if (dirty[NostalgicKeyOnReset]) keyOnReset = n->getKeyOnReset();
-        if (dirty[NostalgicVelocityMin]) velocityMin = n->getVelocityMin();
-        if (dirty[NostalgicVelocityMax]) velocityMax = n->getVelocityMax();
+        if (dirty[NostalgicHoldMin]) holdMin.modTo(n->holdMin);
+        if (dirty[NostalgicHoldMax]) holdMax.modTo(n->holdMax);
+        if (dirty[NostalgicClusterMin]) clusterMin.modTo(n->clusterMin);
+        if (dirty[NostalgicClusterThreshold]) clusterThreshold.modTo(n->clusterThreshold);
+        if (dirty[NostalgicKeyOnReset]) keyOnReset.modTo(n->keyOnReset);
+        if (dirty[NostalgicVelocityMin]) velocityMin.modTo(n->velocityMin);
+        if (dirty[NostalgicVelocityMax]) velocityMax.modTo(n->velocityMax);
         
-        if (dirty[NostalgicUseGlobalSoundSet]) nUseGlobalSoundSet = n->getUseGlobalSoundSet();
+        if (dirty[NostalgicUseGlobalSoundSet]) nUseGlobalSoundSet.modTo(n->nUseGlobalSoundSet);
         
         if (dirty[NostalgicSoundSet])
         {
-            nSoundSet = n->getSoundSet();
-            nSoundSetName = n->getSoundSetName();
+            nSoundSet.modTo(n->nSoundSet);
+            nSoundSetName.modTo(n->nSoundSetName);
         }
     }
     
@@ -227,41 +202,47 @@ public:
     {
         nGain.step();
         nBlendronicGain.step();
+        nLengthMultiplier.step();
+        clusterMin.step();
+        clusterThreshold.step();
     }
     
     void resetModdables()
     {
         nGain.reset();
         nBlendronicGain.reset();
+        nLengthMultiplier.reset();
+        clusterMin.reset();
+        clusterThreshold.reset();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
     {
-        return (nWaveDistance == n->getWavedistance() &&
-                nUndertow == n->getUndertow() &&
-                nTransposition == n->getTransposition() &&
-                nTranspUsesTuning == n->getTranspUsesTuning() &&
+        return (nWaveDistance == n->nWaveDistance &&
+                nUndertow == n->nUndertow &&
+                nTransposition == n->nTransposition &&
+                nTranspUsesTuning == n->nTranspUsesTuning &&
                 nGain == n->nGain &&
                 nBlendronicGain == n->nBlendronicGain &&
-                nLengthMultiplier == n->getLengthMultiplier() &&
-                nBeatsToSkip == n->getBeatsToSkip() &&
-                nReverseAttack == n->getReverseAttack() &&
-                nReverseDecay == n->getReverseDecay() &&
-                nReverseSustain == n->getReverseSustain() &&
-                nReverseRelease == n->getReverseRelease() &&
-                nUndertowAttack == n->getUndertowAttack() &&
-                nUndertowDecay == n->getUndertowDecay() &&
-                nUndertowSustain == n->getUndertowSustain() &&
-                nUndertowRelease == n->getUndertowRelease() &&
-                nMode == n->getMode() &&
-                holdMin == n->getHoldMin() &&
-                holdMax == n->getHoldMax() &&
-                clusterMin == n->getClusterMin() &&
-                clusterThreshold == n->getClusterThreshold() &&
-                keyOnReset == n->getKeyOnReset() &&
-                velocityMin == n->getVelocityMin() &&
-                velocityMax == n->getVelocityMax()) &&
-                targetTypeNostalgicClear == n->getTargetTypeNostalgicClear();
+                nLengthMultiplier == n->nLengthMultiplier &&
+                nBeatsToSkip == n->nBeatsToSkip &&
+                nReverseAttack == n->nReverseAttack &&
+                nReverseDecay == n->nReverseDecay &&
+                nReverseSustain == n->nReverseSustain &&
+                nReverseRelease == n->nReverseRelease &&
+                nUndertowAttack == n->nUndertowAttack &&
+                nUndertowDecay == n->nUndertowDecay &&
+                nUndertowSustain == n->nUndertowSustain &&
+                nUndertowRelease == n->nUndertowRelease &&
+                nMode == n->nMode &&
+                holdMin == n->holdMin &&
+                holdMax == n->holdMax &&
+                clusterMin == n->clusterMin &&
+                clusterThreshold == n->clusterThreshold &&
+                keyOnReset == n->keyOnReset &&
+                velocityMin == n->velocityMin &&
+                velocityMax == n->velocityMax) &&
+                targetTypeNostalgicClear == n->targetTypeNostalgicClear;
     }
 
 	inline void randomize()
@@ -275,11 +256,14 @@ public:
 
 		nWaveDistance = (int)(r[idx++] * 20000);
 		nUndertow = (int)(r[idx++] * 20000);
-		nTransposition.clear();
-		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
-		{
-			nTransposition.add(i, (Random::getSystemRandom().nextFloat()) * 48.0f - 24.0f);
-		}
+        
+        Array<float> dt;
+        for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+        {
+            dt.add(i, (Random::getSystemRandom().nextFloat() * 48.0f - 24.0f));
+        }
+        nTransposition.set(dt);
+
 		nGain = r[idx++] * 10.0f;
         nBlendronicGain = r[idx++] * 2.0f;
 		nLengthMultiplier = r[idx++] * 10.0f;
@@ -304,82 +288,34 @@ public:
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
-    inline const int getWavedistance() const noexcept                      {return nWaveDistance;      }
-    inline const int getUndertow() const noexcept                          {return nUndertow;          }
-    inline const Array<float> getTransposition() const noexcept            {return nTransposition;     }
-    inline const bool getTranspUsesTuning() const noexcept                 {return nTranspUsesTuning;}
-    inline const float getLengthMultiplier() const noexcept                {return nLengthMultiplier;  }
-    inline const float getBeatsToSkip() const noexcept                     {return nBeatsToSkip;       }
-    inline const NostalgicSyncMode getMode() const noexcept                {return nMode;              }
+ 
     
     inline float* getGainPtr()                                             {return &nGain.value;       }
     inline float* getBlendronicGainPtr()                                   {return &nBlendronicGain.value;}
     
-    inline const int getReverseAttack() const noexcept                     {return nReverseAttack;        }
-    inline const int getReverseDecay() const noexcept                      {return nReverseDecay;         }
-    inline const float getReverseSustain() const noexcept                  {return nReverseSustain;       }
-    inline const int getReverseRelease() const noexcept                    {return nReverseRelease;       }
     inline const Array<float> getReverseADSRvals() const noexcept
     {
         return
         {
-            (float) nReverseAttack, (float)nReverseDecay,(float)nReverseSustain, (float)nReverseRelease
+            (float) nReverseAttack.value, (float) nReverseDecay.value,
+            (float) nReverseSustain.value, (float) nReverseRelease.value
         };
     }
-    inline const int getUndertowAttack() const noexcept                    {return nUndertowAttack;        }
-    inline const int getUndertowDecay() const noexcept                     {return nUndertowDecay;         }
-    inline const float getUndertowSustain() const noexcept                 {return nUndertowSustain;       }
-    inline const int getUndertowRelease() const noexcept                   {return nUndertowRelease;       }
-    inline const Array<float> getUndertowADSRvals() const noexcept         {return { (float)nUndertowAttack, (float)nUndertowDecay,(float)nUndertowSustain,(float)nUndertowRelease}; }
+    inline const Array<float> getUndertowADSRvals() const noexcept
+    {
+        return
+        {
+            (float) nUndertowAttack.value, (float) nUndertowDecay.value,
+            (float) nUndertowSustain.value, (float) nUndertowRelease.value
+            
+        };
+    }
     
-    inline const TargetNoteMode getTargetTypeNostalgicClear() const noexcept { return targetTypeNostalgicClear; }
     inline void setTargetTypeNostalgicClear(TargetNoteMode nm)             { targetTypeNostalgicClear = nm; }
     inline void setTargetTypeNostalgic(KeymapTargetType which, TargetNoteMode nm)
     {
         if (which == TargetTypeNostalgicClear)   { targetTypeNostalgicClear = nm; }
     }
-    
-    inline void setWaveDistance(int waveDistance)                          {nWaveDistance = waveDistance;  }
-    inline void setUndertow(int undertow)                                  {nUndertow = undertow;  }
-    inline void setTransposition(Array<float> transposition)               {nTransposition = transposition;  }
-    inline void setTranspUsesTuning(bool val)                              {nTranspUsesTuning = val;}
-    inline void setGain(float gain)                                        {nGain = gain; }
-    inline void setBlendronicGain(float gain)                              {nBlendronicGain = gain;  }
-    inline void setLengthMultiplier(float lengthMultiplier)                {nLengthMultiplier = lengthMultiplier;}
-    inline void setBeatsToSkip(float beatsToSkip)                          {nBeatsToSkip = beatsToSkip; }
-    inline void setMode(NostalgicSyncMode mode)                            {nMode = mode;   }
-    
-    inline void setReverseAttack(int val)                                  {nReverseAttack = val;         }
-    inline void setReverseDecay(int val)                                   {nReverseDecay = val;          }
-    inline void setReverseSustain(float val)                               {nReverseSustain = val;        }
-    inline void setReverseRelease(int val)                                 {nReverseRelease = val;        }
-    
-    inline void setUndertowAttack(int val)                                 {nUndertowAttack = val;         }
-    inline void setUndertowDecay(int val)                                  {nUndertowDecay = val;          }
-    inline void setUndertowSustain(float val)                              {nUndertowSustain = val;        }
-    inline void setUndertowRelease(int val)                                {nUndertowRelease = val;        }
-    
-    inline const float getHoldMin() const noexcept { return holdMin; }
-    inline const float getHoldMax() const noexcept { return holdMax; }
-    
-    inline const void setHoldMin(float min)  { holdMin = min; }
-    inline const void setHoldMax(float max)  { holdMax = max; }
-    
-    inline const int getVelocityMin() const noexcept { return velocityMin; }
-    inline const int getVelocityMax() const noexcept { return velocityMax; }
-    
-    inline const void setVelocityMin(int min)  { velocityMin = min; }
-    inline const void setVelocityMax(int max)  { velocityMax = max; }
-    
-    inline const int getClusterMin() const noexcept { return clusterMin; }
-    inline const int getClusterThreshold() const noexcept { return clusterThreshold; }
-    
-    inline const void setClusterMin(int min)  { clusterMin = min; }
-    inline const void setClusterThreshold(int min)  { clusterThreshold = min; }
-    
-    inline const bool getKeyOnReset() const noexcept { return keyOnReset; }
-    
-    inline const void setKeyOnReset(bool reset)  { keyOnReset = reset; }
     
     inline void setReverseADSRvals(Array<float> vals)
     {
@@ -399,16 +335,16 @@ public:
 
     void print(void)
     {
-        DBG("nWaveDistance: " + String(nWaveDistance));
-        DBG("nUndertow: " + String(nUndertow));
-        DBG("nTransposition: " + floatArrayToString(nTransposition));
+        DBG("nWaveDistance: " + String(nWaveDistance.value));
+        DBG("nUndertow: " + String(nUndertow.value));
+        DBG("nTransposition: " + floatArrayToString(nTransposition.value));
         DBG("nGain: " + String(nGain.value));
         DBG("nBlendronicGain: " + String(nBlendronicGain.value));
         DBG("nGain: " + String(nGain.value));
         DBG("nBlendronicGain: " + String(nBlendronicGain.value));
-        DBG("nLengthMultiplier: " + String(nLengthMultiplier));
-        DBG("nBeatsToSkip: " + String(nBeatsToSkip));
-        DBG("nMode: " + String(nMode));
+        DBG("nLengthMultiplier: " + String(nLengthMultiplier.value));
+        DBG("nBeatsToSkip: " + String(nBeatsToSkip.value));
+        DBG("nMode: " + String(nMode.value));
     }
     
     ValueTree getState(void)
@@ -419,260 +355,119 @@ public:
         nGain.getState(prep, ptagNostalgic_gain);
         nBlendronicGain.getState(prep, ptagNostalgic_blendronicGain);
         
-        prep.setProperty( ptagNostalgic_waveDistance,       getWavedistance(), 0);
-        prep.setProperty( ptagNostalgic_undertow,           getUndertow(), 0);
-        
+        nWaveDistance.getState(prep, ptagNostalgic_waveDistance);
+        nUndertow.getState(prep, ptagNostalgic_undertow);
+    
         ValueTree transp( vtagNostalgic_transposition);
-        int count = 0;
-        for (auto f : getTransposition())
-        {
-            transp.      setProperty( ptagFloat + String(count++), f, 0);
-        }
+        nTransposition.getState(transp, ptagFloat);
         prep.addChild(transp, -1, 0);
-        prep.setProperty( ptagNostalgic_transpUsesTuning,  getTranspUsesTuning() ? 1 : 0, 0);
         
-        prep.setProperty( ptagNostalgic_lengthMultiplier,   getLengthMultiplier(), 0);
-        prep.setProperty( ptagNostalgic_beatsToSkip,        getBeatsToSkip(), 0);
-        prep.setProperty( ptagNostalgic_mode,               getMode(), 0);
+        nTranspUsesTuning.getState(prep, ptagNostalgic_transpUsesTuning);
         
-        prep.setProperty( "holdMin", getHoldMin(), 0);
-        prep.setProperty( "holdMax", getHoldMax(), 0);
+        nLengthMultiplier.getState(prep, ptagNostalgic_lengthMultiplier);
+        nBeatsToSkip.getState(prep, ptagNostalgic_beatsToSkip);
+        nMode.getState(prep, ptagNostalgic_mode);
         
-        prep.setProperty( "clusterMin", getClusterMin(), 0);
-        prep.setProperty( "clusterThreshold", getClusterThreshold(), 0);
+        holdMin.getState(prep, "holdMin");
+        holdMax.getState(prep, "holdMax");
         
-        prep.setProperty( "velocityMin", getVelocityMin(), 0);
-        prep.setProperty( "velocityMax", getVelocityMax(), 0);
+        clusterMin.getState(prep, "clusterMin");
+        clusterThreshold.getState(prep, "clusterThreshold");
         
-        prep.setProperty( "keyOnReset", getKeyOnReset() ? 1 : 0, 0);
+        velocityMin.getState(prep, "velocityMin");
+        velocityMax.getState(prep, "velocityMax");
         
-        prep.setProperty( ptagNostalgic_targetClearAll, getTargetTypeNostalgicClear(), 0);
+        keyOnReset.getState(prep, "keyOnReset");
+        
+        targetTypeNostalgicClear.getState(prep, ptagNostalgic_targetClearAll);
         
         ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
-        count = 0;
-        for (auto f : getReverseADSRvals())
-        {
-            reverseADSRvals.setProperty( ptagFloat + String(count++), f, 0);
-        }
+        int count = 0;
+        nReverseAttack.getState(reverseADSRvals, ptagFloat + String(count++));
+        nReverseDecay.getState(reverseADSRvals, ptagFloat + String(count++));
+        nReverseSustain.getState(reverseADSRvals, ptagFloat + String(count++));
+        nReverseRelease.getState(reverseADSRvals, ptagFloat + String(count));
         prep.addChild(reverseADSRvals, -1, 0);
         
         ValueTree undertowADSRvals( vtagNostalgic_undertowADSR);
         count = 0;
-        for (auto f : getUndertowADSRvals())
-        {
-            undertowADSRvals.setProperty( ptagFloat + String(count++), f, 0);
-        }
+        nUndertowAttack.getState(undertowADSRvals, ptagFloat + String(count++));
+        nUndertowDecay.getState(undertowADSRvals, ptagFloat + String(count++));
+        nUndertowSustain.getState(undertowADSRvals, ptagFloat + String(count++));
+        nUndertowRelease.getState(undertowADSRvals, ptagFloat + String(count));
         prep.addChild(undertowADSRvals, -1, 0);
         
-        prep.setProperty( ptagNostalgic_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
-        
-        prep.setProperty(ptagNostalgic_soundSet, getSoundSetName(), 0);
+        nUseGlobalSoundSet.getState(prep, ptagNostalgic_useGlobalSoundSet);
+        nSoundSetName.getState(prep, ptagNostalgic_soundSet);
         
         return prep;
     }
     
     void setState(XmlElement* e)
     {
-        int i; float f;
-        
         nGain.setState(e, ptagNostalgic_gain, 1.0f);
         nBlendronicGain.setState(e, ptagNostalgic_blendronicGain, 1.0f);
         
-        i = e->getStringAttribute(ptagNostalgic_waveDistance).getIntValue();
-        setWaveDistance(i);
+        nWaveDistance.setState(e, ptagNostalgic_waveDistance, 0);
+        nUndertow.setState(e, ptagNostalgic_undertow, 0);
         
-        i = e->getStringAttribute(ptagNostalgic_undertow).getIntValue();
-        setUndertow(i);
+        nTranspUsesTuning.setState(e, ptagNostalgic_transpUsesTuning, false);
         
-        i = e->getStringAttribute(ptagNostalgic_targetClearAll).getIntValue();
-        setTargetTypeNostalgicClear((TargetNoteMode)i);
+        nLengthMultiplier.setState(e, ptagNostalgic_lengthMultiplier, 1.0f);
+        nBeatsToSkip.setState(e, ptagNostalgic_beatsToSkip, 0.0);
+        nMode.setState(e, ptagNostalgic_mode, NoteLengthSync);
+        
+        holdMin.setState(e, "holdMin", 0);
+        holdMax.setState(e, "holdMax", 12000);
+        
+        clusterMin.setState(e, "clusterMin", 1);
+        clusterThreshold.setState(e, "clusterThreshold", 150);
+        
+        velocityMin.setState(e, "velocityMin", 0);
+        velocityMax.setState(e, "velocityMax", 127);
+        
+        keyOnReset.setState(e, "keyOnReset", false);
+        
+        targetTypeNostalgicClear.setState(e, ptagNostalgic_targetClearAll, NoteOn);
+        
+        nUseGlobalSoundSet.setState(e, ptagNostalgic_useGlobalSoundSet, true);
+        nSoundSetName.setState(e, ptagNostalgic_soundSet, String());
         
         forEachXmlChildElement (*e, sub)
         {
             if (sub->hasTagName(vtagNostalgic_transposition))
             {
-                Array<float> transp;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        transp.add(f);
-                    }
-                }
-                
-                setTransposition(transp);
-                
+                nTransposition.setState(sub, ptagFloat, Array<float>());
             }
-            else  if (sub->hasTagName(vtagNostalgic_reverseADSR))
+            else if (sub->hasTagName(vtagNostalgic_reverseADSR))
             {
-                Array<float> envVals;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        envVals.add(f);
-                    }
-                }
-                
-                setReverseADSRvals(envVals);
-                
+                int count = 0;
+                nReverseAttack.setState(sub, ptagFloat + String(count++), 30);
+                nReverseDecay.setState(sub, ptagFloat + String(count++), 3);
+                nReverseSustain.setState(sub, ptagFloat + String(count++), 1.);
+                nReverseRelease.setState(sub, ptagFloat + String(count), 50);
             }
-            else  if (sub->hasTagName(vtagNostalgic_undertowADSR))
+            else if (sub->hasTagName(vtagNostalgic_undertowADSR))
             {
-                Array<float> envVals;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        envVals.add(f);
-                    }
-                }
-                
-                setUndertowADSRvals(envVals);
-                
+                int count = 0;
+                nUndertowAttack.setState(sub, ptagFloat + String(count++), 50);
+                nUndertowDecay.setState(sub, ptagFloat + String(count++), 3);
+                nUndertowSustain.setState(sub, ptagFloat + String(count++), 1.);
+                nUndertowRelease.setState(sub, ptagFloat + String(count), 2000);
             }
         }
-        
-        
-        f = e->getStringAttribute(ptagNostalgic_lengthMultiplier).getFloatValue();
-        setLengthMultiplier(f);
-        
-        f = e->getStringAttribute(ptagNostalgic_beatsToSkip).getFloatValue();
-        setBeatsToSkip(f);
-        
-        i = e->getStringAttribute(ptagNostalgic_mode).getIntValue();
-        setMode((NostalgicSyncMode)i);
-        
-        String str = e->getStringAttribute(ptagNostalgic_transpUsesTuning);
-        if (str != "") setTranspUsesTuning((bool) str.getIntValue());
-        else setTranspUsesTuning(false);
-        
-        str = e->getStringAttribute(ptagNostalgic_useGlobalSoundSet);
-        if (str != "") setUseGlobalSoundSet((bool) str.getIntValue());
-        else setUseGlobalSoundSet(true);
-        
-        str = e->getStringAttribute(ptagNostalgic_soundSet);
-        setSoundSetName(str);
-        
-        // HOLD MIN / MAX
-        str = e->getStringAttribute("holdMin");
-        
-        if (str != "")
-        {
-            f = str.getFloatValue();
-            setHoldMin(f);
-        }
-        else
-        {
-            setHoldMin(0);
-        }
-        
-        str = e->getStringAttribute("holdMax");
-        
-        if (str != "")
-        {
-            f = str.getFloatValue();
-            setHoldMax(f);
-        }
-        else
-        {
-            setHoldMax(12000);
-        }
-        
-        
-        // CLUSTER MIN
-        str = e->getStringAttribute("clusterMin");
-        
-        if (str != "")
-        {
-            i = str.getIntValue();
-            setClusterMin(i);
-        }
-        else
-        {
-            setClusterMin(1);
-        }
-        
-        // CLUSTER THRESHOLD
-        str = e->getStringAttribute("clusterThreshold");
-        
-        if (str != "")
-        {
-            i = str.getIntValue();
-            setClusterThreshold(i);
-        }
-        else
-        {
-            setClusterThreshold(150);
-        }
-        
-        // VELOCITY MIN
-        str = e->getStringAttribute("velocityMin");
-        
-        if (str != "")
-        {
-            i = atoi(str.getCharPointer());
-            setVelocityMin(i);
-        }
-        else
-        {
-            setVelocityMin(0);
-        }
-        
-        // VELOCITY MAX
-        str = e->getStringAttribute("velocityMax");
-        
-        if (str != "")
-        {
-            i = atoi(str.getCharPointer());
-            setVelocityMax(i);
-        }
-        else
-        {
-            setVelocityMax(127);
-        }
-        
-        str = e->getStringAttribute("keyOnReset");
-        
-        if (str != "")
-        {
-            i = str.getIntValue();
-            setKeyOnReset((bool) i);
-        }
-        else
-        {
-            setKeyOnReset(false);
-        }
-        
     }
     
-    inline void setUseGlobalSoundSet(bool use) { nUseGlobalSoundSet = use; }
     inline void setSoundSet(int Id) { nSoundSet = Id; }
-    inline void setSoundSetName(String name) { nSoundSetName = name; }
-    
-    inline bool getUseGlobalSoundSet(void) { return nUseGlobalSoundSet; }
-    inline int getSoundSet(void) { return nUseGlobalSoundSet ? -1 : nSoundSet; }
-    inline String getSoundSetName(void) { return nSoundSetName; }
+    inline int getSoundSet() { return nUseGlobalSoundSet.value ? -1 : nSoundSet.value; }
+
+    bool modded;
     
     Moddable<float> nGain;                        // gain multiplier
     Moddable<float> nBlendronicGain;
     
-private:
-    String name;
-    int nWaveDistance;  //ms; distance from beginning of sample to stop reverse playback and begin undertow
-    int nUndertow;      //ms; length of time to play forward after directional change
+    Moddable<int> nWaveDistance;  //ms; distance from beginning of sample to stop reverse playback and begin undertow
+    Moddable<int> nUndertow;      //ms; length of time to play forward after directional change
     /*
      one thing i discovered is that the original bK actually plays the forward undertow
      sample for TWICE this value; the first half at steady gain, and then the second
@@ -682,33 +477,32 @@ private:
      --dt
      */
     
-    Array<float> nTransposition;        // transposition, in half steps
-    bool nTranspUsesTuning;             // are transposition values in nTransposition filtered via attached Tuning?
-    float nLengthMultiplier;            // note-length mode: toscale reverse playback time
-    float nBeatsToSkip;                 // synchronic mode: beats to skip before reverse peak
-    NostalgicSyncMode nMode;            // which sync mode to use
+    Moddable<Array<float>> nTransposition;        // transposition, in half steps
+    Moddable<bool> nTranspUsesTuning;             // are transposition values in nTransposition filtered via attached Tuning?
+    Moddable<float> nLengthMultiplier;            // note-length mode: toscale reverse playback time
+    Moddable<float> nBeatsToSkip;                 // synchronic mode: beats to skip before reverse peak
+    Moddable<NostalgicSyncMode> nMode;            // which sync mode to use
     
-    int     nReverseAttack, nReverseDecay, nReverseRelease;     // reverse ADSR, in ms
-    float   nReverseSustain;
+    Moddable<int>     nReverseAttack, nReverseDecay, nReverseRelease;     // reverse ADSR, in ms
+    Moddable<float>   nReverseSustain;
     
-    int     nUndertowAttack, nUndertowDecay, nUndertowRelease;  // undertow ADSR, in ms
-    float   nUndertowSustain;
+    Moddable<int>     nUndertowAttack, nUndertowDecay, nUndertowRelease;  // undertow ADSR, in ms
+    Moddable<float>   nUndertowSustain;
     
-    float holdMin, holdMax;
-    int clusterMin; // minimum number of notes needed to create nostalgic notes
-    int clusterThreshold; // in ms; minimum time between notes to make cluster (irrelevant if clusterMin = 1)
-    int velocityMin, velocityMax;
+    Moddable<float> holdMin, holdMax;
+    Moddable<int> clusterMin; // minimum number of notes needed to create nostalgic notes
+    Moddable<int> clusterThreshold; // in ms; minimum time between notes to make cluster (irrelevant if clusterMin = 1)
+    Moddable<int> velocityMin, velocityMax;
     
-    bool keyOnReset;
+    Moddable<bool> keyOnReset;
     
-    TargetNoteMode targetTypeNostalgicClear;
+    Moddable<TargetNoteMode> targetTypeNostalgicClear;
     
-    // internal keymap for resetting internal values to static
-    // Keymap::Ptr resetMap = new Keymap(0);
-    
-    bool nUseGlobalSoundSet;
-    int nSoundSet;
-    String nSoundSetName;
+    Moddable<bool> nUseGlobalSoundSet;
+    Moddable<int> nSoundSet;
+    Moddable<String> nSoundSetName;
+private:
+    String name;
     
     JUCE_LEAK_DETECTOR(NostalgicPreparation);
 };

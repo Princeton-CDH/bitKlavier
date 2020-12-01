@@ -279,7 +279,7 @@ public:
     }
     
     void setSoundSet(int Id) { dSoundSet = Id; }
-    int getSoundSet(void) { return dUseGlobalSoundSet.value ? -1 : dSoundSet.value; }
+    int getSoundSet() { return dUseGlobalSoundSet.value ? -1 : dSoundSet.value; }
 
     bool modded;
     // output gain multiplier

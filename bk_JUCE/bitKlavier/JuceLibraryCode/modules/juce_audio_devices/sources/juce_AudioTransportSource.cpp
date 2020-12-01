@@ -80,7 +80,7 @@ void AudioTransportSource::setSource (PositionableAudioSource* const newSource,
         else
             newMasterSource = newPositionableSource;
 
-        if (iprepared)
+        if (isPrepared)
         {
             if (newResamplerSource != nullptr && sourceSampleRate > 0 && sampleRate > 0)
                 newResamplerSource->setResamplingRatio (sourceSampleRate / sampleRate);
@@ -222,7 +222,7 @@ void AudioTransportSource::prepareToPlay (int samplesPerBlockExpected, double ne
         resamplerSource->setResamplingRatio (sourceSampleRate / sampleRate);
 
     inputStreamEOF = false;
-    iprepared = true;
+    isPrepared = true;
 }
 
 void AudioTransportSource::releaseMasterResources()
@@ -232,7 +232,7 @@ void AudioTransportSource::releaseMasterResources()
     if (masterSource != nullptr)
         masterSource->releaseResources();
 
-    iprepared = false;
+    isPrepared = false;
 }
 
 void AudioTransportSource::releaseResources()
