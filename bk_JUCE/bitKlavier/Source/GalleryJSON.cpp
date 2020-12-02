@@ -239,42 +239,42 @@ void Gallery::setStateFromJson(var myJson)
                     
                     SynchronicPreparation::Ptr syncPrep = new SynchronicPreparation();
                     
-                    Array<float> accents;
+                    Array<Moddable<float>> accents;
                     var am =  jsonGetProperty(sx+"accentsList");
-                    for (int c = 0; c < am.size(); c++) accents.add(am[c]);
+                    for (int c = 0; c < am.size(); c++) accents.add(Moddable<float>(am[c]));
                     
                     syncPrep->setAccentMultipliers(accents);
                     
-                    Array<float> transp;
+                    Array<Moddable<float>> transp;
                     var tm =  jsonGetProperty(sx+"NoteTranspList");
-                    for (int c = 0; c < tm.size(); c++) transp.add(tm[c]);
+                    for (int c = 0; c < tm.size(); c++) transp.add(Moddable<float>(tm[c]));
                     
-                    Array<Array<float>> atransp;
+                    Array<Array<Moddable<float>>> atransp;
                     atransp.add(transp);
                     
                     syncPrep->setTransposition(atransp);
                     
-                    Array<float> beats;
+                    Array<Moddable<float>> beats;
                     var bm =  jsonGetProperty(sx+"lengthMultList");
-                    for (int c = 0; c < bm.size(); c++) beats.add(bm[c]);
+                    for (int c = 0; c < bm.size(); c++) beats.add(Moddable<float>(bm[c]));
                     
                     syncPrep->setBeatMultipliers(beats);
                     
                     int clusterMin = jsonGetValue(sx+"clusterMin");
                     
-                    syncPrep->setClusterMin(clusterMin);
+                    syncPrep->sClusterMin.set(clusterMin);
                     
                     int clusterMax = jsonGetValue(sx+"clusterMax");
                     
-                    syncPrep->setClusterMax(clusterMax);
+                    syncPrep->sClusterMax.set(clusterMax);
                     
                     int clusterThresh = jsonGetValue(sx+"clusterThresh");
                     
-                    syncPrep->setClusterThresh(clusterThresh);
+                    syncPrep->sClusterThresh.set(clusterThresh);
                     
                     int howMany = jsonGetValue(sx+"howMany");
                     
-                    syncPrep->setNumBeats(howMany);
+                    syncPrep->sNumBeats.set(howMany);
                     
                     float tmp = jsonGetValue(sx+"tempo");
                     
@@ -305,34 +305,35 @@ void Gallery::setStateFromJson(var myJson)
                     
                     if (syncMode == 0) //last note sync / start
                     {
-                        syncPrep->setMode(AnyNoteOnSync);
-                        syncPrep->setBeatsToSkip(0);
+                        syncPrep->sMode.set(AnyNoteOnSync);
+                        syncPrep->sBeatsToSkip.set(0);
                     }
                     else if (syncMode == 1) // first-note-sync
                     {
-                        syncPrep->setMode(FirstNoteOnSync);
-                        syncPrep->setBeatsToSkip(-1);
+                        syncPrep->sMode.set(FirstNoteOnSync);
+                        syncPrep->sBeatsToSkip.set(-1);
                     }
                     else if (syncMode == 2) // note-off-sync
                     {
-                        syncPrep->setMode(LastNoteOffSync);
-                        syncPrep->setBeatsToSkip(1);
+                        syncPrep->sMode.set(LastNoteOffSync);
+                        syncPrep->sBeatsToSkip.set(1);
                     }
                     else if (syncMode == 3) // note-off-start
                     {
-                        syncPrep->setMode(LastNoteOffSync);
-                        syncPrep->setBeatsToSkip(0);
+                        syncPrep->sMode.set(LastNoteOffSync);
+                        syncPrep->sBeatsToSkip.set(0);
                     }
                     else if (syncMode == 4) // first-note-start
                     {
-                        syncPrep->setMode(FirstNoteOnSync);
-                        syncPrep->setBeatsToSkip(0);
+                        syncPrep->sMode.set(FirstNoteOnSync);
+                        syncPrep->sBeatsToSkip.set(0);
                     }
                     
-                    Array<float> lens;
+                    Array<Moddable<float>> lens;
                     var lm = jsonGetProperty(sx+"NoteLengthMultList");
                     //for (int c = 0; c < lm.size(); c++) lens.add(lm[c]);
-                    for (int c = 0; c < lm.size(); c++) lens.add((float)lm[c] * 50. * tmp/60000.);
+                    for (int c = 0; c < lm.size(); c++)
+                        lens.add((Moddable<float>((float)lm[c] * 50. * tmp/60000.)));
                     
                     syncPrep->setLengthMultipliers(lens);
                     

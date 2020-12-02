@@ -779,25 +779,25 @@ void SynchronicPreparationEditor::fillModeSelectCB()
     
     modeSelectCB.clear(dontSendNotification);
     
-    if (prep->getOnOffMode() == KeyOn)
+    if (prep->onOffMode.value == KeyOn)
     {
         modeSelectCB.addItem("First Note-On", 1);
         modeSelectCB.addItem("Any Note-On", 2);
         modeSelectCB.addItem("First Note-Off", 3);
         modeSelectCB.addItem("Any Note-Off", 4);
         modeSelectCB.addItem("Last Note-Off", 5);
-        modeSelectCB.setSelectedItemIndex(prep->getMode(), dontSendNotification);
+        modeSelectCB.setSelectedItemIndex(prep->sMode.value, dontSendNotification);
     }
     else
     {
         modeSelectCB.addItem("First Note-Off", 1);
         modeSelectCB.addItem("Any Note-Off", 2);
         modeSelectCB.addItem("Last Note-Off", 3);
-        if (prep->getMode() < FirstNoteOffSync)
+        if (prep->sMode.value < FirstNoteOffSync)
         {
-            prep->setMode(FirstNoteOffSync);
+            prep->sMode.set(FirstNoteOffSync);
         }
-        modeSelectCB.setSelectedItemIndex(prep->getMode()-2, dontSendNotification);
+        modeSelectCB.setSelectedItemIndex(prep->sMode.value-2, dontSendNotification);
     }
     
 }
@@ -843,9 +843,9 @@ void SynchronicPreparationEditor::timerCallback()
             }
         }
         
-        if (prep->getOnOffMode() == KeyOn)
+        if (prep->onOffMode.value == KeyOn)
         {
-            if (prep->getMode() == AnyNoteOffSync || prep->getMode() == LastNoteOffSync)
+            if (prep->sMode.value == AnyNoteOffSync || prep->sMode.value == LastNoteOffSync)
             {
                 holdTimeMinMaxSlider->setBright();
                 holdTimeMinMaxSlider->setEnabled(true);
@@ -866,11 +866,11 @@ void SynchronicPreparationEditor::timerCallback()
         
         if (cluster == nullptr) return;
         
-        if(cluster->getBeatCounter() < prep->getNumBeats() && sProcessor->getPlayCluster())
+        if(cluster->getBeatCounter() < prep->sNumBeats.value && sProcessor->getPlayCluster())
             howManySlider->setDisplayValue(cluster->getBeatCounter());
         else howManySlider->setDisplayValue(0);
         
-        if(sProcessor->getClusterThresholdTimer() < prep->getClusterThreshMS())
+        if(sProcessor->getClusterThresholdTimer() < prep->sClusterThresh.value)
              clusterThreshSlider->setDisplayValue(sProcessor->getClusterThresholdTimer());
         else clusterThreshSlider->setDisplayValue(0);
         
@@ -880,20 +880,20 @@ void SynchronicPreparationEditor::timerCallback()
         DBG("sProcessor->getLastVelocity() = " + String(sProcessor->getLastVelocity()));
         
         int maxTemp = 12; //arbitrary
-        if(prep->getClusterMax() > prep->getClusterMin()) maxTemp = prep->getClusterMax();
+        if(prep->sClusterMax.value > prep->sClusterMin.value) maxTemp = prep->sClusterMax.value;
         
         /*
-        if(sProcessor->getNumKeysDepressed() <= maxTemp && sProcessor->getClusterThresholdTimer() < active->getClusterThreshMS())
-            //clusterMinMaxSlider->setDisplayValue((float)sProcessor->getNumKeysDepressed() * active->getClusterMax() / clusterMinMaxSlider->maxSlider.getMaximum());
+        if(sProcessor->getNumKeysDepressed() <= maxTemp && sProcessor->getClusterThresholdTimer() < active->sClusterThresh.value)
+            //clusterMinMaxSlider->setDisplayValue((float)sProcessor->getNumKeysDepressed() * active->sClusterMax.value / clusterMinMaxSlider->maxSlider.getMaximum());
             clusterMinMaxSlider->setDisplayValue(sProcessor->getNumKeysDepressed());
         else clusterMinMaxSlider->setDisplayValue(0);
          */
         
-        if(sProcessor->getClusterThresholdTimer() < prep->getClusterThreshMS())
+        if(sProcessor->getClusterThresholdTimer() < prep->sClusterThresh.value)
             clusterMinMaxSlider->setDisplayValue(cluster->getClusterSize()  * 12. / clusterMinMaxSlider->maxSlider.getMaximum()); //scaling not working when minmaxSlider max is > 12
         else clusterMinMaxSlider->setDisplayValue(0);
         
-        //DBG("active->getClusterMax() = " + String(active->getClusterMax()) + "clusterMinMaxSlider->maxSlider.getMaximum() = " + String(clusterMinMaxSlider->maxSlider.getMaximum()));
+        //DBG("active->sClusterMax.value = " + String(active->sClusterMax.value) + "clusterMinMaxSlider->maxSlider.getMaximum() = " + String(clusterMinMaxSlider->maxSlider.getMaximum()));
         
         //DBG("cluster size = " + String(cluster->getClusterSize()));
         
@@ -1060,32 +1060,32 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     
     if(name == "num pulses") {
         DBG("got new how many " + String(val));
-        prep->setNumBeats(val);
+        prep->sNumBeats.set(val);
     }
     else if(name == "cluster threshold")
     {
         DBG("got new cluster threshold " + String(val));
-        prep->setClusterThresh(val);
+        prep->sClusterThresh.set(val);
     }
     else if(name == "cluster thickness")
     {
         DBG("got new cluster thickness " + String(val));
-        prep->setClusterCap(val);
+        prep->sClusterCap.set(val);
     }
     else if(name == "gain")
     {
         DBG("gain " + String(val));
-        prep->setGain(val);
+        prep->sGain.set(val);
     }
     else if(name == "blendronic gain")
     {
-        prep->setBlendronicGain(val);
+        prep->sBlendronicGain.set(val);
     }
     //else if(name == "num layers")
     else if(slider == numClusterSlider.get())
     {
         DBG("num layers " + String(val));
-        prep->setNumClusters(val);
+        prep->numClusters.set(val);
     }
     
     processor.updateState->editsMade = true;
@@ -1097,13 +1097,13 @@ void SynchronicPreparationEditor::BKRangeSliderValueChanged(String name, double 
     
     if(name == "cluster min/max") {
         DBG("got new cluster min/max " + String(minval) + " " + String(maxval));
-        prep->setClusterMin(minval);
-        prep->setClusterMax(maxval);
+        prep->sClusterMin.set(minval);
+        prep->sClusterMax.set(maxval);
     }
     else if(name == "hold min/max") {
         DBG("got new hold min/max " + String(minval) + " " + String(maxval));
-        prep->setHoldMin(minval);
-        prep->setHoldMax(maxval);
+        prep->holdMin.set(minval);
+        prep->holdMax.set(maxval);
     }
     else if(name == "velocity min/max") {
         DBG("got new velocity min/max " + String(minval) + " " + String(maxval));
@@ -1134,7 +1134,7 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         envelopeSliders[i]->resized();
     }
     
-    transpUsesTuning.setToggleState(prep->getTranspUsesTuning(), notify);
+    transpUsesTuning.setToggleState(prep->sTranspUsesTuning.value, notify);
     
     if(envelopeSliders[visibleADSR]->isEnabled()) envelopeSliders[visibleADSR]->setActive();
     
@@ -1144,24 +1144,24 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         blendronicGainSlider->setValue(prep->sBlendronicGain.value, notify);
         
         selectCB.setSelectedId(processor.updateState->currentSynchronicId, notify);
-        modeSelectCB.setSelectedItemIndex(prep->getMode(), notify);
-        onOffSelectCB.setSelectedItemIndex(prep->getOnOffMode(), notify);
+        modeSelectCB.setSelectedItemIndex(prep->sMode.value, notify);
+        onOffSelectCB.setSelectedItemIndex(prep->onOffMode.value, notify);
         //offsetParamStartToggle.setToggleState(prep->getOffsetParamToggle(), notify);
-        offsetParamStartToggle.setToggleState(prep->getBeatsToSkip(), notify);
-        releaseVelocitySetsSynchronicToggle.setToggleState(prep->getReleaseVelocitySetsSynchronic(), notify);
-        howManySlider->setValue(prep->getNumBeats(), notify);
-        clusterThreshSlider->setValue(prep->getClusterThreshMS(), notify);
-        clusterCapSlider->setValue(prep->getClusterCap(), notify);
-        clusterMinMaxSlider->setMinValue(prep->getClusterMin(), notify);
-        clusterMinMaxSlider->setMaxValue(prep->getClusterMax(), notify);
+        offsetParamStartToggle.setToggleState(prep->sBeatsToSkip.value, notify);
+        releaseVelocitySetsSynchronicToggle.setToggleState(prep->sReleaseVelocitySetsSynchronic.value, notify);
+        howManySlider->setValue(prep->sNumBeats.value, notify);
+        clusterThreshSlider->setValue(prep->sClusterThresh.value, notify);
+        clusterCapSlider->setValue(prep->sClusterCap.value, notify);
+        clusterMinMaxSlider->setMinValue(prep->sClusterMin.value, notify);
+        clusterMinMaxSlider->setMaxValue(prep->sClusterMax.value, notify);
         
-        holdTimeMinMaxSlider->setMinValue(prep->getHoldMin(), notify);
-        holdTimeMinMaxSlider->setMaxValue(prep->getHoldMax(), notify);
+        holdTimeMinMaxSlider->setMinValue(prep->holdMin.value, notify);
+        holdTimeMinMaxSlider->setMaxValue(prep->holdMax.value, notify);
         
-        velocityMinMaxSlider->setMinValue(prep->getVelocityMin(), notify);
-        velocityMinMaxSlider->setMaxValue(prep->getVelocityMax(), notify);
+        velocityMinMaxSlider->setMinValue(prep->velocityMin.value, notify);
+        velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, notify);
         
-        numClusterSlider->setValue(prep->getNumClusters(), notify);
+        numClusterSlider->setValue(prep->numClusters.value, notify);
                 
         for (int i = TargetTypeSynchronicPatternSync; i <= TargetTypeSynchronicRotate; i++)
         {
@@ -1173,23 +1173,23 @@ void SynchronicPreparationEditor::update(NotificationType notify)
         {
             if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
             {
-                // paramSliders[i]->setTo(prep->getAccentMultipliers(), notify);
-                paramSliders[i]->setToOnlyActive(prep->getAccentMultipliers(), prep->getAccentMultipliersStates(), notify);
+                // paramSliders[i]->setTo(prep->sAccentMultipliers, notify);
+                paramSliders[i]->setToOnlyActive(prep->sAccentMultipliers, prep->sAccentMultipliersStates, notify);
             }
             
             if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
             {
-                paramSliders[i]->setToOnlyActive(prep->getBeatMultipliers(), prep->getBeatMultipliersStates(), notify);
+                paramSliders[i]->setToOnlyActive(prep->sBeatMultipliers, prep->sBeatMultipliersStates, notify);
             }
             
             if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
             {
-                paramSliders[i]->setToOnlyActive(prep->getLengthMultipliers(), prep->getLengthMultipliersStates(), notify);
+                paramSliders[i]->setToOnlyActive(prep->sLengthMultipliers, prep->sLengthMultipliersStates, notify);
             }
             
             if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
             {
-                paramSliders[i]->setToOnlyActive(prep->getTransposition(), prep->getTranspositionStates(), notify);
+                paramSliders[i]->setToOnlyActive(prep->sTransposition, prep->sTranspositionStates, notify);
             }
         }
         
@@ -1327,9 +1327,9 @@ void SynchronicPreparationEditor::fillMidiOutputSelectCB()
         if (name != String())  midiOutputSelectCB.addItem(name, Id);
         else                   midiOutputSelectCB.addItem("Device"+String(Id), Id);
 
-        if (prep->getMidiOutput() != nullptr)
+        if (prep->midiOutput.value != nullptr)
         {
-            if (name == prep->getMidiOutput()->getName())
+            if (name == prep->midiOutput.value->getName())
             {
                 midiOutputSelectCB.setSelectedId(Id, NotificationType::dontSendNotification);
             }
@@ -1495,27 +1495,27 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         SynchronicPreparation::Ptr prep = processor.gallery->getSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        if (prep->getOnOffMode() == KeyOn)
+        if (prep->onOffMode.value == KeyOn)
         {
-            prep    ->setMode((SynchronicSyncMode) index);
+            prep    ->sMode.set((SynchronicSyncMode) index);
         }
-        else if (prep->getOnOffMode() == KeyOff)
+        else if (prep->onOffMode.value == KeyOff)
         {
-            prep    ->setMode((SynchronicSyncMode) (index+2));
+            prep    ->sMode.set((SynchronicSyncMode) (index+2));
         }
         
         int toggleVal;
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;
 
-        prep->setBeatsToSkip(toggleVal);
+        prep->sBeatsToSkip.set(toggleVal);
         
     }
     else if (name == "OnOff")
     {
         SynchronicPreparation::Ptr prep = processor.gallery->getSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        prep    ->setOnOffMode( (SynchronicOnOffMode) index);
+        prep    ->onOffMode.set( (SynchronicOnOffMode) index);
         
         fillModeSelectCB();
         
@@ -1600,7 +1600,7 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;
 
-        prep->setBeatsToSkip(toggleVal);
+        prep->sBeatsToSkip.set(toggleVal);
         
 
     }
@@ -1608,7 +1608,7 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
     {
         SynchronicPreparation::Ptr prep = processor.gallery->getSynchronicPreparation(processor.updateState->currentSynchronicId);
         
-        prep->setReleaseVelocitySetsSynchronic(releaseVelocitySetsSynchronicToggle.getToggleState());
+        prep->sReleaseVelocitySetsSynchronic.set(releaseVelocitySetsSynchronicToggle.getToggleState());
     }
     else if (b == &hideOrShow)
     {
@@ -1647,7 +1647,7 @@ void SynchronicPreparationEditor::buttonClicked (Button* b)
     {
         SynchronicPreparation::Ptr prep = processor.gallery->getSynchronicPreparation(processor.updateState->currentSynchronicId);
         DBG("Synchronic transpUsesTuning = " + String((int)b->getToggleState()));
-        prep->setTranspUsesTuning(b->getToggleState());
+        prep->sTranspUsesTuning.set(b->getToggleState());
         
     }
 }
@@ -1785,10 +1785,10 @@ void SynchronicModificationEditor::highlightModedComponents()
     }
     if (mod->getDirty(SynchronicADSRs))
     {
-        Array<Array<float>> envs = mod->getADSRs();
+        Array<Array<Moddable<float>>> envs = mod->getADSRs();
         for(int i = 0; i < envelopeSliders.size(); i++)
         {
-            if(envs[i][4]) envelopeSliders[i]->setBright();
+            if(envs[i][4].value) envelopeSliders[i]->setBright();
             else envelopeSliders[i]->setDim(gModAlpha);
         }
         envelopeName.setAlpha(1.);
@@ -1818,53 +1818,53 @@ void SynchronicModificationEditor::update(NotificationType notify)
     
     if (mod != nullptr)
     {
-        modeSelectCB.setSelectedItemIndex(mod->getMode(), notify);
-        onOffSelectCB.setSelectedItemIndex(mod->getOnOffMode(), notify);
+        modeSelectCB.setSelectedItemIndex(mod->sMode.value, notify);
+        onOffSelectCB.setSelectedItemIndex(mod->onOffMode.value, notify);
         
         gainSlider->setValue(mod->sGain.value, notify);
         blendronicGainSlider->setValue(mod->sBlendronicGain.value, notify);
         
-        offsetParamStartToggle.setToggleState(mod->getBeatsToSkip(), notify);
-        howManySlider->setValue(mod->getNumBeats(), notify);
-        clusterThreshSlider->setValue(mod->getClusterThreshMS(), notify);
-        clusterCapSlider->setValue(mod->getClusterCap(), notify);
-        clusterMinMaxSlider->setMinValue(mod->getClusterMin(), notify);
-        clusterMinMaxSlider->setMaxValue(mod->getClusterMax(), notify);
-        holdTimeMinMaxSlider->setMinValue(mod->getHoldMin(), notify);
-        holdTimeMinMaxSlider->setMaxValue(mod->getHoldMax(), notify);
-        velocityMinMaxSlider->setMinValue(mod->getVelocityMin(), notify);
-        velocityMinMaxSlider->setMaxValue(mod->getVelocityMax(), notify);
-        numClusterSlider->setValue(mod->getNumClusters(), notify);
-        transpUsesTuning.setToggleState(mod->getTranspUsesTuning(), notify);
+        offsetParamStartToggle.setToggleState(mod->sBeatsToSkip.value, notify);
+        howManySlider->setValue(mod->sNumBeats.value, notify);
+        clusterThreshSlider->setValue(mod->sClusterThresh.value, notify);
+        clusterCapSlider->setValue(mod->sClusterCap.value, notify);
+        clusterMinMaxSlider->setMinValue(mod->sClusterMin.value, notify);
+        clusterMinMaxSlider->setMaxValue(mod->sClusterMax.value, notify);
+        holdTimeMinMaxSlider->setMinValue(mod->holdMin.value, notify);
+        holdTimeMinMaxSlider->setMaxValue(mod->holdMax.value, notify);
+        velocityMinMaxSlider->setMinValue(mod->velocityMin.value, notify);
+        velocityMinMaxSlider->setMaxValue(mod->velocityMax.value, notify);
+        numClusterSlider->setValue(mod->numClusters.value, notify);
+        transpUsesTuning.setToggleState(mod->sTranspUsesTuning.value, notify);
         
         for (int i = 0; i < paramSliders.size(); i++)
         {
             if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
             {
-                paramSliders[i]->setToOnlyActive(mod->getAccentMultipliers(), mod->getAccentMultipliersStates(), notify);
+                paramSliders[i]->setToOnlyActive(mod->sAccentMultipliers, mod->sAccentMultipliersStates, notify);
             }
             else if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
             {
-                paramSliders[i]->setToOnlyActive(mod->getBeatMultipliers(), mod->getBeatMultipliersStates(), notify);
+                paramSliders[i]->setToOnlyActive(mod->sBeatMultipliers, mod->sBeatMultipliersStates, notify);
             }
             else if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
             {
-                paramSliders[i]->setToOnlyActive(mod->getLengthMultipliers(), mod->getLengthMultipliersStates(), notify);
+                paramSliders[i]->setToOnlyActive(mod->sLengthMultipliers, mod->sLengthMultipliersStates, notify);
             }
             else if(!paramSliders[i]->getName().compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
             {
-                paramSliders[i]->setToOnlyActive(mod->getTransposition(), mod->getTranspositionStates(), notify);
+                paramSliders[i]->setToOnlyActive(mod->sTransposition, mod->sTranspositionStates, notify);
             }
         }
         
         if(mod->getDirty(SynchronicADSRs))
         {
-            Array<Array<float>> fvals = mod->getADSRs();
+            Array<Array<Moddable<float>>> fvals = mod->getADSRs();
             for(int i=0; i<envelopeSliders.size(); i++)
             {
-                if(fvals[i][4] > 0)
+                if(fvals[i][4].value > 0)
                 {
-                    envelopeSliders[fvals[i][5]]->setValue(fvals[i], notify);
+                    envelopeSliders[fvals[i][5].value]->setValue(fvals[i], notify);
                 }
                 envelopeSliders[i]->setValue(fvals[i], notify);
             }
@@ -1896,9 +1896,9 @@ void SynchronicModificationEditor::fillMidiOutputSelectCB()
         if (name != String())  midiOutputSelectCB.addItem(name, Id);
         else                   midiOutputSelectCB.addItem("Device"+String(Id), Id);
         
-        if (mod->getMidiOutput() != nullptr)
+        if (mod->midiOutput.value != nullptr)
         {
-            if (name == mod->getMidiOutput()->getName())
+            if (name == mod->midiOutput.value->getName())
             {
                 midiOutputSelectCB.setSelectedId(Id, NotificationType::dontSendNotification);
             }
@@ -1914,7 +1914,7 @@ void SynchronicModificationEditor::fillModeSelectCB()
     
     modeSelectCB.clear(dontSendNotification);
     
-    if (mod->getOnOffMode() == KeyOn)
+    if (mod->onOffMode.value == KeyOn)
     {
         modeSelectCB.addItem("First Note-On", 1);
         modeSelectCB.addItem("Any Note-On", 2);
@@ -1928,7 +1928,7 @@ void SynchronicModificationEditor::fillModeSelectCB()
         modeSelectCB.addItem("Last Note-Off", 3);
     }
     
-    modeSelectCB.setSelectedItemIndex(mod->getMode(), dontSendNotification);
+    modeSelectCB.setSelectedItemIndex(mod->sMode.value, dontSendNotification);
 }
 
 void SynchronicModificationEditor::update()
@@ -1972,7 +1972,7 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
     
     if (!name.compare(cSynchronicParameterTypes[SynchronicAccentMultipliers]))
     {
-        Array<float> accents = mod->getAccentMultipliers();
+        Array<Moddable<float>> accents = mod->sAccentMultipliers;
         accents.set(whichSlider, values[0]);
         
         mod->setDirty(SynchronicAccentMultipliers);
@@ -1980,7 +1980,7 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
     }
     else if (!name.compare(cSynchronicParameterTypes[SynchronicBeatMultipliers]))
     {
-        Array<float> beats = mod->getBeatMultipliers();
+        Array<Moddable<float>> beats = mod->sBeatMultipliers;
         beats.set(whichSlider, values[0]);
         
         mod->setDirty(SynchronicBeatMultipliers);
@@ -1988,7 +1988,7 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
     }
     else if (!name.compare(cSynchronicParameterTypes[SynchronicLengthMultipliers]))
     {
-        Array<float> lens = mod->getLengthMultipliers();
+        Array<Moddable<float>> lens = mod->sLengthMultipliers;
         lens.set(whichSlider, values[0]);
         
         mod->setDirty(SynchronicLengthMultipliers);
@@ -1996,12 +1996,8 @@ void SynchronicModificationEditor::multiSliderDidChange(String name, int whichSl
     }
     else if (!name.compare(cSynchronicParameterTypes[SynchronicTranspOffsets]))
     {
-        //paramSliders
-        Array<Array<float>> transps = mod->getTransposition();
-        transps.set(whichSlider, values);
-        
         mod->setDirty(SynchronicTranspOffsets);
-        mod->setTransposition(transps);
+        mod->setSingleTransposition(whichSlider, values);
     }
     
     for(int i = 0; i < paramSliders.size(); i++)
@@ -2115,42 +2111,42 @@ void SynchronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
     
     if(name == "num pulses")
     {
-        mod->setNumBeats(val);
+        mod->sNumBeats.set(val);
         mod->setDirty(SynchronicNumPulses);
         
         howManySlider->setBright();
     }
     else if(name == "cluster threshold")
     {
-        mod->setClusterThresh(val);
+        mod->sClusterThresh.set(val);
         mod->setDirty(SynchronicClusterThresh);
         
         clusterThreshSlider->setBright();
     }
     else if(name == "cluster thickness")
     {
-        mod->setClusterCap(val);
+        mod->sClusterCap.set(val);
         mod->setDirty(SynchronicClusterCap);
         
         clusterCapSlider->setBright();
     }
     else if(name == "gain")
     {
-        mod->setGain(val);
+        mod->sGain.set(val);
         mod->setDirty(SynchronicGain);
         
         gainSlider->setBright();
     }
     else if(name == "num clusters")
     {
-        mod->setNumClusters(val);
+        mod->numClusters.set(val);
         mod->setDirty(SynchronicNumClusters);
         
         numClusterSlider->setBright();
     }
     else if(name == "blendronic gain")
     {
-        mod->setBlendronicGain(val);
+        mod->sBlendronicGain.set(val);
         mod->setDirty(SynchronicBlendronicGain);
         
         blendronicGainSlider->setBright();
@@ -2165,20 +2161,20 @@ void SynchronicModificationEditor::BKRangeSliderValueChanged(String name, double
     
     if(name == "cluster min/max")
     {
-        mod->setClusterMin(minval);
+        mod->sClusterMin.set(minval);
         mod->setDirty(SynchronicClusterMin);
         
-        mod->setClusterMax(maxval);
+        mod->sClusterMax.set(maxval);
         mod->setDirty(SynchronicClusterMax);
         
         clusterMinMaxSlider->setBright();
     }
     else if (name == "hold min/max")
     {
-        mod->setHoldMin(minval);
+        mod->holdMin.set(minval);
         mod->setDirty(SynchronicHoldMin);
         
-        mod->setHoldMax(maxval);
+        mod->holdMax.set(maxval);
         mod->setDirty(SynchronicHoldMax);
         
         holdTimeMinMaxSlider->setBright();
@@ -2349,7 +2345,7 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
         
-        mod->setMode((SynchronicSyncMode) index);
+        mod->sMode.set((SynchronicSyncMode) index);
         mod->setDirty(SynchronicMode);
         
         // DO WE NEED THIS HERE IN MOD?
@@ -2357,7 +2353,7 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;
         
-        mod->setBeatsToSkip(toggleVal);
+        mod->sBeatsToSkip.set(toggleVal);
         mod->setDirty(SynchronicBeatsToSkip);
         
         updateModification();
@@ -2368,7 +2364,7 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
     {
         SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
         
-        mod->setOnOffMode((SynchronicOnOffMode) index);
+        mod->onOffMode.set((SynchronicOnOffMode) index);
         mod->setDirty(SynchronicOnOff);
         
         updateModification();
@@ -2441,7 +2437,7 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
         if(offsetParamStartToggle.getToggleState()) toggleVal = 1;
         else toggleVal = 0;
         
-        mod->setBeatsToSkip(toggleVal);
+        mod->sBeatsToSkip.set(toggleVal);
         mod->setDirty(SynchronicBeatsToSkip);
         
         offsetParamStartToggle.setAlpha(1.);
@@ -2483,7 +2479,7 @@ void SynchronicModificationEditor::buttonClicked (Button* b)
     else if (b == &transpUsesTuning)
     {
         SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
-        mod->setTranspUsesTuning(transpUsesTuning.getToggleState());
+        mod->sTranspUsesTuning.set(transpUsesTuning.getToggleState());
         mod->setDirty(SynchronicTranspUsesTuning);
         transpUsesTuning.setAlpha(1.);
     }
@@ -2502,21 +2498,29 @@ void SynchronicModificationEditor::BKADSRSliderValueChanged(String name, int att
 {
     SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
 
-    Array<Array<float>> envs = mod->getADSRs();
     for(int i=0; i<envelopeSliders.size(); i++)
     {
         if(envelopeSliders[i]->getName() == name)
         {
-            envs.set(i, {(float)attack, decay, sustain, release, 1, i});
+            mod->sAttacks[i].set(attack);
+            mod->sDecays[i].set(decay);
+            mod->sSustains[i].set(sustain);
+            mod->sReleases[i].set(release);
+            mod->envelopeOn[i].set(true);
             envelopeSliders[i]->setActive();
             envelopeSliders[i]->setBright();
         }
         else
-        {                              //A, D, S,  R,  inactive, which
-            if(!envs[i][4]) envs.set(i, {3, 3, 1., 30, 0,        i}); //create inactive default
+        {  //A, D, S,  R,  inactive, which
+            if(!mod->envelopeOn[i].value)
+            {
+                mod->sAttacks[i].set(3);
+                mod->sDecays[i].set(3);
+                mod->sSustains[i].set(1.);
+                mod->sReleases[i].set(30);
+            }
         }
     }
-    mod->setADSRs(envs);
     mod->setDirty(SynchronicADSRs);
     
     updateModification();

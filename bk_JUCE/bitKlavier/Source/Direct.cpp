@@ -12,6 +12,37 @@
 #include "PluginProcessor.h"
 #include "Modification.h"
 
+void DirectPreparation::performModification(DirectModification* d, Array<bool> dirty)
+{
+    // Should the mod be reversed?
+    bool reverse = d->altMod && modded;
+    
+    if (dirty[DirectGain]) dGain.modify(d->dGain, reverse);
+    if (dirty[DirectResGain]) dResonanceGain.modify(d->dResonanceGain, reverse);
+    if (dirty[DirectHammerGain]) dHammerGain.modify(d->dHammerGain, reverse);
+    if (dirty[DirectBlendronicGain]) dBlendronicGain.modify(d->dBlendronicGain, reverse);
+    if (dirty[DirectTransposition]) dTransposition.modify(d->dTransposition, reverse);
+    if (dirty[DirectTranspUsesTuning]) dTranspUsesTuning.modify(d->dTranspUsesTuning, reverse);
+    if (dirty[DirectADSR])
+    {
+        dAttack.modify(d->dAttack, reverse);
+        dDecay.modify(d->dDecay, reverse);
+        dSustain.modify(d->dSustain, reverse);
+        dRelease.modify(d->dRelease, reverse);
+    }
+    if (dirty[DirectUseGlobalSoundSet]) dUseGlobalSoundSet.modify(d->dUseGlobalSoundSet, reverse);
+    if (dirty[DirectSoundSet])
+    {
+        dSoundSet.modify(d->dSoundSet, reverse);
+        dSoundSetName.modify(d->dSoundSetName, reverse);
+    }
+    if (dirty[DirectVelocityMin]) velocityMin.modify(d->velocityMin, reverse);
+    if (dirty[DirectVelocityMax]) velocityMax.modify(d->velocityMax, reverse);
+    
+    // If the mod didn't reverse, then it is modded
+    modded = !reverse;
+}
+
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
                                  TuningProcessor::Ptr tuning,
                                  BlendronicProcessor::PtrArr blend,
@@ -304,61 +335,6 @@ void DirectProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoad
     sampleType = type;
     //tuner->processor->incrementAdaptiveClusterTime(numSamples);
 }
-
-void DirectPreparation::performModification(DirectModification* d, Array<bool> dirty)
-{
-    if (d->altMod && modded)
-    {
-        if (dirty[DirectGain]) dGain.unmodFrom(d->dGain);
-        if (dirty[DirectResGain]) dResonanceGain.unmodFrom(d->dResonanceGain);
-        if (dirty[DirectHammerGain]) dHammerGain.unmodFrom(d->dHammerGain);
-        if (dirty[DirectBlendronicGain]) dBlendronicGain.unmodFrom(d->dBlendronicGain);
-        if (dirty[DirectTransposition]) dTransposition.unmodFrom(d->dTransposition);
-        if (dirty[DirectTranspUsesTuning]) dTranspUsesTuning.unmodFrom(d->dTranspUsesTuning);
-        if (dirty[DirectADSR])
-        {
-            dAttack.unmodFrom(d->dAttack);
-            dDecay.unmodFrom(d->dDecay);
-            dSustain.unmodFrom(d->dSustain);
-            dRelease.unmodFrom(d->dRelease);
-        }
-        if (dirty[DirectUseGlobalSoundSet]) dUseGlobalSoundSet.unmodFrom(d->dUseGlobalSoundSet);
-        if (dirty[DirectSoundSet])
-        {
-            dSoundSet.unmodFrom(d->dSoundSet);
-            dSoundSetName.unmodFrom(d->dSoundSetName);
-        }
-        if (dirty[DirectVelocityMin]) velocityMin.unmodFrom(d->velocityMin);
-        if (dirty[DirectVelocityMax]) velocityMax.unmodFrom(d->velocityMax);
-        modded = false;
-    }
-    else
-    {
-        if (dirty[DirectGain]) dGain.modTo(d->dGain);
-        if (dirty[DirectResGain]) dResonanceGain.modTo(d->dResonanceGain);
-        if (dirty[DirectHammerGain]) dHammerGain.modTo(d->dHammerGain);
-        if (dirty[DirectBlendronicGain]) dBlendronicGain.modTo(d->dBlendronicGain);
-        if (dirty[DirectTransposition]) dTransposition.modTo(d->dTransposition);
-        if (dirty[DirectTranspUsesTuning]) dTranspUsesTuning.modTo(d->dTranspUsesTuning);
-        if (dirty[DirectADSR])
-        {
-            dAttack.modTo(d->dAttack);
-            dDecay.modTo(d->dDecay);
-            dSustain.modTo(d->dSustain);
-            dRelease.modTo(d->dRelease);
-        }
-        if (dirty[DirectUseGlobalSoundSet]) dUseGlobalSoundSet.modTo(d->dUseGlobalSoundSet);
-        if (dirty[DirectSoundSet])
-        {
-            dSoundSet.modTo(d->dSoundSet);
-            dSoundSetName.modTo(d->dSoundSetName);
-        }
-        if (dirty[DirectVelocityMin]) velocityMin.modTo(d->velocityMin);
-        if (dirty[DirectVelocityMax]) velocityMax.modTo(d->velocityMax);
-        modded = true;
-    }
-}
-
 
 #if BK_UNIT_TESTS
 

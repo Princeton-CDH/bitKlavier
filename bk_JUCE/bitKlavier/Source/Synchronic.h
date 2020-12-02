@@ -42,51 +42,9 @@ public:
     typedef OwnedArray<SynchronicPreparation, CriticalSection> CSArr;
     
     // Copy Constructor
-    SynchronicPreparation(SynchronicPreparation::Ptr p):
-    sGain(p->sGain),
-    sBlendronicGain(p->sBlendronicGain),
-    sNumBeats(p->getNumBeats()),
-    sClusterMin(p->getClusterMin()),
-    sClusterMax(p->getClusterMax()),
-    sClusterCap(p->getClusterCap()),
-    numClusters(1),
-    holdMin(p->getHoldMin()),
-    holdMax(p->getHoldMax()),
-    velocityMin(p->getVelocityMin()),
-    velocityMax(p->getVelocityMax()),
-    sMode(p->getMode()),
-    sBeatsToSkip(p->getBeatsToSkip()),
-    onOffMode(KeyOn),
-    sBeatMultipliers(p->getBeatMultipliers()),
-    sAccentMultipliers(p->getAccentMultipliers()),
-    sLengthMultipliers(p->getLengthMultipliers()),
-    sTransposition(p->getTransposition()),
-    sBeatMultipliersStates(p->getBeatMultipliersStates()),
-    sAccentMultipliersStates(p->getAccentMultipliersStates()),
-    sLengthMultipliersStates(p->getLengthMultipliersStates()),
-    sTranspositionStates(p->getTranspositionStates()),
-    sTranspUsesTuning(p->getTranspUsesTuning()),
-    sAttacks(p->getAttacks()),
-    sDecays(p->getDecays()),
-    sSustains(p->getSustains()),
-    sReleases(p->getReleases()),
-    envelopeOn(p->getEnvelopesOn()),
-    sClusterThresh(p->getClusterThreshMS()),
-    sClusterThreshSec(p->getClusterThreshSEC()),
-    sReleaseVelocitySetsSynchronic(p->getReleaseVelocitySetsSynchronic()),
-    targetTypeSynchronicPatternSync(p->getTargetTypeSynchronicPatternSync()),
-    targetTypeSynchronicBeatSync(p->getTargetTypeSynchronicBeatSync()),
-    targetTypeSynchronicAddNotes(p->getTargetTypeSynchronicAddNotes()),
-    targetTypeSynchronicPausePlay(p->getTargetTypeSynchronicPausePlay()),
-    targetTypeSynchronicClear(p->getTargetTypeSynchronicClear()),
-    targetTypeSynchronicDeleteOldest(p->getTargetTypeSynchronicDeleteOldest()),
-    targetTypeSynchronicDeleteNewest(p->getTargetTypeSynchronicDeleteNewest()),
-    targetTypeSynchronicRotate(p->getTargetTypeSynchronicRotate()),
-    midiOutput(p->getMidiOutput()),
-    sUseGlobalSoundSet(p->getUseGlobalSoundSet()),
-    sSoundSet(p->getSoundSet())
+    SynchronicPreparation(SynchronicPreparation::Ptr p)
     {
-        
+        copy(p);
     }
     
                         
@@ -113,18 +71,13 @@ public:
     sMode(mode),
     sBeatsToSkip(beatsToSkip),
     onOffMode(KeyOn),
-    sBeatMultipliers(beatMultipliers),
-    sAccentMultipliers(accentMultipliers),
-    sLengthMultipliers(lengthMultipliers),
-    sTransposition(transp),
-    sBeatMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    sAccentMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    sLengthMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    sTranspositionStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
     sTranspUsesTuning(false),
     sClusterThresh(clusterThresh),
-    sClusterThreshSec(.001 * sClusterThresh),
+    sClusterThreshSec(.001 * sClusterThresh.base),
     sReleaseVelocitySetsSynchronic(velocityMode),
+    midiOutput(nullptr),
+    sUseGlobalSoundSet(true),
+    sSoundSet(-1),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
@@ -132,12 +85,36 @@ public:
     targetTypeSynchronicClear(NoteOn),
     targetTypeSynchronicDeleteOldest(NoteOn),
     targetTypeSynchronicDeleteNewest(NoteOn),
-    targetTypeSynchronicRotate(NoteOn),
-    midiOutput(nullptr),
-    sUseGlobalSoundSet(true),
-    sSoundSet(-1)
+    targetTypeSynchronicRotate(NoteOn)
     {
+        sBeatMultipliers = Array<Moddable<float>>();
+        for (auto f : beatMultipliers) sBeatMultipliers.add(Moddable<float>(f));
         
+        sAccentMultipliers = Array<Moddable<float>>();
+        for (auto f : accentMultipliers) sAccentMultipliers.add(Moddable<float>(f));
+        
+        sLengthMultipliers = Array<Moddable<float>>();
+        for (auto f : lengthMultipliers) sLengthMultipliers.add(Moddable<float>(f));
+        
+        sTransposition = Array<Array<Moddable<float>>>();
+        for (auto a : transp)
+        {
+            Array<Moddable<float>> arr;
+            for (auto f : a) arr.add(Moddable<float>(f));
+            sTransposition.add(arr);
+        }
+        
+        sBeatMultipliersStates = Array<Moddable<bool>>();
+        sAccentMultipliersStates = Array<Moddable<bool>>();
+        sLengthMultipliersStates = Array<Moddable<bool>>();
+        sTranspositionStates = Array<Moddable<bool>>();
+        for (int i = 0; i < 12; ++i)
+        {
+            sBeatMultipliersStates.add(Moddable<bool>(i == 0));
+            sAccentMultipliersStates.add(Moddable<bool>(i == 0));
+            sLengthMultipliersStates.add(Moddable<bool>(i == 0));
+            sTranspositionStates.add(Moddable<bool>(i == 0));
+        }
     }
 
     
@@ -156,21 +133,12 @@ public:
     sMode(FirstNoteOnSync),
     sBeatsToSkip(0),
     onOffMode(KeyOn),
-    sBeatMultipliers(Array<float>({1.0})),
-    sAccentMultipliers(Array<float>({1.0})),
-    sLengthMultipliers(Array<float>({1.0})),
-    sBeatMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    sAccentMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    sLengthMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    sTranspositionStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
     sTranspUsesTuning(false),
-    sAttacks(Array<int>({3,3,3,3,3,3,3,3,3,3,3,3})),
-    sDecays(Array<int>({3,3,3,3,3,3,3,3,3,3,3,3})),
-    sSustains(Array<float>({1.,1,1,1,1,1,1,1,1,1,1,1})),
-    sReleases(Array<int>({30,30,30,30,30,30,30,30,30,30,30,30})),
-    envelopeOn(Array<bool>({true,false,false,false,false,false,false,false,false,false,false,false})),
     sClusterThresh(500),
-    sClusterThreshSec(.001 * sClusterThresh),
+    sClusterThreshSec(.001 * sClusterThresh.base),
+    midiOutput(nullptr),
+    sUseGlobalSoundSet(true),
+    sSoundSet(-1),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
@@ -178,56 +146,85 @@ public:
     targetTypeSynchronicClear(NoteOn),
     targetTypeSynchronicDeleteOldest(NoteOn),
     targetTypeSynchronicDeleteNewest(NoteOn),
-    targetTypeSynchronicRotate(NoteOn),
-    midiOutput(nullptr),
-    sUseGlobalSoundSet(true),
-    sSoundSet(-1)
+    targetTypeSynchronicRotate(NoteOn)
     {
-        sTransposition.ensureStorageAllocated(1);
-        sTransposition.add(Array<float>({0.0}));
+        sBeatMultipliers = Array<Moddable<float>>();
+        sBeatMultipliers.add(Moddable<float>(1.0f));
+        
+        sAccentMultipliers = Array<Moddable<float>>();
+        sAccentMultipliers.add(Moddable<float>(1.0f));
+        
+        sLengthMultipliers = Array<Moddable<float>>();
+        sLengthMultipliers.add(Moddable<float>(1.0f));
+        
+        sTransposition = Array<Array<Moddable<float>>>();
+        Array<Moddable<float>> arr;
+        arr.add(Moddable<float>(0.0f));
+        sTransposition.add(arr);
+        
+        sBeatMultipliersStates = Array<Moddable<bool>>();
+        sAccentMultipliersStates = Array<Moddable<bool>>();
+        sLengthMultipliersStates = Array<Moddable<bool>>();
+        sAttacks = Array<Moddable<float>>();
+        sDecays = Array<Moddable<float>>();
+        sSustains = Array<Moddable<float>>();
+        sReleases = Array<Moddable<float>>();
+        envelopeOn = Array<Moddable<bool>>();
+        for (int i = 0; i < 12; ++i)
+        {
+            sBeatMultipliersStates.add(Moddable<bool>(i == 0));
+            sAccentMultipliersStates.add(Moddable<bool>(i == 0));
+            sLengthMultipliersStates.add(Moddable<bool>(i == 0));
+            sTranspositionStates.add(Moddable<bool>(i == 0));
+            sAttacks.add(Moddable<float>(3));
+            sDecays.add(Moddable<float>(3));
+            sSustains.add(Moddable<float>(1.0f));
+            sReleases.add(Moddable<float>(30));
+            envelopeOn.add(Moddable<bool>(i == 0));
+        }
     }
     
     inline void copy(SynchronicPreparation::Ptr s)
     {
-        sNumBeats = s->getNumBeats();
-        sClusterMin = s->getClusterMin();
-        sClusterMax = s->getClusterMax();
-        sClusterCap = s->getClusterCap();
-        sMode = s->getMode();
-        sBeatsToSkip = s->getBeatsToSkip();
-        sBeatMultipliers = s->getBeatMultipliers();
-        sAccentMultipliers = s->getAccentMultipliers();
-        sLengthMultipliers = s->getLengthMultipliers();
+        sNumBeats = s->sNumBeats;
+        sClusterMin = s->sClusterMin;
+        sClusterMax = s->sClusterMax;
+        sClusterCap = s->sClusterCap;
+        sMode = s->sMode;
+        sBeatsToSkip = s->sBeatsToSkip;
+        sBeatMultipliers = s->sBeatMultipliers;
+        sAccentMultipliers = s->sAccentMultipliers;
+        sLengthMultipliers = s->sLengthMultipliers;
         sGain = s->sGain;
         sBlendronicGain = s->sBlendronicGain;
         
-        sTransposition = s->getTransposition();
-        sClusterThresh = s->getClusterThreshMS();
-        sClusterThreshSec = s->getClusterThreshSEC();
-        sReleaseVelocitySetsSynchronic = s->getReleaseVelocitySetsSynchronic();
+        sTransposition = s->sTransposition;
+        sClusterThresh = s->sClusterThresh;
+        sClusterThreshSec = s->sClusterThreshSec;
+        sReleaseVelocitySetsSynchronic = s->sReleaseVelocitySetsSynchronic;
         
-        sBeatMultipliersStates = s->getBeatMultipliersStates();
-        sAccentMultipliersStates = s->getAccentMultipliersStates();
-        sLengthMultipliersStates = s->getLengthMultipliersStates();
-        sTranspositionStates = s->getTranspositionStates();
+        sBeatMultipliersStates = s->sBeatMultipliersStates;
+        sAccentMultipliersStates = s->sAccentMultipliersStates;
+        sLengthMultipliersStates = s->sLengthMultipliersStates;
+        sTranspositionStates = s->sTranspositionStates;
         
-        sTranspUsesTuning = s->getTranspUsesTuning();
+        sTranspUsesTuning = s->sTranspUsesTuning;
         
-        sAttacks = s->getAttacks();
-        sDecays = s->getDecays();
-        sSustains = s->getSustains();
-        sReleases = s->getReleases();
+        sAttacks = s->sAttacks;
+        sDecays = s->sDecays;
+        sSustains = s->sSustains;
+        sReleases = s->sReleases;
         
-        envelopeOn = s->getEnvelopesOn();
+        envelopeOn = s->envelopeOn;
         
-        numClusters = s->getNumClusters();
-        onOffMode = s->getOnOffMode();
+        numClusters = s->numClusters;
+        onOffMode = s->onOffMode;
         
-        holdMin = s->getHoldMin();
-        holdMax = s->getHoldMax();
+        holdMin = s->holdMin;
+        holdMax = s->holdMax;
         
-        velocityMin = s->getVelocityMin();
-        velocityMax = s->getVelocityMax();
+        velocityMin = s->velocityMin;
+        velocityMax = s->velocityMax;
         
         targetTypeSynchronicPatternSync = s->getTargetTypeSynchronicPatternSync();
         targetTypeSynchronicBeatSync = s->getTargetTypeSynchronicBeatSync();
@@ -238,76 +235,77 @@ public:
         targetTypeSynchronicDeleteNewest = s->getTargetTypeSynchronicDeleteNewest();
         targetTypeSynchronicRotate = s->getTargetTypeSynchronicRotate();
         
-        midiOutput = s->getMidiOutput();
+        midiOutput = s->midiOutput;
         
-        sUseGlobalSoundSet = s->getUseGlobalSoundSet();
-        sSoundSet = s->getSoundSet();
+        sUseGlobalSoundSet = s->sUseGlobalSoundSet;
+        sSoundSet = s->sSoundSet;
     }
     
     void performModification(SynchronicPreparation::Ptr s, Array<bool> dirty)
     {
-        if (dirty[SynchronicGain]) sGain.modTo(s->sGain);
-        if (dirty[SynchronicBlendronicGain]) sBlendronicGain.modTo(s->sBlendronicGain);
-        if (dirty[SynchronicNumPulses]) sNumBeats = s->getNumBeats();
-        if (dirty[SynchronicClusterMin]) sClusterMin = s->getClusterMin();
-        if (dirty[SynchronicClusterMax]) sClusterMax = s->getClusterMax();
-        if (dirty[SynchronicClusterCap]) sClusterCap = s->getClusterCap();
-        if (dirty[SynchronicMode]) sMode = s->getMode();
+        if (dirty[SynchronicGain]) sGain.modify(s->sGain, false);
+        if (dirty[SynchronicBlendronicGain]) sBlendronicGain.modify(s->sBlendronicGain, false);
+        if (dirty[SynchronicNumPulses]) sNumBeats = s->sNumBeats;
+        if (dirty[SynchronicClusterMin]) sClusterMin = s->sClusterMin;
+        if (dirty[SynchronicClusterMax]) sClusterMax = s->sClusterMax;
+        if (dirty[SynchronicClusterCap]) sClusterCap = s->sClusterCap;
+        if (dirty[SynchronicMode]) sMode = s->sMode;
         
-        if (dirty[SynchronicBeatsToSkip]) sBeatsToSkip = s->getBeatsToSkip();
+        if (dirty[SynchronicBeatsToSkip]) sBeatsToSkip = s->sBeatsToSkip;
         
         if (dirty[SynchronicBeatMultipliers]) {
-            sBeatMultipliers = s->getBeatMultipliers();
-            sBeatMultipliersStates = s->getBeatMultipliersStates();
+            
+            sBeatMultipliers = s->sBeatMultipliers;
+            sBeatMultipliersStates = s->sBeatMultipliersStates;
         }
         if (dirty[SynchronicAccentMultipliers]) {
-            sAccentMultipliers = s->getAccentMultipliers();
-            sAccentMultipliersStates = s->getAccentMultipliersStates();
+            sAccentMultipliers = s->sAccentMultipliers;
+            sAccentMultipliersStates = s->sAccentMultipliersStates;
         }
         if (dirty[SynchronicLengthMultipliers]) {
-            sLengthMultipliers = s->getLengthMultipliers();
-            sLengthMultipliersStates = s->getLengthMultipliersStates();
+            sLengthMultipliers = s->sLengthMultipliers;
+            sLengthMultipliersStates = s->sLengthMultipliersStates;
         }
         if (dirty[SynchronicTranspOffsets]) {
-            sTransposition = s->getTransposition();
-            sTranspositionStates = s->getTranspositionStates();
+            sTransposition = s->sTransposition;
+            sTranspositionStates = s->sTranspositionStates;
         }
         
-        if (dirty[SynchronicTranspUsesTuning]) sTranspUsesTuning = s->getTranspUsesTuning();
+        if (dirty[SynchronicTranspUsesTuning]) sTranspUsesTuning = s->sTranspUsesTuning;
         
         if (dirty[SynchronicClusterThresh])
         {
-            sClusterThresh = s->getClusterThreshMS();
-            sClusterThreshSec = s->getClusterThreshSEC();
+            sClusterThresh = s->sClusterThresh;
+            sClusterThreshSec = s->sClusterThreshSec;
         }
 
         if (dirty[SynchronicADSRs])
         {
-            sAttacks = s->getAttacks();
-            sDecays = s->getDecays();
-            sSustains = s->getSustains();
-            sReleases = s->getReleases();
+            sAttacks = s->sAttacks;
+            sDecays = s->sDecays;
+            sSustains = s->sSustains;
+            sReleases = s->sReleases;
             
-            envelopeOn = s->getEnvelopesOn();
+            envelopeOn = s->envelopeOn;
         }
         
-        if (dirty[SynchronicNumClusters]) numClusters = s->getNumClusters();
-        if (dirty[SynchronicOnOff]) onOffMode = s->getOnOffMode();
+        if (dirty[SynchronicNumClusters]) numClusters = s->numClusters;
+        if (dirty[SynchronicOnOff]) onOffMode = s->onOffMode;
         
-        if (dirty[SynchronicHoldMin]) holdMin = s->getHoldMin();
-        if (dirty[SynchronicHoldMax]) holdMax = s->getHoldMax();
+        if (dirty[SynchronicHoldMin]) holdMin = s->holdMin;
+        if (dirty[SynchronicHoldMax]) holdMax = s->holdMax;
         
-        if (dirty[SynchronicVelocityMin]) velocityMin = s->getVelocityMin();
-        if (dirty[SynchronicVelocityMax]) velocityMax = s->getVelocityMax();
+        if (dirty[SynchronicVelocityMin]) velocityMin = s->velocityMin;
+        if (dirty[SynchronicVelocityMax]) velocityMax = s->velocityMax;
         
-        if (dirty[SynchronicMidiOutput]) midiOutput = s->getMidiOutput();
+        if (dirty[SynchronicMidiOutput]) midiOutput = s->midiOutput;
         
-        if (dirty[SynchronicUseGlobalSoundSet]) sUseGlobalSoundSet = s->getUseGlobalSoundSet();
+        if (dirty[SynchronicUseGlobalSoundSet]) sUseGlobalSoundSet = s->sUseGlobalSoundSet;
         
         if (dirty[SynchronicSoundSet])
         {
-            sSoundSet = s->getSoundSet();
-            sSoundSetName = s->getSoundSetName();
+            sSoundSet = s->sSoundSet;
+            sSoundSetName = s->sSoundSetName;
         }
     }
         
@@ -339,36 +337,36 @@ public:
         bool beatsStates = true;
         bool transpStates = true;
         
-        for (int i = s->getLengthMultipliers().size(); --i>=0;)
+        for (int i = s->sLengthMultipliers.size(); --i>=0;)
         {
-            if (s->getLengthMultipliers()[i] != sLengthMultipliers[i])
+            if (s->sLengthMultipliers[i] != sLengthMultipliers[i])
             {
                 lens = false;
                 break;
             }
         }
         
-        for (int i = s->getAccentMultipliers().size(); --i>=0;)
+        for (int i = s->sAccentMultipliers.size(); --i>=0;)
         {
-            if (s->getAccentMultipliers()[i] != sAccentMultipliers[i])
+            if (s->sAccentMultipliers[i] != sAccentMultipliers[i])
             {
                 accents = false;
                 break;
             }
         }
         
-        for (int i = s->getBeatMultipliers().size(); --i>=0;)
+        for (int i = s->sBeatMultipliers.size(); --i>=0;)
         {
-            if (s->getBeatMultipliers()[i] != sBeatMultipliers[i])
+            if (s->sBeatMultipliers[i] != sBeatMultipliers[i])
             {
                 beats = false;
                 break;
             }
         }
         
-        for (int i  = s->getTransposition().size(); --i >= 0;)
+        for (int i  = s->sTransposition.size(); --i >= 0;)
         {
-            Array<float> transposition = s->getTransposition()[i];
+            Array<Moddable<float>> transposition = s->sTransposition[i];
             for (int j = transposition.size(); --j >= 0;)
             {
                 if (transposition[j] != sTransposition[i][j])
@@ -379,106 +377,106 @@ public:
             }
         }
         
-        for (int i = s->getLengthMultipliersStates().size(); --i>=0;)
+        for (int i = s->sLengthMultipliersStates.size(); --i>=0;)
         {
-            if (s->getLengthMultipliersStates()[i] != sLengthMultipliersStates[i])
+            if (s->sLengthMultipliersStates[i] != sLengthMultipliersStates[i])
             {
                 lensStates = false;
                 break;
             }
         }
         
-        for (int i = s->getAccentMultipliersStates().size(); --i>=0;)
+        for (int i = s->sAccentMultipliersStates.size(); --i>=0;)
         {
-            if (s->getAccentMultipliersStates()[i] != sAccentMultipliersStates[i])
+            if (s->sAccentMultipliersStates[i] != sAccentMultipliersStates[i])
             {
                 accentsStates = false;
                 break;
             }
         }
         
-        for (int i = s->getBeatMultipliersStates().size(); --i>=0;)
+        for (int i = s->sBeatMultipliersStates.size(); --i>=0;)
         {
-            if (s->getBeatMultipliersStates()[i] != sBeatMultipliersStates[i])
+            if (s->sBeatMultipliersStates[i] != sBeatMultipliersStates[i])
             {
                 beatsStates = false;
                 break;
             }
         }
         
-        for (int i = s->getTranspositionStates().size(); --i>=0;)
+        for (int i = s->sTranspositionStates.size(); --i>=0;)
         {
-            if (s->getTranspositionStates()[i] != sTranspositionStates[i])
+            if (s->sTranspositionStates[i] != sTranspositionStates[i])
             {
                 transpStates = false;
                 break;
             }
         }
         
-        for (int i = s->getAttacks().size(); --i>=0;)
+        for (int i = s->sAttacks.size(); --i>=0;)
         {
-            if (s->getAttacks()[i] != sAttacks[i])
+            if (s->sAttacks[i] != sAttacks[i])
             {
                 attack = false;
                 break;
             }
         }
         
-        for (int i = s->getDecays().size(); --i>=0;)
+        for (int i = s->sDecays.size(); --i>=0;)
         {
-            if (s->getDecays()[i] != sDecays[i])
+            if (s->sDecays[i] != sDecays[i])
             {
                 decay = false;
                 break;
             }
         }
         
-        for (int i = s->getSustains().size(); --i>=0;)
+        for (int i = s->sSustains.size(); --i>=0;)
         {
-            if (s->getSustains()[i] != sSustains[i])
+            if (s->sSustains[i] != sSustains[i])
             {
                 sustain = false;
                 break;
             }
         }
         
-        for (int i = s->getReleases().size(); --i>=0;)
+        for (int i = s->sReleases.size(); --i>=0;)
         {
-            if (s->getReleases()[i] != sReleases[i])
+            if (s->sReleases[i] != sReleases[i])
             {
                 release = false;
                 break;
             }
         }
         
-        for (int i = s->getEnvelopesOn().size(); --i>=0;)
+        for (int i = s->envelopeOn.size(); --i>=0;)
         {
-            if (s->getEnvelopesOn()[i] != envelopeOn[i])
+            if (s->envelopeOn[i] != envelopeOn[i])
             {
                 envelope = false;
                 break;
             }
         }
         
-        return (sNumBeats == s->getNumBeats() &&
-                sClusterMin == s->getClusterMin() &&
-                sClusterMax == s->getClusterMax() &&
-                sClusterCap == s->getClusterCap() &&
-                (sMode == s->getMode()) &&
+        return (sNumBeats == s->sNumBeats &&
+                sClusterMin == s->sClusterMin &&
+                sClusterMax == s->sClusterMax &&
+                sClusterCap == s->sClusterCap &&
+                sMode == s->sMode &&
                 transp && lens && accents && beats && attack && decay && sustain && release &&
                 transpStates && lensStates && accentsStates && beatsStates &&
                 sGain == s->sGain &&
                 sBlendronicGain == s->sBlendronicGain &&
-                sTranspUsesTuning == s->getTranspUsesTuning() &&
-                sClusterThresh == s->getClusterThreshMS() &&
-                sClusterThreshSec == s->getClusterThreshSEC() &&
-                sReleaseVelocitySetsSynchronic == s->getReleaseVelocitySetsSynchronic() &&
-                numClusters == s->getNumClusters() &&
-                onOffMode == s->getOnOffMode() &&
-                holdMin == s->getHoldMin() &&
-                holdMax == s->getHoldMax() &&
-                velocityMin == s->getVelocityMin() &&
-                velocityMax == s->getVelocityMax() &&
+                sTranspUsesTuning == s->sTranspUsesTuning &&
+                sClusterThresh == s->sClusterThresh &&
+                sClusterThreshSec == s->sClusterThreshSec &&
+                sReleaseVelocitySetsSynchronic == s->sReleaseVelocitySetsSynchronic &&
+                numClusters == s->numClusters &&
+                onOffMode == s->onOffMode &&
+                holdMin == s->holdMin &&
+                holdMax == s->holdMax &&
+                velocityMin == s->velocityMin &&
+                velocityMax == s->velocityMax &&
                 targetTypeSynchronicPatternSync == s->getTargetTypeSynchronicPatternSync() &&
                 targetTypeSynchronicBeatSync == s->getTargetTypeSynchronicBeatSync() &&
                 targetTypeSynchronicAddNotes == s->getTargetTypeSynchronicAddNotes() &&
@@ -534,15 +532,15 @@ public:
 		sTransposition.clear();
 		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
 		{
-			Array<float> transposition;
+			Array<Moddable<float>> transposition;
 			for (int j = 0; j < Random::getSystemRandom().nextInt(10); j++)
 			{
-				transposition.add(i, (Random::getSystemRandom().nextFloat()) * 48.0f - 24.0f);
+				transposition.add(i, Moddable<float>((Random::getSystemRandom().nextFloat()) * 48.0f - 24.0f));
 			}
 			sTransposition.add(transposition);
 		}
 		sClusterThresh = (r[idx++] * 2000) + 1;
-		sClusterThreshSec = sClusterThresh * 0.001f;
+		sClusterThreshSec = sClusterThresh.value * 0.001f;
 		sReleaseVelocitySetsSynchronic = (bool)((int)(r[idx++] * 2));
 
 		int numEnvelopes = 12;
@@ -576,57 +574,31 @@ public:
 		}
 	}
     
-    //inline const float getTempo() const noexcept                       {return sTempo;               }
-    inline const int getNumBeats() const noexcept                      {return sNumBeats;              }
-    inline const int getClusterMin() const noexcept                    {return sClusterMin;            }
-    inline const int getClusterMax() const noexcept                    {return sClusterMax;            }
-    inline const int getClusterCap() const noexcept                    {return sClusterCap;            }
-    inline const float getClusterThreshSEC() const noexcept            {return sClusterThreshSec;      }
-    inline const float getClusterThreshMS() const noexcept             {return sClusterThresh;         }
-    inline const SynchronicSyncMode getMode() const noexcept           {return sMode;                  }
-    inline const Array<float> getBeatMultipliers() const noexcept      {return sBeatMultipliers;       }
-    inline const int getBeatsToSkip() const noexcept                   {return sBeatsToSkip;           }
     inline const int getOffsetParamToggle() const noexcept
     {
-        if(getMode() == FirstNoteOnSync || getMode() == AnyNoteOnSync) return getBeatsToSkip() + 1;
-        else return getBeatsToSkip();
+        if(sMode == FirstNoteOnSync || sMode == AnyNoteOnSync) return sBeatsToSkip.value + 1;
+        else return sBeatsToSkip.value;
     }
     
-    inline const Array<float> getAccentMultipliers() const noexcept    {return sAccentMultipliers;     }
-    inline const Array<float> getLengthMultipliers() const noexcept    {return sLengthMultipliers;     }
-    inline const Array<Array<float>> getTransposition() const noexcept {return sTransposition;         }
-    inline const bool getTranspUsesTuning() const noexcept             {return sTranspUsesTuning;}
-    inline const bool getReleaseVelocitySetsSynchronic() const noexcept{return sReleaseVelocitySetsSynchronic; }
     inline float* getGainPtr() { return &sGain.value; }
     inline float* getBlendronicGainPtr() { return &sBlendronicGain.value; }
     
-    inline const Array<bool> getAccentMultipliersStates() const noexcept {return sAccentMultipliersStates; }
-    inline const Array<bool> getBeatMultipliersStates() const noexcept {return sBeatMultipliersStates; }
-    inline const Array<bool> getLengthMultipliersStates() const noexcept {return sLengthMultipliersStates; }
-    inline const Array<bool> getTranspositionStates() const noexcept {return sTranspositionStates; }
+    inline const int getAttack(int which) const noexcept    {return sAttacks[which].value;}
+    inline const int getDecay(int which) const noexcept     {return sDecays[which].value;}
+    inline const float getSustain(int which) const noexcept {return sSustains[which].value;}
+    inline const int getRelease(int which) const noexcept   {return sReleases[which].value;}
     
-    inline const Array<int> getAttacks() const noexcept         {return sAttacks;   }
-    inline const Array<int> getDecays() const noexcept          {return sDecays;    }
-    inline const Array<float> getSustains() const noexcept      {return sSustains;  }
-    inline const Array<int> getReleases() const noexcept        {return sReleases;  }
-    inline const Array<bool> getEnvelopesOn() const noexcept    {return envelopeOn; }
-    
-    inline const int getAttack(int which) const noexcept    {return sAttacks[which];}
-    inline const int getDecay(int which) const noexcept     {return sDecays[which];}
-    inline const float getSustain(int which) const noexcept {return sSustains[which];}
-    inline const int getRelease(int which) const noexcept   {return sReleases[which];}
-    
-    inline const Array<Array<float>> getADSRs() const noexcept
+    inline const Array<Array<Moddable<float>>> getADSRs() const noexcept
     {
-        Array<Array<float>> allADSRs;
+        Array<Array<Moddable<float>>> allADSRs;
         for(int i=0; i<sAttacks.size(); i++)
         {
-            Array<float> singleADSR;
+            Array<Moddable<float>> singleADSR;
             singleADSR.insert(0, sAttacks[i]);
             singleADSR.insert(1, sDecays[i]);
             singleADSR.insert(2, sSustains[i]);
             singleADSR.insert(3, sReleases[i]);
-            if(envelopeOn[i])singleADSR.insert(4, 1);
+            if(envelopeOn[i].value)singleADSR.insert(4, 1);
             else singleADSR.insert(4, 0);
             
             allADSRs.insert(i, singleADSR);
@@ -635,60 +607,153 @@ public:
         return allADSRs;
     }
     
-    inline const bool getEnvelopeOn(int which) const noexcept   {return envelopeOn[which];}
+    inline const bool getEnvelopeOn(int which) const noexcept   { return envelopeOn[which].value; }
     
     inline void setClusterThresh(float clusterThresh)
     {
         sClusterThresh = clusterThresh;
-        sClusterThreshSec = sClusterThresh * .001;
+        sClusterThreshSec = sClusterThresh.base * .001;
     }
     
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
+
+    inline void setBeatMultipliers(Array<Moddable<float>> beatMultipliers)
+    {
+        sBeatMultipliers.clear();
+        for (auto f : beatMultipliers) sBeatMultipliers.add(f);
+    }
+    inline void setAccentMultipliers(Array<Moddable<float>> accentMultipliers)
+    {
+        sAccentMultipliers.clear();
+        for (auto f : accentMultipliers) sAccentMultipliers.add(f);
+    }
+    inline void setTransposition(Array<Array<Moddable<float>>> transp)
+    {
+        sTransposition.clear();
+        for (auto a : transp)
+        {
+            Array<Moddable<float>> arr;
+            for (auto f : a) arr.add(f);
+            sTransposition.add(arr);
+        }
+    }
+    inline void setLengthMultipliers(Array<Moddable<float>> lengthMultipliers)
+    {
+        sLengthMultipliers.clear();
+        for (auto f : lengthMultipliers) sLengthMultipliers.add(f);
+    }
+    inline void setBeatMultipliersStates(Array<Moddable<bool>> beatMultipliers)
+    {
+        sBeatMultipliersStates.clear();
+        for (auto b : beatMultipliers) sBeatMultipliersStates.add(b);
+    }
+    inline void setAccentMultipliersStates(Array<Moddable<bool>> accentMultipliers)
+    {
+        sAccentMultipliersStates.clear();
+        for (auto b : accentMultipliers) sAccentMultipliersStates.add(b);
+    }
+    inline void setTranspositionStates(Array<Moddable<bool>> transp)
+    {
+        sTranspositionStates.clear();
+        for (auto b : transp) sTranspositionStates.add(b);
+    }
+    inline void setLengthMultipliersStates(Array<Moddable<bool>> lengthMultipliers)
+    {
+        sLengthMultipliersStates.clear();
+        for (auto b : lengthMultipliers) sLengthMultipliersStates.add(b);
+    }
     
-    inline void setNumBeats(int numBeats)                              {sNumBeats = numBeats;                              }
-    inline void setClusterMin(int clusterMin)                          {sClusterMin = clusterMin;                          }
-    inline void setClusterMax(int clusterMax)                          {sClusterMax = clusterMax;                          }
-    inline void setClusterCap(int clusterCap)                          {sClusterCap = clusterCap;                          }
-    inline void setMode(SynchronicSyncMode mode)                       {sMode = mode;                                      }
-    inline void setBeatsToSkip(int beatsToSkip)                        {sBeatsToSkip = beatsToSkip;                        }
-    inline void setBeatMultipliers(Array<float> beatMultipliers)       {sBeatMultipliers.swapWith(beatMultipliers);        }
-    inline void setAccentMultipliers(Array<float> accentMultipliers)   {sAccentMultipliers.swapWith(accentMultipliers);    }
-    inline void setTransposition(Array<Array<float>> transp)           {sTransposition.swapWith(transp);                   }
-    inline void setTranspUsesTuning(bool val)                          {sTranspUsesTuning = val;                           }
-    inline void setLengthMultipliers(Array<float> lengthMultipliers)   {sLengthMultipliers.swapWith(lengthMultipliers);    }
+    inline void setBeatMultipliers(Array<float> beatMultipliers)
+    {
+        sBeatMultipliers.clear();
+        for (auto f : beatMultipliers) sBeatMultipliers.add(f);
+    }
+    inline void setAccentMultipliers(Array<float> accentMultipliers)
+    {
+        sAccentMultipliers.clear();
+        for (auto f : accentMultipliers) sAccentMultipliers.add(f);
+    }
+    inline void setTransposition(Array<Array<float>> transp)
+    {
+        sTransposition.clear();
+        for (auto a : transp)
+        {
+            Array<Moddable<float>> arr;
+            for (auto f : a) arr.add(f);
+            sTransposition.add(arr);
+        }
+    }
+    inline void setLengthMultipliers(Array<float> lengthMultipliers)
+    {
+        sLengthMultipliers.clear();
+        for (auto f : lengthMultipliers) sLengthMultipliers.add(f);
+    }
+    inline void setBeatMultipliersStates(Array<bool> beatMultipliers)
+    {
+        sBeatMultipliersStates.clear();
+        for (auto b : beatMultipliers) sBeatMultipliersStates.add(b);
+    }
+    inline void setAccentMultipliersStates(Array<bool> accentMultipliers)
+    {
+        sAccentMultipliersStates.clear();
+        for (auto b : accentMultipliers) sAccentMultipliersStates.add(b);
+    }
+    inline void setTranspositionStates(Array<bool> transp)
+    {
+        sTranspositionStates.clear();
+        for (auto b : transp) sTranspositionStates.add(b);
+    }
+    inline void setLengthMultipliersStates(Array<bool> lengthMultipliers)
+    {
+        sLengthMultipliersStates.clear();
+        for (auto b : lengthMultipliers) sLengthMultipliersStates.add(b);
+    }
     
-    inline void setBeatMultipliersStates(Array<bool> beatMultipliers)       {sBeatMultipliersStates.swapWith(beatMultipliers);        }
-    inline void setAccentMultipliersStates(Array<bool> accentMultipliers)   {sAccentMultipliersStates.swapWith(accentMultipliers);    }
-    inline void setTranspositionStates(Array<bool> transp)                  {sTranspositionStates.swapWith(transp);                   }
-    inline void setLengthMultipliersStates(Array<bool> lengthMultipliers)   {sLengthMultipliersStates.swapWith(lengthMultipliers);    }
+    inline void setBeatMultiplier(int whichSlider, float value)
+    {
+        sBeatMultipliers.set(whichSlider, value);
+    }
+    inline void setAccentMultiplier(int whichSlider, float value)
+    {
+        sAccentMultipliers.set(whichSlider, value);
+    }
+    inline void setLengthMultiplier(int whichSlider, float value)
+    {
+        sLengthMultipliers.set(whichSlider, value);
+    }
+    inline void setSingleTransposition(int whichSlider, Array<float> values)
+    {
+        Array<Moddable<float>> arr;
+        for (auto v : values) arr.add(v);
+        sTransposition.set(whichSlider, arr);
+    }
     
-    inline void setBeatMultiplier(int whichSlider, float value)        {sBeatMultipliers.set(whichSlider, value);           }
-    inline void setAccentMultiplier(int whichSlider, float value)      {sAccentMultipliers.set(whichSlider, value);         }
-    inline void setLengthMultiplier(int whichSlider, float value)      {sLengthMultipliers.set(whichSlider, value);         }
-    inline void setSingleTransposition(int whichSlider, Array<float> values) {sTransposition.set(whichSlider, values); }
-    inline void setReleaseVelocitySetsSynchronic(bool rvss)            {sReleaseVelocitySetsSynchronic = rvss;          }
-    inline void setGain(float gain)                                    {sGain = gain;               }
-    inline void setBlendronicGain(float gain)                          {sBlendronicGain = gain;     }
-    
-    inline void setAttacks(Array<int> attacks)      {sAttacks.swapWith(attacks);    }
-    inline void setDecays(Array<int> decays)        {sDecays.swapWith(decays);      }
-    inline void setSustains(Array<float> sustains)  {sSustains.swapWith(sustains);  }
-    inline void setReleases(Array<int> releases)    {sReleases.swapWith(releases);  }
+    inline void setAttacks(Array<int> attacks)
+    {
+        sAttacks.clear();
+        for (auto f : attacks) sAttacks.add(Moddable<float>(f));
+    }
+    inline void setDecays(Array<int> decays)
+    {
+        sDecays.clear();
+        for (auto f : decays) sDecays.add(Moddable<float>(f));
+    }
+    inline void setSustains(Array<float> sustains)
+    {
+        sSustains.clear();
+        for (auto f : sustains) sSustains.add(Moddable<float>(f));
+    }
+    inline void setReleases(Array<int> releases)
+    {
+        sReleases.clear();
+        for (auto f : releases) sReleases.add(Moddable<float>(f));
+    }
     
     inline void setAttack(int which, int val)       {sAttacks.set(which, val);}
     inline void setDecay(int which, int val)        {sDecays.set(which, val);}
     inline void setSustain(int which, float val)    {sSustains.set(which, val);}
     inline void setRelease(int which, int val)      {sReleases.set(which, val);}
-    
-    inline const int getHoldMin() const noexcept { return holdMin; }
-    inline const int getHoldMax() const noexcept { return holdMax; }
-    
-    inline const void setHoldMin(int min)  { holdMin = min; }
-    inline const void setHoldMax(int max)  { holdMax = max; }
-    
-    inline const int getVelocityMin() const noexcept { return velocityMin; }
-    inline const int getVelocityMax() const noexcept { return velocityMax; }
     
     inline const TargetNoteMode getTargetTypeSynchronicPatternSync() const noexcept { return targetTypeSynchronicPatternSync; }
     inline const TargetNoteMode getTargetTypeSynchronicBeatSync() const noexcept { return targetTypeSynchronicBeatSync; }
@@ -749,27 +814,6 @@ public:
 		sReleases.clear();
 		envelopeOn.clear();
 	}
-    
-    inline void setOnOffMode(SynchronicOnOffMode oo)
-    {
-        onOffMode = oo;
-    }
-    
-    inline SynchronicOnOffMode getOnOffMode(void)
-    {
-        return onOffMode;
-    }
-    
-    inline void setNumClusters(int c)
-    {
-        numClusters = c;
-        // DBG("setNumClusters = " + String(c));
-    }
-    
-    inline int getNumClusters(void)
-    {
-        return numClusters;
-    }
 
     inline void setADSRs(Array<Array<float>> allADSRs)
     {
@@ -800,11 +844,10 @@ public:
     
     inline void setEnvelopeOn(int which, bool val)  {envelopeOn.set(which, val);}
     
-    inline const std::shared_ptr<MidiOutput> getMidiOutput() const noexcept { return midiOutput; }
     inline const void setMidiOutput(MidiDeviceInfo device)
     {
         midiOutput = MidiOutput::openDevice(device.identifier);
-        if (!midiOutput) midiOutput = nullptr;
+        if (!midiOutput.value) midiOutput = nullptr;
     }
     inline const void setMidiOutput(std::shared_ptr<MidiOutput> output)
     {
@@ -814,15 +857,15 @@ public:
     void print(void)
     {
         DBG("| - - - Synchronic Preparation - - - |");
-        DBG("sTempo: " + String(sTempo));
-        DBG("sNumBeats: " + String(sNumBeats));
-        DBG("sClusterMin: " + String(sClusterMin));
-        DBG("sClusterMax: " + String(sClusterMax));
-        DBG("sClusterCap: " + String(sClusterCap));
-        DBG("sClusterThresh: " + String(sClusterThresh));
-        DBG("sReleaseVelocitySetsSynchronic: " + String((int)sReleaseVelocitySetsSynchronic));
-        DBG("sMode: " + String(sMode));
-        DBG("sBeatsToSkip: " + String(sBeatsToSkip));
+        DBG("sTempo: " + String(sTempo.value));
+        DBG("sNumBeats: " + String(sNumBeats.value));
+        DBG("sClusterMin: " + String(sClusterMin.value));
+        DBG("sClusterMax: " + String(sClusterMax.value));
+        DBG("sClusterCap: " + String(sClusterCap.value));
+        DBG("sClusterThresh: " + String(sClusterThresh.value));
+        DBG("sReleaseVelocitySetsSynchronic: " + String((int)sReleaseVelocitySetsSynchronic.value));
+        DBG("sMode: " + String(sMode.value));
+        DBG("sBeatsToSkip: " + String(sBeatsToSkip.value));
         DBG("sBeatMultipliers: " + floatArrayToString(sBeatMultipliers));
         DBG("sLengthMultipliers: " + floatArrayToString(sLengthMultipliers));
         DBG("sAccentMultipliers: " + floatArrayToString(sAccentMultipliers));
@@ -831,7 +874,7 @@ public:
         for (auto arr : sTransposition) s += "{ " + floatArrayToString(arr) + " },\n";
         DBG("sTransposition: " + s);
         
-        DBG("sClusterThreshSec: " + String(sClusterThreshSec));
+        DBG("sClusterThreshSec: " + String(sClusterThreshSec.value));
         //DBG("resetKeymap: " + intArrayToString(getResetMap()->keys()));
         DBG("| - - - - - - - - -- - - - - - - - - |");
     }
@@ -842,23 +885,24 @@ public:
         
         sGain.getState(prep, ptagSynchronic_gain);
         sBlendronicGain.getState(prep, ptagSynchronic_blendronicGain);
-        prep.setProperty( ptagSynchronic_numBeats,            getNumBeats(), 0);
-        prep.setProperty( ptagSynchronic_clusterMin,          getClusterMin(), 0);
-        prep.setProperty( ptagSynchronic_clusterMax,          getClusterMax(), 0);
-        prep.setProperty( ptagSynchronic_clusterCap,          getClusterCap(), 0);
-        prep.setProperty( ptagSynchronic_clusterThresh,       getClusterThreshMS(), 0);
-        prep.setProperty( ptagSynchronic_mode,                getMode(), 0);
-        prep.setProperty( ptagSynchronic_beatsToSkip,         getBeatsToSkip(), 0);
-        prep.setProperty( ptagSynchronic_transpUsesTuning,    getTranspUsesTuning() ? 1 : 0, 0);
         
-        prep.setProperty( "numClusters", getNumClusters(), 0);
-        prep.setProperty( "onOffMode", getOnOffMode(), 0);
+        sNumBeats.getState(prep, ptagSynchronic_numBeats);
+        sClusterMin.getState(prep, ptagSynchronic_clusterMin);
+        sClusterMax.getState(prep, ptagSynchronic_clusterMax);
+        sClusterCap.getState(prep, ptagSynchronic_clusterCap);
+        sClusterThresh.getState(prep, ptagSynchronic_clusterThresh);
+        sMode.getState(prep, ptagSynchronic_mode);
+        sBeatsToSkip.getState(prep, ptagSynchronic_beatsToSkip);
+        sTranspUsesTuning.getState(prep, ptagSynchronic_transpUsesTuning);
+
+        numClusters.getState(prep, "numClusters");
+        onOffMode.getState(prep, "onOffMode");
         
-        prep.setProperty( "holdMin", getHoldMin(), 0);
-        prep.setProperty( "holdMax", getHoldMax(), 0);
+        holdMin.getState(prep, "holdMin");
+        holdMax.getState(prep, "holdMax");
         
-        prep.setProperty( "velocityMin", getVelocityMin(), 0);
-        prep.setProperty( "velocityMax", getVelocityMax(), 0);
+        velocityMin.getState(prep, "velocityMin");
+        velocityMax.getState(prep, "velocityMax");
 
         prep.setProperty( ptagSynchronic_targetPatternSync, getTargetTypeSynchronicPatternSync(), 0);
         prep.setProperty( ptagSynchronic_targetBeatSync, getTargetTypeSynchronicBeatSync(), 0);
@@ -871,51 +915,51 @@ public:
                  
         ValueTree beatMults( vtagSynchronic_beatMults);
         int count = 0;
-        for (auto f : getBeatMultipliers())
+        for (auto f : sBeatMultipliers)
         {
-            beatMults.setProperty( ptagFloat + String(count++), f, 0);
+            f.getState(beatMults, ptagFloat + String(count++));
         }
         prep.addChild(beatMults, -1, 0);
         
         ValueTree beatMultsStates( vtagSynchronic_beatMultsStates);
         count = 0;
-        for (auto f : getBeatMultipliersStates())
+        for (auto f : sBeatMultipliersStates)
         {
-            beatMultsStates.setProperty( ptagBool + String(count++), f ? 1 : 0, 0);
+            f.getState(beatMultsStates, ptagBool + String(count++));
         }
         prep.addChild(beatMultsStates, -1, 0);
         
         
         ValueTree lenMults( vtagSynchronic_lengthMults);
         count = 0;
-        for (auto f : getLengthMultipliers())
+        for (auto f : sLengthMultipliers)
         {
-            lenMults.setProperty( ptagFloat + String(count++), f, 0);
+            f.getState(lenMults, ptagFloat + String(count++));
         }
         prep.addChild(lenMults, -1, 0);
         
         ValueTree lenMultsStates( vtagSynchronic_lengthMultsStates);
         count = 0;
-        for (auto f : getLengthMultipliersStates())
+        for (auto f : sLengthMultipliersStates)
         {
-            lenMultsStates.setProperty( ptagBool + String(count++), f ? 1 : 0, 0);
+            f.getState(lenMultsStates, ptagBool + String(count++));
         }
         prep.addChild(lenMultsStates, -1, 0);
         
         
         ValueTree accentMults( vtagSynchronic_accentMults);
         count = 0;
-        for (auto f : getAccentMultipliers())
+        for (auto f : sAccentMultipliers)
         {
-            accentMults.setProperty( ptagFloat + String(count++), f, 0);
+            f.getState(accentMults, ptagFloat + String(count++));
         }
         prep.addChild(accentMults, -1, 0);
         
         ValueTree accentMultsStates( vtagSynchronic_accentMultsStates);
         count = 0;
-        for (auto f : getAccentMultipliersStates())
+        for (auto f : sAccentMultipliersStates)
         {
-            accentMultsStates.setProperty( ptagBool + String(count++), f ? 1 : 0, 0);
+            f.getState(accentMultsStates, ptagBool + String(count++));
         }
         prep.addChild(accentMultsStates, -1, 0);
         
@@ -923,20 +967,20 @@ public:
         ValueTree transposition( vtagSynchronic_transpOffsets);
         
         int tcount = 0;
-        for (auto arr : getTransposition())
+        for (auto arr : sTransposition)
         {
             ValueTree t("t"+String(tcount++));
             count = 0;
-            for (auto f : arr)  t.setProperty( ptagFloat + String(count++), f, 0);
+            for (auto f : arr)  f.getState(t, ptagFloat + String(count++));
             transposition.addChild(t,-1,0);
         }
         prep.addChild(transposition, -1, 0);
         
         ValueTree transpositionStates( vtagSynchronic_transpOffsetsStates);
         count = 0;
-        for (auto f : getTranspositionStates())
+        for (auto f : sTranspositionStates)
         {
-            transpositionStates.setProperty( ptagBool + String(count++), f ? 1 : 0, 0);
+            f.getState(transpositionStates, ptagBool + String(count++));
         }
         prep.addChild(transpositionStates, -1, 0);
 
@@ -947,13 +991,13 @@ public:
         {
             ValueTree e("e"+String(tcount++));
             count = 0;
-            for (auto f : arr)  e.setProperty( ptagFloat + String(count++), f, 0);
+            for (auto f : arr)  f.getState(e, ptagFloat + String(count++));
             ADSRs.addChild(e,-1,0);
         }
         prep.addChild(ADSRs, -1, 0);
         
-        prep.setProperty( ptagSynchronic_useGlobalSoundSet, getUseGlobalSoundSet() ? 1 : 0, 0);
-        prep.setProperty(ptagSynchronic_soundSet, getSoundSetName(), 0);
+        sUseGlobalSoundSet.getState(prep, ptagSynchronic_useGlobalSoundSet);
+        sSoundSetName.getState(prep, ptagSynchronic_soundSet);
         
         return prep;
     }
@@ -964,259 +1008,146 @@ public:
         
         sGain.setState(e, ptagSynchronic_gain, 1.0f);
         sBlendronicGain.setState(e, ptagSynchronic_blendronicGain, 1.0f);
-        
-        i = e->getStringAttribute(ptagSynchronic_numBeats).getIntValue();
-        setNumBeats(i);
-        
-        i = e->getStringAttribute(ptagSynchronic_clusterMin).getIntValue();
-        setClusterMin(i);
-        
-        i = e->getStringAttribute(ptagSynchronic_clusterMax).getIntValue();
-        setClusterMax(i);
-        
-        //i = e->getStringAttribute(ptagSynchronic_clusterCap).getIntValue();
-        n = e->getStringAttribute(ptagSynchronic_clusterCap);
-        if (n != "")    setClusterCap(n.getIntValue());
-        else            setClusterCap(8);
-        
-        n = e->getStringAttribute("holdMin");
-        
-        if (n != "")    setHoldMin(n.getIntValue());
-        else            setHoldMin(0);
-        
-        n = e->getStringAttribute("holdMax");
-        
-        if (n != "")    setHoldMax(n.getIntValue());
-        else            setHoldMax(12000);
-        
-        n = e->getStringAttribute("velocityMin");
-        
-        if (n != "")    setVelocityMin(n.getIntValue());
-        else            setVelocityMin(0);
-        
-        n = e->getStringAttribute("velocityMax");
-        
-        if (n != "")    setVelocityMax(n.getIntValue());
-        else            setVelocityMax(127);
-        
-        f = e->getStringAttribute(ptagSynchronic_clusterThresh).getFloatValue();
-        setClusterThresh(f);
-        
-        i = e->getStringAttribute(ptagSynchronic_mode).getIntValue();
-        setMode((SynchronicSyncMode) i);
-        
-        i = e->getStringAttribute(ptagSynchronic_beatsToSkip).getIntValue();
-        setBeatsToSkip(i);
-        
-        n = e->getStringAttribute("numClusters");
-        if (n != String())     setNumClusters(n.getIntValue());
-        else                   setNumClusters(1);
-        
-        n = e->getStringAttribute("onOffMode");
-        if (n != String())     setOnOffMode((SynchronicOnOffMode) n.getIntValue());
-        else                   setOnOffMode(KeyOn);
-        
-        i = e->getStringAttribute(ptagSynchronic_targetPatternSync).getIntValue();
-        setTargetTypeSynchronicPatternSync((TargetNoteMode)i);
-        
-        i = e->getStringAttribute(ptagSynchronic_targetBeatSync).getIntValue();
-        setTargetTypeSynchronicBeatSync((TargetNoteMode)i);
-        
-        i = e->getStringAttribute(ptagSynchronic_targetAddNotes).getIntValue();
-        setTargetTypeSynchronicAddNotes((TargetNoteMode)i);
-        
-        i = e->getStringAttribute(ptagSynchronic_targetClear).getIntValue();
-        setTargetTypeSynchronicClear((TargetNoteMode)i);
-        
-        i = e->getStringAttribute(ptagSynchronic_targetPausePlay).getIntValue();
-        setTargetTypeSynchronicPausePlay((TargetNoteMode)i);
-        
-        i = e->getStringAttribute(ptagSynchronic_targetDeleteOldest).getIntValue();
-        setTargetTypeSynchronicDeleteOldest((TargetNoteMode)i);
-        
-        i = e->getStringAttribute(ptagSynchronic_targetDeleteNewest).getIntValue();
-        setTargetTypeSynchronicDeleteNewest((TargetNoteMode)i);
-        
-        i = e->getStringAttribute(ptagSynchronic_targetRotate).getIntValue();
-        setTargetTypeSynchronicRotate((TargetNoteMode)i);
-        
-        String str = e->getStringAttribute(ptagSynchronic_transpUsesTuning);
-        if (str != "") setTranspUsesTuning((bool) str.getIntValue());
-        else setTranspUsesTuning(false);
-        
-        str = e->getStringAttribute(ptagSynchronic_useGlobalSoundSet);
-        if (str != "") setUseGlobalSoundSet((bool) str.getIntValue());
-        else setUseGlobalSoundSet(true);
-        
-        str = e->getStringAttribute(ptagSynchronic_soundSet);
-        setSoundSetName(str);
  
+
+//        holdMin(0),
+//        holdMax(12000),
+//        velocityMin(0),
+//        velocityMax(127),
+//        sMode(FirstNoteOnSync),
+//        sBeatsToSkip(0),
+//        onOffMode(KeyOn),
+//        sTranspUsesTuning(false),
+        
+//        sClusterThreshSec(.001 * sClusterThresh.base),
+//        midiOutput(nullptr),
+//        sUseGlobalSoundSet(true),
+//        sSoundSet(-1),
+        
+        sNumBeats.setState(e, ptagSynchronic_numBeats, 20);
+        sClusterMin.setState(e, ptagSynchronic_clusterMin, 1);
+        sClusterMax.setState(e, ptagSynchronic_clusterMax, 12);
+        sClusterCap.setState(e, ptagSynchronic_clusterCap, 8);
+        sClusterThresh.setState(e, ptagSynchronic_clusterThresh, 500);
+        setClusterThresh(sClusterThresh.base);
+        numClusters.setState(e, "numClusters", 1);
+        
+        holdMin.setState(e, "holdMin", 0);
+        holdMax.setState(e, "holdMax", 12000);
+
+        velocityMin.setState(e, "velocityMin", 0);
+        velocityMax.setState(e, "velocityMax", 127);
+        
+        sMode.setState(e, ptagSynchronic_mode, FirstNoteOnSync);
+        sBeatsToSkip.setState(e, ptagSynchronic_beatsToSkip, 0);
+        onOffMode.setState(e, "onOffMode", KeyOn);
+        
+        sTranspUsesTuning.setState(e, ptagSynchronic_transpUsesTuning, false);
+        sUseGlobalSoundSet.setState(e, ptagSynchronic_useGlobalSoundSet, true);
+        sSoundSetName.setState(e, ptagSynchronic_soundSet, String());
+
         forEachXmlChildElement (*e, sub)
         {
             if (sub->hasTagName(vtagSynchronic_beatMults))
             {
-                Array<float> beats;
-                Array<bool> beatstates;
+                sBeatMultipliers.clear();
+                // for pre-v.2.5.2, when we didn't save beatstates
+                sBeatMultipliersStates.clear();
                 for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        beats.add(f);
-                        beatstates.add(true); // for pre-v.2.5.2, when we didn't save beatstates
-                    }
+                    Moddable<float> f;
+                    f.setState(sub, ptagFloat + String(k), 1.0);
+                    sBeatMultipliers.add(f);
+                    // for pre-v.2.5.2, when we didn't save beatstates
+                    sBeatMultipliersStates.add(Moddable<bool>(true));
                 }
-                
-                setBeatMultipliers(beats);
-                setBeatMultipliersStates(beatstates);
-                
             }
             else if (sub->hasTagName(vtagSynchronic_beatMultsStates))
             {
-                Array<bool> beatstates;
+                sBeatMultipliersStates.clear();
                 for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
-                    String attr = sub->getStringAttribute(ptagBool + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = (bool)attr.getIntValue();
-                        beatstates.add(f);
-                    }
+                    Moddable<bool> b;
+                    b.setState(sub, ptagBool + String(k), false);
+                    sBeatMultipliersStates.add(b);
                 }
-                
-                setBeatMultipliersStates(beatstates);
-                
             }
             else  if (sub->hasTagName(vtagSynchronic_accentMults))
             {
-                Array<float> accents;
-                Array<bool> accentsstates;
+                sAccentMultipliers.clear();
+                sAccentMultipliersStates.clear();
                 for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        accents.add(f);
-                        accentsstates.add(true);
-                    }
+                    Moddable<float> f;
+                    f.setState(sub, ptagFloat + String(k), 1.0);
+                    sAccentMultipliers.add(f);
+                    // for pre-v.2.5.2, when we didn't save beatstates
+                    sAccentMultipliersStates.add(Moddable<bool>(true));
                 }
-                
-                setAccentMultipliers(accents);
-                setAccentMultipliersStates(accentsstates);
-                
             }
             else if (sub->hasTagName(vtagSynchronic_accentMultsStates))
             {
-                Array<bool> accentsstates;
+                sAccentMultipliersStates.clear();
                 for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
-                    String attr = sub->getStringAttribute(ptagBool + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = (bool)attr.getIntValue();
-                        accentsstates.add(f);
-                    }
+                    Moddable<bool> b;
+                    b.setState(sub, ptagBool + String(k), false);
+                    sAccentMultipliersStates.add(b);
                 }
-                
-                setAccentMultipliersStates(accentsstates);
-                
             }
             else  if (sub->hasTagName(vtagSynchronic_lengthMults))
             {
-                Array<float> lens;
-                Array<bool> lengthstates;
+                sLengthMultipliers.clear();
+                sLengthMultipliersStates.clear();
                 for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        lens.add(f);
-                        lengthstates.add(true);
-                    }
+                    Moddable<float> f;
+                    f.setState(sub, ptagFloat + String(k), 1.0);
+                    sLengthMultipliers.add(f);
+                    // for pre-v.2.5.2, when we didn't save beatstates
+                    sLengthMultipliersStates.add(Moddable<bool>(true));
                 }
-                
-                setLengthMultipliers(lens);
-                setLengthMultipliersStates(lengthstates);
-                
             }
             else if (sub->hasTagName(vtagSynchronic_lengthMultsStates))
             {
-                Array<bool> lengthstates;
+                sLengthMultipliersStates.clear();
                 for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
-                    String attr = sub->getStringAttribute(ptagBool + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = (bool)attr.getIntValue();
-                        lengthstates.add(f);
-                    }
+                    Moddable<bool> b;
+                    b.setState(sub, ptagBool + String(k), false);
+                    sLengthMultipliersStates.add(b);
                 }
-                
-                setLengthMultipliersStates(lengthstates);
-                
             }
             else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
             {
-                Array<Array<float>> atransp;
-                Array<bool> transpsstates;
+                sTransposition.clear();
+                sTranspositionStates.clear();
                 int tcount = 0;
                 forEachXmlChildElement (*sub, asub)
                 {
                     if (asub->hasTagName("t" + String(tcount++)))
                     {
-                        Array<float> transp;
+                        Array<Moddable<float>> arr;
                         for (int k = 0; k < asub->getNumAttributes(); k++)
                         {
-                            String attr = asub->getStringAttribute(ptagFloat + String(k));
-                            
-                            if (attr == String()) break;
-                            else
-                            {
-                                f = attr.getFloatValue();
-                                transp.add(f);
-                            }
+                            Moddable<float> f;
+                            f.setState(asub, ptagFloat + String(k), 0.0);
+                            arr.add(f);
                         }
-                        atransp.set(tcount - 1, transp);
-                        transpsstates.set(tcount -1 , true);
+                        sTransposition.add(arr);
+                        sTranspositionStates.add(true);
                     }
                 }
-                
-                setTransposition(atransp);
-                setTranspositionStates(transpsstates);
-                
             }
             else if (sub->hasTagName(vtagSynchronic_transpOffsetsStates))
             {
-                Array<bool> transpsstates;
+                sTranspositionStates.clear();
                 for (int k = 0; k < sub->getNumAttributes(); k++)
                 {
-                    String attr = sub->getStringAttribute(ptagBool + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = (bool)attr.getIntValue();
-                        transpsstates.add(f);
-                    }
+                    Moddable<bool> b;
+                    b.setState(sub, ptagBool + String(k), false);
+                    sTranspositionStates.add(b);
                 }
-                
-                setTranspositionStates(transpsstates);
-                
             }
             else  if (sub->hasTagName(vtagSynchronic_ADSRs))
             {
@@ -1245,61 +1176,89 @@ public:
                 setADSRs(aADSRs);
             }
         }
+  
+        i = e->getStringAttribute(ptagSynchronic_targetPatternSync).getIntValue();
+        setTargetTypeSynchronicPatternSync((TargetNoteMode)i);
+        
+        i = e->getStringAttribute(ptagSynchronic_targetBeatSync).getIntValue();
+        setTargetTypeSynchronicBeatSync((TargetNoteMode)i);
+        
+        i = e->getStringAttribute(ptagSynchronic_targetAddNotes).getIntValue();
+        setTargetTypeSynchronicAddNotes((TargetNoteMode)i);
+        
+        i = e->getStringAttribute(ptagSynchronic_targetClear).getIntValue();
+        setTargetTypeSynchronicClear((TargetNoteMode)i);
+        
+        i = e->getStringAttribute(ptagSynchronic_targetPausePlay).getIntValue();
+        setTargetTypeSynchronicPausePlay((TargetNoteMode)i);
+        
+        i = e->getStringAttribute(ptagSynchronic_targetDeleteOldest).getIntValue();
+        setTargetTypeSynchronicDeleteOldest((TargetNoteMode)i);
+        
+        i = e->getStringAttribute(ptagSynchronic_targetDeleteNewest).getIntValue();
+        setTargetTypeSynchronicDeleteNewest((TargetNoteMode)i);
+        
+        i = e->getStringAttribute(ptagSynchronic_targetRotate).getIntValue();
+        setTargetTypeSynchronicRotate((TargetNoteMode)i);
     }
     
-    inline void setUseGlobalSoundSet(bool use) { sUseGlobalSoundSet = use; }
     inline void setSoundSet(int Id) { sSoundSet = Id; }
-    inline void setSoundSetName(String name) { sSoundSetName = name; }
+    inline int getSoundSet(void) { return sUseGlobalSoundSet.value ? -1 : sSoundSet.value; }
     
-    inline bool getUseGlobalSoundSet(void) { return sUseGlobalSoundSet; }
-    inline int getSoundSet(void) { return sUseGlobalSoundSet ? -1 : sSoundSet; }
-    inline String getSoundSetName(void) { return sSoundSetName; }
+    bool modded;
     
     Moddable<float> sGain;
     Moddable<float> sBlendronicGain;
     
-private:
-    String name;
-    float sTempo;
-    int sNumBeats,sClusterMin,sClusterMax;
-    int sClusterCap = 8; //max in cluster; 8 in original bK. called Cluster Thickness in v2.4 UI
+    Moddable<float> sTempo;
+    Moddable<int> sNumBeats,sClusterMin,sClusterMax;
+    Moddable<int> sClusterCap = 8; //max in cluster; 8 in original bK. called Cluster Thickness in v2.4 UI
     
-    int numClusters;
+    Moddable<int> numClusters;
     
-    int holdMin, holdMax;
-    int velocityMin, velocityMax;
+    Moddable<int> holdMin, holdMax;
+    Moddable<int> velocityMin, velocityMax;
     
-    SynchronicSyncMode sMode;
-    int sBeatsToSkip;
-    SynchronicOnOffMode onOffMode;
+    Moddable<SynchronicSyncMode> sMode;
+    Moddable<int> sBeatsToSkip;
+    Moddable<SynchronicOnOffMode> onOffMode;
     
     // arrays of step sequencer values
-    Array<float> sBeatMultipliers;      // multiply pulse lengths by these
-    Array<float> sAccentMultipliers;    // multiply velocities by these
-    Array<float> sLengthMultipliers;    // multiply note duration by these
-    Array<Array<float>> sTransposition; // transpose by these
+    Array<Moddable<float>> sBeatMultipliers;      // multiply pulse lengths by these
+    Array<Moddable<float>> sAccentMultipliers;    // multiply velocities by these
+    Array<Moddable<float>> sLengthMultipliers;    // multiply note duration by these
+    Array<Array<Moddable<float>>> sTransposition; // transpose by these
     
     // to remember which sliders are active in the UI
     // true => slider is active, false => slider is inactive
-    Array<bool> sBeatMultipliersStates;
-    Array<bool> sAccentMultipliersStates;
-    Array<bool> sLengthMultipliersStates;
-    Array<bool> sTranspositionStates;
+    Array<Moddable<bool>> sBeatMultipliersStates;
+    Array<Moddable<bool>> sAccentMultipliersStates;
+    Array<Moddable<bool>> sLengthMultipliersStates;
+    Array<Moddable<bool>> sTranspositionStates;
     
     // do the transposition values use the Tuning system, or are they relative to the main played note?
-    bool sTranspUsesTuning;
+    Moddable<bool> sTranspUsesTuning;
     
     // ADSR vals
-    Array<int> sAttacks;
-    Array<int> sDecays;
-    Array<float> sSustains;
-    Array<int> sReleases;
-    Array<bool> envelopeOn;
+    Array<Moddable<float>> sAttacks;
+    Array<Moddable<float>> sDecays;
+    Array<Moddable<float>> sSustains;
+    Array<Moddable<float>> sReleases;
+    Array<Moddable<bool>> envelopeOn;
     
-    float sClusterThresh;      //max time between played notes before new cluster is started, in MS
-    float sClusterThreshSec;
+    Moddable<float> sClusterThresh;      //max time between played notes before new cluster is started, in MS
+    Moddable<float> sClusterThreshSec;
     
-    bool sReleaseVelocitySetsSynchronic;
+    Moddable<bool> sReleaseVelocitySetsSynchronic;
+    
+    Moddable<std::shared_ptr<MidiOutput>> midiOutput;
+    
+    Moddable<bool> sUseGlobalSoundSet;
+    Moddable<int> sSoundSet;
+    Moddable<String> sSoundSetName;
+    
+private:
+    String name;
     
     // stores what kind of note event triggers targeted events (as set in Keymap)
     TargetNoteMode targetTypeSynchronicPatternSync;
@@ -1310,12 +1269,6 @@ private:
     TargetNoteMode targetTypeSynchronicDeleteOldest;
     TargetNoteMode targetTypeSynchronicDeleteNewest;
     TargetNoteMode targetTypeSynchronicRotate;
-
-    std::shared_ptr<MidiOutput> midiOutput;
-    
-    bool sUseGlobalSoundSet;
-    int sSoundSet;
-    String sSoundSetName;
 
     JUCE_LEAK_DETECTOR(SynchronicPreparation);
 };
@@ -1477,7 +1430,7 @@ public:
     
     int getLengthMultiplierCounterForDisplay()
     {
-        int tempsize = prep->getLengthMultipliers().size();
+        int tempsize = prep->sLengthMultipliers.size();
         //int counter = getLengthMultiplierCounter() - 1;
         int counter = getLengthMultiplierCounter() ;
         
@@ -1489,7 +1442,7 @@ public:
     
     int getBeatMultiplierCounterForDisplay()
     {
-        int tempsize = prep->getBeatMultipliers().size();
+        int tempsize = prep->sBeatMultipliers.size();
         int counter = getBeatMultiplierCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
@@ -1500,7 +1453,7 @@ public:
     
     int getAccentMultiplierCounterForDisplay()
     {
-        int tempsize = prep->getAccentMultipliers().size();
+        int tempsize = prep->sAccentMultipliers.size();
         int counter = getAccentMultiplierCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
@@ -1511,7 +1464,7 @@ public:
     
     int getTranspCounterForDisplay()
     {
-        int tempsize = prep->getTransposition().size();
+        int tempsize = prep->sTransposition.size();
         int counter = getTranspCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
@@ -1541,15 +1494,15 @@ public:
         phasor -= numSamplesBeat;
         
         //increment parameter counters
-        if (++lengthMultiplierCounter   >= prep->getLengthMultipliers().size())     lengthMultiplierCounter = 0;
-        if (++accentMultiplierCounter   >= prep->getAccentMultipliers().size())     accentMultiplierCounter = 0;
-        if (++transpCounter             >= prep->getTransposition().size())         transpCounter = 0;
-        if (++envelopeCounter           >= prep->getEnvelopesOn().size())           envelopeCounter = 0;
+        if (++lengthMultiplierCounter   >= prep->sLengthMultipliers.size())     lengthMultiplierCounter = 0;
+        if (++accentMultiplierCounter   >= prep->sAccentMultipliers.size())     accentMultiplierCounter = 0;
+        if (++transpCounter             >= prep->sTransposition.size())         transpCounter = 0;
+        if (++envelopeCounter           >= prep->envelopeOn.size())             envelopeCounter = 0;
         
-        while(!prep->getEnvelopesOn()[envelopeCounter]) //skip untoggled envelopes
+        while(!prep->envelopeOn[envelopeCounter].value) //skip untoggled envelopes
         {
             envelopeCounter++;
-            if (envelopeCounter >= prep->getEnvelopesOn().size()) envelopeCounter = 0;
+            if (envelopeCounter >= prep->envelopeOn.size()) envelopeCounter = 0;
         }
         
     }
@@ -1557,13 +1510,13 @@ public:
     inline void postStep ()
     {
     
-        if (++beatMultiplierCounter >= prep->getBeatMultipliers().size())
+        if (++beatMultiplierCounter >= prep->sBeatMultipliers.size())
         {
             //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
             beatMultiplierCounter = 0;
         }
         
-        if (++beatCounter >= (prep->getNumBeats() + prep->getBeatsToSkip()))
+        if (++beatCounter >= (prep->sNumBeats.value + prep->sBeatsToSkip.value))
         {
             shouldPlay = false;
         }
@@ -1571,14 +1524,19 @@ public:
     
     inline void resetPatternPhase()
     {
-        int skipBeats = prep->getBeatsToSkip() - 1;
+        int skipBeats = prep->sBeatsToSkip.value - 1;
         int idx = (skipBeats < -1) ? -1 : skipBeats;
         
-        if(prep->getBeatMultipliers().size() > 0)   beatMultiplierCounter   = mod(idx, prep->getBeatMultipliers().size());
-        if(prep->getLengthMultipliers().size() > 0) lengthMultiplierCounter = mod(idx, prep->getLengthMultipliers().size());
-        if(prep->getAccentMultipliers().size() > 0) accentMultiplierCounter = mod(idx, prep->getAccentMultipliers().size());
-        if(prep->getTransposition().size() > 0)     transpCounter           = mod(idx, prep->getTransposition().size());
-        if(prep->getEnvelopesOn().size() > 0)       envelopeCounter         = mod(idx, prep->getEnvelopesOn().size());
+        if(prep->sBeatMultipliers.size() > 0)
+            beatMultiplierCounter = mod(idx, prep->sBeatMultipliers.size());
+        if(prep->sLengthMultipliers.size() > 0)
+            lengthMultiplierCounter = mod(idx, prep->sLengthMultipliers.size());
+        if(prep->sAccentMultipliers.size() > 0)
+            accentMultiplierCounter = mod(idx, prep->sAccentMultipliers.size());
+        if(prep->sTransposition.size() > 0)
+            transpCounter = mod(idx, prep->sTransposition.size());
+        if(prep->envelopeOn.size() > 0)
+            envelopeCounter = mod(idx, prep->envelopeOn.size());
 
         // DBG("beatMultiplierCounter = " + String(beatMultiplierCounter));
 
@@ -1705,7 +1663,7 @@ public:
         return lastKeyVelocity;
     }
     
-    inline const SynchronicSyncMode getMode() const noexcept {return synchronic->prep->getMode(); }
+    inline const SynchronicSyncMode getMode() const noexcept {return synchronic->prep->sMode.value; }
 
     inline int getId(void) const noexcept { return synchronic->getId(); }
     

@@ -104,7 +104,7 @@ public:
     
     void performModification(BlendronicPreparation::Ptr b, Array<bool> dirty)
     {
-        if (dirty[BlendronicOutGain]) outGain.modTo(b->outGain);
+        if (dirty[BlendronicOutGain]) outGain.modify(b->outGain, false);
         if (dirty[BlendronicBeats]) {
             bBeats = b->getBeats();
             bBeatsStates = b->getBeatsStates();

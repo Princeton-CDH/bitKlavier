@@ -10,6 +10,57 @@
 
 #include "Nostalgic.h"
 #include "PluginProcessor.h"
+#include "Modification.h"
+
+void NostalgicPreparation::performModification(NostalgicModification* n, Array<bool> dirty)
+{
+    // Should the mod be reversed?
+    bool reverse = n->altMod && modded;
+
+    if (dirty[NostalgicGain]) nGain.modify(n->nGain, reverse);
+    if (dirty[NostalgicBlendronicGain]) nBlendronicGain.modify(n->nBlendronicGain, reverse);
+    if (dirty[NostalgicWaveDistance]) nWaveDistance.modify(n->nWaveDistance, reverse);
+    if (dirty[NostalgicUndertow]) nUndertow.modify(n->nUndertow, reverse);
+    if (dirty[NostalgicTransposition]) nTransposition.modify(n->nTransposition, reverse);
+    if (dirty[NostalgicTranspUsesTuning]) nTranspUsesTuning.modify(n->nTranspUsesTuning, reverse);
+    if (dirty[NostalgicLengthMultiplier]) nLengthMultiplier.modify(n->nLengthMultiplier, reverse);
+    if (dirty[NostalgicBeatsToSkip]) nBeatsToSkip.modify(n->nBeatsToSkip, reverse);
+    if (dirty[NostalgicMode]) nMode.modify(n->nMode, reverse);
+    if (dirty[NostalgicReverseADSR])
+    {
+        nReverseAttack.modify(n->nReverseAttack, reverse);
+        nReverseDecay.modify(n->nReverseDecay, reverse);
+        nReverseSustain.modify(n->nReverseSustain, reverse);
+        nReverseRelease.modify(n->nReverseRelease, reverse);
+    }
+    
+    if (dirty[NostalgicUndertowADSR])
+    {
+        nUndertowAttack.modify(n->nUndertowAttack, reverse);
+        nUndertowDecay.modify(n->nUndertowDecay, reverse);
+        nUndertowSustain.modify(n->nUndertowSustain, reverse);
+        nUndertowRelease.modify(n->nUndertowRelease, reverse);
+    }
+    
+    if (dirty[NostalgicHoldMin]) holdMin.modify(n->holdMin, reverse);
+    if (dirty[NostalgicHoldMax]) holdMax.modify(n->holdMax, reverse);
+    if (dirty[NostalgicClusterMin]) clusterMin.modify(n->clusterMin, reverse);
+    if (dirty[NostalgicClusterThreshold]) clusterThreshold.modify(n->clusterThreshold, reverse);
+    if (dirty[NostalgicKeyOnReset]) keyOnReset.modify(n->keyOnReset, reverse);
+    if (dirty[NostalgicVelocityMin]) velocityMin.modify(n->velocityMin, reverse);
+    if (dirty[NostalgicVelocityMax]) velocityMax.modify(n->velocityMax, reverse);
+    
+    if (dirty[NostalgicUseGlobalSoundSet]) nUseGlobalSoundSet.modify(n->nUseGlobalSoundSet, reverse);
+    
+    if (dirty[NostalgicSoundSet])
+    {
+        nSoundSet.modify(n->nSoundSet, reverse);
+        nSoundSetName.modify(n->nSoundSetName, reverse);
+    }
+    
+    // If the mod didn't reverse, then it is modded
+    modded = !reverse;
+}
 
 NostalgicProcessor::NostalgicProcessor(Nostalgic::Ptr nostalgic,
                                        TuningProcessor::Ptr tuning,
@@ -109,7 +160,7 @@ void NostalgicProcessor::keyReleased(int midiNoteNumber, float midiVelocity, int
         if (prep->nUndertow.value > 0) offRamp = aRampUndertowCrossMS;
         else offRamp = aRampNostalgicOffMS;
 
-        SynchronicSyncMode syncTargetMode = synchronic->getSynchronic()->prep->getMode();
+        SynchronicSyncMode syncTargetMode = synchronic->getSynchronic()->prep->sMode.value;
         
         if (prep->nMode.value == SynchronicSync2)
         {

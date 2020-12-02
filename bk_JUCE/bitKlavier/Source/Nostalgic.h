@@ -20,16 +20,7 @@
 #include "Keymap.h"
 #include "Blendronic.h"
 
-/*
- NostalgicPreparation holds all the state variable values for the
- Nostalgic preparation. As with other preparation types, bK will use
- two instantiations of NostalgicPreparation for every active
- Nostalgic in the gallery, one to store the static state of the
- preparation, and the other to store the active state. These will
- be the same, unless a Modification is triggered, in which case the
- active state will be changed (and a Reset will revert the active state
- to the static state).
- */
+class NostalgicModification;
 
 class NostalgicPreparation : public ReferenceCountedObject
 {
@@ -154,49 +145,7 @@ public:
         nSoundSet = n->nSoundSet;
     }
     
-    void performModification(NostalgicPreparation::Ptr n, Array<bool> dirty)
-    {
-        if (dirty[NostalgicGain]) nGain.modTo(n->nGain);
-        if (dirty[NostalgicBlendronicGain]) nBlendronicGain.modTo(n->nBlendronicGain);
-        if (dirty[NostalgicWaveDistance]) nWaveDistance.modTo(n->nWaveDistance);
-        if (dirty[NostalgicUndertow]) nUndertow.modTo(n->nUndertow);
-        if (dirty[NostalgicTransposition]) nTransposition.modTo(n->nTransposition);
-        if (dirty[NostalgicTranspUsesTuning]) nTranspUsesTuning.modTo(n->nTranspUsesTuning);
-        if (dirty[NostalgicLengthMultiplier]) nLengthMultiplier.modTo(n->nLengthMultiplier);
-        if (dirty[NostalgicBeatsToSkip]) nBeatsToSkip.modTo(n->nBeatsToSkip);
-        if (dirty[NostalgicMode]) nMode.modTo(n->nMode);
-        if (dirty[NostalgicReverseADSR])
-        {
-            nReverseAttack.modTo(n->nReverseAttack);
-            nReverseDecay.modTo(n->nReverseDecay);
-            nReverseSustain.modTo(n->nReverseSustain);
-            nReverseRelease.modTo(n->nReverseRelease);
-        }
-        
-        if (dirty[NostalgicUndertowADSR])
-        {
-            nUndertowAttack.modTo(n->nUndertowAttack);
-            nUndertowDecay.modTo(n->nUndertowDecay);
-            nUndertowSustain.modTo(n->nUndertowSustain);
-            nUndertowRelease.modTo(n->nUndertowRelease);
-        }
-        
-        if (dirty[NostalgicHoldMin]) holdMin.modTo(n->holdMin);
-        if (dirty[NostalgicHoldMax]) holdMax.modTo(n->holdMax);
-        if (dirty[NostalgicClusterMin]) clusterMin.modTo(n->clusterMin);
-        if (dirty[NostalgicClusterThreshold]) clusterThreshold.modTo(n->clusterThreshold);
-        if (dirty[NostalgicKeyOnReset]) keyOnReset.modTo(n->keyOnReset);
-        if (dirty[NostalgicVelocityMin]) velocityMin.modTo(n->velocityMin);
-        if (dirty[NostalgicVelocityMax]) velocityMax.modTo(n->velocityMax);
-        
-        if (dirty[NostalgicUseGlobalSoundSet]) nUseGlobalSoundSet.modTo(n->nUseGlobalSoundSet);
-        
-        if (dirty[NostalgicSoundSet])
-        {
-            nSoundSet.modTo(n->nSoundSet);
-            nSoundSetName.modTo(n->nSoundSetName);
-        }
-    }
+    void performModification(NostalgicModification* n, Array<bool> dirty);
     
     void stepModdables()
     {
@@ -311,7 +260,7 @@ public:
         };
     }
     
-    inline void setTargetTypeNostalgicClear(TargetNoteMode nm)             { targetTypeNostalgicClear = nm; }
+    inline void setTargetTypeNostalgicClear(TargetNoteMode nm) { targetTypeNostalgicClear = nm; }
     inline void setTargetTypeNostalgic(KeymapTargetType which, TargetNoteMode nm)
     {
         if (which == TargetTypeNostalgicClear)   { targetTypeNostalgicClear = nm; }
@@ -496,6 +445,7 @@ public:
     
     Moddable<bool> keyOnReset;
     
+    // Is this supposed to be moddable?
     Moddable<TargetNoteMode> targetTypeNostalgicClear;
     
     Moddable<bool> nUseGlobalSoundSet;

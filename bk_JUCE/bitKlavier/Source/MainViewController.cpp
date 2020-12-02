@@ -483,8 +483,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (synchronicSelected)
         {
-            sPrep->setSoundSet(soundSetId);
-            sPrep->setSoundSetName(soundSetName);
+            sPrep->sSoundSet.set(soundSetId);
+            sPrep->sSoundSetName.set(soundSetName);
         }
         else if (nostalgicSelected)
         {
@@ -499,8 +499,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (synchronicModSelected)
         {
-            sMod->setSoundSet(soundSetId);
-            sMod->setSoundSetName(soundSetName);
+            sMod->sSoundSet.set(soundSetId);
+            sMod->sSoundSetName.set(soundSetName);
             sMod->setDirty(SynchronicSoundSet);
         }
         else if (nostalgicModSelected)
@@ -526,8 +526,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             String sfname = processor.loadedSoundSets[sPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
-            sPrep->setSoundSet(soundSetId);
-            sPrep->setSoundSetName(soundSetName);
+            sPrep->sSoundSet.set(soundSetId);
+            sPrep->sSoundSetName.set(soundSetName);
         }
         else if (nostalgicSelected)
         {
@@ -552,8 +552,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             String sfname = processor.loadedSoundSets[sMod->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
-            sMod->setSoundSet(soundSetId);
-            sMod->setSoundSetName(soundSetName);
+            sMod->sSoundSet.set(soundSetId);
+            sMod->sSoundSetName.set(soundSetName);
             sMod->setDirty(SynchronicSoundSet);
         }
         else if (nostalgicModSelected)
@@ -591,8 +591,8 @@ void MainViewController::bkButtonClicked (Button* b)
         else if (item->getType() == PreparationTypeSynchronic)
         {
             SynchronicPreparation::Ptr prep = processor.gallery->getSynchronicPreparation(item->getId());
-            bool toggle = !prep->getUseGlobalSoundSet();
-            prep->setUseGlobalSoundSet(toggle);
+            bool toggle = !prep->sUseGlobalSoundSet.value;
+            prep->sUseGlobalSoundSet.set(toggle);
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
@@ -611,8 +611,8 @@ void MainViewController::bkButtonClicked (Button* b)
         else if (item->getType() == PreparationTypeSynchronicMod)
         {
             SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(item->getId());
-            bool toggle = !mod->getUseGlobalSoundSet();
-            mod->setUseGlobalSoundSet(toggle);
+            bool toggle = !mod->sUseGlobalSoundSet.value;
+            mod->sUseGlobalSoundSet.set(toggle);
             mod->setDirty(SynchronicUseGlobalSoundSet);
         }
         else if (item->getType() == PreparationTypeNostalgicMod)
@@ -1112,7 +1112,7 @@ void MainViewController::timerCallback()
             globalSoundSetButton.setVisible(true);
             SynchronicPreparation::Ptr prep = processor.gallery->getSynchronicPreparation(item->getId());
             if (prep != nullptr)
-                globalSoundSetButton.setToggleState(prep->getUseGlobalSoundSet(), dontSendNotification);
+                globalSoundSetButton.setToggleState(prep->sUseGlobalSoundSet.value, dontSendNotification);
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
@@ -1143,7 +1143,7 @@ void MainViewController::timerCallback()
             SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(item->getId());
             if (mod != nullptr)
             {
-                globalSoundSetButton.setToggleState(mod->getUseGlobalSoundSet(), dontSendNotification);
+                globalSoundSetButton.setToggleState(mod->sUseGlobalSoundSet.value, dontSendNotification);
                 globalSoundSetButton.setAlpha(mod->getDirty(SynchronicUseGlobalSoundSet) ? 1. : gModAlpha);
                 sampleCB.setAlpha(mod->getDirty(SynchronicSoundSet) ? 1. : gModAlpha);
                 instrumentCB.setAlpha(mod->getDirty(SynchronicSoundSet) ? 1. : gModAlpha);

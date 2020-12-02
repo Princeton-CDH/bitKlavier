@@ -355,6 +355,17 @@ String floatArrayToString(Array<float> arr)
     return s;
 }
 
+String floatArrayToString(Array<Moddable<float>> arr)
+{
+    String s = "";
+    for (auto key : arr)
+    {
+        s.append(String(key.value), 6);
+        s.append(" ", 1);
+    }
+    return s;
+}
+
 Array<int> keymapStringToIntArray(String s)
 {
     Array<int> arr = Array<int>();

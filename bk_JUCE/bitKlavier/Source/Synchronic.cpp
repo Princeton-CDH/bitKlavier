@@ -25,10 +25,10 @@ tempo(tempo),
 keymaps(Keymap::PtrArr()),
 notePlayed(false)
 {
-    if (!synchronic->prep->getUseGlobalSoundSet())
+    if (!synchronic->prep->sUseGlobalSoundSet.value)
     {
         // comes in as "soundfont.sf2.subsound1"
-        String name = synchronic->prep->getSoundSetName();
+        String name = synchronic->prep->sSoundSetName.value;
         BKSampleLoadType type = BKLoadSoundfont;
         
         for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
@@ -96,20 +96,20 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
  
     if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
     {
-        noteLength = (fabs(prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()]) * tempoPrep->getBeatThreshMS());
+        noteLength = (fabs(prep->sLengthMultipliers[cluster->getLengthMultiplierCounter()].value) * tempoPrep->getBeatThreshMS());
     }
     else
     {
-        noteLength = (fabs(prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()]) * tempoPrep->getBeatThreshMS() / tempoPrep->getSubdivisions());
+        noteLength = (fabs(prep->sLengthMultipliers[cluster->getLengthMultiplierCounter()].value) * tempoPrep->getBeatThreshMS() / tempoPrep->getSubdivisions());
     }
         
-    if (prep->getLengthMultipliers()[cluster->getLengthMultiplierCounter()] < 0)
+    if (prep->sLengthMultipliers[cluster->getLengthMultiplierCounter()].value < 0)
     {
         noteDirection = Reverse;
         noteStartPos = noteLength + 3; //adjust for rampOn time == 3ms
     }
     
-    for (auto t : prep->getTransposition()[cluster->getTranspCounter()])
+    for (auto t : prep->sTransposition[cluster->getTranspCounter()])
     {
 
         /*
@@ -121,10 +121,10 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
         float synthOffset; // offset from actual sample played, always less than 1.
        
         // tune the transposition
-        if (prep->getTranspUsesTuning()) // use the Tuning setting
-           offset = t + tuner->getOffset(round(t)+ note, false);
+        if (prep->sTranspUsesTuning.value) // use the Tuning setting
+           offset = t.value + tuner->getOffset(round(t.value)+ note, false);
         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
-           offset = t + tuner->getOffset(note, false);
+           offset = t.value + tuner->getOffset(note, false);
        
         synthOffset = offset;
 
@@ -141,7 +141,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                              synthNoteNumber,
                              synthOffset,
                              velocity,
-                             aGlobalGain * prep->getAccentMultipliers()[cluster->getAccentMultiplierCounter()],
+                             aGlobalGain * prep->sAccentMultipliers[cluster->getAccentMultiplierCounter()].value,
                              noteDirection,
                              FixedLengthFixedStart,
                              SynchronicNote,
@@ -166,7 +166,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                              synthNoteNumber,
                              synthOffset,
                              velocity,
-                             aGlobalGain * prep->getAccentMultipliers()[cluster->getAccentMultiplierCounter()],
+                             aGlobalGain * prep->sAccentMultipliers[cluster->getAccentMultiplierCounter()].value,
                              noteDirection,
                              FixedLengthFixedStart,
                              SynchronicNote,
@@ -183,11 +183,11 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 		}
         
         notePlayed = true;
-        if (prep->getMidiOutput() != nullptr && currentVoice != nullptr)
+        if (prep->midiOutput.value != nullptr && currentVoice != nullptr)
         {
             activeSynchronicVoices.set(currentVoice->getCurrentlyPlayingNote(), currentVoice);
             const MidiMessage message = MidiMessage::noteOn(1, synthNoteNumber, velocity);
-            prep->getMidiOutput()->sendMessageNow(message);
+            prep->midiOutput.value->sendMessageNow(message);
             DBG("MIDI Message sent: Note on " + String(synthNoteNumber));
         }
 
@@ -204,16 +204,16 @@ bool SynchronicProcessor::velocityCheck(int noteNumber)
     if (velocity > 127) velocity = 127;
     if (velocity < 0)   velocity = 0;
 
-    if(prep->getVelocityMin() <= prep->getVelocityMax())
+    if(prep->velocityMin.value <= prep->velocityMax.value)
     {
-        if (velocity >= prep->getVelocityMin() && velocity <= prep->getVelocityMax())
+        if (velocity >= prep->velocityMin.value && velocity <= prep->velocityMax.value)
         {
             return true;
         }
     }
     else
     {
-        if (velocity >= prep->getVelocityMin() || velocity <= prep->getVelocityMax())
+        if (velocity >= prep->velocityMin.value || velocity <= prep->velocityMax.value)
         {
             return true;
         }
@@ -229,16 +229,16 @@ bool SynchronicProcessor::holdCheck(int noteNumber)
     
     uint64 hold = holdTimers.getUnchecked(noteNumber) * (1000.0 / synth->getSampleRate());
     
-    if(prep->getHoldMin() <= prep->getHoldMax())
+    if(prep->holdMin.value <= prep->holdMax.value)
     {
-        if (hold >= prep->getHoldMin() && hold <= prep->getHoldMax())
+        if (hold >= prep->holdMin.value && hold <= prep->holdMax.value)
         {
             return true;
         }
     }
     else
     {
-        if (hold >= prep->getHoldMin() || hold <= prep->getHoldMax())
+        if (hold >= prep->holdMin.value || hold <= prep->holdMax.value)
         {
             return true;
         }
@@ -333,8 +333,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
                 continue;
             }
             
-            if(   (synchronic->prep->getMode() == LastNoteOffSync)
-               || (synchronic->prep->getMode() == AnyNoteOffSync))
+            if(   (synchronic->prep->sMode.value == LastNoteOffSync)
+               || (synchronic->prep->sMode.value == AnyNoteOffSync))
             {
                 if(clusters.size() == 1) clusters[0]->setShouldPlay(false);
                 else
@@ -351,13 +351,13 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
         
         // OnOffMode determines whether the keyOffs or keyOns determine whether notes are within the cluster threshold
         // here, we only look at keyOns
-        if (prep->getOnOffMode() == KeyOn) // getOnOffMode() is set by the "determines cluster"
+        if (prep->onOffMode.value == KeyOn) // onOffMode.value is set by the "determines cluster"
         {
             // if we have a new cluster
             if (!inCluster || cluster == nullptr)
             {
                 // check to see if we have as many clusters as we are allowed, remove oldest if we are
-                if (clusters.size() >= synchronic->prep->getNumClusters())
+                if (clusters.size() >= synchronic->prep->numClusters.value)
                 {
                     clusters.remove(0); // remove first (oldest) cluster
                 }
@@ -380,13 +380,13 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
             clusterThresholdTimer = 0;
             
             // reset the beat phase and pattern phase, and start playing, depending on the mode
-            if (prep->getMode() == AnyNoteOnSync)
+            if (prep->sMode.value == AnyNoteOnSync)
             {
                 cluster->setShouldPlay(true);
                 cluster->setBeatPhasor(0);
                 cluster->resetPatternPhase();
             }
-            else if (prep->getMode() == FirstNoteOnSync)
+            else if (prep->sMode.value == FirstNoteOnSync)
             {
                 cluster->setShouldPlay(true);
                 
@@ -428,7 +428,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     {
         //start right away
         uint64 phasor = beatThresholdSamples *
-                        synchronic->prep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                        synchronic->prep->sBeatMultipliers[cluster->getBeatMultiplierCounter()].value *
                         general->getPeriodMultiplier() *
                         tempo->getPeriodMultiplier();
         
@@ -511,11 +511,11 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
         // cluster management
         // OnOffMode determines whether the timing of keyOffs or keyOns determine whether notes are within the cluster threshold
         // in this case, we only want to do these things when keyOffs set the clusters
-        if (synchronic->prep->getOnOffMode() == KeyOff) // set in the "determines cluster" menu
+        if (synchronic->prep->onOffMode.value == KeyOff) // set in the "determines cluster" menu
         {
             if (!inCluster || cluster == nullptr)
             {
-                if (clusters.size() >= synchronic->prep->getNumClusters())
+                if (clusters.size() >= synchronic->prep->numClusters.value)
                 {
                     // remove first (oldest) cluster
                     clusters.remove(0);
@@ -544,9 +544,9 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
         }
             
         // depending on the mode, and whether this is a first or last note, reset the beat and pattern phase and start playing
-        if ((synchronic->prep->getMode() == FirstNoteOffSync && nextOffIsFirst) ||
-            (synchronic->prep->getMode() == AnyNoteOffSync) ||
-            (synchronic->prep->getMode() == LastNoteOffSync && clusterKeysDepressed.size() == 0))
+        if ((synchronic->prep->sMode.value == FirstNoteOffSync && nextOffIsFirst) ||
+            (synchronic->prep->sMode.value == AnyNoteOffSync) ||
+            (synchronic->prep->sMode.value == LastNoteOffSync && clusterKeysDepressed.size() == 0))
         {
             for (int i = clusters.size(); --i >= 0; )
             {
@@ -557,7 +557,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
                     
                     //start right away
                     uint64 phasor = beatThresholdSamples *
-                                    synchronic->prep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                                    synchronic->prep->sBeatMultipliers[cluster->getBeatMultiplierCounter()].value *
                                     general->getPeriodMultiplier() *
                                     tempo->getPeriodMultiplier();
                     
@@ -580,7 +580,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     {
         //start right away
         uint64 phasor = beatThresholdSamples *
-                        synchronic->prep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+                        synchronic->prep->sBeatMultipliers[cluster->getBeatMultiplierCounter()].value *
                         general->getPeriodMultiplier() *
                         tempo->getPeriodMultiplier();
         
@@ -638,14 +638,14 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     SynchronicPreparation::Ptr prep = synchronic->prep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
     
-    while (clusters.size() > prep->getNumClusters())
+    while (clusters.size() > prep->numClusters.value)
     {
         clusters.remove(0);
     }
     
     //do this every block, for adaptive tempo updates
     sampleType = type;
-    thresholdSamples = (prep->getClusterThreshSEC() * synth->getSampleRate());
+    thresholdSamples = (prep->sClusterThreshSec.value * synth->getSampleRate());
 
     if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
     {
@@ -695,7 +695,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             //cap size of slimCluster, removing oldest notes
             Array<int> tempCluster;
             for(int i = 0; i < clusterNotes.size(); i++) tempCluster.set(i, clusterNotes.getUnchecked(i));
-            if(tempCluster.size() > prep->getClusterCap()) tempCluster.resize(prep->getClusterCap());
+            if(tempCluster.size() > prep->sClusterCap.value) tempCluster.resize(prep->sClusterCap.value);
             
             //why not use clusterMax for this? the intent is different:
             //clusterMax: max number of keys pressed within clusterThresh, otherwise shut off pulses
@@ -719,7 +719,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             //get time until next beat => beat length scaled by beatMultiplier parameter
             
             numSamplesBeat =    beatThresholdSamples *
-            prep->getBeatMultipliers()[cluster->getBeatMultiplierCounter()] *
+            prep->sBeatMultipliers[cluster->getBeatMultiplierCounter()].value *
             general->getPeriodMultiplier() *
             tempo->getPeriodMultiplier();
             
@@ -729,7 +729,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                 //update display of counters in UI
                 /*
                  DBG(" samplerate: " + String(sampleRate) +
-                 " length: "         + String(prep->getLengthMultipliers()[lengthMultiplierCounter]) +
+                 " length: "         + String(prep->sLengthMultipliers.value[lengthMultiplierCounter]) +
                  " length counter: "  + String(lengthMultiplierCounter) +
                  " accent: "         + String(prep->getAccentMultipliers()[accentMultiplierCounter]) +
                  " accent counter: " + String(accentMultiplierCounter) +
@@ -747,15 +747,15 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                 bool passCluster = false;
                 
                 //in the normal case, where cluster is within a range defined by clusterMin and Max
-                if(prep->getClusterMin() <= prep->getClusterMax())
+                if(prep->sClusterMin.value <= prep->sClusterMax.value)
                 {
-                    if (clusterNotes.size() >= prep->getClusterMin() && clusterNotes.size() <= prep->getClusterMax())
+                    if (clusterNotes.size() >= prep->sClusterMin.value && clusterNotes.size() <= prep->sClusterMax.value)
                         passCluster = true;
                 }
                 //the inverse case, where we only play cluster that are *outside* the range set by clusterMin and Max
                 else
                 {
-                    if (clusterNotes.size() >= prep->getClusterMin() || clusterNotes.size() <= prep->getClusterMax())
+                    if (clusterNotes.size() >= prep->sClusterMin.value || clusterNotes.size() <= prep->sClusterMax.value)
                         passCluster = true;
                 }
                 
@@ -796,7 +796,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             DBG("MIDI Message sent: Note off " + String(noteNumber));
         }
     }
-    if (!midiBuffer.isEmpty()) prep->getMidiOutput()->sendBlockOfMessagesNow(midiBuffer);
+    if (!midiBuffer.isEmpty()) prep->midiOutput.value->sendBlockOfMessagesNow(midiBuffer);
 }
 
 //return time in ms to future beat, given beatsToSkip
@@ -815,8 +815,8 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
         
         while(beatsToSkip-- > 0)
         {
-            if (++myBeat >= synchronic->prep->getBeatMultipliers().size()) myBeat = 0;
-            timeToReturn += synchronic->prep->getBeatMultipliers()[myBeat] *
+            if (++myBeat >= synchronic->prep->sBeatMultipliers.size()) myBeat = 0;
+            timeToReturn += synchronic->prep->sBeatMultipliers[myBeat].value *
             beatThresholdSamples *
             general->getPeriodMultiplier() *
             tempo->getPeriodMultiplier();

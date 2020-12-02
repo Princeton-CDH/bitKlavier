@@ -238,10 +238,10 @@ void SynchronicModification::setState(XmlElement* e)
         }
         
         SynchronicPreparation::setState(paramsXml);
-        if (!getUseGlobalSoundSet())
+        if (!sUseGlobalSoundSet.value)
         {
             // comes in as "soundfont.sf2.subsound1"
-            String name = getSoundSetName();
+            String name = sSoundSetName.value;
             BKSampleLoadType type = BKLoadSoundfont;
             
             for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
@@ -287,21 +287,21 @@ void SynchronicModification::setStateOld(XmlElement* e)
     String p = e->getStringAttribute(ptagSynchronic_numBeats);
     if (p != "")
     {
-        setNumBeats(p.getIntValue());
+        sNumBeats.set(p.getIntValue());
         setDirty(SynchronicNumPulses);
     }
     
     p = e->getStringAttribute(ptagSynchronic_clusterMin);
     if (p != "")
     {
-        setClusterMin(p.getIntValue());
+        sClusterMin.set(p.getIntValue());
         setDirty(SynchronicClusterMin);
     }
     
     p = e->getStringAttribute(ptagSynchronic_clusterMax);
     if (p != "")
     {
-        setClusterMax(p.getIntValue());
+        sClusterMax.set(p.getIntValue());
         setDirty(SynchronicClusterMax);
     }
     
@@ -315,21 +315,21 @@ void SynchronicModification::setStateOld(XmlElement* e)
     p = e->getStringAttribute(ptagSynchronic_mode);
     if (p != "")
     {
-        setMode((SynchronicSyncMode) p.getIntValue());
+        sMode.set((SynchronicSyncMode) p.getIntValue());
         setDirty(SynchronicMode);
     }
     
     p = e->getStringAttribute(ptagSynchronic_beatsToSkip);
     if (p != "")
     {
-        setBeatsToSkip(p.getIntValue());
+        sBeatsToSkip.set(p.getIntValue());
         setDirty(SynchronicBeatsToSkip);
     }
     
     p = e->getStringAttribute(ptagSynchronic_gain);
     if (p != "")
     {
-        setGain(p.getFloatValue());
+        sGain.set(p.getFloatValue());
         setDirty(SynchronicGain);
     }
     
@@ -337,7 +337,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
     {
         if (sub->hasTagName(vtagSynchronic_beatMults))
         {
-            Array<float> beats;
+            Array<Moddable<float>> beats;
             
             for (int k = 0; k < sub->getNumAttributes(); k++)
             {
@@ -347,7 +347,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 else
                 {
                     f = attr.getFloatValue();
-                    beats.add(f);
+                    beats.add(Moddable<float>(f));
                 }
             }
             
@@ -357,7 +357,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         }
         else  if (sub->hasTagName(vtagSynchronic_accentMults))
         {
-            Array<float> accents;
+            Array<Moddable<float>> accents;
             for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -366,7 +366,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 else
                 {
                     f = attr.getFloatValue();
-                    accents.add(f);
+                    accents.add(Moddable<float>(f));
                 }
             }
             
@@ -376,7 +376,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         }
         else  if (sub->hasTagName(vtagSynchronic_lengthMults))
         {
-            Array<float> lens;
+            Array<Moddable<float>> lens;
             for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -385,7 +385,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 else
                 {
                     f = attr.getFloatValue();
-                    lens.add(f);
+                    lens.add(Moddable<float>(f));
                 }
             }
             
@@ -395,13 +395,13 @@ void SynchronicModification::setStateOld(XmlElement* e)
         }
         else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
         {
-            Array<Array<float>> atransp;
+            Array<Array<Moddable<float>>> atransp;
             int tcount = 0;
             forEachXmlChildElement (*sub, asub)
             {
                 if (asub->hasTagName("t"+String(tcount++)))
                 {
-                    Array<float> transp;
+                    Array<Moddable<float>> transp;
                     for (int k = 0; k < asub->getNumAttributes(); k++)
                     {
                         String attr = asub->getStringAttribute(ptagFloat + String(k));
@@ -410,7 +410,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                         else
                         {
                             f = attr.getFloatValue();
-                            transp.add(f);
+                            transp.add(Moddable<float>(f));
                         }
                     }
                     atransp.set(tcount-1, transp);
