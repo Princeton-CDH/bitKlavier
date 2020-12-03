@@ -1210,13 +1210,12 @@ void BKSingleSlider::sliderValueChanged (Slider *slider)
 {
     if(slider == &thisSlider)
     {
+        if(sliderTextResolution < 0) valueTF.setText(String(thisSlider.getValue()), dontSendNotification);
+        else valueTF.setText(String(thisSlider.getValue(), sliderTextResolution), dontSendNotification);
         listeners.call(&BKSingleSlider::Listener::BKSingleSliderValueChanged,
                        this,
                        getName(),
                        thisSlider.getValue());
-        
-        if(sliderTextResolution < 0) valueTF.setText(String(thisSlider.getValue()), dontSendNotification);
-        else valueTF.setText(String(thisSlider.getValue(), sliderTextResolution), dontSendNotification);
     }
 }
 

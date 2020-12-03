@@ -122,7 +122,7 @@ public:
         if (shouldInc)
         {
             mod += (m.inc * m.n);
-            if (m.n < m.maxN) m.n++;
+            if (m.n < m.maxN || m.maxN == 0) m.n++;
         }
         
         if (time > 0 && (mod - value) != 0)
@@ -168,8 +168,9 @@ public:
     template<class T = ValueType>
     void setInc(tag<T>, double v) { ; }
     
-    void setInc(tag<int>, int v) { inc = v; n = 0; }
-    void setInc(tag<float>, float v) { inc = v; n = 0; }
+    // Be careful to make sure these overload the less specific function above.
+    void setInc(tag<int>, double v) { inc = v; n = 0; }
+    void setInc(tag<float>, double v) { inc = v; n = 0; }
     void setInc(tag<double>, double v) { inc = v; n = 0; }
     
     void setTime(int ms) override { time = ms; }
