@@ -14,7 +14,7 @@
 
 void NostalgicPreparation::performModification(NostalgicModification* n, Array<bool> dirty)
 {
-    // Should the mod be reversed?
+    // Determin if the mod should be reversed
     bool reverse = n->altMod && modded;
 
     if (dirty[NostalgicGain]) nGain.modify(n->nGain, reverse);

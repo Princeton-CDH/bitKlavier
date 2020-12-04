@@ -239,26 +239,25 @@ void Gallery::setStateFromJson(var myJson)
                     
                     SynchronicPreparation::Ptr syncPrep = new SynchronicPreparation();
                     
-                    Array<Moddable<float>> accents;
+                    Array<float> accents;
                     var am =  jsonGetProperty(sx+"accentsList");
-                    for (int c = 0; c < am.size(); c++) accents.add(Moddable<float>(am[c]));
+                    for (int c = 0; c < am.size(); c++) accents.add(am[c]);
+                    syncPrep->sAccentMultipliers.set(accents);
                     
-                    syncPrep->setAccentMultipliers(accents);
-                    
-                    Array<Moddable<float>> transp;
+                    Array<float> transp;
                     var tm =  jsonGetProperty(sx+"NoteTranspList");
-                    for (int c = 0; c < tm.size(); c++) transp.add(Moddable<float>(tm[c]));
+                    for (int c = 0; c < tm.size(); c++) transp.add(tm[c]);
                     
-                    Array<Array<Moddable<float>>> atransp;
+                    Array<Array<float>> atransp;
                     atransp.add(transp);
                     
-                    syncPrep->setTransposition(atransp);
+                    syncPrep->sTransposition.set(atransp);
                     
-                    Array<Moddable<float>> beats;
+                    Array<float> beats;
                     var bm =  jsonGetProperty(sx+"lengthMultList");
-                    for (int c = 0; c < bm.size(); c++) beats.add(Moddable<float>(bm[c]));
+                    for (int c = 0; c < bm.size(); c++) beats.add(bm[c]);
                     
-                    syncPrep->setBeatMultipliers(beats);
+                    syncPrep->sBeatMultipliers.set(beats);
                     
                     int clusterMin = jsonGetValue(sx+"clusterMin");
                     
@@ -329,13 +328,13 @@ void Gallery::setStateFromJson(var myJson)
                         syncPrep->sBeatsToSkip.set(0);
                     }
                     
-                    Array<Moddable<float>> lens;
+                    Array<float> lens;
                     var lm = jsonGetProperty(sx+"NoteLengthMultList");
                     //for (int c = 0; c < lm.size(); c++) lens.add(lm[c]);
                     for (int c = 0; c < lm.size(); c++)
-                        lens.add((Moddable<float>((float)lm[c] * 50. * tmp/60000.)));
+                        lens.add((float)lm[c] * 50. * tmp/60000.);
                     
-                    syncPrep->setLengthMultipliers(lens);
+                    syncPrep->sLengthMultipliers.set(lens);
                     
                     Synchronic::Ptr thisSynchronic = matches(syncPrep);
                     if (thisSynchronic == nullptr)

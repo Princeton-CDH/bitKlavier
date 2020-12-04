@@ -438,7 +438,6 @@ void ModdableViewController::bkButtonClicked (Button* b)
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(processor.updateState->previousDisplay);
-
     }
 }
 
@@ -458,10 +457,8 @@ ModdableBase* ModdableViewController::getCurrentModdable()
             return &mod->dHammerGain;
         else if (processor.updateState->currentModdableName == "blendronic gain")
             return &mod->dBlendronicGain;
-        else
-            ; // continue branching for each parameter and component
     }
-    if (processor.updateState->previousDisplay == DisplayNostalgicMod)
+    else if (processor.updateState->previousDisplay == DisplayNostalgicMod)
     {
         NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
         
@@ -475,7 +472,24 @@ ModdableBase* ModdableViewController::getCurrentModdable()
             return &mod->clusterMin;
         else if (processor.updateState->currentModdableName == "cluster thresh")
             return &mod->clusterThreshold;
-            ; // continue branching for each parameter and component
+    }
+    else if (processor.updateState->previousDisplay == DisplaySynchronicMod)
+    {
+        SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
+        
+        if (processor.updateState->currentModdableName == "gain")
+            return &mod->sGain;
+        else if (processor.updateState->currentModdableName == "blendronic gain")
+            return &mod->sBlendronicGain;
+        else if (processor.updateState->currentModdableName == "num pulses")
+            return &mod->sNumBeats;
+        else if (processor.updateState->currentModdableName == "cluster threshold")
+            return &mod->sClusterThresh;
+        else if (processor.updateState->currentModdableName == "cluster thickness")
+            return &mod->sClusterCap;
+        else if (processor.updateState->currentModdableName == "num layers")
+            return &mod->numClusters;
+        ; // continue branching for each parameter and component
     }
     
     return nullptr;

@@ -146,6 +146,11 @@ BKViewController(p, theGraph, 4)
     }
     targetControlCBs[0]->setTooltip("when targeted by a Keymap, determines what kind of note message will clear all Nostalgic notes");
     
+    alternateMod.setButtonText ("alternate mod");
+    alternateMod.setTooltip("activating this mod will alternate between modding and reseting attached preparations");
+    alternateMod.setToggleState (false, dontSendNotification);
+    addChildComponent(&alternateMod, ALL);
+    alternateMod.setLookAndFeel(&buttonsAndMenusLAF2);
     
 #if JUCE_IOS
     holdTimeMinMaxSlider->addWantsBigOneListener(this);
@@ -216,6 +221,11 @@ void NostalgicViewController::displayShared(void)
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
+    
+    alternateMod.setBounds(actionButton.getRight()+gXSpacing,
+                           actionButton.getY(),
+                           selectCB.getWidth(),
+                           actionButton.getHeight());
     
     comboBoxSlice.removeFromLeft(gXSpacing);
     
@@ -1248,7 +1258,8 @@ NostalgicViewController(p, theGraph)
 //    reverseADSRSlider->addModdableComponentListener(this);
 //    undertowADSRSlider->addModdableComponentListener(this);
 
-    
+    alternateMod.addListener(this);
+    alternateMod.setVisible(true);
     //startTimer(20);
 }
 
@@ -1362,6 +1373,8 @@ void NostalgicModificationEditor::update(void)
         clusterMinSlider->setValue(mod->clusterMin.value, dontSendNotification);
         clusterThresholdSlider->setValue(mod->clusterThreshold.value, dontSendNotification);
         keyOnResetToggle.setToggleState((bool)mod->keyOnReset.value, dontSendNotification);
+        
+        alternateMod.setToggleState(mod->altMod, dontSendNotification);
     }
     
     
@@ -1738,6 +1751,11 @@ void NostalgicModificationEditor::buttonClicked (Button* b)
         mod->nTranspUsesTuning.set(transpUsesTuning.getToggleState());
         mod->setDirty(NostalgicTranspUsesTuning);
         transpUsesTuning.setAlpha(1.);
+    }
+    else if (b == &alternateMod)
+    {
+        NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
+        mod->altMod = alternateMod.getToggleState();
     }
     
     updateModification();

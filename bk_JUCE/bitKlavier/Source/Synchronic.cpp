@@ -10,6 +10,71 @@
 
 #include "Synchronic.h"
 #include "PluginProcessor.h"
+#include "Modification.h"
+
+void SynchronicPreparation::performModification(SynchronicModification* s, Array<bool> dirty)
+{
+    bool reverse = s->altMod && modded;
+    
+    if (dirty[SynchronicGain]) sGain.modify(s->sGain, reverse);
+    if (dirty[SynchronicBlendronicGain]) sBlendronicGain.modify(s->sBlendronicGain, reverse);
+    if (dirty[SynchronicNumPulses]) sNumBeats.modify(s->sNumBeats, reverse);
+    if (dirty[SynchronicClusterMin]) sClusterMin.modify(s->sClusterMin, reverse);
+    if (dirty[SynchronicClusterMax]) sClusterMax.modify(s->sClusterMax, reverse);
+    if (dirty[SynchronicClusterCap]) sClusterCap.modify(s->sClusterCap, reverse);
+    if (dirty[SynchronicMode]) sMode.modify(s->sMode, reverse);
+    
+    if (dirty[SynchronicBeatsToSkip]) sBeatsToSkip.modify(s->sBeatsToSkip, reverse);
+    
+    if (dirty[SynchronicBeatMultipliers]) {
+        
+        sBeatMultipliers.modify(s->sBeatMultipliers, reverse);
+        sBeatMultipliersStates.modify(s->sBeatMultipliersStates, reverse);
+    }
+    if (dirty[SynchronicAccentMultipliers]) {
+        sAccentMultipliers.modify(s->sAccentMultipliers, reverse);
+        sAccentMultipliersStates.modify(s->sAccentMultipliersStates, reverse);
+    }
+    if (dirty[SynchronicLengthMultipliers]) {
+        sLengthMultipliers.modify(s->sLengthMultipliers, reverse);
+        sLengthMultipliersStates.modify(s->sLengthMultipliersStates, reverse);
+    }
+    if (dirty[SynchronicTranspOffsets]) {
+        sTransposition.modify(s->sTransposition, reverse);
+        sTranspositionStates.modify(s->sTranspositionStates, reverse);
+    }
+    
+    if (dirty[SynchronicTranspUsesTuning]) sTranspUsesTuning.modify(s->sTranspUsesTuning, reverse);
+    
+    if (dirty[SynchronicClusterThresh])
+    {
+        sClusterThresh.modify(s->sClusterThresh, reverse);
+        sClusterThreshSec.modify(s->sClusterThreshSec, reverse);
+    }
+    
+    if (dirty[SynchronicADSRs]) sADSRs.modify(s->sADSRs, reverse);
+    
+    if (dirty[SynchronicNumClusters]) numClusters.modify(s->numClusters, reverse);
+    if (dirty[SynchronicOnOff]) onOffMode.modify(s->onOffMode, reverse);
+    
+    if (dirty[SynchronicHoldMin]) holdMin.modify(s->holdMin, reverse);
+    if (dirty[SynchronicHoldMax]) holdMax.modify(s->holdMax, reverse);
+    
+    if (dirty[SynchronicVelocityMin]) velocityMin.modify(s->velocityMin, reverse);
+    if (dirty[SynchronicVelocityMax]) velocityMax.modify(s->velocityMax, reverse);
+    
+    if (dirty[SynchronicMidiOutput]) midiOutput.modify(s->midiOutput, reverse);
+    
+    if (dirty[SynchronicUseGlobalSoundSet]) sUseGlobalSoundSet.modify(s->sUseGlobalSoundSet, reverse);
+    
+    if (dirty[SynchronicSoundSet])
+    {
+        sSoundSet.modify(s->sSoundSet, reverse);
+        sSoundSetName.modify(s->sSoundSetName, reverse);
+    }
+    
+    modded = !reverse;
+}
 
 SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TuningProcessor::Ptr tuning,
@@ -96,20 +161,20 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
  
     if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
     {
-        noteLength = (fabs(prep->sLengthMultipliers[cluster->getLengthMultiplierCounter()].value) * tempoPrep->getBeatThreshMS());
+        noteLength = (fabs(prep->sLengthMultipliers.value[cluster->getLengthMultiplierCounter()]) * tempoPrep->getBeatThreshMS());
     }
     else
     {
-        noteLength = (fabs(prep->sLengthMultipliers[cluster->getLengthMultiplierCounter()].value) * tempoPrep->getBeatThreshMS() / tempoPrep->getSubdivisions());
+        noteLength = (fabs(prep->sLengthMultipliers.value[cluster->getLengthMultiplierCounter()]) * tempoPrep->getBeatThreshMS() / tempoPrep->getSubdivisions());
     }
         
-    if (prep->sLengthMultipliers[cluster->getLengthMultiplierCounter()].value < 0)
+    if (prep->sLengthMultipliers.value[cluster->getLengthMultiplierCounter()] < 0)
     {
         noteDirection = Reverse;
         noteStartPos = noteLength + 3; //adjust for rampOn time == 3ms
     }
     
-    for (auto t : prep->sTransposition[cluster->getTranspCounter()])
+    for (auto t : prep->sTransposition.value[cluster->getTranspCounter()])
     {
 
         /*
@@ -122,9 +187,9 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
        
         // tune the transposition
         if (prep->sTranspUsesTuning.value) // use the Tuning setting
-           offset = t.value + tuner->getOffset(round(t.value)+ note, false);
+           offset = t + tuner->getOffset(round(t)+ note, false);
         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
-           offset = t.value + tuner->getOffset(note, false);
+           offset = t + tuner->getOffset(note, false);
        
         synthOffset = offset;
 
@@ -141,7 +206,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                              synthNoteNumber,
                              synthOffset,
                              velocity,
-                             aGlobalGain * prep->sAccentMultipliers[cluster->getAccentMultiplierCounter()].value,
+                             aGlobalGain * prep->sAccentMultipliers.value[cluster->getAccentMultiplierCounter()],
                              noteDirection,
                              FixedLengthFixedStart,
                              SynchronicNote,
@@ -166,7 +231,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                              synthNoteNumber,
                              synthOffset,
                              velocity,
-                             aGlobalGain * prep->sAccentMultipliers[cluster->getAccentMultiplierCounter()].value,
+                             aGlobalGain * prep->sAccentMultipliers.value[cluster->getAccentMultiplierCounter()],
                              noteDirection,
                              FixedLengthFixedStart,
                              SynchronicNote,
@@ -428,7 +493,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     {
         //start right away
         uint64 phasor = beatThresholdSamples *
-                        synchronic->prep->sBeatMultipliers[cluster->getBeatMultiplierCounter()].value *
+                        synchronic->prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
                         general->getPeriodMultiplier() *
                         tempo->getPeriodMultiplier();
         
@@ -557,7 +622,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
                     
                     //start right away
                     uint64 phasor = beatThresholdSamples *
-                                    synchronic->prep->sBeatMultipliers[cluster->getBeatMultiplierCounter()].value *
+                                    synchronic->prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
                                     general->getPeriodMultiplier() *
                                     tempo->getPeriodMultiplier();
                     
@@ -580,7 +645,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     {
         //start right away
         uint64 phasor = beatThresholdSamples *
-                        synchronic->prep->sBeatMultipliers[cluster->getBeatMultiplierCounter()].value *
+                        synchronic->prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
                         general->getPeriodMultiplier() *
                         tempo->getPeriodMultiplier();
         
@@ -719,7 +784,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             //get time until next beat => beat length scaled by beatMultiplier parameter
             
             numSamplesBeat =    beatThresholdSamples *
-            prep->sBeatMultipliers[cluster->getBeatMultiplierCounter()].value *
+            prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
             general->getPeriodMultiplier() *
             tempo->getPeriodMultiplier();
             
@@ -815,8 +880,8 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
         
         while(beatsToSkip-- > 0)
         {
-            if (++myBeat >= synchronic->prep->sBeatMultipliers.size()) myBeat = 0;
-            timeToReturn += synchronic->prep->sBeatMultipliers[myBeat].value *
+            if (++myBeat >= synchronic->prep->sBeatMultipliers.value.size()) myBeat = 0;
+            timeToReturn += synchronic->prep->sBeatMultipliers.value[myBeat] *
             beatThresholdSamples *
             general->getPeriodMultiplier() *
             tempo->getPeriodMultiplier();

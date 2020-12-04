@@ -112,8 +112,6 @@ public:
         
     }
     
-    
-    
     inline void copy(NostalgicPreparation::Ptr n)
     {
         nWaveDistance = n->nWaveDistance;
@@ -151,18 +149,70 @@ public:
     {
         nGain.step();
         nBlendronicGain.step();
+        nWaveDistance.step();
+        nUndertow.step();
+        nTransposition.step();
+        nTranspUsesTuning.step();
         nLengthMultiplier.step();
+        nBeatsToSkip.step();;
+        nMode.step();;
+        
+        nReverseAttack.step();
+        nReverseDecay.step();
+        nReverseRelease.step();
+        nReverseSustain.step();
+        
+        nUndertowAttack.step();
+        nUndertowDecay.step();
+        nUndertowRelease.step();
+        nUndertowSustain.step();
+        
+        holdMin.step();
+        holdMax.step();
         clusterMin.step();
         clusterThreshold.step();
+        velocityMin.step();
+        velocityMax.step();
+        
+        keyOnReset.step();
+        nUseGlobalSoundSet.step();
+        nSoundSet.step();
+        nSoundSetName.step();
     }
     
     void resetModdables()
     {
         nGain.reset();
         nBlendronicGain.reset();
+        nWaveDistance.reset();
+        nUndertow.reset();
+        nTransposition.reset();
+        nTranspUsesTuning.reset();
         nLengthMultiplier.reset();
+        nBeatsToSkip.reset();;
+        nMode.reset();;
+        
+        nReverseAttack.reset();
+        nReverseDecay.reset();
+        nReverseRelease.reset();
+        nReverseSustain.reset();
+        
+        nUndertowAttack.reset();
+        nUndertowDecay.reset();
+        nUndertowRelease.reset();
+        nUndertowSustain.reset();
+        
+        holdMin.reset();
+        holdMax.reset();
         clusterMin.reset();
         clusterThreshold.reset();
+        velocityMin.reset();
+        velocityMax.reset();
+        
+        keyOnReset.reset();
+        nUseGlobalSoundSet.reset();
+        nSoundSet.reset();
+        nSoundSetName.reset();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -237,8 +287,6 @@ public:
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
- 
-    
     inline float* getGainPtr()                                             {return &nGain.value;       }
     inline float* getBlendronicGainPtr()                                   {return &nBlendronicGain.value;}
     
@@ -307,10 +355,7 @@ public:
         nWaveDistance.getState(prep, ptagNostalgic_waveDistance);
         nUndertow.getState(prep, ptagNostalgic_undertow);
     
-        ValueTree transp( vtagNostalgic_transposition);
-        nTransposition.getState(transp, ptagFloat);
-        prep.addChild(transp, -1, 0);
-        
+        nTransposition.getState(prep, StringArray(vtagNostalgic_transposition, ptagFloat));
         nTranspUsesTuning.getState(prep, ptagNostalgic_transpUsesTuning);
         
         nLengthMultiplier.getState(prep, ptagNostalgic_lengthMultiplier);
@@ -330,7 +375,7 @@ public:
         
         targetTypeNostalgicClear.getState(prep, ptagNostalgic_targetClearAll);
         
-        ValueTree reverseADSRvals( vtagNostalgic_reverseADSR);
+        ValueTree reverseADSRvals(vtagNostalgic_reverseADSR);
         int count = 0;
         nReverseAttack.getState(reverseADSRvals, ptagFloat + String(count++));
         nReverseDecay.getState(reverseADSRvals, ptagFloat + String(count++));
@@ -338,7 +383,7 @@ public:
         nReverseRelease.getState(reverseADSRvals, ptagFloat + String(count));
         prep.addChild(reverseADSRvals, -1, 0);
         
-        ValueTree undertowADSRvals( vtagNostalgic_undertowADSR);
+        ValueTree undertowADSRvals(vtagNostalgic_undertowADSR);
         count = 0;
         nUndertowAttack.getState(undertowADSRvals, ptagFloat + String(count++));
         nUndertowDecay.getState(undertowADSRvals, ptagFloat + String(count++));

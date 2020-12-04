@@ -131,6 +131,23 @@ public:
         dResonanceGain.step();
         dHammerGain.step();
         dBlendronicGain.step();
+        
+        dAttack.step();
+        dDecay.step();
+        dRelease.step();
+        dSustain.step();
+        
+        dTransposition.step();
+        
+        dTranspUsesTuning.step();
+        
+        dUseGlobalSoundSet.step();
+        
+        dSoundSet.step();
+        dSoundSetName.step();
+        
+        velocityMin.step();
+        velocityMax.step();
     }
     
     void resetModdables()
@@ -139,6 +156,23 @@ public:
         dResonanceGain.reset();
         dHammerGain.reset();
         dBlendronicGain.reset();
+        
+        dAttack.reset();
+        dDecay.reset();
+        dRelease.reset();
+        dSustain.reset();
+        
+        dTransposition.reset();
+        
+        dTranspUsesTuning.reset();
+        
+        dUseGlobalSoundSet.reset();
+        
+        dSoundSet.reset();
+        dSoundSetName.reset();
+        
+        velocityMin.reset();
+        velocityMax.reset();
     }
     
     inline bool compare(DirectPreparation::Ptr d)
@@ -224,10 +258,7 @@ public:
         dBlendronicGain.getState(prep, ptagDirect_blendronicGain);
         
         dTranspUsesTuning.getState(prep, ptagDirect_transpUsesTuning);
-        
-        ValueTree transp(vtagDirect_transposition);
-        dTransposition.getState(transp, ptagFloat);
-        prep.addChild(transp, -1, 0);
+        dTransposition.getState(prep, StringArray(vtagDirect_transposition, ptagFloat));
         
         ValueTree ADSRvals( vtagDirect_ADSR);
         int count = 0;
@@ -261,20 +292,16 @@ public:
         velocityMin.setState(e, ptagDirect_velocityMin, 0);
         velocityMax.setState(e, ptagDirect_velocityMax, 127);
         
-        forEachXmlChildElement (*e, sub)
+        dTransposition.setState(e, StringArray(vtagDirect_transposition, ptagFloat), Array<float>());
+        
+        XmlElement* sub = e->getChildByName(vtagDirect_ADSR);
+        if (sub != nullptr)
         {
-            if (sub->hasTagName(vtagDirect_transposition))
-            {
-                dTransposition.setState(sub, ptagFloat, Array<float>());
-            }
-            else if (sub->hasTagName(vtagDirect_ADSR))
-            {
-                int count = 0;
-                dAttack.setState(sub, ptagFloat + String(count++), 3);
-                dDecay.setState(sub, ptagFloat + String(count++), 3);
-                dSustain.setState(sub, ptagFloat + String(count++), 1.);
-                dRelease.setState(sub, ptagFloat + String(count), 30);
-            }
+            int count = 0;
+            dAttack.setState(sub, ptagFloat + String(count++), 3);
+            dDecay.setState(sub, ptagFloat + String(count++), 3);
+            dSustain.setState(sub, ptagFloat + String(count++), 1.);
+            dRelease.setState(sub, ptagFloat + String(count), 30);
         }
     }
     

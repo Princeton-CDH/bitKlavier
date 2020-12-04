@@ -54,9 +54,10 @@ public:
     SynchronicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~SynchronicViewController()
     {
-        setLookAndFeel(nullptr);
+        alternateMod.setLookAndFeel(nullptr);
         releaseVelocitySetsSynchronicToggle.setLookAndFeel(nullptr);
         onOffSelectCB.setLookAndFeel(nullptr);
+        setLookAndFeel(nullptr);
         for (int i=0; i<=TargetTypeSynchronicRotate-TargetTypeSynchronicPatternSync; i++)
         {
             targetControlCBs[i]->setLookAndFeel(nullptr);
@@ -115,6 +116,8 @@ protected:
     std::unique_ptr<BKSingleSlider> blendronicGainSlider;
     
     ToggleButton transpUsesTuning;
+    
+    ToggleButton alternateMod;
     
     BKLabel modeLabel;
     BKLabel onOffLabel;

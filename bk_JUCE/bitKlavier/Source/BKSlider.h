@@ -107,11 +107,6 @@ public:
     //      newActiveVals = {1, 2, 3}
     //      newactives = {true, false, false, true, true, false....... false}
     // will result in [1 / / 2 3 / / / / / / /], where / represents an inactive slider (gap)
-    void setToOnlyActive(Array<Array<Moddable<float>>> newActiveVals, Array<Moddable<bool>> newactives, NotificationType newnotify);
-    
-    // as above, but takes a 1d array, for sliders that don't use subSliders
-    void setToOnlyActive(Array<Moddable<float>> newActiveVals, Array<Moddable<bool>> newactives, NotificationType newnotify);
-    
     void setToOnlyActive(Array<Array<float>> newActiveVals, Array<bool> newactives, NotificationType newnotify);
     
     // as above, but takes a 1d array, for sliders that don't use subSliders
@@ -165,8 +160,6 @@ private:
     // the array of arrays is the slider values, with the inner array for subsliders (multiple sliders at one position
     // the array of bools sets which of the sliders is actually active
     void setTo(Array<Array<float>> newvals, Array<bool> newactives, NotificationType newnotify);
-    
-    void setTo(Array<Array<float>> newvals, Array<Moddable<bool>> newactives, NotificationType newnotify);
     
     // initialize the slider; it should have no less than numDefaultSliders, all set to sliderDefault value
     void initializeSliderVals(int howmany);
@@ -888,20 +881,6 @@ public:
         if(newvals.size() > 4)
         {
             if(newvals[4] > 0) setActive();
-            else setPassive();
-        }
-    }
-    
-    void setValue(Array<Moddable<float>> newvals, NotificationType notify)
-    {
-        setAttackValue(newvals[0].value, notify);
-        setDecayValue(newvals[1].value, notify);
-        setSustainValue(newvals[2].value, notify);
-        setReleaseValue(newvals[3].value, notify);
-        
-        if(newvals.size() > 4)
-        {
-            if(newvals[4].value > 0) setActive();
             else setPassive();
         }
     }

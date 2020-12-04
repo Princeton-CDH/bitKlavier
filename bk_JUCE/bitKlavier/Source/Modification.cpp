@@ -337,7 +337,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
     {
         if (sub->hasTagName(vtagSynchronic_beatMults))
         {
-            Array<Moddable<float>> beats;
+            Array<float> beats;
             
             for (int k = 0; k < sub->getNumAttributes(); k++)
             {
@@ -347,17 +347,17 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 else
                 {
                     f = attr.getFloatValue();
-                    beats.add(Moddable<float>(f));
+                    beats.add(f);
                 }
             }
             
-            setBeatMultipliers(beats);
+            sBeatMultipliers.set(beats);
             setDirty(SynchronicBeatMultipliers);
             
         }
         else  if (sub->hasTagName(vtagSynchronic_accentMults))
         {
-            Array<Moddable<float>> accents;
+            Array<float> accents;
             for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -366,17 +366,17 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 else
                 {
                     f = attr.getFloatValue();
-                    accents.add(Moddable<float>(f));
+                    accents.add(f);
                 }
             }
             
-            setAccentMultipliers(accents);
+            sAccentMultipliers.set(accents);
             setDirty(SynchronicAccentMultipliers);
             
         }
         else  if (sub->hasTagName(vtagSynchronic_lengthMults))
         {
-            Array<Moddable<float>> lens;
+            Array<float> lens;
             for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
@@ -385,23 +385,23 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 else
                 {
                     f = attr.getFloatValue();
-                    lens.add(Moddable<float>(f));
+                    lens.add(f);
                 }
             }
             
-            setLengthMultipliers(lens);
+            sLengthMultipliers.set(lens);
             setDirty(SynchronicLengthMultipliers);
             
         }
         else  if (sub->hasTagName(vtagSynchronic_transpOffsets))
         {
-            Array<Array<Moddable<float>>> atransp;
+            Array<Array<float>> atransp;
             int tcount = 0;
             forEachXmlChildElement (*sub, asub)
             {
                 if (asub->hasTagName("t"+String(tcount++)))
                 {
-                    Array<Moddable<float>> transp;
+                    Array<float> transp;
                     for (int k = 0; k < asub->getNumAttributes(); k++)
                     {
                         String attr = asub->getStringAttribute(ptagFloat + String(k));
@@ -410,14 +410,14 @@ void SynchronicModification::setStateOld(XmlElement* e)
                         else
                         {
                             f = attr.getFloatValue();
-                            transp.add(Moddable<float>(f));
+                            transp.add(f);
                         }
                     }
                     atransp.set(tcount-1, transp);
                 }
             }
             
-            setTransposition(atransp);
+            sTransposition.set(atransp);
             setDirty(SynchronicTranspOffsets);
             
         }
@@ -445,7 +445,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 }
             }
             
-            setADSRs(aenvs);
+            sADSRs.set(aenvs);
             setDirty(SynchronicADSRs);
         }
     }

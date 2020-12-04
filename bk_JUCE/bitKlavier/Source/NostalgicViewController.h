@@ -23,6 +23,7 @@ public:
     NostalgicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~NostalgicViewController()
     {
+        alternateMod.setLookAndFeel(nullptr);
         setLookAndFeel(nullptr);
         for (int i=0; i<=TargetTypeNostalgicClear-TargetTypeNostalgicClear; i++)
         {
@@ -62,6 +63,8 @@ public:
     
     OwnedArray<BKComboBox> targetControlCBs;
     OwnedArray<BKLabel> targetControlCBLabels;
+    
+    ToggleButton alternateMod;
     
     void paint (Graphics&) override;
     void resized() override;

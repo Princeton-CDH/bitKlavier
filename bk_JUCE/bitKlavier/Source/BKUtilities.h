@@ -307,7 +307,6 @@ TuningSystem    tuningStringToTuningSystem(String tuning);
 String          intArrayToString(Array<int> arr);
 
 String          floatArrayToString(Array<float> arr);
-String          floatArrayToString(Array<Moddable<float>> arr);
 String          arrayFloatArrayToString(Array<Array<float>> arr);
 String          arrayActiveFloatArrayToString(Array<Array<float>> afarr, Array<bool> act);
 

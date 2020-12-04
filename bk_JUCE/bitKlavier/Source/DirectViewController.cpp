@@ -848,16 +848,16 @@ void DirectModificationEditor::update(void)
         greyOutAllComponents();
         highlightModedComponents();
         
-        transpositionSlider->setValue(mod->dTransposition.mod, dontSendNotification);
-        gainSlider->setValue(mod->dGain.mod, dontSendNotification);
-        resonanceGainSlider->setValue(mod->dResonanceGain.mod, dontSendNotification);
-        hammerGainSlider->setValue(mod->dHammerGain.mod, dontSendNotification);
-        blendronicGainSlider->setValue(mod->dBlendronicGain.mod, dontSendNotification);
+        transpositionSlider->setValue(mod->dTransposition.value, dontSendNotification);
+        gainSlider->setValue(mod->dGain.value, dontSendNotification);
+        resonanceGainSlider->setValue(mod->dResonanceGain.value, dontSendNotification);
+        hammerGainSlider->setValue(mod->dHammerGain.value, dontSendNotification);
+        blendronicGainSlider->setValue(mod->dBlendronicGain.value, dontSendNotification);
         ADSRSlider->setValue(mod->getADSRvals(), dontSendNotification);
-        transpUsesTuning.setToggleState(mod->dTranspUsesTuning.mod, dontSendNotification);
+        transpUsesTuning.setToggleState(mod->dTranspUsesTuning.value, dontSendNotification);
         alternateMod.setToggleState(mod->altMod, dontSendNotification);
-        velocityMinMaxSlider->setMinValue(mod->velocityMin.mod, dontSendNotification);
-        velocityMinMaxSlider->setMaxValue(mod->velocityMax.mod, dontSendNotification);
+        velocityMinMaxSlider->setMinValue(mod->velocityMin.value, dontSendNotification);
+        velocityMinMaxSlider->setMaxValue(mod->velocityMax.value, dontSendNotification);
     }
 }
 

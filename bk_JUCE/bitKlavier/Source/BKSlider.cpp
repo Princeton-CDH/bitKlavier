@@ -309,22 +309,6 @@ void  BKMultiSlider::setTo(Array<Array<float>> newvals, Array<bool> newactives, 
     drawSliders(newnotify);
 }
 
-void  BKMultiSlider::setTo(Array<Array<float>> newvals, Array<Moddable<bool>> newactives, NotificationType newnotify)
-{
-    initializeSliderVals(newvals.size());
-    
-    for (int i = 0; i < newvals.size() && i < newactives.size(); i++)
-    {
-        allSliderVals.set(i, newvals[i]);
-        
-        if(newactives[i].value) whichSlidersActive.set(i, true);
-        else whichSlidersActive.set(i, false);
-    }
-    
-    drawSliders(newnotify);
-}
-
-
 // when the client sends an array of only the active slider values, this will construct the complete array
 // of slider values, including inactive sliders, and then call setTo
 void BKMultiSlider::setToOnlyActive(Array<Array<float>> newActiveVals, Array<bool> newactives, NotificationType newnotify)
@@ -352,35 +336,6 @@ void BKMultiSlider::setToOnlyActive(Array<float> newActiveVals, Array<bool> newa
     
     setToOnlyActive(allvals, newactives, newnotify);
 }
-
-void BKMultiSlider::setToOnlyActive(Array<Array<Moddable<float>>> newActiveVals, Array<Moddable<bool>> newactives, NotificationType newnotify)
-{
-    Array<Array<float>> allvals;
-    int inc = 0;
-    
-    for (int i = 0; i < newactives.size() && inc < newActiveVals.size(); i++)
-    {
-        Array<float> arr;
-        for (auto v : newActiveVals[inc++]) arr.add(v.value);
-        if (newactives[i].value) allvals.set(i, arr);
-        else allvals.set(i, {0});
-    }
-    
-    setTo(allvals, newactives, newnotify);
-}
-
-
-void BKMultiSlider::setToOnlyActive(Array<Moddable<float>> newActiveVals, Array<Moddable<bool>> newactives, NotificationType newnotify)
-{
-    Array<Array<Moddable<float>>> allvals;
-    for (int i = 0; i < newActiveVals.size(); i++)
-    {
-        allvals.set(i, {newActiveVals.getUnchecked(i)});
-    }
-    
-    setToOnlyActive(allvals, newactives, newnotify);
-}
-
 
 void BKMultiSlider::setMinMaxDefaultInc(std::vector<float> newvals)
 {

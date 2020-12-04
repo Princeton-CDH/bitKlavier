@@ -1,12 +1,12 @@
 /*
-  ==============================================================================
-
-    Moddable.h
-    Created: 2 Dec 2020 11:56:22am
-    Author:  Matthew Wang
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ Moddable.h
+ Created: 2 Dec 2020 11:56:22am
+ Author:  Matthew Wang
+ 
+ ==============================================================================
+ */
 
 #pragma once
 
@@ -38,24 +38,24 @@ class Moddable : public ModdableBase
 public:
     Moddable () = default;
     
-    Moddable (ValueType v, ValueType m, int t):
+    Moddable (ValueType v, int t):
     value(v),
     base(v),
-    mod(m),
+    mod(v),
     time(t),
     dv(v), // Make sure to properly calculate dv before (and if) it is needed
     active(false),
     n(0),
-    maxN(0) {};
-    
-    Moddable (ValueType v, int t):
-    Moddable (v, v, t) {}
+    maxN(0)
+    {
+        initInc(tag<ValueType>{});
+    };
     
     Moddable (ValueType v):
-    Moddable (v, v, 0) {}
+    Moddable (v, 0) {}
     
     Moddable (const Moddable& m):
-    Moddable (m.base, m.mod, m.time)
+    Moddable (m.base, m.time)
     {
         inc = m.inc;
         maxN = m.maxN;
@@ -96,7 +96,7 @@ public:
             modTo(tag<ValueType>{}, m, false);
             return;
         }
-        mod = m.mod;
+        mod = m.base;
         time = m.time;
         modTo(tag<ValueType>{}, m, true);
     }
@@ -265,124 +265,218 @@ public:
     // because it works out better for backwards compatibility while
     // avoiding a lot of extra code in preparations'
     // getState and setState functions
-    void getState(ValueTree& vt, String s) { getState(tag<ValueType>{}, vt, s); }
+    void getState(ValueTree& vt, StringArray s) { getState(tag<ValueType>{}, vt, s); }
+    void getState(ValueTree& vt, String s) { getState(tag<ValueType>{}, vt, StringArray(s)); }
     
     template<class T = ValueType>
-    void getState(tag<T>, ValueTree& vt, String s)
+    void getState(tag<T>, ValueTree& vt, StringArray s)
     {
-        vt.setProperty(s, base, 0);
-        vt.setProperty(s + "_mod", mod, 0);
-        vt.setProperty(s + "_time", time, 0);
-        vt.setProperty(s + "_maxN", maxN, 0);
+        vt.setProperty(s[0], base, 0);
+        vt.setProperty(s[0] + "_time", time, 0);
+        vt.setProperty(s[0] + "_maxN", maxN, 0);
     }
     
-    void getState(tag<int>, ValueTree& vt, String s) { getState(tag<double>{}, vt, s); }
-    void getState(tag<float>, ValueTree& vt, String s) { getState(tag<double>{}, vt, s); }
-    void getState(tag<double>, ValueTree& vt, String s)
+    void getState(tag<int>, ValueTree& vt, StringArray s) { getState(tag<double>{}, vt, s); }
+    void getState(tag<float>, ValueTree& vt, StringArray s) { getState(tag<double>{}, vt, s); }
+    void getState(tag<double>, ValueTree& vt, StringArray s)
     {
-        vt.setProperty(s, base, 0);
-        vt.setProperty(s + "_mod", mod, 0);
-        vt.setProperty(s + "_inc", inc, 0);
-        vt.setProperty(s + "_time", time, 0);
-        vt.setProperty(s + "_maxN", maxN, 0);
+        vt.setProperty(s[0], base, 0);
+        vt.setProperty(s[0] + "_inc", inc, 0);
+        vt.setProperty(s[0] + "_time", time, 0);
+        vt.setProperty(s[0] + "_maxN", maxN, 0);
     }
-    void getState(tag<Array<float>>, ValueTree& vt, String s)
+    
+    template <class T>
+    void getState(tag<Array<T>>, ValueTree& vt, StringArray s)
     {
+//        if (s[0] == String() || s[1] == String())
+//        {
+//            return;
+//        }
+        ValueTree bt(s[0]);
+        ValueTree it(s[0] + "_inc");
         int count = 0;
-        for (auto v : base) vt.setProperty(s + String(count++), v, 0);
+        for (auto v : base) bt.setProperty(s[1] + String(count++), v, 0);
         count = 0;
-        for (auto v : mod) vt.setProperty(s + "_mod" + String(count++), v, 0);
+        for (auto v : inc) it.setProperty(s[1] + String(count++), v, 0);
+        vt.addChild(bt, -1, 0);
+        vt.addChild(it, -1, 0);
+        vt.setProperty(s[0] + "_time", time, 0);
+        vt.setProperty(s[0] + "_maxN", maxN, 0);
+    }
+    
+    template <class T>
+    void getState(tag<Array<Array<T>>>, ValueTree& vt, StringArray s)
+    {
+//        if (s[0] == String() || s[1] == String() || s[2] == String())
+//        {
+//            return;
+//        }
+        ValueTree bt(s[0]);
+        ValueTree it(s[0] + "_inc");
+        int count = 0;
+        for (auto a : base)
+        {
+            ValueTree sst(s[1] + String(count++));
+            int scount = 0;
+            for (auto v : a) sst.setProperty(s[2] + String(scount++), v, 0);
+            bt.addChild(sst, -1, 0);
+        }
         count = 0;
-        for (auto v : inc) vt.setProperty(s + "_inc" + String(count++), v, 0);
-        vt.setProperty(s + "_time", time, 0);
-        vt.setProperty(s + "_maxN", maxN, 0);
+        for (auto a : inc)
+        {
+            ValueTree sst(s[1] + String(count++));
+            int scount = 0;
+            for (auto v : a) sst.setProperty(s[2] + String(scount++), v, 0);
+            it.addChild(sst, -1, 0);
+        }
+        vt.addChild(bt, -1, 0);
+        vt.addChild(it, -1, 0);
+        vt.setProperty(s[0] + "_time", time, 0);
+        vt.setProperty(s[0] + "_maxN", maxN, 0);
     }
     
     //==============================================================================
     
-    void setState(XmlElement* e, String s, ValueType defaultValue)
+    void setState(XmlElement* e, StringArray s, ValueType defaultValue)
     { setState(tag<ValueType>{}, e, s, defaultValue); }
+    void setState(XmlElement* e, String s, ValueType defaultValue)
+    { setState(tag<ValueType>{}, e, StringArray(s), defaultValue); }
     
+    // This will catch enum types
     template<class T = ValueType>
-    void setState(tag<T>, XmlElement* e, String s, T defaultValue)
+    void setState(tag<T>, XmlElement* e, StringArray s, ValueType defaultValue)
     {
-        base = T(e->getIntAttribute(s, defaultValue));
-        mod = T(e->getIntAttribute(s + "_mod", base));
-        time = e->getIntAttribute(s + "_time", 0);
-        maxN = e->getIntAttribute(s + "_maxN", 0);
+        base = T(e->getIntAttribute(s[0], int(defaultValue)));
+        time = e->getIntAttribute(s[0] + "_time", 0);
+        maxN = e->getIntAttribute(s[0] + "_maxN", 0);
         value = base;
     }
     
-    void setState(tag<int>, XmlElement* e, String s, ValueType defaultValue)
+    void setState(tag<int>, XmlElement* e, StringArray s, ValueType defaultValue)
     { setState(tag<double>{}, e, s, defaultValue); }
-    void setState(tag<float>, XmlElement* e, String s, ValueType defaultValue)
+    void setState(tag<float>, XmlElement* e, StringArray s, ValueType defaultValue)
     { setState(tag<double>{}, e, s, defaultValue); }
-    void setState(tag<double>, XmlElement* e, String s, ValueType defaultValue)
+    void setState(tag<double>, XmlElement* e, StringArray s, ValueType defaultValue)
     {
-        base = e->getDoubleAttribute(s, defaultValue);
-        mod = e->getDoubleAttribute(s + "_mod", base);
-        inc = e->getDoubleAttribute(s + "_inc", 0.0);
-        time = e->getIntAttribute(s + "_time", 0);
-        maxN = e->getIntAttribute(s + "_maxN", 0);
+        base = e->getDoubleAttribute(s[0], defaultValue);
+        inc = e->getDoubleAttribute(s[0] + "_inc", 0.0);
+        time = e->getIntAttribute(s[0] + "_time", 0);
+        maxN = e->getIntAttribute(s[0] + "_maxN", 0);
         value = base;
     }
-    void setState(tag<bool>, XmlElement* e, String s, ValueType defaultValue)
+    void setState(tag<bool>, XmlElement* e, StringArray s, ValueType defaultValue)
     {
-        base = e->getBoolAttribute(s, defaultValue);
-        mod = e->getBoolAttribute(s + "_mod", base);
-        time = e->getIntAttribute(s + "_time", 0);
-        maxN = e->getIntAttribute(s + "_maxN", 0);
+        base = e->getBoolAttribute(s[0], defaultValue);
+        time = e->getIntAttribute(s[0] + "_time", 0);
+        maxN = e->getIntAttribute(s[0] + "_maxN", 0);
         value = base;
     }
-    void setState(tag<String>, XmlElement* e, String s, ValueType defaultValue)
+    void setState(tag<String>, XmlElement* e, StringArray s, ValueType defaultValue)
     {
-        base = e->getStringAttribute(s, defaultValue);
-        mod = e->getStringAttribute(s + "_mod", base);
-        time = e->getIntAttribute(s + "_time", 0);
-        maxN = e->getIntAttribute(s + "_maxN", 0);
+        base = e->getStringAttribute(s[0], defaultValue);
+        time = e->getIntAttribute(s[0] + "_time", 0);
+        maxN = e->getIntAttribute(s[0] + "_maxN", 0);
         value = base;
     }
-    void setState(tag<Array<float>>, XmlElement* e, String s, ValueType defaultValue)
+    
+    template <class T>
+    void setState(tag<Array<T>>, XmlElement* e, StringArray s, ValueType defaultValue)
     {
-        base = Array<float>();
-        mod = Array<float>();
-        inc = Array<float>();
-        int count = 0;
-        for (int k = 0; k < e->getNumAttributes(); k++)
+        base = defaultValue;
+        forEachXmlChildElement (*e, sub)
         {
-            if (e->hasAttribute(s + String(count)))
+            if (sub->hasTagName(s[0]))
             {
-                float b = e->getDoubleAttribute(s + String(count), 0.0f);
-                base.add(b);
-                mod.add(e->getDoubleAttribute(s + "_mod" + String(count), b));
-                inc.add(e->getDoubleAttribute(s + "_inc" + String(count), 0.0f));
+                base = Array<T>();
+                for (int k = 0; k < sub->getNumAttributes(); k++)
+                {
+                    if (sub->hasAttribute(s[1] + String(k)))
+                        base.add(getAttribute(tag<T>{}, sub, s[1] + String(k)));
+                }
             }
-            count++;
+            else if (sub->hasTagName(s[0] + "_inc"))
+            {
+                inc = Array<T>();
+                for (int k = 0; k < sub->getNumAttributes(); k++)
+                {
+                    if (sub->hasAttribute(s[1] + String(k)))
+                        inc.add(getAttribute(tag<T>{}, sub, s[1] + String(k)));
+                }
+            }
         }
-        
-        time = e->getIntAttribute(s + "_time", 0);
-        maxN = e->getIntAttribute(s + "_maxN", 0);
+        time = e->getIntAttribute(s[0] + "_time", 0);
+        maxN = e->getIntAttribute(s[0] + "_maxN", 0);
+        value = base;
+    }
+    
+    template <class T>
+    void setState(tag<Array<Array<T>>>, XmlElement* e, StringArray s, ValueType defaultValue)
+    {
+        base = defaultValue;
+        forEachXmlChildElement (*e, sub)
+        {
+            if (sub->hasTagName(s[0]))
+            {
+                base = Array<Array<T>>();
+                int count = 0;
+                forEachXmlChildElement (*sub, asub)
+                {
+                    if (asub->hasTagName(s[1] + String(count++)))
+                    {
+                        Array<T> ba;
+                        for (int k = 0; k < asub->getNumAttributes(); k++)
+                            ba.add(getAttribute(tag<T>{}, asub, s[2] + String(k)));
+                        base.add(ba);
+                    }
+                }
+            }
+            else if (sub->hasTagName(s[0] + "_inc"))
+            {
+                inc = Array<Array<T>>();
+                int count = 0;
+                forEachXmlChildElement (*sub, asub)
+                {
+                    if (asub->hasTagName(s[1] + String(count++)))
+                    {
+                        Array<T> ia;
+                        for (int k = 0; k < asub->getNumAttributes(); k++)
+                            ia.add(getAttribute(tag<T>{}, asub, s[2] + String(k)));
+                        inc.add(ia);
+                    }
+                }
+            }
+        }
+        time = e->getIntAttribute(s[0] + "_time", 0);
+        maxN = e->getIntAttribute(s[0] + "_maxN", 0);
         value = base;
     }
     //==============================================================================
     
     // Moddables are used in pairs, with one existing in a preparation that is being modded
-    // and one in a modification that contains mod info. Some of these members function differently
-    // depending on which of the pair the Moddable is.
+    // and one in a modification that contains mod info. For a Moddable in a mod, base, value, and
+    // mod are generally the same. For moddable in a preparation, value is the current value
+    // to be used in any processing, base is the value set in the preparation editor which
+    // the preparation can be reset to, and mod is the target value set when modify is called()
     
-    // Current value being used by a prep Moddable, irrelevant in mod Moddable
     ValueType value;
-    
-    // Initial value of a prep Moddable, irrelevant in mod Moddable
     ValueType base;
-    
-    // Mod value of a prep Moddable which changes to match the mod value of a mod Moddable
     ValueType mod;
     
-    // Irrelevant in prep Moddable, increment amount of mod Moddable
+    // Only used by mod Moddables - the amount by which the mod value should be adjusted
+    // on each activation
     ValueType inc;
     
 private:
+    template <class T = ValueType>
+    void initInc(tag<T>) { ; }
+    void initInc(tag<double>) { inc = 0.0; }
+    void initInc(tag<int>) { inc = 0; }
+    void initInc(tag<float>) { inc = 0.0f; }
+    void initInc(tag<Array<double>>) { inc = Array<double>(0.0); }
+    void initInc(tag<Array<int>>) { inc = Array<int>(0); }
+    void initInc(tag<Array<float>>) { inc = Array<float>(0.0f); }
+    
     void calcDV(tag<int>)
     {
         dv = mod - value;
@@ -396,6 +490,23 @@ private:
     {
         if (time == 0) dv = mod - value;
         else dv = (mod - value) / time;
+    }
+    
+    float getAttribute(tag<float>, XmlElement* e, String tagName, float v = 0.0f)
+    {
+        return e->getDoubleAttribute(tagName, v);
+    }
+    int getAttribute(tag<int>, XmlElement* e, String tagName, int v = 0)
+    {
+        return e->getIntAttribute(tagName, v);
+    }
+    bool getAttribute(tag<bool>, XmlElement* e, String tagName, bool v = false)
+    {
+        return e->getBoolAttribute(tagName, v);
+    }
+    String getAttribute(tag<String>, XmlElement* e, String tagName, String v = String())
+    {
+        return e->getStringAttribute(tagName, v);
     }
     
     // Time to mod  of a prep Moddable which changes to match the time of a mod Moddable
@@ -415,3 +526,4 @@ private:
     // Max number of times mod can be incremented
     int maxN;
 };
+

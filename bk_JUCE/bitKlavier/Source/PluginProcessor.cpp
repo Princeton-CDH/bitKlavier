@@ -390,6 +390,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 BKAudioProcessor::~BKAudioProcessor()
 {
+    stopTimer();
     for (auto item : clipboard)
         item->clearConnections();
     clipboard.clear();
@@ -1764,6 +1765,22 @@ void BKAudioProcessor::hiResTimerCallback()
     for (auto n : gallery->getAllNostalgic())
     {
         n->prep->stepModdables();
+    }
+    for (auto s : gallery->getAllSynchronic())
+    {
+        s->prep->stepModdables();
+    }
+    for (auto t : gallery->getAllTuning())
+    {
+        t->prep->stepModdables();
+    }
+    for (auto m : gallery->getAllTempo())
+    {
+        m->prep->stepModdables();
+    }
+    for (auto b : gallery->getAllBlendronic())
+    {
+        b->prep->stepModdables();
     }
 }
 

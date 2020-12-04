@@ -40,6 +40,7 @@ public:
     std::unique_ptr<BKADSRSlider> ADSRSlider;
     
     ToggleButton transpUsesTuning;
+    
     ToggleButton alternateMod;
     
     std::unique_ptr<BKSingleSlider> blendronicGainSlider;
