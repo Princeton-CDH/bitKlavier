@@ -433,7 +433,6 @@ public:
 		sMode = (SynchronicSyncMode)(int)(r[idx++] * SynchronicSyncModeNil);
 		sBeatsToSkip = (int)(r[idx++] * 2);
         
-        
         numClusters = (int)(r[idx++] * 20) + 1;
         onOffMode = (r[idx++] < 0.5) ? KeyOn : KeyOff;
         holdMin = (int)(r[idx++] * 12000);
@@ -754,7 +753,7 @@ public:
     inline void setSoundSet(int Id) { sSoundSet = Id; }
     inline int getSoundSet(void) { return sUseGlobalSoundSet.value ? -1 : sSoundSet.value; }
     
-    bool modded;
+    bool modded = false;
     
     Moddable<float> sGain;
     Moddable<float> sBlendronicGain;

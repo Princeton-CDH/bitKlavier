@@ -79,7 +79,7 @@ public:
     {
         value = v;
         base = v;
-        if (!active) mod = v;
+        mod = v;
         return *this;
     }
     

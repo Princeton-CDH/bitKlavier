@@ -1721,6 +1721,9 @@ SynchronicViewController(p, theGraph)
 //    for (auto slider : paramSliders) slider->addModdableComponentListener(this);
 //
 //    for(int i = 0; i < envelopeSliders.size(); i++) envelopeSliders[i]->addModdableComponentListener(this);
+    
+    alternateMod.addListener(this);
+    alternateMod.setVisible(true);
 }
 
 void SynchronicModificationEditor::greyOutAllComponents()
@@ -1756,9 +1759,6 @@ void SynchronicModificationEditor::greyOutAllComponents()
         envelopeSliders[i]->setDim(gModAlpha);
     }
     envelopeName.setAlpha(gModAlpha);
-    
-    alternateMod.addListener(this);
-    alternateMod.setVisible(true);
 }
 
 void SynchronicModificationEditor::highlightModedComponents()

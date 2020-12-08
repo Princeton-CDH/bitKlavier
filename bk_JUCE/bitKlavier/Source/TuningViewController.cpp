@@ -253,6 +253,12 @@ absoluteKeyboard(false, false)
     actionButton.addListener(this);
     addAndMakeVisible(actionButton);
     
+    alternateMod.setButtonText ("alternate mod");
+    alternateMod.setTooltip("activating this mod will alternate between modding and reseting attached preparations");
+    alternateMod.setToggleState (false, dontSendNotification);
+    addChildComponent(&alternateMod, ALL);
+    alternateMod.setLookAndFeel(&buttonsAndMenusLAF2);
+    
 #if JUCE_IOS
     offsetSlider->addWantsBigOneListener(this);
     A1ClusterMax->addWantsBigOneListener(this);
@@ -343,6 +349,11 @@ void TuningViewController::displayShared(void)
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
+    
+    alternateMod.setBounds(actionButton.getRight()+gXSpacing,
+                           actionButton.getY(),
+                           selectCB.getWidth(),
+                           actionButton.getHeight());
     
     comboBoxSlice.removeFromLeft(gXSpacing);
     
@@ -1934,9 +1945,6 @@ TuningViewController(p, theGraph)
     nToneRootOctaveCB.addListener(this);
     nToneSemitoneWidthSlider->addMyListener(this);
     
-   
-    
-    
     // ~ ~ ~ ~ ~ SPRING TUNING STUFF ~ ~ ~ ~ ~
     for (int i = 0; i < 12; i++)
     {
@@ -1962,6 +1970,22 @@ TuningViewController(p, theGraph)
     tetherWeightSecondaryGlobalSlider->addMyListener(this);
     fundamentalSetsTether.addListener(this);
     // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+    
+    A1ClusterThresh->addModdableComponentListener(this);
+    A1ClusterMax->addModdableComponentListener(this);
+    offsetSlider->addModdableComponentListener(this);
+    nToneSemitoneWidthSlider->addModdableComponentListener(this);
+    
+    rateSlider->addModdableComponentListener(this);
+    dragSlider->addModdableComponentListener(this);
+    intervalStiffnessSlider->addModdableComponentListener(this);
+    tetherStiffnessSlider->addModdableComponentListener(this);
+
+    tetherWeightGlobalSlider->addModdableComponentListener(this);
+    tetherWeightSecondaryGlobalSlider->addModdableComponentListener(this);
+    
+    alternateMod.addListener(this);
+    alternateMod.setVisible(true);
 
     update();
 }
@@ -2177,6 +2201,8 @@ void TuningModificationEditor::update(void)
     
         updateComponentVisibility();
         A1reset.setVisible(false);
+        
+        alternateMod.setToggleState(mod->altMod, dontSendNotification);
     }
     
 }
@@ -2731,6 +2757,11 @@ void TuningModificationEditor::buttonClicked (Button* b)
         mod->setDirty(TuningFundamentalSetsTether);
         
         fundamentalSetsTether.setAlpha(1.);
+    }
+    else if (b == &alternateMod)
+    {
+        TuningModification::Ptr mod = processor.gallery->getTuningModification(processor.updateState->currentModTuningId);
+        mod->altMod = alternateMod.getToggleState();
     }
     
     updateModification();

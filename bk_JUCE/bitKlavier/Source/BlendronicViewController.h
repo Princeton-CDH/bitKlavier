@@ -23,6 +23,7 @@ public:
     BlendronicViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~BlendronicViewController()
     {
+        alternateMod.setLookAndFeel(nullptr);
         setLookAndFeel(nullptr);
 //        smoothModeSelectCB.setLookAndFeel(nullptr);
 //        clearModeSelectCB.setLookAndFeel(nullptr);
@@ -71,13 +72,6 @@ protected:
     
     BKEditableComboBox selectCB;
     
-    BKTextButton pulseBeatSmooth;
-    BKTextButton constantFullSmooth;
-    
-    BKLabel smoothTimeLabel;
-    BKLabel smoothEqualLabel;
-    BKLabel smoothValueLabel;
-    
     OwnedArray<BKComboBox> targetControlCBs;
     OwnedArray<BKLabel> targetControlCBLabels;
     GroupComponent targetControlsGroup;
@@ -89,6 +83,8 @@ protected:
     std::unique_ptr<BKSingleSlider> gainSlider;
     
     std::unique_ptr<BKSingleSlider> bufferSizeSlider;
+    
+    ToggleButton alternateMod;
     
     void displayTab(int tab) override;
     void displayShared(void) override;

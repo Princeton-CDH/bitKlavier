@@ -281,8 +281,8 @@ public:
     float paddingScalarX;
     float paddingScalarY;
     
-    int screenWidth;
-    int screenHeight;
+    int screenWidth = 1920;
+    int screenHeight = 1080;
     
     double progress;
     double progressInc;

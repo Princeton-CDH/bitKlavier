@@ -28,6 +28,7 @@ public:
     TuningViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~TuningViewController()
     {
+        alternateMod.setLookAndFeel(nullptr);
         setLookAndFeel(nullptr);
     };
     
@@ -116,6 +117,7 @@ protected:
     
     BKComboBox adaptiveSystemsCB;
     
+    ToggleButton alternateMod;
     
     void fillTuningCB(void);
     void fillFundamentalCB(void);

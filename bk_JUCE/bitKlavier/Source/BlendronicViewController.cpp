@@ -78,30 +78,6 @@ BKViewController(p, theGraph, 3)
     selectCB.setSelectedItemIndex(0);
     addAndMakeVisible(selectCB);
     
-    pulseBeatSmooth.setName("PulseBeatSmooth");
-    pulseBeatSmooth.setButtonText("pulse length");
-    pulseBeatSmooth.setTooltip("Set base for smoothing time");
-    pulseBeatSmooth.addListener(this);
-    addAndMakeVisible(pulseBeatSmooth);
-    
-    constantFullSmooth.setName("MultipleDivideSmooth");
-    constantFullSmooth.setButtonText("full delay change");
-    constantFullSmooth.setTooltip("Set operation of the smoothing value");
-    constantFullSmooth.addListener(this);
-    addAndMakeVisible(constantFullSmooth);
-    
-    smoothTimeLabel.setText("Smooth time across a", dontSendNotification);
-    smoothTimeLabel.setTooltip("Set meaning for smoothing time");
-    addAndMakeVisible(&smoothTimeLabel, ALL);
-    
-    smoothEqualLabel.setText("equals", dontSendNotification);
-    smoothEqualLabel.setTooltip("Set meaning of the smoothing value");
-    addAndMakeVisible(&smoothEqualLabel, ALL);
-
-    smoothValueLabel.setText("times smoothing value.", dontSendNotification);
-    smoothValueLabel.setTooltip("Set meaning of the smoothing value");
-    addAndMakeVisible(&smoothValueLabel, ALL);
-    
     // Target Control CBs
     targetControlCBs = OwnedArray<BKComboBox>();
     for (int i=TargetTypeBlendronicPatternSync; i<=TargetTypeBlendronicOpenCloseOutput; i++)
@@ -132,6 +108,12 @@ BKViewController(p, theGraph, 3)
     actionButton.setButtonText("Action");
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
+    
+    alternateMod.setButtonText ("alternate mod");
+    alternateMod.setTooltip("activating this mod will alternate between modding and reseting attached preparations");
+    alternateMod.setToggleState (false, dontSendNotification);
+    addChildComponent(&alternateMod, ALL);
+    alternateMod.setLookAndFeel(&buttonsAndMenusLAF2);
     
     bufferSizeSlider = std::make_unique<BKSingleSlider>("buffer length (sec)", 1., 10., 4., 0.01);
     bufferSizeSlider->setChangeNotificationOnlyOnRelease(true);
@@ -166,22 +148,6 @@ void BlendronicViewController::invisible(void)
         paramSliders[i]->setVisible(false);
     }
     
-    pulseBeatSmooth.setVisible(false);
-    constantFullSmooth.setVisible(false);
-    smoothTimeLabel.setVisible(false);
-    smoothEqualLabel.setVisible(false);
-    smoothValueLabel.setVisible(false);
-//    smoothModeSelectCB.setVisible(false);
-//    smoothModeLabel.setVisible(false);
-//    syncModeSelectCB.setVisible(false);
-//    syncModeLabel.setVisible(false);
-//    clearModeSelectCB.setVisible(false);
-//    clearModeLabel.setVisible(false);
-//    closeModeSelectCB.setVisible(false);
-//    closeModeLabel.setVisible(false);
-//    openModeSelectCB.setVisible(false);
-//    openModeLabel.setVisible(false);
-    
     for (int i=0; i<targetControlCBs.size(); i++)
     {
         targetControlCBs[i]->setVisible(false);
@@ -215,6 +181,11 @@ void BlendronicViewController::displayShared(void)
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
+    
+    alternateMod.setBounds(actionButton.getRight()+gXSpacing,
+                           actionButton.getY(),
+                           selectCB.getWidth(),
+                           actionButton.getHeight());
     
     actionButton.toFront(false);
     
@@ -264,16 +235,6 @@ void BlendronicViewController::displayTab(int tab)
         for (int i = 0; i < paramSliders.size(); i++)
         {
             paramSliders[i]->setBounds(area.removeFromTop(sliderHeight));
-//            if (i == 2)
-//            {
-//                Rectangle<int> smoothRect (area.removeFromTop(gComponentComboBoxHeight));
-//                smoothTimeLabel.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.2));
-//                constantFullSmooth.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.2));
-//                smoothEqualLabel.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.075));
-//                pulseBeatSmooth.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.15));
-//                smoothValueLabel.setBounds(smoothRect.removeFromLeft(area.getWidth() * 0.25));
-//                area.removeFromTop(gComponentComboBoxHeight*0.5);
-//            }
             area.removeFromTop(gYSpacing);
         }
     }
@@ -371,35 +332,6 @@ void BlendronicViewController::displayTab(int tab)
                                       targetControlCBLabels[targetControlCBs.size() - 1]->getRight() - targetControlCBLabels[0]->getX() + 8 * gXSpacing,
                                       //column1.getWidth() + column2.getWidth() + column3.getWidth() + column4.getWidth() + 8 * gXSpacing,
                                       targetControlCBs[0]->getHeight() * (targetControlCBs.size() / 2) + 2 * gComponentComboBoxHeight + 4 * gYSpacing);
-        
-        /*
-        Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth() * 0.5));
-        leftColumn.removeFromLeft(leftColumn.getWidth() * 0.5);
-        
-        leftColumn.removeFromRight(processor.paddingScalarX * 5);
-        leftColumn.removeFromLeft(processor.paddingScalarX * 20);
-        
-        area.removeFromLeft(processor.paddingScalarX * 5); //area is now right column
-        area.removeFromRight(processor.paddingScalarX * 20);
-        
-        int targetControlCBSection = (gComponentComboBoxHeight + gYSpacing) * targetControlCBs.size();
-        leftColumn.removeFromTop((leftColumn.getHeight() - targetControlCBSection) / 3.);
-        area.removeFromTop((area.getHeight() - targetControlCBSection) / 3.);
-        
-        for (int i=0; i<targetControlCBs.size(); i++)
-        {
-            targetControlCBs[i]->setBounds(leftColumn.removeFromTop(gComponentComboBoxHeight));
-            leftColumn.removeFromTop(gYSpacing);
-            
-            targetControlCBLabels[i]->setBounds(area.removeFromTop(gComponentComboBoxHeight));
-            area.removeFromTop(gYSpacing);
-        }
-        
-        targetControlsGroup.setBounds(targetControlCBs[0]->getX() - 4 * gXSpacing,
-                                      targetControlCBs[0]->getY() - gComponentComboBoxHeight - 2 * gXSpacing,
-                                      targetControlCBs[0]->getWidth() * 2 + 8 * gXSpacing,
-                                      targetControlCBs[0]->getHeight() * targetControlCBs.size() + 2 * gComponentComboBoxHeight + 4 * gYSpacing);
-         */
     }
 }
 
@@ -462,7 +394,7 @@ void BlendronicPreparationEditor::update(void)
         selectCB.setSelectedId(processor.updateState->currentBlendronicId, dontSendNotification);
         
         gainSlider->setValue(prep->outGain.value, dontSendNotification);
-        bufferSizeSlider->setValue(prep->getDelayBufferSizeInSeconds(), dontSendNotification);
+        bufferSizeSlider->setValue(prep->delayBufferSizeInSeconds.value, dontSendNotification);
         
         for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -474,25 +406,25 @@ void BlendronicPreparationEditor::update(void)
         {
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicBeats]))
             {
-                paramSliders[i]->setToOnlyActive(prep->getBeats(), prep->getBeatsStates(), dontSendNotification);
+                paramSliders[i]->setToOnlyActive(prep->bBeats.value, prep->bBeatsStates.value, dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
             {
-                // paramSliders[i]->setTo(prep->getDelayLengths(), dontSendNotification);
-                paramSliders[i]->setToOnlyActive(prep->getDelayLengths(), prep->getDelayLengthsStates(), dontSendNotification);
+                // paramSliders[i]->setTo(prep->bDelayLengths.value, dontSendNotification);
+                paramSliders[i]->setToOnlyActive(prep->bDelayLengths.value, prep->bDelayLengthsStates.value, dontSendNotification);
             }
 
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
             {
-                // paramSliders[i]->setTo(prep->getSmoothLengths(), dontSendNotification);
-                paramSliders[i]->setToOnlyActive(prep->getSmoothLengths(), prep->getSmoothLengthsStates(), dontSendNotification);
+                // paramSliders[i]->setTo(prep->bSmoothLengths.value, dontSendNotification);
+                paramSliders[i]->setToOnlyActive(prep->bSmoothLengths.value, prep->bSmoothLengthsStates.value, dontSendNotification);
             }
 
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
             {
-                // paramSliders[i]->setTo(prep->getFeedbackCoefficients(), dontSendNotification);
-                paramSliders[i]->setToOnlyActive(prep->getFeedbackCoefficients(), prep->getFeedbackCoefficientsStates(), dontSendNotification);
+                // paramSliders[i]->setTo(prep->bFeedbackCoefficients.value, dontSendNotification);
+                paramSliders[i]->setToOnlyActive(prep->bFeedbackCoefficients.value, prep->bFeedbackCoefficientsStates.value, dontSendNotification);
             }
         }
     }
@@ -737,7 +669,7 @@ void BlendronicPreparationEditor::timerCallback()
             delayLineDisplay.setSmoothing(proc->getSmoothingDisplayData());
             delayLineDisplay.setLineSpacing(proc->getPulseLengthInSamples());
             float maxDelayLength = 0.0f;
-            for (auto d : prep->getDelayLengths())
+            for (auto d : prep->bDelayLengths.value)
             {
                 if (d > maxDelayLength) maxDelayLength = d;
             }
@@ -814,25 +746,25 @@ void BlendronicPreparationEditor::multiSliderDidChange(String name, int whichSli
     BlendronicPreparation::Ptr prep = processor.gallery->getBlendronicPreparation(processor.updateState->currentBlendronicId);
     
     DBG("BlendronicPreparationEditor::multiSliderDidChange " + name + " " + String(whichSlider) + " " + String(values[0]));
-    
-    if (name == "beat lengths")
-    {
-        prep    ->setBeat(whichSlider, values[0]);
-    }
-    else if (name == "delay lengths")
-    {
-        prep    ->setDelayLength(whichSlider, values[0]);
-    }
-    else if (name == "smoothing (ms)")
-    {
-        //prep    ->setSmoothValue(whichSlider, values[0]);
-        //active  ->setSmoothValue(whichSlider, values[0]);
-        prep    ->setSmoothLengths(whichSlider, values[0]);
-    }
-    else if (name == "feedback coefficients")
-    {
-        prep    ->setFeedbackCoefficient(whichSlider, values[0]);
-    }
+//
+//    if (name == "beat lengths")
+//    {
+//        prep    ->setBeat(whichSlider, values[0]);
+//    }
+//    else if (name == "delay lengths")
+//    {
+//        prep    ->setDelayLength(whichSlider, values[0]);
+//    }
+//    else if (name == "smoothing (ms)")
+//    {
+//        //prep    ->setSmoothValue(whichSlider, values[0]);
+//        //active  ->setSmoothValue(whichSlider, values[0]);
+//        prep    ->bSmoothLengths.set(whichSlider, values[0]);
+//    }
+//    else if (name == "feedback coefficients")
+//    {
+//        prep    ->setFeedbackCoefficient(whichSlider, values[0]);
+//    }
     
     processor.updateState->editsMade = true;
 }
@@ -848,23 +780,23 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     
     if (name == "beat lengths")
     {
-        prep    ->setBeats(newvals);
-        prep    ->setBeatsStates(states);
+        prep    ->bBeats.set(newvals);
+        prep    ->bBeatsStates.set(states);
     }
     else if (name == "delay lengths")
     {
-        prep    ->setDelayLengths(newvals);
-        prep    ->setDelayLengthsStates(states);
+        prep    ->bDelayLengths.set(newvals);
+        prep    ->bDelayLengthsStates.set(states);
     }
     else if (name == "smoothing (ms)")
     {
-        prep    ->setSmoothLengths(newvals);
-        prep    ->setSmoothLengthsStates(states);
+        prep    ->bSmoothLengths.set(newvals);
+        prep    ->bSmoothLengthsStates.set(states);
     }
     else if (name == "feedback coefficients")
     {
-        prep    ->setFeedbackCoefficients(newvals);
-        prep    ->setFeedbackCoefficientsStates(states);
+        prep    ->bFeedbackCoefficients.set(newvals);
+        prep    ->bFeedbackCoefficientsStates.set(states);
     }
     
     processor.updateState->editsMade = true;
@@ -883,23 +815,23 @@ void BlendronicPreparationEditor::multiSlidersDidChange(String name, Array<Array
     
     if (name == "beat lengths")
     {
-        prep    ->setBeats(newvals);
-        active  ->setBeats(newvals);
+        prep    ->bBeats.set(newvals);
+        active  ->bBeats.set(newvals);
     }
     else if (name == "delay lengths")
     {
-        prep    ->setDelayLengths(newvals);
-        active  ->setDelayLengths(newvals);
+        prep    ->bDelayLengths.set(newvals);
+        active  ->bDelayLengths.set(newvals);
     }
     else if (name == "smoothing (ms)")
     {
-        prep    ->setSmoothLengths(newvals);
-        active  ->setSmoothLengths(newvals);
+        prep    ->bSmoothLengths.set(newvals);
+        active  ->bSmoothLengths.set(newvals);
     }
     else if (name == "feedback coefficients")
     {
-        prep    ->setFeedbackCoefficients(newvals);
-        active  ->setFeedbackCoefficients(newvals);
+        prep    ->bFeedbackCoefficients.set(newvals);
+        active  ->bFeedbackCoefficients.set(newvals);
     }
 }
  */
@@ -934,24 +866,6 @@ void BlendronicPreparationEditor::buttonClicked (Button* b)
         
         displayTab(currentTab);
     }
-    else if (b == &pulseBeatSmooth)
-    {
-        prep->toggleSmoothBase();
-        if (prep->getSmoothBase() == BlendronicSmoothPulse)
-        {
-            pulseBeatSmooth.setButtonText("pulse length");
-        }
-        else pulseBeatSmooth.setButtonText("beat length");
-    }
-    else if (b == &constantFullSmooth)
-    {
-        prep->toggleSmoothScale();
-        if (prep->getSmoothScale() == BlendronicSmoothConstant)
-        {
-            constantFullSmooth.setButtonText("change in delay of 1");
-        }
-        else constantFullSmooth.setButtonText("full delay change");
-    }
 }
 
 void BlendronicPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
@@ -977,6 +891,10 @@ BlendronicViewController(p, theGraph)
     selectCB.addMyListener(this);
     
     gainSlider->addMyListener(this);
+    gainSlider->addModdableComponentListener(this);
+    
+    alternateMod.addListener(this);
+    alternateMod.setVisible(true);
 }
 
 void BlendronicModificationEditor::greyOutAllComponents()
@@ -1056,6 +974,8 @@ void BlendronicModificationEditor::update(void)
     {
         gainSlider->setValue(mod->outGain.value, dontSendNotification);
         
+        alternateMod.setToggleState(mod->altMod, dontSendNotification);
+        
         for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
         {
             targetControlCBs[i - TargetTypeBlendronicPatternSync]->setSelectedItemIndex
@@ -1066,26 +986,26 @@ void BlendronicModificationEditor::update(void)
         {
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicBeats]))
             {
-                // paramSliders[i]->setTo(mod->getBeats(), dontSendNotification);
-                paramSliders[i]->setToOnlyActive(mod->getBeats(), mod->getBeatsStates(), dontSendNotification);
+                // paramSliders[i]->setTo(mod->bBeats.value, dontSendNotification);
+                paramSliders[i]->setToOnlyActive(mod->bBeats.value, mod->bBeatsStates.value, dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
             {
-                // paramSliders[i]->setTo(mod->getDelayLengths(), dontSendNotification);
-                paramSliders[i]->setToOnlyActive(mod->getDelayLengths(), mod->getDelayLengthsStates(), dontSendNotification);
+                // paramSliders[i]->setTo(mod->bDelayLengths.value, dontSendNotification);
+                paramSliders[i]->setToOnlyActive(mod->bDelayLengths.value, mod->bDelayLengthsStates.value, dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
             {
-                // paramSliders[i]->setTo(mod->getSmoothLengths(), dontSendNotification);
-                paramSliders[i]->setToOnlyActive(mod->getSmoothLengths(), mod->getSmoothLengthsStates(), dontSendNotification);
+                // paramSliders[i]->setTo(mod->bSmoothLengths.value, dontSendNotification);
+                paramSliders[i]->setToOnlyActive(mod->bSmoothLengths.value, mod->bSmoothLengthsStates.value, dontSendNotification);
             }
             
             if(!paramSliders[i]->getName().compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
             {
-                // paramSliders[i]->setTo(mod->getFeedbackCoefficients(), dontSendNotification);
-                paramSliders[i]->setToOnlyActive(mod->getFeedbackCoefficients(), mod->getFeedbackCoefficientsStates(), dontSendNotification);
+                // paramSliders[i]->setTo(mod->bFeedbackCoefficients.value, dontSendNotification);
+                paramSliders[i]->setToOnlyActive(mod->bFeedbackCoefficients.value, mod->bFeedbackCoefficientsStates.value, dontSendNotification);
             }
         }
     }
@@ -1132,43 +1052,35 @@ void BlendronicModificationEditor::multiSliderDidChange(String name, int whichSl
     
     if (!name.compare(cBlendronicParameterTypes[BlendronicBeats]))
     {
-        Array<float> beats = mod->getBeats();
+        Array<float> beats = mod->bBeats.value;
         beats.set(whichSlider, values[0]);
         
         mod->setDirty(BlendronicBeats);
-        mod->setBeats(beats);
+        mod->bBeats.set(beats);
     }
     else if (!name.compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
     {
-        Array<float> delayLengths = mod->getDelayLengths();
+        Array<float> delayLengths = mod->bDelayLengths.value;
         delayLengths.set(whichSlider, values[0]);
         
         mod->setDirty(BlendronicDelayLengths);
-        mod->setDelayLengths(delayLengths);
+        mod->bDelayLengths.set(delayLengths);
     }
     else if (!name.compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
     {
-        Array<float> smoothLengths = mod->getSmoothLengths();
+        Array<float> smoothLengths = mod->bSmoothLengths.value;
         smoothLengths.set(whichSlider, values[0]);
         
         mod->setDirty(BlendronicSmoothLengths);
-        mod->setSmoothLengths(smoothLengths);
-    }
-    else if (!name.compare(cBlendronicParameterTypes[BlendronicSmoothValues]))
-    {
-        Array<float> smoothValues = mod->getSmoothValues();
-        smoothValues.set(whichSlider, values[0]);
-        
-        mod->setDirty(BlendronicSmoothValues);
-        mod->setSmoothValues(smoothValues);
+        mod->bSmoothLengths.set(smoothLengths);
     }
     else if (!name.compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
     {
-        Array<float> feedbackCoeffs = mod->getFeedbackCoefficients();
+        Array<float> feedbackCoeffs = mod->bFeedbackCoefficients.value;
         feedbackCoeffs.set(whichSlider, values[0]);
         
         mod->setDirty(BlendronicFeedbackCoeffs);
-        mod->setFeedbackCoefficients(feedbackCoeffs);
+        mod->bFeedbackCoefficients.set(feedbackCoeffs);
     }
     
     for(int i = 0; i < paramSliders.size(); i++)
@@ -1190,32 +1102,26 @@ void BlendronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     
     if (!name.compare(cBlendronicParameterTypes[BlendronicBeats]))
     {
-        mod->setBeats(newvals);
-        mod->setBeatsStates(states);
+        mod->bBeats.set(newvals);
+        mod->bBeatsStates.set(states);
         mod->setDirty(BlendronicBeats);
     }
     else if (!name.compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
     {
-        mod->setDelayLengths(newvals);
-        mod->setDelayLengthsStates(states);
+        mod->bDelayLengths.set(newvals);
+        mod->bDelayLengthsStates.set(states);
         mod->setDirty(BlendronicDelayLengths);
     }
     else if (!name.compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
     {
-        mod->setSmoothLengths(newvals);
-        mod->setSmoothLengthsStates(states);
+        mod->bSmoothLengths.set(newvals);
+        mod->bSmoothLengthsStates.set(states);
         mod->setDirty(BlendronicSmoothLengths);
-    }
-    else if (!name.compare(cBlendronicParameterTypes[BlendronicSmoothValues]))
-    {
-        mod->setSmoothValues(newvals);
-        mod->setSmoothValuesStates(states);
-        mod->setDirty(BlendronicSmoothValues);
     }
     else if (!name.compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
     {
-        mod->setFeedbackCoefficients(newvals);
-        mod->setFeedbackCoefficientsStates(states);
+        mod->bFeedbackCoefficients.set(newvals);
+        mod->bFeedbackCoefficientsStates.set(states);
         mod->setDirty(BlendronicFeedbackCoeffs);
     }
     
@@ -1226,50 +1132,6 @@ void BlendronicModificationEditor::multiSlidersDidChange(String name, Array<Arra
     
     updateModification();
 }
-
-/*
-void BlendronicModificationEditor::multiSlidersDidChange(String name, Array<Array<float>> values)
-{
-    BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
-    
-    //only transposition allows multiple simultaneous vals, so trim down to 1D array
-    Array<float> newvals = Array<float>();
-    for(int i=0; i<values.size(); i++) newvals.add(values[i][0]);
-    
-    if (!name.compare(cBlendronicParameterTypes[BlendronicBeats]))
-    {
-        mod->setBeats(newvals);
-        mod->setDirty(BlendronicBeats);
-    }
-    else if (!name.compare(cBlendronicParameterTypes[BlendronicDelayLengths]))
-    {
-        mod->setDelayLengths(newvals);
-        mod->setDirty(BlendronicDelayLengths);
-    }
-    else if (!name.compare(cBlendronicParameterTypes[BlendronicSmoothLengths]))
-    {
-        mod->setSmoothLengths(newvals);
-        mod->setDirty(BlendronicSmoothLengths);
-    }
-    else if (!name.compare(cBlendronicParameterTypes[BlendronicSmoothValues]))
-    {
-        mod->setSmoothValues(newvals);
-        mod->setDirty(BlendronicSmoothValues);
-    }
-    else if (!name.compare(cBlendronicParameterTypes[BlendronicFeedbackCoeffs]))
-    {
-        mod->setFeedbackCoefficients(newvals);
-        mod->setDirty(BlendronicFeedbackCoeffs);
-    }
-    
-    for(int i = 0; i < paramSliders.size(); i++)
-    {
-        if(paramSliders[i]->getName() == name) paramSliders[i]->setAlpha(1.);
-    }
-    
-    updateModification();
-}
- */
 
 void BlendronicModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
@@ -1477,6 +1339,11 @@ void BlendronicModificationEditor::buttonClicked (Button* b)
     {
         bool single = processor.gallery->getBlendronicModifications().size() == 2;
         getModOptionMenu(PreparationTypeBlendronicMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
+    else if (b == &alternateMod)
+    {
+        BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
+        mod->altMod = alternateMod.getToggleState();
     }
 //    else if (b == &rightArrow)
 //    {

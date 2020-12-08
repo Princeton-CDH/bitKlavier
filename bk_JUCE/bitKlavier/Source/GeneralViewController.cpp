@@ -489,6 +489,13 @@ ModdableBase* ModdableViewController::getCurrentModdable()
             return &mod->sClusterCap;
         else if (processor.updateState->currentModdableName == "num layers")
             return &mod->numClusters;
+    }
+    else if (processor.updateState->previousDisplay == DisplayBlendronicMod)
+    {
+        BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
+        
+        if (processor.updateState->currentModdableName == "gain")
+            return &mod->outGain;
         ; // continue branching for each parameter and component
     }
     

@@ -133,9 +133,13 @@ hotkeysEnabled(true)
     
     Process::setPriority(juce::Process::RealtimePriority);
     
-    Rectangle<int> r = Desktop::getInstance().getDisplays().getMainDisplay().userArea;
-    screenWidth = r.getWidth();
-    screenHeight = r.getHeight();
+    if (Desktop::getInstance().getDisplays().getPrimaryDisplay() != nullptr)
+    {
+        Rectangle<int> r = Desktop::getInstance().getDisplays().getPrimaryDisplay()->userArea;
+        screenWidth = r.getWidth();
+        screenHeight = r.getHeight();
+    }
+
         
     float w_factor = ((float) screenWidth / (float) DEFAULT_WIDTH);
     float h_factor = ((float) screenHeight / (float) DEFAULT_HEIGHT);

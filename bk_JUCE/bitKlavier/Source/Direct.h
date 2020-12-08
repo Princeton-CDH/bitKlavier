@@ -308,7 +308,8 @@ public:
     void setSoundSet(int Id) { dSoundSet = Id; }
     int getSoundSet() { return dUseGlobalSoundSet.value ? -1 : dSoundSet.value; }
 
-    bool modded;
+    bool modded = false;
+    
     // output gain multiplier
     Moddable<float> dGain;
     // gain multipliers for release resonance and hammer

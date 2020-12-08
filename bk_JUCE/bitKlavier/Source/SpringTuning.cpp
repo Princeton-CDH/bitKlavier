@@ -52,32 +52,62 @@ void SpringTuning::copy(SpringTuning::Ptr st)
     setFundamentalSetsTether(st->getFundamentalSetsTether());
     setTetherWeightGlobal(st->getTetherWeightGlobal());
     setTetherWeightSecondaryGlobal(st->getTetherWeightSecondaryGlobal());
-    
-    
-
 }
 
-void SpringTuning::performModification(SpringTuning::Ptr st, Array<bool> dirty)
+void SpringTuning::performModification(SpringTuning::Ptr st, Array<bool> dirty, bool reverse)
 {
     // DBG("SpringTuning::performModification called!!");
-    if (dirty[TuningSpringRate]) rate = st->getRate();
-    if (dirty[TuningSpringStiffness]) stiffness = st->getStiffness();
-    if (dirty[TuningSpringActive]) active = st->getActive();
-    if (dirty[TuningSpringDrag]) drag = st->getDrag();
+    if (dirty[TuningSpringRate]) rate.modify(st->rate, reverse);
+    if (dirty[TuningSpringStiffness]) stiffness.modify(st->stiffness, reverse);
+    if (dirty[TuningSpringActive]) active.modify(st->active, reverse);
+    if (dirty[TuningSpringDrag]) drag.modify(st->drag, reverse);
     
-    if (dirty[TuningSpringIntervalStiffness]) intervalStiffness = st->getIntervalStiffness();
-    if (dirty[TuningSpringTetherStiffness]) tetherStiffness = st->getTetherStiffness();
+    if (dirty[TuningSpringIntervalStiffness]) intervalStiffness.modify(st->intervalStiffness, reverse);
+    if (dirty[TuningSpringTetherStiffness]) tetherStiffness.modify(st->tetherStiffness, reverse);
     
-    if (dirty[TuningSpringIntervalScale]) scaleId = st->getScaleId();
+    if (dirty[TuningSpringIntervalScale]) scaleId.modify(st->scaleId, reverse);
     
-    if (dirty[TuningSpringIntervalFundamental]) setIntervalFundamental(st->getIntervalFundamental());
+    if (dirty[TuningSpringIntervalFundamental])
+    {
+        intervalFundamental.modify(st->intervalFundamental, reverse);
+        intervalFundamentalChanged();
+    }
     //setUsingFundamentalForIntervalSprings(st->getUsingFundamentalForIntervalSprings());
     
-    if (dirty[TuningFundamentalSetsTether]) setFundamentalSetsTether(st->getFundamentalSetsTether());
-    if (dirty[TuningTetherWeightGlobal]) setTetherWeightGlobal(st->getTetherWeightGlobal());
-    if (dirty[TuningTetherWeightGlobal2]) setTetherWeightSecondaryGlobal(st->getTetherWeightSecondaryGlobal());
+    if (dirty[TuningFundamentalSetsTether]) fundamentalSetsTether.modify(st->fundamentalSetsTether, reverse);
+    if (dirty[TuningTetherWeightGlobal]) tetherWeightGlobal.modify(st->tetherWeightGlobal, reverse);
+    if (dirty[TuningTetherWeightGlobal2]) tetherWeightSecondaryGlobal.modify(st->tetherWeightSecondaryGlobal, reverse);
 }
 
+void SpringTuning::stepModdables()
+{
+    rate.step();
+    stiffness.step();
+    active.step();
+    drag.step();
+    intervalStiffness.step();
+    tetherStiffness.step();
+    scaleId.step();
+    intervalFundamental.step();
+    fundamentalSetsTether.step();
+    tetherWeightGlobal.step();
+    tetherWeightSecondaryGlobal.step();
+}
+
+void SpringTuning::resetModdables()
+{
+    rate.reset();
+    stiffness.reset();
+    active.reset();
+    drag.reset();
+    intervalStiffness.reset();
+    tetherStiffness.reset();
+    scaleId.reset();
+    intervalFundamental.reset();
+    fundamentalSetsTether.reset();
+    tetherWeightGlobal.reset();
+    tetherWeightSecondaryGlobal.reset();
+}
 
 SpringTuning::SpringTuning(SpringTuning::Ptr st):
 rate(100),
@@ -153,8 +183,8 @@ scaleId(JustTuning)
     setStiffness(1.0);
 	numNotes = 0;
     if (st != nullptr) copy(st);
-    setDrag(drag);
-    setRate(rate);
+    setDrag(drag.value);
+    setRate(rate.value);
 }
 
 void SpringTuning::setTetherTuning(Array<float> tuning)
@@ -198,7 +228,7 @@ void SpringTuning::simulate()
     {
 		if (particle->getEnabled() && !particle->getLocked())
         {
-            particle->integrate(drag);
+            particle->integrate(drag.value);
         }
 	}
     
@@ -319,26 +349,26 @@ void SpringTuning::addNote(int note)
         // DBG("lowest current note = " + String(getLowestActiveParticle()));
         intervalFundamentalActive = (PitchClass)(getLowestActiveParticle() % 12);
         
-        if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
+        if(fundamentalSetsTether.value) setTetherFundamental(intervalFundamentalActive);
     }
     else if(useHighestNoteForFundamental)
     {
         // DBG("highest current note = " + String(getHighestActiveParticle()));
         intervalFundamentalActive = (PitchClass)(getHighestActiveParticle() % 12);
         
-        if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
+        if(fundamentalSetsTether.value) setTetherFundamental(intervalFundamentalActive);
     }
     else if(useLastNoteForFundamental)
     {
         // DBG("last note = " + String(note));
         intervalFundamentalActive = (PitchClass)(note % 12);
         
-        if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
+        if(fundamentalSetsTether.value) setTetherFundamental(intervalFundamentalActive);
     }
     else if(useAutomaticFundamental)
     {
         findFundamental(); //sets intervalFundamental internally
-        if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
+        if(fundamentalSetsTether.value) setTetherFundamental(intervalFundamentalActive);
     }
     
     addSpringsByNote(note);
@@ -363,7 +393,7 @@ void SpringTuning::removeNote(int note)
     else if(useAutomaticFundamental)
     {
         findFundamental();
-        if(fundamentalSetsTether) setTetherFundamental(intervalFundamentalActive);
+        if(fundamentalSetsTether.value) setTetherFundamental(intervalFundamentalActive);
     }
     
     removeSpringsByNote(note);
@@ -474,12 +504,11 @@ void SpringTuning::addSpring(Spring::Ptr spring)
     int interval = spring->getIntervalIndex();
     
     spring->setEnabled(true);
-    spring->setStiffness(intervalStiffness);
+    spring->setStiffness(intervalStiffness.value);
     spring->setStrength(springWeights[interval]);
     enabledSpringArray.add(spring);
 
     retuneIndividualSpring(spring);
-
 }
 
 void SpringTuning::addSpringsByNote(int note)

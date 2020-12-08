@@ -37,6 +37,7 @@
 #include "BKSTK.h"
 #include "BlendronicDisplay.h"
 
+
 // Forward declaration to allow include of Blendronic in BKSynthesiser
 class BKSynthesiser;
 
@@ -44,16 +45,7 @@ class BKSynthesiser;
 /////////////////////////BLENDRONIC PREPARATION///////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-/*
-BlendronicPreparation holds all the state variable values for the
-Blendrónic preparation. As with other preparation types, bK will use
-two instantiations of BlendronicPreparation for every active
-Blendrónic in the gallery, one to store the static state of the
-preparation, and the other to store the active state. These will
-be the same, unless a Modification is triggered, in which case the
-active state will be changed (and a Reset will revert the active state
-to the static state).
-*/
+class BlendronicModification;
 
 class BlendronicPreparation : public ReferenceCountedObject
 {
@@ -65,77 +57,118 @@ public:
 	typedef OwnedArray<BlendronicPreparation>                  Arr;
 	typedef OwnedArray<BlendronicPreparation, CriticalSection> CSArr;
 
-	//constructors
-	BlendronicPreparation(BlendronicPreparation::Ptr p);
-	BlendronicPreparation(String newName,
+
+    //copy constructor
+    BlendronicPreparation(BlendronicPreparation::Ptr p)
+    {
+        copy(p);
+    }
+    
+    //constructor with input
+    BlendronicPreparation(String newName,
                           Array<float> beats,
                           Array<float> delayLengths,
                           Array<float> smoothLengths,
-                          Array<float> smoothValues,
                           Array<float> feedbackCoefficients,
                           float clusterThresh,
-                          float delayBufferSizeInSeconds);
-	BlendronicPreparation(void);
+                          float delayBufferSizeInSeconds) :
+    bBeats(beats),
+    bDelayLengths(delayLengths),
+    bSmoothLengths(smoothLengths),
+    bFeedbackCoefficients(feedbackCoefficients),
+    bBeatsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    bDelayLengthsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    bSmoothLengthsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    bFeedbackCoefficientsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    delayBufferSizeInSeconds(delayBufferSizeInSeconds),
+    name(newName),
+    targetTypeBlendronicPatternSync(NoteOn),
+    targetTypeBlendronicBeatSync(NoteOn),
+    targetTypeBlendronicClear(NoteOn),
+    targetTypeBlendronicPausePlay(NoteOn),
+    targetTypeBlendronicOpenCloseInput(NoteOn),
+    targetTypeBlendronicOpenCloseOutput(NoteOn)
+    {
+        
+    }
+    
+    //empty constructor
+    BlendronicPreparation(void) :
+    outGain(1.0),
+    bBeats(Array<float>({ 4., 3., 2., 3.})),
+    bDelayLengths(Array<float>({ 4., 3., 2., 3.})),
+    bSmoothLengths(Array<float>({ 50.0f })),
+    bFeedbackCoefficients(Array<float>({ 0.95 })),
+    bBeatsStates(Array<bool>({true, true, true, true, false, false, false, false, false, false, false, false, })),
+    bDelayLengthsStates(Array<bool>({true, true, true, true, false, false, false, false, false, false, false, false, })),
+    bSmoothLengthsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    bFeedbackCoefficientsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    delayBufferSizeInSeconds(5.f),
+    targetTypeBlendronicPatternSync(NoteOn),
+    targetTypeBlendronicBeatSync(NoteOn),
+    targetTypeBlendronicClear(NoteOn),
+    targetTypeBlendronicPausePlay(NoteOn),
+    targetTypeBlendronicOpenCloseInput(NoteOn),
+    targetTypeBlendronicOpenCloseOutput(NoteOn)
+    {
+        
+    }
 
 	// copy, modify, compare, randomize
 	inline void copy(BlendronicPreparation::Ptr b)
     {
         outGain = b->outGain;
-        bBeats = b->getBeats();
-        bDelayLengths = b->getDelayLengths();
-        bSmoothLengths = b->getSmoothLengths();
-        bSmoothValues = b->getSmoothValues();
-        bFeedbackCoefficients = b->getFeedbackCoefficients();
-        bBeatsStates = b->getBeatsStates();
-        bDelayLengthsStates = b->getDelayLengthsStates();
-        bSmoothLengthsStates = b->getSmoothLengthsStates();
-        bSmoothValuesStates = b->getSmoothValuesStates();
-        bFeedbackCoefficientsStates = b->getFeedbackCoefficientsStates();
-        bSmoothBase = b->getSmoothBase();
-        bSmoothScale = b->getSmoothScale();
+        bBeats = b->bBeats;
+        bDelayLengths = b->bDelayLengths;
+        bSmoothLengths = b->bSmoothLengths;
+        bFeedbackCoefficients = b->bFeedbackCoefficients;
+        bBeatsStates = b->bBeatsStates;
+        bDelayLengthsStates = b->bDelayLengthsStates;
+        bSmoothLengthsStates = b->bSmoothLengthsStates;
+        bFeedbackCoefficientsStates = b->bFeedbackCoefficientsStates;
+        delayBufferSizeInSeconds =  b->delayBufferSizeInSeconds;
         targetTypeBlendronicPatternSync = b->getTargetTypeBlendronicPatternSync();
         targetTypeBlendronicBeatSync = b->getTargetTypeBlendronicBeatSync();
         targetTypeBlendronicClear = b->getTargetTypeBlendronicClear();
         targetTypeBlendronicPausePlay = b->getTargetTypeBlendronicPausePlay();
         targetTypeBlendronicOpenCloseInput = b->getTargetTypeBlendronicOpenCloseInput();
         targetTypeBlendronicOpenCloseOutput = b->getTargetTypeBlendronicOpenCloseOutput();
-        delayBufferSizeInSeconds =  b->getDelayBufferSizeInSeconds();
     }
     
-    void performModification(BlendronicPreparation::Ptr b, Array<bool> dirty)
-    {
-        if (dirty[BlendronicOutGain]) outGain.modify(b->outGain, false);
-        if (dirty[BlendronicBeats]) {
-            bBeats = b->getBeats();
-            bBeatsStates = b->getBeatsStates();
-        }
-        if (dirty[BlendronicDelayLengths]) {
-            bDelayLengths = b->getDelayLengths();
-            bDelayLengthsStates = b->getDelayLengthsStates();
-        }
-        if (dirty[BlendronicSmoothLengths]) {
-            bSmoothLengths = b->getSmoothLengths();
-            bSmoothLengthsStates = b->getSmoothLengthsStates();
-        }
-        if (dirty[BlendronicSmoothValues]) {
-            bSmoothValues = b->getSmoothValues();
-            bSmoothValuesStates = b->getSmoothValuesStates();
-        }
-        if (dirty[BlendronicFeedbackCoeffs]) {
-            bFeedbackCoefficients = b->getFeedbackCoefficients();
-            bFeedbackCoefficientsStates = b->getFeedbackCoefficientsStates();
-        }
-        if (dirty[BlendronicDelayBufferSize]) delayBufferSizeInSeconds = b->getDelayBufferSizeInSeconds();
-    }
+    void performModification(BlendronicModification* b, Array<bool> dirty);
     
     void stepModdables()
     {
         outGain.step();
+        
+        bBeats.step();
+        bDelayLengths.step();
+        bSmoothLengths.step();
+        bFeedbackCoefficients.step();
+        
+        bBeatsStates.step();
+        bDelayLengthsStates.step();
+        bSmoothLengthsStates.step();
+        bFeedbackCoefficientsStates.step();
+        
+        delayBufferSizeInSeconds.step();
     }
     
     void resetModdables()
     {
         outGain.reset();
+        
+        bBeats.reset();
+        bDelayLengths.reset();
+        bSmoothLengths.reset();
+        bFeedbackCoefficients.reset();
+        
+        bBeatsStates.reset();
+        bDelayLengthsStates.reset();
+        bSmoothLengthsStates.reset();
+        bFeedbackCoefficientsStates.reset();
+        
+        delayBufferSizeInSeconds.reset();
     }
     
 	inline bool compare(BlendronicPreparation::Ptr b)
@@ -149,72 +182,72 @@ public:
         bool smoothsStates = true;
         bool feedbacksStates = true;
         
-        for (int i = b->getBeats().size(); --i>=0;)
+        for (int i = b->bBeats.value.size(); --i>=0;)
         {
-            if (b->getBeats()[i] != bBeats[i])
+            if (b->bBeats.value[i] != bBeats.value[i])
             {
                 beats = false;
                 break;
             }
         }
         
-        for (int i = b->getBeatsStates().size(); --i>=0;)
+        for (int i = b->bBeatsStates.value.size(); --i>=0;)
         {
-            if (b->getBeatsStates()[i] != bBeatsStates[i])
+            if (b->bBeatsStates.value[i] != bBeatsStates.value[i])
             {
                 beatsStates = false;
                 break;
             }
         }
         
-        for (int i = b->getDelayLengths().size(); --i>=0;)
+        for (int i = b->bDelayLengths.value.size(); --i>=0;)
         {
-            if (b->getDelayLengths()[i] != bDelayLengths[i])
+            if (b->bDelayLengths.value[i] != bDelayLengths.value[i])
             {
                 delays = false;
                 break;
             }
         }
         
-        for (int i = b->getDelayLengthsStates().size(); --i>=0;)
+        for (int i = b->bDelayLengthsStates.value.size(); --i>=0;)
         {
-            if (b->getDelayLengthsStates()[i] != bDelayLengthsStates[i])
+            if (b->bDelayLengthsStates.value[i] != bDelayLengthsStates.value[i])
             {
                 delaysStates = false;
                 break;
             }
         }
         
-        for (int i = b->getSmoothLengths().size(); --i>=0;)
+        for (int i = b->bSmoothLengths.value.size(); --i>=0;)
         {
-            if (b->getSmoothLengths()[i] != bSmoothLengths[i])
+            if (b->bSmoothLengths.value[i] != bSmoothLengths.value[i])
             {
                 smooths = false;
                 break;
             }
         }
         
-        for (int i = b->getSmoothLengthsStates().size(); --i>=0;)
+        for (int i = b->bSmoothLengthsStates.value.size(); --i>=0;)
         {
-            if (b->getSmoothLengthsStates()[i] != bSmoothLengthsStates[i])
+            if (b->bSmoothLengthsStates.value[i] != bSmoothLengthsStates.value[i])
             {
                 smoothsStates = false;
                 break;
             }
         }
         
-        for (int i  = b->getFeedbackCoefficients().size(); --i >= 0;)
+        for (int i  = b->bFeedbackCoefficients.value.size(); --i >= 0;)
         {
-            if (b->getFeedbackCoefficients()[i] != bFeedbackCoefficients[i])
+            if (b->bFeedbackCoefficients.value[i] != bFeedbackCoefficients.value[i])
             {
                 feedbacks = false;
                 break;
             }
         }
         
-        for (int i  = b->getFeedbackCoefficientsStates().size(); --i >= 0;)
+        for (int i  = b->bFeedbackCoefficientsStates.value.size(); --i >= 0;)
         {
-            if (b->getFeedbackCoefficientsStates()[i] != bFeedbackCoefficientsStates[i])
+            if (b->bFeedbackCoefficientsStates.value[i] != bFeedbackCoefficientsStates.value[i])
             {
                 feedbacksStates = false;
                 break;
@@ -224,15 +257,13 @@ public:
         return  beats && delays && smooths && feedbacks &&
                 beatsStates && delaysStates && smoothsStates && feedbacksStates &&
                 outGain == b->outGain &&
-                bSmoothBase == b->getSmoothBase() &&
-                bSmoothScale == b->getSmoothScale() &&
+                delayBufferSizeInSeconds == b->delayBufferSizeInSeconds &&
                 targetTypeBlendronicPatternSync == b->getTargetTypeBlendronicPatternSync() &&
                 targetTypeBlendronicBeatSync == b->getTargetTypeBlendronicBeatSync() &&
                 targetTypeBlendronicClear == b->getTargetTypeBlendronicClear() &&
                 targetTypeBlendronicPausePlay == b->getTargetTypeBlendronicPausePlay() &&
                 targetTypeBlendronicOpenCloseInput == b->getTargetTypeBlendronicOpenCloseInput() &&
-                targetTypeBlendronicOpenCloseOutput == b->getTargetTypeBlendronicOpenCloseOutput() &&
-                delayBufferSizeInSeconds == b->getDelayBufferSizeInSeconds() ;
+                targetTypeBlendronicOpenCloseOutput == b->getTargetTypeBlendronicOpenCloseOutput() ;
     }
     
     inline void randomize()
@@ -244,29 +275,34 @@ public:
         for (int i = 0; i < 100; i++)  r[i] = (Random::getSystemRandom().nextFloat());
         int idx = 0;
         
-        bSmoothBase = (BlendronicSmoothBase)(int)(r[idx++] * BlendronicSmoothBaseNil);
-        bSmoothScale = (BlendronicSmoothScale)(int)(r[idx++] * BlendronicSmoothScaleNil);
+        Array<float> fa;
+        for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
+        {
+            fa.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+        }
+        bBeats.set(fa);
         
-        bBeats.clear();
+        
+        fa.clear();
         for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
         {
-            bBeats.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+            fa.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
         }
-        bDelayLengths.clear();
+        bDelayLengths.set(fa);
+        
+        fa.clear();
         for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
         {
-            bDelayLengths.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+            fa.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
         }
-        bSmoothLengths.clear();
+        bSmoothLengths.set(fa);
+        
+        fa.clear();
         for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
         {
-            bSmoothLengths.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
+            fa.add(i, (Random::getSystemRandom().nextFloat()));
         }
-        bFeedbackCoefficients.clear();
-        for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
-        {
-            bFeedbackCoefficients.add(i, (Random::getSystemRandom().nextFloat()));
-        }
+        bFeedbackCoefficients.set(fa);
         
         outGain.set(r[idx++]);
         delayBufferSizeInSeconds = r[idx++] * 4;
@@ -274,64 +310,7 @@ public:
 
 	//accessors
 	inline const String getName() const noexcept { return name; }
-    
-	inline const Array<float> getBeats() const noexcept { return bBeats; }
-    inline const Array<float> getDelayLengths() const noexcept { return bDelayLengths; }
-    inline const Array<float> getSmoothLengths() const noexcept { return bSmoothLengths; }
-	inline const Array<float> getSmoothValues() const noexcept { return bSmoothValues; }
-	inline const Array<float> getFeedbackCoefficients() const noexcept { return bFeedbackCoefficients; }
-    
-    inline const Array<bool> getBeatsStates() const noexcept { return bBeatsStates; }
-    inline const Array<bool> getDelayLengthsStates() const noexcept { return bDelayLengthsStates; }
-    inline const Array<bool> getSmoothLengthsStates() const noexcept { return bSmoothLengthsStates; }
-    inline const Array<bool> getSmoothValuesStates() const noexcept { return bSmoothValuesStates; }
-    inline const Array<bool> getFeedbackCoefficientsStates() const noexcept { return bFeedbackCoefficientsStates; }
-    
-    inline const float getDelayBufferSizeInSeconds() const noexcept { return delayBufferSizeInSeconds; }
-	
-    inline const BlendronicSmoothBase getSmoothBase() const noexcept { return bSmoothBase; }
-    inline const BlendronicSmoothScale getSmoothScale() const noexcept { return bSmoothScale; }
-	
-	//mutators
-	inline void setName(String n) { name = n; }
-	inline void setBeats(Array<float> beats) { bBeats.swapWith(beats); }
-    inline void setDelayLengths(Array<float> delayLengths) { bDelayLengths.swapWith(delayLengths); }
-    inline void setSmoothLengths(Array<float> smoothLengths) { bSmoothLengths.swapWith(smoothLengths); }
-	inline void setSmoothValues(Array<float> smoothValues) { bSmoothValues.swapWith(smoothValues); }
-	inline void setFeedbackCoefficients(Array<float> feedbackCoefficients) { bFeedbackCoefficients.swapWith(feedbackCoefficients); }
-    
-    inline void setBeatsStates(Array<bool> beats) { bBeatsStates.swapWith(beats); }
-    inline void setDelayLengthsStates(Array<bool> delayLengths) { bDelayLengthsStates.swapWith(delayLengths); }
-    inline void setSmoothLengthsStates(Array<bool> smoothLengths) { bSmoothLengthsStates.swapWith(smoothLengths); }
-    inline void setSmoothValuesStates(Array<bool> smoothValues) { bSmoothValuesStates.swapWith(smoothValues); }
-    inline void setFeedbackCoefficientsStates(Array<bool> feedbackCoefficients) { bFeedbackCoefficientsStates.swapWith(feedbackCoefficients); }
-
-    inline void setDelayBufferSizeInSeconds(float size) { delayBufferSizeInSeconds = size; }
-    
-    inline void setBeat(int whichSlider, float value) { bBeats.set(whichSlider, value); }
-    inline void setDelayLength(int whichSlider, float value) { bDelayLengths.set(whichSlider, value); }
-    inline void setSmoothLengths(int whichSlider, float value) { bSmoothLengths.set(whichSlider, value); }
-    inline void setSmoothValue(int whichSlider, float value) { bSmoothValues.set(whichSlider, value); }
-    inline void setFeedbackCoefficient(int whichSlider, float value) { bFeedbackCoefficients.set(whichSlider, value); }
-    
-    inline const void setSmoothBase(BlendronicSmoothBase base) { bSmoothBase = base; }
-    inline const void setSmoothScale(BlendronicSmoothScale scale) { bSmoothScale = scale; }
-    inline const void toggleSmoothBase()
-    {
-        if (bSmoothBase == BlendronicSmoothPulse)
-        {
-            bSmoothBase = BlendronicSmoothBeat;
-        }
-        else bSmoothBase = BlendronicSmoothPulse;
-    }
-    inline const void toggleSmoothScale()
-    {
-        if (bSmoothScale == BlendronicSmoothConstant)
-        {
-            bSmoothScale = BlendronicSmoothFull;
-        }
-        else bSmoothScale = BlendronicSmoothConstant;
-    }
+    inline void setName(String n) { name = n; }
     
     inline const TargetNoteMode getTargetTypeBlendronicBeatSync() const noexcept { return targetTypeBlendronicBeatSync; }
     inline const TargetNoteMode getTargetTypeBlendronicPatternSync() const noexcept { return targetTypeBlendronicPatternSync; }
@@ -370,12 +349,12 @@ public:
 	void print(void)
     {
         DBG("| - - - Blendronic Preparation - - - |");
-        DBG("bBeats: " + floatArrayToString(bBeats));
-        DBG("bDelayLengths: " + floatArrayToString(bDelayLengths));
-        DBG("bSmoothLengths: " + floatArrayToString(bSmoothLengths));
-        DBG("bFeedbackCoefficients: " + floatArrayToString(bFeedbackCoefficients));
+        DBG("bBeats: " + floatArrayToString(bBeats.value));
+        DBG("bDelayLengths: " + floatArrayToString(bDelayLengths.value));
+        DBG("bSmoothLengths: " + floatArrayToString(bSmoothLengths.value));
+        DBG("bFeedbackCoefficients: " + floatArrayToString(bFeedbackCoefficients.value));
         DBG("outGain: " + String(outGain.value));
-        DBG("delayBufferSizeInSeconds: " + String(delayBufferSizeInSeconds));
+        DBG("delayBufferSizeInSeconds: " + String(delayBufferSizeInSeconds.value));
     }
     
     // TODO
@@ -384,97 +363,26 @@ public:
         ValueTree prep("params");
         
         outGain.getState(prep, ptagBlendronic_outGain);
+        delayBufferSizeInSeconds.getState(prep, ptagBlendronic_delayBufferSize);
+        
+        bBeats.getState(prep, StringArray(vtagBlendronic_beats, ptagFloat));
+        bBeatsStates.getState(prep, StringArray(vtagBlendronic_beatsStates, ptagBool));
+        
+        bDelayLengths.getState(prep, StringArray(vtagBlendronic_delayLengths, ptagFloat));
+        bDelayLengthsStates.getState(prep, StringArray(vtagBlendronic_delayLengthsStates, ptagBool));
+        
+        bSmoothLengths.getState(prep, StringArray(vtagBlendronic_smoothLengths, ptagFloat));
+        bSmoothLengthsStates.getState(prep, StringArray(vtagBlendronic_smoothLengthsStates, ptagBool));
+
+        bFeedbackCoefficients.getState(prep, StringArray(vtagBlendronic_feedbackCoefficients, ptagFloat));
+        bFeedbackCoefficientsStates.getState(prep, StringArray(vtagBlendronic_feedbackCoefficientsStates, ptagBool));
+        
         prep.setProperty( ptagBlendronic_targetPatternSync, getTargetTypeBlendronicPatternSync(), 0);
         prep.setProperty( ptagBlendronic_targetBeatSync, getTargetTypeBlendronicBeatSync(), 0);
         prep.setProperty( ptagBlendronic_targetClear, getTargetTypeBlendronicClear(), 0);
         prep.setProperty( ptagBlendronic_targetPausePlay, getTargetTypeBlendronicPausePlay(), 0);
         prep.setProperty( ptagBlendronic_targetOpenCloseInput, getTargetTypeBlendronicOpenCloseInput(), 0);
         prep.setProperty( ptagBlendronic_targetOpenCloseOutput, getTargetTypeBlendronicOpenCloseOutput(), 0);
-        prep.setProperty( ptagBlendronic_delayBufferSize, getDelayBufferSizeInSeconds(), 0);
-
-        ValueTree beats(vtagBlendronic_beats);
-        int count = 0;
-        for (auto f : getBeats())
-        {
-            beats.setProperty(ptagFloat + String(count++), f, 0);
-        }
-        prep.addChild(beats, -1, 0);
-        
-        ValueTree beatsStates(vtagBlendronic_beatsStates);
-        count = 0;
-        for (auto f : getBeatsStates())
-        {
-            beatsStates.setProperty(ptagBool + String(count++), f ? 1 : 0, 0);
-        }
-        prep.addChild(beatsStates, -1, 0);
-     
-        
-        ValueTree delayLengths(vtagBlendronic_delayLengths);
-        count = 0;
-        for (auto f : getDelayLengths())
-        {
-            delayLengths.setProperty(ptagFloat + String(count++), f, 0);
-        }
-        prep.addChild(delayLengths, -1, 0);
-        
-        ValueTree delayLengthsStates(vtagBlendronic_delayLengthsStates);
-        count = 0;
-        for (auto f : getDelayLengthsStates())
-        {
-            delayLengthsStates.setProperty(ptagBool + String(count++), f ? 1 : 0, 0);
-        }
-        prep.addChild(delayLengthsStates, -1, 0);
-        
-        /*
-         ValueTree beatMultsStates( vtagSynchronic_beatMultsStates);
-         count = 0;
-         for (auto f : getBeatMultipliersStates())
-         {
-             beatMultsStates.setProperty( ptagBool + String(count++), f ? 1 : 0, 0);
-         }
-         prep.addChild(beatMultsStates, -1, 0);
-         */
-        
-        
-        ValueTree smoothLengths(vtagBlendronic_smoothLengths);
-        count = 0;
-        for (auto f : getSmoothLengths())
-        {
-            smoothLengths.setProperty(ptagFloat + String(count++), f, 0);
-        }
-        prep.addChild(smoothLengths, -1, 0);
-        
-        ValueTree smoothLengthsStates(vtagBlendronic_smoothLengthsStates);
-        count = 0;
-        for (auto f : getSmoothLengthsStates())
-        {
-            smoothLengthsStates.setProperty(ptagBool + String(count++), f ? 1 : 0, 0);
-        }
-        prep.addChild(smoothLengthsStates, -1, 0);
-        
-//        ValueTree smoothValues(vtagBlendronic_smoothValues);
-//        count = 0;
-//        for (auto f : getSmoothValues())
-//        {
-//            smoothValues.setProperty(ptagFloat + String(count++), f, 0);
-//        }
-//        prep.addChild(smoothValues, -1, 0);
-
-        ValueTree feedbackCoefficients(vtagBlendronic_feedbackCoefficients);
-        count = 0;
-        for (auto f : getFeedbackCoefficients())
-        {
-            feedbackCoefficients.setProperty(ptagFloat + String(count++), f, 0);
-        }
-        prep.addChild(feedbackCoefficients, -1, 0);
-        
-        ValueTree feedbackCoefficientsStates(vtagBlendronic_feedbackCoefficientsStates);
-        count = 0;
-        for (auto f : getFeedbackCoefficientsStates())
-        {
-            feedbackCoefficientsStates.setProperty(ptagBool + String(count++), f ? 1 : 0, 0);
-        }
-        prep.addChild(feedbackCoefficientsStates, -1, 0);
 
         return prep;
     }
@@ -482,11 +390,31 @@ public:
     // TODO
 	void setState(XmlElement* e)
     {
-        String n; float f; int i;
-        
         outGain.setState(e, ptagBlendronic_outGain, 1.0f);
         
-        i = e->getStringAttribute(ptagBlendronic_targetPatternSync).getIntValue();
+        delayBufferSizeInSeconds.setState(e, ptagBlendronic_delayBufferSize, 4.f);
+        
+        bBeats.setState(e, StringArray(vtagBlendronic_beats, ptagFloat), 1.0);
+        Array<bool> states;
+        for (int i = 0; i < bBeats.base.size(); ++i) states.add(true);
+        bBeatsStates.setState(e, StringArray(vtagBlendronic_beatsStates, ptagBool), states);
+        
+        bDelayLengths.setState(e, StringArray(vtagBlendronic_delayLengths, ptagFloat), 1.0);
+        states.clear();
+        for (int i = 0; i < bDelayLengths.base.size(); ++i) states.add(true);
+        bDelayLengthsStates.setState(e, StringArray(vtagBlendronic_delayLengthsStates, ptagBool), states);
+        
+        bSmoothLengths.setState(e, StringArray(vtagBlendronic_smoothLengths, ptagFloat), 50.0);
+        states.clear();
+        for (int i = 0; i < bSmoothLengths.base.size(); ++i) states.add(true);
+        bSmoothLengthsStates.setState(e, StringArray(vtagBlendronic_smoothLengthsStates, ptagBool), states);
+        
+        bFeedbackCoefficients.setState(e, StringArray(vtagBlendronic_feedbackCoefficients, ptagFloat), 0.95);
+        states.clear();
+        for (int i = 0; i < bFeedbackCoefficients.base.size(); ++i) states.add(true);
+        bFeedbackCoefficientsStates.setState(e, StringArray(vtagBlendronic_feedbackCoefficientsStates, ptagBool), states);
+        
+        int i = e->getStringAttribute(ptagBlendronic_targetPatternSync).getIntValue();
         setTargetTypeBlendronicPatternSync((TargetNoteMode)i);
         
         i = e->getStringAttribute(ptagBlendronic_targetBeatSync).getIntValue();
@@ -503,197 +431,30 @@ public:
         
         i = e->getStringAttribute(ptagBlendronic_targetOpenCloseOutput).getIntValue();
         setTargetTypeBlendronicOpenCloseOutput((TargetNoteMode)i);
-        
-        f = e->getStringAttribute(ptagBlendronic_delayBufferSize).getFloatValue();
-        if (f == 0) f = 4.f;
-        setDelayBufferSizeInSeconds(f);
-
-        forEachXmlChildElement (*e, sub)
-        {
-            if (sub->hasTagName(vtagBlendronic_beats))
-            {
-                Array<float> beats;
-                Array<bool> beatsstates;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        beats.add(f);
-                        beatsstates.add(true);
-                    }
-                }
-                setBeats(beats);
-                setBeatsStates(beatsstates);
-            }
-            else if (sub->hasTagName(vtagBlendronic_beatsStates))
-            {
-                Array<bool> beatsstates;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagBool + String(k));
-
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = (bool)attr.getIntValue();
-                        beatsstates.add(f);
-                    }
-                }
-                setBeatsStates(beatsstates);
-            }
-            else if (sub->hasTagName(vtagBlendronic_delayLengths))
-            {
-                Array<float> lengths;
-                Array<bool> lengthsstates;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        lengths.add(f);
-                        lengthsstates.add(true);
-                    }
-                }
-                setDelayLengths(lengths);
-                setDelayLengthsStates(lengthsstates);
-            }
-            else if (sub->hasTagName(vtagBlendronic_delayLengthsStates))
-            {
-                Array<bool> nstates;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagBool + String(k));
-
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = (bool)attr.getIntValue();
-                        nstates.add(f);
-                    }
-                }
-                setDelayLengthsStates(nstates);
-            }
-            else if (sub->hasTagName(vtagBlendronic_smoothLengths))
-            {
-                Array<float> durs;
-                Array<bool> dursstates;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        durs.add(f);
-                        dursstates.add(true);
-                    }
-                }
-                setSmoothLengths(durs);
-                setSmoothLengthsStates(dursstates);
-            }
-            else if (sub->hasTagName(vtagBlendronic_smoothLengthsStates))
-            {
-                Array<bool> nstates;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagBool + String(k));
-
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = (bool)attr.getIntValue();
-                        nstates.add(f);
-                    }
-                }
-                setSmoothLengthsStates(nstates);
-            }
-//            else if (sub->hasTagName(vtagBlendronic_smoothValues))
-//            {
-//                Array<float> durs;
-//                for (int k = 0; k < 128; k++)
-//                {
-//                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-//
-//                    if (attr == String()) break;
-//                    else
-//                    {
-//                        f = attr.getFloatValue();
-//                        durs.add(f);
-//                    }
-//                }
-//                setSmoothValues(durs);
-//            }
-            else if (sub->hasTagName(vtagBlendronic_feedbackCoefficients))
-            {
-                Array<float> coeffs;
-                Array<bool> coeffsstates;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = attr.getFloatValue();
-                        coeffs.add(f);
-                        coeffsstates.add(true);
-                    }
-                }
-                setFeedbackCoefficients(coeffs);
-                setFeedbackCoefficientsStates(coeffsstates);
-            }
-            else if (sub->hasTagName(vtagBlendronic_feedbackCoefficientsStates))
-            {
-                Array<bool> nstates;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagBool + String(k));
-
-                    if (attr == String()) break;
-                    else
-                    {
-                        f = (bool)attr.getIntValue();
-                        nstates.add(f);
-                    }
-                }
-                setFeedbackCoefficientsStates(nstates);
-            }
-        }
     }
+    
+    bool modded = false;
     
     // output gain
     Moddable<float> outGain;
+    
+    // sequenced parameters
+    Moddable<Array<float>> bBeats;
+    Moddable<Array<float>> bDelayLengths;
+    Moddable<Array<float>> bSmoothLengths;
+    Moddable<Array<float>> bFeedbackCoefficients;
+    
+    // slider states for sequenced params
+    Moddable<Array<bool>> bBeatsStates;
+    Moddable<Array<bool>> bDelayLengthsStates;
+    Moddable<Array<bool>> bSmoothLengthsStates;
+    Moddable<Array<bool>> bFeedbackCoefficientsStates;
+    
+    Moddable<float> delayBufferSizeInSeconds;
 
 private:
     
-	String name;
-	bool isActive;
-
-	// sequenced parameters
-	Array<float> bBeats;
-    Array<float> bDelayLengths;
-    Array<float> bSmoothLengths;
-	Array<float> bSmoothValues;
-	Array<float> bFeedbackCoefficients;
-    
-    // slider states for sequenced params
-    Array<bool> bBeatsStates;
-    Array<bool> bDelayLengthsStates;
-    Array<bool> bSmoothLengthsStates;
-    Array<bool> bSmoothValuesStates;
-    Array<bool> bFeedbackCoefficientsStates;
-
-	// dsmooth stuff
-    BlendronicSmoothBase bSmoothBase;
-    BlendronicSmoothScale bSmoothScale;
+    String name;
     
     TargetNoteMode targetTypeBlendronicPatternSync;
     TargetNoteMode targetTypeBlendronicBeatSync;
@@ -701,14 +462,6 @@ private:
     TargetNoteMode targetTypeBlendronicPausePlay;
     TargetNoteMode targetTypeBlendronicOpenCloseInput;
     TargetNoteMode targetTypeBlendronicOpenCloseOutput;
-
-	// signal chain stk classes
-	float bFeedbackCoefficient;
-    
-    float delayBufferSizeInSeconds;
-
-	//needed for sampling
-//    float inputGain;
     
     JUCE_LEAK_DETECTOR(BlendronicPreparation);
 };

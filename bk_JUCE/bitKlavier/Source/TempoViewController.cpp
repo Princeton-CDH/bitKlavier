@@ -80,6 +80,12 @@ BKViewController(p, theGraph, 1)
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
+    alternateMod.setButtonText ("alternate mod");
+    alternateMod.setTooltip("activating this mod will alternate between modding and reseting attached preparations");
+    alternateMod.setToggleState (false, dontSendNotification);
+    addChildComponent(&alternateMod, ALL);
+    alternateMod.setLookAndFeel(&buttonsAndMenusLAF2);
+    
 #if JUCE_IOS
     AT1MinMaxSlider->addWantsBigOneListener(this);
     AT1HistorySlider->addWantsBigOneListener(this);
@@ -112,6 +118,11 @@ void TempoViewController::resized()
                            selectCB.getY(),
                            selectCB.getWidth() * 0.75,
                            selectCB.getHeight());
+    
+    alternateMod.setBounds(actionButton.getRight()+gXSpacing,
+                           actionButton.getY(),
+                           selectCB.getWidth(),
+                           actionButton.getHeight());
     
     comboBoxSlice.removeFromLeft(gXSpacing);
     A1reset.setBounds(comboBoxSlice.removeFromLeft(90));
@@ -636,6 +647,14 @@ TempoViewController(p, theGraph)
     AT1SubdivisionsSlider->addMyListener(this);
     AT1MinMaxSlider->addMyListener(this);
     A1ModeCB.addListener(this);
+    
+    tempoSlider->addModdableComponentListener(this);
+    subSlider->addModdableComponentListener(this);
+    AT1HistorySlider->addModdableComponentListener(this);
+    AT1SubdivisionsSlider->addModdableComponentListener(this);
+    
+    alternateMod.addListener(this);
+    alternateMod.setVisible(true);
 
     update();
 }
@@ -726,6 +745,8 @@ void TempoModificationEditor::update(void)
         AT1MinMaxSlider->setMinValue(mod->getAdaptiveTempo1Min(), dontSendNotification);
         
         AT1MinMaxSlider->setMaxValue(mod->getAdaptiveTempo1Max(), dontSendNotification);
+        
+        alternateMod.setToggleState(mod->altMod, dontSendNotification);
         
         updateComponentVisibility();
     }
@@ -984,6 +1005,10 @@ void TempoModificationEditor::buttonClicked (Button* b)
         bool single = processor.gallery->getTempoModifications().size() == 2;
         getModOptionMenu(PreparationTypeTempoMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
-    
+    else if (b == &alternateMod)
+    {
+        TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
+        mod->altMod = alternateMod.getToggleState();
+    }
 }
 

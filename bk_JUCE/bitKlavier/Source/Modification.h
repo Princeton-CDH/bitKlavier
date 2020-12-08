@@ -485,7 +485,7 @@ public:
 
         altMod = e->getBoolAttribute("alt", false);
         
-		if (n != String())     setName(n);
+        if (n != String())     setName(n);
 		else                   setName(String(Id));
 
 		XmlElement* dirtyXml = e->getChildByName("dirty");

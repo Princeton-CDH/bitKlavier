@@ -9,93 +9,33 @@
 */
 
 #include "Blendronic.h"
-
 #include "BKSynthesiser.h"
+#include "Modification.h"
 
-//copy constructor
-BlendronicPreparation::BlendronicPreparation(BlendronicPreparation::Ptr p) :
-outGain(p->outGain),
-name(p->getName()),
-bBeats(p->getBeats()),
-bDelayLengths(p->getDelayLengths()),
-bSmoothLengths(p->getSmoothLengths()),
-bSmoothValues(p->getSmoothValues()),
-bFeedbackCoefficients(p->getFeedbackCoefficients()),
-bBeatsStates(p->getBeatsStates()),
-bDelayLengthsStates(p->getDelayLengthsStates()),
-bSmoothLengthsStates(p->getSmoothLengthsStates()),
-bSmoothValuesStates(p->getSmoothValuesStates()),
-bFeedbackCoefficientsStates(p->getFeedbackCoefficientsStates()),
-bSmoothBase(BlendronicSmoothPulse),
-bSmoothScale(BlendronicSmoothFull),
-
-targetTypeBlendronicPatternSync(p->getTargetTypeBlendronicPatternSync()),
-targetTypeBlendronicBeatSync(p->getTargetTypeBlendronicBeatSync()),
-targetTypeBlendronicClear(p->getTargetTypeBlendronicClear()),
-targetTypeBlendronicPausePlay(p->getTargetTypeBlendronicPausePlay()),
-targetTypeBlendronicOpenCloseInput(p->getTargetTypeBlendronicOpenCloseInput()),
-targetTypeBlendronicOpenCloseOutput(p->getTargetTypeBlendronicOpenCloseOutput()),
-delayBufferSizeInSeconds(p->getDelayBufferSizeInSeconds())
+void BlendronicPreparation::performModification(BlendronicModification* b, Array<bool> dirty)
 {
+    bool reverse = b->altMod && modded;
     
-}
-
-//constructor with input
-BlendronicPreparation::BlendronicPreparation(String newName,
-                                             Array<float> beats,
-                                             Array<float> delayLengths,
-                                             Array<float> smoothLengths,
-                                             Array<float> smoothValues,
-                                             Array<float> feedbackCoefficients,
-                                             float clusterThresh,
-                                             float delayBufferSizeInSeconds) :
-	name(newName),
-	bBeats(beats),
-    bDelayLengths(delayLengths),
-    bSmoothLengths(smoothLengths),
-	bSmoothValues(smoothValues),
-	bFeedbackCoefficients(feedbackCoefficients),
-    bBeatsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    bDelayLengthsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    bSmoothLengthsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    bSmoothValuesStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    bFeedbackCoefficientsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    bSmoothBase(BlendronicSmoothPulse),
-    bSmoothScale(BlendronicSmoothFull),
-    targetTypeBlendronicPatternSync(NoteOn),
-    targetTypeBlendronicBeatSync(NoteOn),
-    targetTypeBlendronicClear(NoteOn),
-    targetTypeBlendronicPausePlay(NoteOn),
-    targetTypeBlendronicOpenCloseInput(NoteOn),
-    targetTypeBlendronicOpenCloseOutput(NoteOn)
-{
+    if (dirty[BlendronicOutGain]) outGain.modify(b->outGain, reverse);
+    if (dirty[BlendronicBeats]) {
+        bBeats.modify(b->bBeats, reverse);
+        bBeatsStates.modify(b->bBeatsStates, reverse);
+    }
+    if (dirty[BlendronicDelayLengths]) {
+        bDelayLengths.modify(b->bDelayLengths, reverse);
+        bDelayLengthsStates.modify(b->bDelayLengthsStates, reverse);
+    }
+    if (dirty[BlendronicSmoothLengths]) {
+        bSmoothLengths.modify(b->bSmoothLengths, reverse);
+        bSmoothLengthsStates.modify(b->bSmoothLengthsStates, reverse);
+    }
+    if (dirty[BlendronicFeedbackCoeffs]) {
+        bFeedbackCoefficients.modify(b->bFeedbackCoefficients, reverse);
+        bFeedbackCoefficientsStates.modify(b->bFeedbackCoefficientsStates, reverse);
+    }
+    if (dirty[BlendronicDelayBufferSize]) delayBufferSizeInSeconds.modify(b->delayBufferSizeInSeconds, reverse);
     
-}
-
-//empty constructor
-BlendronicPreparation::BlendronicPreparation(void) :
-outGain(1.0),
-bBeats(Array<float>({ 4., 3., 2., 3.})),
-bDelayLengths(Array<float>({ 4., 3., 2., 3.})),
-bSmoothLengths(Array<float>({ 50.0f })),
-bSmoothValues(Array<float>({ 0.1f })),
-bFeedbackCoefficients(Array<float>({ 0.95 })),
-bBeatsStates(Array<bool>({true, true, true, true, false, false, false, false, false, false, false, false, })),
-bDelayLengthsStates(Array<bool>({true, true, true, true, false, false, false, false, false, false, false, false, })),
-bSmoothLengthsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-bSmoothValuesStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-bFeedbackCoefficientsStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-bSmoothBase(BlendronicSmoothPulse),
-bSmoothScale(BlendronicSmoothFull),
-targetTypeBlendronicPatternSync(NoteOn),
-targetTypeBlendronicBeatSync(NoteOn),
-targetTypeBlendronicClear(NoteOn),
-targetTypeBlendronicPausePlay(NoteOn),
-targetTypeBlendronicOpenCloseInput(NoteOn),
-targetTypeBlendronicOpenCloseOutput(NoteOn),
-delayBufferSizeInSeconds(5.f)
-{
-    
+    modded = !reverse;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -159,7 +99,7 @@ void BlendronicProcessor::tick(float* outputs)
     // Update the pulse length in case tempo or subdiv changed
     // possible to put this behind conditional, so we aren't doing these operations ever tick?
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-    if (pulseLength != prevPulseLength) numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * synth->getSampleRate();
+    if (pulseLength != prevPulseLength) numSamplesBeat = prep->bBeats.value[beatIndex] * pulseLength * synth->getSampleRate();
     
     // Check for beat change
     if (sampleTimer >= numSamplesBeat)
@@ -174,14 +114,14 @@ void BlendronicProcessor::tick(float* outputs)
         }
 
         float beatPatternLength = 0.0;
-        for (auto b : prep->getBeats()) beatPatternLength += b * pulseLength * synth->getSampleRate();
+        for (auto b : prep->bBeats.value) beatPatternLength += b * pulseLength * synth->getSampleRate();
 
-        if (numBeatPositions != (int)((delay->getDelayBuffer()->getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1)
+        if (numBeatPositions != (int)((delay->getDelayBuffer()->getNumSamples() / beatPatternLength) * prep->bBeats.value.size()) - 1)
         {
             beatPositionsInBuffer.clear();
             beatPositionsIndex = -1;
             pulseOffset = delay->getInPoint();
-            numBeatPositions = ((delay->getDelayBuffer()->getNumSamples() / beatPatternLength) * prep->getBeats().size()) - 1;
+            numBeatPositions = ((delay->getDelayBuffer()->getNumSamples() / beatPatternLength) * prep->bBeats.value.size()) - 1;
         }
 
         // Set the next beat position, cycle if we've reached the max number of positions for the buffer
@@ -190,16 +130,16 @@ void BlendronicProcessor::tick(float* outputs)
    
         // Step sequenced params
         beatIndex++;
-        if (beatIndex >= prep->getBeats().size()) beatIndex = 0;
+        if (beatIndex >= prep->bBeats.value.size()) beatIndex = 0;
         delayIndex++;
-        if (delayIndex >= prep->getDelayLengths().size()) delayIndex = 0;
+        if (delayIndex >= prep->bDelayLengths.value.size()) delayIndex = 0;
         smoothIndex++;
-        if (smoothIndex >= prep->getSmoothLengths().size()) smoothIndex = 0;
+        if (smoothIndex >= prep->bSmoothLengths.value.size()) smoothIndex = 0;
         feedbackIndex++;
-        if (feedbackIndex >= prep->getFeedbackCoefficients().size()) feedbackIndex = 0;
+        if (feedbackIndex >= prep->bFeedbackCoefficients.value.size()) feedbackIndex = 0;
              
         // Update numSamplesBeat for the new beat and reset sampleTimer
-        numSamplesBeat = prep->getBeats()[beatIndex] * pulseLength * synth->getSampleRate();
+        numSamplesBeat = prep->bBeats.value[beatIndex] * pulseLength * synth->getSampleRate();
         sampleTimer = 0;
         
         updateDelayParameters();
@@ -260,10 +200,10 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     {
         // Reset the phase of all params and update values
         // setSampleTimer(0);
-        setBeatIndex(prep->getBeats().size());
-        setDelayIndex(prep->getDelayLengths().size());
-        setSmoothIndex(prep->getSmoothLengths().size());
-        setFeedbackIndex(prep->getFeedbackCoefficients().size());
+        setBeatIndex(prep->bBeats.value.size());
+        setDelayIndex(prep->bDelayLengths.value.size());
+        setSmoothIndex(prep->bSmoothLengths.value.size());
+        setFeedbackIndex(prep->bFeedbackCoefficients.value.size());
         // beatPositionsInBuffer.clear();
         // beatPositionsInBuffer.add(delay->getCurrentSample());
         // pulseOffset = delay->getCurrentSample();
@@ -391,7 +331,7 @@ void BlendronicProcessor::prepareToPlay(double sr)
     
     if (delay == nullptr)
     {
-        delay = synth->createBlendronicDelay(prep->getDelayLengths()[0], prep->getDelayBufferSizeInSeconds() * synth->getSampleRate(), synth->getSampleRate(), true);
+        delay = synth->createBlendronicDelay(prep->bDelayLengths.value[0], prep->delayBufferSizeInSeconds.value * synth->getSampleRate(), synth->getSampleRate(), true);
     }
     
     for (int i = 0; i < 1/*numChannels*/; ++i)
@@ -407,8 +347,8 @@ void BlendronicProcessor::prepareToPlay(double sr)
     pulseOffset = 0;
     beatPositionsIndex = 0;
     
-    prevBeat = prep->getBeats()[0];
-    prevDelay = prep->getDelayLengths()[0];
+    prevBeat = prep->bBeats.value[0];
+    prevDelay = prep->bDelayLengths.value[0];
     
     delay->setSampleRate(sr);
     
@@ -418,8 +358,8 @@ void BlendronicProcessor::prepareToPlay(double sr)
     feedbackIndex = 0;
     
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-    numSamplesBeat = prep->getBeats()[beatIndex] * synth->getSampleRate() * pulseLength;
-    numSamplesDelay = prep->getDelayLengths()[delayIndex] * synth->getSampleRate() * pulseLength;
+    numSamplesBeat = prep->bBeats.value[beatIndex] * synth->getSampleRate() * pulseLength;
+    numSamplesDelay = prep->bDelayLengths.value[delayIndex] * synth->getSampleRate() * pulseLength;
     if (pulseLength == INFINITY)
     {
         numSamplesBeat = INFINITY;
@@ -441,11 +381,11 @@ void BlendronicProcessor::updateDelayParameters()
 {
     BlendronicPreparation::Ptr prep = blendronic->prep;
     
-    numSamplesDelay = prep->getDelayLengths()[delayIndex] * pulseLength * synth->getSampleRate();
+    numSamplesDelay = prep->bDelayLengths.value[delayIndex] * pulseLength * synth->getSampleRate();
     if (pulseLength == INFINITY) numSamplesDelay = 0;
     
-    float delayDelta = fabsf(prevDelay - prep->getDelayLengths()[delayIndex]);
-    prevDelay = prep->getDelayLengths()[delayIndex];
+    float delayDelta = fabsf(prevDelay - prep->bDelayLengths.value[delayIndex]);
+    prevDelay = prep->bDelayLengths.value[delayIndex];
     
     // To complicated for now, may add back in later
 //    float smoothRate = 0.0f;
@@ -456,7 +396,7 @@ void BlendronicProcessor::updateDelayParameters()
 //    }
 //    else if (prep->getSmoothBase()  == BlendronicSmoothBeat)
 //    {
-//        smoothBase = pulseLength / prep->getBeats()[beatIndex];
+//        smoothBase = pulseLength / prep->bBeats.value[beatIndex];
 //    }
 //
 //    if (prep->getSmoothScale()  == BlendronicSmoothConstant)
@@ -469,14 +409,14 @@ void BlendronicProcessor::updateDelayParameters()
 //        if (delayDelta == 0) smoothRate = INFINITY;
 //    }
     
-    float smoothRate = (pulseLength * delayDelta) / (prep->getSmoothLengths()[smoothIndex] * 0.001f);
+    float smoothRate = (pulseLength * delayDelta) / (prep->bSmoothLengths.value[smoothIndex] * 0.001f);
     if (delayDelta == 0 || pulseLength == INFINITY) smoothRate = INFINITY;
     
     // DBG(String(getId()) + " new envelope target = " + String(numSamplesDelay));
     // DBG(String(1000. / smoothRate) + "ms"); // smooth rate is change / second
     delay->setDelayTargetLength(numSamplesDelay);
     delay->setSmoothRate(smoothRate); // this is really a rate, not a duration
-    delay->setFeedback(prep->getFeedbackCoefficients()[feedbackIndex]);
+    delay->setFeedback(prep->bFeedbackCoefficients.value[feedbackIndex]);
 }
 
 float BlendronicProcessor::getPulseLengthInSamples()
@@ -487,7 +427,7 @@ float BlendronicProcessor::getPulseLengthInSamples()
 void BlendronicProcessor::setDelayBufferSizeInSeconds(float size)
 {
     const ScopedLock sl (lock);
-    blendronic->prep->setDelayBufferSizeInSeconds(size);
+    blendronic->prep->delayBufferSizeInSeconds.set(size);
     delay->setBufferSize(size * synth->getSampleRate());
     beatPositionsInBuffer.clear();
     beatPositionsIndex = -1;

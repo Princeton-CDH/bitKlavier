@@ -9,8 +9,53 @@
  */
 
 #include "Tuning.h"
-
 #include "PluginProcessor.h"
+#include "Modification.h"
+
+void TuningPreparation::performModification(TuningModification* p, Array<bool> dirty)
+{
+    bool reverse = p->altMod && modded;
+    
+    if (dirty[TuningScale]) tScale.modify(p->tScale, reverse);
+    if (dirty[TuningFundamental]) tFundamental.modify(p->tFundamental, reverse);
+    if (dirty[TuningOffset]) tFundamentalOffset.modify(p->tFundamentalOffset, reverse);
+    if (dirty[TuningA1IntervalScale]) tAdaptiveIntervalScale.modify(p->tAdaptiveIntervalScale, reverse);
+    if (dirty[TuningA1Inversional]) tAdaptiveInversional.modify(p->tAdaptiveInversional, reverse);
+    if (dirty[TuningA1AnchorScale]) tAdaptiveAnchorScale.modify(p->tAdaptiveAnchorScale, reverse);
+    if (dirty[TuningA1AnchorFundamental]) tAdaptiveAnchorFundamental.modify(p->tAdaptiveAnchorFundamental, reverse);
+    if (dirty[TuningA1ClusterThresh]) tAdaptiveClusterThresh.modify(p->tAdaptiveClusterThresh, reverse);
+    if (dirty[TuningA1History]) tAdaptiveHistory.modify(p->tAdaptiveHistory, reverse);
+    if (dirty[TuningCustomScale])
+    {
+        // Why was this done this way?
+        //            // tCustom = p->getCustomScale();
+        //            Array<float> temp = p->getCustomScale();
+        //            for (int i = 0; i < tCustom.size(); i++) tCustom.set(i, temp[i]);
+        //            //tCustom = Array<float>(p->getCustomScale());
+        //            tScale = CustomTuning;
+        tCustom.modify(p->tCustom, reverse);
+        tScale = CustomTuning;
+    }
+    if (dirty[TuningAbsoluteOffsets]) tAbsolute.modify(p->tAbsolute, reverse);
+    if (dirty[TuningNToneSemitoneWidth]) nToneSemitoneWidth.modify(p->nToneSemitoneWidth, reverse);
+    if (dirty[TuningNToneRootCB]) nToneRoot.modify(p->nToneRoot, reverse);
+    if (dirty[TuningAdaptiveSystem]) adaptiveType.modify(p->adaptiveType, reverse);
+    
+    stuning->performModification(p->getSpringTuning(), dirty, reverse);
+    
+    if (adaptiveType == AdaptiveSpring)
+    {
+        stuning->setActive(true);
+    }
+    else
+    {
+        stuning->setActive(false);
+    }
+    
+    modded = !reverse;
+}
+
+
 
 
 TuningProcessor::TuningProcessor(BKAudioProcessor& processor, Tuning::Ptr tuning):

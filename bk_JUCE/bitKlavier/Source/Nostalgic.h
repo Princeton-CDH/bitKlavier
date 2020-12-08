@@ -455,7 +455,7 @@ public:
     inline void setSoundSet(int Id) { nSoundSet = Id; }
     inline int getSoundSet() { return nUseGlobalSoundSet.value ? -1 : nSoundSet.value; }
 
-    bool modded;
+    bool modded = false;
     
     Moddable<float> nGain;                        // gain multiplier
     Moddable<float> nBlendronicGain;

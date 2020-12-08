@@ -22,6 +22,7 @@ public:
     TempoViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~TempoViewController()
     {
+        alternateMod.setLookAndFeel(nullptr);
         setLookAndFeel(nullptr);
     };
     
@@ -57,6 +58,8 @@ protected:
     BKTextButton A1reset;
     
     BKLabel attachKeymap;
+    
+    ToggleButton alternateMod;
     
     void fillModeCB(void);
     void fillA1ModeCB(void);

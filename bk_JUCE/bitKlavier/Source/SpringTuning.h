@@ -37,6 +37,8 @@
 #include "Particle.h"
 #include "Spring.h"
 
+#include "Moddable.h"
+
 class SpringTuning : public ReferenceCountedObject, private HighResolutionTimer
 {
 public:
@@ -56,7 +58,9 @@ public:
      */
 	void simulate();
     
-    void performModification(SpringTuning::Ptr st, Array<bool> dirty);
+    void performModification(SpringTuning::Ptr st, Array<bool> dirty, bool reverse);
+    void stepModdables();
+    void resetModdables();
     void copy(SpringTuning::Ptr st);
 
 	void toggleSpring();
@@ -83,10 +87,10 @@ public:
     inline void setRate(double r, bool start = true)
     {
         rate = r;
-        if (start)  startTimer(1000 / rate);
+        if (start)  startTimer(1000 / rate.value);
         else        stopTimer();
     }
-    inline double getRate(void) { return rate; }
+    inline double getRate(void) { return rate.value; }
     inline void stop(void) { stopTimer(); }
     
     inline void setStiffness(double stiff)
@@ -95,12 +99,12 @@ public:
         
         for (auto spring : enabledSpringArray)
         {
-            spring->setStiffness(stiffness);
+            spring->setStiffness(stiffness.value);
         }
         
         for (auto spring : tetherSpringArray)
         {
-            spring->setStiffness(stiffness);
+            spring->setStiffness(stiffness.value);
         }
     }
     
@@ -109,7 +113,7 @@ public:
         tetherStiffness = stiff;
         for (auto spring : tetherSpringArray)
         {
-            spring->setStiffness(tetherStiffness);
+            spring->setStiffness(tetherStiffness.value);
         }
     }
     
@@ -119,15 +123,15 @@ public:
         
         for (auto spring : enabledSpringArray)
         {
-            spring->setStiffness(intervalStiffness);
+            spring->setStiffness(intervalStiffness.value);
         }
     }
     
-    inline double getStiffness(void) { return stiffness; }
-    inline double getTetherStiffness(void) { return tetherStiffness; }
-    inline double getIntervalStiffness(void) { return intervalStiffness; }
+    inline double getStiffness(void) { return stiffness.value; }
+    inline double getTetherStiffness(void) { return tetherStiffness.value; }
+    inline double getIntervalStiffness(void) { return intervalStiffness.value; }
     inline void setDrag(double newdrag) { drag = newdrag; }
-    inline double getDrag(void) { return drag; }
+    inline double getDrag(void) { return drag.value; }
     
     inline Array<float> getTetherWeights(void)
     {
@@ -173,11 +177,11 @@ public:
         springMode.set(which, on);
     }
     
-    bool getFundamentalSetsTether() { return fundamentalSetsTether; }
+    bool getFundamentalSetsTether() { return fundamentalSetsTether.value; }
     void setFundamentalSetsTether(bool s) { fundamentalSetsTether = s; }
     
-    double getTetherWeightGlobal() { return tetherWeightGlobal; }
-    double getTetherWeightSecondaryGlobal() { return tetherWeightSecondaryGlobal; }
+    double getTetherWeightGlobal() { return tetherWeightGlobal.value; }
+    double getTetherWeightSecondaryGlobal() { return tetherWeightSecondaryGlobal.value; }
     void setTetherWeightGlobal(double s) { tetherWeightGlobal = s; } // DBG("setTetherWeightGlobal :" + String(tetherWeightGlobal)); }
     void setTetherWeightSecondaryGlobal(double s) { tetherWeightSecondaryGlobal = s; }
     
@@ -215,9 +219,14 @@ public:
     void setIntervalTuning(Array<float> tuning);
     Array<float> getIntervalTuning(void){return intervalTuning;}
     
-    void setIntervalFundamental(PitchClass  newfundamental)
+    void setIntervalFundamental(PitchClass newfundamental)
     {
         intervalFundamental = newfundamental;
+        intervalFundamentalChanged();
+    }
+    void intervalFundamentalChanged()
+    {
+        PitchClass newfundamental = intervalFundamental.value;
         
         if(newfundamental < 12) intervalFundamentalActive = newfundamental;
         
@@ -242,7 +251,7 @@ public:
         setTetherFundamental(intervalFundamentalActive);
     }
     
-    PitchClass getIntervalFundamental(void) { return intervalFundamental; }
+    PitchClass getIntervalFundamental(void) { return intervalFundamental.value; }
     PitchClass getIntervalFundamentalActive(void) { return intervalFundamentalActive; }
     
     void findFundamental();
@@ -266,17 +275,17 @@ public:
     {
         ValueTree prep("springtuning");
         
-        prep.setProperty( "rate", rate, 0);
-        prep.setProperty( "drag", drag, 0);
-        prep.setProperty( "tetherStiffness", tetherStiffness, 0);
-        prep.setProperty( "intervalStiffness", intervalStiffness, 0);
-        prep.setProperty( "stiffness", stiffness, 0);
-        prep.setProperty( "active", active ? 1 : 0, 0);
-        prep.setProperty( "intervalTuningId", scaleId, 0);
-        prep.setProperty( "intervalFundamental", (int)intervalFundamental, 0);
-        prep.setProperty( "fundamentalSetsTether", (int)fundamentalSetsTether, 0);
-        prep.setProperty( "tetherWeightGlobal", tetherWeightGlobal, 0);
-        prep.setProperty( "tetherWeightSecondaryGlobal", tetherWeightSecondaryGlobal, 0);
+        prep.setProperty( "rate", rate.value, 0);
+        prep.setProperty( "drag", drag.value, 0);
+        prep.setProperty( "tetherStiffness", tetherStiffness.value, 0);
+        prep.setProperty( "intervalStiffness", intervalStiffness.value, 0);
+        prep.setProperty( "stiffness", stiffness.value, 0);
+        prep.setProperty( "active", active.value ? 1 : 0, 0);
+        prep.setProperty( "intervalTuningId", scaleId.value, 0);
+        prep.setProperty( "intervalFundamental", (int)intervalFundamental.value, 0);
+        prep.setProperty( "fundamentalSetsTether", (int)fundamentalSetsTether.value, 0);
+        prep.setProperty( "tetherWeightGlobal", tetherWeightGlobal.value, 0);
+        prep.setProperty( "tetherWeightSecondaryGlobal", tetherWeightSecondaryGlobal.value, 0);
  
         //prep.setProperty( "usingFundamentalForIntervalSprings", (int)usingFundamentalForIntervalSprings, 0);
     
@@ -425,13 +434,11 @@ public:
         }
     }
     
-
-    
     inline void setActive(bool status) { active = status; }
-    inline bool getActive(void) { return active; }
+    inline bool getActive(void) { return active.value; }
     
     inline void setScaleId(TuningSystem which) { scaleId = which; }
-    inline TuningSystem getScaleId(void) { return scaleId; }
+    inline TuningSystem getScaleId(void) { return scaleId.value; }
     
     //void setTetherStrength(double strength);
     //double getTetherStrength(void);
@@ -440,25 +447,25 @@ public:
     //double getIntervalStrength(void);
     
 private:
-    double rate, stiffness;
-    double tetherStiffness, intervalStiffness;
-    double drag; // actually 1 - drag; drag of 1 => no drag, drag of 0 => infinite drag
+    Moddable<double> rate, stiffness;
+    Moddable<double> tetherStiffness, intervalStiffness;
+    Moddable<double> drag; // actually 1 - drag; drag of 1 => no drag, drag of 0 => infinite drag
     int numNotes; // number of enabled notes
     
-    bool active;
+    Moddable<bool> active;
     bool usingFundamentalForIntervalSprings; //only false when in "none" mode
     bool useLowestNoteForFundamental;
     bool useHighestNoteForFundamental;
     bool useLastNoteForFundamental;
     bool useAutomaticFundamental; //uses findFundamental() to set fundamental automatically, based on what is played
     
-    bool fundamentalSetsTether; //when true, the fundamental will be used to set tether weights
-    double tetherWeightGlobal; //sets weight for tethers to fundamental, when in fundamentalSetsTether mode
-    double tetherWeightSecondaryGlobal; //sets weights for tethers to non-fundamental notes
+    Moddable<bool> fundamentalSetsTether; //when true, the fundamental will be used to set tether weights
+    Moddable<double> tetherWeightGlobal; //sets weight for tethers to fundamental, when in fundamentalSetsTether mode
+    Moddable<double> tetherWeightSecondaryGlobal; //sets weights for tethers to non-fundamental notes
     
-    TuningSystem scaleId;
+    Moddable<TuningSystem> scaleId;
     Array<float> intervalTuning;
-    PitchClass intervalFundamental; //one stored, including the mode
+    Moddable<PitchClass> intervalFundamental; //one stored, including the mode
     PitchClass intervalFundamentalActive; //one actually used in the moment, changed by auto/last/highest/lowest modes
     Array<bool> springMode;
     
@@ -480,7 +487,7 @@ private:
     
     void hiResTimerCallback(void) override
     {
-        if (active)
+        if (active.value)
         {
             simulate();
         }

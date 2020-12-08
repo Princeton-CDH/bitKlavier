@@ -19,16 +19,7 @@
 #include "SpringTuning.h"
 
 
-/*
-TuningPreparation holds all the state variable values for the
-Tuning. As with other preparation types, bK will use
-two instantiations of TuningPreparation for every active
-Synchronic in the gallery, one to store the static state of the
-preparation, and the other to store the active state. These will
-be the same, unless a Modification is triggered, in which case the
-active state will be changed (and a Reset will revert the active state
-to the static state).
-*/
+class TuningModification;
 
 class TuningPreparation : public ReferenceCountedObject
 {
@@ -86,50 +77,45 @@ public:
         }
     }
     
-    void performModification(TuningPreparation::Ptr p, Array<bool> dirty)
-    {
-        if (dirty[TuningScale]) tScale = p->getScale();
-        if (dirty[TuningFundamental]) tFundamental = p->getFundamental();
-        if (dirty[TuningOffset]) tFundamentalOffset = p->getFundamentalOffset();
-        if (dirty[TuningA1IntervalScale]) tAdaptiveIntervalScale = p->getAdaptiveIntervalScale();
-        if (dirty[TuningA1Inversional]) tAdaptiveInversional = p->getAdaptiveInversional();
-        if (dirty[TuningA1AnchorScale]) tAdaptiveAnchorScale = p->getAdaptiveAnchorScale();
-        if (dirty[TuningA1AnchorFundamental]) tAdaptiveAnchorFundamental = p->getAdaptiveAnchorFundamental();
-        if (dirty[TuningA1ClusterThresh]) tAdaptiveClusterThresh = p->getAdaptiveClusterThresh();
-        if (dirty[TuningA1History]) tAdaptiveHistory = p->getAdaptiveHistory();
-        if (dirty[TuningCustomScale])
-        {
-            // tCustom = p->getCustomScale();
-            Array<float> temp = p->getCustomScale();
-            for (int i = 0; i < tCustom.size(); i++) tCustom.set(i, temp[i]);
-            //tCustom = Array<float>(p->getCustomScale());
-            tScale = CustomTuning;
-        }
-        if (dirty[TuningAbsoluteOffsets]) tAbsolute = p->getAbsoluteOffsets();
-        if (dirty[TuningNToneSemitoneWidth]) nToneSemitoneWidth = p->getNToneSemitoneWidth();
-        if (dirty[TuningNToneRootCB]) nToneRoot = p->getNToneRoot();
-        if (dirty[TuningAdaptiveSystem]) adaptiveType = p->getAdaptiveType();
-
-        stuning->performModification(p->getSpringTuning(), dirty);
-        
-        if (adaptiveType == AdaptiveSpring)
-        {
-            stuning->setActive(true);
-        }
-        else
-        {
-            stuning->setActive(false);
-        }
-    }
+    void performModification(TuningModification* p, Array<bool> dirty);
 
     void stepModdables()
     {
-//        dGain.step();
+        tScale.step();
+        tFundamental.step();
+        tFundamentalOffset.step();
+        tAdaptiveIntervalScale.step();
+        tAdaptiveInversional.step();
+        tAdaptiveAnchorScale.step();
+        tAdaptiveAnchorFundamental.step();
+        tAdaptiveClusterThresh.step();
+        tAdaptiveHistory.step();
+        tCustom.step();
+        tAbsolute.step();
+        nToneSemitoneWidth.step();
+        nToneRoot.step();
+        adaptiveType.step();
+        
+        stuning->stepModdables();
     }
     
     void resetModdables()
     {
-//        dGain.reset();
+        tFundamental.reset();
+        tFundamentalOffset.reset();
+        tAdaptiveIntervalScale.reset();
+        tAdaptiveInversional.reset();
+        tAdaptiveAnchorScale.reset();
+        tAdaptiveAnchorFundamental.reset();
+        tAdaptiveClusterThresh.reset();
+        tAdaptiveHistory.reset();
+        tCustom.reset();
+        tAbsolute.reset();
+        nToneSemitoneWidth.reset();
+        nToneRoot.reset();
+        adaptiveType.reset();
+        
+        stuning->resetModdables();
     }
 
     inline bool compare (TuningPreparation::Ptr p)
@@ -139,7 +125,7 @@ public:
         
         for (int i = p->getCustomScale().size(); --i>=0;)
         {
-            if (p->getCustomScale()[i] != tCustom[i])
+            if (p->getCustomScale()[i] != tCustom.value[i])
             {
                 custom = false;
                 break;
@@ -149,7 +135,7 @@ public:
         
         for (int i = p->getAbsoluteOffsets().size(); --i>=0;)
         {
-            if (p->getAbsoluteOffsets()[i] != tAbsolute[i])
+            if (p->getAbsoluteOffsets()[i] != tAbsolute.value[i])
             {
                 absolute = false;
                 break;
@@ -180,7 +166,7 @@ public:
 		int idx = 0;
         
 		tScale = (TuningSystem)(int)( r[idx++] * TuningSystemNil);
-        if ((tScale == AdaptiveTuning) || (tScale == AdaptiveAnchoredTuning)) tScale = (TuningSystem)((int)tScale +  2);
+        if ((tScale == AdaptiveTuning) || (tScale == AdaptiveAnchoredTuning)) tScale = (TuningSystem)((int)tScale.value +  2);
         
 		tFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
 		tFundamentalOffset = r[idx++] * 48.0f - 24.0f;
@@ -190,16 +176,21 @@ public:
 		tAdaptiveAnchorFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
 		tAdaptiveClusterThresh = (uint64) (r[idx++] * 50000);
 		tAdaptiveHistory = (int)(r[idx++] * 100) + 1;
-		tCustom.clear();
+        
+        Array<float> arr;
 		for (int i = 0; i < 12; ++i)
 		{
-			tCustom.add(i, (Random::getSystemRandom().nextFloat() * 2.0f - 1.0f));
+			arr.add(i, (Random::getSystemRandom().nextFloat() * 2.0f - 1.0f));
 		}
-		tAbsolute.clear();
+        tCustom.set(arr);
+        
+		arr.clear();
 		for (int i = 0; i < 128; ++i)
 		{
-			tAbsolute.add(i, (Random::getSystemRandom().nextFloat() * 2.0f - 1.0f));
+			arr.add(i, (Random::getSystemRandom().nextFloat() * 2.0f - 1.0f));
 		}
+        tAbsolute.set(arr);
+        
 		nToneSemitoneWidth = r[idx++] * 200.0f;
 		nToneRoot = (int)(r[idx++] * 127) + 1;
         
@@ -233,8 +224,9 @@ public:
     nToneRoot(semitoneRoot),
     stuning(new SpringTuning(st))
     {
-        tAbsolute.ensureStorageAllocated(128);
-        for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
+        Array<float> arr;
+        for(int i=0; i<128; i++) arr.set(i, 0.);
+        tAbsolute.set(arr);
     }
     
     TuningPreparation(void):
@@ -249,13 +241,12 @@ public:
     tAdaptiveHistory(4),
     tCustom({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}),
     nToneSemitoneWidth(100),
-    nToneRoot(60)
+    nToneRoot(60),
+    stuning(new SpringTuning())
     {
-        tAbsolute.ensureStorageAllocated(128);
-        for(int i=0; i<128; i++) tAbsolute.set(i, 0.);
-        
-        stuning = new SpringTuning();
-
+        Array<float> arr;
+        for(int i=0; i<128; i++) arr.set(i, 0.);
+        tAbsolute.set(arr);
     }
     
     ~TuningPreparation()
@@ -264,30 +255,38 @@ public:
     }
     
     inline const String getName() const noexcept {return name;}
-    inline const TuningSystem getScale() const noexcept                     {return tScale;                     }
-    inline const PitchClass getFundamental() const noexcept                 {return tFundamental;               }
-    inline const String getScaleName() const noexcept                       {return cTuningSystemNames[(int)tScale];}
-    inline const float getFundamentalOffset() const noexcept                {return tFundamentalOffset;         }
-    inline const TuningSystem getAdaptiveIntervalScale() const noexcept     {return tAdaptiveIntervalScale;     }
-    inline const bool getAdaptiveInversional() const noexcept               {return tAdaptiveInversional;       }
-    inline const TuningSystem getAdaptiveAnchorScale() const noexcept       {return tAdaptiveAnchorScale;       }
-    inline const PitchClass getAdaptiveAnchorFundamental() const noexcept   {return tAdaptiveAnchorFundamental; }
-    inline const uint64 getAdaptiveClusterThresh() const noexcept           {return tAdaptiveClusterThresh;     }
-    inline const int getAdaptiveHistory() const noexcept                    {return tAdaptiveHistory;           }
-    inline const Array<float> getCustomScale() const noexcept               {return tCustom;                    }
-    inline const Array<float> getAbsoluteOffsets() const noexcept           {return tAbsolute;                  }
-    float getAbsoluteOffset(int midiNoteNumber) const noexcept              {return tAbsolute.getUnchecked(midiNoteNumber);}
-    inline const float getNToneSemitoneWidth() const noexcept               {return nToneSemitoneWidth;         }
-    inline const int getNToneRoot() const noexcept                          {return nToneRoot;                  }
-    inline const int getNToneRootPC() const noexcept                        {return nToneRoot % 12;             }
-    inline const int getNToneRootOctave() const noexcept                    {return (nToneRoot / 12) - 1;       }
+    inline const TuningSystem getScale() const noexcept
+    { return tScale.value;                     }
+    inline const PitchClass getFundamental() const noexcept
+    { return tFundamental.value;               }
+    inline const String getScaleName() const noexcept
+    { return cTuningSystemNames[(int)tScale.value];}
+    inline const float getFundamentalOffset() const noexcept
+    { return tFundamentalOffset.value;         }
+    inline const TuningSystem getAdaptiveIntervalScale() const noexcept
+    { return tAdaptiveIntervalScale.value;     }
+    inline const bool getAdaptiveInversional() const noexcept
+    { return tAdaptiveInversional.value;       }
+    inline const TuningSystem getAdaptiveAnchorScale() const noexcept
+    { return tAdaptiveAnchorScale.value;       }
+    inline const PitchClass getAdaptiveAnchorFundamental() const noexcept
+    { return tAdaptiveAnchorFundamental.value; }
+    inline const uint64 getAdaptiveClusterThresh() const noexcept   { return tAdaptiveClusterThresh.value;     }
+    inline const int getAdaptiveHistory() const noexcept            { return tAdaptiveHistory.value; }
+    inline const Array<float> getCustomScale() const noexcept       { return tCustom.value;          }
+    inline const Array<float> getAbsoluteOffsets() const noexcept   { return tAbsolute.value;        }
+    float getAbsoluteOffset(int midiNoteNumber) const noexcept      { return tAbsolute.value.getUnchecked(midiNoteNumber); }
+    inline const float getNToneSemitoneWidth() const noexcept       { return nToneSemitoneWidth.value;         }
+    inline const int getNToneRoot() const noexcept          {return nToneRoot.value;        }
+    inline const int getNToneRootPC() const noexcept        {return nToneRoot.value % 12;   }
+    inline const int getNToneRootOctave() const noexcept    {return (nToneRoot.value / 12) - 1;  }
     
     inline const Array<float> getAbsoluteOffsetsCents() const noexcept {
         Array<float> tAbsoluteCents;
         tAbsoluteCents.ensureStorageAllocated(128);
-        for(int i=0; i<tAbsolute.size(); i++)
+        for(int i=0; i<tAbsolute.value.size(); i++)
         {
-            tAbsoluteCents.set(i, tAbsolute.getUnchecked(i) * 100.);
+            tAbsoluteCents.set(i, tAbsolute.value.getUnchecked(i) * 100.);
         }
         return tAbsoluteCents;
     }
@@ -295,9 +294,9 @@ public:
     inline const Array<float> getCustomScaleCents() const noexcept {
         Array<float> tCustomCents;
         tCustomCents.ensureStorageAllocated(12);
-        for(int i=0; i<tCustom.size(); i++)
+        for(int i=0; i<tCustom.value.size(); i++)
         {
-            tCustomCents.set(i, tCustom.getUnchecked(i) * 100.);
+            tCustomCents.set(i, tCustom.value.getUnchecked(i) * 100.);
         }
         return tCustomCents;
     }
@@ -320,23 +319,28 @@ public:
             }
         }
     }
-    inline void setFundamental(PitchClass fundamental)                              {tFundamental = fundamental; }
-    inline void setFundamentalOffset(float offset)                                  {tFundamentalOffset = offset; }
-    inline void setAdaptiveIntervalScale(TuningSystem adaptiveIntervalScale)        {tAdaptiveIntervalScale = adaptiveIntervalScale;}
-    inline void setAdaptiveInversional(bool adaptiveInversional)                    {tAdaptiveInversional = adaptiveInversional; }
-    inline void setAdaptiveAnchorScale(TuningSystem adaptiveAnchorScale)            {tAdaptiveAnchorScale = adaptiveAnchorScale;  }
-    inline void setAdaptiveAnchorFundamental(PitchClass adaptiveAnchorFundamental)  {tAdaptiveAnchorFundamental = adaptiveAnchorFundamental;}
-    inline void setAdaptiveClusterThresh(uint64 adaptiveClusterThresh)              {tAdaptiveClusterThresh = adaptiveClusterThresh; }
-    inline void setAdaptiveHistory(int adaptiveHistory)                             {tAdaptiveHistory = adaptiveHistory; }
-    inline void setCustomScale(Array<float> tuning)                                 {tCustom = tuning;      }
-    inline void setAbsoluteOffsets(Array<float> abs)                                {tAbsolute = abs;   }
-    void setAbsoluteOffset(int which, float val)                                    {tAbsolute.set(which, val);  }
+    inline void setFundamental(PitchClass fundamental)  { tFundamental = fundamental; }
+    inline void setFundamentalOffset(float offset)  { tFundamentalOffset = offset; }
+    inline void setAdaptiveIntervalScale(TuningSystem adaptiveIntervalScale)    { tAdaptiveIntervalScale = adaptiveIntervalScale;}
+    inline void setAdaptiveInversional(bool adaptiveInversional)            { tAdaptiveInversional = adaptiveInversional; }
+    inline void setAdaptiveAnchorScale(TuningSystem adaptiveAnchorScale)    { tAdaptiveAnchorScale = adaptiveAnchorScale;  }
+    inline void setAdaptiveAnchorFundamental(PitchClass adaptiveAnchorFundamental)  { tAdaptiveAnchorFundamental = adaptiveAnchorFundamental;}
+    inline void setAdaptiveClusterThresh(uint64 adaptiveClusterThresh)  { tAdaptiveClusterThresh = adaptiveClusterThresh; }
+    inline void setAdaptiveHistory(int adaptiveHistory)     { tAdaptiveHistory = adaptiveHistory; }
+    inline void setCustomScale(Array<float> tuning)     { tCustom = tuning;      }
+    inline void setAbsoluteOffsets(Array<float> abs)    { tAbsolute = abs;   }
+    void setAbsoluteOffset(int which, float val)
+    {
+        tAbsolute.base.set(which, val);
+        tAbsolute.value.set(which, val);
+        tAbsolute.mod.set(which, val);
+    }
     inline void setNToneSemitoneWidth(float width)                                  {nToneSemitoneWidth = width; }
     inline void setNToneRoot(int root)
     {
         nToneRoot = root;
-        nToneRootPC = nToneRoot % 12;
-        nToneRootOctave = (nToneRoot / 12) - 1;
+        nToneRootPC = nToneRoot.value % 12;
+        nToneRootOctave = (nToneRoot.value / 12) - 1;
     }
     inline void setNToneRootPC(int pc)
     {
@@ -349,34 +353,38 @@ public:
         nToneRoot = (nToneRootOctave + 1) * 12 + nToneRootPC;
     }
 
-    inline void setCustomScaleCents(Array<float> tuning) {
-        for(int i=0; i<tCustom.size() && i<tuning.size(); i++)
-        {
-            tCustom.setUnchecked(i, tuning.getUnchecked(i) * 0.01f);
-        }
+    inline void setCustomScaleCents(Array<float> tuning)
+    {
+        tCustom.set(tuning);
+//        for(int i=0; i<tCustom.value.size() && i<tuning.size(); i++)
+//        {
+//            tCustom.setUnchecked(i, tuning.getUnchecked(i) * 0.01f);
+//        }
     }
     
-    inline void setAbsoluteOffsetCents(Array<float> abs) {
-        for(int i=0; i<tAbsolute.size() && i<abs.size(); i++)
-            tAbsolute.setUnchecked(i, abs.getUnchecked(i) * 0.01f);
+    inline void setAbsoluteOffsetCents(Array<float> abs)
+    {
+        tAbsolute.set(abs);
+//        for(int i=0; i<tAbsolute.size() && i<abs.size(); i++)
+//            tAbsolute.setUnchecked(i, abs.getUnchecked(i) * 0.01f);
     }
     
     
     void print(void)
     {
-        DBG("tScale: " +                  String(tScale));
-        DBG("tFundamental: " +                  String(tFundamental));
-        DBG("tFundamentalOffset: " +            String(tFundamentalOffset));
-        DBG("tAdaptiveIntervalScale: " +        String(tAdaptiveIntervalScale));
-        DBG("tAdaptiveInversional: " +          String((int)tAdaptiveInversional));
-        DBG("tAdaptiveAnchorScale: " +          String(tAdaptiveAnchorScale));
-        DBG("tAdaptiveAnchorFundamental: " +    String(tAdaptiveAnchorFundamental));
-        DBG("tAdaptiveClusterThresh: " +        String(tAdaptiveClusterThresh));
-        DBG("tAdaptiveHistory: " +              String(tAdaptiveHistory));
-        DBG("tCustom: " +                       floatArrayToString(tCustom));
-        DBG("tAbsolute: " +                     floatArrayToString(tAbsolute));
-        DBG("nToneSemitoneWidth: " +            String(nToneSemitoneWidth));
-        DBG("nToneRoot: " +                     String(nToneRoot));
+        DBG("tScale: " +                        String(tScale.value));
+        DBG("tFundamental: " +                  String(tFundamental.value));
+        DBG("tFundamentalOffset: " +            String(tFundamentalOffset.value));
+        DBG("tAdaptiveIntervalScale: " +        String(tAdaptiveIntervalScale.value));
+        DBG("tAdaptiveInversional: " +          String((int)tAdaptiveInversional.value));
+        DBG("tAdaptiveAnchorScale: " +          String(tAdaptiveAnchorScale.value));
+        DBG("tAdaptiveAnchorFundamental: " +    String(tAdaptiveAnchorFundamental.value));
+        DBG("tAdaptiveClusterThresh: " +        String(tAdaptiveClusterThresh.value));
+        DBG("tAdaptiveHistory: " +              String(tAdaptiveHistory.value));
+        DBG("tCustom: " +                       floatArrayToString(tCustom.value));
+        DBG("tAbsolute: " +                     floatArrayToString(tAbsolute.value));
+        DBG("nToneSemitoneWidth: " +            String(nToneSemitoneWidth.value));
+        DBG("nToneRoot: " +                     String(nToneRoot.value));
     }
     
     // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SPRING TUNING ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
@@ -418,7 +426,7 @@ public:
     // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     
     inline void setAdaptiveType (TuningAdaptiveSystemType type) { adaptiveType = type; }
-    inline TuningAdaptiveSystemType getAdaptiveType (void) { return adaptiveType; }
+    inline TuningAdaptiveSystemType getAdaptiveType (void) { return adaptiveType.value; }
     
     inline ValueTree getState(void)
     {
@@ -584,42 +592,42 @@ public:
         
         // MOD REWORK FIX
         // getSpringTuning()->setTetherTuning(getStaticScale());
-        
     }
     
-private:
-    String name;
+    bool modded = false;
+    
     // basic tuning settings, for static tuning
-    TuningSystem    tScale;               //which tuning system to use
-    PitchClass      tFundamental;               //fundamental for tuning system
-    float           tFundamentalOffset;         //offset, in MIDI fractional offset
+    Moddable<TuningSystem>    tScale;               //which tuning system to use
+    Moddable<PitchClass>      tFundamental;               //fundamental for tuning system
+    Moddable<float>           tFundamentalOffset;         //offset, in MIDI fractional offset
     
     // adaptive tuning params
-    TuningSystem    tAdaptiveIntervalScale;     //scale to use to determine successive interval tuning
-    bool            tAdaptiveInversional;       //treat the scale inversionally?
+    Moddable<TuningSystem>    tAdaptiveIntervalScale;     //scale to use to determine successive interval tuning
+    Moddable<bool>            tAdaptiveInversional;       //treat the scale inversionally?
     
-    TuningSystem    tAdaptiveAnchorScale;       //scale to tune new fundamentals to when in anchored
-    PitchClass      tAdaptiveAnchorFundamental; //fundamental for anchor scale
+    Moddable<TuningSystem>    tAdaptiveAnchorScale;       //scale to tune new fundamentals to when in anchored
+    Moddable<PitchClass>      tAdaptiveAnchorFundamental; //fundamental for anchor scale
     
-    uint64          tAdaptiveClusterThresh;     //ms; max time before fundamental is reset
-    int             tAdaptiveHistory;           //cluster max; max number of notes before fundamental is reset
-    
-    
+    Moddable<uint64>          tAdaptiveClusterThresh;     //ms; max time before fundamental is reset
+    Moddable<int>             tAdaptiveHistory;           //cluster max; max number of notes before fundamental is reset
     
     // custom scale and absolute offsets
-    Array<float>    tCustom = Array<float>({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}); //custom scale
-    Array<float>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
+    Moddable<Array<float>>    tCustom = Array<float>({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}); //custom scale
+    Moddable<Array<float>>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
     
-    float nToneSemitoneWidth;
-    int nToneRoot;              //which key matches 12-tone ET; 60 by default
+    Moddable<float> nToneSemitoneWidth;
+    Moddable<int> nToneRoot;              //which key matches 12-tone ET; 60 by default
     int nToneRootPC = 0;        //which pitch class; 0 by default
     int nToneRootOctave = 4;    //which octave; 4 by default, so C4
     
+    Moddable<TuningAdaptiveSystemType> adaptiveType;
+    
+private:
+    String name;
+    
     // SPRING TUNING STUFF
     SpringTuning::Ptr stuning;
-    
-    TuningAdaptiveSystemType adaptiveType;
-    
+
     JUCE_LEAK_DETECTOR(TuningPreparation);
 };
 
