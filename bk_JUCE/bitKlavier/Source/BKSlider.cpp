@@ -1096,8 +1096,8 @@ void BKMultiSlider::deHighlightCurrentSlider()
 // **************************************************  BKSingleSlider ************************************************** //
 // ******************************************************************************************************************** //
 
-BKSingleSlider::BKSingleSlider (String name, double min, double max, double def, double increment):
-ModdableComponent(name, false),
+BKSingleSlider::BKSingleSlider (String name, String Id, double min, double max, double def, double increment):
+ModdableComponent(Id, false),
 sliderName(name),
 sliderMin(min),
 sliderMax(max),
@@ -2472,27 +2472,27 @@ sliderName(name)
     else showName.setJustificationType(Justification::bottomLeft);
     //addAndMakeVisible(showName);
     
-    attackSlider = std::make_unique<BKSingleSlider>("attack time (ms)", 1, 1000, 10, 1);
+    attackSlider = std::make_unique<BKSingleSlider>("attack time (ms)", "attack time (ms)", 1, 1000, 10, 1);
     attackSlider->setSkewFactorFromMidPoint(200);
     attackSlider->setJustifyRight(true);
     attackSlider->addMyListener(this);
     attackSlider->setToolTipString("envelope attack time (ms)");
     addAndMakeVisible(*attackSlider);
     
-    decaySlider = std::make_unique<BKSingleSlider>("decay time (ms)", 1, 1000, 10, 1);
+    decaySlider = std::make_unique<BKSingleSlider>("decay time (ms)", "decay time (ms)", 1, 1000, 10, 1);
     decaySlider->setSkewFactorFromMidPoint(200);
     decaySlider->setJustifyRight(false);
     decaySlider->addMyListener(this);
     decaySlider->setToolTipString("envelope decay time (ms)");
     addAndMakeVisible(*decaySlider);
     
-    sustainSlider = std::make_unique<BKSingleSlider>("sustain level (0-1)", 0., 1., 1., 0.001);
+    sustainSlider = std::make_unique<BKSingleSlider>("sustain level (0-1)", "sustain level (0-1)", 0., 1., 1., 0.001);
     sustainSlider->setJustifyRight(true);
     sustainSlider->addMyListener(this);
     sustainSlider->setToolTipString("envelope sustain level (0-1)");
     addAndMakeVisible(*sustainSlider);
     
-    releaseSlider = std::make_unique<BKSingleSlider>("release time (ms)", 1, 1000, 30, 1);
+    releaseSlider = std::make_unique<BKSingleSlider>("release time (ms)", "release time (ms)", 1, 1000, 30, 1);
     releaseSlider->setSkewFactorFromMidPoint(200);
     releaseSlider->setJustifyRight(false);
     releaseSlider->addMyListener(this);

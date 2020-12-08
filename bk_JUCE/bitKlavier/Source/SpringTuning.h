@@ -275,17 +275,17 @@ public:
     {
         ValueTree prep("springtuning");
         
-        prep.setProperty( "rate", rate.value, 0);
-        prep.setProperty( "drag", drag.value, 0);
-        prep.setProperty( "tetherStiffness", tetherStiffness.value, 0);
-        prep.setProperty( "intervalStiffness", intervalStiffness.value, 0);
-        prep.setProperty( "stiffness", stiffness.value, 0);
-        prep.setProperty( "active", active.value ? 1 : 0, 0);
-        prep.setProperty( "intervalTuningId", scaleId.value, 0);
-        prep.setProperty( "intervalFundamental", (int)intervalFundamental.value, 0);
-        prep.setProperty( "fundamentalSetsTether", (int)fundamentalSetsTether.value, 0);
-        prep.setProperty( "tetherWeightGlobal", tetherWeightGlobal.value, 0);
-        prep.setProperty( "tetherWeightSecondaryGlobal", tetherWeightSecondaryGlobal.value, 0);
+        rate.getState(prep, "rate");
+        drag.getState(prep, "drag");
+        tetherStiffness.getState(prep, "tetherStiffness");
+        intervalStiffness.getState(prep, "intervalStiffness");
+        stiffness.getState(prep, "stiffness");
+        active.getState(prep, "active");
+        scaleId.getState(prep, "intervalTuningId");
+        intervalFundamental.getState(prep, "intervalFundamental");
+        fundamentalSetsTether.getState(prep, "fundamentalSetsTether");
+        tetherWeightGlobal.getState(prep, "tetherWeightGlobal");
+        tetherWeightSecondaryGlobal.getState(prep, "tetherWeightSecondaryGlobal");
  
         //prep.setProperty( "usingFundamentalForIntervalSprings", (int)usingFundamentalForIntervalSprings, 0);
     
@@ -347,24 +347,19 @@ public:
     
     void setState(XmlElement* e)
     {
-        // DBG("SpringTuning::setState called!!");
-        active = (bool) e->getStringAttribute("active").getIntValue();
+        active.setState(e, "active", false);
+        rate.setState(e, "rate", 100);
+        drag.setState(e, "drag", 0.1);
         
-        setRate(e->getStringAttribute("rate").getDoubleValue());
-        setDrag(e->getStringAttribute("drag").getDoubleValue());
+        stiffness.setState(e, "stiffness", 1.0);
+        tetherStiffness.setState(e, "tetherStiffness", 0.5);
+        intervalStiffness.setState(e, "intervalStiffness", 0.5);
         
-        setStiffness(e->getStringAttribute("stiffness").getDoubleValue());
-        setTetherStiffness(e->getStringAttribute("tetherStiffness").getDoubleValue());
-        setIntervalStiffness(e->getStringAttribute("intervalStiffness").getDoubleValue());
-        
-        scaleId = (TuningSystem) e->getStringAttribute("intervalTuningId").getIntValue();
-        setIntervalFundamental((PitchClass) e->getStringAttribute("intervalFundamental").getIntValue());
-
-        fundamentalSetsTether = (bool) e->getStringAttribute("fundamentalSetsTether").getIntValue();
-        tetherWeightGlobal = e->getStringAttribute("tetherWeightGlobal").getDoubleValue();
-        tetherWeightSecondaryGlobal = e->getStringAttribute("tetherWeightSecondaryGlobal").getDoubleValue();
-
-        //usingFundamentalForIntervalSprings = (bool) e->getStringAttribute("usingFundamentalForIntervalSprings").getIntValue();
+        scaleId.setState(e, "intervalTuningId", JustTuning);
+        intervalFundamental.setState(e, "intervalFundamental", C);
+        fundamentalSetsTether.setState(e, "fundamentalSetsTether", false);
+        tetherWeightGlobal.setState(e, "tetherWeightGlobal", 0.5);
+        tetherWeightSecondaryGlobal.setState(e, "tetherWeightSecondaryGlobal", 0.1);
         
         forEachXmlChildElement (*e, sub)
         {
@@ -446,26 +441,27 @@ public:
     //void setIntervalStrength(double strength);
     //double getIntervalStrength(void);
     
-private:
     Moddable<double> rate, stiffness;
     Moddable<double> tetherStiffness, intervalStiffness;
     Moddable<double> drag; // actually 1 - drag; drag of 1 => no drag, drag of 0 => infinite drag
-    int numNotes; // number of enabled notes
     
     Moddable<bool> active;
+    Moddable<bool> fundamentalSetsTether; //when true, the fundamental will be used to set tether weights
+    Moddable<double> tetherWeightGlobal; //sets weight for tethers to fundamental, when in fundamentalSetsTether mode
+    Moddable<double> tetherWeightSecondaryGlobal; //sets weights for tethers to non-fundamental notes
+    
+    Moddable<TuningSystem> scaleId;
+    Moddable<PitchClass> intervalFundamental; //one stored, including the mode
+    
+private:
+    int numNotes; // number of enabled notes
     bool usingFundamentalForIntervalSprings; //only false when in "none" mode
     bool useLowestNoteForFundamental;
     bool useHighestNoteForFundamental;
     bool useLastNoteForFundamental;
     bool useAutomaticFundamental; //uses findFundamental() to set fundamental automatically, based on what is played
     
-    Moddable<bool> fundamentalSetsTether; //when true, the fundamental will be used to set tether weights
-    Moddable<double> tetherWeightGlobal; //sets weight for tethers to fundamental, when in fundamentalSetsTether mode
-    Moddable<double> tetherWeightSecondaryGlobal; //sets weights for tethers to non-fundamental notes
-    
-    Moddable<TuningSystem> scaleId;
     Array<float> intervalTuning;
-    Moddable<PitchClass> intervalFundamental; //one stored, including the mode
     PitchClass intervalFundamentalActive; //one actually used in the moment, changed by auto/last/highest/lowest modes
     Array<bool> springMode;
     

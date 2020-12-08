@@ -46,7 +46,7 @@ BKViewController(p, theGraph, 4)
     transpUsesTuning.setToggleState (false, dontSendNotification);
     addAndMakeVisible(&transpUsesTuning, ALL);
     
-    lengthMultiplierSlider = std::make_unique<BKSingleSlider>("note length multiplier", 0, 10, 1, 0.01);
+    lengthMultiplierSlider = std::make_unique<BKSingleSlider>("note length multiplier", cNostalgicLengthMultiplier, 0, 10, 1, 0.01);
     lengthMultiplierSlider->setToolTipString("Changes length of Nostalgic wave as a factor of note duration");
     lengthMultiplierSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(*lengthMultiplierSlider);
@@ -61,29 +61,29 @@ BKViewController(p, theGraph, 4)
     velocityMinMaxSlider->setJustifyRight(true);
     addAndMakeVisible(*velocityMinMaxSlider);
     
-    clusterMinSlider = std::make_unique<BKSingleSlider>("cluster min", 1, 10, 1, 1);
+    clusterMinSlider = std::make_unique<BKSingleSlider>("cluster min", cNostalgicClusterMin, 1, 10, 1, 1);
     clusterMinSlider->setToolTipString("Sets Min cluster size needed to trigger swell");
     clusterMinSlider->setJustifyRight(true);
     addAndMakeVisible(*clusterMinSlider);
     
     //clusterThresholdSlider
-    clusterThresholdSlider = std::make_unique<BKSingleSlider>("cluster thresh", 0, 1000, 150, 1);
+    clusterThresholdSlider = std::make_unique<BKSingleSlider>("cluster thresh", cNostalgicClusterThreshold, 0, 1000, 150, 1);
     clusterThresholdSlider->setToolTipString("time between note releases (ms) to be included in cluster");
     clusterThresholdSlider->setJustifyRight(true);
     addAndMakeVisible(*clusterThresholdSlider);
     
-    beatsToSkipSlider = std::make_unique<BKSingleSlider>("beats to skip", 0, 10, 0, 1);
+    beatsToSkipSlider = std::make_unique<BKSingleSlider>("beats to skip", cNostalgicBeatsToSkip, 0, 10, 0, 1);
     beatsToSkipSlider->setToolTipString("Indicates how long Nostalgic wave lasts with respect to linked Synchronic sequence");
     addAndMakeVisible(*beatsToSkipSlider);
     beatsToSkipSlider->setVisible(false);
     
-    gainSlider = std::make_unique<BKSingleSlider>("gain", 0, 10, 1, 0.01);
+    gainSlider = std::make_unique<BKSingleSlider>("gain", cNostalgicGain, 0, 10, 1, 0.01);
     gainSlider->setToolTipString("Volume multiplier for Nostalgic notes");
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
     addAndMakeVisible(*gainSlider);
     
-    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", 0, 10, 1, 0.01);
+    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", cNostalgicBlendronicGain, 0, 10, 1, 0.01);
     blendronicGainSlider->setToolTipString("Volume multiplier for Nostalgic output to connected Blendronics");
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
     blendronicGainSlider->setJustifyRight(false);

@@ -22,7 +22,7 @@ BKViewController(p, theGraph, 3)
     iconImageComponent.setAlpha(0.095);
     //addAndMakeVisible(iconImageComponent);
     
-    gainSlider = std::make_unique<BKSingleSlider>("gain", 0, 10, 1, 0.01);
+    gainSlider = std::make_unique<BKSingleSlider>("gain", cBlendronicOutGain, 0, 10, 1, 0.01);
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(true);
     gainSlider->setToolTipString("Adjusts overall volume of blendronic");
@@ -115,7 +115,7 @@ BKViewController(p, theGraph, 3)
     addChildComponent(&alternateMod, ALL);
     alternateMod.setLookAndFeel(&buttonsAndMenusLAF2);
     
-    bufferSizeSlider = std::make_unique<BKSingleSlider>("buffer length (sec)", 1., 10., 4., 0.01);
+    bufferSizeSlider = std::make_unique<BKSingleSlider>("buffer length (sec)", "buffer length (sec)", 1., 10., 4., 0.01);
     bufferSizeSlider->setChangeNotificationOnlyOnRelease(true);
     bufferSizeSlider->setJustifyRight(true);
     bufferSizeSlider->setToolTipString("Sets the size of the delay line in seconds");

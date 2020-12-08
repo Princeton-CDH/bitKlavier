@@ -62,14 +62,13 @@ public:
     bool keymapDidChange = false;
     bool modificationDidChange = false;
     
-    String currentModdableName = String();
+    String currentModdableIdentifier = String();
     
     String comment;
     bool commentDidChange = false;
     
     bool pianoSamplesAreLoading = false;
     bool needsExtraKeys = true;
-    
     
     BKPreparationDisplay currentDisplay = DisplayNil;
     BKPreparationDisplay previousDisplay = DisplayNil;

@@ -19,16 +19,7 @@
 
 #include "Keymap.h"
 
-/*
-TempoPreparation holds all the state variable values for the
-Tempo preparation. As with other preparation types, bK will use
-two instantiations of TempoPreparation for every active
-Tuning in the gallery, one to store the static state of the
-preparation, and the other to store the active state. These will
-be the same, unless a Modification is triggered, in which case the
-active state will be changed (and a Reset will revert the active state
-to the static state).
-*/
+class TempoModification;
 
 class TempoPreparation : public ReferenceCountedObject
 {
@@ -43,11 +34,7 @@ public:
     TempoPreparation(TempoPreparation::Ptr p)
     {
         copy(p);
-        
-        sBeatThreshSec = (60.0/sTempo);
-        sBeatThreshMS = sBeatThreshSec * 1000.;
     }
-    
     
     TempoPreparation():
     sWhichTempoSystem(ConstantTempo),
@@ -59,8 +46,7 @@ public:
     at1Subdivisions(1.0f),
     at1Mode(TimeBetweenNotes)
     {
-        sBeatThreshSec = (60.0/sTempo);
-        sBeatThreshMS = sBeatThreshSec * 1000.;
+        
     }
     
     inline void copy(TempoPreparation::Ptr s)
@@ -73,34 +59,32 @@ public:
         at1Max = s->getAdaptiveTempo1Max();
         at1Subdivisions = s->getAdaptiveTempo1Subdivisions();
         at1Mode = s->getAdaptiveTempo1Mode();
-        
-        sBeatThreshSec = (60.0/sTempo);
-        sBeatThreshMS = sBeatThreshSec * 1000.;
     }
     
-    void performModification(TempoPreparation::Ptr s, Array<bool> dirty)
-    {
-        if (dirty[TempoBPM]) sTempo = s->getTempo();
-        if (dirty[TempoSubdivisions]) subdivisions = s->getSubdivisions();
-        if (dirty[TempoSystem]) sWhichTempoSystem = s->getTempoSystem();
-        if (dirty[AT1History]) at1History = s->getAdaptiveTempo1History();
-        if (dirty[AT1Min]) at1Min = s->getAdaptiveTempo1Min();
-        if (dirty[AT1Max]) at1Max = s->getAdaptiveTempo1Max();
-        if (dirty[AT1Subdivisions]) at1Subdivisions = s->getAdaptiveTempo1Subdivisions();
-        if (dirty[AT1Mode]) at1Mode = s->getAdaptiveTempo1Mode();
-        
-        sBeatThreshSec = (60.0/sTempo);
-        sBeatThreshMS = sBeatThreshSec * 1000.;
-    }
+    void performModification(TempoModification* s, Array<bool> dirty);
     
     void stepModdables()
     {
-//        dGain.step();
+        sTempo.step();
+        subdivisions.step();
+        sWhichTempoSystem.step();
+        at1History.step();
+        at1Min.step();
+        at1Max.step();
+        at1Subdivisions.step();
+        at1Mode.step();
     }
     
     void resetModdables()
     {
-//        dGain.reset();
+        sTempo.reset();
+        subdivisions.reset();
+        sWhichTempoSystem.reset();
+        at1History.reset();
+        at1Min.reset();
+        at1Max.reset();
+        at1Subdivisions.reset();
+        at1Mode.reset();
     }
     
     bool compare(TempoPreparation::Ptr s)
@@ -132,39 +116,31 @@ public:
 		at1History = r[idx++];
 		at1Min = r[idx++];
 		at1Max = r[idx++];
-		at1Subdivisions = r[idx++];
+        at1Subdivisions = (TempoType)r[idx++];
 		at1Mode = (AdaptiveTempo1Mode)(int)(r[idx++] * AdaptiveTempo1ModeNil);
 	}
     
-    inline const TempoType getTempoSystem() const noexcept      {return sWhichTempoSystem; }
-    inline const float getTempo() const noexcept                {return sTempo; }
-    inline const float getBeatThresh() const noexcept           {return sBeatThreshSec; }
-    inline const float getBeatThreshMS() const noexcept         {return sBeatThreshMS; }
+    inline const TempoType getTempoSystem() const noexcept      {return sWhichTempoSystem.value; }
+    inline const float getTempo() const noexcept                {return sTempo.value; }
+    inline const float getBeatThresh() const noexcept           {return (60.0/sTempo.value); }
+    inline const float getBeatThreshMS() const noexcept         {return (60.0/sTempo.value) * 1000.; }
   
     //Adaptive Tempo 1
-    inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)       {return at1Mode;   }
-    inline int getAdaptiveTempo1History(void)                   {return at1History;}
-    inline float getAdaptiveTempo1Subdivisions(void)            {return at1Subdivisions;}
-    inline float getAdaptiveTempo1Min(void)                     {return at1Min;}
-    inline float getAdaptiveTempo1Max(void)                     {return at1Max;}
+    inline AdaptiveTempo1Mode getAdaptiveTempo1Mode(void)       {return at1Mode.value;   }
+    inline int getAdaptiveTempo1History(void)                   {return at1History.value;}
+    inline float getAdaptiveTempo1Subdivisions(void)            {return at1Subdivisions.value;}
+    inline float getAdaptiveTempo1Min(void)                     {return at1Min.value;}
+    inline float getAdaptiveTempo1Max(void)                     {return at1Max.value;}
 
     inline const String getName() const noexcept                {return name;}
     inline void setName(String n)                               {name = n;}
     inline void setTempoSystem(TempoType ts)                    {sWhichTempoSystem = ts;}
-    inline void setTempo(float tempo)
-    {
-        sTempo = tempo;
-        sBeatThreshSec = (60.0/sTempo);
-        sBeatThreshMS = sBeatThreshSec * 1000.;
-        //DBG("tempo = " + String(sTempo));
-    }
+    inline void setTempo(float tempo)                           { sTempo = tempo; }
     
     inline void setHostTempo(float tempo)
     {
         if(sWhichTempoSystem == HostTempo){
             sTempo = tempo;
-            sBeatThreshSec = (60.0/sTempo);
-            sBeatThreshMS = sBeatThreshSec * 1000.;
             //DBG("tempo = " + String(sTempo));
         }
     }
@@ -182,7 +158,7 @@ public:
     
     float getSubdivisions(void)
     {
-        return subdivisions;
+        return subdivisions.value;
     }
     
     //Adaptive Tempo 1
@@ -195,7 +171,7 @@ public:
     void print(void)
     {
         DBG("| - - - Tempo Preparation - - - |");
-        DBG("sTempo: " + String(sTempo));
+        DBG("sTempo: " + String(sTempo.value));
         DBG("| - - - - - - - - -- - - - - - - - - |");
     }
     
@@ -203,64 +179,46 @@ public:
     {
         ValueTree prep("params");
         
-        prep.setProperty( ptagTempo_tempo,                 getTempo(), 0);
-        prep.setProperty( ptagTempo_system,                getTempoSystem(), 0);
-        prep.setProperty( ptagTempo_at1Mode,               getAdaptiveTempo1Mode(), 0 );
-        prep.setProperty( ptagTempo_at1History,            getAdaptiveTempo1History(), 0 );
-        prep.setProperty( ptagTempo_at1Subdivisions,       getAdaptiveTempo1Subdivisions(), 0 );
-        prep.setProperty( ptagTempo_at1Min,                getAdaptiveTempo1Min(), 0 );
-        prep.setProperty( ptagTempo_at1Max,                getAdaptiveTempo1Max(), 0 );
-        prep.setProperty( "subdivisions",                  getSubdivisions(), 0);
+        sTempo.getState(prep, ptagTempo_tempo);
+        sWhichTempoSystem.getState(prep, ptagTempo_system);
+        at1Mode.getState(prep, ptagTempo_at1Mode);
+        at1History.getState(prep, ptagTempo_at1History);
+        at1Subdivisions.getState(prep, ptagTempo_at1Subdivisions);
+        at1Min.getState(prep, ptagTempo_at1Min);
+        at1Max.getState(prep, ptagTempo_at1Max);
+        subdivisions.getState(prep, "subdivisions");
         
         return prep;
     }
     
     void setState(XmlElement* e)
     {
-        float f; int i;
-        f = e->getStringAttribute(ptagTempo_tempo).getFloatValue();
-        setTempo(f);
-        
-        i = e->getStringAttribute(ptagTempo_system).getIntValue();
-        setTempoSystem((TempoType)i);
-        
-        i = e->getStringAttribute(ptagTempo_at1Mode).getIntValue();
-        setAdaptiveTempo1Mode((AdaptiveTempo1Mode)i);
-        
-        i = e->getStringAttribute(ptagTempo_at1History).getIntValue();
-        setAdaptiveTempo1History(i);
-        
-        f = e->getStringAttribute(ptagTempo_at1Subdivisions).getFloatValue();
-        setAdaptiveTempo1Subdivisions(f);
-        
-        f = e->getStringAttribute(ptagTempo_at1Min).getFloatValue();
-        setAdaptiveTempo1Min(f);
-        
-        f = e->getStringAttribute(ptagTempo_at1Max).getFloatValue();
-        setAdaptiveTempo1Max(f);
-        
-        String s = e->getStringAttribute("subdivisions");
-        
-        if (s == "")    setSubdivisions(1.0);
-        else            setSubdivisions(s.getFloatValue());
+        sTempo.setState(e, ptagTempo_tempo, 120);
+        sWhichTempoSystem.setState(e, ptagTempo_system, ConstantTempo);
+        at1Mode.setState(e, ptagTempo_at1Mode, TimeBetweenNotes);
+        at1History.setState(e, ptagTempo_at1History, 4);
+        at1Subdivisions.setState(e, ptagTempo_at1Subdivisions, 1.);
+        at1Min.setState(e, ptagTempo_at1Min, 100);
+        at1Max.setState(e, ptagTempo_at1Max, 2000);
+        subdivisions.setState(e, "subdivisions", 1.0);
     }
     
+    bool modded;
+    
+    Moddable<TempoType> sWhichTempoSystem;
+    
+    Moddable<float> sTempo;
+    
+    Moddable<float> subdivisions;
+    
+    // Adaptive Tempo 1
+    Moddable<int> at1History;
+    Moddable<float> at1Min, at1Max;
+    Moddable<float> at1Subdivisions;
+    Moddable<AdaptiveTempo1Mode> at1Mode;
     
 private:
     String name;
-    TempoType sWhichTempoSystem;
-    
-    float sTempo;
-    float sBeatThreshSec;      //length of time between pulses, as set by tempo
-    float sBeatThreshMS;
-    
-    float subdivisions;
-    
-    // Adaptive Tempo 1
-    int at1History;
-    float at1Min, at1Max;
-    float at1Subdivisions;
-    AdaptiveTempo1Mode at1Mode;
     
     JUCE_LEAK_DETECTOR(TempoPreparation);
 };

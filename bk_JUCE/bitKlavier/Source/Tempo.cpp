@@ -12,6 +12,24 @@
 
 #include "PluginProcessor.h"
 
+#include "Modification.h"
+
+void TempoPreparation::performModification(TempoModification* s, Array<bool> dirty)
+{
+    bool reverse = s->altMod && modded;
+    
+    if (dirty[TempoBPM]) sTempo.modify(s->sTempo, reverse);
+    if (dirty[TempoSubdivisions]) subdivisions.modify(s->subdivisions, reverse);
+    if (dirty[TempoSystem]) sWhichTempoSystem.modify(s->sWhichTempoSystem, reverse);
+    if (dirty[AT1History]) at1History.modify(s->at1History, reverse);
+    if (dirty[AT1Min]) at1Min.modify(s->at1Min, reverse);
+    if (dirty[AT1Max]) at1Max.modify(s->at1Max, reverse);
+    if (dirty[AT1Subdivisions]) at1Subdivisions.modify(s->at1Subdivisions, reverse);
+    if (dirty[AT1Mode]) at1Mode.modify(s->at1Mode, reverse);
+    
+    modded = !reverse;
+}
+
 TempoProcessor::TempoProcessor(BKAudioProcessor& processor, Tempo::Ptr t):
 processor(processor),
 tempo(t),

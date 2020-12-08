@@ -163,12 +163,12 @@ BKViewController(p, theGraph, 4) // third argument => number of tabs
     offsetParamStartToggle.setToggleState (true, dontSendNotification);
     addAndMakeVisible(&offsetParamStartToggle, ALL);
     
-    howManySlider = std::make_unique<BKSingleSlider>("num pulses", 1, 100, 20, 1);
+    howManySlider = std::make_unique<BKSingleSlider>("num pulses", cSynchronicNumBeats, 1, 100, 20, 1);
     howManySlider->setToolTipString("Indicates number of steps/repetitions in Synchronic pulse");
     howManySlider->setJustifyRight(false);
     addAndMakeVisible(*howManySlider, ALL);
     
-    clusterThreshSlider = std::make_unique< BKSingleSlider>("cluster threshold", 20, 2000, 200, 10);
+    clusterThreshSlider = std::make_unique< BKSingleSlider>("cluster threshold", cSynchronicClusterThresh, 20, 2000, 200, 10);
     clusterThreshSlider->setToolTipString("successive notes spaced by less than this time (ms) are grouped as a cluster");
     clusterThreshSlider->setJustifyRight(true);
     addAndMakeVisible(*clusterThreshSlider, ALL);
@@ -178,7 +178,7 @@ BKViewController(p, theGraph, 4) // third argument => number of tabs
     clusterMinMaxSlider->setJustifyRight(true);
     addAndMakeVisible(*clusterMinMaxSlider, ALL);
     
-    clusterCapSlider = std::make_unique<BKSingleSlider>("cluster thickness", 1, 20, 8, 1);
+    clusterCapSlider = std::make_unique<BKSingleSlider>("cluster thickness", cSynchronicClusterCap, 1, 20, 8, 1);
     clusterCapSlider->setToolTipString("maximum number of notes in sounding pulse");
     clusterCapSlider->setJustifyRight(true);
     addAndMakeVisible(*clusterCapSlider, ALL);
@@ -193,13 +193,13 @@ BKViewController(p, theGraph, 4) // third argument => number of tabs
     velocityMinMaxSlider->setJustifyRight(true);
     addAndMakeVisible(*velocityMinMaxSlider, ALL);
     
-    gainSlider = std::make_unique<BKSingleSlider>("gain", 0, 10, 1, 0.0001);
+    gainSlider = std::make_unique<BKSingleSlider>("gain", cSynchronicGain, 0, 10, 1, 0.0001);
     gainSlider->setToolTipString("Overall volume of Synchronic pulse");
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
     addAndMakeVisible(*gainSlider, ALL);
     
-    numClusterSlider = std::make_unique<BKSingleSlider>("num layers", 1, 10, 1, 1);
+    numClusterSlider = std::make_unique<BKSingleSlider>("num layers", cSynchronicNumClusters, 1, 10, 1, 1);
     numClusterSlider->setToolTipString("Number of simultaneous layers of pulses");
     numClusterSlider->setJustifyRight(false);
     addAndMakeVisible(*numClusterSlider, ALL);
@@ -209,7 +209,7 @@ BKViewController(p, theGraph, 4) // third argument => number of tabs
     transpUsesTuning.setToggleState (false, dontSendNotification);
     addAndMakeVisible(&transpUsesTuning, ALL);
     
-    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", 0, 10, 1, 0.0001);
+    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", cSynchronicBlendronicGain, 0, 10, 1, 0.0001);
     blendronicGainSlider->setToolTipString("Volume of Synchronic output to connected Blendronics");
     blendronicGainSlider->setJustifyRight(false);
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);

@@ -116,10 +116,14 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
         return lastNoteOffset;
     }
 
+    tuning->prep->print();
     //else do regular tunings
     Array<float> currentTuning;
-    if(tuning->prep->getScale() == CustomTuning) currentTuning = tuning->prep->getCustomScale();
-    else currentTuning = tuning->tuningLibrary.getUnchecked(tuning->prep->getScale());
+    if(tuning->prep->getScale() == CustomTuning)
+        currentTuning = tuning->prep->getCustomScale();
+    else
+        currentTuning = tuning->tuningLibrary.getUnchecked(tuning->prep->getScale());
+
     
     lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->prep->getFundamental()) % currentTuning.size()]
                       + tuning->prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)

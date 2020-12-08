@@ -78,26 +78,26 @@ absoluteKeyboard(false, false)
     attachKeymap.setText("Attach a Keymap for Adaptive or Spiral/Springs!", dontSendNotification);
     addAndMakeVisible(attachKeymap);
 
-    rateSlider = std::make_unique<BKSingleSlider>("rate", 5., 400., 100., 1);
+    rateSlider = std::make_unique<BKSingleSlider>("rate", cSpringTuningRate, 5., 400., 100., 1);
     rateSlider->setJustifyRight(false);
     rateSlider->displaySliderVisible(false);
     rateSlider->setToolTipString("rate that spring model runs at (Hz)");
     addChildComponent(*rateSlider);
     
-    dragSlider = std::make_unique<BKSingleSlider>("drag", 0., 1., 0.5, 0.0001);
+    dragSlider = std::make_unique<BKSingleSlider>("drag", cSpringTuningDrag, 0., 1., 0.5, 0.0001);
     dragSlider->setJustifyRight(false);
     dragSlider->displaySliderVisible(false);
     dragSlider->setToolTipString("frictional component in spring model");
     dragSlider->setSliderTextResolution(2);
     addChildComponent(*dragSlider);
     
-    tetherStiffnessSlider = std::make_unique<BKSingleSlider>("anchor stiff", 0., 1., 0.5, 0.0001);
+    tetherStiffnessSlider = std::make_unique<BKSingleSlider>("anchor stiff", cSpringTuningStiffness, 0., 1., 0.5, 0.0001);
     tetherStiffnessSlider->setJustifyRight(true);
     tetherStiffnessSlider->displaySliderVisible(false);
     tetherStiffnessSlider->setToolTipString("overall stiffness of anchor sliders");
     addChildComponent(*tetherStiffnessSlider);
     
-    intervalStiffnessSlider = std::make_unique<BKSingleSlider>("interval stiff", 0., 1., 0.5, 0.0001);
+    intervalStiffnessSlider = std::make_unique<BKSingleSlider>("interval stiff", cSpringTuningIntervalStiffness, 0., 1., 0.5, 0.0001);
     intervalStiffnessSlider->setJustifyRight(false);
     intervalStiffnessSlider->displaySliderVisible(false);
     intervalStiffnessSlider->setToolTipString("overall stiffness of interval sliders");
@@ -109,14 +109,14 @@ absoluteKeyboard(false, false)
     fundamentalSetsTether.setToggleState (false, dontSendNotification);
     addAndMakeVisible(&fundamentalSetsTether, ALL);
     
-    tetherWeightGlobalSlider = std::make_unique<BKSingleSlider>("fund weight", 0., 1., 0.5, 0.001);
+    tetherWeightGlobalSlider = std::make_unique<BKSingleSlider>("fund weight", cSpringTuningTetherWeight, 0., 1., 0.5, 0.001);
     tetherWeightGlobalSlider->setJustifyRight(true);
     tetherWeightGlobalSlider->displaySliderVisible(false);
     tetherWeightGlobalSlider->setToolTipString("sets tether weight for fundamental");
     addChildComponent(*tetherWeightGlobalSlider);
     
     //tetherWeightSecondaryGlobalSlider
-    tetherWeightSecondaryGlobalSlider = std::make_unique<BKSingleSlider>("other weights", 0., 1., 0.1, 0.001);
+    tetherWeightSecondaryGlobalSlider = std::make_unique<BKSingleSlider>("other weights", cSpringTuningTetherWeightSecondary, 0., 1., 0.1, 0.001);
     tetherWeightSecondaryGlobalSlider->setJustifyRight(true);
     tetherWeightSecondaryGlobalSlider->displaySliderVisible(false);
     tetherWeightSecondaryGlobalSlider->setToolTipString("sets tether weight for all non-fundamentals");
@@ -180,12 +180,12 @@ absoluteKeyboard(false, false)
     A1FundamentalCB.setTooltip("sets fundamental for the anchor scale");
     addAndMakeVisible(A1FundamentalCB);
     
-    A1ClusterThresh = std::make_unique<BKSingleSlider>("Threshold", 1, 1000, 0, 1);
+    A1ClusterThresh = std::make_unique<BKSingleSlider>("Threshold", cTuningAdaptiveClusterThresh, 1, 1000, 0, 1);
     A1ClusterThresh->setJustifyRight(false);
     A1ClusterThresh->setToolTipString("if this time (ms) is exceeded, the fundamental will reset");
     addAndMakeVisible(*A1ClusterThresh);
     
-    A1ClusterMax = std::make_unique<BKSingleSlider>("Maximum", 1, 8, 1, 1);
+    A1ClusterMax = std::make_unique<BKSingleSlider>("Maximum", cTuningAdaptiveHistory, 1, 8, 1, 1);
     A1ClusterMax->setJustifyRight(false);
     A1ClusterMax->setToolTipString("after these many notes are played, the fundamental will reset");
     addAndMakeVisible(*A1ClusterMax);
@@ -207,7 +207,7 @@ absoluteKeyboard(false, false)
     nToneRootOctaveCB.setTooltip("set octave for root note, when semitone width is not 100");
     addAndMakeVisible(nToneRootOctaveCB);
     
-    nToneSemitoneWidthSlider = std::make_unique<BKSingleSlider>("semitone width and root", 1, 200, 100, 0.001);
+    nToneSemitoneWidthSlider = std::make_unique<BKSingleSlider>("semitone width and root", cTuningToneSemitoneWidth, 1, 200, 100, 0.001);
     nToneSemitoneWidthSlider->setJustifyRight(false);
     nToneSemitoneWidthSlider->displaySliderVisible(false);
     nToneSemitoneWidthSlider->setToolTipString("Adjusts half step distance. For example, 50 cents is a quarter-tone keyboard, and -100 cents is an inverted keyboard");
@@ -232,7 +232,7 @@ absoluteKeyboard(false, false)
     customKeyboard.setFundamental(0);
     addAndMakeVisible(customKeyboard);
     
-    offsetSlider = std::make_unique<BKSingleSlider>("offset: ", -100, 100, 0, 0.1);
+    offsetSlider = std::make_unique<BKSingleSlider>("offset: ", cTuningFundamentalOffset, -100, 100, 0, 0.1);
     offsetSlider->displaySliderVisible(false);
     offsetSlider->setToolTipString("Raise or lower the entire temperament in cents");
     addAndMakeVisible(*offsetSlider);
@@ -343,7 +343,7 @@ void TuningViewController::displayShared(void)
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
-    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() * 0.45));
     
     actionButton.setBounds(selectCB.getRight()+gXSpacing,
                            selectCB.getY(),
@@ -352,7 +352,7 @@ void TuningViewController::displayShared(void)
     
     alternateMod.setBounds(actionButton.getRight()+gXSpacing,
                            actionButton.getY(),
-                           selectCB.getWidth(),
+                           selectCB.getWidth() * 0.75,
                            actionButton.getHeight());
     
     comboBoxSlice.removeFromLeft(gXSpacing);

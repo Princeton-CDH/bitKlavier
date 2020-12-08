@@ -108,6 +108,6 @@ PopupMenu BKViewController::getModOptionMenu(BKPreparationType type, bool single
 void BKViewController::moddableComponentEditorOpened(ModdableComponent* mc)
 {
     processor.updateState->setCurrentDisplay(DisplayModdable);
-    processor.updateState->currentModdableName = mc->getName();
+    processor.updateState->currentModdableIdentifier = mc->getIdentifier();
     setSubWindowInFront(false);
 }

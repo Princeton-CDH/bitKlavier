@@ -1187,9 +1187,7 @@ static const std::vector<std::string> cKeymapParameterTypes = {
 
 static const String cMidiInputDefault = "_MidiInputJUCE";
 static const String cMidiInputDefaultDisplay = "Default MIDI Input";
-
 static const String cMidiInputDAW = "_MidiInputDAW";
-
 static const String cMidiInputUI = "_MidiInputUI";
 
 typedef enum BKSampleLoadType
@@ -1370,5 +1368,42 @@ static const std::vector<std::string> cFundamentalNames = {
     "10: A#/Bb",
     "11: B"
 };
+
+static const String cDirectGain = "Direct_gain";
+static const String cDirectResonanceGain = "Direct_resonanceGain";
+static const String cDirectHammerGain = "Direct_hammerGain";
+static const String cDirectBlendronicGain = "Direct_blendronicGain";
+
+static const String cNostalgicGain = "Nostalgic_gain";
+static const String cNostalgicBlendronicGain = "Nostalgic_blendronicGain";
+static const String cNostalgicLengthMultiplier = "Nostalgic_lengthMultiplier";
+static const String cNostalgicBeatsToSkip = "Nostalgic_beatsToSkip";
+static const String cNostalgicClusterMin = "Nostalgic_clusterMin";
+static const String cNostalgicClusterThreshold = "Nostalgic_clusterThreshold";
+
+static const String cSynchronicGain = "Synchronic_gain";
+static const String cSynchronicBlendronicGain = "Synchronic_blendronicGain";
+static const String cSynchronicNumBeats = "Synchronic_numBeats";
+static const String cSynchronicClusterThresh = "Synchronic_clusterThresh";
+static const String cSynchronicClusterCap = "Synchronic_clusterCap";
+static const String cSynchronicNumClusters = "Synchronic_numClusters";
+
+static const String cBlendronicOutGain = "Blendronic_outGain";
+
+static const String cTuningAdaptiveClusterThresh = "Tuning_adaptiveClusterThresh";
+static const String cTuningAdaptiveHistory = "Tuning_adaptiveHistory";
+static const String cTuningToneSemitoneWidth = "Tuning_toneSemitoneWidth";
+static const String cTuningFundamentalOffset = "Tuning_adaptiveClusterThresh";
+static const String cSpringTuningRate = "SpringTuning_rate";
+static const String cSpringTuningDrag = "SpringTuning_drag";
+static const String cSpringTuningStiffness = "SpringTuning_stiffness";
+static const String cSpringTuningIntervalStiffness = "SpringTuning_intervalStiffness";
+static const String cSpringTuningTetherWeight = "SpringTuning_tetherWeight";
+static const String cSpringTuningTetherWeightSecondary = "SpringTuning_tetherWeightSecondary";
+
+static const String cTempoTempo = "Tempo_tempo";
+static const String cTempoSubdivisions = "Tempo_subdivisions";
+static const String cTempoAT1History = "Tempo_at1History";
+static const String cTempoAT1Subdivisions = "Tempo_at1Subdivisions";
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED

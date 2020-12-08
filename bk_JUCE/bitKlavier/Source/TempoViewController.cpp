@@ -34,20 +34,20 @@ BKViewController(p, theGraph, 1)
     fillModeCB();
     addAndMakeVisible(modeCB);
     
-    tempoSlider = std::make_unique<BKSingleSlider>("Tempo", 40, 208, 100, 0.01);
+    tempoSlider = std::make_unique<BKSingleSlider>("Tempo", cTempoTempo, 40, 208, 100, 0.01);
     tempoSlider->setToolTipString("Indicates current beats-per-minute (BPM)");
     addAndMakeVisible(*tempoSlider);
     
-    subSlider = std::make_unique<BKSingleSlider>("Subdivisions", 0.01, 32.0, 1.0, 0.01);
+    subSlider = std::make_unique<BKSingleSlider>("Subdivisions", cTempoSubdivisions, 0.01, 32.0, 1.0, 0.01);
     subSlider->setToolTipString("Number of pulses per beat");
     addAndMakeVisible(*subSlider);
     
-    AT1HistorySlider = std::make_unique<BKSingleSlider>("History", 1, 10, 4, 1);
+    AT1HistorySlider = std::make_unique<BKSingleSlider>("History", cTempoAT1History, 1, 10, 4, 1);
     AT1HistorySlider->setJustifyRight(false);
     AT1HistorySlider->setToolTipString("Indicates how many notes Tempo is using to determine and generate an average pulse ");
     addAndMakeVisible(*AT1HistorySlider);
     
-    AT1SubdivisionsSlider = std::make_unique<BKSingleSlider>("Subdivisions", 0., 12, 1, 0.01);
+    AT1SubdivisionsSlider = std::make_unique<BKSingleSlider>("Subdivisions", cTempoAT1Subdivisions, 0., 12, 1, 0.01);
     AT1SubdivisionsSlider->setJustifyRight(false);
     AT1SubdivisionsSlider->setToolTipString("Multiplies tempo by interpreting rhythmic value of played notes; values less than 1 will result in tempos slower than what is played, values greater than 1 will result in tempos faster than what is played");
     addAndMakeVisible(*AT1SubdivisionsSlider);
@@ -112,7 +112,7 @@ void TempoViewController::resized()
     comboBoxSlice.removeFromLeft(gXSpacing);
     hideOrShow.setBounds(comboBoxSlice.removeFromLeft(gComponentComboBoxHeight));
     comboBoxSlice.removeFromLeft(gXSpacing);
-    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() * 0.75));
+    selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() * 0.5));
     
     actionButton.setBounds(selectCB.getRight()+gXSpacing,
                            selectCB.getY(),
@@ -121,7 +121,7 @@ void TempoViewController::resized()
     
     alternateMod.setBounds(actionButton.getRight()+gXSpacing,
                            actionButton.getY(),
-                           selectCB.getWidth(),
+                           selectCB.getWidth() * 0.75,
                            actionButton.getHeight());
     
     comboBoxSlice.removeFromLeft(gXSpacing);

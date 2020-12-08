@@ -212,12 +212,12 @@ BKViewController(p, theGraph, 3)
     harmonizerMenuButton.addListener(this);
     addAndMakeVisible(harmonizerMenuButton);
 
-    harPreTranspositionSlider = std::make_unique<BKSingleSlider>("Transpose input", -12, 12, 0, 1);
+    harPreTranspositionSlider = std::make_unique<BKSingleSlider>("Transpose input", "Transpose input", -12, 12, 0, 1);
     harPreTranspositionSlider->setToolTipString("Transpose all input into this Keymap before harmonization");
     harPreTranspositionSlider->addMyListener(this);
     addAndMakeVisible(*harPreTranspositionSlider);
     
-    harPostTranspositionSlider = std::make_unique<BKSingleSlider>("Transpose output", -12, 12, 0, 1);
+    harPostTranspositionSlider = std::make_unique<BKSingleSlider>("Transpose output", "Transpose output", -12, 12, 0, 1);
     harPostTranspositionSlider->setToolTipString("Transpose all output of this Keymap after harmonization");
     harPostTranspositionSlider->addMyListener(this);
     addAndMakeVisible(*harPostTranspositionSlider);

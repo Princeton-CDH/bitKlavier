@@ -168,12 +168,12 @@ BKViewController(p, theGraph, 1)
     iconImageComponent.setAlpha(0.095);
     addAndMakeVisible(iconImageComponent);
     
-    A4tuningReferenceFrequencySlider = std::make_unique<BKSingleSlider>("A4 reference frequency", 415., 450., 440., 0.1);
+    A4tuningReferenceFrequencySlider = std::make_unique<BKSingleSlider>("A4 reference frequency", "A4 reference frequency", 415., 450., 440., 0.1);
     A4tuningReferenceFrequencySlider->setJustifyRight(false);
     A4tuningReferenceFrequencySlider->addMyListener(this);
     addAndMakeVisible(*A4tuningReferenceFrequencySlider);
     
-    tempoMultiplierSlider = std::make_unique<BKSingleSlider>("tempo multiplier", 0.25, 4., 1., 0.01);
+    tempoMultiplierSlider = std::make_unique<BKSingleSlider>("tempo multiplier", "tempo multiplier", 0.25, 4., 1., 0.01);
     tempoMultiplierSlider->setSkewFactorFromMidPoint(1.);
     tempoMultiplierSlider->setJustifyRight(false);
     tempoMultiplierSlider->addMyListener(this);
@@ -322,19 +322,19 @@ BKViewController(p, theGraph, 1)
     
     setLookAndFeel(&buttonsAndMenusLAF);
     
-    timeSlider = std::make_unique<BKSingleSlider>("mod time (ms)", 0, 2000, 0, 1);
+    timeSlider = std::make_unique<BKSingleSlider>("mod time (ms)", "mod time (ms)", 0, 2000, 0, 1);
     timeSlider->setToolTipString("how long it will take to ramp to this mod value");
     timeSlider->setJustifyRight(false);
     timeSlider->addMyListener(this);
     addAndMakeVisible(*timeSlider);
     
-    incSlider = std::make_unique<BKSingleSlider>("mod increment", -2.0f, 2.0f, 0.0, 0.001);
+    incSlider = std::make_unique<BKSingleSlider>("mod increment", "mod increment", -2.0f, 2.0f, 0.0, 0.001);
     incSlider->setToolTipString("how much to increment the mod value on each time the mod is triggered");
     incSlider->setJustifyRight(false);
     incSlider->addMyListener(this);
     addAndMakeVisible(*incSlider);
     
-    maxIncSlider = std::make_unique<BKSingleSlider>("max times to increment", 0, 10, 0, 1);
+    maxIncSlider = std::make_unique<BKSingleSlider>("max times to increment", "max times to increment", 0, 10, 0, 1);
     maxIncSlider->setToolTipString("how many times maximum to increment the mod value");
     maxIncSlider->setJustifyRight(false);
     maxIncSlider->addMyListener(this);
@@ -449,54 +449,93 @@ ModdableBase* ModdableViewController::getCurrentModdable()
     {
         DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
         
-        if (processor.updateState->currentModdableName == "gain")
+        if (processor.updateState->currentModdableIdentifier == cDirectGain)
             return &mod->dGain;
-        else if (processor.updateState->currentModdableName == "resonance gain")
+        else if (processor.updateState->currentModdableIdentifier == cDirectResonanceGain)
             return &mod->dResonanceGain;
-        else if (processor.updateState->currentModdableName == "hammer gain")
+        else if (processor.updateState->currentModdableIdentifier == cDirectHammerGain)
             return &mod->dHammerGain;
-        else if (processor.updateState->currentModdableName == "blendronic gain")
+        else if (processor.updateState->currentModdableIdentifier == cDirectBlendronicGain)
             return &mod->dBlendronicGain;
     }
     else if (processor.updateState->previousDisplay == DisplayNostalgicMod)
     {
         NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
         
-        if (processor.updateState->currentModdableName == "gain")
+        if (processor.updateState->currentModdableIdentifier == cNostalgicGain)
             return &mod->nGain;
-        else if (processor.updateState->currentModdableName == "blendronic gain")
+        else if (processor.updateState->currentModdableIdentifier == cNostalgicBlendronicGain)
             return &mod->nBlendronicGain;
-        else if (processor.updateState->currentModdableName == "note length multiplier")
+        else if (processor.updateState->currentModdableIdentifier == cNostalgicLengthMultiplier)
             return &mod->nLengthMultiplier;
-        else if (processor.updateState->currentModdableName == "cluster min")
+        else if (processor.updateState->currentModdableIdentifier == cNostalgicBeatsToSkip)
+            return &mod->nBeatsToSkip;
+        else if (processor.updateState->currentModdableIdentifier == cNostalgicClusterMin)
             return &mod->clusterMin;
-        else if (processor.updateState->currentModdableName == "cluster thresh")
+        else if (processor.updateState->currentModdableIdentifier == cNostalgicClusterThreshold)
             return &mod->clusterThreshold;
     }
     else if (processor.updateState->previousDisplay == DisplaySynchronicMod)
     {
         SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
         
-        if (processor.updateState->currentModdableName == "gain")
+        if (processor.updateState->currentModdableIdentifier == cSynchronicGain)
             return &mod->sGain;
-        else if (processor.updateState->currentModdableName == "blendronic gain")
+        else if (processor.updateState->currentModdableIdentifier == cSynchronicBlendronicGain)
             return &mod->sBlendronicGain;
-        else if (processor.updateState->currentModdableName == "num pulses")
+        else if (processor.updateState->currentModdableIdentifier == cSynchronicNumBeats)
             return &mod->sNumBeats;
-        else if (processor.updateState->currentModdableName == "cluster threshold")
+        else if (processor.updateState->currentModdableIdentifier == cSynchronicClusterThresh)
             return &mod->sClusterThresh;
-        else if (processor.updateState->currentModdableName == "cluster thickness")
+        else if (processor.updateState->currentModdableIdentifier == cSynchronicClusterCap)
             return &mod->sClusterCap;
-        else if (processor.updateState->currentModdableName == "num layers")
+        else if (processor.updateState->currentModdableIdentifier == cSynchronicNumClusters)
             return &mod->numClusters;
     }
     else if (processor.updateState->previousDisplay == DisplayBlendronicMod)
     {
         BlendronicModification::Ptr mod = processor.gallery->getBlendronicModification(processor.updateState->currentModBlendronicId);
         
-        if (processor.updateState->currentModdableName == "gain")
+        if (processor.updateState->currentModdableIdentifier == cBlendronicOutGain)
             return &mod->outGain;
-        ; // continue branching for each parameter and component
+    }
+    else if (processor.updateState->previousDisplay == DisplayTuningMod)
+    {
+        TuningModification::Ptr mod = processor.gallery->getTuningModification(processor.updateState->currentModTuningId);
+        
+        if (processor.updateState->currentModdableIdentifier == cSpringTuningRate)
+            return &mod->getSpringTuning()->rate;
+        else if (processor.updateState->currentModdableIdentifier == cSpringTuningDrag)
+            return &mod->getSpringTuning()->drag;
+        else if (processor.updateState->currentModdableIdentifier == cSpringTuningStiffness)
+            return &mod->getSpringTuning()->stiffness;
+        else if (processor.updateState->currentModdableIdentifier == cSpringTuningIntervalStiffness)
+            return &mod->getSpringTuning()->intervalStiffness;
+        else if (processor.updateState->currentModdableIdentifier == cSpringTuningTetherWeight)
+            return &mod->getSpringTuning()->tetherWeightGlobal;
+        else if (processor.updateState->currentModdableIdentifier == cSpringTuningTetherWeightSecondary)
+            return &mod->getSpringTuning()->tetherWeightSecondaryGlobal;
+        else if (processor.updateState->currentModdableIdentifier == cTuningAdaptiveClusterThresh)
+            return &mod->tAdaptiveClusterThresh;
+        else if (processor.updateState->currentModdableIdentifier == cTuningAdaptiveHistory)
+            return &mod->tAdaptiveHistory;
+        else if (processor.updateState->currentModdableIdentifier == cTuningToneSemitoneWidth)
+            return &mod->nToneSemitoneWidth;
+        else if (processor.updateState->currentModdableIdentifier == cTuningFundamentalOffset)
+            return &mod->tFundamentalOffset;
+    }
+    else if (processor.updateState->previousDisplay == DisplayTempoMod)
+    {
+        TempoModification::Ptr mod = processor.gallery->getTempoModification(processor.updateState->currentModTempoId);
+
+        if (processor.updateState->currentModdableIdentifier == cTempoTempo)
+            return &mod->sTempo;
+        else if (processor.updateState->currentModdableIdentifier == cTempoSubdivisions)
+            return &mod->subdivisions;
+        else if (processor.updateState->currentModdableIdentifier == cTempoAT1History)
+            return &mod->at1History;
+        else if (processor.updateState->currentModdableIdentifier == cTempoAT1Subdivisions)
+            return &mod->at1Subdivisions;
     }
     
     return nullptr;

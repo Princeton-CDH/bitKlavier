@@ -174,7 +174,7 @@ public:
 		tAdaptiveInversional = (bool)((int) (r[idx++] * 2));
 		tAdaptiveAnchorScale = (TuningSystem)(int)(r[idx++] * TuningSystemNil);
 		tAdaptiveAnchorFundamental = (PitchClass)(int)(r[idx++] * PitchClassNil);
-		tAdaptiveClusterThresh = (uint64) (r[idx++] * 50000);
+		tAdaptiveClusterThresh = (int) (r[idx++] * 50000);
 		tAdaptiveHistory = (int)(r[idx++] * 100) + 1;
         
         Array<float> arr;
@@ -185,7 +185,7 @@ public:
         tCustom.set(arr);
         
 		arr.clear();
-		for (int i = 0; i < 128; ++i)
+		for (int i = 0; i < ABSOLUTE_OFFSET_SIZE; ++i)
 		{
 			arr.add(i, (Random::getSystemRandom().nextFloat() * 2.0f - 1.0f));
 		}
@@ -204,7 +204,7 @@ public:
                       bool adaptiveInversional,
                       TuningSystem adaptiveAnchorScale,
                       PitchClass adaptiveAnchorFundamental,
-                      uint64 adaptiveClusterThresh,
+                      int adaptiveClusterThresh,
                       int adaptiveHistory,
                       Array<float> customScale,
                       float semitoneWidth,
@@ -225,7 +225,7 @@ public:
     stuning(new SpringTuning(st))
     {
         Array<float> arr;
-        for(int i=0; i<128; i++) arr.set(i, 0.);
+        for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(i, 0.);
         tAbsolute.set(arr);
     }
     
@@ -245,7 +245,7 @@ public:
     stuning(new SpringTuning())
     {
         Array<float> arr;
-        for(int i=0; i<128; i++) arr.set(i, 0.);
+        for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(i, 0.);
         tAbsolute.set(arr);
     }
     
@@ -271,7 +271,7 @@ public:
     { return tAdaptiveAnchorScale.value;       }
     inline const PitchClass getAdaptiveAnchorFundamental() const noexcept
     { return tAdaptiveAnchorFundamental.value; }
-    inline const uint64 getAdaptiveClusterThresh() const noexcept   { return tAdaptiveClusterThresh.value;     }
+    inline const int getAdaptiveClusterThresh() const noexcept   { return tAdaptiveClusterThresh.value;     }
     inline const int getAdaptiveHistory() const noexcept            { return tAdaptiveHistory.value; }
     inline const Array<float> getCustomScale() const noexcept       { return tCustom.value;          }
     inline const Array<float> getAbsoluteOffsets() const noexcept   { return tAbsolute.value;        }
@@ -283,7 +283,7 @@ public:
     
     inline const Array<float> getAbsoluteOffsetsCents() const noexcept {
         Array<float> tAbsoluteCents;
-        tAbsoluteCents.ensureStorageAllocated(128);
+        tAbsoluteCents.ensureStorageAllocated(ABSOLUTE_OFFSET_SIZE);
         for(int i=0; i<tAbsolute.value.size(); i++)
         {
             tAbsoluteCents.set(i, tAbsolute.value.getUnchecked(i) * 100.);
@@ -325,7 +325,7 @@ public:
     inline void setAdaptiveInversional(bool adaptiveInversional)            { tAdaptiveInversional = adaptiveInversional; }
     inline void setAdaptiveAnchorScale(TuningSystem adaptiveAnchorScale)    { tAdaptiveAnchorScale = adaptiveAnchorScale;  }
     inline void setAdaptiveAnchorFundamental(PitchClass adaptiveAnchorFundamental)  { tAdaptiveAnchorFundamental = adaptiveAnchorFundamental;}
-    inline void setAdaptiveClusterThresh(uint64 adaptiveClusterThresh)  { tAdaptiveClusterThresh = adaptiveClusterThresh; }
+    inline void setAdaptiveClusterThresh(int adaptiveClusterThresh)  { tAdaptiveClusterThresh = adaptiveClusterThresh; }
     inline void setAdaptiveHistory(int adaptiveHistory)     { tAdaptiveHistory = adaptiveHistory; }
     inline void setCustomScale(Array<float> tuning)     { tCustom = tuning;      }
     inline void setAbsoluteOffsets(Array<float> abs)    { tAbsolute = abs;   }
@@ -432,36 +432,27 @@ public:
     {
         ValueTree prep("params");
         
-        prep.setProperty( ptagTuning_scale,                 getScale(), 0);
-        prep.setProperty( ptagTuning_scaleName,             getScaleName(), 0);
-        prep.setProperty( ptagTuning_fundamental,           getFundamental(), 0);
-        prep.setProperty( ptagTuning_offset,                getFundamentalOffset(), 0 );
-        prep.setProperty( ptagTuning_adaptiveIntervalScale, getAdaptiveIntervalScale(), 0 );
-        prep.setProperty( ptagTuning_adaptiveInversional,   getAdaptiveInversional(), 0 );
-        prep.setProperty( ptagTuning_adaptiveAnchorScale,   getAdaptiveAnchorScale(), 0 );
-        prep.setProperty( ptagTuning_adaptiveAnchorFund,    getAdaptiveAnchorFundamental(), 0 );
-        prep.setProperty( ptagTuning_adaptiveClusterThresh, (int)getAdaptiveClusterThresh(), 0 );
-        prep.setProperty( ptagTuning_adaptiveHistory,       getAdaptiveHistory(), 0 );
+        tScale.getState(prep, ptagTuning_scale);
+        prep.setProperty( ptagTuning_scaleName, String(cTuningSystemNames[(int)tScale.base]), 0);
         
-        prep.setProperty( ptagTuning_nToneRoot,             getNToneRoot(), 0);
-        prep.setProperty( ptagTuning_nToneSemitoneWidth,    getNToneSemitoneWidth(), 0 );
+        tFundamental.getState(prep, ptagTuning_fundamental);
+        tFundamentalOffset.getState(prep, ptagTuning_offset);
         
-        prep.setProperty( "adaptiveSystem", getAdaptiveType(), 0);
+        tAdaptiveIntervalScale.getState(prep, ptagTuning_adaptiveIntervalScale);
+        tAdaptiveInversional.getState(prep, ptagTuning_adaptiveInversional);
+        tAdaptiveAnchorScale.getState(prep, ptagTuning_adaptiveAnchorScale);
+        tAdaptiveAnchorFundamental.getState(prep, ptagTuning_adaptiveAnchorFund);
+        tAdaptiveClusterThresh.getState(prep, ptagTuning_adaptiveClusterThresh);
+        tAdaptiveHistory.getState(prep, ptagTuning_adaptiveHistory);
         
-        ValueTree scale( vtagTuning_customScale);
-        int count = 0;
-        for (auto note : getCustomScale())
-            scale.setProperty( ptagFloat + String(count++), note, 0 );
-        prep.addChild(scale, -1, 0);
+        nToneRoot.getState(prep, ptagTuning_nToneRoot);
+        nToneSemitoneWidth.getState(prep, ptagTuning_nToneSemitoneWidth);
         
-        ValueTree absolute( vTagTuning_absoluteOffsets);
-        count = 0;
-        for (auto note : getAbsoluteOffsets())
-        {
-            if(note != 0.) absolute.setProperty( ptagFloat + String(count), note, 0 );
-            count++;
-        }
-        prep.addChild(absolute, -1, 0);
+        adaptiveType.getState(prep, "adaptiveSystem");
+        
+        tCustom.getState(prep, StringArray(vtagTuning_customScale, ptagFloat));
+        
+        tAbsolute.getState(prep, StringArray(vTagTuning_absoluteOffsets, ptagFloat));
         
         prep.addChild(getSpringTuning()->getState(), -1, 0);
         
@@ -469,20 +460,15 @@ public:
     }
     
     inline void setState(XmlElement* e)
-    {
-        int i; float f; bool b;
+    {        
+        tScale.setState(e, ptagTuning_scale, EqualTemperament);
         
-        i = e->getStringAttribute( ptagTuning_scale).getIntValue();
-        setScale((TuningSystem)i);
-        
-        TuningSystem scale = (TuningSystem) i;
-        
-        if (scale == AdaptiveTuning)
+        if (tScale.value == AdaptiveTuning)
         {
             setAdaptiveType(AdaptiveNormal);
             setScale(EqualTemperament);
         }
-        else if (scale == AdaptiveAnchoredTuning)
+        else if (tScale.value == AdaptiveAnchoredTuning)
         {
             setAdaptiveType(AdaptiveAnchored);
             setScale(EqualTemperament);
@@ -495,53 +481,20 @@ public:
         //if a tuning has been saved by name, use that instead of the index value; need to resave all built-in galleries to do this, eventually
         setScaleByName(e->getStringAttribute(ptagTuning_scaleName));
         
-        i = e->getStringAttribute( ptagTuning_fundamental).getIntValue();
-        setFundamental((PitchClass)i);
+        tFundamental.setState(e, ptagTuning_fundamental, C);
+        tFundamentalOffset.setState(e, ptagTuning_offset, 0.);
+        tAdaptiveIntervalScale.setState(e, ptagTuning_adaptiveIntervalScale, JustTuning);
+        tAdaptiveAnchorScale.setState(e, ptagTuning_adaptiveAnchorScale, EqualTemperament);
+        tAdaptiveHistory.setState(e, ptagTuning_adaptiveHistory, 4);
+        tAdaptiveInversional.setState(e, ptagTuning_adaptiveInversional, true);
+        tAdaptiveClusterThresh.setState(e, ptagTuning_adaptiveClusterThresh, 100);
+        tAdaptiveAnchorFundamental.setState(e, ptagTuning_adaptiveAnchorFund, C);
+
+        nToneRoot.setState(e, ptagTuning_nToneRoot, 60);
+        nToneSemitoneWidth.setState(e, ptagTuning_nToneSemitoneWidth, 100);
         
-        f = e->getStringAttribute( ptagTuning_offset).getFloatValue();
-        setFundamentalOffset(f);
-        
-        i = e->getStringAttribute( ptagTuning_adaptiveIntervalScale).getIntValue();
-        setAdaptiveIntervalScale((TuningSystem)i);
-        
-        i = e->getStringAttribute( ptagTuning_adaptiveAnchorScale).getIntValue();
-        setAdaptiveAnchorScale((TuningSystem)i);
-        
-        i = e->getStringAttribute( ptagTuning_adaptiveHistory).getIntValue();
-        setAdaptiveHistory(i);
-        
-        b = (bool) e->getStringAttribute( ptagTuning_adaptiveInversional).getIntValue();
-        setAdaptiveInversional(b);
-        
-        i = e->getStringAttribute( ptagTuning_adaptiveClusterThresh).getIntValue();
-        setAdaptiveClusterThresh(i);
-        
-        i = e->getStringAttribute( ptagTuning_adaptiveAnchorFund).getIntValue();
-        setAdaptiveAnchorFundamental((PitchClass)i);
-        
-        i = e->getStringAttribute( ptagTuning_nToneRoot).getIntValue();
-        if(i > 0) setNToneRoot(i);
-        else setNToneRoot(60);
-        
-        f = e->getStringAttribute( ptagTuning_nToneSemitoneWidth).getFloatValue();
-        if(f > 0) setNToneSemitoneWidth(f);
-        else setNToneSemitoneWidth(100);
-        
-        String str = e->getStringAttribute("adaptiveSystem");
-        
-        if (str != "")
-        {
-            i = str.getIntValue();
-            
-            TuningAdaptiveSystemType type = (TuningAdaptiveSystemType) i;
-            
-            setAdaptiveType(type);
-            
-            if (type == AdaptiveSpring)
-            {
-                setSpringsActive(true);
-            }
-        }
+        adaptiveType.setState(e, "adaptiveSystem", (TuningAdaptiveSystemType)0);
+        if (adaptiveType.value == AdaptiveSpring) setSpringsActive(true);
         
         // custom scale
         forEachXmlChildElement (*e, sub)
@@ -550,48 +503,22 @@ public:
             {
                 getSpringTuning()->setState(sub);
             }
-            else if (sub->hasTagName(vtagTuning_customScale))
-            {
-                // DBG("TuningModification::setState");
-                Array<float> scale;
-                for (int k = 0; k < sub->getNumAttributes(); k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    
-                    if (attr == String()) break;
-                    else
-                    {
-                        
-                        f = attr.getFloatValue();
-                        scale.add(f);
-                        // if (f != 0) DBG("TuningModification::setState Val = " + String(f));
-                    }
-                }
-                setCustomScale(scale);
-            }
-            else if (sub->hasTagName(vTagTuning_absoluteOffsets))
-            {
-                Array<float> absolute;
-                absolute.ensureStorageAllocated(ABSOLUTE_OFFSET_SIZE);
-                for (int k = 0; k < ABSOLUTE_OFFSET_SIZE; k++)
-                {
-                    String attr = sub->getStringAttribute(ptagFloat + String(k));
-                    f = attr.getFloatValue();
-                    absolute.set(k, f);
-                    
-                }
-                
-                setAbsoluteOffsets(absolute);
-            }
         }
+        
+        Array<float> arr;
+        for(int i=0; i<12; i++) arr.add(0.);
+        tCustom.setState(e, StringArray(vtagTuning_customScale, ptagFloat), arr);
+        if (tCustom.value.isEmpty()) tCustom = arr;
+        
+        arr.clear();
+        for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(0.);
+        tAbsolute.setState(e, StringArray(vTagTuning_absoluteOffsets, ptagFloat), arr);
+        if (tAbsolute.value.isEmpty()) tAbsolute = arr;
         
         if (getSpringTuning()->getActive())
         {
             setAdaptiveType(AdaptiveSpring);
         }
-        
-        // MOD REWORK FIX
-        // getSpringTuning()->setTetherTuning(getStaticScale());
     }
     
     bool modded = false;
@@ -608,7 +535,7 @@ public:
     Moddable<TuningSystem>    tAdaptiveAnchorScale;       //scale to tune new fundamentals to when in anchored
     Moddable<PitchClass>      tAdaptiveAnchorFundamental; //fundamental for anchor scale
     
-    Moddable<uint64>          tAdaptiveClusterThresh;     //ms; max time before fundamental is reset
+    Moddable<int>             tAdaptiveClusterThresh;     //ms; max time before fundamental is reset
     Moddable<int>             tAdaptiveHistory;           //cluster max; max number of notes before fundamental is reset
     
     // custom scale and absolute offsets
@@ -990,7 +917,7 @@ private:
     float   adaptiveCalculate(int midiNoteNumber) const;
     void    newNote(int midiNoteNumber, TuningSystem tuningType);
     float   adaptiveCalculateRatio(int midiNoteNumber) const;
-    uint64  clusterTime;
+    int     clusterTime;
     
     int     adaptiveFundamentalNote = 60; //moves with adaptive tuning
     float   adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote);

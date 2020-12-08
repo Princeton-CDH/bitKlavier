@@ -239,7 +239,7 @@ class ModdableComponent
 {
 public:
     ModdableComponent(String name, bool enabled):
-    name(name),
+    identifier(name),
     enabled(enabled)
     {
     }
@@ -248,7 +248,7 @@ public:
     {
     }
     
-    String& getName() { return name; }
+    String& getIdentifier() { return identifier; }
     
     class Listener
     {
@@ -263,7 +263,7 @@ public:
     void removeModdableComponentListener(Listener* listener)  { listeners.remove(listener);   }
     
 private:
-    String name;
+    String identifier;
     bool enabled;
     float time;
     float resolution;

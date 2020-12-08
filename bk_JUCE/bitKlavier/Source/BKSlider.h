@@ -319,12 +319,11 @@ public TextEditor::Listener
 #endif
 {
 public:
-    BKSingleSlider(String sliderName, double min, double max, double def, double increment);
+    BKSingleSlider(String sliderName, String Id, double min, double max, double def, double increment);
     ~BKSingleSlider()
     {
         displaySlider->setLookAndFeel(nullptr);
         setLookAndFeel(nullptr);
-        
     };
     
     Slider thisSlider;

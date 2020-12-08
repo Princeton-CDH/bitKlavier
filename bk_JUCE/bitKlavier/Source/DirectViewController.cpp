@@ -30,25 +30,25 @@ BKViewController(p, theGraph, 2)
     transpositionSlider->setTooltip("Determines pitch (in semitones) of Direct notes; control-click to add another voice, double-click to edit all");
     addAndMakeVisible(*transpositionSlider);
     
-    gainSlider = std::make_unique<BKSingleSlider>("gain", 0, 10, 1, 0.01);
+    gainSlider = std::make_unique<BKSingleSlider>("gain", cDirectGain, 0, 10, 1, 0.01);
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
     gainSlider->setToolTipString("Adjusts overall volume of keyboard");
     addAndMakeVisible(*gainSlider);
     
-    resonanceGainSlider = std::make_unique<BKSingleSlider>("resonance gain", 0, 10, 0.2, 0.01);
+    resonanceGainSlider = std::make_unique<BKSingleSlider>("resonance gain", cDirectResonanceGain, 0, 10, 0.2, 0.01);
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(false);
     resonanceGainSlider->setToolTipString("Adjusts overall resonance/reverb based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*resonanceGainSlider);
     
-    hammerGainSlider = std::make_unique<BKSingleSlider>("hammer gain", 0, 10, 1, 0.01);
+    hammerGainSlider = std::make_unique<BKSingleSlider>("hammer gain", cDirectHammerGain, 0, 10, 1, 0.01);
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
     hammerGainSlider->setJustifyRight(false);
     hammerGainSlider->setToolTipString("Adjusts mechanical noise sample based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*hammerGainSlider);
     
-    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", 0, 10, 1, 0.01);
+    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", cDirectBlendronicGain, 0, 10, 1, 0.01);
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
     blendronicGainSlider->setJustifyRight(false);
     blendronicGainSlider->setToolTipString("Adjusts volume of Direct output to connected Blendronics");
