@@ -972,33 +972,32 @@ void TuningModification::setStateOld(XmlElement* e)
         }
         else if (sub->hasTagName(vtagTuning_customScale))
         {
+            // Some old galleries have empty custom scale elements so we
+            // need to handle for that by making sure empty custom scales
+            // become 0 filled arrays and are not considered dirty for mods
             Array<float> scale;
+            for (int i = 0; i < 12; ++i) scale.add(0.0);
+            bool dirty = false;
             for (int k = 0; k < sub->getNumAttributes(); k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
-                
-                if (attr == String()) break;
-                else
-                {
-                    f = attr.getFloatValue();
-                    scale.add(f);
-                }
+                f = attr.getFloatValue();
+                scale.set(k, f);
+                dirty = true;
             }
             
             setCustomScale(scale);
-            setDirty(TuningCustomScale);
+            if (dirty) setDirty(TuningCustomScale);
         }
         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
         {
             Array<float> absolute;
-            absolute.ensureStorageAllocated(ABSOLUTE_OFFSET_SIZE);
-            
             for (int k = 0; k < ABSOLUTE_OFFSET_SIZE; k++)
             {
                 String attr = sub->getStringAttribute(ptagFloat + String(k));
+                absolute.add(0.0);
                 f = attr.getFloatValue() * 100.;
                 absolute.set(k, f);
-                
             }
             
             setAbsoluteOffsets(absolute);

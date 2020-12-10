@@ -225,7 +225,7 @@ public:
     stuning(new SpringTuning(st))
     {
         Array<float> arr;
-        for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(i, 0.);
+        for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(0.);
         tAbsolute.set(arr);
     }
     
@@ -245,7 +245,7 @@ public:
     stuning(new SpringTuning())
     {
         Array<float> arr;
-        for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(i, 0.);
+        for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(0.);
         tAbsolute.set(arr);
     }
     
@@ -519,6 +519,8 @@ public:
         {
             setAdaptiveType(AdaptiveSpring);
         }
+        
+        print();
     }
     
     bool modded = false;
