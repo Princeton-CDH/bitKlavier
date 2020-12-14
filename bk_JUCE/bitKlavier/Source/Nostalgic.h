@@ -49,8 +49,8 @@ public:
                          PitchClass basePitch,
                          Tuning::Ptr t):
     modded(false),
-    nGain(gain),
-    nBlendronicGain(blendGain),
+    nGain(gain, true),
+    nBlendronicGain(blendGain, true),
     nWaveDistance(waveDistance),
     nUndertow(undertow),
     nTransposition(transposition),
@@ -76,8 +76,8 @@ public:
     
     NostalgicPreparation(void):
     modded(false),
-    nGain(1.0),
-    nBlendronicGain(1.0f),
+    nGain(0.0, true),
+    nBlendronicGain(0.0, true),
     nWaveDistance(0),
     nUndertow(0),
     nTransposition(Array<float>({0.0})),

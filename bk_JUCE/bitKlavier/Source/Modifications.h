@@ -79,6 +79,13 @@ public:
     Array<Reset> tempoResets;
 	Array<Reset> blendronicResets;
     
+    Array<Reset> directModResets;
+    Array<Reset> nostalgicModResets;
+    Array<Reset> synchronicModResets;
+    Array<Reset> tuningModResets;
+    Array<Reset> tempoModResets;
+    Array<Reset> blendronicModResets;
+    
     struct PianoMap
     {
         int pianoTarget;

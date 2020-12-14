@@ -67,7 +67,7 @@ sustainPedalButton("Sustain Pedal")
     
     mainSlider.setLookAndFeel(&laf);
 
-    mainSlider.setRange (-90, 12.0, 0.1);
+    mainSlider.setRange (-100, 12.0, 0.1);
     mainSlider.setSkewFactor (2.5, false);
     mainSlider.setValue (0);
     mainSlider.setSliderStyle (Slider::LinearBarVertical);

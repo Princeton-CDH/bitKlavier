@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "../JuceLibraryCode/JuceHeader.h"
+
 class ModdableBase
 {
 public:
@@ -38,7 +40,7 @@ class Moddable : public ModdableBase
 public:
     Moddable () = default;
     
-    Moddable (ValueType v, int t):
+    Moddable (ValueType v, int t, bool dB = false):
     value(v),
     base(v),
     mod(v),
@@ -46,13 +48,14 @@ public:
     dv(v), // Make sure to properly calculate dv before (and if) it is needed
     active(false),
     n(0),
-    maxN(0)
+    maxN(0),
+    dB(dB)
     {
         initInc(tag<ValueType>{});
     };
     
-    Moddable (ValueType v):
-    Moddable (v, 0) {}
+    Moddable (ValueType v, bool dB = false):
+    Moddable (v, 0, dB) {}
     
     Moddable (const Moddable& m):
     Moddable (m.base, m.time)
@@ -276,23 +279,20 @@ public:
         vt.setProperty(s[0] + "_maxN", maxN, 0);
     }
     
-    void getState(tag<int>, ValueTree& vt, StringArray s) { getState(tag<double>{}, vt, s); }
-    void getState(tag<float>, ValueTree& vt, StringArray s) { getState(tag<double>{}, vt, s); }
     void getState(tag<double>, ValueTree& vt, StringArray s)
     {
-        vt.setProperty(s[0], base, 0);
+        if (dB) vt.setProperty(s[0], Decibels::decibelsToGain(base), 0);
+        else vt.setProperty(s[0], base, 0);
         vt.setProperty(s[0] + "_inc", inc, 0);
         vt.setProperty(s[0] + "_time", time, 0);
         vt.setProperty(s[0] + "_maxN", maxN, 0);
     }
+    void getState(tag<int>, ValueTree& vt, StringArray s) { getState(tag<double>{}, vt, s); }
+    void getState(tag<float>, ValueTree& vt, StringArray s) { getState(tag<double>{}, vt, s); }
     
     template <class T>
     void getState(tag<Array<T>>, ValueTree& vt, StringArray s)
     {
-//        if (s[0] == String() || s[1] == String())
-//        {
-//            return;
-//        }
         ValueTree bt(s[0]);
         ValueTree it(s[0] + "_inc");
         int count = 0;
@@ -308,10 +308,6 @@ public:
     template <class T>
     void getState(tag<Array<Array<T>>>, ValueTree& vt, StringArray s)
     {
-//        if (s[0] == String() || s[1] == String() || s[2] == String())
-//        {
-//            return;
-//        }
         ValueTree bt(s[0]);
         ValueTree it(s[0] + "_inc");
         int count = 0;
@@ -353,18 +349,20 @@ public:
         value = base;
     }
     
-    void setState(tag<int>, XmlElement* e, StringArray s, ValueType defaultValue)
-    { setState(tag<double>{}, e, s, defaultValue); }
-    void setState(tag<float>, XmlElement* e, StringArray s, ValueType defaultValue)
-    { setState(tag<double>{}, e, s, defaultValue); }
     void setState(tag<double>, XmlElement* e, StringArray s, ValueType defaultValue)
     {
-        base = e->getDoubleAttribute(s[0], defaultValue);
+        if (dB) base = Decibels::gainToDecibels(e->getDoubleAttribute(s[0], defaultValue));
+        else base = e->getDoubleAttribute(s[0], defaultValue);
         inc = e->getDoubleAttribute(s[0] + "_inc", 0.0);
         time = e->getIntAttribute(s[0] + "_time", 0);
         maxN = e->getIntAttribute(s[0] + "_maxN", 0);
         value = base;
     }
+    void setState(tag<int>, XmlElement* e, StringArray s, ValueType defaultValue)
+    { setState(tag<double>{}, e, s, defaultValue); }
+    void setState(tag<float>, XmlElement* e, StringArray s, ValueType defaultValue)
+    { setState(tag<double>{}, e, s, defaultValue); }
+    
     void setState(tag<bool>, XmlElement* e, StringArray s, ValueType defaultValue)
     {
         base = e->getBoolAttribute(s[0], defaultValue);
@@ -486,12 +484,12 @@ private:
         if (time == 0) dv = mod - value;
         else dv = (mod - value) / time;
     }
-    void calcDV(tag<float>)
-    {
-        if (time == 0) dv = mod - value;
-        else dv = (mod - value) / time;
-    }
+    void calcDV(tag<float>) { calcDV(tag<double>{}); }
     
+    float getAttribute(tag<double>, XmlElement* e, String tagName, double v = 0.0)
+    {
+        return e->getDoubleAttribute(tagName, v);
+    }
     float getAttribute(tag<float>, XmlElement* e, String tagName, float v = 0.0f)
     {
         return e->getDoubleAttribute(tagName, v);
@@ -525,5 +523,7 @@ private:
     
     // Max number of times mod can be incremented
     int maxN;
+    
+    bool dB;
 };
 

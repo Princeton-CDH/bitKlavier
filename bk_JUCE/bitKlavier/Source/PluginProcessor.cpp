@@ -1175,6 +1175,92 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             }
         }
     }
+    
+    // MOD RESETS
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->directModResets)
+    {
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                gallery->getDirectModification(reset.prepId)->resetModdables();
+                updateState->directPreparationDidChange = true;
+                break;
+            }
+        }
+    }
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->synchronicModResets)
+    {
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                gallery->getSynchronicModification(reset.prepId)->resetModdables();
+                updateState->synchronicPreparationDidChange = true;
+                break;
+            }
+        }
+    }
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->nostalgicModResets)
+    {
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                gallery->getNostalgicModification(reset.prepId)->resetModdables();
+                updateState->nostalgicPreparationDidChange = true;
+                break;
+            }
+        }
+    }
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->blendronicModResets)
+    {
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                gallery->getBlendronicModification(reset.prepId)->resetModdables();
+                updateState->blendronicPreparationDidChange = true;
+                break;
+            }
+        }
+    }
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->tuningModResets)
+    {
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                gallery->getTuningModification(reset.prepId)->resetModdables();
+                updateState->tuningPreparationDidChange = true;
+                break;
+            }
+        }
+    }
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->tempoModResets)
+    {
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                gallery->getTempoModification(reset.prepId)->resetModdables();
+                updateState->tempoPreparationDidChange = true;
+                break;
+            }
+        }
+    }
 }
 
 // Modification

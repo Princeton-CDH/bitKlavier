@@ -94,7 +94,7 @@ public:
     
     //empty constructor
     BlendronicPreparation(void) :
-    outGain(1.0),
+    outGain(0.0, true),
     bBeats(Array<float>({ 4., 3., 2., 3.})),
     bDelayLengths(Array<float>({ 4., 3., 2., 3.})),
     bSmoothLengths(Array<float>({ 50.0f })),

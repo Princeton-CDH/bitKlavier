@@ -1126,44 +1126,52 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
     else if (type1 == PreparationTypeDirectMod)
     {
         if (type2 == PreparationTypeKeymap ||
-            type2 == PreparationTypeDirect)
+            type2 == PreparationTypeDirect ||
+            type2 == PreparationTypeReset)
             return true;
     }
     else if (type1 == PreparationTypeNostalgicMod)
     {
         if (type2 == PreparationTypeKeymap ||
-            type2 == PreparationTypeNostalgic)
+            type2 == PreparationTypeNostalgic ||
+            type2 == PreparationTypeReset)
             return true;
     }
     else if (type1 == PreparationTypeSynchronicMod)
     {
         if (type2 == PreparationTypeKeymap ||
-            type2 == PreparationTypeSynchronic)
+            type2 == PreparationTypeSynchronic ||
+            type2 == PreparationTypeReset)
             return true;
     }
     else if (type1 == PreparationTypeBlendronicMod)
     {
         if (type2 == PreparationTypeKeymap ||
-            type2 == PreparationTypeBlendronic)
+            type2 == PreparationTypeBlendronic ||
+            type2 == PreparationTypeReset)
             return true;
     }
     else if (type1 == PreparationTypeTuningMod)
     {
         if (type2 == PreparationTypeKeymap ||
-            type2 == PreparationTypeTuning)
+            type2 == PreparationTypeTuning ||
+            type2 == PreparationTypeReset)
             return true;
     }
     else if (type1 == PreparationTypeTempoMod)
     {
         if (type2 == PreparationTypeKeymap ||
-            type2 == PreparationTypeTempo)
+            type2 == PreparationTypeTempo ||
+            type2 == PreparationTypeReset)
             return true;
     }
     else if (type1 == PreparationTypeReset)
     {
         if (type2 == PreparationTypeKeymap ||
             (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo) ||
-            type2 == PreparationTypeBlendronic)
+            type2 == PreparationTypeBlendronic ||
+            (type2 >= PreparationTypeDirectMod && type2 <= PreparationTypeTempoMod) ||
+            type2 == PreparationTypeBlendronicMod)
             return true;
     }
     else if (type1 == PreparationTypePianoMap)

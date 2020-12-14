@@ -680,7 +680,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         const float r = noteVelocity * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
         
         float d = 1.0f;
-        if (dgain != nullptr) d = *dgain;
+        if (dgain != nullptr) d = Decibels::decibelsToGain(*dgain);
 
         if (outR != nullptr)
         {
@@ -693,7 +693,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         }
         
         float b = aGlobalGain * d;
-        if (blendronicGain != nullptr) b *= *blendronicGain;
+        if (blendronicGain != nullptr) b *= Decibels::decibelsToGain(*blendronicGain);
         for (int i = 0; i < numBlendronics; ++i)
         {
             blendronicDelays.getUnchecked(i)->addSample(l * b, addCounter, 0);
@@ -850,7 +850,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         const float r = noteVelocity * adsr.lastOut() * (sampleR * sampleEnv.lastOut());
 
         float d = 1.0f;
-        if (dgain != nullptr) d = *dgain;
+        if (dgain != nullptr) d = Decibels::decibelsToGain(*dgain);
         
         if (outR != nullptr)
         {
@@ -863,7 +863,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         }
         
         float b = aGlobalGain * d;
-        if (blendronicGain != nullptr) b *= *blendronicGain;
+        if (blendronicGain != nullptr) b *= Decibels::decibelsToGain(*blendronicGain);
         for (int i = 0; i < numBlendronics; ++i)
         {
             blendronicDelays.getUnchecked(i)->addSample(l * b, addCounter, 0);
@@ -966,7 +966,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         }
         
         float d = 1.0f;
-        if (dgain != nullptr) d = *dgain;
+        if (dgain != nullptr) d = Decibels::decibelsToGain(*dgain);
         
         if (outR != nullptr)
         {
@@ -1020,7 +1020,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         }
         
         float b = aGlobalGain * d;
-        if (blendronicGain != nullptr) b *= *blendronicGain;
+        if (blendronicGain != nullptr) b *= Decibels::decibelsToGain(*blendronicGain);
         for (int i = 0; i < numBlendronics; ++i)
         {
             blendronicDelays.getUnchecked(i)->addSample(l * b, addCounter, 0);

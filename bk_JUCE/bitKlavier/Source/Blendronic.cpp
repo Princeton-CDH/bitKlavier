@@ -155,7 +155,7 @@ void BlendronicProcessor::tick(float* outputs)
     prevPulseLength = pulseLength;
     
     // Tick the delay
-    delay->tick(outputs, prep->outGain.value);
+    delay->tick(outputs, Decibels::decibelsToGain(prep->outGain.value));
     
     float dlr = 0.0f;
     if (pulseLength != INFINITY) dlr = delay->getDelayLength() / (pulseLength * synth->getSampleRate());

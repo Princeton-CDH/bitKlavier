@@ -645,6 +645,13 @@ void Piano::configureReset(BKItem::Ptr item)
     Array<int> tempo = item->getConnectionIdsOfType(PreparationTypeTempo);
     Array<int> tuning = item->getConnectionIdsOfType(PreparationTypeTuning);
 	Array<int> blendronic = item->getConnectionIdsOfType(PreparationTypeBlendronic);
+    
+    Array<int> directMod = item->getConnectionIdsOfType(PreparationTypeDirectMod);
+    Array<int> nostalgicMod = item->getConnectionIdsOfType(PreparationTypeNostalgicMod);
+    Array<int> synchronicMod = item->getConnectionIdsOfType(PreparationTypeSynchronicMod);
+    Array<int> tempoMod = item->getConnectionIdsOfType(PreparationTypeTempoMod);
+    Array<int> tuningMod = item->getConnectionIdsOfType(PreparationTypeTuningMod);
+    Array<int> blendronicMod = item->getConnectionIdsOfType(PreparationTypeBlendronicMod);
 
     Modifications::Reset resetWithKeymaps;
     
@@ -694,6 +701,42 @@ void Piano::configureReset(BKItem::Ptr item)
                 Modifications::Reset resetToAdd = resetWithKeymaps;
                 resetToAdd.prepId = id;
                 modificationMap[key]->blendronicResets.add(resetToAdd);
+            }
+            for (auto id : directMod)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->directModResets.add(resetToAdd);
+            }
+            for (auto id : synchronicMod)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->synchronicModResets.add(resetToAdd);
+            }
+            for (auto id : nostalgicMod)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->nostalgicModResets.add(resetToAdd);
+            }
+            for (auto id : tuningMod)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->tuningModResets.add(resetToAdd);
+            }
+            for (auto id : tempoMod)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->tempoModResets.add(resetToAdd);
+            }
+            for (auto id : blendronicMod)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->blendronicModResets.add(resetToAdd);
             }
         }
     }

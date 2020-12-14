@@ -90,8 +90,8 @@ public:
 
     
     SynchronicPreparation(void):
-    sGain(1.0),
-    sBlendronicGain(1.0f),
+    sGain(0.0, true),
+    sBlendronicGain(0.0, true),
     sNumBeats(20),
     sClusterMin(1),
     sClusterMax(12),

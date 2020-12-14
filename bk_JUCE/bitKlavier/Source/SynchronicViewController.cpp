@@ -193,7 +193,7 @@ BKViewController(p, theGraph, 4) // third argument => number of tabs
     velocityMinMaxSlider->setJustifyRight(true);
     addAndMakeVisible(*velocityMinMaxSlider, ALL);
     
-    gainSlider = std::make_unique<BKSingleSlider>("gain", cSynchronicGain, 0, 10, 1, 0.0001);
+    gainSlider = std::make_unique<BKSingleSlider>("volume (dB)", cSynchronicGain, -100, 24, 0, 0.01);
     gainSlider->setToolTipString("Overall volume of Synchronic pulse");
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
@@ -209,7 +209,7 @@ BKViewController(p, theGraph, 4) // third argument => number of tabs
     transpUsesTuning.setToggleState (false, dontSendNotification);
     addAndMakeVisible(&transpUsesTuning, ALL);
     
-    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", cSynchronicBlendronicGain, 0, 10, 1, 0.0001);
+    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic send volume (dB)", cSynchronicBlendronicGain, -100, 24, 0, 0.01);
     blendronicGainSlider->setToolTipString("Volume of Synchronic output to connected Blendronics");
     blendronicGainSlider->setJustifyRight(false);
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
@@ -1081,14 +1081,16 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         DBG("got new cluster thickness " + String(val));
         prep->sClusterCap.set(val);
     }
-    else if(name == "gain")
+    else if(slider->getName() == gainSlider->getName())
     {
         DBG("gain " + String(val));
         prep->sGain.set(val);
+        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
     }
-    else if(name == "blendronic gain")
+    else if(slider->getName() == blendronicGainSlider->getName())
     {
         prep->sBlendronicGain.set(val);
+        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
     }
     //else if(name == "num layers")
     else if(slider == numClusterSlider.get())
@@ -1150,7 +1152,9 @@ void SynchronicPreparationEditor::update(NotificationType notify)
     if (prep != nullptr)
     {
         gainSlider->setValue(prep->sGain.value, notify);
+        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         blendronicGainSlider->setValue(prep->sBlendronicGain.value, notify);
+        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         
         selectCB.setSelectedId(processor.updateState->currentSynchronicId, notify);
         modeSelectCB.setSelectedItemIndex(prep->sMode.value, notify);
@@ -1853,7 +1857,9 @@ void SynchronicModificationEditor::update(NotificationType notify)
         onOffSelectCB.setSelectedItemIndex(mod->onOffMode.value, notify);
         
         gainSlider->setValue(mod->sGain.value, notify);
+        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         blendronicGainSlider->setValue(mod->sBlendronicGain.value, notify);
+        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         
         offsetParamStartToggle.setToggleState(mod->sBeatsToSkip.value, notify);
         howManySlider->setValue(mod->sNumBeats.value, notify);
@@ -2169,25 +2175,26 @@ void SynchronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
         
         clusterCapSlider->setBright();
     }
-    else if(name == "gain")
+    else if(slider->getName() == gainSlider->getName())
     {
         mod->sGain.set(val);
-        mod->setDirty(SynchronicGain);
+        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         
+        mod->setDirty(SynchronicGain);
         gainSlider->setBright();
     }
     else if(name == "num clusters")
     {
         mod->numClusters.set(val);
         mod->setDirty(SynchronicNumClusters);
-        
         numClusterSlider->setBright();
     }
-    else if(name == "blendronic gain")
+    else if(slider->getName() == blendronicGainSlider->getName())
     {
         mod->sBlendronicGain.set(val);
-        mod->setDirty(SynchronicBlendronicGain);
+        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         
+        mod->setDirty(SynchronicBlendronicGain);
         blendronicGainSlider->setBright();
     }
     

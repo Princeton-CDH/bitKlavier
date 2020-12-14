@@ -55,10 +55,10 @@ public:
                       float sust,
                       int rel):
     modded(false),
-    dGain(gain),
-    dResonanceGain(resGain),
-    dHammerGain(hamGain),
-    dBlendronicGain(blendGain),
+    dGain(gain, true),
+    dResonanceGain(resGain, true),
+    dHammerGain(hamGain, true),
+    dBlendronicGain(blendGain, true),
     dAttack(atk),
     dDecay(dca),
     dRelease(rel),
@@ -75,10 +75,10 @@ public:
     
     DirectPreparation(void):
     modded(false),
-    dGain(1.0),
-    dResonanceGain(0.5),
-    dHammerGain(0.5),
-    dBlendronicGain(1.0f),
+    dGain(0.0, true),
+    dResonanceGain(-6.0, true),
+    dHammerGain(-6.0, true),
+    dBlendronicGain(0.0, true),
     dAttack(3),
     dDecay(3),
     dRelease(30),
@@ -219,12 +219,13 @@ public:
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
-    inline float* getGainPtr() { return &dGain.value;          }
+    inline float* getGainPtr() { return &dGain.value; }
     inline float* getResonanceGainPtr() { return &(dResonanceGain.value); }
-    inline float* getHammerGainPtr() { return &(dHammerGain.value);    }
+    inline float* getHammerGainPtr() { return &(dHammerGain.value); }
     inline float* getBlendronicGainPtr() { return &(dBlendronicGain.value); }
     
-    inline const Array<float> getADSRvals() const noexcept { return {(float) dAttack.value, (float) dDecay.value,(float) dSustain.value, (float)dRelease.value}; }
+    inline const Array<float> getADSRvals() const noexcept
+    { return {(float) dAttack.value, (float) dDecay.value,(float) dSustain.value, (float)dRelease.value}; }
 
     inline void setTranspUsesTuning(bool val)         { dTranspUsesTuning = val;}
     inline void setADSRvals(Array<float> vals)

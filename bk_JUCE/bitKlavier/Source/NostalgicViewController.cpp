@@ -77,13 +77,13 @@ BKViewController(p, theGraph, 4)
     addAndMakeVisible(*beatsToSkipSlider);
     beatsToSkipSlider->setVisible(false);
     
-    gainSlider = std::make_unique<BKSingleSlider>("gain", cNostalgicGain, 0, 10, 1, 0.01);
+    gainSlider = std::make_unique<BKSingleSlider>("volume (dB)", cNostalgicGain, -100, 24, 0, 0.01);
     gainSlider->setToolTipString("Volume multiplier for Nostalgic notes");
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
     addAndMakeVisible(*gainSlider);
     
-    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", cNostalgicBlendronicGain, 0, 10, 1, 0.01);
+    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic send volume (dB)", cNostalgicBlendronicGain, -100, 24, 0, 0.01);
     blendronicGainSlider->setToolTipString("Volume multiplier for Nostalgic output to connected Blendronics");
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
     blendronicGainSlider->setJustifyRight(false);
@@ -683,7 +683,9 @@ void NostalgicPreparationEditor::update(void)
         lengthModeSelectCB.setSelectedItemIndex(prep->nMode.value, dontSendNotification);
         
         gainSlider->setValue(prep->nGain.value, dontSendNotification);
+        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         blendronicGainSlider->setValue(prep->nBlendronicGain.value, dontSendNotification);
+        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         
         //transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
         transpositionSlider->setTo(prep->nTransposition.value, dontSendNotification);
@@ -943,15 +945,17 @@ void NostalgicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
         //DBG("beats to skip " + String(val));
         prep->nBeatsToSkip.set(val);
     }
-    else if(name == "gain")
+    else if(slider->getName() == gainSlider->getName())
     {
         //DBG("gain " + String(val));
         prep->nGain.set(val);
+        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
     }
-    else if(name == "blendronic gain")
+    else if(slider->getName() == blendronicGainSlider->getName())
     {
         //DBG("gain " + String(val));
         prep->nBlendronicGain.set(val);
+        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
     }
     else if (name == "cluster min")
     {
@@ -1356,7 +1360,9 @@ void NostalgicModificationEditor::update(void)
         }
         
         gainSlider->setValue(mod->nGain.value, dontSendNotification);
+        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         blendronicGainSlider->setValue(mod->nBlendronicGain.value, dontSendNotification);
+        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         
         transpositionSlider->setTo(mod->nTransposition.value, dontSendNotification);
         transpUsesTuning.setToggleState(mod->nTranspUsesTuning.value, dontSendNotification);
@@ -1653,18 +1659,20 @@ void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
         
         beatsToSkipSlider->setBright();
     }
-    else if(name == "gain")
+    else if(slider->getName() == gainSlider->getName())
     {
         mod->nGain.set(val);
-        mod->setDirty(NostalgicGain);
+        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         
+        mod->setDirty(NostalgicGain);
         gainSlider->setBright();
     }
-    else if (name == "blendronic gain")
+    else if (slider->getName() == blendronicGainSlider->getName())
     {
         mod->nBlendronicGain.set(val);
-        mod->setDirty(NostalgicBlendronicGain);
+        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         
+        mod->setDirty(NostalgicBlendronicGain);
         blendronicGainSlider->setBright();
     }
     else if (name == "cluster min")
