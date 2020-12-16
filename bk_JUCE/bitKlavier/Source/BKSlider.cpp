@@ -1218,12 +1218,12 @@ void BKSingleSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
 
 void BKSingleSlider::textEditorFocusLost(TextEditor& textEditor)
 {
-//#if !JUCE_IOS
-//    if(!focusLostByEscapeKey)
-//    {
-//        textEditorReturnKeyPressed(textEditor);
-//    }
-//#endif
+#if !JUCE_IOS
+    if(!focusLostByEscapeKey)
+    {
+        textEditorReturnKeyPressed(textEditor);
+    }
+#endif
 }
 
 void BKSingleSlider::checkValue(double newval)

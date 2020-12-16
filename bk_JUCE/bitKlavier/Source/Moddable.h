@@ -83,6 +83,7 @@ public:
         value = v;
         base = v;
         mod = v;
+        active = false;
         return *this;
     }
     
@@ -156,6 +157,7 @@ public:
         value = v;
         base = v;
         mod = v;
+        active = false;
     }
     void setValue(ValueType v) { value = v; }
     void setBase(ValueType v) { base = v; }
