@@ -44,9 +44,9 @@ public:
     value(v),
     base(v),
     mod(v),
+    active(false),
     time(t),
     dv(v), // Make sure to properly calculate dv before (and if) it is needed
-    active(false),
     n(0),
     maxN(0),
     dB(dB)
@@ -451,11 +451,12 @@ public:
     }
     //==============================================================================
     
-    // Moddables are used in pairs, with one existing in a preparation that is being modded
-    // and one in a modification that contains mod info. For a Moddable in a mod, base, value, and
-    // mod are generally the same. For moddable in a preparation, value is the current value
-    // to be used in any processing, base is the value set in the preparation editor which
-    // the preparation can be reset to, and mod is the target value set when modify is called()
+    // Moddables are exist in pairs, with one in a preparation that is being modded
+    // and one in a modification that contains info for performing modifications.
+    // For a Moddable in a mod, base, value, and mod are generally the same. For
+    // moddable in a preparation, value is the current value to be used in any
+    // processing, base is the value set in the preparation editor which the preparation
+    // can be reset to, and mod is the target value set when modify is called()
     
     ValueType value;
     ValueType base;
@@ -464,6 +465,9 @@ public:
     // Only used by mod Moddables - the amount by which the mod value should be adjusted
     // on each activation
     ValueType inc;
+    
+    // Whether a prep Moddable is in the process of modding, irrelevant in mod Moddable
+    bool active;
     
 private:
     template <class T = ValueType>
@@ -514,9 +518,6 @@ private:
     ValueType dv;
     
     int timeElapsed;
-    
-    // Whether a prep Moddable is in the process of modding, irrelevant in mod Moddable
-    bool active;
     
     // Irrelevant in prep Moddable, increment count of mod Moddable
     int n;

@@ -122,6 +122,12 @@ String HeaderViewController::processResetMapString(const String& s)
         processor.currentPiano->modificationMap[i]->tempoResets.clearQuick();
         processor.currentPiano->modificationMap[i]->nostalgicResets.clearQuick();
         processor.currentPiano->modificationMap[i]->directResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->blendronicModResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->synchronicModResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->tuningModResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->tempoModResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->nostalgicModResets.clearQuick();
+        processor.currentPiano->modificationMap[i]->directModResets.clearQuick();
     }
     
     while (rest != "")

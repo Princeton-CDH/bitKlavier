@@ -1136,8 +1136,6 @@ void TuningViewController::timerCallback(void)
             }
         }
         
-        
-        
         if (currentTab == 1)
         {
             float sliderHeight = springSliders.getUnchecked(0)->getHeight();
@@ -1188,6 +1186,27 @@ void TuningViewController::timerCallback(void)
             
             repaint();
         }
+        
+        if (prep->tFundamentalOffset.active)
+            offsetSlider->setValue(prep->tFundamentalOffset.value, dontSendNotification);
+        if (prep->tAdaptiveClusterThresh.active)
+            A1ClusterThresh->setValue(prep->tAdaptiveClusterThresh.value, dontSendNotification);
+        if (prep->tAdaptiveHistory.active)
+            A1ClusterMax->setValue(prep->tAdaptiveHistory.value, dontSendNotification);
+        if (prep->nToneSemitoneWidth.active)
+            nToneSemitoneWidthSlider->setValue(prep->nToneSemitoneWidth.value, dontSendNotification);
+        if (prep->getSpringTuning()->rate.active)
+            rateSlider->setValue(prep->getSpringTuning()->rate.value, dontSendNotification);
+        if (prep->getSpringTuning()->drag.active)
+            dragSlider->setValue(prep->getSpringTuning()->drag.value, dontSendNotification);
+        if (prep->getSpringTuning()->tetherStiffness.active)
+            tetherStiffnessSlider->setValue(prep->getSpringTuning()->tetherStiffness.value, dontSendNotification);
+        if (prep->getSpringTuning()->intervalStiffness.active)
+            intervalStiffnessSlider->setValue(prep->getSpringTuning()->intervalStiffness.value, dontSendNotification);
+        if (prep->getSpringTuning()->tetherWeightGlobal.active)
+            tetherWeightGlobalSlider->setValue(prep->getSpringTuning()->tetherWeightGlobal.value, dontSendNotification);
+        if (prep->getSpringTuning()->tetherWeightSecondaryGlobal.active)
+            tetherWeightSecondaryGlobalSlider->setValue(prep->getSpringTuning()->tetherWeightSecondaryGlobal.value, dontSendNotification);
     }
 }
 
@@ -2174,7 +2193,6 @@ void TuningModificationEditor::update(void)
         
         if ((adaptiveType < AdaptiveNone) || (adaptiveType >= AdaptiveNil)) adaptiveType = AdaptiveNone;
         
-    
         adaptiveSystemsCB.setSelectedItemIndex(adaptiveType, dontSendNotification);
 
         Array<float> vals;

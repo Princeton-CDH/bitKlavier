@@ -22,7 +22,7 @@ BKViewController(p, theGraph, 3)
     iconImageComponent.setAlpha(0.095);
     //addAndMakeVisible(iconImageComponent);
     
-    gainSlider = std::make_unique<BKSingleSlider>("volume (dB)", cBlendronicOutGain, -100, 24, 0, 0.01);
+    gainSlider = std::make_unique<BKSingleSlider>("volume (dB)", cBlendronicOutGain, -100, 24, 0, 0.01, "-inf");
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(true);
     gainSlider->setToolTipString("Adjusts overall volume of blendronic");
@@ -394,7 +394,6 @@ void BlendronicPreparationEditor::update(void)
         selectCB.setSelectedId(processor.updateState->currentBlendronicId, dontSendNotification);
         
         gainSlider->setValue(prep->outGain.value, dontSendNotification);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         bufferSizeSlider->setValue(prep->delayBufferSizeInSeconds.value, dontSendNotification);
         
         for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
@@ -615,7 +614,6 @@ void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     if (slider->getName() == gainSlider->getName())
     {
         prep->outGain.set(val);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
     }
     else if (slider->getName() == bufferSizeSlider->getName())
     {
@@ -739,6 +737,8 @@ void BlendronicPreparationEditor::timerCallback()
                     paramSliders[i]->setCurrentSlider((counter >= size || counter < 0) ? 0 : counter);
                 }
             }
+            
+            if (prep->outGain.active) gainSlider->setValue(prep->outGain.value, dontSendNotification);
         }
     }
 }
@@ -975,7 +975,6 @@ void BlendronicModificationEditor::update(void)
     if (mod != nullptr)
     {
         gainSlider->setValue(mod->outGain.value, dontSendNotification);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         
         alternateMod.setToggleState(mod->altMod, dontSendNotification);
         
@@ -1313,7 +1312,6 @@ void BlendronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
     if (slider->getName() == gainSlider->getName())
     {
         mod->outGain.set(val);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         
         mod->setDirty(BlendronicOutGain);
         gainSlider->setBright();

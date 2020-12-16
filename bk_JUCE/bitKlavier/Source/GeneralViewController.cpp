@@ -334,7 +334,7 @@ BKViewController(p, theGraph, 1)
     incSlider->addMyListener(this);
     addAndMakeVisible(*incSlider);
     
-    maxIncSlider = std::make_unique<BKSingleSlider>("max times to increment", "max times to increment", 0, 10, 0, 1);
+    maxIncSlider = std::make_unique<BKSingleSlider>("max times to increment", "max times to increment", 0, 10, 0, 1, "no max");
     maxIncSlider->setToolTipString("how many times maximum to increment the mod value");
     maxIncSlider->setJustifyRight(false);
     maxIncSlider->addMyListener(this);
@@ -410,7 +410,6 @@ void ModdableViewController::update(void)
     timeSlider->setValue(mod->getTime(), dontSendNotification);
     incSlider->setValue(mod->getInc(), dontSendNotification);
     maxIncSlider->setValue(mod->getMaxNumberOfInc(), dontSendNotification);
-    if (maxIncSlider->getValue() == 0.0) maxIncSlider->setText("no max");
 }
 
 void ModdableViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
@@ -429,7 +428,6 @@ void ModdableViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, 
     if (name == maxIncSlider->getName())
     {
         mod->setMaxNumberOfInc(val);
-        if (maxIncSlider->getValue() == 0.0) maxIncSlider->setText("no max");
     }
 }
 

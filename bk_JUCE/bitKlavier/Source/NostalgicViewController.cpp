@@ -77,13 +77,13 @@ BKViewController(p, theGraph, 4)
     addAndMakeVisible(*beatsToSkipSlider);
     beatsToSkipSlider->setVisible(false);
     
-    gainSlider = std::make_unique<BKSingleSlider>("volume (dB)", cNostalgicGain, -100, 24, 0, 0.01);
+    gainSlider = std::make_unique<BKSingleSlider>("volume (dB)", cNostalgicGain, -100, 24, 0, 0.01, "-inf");
     gainSlider->setToolTipString("Volume multiplier for Nostalgic notes");
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
     addAndMakeVisible(*gainSlider);
     
-    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic send volume (dB)", cNostalgicBlendronicGain, -100, 24, 0, 0.01);
+    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic send volume (dB)", cNostalgicBlendronicGain, -100, 24, 0, 0.01, "-inf");
     blendronicGainSlider->setToolTipString("Volume multiplier for Nostalgic output to connected Blendronics");
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
     blendronicGainSlider->setJustifyRight(false);
@@ -683,9 +683,7 @@ void NostalgicPreparationEditor::update(void)
         lengthModeSelectCB.setSelectedItemIndex(prep->nMode.value, dontSendNotification);
         
         gainSlider->setValue(prep->nGain.value, dontSendNotification);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         blendronicGainSlider->setValue(prep->nBlendronicGain.value, dontSendNotification);
-        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         
         //transpositionSlider->setValue(prep->getTransposition(), dontSendNotification);
         transpositionSlider->setTo(prep->nTransposition.value, dontSendNotification);
@@ -949,13 +947,11 @@ void NostalgicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
     {
         //DBG("gain " + String(val));
         prep->nGain.set(val);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
     }
     else if(slider->getName() == blendronicGainSlider->getName())
     {
         //DBG("gain " + String(val));
         prep->nBlendronicGain.set(val);
-        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
     }
     else if (name == "cluster min")
     {
@@ -1059,8 +1055,9 @@ void NostalgicPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayNostalgic)
     {
         NostalgicProcessor::Ptr nProcessor = processor.currentPiano->getNostalgicProcessor(processor.updateState->currentNostalgicId);
+        NostalgicPreparation::Ptr prep = processor.gallery->getNostalgicPreparation(processor.updateState->currentNostalgicId);
         
-        if (nProcessor != nullptr)
+        if (prep != nullptr && nProcessor != nullptr)
         {
             Array<int> currentPlayPositions = nProcessor->getPlayPositions();
             Array<int> currentUndertowPositions = nProcessor->getUndertowPositions();
@@ -1084,7 +1081,6 @@ void NostalgicPreparationEditor::timerCallback()
                 clusterThresholdSlider->setDisplayValue(0);
             }
             
-            NostalgicPreparation::Ptr prep = processor.gallery->getNostalgicPreparation(processor.updateState->currentNostalgicId);
             if(prep->nMode.value == NoteLengthSync)
             {
                 holdTimeMinMaxSlider->setBright();
@@ -1138,8 +1134,43 @@ void NostalgicPreparationEditor::timerCallback()
                     targetControlCBs[i - TargetTypeNostalgicClear]->setEnabled(false);
                 }
             }
+            
+            if (prep->nWaveDistance.active) nDisplaySlider.setWaveDistance(prep->nWaveDistance.value, dontSendNotification);
+            if (prep->nUndertow.active) nDisplaySlider.setUndertow(prep->nUndertow.value, dontSendNotification);
+            
+            if (prep->nMode.active) lengthModeSelectCB.setSelectedItemIndex(prep->nMode.value, dontSendNotification);
+            
+            if (prep->nGain.active) gainSlider->setValue(prep->nGain.value, dontSendNotification);
+            if (prep->nBlendronicGain.active) blendronicGainSlider->setValue(prep->nBlendronicGain.value, dontSendNotification);
+            
+            if (prep->nTransposition.active) transpositionSlider->setTo(prep->nTransposition.value, dontSendNotification);
+            if (prep->nLengthMultiplier.active) lengthMultiplierSlider->setValue(prep->nLengthMultiplier.value, dontSendNotification);
+            
+            if (prep->holdMin.active) holdTimeMinMaxSlider->setMinValue(prep->holdMin.value, dontSendNotification);
+            if (prep->holdMax.active) holdTimeMinMaxSlider->setMaxValue(prep->holdMax.value, dontSendNotification);
+            
+            if (prep->velocityMin.active) velocityMinMaxSlider->setMinValue(prep->velocityMin.value, dontSendNotification);
+            if (prep->velocityMax.active) velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, dontSendNotification);
+            
+            if (prep->clusterMin.active) clusterMinSlider->setValue(prep->clusterMin.value, dontSendNotification);
+            if (prep->clusterThreshold.active) clusterThresholdSlider->setValue(prep->clusterThreshold.value, dontSendNotification);
+            
+            if (prep->keyOnReset.active) keyOnResetToggle.setToggleState(prep->keyOnReset.value, dontSendNotification);
+            
+            if (prep->nBeatsToSkip.active) beatsToSkipSlider->setValue(prep->nBeatsToSkip.value, dontSendNotification);
+            
+            if (prep->nTranspUsesTuning.active) transpUsesTuning.setToggleState(prep->nTranspUsesTuning.value, dontSendNotification);
+            
+            if (prep->nReverseAttack.active) reverseADSRSlider->setAttackValue(prep->nReverseAttack.value, dontSendNotification);
+            if (prep->nReverseDecay.active) reverseADSRSlider->setDecayValue(prep->nReverseDecay.value, dontSendNotification);
+            if (prep->nReverseSustain.active) reverseADSRSlider->setSustainValue(prep->nReverseSustain.value, dontSendNotification);
+            if (prep->nReverseRelease.active) reverseADSRSlider->setReleaseValue(prep->nReverseRelease.value, dontSendNotification);
+            
+            if (prep->nUndertowAttack.active) undertowADSRSlider->setAttackValue(prep->nUndertowAttack.value, dontSendNotification);
+            if (prep->nUndertowDecay.active) undertowADSRSlider->setDecayValue(prep->nUndertowDecay.value, dontSendNotification);
+            if (prep->nUndertowSustain.active) undertowADSRSlider->setSustainValue(prep->nUndertowSustain.value, dontSendNotification);
+            if (prep->nUndertowRelease.active) undertowADSRSlider->setReleaseValue(prep->nUndertowRelease.value, dontSendNotification);
         }
-        update();
     }
 }
 
@@ -1360,9 +1391,7 @@ void NostalgicModificationEditor::update(void)
         }
         
         gainSlider->setValue(mod->nGain.value, dontSendNotification);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         blendronicGainSlider->setValue(mod->nBlendronicGain.value, dontSendNotification);
-        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         
         transpositionSlider->setTo(mod->nTransposition.value, dontSendNotification);
         transpUsesTuning.setToggleState(mod->nTranspUsesTuning.value, dontSendNotification);
@@ -1662,7 +1691,6 @@ void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     else if(slider->getName() == gainSlider->getName())
     {
         mod->nGain.set(val);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         
         mod->setDirty(NostalgicGain);
         gainSlider->setBright();
@@ -1670,7 +1698,6 @@ void NostalgicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     else if (slider->getName() == blendronicGainSlider->getName())
     {
         mod->nBlendronicGain.set(val);
-        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         
         mod->setDirty(NostalgicBlendronicGain);
         blendronicGainSlider->setBright();

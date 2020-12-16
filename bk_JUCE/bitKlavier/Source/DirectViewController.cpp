@@ -30,25 +30,25 @@ BKViewController(p, theGraph, 2)
     transpositionSlider->setTooltip("Determines pitch (in semitones) of Direct notes; control-click to add another voice, double-click to edit all");
     addAndMakeVisible(*transpositionSlider);
     
-    gainSlider = std::make_unique<BKSingleSlider>("main volume (dB)", cDirectGain, -100, 24, 0, 0.01);
+    gainSlider = std::make_unique<BKSingleSlider>("main volume (dB)", cDirectGain, -100, 24, 0, 0.01, "-inf");
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
     gainSlider->setToolTipString("Adjusts overall volume of keyboard");
     addAndMakeVisible(*gainSlider);
     
-    resonanceGainSlider = std::make_unique<BKSingleSlider>("resonance volume (dB)", cDirectResonanceGain, -100, 24, -12, 0.01);
+    resonanceGainSlider = std::make_unique<BKSingleSlider>("resonance volume (dB)", cDirectResonanceGain, -100, 24, -12, 0.01, "-inf");
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(false);
     resonanceGainSlider->setToolTipString("Adjusts overall resonance/reverb based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*resonanceGainSlider);
     
-    hammerGainSlider = std::make_unique<BKSingleSlider>("hammers volume (dB)", cDirectHammerGain, -100, 24, 0, 0.01);
+    hammerGainSlider = std::make_unique<BKSingleSlider>("hammers volume (dB)", cDirectHammerGain, -100, 24, 0, 0.01, "-inf");
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
     hammerGainSlider->setJustifyRight(false);
     hammerGainSlider->setToolTipString("Adjusts mechanical noise sample based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*hammerGainSlider);
     
-    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic send volume (dB)", cDirectBlendronicGain, -100, 24, 0, 0.01);
+    blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic send volume (dB)", cDirectBlendronicGain, -100, 24, 0, 0.01, "-inf");
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
     blendronicGainSlider->setJustifyRight(false);
     blendronicGainSlider->setToolTipString("Adjusts volume of Direct output to connected Blendronics");
@@ -390,7 +390,7 @@ DirectViewController(p, theGraph)
     startTimer(30);
 }
 
-void DirectPreparationEditor::update(void)
+void DirectPreparationEditor::update()
 {
     if (processor.updateState->currentDirectId < 0) return;
     setShowADSR(false);
@@ -398,26 +398,21 @@ void DirectPreparationEditor::update(void)
     ADSRSlider->setIsButtonOnly(true);
     
     DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
-
+    
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentDirectId, dontSendNotification);
-        
+    
         transpositionSlider->setValue(prep->dTransposition.value, dontSendNotification);
         gainSlider->setValue(prep->dGain.value, dontSendNotification);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         resonanceGainSlider->setValue(prep->dResonanceGain.value, dontSendNotification);
-        if (resonanceGainSlider->getValue() <= -100.) resonanceGainSlider->setText("-inf");
         hammerGainSlider->setValue(prep->dHammerGain.value, dontSendNotification);
-        if (hammerGainSlider->getValue() <= -100.) hammerGainSlider->setText("-inf");
         blendronicGainSlider->setValue(prep->dBlendronicGain.value, dontSendNotification);
-        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         ADSRSlider->setAttackValue(prep->dAttack.value, dontSendNotification);
         ADSRSlider->setDecayValue(prep->dDecay.value, dontSendNotification);
         ADSRSlider->setSustainValue(prep->dSustain.value, dontSendNotification);
         ADSRSlider->setReleaseValue(prep->dRelease.value, dontSendNotification);
         transpUsesTuning.setToggleState(prep->dTranspUsesTuning.value, dontSendNotification);
-        
         velocityMinMaxSlider->setMinValue(prep->velocityMin.value, dontSendNotification);
         velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, dontSendNotification);
     }
@@ -603,25 +598,21 @@ void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     {
         //DBG("note length multiplier " + String(val));
         prep->dResonanceGain.set(val);
-        if (resonanceGainSlider->getValue() <= -100.) resonanceGainSlider->setText("-inf");
     }
     else if(slider->getName() == hammerGainSlider->getName())
     {
         //DBG("beats to skip " + String(val));
         prep->dHammerGain.set(val);
-        if (hammerGainSlider->getValue() <= -100.) hammerGainSlider->setText("-inf");
     }
     else if(slider->getName() == gainSlider->getName())
     {
         //DBG("gain " + String(val));
         prep->dGain.set(val);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
     }
     else if(slider->getName() == blendronicGainSlider->getName())
     {
         //DBG("gain " + String(val));
         prep->dBlendronicGain.set(val);
-        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
     }
     
     processor.updateState->editsMade = true;
@@ -674,30 +665,26 @@ void DirectPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayDirect)
     {
         DirectProcessor::Ptr dProcessor = processor.currentPiano->getDirectProcessor(processor.updateState->currentDirectId);
-
+        DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
+        
         velocityMinMaxSlider->setDisplayValue(dProcessor->getLastVelocity() * 127.);
         DBG("sProcessor->getLastVelocity() = " + String(dProcessor->getLastVelocity()));
         
-        update();
-        
-        // Stuff for hiding blendronic tab, not sure if should use
-//        BKItem::Ptr item = theGraph->get(PreparationTypeDirect, dProcessor->getId());
-//
-//        if(item != nullptr) {
-//            if (item->getConnectionsOfType(PreparationTypeBlendronic).size() > 0)
-//            {
-//                numTabs = 2;
-//                leftArrow.setVisible(true);
-//                rightArrow.setVisible(true);
-//            }
-//            else
-//            {
-//                numTabs = 1;
-//                leftArrow.setVisible(false);
-//                rightArrow.setVisible(false);
-//            }
-//        }
-//        if (currentTab > numTabs - 1) currentTab = numTabs - 1;
+        if (prep != nullptr && dProcessor != nullptr)
+        {
+            if (prep->dTransposition.active) transpositionSlider->setValue(prep->dTransposition.value, dontSendNotification);
+            if (prep->dGain.active) gainSlider->setValue(prep->dGain.value, dontSendNotification);
+            if (prep->dResonanceGain.active) resonanceGainSlider->setValue(prep->dResonanceGain.value, dontSendNotification);
+            if (prep->dHammerGain.active) hammerGainSlider->setValue(prep->dHammerGain.value, dontSendNotification);
+            if (prep->dBlendronicGain.active) blendronicGainSlider->setValue(prep->dBlendronicGain.value, dontSendNotification);
+            if (prep->dAttack.active) ADSRSlider->setAttackValue(prep->dAttack.value, dontSendNotification);
+            if (prep->dDecay.active) ADSRSlider->setDecayValue(prep->dDecay.value, dontSendNotification);
+            if (prep->dSustain.active) ADSRSlider->setSustainValue(prep->dSustain.value, dontSendNotification);
+            if (prep->dRelease.active) ADSRSlider->setReleaseValue(prep->dRelease.value, dontSendNotification);
+            if (prep->dTranspUsesTuning.active) transpUsesTuning.setToggleState(prep->dTranspUsesTuning.value, dontSendNotification);
+            if (prep->velocityMin.active) velocityMinMaxSlider->setMinValue(prep->velocityMin.value, dontSendNotification);
+            if (prep->velocityMax.active) velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, dontSendNotification);
+        }
     }
 }
 
@@ -858,13 +845,9 @@ void DirectModificationEditor::update(void)
         
         transpositionSlider->setValue(mod->dTransposition.value, dontSendNotification);
         gainSlider->setValue(mod->dGain.value, dontSendNotification);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         resonanceGainSlider->setValue(mod->dResonanceGain.value, dontSendNotification);
-        if (resonanceGainSlider->getValue() <= -100.) resonanceGainSlider->setText("-inf");
         hammerGainSlider->setValue(mod->dHammerGain.value, dontSendNotification);
-        if (hammerGainSlider->getValue() <= -100.) hammerGainSlider->setText("-inf");
         blendronicGainSlider->setValue(mod->dBlendronicGain.value, dontSendNotification);
-        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         ADSRSlider->setValue(mod->getADSRvals(), dontSendNotification);
         transpUsesTuning.setToggleState(mod->dTranspUsesTuning.value, dontSendNotification);
         alternateMod.setToggleState(mod->altMod, dontSendNotification);
@@ -1079,7 +1062,6 @@ void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
     if(slider->getName() == resonanceGainSlider->getName())
     {
         mod->dResonanceGain.set(val);
-        if (resonanceGainSlider->getValue() <= -100.) resonanceGainSlider->setText("-inf");
         
         mod->setDirty(DirectResGain);
         resonanceGainSlider->setBright();
@@ -1087,7 +1069,6 @@ void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
     else if(slider->getName() == hammerGainSlider->getName())
     {
         mod->dHammerGain.set(val);
-        if (hammerGainSlider->getValue() <= -100.) hammerGainSlider->setText("-inf");
         
         mod->setDirty(DirectHammerGain);
         hammerGainSlider->setBright();
@@ -1095,7 +1076,6 @@ void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
     else if(slider->getName() == gainSlider->getName())
     {
         mod->dGain.set(val);
-        if (gainSlider->getValue() <= -100.) gainSlider->setText("-inf");
         
         mod->setDirty(DirectGain);
         gainSlider->setBright();
@@ -1103,7 +1083,6 @@ void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
     else if(slider->getName() == blendronicGainSlider->getName())
     {
         mod->dBlendronicGain.set(val);
-        if (blendronicGainSlider->getValue() <= -100.) blendronicGainSlider->setText("-inf");
         
         mod->setDirty(DirectBlendronicGain);
         blendronicGainSlider->setBright();

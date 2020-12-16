@@ -1096,13 +1096,14 @@ void BKMultiSlider::deHighlightCurrentSlider()
 // **************************************************  BKSingleSlider ************************************************** //
 // ******************************************************************************************************************** //
 
-BKSingleSlider::BKSingleSlider (String name, String Id, double min, double max, double def, double increment):
+BKSingleSlider::BKSingleSlider (String name, String Id, double min, double max, double def, double increment, String minDisplay):
 ModdableComponent(Id, false),
 sliderName(name),
 sliderMin(min),
 sliderMax(max),
 sliderDefault(def),
-sliderIncrement(increment)
+sliderIncrement(increment),
+minDisplay(minDisplay)
 {
     textIsAbove = true;
     justifyRight = true;
@@ -1165,8 +1166,15 @@ void BKSingleSlider::sliderValueChanged (Slider *slider)
 {
     if(slider == &thisSlider)
     {
-        if(sliderTextResolution < 0) valueTF.setText(String(thisSlider.getValue()), dontSendNotification);
-        else valueTF.setText(String(thisSlider.getValue(), sliderTextResolution), dontSendNotification);
+        if (thisSlider.getValue() <= sliderMin && !minDisplay.isEmpty())
+        {
+            valueTF.setText(minDisplay, dontSendNotification);
+        }
+        else
+        {
+            if(sliderTextResolution < 0) valueTF.setText(String(thisSlider.getValue()), dontSendNotification);
+            else valueTF.setText(String(thisSlider.getValue(), sliderTextResolution), dontSendNotification);
+        }
         listeners.call(&BKSingleSlider::Listener::BKSingleSliderValueChanged,
                        this,
                        getName(),
@@ -1176,7 +1184,9 @@ void BKSingleSlider::sliderValueChanged (Slider *slider)
 
 void BKSingleSlider::textEditorReturnKeyPressed(TextEditor& textEditor)
 {
-    double newval = textEditor.getText().getDoubleValue();
+    String textval = textEditor.getText();
+    double newval = textval.getDoubleValue();
+    if (textval == minDisplay) newval = sliderMin;
     checkValue(newval);
     thisSlider.setValue(newval, sendNotification);
     
@@ -1208,12 +1218,12 @@ void BKSingleSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
 
 void BKSingleSlider::textEditorFocusLost(TextEditor& textEditor)
 {
-#if !JUCE_IOS
-    if(!focusLostByEscapeKey)
-    {
-        textEditorReturnKeyPressed(textEditor);
-    }
-#endif
+//#if !JUCE_IOS
+//    if(!focusLostByEscapeKey)
+//    {
+//        textEditorReturnKeyPressed(textEditor);
+//    }
+//#endif
 }
 
 void BKSingleSlider::checkValue(double newval)
@@ -1324,14 +1334,22 @@ void BKSingleSlider::setValue(double newval, NotificationType notify)
 {
     checkValue(newval);
     thisSlider.setValue(newval, notify);
-    valueTF.setText(String(thisSlider.getValue()), notify);
+    if (thisSlider.getValue() == sliderMin && !minDisplay.isEmpty())
+    {
+        valueTF.setText(minDisplay, dontSendNotification);
+    }
+    else valueTF.setText(String(thisSlider.getValue()), notify);
 }
 
 void BKSingleSlider::setValue(double newval, int numDecimalPoints, NotificationType notify)
 {
     checkValue(newval);
     thisSlider.setValue(newval, notify);
-    valueTF.setText(String(thisSlider.getValue(), numDecimalPoints), notify);
+    if (thisSlider.getValue() == sliderMin && !minDisplay.isEmpty())
+    {
+        valueTF.setText(minDisplay, dontSendNotification);
+    }
+    else valueTF.setText(String(thisSlider.getValue(), numDecimalPoints), notify);
 }
 
 

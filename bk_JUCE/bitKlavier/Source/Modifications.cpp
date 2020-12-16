@@ -251,4 +251,10 @@ void Modifications::clearResets(void)
     tuningResets.clear();
     tempoResets.clear();
 	blendronicResets.clear();
+    synchronicModResets.clear();
+    nostalgicModResets.clear();
+    directModResets.clear();
+    tuningModResets.clear();
+    tempoModResets.clear();
+    blendronicModResets.clear();
 }

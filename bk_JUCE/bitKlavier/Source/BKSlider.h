@@ -319,7 +319,7 @@ public TextEditor::Listener
 #endif
 {
 public:
-    BKSingleSlider(String sliderName, String Id, double min, double max, double def, double increment);
+    BKSingleSlider(String sliderName, String Id, double min, double max, double def, double increment, String minDisplay = String());
     ~BKSingleSlider()
     {
         displaySlider->setLookAndFeel(nullptr);
@@ -365,7 +365,7 @@ public:
     void mouseDown(const MouseEvent &event) override;
     void mouseUp(const MouseEvent &event) override;
     void mouseDrag(const MouseEvent &e) override;
-    
+
     void textEditorEscapeKeyPressed (TextEditor& textEditor) override;
     void textEditorFocusLost(TextEditor& textEditor) override;
     void textEditorTextChanged(TextEditor& textEditor) override;
@@ -399,6 +399,8 @@ private:
     double sliderDefault;
     double sliderIncrement;
     int sliderTextResolution;
+    
+    String minDisplay;
     
     bool focusLostByEscapeKey;
     

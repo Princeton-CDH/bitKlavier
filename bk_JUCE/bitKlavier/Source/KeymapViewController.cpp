@@ -384,114 +384,6 @@ void KeymapViewController::displayTab(int tab)
 
     if (tab == 0)
     {
-        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
-        area.removeFromTop(gComponentComboBoxHeight);
-        
-        float harKeyboardHeight = 80 * processor.paddingScalarY;
-        
-        area.removeFromBottom(50 + 30 * processor.paddingScalarY + gYSpacing * 6);
-        area.removeFromBottom(gComponentComboBoxHeight);
-        area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY + gYSpacing);
-        
-        Rectangle<int> harKeyboardSlice = area.removeFromBottom(harKeyboardHeight);
-        area.removeFromBottom(gYSpacing);
-        Rectangle<int> sliderSlice = area.removeFromBottom(gComponentComboBoxHeight);
-        area.removeFromBottom(gYSpacing);
-        Rectangle<int> labelSlice = area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY);
-        
-        float keyWidth = harKeyboardSlice.getWidth() / round((maxKey - minKey) * 7. / 12 + 1); //num white keys
-        
-        harKeyboard->setKeyWidth(keyWidth);
-        harKeyboard->setBlackNoteLengthProportion(0.6);
-        
-#if JUCE_IOS
-        float sliderHeight = 15;
-        Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
-        
-        harOctaveSlider.setBounds(sliderArea);
-#endif
-        
-        harKeyboard->setBounds(harKeyboardSlice);
-        harKeyboard->setVisible(true);
-        
-#if JUCE_IOS
-
-#else
-        harAllKeymapTF.setBounds(harKeyboardSlice);
-        harAllKeymapTF.setVisible(true);
-#endif
-        harKeyboardAllValsTextFieldOpen.setBounds(sliderSlice.removeFromLeft(getWidth() * 0.15f));
-        harKeyboardAllValsTextFieldOpen.setVisible(true);
-        
-        harMidiEditToggle.setBounds(sliderSlice.removeFromLeft(harKeyboardAllValsTextFieldOpen.getWidth()));
-        harMidiEditToggle.setVisible(true);
-        
-        harPreTranspositionSlider->setBounds(sliderSlice.withTop(sliderSlice.getY() - sliderSlice.getHeight() * 0.5f * processor.paddingScalarY));
-        harPreTranspositionSlider->setVisible(true);
-        
-        harKeyboardLabel.setBounds(labelSlice.removeFromLeft(harKeyboardAllValsTextFieldOpen.getWidth()*2));
-        harKeyboardLabel.setVisible(true);
-
-        //harmonizer array keyboard
-        
-        Rectangle<int> textButtonSlice = area.removeFromBottom(gComponentComboBoxHeight - gYSpacing * 2).expanded(0, gYSpacing);
-        harmonizerMenuButton.setBounds(textButtonSlice.removeFromRight(keysCB.getWidth() * 2));
-        harmonizerMenuButton.setVisible(true);
-    
-//        area = area.removeFromTop(harKeyboardHeight + gComponentComboBoxHeight + gComponentComboBoxHeight * processor.paddingScalarY + gYSpacing + gYSpacing);
-        
-        area.removeFromBottom(gYSpacing);
-        harKeyboardSlice = area.removeFromBottom(harKeyboardHeight);
-        area.removeFromBottom(gYSpacing);
-        sliderSlice = area.removeFromBottom(gComponentComboBoxHeight);
-        area.removeFromBottom(gYSpacing);
-        labelSlice = area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY);
-        
-        harArrayKeyboard->setKeyWidth(keyWidth);
-        harArrayKeyboard->setBlackNoteLengthProportion(0.6);
-        
-#if JUCE_IOS
-        harArrayOctaveSlider.setBounds(sliderArea);
-#endif
-        
-        harArrayKeyboard->setBounds(harKeyboardSlice);
-        harArrayKeyboard->setVisible(true);
-        
-#if JUCE_IOS
-        harArrayKeymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
-        harArrayKeymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
-        
-#else
-        harArrayKeymapTF.setBounds(harKeyboardSlice);
-        harArrayKeymapTF.setVisible(true);
-        
-        
-#endif
-        
-        harArrayKeyboardValsTextFieldOpen.setBounds(sliderSlice.removeFromLeft(getWidth() * 0.15f));
-        harArrayKeyboardValsTextFieldOpen.setVisible(true);
-        
-        harArrayMidiEditToggle.setBounds(sliderSlice.removeFromLeft(harArrayKeyboardValsTextFieldOpen.getWidth()));
-        harArrayMidiEditToggle.setVisible(true);
-        
-        harPostTranspositionSlider->setBounds(sliderSlice.withTop(sliderSlice.getY() - sliderSlice.getHeight() * 0.5f * processor.paddingScalarY));
-        harPostTranspositionSlider->setVisible(true);
-        
-        harArrayKeyboardLabel.setBounds(labelSlice.removeFromLeft(harArrayKeyboardValsTextFieldOpen.getWidth()*2));
-        harArrayKeyboardLabel.setVisible(true);
-        
-//        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-//        int tempHarKey = thisKeymap->getHarKey();
-//
-//        harKeyboard->setKeysInKeymap(Array<int>({ tempHarKey }));
-//
-//        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(tempHarKey));
-//        harArrayKeyboard->setKeysInKeymap(harmonizationArray);
-        update(); //update() does all this ^
-    }
-
-	else if (tab == 1)
-	{
         iconImageComponent.setBounds(area);
         area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         
@@ -635,8 +527,114 @@ void KeymapViewController::displayTab(int tab)
                                     blendronicGroup1.getWidth(),
                                     blendronicGroup1.getHeight());
         blendronicTBGroup.setVisible(true);
-	}
-    
+    }
+	else if (tab == 1)
+    {
+        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        area.removeFromTop(gComponentComboBoxHeight);
+        
+        float harKeyboardHeight = 80 * processor.paddingScalarY;
+        
+        area.removeFromBottom(50 + 30 * processor.paddingScalarY + gYSpacing * 6);
+        area.removeFromBottom(gComponentComboBoxHeight);
+        area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY + gYSpacing);
+        
+        Rectangle<int> harKeyboardSlice = area.removeFromBottom(harKeyboardHeight);
+        area.removeFromBottom(gYSpacing);
+        Rectangle<int> sliderSlice = area.removeFromBottom(gComponentComboBoxHeight);
+        area.removeFromBottom(gYSpacing);
+        Rectangle<int> labelSlice = area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY);
+        
+        float keyWidth = harKeyboardSlice.getWidth() / round((maxKey - minKey) * 7. / 12 + 1); //num white keys
+        
+        harKeyboard->setKeyWidth(keyWidth);
+        harKeyboard->setBlackNoteLengthProportion(0.6);
+        
+#if JUCE_IOS
+        float sliderHeight = 15;
+        Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
+        
+        harOctaveSlider.setBounds(sliderArea);
+#endif
+        
+        harKeyboard->setBounds(harKeyboardSlice);
+        harKeyboard->setVisible(true);
+        
+#if JUCE_IOS
+        
+#else
+        harAllKeymapTF.setBounds(harKeyboardSlice);
+        harAllKeymapTF.setVisible(true);
+#endif
+        harKeyboardAllValsTextFieldOpen.setBounds(sliderSlice.removeFromLeft(getWidth() * 0.15f));
+        harKeyboardAllValsTextFieldOpen.setVisible(true);
+        
+        harMidiEditToggle.setBounds(sliderSlice.removeFromLeft(harKeyboardAllValsTextFieldOpen.getWidth()));
+        harMidiEditToggle.setVisible(true);
+        
+        harPreTranspositionSlider->setBounds(sliderSlice.withTop(sliderSlice.getY() - sliderSlice.getHeight() * 0.5f * processor.paddingScalarY));
+        harPreTranspositionSlider->setVisible(true);
+        
+        harKeyboardLabel.setBounds(labelSlice.removeFromLeft(harKeyboardAllValsTextFieldOpen.getWidth()*2));
+        harKeyboardLabel.setVisible(true);
+        
+        //harmonizer array keyboard
+        
+        Rectangle<int> textButtonSlice = area.removeFromBottom(gComponentComboBoxHeight - gYSpacing * 2).expanded(0, gYSpacing);
+        harmonizerMenuButton.setBounds(textButtonSlice.removeFromRight(keysCB.getWidth() * 2));
+        harmonizerMenuButton.setVisible(true);
+        
+        //        area = area.removeFromTop(harKeyboardHeight + gComponentComboBoxHeight + gComponentComboBoxHeight * processor.paddingScalarY + gYSpacing + gYSpacing);
+        
+        area.removeFromBottom(gYSpacing);
+        harKeyboardSlice = area.removeFromBottom(harKeyboardHeight);
+        area.removeFromBottom(gYSpacing);
+        sliderSlice = area.removeFromBottom(gComponentComboBoxHeight);
+        area.removeFromBottom(gYSpacing);
+        labelSlice = area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY);
+        
+        harArrayKeyboard->setKeyWidth(keyWidth);
+        harArrayKeyboard->setBlackNoteLengthProportion(0.6);
+        
+#if JUCE_IOS
+        harArrayOctaveSlider.setBounds(sliderArea);
+#endif
+        
+        harArrayKeyboard->setBounds(harKeyboardSlice);
+        harArrayKeyboard->setVisible(true);
+        
+#if JUCE_IOS
+        harArrayKeymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
+        harArrayKeymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
+        
+#else
+        harArrayKeymapTF.setBounds(harKeyboardSlice);
+        harArrayKeymapTF.setVisible(true);
+        
+        
+#endif
+        
+        harArrayKeyboardValsTextFieldOpen.setBounds(sliderSlice.removeFromLeft(getWidth() * 0.15f));
+        harArrayKeyboardValsTextFieldOpen.setVisible(true);
+        
+        harArrayMidiEditToggle.setBounds(sliderSlice.removeFromLeft(harArrayKeyboardValsTextFieldOpen.getWidth()));
+        harArrayMidiEditToggle.setVisible(true);
+        
+        harPostTranspositionSlider->setBounds(sliderSlice.withTop(sliderSlice.getY() - sliderSlice.getHeight() * 0.5f * processor.paddingScalarY));
+        harPostTranspositionSlider->setVisible(true);
+        
+        harArrayKeyboardLabel.setBounds(labelSlice.removeFromLeft(harArrayKeyboardValsTextFieldOpen.getWidth()*2));
+        harArrayKeyboardLabel.setVisible(true);
+        
+        //        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        //        int tempHarKey = thisKeymap->getHarKey();
+        //
+        //        harKeyboard->setKeysInKeymap(Array<int>({ tempHarKey }));
+        //
+        //        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(tempHarKey));
+        //        harArrayKeyboard->setKeysInKeymap(harmonizationArray);
+        update(); //update() does all this ^
+    }
     else if (tab == 2)
     {
         area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
