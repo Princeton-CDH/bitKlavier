@@ -312,6 +312,7 @@ private:
 class BKSingleSlider :
 public Component,
 public ModdableComponent,
+public Button::Listener,
 public Slider::Listener,
 public TextEditor::Listener
 #if JUCE_IOS
@@ -328,6 +329,8 @@ public:
     
     Slider thisSlider;
     std::unique_ptr<Slider> displaySlider;
+    
+    TextButton moddableOptionsButton;
     
     String sliderName;
     BKLabel showName;
@@ -371,6 +374,8 @@ public:
     void textEditorTextChanged(TextEditor& textEditor) override;
     void resized() override;
     
+    void buttonClicked(Button* b) override;
+    
     void setSkewFactor (double factor, bool symmetricSkew) { thisSlider.setSkewFactor(factor, symmetricSkew); }
     void setSkewFactorFromMidPoint (double sliderValueToShowAtMidPoint    ) { thisSlider.setSkewFactorFromMidPoint(sliderValueToShowAtMidPoint); }
     
@@ -407,6 +412,7 @@ private:
     bool justifyRight;
     
     BKDisplaySliderLookAndFeel displaySliderLookAndFeel;
+    BKButtonAndMenuLAF buttonLAF;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKSingleSlider)
     

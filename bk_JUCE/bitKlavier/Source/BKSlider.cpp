@@ -1092,12 +1092,13 @@ void BKMultiSlider::deHighlightCurrentSlider()
 
 
 
-// ******************************************************************************************************************** //
-// **************************************************  BKSingleSlider ************************************************** //
-// ******************************************************************************************************************** //
+// ****************************************************************************************** //
+// ********************************** BKSingleSlider **************************************** //
+// ****************************************************************************************** //
 
 BKSingleSlider::BKSingleSlider (String name, String Id, double min, double max, double def, double increment, String minDisplay):
 ModdableComponent(Id, false),
+//moddableOptionsButton("moddableOptions", 0.75f, Colours::antiquewhite),
 sliderName(name),
 sliderMin(min),
 sliderMax(max),
@@ -1132,10 +1133,14 @@ minDisplay(minDisplay)
 #if JUCE_IOS
     valueTF.setReadOnly(true);
 #endif
-    
     valueTF.addMouseListener(this, true);
     valueTF.setColour(TextEditor::highlightColourId, Colours::darkgrey);
     addAndMakeVisible(valueTF);
+    
+    moddableOptionsButton.setButtonText("...");
+    moddableOptionsButton.setLookAndFeel(&buttonLAF);
+    moddableOptionsButton.addListener(this);
+    addAndMakeVisible(moddableOptionsButton);
     
     displaySlider = std::make_unique<Slider>();
     displaySlider->setRange(min, max, increment);
@@ -1153,6 +1158,7 @@ void BKSingleSlider::setDim(float alphaVal)
     thisSlider.setAlpha(alphaVal);
     showName.setAlpha(alphaVal);
     valueTF.setAlpha(alphaVal);
+    moddableOptionsButton.setAlpha(alphaVal);
 }
 
 void BKSingleSlider::setBright()
@@ -1160,6 +1166,7 @@ void BKSingleSlider::setBright()
     thisSlider.setAlpha(1.);
     showName.setAlpha(1.);
     valueTF.setAlpha(1.);
+    moddableOptionsButton.setAlpha(1.);
 }
 
 void BKSingleSlider::sliderValueChanged (Slider *slider)
@@ -1219,10 +1226,10 @@ void BKSingleSlider::textEditorEscapeKeyPressed (TextEditor& textEditor)
 void BKSingleSlider::textEditorFocusLost(TextEditor& textEditor)
 {
 #if !JUCE_IOS
-    if(!focusLostByEscapeKey)
-    {
-        textEditorReturnKeyPressed(textEditor);
-    }
+//    if(!focusLostByEscapeKey)
+//    {
+//        textEditorReturnKeyPressed(textEditor);
+//    }
 #endif
 }
 
@@ -1287,6 +1294,14 @@ void BKSingleSlider::mouseDrag(const MouseEvent &e)
     }
 }
 
+void BKSingleSlider::buttonClicked(Button* b)
+{
+    if (b->getName() == moddableOptionsButton.getName())
+    {
+        ModdableComponent::listeners.call(&ModdableComponent::Listener::moddableComponentEditorOpened, this);
+    }
+}
+
 void BKSingleSlider::resized()
 {
     if(textIsAbove)
@@ -1296,12 +1311,22 @@ void BKSingleSlider::resized()
 
         if(justifyRight)
         {
+            if (!ModdableComponent::listeners.isEmpty())
+            {
+                Rectangle<int> buttonArea (textSlab.removeFromLeft(gComponentTextFieldHeight*2));
+                moddableOptionsButton.setBounds(buttonArea);
+            }
             textSlab.removeFromRight(gComponentSingleSliderXOffset);
             valueTF.setBounds(textSlab.removeFromRight(85));
             showName.setBounds(textSlab.removeFromLeft(getWidth() - 75));
         }
         else
         {
+            if (!ModdableComponent::listeners.isEmpty())
+            {
+                Rectangle<int> buttonArea (textSlab.removeFromRight(gComponentTextFieldHeight*2));
+                moddableOptionsButton.setBounds(buttonArea);
+            }
             textSlab.removeFromLeft(gComponentSingleSliderXOffset);
             valueTF.setBounds(textSlab.removeFromLeft(75));
             showName.setBounds(textSlab.removeFromRight(getWidth() - 75));
@@ -1312,8 +1337,6 @@ void BKSingleSlider::resized()
         Rectangle<int> displaySliderArea = thisSlider.getBounds();
         displaySliderArea.reduce(gComponentSingleSliderXOffset, 0);
         displaySlider->setBounds(displaySliderArea.removeFromBottom(gComponentSingleSliderXOffset));
-        
-        
     }
     else
     {
@@ -1353,9 +1376,9 @@ void BKSingleSlider::setValue(double newval, int numDecimalPoints, NotificationT
 }
 
 
-// ******************************************************************************************************************** //
-// **************************************************  BKRangeSlider ************************************************** //
-// ******************************************************************************************************************** //
+// ********************************************************************************************* //
+// ************************  BKRangeSlider ***************************************************** //
+// ********************************************************************************************* //
 
 BKRangeSlider::BKRangeSlider (String name, double min, double max, double defmin, double defmax, double increment):
 sliderName(name),
