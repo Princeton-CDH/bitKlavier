@@ -1991,14 +1991,16 @@ void BKWaveDistanceUndertowSlider::setWaveDistance(int newwavedist, Notification
     
     int xpos = wavedistanceSlider->getPositionOfValue(wavedistanceSlider->getValue());
     undertowSlider->setBounds(xpos, undertowSlider->getY(), getWidth() - xpos, undertowSlider->getHeight());
-    undertowSlider->setRange(sliderMin, sliderMax - wavedistanceSlider->getValue(), sliderIncrement);
+    double max = sliderMax - wavedistanceSlider->getValue();
+    if (max <= sliderMin) max = sliderMin + 0.0001;
+    undertowSlider->setRange(sliderMin, max, sliderIncrement);
     
     for(int i=0; i<maxSliders; i++)
     {
         Slider* newSlider = displaySliders.getUnchecked(i);
         
         newSlider->setBounds(xpos, newSlider->getY(), getWidth() - xpos, newSlider->getHeight());
-        newSlider->setRange(sliderMin, sliderMax - wavedistanceSlider->getValue(), sliderIncrement);
+        newSlider->setRange(sliderMin, max, sliderIncrement);
     }
     
 }

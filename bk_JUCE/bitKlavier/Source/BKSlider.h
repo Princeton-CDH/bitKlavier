@@ -324,6 +324,7 @@ public:
     ~BKSingleSlider()
     {
         displaySlider->setLookAndFeel(nullptr);
+        moddableOptionsButton.setLookAndFeel(nullptr);
         setLookAndFeel(nullptr);
     };
     
