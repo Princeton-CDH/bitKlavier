@@ -426,13 +426,11 @@ public:
         nUseGlobalSoundSet.setState(e, ptagNostalgic_useGlobalSoundSet, true);
         nSoundSetName.setState(e, ptagNostalgic_soundSet, String());
         
+        nTransposition.setState(e, StringArray(vtagNostalgic_transposition, ptagFloat), Array<float>(0.0f));
+        
         forEachXmlChildElement (*e, sub)
         {
-            if (sub->hasTagName(vtagNostalgic_transposition))
-            {
-                nTransposition.setState(sub, ptagFloat, Array<float>(0.0f));
-            }
-            else if (sub->hasTagName(vtagNostalgic_reverseADSR))
+            if (sub->hasTagName(vtagNostalgic_reverseADSR))
             {
                 int count = 0;
                 nReverseAttack.setState(sub, ptagFloat + String(count++), 30);
