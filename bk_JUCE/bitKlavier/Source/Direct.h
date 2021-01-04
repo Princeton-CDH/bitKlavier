@@ -293,7 +293,7 @@ public:
         velocityMin.setState(e, ptagDirect_velocityMin, 0);
         velocityMax.setState(e, ptagDirect_velocityMax, 127);
         
-        dTransposition.setState(e, StringArray(vtagDirect_transposition, ptagFloat), Array<float>());
+        dTransposition.setState(e, StringArray(vtagDirect_transposition, ptagFloat), Array<float>(0.0f));
         
         XmlElement* sub = e->getChildByName(vtagDirect_ADSR);
         if (sub != nullptr)

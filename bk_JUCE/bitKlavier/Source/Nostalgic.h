@@ -348,7 +348,6 @@ public:
     {
         ValueTree prep("params");
         
-
         nGain.getState(prep, ptagNostalgic_gain);
         nBlendronicGain.getState(prep, ptagNostalgic_blendronicGain);
         
@@ -431,7 +430,7 @@ public:
         {
             if (sub->hasTagName(vtagNostalgic_transposition))
             {
-                nTransposition.setState(sub, ptagFloat, Array<float>());
+                nTransposition.setState(sub, ptagFloat, Array<float>(0.0f));
             }
             else if (sub->hasTagName(vtagNostalgic_reverseADSR))
             {
