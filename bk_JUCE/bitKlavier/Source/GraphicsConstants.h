@@ -155,6 +155,8 @@ static const std::string gDisconnectFromShortcut = "";
 static const std::string gDisconnectBetweenShortcut = "";
 static const std::string gAlignShortcut = "";
 static const std::string gMidiEditShortcut = "";
+static const std::string gUndoShortcut = "";
+static const std::string gRedoShortcut = "";
 static const std::string gAllOffShortcut = "";
 #endif
 

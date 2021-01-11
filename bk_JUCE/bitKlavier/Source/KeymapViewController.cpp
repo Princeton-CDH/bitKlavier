@@ -552,9 +552,10 @@ void KeymapViewController::displayTab(int tab)
         
 #if JUCE_IOS
         float sliderHeight = 15;
-        Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
+        Rectangle<int> sliderArea = harKeyboardSlice.removeFromTop(sliderHeight);
         
         harOctaveSlider.setBounds(sliderArea);
+        harOctaveSlider.setVisible(true);
 #endif
         
         harKeyboard->setBounds(harKeyboardSlice);
@@ -597,7 +598,10 @@ void KeymapViewController::displayTab(int tab)
         harArrayKeyboard->setBlackNoteLengthProportion(0.6);
         
 #if JUCE_IOS
+        sliderArea = harKeyboardSlice.removeFromTop(sliderHeight);
+        
         harArrayOctaveSlider.setBounds(sliderArea);
+        harArrayOctaveSlider.setVisible(true);
 #endif
         
         harArrayKeyboard->setBounds(harKeyboardSlice);
@@ -605,7 +609,7 @@ void KeymapViewController::displayTab(int tab)
         
 #if JUCE_IOS
         harArrayKeymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
-        harArrayKeymapTF.setSize(keyboardRow.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
+        harArrayKeymapTF.setSize(harKeyboardSlice.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
         
 #else
         harArrayKeymapTF.setBounds(harKeyboardSlice);
@@ -760,11 +764,13 @@ void KeymapViewController::invisible()
     harKeyboard->setVisible(false);
     harKeyboardAllValsTextFieldOpen.setVisible(false);
     harAllKeymapTF.setVisible(false);
+    harOctaveSlider.setVisible(false);
 
     harArrayKeyboardLabel.setVisible(false);
     harArrayKeymapTF.setVisible(false);
     harArrayKeyboard->setVisible(false);
     harArrayKeyboardValsTextFieldOpen.setVisible(false);
+    harArrayOctaveSlider.setVisible(false);
 
     //enableHarmonizerToggle.setVisible(false);
 
@@ -1553,12 +1559,26 @@ void KeymapViewController::handleKeymapNoteToggled (BKKeymapKeyboardState* sourc
 void KeymapViewController::sliderValueChanged (Slider* slider)
 {
 #if JUCE_IOS
-    else if (slider == &octaveSlider)
+    if (slider == &octaveSlider)
     {
         int octave = (int) octaveSlider.getValue();
         
         if (octave == 0)    keyboard->setAvailableRange(21, 45);
         else                keyboard->setAvailableRange(12+octave*12, 36+octave*12);
+    }
+    else if (slider == &harOctaveSlider)
+    {
+        int octave = (int) harOctaveSlider.getValue();
+        
+        if (octave == 0)    harKeyboard->setAvailableRange(21, 45);
+        else                harKeyboard->setAvailableRange(12+octave*12, 36+octave*12);
+    }
+    else if (slider == &harArrayOctaveSlider)
+    {
+        int octave = (int) harArrayOctaveSlider.getValue();
+        
+        if (octave == 0)    harArrayKeyboard->setAvailableRange(21, 45);
+        else                harArrayKeyboard->setAvailableRange(12+octave*12, 36+octave*12);
     }
 #endif
     processor.updateState->editsMade = true;

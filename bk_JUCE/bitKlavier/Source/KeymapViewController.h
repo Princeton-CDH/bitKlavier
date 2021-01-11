@@ -176,7 +176,6 @@ private:
 
 #if JUCE_IOS
     Slider octaveSlider;
-    void sliderValueChanged     (Slider* slider)                override;
     BKButtonAndMenuLAF laf;
 
     Slider harOctaveSlider;
