@@ -673,17 +673,17 @@ void DirectPreparationEditor::timerCallback()
         if (prep != nullptr && dProcessor != nullptr)
         {
             if (prep->dTransposition.active) transpositionSlider->setValue(prep->dTransposition.value, dontSendNotification);
-            if (prep->dGain.active) gainSlider->setValue(prep->dGain.value, dontSendNotification);
-            if (prep->dResonanceGain.active) resonanceGainSlider->setValue(prep->dResonanceGain.value, dontSendNotification);
-            if (prep->dHammerGain.active) hammerGainSlider->setValue(prep->dHammerGain.value, dontSendNotification);
-            if (prep->dBlendronicGain.active) blendronicGainSlider->setValue(prep->dBlendronicGain.value, dontSendNotification);
-            if (prep->dAttack.active) ADSRSlider->setAttackValue(prep->dAttack.value, dontSendNotification);
-            if (prep->dDecay.active) ADSRSlider->setDecayValue(prep->dDecay.value, dontSendNotification);
-            if (prep->dSustain.active) ADSRSlider->setSustainValue(prep->dSustain.value, dontSendNotification);
-            if (prep->dRelease.active) ADSRSlider->setReleaseValue(prep->dRelease.value, dontSendNotification);
+            if (prep->dGain.value != gainSlider->getValue()) gainSlider->setValue(prep->dGain.value, dontSendNotification);
+            if (prep->dResonanceGain.value != resonanceGainSlider->getValue()) resonanceGainSlider->setValue(prep->dResonanceGain.value, dontSendNotification);
+            if (prep->dHammerGain.value != hammerGainSlider->getValue()) hammerGainSlider->setValue(prep->dHammerGain.value, dontSendNotification);
+            if (prep->dBlendronicGain.value != blendronicGainSlider->getValue()) blendronicGainSlider->setValue(prep->dBlendronicGain.value, dontSendNotification);
+            if (prep->dAttack.value != ADSRSlider->getAttackValue()) ADSRSlider->setAttackValue(prep->dAttack.value, dontSendNotification);
+            if (prep->dDecay.value != ADSRSlider->getDecayValue()) ADSRSlider->setDecayValue(prep->dDecay.value, dontSendNotification);
+            if (prep->dSustain.value != ADSRSlider->getSustainValue()) ADSRSlider->setSustainValue(prep->dSustain.value, dontSendNotification);
+            if (prep->dRelease.value != ADSRSlider->getReleaseValue()) ADSRSlider->setReleaseValue(prep->dRelease.value, dontSendNotification);
             if (prep->dTranspUsesTuning.active) transpUsesTuning.setToggleState(prep->dTranspUsesTuning.value, dontSendNotification);
-            if (prep->velocityMin.active) velocityMinMaxSlider->setMinValue(prep->velocityMin.value, dontSendNotification);
-            if (prep->velocityMax.active) velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, dontSendNotification);
+            if (prep->velocityMin.value != velocityMinMaxSlider->getMinValue()) velocityMinMaxSlider->setMinValue(prep->velocityMin.value, dontSendNotification);
+            if (prep->velocityMax.value != velocityMinMaxSlider->getMaxValue()) velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, dontSendNotification);
         }
     }
 }

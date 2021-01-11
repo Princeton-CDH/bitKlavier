@@ -1140,8 +1140,8 @@ void NostalgicPreparationEditor::timerCallback()
             
             if (prep->nMode.active) lengthModeSelectCB.setSelectedItemIndex(prep->nMode.value, dontSendNotification);
             
-            if (prep->nGain.active) gainSlider->setValue(prep->nGain.value, dontSendNotification);
-            if (prep->nBlendronicGain.active) blendronicGainSlider->setValue(prep->nBlendronicGain.value, dontSendNotification);
+            if (prep->nGain.value != gainSlider->getValue()) gainSlider->setValue(prep->nGain.value, dontSendNotification);
+            if (prep->nBlendronicGain.value != blendronicGainSlider->getValue()) blendronicGainSlider->setValue(prep->nBlendronicGain.value, dontSendNotification);
             
             if (prep->nTransposition.active) transpositionSlider->setTo(prep->nTransposition.value, dontSendNotification);
             if (prep->nLengthMultiplier.active) lengthMultiplierSlider->setValue(prep->nLengthMultiplier.value, dontSendNotification);
@@ -1152,8 +1152,8 @@ void NostalgicPreparationEditor::timerCallback()
             if (prep->velocityMin.active) velocityMinMaxSlider->setMinValue(prep->velocityMin.value, dontSendNotification);
             if (prep->velocityMax.active) velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, dontSendNotification);
             
-            if (prep->clusterMin.active) clusterMinSlider->setValue(prep->clusterMin.value, dontSendNotification);
-            if (prep->clusterThreshold.active) clusterThresholdSlider->setValue(prep->clusterThreshold.value, dontSendNotification);
+            if (prep->clusterMin.value != clusterMinSlider->getValue()) clusterMinSlider->setValue(prep->clusterMin.value, dontSendNotification);
+            if (prep->clusterThreshold.value != clusterThresholdSlider->getValue()) clusterThresholdSlider->setValue(prep->clusterThreshold.value, dontSendNotification);
             
             if (prep->keyOnReset.active) keyOnResetToggle.setToggleState(prep->keyOnReset.value, dontSendNotification);
             

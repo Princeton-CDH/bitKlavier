@@ -469,6 +469,9 @@ public:
     void setMinValue(double newval, NotificationType notify);
     void setMaxValue(double newval, NotificationType notify);
     void setIsMinAlwaysLessThanMax(bool im) { isMinAlwaysLessThanMax = im; }
+
+    double getMinValue() { return sliderMin; }
+    double getMaxValue() { return sliderMax; }
     
     void setDisplayValue(double newval) { displaySlider->setValue(newval); }
     void displaySliderVisible(bool vis) { displaySlider->setVisible(vis); }
