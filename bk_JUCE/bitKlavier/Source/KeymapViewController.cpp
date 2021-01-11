@@ -312,7 +312,7 @@ BKViewController(p, theGraph, 3)
     invertOnOffToggle.addListener(this);
     addAndMakeVisible(&invertOnOffToggle, ALL);
 
-    endKeystrokesToggle.setButtonText("All Notes Off!");
+    endKeystrokesToggle.setButtonText("Trigger All Notes Off");
     endKeystrokesToggle.setToggleState(false, dontSendNotification);
     endKeystrokesToggle.setLookAndFeel(&buttonsAndMenusLAF); // text to right?
     endKeystrokesToggle.setTooltip("Toggle whether to end all notes whenever a key in this Keymap is played. The Keymap does not need to be connected to anything for this feature. Inverting note on/offs will cause this to activate on note offs.");
@@ -646,14 +646,14 @@ void KeymapViewController::displayTab(int tab)
         
         area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.2f * processor.paddingScalarY);
         
+        endKeystrokesToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
+        endKeystrokesToggle.setVisible(true);
+
         invertOnOffToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
         invertOnOffToggle.setVisible(true);
 
         ignoreSustainToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
         ignoreSustainToggle.setVisible(true);
-        
-        endKeystrokesToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
-        endKeystrokesToggle.setVisible(true);
         
         sustainPedalKeysToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
         sustainPedalKeysToggle.setVisible(true);
