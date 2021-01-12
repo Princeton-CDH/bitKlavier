@@ -1306,6 +1306,7 @@ void MainViewController::timerCallback()
 #if JUCE_IOS
             sampleCB.setVisible(false);
             instrumentCB.setVisible(false);
+            globalSoundSetButton.setVisible(false);
 #endif
         }
         else
@@ -1313,6 +1314,7 @@ void MainViewController::timerCallback()
 #if JUCE_IOS
             sampleCB.setVisible(true);
             instrumentCB.setVisible(true);
+            globalSoundSetButton.setVisible(true);
 #endif
             if (processor.updateState->editsMade)
             {
