@@ -387,6 +387,11 @@ void KeymapViewController::displayTab(int tab)
         iconImageComponent.setBounds(area);
         area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         
+#if JUCE_IOS
+//        area.removeFromTop(gComponentComboBoxHeight);
+        area.reduce(0.f, area.getHeight() * 0.2f);
+#endif
+        
         Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
         
         // height of the box for the prep with the most targets (Synchronic)
@@ -533,17 +538,22 @@ void KeymapViewController::displayTab(int tab)
         area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         area.removeFromTop(gComponentComboBoxHeight);
         
+#if JUCE_IOS
+        area.reduce(0, area.getHeight() * 0.1f);
+        float harKeyboardHeight = 50 + 50 * processor.paddingScalarY;
+#else
         float harKeyboardHeight = 80 * processor.paddingScalarY;
         
         area.removeFromBottom(50 + 30 * processor.paddingScalarY + gYSpacing * 6);
         area.removeFromBottom(gComponentComboBoxHeight);
         area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY + gYSpacing);
+#endif
         
         Rectangle<int> harKeyboardSlice = area.removeFromBottom(harKeyboardHeight);
         area.removeFromBottom(gYSpacing);
         Rectangle<int> sliderSlice = area.removeFromBottom(gComponentComboBoxHeight);
         area.removeFromBottom(gYSpacing);
-        Rectangle<int> labelSlice = area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY);
+        Rectangle<int> labelSlice = area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY + 4);
         
         float keyWidth = harKeyboardSlice.getWidth() / round((maxKey - minKey) * 7. / 12 + 1); //num white keys
         
@@ -592,7 +602,7 @@ void KeymapViewController::displayTab(int tab)
         area.removeFromBottom(gYSpacing);
         sliderSlice = area.removeFromBottom(gComponentComboBoxHeight);
         area.removeFromBottom(gYSpacing);
-        labelSlice = area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY);
+        labelSlice = area.removeFromBottom(gComponentComboBoxHeight * processor.paddingScalarY + 4);
         
         harArrayKeyboard->setKeyWidth(keyWidth);
         harArrayKeyboard->setBlackNoteLengthProportion(0.6);
@@ -610,12 +620,9 @@ void KeymapViewController::displayTab(int tab)
 #if JUCE_IOS
         harArrayKeymapTF.setTopLeftPosition(hideOrShow.getX(), hideOrShow.getBottom() + gYSpacing);
         harArrayKeymapTF.setSize(harKeyboardSlice.getWidth() * 0.5, getBottom() - hideOrShow.getBottom() - 2 * gYSpacing);
-        
 #else
         harArrayKeymapTF.setBounds(harKeyboardSlice);
         harArrayKeymapTF.setVisible(true);
-        
-        
 #endif
         
         harArrayKeyboardValsTextFieldOpen.setBounds(sliderSlice.removeFromLeft(getWidth() * 0.15f));
@@ -629,22 +636,15 @@ void KeymapViewController::displayTab(int tab)
         
         harArrayKeyboardLabel.setBounds(labelSlice.removeFromLeft(harArrayKeyboardValsTextFieldOpen.getWidth()*2));
         harArrayKeyboardLabel.setVisible(true);
-        
-        //        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        //        int tempHarKey = thisKeymap->getHarKey();
-        //
-        //        harKeyboard->setKeysInKeymap(Array<int>({ tempHarKey }));
-        //
-        //        Array<int> harmonizationArray = (thisKeymap->getHarmonizationForKey(tempHarKey));
-        //        harArrayKeyboard->setKeysInKeymap(harmonizationArray);
-        update(); //update() does all this ^
+
+        update();
     }
     else if (tab == 2)
     {
         area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         area.removeFromTop(gComponentComboBoxHeight);
         
-        area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.2f * processor.paddingScalarY);
+        area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.2f);
         
         endKeystrokesToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
         endKeystrokesToggle.setVisible(true);
@@ -694,8 +694,13 @@ void KeymapViewController::displayShared()
         midiInputSelectButton.setVisible(true);
     }
     
-    
+    leftArrow.setBounds(0, getHeight() * 0.4, 50, 50);
+    rightArrow.setBounds(getRight() - 50, getHeight() * 0.4, 50, 50);
 
+#if JUCE_IOS
+    if (currentTab > 0) return;
+#endif
+    
     // float keyboardHeight = 100; // + 36 * processor.paddingScalarY;
     float keyboardHeight = 50 + 50 * processor.paddingScalarY;
     Rectangle<int> keyboardRow = area.removeFromBottom(keyboardHeight);
@@ -703,11 +708,12 @@ void KeymapViewController::displayShared()
     keyboard->setKeyWidth(keyWidth);
     keyboard->setBlackNoteLengthProportion(0.6);
     keyboardRow.reduce(gXSpacing, 0);
+    
 
 #if JUCE_IOS
     float sliderHeight = 15;
     Rectangle<int> sliderArea = keyboardRow.removeFromTop(sliderHeight);
-
+    octaveSlider.setVisible(true);
     octaveSlider.setBounds(sliderArea);
 #endif
 
@@ -740,10 +746,6 @@ void KeymapViewController::displayShared()
     clearButton.setVisible(true);
 
     midiEditToggle.toFront(false);
-
-    leftArrow.setBounds(0, getHeight() * 0.4, 50, 50);
-    rightArrow.setBounds(getRight() - 50, getHeight() * 0.4, 50, 50);
-
 }
 
 void KeymapViewController::invisible()
@@ -766,6 +768,7 @@ void KeymapViewController::invisible()
     harAllKeymapTF.setVisible(false);
     
 #if JUCE_IOS
+    octaveSlider.setVisible(false);
     harOctaveSlider.setVisible(false);
     harArrayOctaveSlider.setVisible(false);
 #endif

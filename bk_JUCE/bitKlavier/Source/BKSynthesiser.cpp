@@ -364,7 +364,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
             firstEvent = false;
             
             clearNextDelayBlock(samplesToNextMidiMessage);
-            renderVoices (outputAudio, startSample, samplesToNextMidiMessage);
+            renderVoices(outputAudio, startSample, samplesToNextMidiMessage);
             renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
             handleMidiEvent (m.getMessage());
             
@@ -375,7 +375,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
     }
     
     clearNextDelayBlock(numSamples);
-    renderVoices (outputAudio, startSample, numSamples);
+    renderVoices(outputAudio, startSample, numSamples);
     renderDelays(outputAudio, startSample, numSamples);
     return;
 }

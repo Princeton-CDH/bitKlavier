@@ -113,6 +113,12 @@ isInRampOn (false), isInRampOff (false)
     generalSettings = gen;
     adsr.setSampleRate(currentSampleRate);
     sfzadsr.setSampleRate(currentSampleRate);
+    sampleEnv.setSampleRate(currentSampleRate);
+    loopEnv.setSampleRate(currentSampleRate);
+    gainEnv.setSampleRate(currentSampleRate);
+    gainEnv.setTime(7.0f);
+    bGainEnv.setSampleRate(currentSampleRate);
+    bGainEnv.setTime(7.0f);
 }
 
 BKPianoSamplerVoice::~BKPianoSamplerVoice()
@@ -565,10 +571,21 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     // Trying to save as much time as possible...
     soundLengthMinus1 = playingSound->soundLength - 1;
     const float pan = (playingSound->pan * 0.01f) + 1.0f;
+    
+    float dg = 1.0f;
+    if (dgain != nullptr) dg = Decibels::decibelsToGain(*dgain);
+    float bg = aGlobalGain * dg;
+    if (blendronicGain != nullptr) bg *= Decibels::decibelsToGain(*blendronicGain);
+    
+    gainEnv.setTarget(dg);
+    bGainEnv.setTarget(bg);
 
     int addCounter = 0;
     while (--numSamples >= 0)
     {
+        dg = gainEnv.tick();
+        bg = bGainEnv.tick();
+        
         // always increment length
         lengthTracker += bentRatio;
         
@@ -679,25 +696,20 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         const float l = noteVelocity * adsr.tick()     * sfzadsr.tick()    * (loopL * loopEnv.tick()       + sampleL * sampleEnv.tick());
         const float r = noteVelocity * adsr.lastOut()  * sfzadsr.lastOut() * (loopR * loopEnv.lastOut()    + sampleR * sampleEnv.lastOut());
         
-        float d = 1.0f;
-        if (dgain != nullptr) d = Decibels::decibelsToGain(*dgain);
-
         if (outR != nullptr)
         {
-            *outL++ += l * lgain * d;
-            *outR++ += r * rgain * d;
+            *outL++ += l * lgain * dg;
+            *outR++ += r * rgain * dg;
         }
         else
         {
-            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f * d;
+            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f * dg;
         }
         
-        float b = aGlobalGain * d;
-        if (blendronicGain != nullptr) b *= Decibels::decibelsToGain(*blendronicGain);
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l * b, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r * b, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * bg, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * bg, addCounter, 1);
         }
         addCounter++;
     }
@@ -721,10 +733,21 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         blendronicDelays.add(blendronic.getUnchecked(i)->getDelay()->getDelay().get());
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
+    
+    float dg = 1.0f;
+    if (dgain != nullptr) dg = Decibels::decibelsToGain(*dgain);
+    float bg = aGlobalGain * dg;
+    if (blendronicGain != nullptr) bg *= Decibels::decibelsToGain(*blendronicGain);
+    
+    gainEnv.setTarget(dg);
+    bGainEnv.setTarget(bg);
 
     int addCounter = 0;
     while (--numSamples >= 0)
     {
+        dg = gainEnv.tick();
+        bg = bGainEnv.tick();
+        
         // always increment length
         lengthTracker += bentRatio;
         
@@ -849,25 +872,20 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
         const float l = noteVelocity * adsr.tick() * (sampleL * sampleEnv.tick());
         const float r = noteVelocity * adsr.lastOut() * (sampleR * sampleEnv.lastOut());
 
-        float d = 1.0f;
-        if (dgain != nullptr) d = Decibels::decibelsToGain(*dgain);
-        
         if (outR != nullptr)
         {
-            *outL++ += l * lgain * d;
-            *outR++ += r * rgain * d;
+            *outL++ += l * lgain * dg;
+            *outR++ += r * rgain * dg;
         }
         else
         {
-            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f * d;
+            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f * dg;
         }
         
-        float b = aGlobalGain * d;
-        if (blendronicGain != nullptr) b *= Decibels::decibelsToGain(*blendronicGain);
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l * b, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r * b, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * bg, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * bg, addCounter, 1);
         }
         addCounter++;
     }
@@ -918,10 +936,20 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
+    float dg = 1.0f;
+    if (dgain != nullptr) dg = Decibels::decibelsToGain(*dgain);
+    float bg = aGlobalGain * dg;
+    if (blendronicGain != nullptr) bg *= Decibels::decibelsToGain(*blendronicGain);
+    
+    gainEnv.setTarget(dg);
+    bGainEnv.setTarget(bg);
+
     int addCounter = 0;
     while (--numSamples >= 0)
     {
-
+        dg = gainEnv.tick();
+        bg = bGainEnv.tick();
+        
         if ((adsr.getState() != BKADSR::IDLE) &&
             (playDirection == Reverse) &&
             (sourceSamplePosition > playingSound->soundLength - 1))
@@ -965,17 +993,14 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             break;
         }
         
-        float d = 1.0f;
-        if (dgain != nullptr) d = Decibels::decibelsToGain(*dgain);
-        
         if (outR != nullptr)
         {
-            *outL++ += l * lgain * d;
-            *outR++ += r * rgain * d;
+            *outL++ += l * lgain * dg;
+            *outR++ += r * rgain * dg;
         }
         else
         {
-            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f * d;
+            *outL++ += ((l * lgain) + (r * rgain)) * 0.5f * dg;
         }
         
         if (playDirection == Forward)
@@ -1019,12 +1044,10 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             DBG("Invalid note direction.");
         }
         
-        float b = aGlobalGain * d;
-        if (blendronicGain != nullptr) b *= Decibels::decibelsToGain(*blendronicGain);
         for (int i = 0; i < numBlendronics; ++i)
         {
-            blendronicDelays.getUnchecked(i)->addSample(l * b, addCounter, 0);
-            blendronicDelays.getUnchecked(i)->addSample(r * b, addCounter, 1);
+            blendronicDelays.getUnchecked(i)->addSample(l * bg, addCounter, 0);
+            blendronicDelays.getUnchecked(i)->addSample(r * bg, addCounter, 1);
         }
         addCounter++;
     }

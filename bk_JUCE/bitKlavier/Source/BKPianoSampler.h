@@ -240,7 +240,7 @@ private:
     
     //double beginPosition, loopPosition, endPosition;
     //stk::Envelope sampleEnv, loopEnv;
-    BKEnvelope sampleEnv, loopEnv;
+    BKEnvelope sampleEnv, loopEnv, gainEnv, bGainEnv;
 
     bool sfzEnvApplied;
     
