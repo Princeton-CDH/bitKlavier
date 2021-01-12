@@ -11,7 +11,7 @@
 #include "NostalgicViewController.h"
 
 NostalgicViewController::NostalgicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 4)
+BKViewController(p, theGraph, 3)
 {
     
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -369,25 +369,47 @@ void NostalgicViewController::displayTab(int tab)
         undertowADSRSlider->setVisible(true);
         reverseADSRLabel.setVisible(true);
         undertowADSRLabel.setVisible(true);
+        blendronicGainSlider->setVisible(true);
         
         Rectangle<int> area (getBounds());
-        Rectangle<int> areaSave (getBounds());
-        area.removeFromTop(selectCB.getHeight() + 100 * processor.paddingScalarY + 4 + gYSpacing);
         area.removeFromRight(rightArrow.getWidth());
         area.removeFromLeft(leftArrow.getWidth());
+        area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
         
+        Rectangle<int> bGainSliderArea (area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 5));
+#if !JUCE_IOS
+        int width = bGainSliderArea.getWidth();
+        bGainSliderArea.removeFromLeft(processor.paddingScalarX * width / 4.);
+        bGainSliderArea.removeFromRight(processor.paddingScalarX * width / 4.);
+#endif
+        blendronicGainSlider->setBounds(bGainSliderArea);
+        
+        //Rectangle<int> areaSave (getBounds());
+        //areaSave.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30);
+        //areaSave.removeFromTop(selectCB.getHeight() + 30 * processor.paddingScalarY + 4 + gYSpacing);
         area.removeFromLeft(processor.paddingScalarX * 20);
         area.removeFromRight(processor.paddingScalarX * 20);
+        area.removeFromTop(20 * processor.paddingScalarY);
     
         int columnHeight = area.getHeight();
         
+        reverseADSRLabel.setBounds(area.removeFromTop(columnHeight * 0.15));
+        reverseADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.35));
+        
+        undertowADSRLabel.setBounds(area.removeFromTop(columnHeight * 0.15));
+        undertowADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.35));
+        
+        /*
+        Rectangle<int> areaSave (area);
         reverseADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.5));
         undertowADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.5));
         
         reverseADSRLabel.setBounds(areaSave.removeFromTop(columnHeight * 0.5));
         undertowADSRLabel.setBounds(areaSave.removeFromTop(columnHeight * 0.5));
+         */
 
     }
+    /*
     else if (tab == 3)
     {
         blendronicGainSlider->setVisible(true);
@@ -401,6 +423,7 @@ void NostalgicViewController::displayTab(int tab)
         area.removeFromTop(processor.paddingScalarY * 30);
         blendronicGainSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
     }
+     */
 }
 
 void NostalgicViewController::paint (Graphics& g)

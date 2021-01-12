@@ -15,7 +15,7 @@
 #include "Synchronic.h"
 
 SynchronicViewController::SynchronicViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 4) // third argument => number of tabs
+BKViewController(p, theGraph, 3) // third argument => number of tabs
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
@@ -494,6 +494,8 @@ void SynchronicViewController::displayTab(int tab)
     }
     else if (tab == 2) // keymap target tab
     {
+        blendronicGainSlider->setVisible(true);
+        
         // make the combo boxes visible
         for (int i = 0; i < targetControlCBs.size(); i++)
         {
@@ -509,6 +511,16 @@ void SynchronicViewController::displayTab(int tab)
         area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
         area.removeFromRight(rightArrow.getWidth());
         area.removeFromLeft(leftArrow.getWidth());
+        
+        area.removeFromTop(processor.paddingScalarY * 30);
+        
+        Rectangle<int> bGainSliderArea (area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+#if !JUCE_IOS
+        int width = bGainSliderArea.getWidth();
+        bGainSliderArea.removeFromLeft(processor.paddingScalarX * width * 0.25);
+        bGainSliderArea.removeFromRight(processor.paddingScalarX * width * 0.25);
+#endif
+        blendronicGainSlider->setBounds(bGainSliderArea);
         
         area.removeFromTop((area.getHeight() - (targetControlCBs.size() / 2) * (gComponentComboBoxHeight + gYSpacing)) / 3.);
         
@@ -593,6 +605,7 @@ void SynchronicViewController::displayTab(int tab)
                                       targetControlCBs[0]->getHeight() * targetControlCBs.size() + 2 * gComponentComboBoxHeight + 4 * gYSpacing);
          */
     }
+    /*
     else if (tab == 3)
     {
         blendronicGainSlider->setVisible(true);
@@ -606,6 +619,7 @@ void SynchronicViewController::displayTab(int tab)
         area.removeFromTop(processor.paddingScalarY * 30);
         blendronicGainSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
     }
+     */
 }
 
 void SynchronicViewController::resized()

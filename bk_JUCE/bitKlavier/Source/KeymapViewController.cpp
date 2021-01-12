@@ -764,13 +764,16 @@ void KeymapViewController::invisible()
     harKeyboard->setVisible(false);
     harKeyboardAllValsTextFieldOpen.setVisible(false);
     harAllKeymapTF.setVisible(false);
+    
+#if JUCE_IOS
     harOctaveSlider.setVisible(false);
-
+    harArrayOctaveSlider.setVisible(false);
+#endif
+    
     harArrayKeyboardLabel.setVisible(false);
     harArrayKeymapTF.setVisible(false);
     harArrayKeyboard->setVisible(false);
     harArrayKeyboardValsTextFieldOpen.setVisible(false);
-    harArrayOctaveSlider.setVisible(false);
 
     //enableHarmonizerToggle.setVisible(false);
 

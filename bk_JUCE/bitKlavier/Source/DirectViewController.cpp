@@ -157,7 +157,7 @@ void DirectViewController::displayTab(int tab)
         gainSlider->setVisible(true);
         resonanceGainSlider->setVisible(true);
         hammerGainSlider->setVisible(true);
-        ADSRSlider->setVisible(true);
+        // ADSRSlider->setVisible(true);
         transpositionSlider->setVisible(true);
         transpUsesTuning.setVisible(true);
         velocityMinMaxSlider->setVisible(true);
@@ -168,13 +168,25 @@ void DirectViewController::displayTab(int tab)
         area.removeFromLeft(leftArrow.getWidth());
         area.removeFromRight(processor.paddingScalarX * 20);
         
-        ADSRSlider->setBounds(area.removeFromBottom(area.getHeight() * 0.35));
-
+        // ADSRSlider->setBounds(area.removeFromBottom(area.getHeight() * 0.35));
+        
+        transpositionSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+        transpUsesTuning.setBounds(area.removeFromTop(gComponentToggleBoxHeight));
+        
         area.removeFromBottom(processor.paddingScalarY * 50);
         Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth()* 0.5)); //area is now right column
         leftColumn.removeFromRight(processor.paddingScalarX * 20);
         area.removeFromLeft(processor.paddingScalarX * 20);
         
+        int columnHeight = leftColumn.getHeight();
+        
+        // velocityMinMaxSlider->setBounds(leftColumn.removeFromBottom(gainSlider->getHeight() + 9 * processor.paddingScalarY));
+        velocityMinMaxSlider->setBounds(leftColumn.removeFromBottom(columnHeight / 3));
+        gainSlider->setBounds(leftColumn.removeFromBottom(columnHeight / 3));
+        resonanceGainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
+        hammerGainSlider->setBounds(area.removeFromBottom(columnHeight / 3));
+    
+        /*
         int columnHeight = leftColumn.getHeight();
         
         gainSlider->setBounds(leftColumn.removeFromBottom(columnHeight / 3));
@@ -185,6 +197,7 @@ void DirectViewController::displayTab(int tab)
         area.removeFromBottom(21 * processor.paddingScalarY);
         transpUsesTuning.setBounds(area.removeFromBottom(gComponentToggleBoxHeight));
         transpositionSlider->setBounds(area.removeFromBottom(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+         */
     }
 //    else if (tab == 1)
 //    {
@@ -205,6 +218,7 @@ void DirectViewController::displayTab(int tab)
     else if (tab == 1)
     {
         blendronicGainSlider->setVisible(true);
+        ADSRSlider->setVisible(true);
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(selectCB.getHeight() + 70 * processor.paddingScalarY + 4 + gYSpacing);
@@ -212,8 +226,17 @@ void DirectViewController::displayTab(int tab)
         area.removeFromLeft(leftArrow.getWidth());
         area.removeFromRight(processor.paddingScalarX * 20);
         
+        area.removeFromBottom(processor.paddingScalarY * 30);
+        ADSRSlider->setBounds(area.removeFromBottom(area.getHeight() * 0.35 + processor.paddingScalarY * 30));
+        
         area.removeFromTop(processor.paddingScalarY * 30);
+#if !JUCE_IOS
+        int width = area.getWidth();
+        area.removeFromLeft(processor.paddingScalarX * width / 4.);
+        area.removeFromRight(processor.paddingScalarX * width / 4.);
+#endif
         blendronicGainSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+        
     }
 }
 
