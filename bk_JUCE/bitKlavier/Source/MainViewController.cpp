@@ -1090,7 +1090,13 @@ void MainViewController::timerCallback()
     sampleCB.setAlpha(1.);
     instrumentCB.setAlpha(1.);
     globalSoundSetButton.setAlpha(1.);
-    if (construction.getNumSelected() == 1)
+    
+    bool front = true;
+#if JUCE_IOS
+    front = display == DisplayConstruction &&
+    processor.updateState->currentDisplay == DisplayNil;
+#endif
+    if (construction.getNumSelected() == 1 && front)
     {
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeKeymap && processor.updateState->currentDisplay != DisplayKeymap)
@@ -1169,6 +1175,20 @@ void MainViewController::timerCallback()
         globalSoundSetButton.setVisible(false);
         globalSoundSetButton.setToggleState(true, dontSendNotification);
     }
+    
+#if JUCE_IOS
+    if (display == DisplayConstruction &&
+        processor.updateState->currentDisplay == DisplayNil)
+    {
+        sampleCB.setVisible(true);
+        instrumentCB.setVisible(true);
+    }
+    else
+    {
+        sampleCB.setVisible(false);
+        instrumentCB.setVisible(false);
+    }
+#endif
     
     keyboard->repaint();
     
@@ -1298,24 +1318,12 @@ void MainViewController::timerCallback()
         
         header.update();
 
-        
-        
         if (processor.updateState->currentDisplay != DisplayNil)
         {
             processor.updateState->editsMade = false;
-#if JUCE_IOS
-            sampleCB.setVisible(false);
-            instrumentCB.setVisible(false);
-            globalSoundSetButton.setVisible(false);
-#endif
         }
         else
         {
-#if JUCE_IOS
-            sampleCB.setVisible(true);
-            instrumentCB.setVisible(true);
-            globalSoundSetButton.setVisible(true);
-#endif
             if (processor.updateState->editsMade)
             {
                 if (0 < prevDisplay && prevDisplay < DisplayNil)
