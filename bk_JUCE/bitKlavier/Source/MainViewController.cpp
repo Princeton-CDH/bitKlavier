@@ -1297,17 +1297,29 @@ void MainViewController::timerCallback()
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
         
         header.update();
+
+        
         
         if (processor.updateState->currentDisplay != DisplayNil)
         {
             processor.updateState->editsMade = false;
+#if JUCE_IOS
+            sampleCB.setVisible(false);
+            instrumentCB.setVisible(false);
+#endif
         }
-        else if (processor.updateState->editsMade)
+        else
         {
-            if (0 < prevDisplay && prevDisplay < DisplayNil)
-                processor.saveGalleryToHistory(cDisplayNames[prevDisplay] + " Edits");
-        }
-            
+#if JUCE_IOS
+            sampleCB.setVisible(true);
+            instrumentCB.setVisible(true);
+#endif
+            if (processor.updateState->editsMade)
+            {
+                if (0 < prevDisplay && prevDisplay < DisplayNil)
+                    processor.saveGalleryToHistory(cDisplayNames[prevDisplay] + " Edits");
+            }
+        }   
     }
     
     levelMeterComponentL->updateLevel(processor.getLevelL());

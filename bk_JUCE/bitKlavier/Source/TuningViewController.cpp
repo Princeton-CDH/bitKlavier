@@ -1187,25 +1187,25 @@ void TuningViewController::timerCallback(void)
             repaint();
         }
         
-        if (prep->tFundamentalOffset.active)
+        if (prep->tFundamentalOffset.value != offsetSlider->getValue())
             offsetSlider->setValue(prep->tFundamentalOffset.value, dontSendNotification);
-        if (prep->tAdaptiveClusterThresh.active)
+        if (prep->tAdaptiveClusterThresh.value != A1ClusterThresh->getValue())
             A1ClusterThresh->setValue(prep->tAdaptiveClusterThresh.value, dontSendNotification);
-        if (prep->tAdaptiveHistory.active)
+        if (prep->tAdaptiveHistory.value != A1ClusterMax->getValue())
             A1ClusterMax->setValue(prep->tAdaptiveHistory.value, dontSendNotification);
-        if (prep->nToneSemitoneWidth.active)
+        if (prep->nToneSemitoneWidth.value != nToneSemitoneWidthSlider->getValue())
             nToneSemitoneWidthSlider->setValue(prep->nToneSemitoneWidth.value, dontSendNotification);
-        if (prep->getSpringTuning()->rate.active)
+        if (prep->getSpringTuning()->rate.value != rateSlider->getValue())
             rateSlider->setValue(prep->getSpringTuning()->rate.value, dontSendNotification);
-        if (prep->getSpringTuning()->drag.active)
+        if (prep->getSpringTuning()->drag.value != dragSlider->getValue())
             dragSlider->setValue(prep->getSpringTuning()->drag.value, dontSendNotification);
-        if (prep->getSpringTuning()->tetherStiffness.active)
+        if (prep->getSpringTuning()->tetherStiffness.value != tetherStiffnessSlider->getValue())
             tetherStiffnessSlider->setValue(prep->getSpringTuning()->tetherStiffness.value, dontSendNotification);
-        if (prep->getSpringTuning()->intervalStiffness.active)
+        if (prep->getSpringTuning()->intervalStiffness.value != intervalStiffnessSlider->getValue())
             intervalStiffnessSlider->setValue(prep->getSpringTuning()->intervalStiffness.value, dontSendNotification);
-        if (prep->getSpringTuning()->tetherWeightGlobal.active)
+        if (prep->getSpringTuning()->tetherWeightGlobal.value != tetherWeightGlobalSlider->getValue())
             tetherWeightGlobalSlider->setValue(prep->getSpringTuning()->tetherWeightGlobal.value, dontSendNotification);
-        if (prep->getSpringTuning()->tetherWeightSecondaryGlobal.active)
+        if (prep->getSpringTuning()->tetherWeightSecondaryGlobal.value != tetherWeightSecondaryGlobalSlider->getValue())
             tetherWeightSecondaryGlobalSlider->setValue(prep->getSpringTuning()->tetherWeightSecondaryGlobal.value, dontSendNotification);
     }
 }

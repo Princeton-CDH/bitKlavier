@@ -207,8 +207,8 @@ void BKConstructionSite::startConnection(int x, int y)
     {
         connect = true;
         
-        lineOX = x;
-        lineOY = y;
+        lineEX = lineOX = x;
+        lineEY = lineOY = y;
         DBG("ORIGIN: " + String(lineOX) + " " + String(lineOY));
     }
 }

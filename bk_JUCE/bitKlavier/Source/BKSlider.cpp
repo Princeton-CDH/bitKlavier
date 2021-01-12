@@ -1140,6 +1140,7 @@ minDisplay(minDisplay)
     moddableOptionsButton.setButtonText("...");
     moddableOptionsButton.setLookAndFeel(&buttonLAF);
     moddableOptionsButton.addListener(this);
+    moddableOptionsButton.setTooltip("Edit modification settings for this slider");
     addAndMakeVisible(moddableOptionsButton);
     
     displaySlider = std::make_unique<Slider>();
