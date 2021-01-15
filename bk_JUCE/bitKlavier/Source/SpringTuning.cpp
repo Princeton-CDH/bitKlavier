@@ -113,7 +113,7 @@ SpringTuning::SpringTuning(SpringTuning::Ptr st):
 rate(100),
 tetherStiffness(0.5),
 intervalStiffness(0.5),
-drag(0.1),
+drag(.15),
 active(false),
 tetherWeightGlobal(0.5),
 tetherWeightSecondaryGlobal(0.1),
@@ -139,14 +139,17 @@ usingFundamentalForIntervalSprings(false) //should be false by default
     useLowestNoteForFundamental = false;
     useHighestNoteForFundamental = false;
     useLastNoteForFundamental = false;
-    
-    //"automatic" fundamental mode
-    setFundamentalSetsTether(false);        //needs UI toggle; when on, don't show tether sliders for current notes, only the two tether weight sliders
+
+    setFundamentalSetsTether(true);        //needs UI toggle; when on, don't show tether sliders for current notes, only the two tether weight sliders
     tetherFundamental = C;
+
     //setTetherWeightGlobal(0.5);             //needs UI slider; only show when fundamentalSetsTether == true
     //setTetherWeightSecondaryGlobal(0.1);    //needs UI slider; only show when fundamentalSetsTether == true
     
     for (int i = 0; i < 13; i++) springWeights[i] = 0.5;
+    springWeights[7] = 0.75;
+    springWeights[9] = 0.25;
+    setSpringMode(6, false);
     
     // Converting std::string to juce::String takes time so
     // convert before the look
@@ -185,6 +188,7 @@ usingFundamentalForIntervalSprings(false) //should be false by default
     if (st != nullptr) copy(st);
     setDrag(drag.value);
     setRate(rate.value);
+    setIntervalFundamental((PitchClass)(automatic + 1));
 }
 
 void SpringTuning::setTetherTuning(Array<float> tuning)
