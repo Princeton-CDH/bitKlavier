@@ -557,6 +557,27 @@ void TuningViewController::displayTab(int tab)
                 tetherWeightSecondaryGlobalSlider->setVisible(true);
             }
             
+            if (prep->tFundamentalOffset.value != offsetSlider->getValue())
+                offsetSlider->setValue(prep->tFundamentalOffset.value, dontSendNotification);
+            if (prep->tAdaptiveClusterThresh.value != A1ClusterThresh->getValue())
+                A1ClusterThresh->setValue(prep->tAdaptiveClusterThresh.value, dontSendNotification);
+            if (prep->tAdaptiveHistory.value != A1ClusterMax->getValue())
+                A1ClusterMax->setValue(prep->tAdaptiveHistory.value, dontSendNotification);
+            if (prep->nToneSemitoneWidth.value != nToneSemitoneWidthSlider->getValue())
+                nToneSemitoneWidthSlider->setValue(prep->nToneSemitoneWidth.value, dontSendNotification);
+            if (prep->getSpringTuning()->rate.value != rateSlider->getValue())
+                rateSlider->setValue(prep->getSpringTuning()->rate.value, dontSendNotification);
+            if (dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->drag.value, 100.) != dragSlider->getValue())
+                dragSlider->setValue(dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->drag.value, 100.), dontSendNotification);
+            if (prep->getSpringTuning()->tetherStiffness.value != tetherStiffnessSlider->getValue())
+                tetherStiffnessSlider->setValue(prep->getSpringTuning()->tetherStiffness.value, dontSendNotification);
+            if (prep->getSpringTuning()->intervalStiffness.value != intervalStiffnessSlider->getValue())
+                intervalStiffnessSlider->setValue(prep->getSpringTuning()->intervalStiffness.value, dontSendNotification);
+            if (prep->getSpringTuning()->tetherWeightGlobal.value != tetherWeightGlobalSlider->getValue())
+                tetherWeightGlobalSlider->setValue(prep->getSpringTuning()->tetherWeightGlobal.value, dontSendNotification);
+            if (prep->getSpringTuning()->tetherWeightSecondaryGlobal.value != tetherWeightSecondaryGlobalSlider->getValue())
+                tetherWeightSecondaryGlobalSlider->setValue(prep->getSpringTuning()->tetherWeightSecondaryGlobal.value, dontSendNotification);
+            
         }
         
         TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
@@ -665,6 +686,7 @@ void TuningViewController::displayTab(int tab)
                                      currentFundamental.getWidth(),
                                      currentFundamental.getHeight()  );
     }
+    
     repaint();
 }
 
@@ -1187,6 +1209,8 @@ void TuningViewController::timerCallback(void)
             repaint();
         }
         
+        /*
+         // moved to displayTab()
         if (prep->tFundamentalOffset.value != offsetSlider->getValue())
             offsetSlider->setValue(prep->tFundamentalOffset.value, dontSendNotification);
         if (prep->tAdaptiveClusterThresh.value != A1ClusterThresh->getValue())
@@ -1207,6 +1231,7 @@ void TuningViewController::timerCallback(void)
             tetherWeightGlobalSlider->setValue(prep->getSpringTuning()->tetherWeightGlobal.value, dontSendNotification);
         if (prep->getSpringTuning()->tetherWeightSecondaryGlobal.value != tetherWeightSecondaryGlobalSlider->getValue())
             tetherWeightSecondaryGlobalSlider->setValue(prep->getSpringTuning()->tetherWeightSecondaryGlobal.value, dontSendNotification);
+         */
     }
 }
 
