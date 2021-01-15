@@ -1197,8 +1197,8 @@ void TuningViewController::timerCallback(void)
             nToneSemitoneWidthSlider->setValue(prep->nToneSemitoneWidth.value, dontSendNotification);
         if (prep->getSpringTuning()->rate.value != rateSlider->getValue())
             rateSlider->setValue(prep->getSpringTuning()->rate.value, dontSendNotification);
-        if (prep->getSpringTuning()->drag.value != dragSlider->getValue())
-            dragSlider->setValue(prep->getSpringTuning()->drag.value, dontSendNotification);
+        if (dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->drag.value, 100.) != dragSlider->getValue())
+            dragSlider->setValue(dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->drag.value, 100.), dontSendNotification);
         if (prep->getSpringTuning()->tetherStiffness.value != tetherStiffnessSlider->getValue())
             tetherStiffnessSlider->setValue(prep->getSpringTuning()->tetherStiffness.value, dontSendNotification);
         if (prep->getSpringTuning()->intervalStiffness.value != intervalStiffnessSlider->getValue())
