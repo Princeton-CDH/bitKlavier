@@ -45,7 +45,7 @@ public:
     typedef ReferenceCountedObjectPtr<SpringTuning> Ptr;
     
     SpringTuning(SpringTuning::Ptr st = nullptr);
-    ~SpringTuning(){stopTimer();};
+    ~SpringTuning(){ stopTimer(); DBG("SpringTuning: stopping timer");};
     
     /*
      simulate() first moves through the entire particle array and "integrates" their position,
@@ -87,11 +87,11 @@ public:
     inline void setRate(double r, bool start = true)
     {
         rate = r;
-        if (start)  startTimer(1000 / rate.value);
-        else        stopTimer();
+        if (start)  { startTimer(1000 / rate.value); DBG("SpringTuning: starting timer"); }
+        else        { stopTimer(); DBG("SpringTuning: stopping timer"); }
     }
     inline double getRate(void) { return rate.value; }
-    inline void stop(void) { stopTimer(); }
+    inline void stop(void) { stopTimer(); DBG("SpringTuning: stopping timer");}
     
     inline void setStiffness(double stiff)
     {
@@ -483,6 +483,7 @@ private:
     
     void hiResTimerCallback(void) override
     {
+        DBG("Spring Tuning timer callback");
         if (active.value)
         {
             simulate();

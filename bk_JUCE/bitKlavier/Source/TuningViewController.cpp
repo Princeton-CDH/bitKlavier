@@ -1450,6 +1450,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             
             prep->getSpringTuning()->setActive(true);
             prep->getSpringTuning()->setTetherTuning(tuning->getCurrentScaleCents());
+            prep->getSpringTuning()->setRate(prep->getSpringTuning()->getRate()); // starts timer
             
             //need to make sure the interval scale is also set; i'm finding that sometimes i have to manually change away from just and back to get the system to work
             TuningSystem springScaleId = prep->getSpringTuning()->getScaleId();
@@ -1465,6 +1466,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             
             prep->getSpringTuning()->setActive(false);
             prep->getSpringTuning()->setTetherTuning(EqualTemperament);
+            prep->getSpringTuning()->stop();
             
             displayTab(currentTab);
         }
@@ -1671,15 +1673,14 @@ void TuningPreparationEditor::update(void)
         double newval = dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->getDrag(), 100.);
         dragSlider->setValue(newval, 2, dontSendNotification);
         
-        
-        
         if (prep->getSpringTuning()->getActive())
         {
             showSprings = true;
+            prep->getSpringTuning()->setRate(prep->getSpringTuning()->getRate()); // starts timer
         }
         else
         {
-            showSprings = false;
+            showSprings = false;prep->getSpringTuning()->stop();
         }
         
         tetherWeightGlobalSlider->setValue(prep->getSpringTuning()->getTetherWeightGlobal(), dontSendNotification);
