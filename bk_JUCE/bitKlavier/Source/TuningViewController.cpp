@@ -501,13 +501,18 @@ void TuningViewController::displayTab(int tab)
     }
     else if (tab == 1)
     {
+        DBG("Tuning: displaying tab 1");
+        
         // SET VISIBILITY
         Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         TuningPreparation::Ptr prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
         TuningPreparation::Ptr mod = processor.gallery->getTuningModification(processor.updateState->currentModTuningId);
         
         bool isMod = (processor.updateState->currentDisplay == DisplayTuningMod);
-
+        DBG("tuning VC: is mod = " + String((int) isMod));
+        DBG("tuning VC: showSprings = " + String((int) showSprings));
+        DBG("tuning VC: getUsingFundamentalForIntervalSprings = " + String((int) tuning->getCurrentSpringTuning()->getUsingFundamentalForIntervalSprings()));
+        
         if(showSprings || isMod)
         {
             if (!isMod)
@@ -524,7 +529,6 @@ void TuningViewController::displayTab(int tab)
                     }
                 }
             }
-            
             
             rateSlider->setVisible(true);
             dragSlider->setVisible(true);
@@ -1198,6 +1202,7 @@ void TuningViewController::timerCallback(void)
             nToneSemitoneWidthSlider->setValue(prep->nToneSemitoneWidth.value, dontSendNotification);
         if (prep->getSpringTuning()->rate.value != rateSlider->getValue())
             rateSlider->setValue(prep->getSpringTuning()->rate.value, dontSendNotification);
+        // might need to check if spring tuning is active as well, turn on timer if needed
         if (dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->drag.value, 100.) != dragSlider->getValue())
             dragSlider->setValue(dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->drag.value, 100.), dontSendNotification);
         if (prep->getSpringTuning()->tetherStiffness.value != tetherStiffnessSlider->getValue())
@@ -1634,6 +1639,7 @@ void TuningPreparationEditor::update(void)
         
         //DBG("springScaleFundamentalCB.setSelectedItemIndex " + String(prep->getSpringTuning()->getIntervalFundamental()));
         springScaleFundamentalCB.setSelectedItemIndex((int)prep->getSpringTuning()->getIntervalFundamental(), dontSendNotification);
+        prep->getSpringTuning()->setIntervalFundamental(prep->getSpringTuning()->getIntervalFundamental()); // seems redundant, but needed to make sure everything displays properly
         
         fundamentalCB.setSelectedItemIndex(prep->getFundamental(), dontSendNotification);
         offsetSlider->setValue(prep->getFundamentalOffset() * 100., dontSendNotification);
@@ -1680,7 +1686,8 @@ void TuningPreparationEditor::update(void)
         }
         else
         {
-            showSprings = false;prep->getSpringTuning()->stop();
+            showSprings = false;
+            prep->getSpringTuning()->stop();
         }
         
         tetherWeightGlobalSlider->setValue(prep->getSpringTuning()->getTetherWeightGlobal(), dontSendNotification);

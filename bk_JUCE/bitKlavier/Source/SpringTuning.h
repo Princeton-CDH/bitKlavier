@@ -483,7 +483,7 @@ private:
     
     void hiResTimerCallback(void) override
     {
-        DBG("Spring Tuning timer callback");
+        // DBG("Spring Tuning timer callback");
         if (active.value)
         {
             simulate();
