@@ -38,13 +38,13 @@ BKViewController(p, theGraph, 2)
     
     resonanceGainSlider = std::make_unique<BKSingleSlider>("resonance volume (dB)", cDirectResonanceGain, -100, 24, -12, 0.01, "-inf");
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
-    resonanceGainSlider->setJustifyRight(false);
+    resonanceGainSlider->setJustifyRight(true);
     resonanceGainSlider->setToolTipString("Adjusts overall resonance/reverb based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*resonanceGainSlider);
     
     hammerGainSlider = std::make_unique<BKSingleSlider>("hammers volume (dB)", cDirectHammerGain, -100, 24, 0, 0.01, "-inf");
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
-    hammerGainSlider->setJustifyRight(false);
+    hammerGainSlider->setJustifyRight(true);
     hammerGainSlider->setToolTipString("Adjusts mechanical noise sample based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*hammerGainSlider);
     

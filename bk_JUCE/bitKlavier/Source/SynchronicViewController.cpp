@@ -180,7 +180,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     
     clusterCapSlider = std::make_unique<BKSingleSlider>("cluster thickness", cSynchronicClusterCap, 1, 20, 8, 1);
     clusterCapSlider->setToolTipString("maximum number of notes in sounding pulse");
-    clusterCapSlider->setJustifyRight(true);
+    clusterCapSlider->setJustifyRight(false);
     addAndMakeVisible(*clusterCapSlider, ALL);
     
     holdTimeMinMaxSlider = std::make_unique<BKRangeSlider>("hold min/max", 0., 12000., 0.0, 12000., 1);
