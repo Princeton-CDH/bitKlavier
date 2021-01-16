@@ -129,7 +129,7 @@ namespace BinaryData
     const int            _40__Spring_Tuning_Default_xmlSize = 49858;
 
     extern const char*   _41__Spring_Tuning_Drift_xml;
-    const int            _41__Spring_Tuning_Drift_xmlSize = 49863;
+    const int            _41__Spring_Tuning_Drift_xmlSize = 67266;
 
     extern const char*   _42__Dynamic_Modifications_1_xml;
     const int            _42__Dynamic_Modifications_1_xmlSize = 44712;

@@ -100,22 +100,22 @@
                   file="Source/galleries/Examples/38. Blendronic 6.xml"/>
             <FILE id="zHVocJ" name="39. Blendronic 7.xml" compile="0" resource="1"
                   file="Source/galleries/Examples/39. Blendronic 7.xml"/>
-            <FILE id="BC0zF3" name="40. Spring Tuning Default.xml" compile="0"
-                  resource="1" file="/Applications/bitKlavier/galleries/Examples_new/40. Spring Tuning Default.xml"/>
-            <FILE id="ZELG8X" name="41. Spring Tuning Drift.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/41. Spring Tuning Drift.xml"/>
-            <FILE id="rJXeIK" name="42. Dynamic Modifications 1.xml" compile="0"
-                  resource="1" file="/Applications/bitKlavier/galleries/Examples_new/42. Dynamic Modifications 1.xml"/>
-            <FILE id="DdQh1e" name="43. Dynamic Modifications 2.xml" compile="0"
-                  resource="1" file="/Applications/bitKlavier/galleries/Examples_new/43. Dynamic Modifications 2.xml"/>
-            <FILE id="oPgOEd" name="44. Harmonizer 1.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/44. Harmonizer 1.xml"/>
-            <FILE id="aa3WO2" name="45. Harmonizer 2.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/45. Harmonizer 2.xml"/>
-            <FILE id="lRgdjX" name="46. Harmonizer 3.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/46. Harmonizer 3.xml"/>
-            <FILE id="V6Ogw8" name="47. Harmonizer 4.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/47. Harmonizer 4.xml"/>
+            <FILE id="mD8p16" name="40. Spring Tuning Default.xml" compile="0"
+                  resource="1" file="Source/galleries/Examples/40. Spring Tuning Default.xml"/>
+            <FILE id="LV9nKk" name="41. Spring Tuning Drift.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/41. Spring Tuning Drift.xml"/>
+            <FILE id="zSFwoR" name="42. Dynamic Modifications 1.xml" compile="0"
+                  resource="1" file="Source/galleries/Examples/42. Dynamic Modifications 1.xml"/>
+            <FILE id="tZ89j2" name="43. Dynamic Modifications 2.xml" compile="0"
+                  resource="1" file="Source/galleries/Examples/43. Dynamic Modifications 2.xml"/>
+            <FILE id="JbYgYX" name="44. Harmonizer 1.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/44. Harmonizer 1.xml"/>
+            <FILE id="u2BEFU" name="45. Harmonizer 2.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/45. Harmonizer 2.xml"/>
+            <FILE id="VmvW3Z" name="46. Harmonizer 3.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/46. Harmonizer 3.xml"/>
+            <FILE id="oMflf6" name="47. Harmonizer 4.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/47. Harmonizer 4.xml"/>
           </GROUP>
           <GROUP id="{DC95ED57-B0B0-DFDE-4EA4-2AEDDF41B82F}" name="Mikroetudes">
             <FILE id="o6aLKt" name="And So.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/And So.xml"/>
