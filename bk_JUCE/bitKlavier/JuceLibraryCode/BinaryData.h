@@ -125,6 +125,30 @@ namespace BinaryData
     extern const char*   _39__Blendronic_7_xml;
     const int            _39__Blendronic_7_xmlSize = 23269;
 
+    extern const char*   _40__Spring_Tuning_Default_xml;
+    const int            _40__Spring_Tuning_Default_xmlSize = 49858;
+
+    extern const char*   _41__Spring_Tuning_Drift_xml;
+    const int            _41__Spring_Tuning_Drift_xmlSize = 49863;
+
+    extern const char*   _42__Dynamic_Modifications_1_xml;
+    const int            _42__Dynamic_Modifications_1_xmlSize = 44712;
+
+    extern const char*   _43__Dynamic_Modifications_2_xml;
+    const int            _43__Dynamic_Modifications_2_xmlSize = 49389;
+
+    extern const char*   _44__Harmonizer_1_xml;
+    const int            _44__Harmonizer_1_xmlSize = 40986;
+
+    extern const char*   _45__Harmonizer_2_xml;
+    const int            _45__Harmonizer_2_xmlSize = 40919;
+
+    extern const char*   _46__Harmonizer_3_xml;
+    const int            _46__Harmonizer_3_xmlSize = 39863;
+
+    extern const char*   _47__Harmonizer_4_xml;
+    const int            _47__Harmonizer_4_xmlSize = 41750;
+
     extern const char*   And_So_xml;
     const int            And_So_xmlSize = 15871;
 
@@ -327,7 +351,7 @@ namespace BinaryData
     const int            LICENSESize = 1152;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 106;
+    const int namedResourceListSize = 114;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

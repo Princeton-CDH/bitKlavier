@@ -263,6 +263,14 @@ void BKAudioProcessor::loadGalleries()
         "37. Blendronic 5",
         "38. Blendronic 6",
         "39. Blendronic 7",
+        "40. Spring Tuning Default",
+        "41. Spring Tuning Drift",
+        "42. Dynamic Modifications 1",
+        "43. Dynamic Modifications 2",
+        "44. Harmonizer 1",
+        "45. Harmonizer 2",
+        "46. Harmonizer 3",
+        "47. Harmonizer 4"
         
     });
     
