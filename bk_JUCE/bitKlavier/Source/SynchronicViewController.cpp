@@ -2183,27 +2183,27 @@ void SynchronicModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sl
         
         clusterThreshSlider->setBright();
     }
-    else if(name == "cluster thickness")
+    else if (name == "cluster thickness")
     {
         mod->sClusterCap.set(val);
         mod->setDirty(SynchronicClusterCap);
         
         clusterCapSlider->setBright();
     }
-    else if(slider->getName() == gainSlider->getName())
+    else if (slider->getName() == gainSlider->getName())
     {
         mod->sGain.set(val);
         
         mod->setDirty(SynchronicGain);
         gainSlider->setBright();
     }
-    else if(name == "num clusters")
+    else if (slider->getName() == numClusterSlider->getName())
     {
         mod->numClusters.set(val);
         mod->setDirty(SynchronicNumClusters);
         numClusterSlider->setBright();
     }
-    else if(slider->getName() == blendronicGainSlider->getName())
+    else if (slider->getName() == blendronicGainSlider->getName())
     {
         mod->sBlendronicGain.set(val);
         
