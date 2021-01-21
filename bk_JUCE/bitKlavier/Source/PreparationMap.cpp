@@ -534,6 +534,30 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
             releaseTargetStates.fill(TargetStateNil); }
     }
     
+    for (auto proc : mprocessor)
+    {
+        bool ignoreSustain = !sustainPedalIsDepressed;
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            {
+                targetStates = &pressTargetStates;
+                if (km->isInverted()) targetStates = &releaseTargetStates;
+                
+                if (km->getTargetStates()[TargetTypeTempo] == TargetStateEnabled)
+                    targetStates->set(TargetTypeTempo, TargetStateEnabled);
+                if (km->getIgnoreSustain()) ignoreSustain = true;
+            }
+        }
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity);
+            pressTargetStates.fill(TargetStateNil); }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            if (ignoreSustain && !noteDown)
+                proc->keyReleased(noteNumber, channel);
+            releaseTargetStates.fill(TargetStateNil); }
+    }
+    
     for (auto proc : dprocessor)
     {
         bool ignoreSustain = !sustainPedalIsDepressed;
@@ -613,29 +637,6 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
             releaseTargetStates.fill(TargetStateNil); }
     }
     
-    for (auto proc : mprocessor)
-    {
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                targetStates = &pressTargetStates;
-                if (km->isInverted()) targetStates = &releaseTargetStates;
-                
-                if (km->getTargetStates()[TargetTypeTempo] == TargetStateEnabled)
-                    targetStates->set(TargetTypeTempo, TargetStateEnabled);
-                if (km->getIgnoreSustain()) ignoreSustain = true;
-            }
-        }
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity);
-            pressTargetStates.fill(TargetStateNil); }
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            if (ignoreSustain && !noteDown)
-                proc->keyReleased(noteNumber, channel);
-            releaseTargetStates.fill(TargetStateNil); }
-    }
         // PERFORM MODIFICATION STUFF
 }
 

@@ -595,11 +595,8 @@ void BKAudioProcessor::renameGallery(String newName)
 
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool postHarmonizer)
 {
-    PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     
     bool activeSource = false;
-
-    if (pmap == nullptr) return;
     
     // Check PianoMap for whether piano should change due to key strike.
     for (auto mpmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
@@ -613,13 +610,14 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                 {
                     DBG("change piano to " + String(whichPiano));
                     setCurrentPiano(whichPiano);
-                    
-                    pmap = currentPiano->getPreparationMap();
                 }
                 break;
             }
         }
     }
+    
+    PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
+    if (pmap == nullptr) return;
     
     // This array will hold all the notes to play based on harmonization without duplicates
     Array<int> reducedHarm;
