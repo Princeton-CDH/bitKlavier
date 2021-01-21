@@ -59,9 +59,24 @@ public:
 
 
     //copy constructor
-    BlendronicPreparation(BlendronicPreparation::Ptr p)
+    BlendronicPreparation(BlendronicPreparation::Ptr b) :
+    outGain(b->outGain),
+    bBeats(b->bBeats),
+    bDelayLengths(b->bDelayLengths),
+    bSmoothLengths(b->bSmoothLengths),
+    bFeedbackCoefficients(b->bFeedbackCoefficients),
+    bBeatsStates(b->bBeatsStates),
+    bDelayLengthsStates(b->bDelayLengthsStates),
+    bSmoothLengthsStates(b->bSmoothLengthsStates),
+    bFeedbackCoefficientsStates(b->bFeedbackCoefficientsStates),
+    delayBufferSizeInSeconds( b->delayBufferSizeInSeconds),
+    targetTypeBlendronicPatternSync(b->getTargetTypeBlendronicPatternSync()),
+    targetTypeBlendronicBeatSync(b->getTargetTypeBlendronicBeatSync()),
+    targetTypeBlendronicClear(b->getTargetTypeBlendronicClear()),
+    targetTypeBlendronicPausePlay(b->getTargetTypeBlendronicPausePlay()),
+    targetTypeBlendronicOpenCloseInput(b->getTargetTypeBlendronicOpenCloseInput()),
+    targetTypeBlendronicOpenCloseOutput(b->getTargetTypeBlendronicOpenCloseOutput())
     {
-        copy(p);
     }
     
     //constructor with input
@@ -72,6 +87,7 @@ public:
                           Array<float> feedbackCoefficients,
                           float clusterThresh,
                           float delayBufferSizeInSeconds) :
+    outGain(1.0f),
     bBeats(beats),
     bDelayLengths(delayLengths),
     bSmoothLengths(smoothLengths),

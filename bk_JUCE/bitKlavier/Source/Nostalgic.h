@@ -32,9 +32,36 @@ public:
     typedef OwnedArray<NostalgicPreparation, CriticalSection> CSArr;
     
     
-    NostalgicPreparation(NostalgicPreparation::Ptr p)
+    NostalgicPreparation(NostalgicPreparation::Ptr n) :
+    nGain(n->nGain),
+    nBlendronicGain(n->nBlendronicGain),
+    nWaveDistance(n->nWaveDistance),
+    nUndertow(n->nUndertow),
+    nTransposition(n->nTransposition),
+    nTranspUsesTuning(n->nTranspUsesTuning),
+    nLengthMultiplier(n->nLengthMultiplier),
+    nBeatsToSkip(n->nBeatsToSkip),
+    nMode(n->nMode),
+    nReverseAttack(n->nReverseAttack),
+    nReverseDecay(n->nReverseDecay),
+    nReverseRelease(n->nReverseRelease),
+    nReverseSustain(n->nReverseSustain),
+    nUndertowAttack(n->nUndertowAttack),
+    nUndertowDecay(n->nUndertowDecay),
+    nUndertowRelease(n->nUndertowRelease),
+    nUndertowSustain(n->nUndertowSustain),
+    holdMin(n->holdMin),
+    holdMax(n->holdMax),
+    clusterMin(n->clusterMin),
+    clusterThreshold(n->clusterThreshold),
+    velocityMin(n->velocityMin),
+    velocityMax(n->velocityMax),
+    keyOnReset(n->keyOnReset),
+    targetTypeNostalgicClear(n->targetTypeNostalgicClear),
+    nUseGlobalSoundSet(n->nUseGlobalSoundSet),
+    nSoundSet(n->nSoundSet),
+    nSoundSetName(n->nSoundSetName)
     {
-        copy(p);
     }
     
     NostalgicPreparation(int waveDistance,
@@ -54,24 +81,30 @@ public:
     nWaveDistance(waveDistance),
     nUndertow(undertow),
     nTransposition(transposition),
+    nTranspUsesTuning(false),
     nLengthMultiplier(lengthMultiplier),
     nBeatsToSkip(beatsToSkip),
     nMode(mode),
+    nReverseAttack(30),
+    nReverseDecay(3),
+    nReverseRelease(50),
+    nReverseSustain(1.),
+    nUndertowAttack(50),
+    nUndertowDecay(3),
+    nUndertowRelease(2000),
+    nUndertowSustain(1.),
+    holdMin(0),
+    holdMax(12000),
+    clusterMin(1),
+    clusterThreshold(150),
+    velocityMin(0),
+    velocityMax(127),
+    keyOnReset(false),
+    targetTypeNostalgicClear(NoteOn),
     nUseGlobalSoundSet(true),
-    nSoundSet(-1)
+    nSoundSet(-1),
+    nSoundSetName(String())
     {
-        holdMin = 0;
-        holdMax = 12000;
-        
-        clusterMin = 1;
-        clusterThreshold = 150;
-        
-        velocityMin = 0;
-        velocityMax = 127;
-        
-        keyOnReset = false;
-        
-        nTranspUsesTuning = false;
     }
     
     NostalgicPreparation(void):
@@ -102,7 +135,8 @@ public:
     keyOnReset(false),
     targetTypeNostalgicClear(NoteOn),
     nUseGlobalSoundSet(true),
-    nSoundSet(-1)
+    nSoundSet(-1),
+    nSoundSetName(String())
     {
 
     }

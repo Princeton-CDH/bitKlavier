@@ -979,12 +979,12 @@ void SynchronicPreparationEditor::timerCallback()
             }
         }
         
-        if (prep->sGain.value != gainSlider->getValue()) gainSlider->setValue(prep->sGain.value, dontSendNotification);
-        if (prep->sBlendronicGain.value != blendronicGainSlider->getValue()) blendronicGainSlider->setValue(prep->sBlendronicGain.value, dontSendNotification);
-        if (prep->sNumBeats.value != howManySlider->getValue()) howManySlider->setValue(prep->sNumBeats.value, dontSendNotification);
-        if (prep->sClusterThresh.value != clusterThreshSlider->getValue()) clusterThreshSlider->setValue(prep->sClusterThresh.value, dontSendNotification);
-        if (prep->sClusterCap.value != clusterCapSlider->getValue()) clusterCapSlider->setValue(prep->sClusterCap.value, dontSendNotification);
-        if (prep->numClusters.value != numClusterSlider->getValue()) numClusterSlider->setValue(prep->numClusters.value, dontSendNotification);
+        if (prep->sGain.didChanged()) gainSlider->setValue(prep->sGain.value, dontSendNotification);
+        if (prep->sBlendronicGain.didChanged()) blendronicGainSlider->setValue(prep->sBlendronicGain.value, dontSendNotification);
+        if (prep->sNumBeats.didChanged()) howManySlider->setValue(prep->sNumBeats.value, dontSendNotification);
+        if (prep->sClusterThresh.didChanged()) clusterThreshSlider->setValue(prep->sClusterThresh.value, dontSendNotification);
+        if (prep->sClusterCap.didChanged()) clusterCapSlider->setValue(prep->sClusterCap.value, dontSendNotification);
+        if (prep->numClusters.didChanged()) numClusterSlider->setValue(prep->numClusters.value, dontSendNotification);
     }
 }
 

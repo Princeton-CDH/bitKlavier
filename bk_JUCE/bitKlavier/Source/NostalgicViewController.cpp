@@ -1158,41 +1158,43 @@ void NostalgicPreparationEditor::timerCallback()
                 }
             }
             
-            if (prep->nWaveDistance.active) nDisplaySlider.setWaveDistance(prep->nWaveDistance.value, dontSendNotification);
-            if (prep->nUndertow.active) nDisplaySlider.setUndertow(prep->nUndertow.value, dontSendNotification);
+            if (prep->nWaveDistance.didChanged()) nDisplaySlider.setWaveDistance(prep->nWaveDistance.value, dontSendNotification);
+            if (prep->nUndertow.didChanged()) nDisplaySlider.setUndertow(prep->nUndertow.value, dontSendNotification);
             
-            if (prep->nMode.active) lengthModeSelectCB.setSelectedItemIndex(prep->nMode.value, dontSendNotification);
+            if (prep->nMode.didChanged()) lengthModeSelectCB.setSelectedItemIndex(prep->nMode.value, dontSendNotification);
             
-            if (prep->nGain.value != gainSlider->getValue()) gainSlider->setValue(prep->nGain.value, dontSendNotification);
-            if (prep->nBlendronicGain.value != blendronicGainSlider->getValue()) blendronicGainSlider->setValue(prep->nBlendronicGain.value, dontSendNotification);
+            if (prep->nGain.didChanged()) gainSlider->setValue(prep->nGain.value, dontSendNotification);
+            if (prep->nBlendronicGain.didChanged()) blendronicGainSlider->setValue(prep->nBlendronicGain.value, dontSendNotification);
             
-            if (prep->nTransposition.active) transpositionSlider->setTo(prep->nTransposition.value, dontSendNotification);
-            if (prep->nLengthMultiplier.active) lengthMultiplierSlider->setValue(prep->nLengthMultiplier.value, dontSendNotification);
+            if (prep->nTransposition.didChanged()) transpositionSlider->setTo(prep->nTransposition.value, dontSendNotification);
             
-            if (prep->holdMin.active) holdTimeMinMaxSlider->setMinValue(prep->holdMin.value, dontSendNotification);
-            if (prep->holdMax.active) holdTimeMinMaxSlider->setMaxValue(prep->holdMax.value, dontSendNotification);
+            if (prep->nLengthMultiplier.didChanged()) lengthMultiplierSlider->setValue(prep->nLengthMultiplier.value, dontSendNotification);
             
-            if (prep->velocityMin.active) velocityMinMaxSlider->setMinValue(prep->velocityMin.value, dontSendNotification);
-            if (prep->velocityMax.active) velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, dontSendNotification);
+            if (prep->holdMin.didChanged()) holdTimeMinMaxSlider->setMinValue(prep->holdMin.value, dontSendNotification);
+            if (prep->holdMax.didChanged()) holdTimeMinMaxSlider->setMaxValue(prep->holdMax.value, dontSendNotification);
             
-            if (prep->clusterMin.value != clusterMinSlider->getValue()) clusterMinSlider->setValue(prep->clusterMin.value, dontSendNotification);
-            if (prep->clusterThreshold.value != clusterThresholdSlider->getValue()) clusterThresholdSlider->setValue(prep->clusterThreshold.value, dontSendNotification);
+            if (prep->velocityMin.didChanged()) velocityMinMaxSlider->setMinValue(prep->velocityMin.value, dontSendNotification);
+            if (prep->velocityMax.didChanged()) velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, dontSendNotification);
             
-            if (prep->keyOnReset.active) keyOnResetToggle.setToggleState(prep->keyOnReset.value, dontSendNotification);
+            if (prep->clusterMin.didChanged()) clusterMinSlider->setValue(prep->clusterMin.value, dontSendNotification);
             
-            if (prep->nBeatsToSkip.active) beatsToSkipSlider->setValue(prep->nBeatsToSkip.value, dontSendNotification);
+            if (prep->clusterThreshold.didChanged()) clusterThresholdSlider->setValue(prep->clusterThreshold.value, dontSendNotification);
             
-            if (prep->nTranspUsesTuning.active) transpUsesTuning.setToggleState(prep->nTranspUsesTuning.value, dontSendNotification);
+            if (prep->keyOnReset.didChanged()) keyOnResetToggle.setToggleState(prep->keyOnReset.value, dontSendNotification);
             
-            if (prep->nReverseAttack.active) reverseADSRSlider->setAttackValue(prep->nReverseAttack.value, dontSendNotification);
-            if (prep->nReverseDecay.active) reverseADSRSlider->setDecayValue(prep->nReverseDecay.value, dontSendNotification);
-            if (prep->nReverseSustain.active) reverseADSRSlider->setSustainValue(prep->nReverseSustain.value, dontSendNotification);
-            if (prep->nReverseRelease.active) reverseADSRSlider->setReleaseValue(prep->nReverseRelease.value, dontSendNotification);
+            if (prep->nBeatsToSkip.didChanged()) beatsToSkipSlider->setValue(prep->nBeatsToSkip.value, dontSendNotification);
             
-            if (prep->nUndertowAttack.active) undertowADSRSlider->setAttackValue(prep->nUndertowAttack.value, dontSendNotification);
-            if (prep->nUndertowDecay.active) undertowADSRSlider->setDecayValue(prep->nUndertowDecay.value, dontSendNotification);
-            if (prep->nUndertowSustain.active) undertowADSRSlider->setSustainValue(prep->nUndertowSustain.value, dontSendNotification);
-            if (prep->nUndertowRelease.active) undertowADSRSlider->setReleaseValue(prep->nUndertowRelease.value, dontSendNotification);
+            if (prep->nTranspUsesTuning.didChanged()) transpUsesTuning.setToggleState(prep->nTranspUsesTuning.value, dontSendNotification);
+            
+            if (prep->nReverseAttack.didChanged()) reverseADSRSlider->setAttackValue(prep->nReverseAttack.value, dontSendNotification);
+            if (prep->nReverseDecay.didChanged()) reverseADSRSlider->setDecayValue(prep->nReverseDecay.value, dontSendNotification);
+            if (prep->nReverseSustain.didChanged()) reverseADSRSlider->setSustainValue(prep->nReverseSustain.value, dontSendNotification);
+            if (prep->nReverseRelease.didChanged()) reverseADSRSlider->setReleaseValue(prep->nReverseRelease.value, dontSendNotification);
+            
+            if (prep->nUndertowAttack.didChanged()) undertowADSRSlider->setAttackValue(prep->nUndertowAttack.value, dontSendNotification);
+            if (prep->nUndertowDecay.didChanged()) undertowADSRSlider->setDecayValue(prep->nUndertowDecay.value, dontSendNotification);
+            if (prep->nUndertowSustain.didChanged()) undertowADSRSlider->setSustainValue(prep->nUndertowSustain.value, dontSendNotification);
+            if (prep->nUndertowRelease.didChanged()) undertowADSRSlider->setReleaseValue(prep->nUndertowRelease.value, dontSendNotification);
         }
     }
 }

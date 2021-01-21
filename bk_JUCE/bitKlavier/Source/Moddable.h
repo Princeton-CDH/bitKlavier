@@ -38,7 +38,9 @@ template <typename ValueType>
 class Moddable : public ModdableBase
 {
 public:
-    Moddable () = default;
+    // Maybe not safe to have default constructor. Initialization seems unreliable if we depend on this,
+    // so better to explicitly initialize all Moddables
+//    Moddable () = default;
     
     Moddable (ValueType v, int t, bool dB = false):
     value(v),
@@ -49,7 +51,8 @@ public:
     dv(v), // Make sure to properly calculate dv before (and if) it is needed
     n(0),
     maxN(0),
-    dB(dB)
+    dB(dB),
+    changed(false)
     {
         initInc(tag<ValueType>{});
     };
@@ -75,6 +78,10 @@ public:
         return !(base == m.base &&
                  time == m.time);
     }
+    
+    bool operator== (ValueType v) const noexcept { return value == v; }
+    
+    bool operator!= (ValueType v) const noexcept { return value != v; }
     
     Moddable& operator= (const Moddable&) = default;
     
@@ -200,12 +207,23 @@ public:
     int getNumberOfInc() override { return n; }
     int getMaxNumberOfInc() override { return maxN; }
     
+    bool didChanged()
+    {
+        if (changed)
+        {
+            changed = false;
+            return true;
+        }
+        return false;
+    }
+    
     //==============================================================================
     // Step
     void step()
     {
         if (!active) return;
         step(tag<ValueType>{});
+        changed = true;
         timeElapsed++;
     }
     
@@ -223,22 +241,15 @@ public:
     {
         if (dv > 0)
         {
-            if (value < mod) value += dv;
-            else
-            {
-                value = mod;
-                active = false;
-            }
+            if (value < mod - dv) value += dv;
+            else value = mod;
         }
         else if (dv < 0)
         {
-            if (value > mod) value += dv;
-            else
-            {
-                value = mod;
-                active = false;
-            }
+            if (value > mod - dv) value += dv;
+            else value = mod;
         }
+        if (value == mod) active = false;
     }
     void step(tag<float>) { step(tag<double>{}); }
     void step(tag<int>)
@@ -246,22 +257,15 @@ public:
         float p = 1.0f - (float(timeElapsed) / float(time));
         if (dv > 0)
         {
-            if (value < mod) value = mod - int(dv * p);
-            else
-            {
-                value = mod;
-                active = false;
-            }
+            if (value < mod - dv) value = mod - int(dv * p);
+            else value = mod;
         }
         else if (dv < 0)
         {
-            if (value > mod) value += dv;
-            else
-            {
-                value = mod;
-                active = false;
-            }
+            if (value > mod - dv) value = mod - int(dv * p);
+            else value = mod;
         }
+        if (value == mod) active = false;
     }
     
     //==============================================================================
@@ -528,5 +532,7 @@ private:
     int maxN;
     
     bool dB;
+    
+    bool changed;
 };
 

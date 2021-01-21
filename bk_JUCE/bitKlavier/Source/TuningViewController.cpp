@@ -1192,26 +1192,26 @@ void TuningViewController::timerCallback(void)
         }
 
         // replace the below with Mod flags, so that these aren't being updated all the time
-        if (prep->tFundamentalOffset.value != offsetSlider->getValue())
+        if (prep->tFundamentalOffset.didChanged())
             offsetSlider->setValue(prep->tFundamentalOffset.value, dontSendNotification);
-        if (prep->tAdaptiveClusterThresh.value != A1ClusterThresh->getValue())
+        if (prep->tAdaptiveClusterThresh.didChanged())
             A1ClusterThresh->setValue(prep->tAdaptiveClusterThresh.value, dontSendNotification);
-        if (prep->tAdaptiveHistory.value != A1ClusterMax->getValue())
+        if (prep->tAdaptiveHistory.didChanged())
             A1ClusterMax->setValue(prep->tAdaptiveHistory.value, dontSendNotification);
-        if (prep->nToneSemitoneWidth.value != nToneSemitoneWidthSlider->getValue())
+        if (prep->nToneSemitoneWidth.didChanged())
             nToneSemitoneWidthSlider->setValue(prep->nToneSemitoneWidth.value, dontSendNotification);
-        if (prep->getSpringTuning()->rate.value != rateSlider->getValue())
+        if (prep->getSpringTuning()->rate.didChanged())
             rateSlider->setValue(prep->getSpringTuning()->rate.value, dontSendNotification);
         // might need to check if spring tuning is active as well, turn on timer if needed
-        if (dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->drag.value, 100.) != dragSlider->getValue())
+        if (prep->getSpringTuning()->drag.didChanged())
             dragSlider->setValue(dt_asymwarp_inverse(1.0f - prep->getSpringTuning()->drag.value, 100.), dontSendNotification);
-        if (prep->getSpringTuning()->tetherStiffness.value != tetherStiffnessSlider->getValue())
+        if (prep->getSpringTuning()->tetherStiffness.didChanged())
             tetherStiffnessSlider->setValue(prep->getSpringTuning()->tetherStiffness.value, dontSendNotification);
-        if (prep->getSpringTuning()->intervalStiffness.value != intervalStiffnessSlider->getValue())
+        if (prep->getSpringTuning()->intervalStiffness.didChanged())
             intervalStiffnessSlider->setValue(prep->getSpringTuning()->intervalStiffness.value, dontSendNotification);
-        if (prep->getSpringTuning()->tetherWeightGlobal.value != tetherWeightGlobalSlider->getValue())
+        if (prep->getSpringTuning()->tetherWeightGlobal.didChanged())
             tetherWeightGlobalSlider->setValue(prep->getSpringTuning()->tetherWeightGlobal.value, dontSendNotification);
-        if (prep->getSpringTuning()->tetherWeightSecondaryGlobal.value != tetherWeightSecondaryGlobalSlider->getValue())
+        if (prep->getSpringTuning()->tetherWeightSecondaryGlobal.didChanged())
             tetherWeightSecondaryGlobalSlider->setValue(prep->getSpringTuning()->tetherWeightSecondaryGlobal.value, dontSendNotification);
 
     }

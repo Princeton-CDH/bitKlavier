@@ -111,14 +111,18 @@ void SpringTuning::resetModdables()
 
 SpringTuning::SpringTuning(SpringTuning::Ptr st):
 rate(100),
+stiffness(1.0),
 tetherStiffness(0.5),
 intervalStiffness(0.5),
 drag(.15),
 active(false),
+fundamentalSetsTether(true),
 tetherWeightGlobal(0.5),
 tetherWeightSecondaryGlobal(0.1),
 scaleId(JustTuning),
-usingFundamentalForIntervalSprings(false) //should be false by default
+intervalFundamental(PitchClass(12)),
+usingFundamentalForIntervalSprings(false), //should be false by default
+intervalFundamentalActive(PitchClass(12))
 {
     particleArray.ensureStorageAllocated(128);
     tetherParticleArray.ensureStorageAllocated(128);
@@ -132,9 +136,6 @@ usingFundamentalForIntervalSprings(false) //should be false by default
     for(int i=0; i<12; i++) springMode.insert(i, true);
     
     intervalTuning = Array<float>({0.0, 0.117313, 0.039101, 0.156414, -0.13686, -0.019547, -0.174873, 0.019547, 0.136864, -0.15641, -0.311745, -0.11731});
-    //intervalFundamental = PitchClass(C);
-    intervalFundamental = PitchClass(12);
-    intervalFundamentalActive = PitchClass(12);
     
     useLowestNoteForFundamental = false;
     useHighestNoteForFundamental = false;
@@ -183,7 +184,6 @@ usingFundamentalForIntervalSprings(false) //should be false by default
         tetherSpringArray.add(s);
 	}
     
-    setStiffness(1.0);
 	numNotes = 0;
     if (st != nullptr) copy(st);
     setDrag(drag.value);

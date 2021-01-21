@@ -32,9 +32,48 @@ public:
     typedef OwnedArray<SynchronicPreparation, CriticalSection> CSArr;
     
     // Copy Constructor
-    SynchronicPreparation(SynchronicPreparation::Ptr p)
+    SynchronicPreparation(SynchronicPreparation::Ptr s) :
+    sGain(s->sGain),
+    sBlendronicGain(s->sBlendronicGain),
+    sTempo(s->sTempo),
+    sNumBeats(s->sNumBeats),
+    sClusterMin(s->sClusterMin),
+    sClusterMax(s->sClusterMax),
+    sClusterCap(s->sClusterCap),
+    numClusters(s->numClusters),
+    holdMin(s->holdMin),
+    holdMax(s->holdMax),
+    velocityMin(s->velocityMin),
+    velocityMax(s->velocityMax),
+    sMode(s->sMode),
+    sBeatsToSkip(s->sBeatsToSkip),
+    onOffMode(s->onOffMode),
+    sBeatMultipliers(s->sBeatMultipliers),
+    sAccentMultipliers(s->sAccentMultipliers),
+    sLengthMultipliers(s->sLengthMultipliers),
+    sTransposition(s->sTransposition),
+    sBeatMultipliersStates(s->sBeatMultipliersStates),
+    sAccentMultipliersStates(s->sAccentMultipliersStates),
+    sLengthMultipliersStates(s->sLengthMultipliersStates),
+    sTranspositionStates(s->sTranspositionStates),
+    sTranspUsesTuning(s->sTranspUsesTuning),
+    sADSRs(s->sADSRs),
+    sClusterThresh(s->sClusterThresh),
+    sClusterThreshSec(s->sClusterThreshSec),
+    sReleaseVelocitySetsSynchronic(s->sReleaseVelocitySetsSynchronic),
+    midiOutput(s->midiOutput),
+    sUseGlobalSoundSet(s->sUseGlobalSoundSet),
+    sSoundSet(s->sSoundSet),
+    sSoundSetName(s->sSoundSetName),
+    targetTypeSynchronicPatternSync(s->getTargetTypeSynchronicPatternSync()),
+    targetTypeSynchronicBeatSync(s->getTargetTypeSynchronicBeatSync()),
+    targetTypeSynchronicAddNotes(s->getTargetTypeSynchronicAddNotes()),
+    targetTypeSynchronicPausePlay(s->getTargetTypeSynchronicPausePlay()),
+    targetTypeSynchronicClear(s->getTargetTypeSynchronicClear()),
+    targetTypeSynchronicDeleteOldest(s->getTargetTypeSynchronicDeleteOldest()),
+    targetTypeSynchronicDeleteNewest(s->getTargetTypeSynchronicDeleteNewest()),
+    targetTypeSynchronicRotate(s->getTargetTypeSynchronicRotate())
     {
-        copy(p);
     }
     
                         
@@ -49,6 +88,9 @@ public:
                           Array<float> accentMultipliers,
                           Array<float> lengthMultipliers,
                           Array<Array<float>> transp):
+    sGain(1.0f),
+    sBlendronicGain(1.0f),
+    sTempo(120),
     sNumBeats(numBeats),
     sClusterMin(clusterMin),
     sClusterMax(clusterMax),
@@ -70,12 +112,14 @@ public:
     sLengthMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
     sTranspositionStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
     sTranspUsesTuning(false),
+    sADSRs(Array<Array<float>>(0.0f)),
     sClusterThresh(clusterThresh),
     sClusterThreshSec(.001 * sClusterThresh.base),
     sReleaseVelocitySetsSynchronic(velocityMode),
     midiOutput(nullptr),
     sUseGlobalSoundSet(true),
     sSoundSet(-1),
+    sSoundSetName(String()),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
@@ -85,13 +129,21 @@ public:
     targetTypeSynchronicDeleteNewest(NoteOn),
     targetTypeSynchronicRotate(NoteOn)
     {
-
+        Array<Array<float>> aa;
+        for (int i = 0; i < 12; ++i)
+        {
+            // A D S R active
+            Array<float> a(3, 3, 1, 30, float(i == 0));
+            aa.add(a);
+        }
+        sADSRs.set(aa);
     }
 
     
     SynchronicPreparation(void):
     sGain(0.0, true),
     sBlendronicGain(0.0, true),
+    sTempo(120.f),
     sNumBeats(20),
     sClusterMin(1),
     sClusterMax(12),
@@ -107,16 +159,20 @@ public:
     sBeatMultipliers(Array<float>({1.0})),
     sAccentMultipliers(Array<float>({1.0})),
     sLengthMultipliers(Array<float>({1.0})),
+    sTransposition(Array<Array<float>>(0.0f)),
     sBeatMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
     sAccentMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
     sLengthMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
     sTranspositionStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
     sTranspUsesTuning(false),
+    sADSRs(Array<Array<float>>(0.0f)),
     sClusterThresh(500),
     sClusterThreshSec(.001 * sClusterThresh.base),
+    sReleaseVelocitySetsSynchronic(false),
     midiOutput(nullptr),
     sUseGlobalSoundSet(true),
     sSoundSet(-1),
+    sSoundSetName(String()),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),

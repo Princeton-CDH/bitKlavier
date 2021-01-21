@@ -43,7 +43,7 @@ void TuningPreparation::performModification(TuningModification* p, Array<bool> d
     
     stuning->performModification(p->getSpringTuning(), dirty, reverse);
     
-    if (adaptiveType == AdaptiveSpring)
+    if (adaptiveType.value == AdaptiveSpring)
     {
         stuning->setActive(true);
     }

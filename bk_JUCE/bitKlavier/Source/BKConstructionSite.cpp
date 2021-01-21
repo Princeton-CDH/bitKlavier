@@ -203,7 +203,7 @@ void BKConstructionSite::startConnection(int x, int y)
 {
     itemSource = graph->getSelectedItems().getFirst();
     
-    if (itemSource != nullptr)
+    if (itemSource != nullptr && itemSource->getType() != PreparationTypeComment)
     {
         connect = true;
         

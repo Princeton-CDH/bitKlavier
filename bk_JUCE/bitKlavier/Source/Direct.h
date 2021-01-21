@@ -1,12 +1,12 @@
 /*
-  ==============================================================================
-
-    Direct.h
-    Created: 6 Dec 2016 12:46:37pm
-    Author:  Michael R Mulshine
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ Direct.h
+ Created: 6 Dec 2016 12:46:37pm
+ Author:  Michael R Mulshine
+ 
+ ==============================================================================
+ */
 
 #ifndef DIRECT_H_INCLUDED
 #define DIRECT_H_INCLUDED
@@ -20,15 +20,15 @@
 class DirectModification;
 
 /*
-DirectPreparation holds all the state variable values for the
-Direct preparation. As with other preparation types, bK will use
-two instantiations of DirectPreparation for every active
-Direct in the gallery, one to store the static state of the
-preparation, and the other to store the active state. These will
-be the same, unless a Modification is triggered, in which case the
-active state will be changed (and a Reset will revert the active state
-to the static state).
-*/
+ DirectPreparation holds all the state variable values for the
+ Direct preparation. As with other preparation types, bK will use
+ two instantiations of DirectPreparation for every active
+ Direct in the gallery, one to store the static state of the
+ preparation, and the other to store the active state. These will
+ be the same, unless a Modification is triggered, in which case the
+ active state will be changed (and a Reset will revert the active state
+ to the static state).
+ */
 
 class DirectPreparation : public ReferenceCountedObject
 {
@@ -39,9 +39,23 @@ public:
     typedef OwnedArray<DirectPreparation>                  Arr;
     typedef OwnedArray<DirectPreparation, CriticalSection> CSArr;
     
-    DirectPreparation(DirectPreparation::Ptr p)
+    DirectPreparation(DirectPreparation::Ptr d) :
+    dGain(d->dGain),
+    dResonanceGain(d->dResonanceGain),
+    dHammerGain(d->dHammerGain),
+    dBlendronicGain(d->dBlendronicGain),
+    dAttack(d->dAttack),
+    dDecay(d->dDecay),
+    dRelease(d->dRelease),
+    dSustain(d->dSustain),
+    dTransposition(d->dTransposition),
+    dTranspUsesTuning(d->dTranspUsesTuning),
+    dUseGlobalSoundSet(d->dUseGlobalSoundSet),
+    dSoundSet(d->getSoundSet()),
+    dSoundSetName(d->dSoundSetName),
+    velocityMin(d->velocityMin),
+    velocityMax(d->velocityMax)
     {
-        copy(p);
     }
     
     DirectPreparation(Array<float> transp,
@@ -64,6 +78,7 @@ public:
     dRelease(rel),
     dSustain(sust),
     dTransposition(transp),
+    dTranspUsesTuning(false),
     dUseGlobalSoundSet(true),
     dSoundSet(-1),
     dSoundSetName(String()),
@@ -178,22 +193,22 @@ public:
     inline bool compare(DirectPreparation::Ptr d)
     {
         return  (dTransposition         ==      d->dTransposition       )   &&
-                (dTranspUsesTuning      ==      d->dTranspUsesTuning    )   &&
-                (dGain                  ==      d->dGain           )   &&
-                (dResonanceGain         ==      d->dResonanceGain  )   &&
-                (dHammerGain            ==      d->dHammerGain     )   &&
-                (dBlendronicGain        ==      d->dBlendronicGain )   &&
-                (dAttack                ==      d->dAttack         )   &&
-                (dDecay                 ==      d->dDecay          )   &&
-                (dSustain               ==      d->dSustain        )   &&
-                (dRelease               ==      d->dRelease        )   ;
+        (dTranspUsesTuning      ==      d->dTranspUsesTuning    )   &&
+        (dGain                  ==      d->dGain           )   &&
+        (dResonanceGain         ==      d->dResonanceGain  )   &&
+        (dHammerGain            ==      d->dHammerGain     )   &&
+        (dBlendronicGain        ==      d->dBlendronicGain )   &&
+        (dAttack                ==      d->dAttack         )   &&
+        (dDecay                 ==      d->dDecay          )   &&
+        (dSustain               ==      d->dSustain        )   &&
+        (dRelease               ==      d->dRelease        )   ;
     }
     
     // for unit-testing
     inline void randomize(void)
     {
-		Random::getSystemRandom().setSeedRandomly();
-
+        Random::getSystemRandom().setSeedRandomly();
+        
         float r[20];
         
         for (int i = 0; i < 20; i++)    r[i] = (Random::getSystemRandom().nextFloat());
@@ -202,7 +217,7 @@ public:
         Array<float> dt;
         for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
         {
-			dt.add(i, (Random::getSystemRandom().nextFloat() * 48.0f - 24.0f));
+            dt.add(i, (Random::getSystemRandom().nextFloat() * 48.0f - 24.0f));
         }
         dTransposition.set(dt);
         
@@ -226,7 +241,7 @@ public:
     
     inline const Array<float> getADSRvals() const noexcept
     { return {(float) dAttack.value, (float) dDecay.value,(float) dSustain.value, (float)dRelease.value}; }
-
+    
     inline void setTranspUsesTuning(bool val)         { dTranspUsesTuning = val;}
     inline void setADSRvals(Array<float> vals)
     {
@@ -234,7 +249,7 @@ public:
         dDecay = vals[1];
         dSustain = vals[2];
         dRelease = vals[3];
-    }    
+    }
     
     void print(void)
     {
@@ -252,7 +267,7 @@ public:
     ValueTree getState(void)
     {
         ValueTree prep( "params" );
-    
+        
         dGain.getState(prep, ptagDirect_gain);
         dResonanceGain.getState(prep, ptagDirect_resGain);
         dHammerGain.getState(prep, ptagDirect_hammerGain);
@@ -308,7 +323,7 @@ public:
     
     void setSoundSet(int Id) { dSoundSet = Id; }
     int getSoundSet() { return dUseGlobalSoundSet.value ? -1 : dSoundSet.value; }
-
+    
     bool modded = false;
     
     // output gain multiplier
@@ -368,8 +383,8 @@ public:
     Id(Id),
     name("Direct "+String(Id))
     {
-		prep = new DirectPreparation();
-		if (random) randomize();
+        prep = new DirectPreparation();
+        if (random) randomize();
     };
     
     inline void clear(void)
@@ -433,15 +448,15 @@ public:
     {
         prep->copy(from->prep);
     }
-
-	inline void randomize()
-	{
-		clear();
-		Random::getSystemRandom().setSeedRandomly();
-		prep->randomize();
-		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
-		name = "random";
-	}
+    
+    inline void randomize()
+    {
+        clear();
+        Random::getSystemRandom().setSeedRandomly();
+        prep->randomize();
+        Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
+        name = "random";
+    }
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName)
@@ -458,11 +473,11 @@ private:
 
 
 /*
-DirectProcessor does the main work, including processing a block
-of samples and sending it out. It connects Keymap, Tuning, and
-Blendronic preparations together as needed, and gets the Direct
-values it needs to behave as expected.
-*/
+ DirectProcessor does the main work, including processing a block
+ of samples and sending it out. It connects Keymap, Tuning, and
+ Blendronic preparations together as needed, and gets the Direct
+ values it needs to behave as expected.
+ */
 
 class DirectProcessor : public ReferenceCountedObject
 {
@@ -483,7 +498,7 @@ public:
     
     BKSampleLoadType sampleType;
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
-
+    
     void    keyPressed(int noteNumber, float velocity, int channel);
     void    keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false);
     void    playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont = false);
@@ -498,7 +513,7 @@ public:
     inline void reset(void)
     {
         direct->prep->resetModdables();
-        DBG("direct reset called"); 
+        DBG("direct reset called");
     }
     
     inline int getId(void) const noexcept { return direct->getId(); }
@@ -512,16 +527,16 @@ public:
     {
         return tuner;
     }
-
-	inline void addBlendronic(BlendronicProcessor::Ptr blend)
-	{
-		blendronic.add(blend);
-	}
-
-	inline BlendronicProcessor::PtrArr getBlendronic(void)
-	{
-		return blendronic;
-	}
+    
+    inline void addBlendronic(BlendronicProcessor::Ptr blend)
+    {
+        blendronic.add(blend);
+    }
+    
+    inline BlendronicProcessor::PtrArr getBlendronic(void)
+    {
+        return blendronic;
+    }
     
     inline void addKeymap(Keymap::Ptr keymap)
     {
@@ -536,7 +551,7 @@ public:
     inline float getLastVelocity() const noexcept { return lastVelocity; }
     
     bool velocityCheck(int noteNumber);
-
+    
 private:
     BKSynthesiser*      synth;
     BKSynthesiser*      resonanceSynth;
@@ -544,7 +559,7 @@ private:
     
     Direct::Ptr             direct;
     TuningProcessor::Ptr    tuner;
-	BlendronicProcessor::PtrArr blendronic;
+    BlendronicProcessor::PtrArr blendronic;
     
     Keymap::PtrArr      keymaps;
     
@@ -563,3 +578,4 @@ private:
 };
 
 #endif  // DIRECT_H_INCLUDED
+

@@ -31,9 +31,16 @@ public:
     typedef OwnedArray<TempoPreparation, CriticalSection> CSArr;
     
     // Copy Constructor
-    TempoPreparation(TempoPreparation::Ptr p)
+    TempoPreparation(TempoPreparation::Ptr s) :
+    sWhichTempoSystem(s->getTempoSystem()),
+    sTempo(s->getTempo()),
+    subdivisions(s->getSubdivisions()),
+    at1History(s->getAdaptiveTempo1History()),
+    at1Min(s->getAdaptiveTempo1Min()),
+    at1Max(s->getAdaptiveTempo1Max()),
+    at1Subdivisions(s->getAdaptiveTempo1Subdivisions()),
+    at1Mode(s->getAdaptiveTempo1Mode())
     {
-        copy(p);
     }
     
     TempoPreparation():
@@ -46,7 +53,6 @@ public:
     at1Subdivisions(1.0f),
     at1Mode(TimeBetweenNotes)
     {
-        
     }
     
     inline void copy(TempoPreparation::Ptr s)

@@ -1052,6 +1052,8 @@ void BKItemGraph::print(void)
 
 bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType type2)
 {
+    if (type1 == PreparationTypeComment || type2 == PreparationTypeComment) return false;
+    
     if (type1 == PreparationTypeDirect)
     {
         if (type2 == PreparationTypeKeymap ||

@@ -116,9 +116,9 @@ isInRampOn (false), isInRampOff (false)
     sampleEnv.setSampleRate(currentSampleRate);
     loopEnv.setSampleRate(currentSampleRate);
     gainEnv.setSampleRate(currentSampleRate);
-    gainEnv.setTime(7.0f);
+    gainEnv.setTime(10.0f);
     bGainEnv.setSampleRate(currentSampleRate);
-    bGainEnv.setTime(7.0f);
+    bGainEnv.setTime(10.0f);
 }
 
 BKPianoSamplerVoice::~BKPianoSamplerVoice()

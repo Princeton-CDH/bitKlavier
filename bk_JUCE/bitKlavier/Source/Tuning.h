@@ -44,6 +44,7 @@ public:
     tAbsolute(p->getAbsoluteOffsets()),
     nToneSemitoneWidth(p->getNToneSemitoneWidth()),
     nToneRoot(p->getNToneRoot()),
+    adaptiveType(p->getAdaptiveType()),
     stuning(new SpringTuning(p->getSpringTuning()))
     {
 
@@ -220,13 +221,26 @@ public:
     tAdaptiveClusterThresh(adaptiveClusterThresh),
     tAdaptiveHistory(adaptiveHistory),
     tCustom(customScale),
+    tAbsolute(Array<float>()),
     nToneSemitoneWidth(semitoneWidth),
     nToneRoot(semitoneRoot),
+    adaptiveType(AdaptiveNone),
     stuning(new SpringTuning(st))
     {
         Array<float> arr;
         for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(0.);
         tAbsolute.set(arr);
+        
+        if (tScale.value == AdaptiveTuning)
+        {
+            setAdaptiveType(AdaptiveNormal);
+            setScale(EqualTemperament);
+        }
+        else if (tScale.value == AdaptiveAnchoredTuning)
+        {
+            setAdaptiveType(AdaptiveAnchored);
+            setScale(EqualTemperament);
+        }
     }
     
     TuningPreparation(void):
@@ -240,8 +254,10 @@ public:
     tAdaptiveClusterThresh(100),
     tAdaptiveHistory(4),
     tCustom({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}),
+    tAbsolute(Array<float>()),
     nToneSemitoneWidth(100),
     nToneRoot(60),
+    adaptiveType(AdaptiveNone),
     stuning(new SpringTuning())
     {
         Array<float> arr;
