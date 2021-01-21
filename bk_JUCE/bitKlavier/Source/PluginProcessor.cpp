@@ -601,6 +601,24 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
     if (pmap == nullptr) return;
     
+    // Check PianoMap for whether piano should change due to key strike.
+    for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
+    {
+        for (auto keymap : pmap.keymaps)
+        {
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                int whichPiano = pmap.pianoTarget;
+                if (whichPiano > 0 && whichPiano != currentPiano->getId())
+                {
+                    DBG("change piano to " + String(whichPiano));
+                    setCurrentPiano(whichPiano);
+                }
+                break;
+            }
+        }
+    }
+    
     // This array will hold all the notes to play based on harmonization without duplicates
     Array<int> reducedHarm;
     // Go through all the keymaps
@@ -610,6 +628,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
         if (km->getAllMidiInputIdentifiers().contains(source))
         {
             activeSource = true;
+            
             if (!postHarmonizer) // First pass, haven't resolved harmonization yet
             {
                 // Handle keymap midi editing preharmonization and without checking keymap notes
@@ -681,6 +700,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
     if (!activeSource) return;
     
+    /*
     // Check PianoMap for whether piano should change due to key strike.
     for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
     {
@@ -698,6 +718,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             }
         }
     }
+     */
     
     // modifications
     performResets(noteNumber, source);
