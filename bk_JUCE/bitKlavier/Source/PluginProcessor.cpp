@@ -602,17 +602,19 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     if (pmap == nullptr) return;
     
     // Check PianoMap for whether piano should change due to key strike.
-    for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
+    for (auto mpmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
     {
-        for (auto keymap : pmap.keymaps)
+        for (auto keymap : mpmap.keymaps)
         {
             if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
-                int whichPiano = pmap.pianoTarget;
+                int whichPiano = mpmap.pianoTarget;
                 if (whichPiano > 0 && whichPiano != currentPiano->getId())
                 {
                     DBG("change piano to " + String(whichPiano));
                     setCurrentPiano(whichPiano);
+                    
+                    pmap = currentPiano->getPreparationMap();
                 }
                 break;
             }
