@@ -477,38 +477,6 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
     if (checkForReattack) attemptReattack(noteNumber, mappedFrom, source);
     
     //put ignoreSustain condition in front of keyRelease calls
-
-    for (auto proc : bprocessor)
-    {
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        // For each keymap
-        for (auto km : proc->getKeymaps())
-        {
-            // First check that the the keymap contain the pressed note and uses the midi source of the note
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                // targetStates will refer to press or release depending on inversion
-                targetStates = &pressTargetStates;
-                if (km->isInverted()) targetStates = &releaseTargetStates;
-                
-                // If the keymap has a target enabled, enable that target in targetStates
-                for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
-                {
-                    if (km->getTargetStates()[i] == TargetStateEnabled)
-                        targetStates->set(i, TargetStateEnabled);
-                }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
-            }
-        }
-        // If there are any targets enabled, do the press and/or release
-        if (pressTargetStates.contains(TargetStateEnabled)) {
-            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
-            pressTargetStates.fill(TargetStateNil); /* reset for the next processor */}
-        if (releaseTargetStates.contains(TargetStateEnabled)) {
-            if (ignoreSustain && !noteDown)
-                proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
-            releaseTargetStates.fill(TargetStateNil); /* reset for the next processor */}
-    }
     
     for (auto proc : tprocessor)
     {
@@ -556,6 +524,38 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
             if (ignoreSustain && !noteDown)
                 proc->keyReleased(noteNumber, channel);
             releaseTargetStates.fill(TargetStateNil); }
+    }
+    
+    for (auto proc : bprocessor)
+    {
+        bool ignoreSustain = !sustainPedalIsDepressed;
+        // For each keymap
+        for (auto km : proc->getKeymaps())
+        {
+            // First check that the the keymap contain the pressed note and uses the midi source of the note
+            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            {
+                // targetStates will refer to press or release depending on inversion
+                targetStates = &pressTargetStates;
+                if (km->isInverted()) targetStates = &releaseTargetStates;
+                
+                // If the keymap has a target enabled, enable that target in targetStates
+                for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+                {
+                    if (km->getTargetStates()[i] == TargetStateEnabled)
+                        targetStates->set(i, TargetStateEnabled);
+                }
+                if (km->getIgnoreSustain()) ignoreSustain = true;
+            }
+        }
+        // If there are any targets enabled, do the press and/or release
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
+            pressTargetStates.fill(TargetStateNil); /* reset for the next processor */}
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            if (ignoreSustain && !noteDown)
+                proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
+            releaseTargetStates.fill(TargetStateNil); /* reset for the next processor */}
     }
     
     for (auto proc : dprocessor)
