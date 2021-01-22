@@ -596,8 +596,10 @@ void BKAudioProcessor::renameGallery(String newName)
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool postHarmonizer)
 {
     
+    
     bool activeSource = false;
     
+    /*
     // Check PianoMap for whether piano should change due to key strike.
     for (auto mpmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
     {
@@ -615,6 +617,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             }
         }
     }
+     */
     
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     if (pmap == nullptr) return;
@@ -682,6 +685,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
         // Now call this function for each post harmonization note
         for (auto h : reducedHarm)
         {
+            DBG("BKAudioProcessor::handleNoteOn noteOn");
             handleNoteOn(h, velocity, channel, noteNumber, source, true);
         }
         return; // Done with the first pass
@@ -700,7 +704,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
     if (!activeSource) return;
     
-    /*
+    
     // Check PianoMap for whether piano should change due to key strike.
     for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
     {
@@ -718,7 +722,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             }
         }
     }
-     */
+    
     
     // modifications
     performResets(noteNumber, source);
@@ -1002,6 +1006,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 	{
 		//if (keystrokesEnabled.getValue())
         int note = notesOnUI.getUnchecked(i);
+        DBG("BKAudioProcessor::processBlock noteOn");
         handleNoteOn(note, 0.6, channel, note, cMidiInputUI);
 		notesOnUI.remove(i);
 	}
@@ -1842,6 +1847,7 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     
     if (m.isNoteOn()) //&& keystrokesEnabled.getValue())
     {
+        DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn");
         handleNoteOn(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
     }
     else if (m.isNoteOff())

@@ -225,7 +225,7 @@ namespace BinaryData
     const int            NS_1_Prelude_xmlSize = 65826;
 
     extern const char*   NS_2_Undertow_xml;
-    const int            NS_2_Undertow_xmlSize = 61095;
+    const int            NS_2_Undertow_xmlSize = 207130;
 
     extern const char*   NS_3_Song_xml;
     const int            NS_3_Song_xmlSize = 65823;
