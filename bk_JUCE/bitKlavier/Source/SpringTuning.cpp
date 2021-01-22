@@ -58,19 +58,33 @@ void SpringTuning::performModification(SpringTuning::Ptr st, Array<bool> dirty, 
 {
     // DBG("SpringTuning::performModification called!!");
     if (dirty[TuningSpringRate]) rate.modify(st->rate, reverse);
-    if (dirty[TuningSpringStiffness]) stiffness.modify(st->stiffness, reverse);
+    
+    if (dirty[TuningSpringStiffness])
+    {
+        if (stiffness.modify(st->stiffness, reverse))
+            setStiffness(stiffness.value);
+    }
+    
     if (dirty[TuningSpringActive]) active.modify(st->active, reverse);
     if (dirty[TuningSpringDrag]) drag.modify(st->drag, reverse);
     
-    if (dirty[TuningSpringIntervalStiffness]) intervalStiffness.modify(st->intervalStiffness, reverse);
-    if (dirty[TuningSpringTetherStiffness]) tetherStiffness.modify(st->tetherStiffness, reverse);
+    if (dirty[TuningSpringIntervalStiffness])
+    {
+        if (intervalStiffness.modify(st->intervalStiffness, reverse))
+            setIntervalStiffness(intervalStiffness.value);
+    }
+    if (dirty[TuningSpringTetherStiffness])
+    {
+        if (tetherStiffness.modify(st->tetherStiffness, reverse))
+            setTetherStiffness(tetherStiffness.value);
+    }
     
     if (dirty[TuningSpringIntervalScale]) scaleId.modify(st->scaleId, reverse);
     
     if (dirty[TuningSpringIntervalFundamental])
     {
-        intervalFundamental.modify(st->intervalFundamental, reverse);
-        intervalFundamentalChanged();
+        if (intervalFundamental.modify(st->intervalFundamental, reverse))
+            intervalFundamentalChanged();
     }
     //setUsingFundamentalForIntervalSprings(st->getUsingFundamentalForIntervalSprings());
     
@@ -82,13 +96,13 @@ void SpringTuning::performModification(SpringTuning::Ptr st, Array<bool> dirty, 
 void SpringTuning::stepModdables()
 {
     rate.step();
-    stiffness.step();
+    if (stiffness.step()) setStiffness(stiffness.value);
     active.step();
     drag.step();
-    intervalStiffness.step();
-    tetherStiffness.step();
+    if (intervalStiffness.step()) setIntervalStiffness(intervalStiffness.value);
+    if (tetherStiffness.step()) setTetherStiffness(tetherStiffness.value);
     scaleId.step();
-    intervalFundamental.step();
+    if (intervalFundamental.step()) intervalFundamentalChanged();
     fundamentalSetsTether.step();
     tetherWeightGlobal.step();
     tetherWeightSecondaryGlobal.step();
@@ -98,12 +112,16 @@ void SpringTuning::resetModdables()
 {
     rate.reset();
     stiffness.reset();
+    setStiffness(stiffness.value);
     active.reset();
     drag.reset();
     intervalStiffness.reset();
+    setIntervalStiffness(intervalStiffness.value);
     tetherStiffness.reset();
+    setTetherStiffness(tetherStiffness.value);
     scaleId.reset();
     intervalFundamental.reset();
+    intervalFundamentalChanged();
     fundamentalSetsTether.reset();
     tetherWeightGlobal.reset();
     tetherWeightSecondaryGlobal.reset();

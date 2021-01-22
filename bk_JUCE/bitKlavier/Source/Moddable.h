@@ -98,37 +98,33 @@ public:
     
     //==============================================================================
     
-    void modify(Moddable& m, bool reverse)
+    // Modify this Moddable based on the mod value of another Moddable
+    // return true if this Moddable's value changed directly from this function (time == 0 mod)
+    // otherwise return false (time > 0 mod)
+    bool modify(Moddable& m, bool reverse)
     {
-        if (reverse)
-        {
-            mod = base;
-            time = m.time;
-            modTo(tag<ValueType>{}, m, false);
-            return;
-        }
-        mod = m.base;
-        time = m.time;
-        modTo(tag<ValueType>{}, m, true);
+        mod = reverse ? base : m.base;
+        return modTo(tag<ValueType>{}, m, !reverse);
     }
     
     // The minimal behavior for modTo
     // For special behaviors overload this below with a specific tag
     // as has been done for double, int, and float
     template<class T = ValueType>
-    void modTo(tag<T>, Moddable& m, bool shouldInc)
+    bool modTo(tag<T>, Moddable& m, bool shouldInc)
     {
         if (time > 0)
         {
             active = true;
             timeElapsed = 0;
-            return;
+            return false;
         }
         value = mod;
         active = false;
+        return true;
     }
     
-    void modTo(tag<double>, Moddable& m, bool shouldInc)
+    bool modTo(tag<double>, Moddable& m, bool shouldInc)
     {
         if (shouldInc)
         {
@@ -141,13 +137,14 @@ public:
             calcDV(tag<ValueType>{});
             active = true; //active = m.active;
             timeElapsed = 0;
-            return;
+            return false;
         }
         value = mod;
         active = false;
+        return true;
     }
-    void modTo(tag<float>, Moddable& m, bool shouldInc) { modTo(tag<double>{}, m, shouldInc); }
-    void modTo(tag<int>, Moddable& m, bool shouldInc) { modTo(tag<double>{}, m, shouldInc); }
+    bool modTo(tag<float>, Moddable& m, bool shouldInc) { return modTo(tag<double>{}, m, shouldInc); }
+    bool modTo(tag<int>, Moddable& m, bool shouldInc) { return modTo(tag<double>{}, m, shouldInc); }
     
     //==============================================================================
     
@@ -219,12 +216,13 @@ public:
     
     //==============================================================================
     // Step
-    void step()
+    bool step()
     {
-        if (!active) return;
+        if (!active) return false;
         step(tag<ValueType>{});
         changed = true;
         timeElapsed++;
+        return true;
     }
     
     template<class T = ValueType>

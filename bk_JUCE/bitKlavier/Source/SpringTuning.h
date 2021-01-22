@@ -353,11 +353,15 @@ public:
         drag.setState(e, "drag", 0.1);
         
         stiffness.setState(e, "stiffness", 1.0);
+        setStiffness(stiffness.value);
         tetherStiffness.setState(e, "tetherStiffness", 0.5);
+        setTetherStiffness(tetherStiffness.value);
         intervalStiffness.setState(e, "intervalStiffness", 0.5);
+        setIntervalStiffness(intervalStiffness.value);
         
         scaleId.setState(e, "intervalTuningId", JustTuning);
         intervalFundamental.setState(e, "intervalFundamental", C);
+        intervalFundamentalChanged();
         fundamentalSetsTether.setState(e, "fundamentalSetsTether", false);
         tetherWeightGlobal.setState(e, "tetherWeightGlobal", 0.5);
         tetherWeightSecondaryGlobal.setState(e, "tetherWeightSecondaryGlobal", 0.1);

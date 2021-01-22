@@ -116,7 +116,6 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
         return lastNoteOffset;
     }
 
-    tuning->prep->print();
     //else do regular tunings
     Array<float> currentTuning;
     if(tuning->prep->getScale() == CustomTuning)
