@@ -62,7 +62,7 @@ void SpringTuning::performModification(SpringTuning::Ptr st, Array<bool> dirty, 
     if (dirty[TuningSpringStiffness])
     {
         if (stiffness.modify(st->stiffness, reverse))
-            setStiffness(stiffness.value);
+            stiffnessChanged();
     }
     
     if (dirty[TuningSpringActive]) active.modify(st->active, reverse);
@@ -71,12 +71,12 @@ void SpringTuning::performModification(SpringTuning::Ptr st, Array<bool> dirty, 
     if (dirty[TuningSpringIntervalStiffness])
     {
         if (intervalStiffness.modify(st->intervalStiffness, reverse))
-            setIntervalStiffness(intervalStiffness.value);
+            intervalStiffnessChanged();
     }
     if (dirty[TuningSpringTetherStiffness])
     {
         if (tetherStiffness.modify(st->tetherStiffness, reverse))
-            setTetherStiffness(tetherStiffness.value);
+            tetherStiffnessChanged();
     }
     
     if (dirty[TuningSpringIntervalScale]) scaleId.modify(st->scaleId, reverse);
@@ -96,11 +96,11 @@ void SpringTuning::performModification(SpringTuning::Ptr st, Array<bool> dirty, 
 void SpringTuning::stepModdables()
 {
     rate.step();
-    if (stiffness.step()) setStiffness(stiffness.value);
+    if (stiffness.step()) stiffnessChanged();
     active.step();
     drag.step();
-    if (intervalStiffness.step()) setIntervalStiffness(intervalStiffness.value);
-    if (tetherStiffness.step()) setTetherStiffness(tetherStiffness.value);
+    if (intervalStiffness.step()) intervalStiffnessChanged();
+    if (tetherStiffness.step()) tetherStiffnessChanged();
     scaleId.step();
     if (intervalFundamental.step()) intervalFundamentalChanged();
     fundamentalSetsTether.step();
@@ -112,13 +112,13 @@ void SpringTuning::resetModdables()
 {
     rate.reset();
     stiffness.reset();
-    setStiffness(stiffness.value);
+    stiffnessChanged();
     active.reset();
     drag.reset();
     intervalStiffness.reset();
-    setIntervalStiffness(intervalStiffness.value);
+    intervalStiffnessChanged();
     tetherStiffness.reset();
-    setTetherStiffness(tetherStiffness.value);
+    tetherStiffnessChanged();
     scaleId.reset();
     intervalFundamental.reset();
     intervalFundamentalChanged();

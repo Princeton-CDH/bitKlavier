@@ -97,31 +97,44 @@ public:
     inline void setStiffness(double stiff)
     {
         stiffness = stiff;
-        
-        for (auto spring : enabledSpringArray)
-        {
-            spring->setStiffness(stiffness.value);
-        }
-        
-        for (auto spring : tetherSpringArray)
-        {
-            spring->setStiffness(stiffness.value);
-        }
+        stiffnessChanged();
     }
     
     inline void setTetherStiffness(double stiff)
     {
         tetherStiffness = stiff;
-        for (auto spring : tetherSpringArray)
-        {
-            spring->setStiffness(tetherStiffness.value);
-        }
+        tetherStiffnessChanged();
     }
     
     inline void setIntervalStiffness(double stiff)
     {
         intervalStiffness = stiff;
-        
+        intervalStiffnessChanged();
+    }
+
+    void stiffnessChanged()
+    {
+        for (auto spring : enabledSpringArray)
+        {
+            spring->setStiffness(stiffness.value);
+        }
+
+        for (auto spring : tetherSpringArray)
+        {
+            spring->setStiffness(stiffness.value);
+        }
+    }
+
+    void tetherStiffnessChanged()
+    {
+        for (auto spring : tetherSpringArray)
+        {
+            spring->setStiffness(tetherStiffness.value);
+        }
+    }
+
+    void intervalStiffnessChanged()
+    {
         for (auto spring : enabledSpringArray)
         {
             spring->setStiffness(intervalStiffness.value);
