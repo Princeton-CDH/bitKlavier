@@ -1366,7 +1366,8 @@ static const std::vector<std::string> cFundamentalNames = {
     "8: G#/Ab",
     "9: A",
     "10: A#/Bb",
-    "11: B"
+    "11: B",
+    "none"
 };
 
 static const String cDirectGain = "Direct_gain";

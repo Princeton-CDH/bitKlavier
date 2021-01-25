@@ -971,7 +971,7 @@ void TuningViewController::fillFundamentalCB(void)
     nToneRootOctaveCB.clear(dontSendNotification);
     springScaleFundamentalCB.clear(dontSendNotification);
     
-    for (int i = 0; i < cFundamentalNames.size(); i++)
+    for (int i = 0; i < cFundamentalNames.size() - 1; i++)
     {
         String name = cFundamentalNames[i];
         fundamentalCB.addItem(name, i+1);
@@ -985,11 +985,11 @@ void TuningViewController::fillFundamentalCB(void)
         nToneRootOctaveCB.addItem(String(i), i+1);
     }
     
-    springScaleFundamentalCB.addItem("none", (int)cFundamentalNames.size()+1);
-    springScaleFundamentalCB.addItem("lowest", (int)cFundamentalNames.size()+2);
-    springScaleFundamentalCB.addItem("highest", (int)cFundamentalNames.size()+3);
-    springScaleFundamentalCB.addItem("last", (int)cFundamentalNames.size()+4);
-    springScaleFundamentalCB.addItem("automatic", (int)cFundamentalNames.size()+5);
+    springScaleFundamentalCB.addItem("none", (int)cFundamentalNames.size());
+    springScaleFundamentalCB.addItem("lowest", (int)cFundamentalNames.size()+1);
+    springScaleFundamentalCB.addItem("highest", (int)cFundamentalNames.size()+2);
+    springScaleFundamentalCB.addItem("last", (int)cFundamentalNames.size()+3);
+    springScaleFundamentalCB.addItem("automatic", (int)cFundamentalNames.size()+4);
     
 }
 
