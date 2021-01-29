@@ -1326,7 +1326,7 @@ void MainViewController::timerCallback()
         {
             if (processor.updateState->editsMade)
             {
-                if (0 < prevDisplay && prevDisplay < DisplayNil)
+                if (prevDisplay != DisplayNil)
                     processor.saveGalleryToHistory(cDisplayNames[prevDisplay] + " Edits");
             }
         }   
