@@ -104,6 +104,7 @@ public:
     bool modify(Moddable& m, bool reverse)
     {
         mod = reverse ? base : m.base;
+        time = m.time;
         return modTo(tag<ValueType>{}, m, !reverse);
     }
     
@@ -113,10 +114,10 @@ public:
     template<class T = ValueType>
     bool modTo(tag<T>, Moddable& m, bool shouldInc)
     {
+        timeElapsed = 0;
         if (time > 0)
         {
             active = true;
-            timeElapsed = 0;
             return false;
         }
         value = mod;
@@ -132,11 +133,11 @@ public:
             if (m.n < m.maxN || m.maxN == 0) m.n++;
         }
         
+        timeElapsed = 0;
         if (time > 0 && (mod - value) != 0)
         {
             calcDV(tag<ValueType>{});
             active = true; //active = m.active;
-            timeElapsed = 0;
             return false;
         }
         value = mod;
