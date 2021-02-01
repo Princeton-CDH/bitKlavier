@@ -550,7 +550,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 			}
             
             BKSynthesiserVoice* voice = findFreeVoice (sound, midiChannel, noteNumber, shouldStealNotes);
-            startVoice(findFreeVoice(sound, midiChannel, noteNumber, shouldStealNotes),
+            startVoice(voice,
                        sound,
                        midiChannel,
                        keyNoteNumber,

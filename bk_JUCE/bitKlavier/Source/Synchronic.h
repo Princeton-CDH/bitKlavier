@@ -1422,6 +1422,7 @@ private:
     
     BKSynthesiserVoice** asv;
     Array<BKSynthesiserVoice*> activeSynchronicVoices;
+    Array<int> voiceMidiValues;
 
     
     JUCE_LEAK_DETECTOR(SynchronicProcessor);

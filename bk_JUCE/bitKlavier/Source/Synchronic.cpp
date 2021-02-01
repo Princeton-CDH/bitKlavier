@@ -141,8 +141,7 @@ notePlayed(false)
     clusterKeysDepressed = Array<int>();
     
     activeSynchronicVoices = Array<BKSynthesiserVoice*>();
-    activeSynchronicVoices.resize(128);
-    activeSynchronicVoices.fill(nullptr);
+    voiceMidiValues = Array<int>();
 }
 
 SynchronicProcessor::~SynchronicProcessor()
@@ -250,7 +249,9 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
         notePlayed = true;
         if (prep->midiOutput.value != nullptr && currentVoice != nullptr)
         {
-            activeSynchronicVoices.set(currentVoice->getCurrentlyPlayingNote(), currentVoice);
+            activeSynchronicVoices.add(currentVoice);
+            int midiNote = currentVoice->getCurrentlyPlayingNote();
+            voiceMidiValues.add(midiNote);
             const MidiMessage message = MidiMessage::noteOn(1, synthNoteNumber, velocity);
             prep->midiOutput.value->sendMessageNow(message);
             DBG("MIDI Message sent: Note on " + String(synthNoteNumber));
@@ -848,20 +849,27 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
     }
     playCluster = play;  
     
-    MidiBuffer midiBuffer = MidiBuffer();
-    int i = 0;
-    for (BKSynthesiserVoice* const voice : activeSynchronicVoices) {
-        if (voice == nullptr) continue;
-        if (!voice->isVoiceActive()) {
-            int noteNumber = activeSynchronicVoices.indexOf(voice);
+//    MidiBuffer midiBuffer = MidiBuffer();
+   
+    for (int i = 0; i < activeSynchronicVoices.size(); ++i)
+    {
+        BKSynthesiserVoice* const voice = activeSynchronicVoices.getUnchecked(i);
+        if (voice->getCurrentlyPlayingNote() < 0) {
+            int noteNumber = voiceMidiValues.getUnchecked(i);
             if (noteNumber < 0) continue;
-            activeSynchronicVoices.set(noteNumber, nullptr);
             const MidiMessage message = MidiMessage::noteOff(1, noteNumber);
-            midiBuffer.addEvent(message, i);
+            prep->midiOutput.value->sendMessageNow(message);
+
+            // Collecting all the off in a buffer might have better performance at the cost of using more memory
+            // than sendMessageNow()
+            // Either seems 100% fine for normal cases, just not sure about extremes
+//            midiBuffer.addEvent(message, 1);
             DBG("MIDI Message sent: Note off " + String(noteNumber));
+            activeSynchronicVoices.remove(i);
+            voiceMidiValues.remove(i--);
         }
     }
-    if (!midiBuffer.isEmpty()) prep->midiOutput.value->sendBlockOfMessagesNow(midiBuffer);
+//    if (!midiBuffer.isEmpty()) prep->midiOutput.value->sendBlockOfMessagesNow(midiBuffer);
 }
 
 //return time in ms to future beat, given beatsToSkip
