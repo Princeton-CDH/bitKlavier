@@ -633,9 +633,9 @@ public:
         velocityMax = max;
     }
     
-    inline const void setMidiOutput(MidiDeviceInfo device)
+    inline const void setMidiOutput(String identifier)
     {
-        midiOutput = MidiOutput::openDevice(device.identifier);
+        midiOutput = MidiOutput::openDevice(identifier);
         if (!midiOutput.value) midiOutput = nullptr;
     }
     inline const void setMidiOutput(std::shared_ptr<MidiOutput> output)
@@ -719,6 +719,9 @@ public:
         sUseGlobalSoundSet.getState(prep, ptagSynchronic_useGlobalSoundSet);
         sSoundSetName.getState(prep, ptagSynchronic_soundSet);
         
+        if (midiOutput.value != nullptr)
+            prep.setProperty( ptagSynchronic_midiOutput, midiOutput.value->getIdentifier(), 0);
+        
         return prep;
     }
     
@@ -779,6 +782,9 @@ public:
             aa.add(a);
         }
         sADSRs.setState(e, StringArray(vtagSynchronic_ADSRs, "e", ptagFloat), aa);
+        
+        String s = e->getStringAttribute(ptagSynchronic_midiOutput);
+        if (s != String()) setMidiOutput(s);
   
         int i;
         i = e->getStringAttribute(ptagSynchronic_targetPatternSync).getIntValue();
@@ -1098,7 +1104,7 @@ public:
         if (++transpCounter             >= prep->sTransposition.value.size())         transpCounter = 0;
         if (++envelopeCounter           >= prep->sADSRs.value.size())             envelopeCounter = 0;
         
-        while(prep->sADSRs.value[envelopeCounter][4] != 0) //skip untoggled envelopes
+        while(prep->sADSRs.value[envelopeCounter][4] == 0) //skip untoggled envelopes
         {
             envelopeCounter++;
             if (envelopeCounter >= prep->sADSRs.value.size()) envelopeCounter = 0;

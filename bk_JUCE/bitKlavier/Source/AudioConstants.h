@@ -87,6 +87,7 @@ const String ptagSynchronic_mode = "mode";
 const String ptagSynchronic_beatsToSkip = "beatsToSkip";
 const String ptagSynchronic_gain = "gain";
 const String ptagSynchronic_blendronicGain = "blendronicGain";
+const String ptagSynchronic_midiOutput = "midiOutput";
 
 const String ptagSynchronic_targetPatternSync = "targetTypeSynchronicPatternSync";
 const String ptagSynchronic_targetBeatSync = "targetTypeSynchronicBeatSync";

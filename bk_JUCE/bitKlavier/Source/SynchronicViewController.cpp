@@ -1558,11 +1558,11 @@ void SynchronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         if (index > 0)
         {
-            prep    ->setMidiOutput(processor.getMidiOutputDevices()[index-1]);
+            prep    ->setMidiOutput(processor.getMidiOutputDevices()[index-1].identifier);
         }
         else
         {
-            prep    ->setMidiOutput(nullptr);
+            prep    ->setMidiOutput(String());
         }
         
         fillMidiOutputSelectCB();
@@ -2437,12 +2437,12 @@ void SynchronicModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         if (index > 0)
         {
-            mod->setMidiOutput(processor.getMidiOutputDevices()[index-1]);
+            mod->setMidiOutput(processor.getMidiOutputDevices()[index-1].identifier);
             mod->setDirty(SynchronicMidiOutput);
         }
         else
         {
-            mod->setMidiOutput(nullptr);
+            mod->setMidiOutput(String());
             mod->setDirty(SynchronicMidiOutput);
         }
         
