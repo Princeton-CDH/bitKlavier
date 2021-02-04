@@ -507,7 +507,14 @@ void BKPianoSamplerVoice::startNote (const int midi,
         noteEndPosition = playEndPosition;
 		blendronicGain = blendGain;
 		this->blendronic = blendronic;
-
+        
+        float dg = 1.0f;
+        if (dgain != nullptr) dg = Decibels::decibelsToGain(*dgain);
+        float bg = aGlobalGain * dg;
+        if (blendronicGain != nullptr) bg *= Decibels::decibelsToGain(*blendronicGain);
+        
+        gainEnv.setValue(dg);
+        bGainEnv.setValue(bg);
     }
     else
     {
