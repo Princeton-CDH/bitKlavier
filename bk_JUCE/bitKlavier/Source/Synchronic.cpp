@@ -252,7 +252,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
             activeSynchronicVoices.add(currentVoice);
             int midiNote = currentVoice->getCurrentlyPlayingNote();
             voiceMidiValues.add(midiNote);
-            const MidiMessage message = MidiMessage::noteOn(1, synthNoteNumber, velocity);
+            const MidiMessage message = MidiMessage::noteOn(1, synthNoteNumber, jmin (velocity * prep->sAccentMultipliers.value[cluster->getAccentMultiplierCounter()], 1.0f));
             prep->midiOutput.value->sendMessageNow(message);
             DBG("MIDI Message sent: Note on " + String(synthNoteNumber));
         }
