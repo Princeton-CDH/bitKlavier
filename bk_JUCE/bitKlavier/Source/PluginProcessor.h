@@ -167,9 +167,9 @@ public:
     }
      */
     
-    OwnedArray<HashMap<String, int>>    noteOn;
-    OwnedArray<HashMap<String, int>>&   getNoteOns();
-    OwnedArray<HashMap<String, float>>  noteVelocity;
+    OwnedArray<HashMap<String, int>>    sourcedNotesOn;
+    OwnedArray<HashMap<String, int>>&   getSourcedNotesOn();
+    OwnedArray<HashMap<String, float>>  sourcedNoteVelocities;
     
     void                                noteOnUI (int noteNumber) { if(didLoadMainPianoSamples) notesOnUI.add(noteNumber); }
     void                                noteOffUI(int noteNumber) { if(didLoadMainPianoSamples) notesOffUI.add(noteNumber); }

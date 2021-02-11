@@ -105,8 +105,6 @@ public:
     
     virtual ~StandalonePluginHolder() override
     {
-        stopTimer();
-        
         deletePlugin();
         shutDownAudioDevices();
     }

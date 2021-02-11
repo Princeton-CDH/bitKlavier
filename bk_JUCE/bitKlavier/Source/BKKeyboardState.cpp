@@ -54,6 +54,14 @@ void BKKeymapKeyboardState::setKeymap(Array<int> keymap)
     }
 }
 
+void BKKeymapKeyboardState::setKeymap(OwnedArray<HashMap<String, int>>& keymap)
+{
+    for (int i = 0; i < 128; i++)
+    {
+        inKeymap[i] = keymap.getUnchecked(i)->size() > 0;
+    }
+}
+
 void BKKeymapKeyboardState::addToKeymap(int midiNoteNumber)
 {
     inKeymap[midiNoteNumber] = true;

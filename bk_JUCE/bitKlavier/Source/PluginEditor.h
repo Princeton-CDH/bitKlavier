@@ -33,7 +33,7 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     
-    bool areTooltipsEnabled(void);
+    bool tooltipsAreEnabled(void);
     Value getTooltipsEnabled(void);
     bool setTooltipsEnabled(bool enabled);
 
@@ -46,6 +46,8 @@ public:
 	bool areHotkeysEnabled(void);
 	Value getHotkeysEnabled(void);
 	bool setHotkeysEnabled(bool enabled);
+    
+    void tooltipsChanged(void);
     
     void showBKSettingsDialog(Button* button);
     
@@ -63,6 +65,7 @@ private:
     
     std::unique_ptr<ComponentBoundsConstrainer> constrain;
     std::unique_ptr<ResizableCornerComponent> resizer;
+    std::unique_ptr<TooltipWindow> tipwindow;
     
     BKWindowLAF laf;
     
@@ -82,6 +85,7 @@ private:
             
             tooltipsButton.setClickingTogglesState (true);
             tooltipsButton.getToggleStateValue().referTo (owner.getTooltipsEnabled());
+            tooltipsButton.onClick = [this] { owner.tooltipsChanged(); };
             
             addAndMakeVisible (tooltipsButton);
             addAndMakeVisible (tooltipsLabel);

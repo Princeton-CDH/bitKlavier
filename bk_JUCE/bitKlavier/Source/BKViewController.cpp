@@ -56,7 +56,7 @@ BKViewController::~BKViewController()
 PopupMenu BKViewController::getExportedPrepsMenu(BKPreparationType type)
 {
     BKPopupMenu menu;
-    
+    processor.collectPreparations();
     StringArray* names = processor.exportedPreparations[type];
     for (int i = 0; i < names->size(); i++)
     {

@@ -40,6 +40,15 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
 #endif
     //processor.updateState->pianoDidChangeForGraph = true;
     
+    if (tooltipsAreEnabled() && tipwindow == nullptr)
+    {
+        tipwindow = std::make_unique<TooltipWindow>();
+    }
+    else if (!tooltipsAreEnabled() && tipwindow != nullptr)
+    {
+        tipwindow = nullptr;
+    }
+    
     resized();
 }
 
@@ -79,7 +88,7 @@ void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
     preferences->setLookAndFeel(&laf);
 }
 
-bool BKAudioProcessorEditor::areTooltipsEnabled()
+bool BKAudioProcessorEditor::tooltipsAreEnabled()
 {
     return processor.areTooltipsEnabled();
 }
@@ -109,6 +118,18 @@ bool BKAudioProcessorEditor::setHotkeysEnabled(bool enabled)
 {
 	processor.setHotkeysEnabled(enabled);
 	return processor.areHotkeysEnabled();
+}
+
+void BKAudioProcessorEditor::tooltipsChanged(void)
+{
+    if (tooltipsAreEnabled() && tipwindow == nullptr)
+    {
+        tipwindow = std::make_unique<TooltipWindow>();
+    }
+    else if (!tooltipsAreEnabled() && tipwindow != nullptr)
+    {
+        tipwindow = nullptr;
+    }
 }
 
 //==============================================================================

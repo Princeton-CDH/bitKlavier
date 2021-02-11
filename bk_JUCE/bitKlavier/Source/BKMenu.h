@@ -59,8 +59,17 @@ public:
         //setJustificationType(justification);
         //thisLAF.setComboBoxJustificationType(justification);
     }
-
-
+    
+    void mouseDown(const MouseEvent& e) override
+    {
+        if (beforeOpen != nullptr) beforeOpen();
+        ComboBox::mouseDown(e);
+        if (afterOpen != nullptr) afterOpen();
+    }
+    
+    std::function<void()> beforeOpen;
+    std::function<void()> afterOpen;
+    
 private:
     
     //BKButtonAndMenuLAF thisLAF;

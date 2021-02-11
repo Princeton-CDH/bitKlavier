@@ -215,12 +215,12 @@ void BKAudioProcessor::loadGalleries()
 #endif
 
     
-    noteOn.ensureStorageAllocated(128);
-    noteVelocity.ensureStorageAllocated(128);
+    sourcedNotesOn.ensureStorageAllocated(128);
+    sourcedNoteVelocities.ensureStorageAllocated(128);
     for(int i = 0; i < 128; i++)
     {
-        noteOn.set(i, new HashMap<String, int> ());
-        noteVelocity.set(i, new HashMap<String, float> ());
+        sourcedNotesOn.set(i, new HashMap<String, int> ());
+        sourcedNoteVelocities.set(i, new HashMap<String, float> ());
     }
     
     bk_examples = StringArray({
@@ -402,7 +402,6 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 BKAudioProcessor::~BKAudioProcessor()
 {
-    stopTimer();
     for (auto item : clipboard)
         item->clearConnections();
     clipboard.clear();
@@ -466,7 +465,7 @@ void BKAudioProcessor::clearBitKlavier(void)
     
     //handleAllNotesOff();
 
-    for (auto map : noteOn)
+    for (auto map : sourcedNotesOn)
     {
         for (HashMap<String, int>::Iterator i (*map); i.next();)
         {
@@ -480,7 +479,7 @@ void BKAudioProcessor::clearBitKlavier(void)
         map->clear();
     }
     
-    for (auto map : noteVelocity)
+    for (auto map : sourcedNoteVelocities)
         map->clear();
     
     sustainDeactivate();
@@ -693,13 +692,13 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     
     // Second pass, post harmonization
     String key = source + "n" + String(mappedFrom);
-    bool noteDown = noteOn.getUnchecked(noteNumber)->size() > 0;
+    bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
     
     if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
     {
         ++noteOnCount;
-        noteOn.getUnchecked(noteNumber)->set(key, noteNumber);
-        noteVelocity.getUnchecked(noteNumber)->set(key, velocity);
+        sourcedNotesOn.getUnchecked(noteNumber)->set(key, noteNumber);
+        sourcedNoteVelocities.getUnchecked(noteNumber)->set(key, velocity);
     }
 
     if (!activeSource) return;
@@ -813,8 +812,8 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     
     if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
     {
-        noteOn.getUnchecked(noteNumber)->remove(key);
-        noteVelocity.getUnchecked(noteNumber)->remove(key);
+        sourcedNotesOn.getUnchecked(noteNumber)->remove(key);
+        sourcedNoteVelocities.getUnchecked(noteNumber)->remove(key);
         --noteOnCount;
         if(noteOnCount < 0) noteOnCount = 0;
     }
@@ -824,10 +823,10 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         //DBG("noteoff velocity = " + String(velocity));
         
         noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
-        if(noteOnSetsNoteOffVelocity) velocity = (*noteVelocity.getUnchecked(noteNumber))[key];
+        if(noteOnSetsNoteOffVelocity) velocity = (*sourcedNoteVelocities.getUnchecked(noteNumber))[key];
         else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
         
-        bool noteDown = noteOn.getUnchecked(noteNumber)->size() > 0;
+        bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
         currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, mappedFrom, noteDown,
                                            (loadingSampleType == BKLoadSoundfont), source);
     }
@@ -923,9 +922,9 @@ void BKAudioProcessor::sustainDeactivate(void)
         sustainIsDown = false;
         DBG("SUSTAIN OFF");
         
-        currentPiano->prepMap->sustainPedalReleased(noteOn, false);
+        currentPiano->prepMap->sustainPedalReleased(sourcedNotesOn, false);
         
-        if(prevPiano != currentPiano) prevPiano->prepMap->sustainPedalReleased(noteOn, true);
+        if(prevPiano != currentPiano) prevPiano->prepMap->sustainPedalReleased(sourcedNotesOn, true);
         
         //turn off pedal down resonance
         pedalSynth.keyOff(channel,

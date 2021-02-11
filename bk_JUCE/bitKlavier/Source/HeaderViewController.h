@@ -27,8 +27,7 @@
 #endif
 
 class HeaderViewController : public BKComponent,
-public BKListener,
-private Timer
+public BKListener
 {
 public:
     HeaderViewController(BKAudioProcessor& p, BKConstructionSite* construction);
@@ -62,8 +61,6 @@ private:
     void bkButtonClicked            (Button* b)             override;
     void mouseDown (const MouseEvent &event) override;
     
-    void timerCallback() override;
-    
     static void pianoMenuCallback(int result, HeaderViewController*);
     static void galleryMenuCallback(int result, HeaderViewController*);
     
@@ -88,8 +85,8 @@ private:
     
     //BKComboBox galleryCB;
     //BKComboBox pianoCB;
-    ComboBox galleryCB;
-    ComboBox pianoCB;
+    BKComboBox galleryCB;
+    BKComboBox pianoCB;
     int lastGalleryCBId, lastGalleryCBIndex;
     bool galleryModalCallBackIsOpen;
     

@@ -28,9 +28,9 @@ void BKAudioProcessor::updateUI(void)
     updateState->editsMade = false;
 }
 
-OwnedArray<HashMap<String, int>>& BKAudioProcessor::getNoteOns()
+OwnedArray<HashMap<String, int>>& BKAudioProcessor::getSourcedNotesOn()
 {
-    return noteOn;
+    return sourcedNotesOn;
 }
 
 int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound, bool updateGlobalSet)

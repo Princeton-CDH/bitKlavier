@@ -25,17 +25,12 @@ splash(p),
 timerCallbackCount(0),
 hotkeysEnabled(true),
 preferencesButton("Preferences"),
-tooltipsButton("Show tooltips"),
 hotkeysButton("Enable hotkeys"),
 globalSoundSetButton("Use global samples"),
 sustainPedalButton("Sustain Pedal")
 {
     if (processor.platform == BKIOS)    display = DisplayConstruction;
     else                                display = DisplayDefault;
-
-    tooltipsButton.setClickingTogglesState(true);
-    tooltipsButton.getToggleStateValue().referTo(editor.getTooltipsEnabled());
-    addAndMakeVisible(tooltipsButton);
     
     globalSoundSetButton.setClickingTogglesState(true);
     globalSoundSetButton.addListener(this);
@@ -97,10 +92,12 @@ sustainPedalButton("Sustain Pedal")
     //~~~~~~~~~~~MENUS~~~~~~~~
     sampleCB.setLookAndFeel(&laf);
     sampleCB.setTooltip("Choose and load sample set from your soundfonts folder");
+    sampleCB.beforeOpen = [this] { processor.collectSoundfonts(); fillSampleCB(); };
     
     instrumentCB.setLookAndFeel(&comboBoxRightJustifyLAF);
     comboBoxRightJustifyLAF.setComboBoxJustificationType(juce::Justification::centredRight);
     instrumentCB.setTooltip("Load specific instrument from selected soundfont (if available)");
+    instrumentCB.beforeOpen = [this] { fillInstrumentCB(); };
     
     sampleCB.addListener(this);
     instrumentCB.addListener(this);
@@ -148,15 +145,6 @@ sustainPedalButton("Sustain Pedal")
     preferencesButton.setLookAndFeel(&windowLAF);
     addAndMakeVisible (preferencesButton);
     
-    if (editor.areTooltipsEnabled() && tipwindow == nullptr)
-    {
-        tipwindow = std::make_unique<TooltipWindow>();
-    }
-    else if (!editor.areTooltipsEnabled() && tipwindow != nullptr)
-    {
-        tipwindow = nullptr;
-    }
-    
 //    undoStatus.setLookAndFeel(&laf);
     addChildComponent(undoStatus);
     undoStatusCountdown = 0;
@@ -199,7 +187,6 @@ MainViewController::~MainViewController()
     octaveSlider.setLookAndFeel(nullptr);
     mainSlider.setLookAndFeel(nullptr);
     overtop.setLookAndFeel(nullptr);
-    tooltipsButton.setLookAndFeel(nullptr);
 	//keystrokesButton.setLookAndFeel(nullptr);
 	hotkeysButton.setLookAndFeel(nullptr);
     undoStatus.setLookAndFeel(nullptr);
@@ -295,17 +282,6 @@ void MainViewController::resized()
         float unit = footerSlice.getWidth() * 0.25;
         
         preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
-        
-		/* SPACING WITHOUT PREFERENCES MENU
-		tooltipsButton.setBounds(footerSlice.getX(), footerSlice.getY(), 120, 20);
-
-		keystrokesButton.setBounds(unit/2 + gXSpacing, footerSlice.getY(), 120, 20);
-
-		hotkeysButton.setBounds(unit + 1.5 * gXSpacing, footerSlice.getY(), 120, 20);
-        
-        sampleCB.setBounds(1.6 * unit, footerSlice.getY(), unit-0.5*gXSpacing, 20);
-        instrumentCB.setBounds(2.6*unit+0.5*gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
-		*/
 
 		//original spacing to restore once tooltips/keystrokes/hotkeys get moved to a separate menu
 		sampleCB.setBounds(unit, footerSlice.getY(), unit - 0.5 * gXSpacing, 20);
@@ -512,7 +488,6 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
     }
     else if (cb == &instrumentCB)
     {
-        
         if (directSelected)
         {
             String sfname = processor.loadedSoundSets[dPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
@@ -1041,15 +1016,6 @@ void MainViewController::timerCallback()
 {
     BKUpdateState::Ptr state = processor.updateState;
     
-    if (editor.areTooltipsEnabled() && tipwindow == nullptr)
-    {
-        tipwindow = std::make_unique<TooltipWindow>();
-    }
-    else if (!editor.areTooltipsEnabled() && tipwindow != nullptr)
-    {
-        tipwindow = nullptr;
-    }
-    
     if (undoStatusCountdown > 0)
     {
         undoStatus.setVisible(true);
@@ -1058,35 +1024,12 @@ void MainViewController::timerCallback()
     }
     else undoStatus.setVisible(false);
     
-    // update menu contents periodically
-    if (++timerCallbackCount >= MVC_REFRESH_RATE)
-    {
-        timerCallbackCount = 0;
-        processor.collectGalleries();
-        processor.collectPreparations();
-        processor.collectPianos();
-        processor.collectSoundfonts();
-        
-        //header.fillGalleryCB();
-    }
-
-    fillSampleCB();
     fillInstrumentCB();
     
     // display active noteOns on main keyboard
-    Array<bool> noteOns;
-    OwnedArray<HashMap<String, int>>& map = processor.getNoteOns();
-    noteOns.ensureStorageAllocated(128);
-    for (int i = 0; i < 128; ++i)
-    {
-        if (map.getUnchecked(i)->size() > 0)
-            noteOns.set(i, true);
-        else noteOns.set(i, false);
-    }
-    keyboardState.setKeymap(noteOns);
+    keyboardState.setKeymap(processor.getSourcedNotesOn());
 
     bool soundItemSelected = false;
-    // set main keyboard to display active keys in selected keymap (if there is a selected keymap)
     sampleCB.setAlpha(1.);
     instrumentCB.setAlpha(1.);
     globalSoundSetButton.setAlpha(1.);
@@ -1098,6 +1041,7 @@ void MainViewController::timerCallback()
 #endif
     if (construction.getNumSelected() == 1 && front)
     {
+        // set main keyboard to display active keys in selected keymap (if there is a selected keymap)
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeKeymap && processor.updateState->currentDisplay != DisplayKeymap)
         {

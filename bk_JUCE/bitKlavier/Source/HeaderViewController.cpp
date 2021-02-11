@@ -23,7 +23,7 @@ construction(c)
     galleryB.setButtonText("Gallery");
     galleryB.setTooltip("Create, duplicate, rename, share current Gallery. Also access bitKlavier settings");
     galleryB.addListener(this);
-    
+
     addAndMakeVisible(pianoB);
     pianoB.setButtonText("Piano");
     pianoB.setTooltip("Create, duplicate, rename, or delete current Piano");
@@ -43,12 +43,14 @@ construction(c)
     BKButtonAndMenuLAF* comboBoxLeftJustifyLAF = new BKButtonAndMenuLAF();
     galleryCB.setLookAndFeel(comboBoxLeftJustifyLAF);
     galleryCB.setSelectedId(0, dontSendNotification);
+    galleryCB.beforeOpen = [this] { processor.collectGalleries(); fillGalleryCB(); };
     
     // Piano CB
     addAndMakeVisible(pianoCB);
     pianoCB.setName("pianoCB");
     pianoCB.setTooltip("Select and load saved bitKlavier Pianos. Indicates currently loaded Piano");
     pianoCB.addListener(this);
+    pianoCB.beforeOpen = [this] { processor.collectPianos(); fillPianoCB(); };
     
 #if JUCE_IOS || JUCE_MAC
     bot.setBounds(0,0,20,20);
@@ -70,8 +72,6 @@ construction(c)
     processor.updateState->pianoDidChangeForGraph = true;
     
     addMouseListener(this, true);
-    
-    startTimerHz (5);
 }
 
 HeaderViewController::~HeaderViewController()
@@ -125,7 +125,7 @@ void HeaderViewController::resized()
 
 void HeaderViewController::mouseDown(const MouseEvent &event)
 {
-    fillGalleryCB();
+
 }
 
 PopupMenu HeaderViewController::getLoadMenu(void)
@@ -1145,12 +1145,3 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         }
     }
 }
-
-void HeaderViewController::timerCallback()
-{
-    if (!galleryCB.isPopupActive())
-    {
-        // fillGalleryCB();
-    }
-}
-
