@@ -106,7 +106,7 @@ public Timer
 {
 public:
     BlendronicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~BlendronicPreparationEditor() {};
+    ~BlendronicPreparationEditor() { stopTimer(); };
     
     
     void update(void) override;

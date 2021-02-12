@@ -98,6 +98,7 @@ octaveNumForMiddleC (3)
 
 BKKeymapKeyboardComponent::~BKKeymapKeyboardComponent()
 {
+    stopTimer();
     setLookAndFeel(nullptr);
 }
 

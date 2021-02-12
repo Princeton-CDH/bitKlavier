@@ -83,7 +83,7 @@ public Timer
 public:
     
     TempoPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~TempoPreparationEditor(){};
+    ~TempoPreparationEditor() { stopTimer(); };
     
     void timerCallback() override;
     

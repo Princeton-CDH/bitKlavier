@@ -119,6 +119,8 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
 
 BKItem::~BKItem()
 {
+    stopTimer();
+    
     DBG("~BKItem");
     
     if (getParentComponent() != nullptr)

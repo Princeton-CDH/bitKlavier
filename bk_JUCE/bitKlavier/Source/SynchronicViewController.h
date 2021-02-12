@@ -150,7 +150,7 @@ public Timer
 {
 public:
     SynchronicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~SynchronicPreparationEditor() {}
+    ~SynchronicPreparationEditor() { stopTimer(); }
     
     void update(void) override;
     

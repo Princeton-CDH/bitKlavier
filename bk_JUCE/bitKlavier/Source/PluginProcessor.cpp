@@ -402,6 +402,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 
 BKAudioProcessor::~BKAudioProcessor()
 {
+    stopTimer();
+    
     for (auto item : clipboard)
         item->clearConnections();
     clipboard.clear();

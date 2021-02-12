@@ -345,6 +345,7 @@ BKViewController(p, theGraph, 3)
 
 KeymapViewController::~KeymapViewController()
 {
+    stopTimer();
     setLookAndFeel(nullptr);
     //transpositionLaf 
     //need to set some null pointer stuff - transposition?

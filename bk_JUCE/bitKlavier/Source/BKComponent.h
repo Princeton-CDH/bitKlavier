@@ -61,7 +61,7 @@ public:
     
     ~MouseHoldListener(void)
     {
-        
+        stopTimer();
     }
     
     virtual void mouseHold(Component* frame, bool on) = 0;

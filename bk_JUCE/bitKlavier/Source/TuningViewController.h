@@ -28,6 +28,7 @@ public:
     TuningViewController(BKAudioProcessor&, BKItemGraph* theGraph);
     ~TuningViewController()
     {
+        stopTimer();
         alternateMod.setLookAndFeel(nullptr);
         setLookAndFeel(nullptr);
     };

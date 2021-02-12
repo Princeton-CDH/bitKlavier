@@ -167,6 +167,8 @@ sustainPedalButton("Sustain Pedal")
 
 MainViewController::~MainViewController()
 {
+    stopTimer();
+    
     PopupMenu::dismissAllActiveMenus();
     
     removeMouseListener(this);

@@ -76,6 +76,7 @@ playheadColour (Colours::mediumpurple)
 
 BlendronicDisplay::~BlendronicDisplay()
 {
+    stopTimer();
 }
 
 void BlendronicDisplay::setRepaintRate (int frequencyInHz)

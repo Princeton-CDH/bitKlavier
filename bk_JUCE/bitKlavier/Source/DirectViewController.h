@@ -79,7 +79,7 @@ public Timer
 public:
     
     DirectPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~DirectPreparationEditor() {};
+    ~DirectPreparationEditor() { stopTimer(); };
     
     void update(void) override;
     

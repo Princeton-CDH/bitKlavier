@@ -108,7 +108,7 @@ public Timer
 {
 public:
     NostalgicPreparationEditor(BKAudioProcessor&, BKItemGraph* theGraph);
-    ~NostalgicPreparationEditor() {};
+    ~NostalgicPreparationEditor() { stopTimer(); };
     
     
     void update(void) override;

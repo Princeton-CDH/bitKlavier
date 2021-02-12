@@ -359,6 +359,7 @@ void ModdableViewController::iWantTheBigOne(TextEditor* tf, String name)
 
 ModdableViewController::~ModdableViewController()
 {
+    stopTimer();
     setLookAndFeel(nullptr);
 }
 
