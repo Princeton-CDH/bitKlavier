@@ -81,7 +81,7 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
     //do adaptive tunings if using
     if(tuning->prep->getAdaptiveType() == AdaptiveNormal || tuning->prep->getAdaptiveType() == AdaptiveAnchored)
     {
-        float lastNoteOffset = adaptiveCalculate(midiNoteNumber) + tuning->prep->getFundamentalOffset(); // added getFundamentalOffset()
+        lastNoteOffset = adaptiveCalculate(midiNoteNumber) + tuning->prep->getFundamentalOffset(); // added getFundamentalOffset()
         
         if(updateLastInterval)
         {
@@ -119,14 +119,21 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
     //else do regular tunings
     Array<float> currentTuning;
     if(tuning->prep->getScale() == CustomTuning)
+    {
         currentTuning = tuning->prep->getCustomScale();
+        lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->prep->getFundamental()) % currentTuning.size()]
+                          + tuning->prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                          + tuning->prep->getFundamentalOffset()) * 0.01f;
+    }
     else
+    {
         currentTuning = tuning->tuningLibrary.getUnchecked(tuning->prep->getScale());
+        lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->prep->getFundamental()) % currentTuning.size()]
+                          + tuning->prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                          + tuning->prep->getFundamentalOffset());
+    }
 
     
-    lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->prep->getFundamental()) % currentTuning.size()]
-                      + tuning->prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
-                      + tuning->prep->getFundamentalOffset());
 
     if(updateLastInterval)
     {
@@ -213,7 +220,8 @@ float TuningProcessor::adaptiveCalculateRatio(const int midiNoteNumber) const
     float newnote;
     float newratio;
     
-    const Array<float> intervalScale = tuning->tuningLibrary.getUnchecked(tuning->prep->getAdaptiveIntervalScale());
+    TuningSystem ts = tuning->prep->getAdaptiveIntervalScale();
+    const Array<float> intervalScale = tuning->tuningLibrary.getUnchecked(ts);
     
     if(!tuning->prep->getAdaptiveInversional() || tempnote >= adaptiveFundamentalNote)
     {

@@ -325,7 +325,6 @@ public:
            tScale = tuning;
         }
     }
-    
     inline void setScaleByName(String tuningName)
     {
         for (int i=0; i<cTuningSystemNames.size(); i++)
@@ -371,6 +370,7 @@ public:
 
     inline void setCustomScaleCents(Array<float> tuning)
     {
+        if (tuning.size() > tCustom.value.size()) tuning.resize(tCustom.value.size());
         tCustom.set(tuning);
 //        for(int i=0; i<tCustom.value.size() && i<tuning.size(); i++)
 //        {

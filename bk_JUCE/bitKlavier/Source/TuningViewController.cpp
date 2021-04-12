@@ -1498,12 +1498,20 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (box == &A1IntervalScaleCB)
     {
-        prep->setAdaptiveIntervalScale((TuningSystem) index);
+        TuningSystem scaleId = (TuningSystem) index;
+        
+        if (scaleId >= AdaptiveTuning) scaleId = (TuningSystem)((int)scaleId + 2);
+        
+        prep->setAdaptiveIntervalScale((TuningSystem) scaleId);
         //updateComponentVisibility();
     }
     else if (box == &A1AnchorScaleCB)
     {
-        prep->setAdaptiveAnchorScale((TuningSystem) index);
+        TuningSystem scaleId = (TuningSystem) index;
+        
+        if (scaleId >= AdaptiveTuning) scaleId = (TuningSystem)((int)scaleId + 2);
+        
+        prep->setAdaptiveAnchorScale((TuningSystem) scaleId);
         //updateComponentVisibility();
     }
     else if (box == &A1FundamentalCB)
@@ -2472,7 +2480,11 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (box == &A1IntervalScaleCB)
     {
-        mod->setAdaptiveIntervalScale((TuningSystem) index);
+        TuningSystem scaleId = (TuningSystem) index;
+        
+        if (scaleId >= AdaptiveTuning) scaleId = (TuningSystem)((int)scaleId + 2);
+        
+        mod->setAdaptiveIntervalScale((TuningSystem) scaleId);
         mod->setDirty(TuningA1IntervalScale);
         
         A1IntervalScaleCB.setAlpha(1.);
@@ -2480,7 +2492,11 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (box == &A1AnchorScaleCB)
     {
-        mod->setAdaptiveAnchorScale((TuningSystem) index);
+        TuningSystem scaleId = (TuningSystem) index;
+        
+        if (scaleId >= AdaptiveTuning) scaleId = (TuningSystem)((int)scaleId + 2);
+        
+        mod->setAdaptiveAnchorScale((TuningSystem) scaleId);
         mod->setDirty(TuningA1AnchorScale);
         
         A1AnchorScaleCB.setAlpha(1.);
