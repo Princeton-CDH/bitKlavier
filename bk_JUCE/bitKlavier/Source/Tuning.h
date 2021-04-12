@@ -126,7 +126,7 @@ public:
         
         for (int i = p->getCustomScale().size(); --i>=0;)
         {
-            if (p->getCustomScale()[i] != tCustom.value[i])
+            if (p->getCustomScale()[i] != getCustomScale()[i])
             {
                 custom = false;
                 break;
@@ -289,8 +289,26 @@ public:
     { return tAdaptiveAnchorFundamental.value; }
     inline const int getAdaptiveClusterThresh() const noexcept   { return tAdaptiveClusterThresh.value;     }
     inline const int getAdaptiveHistory() const noexcept            { return tAdaptiveHistory.value; }
-    inline const Array<float> getCustomScale() const noexcept       { return tCustom.value;          }
-    inline const Array<float> getAbsoluteOffsets() const noexcept   { return tAbsolute.value;        }
+    inline const Array<float> getCustomScale() const noexcept
+    {
+        Array<float> tCustomSemitones;
+        tCustomSemitones.ensureStorageAllocated(12);
+        for(int i=0; i<tCustom.value.size(); i++)
+        {
+            tCustomSemitones.set(i, tCustom.value.getUnchecked(i) * 0.01f);
+        }
+        return tCustomSemitones;
+    }
+    inline const Array<float> getAbsoluteOffsets() const noexcept
+    {
+        Array<float> tAbsoluteSemitones;
+        tAbsoluteSemitones.ensureStorageAllocated(ABSOLUTE_OFFSET_SIZE);
+        for(int i=0; i<tAbsolute.value.size(); i++)
+        {
+            tAbsoluteSemitones.set(i, tAbsolute.value.getUnchecked(i) * 0.01f);
+        }
+        return tAbsoluteSemitones;
+    }
     float getAbsoluteOffset(int midiNoteNumber) const noexcept      { return tAbsolute.value.getUnchecked(midiNoteNumber); }
     inline const float getNToneSemitoneWidth() const noexcept       { return nToneSemitoneWidth.value;         }
     inline const int getNToneRoot() const noexcept          {return nToneRoot.value;        }
@@ -298,23 +316,11 @@ public:
     inline const int getNToneRootOctave() const noexcept    {return (nToneRoot.value / 12) - 1;  }
     
     inline const Array<float> getAbsoluteOffsetsCents() const noexcept {
-        Array<float> tAbsoluteCents;
-        tAbsoluteCents.ensureStorageAllocated(ABSOLUTE_OFFSET_SIZE);
-        for(int i=0; i<tAbsolute.value.size(); i++)
-        {
-            tAbsoluteCents.set(i, tAbsolute.value.getUnchecked(i) * 100.);
-        }
-        return tAbsoluteCents;
+        return tAbsolute.value;
     }
     
     inline const Array<float> getCustomScaleCents() const noexcept {
-        Array<float> tCustomCents;
-        tCustomCents.ensureStorageAllocated(12);
-        for(int i=0; i<tCustom.value.size(); i++)
-        {
-            tCustomCents.set(i, tCustom.value.getUnchecked(i) * 100.);
-        }
-        return tCustomCents;
+        return tCustom.value;
     }
     
     inline void setName(String n)                                           {name = n; } // DBG("set tuning name " + name);}
@@ -342,15 +348,38 @@ public:
     inline void setAdaptiveAnchorFundamental(PitchClass adaptiveAnchorFundamental)  { tAdaptiveAnchorFundamental = adaptiveAnchorFundamental;}
     inline void setAdaptiveClusterThresh(int adaptiveClusterThresh)  { tAdaptiveClusterThresh = adaptiveClusterThresh; }
     inline void setAdaptiveHistory(int adaptiveHistory)     { tAdaptiveHistory = adaptiveHistory; }
-    inline void setCustomScale(Array<float> tuning)     { tCustom = tuning;      }
-    inline void setAbsoluteOffsets(Array<float> abs)    { tAbsolute = abs;   }
+    inline void setCustomScale(Array<float> tuning)
+    {
+        if (tuning.size() > tCustom.value.size()) tuning.resize(tCustom.value.size());
+        
+        Array<float> tCustomCents;
+        tCustomCents.ensureStorageAllocated(12);
+        for(int i=0; i<tuning.size(); i++)
+        {
+            tCustomCents.set(i, tuning.getUnchecked(i) * 100.0f);
+        }
+
+        tCustom.set(tCustomCents);
+    }
+    inline void setAbsoluteOffsets(Array<float> abs)
+    {
+        Array<float> tAbsoluteCents;
+        tAbsoluteCents.ensureStorageAllocated(12);
+        for(int i=0; i<abs.size(); i++)
+        {
+            tAbsoluteCents.set(i, abs.getUnchecked(i) * 100.0f);
+        }
+        
+        tAbsolute.set(tAbsoluteCents);
+        
+    }
     void setAbsoluteOffset(int which, float val)
     {
         tAbsolute.base.set(which, val);
         tAbsolute.value.set(which, val);
         tAbsolute.mod.set(which, val);
     }
-    inline void setNToneSemitoneWidth(float width)                                  {nToneSemitoneWidth = width; }
+    inline void setNToneSemitoneWidth(float width) { nToneSemitoneWidth = width; }
     inline void setNToneRoot(int root)
     {
         nToneRoot = root;
@@ -372,17 +401,11 @@ public:
     {
         if (tuning.size() > tCustom.value.size()) tuning.resize(tCustom.value.size());
         tCustom.set(tuning);
-//        for(int i=0; i<tCustom.value.size() && i<tuning.size(); i++)
-//        {
-//            tCustom.setUnchecked(i, tuning.getUnchecked(i) * 0.01f);
-//        }
     }
     
     inline void setAbsoluteOffsetCents(Array<float> abs)
     {
         tAbsolute.set(abs);
-//        for(int i=0; i<tAbsolute.size() && i<abs.size(); i++)
-//            tAbsolute.setUnchecked(i, abs.getUnchecked(i) * 0.01f);
     }
     
     

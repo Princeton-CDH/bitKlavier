@@ -119,21 +119,13 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
     //else do regular tunings
     Array<float> currentTuning;
     if(tuning->prep->getScale() == CustomTuning)
-    {
         currentTuning = tuning->prep->getCustomScale();
-        lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->prep->getFundamental()) % currentTuning.size()]
-                          + tuning->prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
-                          + tuning->prep->getFundamentalOffset()) * 0.01f;
-    }
     else
-    {
         currentTuning = tuning->tuningLibrary.getUnchecked(tuning->prep->getScale());
-        lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->prep->getFundamental()) % currentTuning.size()]
-                          + tuning->prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
-                          + tuning->prep->getFundamentalOffset());
-    }
 
-    
+    lastNoteOffset = (currentTuning[(midiNoteNumber - tuning->prep->getFundamental()) % currentTuning.size()]
+                      + tuning->prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                      + tuning->prep->getFundamentalOffset());
 
     if(updateLastInterval)
     {
@@ -220,8 +212,11 @@ float TuningProcessor::adaptiveCalculateRatio(const int midiNoteNumber) const
     float newnote;
     float newratio;
     
-    TuningSystem ts = tuning->prep->getAdaptiveIntervalScale();
-    const Array<float> intervalScale = tuning->tuningLibrary.getUnchecked(ts);
+    Array<float> intervalScale;
+    if(tuning->prep->getAdaptiveIntervalScale() == CustomTuning)
+        intervalScale = tuning->prep->getCustomScale();
+    else
+        intervalScale = tuning->tuningLibrary.getUnchecked(tuning->prep->getAdaptiveIntervalScale());
     
     if(!tuning->prep->getAdaptiveInversional() || tempnote >= adaptiveFundamentalNote)
     {
