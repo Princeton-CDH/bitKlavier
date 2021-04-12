@@ -1219,7 +1219,7 @@ static const int aMaxTempoPreparations = 5; // arbitrary, should be dynamic
 
 static const float aGlobalGain = 0.5f; //make this user settable
 
-static const float aMaxSampleLengthSec = 30.0f;
+static const float aMaxSampleLengthSec = 90.0f;//30.0f;
 static const float aRampOnTimeSec = 0.004f;
 static const float aRampOffTimeSec = 0.03f; //was .004. don't actually use these anymore...
 static const int aNumScaleDegrees = 12;

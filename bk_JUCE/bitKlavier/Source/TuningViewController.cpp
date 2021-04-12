@@ -1657,9 +1657,14 @@ void TuningPreparationEditor::update(void)
         customKeyboard.setValues(tuning->getCurrentScaleCents());
         customKeyboard.setFundamental(prep->getFundamental());
         
-        A1IntervalScaleCB.setSelectedItemIndex(prep->getAdaptiveIntervalScale(), dontSendNotification);
+        scaleIndex = prep->getAdaptiveIntervalScale();
+        scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
+        A1IntervalScaleCB.setSelectedItemIndex(scaleIndex, dontSendNotification);
         A1Inversional.setToggleState(prep->getAdaptiveInversional(), dontSendNotification);
-        A1AnchorScaleCB.setSelectedItemIndex(prep->getAdaptiveAnchorScale(), dontSendNotification);
+        
+        scaleIndex = prep->getAdaptiveAnchorScale();
+        scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
+        A1AnchorScaleCB.setSelectedItemIndex(scaleIndex, dontSendNotification);
         A1FundamentalCB.setSelectedItemIndex(prep->getAdaptiveAnchorFundamental(), dontSendNotification);
         A1ClusterThresh->setValue(prep->getAdaptiveClusterThresh(), dontSendNotification);
         A1ClusterMax->setValue(prep->getAdaptiveHistory(), dontSendNotification);
@@ -2183,7 +2188,9 @@ void TuningModificationEditor::update(void)
         
         A1Inversional.setToggleState((bool)mod->getAdaptiveInversional(), dontSendNotification);
         
-        A1AnchorScaleCB.setSelectedItemIndex(mod->getAdaptiveAnchorScale(), dontSendNotification);
+        scaleIndex = mod->getAdaptiveAnchorScale();
+        scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
+        A1AnchorScaleCB.setSelectedItemIndex(scaleIndex, dontSendNotification);
         
         A1FundamentalCB.setSelectedItemIndex( mod->getAdaptiveAnchorFundamental(), dontSendNotification);
         
