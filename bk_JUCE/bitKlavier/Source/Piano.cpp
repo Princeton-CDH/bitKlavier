@@ -1147,6 +1147,11 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap, int* id
                     {
                         thisId = idmap->getUnchecked(type)->getReference(oldId);
                     }
+                    else
+                    {
+                        thisId = idcounts[type]++;
+                        idmap->getUnchecked(type)->set(oldId, thisId);
+                    }
                 
                     i = item->getStringAttribute("piano").getIntValue();
                     int piano = i;
