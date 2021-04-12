@@ -168,7 +168,7 @@ namespace BinaryData
     const int            Daily_Decrease_xmlSize = 16883;
 
     extern const char*   Didymus_xml;
-    const int            Didymus_xmlSize = 12392;
+    const int            Didymus_xmlSize = 43348;
 
     extern const char*   for_Bill_D_xml;
     const int            for_Bill_D_xmlSize = 50692;
@@ -180,7 +180,7 @@ namespace BinaryData
     const int            Houseboat_xmlSize = 56953;
 
     extern const char*   Hurra_xml;
-    const int            Hurra_xmlSize = 23966;
+    const int            Hurra_xmlSize = 20447;
 
     extern const char*   Juxtaposed_Weather_xml;
     const int            Juxtaposed_Weather_xmlSize = 41284;
