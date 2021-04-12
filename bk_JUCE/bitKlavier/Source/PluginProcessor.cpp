@@ -1033,6 +1033,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
   
 	//if(didNoteOffs && !sustainIsDown) prevPianos.clearQuick(); //fixes phantom piano, but breaks Nostalgic keyUps over Piano changes. grr...
     
+    
     // Sets some flags to determine whether to send noteoffs to previous pianos.
     if (!noteOnCount && !sustainIsDown) {
         
