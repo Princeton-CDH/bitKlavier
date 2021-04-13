@@ -303,7 +303,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
     if (type == BKLoadLitest)      numLayers = 1;
     else if (type == BKLoadLite)        numLayers = 2;
     else if (type == BKLoadMedium)      numLayers = 4;
-    else if (type == BKLoadHeavy)       numLayers = 8;    
+    else if (type == BKLoadHeavy)       numLayers = 16;
     
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
@@ -319,9 +319,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                 temp.append(String(i),3);
                 temp.append("v",2);
                 
-                if (numLayers == 8)
+                if (numLayers == 16)
                 {
-                    temp.append(String(((k*2)+1)),3);
+                    temp.append(String(k+1),3);
                 }
                 else if (numLayers == 4)
                 {
@@ -374,9 +374,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                     }
                     
                     BigInteger velocityRange;
-                    if (numLayers == 8)
+                    if (numLayers == 16)
                     {
-                        velocityRange.setRange(aVelocityThresh_Eight[k], (aVelocityThresh_Eight[k+1] - aVelocityThresh_Eight[k]), true);
+                        velocityRange.setRange(aVelocityThresh_Sixteen[k], (aVelocityThresh_Sixteen[k+1] - aVelocityThresh_Sixteen[k]), true);
                     }
                     else if (numLayers == 4)
                     {

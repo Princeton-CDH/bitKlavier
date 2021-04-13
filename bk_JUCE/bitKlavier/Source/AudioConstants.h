@@ -1228,6 +1228,26 @@ static const int aRampNostalgicOffMS = 20;
 
 // Sample layers
 
+static const int aVelocityThresh_Sixteen[17] = {
+    0,
+    8,
+    16,
+    24,
+    32,
+    40,
+    48,
+    56,
+    64,
+    72,
+    80,
+    88,
+    96,
+    104,
+    112,
+    120,
+    128
+};
+
 static const int aVelocityThresh_Eight[9] = {
     0,
     30,
