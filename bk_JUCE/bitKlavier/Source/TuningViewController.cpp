@@ -2178,9 +2178,25 @@ void TuningModificationEditor::update(void)
         offsetSlider->setValue(mod->getFundamentalOffset() * 100., dontSendNotification);
         
         absoluteKeyboard.setValues(mod->getAbsoluteOffsetsCents());
-        customKeyboard.setValues(mod->getCustomScaleCents());
-        //absoluteKeyboard.setValues(mod->getAbsoluteOffsets());
-        //customKeyboard.setValues(mod->getCustomScale());
+        
+        if (mod->getScale() == CustomTuning)
+        {
+            customKeyboard.setValues(mod->getCustomScaleCents());
+        }
+        else
+        {
+            Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+            
+            Array<float> mScale =  tuning->tuningLibrary.getUnchecked(mod->getScale());
+            Array<float> cScale;
+            
+            for(int i=0; i<12; i++)
+            {
+                cScale.insert(i, mScale.getUnchecked(i) * 100.0);
+            }
+            
+            customKeyboard.setValues(cScale);
+        }
         
         scaleIndex = mod->getAdaptiveIntervalScale();
         scaleIndex = (scaleIndex >= AdaptiveTuning) ? scaleIndex - 2 : scaleIndex;
@@ -2439,8 +2455,24 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
         
         scaleCB.setAlpha(1.);
         
-        Tuning::Ptr currentTuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-        customKeyboard.setValues(currentTuning->getCurrentScaleCents());
+        if (mod->getScale() == CustomTuning)
+        {
+            customKeyboard.setValues(mod->getCustomScaleCents());
+        }
+        else
+        {
+            Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+           
+            Array<float> mScale =  tuning->tuningLibrary.getUnchecked(mod->getScale());
+            Array<float> cScale;
+            
+            for(int i=0; i<12; i++)
+            {
+                cScale.insert(i, mScale.getUnchecked(i) * 100.0);
+            }
+            
+            customKeyboard.setValues(cScale);
+        }
     }
     else if (box == &adaptiveSystemsCB)
     {

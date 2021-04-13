@@ -34,7 +34,6 @@ void TuningPreparation::performModification(TuningModification* p, Array<bool> d
         //            //tCustom = Array<float>(p->getCustomScale());
         //            tScale = CustomTuning;
         tCustom.modify(p->tCustom, reverse);
-        tScale = CustomTuning;
     }
     if (dirty[TuningAbsoluteOffsets]) tAbsolute.modify(p->tAbsolute, reverse);
     if (dirty[TuningNToneSemitoneWidth]) nToneSemitoneWidth.modify(p->nToneSemitoneWidth, reverse);
