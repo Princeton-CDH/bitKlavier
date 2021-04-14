@@ -967,7 +967,7 @@ void PreparationMap::sustainPedalReleased(bool post)
 
 void PreparationMap::postRelease(int noteNumber, float velocity, int channel, int mappedFrom, String source)
 {
-    // DBG("PreparationMap::postRelease " + String(noteNumber));
+    DBG("PreparationMap::postRelease " + String(noteNumber));
     
     Array<KeymapTargetState> targetStates;
     targetStates.ensureStorageAllocated(TargetStateNil);
@@ -1000,7 +1000,11 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, in
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }
         }
-        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain)) proc->keyReleased(noteNumber, velocity, channel);
+        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain))
+        {
+            DBG("PreparationMap::postRelease releasing noteNumnber: " + String(noteNumber));
+            proc->keyReleased(noteNumber, velocity, channel);
+        }
         //proc->keyReleased(noteNumber, velocity, channel);
     }
     

@@ -762,6 +762,7 @@ void BKAudioProcessor::handleAllNotesOff()
 
 void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool postHarmonizer)
 {
+    DBG("++BKAudioProcessor::handleNoteOff channel = " + String(channel));
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
      
     bool activeSource = false;
@@ -836,6 +837,8 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
     for (auto piano : prevPianos)
     {
+        
+        DBG("BKAudioProcessor::handleNoteOff handling prevPianos");
         pmap  = piano->getPreparationMap();
         
         activeSource = false;
@@ -849,7 +852,11 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         
         if (activeSource)
             if (piano != currentPiano)
-                piano->prepMap->postRelease(noteNumber, velocity, mappedFrom, channel, source);
+            {
+                DBG("BKAudioProcessor::handleNoteOff calling postRelease, channel = " + String (channel));
+                // piano->prepMap->postRelease(noteNumber, velocity, mappedFrom, channel, source);
+                piano->prepMap->postRelease(noteNumber, velocity, channel, mappedFrom, source);
+            }
     }
 }
 
@@ -1849,11 +1856,12 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     
     if (m.isNoteOn()) //&& keystrokesEnabled.getValue())
     {
-        DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn");
+        DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
         handleNoteOn(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
     }
     else if (m.isNoteOff())
     {
+        DBG("BKAudioProcessor::handleIncomingMidiMessage noteOff, channel = " + String(channel));
         handleNoteOff(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
         //didNoteOffs = true;
     }
