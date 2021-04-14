@@ -231,7 +231,7 @@ namespace BinaryData
     const int            NS_3_Song_xmlSize = 65823;
 
     extern const char*   NS_4_Marbles_xml;
-    const int            NS_4_Marbles_xmlSize = 77225;
+    const int            NS_4_Marbles_xmlSize = 223224;
 
     extern const char*   NS_5_Wallumrod_xml;
     const int            NS_5_Wallumrod_xmlSize = 103183;
@@ -240,7 +240,7 @@ namespace BinaryData
     const int            NS_6_PointsAmongLines_xmlSize = 58183;
 
     extern const char*   NS_7_Systerslaat_xml;
-    const int            NS_7_Systerslaat_xmlSize = 196107;
+    const int            NS_7_Systerslaat_xmlSize = 618814;
 
     extern const char*   NS_8_ItIsEnough_xml;
     const int            NS_8_ItIsEnough_xmlSize = 65783;
