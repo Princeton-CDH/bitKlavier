@@ -596,8 +596,6 @@ void BKAudioProcessor::renameGallery(String newName)
 
 void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool postHarmonizer)
 {
-    
-    
     bool activeSource = false;
     
     /*
@@ -803,121 +801,125 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     }
     if (!postHarmonizer)
     {
-        // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
-        handlePostRelease(noteNumber, velocity, channel, mappedFrom, source, false);
-        
         // Now call this function for each post harmonization note
         for (auto h : reducedHarm)
         {
             handleNoteOff(h, velocity, channel, noteNumber, source, true);
         }
-        return; // Done with the first pass
-    }
-    
-    String key = source + "n" + String(mappedFrom);
-    
-    if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
-    {
-        sourcedNotesOn.getUnchecked(noteNumber)->remove(key);
-        sourcedNoteVelocities.getUnchecked(noteNumber)->remove(key);
-        --noteOnCount;
-        if(noteOnCount < 0) noteOnCount = 0;
-    }
-    
-    if (activeSource)
-    {
-        //DBG("noteoff velocity = " + String(velocity));
         
-        noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
-        if(noteOnSetsNoteOffVelocity) velocity = (*sourcedNoteVelocities.getUnchecked(noteNumber))[key];
-        else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
-        
-        bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
-        currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, mappedFrom, noteDown,
-                                           (loadingSampleType == BKLoadSoundfont), source);
-    }
-}
-
-void BKAudioProcessor::handlePostRelease(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool postHarmonizer)
-{
-    for (auto piano : prevPianos)
-    {
-        DBG("BKAudioProcessor::handleNoteOff handling prevPianos");
-        PreparationMap::Ptr pmap  = piano->getPreparationMap();
-        
-        bool activeSource = false;
-        
-        if (pmap == nullptr) continue;
-        
-        Array<int> reducedHarm;
-        for (auto km : pmap->getKeymaps())
+        // This is to make sure note offs are sent to Direct and Nostalgic processors from previous pianos with holdover notes.
+        for (auto piano : prevPianos)
         {
-            if (km->getAllMidiInputIdentifiers().contains(source))
-            {
-                activeSource = true;
-                if (!postHarmonizer && km->containsNote(noteNumber))
-                {
-                    Array<int> harm = km->getHarmonizationForKey(noteNumber, true, true);
-                    for (auto h : harm)
-                    {
-                        reducedHarm.addIfNotAlreadyThere(h);
-                    }
-//                    if (km->isInverted())
-//                    {
-//                        if (km->getAllNotesOff())
-//                            clearBitKlavier();
-//
-//                        if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
-//                            sustainActivate();
-//
-//                        km->setTriggered(noteNumber, true);
-//                    }
-//                    else
-                    {
-                        km->setTriggered(noteNumber, false);
-                        if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
-                            sustainDeactivate();
-                    }
-                }
-            }
+            handlePianoPostRelease(piano, noteNumber, velocity, channel, mappedFrom, source, false);
         }
-        if (!postHarmonizer)
-        {
-            // Now call this function for each post harmonization note
-            for (auto h : reducedHarm)
-            {
-                handlePostRelease(h, velocity, channel, noteNumber, source, true);
-            }
-            return; // Done with the first pass
-        }
-        
+        // Done with the first pass
+    }
+    else
+    {
         String key = source + "n" + String(mappedFrom);
         
         if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
         {
-            sourcedNotesOn.getUnchecked(noteNumber)->remove(key);
-            sourcedNoteVelocities.getUnchecked(noteNumber)->remove(key);
-            --noteOnCount;
-            if(noteOnCount < 0) noteOnCount = 0;
+            if (sourcedNotesOn.getUnchecked(noteNumber)->contains(key))
+            {
+                sourcedNotesOn.getUnchecked(noteNumber)->remove(key);
+                sourcedNoteVelocities.getUnchecked(noteNumber)->remove(key);
+                --noteOnCount;
+                if(noteOnCount < 0) noteOnCount = 0;
+            }
         }
-        
-//        if (activeSource)
-//        {
-//            //DBG("noteoff velocity = " + String(velocity));
-//
-//            noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
-//            if(noteOnSetsNoteOffVelocity) velocity = (*sourcedNoteVelocities.getUnchecked(noteNumber))[key];
-//            else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
-//
-//            bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
-//            currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, mappedFrom, noteDown,
-//                                               (loadingSampleType == BKLoadSoundfont), source);
-//        }
         
         if (activeSource)
         {
-            if (piano != currentPiano)
+            //DBG("noteoff velocity = " + String(velocity));
+            
+            noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
+            if(noteOnSetsNoteOffVelocity) velocity = (*sourcedNoteVelocities.getUnchecked(noteNumber))[key];
+            else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
+            
+            bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
+            currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, mappedFrom, noteDown,
+                                               (loadingSampleType == BKLoadSoundfont), source);
+        }
+    }
+}
+
+void BKAudioProcessor::handlePianoPostRelease(Piano::Ptr piano, int noteNumber, float velocity, int channel, int mappedFrom, String source, bool postHarmonizer)
+{
+    PreparationMap::Ptr pmap  = piano->getPreparationMap();
+    
+    bool activeSource = false;
+    
+    if (pmap == nullptr) return;
+    
+    Array<int> reducedHarm;
+    for (auto km : pmap->getKeymaps())
+    {
+        if (km->getAllMidiInputIdentifiers().contains(source))
+        {
+            activeSource = true;
+            if (!postHarmonizer && km->containsNote(noteNumber))
             {
+                Array<int> harm = km->getHarmonizationForKey(noteNumber, true, true);
+                for (auto h : harm)
+                {
+                    reducedHarm.addIfNotAlreadyThere(h);
+                }
+//                if (km->isInverted())
+//                {
+//                    if (km->getAllNotesOff())
+//                        clearBitKlavier();
+//
+//                    if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
+//                        sustainActivate();
+//
+//                    km->setTriggered(noteNumber, true);
+//                }
+//                else
+//                {
+//                    km->setTriggered(noteNumber, false);
+//                    if (km->getSustainPedalKeys() && !km->getTriggeredKeys().contains(true))
+//                        sustainDeactivate();
+//                }
+            }
+        }
+    }
+    if (!postHarmonizer)
+    {
+        // Now call this function for each post harmonization note
+        for (auto h : reducedHarm)
+        {
+            handlePianoPostRelease(piano, h, velocity, channel, noteNumber, source, true);
+        }
+        // Done with the first pass
+    }
+    else
+    {
+        String key = source + "n" + String(mappedFrom);
+        
+        if (piano != currentPiano)
+        {
+            if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
+            {
+                if (sourcedNotesOn.getUnchecked(noteNumber)->contains(key))
+                {
+                    sourcedNotesOn.getUnchecked(noteNumber)->remove(key);
+                    sourcedNoteVelocities.getUnchecked(noteNumber)->remove(key);
+                    --noteOnCount;
+                    if(noteOnCount < 0) noteOnCount = 0;
+                }
+            }
+            
+            if (activeSource)
+            {
+//                noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
+//                if(noteOnSetsNoteOffVelocity) velocity = (*sourcedNoteVelocities.getUnchecked(noteNumber))[key];
+//                else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
+//
+//                bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
+//                piano->prepMap->keyReleased(noteNumber, velocity, channel, mappedFrom, noteDown,
+//                                            (loadingSampleType == BKLoadSoundfont), source);
+                
                 DBG("BKAudioProcessor::handleNoteOff calling postRelease, channel = " + String (channel));
                 // piano->prepMap->postRelease(noteNumber, velocity, mappedFrom, channel, source);
                 piano->prepMap->postRelease(noteNumber, velocity, channel, mappedFrom, source);
@@ -1170,7 +1172,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
             bprocessor->setActive(false);
         
         currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
-        currentPiano->configure();
+//        currentPiano->configure();
         
         for (auto bprocessor : currentPiano->getBlendronicProcessors())
             bprocessor->setActive(true);

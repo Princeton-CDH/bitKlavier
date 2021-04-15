@@ -238,9 +238,8 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
                       true);
     }
 
-    keyPlayed[noteNumber].clearQuick();
-    keyPlayedOffset[noteNumber].clearQuick();
-    
+    keyPlayed[noteNumber].removeFirstMatchingValue(noteNumber);
+    keyPlayedOffset[noteNumber].removeFirstMatchingValue(noteNumber);
 }
 
 void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont)
