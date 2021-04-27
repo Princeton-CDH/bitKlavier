@@ -176,6 +176,7 @@ private:
     void bkButtonClicked        (Button* b)                     override;
     void sliderValueChanged     (Slider* slider)                override;
     void mouseDown (const MouseEvent &event) override;
+    void mouseUp (const MouseEvent &event) override;
     
     void bkComboBoxDidChange(ComboBox* cb) override;
     
