@@ -1198,9 +1198,9 @@ typedef enum BKSampleLoadType
     BKLoadMedium,
     BKLoadHeavy,
     BKLoadSoundfont,
+    BKLoadCustom,
     BKLoadNil
-    
-}BKSampleLoadType;
+} BKSampleLoadType;
 
 static const std::vector<std::string> cBKSampleLoadTypes = {
     "Piano (litest)",

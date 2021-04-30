@@ -50,8 +50,25 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         }
     }
     
-    
-    if (type == BKLoadSoundfont)
+    if (type < BKLoadSoundfont)
+    {
+        loadingSampleType = type;
+        
+//        progress = 0.0;
+        
+        loadingSoundSet = cBKSampleLoadTypes[type];
+        
+        if (!loadedSoundSets.contains(loadingSoundSet))
+        {
+            loadingSoundSetId = loadedSoundSets.size();
+            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId), true);
+        }
+        else
+        {
+            didLoadMainPianoSamples = true;
+        }
+    }
+    else if (type == BKLoadSoundfont)
     {
         loadingSampleType = type;
         loadingSoundfont = path;
@@ -69,13 +86,11 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
             didLoadMainPianoSamples = true;
         }
     }
-    else if (type < BKLoadSoundfont)
+    else if (type == BKLoadCustom)
     {
         loadingSampleType = type;
-        
-//        progress = 0.0;
-        
-        loadingSoundSet = cBKSampleLoadTypes[type];
+        loadingSoundfont = path;
+        loadingSoundSet = path;
         
         if (!loadedSoundSets.contains(loadingSoundSet))
         {
@@ -86,6 +101,8 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         {
             didLoadMainPianoSamples = true;
         }
+        
+        loadedCustomSamples.addIfNotAlreadyThere(loadingSoundSet);
     }
     
     loadedSoundSets.addIfNotAlreadyThere(loadingSoundSet);

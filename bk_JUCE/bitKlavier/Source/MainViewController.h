@@ -205,6 +205,8 @@ private:
     Label undoStatus;
     int undoStatusCountdown;
     
+    int lastSelectedSampleCBId;
+    
     BKButtonAndMenuLAF laf;
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;
     BKWindowLAF windowLAF;

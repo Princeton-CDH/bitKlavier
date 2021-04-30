@@ -139,6 +139,8 @@ public:
     int                                 loadingSoundSetId;
     StringArray                         loadedSoundSets;
     
+    StringArray                         loadedCustomSamples;
+    
     int                                 globalSoundSetId;
     
     bool firstTime;
