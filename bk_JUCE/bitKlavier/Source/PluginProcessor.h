@@ -220,6 +220,8 @@ public:
     
     void handleNoteOn(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool harmonizer = false);
     void handleNoteOff(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool harmonizer = false);
+    
+    void handlePianoPostRelease(Piano::Ptr piano, int noteNumber, float velocity, int channel, int mappedFrom, String source, bool harmonizer = false);
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;

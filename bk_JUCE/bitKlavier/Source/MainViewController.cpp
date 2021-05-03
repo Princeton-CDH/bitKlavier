@@ -382,6 +382,14 @@ void MainViewController::mouseDown(const MouseEvent &event)
         }
 #endif
     }
+    fillSampleCB();
+    fillInstrumentCB();
+}
+
+void MainViewController::mouseUp(const MouseEvent &event)
+{
+    fillSampleCB();
+    fillInstrumentCB();
 }
 
 void MainViewController::bkComboBoxDidChange(ComboBox* cb)
@@ -743,6 +751,8 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         else if (code == 65) // A all
         {
             if (e.getModifiers().isCommandDown())   construction.selectAll();
+            fillSampleCB();
+            fillInstrumentCB();
         }
         else if (code == 66) // B blendronic
         {
