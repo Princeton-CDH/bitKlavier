@@ -334,13 +334,13 @@ void TempoPreparationEditor::timerCallback()
                 AT1MinMaxSlider->setDisplayValue(0);
         }
         
-        if (prep->sTempo.didChanged())
+        if (prep->sTempo.didChange())
             tempoSlider->setValue(prep->getTempo(), dontSendNotification);
-        if (prep->subdivisions.didChanged())
+        if (prep->subdivisions.didChange())
             subSlider->setValue(prep->getSubdivisions(), dontSendNotification);
-        if (prep->at1Mode.didChanged()) A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
-        if (prep->at1History.didChanged()) AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
-        if (prep->at1Subdivisions.didChanged()) AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
+        if (prep->at1Mode.didChange()) A1ModeCB.setSelectedItemIndex(prep->getAdaptiveTempo1Mode(), dontSendNotification);
+        if (prep->at1History.didChange()) AT1HistorySlider->setValue(prep->getAdaptiveTempo1History(), dontSendNotification);
+        if (prep->at1Subdivisions.didChange()) AT1SubdivisionsSlider->setValue(prep->getAdaptiveTempo1Subdivisions(), dontSendNotification);
     }
     
 }

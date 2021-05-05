@@ -273,7 +273,7 @@ public:
         
         inverted = e->getStringAttribute(ptagKeymap_inverted).getIntValue();
         
-        forEachXmlChildElement (*e, sub)
+        for (auto sub : e->getChildIterator())
         {
             if (sub->hasTagName(vtagKeymap_midiInputNames))
             {
@@ -304,7 +304,7 @@ public:
             else if (sub->hasTagName(vtagKeymap_harmonizer))
             {
                 int hCount = 0;
-                forEachXmlChildElement(*sub, asub)
+                for (auto asub : sub->getChildIterator())
                 {
                     if (asub->hasTagName("t" + String(hCount++)))
                     {

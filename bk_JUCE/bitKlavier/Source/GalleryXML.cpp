@@ -120,7 +120,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
         
         // iterate through its sub-elements
-        forEachXmlChildElement (*xml, e)
+        for (auto e : xml->getChildIterator())
         {
             if (e->hasTagName( vtagKeymap))
             {
@@ -287,7 +287,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
         }
         
         int which = 0;
-        forEachXmlChildElement (*xml, e)
+        for (auto e : xml->getChildIterator()) 
         {
             if (e->hasTagName(vtagPiano))
             {

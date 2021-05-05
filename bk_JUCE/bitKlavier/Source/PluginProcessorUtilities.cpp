@@ -502,7 +502,7 @@ void BKAudioProcessor::importPiano(int Id, int importId)
     
     for (int i = 0; i < BKPreparationTypeNil; i++) importmap.add(new HashMap<int, int>());
     
-    forEachXmlChildElement (*xml, sub)
+    for (auto sub : xml->getChildIterator()) 
     {
         String tag = sub->getTagName();
         

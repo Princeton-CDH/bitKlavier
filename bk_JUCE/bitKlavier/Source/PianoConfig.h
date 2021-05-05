@@ -199,7 +199,7 @@ public:
         clear();
         
         int itemCount = 0;
-        forEachXmlChildElement (*e, item)
+        for (auto item : e->getChildIterator())
         {
             if (item->hasTagName( "item" + String(itemCount++)))
             {
