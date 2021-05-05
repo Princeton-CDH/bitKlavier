@@ -49,8 +49,16 @@ public:
                          int rootMidiNote,
                          int transpose,
                          const BigInteger& midiVelocities,
-                         sfzero::Region::Ptr region = nullptr,
-                         bool isSF2 = true);
+                         sfzero::Region::Ptr region = nullptr);
+    
+    BKPianoSamplerSound (const String& name,
+                         MemoryMappedAudioFormatReader* reader,
+                         uint64 soundLength,
+                         double sourceSampleRate,
+                         const BigInteger& midiNotes,
+                         int rootMidiNote,
+                         int transpose,
+                         const BigInteger& midiVelocities);
 
     
     /** Destructor. */
@@ -65,6 +73,8 @@ public:
      */
     
     AudioSampleBuffer* getAudioData() const noexcept { return data->getAudioSampleBuffer(); }
+    
+    bool isMemoryMapped() const noexcept { return (reader != nullptr); }
     
     //==============================================================================
     bool appliesToNote (int midiNoteNumber) override;
@@ -88,6 +98,7 @@ private:
     String name;
     
     BKReferenceCountedBuffer::Ptr data;
+    std::unique_ptr<MemoryMappedAudioFormatReader> reader;
     
     double sourceSampleRate;
     BigInteger midiNotes;

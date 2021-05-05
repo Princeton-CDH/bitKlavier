@@ -143,10 +143,12 @@ public:
     
     int                                 globalSoundSetId;
     
-    bool firstTime;
+    bool firstPedalDown;
     
     bool                                defaultLoaded;
     String                              defaultName;
+    
+    OwnedArray<MemoryMappedAudioFormatReader> memoryMappedAudioReaders;
 
     void updateGalleries(void);
     
@@ -331,7 +333,7 @@ public:
                 sustainIsDown = true;
                 DBG("sustain inverted, sustain is now pressed");
                 
-                if (firstTime) {firstTime = false; return;}
+                if (firstPedalDown) {firstPedalDown = false; return;}
                 else currentPiano->prepMap->sustainPedalPressed();
             }
         }
@@ -349,7 +351,7 @@ public:
             {
                 sustainIsDown = true;
                 
-                if (firstTime) { firstTime = false; return; }
+                if (firstPedalDown) { firstPedalDown = false; return; }
                 else currentPiano->prepMap->sustainPedalPressed();
             }
         }

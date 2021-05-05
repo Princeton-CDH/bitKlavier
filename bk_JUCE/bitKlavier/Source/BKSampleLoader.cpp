@@ -685,7 +685,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                                                    region->pitch_keycenter,
                                                                    region->transpose,
                                                                    vrange,
-                                                                   region,isSF2));
+                                                                   region));
     }
     
     processor.didLoadMainPianoSamples = true;
@@ -729,9 +729,12 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                 {
                     String soundName = file.getFileName();
                     
-                    sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
+                    MemoryMappedAudioFormatReader* memoryMappedReader =
+                    wavFormat.createMemoryMappedReader(new FileInputStream(file));
                     
                     BigInteger noteRange;
+                    
+                    
                     
                     int root = 0;
                     if (j == 0) {
@@ -759,21 +762,18 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                     
                     velocityRange.setRange(aVelocityThresh_Sixteen[k], (aVelocityThresh_Sixteen[k+1] - aVelocityThresh_Sixteen[k]), true);
       
-                    double sourceSampleRate = sampleReader->sampleRate;
-                    const int numChannels = sampleReader->numChannels;
+                    double sourceSampleRate = memoryMappedReader->sampleRate;
+                    const int numChannels = memoryMappedReader->numChannels;
                     uint64 maxLength;
                     
-                    if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0) {
+                    if (sourceSampleRate <= 0 || memoryMappedReader->lengthInSamples <= 0) {
                         maxLength = 0;
                         
                     } else {
-                        maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
-                        
-                        BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),(int)maxLength);
-                        sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
+                        maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
                         
                         synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
-                                                                                   newBuffer,
+                                                                                   memoryMappedReader,
                                                                                    maxLength,
                                                                                    sourceSampleRate,
                                                                                    noteRange,

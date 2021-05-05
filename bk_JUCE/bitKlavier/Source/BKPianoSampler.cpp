@@ -21,10 +21,11 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const int rootMidiNote,
                                           const int transp,
                                           const BigInteger& velocities,
-                                          sfzero::Region::Ptr reg, bool isSF2)
+                                          sfzero::Region::Ptr reg)
 :
 name (soundName),
 data(buffer),
+reader(nullptr),
 sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
 midiVelocities(velocities),
@@ -70,6 +71,31 @@ transpose(transp)
         region_ = nullptr;
         isSoundfont = false;
     }
+}
+
+BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
+                                          MemoryMappedAudioFormatReader* reader,
+                                          uint64 soundLength,
+                                          double sourceSampleRate,
+                                          const BigInteger& notes,
+                                          int rootMidiNote,
+                                          int transp,
+                                          const BigInteger& velocities) :
+name (soundName),
+data(nullptr),
+reader(reader),
+sourceSampleRate(sourceSampleRate),
+midiNotes (notes),
+midiVelocities(velocities),
+soundLength(soundLength),
+midiRootNote (rootMidiNote),
+transpose(transp),
+isSoundfont(false)
+{
+    reader->mapEntireFile();
+    rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
+    rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
+    region_ = nullptr;
 }
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
@@ -926,10 +952,15 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
                                        int startSample, int numSamples,
                                        const BKPianoSamplerSound* playingSound)
 {
-    const float* const inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
-    const float* const inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1
-                                ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
-                                : nullptr;
+    bool memoryMapped = playingSound->isMemoryMapped();
+    const float* inL;
+    const float* inR;
+    if (!memoryMapped)
+    {
+        inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
+        inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1 ?    playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
+        : nullptr;
+    }
     
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
@@ -990,9 +1021,36 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         const float alpha = (float) (sourceSamplePosition - pos);
         const float invAlpha = 1.0f - alpha;
         int next = pos + 1;
+        
+        float lr[2], lrNext[2];
+        if (memoryMapped)
+        {
+            playingSound->reader->getSample(pos, lr);
+            playingSound->reader->getSample(next, lrNext);
+            if (playingSound->reader->numChannels == 1)
+            {
+                lr[1] = lr[0];
+                lrNext[1] = lrNext[0];
+            }
+        }
+        else
+        {
+            lr[0] = inL[pos];
+            lrNext[0] = inL[next];
+            if (inR == nullptr)
+            {
+                lr[1] = lr[0];
+                lrNext[1] = lrNext[0];
+            }
+            else
+            {
+                lr[1] = inR[pos];
+                lrNext[1] = inR[next];
+            }
+        }
 
-        const float l = (inL [pos] * invAlpha + inL [next] * alpha) * noteVelocity * adsr.tick();
-        const float r = ((inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : l) * noteVelocity * adsr.lastOut();
+        const float l = (lr[0] * invAlpha + lrNext[0] * alpha) * noteVelocity * adsr.tick();
+        const float r = (lr[1] * invAlpha + lrNext[1] * alpha) * noteVelocity * adsr.lastOut();
         
         if (adsr.getState() == BKADSR::IDLE)
         {

@@ -18,13 +18,14 @@ class BKAudioProcessor;
 class BKSampleLoader : public ThreadPoolJob
 {
 public:
-    BKSampleLoader(BKAudioProcessor& p, BKSampleLoadType sampleType, String soundfont, int instrument, int soundSetId):
+    BKSampleLoader(BKAudioProcessor& p, BKSampleLoadType sampleType, String soundfont, int instrument, int soundSetId, bool memoryMap):
     ThreadPoolJob("sample_loader"),
     processor(p),
     loadingSampleType(sampleType),
     loadingSoundfont(soundfont),
     loadingInstrument(instrument),
     loadingSoundSetId(soundSetId),
+    memoryMap(memoryMap),
     jobStatus(jobHasFinished)
     {
         int numSamplesPerLayer = 29;
@@ -57,6 +58,8 @@ private:
     int loadingInstrument;
     int loadingSoundSetId;
     
+    bool memoryMap;
+    
     JobStatus jobStatus;
     
     double progressInc;
@@ -72,6 +75,5 @@ private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BKSampleLoader)
 };
-
 
 #endif  // BKSAMPLELOADER_H_INCLUDED
