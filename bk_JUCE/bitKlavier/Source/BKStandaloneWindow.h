@@ -266,15 +266,24 @@ public:
         minNumInputs  = jmin (minNumInputs,  maxNumInputs);
         minNumOutputs = jmin (minNumOutputs, maxNumOutputs);
         
-        std::unique_ptr<Component> settings = std::make_unique<AudioSettingsComponent>(*this, deviceManager,
-                                                   minNumInputs,
-                                                   maxNumInputs,
-                                                   minNumOutputs,
-                                                   maxNumOutputs);
+        Component* settings = new AudioSettingsComponent(*this, deviceManager,
+                                                         minNumInputs,
+                                                         maxNumInputs,
+                                                         minNumOutputs,
+                                                         maxNumOutputs);
         settings->setSize(450, 500);
+
+        DialogWindow::LaunchOptions launchOptions;
+        launchOptions.dialogTitle = "Audio/MIDI Settings";
+        launchOptions.content = OptionalScopedPointer<Component>(settings, true);
+        launchOptions.componentToCentreAround = processor->getEditor();
+        launchOptions.useNativeTitleBar = false;
+        launchOptions.resizable = false;
         
-        CallOutBox& box = CallOutBox::launchAsynchronously (std::move(settings), button->getScreenBounds(), nullptr);
-        box.setLookAndFeel(&laf);
+        DialogWindow* window = launchOptions.launchAsync();
+        window->setLookAndFeel(&laf);
+        window->setTitleBarButtonsRequired(DocumentWindow::TitleBarButtons::closeButton, false);
+        window->setTitleBarTextCentred(false);
     }
     
     void saveAudioDeviceState()

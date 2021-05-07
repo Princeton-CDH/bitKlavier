@@ -381,18 +381,15 @@ public:
     inline Value getTooltipsEnabled(void) { return tooltipsEnabled; }
     inline void setTooltipsEnabled(bool enabled) { tooltipsEnabled.setValue(enabled); }
 
-    /*
-	inline bool areKeystrokesEnabled(void) { return keystrokesEnabled.getValue(); }
-	inline Value getKeystrokesEnabled(void) { return keystrokesEnabled; }
-	inline void setKeystrokesEnabled(bool enabled) { keystrokesEnabled.setValue(enabled); }
-    */
-
 	inline bool areHotkeysEnabled(void) { return hotkeysEnabled.getValue(); }
 	inline Value getHotkeysEnabled(void) { return hotkeysEnabled; }
 	inline void setHotkeysEnabled(bool enabled) { hotkeysEnabled.setValue(enabled); }
+    
+    inline bool isMemoryMappingEnabled(void) { return memoryMappingEnabled.getValue(); }
+    inline Value getMemoryMappingEnabled(void) { return memoryMappingEnabled; }
+    inline void setMemoryMappingEnabled(bool enabled) { memoryMappingEnabled.setValue(enabled); }
 
     void handleAllNotesOff();
-
     
     Array<std::shared_ptr<XmlElement>> galleryHistory;
     int undoDepth;
@@ -487,10 +484,12 @@ private:
     BKAudioProcessorEditor* editor;
     
     Value tooltipsEnabled;
-
-	//Value keystrokesEnabled;
-
+    
 	Value hotkeysEnabled;
+    
+    Value memoryMappingEnabled;
+    
+    FileSearchPath sampleSearchPaths;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

@@ -18,14 +18,14 @@ class BKAudioProcessor;
 class BKSampleLoader : public ThreadPoolJob
 {
 public:
-    BKSampleLoader(BKAudioProcessor& p, BKSampleLoadType sampleType, String soundfont, int instrument, int soundSetId, bool memoryMap):
+    BKSampleLoader(BKAudioProcessor& p, BKSampleLoadType sampleType, String soundfont, int instrument, int soundSetId, bool memoryMappingEnabled):
     ThreadPoolJob("sample_loader"),
     processor(p),
     loadingSampleType(sampleType),
     loadingSoundfont(soundfont),
     loadingInstrument(instrument),
     loadingSoundSetId(soundSetId),
-    memoryMap(memoryMap),
+    memoryMappingEnabled(memoryMappingEnabled),
     jobStatus(jobHasFinished)
     {
         int numSamplesPerLayer = 29;
@@ -58,7 +58,7 @@ private:
     int loadingInstrument;
     int loadingSoundSetId;
     
-    bool memoryMap;
+    bool memoryMappingEnabled;
     
     JobStatus jobStatus;
     

@@ -61,7 +61,7 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         if (!loadedSoundSets.contains(loadingSoundSet))
         {
             loadingSoundSetId = loadedSoundSets.size();
-            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId, true), true);
+            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId, true), isMemoryMappingEnabled());
         }
         else
         {
@@ -79,7 +79,7 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         if (!loadedSoundSets.contains(loadingSoundSet))
         {
             loadingSoundSetId = loadedSoundSets.size();
-            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId, false), true);
+            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId, false), false);
         }
         else
         {
@@ -95,7 +95,7 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         if (!loadedSoundSets.contains(loadingSoundSet))
         {
             loadingSoundSetId = loadedSoundSets.size();
-            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId, true), true);
+            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId, true), isMemoryMappingEnabled());
         }
         else
         {

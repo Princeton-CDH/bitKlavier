@@ -23,9 +23,7 @@ construction(p, &theGraph),
 overtop(p, &theGraph),
 splash(p),
 timerCallbackCount(0),
-hotkeysEnabled(true),
 preferencesButton("Preferences"),
-hotkeysButton("Enable hotkeys"),
 globalSoundSetButton("Use global samples"),
 sustainPedalButton("Sustain Pedal")
 {
@@ -40,15 +38,6 @@ sustainPedalButton("Sustain Pedal")
     sustainPedalButton.addListener(this);
     addAndMakeVisible(sustainPedalButton);
     sustainPedalButton.setVisible(false);
-    
-	/*keystrokesButton.setClickingTogglesState(true);
-	keystrokesButton.getToggleStateValue().referTo(editor.getKeystrokesEnabled());
-	addAndMakeVisible(keystrokesButton);*/
-
-	hotkeysButton.setClickingTogglesState(true);
-	hotkeysButton.getToggleStateValue().referTo(editor.getHotkeysEnabled());
-	addAndMakeVisible(hotkeysButton);
-    
     
     addAndMakeVisible(splash);
     splash.setAlwaysOnTop(true);
@@ -189,8 +178,6 @@ MainViewController::~MainViewController()
     octaveSlider.setLookAndFeel(nullptr);
     mainSlider.setLookAndFeel(nullptr);
     overtop.setLookAndFeel(nullptr);
-	//keystrokesButton.setLookAndFeel(nullptr);
-	hotkeysButton.setLookAndFeel(nullptr);
     undoStatus.setLookAndFeel(nullptr);
     globalSoundSetButton.setLookAndFeel(nullptr);
     //sustainPedalButton.setLookAndFeel(nullptr);

@@ -111,7 +111,8 @@ currentSampleRate(44100.),
 doneWithSetStateInfo(false),
 midiReady(false),
 tooltipsEnabled(true),
-hotkeysEnabled(true)
+hotkeysEnabled(true),
+memoryMappingEnabled(false)
 {
 #if BK_UNIT_TESTS
     

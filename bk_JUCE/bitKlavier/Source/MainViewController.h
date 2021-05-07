@@ -110,6 +110,8 @@ public:
         /*viewPort.autoScroll(e.x, e.y, 100, 150);*/
     }
     
+    inline BKConstructionSite* getConstructionSite() { return &construction; }
+    
     /*inline Viewport* getViewport(void) { return &viewPort;}*/
     void toggleDisplay(void);
     void performUndo(void);
@@ -190,14 +192,8 @@ private:
     bool keyPressed (const KeyPress& e, Component*) override;
     
     bool isAddingFromMidiInput;
-
-	bool hotkeysEnabled;
-	bool keystrokesEnabled;
     
     TextButton preferencesButton;
-
-	ToggleButton keystrokesButton;
-	ToggleButton hotkeysButton;
     
     ToggleButton globalSoundSetButton;
 

@@ -81,11 +81,20 @@ void BKAudioProcessorEditor::resized()
 
 void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
 {
-    std::unique_ptr<Component> settings = std::make_unique<PreferencesComponent> (*this);
-    settings->setSize(200, 120);
+    Component* settings = new PreferencesComponent(*this);
+    settings->setSize(400, 300);
     
-    CallOutBox* preferences = &CallOutBox::launchAsynchronously (std::move(settings), button->getScreenBounds(), nullptr);
-    preferences->setLookAndFeel(&laf);
+    DialogWindow::LaunchOptions launchOptions;
+    launchOptions.dialogTitle = "Preferences";
+    launchOptions.content = OptionalScopedPointer<Component>(settings, true);
+    launchOptions.componentToCentreAround = mvc.getConstructionSite();
+    launchOptions.useNativeTitleBar = false;
+    launchOptions.resizable = false;
+    
+    DialogWindow* window = launchOptions.launchAsync();
+    window->setLookAndFeel(&laf);
+    window->setTitleBarButtonsRequired(DocumentWindow::TitleBarButtons::closeButton, false);
+    window->setTitleBarTextCentred(false);
 }
 
 bool BKAudioProcessorEditor::tooltipsAreEnabled()
@@ -118,6 +127,23 @@ bool BKAudioProcessorEditor::setHotkeysEnabled(bool enabled)
 {
 	processor.setHotkeysEnabled(enabled);
 	return processor.areHotkeysEnabled();
+}
+
+
+bool BKAudioProcessorEditor::isMemoryMappingEnabled()
+{
+    return processor.isMemoryMappingEnabled();
+}
+
+Value BKAudioProcessorEditor::getMemoryMappingEnabled(void)
+{
+    return processor.getMemoryMappingEnabled();
+}
+
+bool BKAudioProcessorEditor::setMemoryMappingEnabled(bool enabled)
+{
+    processor.setMemoryMappingEnabled(enabled);
+    return processor.isMemoryMappingEnabled();
 }
 
 void BKAudioProcessorEditor::tooltipsChanged(void)

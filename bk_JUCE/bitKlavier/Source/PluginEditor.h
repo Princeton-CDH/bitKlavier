@@ -37,19 +37,19 @@ public:
     Value getTooltipsEnabled(void);
     bool setTooltipsEnabled(bool enabled);
 
-    /*
-	bool areKeystrokesEnabled(void);
-	Value getKeystrokesEnabled(void);
-	bool setKeystrokesEnabled(bool enabled);
-    */
-
 	bool areHotkeysEnabled(void);
 	Value getHotkeysEnabled(void);
 	bool setHotkeysEnabled(bool enabled);
     
+    bool isMemoryMappingEnabled(void);
+    Value getMemoryMappingEnabled(void);
+    bool setMemoryMappingEnabled(bool enabled);
+    
     void tooltipsChanged(void);
     
     void showBKSettingsDialog(Button* button);
+    
+    MainViewController& getMainViewController() { return mvc; }
     
 private:
     // This reference is provided as a quick way for your editor to
@@ -69,46 +69,38 @@ private:
     
     BKWindowLAF laf;
     
-    class PreferencesComponent : public Component
+    class PreferencesComponent : public Component,
+                                 public TextEditor::Listener
     {
     public:
         PreferencesComponent (BKAudioProcessorEditor& editor)
         : owner (editor),
         tooltipsLabel  ("Show tooltips", "Show tooltips"),
-		//keystrokesLabel("Enable keystrokes", "Enable keystrokes"),
 		hotkeysLabel("Enable hotkeys", "Enable hotkeys"),
-        tooltipsButton (""),
-		//keystrokesButton(""),
-		hotkeysButton("")
+        memoryMappingLabel("Enable direct-from-disk sample playback", "Enable direct-from-disk sample playback"),
+        tooltipsButton ("Enable tooltips"),
+		hotkeysButton("Enable hotkeys"),
+        memoryMappingButton("Enable direct-from-disk sample playback")
         {
             setOpaque (true);
+            
+            addAndMakeVisible(searchPathEditor);
             
             tooltipsButton.setClickingTogglesState (true);
             tooltipsButton.getToggleStateValue().referTo (owner.getTooltipsEnabled());
             tooltipsButton.onClick = [this] { owner.tooltipsChanged(); };
-            
             addAndMakeVisible (tooltipsButton);
             addAndMakeVisible (tooltipsLabel);
-            
-            tooltipsLabel.attachToComponent (&tooltipsButton, true);
-
-            /*
-			keystrokesButton.setClickingTogglesState(true);
-			keystrokesButton.getToggleStateValue().referTo(owner.getKeystrokesEnabled());
-
-			addAndMakeVisible(keystrokesButton);
-			addAndMakeVisible(keystrokesLabel);
-
-			keystrokesLabel.attachToComponent(&keystrokesButton, true);
-            */
 
 			hotkeysButton.setClickingTogglesState(true);
-			hotkeysButton.getToggleStateValue().referTo(owner.getHotkeysEnabled());
-
+            hotkeysButton.getToggleStateValue().referTo(owner.getHotkeysEnabled());
 			addAndMakeVisible(hotkeysButton);
 			addAndMakeVisible(hotkeysLabel);
-
-			hotkeysLabel.attachToComponent(&hotkeysButton, true);
+            
+            memoryMappingButton.setClickingTogglesState(true);
+            memoryMappingButton.getToggleStateValue().referTo(owner.getMemoryMappingEnabled());
+            addAndMakeVisible(memoryMappingButton);
+            addAndMakeVisible(memoryMappingLabel);
         }
         
         void paint (Graphics& g) override
@@ -120,24 +112,33 @@ private:
         {
             auto r = getLocalBounds();
             
-            r.removeFromTop(8);
-            r.removeFromLeft(r.getWidth() * 0.5);
-            r.removeFromRight(8);
+            r.reduce(12, 12);
+            searchPathEditor.setBounds(r.removeFromTop(48));
+            memoryMappingButton.setBounds(r.removeFromTop(24));
+            hotkeysButton.setBounds(r.removeFromTop(24));
             tooltipsButton.setBounds (r.removeFromTop(24));
-			//keystrokesButton.setBounds(r.removeFromTop(24));
-			hotkeysButton.setBounds(r.removeFromTop(24));
+        }
+        
+        void textEditorTextChanged(TextEditor& e) override
+        {
+            if (&e == &searchPathEditor)
+            {
+
+            }
         }
         
     private:
         //==============================================================================
         BKAudioProcessorEditor& owner;
         
+        TextEditor searchPathEditor;
+        
         Label tooltipsLabel;
-		//Label keystrokesLabel;
 		Label hotkeysLabel;
+        Label memoryMappingLabel;
         ToggleButton tooltipsButton;
-		//ToggleButton keystrokesButton;
 		ToggleButton hotkeysButton;
+        ToggleButton memoryMappingButton;
 
         // Other ideas for preferences
         // - Show keyboard contents when selected
