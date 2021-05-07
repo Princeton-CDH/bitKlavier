@@ -536,7 +536,7 @@ public:
         if (adaptiveType.value == AdaptiveSpring) setSpringsActive(true);
         
         // custom scale
-        forEachXmlChildElement (*e, sub)
+        for (auto sub : e->getChildIterator())
         {
             if (sub->hasTagName("springtuning"))
             {

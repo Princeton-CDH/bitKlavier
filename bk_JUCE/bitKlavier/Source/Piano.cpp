@@ -1102,9 +1102,9 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap, int* id
     BKItem::Ptr thisItem;
     BKItem::Ptr thisConnection;
 
-    forEachXmlChildElement (*e, group)
+    for (auto group : e->getChildIterator())
     {
-        forEachXmlChildElement(*group, item)
+        for (auto item : group->getChildIterator())
         {
             if (item->getTagName() == "item")
             {
@@ -1194,7 +1194,7 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap, int* id
             
             if (connections != nullptr)
             {
-                forEachXmlChildElement (*connections, connection)
+                for (auto connection : connections->getChildIterator())
                 {
                     i = connection->getStringAttribute("type").getIntValue();
                     BKPreparationType cType = (BKPreparationType) i;

@@ -738,7 +738,7 @@ void BlendronicPreparationEditor::timerCallback()
                 }
             }
             
-            if (prep->outGain.didChanged()) gainSlider->setValue(prep->outGain.value, dontSendNotification);
+            if (prep->outGain.didChange()) gainSlider->setValue(prep->outGain.value, dontSendNotification);
         }
     }
 }

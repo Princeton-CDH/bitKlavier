@@ -139,7 +139,7 @@ void DirectModification::setStateOld(XmlElement* e)
         setDirty(DirectResGain);
     }
     
-    forEachXmlChildElement (*e, sub)
+    for (auto sub : e->getChildIterator())
     {
         if (sub->hasTagName(vtagDirect_transposition))
         {
@@ -333,7 +333,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         setDirty(SynchronicGain);
     }
     
-    forEachXmlChildElement (*e, sub)
+    for (auto sub : e->getChildIterator())
     {
         if (sub->hasTagName(vtagSynchronic_beatMults))
         {
@@ -397,7 +397,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         {
             Array<Array<float>> atransp;
             int tcount = 0;
-            forEachXmlChildElement (*sub, asub)
+            for (auto asub : sub->getChildIterator())
             {
                 if (asub->hasTagName("t"+String(tcount++)))
                 {
@@ -425,7 +425,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         {
             Array<Array<float>> aenvs;
             int tcount = 0;
-            forEachXmlChildElement (*sub, asub)
+            for (auto asub : sub->getChildIterator())
             {
                 if (asub->hasTagName("e"+String(tcount++)))
                 {
@@ -567,7 +567,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
         setDirty(NostalgicUndertow);
     }
     
-    forEachXmlChildElement (*e, sub)
+    for (auto sub : e->getChildIterator())
     {
         if (sub->hasTagName(vtagNostalgic_transposition))
         {
@@ -914,7 +914,7 @@ void TuningModification::setStateOld(XmlElement* e)
     }
     
     // custom scale
-    forEachXmlChildElement (*e, sub)
+    for (auto sub : e->getChildIterator())
     {
         if (sub->hasTagName("twa"))
         {

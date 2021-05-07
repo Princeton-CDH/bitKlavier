@@ -462,7 +462,7 @@ public:
         
         nTransposition.setState(e, StringArray(vtagNostalgic_transposition, ptagFloat), Array<float>(0.0f));
         
-        forEachXmlChildElement (*e, sub)
+        for (auto sub : e->getChildIterator())
         {
             if (sub->hasTagName(vtagNostalgic_reverseADSR))
             {

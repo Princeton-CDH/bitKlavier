@@ -695,21 +695,21 @@ void DirectPreparationEditor::timerCallback()
         
         if (prep != nullptr && dProcessor != nullptr)
         {
-            if (prep->dTransposition.didChanged()) transpositionSlider->setValue(prep->dTransposition.value, dontSendNotification);
-            if (prep->dGain.didChanged())
+            if (prep->dTransposition.didChange()) transpositionSlider->setValue(prep->dTransposition.value, dontSendNotification);
+            if (prep->dGain.didChange())
                 gainSlider->setValue(prep->dGain.value, dontSendNotification);
-            if (prep->dResonanceGain.didChanged()) resonanceGainSlider->setValue(prep->dResonanceGain.value, dontSendNotification);
-            if (prep->dHammerGain.didChanged()) hammerGainSlider->setValue(prep->dHammerGain.value, dontSendNotification);
-            if (prep->dBlendronicGain.didChanged()) blendronicGainSlider->setValue(prep->dBlendronicGain.value, dontSendNotification);
-            if (prep->dAttack.didChanged())
+            if (prep->dResonanceGain.didChange()) resonanceGainSlider->setValue(prep->dResonanceGain.value, dontSendNotification);
+            if (prep->dHammerGain.didChange()) hammerGainSlider->setValue(prep->dHammerGain.value, dontSendNotification);
+            if (prep->dBlendronicGain.didChange()) blendronicGainSlider->setValue(prep->dBlendronicGain.value, dontSendNotification);
+            if (prep->dAttack.didChange())
                 ADSRSlider->setAttackValue(prep->dAttack.value, dontSendNotification);
-            if (prep->dDecay.didChanged())
+            if (prep->dDecay.didChange())
                 ADSRSlider->setDecayValue(prep->dDecay.value, dontSendNotification);
-            if (prep->dSustain.didChanged()) ADSRSlider->setSustainValue(prep->dSustain.value, dontSendNotification);
-            if (prep->dRelease.didChanged()) ADSRSlider->setReleaseValue(prep->dRelease.value, dontSendNotification);
-            if (prep->dTranspUsesTuning.didChanged()) transpUsesTuning.setToggleState(prep->dTranspUsesTuning.value, dontSendNotification);
-            if (prep->velocityMin.didChanged()) velocityMinMaxSlider->setMinValue(prep->velocityMin.value, dontSendNotification);
-            if (prep->velocityMax.didChanged()) velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, dontSendNotification);
+            if (prep->dSustain.didChange()) ADSRSlider->setSustainValue(prep->dSustain.value, dontSendNotification);
+            if (prep->dRelease.didChange()) ADSRSlider->setReleaseValue(prep->dRelease.value, dontSendNotification);
+            if (prep->dTranspUsesTuning.didChange()) transpUsesTuning.setToggleState(prep->dTranspUsesTuning.value, dontSendNotification);
+            if (prep->velocityMin.didChange()) velocityMinMaxSlider->setMinValue(prep->velocityMin.value, dontSendNotification);
+            if (prep->velocityMax.didChange()) velocityMinMaxSlider->setMaxValue(prep->velocityMax.value, dontSendNotification);
         }
     }
 }

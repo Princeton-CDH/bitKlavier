@@ -379,7 +379,20 @@ public:
         tetherWeightGlobal.setState(e, "tetherWeightGlobal", 0.5);
         tetherWeightSecondaryGlobal.setState(e, "tetherWeightSecondaryGlobal", 0.1);
         
-        forEachXmlChildElement (*e, sub)
+        // Starts the timer if active, stops it otherwise
+        setRate(getRate(), getActive());
+        // Make sure all springs and particles are updated
+        setIntervalTuning(getIntervalTuning());
+        setTetherTuning(getTetherTuning());
+        setSpringWeights(getSpringWeights());
+        setTetherWeights(getTetherWeights());
+        setIntervalFundamental(getIntervalFundamental());
+//        setUsingFundamentalForIntervalSprings(getUsingFundamentalForIntervalSprings());
+        setFundamentalSetsTether(getFundamentalSetsTether());
+        setTetherWeightGlobal(getTetherWeightGlobal());
+        setTetherWeightSecondaryGlobal(getTetherWeightSecondaryGlobal());
+        
+        for (auto sub : e->getChildIterator())
         {
             if (sub->hasTagName("intervalScale"))
             {
