@@ -80,6 +80,10 @@ public:
         sustain = s;
         release = r;
     }
+
+    // find the bounding velocities for this sound
+    int minVelocity (void) { return midiVelocities.findNextSetBit(0); }
+    int maxVelocity (void) { return midiVelocities.findNextClearBit(midiVelocities.findNextSetBit(0)); }
     
 private:
     //==============================================================================

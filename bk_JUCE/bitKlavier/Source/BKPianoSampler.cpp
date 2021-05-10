@@ -394,6 +394,24 @@ void BKPianoSamplerVoice::startNote (const int midi,
         
         noteVelocity = velocity;
         
+        // *** START new layer-based approach to velocity handling ** //
+        DBG("noteVelocity = " + String(noteVelocity * 127.));
+        DBG("min velocity = " + String(sound->minVelocity()));
+        DBG("max velocity = " + String(sound->maxVelocity()));
+        
+        //dB range of layer (need to figure out how to estimate range of instrument)
+        // 30 is rough estimate, might actually be fine
+        double dynRange = 30. * (sound->maxVelocity() - sound->minVelocity()) / 127.;
+        //if (sound->minVelocity() == 0) dynRange *= 2.; // extend dynamic range for softest layer?
+        DBG("dynRange = " + String(dynRange));
+        
+        double dBadjust = dynRange * (noteVelocity * 127. - sound->maxVelocity()) / (sound->maxVelocity() - sound->minVelocity());
+        DBG("dB adjust = " + String(dBadjust));
+        double gainAdjust = Decibels::decibelsToGain(dBadjust);
+        noteVelocity = gainAdjust;
+        DBG("new gain multiplier = " + String(noteVelocity));
+        // *** END new layer-based approach to velocity handling ** //
+        
         lengthTracker = 0.0;
         
         inLoop = false;
