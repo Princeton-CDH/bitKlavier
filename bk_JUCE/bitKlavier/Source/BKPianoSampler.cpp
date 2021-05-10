@@ -402,7 +402,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
         //dB range of layer (need to figure out how to estimate range of instrument)
         // 30 is rough estimate, might actually be fine
         double dynRange = 30. * (sound->maxVelocity() - sound->minVelocity()) / 127.;
-        //if (sound->minVelocity() == 0) dynRange *= 2.; // extend dynamic range for softest layer?
+        if (sound->minVelocity() == 0) dynRange *= 4.; // extend dynamic range for softest layer?
         DBG("dynRange = " + String(dynRange));
         
         double dBadjust = dynRange * (noteVelocity * 127. - sound->maxVelocity()) / (sound->maxVelocity() - sound->minVelocity());
