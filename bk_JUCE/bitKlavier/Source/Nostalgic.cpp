@@ -78,7 +78,9 @@ keymaps(Keymap::PtrArr())
     {
         // comes in as "soundfont.sf2.subsound1"
         String name = nostalgic->prep->nSoundSetName.value;
-        BKSampleLoadType type = BKLoadSoundfont;
+        BKSampleLoadType type;
+        String path;
+        int subsound = 0;
         
         for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
         {
@@ -88,22 +90,29 @@ keymaps(Keymap::PtrArr())
             }
         }
         
-        String path = name.upToLastOccurrenceOf(".subsound", false, false);
-        int subsound = 0;
-        
-        if (type == BKLoadSoundfont)
+        String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
+        for (auto sf : synth->processor.soundfontNames)
         {
-            for (auto sf : synth->processor.soundfontNames)
+            if (sf.contains(sfName))
             {
-                if (sf.contains(path))
-                {
-                    path = sf;
-                    break;
-                }
+                type = BKLoadSoundfont;
+                path = sf;
+                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+                break;
             }
-
-            subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
         }
+        
+        
+        for (auto cs : synth->processor.customSampleSetNames)
+        {
+            if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
+            {
+                type = BKLoadCustom;
+                path = cs;
+                break;
+            }
+        }
+        
         int Id = synth->loadSamples(type, path, subsound, false);
         nostalgic->prep->setSoundSet(Id);
     }
