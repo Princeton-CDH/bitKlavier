@@ -124,6 +124,8 @@ public:
     // Names of soundfont instruments keyed by sound set ids
     HashMap<int, StringArray>           instrumentNames;
     
+    StringArray                         customSampleSetNames;
+    
     OwnedArray<StringArray>             exportedPreparations;
     StringArray                         exportedPianos;
         
@@ -139,8 +141,6 @@ public:
     int                                 loadingSoundSetId;
     StringArray                         loadedSoundSets;
     
-    StringArray                         loadedCustomSamples;
-    
     int                                 globalSoundSetId;
     
     bool firstPedalDown;
@@ -149,6 +149,8 @@ public:
     String                              defaultName;
     
     OwnedArray<MemoryMappedAudioFormatReader> memoryMappedAudioReaders;
+    
+    FileSearchPath sampleSearchPath;
 
     void updateGalleries(void);
     
@@ -156,6 +158,7 @@ public:
     void collectPianos(void);
     void collectPreparations(void);
     void collectSoundfonts(void);
+    void collectCustomSamples(void);
     
     void collectGalleriesFromFolder(File folder);
     void collectPianosFromFolder(File folder);
@@ -488,8 +491,6 @@ private:
 	Value hotkeysEnabled;
     
     Value memoryMappingEnabled;
-    
-    FileSearchPath sampleSearchPaths;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)

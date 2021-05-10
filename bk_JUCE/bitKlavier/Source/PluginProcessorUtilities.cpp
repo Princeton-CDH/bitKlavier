@@ -101,8 +101,6 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         {
             didLoadMainPianoSamples = true;
         }
-        
-        loadedCustomSamples.addIfNotAlreadyThere(loadingSoundSet);
     }
     
     loadedSoundSets.addIfNotAlreadyThere(loadingSoundSet);
@@ -188,6 +186,35 @@ void BKAudioProcessor::collectSoundfonts(void)
     
     collectSoundfontsFromFolder(bkSoundfonts);
     soundfontNames.sort(true);
+}
+
+void BKAudioProcessor::collectCustomSamples()
+{
+    customSampleSetNames.clear();
+    
+    // Get every folder in the search path
+    Array<File> directories = sampleSearchPath.findChildFiles(File::TypesOfFileToFind::findDirectories, true);
+    for (int i = 0; i < sampleSearchPath.getNumPaths(); ++i)
+    {
+        directories.add(sampleSearchPath[i]);
+    }
+    
+    for (auto dir : directories)
+    {
+        // Check if the folder contains any properly formatted wav files
+        for (auto iter : RangedDirectoryIterator (File (dir), false, "*.wav"))
+        {
+            String fileName = iter.getFile().getFileNameWithoutExtension();
+            
+            std::regex reg("[ABCDEFG]#*b*\\dv\\d+");
+            if (std::regex_search(fileName.toStdString(), reg))
+            {
+                customSampleSetNames.add(dir.getFullPathName());
+                break;
+            }
+        }
+    }
+
 }
 
 String BKAudioProcessor::firstGallery(void)

@@ -11,6 +11,8 @@
 #ifndef BKUTILITIES_H_INCLUDED
 #define BKUTILITIES_H_INCLUDED
 
+#include <regex>
+
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "BKReferenceCountedBuffer.h"

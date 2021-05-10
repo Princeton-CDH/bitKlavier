@@ -70,20 +70,29 @@ private:
     BKWindowLAF laf;
     
     class PreferencesComponent : public Component,
+                                 public Button::Listener,
                                  public TextEditor::Listener
     {
     public:
         PreferencesComponent (BKAudioProcessorEditor& editor)
         : owner (editor),
-        tooltipsLabel  ("Show tooltips", "Show tooltips"),
+        searchPathLabel("Sample search paths:", "Sample search paths:"),
+        pathAddButton("Add search path"),
+        tooltipsLabel("Enable tooltips", "Enable tooltips"),
 		hotkeysLabel("Enable hotkeys", "Enable hotkeys"),
-        memoryMappingLabel("Enable direct-from-disk sample playback", "Enable direct-from-disk sample playback"),
-        tooltipsButton ("Enable tooltips"),
-		hotkeysButton("Enable hotkeys"),
-        memoryMappingButton("Enable direct-from-disk sample playback")
+        memoryMappingLabel("Enable direct-from-disk sample playback", "Enable direct-from-disk sample playback")
         {
             setOpaque (true);
             
+            searchPathLabel.setJustificationType(Justification::topLeft);
+            addAndMakeVisible(searchPathLabel);
+            pathAddButton.addListener(this);
+            addAndMakeVisible(pathAddButton);
+            
+            searchPathEditor.setMultiLine(true);
+            String text = owner.processor.sampleSearchPath.toString().replace(";", "; ");
+            searchPathEditor.setText(text, dontSendNotification);
+            searchPathEditor.addListener(this);
             addAndMakeVisible(searchPathEditor);
             
             tooltipsButton.setClickingTogglesState (true);
@@ -113,24 +122,73 @@ private:
             auto r = getLocalBounds();
             
             r.reduce(12, 12);
-            searchPathEditor.setBounds(r.removeFromTop(48));
-            memoryMappingButton.setBounds(r.removeFromTop(24));
-            hotkeysButton.setBounds(r.removeFromTop(24));
-            tooltipsButton.setBounds (r.removeFromTop(24));
+            Rectangle<int> slice = r.removeFromTop(24);
+            searchPathLabel.setBounds(slice.removeFromLeft(slice.getWidth()*0.6));
+            pathAddButton.setBounds(slice.withHeight(25));
+            searchPathEditor.setBounds(r.removeFromTop(72));
+            r.removeFromTop(24);
+            slice = r.removeFromTop(24);
+            hotkeysButton.setBounds(slice.removeFromLeft(24));
+            hotkeysButton.changeWidthToFitText();
+            hotkeysLabel.setBounds(slice);
+            slice = r.removeFromTop(24);
+            tooltipsButton.setBounds(slice.removeFromLeft(24));
+            tooltipsButton.changeWidthToFitText();
+            tooltipsLabel.setBounds(slice);
+            slice = r.removeFromTop(24);
+            memoryMappingButton.setBounds(slice.removeFromLeft(24));
+            memoryMappingButton.changeWidthToFitText();
+            memoryMappingLabel.setBounds(slice);
         }
         
-        void textEditorTextChanged(TextEditor& e) override
+        void buttonClicked(Button* b) override
+        {
+            if (b == &pathAddButton)
+            {
+                FileChooser chooser("Add path...",
+                                    File::getSpecialLocation (File::userHomeDirectory));
+                
+                if (chooser.browseForDirectory())
+                {
+                    owner.processor.sampleSearchPath.addIfNotAlreadyThere(chooser.getResult());
+                    updateSearchPath();
+                }
+            }
+        }
+        
+        void textEditorReturnKeyPressed(TextEditor& e) override
         {
             if (&e == &searchPathEditor)
             {
-
+                owner.processor.sampleSearchPath = e.getText();
+                updateSearchPath();
             }
+        }
+        
+        void textEditorFocusLost(TextEditor& e) override
+        {
+            if (&e == &searchPathEditor)
+            {
+                owner.processor.sampleSearchPath = e.getText();
+                updateSearchPath();
+            }
+        }
+        
+        void updateSearchPath()
+        {
+            owner.processor.sampleSearchPath.removeRedundantPaths();
+            owner.processor.sampleSearchPath.removeNonExistentPaths();
+            String text = owner.processor.sampleSearchPath.toString().replace(";", "; ");
+            searchPathEditor.setText(text, dontSendNotification);
+            owner.processor.collectCustomSamples();
         }
         
     private:
         //==============================================================================
         BKAudioProcessorEditor& owner;
         
+        Label searchPathLabel;
+        TextButton pathAddButton;
         TextEditor searchPathEditor;
         
         Label tooltipsLabel;

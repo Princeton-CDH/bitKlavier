@@ -82,7 +82,7 @@ void BKAudioProcessorEditor::resized()
 void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
 {
     Component* settings = new PreferencesComponent(*this);
-    settings->setSize(400, 300);
+    settings->setSize(600, 450);
     
     DialogWindow::LaunchOptions launchOptions;
     launchOptions.dialogTitle = "Preferences";

@@ -77,8 +77,8 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     
     settingsVT.setProperty("tooltipsEnabled", (int)areTooltipsEnabled(), 0);
     settingsVT.setProperty("hotkeysEnabled", (int)areHotkeysEnabled(), 0);
-    
     settingsVT.setProperty("memoryMappingEnabled", (int)isMemoryMappingEnabled(), 0);
+    settingsVT.setProperty("sampleSearchPath", sampleSearchPath.toString(), 0);
     
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
@@ -153,13 +153,19 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             setTooltipsEnabled((bool)userSettings->getIntAttribute("tooltipsEnabled", 1));
             setHotkeysEnabled((bool)userSettings->getIntAttribute("hotkeysEnabled", 1));
             setMemoryMappingEnabled((bool)userSettings->getIntAttribute("memoryMappingEnabled", 0));
+            
+            sampleSearchPath = userSettings->getStringAttribute("sampleSearchPath", "");
         }
         else
         {
             setTooltipsEnabled(true);
             setHotkeysEnabled(true);
             setMemoryMappingEnabled(false);
+            
+            sampleSearchPath = "";
         }
+        
+        collectCustomSamples();
         
         defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
         

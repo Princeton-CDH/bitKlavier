@@ -447,28 +447,28 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             
             soundSetId = processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[index], 0, globalSoundSetButton.getToggleState());
         }
-        else if (selectedId < cb->getNumItems())
+        else //if (selectedId < cb->getNumItems())
         {
             int index = selectedId - processor.soundfontNames.size() - BKLoadSoundfont - 1;
-            soundSetId = processor.loadSamples(BKLoadCustom, processor.loadedCustomSamples[index], 0, globalSoundSetButton.getToggleState());
+            soundSetId = processor.loadSamples(BKLoadCustom, processor.customSampleSetNames[index], 0, globalSoundSetButton.getToggleState());
         }
-        else
-        {
-            FileChooser chooser("Import sample files...",
-                                File::getSpecialLocation (File::userHomeDirectory));
-            
-            if (chooser.browseForDirectory())
-            {
-                String path = chooser.getResult().getFullPathName();
-                soundSetId = processor.loadSamples(BKLoadCustom, path, 0, globalSoundSetButton.getToggleState());
-                fillSampleCB();
-            }
-            else
-            {
-                sampleCB.setSelectedId(lastSelectedSampleCBId, dontSendNotification);
-                return;
-            }
-        }
+//        else
+//        {
+//            FileChooser chooser("Import sample files...",
+//                                File::getSpecialLocation (File::userHomeDirectory));
+//
+//            if (chooser.browseForDirectory())
+//            {
+//                String path = chooser.getResult().getFullPathName();
+//                soundSetId = processor.loadSamples(BKLoadCustom, path, 0, globalSoundSetButton.getToggleState());
+//                fillSampleCB();
+//            }
+//            else
+//            {
+//                sampleCB.setSelectedId(lastSelectedSampleCBId, dontSendNotification);
+//                return;
+//            }
+//        }
         
         String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
         if (directSelected)
@@ -944,9 +944,9 @@ void MainViewController::fillSampleCB()
         id++;
     }
     
-    if (!processor.loadedCustomSamples.isEmpty()) sampleCB.addSeparator();
+    if (!processor.customSampleSetNames.isEmpty()) sampleCB.addSeparator();
     
-    for (auto custom : processor.loadedCustomSamples)
+    for (auto custom : processor.customSampleSetNames)
     {
         String customName = custom.fromLastOccurrenceOf(File::getSeparatorString(), false, true);
         
@@ -956,10 +956,10 @@ void MainViewController::fillSampleCB()
             sampleCB.setSelectedId(id, dontSendNotification);
         id++;
     }
-    
-    sampleCB.addSeparator();
-    
-    sampleCB.addItem("Import samples...", id);
+//
+//    sampleCB.addSeparator();
+//
+//    sampleCB.addItem("Import samples...", id);
 }
 
 void MainViewController::fillInstrumentCB()
