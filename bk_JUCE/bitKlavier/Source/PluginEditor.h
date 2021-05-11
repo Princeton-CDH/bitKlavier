@@ -83,6 +83,7 @@ private:
         memoryMappingLabel("Enable direct-from-disk sample playback", "Enable direct-from-disk sample playback")
         {
             setOpaque (true);
+            setWantsKeyboardFocus(true);
             
             searchPathLabel.setJustificationType(Justification::topLeft);
             addAndMakeVisible(searchPathLabel);
@@ -145,14 +146,20 @@ private:
         {
             if (b == &pathAddButton)
             {
-                FileChooser chooser("Add path...",
-                                    File::getSpecialLocation (File::userHomeDirectory));
+                fc = new FileChooser ("Add folders...",
+                                      File::getSpecialLocation (File::userHomeDirectory));
                 
-                if (chooser.browseForDirectory())
-                {
-                    owner.processor.sampleSearchPath.addIfNotAlreadyThere(chooser.getResult());
+                fc->launchAsync (FileBrowserComponent::openMode |
+                                 FileBrowserComponent::canSelectDirectories |
+                                 FileBrowserComponent::canSelectMultipleItems,
+                                 [this] (const FileChooser& chooser)
+                                 {
+                    for (auto result : chooser.getResults())
+                    {
+                        owner.processor.sampleSearchPath.addIfNotAlreadyThere(result);
+                    }
                     updateSearchPath();
-                }
+                });
             }
         }
         
@@ -160,8 +167,15 @@ private:
         {
             if (&e == &searchPathEditor)
             {
-                owner.processor.sampleSearchPath = e.getText();
-                updateSearchPath();
+                unfocusAllComponents();
+            }
+        }
+        
+        void textEditorEscapeKeyPressed(TextEditor& e) override
+        {
+            if (&e == &searchPathEditor)
+            {
+                unfocusAllComponents();
             }
         }
         
@@ -186,6 +200,8 @@ private:
     private:
         //==============================================================================
         BKAudioProcessorEditor& owner;
+        
+        FileChooser* fc;
         
         Label searchPathLabel;
         TextButton pathAddButton;
