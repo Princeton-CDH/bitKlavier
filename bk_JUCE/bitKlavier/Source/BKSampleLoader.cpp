@@ -248,6 +248,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                         } else {
                             maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
                             
+                            processor.memoryMappedAudioReaders.add(memoryMappedReader);
+                            
                             synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
                                                                                        memoryMappedReader,
                                                                                        maxLength,
@@ -733,6 +735,17 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
     Array<File> wavFiles = samples.findChildFiles(File::TypesOfFileToFind::findFiles, false, "*.wav");
     int numLayers = 0;
     
+    std::regex reg("[ABCDEFG]#*b*\\dv\\d+");
+    for (auto iter : RangedDirectoryIterator (File (samples), false, "*.wav"))
+    {
+        String fileName = iter.getFile().getFileNameWithoutExtension();
+        
+        if (std::regex_search(fileName.toStdString(), reg))
+        {
+            numLayers = jmax(numLayers, fileName.getTrailingIntValue());
+        }
+    }
+    
     for (auto sample : wavFiles)
     {
         numLayers = jmax(numLayers, sample.getFileNameWithoutExtension().getTrailingIntValue());
@@ -815,6 +828,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                         } else {
                             maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
                             
+                            processor.memoryMappedAudioReaders.add(memoryMappedReader);
+                            
                             synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
                                                                                        memoryMappedReader,
                                                                                        maxLength,
@@ -865,3 +880,37 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
     
     return jobStatus;
 }
+
+//========================================================================
+SampleTouchThread::SampleTouchThread(BKAudioProcessor& p) :
+Thread("SampleTouchThread"),
+processor(p),
+index(0),
+position(0)
+{
+}
+
+SampleTouchThread::~SampleTouchThread() {}
+
+void SampleTouchThread::run()
+{
+    while (!threadShouldExit())
+    {
+        for (; index < processor.memoryMappedAudioReaders.size(); ++index)
+        {
+            MemoryMappedAudioFormatReader* reader = processor.memoryMappedAudioReaders.getUnchecked(index);
+            if (reader != nullptr)
+            {
+                if (reader->getMappedSection().contains(position))
+                reader->touchSample(position);
+            }
+            else
+            {
+                processor.memoryMappedAudioReaders.remove(index);
+            }
+            if (threadShouldExit()) return;
+        }
+        index = 0;
+    }
+}
+    

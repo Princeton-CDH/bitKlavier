@@ -146,8 +146,8 @@ private:
         {
             if (b == &pathAddButton)
             {
-                fc = new FileChooser ("Add folders...",
-                                      File::getSpecialLocation (File::userHomeDirectory));
+                fc = std::make_unique<FileChooser> ("Add folders...",
+                                                    File::getSpecialLocation (File::userHomeDirectory));
                 
                 fc->launchAsync (FileBrowserComponent::openMode |
                                  FileBrowserComponent::canSelectDirectories |
@@ -201,7 +201,7 @@ private:
         //==============================================================================
         BKAudioProcessorEditor& owner;
         
-        FileChooser* fc;
+        std::unique_ptr<FileChooser> fc;
         
         Label searchPathLabel;
         TextButton pathAddButton;

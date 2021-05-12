@@ -112,7 +112,8 @@ doneWithSetStateInfo(false),
 midiReady(false),
 tooltipsEnabled(true),
 hotkeysEnabled(true),
-memoryMappingEnabled(false)
+memoryMappingEnabled(false),
+touchThread(*this)
 {
 #if BK_UNIT_TESTS
     
@@ -177,6 +178,8 @@ memoryMappingEnabled(false)
     uiScaleFactor = (uiScaleFactor > 1.0f) ? 1.0f : uiScaleFactor;
     
     loadGalleries();
+    
+    touchThread.startThread(0);
     
     startTimer(1);
 }
@@ -404,6 +407,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 BKAudioProcessor::~BKAudioProcessor()
 {
     stopTimer();
+    
+    touchThread.stopThread(1000);
     
     for (auto item : clipboard)
         item->clearConnections();
@@ -1507,10 +1512,10 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
 
 void BKAudioProcessor::importSoundfont(void)
 {
-    fc = new FileChooser ("Import your gallery",
-                          File::getCurrentWorkingDirectory(),
-                          "*",
-                          true);
+    fc = std::make_unique<FileChooser> ("Import your gallery",
+                                        File::getCurrentWorkingDirectory(),
+                                        "*",
+                                        true);
     
     fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
                      [this] (const FileChooser& chooser)
@@ -1547,10 +1552,10 @@ void BKAudioProcessor::importSoundfont(void)
 
 void BKAudioProcessor::importCurrentGallery(void)
 {
-    fc = new FileChooser ("Import your gallery",
-                          File::getCurrentWorkingDirectory(),
-                          "*.xml",
-                          true);
+    fc = std::make_unique<FileChooser> ("Import your gallery",
+                                        File::getCurrentWorkingDirectory(),
+                                        "*.xml",
+                                        true);
     
     fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
      [this] (const FileChooser& chooser)
@@ -1584,10 +1589,10 @@ void BKAudioProcessor::exportCurrentGallery(void)
 
     File fileToSave (gallery->getURL());
     
-    fc = new FileChooser ("Export your gallery.",
-                          fileToSave,
-                          "*",
-                          true);
+    fc = std::make_unique<FileChooser> ("Export your gallery.",
+                                        fileToSave,
+                                        "*",
+                                        true);
     
     fc->launchAsync (FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::canSelectDirectories,
                      [fileToSave] (const FileChooser& chooser)
