@@ -92,7 +92,6 @@ midiRootNote (rootMidiNote),
 transpose(transp),
 isSoundfont(false)
 {
-    reader->mapEntireFile();
     rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
     rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
     region_ = nullptr;

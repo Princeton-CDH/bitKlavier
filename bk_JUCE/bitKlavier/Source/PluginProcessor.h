@@ -146,8 +146,8 @@ public:
     
     bool                                defaultLoaded;
     String                              defaultName;
-    
-    Array<MemoryMappedAudioFormatReader*> memoryMappedAudioReaders;
+
+    SampleTouchThread touchThread;
     
     FileSearchPath sampleSearchPath;
 
@@ -490,9 +490,7 @@ private:
 	Value hotkeysEnabled;
     
     Value memoryMappingEnabled;
-    
-    SampleTouchThread touchThread;
-
+  
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)
 };

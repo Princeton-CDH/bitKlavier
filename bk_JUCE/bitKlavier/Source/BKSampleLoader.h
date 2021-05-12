@@ -86,10 +86,7 @@ public:
     void run() override;
     
 private:
-    
     BKAudioProcessor& processor;
-    int index;
-    int position;
 };
 
 #endif  // BKSAMPLELOADER_H_INCLUDED

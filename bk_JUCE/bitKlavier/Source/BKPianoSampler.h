@@ -75,6 +75,8 @@ public:
     AudioSampleBuffer* getAudioData() const noexcept { return data->getAudioSampleBuffer(); }
     
     bool isMemoryMapped() const noexcept { return (reader != nullptr); }
+
+    MemoryMappedAudioFormatReader* getReader() const noexcept { return reader.get(); }
     
     //==============================================================================
     bool appliesToNote (int midiNoteNumber) override;
@@ -220,6 +222,8 @@ public:
     void setCurrentPlaybackSampleRate(const double newRate) override;
     
     BKNoteType getNoteType(void) { return bkType; };
+
+    double getSourceSamplePosition() { return sourceSamplePosition; }
     
 private:
     //==============================================================================

@@ -380,7 +380,9 @@ public:
     
     /** Returns the number of voices that have been added. */
     int getNumVoices() const noexcept                               { return voices.size(); }
-    
+
+    ReferenceCountedArray<BKSynthesiserVoice>& getVoices() { return voices; }
+
     /** Returns one of the voices that have been added. */
     BKSynthesiserVoice* getVoice (int index) const;
     

@@ -17,7 +17,12 @@
 
 String notes[4] = {"A","C","D#","F#"};
 
-#define EXIT_CHECK if (shouldExit()) { processor.updateState->pianoSamplesAreLoading = false; return jobStatus; }
+#define EXIT_CHECK if (shouldExit()) \
+{ \
+    processor.updateState->pianoSamplesAreLoading = false; \
+    if (processor.loader.getNumJobs() == 1) processor.touchThread.startThread(); \
+    return jobStatus; \
+}
 
 BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
 {
@@ -117,6 +122,7 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
     processor.updateState->pianoSamplesAreLoading = false;
     jobStatus = jobHasFinished;
     
+    if (processor.loader.getNumJobs() == 1) processor.touchThread.startThread(); 
     return jobHasFinished;
 }
 
@@ -160,11 +166,11 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                 
                 if (numLayers == 8)
                 {
-                    temp.append(String(k+1),3);
+                    temp.append(String((k*2)+1),3);
                 }
                 else if (numLayers == 4)
                 {
-                    temp.append(String(((k*4)+3)),3);
+                    temp.append(String((k*4)+3),3);
                 }
                 else if (numLayers == 2)
                 {
@@ -247,17 +253,18 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                             
                         } else {
                             maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
-                            
-                            processor.memoryMappedAudioReaders.add(memoryMappedReader);
-                            
-                            synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
-                                                                                       memoryMappedReader,
-                                                                                       maxLength,
-                                                                                       sourceSampleRate,
-                                                                                       noteRange,
-                                                                                       root,
-                                                                                       0,
-                                                                                       velocityRange));
+                            if (memoryMappedReader->mapEntireFile())
+                            {
+                                synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                                    memoryMappedReader,
+                                    maxLength,
+                                    sourceSampleRate,
+                                    noteRange,
+                                    root,
+                                    0,
+                                    velocityRange));
+                            }
+                            else DBG("File mapping failed");
                         }
                     }
                     else
@@ -746,11 +753,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
         }
     }
     
-    for (auto sample : wavFiles)
-    {
-        numLayers = jmax(numLayers, sample.getFileNameWithoutExtension().getTrailingIntValue());
-    }
-    
     for (int oct = 0; oct < 8; oct++) {
         for (int n = 0; n < 4; n++) {
             if ((oct == 0) && (n > 0)) continue;
@@ -827,17 +829,18 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                             
                         } else {
                             maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
-                            
-                            processor.memoryMappedAudioReaders.add(memoryMappedReader);
-                            
-                            synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
-                                                                                       memoryMappedReader,
-                                                                                       maxLength,
-                                                                                       sourceSampleRate,
-                                                                                       noteRange,
-                                                                                       root,
-                                                                                       0,
-                                                                                       velocityRange));
+                            if (memoryMappedReader->mapEntireFile())
+                            {
+                                synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                                    memoryMappedReader,
+                                    maxLength,
+                                    sourceSampleRate,
+                                    noteRange,
+                                    root,
+                                    0,
+                                    velocityRange));
+                            }
+                            else DBG("File mapping failed");
                         }
                     }
                     else
@@ -884,9 +887,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
 //========================================================================
 SampleTouchThread::SampleTouchThread(BKAudioProcessor& p) :
 Thread("SampleTouchThread"),
-processor(p),
-index(0),
-position(0)
+processor(p)
 {
 }
 
@@ -896,21 +897,26 @@ void SampleTouchThread::run()
 {
     while (!threadShouldExit())
     {
-        for (; index < processor.memoryMappedAudioReaders.size(); ++index)
+        for (auto voice : processor.mainPianoSynth.getVoices())
         {
-            MemoryMappedAudioFormatReader* reader = processor.memoryMappedAudioReaders.getUnchecked(index);
-            if (reader != nullptr)
+            if (BKPianoSamplerVoice* samplerVoice = dynamic_cast<BKPianoSamplerVoice*>(voice))
             {
-                if (reader->getMappedSection().contains(position))
-                reader->touchSample(position);
-            }
-            else
-            {
-                processor.memoryMappedAudioReaders.remove(index);
+                if (BKPianoSamplerSound* sound = dynamic_cast<BKPianoSamplerSound*>(samplerVoice->getCurrentlyPlayingSound().get()))
+                {
+                    if (MemoryMappedAudioFormatReader* reader = sound->getReader())
+                    {
+                        int position = samplerVoice->getSourceSamplePosition();
+                        while (position < reader->getMappedSection().getLength())
+                        {
+                            reader->touchSample(reader->getMappedSection().clipValue(position));
+                            position += processor.getBlockSize();
+                            if (threadShouldExit()) return;
+                        }   
+                    }
+                }
             }
             if (threadShouldExit()) return;
         }
-        index = 0;
     }
 }
     

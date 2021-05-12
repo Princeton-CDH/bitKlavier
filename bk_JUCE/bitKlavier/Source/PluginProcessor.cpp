@@ -112,7 +112,7 @@ doneWithSetStateInfo(false),
 midiReady(false),
 tooltipsEnabled(true),
 hotkeysEnabled(true),
-memoryMappingEnabled(false),
+memoryMappingEnabled(var(false)),
 touchThread(*this)
 {
 #if BK_UNIT_TESTS
@@ -345,6 +345,7 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    touchThread.stopThread(1000);
     currentSampleRate = sampleRate;
 #if JUCE_IOS
     //stk::Stk::setSampleRate(sampleRate);
@@ -402,6 +403,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     #endif
         }
     }
+    if (loader.getNumJobs() == 0) touchThread.startThread(0);
 }
 
 BKAudioProcessor::~BKAudioProcessor()

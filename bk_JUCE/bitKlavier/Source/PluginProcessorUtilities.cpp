@@ -35,6 +35,8 @@ OwnedArray<HashMap<String, int>>& BKAudioProcessor::getSourcedNotesOn()
 
 int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound, bool updateGlobalSet)
 {
+    touchThread.stopThread(1000);
+
     didLoadMainPianoSamples = false;
     
     // Check if path isn't valid and load BKLoadLite if it is not
@@ -94,7 +96,7 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         
         if (!loadedSoundSets.contains(loadingSoundSet))
         {
-            loadingSoundSetId = loadedSoundSets.size();
+            loadingSoundSetId = loadedSoundSets.size();;
             loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId, isMemoryMappingEnabled()), true);
         }
         else
