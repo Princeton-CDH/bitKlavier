@@ -422,11 +422,17 @@ void BKPianoSamplerVoice::startNote (const int midi,
         
         // *** START new layer-based approach to velocity handling ** //
         // run this if "smooth velocity layers" is enabled in connected Keymap
+        
+        // grab boundaries for this layer
         int minVelocity = sound->minVelocity();
         int maxVelocity = sound->maxVelocity();
         
+        // need to also grab layer number
+        // int current layer = sound->getLayer();
+        
         // dB range of layer (need to figure out how to estimate range of instrument)
         // 30 is rough estimate, might actually be fine, but should measure directly
+        // totalDynamicRange = sound->getTotalDynamicRange // returns dynamic range for note, so dB(v16) - dB(v1)
         double dynRange = 30. * (maxVelocity - minVelocity) / 127.;
         
         // change this to expand dynamic range across the whole whole range, not just v1
