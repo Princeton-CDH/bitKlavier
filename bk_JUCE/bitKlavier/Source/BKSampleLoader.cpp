@@ -263,7 +263,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                                     root,
                                     0,
                                     velocityRange));
-                                processor.memoryMappedReaders.add(memoryMappedReader);
                             }
                             else DBG("File mapping failed");
                         }
@@ -840,7 +839,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                     root,
                                     0,
                                     velocityRange));
-                                processor.memoryMappedReaders.add(memoryMappedReader);
                             }
                             else DBG("File mapping failed");
                         }
@@ -920,15 +918,20 @@ void SampleTouchThread::run()
             if (threadShouldExit()) return;
         }
 
-        for (int i = 0; i < processor.memoryMappedReaders.size(); ++i)
+ /*       for (auto set : processor.mainPianoSynth.getSounds())
         {
-            MemoryMappedAudioFormatReader* reader = processor.memoryMappedReaders.getUnchecked(i);
-            if (reader == nullptr)
-                processor.memoryMappedReaders.remove(i--);
-            else
-                reader->touchSample(0);
-            if (threadShouldExit()) return;
-        }
+            for (auto sound : *set)
+            {
+                if (BKPianoSamplerSound* samplerSound = dynamic_cast<BKPianoSamplerSound*>(sound))
+                {
+                    if (MemoryMappedAudioFormatReader* reader = samplerSound->getReader())
+                    {
+                        reader->touchSample(0);
+                    }
+                }
+                if (threadShouldExit()) return;
+            }
+        }*/
     }
 }
     

@@ -179,8 +179,6 @@ touchThread(*this)
     
     loadGalleries();
     
-    touchThread.startThread(0);
-    
     startTimer(1);
 }
 

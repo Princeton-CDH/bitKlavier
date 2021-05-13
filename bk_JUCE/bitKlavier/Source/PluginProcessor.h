@@ -148,8 +148,6 @@ public:
     String                              defaultName;
 
     SampleTouchThread touchThread;
-
-    Array<MemoryMappedAudioFormatReader*> memoryMappedReaders;
     
     FileSearchPath sampleSearchPath;
 

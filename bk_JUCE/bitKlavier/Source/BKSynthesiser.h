@@ -405,6 +405,8 @@ public:
     
     /** Returns the number of sounds that have been added to the synth. */
     int getNumSounds(int set) const noexcept                               { return soundSets.getUnchecked(set)->size(); }
+
+    OwnedArray < ReferenceCountedArray<BKSynthesiserSound>>& getSounds() { return soundSets; }
     
     /** Returns one of the sounds. */
     BKSynthesiserSound* getSound (int set, int index) const noexcept           { return soundSets.getUnchecked(set)->getUnchecked(index); }
