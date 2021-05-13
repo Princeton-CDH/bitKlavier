@@ -85,11 +85,15 @@ private:
             setOpaque (true);
             setWantsKeyboardFocus(true);
             
+            searchPathLabel.setTooltip("Set paths in which to search for sample libraries. bitKlavier only look for .wav files with the naming format of \"C4v1\".");
             searchPathLabel.setJustificationType(Justification::topLeft);
             addAndMakeVisible(searchPathLabel);
+            
+            pathAddButton.setTooltip("Open the file browser to select folders to add to the search paths list");
             pathAddButton.addListener(this);
             addAndMakeVisible(pathAddButton);
             
+            searchPathEditor.setTooltip("Set paths in which to search for sample libraries. bitKlavier only look for .wav files with the naming format of \"C4v1\".");
             searchPathEditor.setMultiLine(true);
             String text = owner.processor.sampleSearchPath.toString().replace(";", "; ");
             searchPathEditor.setText(text, dontSendNotification);

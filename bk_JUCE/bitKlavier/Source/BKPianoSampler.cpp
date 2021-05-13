@@ -21,11 +21,15 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const int rootMidiNote,
                                           const int transp,
                                           const BigInteger& velocities,
+                                          int layerNumber,
+                                          int numLayers,
                                           sfzero::Region::Ptr reg)
 :
 name (soundName),
 data(buffer),
 reader(nullptr),
+layerNumber(layerNumber),
+numLayers(numLayers),
 sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
 midiVelocities(velocities),
@@ -71,6 +75,14 @@ transpose(transp)
         region_ = nullptr;
         isSoundfont = false;
     }
+
+    for (int i = 0; i < buffer->getAudioSampleBuffer()->getNumChannels(); ++i)
+    {
+        rmsLevel = buffer->getAudioSampleBuffer()
+        ->getRMSLevel(i, 0, jmin(int(sourceSampleRate*0.4f), buffer->getAudioSampleBuffer()->getNumSamples()));
+    }
+    rmsLevel *= 1.f/buffer->getAudioSampleBuffer()->getNumChannels();
+    rmsLevelDB = Decibels::gainToDecibels(rmsLevel);
 }
 
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
@@ -80,10 +92,14 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const BigInteger& notes,
                                           int rootMidiNote,
                                           int transp,
-                                          const BigInteger& velocities) :
+                                          const BigInteger& velocities,
+                                          int layerNumber,
+                                          int numLayers) :
 name (soundName),
 data(nullptr),
 reader(reader),
+layerNumber(layerNumber),
+numLayers(numLayers),
 sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
 midiVelocities(velocities),
@@ -95,6 +111,22 @@ isSoundfont(false)
     rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
     rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
     region_ = nullptr;
+    
+    AudioBuffer<float> rmsBuffer (2, jmin(int(sourceSampleRate*0.4f),
+                                          int(reader->getMappedSection().getLength())));
+    float s[2];
+    for (int i = 0; i < rmsBuffer.getNumSamples(); ++i)
+    {
+        reader->getSample(i, s);
+        rmsBuffer.setSample(0, i, s[0]);
+        rmsBuffer.setSample(1, i, s[1]);
+    }
+    
+    rmsLevel = rmsBuffer.getRMSLevel(0, 0, rmsBuffer.getNumSamples());
+    if (reader->numChannels > 1)
+        rmsLevel = (rmsLevel + rmsBuffer.getRMSLevel(1, 0, rmsBuffer.getNumSamples())) * 0.5f;
+    
+    rmsLevelDB = Decibels::gainToDecibels(rmsLevel);
 }
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
@@ -275,6 +307,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
 {
     if (BKPianoSamplerSound* const sound = dynamic_cast<BKPianoSamplerSound*> (s))
     {
+        DBG("RMS: " + String(sound->getRMSLevel()) + " DB: " + String(sound->getRMSLevelDB()));
         //DBG("BKPianoSamplerVoice::startNote " + String(midi));
         
         

@@ -1,12 +1,12 @@
 /*
-  ==============================================================================
-
-    BKSampleLoader.cpp
-    Created: 2 Dec 2016 1:25:56pm
-    Author:  Michael R Mulshine
-
-  ==============================================================================
-*/
+ ==============================================================================
+ 
+ BKSampleLoader.cpp
+ Created: 2 Dec 2016 1:25:56pm
+ Author:  Michael R Mulshine
+ 
+ ==============================================================================
+ */
 
 #include "BKSampleLoader.h"
 
@@ -19,9 +19,9 @@ String notes[4] = {"A","C","D#","F#"};
 
 #define EXIT_CHECK if (shouldExit()) \
 { \
-    processor.updateState->pianoSamplesAreLoading = false; \
-    if (processor.loader.getNumJobs() == 1) processor.touchThread.startThread(); \
-    return jobStatus; \
+processor.updateState->pianoSamplesAreLoading = false; \
+if (processor.loader.getNumJobs() == 1) processor.touchThread.startThread(); \
+return jobStatus; \
 }
 
 BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
@@ -43,7 +43,7 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
             File file;
             
             file = file.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
-
+            
             switch (which)
             {
                 case 0:
@@ -122,7 +122,7 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
     processor.updateState->pianoSamplesAreLoading = false;
     jobStatus = jobHasFinished;
     
-    if (processor.loader.getNumJobs() == 1) processor.touchThread.startThread(); 
+    if (processor.loader.getNumJobs() == 1) processor.touchThread.startThread();
     return jobHasFinished;
 }
 
@@ -130,9 +130,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.mainPianoSynth;
-
+    
     File bkSamples;
-
+    
 #if JUCE_IOS
     bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
 #endif
@@ -142,9 +142,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
 #if JUCE_LINUX || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
 #endif
-
+    
     int numLayers = 0;
-
+    
     if (type == BKLoadLitest)      numLayers = 1;
     else if (type == BKLoadLite)        numLayers = 2;
     else if (type == BKLoadMedium)      numLayers = 4;
@@ -256,13 +256,15 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                             if (memoryMappedReader->mapEntireFile())
                             {
                                 synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
-                                    memoryMappedReader,
-                                    maxLength,
-                                    sourceSampleRate,
-                                    noteRange,
-                                    root,
-                                    0,
-                                    velocityRange));
+                                                                                           memoryMappedReader,
+                                                                                           maxLength,
+                                                                                           sourceSampleRate,
+                                                                                           noteRange,
+                                                                                           root,
+                                                                                           0,
+                                                                                           velocityRange,
+                                                                                           k+1,
+                                                                                           numLayers));
                             }
                             else DBG("File mapping failed");
                         }
@@ -288,7 +290,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                                                                                        noteRange,
                                                                                        root,
                                                                                        0,
-                                                                                       velocityRange));
+                                                                                       velocityRange,
+                                                                                       k+1,
+                                                                                       numLayers));
                         }
                     }
                     
@@ -327,7 +331,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
 #if JUCE_LINUX || JUCE_WINDOWS
     bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
 #endif
-
+    
     //load release resonance samples
     for (int i = 0; i < 7; i++) {       //i => octave
         for (int j = 0; j < 4; j++) {   //j => note name
@@ -352,8 +356,18 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                 FileInputStream inputStream(file);
                 
                 if (inputStream.openedOk()) {
+                    
                     String soundName = file.getFileName();
-                    sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
+                    
+                    MemoryMappedAudioFormatReader* memoryMappedReader;
+                    if (memoryMappingEnabled)
+                    {
+                        memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+                    }
+                    else
+                    {
+                        sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
+                    }
                     
                     //keymap assignment
                     BigInteger noteRange;
@@ -384,28 +398,55 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                     velocityRange.setRange(aResonanceVelocityThresh[k], (aResonanceVelocityThresh[k+1] - aResonanceVelocityThresh[k]), true);
                     
                     //load the sample, add to synth
-                    double sourceSampleRate = sampleReader->sampleRate;
-                    const int numChannels = sampleReader->numChannels;
-                    uint64 maxLength;
-                    
-                    if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0)
+                    if (memoryMappingEnabled)
                     {
-                        maxLength = 0;
+                        double sourceSampleRate = memoryMappedReader->sampleRate;
+                        uint64 maxLength;
+                        if (sourceSampleRate <= 0 || memoryMappedReader->lengthInSamples <= 0) {
+                            maxLength = 0;
+                            
+                        } else {
+                            maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                            if (memoryMappedReader->mapEntireFile())
+                            {
+                                synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                                                                                           memoryMappedReader,
+                                                                                           maxLength,
+                                                                                           sourceSampleRate,
+                                                                                           noteRange,
+                                                                                           root, 0,
+                                                                                           velocityRange,
+                                                                                           k+1, 3));
+                            }
+                            else DBG("File mapping failed");
+                        }
                     }
                     else
                     {
-                        maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                        double sourceSampleRate = sampleReader->sampleRate;
+                        const int numChannels = sampleReader->numChannels;
+                        uint64 maxLength;
                         
-                        BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
-                        sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
-
-                        synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
-                                                                newBuffer,
-                                                                maxLength,
-                                                                sourceSampleRate,
-                                                                noteRange,
-                                                                root, 0,
-                                                                velocityRange));
+                        if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0)
+                        {
+                            maxLength = 0;
+                        }
+                        else
+                        {
+                            maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                            
+                            BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
+                            sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
+                            
+                            synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                                                                                       newBuffer,
+                                                                                       maxLength,
+                                                                                       sourceSampleRate,
+                                                                                       noteRange,
+                                                                                       root, 0,
+                                                                                       velocityRange,
+                                                                                       k+1, 3));
+                        }
                     }
                     
                     processor.progress += progressInc;
@@ -450,8 +491,18 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
         FileInputStream inputStream(file);
         
         if (inputStream.openedOk()) {
+            
             String soundName = file.getFileName();
-            sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
+            
+            MemoryMappedAudioFormatReader* memoryMappedReader;
+            if (memoryMappingEnabled)
+            {
+                memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+            }
+            else
+            {
+                sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
+            }
             
             BigInteger noteRange;
             noteRange.setRange(20 + i, 1, true);
@@ -460,27 +511,55 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
             velocityRange.setRange(0, 128, true);
             
             int root = 20 + i;
-            
-            double sourceSampleRate = sampleReader->sampleRate;
-            const int numChannels = sampleReader->numChannels;
-            uint64 maxLength;
-            
-            if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0) {
-                maxLength = 0;
+        
+            if (memoryMappingEnabled)
+            {
+                double sourceSampleRate = memoryMappedReader->sampleRate;
+                uint64 maxLength;
+                if (sourceSampleRate <= 0 || memoryMappedReader->lengthInSamples <= 0) {
+                    maxLength = 0;
+                    
+                } else {
+                    maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                    if (memoryMappedReader->mapEntireFile())
+                    {
+                        synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                                                                                   memoryMappedReader,
+                                                                                   maxLength,
+                                                                                   sourceSampleRate,
+                                                                                   noteRange,
+                                                                                   root,
+                                                                                   0,
+                                                                                   velocityRange,
+                                                                                   1, 1));
+                    }
+                    else DBG("File mapping failed");
+                }
+            }
+            else
+            {
+                double sourceSampleRate = sampleReader->sampleRate;
+                const int numChannels = sampleReader->numChannels;
+                uint64 maxLength;
                 
-            } else {
-                maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
-                
-                BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
-                sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
-                
-                synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
-                                                                    newBuffer,
-                                                                    maxLength,
-                                                                    sourceSampleRate,
-                                                                    noteRange,
-                                                                    root, 0,
-                                                                    velocityRange));
+                if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0) {
+                    maxLength = 0;
+                    
+                } else {
+                    maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                    
+                    BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
+                    sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
+                    
+                    synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                                                                               newBuffer,
+                                                                               maxLength,
+                                                                               sourceSampleRate,
+                                                                               noteRange,
+                                                                               root, 0,
+                                                                               velocityRange,
+                                                                               1, 1));
+                }
             }
             processor.progress += progressInc;
             //DBG(soundName+": " + String(processor.progress));
@@ -518,15 +597,25 @@ BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
         else if(i==1) temp = "pedalD2.wav";
         else if(i==2) temp = "pedalU1.wav";
         else if(i==3) temp = "pedalU2.wav";
-
+        
         
         //File file(temp);
         File file(bkSamples.getChildFile(temp));
         FileInputStream inputStream(file);
         
         if (inputStream.openedOk()) {
+            
             String soundName = file.getFileName();
-            sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
+            
+            MemoryMappedAudioFormatReader* memoryMappedReader;
+            if (memoryMappingEnabled)
+            {
+                memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+            }
+            else
+            {
+                sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
+            }
             
             BigInteger noteRange;
             noteRange.setRange(20 + i, 1, true);
@@ -536,27 +625,55 @@ BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
             
             int root = 20 + i;
             
-            double sourceSampleRate = sampleReader->sampleRate;
-            const int numChannels = sampleReader->numChannels;
-            uint64 maxLength;
-            
-            if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0) {
-                maxLength = 0;
+            if (memoryMappingEnabled)
+            {
+                double sourceSampleRate = memoryMappedReader->sampleRate;
+                uint64 maxLength;
+                if (sourceSampleRate <= 0 || memoryMappedReader->lengthInSamples <= 0) {
+                    maxLength = 0;
+                    
+                } else {
+                    maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                    if (memoryMappedReader->mapEntireFile())
+                    {
+                        synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                                                                                   memoryMappedReader,
+                                                                                   maxLength,
+                                                                                   sourceSampleRate,
+                                                                                   noteRange,
+                                                                                   root,
+                                                                                   0,
+                                                                                   velocityRange,
+                                                                                   1, 1));
+                    }
+                    else DBG("File mapping failed");
+                }
+            }
+            else
+            {
+                double sourceSampleRate = sampleReader->sampleRate;
+                const int numChannels = sampleReader->numChannels;
+                uint64 maxLength;
                 
-            } else {
-                maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
-                
-                BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
-                sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
-                
-                synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
-                                                        newBuffer,
-                                                        maxLength,
-                                                        sourceSampleRate,
-                                                        noteRange,
-                                                        root,
-                                                        0,
-                                                        velocityRange));
+                if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0) {
+                    maxLength = 0;
+                    
+                } else {
+                    maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                    
+                    BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
+                    sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
+                    
+                    synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
+                                                                               newBuffer,
+                                                                               maxLength,
+                                                                               sourceSampleRate,
+                                                                               noteRange,
+                                                                               root,
+                                                                               0,
+                                                                               velocityRange,
+                                                                               1, 1));
+                }
             }
             processor.progress += progressInc;
             //DBG(soundName+": " + String(processor.progress));
@@ -629,6 +746,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     }
     else    return jobStatus;
     
+    int n = 1;
     for (auto region : processor.regions.getReference(loadingSoundSetId))
     {
         EXIT_CHECK;
@@ -723,8 +841,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                                                    nrange,
                                                                    region->pitch_keycenter,
                                                                    region->transpose,
-                                                                   vrange,
+                                                                   vrange, n, processor.regions.size(),
                                                                    region));
+        n++;
     }
     
     processor.didLoadMainPianoSamples = true;
@@ -766,7 +885,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                 temp.append(notes[n],3);
                 temp.append(String(oct),3);
                 temp.append("v",2);
-  
+                
                 temp.append(String(k+1),3);
                 
                 temp.append(".wav",5);
@@ -815,11 +934,11 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                     }
                     
                     BigInteger velocityRange;
-                
+                    
                     int lowerVelocityThresh = 128 * (float(k) / numLayers);
                     int upperVelocityThresh = 128 * (float(k+1) / numLayers);
                     velocityRange.setRange(lowerVelocityThresh, (upperVelocityThresh - lowerVelocityThresh), true);
-                
+                    
                     if (memoryMappingEnabled)
                     {
                         double sourceSampleRate = memoryMappedReader->sampleRate;
@@ -832,13 +951,13 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                             if (memoryMappedReader->mapEntireFile())
                             {
                                 synth->addSound(loadingSoundSetId, new BKPianoSamplerSound(soundName,
-                                    memoryMappedReader,
-                                    maxLength,
-                                    sourceSampleRate,
-                                    noteRange,
-                                    root,
-                                    0,
-                                    velocityRange));
+                                                                                           memoryMappedReader,
+                                                                                           maxLength,
+                                                                                           sourceSampleRate,
+                                                                                           noteRange,
+                                                                                           root, 0,
+                                                                                           velocityRange,
+                                                                                           k+1, numLayers));
                             }
                             else DBG("File mapping failed");
                         }
@@ -862,9 +981,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                                                        maxLength,
                                                                                        sourceSampleRate,
                                                                                        noteRange,
-                                                                                       root,
-                                                                                       0,
-                                                                                       velocityRange));
+                                                                                       root, 0,
+                                                                                       velocityRange,
+                                                                                       k+1, numLayers));
                         }
                     }
                     
@@ -911,27 +1030,28 @@ void SampleTouchThread::run()
                             reader->touchSample(reader->getMappedSection().clipValue(position));
                             position += processor.getBlockSize();
                             if (threadShouldExit()) return;
-                        }   
+                        }
                     }
                 }
             }
             if (threadShouldExit()) return;
         }
-
- /*       for (auto set : processor.mainPianoSynth.getSounds())
-        {
-            for (auto sound : *set)
-            {
-                if (BKPianoSamplerSound* samplerSound = dynamic_cast<BKPianoSamplerSound*>(sound))
-                {
-                    if (MemoryMappedAudioFormatReader* reader = samplerSound->getReader())
-                    {
-                        reader->touchSample(0);
-                    }
-                }
-                if (threadShouldExit()) return;
-            }
-        }*/
+        
+        /*       for (auto set : processor.mainPianoSynth.getSounds())
+         {
+         for (auto sound : *set)
+         {
+         if (BKPianoSamplerSound* samplerSound = dynamic_cast<BKPianoSamplerSound*>(sound))
+         {
+         if (MemoryMappedAudioFormatReader* reader = samplerSound->getReader())
+         {
+         reader->touchSample(0);
+         }
+         }
+         if (threadShouldExit()) return;
+         }
+         }*/
     }
 }
-    
+
+

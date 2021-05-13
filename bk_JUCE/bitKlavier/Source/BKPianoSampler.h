@@ -49,6 +49,8 @@ public:
                          int rootMidiNote,
                          int transpose,
                          const BigInteger& midiVelocities,
+                         int layerNumber,
+                         int numLayers,
                          sfzero::Region::Ptr region = nullptr);
     
     BKPianoSamplerSound (const String& name,
@@ -58,7 +60,9 @@ public:
                          const BigInteger& midiNotes,
                          int rootMidiNote,
                          int transpose,
-                         const BigInteger& midiVelocities);
+                         const BigInteger& midiVelocities,
+                         int layerNumber,
+                         int numLayers);
 
     
     /** Destructor. */
@@ -97,6 +101,9 @@ public:
     int minVelocity (void) { return midiVelocities.findNextSetBit(0); }
     int maxVelocity (void) { return midiVelocities.findNextClearBit(midiVelocities.findNextSetBit(0)); }
     
+    float getRMSLevel() { return rmsLevel; }
+    float getRMSLevelDB() { return rmsLevelDB; }
+    
 private:
     //==============================================================================
     friend class BKPianoSamplerVoice;
@@ -105,6 +112,11 @@ private:
     
     BKReferenceCountedBuffer::Ptr data;
     std::unique_ptr<MemoryMappedAudioFormatReader> reader;
+    
+    float rmsLevel;
+    float rmsLevelDB;
+    int layerNumber;
+    int numLayers;
     
     double sourceSampleRate;
     BigInteger midiNotes;
