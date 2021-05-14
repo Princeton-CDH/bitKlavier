@@ -23,11 +23,13 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const BigInteger& velocities,
                                           int layerNumber,
                                           int numLayers,
+                                          float rmsBelow,
                                           sfzero::Region::Ptr reg)
 :
 name (soundName),
 data(buffer),
 reader(nullptr),
+rmsBelow(rmsBelow),
 layerNumber(layerNumber),
 numLayers(numLayers),
 sourceSampleRate(sourceSampleRate),
@@ -82,7 +84,7 @@ transpose(transp)
         ->getRMSLevel(i, 0, jmin(int(sourceSampleRate*0.4f), buffer->getAudioSampleBuffer()->getNumSamples()));
     }
     rmsLevel *= 1.f/buffer->getAudioSampleBuffer()->getNumChannels();
-    rmsLevelDB = Decibels::gainToDecibels(rmsLevel);
+    rmsLevel = Decibels::gainToDecibels(rmsLevel);
 }
 
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
@@ -94,10 +96,12 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           int transp,
                                           const BigInteger& velocities,
                                           int layerNumber,
-                                          int numLayers) :
+                                          int numLayers,
+                                          float rmsBelow) :
 name (soundName),
 data(nullptr),
 reader(reader),
+rmsBelow(rmsBelow),
 layerNumber(layerNumber),
 numLayers(numLayers),
 sourceSampleRate(sourceSampleRate),
@@ -126,7 +130,7 @@ isSoundfont(false)
     if (reader->numChannels > 1)
         rmsLevel = (rmsLevel + rmsBuffer.getRMSLevel(1, 0, rmsBuffer.getNumSamples())) * 0.5f;
     
-    rmsLevelDB = Decibels::gainToDecibels(rmsLevel);
+    rmsLevel = Decibels::gainToDecibels(rmsLevel);
 }
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
@@ -307,7 +311,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
 {
     if (BKPianoSamplerSound* const sound = dynamic_cast<BKPianoSamplerSound*> (s))
     {
-        DBG("RMS: " + String(sound->getRMSLevel()) + " DB: " + String(sound->getRMSLevelDB()));
+        DBG("RMS: " + String(sound->getRMSLevel()));
         //DBG("BKPianoSamplerVoice::startNote " + String(midi));
         
         

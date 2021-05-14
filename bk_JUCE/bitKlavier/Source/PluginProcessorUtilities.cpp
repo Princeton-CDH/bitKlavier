@@ -208,7 +208,8 @@ void BKAudioProcessor::collectCustomSamples()
         {
             String fileName = iter.getFile().getFileNameWithoutExtension();
             
-            std::regex reg("[ABCDEFG]#*b*\\dv\\d+");
+            
+            std::regex reg("(\\b(harm)?[ABCDEFG]#*b*\\dv\\d+\\b)|(\\brel\\d+\\b)");
             if (std::regex_search(fileName.toStdString(), reg))
             {
                 customSampleSetNames.add(dir.getFullPathName());

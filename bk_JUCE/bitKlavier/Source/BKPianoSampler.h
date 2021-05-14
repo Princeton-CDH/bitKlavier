@@ -51,6 +51,7 @@ public:
                          const BigInteger& midiVelocities,
                          int layerNumber,
                          int numLayers,
+                         float rmsBelow,
                          sfzero::Region::Ptr region = nullptr);
     
     BKPianoSamplerSound (const String& name,
@@ -62,7 +63,8 @@ public:
                          int transpose,
                          const BigInteger& midiVelocities,
                          int layerNumber,
-                         int numLayers);
+                         int numLayers,
+                         float rmsBelow);
 
     
     /** Destructor. */
@@ -102,7 +104,10 @@ public:
     int maxVelocity (void) { return midiVelocities.findNextClearBit(midiVelocities.findNextSetBit(0)); }
     
     float getRMSLevel() { return rmsLevel; }
-    float getRMSLevelDB() { return rmsLevelDB; }
+    float setRMSLevel(float rms) { return rmsLevel; }
+    
+    float getRMSLevelBelow() { return rmsBelow; }
+    void setRMSLevelBelow(float rms) { rmsBelow = rms; }
     
 private:
     //==============================================================================
@@ -114,7 +119,7 @@ private:
     std::unique_ptr<MemoryMappedAudioFormatReader> reader;
     
     float rmsLevel;
-    float rmsLevelDB;
+    float rmsBelow;
     int layerNumber;
     int numLayers;
     
