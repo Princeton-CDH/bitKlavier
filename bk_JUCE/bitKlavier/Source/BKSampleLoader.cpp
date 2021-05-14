@@ -154,7 +154,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
         for (int j = 0; j < 4; j++) {
             if ((i == 0) && (j > 0)) continue;
             
-            float rmsBelow = 0.f;
+            float rmsBelow = -100.f;
             for (int k = 0; k < numLayers; k++)
             {
                 EXIT_CHECK;
@@ -337,7 +337,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
             if ((i == 0) && (j > 0)) continue;
             if ((i == 6) && (j != 1) && (j != 2) ) continue;
             
-            float rmsBelow = 0.f;
+            float rmsBelow = -100.f;
             for (int k = 0; k < 3; k++) //k => velocity layer
             {
                 EXIT_CHECK;
@@ -742,7 +742,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     else    return jobStatus;
     
     int n = 1;
-    float rmsBelow = 0.f;
+    float rmsBelow = -100.f;
     for (auto region : processor.regions.getReference(loadingSoundSetId))
     {
         EXIT_CHECK;
@@ -876,7 +876,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
         for (int n = 0; n < 4; n++) {
             if ((oct == 0) && (n > 0)) continue;
             
-            float rmsBelow = 0.f;
+            float rmsBelow = -100.f;
             for (int k = 0; k < numLayers; k++)
             {
                 EXIT_CHECK;

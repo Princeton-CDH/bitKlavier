@@ -109,6 +109,8 @@ public:
     float getRMSLevelBelow() { return rmsBelow; }
     void setRMSLevelBelow(float rms) { rmsBelow = rms; }
     
+    float getRMSDifference() { return rmsLevel - rmsBelow; }
+    
 private:
     //==============================================================================
     friend class BKPianoSamplerVoice;
