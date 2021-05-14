@@ -35,7 +35,7 @@ OwnedArray<HashMap<String, int>>& BKAudioProcessor::getSourcedNotesOn()
 
 int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound, bool updateGlobalSet)
 {
-    touchThread.stopThread(1000);
+//    touchThread.stopThread(1000);
 
     didLoadMainPianoSamples = false;
     

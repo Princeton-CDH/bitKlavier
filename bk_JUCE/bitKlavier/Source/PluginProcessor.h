@@ -147,7 +147,8 @@ public:
     bool                                defaultLoaded;
     String                              defaultName;
 
-    SampleTouchThread touchThread;
+    // This is quite performance intensive with a lot of samples and currently doesn't seems worth doing
+//    SampleTouchThread touchThread;
     
     FileSearchPath sampleSearchPath;
 

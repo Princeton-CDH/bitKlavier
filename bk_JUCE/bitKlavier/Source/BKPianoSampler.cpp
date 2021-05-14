@@ -1013,11 +1013,18 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     bool memoryMapped = playingSound->isMemoryMapped();
     const float* inL;
     const float* inR;
+    MemoryMappedAudioFormatReader* reader = nullptr;
     if (!memoryMapped)
     {
         inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
         inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1 ?    playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
         : nullptr;
+    }
+    else
+    {
+        reader = playingSound->getReader();
+        reader->touchSample(sourceSamplePosition);
+        reader->touchSample(reader->getMappedSection().clipValue(sourceSamplePosition+numSamples)-1);
     }
     
     float* outL = outputBuffer.getWritePointer (0, startSample);
@@ -1083,9 +1090,9 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         float lr[2], lrNext[2];
         if (memoryMapped)
         {
-            playingSound->reader->getSample(pos, lr);
-            playingSound->reader->getSample(next, lrNext);
-            if (playingSound->reader->numChannels == 1)
+            reader->getSample(pos, lr);
+            reader->getSample(next, lrNext);
+            if (reader->numChannels == 1)
             {
                 lr[1] = lr[0];
                 lrNext[1] = lrNext[0];

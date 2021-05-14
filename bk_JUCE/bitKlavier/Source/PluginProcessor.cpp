@@ -105,6 +105,7 @@ hammerReleaseSynth(*this),
 resonanceReleaseSynth(*this),
 pedalSynth(*this),
 firstPedalDown(true),
+//touchThread(*this),
 progress(0),
 progressInc(0),
 currentSampleRate(44100.),
@@ -112,8 +113,7 @@ doneWithSetStateInfo(false),
 midiReady(false),
 tooltipsEnabled(true),
 hotkeysEnabled(true),
-memoryMappingEnabled(var(false)),
-touchThread(*this)
+memoryMappingEnabled(var(false))
 {
 #if BK_UNIT_TESTS
     
@@ -343,7 +343,7 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    touchThread.stopThread(1000);
+//    touchThread.stopThread(1000);
     currentSampleRate = sampleRate;
 #if JUCE_IOS
     //stk::Stk::setSampleRate(sampleRate);
@@ -401,14 +401,14 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     #endif
         }
     }
-    if (loader.getNumJobs() == 0) touchThread.startThread(0);
+//    if (loader.getNumJobs() == 0) touchThread.startThread(0);
 }
 
 BKAudioProcessor::~BKAudioProcessor()
 {
     stopTimer();
     
-    touchThread.stopThread(1000);
+//    touchThread.stopThread(1000);
     
     for (auto item : clipboard)
         item->clearConnections();
