@@ -49,6 +49,9 @@ public:
                          int rootMidiNote,
                          int transpose,
                          const BigInteger& midiVelocities,
+                         int layerNumber,
+                         int numLayers,
+                         float rmsBelow,
                          sfzero::Region::Ptr region = nullptr);
     
     BKPianoSamplerSound (const String& name,
@@ -58,7 +61,10 @@ public:
                          const BigInteger& midiNotes,
                          int rootMidiNote,
                          int transpose,
-                         const BigInteger& midiVelocities);
+                         const BigInteger& midiVelocities,
+                         int layerNumber,
+                         int numLayers,
+                         float rmsBelow);
 
     
     /** Destructor. */
@@ -75,6 +81,8 @@ public:
     AudioSampleBuffer* getAudioData() const noexcept { return data->getAudioSampleBuffer(); }
     
     bool isMemoryMapped() const noexcept { return (reader != nullptr); }
+
+    MemoryMappedAudioFormatReader* getReader() const noexcept { return reader.get(); }
     
     //==============================================================================
     bool appliesToNote (int midiNoteNumber) override;
@@ -95,6 +103,14 @@ public:
     int minVelocity (void) { return midiVelocities.findNextSetBit(0); }
     int maxVelocity (void) { return midiVelocities.findNextClearBit(midiVelocities.findNextSetBit(0)); }
     
+    float getRMSLevel() { return rmsLevel; }
+    float setRMSLevel(float rms) { return rmsLevel; }
+    
+    float getRMSLevelBelow() { return rmsBelow; }
+    void setRMSLevelBelow(float rms) { rmsBelow = rms; }
+    
+    float getRMSDifference() { return rmsLevel - rmsBelow; }
+    
 private:
     //==============================================================================
     friend class BKPianoSamplerVoice;
@@ -103,6 +119,11 @@ private:
     
     BKReferenceCountedBuffer::Ptr data;
     std::unique_ptr<MemoryMappedAudioFormatReader> reader;
+    
+    float rmsLevel;
+    float rmsBelow;
+    int layerNumber;
+    int numLayers;
     
     double sourceSampleRate;
     BigInteger midiNotes;
@@ -220,6 +241,8 @@ public:
     void setCurrentPlaybackSampleRate(const double newRate) override;
     
     BKNoteType getNoteType(void) { return bkType; };
+
+    double getSourceSamplePosition() { return sourceSamplePosition; }
     
 private:
     //==============================================================================

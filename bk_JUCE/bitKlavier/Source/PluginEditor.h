@@ -85,11 +85,15 @@ private:
             setOpaque (true);
             setWantsKeyboardFocus(true);
             
+            searchPathLabel.setTooltip("Set paths in which to search for sample libraries. bitKlavier only look for .wav files with the naming format of \"C4v1\".");
             searchPathLabel.setJustificationType(Justification::topLeft);
             addAndMakeVisible(searchPathLabel);
+            
+            pathAddButton.setTooltip("Open the file browser to select folders to add to the search paths list");
             pathAddButton.addListener(this);
             addAndMakeVisible(pathAddButton);
             
+            searchPathEditor.setTooltip("Set paths in which to search for sample libraries. bitKlavier only look for .wav files with the naming format of \"C4v1\".");
             searchPathEditor.setMultiLine(true);
             String text = owner.processor.sampleSearchPath.toString().replace(";", "; ");
             searchPathEditor.setText(text, dontSendNotification);
@@ -146,8 +150,8 @@ private:
         {
             if (b == &pathAddButton)
             {
-                fc = new FileChooser ("Add folders...",
-                                      File::getSpecialLocation (File::userHomeDirectory));
+                fc = std::make_unique<FileChooser> ("Add folders...",
+                                                    File::getSpecialLocation (File::userHomeDirectory));
                 
                 fc->launchAsync (FileBrowserComponent::openMode |
                                  FileBrowserComponent::canSelectDirectories |
@@ -201,7 +205,7 @@ private:
         //==============================================================================
         BKAudioProcessorEditor& owner;
         
-        FileChooser* fc;
+        std::unique_ptr<FileChooser> fc;
         
         Label searchPathLabel;
         TextButton pathAddButton;

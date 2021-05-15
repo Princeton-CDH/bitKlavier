@@ -76,4 +76,17 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BKSampleLoader)
 };
 
+
+class SampleTouchThread : public Thread
+{
+public:
+    SampleTouchThread(BKAudioProcessor& p);
+    ~SampleTouchThread();
+    
+    void run() override;
+    
+private:
+    BKAudioProcessor& processor;
+};
+
 #endif  // BKSAMPLELOADER_H_INCLUDED

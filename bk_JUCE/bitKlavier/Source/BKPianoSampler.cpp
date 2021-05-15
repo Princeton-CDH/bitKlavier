@@ -21,11 +21,17 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const int rootMidiNote,
                                           const int transp,
                                           const BigInteger& velocities,
+                                          int layerNumber,
+                                          int numLayers,
+                                          float rmsBelow,
                                           sfzero::Region::Ptr reg)
 :
 name (soundName),
 data(buffer),
 reader(nullptr),
+rmsBelow(rmsBelow),
+layerNumber(layerNumber),
+numLayers(numLayers),
 sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
 midiVelocities(velocities),
@@ -71,6 +77,14 @@ transpose(transp)
         region_ = nullptr;
         isSoundfont = false;
     }
+
+    for (int i = 0; i < buffer->getAudioSampleBuffer()->getNumChannels(); ++i)
+    {
+        rmsLevel = buffer->getAudioSampleBuffer()
+        ->getRMSLevel(i, 0, jmin(int(sourceSampleRate*0.4f), buffer->getAudioSampleBuffer()->getNumSamples()));
+    }
+    rmsLevel *= 1.f/buffer->getAudioSampleBuffer()->getNumChannels();
+    rmsLevel = Decibels::gainToDecibels(rmsLevel);
 }
 
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
@@ -80,10 +94,16 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const BigInteger& notes,
                                           int rootMidiNote,
                                           int transp,
-                                          const BigInteger& velocities) :
+                                          const BigInteger& velocities,
+                                          int layerNumber,
+                                          int numLayers,
+                                          float rmsBelow) :
 name (soundName),
 data(nullptr),
 reader(reader),
+rmsBelow(rmsBelow),
+layerNumber(layerNumber),
+numLayers(numLayers),
 sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
 midiVelocities(velocities),
@@ -92,10 +112,25 @@ midiRootNote (rootMidiNote),
 transpose(transp),
 isSoundfont(false)
 {
-    reader->mapEntireFile();
     rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
     rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
     region_ = nullptr;
+    
+    AudioBuffer<float> rmsBuffer (2, jmin(int(sourceSampleRate*0.4f),
+                                          int(reader->getMappedSection().getLength())));
+    float s[2];
+    for (int i = 0; i < rmsBuffer.getNumSamples(); ++i)
+    {
+        reader->getSample(i, s);
+        rmsBuffer.setSample(0, i, s[0]);
+        rmsBuffer.setSample(1, i, s[1]);
+    }
+    
+    rmsLevel = rmsBuffer.getRMSLevel(0, 0, rmsBuffer.getNumSamples());
+    if (reader->numChannels > 1)
+        rmsLevel = (rmsLevel + rmsBuffer.getRMSLevel(1, 0, rmsBuffer.getNumSamples())) * 0.5f;
+    
+    rmsLevel = Decibels::gainToDecibels(rmsLevel);
 }
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
@@ -276,6 +311,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
 {
     if (BKPianoSamplerSound* const sound = dynamic_cast<BKPianoSamplerSound*> (s))
     {
+        DBG("RMS: " + String(sound->getRMSLevel()));
         //DBG("BKPianoSamplerVoice::startNote " + String(midi));
         
         
@@ -987,11 +1023,18 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     bool memoryMapped = playingSound->isMemoryMapped();
     const float* inL;
     const float* inR;
+    MemoryMappedAudioFormatReader* reader = nullptr;
     if (!memoryMapped)
     {
         inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
         inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1 ?    playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
         : nullptr;
+    }
+    else
+    {
+        reader = playingSound->getReader();
+        reader->touchSample(sourceSamplePosition);
+        reader->touchSample(reader->getMappedSection().clipValue(sourceSamplePosition+numSamples)-1);
     }
     
     float* outL = outputBuffer.getWritePointer (0, startSample);
@@ -1057,9 +1100,9 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         float lr[2], lrNext[2];
         if (memoryMapped)
         {
-            playingSound->reader->getSample(pos, lr);
-            playingSound->reader->getSample(next, lrNext);
-            if (playingSound->reader->numChannels == 1)
+            reader->getSample(pos, lr);
+            reader->getSample(next, lrNext);
+            if (reader->numChannels == 1)
             {
                 lr[1] = lr[0];
                 lrNext[1] = lrNext[0];

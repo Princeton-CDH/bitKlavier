@@ -31,7 +31,6 @@
 class StandalonePluginHolder;
 class BKAudioProcessorEditor;
 
-
 //==============================================================================
 /**
 */
@@ -81,7 +80,7 @@ public:
     String firstGallery(void);
     void initializeGallery(void);
     
-    FileChooser* fc;
+    std::unique_ptr<FileChooser> fc;
     
     Gallery::Ptr                        gallery;
     
@@ -147,8 +146,9 @@ public:
     
     bool                                defaultLoaded;
     String                              defaultName;
-    
-    OwnedArray<MemoryMappedAudioFormatReader> memoryMappedAudioReaders;
+
+    // This is quite performance intensive with a lot of samples and currently doesn't seems worth doing
+//    SampleTouchThread touchThread;
     
     FileSearchPath sampleSearchPath;
 
@@ -491,7 +491,7 @@ private:
 	Value hotkeysEnabled;
     
     Value memoryMappingEnabled;
-
+  
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)
 };
