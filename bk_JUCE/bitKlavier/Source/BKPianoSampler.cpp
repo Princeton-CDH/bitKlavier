@@ -23,13 +23,13 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const BigInteger& velocities,
                                           int layerNumber,
                                           int numLayers,
-                                          float rmsBelow,
+                                          float dBFSBelow,
                                           sfzero::Region::Ptr reg)
 :
 name (soundName),
 data(buffer),
 reader(nullptr),
-rmsBelow(rmsBelow),
+dBFSBelow(dBFSBelow),
 layerNumber(layerNumber),
 numLayers(numLayers),
 sourceSampleRate(sourceSampleRate),
@@ -80,11 +80,11 @@ transpose(transp)
 
     for (int i = 0; i < buffer->getAudioSampleBuffer()->getNumChannels(); ++i)
     {
-        rmsLevel = buffer->getAudioSampleBuffer()
+        dBFSLevel = buffer->getAudioSampleBuffer()
         ->getRMSLevel(i, 0, jmin(int(sourceSampleRate*0.4f), buffer->getAudioSampleBuffer()->getNumSamples()));
     }
-    rmsLevel *= 1.f/buffer->getAudioSampleBuffer()->getNumChannels();
-    rmsLevel = Decibels::gainToDecibels(rmsLevel);
+    dBFSLevel *= 1.f/buffer->getAudioSampleBuffer()->getNumChannels();
+    dBFSLevel = Decibels::gainToDecibels(dBFSLevel);
 }
 
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
@@ -97,11 +97,11 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const BigInteger& velocities,
                                           int layerNumber,
                                           int numLayers,
-                                          float rmsBelow) :
+                                          float dBFSBelow) :
 name (soundName),
 data(nullptr),
 reader(reader),
-rmsBelow(rmsBelow),
+dBFSBelow(dBFSBelow),
 layerNumber(layerNumber),
 numLayers(numLayers),
 sourceSampleRate(sourceSampleRate),
@@ -126,11 +126,11 @@ isSoundfont(false)
         rmsBuffer.setSample(1, i, s[1]);
     }
     
-    rmsLevel = rmsBuffer.getRMSLevel(0, 0, rmsBuffer.getNumSamples());
+    dBFSLevel = rmsBuffer.getRMSLevel(0, 0, rmsBuffer.getNumSamples());
     if (reader->numChannels > 1)
-        rmsLevel = (rmsLevel + rmsBuffer.getRMSLevel(1, 0, rmsBuffer.getNumSamples())) * 0.5f;
+        dBFSLevel = (dBFSLevel + rmsBuffer.getRMSLevel(1, 0, rmsBuffer.getNumSamples())) * 0.5f;
     
-    rmsLevel = Decibels::gainToDecibels(rmsLevel);
+    dBFSLevel = Decibels::gainToDecibels(dBFSLevel);
 }
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
@@ -311,7 +311,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
 {
     if (BKPianoSamplerSound* const sound = dynamic_cast<BKPianoSamplerSound*> (s))
     {
-        DBG("RMS: " + String(sound->getRMSLevel()));
+        DBG("RMS: " + String(sound->getDBFSLevel()));
         //DBG("BKPianoSamplerVoice::startNote " + String(midi));
         
         

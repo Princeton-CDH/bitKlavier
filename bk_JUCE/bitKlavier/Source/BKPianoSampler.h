@@ -51,7 +51,7 @@ public:
                          const BigInteger& midiVelocities,
                          int layerNumber,
                          int numLayers,
-                         float rmsBelow,
+                         float dBFSBelow,
                          sfzero::Region::Ptr region = nullptr);
     
     BKPianoSamplerSound (const String& name,
@@ -64,7 +64,7 @@ public:
                          const BigInteger& midiVelocities,
                          int layerNumber,
                          int numLayers,
-                         float rmsBelow);
+                         float dBFSBelow);
 
     
     /** Destructor. */
@@ -103,13 +103,13 @@ public:
     int minVelocity (void) { return midiVelocities.findNextSetBit(0); }
     int maxVelocity (void) { return midiVelocities.findNextClearBit(midiVelocities.findNextSetBit(0)); }
     
-    float getRMSLevel() { return rmsLevel; }
-    float setRMSLevel(float rms) { return rmsLevel; }
+    float getDBFSLevel() { return dBFSLevel; } // dBFS; rename these accordingly?
+    float setDBFSLevel(float rms) { return dBFSLevel; }
     
-    float getRMSLevelBelow() { return rmsBelow; }
-    void setRMSLevelBelow(float rms) { rmsBelow = rms; }
+    float getDBFSLevelBelow() { return dBFSBelow; }
+    void setDBFSLevelBelow(float rms) { dBFSBelow = rms; }
     
-    float getRMSDifference() { return rmsLevel - rmsBelow; }
+    float getDBFSDifference() { return dBFSLevel - dBFSBelow; }
     
 private:
     //==============================================================================
@@ -120,8 +120,8 @@ private:
     BKReferenceCountedBuffer::Ptr data;
     std::unique_ptr<MemoryMappedAudioFormatReader> reader;
     
-    float rmsLevel;
-    float rmsBelow;
+    float dBFSLevel; // dBFS value of this velocity layer
+    float dBFSBelow; // dBFS value of velocity layer below this layer
     int layerNumber;
     int numLayers;
     

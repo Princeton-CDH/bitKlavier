@@ -154,7 +154,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
         for (int j = 0; j < 4; j++) {
             if ((i == 0) && (j > 0)) continue;
             
-            float rmsBelow = -100.f;
+            float dBFSBelow = -100.f;
             for (int k = 0; k < numLayers; k++)
             {
                 EXIT_CHECK;
@@ -262,8 +262,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                                                         noteRange, root,
                                                         0, velocityRange,
                                                         k+1, numLayers,
-                                                        rmsBelow);
-                                rmsBelow = newSound->getRMSLevel();
+                                                        dBFSBelow);
+                                dBFSBelow = newSound->getDBFSLevel();
                                 synth->addSound(loadingSoundSetId, newSound);
                             }
                             else DBG("File mapping failed");
@@ -288,8 +288,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                                                     noteRange, root,
                                                     0, velocityRange,
                                                     k+1, numLayers,
-                                                    rmsBelow);
-                            rmsBelow = newSound->getRMSLevel();
+                                                    dBFSBelow);
+                            dBFSBelow = newSound->getDBFSLevel();
                             synth->addSound(loadingSoundSetId, newSound);
                         }
                     }
@@ -337,7 +337,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
             if ((i == 0) && (j > 0)) continue;
             if ((i == 6) && (j != 1) && (j != 2) ) continue;
             
-            float rmsBelow = -100.f;
+            float dBFSBelow = -100.f;
             for (int k = 0; k < 3; k++) //k => velocity layer
             {
                 EXIT_CHECK;
@@ -414,8 +414,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                                                         noteRange, root,
                                                         0, velocityRange,
                                                         k+1, 3,
-                                                        rmsBelow);
-                                rmsBelow = newSound->getRMSLevel();
+                                                        dBFSBelow);
+                                dBFSBelow = newSound->getDBFSLevel();
                                 synth->addSound(loadingSoundSetId, newSound);
                             }
                             else DBG("File mapping failed");
@@ -443,8 +443,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                                                     noteRange, root,
                                                     0, velocityRange,
                                                     k+1, 3,
-                                                    rmsBelow);
-                            rmsBelow = newSound->getRMSLevel();
+                                                    dBFSBelow);
+                            dBFSBelow = newSound->getDBFSLevel();
                             synth->addSound(loadingSoundSetId, newSound);
                         }
                     }
@@ -742,7 +742,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     else    return jobStatus;
     
     int n = 1;
-    float rmsBelow = -100.f;
+    float dBFSBelow = -100.f;
     for (auto region : processor.regions.getReference(loadingSoundSetId))
     {
         EXIT_CHECK;
@@ -838,8 +838,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                 region->pitch_keycenter,
                                 region->transpose,
                                 vrange, n, processor.regions.size(),
-                                rmsBelow, region);
-        rmsBelow = newSound->getRMSLevel() > rmsBelow ? newSound->getRMSLevel() : 0.f;
+                                dBFSBelow, region);
+        dBFSBelow = newSound->getDBFSLevel() > dBFSBelow ? newSound->getDBFSLevel() : 0.f;
         synth->addSound(loadingSoundSetId, newSound);
         n++;
     }
@@ -876,7 +876,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
         for (int n = 0; n < 4; n++) {
             if ((oct == 0) && (n > 0)) continue;
             
-            float rmsBelow = -100.f;
+            float dBFSBelow = -100.f;
             for (int k = 0; k < numLayers; k++)
             {
                 EXIT_CHECK;
@@ -957,8 +957,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                         noteRange, root,
                                                         0, velocityRange,
                                                         k+1, numLayers,
-                                                        rmsBelow);
-                                rmsBelow = newSound->getRMSLevel();
+                                                        dBFSBelow);
+                                dBFSBelow = newSound->getDBFSLevel();
                                 synth->addSound(loadingSoundSetId, newSound);
                             }
                             else DBG("File mapping failed");
@@ -983,8 +983,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                     noteRange, root,
                                                     0, velocityRange,
                                                     k+1, numLayers,
-                                                    rmsBelow);
-                            rmsBelow = newSound->getRMSLevel();
+                                                    dBFSBelow);
+                            dBFSBelow = newSound->getDBFSLevel();
                             synth->addSound(loadingSoundSetId, newSound);
                         }
                     }
