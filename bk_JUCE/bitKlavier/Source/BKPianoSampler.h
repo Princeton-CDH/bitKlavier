@@ -111,6 +111,9 @@ public:
     
     float getDBFSDifference() { return dBFSLevel - dBFSBelow; }
     
+    int getNumLayers() { return numLayers; }
+    int getLayerNumber() { return layerNumber; }
+    
 private:
     //==============================================================================
     friend class BKPianoSamplerVoice;

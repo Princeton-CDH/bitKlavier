@@ -455,6 +455,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
         dgain = dynamicGain;
         
         noteVelocity = velocity;
+        DBG("noteVelocity = " + String(noteVelocity * 127.));
         
         // *** START new layer-based approach to velocity handling ** //
         if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote)
@@ -467,20 +468,22 @@ void BKPianoSamplerVoice::startNote (const int midi,
             // int current layer = sound->getLayer();
             
             // dB range of layer
-            // double dynRange = 30. * (maxVelocity - minVelocity) / 127.;
             double dynRange = sound->getDBFSDifference();
-            if (dynRange > 50.) dynRange = 4; // set this somehow...
+            
+            // for the first layer
+            if (sound->getLayerNumber() <= 1) dynRange = 30. / sound->getNumLayers(); // assume 30dB for total range of instrument
+            if (dynRange > 50.) dynRange = 30; // not sure we need this, or if 50 is a good threshold
             
             // change this to expand dynamic range across the whole whole range, not just v1
             // user can set "expand / contract dynamic range by N dB"
             // not sure if contraction makes sense, but worth a try
-            if (minVelocity == 0) dynRange *= 4.; // extend dynamic range for softest layer?
+            // if (minVelocity == 0) dynRange *= 4.; // extend dynamic range for softest layer?
             
             double dBadjust = dynRange * (noteVelocity * 127. - maxVelocity) / (maxVelocity - minVelocity);
             double gainAdjust = Decibels::decibelsToGain(dBadjust);
             noteVelocity = gainAdjust;
             
-            DBG("noteVelocity = " + String(noteVelocity * 127.));
+            DBG("layerNumber = " + String(sound->getLayerNumber()));
             DBG("min velocity = " + String(minVelocity));
             DBG("max velocity = " + String(maxVelocity));
             DBG("dynRange = " + String(dynRange));
