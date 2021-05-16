@@ -85,6 +85,9 @@ transpose(transp)
     }
     dBFSLevel *= 1.f/buffer->getAudioSampleBuffer()->getNumChannels();
     dBFSLevel = Decibels::gainToDecibels(dBFSLevel);
+    
+    velocityMin = minVelocity();
+    velocityMax = maxVelocity();
 }
 
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
@@ -131,6 +134,9 @@ isSoundfont(false)
         dBFSLevel = (dBFSLevel + rmsBuffer.getRMSLevel(1, 0, rmsBuffer.getNumSamples())) * 0.5f;
     
     dBFSLevel = Decibels::gainToDecibels(dBFSLevel);
+    
+    velocityMin = minVelocity();
+    velocityMax = maxVelocity();
 }
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
@@ -455,18 +461,12 @@ void BKPianoSamplerVoice::startNote (const int midi,
         dgain = dynamicGain;
         
         noteVelocity = velocity;
-        DBG("noteVelocity = " + String(noteVelocity * 127.));
+        // DBG("noteVelocity = " + String(noteVelocity * 127.));
         
         // *** START new layer-based approach to velocity handling ** //
         if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote)
         {
-            // grab boundaries for this layer
-            int minVelocity = sound->minVelocity();
-            int maxVelocity = sound->maxVelocity();
-            
-            // need to also grab layer number
-            // int current layer = sound->getLayer();
-            
+
             // dB range of layer
             double dynRange = sound->getDBFSDifference();
             
@@ -474,28 +474,27 @@ void BKPianoSamplerVoice::startNote (const int midi,
             if (sound->getLayerNumber() <= 1) dynRange = 30. / sound->getNumLayers(); // assume 30dB for total range of instrument
             if (dynRange > 50.) dynRange = 30; // not sure we need this, or if 50 is a good threshold
             
-            double extendRange = 4; // user sets this, to extend the dynamic range of the set
+            // extend range as needed
+            double extendRange = 4; // *** user sets this, to extend the dynamic range of the set
             dynRange += extendRange / sound->getNumLayers(); // increase the dynamic range of layer by appropriate fraction
             
-            double dBadjust = dynRange * (noteVelocity * 127. - maxVelocity) / (maxVelocity - minVelocity);
-            // change this to expand dynamic range across the whole whole range, not just v1
-            // user can set "expand / contract dynamic range by N dB"
-            // not sure if contraction makes sense, but worth a try
-            // if (minVelocity == 0) dynRange *= 4.; // extend dynamic range for softest layer?
+            // calculate base adjustment to loudness for this layer, as deteremined by velocity
+            double dBadjust = dynRange * (noteVelocity * 127. - sound->getMaxVelocity()) / (sound->getMaxVelocity() - sound->getMinVelocity());
             
-            // need to offset each layer's loudness accordingly
-            double dBoffset= (sound->getLayerNumber() - sound->getNumLayers()) * extendRange / sound->getNumLayers();
-            dBadjust += dBoffset;
+            // offset each layer's loudness accordingly, if the range is extended
+            dBadjust += (sound->getLayerNumber() - sound->getNumLayers()) * extendRange / sound->getNumLayers();
             
-            double gainAdjust = Decibels::decibelsToGain(dBadjust);
-            noteVelocity = gainAdjust;
+            // convert to a gain multipler
+            noteVelocity = Decibels::decibelsToGain(dBadjust);
             
+            /*
             DBG("layerNumber = " + String(sound->getLayerNumber()));
             DBG("min velocity = " + String(minVelocity));
             DBG("max velocity = " + String(maxVelocity));
             DBG("dynRange = " + String(dynRange));
             DBG("dB adjust = " + String(dBadjust));
             DBG("new gain multiplier = " + String(noteVelocity));
+            */
         }
         // *** END new layer-based approach to velocity handling ** //
         

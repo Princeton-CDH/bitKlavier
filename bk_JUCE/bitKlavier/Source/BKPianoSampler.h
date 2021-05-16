@@ -103,6 +103,9 @@ public:
     int minVelocity (void) { return midiVelocities.findNextSetBit(0); }
     int maxVelocity (void) { return midiVelocities.findNextClearBit(midiVelocities.findNextSetBit(0)); }
     
+    int getMinVelocity() { return velocityMin; }
+    int getMaxVelocity() { return velocityMax; }
+    
     float getDBFSLevel() { return dBFSLevel; } // dBFS; rename these accordingly?
     float setDBFSLevel(float rms) { return dBFSLevel; }
     
@@ -127,6 +130,8 @@ private:
     float dBFSBelow; // dBFS value of velocity layer below this layer
     int layerNumber;
     int numLayers;
+    int velocityMin;
+    int velocityMax;
     
     double sourceSampleRate;
     BigInteger midiNotes;
