@@ -516,6 +516,11 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 	const ScopedLock sl(lock);
 
 	int noteNumber = midiNoteNumber;
+    // args: asym_k, sym_k, scale (multiplier), offset -- user settable
+    float velocityCurved = dt_warpscale(velocity, 2., 1., 1, 0.);
+    if (velocityCurved < 0.) velocityCurved = 0.;
+    if (velocityCurved > 1.) velocityCurved = 1.;
+    DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
 
 	// ADDED THIS
 	if (noteNumber > 108 || noteNumber < 21) return nullptr;
@@ -537,7 +542,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 
 		// Check if sound applies to note, velocity, and channel.
 		if (sound->appliesToNote(noteNumber) &&
-			sound->appliesToVelocity((int)(velocity * 127.0)))
+			sound->appliesToVelocity((int)(velocityCurved * 127.0)))
 		{
 			if (sound->region_ != nullptr)
 			{
@@ -557,7 +562,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                        noteNumber,
                        transposition,
                        gain,
-                       velocity,
+                       velocityCurved,
                        direction,
                        type,
                        bktype,

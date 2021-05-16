@@ -778,20 +778,20 @@ double ftom( double f, double sr )
 //help focus one extreme or another of a slider range
 double dt_asymwarp(double inval, double k)
 {
-    if(k==1) return inval;
+    if(k == 1) return inval;
     return (pow(k, inval) - 1.) / (k - 1.);
 }
 
 double dt_asymwarp_inverse(double inval, double k)
 {
-    if(k==1) return inval;
-    return log(inval*(k-1) + 1) / log(k);
+    if(k == 1) return inval;
+    return log(inval * (k-1) + 1) / log(k);
 }
 
 // this one warps symmetrically around 0.5, keeping 0 and 1 fixed
 double dt_symwarp(double inval, double k)
 {
-    if(k==1) return inval;
+    if(k == 1) return inval;
     
     if (inval < 0.5)    return 1. - 0.5 * (pow(1. - 2. * inval, k) + 1);
     else                return      0.5 * (pow(2. * inval - 1., k) + 1);
