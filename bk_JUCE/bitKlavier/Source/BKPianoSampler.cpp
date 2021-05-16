@@ -470,16 +470,23 @@ void BKPianoSamplerVoice::startNote (const int midi,
             // dB range of layer
             double dynRange = sound->getDBFSDifference();
             
-            // for the first layer
+            // for the first layer, create a reasonable dynamic range
             if (sound->getLayerNumber() <= 1) dynRange = 30. / sound->getNumLayers(); // assume 30dB for total range of instrument
             if (dynRange > 50.) dynRange = 30; // not sure we need this, or if 50 is a good threshold
             
+            double extendRange = 4; // user sets this, to extend the dynamic range of the set
+            dynRange += extendRange / sound->getNumLayers(); // increase the dynamic range of layer by appropriate fraction
+            
+            double dBadjust = dynRange * (noteVelocity * 127. - maxVelocity) / (maxVelocity - minVelocity);
             // change this to expand dynamic range across the whole whole range, not just v1
             // user can set "expand / contract dynamic range by N dB"
             // not sure if contraction makes sense, but worth a try
             // if (minVelocity == 0) dynRange *= 4.; // extend dynamic range for softest layer?
             
-            double dBadjust = dynRange * (noteVelocity * 127. - maxVelocity) / (maxVelocity - minVelocity);
+            // need to offset each layer's loudness accordingly
+            double dBoffset= (sound->getLayerNumber() - sound->getNumLayers()) * extendRange / sound->getNumLayers();
+            dBadjust += dBoffset;
+            
             double gainAdjust = Decibels::decibelsToGain(dBadjust);
             noteVelocity = gainAdjust;
             
