@@ -772,10 +772,16 @@ double ftom( double f, double sr )
     return (f > 0 ? (log(f / sr) / LOGTWO) * 12.0 + 69 : -1500);
 }
 
+// warping functions, for velocity curves and other parameters that
+// might benefit from some signal conditioning
 
-//these require inval to be between 0 and 1, and k != 1
-//they warp the input asymmetrically, mostly to
-//help focus one extreme or another of a slider range
+// these require inval to be between 0 and 1, and k != 1
+// they warp the input asymmetrically, mostly to
+// help focus one extreme or another of a slider range
+
+// https://www.desmos.com/calculator/kfajuawsfs, to play with params/graphing
+
+
 double dt_asymwarp(double inval, double k)
 {
     if(k == 1) return inval;
@@ -805,29 +811,6 @@ double dt_warpscale(double inval, double asym_k, double sym_k, double scale, dou
     return offset + scale * dt_asymwarp(dt_symwarp(inval, sym_k), asym_k);
 }
 
-//could add this as well, if it would be useful:
-//symmetrical:
-//y = 0.5*((2x-1)^(1/k) - 1)
-//k = 3 is typical. otherwise have to correct for x<0.5 (mirror)
-
-/*
-fun float dt_symwarp(float inval, float k, int symwarp_type)
-{
-    float sym_warped;
-    if(inval >= 0.5) {
-        Math.pow(2.*inval - 1., 1./k) => sym_warped;
-        if (symwarp_type == 1) return (sym_warped + 1.) * 0.5;
-        if (symwarp_type == 2) return 2. * (sym_warped - 0.5);
-        if (symwarp_type == 3) return 2. * (1. - sym_warped);
-    }
-    1. - inval => inval; // for S curve
-    Math.pow(2.*inval - 1., 1./k) => sym_warped;
-    (sym_warped + 1.) * 0.5 => sym_warped;
-    if (symwarp_type == 1) return 1. - sym_warped;
-    if (symwarp_type == 2) return 2. * (sym_warped - 0.5);
-    if (symwarp_type == 3) return 2. * (1. - sym_warped);
-}
-*/
 
 int mod(int a, int b) { return (a % b + b) % b; }
 

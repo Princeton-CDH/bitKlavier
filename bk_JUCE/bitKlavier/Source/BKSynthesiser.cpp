@@ -516,17 +516,32 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 	const ScopedLock sl(lock);
 
 	int noteNumber = midiNoteNumber;
+    // ADDED THIS
+    if (noteNumber > 108 || noteNumber < 21) return nullptr;
+    float transposition = transp;
+    
+    /*
+     **** Velocity Curving
+     user settable parameters:
+        --asymmetric warping coefficient (0, 10), default 1 (no warping)
+        --symmetric warping coefficent (0, 5), default 1 (no warping)
+        --scaling multipler (0, 10), default 1.
+        --offset (-1, 1), default 0.
+        --invert velocities, toggle, default off
+    */
+    
+    float velocityCurved;
+    
+    // do inversion, or not
+    // if (velocityInvert) velocityCurved = 1. - velocity;
+    // else velocityCurved = velocity;
+    
     // args: asym_k, sym_k, scale (multiplier), offset -- user settable
-    float velocityCurved = dt_warpscale(velocity, 2., 1., 1, 0.);
+    velocityCurved = dt_warpscale(velocity, 2., 1., 1, 0.);
     if (velocityCurved < 0.) velocityCurved = 0.;
     if (velocityCurved > 1.) velocityCurved = 1.;
     DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
 
-	// ADDED THIS
-	if (noteNumber > 108 || noteNumber < 21) return nullptr;
-
-	float transposition = transp;
-    
     // needed for MIDI Out; will just return the last found voice, if there are multiple voices
     BKSynthesiserVoice* voiceToReturn;
     
