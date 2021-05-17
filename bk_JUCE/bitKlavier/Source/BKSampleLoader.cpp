@@ -128,7 +128,7 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
 
 BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
 {
-    WavAudioFormat wavFormat;
+    BKWavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.mainPianoSynth;
     
     File bkSamples;
@@ -193,10 +193,12 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                 {
                     String soundName = file.getFileName();
                     
-                    MemoryMappedAudioFormatReader* memoryMappedReader;
+                    BKMemoryMappedWavReader* memoryMappedReader;
                     if (memoryMappingEnabled)
                     {
-                        memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+                        memoryMappedReader =
+                        dynamic_cast<BKMemoryMappedWavReader*>
+                        (wavFormat.createMemoryMappedReader(new FileInputStream(file)));
                     }
                     else
                     {
@@ -315,7 +317,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
 
 BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
 {
-    WavAudioFormat wavFormat;
+    BKWavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.resonanceReleaseSynth;
     
     File bkSamples;
@@ -358,10 +360,12 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                     
                     String soundName = file.getFileName();
                     
-                    MemoryMappedAudioFormatReader* memoryMappedReader;
+                    BKMemoryMappedWavReader* memoryMappedReader;
                     if (memoryMappingEnabled)
                     {
-                        memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+                        memoryMappedReader =
+                        dynamic_cast<BKMemoryMappedWavReader*>
+                        (wavFormat.createMemoryMappedReader(new FileInputStream(file)));
                     }
                     else
                     {
@@ -464,7 +468,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
 
 BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
 {
-    WavAudioFormat wavFormat;
+    BKWavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.hammerReleaseSynth;
     File bkSamples;
     
@@ -494,10 +498,12 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
             
             String soundName = file.getFileName();
             
-            MemoryMappedAudioFormatReader* memoryMappedReader;
+            BKMemoryMappedWavReader* memoryMappedReader;
             if (memoryMappingEnabled)
             {
-                memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+                memoryMappedReader =
+                dynamic_cast<BKMemoryMappedWavReader*>
+                (wavFormat.createMemoryMappedReader(new FileInputStream(file)));
             }
             else
             {
@@ -572,7 +578,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
 
 BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
 {
-    WavAudioFormat wavFormat;
+    BKWavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.pedalSynth;
     File bkSamples;
     
@@ -605,10 +611,12 @@ BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
             
             String soundName = file.getFileName();
             
-            MemoryMappedAudioFormatReader* memoryMappedReader;
+            BKMemoryMappedWavReader* memoryMappedReader;
             if (memoryMappingEnabled)
             {
-                memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+                memoryMappedReader =
+                dynamic_cast<BKMemoryMappedWavReader*>
+                (wavFormat.createMemoryMappedReader(new FileInputStream(file)));
             }
             else
             {
@@ -851,7 +859,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
 
 BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
 {
-    WavAudioFormat wavFormat;
+    BKWavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.mainPianoSynth;
     
     File samples (loadingSoundfont);
@@ -900,10 +908,12 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                 {
                     String soundName = file.getFileName();
                     
-                    MemoryMappedAudioFormatReader* memoryMappedReader = nullptr;
+                    BKMemoryMappedWavReader* memoryMappedReader;
                     if (memoryMappingEnabled)
                     {
-                        memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+                        memoryMappedReader =
+                        dynamic_cast<BKMemoryMappedWavReader*>
+                        (wavFormat.createMemoryMappedReader(new FileInputStream(file)));
                     }
                     else
                     {

@@ -91,7 +91,7 @@ transpose(transp)
 }
 
 BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
-                                          MemoryMappedAudioFormatReader* reader,
+                                          BKMemoryMappedWavReader* reader,
                                           uint64 soundLength,
                                           double sourceSampleRate,
                                           const BigInteger& notes,
@@ -120,14 +120,10 @@ isSoundfont(false)
     region_ = nullptr;
     
     AudioBuffer<float> rmsBuffer (2, jmin(int(sourceSampleRate*0.4f),
-                                          int(reader->getMappedSection().getLength())));
-    float s[2];
-    for (int i = 0; i < rmsBuffer.getNumSamples(); ++i)
-    {
-        reader->getSample(i, s);
-        rmsBuffer.setSample(0, i, s[0]);
-        rmsBuffer.setSample(1, i, s[1]);
-    }
+                                        int(reader->getMappedSection().getLength())));
+
+    reader->readSamples(rmsBuffer.getArrayOfWritePointers(), rmsBuffer.getNumChannels(),
+                        0, 0, rmsBuffer.getNumSamples());
     
     dBFSLevel = rmsBuffer.getRMSLevel(0, 0, rmsBuffer.getNumSamples());
     if (reader->numChannels > 1)
@@ -1033,18 +1029,29 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     bool memoryMapped = playingSound->isMemoryMapped();
     const float* inL;
     const float* inR;
-    MemoryMappedAudioFormatReader* reader = nullptr;
+    const int* iInL;
+    const int* iInR;
+    BKMemoryMappedWavReader* reader = nullptr;
+    AudioBuffer<float> readerBuffer (2, numSamples);
+    
     if (!memoryMapped)
     {
         inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
-        inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1 ?    playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
-        : nullptr;
+        inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1 ?
+        playingSound->data->getAudioSampleBuffer()->getReadPointer (1) : nullptr;
     }
     else
     {
         reader = playingSound->getReader();
         reader->touchSample(sourceSamplePosition);
         reader->touchSample(reader->getMappedSection().clipValue(sourceSamplePosition+numSamples)-1);
+
+        // If you want to work on this stuff, be careful! Can spit out some really loud garbage audio
+//        reader->readSamples(readerBuffer.getArrayOfWritePointers(), reader->numChannels, 0,
+//                            sourceSamplePosition,
+//                            jmin(numSamples, int(reader->lengthInSamples-sourceSamplePosition)));
+//        iInL = readerBuffer.getReadPointer(0);
+//        iInR = reader->numChannels > 1 ? readerBuffer.getReadPointer(1) : nullptr;
     }
     
     float* outL = outputBuffer.getWritePointer (0, startSample);
@@ -1107,35 +1114,33 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         const float invAlpha = 1.0f - alpha;
         int next = pos + 1;
         
-        float lr[2], lrNext[2];
-        if (memoryMapped)
+        float sL, sLNext, sR, sRNext;
+        if (!memoryMapped)
         {
-            reader->getSample(pos, lr);
-            reader->getSample(next, lrNext);
-            if (reader->numChannels == 1)
-            {
-                lr[1] = lr[0];
-                lrNext[1] = lrNext[0];
-            }
+            sL = inL [pos];
+            sLNext = inL [next];
+            sR = inR != nullptr ? inR [pos] : sL;
+            sRNext = inR != nullptr ? inR [next] : sLNext;
         }
         else
         {
-            lr[0] = inL[pos];
-            lrNext[0] = inL[next];
-            if (inR == nullptr)
-            {
-                lr[1] = lr[0];
-                lrNext[1] = lrNext[0];
-            }
-            else
-            {
-                lr[1] = inR[pos];
-                lrNext[1] = inR[next];
-            }
+            float s[2];
+            reader->getSample(pos, s);
+            sL = s[0];
+            sR = reader->numChannels > 1 ? s[1] : s[0];
+            reader->getSample(next, s);
+            sLNext = s[0];
+            sRNext = reader->numChannels > 1 ? s[1] : s[0];
+            
+//            float invIntMax = (1.f/INT32_MAX);
+//            sL = iInL [pos] * invIntMax;
+//            sLNext = iInL [next] * invIntMax;
+//            sR = iInR != nullptr ? iInR [pos] * invIntMax : sL;
+//            sRNext = iInR != nullptr ? iInR [next] * invIntMax : sLNext;
         }
-
-        const float l = (lr[0] * invAlpha + lrNext[0] * alpha) * noteVelocity * adsr.tick();
-        const float r = (lr[1] * invAlpha + lrNext[1] * alpha) * noteVelocity * adsr.lastOut();
+        
+        const float l = (sL * invAlpha + sLNext * alpha) * noteVelocity * adsr.tick();
+        const float r = (sR * invAlpha + sRNext * alpha) * noteVelocity * adsr.lastOut();
         
         if (adsr.getState() == BKADSR::IDLE)
         {

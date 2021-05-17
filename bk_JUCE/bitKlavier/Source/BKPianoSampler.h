@@ -17,6 +17,7 @@
 #include "BKReferenceCountedBuffer.h"
 #include "AudioConstants.h"
 #include "General.h"
+#include "BKWavReader.h"
 
 class   BKPianoSamplerSound    : public BKSynthesiserSound
 {
@@ -55,7 +56,7 @@ public:
                          sfzero::Region::Ptr region = nullptr);
     
     BKPianoSamplerSound (const String& name,
-                         MemoryMappedAudioFormatReader* reader,
+                         BKMemoryMappedWavReader* reader,
                          uint64 soundLength,
                          double sourceSampleRate,
                          const BigInteger& midiNotes,
@@ -82,7 +83,7 @@ public:
     
     bool isMemoryMapped() const noexcept { return (reader != nullptr); }
 
-    MemoryMappedAudioFormatReader* getReader() const noexcept { return reader.get(); }
+    BKMemoryMappedWavReader* getReader() const noexcept { return reader.get(); }
     
     //==============================================================================
     bool appliesToNote (int midiNoteNumber) override;
@@ -124,7 +125,7 @@ private:
     String name;
     
     BKReferenceCountedBuffer::Ptr data;
-    std::unique_ptr<MemoryMappedAudioFormatReader> reader;
+    std::unique_ptr<BKMemoryMappedWavReader> reader;
     
     float dBFSLevel; // dBFS value of this velocity layer
     float dBFSBelow; // dBFS value of velocity layer below this layer

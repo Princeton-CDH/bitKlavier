@@ -12,6 +12,7 @@
 #define BKSAMPLELOADER_H_INCLUDED
 
 #include "BKUtilities.h"
+#include "BKWavReader.h"
 
 class BKAudioProcessor;
 
@@ -49,7 +50,7 @@ private:
     BKAudioProcessor& processor;
     // Sample loading.
     AudioFormatManager formatManager;
-    WavAudioFormat wavFormat;
+    BKWavAudioFormat wavFormat;
     std::unique_ptr<AudioFormatReader> sampleReader;
     std::unique_ptr<AudioSampleBuffer> sampleBuffer;
     
