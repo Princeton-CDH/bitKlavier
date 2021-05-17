@@ -523,11 +523,11 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     /*
      **** Velocity Curving
      user settable parameters:
-        --asymmetric warping coefficient (0, 10), default 1 (no warping)
-        --symmetric warping coefficent (0, 5), default 1 (no warping)
-        --scaling multipler (0, 10), default 1.
-        --offset (-1, 1), default 0.
-        --invert velocities, toggle, default off
+        --asymmetric warping coefficient (0, 10): default 1 (no warping)
+        --symmetric warping coefficent (0, 5): default 1 (no warping)
+        --scaling multipler (0, 10): default 1.
+        --offset (-1, 1): default 0.
+        --invert velocities, toggle: default off
     */
     
     float velocityCurved;
