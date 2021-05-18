@@ -527,6 +527,15 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
         --scaling multipler (0, 10): default 1.
         --offset (-1, 1): default 0.
         --invert velocities, toggle: default off
+     
+     also, the user should be able to set extendRange (in dB), which is in BKPianoSampler::startNote()
+     and will presumably need to pass through here.
+     
+     velocity curving doesn't actually extend the dynamic range (well, it could if scaling results
+     in velocities > 1.), but rather just distributes the incoming velocities across the dynamic
+     range with the sample layers. extendRange will extend the total dynamic of the sample set, and
+     is set to 4dB by default at the moment (that's probably a reasonable default, and feels good for
+     the Heavy set and other new bK sample libraries).
     */
     
     float velocityCurved;
