@@ -536,7 +536,11 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     // else velocityCurved = velocity;
     
     // args: asym_k, sym_k, scale (multiplier), offset -- user settable
-    velocityCurved = dt_warpscale(velocity, 2., 1., 1, 0.);
+    if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote)
+        velocityCurved = dt_warpscale(velocity, 2., 1., 1, 0.);
+    else
+        velocityCurved = velocity;
+    
     if (velocityCurved < 0.) velocityCurved = 0.;
     // if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
     DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
