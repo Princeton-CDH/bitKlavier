@@ -516,7 +516,6 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 	const ScopedLock sl(lock);
 
 	int noteNumber = midiNoteNumber;
-    // ADDED THIS
     if (noteNumber > 108 || noteNumber < 21) return nullptr;
     float transposition = transp;
     
@@ -539,7 +538,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     // args: asym_k, sym_k, scale (multiplier), offset -- user settable
     velocityCurved = dt_warpscale(velocity, 2., 1., 1, 0.);
     if (velocityCurved < 0.) velocityCurved = 0.;
-    if (velocityCurved > 1.) velocityCurved = 1.;
+    // if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
     DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
 
     // needed for MIDI Out; will just return the last found voice, if there are multiple voices
