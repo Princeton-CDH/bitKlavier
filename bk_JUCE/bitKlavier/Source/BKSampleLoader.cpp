@@ -15,7 +15,32 @@
 #include "PluginProcessor.h"
 
 
-String notes[4] = {"A","C","D#","F#"};
+// Order of these arrays matters
+String bkNotes[4] = { "C", "D#", "F#", "A" };
+
+String completeNotes[17] = {
+    "C", "C#", "Db", "D", "D#", "Eb", "E", "F", "F#",
+    "Gb", "G", "G#", "Ab", "A", "A#", "Bb", "B"
+};
+
+static inline int noteNameToRoot(String name)
+{
+    int root = 0;
+    if (name[0] == 'C') root = 0;
+    else if (name[0] == 'D') root = 2;
+    else if (name[0] == 'E') root = 4;
+    else if (name[0] == 'F') root = 5;
+    else if (name[0] == 'G') root = 7;
+    else if (name[0] == 'A') root = 9;
+    else if (name[0] == 'B') root = 11;
+    
+    if (name[1] == '#') root++;
+    else if (name[1] == 'b') root--;
+    
+    root += 12 * name.getTrailingIntValue() + 12;
+    
+    return root;
+}
 
 #define EXIT_CHECK if (shouldExit()) \
 { \
@@ -152,8 +177,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
     
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
-            if ((i == 0) && (j > 0)) continue;
-            
             float dBFSBelow = -100.f;
             for (int k = 0; k < numLayers; k++)
             {
@@ -161,7 +184,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                 
                 //String temp = path;
                 String temp;
-                temp.append(notes[j],3);
+                temp.append(bkNotes[j],3);
                 temp.append(String(i),3);
                 temp.append("v",2);
                 
@@ -205,27 +228,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                     
                     BigInteger noteRange;
                     
-                    int root = 0;
-                    if (j == 0) {
-                        root = (9+12*i) + 12;
-                        if (i == 7) {
-                            // High C.
-                            noteRange.setRange(root-1,5,true);
-                        }else {
-                            noteRange.setRange(root-1,3,true);
-                        }
-                    } else if (j == 1) {
-                        root = (0+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    } else if (j == 2) {
-                        root = (3+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    } else if (j == 3) {
-                        root = (6+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    } else {
-                        
-                    }
+                    int root = (12 * i) + noteNameToRoot(bkNotes[j]) + 12;
+                    if (i == 7 && j == 3) noteRange.setRange(root-1, 5, true); //High A
+                    else noteRange.setRange(root-1, 3, true);
                     
                     BigInteger velocityRange;
                     if (numLayers == 8)
@@ -300,7 +305,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                 }
                 else
                 {
-                    DBG("file not opened OK: " + temp);
+                    DBG("File not found: " + temp);
                 }
                 
             }
@@ -334,9 +339,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
     for (int i = 0; i < 7; i++) {       //i => octave
         for (int j = 0; j < 4; j++) {   //j => note name
             
-            if ((i == 0) && (j > 0)) continue;
-            if ((i == 6) && (j != 1) && (j != 2) ) continue;
-            
             float dBFSBelow = -100.f;
             for (int k = 0; k < 3; k++) //k => velocity layer
             {
@@ -346,7 +348,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                 if(k==0) temp += "V3";
                 else if(k==1) temp += "S";
                 else if(k==2) temp += "L";
-                temp += notes[j];
+                temp += bkNotes[j];
                 temp += String(i);
                 temp += ".wav";
                 
@@ -454,7 +456,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                 }
                 else
                 {
-                    DBG("file not opened OK: " + temp);
+                    DBG("File not found: " + temp);
                 }
             }
         }
@@ -564,7 +566,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
         }
         else
         {
-            DBG("file not opened OK: " + temp);
+            DBG("File not found: " + temp);
         }
     }
     return jobStatus;
@@ -675,7 +677,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
         }
         else
         {
-            DBG("file not opened OK: " + temp);
+            DBG("File not found: " + temp);
         }
     }
     return jobStatus;
@@ -859,16 +861,19 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
     
     File samples (loadingSoundfont);
     
+    Array<int> noteRoots, resRoots;
+    
     int numLayers = 0;
+    int maxOctave = 0;
     int numResLayers = 0;
+    int maxResOctave = 0;
     int numHammers = 0;
     int numPedal = 0;
+    int numTotalSample = 0;
     
     // Figure out how many layers there
-//    std::regex noteReg("\\b[ABCDEFG]#*b*\\dv\\d+\\b");
-//    std::regex harmReg("\\bharm[ABCDEFG]#*b*\\dv\\d+\\b");
-    std::regex noteReg("\\b(A|C|D#|F#)\\dv\\d+\\b");
-    std::regex harmReg("\\bharm(A|C|D#|F#)\\dv\\d+\\b");
+    std::regex noteReg("\\b[ABCDEFG]#*b*\\dv\\d+\\b");
+    std::regex harmReg("\\bharm[ABCDEFG]#*b*\\dv\\d+\\b");
     std::regex relReg("\\brel\\d+\\b");
     std::regex pedalReg("\\bpedal[DU]\\d+\\b");
     
@@ -879,102 +884,135 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
         if (std::regex_search(fileName.toStdString(), noteReg))
         {
             numLayers = jmax(numLayers, fileName.getTrailingIntValue());
+            String noteName = fileName.upToFirstOccurrenceOf("v", false, false);
+            maxOctave = jmax(maxOctave, noteName.getTrailingIntValue());
+            noteRoots.addIfNotAlreadyThere(noteNameToRoot(noteName));
+            noteRoots.sort();
+            numTotalSample++;
         }
         else if (std::regex_search(fileName.toStdString(), harmReg))
         {
             numResLayers = jmax(numResLayers, fileName.getTrailingIntValue());
+            String resName = fileName.fromFirstOccurrenceOf("harm", false, false)
+            .upToFirstOccurrenceOf("v", false, false);
+            maxResOctave = jmax(maxResOctave, resName.getTrailingIntValue());
+            resRoots.addIfNotAlreadyThere(noteNameToRoot(resName));
+            resRoots.sort();
+            numTotalSample++;
         }
         else if (std::regex_search(fileName.toStdString(), relReg))
         {
             numHammers = jmax(numHammers, fileName.getTrailingIntValue());
+            numTotalSample++;
         }
         else if (std::regex_search(fileName.toStdString(), pedalReg))
         {
             numPedal = jmax(numPedal, fileName.getTrailingIntValue());
+            numTotalSample++;
         }
     }
+    
+    progressInc = 1./numTotalSample;
+    int noteCount = 0;
     
     //==============================================================================
     //==============================================================================
     // Load the normal samples
-    
-    for (int oct = 0; oct < 8; oct++) {
-        for (int n = 0; n < 4; n++) {
-            if ((oct == 0) && (n > 0)) continue;
-            
-            float dBFSBelow = -100.f;
-            for (int k = 0; k < numLayers; k++)
-            {
-                EXIT_CHECK;
-                
-                String temp;
-                temp.append(notes[n],3);
-                temp.append(String(oct),3);
-                temp.append("v",2);
-                temp.append(String(k+1),3);
-                temp.append(".wav",5);
-                
-                File file(samples.getChildFile(temp));
-                
-                FileInputStream inputStream(file);
-                
-                if (inputStream.openedOk())
+
+    if (numLayers > 0)
+    {
+        for (int oct = 0; oct <= maxOctave; oct++) {
+            for (int n = 0; n < 17; n++) {
+                float dBFSBelow = -100.f;
+                bool layerFoundForNote = false;
+                for (int k = 0; k < numLayers; k++)
                 {
-                    String soundName = file.getFileName();
+                    EXIT_CHECK;
                     
-                    MemoryMappedAudioFormatReader* memoryMappedReader = nullptr;
-                    if (memoryMappingEnabled)
+                    String temp;
+                    temp.append(completeNotes[n],3);
+                    temp.append(String(oct),3);
+                    temp.append("v",2);
+                    temp.append(String(k+1),3);
+                    temp.append(".wav",5);
+                    
+                    File file(samples.getChildFile(temp));
+                    
+                    FileInputStream inputStream(file);
+                    
+                    if (inputStream.openedOk())
                     {
-                        memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
-                    }
-                    else
-                    {
-                        sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
-                    }
-                    
-                    BigInteger noteRange;
-                    
-                    int root = 0;
-                    if (n == 0) {
-                        root = (9+12*oct) + 12;
-                        if (oct == 7) {
-                            // High C.
-                            noteRange.setRange(root-1,5,true);
-                        }else {
-                            noteRange.setRange(root-1,3,true);
-                        }
-                    } else if (n == 1) {
-                        root = (0+12*oct) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    } else if (n == 2) {
-                        root = (3+12*oct) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    } else if (n == 3) {
-                        root = (6+12*oct) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    } else {
+                        String soundName = file.getFileName();
                         
-                    }
-                    
-                    BigInteger velocityRange;
-                    
-                    int lowerVelocityThresh = 128 * (float(k) / numLayers);
-                    int upperVelocityThresh = 128 * (float(k+1) / numLayers);
-                    velocityRange.setRange(lowerVelocityThresh, (upperVelocityThresh - lowerVelocityThresh), true);
-                    
-                    if (memoryMappingEnabled)
-                    {
-                        double sourceSampleRate = memoryMappedReader->sampleRate;
-                        uint64 maxLength;
-                        if (sourceSampleRate <= 0 || memoryMappedReader->lengthInSamples <= 0) {
-                            maxLength = 0;
-                            
-                        } else {
-                            maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
-                            if (memoryMappedReader->mapEntireFile())
-                            {
+                        MemoryMappedAudioFormatReader* memoryMappedReader = nullptr;
+                        if (memoryMappingEnabled)
+                        {
+                            memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+                        }
+                        else
+                        {
+                            sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
+                        }
+                        
+                        int root = noteRoots[noteCount];
+                        int rootBelow = 0;
+                        int rootAbove = 127;
+                        
+                        if (noteCount > 0) rootBelow = noteRoots[noteCount-1];
+                        if (noteCount < noteRoots.size()-1) rootAbove = noteRoots[noteCount+1];
+                        
+                        int lowKey = 1 + (root + rootBelow) / 2;
+                        int highKey = 1 + (root + rootAbove) / 2;
+                        
+                        BigInteger noteRange;
+                        
+                        noteRange.setRange(lowKey, highKey-lowKey, true);
+                        
+                        BigInteger velocityRange;
+                        
+                        int lowerVelocityThresh = 128 * (float(k) / numLayers);
+                        int upperVelocityThresh = 128 * (float(k+1) / numLayers);
+                        velocityRange.setRange(lowerVelocityThresh, (upperVelocityThresh - lowerVelocityThresh), true);
+                        
+                        if (memoryMappingEnabled)
+                        {
+                            double sourceSampleRate = memoryMappedReader->sampleRate;
+                            uint64 maxLength;
+                            if (sourceSampleRate <= 0 || memoryMappedReader->lengthInSamples <= 0) {
+                                maxLength = 0;
+                                
+                            } else {
+                                maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                                if (memoryMappedReader->mapEntireFile())
+                                {
+                                    BKPianoSamplerSound* newSound =
+                                    new BKPianoSamplerSound(soundName, memoryMappedReader,
+                                                            maxLength, sourceSampleRate,
+                                                            noteRange, root,
+                                                            0, velocityRange,
+                                                            k+1, numLayers,
+                                                            dBFSBelow);
+                                    dBFSBelow = newSound->getDBFSLevel();
+                                    mainSynth->addSound(loadingSoundSetId, newSound);
+                                }
+                                else DBG("File mapping failed");
+                            }
+                        }
+                        else
+                        {
+                            double sourceSampleRate = sampleReader->sampleRate;
+                            const int numChannels = sampleReader->numChannels;
+                            uint64 maxLength;
+                            if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0) {
+                                maxLength = 0;
+                                
+                            } else {
+                                maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                                
+                                BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),(int)maxLength);
+                                sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
                                 BKPianoSamplerSound* newSound =
-                                new BKPianoSamplerSound(soundName, memoryMappedReader,
+                                new BKPianoSamplerSound(soundName, newBuffer,
                                                         maxLength, sourceSampleRate,
                                                         noteRange, root,
                                                         0, velocityRange,
@@ -983,41 +1021,18 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                 dBFSBelow = newSound->getDBFSLevel();
                                 mainSynth->addSound(loadingSoundSetId, newSound);
                             }
-                            else DBG("File mapping failed");
                         }
+                        
+                        processor.progress += progressInc;
+                        layerFoundForNote = true;
+                        //DBG(soundName+": " + String(processor.progress))
                     }
                     else
                     {
-                        double sourceSampleRate = sampleReader->sampleRate;
-                        const int numChannels = sampleReader->numChannels;
-                        uint64 maxLength;
-                        if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0) {
-                            maxLength = 0;
-                            
-                        } else {
-                            maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
-                            
-                            BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels),(int)maxLength);
-                            sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
-                            BKPianoSamplerSound* newSound =
-                            new BKPianoSamplerSound(soundName, newBuffer,
-                                                    maxLength, sourceSampleRate,
-                                                    noteRange, root,
-                                                    0, velocityRange,
-                                                    k+1, numLayers,
-                                                    dBFSBelow);
-                            dBFSBelow = newSound->getDBFSLevel();
-                            mainSynth->addSound(loadingSoundSetId, newSound);
-                        }
+                        //                    DBG("File not found: " + temp);
                     }
-                    
-                    processor.progress += progressInc;
-                    //DBG(soundName+": " + String(processor.progress))
                 }
-                else
-                {
-                    DBG("file not opened OK: " + temp);
-                }
+                if (layerFoundForNote) noteCount++;
             }
         }
     }
@@ -1028,18 +1043,18 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
     
     if (numResLayers > 0)
     {
-        for (int oct = 0; oct < 8; oct++) {
-            for (int n = 0; n < 4; n++) {
-                if ((oct == 0) && (n > 0)) continue;
-                
+        noteCount = 0;
+        for (int oct = 0; oct <= maxResOctave; oct++) {
+            for (int n = 0; n < 17; n++) {
                 float dBFSBelow = -100.f;
+                bool layerFoundForNote = false;
                 for (int k = 0; k < numResLayers; k++)
                 {
                     EXIT_CHECK;
                     
                     String temp;
                     temp += "harm";
-                    temp.append(notes[n],3);
+                    temp.append(completeNotes[n],3);
                     temp.append(String(oct),3);
                     temp.append("v",2);
                     temp.append(String(k+1),3);
@@ -1063,33 +1078,25 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                             sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
                         }
                         
-                        //keymap assignment
-                        BigInteger noteRange;
-                        int root = 0;
-                        if (n == 0)
-                        {
-                            root = (9+12*oct) + 12;
-                            noteRange.setRange(root-1,3,true);
-                        }
-                        else if (n == 1)
-                        {
-                            root = (0+12*oct) + 12;
-                            noteRange.setRange(root-1,3,true);
-                        }
-                        else if (n == 2)
-                        {
-                            root = (3+12*oct) + 12;
-                            noteRange.setRange(root-1,3,true);
-                        }
-                        else if (n == 3)
-                        {
-                            root = (6+12*oct) + 12;
-                            noteRange.setRange(root-1,3,true);
-                        }
+                        int root = noteRoots[noteCount];
+                        int rootBelow = 0;
+                        int rootAbove = 127;
                         
-                        //velocity switching
+                        if (noteCount > 0) rootBelow = noteRoots[noteCount-1];
+                        if (noteCount < noteRoots.size()-1) rootAbove = noteRoots[noteCount+1];
+                        
+                        int lowKey = 1 + (root + rootBelow) / 2;
+                        int highKey = 1 + (root + rootAbove) / 2;
+                        
+                        BigInteger noteRange;
+                        
+                        noteRange.setRange(lowKey, highKey-lowKey, true);
+                        
                         BigInteger velocityRange;
-                        velocityRange.setRange(aResonanceVelocityThresh[k], (aResonanceVelocityThresh[k+1] - aResonanceVelocityThresh[k]), true);
+                        
+                        int lowerVelocityThresh = 128 * (float(k) / numResLayers);
+                        int upperVelocityThresh = 128 * (float(k+1) / numResLayers);
+                        velocityRange.setRange(lowerVelocityThresh, (upperVelocityThresh - lowerVelocityThresh), true);
                         
                         //load the sample, add to synth
                         if (memoryMappingEnabled)
@@ -1108,7 +1115,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                             maxLength, sourceSampleRate,
                                                             noteRange, root,
                                                             0, velocityRange,
-                                                            k+1, 3,
+                                                            k+1, numResLayers,
                                                             dBFSBelow);
                                     dBFSBelow = newSound->getDBFSLevel();
                                     resSynth->addSound(loadingSoundSetId, newSound);
@@ -1137,7 +1144,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                         maxLength, sourceSampleRate,
                                                         noteRange, root,
                                                         0, velocityRange,
-                                                        k+1, 3,
+                                                        k+1, numResLayers,
                                                         dBFSBelow);
                                 dBFSBelow = newSound->getDBFSLevel();
                                 resSynth->addSound(loadingSoundSetId, newSound);
@@ -1145,13 +1152,15 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                         }
                         
                         processor.progress += progressInc;
+                        layerFoundForNote = true;
                         //DBG(soundName+": " + String(processor.progress));
                     }
                     else
                     {
-                        DBG("file not opened OK: " + temp);
+                        DBG("File not found: " + temp);
                     }
                 }
+                if (layerFoundForNote) noteCount++;
             }
         }
     }
@@ -1249,7 +1258,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
             }
             else
             {
-                DBG("file not opened OK: " + temp);
+                DBG("File not found: " + temp);
             }
         }
     }
@@ -1348,7 +1357,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                 }
                 else
                 {
-                    DBG("file not opened OK: " + temp);
+                    DBG("File not found: " + temp);
                 }
             }
         }
