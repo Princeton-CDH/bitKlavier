@@ -815,15 +815,12 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
             }
         }
         
-        
         //DBG("transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
         
         //DBG("end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
         
         //DBG("trigger: " +String(region->trigger));
         //DBG("pedal needed: " + String((int)region->pedal));
-        
-        
         
         int nbits = region->hikey - region->lokey;
         int vbits = region->hivel - region->lovel;
@@ -839,7 +836,11 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                 region->transpose,
                                 vrange, n, processor.regions.size(),
                                 dBFSBelow, region);
-        dBFSBelow = newSound->getDBFSLevel() > dBFSBelow ? newSound->getDBFSLevel() : 0.f;
+       
+        DBG("NEW LAYER NUM = " + String(n));
+        DBG("NEW NUM LAYERS = " + String(processor.regions.size()));
+        dBFSBelow = newSound->getDBFSLevel();
+        //dBFSBelow = newSound->getDBFSLevel() > dBFSBelow ? newSound->getDBFSLevel() : 0.f;
         synth->addSound(loadingSoundSetId, newSound);
         n++;
     }

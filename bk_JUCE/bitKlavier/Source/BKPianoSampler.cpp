@@ -464,7 +464,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
         // DBG("noteVelocity = " + String(noteVelocity * 127.));
         
         // *** START new layer-based approach to velocity handling ** //
-        if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote)
+        if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote && !sound->isSoundfont)
+            // this isn't working right for SoundFonts (layerNum and numLayers not being set correctly on load)
         {
 
             // dB range of layer
@@ -487,14 +488,15 @@ void BKPianoSamplerVoice::startNote (const int midi,
             // convert to a gain multipler
             noteVelocity = Decibels::decibelsToGain(dBadjust);
             
-            /*
+            
             DBG("layerNumber = " + String(sound->getLayerNumber()));
-            DBG("min velocity = " + String(minVelocity));
-            DBG("max velocity = " + String(maxVelocity));
+            DBG("numLayers = " + String(sound->getNumLayers()));
+            //DBG("min velocity = " + String(minVelocity));
+            //DBG("max velocity = " + String(maxVelocity));
             DBG("dynRange = " + String(dynRange));
             DBG("dB adjust = " + String(dBadjust));
             DBG("new gain multiplier = " + String(noteVelocity));
-            */
+            
         }
         // *** END new layer-based approach to velocity handling ** //
         
