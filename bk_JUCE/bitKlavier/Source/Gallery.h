@@ -122,6 +122,10 @@ public:
 		add = true;
 		for (auto p : blendronic) { if (p->getId() == -1) { add = false; break; } }
 		if (add) addBlendronicWithId(-1);
+
+        add = true;
+        for (auto p : resonance) { if (p->getId() == -1) { add = false; break; } }
+        if (add) addResonanceWithId(-1);
     }
     
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
@@ -383,6 +387,18 @@ public:
 
 		return names;
 	}
+
+    inline const StringArray getAllResonanceNames(void) const noexcept
+    {
+        StringArray names;
+
+        for (auto prep : resonance)
+        {
+            names.add(prep->getName());
+        }
+
+        return names;
+    }
     
     inline const StringArray getAllDirectModNames(void) const noexcept
     {
@@ -576,6 +592,15 @@ public:
 		}
 		return nullptr;
 	}
+
+    inline const Resonance::Ptr getResonance(int Id) const noexcept
+    {
+        for (auto p : resonance)
+        {
+            if (p->getId() == Id) return p;
+        }
+        return nullptr;
+    }
     
     inline const SynchronicModification::Ptr getSynchronicModification(int Id) const noexcept
     {
@@ -746,6 +771,7 @@ public:
     void addDirectWithId(int Id);
     void addKeymapWithId(int Id);
 	void addBlendronicWithId(int Id);
+    void addResonanceWithId(int Id);
     
     inline void setURL(String newURL) { url = newURL; }
     
@@ -779,6 +805,7 @@ private:
     Tuning::PtrArr                      tuning;
     Tempo::PtrArr                       tempo;
 	Blendronic::PtrArr				    blendronic;
+    Resonance::PtrArr                   resonance;
     
     SynchronicModification::PtrArr      modSynchronic;
     DirectModification::PtrArr          modDirect;
@@ -813,6 +840,10 @@ private:
 	void addBlendronic(void);
 	void addBlendronic(Blendronic::Ptr);
 	void addBlendronic(BlendronicPreparation::Ptr);
+
+    void addResonance(void);
+    void addResonance(Resonance::Ptr);
+    void addResonance(ResonancePreparation::Ptr);
 
     void addDirect(void);
     void addDirect(Direct::Ptr);
@@ -855,6 +886,7 @@ private:
     void removeTuning(int Id);
     void removeTempo(int Id);
 	void removeBlendronic(int Id);
+    void removeResonance(int Id);
     void removeKeymap(int Id);
     void removeDirectModification(int Id);
     void removeNostalgicModification(int Id);

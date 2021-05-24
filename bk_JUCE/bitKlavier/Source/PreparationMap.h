@@ -22,6 +22,7 @@
 #include "Tempo.h"
 #include "Tuning.h"
 #include "Blendronic.h"
+#include "Resonance.h"
 
 class PreparationMap : public ReferenceCountedObject
 {
@@ -102,6 +103,13 @@ public:
 			prep.append(String(p->getId()), 3);
 			prep.append(" ", 1);
 		}
+
+        for (auto p : rprocessor)
+        {
+            prep.append("R", 1);
+            prep.append(String(p->getId()), 3);
+            prep.append(" ", 1);
+        }
         
         if (prep == "")
             return " ";
@@ -153,6 +161,12 @@ public:
 	BlendronicProcessor::PtrArr      getBlendronicProcessors(void);
 	BlendronicProcessor::Ptr         getBlendronicProcessor(int Id);
 	bool                        contains(BlendronicProcessor::Ptr);
+
+    void                        addResonanceProcessor(ResonanceProcessor::Ptr);
+    void                        setResonanceProcessors(ResonanceProcessor::PtrArr);
+    ResonanceProcessor::PtrArr      getResonanceProcessors(void);
+    ResonanceProcessor::Ptr         getResonanceProcessor(int Id);
+    bool                        contains(ResonanceProcessor::Ptr);
     
 
     void deactivateIfNecessary();
@@ -189,6 +203,10 @@ public:
 		ps.clear();
 		for (auto p : bprocessor) ps.add(p->getId());
 		DBG("Blendronic: " + intArrayToString(ps));
+
+        ps.clear();
+        for (auto p : rprocessor) ps.add(p->getId());
+        DBG("Resonance: " + intArrayToString(ps));
     }
     
 private:
@@ -202,6 +220,7 @@ private:
     BlendronicProcessor::PtrArr          bprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
+    ResonanceProcessor::PtrArr           rprocessor;
     
     // Pointers to synths (flown in from BKAudioProcessor)
     BKSynthesiser*              synth;

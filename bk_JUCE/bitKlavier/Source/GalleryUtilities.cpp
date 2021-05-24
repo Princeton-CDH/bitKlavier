@@ -152,6 +152,14 @@ void Gallery::removeBlendronic(int Id)
 	}
 }
 
+void Gallery::removeResonance(int Id)
+{
+    for (int i = resonance.size(); --i >= 0;)
+    {
+        if (resonance[i]->getId() == Id) resonance.remove(i);
+    }
+}
+
 void Gallery::removeKeymap(int Id)
 {
     for (int i = bkKeymaps.size(); --i >= 0; )
@@ -215,6 +223,10 @@ void Gallery::remove(BKPreparationType type, int Id)
 	{
 		removeBlendronicModification(Id);
 	}
+    else if (type == PreparationTypeResonance)
+    {
+        removeResonance(Id);
+    }
     else if (type == PreparationTypePiano)
     {
         removePiano(Id);
@@ -283,6 +295,10 @@ String Gallery::iterateName(BKPreparationType type, String name)
 	{
 		for (auto p : modBlendronic)   if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
 	}
+    else if (type == PreparationTypeResonance)
+    {
+        for (auto p : resonance) if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
+    }
     else if (type == PreparationTypePiano)
     {
         for (auto p : bkPianos)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
@@ -366,6 +382,11 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
 		name = getBlendronicModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
 		for (auto p : modBlendronic)   if (p->getName() == name || p->getName().startsWith(name + " ")) num++;
 	}
+    else if (type == PreparationTypeResonance)
+    {
+        name = getResonance(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+        for (auto p : resonance)   if (p->getName() == name || p->getName().startsWith(name + " ")) num++;
+    }
     else if (type == PreparationTypePiano)
     {
          name = getPiano(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
@@ -438,6 +459,16 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         else p->setName(iterateName(PreparationTypeBlendronic, p->getName()));
         return p->getId();
 	}
+    else if (type == PreparationTypeResonance)
+    {
+        Resonance::Ptr p = new Resonance(-1);
+        p->setState(xml);
+        addResonance(p);
+        if (p->getName() == "Resonance " + String(oldId))
+            p->setName("Resonance " + String(p->getId()));
+        else p->setName(iterateName(PreparationTypeResonance, p->getName()));
+        return p->getId();
+    }
     else if (type == PreparationTypeKeymap)
     {
         Keymap::Ptr p = new Keymap(processor, -1);
@@ -579,6 +610,15 @@ int Gallery::duplicate(BKPreparationType type, int Id)
 		String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " (" + String(numWithSameNameAs(PreparationTypeBlendronic, newId)) + ")";
 		newOne->setName(newName);
 	}
+    else if (type == PreparationTypeResonance)
+    {
+        Resonance::Ptr toCopy = getResonance(Id);
+        Resonance::Ptr newOne = toCopy->duplicate();
+        addResonance(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " (" + String(numWithSameNameAs(PreparationTypeResonance, newId)) + ")";
+        newOne->setName(newName);
+    }
     else if (type == PreparationTypeKeymap)
     {
         Keymap::Ptr toCopy = getKeymap(Id);
@@ -691,8 +731,13 @@ int Gallery::add(BKPreparationType type)
 	else if (type == PreparationTypeBlendronic)
 	{
 		addBlendronic();
-		newId = tempo.getLast()->getId();
+		newId = blendronic.getLast()->getId();
 	}
+    else if (type == PreparationTypeResonance)
+    {
+        addResonance();
+        newId = resonance.getLast()->getId();
+    }
     else if (type == PreparationTypeKeymap)
     {
         addKeymap();
@@ -749,6 +794,7 @@ int Gallery::getNum(BKPreparationType type)
     (type == PreparationTypeTuning) ? tuning.size() :
     (type == PreparationTypeTempo) ? tempo.size() :
 	(type == PreparationTypeBlendronic) ? blendronic.size() :
+    (type == PreparationTypeResonance) ? resonance.size() :
     (type == PreparationTypeDirectMod) ? modDirect.size() :
     (type == PreparationTypeNostalgicMod) ? modNostalgic.size() :
     (type == PreparationTypeSynchronicMod) ? modSynchronic.size() :
@@ -930,6 +976,10 @@ void Gallery::copy(BKPreparationType type, int from, int to)
 	{
 		blendronic.getUnchecked(to)->copy(blendronic.getUnchecked(from));
 	}
+    else if (type == PreparationTypeResonance)
+    {
+        resonance.getUnchecked(to)->copy(resonance.getUnchecked(from));
+    }
     else if (type == PreparationTypeKeymap)
     {
         bkKeymaps.getUnchecked(to)->copy(bkKeymaps.getUnchecked(from));
@@ -986,6 +1036,10 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
 	{
 		addBlendronicWithId(Id);
 	}
+    else if (type == PreparationTypeResonance)
+    {
+        addResonanceWithId(Id);
+    }
     else if (type == PreparationTypeKeymap)
     {
         addKeymapWithId(Id);
@@ -1099,9 +1153,33 @@ void Gallery::addBlendronic(BlendronicPreparation::Ptr blend)
 
 void Gallery::addBlendronic(Blendronic::Ptr p)
 {
-	int newId = getNewId(PreparationTypeBlendronic);
-	p->setId(newId);
-	blendronic.add(p);
+    int newId = getNewId(PreparationTypeBlendronic);
+    p->setId(newId);
+    blendronic.add(p);
+}
+
+void Gallery::addResonanceWithId(int Id)
+{
+    resonance.add(new Resonance(Id));
+}
+
+void Gallery::addResonance(void)
+{
+    int newId = getNewId(PreparationTypeResonance);
+    resonance.add(new Resonance(newId));
+}
+
+void Gallery::addResonance(Resonance::Ptr p)
+{
+    int newId = getNewId(PreparationTypeResonance);
+    p->setId(newId);
+    resonance.add(p);
+}
+
+void Gallery::addResonance(ResonancePreparation::Ptr res)
+{
+    int newId = getNewId(PreparationTypeResonance);
+    resonance.add(new Resonance(res, newId));
 }
 
 void Gallery::addTempo(void)
@@ -1223,6 +1301,8 @@ void Gallery::clean(void)
         if (!thisUsed.contains(modDirect[i]->getId())) modDirect.remove(i);
     }
     
+    //put stuff for resonance eventually
+
     thisUsed = used.getUnchecked(PreparationTypeSynchronicMod);
     for (int i = modSynchronic.size(); --i >= 0;)
     {

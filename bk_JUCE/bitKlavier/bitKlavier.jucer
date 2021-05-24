@@ -346,6 +346,8 @@
                 file="Source/PreparationMap.h"/>
         </GROUP>
         <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparation">
+          <FILE id="wmmE7F" name="Resonance.cpp" compile="1" resource="0" file="Source/Resonance.cpp"/>
+          <FILE id="BSwyXC" name="Resonance.h" compile="0" resource="0" file="Source/Resonance.h"/>
           <FILE id="VFgtPR" name="Modification.cpp" compile="1" resource="0"
                 file="Source/Modification.cpp"/>
           <FILE id="xHx6az" name="Modification.h" compile="0" resource="0" file="Source/Modification.h"/>

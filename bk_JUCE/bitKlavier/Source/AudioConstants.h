@@ -198,6 +198,10 @@ const String ptagTuning_springWeights = "sweights";
 const String ptagTuning_intervalScale = "iscale";
 const String ptagTuning_intervalScaleFundamental = "iscalefundamental";
 
+const String vtagResonance = "resonance";
+const String ptagResonance_id = "Id";
+
+
 const String vtagBlendronic = "blendronic";
 const String vtagModBlendronic = "modBlendronic";
 const String ptagBlendronic_id = "Id";
@@ -323,7 +327,8 @@ typedef enum BKPreparationType {
     PreparationTypeComment,
     PreparationTypeBlendronic,
     PreparationTypeBlendronicMod,
-    BKPreparationTypeNil
+    PreparationTypeResonance,
+    BKPreparationTypeNil,
 } BKPreparationType;
 
 inline BKPreparationType modToPrepType(BKPreparationType modType)
@@ -357,7 +362,8 @@ static const std::vector<std::string> cPreparationTypes = {
     "Piano",
     "Comment",
     "Blendronic",
-    "BlendronicMod"
+    "BlendronicMod",
+    "Resonance"
 };
 
 static const std::vector<std::string> cPreparationNames = {
@@ -378,7 +384,8 @@ static const std::vector<std::string> cPreparationNames = {
     "Piano",
     "Comment",
     "Blendronic",
-    "Blendronic Mod"
+    "Blendronic Mod",
+    "Resonance"
 };
 
 typedef enum BKPreparationDisplay {
@@ -1139,6 +1146,7 @@ typedef enum KeymapTargetType
     TargetTypeBlendronicOpenCloseInput,
     TargetTypeBlendronicOpenCloseOutput,
     
+    TargetTypeResonance,
     TargetTypeTempo,
     TargetTypeTuning,
     TargetTypeNil

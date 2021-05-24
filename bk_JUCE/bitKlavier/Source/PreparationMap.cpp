@@ -116,6 +116,16 @@ void PreparationMap::linkKeymapToPreparation(int keymapId, BKPreparationType thi
             }
         }
     }
+    else if (thisType == PreparationTypeResonance)
+    {
+        for (int i = 0; i < rprocessor.size(); ++i)
+        {
+            if (rprocessor[i]->getId() == thisId)
+            {
+                rprocessor[i]->addKeymap(getKeymap(keymapId));
+            }
+        }
+    }
 }
 
 
@@ -371,6 +381,45 @@ bool PreparationMap::contains(BlendronicProcessor::Ptr thisOne)
 	}
 	return false;
 	}
+
+void PreparationMap::addResonanceProcessor(ResonanceProcessor::Ptr p)
+{
+    rprocessor.addIfNotAlreadyThere(p);
+    deactivateIfNecessary();
+}
+
+void PreparationMap::setResonanceProcessors(ResonanceProcessor::PtrArr p)
+{
+    rprocessor = p;
+    deactivateIfNecessary();
+}
+
+ResonanceProcessor::PtrArr PreparationMap::getResonanceProcessors(void)
+{
+    return rprocessor;
+}
+
+ResonanceProcessor::Ptr PreparationMap::getResonanceProcessor(int Id)
+{
+    for (auto p : rprocessor)
+    {
+        if (p->getId() == Id) return p;
+    }
+
+    return nullptr;
+}
+
+bool PreparationMap::contains(ResonanceProcessor::Ptr thisOne)
+{
+    for (auto p : rprocessor)
+    {
+        if (p->getId() == thisOne->getId())
+        {
+            return true;
+        }
+    }
+    return false;
+}
 
 void PreparationMap::deactivateIfNecessary()
 {
@@ -636,6 +685,32 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
                 proc->keyReleased(noteNumber, velocity, channel, releaseTargetStates);
             releaseTargetStates.fill(TargetStateNil); }
     }
+
+    for (auto proc : rprocessor)
+    {
+        bool ignoreSustain = !sustainPedalIsDepressed;
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            {
+                targetStates = &pressTargetStates;
+                if (km->isInverted()) targetStates = &releaseTargetStates;
+
+                if (km->getTargetStates()[TargetTypeResonance] == TargetStateEnabled)
+                    targetStates->set(TargetTypeResonance, TargetStateEnabled);
+                if (km->getIgnoreSustain()) ignoreSustain = true;
+            }
+        }
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
+            pressTargetStates.fill(TargetStateNil);
+        }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            if (ignoreSustain && !noteDown)
+                proc->keyReleased(noteNumber, velocity, channel, pressTargetStates);
+            releaseTargetStates.fill(TargetStateNil);
+        }
+    }
     
         // PERFORM MODIFICATION STUFF
 }
@@ -828,6 +903,31 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
             if (ignoreSustain && !noteDown)
                 proc->keyReleased(noteNumber, channel);
             releaseTargetStates.fill(TargetStateNil); }
+    }
+    for (auto proc : rprocessor)
+    {
+        bool ignoreSustain = !sustainPedalIsDepressed;
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            {
+                targetStates = &releaseTargetStates;
+                if (km->isInverted()) targetStates = &pressTargetStates;
+
+                if (km->getTargetStates()[TargetTypeResonance] == TargetStateEnabled)
+                    targetStates->set(TargetTypeResonance, TargetStateEnabled);
+                if (km->getIgnoreSustain()) ignoreSustain = true;
+            }
+        }
+        if (pressTargetStates.contains(TargetStateEnabled)) {
+            proc->keyPressed(noteNumber, velocity, channel, pressTargetStates);
+            pressTargetStates.fill(TargetStateNil);
+        }
+        if (releaseTargetStates.contains(TargetStateEnabled)) {
+            if (ignoreSustain && !noteDown)
+                proc->keyReleased(noteNumber, velocity, channel, pressTargetStates);
+            releaseTargetStates.fill(TargetStateNil);
+        }
     }
 }
 

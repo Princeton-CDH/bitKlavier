@@ -67,6 +67,7 @@ public:
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
 	BlendronicProcessor::PtrArr		     bprocessor;
+    ResonanceProcessor::PtrArr           rprocessor;
     
     void addProcessor(BKPreparationType thisType, int thisId);
     bool containsProcessor(BKPreparationType thisType, int thisId);
@@ -77,6 +78,7 @@ public:
     TuningProcessor::Ptr        getTuningProcessor(int Id, bool add = true);
     TempoProcessor::Ptr         getTempoProcessor(int Id, bool add = true);
 	BlendronicProcessor::Ptr	getBlendronicProcessor(int Id, bool add = true);
+    ResonanceProcessor::Ptr     getResonanceProcessor(int Id, bool add = true);
     
     inline DirectProcessor::PtrArr        getDirectProcessors(void) const noexcept { return dprocessor; }
     inline NostalgicProcessor::PtrArr     getNostalgicProcessors(void) const noexcept { return nprocessor; }
@@ -84,6 +86,7 @@ public:
     inline TuningProcessor::PtrArr        getTuningProcessors(void) const noexcept { return tprocessor; }
     inline TempoProcessor::PtrArr         getTempoProcessors(void) const noexcept { return mprocessor; }
 	inline BlendronicProcessor::PtrArr  getBlendronicProcessors(void) const noexcept { return bprocessor; }
+    inline ResonanceProcessor::PtrArr   getResonanceProcessors(void) const noexcept { return rprocessor; }
     inline PreparationMap::Ptr       getPreparationMap(void) const noexcept { return prepMap; }
     
     NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
@@ -92,6 +95,7 @@ public:
     TuningProcessor::Ptr        addTuningProcessor(int thisId);
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
 	BlendronicProcessor::Ptr    addBlendronicProcessor(int thisId);
+    ResonanceProcessor::Ptr     addResonanceProcessor(int thisId);
     
     void clearOldNotes(Piano::Ptr prevPiano)
     {
@@ -227,6 +231,8 @@ public:
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
 
 	void linkPreparationWithBlendronic(BKPreparationType thisType, int thisId, Blendronic::Ptr thisBlend);
+
+    void linkPreparationwithResonance(BKPreparationType thisType, int thisId, Resonance::Ptr thisRes);
     
     ValueTree getState(void);
     
@@ -298,6 +304,7 @@ private:
 	BlendronicProcessor::Ptr defaultB;
     BlendronicProcessor::PtrArr defaultBA;
 	BlendronicDelay::Ptr defaultD;
+    ResonanceProcessor::Ptr defaultR;
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
     {
@@ -364,6 +371,16 @@ private:
 
 		return which;
 	}
+
+    inline Array<int> getAllIds(Resonance::PtrArr resonance)
+    {
+        Array<int> which;
+        for (auto p : resonance)
+        {
+            which.add(p->getId());
+        }
+        return which;
+    }
     
     void configureDirectModification(DirectModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     

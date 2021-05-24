@@ -379,7 +379,7 @@ private:
     
     BKAudioProcessor& processor;
     
-    BKPreparationDisplay currentDisplay;
+    BKPreparationDisplay currentDisplay = DisplayNil;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BKOvertop);
     
