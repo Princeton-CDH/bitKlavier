@@ -58,6 +58,9 @@ public:
 
 		s += "\nblendronic";
 		for (auto item : blendronic) s += (" " + String(item->getId()));
+
+        s += "\nresonance";
+        for (auto item : resonance) s += (" " + String(item->getId()));
         
         s += "\nkeymap";
         for (auto item : bkKeymaps) s += (" " + String(item->getId()));
@@ -154,6 +157,7 @@ public:
     inline const int getNumTempo(void) const noexcept {return tempo.size();}
     inline const int getNumTuning(void) const noexcept {return tuning.size();}
 	inline const int getNumBlendronic(void) const noexcept { return blendronic.size(); }
+    inline const int getNumResonance(void) const noexcept { return resonance.size(); }
     inline const int getNumSynchronicMod(void) const noexcept {return modSynchronic.size();}
     inline const int getNumNostalgicMod(void) const noexcept {return modNostalgic.size();}
     inline const int getNumDirectMod(void) const noexcept {return modDirect.size();}
@@ -223,6 +227,11 @@ public:
     inline const Blendronic::PtrArr getAllBlendronic(void) const noexcept
     {
         return blendronic;
+    }
+
+    inline const Resonance::PtrArr getAllResonance(void) const noexcept
+    {
+        return resonance;
     }
     
     inline const Tempo::PtrArr getAllTempo(void) const noexcept
@@ -303,6 +312,15 @@ public:
 		}
 		return nullptr;
 	}
+
+    inline Resonance::Ptr matches(ResonancePreparation::Ptr prep)
+    {
+        for (auto p : resonance)
+        {
+            if (p->prep->compare(prep)) return p;
+        }
+        return nullptr;
+    }
     
     inline const StringArray getAllKeymapNames(void) const noexcept
     {
@@ -532,6 +550,15 @@ public:
 		}
 		return nullptr;
 	}
+
+    inline const ResonancePreparation::Ptr getResonancePreparation(int Id) const noexcept
+    {
+        for (auto p : resonance)
+        {
+            if (p->getId() == Id)   return p->prep;
+        }
+        return nullptr;
+    }
     
     inline const Synchronic::Ptr getSynchronic(int Id) const noexcept
     {

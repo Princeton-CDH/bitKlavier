@@ -24,6 +24,7 @@
 #include "BlendronicViewController.h"
 #include "TuningViewController.h"
 #include "TempoViewController.h"
+#include "ResonanceViewController.h"
 
 #include "KeymapViewController.h"
 #include "GeneralViewController.h"
@@ -45,6 +46,7 @@ public:
     nvc(p, theGraph),
     dvc(p, theGraph),
     bvc(p, theGraph),
+    rvc(p, theGraph),
     tvcm(p, theGraph),
     ovcm(p, theGraph),
     svcm(p, theGraph),
@@ -66,6 +68,7 @@ public:
         addChildComponent(nvc);
         addChildComponent(dvc);
         addChildComponent(bvc);
+        addChildComponent(rvc);
         
         addChildComponent(tvcm);
         addChildComponent(ovcm);
@@ -108,6 +111,8 @@ public:
         dvc.setBounds(area);
         
         bvc.setBounds(area);
+
+        rvc.setBounds(area);
         
         tvcm.setBounds(area);
         
@@ -183,6 +188,10 @@ public:
         {
             bvc.arrowPressed(arrow);
         }
+        else if (display == DisplayResonance)
+        {
+            rvc.arrowPressed(arrow);
+        }
         else if (display == DisplayTuningMod)
         {
             tvcm.arrowPressed(arrow);
@@ -238,6 +247,7 @@ public:
         removeChildComponent(&svc);
         removeChildComponent(&nvc);
         removeChildComponent(&bvc);
+        removeChildComponent(&rvc);
         
         removeChildComponent(&tvcm);
         removeChildComponent(&dvcm);
@@ -303,6 +313,12 @@ public:
             dvc.fillSelectCB(-1,-1);
             dvc.update();
         }
+        else if (type == DisplayResonance)
+        {
+            addAndMakeVisible(&rvc);
+            rvc.fillSelectCB(-1, -1);
+            rvc.update();
+        }
         else if (type == DisplayBlendronic)
         {
             addAndMakeVisible(&bvc);
@@ -367,6 +383,7 @@ public:
     NostalgicPreparationEditor nvc;
     DirectPreparationEditor dvc;
     BlendronicPreparationEditor bvc;
+    ResonancePreparationEditor rvc;
     
     TuningModificationEditor tvcm;
     TempoModificationEditor ovcm;

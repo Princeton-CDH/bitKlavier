@@ -38,6 +38,7 @@ public:
     int  currentBlendronicId = 1;
     int  currentTempoId = 1;
     int  currentTuningId = 1;
+    int  currentResonanceId = 1;
     
     int  currentModDirectId = 1;
     int  currentModSynchronicId = 1;
@@ -58,6 +59,7 @@ public:
     bool synchronicPreparationDidChange = false;
     bool tuningPreparationDidChange = false;
     bool tempoPreparationDidChange = false;
+    bool resonancePreparationDidChange = false;
     bool generalSettingsDidChange = false;
     bool keymapDidChange = false;
     bool modificationDidChange = false;
@@ -107,6 +109,12 @@ public:
             currentBlendronicId = (Id == -1) ? currentBlendronicId : Id;
             blendronicPreparationDidChange = true;
             setCurrentDisplay(DisplayBlendronic);
+        }
+        else if (type == PreparationTypeResonance)
+        {
+            currentResonanceId = (Id == -1) ? currentResonanceId : Id;
+            resonancePreparationDidChange = true;
+            setCurrentDisplay(DisplayResonance);
         }
         else if (type == PreparationTypeTuning)
         {

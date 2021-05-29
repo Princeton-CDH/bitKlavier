@@ -140,7 +140,17 @@ public:
     //accessors
     inline const String getName() const noexcept { return name; }
     inline const Array<int> getDistances() const noexcept { return rOvertoneDistances.value; }
+    inline const Array<float> getDistancesFloat() const noexcept
+    {
+        Array<float> distanceFloats;
+        for (int i : rOvertoneDistances.value)
+        {
+            distanceFloats.add(i);
+        }
+        return distanceFloats;
+    }
     inline const Array<float> getGains() const noexcept { return rOvertoneGains.value; }
+    inline const float getDefGain() const noexcept { return rDefaultGain.value; }
     inline const float getBlendGain() const noexcept { return rBlendronicGain.value; }
     inline const int getStartTime() const noexcept { return rStartTimeMS.value; }
     inline const int getLength() const noexcept { return rLengthMS.value; }
@@ -157,12 +167,26 @@ public:
     }
     inline int getSoundSet() { return rUseGlobalSoundSet.value ? -1 : rSoundSet.value; }
 
+    //inline float* getOvertoneGainPtr(int overtoneIndex) { return &(rOvertoneGains.value[overtoneIndex]); }
+    inline float* getDefaultGainPtr() { return &rDefaultGain.value; }
+    inline float* getBlendGainPtr() { return &rBlendronicGain.value; }
+
     //mutators
     inline void setName(String n) { name = n; }
     inline void setStartTime(int startToSet) { rStartTimeMS = startToSet; }
     inline void setLength(int lengthToSet) { rLengthMS = lengthToSet; }
     inline void setDistances(Array<int> distancesToSet) { rOvertoneDistances.set(distancesToSet); }
+    inline void setDistances(Array<float> distancesToSet)
+    {
+        rOvertoneDistances.value.clear();
+
+        for (float i : distancesToSet)
+        {
+            rOvertoneDistances.value.add(int(i));
+        }
+    }
     inline void setGains(Array<float> gainsToSet) { rOvertoneGains.set(gainsToSet); }
+    inline void setDefGain(float gainToSet) { rDefaultGain = gainToSet; }
     inline void setBlendGain(float gainToSet) { rBlendronicGain = gainToSet; }
     inline void setExciteThresh(float threshToSet) { rExciteThreshold = threshToSet; }
     inline void setAttackThresh(float threshToSet) { rAttackThreshold = threshToSet; }
@@ -173,12 +197,14 @@ public:
         rSustain = vals[2];
         rRelease = vals[3];
     }
+    inline void setADSRvals(int attack, int decay, float sustain, int release)
+    {
+        rAttack = attack;
+        rDecay = decay;
+        rSustain = sustain;
+        rRelease = release;
+    }
     inline void setSoundSet(int Id) { rSoundSet = Id; }
-
-
-    //inline float* getOvertoneGainPtr(int overtoneIndex) { return &(rOvertoneGains.value[overtoneIndex]); }
-    inline float* getDefaultGainPtr() { return &rDefaultGain.value; }
-    inline float* getBlendGainPtr() { return &rBlendronicGain.value; }
 
     // TODO
     void print(void)

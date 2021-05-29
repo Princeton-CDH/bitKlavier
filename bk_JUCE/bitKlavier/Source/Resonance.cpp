@@ -74,7 +74,7 @@ void ResonanceProcessor::keyPressed(int noteNumber, float velocity, int midiChan
                             velocity, // maybe need to set a different velocity than the played note's velocity for resonant notes
                             aGlobalGain,
                             Forward,
-                            FixedLengthFixedStart,
+                            NormalFixedStart,
                             ResonanceNote,
                             resonance->prep->getSoundSet(), //set
                             resonance->getId(),
@@ -98,7 +98,7 @@ void ResonanceProcessor::keyPressed(int noteNumber, float velocity, int midiChan
                             velocity, // maybe need to set a different velocity than the played note's velocity for resonant notes
                             aGlobalGain,
                             Forward,
-                            FixedLengthFixedStart,
+                            NormalFixedStart,
                             ResonanceNote,
                             resonance->prep->getSoundSet(), //set
                             resonance->getId(),
@@ -139,6 +139,8 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
     keysDepressed.removeAllInstancesOf(noteNumber);
     DBG("KeysDepressed after key removed: " + intArrayToString(keysDepressed));
 
+    /*
+    //currently leaving this out, with this commented out keys will only release when the resonating key is released/exceeds its target
     for (int i : resonance->prep->getDistances())
     {
         if (keysExcitedDupes.contains(noteNumber + i))
@@ -165,6 +167,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
             }
         }
     }
+    */
     if (keysExcitedDupes.contains(noteNumber))
     {
         keysExcitedDupes.removeAllInstancesOf(noteNumber);

@@ -405,6 +405,7 @@ typedef enum BKPreparationDisplay {
     DisplayComment,
     DisplayBlendronic,
     DisplayBlendronicMod,
+    DisplayResonance,
     DisplayModdable,
     DisplayNil,
 } BKPreparationDisplay;
@@ -427,7 +428,8 @@ static const std::vector<std::string> cDisplayNames = {
     "About",
     "Comment",
 	"Blendronic",
-    "Blendronic Mod"
+    "Blendronic Mod",
+    "Resonance"
 };
 
 
@@ -1415,5 +1417,11 @@ static const String cTempoTempo = "Tempo_tempo";
 static const String cTempoSubdivisions = "Tempo_subdivisions";
 static const String cTempoAT1History = "Tempo_at1History";
 static const String cTempoAT1Subdivisions = "Tempo_at1Subdivisions";
+
+static const String cResonanceDefGain = "Resonance_defaultGain";
+static const String cResonanceStartTime = "Resonance_startTime";
+static const String cResonanceLength = "Resonance_length";
+static const String cResonanceExciteThresh = "Resonance_exciteThresh";
+static const String cResonanceAttackThresh = "Resonance_attackThresh";
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED

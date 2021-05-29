@@ -52,6 +52,14 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     {
         setImage(ImageCache::getFromMemory(BinaryData::blendronic_icon_png, BinaryData::blendronic_icon_pngSize));
     }
+    //need to figure out how to get icon into binary data, currently using a placeholder icon
+    else if (type == PreparationTypeResonance)
+    {
+        DBG("call to set image from cache, still don't have yet");
+        //setImage(ImageCache::getFromMemory(BinaryData::icon_iOS_72_png, BinaryData::icon_iOS_72_pngSize));
+        setImage(ImageCache::getFromMemory(BinaryData::resonance_icon_png, BinaryData::resonance_icon_pngSize));
+    }
+    
     else if (type == PreparationTypeKeymap)
     {
         setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
@@ -875,12 +883,12 @@ Array<Line<int>> BKItemGraph::getLines(void)
         }
         else if (type == PreparationTypeTuning)
         {
-            // Look for synchronic, direct, and nostalgic targets
+            // Look for synchronic, direct, nostalgic, and resonance targets
             for (auto target : item->getConnections())
             {
                 BKPreparationType targetType = target->getType();
                 
-                if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic)
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) || targetType == PreparationTypeResonance)
                 {
                     Rectangle<int> otherBounds = target->getBounds();
                     
@@ -941,6 +949,25 @@ Array<Line<int>> BKItemGraph::getLines(void)
                                         item->getY() + item->getHeight()/2.0f,
                                         otherBounds.getX() + otherBounds.getWidth()/2.0f,
                                         otherBounds.getY() + otherBounds.getHeight()/2.0f));
+                }
+            }
+        }
+        else if (type == PreparationTypeResonance)
+        {
+            for (auto target : item->getConnections())
+            {
+
+                BKPreparationType targetType = target->getType();
+
+                if (targetType != PreparationTypeKeymap)
+                {
+                    //might not need anything here if resonance only connects to keymap and tuning?
+                    Rectangle<int> otherBounds = target->getBounds();
+
+                    lines.add(Line<int>(item->getX() + item->getWidth() / 2.0f,
+                        item->getY() + item->getHeight() / 2.0f,
+                        otherBounds.getX() + otherBounds.getWidth() / 2.0f,
+                        otherBounds.getY() + otherBounds.getHeight() / 2.0f));
                 }
             }
         }
@@ -1101,12 +1128,19 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             type2 == PreparationTypeReset)
             return true;
     }
+    else if (type1 == PreparationTypeResonance)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeTuning)
+            return true;
+    }
     else if (type1 == PreparationTypeTuning)
     {
         if (type2 == PreparationTypeKeymap ||
             type2 == PreparationTypeSynchronic ||
             type2 == PreparationTypeDirect ||
             type2 == PreparationTypeNostalgic ||
+            type2 == PreparationTypeResonance ||
             type2 == PreparationTypeTuningMod ||
             type2 == PreparationTypeGenericMod ||
             type2 == PreparationTypeReset)

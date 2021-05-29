@@ -94,6 +94,10 @@
 #define DISCONNECT_FROM_ID 57
 #define DISCONNECT_BETWEEN_ID 58
 
+#define RESONANCE_ID 59
+#define RESONANCE_EDIT_ID 60
+#define RESONANCEMOD_EDIT_ID 61
+
 #define SOUNDFONT_ID 1000
 
 #define MIDIOUT_ID 2000
@@ -117,6 +121,7 @@ inline PopupMenu getNewItemMenu(LookAndFeel* laf)
     newMenu.addItem(NOSTALGIC_ID, "Nostalgic" + gNostalgicShortcut);
     newMenu.addItem(SYNCHRONIC_ID, "Synchronic" + gSynchronicShortcut);
     newMenu.addItem(BLENDRONIC_ID, "Blendronic" + gBlendronicShortcut);
+    newMenu.addItem(RESONANCE_ID, "Resonance" + gResonanceShortcut);
     newMenu.addItem(TUNING_ID, "Tuning" + gTuningShortcut);
     newMenu.addItem(TEMPO_ID, "Tempo" + gTempoShortcut);
     newMenu.addSeparator();
@@ -139,6 +144,7 @@ inline PopupMenu getEditItemMenu(LookAndFeel* laf)
     menu.addItem(NOSTALGIC_EDIT_ID, "Nostalgic");
     menu.addItem(SYNCHRONIC_EDIT_ID, "Synchronic");
     menu.addItem(BLENDRONIC_EDIT_ID, "Blendronic");
+    menu.addItem(RESONANCE_EDIT_ID, "Resonance");
     menu.addItem(TUNING_EDIT_ID, "Tuning");
     menu.addItem(TEMPO_EDIT_ID, "Tempo");
     menu.addItem(DIRECTMOD_EDIT_ID, "Direct Mod");

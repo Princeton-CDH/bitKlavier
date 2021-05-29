@@ -183,6 +183,8 @@
                 file="Source/galleries/Exercise Constraint.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
+          <FILE id="nmesJs" name="resonance_icon.png" compile="0" resource="1"
+                file="Source/icons/resonance_icon.png"/>
           <FILE id="jFt7tl" name="blendronic_icon.png" compile="0" resource="1"
                 file="Source/icons/blendronic_icon.png"/>
           <FILE id="xOwvX8" name="left-arrow.png" compile="0" resource="1" file="Source/icons/left-arrow.png"/>
@@ -422,6 +424,10 @@
                 file="Source/PluginEditor.cpp"/>
         </GROUP>
         <GROUP id="{444BC2CA-5FF1-6AEB-00B9-DF5D039DBFFE}" name="PreparationVC">
+          <FILE id="JLoytD" name="ResonanceViewController.cpp" compile="1" resource="0"
+                file="Source/ResonanceViewController.cpp"/>
+          <FILE id="rix4iK" name="ResonanceViewController.h" compile="0" resource="0"
+                file="Source/ResonanceViewController.h"/>
           <FILE id="KJnEpI" name="BlendronicViewController.cpp" compile="1" resource="0"
                 file="Source/BlendronicViewController.cpp"/>
           <FILE id="eIGqlu" name="BlendronicViewController.h" compile="0" resource="0"
