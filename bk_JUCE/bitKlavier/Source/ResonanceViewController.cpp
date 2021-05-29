@@ -319,6 +319,15 @@ void ResonancePreparationEditor::bkComboBoxDidChange(ComboBox* box)
 
 void ResonancePreparationEditor::buttonClicked(Button* b)
 {
+    if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+
+        ADSRSlider->setIsButtonOnly(true);
+        //setShowADSR(false);
+        setSubWindowInFront(false);
+
+    }
     //can leave blank for now since there are no buttons, will need to fill in later
 }
 
