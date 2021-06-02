@@ -43,6 +43,7 @@ void ResonanceProcessor::keyPressed(int noteNumber, float velocity, int midiChan
     DBG("key " + String(noteNumber) + " pressed");
     DBG("KeysDepressed after key added: " + intArrayToString(keysDepressed));
 
+    // check for overtones of the played note
     for (int i : resonance->prep->getDistances())
     {
         DBG("current overtone being checked: " + String(noteNumber + i));
@@ -70,7 +71,7 @@ void ResonanceProcessor::keyPressed(int noteNumber, float velocity, int midiChan
                         synth->keyOn(midiChannel,
                             noteNumber + i,
                             noteNumber + i,
-                            0.0,
+                            tuning->getOffset(noteNumber + i, false),
                             velocity, // maybe need to set a different velocity than the played note's velocity for resonant notes
                             aGlobalGain,
                             Forward,
@@ -94,7 +95,7 @@ void ResonanceProcessor::keyPressed(int noteNumber, float velocity, int midiChan
                         synth->keyOn(midiChannel,
                             noteNumber + i,
                             noteNumber + i,
-                            0.0,
+                            tuning->getOffset(noteNumber + i, false),
                             velocity, // maybe need to set a different velocity than the played note's velocity for resonant notes
                             aGlobalGain,
                             Forward,
@@ -121,6 +122,94 @@ void ResonanceProcessor::keyPressed(int noteNumber, float velocity, int midiChan
                     currentNote->setVelocityAtKeyOn(velocity);
                     currentNote->setStartPosition((resonance->prep->getStartTime()) * synth->getSampleRate() / 1000.);
                     currentNote->setTargetLength((resonance->prep->getLength())*synth->getSampleRate() / 1000.);
+                }
+            }
+            else
+            {
+                DBG("Key " + String(noteNumber + i) + " not added to excited list because already present");
+            }
+        }
+    }
+
+    // check if key is a resonant overtone of an already depressed key
+    for (int i : resonance->prep->getDistances())
+    {
+        DBG("current possible fundamental being checked: " + String(noteNumber - i));
+        if (keysDepressed.contains(noteNumber - i))
+        {
+            keysExcitedDupes.add(noteNumber);
+            DBG("key " + String(noteNumber) + " added to dupes");
+            DBG("Dupes after key added: " + intArrayToString(keysExcitedDupes));
+            if (!(keysExcited.contains(noteNumber)))
+            {
+                DBG("key " + String(noteNumber) + " added to excited list");
+                DBG("KeysExcited after key added: " + intArrayToString(keysExcited));
+                //start timer for newly excited key - need to figure out how to implement
+                //need to figure out check for gain threshold
+                if (velocity < resonance->prep->getAttackThresh())
+                {
+                    DBG("velocity didn't exceed attack threshold");
+                }
+                else
+                {
+                    DBG("going to play note");
+                    Array<float> ADSRvals = resonance->prep->getADSRvals();
+                    if (!blendronic.isEmpty())
+                    {
+                        synth->keyOn(midiChannel,
+                            noteNumber,
+                            noteNumber,
+                            tuning->getOffset(noteNumber, false),
+                            velocity, // maybe need to set a different velocity than the played note's velocity for resonant notes
+                            aGlobalGain,
+                            Forward,
+                            NormalFixedStart,
+                            ResonanceNote,
+                            resonance->prep->getSoundSet(), //set
+                            resonance->getId(),
+                            resonance->prep->getStartTime(),                        //start position
+                            resonance->prep->getLength(),                            //play length
+                            ADSRvals[0],
+                            ADSRvals[1],
+                            ADSRvals[2],
+                            ADSRvals[3],
+                            tuning,
+                            resonance->prep->getDefaultGainPtr(),
+                            resonance->prep->getBlendGainPtr(),
+                            blendronic = blendronic);
+                    }
+                    else
+                    {
+                        synth->keyOn(midiChannel,
+                            noteNumber,
+                            noteNumber,
+                            tuning->getOffset(noteNumber, false),
+                            velocity, // maybe need to set a different velocity than the played note's velocity for resonant notes
+                            aGlobalGain,
+                            Forward,
+                            NormalFixedStart,
+                            ResonanceNote,
+                            resonance->prep->getSoundSet(), //set
+                            resonance->getId(),
+                            resonance->prep->getStartTime(),                        //start position
+                            resonance->prep->getLength(),                            //play length
+                            ADSRvals[0],
+                            ADSRvals[1],
+                            ADSRvals[2],
+                            ADSRvals[3],
+                            tuning,
+                            resonance->prep->getDefaultGainPtr(),
+                            resonance->prep->getBlendGainPtr(),
+                            blendronic = blendronic);
+                    }
+                    keysExcited.insert(0, noteNumber);
+                    resonantNotes.insert(0, new ResonanceNoteStuff(noteNumber));
+                    ResonanceNoteStuff* currentNote = resonantNotes.getUnchecked(0);
+                    currentNote->setPrepAtKeyOn(resonance->prep);
+                    currentNote->setTuningAtKeyOn(tuning->getOffset(noteNumber, false)); // bool value might need to change here?
+                    currentNote->setVelocityAtKeyOn(velocity);
+                    currentNote->setStartPosition((resonance->prep->getStartTime()) * synth->getSampleRate() / 1000.);
+                    currentNote->setTargetLength((resonance->prep->getLength()) * synth->getSampleRate() / 1000.);
                 }
             }
             else
@@ -181,7 +270,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
             64,
             aGlobalGain,
             resonance->prep->getDefaultGainPtr(),
-            false, // need to test more here
+            true, // need to test more here
             true); // need to test more here
         int index = keysExcited.indexOf(noteNumber);
         keysExcited.remove(index);

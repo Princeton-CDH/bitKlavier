@@ -144,10 +144,10 @@ void Piano::configure(void)
     //ResonanceProcessor::Ptr testResProc = new ResonanceProcessor(testRes, defaultT, processor.gallery->getGeneralSettings(), &processor.mainPianoSynth);
     //DBG("ID = " + String(testResProc->getId()));
     
-    processor.gallery->addResonanceWithId(11111);
-    ResonanceProcessor::Ptr testResProc = addResonanceProcessor(11111);
+    //processor.gallery->addResonanceWithId(11111);
+    //ResonanceProcessor::Ptr testResProc = addResonanceProcessor(11111);
     
-    linkPreparationWithTuning(PreparationTypeResonance, 11111, defaultT->getTuning());
+    //linkPreparationWithTuning(PreparationTypeResonance, 11111, defaultT->getTuning());
 
 
     for (auto item : items)
@@ -191,7 +191,7 @@ void Piano::configure(void)
                 }
             }
             //testing by linking all the keymaps with the test resonance
-            linkPreparationWithKeymap(PreparationTypeResonance, 11111, Id);
+            //linkPreparationWithKeymap(PreparationTypeResonance, 11111, Id);
             connex.clear();
         }
         else if (type == PreparationTypeTuning)
