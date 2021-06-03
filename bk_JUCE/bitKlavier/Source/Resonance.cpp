@@ -142,11 +142,18 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
     keysDepressed.removeAllInstancesOf(noteNumber);
     DBG("KeysDepressed after key removed: " + intArrayToString(keysDepressed));
 
-    /*
+    bool alreadyInReleaseList = false;
+
+    if (keysReleasedExcited.contains(noteNumber))
+    {
+        alreadyInReleaseList = true;
+    }
+
+    
     //currently leaving this out, with this commented out keys will only release when the resonating key is released/exceeds its target
     for (int i : resonance->prep->getDistances())
     {
-        if (keysExcitedDupes.contains(noteNumber + i))
+        if (keysExcitedDupes.contains(noteNumber + i) && alreadyInReleaseList)
         {
             keysExcitedDupes.removeFirstMatchingValue(noteNumber + i);
             DBG("key " + String(noteNumber + i) + " removed from dupes");
@@ -170,33 +177,16 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
             }
         }
     }
-    */
-    if (keysExcitedDupes.contains(noteNumber))
-    {
-        keysExcitedDupes.removeAllInstancesOf(noteNumber);
-        DBG("key " + String(noteNumber) + " removed from excited/dupes because released");
-        synth->keyOff(midiChannel,
-            ResonanceNote,
-            resonance->prep->getSoundSet(),
-            resonance->getId(),
-            noteNumber,
-            noteNumber,
-            64,
-            aGlobalGain,
-            resonance->prep->getDefaultGainPtr(),
-            true, // need to test more here
-            true); // need to test more here
-        int index = keysExcited.indexOf(noteNumber);
-        keysExcited.remove(index);
-        resonantNotes.remove(index);
-    }
 
-    // check if key is a resonant overtone of an already depressed key
+    bool hasFundamental = false;
+
+    // check if key is a resonant overtone of an already depressed key, play it on release
     for (int i : resonance->prep->getDistances())
     {
         DBG("current possible fundamental being checked: " + String(noteNumber - i));
         if (keysDepressed.contains(noteNumber - i))
         {
+            hasFundamental = true;
             keysExcitedDupes.add(noteNumber);
             DBG("key " + String(noteNumber) + " added to dupes");
             DBG("Dupes after key added: " + intArrayToString(keysExcitedDupes));
@@ -206,9 +196,9 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
                 DBG("KeysExcited after key added: " + intArrayToString(keysExcited));
                 //start timer for newly excited key - need to figure out how to implement
                 //need to figure out check for gain threshold
-                if (velocity < resonance->prep->getAttackThresh())
+                if ((velocity < resonance->prep->getAttackThresh()) || (alreadyInReleaseList))
                 {
-                    DBG("velocity didn't exceed attack threshold");
+                    DBG("velocity didn't exceed attack threshold or already in release list");
                 }
                 else
                 {
@@ -262,7 +252,8 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
                             resonance->prep->getBlendGainPtr(),
                             blendronic = blendronic);
                     }
-                    keysExcited.insert(0, noteNumber);
+                    
+                    keysReleasedExcited.insert(0, noteNumber);
                     resonantNotes.insert(0, new ResonanceNoteStuff(noteNumber));
                     ResonanceNoteStuff* currentNote = resonantNotes.getUnchecked(0);
                     currentNote->setPrepAtKeyOn(resonance->prep);
@@ -276,6 +267,28 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
             {
                 DBG("Key " + String(noteNumber + i) + " not added to excited list because already present");
             }
+        }
+    }
+    if (!hasFundamental)
+    {
+        if (keysExcitedDupes.contains(noteNumber))
+        {
+            keysExcitedDupes.removeAllInstancesOf(noteNumber);
+            DBG("key " + String(noteNumber) + " removed from excited/dupes because released");
+            synth->keyOff(midiChannel,
+                ResonanceNote,
+                resonance->prep->getSoundSet(),
+                resonance->getId(),
+                noteNumber,
+                noteNumber,
+                64,
+                aGlobalGain,
+                resonance->prep->getDefaultGainPtr(),
+                true, // need to test more here
+                true); // need to test more here
+            int index = keysExcited.indexOf(noteNumber);
+            keysExcited.remove(index);
+            resonantNotes.remove(index);
         }
     }
 }

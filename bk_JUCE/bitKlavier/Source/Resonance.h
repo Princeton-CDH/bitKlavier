@@ -538,6 +538,8 @@ private:
     Array<int> keysDepressed;   //current keys that are depressed
     Array<int> keysExcited; //current keys that are excited
 
+    Array<int> keysReleasedExcited; // current keys that are excited due to being released with a lower fundamental down
+
     //not sure about this, this will track duplicate instances of a key being resonated for the sake of not accidentally removing the wrong thing with multiple shared partials
     //a better way to represent this could just be to represent keysExcited as an 88 int array of 0s, then increment/decrement when a resonant note would be added/decreased
     //depends on whether it's more efficient to have two short lists with a few more checks or one long list with possibly more iterating checks????
