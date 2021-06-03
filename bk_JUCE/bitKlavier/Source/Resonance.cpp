@@ -153,7 +153,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
     //currently leaving this out, with this commented out keys will only release when the resonating key is released/exceeds its target
     for (int i : resonance->prep->getDistances())
     {
-        if (keysExcitedDupes.contains(noteNumber + i) && alreadyInReleaseList)
+        if (keysExcitedDupes.contains(noteNumber + i))
         {
             keysExcitedDupes.removeFirstMatchingValue(noteNumber + i);
             DBG("key " + String(noteNumber + i) + " removed from dupes");
@@ -175,8 +175,8 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
                 keysExcited.remove(index);
                 resonantNotes.remove(index);
                 
-                //int releasedIndex = keysReleasedExcited.indexOf(noteNumber);
-                //if (releasedIndex >= 0) keysReleasedExcited.remove(releasedIndex);
+                int releasedIndex = keysReleasedExcited.indexOf(noteNumber + i);
+                if (releasedIndex >= 0) keysReleasedExcited.remove(releasedIndex);
             }
         }
     }
@@ -297,6 +297,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
             if (releasedIndex >= 0) keysReleasedExcited.remove(releasedIndex);
         }
     }
+    DBG("released excited list at end of keyReleased: " + intArrayToString(keysReleasedExcited));
 }
 
 void ResonanceProcessor::prepareToPlay(double sr)
@@ -307,6 +308,9 @@ void ResonanceProcessor::prepareToPlay(double sr)
 void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
 {
     incrementTimers(numSamples);
+    
+    DBG("peepee poopoo");
+    DBG("released excited list at start of process block: " + intArrayToString(keysReleasedExcited));
 
     for (int i = resonantNotes.size() - 1; i >= 0; --i)
     {
@@ -330,6 +334,9 @@ void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
                 true); // need to test more here
             keysExcited.remove(i);
             resonantNotes.remove(i);
+
+            int releasedIndex = keysReleasedExcited.indexOf(i);
+            if (releasedIndex >= 0) keysReleasedExcited.remove(releasedIndex);
         }
     }
 
