@@ -174,6 +174,9 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
                 int index = keysExcited.indexOf(noteNumber + i);
                 keysExcited.remove(index);
                 resonantNotes.remove(index);
+                
+                //int releasedIndex = keysReleasedExcited.indexOf(noteNumber);
+                //if (releasedIndex >= 0) keysReleasedExcited.remove(releasedIndex);
             }
         }
     }
@@ -289,6 +292,9 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
             int index = keysExcited.indexOf(noteNumber);
             keysExcited.remove(index);
             resonantNotes.remove(index);
+
+            int releasedIndex = keysReleasedExcited.indexOf(noteNumber);
+            if (releasedIndex >= 0) keysReleasedExcited.remove(releasedIndex);
         }
     }
 }
