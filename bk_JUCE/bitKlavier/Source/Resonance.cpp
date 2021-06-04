@@ -169,7 +169,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
                     64,
                     aGlobalGain,
                     resonance->prep->getDefaultGainPtr(),
-                    false, // need to test more here
+                    true, // need to test more here
                     true); // need to test more here
                 int index = keysExcited.indexOf(noteNumber + i);
                 keysExcited.remove(index);
@@ -331,7 +331,7 @@ void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
                 64,
                 aGlobalGain,
                 resonance->prep->getDefaultGainPtr(),
-                false, // need to test more here
+                true, // need to test more here
                 true); // need to test more here
             keysExcited.remove(i);
             resonantNotes.remove(i);
