@@ -153,7 +153,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
     //currently leaving this out, with this commented out keys will only release when the resonating key is released/exceeds its target
     for (int i : resonance->prep->getDistances())
     {
-        if (keysExcitedDupes.contains(noteNumber + i))
+        if (keysExcitedDupes.contains(noteNumber + i) && !keysDepressed.contains(noteNumber + i))
         {
             keysExcitedDupes.removeFirstMatchingValue(noteNumber + i);
             DBG("key " + String(noteNumber + i) + " removed from dupes");
@@ -180,6 +180,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiCha
             }
         }
     }
+    
 
     bool hasFundamental = false;
 
