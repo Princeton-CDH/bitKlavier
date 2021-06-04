@@ -310,7 +310,6 @@ void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
 {
     incrementTimers(numSamples);
     
-    DBG("peepee poopoo");
     DBG("released excited list at start of process block: " + intArrayToString(keysReleasedExcited));
 
     for (int i = resonantNotes.size() - 1; i >= 0; --i)
@@ -340,11 +339,6 @@ void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
             if (releasedIndex >= 0) keysReleasedExcited.remove(releasedIndex);
         }
     }
-
-    //for each excited key:
-    //  advance timer
-    //  if timer is exceeding target:
-    //      remove from list, end timer (probably use helpr function)
 }
 
 void ResonanceProcessor::playNote(int channel, int note, float velocity)

@@ -115,22 +115,10 @@ void ResonanceViewController::displayShared(void)
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
 
-    /*actionButton.setBounds(selectCB.getRight() + gXSpacing,
-        selectCB.getY(),
-        selectCB.getWidth() * 0.5,
-        selectCB.getHeight());
-
-    alternateMod.setBounds(actionButton.getRight() + gXSpacing,
-        actionButton.getY(),
-        selectCB.getWidth(),
-        actionButton.getHeight());*/
-
     comboBoxSlice.removeFromLeft(gXSpacing);
 
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
     modeSlice.removeFromRight(gXSpacing);
-    //modeSlice.reduce(4 + 2.*gPaddingConst * processor.paddingScalarX, 0);
-    //lengthModeSelectCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
     lengthModeSelectCB.setBounds(modeSlice.removeFromRight(modeSlice.getWidth() / 2.));
 
     actionButton.toFront(false);
@@ -160,8 +148,6 @@ void ResonanceViewController::displayShared(void)
 
     //ADSR stuff
 
-    //area.removeFromLeft(processor.paddingScalarX * 20);
-    //area.removeFromRight(processor.paddingScalarX * 20);
     area.removeFromTop(20 * processor.paddingScalarY);
 
     columnHeight = leftColumn.getHeight();
