@@ -16,6 +16,7 @@
 #include "Tuning.h"
 #include "General.h"
 #include "Keymap.h"
+#include "Blendronic.h"
 
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////RESONANCE PREPARATION///////////////////////////////////
@@ -51,7 +52,9 @@ public:
         rRelease(r->rRelease),
         rSoundSet(r->rSoundSet),
         rUseGlobalSoundSet(r->rUseGlobalSoundSet),
-        rSoundSetName(r->rSoundSetName)
+        rSoundSetName(r->rSoundSetName),
+        rMinStartTimeMS(r->rMinStartTimeMS),
+        rMaxStartTimeMS(r->rMaxStartTimeMS)
     {
         
     }
@@ -65,6 +68,8 @@ public:
         rOvertoneGains(gains),
         rStartTimeMS(startTime),
         rLengthMS(length),
+        rMinStartTimeMS(400),
+        rMaxStartTimeMS(2000),
         rExciteThreshold(exciteThresh),
         rAttackThreshold(attackThresh),
         rAttack(0),
@@ -87,6 +92,8 @@ public:
         rBlendronicGain(0.0, true),
         rStartTimeMS(2000),
         rLengthMS(5000),
+        rMinStartTimeMS(400),
+        rMaxStartTimeMS(2000),
         rExciteThreshold(0.5),
         rAttackThreshold(0.5),
         rAttack(0),
@@ -259,6 +266,19 @@ public:
 
     Moddable<float> rDefaultGain; //shortcut until list of overtone gains is implemented
     Moddable<float> rBlendronicGain;
+    
+    //**********
+    // NEW DAN IMPLEMENTATION BELOW
+    // boundaries for start times for resonance sample playback
+    // velocity will be used to set start time between these bounds
+    Moddable<int> rMinStartTimeMS;
+    Moddable<int> rMaxStartTimeMS;
+    
+    inline const int getMinStartTime() const noexcept { return rMinStartTimeMS.value; }
+    inline const int getMaxStartTime() const noexcept { return rMaxStartTimeMS.value; }
+    
+    inline void setMinStartTime(int inval) { rMinStartTimeMS = inval; }
+    inline void setMaxStartTime(int inval) { rMaxStartTimeMS = inval; }
 
 private:
 
@@ -448,6 +468,46 @@ private:
 
 };
 
+
+
+/*
+ SympPartial stores information about an individual partial of an undamped string
+*/
+class SympPartial : public ReferenceCountedObject
+{
+public:
+    typedef ReferenceCountedObjectPtr<SympPartial>   Ptr;
+    typedef Array<SympPartial::Ptr>                  PtrArr;
+    typedef Array<SympPartial::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<SympPartial>                  Arr;
+    typedef OwnedArray<SympPartial, CriticalSection> CSArr;
+    typedef HashMap<int, SympPartial::Ptr>           PtrMap; // not sure if this works
+    
+    // constructors
+    SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset, BKSynthesiserVoice* newVoice);
+    SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset);
+    
+    /** Copies the contents of another string array into this one */
+    SympPartial& operator= (const SympPartial&);
+
+    /** Move assignment operator */
+    SympPartial& operator= (SympPartial&&) noexcept;
+
+    // need copy and assignment constructors; see StringArray
+
+    int heldKey;                // midiNoteNumber for key that is held down; for the undamped string that has this partial
+    int partialKey;             // midiNoteNumber for nearest key to this partial; used to determine whether this partial gets excited
+    float gain;                 // gain multiplier for this partial
+    float offset;               // offset, in cents, from ET for this partial
+    uint64 playPosition;        // current play position for this resonance (samples)
+                                // ==> initialize to large number! perhaps 5 minutes * sampling rate, and cap it there in ProcessBlock
+    BKSynthesiserVoice* voice;  // voice that is playing this partial (to enable stopping it)
+
+    const uint64 maxPlayPosition = 5 * 60 * 96000; // really high number, longer than any of the samples
+};
+
+
+
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////RESONANCE PROCESSOR/////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
@@ -520,11 +580,11 @@ private:
 
     void playNote(int channel, int note, float velocity);
 
-    Resonance::Ptr         resonance;
-    BKSynthesiser* synth;
-    TuningProcessor::Ptr     tuning;
-    GeneralSettings::Ptr    general;
-    Keymap::PtrArr          keymaps;
+    Resonance::Ptr              resonance;
+    BKSynthesiser*              synth;
+    TuningProcessor::Ptr        tuning;
+    GeneralSettings::Ptr        general;
+    Keymap::PtrArr              keymaps;
     BlendronicProcessor::PtrArr blendronic;
 
     OwnedArray<ResonanceNoteStuff> resonantNotes;
@@ -551,6 +611,34 @@ private:
     //uint64 clearThresholdTimer;
     //uint64 openThresholdTimer;
     //uint64 closeThresholdTimer;
+    
+    //**********
+    // NEW DAN IMPLEMENTATION BELOW
+    
+    // basic API
+    void ringSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates); 
+    void addSympStrings(int noteNum);
+    void removeSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post);
+    
+    // => sympStrings
+    // data structure for holding all of the undamped strings and their partials
+    //      outside map is indexed by held note (midiNoteNumber)
+    //      inside map is indexed by partialKey (so, midiNoteNumber + 12, for 2nd partial)
+    //      so this holds all of the partials for all of the currently undamped strings
+    HashMap<int, HashMap<int, SympPartial::Ptr>> sympStrings;
+    HashMap<int, SympPartial::PtrMap> sympStrings2;
+    OwnedArray<SympPartial::PtrMap> sympStrings3;
+    OwnedArray<HashMap<int, SympPartial>> sympStrings4;
+    
+    
+    // => partialStructure
+    // 2D array for partial structure
+    //      index is partial #
+    //      contents are interval from fundamental, gain, and offset from ET
+    //      by default, first 8 partials for conventional overtone series
+    //      user needs to be able to set these
+    //Array<float[3]> partialStructure;
+    Array<Array<float>> partialStructure;
 
     JUCE_LEAK_DETECTOR(ResonanceProcessor);
 };
