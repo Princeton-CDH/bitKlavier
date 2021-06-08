@@ -103,9 +103,9 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
 {
     // resonate existing sympStrings
     // see if there is overlap with the newly pressed key's partials and any sympPartials
-    //for (auto heldNotePartials : sympStrings)
+    for (auto heldNotePartials : sympStrings)
     //for (HashMap<int, SympPartial::PtrMap>::Iterator heldNotePartials (sympStrings2); heldNotePartials.next();)
-    for (HashMap<int, HashMap<int, SympPartial>>::Iterator heldNotePartials (sympStrings); heldNotePartials.next();)
+    //for (HashMap<int, HashMap<int, SympPartial>>::Iterator heldNotePartials (sympStrings); heldNotePartials.next();)
     {
         // indexed by heldNote (midiNoteNumber)
         //int heldNote = heldNotePartials.getKey(); // don't need this
@@ -117,49 +117,105 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
         {
             int currentStruckPartial = noteNumber + partialStructure.getReference(j)[0];
             // if (heldNotePartials.contains(currentStruckPartial))
-            if (heldNotePartials.getKey() == currentStruckPartial)
+            for (auto currentSympPartial : *heldNotePartials)
             {
-                // found an overlapping partial
-                // SympPartial currentSympPartial = heldNotePartials[currentStruckPartial]; // use getReference instead?
-                // SympPartial::Ptr currentSympPartial = heldNotePartials->getValue()[currentStruckPartial];
-                SympPartial currentSympPartial = heldNotePartials.getValue();
-
-                // calculate play position for this new resonance (ms)
-                // based on velocity; so higher velocity, the further into the sample it will play
-                int newPlayPosition = resonance->prep->getMinStartTime() + (resonance->prep->getMaxStartTime() - resonance->prep->getMinStartTime()) * (1. - velocity);
-
-                // only create a new resonance if it would be louder/brighter than what is currently there
-                if (newPlayPosition < currentSympPartial->playPosition / synth->getSampleRate())
+                if (currentSympPartial->heldKey == currentStruckPartial)
                 {
-                    // turn off the current resonance here, if it's playing
-                    synth->keyOffByVoice(
-                                    midiChannel,
-                                    ResonanceNote,
-                                    resonance->prep->getSoundSet(),
-                                    resonance->getId(),
-                                    noteNumber,
-                                    noteNumber,
-                                    64,
-                                    aGlobalGain,
-                                    resonance->prep->getDefaultGainPtr(),
-                                    true, // need to test more here
-                                    currentSympPartial->voice,
-                                    false);
+                    // found an overlapping partial
+                    
+                    // calculate play position for this new resonance (ms)
+                    // based on velocity; so higher velocity, the further into the sample it will play
+                    int newPlayPosition = resonance->prep->getMinStartTime()
+                                        + (resonance->prep->getMaxStartTime() - resonance->prep->getMinStartTime())
+                                        * (1. - velocity);
+                    
+                    // only create a new resonance if it would be louder/brighter than what is currently there
+                    if (newPlayPosition < currentSympPartial->playPosition / synth->getSampleRate())
+                    {
+                        // set the playPosition for this new resonance
+                        currentSympPartial->playPosition = newPlayPosition;
+                        
+                        // turn off the current resonance here, if it's playing
+                        synth->keyOffByVoice(
+                                        midiChannel,
+                                        ResonanceNote,
+                                        resonance->prep->getSoundSet(),
+                                        resonance->getId(),
+                                        noteNumber,
+                                        noteNumber,
+                                        64,
+                                        aGlobalGain,
+                                        resonance->prep->getDefaultGainPtr(),
+                                        true, // need to test more here
+                                        currentSympPartial->voice,
+                                        false);
 
-                    // calculate the tuning gap between attached tuning and the tuning of this partial
-                    // taking into account attached Tuning system, and defined partial structure (which may or may not be the same!)
-                    float tuningGap = fabs( tuning->getOffset(noteNumber, false)
-                                           - (tuning->getOffset(currentSympPartial->heldKey, false) + currentSympPartial->offset)
-                                          ) / 50.; // in cents?
+                        // calculate the tuning gap between attached tuning and the tuning of this partial
+                        // taking into account attached Tuning system, and defined partial structure (which may or may not be the same!)
+                        float tuningGap = fabs( tuning->getOffset(noteNumber, false)
+                                               - (tuning->getOffset(currentSympPartial->heldKey, false) + currentSympPartial->offset)
+                                              ) / 50.; // in cents?
 
-                    if (tuningGap > 2.) tuningGap = 2.;
+                        if (tuningGap > 2.) tuningGap = 2.;
 
-                    // play it, and store the voice so it can be shut off as needed
-                    // use max velocity for all resonance; loudness/brightness is set by newPlayPosition
-                    // adjust gain according to gap in tuning; 50 cent gap will result in 6dB cut in gain
-                    // => DO THIS!!!!!: currentSympPartial->voice = keyOn(currentSympPartial->gain * (1. - 0.5 * tuningGap), currentSympPartial->offset, velocity = 1., newPlayPosition);
+                        // play it, and store the voice so it can be shut off as needed
+                        // use max velocity for all resonance; loudness/brightness is set by newPlayPosition
+                        // adjust gain according to gap in tuning; 50 cent gap will result in 6dB cut in gain
+                        //      might be better to adjust playback position due to gap, instead of adjusting the gain?
+                        
+                        //currentSympPartial->voice = keyOn(currentSympPartial->gain * (1. - 0.5 * tuningGap), currentSympPartial->offset, velocity = 1., newPlayPosition);
 
-
+                        Array<float> ADSRvals = resonance->prep->getADSRvals();
+                        if (!blendronic.isEmpty())
+                        {
+                            currentSympPartial->voice = synth->keyOn(
+                                midiChannel,
+                                noteNumber,
+                                noteNumber,
+                                tuning->getOffset(noteNumber, false) + currentSympPartial->offset,
+                                1., // use max velocity sample for all resonance samples; intensity is set by newPlayPosition
+                                aGlobalGain * currentSympPartial->gain * (1. - 0.5 * tuningGap),
+                                Forward,
+                                NormalFixedStart,
+                                ResonanceNote,
+                                resonance->prep->getSoundSet(), //set
+                                resonance->getId(),
+                                newPlayPosition,                //start position
+                                0,                              //play length
+                                ADSRvals[0],
+                                ADSRvals[1],
+                                ADSRvals[2],
+                                ADSRvals[3],
+                                tuning,
+                                resonance->prep->getDefaultGainPtr(),
+                                resonance->prep->getBlendGainPtr(),
+                                blendronic);
+                        }
+                        else
+                        {
+                            currentSympPartial->voice = synth->keyOn(
+                                midiChannel,
+                                noteNumber,
+                                noteNumber,
+                                tuning->getOffset(noteNumber, false) + currentSympPartial->offset,
+                                1.,
+                                aGlobalGain * currentSympPartial->gain * (1. - 0.5 * tuningGap),
+                                Forward,
+                                NormalFixedStart,
+                                ResonanceNote,
+                                resonance->prep->getSoundSet(), //set
+                                resonance->getId(),
+                                newPlayPosition,                //start position
+                                0,                              //play length
+                                ADSRvals[0],
+                                ADSRvals[1],
+                                ADSRvals[2],
+                                ADSRvals[3],
+                                tuning,
+                                resonance->prep->getDefaultGainPtr(),
+                                resonance->prep->getBlendGainPtr());
+                        }
+                    }
                 }
             }
         }
@@ -169,9 +225,9 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
 // this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
 void ResonanceProcessor::addSympStrings(int noteNumber)
 {
-    HashMap<int, SympPartial> newPartials;
+    //HashMap<int, SympPartial> newPartials;
     // HashMap<int, SympPartial>* newPartials = new HashMap<int, SympPartial>(0);
-    //OwnedArray<SympPartial> newPartials;
+    OwnedArray<SympPartial> newPartials;
     for (int i = 0; i < partialStructure.size(); i++)
     {
         // heldKey = noteNumber
@@ -182,11 +238,11 @@ void ResonanceProcessor::addSympStrings(int noteNumber)
         // make a newPartial object, with gain and offset vals, and active
         // SympPartial::Ptr newPartial = new SympPartial(noteNumber, partialKey, partialStructure[i][1], partialStructure[i][2]);
         SympPartial newPartial(noteNumber, partialKey, partialStructure[i][1], partialStructure[i][2]);
-        newPartials.set(partialKey, newPartial);
-        //newPartials.add(&newPartial);
+        //newPartials.set(partialKey, newPartial);
+        newPartials.add(&newPartial);
     }
-    sympStrings.set(noteNumber, newPartials);
-    // sympStrings.add(&newPartials);
+    //sympStrings.set(noteNumber, newPartials);
+    sympStrings.add(&newPartials);
 }
 
 // this will turn off all the resonace associated with this string/key, and then remove those from the currently available sympathetic strings
@@ -196,23 +252,30 @@ void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity, int m
     //HashMap<int, SympPartial> removePartials = sympStrings[noteNumber];
 
     // turn off each partial associated with this string
-    for (HashMap<int, SympPartial>::Iterator i (sympStrings[noteNumber]); i.next();)
+    //for (HashMap<int, SympPartial>::Iterator i (sympStrings[noteNumber]); i.next();)
+    for (auto sympString : sympStrings)
     {
         // keyOff this partial, by voice
         // keyOff(i.getValue()->voice);
-        synth->keyOffByVoice(
-                        midiChannel,
-                        ResonanceNote,
-                        resonance->prep->getSoundSet(),
-                        resonance->getId(),
-                        noteNumber,
-                        noteNumber,
-                        64,
-                        aGlobalGain,
-                        resonance->prep->getDefaultGainPtr(),
-                        true, // need to test more here
-                        i.getValue().voice,
-                        false);
+        if(sympString->getFirst()->heldKey == noteNumber) { // sympPartials will have the same heldKey in this sympString
+            for (auto sympPartial : *sympString) {
+                synth->keyOffByVoice(
+                                midiChannel,
+                                ResonanceNote,
+                                resonance->prep->getSoundSet(),
+                                resonance->getId(),
+                                noteNumber,
+                                noteNumber,
+                                64,
+                                aGlobalGain,
+                                resonance->prep->getDefaultGainPtr(),
+                                true, // need to test more here
+                                sympPartial->voice,
+                                false);
+            }
+            //sympStrings.removeObject(sympString);
+            break; // should only have one of these sympStrings, since it corresponds to a heldKey, so we can break here
+        }
     }
 
     // clear this held string's partials
@@ -510,12 +573,14 @@ void ResonanceProcessor::prepareToPlay(double sr)
 void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
 {
     // increment playPosition for all resonances
-    for (HashMap<int, HashMap<int, SympPartial::Ptr>>::Iterator i (sympStrings); i.next();)
+    for (auto sympString : sympStrings)
     {
-        for (HashMap<int, SympPartial::Ptr>::Iterator j (i.getValue()); j.next();)
-            j.getValue()->playPosition += numSamples;
+        for (auto sympPartial : *sympString)
+        {
+            sympPartial->playPosition += numSamples;
+        }
     }
-    
+
     /*
      // theo implementation
     incrementTimers(numSamples);

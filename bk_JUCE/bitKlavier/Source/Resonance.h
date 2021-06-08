@@ -625,14 +625,14 @@ private:
     //      outside map is indexed by held note (midiNoteNumber)
     //      inside map is indexed by partialKey (so, midiNoteNumber + 12, for 2nd partial)
     //      so this holds all of the partials for all of the currently undamped strings
-    HashMap<int, HashMap<int, SympPartial>> sympStrings;
+    //HashMap<int, HashMap<int, SympPartial>> sympStrings;
     //HashMap<int, HashMap<int, SympPartial::Ptr>> sympStrings;
     //HashMap<int, SympPartial::PtrMap> sympStrings;
     //OwnedArray<SympPartial::PtrMap> sympStrings;
     //OwnedArray<HashMap<int, SympPartial::Ptr>> sympStrings;
     //OwnedArray<HashMap<int, SympPartial>> sympStrings;
     //HashMap<int, HashMap<int, SympPartial>> sympStrings;
-    //OwnedArray<OwnedArray<SympPartial>> sympStrings;
+    OwnedArray<OwnedArray<SympPartial>> sympStrings;
     
     //Array<SympPartial::PtrMap> sympStrings5;
     //Array<HashMap<int, SympPartial::Ptr>> sympStrings6;
