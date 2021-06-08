@@ -103,8 +103,9 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
 {
     // resonate existing sympStrings
     // see if there is overlap with the newly pressed key's partials and any sympPartials
-    for (HashMap<int, SympPartial::PtrMap>::Iterator heldNotePartials (sympStrings2); heldNotePartials.next();)
-    //for (HashMap<int, HashMap<int, SympPartial::Ptr>>::Iterator heldNotePartials (sympStrings); heldNotePartials.next();)
+    //for (auto heldNotePartials : sympStrings)
+    //for (HashMap<int, SympPartial::PtrMap>::Iterator heldNotePartials (sympStrings2); heldNotePartials.next();)
+    for (HashMap<int, HashMap<int, SympPartial>>::Iterator heldNotePartials (sympStrings); heldNotePartials.next();)
     {
         // indexed by heldNote (midiNoteNumber)
         //int heldNote = heldNotePartials.getKey(); // don't need this
@@ -116,11 +117,12 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
         {
             int currentStruckPartial = noteNumber + partialStructure.getReference(j)[0];
             // if (heldNotePartials.contains(currentStruckPartial))
-            if (heldNotePartials.getValue().contains(currentStruckPartial))
+            if (heldNotePartials.getKey() == currentStruckPartial)
             {
                 // found an overlapping partial
                 // SympPartial currentSympPartial = heldNotePartials[currentStruckPartial]; // use getReference instead?
-                SympPartial::Ptr currentSympPartial = heldNotePartials.getValue()[currentStruckPartial];
+                // SympPartial::Ptr currentSympPartial = heldNotePartials->getValue()[currentStruckPartial];
+                SympPartial currentSympPartial = heldNotePartials.getValue();
 
                 // calculate play position for this new resonance (ms)
                 // based on velocity; so higher velocity, the further into the sample it will play
@@ -167,7 +169,9 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
 // this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
 void ResonanceProcessor::addSympStrings(int noteNumber)
 {
-    HashMap<int, SympPartial::Ptr> newPartials;
+    HashMap<int, SympPartial> newPartials;
+    // HashMap<int, SympPartial>* newPartials = new HashMap<int, SympPartial>(0);
+    //OwnedArray<SympPartial> newPartials;
     for (int i = 0; i < partialStructure.size(); i++)
     {
         // heldKey = noteNumber
@@ -176,19 +180,23 @@ void ResonanceProcessor::addSympStrings(int noteNumber)
         if (partialKey > 108 || partialKey < 21) continue;
 
         // make a newPartial object, with gain and offset vals, and active
-        SympPartial::Ptr newPartial = new SympPartial(noteNumber, partialKey, partialStructure[i][1], partialStructure[i][2]);
+        // SympPartial::Ptr newPartial = new SympPartial(noteNumber, partialKey, partialStructure[i][1], partialStructure[i][2]);
+        SympPartial newPartial(noteNumber, partialKey, partialStructure[i][1], partialStructure[i][2]);
         newPartials.set(partialKey, newPartial);
+        //newPartials.add(&newPartial);
     }
     sympStrings.set(noteNumber, newPartials);
-
+    // sympStrings.add(&newPartials);
 }
 
 // this will turn off all the resonace associated with this string/key, and then remove those from the currently available sympathetic strings
 void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
 {
 
+    //HashMap<int, SympPartial> removePartials = sympStrings[noteNumber];
+
     // turn off each partial associated with this string
-    for (HashMap<int, SympPartial::Ptr>::Iterator i (sympStrings[noteNumber]); i.next();)
+    for (HashMap<int, SympPartial>::Iterator i (sympStrings[noteNumber]); i.next();)
     {
         // keyOff this partial, by voice
         // keyOff(i.getValue()->voice);
@@ -203,7 +211,7 @@ void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity, int m
                         aGlobalGain,
                         resonance->prep->getDefaultGainPtr(),
                         true, // need to test more here
-                        i.getValue()->voice,
+                        i.getValue().voice,
                         false);
     }
 
