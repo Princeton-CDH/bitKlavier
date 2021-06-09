@@ -3,7 +3,7 @@
 
     Resonance.h
     Created: 12 May 2021 12:41:26pm
-    Author:  Theodore R Trevisan
+    Author:  Dan Trueman and Theodore R Trevisan
 
   ==============================================================================
 */
@@ -484,7 +484,6 @@ public:
     typedef HashMap<int, SympPartial::Ptr>           PtrMap; // not sure if this works
     
     // constructors
-    SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset, BKSynthesiserVoice* newVoice);
     SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset);
     
     /** Copies the contents of another string array into this one */
@@ -501,8 +500,6 @@ public:
     float offset;               // offset, in cents, from ET for this partial
     uint64 playPosition;        // current play position for this resonance (samples)
                                 // ==> initialize to large number! perhaps 5 minutes * sampling rate, and cap it there in ProcessBlock
-
-    BKSynthesiserVoice* voice;  // voice that is playing this partial (to enable stopping it)
 
     const uint64 maxPlayPosition = 5 * 60 * 96000; // really high number, longer than any of the samples
 };

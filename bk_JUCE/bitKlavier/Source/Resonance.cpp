@@ -3,7 +3,7 @@
 
     Resonance.cpp
     Created: 12 May 2021 12:41:26pm
-    Author:  Theodore R Trevisan
+    Author:  Dan Trueman and Theodore R Trevisan
 
   ==============================================================================
 */
@@ -15,17 +15,6 @@
 void ResonancePreparation::performModification(ResonancePreparation* r, Array<bool> dirty)
 {
     //TBD
-}
-
-SympPartial::SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset, BKSynthesiserVoice* newVoice)
-{
-    heldKey     = newHeldKey;
-    partialKey  = newPartialKey;
-    gain        = newGain;
-    offset      = newOffset;
-    voice       = newVoice;
-
-    playPosition = maxPlayPosition; // default to past end of sample
 }
 
 SympPartial::SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset) 
@@ -46,7 +35,6 @@ SympPartial& SympPartial::operator= (const SympPartial& other)
     partialKey  = other.partialKey;
     gain        = other.gain;
     offset      = other.offset;
-    voice       = other.voice;
     
     return *this;
 }
@@ -58,7 +46,6 @@ SympPartial& SympPartial::operator= (SympPartial&& other) noexcept
     partialKey  = other.partialKey;
     gain        = other.gain;
     offset      = other.offset;
-    voice       = std::move (other.voice);
     
     return *this;
 }
@@ -131,7 +118,6 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                                         + (resonance->prep->getMaxStartTime() - resonance->prep->getMinStartTime())
                                         * (1. - velocity);
                     
-                    //newPlayPosition = 400; //testing
                     DBG("Resonance: found an overlapping partial, currentPlayPosition = "
                         + String(currentSympPartial->playPosition  / (.001 *  synth->getSampleRate()))
                         + " newPlayPosition = " + String(newPlayPosition));
@@ -178,7 +164,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         Array<float> ADSRvals = resonance->prep->getADSRvals();
                         if (!blendronic.isEmpty())
                         {
-                            currentSympPartial->voice = synth->keyOn(
+                                synth->keyOn(
                                 midiChannel,
                                 //noteNumber,
                                 currentSympPartial->heldKey,
@@ -206,7 +192,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         }
                         else
                         {
-                            currentSympPartial->voice = synth->keyOn(
+                                synth->keyOn(
                                 midiChannel,
                                 //noteNumber,
                                 currentSympPartial->heldKey,
