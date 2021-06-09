@@ -142,26 +142,19 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         // set the playPosition for this new resonance
                         currentSympPartial->playPosition = newPlayPosition * (.001 *  synth->getSampleRate());
                         
-                        
                         // turn off the current resonance here, if it's playing
-                            //if (currentSympPartial->voice->isVoiceActive())
-                        /*
-                            {
-                                synth->keyOffByVoice(
-                                                midiChannel,
-                                                ResonanceNote,
-                                                resonance->prep->getSoundSet(),
-                                                resonance->getId(),
-                                                noteNumber,
-                                                noteNumber,
-                                                64,
-                                                aGlobalGain,
-                                                resonance->prep->getDefaultGainPtr(),
-                                                true, // need to test more here
-                                                currentSympPartial->voice,
-                                                false);
-                            }
-                         */
+                        synth->keyOff(
+                                    midiChannel,
+                                    ResonanceNote,
+                                    resonance->prep->getSoundSet(),
+                                    resonance->getId(),
+                                    currentSympPartial->heldKey,
+                                    currentSympPartial->partialKey,
+                                    64,
+                                    aGlobalGain,
+                                    resonance->prep->getDefaultGainPtr(),
+                                    true, // need to test more here
+                                    false);
 
                         // calculate the tuning gap between attached tuning and the tuning of this partial
                         // taking into account attached Tuning system, and defined partial structure (which may or may not be the same!)
@@ -176,9 +169,6 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         // use max velocity for all resonance; loudness/brightness is set by newPlayPosition
                         // adjust gain according to gap in tuning; 50 cent gap will result in 6dB cut in gain
                         //      might be better to adjust playback position due to gap, instead of adjusting the gain?
-                        
-                        //currentSympPartial->voice = keyOn(currentSympPartial->gain * (1. - 0.5 * tuningGap), currentSympPartial->offset, velocity = 1., newPlayPosition);
-
                         DBG("Resonance playNote: "   + String(noteNumber)
                                                     + " heldKey = " + String(currentSympPartial->heldKey)
                                                     + " partialKey = " + String(currentStruckPartial)
@@ -193,11 +183,11 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                                 //noteNumber,
                                 currentSympPartial->heldKey,
                                 currentStruckPartial,
-                                tuning->getOffset(noteNumber, false) + currentSympPartial->offset * .01,
+                                tuning->getOffset(currentSympPartial->heldKey, false) + currentSympPartial->offset * .01,
                                 // tuning->getOffset(noteNumber, false),
                                 1., // use max velocity sample for all resonance samples; intensity is set by newPlayPosition
-                                //aGlobalGain * currentSympPartial->gain * (1. - 0.5 * tuningGap),
-                                aGlobalGain,
+                                aGlobalGain * currentSympPartial->gain * (1. - 0.5 * tuningGap),
+                                //aGlobalGain,
                                 Forward,
                                 NormalFixedStart,
                                 ResonanceNote,
@@ -221,11 +211,11 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                                 //noteNumber,
                                 currentSympPartial->heldKey,
                                 currentStruckPartial,
-                                tuning->getOffset(noteNumber, false) + currentSympPartial->offset * .01,
+                                tuning->getOffset(currentSympPartial->heldKey, false) + currentSympPartial->offset * .01,
                                 //tuning->getOffset(noteNumber, false),
                                 1.,
-                                //aGlobalGain * currentSympPartial->gain * (1. - 0.5 * tuningGap),
-                                aGlobalGain,
+                                aGlobalGain * currentSympPartial->gain * (1. - 0.5 * tuningGap),
+                                //aGlobalGain,
                                 Forward,
                                 NormalFixedStart,
                                 ResonanceNote,
