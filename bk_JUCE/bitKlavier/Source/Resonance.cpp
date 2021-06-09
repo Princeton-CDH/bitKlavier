@@ -180,6 +180,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         //currentSympPartial->voice = keyOn(currentSympPartial->gain * (1. - 0.5 * tuningGap), currentSympPartial->offset, velocity = 1., newPlayPosition);
 
                         DBG("Resonance playNote: "   + String(noteNumber)
+                                                    + " heldKey = " + String(currentSympPartial->heldKey)
                                                     + " partialKey = " + String(currentStruckPartial)
                                                     + " heldKey offset = " + String(tuning->getOffset(noteNumber, false))
                                                     + " partialKey offset = " + String(tuning->getOffset(currentSympPartial->heldKey, false) + .01 * currentSympPartial->offset));
@@ -189,7 +190,8 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         {
                             currentSympPartial->voice = synth->keyOn(
                                 midiChannel,
-                                noteNumber,
+                                //noteNumber,
+                                currentSympPartial->heldKey,
                                 currentStruckPartial,
                                 tuning->getOffset(noteNumber, false) + currentSympPartial->offset * .01,
                                 // tuning->getOffset(noteNumber, false),
@@ -216,7 +218,8 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         {
                             currentSympPartial->voice = synth->keyOn(
                                 midiChannel,
-                                noteNumber,
+                                //noteNumber,
+                                currentSympPartial->heldKey,
                                 currentStruckPartial,
                                 tuning->getOffset(noteNumber, false) + currentSympPartial->offset * .01,
                                 //tuning->getOffset(noteNumber, false),
