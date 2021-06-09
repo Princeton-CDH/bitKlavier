@@ -512,18 +512,6 @@ public:
                          bool allowTailOff,
                          bool nostalgicOff = false);
     
-    virtual void keyOffByVoice (int midiChannel,
-                         BKNoteType type,
-                         int set,
-                         int layerId,
-                         int keyNoteNumber,
-                         int midiNoteNumber,
-                         float velocity,
-                         float gain,
-                         float* dynamicGain,
-                         bool allowTailOff,
-                         BKSynthesiserVoice* voice = nullptr,
-                         bool nostalgicOff = false);
     
     /** Turns off all notes.
      
