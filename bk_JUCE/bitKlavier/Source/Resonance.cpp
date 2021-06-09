@@ -36,6 +36,8 @@ SympPartial& SympPartial::operator= (const SympPartial& other)
     gain        = other.gain;
     offset      = other.offset;
     
+    playPosition = other.playPosition;
+    
     return *this;
 }
 
@@ -46,6 +48,8 @@ SympPartial& SympPartial::operator= (SympPartial&& other) noexcept
     partialKey  = other.partialKey;
     gain        = other.gain;
     offset      = other.offset;
+    
+    playPosition = other.playPosition;
     
     return *this;
 }
@@ -245,6 +249,7 @@ void ResonanceProcessor::addSympStrings(int noteNumber)
 }
 
 // this will turn off all the resonances associated with this string/key, and then remove those from the currently available sympathetic strings
+// **** note that the sustain pedal doesn't seem to work properly with this!
 void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
 {
     // turn off each partial associated with this string
