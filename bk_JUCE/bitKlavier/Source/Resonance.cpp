@@ -4,6 +4,10 @@
     Resonance.cpp
     Created: 12 May 2021 12:41:26pm
     Author:  Dan Trueman and Theodore R Trevisan
+ 
+    Name candidate for this preparation: Understrings, Undersonic
+        after hardanger understrings, but also the sense that these sounds are "under" the main sounds of the piano
+        also, U is available as a keystroke ;--}
 
   ==============================================================================
 */
