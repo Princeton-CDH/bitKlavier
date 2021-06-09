@@ -684,7 +684,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
         // Now call this function for each post harmonization note
         for (auto h : reducedHarm)
         {
-            DBG("BKAudioProcessor::handleNoteOn noteOn");
+            //DBG("BKAudioProcessor::handleNoteOn noteOn");
             handleNoteOn(h, velocity, channel, noteNumber, source, true);
         }
         return; // Done with the first pass
@@ -760,7 +760,7 @@ void BKAudioProcessor::handleAllNotesOff()
 
 void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool postHarmonizer)
 {
-    DBG("++BKAudioProcessor::handleNoteOff channel = " + String(channel));
+    //DBG("++BKAudioProcessor::handleNoteOff channel = " + String(channel));
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
      
     bool activeSource = false;
@@ -1924,12 +1924,12 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     
     if (m.isNoteOn()) //&& keystrokesEnabled.getValue())
     {
-        DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
+        //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
         handleNoteOn(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
     }
     else if (m.isNoteOff())
     {
-        DBG("BKAudioProcessor::handleIncomingMidiMessage noteOff, channel = " + String(channel));
+        //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOff, channel = " + String(channel));
         handleNoteOff(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
         //didNoteOffs = true;
     }

@@ -219,13 +219,13 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, bool soundfont)
 {
     if (!velocityCheck(noteNumber)) return;
-    DBG("DirectProcessor::keyReleased " + String(noteNumber));
+    //DBG("DirectProcessor::keyReleased " + String(noteNumber));
     for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
     {
         int t = keyPlayed[noteNumber].getUnchecked(i);
         //float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
         
-        DBG("DirectProcessor::keyReleased sending keyOff, channel = " + String(channel));
+        //DBG("DirectProcessor::keyReleased sending keyOff, channel = " + String(channel));
         synth->keyOff(channel,
                       MainNote,
                       direct->prep->getSoundSet(), //set

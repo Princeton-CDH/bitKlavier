@@ -501,6 +501,7 @@ public:
     float offset;               // offset, in cents, from ET for this partial
     uint64 playPosition;        // current play position for this resonance (samples)
                                 // ==> initialize to large number! perhaps 5 minutes * sampling rate, and cap it there in ProcessBlock
+
     BKSynthesiserVoice* voice;  // voice that is playing this partial (to enable stopping it)
 
     const uint64 maxPlayPosition = 5 * 60 * 96000; // really high number, longer than any of the samples
@@ -620,19 +621,28 @@ private:
     void addSympStrings(int noteNum);
     void removeSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post);
     
+    // => allStrings
+    // data structure for holding all the strings; will be empty at first
+    //OwnedArray<SympPartial> allSymps;
+    
+    // all the symps corresponding to a particular noteNumber
+    //OwnedArray<HashMap<int, SympPartial::Ptr>> sympsByNoteNumber;
+    
     // => sympStrings
-    // data structure for holding all of the undamped strings and their partials
-    //      outside map is indexed by held note (midiNoteNumber)
-    //      inside map is indexed by partialKey (so, midiNoteNumber + 12, for 2nd partial)
-    //      so this holds all of the partials for all of the currently undamped strings
-    //HashMap<int, HashMap<int, SympPartial>> sympStrings;
+    // data structure for pointing to all of the undamped strings and their partials
+    //      outside map is indexed by held note (midiNoteNumber), inside map is indexed by partialKey (so, midiNoteNumber + 12, for 2nd partial)
+    //      so this points to all of the partials for all of the currently undamped strings
+    
+    //HashMap<int, HashMap<int, SympPartial::Ptr>> sympStrings;
+    HashMap<int, Array<SympPartial::Ptr>> sympStrings;
+
     //HashMap<int, HashMap<int, SympPartial::Ptr>> sympStrings;
     //HashMap<int, SympPartial::PtrMap> sympStrings;
     //OwnedArray<SympPartial::PtrMap> sympStrings;
     //OwnedArray<HashMap<int, SympPartial::Ptr>> sympStrings;
     //OwnedArray<HashMap<int, SympPartial>> sympStrings;
     //HashMap<int, HashMap<int, SympPartial>> sympStrings;
-    OwnedArray<OwnedArray<SympPartial>> sympStrings;
+    //OwnedArray<OwnedArray<SympPartial>> sympStrings;
     
     //Array<SympPartial::PtrMap> sympStrings5;
     //Array<HashMap<int, SympPartial::Ptr>> sympStrings6;
