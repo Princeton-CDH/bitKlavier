@@ -603,15 +603,6 @@ private:
     Array<int> keysExcitedDupes; 
 
     void incrementTimers(int numsamples);
-
-    //bool inSyncCluster, inClearCluster, inOpenCluster, inCloseCluster;
-    //bool nextSyncOffIsFirst, nextClearOffIsFirst, nextOpenOffIsFirst, nextCloseOffIsFirst;
-
-    //uint64 thresholdSamples;
-    //uint64 syncThresholdTimer;
-    //uint64 clearThresholdTimer;
-    //uint64 openThresholdTimer;
-    //uint64 closeThresholdTimer;
     
     //**********
     // NEW DAN IMPLEMENTATION BELOW
@@ -620,34 +611,14 @@ private:
     void ringSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates); 
     void addSympStrings(int noteNum);
     void removeSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post);
-    
-    // => allStrings
-    // data structure for holding all the strings; will be empty at first
-    //OwnedArray<SympPartial> allSymps;
-    
-    // all the symps corresponding to a particular noteNumber
-    //OwnedArray<HashMap<int, SympPartial::Ptr>> sympsByNoteNumber;
-    
+
     // => sympStrings
     // data structure for pointing to all of the undamped strings and their partials
-    //      outside map is indexed by held note (midiNoteNumber), inside map is indexed by partialKey (so, midiNoteNumber + 12, for 2nd partial)
-    //      so this points to all of the partials for all of the currently undamped strings
+    //      outside map is indexed by held note (midiNoteNumber), inside array resizes depending on the number of partials
+    //      so this includes all of the partials for all of the currently undamped strings
     
-    //HashMap<int, HashMap<int, SympPartial::Ptr>> sympStrings;
     HashMap<int, Array<SympPartial::Ptr>> sympStrings;
 
-    //HashMap<int, HashMap<int, SympPartial::Ptr>> sympStrings;
-    //HashMap<int, SympPartial::PtrMap> sympStrings;
-    //OwnedArray<SympPartial::PtrMap> sympStrings;
-    //OwnedArray<HashMap<int, SympPartial::Ptr>> sympStrings;
-    //OwnedArray<HashMap<int, SympPartial>> sympStrings;
-    //HashMap<int, HashMap<int, SympPartial>> sympStrings;
-    //OwnedArray<OwnedArray<SympPartial>> sympStrings;
-    
-    //Array<SympPartial::PtrMap> sympStrings5;
-    //Array<HashMap<int, SympPartial::Ptr>> sympStrings6;
-    
-    
     // => partialStructure
     // 2D array for partial structure
     //      index is partial #

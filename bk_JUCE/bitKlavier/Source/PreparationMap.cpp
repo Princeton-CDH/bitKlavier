@@ -467,6 +467,9 @@ void PreparationMap::processBlock(AudioSampleBuffer& buffer, int numSamples, int
 
 		for (auto bproc : bprocessor)
 			bproc->processBlock(numSamples, midiChannel);
+        
+        for (auto rproc : rprocessor)
+            rproc->processBlock(numSamples, midiChannel);
     }
 }
 
