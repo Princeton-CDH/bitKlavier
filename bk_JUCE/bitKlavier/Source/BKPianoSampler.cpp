@@ -269,7 +269,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
         
         uint64 totalLength = length;
         
-        if (bkType != MainNote)
+        if (bkType != MainNote && bkType != ResonanceNote)
         {
             //constrain total length minimum to no less than 50ms
             if(totalLength < 0.05 * getSampleRate()) totalLength = 0.05 * getSampleRate();
@@ -345,7 +345,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
                     sourceSamplePosition = startingPosition;
                 }
                 
-                playEndPosition = adsrRelease;
+                //playEndPosition = adsrRelease;
+                playEndPosition = adsrRelease * pitchRatio;
             }
             else if (playType == FixedLength)
             {
@@ -527,6 +528,7 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     {
         //DBG("note type: " + cNoteTypes[getNoteType()]);
         //adsr.setReleaseTime(0.003f);
+        DBG("BKPianoSamplerVoice::stopNote, releaseTime = " + String(adsr.getReleaseTime()));
         adsr.keyOff();
         sfzadsr.keyOff();
     }

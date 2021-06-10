@@ -170,6 +170,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                                                     + " partialKey offset = " + String(tuning->getOffset(currentSympPartial->heldKey, false) + .01 * currentSympPartial->offset));
                         
                         Array<float> ADSRvals = resonance->prep->getADSRvals();
+                        DBG("Resonance: ADSR release time = " + String(ADSRvals[3]));
                         if (!blendronic.isEmpty())
                         {
                                 synth->keyOn(
@@ -223,7 +224,8 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                                 ADSRvals[3],
                                 tuning,
                                 resonance->prep->getDefaultGainPtr(),
-                                resonance->prep->getBlendGainPtr());
+                                resonance->prep->getBlendGainPtr(),
+                                blendronic);
                         }
                     }
                 }
@@ -243,7 +245,7 @@ void ResonanceProcessor::addSympStrings(int noteNumber)
         int partialKey = noteNumber + partialStructure.getUnchecked(i)[0];
         if (partialKey > 108 || partialKey < 21) continue;
 
-        // make a newPartial object, with gain and offset vals, and active
+        // make a newPartial object, with gain and offset vals
         DBG("Resonance: adding partial " + String(partialKey) + " to " + String(noteNumber));
         sympStrings.getReference(noteNumber).add(new SympPartial(noteNumber, partialKey, partialStructure[i][1], partialStructure[i][2]));
     }
