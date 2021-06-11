@@ -334,17 +334,8 @@ public:
     typedef OwnedArray<SympPartial>                  Arr;
     typedef OwnedArray<SympPartial, CriticalSection> CSArr;
     typedef HashMap<int, SympPartial::Ptr>           PtrMap; // not sure if this works
-    
-    // constructors
+
     SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset);
-    
-    /** Copies the contents of another string array into this one */
-    SympPartial& operator= (const SympPartial&);
-
-    /** Move assignment operator */
-    SympPartial& operator= (SympPartial&&) noexcept;
-
-    // need copy and assignment constructors; see StringArray
 
     int heldKey;                // midiNoteNumber for key that is held down; for the undamped string that has this partial
     int partialKey;             // midiNoteNumber for nearest key to this partial; used to determine whether this partial gets excited

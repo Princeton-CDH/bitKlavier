@@ -31,35 +31,6 @@ SympPartial::SympPartial(int newHeldKey, int newPartialKey, float newGain, float
     playPosition = maxPlayPosition;
 }
 
-
-// copy constructor
-SympPartial& SympPartial::operator= (const SympPartial& other)
-{
-    heldKey     = other.heldKey;
-    partialKey  = other.partialKey;
-    gain        = other.gain;
-    offset      = other.offset;
-    
-    playPosition = other.playPosition;
-    
-    return *this;
-}
-
-// assignment operator
-SympPartial& SympPartial::operator= (SympPartial&& other) noexcept
-{
-    heldKey     = other.heldKey;
-    partialKey  = other.partialKey;
-    gain        = other.gain;
-    offset      = other.offset;
-    
-    playPosition = other.playPosition;
-    
-    return *this;
-}
- 
-
-
 ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcessor::Ptr rTuning, GeneralSettings::Ptr rGeneral, BKSynthesiser* rMain):
     resonance(rResonance),
     synth(rMain),
