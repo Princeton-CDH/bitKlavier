@@ -122,8 +122,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         if (tuningGap > 2.) tuningGap = 2.;
                         DBG("Resonance: tuningGap = " + String(tuningGap));
 
-                        // play it, and store the voice so it can be shut off as needed
-                        // use max velocity for all resonance; loudness/brightness is set by newPlayPosition
+                        // play it, use max velocity for all resonance; loudness/brightness is set by newPlayPosition
                         // adjust gain according to gap in tuning; 50 cent gap will result in 6dB cut in gain
                         //      might be better to adjust playback position due to gap, instead of adjusting the gain?
                         DBG("Resonance playNote: "   + String(noteNumber)
