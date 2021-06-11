@@ -160,7 +160,7 @@ void Piano::configure(void)
         addProcessor(thisType, thisId);
     }
 
-    bool testLinkedWithTuning = false;
+    //bool testLinkedWithTuning = false;
     
     for (auto item : items)
     {

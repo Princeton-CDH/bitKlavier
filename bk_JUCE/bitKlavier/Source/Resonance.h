@@ -37,72 +37,55 @@ public:
 
     //copy constructor
     ResonancePreparation(ResonancePreparation::Ptr r) :
-        name(r->name),
-        rDefaultGain(r->rDefaultGain),
-        rBlendronicGain(r->rBlendronicGain),
-        rOvertoneDistances(r->rOvertoneDistances),
-        rOvertoneGains(r->rOvertoneGains),
-        rStartTimeMS(r->rStartTimeMS),
-        rLengthMS(r->rLengthMS),
-        rExciteThreshold(r->rExciteThreshold),
-        rAttackThreshold(r->rAttackThreshold),
-        rAttack(r->rAttack),
-        rSustain(r->rSustain),
-        rDecay(r->rDecay),
-        rRelease(r->rRelease),
         rSoundSet(r->rSoundSet),
         rUseGlobalSoundSet(r->rUseGlobalSoundSet),
         rSoundSetName(r->rSoundSetName),
+        rAttack(r->rAttack),
+        rDecay(r->rDecay),
+        rRelease(r->rRelease),
+        rSustain(r->rSustain),
+        rDefaultGain(r->rDefaultGain),
+        rBlendronicGain(r->rBlendronicGain),
         rMinStartTimeMS(r->rMinStartTimeMS),
-        rMaxStartTimeMS(r->rMaxStartTimeMS)
+        rMaxStartTimeMS(r->rMaxStartTimeMS),
+        name(r->name)
     {
         
     }
 
     //constructor with input
-    ResonancePreparation(String newName, Array<int> distances, Array<float> gains, float defaultGain, float blendGain, int startTime, int length, float exciteThresh, float attackThresh) :
-        name(newName),
+    ResonancePreparation(String newName, float defaultGain, float blendGain) :
+        rSoundSet(-1),
+        rUseGlobalSoundSet(true),
+        rSoundSetName(String()),
+        rAttack(0),
+        rDecay(3),
+        rRelease(50),
+        rSustain(1.),
         rDefaultGain(defaultGain, true),
         rBlendronicGain(blendGain, true),
-        rOvertoneDistances(distances),
-        rOvertoneGains(gains),
-        rStartTimeMS(startTime),
-        rLengthMS(length),
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
-        rExciteThreshold(exciteThresh),
-        rAttackThreshold(attackThresh),
-        rAttack(0),
-        rSustain(1.),
-        rDecay(3),
-        rRelease(2000),
-        rUseGlobalSoundSet(true),
-        rSoundSet(-1),
-        rSoundSetName(String())
+        name(newName)
     {
 
     }
 
     //empty constructor, values will need to be tweaked
     ResonancePreparation(void) :
-        name("test resonance preparation"),
-        rOvertoneDistances(Array<int>({ 12, 19, 24, 28, 31, 34, 36, 38, 40, 42, 43, 44 })),
-        rOvertoneGains(Array<float>({ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 })),
+        rSoundSet(-1),
+        rUseGlobalSoundSet(true),
+        rSoundSetName(String()),
+        rAttack(0),
+        rDecay(3),
+        rRelease(50),
+        rSustain(1.),
         rDefaultGain(0.5, true),
         rBlendronicGain(0.0, true),
-        rStartTimeMS(2000),
-        rLengthMS(5000),
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
-        rExciteThreshold(0.5),
-        rAttackThreshold(0.5),
-        rAttack(0),
-        rSustain(1.),
-        rDecay(3),
-        rRelease(2000),
-        rUseGlobalSoundSet(true),
-        rSoundSet(-1),
-        rSoundSetName(String())
+        name("test resonance preparation")
+        
     {
 
     }
@@ -126,7 +109,7 @@ public:
         float r[100];
 
         for (int i = 0; i < 100; i++)  r[i] = (Random::getSystemRandom().nextFloat());
-        int idx = 0;
+        //int idx = 0;
 
         Array<float> fa;
         for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
@@ -146,23 +129,8 @@ public:
 
     //accessors
     inline const String getName() const noexcept { return name; }
-    inline const Array<int> getDistances() const noexcept { return rOvertoneDistances.value; }
-    inline const Array<float> getDistancesFloat() const noexcept
-    {
-        Array<float> distanceFloats;
-        for (int i : rOvertoneDistances.value)
-        {
-            distanceFloats.add(i);
-        }
-        return distanceFloats;
-    }
-    inline const Array<float> getGains() const noexcept { return rOvertoneGains.value; }
     inline const float getDefGain() const noexcept { return rDefaultGain.value; }
     inline const float getBlendGain() const noexcept { return rBlendronicGain.value; }
-    inline const int getStartTime() const noexcept { return rStartTimeMS.value; }
-    inline const int getLength() const noexcept { return rLengthMS.value; }
-    inline const float getExciteThresh() const noexcept { return rExciteThreshold.value; }
-    inline const float getAttackThresh() const noexcept { return rAttackThreshold.value; }
     inline const Array<float> getADSRvals() const noexcept
     {
         return
@@ -173,30 +141,13 @@ public:
         };
     }
     inline int getSoundSet() { return rUseGlobalSoundSet.value ? -1 : rSoundSet.value; }
-
-    //inline float* getOvertoneGainPtr(int overtoneIndex) { return &(rOvertoneGains.value[overtoneIndex]); }
     inline float* getDefaultGainPtr() { return &rDefaultGain.value; }
     inline float* getBlendGainPtr() { return &rBlendronicGain.value; }
 
     //mutators
     inline void setName(String n) { name = n; }
-    inline void setStartTime(int startToSet) { rStartTimeMS = startToSet; }
-    inline void setLength(int lengthToSet) { rLengthMS = lengthToSet; }
-    inline void setDistances(Array<int> distancesToSet) { rOvertoneDistances.set(distancesToSet); }
-    inline void setDistances(Array<float> distancesToSet)
-    {
-        rOvertoneDistances.value.clear();
-
-        for (float i : distancesToSet)
-        {
-            rOvertoneDistances.value.add(int(i));
-        }
-    }
-    inline void setGains(Array<float> gainsToSet) { rOvertoneGains.set(gainsToSet); }
     inline void setDefGain(float gainToSet) { rDefaultGain = gainToSet; }
     inline void setBlendGain(float gainToSet) { rBlendronicGain = gainToSet; }
-    inline void setExciteThresh(float threshToSet) { rExciteThreshold = threshToSet; }
-    inline void setAttackThresh(float threshToSet) { rAttackThreshold = threshToSet; }
     inline void setADSRvals(Array<float> vals)
     {
         rAttack = vals[0];
@@ -232,31 +183,6 @@ public:
         // TODO
     }
 
-
-    // ideally the next few instance variables should be moved to private
-    // overtone distances represented by distance in midi from fundamental
-    // will be user changeable/possibly different per note, but hardwired for now
-    // currently going up to 13th partial, not including fundamental in list, which will give us { 12, 19, 24, 28, 31, 34, 36, 38, 40, 42, 43, 44} as a default
-    Moddable<Array<int>> rOvertoneDistances;
-
-    // gains of overtones - probably all going to be hardwired to be the same initially but could vary later
-    Moddable<Array<float>> rOvertoneGains;
-
-    // start time in sample, in milliseconds, probably best to keep this unviersal for preparation?
-    Moddable<int> rStartTimeMS;
-
-    // length to play resonance note, in milliseconds, probably best to keep this unviersal for preparation?  Might change to match played note later
-    Moddable<int> rLengthMS;
-
-    //gain threshold - gain of strings has  to be below number to be excitable? for strings that are depressed
-    Moddable<float> rExciteThreshold;
-
-    //playing attack threshold - velocity (or gain?) of attacked string has to be above certain number for string to excite other strings
-    Moddable<float> rAttackThreshold;
-
-    //timer threshold to allow note to be excited?
-    //something with ADSRs? will hold off on this for now
-
     Moddable<int> rSoundSet;
     Moddable<bool> rUseGlobalSoundSet;
     Moddable<String> rSoundSetName;
@@ -266,11 +192,7 @@ public:
 
     Moddable<float> rDefaultGain; //shortcut until list of overtone gains is implemented
     Moddable<float> rBlendronicGain;
-    
-    //**********
-    // NEW DAN IMPLEMENTATION BELOW
-    // boundaries for start times for resonance sample playback
-    // velocity will be used to set start time between these bounds
+
     Moddable<int> rMinStartTimeMS;
     Moddable<int> rMaxStartTimeMS;
     
@@ -401,76 +323,6 @@ private:
 
 
 /*
-ResonantNoteStuff to track stuff for array of resonant notes
-It's modeled after Nostalgic (might not be as necessary because the timing should be simpler)
-But probably better to set this up in case it needs to be expanded on later than to make it arbitrarily simple
-*/
-
-class ResonanceNoteStuff : public ReferenceCountedObject
-{
-
-public:
-    typedef ReferenceCountedObjectPtr<ResonanceNoteStuff>   Ptr;
-    typedef Array<ResonanceNoteStuff::Ptr>                  PtrArr;
-    typedef Array<ResonanceNoteStuff::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<ResonanceNoteStuff>                  Arr;
-    typedef OwnedArray<ResonanceNoteStuff, CriticalSection> CSArr;
-
-    ResonanceNoteStuff(int noteNumber) : notenumber(noteNumber)
-    {
-        resetTimer();
-    }
-
-    ~ResonanceNoteStuff() {}
-
-    void setNoteNumber(int newnote) { notenumber = newnote; }
-    inline const int getNoteNumber() const noexcept { return notenumber; }
-
-    void setPrepAtKeyOn(ResonancePreparation::Ptr rprep) { prepAtKeyOn = rprep; }
-    ResonancePreparation::Ptr getPrepAtKeyOn() { return prepAtKeyOn; }
-
-    void setTuningAtKeyOn(float t) { tuningAtKeyOn = t; }
-    inline const float getTuningAtKeyOn() const noexcept { return tuningAtKeyOn; }
-
-    void setVelocityAtKeyOn(float v) { velocityAtKeyOn = v; }
-    inline const float getVelocityAtKeyOn() const noexcept { return velocityAtKeyOn; }
-
-    void incrementTimer(uint64 numsamples) { timer += numsamples; }
-
-    void resetTimer() { timer = 0; }
-
-    void setStartPosition(uint64 sp) { startPosition = sp; }
-    inline const uint64 getStartPosition() const noexcept { return startPosition; }
-
-    void setTargetLength(uint64 tl) { targetLength = tl; }
-    inline const uint64 getTargetLength() const noexcept { return targetLength; }
-
-    bool timerExceedsTarget() { if (timer > targetLength) return true; else return false; }
-
-    inline const uint64 getPlayPosition() { return (startPosition + timer); }
-
-    bool isActive() { if (startPosition < timer) return false; else return true; }
-
-private:
-
-    int notenumber;
-    ResonancePreparation::Ptr prepAtKeyOn;
-    float tuningAtKeyOn;
-    float velocityAtKeyOn;
-
-    uint64 timer;
-
-    uint64 startPosition;
-    uint64 position;
-    uint64 targetLength;
-
-    JUCE_LEAK_DETECTOR(ResonanceNoteStuff);
-
-};
-
-
-
-/*
  SympPartial stores information about an individual partial of an undamped string
 */
 class SympPartial : public ReferenceCountedObject
@@ -575,34 +427,13 @@ public:
 
 private:
     CriticalSection lock;
-
-    void playNote(int channel, int note, float velocity);
-
+    
     Resonance::Ptr              resonance;
     BKSynthesiser*              synth;
     TuningProcessor::Ptr        tuning;
     GeneralSettings::Ptr        general;
     Keymap::PtrArr              keymaps;
     BlendronicProcessor::PtrArr blendronic;
-
-    OwnedArray<ResonanceNoteStuff> resonantNotes;
-    Array<uint64> noteLengthTimers;     // store current length of played notes here
-    Array<float> velocities;    //record of velocities, probably not relevant
-
-    Array<int> keysDepressed;   //current keys that are depressed
-    Array<int> keysExcited; //current keys that are excited
-
-    Array<int> keysReleasedExcited; // current keys that are excited due to being released with a lower fundamental down
-
-    //not sure about this, this will track duplicate instances of a key being resonated for the sake of not accidentally removing the wrong thing with multiple shared partials
-    //a better way to represent this could just be to represent keysExcited as an 88 int array of 0s, then increment/decrement when a resonant note would be added/decreased
-    //depends on whether it's more efficient to have two short lists with a few more checks or one long list with possibly more iterating checks????
-    Array<int> keysExcitedDupes; 
-
-    void incrementTimers(int numsamples);
-    
-    //**********
-    // NEW DAN IMPLEMENTATION BELOW
     
     // basic API
     void ringSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates); 

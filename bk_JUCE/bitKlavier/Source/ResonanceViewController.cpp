@@ -211,12 +211,12 @@ void ResonancePreparationEditor::update()
     {
         selectCB.setSelectedId(processor.updateState->currentResonanceId, dontSendNotification);
 
-        overtonesSlider->setValue(prep->getDistancesFloat(), dontSendNotification);
+        //overtonesSlider->setValue(prep->getDistancesFloat(), dontSendNotification);
         defGainSlider->setValue(prep->getDefGain(), dontSendNotification);
-        startTimeSlider->setValue(prep->getStartTime(), dontSendNotification);
-        lengthSlider->setValue(prep->getLength(), dontSendNotification);
-        exciteThreshSlider->setValue(prep->getExciteThresh(), dontSendNotification);
-        attackThreshSlider->setValue(prep->getAttackThresh(), dontSendNotification);
+        //startTimeSlider->setValue(prep->getStartTime(), dontSendNotification);
+        //lengthSlider->setValue(prep->getLength(), dontSendNotification);
+        //exciteThreshSlider->setValue(prep->getExciteThresh(), dontSendNotification);
+        //attackThreshSlider->setValue(prep->getAttackThresh(), dontSendNotification);
 
         Array<float> ADSRarray = prep->getADSRvals();
         ADSRSlider->setAttackValue(ADSRarray[0], dontSendNotification);
@@ -334,22 +334,22 @@ void ResonancePreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
     else if (name == "start time (ms)")
     {
         DBG("set start time to " + String(val));
-        prep->setStartTime(val);
+        //prep->setStartTime(val);
     }
     else if (name == "note length (ms)")
     {
         DBG("set length to " + String(val));
-        prep->setLength(val);
+        //prep->setLength(val);
     }
     else if (name == "excitement threshold (dB)")
     {
         DBG("set excitement threshold to " + String(val));
-        prep->setExciteThresh(val);
+        //prep->setExciteThresh(val);
     }
     else if (name == "attack threshold (dB)")
     {
         DBG("set attack threshold to " + String(val));
-        prep->setAttackThresh(val);
+        //prep->setAttackThresh(val);
     }
 
     processor.updateState->editsMade = true;
@@ -361,7 +361,7 @@ void ResonancePreparationEditor::BKStackedSliderValueChanged(String name, Array<
 
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
 
-    prep->setDistances(val);
+    //prep->setDistances(val);
 
     processor.updateState->editsMade = true;
 }

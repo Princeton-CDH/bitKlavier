@@ -62,20 +62,11 @@ SympPartial& SympPartial::operator= (SympPartial&& other) noexcept
 
 ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcessor::Ptr rTuning, GeneralSettings::Ptr rGeneral, BKSynthesiser* rMain):
     resonance(rResonance),
+    synth(rMain),
     tuning(rTuning),
     general(rGeneral),
-    synth(rMain),
     keymaps(Keymap::PtrArr())
 {
-    keysDepressed = Array<int>();
-    keysExcited = Array<int>();
-    keysExcitedDupes = Array<int>();
-
-    //**********
-    // NEW DAN IMPLEMENTATION BELOW
-    
-    // default partials
-    // integer interval from fundamental (corresponding to key distance), gain, offset from ET (cents)
     partialStructure.add({0,  1.0, 0});
     partialStructure.add({12, 0.8, 0});
     partialStructure.add({19, 0.7, 2});
@@ -313,16 +304,3 @@ void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
     }
 }
 
-void ResonanceProcessor::playNote(int channel, int note, float velocity)
-{
-    //TBD, might not be necessary?
-}
-
-void ResonanceProcessor::incrementTimers(int numsamples)
-{
-    for (int i = (resonantNotes.size() - 1); i >= 0; --i)
-    {
-        noteLengthTimers.set(keysExcited.getUnchecked(i),
-            noteLengthTimers.getUnchecked(keysExcited.getUnchecked(i)) + numsamples);
-    }
-}
