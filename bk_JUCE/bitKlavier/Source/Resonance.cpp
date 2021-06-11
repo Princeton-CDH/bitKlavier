@@ -56,6 +56,7 @@ ResonanceProcessor::~ResonanceProcessor()
 }
 
 // this will cause all the resonating strings that have overlapping partials with this new struck string to ring sympathetically
+// N*M^2, where N is number of notes held, M is number of partials in partial structure
 void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
 {
     // DBG("Resonance::ringSympStrings");
