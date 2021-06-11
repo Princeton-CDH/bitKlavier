@@ -185,9 +185,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                                 ADSRvals[2],
                                 ADSRvals[3],
                                 tuning,
-                                resonance->prep->getDefaultGainPtr(),
-                                resonance->prep->getBlendGainPtr(),
-                                blendronic);
+                                resonance->prep->getDefaultGainPtr());
                         }
                     }
                 }
