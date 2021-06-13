@@ -56,7 +56,7 @@ BKViewController(p, theGraph, 2)
     
     velocityMinMaxSlider = std::make_unique<BKRangeSlider>("velocity min/max", 0, 127, 0, 127, 1);
     velocityMinMaxSlider->setToolTipString("Sets Min and Max velocity (0-127) to trigger this Direct; Min can be greater than Max");
-    velocityMinMaxSlider->setJustifyRight(true);
+    velocityMinMaxSlider->setJustifyRight(false);
     addAndMakeVisible(*velocityMinMaxSlider, ALL);
     
     ADSRSlider = std::make_unique<BKADSRSlider>("ADSR");
