@@ -35,6 +35,8 @@ OwnedArray<HashMap<String, int>>& BKAudioProcessor::getSourcedNotesOn()
 
 int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsound, bool updateGlobalSet)
 {
+//    touchThread.stopThread(1000);
+
     didLoadMainPianoSamples = false;
     
     // Check if path isn't valid and load BKLoadLite if it is not
@@ -50,26 +52,7 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         }
     }
     
-    
-    if (type == BKLoadSoundfont)
-    {
-        loadingSampleType = type;
-        loadingSoundfont = path;
-        loadingInstrument = subsound;
-        
-        loadingSoundSet = path + ".subsound" + String(subsound);
-        
-        if (!loadedSoundSets.contains(loadingSoundSet))
-        {
-            loadingSoundSetId = loadedSoundSets.size();
-            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId), true);
-        }
-        else
-        {
-            didLoadMainPianoSamples = true;
-        }
-    }
-    else if (type < BKLoadSoundfont)
+    if (type < BKLoadSoundfont)
     {
         loadingSampleType = type;
         
@@ -80,7 +63,41 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
         if (!loadedSoundSets.contains(loadingSoundSet))
         {
             loadingSoundSetId = loadedSoundSets.size();
-            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId), true);
+            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId, isMemoryMappingEnabled()), true);
+        }
+        else
+        {
+            didLoadMainPianoSamples = true;
+        }
+    }
+    else if (type == BKLoadSoundfont)
+    {
+        loadingSampleType = type;
+        loadingSoundfont = path;
+        loadingInstrument = subsound;
+        
+        loadingSoundSet = path + ".subsound" + String(subsound);
+        
+        if (!loadedSoundSets.contains(loadingSoundSet))
+        {
+            loadingSoundSetId = loadedSoundSets.size();
+            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId, false), true);
+        }
+        else
+        {
+            didLoadMainPianoSamples = true;
+        }
+    }
+    else if (type == BKLoadCustom)
+    {
+        loadingSampleType = type;
+        loadingSoundfont = path;
+        loadingSoundSet = path;
+        
+        if (!loadedSoundSets.contains(loadingSoundSet))
+        {
+            loadingSoundSetId = loadedSoundSets.size();;
+            loader.addJob(new BKSampleLoader(*this, loadingSampleType, loadingSoundfont, loadingInstrument, loadingSoundSetId, isMemoryMappingEnabled()), true);
         }
         else
         {
@@ -171,6 +188,36 @@ void BKAudioProcessor::collectSoundfonts(void)
     
     collectSoundfontsFromFolder(bkSoundfonts);
     soundfontNames.sort(true);
+}
+
+void BKAudioProcessor::collectCustomSamples()
+{
+    customSampleSetNames.clear();
+    
+    // Get every folder in the search path
+    Array<File> directories = sampleSearchPath.findChildFiles(File::TypesOfFileToFind::findDirectories, true);
+    for (int i = 0; i < sampleSearchPath.getNumPaths(); ++i)
+    {
+        directories.add(sampleSearchPath[i]);
+    }
+    
+    for (auto dir : directories)
+    {
+        // Check if the folder contains any properly formatted wav files
+        for (auto iter : RangedDirectoryIterator (File (dir), false, "*.wav"))
+        {
+            String fileName = iter.getFile().getFileNameWithoutExtension();
+            
+            
+            std::regex reg("(\\b(harm)?[ABCDEFG]#*b*\\dv\\d+\\b)|(\\brel\\d+\\b)");
+            if (std::regex_search(fileName.toStdString(), reg))
+            {
+                customSampleSetNames.add(dir.getFullPathName());
+                break;
+            }
+        }
+    }
+
 }
 
 String BKAudioProcessor::firstGallery(void)

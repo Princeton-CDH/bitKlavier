@@ -49,8 +49,22 @@ public:
                          int rootMidiNote,
                          int transpose,
                          const BigInteger& midiVelocities,
-                         sfzero::Region::Ptr region = nullptr,
-                         bool isSF2 = true);
+                         int layerNumber,
+                         int numLayers,
+                         float dBFSBelow,
+                         sfzero::Region::Ptr region = nullptr);
+    
+    BKPianoSamplerSound (const String& name,
+                         MemoryMappedAudioFormatReader* reader,
+                         uint64 soundLength,
+                         double sourceSampleRate,
+                         const BigInteger& midiNotes,
+                         int rootMidiNote,
+                         int transpose,
+                         const BigInteger& midiVelocities,
+                         int layerNumber,
+                         int numLayers,
+                         float dBFSBelow);
 
     
     /** Destructor. */
@@ -66,6 +80,10 @@ public:
     
     AudioSampleBuffer* getAudioData() const noexcept { return data->getAudioSampleBuffer(); }
     
+    bool isMemoryMapped() const noexcept { return (reader != nullptr); }
+
+    MemoryMappedAudioFormatReader* getReader() const noexcept { return reader.get(); }
+    
     //==============================================================================
     bool appliesToNote (int midiNoteNumber) override;
     bool appliesToVelocity (int midiNoteVelocity) override;
@@ -80,6 +98,24 @@ public:
         sustain = s;
         release = r;
     }
+
+    // find the bounding velocities for this sound
+    int minVelocity (void) { return midiVelocities.findNextSetBit(0); }
+    int maxVelocity (void) { return midiVelocities.findNextClearBit(midiVelocities.findNextSetBit(0)); }
+    
+    int getMinVelocity() { return velocityMin; }
+    int getMaxVelocity() { return velocityMax; }
+    
+    float getDBFSLevel() { return dBFSLevel; } // dBFS; rename these accordingly?
+    float setDBFSLevel(float rms) { return dBFSLevel; }
+    
+    float getDBFSLevelBelow() { return dBFSBelow; }
+    void setDBFSLevelBelow(float rms) { dBFSBelow = rms; }
+    
+    float getDBFSDifference() { return dBFSLevel - dBFSBelow; }
+    
+    int getNumLayers() { return numLayers; }
+    int getLayerNumber() { return layerNumber; }
     
 private:
     //==============================================================================
@@ -88,6 +124,14 @@ private:
     String name;
     
     BKReferenceCountedBuffer::Ptr data;
+    std::unique_ptr<MemoryMappedAudioFormatReader> reader;
+    
+    float dBFSLevel; // dBFS value of this velocity layer
+    float dBFSBelow; // dBFS value of velocity layer below this layer
+    int layerNumber;
+    int numLayers;
+    int velocityMin;
+    int velocityMax;
     
     double sourceSampleRate;
     BigInteger midiNotes;
@@ -205,6 +249,8 @@ public:
     void setCurrentPlaybackSampleRate(const double newRate) override;
     
     BKNoteType getNoteType(void) { return bkType; };
+
+    double getSourceSamplePosition() { return sourceSamplePosition; }
     
 private:
     //==============================================================================

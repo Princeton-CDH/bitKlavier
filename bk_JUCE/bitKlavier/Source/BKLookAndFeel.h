@@ -40,7 +40,6 @@ public:
         setColour(ComboBox::outlineColourId, Colours::antiquewhite);
         setColour(ComboBox::arrowColourId, Colours::antiquewhite);
         
-
         setColour(PopupMenu::backgroundColourId, Colours::black);
         setColour(PopupMenu::textColourId, Colours::antiquewhite);
         
@@ -49,6 +48,7 @@ public:
         setColour(TextButton::textColourOnId, Colours::antiquewhite);
         setColour(TextEditor::backgroundColourId, Colours::black);
         setColour(TextEditor::textColourId, Colours::antiquewhite);
+        setColour(TextEditor::outlineColourId, Colours::antiquewhite);
         
         setColour(Label::textColourId, Colours::antiquewhite);
         
@@ -56,6 +56,8 @@ public:
         setColour(Slider::thumbColourId, Colours::lightgrey);
         setColour(Slider::backgroundColourId, Colours::black);
         setColour(Slider::textBoxOutlineColourId, Colours::transparentWhite);
+        
+        setColour(ToggleButton::textColourId, Colours::antiquewhite);
         
         toggleTextToRight = true;
     

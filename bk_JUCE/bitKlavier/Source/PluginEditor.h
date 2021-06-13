@@ -37,19 +37,19 @@ public:
     Value getTooltipsEnabled(void);
     bool setTooltipsEnabled(bool enabled);
 
-    /*
-	bool areKeystrokesEnabled(void);
-	Value getKeystrokesEnabled(void);
-	bool setKeystrokesEnabled(bool enabled);
-    */
-
 	bool areHotkeysEnabled(void);
 	Value getHotkeysEnabled(void);
 	bool setHotkeysEnabled(bool enabled);
     
+    bool isMemoryMappingEnabled(void);
+    Value getMemoryMappingEnabled(void);
+    bool setMemoryMappingEnabled(bool enabled);
+    
     void tooltipsChanged(void);
     
     void showBKSettingsDialog(Button* button);
+    
+    MainViewController& getMainViewController() { return mvc; }
     
 private:
     // This reference is provided as a quick way for your editor to
@@ -69,46 +69,52 @@ private:
     
     BKWindowLAF laf;
     
-    class PreferencesComponent : public Component
+    class PreferencesComponent : public Component,
+                                 public Button::Listener,
+                                 public TextEditor::Listener
     {
     public:
         PreferencesComponent (BKAudioProcessorEditor& editor)
         : owner (editor),
-        tooltipsLabel  ("Show tooltips", "Show tooltips"),
-		//keystrokesLabel("Enable keystrokes", "Enable keystrokes"),
+        searchPathLabel("Sample search paths:", "Sample search paths:"),
+        pathAddButton("Add search path"),
+        tooltipsLabel("Enable tooltips", "Enable tooltips"),
 		hotkeysLabel("Enable hotkeys", "Enable hotkeys"),
-        tooltipsButton (""),
-		//keystrokesButton(""),
-		hotkeysButton("")
+        memoryMappingLabel("Enable direct-from-disk sample playback", "Enable direct-from-disk sample playback")
         {
             setOpaque (true);
+            setWantsKeyboardFocus(true);
+            
+            searchPathLabel.setTooltip("Set paths in which to search for sample libraries. bitKlavier only look for .wav files with the naming format of \"C4v1\".");
+            searchPathLabel.setJustificationType(Justification::topLeft);
+            addAndMakeVisible(searchPathLabel);
+            
+            pathAddButton.setTooltip("Open the file browser to select folders to add to the search paths list");
+            pathAddButton.addListener(this);
+            addAndMakeVisible(pathAddButton);
+            
+            searchPathEditor.setTooltip("Set paths in which to search for sample libraries. bitKlavier only look for .wav files with the naming format of \"C4v1\".");
+            searchPathEditor.setMultiLine(true);
+            String text = owner.processor.sampleSearchPath.toString().replace(";", "; ");
+            searchPathEditor.setText(text, dontSendNotification);
+            searchPathEditor.addListener(this);
+            addAndMakeVisible(searchPathEditor);
             
             tooltipsButton.setClickingTogglesState (true);
             tooltipsButton.getToggleStateValue().referTo (owner.getTooltipsEnabled());
             tooltipsButton.onClick = [this] { owner.tooltipsChanged(); };
-            
             addAndMakeVisible (tooltipsButton);
             addAndMakeVisible (tooltipsLabel);
-            
-            tooltipsLabel.attachToComponent (&tooltipsButton, true);
-
-            /*
-			keystrokesButton.setClickingTogglesState(true);
-			keystrokesButton.getToggleStateValue().referTo(owner.getKeystrokesEnabled());
-
-			addAndMakeVisible(keystrokesButton);
-			addAndMakeVisible(keystrokesLabel);
-
-			keystrokesLabel.attachToComponent(&keystrokesButton, true);
-            */
 
 			hotkeysButton.setClickingTogglesState(true);
-			hotkeysButton.getToggleStateValue().referTo(owner.getHotkeysEnabled());
-
+            hotkeysButton.getToggleStateValue().referTo(owner.getHotkeysEnabled());
 			addAndMakeVisible(hotkeysButton);
 			addAndMakeVisible(hotkeysLabel);
-
-			hotkeysLabel.attachToComponent(&hotkeysButton, true);
+            
+            memoryMappingButton.setClickingTogglesState(true);
+            memoryMappingButton.getToggleStateValue().referTo(owner.getMemoryMappingEnabled());
+            addAndMakeVisible(memoryMappingButton);
+            addAndMakeVisible(memoryMappingLabel);
         }
         
         void paint (Graphics& g) override
@@ -120,24 +126,97 @@ private:
         {
             auto r = getLocalBounds();
             
-            r.removeFromTop(8);
-            r.removeFromLeft(r.getWidth() * 0.5);
-            r.removeFromRight(8);
-            tooltipsButton.setBounds (r.removeFromTop(24));
-			//keystrokesButton.setBounds(r.removeFromTop(24));
-			hotkeysButton.setBounds(r.removeFromTop(24));
+            r.reduce(12, 12);
+            Rectangle<int> slice = r.removeFromTop(24);
+            searchPathLabel.setBounds(slice.removeFromLeft(slice.getWidth()*0.6));
+            pathAddButton.setBounds(slice.withHeight(25));
+            searchPathEditor.setBounds(r.removeFromTop(72));
+            r.removeFromTop(24);
+            slice = r.removeFromTop(24);
+            hotkeysButton.setBounds(slice.removeFromLeft(24));
+            hotkeysButton.changeWidthToFitText();
+            hotkeysLabel.setBounds(slice);
+            slice = r.removeFromTop(24);
+            tooltipsButton.setBounds(slice.removeFromLeft(24));
+            tooltipsButton.changeWidthToFitText();
+            tooltipsLabel.setBounds(slice);
+            slice = r.removeFromTop(24);
+            memoryMappingButton.setBounds(slice.removeFromLeft(24));
+            memoryMappingButton.changeWidthToFitText();
+            memoryMappingLabel.setBounds(slice);
+        }
+        
+        void buttonClicked(Button* b) override
+        {
+            if (b == &pathAddButton)
+            {
+                fc = std::make_unique<FileChooser> ("Add folders...",
+                                                    File::getSpecialLocation (File::userHomeDirectory));
+                
+                fc->launchAsync (FileBrowserComponent::openMode |
+                                 FileBrowserComponent::canSelectDirectories |
+                                 FileBrowserComponent::canSelectMultipleItems,
+                                 [this] (const FileChooser& chooser)
+                                 {
+                    for (auto result : chooser.getResults())
+                    {
+                        owner.processor.sampleSearchPath.addIfNotAlreadyThere(result);
+                    }
+                    updateSearchPath();
+                });
+            }
+        }
+        
+        void textEditorReturnKeyPressed(TextEditor& e) override
+        {
+            if (&e == &searchPathEditor)
+            {
+                unfocusAllComponents();
+            }
+        }
+        
+        void textEditorEscapeKeyPressed(TextEditor& e) override
+        {
+            if (&e == &searchPathEditor)
+            {
+                unfocusAllComponents();
+            }
+        }
+        
+        void textEditorFocusLost(TextEditor& e) override
+        {
+            if (&e == &searchPathEditor)
+            {
+                owner.processor.sampleSearchPath = e.getText();
+                updateSearchPath();
+            }
+        }
+        
+        void updateSearchPath()
+        {
+            owner.processor.sampleSearchPath.removeRedundantPaths();
+            owner.processor.sampleSearchPath.removeNonExistentPaths();
+            String text = owner.processor.sampleSearchPath.toString().replace(";", "; ");
+            searchPathEditor.setText(text, dontSendNotification);
+            owner.processor.collectCustomSamples();
         }
         
     private:
         //==============================================================================
         BKAudioProcessorEditor& owner;
         
+        std::unique_ptr<FileChooser> fc;
+        
+        Label searchPathLabel;
+        TextButton pathAddButton;
+        TextEditor searchPathEditor;
+        
         Label tooltipsLabel;
-		//Label keystrokesLabel;
 		Label hotkeysLabel;
+        Label memoryMappingLabel;
         ToggleButton tooltipsButton;
-		//ToggleButton keystrokesButton;
 		ToggleButton hotkeysButton;
+        ToggleButton memoryMappingButton;
 
         // Other ideas for preferences
         // - Show keyboard contents when selected

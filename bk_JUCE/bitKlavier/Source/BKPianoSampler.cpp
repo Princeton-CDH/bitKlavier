@@ -21,10 +21,17 @@ BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
                                           const int rootMidiNote,
                                           const int transp,
                                           const BigInteger& velocities,
-                                          sfzero::Region::Ptr reg, bool isSF2)
+                                          int layerNumber,
+                                          int numLayers,
+                                          float dBFSBelow,
+                                          sfzero::Region::Ptr reg)
 :
 name (soundName),
 data(buffer),
+reader(nullptr),
+dBFSBelow(dBFSBelow),
+layerNumber(layerNumber),
+numLayers(numLayers),
 sourceSampleRate(sourceSampleRate),
 midiNotes (notes),
 midiVelocities(velocities),
@@ -70,6 +77,66 @@ transpose(transp)
         region_ = nullptr;
         isSoundfont = false;
     }
+
+    for (int i = 0; i < buffer->getAudioSampleBuffer()->getNumChannels(); ++i)
+    {
+        dBFSLevel = buffer->getAudioSampleBuffer()
+        ->getRMSLevel(i, 0, jmin(int(sourceSampleRate*0.4f), buffer->getAudioSampleBuffer()->getNumSamples()));
+    }
+    dBFSLevel *= 1.f/buffer->getAudioSampleBuffer()->getNumChannels();
+    dBFSLevel = Decibels::gainToDecibels(dBFSLevel);
+    
+    velocityMin = minVelocity();
+    velocityMax = maxVelocity();
+}
+
+BKPianoSamplerSound::BKPianoSamplerSound (const String& soundName,
+                                          MemoryMappedAudioFormatReader* reader,
+                                          uint64 soundLength,
+                                          double sourceSampleRate,
+                                          const BigInteger& notes,
+                                          int rootMidiNote,
+                                          int transp,
+                                          const BigInteger& velocities,
+                                          int layerNumber,
+                                          int numLayers,
+                                          float dBFSBelow) :
+name (soundName),
+data(nullptr),
+reader(reader),
+dBFSBelow(dBFSBelow),
+layerNumber(layerNumber),
+numLayers(numLayers),
+sourceSampleRate(sourceSampleRate),
+midiNotes (notes),
+midiVelocities(velocities),
+soundLength(soundLength),
+midiRootNote (rootMidiNote),
+transpose(transp),
+isSoundfont(false)
+{
+    rampOnSamples = roundToInt (aRampOnTimeSec* sourceSampleRate);
+    rampOffSamples = roundToInt (aRampOffTimeSec * sourceSampleRate);
+    region_ = nullptr;
+    
+    AudioBuffer<float> rmsBuffer (2, jmin(int(sourceSampleRate*0.4f),
+                                          int(reader->getMappedSection().getLength())));
+    float s[2];
+    for (int i = 0; i < rmsBuffer.getNumSamples(); ++i)
+    {
+        reader->getSample(i, s);
+        rmsBuffer.setSample(0, i, s[0]);
+        rmsBuffer.setSample(1, i, s[1]);
+    }
+    
+    dBFSLevel = rmsBuffer.getRMSLevel(0, 0, rmsBuffer.getNumSamples());
+    if (reader->numChannels > 1)
+        dBFSLevel = (dBFSLevel + rmsBuffer.getRMSLevel(1, 0, rmsBuffer.getNumSamples())) * 0.5f;
+    
+    dBFSLevel = Decibels::gainToDecibels(dBFSLevel);
+    
+    velocityMin = minVelocity();
+    velocityMax = maxVelocity();
 }
 
 BKPianoSamplerSound::~BKPianoSamplerSound()
@@ -250,6 +317,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
 {
     if (BKPianoSamplerSound* const sound = dynamic_cast<BKPianoSamplerSound*> (s))
     {
+        DBG("RMS: " + String(sound->getDBFSLevel()));
         //DBG("BKPianoSamplerVoice::startNote " + String(midi));
         
         
@@ -394,6 +462,44 @@ void BKPianoSamplerVoice::startNote (const int midi,
         dgain = dynamicGain;
         
         noteVelocity = velocity;
+        // DBG("noteVelocity = " + String(noteVelocity * 127.));
+        
+        // *** START new layer-based approach to velocity handling ** //
+        if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote && !sound->isSoundfont)
+            // this isn't working right for SoundFonts (layerNum and numLayers not being set correctly on load)
+        {
+
+            // dB range of layer
+            double dynRange = sound->getDBFSDifference();
+            
+            // for the first layer, create a reasonable dynamic range
+            if (sound->getLayerNumber() <= 1) dynRange = 30. / sound->getNumLayers(); // assume 30dB for total range of instrument
+            if (dynRange > 50.) dynRange = 30; // not sure we need this, or if 50 is a good threshold
+            
+            // extend range as needed
+            double extendRange = 4; // *** user sets this, to extend the dynamic range of the set
+            dynRange += extendRange / sound->getNumLayers(); // increase the dynamic range of layer by appropriate fraction
+            
+            // calculate base adjustment to loudness for this layer, as deteremined by velocity
+            double dBadjust = dynRange * (noteVelocity * 127. - sound->getMaxVelocity()) / (sound->getMaxVelocity() - sound->getMinVelocity());
+            
+            // offset each layer's loudness accordingly, if the range is extended
+            dBadjust += (sound->getLayerNumber() - sound->getNumLayers()) * extendRange / sound->getNumLayers();
+            
+            // convert to a gain multipler
+            noteVelocity = Decibels::decibelsToGain(dBadjust);
+            
+            
+            DBG("layerNumber = " + String(sound->getLayerNumber()));
+            DBG("numLayers = " + String(sound->getNumLayers()));
+            //DBG("min velocity = " + String(minVelocity));
+            //DBG("max velocity = " + String(maxVelocity));
+            DBG("dynRange = " + String(dynRange));
+            DBG("dB adjust = " + String(dBadjust));
+            DBG("new gain multiplier = " + String(noteVelocity));
+            
+        }
+        // *** END new layer-based approach to velocity handling ** //
         
         lengthTracker = 0.0;
         
@@ -928,10 +1034,22 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
                                        int startSample, int numSamples,
                                        const BKPianoSamplerSound* playingSound)
 {
-    const float* const inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
-    const float* const inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1
-                                ? playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
-                                : nullptr;
+    bool memoryMapped = playingSound->isMemoryMapped();
+    const float* inL;
+    const float* inR;
+    MemoryMappedAudioFormatReader* reader = nullptr;
+    if (!memoryMapped)
+    {
+        inL = playingSound->data->getAudioSampleBuffer()->getReadPointer (0);
+        inR = playingSound->data->getAudioSampleBuffer()->getNumChannels() > 1 ?    playingSound->data->getAudioSampleBuffer()->getReadPointer (1)
+        : nullptr;
+    }
+    else
+    {
+        reader = playingSound->getReader();
+        reader->touchSample(sourceSamplePosition);
+        reader->touchSample(reader->getMappedSection().clipValue(sourceSamplePosition+numSamples)-1);
+    }
     
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
@@ -992,9 +1110,36 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
         const float alpha = (float) (sourceSamplePosition - pos);
         const float invAlpha = 1.0f - alpha;
         int next = pos + 1;
+        
+        float lr[2], lrNext[2];
+        if (memoryMapped)
+        {
+            reader->getSample(pos, lr);
+            reader->getSample(next, lrNext);
+            if (reader->numChannels == 1)
+            {
+                lr[1] = lr[0];
+                lrNext[1] = lrNext[0];
+            }
+        }
+        else
+        {
+            lr[0] = inL[pos];
+            lrNext[0] = inL[next];
+            if (inR == nullptr)
+            {
+                lr[1] = lr[0];
+                lrNext[1] = lrNext[0];
+            }
+            else
+            {
+                lr[1] = inR[pos];
+                lrNext[1] = inR[next];
+            }
+        }
 
-        const float l = (inL [pos] * invAlpha + inL [next] * alpha) * noteVelocity * adsr.tick();
-        const float r = ((inR != nullptr) ? (inR [pos] * invAlpha + inR [next] * alpha) : l) * noteVelocity * adsr.lastOut();
+        const float l = (lr[0] * invAlpha + lrNext[0] * alpha) * noteVelocity * adsr.tick();
+        const float r = (lr[1] * invAlpha + lrNext[1] * alpha) * noteVelocity * adsr.lastOut();
         
         if (adsr.getState() == BKADSR::IDLE)
         {
