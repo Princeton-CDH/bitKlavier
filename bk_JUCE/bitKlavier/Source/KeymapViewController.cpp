@@ -332,6 +332,49 @@ BKViewController(p, theGraph, 3)
     sustainPedalKeysToggle.setTooltip("Toggle whether the keys of this Keymap should function as a sustain pedals");
     sustainPedalKeysToggle.addListener(this);
     addAndMakeVisible(&sustainPedalKeysToggle, ALL);
+    
+    //======================================================================================
+    // Velocity curving
+    
+    asym_kSlider = std::make_unique<BKSingleSlider>("Asymmetrical Warp",
+                                                    "Asymmetrical Warp", 0, 10, 1, 0.1);
+    asym_kSlider->setToolTipString("Adjust the assymmetrical warp of the velocity map");
+    asym_kSlider->addMyListener(this);
+    addAndMakeVisible(*asym_kSlider);
+    
+    sym_kSlider = std::make_unique<BKSingleSlider>("Symmetrical Warp",
+                                                   "Symmetrical Warp", 0, 5, 1, 0.1);
+    sym_kSlider->setToolTipString("Adjust the symmetrical warp of the velocity map");
+    sym_kSlider->addMyListener(this);
+    addAndMakeVisible(*sym_kSlider);
+    
+    scaleSlider = std::make_unique<BKSingleSlider>("Scale", "Scale", 0, 10, 1, 0.1);
+    scaleSlider->setToolTipString("Adjust the scale of the velocity map");
+    scaleSlider->addMyListener(this);
+    addAndMakeVisible(*scaleSlider);
+    
+    offsetSlider = std::make_unique<BKSingleSlider>("Offset", "Offset", -1, 1, 0, 0.01);
+    offsetSlider->setToolTipString("Adjust the offset of the velocity map");
+    offsetSlider->addMyListener(this);
+    addAndMakeVisible(*offsetSlider);
+    
+    velocityInvertToggle.setButtonText("Invert");
+    velocityInvertToggle.setToggleState(false, dontSendNotification);
+    velocityInvertToggle.setLookAndFeel(&buttonsAndMenusLAF);
+    velocityInvertToggle.setTooltip("Invert the velocity map");
+    velocityInvertToggle.addListener(this);
+    addAndMakeVisible(&velocityInvertToggle, ALL);
+    
+    addAndMakeVisible(velocityCurveGraph);
+    
+    velocityCurveGroup.setName("velocityCurveGroup");
+    velocityCurveGroup.setAlpha(gMedium);
+    velocityCurveGroup.setText("Velocity Curving");
+    velocityCurveGroup.setTextLabelPosition(Justification::centred);
+    addAndMakeVisible(velocityCurveGroup);
+    
+    //======================================================================================
+
 
     currentTab = 0;
     //displayTab(currentTab);
@@ -640,7 +683,68 @@ void KeymapViewController::displayTab(int tab)
 
         update();
     }
-    else if (tab == 2)
+    else if (tab == 2) {
+        //set the bounds of the area to work in
+        area.reduce(x0 + 10 * processor.paddingScalarX + 4,
+                    10 * processor.paddingScalarY + 4);
+        area.removeFromTop(gComponentComboBoxHeight + 10);
+        //area.removeFromBottom(140);
+        area.removeFromBottom(90 + 50 * processor.paddingScalarY);
+        
+        // Border
+        velocityCurveGroup.setBounds(area);
+        velocityCurveGroup.setVisible(true);
+        
+        // Padding between border and components
+        area.removeFromTop(40);
+        area.removeFromBottom(20);
+        area.reduce(20, 0);
+        
+        // Position sliders on left and graph on right
+        Rectangle<int> paramWrapper = area.removeFromLeft(area.getWidth() / 2);
+        Rectangle<int> graphWrapper = area;
+        
+        // Position parameters within evenly spaced wrappers
+        //int spacing = 50;
+        int spacing = area.getHeight() / 5;
+        
+        Rectangle<int> asym_kSliderWrapper(paramWrapper.getX(), paramWrapper.getY(),
+                                           paramWrapper.getWidth(), spacing);
+        asym_kSlider->setBounds(asym_kSliderWrapper);
+        asym_kSlider->setVisible(true);
+        
+        Rectangle<int> sym_kSliderWrapper(paramWrapper.getX(),
+                                          paramWrapper.getY() + spacing,
+                                          paramWrapper.getWidth(), spacing);
+        sym_kSlider->setBounds(sym_kSliderWrapper);
+        sym_kSlider->setVisible(true);
+        
+        Rectangle<int> scaleSliderWrapper(paramWrapper.getX(),
+                                          paramWrapper.getY() + 2 * spacing,
+                                          paramWrapper.getWidth(), spacing);
+        scaleSlider->setBounds(scaleSliderWrapper);
+        scaleSlider->setVisible(true);
+        
+        Rectangle<int> offsetSliderWrapper(paramWrapper.getX(),
+                                           paramWrapper.getY() + 3 * spacing,
+                                           paramWrapper.getWidth(), spacing);
+        offsetSlider->setBounds(offsetSliderWrapper);
+        offsetSlider->setVisible(true);
+        
+        Rectangle<int> velocityInvertWrapper(paramWrapper.getX(),
+                                             paramWrapper.getY() + 4 * spacing,
+                                             paramWrapper.getWidth(), spacing);
+        velocityInvertWrapper.removeFromLeft(paramWrapper.getWidth() / 2 - 40);
+        velocityInvertToggle.setBounds(velocityInvertWrapper);
+        velocityInvertToggle.setVisible(true);
+        
+        // Graph
+        graphWrapper.removeFromLeft(30);
+        velocityCurveGraph.setBounds(graphWrapper);
+        velocityCurveGraph.setVisible(true);
+    }
+    
+    else if (tab == 3)
     {
         area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         area.removeFromTop(gComponentComboBoxHeight);
@@ -779,7 +883,6 @@ void KeymapViewController::invisible()
     harArrayKeyboard->setVisible(false);
     harArrayKeyboardValsTextFieldOpen.setVisible(false);
 
-
     //enableHarmonizerToggle.setVisible(false);
 
     midiInputSelectButton.setVisible(false);
@@ -808,6 +911,15 @@ void KeymapViewController::invisible()
 
     harPreTranspositionSlider->setVisible(false);
     harPostTranspositionSlider->setVisible(false);
+    
+    // Velocity Curving
+    asym_kSlider->setVisible(false);
+    sym_kSlider->setVisible(false);
+    scaleSlider->setVisible(false);
+    offsetSlider->setVisible(false);
+    velocityInvertToggle.setVisible(false);
+    velocityCurveGraph.setVisible(false);
+    velocityCurveGroup.setVisible(false);
 }
 
 int KeymapViewController::addKeymap(void)
@@ -1333,6 +1445,13 @@ void KeymapViewController::bkButtonClicked (Button* b)
         keymap->setSustainPedalKeys(sustainPedalKeysToggle.getToggleState());
         processor.updateState->editsMade = true;
     }
+    else if (b == &velocityInvertToggle) {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setVelocityInvert(velocityInvertToggle.getToggleState());
+        velocityCurveGraph.invertVelocities();
+        processor.updateState->editsMade = true;
+        DBG("velocity inverted");
+    }
     else if (b == &rightArrow)
     {
         arrowPressed(RightArrow);
@@ -1504,6 +1623,11 @@ void KeymapViewController::update(void)
         keyboard->setKeysInKeymap(km->keys());
         harKeyboard->setKeysInKeymap(Array<int>(km->getHarKey()));
         harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey(true, false));
+        //asym_kSlider->setValue(km->getAsym_k(), dontSendNotification);
+        //sym_kSlider->setValue(km->getSym_k(), dontSendNotification);
+        //scaleSlider->setValue(km->getScale(), dontSendNotification);
+        //offsetSlider->setValue(km->getOffset(), dontSendNotification);
+        //velocityInvertToggle.setToggleState(km->getVelocityInvert(), dontSendNotification);
         
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -1612,6 +1736,41 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
         
         update();
     }
+    
+    // Velocity Sliders
+    else if (slider == asym_kSlider.get()) {
+        float newAsym_k = asym_kSlider->getValue();
+        Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        km->setAsym_k(newAsym_k);
+        velocityCurveGraph.setAsym_k(newAsym_k);
+        DBG("Asym_k = " + String(newAsym_k));
+    }
+    
+    else if (slider == sym_kSlider.get()) {
+        float newSym_k = sym_kSlider->getValue();
+        Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        km->setSym_k(newSym_k);
+        velocityCurveGraph.setSym_k(newSym_k);
+        DBG("Sym_k = " + String(newSym_k));
+    }
+    
+    else if (slider == scaleSlider.get()) {
+        float newScale = scaleSlider->getValue();
+        Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        km->setScale(newScale);
+        velocityCurveGraph.setScale(newScale);
+        DBG("Scale = " + String(newScale));
+    }
+    
+    else if (slider == offsetSlider.get()) {
+        float newOffset = offsetSlider->getValue();
+        Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        km->setOffset(newOffset);
+        velocityCurveGraph.setOffset(newOffset);
+        DBG("Offset = " + String(newOffset));
+        
+    }
+
 
     processor.updateState->editsMade = true;
 }

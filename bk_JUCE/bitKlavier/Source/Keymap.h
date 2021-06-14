@@ -581,6 +581,19 @@ public:
     inline void setSustainPedalKeys(bool toSet) { sustainPedalKeys = toSet; }
     inline void toggleSustainPedalKeys() { sustainPedalKeys = !sustainPedalKeys; }
     
+    // Velocity Curving getters & setters
+    inline float getAsym_k() { return asym_k; }
+    inline float getSym_k() { return sym_k; }
+    inline float getScale() { return scale; }
+    inline float getOffset() { return offset; }
+    inline bool getVelocityInvert() { return velocityInvert; }
+    
+    inline void setAsym_k(float newAsym_k) { asym_k = newAsym_k; }
+    inline void setSym_k(float newSym_k) { sym_k = newSym_k; }
+    inline void setScale(float newScale) { scale = newScale; }
+    inline void setOffset(float newOffset) { offset = newOffset; }
+    inline void setVelocityInvert(bool newVelocityInvert) { velocityInvert = newVelocityInvert; }
+    
 private:
     BKAudioProcessor& processor;
     int Id;
@@ -611,6 +624,14 @@ private:
     int harKey;
     int harPreTranspose;
     int harPostTranspose;
+    
+    // Velocity Curving Params
+    // Do these need to be default set like this?
+    float asym_k = 1.0;
+    float sym_k = 1.0;
+    float scale = 1.0;
+    float offset = 0.0;
+    bool velocityInvert = false;
 
     bool ignoreSustain;
     

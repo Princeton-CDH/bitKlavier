@@ -463,6 +463,8 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
+        <FILE id="udvcxb" name="VelocityCurveGraph.h" compile="0" resource="0"
+              file="Source/VelocityCurveGraph.h"/>
         <FILE id="sM6zCj" name="BKUIComponents.h" compile="0" resource="0"
               file="Source/BKUIComponents.h"/>
         <GROUP id="{AE933235-955C-4B29-B82E-A67897458CE4}" name="BlendronicDisplay">
