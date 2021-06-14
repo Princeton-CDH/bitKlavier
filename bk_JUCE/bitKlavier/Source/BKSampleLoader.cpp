@@ -19,7 +19,7 @@ String notes[4] = {"A","C","D#","F#"};
 
 #define EXIT_CHECK if (shouldExit()) \
 { \
-processor.updateState->pianoSamplesAreLoading = false; \
+if (processor.loader.getNumJobs() == 1) processor.updateState->pianoSamplesAreLoading = false; \
 /*if (processor.loader.getNumJobs() == 1) processor.touchThread.startThread();*/ \
 return jobStatus; \
 }
@@ -119,7 +119,7 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
     }
     
     processor.progress -= 1.0f;
-    processor.updateState->pianoSamplesAreLoading = false;
+    if (processor.loader.getNumJobs() == 1) processor.updateState->pianoSamplesAreLoading = false;
     jobStatus = jobHasFinished;
     
 //    if (processor.loader.getNumJobs() == 1) processor.touchThread.startThread();
