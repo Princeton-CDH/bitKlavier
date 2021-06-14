@@ -1161,6 +1161,23 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, in
             targetStates.fill(TargetStateNil); }
     }
     
+    for (auto proc : rprocessor) // not sure this is necessary for Resonance?
+    {
+        bool ignoreSustain = false;
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            {
+                if (km->getIgnoreSustain()) ignoreSustain = true;
+            }
+        }
+        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain))
+        {
+            proc->keyReleased(noteNumber, velocity, channel, targetStates, true);
+        }
+        //proc->keyReleased(noteNumber, velocity, channel);
+    }
+    
     for (auto proc : mprocessor)
     {
         proc->keyReleased(noteNumber, velocity);
