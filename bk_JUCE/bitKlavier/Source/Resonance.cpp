@@ -210,8 +210,7 @@ void ResonanceProcessor::addSympStrings(int noteNumber)
         sympStrings.getReference(noteNumber).add(new SympPartial(noteNumber, partialKey, partialStructure[i][1], partialStructure[i][2]));
     }
 
-    int numParts = sympStrings[noteNumber].size();
-    DBG("Resonance: number of partials = " + String(numParts));
+    DBG("Resonance: number of partials = " + String(sympStrings[noteNumber].size()));
 }
 
 // this will turn off all the resonances associated with this string/key, and then remove those from the currently available sympathetic strings

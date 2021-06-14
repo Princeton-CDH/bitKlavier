@@ -429,7 +429,8 @@ void PreparationMap::deactivateIfNecessary()
     dprocessor.size() == 0 &&
     tprocessor.size() == 0 &&
     mprocessor.size() == 0 &&
-    bprocessor.size() == 0)
+    bprocessor.size() == 0 &&
+    rprocessor.size() == 0)
     {
         isActive = false;
     }
@@ -1053,6 +1054,22 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                 if (!keyIsDepressed && !allIgnoreSustain)
                     proc->keyReleased(noteNumber, velocity, channel, targetStates);
                 targetStates.fill(TargetStateNil); }
+        }
+        
+        for (auto proc : rprocessor)
+        {
+            bool allIgnoreSustain = true;
+            for (auto km : proc->getKeymaps())
+            {
+                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+                {
+                    if (!km->getIgnoreSustain()) allIgnoreSustain = false;
+                }
+            }
+            //local flag for keymap that isn't ignoring sustain
+            if (!keyIsDepressed && !allIgnoreSustain)
+                //don't turn off note if key is down!
+                proc->keyReleased(noteNumber, velocity, channel, targetStates);
         }
     }
     
