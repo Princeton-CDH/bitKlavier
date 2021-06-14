@@ -538,6 +538,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
      the Heavy set and other new bK sample libraries).
     */
     
+    // Graph the parameter values from the keymap
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     float asym_k = km->getAsym_k();
     float sym_k = km->getSym_k();

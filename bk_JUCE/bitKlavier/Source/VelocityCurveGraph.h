@@ -15,7 +15,11 @@
 
 //==============================================================================
 /*
+ This class merely implements the graph component of the velocity curving UI.
+ Whenever a parameter changes, KeymapViewController updates the parameters here and
+ then draws the appropriate graph.
 */
+
 class VelocityCurveGraph  : public juce::Component
 {
 public:
@@ -76,7 +80,6 @@ public:
         // plotter
         g.setColour(juce::Colours::red);
         juce::Path plot;
-        //plot.startNewSubPath(leftPadding, graphHeight);
         
         // go pixel by pixel, adding each point to plot
         for (int i = 0; i <= graphWidth; i++) {
@@ -91,9 +94,10 @@ public:
                 toAdd.setY(graphHeight - toAdd.getY());
             }
             
+            // the first point starts the subpath, whereas all subsequent points are merely
+            // added to the subpath.
             if (i == 0) plot.startNewSubPath(toAdd);
             else plot.lineTo(toAdd);
-            //DBG("graphed " + toAdd.toString());
         }
         
         g.strokePath(plot, PathStrokeType(2.0));
@@ -101,10 +105,8 @@ public:
 
     void resized() override
     {
-        // This method is where you should set the bounds of any child
-        // components that your component contains..
+        // the graph should be re-drawn when the window resizes
         repaint();
-
     }
     
     
@@ -131,6 +133,9 @@ public:
     }
 
 private:
+    
+    // Various Parameters
+    // Do these need to be initialized like this?
     float asym_k = 1;
     float sym_k = 1;
     float scale = 1;

@@ -142,6 +142,8 @@ private:
     
     VelocityCurveGraph velocityCurveGraph;
     
+    // This is just for the border
+    /* Not sure that it's necessary to have a border around this bit of UI, but these parameters are a bit obscure without something to clarify what they are actually changing. */
     GroupComponent velocityCurveGroup;
     
     //======================================================================================

@@ -335,6 +335,7 @@ BKViewController(p, theGraph, 3)
     
     //======================================================================================
     // Velocity curving
+    // this is merely setup code to initialize the various UI elements (sliders, button, etc.)
     
     asym_kSlider = std::make_unique<BKSingleSlider>("Asymmetrical Warp",
                                                     "Asymmetrical Warp", 0, 10, 1, 0.1);
@@ -683,12 +684,19 @@ void KeymapViewController::displayTab(int tab)
 
         update();
     }
+    
+    
+    
+    
+    // Velocity Curving UI
+    // This does the heavy lifting with regards to the UI. All the UI elements that are merely initialized in the constructor are not actually positioned in the window until they must be displayed here.
+    // Note that it's necessary to make each element of the UI visible via the setVisible() method here. At the beginning of this function, all elements are turned invisible with invisible(). Only the appropriate elements to be displayed on a particular tab should be made visible.
+    // Please note that many of the pixel values here are essentially random. I selected pixel values that I thought looked good, but there is no need to stick with these values in the future.
     else if (tab == 2) {
         //set the bounds of the area to work in
         area.reduce(x0 + 10 * processor.paddingScalarX + 4,
                     10 * processor.paddingScalarY + 4);
         area.removeFromTop(gComponentComboBoxHeight + 10);
-        //area.removeFromBottom(140);
         area.removeFromBottom(90 + 50 * processor.paddingScalarY);
         
         // Border
@@ -705,7 +713,7 @@ void KeymapViewController::displayTab(int tab)
         Rectangle<int> graphWrapper = area;
         
         // Position parameters within evenly spaced wrappers
-        //int spacing = 50;
+        // 5 is an essentially random choice, but doing this helps make the layout at least slightly responsive.
         int spacing = area.getHeight() / 5;
         
         Rectangle<int> asym_kSliderWrapper(paramWrapper.getX(), paramWrapper.getY(),
