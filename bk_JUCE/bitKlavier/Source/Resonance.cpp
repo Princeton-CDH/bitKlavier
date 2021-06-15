@@ -46,6 +46,8 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcesso
     partialStructure.add({31, 0.7, 2});
     partialStructure.add({34, 0.5, -31.175});
     partialStructure.add({36, 0.8, 0});
+    
+    maxSympStrings = 4; // by default, user should be able to set.
 
     DBG("Create rProc");
 }
@@ -195,8 +197,16 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
 }
 
 // this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
-void ResonanceProcessor::addSympStrings(int noteNumber)
+void ResonanceProcessor::addSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
 {
+    if(sympStrings.size() > maxSympStrings)
+    {
+        DBG("Resonance: removing oldest sympathetic string");
+        int oldestString = activeSympStrings.getLast();
+        removeSympStrings(oldestString, velocity, midiChannel, targetStates, false);
+        activeSympStrings.removeLast();
+    }
+    
     DBG("Resonance: addingSympatheticString " + String(noteNumber));
     for (int i = 0; i < partialStructure.size(); i++)
     {
@@ -208,6 +218,9 @@ void ResonanceProcessor::addSympStrings(int noteNumber)
         // make a newPartial object, with gain and offset vals
         DBG("Resonance: adding partial " + String(partialKey) + " to " + String(noteNumber));
         sympStrings.getReference(noteNumber).add(new SympPartial(noteNumber, partialKey, partialStructure[i][1], partialStructure[i][2]));
+        
+        // add to list of currently active strings, for voice management
+        activeSympStrings.insert(0, noteNumber);
     }
 
     DBG("Resonance: number of partials = " + String(sympStrings[noteNumber].size()));
@@ -247,7 +260,7 @@ void ResonanceProcessor::keyPressed(int noteNumber, float velocity, int midiChan
     ringSympStrings(noteNumber, velocity, midiChannel, targetStates);
 
     // then, add this new string and its partials to the currently available sympathetic strings
-    addSympStrings(noteNumber);
+    addSympStrings(noteNumber, velocity, midiChannel, targetStates);
 }
 
 void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)

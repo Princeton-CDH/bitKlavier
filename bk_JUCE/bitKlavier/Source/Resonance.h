@@ -428,7 +428,7 @@ private:
     
     // basic API
     void ringSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates); 
-    void addSympStrings(int noteNum);
+    void addSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates);
     void removeSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post);
 
     // => sympStrings
@@ -446,6 +446,14 @@ private:
     //      user needs to be able to set these
     //Array<float[3]> partialStructure;
     Array<Array<float>> partialStructure;
+    
+    // => current strings
+    // A queue to store the currently active notes in sympStrings
+    // so we can remove the oldest one when we exceed maxSympStrings
+    Array<int> activeSympStrings;
+    
+    // => cap the number of sympStrings to this
+    int maxSympStrings;
 
     JUCE_LEAK_DETECTOR(ResonanceProcessor);
 };
