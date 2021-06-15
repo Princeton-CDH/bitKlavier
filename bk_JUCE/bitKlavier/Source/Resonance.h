@@ -208,6 +208,7 @@ public:
     
     inline void setMinStartTime(int inval) { rMinStartTimeMS = inval; }
     inline void setMaxStartTime(int inval) { rMaxStartTimeMS = inval; }
+    inline void setMaxSympStrings(int inval) { rMaxSympStrings = inval; }
 
 private:
 
