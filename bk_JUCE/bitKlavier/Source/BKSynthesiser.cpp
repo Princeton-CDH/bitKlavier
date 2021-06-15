@@ -538,8 +538,9 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
      the Heavy set and other new bK sample libraries).
     */
     
-    // Graph the parameter values from the keymap
+    // Grab the parameter values from the keymap
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    float rangeExtend = km->getRangeExtend();
     float asym_k = km->getAsym_k();
     float sym_k = km->getSym_k();
     float scale = km->getScale();
@@ -566,6 +567,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
     // something will break down the line if not capped - note from jeff
     
+    DBG("rangeExtend = " + String(rangeExtend));
     DBG("asym_k = " + String(asym_k));
     DBG("sym_k = " + String(sym_k));
     DBG("scale = " + String(scale));

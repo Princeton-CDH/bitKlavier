@@ -339,11 +339,19 @@ BKViewController(p, theGraph, 3)
     
     // The default values for these parameters are initialized in Keymap. Grab them now to avoid setting defaults in multiple places.
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    float rangeExtendDefualt = km->getRangeExtend();
     float asym_kDefault = km->getAsym_k();
     float sym_kDefault = km->getSym_k();
     float scaleDefault = km->getScale();
     float offsetDefault = km->getOffset();
     float velocityInvertDefault = km->getVelocityInvert();
+    
+    rangeExtendSlider = std::make_unique<BKSingleSlider>("Extend Range (dB)",
+                                                         "Extend Range",
+                                                         0, 20, rangeExtendDefualt, 0.1);
+    rangeExtendSlider->setToolTipString("Extend the range of possible dynamics for the sample set to cover");
+    rangeExtendSlider->addMyListener(this);
+    addAndMakeVisible(*rangeExtendSlider);
     
     asym_kSlider = std::make_unique<BKSingleSlider>("Asymmetrical Warp",
                                                     "Asymmetrical Warp", 0, 10,
@@ -730,34 +738,40 @@ void KeymapViewController::displayTab(int tab)
         Rectangle<int> graphWrapper = area;
         
         // Position parameters within evenly spaced wrappers
-        // 5 is an essentially random choice, but doing this helps make the layout at least slightly responsive.
-        int spacing = area.getHeight() / 5;
+        // 6 is an essentially random choice, but doing this helps make the layout at least slightly responsive.
+        int spacing = area.getHeight() / 6;
         
-        Rectangle<int> asym_kSliderWrapper(paramWrapper.getX(), paramWrapper.getY(),
+        Rectangle<int> rangeExtendSliderWrapper(paramWrapper.getX(), paramWrapper.getY(),
+                                                paramWrapper.getWidth(), spacing);
+        rangeExtendSlider->setBounds(rangeExtendSliderWrapper);
+        rangeExtendSlider->setVisible(true);
+        
+        Rectangle<int> asym_kSliderWrapper(paramWrapper.getX(),
+                                           paramWrapper.getY() + spacing,
                                            paramWrapper.getWidth(), spacing);
         asym_kSlider->setBounds(asym_kSliderWrapper);
         asym_kSlider->setVisible(true);
         
         Rectangle<int> sym_kSliderWrapper(paramWrapper.getX(),
-                                          paramWrapper.getY() + spacing,
+                                          paramWrapper.getY() + 2 * spacing,
                                           paramWrapper.getWidth(), spacing);
         sym_kSlider->setBounds(sym_kSliderWrapper);
         sym_kSlider->setVisible(true);
         
         Rectangle<int> scaleSliderWrapper(paramWrapper.getX(),
-                                          paramWrapper.getY() + 2 * spacing,
+                                          paramWrapper.getY() + 3 * spacing,
                                           paramWrapper.getWidth(), spacing);
         scaleSlider->setBounds(scaleSliderWrapper);
         scaleSlider->setVisible(true);
         
         Rectangle<int> offsetSliderWrapper(paramWrapper.getX(),
-                                           paramWrapper.getY() + 3 * spacing,
+                                           paramWrapper.getY() + 4 * spacing,
                                            paramWrapper.getWidth(), spacing);
         offsetSlider->setBounds(offsetSliderWrapper);
         offsetSlider->setVisible(true);
         
         Rectangle<int> velocityInvertWrapper(paramWrapper.getX(),
-                                             paramWrapper.getY() + 4 * spacing,
+                                             paramWrapper.getY() + 5 * spacing,
                                              paramWrapper.getWidth(), spacing);
         velocityInvertWrapper.removeFromLeft(paramWrapper.getWidth() / 2 - 40);
         velocityInvertToggle.setBounds(velocityInvertWrapper);
@@ -938,6 +952,7 @@ void KeymapViewController::invisible()
     harPostTranspositionSlider->setVisible(false);
     
     // Velocity Curving
+    rangeExtendSlider->setVisible(false);
     asym_kSlider->setVisible(false);
     sym_kSlider->setVisible(false);
     scaleSlider->setVisible(false);
@@ -1766,6 +1781,12 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
     
     // Velocity Sliders
     // Note that graph must be redrawn whenever a parameter changes.
+    else if (slider == rangeExtendSlider.get()) {
+        float newRangeExtend = rangeExtendSlider->getValue();
+        Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        km->setRangeExtend(newRangeExtend);
+    }
+    
     else if (slider == asym_kSlider.get()) {
         float newAsym_k = asym_kSlider->getValue();
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);

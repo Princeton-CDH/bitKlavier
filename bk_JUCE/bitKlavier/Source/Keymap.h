@@ -582,12 +582,14 @@ public:
     inline void toggleSustainPedalKeys() { sustainPedalKeys = !sustainPedalKeys; }
     
     // Velocity Curving getters & setters
+    inline float getRangeExtend() { return rangeExtend; }
     inline float getAsym_k() { return asym_k; }
     inline float getSym_k() { return sym_k; }
     inline float getScale() { return scale; }
     inline float getOffset() { return offset; }
     inline bool getVelocityInvert() { return velocityInvert; }
     
+    inline void setRangeExtend(float newRangeExtend) { rangeExtend = newRangeExtend; }
     inline void setAsym_k(float newAsym_k) { asym_k = newAsym_k; }
     inline void setSym_k(float newSym_k) { sym_k = newSym_k; }
     inline void setScale(float newScale) { scale = newScale; }
@@ -626,6 +628,7 @@ private:
     int harPostTranspose;
     
     // Velocity Curving Params initialized here to the default values.
+    float rangeExtend = 4.0;
     float asym_k = 1.0;
     float sym_k = 1.0;
     float scale = 1.0;

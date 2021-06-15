@@ -134,6 +134,7 @@ private:
     //======================================================================================
     // Velocity Curving UI
     
+    std::unique_ptr<BKSingleSlider> rangeExtendSlider;
     std::unique_ptr<BKSingleSlider> asym_kSlider;
     std::unique_ptr<BKSingleSlider> sym_kSlider;
     std::unique_ptr<BKSingleSlider> scaleSlider;
