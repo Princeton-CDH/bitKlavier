@@ -48,6 +48,7 @@ public:
         rBlendronicGain(r->rBlendronicGain),
         rMinStartTimeMS(r->rMinStartTimeMS),
         rMaxStartTimeMS(r->rMaxStartTimeMS),
+        rMaxSympStrings(r->rMaxSympStrings),
         name(r->name)
     {
         
@@ -66,13 +67,14 @@ public:
         rBlendronicGain(blendGain, true),
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
+        rMaxSympStrings(8),
         name(newName)
     {
 
     }
 
     //empty constructor, values will need to be tweaked
-    ResonancePreparation(void) :
+    ResonancePreparation(void) : 
         rSoundSet(-1),
         rUseGlobalSoundSet(true),
         rSoundSetName(String()),
@@ -84,6 +86,7 @@ public:
         rBlendronicGain(0.0, true),
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
+        rMaxSympStrings(8),
         name("test resonance preparation")
         
     {
@@ -196,8 +199,12 @@ public:
     Moddable<int> rMinStartTimeMS;
     Moddable<int> rMaxStartTimeMS;
     
+    // => cap the number of sympStrings to this
+    Moddable<int> rMaxSympStrings;
+    
     inline const int getMinStartTime() const noexcept { return rMinStartTimeMS.value; }
     inline const int getMaxStartTime() const noexcept { return rMaxStartTimeMS.value; }
+    inline const int getMaxSympStrings() const noexcept { return rMaxSympStrings.value; }
     
     inline void setMinStartTime(int inval) { rMinStartTimeMS = inval; }
     inline void setMaxStartTime(int inval) { rMaxStartTimeMS = inval; }
@@ -451,9 +458,6 @@ private:
     // A queue to store the currently active notes in sympStrings
     // so we can remove the oldest one when we exceed maxSympStrings
     Array<int> activeSympStrings;
-    
-    // => cap the number of sympStrings to this
-    int maxSympStrings;
 
     JUCE_LEAK_DETECTOR(ResonanceProcessor);
 };

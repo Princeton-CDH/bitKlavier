@@ -46,8 +46,6 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcesso
     partialStructure.add({31, 0.7, 2});
     partialStructure.add({34, 0.5, -31.175});
     partialStructure.add({36, 0.8, 0});
-    
-    maxSympStrings = 8; // by default, user should be able to set.
 
     DBG("Create rProc");
 }
@@ -199,7 +197,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
 // this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
 void ResonanceProcessor::addSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
 {
-    if(sympStrings.size() > maxSympStrings)
+    if(sympStrings.size() > resonance->prep->getMaxSympStrings())
     {
         DBG("Resonance: removing oldest sympathetic string");
         int oldestString = activeSympStrings.getLast();
