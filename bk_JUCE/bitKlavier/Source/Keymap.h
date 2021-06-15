@@ -625,8 +625,7 @@ private:
     int harPreTranspose;
     int harPostTranspose;
     
-    // Velocity Curving Params
-    // Do these need to be default set like this?
+    // Velocity Curving Params initialized here to the default values.
     float asym_k = 1.0;
     float sym_k = 1.0;
     float scale = 1.0;

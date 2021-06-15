@@ -337,35 +337,52 @@ BKViewController(p, theGraph, 3)
     // Velocity curving
     // this is merely setup code to initialize the various UI elements (sliders, button, etc.)
     
+    // The default values for these parameters are initialized in Keymap. Grab them now to avoid setting defaults in multiple places.
+    Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    float asym_kDefault = km->getAsym_k();
+    float sym_kDefault = km->getSym_k();
+    float scaleDefault = km->getScale();
+    float offsetDefault = km->getOffset();
+    float velocityInvertDefault = km->getVelocityInvert();
+    
     asym_kSlider = std::make_unique<BKSingleSlider>("Asymmetrical Warp",
-                                                    "Asymmetrical Warp", 0, 10, 1, 0.1);
+                                                    "Asymmetrical Warp", 0, 10,
+                                                    asym_kDefault, 0.1);
     asym_kSlider->setToolTipString("Adjust the assymmetrical warp of the velocity map");
     asym_kSlider->addMyListener(this);
     addAndMakeVisible(*asym_kSlider);
     
     sym_kSlider = std::make_unique<BKSingleSlider>("Symmetrical Warp",
-                                                   "Symmetrical Warp", 0, 5, 1, 0.1);
+                                                   "Symmetrical Warp", 0, 5,
+                                                   sym_kDefault, 0.1);
     sym_kSlider->setToolTipString("Adjust the symmetrical warp of the velocity map");
     sym_kSlider->addMyListener(this);
     addAndMakeVisible(*sym_kSlider);
     
-    scaleSlider = std::make_unique<BKSingleSlider>("Scale", "Scale", 0, 10, 1, 0.1);
+    scaleSlider = std::make_unique<BKSingleSlider>("Scale", "Scale", 0, 10,
+                                                   scaleDefault, 0.1);
     scaleSlider->setToolTipString("Adjust the scale of the velocity map");
     scaleSlider->addMyListener(this);
     addAndMakeVisible(*scaleSlider);
     
-    offsetSlider = std::make_unique<BKSingleSlider>("Offset", "Offset", -1, 1, 0, 0.01);
+    offsetSlider = std::make_unique<BKSingleSlider>("Offset", "Offset", -1, 1,
+                                                    offsetDefault, 0.01);
     offsetSlider->setToolTipString("Adjust the offset of the velocity map");
     offsetSlider->addMyListener(this);
     addAndMakeVisible(*offsetSlider);
     
     velocityInvertToggle.setButtonText("Invert");
-    velocityInvertToggle.setToggleState(false, dontSendNotification);
+    velocityInvertToggle.setToggleState(velocityInvertDefault, dontSendNotification);
     velocityInvertToggle.setLookAndFeel(&buttonsAndMenusLAF);
     velocityInvertToggle.setTooltip("Invert the velocity map");
     velocityInvertToggle.addListener(this);
     addAndMakeVisible(&velocityInvertToggle, ALL);
     
+    velocityCurveGraph.setAsym_k(asym_kDefault);
+    velocityCurveGraph.setSym_k(sym_kDefault);
+    velocityCurveGraph.setScale(scaleDefault);
+    velocityCurveGraph.setOffset(offsetDefault);
+    velocityCurveGraph.setVelocityInvert(velocityInvertDefault);
     addAndMakeVisible(velocityCurveGraph);
     
     velocityCurveGroup.setName("velocityCurveGroup");
@@ -1455,8 +1472,10 @@ void KeymapViewController::bkButtonClicked (Button* b)
     }
     else if (b == &velocityInvertToggle) {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-        keymap->setVelocityInvert(velocityInvertToggle.getToggleState());
-        velocityCurveGraph.invertVelocities();
+        bool newVelocityInvert = velocityInvertToggle.getToggleState();
+        keymap->setVelocityInvert(newVelocityInvert);
+        velocityCurveGraph.setVelocityInvert(newVelocityInvert);
+        velocityCurveGraph.repaint();
         processor.updateState->editsMade = true;
         DBG("velocity inverted");
     }
@@ -1746,11 +1765,13 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
     }
     
     // Velocity Sliders
+    // Note that graph must be redrawn whenever a parameter changes.
     else if (slider == asym_kSlider.get()) {
         float newAsym_k = asym_kSlider->getValue();
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setAsym_k(newAsym_k);
         velocityCurveGraph.setAsym_k(newAsym_k);
+        velocityCurveGraph.repaint();
         DBG("Asym_k = " + String(newAsym_k));
     }
     
@@ -1759,6 +1780,7 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setSym_k(newSym_k);
         velocityCurveGraph.setSym_k(newSym_k);
+        velocityCurveGraph.repaint();
         DBG("Sym_k = " + String(newSym_k));
     }
     
@@ -1767,6 +1789,7 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setScale(newScale);
         velocityCurveGraph.setScale(newScale);
+        velocityCurveGraph.repaint();
         DBG("Scale = " + String(newScale));
     }
     
@@ -1775,6 +1798,7 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setOffset(newOffset);
         velocityCurveGraph.setOffset(newOffset);
+        velocityCurveGraph.repaint();
         DBG("Offset = " + String(newOffset));
         
     }

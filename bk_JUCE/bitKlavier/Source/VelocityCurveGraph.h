@@ -109,38 +109,20 @@ public:
         repaint();
     }
     
-    
-    // the graph must be re-drawn whenever a parameter changes
-    void setAsym_k (float newAsym_k) {
-        asym_k = newAsym_k;
-        repaint();
-    }
-    void setSym_k (float newSym_k) {
-        sym_k = newSym_k;
-        repaint();
-    }
-    void setScale (float newScale) {
-        scale = newScale;
-        repaint();
-    }
-    void setOffset (float newOffset) {
-        offset = newOffset;
-        repaint();
-    }
-    void invertVelocities () {
-        velocityInvert = !velocityInvert;
-        repaint();
-    }
+    void setAsym_k (float newAsym_k) { asym_k = newAsym_k; }
+    void setSym_k (float newSym_k) { sym_k = newSym_k; }
+    void setScale (float newScale) { scale = newScale; }
+    void setOffset (float newOffset) { offset = newOffset; }
+    void setVelocityInvert (bool newVelocityInvert) { velocityInvert = newVelocityInvert; }
 
 private:
     
     // Various Parameters
-    // Do these need to be initialized like this?
-    float asym_k = 1;
-    float sym_k = 1;
-    float scale = 1;
-    float offset = 0;
-    bool velocityInvert = false;
+    float asym_k;
+    float sym_k;
+    float scale;
+    float offset;
+    bool velocityInvert;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VelocityCurveGraph)
 };
