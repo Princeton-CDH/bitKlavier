@@ -408,6 +408,8 @@ BKAudioProcessor::~BKAudioProcessor()
 {
     stopTimer();
     
+    loader.removeAllJobs(true, 1000);
+    
 //    touchThread.stopThread(1000);
     
     for (auto item : clipboard)
