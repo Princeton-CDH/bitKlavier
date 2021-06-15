@@ -47,7 +47,7 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcesso
     partialStructure.add({34, 0.5, -31.175});
     partialStructure.add({36, 0.8, 0});
     
-    maxSympStrings = 4; // by default, user should be able to set.
+    maxSympStrings = 8; // by default, user should be able to set.
 
     DBG("Create rProc");
 }
@@ -227,7 +227,6 @@ void ResonanceProcessor::addSympStrings(int noteNumber, float velocity, int midi
 }
 
 // this will turn off all the resonances associated with this string/key, and then remove those from the currently available sympathetic strings
-// **** note that the sustain pedal doesn't seem to work properly with this!
 void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
 {
     // turn off each partial associated with this string
