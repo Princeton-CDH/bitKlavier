@@ -1785,6 +1785,7 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
         float newRangeExtend = rangeExtendSlider->getValue();
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setRangeExtend(newRangeExtend);
+        //DBG("rangeExtend = " + String(newRangeExtend));
     }
     
     else if (slider == asym_kSlider.get()) {
