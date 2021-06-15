@@ -163,6 +163,24 @@ const String ptagDirect_soundSet = "directSoundSet";
 const String ptagDirect_velocityMin = "velocityMin";
 const String ptagDirect_velocityMax = "velocityMax";
 
+
+const String vtagResonance = "resonance";
+const String vtagModResonance = "modResonance";
+const String ptagResonance_id ="Id";
+const String ptagResonance_tuning = "tuning";
+const String ptagResonance_gain = "gain";
+const String ptagResonance_blendronicGain = "blendronicGain";
+const String ptagResonance_reset = "resonanceReset";
+const String vtagResonance_ADSR = "ADSR";
+const String ptagResonance_useGlobalSoundSet = "resonanceUseGlobalSoundSet";
+const String ptagResonance_soundSet = "resonanceSoundSet";
+const String ptagResonance_starttimeMin = "starttimeMin";
+const String ptagResonance_starttimeMax = "starttimeMax";
+const String vtagResonance_closestKeys = "closestKeys";
+const String vtagResonance_offsets = "offsets";
+const String vtagResonance_gains = "gains";
+
+
 const String vtagTuning = "tuning";
 const String vtagModTuning = "modTuning";
 const String ptagTuning_Id = "Id";
@@ -197,9 +215,6 @@ const String ptagTuning_tetherWeights = "tweights";
 const String ptagTuning_springWeights = "sweights";
 const String ptagTuning_intervalScale = "iscale";
 const String ptagTuning_intervalScaleFundamental = "iscalefundamental";
-
-const String vtagResonance = "resonance";
-const String ptagResonance_id = "Id";
 
 
 const String vtagBlendronic = "blendronic";
@@ -363,7 +378,8 @@ static const std::vector<std::string> cPreparationTypes = {
     "Comment",
     "Blendronic",
     "BlendronicMod",
-    "Resonance"
+    "Resonance",
+    "ResonanceMod"
 };
 
 static const std::vector<std::string> cPreparationNames = {
@@ -385,7 +401,8 @@ static const std::vector<std::string> cPreparationNames = {
     "Comment",
     "Blendronic",
     "Blendronic Mod",
-    "Resonance"
+    "Resonance",
+    "Resonance Mod"
 };
 
 typedef enum BKPreparationDisplay {
@@ -406,6 +423,7 @@ typedef enum BKPreparationDisplay {
     DisplayBlendronic,
     DisplayBlendronicMod,
     DisplayResonance,
+    DisplayResonanceMod,
     DisplayModdable,
     DisplayNil,
 } BKPreparationDisplay;
@@ -429,7 +447,8 @@ static const std::vector<std::string> cDisplayNames = {
     "Comment",
 	"Blendronic",
     "Blendronic Mod",
-    "Resonance"
+    "Resonance",
+    "Resonance Mod"
 };
 
 
@@ -802,6 +821,52 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "Tuning Id",
     "ADSR"
 };
+
+ #pragma mark - Resonance
+ typedef enum ResonanceParameterType
+ {
+     ResonanceId = 0,
+     ResonanceGain,
+     ResonanceBlendronicGain,
+     ResonanceMinStartTime,
+     ResonanceMaxStartTime,
+     ResonanceClosestKeys,
+     ResonanceOffsets,
+     ResonanceGains,
+     ResonanceADSR,
+     ResonanceUseGlobalSoundSet,
+     ResonanceSoundSet,
+     ParameterTypeNil
+     
+ } ResonanceParameterType;
+
+static const std::vector<BKParameterDataType> cResonanceDataTypes = {
+    BKInt,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKIntArr,
+    BKFloatArr,
+    BKFloatArr,
+    BKFloatArr,
+    BKBool,
+    BKInt
+};
+
+static const std::vector<std::string> cResonanceParameterTypes = {
+    "Direct Id",
+    "Gain",
+    "Blendronic Gain",
+    "Min Start Time",
+    "Max Start Time",
+    "Closest Keys",
+    "Offsets",
+    "Gains",
+    "ADSR"
+};
+
+
 
 typedef enum TuningAdaptiveSystemType
 {
@@ -1439,9 +1504,11 @@ static const String cTempoAT1History = "Tempo_at1History";
 static const String cTempoAT1Subdivisions = "Tempo_at1Subdivisions";
 
 static const String cResonanceDefGain = "Resonance_defaultGain";
-static const String cResonanceStartTime = "Resonance_startTime";
-static const String cResonanceLength = "Resonance_length";
-static const String cResonanceExciteThresh = "Resonance_exciteThresh";
-static const String cResonanceAttackThresh = "Resonance_attackThresh";
+static const String cResonanceMinStartTime = "Resonance_minstartTime";
+static const String cResonanceMaxStartTime = "Resonance_maxstartTime";
+static const String cResonanceStartTime = "Resonance_startTime"; // cut
+static const String cResonanceLength = "Resonance_length"; // cut
+static const String cResonanceExciteThresh = "Resonance_exciteThresh"; // cut
+static const String cResonanceAttackThresh = "Resonance_attackThresh"; // cut
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED
