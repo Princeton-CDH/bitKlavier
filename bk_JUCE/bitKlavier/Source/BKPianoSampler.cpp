@@ -197,6 +197,10 @@ void BKPianoSamplerVoice::setCurrentPlaybackSampleRate(const double newRate)
     currentSampleRate = newRate;
     adsr.setSampleRate(currentSampleRate);
     sfzadsr.setSampleRate(currentSampleRate);
+    sampleEnv.setSampleRate(currentSampleRate);
+    loopEnv.setSampleRate(currentSampleRate);
+    gainEnv.setSampleRate(currentSampleRate);
+    bGainEnv.setSampleRate(currentSampleRate);
 }
 
 bool BKPianoSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
