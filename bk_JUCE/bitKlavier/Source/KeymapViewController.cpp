@@ -386,6 +386,8 @@ BKViewController(p, theGraph, 3)
     velocityInvertToggle.addListener(this);
     addAndMakeVisible(&velocityInvertToggle, ALL);
     
+    
+    velocityCurveGraph.initVelocityList(km->getVelocities());
     velocityCurveGraph.setAsym_k(asym_kDefault);
     velocityCurveGraph.setSym_k(sym_kDefault);
     velocityCurveGraph.setScale(scaleDefault);
@@ -1938,6 +1940,9 @@ void KeymapViewController::timerCallback(){
     {
         harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey(true, false));
     }
+    
+    velocityCurveGraph.initVelocityList(km->getVelocities());
+    velocityCurveGraph.repaint();
 
     //updateKeymapTargets(); // needed?
     /*

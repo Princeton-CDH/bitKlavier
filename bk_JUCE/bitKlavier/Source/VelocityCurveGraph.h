@@ -101,6 +101,19 @@ public:
         }
         
         g.strokePath(plot, PathStrokeType(2.0));
+        
+        // add a dot whenever the user plays a key
+        g.setColour(Colours::goldenrod);
+        int radius = 12;
+        for (float velocity : velocities) {
+            float warpscale = dt_warpscale(velocity, asym_k, sym_k, scale, offset);
+            if (warpscale > 1) warpscale = 1;
+            if (warpscale < 0) warpscale = 0;
+            
+            g.fillEllipse(leftPadding + velocity * graphWidth - radius / 2,
+                          graphHeight - graphHeight * warpscale - radius / 2,
+                          radius, radius);
+        }
     }
 
     void resized() override
@@ -114,6 +127,8 @@ public:
     void setScale (float newScale) { scale = newScale; }
     void setOffset (float newOffset) { offset = newOffset; }
     void setVelocityInvert (bool newVelocityInvert) { velocityInvert = newVelocityInvert; }
+    
+    void initVelocityList(std::unordered_set<float>* velocityList) { velocities = *velocityList; }
 
 private:
     
@@ -123,6 +138,8 @@ private:
     float scale;
     float offset;
     bool velocityInvert;
+    
+    std::unordered_set<float> velocities;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VelocityCurveGraph)
 };

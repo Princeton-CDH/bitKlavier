@@ -567,6 +567,9 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
     // something will break down the line if not capped - note from jeff
     
+    // Add this velocity to the list (to be displayed by the velocity curving graph)
+    km->addVelocity(velocity);
+    
     DBG("rangeExtend = " + String(rangeExtend));
     DBG("asym_k = " + String(asym_k));
     DBG("sym_k = " + String(sym_k));
@@ -788,6 +791,10 @@ void BKSynthesiser::keyOff(const int midiChannel,
 
 	DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber) + " " + String(midiChannel));
 	const ScopedLock sl(lock);
+    
+    // Remove this velocity from the list of currently being played velocities
+    Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    km->removeVelocity(velocity);
 
 	for (int i = voices.size(); --i >= 0;)
 	{

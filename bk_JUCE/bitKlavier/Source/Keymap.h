@@ -596,6 +596,11 @@ public:
     inline void setOffset(float newOffset) { offset = newOffset; }
     inline void setVelocityInvert(bool newVelocityInvert) { velocityInvert = newVelocityInvert; }
     
+    // Velocity list handling - for velocity curve graph
+    inline void addVelocity(float toAdd) { velocities.insert(toAdd); }
+    inline void removeVelocity(float toRemove) { velocities.erase(toRemove); }
+    inline std::unordered_set<float>* getVelocities() { return &velocities; }
+    
 private:
     BKAudioProcessor& processor;
     int Id;
@@ -634,6 +639,7 @@ private:
     float scale = 1.0;
     float offset = 0.0;
     bool velocityInvert = false;
+    std::unordered_set<float> velocities;
 
     bool ignoreSustain;
     
