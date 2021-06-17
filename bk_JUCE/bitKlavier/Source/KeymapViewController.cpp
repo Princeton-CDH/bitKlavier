@@ -355,20 +355,22 @@ BKViewController(p, theGraph, 3)
     
     asym_kSlider = std::make_unique<BKSingleSlider>("Asymmetrical Warp",
                                                     "Asymmetrical Warp", 0, 10,
-                                                    asym_kDefault, 0.1);
+                                                    asym_kDefault, 0.001);
+    asym_kSlider->setSkewFactorFromMidPoint(1);
     asym_kSlider->setToolTipString("Adjust the assymmetrical warp of the velocity map");
     asym_kSlider->addMyListener(this);
     addAndMakeVisible(*asym_kSlider);
     
     sym_kSlider = std::make_unique<BKSingleSlider>("Symmetrical Warp",
                                                    "Symmetrical Warp", 0, 5,
-                                                   sym_kDefault, 0.1);
+                                                   sym_kDefault, 0.001);
+    sym_kSlider->setSkewFactorFromMidPoint(1);
     sym_kSlider->setToolTipString("Adjust the symmetrical warp of the velocity map");
     sym_kSlider->addMyListener(this);
     addAndMakeVisible(*sym_kSlider);
     
     scaleSlider = std::make_unique<BKSingleSlider>("Scale", "Scale", 0, 10,
-                                                   scaleDefault, 0.1);
+                                                   scaleDefault, 0.01);
     scaleSlider->setToolTipString("Adjust the scale of the velocity map");
     scaleSlider->addMyListener(this);
     addAndMakeVisible(*scaleSlider);
@@ -1941,8 +1943,11 @@ void KeymapViewController::timerCallback(){
         harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey(true, false));
     }
     
-    velocityCurveGraph.initVelocityList(km->getVelocities());
-    velocityCurveGraph.repaint();
+    if (km->didVelocitiesChange()) {
+        velocityCurveGraph.initVelocityList(km->getVelocities());
+        velocityCurveGraph.repaint();
+        km->setVelocitiesChanged(false);
+    }
 
     //updateKeymapTargets(); // needed?
     /*

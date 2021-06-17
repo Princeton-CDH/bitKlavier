@@ -588,6 +588,7 @@ public:
     inline float getScale() { return scale; }
     inline float getOffset() { return offset; }
     inline bool getVelocityInvert() { return velocityInvert; }
+    inline bool didVelocitiesChange() { return velocitiesChanged; }
     
     inline void setRangeExtend(float newRangeExtend) { rangeExtend = newRangeExtend; }
     inline void setAsym_k(float newAsym_k) { asym_k = newAsym_k; }
@@ -595,6 +596,7 @@ public:
     inline void setScale(float newScale) { scale = newScale; }
     inline void setOffset(float newOffset) { offset = newOffset; }
     inline void setVelocityInvert(bool newVelocityInvert) { velocityInvert = newVelocityInvert; }
+    inline void setVelocitiesChanged(bool newVelocitiesChanged) { velocitiesChanged = newVelocitiesChanged; }
     
     // Velocity list handling - for velocity curve graph
     inline void addVelocity(float toAdd) { velocities.insert(toAdd); }
@@ -640,6 +642,7 @@ private:
     float offset = 0.0;
     bool velocityInvert = false;
     std::unordered_set<float> velocities;
+    bool velocitiesChanged = false;
 
     bool ignoreSustain;
     

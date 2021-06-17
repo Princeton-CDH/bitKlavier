@@ -547,6 +547,10 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     float offset = km->getOffset();
     bool velocityInvert = km->getVelocityInvert();
     
+    // Add this velocity to the list (to be displayed by the velocity curving graph)
+    km->addVelocity(velocity);
+    km->setVelocitiesChanged(true);
+    
     float velocityCurved;
     
     // do inversion, or not
@@ -566,9 +570,6 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     if (velocityCurved < 0.) velocityCurved = 0.;
     if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
     // something will break down the line if not capped - note from jeff
-    
-    // Add this velocity to the list (to be displayed by the velocity curving graph)
-    km->addVelocity(velocity);
     
     DBG("rangeExtend = " + String(rangeExtend));
     DBG("asym_k = " + String(asym_k));
@@ -795,6 +796,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
     // Remove this velocity from the list of currently being played velocities
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     km->removeVelocity(velocity);
+    km->setVelocitiesChanged(true);
 
 	for (int i = voices.size(); --i >= 0;)
 	{

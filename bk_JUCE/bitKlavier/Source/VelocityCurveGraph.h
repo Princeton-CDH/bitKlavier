@@ -31,25 +31,29 @@ public:
     {
     }
 
+    // note: geometry here could be greatly simplified if the graph label could be done in KeymapViewcontroller. The geometry is kind of ridiculous.
     void paint (juce::Graphics& g) override
     {
         int leftPadding = 80; // space for "velocity out" label
+        int rightPadding = 4; // space for the graph's right edge to fully display
+        int topPadding = 6; // space for the dot and graph's top edge to fully display
         int bottomPadding = 40; // space for "velocity in" label
         int leftAdditional = 30; // additional space for number labels on left
         
         // don't bother if there's not enough room
-        if (getWidth() <= leftPadding + 2 || getHeight() <= bottomPadding + 2) return;
+        if (getWidth() <= leftPadding + rightPadding + 2 || getHeight() <= bottomPadding + topPadding + 2) return;
         
         // wrapper rectangles for labels
-        juce::Rectangle<int> graphArea(leftPadding, 0, getWidth() - leftPadding,
-                                       getHeight() - bottomPadding);
+        juce::Rectangle<int> graphArea(leftPadding, topPadding, getWidth() - leftPadding - rightPadding,
+                                       getHeight() - bottomPadding - topPadding);
         
-        juce::Rectangle<int> bottomLabel(leftPadding, getHeight() - bottomPadding,
-                                         getWidth() - leftPadding, bottomPadding);
-        juce::Rectangle<int> leftLabel(0, 0, leftPadding - leftAdditional,
-                                       getHeight() - bottomPadding);
-        juce::Rectangle<int> leftNumbers(leftPadding - leftAdditional, 0, leftAdditional,
-                                         getHeight() - bottomPadding);
+        juce::Rectangle<int> bottomLabel(leftPadding - rightPadding, getHeight() - bottomPadding,
+                                         getWidth() - leftPadding + rightPadding, bottomPadding);
+        juce::Rectangle<int> leftLabel(0, topPadding, leftPadding - leftAdditional,
+                                       getHeight() - bottomPadding - topPadding);
+        juce::Rectangle<int> leftNumbers(leftPadding - leftAdditional, topPadding - 5, leftAdditional,
+                                         getHeight() - bottomPadding - topPadding + 10);
+        juce::Rectangle<int> zeroLabel(0, getHeight() - bottomPadding, leftPadding, bottomPadding);
         
         // graph background setup
         g.setColour (juce::Colours::grey);
@@ -58,19 +62,20 @@ public:
         int graphWidth = graphArea.getWidth();
         int graphX = graphArea.getX();
         int graphY = graphArea.getY();
-        juce::Line<float> hMidLine(graphX, graphHeight / 2,
-                                   graphWidth + graphX, graphHeight / 2);
+        juce::Line<float> hMidLine(graphX, topPadding + graphHeight / 2,
+                                   graphWidth + graphX, topPadding + graphHeight / 2);
         juce::Line<float> vMidLine(graphWidth / 2 + graphX, graphY,
-                                   graphWidth / 2 + graphX, graphHeight);
+                                   graphWidth / 2 + graphX, graphHeight + topPadding);
         const float dashLengths[] = {5, 3};
         g.drawDashedLine(hMidLine, dashLengths, 2);
         g.drawDashedLine(vMidLine, dashLengths, 2);
         
         // graph label setup
-        g.drawText("0", bottomLabel, juce::Justification::topLeft);
+        //g.drawText("0", bottomLabel, juce::Justification::topLeft);
+        g.drawText("0", zeroLabel, juce::Justification::topRight);
         g.drawText("0.5", bottomLabel, juce::Justification::centredTop);
         g.drawText("1", bottomLabel, juce::Justification::topRight);
-        g.drawText("0", leftNumbers, juce::Justification::bottomRight);
+        //g.drawText("0", leftNumbers, juce::Justification::bottomRight);
         g.drawText("0.5", leftNumbers, juce::Justification::centredRight);
         g.drawText("1", leftNumbers, juce::Justification::topRight);
         g.setColour(juce::Colours::white);
@@ -83,15 +88,15 @@ public:
         
         // go pixel by pixel, adding each point to plot
         for (int i = 0; i <= graphWidth; i++) {
-            juce::Point<float> toAdd (leftPadding + i, graphHeight - graphHeight
+            juce::Point<float> toAdd (leftPadding + i, graphHeight + topPadding - graphHeight
                                * dt_warpscale((float) i / graphWidth, asym_k, sym_k, scale,
                                               offset));
             
-            if (toAdd.getY() < 0) toAdd.setY(0);
-            if (toAdd.getY() > graphHeight) toAdd.setY(graphHeight);
+            if (toAdd.getY() < topPadding) toAdd.setY(topPadding);
+            if (toAdd.getY() > graphHeight + topPadding) toAdd.setY(graphHeight + topPadding);
             
             if (velocityInvert) {
-                toAdd.setY(graphHeight - toAdd.getY());
+                toAdd.setY(graphHeight + 2 * topPadding - toAdd.getY());
             }
             
             // the first point starts the subpath, whereas all subsequent points are merely
@@ -102,7 +107,7 @@ public:
         
         g.strokePath(plot, PathStrokeType(2.0));
         
-        // add a dot whenever the user plays a key
+        // add a dot to represent input velocity
         g.setColour(Colours::goldenrod);
         int radius = 12;
         for (float velocity : velocities) {
@@ -110,9 +115,16 @@ public:
             if (warpscale > 1) warpscale = 1;
             if (warpscale < 0) warpscale = 0;
             
-            g.fillEllipse(leftPadding + velocity * graphWidth - radius / 2,
-                          graphHeight - graphHeight * warpscale - radius / 2,
-                          radius, radius);
+            if (velocityInvert) {
+                g.fillEllipse(leftPadding + velocity * graphWidth - radius / 2,
+                              topPadding + graphHeight * warpscale - radius / 2,
+                              radius, radius);
+            }
+            else {
+                g.fillEllipse(leftPadding + velocity * graphWidth - radius / 2,
+                              topPadding + graphHeight - graphHeight * warpscale - radius / 2,
+                              radius, radius);
+            }
         }
     }
 
