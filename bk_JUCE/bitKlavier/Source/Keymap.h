@@ -235,6 +235,13 @@ public:
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_sustainPedalKeys, sustainPedalKeys ? 1 : 0, 0);
         
+        keysave.setProperty(ptagKeymap_extendRange, rangeExtend, 0);
+        keysave.setProperty(ptagKeymap_asymmetricalWarp, asym_k, 0);
+        keysave.setProperty(ptagKeymap_symmetricalWarp, sym_k, 0);
+        keysave.setProperty(ptagKeymap_scale, scale, 0);
+        keysave.setProperty(ptagKeymap_offset, offset, 0);
+        keysave.setProperty(ptagKeymap_velocityInvert, velocityInvert ? 1 : 0, 0);
+        
         keysave.setProperty(ptagKeymap_defaultSelected, defaultSelected, 0);
         
         keysave.setProperty(ptagKeymap_onscreenSelected, onscreenSelected, 0);
@@ -333,6 +340,14 @@ public:
         setAllNotesOff((bool) e->getIntAttribute(ptagKeymap_endKeystrokes, 0));
         setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
         setSustainPedalKeys((bool) e->getIntAttribute(ptagKeymap_sustainPedalKeys, 0));
+        
+        // Not sure what value the second argument needs to be. Right now I'm using the default values, but these are the values that bK uses for velocity curving before the view controller is opened and the values update to what they were saved to be.
+        rangeExtend = (float) e->getDoubleAttribute(ptagKeymap_extendRange, 4);
+        asym_k = (float) e->getDoubleAttribute(ptagKeymap_asymmetricalWarp, 1);
+        sym_k = (float) e->getDoubleAttribute(ptagKeymap_symmetricalWarp, 1);
+        scale = (float) e->getDoubleAttribute(ptagKeymap_scale, 1);
+        offset = (float) e->getDoubleAttribute(ptagKeymap_offset, 0);
+        velocityInvert = (bool) e->getIntAttribute(ptagKeymap_velocityInvert, 0);
 
         setDefaultSelected((bool) e->getIntAttribute(ptagKeymap_defaultSelected, 1));
         setOnscreenSelected((bool) e->getIntAttribute(ptagKeymap_onscreenSelected, 1));
@@ -634,13 +649,13 @@ private:
     int harPreTranspose;
     int harPostTranspose;
     
-    // Velocity Curving Params initialized here to the default values.
-    float rangeExtend = 4.0;
-    float asym_k = 1.0;
-    float sym_k = 1.0;
-    float scale = 1.0;
-    float offset = 0.0;
-    bool velocityInvert = false;
+    // Velocity Curving Params - initalized to default values in the constructors
+    float rangeExtend;
+    float asym_k;
+    float sym_k;
+    float scale;
+    float offset;
+    bool velocityInvert;
     std::unordered_set<float> velocities;
     bool velocitiesChanged = false;
 

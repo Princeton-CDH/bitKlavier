@@ -388,7 +388,7 @@ BKViewController(p, theGraph, 3)
     velocityInvertToggle.addListener(this);
     addAndMakeVisible(&velocityInvertToggle, ALL);
     
-    
+    DBG("asym_k equals " + String(asym_kDefault));
     velocityCurveGraph.initVelocityList(km->getVelocities());
     velocityCurveGraph.setAsym_k(asym_kDefault);
     velocityCurveGraph.setSym_k(sym_kDefault);
@@ -1669,11 +1669,18 @@ void KeymapViewController::update(void)
         keyboard->setKeysInKeymap(km->keys());
         harKeyboard->setKeysInKeymap(Array<int>(km->getHarKey()));
         harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey(true, false));
-        //asym_kSlider->setValue(km->getAsym_k(), dontSendNotification);
-        //sym_kSlider->setValue(km->getSym_k(), dontSendNotification);
-        //scaleSlider->setValue(km->getScale(), dontSendNotification);
-        //offsetSlider->setValue(km->getOffset(), dontSendNotification);
-        //velocityInvertToggle.setToggleState(km->getVelocityInvert(), dontSendNotification);
+        rangeExtendSlider->setValue(km->getRangeExtend(), dontSendNotification);
+        asym_kSlider->setValue(km->getAsym_k(), dontSendNotification);
+        sym_kSlider->setValue(km->getSym_k(), dontSendNotification);
+        scaleSlider->setValue(km->getScale(), dontSendNotification);
+        offsetSlider->setValue(km->getOffset(), dontSendNotification);
+        velocityInvertToggle.setToggleState(km->getVelocityInvert(), dontSendNotification);
+        velocityCurveGraph.setAsym_k(km->getAsym_k());
+        velocityCurveGraph.setSym_k(km->getSym_k());
+        velocityCurveGraph.setScale(km->getScale());
+        velocityCurveGraph.setOffset(km->getOffset());
+        velocityCurveGraph.setVelocityInvert(km->getVelocityInvert());
+        velocityCurveGraph.repaint();
         
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
         {
@@ -1770,8 +1777,6 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setHarPreTranspose(transposition);
         DBG("harPreTranspositionSlider = " + String(transposition));
-        
-        update();
     }
     else if (slider == harPostTranspositionSlider.get())
     {
@@ -1779,8 +1784,6 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
         Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         km->setHarPostTranspose(transposition);
         DBG("harPostTranspositionSlider = " + String(transposition));
-        
-        update();
     }
     
     // Velocity Sliders
@@ -1826,10 +1829,9 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
         velocityCurveGraph.setOffset(newOffset);
         velocityCurveGraph.repaint();
         DBG("Offset = " + String(newOffset));
-        
     }
 
-
+    update();
     processor.updateState->editsMade = true;
 }
 
@@ -1943,6 +1945,7 @@ void KeymapViewController::timerCallback(){
         harArrayKeyboard->setKeysInKeymap(km->getHarmonizationForKey(true, false));
     }
     
+    // Periodically, check whether notes have been pressed and display their velocities on the graph.
     if (km->didVelocitiesChange()) {
         velocityCurveGraph.initVelocityList(km->getVelocities());
         velocityCurveGraph.repaint();
