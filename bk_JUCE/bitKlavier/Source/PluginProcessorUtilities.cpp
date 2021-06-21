@@ -124,7 +124,7 @@ void BKAudioProcessor::collectSoundfontsFromFolder(File folder)
     {
         File soundfontFile = iter.getFile();
         
-        soundfontNames.add(soundfontFile.getFullPathName());
+        soundfontNames.addIfNotAlreadyThere(soundfontFile.getFullPathName());
     }
 }
 
@@ -172,21 +172,9 @@ void BKAudioProcessor::collectSoundfonts(void)
 {
     soundfontNames.clear();
     
-    File bkSoundfonts;
+    for (auto path : getSoundfontsPaths())
+        collectSoundfontsFromFolder(path);
     
-#if JUCE_IOS
-    bkSoundfonts = File::getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
-    collectSoundfontsFromFolder(bkSoundfonts);
-    bkSoundfonts = File::getSpecialLocation (File::userDocumentsDirectory);
-#endif
-#if JUCE_MAC
-    bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
-#endif
-#if JUCE_WINDOWS || JUCE_LINUX
-    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
-#endif
-    
-    collectSoundfontsFromFolder(bkSoundfonts);
     soundfontNames.sort(true);
 }
 
@@ -194,17 +182,10 @@ void BKAudioProcessor::collectCustomSamples()
 {
     customSampleSetNames.clear();
     
-    // Get every folder in the search path
-    Array<File> directories = sampleSearchPath.findChildFiles(File::TypesOfFileToFind::findDirectories, true);
-    for (int i = 0; i < sampleSearchPath.getNumPaths(); ++i)
-    {
-        directories.add(sampleSearchPath[i]);
-    }
-    
-    for (auto dir : directories)
+    for (auto path : getCustomSamplesPaths())
     {
         // Check if the folder contains any properly formatted wav files
-        for (auto iter : RangedDirectoryIterator (File (dir), false, "*.wav"))
+        for (auto iter : RangedDirectoryIterator (File (path), false, "*.wav"))
         {
             String fileName = iter.getFile().getFileNameWithoutExtension();
             
@@ -216,7 +197,7 @@ void BKAudioProcessor::collectCustomSamples()
 //                            (\\bpedal[DU]\\d+\\b)");
             if (std::regex_search(fileName.toStdString(), reg))
             {
-                customSampleSetNames.add(dir.getFullPathName());
+                customSampleSetNames.add(path.getFullPathName());
                 break;
             }
         }

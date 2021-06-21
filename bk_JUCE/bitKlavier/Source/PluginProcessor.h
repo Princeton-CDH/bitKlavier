@@ -150,7 +150,9 @@ public:
     // This is quite performance intensive with a lot of samples and currently doesn't seems worth doing
 //    SampleTouchThread touchThread;
     
-    FileSearchPath sampleSearchPath;
+    File defaultSamplesPath;
+    FileSearchPath soundfontsPaths;
+    FileSearchPath customSamplesPaths;
 
     void updateGalleries(void);
     
@@ -246,10 +248,16 @@ public:
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) override;
     void changeProgramName (int index, const String& newName) override;
+    
 
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    //==============================================================================
+    File getDefaultSamplesPath();
+    Array<File> getSoundfontsPaths();
+    Array<File> getCustomSamplesPaths();
     
     double getLevelL();
     double getLevelR();

@@ -146,7 +146,29 @@ memoryMappingEnabled(var(false))
     float w_factor = ((float) screenWidth / (float) DEFAULT_WIDTH);
     float h_factor = ((float) screenHeight / (float) DEFAULT_HEIGHT);
     
+    File bkSamples;
+#if JUCE_IOS
+    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
+#endif
+#if JUCE_MAC
+    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+#if JUCE_LINUX || JUCE_WINDOWS
+    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+    defaultSamplesPath = bkSamples;
     
+    File bkSoundfonts;
+#if JUCE_IOS
+    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory);
+#endif
+#if JUCE_MAC
+    bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+    soundfontsPaths.add(bkSoundfonts);
     
 #if JUCE_IOS
     int heightUnit = ((screenHeight * 0.1f) > 48) ? 48 : (screenHeight * 0.1f);
