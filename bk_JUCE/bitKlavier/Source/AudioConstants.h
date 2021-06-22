@@ -240,6 +240,12 @@ const String ptagKeymap_harmonizerPostTranspose = "harmonizerPostTranspose";
 const String ptagKeymap_endKeystrokes = "endKeystrokes";
 const String ptagKeymap_ignoreSustain = "ignoreSustain";
 const String ptagKeymap_sustainPedalKeys = "sustainPedalKeys";
+const String ptagKeymap_extendRange = "extendRange";
+const String ptagKeymap_asymmetricalWarp = "asymmetricalWarp";
+const String ptagKeymap_symmetricalWarp = "symmetricalWarp";
+const String ptagKeymap_scale = "scale";
+const String ptagKeymap_offset = "offset";
+const String ptagKeymap_velocityInvert = "velocityInvert";
 
 typedef enum PitchClass {
     C = 0,

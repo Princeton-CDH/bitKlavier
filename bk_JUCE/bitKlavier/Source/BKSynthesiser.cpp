@@ -538,6 +538,19 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
      the Heavy set and other new bK sample libraries).
     */
     
+    // Grab the parameter values from the keymap
+    Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    float rangeExtend = km->getRangeExtend();
+    float asym_k = km->getAsym_k();
+    float sym_k = km->getSym_k();
+    float scale = km->getScale();
+    float offset = km->getOffset();
+    bool velocityInvert = km->getVelocityInvert();
+    
+    // Add this velocity to the list (to be displayed by the velocity curving graph)
+    km->addVelocity(velocity);
+    km->setVelocitiesChanged(true);
+    
     float velocityCurved;
     
     // do inversion, or not
@@ -545,13 +558,24 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     // else velocityCurved = velocity;
     
     // args: asym_k, sym_k, scale (multiplier), offset -- user settable
-    if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote)
-        velocityCurved = dt_warpscale(velocity, 2., 1., 1, 0.);
+    if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote) {
+        // velocityCurved = dt_warpscale(velocity, 2., 1., 1, 0.);
+        velocityCurved = dt_warpscale(velocity, asym_k, sym_k, scale, offset);
+        // i think inversion should be here?
+        if (velocityInvert) velocityCurved = 1. - velocityCurved;
+    }
     else
         velocityCurved = velocity;
     
     if (velocityCurved < 0.) velocityCurved = 0.;
-    // if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
+    if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
+    // something will break down the line if not capped - note from jeff
+    
+    DBG("rangeExtend = " + String(rangeExtend));
+    DBG("asym_k = " + String(asym_k));
+    DBG("sym_k = " + String(sym_k));
+    DBG("scale = " + String(scale));
+    DBG("offset = " + String(offset));
     DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
 
     // needed for MIDI Out; will just return the last found voice, if there are multiple voices
@@ -590,6 +614,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                        transposition,
                        gain,
                        velocityCurved,
+                       rangeExtend,
                        direction,
                        type,
                        bktype,
@@ -646,6 +671,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                midiNoteNumberOffset,
                gain,
                velocity,
+               0, // for now
                direction,
                type,
                bktype,
@@ -671,6 +697,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                                const float midiNoteNumberOffset,
                                const float gain,
                                const float velocity,
+                               const float rangeExtend,
                                PianoSamplerNoteDirection direction,
                                PianoSamplerNoteType type,
                                BKNoteType bktype,
@@ -723,6 +750,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                          pitchWheelValue,
                          g,
                          velocity,
+                         rangeExtend,
                          direction,
                          type,
                          bktype,
@@ -764,6 +792,11 @@ void BKSynthesiser::keyOff(const int midiChannel,
 
 	DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber) + " " + String(midiChannel));
 	const ScopedLock sl(lock);
+    
+    // Remove this velocity from the list of currently being played velocities
+    Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+    km->removeVelocity(velocity);
+    km->setVelocitiesChanged(true);
 
 	for (int i = voices.size(); --i >= 0;)
 	{
@@ -846,6 +879,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
                        0, // might need to deal with this
                        gain,
                        velocity,
+                       0, // for now
                        Forward,
                        FixedLengthFixedStart,
                        DirectNote,             //
