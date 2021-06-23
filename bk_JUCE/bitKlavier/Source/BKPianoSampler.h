@@ -209,7 +209,7 @@ public:
                     int pitchWheelValue,
                     float gain,
                     float velocity,
-                    float extendRange,
+                    //float extendRange,
                     PianoSamplerNoteDirection direction,
                     PianoSamplerNoteType type,
                     BKNoteType bktype,

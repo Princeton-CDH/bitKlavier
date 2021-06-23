@@ -540,7 +540,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     
     // Grab the parameter values from the keymap
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    float rangeExtend = km->getRangeExtend();
+    //float rangeExtend = km->getRangeExtend();
     float asym_k = km->getAsym_k();
     float sym_k = km->getSym_k();
     float scale = km->getScale();
@@ -571,7 +571,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
     if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
     // something will break down the line if not capped - note from jeff
     
-    DBG("rangeExtend = " + String(rangeExtend));
+    //DBG("rangeExtend = " + String(rangeExtend));
     DBG("asym_k = " + String(asym_k));
     DBG("sym_k = " + String(sym_k));
     DBG("scale = " + String(scale));
@@ -614,7 +614,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                        transposition,
                        gain,
                        velocityCurved,
-                       rangeExtend,
+                       //rangeExtend,
                        direction,
                        type,
                        bktype,
@@ -671,7 +671,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                midiNoteNumberOffset,
                gain,
                velocity,
-               0, // for now
+               //0, // for now
                direction,
                type,
                bktype,
@@ -697,7 +697,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                                const float midiNoteNumberOffset,
                                const float gain,
                                const float velocity,
-                               const float rangeExtend,
+                               //const float rangeExtend,
                                PianoSamplerNoteDirection direction,
                                PianoSamplerNoteType type,
                                BKNoteType bktype,
@@ -750,7 +750,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                          pitchWheelValue,
                          g,
                          velocity,
-                         rangeExtend,
+                         //rangeExtend,
                          direction,
                          type,
                          bktype,
@@ -879,7 +879,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
                        0, // might need to deal with this
                        gain,
                        velocity,
-                       0, // for now
+                       //0, // for now
                        Forward,
                        FixedLengthFixedStart,
                        DirectNote,             //
