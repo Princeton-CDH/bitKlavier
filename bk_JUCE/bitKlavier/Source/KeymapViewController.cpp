@@ -389,7 +389,7 @@ BKViewController(p, theGraph, 3)
     addAndMakeVisible(&velocityInvertToggle, ALL);
     
     DBG("asym_k equals " + String(asym_kDefault));
-    velocityCurveGraph.initVelocityList(km->getVelocities());
+    velocityCurveGraph.updateVelocityList(km->getVelocities());
     velocityCurveGraph.setAsym_k(asym_kDefault);
     velocityCurveGraph.setSym_k(sym_kDefault);
     velocityCurveGraph.setScale(scaleDefault);
@@ -1947,7 +1947,7 @@ void KeymapViewController::timerCallback(){
     
     // Periodically, check whether notes have been pressed and display their velocities on the graph.
     if (km->didVelocitiesChange()) {
-        velocityCurveGraph.initVelocityList(km->getVelocities());
+        velocityCurveGraph.updateVelocityList(km->getVelocities());
         velocityCurveGraph.repaint();
         km->setVelocitiesChanged(false);
     }

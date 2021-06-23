@@ -616,7 +616,7 @@ public:
     // Velocity list handling - for velocity curve graph
     inline void addVelocity(float toAdd) { velocities.insert(toAdd); }
     inline void removeVelocity(float toRemove) { velocities.erase(toRemove); }
-    inline std::unordered_set<float>* getVelocities() { return &velocities; }
+    inline std::unordered_multiset<float>* getVelocities() { return &velocities; }
     
 private:
     BKAudioProcessor& processor;
@@ -656,7 +656,7 @@ private:
     float scale;
     float offset;
     bool velocityInvert;
-    std::unordered_set<float> velocities;
+    std::unordered_multiset<float> velocities;
     bool velocitiesChanged = false;
 
     bool ignoreSustain;

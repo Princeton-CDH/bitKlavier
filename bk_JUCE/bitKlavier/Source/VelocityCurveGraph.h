@@ -140,7 +140,7 @@ public:
     void setOffset (float newOffset) { offset = newOffset; }
     void setVelocityInvert (bool newVelocityInvert) { velocityInvert = newVelocityInvert; }
     
-    void initVelocityList(std::unordered_set<float>* velocityList) { velocities = *velocityList; }
+    void updateVelocityList(std::unordered_multiset<float>* velocityList) { velocities = *velocityList; }
 
 private:
     
@@ -151,7 +151,7 @@ private:
     float offset;
     bool velocityInvert;
     
-    std::unordered_set<float> velocities;
+    std::unordered_multiset<float> velocities;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VelocityCurveGraph)
 };
