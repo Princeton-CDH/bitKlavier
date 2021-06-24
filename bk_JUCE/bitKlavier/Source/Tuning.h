@@ -892,8 +892,8 @@ public:
     float getOffset(int midiNoteNumber, bool updateLastInterval);
     
     //for calculating adaptive tuning
-    void keyPressed(int midiNoteNumber, Array<float>& targetVelocities);
-    void keyReleased(int midiNoteNumber, Array<float>& targetVelocities);
+    void keyPressed(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress);
+    void keyReleased(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress);
     
     inline int getId(void) const noexcept { return tuning->getId(); }
     
@@ -963,6 +963,9 @@ private:
     int     adaptiveFundamentalNote = 60; //moves with adaptive tuning
     float   adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote);
     int     adaptiveHistoryCounter = 0;
+    
+    OwnedArray<Array<float>> velocities;
+    OwnedArray<Array<float>> invertVelocities;
     
     JUCE_LEAK_DETECTOR(TuningProcessor);
 };

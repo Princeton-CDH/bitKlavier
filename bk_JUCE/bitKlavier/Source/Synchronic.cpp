@@ -136,12 +136,12 @@ notePlayed(false)
     for (int j = 0; j < 128; j++)
     {
         clusterVelocities.add(0.f);
-        pressVelocities.add(new Array<float>());
-        releaseVelocities.add(new Array<float>());
+        velocities.add(new Array<float>());
+        invertVelocities.add(new Array<float>());
         for (int i = 0; i < TargetTypeNostalgic-TargetTypeSynchronic; i++)
         {
-            pressVelocities.getLast()->add(0.f);
-            releaseVelocities.getLast()->add(0.f);
+            velocities.getLast()->add(0.f);
+            invertVelocities.getLast()->add(0.f);
         }
     }
     
@@ -348,8 +348,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = pressVelocities.getUnchecked(noteNumber);
-        for (int i = 0; i < pressVelocities.getUnchecked(noteNumber)->size(); ++i)
+        aVels = bVels = velocities.getUnchecked(noteNumber);
+        for (int i = 0; i < velocities.getUnchecked(noteNumber)->size(); ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeSynchronic));
         }
@@ -359,7 +359,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     else
     {
         aVels = &targetVelocities;
-        bVels = releaseVelocities.getUnchecked(noteNumber);
+        bVels = invertVelocities.getUnchecked(noteNumber);
     }
        
     int s = TargetTypeSynchronic;
@@ -575,8 +575,8 @@ void SynchronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = releaseVelocities.getUnchecked(noteNumber);
-        for (int i = 0; i < releaseVelocities.getUnchecked(noteNumber)->size(); ++i)
+        aVels = bVels = invertVelocities.getUnchecked(noteNumber);
+        for (int i = 0; i < invertVelocities.getUnchecked(noteNumber)->size(); ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeSynchronic));
         }
@@ -586,7 +586,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
     else
     {
         aVels = &targetVelocities;
-        bVels = pressVelocities.getUnchecked(noteNumber);
+        bVels = velocities.getUnchecked(noteNumber);
     }
     
     int s = TargetTypeSynchronic;

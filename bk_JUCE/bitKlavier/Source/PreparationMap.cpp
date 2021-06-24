@@ -455,8 +455,15 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
         {
             if (km->containsNoteMapping(noteNumber, mappedFrom))
             {
-                if (km->isInverted()) checkForSustain = true;
-                else checkForReattack = true;
+                km->addVelocity(noteNumber, velocity);
+                if (km->isInverted())
+                {
+                    checkForSustain = true;
+                }
+                else
+                {
+                    checkForReattack = true;
+                }
             }
         }
     }
@@ -487,11 +494,11 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }
         }
-        proc->keyPressed(noteNumber, pressTargetVelocities);
+        proc->keyPressed(noteNumber, pressTargetVelocities, true);
         pressTargetVelocities.fill(-1.f);
         
         if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities);
+            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
         releaseTargetVelocities.fill(-1.f);
     }
     
@@ -517,11 +524,11 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }
         }
-        proc->keyPressed(noteNumber, pressTargetVelocities);
+        proc->keyPressed(noteNumber, pressTargetVelocities, true);
         pressTargetVelocities.fill(-1.f);
         
         if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities);
+            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
         releaseTargetVelocities.fill(-1.f);
     }
     
@@ -561,11 +568,11 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }
         }
-        proc->keyPressed(noteNumber, pressTargetVelocities);
+        proc->keyPressed(noteNumber, pressTargetVelocities, true);
         pressTargetVelocities.fill(-1.f);
         
         if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities);
+            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
         releaseTargetVelocities.fill(-1.f);
     }
     
@@ -708,6 +715,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
     {
         if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
         {
+            km->removeVelocity(noteNumber);
             if (km->isInverted()) foundReattack = true;
             else foundSustain = true;
         }
@@ -774,11 +782,11 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
             }
         }
         
-        proc->keyPressed(noteNumber, pressTargetVelocities);
+        proc->keyPressed(noteNumber, pressTargetVelocities, false);
         pressTargetVelocities.fill(-1.f);
         
         if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities);
+            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
     }
     
@@ -882,11 +890,11 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }
         }
-        proc->keyPressed(noteNumber, pressTargetVelocities);
+        proc->keyPressed(noteNumber, pressTargetVelocities, false);
         pressTargetVelocities.fill(-1.f);
         
         if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities);
+            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
     }
     
@@ -911,11 +919,11 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }
         }
-        proc->keyPressed(noteNumber, pressTargetVelocities);
+        proc->keyPressed(noteNumber, pressTargetVelocities, false);
         pressTargetVelocities.fill(-1.f);
         
         if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities);
+            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
     }
 }
@@ -985,7 +993,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                 }
             }
             if (!keyIsDepressed && !allIgnoreSustain)
-                proc->keyReleased(noteNumber, targetStates);
+                proc->keyReleased(noteNumber, targetStates, false);
             targetStates.fill(-1.f);
         }
         
@@ -1005,7 +1013,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                 }
             }
             if (!keyIsDepressed && !allIgnoreSustain)
-                proc->keyReleased(noteNumber, targetStates);
+                proc->keyReleased(noteNumber, targetStates, false);
             targetStates.fill(-1.f);
         }
         
@@ -1074,7 +1082,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                 }
             }
             if (!keyIsDepressed && !allIgnoreSustain)
-                proc->keyReleased(noteNumber, targetStates);
+                proc->keyReleased(noteNumber, targetStates, false);
             targetStates.fill(-1.f);
         }
     }
@@ -1152,7 +1160,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, in
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }
         }
-        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain)) proc->keyReleased(noteNumber, targetStates);
+        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain)) proc->keyReleased(noteNumber, targetStates, false);
         targetStates.fill(-1.f);
     }
     
@@ -1194,7 +1202,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, in
             }
         }
         if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain))
-            proc->keyReleased(noteNumber, targetStates);
+            proc->keyReleased(noteNumber, targetStates, false);
         targetStates.fill(-1.f);
     }
 }

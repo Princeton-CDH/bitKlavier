@@ -877,8 +877,8 @@ private:
     Array<uint64> noteLengthTimers;     // store current length of played notes here
     Array<int> activeNotes;             // table of notes currently being played by player
     Array<bool> noteOn;                 // table of booleans representing state of each note
-    OwnedArray<Array<float>> pressVelocities;            // table of velocities played
-    OwnedArray<Array<float>> releaseVelocities;
+    OwnedArray<Array<float>> velocities;            // table of velocities played
+    OwnedArray<Array<float>> invertVelocities;
     
     uint64 lastHoldTime;
     int lastKeyPlayed;

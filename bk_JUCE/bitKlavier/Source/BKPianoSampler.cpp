@@ -231,7 +231,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      64,
                                      gain,
                                      velocity,
-                                     0, // not sure when this gets called so just 0 for now
+                                     //0, // not sure when this gets called so just 0 for now
                                      direction,
                                      type,
                                      bktype,
@@ -305,7 +305,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                                      const int pitchWheelValue,
                                      const float gain,
                                      const float velocity,
-                                     const float rangeExtend,
+                                     //const float rangeExtend,
                                      PianoSamplerNoteDirection direction,
                                      PianoSamplerNoteType type,
                                      BKNoteType bktype,
@@ -325,7 +325,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
         DBG("RMS: " + String(sound->getDBFSLevel()));
         //DBG("BKPianoSamplerVoice::startNote " + String(midi));
         
-        DBG("passed through range extend = " + String(rangeExtend));
+        //DBG("passed through range extend = " + String(rangeExtend));
         
         
         currentMidiNoteNumber = midi;
@@ -482,14 +482,14 @@ void BKPianoSamplerVoice::startNote (const int midi,
             if (dynRange > 50.) dynRange = 30; // not sure we need this, or if 50 is a good threshold
             
             // extend range as needed
-            //double extendRange = 4; // *** user sets this, to extend the dynamic range of the set
-            dynRange += rangeExtend / sound->getNumLayers(); // increase the dynamic range of layer by appropriate fraction
+            double extendRange = 4; // *** user sets this, to extend the dynamic range of the set
+            dynRange += extendRange / sound->getNumLayers(); // increase the dynamic range of layer by appropriate fraction
             
             // calculate base adjustment to loudness for this layer, as deteremined by velocity
             double dBadjust = dynRange * (noteVelocity * 127. - sound->getMaxVelocity()) / (sound->getMaxVelocity() - sound->getMinVelocity());
             
             // offset each layer's loudness accordingly, if the range is extended
-            dBadjust += (sound->getLayerNumber() - sound->getNumLayers()) * rangeExtend / sound->getNumLayers();
+            dBadjust += (sound->getLayerNumber() - sound->getNumLayers()) * extendRange / sound->getNumLayers();
             
             // convert to a gain multipler
             noteVelocity = Decibels::decibelsToGain(dBadjust);

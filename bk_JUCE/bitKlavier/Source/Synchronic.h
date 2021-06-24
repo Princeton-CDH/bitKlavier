@@ -1397,8 +1397,8 @@ private:
     
     void playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster);
     
-    OwnedArray<Array<float>> pressVelocities;
-    OwnedArray<Array<float>> releaseVelocities;
+    OwnedArray<Array<float>> velocities;
+    OwnedArray<Array<float>> invertVelocities;
     Array<float> clusterVelocities;
     Array<int> keysDepressed;   //current keys that are depressed
     Array<int> syncKeysDepressed;

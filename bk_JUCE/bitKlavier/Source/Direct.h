@@ -573,8 +573,8 @@ private:
     Array<int>      keyPlayed[128];         //keep track of pitches played associated with particular key on keyboard
     Array<float>    keyPlayedOffset[128];   //and also the offsets
     
-    OwnedArray<Array<float>> pressVelocities;
-    OwnedArray<Array<float>> releaseVelocities;
+    OwnedArray<Array<float>> velocities;
+    OwnedArray<Array<float>> invertVelocities;
     
     float lastVelocity = 0.0f;
     bool lastVelocityInRange = false;

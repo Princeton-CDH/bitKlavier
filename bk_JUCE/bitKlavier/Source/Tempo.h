@@ -368,8 +368,8 @@ public:
     ~TempoProcessor();
     
     void processBlock(int numSamples, int channel);
-    void keyPressed(int noteNumber, Array<float>& targetVelocities);
-    void keyReleased(int noteNumber, Array<float>& targetVelocities);
+    void keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
     inline float getPeriodMultiplier(void)
     {
         return ((tempo->prep->getTempoSystem() == AdaptiveTempo1) ? adaptiveTempoPeriodMultiplier : 1.0);
@@ -441,6 +441,8 @@ private:
     void atCalculatePeriodMultiplier();
     float adaptiveTempoPeriodMultiplier;
     
+    OwnedArray<Array<float>> velocities;
+    OwnedArray<Array<float>> invertVelocities;
     
     JUCE_LEAK_DETECTOR(TempoProcessor);
 };

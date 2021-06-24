@@ -235,7 +235,7 @@ public:
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_sustainPedalKeys, sustainPedalKeys ? 1 : 0, 0);
         
-        keysave.setProperty(ptagKeymap_extendRange, rangeExtend, 0);
+        //keysave.setProperty(ptagKeymap_extendRange, rangeExtend, 0);
         keysave.setProperty(ptagKeymap_asymmetricalWarp, asym_k, 0);
         keysave.setProperty(ptagKeymap_symmetricalWarp, sym_k, 0);
         keysave.setProperty(ptagKeymap_scale, scale, 0);
@@ -342,7 +342,7 @@ public:
         setSustainPedalKeys((bool) e->getIntAttribute(ptagKeymap_sustainPedalKeys, 0));
         
         // Not sure what value the second argument needs to be. Right now I'm using the default values, but these are the values that bK uses for velocity curving before the view controller is opened and the values update to what they were saved to be.
-        rangeExtend = (float) e->getDoubleAttribute(ptagKeymap_extendRange, 4);
+        //rangeExtend = (float) e->getDoubleAttribute(ptagKeymap_extendRange, 4);
         asym_k = (float) e->getDoubleAttribute(ptagKeymap_asymmetricalWarp, 1);
         sym_k = (float) e->getDoubleAttribute(ptagKeymap_symmetricalWarp, 1);
         scale = (float) e->getDoubleAttribute(ptagKeymap_scale, 1);
@@ -594,7 +594,7 @@ public:
     inline void toggleSustainPedalKeys() { sustainPedalKeys = !sustainPedalKeys; }
     
     // Velocity Curving getters & setters
-    inline float getRangeExtend() { return rangeExtend; }
+    //inline float getRangeExtend() { return rangeExtend; }
     inline float getAsym_k() { return asym_k; }
     inline float getSym_k() { return sym_k; }
     inline float getScale() { return scale; }
@@ -602,7 +602,7 @@ public:
     inline bool getVelocityInvert() { return velocityInvert; }
     inline bool didVelocitiesChange() { return velocitiesChanged; }
     
-    inline void setRangeExtend(float newRangeExtend) { rangeExtend = newRangeExtend; }
+    //inline void setRangeExtend(float newRangeExtend) { rangeExtend = newRangeExtend; }
     inline void setAsym_k(float newAsym_k) { asym_k = newAsym_k; }
     inline void setSym_k(float newSym_k) { sym_k = newSym_k; }
     inline void setScale(float newScale) { scale = newScale; }
@@ -611,9 +611,11 @@ public:
     inline void setVelocitiesChanged(bool newVelocitiesChanged) { velocitiesChanged = newVelocitiesChanged; }
     
     // Velocity list handling - for velocity curve graph
-    inline void addVelocity(float toAdd) { velocities.insert(toAdd); setVelocitiesChanged(true); }
-    inline void removeVelocity(float toRemove) { velocities.erase(toRemove); setVelocitiesChanged(true); }
-    inline std::unordered_set<float>* getVelocities() { return &velocities; }
+    inline void addVelocity(int note, float toAdd)
+    { velocities.set(note, toAdd); setVelocitiesChanged(true); }
+    inline void removeVelocity(int note)
+    { velocities.remove(note); setVelocitiesChanged(true);  }
+    inline HashMap<int, float>* getVelocities() { return &velocities; }
     
 private:
     BKAudioProcessor& processor;
@@ -647,13 +649,13 @@ private:
     int harPostTranspose;
     
     // Velocity Curving Params - initalized to default values in the constructors
-    float rangeExtend;
+    //float rangeExtend;
     float asym_k;
     float sym_k;
     float scale;
     float offset;
     bool velocityInvert;
-    std::unordered_set<float> velocities;
+    HashMap<int, float> velocities;
     bool velocitiesChanged = false;
 
     bool ignoreSustain;

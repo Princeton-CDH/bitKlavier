@@ -59,12 +59,13 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
     for (int j = 0; j < 128; j++)
     {
         velocities.add(new Array<float>());
-        for (int i = 0; i < TargetTypeTempo-TargetTypeBlendronicPatternSync; i++)
+        invertVelocities.add(new Array<float>());
+        for (int i = 0; i < TargetTypeTempo-TargetTypeBlendronicPatternSync; ++i)
         {
             velocities.getLast()->add(0.f);
+            invertVelocities.getLast()->add(0.f);
         }
     }
-    
     
     holdTimers.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -183,15 +184,29 @@ void BlendronicProcessor::processBlock(int numSamples, int midiChannel)
     
 }
 
-void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities)
+void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
     BlendronicPreparation::Ptr prep = blendronic->prep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
     
-    for (int i = 0; i < velocities.size(); ++i)
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an actual key press (not an inverted release) aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
     {
-        float velocity = targetVelocities.getUnchecked(i+TargetTypeBlendronicPatternSync);
-        velocities.getUnchecked(i)->setUnchecked(noteNumber, velocity);
+        aVels = bVels = velocities.getUnchecked(noteNumber);
+        for (int i = 0; i < velocities.getUnchecked(noteNumber)->size(); ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeBlendronicPatternSync));
+        }
+    }
+    // If this an inverted release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last inverted press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = invertVelocities.getUnchecked(noteNumber);
     }
     
     //add note to array of depressed notes
@@ -199,12 +214,13 @@ void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     holdTimers.set(noteNumber, 0);
     
     // Get target flags
-    bool doPatternSync = targetVelocities.getUnchecked(TargetTypeBlendronicPatternSync) >= 0.f;
-    bool doBeatSync = targetVelocities.getUnchecked(TargetTypeBlendronicBeatSync) >= 0.f;
-    bool doClear = targetVelocities.getUnchecked(TargetTypeBlendronicClear) >= 0.f;
-    bool doPausePlay = targetVelocities.getUnchecked(TargetTypeBlendronicPausePlay) >= 0.f;
-    bool doOpenCloseInput = targetVelocities.getUnchecked(TargetTypeBlendronicOpenCloseInput) >= 0.f;
-    bool doOpenCloseOutput = targetVelocities.getUnchecked(TargetTypeBlendronicOpenCloseOutput) >= 0.f;
+    int s = TargetTypeBlendronicPatternSync;
+    bool doPatternSync = bVels->getUnchecked(TargetTypeBlendronicPatternSync-s) >= 0.f;
+    bool doBeatSync = bVels->getUnchecked(TargetTypeBlendronicBeatSync-s) >= 0.f;
+    bool doClear = bVels->getUnchecked(TargetTypeBlendronicClear-s) >= 0.f;
+    bool doPausePlay = bVels->getUnchecked(TargetTypeBlendronicPausePlay-s) >= 0.f;
+    bool doOpenCloseInput = bVels->getUnchecked(TargetTypeBlendronicOpenCloseInput-s) >= 0.f;
+    bool doOpenCloseOutput = bVels->getUnchecked(TargetTypeBlendronicOpenCloseOutput-s) >= 0.f;
     
     // DBG("doPatternSync = " + String((int)doPatternSync) + " doBeatSync = " + String((int)doBeatSync));
     
@@ -263,27 +279,42 @@ void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     }
 }
 
-void BlendronicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities)
+void BlendronicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
     BlendronicPreparation::Ptr prep = blendronic->prep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
 
-    for (int i = 0; i < velocities.size(); ++i)
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an inverted key press, aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
     {
-        float velocity = targetVelocities.getUnchecked(i+TargetTypeBlendronicPatternSync);
-        velocities.getUnchecked(i)->setUnchecked(noteNumber, velocity);
+        aVels = bVels = invertVelocities.getUnchecked(noteNumber);
+        for (int i = 0; i < invertVelocities.getUnchecked(noteNumber)->size(); ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeBlendronicPatternSync));
+        }
+    }
+    // If this an actual release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = velocities.getUnchecked(noteNumber);
     }
     
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
     
     // Get target flags
-    bool doPatternSync = targetVelocities.getUnchecked(TargetTypeBlendronicPatternSync) >= 0.f;
-    bool doBeatSync = targetVelocities.getUnchecked(TargetTypeBlendronicBeatSync) >= 0.f;
-    bool doClear = targetVelocities.getUnchecked(TargetTypeBlendronicClear) >= 0.f;
-    bool doPausePlay = targetVelocities.getUnchecked(TargetTypeBlendronicPausePlay) >= 0.f;
-    bool doOpenCloseInput = targetVelocities.getUnchecked(TargetTypeBlendronicOpenCloseInput) >= 0.f;
-    bool doOpenCloseOutput = targetVelocities.getUnchecked(TargetTypeBlendronicOpenCloseOutput) >= 0.f;
+    int s = TargetTypeBlendronicPatternSync;
+    bool doPatternSync = bVels->getUnchecked(TargetTypeBlendronicPatternSync-s) >= 0.f;
+    bool doBeatSync = bVels->getUnchecked(TargetTypeBlendronicBeatSync-s) >= 0.f;
+    bool doClear = bVels->getUnchecked(TargetTypeBlendronicClear-s) >= 0.f;
+    bool doPausePlay = bVels->getUnchecked(TargetTypeBlendronicPausePlay-s) >= 0.f;
+    bool doOpenCloseInput = bVels->getUnchecked(TargetTypeBlendronicOpenCloseInput-s) >= 0.f;
+    bool doOpenCloseOutput = bVels->getUnchecked(TargetTypeBlendronicOpenCloseOutput-s) >= 0.f;
 
     if (doPatternSync &&
         (prep->getTargetTypeBlendronicPatternSync() == NoteOff || prep->getTargetTypeBlendronicPatternSync() == Both))

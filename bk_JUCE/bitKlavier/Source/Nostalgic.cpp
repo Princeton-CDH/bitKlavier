@@ -119,12 +119,12 @@ keymaps(Keymap::PtrArr())
     
     for (int j = 0; j < 128; j++)
     {
-        pressVelocities.add(new Array<float>());
-        releaseVelocities.add(new Array<float>());
+        velocities.add(new Array<float>());
+        invertVelocities.add(new Array<float>());
         for (int i = 0; i < TargetTypeBlendronicPatternSync-TargetTypeNostalgic; ++i)
         {
-            pressVelocities.getLast()->add(0.f);
-            releaseVelocities.getLast()->add(0.f);
+            velocities.getLast()->add(0.f);
+            invertVelocities.getLast()->add(0.f);
         }
     }
     
@@ -165,20 +165,20 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = releaseVelocities.getUnchecked(noteNumber);
-        for (int i = 0; i < releaseVelocities.getUnchecked(noteNumber)->size(); ++i)
+        aVels = bVels = invertVelocities.getUnchecked(noteNumber);
+        for (int i = 0; i < invertVelocities.getUnchecked(noteNumber)->size(); ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeNostalgic));
         }
-        cVels = &releaseVelocities;
+        cVels = &invertVelocities;
     }
     // If this an actual release, aVels will be the incoming velocities,
     // but bVels will use the values from the last press (keyReleased with fromPress=true)
     else
     {
         aVels = &targetVelocities;
-        bVels = pressVelocities.getUnchecked(noteNumber);
-        cVels = &pressVelocities;
+        bVels = velocities.getUnchecked(noteNumber);
+        cVels = &velocities;
     }
     
     int s = TargetTypeNostalgic;
@@ -577,8 +577,8 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = pressVelocities.getUnchecked(noteNumber);
-        for (int i = 0; i < pressVelocities.getUnchecked(noteNumber)->size(); ++i)
+        aVels = bVels = velocities.getUnchecked(noteNumber);
+        for (int i = 0; i < velocities.getUnchecked(noteNumber)->size(); ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeNostalgic));
         }
@@ -588,7 +588,7 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
     else
     {
         aVels = &targetVelocities;
-        bVels = releaseVelocities.getUnchecked(noteNumber);
+        bVels = invertVelocities.getUnchecked(noteNumber);
     }
     
     int s = TargetTypeNostalgic;

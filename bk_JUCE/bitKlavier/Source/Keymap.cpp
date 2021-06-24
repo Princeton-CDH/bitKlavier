@@ -31,7 +31,7 @@ onscreenSelected(true),
 harKey(60),
 harPreTranspose(0),
 harPostTranspose(0),
-rangeExtend(4),
+//rangeExtend(4),
 asym_k(1),
 sym_k(1),
 scale(1),
@@ -82,7 +82,7 @@ onscreenSelected(k->isOnscreenSelected()),
 harKey(k->getHarKey()),
 harPreTranspose(k->getHarPreTranspose()),
 harPostTranspose(k->getHarPostTranspose()),
-rangeExtend(k->getRangeExtend()),
+//rangeExtend(k->getRangeExtend()),
 asym_k(k->getAsym_k()),
 sym_k(k->getSym_k()),
 scale(k->getScale()),
@@ -139,7 +139,7 @@ onscreenSelected(k->isOnscreenSelected()),
 harKey(k->getHarKey()),
 harPreTranspose(k->getHarPreTranspose()),
 harPostTranspose(k->getHarPostTranspose()),
-rangeExtend(k->getRangeExtend()),
+//rangeExtend(k->getRangeExtend()),
 asym_k(k->getAsym_k()),
 sym_k(k->getSym_k()),
 scale(k->getScale()),
@@ -199,7 +199,7 @@ onscreenSelected(true),
 harKey(60),
 harPreTranspose(0),
 harPostTranspose(0),
-rangeExtend(4),
+//rangeExtend(4),
 asym_k(1),
 sym_k(1),
 scale(1),
@@ -646,9 +646,6 @@ float Keymap::applyVelocityCurve(float velocity)
      the Heavy set and other new bK sample libraries).
      */
     
-    // Add this velocity to the list (to be displayed by the velocity curving graph)
-    addVelocity(velocity);
-    
     float velocityCurved = dt_warpscale(velocity, asym_k, sym_k, scale, offset);
     if (velocityInvert) velocityCurved = 1. - velocityCurved;
     
@@ -656,7 +653,6 @@ float Keymap::applyVelocityCurve(float velocity)
     else if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
     // something will break down the line if not capped - note from jeff
     
-    DBG("rangeExtend = " + String(rangeExtend));
     DBG("asym_k = " + String(asym_k));
     DBG("sym_k = " + String(sym_k));
     DBG("scale = " + String(scale));
