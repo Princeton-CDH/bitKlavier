@@ -892,8 +892,8 @@ public:
     float getOffset(int midiNoteNumber, bool updateLastInterval);
     
     //for calculating adaptive tuning
-    void keyPressed(int midiNoteNumber);
-    void keyReleased(int midiNoteNumber);
+    void keyPressed(int midiNoteNumber, Array<float>& targetVelocities);
+    void keyReleased(int midiNoteNumber, Array<float>& targetVelocities);
     
     inline int getId(void) const noexcept { return tuning->getId(); }
     

@@ -17,7 +17,7 @@ processor(processor),
 Id(Id),
 name("Keymap "+String(Id)),
 keymap(Array<bool>()),
-targetStates(Array<KeymapTargetState>()),
+targetStates(Array<bool>()),
 midiEdit(false),
 harMidiEdit(false),
 harArrayMidiEdit(false),
@@ -56,7 +56,7 @@ sustainPedalKeys(false)
     targetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
     {
-        targetStates.add(TargetStateNil);
+        targetStates.add(false);
     }
 
     harmonizerKeys.ensureStorageAllocated(128);
@@ -102,7 +102,7 @@ sustainPedalKeys(k->getSustainPedalKeys())
     targetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
     {
-        targetStates.add(TargetStateNil);
+        targetStates.add(false);
     }
     
     inverted = k->isInverted();
@@ -159,7 +159,7 @@ sustainPedalKeys(k->getSustainPedalKeys())
     targetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
     {
-        targetStates.add(TargetStateNil);
+        targetStates.add(false);
     }
     
     inverted = k->isInverted();
@@ -186,7 +186,7 @@ processor(processor),
 Id(-1),
 name("Keymap "+String(Id)),
 keymap(Array<bool>()),
-targetStates(Array<KeymapTargetState>()),
+targetStates(Array<bool>()),
 midiEdit(false),
 harMidiEdit(false),
 harArrayMidiEdit(false),
@@ -218,7 +218,7 @@ sustainPedalKeys(false)
     targetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
     {
-        targetStates.add(TargetStateNil);
+        targetStates.add(false);
     }
 
     harmonizerKeys.ensureStorageAllocated(128);
@@ -443,7 +443,7 @@ void Keymap::setKeys(KeySet set, bool action, PitchClass pc)
     }
 }
 
-void Keymap::setTarget(KeymapTargetType target, KeymapTargetState state)
+void Keymap::setTarget(KeymapTargetType target, bool state)
 {
     //if (targetStates[target] == TargetStateNil) return;
     
@@ -454,84 +454,20 @@ void Keymap::setTarget(KeymapTargetType target, KeymapTargetState state)
 
 void Keymap::toggleTarget(KeymapTargetType target)
 {
-    if (targetStates[target] == TargetStateNil) return;
+    if (!targetStates[target]) return;
     
-    targetStates.set(target, (targetStates[target] == TargetStateDisabled) ? TargetStateEnabled : TargetStateDisabled);
+    targetStates.set(target, !targetStates[target]);
     DBG("Keymap::toggleTarget = " + String(target) + " " + String((int) getTargetState(target)));
 }
 
 void Keymap::enableTarget(KeymapTargetType target)
 {
-    targetStates.set(target, TargetStateEnabled);
+    targetStates.set(target, true);
 }
 
 void Keymap::disableTarget(KeymapTargetType target)
 {
-    targetStates.set(target, TargetStateDisabled);
-}
-
-void Keymap::addTarget(KeymapTargetType target)
-{
-    if (targetStates[target] == TargetStateNil)
-    {
-        targetStates.set(target, TargetStateEnabled);
-    }
-}
-
-void Keymap::addTarget(KeymapTargetType target, KeymapTargetState state)
-{
-    if (targetStates[target] == TargetStateNil)
-    {
-        targetStates.set(target, state);
-    }
-}
-
-void Keymap::removeTarget(KeymapTargetType target)
-{
-    targetStates.set(target, TargetStateNil);
-}
-
-
-void Keymap::removeTargetsOfType(BKPreparationType type)
-{
-    if (type == PreparationTypeDirect)
-    {
-        removeTarget(TargetTypeDirect);
-    }
-    if (type == PreparationTypeSynchronic)
-    {
-        for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
-        {
-            removeTarget((KeymapTargetType) i);
-        }
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        removeTarget(TargetTypeNostalgic);
-    }
-    else if (type == PreparationTypeBlendronic)
-    {
-        for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
-        {
-            removeTarget((KeymapTargetType) i);
-        }
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        removeTarget(TargetTypeTempo);
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        removeTarget(TargetTypeTuning);
-    }
-}
-
-void Keymap::clearTargets()
-{
-    for (int i = 0; i < TargetTypeNil; i++)
-    {
-        targetStates.set(i, TargetStateNil);
-    }
+    targetStates.set(target, false);
 }
 
 const Array<String> Keymap::getAllMidiInputNames()
@@ -687,4 +623,45 @@ void Keymap::setOnscreenSelected(bool selected)
         onscreenSelected = true;
     }
     else onscreenSelected = selected;
+}
+
+float Keymap::applyVelocityCurve(float velocity)
+{
+    /*
+     **** Velocity Curving
+     user settable parameters:
+     --asymmetric warping coefficient (0, 10): default 1 (no warping)
+     --symmetric warping coefficent (0, 5): default 1 (no warping)
+     --scaling multipler (0, 10): default 1.
+     --offset (-1, 1): default 0.
+     --invert velocities, toggle: default off
+     
+     also, the user should be able to set extendRange (in dB), which is in BKPianoSampler::startNote()
+     and will presumably need to pass through here.
+     
+     velocity curving doesn't actually extend the dynamic range (well, it could if scaling results
+     in velocities > 1.), but rather just distributes the incoming velocities across the dynamic
+     range with the sample layers. extendRange will extend the total dynamic of the sample set, and
+     is set to 4dB by default at the moment (that's probably a reasonable default, and feels good for
+     the Heavy set and other new bK sample libraries).
+     */
+    
+    // Add this velocity to the list (to be displayed by the velocity curving graph)
+    addVelocity(velocity);
+    
+    float velocityCurved = dt_warpscale(velocity, asym_k, sym_k, scale, offset);
+    if (velocityInvert) velocityCurved = 1. - velocityCurved;
+    
+    if (velocityCurved < 0.) velocityCurved = 0.;
+    else if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
+    // something will break down the line if not capped - note from jeff
+    
+    DBG("rangeExtend = " + String(rangeExtend));
+    DBG("asym_k = " + String(asym_k));
+    DBG("sym_k = " + String(sym_k));
+    DBG("scale = " + String(scale));
+    DBG("offset = " + String(offset));
+    DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
+    
+    return velocityCurved;
 }

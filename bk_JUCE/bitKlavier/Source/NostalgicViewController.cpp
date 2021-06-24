@@ -1140,7 +1140,7 @@ void NostalgicPreparationEditor::timerCallback()
             {
                 bool makeBright = false;
                 for (auto km : nProcessor->getKeymaps())
-                    if (km->getTargetStates()[(KeymapTargetType) i] == TargetStateEnabled) makeBright = true;
+                    if (km->getTargetStates()[(KeymapTargetType) i]) makeBright = true;
                 
                 if (makeBright)
                 {

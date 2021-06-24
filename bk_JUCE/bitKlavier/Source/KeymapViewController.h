@@ -61,7 +61,7 @@ public:
     void deleteCurrent(void);
     
     void keymapUpdated(TextEditor& tf);
-    void hideUnconnectedTargets();
+    void updateTargets();
     
     void bkTextFieldDidChange       (TextEditor&)           override;
 
@@ -179,8 +179,6 @@ private:
     void bkButtonClicked            (Button* b)             override;
     
     void timerCallback() override;
-    
-    void updateKeymapTargets(void);
     
     bool focusLostByEscapeKey;
     

@@ -358,27 +358,10 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                     
                     //keymap assignment
                     BigInteger noteRange;
-                    int root = 0;
-                    if (j == 0)
-                    {
-                        root = (9+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    }
-                    else if (j == 1)
-                    {
-                        root = (0+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    }
-                    else if (j == 2)
-                    {
-                        root = (3+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    }
-                    else if (j == 3)
-                    {
-                        root = (6+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    }
+                    
+                    int root = (12 * i) + noteNameToRoot(bkNotes[j]) + 12;
+                    if (i == 7 && j == 3) noteRange.setRange(root-1, 5, true); //High A
+                    else noteRange.setRange(root-1, 3, true);
                     
                     //velocity switching
                     BigInteger velocityRange;

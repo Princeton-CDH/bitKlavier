@@ -274,7 +274,7 @@ public:
             
             if (attr != String())
             {
-                targetStates.setUnchecked(i, (KeymapTargetState) attr.getIntValue());
+                targetStates.setUnchecked(i, (bool) attr.getIntValue());
             }
         }
         
@@ -355,9 +355,9 @@ public:
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }
     
-    inline KeymapTargetState getTargetState(KeymapTargetType type) const noexcept { return targetStates[type]; }
-    inline Array<KeymapTargetState> getTargetStates(void) const noexcept { return targetStates; }
-    inline void setTargetStates(Array<KeymapTargetState> ts) { targetStates = ts; }
+    inline bool getTargetState(KeymapTargetType type) const noexcept { return targetStates[type]; }
+    inline const Array<bool>& getTargetStates(void) const noexcept { return targetStates; }
+    inline void setTargetStates(Array<bool> ts) { targetStates = ts; }
     
     inline bool isInverted(void) const noexcept { return inverted; }
     inline void setInverted(bool inv) { inverted = inv; }
@@ -392,15 +392,10 @@ public:
     inline bool isOnscreenSelected() { return onscreenSelected; }
     void setOnscreenSelected(bool selected);
     
-    void setTarget(KeymapTargetType target, KeymapTargetState state);
+    void setTarget(KeymapTargetType target, bool state);
     void toggleTarget(KeymapTargetType target);
     void enableTarget(KeymapTargetType target);
     void disableTarget(KeymapTargetType target);
-    void addTarget(KeymapTargetType target);
-    void addTarget(KeymapTargetType target, KeymapTargetState state);
-    void removeTarget(KeymapTargetType target);
-    void removeTargetsOfType(BKPreparationType type);
-    void clearTargets(void);
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
@@ -572,6 +567,8 @@ public:
 
     void defaultHarmonizations();
     void clearHarmonizations();
+    
+    float applyVelocityCurve(float velocity);
 
     /*
     inline bool getHarmonizerEnabled() { return harmonizerEnabled; }
@@ -614,8 +611,8 @@ public:
     inline void setVelocitiesChanged(bool newVelocitiesChanged) { velocitiesChanged = newVelocitiesChanged; }
     
     // Velocity list handling - for velocity curve graph
-    inline void addVelocity(float toAdd) { velocities.insert(toAdd); }
-    inline void removeVelocity(float toRemove) { velocities.erase(toRemove); }
+    inline void addVelocity(float toAdd) { velocities.insert(toAdd); setVelocitiesChanged(true); }
+    inline void removeVelocity(float toRemove) { velocities.erase(toRemove); setVelocitiesChanged(true); }
     inline std::unordered_set<float>* getVelocities() { return &velocities; }
     
 private:
@@ -624,7 +621,7 @@ private:
     String name;
     Array<bool> keymap;
     
-    Array<KeymapTargetState> targetStates;
+    Array<bool> targetStates;
     
     // Use midi input to edit active keys 
     bool midiEdit;

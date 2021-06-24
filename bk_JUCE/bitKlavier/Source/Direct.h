@@ -499,9 +499,10 @@ public:
     BKSampleLoadType sampleType;
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
     
-    void    keyPressed(int noteNumber, float velocity, int channel);
-    void    keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false);
-    void    playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont = false);
+    void    keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void    keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void    playReleaseSample(int noteNumber, Array<float>& targetVelocities,
+                              bool fromPress, bool soundfont = false);
     
     inline void prepareToPlay(double sr, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
     {
@@ -550,7 +551,10 @@ public:
     
     inline float getLastVelocity() const noexcept { return lastVelocity; }
     
-    bool velocityCheck(int noteNumber);
+    // Return vel if within range, else return -1.f
+    float filterVelocity(float vel);
+    void resetLastVelocity() { lastVelocityInRange = false; }
+
     
 private:
     BKSynthesiser*      synth;
@@ -569,10 +573,11 @@ private:
     Array<int>      keyPlayed[128];         //keep track of pitches played associated with particular key on keyboard
     Array<float>    keyPlayedOffset[128];   //and also the offsets
     
-    Array<float> velocities;
-    Array<float> velocitiesActive;
+    OwnedArray<Array<float>> pressVelocities;
+    OwnedArray<Array<float>> releaseVelocities;
     
     float lastVelocity = 0.0f;
+    bool lastVelocityInRange = false;
     
     JUCE_LEAK_DETECTOR(DirectProcessor);
 };

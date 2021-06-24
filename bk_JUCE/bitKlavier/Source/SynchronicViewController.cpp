@@ -837,8 +837,9 @@ void SynchronicPreparationEditor::timerCallback()
         for (int i = TargetTypeSynchronicPatternSync; i <= TargetTypeSynchronicRotate; i++)
         {
             bool makeBright = false;
+            
             for (auto km : sProcessor->getKeymaps())
-                if (km->getTargetStates()[(KeymapTargetType) i] == TargetStateEnabled) makeBright = true;
+                makeBright = km->getTargetStates()[i];
             
             if (makeBright)
             {

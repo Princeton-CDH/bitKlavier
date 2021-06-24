@@ -630,10 +630,10 @@ public:
 	BKSampleLoadType sampleType;
 
 	//begin timing played note length, called with noteOn
-	void keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates);
+	void keyPressed(int noteNumber, Array<float>& targetVelocities);
 
 	//begin playing reverse note, called with noteOff
-	void keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post = false);
+	void keyReleased(int noteNumber, Array<float>& targetVelocities);
 
 	void postRelease(int noteNumber, int midiChannel);
 
@@ -726,7 +726,7 @@ private:
     
     bool blendronicActive;
     
-	Array<float> velocities;    //record of velocities
+	OwnedArray<Array<float>> velocities;    //record of velocities
     Array<uint64> holdTimers;
 	Array<int> keysDepressed;   //current keys that are depressed
     

@@ -563,50 +563,34 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     {
         DirectProcessor::Ptr dproc = getDirectProcessor(thisId);
         prepMap->addDirectProcessor(dproc);
-        
-        keymap->addTarget(TargetTypeDirect);
+        keymap->enableTarget(TargetTypeDirect);
     }
     else if (thisType == PreparationTypeSynchronic)
     {
         SynchronicProcessor::Ptr sproc = getSynchronicProcessor(thisId);
         prepMap->addSynchronicProcessor(sproc);
-        
-        keymap->addTarget(TargetTypeSynchronic);
-        for (int i = TargetTypeSynchronic+1; i <= TargetTypeSynchronicRotate; i++)
-        {
-            keymap->addTarget((KeymapTargetType) i, TargetStateDisabled);
-        }
     }
     else if (thisType == PreparationTypeNostalgic)
     {
         NostalgicProcessor::Ptr nproc = getNostalgicProcessor(thisId);
         prepMap->addNostalgicProcessor(nproc);
-        
-        keymap->addTarget(TargetTypeNostalgic);
     }
     else if (thisType == PreparationTypeBlendronic)
     {
         BlendronicProcessor::Ptr bproc = getBlendronicProcessor(thisId);
         prepMap->addBlendronicProcessor(bproc);
-        
-        for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
-        {
-            keymap->addTarget((KeymapTargetType) i, TargetStateDisabled);
-        }
     }
     else if (thisType == PreparationTypeTempo)
     {
         TempoProcessor::Ptr mproc = getTempoProcessor(thisId);
         prepMap->addTempoProcessor(mproc);
-        
-        keymap->addTarget(TargetTypeTempo);
+        keymap->enableTarget(TargetTypeTempo);
     }
     else if (thisType == PreparationTypeTuning)
     {
         TuningProcessor::Ptr tproc = getTuningProcessor(thisId);
         prepMap->addTuningProcessor(tproc);
-        
-        keymap->addTarget(TargetTypeTuning);
+        keymap->enableTarget(TargetTypeTuning);
     }
     prepMap->linkKeymapToPreparation(keymapId, thisType, thisId);
 }

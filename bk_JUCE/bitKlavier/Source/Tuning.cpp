@@ -154,15 +154,17 @@ void TuningProcessor::processBlock(int numSamples)
     }
 }
 
-void TuningProcessor::keyReleased(int midiNoteNumber)
+void TuningProcessor::keyReleased(int midiNoteNumber, Array<float>& targetVelocities)
 {
+    if (targetVelocities.getUnchecked(TargetTypeTuning) < 0.f) return;
     tuning->prep->getSpringTuning()->removeNote(midiNoteNumber);
 }
 
 
 //add note to the adaptive tuning history, update adaptive fundamental
-void TuningProcessor::keyPressed(int midiNoteNumber)
+void TuningProcessor::keyPressed(int midiNoteNumber, Array<float>& targetVelocities)
 {
+    if (targetVelocities.getUnchecked(TargetTypeTuning) < 0.f) return;
     //DBG("TuningProcessor::keyPressed " + String(midiNoteNumber));
     
     adaptiveHistoryCounter++;

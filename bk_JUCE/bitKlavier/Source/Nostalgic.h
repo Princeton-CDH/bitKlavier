@@ -764,10 +764,10 @@ public:
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
     
     // begin timing played note length, called with noteOn
-    void keyPressed(int midiNoteNumber, float midiNoteVelocity, int midiChannel, Array<KeymapTargetState> targetStates);
+    void keyPressed(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress);
     
     // begin playing reverse note, called with noteOff
-    void keyReleased(int midiNoteNumber, float midiVelocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post = false);
+    void keyReleased(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress, bool post = false);
     
     void postRelease(int midiNoteNumber, int midiChannel);
     
@@ -814,11 +814,6 @@ public:
 		return blendronic;
 	}
 
-//    inline int getBlendronicId(void)
-//    {
-//        return blendronic->getId();
-//    }
-    
     inline void setTuning(TuningProcessor::Ptr p)
     {
         tuner = p;
@@ -856,6 +851,9 @@ public:
     inline int getCurrentClusterSize() const noexcept { return currentClusterSize; }
     inline int getClusterThresholdTimer() const noexcept { return clusterThresholdTimer * 1000. / synth->getSampleRate(); }
     
+    float filterVelocity(float vel);
+    void resetLastVelocity() { lastVelocityInRange = false; }
+    
     inline void addKeymap(Keymap::Ptr keymap)
     {
         keymaps.add(keymap);
@@ -879,11 +877,13 @@ private:
     Array<uint64> noteLengthTimers;     // store current length of played notes here
     Array<int> activeNotes;             // table of notes currently being played by player
     Array<bool> noteOn;                 // table of booleans representing state of each note
-    Array<float> velocities;            // table of velocities played
+    OwnedArray<Array<float>> pressVelocities;            // table of velocities played
+    OwnedArray<Array<float>> releaseVelocities;
     
     uint64 lastHoldTime;
     int lastKeyPlayed;
-    float lastVelocity;
+    float lastVelocity = 0.f;
+    bool lastVelocityInRange = false;
     
     // CLUSTER STUFF
     bool inCluster;

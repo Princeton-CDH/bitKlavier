@@ -208,7 +208,6 @@ bool BKPianoSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
     return dynamic_cast<const BKPianoSamplerSound*> (sound) != nullptr;
 }
 
-
 void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      const float offset,
                                      const float gain,

@@ -56,11 +56,19 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
 	smoothIndex(0),
 	feedbackIndex(0)
 {
-    velocities.ensureStorageAllocated(128);
+    for (int j = 0; j < 128; j++)
+    {
+        velocities.add(new Array<float>());
+        for (int i = 0; i < TargetTypeTempo-TargetTypeBlendronicPatternSync; i++)
+        {
+            velocities.getLast()->add(0.f);
+        }
+    }
+    
+    
     holdTimers.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
-        velocities.insert(i, 0.);
         holdTimers.insert(i, 0);
     }
     
@@ -175,23 +183,28 @@ void BlendronicProcessor::processBlock(int numSamples, int midiChannel)
     
 }
 
-void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
+void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities)
 {
     BlendronicPreparation::Ptr prep = blendronic->prep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
     
+    for (int i = 0; i < velocities.size(); ++i)
+    {
+        float velocity = targetVelocities.getUnchecked(i+TargetTypeBlendronicPatternSync);
+        velocities.getUnchecked(i)->setUnchecked(noteNumber, velocity);
+    }
+    
     //add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
-    velocities.set(noteNumber, velocity);
     holdTimers.set(noteNumber, 0);
     
     // Get target flags
-    bool doPatternSync = targetStates[TargetTypeBlendronicPatternSync] == TargetStateEnabled;
-    bool doBeatSync = targetStates[TargetTypeBlendronicBeatSync] == TargetStateEnabled;
-    bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
-    bool doPausePlay = targetStates[TargetTypeBlendronicPausePlay] == TargetStateEnabled;
-    bool doOpenCloseInput = targetStates[TargetTypeBlendronicOpenCloseInput] == TargetStateEnabled;
-    bool doOpenCloseOutput = targetStates[TargetTypeBlendronicOpenCloseOutput] == TargetStateEnabled;
+    bool doPatternSync = targetVelocities.getUnchecked(TargetTypeBlendronicPatternSync) >= 0.f;
+    bool doBeatSync = targetVelocities.getUnchecked(TargetTypeBlendronicBeatSync) >= 0.f;
+    bool doClear = targetVelocities.getUnchecked(TargetTypeBlendronicClear) >= 0.f;
+    bool doPausePlay = targetVelocities.getUnchecked(TargetTypeBlendronicPausePlay) >= 0.f;
+    bool doOpenCloseInput = targetVelocities.getUnchecked(TargetTypeBlendronicOpenCloseInput) >= 0.f;
+    bool doOpenCloseOutput = targetVelocities.getUnchecked(TargetTypeBlendronicOpenCloseOutput) >= 0.f;
     
     // DBG("doPatternSync = " + String((int)doPatternSync) + " doBeatSync = " + String((int)doBeatSync));
     
@@ -250,21 +263,27 @@ void BlendronicProcessor::keyPressed(int noteNumber, float velocity, int midiCha
     }
 }
 
-void BlendronicProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
+void BlendronicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities)
 {
     BlendronicPreparation::Ptr prep = blendronic->prep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+
+    for (int i = 0; i < velocities.size(); ++i)
+    {
+        float velocity = targetVelocities.getUnchecked(i+TargetTypeBlendronicPatternSync);
+        velocities.getUnchecked(i)->setUnchecked(noteNumber, velocity);
+    }
     
     //remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
     
     // Get target flags
-    bool doPatternSync = targetStates[TargetTypeBlendronicPatternSync] == TargetStateEnabled;
-    bool doBeatSync = targetStates[TargetTypeBlendronicBeatSync] == TargetStateEnabled;
-    bool doClear = targetStates[TargetTypeBlendronicClear] == TargetStateEnabled;
-    bool doPausePlay = targetStates[TargetTypeBlendronicPausePlay] == TargetStateEnabled;
-    bool doOpenCloseInput = targetStates[TargetTypeBlendronicOpenCloseInput] == TargetStateEnabled;
-    bool doOpenCloseOutput = targetStates[TargetTypeBlendronicOpenCloseOutput] == TargetStateEnabled;
+    bool doPatternSync = targetVelocities.getUnchecked(TargetTypeBlendronicPatternSync) >= 0.f;
+    bool doBeatSync = targetVelocities.getUnchecked(TargetTypeBlendronicBeatSync) >= 0.f;
+    bool doClear = targetVelocities.getUnchecked(TargetTypeBlendronicClear) >= 0.f;
+    bool doPausePlay = targetVelocities.getUnchecked(TargetTypeBlendronicPausePlay) >= 0.f;
+    bool doOpenCloseInput = targetVelocities.getUnchecked(TargetTypeBlendronicOpenCloseInput) >= 0.f;
+    bool doOpenCloseOutput = targetVelocities.getUnchecked(TargetTypeBlendronicOpenCloseOutput) >= 0.f;
 
     if (doPatternSync &&
         (prep->getTargetTypeBlendronicPatternSync() == NoteOff || prep->getTargetTypeBlendronicPatternSync() == Both))

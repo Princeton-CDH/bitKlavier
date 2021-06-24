@@ -54,14 +54,16 @@ void TempoProcessor::processBlock(int numSamples, int channel)
     atTimer += numSamples;
 }
 
-void TempoProcessor::keyPressed(int noteNumber, float velocity)
+void TempoProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities)
 {
+    if (targetVelocities.getUnchecked(TargetTypeTempo) < 0.f) return;
     DBG("adding adaptive tempo note" + String(noteNumber));
     atNewNote();
 }
 
-void TempoProcessor::keyReleased(int noteNumber, int channel)
+void TempoProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities)
 {
+    if (targetVelocities.getUnchecked(TargetTypeTempo) < 0.f) return;
     atNewNoteOff();
 }
 

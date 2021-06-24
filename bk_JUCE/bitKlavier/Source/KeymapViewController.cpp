@@ -1522,9 +1522,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
         {
             if (b == targetControlTBs[i])
             {
-                //state ? TargetStateDisabled : TargetStateEnabled
-                keymap->setTarget((KeymapTargetType) i,  (KeymapTargetState) b->getToggleState());
-                // keymap->setTarget((KeymapTargetType) i,  b->getToggleState() ? TargetStateDisabled : TargetStateEnabled);
+                keymap->setTarget((KeymapTargetType) i, b->getToggleState());
                 DBG("Keymap toggle change: " + (String)cKeymapTargetTypes[i] + " " + String((int)b->getToggleState()));
             }
         }
@@ -1684,11 +1682,11 @@ void KeymapViewController::update(void)
         
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
         {
-            targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType) i) == TargetStateEnabled, dontSendNotification);
+            targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType) i), dontSendNotification);
         }
     }
     
-    hideUnconnectedTargets();
+    updateTargets();
     
     km->print();
     
@@ -1835,25 +1833,7 @@ void KeymapViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, St
     processor.updateState->editsMade = true;
 }
 
-
-
-void KeymapViewController::updateKeymapTargets()
-{
-    Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-    BKItem::Ptr kmItem = theGraph->get(PreparationTypeKeymap, km->getId());
-    
-    if(kmItem != nullptr) {
-        for (int type = 0; type < BKPreparationTypeNil; ++type)
-        {
-            if (kmItem->getConnectionsOfType((BKPreparationType) type).size() == 0)
-            {
-                km->removeTargetsOfType((BKPreparationType) type);
-            }
-        }
-    }
-}
-
-void KeymapViewController::hideUnconnectedTargets()
+void KeymapViewController::updateTargets()
 {
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     BKItem::Ptr kmItem = theGraph->get(PreparationTypeKeymap, km->getId());
@@ -1864,6 +1844,7 @@ void KeymapViewController::hideUnconnectedTargets()
             {
                 targetControlTBs[i]->setAlpha(gDim);
                 targetControlTBs[i]->setEnabled(false);
+                targetControlTBs[i]->setToggleState(false, sendNotification);
             }
             
             synchronicTBGroup.setAlpha(gDim);
@@ -1874,6 +1855,7 @@ void KeymapViewController::hideUnconnectedTargets()
             {
                 targetControlTBs[i]->setAlpha(gBright);
                 targetControlTBs[i]->setEnabled(true);
+                targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType)i), dontSendNotification);
             }
             
             synchronicTBGroup.setAlpha(gMedium);
@@ -1885,6 +1867,7 @@ void KeymapViewController::hideUnconnectedTargets()
             {
                 targetControlTBs[i]->setAlpha(gDim);
                 targetControlTBs[i]->setEnabled(false);
+                targetControlTBs[i]->setToggleState(false, sendNotification);
             }
             
             blendronicTBGroup.setAlpha(gDim);
@@ -1895,6 +1878,7 @@ void KeymapViewController::hideUnconnectedTargets()
             {
                 targetControlTBs[i]->setAlpha(gBright);
                 targetControlTBs[i]->setEnabled(true);
+                targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType)i), dontSendNotification);
             }
             
             blendronicTBGroup.setAlpha(gMedium);
@@ -1906,6 +1890,7 @@ void KeymapViewController::hideUnconnectedTargets()
             {
                 targetControlTBs[i]->setAlpha(gDim);
                 targetControlTBs[i]->setEnabled(false);
+                targetControlTBs[i]->setToggleState(false, sendNotification);
             }
             
             nostalgicTBGroup.setAlpha(gDim);
@@ -1916,6 +1901,7 @@ void KeymapViewController::hideUnconnectedTargets()
             {
                 targetControlTBs[i]->setAlpha(gBright);
                 targetControlTBs[i]->setEnabled(true);
+                targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType)i), dontSendNotification);
             }
             
             nostalgicTBGroup.setAlpha(gMedium);
@@ -1952,7 +1938,6 @@ void KeymapViewController::timerCallback(){
         km->setVelocitiesChanged(false);
     }
 
-    //updateKeymapTargets(); // needed?
     /*
     BKItem::Ptr kmItem = theGraph->get(PreparationTypeKeymap, km->getId());
     if(kmItem != nullptr) {

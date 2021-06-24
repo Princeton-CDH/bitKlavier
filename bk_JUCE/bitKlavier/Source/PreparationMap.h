@@ -50,7 +50,8 @@ public:
     void sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post);
     void sustainPedalReleased() { sustainPedalReleased(false); };
     void attemptReattack(int noteNumber, int mappedFrom, String source = String("Default"));
-    void attemptSustain(int noteNumber, float velocity, int channel, int mappedFrom, bool soundfont, String source = String("Default"));
+    void attemptSustain(int noteNumber, float velocity, int channel, int mappedFrom,
+                        bool fromPress, bool soundfont, String source = String("Default"));
     
     inline bool keymapsContainNote(int noteNumber) {
         bool contains = false;

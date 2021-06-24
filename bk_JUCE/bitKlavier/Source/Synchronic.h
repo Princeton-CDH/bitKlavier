@@ -1244,8 +1244,8 @@ public:
     
     BKSampleLoadType sampleType;
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
-    void keyPressed(int noteNumber, float velocity, Array<KeymapTargetState> targetStates);
-    void keyReleased(int noteNumber, float velocity, int channel, Array<KeymapTargetState> targetStates);
+    void keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
     float getTimeToBeatMS(float beatsToSkip);
     
     
@@ -1256,14 +1256,12 @@ public:
     
     inline const float getHoldTimer() const noexcept
     {
-        // if(keysDepressed.size() == 0 ) return 0;
         return 1000. * holdTimers[lastKeyPressed] / synth->getSampleRate() ;
     }
     
     inline const float getLastVelocity() const noexcept
     {
-        // if(keysDepressed.size() == 0 ) return 0;
-        return lastKeyVelocity;
+        return lastVelocity;
     }
     
     inline const SynchronicSyncMode getMode() const noexcept {return synchronic->prep->sMode.value; }
@@ -1357,7 +1355,9 @@ public:
         clusters = nclusters;
     }
     
-    bool velocityCheck(int noteNumber);
+    float filterVelocity(float vel);
+    void resetLastVelocity() { lastVelocityInRange = false; }
+    
     bool holdCheck(int noteNumber);
     
     inline void addKeymap(Keymap::Ptr keymap)
@@ -1396,8 +1396,10 @@ private:
     PitchClass tuningBasePitch;
     
     void playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster);
-    Array<float> velocities;    //record of velocities
-    Array<float> velocitiesActive;
+    
+    OwnedArray<Array<float>> pressVelocities;
+    OwnedArray<Array<float>> releaseVelocities;
+    Array<float> clusterVelocities;
     Array<int> keysDepressed;   //current keys that are depressed
     Array<int> syncKeysDepressed;
     Array<int> clusterKeysDepressed;
@@ -1422,7 +1424,8 @@ private:
     
     Array<uint64> holdTimers;
     int lastKeyPressed;
-    float lastKeyVelocity;
+    float lastVelocity = 0.f;
+    bool lastVelocityInRange = false;
     
     bool notePlayed;
     

@@ -57,13 +57,18 @@ tuner(tuning),
 blendronic(blend),
 keymaps(Keymap::PtrArr())
 {
-    velocities.ensureStorageAllocated(128);
-    velocitiesActive.ensureStorageAllocated(128);
-    for (int i = 0; i < 128; i++)
+    // Only one Direct target right now, but will use structure for multiple in case we add more
+    for (int j = 0; j < 128; j++)
     {
-        velocities.insert(i, 0.);
-        velocitiesActive.insert(i, 0);
+        pressVelocities.add(new Array<float>());
+        releaseVelocities.add(new Array<float>());
+        for (int i = 0; i < TargetTypeSynchronic-TargetTypeDirect; ++i)
+        {
+            pressVelocities.getLast()->add(0.f);
+            releaseVelocities.getLast()->add(0.f);
+        }
     }
+         
     
     if (!direct->prep->dUseGlobalSoundSet.value)
     {
@@ -114,31 +119,33 @@ DirectProcessor::~DirectProcessor(void)
     
 }
 
-void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
+void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an actual key press (not an inverted release) aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
+    {
+        aVels = bVels = pressVelocities.getUnchecked(noteNumber);
+        for (int i = 0; i < pressVelocities.getUnchecked(noteNumber)->size(); ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeDirect));
+        }
+    }
+    // If this an inverted release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last inverted press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = releaseVelocities.getUnchecked(noteNumber);
+    }
+    
+    if (bVels->getUnchecked(0) < 0.f) return;
+    
     tuner->getOffset(noteNumber, true);
     
-    lastVelocity = velocity;
-    
     DirectPreparation::Ptr prep = direct->prep;
-    
-    // check velocity filtering
-    //  need to save old velocity, in case this new velocity failes the velocity test
-    float velocitySave = velocitiesActive.getUnchecked(noteNumber);
-    
-    // save this velocity, for velocity checks, here and in keyRelease()
-    velocities.set(noteNumber, velocity); // used for velocity checks
-    
-    // save this as the active velocity, for playback as well
-    velocitiesActive.set(noteNumber, velocity); // used for actual note playback velocity
-    
-    // check the velocity
-    if (!velocityCheck(noteNumber))
-    {
-        // need to set the active velocity back to what it was, since we're going to ignore this one
-        velocitiesActive.set(noteNumber, velocitySave);
-        return;
-    }
     
     for (auto t : prep->dTransposition.value)
     {
@@ -170,11 +177,11 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
             {
                 b->setClearDelayOnNextBeat(false);
             }
-            synth->keyOn(channel,
+            synth->keyOn(1,
                          noteNumber,
                          synthNoteNumber,
                          synthOffset,
-                         velocitiesActive.getUnchecked(noteNumber),
+                         aVels->getUnchecked(0),
                          aGlobalGain,
                          Forward,
                          Normal,
@@ -194,11 +201,11 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 		}
 		else
 		{
-			synth->keyOn(channel,
+			synth->keyOn(1,
                          noteNumber,
                          synthNoteNumber,
                          synthOffset,
-                         velocitiesActive.getUnchecked(noteNumber),
+                         aVels->getUnchecked(0),
                          aGlobalGain,
                          Forward,
                          Normal,
@@ -224,23 +231,44 @@ void DirectProcessor::keyPressed(int noteNumber, float velocity, int channel)
 
 #define HAMMER_GAIN_SCALE 0.02f
 #define RES_GAIN_SCALE 0.2f
-void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, bool soundfont)
+void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
-    if (!velocityCheck(noteNumber)) return;
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an inverted key press, aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
+    {
+        aVels = bVels = releaseVelocities.getUnchecked(noteNumber);
+        for (int i = 0; i < releaseVelocities.getUnchecked(noteNumber)->size(); ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeDirect));
+        }
+    }
+    // If this an actual release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = pressVelocities.getUnchecked(noteNumber);
+    }
+    
+    if (bVels->getUnchecked(0) < 0.f) return;
+    
     DBG("DirectProcessor::keyReleased " + String(noteNumber));
-    for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
+    for (int i = 0; i < keyPlayed[noteNumber].size(); i++)
     {
         int t = keyPlayed[noteNumber].getUnchecked(i);
         //float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
         
-        DBG("DirectProcessor::keyReleased sending keyOff, channel = " + String(channel));
-        synth->keyOff(channel,
+        DBG("DirectProcessor::keyReleased sending keyOff");
+        synth->keyOff(1,
                       MainNote,
                       direct->prep->getSoundSet(), //set
                       direct->getId(),
                       noteNumber,
                       t,
-                      velocitiesActive.getUnchecked(noteNumber),
+                      aVels->getUnchecked(0),
                       aGlobalGain,
                       direct->prep->getGainPtr(),
                       true);
@@ -250,92 +278,111 @@ void DirectProcessor::keyReleased(int noteNumber, float velocity, int channel, b
     keyPlayedOffset[noteNumber].removeFirstMatchingValue(noteNumber);
 }
 
-void DirectProcessor::playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont)
+void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelocities,
+                                        bool fromPress, bool soundfont)
 {
-    // CHECK THIS OUT WITH DAN (dont need loop right? can just do keyPlayed[noteNumber].getUnchecked(0);
-    for (int i = 0; i<keyPlayed[noteNumber].size(); i++)
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an inverted key press, aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
     {
-        int t = keyPlayed[noteNumber].getUnchecked(i);
-        float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
-        
-        //only play hammers/resonance for first note in layers of transpositions
-        if(i==0)
+        aVels = bVels = releaseVelocities.getUnchecked(noteNumber);
+        for (int i = 0; i < releaseVelocities.getUnchecked(noteNumber)->size(); ++i)
         {
-            /*
-             if (soundfont)
-             {
-             synth->keyOff(channel, HammerNote, direct->getId(), noteNumber, noteNumber, velocity, true);
-             }
-             else
-             */
-            if (!soundfont)
-            {
-                hammerSynth->keyOn  (channel,
-                                     noteNumber,
-                                     t,
-                                     0,
-                                     velocitiesActive.getUnchecked(noteNumber),
-                                     HAMMER_GAIN_SCALE,
-                                     Forward,
-                                     Normal,
-                                     HammerNote,
-                                     direct->prep->getSoundSet(), //set
-                                     direct->getId(),
-                                     0,
-                                     2000,
-                                     3,
-                                     3,
-                                     tuner,
-                                     direct->prep->getHammerGainPtr());
-            }
-            
-            resonanceSynth->keyOn(channel,
-                                  noteNumber,
-                                  t,
-                                  t_offset,
-                                  velocitiesActive.getUnchecked(noteNumber),
-                                  RES_GAIN_SCALE,
-                                  Forward,
-                                  Normal,
-                                  ResonanceNote,
-                                  direct->prep->getSoundSet(), //set
-                                  direct->getId(),
-                                  0,
-                                  2000,
-                                  3,
-                                  3,
-                                  tuner,
-                                  direct->prep->getResonanceGainPtr());
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeDirect));
         }
+    }
+    // If this an actual release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = pressVelocities.getUnchecked(noteNumber);
+    }
+    
+    if (bVels->getUnchecked(0) < 0.f) return;
+    
+    //only play hammers/resonance for first note in layers of transpositions
+    if (keyPlayed[noteNumber].isEmpty()) return;
+    int t = keyPlayed[noteNumber].getUnchecked(0);
+    float t_offset = keyPlayedOffset[noteNumber].getUnchecked(0);
+    
+    /*
+     if (soundfont)
+     {
+     synth->keyOff(channel, HammerNote, direct->getId(), noteNumber, noteNumber, velocity, true);
+     }
+     else
+     */
+    if (!soundfont)
+    {
+        hammerSynth->keyOn  (1,
+                             noteNumber,
+                             t,
+                             0,
+                             aVels->getUnchecked(0),
+                             HAMMER_GAIN_SCALE,
+                             Forward,
+                             Normal,
+                             HammerNote,
+                             direct->prep->getSoundSet(), //set
+                             direct->getId(),
+                             0,
+                             2000,
+                             3,
+                             3,
+                             tuner,
+                             direct->prep->getHammerGainPtr());
+        resonanceSynth->keyOn(1,
+                              noteNumber,
+                              t,
+                              t_offset,
+                              aVels->getUnchecked(0),
+                              RES_GAIN_SCALE,
+                              Forward,
+                              Normal,
+                              ResonanceNote,
+                              direct->prep->getSoundSet(), //set
+                              direct->getId(),
+                              0,
+                              2000,
+                              3,
+                              3,
+                              tuner,
+                              direct->prep->getResonanceGainPtr());
     }
 }
 
-bool DirectProcessor::velocityCheck(int noteNumber)
+float DirectProcessor::filterVelocity(float vel)
 {
     DirectPreparation::Ptr prep = direct->prep;
     
-    int velocity = (int)(velocities.getUnchecked(noteNumber) * 127.0);
+    if (!lastVelocityInRange) lastVelocity = vel;
     
-    if (velocity > 127) velocity = 127;
-    if (velocity < 0)   velocity = 0;
+    int velocity = vel*127.f;
     
     if(prep->velocityMin.value <= prep->velocityMax.value)
     {
         if (velocity >= prep->velocityMin.value && velocity <= prep->velocityMax.value)
         {
-            return true;
+            lastVelocityInRange = true;
+            lastVelocity = vel;
+            return vel;
         }
     }
     else
     {
         if (velocity >= prep->velocityMin.value || velocity <= prep->velocityMax.value)
         {
-            return true;
+            lastVelocityInRange = true;
+            lastVelocity = vel;
+            return vel;
         }
     }
     
     DBG("failed velocity check");
-    return false;
+    return -1.f;
 }
 
 void DirectProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoadType type)
