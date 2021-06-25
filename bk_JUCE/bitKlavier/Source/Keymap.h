@@ -195,7 +195,8 @@ public:
         count = 0;
         for (auto state : getTargetStates())
         {
-            keysave.setProperty(ptagKeymap_targetStates + String(count++), state, 0);
+            // Due to how these used to be represented, true will be saved as 0 and false as 1
+            keysave.setProperty(ptagKeymap_targetStates + String(count++), state ? 0 : 1, 0);
         }
         
         keysave.setProperty(ptagKeymap_inverted, isInverted(), 0);
@@ -268,13 +269,15 @@ public:
                 keymap.setUnchecked(attr.getIntValue(), true);
             }
         }
+
         for (int i = 0; i < TargetTypeNil; ++i)
         {
             String attr = e->getStringAttribute(ptagKeymap_targetStates + String(i));
             
             if (attr != String())
             {
-                targetStates.setUnchecked(i, (bool) attr.getIntValue());
+                // 0 indicates enabled
+                targetStates.setUnchecked(i, (bool) attr.getIntValue() == 0);
             }
         }
         

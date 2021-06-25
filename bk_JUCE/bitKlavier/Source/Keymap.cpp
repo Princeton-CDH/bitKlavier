@@ -58,6 +58,8 @@ sustainPedalKeys(false)
     {
         targetStates.add(false);
     }
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
 
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
