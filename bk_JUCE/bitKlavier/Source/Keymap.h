@@ -195,8 +195,7 @@ public:
         count = 0;
         for (auto state : getTargetStates())
         {
-            // Due to how these used to be represented, true will be saved as 0 and false as 1
-            keysave.setProperty(ptagKeymap_targetStates + String(count++), state ? 0 : 1, 0);
+            keysave.setProperty(ptagKeymap_targetStates + String(count++), state ? 1 : 0, 0);
         }
         
         keysave.setProperty(ptagKeymap_inverted, isInverted(), 0);
@@ -276,8 +275,8 @@ public:
             
             if (attr != String())
             {
-                // 0 indicates enabled
-                targetStates.setUnchecked(i, (bool) attr.getIntValue() == 0);
+                // Because this used to be an enum, both 0 and 2 are false and only 1 is true
+                targetStates.setUnchecked(i, attr.getIntValue() == 1);
             }
         }
         

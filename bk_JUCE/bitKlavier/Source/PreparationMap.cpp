@@ -580,19 +580,25 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
     {
         bool ignoreSustain = !sustainPedalIsDepressed;
         proc->resetLastVelocity();
+        // For each Keymap in each Direct processor
         for (auto km : proc->getKeymaps())
         {
+            // Check that the keymap contains this note mapped from this harmonizer note
+            // and that it uses this midi source
             if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
             {
+                // Check that Direct is enabled as a target (should always be true until we add other targets)
                 if (km->getTargetStates()[TargetTypeDirect])
                 {
+                    // Collect inverted keymaps into one velocities array
                     if (km->isInverted())
                     {
-                        // Filter here so that we only take the max within the filtered range
+                        // Apply curve, take the max of any overlapping cases, then filter
                         float v = proc->filterVelocity(jmax(releaseTargetVelocities.getUnchecked(TargetTypeDirect),
                                                             km->applyVelocityCurve(velocity)));
                         releaseTargetVelocities.set(TargetTypeDirect, v);
                     }
+                    // Collect normal keymaps into another velocity array
                     else
                     {
                         float v = proc->filterVelocity(jmax(pressTargetVelocities.getUnchecked(TargetTypeDirect),
@@ -603,11 +609,13 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }
         }
+        // Send the processor the velocities collected from normal keymaps and let it know this is a keypress
         proc->keyPressed(noteNumber, pressTargetVelocities, true);
         pressTargetVelocities.fill(-1.f);
         
+        // Send the processor the velocities collected from inverted keymaps and let it know this is a keypress
         proc->playReleaseSample(noteNumber, releaseTargetVelocities, true, soundfont);
-        if (ignoreSustain && !noteDown)
+        if (ignoreSustain && !noteDown) // Don't keyrelease if we're sustaining or the note isn't down
             proc->keyReleased(noteNumber, releaseTargetVelocities, true);
         releaseTargetVelocities.fill(-1.f);
     }
