@@ -110,7 +110,9 @@ public:
         // add a dot to represent input velocity
         g.setColour(Colours::goldenrod);
         int radius = 12;
-        for (float velocity : *velocities) {
+        for (std::pair<int, float> element : velocities)
+        {
+            float velocity = element.second;
             float warpscale = dt_warpscale(velocity, asym_k, sym_k, scale, offset);
             if (warpscale > 1) warpscale = 1;
             if (warpscale < 0) warpscale = 0;
@@ -140,7 +142,8 @@ public:
     void setOffset (float newOffset) { offset = newOffset; }
     void setVelocityInvert (bool newVelocityInvert) { velocityInvert = newVelocityInvert; }
     
-    void updateVelocityList(HashMap<int, float>* velocityList) { velocities = velocityList; }
+    // Gotta do a copy here for thread safety, sorry Jeff!
+    void updateVelocityList(std::map<int, float>& velocityList) { velocities = velocityList; }
 
 private:
     
@@ -151,7 +154,7 @@ private:
     float offset;
     bool velocityInvert;
     
-    HashMap<int, float>* velocities;
+    std::map<int, float> velocities;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (VelocityCurveGraph)
 };

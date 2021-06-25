@@ -614,10 +614,10 @@ public:
     
     // Velocity list handling - for velocity curve graph
     inline void addVelocity(int note, float toAdd)
-    { velocities.set(note, toAdd); setVelocitiesChanged(true); }
+    { velocities.insert(std::pair<int, float>(note, toAdd)); setVelocitiesChanged(true); }
     inline void removeVelocity(int note)
-    { velocities.remove(note); setVelocitiesChanged(true);  }
-    inline HashMap<int, float>* getVelocities() { return &velocities; }
+    { velocities.erase(note); setVelocitiesChanged(true);  }
+    inline std::map<int, float>& getVelocities() { return velocities; }
     
 private:
     BKAudioProcessor& processor;
@@ -657,7 +657,7 @@ private:
     float scale;
     float offset;
     bool velocityInvert;
-    HashMap<int, float> velocities;
+    std::map<int, float> velocities;
     bool velocitiesChanged = false;
 
     bool ignoreSustain;

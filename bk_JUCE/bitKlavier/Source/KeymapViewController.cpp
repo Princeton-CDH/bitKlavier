@@ -405,7 +405,6 @@ BKViewController(p, theGraph, 4)
     
     //======================================================================================
 
-
     currentTab = 0;
     //displayTab(currentTab);
 
@@ -1673,7 +1672,6 @@ void KeymapViewController::update(void)
         scaleSlider->setValue(km->getScale(), dontSendNotification);
         offsetSlider->setValue(km->getOffset(), dontSendNotification);
         velocityInvertToggle.setToggleState(km->getVelocityInvert(), dontSendNotification);
-        velocityCurveGraph.updateVelocityList(km->getVelocities());
         velocityCurveGraph.setAsym_k(km->getAsym_k());
         velocityCurveGraph.setSym_k(km->getSym_k());
         velocityCurveGraph.setScale(km->getScale());
@@ -1933,7 +1931,8 @@ void KeymapViewController::timerCallback(){
     }
     
     // Periodically, check whether notes have been pressed and display their velocities on the graph.
-    if (km->didVelocitiesChange()) {
+    if (km->didVelocitiesChange() && processor.updateState->currentDisplay == DisplayKeymap) {
+        velocityCurveGraph.updateVelocityList(km->getVelocities());
         velocityCurveGraph.repaint();
         km->setVelocitiesChanged(false);
     }

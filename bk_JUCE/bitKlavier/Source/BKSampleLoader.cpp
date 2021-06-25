@@ -224,7 +224,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                     
                     BigInteger noteRange;
                     
-                    int root = (12 * i) + noteNameToRoot(bkNotes[j]) + 12;
+                    int root = (12 * i) + noteNameToRoot(bkNotes[j]);
                     if (i == 7 && j == 3) noteRange.setRange(root-1, 5, true); //High A
                     else noteRange.setRange(root-1, 3, true);
                     
@@ -359,7 +359,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                     //keymap assignment
                     BigInteger noteRange;
                     
-                    int root = (12 * i) + noteNameToRoot(bkNotes[j]) + 12;
+                    int root = (12 * i) + noteNameToRoot(bkNotes[j]);
                     if (i == 7 && j == 3) noteRange.setRange(root-1, 5, true); //High A
                     else noteRange.setRange(root-1, 3, true);
                     
