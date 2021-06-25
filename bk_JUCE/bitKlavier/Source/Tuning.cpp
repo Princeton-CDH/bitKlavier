@@ -70,8 +70,8 @@ lastIntervalTuning(0)
         invertVelocities.add(new Array<float>());
         for (int i = 0; i < 1; ++i)
         {
-            velocities.getLast()->add(0.f);
-            invertVelocities.getLast()->add(0.f);
+            velocities.getLast()->add(-1.f);
+            invertVelocities.getLast()->add(-1.f);
         }
     }
 }

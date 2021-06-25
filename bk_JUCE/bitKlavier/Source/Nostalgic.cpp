@@ -123,8 +123,8 @@ keymaps(Keymap::PtrArr())
         invertVelocities.add(new Array<float>());
         for (int i = 0; i < TargetTypeBlendronicPatternSync-TargetTypeNostalgic; ++i)
         {
-            velocities.getLast()->add(0.f);
-            invertVelocities.getLast()->add(0.f);
+            velocities.getLast()->add(-1.f);
+            invertVelocities.getLast()->add(-1.f);
         }
     }
     

@@ -62,8 +62,8 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
         invertVelocities.add(new Array<float>());
         for (int i = 0; i < TargetTypeTempo-TargetTypeBlendronicPatternSync; ++i)
         {
-            velocities.getLast()->add(0.f);
-            invertVelocities.getLast()->add(0.f);
+            velocities.getLast()->add(-1.f);
+            invertVelocities.getLast()->add(-1.f);
         }
     }
     
