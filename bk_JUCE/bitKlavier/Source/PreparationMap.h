@@ -216,7 +216,7 @@ private:
         int noteNumber;
         float velocity;
         int channel;
-        int mappedFrom;
+        int mappedFrom; // tracks what key was played that triggered this note, for harmonizer purposes
         String source;
     };
     Array<Note> sustainedNotes;
