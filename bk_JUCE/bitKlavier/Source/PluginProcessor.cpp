@@ -848,6 +848,12 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     {
         String key = source + "n" + String(mappedFrom);
         
+        if (noteOnSetsNoteOffVelocity)
+        {
+            velocity = sourcedNoteVelocities.getUnchecked(noteNumber)->getReference(key);
+        }
+        else if (velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
+        
         if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
         {
             if (sourcedNotesOn.getUnchecked(noteNumber)->contains(key))
@@ -864,8 +870,6 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
             //DBG("noteoff velocity = " + String(velocity));
             
             noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
-            if(noteOnSetsNoteOffVelocity) velocity = (*sourcedNoteVelocities.getUnchecked(noteNumber))[key];
-            else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
             
             bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
             currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, mappedFrom, noteDown,
