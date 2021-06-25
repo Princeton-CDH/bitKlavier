@@ -962,9 +962,11 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
          if the keymap contains the note and the source, if any aren't ignoring sustain, for that note/source, set flag to true
          check against that flag for release*/
         
+        bool hasActiveTarget;
         
         for (auto proc : dprocessor)
         {
+            hasActiveTarget = false;
             bool allIgnoreSustain = true;
             for (auto km : proc->getKeymaps())
             {
@@ -972,6 +974,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                 {
                     if (km->getTargetStates()[TargetTypeDirect])
                     {
+                        hasActiveTarget = true;
                         float v = km->applyVelocityCurve(velocity);
                         targetStates.set(TargetTypeDirect, v);
                     }
@@ -979,7 +982,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                 }
             }
             //local flag for keymap that isn't ignoring sustain
-            if (!keyIsDepressed && !allIgnoreSustain)
+            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
                 //don't turn off note if key is down!
                 proc->keyReleased(noteNumber, targetStates, false);
             targetStates.fill(-1.f);
@@ -987,6 +990,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
         
         for (auto proc : tprocessor)
         {
+            hasActiveTarget = false;
             bool allIgnoreSustain = true;
             for (auto km : proc->getKeymaps())
             {
@@ -994,19 +998,21 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                 {
                     if (km->getTargetStates()[TargetTypeTuning])
                     {
+                        hasActiveTarget = true;
                         float v = km->applyVelocityCurve(velocity);
                         targetStates.set(TargetTypeTuning, v);
                     }
                     if (!km->getIgnoreSustain()) allIgnoreSustain = false;
                 }
             }
-            if (!keyIsDepressed && !allIgnoreSustain)
+            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
                 proc->keyReleased(noteNumber, targetStates, false);
             targetStates.fill(-1.f);
         }
         
         for (auto proc : mprocessor)
         {
+            hasActiveTarget = false;
             bool allIgnoreSustain = true;
             for (auto km : proc->getKeymaps())
             {
@@ -1014,19 +1020,21 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                 {
                     if (km->getTargetStates()[TargetTypeTempo])
                     {
+                        hasActiveTarget = true;
                         float v = km->applyVelocityCurve(velocity);
                         targetStates.set(TargetTypeTempo, v);
                     }
                     if (!km->getIgnoreSustain()) allIgnoreSustain = false;
                 }
             }
-            if (!keyIsDepressed && !allIgnoreSustain)
+            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
                 proc->keyReleased(noteNumber, targetStates, false);
             targetStates.fill(-1.f);
         }
         
         for (auto proc : sprocessor)
         {
+            hasActiveTarget = false;
             bool allIgnoreSustain = true;
             for (auto km : proc->getKeymaps())
             {
@@ -1036,6 +1044,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                     {
                         if (km->getTargetStates()[i])
                         {
+                            hasActiveTarget = true;
                             float v = km->applyVelocityCurve(velocity);
                             targetStates.set(i, v);
                         }
@@ -1043,13 +1052,14 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                     if (!km->getIgnoreSustain()) allIgnoreSustain = false;
                 }
             }
-            if (!keyIsDepressed && !allIgnoreSustain)
+            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
                 proc->keyReleased(noteNumber, targetStates, false);
             targetStates.fill(-1.f);
         }
         
         for (auto proc : nprocessor)
         {
+            hasActiveTarget = false;
             bool allIgnoreSustain = true;
             for (auto km : proc->getKeymaps())
             {
@@ -1059,6 +1069,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                     {
                         if (km->getTargetStates()[i])
                         {
+                            hasActiveTarget = true;
                             float v = km->applyVelocityCurve(velocity);
                             targetStates.set(i, v);
                         }
@@ -1066,13 +1077,14 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                     if (!km->getIgnoreSustain()) allIgnoreSustain = false;
                 }
             }
-            if (!keyIsDepressed && !allIgnoreSustain)
+            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
                 proc->keyReleased(noteNumber, targetStates, post);
             targetStates.fill(-1.f);
         }
         
         for (auto proc : bprocessor)
         {
+            hasActiveTarget = false;
             bool allIgnoreSustain = true;
             for (auto km : proc->getKeymaps())
             {
@@ -1082,6 +1094,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                     {
                         if (km->getTargetStates()[i])
                         {
+                            hasActiveTarget = true;
                             float v = km->applyVelocityCurve(velocity);
                             targetStates.set(i, v);
                         }
@@ -1089,7 +1102,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                     if (!km->getIgnoreSustain()) allIgnoreSustain = false;
                 }
             }
-            if (!keyIsDepressed && !allIgnoreSustain)
+            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
                 proc->keyReleased(noteNumber, targetStates, false);
             targetStates.fill(-1.f);
         }
