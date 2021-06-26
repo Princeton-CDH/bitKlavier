@@ -62,7 +62,7 @@ keymaps(Keymap::PtrArr())
     {
         velocities.add(new Array<float>());
         invertVelocities.add(new Array<float>());
-        for (int i = 0; i < TargetTypeSynchronic-TargetTypeDirect; ++i)
+        for (int i = 0; i < TargetTypeNil; ++i)
         {
             velocities.getLast()->add(-1.f);
             invertVelocities.getLast()->add(-1.f);
@@ -128,9 +128,9 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
     if (fromPress)
     {
         aVels = bVels = velocities.getUnchecked(noteNumber);
-        for (int i = 0; i < velocities.getUnchecked(noteNumber)->size(); ++i)
+        for (int i = TargetTypeDirect; i < TargetTypeSynchronic; ++i)
         {
-            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeDirect));
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
     }
     // If this an inverted release, aVels will be the incoming velocities,
@@ -141,7 +141,7 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
         bVels = invertVelocities.getUnchecked(noteNumber);
     }
     
-    if (bVels->getUnchecked(0) < 0.f) return;
+    if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
     
     tuner->getOffset(noteNumber, true);
     
@@ -181,7 +181,7 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
                          noteNumber,
                          synthNoteNumber,
                          synthOffset,
-                         aVels->getUnchecked(0),
+                         aVels->getUnchecked(TargetTypeDirect),
                          aGlobalGain,
                          Forward,
                          Normal,
@@ -205,7 +205,7 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
                          noteNumber,
                          synthNoteNumber,
                          synthOffset,
-                         aVels->getUnchecked(0),
+                         aVels->getUnchecked(TargetTypeDirect),
                          aGlobalGain,
                          Forward,
                          Normal,
@@ -240,9 +240,9 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
     if (fromPress)
     {
         aVels = bVels = invertVelocities.getUnchecked(noteNumber);
-        for (int i = 0; i < invertVelocities.getUnchecked(noteNumber)->size(); ++i)
+        for (int i = TargetTypeDirect; i < TargetTypeSynchronic; ++i)
         {
-            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeDirect));
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
     }
     // If this an actual release, aVels will be the incoming velocities,
@@ -253,7 +253,7 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
         bVels = velocities.getUnchecked(noteNumber);
     }
     
-    if (bVels->getUnchecked(0) < 0.f) return;
+    if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
     
     DBG("DirectProcessor::keyReleased " + String(noteNumber));
     for (int i = 0; i < keyPlayed[noteNumber].size(); i++)
@@ -268,7 +268,7 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
                       direct->getId(),
                       noteNumber,
                       t,
-                      aVels->getUnchecked(0),
+                      aVels->getUnchecked(TargetTypeDirect),
                       aGlobalGain,
                       direct->prep->getGainPtr(),
                       true);
@@ -301,7 +301,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
         bVels = velocities.getUnchecked(noteNumber);
     }
     
-    if (bVels->getUnchecked(0) < 0.f) return;
+    if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
     
     //only play hammers/resonance for first note in layers of transpositions
     if (keyPlayed[noteNumber].isEmpty()) return;
@@ -321,7 +321,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
                              noteNumber,
                              t,
                              0,
-                             aVels->getUnchecked(0),
+                             aVels->getUnchecked(TargetTypeDirect),
                              HAMMER_GAIN_SCALE,
                              Forward,
                              Normal,
@@ -338,7 +338,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
                               noteNumber,
                               t,
                               t_offset,
-                              aVels->getUnchecked(0),
+                              aVels->getUnchecked(TargetTypeDirect),
                               RES_GAIN_SCALE,
                               Forward,
                               Normal,

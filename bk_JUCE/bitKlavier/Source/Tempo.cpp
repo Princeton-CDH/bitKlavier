@@ -48,7 +48,7 @@ keymaps(Keymap::PtrArr())
     {
         velocities.add(new Array<float>());
         invertVelocities.add(new Array<float>());
-        for (int i = 0; i < 1; ++i)
+        for (int i = 0; i < TargetTypeNil; ++i)
         {
             velocities.getLast()->add(-1.f);
             invertVelocities.getLast()->add(-1.f);
@@ -74,9 +74,9 @@ void TempoProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, 
     if (fromPress)
     {
         aVels = bVels = velocities.getUnchecked(noteNumber);
-        for (int i = 0; i < velocities.getUnchecked(noteNumber)->size(); ++i)
+        for (int i = TargetTypeTempo; i < TargetTypeTuning; ++i)
         {
-            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeTempo));
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
     }
     // If this an inverted release, aVels will be the incoming velocities,
@@ -87,7 +87,7 @@ void TempoProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, 
         bVels = invertVelocities.getUnchecked(noteNumber);
     }
     
-    if (bVels->getUnchecked(0) < 0.f) return;
+    if (bVels->getUnchecked(TargetTypeTempo) < 0.f) return;
     
     DBG("adding adaptive tempo note" + String(noteNumber));
     atNewNote();
@@ -102,9 +102,9 @@ void TempoProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities,
     if (fromPress)
     {
         aVels = bVels = invertVelocities.getUnchecked(noteNumber);
-        for (int i = 0; i < invertVelocities.getUnchecked(noteNumber)->size(); ++i)
+        for (int i = TargetTypeTempo; i < TargetTypeTuning; ++i)
         {
-            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeTempo));
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
     }
     // If this an actual release, aVels will be the incoming velocities,
@@ -115,7 +115,7 @@ void TempoProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities,
         bVels = velocities.getUnchecked(noteNumber);
     }
     
-    if (bVels->getUnchecked(0) < 0.f) return;
+    if (bVels->getUnchecked(TargetTypeTempo) < 0.f) return;
     
     atNewNoteOff();
 }

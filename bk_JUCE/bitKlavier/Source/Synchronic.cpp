@@ -138,7 +138,7 @@ notePlayed(false)
         clusterVelocities.add(0.f);
         velocities.add(new Array<float>());
         invertVelocities.add(new Array<float>());
-        for (int i = 0; i < TargetTypeNostalgic-TargetTypeSynchronic; i++)
+        for (int i = 0; i < TargetTypeNil; i++)
         {
             velocities.getLast()->add(-1.f);
             invertVelocities.getLast()->add(-1.f);
@@ -349,9 +349,9 @@ void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     if (fromPress)
     {
         aVels = bVels = velocities.getUnchecked(noteNumber);
-        for (int i = 0; i < velocities.getUnchecked(noteNumber)->size(); ++i)
+        for (int i = TargetTypeSynchronic; i < TargetTypeNostalgic; ++i)
         {
-            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeSynchronic));
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
     }
     // If this an inverted release, aVels will be the incoming velocities,
@@ -362,24 +362,23 @@ void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
         bVels = invertVelocities.getUnchecked(noteNumber);
     }
        
-    int s = TargetTypeSynchronic;
-    bool doCluster = bVels->getUnchecked(TargetTypeSynchronic-s) >= 0.f; // primary Synchronic mode
-    bool doPatternSync = bVels->getUnchecked(TargetTypeSynchronicPatternSync-s) >= 0.f; // resetting pattern phases
-    bool doBeatSync = bVels->getUnchecked(TargetTypeSynchronicBeatSync-s) >= 0.f; // resetting beat phase
-    bool doAddNotes = bVels->getUnchecked(TargetTypeSynchronicAddNotes-s) >= 0.f; // adding notes to cluster
-    bool doPausePlay = bVels->getUnchecked(TargetTypeSynchronicPausePlay-s) >= 0.f; // targeting pause/play
-    bool doClear = bVels->getUnchecked(TargetTypeSynchronicClear-s) >= 0.f;
-    bool doDeleteOldest = bVels->getUnchecked(TargetTypeSynchronicDeleteOldest-s) >= 0.f;
-    bool doDeleteNewest = bVels->getUnchecked(TargetTypeSynchronicDeleteNewest-s) >= 0.f;
-    bool doRotate = bVels->getUnchecked(TargetTypeSynchronicRotate-s) >= 0.f;
+    bool doCluster = bVels->getUnchecked(TargetTypeSynchronic) >= 0.f; // primary Synchronic mode
+    bool doPatternSync = bVels->getUnchecked(TargetTypeSynchronicPatternSync) >= 0.f; // resetting pattern phases
+    bool doBeatSync = bVels->getUnchecked(TargetTypeSynchronicBeatSync) >= 0.f; // resetting beat phase
+    bool doAddNotes = bVels->getUnchecked(TargetTypeSynchronicAddNotes) >= 0.f; // adding notes to cluster
+    bool doPausePlay = bVels->getUnchecked(TargetTypeSynchronicPausePlay) >= 0.f; // targeting pause/play
+    bool doClear = bVels->getUnchecked(TargetTypeSynchronicClear) >= 0.f;
+    bool doDeleteOldest = bVels->getUnchecked(TargetTypeSynchronicDeleteOldest) >= 0.f;
+    bool doDeleteNewest = bVels->getUnchecked(TargetTypeSynchronicDeleteNewest) >= 0.f;
+    bool doRotate = bVels->getUnchecked(TargetTypeSynchronicRotate) >= 0.f;
     
     // add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
     
     if (doCluster || doAddNotes)
     {
-        float v = jmax(aVels->getUnchecked(0),
-                       aVels->getUnchecked(TargetTypeSynchronicAddNotes-TargetTypeSynchronic));
+        float v = jmax(aVels->getUnchecked(TargetTypeSynchronic),
+                       aVels->getUnchecked(TargetTypeSynchronicAddNotes));
         clusterVelocities.set(noteNumber, v);
     }
     
@@ -576,9 +575,9 @@ void SynchronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
     if (fromPress)
     {
         aVels = bVels = invertVelocities.getUnchecked(noteNumber);
-        for (int i = 0; i < invertVelocities.getUnchecked(noteNumber)->size(); ++i)
+        for (int i = TargetTypeSynchronic; i < TargetTypeNostalgic; ++i)
         {
-            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeSynchronic));
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
     }
     // If this an actual release, aVels will be the incoming velocities,
@@ -589,16 +588,15 @@ void SynchronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
         bVels = velocities.getUnchecked(noteNumber);
     }
     
-    int s = TargetTypeSynchronic;
-    bool doCluster = bVels->getUnchecked(TargetTypeSynchronic-s) >= 0.f; // primary Synchronic mode
-    bool doPatternSync = bVels->getUnchecked(TargetTypeSynchronicPatternSync-s) >= 0.f; // resetting pattern phases
-    bool doBeatSync = bVels->getUnchecked(TargetTypeSynchronicBeatSync-s) >= 0.f; // resetting beat phase
-    bool doAddNotes = bVels->getUnchecked(TargetTypeSynchronicAddNotes-s) >= 0.f; // adding notes to cluster
-    bool doPausePlay = bVels->getUnchecked(TargetTypeSynchronicPausePlay-s) >= 0.f; // targeting pause/play
-    bool doClear = bVels->getUnchecked(TargetTypeSynchronicClear-s) >= 0.f;
-    bool doDeleteOldest = bVels->getUnchecked(TargetTypeSynchronicDeleteOldest-s) >= 0.f;
-    bool doDeleteNewest = bVels->getUnchecked(TargetTypeSynchronicDeleteNewest-s) >= 0.f;
-    bool doRotate = bVels->getUnchecked(TargetTypeSynchronicRotate-s) >= 0.f;
+    bool doCluster = bVels->getUnchecked(TargetTypeSynchronic) >= 0.f; // primary Synchronic mode
+    bool doPatternSync = bVels->getUnchecked(TargetTypeSynchronicPatternSync) >= 0.f; // resetting pattern phases
+    bool doBeatSync = bVels->getUnchecked(TargetTypeSynchronicBeatSync) >= 0.f; // resetting beat phase
+    bool doAddNotes = bVels->getUnchecked(TargetTypeSynchronicAddNotes) >= 0.f; // adding notes to cluster
+    bool doPausePlay = bVels->getUnchecked(TargetTypeSynchronicPausePlay) >= 0.f; // targeting pause/play
+    bool doClear = bVels->getUnchecked(TargetTypeSynchronicClear) >= 0.f;
+    bool doDeleteOldest = bVels->getUnchecked(TargetTypeSynchronicDeleteOldest) >= 0.f;
+    bool doDeleteNewest = bVels->getUnchecked(TargetTypeSynchronicDeleteNewest) >= 0.f;
+    bool doRotate = bVels->getUnchecked(TargetTypeSynchronicRotate) >= 0.f;
     
     // remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
