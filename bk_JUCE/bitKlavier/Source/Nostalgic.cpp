@@ -160,7 +160,6 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     
     // aVels will be used for velocity calculations; bVels will be used for conditionals
     Array<float> *aVels, *bVels;
-    OwnedArray<Array<float>>* cVels;
     // If this is an inverted key press, aVels and bVels are the same
     // We'll save and use the incoming velocity values
     if (fromPress)
@@ -170,7 +169,6 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
-        cVels = &invertVelocities;
     }
     // If this an actual release, aVels will be the incoming velocities,
     // but bVels will use the values from the last press (keyReleased with fromPress=true)
@@ -178,7 +176,6 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     {
         aVels = &targetVelocities;
         bVels = velocities.getUnchecked(noteNumber);
-        cVels = &velocities;
     }
     
     bool doNostalgic = bVels->getUnchecked(TargetTypeNostalgic) >= 0.f; // primary Nostalgic mode
@@ -408,7 +405,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                                          note,
                                          synthNoteNumber,
                                          synthOffset,
-                                         cVels->getUnchecked(note)->getUnchecked(TargetTypeNostalgic),
+                                         aVels->getUnchecked(TargetTypeNostalgic),
                                          aGlobalGain,
                                          Reverse,
                                          FixedLengthFixedStart,
@@ -431,7 +428,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                                          note,
                                          synthNoteNumber,
                                          synthOffset,
-                                         cVels->getUnchecked(note)->getUnchecked(TargetTypeNostalgic),
+                                         aVels->getUnchecked(TargetTypeNostalgic),
                                          aGlobalGain,
                                          Reverse,
                                          FixedLengthFixedStart,
@@ -453,8 +450,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                         NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
                         currentNote->setPrepAtKeyOn(prep);
                         currentNote->setTuningAtKeyOn(tuner->getOffset(note, false));
-                        currentNote->setVelocityAtKeyOn(cVels->getUnchecked(note)
-                                                        ->getUnchecked(TargetTypeNostalgic));
+                        currentNote->setVelocityAtKeyOn(aVels->getUnchecked(TargetTypeNostalgic));
                         currentNote->setReverseStartPosition((duration + prep->nWaveDistance.value) * synth->getSampleRate()/1000.);
                         currentNote->setReverseTargetLength((duration) * synth->getSampleRate()/1000.);
                         currentNote->setUndertowTargetLength(prep->nUndertow.value * synth->getSampleRate()/1000.);
