@@ -238,16 +238,18 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                 
                 //play nostalgic note
 
-                DBG("reverse note on noteNum/offset " +
+                DBG("reverse note on noteNum/offset/velocity " +
                     String(synthNoteNumber) + " " +
-                    String(synthOffset));
+                    String(synthOffset) + " " +
+                    String(aVels->getUnchecked(0)));
                 if (!blendronic.isEmpty())
                 {
                     synth->keyOn(1,
                                  noteNumber,
                                  synthNoteNumber,
                                  synthOffset,
-                                 aVels->getUnchecked(0),
+                                 //aVels->getUnchecked(0),
+                                 cVels->getUnchecked(noteNumber)->getUnchecked(0),
                                  aGlobalGain,
                                  Reverse,
                                  FixedLengthFixedStart,
@@ -272,7 +274,8 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                                  noteNumber,
                                  synthNoteNumber,
                                  synthOffset,
-                                 aVels->getUnchecked(0),
+                                 //aVels->getUnchecked(0),
+                                 cVels->getUnchecked(noteNumber)->getUnchecked(0),
                                  aGlobalGain,
                                  Reverse,
                                  FixedLengthFixedStart,
@@ -299,7 +302,8 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
             currentNote->setPrepAtKeyOn(prep);
             currentNote->setTuningAtKeyOn(tuner->getOffset(noteNumber, false));
-            currentNote->setVelocityAtKeyOn(aVels->getUnchecked(0));
+            //currentNote->setVelocityAtKeyOn(aVels->getUnchecked(0));
+            currentNote->setVelocityAtKeyOn(cVels->getUnchecked(noteNumber)->getUnchecked(0));
             currentNote->setReverseStartPosition((duration + prep->nWaveDistance.value) * synth->getSampleRate()/1000.);
             currentNote->setReverseTargetLength((duration) * synth->getSampleRate()/1000.);
             currentNote->setUndertowTargetLength(prep->nUndertow.value * synth->getSampleRate()/1000.);

@@ -291,7 +291,7 @@ public:
             valueMin = newMinValue;
             valueMax = newMaxValue;
             owner.repaint();
-            
+
             triggerChangeMessage (notification);
         }
     }
