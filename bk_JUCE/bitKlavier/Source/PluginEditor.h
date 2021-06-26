@@ -49,6 +49,8 @@ public:
     
     void showBKSettingsDialog(Button* button);
     
+    void showEqualizer(BKAudioProcessor& processor);
+    
     MainViewController& getMainViewController() { return mvc; }
     
 private:
@@ -333,6 +335,30 @@ private:
         //==============================================================================
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreferencesComponent)
     };
+    
+//    class EqualizerComponent : public Component
+//    {
+//    public:
+//        EqualizerComponent(BKAudioProcessorEditor& editor) : owner (editor) {
+//            //setOpaque(true);
+//            //setWantsKeyboardFocus(true);
+//        }
+//
+//        void paint (Graphics& g) override {
+//            g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+//        }
+//
+//        void resized() override {
+//
+//        }
+//        
+//    private:
+//        BKAudioProcessorEditor& owner;
+//
+//        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(EqualizerComponent)
+//    };
+    
+    
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessorEditor)
 };

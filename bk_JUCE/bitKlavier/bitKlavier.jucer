@@ -12,7 +12,7 @@
               companyName="Many Arrows Music" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
-              buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="Many Arrows Music"
+              buildStandalone="1" enableIAA="1" cppLanguageStandard="17" companyCopyright="Many Arrows Music"
               pluginFormats="buildAU,buildStandalone,buildVST,buildVST3,enableIAA"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
               pluginVST3Category="Instrument" defines="JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1"
@@ -381,6 +381,8 @@
             <FILE id="wwKFGe" name="BKSampleLoader.h" compile="0" resource="0"
                   file="Source/BKSampleLoader.h"/>
           </GROUP>
+          <FILE id="vkphQJ" name="BKEqualizer.cpp" compile="1" resource="0" file="Source/BKEqualizer.cpp"/>
+          <FILE id="jCKRAN" name="BKEqualizer.h" compile="0" resource="0" file="Source/BKEqualizer.h"/>
           <FILE id="HVbOmG" name="BKPianoSampler.cpp" compile="1" resource="0"
                 file="Source/BKPianoSampler.cpp"/>
           <FILE id="Spprlk" name="BKPianoSampler.h" compile="0" resource="0"
@@ -391,6 +393,10 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <FILE id="uTurTG" name="BKEqualizerViewController.cpp" compile="1"
+              resource="0" file="Source/BKEqualizerViewController.cpp"/>
+        <FILE id="VlzEBU" name="BKEqualizerViewController.h" compile="0" resource="0"
+              file="Source/BKEqualizerViewController.h"/>
         <FILE id="ybYtMd" name="ShareBot.h" compile="0" resource="0" file="Source/ShareBot.h"/>
         <FILE id="rnxxIN" name="ShareBot.mm" compile="1" resource="0" file="Source/ShareBot.mm"/>
         <FILE id="QpXmnO" name="BKViewController.cpp" compile="1" resource="0"

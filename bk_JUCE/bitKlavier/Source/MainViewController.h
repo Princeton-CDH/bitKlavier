@@ -199,6 +199,9 @@ private:
 
     ToggleButton sustainPedalButton;
     
+    // Equalizer
+    TextButton equalizerButton;
+    
     Label undoStatus;
     int undoStatusCountdown;
     

@@ -12,6 +12,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "GraphicsConstants.h"
+#include "BKEqualizerViewController.h"
 
 //==============================================================================
 BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p):
@@ -90,6 +91,23 @@ void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
     launchOptions.componentToCentreAround = mvc.getConstructionSite();
     launchOptions.useNativeTitleBar = false;
     launchOptions.resizable = false;
+    
+    DialogWindow* window = launchOptions.launchAsync();
+    window->setLookAndFeel(&laf);
+    window->setTitleBarButtonsRequired(DocumentWindow::TitleBarButtons::closeButton, false);
+    window->setTitleBarTextCentred(false);
+}
+
+void BKAudioProcessorEditor::showEqualizer(BKAudioProcessor& processor) {
+    Component* eqvc = new BKEqualizerViewController(processor);
+    eqvc->setSize(600, 450);
+    
+    DialogWindow::LaunchOptions launchOptions;
+    launchOptions.dialogTitle = "Equalizer";
+    launchOptions.content = OptionalScopedPointer<Component>(eqvc, true);
+    launchOptions.componentToCentreAround = mvc.getConstructionSite();
+    launchOptions.useNativeTitleBar = false;
+    launchOptions.resizable = false; // this doesn't necessarily need to be non-resizable, but it is for now. Also makes the border larger when resizable for some reason
     
     DialogWindow* window = launchOptions.launchAsync();
     window->setLookAndFeel(&laf);
