@@ -68,7 +68,7 @@ lastIntervalTuning(0)
     {
         velocities.add(new Array<float>());
         invertVelocities.add(new Array<float>());
-        for (int i = 0; i < 1; ++i)
+        for (int i = 0; i < TargetTypeNil; ++i)
         {
             velocities.getLast()->add(-1.f);
             invertVelocities.getLast()->add(-1.f);
@@ -173,9 +173,9 @@ void TuningProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
     if (fromPress)
     {
         aVels = bVels = invertVelocities.getUnchecked(noteNumber);
-        for (int i = 0; i < invertVelocities.getUnchecked(noteNumber)->size(); ++i)
+        for (int i = TargetTypeTuning; i < TargetTypeNil; ++i)
         {
-            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeTuning));
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
     }
     // If this an actual release, aVels will be the incoming velocities,
@@ -186,7 +186,7 @@ void TuningProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
         bVels = velocities.getUnchecked(noteNumber);
     }
     
-    if (bVels->getUnchecked(0) < 0.f) return;
+    if (bVels->getUnchecked(TargetTypeTuning) < 0.f) return;
     
     tuning->prep->getSpringTuning()->removeNote(noteNumber);
 }
@@ -202,9 +202,9 @@ void TuningProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
     if (fromPress)
     {
         aVels = bVels = velocities.getUnchecked(noteNumber);
-        for (int i = 0; i < velocities.getUnchecked(noteNumber)->size(); ++i)
+        for (int i = TargetTypeTuning; i < TargetTypeNil; ++i)
         {
-            aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeTuning));
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
     }
     // If this an inverted release, aVels will be the incoming velocities,
@@ -215,7 +215,7 @@ void TuningProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
         bVels = invertVelocities.getUnchecked(noteNumber);
     }
     
-    if (bVels->getUnchecked(0) < 0.f) return;
+    if (bVels->getUnchecked(TargetTypeTuning) < 0.f) return;
     //DBG("TuningProcessor::keyPressed " + String(midiNoteNumber));
     
     adaptiveHistoryCounter++;
