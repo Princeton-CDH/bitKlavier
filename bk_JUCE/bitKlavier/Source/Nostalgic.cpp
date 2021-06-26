@@ -234,9 +234,10 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                 
                 //play nostalgic note
 
-                DBG("reverse note on noteNum/offset " +
+                DBG("reverse note on noteNum/offset/velocity " +
                     String(synthNoteNumber) + " " +
-                    String(synthOffset));
+                    String(synthOffset) + " " +
+                    String(aVels->getUnchecked(0)));
                 if (!blendronic.isEmpty())
                 {
                     synth->keyOn(1,
