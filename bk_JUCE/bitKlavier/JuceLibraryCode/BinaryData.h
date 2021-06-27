@@ -243,7 +243,7 @@ namespace BinaryData
     const int            NS_7_Systerslaat_xmlSize = 618814;
 
     extern const char*   NS_8_ItIsEnough_xml;
-    const int            NS_8_ItIsEnough_xmlSize = 65783;
+    const int            NS_8_ItIsEnough_xmlSize = 252786;
 
     extern const char*   Machines_for_Listening_49key_xml;
     const int            Machines_for_Listening_49key_xmlSize = 264479;
