@@ -468,10 +468,9 @@ void BKPianoSamplerVoice::startNote (const int midi,
         dgain = dynamicGain;
         
         noteVelocity = velocity;
-        // DBG("noteVelocity = " + String(noteVelocity * 127.));
         
         // *** START new layer-based approach to velocity handling ** //
-        if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote)
+        if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote && !sound->isSoundfont)
         {
 
             // dB range of layer
@@ -504,6 +503,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
             */
         }
         // *** END new layer-based approach to velocity handling ** //
+        
+        DBG("noteVelocity = " + String(noteVelocity * 127.));
         
         lengthTracker = 0.0;
         
