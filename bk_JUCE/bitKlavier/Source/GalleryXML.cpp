@@ -254,7 +254,6 @@ void Gallery::setStateFromXML(XmlElement* xml)
             {
                 addBlendronicWithId(0);
                 
-                // TODO: write setState for Blendronic
                 blendronic.getLast()->setState(e);
                 
                 int oldId = blendronic.getLast()->getId();

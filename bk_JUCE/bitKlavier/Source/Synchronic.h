@@ -1239,8 +1239,7 @@ public:
     
     ~SynchronicProcessor();
     
-    inline const uint64 getCurrentNumSamplesBeat(void) const noexcept   { return numSamplesBeat;    }
-    
+    inline const uint64 getNumSamplesBeat(void) const noexcept { return numSamplesBeat;    }
     
     BKSampleLoadType sampleType;
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
@@ -1381,6 +1380,14 @@ public:
         return notePlayed;
     }
     
+    OwnedArray<Array<float>>& getVelocities() { return velocities; }
+    OwnedArray<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    Array<float>& getClusterVelocities() { return clusterVelocities; }
+    
+    void swapVelocities(OwnedArray<Array<float>>& swap) { velocities.swapWith(swap); }
+    void swapInvertVelocities(OwnedArray<Array<float>>& swap) { invertVelocities.swapWith(swap); }
+    void swapClusterVelocities(Array<float>& swap) { clusterVelocities.swapWith(swap); }
+    
 private:
     BKSynthesiser* synth;
     GeneralSettings::Ptr general;
@@ -1419,7 +1426,7 @@ private:
     
     SynchronicCluster::PtrArr clusters;
 
-    uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
+    uint64 numSamplesBeat = 0;          // = beatThresholdSamples * beatMultiplier
     uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
     
     Array<uint64> holdTimers;
@@ -1433,7 +1440,6 @@ private:
     Array<BKSynthesiserVoice*> activeSynchronicVoices;
     Array<int> voiceMidiValues;
 
-    
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };
 

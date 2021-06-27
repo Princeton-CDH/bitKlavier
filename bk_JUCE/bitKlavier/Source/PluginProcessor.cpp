@@ -733,7 +733,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
     if (!activeSource) return;
     
-    
     // Check PianoMap for whether piano should change due to key strike.
     for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
     {
@@ -751,7 +750,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             }
         }
     }
-    
     
     // modifications
     performResets(noteNumber, source);
@@ -1191,7 +1189,6 @@ double BKAudioProcessor::getLevelR()
 // Piano
 void  BKAudioProcessor::setCurrentPiano(int which)
 {
-    
     updateState->setCurrentDisplay(DisplayNil);
 
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);
@@ -1211,9 +1208,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
         for (auto bprocessor : currentPiano->getBlendronicProcessors())
             bprocessor->setActive(true);
         
-        currentPiano->copySynchronicState(prevPiano);
-        currentPiano->copyAdaptiveTuningState(prevPiano);
-        currentPiano->copyAdaptiveTempoState(prevPiano);
+        currentPiano->copyProcessorStates(prevPiano);
         
         updateState->pianoDidChangeForGraph = true;
         updateState->synchronicPreparationDidChange = true;
@@ -1778,12 +1773,7 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
         
         gallery->setGalleryDirty(false);
     }
-    
-    currentPiano->configure();
 
-    for (auto bprocessor : currentPiano->getBlendronicProcessors())
-        bprocessor->setActive(true);
-    
     if (resetHistory) resetGalleryHistory();
 }
 
@@ -1919,8 +1909,15 @@ void BKAudioProcessor::initializeGallery()
         piano->configure();
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
         if (piano != currentPiano)
+        {
             for (auto bprocessor : piano->getBlendronicProcessors())
                 bprocessor->setActive(false);
+        }
+        else
+        {
+            for (auto bprocessor : piano->getBlendronicProcessors())
+                bprocessor->setActive(true);
+        }
     }
 
     gallery->prepareToPlay(getSampleRate()); 

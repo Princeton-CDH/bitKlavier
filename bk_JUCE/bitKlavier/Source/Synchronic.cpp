@@ -518,6 +518,15 @@ void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     // synchronize beat, if targeting beat sync on noteOn or on both noteOn/Off
     if (doBeatSync && (prep->getTargetTypeSynchronicBeatSync() == NoteOn || prep->getTargetTypeSynchronicBeatSync() == Both))
     {
+        TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+        if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
+        {
+            beatThresholdSamples = (tempoPrep->getBeatThresh() * synth->getSampleRate());
+        }
+        else
+        {
+            beatThresholdSamples = (tempoPrep->getBeatThresh() / tempoPrep->getSubdivisions() * synth->getSampleRate());
+        }
         //start right away
         uint64 phasor = beatThresholdSamples *
                         synchronic->prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
@@ -612,6 +621,16 @@ void SynchronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
     
     // always work on the most recent cluster/layer
     SynchronicCluster::Ptr cluster = clusters.getLast();
+    
+    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+    if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
+    {
+        beatThresholdSamples = (tempoPrep->getBeatThresh() * synth->getSampleRate());
+    }
+    else
+    {
+        beatThresholdSamples = (tempoPrep->getBeatThresh() / tempoPrep->getSubdivisions() * synth->getSampleRate());
+    }
     
     // do only if this note is targeted as a primary Synchronic note (TargetTypeSynchronic)
     if (doCluster && !pausePlay)
@@ -826,7 +845,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             
             //get time until next beat => beat length scaled by beatMultiplier parameter
             
-            numSamplesBeat =    beatThresholdSamples *
+            numSamplesBeat = beatThresholdSamples *
             prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
             general->getPeriodMultiplier() *
             tempo->getPeriodMultiplier();
@@ -922,6 +941,21 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     
     if (cluster != nullptr)
     {
+        TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+        if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
+        {
+            beatThresholdSamples = (tempoPrep->getBeatThresh() * synth->getSampleRate());
+        }
+        else
+        {
+            beatThresholdSamples = (tempoPrep->getBeatThresh() / tempoPrep->getSubdivisions() * synth->getSampleRate());
+        }
+        
+        numSamplesBeat = beatThresholdSamples *
+        synchronic->prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
+        general->getPeriodMultiplier() *
+        tempo->getPeriodMultiplier();
+        
         uint64 timeToReturn = numSamplesBeat - cluster->getPhasor(); //next beat
         int myBeat = cluster->getBeatMultiplierCounter();
         

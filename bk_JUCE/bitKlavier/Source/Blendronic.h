@@ -708,6 +708,12 @@ public:
     inline OwnedArray<BlendronicDisplay::ChannelInfo>* getAudioDisplayData(void) { return &audio; }
     
     inline BlendronicDisplay::ChannelInfo* getSmoothingDisplayData(void) { return smoothing.get(); }
+    
+    OwnedArray<Array<float>>& getVelocities() { return velocities; }
+    OwnedArray<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    
+    void swapVelocities(OwnedArray<Array<float>>& swap) { velocities.swapWith(swap); }
+    void swapInvertVelocities(OwnedArray<Array<float>>& swap) { invertVelocities.swapWith(swap); }
 
 private:
     CriticalSection lock;

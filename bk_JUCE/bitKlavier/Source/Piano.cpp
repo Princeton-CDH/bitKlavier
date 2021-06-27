@@ -1125,8 +1125,7 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap, int* id
                 {
                     int oldId = item->getStringAttribute("Id").getIntValue();
                     
-                    int thisId = oldId;
-                    
+                    int thisId;
                     if (idmap->getUnchecked(type)->contains(oldId))
                     {
                         thisId = idmap->getUnchecked(type)->getReference(oldId);

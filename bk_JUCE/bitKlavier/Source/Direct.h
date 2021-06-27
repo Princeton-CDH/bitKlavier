@@ -554,7 +554,12 @@ public:
     // Return vel if within range, else return -1.f
     float filterVelocity(float vel);
     void resetLastVelocity() { lastVelocityInRange = false; }
-
+    
+    OwnedArray<Array<float>>& getVelocities() { return velocities; }
+    OwnedArray<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    
+    void swapVelocities(OwnedArray<Array<float>>& swap) { velocities.swapWith(swap); }
+    void swapInvertVelocities(OwnedArray<Array<float>>& swap) { invertVelocities.swapWith(swap); }
     
 private:
     BKSynthesiser*      synth;
