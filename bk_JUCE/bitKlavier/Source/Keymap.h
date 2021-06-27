@@ -269,6 +269,12 @@ public:
             }
         }
 
+        // If the xml is old enough to not have targetStates saved these should be set to true
+        targetStates.setUnchecked(TargetTypeDirect, true);
+        targetStates.setUnchecked(TargetTypeSynchronic, true);
+        targetStates.setUnchecked(TargetTypeNostalgic, true);
+        targetStates.setUnchecked(TargetTypeTempo, true);
+        targetStates.setUnchecked(TargetTypeTuning, true);
         for (int i = 0; i < TargetTypeNil; ++i)
         {
             String attr = e->getStringAttribute(ptagKeymap_targetStates + String(i));
@@ -357,7 +363,6 @@ public:
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }
     
-    inline bool getTargetState(KeymapTargetType type) const noexcept { return targetStates[type]; }
     inline const Array<bool>& getTargetStates(void) const noexcept { return targetStates; }
     inline void setTargetStates(Array<bool> ts) { targetStates = ts; }
     
@@ -395,9 +400,6 @@ public:
     void setOnscreenSelected(bool selected);
     
     void setTarget(KeymapTargetType target, bool state);
-    void toggleTarget(KeymapTargetType target);
-    void enableTarget(KeymapTargetType target);
-    void disableTarget(KeymapTargetType target);
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}

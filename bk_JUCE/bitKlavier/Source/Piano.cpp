@@ -563,7 +563,6 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     {
         DirectProcessor::Ptr dproc = getDirectProcessor(thisId);
         prepMap->addDirectProcessor(dproc);
-        keymap->enableTarget(TargetTypeDirect);
     }
     else if (thisType == PreparationTypeSynchronic)
     {
@@ -584,13 +583,11 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     {
         TempoProcessor::Ptr mproc = getTempoProcessor(thisId);
         prepMap->addTempoProcessor(mproc);
-        keymap->enableTarget(TargetTypeTempo);
     }
     else if (thisType == PreparationTypeTuning)
     {
         TuningProcessor::Ptr tproc = getTuningProcessor(thisId);
         prepMap->addTuningProcessor(tproc);
-        keymap->enableTarget(TargetTypeTuning);
     }
     prepMap->linkKeymapToPreparation(keymapId, thisType, thisId);
 }

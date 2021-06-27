@@ -58,9 +58,12 @@ sustainPedalKeys(false)
     {
         targetStates.add(false);
     }
-    targetStates.setUnchecked(TargetTypeSynchronic, true);
-    targetStates.setUnchecked(TargetTypeNostalgic, true);
-
+//    targetStates.setUnchecked(TargetTypeDirect, true);
+//    targetStates.setUnchecked(TargetTypeSynchronic, true);
+//    targetStates.setUnchecked(TargetTypeNostalgic, true);
+//    targetStates.setUnchecked(TargetTypeTempo, true);
+//    targetStates.setUnchecked(TargetTypeTuning, true);
+    
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
@@ -450,26 +453,8 @@ void Keymap::setTarget(KeymapTargetType target, bool state)
     //if (targetStates[target] == TargetStateNil) return;
     
     //targetStates.set(target, state ? TargetStateDisabled : TargetStateEnabled);
-    targetStates.set(target, state);
-    DBG("Keymap::setTarget = " + String(target) + " " + String((int) getTargetState(target)));
-}
-
-void Keymap::toggleTarget(KeymapTargetType target)
-{
-    if (!targetStates[target]) return;
-    
-    targetStates.set(target, !targetStates[target]);
-    DBG("Keymap::toggleTarget = " + String(target) + " " + String((int) getTargetState(target)));
-}
-
-void Keymap::enableTarget(KeymapTargetType target)
-{
-    targetStates.set(target, true);
-}
-
-void Keymap::disableTarget(KeymapTargetType target)
-{
-    targetStates.set(target, false);
+    targetStates.setUnchecked(target, state);
+    DBG("Keymap::setTarget = " + String(target) + " " + String((int) getTargetStates()[target]));
 }
 
 const Array<String> Keymap::getAllMidiInputNames()

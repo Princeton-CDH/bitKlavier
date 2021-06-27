@@ -1681,7 +1681,7 @@ void KeymapViewController::update(void)
         
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
         {
-            targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType) i), dontSendNotification);
+            targetControlTBs[i]->setToggleState(km->getTargetStates()[i], dontSendNotification);
         }
     }
     
@@ -1854,7 +1854,7 @@ void KeymapViewController::updateTargets()
             {
                 targetControlTBs[i]->setAlpha(gBright);
                 targetControlTBs[i]->setEnabled(true);
-                targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType)i), dontSendNotification);
+                targetControlTBs[i]->setToggleState(km->getTargetStates()[i], dontSendNotification);
             }
             
             synchronicTBGroup.setAlpha(gMedium);
@@ -1877,7 +1877,7 @@ void KeymapViewController::updateTargets()
             {
                 targetControlTBs[i]->setAlpha(gBright);
                 targetControlTBs[i]->setEnabled(true);
-                targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType)i), dontSendNotification);
+                targetControlTBs[i]->setToggleState(km->getTargetStates()[i], dontSendNotification);
             }
             
             blendronicTBGroup.setAlpha(gMedium);
@@ -1900,7 +1900,7 @@ void KeymapViewController::updateTargets()
             {
                 targetControlTBs[i]->setAlpha(gBright);
                 targetControlTBs[i]->setEnabled(true);
-                targetControlTBs[i]->setToggleState(km->getTargetState((KeymapTargetType)i), dontSendNotification);
+                targetControlTBs[i]->setToggleState(km->getTargetStates()[i], dontSendNotification);
             }
             
             nostalgicTBGroup.setAlpha(gMedium);
