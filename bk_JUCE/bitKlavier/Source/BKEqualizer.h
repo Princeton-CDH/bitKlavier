@@ -14,6 +14,11 @@
 
 //==============================================================================
 /*
+ Class for the equalizer. Attaches to bK in pluginProcessor processBlock() and
+ prepareToPlay(). See also BKEqualizerViewController().
+ 
+ Much of the code here is based off this video:
+ https://www.youtube.com/watch?v=i_Iq4_Kd7Rc&t=1596s&ab_channel=freeCodeCamp.org
 */
 class BKEqualizer  : public juce::Component
 {
@@ -21,10 +26,16 @@ public:
     BKEqualizer();
     ~BKEqualizer() override;
     
+    // Must be called before playback begins or change to sample settings
     void prepareToPlay(double sampleRate, int samplesPerBlock);
+    
+    // Called upon initializiation and whenever a user changes parameters with a slider
     void updateCoefficients(double sampleRate);
+    
+    // Performs the actual processing of audio
     void process(juce::dsp::ProcessContextReplacing<float>& context);
     
+    // Getters and Setters for the view controller
     inline void setPeakFreq(float peakFreq) { this->peakFreq = peakFreq; }
     inline void setPeakGain(float peakGain) { this->peakGain = peakGain; }
     inline void setPeakQuality(float peakQuality) {this->peakQuality = peakQuality; }
@@ -39,6 +50,7 @@ private:
     float peakGain = 0;
     float peakQuality = 1;
     
+    // DSP stuff
     using Filter = juce::dsp::IIR::Filter<float>;
     using MonoChain = juce::dsp::ProcessorChain<Filter>; // Can add more filters here later
     MonoChain chain;

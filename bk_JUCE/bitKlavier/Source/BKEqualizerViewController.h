@@ -30,8 +30,10 @@ public:
 private:
     void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     
+    // Store a reference to the processor
     BKAudioProcessor& processor;
     
+    // UI elements
     std::unique_ptr<BKSingleSlider> peakFreqSlider;
     std::unique_ptr<BKSingleSlider> peakGainSlider;
     std::unique_ptr<BKSingleSlider> peakQualitySlider;

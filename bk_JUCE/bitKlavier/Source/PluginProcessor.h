@@ -110,7 +110,7 @@ public:
     
     // Equalizer
     BKEqualizer                         eq;
-    inline BKEqualizer* getBKEqualizer() { return &eq; }
+    inline BKEqualizer* getBKEqualizer() { return &eq; } // may need to move to gallery later
     
     //sfzero::Synth                       synth;
     

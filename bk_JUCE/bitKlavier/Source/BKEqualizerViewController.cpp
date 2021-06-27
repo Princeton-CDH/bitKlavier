@@ -21,7 +21,7 @@ processor(p)
     float peakGainDefault = eq->getPeakGain();
     float peakQualityDefault = eq->getPeakQuality();
     
-    
+    // Slider setup
     peakFreqSlider = std::make_unique<BKSingleSlider>("Peak Frequency", "Peak Frequency", 20.f, 20000.f, peakFreqDefault, 1.f);
     peakFreqSlider->setToolTipString("Adjust the frequency of the peak.");
     peakFreqSlider->addMyListener(this);
