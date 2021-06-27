@@ -12,6 +12,8 @@
 
 #include "BKSynthesiser.h"
 
+#include "BKEqualizer.h"
+
 #include "BKUpdateState.h"
 
 #include "Keymap.h"
@@ -105,6 +107,10 @@ public:
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
     BKSynthesiser                       pedalSynth;
+    
+    // Equalizer
+    BKEqualizer                         eq;
+    inline BKEqualizer* getBKEqualizer() { return &eq; }
     
     //sfzero::Synth                       synth;
     

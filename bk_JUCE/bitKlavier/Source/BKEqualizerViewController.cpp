@@ -14,18 +14,25 @@
 //==============================================================================
 BKEqualizerViewController::BKEqualizerViewController(BKAudioProcessor& p) :
 processor(p)
-{    
-    peakFreqSlider = std::make_unique<BKSingleSlider>("Peak Frequency", "Peak Frequency", 20.f, 20000.f, 750.f, 1.f);
+{
+    // grab defaults here
+    BKEqualizer* eq = processor.getBKEqualizer();
+    float peakFreqDefault = eq->getPeakFreq();
+    float peakGainDefault = eq->getPeakGain();
+    float peakQualityDefault = eq->getPeakQuality();
+    
+    
+    peakFreqSlider = std::make_unique<BKSingleSlider>("Peak Frequency", "Peak Frequency", 20.f, 20000.f, peakFreqDefault, 1.f);
     peakFreqSlider->setToolTipString("Adjust the frequency of the peak.");
     peakFreqSlider->addMyListener(this);
     addAndMakeVisible(*peakFreqSlider);
     
-    peakGainSlider = std::make_unique<BKSingleSlider>("Peak Gain", "Peak Gain", -24.f, 24.f, 0.f, 0.5f);
+    peakGainSlider = std::make_unique<BKSingleSlider>("Peak Gain", "Peak Gain", -24.f, 24.f, peakGainDefault, 0.5f);
     peakGainSlider->setToolTipString("Adjust the gain of the peak.");
     peakGainSlider->addMyListener(this);
     addAndMakeVisible(*peakGainSlider);
     
-    peakQualitySlider = std::make_unique<BKSingleSlider>("Peak Quality", "Peak Quality", 0.1f, 10.f, 1.f, 0.05f);
+    peakQualitySlider = std::make_unique<BKSingleSlider>("Peak Quality", "Peak Quality", 0.1f, 10.f, peakQualityDefault, 0.05f);
     peakQualitySlider->setToolTipString("Adjust the quality of the peak.");
     peakQualitySlider->addMyListener(this);
     addAndMakeVisible(*peakQualitySlider);
@@ -67,9 +74,21 @@ void BKEqualizerViewController::resized()
 
 void BKEqualizerViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) {
     
-//    if (slider == peakFreqSlider.get()) {
-//        float peakFreq = peakFreqSlider->getValue();
-//        
-//    }
+    BKEqualizer* eq = processor.getBKEqualizer();
     
+    if (slider == peakFreqSlider.get()) {
+        float peakFreq = peakFreqSlider->getValue();
+        eq->setPeakFreq(peakFreq);
+        DBG("Peak Frequency: " + String(peakFreq));
+    }
+    else if (slider == peakGainSlider.get()) {
+        float peakGain = peakGainSlider->getValue();
+        eq->setPeakGain(peakGain);
+        DBG("Peak Gain: " + String(peakGain));
+    }
+    else if (slider == peakQualitySlider.get()) {
+        float peakQuality = peakQualitySlider->getValue();
+        eq->setPeakQuality(peakQuality);
+        DBG("Peak Quality: " + String(peakQuality));
+    }
 }

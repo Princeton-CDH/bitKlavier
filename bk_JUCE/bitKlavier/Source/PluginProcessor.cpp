@@ -104,6 +104,7 @@ mainPianoSynth(*this),
 hammerReleaseSynth(*this),
 resonanceReleaseSynth(*this),
 pedalSynth(*this),
+eq(),
 firstPedalDown(true),
 //touchThread(*this),
 progress(0),
@@ -423,6 +424,11 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     #endif
         }
     }
+    
+    // Prepare EQ
+    eq.prepareToPlay(sampleRate, samplesPerBlock);
+    
+    
 //    if (loader.getNumJobs() == 0) touchThread.startThread(0);
 }
 
@@ -1162,6 +1168,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 #else
     buffer.applyGain(0, numSamples, gallery->getGeneralSettings()->getGlobalGain());
 #endif
+    
+    // Apply EQ filter to the buffer
+    eq.updateCoefficients(getSampleRate());
+    juce::dsp::AudioBlock<float> block(buffer);
+    auto monoBlock = block.getSingleChannelBlock(0);
+    juce::dsp::ProcessContextReplacing<float> context(monoBlock);
+    eq.process(context);
     
     // store buffer for level calculation when needed
     levelBuf.copyFrom(0, 0, buffer, 0, 0, numSamples);
