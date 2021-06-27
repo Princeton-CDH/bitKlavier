@@ -1158,6 +1158,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, in
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }
         }
+        proc->playReleaseSample(noteNumber, targetStates, false);
         if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain))
         {
             DBG("PreparationMap::postRelease releasing noteNumnber: " + String(noteNumber));

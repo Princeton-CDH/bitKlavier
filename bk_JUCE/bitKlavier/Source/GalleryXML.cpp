@@ -75,7 +75,7 @@ ValueTree  Gallery::getState(void)
     
     for (int i = 0; i < nostalgic.size(); i++)              galleryVT.addChild( nostalgic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < blendronic.size(); i++)           galleryVT.addChild( blendronic[i]->getState(), -1, 0);
+    for (int i = 0; i < blendronic.size(); i++)             galleryVT.addChild( blendronic[i]->getState(), -1, 0);
     
     for (int i = 0; i < modTempo.size(); i++)               galleryVT.addChild( modTempo[i]->getState(), -1, 0);
     

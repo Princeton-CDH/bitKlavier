@@ -136,12 +136,12 @@ notePlayed(false)
     for (int j = 0; j < 128; j++)
     {
         clusterVelocities.add(0.f);
-        velocities.add(new Array<float>());
-        invertVelocities.add(new Array<float>());
+        velocities.add(Array<float>());
+        invertVelocities.add(Array<float>());
         for (int i = 0; i < TargetTypeNil; i++)
         {
-            velocities.getLast()->add(-1.f);
-            invertVelocities.getLast()->add(-1.f);
+            velocities.getReference(j).add(-1.f);
+            invertVelocities.getReference(j).add(-1.f);
         }
     }
     
@@ -348,7 +348,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = velocities.getUnchecked(noteNumber);
+        aVels = bVels = &velocities.getReference(noteNumber);
         for (int i = TargetTypeSynchronic; i < TargetTypeNostalgic; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
@@ -359,7 +359,7 @@ void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     else
     {
         aVels = &targetVelocities;
-        bVels = invertVelocities.getUnchecked(noteNumber);
+        bVels = &invertVelocities.getReference(noteNumber);
     }
        
     bool doCluster = bVels->getUnchecked(TargetTypeSynchronic) >= 0.f; // primary Synchronic mode
@@ -583,7 +583,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = invertVelocities.getUnchecked(noteNumber);
+        aVels = bVels = &invertVelocities.getReference(noteNumber);
         for (int i = TargetTypeSynchronic; i < TargetTypeNostalgic; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
@@ -594,7 +594,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
     else
     {
         aVels = &targetVelocities;
-        bVels = velocities.getUnchecked(noteNumber);
+        bVels = &velocities.getReference(noteNumber);
     }
     
     bool doCluster = bVels->getUnchecked(TargetTypeSynchronic) >= 0.f; // primary Synchronic mode

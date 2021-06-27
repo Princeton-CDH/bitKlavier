@@ -423,11 +423,11 @@ public:
         return keymaps;
     }
     
-    OwnedArray<Array<float>>& getVelocities() { return velocities; }
-    OwnedArray<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    Array<Array<float>>& getVelocities() { return velocities; }
+    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
     
-    void swapVelocities(OwnedArray<Array<float>>& swap) { velocities.swapWith(swap); }
-    void swapInvertVelocities(OwnedArray<Array<float>>& swap) { invertVelocities.swapWith(swap); }
+    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
+    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     
 private:
     BKAudioProcessor& processor;
@@ -447,8 +447,8 @@ private:
     void atCalculatePeriodMultiplier();
     float adaptiveTempoPeriodMultiplier;
     
-    OwnedArray<Array<float>> velocities;
-    OwnedArray<Array<float>> invertVelocities;
+    Array<Array<float>> velocities;
+    Array<Array<float>> invertVelocities;
     
     JUCE_LEAK_DETECTOR(TempoProcessor);
 };

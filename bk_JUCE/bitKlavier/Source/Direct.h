@@ -555,11 +555,11 @@ public:
     float filterVelocity(float vel);
     void resetLastVelocity() { lastVelocityInRange = false; }
     
-    OwnedArray<Array<float>>& getVelocities() { return velocities; }
-    OwnedArray<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    Array<Array<float>>& getVelocities() { return velocities; }
+    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
     
-    void swapVelocities(OwnedArray<Array<float>>& swap) { velocities.swapWith(swap); }
-    void swapInvertVelocities(OwnedArray<Array<float>>& swap) { invertVelocities.swapWith(swap); }
+    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
+    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     
 private:
     BKSynthesiser*      synth;
@@ -575,11 +575,11 @@ private:
     //need to keep track of the actual notes played and their offsets when a particular key is pressed
     //so that they can all be turned off properly, even in the event of a preparation change
     //while the key is held
-    Array<int>      keyPlayed[128];         //keep track of pitches played associated with particular key on keyboard
+    Array<int>      keyPlayed[128];//keep track of pitches played associated with particular key on keyboard
     Array<float>    keyPlayedOffset[128];   //and also the offsets
     
-    OwnedArray<Array<float>> velocities;
-    OwnedArray<Array<float>> invertVelocities;
+    Array<Array<float>> velocities;
+    Array<Array<float>> invertVelocities;
     
     float lastVelocity = 0.0f;
     bool lastVelocityInRange = false;

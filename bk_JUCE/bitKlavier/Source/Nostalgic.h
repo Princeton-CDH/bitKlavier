@@ -864,11 +864,11 @@ public:
         return keymaps;
     }
     
-    OwnedArray<Array<float>>& getVelocities() { return velocities; }
-    OwnedArray<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    Array<Array<float>>& getVelocities() { return velocities; }
+    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
     
-    void swapVelocities(OwnedArray<Array<float>>& swap) { velocities.swapWith(swap); }
-    void swapInvertVelocities(OwnedArray<Array<float>>& swap) { invertVelocities.swapWith(swap); }
+    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
+    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     
 private:
     BKSynthesiser*              synth;
@@ -883,8 +883,8 @@ private:
     Array<uint64> noteLengthTimers;     // store current length of played notes here
     Array<int> activeNotes;             // table of notes currently being played by player
     Array<bool> noteOn;                 // table of booleans representing state of each note
-    OwnedArray<Array<float>> velocities;            // table of velocities played
-    OwnedArray<Array<float>> invertVelocities;
+    Array<Array<float>> velocities;            // table of velocities played
+    Array<Array<float>> invertVelocities;
     
     uint64 lastHoldTime;
     int lastKeyPlayed;

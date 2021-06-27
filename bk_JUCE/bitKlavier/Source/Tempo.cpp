@@ -46,12 +46,12 @@ keymaps(Keymap::PtrArr())
     
     for (int j = 0; j < 128; j++)
     {
-        velocities.add(new Array<float>());
-        invertVelocities.add(new Array<float>());
+        velocities.add(Array<float>());
+        invertVelocities.add(Array<float>());
         for (int i = 0; i < TargetTypeNil; ++i)
         {
-            velocities.getLast()->add(-1.f);
-            invertVelocities.getLast()->add(-1.f);
+            velocities.getReference(j).add(-1.f);
+            invertVelocities.getReference(j).add(-1.f);
         }
     }
 }
@@ -73,7 +73,7 @@ void TempoProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, 
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = velocities.getUnchecked(noteNumber);
+        aVels = bVels = &velocities.getReference(noteNumber);
         for (int i = TargetTypeTempo; i < TargetTypeTuning; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
@@ -84,7 +84,7 @@ void TempoProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, 
     else
     {
         aVels = &targetVelocities;
-        bVels = invertVelocities.getUnchecked(noteNumber);
+        bVels = &invertVelocities.getReference(noteNumber);
     }
     
     if (bVels->getUnchecked(TargetTypeTempo) < 0.f) return;
@@ -101,7 +101,7 @@ void TempoProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities,
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = invertVelocities.getUnchecked(noteNumber);
+        aVels = bVels = &invertVelocities.getReference(noteNumber);
         for (int i = TargetTypeTempo; i < TargetTypeTuning; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
@@ -112,7 +112,7 @@ void TempoProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities,
     else
     {
         aVels = &targetVelocities;
-        bVels = velocities.getUnchecked(noteNumber);
+        bVels = &velocities.getReference(noteNumber);
     }
     
     if (bVels->getUnchecked(TargetTypeTempo) < 0.f) return;

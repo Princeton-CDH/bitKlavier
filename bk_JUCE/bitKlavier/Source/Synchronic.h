@@ -1380,12 +1380,12 @@ public:
         return notePlayed;
     }
     
-    OwnedArray<Array<float>>& getVelocities() { return velocities; }
-    OwnedArray<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    Array<Array<float>>& getVelocities() { return velocities; }
+    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
     Array<float>& getClusterVelocities() { return clusterVelocities; }
     
-    void swapVelocities(OwnedArray<Array<float>>& swap) { velocities.swapWith(swap); }
-    void swapInvertVelocities(OwnedArray<Array<float>>& swap) { invertVelocities.swapWith(swap); }
+    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
+    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     void swapClusterVelocities(Array<float>& swap) { clusterVelocities.swapWith(swap); }
     
 private:
@@ -1404,8 +1404,8 @@ private:
     
     void playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster);
     
-    OwnedArray<Array<float>> velocities;
-    OwnedArray<Array<float>> invertVelocities;
+    Array<Array<float>> velocities;
+    Array<Array<float>> invertVelocities;
     Array<float> clusterVelocities;
     Array<int> keysDepressed;   //current keys that are depressed
     Array<int> syncKeysDepressed;

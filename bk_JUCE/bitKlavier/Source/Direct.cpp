@@ -60,12 +60,12 @@ keymaps(Keymap::PtrArr())
     // Only one Direct target right now, but will use structure for multiple in case we add more
     for (int j = 0; j < 128; j++)
     {
-        velocities.add(new Array<float>());
-        invertVelocities.add(new Array<float>());
+        velocities.add(Array<float>());
+        invertVelocities.add(Array<float>());
         for (int i = 0; i < TargetTypeNil; ++i)
         {
-            velocities.getLast()->add(-1.f);
-            invertVelocities.getLast()->add(-1.f);
+            velocities.getReference(j).add(-1.f);
+            invertVelocities.getReference(j).add(-1.f);
         }
     }
          
@@ -127,7 +127,7 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = velocities.getUnchecked(noteNumber);
+        aVels = bVels = &velocities.getReference(noteNumber);
         for (int i = TargetTypeDirect; i < TargetTypeSynchronic; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
@@ -138,7 +138,7 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
     else
     {
         aVels = &targetVelocities;
-        bVels = invertVelocities.getUnchecked(noteNumber);
+        bVels = &invertVelocities.getReference(noteNumber);
     }
     
     if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
@@ -239,7 +239,7 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = invertVelocities.getUnchecked(noteNumber);
+        aVels = bVels = &invertVelocities.getReference(noteNumber);
         for (int i = TargetTypeDirect; i < TargetTypeSynchronic; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
@@ -250,7 +250,7 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
     else
     {
         aVels = &targetVelocities;
-        bVels = velocities.getUnchecked(noteNumber);
+        bVels = &velocities.getReference(noteNumber);
     }
     
     if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
@@ -287,8 +287,8 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = invertVelocities.getUnchecked(noteNumber);
-        for (int i = 0; i < invertVelocities.getUnchecked(noteNumber)->size(); ++i)
+        aVels = bVels = &invertVelocities.getReference(noteNumber);
+        for (int i = TargetTypeDirect; i < TargetTypeSynchronic; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i+TargetTypeDirect));
         }
@@ -298,7 +298,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
     else
     {
         aVels = &targetVelocities;
-        bVels = velocities.getUnchecked(noteNumber);
+        bVels = &velocities.getReference(noteNumber);
     }
     
     if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
@@ -334,6 +334,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
                              3,
                              tuner,
                              direct->prep->getHammerGainPtr());
+        
         resonanceSynth->keyOn(1,
                               noteNumber,
                               t,

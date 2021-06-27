@@ -709,11 +709,11 @@ public:
     
     inline BlendronicDisplay::ChannelInfo* getSmoothingDisplayData(void) { return smoothing.get(); }
     
-    OwnedArray<Array<float>>& getVelocities() { return velocities; }
-    OwnedArray<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    Array<Array<float>>& getVelocities() { return velocities; }
+    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
     
-    void swapVelocities(OwnedArray<Array<float>>& swap) { velocities.swapWith(swap); }
-    void swapInvertVelocities(OwnedArray<Array<float>>& swap) { invertVelocities.swapWith(swap); }
+    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
+    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
 
 private:
     CriticalSection lock;
@@ -732,8 +732,8 @@ private:
     
     bool blendronicActive;
     
-    OwnedArray<Array<float>> velocities;
-    OwnedArray<Array<float>> invertVelocities;
+    Array<Array<float>> velocities;
+    Array<Array<float>> invertVelocities;
     Array<uint64> holdTimers;
 	Array<int> keysDepressed;   //current keys that are depressed
     

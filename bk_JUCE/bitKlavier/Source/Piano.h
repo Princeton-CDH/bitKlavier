@@ -129,9 +129,9 @@ public:
                     if (dprocessor.getUnchecked(j)->getId() == prevDirectProcessors.getUnchecked(i)->getId())
                     {
                         dprocessor.getUnchecked(j)
-                        ->swapVelocities(prevDirectProcessors.getUnchecked(i)->getVelocities());
+                        ->setVelocities(prevDirectProcessors.getUnchecked(i)->getVelocities());
                         dprocessor.getUnchecked(j)
-                        ->swapInvertVelocities(prevDirectProcessors.getUnchecked(i)->getInvertVelocities());
+                        ->setInvertVelocities(prevDirectProcessors.getUnchecked(i)->getInvertVelocities());
                         continue;
                     }
                 }
@@ -148,8 +148,8 @@ public:
                     {
                         SynchronicProcessor::Ptr s = sprocessor.getUnchecked(j);
                         s->setClusters(prevSynchronicProcessors.getUnchecked(i)->getClusters());
-                        s->swapVelocities(prevSynchronicProcessors.getUnchecked(i)->getVelocities());
-                        s->swapInvertVelocities(prevSynchronicProcessors.getUnchecked(i)->getInvertVelocities());
+                        s->setVelocities(prevSynchronicProcessors.getUnchecked(i)->getVelocities());
+                        s->setInvertVelocities(prevSynchronicProcessors.getUnchecked(i)->getInvertVelocities());
                         s->swapClusterVelocities(prevSynchronicProcessors.getUnchecked(i)->getClusterVelocities());
                         continue;
                     }
@@ -166,9 +166,9 @@ public:
                     if (nprocessor.getUnchecked(j)->getId() == prevNostalgicProcessors.getUnchecked(i)->getId())
                     {
                         nprocessor.getUnchecked(j)
-                        ->swapVelocities(prevNostalgicProcessors.getUnchecked(i)->getVelocities());
+                        ->setVelocities(prevNostalgicProcessors.getUnchecked(i)->getVelocities());
                         nprocessor.getUnchecked(j)
-                        ->swapInvertVelocities(prevNostalgicProcessors.getUnchecked(i)->getInvertVelocities());
+                        ->setInvertVelocities(prevNostalgicProcessors.getUnchecked(i)->getInvertVelocities());
                         continue;
                     }
                 }
@@ -184,9 +184,9 @@ public:
                     if (bprocessor.getUnchecked(j)->getId() == prevBlendronicProcessors.getUnchecked(i)->getId())
                     {
                         bprocessor.getUnchecked(j)
-                        ->swapVelocities(prevBlendronicProcessors.getUnchecked(i)->getVelocities());
+                        ->setVelocities(prevBlendronicProcessors.getUnchecked(i)->getVelocities());
                         bprocessor.getUnchecked(j)
-                        ->swapInvertVelocities(prevBlendronicProcessors.getUnchecked(i)->getInvertVelocities());
+                        ->setInvertVelocities(prevBlendronicProcessors.getUnchecked(i)->getInvertVelocities());
                         continue;
                     }
                 }
@@ -206,9 +206,9 @@ public:
                         mprocessor.getUnchecked(j)->setAtDeltaHistory(prevTempoProcessors.getUnchecked(i)->getAtDeltaHistory());
                         mprocessor.getUnchecked(j)->setAdaptiveTempoPeriodMultiplier(prevTempoProcessors.getUnchecked(i)->getAdaptiveTempoPeriodMultiplier());
                         mprocessor.getUnchecked(j)
-                        ->swapVelocities(prevTempoProcessors.getUnchecked(i)->getVelocities());
+                        ->setVelocities(prevTempoProcessors.getUnchecked(i)->getVelocities());
                         mprocessor.getUnchecked(j)
-                        ->swapInvertVelocities(prevTempoProcessors.getUnchecked(i)->getInvertVelocities());
+                        ->setInvertVelocities(prevTempoProcessors.getUnchecked(i)->getInvertVelocities());
                         continue;
                     }
                 }
@@ -227,9 +227,9 @@ public:
                         tprocessor.getUnchecked(j)->setAdaptiveFundamentalFreq(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalFreq());
                         tprocessor.getUnchecked(j)->setAdaptiveFundamentalNote(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalNote());
                         tprocessor.getUnchecked(j)
-                        ->swapVelocities(prevTuningProcessors.getUnchecked(i)->getVelocities());
+                        ->setVelocities(prevTuningProcessors.getUnchecked(i)->getVelocities());
                         tprocessor.getUnchecked(j)
-                        ->swapInvertVelocities(prevTuningProcessors.getUnchecked(i)->getInvertVelocities());
+                        ->setInvertVelocities(prevTuningProcessors.getUnchecked(i)->getInvertVelocities());
                         continue;
                     }
                 }

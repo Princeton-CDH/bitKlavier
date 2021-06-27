@@ -58,12 +58,12 @@ BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
 {
     for (int j = 0; j < 128; j++)
     {
-        velocities.add(new Array<float>());
-        invertVelocities.add(new Array<float>());
+        velocities.add(Array<float>());
+        invertVelocities.add(Array<float>());
         for (int i = 0; i < TargetTypeNil; ++i)
         {
-            velocities.getLast()->add(-1.f);
-            invertVelocities.getLast()->add(-1.f);
+            velocities.getReference(j).add(-1.f);
+            invertVelocities.getReference(j).add(-1.f);
         }
     }
     
@@ -195,7 +195,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = velocities.getUnchecked(noteNumber);
+        aVels = bVels = &velocities.getReference(noteNumber);
         for (int i = TargetTypeBlendronicPatternSync; i < TargetTypeTempo; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
@@ -206,7 +206,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     else
     {
         aVels = &targetVelocities;
-        bVels = invertVelocities.getUnchecked(noteNumber);
+        bVels = &invertVelocities.getReference(noteNumber);
     }
     
     //add note to array of depressed notes
@@ -289,7 +289,7 @@ void BlendronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
-        aVels = bVels = invertVelocities.getUnchecked(noteNumber);
+        aVels = bVels = &invertVelocities.getReference(noteNumber);
         for (int i = TargetTypeBlendronicPatternSync; i < TargetTypeTempo; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
@@ -300,7 +300,7 @@ void BlendronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
     else
     {
         aVels = &targetVelocities;
-        bVels = velocities.getUnchecked(noteNumber);
+        bVels = &velocities.getReference(noteNumber);
     }
     
     //remove key from array of pressed keys

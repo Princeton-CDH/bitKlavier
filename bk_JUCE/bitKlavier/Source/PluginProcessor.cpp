@@ -827,6 +827,14 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
             }
         }
     }
+    
+    String key = source + "n" + String(mappedFrom);
+    if (noteOnSetsNoteOffVelocity)
+    {
+        velocity = sourcedNoteVelocities.getUnchecked(noteNumber)->getReference(key);
+    }
+    else if (velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
+    
     if (!postHarmonizer)
     {
         // Now call this function for each post harmonization note
@@ -844,14 +852,6 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     }
     else
     {
-        String key = source + "n" + String(mappedFrom);
-        
-        if (noteOnSetsNoteOffVelocity)
-        {
-            velocity = sourcedNoteVelocities.getUnchecked(noteNumber)->getReference(key);
-        }
-        else if (velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
-        
         if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
         {
             if (sourcedNotesOn.getUnchecked(noteNumber)->contains(key))
