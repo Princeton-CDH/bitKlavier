@@ -15,11 +15,11 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGraph* theGraph) :
-    BKViewController(p, theGraph, 2),
+    BKViewController(p, theGraph, 2)
 #if JUCE_IOS
-absoluteKeyboard(false, true)
+//absoluteKeyboard(false, true)
 #else
-absoluteKeyboard(false, false)
+//absoluteKeyboard(false, false)
 #endif
 {
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -45,11 +45,18 @@ absoluteKeyboard(false, false)
     defGainSlider->setToolTipString("Adjusts overall volume of resonant notes");
     addAndMakeVisible(*defGainSlider);
 
-    startTimeSlider = std::make_unique<BKSingleSlider>("start time (ms)", cResonanceStartTime, -4000, 4000, 2000, 1);
+//    startTimeSlider = std::make_unique<BKSingleSlider>("start time (ms)", cResonanceStartTime, -4000, 4000, 2000, 1);
+    
+    startTimeSlider = std::make_unique<BKRangeSlider>("start time (ms)", 0, 4000, 0, 4000, 1);
     startTimeSlider->setJustifyRight(false);
     startTimeSlider->setToolTipString("Adjusts start time into sample of resonant notes");
     addAndMakeVisible(*startTimeSlider);
 
+    maxSympStringsSlider =std::make_unique<BKSingleSlider>("max sympathetic strings", "maxsymp", 0, 20, 20, 0.01, "-inf");
+    maxSympStringsSlider->setJustifyRight(false);
+    maxSympStringsSlider->setToolTipString("Adjusts maximum number of sympathetic strings");
+    addAndMakeVisible(*maxSympStringsSlider);
+    
     lengthSlider = std::make_unique<BKSingleSlider>("note length (ms)", cResonanceLength, -4000, 4000, 2000, 1);
     lengthSlider->setJustifyRight(false);
     lengthSlider->setToolTipString("Adjusts length of resonant notes");
@@ -75,15 +82,59 @@ absoluteKeyboard(false, false)
     ADSRLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(&ADSRLabel, ALL);
     
-    absoluteKeyboard.setName("absolute");
-    absoluteKeyboard.setAlpha(1);
-    addAndMakeVisible(absoluteKeyboard);
+    NUM_KEYS = 49;
+    absoluteKeyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    absoluteKeyboard->setName("absolute");
+//    absoluteKeyboard.setAlpha(1);
+    absoluteKeyboard->setAvailableRange(24, 24+NUM_KEYS);
+    absoluteKeyboard->setOctaveForMiddleC(4);
+    addAndMakeVisible(*absoluteKeyboard);
     
-    lastNote.setText("note: ", dontSendNotification);
-    lastNote.setTooltip("last note played as MIDI value");
-    addAndMakeVisible(lastNote);
+    ringingKeyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    ringingKeyboard->setName("ringing");
+//    absoluteKeyboard.setAlpha(1);
+//    absoluteKeyboard->setAvailableRange(24, 24+NUM_KEYS);
+    ringingKeyboard->setOctaveForMiddleC(4);
+    addAndMakeVisible(*ringingKeyboard);
+    
+    for (int i = 0; i < NUM_KEYS; i++)
+    {
+        ToggleButton* t = new ToggleButton();
+        t->setToggleState(false, dontSendNotification);
+        t->setLookAndFeel(&buttonsAndMenusLAF);
+        t->setTooltip("Toggle whether this key is your fundamental");
+        t->addListener(this);
+        addChildComponent(t);
+        addAndMakeVisible(t);
+        fundamentalButtons.add(t);
+    }
+    
+    Array<float> newActiveVals;
+    Array<bool> newactives;
+    
+    for (int i = 0; i < NUM_KEYS; i++){
+        newActiveVals.add(i);
+        newactives.add(true);
+    }
+    
+    offsets.setName("offsets");
+    offsets.setToOnlyActive(newActiveVals,newactives, dontSendNotification);
+    addAndMakeVisible(offsets);
+    
+    gains.setName("gains");
+    gains.setToOnlyActive(newActiveVals,newactives, dontSendNotification);
+    addAndMakeVisible(gains);
+
+//    lastNote.setText("note: ", dontSendNotification);
+//    lastNote.setTooltip("last note played as MIDI value");
+//    addAndMakeVisible(lastNote);
     
     closestKey.setText("Closest Key: ", dontSendNotification);
+    addAndMakeVisible(closestKey);
+    
+    fundamental.setText("Fundamental: ", dontSendNotification);
+    addAndMakeVisible(fundamental);
+
 
     //will need to do more with blendronic, modifications, etc eventually
 
@@ -111,17 +162,21 @@ void ResonanceViewController::displayTab(int tab)
     invisible();
     displayShared();
 
-//    int x0 = leftArrow.getRight() + gXSpacing;
+    int x0 = leftArrow.getRight() + gXSpacing;
 //    int y0 = hideOrShow.getBottom() + gYSpacing;
 //    int right = rightArrow.getX() - gXSpacing;
 //    int width = right - x0;
 //    int height = getHeight() - y0;
 
     Rectangle<int> area(getLocalBounds());
-    
+    area.removeFromLeft(leftArrow.getWidth());
+    area.removeFromRight(rightArrow.getWidth());
+    area.removeFromTop(gComponentComboBoxHeight);
+
     if (tab == 0){
         iconImageComponent.setBounds(area);
-        area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+//        area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         
 //        overtonesSlider->setVisible(true);
         
@@ -132,29 +187,99 @@ void ResonanceViewController::displayTab(int tab)
         area.reduce(0.f, area.getHeight() * 0.2f);
 #endif
         
-        Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.1);
-        leftColumn.removeFromTop(gYSpacing + processor.paddingScalarY * 30);
-        area.removeFromLeft(leftArrow.getWidth());
-        area.removeFromRight(rightArrow.getWidth());
+//        Rectangle<int> topRows = area.removeFromTop(area.getHeight()*0.25);
+//        Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.05);
+//        leftColumn.removeFromTop(gYSpacing + processor.paddingScalarY * 30);
+        
 //        overtonesSlider->setBounds(leftColumn.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
        
-        float keyboardHeight = 100 + 50 * processor.paddingScalarY;
-        Rectangle<int> absoluteKeymapRow = area.removeFromBottom(keyboardHeight);
-        absoluteKeymapRow.reduce(gXSpacing, 0);
+        float keyboardHeight = 80 * processor.paddingScalarY;
         
-        absoluteKeyboard.setBounds(absoluteKeymapRow);
+        Rectangle<int> absoluteKeyboardRow = area.removeFromBottom(keyboardHeight);
+//        absoluteKeyboardRow.reduce(gXSpacing, 0);
         
-        absoluteKeyboard.setVisible(true);
+        closestKey.setBounds(absoluteKeyboardRow.removeFromLeft(absoluteKeyboardRow.getWidth()*0.1));
+        closestKey.setVisible(true);
         
-        Rectangle<float> editAllBounds = absoluteKeyboard.getEditAllBounds();
-        editAllBounds.translate(absoluteKeyboard.getX(), absoluteKeyboard.getY());
-        lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
+        float keyWidth = absoluteKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12 + 1); //num white keys, gives error
+        
+        DBG("calculated key width: "+ String(keyWidth));
+        DBG("width of row: " + String(absoluteKeyboardRow.getWidth()));
+        DBG("key width: " + String(absoluteKeyboard->getKeyWidth()));
+        absoluteKeyboard->setKeyWidth(18.5);
+//        absoluteKeyboard->setKeyWidth(absoluteKeyboardRow.getWidth()/NUM_KEYS); //gives error
+        absoluteKeyboard->setBlackNoteLengthProportion(0.6);
+        absoluteKeyboard->setBounds(absoluteKeyboardRow);
+        absoluteKeyboard->setVisible(true);
+        
+        area.removeFromBottom(10 * processor.paddingScalarY);
+
+        float buttonHeight = 10 + processor.paddingScalarY;
+        Rectangle<int> fundamentalButtonRow = area.removeFromBottom(buttonHeight);
+        
+        fundamental.setBounds(fundamentalButtonRow.removeFromLeft(fundamentalButtonRow.getWidth()*0.1));
+        fundamental.setVisible(true);
+        
+        area.removeFromBottom(10 * processor.paddingScalarY);
+        
+        for (int i = 0; i < NUM_KEYS; i++){
+            fundamentalButtons[i]->setBounds(fundamentalButtonRow);
+            fundamentalButtons[i]->setVisible(true);
+            fundamentalButtonRow.removeFromLeft(absoluteKeyboardRow.getWidth()/NUM_KEYS);
+        }
+        
+        area.removeFromBottom(processor.paddingScalarY);
+
+        float multiHeight = 80 + processor.paddingScalarY;
+        Rectangle<int> offsetsRow = area.removeFromBottom(multiHeight);
+//        offsetsRow.setLeft(area.getX()-80);
+        offsets.setBounds(offsetsRow);
+        offsets.setVisible(true);
+        
+        area.removeFromBottom(10 * processor.paddingScalarY);
+        
+        Rectangle<int> gainsRow = area.removeFromBottom(multiHeight);
+//        gainsRow.setLeft(offsetsRow.getX());
+        gains.setBounds(gainsRow);
+        gains.setVisible(true);
+        
+        area.removeFromBottom(10 * processor.paddingScalarY);
+        
+        Rectangle<int> ringingRow = area.removeFromBottom(keyboardHeight);
+        ringingKeyboard->setBlackNoteLengthProportion(0.6);
+        ringingKeyboard->setBounds(ringingRow);
+        ringingKeyboard->setVisible(true);
+        
+        float sliderHeight = 50 + processor.paddingScalarY;
+        Rectangle<int> sliderRow = area.removeFromBottom(sliderHeight);
+        
+        Rectangle<int> volumeSlider = sliderRow.removeFromLeft(sliderRow.getWidth()/3);
+        defGainSlider->setBounds(volumeSlider);
+        defGainSlider->setVisible(true);
+        
+        Rectangle<int> startSlider = sliderRow.removeFromLeft(sliderRow.getWidth()/2);
+        startTimeSlider->setBounds(startSlider);
+        startTimeSlider->setVisible(true);
+    
+        maxSympStringsSlider->setBounds(sliderRow);
+        maxSympStringsSlider->setVisible(true);
+    
+//
+//        Rectangle<float> editAllBounds = absoluteKeyboard.getEditAllBounds();
+//        editAllBounds.translate(absoluteKeyboard.getX(), absoluteKeyboard.getY());
+//        lastNote.setBounds(editAllBounds.getRight() + gXSpacing, editAllBounds.getY(),editAllBounds.getWidth() * 2, editAllBounds.getHeight());
 //        lastInterval.setBounds(lastNote.getRight() + gXSpacing, lastNote.getY(),lastNote.getWidth(), lastNote.getHeight());
         
     }
     else if (tab == 1){
-        defGainSlider->setVisible(true); 
-        startTimeSlider->setVisible(true);
+        
+#if JUCE_IOS
+//        area.removeFromTop(gComponentComboBoxHeight);
+        area.reduce(0.f, area.getHeight() * 0.2f);
+#endif
+        
+//        defGainSlider->setVisible(true);
+//        startTimeSlider->setVisible(true);
         lengthSlider->setVisible(true);
         exciteThreshSlider->setVisible(true);
         attackThreshSlider->setVisible(true);
@@ -162,16 +287,18 @@ void ResonanceViewController::displayTab(int tab)
         ADSRLabel.setVisible(true);
 
         //area = (getLocalBounds());
-        area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        area.reduce(20 * processor.paddingScalarX + 4, 20 * processor.paddingScalarY + 4);
         
         //single parameter sliders
 
         int columnHeight = area.getHeight();
-        defGainSlider->setBounds(area.removeFromTop(columnHeight / 5));
-        startTimeSlider->setBounds(area.removeFromTop(columnHeight / 5));
+//        defGainSlider->setBounds(area.removeFromTop(columnHeight / 5));
+//        startTimeSlider->setBounds(area.removeFromTop(columnHeight / 5));
         lengthSlider->setBounds(area.removeFromTop(columnHeight / 5));
         exciteThreshSlider->setBounds(area.removeFromTop(columnHeight / 5));
         attackThreshSlider->setBounds(area.removeFromTop(columnHeight / 5));
+        ADSRLabel.setBounds(area.removeFromTop(columnHeight / 8));
+        ADSRSlider->setBounds(area.removeFromTop(columnHeight / 5));
 
     }
     //all the display code is in displayShared for now, some will get moved here for when multiple tabs are implemented
@@ -201,7 +328,7 @@ void ResonanceViewController::displayShared(void)
 
     actionButton.toFront(false);
 
-    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+//    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
 
 //    overtonesSlider->setVisible(true);
 //    defGainSlider->setVisible(true);
@@ -235,6 +362,8 @@ void ResonanceViewController::displayShared(void)
     leftArrow.setBounds(0, getHeight() * 0.4, 50, 50);
     rightArrow.setBounds(getRight() - 50, getHeight() * 0.4, 50, 50);
     
+//    offsets.setVisible();
+    
 }
 
 void ResonanceViewController::invisible(void)
@@ -245,10 +374,22 @@ void ResonanceViewController::invisible(void)
     lengthSlider->setVisible(false);
     exciteThreshSlider->setVisible(false);
     attackThreshSlider->setVisible(false);
+    maxSympStringsSlider->setVisible(false);
+    
     ADSRSlider->setVisible(false);
     ADSRLabel.setVisible(false);
     
-    absoluteKeyboard.setVisible(false);
+    absoluteKeyboard->setVisible(false);
+    ringingKeyboard->setVisible(false);
+    offsets.setVisible(false);
+    gains.setVisible(false);
+
+    closestKey.setVisible(false);
+    fundamental.setVisible(false);
+    
+    for (int i = 0; i < fundamentalButtons.size(); i++){
+        fundamentalButtons[i]->setVisible(false);
+    }
 }
 
 
@@ -271,7 +412,7 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     exciteThreshSlider->addMyListener(this);
     attackThreshSlider->addMyListener(this);
 
-    absoluteKeyboard.addMyListener(this);
+//    absoluteKeyboard->addMyListener(this);
 
     ADSRSlider->addMyListener(this);
     
@@ -310,6 +451,9 @@ void ResonancePreparationEditor::fillSelectCB(int last, int current)
 
 void ResonancePreparationEditor::timerCallback()
 {
+//    Resonance::Ptr rs = processor.gallery->getResonance(processor.updateState->currentId);
+//
+//    DBG("Ringing: " + rs->getRinging());
 }
 
 void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePreparationEditor*)
@@ -407,6 +551,14 @@ void ResonancePreparationEditor::buttonClicked(Button* b)
         DBG("currentTab: " + String(currentTab));
 
         displayTab(currentTab);
+    }
+    else if (b == fundamentalButtons[1])
+    {
+        DBG("fundamental button pressed");
+        fundamentalButtons[1]->setToggleState(false, dontSendNotification);
+
+        ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+        prep->setFundamental(1);
     }
     //can leave blank for now since there are no buttons, will need to fill in later
 }

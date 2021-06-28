@@ -34,15 +34,26 @@ public:
 //    std::unique_ptr<BKStackedSlider> overtonesSlider;
     //will do something with overtoneGains eventually
 
-    std::unique_ptr<BKSingleSlider> startTimeSlider;
+    std::unique_ptr<BKRangeSlider> startTimeSlider;
     std::unique_ptr<BKSingleSlider> lengthSlider;
     std::unique_ptr<BKSingleSlider> exciteThreshSlider;
     std::unique_ptr<BKSingleSlider> attackThreshSlider;
     std::unique_ptr<BKSingleSlider> defGainSlider;
+    std::unique_ptr<BKSingleSlider> maxSympStringsSlider;
 
     BKLabel lastNote;
     
-    BKAbsoluteKeyboardSlider absoluteKeyboard;
+    BKMultiSlider offsets;
+    BKMultiSlider gains;
+
+    BKKeymapKeyboardState keyboardState;
+    
+    OwnedArray<ToggleButton> fundamentalButtons;
+    
+    std::unique_ptr<BKKeymapKeyboardComponent> absoluteKeyboard;
+    std::unique_ptr<BKKeymapKeyboardComponent> ringingKeyboard;
+
+//    BKAbsoluteKeyboardSlider absoluteKeyboard;
     //todo for later
     //std::unique_ptr<BKSingleSlider> blendronicGainSlider;
     //std::unique_ptr<BKStackedSlider> transpositionSlider;
@@ -58,9 +69,13 @@ public:
     */
     
     ToggleButton alternateMod;
+    
+    int NUM_KEYS;
 
     BKLabel         ADSRLabel;
     BKLabel closestKey;
+    BKLabel fundamental;
+
 
     void paint(Graphics&) override;
     void resized() override;
