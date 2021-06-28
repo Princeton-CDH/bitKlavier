@@ -179,7 +179,7 @@ public:
             BlendronicProcessor::PtrArr prevBlendronicProcessors = prevPiano->getBlendronicProcessors();
             for(int i = 0; i < prevBlendronicProcessors.size(); i++)
             {
-                for(int j = 0; j < sprocessor.size(); j++)
+                for(int j = 0; j < bprocessor.size(); j++)
                 {
                     if (bprocessor.getUnchecked(j)->getId() == prevBlendronicProcessors.getUnchecked(i)->getId())
                     {
