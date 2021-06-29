@@ -17,7 +17,7 @@
  Class for the equalizer. Attaches to bK in pluginProcessor processBlock() and
  prepareToPlay(). See also BKEqualizerViewController().
  
- Much of the code here is based off this video:
+ Much of the DSP code here is based off this video:
  https://www.youtube.com/watch?v=i_Iq4_Kd7Rc&t=1596s&ab_channel=freeCodeCamp.org
 */
 class BKEqualizer  : public juce::Component
@@ -36,28 +36,81 @@ public:
     void process(juce::dsp::ProcessContextReplacing<float>& context);
     
     // Getters and Setters for the view controller
-    inline void setPeakFreq(float peakFreq) { this->peakFreq = peakFreq; }
-    inline void setPeakGain(float peakGain) { this->peakGain = peakGain; }
-    inline void setPeakQuality(float peakQuality) {this->peakQuality = peakQuality; }
+    inline void setLowCutFreq(float lowCutFreq) { this->lowCutFreq = lowCutFreq; }
+    inline void setLowCutSlope(int lowCutSlope) {this->lowCutSlope = lowCutSlope; }
+    inline void setPeak1Freq(float peak1Freq) { this->peak1Freq = peak1Freq; }
+    inline void setPeak1Gain(float peak1Gain) {this->peak1Gain = peak1Gain; }
+    inline void setPeak1Quality(float peak1Quality) {this->peak1Quality = peak1Quality; }
+    inline void setPeak2Freq(float peak2Freq) { this->peak2Freq = peak2Freq;}
+    inline void setPeak2Gain(float peak2Gain) {this->peak2Gain = peak2Gain; }
+    inline void setPeak2Quality(float peak2Quality) {this->peak2Quality = peak2Quality; }
+    inline void setPeak3Freq(float peak3Freq) { this->peak3Freq = peak3Freq;}
+    inline void setPeak3Gain(float peak3Gain) {this->peak3Gain = peak3Gain; }
+    inline void setPeak3Quality(float peak3Quality) {this->peak3Quality = peak3Quality; }
+    inline void setHighCutFreq(float highCutFreq) { this->highCutFreq = highCutFreq; }
+    inline void setHighCutSlope(int highCutSlope) {this->highCutSlope = highCutSlope; }
     
-    inline float getPeakFreq() { return peakFreq; }
-    inline float getPeakGain() { return peakGain; }
-    inline float getPeakQuality() { return peakQuality; }
+    inline float getLowCutFreq() { return lowCutFreq; }
+    inline int getLowCutSlope() { return lowCutSlope; }
+    inline float getPeak1Freq() { return peak1Freq; }
+    inline float getPeak1Gain() { return peak1Gain; }
+    inline float getPeak1Quality() { return peak1Quality; }
+    inline float getPeak2Freq() { return peak2Freq; }
+    inline float getPeak2Gain() { return peak2Gain; }
+    inline float getPeak2Quality() { return peak2Quality; }
+    inline float getPeak3Freq() { return peak3Freq; }
+    inline float getPeak3Gain() { return peak3Gain; }
+    inline float getPeak3Quality() { return peak3Quality; }
+    inline float getHighCutFreq() { return highCutFreq; }
+    inline int getHighCutSlope() { return highCutSlope; }
+    
+    inline void setLastDisplayed(int lastDisplayed) { this->lastDisplayed = lastDisplayed; }
+    inline int getLastDisplayed() { return lastDisplayed; }
 
 private:
     // Parameters initialized here
-    float peakFreq = 750;
-    float peakGain = 0;
-    float peakQuality = 1;
+    float lowCutFreq = 20;
+    int lowCutSlope = 12;
+    
+    float peak1Freq = 500;
+    float peak1Gain = 0;
+    float peak1Quality = 1;
+    
+    float peak2Freq = 1000;
+    float peak2Gain = 0;
+    float peak2Quality = 1;
+    
+    float peak3Freq = 5000;
+    float peak3Gain = 0;
+    float peak3Quality = 1;
+    
+    float highCutFreq = 20000;
+    int highCutSlope = 12;
     
     // DSP stuff
     using Filter = juce::dsp::IIR::Filter<float>;
-    using MonoChain = juce::dsp::ProcessorChain<Filter>; // Can add more filters here later
+    using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
+    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, Filter, Filter, CutFilter>;
     MonoChain chain;
     
     enum ChainPositions {
-        Peak // can add more filters here later
+        LowCut,
+        Peak1,
+        Peak2,
+        Peak3,
+        HighCut
     };
+    
+    enum Slope {
+        S12,
+        S24,
+        S36,
+        S48
+    };
+    
+    // Need to save which filter to display outside view controller, so it's here for now
+    // initalized to show low cut on first open
+    int lastDisplayed = ChainPositions::LowCut;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKEqualizer)
 };
