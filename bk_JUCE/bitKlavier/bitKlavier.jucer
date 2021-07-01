@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.9rc5"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.9rc6"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -552,10 +552,10 @@
                   iCloudPermissions="1" UISupportsDocumentBrowser="1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
-                       plistPreprocessorDefinitions="" iosCompatibility="9.0" enablePluginBinaryCopyStep="1"
-                       codeSigningIdentity="YT6AXURH62"/>
+                       plistPreprocessorDefinitions="" iosCompatibility="12.0" enablePluginBinaryCopyStep="1"
+                       codeSigningIdentity="EFHE8JGE6R"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       iosCompatibility="9.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="YT6AXURH62"/>
+                       iosCompatibility="12.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="EFHE8JGE6R"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>
