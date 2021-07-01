@@ -66,15 +66,8 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
             int which = soundfont.fromLastOccurrenceOf("default.sf", false, false).getIntValue();
             
             File file;
-#if JUCE_IOS
-            file = File::getSpecialLocation(File::userDocumentsDirectory);
-#endif
-#if JUCE_MAC
-            file = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
-#endif
-#if JUCE_WINDOWS || JUCE_LINUX
-            file = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
-#endif
+            
+            file = file.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
             
             switch (which)
             {
