@@ -107,7 +107,7 @@ private:
             
             //==============================================================================
             
-            soundfontPathLabel.setTooltip("Set paths in which to search for soundfonts.");
+            soundfontPathLabel.setTooltip("Set extra paths in which to search for soundfonts. bitKlavier will always search the soundfonts folder in the bitKlavier folder.");
             soundfontPathLabel.setJustificationType(Justification::topLeft);
             addAndMakeVisible(soundfontPathLabel);
             

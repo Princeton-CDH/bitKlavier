@@ -168,6 +168,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             }
             
             soundfontsPaths = userSettings->getStringAttribute("soundfontsSearchPath", soundfontsPaths.toString());
+            
             customSamplesPaths = userSettings->getStringAttribute("sampleSearchPath", "");
         }
         else
@@ -349,6 +350,20 @@ Array<File> BKAudioProcessor::getSoundfontsPaths()
     {
         directories.add(soundfontsPaths[i]);
     }
+    
+    File bkSoundfonts;
+#if JUCE_IOS
+//    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory);
+    bkSoundfonts = File::getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
+#endif
+#if JUCE_MAC
+    bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+#endif
+    directories.add(bkSoundfonts);
+    
     return directories;
 }
 
