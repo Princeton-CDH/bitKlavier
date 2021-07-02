@@ -340,39 +340,52 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 File BKAudioProcessor::getDefaultSamplesPath()
 {
+#if JUCE_IOS
+    return File::getSpecialLocation(File::invokedExecutableFile)
+    .getParentDirectory().getChildFile("samples");
+#else
     return defaultSamplesPath;
+#endif
 }
 
 Array<File> BKAudioProcessor::getSoundfontsPaths()
 {
-    Array<File> directories = soundfontsPaths.findChildFiles(File::TypesOfFileToFind::findDirectories, true);
+    Array<File> directories = soundfontsPaths
+    .findChildFiles(File::TypesOfFileToFind::findDirectories, true);
     for (int i = 0; i < soundfontsPaths.getNumPaths(); ++i)
     {
         directories.add(soundfontsPaths[i]);
     }
     
-    File bkSoundfonts;
 #if JUCE_IOS
-//    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory);
-    bkSoundfonts = File::getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("soundfonts");
+    directories.add(File::getSpecialLocation(File::invokedExecutableFile)
+                    .getParentDirectory().getChildFile("soundfonts"));
+    directories.add(File::getSpecialLocation(File::userDocumentsDirectory));
 #endif
 #if JUCE_MAC
-    bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+    directories.add(File::getSpecialLocation(File::globalApplicationsDirectory)
+                    .getChildFile("bitKlavier").getChildFile("soundfonts"));
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-    bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
+    directories.add(File::getSpecialLocation(File::userDocumentsDirectory)
+                    .getChildFile("bitKlavier").getChildFile("soundfonts"));
 #endif
-    directories.add(bkSoundfonts);
     
     return directories;
 }
 
 Array<File> BKAudioProcessor::getCustomSamplesPaths()
 {
-    Array<File> directories = customSamplesPaths.findChildFiles(File::TypesOfFileToFind::findDirectories, true);
+    Array<File> directories = customSamplesPaths
+    .findChildFiles(File::TypesOfFileToFind::findDirectories, true);
     for (int i = 0; i < customSamplesPaths.getNumPaths(); ++i)
     {
         directories.add(customSamplesPaths[i]);
     }
+
+#if JUCE_IOS
+    directories.add(File::getSpecialLocation(File::userDocumentsDirectory));
+#endif
+    
     return directories;
 }
