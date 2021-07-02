@@ -198,6 +198,7 @@ void BKAudioProcessor::loadGalleries()
     collectPianos();
     collectPreparations();
     collectSoundfonts();
+    collectCustomSamples();
     
     updateUI();
     
