@@ -384,7 +384,9 @@ Array<File> BKAudioProcessor::getCustomSamplesPaths()
     }
 
 #if JUCE_IOS
-    directories.add(File::getSpecialLocation(File::userDocumentsDirectory));
+    Array<File> subDirs = File::getSpecialLocation(File::userDocumentsDirectory)
+    .findChildFiles(File::TypesOfFileToFind::findDirectories, true);
+    directories.addArray(subDirs);
 #endif
     
     return directories;
