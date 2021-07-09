@@ -163,6 +163,15 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
     else if (type == BKLoadLite)        numLayers = 2;
     else if (type == BKLoadMedium)      numLayers = 4;
     else if (type == BKLoadHeavy)       numLayers = 8;
+
+#if JUCE_IOS
+    memoryMappingEnabled = true;
+#endif
+    
+    if (memoryMappingEnabled)
+    {
+        DBG("DOING MEMORY MAPPING");
+    }
     
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
@@ -832,6 +841,15 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
     std::regex harmReg("\\bharm[ABCDEFG]#*b*\\dv\\d+\\b");
     std::regex relReg("\\brel\\d+\\b");
     std::regex pedalReg("\\bpedal[DU]\\d+\\b");
+
+#if JUCE_IOS
+    memoryMappingEnabled = true;
+#endif
+    
+    if (memoryMappingEnabled)
+    {
+        DBG("DOING MEMORY MAPPING");
+    }
     
     for (auto iter : RangedDirectoryIterator (File (samples), false, "*.wav"))
     {
@@ -903,7 +921,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                         MemoryMappedAudioFormatReader* memoryMappedReader = nullptr;
                         if (memoryMappingEnabled)
                         {
+                            DBG("DOING MEMORY MAPPING on " + soundName);
                             memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+                            //if(memoryMappedReader == nullptr) continue;
                         }
                         else
                         {
@@ -932,6 +952,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                         
                         if (memoryMappingEnabled)
                         {
+                            DBG("DOING MORE MEMORY MAPPING on " + soundName);
                             double sourceSampleRate = memoryMappedReader->sampleRate;
                             uint64 maxLength;
                             if (sourceSampleRate <= 0 || memoryMappedReader->lengthInSamples <= 0) {
@@ -1447,6 +1468,7 @@ SampleTouchThread::~SampleTouchThread() {}
 
 void SampleTouchThread::run()
 {
+    
     while (!threadShouldExit())
     {
         for (auto voice : processor.mainPianoSynth.getVoices())

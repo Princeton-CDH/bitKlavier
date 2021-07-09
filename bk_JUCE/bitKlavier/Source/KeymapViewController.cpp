@@ -405,6 +405,13 @@ BKViewController(p, theGraph, 4)
     
     //======================================================================================
 
+#if JUCE_IOS
+    asym_kSlider->addWantsBigOneListener(this);
+    sym_kSlider->addWantsBigOneListener(this);
+    scaleSlider->addWantsBigOneListener(this);
+    offsetSlider->addWantsBigOneListener(this);
+#endif
+    
     currentTab = 0;
     //displayTab(currentTab);
 
@@ -725,7 +732,11 @@ void KeymapViewController::displayTab(int tab)
         area.reduce(x0 + 10 * processor.paddingScalarX + 4,
                     10 * processor.paddingScalarY + 4);
         area.removeFromTop(gComponentComboBoxHeight + 10);
+#if JUCE_IOS
+        area.removeFromBottom(50 * processor.paddingScalarY);
+#else
         area.removeFromBottom(90 + 50 * processor.paddingScalarY);
+#endif
         
         // Border
         velocityCurveGroup.setBounds(area);
