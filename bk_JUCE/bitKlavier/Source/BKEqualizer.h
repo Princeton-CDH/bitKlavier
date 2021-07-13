@@ -33,7 +33,7 @@ public:
     void updateCoefficients(double sampleRate);
     
     // Performs the actual processing of audio
-    void process(juce::dsp::ProcessContextReplacing<float>& context);
+    void process(juce::dsp::ProcessContextReplacing<float>& context, int channel);
     
     // Getters and Setters for the view controller
     inline void setLowCutFreq(float lowCutFreq) { this->lowCutFreq = lowCutFreq; }
@@ -90,8 +90,9 @@ private:
     // DSP stuff
     using Filter = juce::dsp::IIR::Filter<float>;
     using CutFilter = juce::dsp::ProcessorChain<Filter, Filter, Filter, Filter>;
-    using MonoChain = juce::dsp::ProcessorChain<CutFilter, Filter, Filter, Filter, CutFilter>;
-    MonoChain chain;
+    using Chain = juce::dsp::ProcessorChain<CutFilter, Filter, Filter, Filter, CutFilter>;
+    Chain leftChain;
+    Chain rightChain;
     
     enum ChainPositions {
         LowCut,

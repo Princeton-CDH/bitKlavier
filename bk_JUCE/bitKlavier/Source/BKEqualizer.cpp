@@ -29,7 +29,8 @@ void BKEqualizer::prepareToPlay(double sampleRate, int samplesPerBlock) {
     spec.numChannels = 1;
     spec.sampleRate = sampleRate;
     
-    chain.prepare(spec);
+    leftChain.prepare(spec);
+    rightChain.prepare(spec);
     
     updateCoefficients(sampleRate);
 }
@@ -43,37 +44,53 @@ void BKEqualizer::updateCoefficients(double sampleRate) {
     auto peak3Coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, peak3Freq, peak3Quality,
                                                                                 juce::Decibels::decibelsToGain(peak3Gain));
     
-    *chain.get<ChainPositions::Peak1>().coefficients = *peak1Coefficients;
-    *chain.get<ChainPositions::Peak2>().coefficients = *peak2Coefficients;
-    *chain.get<ChainPositions::Peak3>().coefficients = *peak3Coefficients;
+    *leftChain.get<ChainPositions::Peak1>().coefficients = *peak1Coefficients;
+    *leftChain.get<ChainPositions::Peak2>().coefficients = *peak2Coefficients;
+    *leftChain.get<ChainPositions::Peak3>().coefficients = *peak3Coefficients;
+    *rightChain.get<ChainPositions::Peak1>().coefficients = *peak1Coefficients;
+    *rightChain.get<ChainPositions::Peak2>().coefficients = *peak2Coefficients;
+    *rightChain.get<ChainPositions::Peak3>().coefficients = *peak3Coefficients;
     
     // calculate low cut filter coefficients
     jassert(lowCutSlope % 12 == 0 && lowCutSlope >= 12 && lowCutSlope <= 48);
     auto lowCutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(lowCutFreq, sampleRate, lowCutSlope / 6);
     
-    auto& lowCutChain = chain.get<ChainPositions::LowCut>();
-    lowCutChain.setBypassed<Slope::S12>(true);
-    lowCutChain.setBypassed<Slope::S24>(true);
-    lowCutChain.setBypassed<Slope::S36>(true);
-    lowCutChain.setBypassed<Slope::S48>(true);
+    auto& leftLowCutChain = leftChain.get<ChainPositions::LowCut>();
+    leftLowCutChain.setBypassed<Slope::S12>(true);
+    leftLowCutChain.setBypassed<Slope::S24>(true);
+    leftLowCutChain.setBypassed<Slope::S36>(true);
+    leftLowCutChain.setBypassed<Slope::S48>(true);
+    auto& rightLowCutChain = rightChain.get<ChainPositions::LowCut>();
+    rightLowCutChain.setBypassed<Slope::S12>(true);
+    rightLowCutChain.setBypassed<Slope::S24>(true);
+    rightLowCutChain.setBypassed<Slope::S36>(true);
+    rightLowCutChain.setBypassed<Slope::S48>(true);
     
     // breaks omitted on purpose to facilitate fall through
     switch(lowCutSlope) {
         case 48: {
-            *lowCutChain.get<Slope::S48>().coefficients = *lowCutCoefficients[Slope::S48];
-            lowCutChain.setBypassed<Slope::S48>(false);
+            *leftLowCutChain.get<Slope::S48>().coefficients = *lowCutCoefficients[Slope::S48];
+            leftLowCutChain.setBypassed<Slope::S48>(false);
+            *rightLowCutChain.get<Slope::S48>().coefficients = *lowCutCoefficients[Slope::S48];
+            rightLowCutChain.setBypassed<Slope::S48>(false);
         }
         case 36: {
-            *lowCutChain.get<Slope::S36>().coefficients = *lowCutCoefficients[Slope::S36];
-            lowCutChain.setBypassed<Slope::S36>(false);
+            *leftLowCutChain.get<Slope::S36>().coefficients = *lowCutCoefficients[Slope::S36];
+            leftLowCutChain.setBypassed<Slope::S36>(false);
+            *rightLowCutChain.get<Slope::S36>().coefficients = *lowCutCoefficients[Slope::S36];
+            rightLowCutChain.setBypassed<Slope::S36>(false);
         }
         case 24: {
-            *lowCutChain.get<Slope::S24>().coefficients = *lowCutCoefficients[Slope::S24];
-            lowCutChain.setBypassed<Slope::S24>(false);
+            *leftLowCutChain.get<Slope::S24>().coefficients = *lowCutCoefficients[Slope::S24];
+            leftLowCutChain.setBypassed<Slope::S24>(false);
+            *rightLowCutChain.get<Slope::S24>().coefficients = *lowCutCoefficients[Slope::S24];
+            rightLowCutChain.setBypassed<Slope::S24>(false);
         }
         case 12: {
-            *lowCutChain.get<Slope::S12>().coefficients = *lowCutCoefficients[Slope::S12];
-            lowCutChain.setBypassed<Slope::S12>(false);
+            *leftLowCutChain.get<Slope::S12>().coefficients = *lowCutCoefficients[Slope::S12];
+            leftLowCutChain.setBypassed<Slope::S12>(false);
+            *rightLowCutChain.get<Slope::S12>().coefficients = *lowCutCoefficients[Slope::S12];
+            rightLowCutChain.setBypassed<Slope::S12>(false);
         }
     }
     
@@ -81,33 +98,48 @@ void BKEqualizer::updateCoefficients(double sampleRate) {
     jassert(highCutSlope % 12 == 0 && highCutSlope >= 12 && highCutSlope <= 48);
     auto highCutCoefficients = juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(highCutFreq, sampleRate, highCutSlope / 6);
     
-    auto& highCutChain = chain.get<ChainPositions::HighCut>();
-    highCutChain.setBypassed<Slope::S12>(true);
-    highCutChain.setBypassed<Slope::S24>(true);
-    highCutChain.setBypassed<Slope::S36>(true);
-    highCutChain.setBypassed<Slope::S48>(true);
+    auto& leftHighCutChain = leftChain.get<ChainPositions::HighCut>();
+    leftHighCutChain.setBypassed<Slope::S12>(true);
+    leftHighCutChain.setBypassed<Slope::S24>(true);
+    leftHighCutChain.setBypassed<Slope::S36>(true);
+    leftHighCutChain.setBypassed<Slope::S48>(true);
+    auto& rightHighCutChain = rightChain.get<ChainPositions::HighCut>();
+    rightHighCutChain.setBypassed<Slope::S12>(true);
+    rightHighCutChain.setBypassed<Slope::S24>(true);
+    rightHighCutChain.setBypassed<Slope::S36>(true);
+    rightHighCutChain.setBypassed<Slope::S48>(true);
     
     // breaks omitted on purpose to facilitate fall through
     switch(highCutSlope) {
         case 48: {
-            *highCutChain.get<Slope::S48>().coefficients = *highCutCoefficients[Slope::S48];
-            highCutChain.setBypassed<Slope::S48>(false);
+            *leftHighCutChain.get<Slope::S48>().coefficients = *highCutCoefficients[Slope::S48];
+            leftHighCutChain.setBypassed<Slope::S48>(false);
+            *rightHighCutChain.get<Slope::S48>().coefficients = *highCutCoefficients[Slope::S48];
+            rightHighCutChain.setBypassed<Slope::S48>(false);
         }
         case 36: {
-            *highCutChain.get<Slope::S36>().coefficients = *highCutCoefficients[Slope::S36];
-            highCutChain.setBypassed<Slope::S36>(false);
+            *leftHighCutChain.get<Slope::S36>().coefficients = *highCutCoefficients[Slope::S36];
+            leftHighCutChain.setBypassed<Slope::S36>(false);
+            *rightHighCutChain.get<Slope::S36>().coefficients = *highCutCoefficients[Slope::S36];
+            rightHighCutChain.setBypassed<Slope::S36>(false);
         }
         case 24: {
-            *highCutChain.get<Slope::S24>().coefficients = *highCutCoefficients[Slope::S24];
-            highCutChain.setBypassed<Slope::S24>(false);
+            *leftHighCutChain.get<Slope::S24>().coefficients = *highCutCoefficients[Slope::S24];
+            leftHighCutChain.setBypassed<Slope::S24>(false);
+            *rightHighCutChain.get<Slope::S24>().coefficients = *highCutCoefficients[Slope::S24];
+            rightHighCutChain.setBypassed<Slope::S24>(false);
         }
         case 12: {
-            *highCutChain.get<Slope::S12>().coefficients = *highCutCoefficients[Slope::S12];
-            highCutChain.setBypassed<Slope::S12>(false);
+            *leftHighCutChain.get<Slope::S12>().coefficients = *highCutCoefficients[Slope::S12];
+            leftHighCutChain.setBypassed<Slope::S12>(false);
+            *rightHighCutChain.get<Slope::S12>().coefficients = *highCutCoefficients[Slope::S12];
+            rightHighCutChain.setBypassed<Slope::S12>(false);
         }
     }
 }
 
-void BKEqualizer::process(juce::dsp::ProcessContextReplacing<float>& context) {
-    chain.process(context);
+void BKEqualizer::process(juce::dsp::ProcessContextReplacing<float>& context, int channel) {
+    if (channel == 0) leftChain.process(context);
+    else if (channel == 1) rightChain.process(context);
+    else DBG("invalid channel!");
 }
