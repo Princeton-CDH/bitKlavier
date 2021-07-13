@@ -1169,15 +1169,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     buffer.applyGain(0, numSamples, gallery->getGeneralSettings()->getGlobalGain());
 #endif
     
-    // Apply EQ filter to the buffer
-    // is this making the buffer mono??? No, but it's only applying processing to one side
-//    eq.updateCoefficients(getSampleRate());
-//    juce::dsp::AudioBlock<float> block(buffer);
-//    auto monoBlock = block.getSingleChannelBlock(0);
-//    juce::dsp::ProcessContextReplacing<float> context(monoBlock);
-//    eq.process(context);
-    
-    // hmmm this doesn't work, seems like maybe it's not OK to pass different channels through the same filter
+    // Apply EQ filters to the buffer
     eq.updateCoefficients(getSampleRate());
     juce::dsp::AudioBlock<float> block(buffer);
     auto leftBlock = block.getSingleChannelBlock(0);

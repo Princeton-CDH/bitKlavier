@@ -90,18 +90,62 @@ public:
 #endif
 
 private:
-    //BKAudioProcessor& processor;
+    void displayTab(int tab) override;
+    void displayShared(void) override;
+    void invisible(void) override;
+    
+    enum Tabs {
+        settings,
+        equalizer
+    };
+    
+    int arrowSpace = 50; // amount of space needed for arrows
+    
+    BKAudioProcessor& processor;
     int currentNostalgicLayer;
     
+    // Settings UI components
     ToggleButton invertSustainB;
-    BKLabel     invertSustainL;
-    
     ToggleButton noteOnSetsNoteOffVelocityB;
-    BKLabel     noteOnSetsNoteOffVelocityL;
-    
-    std::unique_ptr<BKSingleSlider> A4tuningReferenceFrequencySlider; //A440
+    std::unique_ptr<BKSingleSlider> A4tuningReferenceFrequencySlider;
     std::unique_ptr<BKSingleSlider> tempoMultiplierSlider;
     
+    // Equalizer UI components
+    TextButton lowCutButton;
+    TextButton peak1Button;
+    TextButton peak2Button;
+    TextButton peak3Button;
+    TextButton highCutButton;
+    
+    std::unique_ptr<BKSingleSlider> lowCutFreqSlider;
+    std::unique_ptr<BKSingleSlider> lowCutSlopeSlider;
+    
+    std::unique_ptr<BKSingleSlider> peak1FreqSlider;
+    std::unique_ptr<BKSingleSlider> peak1GainSlider;
+    std::unique_ptr<BKSingleSlider> peak1QualitySlider;
+    
+    std::unique_ptr<BKSingleSlider> peak2FreqSlider;
+    std::unique_ptr<BKSingleSlider> peak2GainSlider;
+    std::unique_ptr<BKSingleSlider> peak2QualitySlider;
+    
+    std::unique_ptr<BKSingleSlider> peak3FreqSlider;
+    std::unique_ptr<BKSingleSlider> peak3GainSlider;
+    std::unique_ptr<BKSingleSlider> peak3QualitySlider;
+    
+    std::unique_ptr<BKSingleSlider> highCutFreqSlider;
+    std::unique_ptr<BKSingleSlider> highCutSlopeSlider;
+    
+    enum Filters {
+        lowCut,
+        peak1,
+        peak2,
+        peak3,
+        highCut
+    };
+    
+    int currentFilter = Filters::lowCut; // like currentTab but for filter
+    void displayFilter(int filter);
+    void invisibleFilters();
     
     void bkTextFieldDidChange       (TextEditor&)               override;
     void bkComboBoxDidChange        (ComboBox* box)             override { };

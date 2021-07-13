@@ -53,10 +53,10 @@ private:
     TextButton peak3Button;
     TextButton highCutButton;
     
-    std::unique_ptr<BKSingleSlider> peakFreqSlider;
-    std::unique_ptr<BKSingleSlider> peakGainSlider;
-    std::unique_ptr<BKSingleSlider> peakQualitySlider;
-    
+//    std::unique_ptr<BKSingleSlider> peakFreqSlider;
+//    std::unique_ptr<BKSingleSlider> peakGainSlider;
+//    std::unique_ptr<BKSingleSlider> peakQualitySlider;
+//
     
     std::unique_ptr<BKSingleSlider> lowCutFreqSlider;
     std::unique_ptr<BKSingleSlider> lowCutSlopeSlider;
