@@ -122,6 +122,12 @@ private:
     TextButton peak3Button;
     TextButton highCutButton;
     
+    ImageComponent lowCutIcon;
+    ImageComponent highCutIcon;
+    ImageComponent peak1Icon;
+    ImageComponent peak2Icon;
+    ImageComponent peak3Icon;
+    
     std::unique_ptr<BKSingleSlider> lowCutFreqSlider;
     std::unique_ptr<BKSingleSlider> lowCutSlopeSlider;
     

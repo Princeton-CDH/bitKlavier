@@ -195,35 +195,45 @@ processor(p)
 #endif
     
     // Equalizer UI components setup
-    // Filter Selection Buttons
+    // Filter Selection Buttons - icons must be added first to be "behind" the buttons
+    lowCutIcon.setImage(ImageCache::getFromMemory(BinaryData::lo_cut_png, BinaryData::lo_cut_pngSize));
+    addAndMakeVisible(lowCutIcon);
     lowCutButton.setName("Low Cut");
-    lowCutButton.setButtonText("Low Cut");
-    lowCutButton.setTooltip("Select the Low Cut filter to alter its parameters.");
+    lowCutButton.setTooltip("Select the low cut filter to alter its parameters");
     lowCutButton.addListener(this);
+    lowCutButton.setAlpha(0.5);
     addAndMakeVisible(lowCutButton);
     
+    peak1Icon.setImage(ImageCache::getFromMemory(BinaryData::peak_png, BinaryData::peak_pngSize));
+    addAndMakeVisible(peak1Icon);
     peak1Button.setName("Peak 1");
-    peak1Button.setButtonText("Peak 1");
-    peak1Button.setTooltip("Select the first Peak filter to alter its parameters.");
+    peak1Button.setTooltip("Select the first peak filter to alter its parameters");
     peak1Button.addListener(this);
+    peak1Button.setAlpha(0.5);
     addAndMakeVisible(peak1Button);
     
+    peak2Icon.setImage(ImageCache::getFromMemory(BinaryData::peak_png, BinaryData::peak_pngSize));
+    addAndMakeVisible(peak2Icon);
     peak2Button.setName("Peak 2");
-    peak2Button.setButtonText("Peak 2");
-    peak2Button.setTooltip("Select the second Peak filter to alter its parameters.");
+    peak2Button.setTooltip("Select the second peak filter to alter its parameters");
     peak2Button.addListener(this);
+    peak2Button.setAlpha(0.5);
     addAndMakeVisible(peak2Button);
     
+    peak3Icon.setImage(ImageCache::getFromMemory(BinaryData::peak_png, BinaryData::peak_pngSize));
+    addAndMakeVisible(peak3Icon);
     peak3Button.setName("Peak 3");
-    peak3Button.setButtonText("Peak 3");
-    peak3Button.setTooltip("Select the third Peak filter to alter its parameters.");
+    peak3Button.setTooltip("Select the third peak filter to alter its parameters");
     peak3Button.addListener(this);
+    peak3Button.setAlpha(0.5);
     addAndMakeVisible(peak3Button);
     
+    highCutIcon.setImage(ImageCache::getFromMemory(BinaryData::hi_cut_png, BinaryData::hi_cut_pngSize));
+    addAndMakeVisible(highCutIcon);
     highCutButton.setName("High Cut");
-    highCutButton.setButtonText("High Cut");
-    highCutButton.setTooltip("Select the High Cut filter to alter its parameters.");
+    highCutButton.setTooltip("Select the high cut filter to alter its parameters");
     highCutButton.addListener(this);
+    highCutButton.setAlpha(0.5);
     addAndMakeVisible(highCutButton);
     
     // grab defaults from here
@@ -336,10 +346,15 @@ void GeneralViewController::displayTab(int tab) {
     }
     else if (tab == Tabs::equalizer) {
         lowCutButton.setVisible(true);
+        lowCutIcon.setVisible(true);
         highCutButton.setVisible(true);
+        highCutIcon.setVisible(true);
         peak1Button.setVisible(true);
+        peak1Icon.setVisible(true);
         peak2Button.setVisible(true);
+        peak2Icon.setVisible(true);
         peak3Button.setVisible(true);
+        peak3Icon.setVisible(true);
         displayFilter(currentFilter);
     }
     
@@ -356,10 +371,15 @@ void GeneralViewController::invisible() {
     invertSustainB.setVisible(false);
     noteOnSetsNoteOffVelocityB.setVisible(false);
     lowCutButton.setVisible(false);
+    lowCutIcon.setVisible(false);
     highCutButton.setVisible(false);
+    highCutIcon.setVisible(false);
     peak1Button.setVisible(false);
+    peak1Icon.setVisible(false);
     peak2Button.setVisible(false);
+    peak2Icon.setVisible(false);
     peak3Button.setVisible(false);
+    peak3Icon.setVisible(false);
     invisibleFilters();
 }
 
@@ -411,11 +431,39 @@ void GeneralViewController::resized()
     
     float spacing = equalizerButtonsArea.getWidth() / 5;
     int padding = spacing - 2; // change the 2 to change padding between buttons
-    lowCutButton.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
-    peak1Button.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
-    peak2Button.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
-    peak3Button.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
-    highCutButton.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
+    Rectangle<int> lowCutArea = equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding);
+    Rectangle<int> peak1Area = equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding);
+    Rectangle<int> peak2Area = equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding);
+    Rectangle<int> peak3Area = equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding);
+    Rectangle<int> highCutArea = equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding);
+    
+    int rx = 20, ry = 10;
+    lowCutButton.setBounds(lowCutArea);
+    lowCutArea.reduce(rx, ry);
+    lowCutIcon.setBounds(lowCutArea);
+    peak1Button.setBounds(peak1Area);
+    peak1Area.reduce(rx, ry);
+    peak1Icon.setBounds(peak1Area);
+    peak2Button.setBounds(peak2Area);
+    peak2Area.reduce(rx, ry);
+    peak2Icon.setBounds(peak2Area);
+    peak3Button.setBounds(peak3Area);
+    peak3Area.reduce(rx, ry);
+    peak3Icon.setBounds(peak3Area);
+    highCutButton.setBounds(highCutArea);
+    highCutArea.reduce(rx, ry);
+    highCutIcon.setBounds(highCutArea);
+    
+//    lowCutButton.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
+//    lowCutIcon.setBounds(lowCutButton.getBounds());
+//    peak1Button.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
+//    peak1Icon.setBounds(peak1Button.getBounds());
+//    peak2Button.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
+//    peak2Icon.setBounds(peak2Button.getBounds());
+//    peak3Button.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
+//    peak3Icon.setBounds(peak3Button.getBounds());
+//    highCutButton.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
+//    highCutIcon.setBounds(highCutButton.getBounds());
     
     // Graph
     Rectangle<int> equalizerGraphArea(equalizerArea);
