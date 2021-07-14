@@ -677,9 +677,14 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     int64 loopStart, loopEnd, start, end, soundLengthMinus1;
     
     int numBlendronics = blendronic.size();
+    /*
     Array<BKDelayL*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
         blendronicDelays.add(blendronic.getUnchecked(i)->getDelay()->getDelay().get());
+     */
+    Array<BlendronicDelay*> blendronicDelays;
+    for (int i = 0; i < numBlendronics; ++i)
+        blendronicDelays.add(blendronic.getUnchecked(i)->getDelay());
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
@@ -847,9 +852,14 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
    
     int numBlendronics = blendronic.size();
+    /*
     Array<BKDelayL*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
         blendronicDelays.add(blendronic.getUnchecked(i)->getDelay()->getDelay().get());
+     */
+    Array<BlendronicDelay*> blendronicDelays;
+    for (int i = 0; i < numBlendronics; ++i)
+        blendronicDelays.add(blendronic.getUnchecked(i)->getDelay());
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
@@ -1061,9 +1071,17 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     // Putting blendronics into a temp raw pointer array to avoid taking the extra time
     // to do ReferenceCountedObject stuff in the loop
     int numBlendronics = blendronic.size();
+    
+    /*
     Array<BKDelayL*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
         blendronicDelays.add(blendronic.getUnchecked(i)->getDelay()->getDelay().get());
+     */
+    
+    Array<BlendronicDelay*> blendronicDelays;
+    for (int i = 0; i < numBlendronics; ++i)
+        blendronicDelays.add(blendronic.getUnchecked(i)->getDelay());
+    
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
