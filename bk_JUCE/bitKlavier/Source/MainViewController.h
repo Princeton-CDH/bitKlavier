@@ -112,6 +112,8 @@ public:
     
     inline BKConstructionSite* getConstructionSite() { return &construction; }
     
+    inline BKOvertop* getOvertop() { return &overtop; }
+    
     /*inline Viewport* getViewport(void) { return &viewPort;}*/
     void toggleDisplay(void);
     void performUndo(void);

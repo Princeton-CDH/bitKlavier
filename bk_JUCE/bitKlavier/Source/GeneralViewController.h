@@ -88,6 +88,11 @@ public:
 #if JUCE_IOS
     void iWantTheBigOne(TextEditor*, String name) override;
 #endif
+    
+    inline void setTab(int tab) {
+        currentTab = tab;
+        displayTab(currentTab);
+    }
 
 private:
     void displayTab(int tab) override;
