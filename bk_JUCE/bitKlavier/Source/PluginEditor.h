@@ -49,7 +49,7 @@ public:
     
     void showBKSettingsDialog(Button* button);
     
-    void showEqualizer(BKAudioProcessor& processor);
+    void showGenSettings(int tab);
     
     MainViewController& getMainViewController() { return mvc; }
     

@@ -242,6 +242,9 @@ public:
     AudioProcessorEditor* getEditor();
 
     //==============================================================================
+    
+    inline BKAudioProcessorEditor* getBKEditor() { return editor; }
+    
     const String getName() const override;
 
     bool acceptsMidi() const override;

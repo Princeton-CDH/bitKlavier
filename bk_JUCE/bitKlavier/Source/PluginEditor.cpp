@@ -98,8 +98,8 @@ void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
     window->setTitleBarTextCentred(false);
 }
 
-void BKAudioProcessorEditor::showEqualizer(BKAudioProcessor& processor) {
-    mvc.getOvertop()->gvc.setTab(1);
+void BKAudioProcessorEditor::showGenSettings(int tab) {
+    mvc.getOvertop()->gvc.setTab(tab); // 0 for settings, 1 for equalizer
     processor.updateState->setCurrentDisplay(DisplayGeneral);
 }
 

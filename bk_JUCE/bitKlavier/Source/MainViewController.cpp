@@ -635,7 +635,7 @@ void MainViewController::bkButtonClicked (Button* b)
         processor.setSustainFromMenu(sustainPedalButton.getToggleState());
     }
     if (b == &equalizerButton) {
-        editor.showEqualizer(processor);
+        editor.showGenSettings(1);
     }
 }
 
