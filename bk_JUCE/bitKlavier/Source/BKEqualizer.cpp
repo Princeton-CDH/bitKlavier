@@ -12,7 +12,8 @@
 #include "BKEqualizer.h"
 
 //==============================================================================
-BKEqualizer::BKEqualizer()
+BKEqualizer::BKEqualizer(BKAudioProcessor& p) :
+processor(p)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
@@ -142,4 +143,37 @@ void BKEqualizer::process(juce::dsp::ProcessContextReplacing<float>& context, in
     if (channel == 0) leftChain.process(context);
     else if (channel == 1) rightChain.process(context);
     else DBG("invalid channel!");
+}
+
+double BKEqualizer::magForFreq(double freq) {
+    double mag = 1.f;
+    double sampleRate = processor.getCurrentSampleRate();
+    
+    // Since leftChain and rightChain use the same coefficients, it's fine to just get them from left
+    if (!leftChain.isBypassed<ChainPositions::Peak1>())
+        mag *= leftChain.get<ChainPositions::Peak1>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    if (!leftChain.isBypassed<ChainPositions::Peak2>())
+        mag *= leftChain.get<ChainPositions::Peak2>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    if (!leftChain.isBypassed<ChainPositions::Peak3>())
+        mag *= leftChain.get<ChainPositions::Peak3>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    
+    if(!leftChain.get<ChainPositions::LowCut>().isBypassed<0>())
+        mag *= leftChain.get<ChainPositions::LowCut>().get<0>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    if(!leftChain.get<ChainPositions::LowCut>().isBypassed<1>())
+        mag *= leftChain.get<ChainPositions::LowCut>().get<1>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    if(!leftChain.get<ChainPositions::LowCut>().isBypassed<2>())
+        mag *= leftChain.get<ChainPositions::LowCut>().get<2>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    if(!leftChain.get<ChainPositions::LowCut>().isBypassed<3>())
+        mag *= leftChain.get<ChainPositions::LowCut>().get<3>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    
+    if(!leftChain.get<ChainPositions::HighCut>().isBypassed<0>())
+        mag *= leftChain.get<ChainPositions::HighCut>().get<0>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    if(!leftChain.get<ChainPositions::HighCut>().isBypassed<1>())
+        mag *= leftChain.get<ChainPositions::HighCut>().get<1>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    if(!leftChain.get<ChainPositions::HighCut>().isBypassed<2>())
+        mag *= leftChain.get<ChainPositions::HighCut>().get<2>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    if(!leftChain.get<ChainPositions::HighCut>().isBypassed<3>())
+        mag *= leftChain.get<ChainPositions::HighCut>().get<3>().coefficients->getMagnitudeForFrequency(freq, sampleRate);
+    
+    return mag;
 }

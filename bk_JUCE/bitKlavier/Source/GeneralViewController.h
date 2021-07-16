@@ -11,6 +11,7 @@
 #pragma once
 
 #include "BKViewController.h"
+#include "EqualizerGraph.h"
 
 class CommentViewController :
 public BKViewController
@@ -157,6 +158,8 @@ private:
     int currentFilter = Filters::lowCut; // like currentTab but for filter
     void displayFilter(int filter);
     void invisibleFilters();
+    
+    EqualizerGraph eqGraph;
     
     void bkTextFieldDidChange       (TextEditor&)               override;
     void bkComboBoxDidChange        (ComboBox* box)             override { };

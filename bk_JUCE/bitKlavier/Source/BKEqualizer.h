@@ -12,6 +12,8 @@
 
 #include <JuceHeader.h>
 
+#include "PluginProcessor.h"
+
 //==============================================================================
 /*
  Class for the equalizer. Attaches to bK in pluginProcessor processBlock() and
@@ -23,7 +25,7 @@
 class BKEqualizer  : public juce::Component
 {
 public:
-    BKEqualizer();
+    BKEqualizer(BKAudioProcessor& p);
     ~BKEqualizer() override;
     
     // Must be called before playback begins or change to sample settings
@@ -66,8 +68,17 @@ public:
     
     inline void setLastDisplayed(int lastDisplayed) { this->lastDisplayed = lastDisplayed; }
     inline int getLastDisplayed() { return lastDisplayed; }
+    
+    // Return the magnitude corresponding to this frequency based off the parameters of this equalizer
+    double magForFreq(double freq);
+    
+    //inline void setSampleRate(double sampleRate) { sr = sampleRate; }
 
 private:
+    BKAudioProcessor& processor; // hmmm this might be the issue, this and plugin processor both depend on each other
+    
+    // double sr;
+    
     // Parameters initialized here
     float lowCutFreq = 20;
     int lowCutSlope = 12;

@@ -236,8 +236,10 @@ processor(p)
     highCutButton.setAlpha(0.5);
     addAndMakeVisible(highCutButton);
     
-    // grab defaults from here
     BKEqualizer* eq = processor.getBKEqualizer();
+
+    addAndMakeVisible(eqGraph);
+    eqGraph.updateEQ(*eq);
     
     // Slider setup -- that's a lot of sliders!
     lowCutFreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Low Cut Frequency", 20.f, 20000.f, eq->getLowCutFreq(), 1.f);
@@ -355,6 +357,7 @@ void GeneralViewController::displayTab(int tab) {
         peak2Icon.setVisible(true);
         peak3Button.setVisible(true);
         peak3Icon.setVisible(true);
+        eqGraph.setVisible(true);
         displayFilter(currentFilter);
     }
     
@@ -380,6 +383,7 @@ void GeneralViewController::invisible() {
     peak2Icon.setVisible(false);
     peak3Button.setVisible(false);
     peak3Icon.setVisible(false);
+    eqGraph.setVisible(false);
     invisibleFilters();
 }
 
@@ -454,21 +458,12 @@ void GeneralViewController::resized()
     highCutArea.reduce(rx, ry);
     highCutIcon.setBounds(highCutArea);
     
-//    lowCutButton.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
-//    lowCutIcon.setBounds(lowCutButton.getBounds());
-//    peak1Button.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
-//    peak1Icon.setBounds(peak1Button.getBounds());
-//    peak2Button.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
-//    peak2Icon.setBounds(peak2Button.getBounds());
-//    peak3Button.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
-//    peak3Icon.setBounds(peak3Button.getBounds());
-//    highCutButton.setBounds(equalizerButtonsArea.removeFromLeft(spacing).removeFromRight(padding));
-//    highCutIcon.setBounds(highCutButton.getBounds());
-    
     // Graph
     Rectangle<int> equalizerGraphArea(equalizerArea);
     equalizerGraphArea.removeFromTop(equalizerArea.getHeight() * 1 / 8);
     equalizerGraphArea.removeFromBottom(equalizerArea.getHeight() * 3 / 8);
+    equalizerGraphArea.reduce(0, 10); // some padding
+    eqGraph.setBounds(equalizerGraphArea);
     
     // Sliders
     Rectangle<int> equalizerSlidersArea(equalizerArea);
@@ -590,66 +585,92 @@ void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, S
     else if (slider == lowCutFreqSlider.get()) {
         float lowCutFreq = lowCutFreqSlider->getValue();
         eq->setLowCutFreq(lowCutFreq);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Low Cut Freq: " + String(lowCutFreq));
     }
     else if (slider == lowCutSlopeSlider.get()) {
         int lowCutSlope = lowCutSlopeSlider->getValue();
         eq->setLowCutSlope(lowCutSlope);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Low Cut Slope: " + String(lowCutSlope));
     }
     else if (slider == peak1FreqSlider.get()) {
         float peak1Freq = peak1FreqSlider->getValue();
         eq->setPeak1Freq(peak1Freq);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Peak 1 Frequency: " + String(peak1Freq));
     }
     else if (slider == peak1GainSlider.get()) {
         float peak1Gain = peak1GainSlider->getValue();
         eq->setPeak1Gain(peak1Gain);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Peak 1 Gain: " + String(peak1Gain));
     }
     else if (slider == peak1QualitySlider.get()) {
         float peak1Quality = peak1QualitySlider->getValue();
         eq->setPeak1Quality(peak1Quality);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Peak 1 Quality: " + String(peak1Quality));
     }
     else if (slider == peak2FreqSlider.get()) {
         float peak2Freq = peak2FreqSlider->getValue();
         eq->setPeak2Freq(peak2Freq);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Peak 2 Frequency: " + String(peak2Freq));
     }
     else if (slider == peak2GainSlider.get()) {
         float peak2Gain = peak2GainSlider->getValue();
         eq->setPeak2Gain(peak2Gain);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Peak 2 Gain: " + String(peak2Gain));
     }
     else if (slider == peak2QualitySlider.get()) {
         float peak2Quality = peak2QualitySlider->getValue();
         eq->setPeak2Quality(peak2Quality);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Peak 2 Quality: " + String(peak2Quality));
     }
     else if (slider == peak3FreqSlider.get()) {
         float peak3Freq = peak3FreqSlider->getValue();
         eq->setPeak3Freq(peak3Freq);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Peak 3 Frequency: " + String(peak3Freq));
     }
     else if (slider == peak3GainSlider.get()) {
         float peak3Gain = peak3GainSlider->getValue();
         eq->setPeak3Gain(peak3Gain);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Peak 3 Gain: " + String(peak3Gain));
     }
     else if (slider == peak3QualitySlider.get()) {
         float peak3Quality = peak3QualitySlider->getValue();
         eq->setPeak3Quality(peak3Quality);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("Peak 3 Quality: " + String(peak3Quality));
     }
     else if (slider == highCutFreqSlider.get()) {
         float highCutFreq = highCutFreqSlider->getValue();
         eq->setHighCutFreq(highCutFreq);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("High Cut Freq: " + String(highCutFreq));
     }
     else if (slider == highCutSlopeSlider.get()) {
         int highCutSlope = highCutSlopeSlider->getValue();
         eq->setHighCutSlope(highCutSlope);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
         DBG("High Cut Slope: " + String(highCutSlope));
     }
 }
