@@ -63,7 +63,12 @@ public:
         double outputMin = graphArea.getBottom();
         double outputMax = graphArea.getY();
         auto map = [outputMin, outputMax](double input) {
-            return jmap(input, -24.0, 24.0, outputMin, outputMax);
+            double inputMin = -24.0;
+            double inputMax = 24.0;
+            
+            if (input < inputMin) return outputMin;
+            else if (input > inputMax) return outputMax;
+            else return jmap(input, inputMin, inputMax, outputMin, outputMax);
         };
         
         responseCurve.startNewSubPath(graphArea.getX(), map(mags.front()));
