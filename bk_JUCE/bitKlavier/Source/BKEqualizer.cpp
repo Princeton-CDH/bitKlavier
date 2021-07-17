@@ -14,16 +14,13 @@
 //==============================================================================
 BKEqualizer::BKEqualizer()
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-
 }
 
 BKEqualizer::~BKEqualizer()
 {
 }
 
-void BKEqualizer::prepareToPlay(double sampleRate, int samplesPerBlock) {
+void BKEqualizer::prepareToPlay(int samplesPerBlock) {
     juce::dsp::ProcessSpec spec;
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = 1;
@@ -32,11 +29,11 @@ void BKEqualizer::prepareToPlay(double sampleRate, int samplesPerBlock) {
     leftChain.prepare(spec);
     rightChain.prepare(spec);
     
-    updateCoefficients(sampleRate);
+    updateCoefficients();
 }
 
-void BKEqualizer::updateCoefficients(double sampleRate) {
-    // calculate peak filters' coefficients
+void BKEqualizer::updateCoefficients() {
+    // calculate and set peak filters' coefficients
     auto peak1Coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, peak1Freq, peak1Quality,
                                                                                 juce::Decibels::decibelsToGain(peak1Gain));
     auto peak2Coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, peak2Freq, peak2Quality,
@@ -51,7 +48,7 @@ void BKEqualizer::updateCoefficients(double sampleRate) {
     *rightChain.get<ChainPositions::Peak2>().coefficients = *peak2Coefficients;
     *rightChain.get<ChainPositions::Peak3>().coefficients = *peak3Coefficients;
     
-    // calculate low cut filter coefficients
+    // calculate and set low cut filter coefficients
     jassert(lowCutSlope % 12 == 0 && lowCutSlope >= 12 && lowCutSlope <= 48);
     auto lowCutCoefficients = juce::dsp::FilterDesign<float>::designIIRHighpassHighOrderButterworthMethod(lowCutFreq, sampleRate, lowCutSlope / 6);
     
@@ -94,7 +91,7 @@ void BKEqualizer::updateCoefficients(double sampleRate) {
         }
     }
     
-    // calculate high cut filter coefficients
+    // calculate and set high cut filter coefficients
     jassert(highCutSlope % 12 == 0 && highCutSlope >= 12 && highCutSlope <= 48);
     auto highCutCoefficients = juce::dsp::FilterDesign<float>::designIIRLowpassHighOrderButterworthMethod(highCutFreq, sampleRate, highCutSlope / 6);
     
@@ -146,7 +143,6 @@ void BKEqualizer::process(juce::dsp::ProcessContextReplacing<float>& context, in
 
 double BKEqualizer::magForFreq(double freq) {
     double mag = 1.f;
-    double sampleRate = sr;
     
     // Since leftChain and rightChain use the same coefficients, it's fine to just get them from left
     if (!leftChain.isBypassed<ChainPositions::Peak1>())

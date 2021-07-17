@@ -12,12 +12,10 @@
 
 #include <JuceHeader.h>
 
-//#include "PluginProcessor.h"
-
 //==============================================================================
 /*
  Class for the equalizer. Attaches to bK in pluginProcessor processBlock() and
- prepareToPlay().
+ prepareToPlay(). See GeneralViewController and EqualizerGraph for UI.
  
  Much of the DSP code here is based off this video:
  https://www.youtube.com/watch?v=i_Iq4_Kd7Rc&t=1596s&ab_channel=freeCodeCamp.org
@@ -28,11 +26,14 @@ public:
     BKEqualizer();
     ~BKEqualizer() override;
     
+    // IMPORTANT: set the sample rate before doing anything else!
+    inline void setSampleRate(double sampleRate) { this->sampleRate = sampleRate; }
+    
     // Must be called before playback begins or change to sample settings
-    void prepareToPlay(double sampleRate, int samplesPerBlock);
+    void prepareToPlay(int samplesPerBlock);
     
     // Called upon initializiation and whenever a user changes parameters with a slider
-    void updateCoefficients(double sampleRate);
+    void updateCoefficients();
     
     // Performs the actual processing of audio
     void process(juce::dsp::ProcessContextReplacing<float>& context, int channel);
@@ -66,18 +67,11 @@ public:
     inline float getHighCutFreq() { return highCutFreq; }
     inline int getHighCutSlope() { return highCutSlope; }
     
-    inline void setLastDisplayed(int lastDisplayed) { this->lastDisplayed = lastDisplayed; }
-    inline int getLastDisplayed() { return lastDisplayed; }
-    
-    // Return the magnitude corresponding to this frequency based off the parameters of this equalizer
+    // Return the magnitude corresponding to this frequency based off the curent parameters of this equalizer
     double magForFreq(double freq);
-    
-    inline void setSampleRate(double sampleRate) { sr = sampleRate; }
 
 private:
-    //BKAudioProcessor& processor; // hmmm this might be the issue, this and plugin processor both depend on each other
-    
-    double sr;
+    double sampleRate;
     
     // Parameters initialized here
     float lowCutFreq = 20;
@@ -119,10 +113,6 @@ private:
         S36,
         S48
     };
-    
-    // Need to save which filter to display outside view controller, so it's here for now
-    // initalized to show low cut on first open
-    int lastDisplayed = ChainPositions::LowCut;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKEqualizer)
 };

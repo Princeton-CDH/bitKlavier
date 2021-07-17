@@ -426,7 +426,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     }
     
     // Prepare EQ
-    eq.prepareToPlay(sampleRate, samplesPerBlock);
+    eq.setSampleRate(currentSampleRate);
+    eq.prepareToPlay(samplesPerBlock);
     
     
 //    if (loader.getNumJobs() == 0) touchThread.startThread(0);
@@ -1171,7 +1172,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     // Apply EQ filters to the buffer
     eq.setSampleRate(getSampleRate());
-    eq.updateCoefficients(getSampleRate());
+    eq.updateCoefficients();
     juce::dsp::AudioBlock<float> block(buffer);
     auto leftBlock = block.getSingleChannelBlock(0);
     juce::dsp::ProcessContextReplacing<float> leftContext(leftBlock);
