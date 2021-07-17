@@ -12,7 +12,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "GraphicsConstants.h"
-#include "BKEqualizerViewController.h"
 
 //==============================================================================
 BKAudioProcessorEditor::BKAudioProcessorEditor (BKAudioProcessor& p):

@@ -104,7 +104,7 @@ mainPianoSynth(*this),
 hammerReleaseSynth(*this),
 resonanceReleaseSynth(*this),
 pedalSynth(*this),
-eq(*this),
+eq(),
 firstPedalDown(true),
 //touchThread(*this),
 progress(0),
@@ -1170,6 +1170,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 #endif
     
     // Apply EQ filters to the buffer
+    eq.setSampleRate(getSampleRate());
     eq.updateCoefficients(getSampleRate());
     juce::dsp::AudioBlock<float> block(buffer);
     auto leftBlock = block.getSingleChannelBlock(0);

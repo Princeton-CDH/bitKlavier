@@ -12,8 +12,7 @@
 #include "BKEqualizer.h"
 
 //==============================================================================
-BKEqualizer::BKEqualizer(BKAudioProcessor& p) :
-processor(p)
+BKEqualizer::BKEqualizer()
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
@@ -147,7 +146,7 @@ void BKEqualizer::process(juce::dsp::ProcessContextReplacing<float>& context, in
 
 double BKEqualizer::magForFreq(double freq) {
     double mag = 1.f;
-    double sampleRate = processor.getCurrentSampleRate();
+    double sampleRate = sr;
     
     // Since leftChain and rightChain use the same coefficients, it's fine to just get them from left
     if (!leftChain.isBypassed<ChainPositions::Peak1>())

@@ -32,7 +32,7 @@
 
 class StandalonePluginHolder;
 class BKAudioProcessorEditor;
-class BKEqualizer;
+//class BKEqualizer;
 
 //==============================================================================
 /**

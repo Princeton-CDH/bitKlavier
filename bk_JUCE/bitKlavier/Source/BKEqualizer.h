@@ -12,12 +12,12 @@
 
 #include <JuceHeader.h>
 
-#include "PluginProcessor.h"
+//#include "PluginProcessor.h"
 
 //==============================================================================
 /*
  Class for the equalizer. Attaches to bK in pluginProcessor processBlock() and
- prepareToPlay(). See also BKEqualizerViewController().
+ prepareToPlay().
  
  Much of the DSP code here is based off this video:
  https://www.youtube.com/watch?v=i_Iq4_Kd7Rc&t=1596s&ab_channel=freeCodeCamp.org
@@ -25,7 +25,7 @@
 class BKEqualizer  : public juce::Component
 {
 public:
-    BKEqualizer(BKAudioProcessor& p);
+    BKEqualizer();
     ~BKEqualizer() override;
     
     // Must be called before playback begins or change to sample settings
@@ -72,12 +72,12 @@ public:
     // Return the magnitude corresponding to this frequency based off the parameters of this equalizer
     double magForFreq(double freq);
     
-    //inline void setSampleRate(double sampleRate) { sr = sampleRate; }
+    inline void setSampleRate(double sampleRate) { sr = sampleRate; }
 
 private:
-    BKAudioProcessor& processor; // hmmm this might be the issue, this and plugin processor both depend on each other
+    //BKAudioProcessor& processor; // hmmm this might be the issue, this and plugin processor both depend on each other
     
-    // double sr;
+    double sr;
     
     // Parameters initialized here
     float lowCutFreq = 20;
