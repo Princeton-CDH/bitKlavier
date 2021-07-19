@@ -28,6 +28,7 @@ public:
     
     // IMPORTANT: set the sample rate before doing anything else!
     inline void setSampleRate(double sampleRate) { this->sampleRate = sampleRate; }
+    inline double getSampleRate() { return sampleRate; }
     
     // Must be called before playback begins or change to sample settings
     void prepareToPlay(int samplesPerBlock);
@@ -69,6 +70,32 @@ public:
     
     // Return the magnitude corresponding to this frequency based off the curent parameters of this equalizer
     double magForFreq(double freq);
+    
+    // Create a copy of an equalizer using =
+    inline BKEqualizer& operator=(BKEqualizer& other) {
+        // Guard self reference
+        if (this == &other) return *this;
+        
+        this->sampleRate = other.sampleRate;
+        
+        this->lowCutFreq = other.lowCutFreq;
+        this->lowCutSlope = other.lowCutSlope;
+        this->peak1Freq = other.peak1Freq;
+        this->peak1Gain = other.peak1Gain;
+        this->peak1Quality = other.peak1Quality;
+        this->peak2Freq = other.peak2Freq;
+        this->peak2Gain = other.peak2Gain;
+        this->peak2Quality = other.peak2Quality;
+        this->peak3Freq = other.peak3Freq;
+        this->peak3Gain = other.peak3Gain;
+        this->peak3Quality = other.peak3Quality;
+        this->highCutFreq = other.highCutFreq;
+        this->highCutSlope = other.highCutSlope;
+        
+        this->updateCoefficients();
+        
+        return *this;
+    }
 
 private:
     double sampleRate;

@@ -172,3 +172,10 @@ double BKEqualizer::magForFreq(double freq) {
     
     return mag;
 }
+
+//BKEqualizer& BKEqualizer::operator=(const BKEqualizer& other) {
+//    // Guard self reference
+//    if (this == &other) return *this;
+//    
+//    other.setSampleRate();
+//}

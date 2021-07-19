@@ -468,6 +468,7 @@ void GeneralViewController::resized()
     // Sliders
     Rectangle<int> equalizerSlidersArea(equalizerArea);
     equalizerSlidersArea.removeFromTop(equalizerArea.getHeight() * 5 / 8);
+    equalizerSlidersArea.removeFromTop(10); // needs a little extra space
     equalizerSlidersArea.reduce(100, 0); // sliders don't need to be so wide
     Rectangle<int> equalizerSlidersAreaCopy(equalizerSlidersArea);
     
