@@ -260,14 +260,14 @@ namespace BinaryData
     extern const char*   Exercise_Constraint_xml;
     const int            Exercise_Constraint_xmlSize = 51355;
 
-    extern const char*   peak_png;
-    const int            peak_pngSize = 8612;
-
     extern const char*   hi_cut_png;
     const int            hi_cut_pngSize = 3642;
 
     extern const char*   lo_cut_png;
     const int            lo_cut_pngSize = 2447;
+
+    extern const char*   peak_png;
+    const int            peak_pngSize = 8612;
 
     extern const char*   blendronic_icon_png;
     const int            blendronic_icon_pngSize = 36000;

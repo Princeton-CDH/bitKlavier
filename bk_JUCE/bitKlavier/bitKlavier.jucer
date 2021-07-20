@@ -183,9 +183,9 @@
                 file="Source/galleries/Exercise Constraint.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
-          <FILE id="m0AtaD" name="peak.png" compile="0" resource="1" file="../../../../../Downloads/peak.png"/>
-          <FILE id="sR78JH" name="hi cut.png" compile="0" resource="1" file="../../../../../Downloads/hi cut.png"/>
-          <FILE id="j0ouuY" name="lo cut.png" compile="0" resource="1" file="../../../../../Downloads/lo cut.png"/>
+          <FILE id="suTd6x" name="hi_cut.png" compile="0" resource="1" file="Source/icons/hi_cut.png"/>
+          <FILE id="K955yI" name="lo_cut.png" compile="0" resource="1" file="Source/icons/lo_cut.png"/>
+          <FILE id="DtQaJB" name="peak.png" compile="0" resource="1" file="Source/icons/peak.png"/>
           <FILE id="jFt7tl" name="blendronic_icon.png" compile="0" resource="1"
                 file="Source/icons/blendronic_icon.png"/>
           <FILE id="xOwvX8" name="left-arrow.png" compile="0" resource="1" file="Source/icons/left-arrow.png"/>
