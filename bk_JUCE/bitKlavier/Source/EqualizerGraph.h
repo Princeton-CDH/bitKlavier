@@ -63,7 +63,7 @@ public:
         mags.resize(w);
         for (int i = 0; i < w; i++) {
             auto freq = mapToLog10(double(i) / double(w), 20.0, 20000.0);
-            double mag = eq->magForFreq(freq);
+            double mag = eq.magForFreq(freq);
             
             mags[i] = Decibels::gainToDecibels(mag);
         }
@@ -102,10 +102,10 @@ public:
     }
     
     // hmmmm is there a thread safety issue here?
-    void updateEQ(BKEqualizer& newEQ) { eq = &newEQ;}
+    void updateEQ(BKEqualizer& newEQ) { eq = newEQ;}
 
 private:
-    BKEqualizer* eq;
+    BKEqualizer eq;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EqualizerGraph)
 };

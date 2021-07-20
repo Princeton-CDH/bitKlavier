@@ -264,7 +264,7 @@ processor(p)
     highCutSlopeSlider->addMyListener(this);
     addAndMakeVisible(*highCutSlopeSlider);
     
-    peak1FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 1 Frequency", 20.f, 20000.f, eq->getPeak1Freq(), 1.5);
+    peak1FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 1 Frequency", 20.f, 20000.f, eq->getPeak1Freq(), 1.f);
     peak1FreqSlider->setToolTipString("Adjust the frequency of the first peak filter");
     peak1FreqSlider->setSkewFactorFromMidPoint(1000.f);
     peak1FreqSlider->addMyListener(this);
@@ -280,7 +280,7 @@ processor(p)
     peak1QualitySlider->addMyListener(this);
     addAndMakeVisible(*peak1QualitySlider);
     
-    peak2FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 2 Frequency", 20.f, 20000.f, eq->getPeak2Freq(), 1.5);
+    peak2FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 2 Frequency", 20.f, 20000.f, eq->getPeak2Freq(), 1.f);
     peak2FreqSlider->setToolTipString("Adjust the frequency of the second peak filter");
     peak2FreqSlider->setSkewFactorFromMidPoint(1000.f);
     peak2FreqSlider->addMyListener(this);
@@ -296,7 +296,7 @@ processor(p)
     peak2QualitySlider->addMyListener(this);
     addAndMakeVisible(*peak2QualitySlider);
     
-    peak3FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 3 Frequency", 20.f, 20000.f, eq->getPeak3Freq(), 1.5);
+    peak3FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 3 Frequency", 20.f, 20000.f, eq->getPeak3Freq(), 1.f);
     peak3FreqSlider->setToolTipString("Adjust the frequency of the third peak filter");
     peak3FreqSlider->setSkewFactorFromMidPoint(1000.f);
     peak3FreqSlider->addMyListener(this);
