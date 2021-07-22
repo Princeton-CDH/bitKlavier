@@ -11,6 +11,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "BKUtilities.h"
 
 //==============================================================================
 /*
@@ -95,6 +96,42 @@ public:
         this->updateCoefficients();
         
         return *this;
+    }
+    
+    inline void setState(XmlElement* e) {
+        lowCutFreq = e->getStringAttribute(ptagEqualizer_lowCutFreq).getFloatValue();
+        lowCutSlope = e->getStringAttribute(ptagEqualizer_lowCutSlope).getFloatValue();
+        peak1Freq = e->getStringAttribute(ptagEqualizer_peak1Freq).getFloatValue();
+        peak1Gain = e->getStringAttribute(ptagEqualizer_peak1Gain).getFloatValue();
+        peak1Quality = e->getStringAttribute(ptagEqualizer_peak1Quality).getFloatValue();
+        peak2Freq = e->getStringAttribute(ptagEqualizer_peak2Freq).getFloatValue();
+        peak2Gain = e->getStringAttribute(ptagEqualizer_peak2Gain).getFloatValue();
+        peak2Quality = e->getStringAttribute(ptagEqualizer_peak2Quality).getFloatValue();
+        peak3Freq = e->getStringAttribute(ptagEqualizer_peak3Freq).getFloatValue();
+        peak3Gain = e->getStringAttribute(ptagEqualizer_peak3Gain).getFloatValue();
+        peak3Quality = e->getStringAttribute(ptagEqualizer_peak3Quality).getFloatValue();
+        highCutFreq = e->getStringAttribute(ptagEqualizer_highCutFreq).getFloatValue();
+        highCutSlope = e->getStringAttribute(ptagEqualizer_highCutSlope).getFloatValue();
+    }
+    
+    inline ValueTree getState(void) {
+        ValueTree vt(vtagEqualizer);
+        
+        vt.setProperty(ptagEqualizer_lowCutFreq, lowCutFreq, 0);
+        vt.setProperty(ptagEqualizer_lowCutSlope, lowCutSlope, 0);
+        vt.setProperty(ptagEqualizer_peak1Freq, peak1Freq, 0);
+        vt.setProperty(ptagEqualizer_peak1Gain, peak1Gain, 0);
+        vt.setProperty(ptagEqualizer_peak1Quality, peak1Quality, 0);
+        vt.setProperty(ptagEqualizer_peak2Freq, peak2Freq, 0);
+        vt.setProperty(ptagEqualizer_peak2Gain, peak2Gain, 0);
+        vt.setProperty(ptagEqualizer_peak2Quality, peak2Quality, 0);
+        vt.setProperty(ptagEqualizer_peak3Freq, peak3Freq, 0);
+        vt.setProperty(ptagEqualizer_peak3Gain, peak3Gain, 0);
+        vt.setProperty(ptagEqualizer_peak3Quality, peak3Quality, 0);
+        vt.setProperty(ptagEqualizer_highCutFreq, highCutFreq, 0);
+        vt.setProperty(ptagEqualizer_highCutSlope, highCutSlope, 0);
+        
+        return vt;
     }
 
 private:

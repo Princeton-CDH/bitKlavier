@@ -39,6 +39,21 @@ const String ptagGeneral_invertSustain = "invertSustain";
 const String ptagGeneral_noteOnSetsNoteOffVelocity = "noteOnSetsNoteOffVelocity";
 const String ptagGeneral_tuningFund = "tuningFund";
 
+const String vtagEqualizer = "equalizer";
+const String ptagEqualizer_lowCutFreq = "lowCutFreq";
+const String ptagEqualizer_lowCutSlope = "lowCutSlope";
+const String ptagEqualizer_peak1Freq = "peak1Freq";
+const String ptagEqualizer_peak1Gain = "peak1Gain";
+const String ptagEqualizer_peak1Quality = "peak1Quality";
+const String ptagEqualizer_peak2Freq = "peak2Freq";
+const String ptagEqualizer_peak2Gain = "peak2Gain";
+const String ptagEqualizer_peak2Quality = "peak2Quality";
+const String ptagEqualizer_peak3Freq = "peak3Freq";
+const String ptagEqualizer_peak3Gain = "peak3Gain";
+const String ptagEqualizer_peak3Quality = "peak3Quality";
+const String ptagEqualizer_highCutFreq = "highCutFreq";
+const String ptagEqualizer_highCutSlope = "highCutSlope";
+
 const String vtagPiano = "piano";
 const String vtagPrepMap = "prepMap";
 const String ptagPrepMap_keymapId = "keymapId";
