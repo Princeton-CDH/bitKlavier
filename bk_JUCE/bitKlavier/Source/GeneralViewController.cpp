@@ -250,6 +250,7 @@ processor(p)
     
     lowCutSlopeBorder.setText("Slope (db/Oct)");
     lowCutSlopeBorder.setTextLabelPosition(juce::Justification::centred);
+    lowCutSlopeBorder.setAlpha(0.75);
     addAndMakeVisible(lowCutSlopeBorder);
     
     lowCutSlope12.setButtonText("12");
@@ -290,6 +291,7 @@ processor(p)
     
     highCutSlopeBorder.setText("Slope (db/Oct)");
     highCutSlopeBorder.setTextLabelPosition(juce::Justification::centred);
+    highCutSlopeBorder.setAlpha(0.75);
     addAndMakeVisible(highCutSlopeBorder);
     
     highCutSlope12.setButtonText("12");
@@ -523,7 +525,7 @@ void GeneralViewController::resized()
     equalizerGraphArea.reduce(0, 10); // some padding
     eqGraph.setBounds(equalizerGraphArea);
     
-    // Sliders
+    // Peak parameters
     Rectangle<int> equalizerSlidersArea(equalizerArea);
     equalizerSlidersArea.removeFromTop(equalizerArea.getHeight() * 5 / 8);
     equalizerSlidersArea.removeFromTop(10); // needs a little extra space
@@ -547,14 +549,18 @@ void GeneralViewController::resized()
     peak2QualitySlider->setBounds(thirdOfThree);
     peak3QualitySlider->setBounds(thirdOfThree);
     
+    // Cut parameters
     int spacing2 = equalizerSlidersAreaCopy.getHeight() / 2;
+    int trim = equalizerSlidersAreaCopy.getHeight() / 10;
     Rectangle<int> firstOfTwo(equalizerSlidersAreaCopy.removeFromTop(spacing2));
+    firstOfTwo.removeFromTop(trim);
     Rectangle<int> secondOfTwo(equalizerSlidersAreaCopy.removeFromTop(spacing2));
+    secondOfTwo.removeFromBottom(trim);
     
     lowCutSlopeBorder.setBounds(secondOfTwo);
     highCutSlopeBorder.setBounds(secondOfTwo);
-    int spacing4 = secondOfTwo.getWidth() / 5;
-    secondOfTwo.removeFromLeft(lowCutSlope12.getWidth());
+    int spacing4 = secondOfTwo.getWidth() / 4;
+    secondOfTwo.removeFromLeft(spacing4 / 3); // need to move everything over to the right
     Rectangle<int> slope12Area(secondOfTwo.removeFromLeft(spacing4));
     Rectangle<int> slope24Area(secondOfTwo.removeFromLeft(spacing4));
     Rectangle<int> slope36Area(secondOfTwo.removeFromLeft(spacing4));
@@ -563,17 +569,30 @@ void GeneralViewController::resized()
     lowCutFreqSlider->setBounds(firstOfTwo);
     highCutFreqSlider->setBounds(firstOfTwo);
     
-//    lowCutSlope12.setCentrePosition(slope12Area.getX() + slope12Area.getWidth() / 2 - lowCutSlope12.getWidth(), slope12Area.getY() + slope12Area.getHeight() / 2 - lowCutSlope12.getHeight());
-    
-    lowCutSlope12.setBounds(slope12Area);
-    lowCutSlope24.setBounds(slope24Area);
-    lowCutSlope36.setBounds(slope36Area);
-    lowCutSlope48.setBounds(slope48Area);
-    
-    highCutSlope12.setBounds(slope12Area);
-    highCutSlope24.setBounds(slope24Area);
-    highCutSlope36.setBounds(slope36Area);
-    highCutSlope48.setBounds(slope48Area);
+    // Only draw the buttons when there is enough space
+    if (spacing4 > 45 & secondOfTwo.getHeight() > 35) {
+        lowCutSlope12.setBounds(slope12Area);
+        lowCutSlope24.setBounds(slope24Area);
+        lowCutSlope36.setBounds(slope36Area);
+        lowCutSlope48.setBounds(slope48Area);
+        
+        highCutSlope12.setBounds(slope12Area);
+        highCutSlope24.setBounds(slope24Area);
+        highCutSlope36.setBounds(slope36Area);
+        highCutSlope48.setBounds(slope48Area);
+    }
+    else {
+        Rectangle<int> zero(0, 0, 0, 0);
+        lowCutSlope12.setBounds(zero);
+        lowCutSlope24.setBounds(zero);
+        lowCutSlope36.setBounds(zero);
+        lowCutSlope48.setBounds(zero);
+        
+        highCutSlope12.setBounds(zero);
+        highCutSlope24.setBounds(zero);
+        highCutSlope36.setBounds(zero);
+        highCutSlope48.setBounds(zero);
+    }
     
     // Update view
     displayShared();
@@ -750,13 +769,6 @@ void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, S
         eqGraph.repaint();
         DBG("High Cut Freq: " + String(highCutFreq));
     }
-//    else if (slider == highCutSlopeSlider.get()) {
-//        int highCutSlope = highCutSlopeSlider->getValue();
-//        eq->setHighCutSlope(highCutSlope);
-//        eqGraph.updateEQ(*eq);
-//        eqGraph.repaint();
-//        DBG("High Cut Slope: " + String(highCutSlope));
-//    }
 }
 
 void GeneralViewController::bkButtonClicked (Button* b)
@@ -796,6 +808,62 @@ void GeneralViewController::bkButtonClicked (Button* b)
     }
     else if (b == &highCutButton) {
         displayFilter(Filters::highCut);
+    }
+    else if (b == &lowCutSlope12) {
+        int lowCutSlope = 12;
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setLowCutSlope(lowCutSlope);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &lowCutSlope24) {
+        int lowCutSlope = 24;
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setLowCutSlope(lowCutSlope);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &lowCutSlope36) {
+        int lowCutSlope = 36;
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setLowCutSlope(lowCutSlope);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &lowCutSlope48) {
+        int lowCutSlope = 48;
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setLowCutSlope(lowCutSlope);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &highCutSlope12) {
+        int highCutSlope = 12;
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setHighCutSlope(highCutSlope);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &highCutSlope24) {
+        int highCutSlope = 24;
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setHighCutSlope(highCutSlope);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &highCutSlope36) {
+        int highCutSlope = 36;
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setHighCutSlope(highCutSlope);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &highCutSlope48) {
+        int highCutSlope = 48;
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setHighCutSlope(highCutSlope);
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
     }
     else if (b == &leftArrow) {
         arrowPressed(LeftArrow);
