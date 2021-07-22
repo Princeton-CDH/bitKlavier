@@ -130,7 +130,11 @@ private:
     ImageComponent peak3Icon;
     
     std::unique_ptr<BKSingleSlider> lowCutFreqSlider;
-    std::unique_ptr<BKSingleSlider> lowCutSlopeSlider;
+    GroupComponent lowCutSlopeBorder;
+    ToggleButton lowCutSlope12;
+    ToggleButton lowCutSlope24;
+    ToggleButton lowCutSlope36;
+    ToggleButton lowCutSlope48;
     
     std::unique_ptr<BKSingleSlider> peak1FreqSlider;
     std::unique_ptr<BKSingleSlider> peak1GainSlider;
@@ -145,7 +149,16 @@ private:
     std::unique_ptr<BKSingleSlider> peak3QualitySlider;
     
     std::unique_ptr<BKSingleSlider> highCutFreqSlider;
-    std::unique_ptr<BKSingleSlider> highCutSlopeSlider;
+    GroupComponent highCutSlopeBorder;
+    ToggleButton highCutSlope12;
+    ToggleButton highCutSlope24;
+    ToggleButton highCutSlope36;
+    ToggleButton highCutSlope48;
+    
+    enum RadioButtonID {
+        lowCutButtons = 1001,
+        highCutButtons = 1002
+    };
     
     enum Filters {
         lowCut,

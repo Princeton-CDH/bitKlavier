@@ -241,17 +241,46 @@ processor(p)
     addAndMakeVisible(eqGraph);
     eqGraph.updateEQ(*eq);
     
-    // Slider setup -- that's a lot of sliders!
+    // EQ Parameter setup
     lowCutFreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Low Cut Frequency", 20.f, 20000.f, eq->getLowCutFreq(), 1.f);
     lowCutFreqSlider->setToolTipString("Adjust the frequency of the low cut");
     lowCutFreqSlider->setSkewFactorFromMidPoint(1000.f);
     lowCutFreqSlider->addMyListener(this);
     addAndMakeVisible(*lowCutFreqSlider);
     
-    lowCutSlopeSlider = std::make_unique<BKSingleSlider>("Slope (db/Oct)", "Low Cut Slope", 12, 48, eq->getLowCutSlope(), 12);
-    lowCutSlopeSlider->setToolTipString("Adjust the slope of the low cut");
-    lowCutSlopeSlider->addMyListener(this);
-    addAndMakeVisible(*lowCutSlopeSlider);
+    lowCutSlopeBorder.setText("Slope (db/Oct)");
+    lowCutSlopeBorder.setTextLabelPosition(juce::Justification::centred);
+    addAndMakeVisible(lowCutSlopeBorder);
+    
+    lowCutSlope12.setButtonText("12");
+    lowCutSlope12.setTooltip("Set the slope of the low cut filter to 12 db/Oct");
+    lowCutSlope12.addListener(this);
+    lowCutSlope12.setRadioGroupId(RadioButtonID::lowCutButtons);
+    addAndMakeVisible(lowCutSlope12);
+    
+    lowCutSlope24.setButtonText("24");
+    lowCutSlope24.setTooltip("Set the slope of the low cut filter to 24 db/Oct");
+    lowCutSlope24.addListener(this);
+    lowCutSlope24.setRadioGroupId(RadioButtonID::lowCutButtons);
+    addAndMakeVisible(lowCutSlope24);
+    
+    lowCutSlope36.setButtonText("36");
+    lowCutSlope36.setTooltip("Set the slope of the low cut filter to 36 db/Oct");
+    lowCutSlope36.addListener(this);
+    lowCutSlope36.setRadioGroupId(RadioButtonID::lowCutButtons);
+    addAndMakeVisible(lowCutSlope36);
+    
+    lowCutSlope48.setButtonText("48");
+    lowCutSlope48.setTooltip("Set the slope of the low cut filter to 48 db/Oct");
+    lowCutSlope48.addListener(this);
+    lowCutSlope48.setRadioGroupId(RadioButtonID::lowCutButtons);
+    addAndMakeVisible(lowCutSlope48);
+    
+    int lowCutSlopeDefault = eq->getLowCutSlope();
+    if (lowCutSlopeDefault == 12) lowCutSlope12.setToggleState(true, juce::dontSendNotification);
+    else if (lowCutSlopeDefault == 24) lowCutSlope24.setToggleState(true, juce::dontSendNotification);
+    else if (lowCutSlopeDefault == 36) lowCutSlope36.setToggleState(true, juce::dontSendNotification);
+    else lowCutSlope48.setToggleState(true, juce::dontSendNotification);
     
     highCutFreqSlider = std::make_unique<BKSingleSlider>("Frequency", "High Cut Frequency", 20.f, 20000.f, eq->getHighCutFreq(), 1.f);
     highCutFreqSlider->setToolTipString("Adjust the frequency of the high cut");
@@ -259,10 +288,39 @@ processor(p)
     highCutFreqSlider->addMyListener(this);
     addAndMakeVisible(*highCutFreqSlider);
     
-    highCutSlopeSlider = std::make_unique<BKSingleSlider>("Slope (db/Oct)", "High Cut Slope", 12, 48, eq->getHighCutSlope(), 12);
-    highCutSlopeSlider->setToolTipString("Adjust the slope of the high cut");
-    highCutSlopeSlider->addMyListener(this);
-    addAndMakeVisible(*highCutSlopeSlider);
+    highCutSlopeBorder.setText("Slope (db/Oct)");
+    highCutSlopeBorder.setTextLabelPosition(juce::Justification::centred);
+    addAndMakeVisible(highCutSlopeBorder);
+    
+    highCutSlope12.setButtonText("12");
+    highCutSlope12.setTooltip("Set the slope of the high cut filter to 12 db/Oct");
+    highCutSlope12.addListener(this);
+    highCutSlope12.setRadioGroupId(RadioButtonID::highCutButtons);
+    addAndMakeVisible(highCutSlope12);
+    
+    highCutSlope24.setButtonText("24");
+    highCutSlope24.setTooltip("Set the slope of the high cut filter to 24 db/Oct");
+    highCutSlope24.addListener(this);
+    highCutSlope24.setRadioGroupId(RadioButtonID::highCutButtons);
+    addAndMakeVisible(highCutSlope24);
+    
+    highCutSlope36.setButtonText("36");
+    highCutSlope36.setTooltip("Set the slope of the high cut filter to 36 db/Oct");
+    highCutSlope36.addListener(this);
+    highCutSlope36.setRadioGroupId(RadioButtonID::highCutButtons);
+    addAndMakeVisible(highCutSlope36);
+    
+    highCutSlope48.setButtonText("48");
+    highCutSlope48.setTooltip("Set the slope of the high cut filter to 48 db/Oct");
+    highCutSlope48.addListener(this);
+    highCutSlope48.setRadioGroupId(RadioButtonID::highCutButtons);
+    addAndMakeVisible(highCutSlope48);
+    
+    int highCutSlopeDefault = eq->getHighCutSlope();
+    if (highCutSlopeDefault == 12) highCutSlope12.setToggleState(true, juce::dontSendNotification);
+    else if (highCutSlopeDefault == 24) highCutSlope24.setToggleState(true, juce::dontSendNotification);
+    else if (highCutSlopeDefault == 36) highCutSlope36.setToggleState(true, juce::dontSendNotification);
+    else highCutSlope48.setToggleState(true, juce::dontSendNotification);
     
     peak1FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 1 Frequency", 20.f, 20000.f, eq->getPeak1Freq(), 1.f);
     peak1FreqSlider->setToolTipString("Adjust the frequency of the first peak filter");
@@ -481,7 +539,6 @@ void GeneralViewController::resized()
     peak2FreqSlider->setBounds(firstOfThree);
     peak3FreqSlider->setBounds(firstOfThree);
     
-    lowCutSlopeSlider->setBounds(secondOfThree);
     peak1GainSlider->setBounds(secondOfThree);
     peak2GainSlider->setBounds(secondOfThree);
     peak3GainSlider->setBounds(secondOfThree);
@@ -494,12 +551,29 @@ void GeneralViewController::resized()
     Rectangle<int> firstOfTwo(equalizerSlidersAreaCopy.removeFromTop(spacing2));
     Rectangle<int> secondOfTwo(equalizerSlidersAreaCopy.removeFromTop(spacing2));
     
+    lowCutSlopeBorder.setBounds(secondOfTwo);
+    highCutSlopeBorder.setBounds(secondOfTwo);
+    int spacing4 = secondOfTwo.getWidth() / 5;
+    secondOfTwo.removeFromLeft(lowCutSlope12.getWidth());
+    Rectangle<int> slope12Area(secondOfTwo.removeFromLeft(spacing4));
+    Rectangle<int> slope24Area(secondOfTwo.removeFromLeft(spacing4));
+    Rectangle<int> slope36Area(secondOfTwo.removeFromLeft(spacing4));
+    Rectangle<int> slope48Area(secondOfTwo.removeFromLeft(spacing4));
+    
     lowCutFreqSlider->setBounds(firstOfTwo);
     highCutFreqSlider->setBounds(firstOfTwo);
     
-    lowCutSlopeSlider->setBounds(secondOfTwo);
-    highCutSlopeSlider->setBounds(secondOfTwo);
+//    lowCutSlope12.setCentrePosition(slope12Area.getX() + slope12Area.getWidth() / 2 - lowCutSlope12.getWidth(), slope12Area.getY() + slope12Area.getHeight() / 2 - lowCutSlope12.getHeight());
     
+    lowCutSlope12.setBounds(slope12Area);
+    lowCutSlope24.setBounds(slope24Area);
+    lowCutSlope36.setBounds(slope36Area);
+    lowCutSlope48.setBounds(slope48Area);
+    
+    highCutSlope12.setBounds(slope12Area);
+    highCutSlope24.setBounds(slope24Area);
+    highCutSlope36.setBounds(slope36Area);
+    highCutSlope48.setBounds(slope48Area);
     
     // Update view
     displayShared();
@@ -514,7 +588,11 @@ void GeneralViewController::displayFilter(int filter) {
     
     if (filter == Filters::lowCut) {
         lowCutFreqSlider->setVisible(true);
-        lowCutSlopeSlider->setVisible(true);
+        lowCutSlopeBorder.setVisible(true);
+        lowCutSlope12.setVisible(true);
+        lowCutSlope24.setVisible(true);
+        lowCutSlope36.setVisible(true);
+        lowCutSlope48.setVisible(true);
     }
     else if (filter == Filters::peak1) {
         peak1FreqSlider->setVisible(true);
@@ -533,13 +611,21 @@ void GeneralViewController::displayFilter(int filter) {
     }
     else if (filter == Filters::highCut) {
         highCutFreqSlider->setVisible(true);
-        highCutSlopeSlider->setVisible(true);
+        highCutSlopeBorder.setVisible(true);
+        highCutSlope12.setVisible(true);
+        highCutSlope24.setVisible(true);
+        highCutSlope36.setVisible(true);
+        highCutSlope48.setVisible(true);
     }
 }
 
 void GeneralViewController::invisibleFilters() {
     lowCutFreqSlider->setVisible(false);
-    lowCutSlopeSlider->setVisible(false);
+    lowCutSlopeBorder.setVisible(false);
+    lowCutSlope12.setVisible(false);
+    lowCutSlope24.setVisible(false);
+    lowCutSlope36.setVisible(false);
+    lowCutSlope48.setVisible(false);
     peak1FreqSlider->setVisible(false);
     peak1GainSlider->setVisible(false);
     peak1QualitySlider->setVisible(false);
@@ -550,7 +636,11 @@ void GeneralViewController::invisibleFilters() {
     peak3GainSlider->setVisible(false);
     peak3QualitySlider->setVisible(false);
     highCutFreqSlider->setVisible(false);
-    highCutSlopeSlider->setVisible(false);
+    highCutSlopeBorder.setVisible(false);
+    highCutSlope12.setVisible(false);
+    highCutSlope24.setVisible(false);
+    highCutSlope36.setVisible(false);
+    highCutSlope48.setVisible(false);
 }
 
 
@@ -589,13 +679,6 @@ void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, S
         eqGraph.updateEQ(*eq);
         eqGraph.repaint();
         DBG("Low Cut Freq: " + String(lowCutFreq));
-    }
-    else if (slider == lowCutSlopeSlider.get()) {
-        int lowCutSlope = lowCutSlopeSlider->getValue();
-        eq->setLowCutSlope(lowCutSlope);
-        eqGraph.updateEQ(*eq);
-        eqGraph.repaint();
-        DBG("Low Cut Slope: " + String(lowCutSlope));
     }
     else if (slider == peak1FreqSlider.get()) {
         float peak1Freq = peak1FreqSlider->getValue();
@@ -667,13 +750,13 @@ void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, S
         eqGraph.repaint();
         DBG("High Cut Freq: " + String(highCutFreq));
     }
-    else if (slider == highCutSlopeSlider.get()) {
-        int highCutSlope = highCutSlopeSlider->getValue();
-        eq->setHighCutSlope(highCutSlope);
-        eqGraph.updateEQ(*eq);
-        eqGraph.repaint();
-        DBG("High Cut Slope: " + String(highCutSlope));
-    }
+//    else if (slider == highCutSlopeSlider.get()) {
+//        int highCutSlope = highCutSlopeSlider->getValue();
+//        eq->setHighCutSlope(highCutSlope);
+//        eqGraph.updateEQ(*eq);
+//        eqGraph.repaint();
+//        DBG("High Cut Slope: " + String(highCutSlope));
+//    }
 }
 
 void GeneralViewController::bkButtonClicked (Button* b)
