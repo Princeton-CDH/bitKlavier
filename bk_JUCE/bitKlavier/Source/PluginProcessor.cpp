@@ -1744,14 +1744,14 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
-        // if (currentPiano != nullptr) currentPiano->deconfigure();
-        
+        // if (currentPiano != nullptr) currentPiano->deconfigure();        
         if (gallery != nullptr)
         {
             for (auto piano : gallery->getPianos())
             {
                 piano->deconfigure();
             }
+            clearBitKlavier();
         }
         
         gallery = new Gallery(xml, *this);
