@@ -240,7 +240,8 @@ processor(p)
     
     
     // EQ Parameter setup
-    lowCutFreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Low Cut Frequency", 20.f, 20000.f, 20.f, 1.f);
+    lowCutFreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Low Cut Frequency", 20.f, 20000.f, 20.f, 0.f);
+    lowCutFreqSlider->setNumDecimalPlacesToDisplay(0);
     lowCutFreqSlider->setToolTipString("Adjust the frequency of the low cut");
     lowCutFreqSlider->setSkewFactorFromMidPoint(1000.f);
     lowCutFreqSlider->addMyListener(this);
@@ -275,7 +276,8 @@ processor(p)
     lowCutSlope48.setRadioGroupId(RadioButtonID::lowCutButtons);
     addAndMakeVisible(lowCutSlope48);
     
-    highCutFreqSlider = std::make_unique<BKSingleSlider>("Frequency", "High Cut Frequency", 20.f, 20000.f, 20.f, 1.f);
+    highCutFreqSlider = std::make_unique<BKSingleSlider>("Frequency", "High Cut Frequency", 20.f, 20000.f, 20.f, 0.f);
+    highCutFreqSlider->setNumDecimalPlacesToDisplay(0);
     highCutFreqSlider->setToolTipString("Adjust the frequency of the high cut");
     highCutFreqSlider->setSkewFactorFromMidPoint(1000.f);
     highCutFreqSlider->addMyListener(this);
@@ -310,55 +312,67 @@ processor(p)
     highCutSlope48.setRadioGroupId(RadioButtonID::highCutButtons);
     addAndMakeVisible(highCutSlope48);
     
-    peak1FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 1 Frequency", 20.f, 20000.f, 20.f, 1.f);
+    peak1FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 1 Frequency", 20.f, 20000.f, 20.f, 0.f);
+    peak1FreqSlider->setNumDecimalPlacesToDisplay(0);
     peak1FreqSlider->setToolTipString("Adjust the frequency of the first peak filter");
     peak1FreqSlider->setSkewFactorFromMidPoint(1000.f);
     peak1FreqSlider->addMyListener(this);
     addAndMakeVisible(*peak1FreqSlider);
     
-    peak1GainSlider = std::make_unique<BKSingleSlider>("Gain (db)", "Peak 1 Gain", -24.f, 24.f, 20.f, 0.5f);
+    peak1GainSlider = std::make_unique<BKSingleSlider>("Gain (db)", "Peak 1 Gain", -24.f, 24.f, 20.f, 0.f);
+    peak1GainSlider->setNumDecimalPlacesToDisplay(1);
     peak1GainSlider->setToolTipString("Adjust the cut or boost size of the first peak filter");
     peak1GainSlider->addMyListener(this);
     addAndMakeVisible(*peak1GainSlider);
     
-    peak1QualitySlider = std::make_unique<BKSingleSlider>("Quality", "Peak 1 Quality", 0.1f, 10.f, 0.1f, 0.05f);
+    peak1QualitySlider = std::make_unique<BKSingleSlider>("Quality", "Peak 1 Quality", 0.1f, 10.f, 0.1f, 0.f);
+    peak1QualitySlider->setNumDecimalPlacesToDisplay(2);
     peak1QualitySlider->setToolTipString("Adjust the quality of the first peak filter's cut or boost");
+    peak1QualitySlider->setSkewFactorFromMidPoint(2.f);
     peak1QualitySlider->addMyListener(this);
     addAndMakeVisible(*peak1QualitySlider);
     
-    peak2FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 2 Frequency", 20.f, 20000.f, 20.f, 1.f);
+    peak2FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 2 Frequency", 20.f, 20000.f, 20.f, 0.f);
+    peak2FreqSlider->setNumDecimalPlacesToDisplay(0);
     peak2FreqSlider->setToolTipString("Adjust the frequency of the second peak filter");
     peak2FreqSlider->setSkewFactorFromMidPoint(1000.f);
     peak2FreqSlider->addMyListener(this);
     addAndMakeVisible(*peak2FreqSlider);
     
-    peak2GainSlider = std::make_unique<BKSingleSlider>("Gain (db)", "Peak 2 Gain", -24.f, 24.f, -24.f, 0.5f);
+    peak2GainSlider = std::make_unique<BKSingleSlider>("Gain (db)", "Peak 2 Gain", -24.f, 24.f, -24.f, 0.f);
+    peak2GainSlider->setNumDecimalPlacesToDisplay(1);
     peak2GainSlider->setToolTipString("Adjust the cut or boost size of the second peak filter");
     peak2GainSlider->addMyListener(this);
     addAndMakeVisible(*peak2GainSlider);
     
-    peak2QualitySlider = std::make_unique<BKSingleSlider>("Quality", "Peak 2 Quality", 0.1f, 10.f, 0.1f, 0.05f);
+    peak2QualitySlider = std::make_unique<BKSingleSlider>("Quality", "Peak 2 Quality", 0.1f, 10.f, 0.1f, 0.f);
+    peak2QualitySlider->setNumDecimalPlacesToDisplay(2);
     peak2QualitySlider->setToolTipString("Adjust the quality of the second peak filter's cut or boost");
+    peak2QualitySlider->setSkewFactorFromMidPoint(2.f);
     peak2QualitySlider->addMyListener(this);
     addAndMakeVisible(*peak2QualitySlider);
     
-    peak3FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 3 Frequency", 20.f, 20000.f, 20.f, 1.f);
+    peak3FreqSlider = std::make_unique<BKSingleSlider>("Frequency", "Peak 3 Frequency", 20.f, 20000.f, 20.f, 0.f);
+    peak3FreqSlider->setNumDecimalPlacesToDisplay(0);
     peak3FreqSlider->setToolTipString("Adjust the frequency of the third peak filter");
     peak3FreqSlider->setSkewFactorFromMidPoint(1000.f);
     peak3FreqSlider->addMyListener(this);
     addAndMakeVisible(*peak3FreqSlider);
     
-    peak3GainSlider = std::make_unique<BKSingleSlider>("Gain (db)", "Peak 3 Gain", -24.f, 24.f, -24.f, 0.5f);
+    peak3GainSlider = std::make_unique<BKSingleSlider>("Gain (db)", "Peak 3 Gain", -24.f, 24.f, -24.f, 0.f);
+    peak3GainSlider->setNumDecimalPlacesToDisplay(1);
     peak3GainSlider->setToolTipString("Adjust the cut or boost size of the third peak filter");
     peak3GainSlider->addMyListener(this);
     addAndMakeVisible(*peak3GainSlider);
     
-    peak3QualitySlider = std::make_unique<BKSingleSlider>("Quality", "Peak 3 Quality", 0.1f, 10.f, 0.1f, 0.05f);
+    peak3QualitySlider = std::make_unique<BKSingleSlider>("Quality", "Peak 3 Quality", 0.1f, 10.f, 0.1f, 0.f);
+    peak3QualitySlider->setNumDecimalPlacesToDisplay(2);
     peak3QualitySlider->setToolTipString("Adjust the quality of the third peak filter's cut or boost");
+    peak3QualitySlider->setSkewFactorFromMidPoint(2.f);
     peak3QualitySlider->addMyListener(this);
     addAndMakeVisible(*peak3QualitySlider);
     
-    
+    // Set all parameters to saved or default values
     update();
     
 }

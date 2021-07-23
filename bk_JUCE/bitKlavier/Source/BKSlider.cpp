@@ -1154,6 +1154,11 @@ minDisplay(minDisplay)
 
 }
 
+void BKSingleSlider::setNumDecimalPlacesToDisplay(int numDecimals) {
+    thisSlider.setNumDecimalPlacesToDisplay(numDecimals);
+    displaySlider->setNumDecimalPlacesToDisplay(numDecimals);
+}
+
 void BKSingleSlider::setDim(float alphaVal)
 {
     thisSlider.setAlpha(alphaVal);

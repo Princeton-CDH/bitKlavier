@@ -399,6 +399,8 @@ public:
     void setDim(float newAlpha);
     void setBright();
     
+    void setNumDecimalPlacesToDisplay(int numDecimals);
+    
 private:
     
     double sliderMin, sliderMax;
