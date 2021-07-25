@@ -196,12 +196,14 @@ processor(p)
     
     // Equalizer UI components setup
     // Filter Selection Buttons - icons must be added first to be "behind" the buttons
+    float buttonAlpha = 0.4;
+    
     lowCutIcon.setImage(ImageCache::getFromMemory(BinaryData::lo_cut_png, BinaryData::lo_cut_pngSize));
     addAndMakeVisible(lowCutIcon);
     lowCutButton.setName("Low Cut");
     lowCutButton.setTooltip("Select the low cut filter to alter its parameters");
     lowCutButton.addListener(this);
-    lowCutButton.setAlpha(0.5);
+    lowCutButton.setAlpha(buttonAlpha);
     addAndMakeVisible(lowCutButton);
     
     peak1Icon.setImage(ImageCache::getFromMemory(BinaryData::peak_png, BinaryData::peak_pngSize));
@@ -209,7 +211,7 @@ processor(p)
     peak1Button.setName("Peak 1");
     peak1Button.setTooltip("Select the first peak filter to alter its parameters");
     peak1Button.addListener(this);
-    peak1Button.setAlpha(0.5);
+    peak1Button.setAlpha(buttonAlpha);
     addAndMakeVisible(peak1Button);
     
     peak2Icon.setImage(ImageCache::getFromMemory(BinaryData::peak_png, BinaryData::peak_pngSize));
@@ -217,7 +219,7 @@ processor(p)
     peak2Button.setName("Peak 2");
     peak2Button.setTooltip("Select the second peak filter to alter its parameters");
     peak2Button.addListener(this);
-    peak2Button.setAlpha(0.5);
+    peak2Button.setAlpha(buttonAlpha);
     addAndMakeVisible(peak2Button);
     
     peak3Icon.setImage(ImageCache::getFromMemory(BinaryData::peak_png, BinaryData::peak_pngSize));
@@ -225,7 +227,7 @@ processor(p)
     peak3Button.setName("Peak 3");
     peak3Button.setTooltip("Select the third peak filter to alter its parameters");
     peak3Button.addListener(this);
-    peak3Button.setAlpha(0.5);
+    peak3Button.setAlpha(buttonAlpha);
     addAndMakeVisible(peak3Button);
     
     highCutIcon.setImage(ImageCache::getFromMemory(BinaryData::hi_cut_png, BinaryData::hi_cut_pngSize));
@@ -233,7 +235,7 @@ processor(p)
     highCutButton.setName("High Cut");
     highCutButton.setTooltip("Select the high cut filter to alter its parameters");
     highCutButton.addListener(this);
-    highCutButton.setAlpha(0.5);
+    highCutButton.setAlpha(buttonAlpha);
     addAndMakeVisible(highCutButton);
     
     addAndMakeVisible(eqGraph);
