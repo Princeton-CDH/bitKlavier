@@ -171,6 +171,7 @@ private:
     int currentFilter = Filters::lowCut; // like currentTab but for filter
     void displayFilter(int filter);
     void invisibleFilters();
+    void clearColors();
     
     EqualizerGraph eqGraph;
     

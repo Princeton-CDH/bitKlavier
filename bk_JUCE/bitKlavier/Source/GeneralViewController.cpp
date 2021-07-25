@@ -613,10 +613,14 @@ void GeneralViewController::resized()
 
 void GeneralViewController::displayFilter(int filter) {
     invisibleFilters();
+    clearColors();
     
     currentFilter = filter;
     
+    juce::Colour displayColor = juce::Colours::grey;
+    
     if (filter == Filters::lowCut) {
+        lowCutButton.setColour(TextButton::ColourIds::buttonColourId, displayColor);
         lowCutFreqSlider->setVisible(true);
         lowCutSlopeBorder.setVisible(true);
         lowCutSlope12.setVisible(true);
@@ -625,21 +629,25 @@ void GeneralViewController::displayFilter(int filter) {
         lowCutSlope48.setVisible(true);
     }
     else if (filter == Filters::peak1) {
+        peak1Button.setColour(TextButton::ColourIds::buttonColourId, displayColor);
         peak1FreqSlider->setVisible(true);
         peak1GainSlider->setVisible(true);
         peak1QualitySlider->setVisible(true);
     }
     else if (filter == Filters::peak2) {
+        peak2Button.setColour(TextButton::ColourIds::buttonColourId, displayColor);
         peak2FreqSlider->setVisible(true);
         peak2GainSlider->setVisible(true);
         peak2QualitySlider->setVisible(true);
     }
     else if (filter == Filters::peak3) {
+        peak3Button.setColour(TextButton::ColourIds::buttonColourId, displayColor);
         peak3FreqSlider->setVisible(true);
         peak3GainSlider->setVisible(true);
         peak3QualitySlider->setVisible(true);
     }
     else if (filter == Filters::highCut) {
+        highCutButton.setColour(TextButton::ColourIds::buttonColourId, displayColor);
         highCutFreqSlider->setVisible(true);
         highCutSlopeBorder.setVisible(true);
         highCutSlope12.setVisible(true);
@@ -647,6 +655,14 @@ void GeneralViewController::displayFilter(int filter) {
         highCutSlope36.setVisible(true);
         highCutSlope48.setVisible(true);
     }
+}
+
+void GeneralViewController::clearColors() {
+    lowCutButton.setColour(TextButton::ColourIds::buttonColourId, juce::Colours::transparentBlack);
+    peak1Button.setColour(TextButton::ColourIds::buttonColourId, juce::Colours::transparentBlack);
+    peak2Button.setColour(TextButton::ColourIds::buttonColourId, juce::Colours::transparentBlack);
+    peak3Button.setColour(TextButton::ColourIds::buttonColourId, juce::Colours::transparentBlack);
+    highCutButton.setColour(TextButton::ColourIds::buttonColourId, juce::Colours::transparentBlack);
 }
 
 void GeneralViewController::invisibleFilters() {
