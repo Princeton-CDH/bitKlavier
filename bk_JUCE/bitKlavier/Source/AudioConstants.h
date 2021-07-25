@@ -240,6 +240,12 @@ const String ptagKeymap_harmonizerPostTranspose = "harmonizerPostTranspose";
 const String ptagKeymap_endKeystrokes = "endKeystrokes";
 const String ptagKeymap_ignoreSustain = "ignoreSustain";
 const String ptagKeymap_sustainPedalKeys = "sustainPedalKeys";
+const String ptagKeymap_extendRange = "extendRange";
+const String ptagKeymap_asymmetricalWarp = "asymmetricalWarp";
+const String ptagKeymap_symmetricalWarp = "symmetricalWarp";
+const String ptagKeymap_scale = "scale";
+const String ptagKeymap_offset = "offset";
+const String ptagKeymap_velocityInvert = "velocityInvert";
 
 typedef enum PitchClass {
     C = 0,
@@ -1173,14 +1179,6 @@ static const std::vector<std::string> cKeymapTargetTypes = {
     "Tuning"
 };
 
-typedef enum KeymapTargetState
-{
-    TargetStateDisabled = 0,
-    TargetStateEnabled,
-    TargetStateNil
-} KeymapTargetState;
-
-
 static const std::vector<std::string> cKeymapParameterTypes = {
     "Keymap Id",
     "Keymap"
@@ -1198,9 +1196,9 @@ typedef enum BKSampleLoadType
     BKLoadMedium,
     BKLoadHeavy,
     BKLoadSoundfont,
+    BKLoadCustom,
     BKLoadNil
-    
-}BKSampleLoadType;
+} BKSampleLoadType;
 
 static const std::vector<std::string> cBKSampleLoadTypes = {
     "Piano (litest)",
@@ -1227,6 +1225,26 @@ static const int aRampUndertowCrossMS = 50;
 static const int aRampNostalgicOffMS = 20;
 
 // Sample layers
+
+static const int aVelocityThresh_Sixteen[17] = {
+    0,
+    8,
+    16,
+    24,
+    32,
+    40,
+    48,
+    56,
+    64,
+    72,
+    80,
+    88,
+    96,
+    104,
+    112,
+    120,
+    128
+};
 
 static const int aVelocityThresh_Eight[9] = {
     0,

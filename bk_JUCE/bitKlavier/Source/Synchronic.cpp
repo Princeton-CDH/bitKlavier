@@ -94,7 +94,9 @@ notePlayed(false)
     {
         // comes in as "soundfont.sf2.subsound1"
         String name = synchronic->prep->sSoundSetName.value;
-        BKSampleLoadType type = BKLoadSoundfont;
+        BKSampleLoadType type;
+        String path;
+        int subsound = 0;
         
         for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
         {
@@ -104,34 +106,48 @@ notePlayed(false)
             }
         }
         
-        String path = name.upToLastOccurrenceOf(".subsound", false, false);
-        int subsound = 0;
-        
-        if (type == BKLoadSoundfont)
+        String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
+        for (auto sf : synth->processor.soundfontNames)
         {
-            for (auto sf : synth->processor.soundfontNames)
+            if (sf.contains(sfName))
             {
-                if (sf.contains(path))
-                {
-                    path = sf;
-                    break;
-                }
+                type = BKLoadSoundfont;
+                path = sf;
+                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+                break;
             }
-
-            subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
         }
+        
+        
+        for (auto cs : synth->processor.customSampleSetNames)
+        {
+            if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
+            {
+                type = BKLoadCustom;
+                path = cs;
+                break;
+            }
+        }
+        
         int Id = synth->loadSamples(type, path, subsound, false);
         synchronic->prep->setSoundSet(Id);
     }
     
-    velocities.ensureStorageAllocated(128);
-    velocitiesActive.ensureStorageAllocated(128);
-    holdTimers.ensureStorageAllocated(128);
+    for (int j = 0; j < 128; j++)
+    {
+        clusterVelocities.add(0.f);
+        velocities.add(Array<float>());
+        invertVelocities.add(Array<float>());
+        for (int i = 0; i < TargetTypeNil; i++)
+        {
+            velocities.getReference(j).add(-1.f);
+            invertVelocities.getReference(j).add(-1.f);
+        }
+    }
+    
     for (int i = 0; i < 128; i++)
     {
-        velocities.insert(i, 0.);
-        velocitiesActive.insert(i, 0);
-        holdTimers.insert(i, 0);
+        holdTimers.add(0);
     }
 
     inCluster = false;
@@ -200,7 +216,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 		if (!blendronic.isEmpty())
 		{
             currentVoice =
-                synth->keyOn(channel,
+                synth->keyOn(1,
                              note,
                              synthNoteNumber,
                              synthOffset,
@@ -225,7 +241,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 		else
 		{
 			currentVoice =
-				synth->keyOn(channel,
+				synth->keyOn(1,
                              note,
                              synthNoteNumber,
                              synthOffset,
@@ -258,35 +274,37 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
         }
 
     }
-    
 }
 
-bool SynchronicProcessor::velocityCheck(int noteNumber)
+float SynchronicProcessor::filterVelocity(float vel)
 {
     SynchronicPreparation::Ptr prep = synchronic->prep;
     
-    int velocity = (int)(velocities.getUnchecked(noteNumber) * 127.0);
+    if (!lastVelocityInRange) lastVelocity = vel;
     
-    if (velocity > 127) velocity = 127;
-    if (velocity < 0)   velocity = 0;
+    int velocity = vel*127.f;
 
     if(prep->velocityMin.value <= prep->velocityMax.value)
     {
         if (velocity >= prep->velocityMin.value && velocity <= prep->velocityMax.value)
         {
-            return true;
+            lastVelocityInRange = true;
+            lastVelocity = vel;
+            return vel;
         }
     }
     else
     {
         if (velocity >= prep->velocityMin.value || velocity <= prep->velocityMax.value)
         {
-            return true;
+            lastVelocityInRange = true;
+            lastVelocity = vel;
+            return vel;
         }
     }
     
     DBG("failed velocity check");
-    return false;
+    return -1.f;
 }
 
 bool SynchronicProcessor::holdCheck(int noteNumber)
@@ -315,37 +333,54 @@ bool SynchronicProcessor::holdCheck(int noteNumber)
 }
 
 
-void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<KeymapTargetState> targetStates)
+void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
-    
     SynchronicPreparation::Ptr prep = synchronic->prep;
     
     lastKeyPressed = noteNumber;
-    lastKeyVelocity = velocity;
     
     // reset the timer for hold time checks
     holdTimers.set(noteNumber, 0);
     
-    // check velocity filtering
-    //  need to save old velocity, in case this new velocity failes the velocity test
-    float velocitySave = velocitiesActive.getUnchecked(noteNumber);
-    
-    // save this velocity, for velocity checks, here and in keyRelease()
-    velocities.set(noteNumber, velocity); // used for velocity checks
-    
-    // save this as the active velocity, for playback as well
-    velocitiesActive.set(noteNumber, velocity); // used for actual note playback velocity
-    
-    // check the velocity
-    if (!velocityCheck(noteNumber))
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an actual key press (not an inverted release) aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
     {
-        // need to set the active velocity back to what it was, since we're going to ignore this one
-        velocitiesActive.set(noteNumber, velocitySave);
-        return;
+        aVels = bVels = &velocities.getReference(noteNumber);
+        for (int i = TargetTypeSynchronic; i < TargetTypeNostalgic; ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
+        }
     }
+    // If this an inverted release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last inverted press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = &invertVelocities.getReference(noteNumber);
+    }
+       
+    bool doCluster = bVels->getUnchecked(TargetTypeSynchronic) >= 0.f; // primary Synchronic mode
+    bool doPatternSync = bVels->getUnchecked(TargetTypeSynchronicPatternSync) >= 0.f; // resetting pattern phases
+    bool doBeatSync = bVels->getUnchecked(TargetTypeSynchronicBeatSync) >= 0.f; // resetting beat phase
+    bool doAddNotes = bVels->getUnchecked(TargetTypeSynchronicAddNotes) >= 0.f; // adding notes to cluster
+    bool doPausePlay = bVels->getUnchecked(TargetTypeSynchronicPausePlay) >= 0.f; // targeting pause/play
+    bool doClear = bVels->getUnchecked(TargetTypeSynchronicClear) >= 0.f;
+    bool doDeleteOldest = bVels->getUnchecked(TargetTypeSynchronicDeleteOldest) >= 0.f;
+    bool doDeleteNewest = bVels->getUnchecked(TargetTypeSynchronicDeleteNewest) >= 0.f;
+    bool doRotate = bVels->getUnchecked(TargetTypeSynchronicRotate) >= 0.f;
     
     // add note to array of depressed notes
     keysDepressed.addIfNotAlreadyThere(noteNumber);
+    
+    if (doCluster || doAddNotes)
+    {
+        float v = jmax(aVels->getUnchecked(TargetTypeSynchronic),
+                       aVels->getUnchecked(TargetTypeSynchronicAddNotes));
+        clusterVelocities.set(noteNumber, v);
+    }
     
     // track the note's target, as set in Keymap
     /*
@@ -367,21 +402,12 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
      too many? i can imagine these being useful though
     */
     
-    bool doCluster = targetStates[TargetTypeSynchronic] == TargetStateEnabled; // primary Synchronic mode
-    bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled; // only if resetting pattern phases
-    bool doBeatSync = targetStates[TargetTypeSynchronicBeatSync] == TargetStateEnabled; // only if resetting beat phase
-    bool doAddNotes = targetStates[TargetTypeSynchronicAddNotes] == TargetStateEnabled; // if only adding notes to cluster
-    bool doPausePlay = targetStates[TargetTypeSynchronicPausePlay] == TargetStateEnabled; // if targeting pause/play
-    bool doClear = targetStates[TargetTypeSynchronicClear] == TargetStateEnabled;
-    bool doDeleteOldest = targetStates[TargetTypeSynchronicDeleteOldest] == TargetStateEnabled;
-    bool doDeleteNewest = targetStates[TargetTypeSynchronicDeleteNewest] == TargetStateEnabled;
-    bool doRotate = targetStates[TargetTypeSynchronicRotate] == TargetStateEnabled;
-    
     // is this a new cluster?
     bool isNewCluster = false;
     
     // add note to clusterKeysDepressed (keys targeting the main synchronic functionality)
     if (doCluster) clusterKeysDepressed.addIfNotAlreadyThere(noteNumber);
+    
 
     // always work on the most recent cluster/layer
     SynchronicCluster::Ptr cluster = clusters.getLast();
@@ -492,6 +518,15 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     // synchronize beat, if targeting beat sync on noteOn or on both noteOn/Off
     if (doBeatSync && (prep->getTargetTypeSynchronicBeatSync() == NoteOn || prep->getTargetTypeSynchronicBeatSync() == Both))
     {
+        TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+        if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
+        {
+            beatThresholdSamples = (tempoPrep->getBeatThresh() * synth->getSampleRate());
+        }
+        else
+        {
+            beatThresholdSamples = (tempoPrep->getBeatThresh() / tempoPrep->getSubdivisions() * synth->getSampleRate());
+        }
         //start right away
         uint64 phasor = beatThresholdSamples *
                         synchronic->prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
@@ -538,25 +573,42 @@ void SynchronicProcessor::keyPressed(int noteNumber, float velocity, Array<Keyma
     }
 }
 
-void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channel, Array<KeymapTargetState> targetStates)
+void SynchronicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
     SynchronicPreparation::Ptr prep = synchronic->prep;
     
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an inverted key press, aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
+    {
+        aVels = bVels = &invertVelocities.getReference(noteNumber);
+        for (int i = TargetTypeSynchronic; i < TargetTypeNostalgic; ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
+        }
+    }
+    // If this an actual release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = &velocities.getReference(noteNumber);
+    }
+    
+    bool doCluster = bVels->getUnchecked(TargetTypeSynchronic) >= 0.f; // primary Synchronic mode
+    bool doPatternSync = bVels->getUnchecked(TargetTypeSynchronicPatternSync) >= 0.f; // resetting pattern phases
+    bool doBeatSync = bVels->getUnchecked(TargetTypeSynchronicBeatSync) >= 0.f; // resetting beat phase
+    bool doAddNotes = bVels->getUnchecked(TargetTypeSynchronicAddNotes) >= 0.f; // adding notes to cluster
+    bool doPausePlay = bVels->getUnchecked(TargetTypeSynchronicPausePlay) >= 0.f; // targeting pause/play
+    bool doClear = bVels->getUnchecked(TargetTypeSynchronicClear) >= 0.f;
+    bool doDeleteOldest = bVels->getUnchecked(TargetTypeSynchronicDeleteOldest) >= 0.f;
+    bool doDeleteNewest = bVels->getUnchecked(TargetTypeSynchronicDeleteNewest) >= 0.f;
+    bool doRotate = bVels->getUnchecked(TargetTypeSynchronicRotate) >= 0.f;
+    
     // remove key from array of pressed keys
     keysDepressed.removeAllInstancesOf(noteNumber);
-    
-    // track the note's target, as set in Keymap; save as needed
-    bool doCluster = targetStates[TargetTypeSynchronic] == TargetStateEnabled;
-    bool doPatternSync = targetStates[TargetTypeSynchronicPatternSync] == TargetStateEnabled;
-    bool doBeatSync = targetStates[TargetTypeSynchronicBeatSync] == TargetStateEnabled;
-    bool doAddNotes = targetStates[TargetTypeSynchronicAddNotes] == TargetStateEnabled;
-    bool doPausePlay = targetStates[TargetTypeSynchronicPausePlay] == TargetStateEnabled;
-    bool doClear = targetStates[TargetTypeSynchronicClear] == TargetStateEnabled;
-    bool doDeleteOldest = targetStates[TargetTypeSynchronicDeleteOldest] == TargetStateEnabled;
-    bool doDeleteNewest = targetStates[TargetTypeSynchronicDeleteNewest] == TargetStateEnabled;
-    bool doRotate = targetStates[TargetTypeSynchronicRotate] == TargetStateEnabled;
-    
-    DBG("SynchronicProcessor::doCluster " + String((int)doCluster));
     
     // is this a new cluster?
     bool isNewCluster = false;
@@ -564,12 +616,21 @@ void SynchronicProcessor::keyReleased(int noteNumber, float velocity, int channe
     // remove key from cluster-targeted keys
     if (doCluster) clusterKeysDepressed.removeAllInstancesOf(noteNumber);
     
-    // do velocity and hold-time filtering (how long the key was held down)
-    if (!velocityCheck(noteNumber)) return;
+    // do hold-time filtering (how long the key was held down)
     if (!holdCheck(noteNumber)) return;
     
     // always work on the most recent cluster/layer
     SynchronicCluster::Ptr cluster = clusters.getLast();
+    
+    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+    if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
+    {
+        beatThresholdSamples = (tempoPrep->getBeatThresh() * synth->getSampleRate());
+    }
+    else
+    {
+        beatThresholdSamples = (tempoPrep->getBeatThresh() / tempoPrep->getSubdivisions() * synth->getSampleRate());
+    }
     
     // do only if this note is targeted as a primary Synchronic note (TargetTypeSynchronic)
     if (doCluster && !pausePlay)
@@ -784,7 +845,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             
             //get time until next beat => beat length scaled by beatMultiplier parameter
             
-            numSamplesBeat =    beatThresholdSamples *
+            numSamplesBeat = beatThresholdSamples *
             prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
             general->getPeriodMultiplier() *
             tempo->getPeriodMultiplier();
@@ -833,7 +894,7 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
                     {
                         playNote(channel,
                                  slimCluster[n],
-                                 velocitiesActive.getUnchecked(slimCluster[n]),
+                                 clusterVelocities.getUnchecked(slimCluster[n]),
                                  cluster);
                     }
                 }
@@ -880,6 +941,21 @@ float SynchronicProcessor::getTimeToBeatMS(float beatsToSkip)
     
     if (cluster != nullptr)
     {
+        TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+        if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
+        {
+            beatThresholdSamples = (tempoPrep->getBeatThresh() * synth->getSampleRate());
+        }
+        else
+        {
+            beatThresholdSamples = (tempoPrep->getBeatThresh() / tempoPrep->getSubdivisions() * synth->getSampleRate());
+        }
+        
+        numSamplesBeat = beatThresholdSamples *
+        synchronic->prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
+        general->getPeriodMultiplier() *
+        tempo->getPeriodMultiplier();
+        
         uint64 timeToReturn = numSamplesBeat - cluster->getPhasor(); //next beat
         int myBeat = cluster->getBeatMultiplierCounter();
         

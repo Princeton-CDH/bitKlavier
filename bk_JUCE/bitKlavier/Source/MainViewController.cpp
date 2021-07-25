@@ -23,9 +23,7 @@ construction(p, &theGraph),
 overtop(p, &theGraph),
 splash(p),
 timerCallbackCount(0),
-hotkeysEnabled(true),
 preferencesButton("Preferences"),
-hotkeysButton("Enable hotkeys"),
 globalSoundSetButton("Use global samples"),
 sustainPedalButton("Sustain Pedal")
 {
@@ -40,15 +38,6 @@ sustainPedalButton("Sustain Pedal")
     sustainPedalButton.addListener(this);
     addAndMakeVisible(sustainPedalButton);
     sustainPedalButton.setVisible(false);
-    
-	/*keystrokesButton.setClickingTogglesState(true);
-	keystrokesButton.getToggleStateValue().referTo(editor.getKeystrokesEnabled());
-	addAndMakeVisible(keystrokesButton);*/
-
-	hotkeysButton.setClickingTogglesState(true);
-	hotkeysButton.getToggleStateValue().referTo(editor.getHotkeysEnabled());
-	addAndMakeVisible(hotkeysButton);
-    
     
     addAndMakeVisible(splash);
     splash.setAlwaysOnTop(true);
@@ -189,8 +178,6 @@ MainViewController::~MainViewController()
     octaveSlider.setLookAndFeel(nullptr);
     mainSlider.setLookAndFeel(nullptr);
     overtop.setLookAndFeel(nullptr);
-	//keystrokesButton.setLookAndFeel(nullptr);
-	hotkeysButton.setLookAndFeel(nullptr);
     undoStatus.setLookAndFeel(nullptr);
     globalSoundSetButton.setLookAndFeel(nullptr);
     //sustainPedalButton.setLookAndFeel(nullptr);
@@ -382,6 +369,14 @@ void MainViewController::mouseDown(const MouseEvent &event)
         }
 #endif
     }
+    fillSampleCB();
+    fillInstrumentCB();
+}
+
+void MainViewController::mouseUp(const MouseEvent &event)
+{
+    fillSampleCB();
+    fillInstrumentCB();
 }
 
 void MainViewController::bkComboBoxDidChange(ComboBox* cb)
@@ -442,16 +437,38 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         
         int soundSetId;
 
-        if (selectedId <= 4)
+        if (selectedId <= BKLoadSoundfont)
         {
             soundSetId = processor.loadSamples((BKSampleLoadType)(selectedId - 1), String(), 0, globalSoundSetButton.getToggleState());
         }
-        else
+        else if (selectedId <= processor.soundfontNames.size() + BKLoadSoundfont)
         {
             int index = selectedId - BKLoadSoundfont - 1;
             
             soundSetId = processor.loadSamples(BKLoadSoundfont, processor.soundfontNames[index], 0, globalSoundSetButton.getToggleState());
         }
+        else //if (selectedId < cb->getNumItems())
+        {
+            int index = selectedId - processor.soundfontNames.size() - BKLoadSoundfont - 1;
+            soundSetId = processor.loadSamples(BKLoadCustom, processor.customSampleSetNames[index], 0, globalSoundSetButton.getToggleState());
+        }
+//        else
+//        {
+//            FileChooser chooser("Import sample files...",
+//                                File::getSpecialLocation (File::userHomeDirectory));
+//
+//            if (chooser.browseForDirectory())
+//            {
+//                String path = chooser.getResult().getFullPathName();
+//                soundSetId = processor.loadSamples(BKLoadCustom, path, 0, globalSoundSetButton.getToggleState());
+//                fillSampleCB();
+//            }
+//            else
+//            {
+//                sampleCB.setSelectedId(lastSelectedSampleCBId, dontSendNotification);
+//                return;
+//            }
+//        }
         
         String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
         if (directSelected)
@@ -487,6 +504,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             nMod->nSoundSetName.set(soundSetName);
             nMod->setDirty(NostalgicSoundSet);
         }
+        
+        lastSelectedSampleCBId = selectedId;
     }
     else if (cb == &instrumentCB)
     {
@@ -719,6 +738,8 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         else if (code == 65) // A all
         {
             if (e.getModifiers().isCommandDown())   construction.selectAll();
+            fillSampleCB();
+            fillInstrumentCB();
         }
         else if (code == 66) // B blendronic
         {
@@ -913,19 +934,32 @@ void MainViewController::fillSampleCB()
     int id = 5;
     for (auto sf : processor.soundfontNames)
     {
-		String sfname;
-
-		sfname = sf.fromLastOccurrenceOf(File::getSeparatorString(), false, true).upToFirstOccurrenceOf(".sf", false, true);
+		String sfname = sf.fromLastOccurrenceOf(File::getSeparatorString(), false, true)
+        .upToFirstOccurrenceOf(".sf", false, true);
 
         sampleCB.addItem(sfname, id);
         
         if (sfname == name)
-        {
             sampleCB.setSelectedId(id, dontSendNotification);
-        }
-        
         id++;
     }
+    
+    if (!processor.customSampleSetNames.isEmpty()) sampleCB.addSeparator();
+    
+    for (auto custom : processor.customSampleSetNames)
+    {
+        String customName = custom.fromLastOccurrenceOf(File::getSeparatorString(), false, true);
+        
+        sampleCB.addItem(customName, id);
+        
+        if (customName == name)
+            sampleCB.setSelectedId(id, dontSendNotification);
+        id++;
+    }
+//
+//    sampleCB.addSeparator();
+//
+//    sampleCB.addItem("Import samples...", id);
 }
 
 void MainViewController::fillInstrumentCB()

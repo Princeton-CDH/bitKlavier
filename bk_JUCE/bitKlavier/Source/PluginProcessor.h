@@ -31,7 +31,6 @@
 class StandalonePluginHolder;
 class BKAudioProcessorEditor;
 
-
 //==============================================================================
 /**
 */
@@ -81,7 +80,7 @@ public:
     String firstGallery(void);
     void initializeGallery(void);
     
-    FileChooser* fc;
+    std::unique_ptr<FileChooser> fc;
     
     Gallery::Ptr                        gallery;
     
@@ -124,6 +123,8 @@ public:
     // Names of soundfont instruments keyed by sound set ids
     HashMap<int, StringArray>           instrumentNames;
     
+    StringArray                         customSampleSetNames;
+    
     OwnedArray<StringArray>             exportedPreparations;
     StringArray                         exportedPianos;
         
@@ -141,10 +142,17 @@ public:
     
     int                                 globalSoundSetId;
     
-    bool firstTime;
+    bool firstPedalDown;
     
     bool                                defaultLoaded;
     String                              defaultName;
+
+    // This is quite performance intensive with a lot of samples and currently doesn't seems worth doing
+//    SampleTouchThread touchThread;
+    
+    File defaultSamplesPath;
+    FileSearchPath soundfontsPaths;
+    FileSearchPath customSamplesPaths;
 
     void updateGalleries(void);
     
@@ -152,6 +160,7 @@ public:
     void collectPianos(void);
     void collectPreparations(void);
     void collectSoundfonts(void);
+    void collectCustomSamples(void);
     
     void collectGalleriesFromFolder(File folder);
     void collectPianosFromFolder(File folder);
@@ -239,10 +248,16 @@ public:
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) override;
     void changeProgramName (int index, const String& newName) override;
+    
 
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    //==============================================================================
+    File getDefaultSamplesPath();
+    Array<File> getSoundfontsPaths();
+    Array<File> getCustomSamplesPaths();
     
     double getLevelL();
     double getLevelR();
@@ -329,7 +344,7 @@ public:
                 sustainIsDown = true;
                 DBG("sustain inverted, sustain is now pressed");
                 
-                if (firstTime) {firstTime = false; return;}
+                if (firstPedalDown) {firstPedalDown = false; return;}
                 else currentPiano->prepMap->sustainPedalPressed();
             }
         }
@@ -347,7 +362,7 @@ public:
             {
                 sustainIsDown = true;
                 
-                if (firstTime) { firstTime = false; return; }
+                if (firstPedalDown) { firstPedalDown = false; return; }
                 else currentPiano->prepMap->sustainPedalPressed();
             }
         }
@@ -377,18 +392,15 @@ public:
     inline Value getTooltipsEnabled(void) { return tooltipsEnabled; }
     inline void setTooltipsEnabled(bool enabled) { tooltipsEnabled.setValue(enabled); }
 
-    /*
-	inline bool areKeystrokesEnabled(void) { return keystrokesEnabled.getValue(); }
-	inline Value getKeystrokesEnabled(void) { return keystrokesEnabled; }
-	inline void setKeystrokesEnabled(bool enabled) { keystrokesEnabled.setValue(enabled); }
-    */
-
 	inline bool areHotkeysEnabled(void) { return hotkeysEnabled.getValue(); }
 	inline Value getHotkeysEnabled(void) { return hotkeysEnabled; }
 	inline void setHotkeysEnabled(bool enabled) { hotkeysEnabled.setValue(enabled); }
+    
+    inline bool isMemoryMappingEnabled(void) { return memoryMappingEnabled.getValue(); }
+    inline Value getMemoryMappingEnabled(void) { return memoryMappingEnabled; }
+    inline void setMemoryMappingEnabled(bool enabled) { memoryMappingEnabled.setValue(enabled); }
 
     void handleAllNotesOff();
-
     
     Array<std::shared_ptr<XmlElement>> galleryHistory;
     int undoDepth;
@@ -483,11 +495,11 @@ private:
     BKAudioProcessorEditor* editor;
     
     Value tooltipsEnabled;
-
-	//Value keystrokesEnabled;
-
+    
 	Value hotkeysEnabled;
-
+    
+    Value memoryMappingEnabled;
+  
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKAudioProcessor)
 };

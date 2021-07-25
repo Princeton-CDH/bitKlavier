@@ -160,6 +160,7 @@ public:
                             int pitchWheelValue,
                             float gain,
                             float velocity,
+                            //float rangeExtend,
                             PianoSamplerNoteDirection direction,
                             PianoSamplerNoteType type,
                             BKNoteType bktype,
@@ -380,7 +381,9 @@ public:
     
     /** Returns the number of voices that have been added. */
     int getNumVoices() const noexcept                               { return voices.size(); }
-    
+
+    ReferenceCountedArray<BKSynthesiserVoice>& getVoices() { return voices; }
+
     /** Returns one of the voices that have been added. */
     BKSynthesiserVoice* getVoice (int index) const;
     
@@ -403,6 +406,8 @@ public:
     
     /** Returns the number of sounds that have been added to the synth. */
     int getNumSounds(int set) const noexcept                               { return soundSets.getUnchecked(set)->size(); }
+
+    OwnedArray < ReferenceCountedArray<BKSynthesiserSound>>& getSounds() { return soundSets; }
     
     /** Returns one of the sounds. */
     BKSynthesiserSound* getSound (int set, int index) const noexcept           { return soundSets.getUnchecked(set)->getUnchecked(index); }
@@ -756,6 +761,7 @@ protected:
                      float midiNoteNumberOffset,
                      float gain,
                      float velocity,
+                     //float rangeExtend,
                      PianoSamplerNoteDirection direction,
                      PianoSamplerNoteType type,
                      BKNoteType bktype,

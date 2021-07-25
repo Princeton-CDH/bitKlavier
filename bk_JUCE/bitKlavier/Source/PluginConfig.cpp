@@ -77,6 +77,12 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     
     settingsVT.setProperty("tooltipsEnabled", (int)areTooltipsEnabled(), 0);
     settingsVT.setProperty("hotkeysEnabled", (int)areHotkeysEnabled(), 0);
+    settingsVT.setProperty("memoryMappingEnabled", (int)isMemoryMappingEnabled(), 0);
+    
+    settingsVT.setProperty("defaultSamplesSearchPath", defaultSamplesPath.getFullPathName(), 0);
+    settingsVT.setProperty("soundfontsSearchPath", soundfontsPaths.toString(), 0);
+    settingsVT.setProperty("sampleSearchPath", customSamplesPaths.toString(), 0);
+    
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
@@ -86,9 +92,9 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     galleryVT.setProperty("defaultName", defaultName, 0);
     
     galleryVT.setProperty("sampleType", (int)globalSampleType, 0);
-    File soundfont(globalSoundfont);
-    if (soundfont.exists()) galleryVT.setProperty("soundfontURL", soundfont.getFileName(), 0);
-    else galleryVT.setProperty("soundfontURL", globalSoundfont, 0);
+    
+    galleryVT.setProperty("soundfontURL", globalSoundfont, 0);
+    
     galleryVT.setProperty("soundfontInst", globalInstrument, 0);
     
     galleryVT.setProperty("galleryPath", gallery->getURL(), 0);
@@ -108,16 +114,18 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
 void BKAudioProcessor::loadSamplesStartup(void)
 {
     // LOAD SAMPLES
+    // Load Litest, Lite, Medium, or Heavy
     if (globalSampleType < BKLoadSoundfont)
     {
         loadSamples(globalSampleType);
     }
-    else if (globalSampleType == BKLoadSoundfont)
+    // Load Soundfont or Custom
+    else if (globalSampleType <= BKLoadCustom)
     {
         File file (globalSoundfont);
-        if (file.existsAsFile())
+        if (file.exists())
         {
-            loadSamples(BKLoadSoundfont, globalSoundfont, globalInstrument);
+            loadSamples(globalSampleType, globalSoundfont, globalInstrument);
         }
         else
         {
@@ -149,12 +157,29 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         {
             setTooltipsEnabled((bool)userSettings->getIntAttribute("tooltipsEnabled", 1));
             setHotkeysEnabled((bool)userSettings->getIntAttribute("hotkeysEnabled", 1));
+            setMemoryMappingEnabled((bool)userSettings->getIntAttribute("memoryMappingEnabled", 0));
+            
+            // Make sure this path exists, otherwise leave it as its initial value set in the processor construtor
+            String defaultSamplesPathName = userSettings->getStringAttribute("defaultSamplesSearchPath", "");
+            if (defaultSamplesPathName.isNotEmpty())
+            {
+                File path (defaultSamplesPathName);
+                if (path.exists()) defaultSamplesPath = path;
+            }
+            
+            soundfontsPaths = userSettings->getStringAttribute("soundfontsSearchPath", soundfontsPaths.toString());
+            
+            customSamplesPaths = userSettings->getStringAttribute("sampleSearchPath", "");
         }
         else
         {
             setTooltipsEnabled(true);
             setHotkeysEnabled(true);
+            setMemoryMappingEnabled(false);
+            customSamplesPaths = "";
         }
+        
+        collectCustomSamples();
         
         defaultLoaded = (bool) galleryXML->getStringAttribute("defaultLoaded").getIntValue();
         
@@ -216,18 +241,39 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 
         globalSoundfont = galleryXML->getStringAttribute("soundfontURL");
         
-        File bkSoundfonts;
-#if JUCE_IOS
-        bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory);
-#endif
-#if JUCE_MAC
-        bkSoundfonts = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
-#endif
-#if JUCE_WINDOWS || JUCE_LINUX
-        bkSoundfonts = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("soundfonts");
-#endif
-        Array<File> files = bkSoundfonts.findChildFiles(File::findFiles, true, globalSoundfont);
-        if (!files.isEmpty()) globalSoundfont = files.getUnchecked(0).getFullPathName();
+        // Check that the file exists in it's absolute path and if not reduce to just the file name
+        if (File::isAbsolutePath(globalSoundfont))
+        {
+            File soundfont(globalSoundfont);
+            if (!soundfont.exists()) globalSoundfont = soundfont.getFileName();
+        }
+        
+        // If the file didn't exist in above block or if it wasn't saved as an absolute path
+        // look for it in the soundfont folder and the sample search paths
+        if (!File::isAbsolutePath(globalSoundfont))
+        {
+            Array<File> files;
+            // Check the soundfonts folder
+            for (auto path : getSoundfontsPaths())
+            {
+                files.addArray(path.findChildFiles(File::findFiles, true, globalSoundfont.fromLastOccurrenceOf(File::getSeparatorString(), false, false)));
+            }
+        
+            // Set the global soundfont if we've found a matching file
+            if (!files.isEmpty()) globalSoundfont = files.getUnchecked(0).getFullPathName();
+            // Or if not in the soundfonts folder, check the custom samples search paths
+            else
+            {
+                for (auto path : getCustomSamplesPaths())
+                {
+                    if (path.getFileName() == globalSoundfont)
+                    {
+                        globalSoundfont = path.getFullPathName();
+                        files.clear();
+                    }
+                }
+            }
+        }
 
         globalInstrument = galleryXML->getStringAttribute("soundfontInst").getIntValue();
         
@@ -290,4 +336,58 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
     
     return  processor;
+}
+
+File BKAudioProcessor::getDefaultSamplesPath()
+{
+#if JUCE_IOS
+    return File::getSpecialLocation(File::invokedExecutableFile)
+    .getParentDirectory().getChildFile("samples");
+#else
+    return defaultSamplesPath;
+#endif
+}
+
+Array<File> BKAudioProcessor::getSoundfontsPaths()
+{
+    Array<File> directories = soundfontsPaths
+    .findChildFiles(File::TypesOfFileToFind::findDirectories, true);
+    for (int i = 0; i < soundfontsPaths.getNumPaths(); ++i)
+    {
+        directories.add(soundfontsPaths[i]);
+    }
+    
+#if JUCE_IOS
+    directories.add(File::getSpecialLocation(File::invokedExecutableFile)
+                    .getParentDirectory().getChildFile("soundfonts"));
+    directories.add(File::getSpecialLocation(File::userDocumentsDirectory));
+#endif
+#if JUCE_MAC
+    directories.add(File::getSpecialLocation(File::globalApplicationsDirectory)
+                    .getChildFile("bitKlavier").getChildFile("soundfonts"));
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    directories.add(File::getSpecialLocation(File::userDocumentsDirectory)
+                    .getChildFile("bitKlavier").getChildFile("soundfonts"));
+#endif
+    
+    return directories;
+}
+
+Array<File> BKAudioProcessor::getCustomSamplesPaths()
+{
+    Array<File> directories = customSamplesPaths
+    .findChildFiles(File::TypesOfFileToFind::findDirectories, true);
+    for (int i = 0; i < customSamplesPaths.getNumPaths(); ++i)
+    {
+        directories.add(customSamplesPaths[i]);
+    }
+
+#if JUCE_IOS
+    Array<File> subDirs = File::getSpecialLocation(File::userDocumentsDirectory)
+    .findChildFiles(File::TypesOfFileToFind::findDirectories, true);
+    directories.addArray(subDirs);
+#endif
+    
+    return directories;
 }

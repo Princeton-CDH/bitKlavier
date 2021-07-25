@@ -110,6 +110,8 @@ public:
         /*viewPort.autoScroll(e.x, e.y, 100, 150);*/
     }
     
+    inline BKConstructionSite* getConstructionSite() { return &construction; }
+    
     /*inline Viewport* getViewport(void) { return &viewPort;}*/
     void toggleDisplay(void);
     void performUndo(void);
@@ -176,6 +178,7 @@ private:
     void bkButtonClicked        (Button* b)                     override;
     void sliderValueChanged     (Slider* slider)                override;
     void mouseDown (const MouseEvent &event) override;
+    void mouseUp (const MouseEvent &event) override;
     
     void bkComboBoxDidChange(ComboBox* cb) override;
     
@@ -189,14 +192,8 @@ private:
     bool keyPressed (const KeyPress& e, Component*) override;
     
     bool isAddingFromMidiInput;
-
-	bool hotkeysEnabled;
-	bool keystrokesEnabled;
     
     TextButton preferencesButton;
-
-	ToggleButton keystrokesButton;
-	ToggleButton hotkeysButton;
     
     ToggleButton globalSoundSetButton;
 
@@ -204,6 +201,8 @@ private:
     
     Label undoStatus;
     int undoStatusCountdown;
+    
+    int lastSelectedSampleCBId;
     
     BKButtonAndMenuLAF laf;
     BKButtonAndMenuLAF comboBoxRightJustifyLAF;

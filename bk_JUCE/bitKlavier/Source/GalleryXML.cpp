@@ -75,7 +75,7 @@ ValueTree  Gallery::getState(void)
     
     for (int i = 0; i < nostalgic.size(); i++)              galleryVT.addChild( nostalgic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < blendronic.size(); i++)           galleryVT.addChild( blendronic[i]->getState(), -1, 0);
+    for (int i = 0; i < blendronic.size(); i++)             galleryVT.addChild( blendronic[i]->getState(), -1, 0);
     
     for (int i = 0; i < modTempo.size(); i++)               galleryVT.addChild( modTempo[i]->getState(), -1, 0);
     
@@ -120,7 +120,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
         
         // iterate through its sub-elements
-        forEachXmlChildElement (*xml, e)
+        for (auto e : xml->getChildIterator())
         {
             if (e->hasTagName( vtagKeymap))
             {
@@ -254,7 +254,6 @@ void Gallery::setStateFromXML(XmlElement* xml)
             {
                 addBlendronicWithId(0);
                 
-                // TODO: write setState for Blendronic
                 blendronic.getLast()->setState(e);
                 
                 int oldId = blendronic.getLast()->getId();
@@ -287,7 +286,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
         }
         
         int which = 0;
-        forEachXmlChildElement (*xml, e)
+        for (auto e : xml->getChildIterator()) 
         {
             if (e->hasTagName(vtagPiano))
             {

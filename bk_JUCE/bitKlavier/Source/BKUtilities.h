@@ -11,6 +11,8 @@
 #ifndef BKUTILITIES_H_INCLUDED
 #define BKUTILITIES_H_INCLUDED
 
+#include <regex>
+
 #include "../JuceLibraryCode/JuceHeader.h"
 
 #include "BKReferenceCountedBuffer.h"
@@ -333,6 +335,8 @@ double          ftom(double f, double sr);
 //these require inval to be between 0 and 1, and k != 1
 double          dt_asymwarp(double inval, double k);
 double          dt_asymwarp_inverse(double inval, double k);
+double          dt_symwarp(double inval, double k);
+double          dt_warpscale(double inval, double asym_k, double sym_k, double scale, double offset);
 
 int mod(int a, int b);
 

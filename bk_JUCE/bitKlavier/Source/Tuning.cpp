@@ -64,6 +64,16 @@ keymaps(Keymap::PtrArr()),
 lastNoteTuning(0),
 lastIntervalTuning(0)
 {
+    for (int j = 0; j < 128; j++)
+    {
+        velocities.add(Array<float>());
+        invertVelocities.add(Array<float>());
+        for (int i = 0; i < TargetTypeNil; ++i)
+        {
+            velocities.getReference(j).add(-1.f);
+            invertVelocities.getReference(j).add(-1.f);
+        }
+    }
 }
 
 TuningProcessor::~TuningProcessor()
@@ -154,15 +164,58 @@ void TuningProcessor::processBlock(int numSamples)
     }
 }
 
-void TuningProcessor::keyReleased(int midiNoteNumber)
+void TuningProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
-    tuning->prep->getSpringTuning()->removeNote(midiNoteNumber);
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an inverted key press, aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
+    {
+        aVels = bVels = &invertVelocities.getReference(noteNumber);
+        for (int i = TargetTypeTuning; i < TargetTypeNil; ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
+        }
+    }
+    // If this an actual release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = &velocities.getReference(noteNumber);
+    }
+    
+    if (bVels->getUnchecked(TargetTypeTuning) < 0.f) return;
+    
+    tuning->prep->getSpringTuning()->removeNote(noteNumber);
 }
 
 
 //add note to the adaptive tuning history, update adaptive fundamental
-void TuningProcessor::keyPressed(int midiNoteNumber)
+void TuningProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an actual key press (not an inverted release) aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
+    {
+        aVels = bVels = &velocities.getReference(noteNumber);
+        for (int i = TargetTypeTuning; i < TargetTypeNil; ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
+        }
+    }
+    // If this an inverted release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last inverted press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = &invertVelocities.getReference(noteNumber);
+    }
+    
+    if (bVels->getUnchecked(TargetTypeTuning) < 0.f) return;
     //DBG("TuningProcessor::keyPressed " + String(midiNoteNumber));
     
     adaptiveHistoryCounter++;
@@ -175,8 +228,8 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
         if (clusterTime * (1000.0 / processor.getCurrentSampleRate()) > tuning->prep->getAdaptiveClusterThresh() || adaptiveHistoryCounter >= tuning->prep->getAdaptiveHistory())
         {
             adaptiveHistoryCounter = 0;
-            adaptiveFundamentalFreq = adaptiveFundamentalFreq * adaptiveCalculateRatio(midiNoteNumber);
-            adaptiveFundamentalNote = midiNoteNumber;
+            adaptiveFundamentalFreq = adaptiveFundamentalFreq * adaptiveCalculateRatio(noteNumber);
+            adaptiveFundamentalNote = noteNumber;
         }
         //else adaptiveHistoryCounter++;
         
@@ -189,17 +242,17 @@ void TuningProcessor::keyPressed(int midiNoteNumber)
             adaptiveHistoryCounter = 0;
             
             const Array<float> anchorTuning = tuning->tuningLibrary.getUnchecked(tuning->prep->getAdaptiveAnchorScale());
-            adaptiveFundamentalFreq = mtof(midiNoteNumber +
-                                           anchorTuning[(midiNoteNumber + tuning->prep->getAdaptiveAnchorFundamental()) % anchorTuning.size()],
+            adaptiveFundamentalFreq = mtof(noteNumber +
+                                           anchorTuning[(noteNumber + tuning->prep->getAdaptiveAnchorFundamental()) % anchorTuning.size()],
                                            globalTuningReference
                                            );
-            adaptiveFundamentalNote = midiNoteNumber;
+            adaptiveFundamentalNote = noteNumber;
 
         }
         //else adaptiveHistoryCounter++;
     }
     
-    tuning->prep->getSpringTuning()->addNote(midiNoteNumber);
+    tuning->prep->getSpringTuning()->addNote(noteNumber);
     
     clusterTime = 0;
     

@@ -104,14 +104,16 @@ mainPianoSynth(*this),
 hammerReleaseSynth(*this),
 resonanceReleaseSynth(*this),
 pedalSynth(*this),
-firstTime(true),
+firstPedalDown(true),
+//touchThread(*this),
 progress(0),
 progressInc(0),
 currentSampleRate(44100.),
 doneWithSetStateInfo(false),
 midiReady(false),
 tooltipsEnabled(true),
-hotkeysEnabled(true)
+hotkeysEnabled(true),
+memoryMappingEnabled(var(false))
 {
 #if BK_UNIT_TESTS
     
@@ -144,7 +146,17 @@ hotkeysEnabled(true)
     float w_factor = ((float) screenWidth / (float) DEFAULT_WIDTH);
     float h_factor = ((float) screenHeight / (float) DEFAULT_HEIGHT);
     
-    
+    File bkSamples;
+#if JUCE_IOS
+    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
+#endif
+#if JUCE_MAC
+    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+#if JUCE_LINUX || JUCE_WINDOWS
+    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
+#endif
+    defaultSamplesPath = bkSamples;
     
 #if JUCE_IOS
     int heightUnit = ((screenHeight * 0.1f) > 48) ? 48 : (screenHeight * 0.1f);
@@ -186,6 +198,7 @@ void BKAudioProcessor::loadGalleries()
     collectPianos();
     collectPreparations();
     collectSoundfonts();
+    collectCustomSamples();
     
     updateUI();
     
@@ -341,6 +354,7 @@ void BKAudioProcessor::openSoundfont(void)
 
 void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+//    touchThread.stopThread(1000);
     currentSampleRate = sampleRate;
 #if JUCE_IOS
     //stk::Stk::setSampleRate(sampleRate);
@@ -398,11 +412,16 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     #endif
         }
     }
+//    if (loader.getNumJobs() == 0) touchThread.startThread(0);
 }
 
 BKAudioProcessor::~BKAudioProcessor()
 {
     stopTimer();
+    
+    loader.removeAllJobs(true, 1000);
+    
+//    touchThread.stopThread(1000);
     
     for (auto item : clipboard)
         item->clearConnections();
@@ -703,7 +722,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
     if (!activeSource) return;
     
-    
     // Check PianoMap for whether piano should change due to key strike.
     for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
     {
@@ -721,7 +739,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
             }
         }
     }
-    
     
     // modifications
     performResets(noteNumber, source);
@@ -799,6 +816,14 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
             }
         }
     }
+    
+    String key = source + "n" + String(mappedFrom);
+    if (noteOnSetsNoteOffVelocity)
+    {
+        velocity = sourcedNoteVelocities.getUnchecked(noteNumber)->getReference(key);
+    }
+    else if (velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
+    
     if (!postHarmonizer)
     {
         // Now call this function for each post harmonization note
@@ -816,8 +841,6 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
     }
     else
     {
-        String key = source + "n" + String(mappedFrom);
-        
         if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
         {
             if (sourcedNotesOn.getUnchecked(noteNumber)->contains(key))
@@ -834,8 +857,6 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
             //DBG("noteoff velocity = " + String(velocity));
             
             noteOnSetsNoteOffVelocity = gallery->getGeneralSettings()->getNoteOnSetsNoteOffVelocity();
-            if(noteOnSetsNoteOffVelocity) velocity = (*sourcedNoteVelocities.getUnchecked(noteNumber))[key];
-            else if(velocity <= 0) velocity = 0.7; //for keyboards that don't do proper noteOff messages
             
             bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
             currentPiano->prepMap->keyReleased(noteNumber, velocity, channel, mappedFrom, noteDown,
@@ -1157,7 +1178,6 @@ double BKAudioProcessor::getLevelR()
 // Piano
 void  BKAudioProcessor::setCurrentPiano(int which)
 {
-    
     updateState->setCurrentDisplay(DisplayNil);
 
     if (noteOnCount)  prevPianos.addIfNotAlreadyThere(currentPiano);
@@ -1177,9 +1197,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
         for (auto bprocessor : currentPiano->getBlendronicProcessors())
             bprocessor->setActive(true);
         
-        currentPiano->copySynchronicState(prevPiano);
-        currentPiano->copyAdaptiveTuningState(prevPiano);
-        currentPiano->copyAdaptiveTempoState(prevPiano);
+        currentPiano->copyProcessorStates(prevPiano);
         
         updateState->pianoDidChangeForGraph = true;
         updateState->synchronicPreparationDidChange = true;
@@ -1506,10 +1524,10 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
 
 void BKAudioProcessor::importSoundfont(void)
 {
-    fc = new FileChooser ("Import your gallery",
-                          File::getCurrentWorkingDirectory(),
-                          "*",
-                          true);
+    fc = std::make_unique<FileChooser> ("Import your gallery",
+                                        File::getCurrentWorkingDirectory(),
+                                        "*",
+                                        true);
     
     fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
                      [this] (const FileChooser& chooser)
@@ -1546,10 +1564,10 @@ void BKAudioProcessor::importSoundfont(void)
 
 void BKAudioProcessor::importCurrentGallery(void)
 {
-    fc = new FileChooser ("Import your gallery",
-                          File::getCurrentWorkingDirectory(),
-                          "*.xml",
-                          true);
+    fc = std::make_unique<FileChooser> ("Import your gallery",
+                                        File::getCurrentWorkingDirectory(),
+                                        "*.xml",
+                                        true);
     
     fc->launchAsync (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles,
      [this] (const FileChooser& chooser)
@@ -1583,10 +1601,10 @@ void BKAudioProcessor::exportCurrentGallery(void)
 
     File fileToSave (gallery->getURL());
     
-    fc = new FileChooser ("Export your gallery.",
-                          fileToSave,
-                          "*",
-                          true);
+    fc = std::make_unique<FileChooser> ("Export your gallery.",
+                                        fileToSave,
+                                        "*",
+                                        true);
     
     fc->launchAsync (FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::canSelectDirectories,
                      [fileToSave] (const FileChooser& chooser)
@@ -1744,12 +1762,7 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
         
         gallery->setGalleryDirty(false);
     }
-    
-    currentPiano->configure();
 
-    for (auto bprocessor : currentPiano->getBlendronicProcessors())
-        bprocessor->setActive(true);
-    
     if (resetHistory) resetGalleryHistory();
 }
 
@@ -1885,8 +1898,15 @@ void BKAudioProcessor::initializeGallery()
         piano->configure();
         if (piano->getId() > gallery->getIdCount(PreparationTypePiano)) gallery->setIdCount(PreparationTypePiano, piano->getId());
         if (piano != currentPiano)
+        {
             for (auto bprocessor : piano->getBlendronicProcessors())
                 bprocessor->setActive(false);
+        }
+        else
+        {
+            for (auto bprocessor : piano->getBlendronicProcessors())
+                bprocessor->setActive(true);
+        }
     }
 
     gallery->prepareToPlay(getSampleRate()); 

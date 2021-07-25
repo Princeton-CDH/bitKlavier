@@ -799,6 +799,30 @@ bool BKItemGraph::connect(BKItem* item1, BKItem* item2)
             tune->removeConnection(item2);
         }
     }
+    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeSynchronic)
+    {
+        Keymap::Ptr km = processor.gallery->getKeymap(item1->getId());
+        BKItem::PtrArr connections = item1->getConnectionsOfType(item2Type);
+        if (connections.size() == 0) km->setTarget(TargetTypeSynchronic, true);
+    }
+    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeSynchronic)
+    {
+        Keymap::Ptr km = processor.gallery->getKeymap(item2->getId());
+        BKItem::PtrArr connections = item2->getConnectionsOfType(item1Type);
+        if (connections.size() == 0) km->setTarget(TargetTypeSynchronic, true);
+    }
+    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeNostalgic)
+    {
+        Keymap::Ptr km = processor.gallery->getKeymap(item1->getId());
+        BKItem::PtrArr connections = item1->getConnectionsOfType(item2Type);
+        if (connections.size() == 0) km->setTarget(TargetTypeNostalgic, true);
+    }
+    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeNostalgic)
+    {
+        Keymap::Ptr km = processor.gallery->getKeymap(item2->getId());
+        BKItem::PtrArr connections = item2->getConnectionsOfType(item1Type);
+        if (connections.size() == 0) km->setTarget(TargetTypeNostalgic, true);
+    }
     
     // Add the connections
     item1->addConnection(item2);

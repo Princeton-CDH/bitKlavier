@@ -837,8 +837,9 @@ void SynchronicPreparationEditor::timerCallback()
         for (int i = TargetTypeSynchronicPatternSync; i <= TargetTypeSynchronicRotate; i++)
         {
             bool makeBright = false;
+            
             for (auto km : sProcessor->getKeymaps())
-                if (km->getTargetStates()[(KeymapTargetType) i] == TargetStateEnabled) makeBright = true;
+                makeBright = km->getTargetStates()[i];
             
             if (makeBright)
             {
@@ -979,12 +980,12 @@ void SynchronicPreparationEditor::timerCallback()
             }
         }
         
-        if (prep->sGain.didChanged()) gainSlider->setValue(prep->sGain.value, dontSendNotification);
-        if (prep->sBlendronicGain.didChanged()) blendronicGainSlider->setValue(prep->sBlendronicGain.value, dontSendNotification);
-        if (prep->sNumBeats.didChanged()) howManySlider->setValue(prep->sNumBeats.value, dontSendNotification);
-        if (prep->sClusterThresh.didChanged()) clusterThreshSlider->setValue(prep->sClusterThresh.value, dontSendNotification);
-        if (prep->sClusterCap.didChanged()) clusterCapSlider->setValue(prep->sClusterCap.value, dontSendNotification);
-        if (prep->numClusters.didChanged()) numClusterSlider->setValue(prep->numClusters.value, dontSendNotification);
+        if (prep->sGain.didChange()) gainSlider->setValue(prep->sGain.value, dontSendNotification);
+        if (prep->sBlendronicGain.didChange()) blendronicGainSlider->setValue(prep->sBlendronicGain.value, dontSendNotification);
+        if (prep->sNumBeats.didChange()) howManySlider->setValue(prep->sNumBeats.value, dontSendNotification);
+        if (prep->sClusterThresh.didChange()) clusterThreshSlider->setValue(prep->sClusterThresh.value, dontSendNotification);
+        if (prep->sClusterCap.didChange()) clusterCapSlider->setValue(prep->sClusterCap.value, dontSendNotification);
+        if (prep->numClusters.didChange()) numClusterSlider->setValue(prep->numClusters.value, dontSendNotification);
     }
 }
 

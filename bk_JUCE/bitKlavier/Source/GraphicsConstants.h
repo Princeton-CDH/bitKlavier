@@ -43,7 +43,6 @@ extern int gComponentSingleSliderHeight;
 extern int gComponentStackedSliderHeight;
 
 extern int gComponentToggleBoxHeight;
-
 #else
 static const int fontHeight = 15;
 

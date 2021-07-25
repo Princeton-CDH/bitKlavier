@@ -205,7 +205,7 @@ public:
     int getNumberOfInc() override { return n; }
     int getMaxNumberOfInc() override { return maxN; }
     
-    bool didChanged()
+    bool didChange()
     {
         if (changed)
         {
@@ -387,7 +387,7 @@ public:
     void setState(tag<Array<T>>, XmlElement* e, StringArray s, ValueType defaultValue)
     {
         base = defaultValue;
-        forEachXmlChildElement (*e, sub)
+        for (auto sub : e->getChildIterator())
         {
             if (sub->hasTagName(s[0]))
             {
@@ -417,13 +417,13 @@ public:
     void setState(tag<Array<Array<T>>>, XmlElement* e, StringArray s, ValueType defaultValue)
     {
         base = defaultValue;
-        forEachXmlChildElement (*e, sub)
+        for (auto sub : e->getChildIterator())
         {
             if (sub->hasTagName(s[0]))
             {
                 base = Array<Array<T>>();
                 int count = 0;
-                forEachXmlChildElement (*sub, asub)
+                for (auto asub : sub->getChildIterator())
                 {
                     if (asub->hasTagName(s[1] + String(count++)))
                     {
@@ -438,7 +438,7 @@ public:
             {
                 inc = Array<Array<T>>();
                 int count = 0;
-                forEachXmlChildElement (*sub, asub)
+                for (auto asub : sub->getChildIterator())
                 {
                     if (asub->hasTagName(s[1] + String(count++)))
                     {

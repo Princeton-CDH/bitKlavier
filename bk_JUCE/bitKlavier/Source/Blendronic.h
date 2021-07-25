@@ -630,10 +630,10 @@ public:
 	BKSampleLoadType sampleType;
 
 	//begin timing played note length, called with noteOn
-	void keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates);
+	void keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
 
 	//begin playing reverse note, called with noteOff
-	void keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post = false);
+	void keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
 
 	void postRelease(int noteNumber, int midiChannel);
 
@@ -708,6 +708,12 @@ public:
     inline OwnedArray<BlendronicDisplay::ChannelInfo>* getAudioDisplayData(void) { return &audio; }
     
     inline BlendronicDisplay::ChannelInfo* getSmoothingDisplayData(void) { return smoothing.get(); }
+    
+    Array<Array<float>>& getVelocities() { return velocities; }
+    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    
+    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
+    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
 
 private:
     CriticalSection lock;
@@ -726,7 +732,8 @@ private:
     
     bool blendronicActive;
     
-	Array<float> velocities;    //record of velocities
+    Array<Array<float>> velocities;
+    Array<Array<float>> invertVelocities;
     Array<uint64> holdTimers;
 	Array<int> keysDepressed;   //current keys that are depressed
     

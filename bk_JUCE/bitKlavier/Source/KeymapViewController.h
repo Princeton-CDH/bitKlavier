@@ -16,6 +16,8 @@
 #include "BKKeyboard.h"
 #include "BKKeyboardState.h"
 
+#include "VelocityCurveGraph.h"
+
 
 //==============================================================================
 /*
@@ -59,7 +61,7 @@ public:
     void deleteCurrent(void);
     
     void keymapUpdated(TextEditor& tf);
-    void hideUnconnectedTargets();
+    void updateTargets();
     
     void bkTextFieldDidChange       (TextEditor&)           override;
 
@@ -128,6 +130,24 @@ private:
     //int harKey; //for rendering harmonizer array stuff for now
 
     //end
+    
+    //======================================================================================
+    // Velocity Curving UI
+    
+    //std::unique_ptr<BKSingleSlider> rangeExtendSlider;
+    std::unique_ptr<BKSingleSlider> asym_kSlider;
+    std::unique_ptr<BKSingleSlider> sym_kSlider;
+    std::unique_ptr<BKSingleSlider> scaleSlider;
+    std::unique_ptr<BKSingleSlider> offsetSlider;
+    ToggleButton velocityInvertToggle;
+    
+    VelocityCurveGraph velocityCurveGraph;
+    
+    // This is just for the border
+    /* Not sure that it's necessary to have a border around this bit of UI, but these parameters are a bit obscure without something to clarify what they are actually changing. */
+    GroupComponent velocityCurveGroup;
+    
+    //======================================================================================
 
     bool selectType;
     
@@ -159,8 +179,6 @@ private:
     void bkButtonClicked            (Button* b)             override;
     
     void timerCallback() override;
-    
-    void updateKeymapTargets(void);
     
     bool focusLostByEscapeKey;
     

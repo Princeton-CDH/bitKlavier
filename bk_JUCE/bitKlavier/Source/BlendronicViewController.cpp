@@ -689,7 +689,7 @@ void BlendronicPreparationEditor::timerCallback()
             {
                 bool makeBright = false;
                 for (auto km : proc->getKeymaps())
-                    if (km->getTargetStates()[(KeymapTargetType) i] == TargetStateEnabled) makeBright = true;
+                    if (km->getTargetStates()[(KeymapTargetType) i]) makeBright = true;
                 
                 if (makeBright)
                 {
@@ -738,7 +738,7 @@ void BlendronicPreparationEditor::timerCallback()
                 }
             }
             
-            if (prep->outGain.didChanged()) gainSlider->setValue(prep->outGain.value, dontSendNotification);
+            if (prep->outGain.didChange()) gainSlider->setValue(prep->outGain.value, dontSendNotification);
         }
     }
 }

@@ -499,9 +499,10 @@ public:
     BKSampleLoadType sampleType;
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
     
-    void    keyPressed(int noteNumber, float velocity, int channel);
-    void    keyReleased(int noteNumber, float velocity, int channel, bool soundfont = false);
-    void    playReleaseSample(int noteNumber, float velocity, int channel, bool soundfont = false);
+    void    keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void    keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void    playReleaseSample(int noteNumber, Array<float>& targetVelocities,
+                              bool fromPress, bool soundfont = false);
     
     inline void prepareToPlay(double sr, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
     {
@@ -550,7 +551,15 @@ public:
     
     inline float getLastVelocity() const noexcept { return lastVelocity; }
     
-    bool velocityCheck(int noteNumber);
+    // Return vel if within range, else return -1.f
+    float filterVelocity(float vel);
+    void resetLastVelocity() { lastVelocityInRange = false; }
+    
+    Array<Array<float>>& getVelocities() { return velocities; }
+    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    
+    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
+    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     
 private:
     BKSynthesiser*      synth;
@@ -566,13 +575,14 @@ private:
     //need to keep track of the actual notes played and their offsets when a particular key is pressed
     //so that they can all be turned off properly, even in the event of a preparation change
     //while the key is held
-    Array<int>      keyPlayed[128];         //keep track of pitches played associated with particular key on keyboard
+    Array<int>      keyPlayed[128];//keep track of pitches played associated with particular key on keyboard
     Array<float>    keyPlayedOffset[128];   //and also the offsets
     
-    Array<float> velocities;
-    Array<float> velocitiesActive;
+    Array<Array<float>> velocities;
+    Array<Array<float>> invertVelocities;
     
     float lastVelocity = 0.0f;
+    bool lastVelocityInRange = false;
     
     JUCE_LEAK_DETECTOR(DirectProcessor);
 };

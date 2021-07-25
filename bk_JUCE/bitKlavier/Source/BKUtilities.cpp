@@ -772,45 +772,45 @@ double ftom( double f, double sr )
     return (f > 0 ? (log(f / sr) / LOGTWO) * 12.0 + 69 : -1500);
 }
 
+// warping functions, for velocity curves and other parameters that
+// might benefit from some signal conditioning
 
-//these require inval to be between 0 and 1, and k != 1
-//they warp the input asymmetrically, mostly to
-//help focus one extreme or another of a slider range
+// these require inval to be between 0 and 1, and k != 1
+// they warp the input asymmetrically, mostly to
+// help focus one extreme or another of a slider range
+
+// https://www.desmos.com/calculator/kfajuawsfs, to play with params/graphing
+
+
 double dt_asymwarp(double inval, double k)
 {
-    if(k==1) return inval;
+    if(k == 1) return inval;
     return (pow(k, inval) - 1.) / (k - 1.);
 }
 
 double dt_asymwarp_inverse(double inval, double k)
 {
-    if(k==1) return inval;
-    return log(inval*(k-1) + 1) / log(k);
+    if(k == 1) return inval;
+    return log(inval * (k-1) + 1) / log(k);
 }
 
-//could add this as well, if it would be useful:
-//symmetrical:
-//y = 0.5*((2x-1)^(1/k) - 1)
-//k = 3 is typical. otherwise have to correct for x<0.5 (mirror)
-
-/*
-fun float dt_symwarp(float inval, float k, int symwarp_type)
+// this one warps symmetrically around 0.5, keeping 0 and 1 fixed
+double dt_symwarp(double inval, double k)
 {
-    float sym_warped;
-    if(inval >= 0.5) {
-        Math.pow(2.*inval - 1., 1./k) => sym_warped;
-        if (symwarp_type == 1) return (sym_warped + 1.) * 0.5;
-        if (symwarp_type == 2) return 2. * (sym_warped - 0.5);
-        if (symwarp_type == 3) return 2. * (1. - sym_warped);
-    }
-    1. - inval => inval; // for S curve
-    Math.pow(2.*inval - 1., 1./k) => sym_warped;
-    (sym_warped + 1.) * 0.5 => sym_warped;
-    if (symwarp_type == 1) return 1. - sym_warped;
-    if (symwarp_type == 2) return 2. * (sym_warped - 0.5);
-    if (symwarp_type == 3) return 2. * (1. - sym_warped);
+    if(k == 1) return inval;
+    
+    if (inval < 0.5)    return 1. - 0.5 * (pow(1. - 2. * inval, k) + 1);
+    else                return      0.5 * (pow(2. * inval - 1., k) + 1);
 }
-*/
+
+// this one combines asymwarp, symwarp, and generally scaling and offset
+// with both k values == 1, this is linear
+// with scale = 1 and offset = 0, and k's == 1, this returns the input
+double dt_warpscale(double inval, double asym_k, double sym_k, double scale, double offset)
+{
+    return offset + scale * dt_asymwarp(dt_symwarp(inval, sym_k), asym_k);
+}
+
 
 int mod(int a, int b) { return (a % b + b) % b; }
 

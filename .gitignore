@@ -1,4 +1,5 @@
 Builds/
+JuceLibraryCode/
 *.DS_Store
 *.app
 *.a

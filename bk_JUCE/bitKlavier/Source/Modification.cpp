@@ -71,7 +71,9 @@ void DirectModification::setState(XmlElement* e)
         {
             // comes in as "soundfont.sf2.subsound1"
             String name = dSoundSetName.value;
-            BKSampleLoadType type = BKLoadSoundfont;
+            BKSampleLoadType type;
+            String path;
+            int subsound = 0;
             
             for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
             {
@@ -81,21 +83,27 @@ void DirectModification::setState(XmlElement* e)
                 }
             }
             
-            String path = name.upToLastOccurrenceOf(".subsound", false, false);
-            int subsound = 0;
-            
-            if (type == BKLoadSoundfont)
+            String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
+            for (auto sf : processor.soundfontNames)
             {
-                for (auto sf : processor.soundfontNames)
+                if (sf.contains(sfName))
                 {
-                    if (sf.contains(path))
-                    {
-                        path = sf;
-                        break;
-                    }
+                    type = BKLoadSoundfont;
+                    path = sf;
+                    subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+                    break;
                 }
-                
-                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+            }
+            
+            
+            for (auto cs : processor.customSampleSetNames)
+            {
+                if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
+                {
+                    type = BKLoadCustom;
+                    path = cs;
+                    break;
+                }
             }
             int Id = processor.loadSamples(type, path, subsound, false);
             setSoundSet(Id);
@@ -139,7 +147,7 @@ void DirectModification::setStateOld(XmlElement* e)
         setDirty(DirectResGain);
     }
     
-    forEachXmlChildElement (*e, sub)
+    for (auto sub : e->getChildIterator())
     {
         if (sub->hasTagName(vtagDirect_transposition))
         {
@@ -242,7 +250,9 @@ void SynchronicModification::setState(XmlElement* e)
         {
             // comes in as "soundfont.sf2.subsound1"
             String name = sSoundSetName.value;
-            BKSampleLoadType type = BKLoadSoundfont;
+            BKSampleLoadType type;
+            String path;
+            int subsound = 0;
             
             for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
             {
@@ -252,21 +262,27 @@ void SynchronicModification::setState(XmlElement* e)
                 }
             }
             
-            String path = name.upToLastOccurrenceOf(".subsound", false, false);
-            int subsound = 0;
-            
-            if (type == BKLoadSoundfont)
+            String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
+            for (auto sf : processor.soundfontNames)
             {
-                for (auto sf : processor.soundfontNames)
+                if (sf.contains(sfName))
                 {
-                    if (sf.contains(path))
-                    {
-                        path = sf;
-                        break;
-                    }
+                    type = BKLoadSoundfont;
+                    path = sf;
+                    subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+                    break;
                 }
-                
-                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+            }
+            
+            
+            for (auto cs : processor.customSampleSetNames)
+            {
+                if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
+                {
+                    type = BKLoadCustom;
+                    path = cs;
+                    break;
+                }
             }
             int Id = processor.loadSamples(type, path, subsound, false);
             setSoundSet(Id);
@@ -333,7 +349,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         setDirty(SynchronicGain);
     }
     
-    forEachXmlChildElement (*e, sub)
+    for (auto sub : e->getChildIterator())
     {
         if (sub->hasTagName(vtagSynchronic_beatMults))
         {
@@ -397,7 +413,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         {
             Array<Array<float>> atransp;
             int tcount = 0;
-            forEachXmlChildElement (*sub, asub)
+            for (auto asub : sub->getChildIterator())
             {
                 if (asub->hasTagName("t"+String(tcount++)))
                 {
@@ -425,7 +441,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
         {
             Array<Array<float>> aenvs;
             int tcount = 0;
-            forEachXmlChildElement (*sub, asub)
+            for (auto asub : sub->getChildIterator())
             {
                 if (asub->hasTagName("e"+String(tcount++)))
                 {
@@ -511,7 +527,9 @@ void NostalgicModification::setState(XmlElement* e)
         {
             // comes in as "soundfont.sf2.subsound1"
             String name = nSoundSetName.value;
-            BKSampleLoadType type = BKLoadSoundfont;
+            BKSampleLoadType type;
+            String path;
+            int subsound = 0;
             
             for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
             {
@@ -521,21 +539,27 @@ void NostalgicModification::setState(XmlElement* e)
                 }
             }
             
-            String path = name.upToLastOccurrenceOf(".subsound", false, false);
-            int subsound = 0;
-            
-            if (type == BKLoadSoundfont)
+            String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
+            for (auto sf : processor.soundfontNames)
             {
-                for (auto sf : processor.soundfontNames)
+                if (sf.contains(sfName))
                 {
-                    if (sf.contains(path))
-                    {
-                        path = sf;
-                        break;
-                    }
+                    type = BKLoadSoundfont;
+                    path = sf;
+                    subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+                    break;
                 }
-                
-                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+            }
+            
+            
+            for (auto cs : processor.customSampleSetNames)
+            {
+                if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
+                {
+                    type = BKLoadCustom;
+                    path = cs;
+                    break;
+                }
             }
             int Id = processor.loadSamples(type, path, subsound, false);
             setSoundSet(Id);
@@ -567,7 +591,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
         setDirty(NostalgicUndertow);
     }
     
-    forEachXmlChildElement (*e, sub)
+    for (auto sub : e->getChildIterator())
     {
         if (sub->hasTagName(vtagNostalgic_transposition))
         {
@@ -914,7 +938,7 @@ void TuningModification::setStateOld(XmlElement* e)
     }
     
     // custom scale
-    forEachXmlChildElement (*e, sub)
+    for (auto sub : e->getChildIterator())
     {
         if (sub->hasTagName("twa"))
         {

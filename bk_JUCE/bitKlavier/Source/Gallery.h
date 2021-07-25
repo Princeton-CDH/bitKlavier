@@ -738,7 +738,6 @@ public:
     
     void clean(void);
     
-    
     void addSynchronicWithId(int Id);
     void addNostalgicWithId(int Id);
     void addTuningWithId(int Id);

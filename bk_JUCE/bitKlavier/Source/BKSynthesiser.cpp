@@ -516,12 +516,9 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 	const ScopedLock sl(lock);
 
 	int noteNumber = midiNoteNumber;
+    if (noteNumber > 108 || noteNumber < 21) return nullptr;
+    float transposition = transp;
 
-	// ADDED THIS
-	if (noteNumber > 108 || noteNumber < 21) return nullptr;
-
-	float transposition = transp;
-    
     // needed for MIDI Out; will just return the last found voice, if there are multiple voices
     BKSynthesiserVoice* voiceToReturn;
     
@@ -558,6 +555,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                        transposition,
                        gain,
                        velocity,
+                       //rangeExtend,
                        direction,
                        type,
                        bktype,
@@ -614,6 +612,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                midiNoteNumberOffset,
                gain,
                velocity,
+               //0, // for now
                direction,
                type,
                bktype,
@@ -639,6 +638,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                                const float midiNoteNumberOffset,
                                const float gain,
                                const float velocity,
+                               //const float rangeExtend,
                                PianoSamplerNoteDirection direction,
                                PianoSamplerNoteType type,
                                BKNoteType bktype,
@@ -691,6 +691,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                          pitchWheelValue,
                          g,
                          velocity,
+                         //rangeExtend,
                          direction,
                          type,
                          bktype,
@@ -814,6 +815,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
                        0, // might need to deal with this
                        gain,
                        velocity,
+                       //0, // for now
                        Forward,
                        FixedLengthFixedStart,
                        DirectNote,             //
