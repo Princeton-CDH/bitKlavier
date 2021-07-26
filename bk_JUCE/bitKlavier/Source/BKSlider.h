@@ -59,7 +59,6 @@ private:
 
 
 
-
 // ******************************************************************************************************************** //
 // **************************************************  BKMultiSlider ************************************************** //
 // ******************************************************************************************************************** //
@@ -102,6 +101,7 @@ public:
     BKMultiSlider();
     ~BKMultiSlider();
         
+    void hideRotateButton();
     // when the client sends an array of only the active slider values, this will construct the complete array
     // of slider values, including inactive sliders, and then call setTo. So
     //      newActiveVals = {1, 2, 3}

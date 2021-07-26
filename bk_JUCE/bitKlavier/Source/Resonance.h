@@ -49,6 +49,7 @@ public:
         rMinStartTimeMS(r->rMinStartTimeMS),
         rMaxStartTimeMS(r->rMaxStartTimeMS),
         rMaxSympStrings(r->rMaxSympStrings),
+        rFundamental(r->rFundamental),
         name(r->name)
     {
         
@@ -68,6 +69,7 @@ public:
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
         rMaxSympStrings(8),
+        rFundamental(1),
         name(newName)
     {
 
@@ -87,6 +89,7 @@ public:
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
         rMaxSympStrings(8),
+        rFundamental(1),
         name("test resonance preparation")
         
     {
@@ -202,17 +205,65 @@ public:
     // => cap the number of sympStrings to this
     Moddable<int> rMaxSympStrings;
     
+    Moddable<int> rFundamental;
+    
     inline const int getMinStartTime() const noexcept { return rMinStartTimeMS.value; }
     inline const int getMaxStartTime() const noexcept { return rMaxStartTimeMS.value; }
     inline const int getMaxSympStrings() const noexcept { return rMaxSympStrings.value; }
-    
+    inline const int getFundamental() const noexcept { return rFundamental.value; }
+
     inline void setMinStartTime(int inval) { rMinStartTimeMS = inval; }
     inline void setMaxStartTime(int inval) { rMaxStartTimeMS = inval; }
     inline void setMaxSympStrings(int inval) { rMaxSympStrings = inval; }
+    inline void setOffset(int i, int inval) { offsets.set(i, inval);}
+    inline void setGain(int i, int inval) { gains.set(i, inval);
+        DBG("setGain called");
+    }
+    
+    inline void setFundamental(int fun){rFundamental = fun; }
+    inline void addActive(int midiNoteNumber, float gain, float offset) {
+//        isActiveArray.ensureStorageAllocated(49);
+        isActiveArray[midiNoteNumber - 24] = true;
+        gains.insert(midiNoteNumber - 24, gain);
+        DBG("gains size: " + String(gains.size()));
+        offsets.insert(midiNoteNumber - 24, offset);
+        partialStructure.add({midiNoteNumber - getFundamental(), gain, offset});
+}
+    inline void removeActive(int midiNoteNumber) {isActiveArray[midiNoteNumber - 24] = false;
+;
+        bool setTo = isActive(midiNoteNumber);
+        if (setTo) {
+            DBG("removeActive called isActive is true");
+        }
+        else {
+            DBG("removeActive called isActive is false");
+        }
+    
+    }
+
+    inline bool isActive(int midiNoteNumber) {return isActiveArray[midiNoteNumber-24]; }
+    inline void updatePartialStructure() {
+        partialStructure.clearQuick();
+        for (int i = 0; i < 49; i++){
+            if (isActiveArray[i])
+            {
+                partialStructure.add({i, gains[i], offsets[i]});
+            }
+        }
+        
+    }
+
 
 private:
 
     String name;
+    Array<Array<float>> partialStructure;
+//    Array<bool, DummyCriticalSection, 49> isActiveArray;
+    bool isActiveArray[49];
+//    float gains[49];
+//    float offsets[49];
+    Array<float> gains;
+    Array<float> offsets;
 
     JUCE_LEAK_DETECTOR(ResonancePreparation);
 };
@@ -397,11 +448,13 @@ public:
     inline TuningProcessor::Ptr getTuning(void) const noexcept { return tuning; }
     inline int getId(void) const noexcept { return resonance->getId(); }
     inline int getTuningId(void) const noexcept { return tuning->getId(); }
+    
+//    inline getRinging[](void) {return ringing;}
    
     //mutators
     inline void setResonance(Resonance::Ptr res) { resonance = res; }
     inline void setTuning(TuningProcessor::Ptr tun) { tuning = tun; }
-
+    
     void processBlock(int numSamples, int midiChannel);
 
     inline void addKeymap(Keymap::Ptr keymap)
@@ -423,6 +476,8 @@ public:
     {
         return blendronic;
     }
+    
+   
 
 private:
     CriticalSection lock;
@@ -433,6 +488,8 @@ private:
     GeneralSettings::Ptr        general;
     Keymap::PtrArr              keymaps;
     BlendronicProcessor::PtrArr blendronic;
+    
+    bool ringing[88] = {false};
     
     // basic API
     void ringSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates); 
