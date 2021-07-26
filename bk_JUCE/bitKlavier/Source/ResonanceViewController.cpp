@@ -35,15 +35,15 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
 
-    
-//    overtonesSlider = std::make_unique<BKStackedSlider>("overtones", -50, 50, -50, 50, 0, 1);
-//    overtonesSlider->setTooltip("Determines overtone pitches that resonance with a fundamental; control-click to add another voice, double-click to edit all");
-//    addAndMakeVisible(*overtonesSlider);
-
     defGainSlider = std::make_unique<BKSingleSlider>("resonant note volume (dB)", cResonanceDefGain, -100, 24, 0, 0.01, "-inf");
     defGainSlider->setJustifyRight(false);
     defGainSlider->setToolTipString("Adjusts overall volume of resonant notes");
     addAndMakeVisible(*defGainSlider);
+    
+    blendGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", cBlendronicOutGain, -100, 24, 0, 0.01, "-inf");
+    blendGainSlider->setJustifyRight(false);
+    blendGainSlider->setToolTipString("Adjusts overall volume of resonant notes");
+    addAndMakeVisible(*blendGainSlider);
 
 //    startTimeSlider = std::make_unique<BKSingleSlider>("start time (ms)", cResonanceStartTime, -4000, 4000, 2000, 1);
     
@@ -56,21 +56,6 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     maxSympStringsSlider->setJustifyRight(false);
     maxSympStringsSlider->setToolTipString("Adjusts maximum number of sympathetic strings");
     addAndMakeVisible(*maxSympStringsSlider);
-    
-    lengthSlider = std::make_unique<BKSingleSlider>("note length (ms)", cResonanceLength, -4000, 4000, 2000, 1);
-    lengthSlider->setJustifyRight(false);
-    lengthSlider->setToolTipString("Adjusts length of resonant notes");
-    addAndMakeVisible(*lengthSlider);
-
-    exciteThreshSlider = std::make_unique<BKSingleSlider>("excitement threshold (dB)", cResonanceExciteThresh, -100, 24, 1, 0.01, "-inf");
-    exciteThreshSlider->setJustifyRight(false);
-    exciteThreshSlider->setToolTipString("Adjusts the gain threshold which strings must be below to resonate");
-    addAndMakeVisible(*exciteThreshSlider);
-
-    attackThreshSlider = std::make_unique<BKSingleSlider>("attack threshold (ms)", cResonanceAttackThresh, -100, 24, 0, 0.01);
-    attackThreshSlider->setJustifyRight(false);
-    attackThreshSlider->setToolTipString("Adjusts the velocity threshold which attacking strings must be above to resonate");
-    addAndMakeVisible(*attackThreshSlider);
 
     ADSRSlider = std::make_unique<BKADSRSlider>("Resonance envelope");
     ADSRSlider->setButtonText("edit resonance envelope");
@@ -89,6 +74,13 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     absoluteKeyboard->setAvailableRange(24, 24+NUM_KEYS);
     absoluteKeyboard->setOctaveForMiddleC(4);
     addAndMakeVisible(*absoluteKeyboard);
+    
+    fundamentalKeyboard = std::make_unique<BKKeymapKeyboardComponent> (fundamentalKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    fundamentalKeyboard->setName("fundamental");
+//    absoluteKeyboard.setAlpha(1);
+    fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS);
+    fundamentalKeyboard->setOctaveForMiddleC(4);
+    addAndMakeVisible(*fundamentalKeyboard);
     
 //    ringingKeyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
 //    ringingKeyboard->setName("ringing");
@@ -122,17 +114,17 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     
     for (int i = 0; i < NUM_KEYS; i++)
     {
-        ToggleButton* t = new ToggleButton();
-        t->setToggleState(true, dontSendNotification);
-        t->setLookAndFeel(&buttonsAndMenusLAF);
-        t->setTooltip("Toggle whether this key is your fundamental");
-        t->addListener(this);
-        t->setRadioGroupId(1);
+//        ToggleButton* t = new ToggleButton();
+//        t->setToggleState(false, dontSendNotification);
+//        t->setLookAndFeel(&buttonsAndMenusLAF);
+//        t->setTooltip("Toggle whether this key is your fundamental");
+//        t->addListener(this);
+//        t->setRadioGroupId(1);
 //        t->setClickingTogglesState(true);
-        
-        addChildComponent(t);
-        addAndMakeVisible(t);
-        fundamentalButtons.add(t);
+//
+//        addChildComponent(t);
+//        addAndMakeVisible(t);
+//        fundamentalButtons.add(t);
         
         BKSubSlider* refSlider = new BKSubSlider(Slider::LinearBarVertical,
                                                                  sliderMin,
@@ -191,11 +183,11 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
 //    lastNote.setTooltip("last note played as MIDI value");
 //    addAndMakeVisible(lastNote);
     
-    closestKey.setText("Closest Key: ", dontSendNotification);
-    addAndMakeVisible(closestKey);
+    closestKeyLabel.setText("Closest Key: ", dontSendNotification);
+    addAndMakeVisible(closestKeyLabel);
     
-    fundamental.setText("Fundamental: ", dontSendNotification);
-    addAndMakeVisible(fundamental);
+    fundamentalLabel.setText("Fundamental: ", dontSendNotification);
+    addAndMakeVisible(fundamentalLabel);
     
     gainsLabel.setText("Gains: ", dontSendNotification);
     addAndMakeVisible(gainsLabel);
@@ -254,22 +246,27 @@ void ResonanceViewController::displayTab(int tab)
 //        area.removeFromTop(gComponentComboBoxHeight);
         area.reduce(0.f, area.getHeight() * 0.2f);
 #endif
-        
-//        Rectangle<int> topRows = area.removeFromTop(area.getHeight()*0.25);
-//        Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.05);
-//        leftColumn.removeFromTop(gYSpacing + processor.paddingScalarY * 30);
-        
-//        overtonesSlider->setBounds(leftColumn.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
-       
         float keyboardHeight = 80 * processor.paddingScalarY;
         
+        Rectangle<int> fundamentalKeyboardRow = area.removeFromBottom(keyboardHeight);
+        
+        fundamentalLabel.setBounds(fundamentalKeyboardRow.removeFromLeft(fundamentalKeyboardRow.getWidth()*0.1));
+        fundamentalLabel.setVisible(true);
+        
+        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12 + 1); //num white keys, gives error
+        
+        fundamentalKeyboard->setKeyWidth(18.5);
+//        absoluteKeyboard->setKeyWidth(absoluteKeyboardRow.getWidth()/NUM_KEYS); //gives error
+        fundamentalKeyboard->setBlackNoteLengthProportion(0.6);
+        fundamentalKeyboard->setBounds(fundamentalKeyboardRow);
+        fundamentalKeyboard->setVisible(true);
+        
+        area.removeFromBottom(processor.paddingScalarX * 10);
+        
         Rectangle<int> absoluteKeyboardRow = area.removeFromBottom(keyboardHeight);
-//        absoluteKeyboardRow.reduce(gXSpacing, 0);
         
-        closestKey.setBounds(absoluteKeyboardRow.removeFromLeft(absoluteKeyboardRow.getWidth()*0.1));
-        closestKey.setVisible(true);
-        
-        float keyWidth = absoluteKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12 + 1); //num white keys, gives error
+        closestKeyLabel.setBounds(absoluteKeyboardRow.removeFromLeft(absoluteKeyboardRow.getWidth()*0.1));
+        closestKeyLabel.setVisible(true);
         
         DBG("calculated key width: "+ String(keyWidth));
         DBG("width of row: " + String(absoluteKeyboardRow.getWidth()));
@@ -279,29 +276,8 @@ void ResonanceViewController::displayTab(int tab)
         absoluteKeyboard->setBlackNoteLengthProportion(0.6);
         absoluteKeyboard->setBounds(absoluteKeyboardRow);
         absoluteKeyboard->setVisible(true);
-        
-        area.removeFromBottom(10 * processor.paddingScalarY);
-
-        float buttonHeight = 11 + processor.paddingScalarY;
-        Rectangle<int> fundamentalButtonRow = area.removeFromBottom(buttonHeight);
-        
-        fundamental.setBounds(fundamentalButtonRow.removeFromLeft(fundamentalButtonRow.getWidth()*0.1));
-        fundamental.setVisible(true);
-        
-        area.removeFromBottom(10 * processor.paddingScalarY);
-        
-//        float buttonWidth = fundamentalButtonRow.getWidth() *1.0 / (NUM_KEYS + 5);
-        float buttonWidth = (fundamentalButtonRow.getWidth() - 49 * processor.paddingScalarX)/ NUM_KEYS;
-        DBG("buttonwidth = " + String(buttonWidth));
-        DBG("row width = " + String(fundamentalButtonRow.getWidth()));
-        for (int i = 0; i < NUM_KEYS; i++){
-//            fundamentalButtons[i]->setBounds(fundamentalButtonRow.removeFromLeft(absoluteKeyboardRow.getWidth() / (NUM_KEYS * 1.0))); ///NUM_KEYS));
-            fundamentalButtons[i]->setBounds(fundamentalButtonRow);
-            fundamentalButtons[i]->setVisible(true);
-            fundamentalButtonRow.removeFromLeft(buttonWidth + processor.paddingScalarX);
-        }
-        
-        area.removeFromBottom(processor.paddingScalarY);
+    
+        area.removeFromBottom(processor.paddingScalarY * 10);
 
         float multiHeight = 100 + processor.paddingScalarY;
         
@@ -332,18 +308,18 @@ void ResonanceViewController::displayTab(int tab)
 
         
         float sliderHeight = 50 + processor.paddingScalarY;
-        Rectangle<int> sliderRow = area.removeFromBottom(sliderHeight);
+//        Rectangle<int> sliderRow = area.removeFromBottom(sliderHeight);
         
-        Rectangle<int> volumeSlider = sliderRow.removeFromLeft(sliderRow.getWidth()/3);
-        defGainSlider->setBounds(volumeSlider);
-        defGainSlider->setVisible(true);
-        
-        Rectangle<int> startSlider = sliderRow.removeFromLeft(sliderRow.getWidth()/2);
-        startTimeSlider->setBounds(startSlider);
-        startTimeSlider->setVisible(true);
-    
-        maxSympStringsSlider->setBounds(sliderRow);
-        maxSympStringsSlider->setVisible(true);
+//        Rectangle<int> volumeSlider = sliderRow.removeFromLeft(sliderRow.getWidth()/3);
+//        defGainSlider->setBounds(volumeSlider);
+//        defGainSlider->setVisible(true);
+//
+//        Rectangle<int> startSlider = sliderRow.removeFromLeft(sliderRow.getWidth()/2);
+//        startTimeSlider->setBounds(startSlider);
+//        startTimeSlider->setVisible(true);
+//
+//        maxSympStringsSlider->setBounds(sliderRow);
+//        maxSympStringsSlider->setVisible(true);
     
 //
 //        Rectangle<float> editAllBounds = absoluteKeyboard.getEditAllBounds();
@@ -361,9 +337,7 @@ void ResonanceViewController::displayTab(int tab)
         
 //        defGainSlider->setVisible(true);
 //        startTimeSlider->setVisible(true);
-        lengthSlider->setVisible(true);
-        exciteThreshSlider->setVisible(true);
-        attackThreshSlider->setVisible(true);
+        
         ADSRSlider->setVisible(true);
         ADSRLabel.setVisible(true);
 
@@ -372,12 +346,33 @@ void ResonanceViewController::displayTab(int tab)
         
         //single parameter sliders
 
+        
         int columnHeight = area.getHeight();
+        
+        area.removeFromTop(columnHeight/5);
+ 
+        int columnWidth = area.getWidth()/2;
 //        defGainSlider->setBounds(area.removeFromTop(columnHeight / 5));
 //        startTimeSlider->setBounds(area.removeFromTop(columnHeight / 5));
-        lengthSlider->setBounds(area.removeFromTop(columnHeight / 5));
-        exciteThreshSlider->setBounds(area.removeFromTop(columnHeight / 5));
-        attackThreshSlider->setBounds(area.removeFromTop(columnHeight / 5));
+        
+        Rectangle<int> firstRow = area.removeFromTop(columnHeight / 5);
+        defGainSlider->setBounds(firstRow.removeFromLeft(columnWidth));
+        defGainSlider->setVisible(true);
+        
+        blendGainSlider->setBounds(firstRow);
+        blendGainSlider->setVisible(true);
+
+        
+        Rectangle<int> secondRow = area.removeFromTop(columnHeight / 5);
+
+        
+        startTimeSlider->setBounds(secondRow.removeFromLeft(columnWidth));
+        startTimeSlider->setVisible(true);
+        
+        maxSympStringsSlider->setBounds(secondRow);
+        maxSympStringsSlider->setVisible(true);
+        
+        
         ADSRLabel.setBounds(area.removeFromTop(columnHeight / 8));
         ADSRSlider->setBounds(area.removeFromTop(columnHeight / 5));
 
@@ -414,7 +409,6 @@ void ResonanceViewController::displayShared(void)
 //    overtonesSlider->setVisible(true);
 //    defGainSlider->setVisible(true);
 //    startTimeSlider->setVisible(true);
-//    lengthSlider->setVisible(true);
 //    exciteThreshSlider->setVisible(true);
 //    attackThreshSlider->setVisible(true);
 //    ADSRSlider->setVisible(true);
@@ -449,33 +443,26 @@ void ResonanceViewController::displayShared(void)
 
 void ResonanceViewController::invisible(void)
 {
-//    overtonesSlider->setVisible(false);
     defGainSlider->setVisible(false);
     startTimeSlider->setVisible(false);
-    lengthSlider->setVisible(false);
-    exciteThreshSlider->setVisible(false);
-    attackThreshSlider->setVisible(false);
     maxSympStringsSlider->setVisible(false);
+    blendGainSlider->setVisible(false);
     
+    gainsLabel.setVisible(false);
+    offsetsLabel.setVisible(false);
     ADSRSlider->setVisible(false);
     ADSRLabel.setVisible(false);
     
     absoluteKeyboard->setVisible(false);
-//    ringingKeyboard->setVisible(false);
-//    offsets.setVisible(false);
-//    gains.setVisible(false);
-    
+
     for (int i = 0; i < NUM_KEYS; i++) {
         offsetsArray[i]->setVisible(false);
         gainsArray[i]->setVisible(false);
     }
 
-    closestKey.setVisible(false);
-    fundamental.setVisible(false);
-    
-    for (int i = 0; i < fundamentalButtons.size(); i++){
-        fundamentalButtons[i]->setVisible(false);
-    }
+    closestKeyLabel.setVisible(false);
+    fundamentalLabel.setVisible(false);
+
 }
 
 
@@ -492,22 +479,15 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
 
     fillSelectCB(-1, -1);
 
-//    overtonesSlider->addMyListener(this);
     defGainSlider->addMyListener(this);
     startTimeSlider->addMyListener(this);
-    lengthSlider->addMyListener(this);
-    exciteThreshSlider->addMyListener(this);
-    attackThreshSlider->addMyListener(this);
-
-//    absoluteKeyboard->addMyListener(this);
+    blendGainSlider->addMyListener(this);
+    maxSympStringsSlider->addMyListener(this);
 
     ADSRSlider->addMyListener(this);
     keyboardState.addListener(this);
+    fundamentalKeyboardState.addListener(this);
 
-//    for (int i = 0; i < offsetsArray.size(); i++){
-//        offsetsArray[i]->addListener(this);
-//        fundamentalButtons[i]->addListener(this);
-//    }
     
     
     startTimer(30);
@@ -659,21 +639,22 @@ void ResonancePreparationEditor::buttonClicked(Button* b)
 
         displayTab(currentTab);
     }
-    else
-    {
-        for (int i=0; i<fundamentalButtons.size(); i++)
-        {
-            if (b == fundamentalButtons[i])
-            {
-                ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
-                prep->setFundamental(i);
-//                DBG("Keymap toggle change: " + (String)cKeymapTargetTypes[i] + " " + String((int)b->getToggleState()));
-//                fundamentalButtons[i]->setToggleState(true, dontSendNotification);
-                DBG("new fundamental:" + String(prep->getFundamental()));
-                DBG("button pressed:" + String(i));
-                DBG("number of buttons:" + String(fundamentalButtons.size()));
-            }
-        }
+//    else
+//    {
+//        for (int i=0; i<fundamentalButtons.size(); i++)
+//        {
+//            if (b == fundamentalButtons[i])
+//            {
+//                ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+//                prep->setFundamental(i);
+////                DBG("Keymap toggle change: " + (String)cKeymapTargetTypes[i] + " " + String((int)b->getToggleState()));
+////                fundamentalButtons[i]->setToggleState(true, dontSendNotification);
+//                DBG("new fundamental:" + String(prep->getFundamental()));
+//                DBG("button pressed:" + String(i));
+//                DBG("number of buttons:" + String(fundamentalButtons.size()));
+//                DBG("clicked toggle state:" + String((int)b->getToggleState()));
+//            }
+//        }
         processor.updateState->editsMade = true;
     }
 //    else if (b == fundamentalButtons[1])
@@ -685,7 +666,7 @@ void ResonancePreparationEditor::buttonClicked(Button* b)
 //        prep->setFundamental(1);
 //    }
     //can leave blank for now since there are no buttons, will need to fill in later
-}
+//}
 
 void ResonancePreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
@@ -696,33 +677,19 @@ void ResonancePreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
 {
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
 
-    if (name == "resonant note volume (dB)")
+    if (name == defGainSlider->getName())
     {
         DBG("set resonant note volume to " + String(val));
         prep->setDefGain(val);
     }
-//    else if (name == "start time (ms)")
-//    {
-//        DBG("set start time to " + String(val));
-//        //prep->setStartTime(val);
-//    }
-    else if (name == "note length (ms)")
+    else if (name == blendGainSlider->getName())
     {
-        DBG("set length to " + String(val));
-        //prep->setLength(val);
-    }
-    else if (name == "excitement threshold (dB)")
-    {
-        DBG("set excitement threshold to " + String(val));
-        //prep->setExciteThresh(val);
-    }
-    else if (name == "attack threshold (dB)")
-    {
-        DBG("set attack threshold to " + String(val));
-        //prep->setAttackThresh(val);
+        DBG("set blendronic gain to " + String(val));
+        prep->setBlendGain(val);
     }
     else if (name == maxSympStringsSlider->getName())
     {
+        DBG("set max symp strings to " + String(val));
         prep->setMaxSympStrings(val);
     }
     else {
@@ -804,10 +771,20 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
             isActive.set(midiNoteNumber - 24, true);
             DBG("adding active"+ String(midiNoteNumber));
         }
-        
         update();
 
     }
+    else if (source == &fundamentalKeyboardState)
+    {
+//        thisKeymap->toggleNote(midiNoteNumber);
+        fundamentalKeyboard->setKeysInKeymap(thisKeymap->keys());
+        
+        prep->setFundamental(midiNoteNumber);
+        DBG("fundamental key toggled");
+        update();
+
+    }
+        
 }
 
 void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float> values)

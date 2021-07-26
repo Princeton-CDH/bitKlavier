@@ -35,9 +35,7 @@ public:
     //will do something with overtoneGains eventually
 
     std::unique_ptr<BKRangeSlider> startTimeSlider;
-    std::unique_ptr<BKSingleSlider> lengthSlider;
-    std::unique_ptr<BKSingleSlider> exciteThreshSlider;
-    std::unique_ptr<BKSingleSlider> attackThreshSlider;
+    std::unique_ptr<BKSingleSlider> blendGainSlider;
     std::unique_ptr<BKSingleSlider> defGainSlider;
     std::unique_ptr<BKSingleSlider> maxSympStringsSlider;
     
@@ -49,11 +47,12 @@ public:
     BKLabel lastNote;
 
     BKKeymapKeyboardState keyboardState;
+    BKKeymapKeyboardState fundamentalKeyboardState;
     
     OwnedArray<ToggleButton> fundamentalButtons;
     
     std::unique_ptr<BKKeymapKeyboardComponent> absoluteKeyboard;
-    std::unique_ptr<BKKeymapKeyboardComponent> ringingKeyboard;
+    std::unique_ptr<BKKeymapKeyboardComponent> fundamentalKeyboard;
 
 
     std::unique_ptr<BKADSRSlider> ADSRSlider;
@@ -70,8 +69,8 @@ public:
     int NUM_KEYS;
 
     BKLabel         ADSRLabel;
-    BKLabel closestKey;
-    BKLabel fundamental;
+    BKLabel closestKeyLabel;
+    BKLabel fundamentalLabel;
     BKLabel gainsLabel;
     BKLabel offsetsLabel;
 

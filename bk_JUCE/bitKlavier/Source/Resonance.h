@@ -72,7 +72,9 @@ public:
         rFundamental(1),
         name(newName)
     {
-
+        for (int i =0; i < 49; i++) {
+            isActiveArray.add(false);
+        }
     }
 
     //empty constructor, values will need to be tweaked
@@ -93,7 +95,9 @@ public:
         name("test resonance preparation")
         
     {
-
+        for (int i =0; i < 49; i++) {
+            isActiveArray.add(false);
+        }
     }
 
     // copy, modify, compare, randomize
@@ -223,14 +227,13 @@ public:
     inline void setFundamental(int fun){rFundamental = fun; }
     inline void addActive(int midiNoteNumber, float gain, float offset) {
 //        isActiveArray.ensureStorageAllocated(49);
-        isActiveArray[midiNoteNumber - 24] = true;
+        isActiveArray.set(midiNoteNumber - 24, true);
         gains.insert(midiNoteNumber - 24, gain);
         DBG("gains size: " + String(gains.size()));
         offsets.insert(midiNoteNumber - 24, offset);
         partialStructure.add({midiNoteNumber - getFundamental(), gain, offset});
 }
-    inline void removeActive(int midiNoteNumber) {isActiveArray[midiNoteNumber - 24] = false;
-;
+    inline void removeActive(int midiNoteNumber) {isActiveArray.set(midiNoteNumber - 24, false);
         bool setTo = isActive(midiNoteNumber);
         if (setTo) {
             DBG("removeActive called isActive is true");
@@ -258,8 +261,8 @@ private:
 
     String name;
     Array<Array<float>> partialStructure;
-//    Array<bool, DummyCriticalSection, 49> isActiveArray;
-    bool isActiveArray[49];
+    Array<bool> isActiveArray;
+//    bool isActiveArray[49];
 //    float gains[49];
 //    float offsets[49];
     Array<float> gains;
