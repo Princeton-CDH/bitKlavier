@@ -399,9 +399,6 @@ public:
     void setDim(float newAlpha);
     void setBright();
     
-    // This method currently does not work
-    void setNumDecimalPlacesToDisplay(int numDecimals);
-    
 private:
     
     double sliderMin, sliderMax;

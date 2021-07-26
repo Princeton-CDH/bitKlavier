@@ -1154,11 +1154,6 @@ minDisplay(minDisplay)
 
 }
 
-void BKSingleSlider::setNumDecimalPlacesToDisplay(int numDecimals) {
-    displaySlider->setNumDecimalPlacesToDisplay(numDecimals);
-    thisSlider.setNumDecimalPlacesToDisplay(numDecimals);
-}
-
 void BKSingleSlider::setDim(float alphaVal)
 {
     thisSlider.setAlpha(alphaVal);
@@ -1186,6 +1181,7 @@ void BKSingleSlider::sliderValueChanged (Slider *slider)
         else
         {
             if(sliderTextResolution < 0) valueTF.setText(String(thisSlider.getValue()), dontSendNotification);
+            else if (sliderTextResolution == 0) valueTF.setText(String((int) thisSlider.getValue()), dontSendNotification);
             else valueTF.setText(String(thisSlider.getValue(), sliderTextResolution), dontSendNotification);
         }
         listeners.call(&BKSingleSlider::Listener::BKSingleSliderValueChanged,
@@ -1367,7 +1363,11 @@ void BKSingleSlider::setValue(double newval, NotificationType notify)
     {
         valueTF.setText(minDisplay, dontSendNotification);
     }
-    else valueTF.setText(String(thisSlider.getValue()), notify);
+    else {
+        if(sliderTextResolution < 0) valueTF.setText(String(thisSlider.getValue()), notify);
+        else if (sliderTextResolution == 0) valueTF.setText(String((int) thisSlider.getValue()), notify);
+        else valueTF.setText(String(thisSlider.getValue(), sliderTextResolution), notify);
+    }
 }
 
 void BKSingleSlider::setValue(double newval, int numDecimalPoints, NotificationType notify)
