@@ -16,6 +16,7 @@
 #include "Tuning.h"
 #include "General.h"
 #include "Keymap.h"
+#include "BKKeyboardState.h"
 #include "Blendronic.h"
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -215,6 +216,20 @@ public:
     inline const int getMaxStartTime() const noexcept { return rMaxStartTimeMS.value; }
     inline const int getMaxSympStrings() const noexcept { return rMaxSympStrings.value; }
     inline const int getFundamental() const noexcept { return rFundamental.value; }
+    
+    inline Array<int>& getKeys() {
+        return keys;
+    }
+    
+    inline void toggleNote(int midiNoteNumber) {
+        if (!keys.addIfNotAlreadyThere(midiNoteNumber)){
+            keys.remove(keys.indexOf(midiNoteNumber));
+        }
+    }
+    
+    inline void toggleFundamental(int midiNoteNumber) {
+        setFundamental(midiNoteNumber);
+    }
 
     inline void setMinStartTime(int inval) { rMinStartTimeMS = inval; }
     inline void setMaxStartTime(int inval) { rMaxStartTimeMS = inval; }
@@ -267,6 +282,7 @@ private:
 //    float offsets[49];
     Array<float> gains;
     Array<float> offsets;
+    Array<int> keys;
 
     JUCE_LEAK_DETECTOR(ResonancePreparation);
 };

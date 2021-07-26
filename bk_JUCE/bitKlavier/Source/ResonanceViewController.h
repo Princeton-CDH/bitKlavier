@@ -133,6 +133,7 @@ public:
     void setCurrentId(int Id);
     void deleteCurrent(void);
 
+
 private:
 
     void bkMessageReceived(const String& message) override;

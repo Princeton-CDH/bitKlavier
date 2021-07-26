@@ -754,13 +754,12 @@ void ResonancePreparationEditor::BKRangeSliderValueChanged(String name, double m
 }
 
 void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) {
-    Keymap::Ptr thisKeymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
     if (source == &keyboardState)
     {
-        thisKeymap->toggleNote(midiNoteNumber);
 
-        absoluteKeyboard->setKeysInKeymap(thisKeymap->keys());
+        prep->toggleNote(midiNoteNumber);
+        absoluteKeyboard->setKeysInKeymap(prep->getKeys());
        
         if (prep->isActive(midiNoteNumber)) {
             prep->removeActive(midiNoteNumber);
@@ -775,10 +774,9 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
     }
     else if (source == &fundamentalKeyboardState)
     {
-//        thisKeymap->toggleNote(midiNoteNumber);
-        fundamentalKeyboard->setKeysInKeymap(thisKeymap->keys());
-        
-        prep->setFundamental(midiNoteNumber);
+
+        prep->toggleFundamental(midiNoteNumber);
+        fundamentalKeyboard->setKeysInKeymap({midiNoteNumber});
         DBG("fundamental key toggled");
     }
     update();
