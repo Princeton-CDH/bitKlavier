@@ -454,7 +454,8 @@ void ResonanceViewController::invisible(void)
     ADSRLabel.setVisible(false);
     
     absoluteKeyboard->setVisible(false);
-
+    fundamentalKeyboard->setVisible(false);
+    
     for (int i = 0; i < NUM_KEYS; i++) {
         offsetsArray[i]->setVisible(false);
         gainsArray[i]->setVisible(false);
@@ -771,8 +772,6 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
             isActive.set(midiNoteNumber - 24, true);
             DBG("adding active"+ String(midiNoteNumber));
         }
-        update();
-
     }
     else if (source == &fundamentalKeyboardState)
     {
@@ -781,10 +780,9 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
         
         prep->setFundamental(midiNoteNumber);
         DBG("fundamental key toggled");
-        update();
-
     }
-        
+    update();
+
 }
 
 void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float> values)
