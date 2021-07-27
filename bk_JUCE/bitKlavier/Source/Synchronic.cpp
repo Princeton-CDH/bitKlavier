@@ -94,7 +94,7 @@ notePlayed(false)
     {
         // comes in as "soundfont.sf2.subsound1"
         String name = synchronic->prep->sSoundSetName.value;
-        BKSampleLoadType type;
+        BKSampleLoadType type = BKLoadLite;
         String path;
         int subsound = 0;
         

@@ -78,7 +78,7 @@ keymaps(Keymap::PtrArr())
     {
         // comes in as "soundfont.sf2.subsound1"
         String name = nostalgic->prep->nSoundSetName.value;
-        BKSampleLoadType type;
+        BKSampleLoadType type = BKLoadLite;
         String path;
         int subsound = 0;
         

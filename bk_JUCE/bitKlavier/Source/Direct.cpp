@@ -74,7 +74,7 @@ keymaps(Keymap::PtrArr())
     {
         // comes in as "soundfont.sf2.subsound1"
         String name = direct->prep->dSoundSetName.value;
-        BKSampleLoadType type = BKLoadLitest;
+        BKSampleLoadType type = BKLoadLite;
         String path;
         int subsound = 0;
         
