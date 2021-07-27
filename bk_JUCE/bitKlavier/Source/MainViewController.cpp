@@ -577,24 +577,43 @@ void MainViewController::bkButtonClicked (Button* b)
     }
     if (b == &globalSoundSetButton)
     {
+        String globalSoundSetName =
+        processor.loadedSoundSets[processor.globalSoundSetId]
+        .fromLastOccurrenceOf(File::getSeparatorString(), false, false);
+        
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
             DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(item->getId());
             bool toggle = !prep->dUseGlobalSoundSet.value;
             prep->dUseGlobalSoundSet.set(toggle);
+            if (prep->dSoundSet.value < 0)
+            {
+                prep->dSoundSet.set(processor.globalSoundSetId);
+                prep->dSoundSetName.set(globalSoundSetName);
+            }
         }
         else if (item->getType() == PreparationTypeSynchronic)
         {
             SynchronicPreparation::Ptr prep = processor.gallery->getSynchronicPreparation(item->getId());
             bool toggle = !prep->sUseGlobalSoundSet.value;
             prep->sUseGlobalSoundSet.set(toggle);
+            if (prep->sSoundSet.value < 0)
+            {
+                prep->sSoundSet.set(processor.globalSoundSetId);
+                prep->sSoundSetName.set(globalSoundSetName);
+            }
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
             NostalgicPreparation::Ptr prep = processor.gallery->getNostalgicPreparation(item->getId());
             bool toggle = !prep->nUseGlobalSoundSet.value;
             prep->nUseGlobalSoundSet.set(toggle);
+            if (prep->nSoundSet.value < 0)
+            {
+                prep->nSoundSet.set(processor.globalSoundSetId);
+                prep->nSoundSetName.set(globalSoundSetName);
+            }
         }
         // Modifications
         else if (item->getType() == PreparationTypeDirectMod)
@@ -603,6 +622,12 @@ void MainViewController::bkButtonClicked (Button* b)
             bool toggle = !mod->dUseGlobalSoundSet.value;
             mod->dUseGlobalSoundSet.set(toggle);
             mod->setDirty(DirectUseGlobalSoundSet);
+            if (mod->dSoundSet.value < 0)
+            {
+                mod->dSoundSet.set(processor.globalSoundSetId);
+                mod->dSoundSetName.set(globalSoundSetName);
+                mod->setDirty(DirectSoundSet);
+            }
         }
         else if (item->getType() == PreparationTypeSynchronicMod)
         {
@@ -610,6 +635,12 @@ void MainViewController::bkButtonClicked (Button* b)
             bool toggle = !mod->sUseGlobalSoundSet.value;
             mod->sUseGlobalSoundSet.set(toggle);
             mod->setDirty(SynchronicUseGlobalSoundSet);
+            if (mod->sSoundSet.value < 0)
+            {
+                mod->sSoundSet.set(processor.globalSoundSetId);
+                mod->sSoundSetName.set(globalSoundSetName);
+                mod->setDirty(SynchronicSoundSet);
+            }
         }
         else if (item->getType() == PreparationTypeNostalgicMod)
         {
@@ -617,6 +648,12 @@ void MainViewController::bkButtonClicked (Button* b)
             bool toggle = !mod->nUseGlobalSoundSet.value;
             mod->nUseGlobalSoundSet.set(toggle);
             mod->setDirty(NostalgicUseGlobalSoundSet);
+            if (mod->nSoundSet.value < 0)
+            {
+                mod->nSoundSet.set(processor.globalSoundSetId);
+                mod->nSoundSetName.set(globalSoundSetName);
+                mod->setDirty(NostalgicSoundSet);
+            }
         }
     }
     if (b == &sustainPedalButton)

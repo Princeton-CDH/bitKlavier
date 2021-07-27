@@ -74,7 +74,7 @@ keymaps(Keymap::PtrArr())
     {
         // comes in as "soundfont.sf2.subsound1"
         String name = direct->prep->dSoundSetName.value;
-        BKSampleLoadType type;
+        BKSampleLoadType type = BKLoadLitest;
         String path;
         int subsound = 0;
         
@@ -89,7 +89,7 @@ keymaps(Keymap::PtrArr())
         String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
         for (auto sf : synth->processor.soundfontNames)
         {
-            if (sf.contains(sfName))
+            if (sf.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == sfName)
             {
                 type = BKLoadSoundfont;
                 path = sf;
@@ -97,7 +97,6 @@ keymaps(Keymap::PtrArr())
                 break;
             }
         }
-        
         
         for (auto cs : synth->processor.customSampleSetNames)
         {

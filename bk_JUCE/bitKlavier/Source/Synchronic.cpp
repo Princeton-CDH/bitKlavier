@@ -109,7 +109,7 @@ notePlayed(false)
         String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
         for (auto sf : synth->processor.soundfontNames)
         {
-            if (sf.contains(sfName))
+            if (sf.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == sfName)
             {
                 type = BKLoadSoundfont;
                 path = sf;

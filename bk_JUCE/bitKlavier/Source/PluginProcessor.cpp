@@ -445,7 +445,7 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     
     ValueTree galleryVT = gallery->getState();
     
-    galleryVT.setProperty("name", myFile.getFileName().upToFirstOccurrenceOf(".xml", false, false), 0);
+    galleryVT.setProperty("name", myFile.getFileName().upToLastOccurrenceOf(".xml", false, false), 0);
     
     std::unique_ptr<XmlElement> myXML = galleryVT.createXml();
     
@@ -537,9 +537,9 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
     
     
     File myFile(bkGalleries);
-    String galleryName = name.upToFirstOccurrenceOf(".xml",false,false);
+    String galleryName = name.upToLastOccurrenceOf(".xml",false,false);
     DBG("new file name: " + galleryName);
-    myFile = myFile.getNonexistentChildFile(name.upToFirstOccurrenceOf(".xml",false,false), ".xml", true);
+    myFile = myFile.getNonexistentChildFile(name.upToLastOccurrenceOf(".xml",false,false), ".xml", true);
     if (xml == nullptr)
     {
         myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
@@ -583,7 +583,7 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
 
 void BKAudioProcessor::duplicateGallery(String newName)
 {
-    newName = newName.upToFirstOccurrenceOf(".xml",false,false);
+    newName = newName.upToLastOccurrenceOf(".xml",false,false);
     
     File oldFile (gallery->getURL());
     String baseURL = oldFile.getParentDirectory().getFullPathName();
@@ -597,8 +597,8 @@ void BKAudioProcessor::duplicateGallery(String newName)
 
 void BKAudioProcessor::renameGallery(String newName)
 {
-    String oldName = gallery->getName().upToFirstOccurrenceOf(".xml",false,false);
-    newName = newName.upToFirstOccurrenceOf(".xml",false,false);
+    String oldName = gallery->getName().upToLastOccurrenceOf(".xml",false,false);
+    newName = newName.upToLastOccurrenceOf(".xml",false,false);
 
     File oldFile (gallery->getURL());
     String baseURL = oldFile.getParentDirectory().getFullPathName();
@@ -1603,7 +1603,7 @@ void BKAudioProcessor::exportCurrentGallery(void)
     
     fc = std::make_unique<FileChooser> ("Export your gallery.",
                                         fileToSave,
-                                        "*",
+                                        "*.xml",
                                         true);
     
     fc->launchAsync (FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::canSelectDirectories,

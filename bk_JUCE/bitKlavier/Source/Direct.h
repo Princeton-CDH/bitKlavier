@@ -85,7 +85,7 @@ public:
     velocityMin(0),
     velocityMax(127)
     {
-        
+
     }
     
     DirectPreparation(void):
@@ -108,9 +108,6 @@ public:
     {
         
     }
-    
-    
-    
     
     ~DirectPreparation()
     {

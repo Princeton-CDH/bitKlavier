@@ -669,7 +669,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     if      (ext == ".sf2")
     {
         isSF2 = true;
-        sf2sound   = new sfzero::SF2Sound(sfzFile);
+        sf2sound = new sfzero::SF2Sound(sfzFile);
         
         sf2sound->loadRegions(loadingInstrument);
         sf2sound->loadSamples(&formatManager);
@@ -750,7 +750,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         //
         //        for (int i = 0; i < destBuffer->getNumChannels(); i++)
         //            destBuffer->copyFrom(i, 0, sourceBuffer->getReadPointer(i, (int)sampleStart), (int)sampleLength);
-        
         
         // WEIRD thing where sample metadata defines loop point instead of the sfz format
         if (!isSF2 && (region->loop_mode == 0))

@@ -58,11 +58,12 @@ sustainPedalKeys(false)
     {
         targetStates.add(false);
     }
-//    targetStates.setUnchecked(TargetTypeDirect, true);
-//    targetStates.setUnchecked(TargetTypeSynchronic, true);
-//    targetStates.setUnchecked(TargetTypeNostalgic, true);
-//    targetStates.setUnchecked(TargetTypeTempo, true);
-//    targetStates.setUnchecked(TargetTypeTuning, true);
+    
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
     
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -109,6 +110,12 @@ sustainPedalKeys(k->getSustainPedalKeys())
     {
         targetStates.add(false);
     }
+    
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
     
     inverted = k->isInverted();
 
@@ -166,6 +173,11 @@ sustainPedalKeys(k->getSustainPedalKeys())
     {
         targetStates.add(false);
     }
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
     
     inverted = k->isInverted();
 
@@ -225,6 +237,11 @@ sustainPedalKeys(false)
     {
         targetStates.add(false);
     }
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
 
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
