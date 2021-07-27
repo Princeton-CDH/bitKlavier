@@ -73,7 +73,7 @@ public:
         rFundamental(24),
         name(newName)
     {
-        for (int i =0; i < 50; i++) {
+        for (int i =0; i < 51; i++) {
             isActiveArray[i] = false;
         }
         addActive(0+24, 1.0, 0);
@@ -103,7 +103,7 @@ public:
         rFundamental(24),
         name("test resonance preparation")
     {
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 51; i++) {
             isActiveArray[i] = false;
         }
 
@@ -272,27 +272,37 @@ public:
         DBG("setGain called");
     }
     
-    inline void setFundamental(int fun){rFundamental = fun; }
+    inline void setFundamental(int fun){
+        rFundamental = fun;
+        partialStructure.clearQuick();
+        for (int i = 0; i < 51; i++){
+            if (isActiveArray[i])
+            {
+                partialStructure.add({i - getFundamental(), gains[i], offsets[i]});
+            }
+        }
+    }
     inline void addActive(int midiNoteNumber, float gain, float offset) {
         isActiveArray[midiNoteNumber - 24] = true;
         gains[midiNoteNumber - 24] = gain;
 //        DBG("gains size: " + String(gains.size()));
         offsets[midiNoteNumber - 24] = offset;
-        partialStructure.add({midiNoteNumber - getFundamental(), gain, offset});
+        partialStructure.add({midiNoteNumber - 24 - getFundamental(), gain, offset});
         toggleNote(midiNoteNumber);
 }
     inline void removeActive(int midiNoteNumber) {
         isActiveArray[midiNoteNumber - 24] = false;
+        keys.remove(keys.indexOf(midiNoteNumber));
         updatePartialStructure();
     }
 
     inline bool isActive(int midiNoteNumber) {return isActiveArray[midiNoteNumber-24]; }
     inline void updatePartialStructure() {
         partialStructure.clearQuick();
-        for (int i = 0; i < 50; i++){
+        for (int i = 0; i < 51; i++){
             if (isActiveArray[i])
             {
-                partialStructure.add({i, gains[i], offsets[i]});
+                partialStructure.add({i - getFundamental(), gains[i], offsets[i]});
             }
         }
         
@@ -303,9 +313,9 @@ private:
     String name;
     Array<Array<float>> partialStructure;
 //    Array<bool> isActiveArray;
-    bool isActiveArray[50];
-    float gains[50];
-    float offsets[50];
+    bool isActiveArray[51];
+    float gains[51];
+    float offsets[51];
 //    Array<float> gains;
 //    Array<float> offsets;
     Array<int> keys;

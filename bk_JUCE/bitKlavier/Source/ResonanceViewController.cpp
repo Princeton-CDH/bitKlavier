@@ -67,11 +67,11 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     ADSRLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(&ADSRLabel, ALL);
     
-    NUM_KEYS = 50;
+    NUM_KEYS = 51;
     absoluteKeyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     absoluteKeyboard->setName("absolute");
 //    absoluteKeyboard.setAlpha(1);
-    absoluteKeyboard->setAvailableRange(24, 24+NUM_KEYS);
+    absoluteKeyboard->setAvailableRange(24, 24+NUM_KEYS-1);
     absoluteKeyboard->setOctaveForMiddleC(4);
     absoluteKeyboard->setScrollButtonsVisible(false);
     addAndMakeVisible(*absoluteKeyboard);
@@ -79,7 +79,7 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     fundamentalKeyboard = std::make_unique<BKKeymapKeyboardComponent> (fundamentalKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     fundamentalKeyboard->setName("fundamental");
 //    absoluteKeyboard.setAlpha(1);
-    fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS);
+    fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS-1);
     fundamentalKeyboard->setOctaveForMiddleC(4);
     fundamentalKeyboard->setScrollButtonsVisible(false);
 
@@ -225,16 +225,20 @@ void ResonanceViewController::displayTab(int tab)
         area.reduce(0.f, area.getHeight() * 0.2f);
 #endif
         float keyboardHeight = 80 * processor.paddingScalarY;
+        float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
         
         Rectangle<int> fundamentalKeyboardRow = area.removeFromBottom(keyboardHeight);
         
-        fundamentalLabel.setBounds(fundamentalKeyboardRow.removeFromLeft(fundamentalKeyboardRow.getWidth()*0.1));
+        fundamentalLabel.setBounds(fundamentalKeyboardRow.removeFromLeft(columnWidth));
         fundamentalLabel.setVisible(true);
         
 //        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12); //num white keys, gives error
         
         float keyWidth = fundamentalKeyboardRow.getWidth() / 30.; // 30 is number of white keys
         
+        DBG("Keyboard row width: " + String(fundamentalKeyboardRow.getWidth()));
+        DBG("Keyboard width" + String(fundamentalKeyboard->getWidth()));
+
         fundamentalKeyboard->setKeyWidth(keyWidth);
         fundamentalKeyboard->setBlackNoteLengthProportion(0.6);
         fundamentalKeyboard->setBounds(fundamentalKeyboardRow);
@@ -244,7 +248,7 @@ void ResonanceViewController::displayTab(int tab)
         
         Rectangle<int> absoluteKeyboardRow = area.removeFromBottom(keyboardHeight);
         
-        closestKeyLabel.setBounds(absoluteKeyboardRow.removeFromLeft(absoluteKeyboardRow.getWidth()*0.1));
+        closestKeyLabel.setBounds(absoluteKeyboardRow.removeFromLeft(columnWidth));
         closestKeyLabel.setVisible(true);
 
         absoluteKeyboard->setKeyWidth(keyWidth);
@@ -257,10 +261,14 @@ void ResonanceViewController::displayTab(int tab)
         float multiHeight = 100 + processor.paddingScalarY;
         
         Rectangle<int> offsetsRow = area.removeFromBottom(multiHeight);
-        offsetsLabel.setBounds(offsetsRow.removeFromLeft(offsetsRow.getWidth()*0.1));
+        offsetsLabel.setBounds(offsetsRow.removeFromLeft(columnWidth));
         offsetsLabel.setVisible(true);
         
-        float sliderWidth = offsetsRow.getWidth()/NUM_KEYS;
+        float sliderWidth = offsetsRow.getWidth()/ (NUM_KEYS * 1.);
+        
+        DBG("Slider width:" + String(sliderWidth));
+        DBG("Offsets row width: " + String(offsetsRow.getWidth()));
+        
         for (int i = 0; i < NUM_KEYS; i++) {
             offsetsArray[i]->setBounds(offsetsRow.removeFromLeft(sliderWidth));
             if (isActive[i])
@@ -271,7 +279,7 @@ void ResonanceViewController::displayTab(int tab)
         
         Rectangle<int> gainsRow = area.removeFromBottom(multiHeight);
         
-        gainsLabel.setBounds(gainsRow.removeFromLeft(gainsRow.getWidth()*0.1));
+        gainsLabel.setBounds(gainsRow.removeFromLeft(columnWidth));
         gainsLabel.setVisible(true);
         
         for (int i = 0; i < NUM_KEYS; i++) {
@@ -609,8 +617,6 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
     if (source == &keyboardState)
     {
-
-        prep->toggleNote(midiNoteNumber);
         if (prep->isActive(midiNoteNumber)) {
             prep->removeActive(midiNoteNumber);
             isActive[midiNoteNumber - 24] = false;
@@ -627,7 +633,6 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
     }
     else if (source == &fundamentalKeyboardState)
     {
-
         prep->toggleFundamental(midiNoteNumber);
         fundamentalKeyboard->setKeysInKeymap({midiNoteNumber});
         DBG("fundamental key toggled");
