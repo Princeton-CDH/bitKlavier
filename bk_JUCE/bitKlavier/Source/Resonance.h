@@ -264,8 +264,11 @@ public:
     inline void setMinStartTime(int inval) { rMinStartTimeMS = inval; }
     inline void setMaxStartTime(int inval) { rMaxStartTimeMS = inval; }
     inline void setMaxSympStrings(int inval) { rMaxSympStrings = inval; }
-    inline void setOffset(int i, float inval) { offsets[i] = inval;}
+    inline void setOffset(int i, float inval) { offsets[i] = inval;
+        updatePartialStructure();
+    }
     inline void setGain(int i, float inval) { gains[i] = inval;
+        updatePartialStructure();
         DBG("setGain called");
     }
     
@@ -278,16 +281,9 @@ public:
         partialStructure.add({midiNoteNumber - getFundamental(), gain, offset});
         toggleNote(midiNoteNumber);
 }
-    inline void removeActive(int midiNoteNumber) {isActiveArray[midiNoteNumber - 24] = false;
-
-        bool setTo = isActive(midiNoteNumber);
-        if (setTo) {
-            DBG("removeActive called isActive is true");
-        }
-        else {
-            DBG("removeActive called isActive is false");
-        }
-    
+    inline void removeActive(int midiNoteNumber) {
+        isActiveArray[midiNoteNumber - 24] = false;
+        updatePartialStructure();
     }
 
     inline bool isActive(int midiNoteNumber) {return isActiveArray[midiNoteNumber-24]; }
