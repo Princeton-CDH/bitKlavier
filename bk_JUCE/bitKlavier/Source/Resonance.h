@@ -277,7 +277,7 @@ public:
         isActiveArray[midiNoteNumber - 24] = true;
         gains[midiNoteNumber - 24] = gain;
 //        DBG("gains size: " + String(gains.size()));
-        offsets[midiNoteNumber - 24] = gain;
+        offsets[midiNoteNumber - 24] = offset;
         partialStructure.add({midiNoteNumber - getFundamental(), gain, offset});
         toggleNote(midiNoteNumber);
 }
