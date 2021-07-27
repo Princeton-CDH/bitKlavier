@@ -41,8 +41,8 @@ public:
     
     OwnedArray<BKSubSlider> gainsArray;
     OwnedArray<BKSubSlider> offsetsArray;
-    Array<bool> isActive;
-//    bool isActive[49];
+//    Array<bool> isActive;
+    bool isActive[50];
 
     BKLabel lastNote;
 
@@ -53,7 +53,6 @@ public:
     
     std::unique_ptr<BKKeymapKeyboardComponent> absoluteKeyboard;
     std::unique_ptr<BKKeymapKeyboardComponent> fundamentalKeyboard;
-
 
     std::unique_ptr<BKADSRSlider> ADSRSlider;
 

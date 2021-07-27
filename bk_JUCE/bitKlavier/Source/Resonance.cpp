@@ -27,7 +27,6 @@ SympPartial::SympPartial(int newHeldKey, int newPartialKey, float newGain, float
     partialKey  = newPartialKey;
     gain        = newGain;
     offset      = newOffset;
-
     playPosition = maxPlayPosition;
 }
 
@@ -69,11 +68,11 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
         DBG("Resonance::ringSympStrings: iterating through sympStrings");
         // indexed by heldNote (midiNoteNumber)
         // iterate through partials of incoming note (noteNumber) and see if they are contained in this set of heldNotePartials
-        for (int j = 0; j < partialStructure.size(); j++)
+        for (int j = 0; j < resonance->prep->getPartialStructure().size(); j++)
         {
             DBG("Resonance::ringSympStrings: iterating through partialStructure");
             // strucknote (noteNumber) + partialKey offset (key closest to this partial)
-            int currentStruckPartial = noteNumber + partialStructure.getReference(j)[0];
+            int currentStruckPartial = noteNumber + resonance->prep->getPartialStructure().getReference(j)[0];
             
             for (auto currentSympPartial : *heldNotePartials)
             {
@@ -209,16 +208,16 @@ void ResonanceProcessor::addSympStrings(int noteNumber, float velocity, int midi
     }
     
     DBG("Resonance: addingSympatheticString " + String(noteNumber));
-    for (int i = 0; i < partialStructure.size(); i++)
+    for (int i = 0; i < resonance->prep->getPartialStructure().size(); i++)
     {
         // heldKey      = noteNumber
         // partialKey   = key that this partial is nearest, as assigned by partialStructure
-        int partialKey = noteNumber + partialStructure.getUnchecked(i)[0];
+        int partialKey = noteNumber + resonance->prep->getPartialStructure().getUnchecked(i)[0];
         if (partialKey > 108 || partialKey < 21) continue;
 
         // make a newPartial object, with gain and offset vals
         DBG("Resonance: adding partial " + String(partialKey) + " to " + String(noteNumber));
-        sympStrings.getReference(noteNumber).add(new SympPartial(noteNumber, partialKey, partialStructure[i][1], partialStructure[i][2]));
+        sympStrings.getReference(noteNumber).add(new SympPartial(noteNumber, partialKey, resonance->prep->getPartialStructure()[i][1], resonance->prep->getPartialStructure()[i][2]));
         
         // add to list of currently active strings, for voice management
         activeSympStrings.insert(0, noteNumber);

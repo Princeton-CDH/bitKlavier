@@ -70,12 +70,20 @@ public:
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
         rMaxSympStrings(8),
-        rFundamental(1),
+        rFundamental(24),
         name(newName)
     {
-        for (int i =0; i < 49; i++) {
-            isActiveArray.add(false);
+        for (int i =0; i < 50; i++) {
+            isActiveArray[i] = false;
         }
+        addActive(0+24, 1.0, 0);
+        addActive(12+24, 0.8, 0);
+        addActive(19+24, 0.7, 2);
+        addActive(24+24, 0.8, 0);
+        addActive(28+24, 0.6, -13.7);
+        addActive(31+24, 0.7, 2);
+        addActive(34+24, 0.5, -31.175);
+        addActive(36+24, 0.8, 0);
     }
 
     //empty constructor, values will need to be tweaked
@@ -92,13 +100,30 @@ public:
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
         rMaxSympStrings(8),
-        rFundamental(1),
+        rFundamental(24),
         name("test resonance preparation")
-        
     {
-        for (int i =0; i < 49; i++) {
-            isActiveArray.add(false);
+        for (int i = 0; i < 50; i++) {
+            isActiveArray[i] = false;
         }
+
+        addActive(0+24, 1.0, 0);
+        addActive(12+24, 0.8, 0);
+        addActive(19+24, 0.7, 2);
+        addActive(24+24, 0.8, 0);
+        addActive(28+24, 0.6, -13.7);
+        addActive(31+24, 0.7, 2);
+        addActive(34+24, 0.5, -31.175);
+        addActive(36+24, 0.8, 0);
+//    
+//            partialStructure.add({0,  1.0, 0});
+//            partialStructure.add({12, 0.8, 0});
+//            partialStructure.add({19, 0.7, 2});
+//            partialStructure.add({24, 0.8, 0});
+//            partialStructure.add({28, 0.6, -13.7});
+//            partialStructure.add({31, 0.7, 2});
+//            partialStructure.add({34, 0.5, -31.175});
+//            partialStructure.add({36, 0.8, 0});
     }
 
     // copy, modify, compare, randomize
@@ -212,11 +237,16 @@ public:
     
     Moddable<int> rFundamental;
     
+    inline Array<Array<float>>& getPartialStructure() {return partialStructure;}
+    
     inline const int getMinStartTime() const noexcept { return rMinStartTimeMS.value; }
     inline const int getMaxStartTime() const noexcept { return rMaxStartTimeMS.value; }
     inline const int getMaxSympStrings() const noexcept { return rMaxSympStrings.value; }
     inline const int getFundamental() const noexcept { return rFundamental.value; }
-    
+   
+    inline const float getGain(int i) const noexcept { return gains[i];}
+    inline const float getOffset(int i) const noexcept { return offsets[i];}
+
     inline Array<int>& getKeys() {
         return keys;
     }
@@ -234,21 +264,22 @@ public:
     inline void setMinStartTime(int inval) { rMinStartTimeMS = inval; }
     inline void setMaxStartTime(int inval) { rMaxStartTimeMS = inval; }
     inline void setMaxSympStrings(int inval) { rMaxSympStrings = inval; }
-    inline void setOffset(int i, int inval) { offsets.set(i, inval);}
-    inline void setGain(int i, int inval) { gains.set(i, inval);
+    inline void setOffset(int i, float inval) { offsets[i] = inval;}
+    inline void setGain(int i, float inval) { gains[i] = inval;
         DBG("setGain called");
     }
     
     inline void setFundamental(int fun){rFundamental = fun; }
     inline void addActive(int midiNoteNumber, float gain, float offset) {
-//        isActiveArray.ensureStorageAllocated(49);
-        isActiveArray.set(midiNoteNumber - 24, true);
-        gains.insert(midiNoteNumber - 24, gain);
-        DBG("gains size: " + String(gains.size()));
-        offsets.insert(midiNoteNumber - 24, offset);
+        isActiveArray[midiNoteNumber - 24] = true;
+        gains[midiNoteNumber - 24] = gain;
+//        DBG("gains size: " + String(gains.size()));
+        offsets[midiNoteNumber - 24] = gain;
         partialStructure.add({midiNoteNumber - getFundamental(), gain, offset});
+        toggleNote(midiNoteNumber);
 }
-    inline void removeActive(int midiNoteNumber) {isActiveArray.set(midiNoteNumber - 24, false);
+    inline void removeActive(int midiNoteNumber) {isActiveArray[midiNoteNumber - 24] = false;
+
         bool setTo = isActive(midiNoteNumber);
         if (setTo) {
             DBG("removeActive called isActive is true");
@@ -262,7 +293,7 @@ public:
     inline bool isActive(int midiNoteNumber) {return isActiveArray[midiNoteNumber-24]; }
     inline void updatePartialStructure() {
         partialStructure.clearQuick();
-        for (int i = 0; i < 49; i++){
+        for (int i = 0; i < 50; i++){
             if (isActiveArray[i])
             {
                 partialStructure.add({i, gains[i], offsets[i]});
@@ -271,17 +302,16 @@ public:
         
     }
 
-
 private:
 
     String name;
     Array<Array<float>> partialStructure;
-    Array<bool> isActiveArray;
-//    bool isActiveArray[49];
-//    float gains[49];
-//    float offsets[49];
-    Array<float> gains;
-    Array<float> offsets;
+//    Array<bool> isActiveArray;
+    bool isActiveArray[50];
+    float gains[50];
+    float offsets[50];
+//    Array<float> gains;
+//    Array<float> offsets;
     Array<int> keys;
 
     JUCE_LEAK_DETECTOR(ResonancePreparation);
