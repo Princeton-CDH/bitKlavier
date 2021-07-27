@@ -42,7 +42,7 @@ public:
     OwnedArray<BKSubSlider> gainsArray;
     OwnedArray<BKSubSlider> offsetsArray;
 //    Array<bool> isActive;
-    bool isActive[51];
+    bool isActive[62];
 
     BKLabel lastNote;
 

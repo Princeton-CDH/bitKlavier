@@ -73,17 +73,17 @@ public:
         rFundamental(24),
         name(newName)
     {
-        for (int i =0; i < 51; i++) {
+        for (int i =0; i < 62; i++) {
             isActiveArray[i] = false;
         }
-        addActive(0+24, 1.0, 0);
-        addActive(12+24, 0.8, 0);
-        addActive(19+24, 0.7, 2);
-        addActive(24+24, 0.8, 0);
-        addActive(28+24, 0.6, -13.7);
-        addActive(31+24, 0.7, 2);
-        addActive(34+24, 0.5, -31.175);
-        addActive(36+24, 0.8, 0);
+        addActive(0+24+12, 1.0, 0);
+        addActive(12+24+12, 0.8, 0);
+        addActive(19+24+12, 0.7, 2);
+        addActive(24+24+12, 0.8, 0);
+        addActive(28+24+12, 0.6, -13.7);
+        addActive(31+24+12, 0.7, 2);
+        addActive(34+24+12, 0.5, -31.175);
+        addActive(36+24+12, 0.8, 0);
     }
 
     //empty constructor, values will need to be tweaked
@@ -103,18 +103,17 @@ public:
         rFundamental(24),
         name("test resonance preparation")
     {
-        for (int i = 0; i < 51; i++) {
+        for (int i = 0; i < 62; i++) {
             isActiveArray[i] = false;
         }
-
-        addActive(0+24, 1.0, 0);
-        addActive(12+24, 0.8, 0);
-        addActive(19+24, 0.7, 2);
-        addActive(24+24, 0.8, 0);
-        addActive(28+24, 0.6, -13.7);
-        addActive(31+24, 0.7, 2);
-        addActive(34+24, 0.5, -31.175);
-        addActive(36+24, 0.8, 0);
+        addActive(0+24+12, 1.0, 0);
+        addActive(12+24+12, 0.8, 0);
+        addActive(19+24+12, 0.7, 2);
+        addActive(24+24+12, 0.8, 0);
+        addActive(28+24+12, 0.6, -13.7);
+        addActive(31+24+12, 0.7, 2);
+        addActive(34+24+12, 0.5, -31.175);
+        addActive(36+24+12, 0.8, 0);
 //    
 //            partialStructure.add({0,  1.0, 0});
 //            partialStructure.add({12, 0.8, 0});
@@ -275,7 +274,7 @@ public:
     inline void setFundamental(int fun){
         rFundamental = fun;
         partialStructure.clearQuick();
-        for (int i = 0; i < 51; i++){
+        for (int i = 0; i < 62; i++){
             if (isActiveArray[i])
             {
                 partialStructure.add({i - getFundamental(), gains[i], offsets[i]});
@@ -299,7 +298,7 @@ public:
     inline bool isActive(int midiNoteNumber) {return isActiveArray[midiNoteNumber-24]; }
     inline void updatePartialStructure() {
         partialStructure.clearQuick();
-        for (int i = 0; i < 51; i++){
+        for (int i = 0; i < 62; i++){
             if (isActiveArray[i])
             {
                 partialStructure.add({i - getFundamental(), gains[i], offsets[i]});
@@ -313,9 +312,9 @@ private:
     String name;
     Array<Array<float>> partialStructure;
 //    Array<bool> isActiveArray;
-    bool isActiveArray[51];
-    float gains[51];
-    float offsets[51];
+    bool isActiveArray[62];
+    float gains[62];
+    float offsets[62];
 //    Array<float> gains;
 //    Array<float> offsets;
     Array<int> keys;

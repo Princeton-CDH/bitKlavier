@@ -67,7 +67,7 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     ADSRLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(&ADSRLabel, ALL);
     
-    NUM_KEYS = 51;
+    NUM_KEYS = 62;
     absoluteKeyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     absoluteKeyboard->setName("absolute");
 //    absoluteKeyboard.setAlpha(1);
@@ -84,6 +84,11 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     fundamentalKeyboard->setScrollButtonsVisible(false);
 
     addAndMakeVisible(*fundamentalKeyboard);
+    
+    addAndMakeVisible(&actionButton, ALL);
+    actionButton.setButtonText("Action");
+    actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
+    actionButton.addListener(this);
     
     
     float sliderMin  = -1.;
@@ -175,7 +180,8 @@ void ResonanceViewController::displayTab(int tab)
     Rectangle<int> area(getLocalBounds());
     area.removeFromLeft(leftArrow.getWidth());
     area.removeFromRight(rightArrow.getWidth());
-    area.removeFromTop(gComponentComboBoxHeight);
+    
+//    area.removeFromTop(gComponentComboBoxHeight);
 
      if (tab == 0){
         
@@ -188,7 +194,7 @@ void ResonanceViewController::displayTab(int tab)
         ADSRLabel.setVisible(true);
 
         //area = (getLocalBounds());
-        area.reduce(20 * processor.paddingScalarX + 4, 20 * processor.paddingScalarY + 4);
+       area.reduce(20 * processor.paddingScalarX + 4, 20 * processor.paddingScalarY + 4);
         
         //single parameter sliders
 
@@ -218,12 +224,14 @@ void ResonanceViewController::displayTab(int tab)
     }
     else if (tab == 1){
         iconImageComponent.setBounds(area);
-        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+//        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         
 #if JUCE_IOS
 //        area.removeFromTop(gComponentComboBoxHeight);
         area.reduce(0.f, area.getHeight() * 0.2f);
 #endif
+        area.removeFromBottom(40 * processor.paddingScalarY);
+        
         float keyboardHeight = 80 * processor.paddingScalarY;
         float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
         
@@ -269,12 +277,17 @@ void ResonanceViewController::displayTab(int tab)
         DBG("Slider width:" + String(sliderWidth));
         DBG("Offsets row width: " + String(offsetsRow.getWidth()));
         
+        float sum = 0;
+        
         for (int i = 0; i < NUM_KEYS; i++) {
             offsetsArray[i]->setBounds(offsetsRow.removeFromLeft(sliderWidth));
+            sum += sliderWidth;
             if (isActive[i])
                 offsetsArray[i]->setVisible(true);
         }
    
+        DBG("slider width sum: " + String(sum));
+        
         area.removeFromBottom(10 * processor.paddingScalarY);
         
         Rectangle<int> gainsRow = area.removeFromBottom(multiHeight);
@@ -310,6 +323,11 @@ void ResonanceViewController::displayShared(void)
     comboBoxSlice.removeFromLeft(gXSpacing);
     selectCB.setBounds(comboBoxSlice.removeFromLeft(comboBoxSlice.getWidth() / 2.));
 
+    actionButton.setBounds(selectCB.getRight()+gXSpacing,
+                           selectCB.getY(),
+                           selectCB.getWidth() * 0.5,
+                           selectCB.getHeight());
+    
     comboBoxSlice.removeFromLeft(gXSpacing);
 
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
@@ -420,7 +438,31 @@ void ResonancePreparationEditor::update()
 }
 
 void ResonancePreparationEditor::fillSelectCB(int last, int current)
-{
+{   selectCB.clear(dontSendNotification);
+    
+    for (auto prep : processor.gallery->getAllResonance())
+    {
+        int Id = prep->getId();;
+        String name = prep->getName();
+        
+        if (name != String())  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("ResonanceMod"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeResonance, Id))
+            selectCB.setItemEnabled(Id, false);
+    }
+    
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
+    
+    int selectedId = processor.updateState->currentResonanceId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
+    
+    lastId = selectedId;
 }
 
 void ResonancePreparationEditor::timerCallback()
@@ -430,9 +472,98 @@ void ResonancePreparationEditor::timerCallback()
 //    DBG("Ringing: " + rs->getRinging());
 }
 
-void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePreparationEditor*)
+void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePreparationEditor* vc)
 {
-    //so far nothing needed here, there will inevitably need to be a tower of if statements later
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
+    BKAudioProcessor& processor = vc->processor;
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Resonance Preparation");
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Resonance Preparation");
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Resonance Preparation");
+    }
+    else if (action == 4)
+    {
+        processor.reset(PreparationTypeTempo, processor.updateState->currentResonanceId);
+        vc->update();
+    }
+    else if (action == 5)
+    {
+        processor.clear(PreparationTypeTempo, processor.updateState->currentResonanceId);
+        vc->update();
+        processor.saveGalleryToHistory("Clear Resonance Preparation");
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentTempoId;
+        Tempo::Ptr prep = processor.gallery->getTempo(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Resonance Preparation");
+        }
+        
+        vc->update();
+    }
+    else if (action == 7)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentTempoId;
+        Tempo::Ptr prep = processor.gallery->getTempo(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        DBG("name: " + String(name));
+        
+        if (result == 1)
+        {
+            processor.exportPreparation(PreparationTypeResonance, Id, name);
+        }
+    }
+    else if (action >= 100)
+    {
+        int which = action - 100;
+        processor.importPreparation(PreparationTypeTempo, processor.updateState->currentTempoId, which);
+        vc->update();
+        processor.saveGalleryToHistory("Import Tempo Preparation");
+    }
 }
 
 void ResonancePreparationEditor::closeSubWindow()
@@ -509,6 +640,11 @@ void ResonancePreparationEditor::buttonClicked(Button* b)
         //setShowADSR(false);
         setSubWindowInFront(false);
 
+    }
+    else if (b == &actionButton)
+    {
+        bool single = processor.gallery->getAllResonance().size() == 2;
+        getPrepOptionMenu(PreparationTypeResonance, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
     {
