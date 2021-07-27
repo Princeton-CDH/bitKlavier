@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.9"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.0a"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -468,7 +468,6 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
-
         <FILE id="udvcxb" name="VelocityCurveGraph.h" compile="0" resource="0"
               file="Source/VelocityCurveGraph.h"/>
         <FILE id="ZZYk56" name="EqualizerGraph.h" compile="0" resource="0"
