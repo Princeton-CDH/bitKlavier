@@ -25,7 +25,8 @@ splash(p),
 timerCallbackCount(0),
 preferencesButton("Preferences"),
 globalSoundSetButton("Use global samples"),
-sustainPedalButton("Sustain Pedal")
+sustainPedalButton("Sustain Pedal"),
+equalizerButton("Equalizer")
 {
     if (processor.platform == BKIOS)    display = DisplayConstruction;
     else                                display = DisplayDefault;
@@ -134,6 +135,12 @@ sustainPedalButton("Sustain Pedal")
     preferencesButton.setLookAndFeel(&windowLAF);
     addAndMakeVisible (preferencesButton);
     
+    // Equalizer
+    equalizerButton.addListener(this);
+    equalizerButton.setTriggeredOnMouseDown(true);
+    equalizerButton.setLookAndFeel(&windowLAF);
+    addAndMakeVisible(equalizerButton);
+    
 //    undoStatus.setLookAndFeel(&laf);
     addChildComponent(undoStatus);
     undoStatusCountdown = 0;
@@ -167,6 +174,7 @@ MainViewController::~MainViewController()
     globalSoundSetButton.removeListener(this);
     sustainPedalButton.removeListener(this);
     preferencesButton.removeListener(this);
+    equalizerButton.removeListener(this);
     mainSlider.removeListener(this);
     sampleCB.removeListener(this);
     instrumentCB.removeListener(this);
@@ -182,6 +190,7 @@ MainViewController::~MainViewController()
     globalSoundSetButton.setLookAndFeel(nullptr);
     //sustainPedalButton.setLookAndFeel(nullptr);
     preferencesButton.setLookAndFeel(nullptr);
+    equalizerButton.setLookAndFeel(nullptr);
     keyboardComponent = nullptr;
     
 }
@@ -271,6 +280,8 @@ void MainViewController::resized()
         float unit = footerSlice.getWidth() * 0.25;
         
         preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
+        
+        equalizerButton.setBounds(footerSlice.getWidth() - 100, footerSlice.getY(), 100, 20);
 
 		//original spacing to restore once tooltips/keystrokes/hotkeys get moved to a separate menu
 		sampleCB.setBounds(unit, footerSlice.getY(), unit - 0.5 * gXSpacing, 20);
@@ -659,6 +670,9 @@ void MainViewController::bkButtonClicked (Button* b)
     if (b == &sustainPedalButton)
     {
         processor.setSustainFromMenu(sustainPedalButton.getToggleState());
+    }
+    if (b == &equalizerButton) {
+        editor.showGenSettings(1);
     }
 }
 

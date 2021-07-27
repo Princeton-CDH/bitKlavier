@@ -11,6 +11,7 @@
 #pragma once
 
 #include "BKViewController.h"
+#include "EqualizerGraph.h"
 
 class CommentViewController :
 public BKViewController
@@ -88,20 +89,91 @@ public:
 #if JUCE_IOS
     void iWantTheBigOne(TextEditor*, String name) override;
 #endif
+    
+    inline void setTab(int tab) {
+        currentTab = tab;
+        displayTab(currentTab);
+    }
 
 private:
-    //BKAudioProcessor& processor;
+    void displayTab(int tab) override;
+    void displayShared(void) override;
+    void invisible(void) override;
+    
+    enum Tabs {
+        settings,
+        equalizer
+    };
+    
+    int arrowSpace = 50; // amount of space needed for arrows
+    
+    BKAudioProcessor& processor;
     int currentNostalgicLayer;
     
+    // Settings UI components
     ToggleButton invertSustainB;
-    BKLabel     invertSustainL;
-    
     ToggleButton noteOnSetsNoteOffVelocityB;
-    BKLabel     noteOnSetsNoteOffVelocityL;
-    
-    std::unique_ptr<BKSingleSlider> A4tuningReferenceFrequencySlider; //A440
+    std::unique_ptr<BKSingleSlider> A4tuningReferenceFrequencySlider;
     std::unique_ptr<BKSingleSlider> tempoMultiplierSlider;
     
+    // Equalizer UI components
+    TextButton lowCutButton;
+    TextButton peak1Button;
+    TextButton peak2Button;
+    TextButton peak3Button;
+    TextButton highCutButton;
+    
+    ImageComponent lowCutIcon;
+    ImageComponent highCutIcon;
+    ImageComponent peak1Icon;
+    ImageComponent peak2Icon;
+    ImageComponent peak3Icon;
+    
+    std::unique_ptr<BKSingleSlider> lowCutFreqSlider;
+    GroupComponent lowCutSlopeBorder;
+    ToggleButton lowCutSlope12;
+    ToggleButton lowCutSlope24;
+    ToggleButton lowCutSlope36;
+    ToggleButton lowCutSlope48;
+    
+    std::unique_ptr<BKSingleSlider> peak1FreqSlider;
+    std::unique_ptr<BKSingleSlider> peak1GainSlider;
+    std::unique_ptr<BKSingleSlider> peak1QualitySlider;
+    
+    std::unique_ptr<BKSingleSlider> peak2FreqSlider;
+    std::unique_ptr<BKSingleSlider> peak2GainSlider;
+    std::unique_ptr<BKSingleSlider> peak2QualitySlider;
+    
+    std::unique_ptr<BKSingleSlider> peak3FreqSlider;
+    std::unique_ptr<BKSingleSlider> peak3GainSlider;
+    std::unique_ptr<BKSingleSlider> peak3QualitySlider;
+    
+    std::unique_ptr<BKSingleSlider> highCutFreqSlider;
+    GroupComponent highCutSlopeBorder;
+    ToggleButton highCutSlope12;
+    ToggleButton highCutSlope24;
+    ToggleButton highCutSlope36;
+    ToggleButton highCutSlope48;
+    
+    enum RadioButtonID {
+        lowCutButtons = 1001,
+        highCutButtons = 1002
+    };
+    
+    enum Filters {
+        lowCut,
+        peak1,
+        peak2,
+        peak3,
+        highCut
+    };
+    
+    int currentFilter = Filters::lowCut; // like currentTab but for filter
+    void displayFilter(int filter);
+    void invisibleFilters();
+    void clearColors();
+    
+    EqualizerGraph eqGraph;
     
     void bkTextFieldDidChange       (TextEditor&)               override;
     void bkComboBoxDidChange        (ComboBox* box)             override { };

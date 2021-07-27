@@ -12,7 +12,7 @@
               companyName="Many Arrows Music" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
-              buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="Many Arrows Music"
+              buildStandalone="1" enableIAA="1" cppLanguageStandard="17" companyCopyright="Many Arrows Music"
               pluginFormats="buildAU,buildStandalone,buildVST,buildVST3,enableIAA"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
               pluginVST3Category="Instrument" defines="JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1"
@@ -183,6 +183,9 @@
                 file="Source/galleries/Exercise Constraint.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
+          <FILE id="suTd6x" name="hi_cut.png" compile="0" resource="1" file="Source/icons/hi_cut.png"/>
+          <FILE id="K955yI" name="lo_cut.png" compile="0" resource="1" file="Source/icons/lo_cut.png"/>
+          <FILE id="DtQaJB" name="peak.png" compile="0" resource="1" file="Source/icons/peak.png"/>
           <FILE id="jFt7tl" name="blendronic_icon.png" compile="0" resource="1"
                 file="Source/icons/blendronic_icon.png"/>
           <FILE id="xOwvX8" name="left-arrow.png" compile="0" resource="1" file="Source/icons/left-arrow.png"/>
@@ -381,6 +384,8 @@
             <FILE id="wwKFGe" name="BKSampleLoader.h" compile="0" resource="0"
                   file="Source/BKSampleLoader.h"/>
           </GROUP>
+          <FILE id="vkphQJ" name="BKEqualizer.cpp" compile="1" resource="0" file="Source/BKEqualizer.cpp"/>
+          <FILE id="jCKRAN" name="BKEqualizer.h" compile="0" resource="0" file="Source/BKEqualizer.h"/>
           <FILE id="HVbOmG" name="BKPianoSampler.cpp" compile="1" resource="0"
                 file="Source/BKPianoSampler.cpp"/>
           <FILE id="Spprlk" name="BKPianoSampler.h" compile="0" resource="0"
@@ -463,8 +468,11 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
+
         <FILE id="udvcxb" name="VelocityCurveGraph.h" compile="0" resource="0"
               file="Source/VelocityCurveGraph.h"/>
+        <FILE id="ZZYk56" name="EqualizerGraph.h" compile="0" resource="0"
+              file="Source/EqualizerGraph.h"/>
         <FILE id="sM6zCj" name="BKUIComponents.h" compile="0" resource="0"
               file="Source/BKUIComponents.h"/>
         <GROUP id="{AE933235-955C-4B29-B82E-A67897458CE4}" name="BlendronicDisplay">
@@ -541,6 +549,7 @@
         <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="UIInterfaceOrientationLandscapeLeft,UIInterfaceOrientationLandscapeRight"
@@ -573,6 +582,7 @@
         <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2017 targetFolder="Builds/VisualStudio2017" bigIcon="iHGLGD" smallIcon="smHM8h"
@@ -601,6 +611,7 @@
         <MODULEPATH id="juce_audio_devices" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
     <VS2019 targetFolder="Builds/VisualStudio2019" bigIcon="iHGLGD" windowsTargetPlatformVersion="10.0.18362.0"
@@ -626,6 +637,7 @@
         <MODULEPATH id="juce_audio_devices"/>
         <MODULEPATH id="juce_audio_basics"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </VS2019>
   </EXPORTFORMATS>
@@ -640,6 +652,7 @@
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>

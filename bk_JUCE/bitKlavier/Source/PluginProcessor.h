@@ -12,6 +12,8 @@
 
 #include "BKSynthesiser.h"
 
+#include "BKEqualizer.h"
+
 #include "BKUpdateState.h"
 
 #include "Keymap.h"
@@ -30,6 +32,7 @@
 
 class StandalonePluginHolder;
 class BKAudioProcessorEditor;
+//class BKEqualizer;
 
 //==============================================================================
 /**
@@ -105,6 +108,10 @@ public:
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
     BKSynthesiser                       pedalSynth;
+    
+    // Equalizer
+    BKEqualizer                         eq;
+    inline BKEqualizer* getBKEqualizer() { return &eq; } // may need to move to gallery later
     
     //sfzero::Synth                       synth;
     
@@ -236,6 +243,9 @@ public:
     AudioProcessorEditor* getEditor();
 
     //==============================================================================
+    
+    inline BKAudioProcessorEditor* getBKEditor() { return editor; }
+    
     const String getName() const override;
 
     bool acceptsMidi() const override;
