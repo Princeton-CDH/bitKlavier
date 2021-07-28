@@ -249,6 +249,9 @@ public:
    
     inline const float getGain(int i) const noexcept { return gains[i];}
     inline const float getOffset(int i) const noexcept { return offsets[i];}
+    
+//    inline const float getGains(int i) const noexcept { return gains[i];}
+//    inline const float getOffset(int i) const noexcept { return offsets[i];}
 
     inline Array<int>& getKeys() {
         return keys;
@@ -267,13 +270,24 @@ public:
     inline void setMinStartTime(int inval) { rMinStartTimeMS = inval; }
     inline void setMaxStartTime(int inval) { rMaxStartTimeMS = inval; }
     inline void setMaxSympStrings(int inval) { rMaxSympStrings = inval; }
-    inline void setOffset(int i, float inval) { offsets[i] = inval;
-        updatePartialStructure();
+//    inline void setOffset(int i, float inval) { offsets[i] = inval;
+//        updatePartialStructure();
+//    }
+//    inline void setGain(int i, float inval) { gains[i] = inval;
+//        DBG("new Gain:" + String(getGain(i)));
+//        updatePartialStructure();
+//        DBG("setGain called");
+//    }
+    inline void setGains(Array<float> values) {
+        for (int i = 0; i < 62; i++) gains[i] = values[24+i];
+        DBG("setting gains");
     }
-    inline void setGain(int i, float inval) { gains[i] = inval;
-        updatePartialStructure();
-        DBG("setGain called");
+    inline void setOffsets(Array<float> values) {
+        for (int i = 0; i < 62; i++) offsets[i] = values[24+i];
+        DBG("setting offsets");
     }
+    
+
     
     inline void setFundamental(int midiNoteNumber){
         rFundamental = midiNoteNumber - 24;

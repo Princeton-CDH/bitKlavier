@@ -41,6 +41,10 @@ public:
     
     OwnedArray<BKSubSlider> gainsArray;
     OwnedArray<BKSubSlider> offsetsArray;
+    
+    BKAbsoluteKeyboardSlider gainsKeyboard;
+    BKAbsoluteKeyboardSlider offsetsKeyboard;
+    
 //    Array<bool> isActive;
     bool isActive[62];
 
@@ -51,7 +55,7 @@ public:
     
     OwnedArray<ToggleButton> fundamentalButtons;
     
-    std::unique_ptr<BKKeymapKeyboardComponent> absoluteKeyboard;
+    std::unique_ptr<BKKeymapKeyboardComponent> closestKeyboard;
     std::unique_ptr<BKKeymapKeyboardComponent> fundamentalKeyboard;
 
     std::unique_ptr<BKADSRSlider> ADSRSlider;

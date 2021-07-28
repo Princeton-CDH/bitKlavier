@@ -15,11 +15,13 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGraph* theGraph) :
-    BKViewController(p, theGraph, 2)
+    BKViewController(p, theGraph, 2),
 #if JUCE_IOS
-//absoluteKeyboard(false, true)
+gainsKeyboard(false, true),
+offsetsKeyboard(false, true)
 #else
-//absoluteKeyboard(false, false)
+gainsKeyboard(false, false),
+offsetsKeyboard(false, true)
 #endif
 {
     setLookAndFeel(&buttonsAndMenusLAF);
@@ -68,17 +70,17 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     addAndMakeVisible(&ADSRLabel, ALL);
     
     NUM_KEYS = 62;
-    absoluteKeyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
-    absoluteKeyboard->setName("absolute");
-//    absoluteKeyboard.setAlpha(1);
-    absoluteKeyboard->setAvailableRange(24, 24+NUM_KEYS-1);
-    absoluteKeyboard->setOctaveForMiddleC(4);
-    absoluteKeyboard->setScrollButtonsVisible(false);
-    addAndMakeVisible(*absoluteKeyboard);
+    closestKeyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    closestKeyboard->setName("absolute");
+//    closestKeyboard.setAlpha(1);
+    closestKeyboard->setAvailableRange(24, 24+NUM_KEYS-1);
+    closestKeyboard->setOctaveForMiddleC(4);
+    closestKeyboard->setScrollButtonsVisible(false);
+    addAndMakeVisible(*closestKeyboard);
     
     fundamentalKeyboard = std::make_unique<BKKeymapKeyboardComponent> (fundamentalKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     fundamentalKeyboard->setName("fundamental");
-//    absoluteKeyboard.setAlpha(1);
+//    closestKeyboard.setAlpha(1);
     fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS-1);
     fundamentalKeyboard->setOctaveForMiddleC(4);
     fundamentalKeyboard->setScrollButtonsVisible(false);
@@ -90,53 +92,63 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
+    gainsKeyboard.setAvailableRange(24, NUM_KEYS+12);
+    gainsKeyboard.setName("gain");
+    gainsKeyboard.addMouseListener(this, true);
+    addAndMakeVisible(&gainsKeyboard);
+    
+    offsetsKeyboard.setAvailableRange(24, NUM_KEYS+12);
+    offsetsKeyboard.setName("offset");
+    offsetsKeyboard.addMouseListener(this, true);
+    addAndMakeVisible(&offsetsKeyboard);
 
-    float offsetMin  = -100.;
-   float offsetMax  = 100.;
-   float offsetIncrement = 0.1;
-   float offsetDefault = 0.;
-    
-   float gainMin = 0.;
-   float gainMax = 1.;
-   float gainIncrement = 0.1;
-   float gainDefault = 0.5;
-  String subSliderName = "add subslider";
-   int  sliderHeight = 60;
-    
-    for (int i = 0; i < NUM_KEYS; i++)
-    {
-        BKSubSlider* refSlider = new BKSubSlider(Slider::LinearBarVertical,
-                                                                 offsetMin,
-                                                                 offsetMax,
-                                                                 offsetDefault,
-                                                                 offsetIncrement,
-                                                                 20,
-                                                                sliderHeight);
-//        refSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 0,0);
+
+//    float offsetMin  = -100.;
+//   float offsetMax  = 100.;
+//   float offsetIncrement = 0.1;
+//   float offsetDefault = 0.;
+//
+//   float gainMin = 0.1;
+//   float gainMax = 10.;
+//   float gainIncrement = 0.1;
+//   float gainDefault = 1;
+//  String subSliderName = "add subslider";
+//   int  sliderHeight = 60;
+//
+//    for (int i = 0; i < NUM_KEYS; i++)
+//    {
+//        BKSubSlider* refSlider = new BKSubSlider(Slider::LinearBarVertical,
+//                                                                 offsetMin,
+//                                                                 offsetMax,
+//                                                                 offsetDefault,
+//                                                                 offsetIncrement,
+//                                                                 20,
+//                                                                sliderHeight);
+////        refSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 0,0);
 //        refSlider->addMouseListener(this, true);
-        refSlider->setName("offset" + String(i));
-        refSlider->setTooltip(String(refSlider->getValue()));
-//        refSlider->setInterceptsMouseClicks(false, false);
-//        refSlider->setLookAndFeel(&displaySliderLookAndFeel);
-        addAndMakeVisible(*refSlider);
-        
-        offsetsArray.add(refSlider);
-        
-        BKSubSlider* refgainSlider = new BKSubSlider(Slider::LinearBarVertical,
-                                                                 gainMin,
-                                                                 gainMax,
-                                                                 gainDefault,
-                                                                 gainIncrement,
-                                                                 20,
-                                                                sliderHeight);
-        refgainSlider->setName("gain" + String(i));
-        addAndMakeVisible(*refgainSlider);
-        gainsArray.add(refgainSlider);
-        
-        isActive[i] = false;
-//        gainsArray.add(std::make_unique<BKSingleSlider>("gain" + String(i), 10, -100, 24, 1, 0.01, "-inf"));
-        
-    }
+//        refSlider->setName("offset" + String(i));
+//        refSlider->setTooltip(String(refSlider->getValue()));
+////        refSlider->setInterceptsMouseClicks(false, false);
+////        refSlider->setLookAndFeel(&displaySliderLookAndFeel);
+//        addAndMakeVisible(*refSlider);
+//
+//        offsetsArray.add(refSlider);
+//
+//        BKSubSlider* refgainSlider = new BKSubSlider(Slider::LinearBarVertical,
+//                                                                 gainMin,
+//                                                                 gainMax,
+//                                                                 gainDefault,
+//                                                                 gainIncrement,
+//                                                                 20,
+//                                                                sliderHeight);
+//        refgainSlider->setName("gain" + String(i));
+//        addAndMakeVisible(*refgainSlider);
+//        gainsArray.add(refgainSlider);
+//
+//        isActive[i] = false;
+////        gainsArray.add(std::make_unique<BKSingleSlider>("gain" + String(i), 10, -100, 24, 1, 0.01, "-inf"));
+//
+//    }
     
     closestKeyLabel.setText("Closest Key: ", dontSendNotification);
     addAndMakeVisible(closestKeyLabel);
@@ -260,15 +272,15 @@ void ResonanceViewController::displayTab(int tab)
         
         area.removeFromBottom(processor.paddingScalarX * 10);
         
-        Rectangle<int> absoluteKeyboardRow = area.removeFromBottom(keyboardHeight);
+        Rectangle<int> closestKeyboardRow = area.removeFromBottom(keyboardHeight);
         
-        closestKeyLabel.setBounds(absoluteKeyboardRow.removeFromLeft(columnWidth));
+        closestKeyLabel.setBounds(closestKeyboardRow.removeFromLeft(columnWidth));
         closestKeyLabel.setVisible(true);
 
-        absoluteKeyboard->setKeyWidth(keyWidth);
-        absoluteKeyboard->setBlackNoteLengthProportion(0.6);
-        absoluteKeyboard->setBounds(absoluteKeyboardRow);
-        absoluteKeyboard->setVisible(true);
+        closestKeyboard->setKeyWidth(keyWidth);
+        closestKeyboard->setBlackNoteLengthProportion(0.6);
+        closestKeyboard->setBounds(closestKeyboardRow);
+        closestKeyboard->setVisible(true);
     
         area.removeFromBottom(processor.paddingScalarY * 10);
 
@@ -278,21 +290,24 @@ void ResonanceViewController::displayTab(int tab)
         offsetsLabel.setBounds(offsetsRow.removeFromLeft(columnWidth));
         offsetsLabel.setVisible(true);
         
-        float sliderWidth = offsetsRow.getWidth()/ (NUM_KEYS * 1.);
+//        float sliderWidth = offsetsRow.getWidth()/ (NUM_KEYS * 1.);
+//
+//        DBG("Slider width:" + String(sliderWidth));
+//        DBG("Offsets row width: " + String(offsetsRow.getWidth()));
+//
+//        float sum = 0;
+//
+//        for (int i = 0; i < NUM_KEYS; i++) {
+//            offsetsArray[i]->setBounds(offsetsRow.removeFromLeft(sliderWidth));
+//            sum += sliderWidth;
+//            if (isActive[i])
+//                offsetsArray[i]->setVisible(true);
+//        }
+//
+//        DBG("slider width sum: " + String(sum));
         
-        DBG("Slider width:" + String(sliderWidth));
-        DBG("Offsets row width: " + String(offsetsRow.getWidth()));
-        
-        float sum = 0;
-        
-        for (int i = 0; i < NUM_KEYS; i++) {
-            offsetsArray[i]->setBounds(offsetsRow.removeFromLeft(sliderWidth));
-            sum += sliderWidth;
-            if (isActive[i])
-                offsetsArray[i]->setVisible(true);
-        }
-   
-        DBG("slider width sum: " + String(sum));
+        offsetsKeyboard.setBounds(offsetsRow);
+        offsetsKeyboard.setVisible(true);
         
         area.removeFromBottom(10 * processor.paddingScalarY);
         
@@ -301,11 +316,15 @@ void ResonanceViewController::displayTab(int tab)
         gainsLabel.setBounds(gainsRow.removeFromLeft(columnWidth));
         gainsLabel.setVisible(true);
         
-        for (int i = 0; i < NUM_KEYS; i++) {
-            gainsArray[i]->setBounds(gainsRow.removeFromLeft(sliderWidth));
-            if (isActive[i])
-                gainsArray[i]->setVisible(true);
-        }
+//        for (int i = 0; i < NUM_KEYS; i++) {
+//            gainsArray[i]->setBounds(gainsRow.removeFromLeft(sliderWidth));
+//            if (isActive[i])
+//                gainsArray[i]->setVisible(true);
+//        }
+        
+        gainsKeyboard.setBounds(gainsRow);
+        gainsKeyboard.setVisible(true);
+
         area.removeFromBottom(10 * processor.paddingScalarY);
         
     }
@@ -359,18 +378,26 @@ void ResonanceViewController::invisible(void)
     ADSRSlider->setVisible(false);
     ADSRLabel.setVisible(false);
     
-    absoluteKeyboard->setVisible(false);
+    closestKeyboard->setVisible(false);
     fundamentalKeyboard->setVisible(false);
     
-    for (int i = 0; i < NUM_KEYS; i++) {
-        offsetsArray[i]->setVisible(false);
-        gainsArray[i]->setVisible(false);
-    }
+    gainsKeyboard.setVisible(false);
+    offsetsKeyboard.setVisible(false);
+    
+//    for (int i = 0; i < NUM_KEYS; i++) {
+//        offsetsArray[i]->setVisible(false);
+//        gainsArray[i]->setVisible(false);
+//    }
 
     closestKeyLabel.setVisible(false);
     fundamentalLabel.setVisible(false);
 
 }
+//
+//void ResonanceViewController::mouseEnter(const MouseEvent& e)
+//{
+//}
+
 
 
 
@@ -394,6 +421,9 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     ADSRSlider->addMyListener(this);
     keyboardState.addListener(this);
     fundamentalKeyboardState.addListener(this);
+    
+    offsetsKeyboard.addMyListener(this);
+    gainsKeyboard.addMyListener(this);
 
     startTimer(30);
 }
@@ -422,22 +452,38 @@ void ResonancePreparationEditor::update()
         ADSRSlider->setSustainValue(ADSRarray[2], dontSendNotification);
         ADSRSlider->setReleaseValue(ADSRarray[3], dontSendNotification);
         
-        for (int i = 0; i < NUM_KEYS; i++){
-            if (prep->isActive(i + 24)) {
-                gainsArray[i]->setVisible(true);
-                gainsArray[i]->setValue(prep->getGain(i), dontSendNotification);
-                offsetsArray[i]->setVisible(true);
-                offsetsArray[i]->setValue(prep->getOffset(i), dontSendNotification);
-                isActive[i] = true;
-            }
-            else {
-                gainsArray[i]->setVisible(false);
-                offsetsArray[i]->setVisible(false);
-                isActive[i] = false;
-            }
+//        for (int i = 0; i < NUM_KEYS; i++){
+//            if (prep->isActive(i + 24)) {
+//                gainsArray[i]->setVisible(true);
+//                gainsArray[i]->setValue(prep->getGain(i), dontSendNotification);
+//                offsetsArray[i]->setVisible(true);
+//                offsetsArray[i]->setValue(prep->getOffset(i), dontSendNotification);
+//                isActive[i] = true;
+//            }
+//            else {
+//                gainsArray[i]->setVisible(false);
+//                offsetsArray[i]->setVisible(false);
+//                isActive[i] = false;
+//            }
+//        }
+//
+        Array<float> offsets;
+        Array<float> gains;
+
+        for (int i = 0; i < 24; i++) {
+            offsets.add(0);
+            gains.add(0);
         }
         
-        absoluteKeyboard->setKeysInKeymap(prep->getKeys());
+        for (int i = 0; i < NUM_KEYS; i++) {
+            offsets.add(prep->getOffset(i));
+            gains.add(prep->getGain(i));
+        }
+        
+        offsetsKeyboard.setValues(offsets);
+        gainsKeyboard.setValues(gains);
+
+        closestKeyboard->setKeysInKeymap(prep->getKeys());
         fundamentalKeyboard->setKeysInKeymap({prep->getFundamental()});
         
     }
@@ -694,20 +740,23 @@ void ResonancePreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
     {
         DBG("set max symp strings to " + String(val));
         prep->setMaxSympStrings(val);
-    }
-    else {
-        for (int i = 0; i < offsetsArray.size(); i++){
-            if (name == offsetsArray[i]->getName()) {
-                prep->setOffset(i, val);
-                DBG("set" + String(i) + "offset to " + String(val));
-            }
-        }
-        for (int i = 0; i < gainsArray.size(); i++){
-            if (name == gainsArray[i]->getName()) {
-                prep->setGain(i, val);
-                DBG("set" + String(i) + "offset to " + String(val));
-            }
-        }
+//    }
+//    else if (slider == offsetsArray[0]){
+//        DBG("first offset slider changed");
+//    }
+//    else {
+//        for (int i = 0; i < offsetsArray.size(); i++){
+//            if (name == offsetsArray[i]->getName()) {
+//                prep->setOffset(i, val);
+//                DBG("set" + String(i) + "offset to " + String(val));
+//            }
+//        }
+//        for (int i = 0; i < gainsArray.size(); i++){
+//            if (name == gainsArray[i]->getName()) {
+//                prep->setGain(i, val);
+//                DBG("set" + String(i) + "gain to " + String(val));
+//            }
+//        }
 }
     processor.updateState->editsMade = true;
 }
@@ -770,7 +819,7 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
             DBG("adding active"+ String(midiNoteNumber));
         }
         
-        absoluteKeyboard->setKeysInKeymap(prep->getKeys());
+        closestKeyboard->setKeysInKeymap(prep->getKeys());
 
     }
     else if (source == &fundamentalKeyboardState)
@@ -785,9 +834,27 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
 
 void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
-    
-//    processor.gallery->setGalleryDirty(true);
-//
-//    processor.updateState->editsMade = true;
-}
+        ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+     
+        if(name == gainsKeyboard.getName())
+        {
+            DBG("updating gain vals");
+            prep->setGains(values);
+            float sum = 0;
+            for (float i : values) {
+                sum+=1;
+                DBG(String(i));
+            }
+            DBG("sum: " + String(sum));
+        }
+        else if(name == offsetsKeyboard.getName())
+        {
+            DBG("updating offset vals");
+            prep->setOffsets(values);
+            
+        }
+        processor.gallery->setGalleryDirty(true);
+        
+        processor.updateState->editsMade = true;
+    }
 
