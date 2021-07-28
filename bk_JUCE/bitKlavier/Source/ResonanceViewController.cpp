@@ -69,19 +69,19 @@ offsetsKeyboard(false, true)
     ADSRLabel.setJustificationType(Justification::centred);
     addAndMakeVisible(&ADSRLabel, ALL);
     
-    NUM_KEYS = 62;
+    NUM_KEYS = 52;
     closestKeyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     closestKeyboard->setName("absolute");
 //    closestKeyboard.setAlpha(1);
-    closestKeyboard->setAvailableRange(24, 24+NUM_KEYS-1);
+    closestKeyboard->setAvailableRange(24, 24+NUM_KEYS);
     closestKeyboard->setOctaveForMiddleC(4);
-    closestKeyboard->setScrollButtonsVisible(false);
+    closestKeyboard->setScrollButtonsVisible(true);
     addAndMakeVisible(*closestKeyboard);
     
     fundamentalKeyboard = std::make_unique<BKKeymapKeyboardComponent> (fundamentalKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     fundamentalKeyboard->setName("fundamental");
 //    closestKeyboard.setAlpha(1);
-    fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS-1);
+    fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS);
     fundamentalKeyboard->setOctaveForMiddleC(4);
     fundamentalKeyboard->setScrollButtonsVisible(false);
 
@@ -92,12 +92,12 @@ offsetsKeyboard(false, true)
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
-    gainsKeyboard.setAvailableRange(24, NUM_KEYS+12);
+    gainsKeyboard.setAvailableRange(24, 24+NUM_KEYS);
     gainsKeyboard.setName("gain");
     gainsKeyboard.addMouseListener(this, true);
     addAndMakeVisible(&gainsKeyboard);
     
-    offsetsKeyboard.setAvailableRange(24, NUM_KEYS+12);
+    offsetsKeyboard.setAvailableRange(24, 24+NUM_KEYS);
     offsetsKeyboard.setName("offset");
     offsetsKeyboard.addMouseListener(this, true);
     addAndMakeVisible(&offsetsKeyboard);
@@ -260,7 +260,7 @@ void ResonanceViewController::displayTab(int tab)
         
 //        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12); //num white keys, gives error
         
-        float keyWidth = fundamentalKeyboardRow.getWidth() / 30.; // 30 is number of white keys
+        float keyWidth = fundamentalKeyboardRow.getWidth() / 31.; // 31 is number of white keys
         
         DBG("Keyboard row width: " + String(fundamentalKeyboardRow.getWidth()));
         DBG("Keyboard width" + String(fundamentalKeyboard->getWidth()));

@@ -73,7 +73,7 @@ public:
         rFundamental(24),
         name(newName)
     {
-        for (int i =0; i < 62; i++) {
+        for (int i =0; i < 52; i++) {
             isActiveArray[i] = false;
             gains[i] = 0.0;
             offsets[i] = 0.0;
@@ -105,7 +105,7 @@ public:
         rFundamental(24),
         name("test resonance preparation")
     {
-        for (int i = 0; i < 62; i++) {
+        for (int i = 0; i < 52; i++) {
             isActiveArray[i] = false;
             gains[i] = 0.0;
             offsets[i] = 0.0;
@@ -279,11 +279,11 @@ public:
 //        DBG("setGain called");
 //    }
     inline void setGains(Array<float> values) {
-        for (int i = 0; i < 62; i++) gains[i] = values[24+i];
+        for (int i = 0; i < 52; i++) gains[i] = values[24+i];
         DBG("setting gains");
     }
     inline void setOffsets(Array<float> values) {
-        for (int i = 0; i < 62; i++) offsets[i] = values[24+i];
+        for (int i = 0; i < 52; i++) offsets[i] = values[24+i];
         DBG("setting offsets");
     }
     
@@ -292,7 +292,7 @@ public:
     inline void setFundamental(int midiNoteNumber){
         rFundamental = midiNoteNumber - 24;
         partialStructure.clearQuick();
-        for (int i = 0; i < 62; i++){
+        for (int i = 0; i < 52; i++){
             if (isActiveArray[i])
             {
                 partialStructure.add({i - getFundamental(), gains[i], offsets[i]});
@@ -316,7 +316,7 @@ public:
     inline bool isActive(int midiNoteNumber) {return isActiveArray[midiNoteNumber-24]; }
     inline void updatePartialStructure() {
         partialStructure.clearQuick();
-        for (int i = 0; i < 62; i++){
+        for (int i = 0; i < 52; i++){
             if (isActiveArray[i])
             {
                 partialStructure.add({i - getFundamental(), gains[i], offsets[i]});
@@ -330,9 +330,9 @@ private:
     String name;
     Array<Array<float>> partialStructure;
 //    Array<bool> isActiveArray;
-    bool isActiveArray[62];
-    float gains[62];
-    float offsets[62];
+    bool isActiveArray[52];
+    float gains[52];
+    float offsets[52];
 //    Array<float> gains;
 //    Array<float> offsets;
     Array<int> keys;

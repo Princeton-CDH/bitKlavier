@@ -46,7 +46,7 @@ public:
     BKAbsoluteKeyboardSlider offsetsKeyboard;
     
 //    Array<bool> isActive;
-    bool isActive[62];
+    bool isActive[52];
 
     BKLabel lastNote;
 
