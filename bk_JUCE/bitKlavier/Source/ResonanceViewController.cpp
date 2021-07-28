@@ -90,26 +90,32 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
+
+    float offsetMin  = -100.;
+   float offsetMax  = 100.;
+   float offsetIncrement = 0.1;
+   float offsetDefault = 0.;
     
-    float sliderMin  = -1.;
-   float sliderMax  = 1.;
-   float  sliderIncrement = 0.01;
-   float sliderDefault = 0.;
-    String subSliderName = "add subslider";
+   float gainMin = 0.;
+   float gainMax = 1.;
+   float gainIncrement = 0.1;
+   float gainDefault = 0.5;
+  String subSliderName = "add subslider";
    int  sliderHeight = 60;
     
     for (int i = 0; i < NUM_KEYS; i++)
     {
         BKSubSlider* refSlider = new BKSubSlider(Slider::LinearBarVertical,
-                                                                 sliderMin,
-                                                                 sliderMax,
-                                                                 sliderDefault,
-                                                                 sliderIncrement,
+                                                                 offsetMin,
+                                                                 offsetMax,
+                                                                 offsetDefault,
+                                                                 offsetIncrement,
                                                                  20,
                                                                 sliderHeight);
 //        refSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 0,0);
 //        refSlider->addMouseListener(this, true);
         refSlider->setName("offset" + String(i));
+        refSlider->setTooltip(String(refSlider->getValue()));
 //        refSlider->setInterceptsMouseClicks(false, false);
 //        refSlider->setLookAndFeel(&displaySliderLookAndFeel);
         addAndMakeVisible(*refSlider);
@@ -117,10 +123,10 @@ ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGrap
         offsetsArray.add(refSlider);
         
         BKSubSlider* refgainSlider = new BKSubSlider(Slider::LinearBarVertical,
-                                                                 sliderMin,
-                                                                 sliderMax,
-                                                                 sliderDefault,
-                                                                 sliderIncrement,
+                                                                 gainMin,
+                                                                 gainMax,
+                                                                 gainDefault,
+                                                                 gainIncrement,
                                                                  20,
                                                                 sliderHeight);
         refgainSlider->setName("gain" + String(i));

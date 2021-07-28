@@ -75,15 +75,17 @@ public:
     {
         for (int i =0; i < 62; i++) {
             isActiveArray[i] = false;
+            gains[i] = 0.0;
+            offsets[i] = 0.0;
         }
-        addActive(0+24+12, 1.0, 0);
-        addActive(12+24+12, 0.8, 0);
-        addActive(19+24+12, 0.7, 2);
-        addActive(24+24+12, 0.8, 0);
-        addActive(28+24+12, 0.6, -13.7);
-        addActive(31+24+12, 0.7, 2);
-        addActive(34+24+12, 0.5, -31.175);
-        addActive(36+24+12, 0.8, 0);
+//        addActive(0+24, 1.0, 0);
+        addActive(12+24, 0.8, 0);
+        addActive(19+24, 0.7, 2);
+        addActive(24+24, 0.8, 0);
+        addActive(28+24, 0.6, -13.7);
+        addActive(31+24, 0.7, 2);
+        addActive(34+24, 0.5, -31.175);
+        addActive(36+24, 0.8, 0);
     }
 
     //empty constructor, values will need to be tweaked
@@ -105,15 +107,17 @@ public:
     {
         for (int i = 0; i < 62; i++) {
             isActiveArray[i] = false;
+            gains[i] = 0.0;
+            offsets[i] = 0.0;
         }
-        addActive(0+24+12, 1.0, 0);
-        addActive(12+24+12, 0.8, 0);
-        addActive(19+24+12, 0.7, 2);
-        addActive(24+24+12, 0.8, 0);
-        addActive(28+24+12, 0.6, -13.7);
-        addActive(31+24+12, 0.7, 2);
-        addActive(34+24+12, 0.5, -31.175);
-        addActive(36+24+12, 0.8, 0);
+//        addActive(0+24, 1.0, 0);
+        addActive(12+24, 0.8, 0);
+        addActive(19+24, 0.7, 2);
+        addActive(24+24, 0.8, 0);
+        addActive(28+24, 0.6, -13.7);
+        addActive(31+24, 0.7, 2);
+        addActive(34+24, 0.5, -31.175);
+        addActive(36+24, 0.8, 0);
 //    
 //            partialStructure.add({0,  1.0, 0});
 //            partialStructure.add({12, 0.8, 0});
@@ -271,8 +275,8 @@ public:
         DBG("setGain called");
     }
     
-    inline void setFundamental(int fun){
-        rFundamental = fun;
+    inline void setFundamental(int midiNoteNumber){
+        rFundamental = midiNoteNumber - 24;
         partialStructure.clearQuick();
         for (int i = 0; i < 62; i++){
             if (isActiveArray[i])
