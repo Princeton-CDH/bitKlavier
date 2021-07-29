@@ -84,7 +84,7 @@ struct DefaultHashFunctions
     hash.set (2, "item2");
 
     DBG (hash [1]); // prints "item1"
-    DBG (hash [2]); // prints "item2"
+ *   DBG (hash [2]); // prints "item2"
 
     // This iterates the map, printing all of its key -> value pairs..
     for (HashMap<int, String>::Iterator i (hash); i.next();)

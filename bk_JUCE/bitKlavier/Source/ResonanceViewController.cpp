@@ -271,6 +271,7 @@ void ResonanceViewController::displayTab(int tab)
         fundamentalKeyboard->setVisible(true);
         
         area.removeFromBottom(processor.paddingScalarX * 10);
+        area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
         
         Rectangle<int> closestKeyboardRow = area.removeFromBottom(keyboardHeight);
         
@@ -283,6 +284,7 @@ void ResonanceViewController::displayTab(int tab)
         closestKeyboard->setVisible(true);
     
         area.removeFromBottom(processor.paddingScalarY * 10);
+        area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
 
         float multiHeight = 100 + processor.paddingScalarY;
         
@@ -469,17 +471,21 @@ void ResonancePreparationEditor::update()
 //
         Array<float> offsets;
         Array<float> gains;
-
-        for (int i = 0; i < 24; i++) {
-            offsets.add(0);
-            gains.add(0);
-        }
-        
-        for (int i = 0; i < NUM_KEYS; i++) {
+//
+//        for (int i = 0; i < 24; i++) {
+//            offsets.add(0);
+//            gains.add(0);
+//        }
+//
+        for (int i = 24; i < 24+NUM_KEYS; i++) {
             offsets.add(prep->getOffset(i));
             gains.add(prep->getGain(i));
         }
         
+//        Array<float> offsets = Array<float>(prep->getOffsets());
+//        Array<float> gains = Array<float>(prep->getGains());
+
+      //        Array<float> gains;
         offsetsKeyboard.setValues(offsets);
         gainsKeyboard.setValues(gains);
 
