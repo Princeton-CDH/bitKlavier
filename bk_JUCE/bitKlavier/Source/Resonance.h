@@ -117,9 +117,9 @@ public:
 //            offsets[i] = 0.0;
 //        }
 //        addActive(0+24, 1.0, 0);
-        
-        offsets.ensureStorageAllocated(128);
-        gains.ensureStorageAllocated(128);
+//
+//        offsets.ensureStorageAllocated(128);
+//        gains.ensureStorageAllocated(128);
 
         
         addActive(12+24, 0.8, 0);
@@ -155,10 +155,8 @@ public:
 //        }
 //        addActive(0+24, 1.0, 0);
         
-        offsets.ensureStorageAllocated(128);
-        gains.ensureStorageAllocated(128);
-        
-        
+//        offsets.ensureStorageAllocated(128);
+//        gains.ensureStorageAllocated(128);
         
         addActive(12+24, 0.8, 0);
         addActive(19+24, 0.7, 2);
@@ -304,20 +302,29 @@ public:
     
     
         inline const float getGain(int midiNoteNumber) const noexcept {
-            if (!active.contains(midiNoteNumber)){
-                DBG("inactive key");
-                return -1;
-            }
-            return active.operator[](midiNoteNumber)->getGain();}
+//            if (!active.contains(midiNoteNumber)){
+//                DBG("inactive key");
+//                return -1;
+//            }
+//            return active.operator[](midiNoteNumber)->getGain();
+            return gainsMap.operator[](midiNoteNumber);
+        }
     
         inline const float getOffset(int midiNoteNumber) const noexcept {
-            DBG("get num slots: "+ String(active.getNumSlots()));
-            DBG("active slots: "+ String(active.size()));
-            if (!active.contains(midiNoteNumber)){
+//            DBG("get num slots: "+ String(active.getNumSlots()));
+//            DBG("active slots: "+ String(active.size()));
+//            if (!active.contains(midiNoteNumber)){
+//                DBG("inactive key");
+//                return -1;
+//            }
+//            return active.operator[](midiNoteNumber)->getOffset();
+            if (!offsetsMap.contains(midiNoteNumber)){
                 DBG("inactive key");
                 return -1;
             }
-            return active.operator[](midiNoteNumber)->getOffset();}
+            return offsetsMap.operator[](midiNoteNumber);
+
+        }
         
 //    inline Array<float>& getGains() {
 //        gains.clearQuick();
@@ -340,7 +347,11 @@ public:
 
     inline Array<int>& getKeys() {
         keys.clearQuick();
-        HashMap<int, GainOffsetPair::Ptr>::Iterator i (active);
+//        HashMap<int, GainOffsetPair::Ptr>::Iterator i (active);
+//        while (i.next()) {
+//            keys.add(i.getKey());
+//        }
+        HashMap<int, float>::Iterator i (gainsMap);
         while (i.next()) {
             keys.add(i.getKey());
         }
@@ -371,23 +382,31 @@ public:
     inline void setGains(Array<float> values) {
 //        for (int i = 0; i < 52; i++) gains[i] = values[24+i];
 //        DBG("setting gains");
-        for (int i = 0; i < values.size(); i++) {
-            if (active.contains(i)) {
-                float savedOffset = active.operator[](i)->getOffset();
-                GainOffsetPair newpair = *new GainOffsetPair(values[i], savedOffset);
-                active.set(i, newpair);
+//        for (int i = 0; i < values.size(); i++) {
+//            if (active.contains(i)) {
+//                float savedOffset = active.operator[](i)->getOffset();
+//                active.set(i, new GainOffsetPair(values[i], savedOffset));
+//            }
+//        }
+        for (int i = 0; i < values.size(); i++){
+            if (!offsetsMap.contains(i)) {
+                gainsMap.set(i, values[i]);
             }
-        }
+    }
     }
     
     inline void setOffsets(Array<float> values) {
 //        for (int i = 0; i < 52; i++) offsets[i] = values[24+i];
 //        DBG("setting offsets");
-        for (int i = 0; i < values.size(); i++) {
-            if (active.contains(i)) {
-                float savedGain = active.operator[](i)->getGain();
-//                GainOffsetPair newpair = ;
-                active.set(i, new GainOffsetPair(savedGain, values[i]));
+//        for (int i = 0; i < values.size(); i++) {
+//            if (active.contains(i)) {
+//                float savedGain = active.operator[](i)->getGain();
+////                GainOffsetPair newpair = ;
+//                active.set(i, new GainOffsetPair(savedGain, values[i]));
+//            }
+        for (int i = 0; i < values.size(); i++){
+            if (!gainsMap.contains(i)) {
+                offsetsMap.set(i, values[i]);
             }
         }
     }
@@ -409,21 +428,25 @@ public:
 //        gains[midiNoteNumber - 24] = gain;
 ////        DBG("gains size: " + String(gains.size()));
 //        offsets[midiNoteNumber - 24] = offset;
-        active.set(midiNoteNumber, (new GainOffsetPair(gain, offset)));
+//        active.set(midiNoteNumber, (new GainOffsetPair(gain, offset)));
+        gainsMap.set(midiNoteNumber, gain);
+        offsetsMap.set(midiNoteNumber, offset);
         partialStructure.add({midiNoteNumber - getFundamental(), gain, offset});
 //        toggleNote(midiNoteNumber);
 }
     inline void removeActive(int midiNoteNumber) {
 //        isActiveArray[midiNoteNumber - 24] = false;
 //        keys.remove(keys.indexOf(midiNoteNumber));
-        active.remove(midiNoteNumber);
+        gainsMap.remove(midiNoteNumber);
+        offsetsMap.remove(midiNoteNumber);
         updatePartialStructure();
     }
 
     inline bool isActive(int midiNoteNumber) {
 //        return isActiveArray[midiNoteNumber-24];
-        return active.contains(midiNoteNumber);
+        return (gainsMap.contains(midiNoteNumber) && offsetsMap.contains(midiNoteNumber));
     }
+        
     inline void updatePartialStructure() {
         partialStructure.clearQuick();
 //        for (int i = 0; i < 52; i++){
@@ -432,9 +455,11 @@ public:
 //                partialStructure.add({i - getFundamental(), gains[i], offsets[i]});
 //            }
 //        }
-        HashMap<int, GainOffsetPair::Ptr>::Iterator i (active);
+        
+        HashMap<int, float>::Iterator i (gainsMap);
+        
         while (i.next()) {
-            partialStructure.add({i.getKey() - getFundamental(), i.getValue()->getGain(), i.getValue()->getGain()});
+            partialStructure.add({i.getKey() - getFundamental(), i.getValue(), offsetsMap.operator[](i.getKey())});
         }
     }
     
@@ -447,10 +472,12 @@ private:
 //    bool isActiveArray[52];
 //    float gains[52];
 //    float offsets[52];
-    Array<float> gains;
-    Array<float> offsets;
+//    Array<float> gains;
+//    Array<float> offsets;
     Array<int> keys;
-    HashMap<int, GainOffsetPair::Ptr> active;
+    HashMap<int, float> gainsMap;
+    HashMap<int, float> offsetsMap;
+//    HashMap<int, GainOffsetPair::Ptr> active;
 
     JUCE_LEAK_DETECTOR(ResonancePreparation);
 };
