@@ -31,20 +31,32 @@ public:
     BKEditableComboBox selectCB;
     BKComboBox lengthModeSelectCB;
 
-    std::unique_ptr<BKStackedSlider> overtonesSlider;
+//    std::unique_ptr<BKStackedSlider> overtonesSlider;
     //will do something with overtoneGains eventually
 
-    std::unique_ptr<BKSingleSlider> startTimeSlider;
-    std::unique_ptr<BKSingleSlider> lengthSlider;
-    std::unique_ptr<BKSingleSlider> exciteThreshSlider;
-    std::unique_ptr<BKSingleSlider> attackThreshSlider;
+    std::unique_ptr<BKRangeSlider> startTimeSlider;
+    std::unique_ptr<BKSingleSlider> blendGainSlider;
     std::unique_ptr<BKSingleSlider> defGainSlider;
+    std::unique_ptr<BKSingleSlider> maxSympStringsSlider;
+    
+    OwnedArray<BKSubSlider> gainsArray;
+    OwnedArray<BKSubSlider> offsetsArray;
+    
+    BKAbsoluteKeyboardSlider gainsKeyboard;
+    BKAbsoluteKeyboardSlider offsetsKeyboard;
+    
+//    Array<bool> isActive;
+    bool isActive[52];
 
+    BKLabel lastNote;
 
-    //todo for later
-    //std::unique_ptr<BKSingleSlider> blendronicGainSlider;
-    //std::unique_ptr<BKStackedSlider> transpositionSlider;
-    //ToggleButton transpUsesTuning;
+    BKKeymapKeyboardState keyboardState;
+    BKKeymapKeyboardState fundamentalKeyboardState;
+    
+    OwnedArray<ToggleButton> fundamentalButtons;
+    
+    std::unique_ptr<BKKeymapKeyboardComponent> closestKeyboard;
+    std::unique_ptr<BKKeymapKeyboardComponent> fundamentalKeyboard;
 
     std::unique_ptr<BKADSRSlider> ADSRSlider;
 
@@ -54,10 +66,17 @@ public:
     std::unique_ptr<BKRangeSlider> holdTimeMinMaxSlider;
     std::unique_ptr<BKRangeSlider> velocityMinMaxSlider;
     */
-
+    
     ToggleButton alternateMod;
+    
+    int NUM_KEYS;
 
     BKLabel         ADSRLabel;
+    BKLabel closestKeyLabel;
+    BKLabel fundamentalLabel;
+    BKLabel gainsLabel;
+    BKLabel offsetsLabel;
+
 
     void paint(Graphics&) override;
     void resized() override;
@@ -91,6 +110,9 @@ class ResonancePreparationEditor :
     public BKStackedSlider::Listener,
     public BKADSRSlider::Listener,
     public BKRangeSlider::Listener,
+    public BKAbsoluteKeyboardSlider::Listener,
+    private BKKeymapKeyboardStateListener,
+//    public Slider::Listener,
     //public SliderListener,
     public Timer
 {
@@ -114,6 +136,7 @@ public:
     void setCurrentId(int Id);
     void deleteCurrent(void);
 
+
 private:
 
     void bkMessageReceived(const String& message) override;
@@ -126,6 +149,8 @@ private:
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
     void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+    void keyboardSliderChanged(String name, Array<float> values) override;
+    void handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) override;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ResonancePreparationEditor)
 
@@ -142,6 +167,7 @@ class ResonanceModificationEditor :
     public BKStackedSlider::Listener,
     public BKADSRSlider::Listener,
     public BKRangeSlider::Listener,
+//    public BKAbsoluteKeyboardSlider::Listener,
     //public SliderListener,
     public Timer
 {
@@ -164,6 +190,8 @@ public:
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
     void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
+
+//    void keyboardSliderChanged(String name, Array<float> values) override;
 
     void fillSelectCB(int last, int current);
     void greyOutAllComponents();
