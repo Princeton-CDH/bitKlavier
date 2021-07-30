@@ -71,7 +71,7 @@ public:
     
     int NUM_KEYS;
 
-    BKLabel         ADSRLabel;
+    BKLabel ADSRLabel;
     BKLabel closestKeyLabel;
     BKLabel fundamentalLabel;
     BKLabel gainsLabel;

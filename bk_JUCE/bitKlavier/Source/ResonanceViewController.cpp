@@ -427,7 +427,7 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
 
-    startTimer(30);
+    // startTimer(30);
 }
 
 void ResonancePreparationEditor::update()
