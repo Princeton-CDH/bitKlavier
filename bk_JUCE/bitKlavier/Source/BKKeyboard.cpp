@@ -86,9 +86,14 @@ octaveNumForMiddleC (3)
     colourChanged();
     //setWantsKeyboardFocus (true);
     
+    midRange = 0.;
+    minRange = -50.;
+    maxRange = 50;
+    
     for(int i=0; i<128; i++)
     {
-        keyValues.add(0.);
+        //keyValues.add(0.);
+        keyValues.add(midRange);
     }
     
     state.addListener (this);
@@ -483,10 +488,14 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
     Colour c (keyColour);
     
     float keyVal = keyValues.getUnchecked(midiNoteNumber);
-    if(keyVal != 0.)
+    //if(keyVal != 0.)
+    if(keyVal != midRange)
     {
-        if(keyVal > 0) c = c.overlaidWith (Colours::red.withSaturation ( sqrt(keyVal / 50.)) );
-        else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.)));
+        //if(keyVal > 0) c = c.overlaidWith (Colours::red.withSaturation ( sqrt(keyVal / 50.)) );
+        //else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.)));
+        //DBG("keyVal = " + String(midRange - keyVal));
+        if(keyVal > midRange) c = c.overlaidWith (Colours::red.withSaturation ( sqrt((keyVal - midRange) / (maxRange - midRange))) );
+        else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt((midRange - keyVal) / (midRange - minRange))));
     }
     else
     {
@@ -594,10 +603,15 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
     {
         
         float keyVal = keyValues.getUnchecked(midiNoteNumber);
-        if(keyVal != 0.)
+        //if(keyVal != 0.)
+        if(keyVal != midRange)
         {
-            if(keyVal > 0) c = Colours::red.withSaturation ( sqrt(keyVal / 50.)) ;
-            else c = Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.));
+            //if(keyVal > 0) c = Colours::red.withSaturation ( sqrt(keyVal / 50.)) ;
+            //else c = Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.));
+            
+            if(keyVal > midRange) c = c.overlaidWith (Colours::red.withSaturation ( sqrt((keyVal - midRange) / (maxRange - midRange))) );
+            else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt((midRange - keyVal) / (midRange - minRange))));
+            
             g.setColour(c);
         }
         else g.setColour (c.brighter());
@@ -963,7 +977,8 @@ void BKKeymapKeyboardComponent::setValues(Array<float> vals)
     for (int i = vals.size(); i<=rangeEnd;i++)
     {
         //DBG("keyValues SET DIRECT " + String(i) + " " + String(i) + " 0");
-        keyValues.set(i, 0);
+        //keyValues.set(i, 0);
+        keyValues.set(i, midRange);
     }
 }
 
@@ -978,7 +993,8 @@ float BKKeymapKeyboardComponent::getLastNoteOverValue()
 
 void BKKeymapKeyboardComponent::clearKeyValues()
 {
-    for (int i = 0; i < 128; i++) keyValues.set(i, 0.);
+    //for (int i = 0; i < 128; i++) keyValues.set(i, 0.);
+    for (int i = 0; i < 128; i++) keyValues.set(i, midRange);
 }
 
 void BKKeymapKeyboardComponent::setFundamental(int fund)
@@ -990,7 +1006,8 @@ void BKKeymapKeyboardComponent::setFundamental(int fund)
     int offset = fund - oldFund;
     
     Array<float> tempVals;
-    for (int i = 0; i < 128; i++) tempVals.add(0.);
+    //for (int i = 0; i < 128; i++) tempVals.add(0.);
+    for (int i = 0; i < 128; i++) tempVals.add(midRange);
     
     for(int i=rangeStart; i<=rangeEnd; i++)
     {

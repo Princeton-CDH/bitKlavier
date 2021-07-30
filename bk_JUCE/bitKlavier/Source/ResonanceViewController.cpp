@@ -159,15 +159,19 @@ offsetsKeyboard(false, true)
 //    }
     
     closestKeyLabel.setText("Resonance: ", dontSendNotification);
+    closestKeyLabel.setJustificationType(Justification::right);
     addAndMakeVisible(closestKeyLabel);
     
     fundamentalLabel.setText("Fundamental: ", dontSendNotification);
+    fundamentalLabel.setJustificationType(Justification::right);
     addAndMakeVisible(fundamentalLabel);
     
     gainsLabel.setText("Gains: ", dontSendNotification);
+    gainsLabel.setJustificationType(Justification::right);
     addAndMakeVisible(gainsLabel);
     
     offsetsLabel.setText("Offsets: ", dontSendNotification);
+    offsetsLabel.setJustificationType(Justification::right);
     addAndMakeVisible(offsetsLabel);
 
 

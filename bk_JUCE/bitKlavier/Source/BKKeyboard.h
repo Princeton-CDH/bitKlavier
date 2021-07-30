@@ -280,6 +280,20 @@ public:
     float getLastNoteOverValue();
     
     void doKeysToggle(bool tog) { keysToggle = tog; }
+    
+    void setMinMidMaxValues(float min, float mid, float max)
+    {
+        if (min > mid || min > max || mid > max) {
+            DBG("min must be < mid must be < max");
+            return;
+        }
+        
+        minRange = min;
+        midRange = mid;
+        maxRange = max;
+        
+        clearKeyValues();
+    }
 
     //==============================================================================
     /** @internal */
@@ -448,6 +462,10 @@ private:
     void updateNoteUnderMouse (const MouseEvent&, bool isDown);
     void repaintNote (int midiNoteNumber);
     void setLowestVisibleKeyFloat (float noteNumber);
+    
+    float midRange;
+    float minRange;
+    float maxRange;
     
     int lastNoteOver;
 

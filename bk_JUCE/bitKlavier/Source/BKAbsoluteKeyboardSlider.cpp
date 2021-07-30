@@ -62,7 +62,7 @@ ratio(1.0)
     showName.addMouseListener(this, true);
     addAndMakeVisible(showName);
 
-    keyboardValueTF.setText(String(0.0, 1));
+    keyboardValueTF.setText(String(midRange, displayResolution));
     keyboardValueTF.setName("KSLIDERTXT");
     keyboardValueTF.setTooltip("offset from ET in cents for last key pressed; can enter values here as well");
     keyboardValueTF.addListener(this);
@@ -156,7 +156,7 @@ void BKAbsoluteKeyboardSlider::setAvailableRange(int min, int max)
 
 void BKAbsoluteKeyboardSlider::mouseMove(const MouseEvent& e)
 {
-    keyboardValueTF.setText(String(keyboard->getLastNoteOverValue(), 1), dontSendNotification);
+    keyboardValueTF.setText(String(keyboard->getLastNoteOverValue(), displayResolution), dontSendNotification);
 }
 
 void BKAbsoluteKeyboardSlider::mouseDrag(const MouseEvent& e)
@@ -192,7 +192,7 @@ void BKAbsoluteKeyboardSlider::mouseUp(const MouseEvent& e)
     {
         if(e.mods.isShiftDown())
         {
-            keyboardValueTF.setText(String(0.), dontSendNotification);
+            keyboardValueTF.setText(String(midRange, displayResolution), dontSendNotification);
             keyboard->setKeyValue(lastKeyPressed, 0.);
         }
     }

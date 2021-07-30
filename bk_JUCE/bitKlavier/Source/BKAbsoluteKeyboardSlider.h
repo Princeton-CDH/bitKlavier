@@ -97,7 +97,9 @@ public:
         minRange = min;
         midRange = mid;
         maxRange = max;
-        displayResolution = resolution; 
+        displayResolution = resolution;
+        
+        keyboard->setMinMidMaxValues(min, mid, max);
     }
     
     void setOctaveForMiddleC(int octave) { keyboard->setOctaveForMiddleC(octave);};
