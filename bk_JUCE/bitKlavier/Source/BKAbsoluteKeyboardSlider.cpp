@@ -176,12 +176,12 @@ void BKAbsoluteKeyboardSlider::mouseDrag(const MouseEvent& e)
         dragPos = 1. - 2. * dragPos;
         if(dragPos > 0.) dragPos = dragPos * dragPos;
         else dragPos = -1.* dragPos * dragPos;
-        DBG("BKAbsoluteKeyboardSlider::mouseDrag dragPos = " + String(dragPos));
+        //DBG("BKAbsoluteKeyboardSlider::mouseDrag dragPos = " + String(dragPos));
         
         float outval;
         if (dragPos > 0) outval = midRange + dragPos * (maxRange - midRange);
         else outval = midRange + dragPos * (midRange - minRange);
-        DBG("BKAbsoluteKeyboardSlider::mouseDrag outval = " + String(outval));
+        //DBG("BKAbsoluteKeyboardSlider::mouseDrag outval = " + String(outval));
 
         //keyboardValueTF.setText(String(dragPos * 50.0, 1), dontSendNotification);
         //keyboard->setKeyValue(lastKeyPressed, dragPos * 50.);

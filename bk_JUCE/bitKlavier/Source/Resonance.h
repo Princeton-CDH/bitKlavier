@@ -51,7 +51,7 @@ public:
         rMaxSympStrings(r->rMaxSympStrings),
         name(r->name)
     {
-        
+        fundamentalKey = 0;
     }
 
     //constructor with input
@@ -70,7 +70,7 @@ public:
         rMaxSympStrings(8),
         name(newName)
     {
-
+        fundamentalKey = 0;
     }
 
     //empty constructor, values will need to be tweaked
@@ -90,7 +90,7 @@ public:
         name("test resonance preparation")
         
     {
-
+        fundamentalKey = 0;
     }
 
     // copy, modify, compare, randomize
@@ -167,7 +167,11 @@ public:
     }
     inline void setSoundSet(int Id) { rSoundSet = Id; }
     
-    void setFundamentalKey(int nf) { fundamentalKey = nf; }
+    void setFundamentalKey(int nf)
+    {
+        fundamentalKey = nf;
+        updatePartialStructure();
+    }
     void toggleResonanceKey(int nr)
     {
         if (resonanceKeys.contains(nr)) {
@@ -180,7 +184,40 @@ public:
             offsetsKeys.set(nr, 0.);
             gainsKeys.set(nr, 1.);
         }
+        
+        updatePartialStructure();
     }
+    
+    void addResonanceKey(int nr)
+    {
+        if(!resonanceKeys.contains(nr))
+        {
+            resonanceKeys.add(nr);
+            offsetsKeys.set(nr, 0.);
+            gainsKeys.set(nr, 1.);
+            
+            updatePartialStructure();
+        }
+    }
+    
+    void setOffset(int nr)
+    {
+        if (resonanceKeys.contains(nr))
+        {
+            offsetsKeys.set(nr, 0.);
+            updatePartialStructure();
+        }
+    }
+    
+    void setGain(int nr)
+    {
+        if (resonanceKeys.contains(nr))
+        {
+            gainsKeys.set(nr, 1.);
+            updatePartialStructure();
+        }
+    }
+    
     void setOffsets(Array<float> no) {
         
         for (int i = 0; i < 128; i++)
@@ -190,6 +227,8 @@ public:
                 offsetsKeys.set(i, no[i]);
             }
         }
+        
+        updatePartialStructure();
     }
     
     void setGains(Array<float> no) {
@@ -201,6 +240,8 @@ public:
                 gainsKeys.set(i, no[i]);
             }
         }
+        
+        updatePartialStructure();
     }
     
     int getFundamentalKey() { return fundamentalKey; }
@@ -240,6 +281,37 @@ public:
         }
         
         return vals;
+    }
+    
+    void updatePartialStructure()
+    {
+        // => partialStructure
+        // 2D array for partial structure
+        //      index is partial #
+        //      contents are interval from fundamental, gain, and offset from ET
+        //      by default, first 8 partials for conventional overtone series
+        //      user needs to be able to set these
+            
+        //Array<Array<float>> partialStructure;
+    
+        partialStructure.clearQuick();
+        
+        for (auto i : resonanceKeys)
+        {
+            //DBG("updatePartialStructure " + String(i) + " " + String(gainsKeys[i]) + " " + String(offsetsKeys[i]));
+            partialStructure.add({i - fundamentalKey, gainsKeys[i], offsetsKeys[i]});
+        }
+        
+        printPartialStructure();
+    }
+    
+    void printPartialStructure()
+    {
+        DBG("PRINTING PARTIAL STRUCTURE");
+        for (auto part : partialStructure)
+        {
+            DBG(String(part[0]) + ":" + String(part[1]) + ":" + String(part[2]));
+        }
     }
 
     // TODO

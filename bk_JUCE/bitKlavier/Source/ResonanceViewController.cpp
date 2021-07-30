@@ -877,6 +877,7 @@ void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float>
             DBG("updating gain vals");
             prep->setGains(values);
             
+            /*
             float sum = 0;
             for (float i : values) {
                 //DBG(String(i));
@@ -885,6 +886,7 @@ void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float>
                 }
                 sum+=1;
             }
+             */
             //DBG("sum: " + String(sum));
         }
         else if(name == offsetsKeyboard.getName())
@@ -892,6 +894,7 @@ void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float>
             DBG("updating offset vals");
             prep->setOffsets(values);
             
+            /*
             float sum = 0;
             for (float i : values) {
                 //DBG(String(i));
@@ -900,6 +903,7 @@ void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float>
                 }
                 sum+=1;
             }
+             */
             
         }
         processor.gallery->setGalleryDirty(true);
