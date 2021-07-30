@@ -73,18 +73,21 @@ offsetsKeyboard(false, true)
     closestKeyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     closestKeyboard->setName("absolute");
 //    closestKeyboard.setAlpha(1);
-    closestKeyboard->setAvailableRange(24, 24+NUM_KEYS);
+    //closestKeyboard->setAvailableRange(24, 24+NUM_KEYS);
+    closestKeyboard->setAvailableRange(0, NUM_KEYS);
     closestKeyboard->setOctaveForMiddleC(4);
     closestKeyboard->setScrollButtonsVisible(true);
+    closestKeyboard->setOctaveForMiddleC(5);
     addAndMakeVisible(*closestKeyboard);
     
     fundamentalKeyboard = std::make_unique<BKKeymapKeyboardComponent> (fundamentalKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     fundamentalKeyboard->setName("fundamental");
 //    closestKeyboard.setAlpha(1);
-    fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS);
+    //fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS);
+    fundamentalKeyboard->setAvailableRange(0, NUM_KEYS);
     fundamentalKeyboard->setOctaveForMiddleC(4);
     fundamentalKeyboard->setScrollButtonsVisible(false);
-
+    fundamentalKeyboard->setOctaveForMiddleC(5);
     addAndMakeVisible(*fundamentalKeyboard);
     
     addAndMakeVisible(&actionButton, ALL);
@@ -92,14 +95,19 @@ offsetsKeyboard(false, true)
     actionButton.setTooltip("Create, duplicate, rename, delete, or reset current settings");
     actionButton.addListener(this);
     
-    gainsKeyboard.setAvailableRange(24, 24+NUM_KEYS);
+    //gainsKeyboard.setAvailableRange(24, 24+NUM_KEYS);
+    gainsKeyboard.setAvailableRange(0, NUM_KEYS);
     gainsKeyboard.setName("gain");
     gainsKeyboard.addMouseListener(this, true);
+    gainsKeyboard.setOctaveForMiddleC(5);
+    gainsKeyboard.setMinMidMaxValues(0.1, 1., 10., 2); // min, mid, max, display resolution
     addAndMakeVisible(&gainsKeyboard);
     
-    offsetsKeyboard.setAvailableRange(24, 24+NUM_KEYS);
+    //offsetsKeyboard.setAvailableRange(24, 24+NUM_KEYS);
+    offsetsKeyboard.setAvailableRange(0, NUM_KEYS);
     offsetsKeyboard.setName("offset");
     offsetsKeyboard.addMouseListener(this, true);
+    offsetsKeyboard.setOctaveForMiddleC(5);
     addAndMakeVisible(&offsetsKeyboard);
 
 
@@ -150,7 +158,7 @@ offsetsKeyboard(false, true)
 //
 //    }
     
-    closestKeyLabel.setText("Closest Key: ", dontSendNotification);
+    closestKeyLabel.setText("Resonance: ", dontSendNotification);
     addAndMakeVisible(closestKeyLabel);
     
     fundamentalLabel.setText("Fundamental: ", dontSendNotification);
@@ -828,16 +836,17 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
             isActive[midiNoteNumber - 24] = true;
             DBG("adding active"+ String(midiNoteNumber));
         }
-        
-        closestKeyboard->setKeysInKeymap(prep->getKeys());
          */
+        
+        //closestKeyboard->setKeysInKeymap(prep->getKeys());
+         
 
     }
     else if (source == &fundamentalKeyboardState)
     {
         //prep->toggleFundamental(midiNoteNumber);
         fundamentalKeyboard->setKeysInKeymap({midiNoteNumber});
-        DBG("fundamental key toggled");
+        DBG("fundamental key toggled " + String(midiNoteNumber));
     }
     update();
 
@@ -853,15 +862,26 @@ void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float>
             //prep->setGains(values);
             float sum = 0;
             for (float i : values) {
+                //DBG(String(i));
+                if(i != 0) {
+                    DBG(String(sum) + " = " + String(i));
+                }
                 sum+=1;
-                DBG(String(i));
             }
-            DBG("sum: " + String(sum));
+            //DBG("sum: " + String(sum));
         }
         else if(name == offsetsKeyboard.getName())
         {
             DBG("updating offset vals");
             //prep->setOffsets(values);
+            float sum = 0;
+            for (float i : values) {
+                //DBG(String(i));
+                if(i != 0) {
+                    DBG(String(sum) + " = " + String(i));
+                }
+                sum+=1;
+            }
             
         }
         processor.gallery->setGalleryDirty(true);

@@ -86,6 +86,21 @@ public:
     
     void setAvailableRange(int min, int max);
     void setValues(Array<float> newvals);
+    
+    void setMinMidMaxValues(float min, float mid, float max, int resolution)
+    {
+        if (min > mid || min > max || mid > max) {
+            DBG("min must be < mid must be < max");
+            return;
+        }
+        
+        minRange = min;
+        midRange = mid;
+        maxRange = max;
+        displayResolution = resolution; 
+    }
+    
+    void setOctaveForMiddleC(int octave) { keyboard->setOctaveForMiddleC(octave);};
 
     inline void setDimensionRatio(float r) { ratio = r; }
     
@@ -105,6 +120,7 @@ private:
     
     String sliderName;
     BKLabel showName;
+
     
     bool needsOctaveSlider;
 #if JUCE_IOS
@@ -125,8 +141,14 @@ private:
     int keyboardSize, minKey, maxKey;
     int lastKeyPressed;
     
+    float midRange;
+    float minRange;
+    float maxRange;
+    int displayResolution; // how many decimal points
+    
     void setActiveValsFromString(String s);
     void setActiveValsFromStringWithFundamentalOffset(String s);
+
     
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override {};
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override {};

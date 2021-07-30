@@ -40,6 +40,13 @@ ratio(1.0)
     minKey = 21; // 21
     maxKey = 108; // 108
 #endif
+    
+    // be default, assume cents, +/- 50
+    midRange = 0.;
+    minRange = -50.;
+    maxRange = 50.;
+    displayResolution = 1;
+    
     keyboard->setRepaintsOnMouseActivity(false);
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
@@ -163,10 +170,18 @@ void BKAbsoluteKeyboardSlider::mouseDrag(const MouseEvent& e)
         dragPos = 1. - 2. * dragPos;
         if(dragPos > 0.) dragPos = dragPos * dragPos;
         else dragPos = -1.* dragPos * dragPos;
-
-        keyboardValueTF.setText(String(dragPos * 50.0, 1), dontSendNotification);
-        keyboard->setKeyValue(lastKeyPressed, dragPos * 50.);
+        DBG("BKAbsoluteKeyboardSlider::mouseDrag dragPos = " + String(dragPos));
         
+        float outval;
+        if (dragPos > 0) outval = midRange + dragPos * (maxRange - midRange);
+        else outval = midRange + dragPos * (midRange - minRange);
+        DBG("BKAbsoluteKeyboardSlider::mouseDrag outval = " + String(outval));
+
+        //keyboardValueTF.setText(String(dragPos * 50.0, 1), dontSendNotification);
+        //keyboard->setKeyValue(lastKeyPressed, dragPos * 50.);
+        keyboardValueTF.setText(String(outval, displayResolution), dontSendNotification);
+        keyboard->setKeyValue(lastKeyPressed, outval);
+ 
         //DBG("dragging last key, height " + String(keyboard->getLastKeySelected()) + " " + String(dragPos));
     }
 }
