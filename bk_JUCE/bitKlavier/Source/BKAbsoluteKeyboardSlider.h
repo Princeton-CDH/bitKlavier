@@ -114,6 +114,16 @@ public:
         keyboard->enableKey(midiNoteNumber);
     }
     
+    void setKeys(Array<int> midiNotes)
+    {
+        disableAllKeys();
+        
+        for (auto key : midiNotes)
+        {
+            enableKey(key);
+        }
+    }
+    
     void disableAllKeys()
     {
         for (int i = minKey; i <= maxKey; i++) {

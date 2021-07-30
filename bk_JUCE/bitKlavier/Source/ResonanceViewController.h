@@ -50,7 +50,7 @@ public:
 
     BKLabel lastNote;
 
-    BKKeymapKeyboardState keyboardState;
+    BKKeymapKeyboardState resonanceKeyboardState;
     BKKeymapKeyboardState fundamentalKeyboardState;
     
     OwnedArray<ToggleButton> fundamentalButtons;

@@ -245,7 +245,7 @@ void BKAbsoluteKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor
 {
     if(textEditor.getName() == keyboardValsTextField->getName())
     {
-        keyboard->setValues(stringOrderedPairsToFloatArray(keyboardValsTextField->getText(), 128));
+        keyboard->setValues(stringOrderedPairsToFloatArray(keyboardValsTextField->getText(), 128, midRange));
 
         listeners.call(&BKAbsoluteKeyboardSlider::Listener::keyboardSliderChanged,
                        getName(),
@@ -318,8 +318,8 @@ void BKAbsoluteKeyboardSlider::bkButtonClicked (Button* b)
 {
     if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
-
-        keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValues()), dontSendNotification);
+        
+        keyboardValsTextField->setText(offsetArrayToString3(keyboard->getValues(), midRange), dontSendNotification); 
 
 #if JUCE_IOS
         hasBigOne = true;

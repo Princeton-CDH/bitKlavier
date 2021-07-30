@@ -325,11 +325,12 @@ Array<bool>     slashToFalse(String s);
 
 String          offsetArrayToString(Array<float> arr);
 String          offsetArrayToString2(Array<float> arr);
+String          offsetArrayToString3(Array<float> arr, float mid);
 String          boolArrayToString(Array<bool> arr);
 Array<int>      stringToIntArray(String s);
 Array<int>      keymapStringToIntArray(String s);
 
-Array<float>    stringOrderedPairsToFloatArray(String s, int size);
+Array<float>    stringOrderedPairsToFloatArray(String s, int size, float init);
 
 double          mtof(double f);
 double          ftom(double f);

@@ -267,6 +267,22 @@ String offsetArrayToString2(Array<float> arr)
     return s;
 }
 
+String offsetArrayToString3(Array<float> arr, float mid)
+{
+    String s = "";
+    int key = 0;
+    for (auto offset : arr)
+    {
+        //if (offset != 0.0)  s += String(key) + ":" + String((int)(offset*100.0f)) + " ";
+        DBG("offsetArrayToString3 val = " + String(offset));
+        if (offset != mid)  s += String(key) + ":" + String((offset)) + " ";
+        
+        ++key;
+    }
+    
+    return s;
+}
+
 String arrayIntArrayToString(Array<Array<int>> afarr)
 {
     String s = "";
@@ -616,7 +632,7 @@ Array<float> stringToFloatArray(String s)
 
 //takes string of ordered pairs in the form x1:y1 x2:y2
 //and converts into Array of floats of y, with indices x
-Array<float> stringOrderedPairsToFloatArray(String s, int size)
+Array<float> stringOrderedPairsToFloatArray(String s, int size, float init)
 {
     
     String tempInt = "";
@@ -647,7 +663,8 @@ Array<float> stringOrderedPairsToFloatArray(String s, int size)
     
     Array<float> newarray;
     newarray.ensureStorageAllocated(size);
-    for(int i=0;i<size;i++) newarray.set(i, 0.);
+    // for(int i=0;i<size;i++) newarray.set(i, 0.);
+    for(int i=0;i<size;i++) newarray.set(i, init);
     
     for (int i = 0; i < (s.length()+1); i++)
     {

@@ -166,6 +166,81 @@ public:
         rRelease = release;
     }
     inline void setSoundSet(int Id) { rSoundSet = Id; }
+    
+    void setFundamentalKey(int nf) { fundamentalKey = nf; }
+    void toggleResonanceKey(int nr)
+    {
+        if (resonanceKeys.contains(nr)) {
+            resonanceKeys.removeAllInstancesOf(nr);
+            offsetsKeys.remove(nr);
+            gainsKeys.remove(nr);
+        }
+        else {
+            resonanceKeys.add(nr);
+            offsetsKeys.set(nr, 0.);
+            gainsKeys.set(nr, 1.);
+        }
+    }
+    void setOffsets(Array<float> no) {
+        
+        for (int i = 0; i < 128; i++)
+        {
+            if (resonanceKeys.contains(i))
+            {
+                offsetsKeys.set(i, no[i]);
+            }
+        }
+    }
+    
+    void setGains(Array<float> no) {
+        
+        for (int i = 0; i < 128; i++)
+        {
+            if (resonanceKeys.contains(i))
+            {
+                gainsKeys.set(i, no[i]);
+            }
+        }
+    }
+    
+    int getFundamentalKey() { return fundamentalKey; }
+    Array<int> getResonanceKeys() { return resonanceKeys; }
+    
+    Array<float> getOffsets()
+    {
+        Array<float> vals;
+        
+        for(int i = 0; i < 128; i++)
+        {
+            if (offsetsKeys.contains(i))
+            {
+                vals.set(i, offsetsKeys[i]);
+            }
+            else {
+                vals.set(i, 0.);
+            }
+        }
+        
+        return vals;
+    }
+    
+    Array<float> getGains()
+    {
+        Array<float> vals;
+        
+        for(int i = 0; i < 128; i++)
+        {
+            if (gainsKeys.contains(i))
+            {
+                vals.set(i, gainsKeys[i]);
+            }
+            else {
+                vals.set(i, 1.);
+            }
+        }
+        
+        return vals;
+    }
 
     // TODO
     void print(void)
@@ -213,6 +288,22 @@ public:
 private:
 
     String name;
+    
+    // => partialStructure
+    // 2D array for partial structure
+    //      index is partial #
+    //      contents are interval from fundamental, gain, and offset from ET
+    //      by default, first 8 partials for conventional overtone series
+    //      user needs to be able to set these
+    Array<Array<float>> partialStructure;
+    
+    // key that partials are related to. usually the lowest C on the UI keyboard
+    int fundamentalKey;
+    
+    // with the partials indicated in resonanceKeys
+    Array<int> resonanceKeys;
+    HashMap<int, float> offsetsKeys;
+    HashMap<int, float> gainsKeys;
 
     JUCE_LEAK_DETECTOR(ResonancePreparation);
 };

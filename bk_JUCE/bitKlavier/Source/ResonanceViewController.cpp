@@ -70,7 +70,7 @@ offsetsKeyboard(false, true)
     addAndMakeVisible(&ADSRLabel, ALL);
     
     NUM_KEYS = 52;
-    closestKeyboard = std::make_unique<BKKeymapKeyboardComponent> (keyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    closestKeyboard = std::make_unique<BKKeymapKeyboardComponent> (resonanceKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     closestKeyboard->setName("absolute");
 //    closestKeyboard.setAlpha(1);
     //closestKeyboard->setAvailableRange(24, 24+NUM_KEYS);
@@ -88,6 +88,7 @@ offsetsKeyboard(false, true)
     fundamentalKeyboard->setOctaveForMiddleC(4);
     fundamentalKeyboard->setScrollButtonsVisible(false);
     fundamentalKeyboard->setOctaveForMiddleC(5);
+    fundamentalKeyboard->setKeysInKeymap(0);
     addAndMakeVisible(*fundamentalKeyboard);
     
     addAndMakeVisible(&actionButton, ALL);
@@ -203,7 +204,7 @@ void ResonanceViewController::displayTab(int tab)
     invisible();
     displayShared();
 
-    int x0 = leftArrow.getRight() + gXSpacing;
+//    int x0 = leftArrow.getRight() + gXSpacing;
 //    int y0 = hideOrShow.getBottom() + gYSpacing;
 //    int right = rightArrow.getX() - gXSpacing;
 //    int width = right - x0;
@@ -435,7 +436,7 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     maxSympStringsSlider->addMyListener(this);
 
     ADSRSlider->addMyListener(this);
-    keyboardState.addListener(this);
+    resonanceKeyboardState.addListener(this);
     fundamentalKeyboardState.addListener(this);
     
     offsetsKeyboard.addMyListener(this);
@@ -829,7 +830,7 @@ void ResonancePreparationEditor::BKRangeSliderValueChanged(String name, double m
 
 void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) {
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
-    if (source == &keyboardState)
+    if (source == &resonanceKeyboardState)
     {
         /*
         if (prep->isActive(midiNoteNumber)) {
@@ -845,12 +846,21 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
          */
         
         //closestKeyboard->setKeysInKeymap(prep->getKeys());
+        DBG("resonanceKeyboardState " + String(midiNoteNumber));
+        prep->toggleResonanceKey(midiNoteNumber);
+        closestKeyboard->setKeysInKeymap(prep->getResonanceKeys());
+        
+        offsetsKeyboard.setKeys(prep->getResonanceKeys());
+        offsetsKeyboard.setValues(prep->getOffsets());
+        
+        gainsKeyboard.setKeys(prep->getResonanceKeys());
+        gainsKeyboard.setValues(prep->getGains());
          
 
     }
     else if (source == &fundamentalKeyboardState)
     {
-        //prep->toggleFundamental(midiNoteNumber);
+        prep->setFundamentalKey(midiNoteNumber); 
         fundamentalKeyboard->setKeysInKeymap({midiNoteNumber});
         DBG("fundamental key toggled " + String(midiNoteNumber));
     }
@@ -865,7 +875,8 @@ void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float>
         if(name == gainsKeyboard.getName())
         {
             DBG("updating gain vals");
-            //prep->setGains(values);
+            prep->setGains(values);
+            
             float sum = 0;
             for (float i : values) {
                 //DBG(String(i));
@@ -879,7 +890,8 @@ void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float>
         else if(name == offsetsKeyboard.getName())
         {
             DBG("updating offset vals");
-            //prep->setOffsets(values);
+            prep->setOffsets(values);
+            
             float sum = 0;
             for (float i : values) {
                 //DBG(String(i));

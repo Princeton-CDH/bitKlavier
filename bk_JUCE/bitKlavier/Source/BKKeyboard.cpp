@@ -502,7 +502,7 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
     else
     {
         if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
-        if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+        if (isOver && !disabledKeys.contains(midiNoteNumber))  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
     }
     
     g.setColour (c);
@@ -595,7 +595,7 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
     //Colour c (noteFillColour);
     
     if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
-    if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+    if (isOver && !disabledKeys.contains(midiNoteNumber))  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
     
     g.setColour (c);
     g.fillRect (x, y, w, h);
@@ -951,7 +951,8 @@ void BKKeymapKeyboardComponent::setValuesRotatedByFundamental(Array<float> vals)
 Array<float> BKKeymapKeyboardComponent::getValues()
 {
     Array<float> valsToSend;
-    for (int i = 0; i < 128; i++) valsToSend.add(0.);
+    //for (int i = 0; i < 128; i++) valsToSend.add(0.);
+    for (int i = 0; i < 128; i++) valsToSend.add(midRange);
     //for (int i = 0; i < 12; i++) valsToSend.add(0.);
     
     int offset;
@@ -1000,6 +1001,7 @@ float BKKeymapKeyboardComponent::getLastNoteOverValue()
 void BKKeymapKeyboardComponent::clearKeyValues()
 {
     //for (int i = 0; i < 128; i++) keyValues.set(i, 0.);
+    DBG("BKKeymapKeyboardComponent::clearKeyValues, setting to " + String(midRange));
     for (int i = 0; i < 128; i++) keyValues.set(i, midRange);
 }
 
