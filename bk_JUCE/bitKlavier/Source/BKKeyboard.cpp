@@ -895,7 +895,7 @@ void BKKeymapKeyboardComponent::mouseDrag (const MouseEvent& e)
     {
         float mousePositionVelocity;
         const int newNote = xyToNote (e.getPosition(), mousePositionVelocity);
-        
+ 
         if (newNote >= 0)
             mouseDraggedToKey (newNote, e);
         

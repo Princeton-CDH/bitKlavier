@@ -161,6 +161,12 @@ void BKAbsoluteKeyboardSlider::mouseMove(const MouseEvent& e)
 
 void BKAbsoluteKeyboardSlider::mouseDrag(const MouseEvent& e)
 {
+    if (disabledKeys.contains(lastKeyPressed))
+    {
+        DBG("key disabled");
+        return;
+    }
+    
     if(e.y >= 0 && e.y <= keyboard->getHeight())
     {
         bool isBlackKey = MidiMessage::isMidiNoteBlack (keyboard->getLastKeySelected());

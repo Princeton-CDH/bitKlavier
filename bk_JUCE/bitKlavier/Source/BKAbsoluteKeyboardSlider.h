@@ -102,6 +102,28 @@ public:
         keyboard->setMinMidMaxValues(min, mid, max);
     }
     
+    void disableKey(int midiNoteNumber)
+    {
+        disabledKeys.add(midiNoteNumber);
+    }
+    
+    void enableKey(int midiNoteNumber)
+    {
+        disabledKeys.removeAllInstancesOf(midiNoteNumber);
+    }
+    
+    void disableAllKeys()
+    {
+        for (int i = minKey; i <= maxKey; i++) {
+            disableKey(i);
+        }
+    }
+    
+    void enableAllKeys()
+    {
+        disabledKeys.clearQuick();
+    }
+    
     void setOctaveForMiddleC(int octave) { keyboard->setOctaveForMiddleC(octave);};
 
     inline void setDimensionRatio(float r) { ratio = r; }
@@ -122,7 +144,6 @@ private:
     
     String sliderName;
     BKLabel showName;
-
     
     bool needsOctaveSlider;
 #if JUCE_IOS
@@ -148,10 +169,11 @@ private:
     float maxRange;
     int displayResolution; // how many decimal points
     
+    Array<int> disabledKeys;
+    
     void setActiveValsFromString(String s);
     void setActiveValsFromStringWithFundamentalOffset(String s);
 
-    
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override {};
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override {};
     void handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber) override;

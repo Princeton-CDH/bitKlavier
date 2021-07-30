@@ -101,13 +101,15 @@ offsetsKeyboard(false, true)
     gainsKeyboard.addMouseListener(this, true);
     gainsKeyboard.setOctaveForMiddleC(5);
     gainsKeyboard.setMinMidMaxValues(0.1, 1., 10., 2); // min, mid, max, display resolution
+    gainsKeyboard.disableAllKeys();
     addAndMakeVisible(&gainsKeyboard);
-    
+
     //offsetsKeyboard.setAvailableRange(24, 24+NUM_KEYS);
     offsetsKeyboard.setAvailableRange(0, NUM_KEYS);
     offsetsKeyboard.setName("offset");
     offsetsKeyboard.addMouseListener(this, true);
     offsetsKeyboard.setOctaveForMiddleC(5);
+    offsetsKeyboard.disableAllKeys();
     addAndMakeVisible(&offsetsKeyboard);
 
 
