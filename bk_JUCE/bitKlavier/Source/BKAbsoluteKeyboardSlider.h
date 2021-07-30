@@ -105,11 +105,13 @@ public:
     void disableKey(int midiNoteNumber)
     {
         disabledKeys.add(midiNoteNumber);
+        keyboard->disableKey(midiNoteNumber);
     }
     
     void enableKey(int midiNoteNumber)
     {
         disabledKeys.removeAllInstancesOf(midiNoteNumber);
+        keyboard->enableKey(midiNoteNumber);
     }
     
     void disableAllKeys()
@@ -122,6 +124,7 @@ public:
     void enableAllKeys()
     {
         disabledKeys.clearQuick();
+        keyboard->enableAllKeys();
     }
     
     void setOctaveForMiddleC(int octave) { keyboard->setOctaveForMiddleC(octave);};

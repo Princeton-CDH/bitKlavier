@@ -485,7 +485,9 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
                                            const Colour& lineColour,
                                            const Colour& textColour)
 {
-    Colour c (keyColour);
+    Colour c;
+    if(disabledKeys.contains(midiNoteNumber)) c = findColour(shadowColourId);
+    else c = keyColour;
     
     float keyVal = keyValues.getUnchecked(midiNoteNumber);
     //if(keyVal != 0.)
@@ -586,7 +588,11 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
                                            bool isDown, bool isOver,
                                            const Colour& noteFillColour)
 {
-    Colour c (noteFillColour);
+    Colour c;
+    if(disabledKeys.contains(midiNoteNumber)) c = findColour(shadowColourId);
+    else c = noteFillColour;
+    
+    //Colour c (noteFillColour);
     
     if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
     if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));

@@ -294,6 +294,28 @@ public:
         
         clearKeyValues();
     }
+    
+    void disableKey(int midiNoteNumber)
+    {
+        disabledKeys.add(midiNoteNumber);
+    }
+    
+    void enableKey(int midiNoteNumber)
+    {
+        disabledKeys.removeAllInstancesOf(midiNoteNumber);
+    }
+    
+    void disableAllKeys()
+    {
+        for (int i = rangeStart; i <= rangeEnd; i++) {
+            disableKey(i);
+        }
+    }
+    
+    void enableAllKeys()
+    {
+        disabledKeys.clearQuick();
+    }
 
     //==============================================================================
     /** @internal */
@@ -468,6 +490,8 @@ private:
     float maxRange;
     
     int lastNoteOver;
+    
+    Array<int> disabledKeys;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeymapKeyboardComponent)
 };
