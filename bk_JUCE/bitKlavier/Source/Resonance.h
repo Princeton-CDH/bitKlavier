@@ -246,6 +246,7 @@ public:
     
     int getFundamentalKey() { return fundamentalKey; }
     Array<int> getResonanceKeys() { return resonanceKeys; }
+    Array<Array<float>> getPartialStructure() { return partialStructure; }
     
     Array<float> getOffsets()
     {
