@@ -49,9 +49,10 @@ public:
         rMinStartTimeMS(r->rMinStartTimeMS),
         rMaxStartTimeMS(r->rMaxStartTimeMS),
         rMaxSympStrings(r->rMaxSympStrings),
+        rFundamentalKey(r->rFundamentalKey),
         rResonanceKeys(r->rResonanceKeys),
-        //rOffsetsKeys(r->rOffsetsKeys),
-        //rGainsKeys(r->rGainsKeys),
+        rOffsetsKeys(r->rOffsetsKeys),
+        rGainsKeys(r->rGainsKeys),
         name(r->name)
     {
         setDefaultPartialStructure();
@@ -71,9 +72,10 @@ public:
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
         rMaxSympStrings(8),
+        rFundamentalKey(0),
         rResonanceKeys({}),
-        //rOffsetsKeys(HashMap<int, float>(0)),
-        //rGainsKeys(new HashMap<int, float>(0, 1.)),
+        rOffsetsKeys({}),
+        rGainsKeys({}),
         name(newName)
     {
         setDefaultPartialStructure();
@@ -85,7 +87,7 @@ public:
     }
 
     //empty constructor, values will need to be tweaked
-    ResonancePreparation(void) : 
+    ResonancePreparation(void) :
         rSoundSet(-1),
         rUseGlobalSoundSet(true),
         rSoundSetName(String()),
@@ -98,7 +100,10 @@ public:
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
         rMaxSympStrings(8),
+        rFundamentalKey(0),
         rResonanceKeys({}),
+        rOffsetsKeys({}),
+        rGainsKeys({}),
         name("test resonance preparation")
         
     {
@@ -181,21 +186,23 @@ public:
     
     void setFundamentalKey(int nf)
     {
-        fundamentalKey = nf;
+        rFundamentalKey.value = nf;
         updatePartialStructure();
     }
     
     void toggleResonanceKey(int nr)
     {
-        if (resonanceKeys.contains(nr)) {
-            resonanceKeys.removeAllInstancesOf(nr);
-            offsetsKeys.remove(nr);
-            gainsKeys.remove(nr);
+        if (rResonanceKeys.value.contains(nr)) {
+            rResonanceKeys.value.removeAllInstancesOf(nr);
+            rOffsetsKeys.value.set(nr, 0.);
+            rGainsKeys.value.set(nr, 1.);
+            //offsetsKeys.remove(nr);
+            //gainsKeys.remove(nr);
         }
         else {
-            resonanceKeys.add(nr);
-            offsetsKeys.set(nr, 0.);
-            gainsKeys.set(nr, 1.);
+            rResonanceKeys.value.add(nr);
+            rOffsetsKeys.value.set(nr, 0.);
+            rGainsKeys.value.set(nr, 1.);
         }
         
         updatePartialStructure();
@@ -203,11 +210,11 @@ public:
     
     void addResonanceKey(int nr)
     {
-        if(!resonanceKeys.contains(nr))
+        if(!rResonanceKeys.value.contains(nr))
         {
-            resonanceKeys.add(nr);
-            offsetsKeys.set(nr, 0.);
-            gainsKeys.set(nr, 1.);
+            rResonanceKeys.value.add(nr);
+            rOffsetsKeys.value.set(nr, 0.);
+            rGainsKeys.value.set(nr, 1.);
             
             updatePartialStructure();
         }
@@ -215,11 +222,11 @@ public:
     
     void addResonanceKey(int nr, float gain, float offset)
     {
-        if(!resonanceKeys.contains(nr))
+        if(!rResonanceKeys.value.contains(nr))
         {
-            resonanceKeys.add(nr);
-            offsetsKeys.set(nr, offset);
-            gainsKeys.set(nr, gain);
+            rResonanceKeys.value.add(nr);
+            rOffsetsKeys.value.set(nr, offset);
+            rGainsKeys.value.set(nr, gain);
             
             updatePartialStructure();
         }
@@ -227,18 +234,18 @@ public:
     
     void setOffset(int nr)
     {
-        if (resonanceKeys.contains(nr))
+        if (rResonanceKeys.value.contains(nr))
         {
-            offsetsKeys.set(nr, 0.);
+            rOffsetsKeys.value.set(nr, 0.);
             updatePartialStructure();
         }
     }
     
     void setGain(int nr)
     {
-        if (resonanceKeys.contains(nr))
+        if (rResonanceKeys.value.contains(nr))
         {
-            gainsKeys.set(nr, 1.);
+            rGainsKeys.value.set(nr, 1.);
             updatePartialStructure();
         }
     }
@@ -247,9 +254,9 @@ public:
         
         for (int i = 0; i < 128; i++)
         {
-            if (resonanceKeys.contains(i))
+            if (rResonanceKeys.value.contains(i))
             {
-                offsetsKeys.set(i, no[i]);
+                rOffsetsKeys.value.set(i, no[i]);
             }
         }
         
@@ -260,21 +267,22 @@ public:
         
         for (int i = 0; i < 128; i++)
         {
-            if (resonanceKeys.contains(i))
+            if (rResonanceKeys.value.contains(i))
             {
-                gainsKeys.set(i, no[i]);
+                rGainsKeys.value.set(i, no[i]);
             }
         }
         
         updatePartialStructure();
     }
     
-    int getFundamentalKey() { return fundamentalKey; }
-    Array<int> getResonanceKeys() { return resonanceKeys; }
+    int getFundamentalKey() { return rFundamentalKey.value; }
+    Array<int> getResonanceKeys() { return rResonanceKeys.value; }
     Array<Array<float>> getPartialStructure() { return partialStructure; }
     
     Array<float> getOffsets()
     {
+        /*
         Array<float> vals;
         
         for(int i = 0; i < 128; i++)
@@ -289,10 +297,15 @@ public:
         }
         
         return vals;
+         */
+        
+        return rOffsetsKeys.value;
+
     }
     
     Array<float> getGains()
     {
+        /*
         Array<float> vals;
         
         for(int i = 0; i < 128; i++)
@@ -307,6 +320,8 @@ public:
         }
         
         return vals;
+         */
+        return rGainsKeys.value;
     }
     
     void updatePartialStructure()
@@ -322,18 +337,28 @@ public:
     
         partialStructure.clearQuick();
         
-        for (auto i : resonanceKeys)
+        for (auto i : rResonanceKeys.value)
         {
             //DBG("updatePartialStructure " + String(i) + " " + String(gainsKeys[i]) + " " + String(offsetsKeys[i]));
-            partialStructure.add({i - fundamentalKey, gainsKeys[i], offsetsKeys[i]});
+            //partialStructure.add({i - fundamentalKey, gainsKeys[i], offsetsKeys[i]});
+            partialStructure.add({i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]});
         }
         
-        // printPartialStructure();
+        printPartialStructure();
     }
     
     void setDefaultPartialStructure()
     {
-        fundamentalKey = 0;
+        //fundamentalKey = 0;
+        rFundamentalKey = 0;
+        
+        for(int i = 0; i < 128; i++)
+        {
+            //offsetsKeys.set(i, 0.);
+            //gainsKeys.set(i, 1.);
+            rOffsetsKeys.value.set(i, 0.);
+            rGainsKeys.value.set(i, 1.);
+        }
         
         addResonanceKey( 0, 1.0, 0.);
         addResonanceKey(12, 0.8, 0);
@@ -390,9 +415,10 @@ public:
     // => cap the number of sympStrings to this
     Moddable<int> rMaxSympStrings;
     
+    Moddable<int> rFundamentalKey;
     Moddable<Array<int>> rResonanceKeys; // not currently used as is; should replace resonanceKeys
-    //Moddable<HashMap<int, float>> rOffsetsKeys;
-    //Moddable<HashMap<int, float>> rGainsKeys;
+    Moddable<Array<float>> rOffsetsKeys;
+    Moddable<Array<float>> rGainsKeys;
     
     inline const int getMinStartTime() const noexcept { return rMinStartTimeMS.value; }
     inline const int getMaxStartTime() const noexcept { return rMaxStartTimeMS.value; }
@@ -415,12 +441,12 @@ private:
     Array<Array<float>> partialStructure;
     
     // key that partials are related to. usually the lowest C on the UI keyboard
-    int fundamentalKey;
+    //int fundamentalKey;
     
     // with the partials indicated in resonanceKeys
-    Array<int> resonanceKeys;
-    HashMap<int, float> offsetsKeys;
-    HashMap<int, float> gainsKeys;
+    //Array<int> resonanceKeys;
+    //HashMap<int, float> offsetsKeys;
+    //HashMap<int, float> gainsKeys;
 
     JUCE_LEAK_DETECTOR(ResonancePreparation);
 };
