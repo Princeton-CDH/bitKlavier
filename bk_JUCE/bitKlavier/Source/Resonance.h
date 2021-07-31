@@ -49,6 +49,9 @@ public:
         rMinStartTimeMS(r->rMinStartTimeMS),
         rMaxStartTimeMS(r->rMaxStartTimeMS),
         rMaxSympStrings(r->rMaxSympStrings),
+        rResonanceKeys(r->rResonanceKeys),
+        //rOffsetsKeys(r->rOffsetsKeys),
+        //rGainsKeys(r->rGainsKeys),
         name(r->name)
     {
         setDefaultPartialStructure();
@@ -68,9 +71,17 @@ public:
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
         rMaxSympStrings(8),
+        rResonanceKeys({}),
+        //rOffsetsKeys(HashMap<int, float>(0)),
+        //rGainsKeys(new HashMap<int, float>(0, 1.)),
         name(newName)
     {
         setDefaultPartialStructure();
+        /*
+         Moddable<Array<int>> rResonanceKeys;
+         Moddable<HashMap<int, float>> rOffsetsKeys;
+         Moddable<HashMap<int, float>> rGainsKeys;
+         */
     }
 
     //empty constructor, values will need to be tweaked
@@ -87,6 +98,7 @@ public:
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
         rMaxSympStrings(8),
+        rResonanceKeys({}),
         name("test resonance preparation")
         
     {
@@ -172,6 +184,7 @@ public:
         fundamentalKey = nf;
         updatePartialStructure();
     }
+    
     void toggleResonanceKey(int nr)
     {
         if (resonanceKeys.contains(nr)) {
@@ -315,7 +328,7 @@ public:
             partialStructure.add({i - fundamentalKey, gainsKeys[i], offsetsKeys[i]});
         }
         
-        printPartialStructure();
+        // printPartialStructure();
     }
     
     void setDefaultPartialStructure()
@@ -330,17 +343,6 @@ public:
         addResonanceKey(31, 0.7, 2);
         addResonanceKey(34, 0.5, -31.175);
         addResonanceKey(36, 0.8, 0);
-        
-        /*
-        partialStructure.add({0,  1.0, 0});
-        partialStructure.add({12, 0.8, 0});
-        partialStructure.add({19, 0.7, 2});
-        partialStructure.add({24, 0.8, 0});
-        partialStructure.add({28, 0.6, -13.7});
-        partialStructure.add({31, 0.7, 2});
-        partialStructure.add({34, 0.5, -31.175});
-        partialStructure.add({36, 0.8, 0});
-         */
 
     }
     
@@ -387,6 +389,10 @@ public:
     
     // => cap the number of sympStrings to this
     Moddable<int> rMaxSympStrings;
+    
+    Moddable<Array<int>> rResonanceKeys; // not currently used as is; should replace resonanceKeys
+    //Moddable<HashMap<int, float>> rOffsetsKeys;
+    //Moddable<HashMap<int, float>> rGainsKeys;
     
     inline const int getMinStartTime() const noexcept { return rMinStartTimeMS.value; }
     inline const int getMaxStartTime() const noexcept { return rMaxStartTimeMS.value; }
