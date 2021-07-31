@@ -79,11 +79,6 @@ public:
         name(newName)
     {
         setDefaultPartialStructure();
-        /*
-         Moddable<Array<int>> rResonanceKeys;
-         Moddable<HashMap<int, float>> rOffsetsKeys;
-         Moddable<HashMap<int, float>> rGainsKeys;
-         */
     }
 
     //empty constructor, values will need to be tweaked
@@ -186,7 +181,7 @@ public:
     
     void setFundamentalKey(int nf)
     {
-        rFundamentalKey.value = nf;
+        rFundamentalKey = nf;
         updatePartialStructure();
     }
     
@@ -415,8 +410,11 @@ public:
     // => cap the number of sympStrings to this
     Moddable<int> rMaxSympStrings;
     
+    // key that partials are related to. usually the lowest C on the UI keyboard, but could be otherwise, for "undertones"
     Moddable<int> rFundamentalKey;
-    Moddable<Array<int>> rResonanceKeys; // not currently used as is; should replace resonanceKeys
+    
+    // with the partials indicated in resonanceKeys, with offsets and gains for each resonance/partial, indexed by noteNumber
+    Moddable<Array<int>> rResonanceKeys;
     Moddable<Array<float>> rOffsetsKeys;
     Moddable<Array<float>> rGainsKeys;
     
