@@ -469,6 +469,15 @@ void ResonancePreparationEditor::update()
         ADSRSlider->setSustainValue(ADSRarray[2], dontSendNotification);
         ADSRSlider->setReleaseValue(ADSRarray[3], dontSendNotification);
         
+        fundamentalKeyboard->setKeysInKeymap({prep->getFundamentalKey()});
+        closestKeyboard->setKeysInKeymap(prep->getResonanceKeys());
+        
+        offsetsKeyboard.setKeys(prep->getResonanceKeys());
+        offsetsKeyboard.setValues(prep->getOffsets());
+        
+        gainsKeyboard.setKeys(prep->getResonanceKeys());
+        gainsKeyboard.setValues(prep->getGains());
+        
 //        for (int i = 0; i < NUM_KEYS; i++){
 //            if (prep->isActive(i + 24)) {
 //                gainsArray[i]->setVisible(true);
@@ -484,8 +493,8 @@ void ResonancePreparationEditor::update()
 //            }
 //        }
 //
-        Array<float> offsets;
-        Array<float> gains;
+        //Array<float> offsets;
+        //Array<float> gains;
 //
 //        for (int i = 0; i < 24; i++) {
 //            offsets.add(0);
@@ -503,8 +512,8 @@ void ResonancePreparationEditor::update()
 //        Array<float> gains = Array<float>(prep->getGains());
 
       //        Array<float> gains;
-        offsetsKeyboard.setValues(offsets);
-        gainsKeyboard.setValues(gains);
+        //offsetsKeyboard.setValues(offsets);
+        //gainsKeyboard.setValues(gains);
 
         /*
         closestKeyboard->setKeysInKeymap(prep->getKeys());

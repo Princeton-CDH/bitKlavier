@@ -38,6 +38,7 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcesso
     general(rGeneral),
     keymaps(Keymap::PtrArr())
 {
+    /*
     partialStructure.add({0,  1.0, 0});
     partialStructure.add({12, 0.8, 0});
     partialStructure.add({19, 0.7, 2});
@@ -46,6 +47,7 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcesso
     partialStructure.add({31, 0.7, 2});
     partialStructure.add({34, 0.5, -31.175});
     partialStructure.add({36, 0.8, 0});
+    */
 
     DBG("Create rProc");
 }

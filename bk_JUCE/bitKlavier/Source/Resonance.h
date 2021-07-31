@@ -51,7 +51,7 @@ public:
         rMaxSympStrings(r->rMaxSympStrings),
         name(r->name)
     {
-        fundamentalKey = 0;
+        setDefaultPartialStructure();
     }
 
     //constructor with input
@@ -70,7 +70,7 @@ public:
         rMaxSympStrings(8),
         name(newName)
     {
-        fundamentalKey = 0;
+        setDefaultPartialStructure();
     }
 
     //empty constructor, values will need to be tweaked
@@ -90,7 +90,7 @@ public:
         name("test resonance preparation")
         
     {
-        fundamentalKey = 0;
+        setDefaultPartialStructure();
     }
 
     // copy, modify, compare, randomize
@@ -200,6 +200,18 @@ public:
         }
     }
     
+    void addResonanceKey(int nr, float gain, float offset)
+    {
+        if(!resonanceKeys.contains(nr))
+        {
+            resonanceKeys.add(nr);
+            offsetsKeys.set(nr, offset);
+            gainsKeys.set(nr, gain);
+            
+            updatePartialStructure();
+        }
+    }
+    
     void setOffset(int nr)
     {
         if (resonanceKeys.contains(nr))
@@ -304,6 +316,32 @@ public:
         }
         
         printPartialStructure();
+    }
+    
+    void setDefaultPartialStructure()
+    {
+        fundamentalKey = 0;
+        
+        addResonanceKey( 0, 1.0, 0.);
+        addResonanceKey(12, 0.8, 0);
+        addResonanceKey(19, 0.7, 2);
+        addResonanceKey(24, 0.8, 0);
+        addResonanceKey(28, 0.6, -13.7);
+        addResonanceKey(31, 0.7, 2);
+        addResonanceKey(34, 0.5, -31.175);
+        addResonanceKey(36, 0.8, 0);
+        
+        /*
+        partialStructure.add({0,  1.0, 0});
+        partialStructure.add({12, 0.8, 0});
+        partialStructure.add({19, 0.7, 2});
+        partialStructure.add({24, 0.8, 0});
+        partialStructure.add({28, 0.6, -13.7});
+        partialStructure.add({31, 0.7, 2});
+        partialStructure.add({34, 0.5, -31.175});
+        partialStructure.add({36, 0.8, 0});
+         */
+
     }
     
     void printPartialStructure()
@@ -617,7 +655,7 @@ private:
     //      by default, first 8 partials for conventional overtone series
     //      user needs to be able to set these
     //Array<float[3]> partialStructure;
-    Array<Array<float>> partialStructure;
+    //Array<Array<float>> partialStructure;
     
     // => current strings
     // A queue to store the currently active notes in sympStrings
