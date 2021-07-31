@@ -37,26 +37,26 @@ offsetsKeyboard(false, true)
     selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
 
-    defGainSlider = std::make_unique<BKSingleSlider>("resonant note volume (dB)", cResonanceDefGain, -100, 24, 0, 0.01, "-inf");
+    defGainSlider = std::make_unique<BKSingleSlider>("resonant note volume (dBFS)", cResonanceDefGain, -100, 24, 0, 0.01, "-inf");
     defGainSlider->setJustifyRight(false);
     defGainSlider->setToolTipString("Adjusts overall volume of resonant notes");
     addAndMakeVisible(*defGainSlider);
     
-    blendGainSlider = std::make_unique<BKSingleSlider>("blendronic gain", cBlendronicOutGain, -100, 24, 0, 0.01, "-inf");
+    blendGainSlider = std::make_unique<BKSingleSlider>("blendronic gain (dBFS)", cBlendronicOutGain, -100, 24, 0, 0.01, "-inf");
     blendGainSlider->setJustifyRight(false);
-    blendGainSlider->setToolTipString("Adjusts overall volume of resonant notes");
+    blendGainSlider->setToolTipString("Adjusts volume sent to blendronic, if attached");
     addAndMakeVisible(*blendGainSlider);
 
 //    startTimeSlider = std::make_unique<BKSingleSlider>("start time (ms)", cResonanceStartTime, -4000, 4000, 2000, 1);
     
     startTimeSlider = std::make_unique<BKRangeSlider>("start time (ms)", 0, 4000, 0, 4000, 1);
     startTimeSlider->setJustifyRight(false);
-    startTimeSlider->setToolTipString("Adjusts start time into sample of resonant notes");
+    startTimeSlider->setToolTipString("sets range for start time into sample of resonant notes; velocity will set where in this range to start");
     addAndMakeVisible(*startTimeSlider);
 
-    maxSympStringsSlider =std::make_unique<BKSingleSlider>("max sympathetic strings", "maxsymp", 0, 20, 20, 1, "-inf");
+    maxSympStringsSlider =std::make_unique<BKSingleSlider>("max sympathetic strings", "maxsymp", 0, 20, 8, 1, "-inf");
     maxSympStringsSlider->setJustifyRight(false);
-    maxSympStringsSlider->setToolTipString("Adjusts maximum number of sympathetic strings");
+    maxSympStringsSlider->setToolTipString("sets maximum number of sympathetic strings");
     addAndMakeVisible(*maxSympStringsSlider);
 
     ADSRSlider = std::make_unique<BKADSRSlider>("Resonance envelope");
@@ -161,20 +161,24 @@ offsetsKeyboard(false, true)
 //
 //    }
     
-    closestKeyLabel.setText("Resonance: ", dontSendNotification);
+    closestKeyLabel.setText("Resonant Keys: ", dontSendNotification);
     closestKeyLabel.setJustificationType(Justification::right);
+    closestKeyLabel.setTooltip("keys that should resonate when struck; partials");
     addAndMakeVisible(closestKeyLabel);
     
-    fundamentalLabel.setText("Fundamental: ", dontSendNotification);
+    fundamentalLabel.setText("Held Key: ", dontSendNotification);
     fundamentalLabel.setJustificationType(Justification::right);
+    fundamentalLabel.setTooltip("Key that defines resonance/partial structure; usually the lowest, but not necessarily!");
     addAndMakeVisible(fundamentalLabel);
     
     gainsLabel.setText("Gains: ", dontSendNotification);
     gainsLabel.setJustificationType(Justification::right);
+    gainsLabel.setTooltip("gain multiplier for this resonance");
     addAndMakeVisible(gainsLabel);
     
     offsetsLabel.setText("Offsets: ", dontSendNotification);
     offsetsLabel.setJustificationType(Justification::right);
+    offsetsLabel.setTooltip("offset in cents from ET for this resonance");
     addAndMakeVisible(offsetsLabel);
 
 
