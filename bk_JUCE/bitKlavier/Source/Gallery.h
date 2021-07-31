@@ -649,6 +649,16 @@ public:
         return nullptr;
     }
     
+    inline const ResonanceModification::Ptr getResonanceModification(int Id) const noexcept
+    {
+
+        for (auto p : modResonance)
+        {
+            if (p->getId() == Id)   return p;
+        }
+        return nullptr;
+    }
+    
     inline const DirectModification::Ptr getDirectModification(int Id) const noexcept
     {
 
@@ -837,6 +847,7 @@ private:
     SynchronicModification::PtrArr      modSynchronic;
     DirectModification::PtrArr          modDirect;
     NostalgicModification::PtrArr       modNostalgic;
+    ResonanceModification::PtrArr       modResonance;
     TuningModification::PtrArr          modTuning;
     TempoModification::PtrArr           modTempo;
 	BlendronicModification::PtrArr	    modBlendronic;

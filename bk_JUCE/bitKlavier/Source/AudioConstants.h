@@ -176,7 +176,9 @@ const String ptagResonance_useGlobalSoundSet = "resonanceUseGlobalSoundSet";
 const String ptagResonance_soundSet = "resonanceSoundSet";
 const String ptagResonance_starttimeMin = "starttimeMin";
 const String ptagResonance_starttimeMax = "starttimeMax";
-const String vtagResonance_closestKeys = "closestKeys";
+const String ptagResonance_maxSympStrings = "maxSympStrings";
+const String ptagResonance_fundamentalKey = "fundamentalKey";
+const String vtagResonance_resonanceKeys = "closestKeys";
 const String vtagResonance_offsets = "offsets";
 const String vtagResonance_gains = "gains";
 
@@ -343,6 +345,7 @@ typedef enum BKPreparationType {
     PreparationTypeBlendronic,
     PreparationTypeBlendronicMod,
     PreparationTypeResonance,
+    PreparationTypeResonanceMod,
     BKPreparationTypeNil,
 } BKPreparationType;
 
@@ -1506,9 +1509,7 @@ static const String cTempoAT1Subdivisions = "Tempo_at1Subdivisions";
 static const String cResonanceDefGain = "Resonance_defaultGain";
 static const String cResonanceMinStartTime = "Resonance_minstartTime";
 static const String cResonanceMaxStartTime = "Resonance_maxstartTime";
-static const String cResonanceStartTime = "Resonance_startTime"; // cut
-static const String cResonanceLength = "Resonance_length"; // cut
-static const String cResonanceExciteThresh = "Resonance_exciteThresh"; // cut
-static const String cResonanceAttackThresh = "Resonance_attackThresh"; // cut
+static const String cResonanceBlendronicGain = "Resonance_blendronicGain";
+static const String cResonanceMaxSympStrings = "Resonance_maxSympStrings";
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED

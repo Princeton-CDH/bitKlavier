@@ -474,6 +474,22 @@ ModdableBase* ModdableViewController::getCurrentModdable()
         else if (processor.updateState->currentModdableIdentifier == cNostalgicClusterThreshold)
             return &mod->clusterThreshold;
     }
+    else if (processor.updateState->previousDisplay == DisplayResonanceMod)
+    {
+        ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
+
+        if (processor.updateState->currentModdableIdentifier == cResonanceDefGain)
+            return &mod->rDefaultGain;
+        else if (processor.updateState->currentModdableIdentifier == cResonanceMinStartTime)
+            return &mod->rMinStartTimeMS;
+        else if (processor.updateState->currentModdableIdentifier == cResonanceMaxStartTime)
+            return &mod->rMaxStartTimeMS;
+        else if (processor.updateState->currentModdableIdentifier == cResonanceBlendronicGain)
+            return &mod->rBlendronicGain;
+        else if (processor.updateState->currentModdableIdentifier == cResonanceMaxSympStrings)
+            return &mod->rMaxSympStrings;
+
+    }
     else if (processor.updateState->previousDisplay == DisplaySynchronicMod)
     {
         SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);

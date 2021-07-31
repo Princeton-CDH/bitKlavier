@@ -17,14 +17,13 @@ void BKAudioProcessor::updateUI(void)
     updateState->nostalgicPreparationDidChange = true;
     updateState->synchronicPreparationDidChange = true;
     updateState->blendronicPreparationDidChange = true;
+    updateState->resonancePreparationDidChange = true;
     updateState->tuningPreparationDidChange = true;
     updateState->tempoPreparationDidChange = true;
     updateState->generalSettingsDidChange = true;
-    
-    
     updateState->directDidChange = true;
     updateState->keymapDidChange = true;
-
+    
     updateState->editsMade = false;
 }
 
@@ -276,6 +275,10 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     {
         return gallery->getSynchronicModification(Id)->getState();
     }
+    else if (type == PreparationTypeResonance)
+    {
+        return gallery->getResonance(Id)->getState(true);
+    }
     else if (type == PreparationTypeBlendronic)
     {
         return gallery->getBlendronic(Id)->getState(true);
@@ -358,6 +361,26 @@ void BKAudioProcessor::setPreparationState(BKPreparationType type, int Id, XmlEl
         prep->setName(name);
         prep->setId(Id);
     }
+    
+    else if (type == PreparationTypeResonance)
+    {
+        Resonance::Ptr prep = gallery->getResonance(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+     
+    /*
+    else if (type == PreparationTypeResonanceMod)
+    {
+        ResonanceModification::Ptr prep = gallery->getResonanceModification(Id);
+        String name = prep->getName();
+        prep->setState(xml);
+        prep->setName(name);
+        prep->setId(Id);
+    }
+     */
     else if (type == PreparationTypeBlendronic)
     {
         Blendronic::Ptr prep = gallery->getBlendronic(Id);
@@ -574,6 +597,11 @@ void BKAudioProcessor::importPiano(int Id, int importId)
         {
             newId = gallery->addCopy(PreparationTypeSynchronic, sub);
             type = PreparationTypeSynchronic;
+        }
+        else if (tag == vtagResonance)
+        {
+            newId = gallery->addCopy(PreparationTypeResonance, sub);
+            type = PreparationTypeResonance;
         }
         else if (tag == vtagTempo)
         {

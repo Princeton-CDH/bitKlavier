@@ -75,7 +75,9 @@ ValueTree  Gallery::getState(void)
     
     for (int i = 0; i < nostalgic.size(); i++)              galleryVT.addChild( nostalgic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < blendronic.size(); i++)           galleryVT.addChild( blendronic[i]->getState(), -1, 0);
+    for (int i = 0; i < blendronic.size(); i++)             galleryVT.addChild( blendronic[i]->getState(), -1, 0);
+    
+    for (int i = 0; i < resonance.size(); i++)             galleryVT.addChild( resonance[i]->getState(), -1, 0);
     
     for (int i = 0; i < modTempo.size(); i++)               galleryVT.addChild( modTempo[i]->getState(), -1, 0);
     
@@ -203,6 +205,17 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 
                 modSynchronic.getLast()->setId(newId);
                 
+            }
+            else if (e->hasTagName( vtagResonance))
+            {
+                addResonanceWithId(0);
+                
+                resonance.getLast()->setState(e);
+                
+                int oldId = resonance.getLast()->getId();
+                int newId = transformId(PreparationTypeResonance, oldId);
+                
+                resonance.getLast()->setId(newId);
             }
             else if (e->hasTagName( vtagTempo))
             {

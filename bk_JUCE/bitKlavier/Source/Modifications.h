@@ -100,6 +100,7 @@ private:
     TuningModification::PtrArr      tuningMods;
     TempoModification::PtrArr       tempoMods;
 	BlendronicModification::PtrArr	blendronicMods;
+    //ResonanceModification::PtrArr   resonanceMods;
     
     JUCE_LEAK_DETECTOR(Modifications)
 };

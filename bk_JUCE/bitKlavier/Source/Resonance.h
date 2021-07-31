@@ -108,13 +108,48 @@ public:
     // copy, modify, compare, randomize
     inline void copy(ResonancePreparation::Ptr r)
     {
+        rSoundSet               = r->rSoundSet;
+        rUseGlobalSoundSet      = r->rUseGlobalSoundSet;
+        rSoundSetName           = r->rSoundSetName;
+        rAttack                 = r->rAttack;
+        rDecay                  = r->rDecay;
+        rRelease                = r->rRelease;
+        rSustain                = r->rSustain;
+        rDefaultGain            = r->rDefaultGain;
+        rBlendronicGain         = r->rBlendronicGain;
+        rMinStartTimeMS         = r->rMinStartTimeMS;
+        rMaxStartTimeMS         = r->rMaxStartTimeMS;
+        rMaxSympStrings         = r->rMaxSympStrings;
+        rFundamentalKey         = r->rFundamentalKey;
+        rResonanceKeys          = r->rResonanceKeys;
+        rOffsetsKeys            = r->rOffsetsKeys;
+        rGainsKeys              = r->rGainsKeys;
+        
     }
 
-    void performModification(ResonancePreparation* r, Array<bool> dirty);
+    void performModification(ResonanceModification* r, Array<bool> dirty);
 
     inline bool compare(ResonancePreparation::Ptr r)
     {
-        return true;
+        return (
+                rSoundSet               == r->rSoundSet &&
+                rUseGlobalSoundSet      == r->rUseGlobalSoundSet &&
+                rSoundSetName           == r->rSoundSetName &&
+                rAttack                 == r->rAttack &&
+                rDecay                  == r->rDecay &&
+                rRelease                == r->rRelease &&
+                rSustain                == r->rSustain &&
+                rDefaultGain            == r->rDefaultGain &&
+                rBlendronicGain         == r->rBlendronicGain &&
+                rMinStartTimeMS         == r->rMinStartTimeMS &&
+                rMaxStartTimeMS         == r->rMaxStartTimeMS &&
+                rMaxSympStrings         == r->rMaxSympStrings &&
+                rFundamentalKey         == r->rFundamentalKey &&
+                rResonanceKeys          == r->rResonanceKeys &&
+                rOffsetsKeys            == r->rOffsetsKeys &&
+                rGainsKeys              == r->rGainsKeys
+                );
+
     }
 
     inline void randomize()
@@ -140,6 +175,46 @@ public:
             fa.add(i, (Random::getSystemRandom().nextFloat() * 2.0f));
         }
         //etc etc etc
+    }
+    
+    void stepModdables()
+    {
+        rSoundSet.step();
+        rUseGlobalSoundSet.step();
+        rSoundSetName.step();
+        rAttack.step();
+        rDecay.step();
+        rRelease.step();
+        rSustain.step();
+        rDefaultGain.step();
+        rBlendronicGain.step();
+        rMinStartTimeMS.step();
+        rMaxStartTimeMS.step();
+        rMaxSympStrings.step();
+        rFundamentalKey.step();
+        rResonanceKeys.step();
+        rOffsetsKeys.step();
+        rGainsKeys.step();
+    }
+    
+    void resetModdables()
+    {
+        rSoundSet.reset();
+        rUseGlobalSoundSet.reset();
+        rSoundSetName.reset();
+        rAttack.reset();
+        rDecay.reset();
+        rRelease.reset();
+        rSustain.reset();
+        rDefaultGain.reset();
+        rBlendronicGain.reset();
+        rMinStartTimeMS.reset();
+        rMaxStartTimeMS.reset();
+        rMaxSympStrings.reset();
+        rFundamentalKey.reset();
+        rResonanceKeys.reset();
+        rOffsetsKeys.reset();
+        rGainsKeys.reset();
     }
 
     //accessors
@@ -274,50 +349,8 @@ public:
     int getFundamentalKey() { return rFundamentalKey.value; }
     Array<int> getResonanceKeys() { return rResonanceKeys.value; }
     Array<Array<float>> getPartialStructure() { return partialStructure; }
-    
-    Array<float> getOffsets()
-    {
-        /*
-        Array<float> vals;
-        
-        for(int i = 0; i < 128; i++)
-        {
-            if (offsetsKeys.contains(i))
-            {
-                vals.set(i, offsetsKeys[i]);
-            }
-            else {
-                vals.set(i, 0.);
-            }
-        }
-        
-        return vals;
-         */
-        
-        return rOffsetsKeys.value;
-
-    }
-    
-    Array<float> getGains()
-    {
-        /*
-        Array<float> vals;
-        
-        for(int i = 0; i < 128; i++)
-        {
-            if (gainsKeys.contains(i))
-            {
-                vals.set(i, gainsKeys[i]);
-            }
-            else {
-                vals.set(i, 1.);
-            }
-        }
-        
-        return vals;
-         */
-        return rGainsKeys.value;
-    }
+    Array<float> getOffsets() { return rOffsetsKeys.value; }
+    Array<float> getGains() { return rGainsKeys.value; }
     
     void updatePartialStructure()
     {
@@ -339,7 +372,7 @@ public:
             partialStructure.add({i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]});
         }
         
-        printPartialStructure();
+        // printPartialStructure();
     }
     
     void setDefaultPartialStructure()
@@ -384,15 +417,66 @@ public:
     {
         ValueTree prep("params");
 
-        //TODO
+        rDefaultGain.getState(prep, ptagResonance_gain);
+        rBlendronicGain.getState(prep, ptagResonance_blendronicGain);
+        
+        ValueTree ADSRvals( vtagResonance_ADSR);
+        int count = 0;
+        rAttack.getState(ADSRvals, ptagFloat + String(count++));
+        rDecay.getState(ADSRvals, ptagFloat + String(count++));
+        rSustain.getState(ADSRvals, ptagFloat + String(count++));
+        rRelease.getState(ADSRvals, ptagFloat + String(count));
+        prep.addChild(ADSRvals, -1, 0);
+        
+        rUseGlobalSoundSet.getState(prep, ptagResonance_useGlobalSoundSet);
+        rSoundSetName.getState(prep, ptagResonance_soundSet);
+        
+        rMinStartTimeMS.getState(prep, ptagResonance_starttimeMin);
+        rMaxStartTimeMS.getState(prep, ptagResonance_starttimeMax);
+        
+        rMaxSympStrings.getState(prep, ptagResonance_maxSympStrings);
+        
+        rFundamentalKey.getState(prep, ptagResonance_fundamentalKey);
+        rResonanceKeys.getState(prep, StringArray(vtagResonance_resonanceKeys, ptagInt));
+        rOffsetsKeys.getState(prep, StringArray(vtagResonance_offsets, ptagFloat));
+        rGainsKeys.getState(prep, StringArray(vtagResonance_gains, ptagFloat));
 
         return prep;
     }
 
     void setState(XmlElement* e)
     {
-        // TODO
+        rDefaultGain.setState(e, ptagResonance_gain, 1.0f);
+        rBlendronicGain.setState(e, ptagResonance_blendronicGain, 1.0f);
+        
+        XmlElement* sub = e->getChildByName(vtagResonance_ADSR);
+        if (sub != nullptr)
+        {
+            int count = 0;
+            rAttack.setState(sub, ptagFloat + String(count++), 3);
+            rDecay.setState(sub, ptagFloat + String(count++), 3);
+            rSustain.setState(sub, ptagFloat + String(count++), 1.);
+            rRelease.setState(sub, ptagFloat + String(count), 30);
+        }
+        
+        rUseGlobalSoundSet.setState(e, ptagResonance_useGlobalSoundSet, true);
+        rSoundSetName.setState(e, ptagResonance_soundSet, String());
+        
+        rMinStartTimeMS.setState(e, ptagResonance_starttimeMin, 400);
+        rMaxStartTimeMS.setState(e, ptagResonance_starttimeMax, 4000);
+        
+        rMaxSympStrings.setState(e, ptagResonance_maxSympStrings, 8);
+        
+        rFundamentalKey.setState(e, ptagResonance_fundamentalKey, 0);
+        rResonanceKeys.setState(e, StringArray(vtagResonance_resonanceKeys, ptagInt), 0);
+        rOffsetsKeys.setState(e, StringArray(vtagResonance_offsets, ptagFloat), 0.);
+        rGainsKeys.setState(e, StringArray(vtagResonance_gains, ptagFloat), 1.);
+        
+        setDefaultPartialStructure();
+        updatePartialStructure();
     }
+    
+    bool modded = false;
 
     Moddable<int> rSoundSet;
     Moddable<bool> rUseGlobalSoundSet;
@@ -469,7 +553,7 @@ public:
         Id(Id),
         name("Resonance " + String(Id))
     {
-
+        DBG("created Resonance with ID " + String(Id));
     }
 
     Resonance(int Id, bool random = false) :
@@ -478,6 +562,7 @@ public:
     {
         prep = new ResonancePreparation();
         if (random) randomize();
+        DBG("created Resonance with ID " + String(Id));
     }
 
     inline Resonance::Ptr duplicate()

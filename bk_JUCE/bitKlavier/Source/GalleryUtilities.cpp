@@ -195,6 +195,10 @@ void Gallery::remove(BKPreparationType type, int Id)
 	{
 		removeBlendronic(Id);
 	}
+    else if (type == PreparationTypeResonance)
+    {
+        removeResonance(Id);
+    }
     else if (type == PreparationTypeKeymap)
     {
         removeKeymap(Id);
@@ -223,10 +227,6 @@ void Gallery::remove(BKPreparationType type, int Id)
 	{
 		removeBlendronicModification(Id);
 	}
-    else if (type == PreparationTypeResonance)
-    {
-        removeResonance(Id);
-    }
     else if (type == PreparationTypePiano)
     {
         removePiano(Id);
@@ -1269,6 +1269,12 @@ void Gallery::clean(void)
     for (int i = nostalgic.size(); --i >= 0;)
     {
         if (!thisUsed.contains(nostalgic[i]->getId())) nostalgic.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeResonance);
+    for (int i = resonance.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(resonance[i]->getId())) resonance.remove(i);
     }
     
     thisUsed = used.getUnchecked(PreparationTypeTempo);

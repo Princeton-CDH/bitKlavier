@@ -16,6 +16,7 @@
 #include "Direct.h"
 #include "Nostalgic.h"
 #include "Synchronic.h"
+#include "Resonance.h"
 #include "Tuning.h"
 #include "Tempo.h"
 #include "Blendronic.h"
@@ -221,6 +222,46 @@ private:
     
     JUCE_LEAK_DETECTOR(NostalgicModification)
 };
+
+class ResonanceModification :
+public Modification,
+public ResonancePreparation
+{
+public:
+    typedef ReferenceCountedObjectPtr<ResonanceModification>   Ptr;
+    typedef Array<ResonanceModification::Ptr>                  PtrArr;
+    
+    ResonanceModification(BKAudioProcessor& processor, int Id);
+    ~ResonanceModification(void)
+    {
+        
+    }
+    
+    inline ResonanceModification::Ptr duplicate(void)
+    {
+        ResonanceModification::Ptr mod = new ResonanceModification(processor, -1);
+        
+        mod->copy(this);
+        
+        return mod;
+    }
+    
+    inline void copy (ResonanceModification::Ptr mod)
+    {
+        setName(mod->getName() + "copy");
+        altMod = mod->altMod;
+        ResonancePreparation::copy(mod);
+    }
+    
+    ValueTree getState(void);
+    void setState(XmlElement* e);
+    void setStateOld(XmlElement* e);
+    
+private:
+    
+    JUCE_LEAK_DETECTOR(ResonanceModification)
+};
+
 
 
 class TuningModification :

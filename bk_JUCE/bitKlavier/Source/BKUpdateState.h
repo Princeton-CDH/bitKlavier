@@ -43,6 +43,7 @@ public:
     int  currentModDirectId = 1;
     int  currentModSynchronicId = 1;
     int  currentModNostalgicId = 1;
+    int  currentModResonanceId = 1;
     int  currentModBlendronicId = 1;
     int  currentModTempoId = 1;
     int  currentModTuningId = 1;
@@ -190,6 +191,10 @@ public:
         {
             return currentNostalgicId;
         }
+        else if (type == DisplayResonance)
+        {
+            return currentResonanceId;
+        }
         else if (type == DisplayBlendronic)
         {
             return currentBlendronicId;
@@ -238,6 +243,7 @@ public:
         currentDirectId = val;
         currentSynchronicId = val;
         currentNostalgicId = val;
+        currentResonanceId = val;
         currentBlendronicId = val;
         currentTempoId = val;
         currentTuningId = val;

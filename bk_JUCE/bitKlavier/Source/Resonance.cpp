@@ -16,9 +16,37 @@
 #include "PluginProcessor.h"
 #include "Modification.h"
 
-void ResonancePreparation::performModification(ResonancePreparation* r, Array<bool> dirty)
+void ResonancePreparation::performModification(ResonanceModification* r, Array<bool> dirty)
 {
-    //TBD
+    // Should the mod be reversed?
+    bool reverse = r->altMod && modded;
+    
+    if (dirty[ResonanceGain]) rDefaultGain.modify(r->rDefaultGain, reverse);
+    if (dirty[ResonanceBlendronicGain]) rBlendronicGain.modify(r->rBlendronicGain, reverse);
+    if (dirty[ResonanceMinStartTime]) rMinStartTimeMS.modify(r->rMinStartTimeMS, reverse);
+    if (dirty[ResonanceMaxStartTime]) rMaxStartTimeMS.modify(r->rMaxStartTimeMS, reverse);
+    
+    if (dirty[ResonanceClosestKeys]) rResonanceKeys.modify(r->rResonanceKeys, reverse);
+    if (dirty[ResonanceOffsets]) rOffsetsKeys.modify(r->rOffsetsKeys, reverse);
+    if (dirty[ResonanceGains]) rGainsKeys.modify(r->rGainsKeys, reverse);
+    if (dirty[ResonanceADSR])
+    {
+        rAttack.modify(r->rAttack, reverse);
+        rDecay.modify(r->rDecay, reverse);
+        rSustain.modify(r->rSustain, reverse);
+        rRelease.modify(r->rRelease, reverse);
+    }
+    
+    if (dirty[ResonanceUseGlobalSoundSet]) rUseGlobalSoundSet.modify(r->rUseGlobalSoundSet, reverse);
+    if (dirty[ResonanceSoundSet])
+    {
+        rSoundSet.modify(r->rSoundSet, reverse);
+        rSoundSetName.modify(r->rSoundSetName, reverse);
+    }
+    
+    // If the mod didn't reverse, then it is modded
+    modded = !reverse;
+
 }
 
 SympPartial::SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset) 

@@ -500,6 +500,10 @@ void Keymap::removeTargetsOfType(BKPreparationType type)
     {
         removeTarget(TargetTypeTuning);
     }
+    else if (type == PreparationTypeResonance)
+    {
+        removeTarget(TargetTypeResonance);
+    }
 }
 
 void Keymap::clearTargets()

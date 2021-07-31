@@ -201,7 +201,7 @@ void Piano::configure(void)
             {
                 BKPreparationType targetType = target->getType();
                 int targetId = target->getId();
-                
+                DBG("linking preparation type to tuning: " + String(targetType));
                 if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) || targetType == PreparationTypeResonance)
                 {
                     linkPreparationWithTuning(targetType, targetId, processor.gallery->getTuning(Id));
@@ -561,6 +561,8 @@ void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tu
 {
     TuningProcessor::Ptr tproc = getTuningProcessor(thisTuning->getId());
     
+    DBG("linking Tuning and SOMETHIUNG " + String(thisType));
+    
     if (thisType == PreparationTypeDirect)
     {
         DirectProcessor::Ptr dproc = getDirectProcessor(thisId);
@@ -581,6 +583,7 @@ void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tu
     }
     else if (thisType == PreparationTypeResonance)
     {
+        DBG("linking Tuning and Resonance");
         ResonanceProcessor::Ptr rproc = getResonanceProcessor(thisId);
         rproc->setTuning(tproc);
     }

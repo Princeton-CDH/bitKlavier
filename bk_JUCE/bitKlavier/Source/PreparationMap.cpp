@@ -908,6 +908,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                 proc->keyReleased(noteNumber, channel);
             releaseTargetStates.fill(TargetStateNil); }
     }
+    
     for (auto proc : rprocessor)
     {
         bool ignoreSustain = !sustainPedalIsDepressed;
