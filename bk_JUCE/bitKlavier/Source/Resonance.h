@@ -267,15 +267,19 @@ public:
             DBG("turning off this resonance note");
             //rResonanceKeys.value.removeAllInstancesOf(nr);
             rResonanceKeys.arrayRemoveAllInstancesOf(nr);
-            rOffsetsKeys.value.set(nr, 0.);
-            rGainsKeys.value.set(nr, 1.);
+            //rOffsetsKeys.value.set(nr, 0.);
+            //rGainsKeys.value.set(nr, 1.);
+            rOffsetsKeys.setArrayValue(nr, 0.0f);
+            rGainsKeys.setArrayValue(nr, 1.0f);
         }
         else {
             DBG("turning on this resonance note");
             //rResonanceKeys.value.add(nr);
             rResonanceKeys.addArrayValue(nr);
-            rOffsetsKeys.value.set(nr, 0.);
-            rGainsKeys.value.set(nr, 1.);
+            //rOffsetsKeys.value.set(nr, 0.);
+            //rGainsKeys.value.set(nr, 1.);
+            rOffsetsKeys.setArrayValue(nr, 0.0f);
+            rGainsKeys.setArrayValue(nr, 1.0f);
         }
         
         updatePartialStructure();
@@ -288,8 +292,10 @@ public:
         {
             //rResonanceKeys.value.add(nr);
             rResonanceKeys.addArrayValue(nr);
-            rOffsetsKeys.value.set(nr, 0.);
-            rGainsKeys.value.set(nr, 1.);
+            //rOffsetsKeys.value.set(nr, 0.);
+            //rGainsKeys.value.set(nr, 1.);
+            rOffsetsKeys.setArrayValue(nr, 0.0f);
+            rGainsKeys.setArrayValue(nr, 1.0f);
             
             updatePartialStructure();
         }
@@ -302,8 +308,10 @@ public:
         {
             //rResonanceKeys.value.add(nr);
             rResonanceKeys.addArrayValue(nr);
-            rOffsetsKeys.value.set(nr, offset);
-            rGainsKeys.value.set(nr, gain);
+            //rOffsetsKeys.value.set(nr, offset);
+            //rGainsKeys.value.set(nr, gain);
+            rOffsetsKeys.setArrayValue(nr, offset);
+            rGainsKeys.setArrayValue(nr, gain);
             
             updatePartialStructure();
         }
@@ -314,7 +322,8 @@ public:
         //if (rResonanceKeys.base.contains(nr))
         if (rResonanceKeys.arrayContains(nr))
         {
-            rOffsetsKeys.value.set(nr, 0.);
+            //rOffsetsKeys.value.set(nr, 0.);
+            rOffsetsKeys.setArrayValue(nr, 0.0f);
             updatePartialStructure();
         }
     }
@@ -324,7 +333,8 @@ public:
         //if (rResonanceKeys.base.contains(nr))
         if (rResonanceKeys.arrayContains(nr))
         {
-            rGainsKeys.value.set(nr, 1.);
+            //rGainsKeys.value.set(nr, 1.);
+            rGainsKeys.setArrayValue(nr, 1.0f);
             updatePartialStructure();
         }
     }
@@ -336,7 +346,8 @@ public:
             //if (rResonanceKeys.base.contains(i))
             if (rResonanceKeys.arrayContains(i))
             {
-                rOffsetsKeys.value.set(i, no[i]);
+                //rOffsetsKeys.value.set(i, no[i]);
+                rOffsetsKeys.setArrayValue(i, no[i]);
             }
         }
         
@@ -350,7 +361,8 @@ public:
             //if (rResonanceKeys.base.contains(i))
             if (rResonanceKeys.arrayContains(i))
             {
-                rGainsKeys.value.set(i, no[i]);
+                //rGainsKeys.value.set(i, no[i]);
+                rGainsKeys.setArrayValue(i, no[i]);
             }
         }
         
@@ -383,7 +395,7 @@ public:
             partialStructure.add({i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]});
         }
         
-        // printPartialStructure();
+        printPartialStructure();
     }
     
     void setDefaultPartialStructure()
@@ -395,8 +407,8 @@ public:
         {
             //offsetsKeys.set(i, 0.);
             //gainsKeys.set(i, 1.);
-            rOffsetsKeys.value.set(i, 0.);
-            rGainsKeys.value.set(i, 1.);
+            rOffsetsKeys.setArrayValue(i, 0.0f);
+            rGainsKeys.setArrayValue(i, 1.0f);
         }
         
         addResonanceKey( 0, 1.0, 0.);

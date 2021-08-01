@@ -165,6 +165,35 @@ public:
         active = false;
     }
     
+    void setValue(ValueType v) { value = v; }
+    void setBase(ValueType v) { base = v; }
+    void setMod(ValueType v)
+    {
+        mod = v;
+        n = 0;
+    }
+    
+    // This use a double arg instead of ValueType so it's usable from the ModdableBase class
+    void setInc(double v) override { setInc(tag<ValueType>{}, v); }
+    
+    template<class T = ValueType>
+    void setInc(tag<T>, double v) { ; }
+    
+    // Be careful to make sure these overload the less specific function above.
+    void setInc(tag<int>, double v) { inc = v; n = 0; }
+    void setInc(tag<float>, double v) { inc = v; n = 0; }
+    void setInc(tag<double>, double v) { inc = v; n = 0; }
+    
+    void setTime(int ms) override { time = ms; }
+    void setActive(bool a) { active = a; }
+    void setMaxNumberOfInc(int mn) override
+    {
+        maxN = mn;
+        n = 0;
+    }
+    
+    // Array functions
+        // ints
     void setArrayValue(int index, int val)
     {
         value.set(index, val);
@@ -194,32 +223,34 @@ public:
         active = false;
     }
     
-    
-    void setValue(ValueType v) { value = v; }
-    void setBase(ValueType v) { base = v; }
-    void setMod(ValueType v)
+        // floats
+    void setArrayValue(int index, float val)
     {
-        mod = v;
-        n = 0;
+        value.set(index, val);
+        base.set(index, val);
+        mod.set(index, val);
+        active = false;
     }
     
-    // This use a double arg instead of ValueType so it's usable from the ModdableBase class
-    void setInc(double v) override { setInc(tag<ValueType>{}, v); }
-    
-    template<class T = ValueType>
-    void setInc(tag<T>, double v) { ; }
-    
-    // Be careful to make sure these overload the less specific function above.
-    void setInc(tag<int>, double v) { inc = v; n = 0; }
-    void setInc(tag<float>, double v) { inc = v; n = 0; }
-    void setInc(tag<double>, double v) { inc = v; n = 0; }
-    
-    void setTime(int ms) override { time = ms; }
-    void setActive(bool a) { active = a; }
-    void setMaxNumberOfInc(int mn) override
+    void addArrayValue(float val)
     {
-        maxN = mn;
-        n = 0;
+        value.add(val);
+        base.add(val);
+        mod.add(val);
+        active = false;
+    }
+    
+    bool arrayContains(float val)
+    {
+        return (base.contains(val)); 
+    }
+    
+    void arrayRemoveAllInstancesOf(float val)
+    {
+        value.removeAllInstancesOf(val);
+        base.removeAllInstancesOf(val);
+        mod.removeAllInstancesOf(val);
+        active = false;
     }
     
     // Getters
