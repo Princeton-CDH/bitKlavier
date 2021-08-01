@@ -164,6 +164,37 @@ public:
         mod = v;
         active = false;
     }
+    
+    void setArrayValue(int index, int val)
+    {
+        value.set(index, val);
+        base.set(index, val);
+        mod.set(index, val);
+        active = false;
+    }
+    
+    void addArrayValue(int val)
+    {
+        value.add(val);
+        base.add(val);
+        mod.add(val);
+        active = false;
+    }
+    
+    bool arrayContains(int val)
+    {
+        return (base.contains(val));
+    }
+    
+    void arrayRemoveAllInstancesOf(int val)
+    {
+        value.removeAllInstancesOf(val);
+        base.removeAllInstancesOf(val);
+        mod.removeAllInstancesOf(val);
+        active = false;
+    }
+    
+    
     void setValue(ValueType v) { value = v; }
     void setBase(ValueType v) { base = v; }
     void setMod(ValueType v)

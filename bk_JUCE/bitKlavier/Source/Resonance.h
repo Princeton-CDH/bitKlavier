@@ -262,15 +262,18 @@ public:
     
     void toggleResonanceKey(int nr)
     {
-        if (rResonanceKeys.value.contains(nr)) {
-            rResonanceKeys.value.removeAllInstancesOf(nr);
+        //if (rResonanceKeys.base.contains(nr)) {
+        if (rResonanceKeys.arrayContains(nr)) {
+            DBG("turning off this resonance note");
+            //rResonanceKeys.value.removeAllInstancesOf(nr);
+            rResonanceKeys.arrayRemoveAllInstancesOf(nr);
             rOffsetsKeys.value.set(nr, 0.);
             rGainsKeys.value.set(nr, 1.);
-            //offsetsKeys.remove(nr);
-            //gainsKeys.remove(nr);
         }
         else {
-            rResonanceKeys.value.add(nr);
+            DBG("turning on this resonance note");
+            //rResonanceKeys.value.add(nr);
+            rResonanceKeys.addArrayValue(nr);
             rOffsetsKeys.value.set(nr, 0.);
             rGainsKeys.value.set(nr, 1.);
         }
@@ -280,9 +283,11 @@ public:
     
     void addResonanceKey(int nr)
     {
-        if(!rResonanceKeys.value.contains(nr))
+        //if(!rResonanceKeys.base.contains(nr))
+        if(!rResonanceKeys.arrayContains(nr))
         {
-            rResonanceKeys.value.add(nr);
+            //rResonanceKeys.value.add(nr);
+            rResonanceKeys.addArrayValue(nr);
             rOffsetsKeys.value.set(nr, 0.);
             rGainsKeys.value.set(nr, 1.);
             
@@ -292,9 +297,11 @@ public:
     
     void addResonanceKey(int nr, float gain, float offset)
     {
-        if(!rResonanceKeys.value.contains(nr))
+        //if(!rResonanceKeys.base.contains(nr))
+        if(!rResonanceKeys.arrayContains(nr))
         {
-            rResonanceKeys.value.add(nr);
+            //rResonanceKeys.value.add(nr);
+            rResonanceKeys.addArrayValue(nr);
             rOffsetsKeys.value.set(nr, offset);
             rGainsKeys.value.set(nr, gain);
             
@@ -304,7 +311,8 @@ public:
     
     void setOffset(int nr)
     {
-        if (rResonanceKeys.value.contains(nr))
+        //if (rResonanceKeys.base.contains(nr))
+        if (rResonanceKeys.arrayContains(nr))
         {
             rOffsetsKeys.value.set(nr, 0.);
             updatePartialStructure();
@@ -313,7 +321,8 @@ public:
     
     void setGain(int nr)
     {
-        if (rResonanceKeys.value.contains(nr))
+        //if (rResonanceKeys.base.contains(nr))
+        if (rResonanceKeys.arrayContains(nr))
         {
             rGainsKeys.value.set(nr, 1.);
             updatePartialStructure();
@@ -324,7 +333,8 @@ public:
         
         for (int i = 0; i < 128; i++)
         {
-            if (rResonanceKeys.value.contains(i))
+            //if (rResonanceKeys.base.contains(i))
+            if (rResonanceKeys.arrayContains(i))
             {
                 rOffsetsKeys.value.set(i, no[i]);
             }
@@ -337,7 +347,8 @@ public:
         
         for (int i = 0; i < 128; i++)
         {
-            if (rResonanceKeys.value.contains(i))
+            //if (rResonanceKeys.base.contains(i))
+            if (rResonanceKeys.arrayContains(i))
             {
                 rGainsKeys.value.set(i, no[i]);
             }
@@ -439,7 +450,7 @@ public:
         rFundamentalKey.getState(prep, ptagResonance_fundamentalKey);
         rResonanceKeys.getState(prep, StringArray(vtagResonance_resonanceKeys, ptagInt));
         rOffsetsKeys.getState(prep, StringArray(vtagResonance_offsets, ptagFloat));
-        DBG("getState - rOffsetsKeys: " + floatArrayToString(rOffsetsKeys.value));
+        DBG("getState - rOffsetsKeys: " + floatArrayToString(rOffsetsKeys.base));
         rGainsKeys.getState(prep, StringArray(vtagResonance_gains, ptagFloat));
         
         DBG("Resonance getState ValueTree = " + prep.toXmlString());
