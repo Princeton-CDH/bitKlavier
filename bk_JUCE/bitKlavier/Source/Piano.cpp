@@ -565,7 +565,7 @@ void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tu
 {
     TuningProcessor::Ptr tproc = getTuningProcessor(thisTuning->getId());
     
-    DBG("linking Tuning and SOMETHIUNG " + String(thisType));
+    //DBG("linking Tuning and SOMETHING " + String(thisType));
     
     if (thisType == PreparationTypeDirect)
     {
@@ -587,7 +587,7 @@ void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tu
     }
     else if (thisType == PreparationTypeResonance)
     {
-        DBG("linking Tuning and Resonance");
+        //DBG("linking Tuning and Resonance");
         ResonanceProcessor::Ptr rproc = getResonanceProcessor(thisId);
         rproc->setTuning(tproc);
     }
@@ -1046,6 +1046,7 @@ void Piano::configureTuningModification(TuningModification::Ptr mod, Array<int> 
 void Piano::prepareToPlay(double sr)
 {
     double sampleRate = processor.getCurrentSampleRate();
+    
     for (auto dproc : dprocessor)
         dproc->prepareToPlay(sampleRate, &processor.mainPianoSynth, &processor.resonanceReleaseSynth, &processor.hammerReleaseSynth);
     
@@ -1063,6 +1064,7 @@ void Piano::prepareToPlay(double sr)
 
 	for (auto bproc : bprocessor)
 		bproc->prepareToPlay(sampleRate);
+    
     for (auto rproc : rprocessor)
         rproc->prepareToPlay(sampleRate);
 }
@@ -1143,7 +1145,11 @@ ValueTree Piano::getState(void)
             itemVT.addChild(item->getState(), -1, 0);
             pianoVT.addChild(itemVT, -1, 0);
         }
-        //
+        else if (type == PreparationTypeResonance)
+        {
+            itemVT.addChild(item->getState(), -1, 0);
+            pianoVT.addChild(itemVT, -1, 0);
+        }
         else if (type == PreparationTypeSynchronic)
         {
             itemVT.addChild(item->getState(), -1, 0);
@@ -1181,7 +1187,8 @@ ValueTree Piano::getState(void)
 		}
         else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) ||
                  type == PreparationTypeReset ||
-                 type == PreparationTypeBlendronicMod)
+                 type == PreparationTypeBlendronicMod ||
+                 type == PreparationTypeResonanceMod)
         {
             itemVT.addChild(item->getState(), -1, 0);
             

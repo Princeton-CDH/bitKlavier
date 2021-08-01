@@ -439,13 +439,18 @@ public:
         rFundamentalKey.getState(prep, ptagResonance_fundamentalKey);
         rResonanceKeys.getState(prep, StringArray(vtagResonance_resonanceKeys, ptagInt));
         rOffsetsKeys.getState(prep, StringArray(vtagResonance_offsets, ptagFloat));
+        DBG("getState - rOffsetsKeys: " + floatArrayToString(rOffsetsKeys.value));
         rGainsKeys.getState(prep, StringArray(vtagResonance_gains, ptagFloat));
+        
+        DBG("Resonance getState ValueTree = " + prep.toXmlString());
 
         return prep;
     }
 
     void setState(XmlElement* e)
     {
+        //setDefaultPartialStructure();
+        
         rDefaultGain.setState(e, ptagResonance_gain, 1.0f);
         rBlendronicGain.setState(e, ptagResonance_blendronicGain, 1.0f);
         
@@ -469,10 +474,11 @@ public:
         
         rFundamentalKey.setState(e, ptagResonance_fundamentalKey, 0);
         rResonanceKeys.setState(e, StringArray(vtagResonance_resonanceKeys, ptagInt), 0);
+        DBG("before setState - rOffsetsKeys: " + floatArrayToString(rOffsetsKeys.value));
         rOffsetsKeys.setState(e, StringArray(vtagResonance_offsets, ptagFloat), 0.);
+        DBG("after setState - rOffsetsKeys: " + floatArrayToString(rOffsetsKeys.value));
         rGainsKeys.setState(e, StringArray(vtagResonance_gains, ptagFloat), 1.);
         
-        setDefaultPartialStructure();
         updatePartialStructure();
     }
     

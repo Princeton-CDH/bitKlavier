@@ -251,6 +251,7 @@ public:
                 
 				if (type == PreparationTypeDirect) ptype = "d";
 				else if (type == PreparationTypeNostalgic) ptype = "n";
+                else if (type == PreparationTypeResonance) ptype = "r";
 				else if (type == PreparationTypeSynchronic) ptype = "s";
 				else if (type == PreparationTypeTuning) ptype = "t";
 				else if (type == PreparationTypeTempo) ptype = "m";

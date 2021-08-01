@@ -72,6 +72,14 @@ void Gallery::removeNostalgicModification(int Id)
     }
 }
 
+void Gallery::removeResonanceModification(int Id)
+{
+    for (int i = modResonance.size(); --i >= 0; )
+    {
+        if (modResonance[i]->getId() == Id) modResonance.remove(i);
+    }
+}
+
 void Gallery::removeDirectModification(int Id)
 {
     for (int i = modDirect.size(); --i >= 0; )
@@ -227,6 +235,10 @@ void Gallery::remove(BKPreparationType type, int Id)
 	{
 		removeBlendronicModification(Id);
 	}
+    else if (type == PreparationTypeResonanceMod)
+    {
+        removeResonanceModification(Id);
+    }
     else if (type == PreparationTypePiano)
     {
         removePiano(Id);
@@ -299,6 +311,10 @@ String Gallery::iterateName(BKPreparationType type, String name)
     {
         for (auto p : resonance) if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
     }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        for (auto p : modResonance)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+    }
     else if (type == PreparationTypePiano)
     {
         for (auto p : bkPianos)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
@@ -346,7 +362,7 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
 	}
     else if (type == PreparationTypeKeymap)
     {
-         name = getKeymap(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+        name = getKeymap(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : bkKeymaps)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     if (type == PreparationTypeDirectMod)
@@ -386,6 +402,11 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
     {
         name = getResonance(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : resonance)   if (p->getName() == name || p->getName().startsWith(name + " ")) num++;
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        name = getResonanceModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+        for (auto p : modResonance)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypePiano)
     {
@@ -507,6 +528,16 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         if (p->getName() == String(oldId))
             p->setName(String(p->getId()));
         else p->setName(iterateName(PreparationTypeNostalgicMod, p->getName()));
+        return p->getId();
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        ResonanceModification::Ptr p = new ResonanceModification(processor, -1);
+        p->setState(xml);
+        addResonanceMod(p);
+        if (p->getName() == String(oldId))
+            p->setName(String(p->getId()));
+        else p->setName(iterateName(PreparationTypeResonanceMod, p->getName()));
         return p->getId();
     }
     else if (type == PreparationTypeTuningMod)
@@ -655,6 +686,15 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeNostalgicMod, newId))+")";
         newOne->setName(newName);
     }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        ResonanceModification::Ptr toCopy = getResonanceModification(Id);
+        ResonanceModification::Ptr newOne = toCopy->duplicate();
+        addResonanceMod(newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeResonanceMod, newId))+")";
+        newOne->setName(newName);
+    }
     else if (type == PreparationTypeTuningMod)
     {
         TuningModification::Ptr toCopy = getTuningModification(Id);
@@ -758,6 +798,11 @@ int Gallery::add(BKPreparationType type)
         addNostalgicMod();
         newId = modNostalgic.getLast()->getId();
     }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        addResonanceMod();
+        newId = modResonance.getLast()->getId();
+    }
     else if (type == PreparationTypeTuningMod)
     {
         addTuningMod();
@@ -797,6 +842,7 @@ int Gallery::getNum(BKPreparationType type)
     (type == PreparationTypeResonance) ? resonance.size() :
     (type == PreparationTypeDirectMod) ? modDirect.size() :
     (type == PreparationTypeNostalgicMod) ? modNostalgic.size() :
+    (type == PreparationTypeResonanceMod) ? modResonance.size() :
     (type == PreparationTypeSynchronicMod) ? modSynchronic.size() :
     (type == PreparationTypeTuningMod) ? modTuning.size() :
     (type == PreparationTypeTempoMod) ? modTempo.size() :
@@ -858,6 +904,24 @@ void Gallery::addNostalgicMod(NostalgicModification::Ptr mod)
     int newId = getNewId(PreparationTypeNostalgicMod);
     mod->setId(newId);
     modNostalgic.add           (mod);
+}
+
+void Gallery::addResonanceMod()
+{
+    int newId = getNewId(PreparationTypeNostalgicMod);
+    modResonance.add        (new ResonanceModification(processor, newId));
+}
+
+void Gallery::addResonanceModWithId(int Id)
+{
+    modResonance.add        (new ResonanceModification(processor, Id));
+}
+
+void Gallery::addResonanceMod(ResonanceModification::Ptr mod)
+{
+    int newId = getNewId(PreparationTypeResonanceMod);
+    mod->setId(newId);
+    modResonance.add           (mod);
 }
 
 void Gallery::addTuningMod()

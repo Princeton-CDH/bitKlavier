@@ -101,10 +101,8 @@ void Gallery::resetPreparations(void)
     for (int i = synchronic.size(); --i >= 0; )
         synchronic[i]->prep->resetModdables();
     
-    /*
     for (int i = resonance.size(); --i >= 0; )
         resonance[i]->prep->resetModdables();
-     */
     
     for (int i = tuning.size(); --i >= 0; )
         tuning[i]->prep->resetModdables();

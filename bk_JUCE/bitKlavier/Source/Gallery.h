@@ -71,6 +71,9 @@ public:
         s += "\nnostalgicmod";
         for (auto item : modNostalgic) s += (" " + String(item->getId()));
         
+        s += "\nresonancemod";
+        for (auto item : modResonance) s += (" " + String(item->getId()));
+        
         s += "\nsynchronicmod";
         for (auto item : modSynchronic) s += (" " + String(item->getId()));
         
@@ -160,6 +163,7 @@ public:
     inline const int getNumResonance(void) const noexcept { return resonance.size(); }
     inline const int getNumSynchronicMod(void) const noexcept {return modSynchronic.size();}
     inline const int getNumNostalgicMod(void) const noexcept {return modNostalgic.size();}
+    inline const int getNumResonanceMod(void) const noexcept {return modResonance.size();}
     inline const int getNumDirectMod(void) const noexcept {return modDirect.size();}
     inline const int getNumTempoMod(void) const noexcept {return modTempo.size();}
     inline const int getNumTuningMod(void) const noexcept {return modTuning.size();}
@@ -435,6 +439,18 @@ public:
         StringArray names;
         
         for (auto mod : modNostalgic)
+        {
+            names.add(mod->getName());
+        }
+        
+        return names;
+    }
+    
+    inline const StringArray getAllResonanceModNames(void) const noexcept
+    {
+        StringArray names;
+        
+        for (auto mod : modResonance)
         {
             names.add(mod->getName());
         }
@@ -731,6 +747,11 @@ public:
         return modNostalgic;
     }
     
+    inline const ResonanceModification::PtrArr getResonanceModifications(void) const noexcept
+    {
+        return modResonance;
+    }
+    
     inline const DirectModification::PtrArr getDirectModifications(void) const noexcept
     {
         return modDirect;
@@ -899,6 +920,7 @@ private:
     
     void addDirectMod(void);
     void addNostalgicMod(void);
+    void addResonanceMod(void);
     void addSynchronicMod(void);
     void addTuningMod(void);
     void addTempoMod(void);
@@ -906,6 +928,7 @@ private:
     
     void addDirectModWithId(int Id);
     void addNostalgicModWithId(int Id);
+    void addResonanceModWithId(int Id);
     void addSynchronicModWithId(int Id);
     void addTuningModWithId(int Id);
     void addTempoModWithId(int Id);
@@ -916,6 +939,7 @@ private:
     void addDirectMod(DirectModification::Ptr);
     void addSynchronicMod(SynchronicModification::Ptr);
     void addNostalgicMod(NostalgicModification::Ptr);
+    void addResonanceMod(ResonanceModification::Ptr);
 	void addBlendronicMod(BlendronicModification::Ptr);
     
     void removeDirect(int Id);
@@ -932,6 +956,7 @@ private:
     void removeTuningModification(int Id);
     void removeTempoModification(int Id);
 	void removeBlendronicModification(int Id);
+    void removeResonanceModification(int Id);
     
     int transformId(BKPreparationType type, int oldId);
     

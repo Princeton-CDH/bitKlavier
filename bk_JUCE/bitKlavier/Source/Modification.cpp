@@ -693,8 +693,8 @@ ResonancePreparation()
 ValueTree ResonanceModification::getState(void)
 {
     
-    ValueTree prep(vtagModNostalgic);
-    /*
+    ValueTree prep(vtagModResonance);
+    
     prep.setProperty( "Id", Id, 0);
     prep.setProperty( "name", getName(), 0);
     prep.setProperty("alt", altMod, 0);
@@ -706,15 +706,14 @@ ValueTree ResonanceModification::getState(void)
     }
     prep.addChild(dirtyVT, -1, 0);
     
-    prep.addChild(NostalgicPreparation::getState(), -1, 0);
-     */
+    prep.addChild(ResonancePreparation::getState(), -1, 0);
     
     return prep;
 }
 
 void ResonanceModification::setState(XmlElement* e)
 {
-    /*
+    
     Id = e->getStringAttribute("Id").getIntValue();
     
     String n = e->getStringAttribute("name");
@@ -741,11 +740,11 @@ void ResonanceModification::setState(XmlElement* e)
             }
         }
         
-        NostalgicPreparation::setState(paramsXml);
-        if (!nUseGlobalSoundSet.value)
+        ResonancePreparation::setState(paramsXml);
+        if (!rUseGlobalSoundSet.value)
         {
             // comes in as "soundfont.sf2.subsound1"
-            String name = nSoundSetName.value;
+            String name = rSoundSetName.value;
             BKSampleLoadType type;
             String path;
             int subsound = 0;
@@ -784,11 +783,13 @@ void ResonanceModification::setState(XmlElement* e)
             setSoundSet(Id);
         }
     }
+    /*
     else
     {
         setStateOld(e);
     }
      */
+     
 }
 
 TempoModification::TempoModification(BKAudioProcessor& processor, int Id):

@@ -352,12 +352,14 @@ typedef enum BKPreparationType {
 inline BKPreparationType modToPrepType(BKPreparationType modType)
 {
     if (modType == PreparationTypeBlendronicMod) return PreparationTypeBlendronic;
+    if (modType == PreparationTypeResonanceMod) return PreparationTypeResonance;
     return ((modType >= PreparationTypeDirectMod && modType <= PreparationTypeTempoMod) ? (BKPreparationType)(modType - 6) : BKPreparationTypeNil);
 }
 
 inline BKPreparationType prepToModType(BKPreparationType modType)
 {
     if (modType == PreparationTypeBlendronic) return PreparationTypeBlendronicMod;
+    if (modType == PreparationTypeResonance) return PreparationTypeResonanceMod;
     return ((modType >= PreparationTypeDirect && modType <= PreparationTypeTempo) ? (BKPreparationType)(modType + 6) : BKPreparationTypeNil);
 }
 
