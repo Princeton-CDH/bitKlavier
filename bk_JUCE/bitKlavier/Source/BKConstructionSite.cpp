@@ -830,6 +830,10 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     {
         processor.updateState->setCurrentDisplay(PreparationTypeNostalgicMod);
     }
+    else if (result == RESONANCEMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeResonanceMod);
+    }
     else if (result == SYNCHRONICMOD_EDIT_ID)
     {
         processor.updateState->setCurrentDisplay(PreparationTypeSynchronicMod);
@@ -1198,6 +1202,7 @@ void BKConstructionSite::idDidChange(void)
     else if (type == PreparationTypeTuning)         newId = processor.updateState->currentTuningId;
     else if (type == PreparationTypeDirectMod)      newId = processor.updateState->currentModDirectId;
     else if (type == PreparationTypeNostalgicMod)   newId = processor.updateState->currentModNostalgicId;
+    else if (type == PreparationTypeResonanceMod)   newId = processor.updateState->currentModResonanceId;
     else if (type == PreparationTypeSynchronicMod)  newId = processor.updateState->currentModSynchronicId;
     else if (type == PreparationTypeBlendronicMod)  newId = processor.updateState->currentModBlendronicId;
     else if (type == PreparationTypeTuningMod)      newId = processor.updateState->currentModTuningId;

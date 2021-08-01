@@ -457,6 +457,10 @@ bool Piano::containsProcessor(BKPreparationType thisType, int thisId)
     {
         return (getNostalgicProcessor(thisId) == nullptr) ? false : true;
     }
+    else if (thisType == PreparationTypeResonance)
+    {
+        return (getResonanceProcessor(thisId) == nullptr) ? false : true;
+    }
     else if (thisType == PreparationTypeTuning)
     {
         return (getTuningProcessor(thisId) == nullptr) ? false : true;
@@ -731,6 +735,7 @@ void Piano::configureReset(BKItem::Ptr item)
     Array<int> tempoMod = item->getConnectionIdsOfType(PreparationTypeTempoMod);
     Array<int> tuningMod = item->getConnectionIdsOfType(PreparationTypeTuningMod);
     Array<int> blendronicMod = item->getConnectionIdsOfType(PreparationTypeBlendronicMod);
+    Array<int> resonanceMod = item->getConnectionIdsOfType(PreparationTypeResonanceMod);
 
     Modifications::Reset resetWithKeymaps;
     
@@ -781,12 +786,12 @@ void Piano::configureReset(BKItem::Ptr item)
                 resetToAdd.prepId = id;
                 modificationMap[key]->blendronicResets.add(resetToAdd);
             }
-            /*for (auto id : resonance)
+            for (auto id : resonance)
             {
                 Modifications::Reset resetToAdd = resetWithKeymaps;
                 resetToAdd.prepId = id;
                 modificationMap[key]->resonanceResets.add(resetToAdd);
-            }*/
+            }
             for (auto id : directMod)
             {
                 Modifications::Reset resetToAdd = resetWithKeymaps;
@@ -804,6 +809,12 @@ void Piano::configureReset(BKItem::Ptr item)
                 Modifications::Reset resetToAdd = resetWithKeymaps;
                 resetToAdd.prepId = id;
                 modificationMap[key]->nostalgicModResets.add(resetToAdd);
+            }
+            for (auto id : resonanceMod)
+            {
+                Modifications::Reset resetToAdd = resetWithKeymaps;
+                resetToAdd.prepId = id;
+                modificationMap[key]->resonanceModResets.add(resetToAdd);
             }
             for (auto id : tuningMod)
             {
@@ -893,6 +904,10 @@ void Piano::configureModification(BKItem::Ptr map)
 	{
 		configureBlendronicModification(processor.gallery->getBlendronicModification(Id), whichKeymaps, whichPreps);
 	}
+    else if (modType == PreparationTypeResonanceMod)
+    {
+        configureResonanceModification(processor.gallery->getResonanceModification(Id), whichKeymaps, whichPreps);
+    }
 
 }
 
@@ -984,6 +999,28 @@ void Piano::configureBlendronicModification(BlendronicModification::Ptr mod, Arr
 	}
 }
 
+void Piano::configureResonanceModification(ResonanceModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
+{
+    mod->setTargets(whichPreps);
+    
+    Keymap::PtrArr keymaps;
+    for (auto keymap : whichKeymaps)
+    {
+        Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
+        keymaps.add(thisKeymap);
+    }
+    
+    mod->setKeymaps(keymaps);
+
+    for (auto keymap : whichKeymaps)
+    {
+        for (auto key : processor.gallery->getKeymap(keymap)->keys())
+        {
+            modificationMap[key]->addResonanceModification(mod);
+        }
+    }
+}
+
 void Piano::configureTuningModification(TuningModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
     mod->setTargets(whichPreps);
@@ -1067,7 +1104,8 @@ ValueTree Piano::getState(void)
             {
                 BKPreparationType targetType = target->getType();
                 
-                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic))
+                if (((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) ||
+                     targetType == PreparationTypeResonance))
                 {
                     connectionsVT.addChild(target->getState(), -1, 0);
                 }

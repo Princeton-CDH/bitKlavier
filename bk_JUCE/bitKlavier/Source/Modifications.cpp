@@ -89,6 +89,11 @@ void Modifications::addDirectModification(DirectModification::Ptr m)
     directMods.add(m);
 }
 
+void Modifications::addResonanceModification(ResonanceModification::Ptr m)
+{
+    resonanceMods.add(m);
+}
+
 
 void Modifications::removeDirectModification(DirectModification::Ptr m)
 {
@@ -109,6 +114,30 @@ void Modifications::removeDirectModification(int which)
         if (directMods[i]->getId() == which)
         {
             directMods.remove(i);
+            break;
+        }
+    }
+}
+
+void Modifications::removeResonanceModification(ResonanceModification::Ptr m)
+{
+    for (int i = resonanceMods.size(); --i >= 0;)
+    {
+        if (resonanceMods[i] == m)
+        {
+            resonanceMods.remove(i);
+            break;
+        }
+    }
+}
+
+void Modifications::removeResonanceModification(int which)
+{
+    for (int i = 0; i < resonanceMods.size(); i++)
+    {
+        if (resonanceMods[i]->getId() == which)
+        {
+            resonanceMods.remove(i);
             break;
         }
     }

@@ -89,6 +89,7 @@ public:
     inline ResonanceProcessor::PtrArr   getResonanceProcessors(void) const noexcept { return rprocessor; }
     inline PreparationMap::Ptr       getPreparationMap(void) const noexcept { return prepMap; }
     
+    
     NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
     SynchronicProcessor::Ptr    addSynchronicProcessor(int thisId);
     DirectProcessor::Ptr        addDirectProcessor(int thisId);
@@ -393,6 +394,8 @@ private:
     void configureTempoModification(TempoModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     
 	void configureBlendronicModification(BlendronicModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
+    
+    void configureResonanceModification(ResonanceModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
 
     JUCE_LEAK_DETECTOR(Piano)
 };

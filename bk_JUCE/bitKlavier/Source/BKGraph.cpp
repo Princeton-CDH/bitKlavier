@@ -835,7 +835,8 @@ bool BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
         item1Type == PreparationTypeNostalgicMod ||
         item1Type == PreparationTypeBlendronicMod || 
         item1Type == PreparationTypeSynchronicMod || 
-        item1Type == PreparationTypeTuningMod || 
+        item1Type == PreparationTypeTuningMod ||
+        item1Type == PreparationTypeResonanceMod ||
         item1Type == PreparationTypeTempoMod)
     {
         if (!item1->isConnectedToAnyPreparation())
@@ -848,6 +849,7 @@ bool BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
         item2Type == PreparationTypeBlendronicMod ||
         item2Type == PreparationTypeSynchronicMod ||
         item2Type == PreparationTypeTuningMod ||
+        item2Type == PreparationTypeResonanceMod ||
         item2Type == PreparationTypeTempoMod)
     {
         if (!item2->isConnectedToAnyPreparation())
@@ -1122,6 +1124,7 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             type2 == PreparationTypeSynchronic ||
             type2 == PreparationTypeDirect ||
             type2 == PreparationTypeNostalgic ||
+            type2 == PreparationTypeResonance ||
             type2 == PreparationTypeTempo ||
             type2 == PreparationTypeBlendronicMod ||
             type2 == PreparationTypeGenericMod ||
@@ -1131,7 +1134,11 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
     else if (type1 == PreparationTypeResonance)
     {
         if (type2 == PreparationTypeKeymap ||
-            type2 == PreparationTypeTuning)
+            type2 == PreparationTypeResonanceMod ||
+            type2 == PreparationTypeGenericMod ||
+            type2 == PreparationTypeBlendronic ||
+            type2 == PreparationTypeTuning ||
+            type2 == PreparationTypeReset)
             return true;
     }
     else if (type1 == PreparationTypeTuning)
@@ -1182,6 +1189,13 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             type2 == PreparationTypeReset)
             return true;
     }
+    else if (type1 == PreparationTypeResonanceMod)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeResonance ||
+            type2 == PreparationTypeReset)
+            return true;
+    }
     else if (type1 == PreparationTypeBlendronicMod)
     {
         if (type2 == PreparationTypeKeymap ||
@@ -1221,7 +1235,8 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
     {
         if (type2 == PreparationTypeKeymap ||
             (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo) ||
-            type2 == PreparationTypeBlendronic)
+            type2 == PreparationTypeBlendronic ||
+            type2 == PreparationTypeResonance)
             return true;
     }
     

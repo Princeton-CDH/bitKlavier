@@ -50,6 +50,10 @@ public:
 	void addBlendronicModification(BlendronicModification::Ptr b);
 	void removeBlendronicModification(BlendronicModification::Ptr b);
 	void removeBlendronicModification(int which);
+    
+    void addResonanceModification(ResonanceModification::Ptr b);
+    void removeResonanceModification(ResonanceModification::Ptr b);
+    void removeResonanceModification(int which);
 
     SynchronicModification::PtrArr getSynchronicModifications(void);
     
@@ -78,6 +82,7 @@ public:
     Array<Reset> tuningResets;
     Array<Reset> tempoResets;
 	Array<Reset> blendronicResets;
+    Array<Reset> resonanceResets;
     
     Array<Reset> directModResets;
     Array<Reset> nostalgicModResets;
@@ -85,6 +90,7 @@ public:
     Array<Reset> tuningModResets;
     Array<Reset> tempoModResets;
     Array<Reset> blendronicModResets;
+    Array<Reset> resonanceModResets;
     
     struct PianoMap
     {
@@ -100,7 +106,7 @@ private:
     TuningModification::PtrArr      tuningMods;
     TempoModification::PtrArr       tempoMods;
 	BlendronicModification::PtrArr	blendronicMods;
-    //ResonanceModification::PtrArr   resonanceMods;
+    ResonanceModification::PtrArr   resonanceMods;
     
     JUCE_LEAK_DETECTOR(Modifications)
 };

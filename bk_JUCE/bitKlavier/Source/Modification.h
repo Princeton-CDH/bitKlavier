@@ -255,7 +255,7 @@ public:
     
     ValueTree getState(void);
     void setState(XmlElement* e);
-    void setStateOld(XmlElement* e);
+    // void setStateOld(XmlElement* e);
     
 private:
     

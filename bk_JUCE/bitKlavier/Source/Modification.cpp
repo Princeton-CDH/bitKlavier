@@ -683,7 +683,113 @@ void NostalgicModification::setStateOld(XmlElement* e)
     }
 }
 
+ResonanceModification::ResonanceModification(BKAudioProcessor& processor, int Id):
+Modification(processor, Id, ResonanceParameterTypeNil),
+ResonancePreparation()
+{
 
+}
+
+ValueTree ResonanceModification::getState(void)
+{
+    
+    ValueTree prep(vtagModNostalgic);
+    /*
+    prep.setProperty( "Id", Id, 0);
+    prep.setProperty( "name", getName(), 0);
+    prep.setProperty("alt", altMod, 0);
+    ValueTree dirtyVT( "dirty");
+    int count = 0;
+    for (auto b : dirty)
+    {
+        dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
+    }
+    prep.addChild(dirtyVT, -1, 0);
+    
+    prep.addChild(NostalgicPreparation::getState(), -1, 0);
+     */
+    
+    return prep;
+}
+
+void ResonanceModification::setState(XmlElement* e)
+{
+    /*
+    Id = e->getStringAttribute("Id").getIntValue();
+    
+    String n = e->getStringAttribute("name");
+    
+    altMod = e->getBoolAttribute("alt", false);
+    
+    if (n != String())     setName(n);
+    else                        setName(String(Id));
+    
+    XmlElement* dirtyXml = e->getChildByName("dirty");
+    XmlElement* paramsXml = e->getChildByName("params");
+    
+    if (dirtyXml != nullptr && paramsXml != nullptr)
+    {
+        dirty.clear();
+        for (int k = 0; k < NostalgicParameterTypeNil; k++)
+        {
+            String attr = dirtyXml->getStringAttribute("d" + String(k));
+            
+            if (attr == String()) dirty.add(false);
+            else
+            {
+                dirty.add((bool)attr.getIntValue());
+            }
+        }
+        
+        NostalgicPreparation::setState(paramsXml);
+        if (!nUseGlobalSoundSet.value)
+        {
+            // comes in as "soundfont.sf2.subsound1"
+            String name = nSoundSetName.value;
+            BKSampleLoadType type;
+            String path;
+            int subsound = 0;
+            
+            for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
+            {
+                if (name == String(cBKSampleLoadTypes[i]))
+                {
+                    type = (BKSampleLoadType) i;
+                }
+            }
+            
+            String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
+            for (auto sf : processor.soundfontNames)
+            {
+                if (sf.contains(sfName))
+                {
+                    type = BKLoadSoundfont;
+                    path = sf;
+                    subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+                    break;
+                }
+            }
+            
+            
+            for (auto cs : processor.customSampleSetNames)
+            {
+                if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
+                {
+                    type = BKLoadCustom;
+                    path = cs;
+                    break;
+                }
+            }
+            int Id = processor.loadSamples(type, path, subsound, false);
+            setSoundSet(Id);
+        }
+    }
+    else
+    {
+        setStateOld(e);
+    }
+     */
+}
 
 TempoModification::TempoModification(BKAudioProcessor& processor, int Id):
 Modification(processor, Id, TempoParameterTypeNil),

@@ -839,7 +839,7 @@ static const std::vector<std::string> cDirectParameterTypes = {
      ResonanceADSR,
      ResonanceUseGlobalSoundSet,
      ResonanceSoundSet,
-     ParameterTypeNil
+     ResonanceParameterTypeNil
      
  } ResonanceParameterType;
 

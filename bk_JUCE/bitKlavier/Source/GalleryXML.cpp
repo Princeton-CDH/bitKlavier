@@ -77,7 +77,7 @@ ValueTree  Gallery::getState(void)
     
     for (int i = 0; i < blendronic.size(); i++)             galleryVT.addChild( blendronic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < resonance.size(); i++)             galleryVT.addChild( resonance[i]->getState(), -1, 0);
+    for (int i = 0; i < resonance.size(); i++)              galleryVT.addChild( resonance[i]->getState(), -1, 0);
     
     for (int i = 0; i < modTempo.size(); i++)               galleryVT.addChild( modTempo[i]->getState(), -1, 0);
     
@@ -89,7 +89,9 @@ ValueTree  Gallery::getState(void)
     
     for (int i = 0; i < modNostalgic.size(); i++)           galleryVT.addChild( modNostalgic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modBlendronic.size(); i++)        galleryVT.addChild( modBlendronic[i]->getState(), -1, 0);
+    for (int i = 0; i < modResonance.size(); i++)           galleryVT.addChild( modResonance[i]->getState(), -1, 0);
+    
+    for (int i = 0; i < modBlendronic.size(); i++)          galleryVT.addChild( modBlendronic[i]->getState(), -1, 0);
     
     for (int i = 0; i < bkKeymaps.size(); i++)              galleryVT.addChild( bkKeymaps[i]->getState(), -1, 0);
     
