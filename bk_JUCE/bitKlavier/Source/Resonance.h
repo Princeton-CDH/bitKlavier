@@ -462,10 +462,7 @@ public:
         rFundamentalKey.getState(prep, ptagResonance_fundamentalKey);
         rResonanceKeys.getState(prep, StringArray(vtagResonance_resonanceKeys, ptagInt));
         rOffsetsKeys.getState(prep, StringArray(vtagResonance_offsets, ptagFloat));
-        DBG("getState - rOffsetsKeys: " + floatArrayToString(rOffsetsKeys.base));
         rGainsKeys.getState(prep, StringArray(vtagResonance_gains, ptagFloat));
-        
-        DBG("Resonance getState ValueTree = " + prep.toXmlString());
 
         return prep;
     }

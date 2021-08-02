@@ -317,6 +317,9 @@ namespace BinaryData
     extern const char*   mod_synchronic_icon_png;
     const int            mod_synchronic_icon_pngSize = 11468;
 
+    extern const char*   mod_resonance_icon_png;
+    const int            mod_resonance_icon_pngSize = 6985;
+
     extern const char*   mod_blendronic_icon_png;
     const int            mod_blendronic_icon_pngSize = 5339;
 
@@ -354,7 +357,7 @@ namespace BinaryData
     const int            LICENSESize = 1152;
 
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 115;
+    const int namedResourceListSize = 116;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

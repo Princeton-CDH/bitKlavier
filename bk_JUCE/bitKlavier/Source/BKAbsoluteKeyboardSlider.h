@@ -137,6 +137,8 @@ public:
         keyboard->enableAllKeys();
     }
     
+    void setKeysInKeymap(Array<int> keys) { keyboard->setKeysInKeymap(keys); };
+    
     void setOctaveForMiddleC(int octave) { keyboard->setOctaveForMiddleC(octave);};
 
     inline void setDimensionRatio(float r) { ratio = r; }

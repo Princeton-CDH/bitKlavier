@@ -76,7 +76,7 @@ offsetsKeyboard(false, true)
     //closestKeyboard->setAvailableRange(24, 24+NUM_KEYS);
     closestKeyboard->setAvailableRange(0, NUM_KEYS);
     closestKeyboard->setOctaveForMiddleC(4);
-    closestKeyboard->setScrollButtonsVisible(true);
+    closestKeyboard->setScrollButtonsVisible(false);
     closestKeyboard->setOctaveForMiddleC(5);
     addAndMakeVisible(*closestKeyboard);
     
@@ -86,7 +86,7 @@ offsetsKeyboard(false, true)
     //fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS);
     fundamentalKeyboard->setAvailableRange(0, NUM_KEYS);
     fundamentalKeyboard->setOctaveForMiddleC(4);
-    fundamentalKeyboard->setScrollButtonsVisible(false);
+    //fundamentalKeyboard.setScrollButtonsVisible(false);
     fundamentalKeyboard->setOctaveForMiddleC(5);
     fundamentalKeyboard->setKeysInKeymap(0);
     addAndMakeVisible(*fundamentalKeyboard);
@@ -112,54 +112,6 @@ offsetsKeyboard(false, true)
     offsetsKeyboard.setOctaveForMiddleC(5);
     offsetsKeyboard.disableAllKeys();
     addAndMakeVisible(&offsetsKeyboard);
-
-
-//    float offsetMin  = -100.;
-//   float offsetMax  = 100.;
-//   float offsetIncrement = 0.1;
-//   float offsetDefault = 0.;
-//
-//   float gainMin = 0.1;
-//   float gainMax = 10.;
-//   float gainIncrement = 0.1;
-//   float gainDefault = 1;
-//  String subSliderName = "add subslider";
-//   int  sliderHeight = 60;
-//
-//    for (int i = 0; i < NUM_KEYS; i++)
-//    {
-//        BKSubSlider* refSlider = new BKSubSlider(Slider::LinearBarVertical,
-//                                                                 offsetMin,
-//                                                                 offsetMax,
-//                                                                 offsetDefault,
-//                                                                 offsetIncrement,
-//                                                                 20,
-//                                                                sliderHeight);
-////        refSlider->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxLeft, true, 0,0);
-//        refSlider->addMouseListener(this, true);
-//        refSlider->setName("offset" + String(i));
-//        refSlider->setTooltip(String(refSlider->getValue()));
-////        refSlider->setInterceptsMouseClicks(false, false);
-////        refSlider->setLookAndFeel(&displaySliderLookAndFeel);
-//        addAndMakeVisible(*refSlider);
-//
-//        offsetsArray.add(refSlider);
-//
-//        BKSubSlider* refgainSlider = new BKSubSlider(Slider::LinearBarVertical,
-//                                                                 gainMin,
-//                                                                 gainMax,
-//                                                                 gainDefault,
-//                                                                 gainIncrement,
-//                                                                 20,
-//                                                                sliderHeight);
-//        refgainSlider->setName("gain" + String(i));
-//        addAndMakeVisible(*refgainSlider);
-//        gainsArray.add(refgainSlider);
-//
-//        isActive[i] = false;
-////        gainsArray.add(std::make_unique<BKSingleSlider>("gain" + String(i), 10, -100, 24, 1, 0.01, "-inf"));
-//
-//    }
     
     closestKeyLabel.setText("Resonant Keys: ", dontSendNotification);
     closestKeyLabel.setJustificationType(Justification::right);
@@ -180,9 +132,6 @@ offsetsKeyboard(false, true)
     offsetsLabel.setJustificationType(Justification::right);
     offsetsLabel.setTooltip("offset in cents from ET for this resonance");
     addAndMakeVisible(offsetsLabel);
-
-
-    //will need to do more with blendronic, modifications, etc eventually
 
     currentTab = 0;
     displayTab(currentTab);
@@ -279,7 +228,7 @@ void ResonanceViewController::displayTab(int tab)
         
 //        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12); //num white keys, gives error
         
-        float keyWidth = fundamentalKeyboardRow.getWidth() / 31.; // 31 is number of white keys
+        float keyWidth = fundamentalKeyboardRow.getWidth() / 31.; // 31 is number of white keys 
         
         DBG("Keyboard row width: " + String(fundamentalKeyboardRow.getWidth()));
         DBG("Keyboard width" + String(fundamentalKeyboard->getWidth()));
@@ -777,24 +726,8 @@ void ResonancePreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slid
     {
         DBG("set max symp strings to " + String(val));
         prep->setMaxSympStrings(val);
-//    }
-//    else if (slider == offsetsArray[0]){
-//        DBG("first offset slider changed");
-//    }
-//    else {
-//        for (int i = 0; i < offsetsArray.size(); i++){
-//            if (name == offsetsArray[i]->getName()) {
-//                prep->setOffset(i, val);
-//                DBG("set" + String(i) + "offset to " + String(val));
-//            }
-//        }
-//        for (int i = 0; i < gainsArray.size(); i++){
-//            if (name == gainsArray[i]->getName()) {
-//                prep->setGain(i, val);
-//                DBG("set" + String(i) + "gain to " + String(val));
-//            }
-//        }
-}
+
+    }
     processor.updateState->editsMade = true;
 }
 
@@ -845,21 +778,8 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
     if (source == &resonanceKeyboardState)
     {
-        /*
-        if (prep->isActive(midiNoteNumber)) {
-            prep->removeActive(midiNoteNumber);
-            isActive[midiNoteNumber - 24] = false;
-            DBG("removing active" + String(midiNoteNumber));
-        }
-        else {
-            prep->addActive(midiNoteNumber, 1.0, 0);
-            isActive[midiNoteNumber - 24] = true;
-            DBG("adding active"+ String(midiNoteNumber));
-        }
-         */
-        
         //closestKeyboard->setKeysInKeymap(prep->getKeys());
-        DBG("resonanceKeyboardState " + String(midiNoteNumber));
+        //DBG("resonanceKeyboardState " + String(midiNoteNumber));
         prep->toggleResonanceKey(midiNoteNumber);
         closestKeyboard->setKeysInKeymap(prep->getResonanceKeys());
         
@@ -875,7 +795,7 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
     {
         prep->setFundamentalKey(midiNoteNumber); 
         fundamentalKeyboard->setKeysInKeymap({midiNoteNumber});
-        DBG("fundamental key toggled " + String(midiNoteNumber));
+        //DBG("fundamental key toggled " + String(midiNoteNumber));
     }
     update();
 
@@ -883,44 +803,456 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
 
 void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
-        ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
-     
-        if(name == gainsKeyboard.getName())
-        {
-            DBG("updating gain vals");
-            prep->setGains(values);
-            
-            /*
-            float sum = 0;
-            for (float i : values) {
-                //DBG(String(i));
-                if(i != 0) {
-                    DBG(String(sum) + " = " + String(i));
-                }
-                sum+=1;
-            }
-             */
-            //DBG("sum: " + String(sum));
-        }
-        else if(name == offsetsKeyboard.getName())
-        {
-            DBG("updating offset vals");
-            prep->setOffsets(values);
-            
-            /*
-            float sum = 0;
-            for (float i : values) {
-                //DBG(String(i));
-                if(i != 0) {
-                    DBG(String(sum) + " = " + String(i));
-                }
-                sum+=1;
-            }
-             */
-            
-        }
-        processor.gallery->setGalleryDirty(true);
-        
-        processor.updateState->editsMade = true;
+    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+ 
+    if(name == gainsKeyboard.getName())
+    {
+        DBG("updating gain vals");
+        prep->setGains(values);
     }
+    else if(name == offsetsKeyboard.getName())
+    {
+        DBG("updating offset vals");
+        prep->setOffsets(values);
+    }
+    processor.gallery->setGalleryDirty(true);
+    
+    processor.updateState->editsMade = true;
+}
 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
+ResonanceModificationEditor::ResonanceModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
+ResonanceViewController(p, theGraph)
+{
+    selectCB.addListener(this);
+    selectCB.addMyListener(this);
+    
+    fillSelectCB(-1,-1);
+    
+    defGainSlider->addMyListener(this);
+    startTimeSlider->addMyListener(this);
+    blendGainSlider->addMyListener(this);
+    maxSympStringsSlider->addMyListener(this);
+
+    ADSRSlider->addMyListener(this);
+    
+    //closestKeyboard->addMyListener(this);
+    //fundamentalKeyboard->addMyListener(this);
+    
+    offsetsKeyboard.addMyListener(this);
+    gainsKeyboard.addMyListener(this);
+    
+    alternateMod.addListener(this);
+    alternateMod.setVisible(true);
+}
+
+void ResonanceModificationEditor::greyOutAllComponents()
+{
+    defGainSlider->setDim(gModAlpha);
+    startTimeSlider->setDim(gModAlpha);
+    blendGainSlider->setDim(gModAlpha);
+    maxSympStringsSlider->setDim(gModAlpha);
+    ADSRSlider->setDim(gModAlpha);
+    //closestKeyboard->setDim(gModAlpha);
+    //fundamentalKeyboard->setDim(gModAlpha);
+    offsetsKeyboard.setDim(gModAlpha);
+    gainsKeyboard.setDim(gModAlpha);
+}
+
+void ResonanceModificationEditor::highlightModedComponents()
+{
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+
+    /*
+    if(mod->getDirty(DirectTransposition))    transpositionSlider->setBright();
+    if(mod->getDirty(DirectGain))             gainSlider->setBright();
+    if(mod->getDirty(DirectResGain))          resonanceGainSlider->setBright();
+    if(mod->getDirty(DirectHammerGain))       hammerGainSlider->setBright();
+    if(mod->getDirty(DirectADSR))             ADSRSlider->setBright();
+    if(mod->getDirty(DirectTranspUsesTuning)) transpUsesTuning.setAlpha(1.);
+    if(mod->getDirty(DirectVelocityMin))      velocityMinMaxSlider->setBright();
+    if(mod->getDirty(DirectVelocityMax))      velocityMinMaxSlider->setBright();
+    if(mod->getDirty(DirectBlendronicGain))   blendronicGainSlider->setBright();
+     */
+}
+
+void ResonanceModificationEditor::update(void)
+{
+    /*
+    if (processor.updateState->currentModDirectId < 0) return;
+    
+    selectCB.setSelectedId(processor.updateState->currentModDirectId, dontSendNotification);
+    
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    
+    if (mod != nullptr)
+    {
+        greyOutAllComponents();
+        highlightModedComponents();
+        
+        transpositionSlider->setValue(mod->dTransposition.value, dontSendNotification);
+        gainSlider->setValue(mod->dGain.value, dontSendNotification);
+        resonanceGainSlider->setValue(mod->dResonanceGain.value, dontSendNotification);
+        hammerGainSlider->setValue(mod->dHammerGain.value, dontSendNotification);
+        blendronicGainSlider->setValue(mod->dBlendronicGain.value, dontSendNotification);
+        ADSRSlider->setValue(mod->getADSRvals(), dontSendNotification);
+        transpUsesTuning.setToggleState(mod->dTranspUsesTuning.value, dontSendNotification);
+        alternateMod.setToggleState(mod->altMod, dontSendNotification);
+        velocityMinMaxSlider->setMinValue(mod->velocityMin.value, dontSendNotification);
+        velocityMinMaxSlider->setMaxValue(mod->velocityMax.value, dontSendNotification);
+    }
+     */
+}
+
+void ResonanceModificationEditor::fillSelectCB(int last, int current)
+{
+    selectCB.clear(dontSendNotification);
+    
+    /*
+    for (auto prep : processor.gallery->getDirectModifications())
+    {
+        int Id = prep->getId();;
+        String name = prep->getName();
+        
+        if (name != String())  selectCB.addItem(name, Id);
+        else                        selectCB.addItem("DirectMod"+String(Id), Id);
+        
+        selectCB.setItemEnabled(Id, true);
+        if (processor.currentPiano->isActive(PreparationTypeDirect, Id))
+            selectCB.setItemEnabled(Id, false);
+    }
+    
+    if (last != 0)      selectCB.setItemEnabled(last, true);
+    if (current != 0)   selectCB.setItemEnabled(current, false);
+    
+    int selectedId = processor.updateState->currentDirectId;
+    
+    selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
+    
+    selectCB.setItemEnabled(selectedId, false);
+    
+    lastId = selectedId;
+    */
+}
+
+void ResonanceModificationEditor::bkMessageReceived (const String& message)
+{
+    if (message == "resonance/update")
+    {
+        update();
+    }
+}
+
+int ResonanceModificationEditor::addPreparation(void)
+{
+    processor.gallery->add(PreparationTypeDirectMod);
+    
+    return processor.gallery->getDirectModifications().getLast()->getId();
+}
+
+int ResonanceModificationEditor::duplicatePreparation(void)
+{
+    processor.gallery->duplicate(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
+    
+    return processor.gallery->getDirectModifications().getLast()->getId();
+}
+
+void ResonanceModificationEditor::deleteCurrent(void)
+{
+    int directId = selectCB.getSelectedId();
+    int index = selectCB.getSelectedItemIndex();
+    
+    if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
+    
+    processor.gallery->remove(PreparationTypeDirect, directId);
+    
+    fillSelectCB(0, 0);
+    
+    selectCB.setSelectedItemIndex(0, dontSendNotification);
+    int newId = selectCB.getSelectedId();
+    
+    setCurrentId(newId);
+}
+
+void ResonanceModificationEditor::setCurrentId(int Id)
+{
+    processor.updateState->currentDirectId = Id;
+    
+    processor.updateState->idDidChange = true;
+    
+    update();
+    
+    fillSelectCB(lastId, Id);
+    
+    lastId = Id;
+}
+
+void ResonanceModificationEditor::actionButtonCallback(int action, ResonanceModificationEditor* vc)
+{
+    if (vc == nullptr)
+    {
+        PopupMenu::dismissAllActiveMenus();
+        return;
+    }
+    
+    BKAudioProcessor& processor = vc->processor;
+    
+    if (action == 1)
+    {
+        int Id = vc->addPreparation();
+        vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("New Resonance Modification");
+    }
+    else if (action == 2)
+    {
+        int Id = vc->duplicatePreparation();
+        vc->setCurrentId(Id);
+        processor.saveGalleryToHistory("Duplicate Resonance Modification");
+    }
+    else if (action == 3)
+    {
+        vc->deleteCurrent();
+        processor.saveGalleryToHistory("Delete Resonance Modification");
+    }
+    else if (action == 5)
+    {
+        processor.clear(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
+        vc->update();
+        vc->updateModification();
+        processor.saveGalleryToHistory("Clear Resonance Modification");
+    }
+    else if (action == 6)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModDirectId;
+        DirectModification::Ptr prep = processor.gallery->getDirectModification(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        if (result == 1)
+        {
+            prep->setName(name);
+            vc->fillSelectCB(Id, Id);
+            processor.saveGalleryToHistory("Rename Resonance Modification");
+        }
+        
+        vc->update();
+    }
+    else if (action == 7)
+    {
+        AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
+        
+        int Id = processor.updateState->currentModDirectId;
+        DirectModification::Ptr prep = processor.gallery->getDirectModification(Id);
+        
+        prompt.addTextEditor("name", prep->getName());
+        
+        prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
+        prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
+        
+        int result = prompt.runModalLoop();
+        
+        String name = prompt.getTextEditorContents("name");
+        
+        DBG("name: " + String(name));
+        
+        if (result == 1)
+        {
+            processor.exportPreparation(PreparationTypeDirectMod, Id, name);
+        }
+    }
+    else if (action >= 100)
+    {
+        int which = action - 100;
+        processor.importPreparation(PreparationTypeDirectMod, processor.updateState->currentModDirectId, which);
+        vc->update();
+        processor.saveGalleryToHistory("Import Resonance Modification");
+    }
+    
+}
+
+void ResonanceModificationEditor::bkComboBoxDidChange (ComboBox* box)
+{
+    String name = box->getName();
+    int Id = box->getSelectedId();
+    
+    if (name == "Resonance")
+    {
+        setCurrentId(Id);
+    }
+    
+    processor.updateState->editsMade = true;
+}
+
+void ResonanceModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
+{
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    
+    mod->setName(name);
+    
+    updateModification();
+    
+    processor.updateState->editsMade = true;
+}
+
+
+void ResonanceModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
+{
+    /*
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    
+    if(slider->getName() == resonanceGainSlider->getName())
+    {
+        mod->dResonanceGain.set(val);
+        
+        mod->setDirty(DirectResGain);
+        resonanceGainSlider->setBright();
+    }
+    else if(slider->getName() == hammerGainSlider->getName())
+    {
+        mod->dHammerGain.set(val);
+        
+        mod->setDirty(DirectHammerGain);
+        hammerGainSlider->setBright();
+    }
+    else if(slider->getName() == gainSlider->getName())
+    {
+        mod->dGain.set(val);
+        
+        mod->setDirty(DirectGain);
+        gainSlider->setBright();
+    }
+    else if(slider->getName() == blendronicGainSlider->getName())
+    {
+        mod->dBlendronicGain.set(val);
+        
+        mod->setDirty(DirectBlendronicGain);
+        blendronicGainSlider->setBright();
+    }
+     */
+    
+    updateModification();
+}
+
+void ResonanceModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
+{
+    /*
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    
+    if (name == "velocity min/max")
+    {
+        mod->velocityMin.set(minval);
+        mod->setDirty(DirectVelocityMin);
+        
+        mod->velocityMax.set(maxval);
+        mod->setDirty(DirectVelocityMax);
+        
+        velocityMinMaxSlider->setBright();
+    }
+     */
+    
+    updateModification();
+}
+
+
+void ResonanceModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
+{
+    /*
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    
+    mod->dTransposition.set(val);
+    mod->setDirty(DirectTransposition);
+    
+    transpositionSlider->setBright();
+     */
+    
+    updateModification();
+}
+
+void ResonanceModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
+{
+    /*
+    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    
+    Array<float> newvals = {(float)attack, (float)decay, sustain, (float)release};
+    
+    mod->setADSRvals(newvals);
+    mod->setDirty(DirectADSR);
+    
+    ADSRSlider->setBright();
+     */
+    
+    updateModification();
+}
+
+void ResonanceModificationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
+{
+    /*
+    setShowADSR(!state);
+    setSubWindowInFront(!state);
+     */
+}
+
+void ResonanceModificationEditor::updateModification(void)
+{
+    processor.updateState->modificationDidChange = true;
+    
+    processor.updateState->editsMade = true;
+}
+
+void ResonanceModificationEditor::buttonClicked (Button* b)
+{
+    /*
+    if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+        
+    }
+    else if (b == &actionButton)
+    {
+        bool single = processor.gallery->getDirectModifications().size() == 2;
+        getModOptionMenu(PreparationTypeDirectMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+    }
+    else if (b == &rightArrow)
+    {
+        arrowPressed(RightArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
+    }
+    else if (b == &leftArrow)
+    {
+        arrowPressed(LeftArrow);
+        
+        DBG("currentTab: " + String(currentTab));
+        
+        displayTab(currentTab);
+    }
+    else if (b == &transpUsesTuning)
+    {
+        DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+        mod->setTranspUsesTuning(transpUsesTuning.getToggleState());
+        mod->setDirty(DirectTranspUsesTuning);
+        transpUsesTuning.setAlpha(1.);
+    }
+    else if (b == &alternateMod)
+    {
+        DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+        mod->altMod = alternateMod.getToggleState();
+    }
+     */
+}
+
+void ResonanceModificationEditor::timerCallback()
+{
+    
+}

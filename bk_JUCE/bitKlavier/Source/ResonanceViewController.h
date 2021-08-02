@@ -31,9 +31,6 @@ public:
     BKEditableComboBox selectCB;
     BKComboBox lengthModeSelectCB;
 
-//    std::unique_ptr<BKStackedSlider> overtonesSlider;
-    //will do something with overtoneGains eventually
-
     std::unique_ptr<BKRangeSlider> startTimeSlider;
     std::unique_ptr<BKSingleSlider> blendGainSlider;
     std::unique_ptr<BKSingleSlider> defGainSlider;
@@ -45,10 +42,10 @@ public:
     BKAbsoluteKeyboardSlider gainsKeyboard;
     BKAbsoluteKeyboardSlider offsetsKeyboard;
     
-//    Array<bool> isActive;
-    bool isActive[52];
+    //Array<bool> isActive;
+    //bool isActive[52];
 
-    BKLabel lastNote;
+    //BKLabel lastNote;
 
     BKKeymapKeyboardState resonanceKeyboardState;
     BKKeymapKeyboardState fundamentalKeyboardState;
@@ -57,6 +54,8 @@ public:
     
     std::unique_ptr<BKKeymapKeyboardComponent> closestKeyboard;
     std::unique_ptr<BKKeymapKeyboardComponent> fundamentalKeyboard;
+    //BKAbsoluteKeyboardSlider closestKeyboard;
+    //BKAbsoluteKeyboardSlider fundamentalKeyboard;
 
     std::unique_ptr<BKADSRSlider> ADSRSlider;
 
@@ -167,8 +166,8 @@ class ResonanceModificationEditor :
     public BKStackedSlider::Listener,
     public BKADSRSlider::Listener,
     public BKRangeSlider::Listener,
-//    public BKAbsoluteKeyboardSlider::Listener,
-    //public SliderListener,
+    public BKAbsoluteKeyboardSlider::Listener,
+    public Slider::Listener,
     public Timer
 {
 public:

@@ -52,14 +52,10 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     {
         setImage(ImageCache::getFromMemory(BinaryData::blendronic_icon_png, BinaryData::blendronic_icon_pngSize));
     }
-    //need to figure out how to get icon into binary data, currently using a placeholder icon
     else if (type == PreparationTypeResonance)
     {
-        DBG("call to set image from cache, still don't have yet");
-        //setImage(ImageCache::getFromMemory(BinaryData::icon_iOS_72_png, BinaryData::icon_iOS_72_pngSize));
         setImage(ImageCache::getFromMemory(BinaryData::resonance_icon_png, BinaryData::resonance_icon_pngSize));
     }
-    
     else if (type == PreparationTypeKeymap)
     {
         setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
@@ -275,6 +271,10 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     else if (type == PreparationTypeNostalgicMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_nostalgic_icon_png, BinaryData::mod_nostalgic_icon_pngSize));
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_resonance_icon_png, BinaryData::mod_resonance_icon_pngSize));
     }
     else if (type == PreparationTypeBlendronicMod)
     {
@@ -712,7 +712,8 @@ bool BKItemGraph::connect(BKItem* item1, BKItem* item2)
     if (item1Type == PreparationTypeGenericMod)
     {
         if ((item2Type >= PreparationTypeDirect && item2Type <= PreparationTypeTempo) ||
-            item2Type == PreparationTypeBlendronic)
+            item2Type == PreparationTypeBlendronic ||
+            item2Type == PreparationTypeResonance)
         {
             item1->setItemType(getModType(item2Type), true);
         }
@@ -720,7 +721,8 @@ bool BKItemGraph::connect(BKItem* item1, BKItem* item2)
     else if (item2Type == PreparationTypeGenericMod)
     {
         if ((item1Type >= PreparationTypeDirect && item1Type <= PreparationTypeTempo) ||
-            item1Type == PreparationTypeBlendronic)
+            item1Type == PreparationTypeBlendronic ||
+            item1Type == PreparationTypeResonance)
         {
             item2->setItemType(getModType(item1Type), true);
         }
@@ -1017,6 +1019,7 @@ void BKItemGraph::reconstruct(void)
 BKPreparationType BKItemGraph::getModType(BKPreparationType type)
 {
     if (type == PreparationTypeBlendronic) return PreparationTypeBlendronicMod;
+    if (type == PreparationTypeResonance) return PreparationTypeResonanceMod;
     return (BKPreparationType)(type+6);
 }
 
@@ -1138,6 +1141,7 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             type2 == PreparationTypeGenericMod ||
             type2 == PreparationTypeBlendronic ||
             type2 == PreparationTypeTuning ||
+            type2 == PreparationTypeGenericMod ||
             type2 == PreparationTypeReset)
             return true;
     }
@@ -1223,6 +1227,8 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo) ||
             type2 == PreparationTypeBlendronic ||
             (type2 >= PreparationTypeDirectMod && type2 <= PreparationTypeTempoMod) ||
+            type2 == PreparationTypeResonance ||
+            type2 == PreparationTypeResonanceMod ||
             type2 == PreparationTypeBlendronicMod)
             return true;
     }
