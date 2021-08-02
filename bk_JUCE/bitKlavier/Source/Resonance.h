@@ -99,7 +99,7 @@ public:
         rResonanceKeys({}),
         rOffsetsKeys({}),
         rGainsKeys({}),
-        name("test resonance preparation")
+        name("resonance preparation")
         
     {
         setDefaultPartialStructure();

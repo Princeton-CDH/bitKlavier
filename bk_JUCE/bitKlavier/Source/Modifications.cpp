@@ -262,6 +262,11 @@ BlendronicModification::PtrArr Modifications::getBlendronicModifications(void)
 	return blendronicMods;
 }
 
+ResonanceModification::PtrArr Modifications::getResonanceModifications(void)
+{
+    return resonanceMods;
+}
+
 void Modifications::clearModifications(void)
 {
     synchronicMods.clear();
@@ -270,6 +275,7 @@ void Modifications::clearModifications(void)
     tuningMods.clear();
     tempoMods.clear();
 	blendronicMods.clear();
+    resonanceMods.clear();
 }
 
 void Modifications::clearResets(void)
@@ -279,6 +285,7 @@ void Modifications::clearResets(void)
     directResets.clear();
     tuningResets.clear();
     tempoResets.clear();
+    resonanceResets.clear();
 	blendronicResets.clear();
     synchronicModResets.clear();
     nostalgicModResets.clear();
@@ -286,4 +293,5 @@ void Modifications::clearResets(void)
     tuningModResets.clear();
     tempoModResets.clear();
     blendronicModResets.clear();
+    resonanceModResets.clear();
 }

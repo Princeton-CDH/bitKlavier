@@ -1469,6 +1469,30 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
         }
     }
     
+    
+    ResonanceModification::PtrArr rMod = currentPiano->modificationMap[noteNumber]->getResonanceModifications();
+    DBG("about to perform resonance modifications: " + String(rMod.size()));
+    for (int i = rMod.size(); --i >= 0;)
+    {
+        ResonanceModification::Ptr mod = rMod[i];
+        
+        for (auto keymap : mod->getKeymaps())
+        {
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                Array<int> targets = mod->getTargets();
+                for (auto target : targets)
+                {
+                    ResonancePreparation::Ptr prep = gallery->getResonance(target)->prep;
+                    prep->performModification(mod, mod->getDirty());
+                }
+                updateState->resonancePreparationDidChange = true;
+                break;
+            }
+        }
+    }
+     
+    
     SynchronicModification::PtrArr sMod = currentPiano->modificationMap[noteNumber]->getSynchronicModifications();
     for (int i = sMod.size(); --i >= 0;)
     {

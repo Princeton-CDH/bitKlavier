@@ -66,6 +66,8 @@ public:
     TempoModification::PtrArr getTempoModifications(void);
 
 	BlendronicModification::PtrArr getBlendronicModifications(void);
+    
+    ResonanceModification::PtrArr getResonanceModifications(void);
 
     
     void clearModifications(void);

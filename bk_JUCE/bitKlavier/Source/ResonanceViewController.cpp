@@ -37,7 +37,7 @@ offsetsKeyboard(false, true)
     selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
 
-    defGainSlider = std::make_unique<BKSingleSlider>("resonant note volume (dBFS)", cResonanceDefGain, -100, 24, 0, 0.01, "-inf");
+    defGainSlider = std::make_unique<BKSingleSlider>("volume (dBFS)", cResonanceDefGain, -100, 24, 0, 0.01, "-inf");
     defGainSlider->setJustifyRight(false);
     defGainSlider->setToolTipString("Adjusts overall volume of resonant notes");
     addAndMakeVisible(*defGainSlider);
@@ -197,18 +197,19 @@ void ResonanceViewController::displayTab(int tab)
         int columnWidth = area.getWidth()/2;
         
         Rectangle<int> firstRow = area.removeFromTop(columnHeight / 5);
-        defGainSlider->setBounds(firstRow.removeFromLeft(columnWidth));
+        defGainSlider->setBounds(firstRow.removeFromLeft(columnWidth - 5 * gYSpacing));
         defGainSlider->setVisible(true);
         
-        blendGainSlider->setBounds(firstRow);
+        //blendGainSlider->setBounds(firstRow);
+         blendGainSlider->setBounds(firstRow.removeFromRight(columnWidth - 5 * gYSpacing));
         blendGainSlider->setVisible(true);
         
         Rectangle<int> secondRow = area.removeFromTop(columnHeight / 5);
 
-        startTimeSlider->setBounds(secondRow.removeFromLeft(columnWidth));
+        startTimeSlider->setBounds(secondRow.removeFromLeft(columnWidth - 5 * gYSpacing));
         startTimeSlider->setVisible(true);
         
-        maxSympStringsSlider->setBounds(secondRow);
+        maxSympStringsSlider->setBounds(secondRow.removeFromRight(columnWidth - 5 * gYSpacing));
         maxSympStringsSlider->setVisible(true);
                 
         ADSRLabel.setBounds(area.removeFromTop(columnHeight / 8));
@@ -860,6 +861,17 @@ ResonanceViewController(p, theGraph)
     
     alternateMod.addListener(this);
     alternateMod.setVisible(true);
+    
+    defGainSlider->addModdableComponentListener(this);
+    blendGainSlider->addModdableComponentListener(this);
+    maxSympStringsSlider->addModdableComponentListener(this);
+    
+    /*
+     gainSlider->addModdableComponentListener(this);
+     resonanceGainSlider->addModdableComponentListener(this);
+     hammerGainSlider->addModdableComponentListener(this);
+     blendronicGainSlider->addModdableComponentListener(this);
+     */
 }
 
 void ResonanceModificationEditor::greyOutAllComponents()

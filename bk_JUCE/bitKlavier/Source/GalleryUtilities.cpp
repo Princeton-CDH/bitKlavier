@@ -908,56 +908,56 @@ void Gallery::addNostalgicMod(NostalgicModification::Ptr mod)
 
 void Gallery::addResonanceMod()
 {
-    int newId = getNewId(PreparationTypeNostalgicMod);
-    modResonance.add        (new ResonanceModification(processor, newId));
+    int newId = getNewId(PreparationTypeResonanceMod);
+    modResonance.add(new ResonanceModification(processor, newId));
 }
 
 void Gallery::addResonanceModWithId(int Id)
 {
-    modResonance.add        (new ResonanceModification(processor, Id));
+    modResonance.add(new ResonanceModification(processor, Id));
 }
 
 void Gallery::addResonanceMod(ResonanceModification::Ptr mod)
 {
     int newId = getNewId(PreparationTypeResonanceMod);
     mod->setId(newId);
-    modResonance.add           (mod);
+    modResonance.add(mod);
 }
 
 void Gallery::addTuningMod()
 {
     int newId = getNewId(PreparationTypeTuningMod);
-    modTuning.add           (new TuningModification(processor, newId));
+    modTuning.add(new TuningModification(processor, newId));
 }
 
 void Gallery::addTuningMod(TuningModification::Ptr tmod)
 {
     int newId = getNewId(PreparationTypeTuningMod);
     tmod->setId(newId);
-    modTuning.add           (tmod);
+    modTuning.add(tmod);
 }
 
 void Gallery::addTuningModWithId(int Id)
 {
-    modTuning.add           (new TuningModification(processor, Id));
+    modTuning.add(new TuningModification(processor, Id));
 }
 
 void Gallery::addTempoMod()
 {
     int newId = getNewId(PreparationTypeTempoMod);
-    modTempo.add           (new TempoModification(processor, newId));
+    modTempo.add(new TempoModification(processor, newId));
 }
 
 void Gallery::addTempoModWithId(int Id)
 {
-    modTempo.add           (new TempoModification(processor, Id));
+    modTempo.add(new TempoModification(processor, Id));
 }
 
 void Gallery::addTempoMod(TempoModification::Ptr tmod)
 {
     int newId = getNewId(PreparationTypeTempoMod);
     tmod->setId(newId);
-    modTempo.add           (tmod);
+    modTempo.add(tmod);
 }
 
 void Gallery::addBlendronicMod()
@@ -1060,6 +1060,10 @@ void Gallery::copy(BKPreparationType type, int from, int to)
     {
         modNostalgic.getUnchecked(to)->copy(modNostalgic.getUnchecked(from));
     }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        modResonance.getUnchecked(to)->copy(modResonance.getUnchecked(from));
+    }
     else if (type == PreparationTypeTuningMod)
     {
         modTuning.getUnchecked(to)->copy(modTuning.getUnchecked(from));
@@ -1119,6 +1123,10 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
     else if (type == PreparationTypeNostalgicMod)
     {
         addNostalgicModWithId(Id);
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        addResonanceModWithId(Id);
     }
     else if (type == PreparationTypeTuningMod)
     {
@@ -1383,6 +1391,12 @@ void Gallery::clean(void)
     for (int i = modNostalgic.size(); --i >= 0;)
     {
         if (!thisUsed.contains(modNostalgic[i]->getId())) modNostalgic.remove(i);
+    }
+    
+    thisUsed = used.getUnchecked(PreparationTypeResonanceMod);
+    for (int i = modResonance.size(); --i >= 0;)
+    {
+        if (!thisUsed.contains(modResonance[i]->getId())) modResonance.remove(i);
     }
     
     thisUsed = used.getUnchecked(PreparationTypeTempoMod);

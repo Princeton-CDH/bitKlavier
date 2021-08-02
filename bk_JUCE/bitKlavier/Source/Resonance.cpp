@@ -18,10 +18,14 @@
 
 void ResonancePreparation::performModification(ResonanceModification* r, Array<bool> dirty)
 {
+    DBG("ResonancePreparation::performModification");
     // Should the mod be reversed?
     bool reverse = r->altMod && modded;
     
-    if (dirty[ResonanceGain]) rDefaultGain.modify(r->rDefaultGain, reverse);
+    if (dirty[ResonanceGain]) {
+        DBG("ResonancePreparation::performModification on ResonanceGan");
+        rDefaultGain.modify(r->rDefaultGain, reverse);
+    }
     if (dirty[ResonanceBlendronicGain]) rBlendronicGain.modify(r->rBlendronicGain, reverse);
     if (dirty[ResonanceMinStartTime]) rMinStartTimeMS.modify(r->rMinStartTimeMS, reverse);
     if (dirty[ResonanceMaxStartTime]) rMaxStartTimeMS.modify(r->rMaxStartTimeMS, reverse);
