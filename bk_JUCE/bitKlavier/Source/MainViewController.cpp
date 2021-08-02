@@ -1272,7 +1272,7 @@ void MainViewController::timerCallback()
         state->resonancePreparationDidChange = false;
 
         overtop.rvc.update();
-        //overtop.rvcm.update();
+        overtop.rvcm.update();
     }
     
     if (state->pianoDidChangeForGraph)

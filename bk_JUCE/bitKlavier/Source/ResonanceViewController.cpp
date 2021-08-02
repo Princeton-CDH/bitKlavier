@@ -26,7 +26,7 @@ offsetsKeyboard(false, true)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
 
-    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::direct_icon_png, BinaryData::direct_icon_pngSize));
+    iconImageComponent.setImage(ImageCache::getFromMemory(BinaryData::resonance_icon_png, BinaryData::resonance_icon_pngSize));
     iconImageComponent.setImagePlacement(RectanglePlacement(juce::RectanglePlacement::stretchToFit));
     iconImageComponent.setAlpha(0.095);
 
@@ -823,7 +823,7 @@ void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float>
     processor.updateState->editsMade = true;
 }
 
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ DirectModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ResonanceModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~//
 ResonanceModificationEditor::ResonanceModificationEditor(BKAudioProcessor& p, BKItemGraph* theGraph):
 ResonanceViewController(p, theGraph)
 {
@@ -880,61 +880,67 @@ void ResonanceModificationEditor::highlightModedComponents()
 
 void ResonanceModificationEditor::update(void)
 {
-    /*
-    if (processor.updateState->currentModDirectId < 0) return;
     
-    selectCB.setSelectedId(processor.updateState->currentModDirectId, dontSendNotification);
+    if (processor.updateState->currentModResonanceId < 0) return;
     
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    selectCB.setSelectedId(processor.updateState->currentModResonanceId, dontSendNotification);
+    
+    ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
     
     if (mod != nullptr)
     {
         greyOutAllComponents();
         highlightModedComponents();
         
-        transpositionSlider->setValue(mod->dTransposition.value, dontSendNotification);
-        gainSlider->setValue(mod->dGain.value, dontSendNotification);
-        resonanceGainSlider->setValue(mod->dResonanceGain.value, dontSendNotification);
-        hammerGainSlider->setValue(mod->dHammerGain.value, dontSendNotification);
-        blendronicGainSlider->setValue(mod->dBlendronicGain.value, dontSendNotification);
+        selectCB.setSelectedId(processor.updateState->currentModResonanceId, dontSendNotification);
+        
+        defGainSlider->setValue(mod->rDefaultGain.value, dontSendNotification);
+        startTimeSlider->setMinValue(mod->rMinStartTimeMS.value, dontSendNotification);
+        startTimeSlider->setMaxValue(mod->rMaxStartTimeMS.value, dontSendNotification);
+        blendGainSlider->setValue(mod->rBlendronicGain.value, dontSendNotification);
+        maxSympStringsSlider->setValue(mod->rMaxSympStrings.value, dontSendNotification);
         ADSRSlider->setValue(mod->getADSRvals(), dontSendNotification);
-        transpUsesTuning.setToggleState(mod->dTranspUsesTuning.value, dontSendNotification);
-        alternateMod.setToggleState(mod->altMod, dontSendNotification);
-        velocityMinMaxSlider->setMinValue(mod->velocityMin.value, dontSendNotification);
-        velocityMinMaxSlider->setMaxValue(mod->velocityMax.value, dontSendNotification);
+        fundamentalKeyboard->setKeysInKeymap({mod->getFundamentalKey()});
+        closestKeyboard->setKeysInKeymap(mod->getResonanceKeys());
+        offsetsKeyboard.setKeys(mod->getResonanceKeys());
+        offsetsKeyboard.setValues(mod->getOffsets());
+        gainsKeyboard.setKeys(mod->getResonanceKeys());
+        gainsKeyboard.setValues(mod->getGains());
+  
+        //updateComponentVisibility();
     }
-     */
+     
 }
 
 void ResonanceModificationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    /*
-    for (auto prep : processor.gallery->getDirectModifications())
+    
+    for (auto prep : processor.gallery->getResonanceModifications())
     {
         int Id = prep->getId();;
         String name = prep->getName();
         
         if (name != String())  selectCB.addItem(name, Id);
-        else                        selectCB.addItem("DirectMod"+String(Id), Id);
+        else selectCB.addItem("ResonanceMod"+String(Id), Id);
         
         selectCB.setItemEnabled(Id, true);
-        if (processor.currentPiano->isActive(PreparationTypeDirect, Id))
+        if (processor.currentPiano->isActive(PreparationTypeResonance, Id))
             selectCB.setItemEnabled(Id, false);
     }
     
     if (last != 0)      selectCB.setItemEnabled(last, true);
     if (current != 0)   selectCB.setItemEnabled(current, false);
     
-    int selectedId = processor.updateState->currentDirectId;
+    int selectedId = processor.updateState->currentResonanceId;
     
     selectCB.setSelectedId(selectedId, NotificationType::dontSendNotification);
     
     selectCB.setItemEnabled(selectedId, false);
     
     lastId = selectedId;
-    */
+    
 }
 
 void ResonanceModificationEditor::bkMessageReceived (const String& message)
@@ -947,16 +953,16 @@ void ResonanceModificationEditor::bkMessageReceived (const String& message)
 
 int ResonanceModificationEditor::addPreparation(void)
 {
-    processor.gallery->add(PreparationTypeDirectMod);
+    processor.gallery->add(PreparationTypeResonanceMod);
     
-    return processor.gallery->getDirectModifications().getLast()->getId();
+    return processor.gallery->getResonanceModifications().getLast()->getId();
 }
 
 int ResonanceModificationEditor::duplicatePreparation(void)
 {
-    processor.gallery->duplicate(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
+    processor.gallery->duplicate(PreparationTypeResonanceMod, processor.updateState->currentModResonanceId);
     
-    return processor.gallery->getDirectModifications().getLast()->getId();
+    return processor.gallery->getResonanceModifications().getLast()->getId();
 }
 
 void ResonanceModificationEditor::deleteCurrent(void)
@@ -966,7 +972,7 @@ void ResonanceModificationEditor::deleteCurrent(void)
     
     if ((index == 0) && (selectCB.getItemId(index+1) == -1)) return;
     
-    processor.gallery->remove(PreparationTypeDirect, directId);
+    processor.gallery->remove(PreparationTypeResonance, directId);
     
     fillSelectCB(0, 0);
     
@@ -978,7 +984,7 @@ void ResonanceModificationEditor::deleteCurrent(void)
 
 void ResonanceModificationEditor::setCurrentId(int Id)
 {
-    processor.updateState->currentDirectId = Id;
+    processor.updateState->currentResonanceId = Id;
     
     processor.updateState->idDidChange = true;
     
@@ -1018,7 +1024,7 @@ void ResonanceModificationEditor::actionButtonCallback(int action, ResonanceModi
     }
     else if (action == 5)
     {
-        processor.clear(PreparationTypeDirectMod, processor.updateState->currentModDirectId);
+        processor.clear(PreparationTypeResonanceMod, processor.updateState->currentModResonanceId);
         vc->update();
         vc->updateModification();
         processor.saveGalleryToHistory("Clear Resonance Modification");
@@ -1027,8 +1033,8 @@ void ResonanceModificationEditor::actionButtonCallback(int action, ResonanceModi
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        int Id = processor.updateState->currentModDirectId;
-        DirectModification::Ptr prep = processor.gallery->getDirectModification(Id);
+        int Id = processor.updateState->currentModResonanceId;
+        ResonanceModification::Ptr prep = processor.gallery->getResonanceModification(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -1052,8 +1058,8 @@ void ResonanceModificationEditor::actionButtonCallback(int action, ResonanceModi
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        int Id = processor.updateState->currentModDirectId;
-        DirectModification::Ptr prep = processor.gallery->getDirectModification(Id);
+        int Id = processor.updateState->currentModResonanceId;
+        ResonanceModification::Ptr prep = processor.gallery->getResonanceModification(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -1068,13 +1074,13 @@ void ResonanceModificationEditor::actionButtonCallback(int action, ResonanceModi
         
         if (result == 1)
         {
-            processor.exportPreparation(PreparationTypeDirectMod, Id, name);
+            processor.exportPreparation(PreparationTypeResonanceMod, Id, name);
         }
     }
     else if (action >= 100)
     {
         int which = action - 100;
-        processor.importPreparation(PreparationTypeDirectMod, processor.updateState->currentModDirectId, which);
+        processor.importPreparation(PreparationTypeResonanceMod, processor.updateState->currentModResonanceId, which);
         vc->update();
         processor.saveGalleryToHistory("Import Resonance Modification");
     }
@@ -1096,7 +1102,7 @@ void ResonanceModificationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void ResonanceModificationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
     
     mod->setName(name);
     
@@ -1108,119 +1114,103 @@ void ResonanceModificationEditor::BKEditableComboBoxChanged(String name, BKEdita
 
 void ResonanceModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    /*
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
     
-    if(slider->getName() == resonanceGainSlider->getName())
+    ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
+    
+    if (name == defGainSlider->getName())
     {
-        mod->dResonanceGain.set(val);
+        DBG("modding resonant note volume to " + String(val));
+        mod->setDefGain(val);
         
-        mod->setDirty(DirectResGain);
-        resonanceGainSlider->setBright();
+        mod->setDirty(ResonanceGain);
+        defGainSlider->setBright();
     }
-    else if(slider->getName() == hammerGainSlider->getName())
+    else if (name == blendGainSlider->getName())
     {
-        mod->dHammerGain.set(val);
+        DBG("modding blendronic gain to " + String(val));
+        mod->setBlendGain(val);
         
-        mod->setDirty(DirectHammerGain);
-        hammerGainSlider->setBright();
+        mod->setDirty(ResonanceBlendronicGain);
+        blendGainSlider->setBright();
     }
-    else if(slider->getName() == gainSlider->getName())
+    else if (name == maxSympStringsSlider->getName())
     {
-        mod->dGain.set(val);
+        DBG("modding max symp strings to " + String(val));
+        mod->setMaxSympStrings(val);
         
-        mod->setDirty(DirectGain);
-        gainSlider->setBright();
+        mod->setDirty(ResonanceMaxSympStrings);
+        maxSympStringsSlider->setBright();
     }
-    else if(slider->getName() == blendronicGainSlider->getName())
-    {
-        mod->dBlendronicGain.set(val);
-        
-        mod->setDirty(DirectBlendronicGain);
-        blendronicGainSlider->setBright();
-    }
-     */
+    processor.updateState->editsMade = true;
     
     updateModification();
 }
 
 void ResonanceModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    /*
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
     
-    if (name == "velocity min/max")
-    {
-        mod->velocityMin.set(minval);
-        mod->setDirty(DirectVelocityMin);
+    if(name == startTimeSlider->getName()) {
+        DBG("modding new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
+        mod->setMinStartTime(minval);
+        mod->setMaxStartTime(maxval);
         
-        mod->velocityMax.set(maxval);
-        mod->setDirty(DirectVelocityMax);
-        
-        velocityMinMaxSlider->setBright();
+        mod->setDirty(ResonanceMinStartTime);
+        mod->setDirty(ResonanceMaxStartTime);
+        startTimeSlider->setBright();
     }
-     */
     
     updateModification();
 }
 
 void ResonanceModificationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
-    /*
-    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
- 
+    ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
+
     if(name == gainsKeyboard.getName())
     {
-        DBG("updating gain vals");
-        prep->setGains(values);
+        DBG("modding gain vals");
+        mod->setGains(values);
+        
+        mod->setDirty(ResonanceGains);
+        gainsKeyboard.setBright();
     }
     else if(name == offsetsKeyboard.getName())
     {
-        DBG("updating offset vals");
-        prep->setOffsets(values);
+        DBG("modding offset vals");
+        mod->setOffsets(values);
+        
+        mod->setDirty(ResonanceOffsets);
+        offsetsKeyboard.setBright();
     }
-    processor.gallery->setGalleryDirty(true);
     
-    processor.updateState->editsMade = true;
-     */
+    updateModification();
+
 }
 
 void ResonanceModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
-    /*
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
-    
-    mod->dTransposition.set(val);
-    mod->setDirty(DirectTransposition);
-    
-    transpositionSlider->setBright();
-     */
-    
-    updateModification();
+
 }
 
 void ResonanceModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
 {
-    /*
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    
+    ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
     
     Array<float> newvals = {(float)attack, (float)decay, sustain, (float)release};
     
     mod->setADSRvals(newvals);
-    mod->setDirty(DirectADSR);
+    mod->setDirty(ResonanceADSR);
     
     ADSRSlider->setBright();
-     */
     
     updateModification();
 }
 
 void ResonanceModificationEditor::BKADSRButtonStateChanged(String name, bool mod, bool state)
 {
-    /*
-    setShowADSR(!state);
     setSubWindowInFront(!state);
-     */
 }
 
 void ResonanceModificationEditor::updateModification(void)
@@ -1232,7 +1222,6 @@ void ResonanceModificationEditor::updateModification(void)
 
 void ResonanceModificationEditor::buttonClicked (Button* b)
 {
-    /*
     if (b == &hideOrShow)
     {
         processor.updateState->setCurrentDisplay(DisplayNil);
@@ -1240,8 +1229,8 @@ void ResonanceModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        bool single = processor.gallery->getDirectModifications().size() == 2;
-        getModOptionMenu(PreparationTypeDirectMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
+        bool single = processor.gallery->getResonanceModifications().size() == 2;
+        getModOptionMenu(PreparationTypeResonanceMod, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
     {
@@ -1259,19 +1248,11 @@ void ResonanceModificationEditor::buttonClicked (Button* b)
         
         displayTab(currentTab);
     }
-    else if (b == &transpUsesTuning)
-    {
-        DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
-        mod->setTranspUsesTuning(transpUsesTuning.getToggleState());
-        mod->setDirty(DirectTranspUsesTuning);
-        transpUsesTuning.setAlpha(1.);
-    }
     else if (b == &alternateMod)
     {
-        DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+        ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
         mod->altMod = alternateMod.getToggleState();
     }
-     */
 }
 
 void ResonanceModificationEditor::timerCallback()
