@@ -775,7 +775,9 @@ void ResonancePreparationEditor::BKRangeSliderValueChanged(String name, double m
 }
 
 void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) {
+    
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+    
     if (source == &resonanceKeyboardState)
     {
         //closestKeyboard->setKeysInKeymap(prep->getKeys());
@@ -797,6 +799,7 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
         fundamentalKeyboard->setKeysInKeymap({midiNoteNumber});
         //DBG("fundamental key toggled " + String(midiNoteNumber));
     }
+    
     update();
 
 }
@@ -853,27 +856,26 @@ void ResonanceModificationEditor::greyOutAllComponents()
     blendGainSlider->setDim(gModAlpha);
     maxSympStringsSlider->setDim(gModAlpha);
     ADSRSlider->setDim(gModAlpha);
-    //closestKeyboard->setDim(gModAlpha);
-    //fundamentalKeyboard->setDim(gModAlpha);
+    closestKeyboard->setAlpha(gModAlpha);
+    fundamentalKeyboard->setAlpha(gModAlpha);
     offsetsKeyboard.setDim(gModAlpha);
     gainsKeyboard.setDim(gModAlpha);
 }
 
 void ResonanceModificationEditor::highlightModedComponents()
 {
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
 
-    /*
-    if(mod->getDirty(DirectTransposition))    transpositionSlider->setBright();
-    if(mod->getDirty(DirectGain))             gainSlider->setBright();
-    if(mod->getDirty(DirectResGain))          resonanceGainSlider->setBright();
-    if(mod->getDirty(DirectHammerGain))       hammerGainSlider->setBright();
-    if(mod->getDirty(DirectADSR))             ADSRSlider->setBright();
-    if(mod->getDirty(DirectTranspUsesTuning)) transpUsesTuning.setAlpha(1.);
-    if(mod->getDirty(DirectVelocityMin))      velocityMinMaxSlider->setBright();
-    if(mod->getDirty(DirectVelocityMax))      velocityMinMaxSlider->setBright();
-    if(mod->getDirty(DirectBlendronicGain))   blendronicGainSlider->setBright();
-     */
+    if(mod->getDirty(ResonanceGain))            defGainSlider->setBright();
+    if(mod->getDirty(ResonanceBlendronicGain))  blendGainSlider->setBright();
+    if(mod->getDirty(ResonanceMinStartTime))    startTimeSlider->setBright();
+    if(mod->getDirty(ResonanceMaxStartTime))    startTimeSlider->setBright();
+    if(mod->getDirty(ResonanceFundamental))     fundamentalKeyboard->setAlpha(1.);
+    if(mod->getDirty(ResonanceMaxSympStrings))  maxSympStringsSlider->setBright();
+    if(mod->getDirty(ResonanceClosestKeys))     closestKeyboard->setAlpha(1.);
+    if(mod->getDirty(ResonanceOffsets))         offsetsKeyboard.setAlpha(1.);
+    if(mod->getDirty(ResonanceGains))           gainsKeyboard.setBright();
+    if(mod->getDirty(ResonanceADSR))            ADSRSlider->setBright();
 }
 
 void ResonanceModificationEditor::update(void)

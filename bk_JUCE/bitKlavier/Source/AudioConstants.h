@@ -835,10 +835,12 @@ static const std::vector<std::string> cDirectParameterTypes = {
      ResonanceBlendronicGain,
      ResonanceMinStartTime,
      ResonanceMaxStartTime,
+     ResonanceFundamental,
      ResonanceClosestKeys,
      ResonanceOffsets,
      ResonanceGains,
      ResonanceADSR,
+     ResonanceMaxSympStrings, 
      ResonanceUseGlobalSoundSet,
      ResonanceSoundSet,
      ResonanceParameterTypeNil
