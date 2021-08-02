@@ -147,6 +147,12 @@ public:
             nostalgicPreparationDidChange = true;
             setCurrentDisplay(DisplayNostalgicMod);
         }
+        else if (type == PreparationTypeResonanceMod)
+        {
+            currentModResonanceId = (Id == -1) ? currentModResonanceId : Id;
+            resonancePreparationDidChange = true;
+            setCurrentDisplay(DisplayResonanceMod);
+        }
         else if (type == PreparationTypeSynchronicMod)
         {
             currentModSynchronicId = (Id == -1) ? currentModSynchronicId : Id;

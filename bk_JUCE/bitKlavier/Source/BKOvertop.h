@@ -53,6 +53,7 @@ public:
     nvcm(p, theGraph),
     dvcm(p, theGraph),
     bvcm(p, theGraph),
+    rvcm(p, theGraph),
     processor(p)
     {
         
@@ -76,6 +77,7 @@ public:
         addChildComponent(nvcm);
         addChildComponent(dvcm);
         addChildComponent(bvcm);
+        addChildComponent(rvcm);
         
     }
     
@@ -125,6 +127,8 @@ public:
         dvcm.setBounds(area);
         
         bvcm.setBounds(area);
+        
+        rvcm.setBounds(area);
         
 #if JUCE_IOS
         cvc.setBounds(5, 5, area.getWidth()-10, area.getHeight() * 0.5f);
@@ -216,6 +220,10 @@ public:
         {
             bvcm.arrowPressed(arrow);
         }
+        else if (display == DisplayResonanceMod)
+        {
+            rvcm.arrowPressed(arrow);
+        }
     }
     
     inline void setCurrentDisplay(BKPreparationDisplay type)
@@ -255,6 +263,7 @@ public:
         removeChildComponent(&svcm);
         removeChildComponent(&nvcm);
         removeChildComponent(&bvcm);
+        removeChildComponent(&rvcm);
         
         if (type == DisplayKeymap)
         {
@@ -349,6 +358,12 @@ public:
             nvcm.fillSelectCB(-1,-1);
             nvcm.update();
         }
+        else if (type == DisplayResonanceMod)
+        {
+            addAndMakeVisible(&rvcm);
+            rvcm.fillSelectCB(-1,-1);
+            rvcm.update();
+        }
         else if (type == DisplayDirectMod)
         {
             addAndMakeVisible(&dvcm);
@@ -391,6 +406,7 @@ public:
     NostalgicModificationEditor nvcm;
     DirectModificationEditor dvcm;
     BlendronicModificationEditor bvcm;
+    ResonanceModificationEditor rvcm;
     
 private:
     

@@ -1164,6 +1164,26 @@ void ResonanceModificationEditor::BKRangeSliderValueChanged(String name, double 
     updateModification();
 }
 
+void ResonanceModificationEditor::keyboardSliderChanged(String name, Array<float> values)
+{
+    /*
+    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+ 
+    if(name == gainsKeyboard.getName())
+    {
+        DBG("updating gain vals");
+        prep->setGains(values);
+    }
+    else if(name == offsetsKeyboard.getName())
+    {
+        DBG("updating offset vals");
+        prep->setOffsets(values);
+    }
+    processor.gallery->setGalleryDirty(true);
+    
+    processor.updateState->editsMade = true;
+     */
+}
 
 void ResonanceModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
