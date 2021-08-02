@@ -2001,6 +2001,10 @@ void BKAudioProcessor::hiResTimerCallback()
     {
         n->prep->stepModdables();
     }
+    for (auto r : gallery->getAllResonance())
+    {
+        r->prep->stepModdables();
+    }
     for (auto s : gallery->getAllSynchronic())
     {
         s->prep->stepModdables();
