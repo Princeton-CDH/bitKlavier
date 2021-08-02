@@ -132,6 +132,12 @@ offsetsKeyboard(false, true)
     offsetsLabel.setJustificationType(Justification::right);
     offsetsLabel.setTooltip("offset in cents from ET for this resonance");
     addAndMakeVisible(offsetsLabel);
+    
+    alternateMod.setButtonText ("alternate mod");
+    alternateMod.setTooltip("activating this mod will alternate between modding and reseting attached preparations");
+    alternateMod.setToggleState (false, dontSendNotification);
+    addChildComponent(&alternateMod, ALL);
+    alternateMod.setLookAndFeel(&buttonsAndMenusLAF2);
 
     currentTab = 0;
     displayTab(currentTab);
@@ -323,6 +329,11 @@ void ResonanceViewController::displayShared(void)
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
     
+    alternateMod.setBounds(actionButton.getRight()+gXSpacing,
+                           actionButton.getY(),
+                           selectCB.getWidth(),
+                           actionButton.getHeight());
+    
     comboBoxSlice.removeFromLeft(gXSpacing);
 
     Rectangle<int> modeSlice = area.removeFromTop(gComponentComboBoxHeight);
@@ -333,6 +344,8 @@ void ResonanceViewController::displayShared(void)
     
     leftArrow.setBounds(0, getHeight() * 0.4, 50, 50);
     rightArrow.setBounds(getRight() - 50, getHeight() * 0.4, 50, 50);
+    
+    
     
     
 }
@@ -907,6 +920,8 @@ void ResonanceModificationEditor::update(void)
         gainsKeyboard.setKeys(mod->getResonanceKeys());
         gainsKeyboard.setValues(mod->getGains());
   
+        alternateMod.setToggleState(mod->altMod, dontSendNotification);
+        
         //updateComponentVisibility();
     }
      
@@ -1187,6 +1202,8 @@ void ResonanceModificationEditor::keyboardSliderChanged(String name, Array<float
     updateModification();
 
 }
+    
+    // also need for other two keyboard sliders
 
 void ResonanceModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
