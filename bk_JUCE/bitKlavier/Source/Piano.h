@@ -233,7 +233,7 @@ public:
 
 	void linkPreparationWithBlendronic(BKPreparationType thisType, int thisId, Blendronic::Ptr thisBlend);
 
-    void linkPreparationwithResonance(BKPreparationType thisType, int thisId, Resonance::Ptr thisRes);
+    //void linkPreparationwithResonance(BKPreparationType thisType, int thisId, Resonance::Ptr thisRes);
     
     ValueTree getState(void);
     
@@ -282,9 +282,9 @@ public:
     }
 
 
-    int                         numModSMaps, numModNMaps, numModDMaps;
+    int numModSMaps, numModNMaps, numModDMaps;
 
-    void                        prepareToPlay(double sampleRate);
+    void prepareToPlay(double sampleRate);
     
     void configurePianoMap(BKItem::Ptr map);
     

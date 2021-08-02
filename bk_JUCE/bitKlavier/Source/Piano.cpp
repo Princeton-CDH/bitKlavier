@@ -263,7 +263,9 @@ void Piano::configure(void)
         
         // These three cases used to be handling in the keymap case as keymap connections, but
         // they handle all connected keymaps internally so that was redundant. Should be fine here.
-        else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeBlendronicMod)
+        else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod)
+                 || type == PreparationTypeBlendronicMod
+                 || type == PreparationTypeResonanceMod )
         {
             configureModification(item);
         }
@@ -867,6 +869,7 @@ void Piano::configurePianoMap(BKItem::Ptr map)
 
 void Piano::configureModification(BKItem::Ptr map)
 {
+    DBG("Piano::configureModification");
     map->print();
     
     BKPreparationType modType = map->getType();
@@ -1001,6 +1004,7 @@ void Piano::configureBlendronicModification(BlendronicModification::Ptr mod, Arr
 
 void Piano::configureResonanceModification(ResonanceModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps)
 {
+    DBG("Piano::configureResonanceModification");
     mod->setTargets(whichPreps);
     
     Keymap::PtrArr keymaps;
