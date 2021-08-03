@@ -1239,13 +1239,12 @@ public:
     
     ~SynchronicProcessor();
     
-    inline const uint64 getCurrentNumSamplesBeat(void) const noexcept   { return numSamplesBeat;    }
-    
+    inline const uint64 getNumSamplesBeat(void) const noexcept { return numSamplesBeat;    }
     
     BKSampleLoadType sampleType;
     void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
-    void keyPressed(int noteNumber, float velocity, Array<KeymapTargetState> targetStates);
-    void keyReleased(int noteNumber, float velocity, int channel, Array<KeymapTargetState> targetStates);
+    void keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
     float getTimeToBeatMS(float beatsToSkip);
     
     
@@ -1256,14 +1255,12 @@ public:
     
     inline const float getHoldTimer() const noexcept
     {
-        // if(keysDepressed.size() == 0 ) return 0;
         return 1000. * holdTimers[lastKeyPressed] / synth->getSampleRate() ;
     }
     
     inline const float getLastVelocity() const noexcept
     {
-        // if(keysDepressed.size() == 0 ) return 0;
-        return lastKeyVelocity;
+        return lastVelocity;
     }
     
     inline const SynchronicSyncMode getMode() const noexcept {return synchronic->prep->sMode.value; }
@@ -1357,7 +1354,9 @@ public:
         clusters = nclusters;
     }
     
-    bool velocityCheck(int noteNumber);
+    float filterVelocity(float vel);
+    void resetLastVelocity() { lastVelocityInRange = false; }
+    
     bool holdCheck(int noteNumber);
     
     inline void addKeymap(Keymap::Ptr keymap)
@@ -1381,6 +1380,14 @@ public:
         return notePlayed;
     }
     
+    Array<Array<float>>& getVelocities() { return velocities; }
+    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    Array<float>& getClusterVelocities() { return clusterVelocities; }
+    
+    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
+    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
+    void swapClusterVelocities(Array<float>& swap) { clusterVelocities.swapWith(swap); }
+    
 private:
     BKSynthesiser* synth;
     GeneralSettings::Ptr general;
@@ -1396,8 +1403,10 @@ private:
     PitchClass tuningBasePitch;
     
     void playNote(int channel, int note, float velocity, SynchronicCluster::Ptr cluster);
-    Array<float> velocities;    //record of velocities
-    Array<float> velocitiesActive;
+    
+    Array<Array<float>> velocities;
+    Array<Array<float>> invertVelocities;
+    Array<float> clusterVelocities;
     Array<int> keysDepressed;   //current keys that are depressed
     Array<int> syncKeysDepressed;
     Array<int> clusterKeysDepressed;
@@ -1417,12 +1426,13 @@ private:
     
     SynchronicCluster::PtrArr clusters;
 
-    uint64 numSamplesBeat;          // = beatThresholdSamples * beatMultiplier
+    uint64 numSamplesBeat = 0;          // = beatThresholdSamples * beatMultiplier
     uint64 beatThresholdSamples;    // # samples in a beat, as set by tempo
     
     Array<uint64> holdTimers;
     int lastKeyPressed;
-    float lastKeyVelocity;
+    float lastVelocity = 0.f;
+    bool lastVelocityInRange = false;
     
     bool notePlayed;
     
@@ -1430,7 +1440,6 @@ private:
     Array<BKSynthesiserVoice*> activeSynchronicVoices;
     Array<int> voiceMidiValues;
 
-    
     JUCE_LEAK_DETECTOR(SynchronicProcessor);
 };
 

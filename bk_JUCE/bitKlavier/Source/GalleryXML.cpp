@@ -222,6 +222,18 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 
                 resonance.getLast()->setId(newId);
             }
+            else if (e->hasTagName( vtagModResonance))
+            {
+                addResonanceModWithId(0);
+                
+                modResonance.getLast()->setState(e);
+                
+                int oldId = modResonance.getLast()->getId();
+                int newId = transformId(PreparationTypeResonanceMod, oldId);
+                
+                modResonance.getLast()->setId(newId);
+                
+            }
             else if (e->hasTagName( vtagTempo))
             {
                 addTempoWithId(0);
@@ -272,7 +284,6 @@ void Gallery::setStateFromXML(XmlElement* xml)
             {
                 addBlendronicWithId(0);
                 
-                // TODO: write setState for Blendronic
                 blendronic.getLast()->setState(e);
                 
                 int oldId = blendronic.getLast()->getId();

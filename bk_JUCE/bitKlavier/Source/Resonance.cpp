@@ -70,6 +70,24 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcesso
     general(rGeneral),
     keymaps(Keymap::PtrArr())
 {
+    for (int j = 0; j < 128; j++)
+    {
+        velocities.add(Array<float>());
+        invertVelocities.add(Array<float>());
+        for (int i = 0; i < TargetTypeNil; ++i)
+        {
+            velocities.getReference(j).add(-1.f);
+            invertVelocities.getReference(j).add(-1.f);
+        }
+    }
+    
+    if (!resonance->prep->rUseGlobalSoundSet.value)
+    {
+        String name = resonance->prep->rSoundSetName.value;
+        int Id = synth->processor.findPathAndLoadSamples(name);
+        resonance->prep->setSoundSet(Id);
+    }
+    
     /*
     partialStructure.add({0,  1.0, 0});
     partialStructure.add({12, 0.8, 0});
@@ -91,7 +109,7 @@ ResonanceProcessor::~ResonanceProcessor()
 
 // this will cause all the resonating strings that have overlapping partials with this new struck string to ring sympathetically
 // N*M^2, where N is number of notes held, M is number of partials in partial structure
-void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
+void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
 {
     // DBG("Resonance::ringSympStrings");
     
@@ -136,18 +154,17 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         currentSympPartial->playPosition = newPlayPosition * (.001 *  synth->getSampleRate());
                         
                         // turn off the current resonance here, if it's playing
-                        synth->keyOff(
-                                    midiChannel,
-                                    ResonanceNote,
-                                    resonance->prep->getSoundSet(),
-                                    resonance->getId(),
-                                    currentSympPartial->heldKey,
-                                    currentSympPartial->partialKey,
-                                    64,
-                                    aGlobalGain,
-                                    resonance->prep->getDefaultGainPtr(),
-                                    true, // need to test more here
-                                    false);
+                        synth->keyOff(1,
+                                      ResonanceNote,
+                                      resonance->prep->getSoundSet(),
+                                      resonance->getId(),
+                                      currentSympPartial->heldKey,
+                                      currentSympPartial->partialKey,
+                                      64,
+                                      aGlobalGain,
+                                      resonance->prep->getDefaultGainPtr(),
+                                      true, // need to test more here
+                                      false);
 
                         // calculate the tuning gap between attached tuning and the tuning of this partial
                         // taking into account attached Tuning system, and defined partial structure (which may or may not be the same!)
@@ -172,7 +189,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         if (!blendronic.isEmpty())
                         {
                                 synth->keyOn(
-                                midiChannel,
+                                1,
                                 //noteNumber,
                                 currentSympPartial->heldKey,
                                 currentStruckPartial,
@@ -200,7 +217,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
                         else
                         {
                                 synth->keyOn(
-                                midiChannel,
+                                1,
                                 //noteNumber,
                                 currentSympPartial->heldKey,
                                 currentStruckPartial,
@@ -231,13 +248,13 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity, int mid
 }
 
 // this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
-void ResonanceProcessor::addSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
+void ResonanceProcessor::addSympStrings(int noteNumber, float velocity)
 {
     if(sympStrings.size() > resonance->prep->getMaxSympStrings())
     {
         DBG("Resonance: removing oldest sympathetic string");
         int oldestString = activeSympStrings.getLast();
-        removeSympStrings(oldestString, velocity, midiChannel, targetStates, false);
+        removeSympStrings(oldestString, velocity);
         activeSympStrings.removeLast();
     }
     
@@ -263,7 +280,7 @@ void ResonanceProcessor::addSympStrings(int noteNumber, float velocity, int midi
 }
 
 // this will turn off all the resonances associated with this string/key, and then remove those from the currently available sympathetic strings
-void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
+void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity)
 {
     // turn off each partial associated with this string
     DBG("Resonance: removing partials of " + String(noteNumber));
@@ -271,37 +288,80 @@ void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity, int m
     {
         DBG("Resonance: removing partial " + String(sympString->partialKey) + " of held key " + String(sympString->heldKey));
         
-        synth->keyOff(
-                    midiChannel,
-                    ResonanceNote,
-                    resonance->prep->getSoundSet(),
-                    resonance->getId(),
-                    sympString->heldKey,
-                    sympString->partialKey,
-                    64,
-                    aGlobalGain,
-                    resonance->prep->getDefaultGainPtr(),
-                    true, // need to test more here
-                    false);
+        synth->keyOff(1,
+                      ResonanceNote,
+                      resonance->prep->getSoundSet(),
+                      resonance->getId(),
+                      sympString->heldKey,
+                      sympString->partialKey,
+                      64,
+                      aGlobalGain,
+                      resonance->prep->getDefaultGainPtr(),
+                      true, // need to test more here
+                      false);
     }
 
     // clear this held string's partials
     sympStrings.remove(noteNumber);
 }
 
-void ResonanceProcessor::keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates)
+void ResonanceProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an actual key press (not an inverted release) aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
+    {
+        aVels = bVels = &velocities.getReference(noteNumber);
+        for (int i = TargetTypeResonance; i < TargetTypeResonance+1; ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
+        }
+    }
+    // If this an inverted release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last inverted press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = &invertVelocities.getReference(noteNumber);
+    }
+    
+    if (bVels->getUnchecked(TargetTypeResonance) < 0.f) return;
+    
     // resonate the currently available strings and their overlapping partials
-    ringSympStrings(noteNumber, velocity, midiChannel, targetStates);
+    ringSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonance));
 
     // then, add this new string and its partials to the currently available sympathetic strings
-    addSympStrings(noteNumber, velocity, midiChannel, targetStates);
+    addSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonance));
 }
 
-void ResonanceProcessor::keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post)
+void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an inverted key press, aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
+    {
+        aVels = bVels = &invertVelocities.getReference(noteNumber);
+        for (int i = TargetTypeResonance; i < TargetTypeResonance+1; ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
+        }
+    }
+    // If this an actual release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = &velocities.getReference(noteNumber);
+    }
+    
+    if (bVels->getUnchecked(TargetTypeResonance) < 0.f) return;
+    
     // this will turn off all the resonace associated with this string/key, and then remove those from the currently available sympathetic strings
-    removeSympStrings(noteNumber, velocity, midiChannel, targetStates, post);
+    removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonance));
 }
 
 void ResonanceProcessor::prepareToPlay(double sr)

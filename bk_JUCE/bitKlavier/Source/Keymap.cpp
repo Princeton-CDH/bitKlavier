@@ -17,7 +17,7 @@ processor(processor),
 Id(Id),
 name("Keymap "+String(Id)),
 keymap(Array<bool>()),
-targetStates(Array<KeymapTargetState>()),
+targetStates(Array<bool>()),
 midiEdit(false),
 harMidiEdit(false),
 harArrayMidiEdit(false),
@@ -31,6 +31,12 @@ onscreenSelected(true),
 harKey(60),
 harPreTranspose(0),
 harPostTranspose(0),
+//rangeExtend(4),
+asym_k(1),
+sym_k(1),
+scale(1),
+offset(0),
+velocityInvert(false),
 ignoreSustain(false),
 allNotesOff(false),
 sustainPedalKeys(false)
@@ -50,9 +56,16 @@ sustainPedalKeys(false)
     targetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
     {
-        targetStates.add(TargetStateNil);
+        targetStates.add(false);
     }
-
+    
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
+    
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
     {
@@ -76,6 +89,12 @@ onscreenSelected(k->isOnscreenSelected()),
 harKey(k->getHarKey()),
 harPreTranspose(k->getHarPreTranspose()),
 harPostTranspose(k->getHarPostTranspose()),
+//rangeExtend(k->getRangeExtend()),
+asym_k(k->getAsym_k()),
+sym_k(k->getSym_k()),
+scale(k->getScale()),
+offset(k->getOffset()),
+velocityInvert(k->getVelocityInvert()),
 ignoreSustain(k->getIgnoreSustain()),
 allNotesOff(k->getAllNotesOff()),
 sustainPedalKeys(k->getSustainPedalKeys())
@@ -90,8 +109,15 @@ sustainPedalKeys(k->getSustainPedalKeys())
     targetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
     {
-        targetStates.add(TargetStateNil);
+        targetStates.add(false);
     }
+    
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
     
     inverted = k->isInverted();
 
@@ -127,6 +153,12 @@ onscreenSelected(k->isOnscreenSelected()),
 harKey(k->getHarKey()),
 harPreTranspose(k->getHarPreTranspose()),
 harPostTranspose(k->getHarPostTranspose()),
+//rangeExtend(k->getRangeExtend()),
+asym_k(k->getAsym_k()),
+sym_k(k->getSym_k()),
+scale(k->getScale()),
+offset(k->getOffset()),
+velocityInvert(k->getVelocityInvert()),
 ignoreSustain(k->getIgnoreSustain()),
 allNotesOff(k->getAllNotesOff()),
 sustainPedalKeys(k->getSustainPedalKeys())
@@ -141,8 +173,14 @@ sustainPedalKeys(k->getSustainPedalKeys())
     targetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
     {
-        targetStates.add(TargetStateNil);
+        targetStates.add(false);
     }
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
     
     inverted = k->isInverted();
 
@@ -168,7 +206,7 @@ processor(processor),
 Id(-1),
 name("Keymap "+String(Id)),
 keymap(Array<bool>()),
-targetStates(Array<KeymapTargetState>()),
+targetStates(Array<bool>()),
 midiEdit(false),
 harMidiEdit(false),
 harArrayMidiEdit(false),
@@ -181,6 +219,12 @@ onscreenSelected(true),
 harKey(60),
 harPreTranspose(0),
 harPostTranspose(0),
+//rangeExtend(4),
+asym_k(1),
+sym_k(1),
+scale(1),
+offset(0),
+velocityInvert(false),
 ignoreSustain(false),
 allNotesOff(false),
 sustainPedalKeys(false)
@@ -194,8 +238,14 @@ sustainPedalKeys(false)
     targetStates.ensureStorageAllocated(TargetTypeNil);
     for (int i = 0; i < TargetTypeNil; i++)
     {
-        targetStates.add(TargetStateNil);
+        targetStates.add(false);
     }
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
 
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -419,99 +469,10 @@ void Keymap::setKeys(KeySet set, bool action, PitchClass pc)
     }
 }
 
-void Keymap::setTarget(KeymapTargetType target, KeymapTargetState state)
+void Keymap::setTarget(KeymapTargetType target, bool state)
 {
-    //if (targetStates[target] == TargetStateNil) return;
-    
-    //targetStates.set(target, state ? TargetStateDisabled : TargetStateEnabled);
-    targetStates.set(target, state);
-    DBG("Keymap::setTarget = " + String(target) + " " + String((int) getTargetState(target)));
-}
-
-void Keymap::toggleTarget(KeymapTargetType target)
-{
-    if (targetStates[target] == TargetStateNil) return;
-    
-    targetStates.set(target, (targetStates[target] == TargetStateDisabled) ? TargetStateEnabled : TargetStateDisabled);
-    DBG("Keymap::toggleTarget = " + String(target) + " " + String((int) getTargetState(target)));
-}
-
-void Keymap::enableTarget(KeymapTargetType target)
-{
-    targetStates.set(target, TargetStateEnabled);
-}
-
-void Keymap::disableTarget(KeymapTargetType target)
-{
-    targetStates.set(target, TargetStateDisabled);
-}
-
-void Keymap::addTarget(KeymapTargetType target)
-{
-    if (targetStates[target] == TargetStateNil)
-    {
-        targetStates.set(target, TargetStateEnabled);
-    }
-}
-
-void Keymap::addTarget(KeymapTargetType target, KeymapTargetState state)
-{
-    if (targetStates[target] == TargetStateNil)
-    {
-        targetStates.set(target, state);
-    }
-}
-
-void Keymap::removeTarget(KeymapTargetType target)
-{
-    targetStates.set(target, TargetStateNil);
-}
-
-
-void Keymap::removeTargetsOfType(BKPreparationType type)
-{
-    if (type == PreparationTypeDirect)
-    {
-        removeTarget(TargetTypeDirect);
-    }
-    if (type == PreparationTypeSynchronic)
-    {
-        for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
-        {
-            removeTarget((KeymapTargetType) i);
-        }
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        removeTarget(TargetTypeNostalgic);
-    }
-    else if (type == PreparationTypeBlendronic)
-    {
-        for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
-        {
-            removeTarget((KeymapTargetType) i);
-        }
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        removeTarget(TargetTypeTempo);
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        removeTarget(TargetTypeTuning);
-    }
-    else if (type == PreparationTypeResonance)
-    {
-        removeTarget(TargetTypeResonance);
-    }
-}
-
-void Keymap::clearTargets()
-{
-    for (int i = 0; i < TargetTypeNil; i++)
-    {
-        targetStates.set(i, TargetStateNil);
-    }
+    targetStates.setUnchecked(target, state);
+    DBG("Keymap::setTarget = " + String(target) + " " + String((int) getTargetStates()[target]));
 }
 
 const Array<String> Keymap::getAllMidiInputNames()
@@ -667,4 +628,41 @@ void Keymap::setOnscreenSelected(bool selected)
         onscreenSelected = true;
     }
     else onscreenSelected = selected;
+}
+
+float Keymap::applyVelocityCurve(float velocity)
+{
+    /*
+     **** Velocity Curving
+     user settable parameters:
+     --asymmetric warping coefficient (0, 10): default 1 (no warping)
+     --symmetric warping coefficent (0, 5): default 1 (no warping)
+     --scaling multipler (0, 10): default 1.
+     --offset (-1, 1): default 0.
+     --invert velocities, toggle: default off
+     
+     also, the user should be able to set extendRange (in dB), which is in BKPianoSampler::startNote()
+     and will presumably need to pass through here.
+     
+     velocity curving doesn't actually extend the dynamic range (well, it could if scaling results
+     in velocities > 1.), but rather just distributes the incoming velocities across the dynamic
+     range with the sample layers. extendRange will extend the total dynamic of the sample set, and
+     is set to 4dB by default at the moment (that's probably a reasonable default, and feels good for
+     the Heavy set and other new bK sample libraries).
+     */
+    
+    float velocityCurved = dt_warpscale(velocity, asym_k, sym_k, scale, offset);
+    if (velocityInvert) velocityCurved = 1. - velocityCurved;
+    
+    if (velocityCurved < 0.) velocityCurved = 0.;
+    else if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
+    // something will break down the line if not capped - note from jeff
+    
+    DBG("asym_k = " + String(asym_k));
+    DBG("sym_k = " + String(sym_k));
+    DBG("scale = " + String(scale));
+    DBG("offset = " + String(offset));
+    DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
+    
+    return velocityCurved;
 }

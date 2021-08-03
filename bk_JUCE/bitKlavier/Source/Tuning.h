@@ -892,8 +892,8 @@ public:
     float getOffset(int midiNoteNumber, bool updateLastInterval);
     
     //for calculating adaptive tuning
-    void keyPressed(int midiNoteNumber);
-    void keyReleased(int midiNoteNumber);
+    void keyPressed(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress);
+    void keyReleased(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress);
     
     inline int getId(void) const noexcept { return tuning->getId(); }
     
@@ -938,6 +938,12 @@ public:
         return keymaps;
     }
     
+    Array<Array<float>>& getVelocities() { return velocities; }
+    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    
+    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
+    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
+    
 private:
     BKAudioProcessor& processor;
     
@@ -963,6 +969,9 @@ private:
     int     adaptiveFundamentalNote = 60; //moves with adaptive tuning
     float   adaptiveFundamentalFreq = mtof(adaptiveFundamentalNote);
     int     adaptiveHistoryCounter = 0;
+    
+    Array<Array<float>> velocities;
+    Array<Array<float>> invertVelocities;
     
     JUCE_LEAK_DETECTOR(TuningProcessor);
 };

@@ -430,7 +430,7 @@ void BKKeymapKeyboardComponent::paint (Graphics& g)
     if (! shadowCol.isTransparent())
     {
         g.setGradientFill (ColourGradient (shadowCol, x1, y1, shadowCol.withAlpha (0.0f), x2, y2, false));
-        
+
         switch (orientation)
         {
             case horizontalKeyboard:            g.fillRect (0, 0, x, 5); break;
@@ -486,8 +486,10 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
                                            const Colour& textColour)
 {
     Colour c;
-    if(disabledKeys.contains(midiNoteNumber)) c = findColour(shadowColourId);
-    else c = keyColour;
+    if (disabledKeys.contains(midiNoteNumber))
+        c = findColour(shadowColourId);
+    else
+    c = keyColour;
     
     float keyVal = keyValues.getUnchecked(midiNoteNumber);
     //if(keyVal != 0.)
@@ -589,8 +591,10 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
                                            const Colour& noteFillColour)
 {
     Colour c;
-    if(disabledKeys.contains(midiNoteNumber)) c = findColour(shadowColourId);
-    else c = noteFillColour;
+    if (disabledKeys.contains(midiNoteNumber))
+        c = findColour(shadowColourId).withAlpha(1.f).withBrightness(0.3f);
+    else
+    c = noteFillColour;
     
     //Colour c (noteFillColour);
     
@@ -1034,6 +1038,7 @@ void BKKeymapKeyboardComponent::setFundamental(int fund)
 // FLESH THESE OUT TO ALLOW FOR DRAGGING
 bool BKKeymapKeyboardComponent::mouseDownOnKey    (int midiNoteNumber, const MouseEvent& e)
 {
+    if (disabledKeys.contains(midiNoteNumber)) return false;
     lastNoteOn = midiNoteNumber;
     
     if (lastKeySelected == -1)
@@ -1048,6 +1053,7 @@ bool BKKeymapKeyboardComponent::mouseDownOnKey    (int midiNoteNumber, const Mou
 
 void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const MouseEvent&)
 {
+    if (disabledKeys.contains(midiNoteNumber)) return;
     if (midiNoteNumber != lastKeySelected)
     {
         if(keysToggle)
@@ -1066,6 +1072,7 @@ void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const Mou
 
 void BKKeymapKeyboardComponent::mouseUpOnKey      (int midiNoteNumber, const MouseEvent&)
 {
+    if (disabledKeys.contains(midiNoteNumber)) return;
     if(keysToggle)
     {
         state.toggle(midiNoteNumber);

@@ -150,7 +150,9 @@ public:
     // This is quite performance intensive with a lot of samples and currently doesn't seems worth doing
 //    SampleTouchThread touchThread;
     
-    FileSearchPath sampleSearchPath;
+    File defaultSamplesPath;
+    FileSearchPath soundfontsPaths;
+    FileSearchPath customSamplesPaths;
 
     void updateGalleries(void);
     
@@ -246,10 +248,16 @@ public:
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) override;
     void changeProgramName (int index, const String& newName) override;
+    
 
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    //==============================================================================
+    File getDefaultSamplesPath();
+    Array<File> getSoundfontsPaths();
+    Array<File> getCustomSamplesPaths();
     
     double getLevelL();
     double getLevelR();
@@ -449,6 +457,46 @@ public:
 //        currentPiano->configure();
         
         return "Redo " + galleryVT->getStringAttribute("actionDesc");
+    }
+    
+    int findPathAndLoadSamples(String name)
+    {
+        // name comes in as "soundfont.sf2.subsound1"
+        BKSampleLoadType type = BKLoadLite;
+        String path;
+        int subsound = 0;
+        
+        for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
+        {
+            if (name == String(cBKSampleLoadTypes[i]))
+            {
+                type = (BKSampleLoadType) i;
+            }
+        }
+        
+        String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
+        for (auto sf : soundfontNames)
+        {
+            if (sf.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == sfName)
+            {
+                type = BKLoadSoundfont;
+                path = sf;
+                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+                break;
+            }
+        }
+        
+        for (auto cs : customSampleSetNames)
+        {
+            if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
+            {
+                type = BKLoadCustom;
+                path = cs;
+                break;
+            }
+        }
+        
+        return loadSamples(type, path, subsound, false);
     }
     
 private:

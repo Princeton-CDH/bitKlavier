@@ -518,41 +518,6 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 	int noteNumber = midiNoteNumber;
     if (noteNumber > 108 || noteNumber < 21) return nullptr;
     float transposition = transp;
-    
-    /*
-     **** Velocity Curving
-     user settable parameters:
-        --asymmetric warping coefficient (0, 10): default 1 (no warping)
-        --symmetric warping coefficent (0, 5): default 1 (no warping)
-        --scaling multipler (0, 10): default 1.
-        --offset (-1, 1): default 0.
-        --invert velocities, toggle: default off
-     
-     also, the user should be able to set extendRange (in dB), which is in BKPianoSampler::startNote()
-     and will presumably need to pass through here.
-     
-     velocity curving doesn't actually extend the dynamic range (well, it could if scaling results
-     in velocities > 1.), but rather just distributes the incoming velocities across the dynamic
-     range with the sample layers. extendRange will extend the total dynamic of the sample set, and
-     is set to 4dB by default at the moment (that's probably a reasonable default, and feels good for
-     the Heavy set and other new bK sample libraries).
-    */
-    
-    float velocityCurved;
-    
-    // do inversion, or not
-    // if (velocityInvert) velocityCurved = 1. - velocity;
-    // else velocityCurved = velocity;
-    
-    // args: asym_k, sym_k, scale (multiplier), offset -- user settable
-    if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote)
-        velocityCurved = dt_warpscale(velocity, 2., 1., 1, 0.);
-    else
-        velocityCurved = velocity;
-    
-    if (velocityCurved < 0.) velocityCurved = 0.;
-    // if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
-    DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
 
     // needed for MIDI Out; will just return the last found voice, if there are multiple voices
     BKSynthesiserVoice* voiceToReturn;
@@ -569,7 +534,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 
 		// Check if sound applies to note, velocity, and channel.
 		if (sound->appliesToNote(noteNumber) &&
-			sound->appliesToVelocity((int)(velocityCurved * 127.0)))
+			sound->appliesToVelocity((int)(velocity * 127.0)))
 		{
 			if (sound->region_ != nullptr)
 			{
@@ -589,7 +554,8 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                        noteNumber,
                        transposition,
                        gain,
-                       velocityCurved,
+                       velocity,
+                       //rangeExtend,
                        direction,
                        type,
                        bktype,
@@ -646,6 +612,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                midiNoteNumberOffset,
                gain,
                velocity,
+               //0, // for now
                direction,
                type,
                bktype,
@@ -671,6 +638,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                                const float midiNoteNumberOffset,
                                const float gain,
                                const float velocity,
+                               //const float rangeExtend,
                                PianoSamplerNoteDirection direction,
                                PianoSamplerNoteType type,
                                BKNoteType bktype,
@@ -723,6 +691,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                          pitchWheelValue,
                          g,
                          velocity,
+                         //rangeExtend,
                          direction,
                          type,
                          bktype,
@@ -846,6 +815,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
                        0, // might need to deal with this
                        gain,
                        velocity,
+                       //0, // for now
                        Forward,
                        FixedLengthFixedStart,
                        DirectNote,             //

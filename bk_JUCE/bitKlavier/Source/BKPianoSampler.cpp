@@ -208,7 +208,6 @@ bool BKPianoSamplerVoice::canPlaySound (BKSynthesiserSound* sound)
     return dynamic_cast<const BKPianoSamplerSound*> (sound) != nullptr;
 }
 
-
 void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      const float offset,
                                      const float gain,
@@ -232,6 +231,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      64,
                                      gain,
                                      velocity,
+                                     //0, // not sure when this gets called so just 0 for now
                                      direction,
                                      type,
                                      bktype,
@@ -305,6 +305,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                                      const int pitchWheelValue,
                                      const float gain,
                                      const float velocity,
+                                     //const float rangeExtend,
                                      PianoSamplerNoteDirection direction,
                                      PianoSamplerNoteType type,
                                      BKNoteType bktype,
@@ -323,6 +324,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
     {
         DBG("RMS: " + String(sound->getDBFSLevel()));
         //DBG("BKPianoSamplerVoice::startNote " + String(midi));
+        
+        //DBG("passed through range extend = " + String(rangeExtend));
         
         
         currentMidiNoteNumber = midi;
@@ -466,11 +469,9 @@ void BKPianoSamplerVoice::startNote (const int midi,
         dgain = dynamicGain;
         
         noteVelocity = velocity;
-        // DBG("noteVelocity = " + String(noteVelocity * 127.));
         
         // *** START new layer-based approach to velocity handling ** //
         if (bktype != HammerNote && bktype != ResonanceNote && bktype != PedalNote && !sound->isSoundfont)
-            // this isn't working right for SoundFonts (layerNum and numLayers not being set correctly on load)
         {
 
             // dB range of layer
@@ -504,6 +505,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
             
         }
         // *** END new layer-based approach to velocity handling ** //
+        
+        DBG("noteVelocity = " + String(noteVelocity * 127.));
         
         lengthTracker = 0.0;
         
@@ -677,9 +680,14 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     int64 loopStart, loopEnd, start, end, soundLengthMinus1;
     
     int numBlendronics = blendronic.size();
+    /*
     Array<BKDelayL*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
         blendronicDelays.add(blendronic.getUnchecked(i)->getDelay()->getDelay().get());
+     */
+    Array<BlendronicDelay*> blendronicDelays;
+    for (int i = 0; i < numBlendronics; ++i)
+        blendronicDelays.add(blendronic.getUnchecked(i)->getDelay());
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
@@ -847,9 +855,14 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
    
     int numBlendronics = blendronic.size();
+    /*
     Array<BKDelayL*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
         blendronicDelays.add(blendronic.getUnchecked(i)->getDelay()->getDelay().get());
+     */
+    Array<BlendronicDelay*> blendronicDelays;
+    for (int i = 0; i < numBlendronics; ++i)
+        blendronicDelays.add(blendronic.getUnchecked(i)->getDelay());
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
@@ -1061,9 +1074,17 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     // Putting blendronics into a temp raw pointer array to avoid taking the extra time
     // to do ReferenceCountedObject stuff in the loop
     int numBlendronics = blendronic.size();
+    
+    /*
     Array<BKDelayL*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
         blendronicDelays.add(blendronic.getUnchecked(i)->getDelay()->getDelay().get());
+     */
+    
+    Array<BlendronicDelay*> blendronicDelays;
+    for (int i = 0; i < numBlendronics; ++i)
+        blendronicDelays.add(blendronic.getUnchecked(i)->getDelay());
+    
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     

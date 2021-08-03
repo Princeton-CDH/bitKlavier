@@ -80,8 +80,7 @@ url(String())
 
 void Gallery::prepareToPlay (double sampleRate)
 {
-    
-    for (auto piano : bkPianos)     piano->prepareToPlay(sampleRate);
+    for (auto piano : bkPianos) piano->prepareToPlay(sampleRate);
 }
 
 Gallery::~Gallery()
@@ -187,5 +186,3 @@ void Gallery::randomize()
         }
     }
 }
-
-

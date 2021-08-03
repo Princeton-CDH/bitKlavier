@@ -667,7 +667,6 @@ public:
     
     inline const ResonanceModification::Ptr getResonanceModification(int Id) const noexcept
     {
-
         for (auto p : modResonance)
         {
             if (p->getId() == Id)   return p;
@@ -820,7 +819,6 @@ public:
     }
     
     void clean(void);
-    
     
     void addSynchronicWithId(int Id);
     void addNostalgicWithId(int Id);

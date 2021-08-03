@@ -18,7 +18,7 @@ class BKAudioProcessor;
 class BKSampleLoader : public ThreadPoolJob
 {
 public:
-    BKSampleLoader(BKAudioProcessor& p, BKSampleLoadType sampleType, String soundfont, int instrument, int soundSetId, bool memoryMappingEnabled):
+    BKSampleLoader(BKAudioProcessor& p, BKSampleLoadType sampleType, String& soundfont, int instrument, int soundSetId, bool memoryMappingEnabled):
     ThreadPoolJob("sample_loader"),
     processor(p),
     loadingSampleType(sampleType),

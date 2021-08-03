@@ -83,24 +83,22 @@ public:
 
     //empty constructor, values will need to be tweaked
     ResonancePreparation(void) :
-        rSoundSet(-1),
-        rUseGlobalSoundSet(true),
-        rSoundSetName(String()),
-        rAttack(50),
-        rDecay(3),
-        rRelease(50),
-        rSustain(1.),
-        rDefaultGain(0.5, true),
-        rBlendronicGain(0.0, true),
-        rMinStartTimeMS(400),
-        rMaxStartTimeMS(4000),
-        rMaxSympStrings(8),
-        rFundamentalKey(0),
-        rResonanceKeys({}),
-        rOffsetsKeys({}),
-        rGainsKeys({}),
-        name("resonance preparation")
-        
+    rSoundSet(-1),
+    rUseGlobalSoundSet(true),
+    rSoundSetName(String()),
+    rAttack(50),
+    rDecay(3),
+    rRelease(50),
+    rSustain(1.),
+    rDefaultGain(0.5, true),
+    rBlendronicGain(0.0, true),
+    rMinStartTimeMS(400),
+    rMaxStartTimeMS(4000),
+    rMaxSympStrings(8),
+    rFundamentalKey(0),
+    rResonanceKeys({}),
+    rOffsetsKeys({}),
+    rGainsKeys({})
     {
         setDefaultPartialStructure();
     }
@@ -719,7 +717,7 @@ public:
         GeneralSettings::Ptr rGeneral,
         BKSynthesiser* rMain
     );
-    virtual ~ResonanceProcessor();
+    ~ResonanceProcessor();
     
     inline void reset(void)
     {
@@ -730,11 +728,8 @@ public:
     //called with every audio vector
     BKSampleLoadType sampleType;
 
-    //begin timing played note length, called with noteOn
-    void keyPressed(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates);
-
-    //begin playing reverse note, called with noteOff
-    void keyReleased(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post = false);
+    void    keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void    keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
 
     //probably not necessary but keeping just in case?
     //void postRelease(int noteNumber, int midiChannel);
@@ -783,10 +778,13 @@ private:
     Keymap::PtrArr              keymaps;
     BlendronicProcessor::PtrArr blendronic;
     
+    Array<Array<float>> velocities;
+    Array<Array<float>> invertVelocities;
+    
     // basic API
-    void ringSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates); 
-    void addSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates);
-    void removeSympStrings(int noteNumber, float velocity, int midiChannel, Array<KeymapTargetState> targetStates, bool post);
+    void ringSympStrings(int noteNumber, float velocity);
+    void addSympStrings(int noteNumber, float velocity);
+    void removeSympStrings(int noteNumber, float velocity);
 
     // => sympStrings
     // data structure for pointing to all of the undamped strings and their partials

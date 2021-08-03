@@ -76,8 +76,12 @@ private:
     public:
         PreferencesComponent (BKAudioProcessorEditor& editor)
         : owner (editor),
-        searchPathLabel("Sample search paths:", "Sample search paths:"),
-        pathAddButton("Add search path"),
+        defaultPathLabel("Piano (Litest-Heavy) search path:", "Piano (Litest-Heavy) search path:"),
+        defaultPathButton("Set search path"),
+        soundfontPathLabel("Soundfont search paths:", "Soundfont search paths:"),
+        soundfontPathButton("Add search path"),
+        customPathLabel("Sample search paths:", "Sample search paths:"),
+        customPathButton("Add search path"),
         tooltipsLabel("Enable tooltips", "Enable tooltips"),
 		hotkeysLabel("Enable hotkeys", "Enable hotkeys"),
         memoryMappingLabel("Enable direct-from-disk sample playback", "Enable direct-from-disk sample playback")
@@ -85,20 +89,57 @@ private:
             setOpaque (true);
             setWantsKeyboardFocus(true);
             
-            searchPathLabel.setTooltip("Set paths in which to search for sample libraries. bitKlavier only look for .wav files with the naming format of \"C4v1\".");
-            searchPathLabel.setJustificationType(Justification::topLeft);
-            addAndMakeVisible(searchPathLabel);
+            //==============================================================================
             
-            pathAddButton.setTooltip("Open the file browser to select folders to add to the search paths list");
-            pathAddButton.addListener(this);
-            addAndMakeVisible(pathAddButton);
+            defaultPathLabel.setTooltip("Set the path to the default bitKlavier samples.");
+            defaultPathLabel.setJustificationType(Justification::topLeft);
+            addAndMakeVisible(defaultPathLabel);
             
-            searchPathEditor.setTooltip("Set paths in which to search for sample libraries. bitKlavier only look for .wav files with the naming format of \"C4v1\".");
-            searchPathEditor.setMultiLine(true);
-            String text = owner.processor.sampleSearchPath.toString().replace(";", "; ");
-            searchPathEditor.setText(text, dontSendNotification);
-            searchPathEditor.addListener(this);
-            addAndMakeVisible(searchPathEditor);
+            defaultPathButton.setTooltip("Open the file browser to select a folder.");
+            defaultPathButton.addListener(this);
+            addAndMakeVisible(defaultPathButton);
+            
+            defaultPathEditor.setTooltip("Set the path to the default bitKlavier samples.");
+            defaultPathEditor.setMultiLine(true);
+            defaultPathEditor.setText(owner.processor.defaultSamplesPath.getFullPathName(), dontSendNotification);
+            defaultPathEditor.addListener(this);
+            addAndMakeVisible(defaultPathEditor);
+            
+            //==============================================================================
+            
+            soundfontPathLabel.setTooltip("Set extra paths in which to search for soundfonts. bitKlavier will always search the soundfonts folder in the bitKlavier folder.");
+            soundfontPathLabel.setJustificationType(Justification::topLeft);
+            addAndMakeVisible(soundfontPathLabel);
+            
+            soundfontPathButton.setTooltip("Open the file browser to select folders to add to the search paths list.");
+            soundfontPathButton.addListener(this);
+            addAndMakeVisible(soundfontPathButton);
+            
+            soundfontPathEditor.setTooltip("Set paths in which to search for soundfonts.");
+            soundfontPathEditor.setMultiLine(true);
+            String text = owner.processor.soundfontsPaths.toString().replace(";", "; ");
+            soundfontPathEditor.setText(text, dontSendNotification);
+            soundfontPathEditor.addListener(this);
+            addAndMakeVisible(soundfontPathEditor);
+            
+            //==============================================================================
+            
+            customPathLabel.setTooltip("Set paths in which to search for additional sample libraries. bitKlavier only look for .wav files with the naming format of \"C4v1\".");
+            customPathLabel.setJustificationType(Justification::topLeft);
+            addAndMakeVisible(customPathLabel);
+            
+            customPathButton.setTooltip("Open the file browser to select folders to add to the search paths list.");
+            customPathButton.addListener(this);
+            addAndMakeVisible(customPathButton);
+            
+            customPathEditor.setTooltip("Set paths in which to search for sample libraries. bitKlavier only looks for .wav files with the naming format of \"C4v1\".");
+            customPathEditor.setMultiLine(true);
+            text = owner.processor.customSamplesPaths.toString().replace(";", "; ");
+            customPathEditor.setText(text, dontSendNotification);
+            customPathEditor.addListener(this);
+            addAndMakeVisible(customPathEditor);
+            
+            //==============================================================================
             
             tooltipsButton.setClickingTogglesState (true);
             tooltipsButton.getToggleStateValue().referTo (owner.getTooltipsEnabled());
@@ -127,10 +168,24 @@ private:
             auto r = getLocalBounds();
             
             r.reduce(12, 12);
+            
             Rectangle<int> slice = r.removeFromTop(24);
-            searchPathLabel.setBounds(slice.removeFromLeft(slice.getWidth()*0.6));
-            pathAddButton.setBounds(slice.withHeight(25));
-            searchPathEditor.setBounds(r.removeFromTop(72));
+            defaultPathLabel.setBounds(slice.removeFromLeft(slice.getWidth()*0.6));
+            defaultPathButton.setBounds(slice.withHeight(25));
+            defaultPathEditor.setBounds(r.removeFromTop(24));
+            r.removeFromTop(24);
+            
+            slice = r.removeFromTop(24);
+            soundfontPathLabel.setBounds(slice.removeFromLeft(slice.getWidth()*0.6));
+            soundfontPathButton.setBounds(slice.withHeight(25));
+            soundfontPathEditor.setBounds(r.removeFromTop(72));
+            r.removeFromTop(24);
+            
+            slice = r.removeFromTop(24);
+            customPathLabel.setBounds(slice.removeFromLeft(slice.getWidth()*0.6));
+            customPathButton.setBounds(slice.withHeight(25));
+            customPathEditor.setBounds(r.removeFromTop(72));
+            
             r.removeFromTop(24);
             slice = r.removeFromTop(24);
             hotkeysButton.setBounds(slice.removeFromLeft(24));
@@ -148,7 +203,20 @@ private:
         
         void buttonClicked(Button* b) override
         {
-            if (b == &pathAddButton)
+            if (b == &defaultPathButton)
+            {
+                fc = std::make_unique<FileChooser> ("Select folders...",
+                                                    File::getSpecialLocation (File::userHomeDirectory));
+                
+                fc->launchAsync (FileBrowserComponent::openMode |
+                                 FileBrowserComponent::canSelectDirectories,
+                                 [this] (const FileChooser& chooser)
+                                 {
+                    owner.processor.defaultSamplesPath = chooser.getResult();
+                    defaultPathEditor.setText(owner.processor.defaultSamplesPath.getFullPathName());
+                });
+            }
+            if (b == &soundfontPathButton)
             {
                 fc = std::make_unique<FileChooser> ("Add folders...",
                                                     File::getSpecialLocation (File::userHomeDirectory));
@@ -160,44 +228,74 @@ private:
                                  {
                     for (auto result : chooser.getResults())
                     {
-                        owner.processor.sampleSearchPath.addIfNotAlreadyThere(result);
+                        owner.processor.soundfontsPaths.addIfNotAlreadyThere(result);
                     }
-                    updateSearchPath();
+                    updateSoundfontsPaths();
+                });
+            }
+            if (b == &customPathButton)
+            {
+                fc = std::make_unique<FileChooser> ("Add folders...",
+                                                    File::getSpecialLocation (File::userHomeDirectory));
+                
+                fc->launchAsync (FileBrowserComponent::openMode |
+                                 FileBrowserComponent::canSelectDirectories |
+                                 FileBrowserComponent::canSelectMultipleItems,
+                                 [this] (const FileChooser& chooser)
+                                 {
+                    for (auto result : chooser.getResults())
+                    {
+                        owner.processor.customSamplesPaths.addIfNotAlreadyThere(result);
+                    }
+                    updateCustomSamplesPaths();
                 });
             }
         }
         
         void textEditorReturnKeyPressed(TextEditor& e) override
         {
-            if (&e == &searchPathEditor)
-            {
-                unfocusAllComponents();
-            }
+            unfocusAllComponents();
         }
         
         void textEditorEscapeKeyPressed(TextEditor& e) override
         {
-            if (&e == &searchPathEditor)
-            {
-                unfocusAllComponents();
-            }
+            unfocusAllComponents();
         }
         
         void textEditorFocusLost(TextEditor& e) override
         {
-            if (&e == &searchPathEditor)
+            if (&e == &defaultPathEditor)
             {
-                owner.processor.sampleSearchPath = e.getText();
-                updateSearchPath();
+                owner.processor.defaultSamplesPath = e.getText();
+                defaultPathEditor.setText(owner.processor.defaultSamplesPath.getFullPathName());
+            }
+            if (&e == &soundfontPathEditor)
+            {
+                owner.processor.soundfontsPaths = e.getText();
+                updateSoundfontsPaths();
+            }
+            if (&e == &customPathEditor)
+            {
+                owner.processor.customSamplesPaths = e.getText();
+                updateCustomSamplesPaths();
             }
         }
         
-        void updateSearchPath()
+        void updateSoundfontsPaths()
         {
-            owner.processor.sampleSearchPath.removeRedundantPaths();
-            owner.processor.sampleSearchPath.removeNonExistentPaths();
-            String text = owner.processor.sampleSearchPath.toString().replace(";", "; ");
-            searchPathEditor.setText(text, dontSendNotification);
+            owner.processor.soundfontsPaths.removeRedundantPaths();
+            owner.processor.soundfontsPaths.removeNonExistentPaths();
+            String text = owner.processor.soundfontsPaths.toString().replace(";", "; ");
+            soundfontPathEditor.setText(text, dontSendNotification);
+            owner.processor.collectSoundfonts();
+        }
+        
+        void updateCustomSamplesPaths()
+        {
+            owner.processor.customSamplesPaths.removeRedundantPaths();
+            owner.processor.customSamplesPaths.removeNonExistentPaths();
+            String text = owner.processor.customSamplesPaths.toString().replace(";", "; ");
+            customPathEditor.setText(text, dontSendNotification);
             owner.processor.collectCustomSamples();
         }
         
@@ -207,9 +305,17 @@ private:
         
         std::unique_ptr<FileChooser> fc;
         
-        Label searchPathLabel;
-        TextButton pathAddButton;
-        TextEditor searchPathEditor;
+        Label defaultPathLabel;
+        TextButton defaultPathButton;
+        TextEditor defaultPathEditor;
+        
+        Label soundfontPathLabel;
+        TextButton soundfontPathButton;
+        TextEditor soundfontPathEditor;
+        
+        Label customPathLabel;
+        TextButton customPathButton;
+        TextEditor customPathEditor;
         
         Label tooltipsLabel;
 		Label hotkeysLabel;

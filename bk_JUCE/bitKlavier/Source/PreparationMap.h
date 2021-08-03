@@ -51,7 +51,8 @@ public:
     void sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post);
     void sustainPedalReleased() { sustainPedalReleased(false); };
     void attemptReattack(int noteNumber, int mappedFrom, String source = String("Default"));
-    void attemptSustain(int noteNumber, float velocity, int channel, int mappedFrom, bool soundfont, String source = String("Default"));
+    void attemptSustain(int noteNumber, float velocity, int channel, int mappedFrom,
+                        bool fromPress, bool soundfont, String source = String("Default"));
     
     inline bool keymapsContainNote(int noteNumber) {
         bool contains = false;
@@ -234,7 +235,7 @@ private:
         int noteNumber;
         float velocity;
         int channel;
-        int mappedFrom;
+        int mappedFrom; // tracks what key was played that triggered this note, for harmonizer purposes
         String source;
     };
     Array<Note> sustainedNotes;

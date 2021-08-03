@@ -209,6 +209,7 @@ public:
                     int pitchWheelValue,
                     float gain,
                     float velocity,
+                    //float extendRange,
                     PianoSamplerNoteDirection direction,
                     PianoSamplerNoteType type,
                     BKNoteType bktype,
@@ -265,7 +266,7 @@ private:
     double pitchbendMultiplier;
     double bentRatio;
     
-    double sourceSamplePosition;
+    double sourceSamplePosition = 0.0;
     
     double fadeTracker,fadeOffset;
     double lengthTracker, lengthEnv;

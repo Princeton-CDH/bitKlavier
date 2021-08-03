@@ -1,15 +1,15 @@
 /*
-  ==============================================================================
-
-    Piano.h
-    Created: 7 Dec 2016 10:25:40am
-    Author:  Michael R Mulshine
+ ==============================================================================
  
-    A "Piano" is an array of PreparationsMaps
-    (equivalent to a "Preset" in the original bitKlavier)
-
-  ==============================================================================
-*/
+ Piano.h
+ Created: 7 Dec 2016 10:25:40am
+ Author:  Michael R Mulshine
+ 
+ A "Piano" is an array of PreparationsMaps
+ (equivalent to a "Preset" in the original bitKlavier)
+ 
+ ==============================================================================
+ */
 
 #ifndef Piano_H_INCLUDED
 #define Piano_H_INCLUDED
@@ -42,20 +42,20 @@ public:
     ~Piano();
     
     Piano::Ptr duplicate(bool withSameId = false);
-
+    
     void clear(void);
     
     void storeCurrentPiano();
     
     void recallCurrentPiano();
-
-
+    
+    
     ValueTree*  getPianoValueTree(void);
     
     inline void setId(int newId) { Id = newId; }
     
     inline int getId(void) { return Id; }
-
+    
     inline const String getName() const noexcept {return pianoName;}
     inline void setName(String n){pianoName = n;}
     
@@ -68,6 +68,7 @@ public:
     TuningProcessor::PtrArr              tprocessor;
 	BlendronicProcessor::PtrArr		     bprocessor;
     ResonanceProcessor::PtrArr           rprocessor;
+
     
     void addProcessor(BKPreparationType thisType, int thisId);
     bool containsProcessor(BKPreparationType thisType, int thisId);
@@ -79,14 +80,18 @@ public:
     TempoProcessor::Ptr         getTempoProcessor(int Id, bool add = true);
 	BlendronicProcessor::Ptr	getBlendronicProcessor(int Id, bool add = true);
     ResonanceProcessor::Ptr     getResonanceProcessor(int Id, bool add = true);
+
     
     inline DirectProcessor::PtrArr        getDirectProcessors(void) const noexcept { return dprocessor; }
     inline NostalgicProcessor::PtrArr     getNostalgicProcessors(void) const noexcept { return nprocessor; }
     inline SynchronicProcessor::PtrArr    getSynchronicProcessors(void) const noexcept { return sprocessor; }
-    inline TuningProcessor::PtrArr        getTuningProcessors(void) const noexcept { return tprocessor; }
-    inline TempoProcessor::PtrArr         getTempoProcessors(void) const noexcept { return mprocessor; }
-	inline BlendronicProcessor::PtrArr  getBlendronicProcessors(void) const noexcept { return bprocessor; }
-    inline ResonanceProcessor::PtrArr   getResonanceProcessors(void) const noexcept { return rprocessor; }
+    inline TuningProcessor::PtrArr      getTuningProcessors(void) const noexcept { return tprocessor; }
+    inline TempoProcessor::PtrArr       getTempoProcessors(void) const noexcept { return mprocessor; }
+	inline BlendronicProcessor::PtrArr  getBlendronicProcessors(void) const noexcept
+    { return bprocessor; }
+    inline ResonanceProcessor::PtrArr   getResonanceProcessors(void) const noexcept
+    { return rprocessor; }
+
     inline PreparationMap::Ptr       getPreparationMap(void) const noexcept { return prepMap; }
     
     
@@ -97,6 +102,7 @@ public:
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
 	BlendronicProcessor::Ptr    addBlendronicProcessor(int thisId);
     ResonanceProcessor::Ptr     addResonanceProcessor(int thisId);
+
     
     void clearOldNotes(Piano::Ptr prevPiano)
     {
@@ -119,51 +125,124 @@ public:
         }
     }
     
-    void copyAdaptiveTuningState (Piano::Ptr prevPiano)
+    // For when a piano switch occurs
+    // Pianos use separate processors even for the same preparation, so we need to copy over
+    // some parts (things like saved velocities or Synchronic clusters, but not reference to
+    // connected preparations) of the processor from the previous piano to keep continuity
+    void copyProcessorStates (Piano::Ptr prevPiano)
     {
-        TuningProcessor::PtrArr prevTuningProcessors = prevPiano->getTuningProcessors();
-        for(int i=0; i<prevTuningProcessors.size(); i++)
         {
-            for(int j=0; j<tprocessor.size(); j++)
+            DirectProcessor::PtrArr prevDirectProcessors = prevPiano->getDirectProcessors();
+            for (int i = 0; i < prevDirectProcessors.size(); i++)
             {
-                if(tprocessor.getUnchecked(j)->getId() == prevTuningProcessors.getUnchecked(i)->getId())
+                for (int j = 0; j < dprocessor.size(); j++)
                 {
-                    tprocessor.getUnchecked(j)->setAdaptiveHistoryCounter(prevTuningProcessors.getUnchecked(i)->getAdaptiveHistoryCounter());
-                    tprocessor.getUnchecked(j)->setAdaptiveFundamentalFreq(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalFreq());
-                    tprocessor.getUnchecked(j)->setAdaptiveFundamentalNote(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalNote());
+                    if (dprocessor.getUnchecked(j)->getId() == prevDirectProcessors.getUnchecked(i)->getId())
+                    {
+                        dprocessor.getUnchecked(j)
+                        ->setVelocities(prevDirectProcessors.getUnchecked(i)->getVelocities());
+                        dprocessor.getUnchecked(j)
+                        ->setInvertVelocities(prevDirectProcessors.getUnchecked(i)->getInvertVelocities());
+                        continue;
+                    }
                 }
             }
         }
-    }
-    
-    void copyAdaptiveTempoState (Piano::Ptr prevPiano)
-    {
-        TempoProcessor::PtrArr prevTempoProcessors = prevPiano->getTempoProcessors();
-        for(int i=0; i<prevTempoProcessors.size(); i++)
+        
         {
-            for(int j=0; j<mprocessor.size(); j++)
+            SynchronicProcessor::PtrArr prevSynchronicProcessors = prevPiano->getSynchronicProcessors();
+            for (int i = 0; i < prevSynchronicProcessors.size(); i++)
             {
-                if(mprocessor.getUnchecked(j)->getId() == prevTempoProcessors.getUnchecked(i)->getId())
+                for (int j = 0; j < sprocessor.size(); j++)
                 {
-                    mprocessor.getUnchecked(j)->setAtTimer(prevTempoProcessors.getUnchecked(i)->getAtTimer());
-                    mprocessor.getUnchecked(j)->setAtLastTime(prevTempoProcessors.getUnchecked(i)->getAtLastTime());
-                    mprocessor.getUnchecked(j)->setAtDeltaHistory(prevTempoProcessors.getUnchecked(i)->getAtDeltaHistory());
-                    mprocessor.getUnchecked(j)->setAdaptiveTempoPeriodMultiplier(prevTempoProcessors.getUnchecked(i)->getAdaptiveTempoPeriodMultiplier());
+                    if (sprocessor.getUnchecked(j)->getId() == prevSynchronicProcessors.getUnchecked(i)->getId())
+                    {
+                        SynchronicProcessor::Ptr s = sprocessor.getUnchecked(j);
+                        s->setClusters(prevSynchronicProcessors.getUnchecked(i)->getClusters());
+                        s->setVelocities(prevSynchronicProcessors.getUnchecked(i)->getVelocities());
+                        s->setInvertVelocities(prevSynchronicProcessors.getUnchecked(i)->getInvertVelocities());
+                        s->swapClusterVelocities(prevSynchronicProcessors.getUnchecked(i)->getClusterVelocities());
+                        continue;
+                    }
                 }
             }
         }
-    }
-    
-    void copySynchronicState (Piano::Ptr prevPiano)
-    {
-        SynchronicProcessor::PtrArr prevSynchronicProcessors = prevPiano->getSynchronicProcessors();
-        for(int i = 0; i < prevSynchronicProcessors.size(); i++)
+        
         {
-            for(int j = 0; j < sprocessor.size(); j++)
+            NostalgicProcessor::PtrArr prevNostalgicProcessors = prevPiano->getNostalgicProcessors();
+            for (int i = 0; i < prevNostalgicProcessors.size(); i++)
             {
-                if(sprocessor.getUnchecked(j)->getId() == prevSynchronicProcessors.getUnchecked(i)->getId())
+                for (int j = 0; j < nprocessor.size(); j++)
                 {
-                    sprocessor.getUnchecked(j)->setClusters(prevSynchronicProcessors.getUnchecked(i)->getClusters()); 
+                    if (nprocessor.getUnchecked(j)->getId() == prevNostalgicProcessors.getUnchecked(i)->getId())
+                    {
+                        nprocessor.getUnchecked(j)
+                        ->setVelocities(prevNostalgicProcessors.getUnchecked(i)->getVelocities());
+                        nprocessor.getUnchecked(j)
+                        ->setInvertVelocities(prevNostalgicProcessors.getUnchecked(i)->getInvertVelocities());
+                        continue;
+                    }
+                }
+            }
+        }
+        
+        {
+            BlendronicProcessor::PtrArr prevBlendronicProcessors = prevPiano->getBlendronicProcessors();
+            for(int i = 0; i < prevBlendronicProcessors.size(); i++)
+            {
+                for(int j = 0; j < bprocessor.size(); j++)
+                {
+                    if (bprocessor.getUnchecked(j)->getId() == prevBlendronicProcessors.getUnchecked(i)->getId())
+                    {
+                        bprocessor.getUnchecked(j)
+                        ->setVelocities(prevBlendronicProcessors.getUnchecked(i)->getVelocities());
+                        bprocessor.getUnchecked(j)
+                        ->setInvertVelocities(prevBlendronicProcessors.getUnchecked(i)->getInvertVelocities());
+                        continue;
+                    }
+                }
+            }
+        }
+        
+        {
+            TempoProcessor::PtrArr prevTempoProcessors = prevPiano->getTempoProcessors();
+            for (int i = 0; i < prevTempoProcessors.size(); i++)
+            {
+                for (int j = 0; j < mprocessor.size(); j++)
+                {
+                    if (mprocessor.getUnchecked(j)->getId() == prevTempoProcessors.getUnchecked(i)->getId())
+                    {
+                        mprocessor.getUnchecked(j)->setAtTimer(prevTempoProcessors.getUnchecked(i)->getAtTimer());
+                        mprocessor.getUnchecked(j)->setAtLastTime(prevTempoProcessors.getUnchecked(i)->getAtLastTime());
+                        mprocessor.getUnchecked(j)->setAtDeltaHistory(prevTempoProcessors.getUnchecked(i)->getAtDeltaHistory());
+                        mprocessor.getUnchecked(j)->setAdaptiveTempoPeriodMultiplier(prevTempoProcessors.getUnchecked(i)->getAdaptiveTempoPeriodMultiplier());
+                        mprocessor.getUnchecked(j)
+                        ->setVelocities(prevTempoProcessors.getUnchecked(i)->getVelocities());
+                        mprocessor.getUnchecked(j)
+                        ->setInvertVelocities(prevTempoProcessors.getUnchecked(i)->getInvertVelocities());
+                        continue;
+                    }
+                }
+            }
+        }
+        
+        {
+            TuningProcessor::PtrArr prevTuningProcessors = prevPiano->getTuningProcessors();
+            for (int i = 0; i < prevTuningProcessors.size(); i++)
+            {
+                for (int j = 0; j < tprocessor.size(); j++)
+                {
+                    if (tprocessor.getUnchecked(j)->getId() == prevTuningProcessors.getUnchecked(i)->getId())
+                    {
+                        tprocessor.getUnchecked(j)->setAdaptiveHistoryCounter(prevTuningProcessors.getUnchecked(i)->getAdaptiveHistoryCounter());
+                        tprocessor.getUnchecked(j)->setAdaptiveFundamentalFreq(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalFreq());
+                        tprocessor.getUnchecked(j)->setAdaptiveFundamentalNote(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalNote());
+                        tprocessor.getUnchecked(j)
+                        ->setVelocities(prevTuningProcessors.getUnchecked(i)->getVelocities());
+                        tprocessor.getUnchecked(j)
+                        ->setInvertVelocities(prevTuningProcessors.getUnchecked(i)->getInvertVelocities());
+                        continue;
+                    }
                 }
             }
         }
@@ -218,7 +297,7 @@ public:
     void remove(BKItem::Ptr item);
     void configure(void);
     void deconfigure(void);
-
+    
     BKItem::PtrArr    items;
     
     void removePreparationFromKeymap(BKPreparationType thisType, int thisId, int keymapId);
@@ -230,8 +309,8 @@ public:
     void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic);
     
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
-
-	void linkPreparationWithBlendronic(BKPreparationType thisType, int thisId, Blendronic::Ptr thisBlend);
+    
+    void linkPreparationWithBlendronic(BKPreparationType thisType, int thisId, Blendronic::Ptr thisBlend);
     
     ValueTree getState(void);
     
@@ -254,6 +333,7 @@ public:
 				else if (type == PreparationTypeTuning) ptype = "t";
 				else if (type == PreparationTypeTempo) ptype = "m";
 				else if (type == PreparationTypeBlendronic) ptype = "b";
+
                 
                 out += String(i) + ":" + ptype + String(item->getId()) + ":" + "{" + item->connectionsToString() +"} ";
                 
@@ -262,7 +342,7 @@ public:
         
         return out;
     }
-
+    
     void clearmodificationMap(void)
     {
         for (int i = 0; i<modificationMap.size(); i++)
@@ -270,7 +350,7 @@ public:
             modificationMap[i]->clearModifications();
         }
     }
-
+    
     void clearResetMap(void)
     {
         for (int i = 0; i<modificationMap.size(); i++)
@@ -278,8 +358,7 @@ public:
             modificationMap[i]->clearResets();
         }
     }
-
-
+    
     int numModSMaps, numModNMaps, numModDMaps;
 
     void prepareToPlay(double sampleRate);
@@ -287,9 +366,9 @@ public:
     void configurePianoMap(BKItem::Ptr map);
     
     void configureReset(BKItem::Ptr item);
-
+    
     void configureModification(BKItem::Ptr map);
-
+    
     
     void reset(void);
 private:
@@ -301,7 +380,7 @@ private:
     TuningProcessor::Ptr defaultT;
     TempoProcessor::Ptr defaultM;
     SynchronicProcessor::Ptr defaultS;
-	BlendronicProcessor::Ptr defaultB;
+    BlendronicProcessor::Ptr defaultB;
     BlendronicProcessor::PtrArr defaultBA;
 	BlendronicDelay::Ptr defaultD;
     ResonanceProcessor::Ptr defaultR;
@@ -360,7 +439,7 @@ private:
         
         return which;
     }
-
+    
 	inline Array<int> getAllIds(Blendronic::PtrArr direct)
 	{
 		Array<int> which;
@@ -379,6 +458,7 @@ private:
         {
             which.add(p->getId());
         }
+        
         return which;
     }
     
@@ -400,17 +480,18 @@ private:
 };
 
 /*class PianoComparator : public ReferenceCountedObject
-{
-public:
-	//currently compares by name as to enable "reodering" by changing name
-	int compareElements(Piano::Ptr first, Piano::Ptr second)
-	{
-		int compareResult = first->getName().compare(second->getName());
-		if (compareResult > 1) return 1;
-		else if (compareResult < 1) return -1;
-		else return 0;
-	}
-};*/
+ {
+ public:
+ //currently compares by name as to enable "reodering" by changing name
+ int compareElements(Piano::Ptr first, Piano::Ptr second)
+ {
+ int compareResult = first->getName().compare(second->getName());
+ if (compareResult > 1) return 1;
+ else if (compareResult < 1) return -1;
+ else return 0;
+ }
+ };*/
 
 
 #endif  // Piano_H_INCLUDED
+

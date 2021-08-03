@@ -121,10 +121,11 @@ public:
     //void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
     
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it
+
 #define MVC_REFRESH_RATE 20
     
+    // This reference is provided as a quick way for your editor to
+    // access the processor object that created it
     BKAudioProcessor& processor;
     BKAudioProcessorEditor& editor;
     

@@ -368,8 +368,8 @@ public:
     ~TempoProcessor();
     
     void processBlock(int numSamples, int channel);
-    void keyPressed(int noteNumber, float velocity);
-    void keyReleased(int noteNumber, int channel);
+    void keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
     inline float getPeriodMultiplier(void)
     {
         return ((tempo->prep->getTempoSystem() == AdaptiveTempo1) ? adaptiveTempoPeriodMultiplier : 1.0);
@@ -423,6 +423,12 @@ public:
         return keymaps;
     }
     
+    Array<Array<float>>& getVelocities() { return velocities; }
+    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    
+    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
+    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
+    
 private:
     BKAudioProcessor& processor;
     
@@ -441,6 +447,8 @@ private:
     void atCalculatePeriodMultiplier();
     float adaptiveTempoPeriodMultiplier;
     
+    Array<Array<float>> velocities;
+    Array<Array<float>> invertVelocities;
     
     JUCE_LEAK_DETECTOR(TempoProcessor);
 };

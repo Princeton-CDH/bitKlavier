@@ -195,7 +195,7 @@ public:
         count = 0;
         for (auto state : getTargetStates())
         {
-            keysave.setProperty(ptagKeymap_targetStates + String(count++), state, 0);
+            keysave.setProperty(ptagKeymap_targetStates + String(count++), state ? 1 : 0, 0);
         }
         
         keysave.setProperty(ptagKeymap_inverted, isInverted(), 0);
@@ -235,6 +235,13 @@ public:
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_sustainPedalKeys, sustainPedalKeys ? 1 : 0, 0);
         
+        //keysave.setProperty(ptagKeymap_extendRange, rangeExtend, 0);
+        keysave.setProperty(ptagKeymap_asymmetricalWarp, asym_k, 0);
+        keysave.setProperty(ptagKeymap_symmetricalWarp, sym_k, 0);
+        keysave.setProperty(ptagKeymap_scale, scale, 0);
+        keysave.setProperty(ptagKeymap_offset, offset, 0);
+        keysave.setProperty(ptagKeymap_velocityInvert, velocityInvert ? 1 : 0, 0);
+        
         keysave.setProperty(ptagKeymap_defaultSelected, defaultSelected, 0);
         
         keysave.setProperty(ptagKeymap_onscreenSelected, onscreenSelected, 0);
@@ -261,15 +268,26 @@ public:
                 keymap.setUnchecked(attr.getIntValue(), true);
             }
         }
+
+        // If the xml is old enough to not have targetStates saved these should be set to true
+        targetStates.setUnchecked(TargetTypeSynchronic, true);
+        targetStates.setUnchecked(TargetTypeNostalgic, true);
         for (int i = 0; i < TargetTypeNil; ++i)
         {
             String attr = e->getStringAttribute(ptagKeymap_targetStates + String(i));
             
             if (attr != String())
             {
-                targetStates.setUnchecked(i, (KeymapTargetState) attr.getIntValue());
+                // Because this used to be an enum, both 0 and 2 are false and only 1 is true
+                targetStates.setUnchecked(i, attr.getIntValue() == 1);
             }
         }
+        // These should always be true regardless of what has been saved
+        // (until we add other targets to these)
+        targetStates.setUnchecked(TargetTypeDirect, true);
+        targetStates.setUnchecked(TargetTypeTempo, true);
+        targetStates.setUnchecked(TargetTypeTuning, true);
+        targetStates.setUnchecked(TargetTypeResonance, true);
         
         inverted = e->getStringAttribute(ptagKeymap_inverted).getIntValue();
         
@@ -333,6 +351,14 @@ public:
         setAllNotesOff((bool) e->getIntAttribute(ptagKeymap_endKeystrokes, 0));
         setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
         setSustainPedalKeys((bool) e->getIntAttribute(ptagKeymap_sustainPedalKeys, 0));
+        
+        // Not sure what value the second argument needs to be. Right now I'm using the default values, but these are the values that bK uses for velocity curving before the view controller is opened and the values update to what they were saved to be.
+        //rangeExtend = (float) e->getDoubleAttribute(ptagKeymap_extendRange, 4);
+        asym_k = (float) e->getDoubleAttribute(ptagKeymap_asymmetricalWarp, 1);
+        sym_k = (float) e->getDoubleAttribute(ptagKeymap_symmetricalWarp, 1);
+        scale = (float) e->getDoubleAttribute(ptagKeymap_scale, 1);
+        offset = (float) e->getDoubleAttribute(ptagKeymap_offset, 0);
+        velocityInvert = (bool) e->getIntAttribute(ptagKeymap_velocityInvert, 0);
 
         setDefaultSelected((bool) e->getIntAttribute(ptagKeymap_defaultSelected, 1));
         setOnscreenSelected((bool) e->getIntAttribute(ptagKeymap_onscreenSelected, 1));
@@ -340,9 +366,8 @@ public:
     
     inline Array<bool> getKeymap(void) const noexcept { return keymap; }
     
-    inline KeymapTargetState getTargetState(KeymapTargetType type) const noexcept { return targetStates[type]; }
-    inline Array<KeymapTargetState> getTargetStates(void) const noexcept { return targetStates; }
-    inline void setTargetStates(Array<KeymapTargetState> ts) { targetStates = ts; }
+    inline const Array<bool>& getTargetStates(void) const noexcept { return targetStates; }
+    inline void setTargetStates(Array<bool> ts) { targetStates = ts; }
     
     inline bool isInverted(void) const noexcept { return inverted; }
     inline void setInverted(bool inv) { inverted = inv; }
@@ -377,15 +402,7 @@ public:
     inline bool isOnscreenSelected() { return onscreenSelected; }
     void setOnscreenSelected(bool selected);
     
-    void setTarget(KeymapTargetType target, KeymapTargetState state);
-    void toggleTarget(KeymapTargetType target);
-    void enableTarget(KeymapTargetType target);
-    void disableTarget(KeymapTargetType target);
-    void addTarget(KeymapTargetType target);
-    void addTarget(KeymapTargetType target, KeymapTargetState state);
-    void removeTarget(KeymapTargetType target);
-    void removeTargetsOfType(BKPreparationType type);
-    void clearTargets(void);
+    void setTarget(KeymapTargetType target, bool state);
     
     inline String getName(void) const noexcept {return name;}
     inline void setName(String newName) {name = newName;}
@@ -557,6 +574,8 @@ public:
 
     void defaultHarmonizations();
     void clearHarmonizations();
+    
+    float applyVelocityCurve(float velocity);
 
     /*
     inline bool getHarmonizerEnabled() { return harmonizerEnabled; }
@@ -581,13 +600,37 @@ public:
     inline void setSustainPedalKeys(bool toSet) { sustainPedalKeys = toSet; }
     inline void toggleSustainPedalKeys() { sustainPedalKeys = !sustainPedalKeys; }
     
+    // Velocity Curving getters & setters
+    //inline float getRangeExtend() { return rangeExtend; }
+    inline float getAsym_k() { return asym_k; }
+    inline float getSym_k() { return sym_k; }
+    inline float getScale() { return scale; }
+    inline float getOffset() { return offset; }
+    inline bool getVelocityInvert() { return velocityInvert; }
+    inline bool didVelocitiesChange() { return velocitiesChanged; }
+    
+    //inline void setRangeExtend(float newRangeExtend) { rangeExtend = newRangeExtend; }
+    inline void setAsym_k(float newAsym_k) { asym_k = newAsym_k; }
+    inline void setSym_k(float newSym_k) { sym_k = newSym_k; }
+    inline void setScale(float newScale) { scale = newScale; }
+    inline void setOffset(float newOffset) { offset = newOffset; }
+    inline void setVelocityInvert(bool newVelocityInvert) { velocityInvert = newVelocityInvert; }
+    inline void setVelocitiesChanged(bool newVelocitiesChanged) { velocitiesChanged = newVelocitiesChanged; }
+    
+    // Velocity list handling - for velocity curve graph
+    inline void addVelocity(int note, float toAdd)
+    { velocities.insert(std::pair<int, float>(note, toAdd)); setVelocitiesChanged(true); }
+    inline void removeVelocity(int note)
+    { velocities.erase(note); setVelocitiesChanged(true);  }
+    inline std::map<int, float>& getVelocities() { return velocities; }
+    
 private:
     BKAudioProcessor& processor;
     int Id;
     String name;
     Array<bool> keymap;
     
-    Array<KeymapTargetState> targetStates;
+    Array<bool> targetStates;
     
     // Use midi input to edit active keys 
     bool midiEdit;
@@ -611,6 +654,16 @@ private:
     int harKey;
     int harPreTranspose;
     int harPostTranspose;
+    
+    // Velocity Curving Params - initalized to default values in the constructors
+    //float rangeExtend;
+    float asym_k;
+    float sym_k;
+    float scale;
+    float offset;
+    bool velocityInvert;
+    std::map<int, float> velocities;
+    bool velocitiesChanged = false;
 
     bool ignoreSustain;
     

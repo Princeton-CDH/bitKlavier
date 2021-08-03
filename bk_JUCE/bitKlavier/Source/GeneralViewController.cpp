@@ -269,6 +269,7 @@ void GeneralViewController::update(void)
     
     A4tuningReferenceFrequencySlider->setValue(gen->getTuningFundamental(), dontSendNotification);
     tempoMultiplierSlider->setValue(gen->getTempoMultiplier(), dontSendNotification);
+    noteOnSetsNoteOffVelocityB.setToggleState(gen->getNoteOnSetsNoteOffVelocity(), dontSendNotification);
     invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
 }
 

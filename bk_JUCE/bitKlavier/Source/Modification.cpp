@@ -71,41 +71,7 @@ void DirectModification::setState(XmlElement* e)
         {
             // comes in as "soundfont.sf2.subsound1"
             String name = dSoundSetName.value;
-            BKSampleLoadType type;
-            String path;
-            int subsound = 0;
-            
-            for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
-            {
-                if (name == String(cBKSampleLoadTypes[i]))
-                {
-                    type = (BKSampleLoadType) i;
-                }
-            }
-            
-            String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
-            for (auto sf : processor.soundfontNames)
-            {
-                if (sf.contains(sfName))
-                {
-                    type = BKLoadSoundfont;
-                    path = sf;
-                    subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
-                    break;
-                }
-            }
-            
-            
-            for (auto cs : processor.customSampleSetNames)
-            {
-                if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
-                {
-                    type = BKLoadCustom;
-                    path = cs;
-                    break;
-                }
-            }
-            int Id = processor.loadSamples(type, path, subsound, false);
+            int Id = processor.findPathAndLoadSamples(name);
             setSoundSet(Id);
         }
     }
@@ -250,41 +216,7 @@ void SynchronicModification::setState(XmlElement* e)
         {
             // comes in as "soundfont.sf2.subsound1"
             String name = sSoundSetName.value;
-            BKSampleLoadType type;
-            String path;
-            int subsound = 0;
-            
-            for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
-            {
-                if (name == String(cBKSampleLoadTypes[i]))
-                {
-                    type = (BKSampleLoadType) i;
-                }
-            }
-            
-            String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
-            for (auto sf : processor.soundfontNames)
-            {
-                if (sf.contains(sfName))
-                {
-                    type = BKLoadSoundfont;
-                    path = sf;
-                    subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
-                    break;
-                }
-            }
-            
-            
-            for (auto cs : processor.customSampleSetNames)
-            {
-                if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
-                {
-                    type = BKLoadCustom;
-                    path = cs;
-                    break;
-                }
-            }
-            int Id = processor.loadSamples(type, path, subsound, false);
+            int Id = processor.findPathAndLoadSamples(name);
             setSoundSet(Id);
         }
     }
@@ -527,41 +459,7 @@ void NostalgicModification::setState(XmlElement* e)
         {
             // comes in as "soundfont.sf2.subsound1"
             String name = nSoundSetName.value;
-            BKSampleLoadType type;
-            String path;
-            int subsound = 0;
-            
-            for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
-            {
-                if (name == String(cBKSampleLoadTypes[i]))
-                {
-                    type = (BKSampleLoadType) i;
-                }
-            }
-            
-            String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
-            for (auto sf : processor.soundfontNames)
-            {
-                if (sf.contains(sfName))
-                {
-                    type = BKLoadSoundfont;
-                    path = sf;
-                    subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
-                    break;
-                }
-            }
-            
-            
-            for (auto cs : processor.customSampleSetNames)
-            {
-                if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
-                {
-                    type = BKLoadCustom;
-                    path = cs;
-                    break;
-                }
-            }
-            int Id = processor.loadSamples(type, path, subsound, false);
+            int Id = processor.findPathAndLoadSamples(name);
             setSoundSet(Id);
         }
     }
@@ -745,41 +643,7 @@ void ResonanceModification::setState(XmlElement* e)
         {
             // comes in as "soundfont.sf2.subsound1"
             String name = rSoundSetName.value;
-            BKSampleLoadType type;
-            String path;
-            int subsound = 0;
-            
-            for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
-            {
-                if (name == String(cBKSampleLoadTypes[i]))
-                {
-                    type = (BKSampleLoadType) i;
-                }
-            }
-            
-            String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
-            for (auto sf : processor.soundfontNames)
-            {
-                if (sf.contains(sfName))
-                {
-                    type = BKLoadSoundfont;
-                    path = sf;
-                    subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
-                    break;
-                }
-            }
-            
-            
-            for (auto cs : processor.customSampleSetNames)
-            {
-                if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
-                {
-                    type = BKLoadCustom;
-                    path = cs;
-                    break;
-                }
-            }
-            int Id = processor.loadSamples(type, path, subsound, false);
+            int Id = processor.findPathAndLoadSamples(name);
             setSoundSet(Id);
         }
     }

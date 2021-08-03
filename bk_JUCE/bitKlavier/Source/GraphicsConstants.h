@@ -43,7 +43,6 @@ extern int gComponentSingleSliderHeight;
 extern int gComponentStackedSliderHeight;
 
 extern int gComponentToggleBoxHeight;
-
 #else
 static const int fontHeight = 15;
 
@@ -105,7 +104,7 @@ static const std::string gMidiEditShortcut = " (CMD+E)";
 static const std::string gUndoShortcut = " (CMD+Z)";
 static const std::string gRedoShortcut = " (CMD+SHIFT+Z)";
 static const std::string gAllOffShortcut = " (Space)";
-#elif JUCE_WINDOWS
+#elif JUCE_WINDOWS || JUCE_LINUX
 static const std::string gKeymapShortcut = " (K)";
 static const std::string gDirectShortcut = " (D)";
 static const std::string gNostalgicShortcut = " (N)";

@@ -43,6 +43,17 @@ keymaps(Keymap::PtrArr())
         atDeltaHistory.insert(0, (tempo->prep->getAdaptiveTempo1Subdivisions() * 60000.0/tempo->prep->getTempo()));
     }
     adaptiveTempoPeriodMultiplier = 1.;
+    
+    for (int j = 0; j < 128; j++)
+    {
+        velocities.add(Array<float>());
+        invertVelocities.add(Array<float>());
+        for (int i = 0; i < TargetTypeNil; ++i)
+        {
+            velocities.getReference(j).add(-1.f);
+            invertVelocities.getReference(j).add(-1.f);
+        }
+    }
 }
 
 TempoProcessor::~TempoProcessor()
@@ -54,14 +65,58 @@ void TempoProcessor::processBlock(int numSamples, int channel)
     atTimer += numSamples;
 }
 
-void TempoProcessor::keyPressed(int noteNumber, float velocity)
+void TempoProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an actual key press (not an inverted release) aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
+    {
+        aVels = bVels = &velocities.getReference(noteNumber);
+        for (int i = TargetTypeTempo; i < TargetTypeTempo+1; ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
+        }
+    }
+    // If this an inverted release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last inverted press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = &invertVelocities.getReference(noteNumber);
+    }
+    
+    if (bVels->getUnchecked(TargetTypeTempo) < 0.f) return;
+    
     DBG("adding adaptive tempo note" + String(noteNumber));
     atNewNote();
 }
 
-void TempoProcessor::keyReleased(int noteNumber, int channel)
+void TempoProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
+    // aVels will be used for velocity calculations; bVels will be used for conditionals
+    Array<float> *aVels, *bVels;
+    // If this is an inverted key press, aVels and bVels are the same
+    // We'll save and use the incoming velocity values
+    if (fromPress)
+    {
+        aVels = bVels = &invertVelocities.getReference(noteNumber);
+        for (int i = TargetTypeTempo; i < TargetTypeTempo+1; ++i)
+        {
+            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
+        }
+    }
+    // If this an actual release, aVels will be the incoming velocities,
+    // but bVels will use the values from the last press (keyReleased with fromPress=true)
+    else
+    {
+        aVels = &targetVelocities;
+        bVels = &velocities.getReference(noteNumber);
+    }
+    
+    if (bVels->getUnchecked(TargetTypeTempo) < 0.f) return;
+    
     atNewNoteOff();
 }
 

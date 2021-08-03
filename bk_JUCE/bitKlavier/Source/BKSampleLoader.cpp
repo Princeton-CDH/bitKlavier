@@ -98,7 +98,6 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
         else
         {
             File file (soundfont);
-            
             loadSoundfontFromFile(file);
         }
     }
@@ -156,17 +155,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.mainPianoSynth;
     
-    File bkSamples;
-    
-#if JUCE_IOS
-    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#endif
-#if JUCE_MAC
-    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
-#endif
-#if JUCE_LINUX || JUCE_WINDOWS
-    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
-#endif
+    File bkSamples = processor.getDefaultSamplesPath();
     
     int numLayers = 0;
     
@@ -174,6 +163,15 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
     else if (type == BKLoadLite)        numLayers = 2;
     else if (type == BKLoadMedium)      numLayers = 4;
     else if (type == BKLoadHeavy)       numLayers = 8;
+
+#if JUCE_IOS
+    memoryMappingEnabled = true;
+#endif
+    
+    if (memoryMappingEnabled)
+    {
+        DBG("DOING MEMORY MAPPING");
+    }
     
     for (int i = 0; i < 8; i++) {
         for (int j = 0; j < 4; j++) {
@@ -228,7 +226,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                     
                     BigInteger noteRange;
                     
-                    int root = (12 * i) + noteNameToRoot(bkNotes[j]) + 12;
+                    int root = (12 * i) + noteNameToRoot(bkNotes[j]);
                     if (i == 7 && j == 3) noteRange.setRange(root-1, 5, true); //High A
                     else noteRange.setRange(root-1, 3, true);
                     
@@ -323,17 +321,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.resonanceReleaseSynth;
     
-    File bkSamples;
-    
-#if JUCE_IOS
-    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#endif
-#if JUCE_MAC
-    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
-#endif
-#if JUCE_LINUX || JUCE_WINDOWS
-    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
-#endif
+    File bkSamples = processor.getDefaultSamplesPath();
     
     //load release resonance samples
     for (int i = 0; i < 7; i++) {       //i => octave
@@ -356,6 +344,19 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                 File file(bkSamples.getChildFile(temp));
                 FileInputStream inputStream(file);
                 
+                // If the old name format didn't open try the new one
+                if (!inputStream.openedOk())
+                {
+                    temp = "harm";
+                    temp += bkNotes[j];
+                    temp += String(i);
+                    temp += "v" + String(k+1);
+                    temp += ".wav";
+                    //File file(temp);
+                    File file(bkSamples.getChildFile(temp));
+                    FileInputStream inputStream(file);
+                }
+                
                 if (inputStream.openedOk()) {
                     
                     String soundName = file.getFileName();
@@ -372,27 +373,10 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                     
                     //keymap assignment
                     BigInteger noteRange;
-                    int root = 0;
-                    if (j == 0)
-                    {
-                        root = (9+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    }
-                    else if (j == 1)
-                    {
-                        root = (0+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    }
-                    else if (j == 2)
-                    {
-                        root = (3+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    }
-                    else if (j == 3)
-                    {
-                        root = (6+12*i) + 12;
-                        noteRange.setRange(root-1,3,true);
-                    }
+                    
+                    int root = (12 * i) + noteNameToRoot(bkNotes[j]);
+                    if (i == 7 && j == 3) noteRange.setRange(root-1, 5, true); //High A
+                    else noteRange.setRange(root-1, 3, true);
                     
                     //velocity switching
                     BigInteger velocityRange;
@@ -468,17 +452,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.hammerReleaseSynth;
-    File bkSamples;
     
-#if JUCE_IOS
-    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#endif
-#if JUCE_MAC
-    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
-#endif
-#if JUCE_WINDOWS || JUCE_LINUX
-    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
-#endif
+    File bkSamples = processor.getDefaultSamplesPath();
     
     //load hammer release samples
     for (int i = 1; i <= 88; i++) {
@@ -576,17 +551,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
 {
     WavAudioFormat wavFormat;
     BKSynthesiser* synth = &processor.pedalSynth;
-    File bkSamples;
     
-#if JUCE_IOS
-    bkSamples = bkSamples.getSpecialLocation(File::invokedExecutableFile).getParentDirectory().getChildFile("samples");
-#endif
-#if JUCE_MAC
-    bkSamples = bkSamples.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("samples");
-#endif
-#if JUCE_WINDOWS || JUCE_LINUX
-    bkSamples = bkSamples.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("samples");
-#endif
+    File bkSamples = processor.getDefaultSamplesPath();
     
     //load pedal release samples
     for (int i = 0; i < 4; i++) {
@@ -597,7 +563,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
         else if(i==1) temp = "pedalD2.wav";
         else if(i==2) temp = "pedalU1.wav";
         else if(i==3) temp = "pedalU2.wav";
-        
         
         //File file(temp);
         File file(bkSamples.getChildFile(temp));
@@ -704,7 +669,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     if      (ext == ".sf2")
     {
         isSF2 = true;
-        sf2sound   = new sfzero::SF2Sound(sfzFile);
+        sf2sound = new sfzero::SF2Sound(sfzFile);
         
         sf2sound->loadRegions(loadingInstrument);
         sf2sound->loadSamples(&formatManager);
@@ -786,7 +751,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         //        for (int i = 0; i < destBuffer->getNumChannels(); i++)
         //            destBuffer->copyFrom(i, 0, sourceBuffer->getReadPointer(i, (int)sampleStart), (int)sampleLength);
         
-        
         // WEIRD thing where sample metadata defines loop point instead of the sfz format
         if (!isSF2 && (region->loop_mode == 0))
         {
@@ -836,15 +800,11 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                 nrange,
                                 region->pitch_keycenter,
                                 region->transpose,
-                                vrange, n, processor.regions.size(),
+                                vrange, n, 1,
                                 dBFSBelow, region);
-       
-        DBG("NEW LAYER NUM = " + String(n));
-        DBG("NEW NUM LAYERS = " + String(processor.regions.size()));
         dBFSBelow = newSound->getDBFSLevel();
-        //dBFSBelow = newSound->getDBFSLevel() > dBFSBelow ? newSound->getDBFSLevel() : 0.f;
         synth->addSound(loadingSoundSetId, newSound);
-        n++;
+//        n++;
     }
     
     processor.didLoadMainPianoSamples = true;
@@ -877,6 +837,15 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
     std::regex harmReg("\\bharm[ABCDEFG]#*b*\\dv\\d+\\b");
     std::regex relReg("\\brel\\d+\\b");
     std::regex pedalReg("\\bpedal[DU]\\d+\\b");
+
+#if JUCE_IOS
+    memoryMappingEnabled = true;
+#endif
+    
+    if (memoryMappingEnabled)
+    {
+        DBG("DOING MEMORY MAPPING");
+    }
     
     for (auto iter : RangedDirectoryIterator (File (samples), false, "*.wav"))
     {
@@ -948,7 +917,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                         MemoryMappedAudioFormatReader* memoryMappedReader = nullptr;
                         if (memoryMappingEnabled)
                         {
+                            DBG("DOING MEMORY MAPPING on " + soundName);
                             memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+                            //if(memoryMappedReader == nullptr) continue;
                         }
                         else
                         {
@@ -977,6 +948,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                         
                         if (memoryMappingEnabled)
                         {
+                            DBG("DOING MORE MEMORY MAPPING on " + soundName);
                             double sourceSampleRate = memoryMappedReader->sampleRate;
                             uint64 maxLength;
                             if (sourceSampleRate <= 0 || memoryMappedReader->lengthInSamples <= 0) {
@@ -1162,6 +1134,118 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                     }
                 }
                 if (layerFoundForNote) noteCount++;
+            }
+        }
+    }
+    else
+    {
+        // Just to make sure we can open the old file name format
+        for (int i = 0; i < 7; i++) {       //i => octave
+            for (int j = 0; j < 4; j++) {   //j => note name
+                float dBFSBelow = -100.f;
+                for (int k = 0; k < 3; k++) //k => velocity layer
+                {
+                    EXIT_CHECK;
+                    String temp;
+                    temp += "harm";
+                    if(k==0) temp += "V3";
+                    else if(k==1) temp += "S";
+                    else if(k==2) temp += "L";
+                    temp += bkNotes[j];
+                    temp += String(i);
+                    temp += ".wav";
+                    
+                    //File file(temp);
+                    File file(samples.getChildFile(temp));
+                    FileInputStream inputStream(file);
+                    
+                    if (inputStream.openedOk()) {
+                        
+                        String soundName = file.getFileName();
+                        
+                        MemoryMappedAudioFormatReader* memoryMappedReader;
+                        if (memoryMappingEnabled)
+                        {
+                            memoryMappedReader = wavFormat.createMemoryMappedReader(new FileInputStream(file));
+                        }
+                        else
+                        {
+                            sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
+                        }
+                        
+                        //keymap assignment
+                        BigInteger noteRange;
+                        
+                        int root = (12 * i) + noteNameToRoot(bkNotes[j]);
+                        if (i == 7 && j == 3) noteRange.setRange(root-1, 5, true); //High A
+                        else noteRange.setRange(root-1, 3, true);
+                        
+                        //velocity switching
+                        BigInteger velocityRange;
+                        velocityRange.setRange(aResonanceVelocityThresh[k], (aResonanceVelocityThresh[k+1] - aResonanceVelocityThresh[k]), true);
+                        
+                        //load the sample, add to synth
+                        if (memoryMappingEnabled)
+                        {
+                            double sourceSampleRate = memoryMappedReader->sampleRate;
+                            uint64 maxLength;
+                            if (sourceSampleRate <= 0 || memoryMappedReader->lengthInSamples <= 0) {
+                                maxLength = 0;
+                                
+                            } else {
+                                maxLength = jmin((uint64)memoryMappedReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                                if (memoryMappedReader->mapEntireFile())
+                                {
+                                    BKPianoSamplerSound* newSound =
+                                    new BKPianoSamplerSound(soundName, memoryMappedReader,
+                                                            maxLength, sourceSampleRate,
+                                                            noteRange, root,
+                                                            0, velocityRange,
+                                                            k+1, 3,
+                                                            dBFSBelow);
+                                    dBFSBelow = newSound->getDBFSLevel();
+                                    resSynth->addSound(loadingSoundSetId, newSound);
+                                }
+                                else DBG("File mapping failed");
+                            }
+                        }
+                        else
+                        {
+                            double sourceSampleRate = sampleReader->sampleRate;
+                            const int numChannels = sampleReader->numChannels;
+                            uint64 maxLength;
+                            
+                            if (sourceSampleRate <= 0 || sampleReader->lengthInSamples <= 0)
+                            {
+                                maxLength = 0;
+                            }
+                            else
+                            {
+                                maxLength = jmin((uint64)sampleReader->lengthInSamples, (uint64) (aMaxSampleLengthSec * sourceSampleRate));
+                                
+                                BKReferenceCountedBuffer::Ptr newBuffer = new BKReferenceCountedBuffer(file.getFileName(),jmin(2, numChannels), (int)maxLength);
+                                sampleReader->read(newBuffer->getAudioSampleBuffer(), 0, (int)sampleReader->lengthInSamples, 0, true, true);
+                                BKPianoSamplerSound* newSound =
+                                new BKPianoSamplerSound(soundName, newBuffer,
+                                                        maxLength, sourceSampleRate,
+                                                        noteRange, root,
+                                                        0, velocityRange,
+                                                        k+1, 3,
+                                                        dBFSBelow);
+                                dBFSBelow = newSound->getDBFSLevel();
+                                resSynth->addSound(loadingSoundSetId, newSound);
+                            }
+                        }
+                        
+                        processor.progress += progressInc;
+                        //DBG(soundName+": " + String(processor.progress));
+                    }
+                    else
+                    {
+                        
+                        DBG("File not found: " + temp);
+                    }
+                }
             }
         }
     }
@@ -1380,6 +1464,7 @@ SampleTouchThread::~SampleTouchThread() {}
 
 void SampleTouchThread::run()
 {
+    
     while (!threadShouldExit())
     {
         for (auto voice : processor.mainPianoSynth.getVoices())

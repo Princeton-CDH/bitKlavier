@@ -409,7 +409,7 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
 
-    // startTimer(30);
+    startTimer(10);
 }
 
 void ResonancePreparationEditor::update()
@@ -519,6 +519,48 @@ void ResonancePreparationEditor::fillSelectCB(int last, int current)
 
 void ResonancePreparationEditor::timerCallback()
 {
+    if (processor.updateState->currentDisplay == DisplayResonance)
+    {
+        ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
+        ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+        
+        if (prep != nullptr && proc != nullptr)
+        {
+            if (prep->rDefaultGain.didChange())
+                defGainSlider->setValue(prep->rDefaultGain.value, dontSendNotification);
+            if (prep->rBlendronicGain.didChange())
+                blendGainSlider->setValue(prep->rBlendronicGain.value, dontSendNotification);
+            
+            if (prep->rAttack.didChange())
+                ADSRSlider->setAttackValue(prep->rAttack.value, dontSendNotification);
+            if (prep->rDecay.didChange())
+                ADSRSlider->setDecayValue(prep->rDecay.value, dontSendNotification);
+            if (prep->rSustain.didChange())
+                ADSRSlider->setSustainValue(prep->rSustain.value, dontSendNotification);
+            if (prep->rRelease.didChange())
+                ADSRSlider->setReleaseValue(prep->rRelease.value, dontSendNotification);
+            
+            if (prep->rMaxSympStrings.didChange())
+                maxSympStringsSlider->setValue(prep->rMaxSympStrings.value, dontSendNotification);
+            if (prep->rMinStartTimeMS.didChange())
+                startTimeSlider->setMinValue(prep->rMinStartTimeMS.value, dontSendNotification);
+            if (prep->rMaxStartTimeMS.didChange())
+                startTimeSlider->setMaxValue(prep->rMaxStartTimeMS.value, dontSendNotification);
+            
+            if (prep->rFundamentalKey.didChange()) fundamentalKeyboard->setKeysInKeymap(prep->rFundamentalKey.value);
+            if (prep->rResonanceKeys.didChange())
+            {
+                closestKeyboard->setKeysInKeymap(prep->rResonanceKeys.value);
+                offsetsKeyboard.setKeys(prep->getResonanceKeys());
+                gainsKeyboard.setKeys(prep->getResonanceKeys());
+            }
+            if (prep->rOffsetsKeys.didChange())
+                offsetsKeyboard.setValues(prep->getOffsets());
+            if (prep->rGainsKeys.didChange())
+                gainsKeyboard.setValues(prep->getGains());
+            
+        }
+    }
 //    Resonance::Ptr rs = processor.gallery->getResonance(processor.updateState->currentId);
 //
 //    DBG("Ringing: " + rs->getRinging());
