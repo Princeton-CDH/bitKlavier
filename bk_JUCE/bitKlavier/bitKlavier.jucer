@@ -353,8 +353,6 @@
                 file="Source/PreparationMap.h"/>
         </GROUP>
         <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparation">
-          <FILE id="wmmE7F" name="Resonance.cpp" compile="1" resource="0" file="Source/Resonance.cpp"/>
-          <FILE id="BSwyXC" name="Resonance.h" compile="0" resource="0" file="Source/Resonance.h"/>
           <FILE id="VFgtPR" name="Modification.cpp" compile="1" resource="0"
                 file="Source/Modification.cpp"/>
           <FILE id="xHx6az" name="Modification.h" compile="0" resource="0" file="Source/Modification.h"/>
@@ -364,6 +362,8 @@
           <FILE id="QU7LbV" name="Nostalgic.h" compile="0" resource="0" file="Source/Nostalgic.h"/>
           <FILE id="O8HjWt" name="Synchronic.cpp" compile="1" resource="0" file="Source/Synchronic.cpp"/>
           <FILE id="FXpKMX" name="Synchronic.h" compile="0" resource="0" file="Source/Synchronic.h"/>
+          <FILE id="wmmE7F" name="Resonance.cpp" compile="1" resource="0" file="Source/Resonance.cpp"/>
+          <FILE id="BSwyXC" name="Resonance.h" compile="0" resource="0" file="Source/Resonance.h"/>
           <FILE id="yrfH9O" name="Blendronic.cpp" compile="1" resource="0" file="Source/Blendronic.cpp"/>
           <FILE id="FFCWE6" name="Blendronic.h" compile="0" resource="0" file="Source/Blendronic.h"/>
           <FILE id="ac8QzA" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
