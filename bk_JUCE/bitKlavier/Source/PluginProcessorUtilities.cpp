@@ -259,6 +259,7 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     {
         return gallery->getDirectModification(Id)->getState();
     }
+    
     else if (type == PreparationTypeNostalgic)
     {
         return gallery->getNostalgic(Id)->getState(true);
@@ -267,6 +268,7 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     {
         return gallery->getNostalgicModification(Id)->getState();
     }
+    
     else if (type == PreparationTypeSynchronic)
     {
         return gallery->getSynchronic(Id)->getState(true);
@@ -275,10 +277,7 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     {
         return gallery->getSynchronicModification(Id)->getState();
     }
-    else if (type == PreparationTypeResonance)
-    {
-        return gallery->getResonance(Id)->getState(true);
-    }
+    
     else if (type == PreparationTypeBlendronic)
     {
         return gallery->getBlendronic(Id)->getState(true);
@@ -287,6 +286,16 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     {
         return gallery->getBlendronicModification(Id)->getState();
     }
+    
+    else if (type == PreparationTypeResonance)
+    {
+        return gallery->getResonance(Id)->getState(true);
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        return gallery->getResonanceModification(Id)->getState();
+    }
+    
     else if (type == PreparationTypeTuning)
     {
         return gallery->getTuning(Id)->getState(true);
@@ -295,6 +304,7 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     {
         return gallery->getTuningModification(Id)->getState();
     }
+    
     else if (type == PreparationTypeTempo)
     {
         return gallery->getTempo(Id)->getState(true);
@@ -303,6 +313,7 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     {
         return gallery->getTempoModification(Id)->getState();
     }
+    
     else if (type == PreparationTypeKeymap)
     {
         return gallery->getKeymap(Id)->getState();
@@ -371,7 +382,6 @@ void BKAudioProcessor::setPreparationState(BKPreparationType type, int Id, XmlEl
         prep->setId(Id);
     }
      
-    /*
     else if (type == PreparationTypeResonanceMod)
     {
         ResonanceModification::Ptr prep = gallery->getResonanceModification(Id);
@@ -380,7 +390,7 @@ void BKAudioProcessor::setPreparationState(BKPreparationType type, int Id, XmlEl
         prep->setName(name);
         prep->setId(Id);
     }
-     */
+     
     else if (type == PreparationTypeBlendronic)
     {
         Blendronic::Ptr prep = gallery->getBlendronic(Id);
@@ -598,6 +608,11 @@ void BKAudioProcessor::importPiano(int Id, int importId)
             newId = gallery->addCopy(PreparationTypeSynchronic, sub);
             type = PreparationTypeSynchronic;
         }
+        else if (tag == vtagBlendronic)
+        {
+            newId = gallery->addCopy(PreparationTypeBlendronic, sub);
+            type = PreparationTypeBlendronic;
+        }
         else if (tag == vtagResonance)
         {
             newId = gallery->addCopy(PreparationTypeResonance, sub);
@@ -628,6 +643,16 @@ void BKAudioProcessor::importPiano(int Id, int importId)
             newId = gallery->addCopy(PreparationTypeSynchronicMod, sub);
             type = PreparationTypeSynchronicMod;
         }
+        else if (tag == vtagModBlendronic)
+        {
+            newId = gallery->addCopy(PreparationTypeBlendronicMod, sub);
+            type = PreparationTypeBlendronicMod;
+        }
+        else if (tag == vtagModResonance)
+        {
+            newId = gallery->addCopy(PreparationTypeResonanceMod, sub);
+            type = PreparationTypeResonanceMod;
+        }
         else if (tag == vtagModTempo)
         {
             newId = gallery->addCopy(PreparationTypeTempoMod, sub);
@@ -642,16 +667,6 @@ void BKAudioProcessor::importPiano(int Id, int importId)
         {
             newId = gallery->addCopy(PreparationTypeKeymap, sub);
             type = PreparationTypeKeymap;
-        }
-        else if (tag == vtagBlendronic)
-        {
-            newId = gallery->addCopy(PreparationTypeBlendronic, sub);
-            type = PreparationTypeBlendronic;
-        }
-        else if (tag == vtagModBlendronic)
-        {
-            newId = gallery->addCopy(PreparationTypeBlendronicMod, sub);
-            type = PreparationTypeBlendronicMod;
         }
         else continue;
         

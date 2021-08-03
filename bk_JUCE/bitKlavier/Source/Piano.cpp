@@ -167,7 +167,6 @@ void Piano::configure(void)
         BKPreparationType type = item->getType();
         int Id = item->getId();
         
-        //TODO: figure out connecting blendronic
         // Connect keymaps to everything
         // Connect tunings, tempos, synchronics to preparations
         // Connect mods and resets to all their targets
@@ -184,7 +183,7 @@ void Piano::configure(void)
                 BKPreparationType targetType = target->getType();
                 int targetId = target->getId();
                 
-                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo) || targetType == PreparationTypeBlendronic || targetType == PreparationTypeResonance)
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo))
                 {
                     // DBG(String(targetType) + " linked with keymap");
                     linkPreparationWithKeymap(targetType, targetId, Id);
@@ -250,22 +249,16 @@ void Piano::configure(void)
 				int targetId = target->getId();
 
                 if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) ||
-                    targetType == PreparationTypeBlendronicMod)
+                    targetType == PreparationTypeResonance)
 				{
 					linkPreparationWithBlendronic(targetType, targetId, processor.gallery->getBlendronic(Id));
 				}
 			}
 		}
-        else if (type == PreparationTypeResonance)
-        {
-            //might not be neeeded?  Tuning and keymap are already covered
-        }
         
         // These three cases used to be handling in the keymap case as keymap connections, but
         // they handle all connected keymaps internally so that was redundant. Should be fine here.
-        else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod)
-                 || type == PreparationTypeBlendronicMod
-                 || type == PreparationTypeResonanceMod )
+        else if (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod)
         {
             configureModification(item);
         }
@@ -623,12 +616,6 @@ void Piano::linkPreparationWithBlendronic(BKPreparationType thisType, int thisId
         rproc->addBlendronic(bproc);
     }
 }
-
-/* might not be necessary?
-void Piano::linkPreparationwithResonance(BKPreparationType thisType, int thisId, Resonance::Ptr thisRes)
-{
-}
-*/
 
 void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, int keymapId)
 {
@@ -1245,7 +1232,7 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap, int* id
             if (item->getTagName() == "item")
             {
                 i = item->getStringAttribute("type").getIntValue();
-                BKPreparationType type = (BKPreparationType) i;
+                BKPreparationType type = cPreparationIdToType[i];
                 
                 if (type == PreparationTypeComment)
                 {
@@ -1333,7 +1320,7 @@ void Piano::setState(XmlElement* e, OwnedArray<HashMap<int,int>>* idmap, int* id
                 for (auto connection : connections->getChildIterator())
                 {
                     i = connection->getStringAttribute("type").getIntValue();
-                    BKPreparationType cType = (BKPreparationType) i;
+                    BKPreparationType cType = cPreparationIdToType[i];
                     
                     i = connection->getStringAttribute("Id").getIntValue();
                     int cId = i;

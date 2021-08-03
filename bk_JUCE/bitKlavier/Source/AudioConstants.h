@@ -314,19 +314,63 @@ typedef enum BKNoteType {
     BKNoteTypeNil,
 } BKNoteType;
 
-static const std::vector<std::string> cNoteTypes = {
-    "SynchronicNote",
-    "NostalgicNote",
-    "DirectNote",
-    "MainNote",
-    "HammerNote",
-    "ResonanceNote",
-    "PedalNote",
-    "NilNote"
-};
+// Ids for saving and loading
+// To maintain compatibility with older galleries,
+// the order of this cannot change (add new preparation at the end),
+// so we'll avoid using this except at saving/loading in Piano
+// and instead use BKPreparationType, which can be freely ordered
+typedef enum BKPreparationId {
+    PreparationIdDirect = 0,
+    PreparationIdSynchronic,
+    PreparationIdNostalgic,
+    PreparationIdTuning,
+    PreparationIdTempo,
+    PreparationIdKeymap,
+    PreparationIdDirectMod,
+    PreparationIdSynchronicMod,
+    PreparationIdNostalgicMod,
+    PreparationIdTuningMod,
+    PreparationIdTempoMod,
+    PreparationIdGenericMod,
+    PreparationIdPianoMap,
+    PreparationIdReset,
+    PreparationIdPiano,
+    PreparationIdComment,
+    PreparationIdBlendronic,
+    PreparationIdBlendronicMod,
+    PreparationIdResonance,
+    PreparationIdResonanceMod,
+    BKPreparationIdNil,
+} BKPreparationId;
 
+// When updating this or the above enum, make sure to update
+// the vectors just below here too
 typedef enum BKPreparationType {
     PreparationTypeDirect = 0,
+    PreparationTypeSynchronic,
+    PreparationTypeNostalgic,
+    PreparationTypeBlendronic,
+    PreparationTypeResonance,
+    PreparationTypeTuning,
+    PreparationTypeTempo,
+    PreparationTypeKeymap,
+    PreparationTypeDirectMod,
+    PreparationTypeSynchronicMod,
+    PreparationTypeNostalgicMod,
+    PreparationTypeBlendronicMod,
+    PreparationTypeResonanceMod,
+    PreparationTypeTuningMod,
+    PreparationTypeTempoMod,
+    PreparationTypeGenericMod,
+    PreparationTypePianoMap,
+    PreparationTypeReset,
+    PreparationTypePiano,
+    PreparationTypeComment,
+    BKPreparationTypeNil
+} BKPreparationType;
+
+static const std::vector<BKPreparationType> cPreparationIdToType = {
+    PreparationTypeDirect,
     PreparationTypeSynchronic,
     PreparationTypeNostalgic,
     PreparationTypeTuning,
@@ -346,21 +390,41 @@ typedef enum BKPreparationType {
     PreparationTypeBlendronicMod,
     PreparationTypeResonance,
     PreparationTypeResonanceMod,
-    BKPreparationTypeNil,
-} BKPreparationType;
+    BKPreparationTypeNil
+};
+
+static const std::vector<BKPreparationId> cPreparationTypeToId = {
+    PreparationIdDirect,
+    PreparationIdSynchronic,
+    PreparationIdNostalgic,
+    PreparationIdBlendronic,
+    PreparationIdResonance,
+    PreparationIdTuning,
+    PreparationIdTempo,
+    PreparationIdKeymap,
+    PreparationIdDirectMod,
+    PreparationIdSynchronicMod,
+    PreparationIdNostalgicMod,
+    PreparationIdBlendronicMod,
+    PreparationIdResonanceMod,
+    PreparationIdTuningMod,
+    PreparationIdTempoMod,
+    PreparationIdGenericMod,
+    PreparationIdPianoMap,
+    PreparationIdReset,
+    PreparationIdPiano,
+    PreparationIdComment,
+    BKPreparationIdNil
+};
 
 inline BKPreparationType modToPrepType(BKPreparationType modType)
 {
-    if (modType == PreparationTypeBlendronicMod) return PreparationTypeBlendronic;
-    if (modType == PreparationTypeResonanceMod) return PreparationTypeResonance;
-    return ((modType >= PreparationTypeDirectMod && modType <= PreparationTypeTempoMod) ? (BKPreparationType)(modType - 6) : BKPreparationTypeNil);
+    return ((modType >= PreparationTypeDirectMod && modType <= PreparationTypeTempoMod) ? (BKPreparationType)(modType - PreparationTypeDirectMod) : BKPreparationTypeNil);
 }
 
 inline BKPreparationType prepToModType(BKPreparationType modType)
 {
-    if (modType == PreparationTypeBlendronic) return PreparationTypeBlendronicMod;
-    if (modType == PreparationTypeResonance) return PreparationTypeResonanceMod;
-    return ((modType >= PreparationTypeDirect && modType <= PreparationTypeTempo) ? (BKPreparationType)(modType + 6) : BKPreparationTypeNil);
+    return ((modType >= PreparationTypeDirect && modType <= PreparationTypeTempo) ? (BKPreparationType)(modType + PreparationTypeDirectMod) : BKPreparationTypeNil);
 }
 
 
@@ -368,67 +432,67 @@ static const std::vector<std::string> cPreparationTypes = {
     "Direct",
     "Synchronic",
     "Nostalgic",
+    "Blendronic",
+    "Resonance",
     "Tuning",
     "Tempo",
     "Keymap",
     "DirectMod",
     "SynchronicMod",
     "NostalgicMod",
+    "BlendronicMod",
+    "ResonanceMod",
     "TuningMod",
     "TempoMod",
     "GenericMod",
     "PianoMap",
     "Reset",
     "Piano",
-    "Comment",
-    "Blendronic",
-    "BlendronicMod",
-    "Resonance",
-    "ResonanceMod"
+    "Comment"
 };
 
 static const std::vector<std::string> cPreparationNames = {
     "Direct",
     "Synchronic",
     "Nostalgic",
+    "Blendronic",
+    "Resonance",
     "Tuning",
     "Tempo",
     "Keymap",
     "Direct Mod",
     "Synchronic Mod",
     "Nostalgic Mod",
+    "Blendronic Mod",
+    "Resonance Mod",
     "Tuning Mod",
     "Tempo Mod",
     "Generic Mod",
     "Piano Map",
     "Reset",
     "Piano",
-    "Comment",
-    "Blendronic",
-    "Blendronic Mod",
-    "Resonance",
-    "Resonance Mod"
+    "Comment"
 };
 
 typedef enum BKPreparationDisplay {
     DisplayDirect = 0,
     DisplaySynchronic,
     DisplayNostalgic,
+    DisplayBlendronic,
+    DisplayResonance,
     DisplayTuning,
     DisplayTempo,
     DisplayKeymap,
     DisplayDirectMod,
     DisplaySynchronicMod,
     DisplayNostalgicMod,
+    DisplayBlendronicMod,
+    DisplayResonanceMod,
     DisplayTuningMod,
     DisplayTempoMod,
     DisplayGeneral,
     DisplayAbout,
     DisplayComment,
-    DisplayBlendronic,
-    DisplayBlendronicMod,
-    DisplayResonance,
-    DisplayResonanceMod,
     DisplayModdable,
     DisplayNil,
 } BKPreparationDisplay;
@@ -439,28 +503,22 @@ static const std::vector<std::string> cDisplayNames = {
     "Direct",
     "Synchronic",
     "Nostalgic",
+    "Blendronic",
+    "Resonance",
     "Tuning",
     "Tempo",
     "Keymap",
     "Direct Mod",
     "Synchronic Mod",
     "Nostalgic Mod",
+    "Blendronic Mod",
+    "Resonance Mod",
     "Tuning Mod",
     "Tempo Mod",
     "General",
     "About",
     "Comment",
-	"Blendronic",
-    "Blendronic Mod",
-    "Resonance",
-    "Resonance Mod"
 };
-
-
-
-
-
-
 
 static const std::vector<std::string> cPianoName = {
     "Piano1",
@@ -1249,10 +1307,12 @@ static const std::vector<std::string> cKeymapTargetTypes = {
     "Pause-Play",
     "Open-Close Input",
     "Open-Close Output",
+    // Resonance
+    "Resonance",
     // Tempo
     "Tempo",
     // Tuning
-    "Tuning"
+    "Tuning",
 };
 
 typedef enum KeymapTargetState

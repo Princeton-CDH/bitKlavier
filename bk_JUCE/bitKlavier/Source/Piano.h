@@ -232,8 +232,6 @@ public:
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
 
 	void linkPreparationWithBlendronic(BKPreparationType thisType, int thisId, Blendronic::Ptr thisBlend);
-
-    //void linkPreparationwithResonance(BKPreparationType thisType, int thisId, Resonance::Ptr thisRes);
     
     ValueTree getState(void);
     

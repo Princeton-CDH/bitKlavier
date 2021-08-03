@@ -277,8 +277,12 @@ String Gallery::iterateName(BKPreparationType type, String name)
     }
 	else if (type == PreparationTypeBlendronic)
 	{
-		for (auto p : blendronic)   if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
+		for (auto p : blendronic) if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
 	}
+    else if (type == PreparationTypeResonance)
+    {
+        for (auto p : resonance) if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
+    }
     else if (type == PreparationTypeKeymap)
     {
         for (auto p : bkKeymaps)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
@@ -289,11 +293,11 @@ String Gallery::iterateName(BKPreparationType type, String name)
     }
     else if (type == PreparationTypeSynchronicMod)
     {
-        for (auto p : modSynchronic)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : modSynchronic) if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
     }
     else if (type == PreparationTypeNostalgicMod)
     {
-        for (auto p : modNostalgic)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : modNostalgic) if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
     }
     else if (type == PreparationTypeTuningMod)
     {
@@ -307,13 +311,9 @@ String Gallery::iterateName(BKPreparationType type, String name)
 	{
 		for (auto p : modBlendronic)   if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
 	}
-    else if (type == PreparationTypeResonance)
-    {
-        for (auto p : resonance) if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
-    }
     else if (type == PreparationTypeResonanceMod)
     {
-        for (auto p : modResonance)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : modResonance) if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
     }
     else if (type == PreparationTypePiano)
     {
@@ -1028,6 +1028,14 @@ void Gallery::copy(BKPreparationType type, int from, int to)
     {
         nostalgic.getUnchecked(to)->copy(nostalgic.getUnchecked(from));
     }
+    else if (type == PreparationTypeBlendronic)
+    {
+        blendronic.getUnchecked(to)->copy(blendronic.getUnchecked(from));
+    }
+    else if (type == PreparationTypeResonance)
+    {
+        resonance.getUnchecked(to)->copy(resonance.getUnchecked(from));
+    }
     else if (type == PreparationTypeTuning)
     {
         tuning.getUnchecked(to)->copy(tuning.getUnchecked(from));
@@ -1035,14 +1043,6 @@ void Gallery::copy(BKPreparationType type, int from, int to)
     else if (type == PreparationTypeTempo)
     {
         tempo.getUnchecked(to)->copy(tempo.getUnchecked(from));
-    }
-	else if (type == PreparationTypeBlendronic)
-	{
-		blendronic.getUnchecked(to)->copy(blendronic.getUnchecked(from));
-	}
-    else if (type == PreparationTypeResonance)
-    {
-        resonance.getUnchecked(to)->copy(resonance.getUnchecked(from));
     }
     else if (type == PreparationTypeKeymap)
     {
@@ -1060,6 +1060,10 @@ void Gallery::copy(BKPreparationType type, int from, int to)
     {
         modNostalgic.getUnchecked(to)->copy(modNostalgic.getUnchecked(from));
     }
+    else if (type == PreparationTypeBlendronicMod)
+    {
+        modBlendronic.getUnchecked(to)->copy(modBlendronic.getUnchecked(from));
+    }
     else if (type == PreparationTypeResonanceMod)
     {
         modResonance.getUnchecked(to)->copy(modResonance.getUnchecked(from));
@@ -1072,10 +1076,6 @@ void Gallery::copy(BKPreparationType type, int from, int to)
     {
         modTempo.getUnchecked(to)->copy(modTempo.getUnchecked(from));
     }
-	else if (type == PreparationTypeBlendronicMod)
-	{
-		modBlendronic.getUnchecked(to)->copy(modBlendronic.getUnchecked(from));
-	}
 }
 
 void Gallery::addTypeWithId(BKPreparationType type, int Id)

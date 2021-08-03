@@ -2049,6 +2049,12 @@ void BKAudioProcessor::reset(BKPreparationType type, int Id)
         
         if (proc != nullptr) proc->reset();
     }
+    else if (type == PreparationTypeResonance)
+    {
+        ResonanceProcessor::Ptr proc = currentPiano->getResonanceProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
     else if (type == PreparationTypeTuning)
     {
         TuningProcessor::Ptr proc = currentPiano->getTuningProcessor(Id, false);
@@ -2080,6 +2086,10 @@ void BKAudioProcessor::reset(BKPreparationType type, int Id)
     else if (type == PreparationTypeBlendronicMod)
     {
         gallery->getBlendronicModification(Id)->reset();
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        gallery->getResonanceModification(Id)->reset();
     }
     else if (type == PreparationTypeTuningMod)
     {
@@ -2126,6 +2136,14 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
         
         if (proc != nullptr) proc->reset();
     }
+    else if (type == PreparationTypeResonance)
+    {
+        gallery->getResonance(Id)->clear();
+        
+        ResonanceProcessor::Ptr proc = currentPiano->getResonanceProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
     else if (type == PreparationTypeTuning)
     {
         gallery->getTuning(Id)->clear();
@@ -2161,6 +2179,10 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     else if (type == PreparationTypeBlendronicMod)
     {
         gallery->getBlendronicModification(Id)->reset();
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        gallery->getResonanceModification(Id)->reset();
     }
     else if (type == PreparationTypeTuningMod)
     {

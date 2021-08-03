@@ -203,7 +203,9 @@ public:
         {
             if (item->hasTagName( "item" + String(itemCount++)))
             {
-                BKPreparationType type  = (BKPreparationType) item->getStringAttribute("type").getIntValue();
+                BKPreparationType type  =
+                cPreparationIdToType[item->getStringAttribute("type").getIntValue()];
+                
                 int Id = item->getStringAttribute("Id").getIntValue();
                 int X = item->getStringAttribute("X").getIntValue();
                 int Y = item->getStringAttribute("Y").getIntValue();
@@ -230,7 +232,7 @@ public:
         {
             ValueTree itemVT("item"+String(itemCount++));
             
-            itemVT.setProperty("type", item->getType(), 0);
+            itemVT.setProperty("type", cPreparationTypeToId[item->getType()], 0);
             itemVT.setProperty("Id", item->getId(), 0);
             itemVT.setProperty("X", item->getX(), 0);
             itemVT.setProperty("Y", item->getY(), 0);

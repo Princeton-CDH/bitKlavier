@@ -720,6 +720,12 @@ public:
         BKSynthesiser* rMain
     );
     virtual ~ResonanceProcessor();
+    
+    inline void reset(void)
+    {
+        resonance->prep->resetModdables();
+        DBG("resonance reset called");
+    }
 
     //called with every audio vector
     BKSampleLoadType sampleType;

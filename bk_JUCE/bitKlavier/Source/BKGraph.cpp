@@ -84,6 +84,10 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_blendronic_icon_png, BinaryData::mod_blendronic_icon_pngSize));
     }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_resonance_icon_png, BinaryData::mod_resonance_icon_pngSize));
+    }
     else if (type == PreparationTypeTuningMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_tuning_icon_png, BinaryData::mod_tuning_icon_pngSize));
@@ -500,7 +504,7 @@ ValueTree BKItem::getState(void)
     
     itemVT.setProperty("name", getItemName(), 0);
     
-    itemVT.setProperty("type", type, 0);
+    itemVT.setProperty("type", cPreparationTypeToId[type], 0);
     
     if (type != PreparationTypeComment)
     {
@@ -538,7 +542,7 @@ void BKItem::setState(XmlElement* e)
     name = s;
     
     i = e->getStringAttribute( "type" ).getIntValue();
-    type = (BKPreparationType)i;
+    type = cPreparationIdToType[i];
     
     if (type != PreparationTypeComment)
     {
@@ -711,18 +715,14 @@ bool BKItemGraph::connect(BKItem* item1, BKItem* item2)
     // If connecting a modification, set its type
     if (item1Type == PreparationTypeGenericMod)
     {
-        if ((item2Type >= PreparationTypeDirect && item2Type <= PreparationTypeTempo) ||
-            item2Type == PreparationTypeBlendronic ||
-            item2Type == PreparationTypeResonance)
+        if (item2Type >= PreparationTypeDirect && item2Type <= PreparationTypeTempo)
         {
             item1->setItemType(getModType(item2Type), true);
         }
     }
     else if (item2Type == PreparationTypeGenericMod)
     {
-        if ((item1Type >= PreparationTypeDirect && item1Type <= PreparationTypeTempo) ||
-            item1Type == PreparationTypeBlendronic ||
-            item1Type == PreparationTypeResonance)
+        if (item1Type >= PreparationTypeDirect && item1Type <= PreparationTypeTempo)
         {
             item2->setItemType(getModType(item1Type), true);
         }
@@ -1018,9 +1018,7 @@ void BKItemGraph::reconstruct(void)
 
 BKPreparationType BKItemGraph::getModType(BKPreparationType type)
 {
-    if (type == PreparationTypeBlendronic) return PreparationTypeBlendronicMod;
-    if (type == PreparationTypeResonance) return PreparationTypeResonanceMod;
-    return (BKPreparationType)(type+6);
+    return (BKPreparationType)(type+PreparationTypeDirectMod);
 }
 
 void BKItemGraph::select(BKItem* item)
