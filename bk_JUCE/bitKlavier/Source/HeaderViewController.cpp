@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-
+#include "PluginEditor.h"
 
 #include "HeaderViewController.h"
 
@@ -555,7 +555,7 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     }
     else if (result == SETTINGS_ID) // open General settings
     {
-        processor.updateState->setCurrentDisplay(DisplayGeneral);
+        processor.getBKEditor()->showGenSettings(0);
     }
     else if (result == CLEAN_ID) // Clean
     {

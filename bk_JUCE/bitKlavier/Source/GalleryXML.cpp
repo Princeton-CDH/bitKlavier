@@ -63,6 +63,8 @@ ValueTree  Gallery::getState(void)
     
     galleryVT.addChild(general->getState(), -1, 0);
     
+    galleryVT.addChild(processor.getBKEqualizer()->getState(), -1, 0);
+    
     // Preparations and keymaps must be first.
     // Tempo and Tuning must be first of the preparations.
     for (int i = 0; i < tempo.size(); i++)          galleryVT.addChild( tempo[i]->getState(), -1, 0);
@@ -143,6 +145,9 @@ void Gallery::setStateFromXML(XmlElement* xml)
             else if (e->hasTagName ( vtagGeneral))
             {
                 general->setState(e);
+            }
+            else if (e->hasTagName(vtagEqualizer)) {
+                processor.getBKEqualizer()->setState(e);
             }
             else if (e->hasTagName( vtagTuning))
             {
