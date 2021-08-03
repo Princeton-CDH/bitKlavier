@@ -34,12 +34,9 @@ void BKEqualizer::prepareToPlay(int samplesPerBlock) {
 
 void BKEqualizer::updateCoefficients() {
     // calculate and set peak filters' coefficients
-    auto peak1Coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, peak1Freq, peak1Quality,
-                                                                                juce::Decibels::decibelsToGain(peak1Gain));
-    auto peak2Coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, peak2Freq, peak2Quality,
-                                                                                juce::Decibels::decibelsToGain(peak2Gain));
-    auto peak3Coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, peak3Freq, peak3Quality,
-                                                                                juce::Decibels::decibelsToGain(peak3Gain));
+    auto peak1Coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, peak1Freq, peak1Quality, juce::Decibels::decibelsToGain(peak1Gain));
+    auto peak2Coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, peak2Freq, peak2Quality, juce::Decibels::decibelsToGain(peak2Gain));
+    auto peak3Coefficients = juce::dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, peak3Freq, peak3Quality, juce::Decibels::decibelsToGain(peak3Gain));
     
     *leftChain.get<ChainPositions::Peak1>().coefficients = *peak1Coefficients;
     *leftChain.get<ChainPositions::Peak2>().coefficients = *peak2Coefficients;

@@ -1064,7 +1064,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     else
     {
         reader = playingSound->getReader();
-        reader->touchSample(sourceSamplePosition);
+        reader->touchSample(reader->getMappedSection().clipValue(sourceSamplePosition));
         reader->touchSample(reader->getMappedSection().clipValue(sourceSamplePosition+numSamples)-1);
     }
     

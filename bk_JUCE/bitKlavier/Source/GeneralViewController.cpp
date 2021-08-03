@@ -714,7 +714,7 @@ void GeneralViewController::update(void)
     peak3GainSlider->setValue(eq->getPeak3Gain(), dontSendNotification);
     peak3QualitySlider->setValue(eq->getPeak3Quality(), dontSendNotification);
     
-    lowCutFreqSlider->setValue(eq->getLowCutFreq(), dontSendNotification);
+    highCutFreqSlider->setValue(eq->getHighCutFreq(), dontSendNotification);
     int highCutSlopeDefault = eq->getHighCutSlope();
     if (highCutSlopeDefault == 12) highCutSlope12.setToggleState(true, dontSendNotification);
     else if (highCutSlopeDefault == 24) highCutSlope24.setToggleState(true, dontSendNotification);

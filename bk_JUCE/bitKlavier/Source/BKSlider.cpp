@@ -1034,15 +1034,16 @@ void BKMultiSlider::setCurrentSlider(int activeSliderNum)
             if (!whichSlidersActive[i]) sliders[i]->operator[](j)->setLookAndFeel(&passiveSliderLookAndFeel);
         }
     }
-
-    int sliderNum = getActiveSlider(activeSliderNum);
-    highlight(sliderNum);
     
     if (lastHighlightedSlider < sliders.size())
     {
         deHighlight(lastHighlightedSlider);
-        displaySlider->setValue(sliders[sliderNum]->operator[](0)->getValue());
     }
+
+    int sliderNum = getActiveSlider(activeSliderNum);
+    highlight(sliderNum);
+    displaySlider->setValue(sliders[sliderNum]->operator[](0)->getValue());
+    
     lastHighlightedSlider = sliderNum;
 }
 
