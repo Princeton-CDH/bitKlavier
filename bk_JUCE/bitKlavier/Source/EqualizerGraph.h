@@ -102,6 +102,7 @@ public:
     }
     
     // hmmmm is there a thread safety issue here?
+    void setSampleRate(double sr) { eq.setSampleRate(sr); }
     void updateEQ(BKEqualizer& newEQ) { eq = newEQ;}
 
 private:

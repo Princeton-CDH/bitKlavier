@@ -28,7 +28,7 @@ public:
     ~BKEqualizer() override;
     
     // IMPORTANT: set the sample rate before doing anything else!
-    inline void setSampleRate(double sampleRate) { this->sampleRate = sampleRate; }
+    inline void setSampleRate(double sampleRate) { this->sampleRate = sampleRate; DBG("BKEqualizer setting sr to" + String(sampleRate)); }
     inline double getSampleRate() { return sampleRate; }
     
     // Must be called before playback begins or change to sample settings

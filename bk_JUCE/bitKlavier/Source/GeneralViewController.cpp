@@ -721,6 +721,8 @@ void GeneralViewController::update(void)
     else if (highCutSlopeDefault == 36) highCutSlope36.setToggleState(true, dontSendNotification);
     else highCutSlope48.setToggleState(true, dontSendNotification);
     
+    eq->setSampleRate(processor.getCurrentSampleRate());
+    eqGraph.setSampleRate(processor.getCurrentSampleRate());
     eqGraph.updateEQ(*eq);
 }
 
