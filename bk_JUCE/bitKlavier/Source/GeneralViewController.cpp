@@ -161,7 +161,6 @@ GeneralViewController::GeneralViewController(BKAudioProcessor& p, BKItemGraph* t
 BKViewController(p, theGraph, 2),
 processor(p)
 {
-    
     setLookAndFeel(&buttonsAndMenusLAF);
     
     // Settings UI components setup
@@ -197,6 +196,59 @@ processor(p)
     // Equalizer UI components setup
     // Filter Selection Buttons - icons must be added first to be "behind" the buttons
     float buttonAlpha = 0.4;
+    bypassToggle.setButtonText("Bypass EQ");
+    bypassToggle.setTooltip("Set whether audio should bypass the equalizer");
+    bypassToggle.addListener(this);
+    addAndMakeVisible(bypassToggle);
+    
+    resetToDefaultButton.setButtonText("Reset EQ");
+    resetToDefaultButton.addListener(this);
+    addAndMakeVisible(resetToDefaultButton);
+    
+    lowCutBypass.setButtonText("Bypass low cut");
+    lowCutBypass.setTooltip("Set whether audio should bypass the low cut filter");
+    lowCutBypass.addListener(this);
+    addAndMakeVisible(lowCutBypass);
+    
+    lowCutReset.setButtonText("Reset low cut");
+    lowCutReset.addListener(this);
+    addAndMakeVisible(lowCutReset);
+    
+    peak1Bypass.setButtonText("Bypass peak 1");
+    peak1Bypass.setTooltip("Set whether audio should bypass peak 1");
+    peak1Bypass.addListener(this);
+    addAndMakeVisible(peak1Bypass);
+    
+    peak1Reset.setButtonText("Reset peak 1");
+    peak1Reset.addListener(this);
+    addAndMakeVisible(peak1Reset);
+    
+    peak2Bypass.setButtonText("Bypass peak 2");
+    peak2Bypass.setTooltip("Set whether audio should bypass peak 2");
+    peak2Bypass.addListener(this);
+    addAndMakeVisible(peak2Bypass);
+    
+    peak2Reset.setButtonText("Reset peak 2");
+    peak2Reset.addListener(this);
+    addAndMakeVisible(peak2Reset);
+    
+    peak3Bypass.setButtonText("Bypass peak 3");
+    peak3Bypass.setTooltip("Set whether audio should bypass peak 3");
+    peak3Bypass.addListener(this);
+    addAndMakeVisible(peak3Bypass);
+    
+    peak3Reset.setButtonText("Reset peak 3");
+    peak3Reset.addListener(this);
+    addAndMakeVisible(peak3Reset);
+    
+    highCutBypass.setButtonText("Bypass high cut");
+    highCutBypass.setTooltip("Set whether audio should bypass the high cut filter");
+    highCutBypass.addListener(this);
+    addAndMakeVisible(highCutBypass);
+    
+    highCutReset.setButtonText("Reset high cut");
+    highCutReset.addListener(this);
+    addAndMakeVisible(highCutReset);
     
     lowCutIcon.setImage(ImageCache::getFromMemory(BinaryData::lo_cut_png, BinaryData::lo_cut_pngSize));
     addAndMakeVisible(lowCutIcon);
@@ -409,6 +461,8 @@ void GeneralViewController::displayTab(int tab) {
         noteOnSetsNoteOffVelocityB.setVisible(true);
     }
     else if (tab == Tabs::equalizer) {
+        bypassToggle.setVisible(true);
+        resetToDefaultButton.setVisible(true);
         lowCutButton.setVisible(true);
         lowCutIcon.setVisible(true);
         highCutButton.setVisible(true);
@@ -435,6 +489,8 @@ void GeneralViewController::invisible() {
     tempoMultiplierSlider->setVisible(false);
     invertSustainB.setVisible(false);
     noteOnSetsNoteOffVelocityB.setVisible(false);
+    bypassToggle.setVisible(false);
+    resetToDefaultButton.setVisible(false);
     lowCutButton.setVisible(false);
     lowCutIcon.setVisible(false);
     highCutButton.setVisible(false);
@@ -531,8 +587,35 @@ void GeneralViewController::resized()
     Rectangle<int> equalizerSlidersArea(equalizerArea);
     equalizerSlidersArea.removeFromTop(equalizerArea.getHeight() * 5 / 8);
     equalizerSlidersArea.removeFromTop(10); // needs a little extra space
-    equalizerSlidersArea.reduce(100, 0); // sliders don't need to be so wide
+    int w4 = equalizerSlidersArea.getWidth() / 4;
+    Rectangle<int> buttonArea = equalizerSlidersArea.removeFromRight(w4);
+    buttonArea.reduce(10, 0);
     Rectangle<int> equalizerSlidersAreaCopy(equalizerSlidersArea);
+    
+    int spacing4 = buttonArea.getHeight() / 4;
+    int trim = equalizerSlidersAreaCopy.getHeight() / 12;
+    Rectangle<int> firstOfFour(buttonArea.removeFromTop(spacing4));
+    Rectangle<int> secondOfFour(buttonArea.removeFromTop(spacing4));
+    Rectangle<int> thirdOfFour(buttonArea.removeFromTop(spacing4));
+    Rectangle<int> fourthOfFour(buttonArea.removeFromTop(spacing4));
+    firstOfFour.removeFromBottom(trim);
+    secondOfFour.removeFromBottom(trim);
+    thirdOfFour.removeFromBottom(trim);
+    fourthOfFour.removeFromBottom(trim);
+    
+    lowCutReset.setBounds(firstOfFour);
+    lowCutBypass.setBounds(secondOfFour);
+    peak1Reset.setBounds(firstOfFour);
+    peak1Bypass.setBounds(secondOfFour);
+    peak2Reset.setBounds(firstOfFour);
+    peak2Bypass.setBounds(secondOfFour);
+    peak3Reset.setBounds(firstOfFour);
+    peak3Bypass.setBounds(secondOfFour);
+    highCutReset.setBounds(firstOfFour);
+    highCutBypass.setBounds(secondOfFour);
+    
+    resetToDefaultButton.setBounds(thirdOfFour);
+    bypassToggle.setBounds(fourthOfFour);
     
     int spacing3 = equalizerSlidersArea.getHeight() / 3;
     Rectangle<int> firstOfThree(equalizerSlidersArea.removeFromTop(spacing3));
@@ -552,16 +635,13 @@ void GeneralViewController::resized()
     peak3QualitySlider->setBounds(thirdOfThree);
     
     // Cut parameters
-    int spacing2 = equalizerSlidersAreaCopy.getHeight() / 2;
-    int trim = equalizerSlidersAreaCopy.getHeight() / 10;
-    Rectangle<int> firstOfTwo(equalizerSlidersAreaCopy.removeFromTop(spacing2));
-    firstOfTwo.removeFromTop(trim);
-    Rectangle<int> secondOfTwo(equalizerSlidersAreaCopy.removeFromTop(spacing2));
+    Rectangle<int> firstOfTwo(equalizerSlidersAreaCopy.removeFromTop(spacing3));
+    Rectangle<int> secondOfTwo(equalizerSlidersAreaCopy.removeFromTop(spacing3*2));
     secondOfTwo.removeFromBottom(trim);
     
     lowCutSlopeBorder.setBounds(secondOfTwo);
     highCutSlopeBorder.setBounds(secondOfTwo);
-    int spacing4 = secondOfTwo.getWidth() / 4;
+    spacing4 = secondOfTwo.getWidth() / 4;
     secondOfTwo.removeFromLeft(spacing4 / 3); // need to move everything over to the right
     Rectangle<int> slope12Area(secondOfTwo.removeFromLeft(spacing4));
     Rectangle<int> slope24Area(secondOfTwo.removeFromLeft(spacing4));
@@ -611,6 +691,8 @@ void GeneralViewController::displayFilter(int filter) {
     juce::Colour displayColor = juce::Colours::grey;
     
     if (filter == Filters::lowCut) {
+        lowCutBypass.setVisible(true);
+        lowCutReset.setVisible(true);
         lowCutButton.setColour(TextButton::ColourIds::buttonColourId, displayColor);
         lowCutFreqSlider->setVisible(true);
         lowCutSlopeBorder.setVisible(true);
@@ -620,24 +702,32 @@ void GeneralViewController::displayFilter(int filter) {
         lowCutSlope48.setVisible(true);
     }
     else if (filter == Filters::peak1) {
+        peak1Bypass.setVisible(true);
+        peak1Reset.setVisible(true);
         peak1Button.setColour(TextButton::ColourIds::buttonColourId, displayColor);
         peak1FreqSlider->setVisible(true);
         peak1GainSlider->setVisible(true);
         peak1QualitySlider->setVisible(true);
     }
     else if (filter == Filters::peak2) {
+        peak2Bypass.setVisible(true);
+        peak2Reset.setVisible(true);
         peak2Button.setColour(TextButton::ColourIds::buttonColourId, displayColor);
         peak2FreqSlider->setVisible(true);
         peak2GainSlider->setVisible(true);
         peak2QualitySlider->setVisible(true);
     }
     else if (filter == Filters::peak3) {
+        peak3Bypass.setVisible(true);
+        peak3Reset.setVisible(true);
         peak3Button.setColour(TextButton::ColourIds::buttonColourId, displayColor);
         peak3FreqSlider->setVisible(true);
         peak3GainSlider->setVisible(true);
         peak3QualitySlider->setVisible(true);
     }
     else if (filter == Filters::highCut) {
+        highCutBypass.setVisible(true);
+        highCutReset.setVisible(true);
         highCutButton.setColour(TextButton::ColourIds::buttonColourId, displayColor);
         highCutFreqSlider->setVisible(true);
         highCutSlopeBorder.setVisible(true);
@@ -656,7 +746,19 @@ void GeneralViewController::clearColors() {
     highCutButton.setColour(TextButton::ColourIds::buttonColourId, juce::Colours::transparentBlack);
 }
 
-void GeneralViewController::invisibleFilters() {
+void GeneralViewController::invisibleFilters()
+{
+    lowCutBypass.setVisible(false);
+    lowCutReset.setVisible(false);
+    peak1Bypass.setVisible(false);
+    peak1Reset.setVisible(false);
+    peak2Bypass.setVisible(false);
+    peak2Reset.setVisible(false);
+    peak3Bypass.setVisible(false);
+    peak3Reset.setVisible(false);
+    highCutBypass.setVisible(false);
+    highCutReset.setVisible(false);
+    
     lowCutFreqSlider->setVisible(false);
     lowCutSlopeBorder.setVisible(false);
     lowCutSlope12.setVisible(false);
@@ -696,6 +798,13 @@ void GeneralViewController::update(void)
     invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
     
     BKEqualizer* eq = processor.getBKEqualizer();
+    
+    bypassToggle.setToggleState(eq->getBypassed(), dontSendNotification);
+    lowCutBypass.setToggleState(eq->getLowCutBypassed(), dontSendNotification);
+    peak1Bypass.setToggleState(eq->getPeak1Bypassed(), dontSendNotification);
+    peak2Bypass.setToggleState(eq->getPeak2Bypassed(), dontSendNotification);
+    peak3Bypass.setToggleState(eq->getPeak3Bypassed(), dontSendNotification);
+    highCutBypass.setToggleState(eq->getHighCutBypassed(), dontSendNotification);
     
     lowCutFreqSlider->setValue(eq->getLowCutFreq(), dontSendNotification);
     int lowCutSlopeDefault = eq->getLowCutSlope();
@@ -842,6 +951,102 @@ void GeneralViewController::bkButtonClicked (Button* b)
         bool newstate =  b->getToggleState();
         DBG("invert noteOnSetsNoteOffVelocity = " + String((int)newstate));
         gen->setNoteOnSetsNoteOffVelocity(newstate);
+    }
+    else if (b == &bypassToggle)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setBypassed(bypassToggle.getToggleState());
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &resetToDefaultButton)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->restoreDefaultState();
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &lowCutBypass)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setLowCutBypassed(lowCutBypass.getToggleState());
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &lowCutReset)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->restoreDefaultLowCut();
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &peak1Bypass)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setPeak1Bypassed(peak1Bypass.getToggleState());
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &peak1Reset)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->restoreDefaultPeak1();
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &peak2Bypass)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setPeak2Bypassed(peak2Bypass.getToggleState());
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &peak2Reset)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->restoreDefaultPeak2();
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &peak3Bypass)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setPeak3Bypassed(peak3Bypass.getToggleState());
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &peak3Reset)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->restoreDefaultPeak3();
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &highCutBypass)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->setHighCutBypassed(highCutBypass.getToggleState());
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
+    }
+    else if (b == &highCutReset)
+    {
+        BKEqualizer* eq = processor.getBKEqualizer();
+        eq->restoreDefaultHighCut();
+        update();
+        eqGraph.updateEQ(*eq);
+        eqGraph.repaint();
     }
     else if (b == &lowCutButton) {
         displayFilter(Filters::lowCut);

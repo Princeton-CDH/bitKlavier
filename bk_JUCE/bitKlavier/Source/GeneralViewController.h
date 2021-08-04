@@ -129,24 +129,35 @@ private:
     ImageComponent peak2Icon;
     ImageComponent peak3Icon;
     
+    ToggleButton bypassToggle;
+    TextButton resetToDefaultButton;
+    
     std::unique_ptr<BKSingleSlider> lowCutFreqSlider;
     GroupComponent lowCutSlopeBorder;
     ToggleButton lowCutSlope12;
     ToggleButton lowCutSlope24;
     ToggleButton lowCutSlope36;
     ToggleButton lowCutSlope48;
+    ToggleButton lowCutBypass;
+    TextButton lowCutReset;
     
     std::unique_ptr<BKSingleSlider> peak1FreqSlider;
     std::unique_ptr<BKSingleSlider> peak1GainSlider;
     std::unique_ptr<BKSingleSlider> peak1QualitySlider;
+    ToggleButton peak1Bypass;
+    TextButton peak1Reset;
     
     std::unique_ptr<BKSingleSlider> peak2FreqSlider;
     std::unique_ptr<BKSingleSlider> peak2GainSlider;
     std::unique_ptr<BKSingleSlider> peak2QualitySlider;
+    ToggleButton peak2Bypass;
+    TextButton peak2Reset;
     
     std::unique_ptr<BKSingleSlider> peak3FreqSlider;
     std::unique_ptr<BKSingleSlider> peak3GainSlider;
     std::unique_ptr<BKSingleSlider> peak3QualitySlider;
+    ToggleButton peak3Bypass;
+    TextButton peak3Reset;
     
     std::unique_ptr<BKSingleSlider> highCutFreqSlider;
     GroupComponent highCutSlopeBorder;
@@ -154,6 +165,8 @@ private:
     ToggleButton highCutSlope24;
     ToggleButton highCutSlope36;
     ToggleButton highCutSlope48;
+    ToggleButton highCutBypass;
+    TextButton highCutReset;
     
     enum RadioButtonID {
         lowCutButtons = 1001,

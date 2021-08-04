@@ -103,10 +103,12 @@ public:
     
     // hmmmm is there a thread safety issue here?
     void setSampleRate(double sr) { eq.setSampleRate(sr); }
-    void updateEQ(BKEqualizer& newEQ) { eq = newEQ;}
+    void updateEQ(BKEqualizer& newEQ) { eq = newEQ; }
 
 private:
     BKEqualizer eq;
+    
+    
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EqualizerGraph)
 };

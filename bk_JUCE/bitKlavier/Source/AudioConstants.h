@@ -40,6 +40,12 @@ const String ptagGeneral_noteOnSetsNoteOffVelocity = "noteOnSetsNoteOffVelocity"
 const String ptagGeneral_tuningFund = "tuningFund";
 
 const String vtagEqualizer = "equalizer";
+const String ptagEqualizer_bypassed = "bypassed";
+const String ptagEqualizer_lowCutBypassed = "lowCutBypassed";
+const String ptagEqualizer_peak1Bypassed = "peak1Bypassed";
+const String ptagEqualizer_peak2Bypassed = "peak2Bypassed";
+const String ptagEqualizer_peak3Bypassed = "peak3Bypassed";
+const String ptagEqualizer_highCutBypassed = "highCutBypassed";
 const String ptagEqualizer_lowCutFreq = "lowCutFreq";
 const String ptagEqualizer_lowCutSlope = "lowCutSlope";
 const String ptagEqualizer_peak1Freq = "peak1Freq";
