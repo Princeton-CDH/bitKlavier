@@ -110,7 +110,7 @@ BKViewController(p, theGraph, 1)
     about.setMultiLine(true);
     String astring = "Welcome to bitKlavier v";
     astring.append(JucePlugin_VersionString, 8);
-    astring += "! www.bitKlavier.com\n--\nbitKlavier was created by\nDan Trueman\n Mike Mulshine\nMatt Wang";
+    astring += "! www.bitKlavier.com\n--\nbitKlavier was created by\nDan Trueman\n Mike Mulshine\nMatt Wang\n Theo Trevisan\n Katie Chou\n Jeff Gordon";
     about.setText(astring);
 
     image = ImageCache::getFromMemory(BinaryData::icon_png, BinaryData::icon_pngSize);
