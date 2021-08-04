@@ -516,7 +516,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 	const ScopedLock sl(lock);
 
 	int noteNumber = midiNoteNumber;
-    if (noteNumber > 108 || noteNumber < 21) return nullptr;
+    if (noteNumber > 127 || noteNumber < 0) return nullptr;
     float transposition = transp;
 
     // needed for MIDI Out; will just return the last found voice, if there are multiple voices
@@ -786,7 +786,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
 
 	int noteNumber = midiNoteNumber;
 
-	if (noteNumber > 108 || noteNumber < 21) return;
+	if (noteNumber > 127 || noteNumber < 0) return;
     
     int soundSetId = (set < 0) ? processor.globalSoundSetId : set;
     if (soundSets.size() - 1 < soundSetId) return;

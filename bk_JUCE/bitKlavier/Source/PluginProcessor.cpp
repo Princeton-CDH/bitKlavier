@@ -715,6 +715,8 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
         return; // Done with the first pass
     }
     
+    if (noteNumber < 0 || noteNumber > 127) return;
+    
     // Second pass, post harmonization
     String key = source + "n" + String(mappedFrom);
     bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
@@ -823,6 +825,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         }
     }
     
+    if (noteNumber < 0 || noteNumber > 127) return;
     String key = source + "n" + String(mappedFrom);
     if (noteOnSetsNoteOffVelocity)
     {
@@ -1110,14 +1113,14 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 		//if (keystrokesEnabled.getValue())
         int note = notesOnUI.getUnchecked(i);
         DBG("BKAudioProcessor::processBlock noteOn");
-        handleNoteOn(note, 0.6, channel, note, cMidiInputUI);
+        handleNoteOn(note, 0.8, channel, note, cMidiInputUI);
 		notesOnUI.remove(i);
 	}
     
     for(int i=0; i<notesOffUI.size(); i++)
     {
         int note = notesOffUI.getUnchecked(i);
-        handleNoteOff(note, 0.6, channel, note, cMidiInputUI);
+        handleNoteOff(note, 0.8, channel, note, cMidiInputUI);
         notesOffUI.remove(i);
     }
     

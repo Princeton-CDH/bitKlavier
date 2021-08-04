@@ -847,9 +847,16 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         {
             construction.addItem(PreparationTypeDirect);
         }
-        else if (code == 69) // E resonance, previous code moved to Y
+        else if (code == 69) // E resonance
         {
-            construction.addItem(PreparationTypeResonance);
+            if (processor.updateState->currentDisplay == DisplayKeymap)
+            {
+                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+                keymap->toggleMidiEdit();
+                keymap->setHarMidiEdit(false);
+                keymap->setHarArrayMidiEdit(false);
+            }
+            else construction.addItem(PreparationTypeResonance);
         }
         else if (code == 73) // I
         {
@@ -926,16 +933,6 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         else if (code == 88) // X
         {
             if (e.getModifiers().isCommandDown())   construction.cut();
-        }
-        else if (code == 89) // Y, used to be at E
-        {
-            if (processor.updateState->currentDisplay == DisplayKeymap)
-            {
-                Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
-                keymap->toggleMidiEdit();
-                keymap->setHarMidiEdit(false);
-                keymap->setHarArrayMidiEdit(false);
-            }
         }
         else if (code == 90) // Z
         {

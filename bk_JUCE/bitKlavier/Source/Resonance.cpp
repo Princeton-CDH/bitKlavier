@@ -265,7 +265,7 @@ void ResonanceProcessor::addSympStrings(int noteNumber, float velocity)
         // heldKey      = noteNumber
         // partialKey   = key that this partial is nearest, as assigned by partialStructure
         int partialKey = noteNumber + resonance->prep->getPartialStructure().getUnchecked(i)[0];
-        if (partialKey > 108 || partialKey < 21) continue;
+        if (partialKey > 127 || partialKey < 0) continue;
 
         // make a newPartial object, with gain and offset vals
         DBG("Resonance: adding partial " + String(partialKey) + " to " + String(noteNumber));
