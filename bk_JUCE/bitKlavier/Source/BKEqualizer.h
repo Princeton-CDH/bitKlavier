@@ -38,22 +38,158 @@ public:
     void updateCoefficients();
     
     // Performs the actual processing of audio
-    void process(juce::dsp::ProcessContextReplacing<float>& context, int channel);
+    void process(AudioSampleBuffer& buffer);
+    
+    void restoreDefaultLowCut()
+    {
+        lowCutFreq = 20;
+        lowCutSlope = 12;
+        paramsChanged = true;
+    }
+    
+    void restoreDefaultPeak1()
+    {
+        peak1Freq = 500;
+        peak1Gain = 0;
+        peak1Quality = 1;
+        paramsChanged = true;
+    }
+    
+    void restoreDefaultPeak2()
+    {
+        peak2Freq = 1000;
+        peak2Gain = 0;
+        peak2Quality = 1;
+        paramsChanged = true;
+    }
+    
+    void restoreDefaultPeak3()
+    {
+        peak3Freq = 5000;
+        peak3Gain = 0;
+        peak3Quality = 1;
+        paramsChanged = true;
+    }
+    
+    void restoreDefaultHighCut()
+    {
+        highCutFreq = 20000;
+        highCutSlope = 12;
+        paramsChanged = true;
+    }
+    
+    void restoreDefaultState()
+    {
+        restoreDefaultLowCut();
+        restoreDefaultPeak1();
+        restoreDefaultPeak2();
+        restoreDefaultPeak3();
+        restoreDefaultHighCut();
+    }
     
     // Getters and Setters for the view controller
-    inline void setLowCutFreq(float lowCutFreq) { this->lowCutFreq = lowCutFreq; }
-    inline void setLowCutSlope(int lowCutSlope) {this->lowCutSlope = lowCutSlope; }
-    inline void setPeak1Freq(float peak1Freq) { this->peak1Freq = peak1Freq; }
-    inline void setPeak1Gain(float peak1Gain) {this->peak1Gain = peak1Gain; }
-    inline void setPeak1Quality(float peak1Quality) {this->peak1Quality = peak1Quality; }
-    inline void setPeak2Freq(float peak2Freq) { this->peak2Freq = peak2Freq;}
-    inline void setPeak2Gain(float peak2Gain) {this->peak2Gain = peak2Gain; }
-    inline void setPeak2Quality(float peak2Quality) {this->peak2Quality = peak2Quality; }
-    inline void setPeak3Freq(float peak3Freq) { this->peak3Freq = peak3Freq;}
-    inline void setPeak3Gain(float peak3Gain) {this->peak3Gain = peak3Gain; }
-    inline void setPeak3Quality(float peak3Quality) {this->peak3Quality = peak3Quality; }
-    inline void setHighCutFreq(float highCutFreq) { this->highCutFreq = highCutFreq; }
-    inline void setHighCutSlope(int highCutSlope) {this->highCutSlope = highCutSlope; }
+    inline void setBypassed(bool bypass)
+    {
+        this->bypassed = bypass;
+        paramsChanged = true;
+    }
+    inline void setLowCutBypassed(bool bypass)
+    {
+        this->lowCutBypassed = bypass;
+        paramsChanged = true;
+    }
+    inline void setPeak1Bypassed(bool bypass)
+    {
+        this->peak1Bypassed = bypass;
+        paramsChanged = true;
+    }
+    inline void setPeak2Bypassed(bool bypass)
+    {
+        this->peak2Bypassed = bypass;
+        paramsChanged = true;
+    }
+    inline void setPeak3Bypassed(bool bypass)
+    {
+        this->peak3Bypassed = bypass;
+        paramsChanged = true;
+    }
+    inline void setHighCutBypassed(bool bypass)
+    {
+        this->highCutBypassed = bypass;
+        paramsChanged = true;
+    }
+    inline void setLowCutFreq(float lowCutFreq)
+    {
+        this->lowCutFreq = lowCutFreq;
+        paramsChanged = true;
+    }
+    inline void setLowCutSlope(int lowCutSlope)
+    {
+        this->lowCutSlope = lowCutSlope;
+        paramsChanged = true;
+    }
+    inline void setPeak1Freq(float peak1Freq)
+    {
+        this->peak1Freq = peak1Freq;
+        paramsChanged = true;
+    }
+    inline void setPeak1Gain(float peak1Gain)
+    {
+        this->peak1Gain = peak1Gain;
+        paramsChanged = true;
+    }
+    inline void setPeak1Quality(float peak1Quality)
+    {
+        this->peak1Quality = peak1Quality;
+        paramsChanged = true;
+    }
+    inline void setPeak2Freq(float peak2Freq)
+    {
+        this->peak2Freq = peak2Freq;
+        paramsChanged = true;
+    }
+    inline void setPeak2Gain(float peak2Gain)
+    {
+        this->peak2Gain = peak2Gain;
+        paramsChanged = true;
+    }
+    inline void setPeak2Quality(float peak2Quality)
+    {
+        this->peak2Quality = peak2Quality;
+        paramsChanged = true;
+    }
+    inline void setPeak3Freq(float peak3Freq)
+    {
+        this->peak3Freq = peak3Freq;
+        paramsChanged = true;
+    }
+    inline void setPeak3Gain(float peak3Gain)
+    {
+        this->peak3Gain = peak3Gain;
+        paramsChanged = true;
+    }
+    inline void setPeak3Quality(float peak3Quality)
+    {
+        this->peak3Quality = peak3Quality;
+        paramsChanged = true;
+    }
+    inline void setHighCutFreq(float highCutFreq)
+    {
+        this->highCutFreq = highCutFreq;
+        paramsChanged = true;
+    }
+    inline void setHighCutSlope(int highCutSlope)
+    {
+        this->highCutSlope = highCutSlope;
+        paramsChanged = true;
+    }
+    
+    inline bool getBypassed() { return bypassed; }
+    inline bool getLowCutBypassed() { return lowCutBypassed; }
+    inline bool getPeak1Bypassed() { return peak1Bypassed; }
+    inline bool getPeak2Bypassed() { return peak2Bypassed; }
+    inline bool getPeak3Bypassed() { return peak3Bypassed; }
+    inline bool getHighCutBypassed() { return highCutBypassed; }
     
     inline float getLowCutFreq() { return lowCutFreq; }
     inline int getLowCutSlope() { return lowCutSlope; }
@@ -79,6 +215,13 @@ public:
         
         this->sampleRate = other.sampleRate;
         
+        this->bypassed = other.bypassed;
+        this->lowCutBypassed = other.lowCutBypassed;
+        this->peak1Bypassed = other.peak1Bypassed;
+        this->peak1Bypassed = other.peak1Bypassed;
+        this->peak1Bypassed = other.peak1Bypassed;
+        this->highCutBypassed = other.highCutBypassed;
+        
         this->lowCutFreq = other.lowCutFreq;
         this->lowCutSlope = other.lowCutSlope;
         this->peak1Freq = other.peak1Freq;
@@ -99,6 +242,13 @@ public:
     }
     
     inline void setState(XmlElement* e) {
+        bypassed = e->getBoolAttribute(ptagEqualizer_bypassed);
+        lowCutBypassed = e->getBoolAttribute(ptagEqualizer_lowCutBypassed);
+        peak1Bypassed = e->getBoolAttribute(ptagEqualizer_peak1Bypassed);
+        peak2Bypassed = e->getBoolAttribute(ptagEqualizer_peak2Bypassed);
+        peak3Bypassed = e->getBoolAttribute(ptagEqualizer_peak3Bypassed);
+        highCutBypassed = e->getBoolAttribute(ptagEqualizer_highCutBypassed);
+        
         lowCutFreq = e->getStringAttribute(ptagEqualizer_lowCutFreq).getFloatValue();
         lowCutSlope = e->getStringAttribute(ptagEqualizer_lowCutSlope).getFloatValue();
         peak1Freq = e->getStringAttribute(ptagEqualizer_peak1Freq).getFloatValue();
@@ -116,6 +266,13 @@ public:
     
     inline ValueTree getState(void) {
         ValueTree vt(vtagEqualizer);
+        
+        vt.setProperty(ptagEqualizer_bypassed, bypassed, 0);
+        vt.setProperty(ptagEqualizer_lowCutBypassed, lowCutBypassed, 0);
+        vt.setProperty(ptagEqualizer_peak1Bypassed, peak1Bypassed, 0);
+        vt.setProperty(ptagEqualizer_peak2Bypassed, peak2Bypassed, 0);
+        vt.setProperty(ptagEqualizer_peak3Bypassed, peak3Bypassed, 0);
+        vt.setProperty(ptagEqualizer_highCutBypassed, highCutBypassed, 0);
         
         vt.setProperty(ptagEqualizer_lowCutFreq, lowCutFreq, 0);
         vt.setProperty(ptagEqualizer_lowCutSlope, lowCutSlope, 0);
@@ -137,24 +294,33 @@ public:
 private:
     double sampleRate;
     
+    bool paramsChanged;
+    
+    bool bypassed = true;
+    
     // Parameters initialized here
-    float lowCutFreq = 20;
-    int lowCutSlope = 12;
+    float lowCutFreq;
+    int lowCutSlope;
+    bool lowCutBypassed = false;
     
-    float peak1Freq = 500;
-    float peak1Gain = 0;
-    float peak1Quality = 1;
+    float peak1Freq;
+    float peak1Gain;
+    float peak1Quality;
+    bool peak1Bypassed = false;
     
-    float peak2Freq = 1000;
-    float peak2Gain = 0;
-    float peak2Quality = 1;
+    float peak2Freq;
+    float peak2Gain;
+    float peak2Quality;
+    bool peak2Bypassed = false;
     
-    float peak3Freq = 5000;
-    float peak3Gain = 0;
-    float peak3Quality = 1;
+    float peak3Freq;
+    float peak3Gain;
+    float peak3Quality;
+    bool peak3Bypassed = false;
     
-    float highCutFreq = 20000;
-    int highCutSlope = 12;
+    float highCutFreq;
+    int highCutSlope;
+    bool highCutBypassed = false;
     
     // DSP stuff
     using Filter = juce::dsp::IIR::Filter<float>;
