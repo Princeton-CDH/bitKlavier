@@ -197,6 +197,7 @@ public:
     
     void resetModdables()
     {
+        DBG("resetting Resonance Moddables");
         rSoundSet.reset();
         rUseGlobalSoundSet.reset();
         rSoundSetName.reset();
@@ -728,8 +729,8 @@ public:
     //called with every audio vector
     BKSampleLoadType sampleType;
 
-    void    keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
-    void    keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
 
     //probably not necessary but keeping just in case?
     //void postRelease(int noteNumber, int midiChannel);

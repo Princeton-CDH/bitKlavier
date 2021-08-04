@@ -1280,6 +1280,20 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             }
         }
     }
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->resonanceResets)
+    {
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                currentPiano->getResonanceProcessor(reset.prepId)->reset();
+                updateState->resonancePreparationDidChange = true;
+                break;
+            }
+        }
+    }
     for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->blendronicResets)
     {
         for (auto Id : reset.keymapIds)
@@ -1362,6 +1376,20 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             {
                 gallery->getNostalgicModification(reset.prepId)->resetModdables();
                 updateState->nostalgicPreparationDidChange = true;
+                break;
+            }
+        }
+    }
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->resonanceModResets)
+    {
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                gallery->getResonanceModification(reset.prepId)->resetModdables();
+                updateState->resonancePreparationDidChange = true;
                 break;
             }
         }

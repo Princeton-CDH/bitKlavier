@@ -22,17 +22,16 @@ void ResonancePreparation::performModification(ResonanceModification* r, Array<b
     // Should the mod be reversed?
     bool reverse = r->altMod && modded;
     
-    if (dirty[ResonanceGain]) {
-        DBG("ResonancePreparation::performModification on ResonanceGan");
-        rDefaultGain.modify(r->rDefaultGain, reverse);
-    }
+    if (dirty[ResonanceGain]) rDefaultGain.modify(r->rDefaultGain, reverse);
     if (dirty[ResonanceBlendronicGain]) rBlendronicGain.modify(r->rBlendronicGain, reverse);
     if (dirty[ResonanceMinStartTime]) rMinStartTimeMS.modify(r->rMinStartTimeMS, reverse);
     if (dirty[ResonanceMaxStartTime]) rMaxStartTimeMS.modify(r->rMaxStartTimeMS, reverse);
     
+    if (dirty[ResonanceFundamental]) rFundamentalKey.modify(r->rFundamentalKey, reverse);
     if (dirty[ResonanceClosestKeys]) rResonanceKeys.modify(r->rResonanceKeys, reverse);
     if (dirty[ResonanceOffsets]) rOffsetsKeys.modify(r->rOffsetsKeys, reverse);
     if (dirty[ResonanceGains]) rGainsKeys.modify(r->rGainsKeys, reverse);
+    
     if (dirty[ResonanceADSR])
     {
         rAttack.modify(r->rAttack, reverse);
