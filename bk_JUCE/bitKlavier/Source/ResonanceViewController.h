@@ -167,7 +167,7 @@ class ResonanceModificationEditor :
     public BKADSRSlider::Listener,
     public BKRangeSlider::Listener,
     public BKAbsoluteKeyboardSlider::Listener,
-    //private BKKeymapKeyboardStateListener,
+    private BKKeymapKeyboardStateListener,
     //public Slider::Listener,
     public Timer
 {
@@ -190,7 +190,7 @@ public:
     void BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release) override;
     void BKADSRButtonStateChanged(String name, bool mod, bool state) override;
     void BKRangeSliderValueChanged(String name, double minval, double maxval) override;
-
+    void handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
 
     void fillSelectCB(int last, int current);

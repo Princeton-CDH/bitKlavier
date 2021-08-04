@@ -897,6 +897,8 @@ ResonanceViewController(p, theGraph)
     
     //closestKeyboard->addMyListener(this);
     //fundamentalKeyboard->addMyListener(this);
+    resonanceKeyboardState.addListener(this);
+    fundamentalKeyboardState.addListener(this);
     
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
@@ -1230,6 +1232,46 @@ void ResonanceModificationEditor::BKRangeSliderValueChanged(String name, double 
     }
     
     updateModification();
+}
+
+void ResonanceModificationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) {
+    
+    ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
+    DBG("ResonanceModificationEditor::handleKeymapNoteToggled");
+    
+    if (source == &resonanceKeyboardState)
+    {
+        //closestKeyboard->setKeysInKeymap(prep->getKeys());
+        //DBG("resonanceKeyboardState " + String(midiNoteNumber));
+        mod->toggleResonanceKey(midiNoteNumber);
+        closestKeyboard->setKeysInKeymap(mod->getResonanceKeys());
+        mod->setDirty(ResonanceClosestKeys);
+        closestKeyboard->setAlpha(1.);
+        
+        offsetsKeyboard.setKeys(mod->getResonanceKeys());
+        offsetsKeyboard.setValues(mod->getOffsets());
+        mod->setDirty(ResonanceOffsets);
+        offsetsKeyboard.setBright();
+        
+        gainsKeyboard.setKeys(mod->getResonanceKeys());
+        gainsKeyboard.setValues(mod->getGains());
+        mod->setDirty(ResonanceGains);
+        gainsKeyboard.setBright();
+         
+
+    }
+    else if (source == &fundamentalKeyboardState)
+    {
+        mod->setFundamentalKey(midiNoteNumber);
+        fundamentalKeyboard->setKeysInKeymap({midiNoteNumber});
+        mod->setDirty(ResonanceFundamental);
+        fundamentalKeyboard->setAlpha(1.);
+        
+        //DBG("fundamental key toggled " + String(midiNoteNumber));
+    }
+    
+    update();
+
 }
 
 void ResonanceModificationEditor::keyboardSliderChanged(String name, Array<float> values)
