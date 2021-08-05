@@ -1339,7 +1339,8 @@ ModdableBase* ModdableViewController::getCurrentModdable()
         else if (processor.updateState->currentModdableIdentifier == cSpringTuningDrag)
             return &mod->getSpringTuning()->drag;
         else if (processor.updateState->currentModdableIdentifier == cSpringTuningStiffness)
-            return &mod->getSpringTuning()->stiffness;
+            //return &mod->getSpringTuning()->stiffness;
+            return &mod->getSpringTuning()->tetherStiffness;
         else if (processor.updateState->currentModdableIdentifier == cSpringTuningIntervalStiffness)
             return &mod->getSpringTuning()->intervalStiffness;
         else if (processor.updateState->currentModdableIdentifier == cSpringTuningTetherWeight)
