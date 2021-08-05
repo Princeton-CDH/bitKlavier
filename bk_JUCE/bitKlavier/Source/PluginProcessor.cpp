@@ -1155,14 +1155,13 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
-    pedalSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+	pedalSynth.renderNextBlock(buffer, midiMessages, 0, numSamples);
     
 #if JUCE_IOS
     buffer.applyGain(0, numSamples, 0.3 * gallery->getGeneralSettings()->getGlobalGain());
 #else
     buffer.applyGain(0, numSamples, gallery->getGeneralSettings()->getGlobalGain());
 #endif
-    
     // Apply EQ filters to the buffer
     eq.process(buffer);
     

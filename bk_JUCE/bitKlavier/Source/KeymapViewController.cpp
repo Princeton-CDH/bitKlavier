@@ -464,6 +464,7 @@ void KeymapViewController::displayTab(int tab)
 
     if (tab == 0)
     {
+        
         iconImageComponent.setBounds(area);
         area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         
@@ -1922,6 +1923,13 @@ void KeymapViewController::updateTargets()
 void KeymapViewController::timerCallback(){
     
     Keymap::Ptr km = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+
+    if (currentTab != 1)
+    {
+        km->setMidiEdit(false);
+        km->setHarMidiEdit(false);
+        km->setHarArrayMidiEdit(false);
+    }
 
     midiEditToggle.setToggleState(km->getMidiEdit(), dontSendNotification);
     harMidiEditToggle.setToggleState(km->getHarMidiEdit(), dontSendNotification);

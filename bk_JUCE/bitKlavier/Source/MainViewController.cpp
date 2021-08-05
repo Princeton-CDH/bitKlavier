@@ -780,16 +780,19 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         }
         else if (code == KeyPress::deleteKey)
         {
-            construction.deleteSelected();
+            if (processor.updateState->currentDisplay == DisplayNil) construction.deleteSelected();
         }
         else if (code == KeyPress::backspaceKey)
         {
-            construction.deleteSelected();
+            if (processor.updateState->currentDisplay == DisplayNil) construction.deleteSelected();
         }
         else if (code == KeyPress::upKey)
         {
-            if (e.getModifiers().isCommandDown())   construction.align(0);
-            else                                    construction.move(0, e.getModifiers().isShiftDown());
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                if (e.getModifiers().isCommandDown())   construction.align(0);
+                else                                    construction.move(0, e.getModifiers().isShiftDown());
+            }
         }
         else if (code == KeyPress::rightKey)
         {
@@ -805,11 +808,11 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         }
         else if (code == KeyPress::downKey)
         {
-            
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
                 if (e.getModifiers().isCommandDown())   construction.align(2);
                 else                                    construction.move(2, e.getModifiers().isShiftDown());
-            
-            
+            }
         }
         else if (code == KeyPress::leftKey)
         {
@@ -836,16 +839,19 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         }
         else if (code == 66) // B blendronic
         {
-            construction.addItem(PreparationTypeBlendronic);
+            if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeBlendronic);
         }
         else if (code == 67) // C modification
         {
-            if (e.getModifiers().isCommandDown())   construction.copy();
-            else                                    construction.addItem(PreparationTypeGenericMod);
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                if (e.getModifiers().isCommandDown())   construction.copy();
+                else                                    construction.addItem(PreparationTypeGenericMod);
+            }
         }
         else if (code == 68) // D direct
         {
-            construction.addItem(PreparationTypeDirect);
+            if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeDirect);
         }
         else if (code == 69) // E resonance
         {
@@ -856,31 +862,31 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                 keymap->setHarMidiEdit(false);
                 keymap->setHarArrayMidiEdit(false);
             }
-            else construction.addItem(PreparationTypeResonance);
+            else if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeResonance);
         }
         else if (code == 73) // I
         {
-            construction.removeConnectionsBetween();
+            if (processor.updateState->currentDisplay == DisplayNil) construction.removeConnectionsBetween();
         }
         else if (code == 75) // K keymap
         {
-            construction.addItem(PreparationTypeKeymap);
+        if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeKeymap);
         }
         else if (code == 77) // M tempo
         {
-            construction.addItem(PreparationTypeTempo);
+        if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeTempo);
         }
         else if (code == 78) // N nostalgic
         {
-            construction.addItem(PreparationTypeNostalgic);
+        if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeNostalgic);
         }
         else if (code == 79) // O
         {
-            construction.removeConnectionsTo();
+        if (processor.updateState->currentDisplay == DisplayNil) construction.removeConnectionsTo();
         }
         else if (code == 80) // P piano
         {
-            construction.addItem(PreparationTypePianoMap);
+        if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypePianoMap);
         }
         else if (code == 81) // Q comment
         {
@@ -891,11 +897,11 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                 keymap->setHarMidiEdit(false);
                 keymap->toggleHarArrayMidiEdit();
             }
-            else construction.addItem(PreparationTypeComment);
+            else if(processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeComment);
         }
         else if (code == 82) // R reset
         {
-            construction.addItem(PreparationTypeReset);
+            if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeReset);
         }
         else if (code == 83) // S synchronic
         {
@@ -905,20 +911,22 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                     processor.saveCurrentGalleryAs();
                 else processor.saveCurrentGallery();
             }
-            else                                    construction.addItem(PreparationTypeSynchronic);
+            else if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeSynchronic);
         }
         else if (code == 84) // T tuning
         {
-            construction.addItem(PreparationTypeTuning);
+        if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeTuning);
         }
-        
         else if (code == 85) // U
         {
-            construction.connectAllSelected();
+        if (processor.updateState->currentDisplay == DisplayNil) construction.connectAllSelected();
         }
         else if (code == 86) // V
         {
-            if (e.getModifiers().isCommandDown())   construction.paste();
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                if (e.getModifiers().isCommandDown())   construction.paste();
+            }
         }
         else if (code == 87) // W
         {
@@ -932,7 +940,10 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         }
         else if (code == 88) // X
         {
-            if (e.getModifiers().isCommandDown())   construction.cut();
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                if (e.getModifiers().isCommandDown())   construction.cut();
+            }
         }
         else if (code == 90) // Z
         {

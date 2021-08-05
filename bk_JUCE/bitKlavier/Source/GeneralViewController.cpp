@@ -833,6 +833,7 @@ void GeneralViewController::update(void)
     eq->setSampleRate(processor.getCurrentSampleRate());
     eqGraph.setSampleRate(processor.getCurrentSampleRate());
     eqGraph.updateEQ(*eq);
+    eqGraph.setAlpha(eq->getBypassed() ? 0.4f : 1.f);
 }
 
 void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)

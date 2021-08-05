@@ -391,7 +391,7 @@ public:
         {
             //DBG("updatePartialStructure " + String(i) + " " + String(gainsKeys[i]) + " " + String(offsetsKeys[i]));
             //partialStructure.add({i - fundamentalKey, gainsKeys[i], offsetsKeys[i]});
-            partialStructure.add({i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]});
+            partialStructure.add((i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]));
         }
         
         printPartialStructure();
