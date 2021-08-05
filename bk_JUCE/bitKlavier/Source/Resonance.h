@@ -389,9 +389,11 @@ public:
         
         for (auto i : rResonanceKeys.value)
         {
+            Array<float> newres = {i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]};
+            partialStructure.add(newres);
             //DBG("updatePartialStructure " + String(i) + " " + String(gainsKeys[i]) + " " + String(offsetsKeys[i]));
-            //partialStructure.add({i - fundamentalKey, gainsKeys[i], offsetsKeys[i]});
-            partialStructure.add((i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]));
+            //partialStructure.add({i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]});
+            //partialStructure.add(((static_cast<void>(i - rFundamentalKey.value)), static_cast<void>(rGainsKeys.value[i]), rOffsetsKeys.value[i]));
         }
         
         printPartialStructure();
