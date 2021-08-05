@@ -395,6 +395,7 @@ public:
             newres.add(rOffsetsKeys.value[i]);
             partialStructure.add(newres);
             //DBG("updatePartialStructure " + String(i) + " " + String(gainsKeys[i]) + " " + String(offsetsKeys[i]));
+            // syntax below doesn't work with Windows, hence the individual adds above.
             //partialStructure.add({i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]});
             //partialStructure.add(((static_cast<void>(i - rFundamentalKey.value)), static_cast<void>(rGainsKeys.value[i]), rOffsetsKeys.value[i]));
         }
