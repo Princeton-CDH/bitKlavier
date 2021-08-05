@@ -388,8 +388,11 @@ public:
         partialStructure.clearQuick();
         
         for (auto i : rResonanceKeys.value)
-        {
-            Array<float> newres = {i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]};
+		{
+			Array<float> newres;
+            newres.add(i - rFundamentalKey.value);
+            newres.add(rGainsKeys.value[i]);
+            newres.add(rOffsetsKeys.value[i]);
             partialStructure.add(newres);
             //DBG("updatePartialStructure " + String(i) + " " + String(gainsKeys[i]) + " " + String(offsetsKeys[i]));
             //partialStructure.add({i - rFundamentalKey.value, rGainsKeys.value[i], rOffsetsKeys.value[i]});
