@@ -498,8 +498,14 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
         //if(keyVal > 0) c = c.overlaidWith (Colours::red.withSaturation ( sqrt(keyVal / 50.)) );
         //else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.)));
         //DBG("keyVal = " + String(midRange - keyVal));
+        //if (isOver && !disabledKeys.contains(midiNoteNumber) && !isDown)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+        //else
         if(keyVal > midRange) c = c.overlaidWith (Colours::red.withSaturation ( sqrt((keyVal - midRange) / (maxRange - midRange))) );
         else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt((midRange - keyVal) / (midRange - minRange))));
+
+        //if (isOver && !disabledKeys.contains(midiNoteNumber) && !isDown)  c = c.interpolatedWith (findColour (mouseOverKeyOverlayColourId), 0.5);
+        //if (isOver && !disabledKeys.contains(midiNoteNumber) && !isDown)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+
     }
     else
     {
@@ -856,6 +862,7 @@ void BKKeymapKeyboardComponent::updateNoteUnderMouse (juce::Point<int> pos, bool
     const int oldNoteDown = mouseDownNotes.getUnchecked (fingerNum);
     const float eventVelocity = useMousePositionForVelocity ? mousePositionVelocity * velocity : 1.0f;
     
+    //if (disabledKeys.contains(newNote)) return;
     lastNoteOver = newNote;
     
     if (oldNote != newNote)
@@ -864,6 +871,8 @@ void BKKeymapKeyboardComponent::updateNoteUnderMouse (juce::Point<int> pos, bool
         repaintNote (newNote);
         mouseOverNotes.set (fingerNum, newNote);
     }
+    
+    if (disabledKeys.contains(newNote)) return;
     
     if (isDown)
     {
