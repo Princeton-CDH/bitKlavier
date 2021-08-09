@@ -1714,25 +1714,26 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
 void BKAudioProcessor::saveCurrentGallery(void)
 {
     if (defaultLoaded) return;
+    File fileToSave;
     if (gallery->getURL() == "")
     {
 #if JUCE_IOS
-        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName());
+        fileToSave = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName();
 #endif
 #if JUCE_MAC
-        File fileToSave = File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + "/bitKlavier/galleries/" + gallery->getName();
-        if (!fileToSave.hasFileExtension("xml")) fileToSave = fileToSave.withFileExtension("xml");
-        writeCurrentGalleryToURL(fileToSave.getFullPathName());
-        //writeCurrentGalleryToURL( File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + "/bitKlavier/galleries/" + gallery->getName());
+        fileToSave = File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + "/bitKlavier/galleries/" + gallery->getName();
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getFullPathName() + "\\bitKlavier\\galleries\\" + gallery->getName());
+        fileToSave = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getFullPathName() + "\\bitKlavier\\galleries\\" + gallery->getName();
 #endif
     }
     else
     {
-        writeCurrentGalleryToURL(gallery->getURL());
+        fileToSave = File(gallery->getURL());
     }
+	if (!fileToSave.hasFileExtension("xml")) fileToSave = fileToSave.withFileExtension("xml");
+	writeCurrentGalleryToURL(fileToSave.getFullPathName());
+
     if (wrapperType == wrapperType_Standalone) getPluginHolder()->savePluginState();
 }
 
