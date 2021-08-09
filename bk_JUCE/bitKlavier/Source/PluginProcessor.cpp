@@ -1702,7 +1702,9 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
     
     if (myChooser.browseForFileToSave(true))
     {
-        writeCurrentGalleryToURL(myChooser.getResult().getFullPathName());
+        File fileToSave = myChooser.getResult();
+        if (!fileToSave.hasFileExtension("xml")) fileToSave = fileToSave.withFileExtension("xml");
+        writeCurrentGalleryToURL(fileToSave.getFullPathName());
     }
     
     updateGalleries();
