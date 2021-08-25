@@ -658,11 +658,11 @@ float Keymap::applyVelocityCurve(float velocity)
     else if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
     // something will break down the line if not capped - note from jeff
     
-    DBG("asym_k = " + String(asym_k));
-    DBG("sym_k = " + String(sym_k));
-    DBG("scale = " + String(scale));
-    DBG("offset = " + String(offset));
-    DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
+    //DBG("asym_k = " + String(asym_k));
+    //DBG("sym_k = " + String(sym_k));
+    //DBG("scale = " + String(scale));
+    //DBG("offset = " + String(offset));
+    //DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
     
     return velocityCurved;
 }

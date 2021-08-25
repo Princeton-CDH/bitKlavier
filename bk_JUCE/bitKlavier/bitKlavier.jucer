@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.0b"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.0rc3"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -15,7 +15,7 @@
               buildStandalone="1" enableIAA="1" cppLanguageStandard="17" companyCopyright="Many Arrows Music"
               pluginFormats="buildAU,buildStandalone,buildVST,buildVST3,enableIAA"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
-              pluginVST3Category="Instrument" defines="JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1"
+              pluginVST3Category="Instrument" defines="JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1&#10;JUCE_MODAL_LOOPS_PERMITTED=1&#10;"
               jucerFormatVersion="1">
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
@@ -116,6 +116,18 @@
                   file="Source/galleries/Examples/46. Harmonizer 3.xml"/>
             <FILE id="oMflf6" name="47. Harmonizer 4.xml" compile="0" resource="1"
                   file="Source/galleries/Examples/47. Harmonizer 4.xml"/>
+            <FILE id="eiqzVh" name="48. Resonance 1.xml" compile="0" resource="1"
+                  file="/Applications/bitKlavier/galleries/Examples_new/48. Resonance 1.xml"/>
+            <FILE id="DxOkX2" name="49. Resonance 2.xml" compile="0" resource="1"
+                  file="/Applications/bitKlavier/galleries/Examples_new/49. Resonance 2.xml"/>
+            <FILE id="GidLjc" name="50. Resonance 3.xml" compile="0" resource="1"
+                  file="/Applications/bitKlavier/galleries/Examples_new/50. Resonance 3.xml"/>
+            <FILE id="OqJB8o" name="51. Resonance 4.xml" compile="0" resource="1"
+                  file="/Applications/bitKlavier/galleries/Examples_new/51. Resonance 4.xml"/>
+            <FILE id="fXjld6" name="52. Resonance 5.xml" compile="0" resource="1"
+                  file="/Applications/bitKlavier/galleries/Examples_new/52. Resonance 5.xml"/>
+            <FILE id="s7mGXy" name="53. Resonance 6.xml" compile="0" resource="1"
+                  file="/Applications/bitKlavier/galleries/Examples_new/53. Resonance 6.xml"/>
           </GROUP>
           <GROUP id="{DC95ED57-B0B0-DFDE-4EA4-2AEDDF41B82F}" name="Mikroetudes">
             <FILE id="o6aLKt" name="And So.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/And So.xml"/>
@@ -540,7 +552,7 @@
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        cppLibType="" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       osxCompatibility="10.9 SDK" enablePluginBinaryCopyStep="1"/>
+                       osxCompatibility="10.9 SDK" enablePluginBinaryCopyStep="1" macOSDeploymentTarget="10.9"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
@@ -571,9 +583,10 @@
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        plistPreprocessorDefinitions="" iosCompatibility="12.0" enablePluginBinaryCopyStep="1"
-                       codeSigningIdentity="EFHE8JGE6R"/>
+                       codeSigningIdentity="EFHE8JGE6R" iosDeploymentTarget="12.0"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       iosCompatibility="12.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="EFHE8JGE6R"/>
+                       iosCompatibility="12.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="EFHE8JGE6R"
+                       iosDeploymentTarget="12.0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>

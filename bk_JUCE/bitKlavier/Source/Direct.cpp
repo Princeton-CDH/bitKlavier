@@ -219,13 +219,13 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
     
     if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
     
-    DBG("DirectProcessor::keyReleased " + String(noteNumber));
+    //DBG("DirectProcessor::keyReleased " + String(noteNumber));
     for (int i = 0; i < keyPlayed[noteNumber].size(); i++)
     {
         int t = keyPlayed[noteNumber].getUnchecked(i);
         //float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
         
-        DBG("DirectProcessor::keyReleased sending keyOff");
+        //DBG("DirectProcessor::keyReleased sending keyOff");
         synth->keyOff(1,
                       MainNote,
                       direct->prep->getSoundSet(), //set

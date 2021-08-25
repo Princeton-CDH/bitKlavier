@@ -117,13 +117,13 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
 
     for (HashMap<int, Array<SympPartial::Ptr>>::Iterator heldNotePartials (sympStrings); heldNotePartials.next();)
     {
-        DBG("Resonance::ringSympStrings: iterating through sympStrings");
+        //DBG("Resonance::ringSympStrings: iterating through sympStrings");
         // indexed by heldNote (midiNoteNumber)
         // iterate through partials of incoming note (noteNumber) and see if they are contained in this set of heldNotePartials
         //for (int j = 0; j < partialStructure.size(); j++)
         for (int j = 0; j < resonance->prep->getPartialStructure().size(); j++)
         {
-            DBG("Resonance::ringSympStrings: iterating through partialStructure");
+            //DBG("Resonance::ringSympStrings: iterating through partialStructure");
             // strucknote (noteNumber) + partialKey offset (key closest to this partial)
             //int currentStruckPartial = noteNumber + partialStructure.getReference(j)[0];
             int currentStruckPartial = noteNumber + resonance->prep->getPartialStructure().getReference(j)[0];
@@ -131,7 +131,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
             for (auto currentSympPartial : *heldNotePartials)
             {
                 // DBG("Resonance::ringSympStrings: iterating through heldNotePartials");
-                DBG("Resonance: currentStruckPartial = " + String(currentStruckPartial) + " heldKey = " + String(currentSympPartial->heldKey));
+                //DBG("Resonance: currentStruckPartial = " + String(currentStruckPartial) + " heldKey = " + String(currentSympPartial->heldKey));
                 if (currentSympPartial->partialKey == currentStruckPartial)
                 {
                     // found an overlapping partial!
@@ -142,9 +142,9 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                                         + (resonance->prep->getMaxStartTime() - resonance->prep->getMinStartTime())
                                         * (1. - velocity);
                     
-                    DBG("Resonance: found an overlapping partial, currentPlayPosition = "
-                        + String(currentSympPartial->playPosition  / (.001 *  synth->getSampleRate()))
-                        + " newPlayPosition = " + String(newPlayPosition));
+                    //DBG("Resonance: found an overlapping partial, currentPlayPosition = "
+                        //+ String(currentSympPartial->playPosition  / (.001 *  synth->getSampleRate()))
+                        //+ " newPlayPosition = " + String(newPlayPosition));
                     
                     // only create a new resonance if it would be louder/brighter than what is currently there
                     if (newPlayPosition < currentSympPartial->playPosition  / (.001 *  synth->getSampleRate()))
@@ -172,19 +172,21 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                                               ) / .5; // in fractional note values
 
                         if (tuningGap > 2.) tuningGap = 2.;
-                        DBG("Resonance: tuningGap = " + String(tuningGap));
+                        //DBG("Resonance: tuningGap = " + String(tuningGap));
 
                         // play it, use max velocity for all resonance; loudness/brightness is set by newPlayPosition
                         // adjust gain according to gap in tuning; 50 cent gap will result in 6dB cut in gain
                         //      might be better to adjust playback position due to gap, instead of adjusting the gain?
+                        /*
                         DBG("Resonance playNote: "   + String(noteNumber)
                                                     + " heldKey = " + String(currentSympPartial->heldKey)
                                                     + " partialKey = " + String(currentStruckPartial)
                                                     + " heldKey offset = " + String(tuning->getOffset(noteNumber, false))
                                                     + " partialKey offset = " + String(tuning->getOffset(currentSympPartial->heldKey, false) + .01 * currentSympPartial->offset));
+                         */
                         
                         Array<float> ADSRvals = resonance->prep->getADSRvals();
-                        DBG("Resonance: ADSR release time = " + String(ADSRvals[3]));
+                        //DBG("Resonance: ADSR release time = " + String(ADSRvals[3]));
                         if (!blendronic.isEmpty())
                         {
                                 synth->keyOn(
@@ -251,13 +253,13 @@ void ResonanceProcessor::addSympStrings(int noteNumber, float velocity)
 {
     if(sympStrings.size() > resonance->prep->getMaxSympStrings())
     {
-        DBG("Resonance: removing oldest sympathetic string");
+        //DBG("Resonance: removing oldest sympathetic string");
         int oldestString = activeSympStrings.getLast();
         removeSympStrings(oldestString, velocity);
         activeSympStrings.removeLast();
     }
     
-    DBG("Resonance: addingSympatheticString " + String(noteNumber));
+    //DBG("Resonance: addingSympatheticString " + String(noteNumber));
     //for (int i = 0; i < partialStructure.size(); i++)
     //resonance->prep->getPartialStructure()
     for (int i = 0; i < resonance->prep->getPartialStructure().size(); i++)
@@ -268,24 +270,24 @@ void ResonanceProcessor::addSympStrings(int noteNumber, float velocity)
         if (partialKey > 127 || partialKey < 0) continue;
 
         // make a newPartial object, with gain and offset vals
-        DBG("Resonance: adding partial " + String(partialKey) + " to " + String(noteNumber));
+        //DBG("Resonance: adding partial " + String(partialKey) + " to " + String(noteNumber));
         sympStrings.getReference(noteNumber).add(new SympPartial(noteNumber, partialKey, resonance->prep->getPartialStructure()[i][1], resonance->prep->getPartialStructure()[i][2]));
         
         // add to list of currently active strings, for voice management
         activeSympStrings.insert(0, noteNumber);
     }
 
-    DBG("Resonance: number of partials = " + String(sympStrings[noteNumber].size()));
+    //DBG("Resonance: number of partials = " + String(sympStrings[noteNumber].size()));
 }
 
 // this will turn off all the resonances associated with this string/key, and then remove those from the currently available sympathetic strings
 void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity)
 {
     // turn off each partial associated with this string
-    DBG("Resonance: removing partials of " + String(noteNumber));
+    //DBG("Resonance: removing partials of " + String(noteNumber));
     for (auto sympString : sympStrings.getReference(noteNumber))
     {
-        DBG("Resonance: removing partial " + String(sympString->partialKey) + " of held key " + String(sympString->heldKey));
+        //DBG("Resonance: removing partial " + String(sympString->partialKey) + " of held key " + String(sympString->heldKey));
         
         synth->keyOff(1,
                       ResonanceNote,

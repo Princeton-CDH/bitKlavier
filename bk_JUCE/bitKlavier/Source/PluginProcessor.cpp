@@ -284,7 +284,13 @@ void BKAudioProcessor::loadGalleries()
         "44. Harmonizer 1",
         "45. Harmonizer 2",
         "46. Harmonizer 3",
-        "47. Harmonizer 4"
+        "47. Harmonizer 4",
+        "48. Resonance 1",
+        "49. Resonance 2",
+        "50. Resonance 3",
+        "51. Resonance 4",
+        "52. Resonance 5",
+        "53. Resonance 6"
         
     });
     
@@ -1520,7 +1526,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
     
     
     ResonanceModification::PtrArr rMod = currentPiano->modificationMap[noteNumber]->getResonanceModifications();
-    DBG("about to perform resonance modifications: " + String(rMod.size()));
+    //DBG("about to perform resonance modifications: " + String(rMod.size()));
     for (int i = rMod.size(); --i >= 0;)
     {
         ResonanceModification::Ptr mod = rMod[i];
