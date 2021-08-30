@@ -749,6 +749,9 @@ void MainViewController::handleNoteOff(BKKeymapKeyboardState* source, int midiNo
 bool MainViewController::keyPressed (const KeyPress& e, Component*)
 {
     int code = e.getKeyCode();
+    //DBG("ainViewController::keyPressed code = " + String(code));
+    // '/' = 47
+    // '\' = 92
 
 	if (processor.areHotkeysEnabled())
 	{
@@ -853,7 +856,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         {
             if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeDirect);
         }
-        else if (code == 69) // E resonance
+        else if (code == 69) // E Keymap stuff
         {
             if (processor.updateState->currentDisplay == DisplayKeymap)
             {
@@ -862,7 +865,11 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                 keymap->setHarMidiEdit(false);
                 keymap->setHarArrayMidiEdit(false);
             }
-            else if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeResonance);
+            //else if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeResonance);
+        }
+        else if (code == 82) // R resonance
+        {
+            if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeResonance);
         }
         else if (code == 73) // I
         {
@@ -888,7 +895,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         {
         if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypePianoMap);
         }
-        else if (code == 81) // Q comment
+        else if (code == 81) // Q keymap stuff
         {
             if (processor.updateState->currentDisplay == DisplayKeymap)
             {
@@ -897,9 +904,13 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                 keymap->setHarMidiEdit(false);
                 keymap->toggleHarArrayMidiEdit();
             }
-            else if(processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeComment);
         }
-        else if (code == 82) // R reset
+        else if (code == 47) // '/' comment
+        {
+            if(processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeComment);
+        }
+        //else if (code == 82) // R reset
+        else if (code == 92) // '\' reset
         {
             if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeReset);
         }
