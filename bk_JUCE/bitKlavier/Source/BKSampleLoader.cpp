@@ -1290,9 +1290,13 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
     //==============================================================================
     //==============================================================================
     // Load any hammer release samples
-    
     if (numHammers > 0)
     {
+        int start;
+        int end = 20;
+        int range = 88 / numHammers;
+        int root;
+        
         for (int i = 1; i <= numHammers; i++) {
             EXIT_CHECK;
             String temp;
@@ -1318,7 +1322,19 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                     sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
                 }
                 
+                // set range and root for each sample; try to divide evenly across keyboard to minimize transposition
+                //      transposition will still be pretty extreme if there aren't very many samples though!
+                start   = end;
+                end     = start + range;
+                root    = start + range / 2;
+                
                 BigInteger noteRange;
+                if (i == numHammers) noteRange.setRange(start, 109 - start, true); // make sure top one reaches all the way
+                else noteRange.setRange(start, range, true);
+                
+                DBG("HAMMER LOAD root = " + String(root) + " start = " + String(start) + " end = " + String(end));
+                
+                /*
                 // Distribute hammers across the keyboard
                 int a = ((88. / numHammers) * i) - i;
                 int start = 20 - a + (88. / numHammers) * i;
@@ -1335,11 +1351,12 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                 {
                     noteRange.setRange(start, num, true);
                 }
+                 */
                 
                 BigInteger velocityRange;
                 velocityRange.setRange(0, 128, true);
                 
-                int root = 20 + i;
+                //int root = 20 + i;
                 
                 if (memoryMappingEnabled)
                 {

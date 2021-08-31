@@ -552,7 +552,7 @@
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        cppLibType="" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       osxCompatibility="10.9 SDK" enablePluginBinaryCopyStep="1" macOSDeploymentTarget="10.9"/>
+                       osxCompatibility="10.11 SDK" enablePluginBinaryCopyStep="1" macOSDeploymentTarget="10.11"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>

@@ -899,9 +899,9 @@ void SynchronicPreparationEditor::timerCallback()
         else clusterThreshSlider->setDisplayValue(0);
         
         holdTimeMinMaxSlider->setDisplayValue(sProcessor->getHoldTimer());
-        DBG("sProcessor->getOldestHoldTimer() = " + String(sProcessor->getHoldTimer()));
+        //DBG("sProcessor->getOldestHoldTimer() = " + String(sProcessor->getHoldTimer()));
         velocityMinMaxSlider->setDisplayValue(sProcessor->getLastVelocity() * 127.);
-        DBG("sProcessor->getLastVelocity() = " + String(sProcessor->getLastVelocity()));
+        //DBG("sProcessor->getLastVelocity() = " + String(sProcessor->getLastVelocity()));
         
         int maxTemp = 12; //arbitrary
         if(prep->sClusterMax.value > prep->sClusterMin.value) maxTemp = prep->sClusterMax.value;

@@ -691,7 +691,7 @@ void DirectPreparationEditor::timerCallback()
         DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
         
         velocityMinMaxSlider->setDisplayValue(dProcessor->getLastVelocity() * 127.);
-        DBG("sProcessor->getLastVelocity() = " + String(dProcessor->getLastVelocity()));
+        //DBG("sProcessor->getLastVelocity() = " + String(dProcessor->getLastVelocity()));
         
         if (prep != nullptr && dProcessor != nullptr)
         {
