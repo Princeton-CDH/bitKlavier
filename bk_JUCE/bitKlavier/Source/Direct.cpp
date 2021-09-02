@@ -41,6 +41,7 @@ void DirectPreparation::performModification(DirectModification* d, Array<bool> d
     
     // If the mod didn't reverse, then it is modded
     modded = !reverse;
+
 }
 
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
@@ -68,13 +69,18 @@ keymaps(Keymap::PtrArr())
             invertVelocities.getReference(j).add(-1.f);
         }
     }
-         
     
     if (!direct->prep->dUseGlobalSoundSet.value)
     {
         String name = direct->prep->dSoundSetName.value;
         int Id = synth->processor.findPathAndLoadSamples(name);
         direct->prep->setSoundSet(Id);
+    }
+    
+    noteLengthTimers.ensureStorageAllocated(128);
+    for (int i = 0; i < 128; i++)
+    {
+        noteLengthTimers.insert(i, 0); //initialize timers for all notes
     }
 }
 
@@ -85,6 +91,9 @@ DirectProcessor::~DirectProcessor(void)
 
 void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
+    activeNotes.addIfNotAlreadyThere(noteNumber);
+    //noteLengthTimers.set(noteNumber, 0);
+    
     // aVels will be used for velocity calculations; bVels will be used for conditionals
     Array<float> *aVels, *bVels;
     // If this is an actual key press (not an inverted release) aVels and bVels are the same
@@ -240,6 +249,9 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
 
     keyPlayed[noteNumber].removeFirstMatchingValue(noteNumber);
     keyPlayedOffset[noteNumber].removeFirstMatchingValue(noteNumber);
+    
+    activeNotes.removeFirstMatchingValue(noteNumber);
+    noteLengthTimers.set(noteNumber, 0);
 }
 
 void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelocities,
@@ -299,11 +311,15 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
                              tuner,
                              direct->prep->getHammerGainPtr());
         
+        float held = noteLengthTimers.getUnchecked(noteNumber) * (1. / synth->getSampleRate());
         resonanceSynth->keyOn(1,
                               noteNumber,
                               t,
                               t_offset,
-                              aVels->getUnchecked(TargetTypeDirect),
+                              //aVels->getUnchecked(TargetTypeDirect),
+                              // resonance loudness should be set by attack velocity, not release velocity
+                              // and then scaled exponentially by how long the note is held
+                              bVels->getUnchecked(TargetTypeDirect) * exp(-1. * held / 2.), // 2 second half-life
                               RES_GAIN_SCALE,
                               Forward,
                               Normal,
@@ -353,6 +369,13 @@ float DirectProcessor::filterVelocity(float vel)
 void DirectProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoadType type)
 {
     sampleType = type;
+    
+    for(int i=(activeNotes.size()-1); i >= 0; --i)
+    {
+        //DBG("DirectProcessor::processBlock = " + String(noteLengthTimers.getUnchecked(activeNotes.getUnchecked(i))));
+        noteLengthTimers.set(activeNotes.getUnchecked(i),
+                             noteLengthTimers.getUnchecked(activeNotes.getUnchecked(i)) + numSamples);
+    }
     //tuner->processor->incrementAdaptiveClusterTime(numSamples);
 }
 
