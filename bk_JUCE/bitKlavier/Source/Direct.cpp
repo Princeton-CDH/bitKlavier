@@ -319,7 +319,7 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
                               //aVels->getUnchecked(TargetTypeDirect),
                               // resonance loudness should be set by attack velocity, not release velocity
                               // and then scaled exponentially by how long the note is held
-                              bVels->getUnchecked(TargetTypeDirect) * exp(-1. * held / 2.), // 2 second half-life
+                              bVels->getUnchecked(TargetTypeDirect) * exp(-1. * held / 2.), // 2 second "mean lifetime"
                               RES_GAIN_SCALE,
                               Forward,
                               Normal,
