@@ -116,18 +116,18 @@
                   file="Source/galleries/Examples/46. Harmonizer 3.xml"/>
             <FILE id="oMflf6" name="47. Harmonizer 4.xml" compile="0" resource="1"
                   file="Source/galleries/Examples/47. Harmonizer 4.xml"/>
-            <FILE id="eiqzVh" name="48. Resonance 1.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/48. Resonance 1.xml"/>
-            <FILE id="DxOkX2" name="49. Resonance 2.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/49. Resonance 2.xml"/>
-            <FILE id="GidLjc" name="50. Resonance 3.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/50. Resonance 3.xml"/>
-            <FILE id="OqJB8o" name="51. Resonance 4.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/51. Resonance 4.xml"/>
-            <FILE id="fXjld6" name="52. Resonance 5.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/52. Resonance 5.xml"/>
-            <FILE id="s7mGXy" name="53. Resonance 6.xml" compile="0" resource="1"
-                  file="/Applications/bitKlavier/galleries/Examples_new/53. Resonance 6.xml"/>
+            <FILE id="zQ6YC5" name="48. Resonance 1.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/48. Resonance 1.xml"/>
+            <FILE id="mEts4f" name="49. Resonance 2.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/49. Resonance 2.xml"/>
+            <FILE id="laAPXk" name="50. Resonance 3.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/50. Resonance 3.xml"/>
+            <FILE id="gbjMtx" name="51. Resonance 4.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/51. Resonance 4.xml"/>
+            <FILE id="dUb2mp" name="52. Resonance 5.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/52. Resonance 5.xml"/>
+            <FILE id="hPK6G1" name="53. Resonance 6.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/53. Resonance 6.xml"/>
           </GROUP>
           <GROUP id="{DC95ED57-B0B0-DFDE-4EA4-2AEDDF41B82F}" name="Mikroetudes">
             <FILE id="o6aLKt" name="And So.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/And So.xml"/>
