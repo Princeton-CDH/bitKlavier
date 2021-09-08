@@ -1,10 +1,6 @@
 # bitKlavier: the prepared digital piano
 
-<<<<<<< HEAD
-Developed by Dan Trueman, Michael Mulshine, Matt Wang, and Theo Trevisan.
-=======
 Developed by Dan Trueman, Michael Mulshine, Matt Wang, Theo Trevisan, Katie Chou, and Jeff Gordon.
->>>>>>> dev
 
 bitKlavier takes inspiration from John Cage's *prepared piano*, but instead of screws and erasers we place a reconfigurable collection of digital machines between the virtual strings of the digital piano. Learn more at the [bitKlavier website](http://bitklavier.com).
 
