@@ -173,7 +173,7 @@ void TuningProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
     if (fromPress)
     {
         aVels = bVels = &invertVelocities.getReference(noteNumber);
-        for (int i = TargetTypeTuning; i < TargetTypeNil; ++i)
+        for (int i = TargetTypeTuning; i < TargetTypeTuning+1; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
@@ -202,7 +202,7 @@ void TuningProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
     if (fromPress)
     {
         aVels = bVels = &velocities.getReference(noteNumber);
-        for (int i = TargetTypeTuning; i < TargetTypeNil; ++i)
+        for (int i = TargetTypeTuning; i < TargetTypeTuning+1; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }

@@ -78,42 +78,7 @@ keymaps(Keymap::PtrArr())
     {
         // comes in as "soundfont.sf2.subsound1"
         String name = nostalgic->prep->nSoundSetName.value;
-        BKSampleLoadType type;
-        String path;
-        int subsound = 0;
-        
-        for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
-        {
-            if (name == String(cBKSampleLoadTypes[i]))
-            {
-                type = (BKSampleLoadType) i;
-            }
-        }
-        
-        String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
-        for (auto sf : synth->processor.soundfontNames)
-        {
-            if (sf.contains(sfName))
-            {
-                type = BKLoadSoundfont;
-                path = sf;
-                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
-                break;
-            }
-        }
-        
-        
-        for (auto cs : synth->processor.customSampleSetNames)
-        {
-            if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
-            {
-                type = BKLoadCustom;
-                path = cs;
-                break;
-            }
-        }
-        
-        int Id = synth->loadSamples(type, path, subsound, false);
+        int Id = synth->processor.findPathAndLoadSamples(name);
         nostalgic->prep->setSoundSet(Id);
     }
     
@@ -165,7 +130,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     if (fromPress)
     {
         aVels = bVels = &invertVelocities.getReference(noteNumber);
-        for (int i = TargetTypeNostalgic; i < TargetTypeBlendronicPatternSync; ++i)
+        for (int i = TargetTypeNostalgic; i <= TargetTypeNostalgicClear; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
@@ -575,7 +540,7 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
     if (fromPress)
     {
         aVels = bVels = &velocities.getReference(noteNumber);
-        for (int i = TargetTypeNostalgic; i < TargetTypeBlendronicPatternSync; ++i)
+        for (int i = TargetTypeNostalgic; i <= TargetTypeNostalgicClear; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }

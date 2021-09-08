@@ -280,6 +280,42 @@ public:
     float getLastNoteOverValue();
     
     void doKeysToggle(bool tog) { keysToggle = tog; }
+    
+    void setMinMidMaxValues(float min, float mid, float max)
+    {
+        if (min > mid || min > max || mid > max) {
+            DBG("min must be < mid must be < max");
+            return;
+        }
+        
+        minRange = min;
+        midRange = mid;
+        maxRange = max;
+        
+        clearKeyValues();
+    }
+    
+    void disableKey(int midiNoteNumber)
+    {
+        disabledKeys.add(midiNoteNumber);
+    }
+    
+    void enableKey(int midiNoteNumber)
+    {
+        disabledKeys.removeAllInstancesOf(midiNoteNumber);
+    }
+    
+    void disableAllKeys()
+    {
+        for (int i = rangeStart; i <= rangeEnd; i++) {
+            disableKey(i);
+        }
+    }
+    
+    void enableAllKeys()
+    {
+        disabledKeys.clearQuick();
+    }
 
     //==============================================================================
     /** @internal */
@@ -449,7 +485,13 @@ private:
     void repaintNote (int midiNoteNumber);
     void setLowestVisibleKeyFloat (float noteNumber);
     
+    float midRange;
+    float minRange;
+    float maxRange;
+    
     int lastNoteOver;
+    
+    Array<int> disabledKeys;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKKeymapKeyboardComponent)
 };

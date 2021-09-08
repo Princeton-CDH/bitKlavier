@@ -756,6 +756,10 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     {
         vc->addItem(PreparationTypeBlendronic, true);
     }
+    else if (result == RESONANCE_ID)
+    {
+        vc->addItem(PreparationTypeResonance, true);
+    }
     else if (result == TUNING_ID)
     {
         vc->addItem(PreparationTypeTuning, true);
@@ -806,6 +810,10 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     {
         processor.updateState->setCurrentDisplay(PreparationTypeBlendronic);
     }
+    else if (result == RESONANCE_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeResonance);
+    }
     else if (result == TUNING_EDIT_ID)
     {
         processor.updateState->setCurrentDisplay(PreparationTypeTuning);
@@ -821,6 +829,10 @@ void BKConstructionSite::editMenuCallback(int result, BKConstructionSite* vc)
     else if (result == NOSTALGICMOD_EDIT_ID)
     {
         processor.updateState->setCurrentDisplay(PreparationTypeNostalgicMod);
+    }
+    else if (result == RESONANCEMOD_EDIT_ID)
+    {
+        processor.updateState->setCurrentDisplay(PreparationTypeResonanceMod);
     }
     else if (result == SYNCHRONICMOD_EDIT_ID)
     {
@@ -853,7 +865,7 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
             itemSource = itemToSelect;
             
             if (itemSource != nullptr)
-            {
+            {`
                 if ((itemSource->getType() != PreparationTypeComment) &&
                     (itemSource->getType() != PreparationTypePianoMap))
                 {
@@ -1185,10 +1197,12 @@ void BKConstructionSite::idDidChange(void)
     else if (type == PreparationTypeNostalgic)      newId = processor.updateState->currentNostalgicId;
     else if (type == PreparationTypeSynchronic)     newId = processor.updateState->currentSynchronicId;
     else if (type == PreparationTypeBlendronic)     newId = processor.updateState->currentBlendronicId;
+    else if (type == PreparationTypeResonance)      newId = processor.updateState->currentResonanceId;
     else if (type == PreparationTypeTempo)          newId = processor.updateState->currentTempoId;
     else if (type == PreparationTypeTuning)         newId = processor.updateState->currentTuningId;
     else if (type == PreparationTypeDirectMod)      newId = processor.updateState->currentModDirectId;
     else if (type == PreparationTypeNostalgicMod)   newId = processor.updateState->currentModNostalgicId;
+    else if (type == PreparationTypeResonanceMod)   newId = processor.updateState->currentModResonanceId;
     else if (type == PreparationTypeSynchronicMod)  newId = processor.updateState->currentModSynchronicId;
     else if (type == PreparationTypeBlendronicMod)  newId = processor.updateState->currentModBlendronicId;
     else if (type == PreparationTypeTuningMod)      newId = processor.updateState->currentModTuningId;

@@ -270,11 +270,8 @@ public:
         }
 
         // If the xml is old enough to not have targetStates saved these should be set to true
-        targetStates.setUnchecked(TargetTypeDirect, true);
         targetStates.setUnchecked(TargetTypeSynchronic, true);
         targetStates.setUnchecked(TargetTypeNostalgic, true);
-        targetStates.setUnchecked(TargetTypeTempo, true);
-        targetStates.setUnchecked(TargetTypeTuning, true);
         for (int i = 0; i < TargetTypeNil; ++i)
         {
             String attr = e->getStringAttribute(ptagKeymap_targetStates + String(i));
@@ -285,6 +282,12 @@ public:
                 targetStates.setUnchecked(i, attr.getIntValue() == 1);
             }
         }
+        // These should always be true regardless of what has been saved
+        // (until we add other targets to these)
+        targetStates.setUnchecked(TargetTypeDirect, true);
+        targetStates.setUnchecked(TargetTypeTempo, true);
+        targetStates.setUnchecked(TargetTypeTuning, true);
+        targetStates.setUnchecked(TargetTypeResonance, true);
         
         inverted = e->getStringAttribute(ptagKeymap_inverted).getIntValue();
         

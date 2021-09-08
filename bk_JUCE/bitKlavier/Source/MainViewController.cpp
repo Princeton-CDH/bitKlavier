@@ -25,7 +25,8 @@ splash(p),
 timerCallbackCount(0),
 preferencesButton("Preferences"),
 globalSoundSetButton("Use global samples"),
-sustainPedalButton("Sustain Pedal")
+sustainPedalButton("Sustain Pedal"),
+equalizerButton("Equalizer")
 {
     if (processor.platform == BKIOS)    display = DisplayConstruction;
     else                                display = DisplayDefault;
@@ -134,6 +135,12 @@ sustainPedalButton("Sustain Pedal")
     preferencesButton.setLookAndFeel(&windowLAF);
     addAndMakeVisible (preferencesButton);
     
+    // Equalizer
+    equalizerButton.addListener(this);
+    equalizerButton.setTriggeredOnMouseDown(true);
+    equalizerButton.setLookAndFeel(&windowLAF);
+    addAndMakeVisible(equalizerButton);
+    
 //    undoStatus.setLookAndFeel(&laf);
     addChildComponent(undoStatus);
     undoStatusCountdown = 0;
@@ -167,6 +174,7 @@ MainViewController::~MainViewController()
     globalSoundSetButton.removeListener(this);
     sustainPedalButton.removeListener(this);
     preferencesButton.removeListener(this);
+    equalizerButton.removeListener(this);
     mainSlider.removeListener(this);
     sampleCB.removeListener(this);
     instrumentCB.removeListener(this);
@@ -182,6 +190,7 @@ MainViewController::~MainViewController()
     globalSoundSetButton.setLookAndFeel(nullptr);
     //sustainPedalButton.setLookAndFeel(nullptr);
     preferencesButton.setLookAndFeel(nullptr);
+    equalizerButton.setLookAndFeel(nullptr);
     keyboardComponent = nullptr;
     
 }
@@ -271,6 +280,8 @@ void MainViewController::resized()
         float unit = footerSlice.getWidth() * 0.25;
         
         preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
+        
+        equalizerButton.setBounds(footerSlice.getWidth() - 100, footerSlice.getY(), 100, 20);
 
 		//original spacing to restore once tooltips/keystrokes/hotkeys get moved to a separate menu
 		sampleCB.setBounds(unit, footerSlice.getY(), unit - 0.5 * gXSpacing, 20);
@@ -384,15 +395,19 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
     DirectPreparation::Ptr dPrep;
     SynchronicPreparation::Ptr sPrep;
     NostalgicPreparation::Ptr nPrep;
+    ResonancePreparation::Ptr rPrep;
     DirectModification::Ptr dMod;
     SynchronicModification::Ptr sMod;
     NostalgicModification::Ptr nMod;
+    ResonanceModification::Ptr rMod;
     bool directSelected = false;
     bool directModSelected = false;
     bool synchronicSelected = false;
     bool synchronicModSelected = false;
     bool nostalgicSelected = false;
     bool nostalgicModSelected = false;
+    bool resonanceSelected = false;
+    bool resonanceModSelected = false;
     if (!globalSoundSetButton.getToggleState() && construction.getNumSelected() == 1)
     {
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
@@ -411,6 +426,11 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             nPrep = processor.gallery->getNostalgicPreparation(item->getId());
             nostalgicSelected = true;
         }
+        else if (item->getType() == PreparationTypeResonance)
+        {
+            rPrep = processor.gallery->getResonancePreparation(item->getId());
+            resonanceSelected = true;
+        }
         // Modifications
         else if (item->getType() == PreparationTypeDirectMod)
         {
@@ -426,6 +446,11 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         {
             nMod = processor.gallery->getNostalgicModification(item->getId());
             nostalgicModSelected = true;
+        }
+        else if (item->getType() == PreparationTypeResonanceMod)
+        {
+            rMod = processor.gallery->getResonanceModification(item->getId());
+            resonanceModSelected = true;
         }
     }
     
@@ -486,6 +511,11 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             nPrep->nSoundSet.set(soundSetId);
             nPrep->nSoundSetName.set(soundSetName);
         }
+        else if (resonanceSelected)
+        {
+            rPrep->rSoundSet.set(soundSetId);
+            rPrep->rSoundSetName.set(soundSetName);
+        }
         else if (directModSelected)
         {
             dMod->dSoundSet.set(soundSetId);
@@ -503,6 +533,12 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             nMod->nSoundSet.set(soundSetId);
             nMod->nSoundSetName.set(soundSetName);
             nMod->setDirty(NostalgicSoundSet);
+        }
+        else if (resonanceModSelected)
+        {
+            rMod->rSoundSet.set(soundSetId);
+            rMod->rSoundSetName.set(soundSetName);
+            rMod->setDirty(ResonanceSoundSet);
         }
         
         lastSelectedSampleCBId = selectedId;
@@ -533,6 +569,14 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             nPrep->nSoundSet.set(soundSetId);
             nPrep->nSoundSetName.set(soundSetName);
         }
+        else if (resonanceSelected)
+        {
+            String sfname = processor.loadedSoundSets[rPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
+            int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
+            rPrep->rSoundSet.set(soundSetId);
+            rPrep->rSoundSetName.set(soundSetName);
+        }
         // Modifications
         else if (directModSelected)
         {
@@ -561,6 +605,15 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             nMod->nSoundSetName.set(soundSetName);
             nMod->setDirty(NostalgicSoundSet);
         }
+        else if (resonanceModSelected)
+        {
+            String sfname = processor.loadedSoundSets[rMod->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
+            int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
+            String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
+            rMod->rSoundSet.set(soundSetId);
+            rMod->rSoundSetName.set(soundSetName);
+            rMod->setDirty(ResonanceSoundSet);
+        }
         else
         {
             processor.loadSamples(BKLoadSoundfont, processor.globalSoundfont, cb->getSelectedItemIndex());
@@ -577,24 +630,43 @@ void MainViewController::bkButtonClicked (Button* b)
     }
     if (b == &globalSoundSetButton)
     {
+        String globalSoundSetName =
+        processor.loadedSoundSets[processor.globalSoundSetId]
+        .fromLastOccurrenceOf(File::getSeparatorString(), false, false);
+        
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
             DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(item->getId());
             bool toggle = !prep->dUseGlobalSoundSet.value;
             prep->dUseGlobalSoundSet.set(toggle);
+            if (prep->dSoundSet.value < 0)
+            {
+                prep->dSoundSet.set(processor.globalSoundSetId);
+                prep->dSoundSetName.set(globalSoundSetName);
+            }
         }
         else if (item->getType() == PreparationTypeSynchronic)
         {
             SynchronicPreparation::Ptr prep = processor.gallery->getSynchronicPreparation(item->getId());
             bool toggle = !prep->sUseGlobalSoundSet.value;
             prep->sUseGlobalSoundSet.set(toggle);
+            if (prep->sSoundSet.value < 0)
+            {
+                prep->sSoundSet.set(processor.globalSoundSetId);
+                prep->sSoundSetName.set(globalSoundSetName);
+            }
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
             NostalgicPreparation::Ptr prep = processor.gallery->getNostalgicPreparation(item->getId());
             bool toggle = !prep->nUseGlobalSoundSet.value;
             prep->nUseGlobalSoundSet.set(toggle);
+            if (prep->nSoundSet.value < 0)
+            {
+                prep->nSoundSet.set(processor.globalSoundSetId);
+                prep->nSoundSetName.set(globalSoundSetName);
+            }
         }
         // Modifications
         else if (item->getType() == PreparationTypeDirectMod)
@@ -603,6 +675,12 @@ void MainViewController::bkButtonClicked (Button* b)
             bool toggle = !mod->dUseGlobalSoundSet.value;
             mod->dUseGlobalSoundSet.set(toggle);
             mod->setDirty(DirectUseGlobalSoundSet);
+            if (mod->dSoundSet.value < 0)
+            {
+                mod->dSoundSet.set(processor.globalSoundSetId);
+                mod->dSoundSetName.set(globalSoundSetName);
+                mod->setDirty(DirectSoundSet);
+            }
         }
         else if (item->getType() == PreparationTypeSynchronicMod)
         {
@@ -610,6 +688,12 @@ void MainViewController::bkButtonClicked (Button* b)
             bool toggle = !mod->sUseGlobalSoundSet.value;
             mod->sUseGlobalSoundSet.set(toggle);
             mod->setDirty(SynchronicUseGlobalSoundSet);
+            if (mod->sSoundSet.value < 0)
+            {
+                mod->sSoundSet.set(processor.globalSoundSetId);
+                mod->sSoundSetName.set(globalSoundSetName);
+                mod->setDirty(SynchronicSoundSet);
+            }
         }
         else if (item->getType() == PreparationTypeNostalgicMod)
         {
@@ -617,11 +701,20 @@ void MainViewController::bkButtonClicked (Button* b)
             bool toggle = !mod->nUseGlobalSoundSet.value;
             mod->nUseGlobalSoundSet.set(toggle);
             mod->setDirty(NostalgicUseGlobalSoundSet);
+            if (mod->nSoundSet.value < 0)
+            {
+                mod->nSoundSet.set(processor.globalSoundSetId);
+                mod->nSoundSetName.set(globalSoundSetName);
+                mod->setDirty(NostalgicSoundSet);
+            }
         }
     }
     if (b == &sustainPedalButton)
     {
         processor.setSustainFromMenu(sustainPedalButton.getToggleState());
+    }
+    if (b == &equalizerButton) {
+        editor.showGenSettings(1);
     }
 }
 
@@ -656,6 +749,9 @@ void MainViewController::handleNoteOff(BKKeymapKeyboardState* source, int midiNo
 bool MainViewController::keyPressed (const KeyPress& e, Component*)
 {
     int code = e.getKeyCode();
+    //DBG("ainViewController::keyPressed code = " + String(code));
+    // '/' = 47
+    // '\' = 92
 
 	if (processor.areHotkeysEnabled())
 	{
@@ -687,16 +783,19 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         }
         else if (code == KeyPress::deleteKey)
         {
-            construction.deleteSelected();
+            if (processor.updateState->currentDisplay == DisplayNil) construction.deleteSelected();
         }
         else if (code == KeyPress::backspaceKey)
         {
-            construction.deleteSelected();
+            if (processor.updateState->currentDisplay == DisplayNil) construction.deleteSelected();
         }
         else if (code == KeyPress::upKey)
         {
-            if (e.getModifiers().isCommandDown())   construction.align(0);
-            else                                    construction.move(0, e.getModifiers().isShiftDown());
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                if (e.getModifiers().isCommandDown())   construction.align(0);
+                else                                    construction.move(0, e.getModifiers().isShiftDown());
+            }
         }
         else if (code == KeyPress::rightKey)
         {
@@ -712,11 +811,11 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         }
         else if (code == KeyPress::downKey)
         {
-            
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
                 if (e.getModifiers().isCommandDown())   construction.align(2);
                 else                                    construction.move(2, e.getModifiers().isShiftDown());
-            
-            
+            }
         }
         else if (code == KeyPress::leftKey)
         {
@@ -743,18 +842,21 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         }
         else if (code == 66) // B blendronic
         {
-            construction.addItem(PreparationTypeBlendronic);
+            if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeBlendronic);
         }
         else if (code == 67) // C modification
         {
-            if (e.getModifiers().isCommandDown())   construction.copy();
-            else                                    construction.addItem(PreparationTypeGenericMod);
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                if (e.getModifiers().isCommandDown())   construction.copy();
+                else                                    construction.addItem(PreparationTypeGenericMod);
+            }
         }
         else if (code == 68) // D direct
         {
-            construction.addItem(PreparationTypeDirect);
+            if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeDirect);
         }
-        else if (code == 69) // E
+        else if (code == 69) // E Keymap stuff
         {
             if (processor.updateState->currentDisplay == DisplayKeymap)
             {
@@ -763,32 +865,37 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                 keymap->setHarMidiEdit(false);
                 keymap->setHarArrayMidiEdit(false);
             }
+            //else if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeResonance);
+        }
+        else if (code == 82) // R resonance
+        {
+            if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeResonance);
         }
         else if (code == 73) // I
         {
-            construction.removeConnectionsBetween();
+            if (processor.updateState->currentDisplay == DisplayNil) construction.removeConnectionsBetween();
         }
         else if (code == 75) // K keymap
         {
-            construction.addItem(PreparationTypeKeymap);
+        if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeKeymap);
         }
         else if (code == 77) // M tempo
         {
-            construction.addItem(PreparationTypeTempo);
+        if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeTempo);
         }
         else if (code == 78) // N nostalgic
         {
-            construction.addItem(PreparationTypeNostalgic);
+        if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeNostalgic);
         }
         else if (code == 79) // O
         {
-            construction.removeConnectionsTo();
+        if (processor.updateState->currentDisplay == DisplayNil) construction.removeConnectionsTo();
         }
         else if (code == 80) // P piano
         {
-            construction.addItem(PreparationTypePianoMap);
+        if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypePianoMap);
         }
-        else if (code == 81) // Q comment
+        else if (code == 81) // Q keymap stuff
         {
             if (processor.updateState->currentDisplay == DisplayKeymap)
             {
@@ -797,11 +904,15 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                 keymap->setHarMidiEdit(false);
                 keymap->toggleHarArrayMidiEdit();
             }
-            else construction.addItem(PreparationTypeComment);
         }
-        else if (code == 82) // R reset
+        else if (code == 47) // '/' comment
         {
-            construction.addItem(PreparationTypeReset);
+            if(processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeComment);
+        }
+        //else if (code == 82) // R reset
+        else if (code == 92) // '\' reset
+        {
+            if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeReset);
         }
         else if (code == 83) // S synchronic
         {
@@ -811,20 +922,22 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
                     processor.saveCurrentGalleryAs();
                 else processor.saveCurrentGallery();
             }
-            else                                    construction.addItem(PreparationTypeSynchronic);
+            else if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeSynchronic);
         }
         else if (code == 84) // T tuning
         {
-            construction.addItem(PreparationTypeTuning);
+        if (processor.updateState->currentDisplay == DisplayNil) construction.addItem(PreparationTypeTuning);
         }
-        
         else if (code == 85) // U
         {
-            construction.connectAllSelected();
+        if (processor.updateState->currentDisplay == DisplayNil) construction.connectAllSelected();
         }
         else if (code == 86) // V
         {
-            if (e.getModifiers().isCommandDown())   construction.paste();
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                if (e.getModifiers().isCommandDown())   construction.paste();
+            }
         }
         else if (code == 87) // W
         {
@@ -838,7 +951,10 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
         }
         else if (code == 88) // X
         {
-            if (e.getModifiers().isCommandDown())   construction.cut();
+            if (processor.updateState->currentDisplay == DisplayNil)
+            {
+                if (e.getModifiers().isCommandDown())   construction.cut();
+            }
         }
         else if (code == 90) // Z
         {
@@ -1108,6 +1224,14 @@ void MainViewController::timerCallback()
             if (prep != nullptr)
                 globalSoundSetButton.setToggleState(prep->nUseGlobalSoundSet.value, dontSendNotification);
         }
+        else if (item->getType() == PreparationTypeResonance)
+        {
+            soundItemSelected = true;
+            globalSoundSetButton.setVisible(true);
+            ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(item->getId());
+            if (prep != nullptr)
+                globalSoundSetButton.setToggleState(prep->rUseGlobalSoundSet.value, dontSendNotification);
+        }
         // Modifications
         else if (item->getType() == PreparationTypeDirectMod)
         {
@@ -1146,6 +1270,19 @@ void MainViewController::timerCallback()
                 globalSoundSetButton.setAlpha(mod->getDirty(NostalgicUseGlobalSoundSet) ? 1. : gModAlpha);
                 sampleCB.setAlpha(mod->getDirty(NostalgicSoundSet) ? 1. : gModAlpha);
                 instrumentCB.setAlpha(mod->getDirty(NostalgicSoundSet) ? 1. : gModAlpha);
+            }
+        }
+        else if (item->getType() == PreparationTypeResonanceMod)
+        {
+            soundItemSelected = true;
+            globalSoundSetButton.setVisible(true);
+            ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(item->getId());
+            if (mod != nullptr)
+            {
+                globalSoundSetButton.setToggleState(mod->rUseGlobalSoundSet.value, dontSendNotification);
+                globalSoundSetButton.setAlpha(mod->getDirty(ResonanceUseGlobalSoundSet) ? 1. : gModAlpha);
+                sampleCB.setAlpha(mod->getDirty(ResonanceSoundSet) ? 1. : gModAlpha);
+                instrumentCB.setAlpha(mod->getDirty(ResonanceSoundSet) ? 1. : gModAlpha);
             }
         }
     }
@@ -1262,6 +1399,13 @@ void MainViewController::timerCallback()
         
         overtop.ovc.update();
         overtop.ovcm.update();
+    }
+    if (state->resonancePreparationDidChange)
+    {
+        state->resonancePreparationDidChange = false;
+
+        overtop.rvc.update();
+        overtop.rvcm.update();
     }
     
     if (state->pianoDidChangeForGraph)

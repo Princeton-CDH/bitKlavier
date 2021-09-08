@@ -517,6 +517,7 @@ public:
                          bool allowTailOff,
                          bool nostalgicOff = false);
     
+    
     /** Turns off all notes.
      
      This will turn off any voices that are playing a sound on the given midi channel.

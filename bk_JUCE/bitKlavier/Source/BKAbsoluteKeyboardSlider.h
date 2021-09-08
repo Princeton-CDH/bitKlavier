@@ -86,6 +86,60 @@ public:
     
     void setAvailableRange(int min, int max);
     void setValues(Array<float> newvals);
+    
+    void setMinMidMaxValues(float min, float mid, float max, int resolution)
+    {
+        if (min > mid || min > max || mid > max) {
+            DBG("min must be < mid must be < max");
+            return;
+        }
+        
+        minRange = min;
+        midRange = mid;
+        maxRange = max;
+        displayResolution = resolution;
+        
+        keyboard->setMinMidMaxValues(min, mid, max);
+    }
+    
+    void disableKey(int midiNoteNumber)
+    {
+        disabledKeys.add(midiNoteNumber);
+        keyboard->disableKey(midiNoteNumber);
+    }
+    
+    void enableKey(int midiNoteNumber)
+    {
+        disabledKeys.removeAllInstancesOf(midiNoteNumber);
+        keyboard->enableKey(midiNoteNumber);
+    }
+    
+    void setKeys(Array<int> midiNotes)
+    {
+        disableAllKeys();
+        
+        for (auto key : midiNotes)
+        {
+            enableKey(key);
+        }
+    }
+    
+    void disableAllKeys()
+    {
+        for (int i = minKey; i <= maxKey; i++) {
+            disableKey(i);
+        }
+    }
+    
+    void enableAllKeys()
+    {
+        disabledKeys.clearQuick();
+        keyboard->enableAllKeys();
+    }
+    
+    void setKeysInKeymap(Array<int> keys) { keyboard->setKeysInKeymap(keys); };
+    
+    void setOctaveForMiddleC(int octave) { keyboard->setOctaveForMiddleC(octave);};
 
     inline void setDimensionRatio(float r) { ratio = r; }
     
@@ -125,9 +179,16 @@ private:
     int keyboardSize, minKey, maxKey;
     int lastKeyPressed;
     
+    float midRange;
+    float minRange;
+    float maxRange;
+    int displayResolution; // how many decimal points
+    
+    Array<int> disabledKeys;
+    
     void setActiveValsFromString(String s);
     void setActiveValsFromStringWithFundamentalOffset(String s);
-    
+
     void handleKeymapNoteOn (BKKeymapKeyboardState* source, int midiNoteNumber) override {};
     void handleKeymapNoteOff (BKKeymapKeyboardState* source, int midiNoteNumber) override {};
     void handleKeymapNoteToggled (BKKeymapKeyboardState* source, int midiNoteNumber) override;

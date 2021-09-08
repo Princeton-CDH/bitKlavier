@@ -164,6 +164,7 @@ public:
         mod = v;
         active = false;
     }
+    
     void setValue(ValueType v) { value = v; }
     void setBase(ValueType v) { base = v; }
     void setMod(ValueType v)
@@ -189,6 +190,67 @@ public:
     {
         maxN = mn;
         n = 0;
+    }
+    
+    // Array functions
+        // ints
+    void setArrayValue(int index, int val)
+    {
+        value.set(index, val);
+        base.set(index, val);
+        mod.set(index, val);
+        active = false;
+    }
+    
+    void addArrayValue(int val)
+    {
+        value.add(val);
+        base.add(val);
+        mod.add(val);
+        active = false;
+    }
+    
+    bool arrayContains(int val)
+    {
+        return (base.contains(val));
+    }
+    
+    void arrayRemoveAllInstancesOf(int val)
+    {
+        value.removeAllInstancesOf(val);
+        base.removeAllInstancesOf(val);
+        mod.removeAllInstancesOf(val);
+        active = false;
+    }
+    
+        // floats
+    void setArrayValue(int index, float val)
+    {
+        value.set(index, val);
+        base.set(index, val);
+        mod.set(index, val);
+        active = false;
+    }
+    
+    void addArrayValue(float val)
+    {
+        value.add(val);
+        base.add(val);
+        mod.add(val);
+        active = false;
+    }
+    
+    bool arrayContains(float val)
+    {
+        return (base.contains(val)); 
+    }
+    
+    void arrayRemoveAllInstancesOf(float val)
+    {
+        value.removeAllInstancesOf(val);
+        base.removeAllInstancesOf(val);
+        mod.removeAllInstancesOf(val);
+        active = false;
     }
     
     // Getters

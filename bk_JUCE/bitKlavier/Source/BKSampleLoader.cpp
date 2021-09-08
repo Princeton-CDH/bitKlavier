@@ -227,7 +227,17 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                     BigInteger noteRange;
                     
                     int root = (12 * i) + noteNameToRoot(bkNotes[j]);
-                    if (i == 7 && j == 3) noteRange.setRange(root-1, 5, true); //High A
+                    int start = root-1;
+                    // First note
+                    if (i == 0 && j == 3)
+                    {
+                        noteRange.setRange(0, start+3, true);
+                    }
+                    // Last note
+                    else if (i == 7 && j == 3)
+                    {
+                        noteRange.setRange(start, 128-start, true);
+                    }
                     else noteRange.setRange(root-1, 3, true);
                     
                     BigInteger velocityRange;
@@ -375,8 +385,19 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                     BigInteger noteRange;
                     
                     int root = (12 * i) + noteNameToRoot(bkNotes[j]);
-                    if (i == 7 && j == 3) noteRange.setRange(root-1, 5, true); //High A
+                    int start = root-1;
+                    // First note
+                    if (i == 0 && j == 3)
+                    {
+                        noteRange.setRange(0, start+3, true);
+                    }
+                    // Last note
+                    else if (i == 7 && j == 3)
+                    {
+                        noteRange.setRange(start, 128-start, true);
+                    }
                     else noteRange.setRange(root-1, 3, true);
+                    
                     
                     //velocity switching
                     BigInteger velocityRange;
@@ -482,7 +503,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
             }
             
             BigInteger noteRange;
-            noteRange.setRange(20 + i, 1, true);
+            if (i == 1) noteRange.setRange(0, 22, true);
+            else if (i == 88) noteRange.setRange(20 + i, 108 - i, true);
+            else noteRange.setRange(20 + i, 1, true);
             
             BigInteger velocityRange;
             velocityRange.setRange(0, 128, true);
@@ -669,7 +692,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
     if      (ext == ".sf2")
     {
         isSF2 = true;
-        sf2sound   = new sfzero::SF2Sound(sfzFile);
+        sf2sound = new sfzero::SF2Sound(sfzFile);
         
         sf2sound->loadRegions(loadingInstrument);
         sf2sound->loadSamples(&formatManager);
@@ -751,7 +774,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
         //        for (int i = 0; i < destBuffer->getNumChannels(); i++)
         //            destBuffer->copyFrom(i, 0, sourceBuffer->getReadPointer(i, (int)sampleStart), (int)sampleLength);
         
-        
         // WEIRD thing where sample metadata defines loop point instead of the sfz format
         if (!isSF2 && (region->loop_mode == 0))
         {
@@ -782,15 +804,12 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
             }
         }
         
-        
         //DBG("transp: " + String(region->transpose) + "   keycenter: " + String(region->pitch_keycenter) + " keytrack: " + String(region->pitch_keytrack));
         
         //DBG("end: " + String(region->end) + "   ls: " + String(region->loop_start) + "   le: " + String(region->loop_end) + "   keyrange: " + String(region->lokey) + "-" + String(region->hikey) + "   velrange: " + String(region->lovel) + "-" + String(region->hivel));
         
         //DBG("trigger: " +String(region->trigger));
         //DBG("pedal needed: " + String((int)region->pedal));
-        
-        
         
         int nbits = region->hikey - region->lokey;
         int vbits = region->hivel - region->lovel;
@@ -938,7 +957,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                         if (noteCount < noteRoots.size()-1) rootAbove = noteRoots[noteCount+1];
                         
                         int lowKey = 1 + (root + rootBelow) / 2;
+                        if (noteCount == 0) lowKey = 0;
                         int highKey = 1 + (root + rootAbove) / 2;
+                        if (noteCount == noteRoots.size()-1) highKey = 127;
                         
                         BigInteger noteRange;
                         
@@ -1063,7 +1084,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                         if (noteCount < noteRoots.size()-1) rootAbove = noteRoots[noteCount+1];
                         
                         int lowKey = 1 + (root + rootBelow) / 2;
+                        if (noteCount == 0) lowKey = 0;
                         int highKey = 1 + (root + rootAbove) / 2;
+                        if (noteCount == noteRoots.size()-1) highKey = 127;
                         
                         BigInteger noteRange;
                         
@@ -1181,7 +1204,17 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                         BigInteger noteRange;
                         
                         int root = (12 * i) + noteNameToRoot(bkNotes[j]);
-                        if (i == 7 && j == 3) noteRange.setRange(root-1, 5, true); //High A
+                        int start = root-1;
+                        // First note
+                        if (i == 0 && j == 0)
+                        {
+                            noteRange.setRange(0, start+3, true);
+                        }
+                        // Last note
+                        else if (i == 7 && j == 3)
+                        {
+                            noteRange.setRange(start, 128-start, true);
+                        }
                         else noteRange.setRange(root-1, 3, true);
                         
                         //velocity switching
@@ -1257,9 +1290,13 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
     //==============================================================================
     //==============================================================================
     // Load any hammer release samples
-    
     if (numHammers > 0)
     {
+        int start;
+        int end = 20;
+        int range = 88 / numHammers;
+        int root;
+        
         for (int i = 1; i <= numHammers; i++) {
             EXIT_CHECK;
             String temp;
@@ -1285,15 +1322,41 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                     sampleReader = std::unique_ptr<AudioFormatReader> (wavFormat.createReaderFor(new FileInputStream(file), true));
                 }
                 
+                // set range and root for each sample; try to divide evenly across keyboard to minimize transposition
+                //      transposition will still be pretty extreme if there aren't very many samples though!
+                start   = end;
+                end     = start + range;
+                root    = start + range / 2;
+                
                 BigInteger noteRange;
+                if (i == numHammers) noteRange.setRange(start, 109 - start, true); // make sure top one reaches all the way
+                else noteRange.setRange(start, range, true);
+                
+                DBG("HAMMER LOAD root = " + String(root) + " start = " + String(start) + " end = " + String(end));
+                
+                /*
                 // Distribute hammers across the keyboard
                 int a = ((88. / numHammers) * i) - i;
-                noteRange.setRange(20 - a + (88. / numHammers) * i, 1 + a, true);
+                int start = 20 - a + (88. / numHammers) * i;
+                int num = 1 + a;
+                if (i == 1)
+                {
+                    noteRange.setRange(0, start+num, true);
+                }
+                else if (i == numHammers)
+                {
+                    noteRange.setRange(start, 128-start, true);
+                }
+                else
+                {
+                    noteRange.setRange(start, num, true);
+                }
+                 */
                 
                 BigInteger velocityRange;
                 velocityRange.setRange(0, 128, true);
                 
-                int root = 20 + i;
+                //int root = 20 + i;
                 
                 if (memoryMappingEnabled)
                 {

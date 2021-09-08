@@ -74,7 +74,7 @@ void TempoProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, 
     if (fromPress)
     {
         aVels = bVels = &velocities.getReference(noteNumber);
-        for (int i = TargetTypeTempo; i < TargetTypeTuning; ++i)
+        for (int i = TargetTypeTempo; i < TargetTypeTempo+1; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
@@ -102,7 +102,7 @@ void TempoProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities,
     if (fromPress)
     {
         aVels = bVels = &invertVelocities.getReference(noteNumber);
-        for (int i = TargetTypeTempo; i < TargetTypeTuning; ++i)
+        for (int i = TargetTypeTempo; i < TargetTypeTempo+1; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }

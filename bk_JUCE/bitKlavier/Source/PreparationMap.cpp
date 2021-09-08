@@ -116,8 +116,17 @@ void PreparationMap::linkKeymapToPreparation(int keymapId, BKPreparationType thi
             }
         }
     }
+    else if (thisType == PreparationTypeResonance)
+    {
+        for (int i = 0; i < rprocessor.size(); ++i)
+        {
+            if (rprocessor[i]->getId() == thisId)
+            {
+                rprocessor[i]->addKeymap(getKeymap(keymapId));
+            }
+        }
+    }
 }
-
 
 bool PreparationMap::contains(Keymap::Ptr thisOne)
 {
@@ -372,15 +381,55 @@ bool PreparationMap::contains(BlendronicProcessor::Ptr thisOne)
     return false;
 }
 
+void PreparationMap::addResonanceProcessor(ResonanceProcessor::Ptr p)
+{
+    rprocessor.addIfNotAlreadyThere(p);
+    deactivateIfNecessary();
+}
+
+void PreparationMap::setResonanceProcessors(ResonanceProcessor::PtrArr p)
+{
+    rprocessor = p;
+    deactivateIfNecessary();
+}
+
+ResonanceProcessor::PtrArr PreparationMap::getResonanceProcessors(void)
+{
+    return rprocessor;
+}
+
+ResonanceProcessor::Ptr PreparationMap::getResonanceProcessor(int Id)
+{
+    for (auto p : rprocessor)
+    {
+        if (p->getId() == Id) return p;
+    }
+
+    return nullptr;
+}
+
+bool PreparationMap::contains(ResonanceProcessor::Ptr thisOne)
+{
+    for (auto p : rprocessor)
+    {
+        if (p->getId() == thisOne->getId())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 void PreparationMap::deactivateIfNecessary()
 {
     if(keymaps.size() == 0 &&
-       sprocessor.size() == 0 &&
-       nprocessor.size() == 0 &&
-       dprocessor.size() == 0 &&
-       tprocessor.size() == 0 &&
-       mprocessor.size() == 0 &&
-       bprocessor.size() == 0)
+    sprocessor.size() == 0 &&
+    nprocessor.size() == 0 &&
+    dprocessor.size() == 0 &&
+    tprocessor.size() == 0 &&
+    mprocessor.size() == 0 &&
+    bprocessor.size() == 0 &&
+    rprocessor.size() == 0)
     {
         isActive = false;
     }
@@ -415,9 +464,13 @@ void PreparationMap::processBlock(AudioSampleBuffer& buffer, int numSamples, int
         
         for (auto mproc : mprocessor)
             mproc->processBlock(numSamples, midiChannel);
+
+		for (auto bproc : bprocessor)
+			bproc->processBlock(numSamples, midiChannel);
         
-        for (auto bproc : bprocessor)
-            bproc->processBlock(numSamples, midiChannel);
+        for (auto rproc : rprocessor)
+            rproc->processBlock(numSamples, midiChannel);
+
     }
 }
 
@@ -694,6 +747,47 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
         releaseTargetVelocities.fill(-1.f);
     }
     
+    for (auto proc : rprocessor)
+    {
+        bool ignoreSustain = !sustainPedalIsDepressed;
+        // For each Keymap in each Direct processor
+        for (auto km : proc->getKeymaps())
+        {
+            // Check that the keymap contains this note mapped from this harmonizer note
+            // and that it uses this midi source
+            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            {
+                // Check that Direct is enabled as a target (should always be true until we add other targets)
+                if (km->getTargetStates()[TargetTypeResonance])
+                {
+                    // Collect inverted keymaps into one velocities array
+                    if (km->isInverted())
+                    {
+                        // Apply curve, take the max of any overlapping cases, then filter
+                        float v = jmax(releaseTargetVelocities.getUnchecked(TargetTypeResonance),
+                                                            km->applyVelocityCurve(velocity));
+                        releaseTargetVelocities.set(TargetTypeResonance, v);
+                    }
+                    // Collect normal keymaps into another velocity array
+                    else
+                    {
+                        float v = jmax(pressTargetVelocities.getUnchecked(TargetTypeResonance),
+                                                            km->applyVelocityCurve(velocity));
+                        pressTargetVelocities.set(TargetTypeResonance, v);
+                    }
+                }
+                if (km->getIgnoreSustain()) ignoreSustain = true;
+            }
+        }
+        // Send the processor the velocities collected from normal keymaps and let it know this is a keypress
+        proc->keyPressed(noteNumber, pressTargetVelocities, true);
+        pressTargetVelocities.fill(-1.f);
+        
+        if (ignoreSustain && !noteDown) // Don't keyrelease if we're sustaining or the note isn't down
+            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
+        releaseTargetVelocities.fill(-1.f);
+    }
+    
     // PERFORM MODIFICATION STUFF
 }
 
@@ -934,6 +1028,42 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
             proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
     }
+    
+    for (auto proc : rprocessor)
+    {
+        bool ignoreSustain = !sustainPedalIsDepressed;
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            {
+                if (km->getTargetStates()[TargetTypeResonance])
+                {
+                    if (km->isInverted())
+                    {
+                        // Don't filter release velocities because they are not reliable.
+                        // The processor will internally ignore this release if the
+                        // last key press was filtered out.
+                        float v = jmax(pressTargetVelocities.getUnchecked(TargetTypeResonance),
+                                       km->applyVelocityCurve(velocity));
+                        pressTargetVelocities.setUnchecked(TargetTypeResonance, v);
+                    }
+                    else
+                    {
+                        float v = jmax(releaseTargetVelocities.getUnchecked(TargetTypeResonance),
+                                       km->applyVelocityCurve(velocity));
+                        releaseTargetVelocities.setUnchecked(TargetTypeResonance, v);
+                    }
+                }
+                if (km->getIgnoreSustain()) ignoreSustain = true;
+            }
+        }
+        proc->keyPressed(noteNumber, pressTargetVelocities, false);
+        pressTargetVelocities.fill(-1.f);
+        
+        if (ignoreSustain && !noteDown)
+            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
+        releaseTargetVelocities.fill(-1.f);
+    }
 }
 
 void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatAreDepressed, bool post)
@@ -1106,6 +1236,30 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                 proc->keyReleased(noteNumber, targetVelocities, false);
             targetVelocities.fill(-1.f);
         }
+        
+        for (auto proc : rprocessor)
+        {
+            hasActiveTarget = false;
+            bool allIgnoreSustain = true;
+            for (auto km : proc->getKeymaps())
+            {
+                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+                {
+                    if (km->getTargetStates()[TargetTypeResonance])
+                    {
+                        hasActiveTarget = true;
+                        float v = km->applyVelocityCurve(velocity);
+                        targetVelocities.set(TargetTypeResonance, v);
+                    }
+                    if (!km->getIgnoreSustain()) allIgnoreSustain = false;
+                }
+            }
+            //local flag for keymap that isn't ignoring sustain
+            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
+                //don't turn off note if key is down!
+                proc->keyReleased(noteNumber, targetVelocities, false);
+            targetVelocities.fill(-1.f);
+        }
     }
     
     sustainedNotes.clearQuick();
@@ -1205,6 +1359,28 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, in
             }
         }
         if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain)) proc->keyReleased(noteNumber, targetVelocities, true);
+        targetVelocities.fill(-1.f);
+    }
+    
+    for (auto proc : rprocessor)
+    {
+        bool ignoreSustain = false;
+        for (auto km : proc->getKeymaps())
+        {
+            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            {
+                if (km->getTargetStates()[TargetTypeResonance])
+                {
+                    float v = km->applyVelocityCurve(velocity);
+                    targetVelocities.set(TargetTypeResonance, v);
+                }
+                if (km->getIgnoreSustain()) ignoreSustain = true;
+            }
+        }
+        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain))
+        {
+            proc->keyReleased(noteNumber, targetVelocities, false);
+        }
         targetVelocities.fill(-1.f);
     }
     

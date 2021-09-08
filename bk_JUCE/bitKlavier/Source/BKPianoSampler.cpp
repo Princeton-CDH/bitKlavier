@@ -322,7 +322,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
 {
     if (BKPianoSamplerSound* const sound = dynamic_cast<BKPianoSamplerSound*> (s))
     {
-        DBG("RMS: " + String(sound->getDBFSLevel()));
+        //DBG("RMS: " + String(sound->getDBFSLevel()));
         //DBG("BKPianoSamplerVoice::startNote " + String(midi));
         
         //DBG("passed through range extend = " + String(rangeExtend));
@@ -344,7 +344,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
         
         uint64 totalLength = length;
         
-        if (bkType != MainNote)
+        if (bkType != MainNote && bkType != ResonanceNote)
         {
             //constrain total length minimum to no less than 50ms
             if(totalLength < 0.05 * getSampleRate()) totalLength = 0.05 * getSampleRate();
@@ -420,7 +420,8 @@ void BKPianoSamplerVoice::startNote (const int midi,
                     sourceSamplePosition = startingPosition;
                 }
                 
-                playEndPosition = adsrRelease;
+                //playEndPosition = adsrRelease;
+                playEndPosition = adsrRelease * pitchRatio;
             }
             else if (playType == FixedLength)
             {
@@ -493,18 +494,19 @@ void BKPianoSamplerVoice::startNote (const int midi,
             // convert to a gain multipler
             noteVelocity = Decibels::decibelsToGain(dBadjust);
             
-            /*
-            DBG("layerNumber = " + String(sound->getLayerNumber()));
-            DBG("min velocity = " + String(minVelocity));
-            DBG("max velocity = " + String(maxVelocity));
-            DBG("dynRange = " + String(dynRange));
-            DBG("dB adjust = " + String(dBadjust));
-            DBG("new gain multiplier = " + String(noteVelocity));
-            */
+            
+            //DBG("layerNumber = " + String(sound->getLayerNumber()));
+            //DBG("numLayers = " + String(sound->getNumLayers()));
+            //DBG("min velocity = " + String(minVelocity));
+            //DBG("max velocity = " + String(maxVelocity));
+            //DBG("dynRange = " + String(dynRange));
+            //DBG("dB adjust = " + String(dBadjust));
+            //DBG("new gain multiplier = " + String(noteVelocity));
+            
         }
         // *** END new layer-based approach to velocity handling ** //
         
-        DBG("noteVelocity = " + String(noteVelocity * 127.));
+        //DBG("noteVelocity = " + String(noteVelocity * 127.));
         
         lengthTracker = 0.0;
         
@@ -639,6 +641,7 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
     {
         //DBG("note type: " + cNoteTypes[getNoteType()]);
         //adsr.setReleaseTime(0.003f);
+        //DBG("BKPianoSamplerVoice::stopNote, releaseTime = " + String(adsr.getReleaseTime()));
         adsr.keyOff();
         sfzadsr.keyOff();
     }
@@ -653,7 +656,7 @@ void BKPianoSamplerVoice::pitchWheelMoved (const int newValue)
     pitchWheel = newValue;
     pitchbendMultiplier = powf(2.0f, (newValue / 8192. - 1.)/6.);
     bentRatio = pitchRatio * pitchbendMultiplier;
-    DBG("BKPianoSamplerVoice::pitchWheelMoved : " + String(pitchbendMultiplier));
+    //DBG("BKPianoSamplerVoice::pitchWheelMoved : " + String(pitchbendMultiplier));
 }
 
 void BKPianoSamplerVoice::controllerMoved (const int /*controllerNumber*/,
@@ -1061,7 +1064,7 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     else
     {
         reader = playingSound->getReader();
-        reader->touchSample(sourceSamplePosition);
+        reader->touchSample(reader->getMappedSection().clipValue(sourceSamplePosition));
         reader->touchSample(reader->getMappedSection().clipValue(sourceSamplePosition+numSamples)-1);
     }
     

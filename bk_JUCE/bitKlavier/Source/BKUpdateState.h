@@ -38,10 +38,12 @@ public:
     int  currentBlendronicId = 1;
     int  currentTempoId = 1;
     int  currentTuningId = 1;
+    int  currentResonanceId = 1;
     
     int  currentModDirectId = 1;
     int  currentModSynchronicId = 1;
     int  currentModNostalgicId = 1;
+    int  currentModResonanceId = 1;
     int  currentModBlendronicId = 1;
     int  currentModTempoId = 1;
     int  currentModTuningId = 1;
@@ -58,6 +60,7 @@ public:
     bool synchronicPreparationDidChange = false;
     bool tuningPreparationDidChange = false;
     bool tempoPreparationDidChange = false;
+    bool resonancePreparationDidChange = false;
     bool generalSettingsDidChange = false;
     bool keymapDidChange = false;
     bool modificationDidChange = false;
@@ -108,6 +111,12 @@ public:
             blendronicPreparationDidChange = true;
             setCurrentDisplay(DisplayBlendronic);
         }
+        else if (type == PreparationTypeResonance)
+        {
+            currentResonanceId = (Id == -1) ? currentResonanceId : Id;
+            resonancePreparationDidChange = true;
+            setCurrentDisplay(DisplayResonance);
+        }
         else if (type == PreparationTypeTuning)
         {
             currentTuningId = (Id == -1) ? currentTuningId : Id;
@@ -137,6 +146,12 @@ public:
             currentModNostalgicId = (Id == -1) ? currentModNostalgicId : Id;
             nostalgicPreparationDidChange = true;
             setCurrentDisplay(DisplayNostalgicMod);
+        }
+        else if (type == PreparationTypeResonanceMod)
+        {
+            currentModResonanceId = (Id == -1) ? currentModResonanceId : Id;
+            resonancePreparationDidChange = true;
+            setCurrentDisplay(DisplayResonanceMod);
         }
         else if (type == PreparationTypeSynchronicMod)
         {
@@ -181,6 +196,10 @@ public:
         else if (type == DisplayNostalgic)
         {
             return currentNostalgicId;
+        }
+        else if (type == DisplayResonance)
+        {
+            return currentResonanceId;
         }
         else if (type == DisplayBlendronic)
         {
@@ -230,6 +249,7 @@ public:
         currentDirectId = val;
         currentSynchronicId = val;
         currentNostalgicId = val;
+        currentResonanceId = val;
         currentBlendronicId = val;
         currentTempoId = val;
         currentTuningId = val;

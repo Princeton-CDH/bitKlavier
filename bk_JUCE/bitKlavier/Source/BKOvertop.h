@@ -24,6 +24,7 @@
 #include "BlendronicViewController.h"
 #include "TuningViewController.h"
 #include "TempoViewController.h"
+#include "ResonanceViewController.h"
 
 #include "KeymapViewController.h"
 #include "GeneralViewController.h"
@@ -45,12 +46,14 @@ public:
     nvc(p, theGraph),
     dvc(p, theGraph),
     bvc(p, theGraph),
+    rvc(p, theGraph),
     tvcm(p, theGraph),
     ovcm(p, theGraph),
     svcm(p, theGraph),
     nvcm(p, theGraph),
     dvcm(p, theGraph),
     bvcm(p, theGraph),
+    rvcm(p, theGraph),
     processor(p)
     {
         
@@ -66,6 +69,7 @@ public:
         addChildComponent(nvc);
         addChildComponent(dvc);
         addChildComponent(bvc);
+        addChildComponent(rvc);
         
         addChildComponent(tvcm);
         addChildComponent(ovcm);
@@ -73,6 +77,7 @@ public:
         addChildComponent(nvcm);
         addChildComponent(dvcm);
         addChildComponent(bvcm);
+        addChildComponent(rvcm);
         
     }
     
@@ -108,6 +113,8 @@ public:
         dvc.setBounds(area);
         
         bvc.setBounds(area);
+
+        rvc.setBounds(area);
         
         tvcm.setBounds(area);
         
@@ -120,6 +127,8 @@ public:
         dvcm.setBounds(area);
         
         bvcm.setBounds(area);
+        
+        rvcm.setBounds(area);
         
 #if JUCE_IOS
         cvc.setBounds(5, 5, area.getWidth()-10, area.getHeight() * 0.5f);
@@ -183,6 +192,10 @@ public:
         {
             bvc.arrowPressed(arrow);
         }
+        else if (display == DisplayResonance)
+        {
+            rvc.arrowPressed(arrow);
+        }
         else if (display == DisplayTuningMod)
         {
             tvcm.arrowPressed(arrow);
@@ -206,6 +219,10 @@ public:
         else if (display == DisplayBlendronicMod)
         {
             bvcm.arrowPressed(arrow);
+        }
+        else if (display == DisplayResonanceMod)
+        {
+            rvcm.arrowPressed(arrow);
         }
     }
     
@@ -238,6 +255,7 @@ public:
         removeChildComponent(&svc);
         removeChildComponent(&nvc);
         removeChildComponent(&bvc);
+        removeChildComponent(&rvc);
         
         removeChildComponent(&tvcm);
         removeChildComponent(&dvcm);
@@ -245,6 +263,7 @@ public:
         removeChildComponent(&svcm);
         removeChildComponent(&nvcm);
         removeChildComponent(&bvcm);
+        removeChildComponent(&rvcm);
         
         if (type == DisplayKeymap)
         {
@@ -303,6 +322,12 @@ public:
             dvc.fillSelectCB(-1,-1);
             dvc.update();
         }
+        else if (type == DisplayResonance)
+        {
+            addAndMakeVisible(&rvc);
+            rvc.fillSelectCB(-1, -1);
+            rvc.update();
+        }
         else if (type == DisplayBlendronic)
         {
             addAndMakeVisible(&bvc);
@@ -332,6 +357,12 @@ public:
             addAndMakeVisible(&nvcm);
             nvcm.fillSelectCB(-1,-1);
             nvcm.update();
+        }
+        else if (type == DisplayResonanceMod)
+        {
+            addAndMakeVisible(&rvcm);
+            rvcm.fillSelectCB(-1,-1);
+            rvcm.update();
         }
         else if (type == DisplayDirectMod)
         {
@@ -367,6 +398,7 @@ public:
     NostalgicPreparationEditor nvc;
     DirectPreparationEditor dvc;
     BlendronicPreparationEditor bvc;
+    ResonancePreparationEditor rvc;
     
     TuningModificationEditor tvcm;
     TempoModificationEditor ovcm;
@@ -374,6 +406,7 @@ public:
     NostalgicModificationEditor nvcm;
     DirectModificationEditor dvcm;
     BlendronicModificationEditor bvcm;
+    ResonanceModificationEditor rvcm;
     
 private:
     

@@ -40,6 +40,13 @@ ratio(1.0)
     minKey = 21; // 21
     maxKey = 108; // 108
 #endif
+    
+    // be default, assume cents, +/- 50
+    midRange = 0.;
+    minRange = -50.;
+    maxRange = 50.;
+    displayResolution = 1;
+    
     keyboard->setRepaintsOnMouseActivity(false);
     keyboard->setScrollButtonsVisible(false);
     keyboard->setAvailableRange(minKey, maxKey);
@@ -55,9 +62,8 @@ ratio(1.0)
     showName.addMouseListener(this, true);
     addAndMakeVisible(showName);
 
-    keyboardValueTF.setText(String(0.0, 1));
+    keyboardValueTF.setText(String(midRange, displayResolution));
     keyboardValueTF.setName("KSLIDERTXT");
-    keyboardValueTF.setTooltip("offset from ET in cents for last key pressed; can enter values here as well");
     keyboardValueTF.addListener(this);
 #if JUCE_IOS
     keyboardValueTF.setReadOnly(true);
@@ -75,7 +81,7 @@ ratio(1.0)
     keyboardValsTextFieldOpen.setName("KSLIDERTXTEDITALLBUTTON");
     keyboardValsTextFieldOpen.addListener(this);
     keyboardValsTextFieldOpen.setButtonText("edit all");
-    keyboardValsTextFieldOpen.setTooltip("click drag on keys to set offsets in cents by key, or press 'edit all' to edit as text");
+    keyboardValsTextFieldOpen.setTooltip("click drag on keys to set values by key, or press 'edit all' to edit as text");
     addAndMakeVisible(keyboardValsTextFieldOpen);
 }
 
@@ -149,11 +155,17 @@ void BKAbsoluteKeyboardSlider::setAvailableRange(int min, int max)
 
 void BKAbsoluteKeyboardSlider::mouseMove(const MouseEvent& e)
 {
-    keyboardValueTF.setText(String(keyboard->getLastNoteOverValue(), 1), dontSendNotification);
+    keyboardValueTF.setText(String(keyboard->getLastNoteOverValue(), displayResolution), dontSendNotification);
 }
 
 void BKAbsoluteKeyboardSlider::mouseDrag(const MouseEvent& e)
 {
+    if (disabledKeys.contains(lastKeyPressed))
+    {
+        DBG("key disabled");
+        return;
+    }
+    
     if(e.y >= 0 && e.y <= keyboard->getHeight())
     {
         bool isBlackKey = MidiMessage::isMidiNoteBlack (keyboard->getLastKeySelected());
@@ -163,10 +175,18 @@ void BKAbsoluteKeyboardSlider::mouseDrag(const MouseEvent& e)
         dragPos = 1. - 2. * dragPos;
         if(dragPos > 0.) dragPos = dragPos * dragPos;
         else dragPos = -1.* dragPos * dragPos;
-
-        keyboardValueTF.setText(String(dragPos * 50.0, 1), dontSendNotification);
-        keyboard->setKeyValue(lastKeyPressed, dragPos * 50.);
+        //DBG("BKAbsoluteKeyboardSlider::mouseDrag dragPos = " + String(dragPos));
         
+        float outval;
+        if (dragPos > 0) outval = midRange + dragPos * (maxRange - midRange);
+        else outval = midRange + dragPos * (midRange - minRange);
+        //DBG("BKAbsoluteKeyboardSlider::mouseDrag outval = " + String(outval));
+
+        //keyboardValueTF.setText(String(dragPos * 50.0, 1), dontSendNotification);
+        //keyboard->setKeyValue(lastKeyPressed, dragPos * 50.);
+        keyboardValueTF.setText(String(outval, displayResolution), dontSendNotification);
+        keyboard->setKeyValue(lastKeyPressed, outval);
+ 
         //DBG("dragging last key, height " + String(keyboard->getLastKeySelected()) + " " + String(dragPos));
     }
 }
@@ -177,7 +197,7 @@ void BKAbsoluteKeyboardSlider::mouseUp(const MouseEvent& e)
     {
         if(e.mods.isShiftDown())
         {
-            keyboardValueTF.setText(String(0.), dontSendNotification);
+            keyboardValueTF.setText(String(midRange, displayResolution), dontSendNotification);
             keyboard->setKeyValue(lastKeyPressed, 0.);
         }
     }
@@ -224,7 +244,7 @@ void BKAbsoluteKeyboardSlider::textEditorReturnKeyPressed(TextEditor& textEditor
 {
     if(textEditor.getName() == keyboardValsTextField->getName())
     {
-        keyboard->setValues(stringOrderedPairsToFloatArray(keyboardValsTextField->getText(), 128));
+        keyboard->setValues(stringOrderedPairsToFloatArray(keyboardValsTextField->getText(), 128, midRange));
 
         listeners.call(&BKAbsoluteKeyboardSlider::Listener::keyboardSliderChanged,
                        getName(),
@@ -297,8 +317,8 @@ void BKAbsoluteKeyboardSlider::bkButtonClicked (Button* b)
 {
     if(b->getName() == keyboardValsTextFieldOpen.getName())
     {
-
-        keyboardValsTextField->setText(offsetArrayToString2(keyboard->getValues()), dontSendNotification);
+        
+        keyboardValsTextField->setText(offsetArrayToString3(keyboard->getValues(), midRange), dontSendNotification); 
 
 #if JUCE_IOS
         hasBigOne = true;

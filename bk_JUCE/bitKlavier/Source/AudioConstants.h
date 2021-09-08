@@ -39,6 +39,27 @@ const String ptagGeneral_invertSustain = "invertSustain";
 const String ptagGeneral_noteOnSetsNoteOffVelocity = "noteOnSetsNoteOffVelocity";
 const String ptagGeneral_tuningFund = "tuningFund";
 
+const String vtagEqualizer = "equalizer";
+const String ptagEqualizer_bypassed = "bypassed";
+const String ptagEqualizer_lowCutBypassed = "lowCutBypassed";
+const String ptagEqualizer_peak1Bypassed = "peak1Bypassed";
+const String ptagEqualizer_peak2Bypassed = "peak2Bypassed";
+const String ptagEqualizer_peak3Bypassed = "peak3Bypassed";
+const String ptagEqualizer_highCutBypassed = "highCutBypassed";
+const String ptagEqualizer_lowCutFreq = "lowCutFreq";
+const String ptagEqualizer_lowCutSlope = "lowCutSlope";
+const String ptagEqualizer_peak1Freq = "peak1Freq";
+const String ptagEqualizer_peak1Gain = "peak1Gain";
+const String ptagEqualizer_peak1Quality = "peak1Quality";
+const String ptagEqualizer_peak2Freq = "peak2Freq";
+const String ptagEqualizer_peak2Gain = "peak2Gain";
+const String ptagEqualizer_peak2Quality = "peak2Quality";
+const String ptagEqualizer_peak3Freq = "peak3Freq";
+const String ptagEqualizer_peak3Gain = "peak3Gain";
+const String ptagEqualizer_peak3Quality = "peak3Quality";
+const String ptagEqualizer_highCutFreq = "highCutFreq";
+const String ptagEqualizer_highCutSlope = "highCutSlope";
+
 const String vtagPiano = "piano";
 const String vtagPrepMap = "prepMap";
 const String ptagPrepMap_keymapId = "keymapId";
@@ -163,6 +184,26 @@ const String ptagDirect_soundSet = "directSoundSet";
 const String ptagDirect_velocityMin = "velocityMin";
 const String ptagDirect_velocityMax = "velocityMax";
 
+
+const String vtagResonance = "resonance";
+const String vtagModResonance = "modResonance";
+const String ptagResonance_id ="Id";
+const String ptagResonance_tuning = "tuning";
+const String ptagResonance_gain = "gain";
+const String ptagResonance_blendronicGain = "blendronicGain";
+const String ptagResonance_reset = "resonanceReset";
+const String vtagResonance_ADSR = "ADSR";
+const String ptagResonance_useGlobalSoundSet = "resonanceUseGlobalSoundSet";
+const String ptagResonance_soundSet = "resonanceSoundSet";
+const String ptagResonance_starttimeMin = "starttimeMin";
+const String ptagResonance_starttimeMax = "starttimeMax";
+const String ptagResonance_maxSympStrings = "maxSympStrings";
+const String ptagResonance_fundamentalKey = "fundamentalKey";
+const String vtagResonance_resonanceKeys = "closestKeys";
+const String vtagResonance_offsets = "offsets";
+const String vtagResonance_gains = "gains";
+
+
 const String vtagTuning = "tuning";
 const String vtagModTuning = "modTuning";
 const String ptagTuning_Id = "Id";
@@ -197,6 +238,7 @@ const String ptagTuning_tetherWeights = "tweights";
 const String ptagTuning_springWeights = "sweights";
 const String ptagTuning_intervalScale = "iscale";
 const String ptagTuning_intervalScaleFundamental = "iscalefundamental";
+
 
 const String vtagBlendronic = "blendronic";
 const String vtagModBlendronic = "modBlendronic";
@@ -299,19 +341,63 @@ typedef enum BKNoteType {
     BKNoteTypeNil,
 } BKNoteType;
 
-static const std::vector<std::string> cNoteTypes = {
-    "SynchronicNote",
-    "NostalgicNote",
-    "DirectNote",
-    "MainNote",
-    "HammerNote",
-    "ResonanceNote",
-    "PedalNote",
-    "NilNote"
-};
+// Ids for saving and loading
+// To maintain compatibility with older galleries,
+// the order of this cannot change (add new preparation at the end),
+// so we'll avoid using this except at saving/loading in Piano
+// and instead use BKPreparationType, which can be freely ordered
+typedef enum BKPreparationId {
+    PreparationIdDirect = 0,
+    PreparationIdSynchronic,
+    PreparationIdNostalgic,
+    PreparationIdTuning,
+    PreparationIdTempo,
+    PreparationIdKeymap,
+    PreparationIdDirectMod,
+    PreparationIdSynchronicMod,
+    PreparationIdNostalgicMod,
+    PreparationIdTuningMod,
+    PreparationIdTempoMod,
+    PreparationIdGenericMod,
+    PreparationIdPianoMap,
+    PreparationIdReset,
+    PreparationIdPiano,
+    PreparationIdComment,
+    PreparationIdBlendronic,
+    PreparationIdBlendronicMod,
+    PreparationIdResonance,
+    PreparationIdResonanceMod,
+    BKPreparationIdNil,
+} BKPreparationId;
 
+// When updating this or the above enum, make sure to update
+// the vectors just below here too
 typedef enum BKPreparationType {
     PreparationTypeDirect = 0,
+    PreparationTypeSynchronic,
+    PreparationTypeNostalgic,
+    PreparationTypeBlendronic,
+    PreparationTypeResonance,
+    PreparationTypeTuning,
+    PreparationTypeTempo,
+    PreparationTypeKeymap,
+    PreparationTypeDirectMod,
+    PreparationTypeSynchronicMod,
+    PreparationTypeNostalgicMod,
+    PreparationTypeBlendronicMod,
+    PreparationTypeResonanceMod,
+    PreparationTypeTuningMod,
+    PreparationTypeTempoMod,
+    PreparationTypeGenericMod,
+    PreparationTypePianoMap,
+    PreparationTypeReset,
+    PreparationTypePiano,
+    PreparationTypeComment,
+    BKPreparationTypeNil
+} BKPreparationType;
+
+static const std::vector<BKPreparationType> cPreparationIdToType = {
+    PreparationTypeDirect,
     PreparationTypeSynchronic,
     PreparationTypeNostalgic,
     PreparationTypeTuning,
@@ -329,19 +415,43 @@ typedef enum BKPreparationType {
     PreparationTypeComment,
     PreparationTypeBlendronic,
     PreparationTypeBlendronicMod,
+    PreparationTypeResonance,
+    PreparationTypeResonanceMod,
     BKPreparationTypeNil
-} BKPreparationType;
+};
+
+static const std::vector<BKPreparationId> cPreparationTypeToId = {
+    PreparationIdDirect,
+    PreparationIdSynchronic,
+    PreparationIdNostalgic,
+    PreparationIdBlendronic,
+    PreparationIdResonance,
+    PreparationIdTuning,
+    PreparationIdTempo,
+    PreparationIdKeymap,
+    PreparationIdDirectMod,
+    PreparationIdSynchronicMod,
+    PreparationIdNostalgicMod,
+    PreparationIdBlendronicMod,
+    PreparationIdResonanceMod,
+    PreparationIdTuningMod,
+    PreparationIdTempoMod,
+    PreparationIdGenericMod,
+    PreparationIdPianoMap,
+    PreparationIdReset,
+    PreparationIdPiano,
+    PreparationIdComment,
+    BKPreparationIdNil
+};
 
 inline BKPreparationType modToPrepType(BKPreparationType modType)
 {
-    if (modType == PreparationTypeBlendronicMod) return PreparationTypeBlendronic;
-    return ((modType >= PreparationTypeDirectMod && modType <= PreparationTypeTempoMod) ? (BKPreparationType)(modType - 6) : BKPreparationTypeNil);
+    return ((modType >= PreparationTypeDirectMod && modType <= PreparationTypeTempoMod) ? (BKPreparationType)(modType - PreparationTypeDirectMod) : BKPreparationTypeNil);
 }
 
 inline BKPreparationType prepToModType(BKPreparationType modType)
 {
-    if (modType == PreparationTypeBlendronic) return PreparationTypeBlendronicMod;
-    return ((modType >= PreparationTypeDirect && modType <= PreparationTypeTempo) ? (BKPreparationType)(modType + 6) : BKPreparationTypeNil);
+    return ((modType >= PreparationTypeDirect && modType <= PreparationTypeTempo) ? (BKPreparationType)(modType + PreparationTypeDirectMod) : BKPreparationTypeNil);
 }
 
 
@@ -349,61 +459,67 @@ static const std::vector<std::string> cPreparationTypes = {
     "Direct",
     "Synchronic",
     "Nostalgic",
+    "Blendronic",
+    "Resonance",
     "Tuning",
     "Tempo",
     "Keymap",
     "DirectMod",
     "SynchronicMod",
     "NostalgicMod",
+    "BlendronicMod",
+    "ResonanceMod",
     "TuningMod",
     "TempoMod",
     "GenericMod",
     "PianoMap",
     "Reset",
     "Piano",
-    "Comment",
-    "Blendronic",
-    "BlendronicMod"
+    "Comment"
 };
 
 static const std::vector<std::string> cPreparationNames = {
     "Direct",
     "Synchronic",
     "Nostalgic",
+    "Blendronic",
+    "Resonance",
     "Tuning",
     "Tempo",
     "Keymap",
     "Direct Mod",
     "Synchronic Mod",
     "Nostalgic Mod",
+    "Blendronic Mod",
+    "Resonance Mod",
     "Tuning Mod",
     "Tempo Mod",
     "Generic Mod",
     "Piano Map",
     "Reset",
     "Piano",
-    "Comment",
-    "Blendronic",
-    "Blendronic Mod"
+    "Comment"
 };
 
 typedef enum BKPreparationDisplay {
     DisplayDirect = 0,
     DisplaySynchronic,
     DisplayNostalgic,
+    DisplayBlendronic,
+    DisplayResonance,
     DisplayTuning,
     DisplayTempo,
     DisplayKeymap,
     DisplayDirectMod,
     DisplaySynchronicMod,
     DisplayNostalgicMod,
+    DisplayBlendronicMod,
+    DisplayResonanceMod,
     DisplayTuningMod,
     DisplayTempoMod,
     DisplayGeneral,
     DisplayAbout,
     DisplayComment,
-    DisplayBlendronic,
-    DisplayBlendronicMod,
     DisplayModdable,
     DisplayNil,
 } BKPreparationDisplay;
@@ -414,26 +530,22 @@ static const std::vector<std::string> cDisplayNames = {
     "Direct",
     "Synchronic",
     "Nostalgic",
+    "Blendronic",
+    "Resonance",
     "Tuning",
     "Tempo",
     "Keymap",
     "Direct Mod",
     "Synchronic Mod",
     "Nostalgic Mod",
+    "Blendronic Mod",
+    "Resonance Mod",
     "Tuning Mod",
     "Tempo Mod",
     "General",
     "About",
     "Comment",
-	"Blendronic",
-    "Blendronic Mod"
 };
-
-
-
-
-
-
 
 static const std::vector<std::string> cPianoName = {
     "Piano1",
@@ -800,6 +912,54 @@ static const std::vector<std::string> cDirectParameterTypes = {
     "ADSR"
 };
 
+ #pragma mark - Resonance
+ typedef enum ResonanceParameterType
+ {
+     ResonanceId = 0,
+     ResonanceGain,
+     ResonanceBlendronicGain,
+     ResonanceMinStartTime,
+     ResonanceMaxStartTime,
+     ResonanceFundamental,
+     ResonanceClosestKeys,
+     ResonanceOffsets,
+     ResonanceGains,
+     ResonanceADSR,
+     ResonanceMaxSympStrings, 
+     ResonanceUseGlobalSoundSet,
+     ResonanceSoundSet,
+     ResonanceParameterTypeNil
+     
+ } ResonanceParameterType;
+
+static const std::vector<BKParameterDataType> cResonanceDataTypes = {
+    BKInt,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKFloat,
+    BKIntArr,
+    BKFloatArr,
+    BKFloatArr,
+    BKFloatArr,
+    BKBool,
+    BKInt
+};
+
+static const std::vector<std::string> cResonanceParameterTypes = {
+    "Direct Id",
+    "Gain",
+    "Blendronic Gain",
+    "Min Start Time",
+    "Max Start Time",
+    "Closest Keys",
+    "Offsets",
+    "Gains",
+    "ADSR"
+};
+
+
+
 typedef enum TuningAdaptiveSystemType
 {
     AdaptiveNone = 0,
@@ -1145,6 +1305,7 @@ typedef enum KeymapTargetType
     TargetTypeBlendronicOpenCloseInput,
     TargetTypeBlendronicOpenCloseOutput,
     
+    TargetTypeResonance,
     TargetTypeTempo,
     TargetTypeTuning,
     TargetTypeNil
@@ -1173,10 +1334,12 @@ static const std::vector<std::string> cKeymapTargetTypes = {
     "Pause-Play",
     "Open-Close Input",
     "Open-Close Output",
+    // Resonance
+    "Resonance",
     // Tempo
     "Tempo",
     // Tuning
-    "Tuning"
+    "Tuning",
 };
 
 static const std::vector<std::string> cKeymapParameterTypes = {
@@ -1425,5 +1588,11 @@ static const String cTempoTempo = "Tempo_tempo";
 static const String cTempoSubdivisions = "Tempo_subdivisions";
 static const String cTempoAT1History = "Tempo_at1History";
 static const String cTempoAT1Subdivisions = "Tempo_at1Subdivisions";
+
+static const String cResonanceDefGain = "Resonance_defaultGain";
+static const String cResonanceMinStartTime = "Resonance_minstartTime";
+static const String cResonanceMaxStartTime = "Resonance_maxstartTime";
+static const String cResonanceBlendronicGain = "Resonance_blendronicGain";
+static const String cResonanceMaxSympStrings = "Resonance_maxSympStrings";
 
 #endif  // AUDIOCONSTANTS_H_INCLUDED

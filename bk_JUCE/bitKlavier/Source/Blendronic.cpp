@@ -108,8 +108,10 @@ void BlendronicProcessor::tick(float* outputs)
     // Update the pulse length in case tempo or subdiv changed
     // possible to put this behind conditional, so we aren't doing these operations ever tick?
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-    if (pulseLength != prevPulseLength) numSamplesBeat = prep->bBeats.value[beatIndex] * pulseLength * synth->getSampleRate();
+    pulseLength *= (general->getPeriodMultiplier() * tempo->getPeriodMultiplier());
     
+    if (pulseLength != prevPulseLength) numSamplesBeat = prep->bBeats.value[beatIndex] * pulseLength * synth->getSampleRate();
+
     // Check for beat change
     if (sampleTimer >= numSamplesBeat)
     {
@@ -160,8 +162,9 @@ void BlendronicProcessor::tick(float* outputs)
         // Set parameters of the delay object
         updateDelayParameters();
         resetPhase = true;
+        prevPulseLength = pulseLength;
     }
-    prevPulseLength = pulseLength;
+    //prevPulseLength = pulseLength;
     
     // Tick the delay
     delay->tick(outputs, Decibels::decibelsToGain(prep->outGain.value));
@@ -181,7 +184,7 @@ void BlendronicProcessor::tick(float* outputs)
 
 void BlendronicProcessor::processBlock(int numSamples, int midiChannel)
 {
-    
+    // DBG("Blendronic tempo = " + String(tempo->getTempo()->prep->getTempo()));
 }
 
 void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
@@ -196,7 +199,7 @@ void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     if (fromPress)
     {
         aVels = bVels = &velocities.getReference(noteNumber);
-        for (int i = TargetTypeBlendronicPatternSync; i < TargetTypeTempo; ++i)
+        for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
@@ -290,7 +293,7 @@ void BlendronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
     if (fromPress)
     {
         aVels = bVels = &invertVelocities.getReference(noteNumber);
-        for (int i = TargetTypeBlendronicPatternSync; i < TargetTypeTempo; ++i)
+        for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
@@ -406,6 +409,7 @@ void BlendronicProcessor::prepareToPlay(double sr)
     feedbackIndex = 0;
     
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
+    pulseLength *= (general->getPeriodMultiplier() * tempo->getPeriodMultiplier());
     numSamplesBeat = prep->bBeats.value[beatIndex] * synth->getSampleRate() * pulseLength;
     numSamplesDelay = prep->bDelayLengths.value[delayIndex] * synth->getSampleRate() * pulseLength;
     if (pulseLength == INFINITY)

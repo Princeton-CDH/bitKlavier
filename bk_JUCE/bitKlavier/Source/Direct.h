@@ -85,7 +85,7 @@ public:
     velocityMin(0),
     velocityMax(127)
     {
-        
+
     }
     
     DirectPreparation(void):
@@ -108,9 +108,6 @@ public:
     {
         
     }
-    
-    
-    
     
     ~DirectPreparation()
     {
@@ -577,6 +574,9 @@ private:
     //while the key is held
     Array<int>      keyPlayed[128];//keep track of pitches played associated with particular key on keyboard
     Array<float>    keyPlayedOffset[128];   //and also the offsets
+    
+    Array<uint64> noteLengthTimers;     // store current length of played notes here
+    Array<int> activeNotes;             // table of notes currently being played by player
     
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;

@@ -63,36 +63,45 @@ ValueTree  Gallery::getState(void)
     
     galleryVT.addChild(general->getState(), -1, 0);
     
+    galleryVT.addChild(processor.getBKEqualizer()->getState(), -1, 0);
+    
     // Preparations and keymaps must be first.
     // Tempo and Tuning must be first of the preparations.
-    for (int i = 0; i < tempo.size(); i++)                  galleryVT.addChild( tempo[i]->getState(), -1, 0);
+    for (int i = 0; i < tempo.size(); i++)          galleryVT.addChild( tempo[i]->getState(), -1, 0);
     
-    for (int i = 0; i < tuning.size(); i++)                 galleryVT.addChild( tuning[i]->getState(), -1, 0);
+    for (int i = 0; i < tuning.size(); i++)         galleryVT.addChild( tuning[i]->getState(), -1, 0);
     
-    for (int i = 0; i < direct.size(); i++)                 galleryVT.addChild( direct[i]->getState(), -1, 0);
+    for (int i = 0; i < direct.size(); i++)         galleryVT.addChild( direct[i]->getState(), -1, 0);
     
-    for (int i = 0; i < synchronic.size(); i++)             galleryVT.addChild( synchronic[i]->getState(), -1, 0);
+    for (int i = 0; i < synchronic.size(); i++)     galleryVT.addChild( synchronic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < nostalgic.size(); i++)              galleryVT.addChild( nostalgic[i]->getState(), -1, 0);
+    for (int i = 0; i < nostalgic.size(); i++)      galleryVT.addChild( nostalgic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < blendronic.size(); i++)             galleryVT.addChild( blendronic[i]->getState(), -1, 0);
+    for (int i = 0; i < blendronic.size(); i++)     galleryVT.addChild( blendronic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modTempo.size(); i++)               galleryVT.addChild( modTempo[i]->getState(), -1, 0);
+    for (int i = 0; i < resonance.size(); i++)      galleryVT.addChild( resonance[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modTuning.size(); i++)              galleryVT.addChild( modTuning[i]->getState(), -1, 0);
+    for (int i = 0; i < modTempo.size(); i++)       galleryVT.addChild( modTempo[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modDirect.size(); i++)              galleryVT.addChild( modDirect[i]->getState(), -1, 0);
+    for (int i = 0; i < modTuning.size(); i++)      galleryVT.addChild( modTuning[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modSynchronic.size(); i++)          galleryVT.addChild( modSynchronic[i]->getState(), -1, 0);
+    for (int i = 0; i < modDirect.size(); i++)      galleryVT.addChild( modDirect[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modNostalgic.size(); i++)           galleryVT.addChild( modNostalgic[i]->getState(), -1, 0);
+    for (int i = 0; i < modSynchronic.size(); i++)  galleryVT.addChild( modSynchronic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < modBlendronic.size(); i++)        galleryVT.addChild( modBlendronic[i]->getState(), -1, 0);
+    for (int i = 0; i < modNostalgic.size(); i++)   galleryVT.addChild( modNostalgic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < bkKeymaps.size(); i++)              galleryVT.addChild( bkKeymaps[i]->getState(), -1, 0);
+    for (int i = 0; i < modResonance.size(); i++)   galleryVT.addChild( modResonance[i]->getState(), -1, 0);
+    
+    for (int i = 0; i < modBlendronic.size(); i++)  galleryVT.addChild( modBlendronic[i]->getState(), -1, 0);
+    
+    for (int i = 0; i < bkKeymaps.size(); i++)      galleryVT.addChild( bkKeymaps[i]->getState(), -1, 0);
     
     // Pianos
-    for (int piano = 0; piano < bkPianos.size(); piano++)   galleryVT.addChild( bkPianos[piano]->getState(), -1, 0);
+    for (int piano = 0; piano < bkPianos.size(); piano++)
+    {
+        galleryVT.addChild( bkPianos[piano]->getState(), -1, 0);
+    }
     
     galleryVT.setProperty("defaultPiano", getDefaultPiano(), 0);
     
@@ -136,6 +145,9 @@ void Gallery::setStateFromXML(XmlElement* xml)
             else if (e->hasTagName ( vtagGeneral))
             {
                 general->setState(e);
+            }
+            else if (e->hasTagName(vtagEqualizer)) {
+                processor.getBKEqualizer()->setState(e);
             }
             else if (e->hasTagName( vtagTuning))
             {
@@ -202,6 +214,29 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 int newId = transformId(PreparationTypeSynchronicMod, oldId);
                 
                 modSynchronic.getLast()->setId(newId);
+                
+            }
+            else if (e->hasTagName( vtagResonance))
+            {
+                addResonanceWithId(0);
+                
+                resonance.getLast()->setState(e);
+                
+                int oldId = resonance.getLast()->getId();
+                int newId = transformId(PreparationTypeResonance, oldId);
+                
+                resonance.getLast()->setId(newId);
+            }
+            else if (e->hasTagName( vtagModResonance))
+            {
+                addResonanceModWithId(0);
+                
+                modResonance.getLast()->setState(e);
+                
+                int oldId = modResonance.getLast()->getId();
+                int newId = transformId(PreparationTypeResonanceMod, oldId);
+                
+                modResonance.getLast()->setId(newId);
                 
             }
             else if (e->hasTagName( vtagTempo))

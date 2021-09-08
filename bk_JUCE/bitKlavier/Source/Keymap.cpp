@@ -58,11 +58,13 @@ sustainPedalKeys(false)
     {
         targetStates.add(false);
     }
-//    targetStates.setUnchecked(TargetTypeDirect, true);
-//    targetStates.setUnchecked(TargetTypeSynchronic, true);
-//    targetStates.setUnchecked(TargetTypeNostalgic, true);
-//    targetStates.setUnchecked(TargetTypeTempo, true);
-//    targetStates.setUnchecked(TargetTypeTuning, true);
+    
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
     
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -109,6 +111,13 @@ sustainPedalKeys(k->getSustainPedalKeys())
     {
         targetStates.add(false);
     }
+    
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
     
     inverted = k->isInverted();
 
@@ -166,6 +175,12 @@ sustainPedalKeys(k->getSustainPedalKeys())
     {
         targetStates.add(false);
     }
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
     
     inverted = k->isInverted();
 
@@ -225,6 +240,12 @@ sustainPedalKeys(false)
     {
         targetStates.add(false);
     }
+    targetStates.setUnchecked(TargetTypeDirect, true);
+    targetStates.setUnchecked(TargetTypeSynchronic, true);
+    targetStates.setUnchecked(TargetTypeNostalgic, true);
+    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeTempo, true);
+    targetStates.setUnchecked(TargetTypeTuning, true);
 
     harmonizerKeys.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -450,9 +471,6 @@ void Keymap::setKeys(KeySet set, bool action, PitchClass pc)
 
 void Keymap::setTarget(KeymapTargetType target, bool state)
 {
-    //if (targetStates[target] == TargetStateNil) return;
-    
-    //targetStates.set(target, state ? TargetStateDisabled : TargetStateEnabled);
     targetStates.setUnchecked(target, state);
     DBG("Keymap::setTarget = " + String(target) + " " + String((int) getTargetStates()[target]));
 }
@@ -640,11 +658,11 @@ float Keymap::applyVelocityCurve(float velocity)
     else if (velocityCurved > 1.) velocityCurved = 1.; // not sure we need to cap this
     // something will break down the line if not capped - note from jeff
     
-    DBG("asym_k = " + String(asym_k));
-    DBG("sym_k = " + String(sym_k));
-    DBG("scale = " + String(scale));
-    DBG("offset = " + String(offset));
-    DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
+    //DBG("asym_k = " + String(asym_k));
+    //DBG("sym_k = " + String(sym_k));
+    //DBG("scale = " + String(scale));
+    //DBG("offset = " + String(offset));
+    //DBG("velocity, velocityCurved = " + String(velocity) + ", " + String(velocityCurved));
     
     return velocityCurved;
 }

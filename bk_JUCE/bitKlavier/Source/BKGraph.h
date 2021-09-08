@@ -146,7 +146,7 @@ public:
         for (auto item : connections)
         {
             if ((item->getType() >= PreparationTypeDirect && item->getType() <= PreparationTypeTempo) ||
-                item->getType() == PreparationTypeBlendronic)
+                item->getType() == PreparationTypeBlendronic || item->getType() == PreparationTypeResonance)
             {
                 return true;
             }

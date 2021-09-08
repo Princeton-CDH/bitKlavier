@@ -516,7 +516,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
 	const ScopedLock sl(lock);
 
 	int noteNumber = midiNoteNumber;
-    if (noteNumber > 108 || noteNumber < 21) return nullptr;
+    if (noteNumber > 127 || noteNumber < 0) return nullptr;
     float transposition = transp;
 
     // needed for MIDI Out; will just return the last found voice, if there are multiple voices
@@ -731,7 +731,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
                            bool nostalgicOff)
 {
 
-	DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber) + " " + String(midiChannel));
+	//DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber) + " " + String(midiChannel));
 	const ScopedLock sl(lock);
 
 	for (int i = voices.size(); --i >= 0;)
@@ -752,22 +752,22 @@ void BKSynthesiser::keyOff(const int midiChannel,
 		 */
 
 
-        if (voice->layerId == layerToLayerId(type, layerId)) DBG("BKSynthesiser::keyOff FOUND PLAYING LAYER ");
+        //if (voice->layerId == layerToLayerId(type, layerId)) DBG("BKSynthesiser::keyOff FOUND PLAYING LAYER ");
 		if (voice->getCurrentlyPlayingNote() == midiNoteNumber
 			&& voice->getCurrentlyPlayingKey() == keyNoteNumber
 			&& voice->isPlayingChannel(midiChannel) // currently broken
 			&& (voice->layerId == layerToLayerId(type, layerId))) //need to add transposition level as well here
 		{
-            DBG("BKSynthesiser::keyOff: voice->getCurrentlyPlayingNote()");
+            //DBG("BKSynthesiser::keyOff: voice->getCurrentlyPlayingNote()");
             
 			if (BKSynthesiserSound * const sound = voice->getCurrentlyPlayingSound())
 			{
-                DBG("BKSynthesiser::keyOff: sound = voice->getCurrentlyPlayingSound()");
+                //DBG("BKSynthesiser::keyOff: sound = voice->getCurrentlyPlayingSound()");
                 
 				if (sound->appliesToNote(midiNoteNumber)
 					&& sound->appliesToChannel(midiChannel))
 				{
-                    DBG("BKSynthesiser::keyOff: sound->appliesToNote");
+                    //DBG("BKSynthesiser::keyOff: sound->appliesToNote");
                     
 					// Let synthesiser know that key is no longer down,
 					voice->keyIsDown = false;
@@ -776,7 +776,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
 						(voice->type == FixedLength) ||
 						voice->sostenutoPedalDown)))
 					{
-                        DBG("BKSynthesiser::keyOff: stoppingVoice");
+                        //DBG("BKSynthesiser::keyOff: stoppingVoice");
 						stopVoice(voice, velocity, allowTailOff);
 					}
 				}
@@ -786,7 +786,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
 
 	int noteNumber = midiNoteNumber;
 
-	if (noteNumber > 108 || noteNumber < 21) return;
+	if (noteNumber > 127 || noteNumber < 0) return;
     
     int soundSetId = (set < 0) ? processor.globalSoundSetId : set;
     if (soundSets.size() - 1 < soundSetId) return;

@@ -66,7 +66,9 @@ public:
     NostalgicProcessor::PtrArr           nprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
-    BlendronicProcessor::PtrArr             bprocessor;
+	BlendronicProcessor::PtrArr		     bprocessor;
+    ResonanceProcessor::PtrArr           rprocessor;
+
     
     void addProcessor(BKPreparationType thisType, int thisId);
     bool containsProcessor(BKPreparationType thisType, int thisId);
@@ -76,22 +78,31 @@ public:
     SynchronicProcessor::Ptr    getSynchronicProcessor(int Id, bool add = true);
     TuningProcessor::Ptr        getTuningProcessor(int Id, bool add = true);
     TempoProcessor::Ptr         getTempoProcessor(int Id, bool add = true);
-    BlendronicProcessor::Ptr    getBlendronicProcessor(int Id, bool add = true);
+	BlendronicProcessor::Ptr	getBlendronicProcessor(int Id, bool add = true);
+    ResonanceProcessor::Ptr     getResonanceProcessor(int Id, bool add = true);
+
     
     inline DirectProcessor::PtrArr        getDirectProcessors(void) const noexcept { return dprocessor; }
     inline NostalgicProcessor::PtrArr     getNostalgicProcessors(void) const noexcept { return nprocessor; }
     inline SynchronicProcessor::PtrArr    getSynchronicProcessors(void) const noexcept { return sprocessor; }
-    inline TuningProcessor::PtrArr        getTuningProcessors(void) const noexcept { return tprocessor; }
-    inline TempoProcessor::PtrArr         getTempoProcessors(void) const noexcept { return mprocessor; }
-    inline BlendronicProcessor::PtrArr  getBlendronicProcessors(void) const noexcept { return bprocessor; }
+    inline TuningProcessor::PtrArr      getTuningProcessors(void) const noexcept { return tprocessor; }
+    inline TempoProcessor::PtrArr       getTempoProcessors(void) const noexcept { return mprocessor; }
+	inline BlendronicProcessor::PtrArr  getBlendronicProcessors(void) const noexcept
+    { return bprocessor; }
+    inline ResonanceProcessor::PtrArr   getResonanceProcessors(void) const noexcept
+    { return rprocessor; }
+
     inline PreparationMap::Ptr       getPreparationMap(void) const noexcept { return prepMap; }
+    
     
     NostalgicProcessor::Ptr     addNostalgicProcessor(int thisId);
     SynchronicProcessor::Ptr    addSynchronicProcessor(int thisId);
     DirectProcessor::Ptr        addDirectProcessor(int thisId);
     TuningProcessor::Ptr        addTuningProcessor(int thisId);
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
-    BlendronicProcessor::Ptr    addBlendronicProcessor(int thisId);
+	BlendronicProcessor::Ptr    addBlendronicProcessor(int thisId);
+    ResonanceProcessor::Ptr     addResonanceProcessor(int thisId);
+
     
     void clearOldNotes(Piano::Ptr prevPiano)
     {
@@ -315,12 +326,14 @@ public:
             {
                 BKPreparationType type = item->getType();
                 
-                if (type == PreparationTypeDirect) ptype = "d";
-                else if (type == PreparationTypeNostalgic) ptype = "n";
-                else if (type == PreparationTypeSynchronic) ptype = "s";
-                else if (type == PreparationTypeTuning) ptype = "t";
-                else if (type == PreparationTypeTempo) ptype = "m";
-                else if (type == PreparationTypeBlendronic) ptype = "b";
+				if (type == PreparationTypeDirect) ptype = "d";
+				else if (type == PreparationTypeNostalgic) ptype = "n";
+                else if (type == PreparationTypeResonance) ptype = "r";
+				else if (type == PreparationTypeSynchronic) ptype = "s";
+				else if (type == PreparationTypeTuning) ptype = "t";
+				else if (type == PreparationTypeTempo) ptype = "m";
+				else if (type == PreparationTypeBlendronic) ptype = "b";
+
                 
                 out += String(i) + ":" + ptype + String(item->getId()) + ":" + "{" + item->connectionsToString() +"} ";
                 
@@ -346,10 +359,9 @@ public:
         }
     }
     
-    
-    int                         numModSMaps, numModNMaps, numModDMaps;
-    
-    void                        prepareToPlay(double sampleRate);
+    int numModSMaps, numModNMaps, numModDMaps;
+
+    void prepareToPlay(double sampleRate);
     
     void configurePianoMap(BKItem::Ptr map);
     
@@ -370,7 +382,8 @@ private:
     SynchronicProcessor::Ptr defaultS;
     BlendronicProcessor::Ptr defaultB;
     BlendronicProcessor::PtrArr defaultBA;
-    BlendronicDelay::Ptr defaultD;
+	BlendronicDelay::Ptr defaultD;
+    ResonanceProcessor::Ptr defaultR;
     
     inline Array<int> getAllIds(Direct::PtrArr direct)
     {
@@ -427,10 +440,21 @@ private:
         return which;
     }
     
-    inline Array<int> getAllIds(Blendronic::PtrArr direct)
+	inline Array<int> getAllIds(Blendronic::PtrArr direct)
+	{
+		Array<int> which;
+		for (auto p : direct)
+		{
+			which.add(p->getId());
+		}
+
+		return which;
+	}
+
+    inline Array<int> getAllIds(Resonance::PtrArr resonance)
     {
         Array<int> which;
-        for (auto p : direct)
+        for (auto p : resonance)
         {
             which.add(p->getId());
         }
@@ -448,8 +472,10 @@ private:
     
     void configureTempoModification(TempoModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     
-    void configureBlendronicModification(BlendronicModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
+	void configureBlendronicModification(BlendronicModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
     
+    void configureResonanceModification(ResonanceModification::Ptr mod, Array<int> whichKeymaps, Array<int> whichPreps);
+
     JUCE_LEAK_DETECTOR(Piano)
 };
 

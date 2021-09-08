@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="2.9"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.0"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
-              buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
+              buildVST="1" buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="Many Arrows Music" pluginManufacturerCode="Manu"
               pluginCode="bK2m" pluginChannelConfigs="{0,2}" pluginIsSynth="1"
@@ -12,10 +12,10 @@
               companyName="Many Arrows Music" companyEmail="dtrueman@princeton.edu"
               maxBinaryFileSize="" companyWebsite="http://manyarrowsmusic.com/"
               displaySplashScreen="1" reportAppUsage="1" splashScreenColour="Light"
-              buildStandalone="1" enableIAA="1" cppLanguageStandard="11" companyCopyright="Many Arrows Music"
-              pluginFormats="buildAU,buildStandalone,buildVST,buildVST3,enableIAA"
+              buildStandalone="1" enableIAA="1" cppLanguageStandard="17" companyCopyright="Many Arrows Music"
+              pluginFormats="buildAU,buildAUv3,buildStandalone,buildVST,buildVST3,enableIAA"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut,pluginEditorRequiresKeys"
-              pluginVST3Category="Instrument" defines="JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1"
+              pluginVST3Category="Instrument" defines="JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1&#10;JUCE_MODAL_LOOPS_PERMITTED=1&#10;"
               jucerFormatVersion="1">
   <MAINGROUP id="s4R02g" name="bitKlavier">
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
@@ -116,6 +116,18 @@
                   file="Source/galleries/Examples/46. Harmonizer 3.xml"/>
             <FILE id="oMflf6" name="47. Harmonizer 4.xml" compile="0" resource="1"
                   file="Source/galleries/Examples/47. Harmonizer 4.xml"/>
+            <FILE id="zQ6YC5" name="48. Resonance 1.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/48. Resonance 1.xml"/>
+            <FILE id="mEts4f" name="49. Resonance 2.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/49. Resonance 2.xml"/>
+            <FILE id="laAPXk" name="50. Resonance 3.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/50. Resonance 3.xml"/>
+            <FILE id="gbjMtx" name="51. Resonance 4.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/51. Resonance 4.xml"/>
+            <FILE id="dUb2mp" name="52. Resonance 5.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/52. Resonance 5.xml"/>
+            <FILE id="hPK6G1" name="53. Resonance 6.xml" compile="0" resource="1"
+                  file="Source/galleries/Examples/53. Resonance 6.xml"/>
           </GROUP>
           <GROUP id="{DC95ED57-B0B0-DFDE-4EA4-2AEDDF41B82F}" name="Mikroetudes">
             <FILE id="o6aLKt" name="And So.xml" compile="0" resource="1" file="Source/galleries/Mikroetudes/And So.xml"/>
@@ -183,8 +195,9 @@
                 file="Source/galleries/Exercise Constraint.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
-          <FILE id="jFt7tl" name="blendronic_icon.png" compile="0" resource="1"
-                file="Source/icons/blendronic_icon.png"/>
+          <FILE id="suTd6x" name="hi_cut.png" compile="0" resource="1" file="Source/icons/hi_cut.png"/>
+          <FILE id="K955yI" name="lo_cut.png" compile="0" resource="1" file="Source/icons/lo_cut.png"/>
+          <FILE id="DtQaJB" name="peak.png" compile="0" resource="1" file="Source/icons/peak.png"/>
           <FILE id="xOwvX8" name="left-arrow.png" compile="0" resource="1" file="Source/icons/left-arrow.png"/>
           <FILE id="IksJJv" name="right-arrow.png" compile="0" resource="1" file="Source/icons/right-arrow.png"/>
           <FILE id="jf5jjp" name="rotate-arrow.png" compile="0" resource="1"
@@ -195,16 +208,29 @@
           <FILE id="Dl47P7" name="bitKlavier_x.png" compile="0" resource="1"
                 file="Source/bitKlavier_x.png"/>
           <FILE id="hXCh3E" name="Icon.icns" compile="0" resource="1" file="Source/icons/Icon.icns"/>
-          <FILE id="fiXHO5" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"/>
-          <FILE id="CHQGaP" name="general_icon.png" compile="0" resource="1"
-                file="Source/icons/general_icon.png"/>
           <FILE id="puwr6J" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"/>
           <FILE id="XA1tC4" name="icon_win_large.png" compile="0" resource="1"
                 file="Source/icons/icon_win_large.png"/>
           <FILE id="u4lh0r" name="icon_win_small.png" compile="0" resource="1"
                 file="Source/icons/icon_win_small.png"/>
-          <FILE id="jAEdvs" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"/>
           <FILE id="eJtWfs" name="logo.jpg" compile="0" resource="1" file="Source/icons/logo.jpg"/>
+          <FILE id="OygRi2" name="samplePic.png" compile="0" resource="1" file="Source/icons/samplePic.png"/>
+          <FILE id="jAEdvs" name="keymap_icon.png" compile="0" resource="1" file="Source/icons/keymap_icon.png"/>
+          <FILE id="fiXHO5" name="direct_icon.png" compile="0" resource="1" file="Source/icons/direct_icon.png"/>
+          <FILE id="zYafoQ" name="nostalgic_icon.png" compile="0" resource="1"
+                file="Source/icons/nostalgic_icon.png"/>
+          <FILE id="cRWRNc" name="synchronic_icon.png" compile="0" resource="1"
+                file="Source/icons/synchronic_icon.png"/>
+          <FILE id="jFt7tl" name="blendronic_icon.png" compile="0" resource="1"
+                file="Source/icons/blendronic_icon.png"/>
+          <FILE id="nmesJs" name="resonance_icon.png" compile="0" resource="1"
+                file="Source/icons/resonance_icon.png"/>
+          <FILE id="QNLZ5x" name="tempo_icon.png" compile="0" resource="1" file="Source/icons/tempo_icon.png"/>
+          <FILE id="uY7VmT" name="tuning_icon.png" compile="0" resource="1" file="Source/icons/tuning_icon.png"/>
+          <FILE id="plhpj8" name="piano_icon.png" compile="0" resource="1" file="Source/icons/piano_icon.png"/>
+          <FILE id="CHQGaP" name="general_icon.png" compile="0" resource="1"
+                file="Source/icons/general_icon.png"/>
+          <FILE id="qCqL85" name="reset_icon.png" compile="0" resource="1" file="Source/icons/reset_icon.png"/>
           <FILE id="iljBYp" name="mod_direct_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_direct_icon.png"/>
           <FILE id="FliMzy" name="mod_nostalgic_icon.png" compile="0" resource="1"
@@ -213,21 +239,14 @@
                 file="Source/icons/mod_synchronic_icon.png"/>
           <FILE id="wvPNZy" name="mod_blendronic_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_blendronic_icon.png"/>
+          <FILE id="lJqPHp" name="mod_resonance_icon.png" compile="0" resource="1"
+                file="Source/icons/mod_resonance_icon.png"/>
           <FILE id="JTngLR" name="mod_tempo_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_tempo_icon.png"/>
           <FILE id="jENQvx" name="mod_tuning_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_tuning_icon.png"/>
           <FILE id="YIRkMI" name="mod_unassigned_icon.png" compile="0" resource="1"
                 file="Source/icons/mod_unassigned_icon.png"/>
-          <FILE id="zYafoQ" name="nostalgic_icon.png" compile="0" resource="1"
-                file="Source/icons/nostalgic_icon.png"/>
-          <FILE id="plhpj8" name="piano_icon.png" compile="0" resource="1" file="Source/icons/piano_icon.png"/>
-          <FILE id="qCqL85" name="reset_icon.png" compile="0" resource="1" file="Source/icons/reset_icon.png"/>
-          <FILE id="OygRi2" name="samplePic.png" compile="0" resource="1" file="Source/icons/samplePic.png"/>
-          <FILE id="cRWRNc" name="synchronic_icon.png" compile="0" resource="1"
-                file="Source/icons/synchronic_icon.png"/>
-          <FILE id="QNLZ5x" name="tempo_icon.png" compile="0" resource="1" file="Source/icons/tempo_icon.png"/>
-          <FILE id="uY7VmT" name="tuning_icon.png" compile="0" resource="1" file="Source/icons/tuning_icon.png"/>
         </GROUP>
       </GROUP>
       <GROUP id="{19157329-C279-4066-03E0-75F988B82181}" name="Constants">
@@ -355,6 +374,8 @@
           <FILE id="QU7LbV" name="Nostalgic.h" compile="0" resource="0" file="Source/Nostalgic.h"/>
           <FILE id="O8HjWt" name="Synchronic.cpp" compile="1" resource="0" file="Source/Synchronic.cpp"/>
           <FILE id="FXpKMX" name="Synchronic.h" compile="0" resource="0" file="Source/Synchronic.h"/>
+          <FILE id="wmmE7F" name="Resonance.cpp" compile="1" resource="0" file="Source/Resonance.cpp"/>
+          <FILE id="BSwyXC" name="Resonance.h" compile="0" resource="0" file="Source/Resonance.h"/>
           <FILE id="yrfH9O" name="Blendronic.cpp" compile="1" resource="0" file="Source/Blendronic.cpp"/>
           <FILE id="FFCWE6" name="Blendronic.h" compile="0" resource="0" file="Source/Blendronic.h"/>
           <FILE id="ac8QzA" name="Tuning.cpp" compile="1" resource="0" file="Source/Tuning.cpp"/>
@@ -381,6 +402,8 @@
             <FILE id="wwKFGe" name="BKSampleLoader.h" compile="0" resource="0"
                   file="Source/BKSampleLoader.h"/>
           </GROUP>
+          <FILE id="vkphQJ" name="BKEqualizer.cpp" compile="1" resource="0" file="Source/BKEqualizer.cpp"/>
+          <FILE id="jCKRAN" name="BKEqualizer.h" compile="0" resource="0" file="Source/BKEqualizer.h"/>
           <FILE id="HVbOmG" name="BKPianoSampler.cpp" compile="1" resource="0"
                 file="Source/BKPianoSampler.cpp"/>
           <FILE id="Spprlk" name="BKPianoSampler.h" compile="0" resource="0"
@@ -420,6 +443,10 @@
                 file="Source/PluginEditor.cpp"/>
         </GROUP>
         <GROUP id="{444BC2CA-5FF1-6AEB-00B9-DF5D039DBFFE}" name="PreparationVC">
+          <FILE id="JLoytD" name="ResonanceViewController.cpp" compile="1" resource="0"
+                file="Source/ResonanceViewController.cpp"/>
+          <FILE id="rix4iK" name="ResonanceViewController.h" compile="0" resource="0"
+                file="Source/ResonanceViewController.h"/>
           <FILE id="KJnEpI" name="BlendronicViewController.cpp" compile="1" resource="0"
                 file="Source/BlendronicViewController.cpp"/>
           <FILE id="eIGqlu" name="BlendronicViewController.h" compile="0" resource="0"
@@ -465,6 +492,8 @@
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
         <FILE id="udvcxb" name="VelocityCurveGraph.h" compile="0" resource="0"
               file="Source/VelocityCurveGraph.h"/>
+        <FILE id="ZZYk56" name="EqualizerGraph.h" compile="0" resource="0"
+              file="Source/EqualizerGraph.h"/>
         <FILE id="sM6zCj" name="BKUIComponents.h" compile="0" resource="0"
               file="Source/BKUIComponents.h"/>
         <GROUP id="{AE933235-955C-4B29-B82E-A67897458CE4}" name="BlendronicDisplay">
@@ -523,7 +552,7 @@
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        cppLibType="" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       osxCompatibility="10.9 SDK" enablePluginBinaryCopyStep="1"/>
+                       osxCompatibility="10.11 SDK" enablePluginBinaryCopyStep="1" macOSDeploymentTarget="10.11"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
@@ -541,6 +570,7 @@
         <MODULEPATH id="juce_audio_plugin_client" path="../../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="UIInterfaceOrientationLandscapeLeft,UIInterfaceOrientationLandscapeRight"
@@ -553,9 +583,10 @@
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        plistPreprocessorDefinitions="" iosCompatibility="12.0" enablePluginBinaryCopyStep="1"
-                       codeSigningIdentity="EFHE8JGE6R"/>
+                       codeSigningIdentity="EFHE8JGE6R" iosDeploymentTarget="12.0"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       iosCompatibility="12.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="EFHE8JGE6R"/>
+                       iosCompatibility="12.0" enablePluginBinaryCopyStep="1" codeSigningIdentity="EFHE8JGE6R"
+                       iosDeploymentTarget="12.0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../../JUCE/modules"/>
@@ -573,6 +604,7 @@
         <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2017 targetFolder="Builds/VisualStudio2017" bigIcon="iHGLGD" smallIcon="smHM8h"
@@ -601,10 +633,10 @@
         <MODULEPATH id="juce_audio_devices" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="..\..\..\JUCE\modules"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
     <VS2019 targetFolder="Builds/VisualStudio2019" bigIcon="iHGLGD" windowsTargetPlatformVersion="10.0.18362.0"
-            vstLegacyFolder="..\..\..\..\Desktop\vstsdk365_12_11_2015_build_67\VST3 SDK"
             vst3Folder="C:\Users\theot\Desktop\Work\Summer work\bitKlavier\bk_JUCE\bitKlavier\Builds\VisualStudio2019">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug"/>
@@ -626,6 +658,7 @@
         <MODULEPATH id="juce_audio_devices"/>
         <MODULEPATH id="juce_audio_basics"/>
         <MODULEPATH id="juce_audio_processors" path="../../../../../../../../Program Files/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../../../Downloads/JUCE/modules"/>
       </MODULEPATHS>
     </VS2019>
   </EXPORTFORMATS>
@@ -640,6 +673,7 @@
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="1" useGlobalPath="1"/>

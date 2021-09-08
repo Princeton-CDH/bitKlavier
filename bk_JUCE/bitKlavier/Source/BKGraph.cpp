@@ -52,6 +52,10 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     {
         setImage(ImageCache::getFromMemory(BinaryData::blendronic_icon_png, BinaryData::blendronic_icon_pngSize));
     }
+    else if (type == PreparationTypeResonance)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::resonance_icon_png, BinaryData::resonance_icon_pngSize));
+    }
     else if (type == PreparationTypeKeymap)
     {
         setImage(ImageCache::getFromMemory(BinaryData::keymap_icon_png, BinaryData::keymap_icon_pngSize));
@@ -79,6 +83,10 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     else if (type == PreparationTypeBlendronicMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_blendronic_icon_png, BinaryData::mod_blendronic_icon_pngSize));
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_resonance_icon_png, BinaryData::mod_resonance_icon_pngSize));
     }
     else if (type == PreparationTypeTuningMod)
     {
@@ -267,6 +275,10 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     else if (type == PreparationTypeNostalgicMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_nostalgic_icon_png, BinaryData::mod_nostalgic_icon_pngSize));
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        setImage(ImageCache::getFromMemory(BinaryData::mod_resonance_icon_png, BinaryData::mod_resonance_icon_pngSize));
     }
     else if (type == PreparationTypeBlendronicMod)
     {
@@ -492,7 +504,7 @@ ValueTree BKItem::getState(void)
     
     itemVT.setProperty("name", getItemName(), 0);
     
-    itemVT.setProperty("type", type, 0);
+    itemVT.setProperty("type", cPreparationTypeToId[type], 0);
     
     if (type != PreparationTypeComment)
     {
@@ -530,7 +542,7 @@ void BKItem::setState(XmlElement* e)
     name = s;
     
     i = e->getStringAttribute( "type" ).getIntValue();
-    type = (BKPreparationType)i;
+    type = cPreparationIdToType[i];
     
     if (type != PreparationTypeComment)
     {
@@ -573,7 +585,8 @@ void BKItem::timerCallback()
     {
         if (type == PreparationTypeKeymap ||
             type == PreparationTypeSynchronic ||
-            type == PreparationTypeNostalgic)
+            type == PreparationTypeNostalgic ||
+            type == PreparationTypeResonance)
         {
             repaint();
         }
@@ -703,16 +716,14 @@ bool BKItemGraph::connect(BKItem* item1, BKItem* item2)
     // If connecting a modification, set its type
     if (item1Type == PreparationTypeGenericMod)
     {
-        if ((item2Type >= PreparationTypeDirect && item2Type <= PreparationTypeTempo) ||
-            item2Type == PreparationTypeBlendronic)
+        if (item2Type >= PreparationTypeDirect && item2Type <= PreparationTypeTempo)
         {
             item1->setItemType(getModType(item2Type), true);
         }
     }
     else if (item2Type == PreparationTypeGenericMod)
     {
-        if ((item1Type >= PreparationTypeDirect && item1Type <= PreparationTypeTempo) ||
-            item1Type == PreparationTypeBlendronic)
+        if (item1Type >= PreparationTypeDirect && item1Type <= PreparationTypeTempo)
         {
             item2->setItemType(getModType(item1Type), true);
         }
@@ -799,6 +810,18 @@ bool BKItemGraph::connect(BKItem* item1, BKItem* item2)
             tune->removeConnection(item2);
         }
     }
+    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeDirect)
+    {
+        Keymap::Ptr km = processor.gallery->getKeymap(item1->getId());
+        BKItem::PtrArr connections = item1->getConnectionsOfType(item2Type);
+        if (connections.size() == 0) km->setTarget(TargetTypeDirect, true);
+    }
+    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeDirect)
+    {
+        Keymap::Ptr km = processor.gallery->getKeymap(item2->getId());
+        BKItem::PtrArr connections = item2->getConnectionsOfType(item1Type);
+        if (connections.size() == 0) km->setTarget(TargetTypeDirect, true);
+    }
     else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeSynchronic)
     {
         Keymap::Ptr km = processor.gallery->getKeymap(item1->getId());
@@ -851,7 +874,8 @@ bool BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
         item1Type == PreparationTypeNostalgicMod ||
         item1Type == PreparationTypeBlendronicMod || 
         item1Type == PreparationTypeSynchronicMod || 
-        item1Type == PreparationTypeTuningMod || 
+        item1Type == PreparationTypeTuningMod ||
+        item1Type == PreparationTypeResonanceMod ||
         item1Type == PreparationTypeTempoMod)
     {
         if (!item1->isConnectedToAnyPreparation())
@@ -864,6 +888,7 @@ bool BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
         item2Type == PreparationTypeBlendronicMod ||
         item2Type == PreparationTypeSynchronicMod ||
         item2Type == PreparationTypeTuningMod ||
+        item2Type == PreparationTypeResonanceMod ||
         item2Type == PreparationTypeTempoMod)
     {
         if (!item2->isConnectedToAnyPreparation())
@@ -899,12 +924,12 @@ Array<Line<int>> BKItemGraph::getLines(void)
         }
         else if (type == PreparationTypeTuning)
         {
-            // Look for synchronic, direct, and nostalgic targets
+            // Look for synchronic, direct, nostalgic, and resonance targets
             for (auto target : item->getConnections())
             {
                 BKPreparationType targetType = target->getType();
                 
-                if (targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic)
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) || targetType == PreparationTypeResonance)
                 {
                     Rectangle<int> otherBounds = target->getBounds();
                     
@@ -968,6 +993,25 @@ Array<Line<int>> BKItemGraph::getLines(void)
                 }
             }
         }
+        else if (type == PreparationTypeResonance)
+        {
+            for (auto target : item->getConnections())
+            {
+
+                BKPreparationType targetType = target->getType();
+
+                if (targetType != PreparationTypeKeymap)
+                {
+                    //might not need anything here if resonance only connects to keymap and tuning?
+                    Rectangle<int> otherBounds = target->getBounds();
+
+                    lines.add(Line<int>(item->getX() + item->getWidth() / 2.0f,
+                        item->getY() + item->getHeight() / 2.0f,
+                        otherBounds.getX() + otherBounds.getWidth() / 2.0f,
+                        otherBounds.getY() + otherBounds.getHeight() / 2.0f));
+                }
+            }
+        }
         else if ((type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod) || type == PreparationTypeReset)
         {
             // Look for nostalgic targets
@@ -1011,8 +1055,7 @@ void BKItemGraph::reconstruct(void)
 
 BKPreparationType BKItemGraph::getModType(BKPreparationType type)
 {
-    if (type == PreparationTypeBlendronic) return PreparationTypeBlendronicMod;
-    return (BKPreparationType)(type+6);
+    return (BKPreparationType)(type+PreparationTypeDirectMod);
 }
 
 void BKItemGraph::select(BKItem* item)
@@ -1119,8 +1162,20 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             type2 == PreparationTypeSynchronic ||
             type2 == PreparationTypeDirect ||
             type2 == PreparationTypeNostalgic ||
+            type2 == PreparationTypeResonance ||
             type2 == PreparationTypeTempo ||
             type2 == PreparationTypeBlendronicMod ||
+            type2 == PreparationTypeGenericMod ||
+            type2 == PreparationTypeReset)
+            return true;
+    }
+    else if (type1 == PreparationTypeResonance)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeResonanceMod ||
+            type2 == PreparationTypeGenericMod ||
+            type2 == PreparationTypeBlendronic ||
+            type2 == PreparationTypeTuning ||
             type2 == PreparationTypeGenericMod ||
             type2 == PreparationTypeReset)
             return true;
@@ -1131,6 +1186,7 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             type2 == PreparationTypeSynchronic ||
             type2 == PreparationTypeDirect ||
             type2 == PreparationTypeNostalgic ||
+            type2 == PreparationTypeResonance ||
             type2 == PreparationTypeTuningMod ||
             type2 == PreparationTypeGenericMod ||
             type2 == PreparationTypeReset)
@@ -1172,6 +1228,13 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             type2 == PreparationTypeReset)
             return true;
     }
+    else if (type1 == PreparationTypeResonanceMod)
+    {
+        if (type2 == PreparationTypeKeymap ||
+            type2 == PreparationTypeResonance ||
+            type2 == PreparationTypeReset)
+            return true;
+    }
     else if (type1 == PreparationTypeBlendronicMod)
     {
         if (type2 == PreparationTypeKeymap ||
@@ -1199,6 +1262,8 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
             (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo) ||
             type2 == PreparationTypeBlendronic ||
             (type2 >= PreparationTypeDirectMod && type2 <= PreparationTypeTempoMod) ||
+            type2 == PreparationTypeResonance ||
+            type2 == PreparationTypeResonanceMod ||
             type2 == PreparationTypeBlendronicMod)
             return true;
     }
@@ -1211,7 +1276,8 @@ bool BKItemGraph::isValidConnection(BKPreparationType type1, BKPreparationType t
     {
         if (type2 == PreparationTypeKeymap ||
             (type2 >= PreparationTypeDirect && type2 <= PreparationTypeTempo) ||
-            type2 == PreparationTypeBlendronic)
+            type2 == PreparationTypeBlendronic ||
+            type2 == PreparationTypeResonance)
             return true;
     }
     

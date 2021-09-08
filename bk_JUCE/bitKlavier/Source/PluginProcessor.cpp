@@ -104,6 +104,7 @@ mainPianoSynth(*this),
 hammerReleaseSynth(*this),
 resonanceReleaseSynth(*this),
 pedalSynth(*this),
+eq(),
 firstPedalDown(true),
 //touchThread(*this),
 progress(0),
@@ -283,7 +284,13 @@ void BKAudioProcessor::loadGalleries()
         "44. Harmonizer 1",
         "45. Harmonizer 2",
         "46. Harmonizer 3",
-        "47. Harmonizer 4"
+        "47. Harmonizer 4",
+        "48. Resonance 1",
+        "49. Resonance 2",
+        "50. Resonance 3",
+        "51. Resonance 4",
+        "52. Resonance 5",
+        "53. Resonance 6"
         
     });
     
@@ -412,6 +419,11 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     #endif
         }
     }
+    
+    // Prepare EQ
+    eq.setSampleRate(currentSampleRate);
+    eq.prepareToPlay(samplesPerBlock);
+    
 //    if (loader.getNumJobs() == 0) touchThread.startThread(0);
 }
 
@@ -445,7 +457,7 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     
     ValueTree galleryVT = gallery->getState();
     
-    galleryVT.setProperty("name", myFile.getFileName().upToFirstOccurrenceOf(".xml", false, false), 0);
+    galleryVT.setProperty("name", myFile.getFileName().upToLastOccurrenceOf(".xml", false, false), 0);
     
     std::unique_ptr<XmlElement> myXML = galleryVT.createXml();
     
@@ -537,9 +549,9 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
     
     
     File myFile(bkGalleries);
-    String galleryName = name.upToFirstOccurrenceOf(".xml",false,false);
+    String galleryName = name.upToLastOccurrenceOf(".xml",false,false);
     DBG("new file name: " + galleryName);
-    myFile = myFile.getNonexistentChildFile(name.upToFirstOccurrenceOf(".xml",false,false), ".xml", true);
+    myFile = myFile.getNonexistentChildFile(name.upToLastOccurrenceOf(".xml",false,false), ".xml", true);
     if (xml == nullptr)
     {
         myFile.appendData(BinaryData::Basic_Piano_xml, BinaryData::Basic_Piano_xmlSize);
@@ -583,7 +595,7 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
 
 void BKAudioProcessor::duplicateGallery(String newName)
 {
-    newName = newName.upToFirstOccurrenceOf(".xml",false,false);
+    newName = newName.upToLastOccurrenceOf(".xml",false,false);
     
     File oldFile (gallery->getURL());
     String baseURL = oldFile.getParentDirectory().getFullPathName();
@@ -597,8 +609,8 @@ void BKAudioProcessor::duplicateGallery(String newName)
 
 void BKAudioProcessor::renameGallery(String newName)
 {
-    String oldName = gallery->getName().upToFirstOccurrenceOf(".xml",false,false);
-    newName = newName.upToFirstOccurrenceOf(".xml",false,false);
+    String oldName = gallery->getName().upToLastOccurrenceOf(".xml",false,false);
+    newName = newName.upToLastOccurrenceOf(".xml",false,false);
 
     File oldFile (gallery->getURL());
     String baseURL = oldFile.getParentDirectory().getFullPathName();
@@ -703,11 +715,13 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
         // Now call this function for each post harmonization note
         for (auto h : reducedHarm)
         {
-            DBG("BKAudioProcessor::handleNoteOn noteOn");
+            //DBG("BKAudioProcessor::handleNoteOn noteOn");
             handleNoteOn(h, velocity, channel, noteNumber, source, true);
         }
         return; // Done with the first pass
     }
+    
+    if (noteNumber < 0 || noteNumber > 127) return;
     
     // Second pass, post harmonization
     String key = source + "n" + String(mappedFrom);
@@ -777,7 +791,7 @@ void BKAudioProcessor::handleAllNotesOff()
 
 void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel, int mappedFrom, String source, bool postHarmonizer)
 {
-    DBG("++BKAudioProcessor::handleNoteOff channel = " + String(channel));
+    //DBG("++BKAudioProcessor::handleNoteOff channel = " + String(channel));
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
      
     bool activeSource = false;
@@ -817,6 +831,7 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
         }
     }
     
+    if (noteNumber < 0 || noteNumber > 127) return;
     String key = source + "n" + String(mappedFrom);
     if (noteOnSetsNoteOffVelocity)
     {
@@ -1104,14 +1119,14 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 		//if (keystrokesEnabled.getValue())
         int note = notesOnUI.getUnchecked(i);
         DBG("BKAudioProcessor::processBlock noteOn");
-        handleNoteOn(note, 0.6, channel, note, cMidiInputUI);
+        handleNoteOn(note, 0.8, channel, note, cMidiInputUI);
 		notesOnUI.remove(i);
 	}
     
     for(int i=0; i<notesOffUI.size(); i++)
     {
         int note = notesOffUI.getUnchecked(i);
-        handleNoteOff(note, 0.6, channel, note, cMidiInputUI);
+        handleNoteOff(note, 0.8, channel, note, cMidiInputUI);
         notesOffUI.remove(i);
     }
     
@@ -1146,13 +1161,15 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
-    pedalSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+	pedalSynth.renderNextBlock(buffer, midiMessages, 0, numSamples);
     
 #if JUCE_IOS
     buffer.applyGain(0, numSamples, 0.3 * gallery->getGeneralSettings()->getGlobalGain());
 #else
     buffer.applyGain(0, numSamples, gallery->getGeneralSettings()->getGlobalGain());
 #endif
+    // Apply EQ filters to the buffer
+    eq.process(buffer);
     
     // store buffer for level calculation when needed
     levelBuf.copyFrom(0, 0, buffer, 0, 0, numSamples);
@@ -1262,6 +1279,20 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             }
         }
     }
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->resonanceResets)
+    {
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                currentPiano->getResonanceProcessor(reset.prepId)->reset();
+                updateState->resonancePreparationDidChange = true;
+                break;
+            }
+        }
+    }
     for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->blendronicResets)
     {
         for (auto Id : reset.keymapIds)
@@ -1344,6 +1375,20 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             {
                 gallery->getNostalgicModification(reset.prepId)->resetModdables();
                 updateState->nostalgicPreparationDidChange = true;
+                break;
+            }
+        }
+    }
+    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->resonanceModResets)
+    {
+        for (auto Id : reset.keymapIds)
+        {
+            Keymap::Ptr keymap = gallery->getKeymap(Id);
+            
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                gallery->getResonanceModification(reset.prepId)->resetModdables();
+                updateState->resonancePreparationDidChange = true;
                 break;
             }
         }
@@ -1479,6 +1524,30 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
         }
     }
     
+    
+    ResonanceModification::PtrArr rMod = currentPiano->modificationMap[noteNumber]->getResonanceModifications();
+    //DBG("about to perform resonance modifications: " + String(rMod.size()));
+    for (int i = rMod.size(); --i >= 0;)
+    {
+        ResonanceModification::Ptr mod = rMod[i];
+        
+        for (auto keymap : mod->getKeymaps())
+        {
+            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            {
+                Array<int> targets = mod->getTargets();
+                for (auto target : targets)
+                {
+                    ResonancePreparation::Ptr prep = gallery->getResonance(target)->prep;
+                    prep->performModification(mod, mod->getDirty());
+                }
+                updateState->resonancePreparationDidChange = true;
+                break;
+            }
+        }
+    }
+     
+    
     SynchronicModification::PtrArr sMod = currentPiano->modificationMap[noteNumber]->getSynchronicModifications();
     for (int i = sMod.size(); --i >= 0;)
     {
@@ -1603,7 +1672,7 @@ void BKAudioProcessor::exportCurrentGallery(void)
     
     fc = std::make_unique<FileChooser> ("Export your gallery.",
                                         fileToSave,
-                                        "*",
+                                        "*.xml",
                                         true);
     
     fc->launchAsync (FileBrowserComponent::saveMode | FileBrowserComponent::canSelectFiles | FileBrowserComponent::canSelectDirectories,
@@ -1639,7 +1708,9 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
     
     if (myChooser.browseForFileToSave(true))
     {
-        writeCurrentGalleryToURL(myChooser.getResult().getFullPathName());
+        File fileToSave = myChooser.getResult();
+        if (!fileToSave.hasFileExtension("xml")) fileToSave = fileToSave.withFileExtension("xml");
+        writeCurrentGalleryToURL(fileToSave.getFullPathName());
     }
     
     updateGalleries();
@@ -1649,22 +1720,26 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
 void BKAudioProcessor::saveCurrentGallery(void)
 {
     if (defaultLoaded) return;
+    File fileToSave;
     if (gallery->getURL() == "")
     {
 #if JUCE_IOS
-        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName());
+        fileToSave = File::getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/" + gallery->getName();
 #endif
 #if JUCE_MAC
-        writeCurrentGalleryToURL( File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + "/bitKlavier/galleries/" + gallery->getName());
+        fileToSave = File::getSpecialLocation(File::globalApplicationsDirectory).getFullPathName() + "/bitKlavier/galleries/" + gallery->getName();
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-        writeCurrentGalleryToURL( File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getFullPathName() + "\\bitKlavier\\galleries\\" + gallery->getName());
+        fileToSave = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getFullPathName() + "\\bitKlavier\\galleries\\" + gallery->getName();
 #endif
     }
     else
     {
-        writeCurrentGalleryToURL(gallery->getURL());
+        fileToSave = File(gallery->getURL());
     }
+	if (!fileToSave.hasFileExtension("xml")) fileToSave = fileToSave.withFileExtension("xml");
+	writeCurrentGalleryToURL(fileToSave.getFullPathName());
+
     if (wrapperType == wrapperType_Standalone) getPluginHolder()->savePluginState();
 }
 
@@ -1744,14 +1819,14 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
-        // if (currentPiano != nullptr) currentPiano->deconfigure();
-        
+        // if (currentPiano != nullptr) currentPiano->deconfigure();        
         if (gallery != nullptr)
         {
             for (auto piano : gallery->getPianos())
             {
                 piano->deconfigure();
             }
+            clearBitKlavier();
         }
         
         gallery = new Gallery(xml, *this);
@@ -1944,12 +2019,12 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     
     if (m.isNoteOn()) //&& keystrokesEnabled.getValue())
     {
-        DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
+        //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
         handleNoteOn(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
     }
     else if (m.isNoteOff())
     {
-        DBG("BKAudioProcessor::handleIncomingMidiMessage noteOff, channel = " + String(channel));
+        //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOff, channel = " + String(channel));
         handleNoteOff(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
         //didNoteOffs = true;
     }
@@ -1988,6 +2063,10 @@ void BKAudioProcessor::hiResTimerCallback()
     for (auto n : gallery->getAllNostalgic())
     {
         n->prep->stepModdables();
+    }
+    for (auto r : gallery->getAllResonance())
+    {
+        r->prep->stepModdables();
     }
     for (auto s : gallery->getAllSynchronic())
     {
@@ -2033,6 +2112,12 @@ void BKAudioProcessor::reset(BKPreparationType type, int Id)
         
         if (proc != nullptr) proc->reset();
     }
+    else if (type == PreparationTypeResonance)
+    {
+        ResonanceProcessor::Ptr proc = currentPiano->getResonanceProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
     else if (type == PreparationTypeTuning)
     {
         TuningProcessor::Ptr proc = currentPiano->getTuningProcessor(Id, false);
@@ -2064,6 +2149,10 @@ void BKAudioProcessor::reset(BKPreparationType type, int Id)
     else if (type == PreparationTypeBlendronicMod)
     {
         gallery->getBlendronicModification(Id)->reset();
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        gallery->getResonanceModification(Id)->reset();
     }
     else if (type == PreparationTypeTuningMod)
     {
@@ -2110,6 +2199,14 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
         
         if (proc != nullptr) proc->reset();
     }
+    else if (type == PreparationTypeResonance)
+    {
+        gallery->getResonance(Id)->clear();
+        
+        ResonanceProcessor::Ptr proc = currentPiano->getResonanceProcessor(Id, false);
+        
+        if (proc != nullptr) proc->reset();
+    }
     else if (type == PreparationTypeTuning)
     {
         gallery->getTuning(Id)->clear();
@@ -2145,6 +2242,10 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     else if (type == PreparationTypeBlendronicMod)
     {
         gallery->getBlendronicModification(Id)->reset();
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+        gallery->getResonanceModification(Id)->reset();
     }
     else if (type == PreparationTypeTuningMod)
     {

@@ -86,9 +86,14 @@ octaveNumForMiddleC (3)
     colourChanged();
     //setWantsKeyboardFocus (true);
     
+    midRange = 0.;
+    minRange = -50.;
+    maxRange = 50;
+    
     for(int i=0; i<128; i++)
     {
-        keyValues.add(0.);
+        //keyValues.add(0.);
+        keyValues.add(midRange);
     }
     
     state.addListener (this);
@@ -425,7 +430,7 @@ void BKKeymapKeyboardComponent::paint (Graphics& g)
     if (! shadowCol.isTransparent())
     {
         g.setGradientFill (ColourGradient (shadowCol, x1, y1, shadowCol.withAlpha (0.0f), x2, y2, false));
-        
+
         switch (orientation)
         {
             case horizontalKeyboard:            g.fillRect (0, 0, x, 5); break;
@@ -480,18 +485,32 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
                                            const Colour& lineColour,
                                            const Colour& textColour)
 {
-    Colour c (keyColour);
+    Colour c;
+    if (disabledKeys.contains(midiNoteNumber))
+        c = findColour(shadowColourId);
+    else
+    c = keyColour;
     
     float keyVal = keyValues.getUnchecked(midiNoteNumber);
-    if(keyVal != 0.)
+    //if(keyVal != 0.)
+    if(keyVal != midRange)
     {
-        if(keyVal > 0) c = c.overlaidWith (Colours::red.withSaturation ( sqrt(keyVal / 50.)) );
-        else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.)));
+        //if(keyVal > 0) c = c.overlaidWith (Colours::red.withSaturation ( sqrt(keyVal / 50.)) );
+        //else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.)));
+        //DBG("keyVal = " + String(midRange - keyVal));
+        //if (isOver && !disabledKeys.contains(midiNoteNumber) && !isDown)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+        //else
+        if(keyVal > midRange) c = c.overlaidWith (Colours::red.withSaturation ( sqrt((keyVal - midRange) / (maxRange - midRange))) );
+        else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt((midRange - keyVal) / (midRange - minRange))));
+
+        //if (isOver && !disabledKeys.contains(midiNoteNumber) && !isDown)  c = c.interpolatedWith (findColour (mouseOverKeyOverlayColourId), 0.5);
+        //if (isOver && !disabledKeys.contains(midiNoteNumber) && !isDown)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+
     }
     else
     {
         if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
-        if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+        if (isOver && !disabledKeys.contains(midiNoteNumber))  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
     }
     
     g.setColour (c);
@@ -577,10 +596,16 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
                                            bool isDown, bool isOver,
                                            const Colour& noteFillColour)
 {
-    Colour c (noteFillColour);
+    Colour c;
+    if (disabledKeys.contains(midiNoteNumber))
+        c = findColour(shadowColourId).withAlpha(1.f).withBrightness(0.3f);
+    else
+    c = noteFillColour;
+    
+    //Colour c (noteFillColour);
     
     if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
-    if (isOver)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+    if (isOver && !disabledKeys.contains(midiNoteNumber))  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
     
     g.setColour (c);
     g.fillRect (x, y, w, h);
@@ -594,10 +619,15 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
     {
         
         float keyVal = keyValues.getUnchecked(midiNoteNumber);
-        if(keyVal != 0.)
+        //if(keyVal != 0.)
+        if(keyVal != midRange)
         {
-            if(keyVal > 0) c = Colours::red.withSaturation ( sqrt(keyVal / 50.)) ;
-            else c = Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.));
+            //if(keyVal > 0) c = Colours::red.withSaturation ( sqrt(keyVal / 50.)) ;
+            //else c = Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.));
+            
+            if(keyVal > midRange) c = c.overlaidWith (Colours::red.withSaturation ( sqrt((keyVal - midRange) / (maxRange - midRange))) );
+            else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt((midRange - keyVal) / (midRange - minRange))));
+            
             g.setColour(c);
         }
         else g.setColour (c.brighter());
@@ -832,6 +862,7 @@ void BKKeymapKeyboardComponent::updateNoteUnderMouse (juce::Point<int> pos, bool
     const int oldNoteDown = mouseDownNotes.getUnchecked (fingerNum);
     const float eventVelocity = useMousePositionForVelocity ? mousePositionVelocity * velocity : 1.0f;
     
+    //if (disabledKeys.contains(newNote)) return;
     lastNoteOver = newNote;
     
     if (oldNote != newNote)
@@ -840,6 +871,8 @@ void BKKeymapKeyboardComponent::updateNoteUnderMouse (juce::Point<int> pos, bool
         repaintNote (newNote);
         mouseOverNotes.set (fingerNum, newNote);
     }
+    
+    if (disabledKeys.contains(newNote)) return;
     
     if (isDown)
     {
@@ -881,7 +914,7 @@ void BKKeymapKeyboardComponent::mouseDrag (const MouseEvent& e)
     {
         float mousePositionVelocity;
         const int newNote = xyToNote (e.getPosition(), mousePositionVelocity);
-        
+ 
         if (newNote >= 0)
             mouseDraggedToKey (newNote, e);
         
@@ -931,7 +964,8 @@ void BKKeymapKeyboardComponent::setValuesRotatedByFundamental(Array<float> vals)
 Array<float> BKKeymapKeyboardComponent::getValues()
 {
     Array<float> valsToSend;
-    for (int i = 0; i < 128; i++) valsToSend.add(0.);
+    //for (int i = 0; i < 128; i++) valsToSend.add(0.);
+    for (int i = 0; i < 128; i++) valsToSend.add(midRange);
     //for (int i = 0; i < 12; i++) valsToSend.add(0.);
     
     int offset;
@@ -963,7 +997,8 @@ void BKKeymapKeyboardComponent::setValues(Array<float> vals)
     for (int i = vals.size(); i<=rangeEnd;i++)
     {
         //DBG("keyValues SET DIRECT " + String(i) + " " + String(i) + " 0");
-        keyValues.set(i, 0);
+        //keyValues.set(i, 0);
+        keyValues.set(i, midRange);
     }
 }
 
@@ -978,7 +1013,9 @@ float BKKeymapKeyboardComponent::getLastNoteOverValue()
 
 void BKKeymapKeyboardComponent::clearKeyValues()
 {
-    for (int i = 0; i < 128; i++) keyValues.set(i, 0.);
+    //for (int i = 0; i < 128; i++) keyValues.set(i, 0.);
+    DBG("BKKeymapKeyboardComponent::clearKeyValues, setting to " + String(midRange));
+    for (int i = 0; i < 128; i++) keyValues.set(i, midRange);
 }
 
 void BKKeymapKeyboardComponent::setFundamental(int fund)
@@ -990,7 +1027,8 @@ void BKKeymapKeyboardComponent::setFundamental(int fund)
     int offset = fund - oldFund;
     
     Array<float> tempVals;
-    for (int i = 0; i < 128; i++) tempVals.add(0.);
+    //for (int i = 0; i < 128; i++) tempVals.add(0.);
+    for (int i = 0; i < 128; i++) tempVals.add(midRange);
     
     for(int i=rangeStart; i<=rangeEnd; i++)
     {
@@ -1009,6 +1047,7 @@ void BKKeymapKeyboardComponent::setFundamental(int fund)
 // FLESH THESE OUT TO ALLOW FOR DRAGGING
 bool BKKeymapKeyboardComponent::mouseDownOnKey    (int midiNoteNumber, const MouseEvent& e)
 {
+    if (disabledKeys.contains(midiNoteNumber)) return false;
     lastNoteOn = midiNoteNumber;
     
     if (lastKeySelected == -1)
@@ -1023,6 +1062,7 @@ bool BKKeymapKeyboardComponent::mouseDownOnKey    (int midiNoteNumber, const Mou
 
 void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const MouseEvent&)
 {
+    if (disabledKeys.contains(midiNoteNumber)) return;
     if (midiNoteNumber != lastKeySelected)
     {
         if(keysToggle)
@@ -1041,6 +1081,7 @@ void BKKeymapKeyboardComponent::mouseDraggedToKey (int midiNoteNumber, const Mou
 
 void BKKeymapKeyboardComponent::mouseUpOnKey      (int midiNoteNumber, const MouseEvent&)
 {
+    if (disabledKeys.contains(midiNoteNumber)) return;
     if(keysToggle)
     {
         state.toggle(midiNoteNumber);

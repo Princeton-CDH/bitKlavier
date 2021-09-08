@@ -12,6 +12,8 @@
 
 #include "BKSynthesiser.h"
 
+#include "BKEqualizer.h"
+
 #include "BKUpdateState.h"
 
 #include "Keymap.h"
@@ -30,6 +32,7 @@
 
 class StandalonePluginHolder;
 class BKAudioProcessorEditor;
+//class BKEqualizer;
 
 //==============================================================================
 /**
@@ -105,6 +108,10 @@ public:
     BKSynthesiser                       hammerReleaseSynth;
     BKSynthesiser                       resonanceReleaseSynth;
     BKSynthesiser                       pedalSynth;
+    
+    // Equalizer
+    BKEqualizer                         eq;
+    inline BKEqualizer* getBKEqualizer() { return &eq; } // may need to move to gallery later
     
     //sfzero::Synth                       synth;
     
@@ -236,6 +243,9 @@ public:
     AudioProcessorEditor* getEditor();
 
     //==============================================================================
+    
+    inline BKAudioProcessorEditor* getBKEditor() { return editor; }
+    
     const String getName() const override;
 
     bool acceptsMidi() const override;
@@ -457,6 +467,46 @@ public:
 //        currentPiano->configure();
         
         return "Redo " + galleryVT->getStringAttribute("actionDesc");
+    }
+    
+    int findPathAndLoadSamples(String name)
+    {
+        // name comes in as "soundfont.sf2.subsound1"
+        BKSampleLoadType type = BKLoadLite;
+        String path;
+        int subsound = 0;
+        
+        for (int i = 0; i < cBKSampleLoadTypes.size(); i++)
+        {
+            if (name == String(cBKSampleLoadTypes[i]))
+            {
+                type = (BKSampleLoadType) i;
+            }
+        }
+        
+        String sfName = name.upToLastOccurrenceOf(".subsound", false, false);
+        for (auto sf : soundfontNames)
+        {
+            if (sf.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == sfName)
+            {
+                type = BKLoadSoundfont;
+                path = sf;
+                subsound = name.fromLastOccurrenceOf(".subsound", false, false).getIntValue();
+                break;
+            }
+        }
+        
+        for (auto cs : customSampleSetNames)
+        {
+            if (cs.fromLastOccurrenceOf(File::getSeparatorString(), false, false) == name)
+            {
+                type = BKLoadCustom;
+                path = cs;
+                break;
+            }
+        }
+        
+        return loadSamples(type, path, subsound, false);
     }
     
 private:
