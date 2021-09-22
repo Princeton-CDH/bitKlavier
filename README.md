@@ -2,6 +2,10 @@
 
 Developed by Dan Trueman, Michael Mulshine, Matt Wang, Theo Trevisan, Katie Chou, and Jeff Gordon.
 
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3667650.svg)](https://doi.org/10.5281/zenodo.3667650)
+
+
 bitKlavier takes inspiration from John Cage's *prepared piano*, but instead of screws and erasers we place a reconfigurable collection of digital machines between the virtual strings of the digital piano. Learn more at the [bitKlavier website](http://bitklavier.com).
 
 bitKlavier is built with [JUCE](http://juce.com>), the C++ audio programming framework ([available under GPLv3 license](https://github.com/WeAreROLI/JUCE)).
