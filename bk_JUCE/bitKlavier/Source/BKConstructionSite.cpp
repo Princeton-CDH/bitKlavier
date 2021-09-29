@@ -865,7 +865,7 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
             itemSource = itemToSelect;
             
             if (itemSource != nullptr)
-            {`
+            {
                 if ((itemSource->getType() != PreparationTypeComment) &&
                     (itemSource->getType() != PreparationTypePianoMap))
                 {

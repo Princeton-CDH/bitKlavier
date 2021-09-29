@@ -58,6 +58,13 @@ offsetsKeyboard(false, true)
     maxSympStringsSlider->setJustifyRight(false);
     maxSympStringsSlider->setToolTipString("sets maximum number of sympathetic strings");
     addAndMakeVisible(*maxSympStringsSlider);
+    
+#if JUCE_IOS
+    defGainSlider->addWantsBigOneListener(this);
+    blendGainSlider->addWantsBigOneListener(this);
+    startTimeSlider->addWantsBigOneListener(this);
+    maxSympStringsSlider->addWantsBigOneListener(this);
+#endif
 
     ADSRSlider = std::make_unique<BKADSRSlider>("Resonance envelope");
     ADSRSlider->setButtonText("edit resonance envelope");
@@ -155,6 +162,16 @@ void ResonanceViewController::resized()
 
     //will have to put big '#if 0' here eventually
 }
+
+#if JUCE_IOS
+void ResonanceViewController::iWantTheBigOne(TextEditor* tf, String name)
+{
+    hideOrShow.setAlwaysOnTop(false);
+    rightArrow.setAlwaysOnTop(false);
+    leftArrow.setAlwaysOnTop(false);
+    bigOne.display(tf, name, getBounds());
+}
+#endif
 
 void ResonanceViewController::displayTab(int tab)
 {
