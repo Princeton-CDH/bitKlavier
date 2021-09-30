@@ -374,7 +374,8 @@ void NostalgicViewController::displayTab(int tab)
         Rectangle<int> area (getBounds());
         area.removeFromRight(rightArrow.getWidth());
         area.removeFromLeft(leftArrow.getWidth());
-        area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
+        //area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + gYSpacing);
         
         Rectangle<int> bGainSliderArea (area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 5));
 #if !JUCE_IOS
@@ -393,11 +394,11 @@ void NostalgicViewController::displayTab(int tab)
     
         int columnHeight = area.getHeight();
         
-        reverseADSRLabel.setBounds(area.removeFromTop(columnHeight * 0.15));
-        reverseADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.35));
+        reverseADSRLabel.setBounds(area.removeFromTop(columnHeight * 0.1)); // was .15
+        reverseADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.38)); // was .35
         
-        undertowADSRLabel.setBounds(area.removeFromTop(columnHeight * 0.15));
-        undertowADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.35));
+        undertowADSRLabel.setBounds(area.removeFromTop(columnHeight * 0.1));
+        undertowADSRSlider->setBounds(area.removeFromTop(columnHeight * 0.38));
         
         /*
         Rectangle<int> areaSave (area);

@@ -470,7 +470,8 @@ void KeymapViewController::displayTab(int tab)
         
 #if JUCE_IOS
 //        area.removeFromTop(gComponentComboBoxHeight);
-        area.reduce(0.f, area.getHeight() * 0.2f);
+        //area.reduce(0.f, area.getHeight() * 0.2f);
+        area.removeFromTop(gComponentComboBoxHeight + 2*gYSpacing + 50 * processor.paddingScalarY);
 #endif
         
         Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);

@@ -508,11 +508,11 @@ void SynchronicViewController::displayTab(int tab)
         Rectangle<int> area (getBounds());
         area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
     
-        area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + gYSpacing);
         area.removeFromRight(rightArrow.getWidth());
         area.removeFromLeft(leftArrow.getWidth());
         
-        area.removeFromTop(processor.paddingScalarY * 30);
+        area.removeFromTop(processor.paddingScalarY * 30 + gYSpacing);
         
         Rectangle<int> bGainSliderArea (area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
 #if !JUCE_IOS
@@ -522,6 +522,7 @@ void SynchronicViewController::displayTab(int tab)
 #endif
         blendronicGainSlider->setBounds(bGainSliderArea);
         
+        area.removeFromTop(2 * gYSpacing);
         area.removeFromTop((area.getHeight() - (targetControlCBs.size() / 2) * (gComponentComboBoxHeight + gYSpacing)) / 3.);
         
         // make four columns
