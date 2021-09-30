@@ -17,8 +17,8 @@
 ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGraph* theGraph) :
     BKViewController(p, theGraph, 2),
 #if JUCE_IOS
-gainsKeyboard(false, true),
-offsetsKeyboard(false, true)
+gainsKeyboard(false, false),
+offsetsKeyboard(false, false)
 #else
 gainsKeyboard(false, false),
 offsetsKeyboard(false, true)
@@ -64,6 +64,8 @@ offsetsKeyboard(false, true)
     blendGainSlider->addWantsBigOneListener(this);
     startTimeSlider->addWantsBigOneListener(this);
     maxSympStringsSlider->addWantsBigOneListener(this);
+    offsetsKeyboard.addWantsBigOneListener(this);
+    gainsKeyboard.addWantsBigOneListener(this);
 #endif
 
     ADSRSlider = std::make_unique<BKADSRSlider>("Resonance envelope");
@@ -196,32 +198,35 @@ void ResonanceViewController::displayTab(int tab)
         
 #if JUCE_IOS
 //        area.removeFromTop(gComponentComboBoxHeight);
-        area.reduce(0.f, area.getHeight() * 0.2f);
+        //area.reduce(0.f, area.getHeight() * 0.2f);
 #endif
         
         ADSRSlider->setVisible(true);
         ADSRLabel.setVisible(true);
 
         //area = (getLocalBounds());
-       area.reduce(20 * processor.paddingScalarX + 4, 20 * processor.paddingScalarY + 4);
-        
+        //area.reduce(20 * processor.paddingScalarX + 4, 20 * processor.paddingScalarY + 4);
+        //area.reduce(24 * processor.paddingScalarX, 24 * processor.paddingScalarY);
+         area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+         
         //single parameter sliders
 
+        area.removeFromTop(gComponentComboBoxHeight + 2*gYSpacing + 50 * processor.paddingScalarY);
         int columnHeight = area.getHeight();
         
-        area.removeFromTop(columnHeight/5);
+        //area.removeFromTop(columnHeight/5);
  
         int columnWidth = area.getWidth()/2;
         
-        Rectangle<int> firstRow = area.removeFromTop(columnHeight / 5);
+        Rectangle<int> firstRow = area.removeFromTop(columnHeight / 4);
         defGainSlider->setBounds(firstRow.removeFromLeft(columnWidth - 5 * gYSpacing));
         defGainSlider->setVisible(true);
         
         //blendGainSlider->setBounds(firstRow);
-         blendGainSlider->setBounds(firstRow.removeFromRight(columnWidth - 5 * gYSpacing));
+        blendGainSlider->setBounds(firstRow.removeFromRight(columnWidth - 5 * gYSpacing));
         blendGainSlider->setVisible(true);
         
-        Rectangle<int> secondRow = area.removeFromTop(columnHeight / 5);
+        Rectangle<int> secondRow = area.removeFromTop(columnHeight / 4);
 
         startTimeSlider->setBounds(secondRow.removeFromLeft(columnWidth - 5 * gYSpacing));
         startTimeSlider->setVisible(true);
@@ -229,8 +234,9 @@ void ResonanceViewController::displayTab(int tab)
         maxSympStringsSlider->setBounds(secondRow.removeFromRight(columnWidth - 5 * gYSpacing));
         maxSympStringsSlider->setVisible(true);
                 
-        ADSRLabel.setBounds(area.removeFromTop(columnHeight / 8));
-        ADSRSlider->setBounds(area.removeFromTop(columnHeight / 5));
+        ADSRLabel.setBounds(area.removeFromTop(2 * gYSpacing + processor.paddingScalarY * columnHeight / 8));
+        //ADSRSlider->setBounds(area.removeFromTop(columnHeight / 4));
+         ADSRSlider->setBounds(area);
     }
     else if (tab == 1){
         iconImageComponent.setBounds(area);
@@ -238,20 +244,19 @@ void ResonanceViewController::displayTab(int tab)
         
 #if JUCE_IOS
 //        area.removeFromTop(gComponentComboBoxHeight);
-        area.reduce(0.f, area.getHeight() * 0.2f);
+        //area.reduce(0.f, area.getHeight() * 0.2f);
 #endif
         area.removeFromBottom(40 * processor.paddingScalarY);
         
-        float keyboardHeight = 80 * processor.paddingScalarY;
+        //float keyboardHeight = 80 * processor.paddingScalarY;
+        float keyboardHeight = (area.getHeight() - 5. * processor.paddingScalarY * 10) / 4;
         float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
         
-        Rectangle<int> fundamentalKeyboardRow = area.removeFromBottom(keyboardHeight);
+        Rectangle<int> fundamentalKeyboardRow = area.removeFromBottom(keyboardHeight - gComponentComboBoxHeight);
         
         fundamentalLabel.setBounds(fundamentalKeyboardRow.removeFromLeft(columnWidth));
         fundamentalLabel.setVisible(true);
-        
-//        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12); //num white keys, gives error
-        
+
         float keyWidth = fundamentalKeyboardRow.getWidth() / 31.; // 31 is number of white keys 
         
         DBG("Keyboard row width: " + String(fundamentalKeyboardRow.getWidth()));
@@ -263,9 +268,9 @@ void ResonanceViewController::displayTab(int tab)
         fundamentalKeyboard->setVisible(true);
         
         area.removeFromBottom(processor.paddingScalarX * 10);
-        area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
+        //area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
         
-        Rectangle<int> closestKeyboardRow = area.removeFromBottom(keyboardHeight);
+        Rectangle<int> closestKeyboardRow = area.removeFromBottom(keyboardHeight - gComponentComboBoxHeight);
         
         closestKeyLabel.setBounds(closestKeyboardRow.removeFromLeft(columnWidth));
         closestKeyLabel.setVisible(true);
@@ -276,29 +281,14 @@ void ResonanceViewController::displayTab(int tab)
         closestKeyboard->setVisible(true);
     
         area.removeFromBottom(processor.paddingScalarY * 10);
-        area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
+        //11area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
 
-        float multiHeight = 100 + processor.paddingScalarY;
+        //float multiHeight = 100 + processor.paddingScalarY;
+        float multiHeight = keyboardHeight;
         
         Rectangle<int> offsetsRow = area.removeFromBottom(multiHeight);
         offsetsLabel.setBounds(offsetsRow.removeFromLeft(columnWidth));
         offsetsLabel.setVisible(true);
-        
-//        float sliderWidth = offsetsRow.getWidth()/ (NUM_KEYS * 1.);
-//
-//        DBG("Slider width:" + String(sliderWidth));
-//        DBG("Offsets row width: " + String(offsetsRow.getWidth()));
-//
-//        float sum = 0;
-//
-//        for (int i = 0; i < NUM_KEYS; i++) {
-//            offsetsArray[i]->setBounds(offsetsRow.removeFromLeft(sliderWidth));
-//            sum += sliderWidth;
-//            if (isActive[i])
-//                offsetsArray[i]->setVisible(true);
-//        }
-//
-//        DBG("slider width sum: " + String(sum));
         
         offsetsKeyboard.setBounds(offsetsRow);
         offsetsKeyboard.setVisible(true);
@@ -309,17 +299,11 @@ void ResonanceViewController::displayTab(int tab)
         
         gainsLabel.setBounds(gainsRow.removeFromLeft(columnWidth));
         gainsLabel.setVisible(true);
-        
-//        for (int i = 0; i < NUM_KEYS; i++) {
-//            gainsArray[i]->setBounds(gainsRow.removeFromLeft(sliderWidth));
-//            if (isActive[i])
-//                gainsArray[i]->setVisible(true);
-//        }
-        
+
         gainsKeyboard.setBounds(gainsRow);
         gainsKeyboard.setVisible(true);
 
-        area.removeFromBottom(10 * processor.paddingScalarY);
+        //area.removeFromBottom(10 * processor.paddingScalarY);
         
     }
 

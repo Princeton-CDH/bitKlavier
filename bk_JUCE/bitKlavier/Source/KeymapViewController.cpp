@@ -621,7 +621,10 @@ void KeymapViewController::displayTab(int tab)
         
 #if JUCE_IOS
         area.reduce(0, area.getHeight() * 0.1f);
-        float harKeyboardHeight = 50 + 50 * processor.paddingScalarY;
+        //float harKeyboardHeight = 50 + 50 * processor.paddingScalarY;
+        float harKeyboardHeight = (area.getHeight()
+                                    - 3. * (gComponentComboBoxHeight + gYSpacing))
+                                    / 2.;
 #else
         float harKeyboardHeight = 80 * processor.paddingScalarY;
         
