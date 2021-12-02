@@ -251,12 +251,18 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
 // this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
 void ResonanceProcessor::addSympStrings(int noteNumber, float velocity)
 {
-    if(sympStrings.size() > resonance->prep->getMaxSympStrings())
+    if (activeSympStrings.contains(noteNumber)) {
+        DBG("Resonance: not adding duplicate resonant string");
+        return;
+    }
+    
+    if(sympStrings.size() >= resonance->prep->getMaxSympStrings())
     {
-        //DBG("Resonance: removing oldest sympathetic string");
         int oldestString = activeSympStrings.getLast();
+        DBG("Resonance: removing oldest sympathetic string: " + String(oldestString));
         removeSympStrings(oldestString, velocity);
-        activeSympStrings.removeLast();
+        //activeSympStrings.removeLast();
+        activeSympStrings.removeAllInstancesOf(oldestString);
     }
     
     //DBG("Resonance: addingSympatheticString " + String(noteNumber));
@@ -284,7 +290,7 @@ void ResonanceProcessor::addSympStrings(int noteNumber, float velocity)
 void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity)
 {
     // turn off each partial associated with this string
-    //DBG("Resonance: removing partials of " + String(noteNumber));
+    DBG("Resonance: removing partials of " + String(noteNumber));
     for (auto sympString : sympStrings.getReference(noteNumber))
     {
         //DBG("Resonance: removing partial " + String(sympString->partialKey) + " of held key " + String(sympString->heldKey));
@@ -304,6 +310,7 @@ void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity)
 
     // clear this held string's partials
     sympStrings.remove(noteNumber);
+    activeSympStrings.removeAllInstancesOf(noteNumber);
 }
 
 void ResonanceProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
