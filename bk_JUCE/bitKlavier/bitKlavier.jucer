@@ -547,7 +547,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" customXcodeResourceFolders="" customPList=""
-               smallIcon="smHM8h" bigIcon="iHGLGD" vstLegacyFolder="../../../modules/VST_SDK/VST2_SDK">
+               smallIcon="smHM8h" bigIcon="iHGLGD" vstLegacyFolder="../../../../../SDKs/VST2_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        cppLibType="" enablePluginBinaryCopyStep="1"/>

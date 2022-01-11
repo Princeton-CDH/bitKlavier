@@ -1700,7 +1700,7 @@ void BKAudioProcessor::exportCurrentGallery(void)
 
 }
 
-void BKAudioProcessor::saveCurrentGalleryAs(void)
+bool BKAudioProcessor::saveCurrentGalleryAs(void)
 {
     FileChooser myChooser ("Save gallery to file...",
                            lastGalleryPath,
@@ -1711,10 +1711,12 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
         File fileToSave = myChooser.getResult();
         if (!fileToSave.hasFileExtension("xml")) fileToSave = fileToSave.withFileExtension("xml");
         writeCurrentGalleryToURL(fileToSave.getFullPathName());
+        updateGalleries();
+        if (wrapperType == wrapperType_Standalone) getPluginHolder()->savePluginState();
+        return true;
+    } else { //code executes if user presses cancel
+        return false;
     }
-    
-    updateGalleries();
-    if (wrapperType == wrapperType_Standalone) getPluginHolder()->savePluginState();
 }
 
 void BKAudioProcessor::saveCurrentGallery(void)

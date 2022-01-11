@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "BKUtilities.h"
 class ShareBot : public juce::Component
 {
 public:

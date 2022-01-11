@@ -1430,7 +1430,7 @@ void MainViewController::timerCallback()
     
         overtop.kvc.reset();
     }
-    
+   
     if (state->displayDidChange)
     {
         state->displayDidChange = false;
