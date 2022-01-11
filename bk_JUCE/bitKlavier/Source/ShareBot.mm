@@ -7,13 +7,24 @@
 
   ==============================================================================
 */
+//Required to fix the "Point" is ambiguous bug
+#ifdef __APPLE__
+ #define Point CarbonDummyPointName
+ #import <Foundation/Foundation.h>
+ #undef Point
+#endif
 
-#import <Foundation/Foundation.h>
 
+//Required to fix the "Point" is ambiguous bug
 #include "ShareBot.h"
-
 #if JUCE_MAC
-#import <AppKit/AppKit.h>
+#ifdef __APPLE__
+ #define Point CarbonDummyPointName
+ #include <AppKit/AppKit.h>
+ #undef Point
+#endif
+
+
 
 //==============================================================================
 @interface CocoaShareBot : NSObject<NSSharingServiceDelegate>
