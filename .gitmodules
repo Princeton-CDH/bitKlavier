@@ -1,0 +1,3 @@
+[submodule "bk_JUCE/bitKlavier/Source/tuning-library"]
+	path = bk_JUCE/bitKlavier/Source/tuning-library
+	url = git@github.com:surge-synthesizer/tuning-library.git
