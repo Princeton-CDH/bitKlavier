@@ -1413,9 +1413,8 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
             
             int Id = processor.updateState->currentTuningId;
             Tuning::Ptr prep = processor.gallery->getTuning(Id);
-            String st = myFile.getFullPathName();
             prep->loadScalaFile(myFile.getFullPathName().toStdString());
-            customKeyboard.s
+            vc->update();
         }
     }
     else if (action >= 100)

@@ -348,7 +348,7 @@ public:
     inline void setAdaptiveAnchorFundamental(PitchClass adaptiveAnchorFundamental)  { tAdaptiveAnchorFundamental = adaptiveAnchorFundamental;}
     inline void setAdaptiveClusterThresh(int adaptiveClusterThresh)  { tAdaptiveClusterThresh = adaptiveClusterThresh; }
     inline void setAdaptiveHistory(int adaptiveHistory)     { tAdaptiveHistory = adaptiveHistory; }
-    inline void setCustomScale(Array<float> tuning)
+    inline void setCustomScale(Array<float> tuning) //takes in fractional midi
     {
         if (tuning.size() > tCustom.value.size()) tuning.resize(tCustom.value.size());
         
@@ -565,7 +565,7 @@ public:
     //Scala Reading
     inline void setState(Tunings::Scale s)
     {
-        Array<float> offsets;
+        auto offsets = Array<float>(12);
 
         if (s.count != 12)
         {
@@ -577,11 +577,12 @@ public:
             Tunings::Scale et = Tunings::evenTemperament12NoteScale();
             for (int i = 0; i < 12; i++)
             {
-                float micro = s.tones[i].floatValue;
-                float equal = et.tones[i].floatValue;
+                float micro = s.tones[i].cents;
+                float equal = et.tones[i].cents;
                 float offset = micro - equal;
-                offsets.add(offset);
+                offsets.set((i+1)%12,offset); //.scl format puts first interval as the first line so we shift the representation over
             }
+            
             
         }
         //put tuning name in TuningLibrary
@@ -589,7 +590,6 @@ public:
         tFundamental.setValue(C);
         tFundamentalOffset.setValue(0.);
         tCustom.setValue(offsets);
-        //setCustomScale(tCustom);
         setScale(CustomTuning);
         print();
     }
