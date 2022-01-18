@@ -2008,23 +2008,33 @@ std::unique_ptr<MidiInput> BKAudioProcessor::openMidiInputDevice(const String &d
 
 void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMessage& m)
 {
-    int noteNumber = m.getNoteNumber();
-    float velocity = m.getFloatVelocity();
-    
-    String sourceIdentifier;
-    if(source != nullptr) sourceIdentifier = source->getIdentifier();
-    else sourceIdentifier = cMidiInputDAW;
-    
-    channel = m.getChannel();
-    
+
     if (m.isNoteOn()) //&& keystrokesEnabled.getValue())
     {
         //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
+        int noteNumber = m.getNoteNumber();
+        float velocity = m.getFloatVelocity();
+        
+        String sourceIdentifier;
+        if(source != nullptr) sourceIdentifier = source->getIdentifier();
+        else sourceIdentifier = cMidiInputDAW;
+        
+        channel = m.getChannel();
+        
         handleNoteOn(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
     }
     else if (m.isNoteOff())
     {
         //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOff, channel = " + String(channel));
+        int noteNumber = m.getNoteNumber();
+        float velocity = m.getFloatVelocity();
+        
+        String sourceIdentifier;
+        if(source != nullptr) sourceIdentifier = source->getIdentifier();
+        else sourceIdentifier = cMidiInputDAW;
+        
+        channel = m.getChannel();
+         
         handleNoteOff(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
         //didNoteOffs = true;
     }
