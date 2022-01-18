@@ -1397,6 +1397,27 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
             processor.exportPreparation(PreparationTypeTuning, Id, name);
         }
     }
+    else if (action == 8)
+    {
+        FileChooser myChooser ("Load tuning from .scl file...",
+                               File::getSpecialLocation (File::userHomeDirectory),
+                               "*.scl");
+        
+        if (myChooser.browseForFileToOpen())
+        {
+            File myFile (myChooser.getResult());
+
+            //File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
+
+            //user = user.getChildFile(myFile.getFileName());
+            
+            int Id = processor.updateState->currentTuningId;
+            Tuning::Ptr prep = processor.gallery->getTuning(Id);
+            String st = myFile.getFullPathName();
+            prep->loadScalaFile(myFile.getFullPathName().toStdString());
+            customKeyboard.s
+        }
+    }
     else if (action >= 100)
     {
         int which = action - 100;

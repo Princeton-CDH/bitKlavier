@@ -17,7 +17,7 @@
 #include "Keymap.h"
 
 #include "SpringTuning.h"
-
+#include "tuning-library/include/Tunings.h"
 
 class TuningModification;
 
@@ -562,6 +562,37 @@ public:
         print();
     }
     
+    //Scala Reading
+    inline void setState(Tunings::Scale s)
+    {
+        Array<float> offsets;
+
+        if (s.count != 12)
+        {
+            AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Scala Loading Error"), TRANS("Only 12 note scales supported"));
+        }
+        if(s.count == 12)
+        {
+            //subtract from equal temperament to get fractional midi representation
+            Tunings::Scale et = Tunings::evenTemperament12NoteScale();
+            for (int i = 0; i < 12; i++)
+            {
+                float micro = s.tones[i].floatValue;
+                float equal = et.tones[i].floatValue;
+                float offset = micro - equal;
+                offsets.add(offset);
+            }
+            
+        }
+        //put tuning name in TuningLibrary
+        
+        tFundamental.setValue(C);
+        tFundamentalOffset.setValue(0.);
+        tCustom.setValue(offsets);
+        //setCustomScale(tCustom);
+        setScale(CustomTuning);
+        print();
+    }
     bool modded = false;
     
     // basic tuning settings, for static tuning
@@ -710,7 +741,7 @@ public:
     
     ValueTree getState(bool active = false);
     void setState(XmlElement*);
-    
+    void loadScalaFile(std::string fname);
     ~Tuning() {};
     
     inline int getId() {return Id;}
@@ -944,6 +975,7 @@ public:
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     
+
 private:
     BKAudioProcessor& processor;
     
@@ -972,7 +1004,7 @@ private:
     
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;
-    
+   
     JUCE_LEAK_DETECTOR(TuningProcessor);
 };
 

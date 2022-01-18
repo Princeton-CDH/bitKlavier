@@ -11,6 +11,7 @@
 #include "Tuning.h"
 #include "PluginProcessor.h"
 #include "Modification.h"
+#include "tuning-library/include/Tunings.h"
 
 void TuningPreparation::performModification(TuningModification* p, Array<bool> dirty)
 {
@@ -335,6 +336,18 @@ void Tuning::setState(XmlElement* e)
     {
         prep->setState(e);
     }
+}
+
+void Tuning::loadScalaFile(std::string fname)
+{
+    Tunings::Scale s;
+    try {
+        s = Tunings::readSCLFile(fname);
+    } catch (Tunings::TuningError t) {
+        AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Scala Loading Error"), TRANS(t.what()));
+        return;
+    }
+    prep->setState(s);
 }
 
 
