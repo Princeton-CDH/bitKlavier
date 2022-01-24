@@ -562,9 +562,39 @@ public:
         print();
     }
     
-    //Scala Reading
+    
+    bool modded = false;
+    
+    // basic tuning settings, for static tuning
+    Moddable<TuningSystem>    tScale;               //which tuning system to use
+    Moddable<PitchClass>      tFundamental;               //fundamental for tuning system
+    Moddable<float>           tFundamentalOffset;         //offset, in MIDI fractional offset
+    
+    // adaptive tuning params
+    Moddable<TuningSystem>    tAdaptiveIntervalScale;     //scale to use to determine successive interval tuning
+    Moddable<bool>            tAdaptiveInversional;       //treat the scale inversionally?
+    
+    Moddable<TuningSystem>    tAdaptiveAnchorScale;       //scale to tune new fundamentals to when in anchored
+    Moddable<PitchClass>      tAdaptiveAnchorFundamental; //fundamental for anchor scale
+    
+    Moddable<int>             tAdaptiveClusterThresh;     //ms; max time before fundamental is reset
+    Moddable<int>             tAdaptiveHistory;           //cluster max; max number of notes before fundamental is reset
+    
+    // custom scale and absolute offsets
+    Moddable<Array<float>>    tCustom = Array<float>({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}); //custom scale
+    Moddable<Array<float>>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
+    
+    Moddable<float> nToneSemitoneWidth;
+    Moddable<int> nToneRoot;              //which key matches 12-tone ET; 60 by default
+    int nToneRootPC = 0;        //which pitch class; 0 by default
+    int nToneRootOctave = 4;    //which octave; 4 by default, so C4
+    
+    Moddable<TuningAdaptiveSystemType> adaptiveType;
+    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SCALA READING ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     inline void setState(Tunings::Scale s)
     {
+        scalaBackend = Tunings::ScalaTuning(s);
+        currentScalaString = s.rawText;
         auto offsets = Array<float>(12);
 
         if (s.count != 12)
@@ -593,34 +623,9 @@ public:
         setScale(CustomTuning);
         print();
     }
-    bool modded = false;
-    
-    // basic tuning settings, for static tuning
-    Moddable<TuningSystem>    tScale;               //which tuning system to use
-    Moddable<PitchClass>      tFundamental;               //fundamental for tuning system
-    Moddable<float>           tFundamentalOffset;         //offset, in MIDI fractional offset
-    
-    // adaptive tuning params
-    Moddable<TuningSystem>    tAdaptiveIntervalScale;     //scale to use to determine successive interval tuning
-    Moddable<bool>            tAdaptiveInversional;       //treat the scale inversionally?
-    
-    Moddable<TuningSystem>    tAdaptiveAnchorScale;       //scale to tune new fundamentals to when in anchored
-    Moddable<PitchClass>      tAdaptiveAnchorFundamental; //fundamental for anchor scale
-    
-    Moddable<int>             tAdaptiveClusterThresh;     //ms; max time before fundamental is reset
-    Moddable<int>             tAdaptiveHistory;           //cluster max; max number of notes before fundamental is reset
-    
-    // custom scale and absolute offsets
-    Moddable<Array<float>>    tCustom = Array<float>({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}); //custom scale
-    Moddable<Array<float>>    tAbsolute;  //offset (in MIDI fractional offsets, like other tunings) for specific notes; size = 128
-    
-    Moddable<float> nToneSemitoneWidth;
-    Moddable<int> nToneRoot;              //which key matches 12-tone ET; 60 by default
-    int nToneRootPC = 0;        //which pitch class; 0 by default
-    int nToneRootOctave = 4;    //which octave; 4 by default, so C4
-    
-    Moddable<TuningAdaptiveSystemType> adaptiveType;
-    
+    Tunings::ScalaTuning scalaBackend;
+    String currentScalaString;
+    String currentKBMString;
 private:
     String name;
     

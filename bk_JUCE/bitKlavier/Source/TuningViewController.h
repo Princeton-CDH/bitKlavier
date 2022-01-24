@@ -16,6 +16,7 @@
 
 //std::vector<std::string> intervalNames = {"U", "m2", "M2", "m3", "M3", "P4", "d5", "P5", "m6", "M6", "m7", "M7", "O"};
 
+
 class TuningViewController :
 public BKViewController,
 public Timer
@@ -39,7 +40,7 @@ public:
     void resized() override;
     
     virtual void update(void) {};
-    
+
 #if JUCE_IOS
     void iWantTheBigOne(TextEditor*, String name) override;
 #endif
@@ -130,11 +131,23 @@ protected:
     void displayTab(int tab) override;
     void displayShared(void) override;
     void invisible(void) override;
+   //SCALA
+    std::unique_ptr<BKTextEditor> sclTextEditor;
+    std::unique_ptr<BKTextEditor> kbmTextEditor;
+    std::unique_ptr<BKTextButton> applyButton;
+    std::unique_ptr<BKTextButton> importButton;
+    std::unique_ptr<BKTextButton> exportButton;
+    std::unique_ptr<BKTextButton> resetButton;
+    BKTextFieldLAF textLAF;
+    BKButtonAndMenuLAF buttonLAF;
+    virtual void bkTextFieldDidChange (TextEditor&) override;
 private:
   
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController)
     
 };
+
+
 
 class TuningPreparationEditor :
 public TuningViewController,

@@ -11,7 +11,7 @@
 #include "TuningViewController.h"
 
 TuningViewController::TuningViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 2),
+BKViewController(p, theGraph, 3),
 showSprings(false),
 #if JUCE_IOS
 absoluteKeyboard(false, true)
@@ -278,12 +278,70 @@ absoluteKeyboard(false, false)
     tetherWeightSecondaryGlobalSlider->addWantsBigOneListener(this);
 #endif
     
+    // Scala editing
+    sclTextEditor.reset(new BKTextEditor());
+    addAndMakeVisible(sclTextEditor.get());
+    sclTextEditor->setMultiLine(true);
+    sclTextEditor->setReturnKeyStartsNewLine(true);
+    sclTextEditor->setReadOnly(false);
+    sclTextEditor->setScrollbarsShown(true);
+    sclTextEditor->setCaretVisible(true);
+    sclTextEditor->setPopupMenuEnabled(true);
+    sclTextEditor->setText(String());
+    sclTextEditor->setLookAndFeel(&textLAF);
+    sclTextEditor->setName("SCLTXT");
+    
+    kbmTextEditor.reset(new BKTextEditor());
+    addAndMakeVisible(kbmTextEditor.get());
+    kbmTextEditor->setMultiLine(true);
+    kbmTextEditor->setReturnKeyStartsNewLine(true);
+    kbmTextEditor->setReadOnly(false);
+    kbmTextEditor->setScrollbarsShown(true);
+    kbmTextEditor->setCaretVisible(true);
+    kbmTextEditor->setPopupMenuEnabled(true);
+    kbmTextEditor->setText(String());
+    kbmTextEditor->setLookAndFeel(&textLAF);
+    kbmTextEditor->setName("KBMTXT");
+    
+    
+    importButton.reset(new BKTextButton());
+    addAndMakeVisible (importButton.get());
+    importButton->setButtonText (TRANS("Open"));
+    importButton->addListener (this);
+    importButton->setLookAndFeel(&buttonLAF);
+    
+    exportButton.reset(new BKTextButton());
+    addAndMakeVisible (exportButton.get());
+    exportButton->setButtonText (TRANS("Export"));
+    exportButton->addListener (this);
+    exportButton->setLookAndFeel(&buttonLAF);
+    
+    resetButton.reset(new BKTextButton());
+    addAndMakeVisible (resetButton.get());
+    resetButton->setButtonText (TRANS("Reset"));
+    resetButton->addListener (this);
+    resetButton->setLookAndFeel(&buttonLAF);
+
+    sclTextEditor->addListener(this);
+    kbmTextEditor->addListener(this);
+    
     currentTab = 0;
     displayTab(currentTab);
     
     updateComponentVisibility();
     
     startTimerHz(30);
+}
+void TuningViewController::bkTextFieldDidChange(TextEditor& textEditor)
+{
+    if (textEditor.getName() == sclTextEditor->getName())
+    {
+        
+    } else if (textEditor.getName() == kbmTextEditor->getName())
+    {
+        
+    }
+    
 }
 
 void TuningViewController::invisible(void)
@@ -311,6 +369,7 @@ void TuningViewController::invisible(void)
     A1AnchorScaleCB.setVisible(false);
     A1FundamentalCB.setVisible(false);
     
+    
     for (auto s : tetherSliders)        s->setVisible(false);
     for (auto s : springSliders)        s->setVisible(false);
     for (auto l : springLabels)         l->setVisible(false);
@@ -327,6 +386,16 @@ void TuningViewController::invisible(void)
     
     tetherWeightGlobalSlider->setVisible(false);
     tetherWeightSecondaryGlobalSlider->setVisible(false);
+    
+    
+    attachKeymap.setVisible(false); ///unsure why i need to do this but it otherwise doesn't go away on tab 2????
+    //scalaEditor.setVisible(false);
+    sclTextEditor->setVisible(false);
+    kbmTextEditor->setVisible(false);
+    
+    importButton->setVisible(false);
+    exportButton->setVisible(false);
+    resetButton->setVisible(false);
 }
 
 void TuningViewController::displayShared(void)
@@ -667,6 +736,21 @@ void TuningViewController::displayTab(int tab)
                                      springSliders[0]->getY(),
                                      currentFundamental.getWidth(),
                                      currentFundamental.getHeight()  );
+    } else if (tab == 2)
+    {
+        //scalaEditor.setVisible(true);
+        //scalaEditor.setBoundsRelative(0.05f, 0.08f, 0.9f, 0.84f);
+        //applyButton->setBounds (346, 298, 78, 24);
+        importButton->setVisible(true);
+        exportButton->setVisible(true);
+        resetButton->setVisible(true);
+        sclTextEditor->setVisible(true);
+        kbmTextEditor->setVisible(true);
+        importButton->setBounds (94, 298, 78, 24);
+        exportButton->setBounds (10, 298, 78, 24);
+        resetButton->setBounds (262, 298, 78, 24);
+        sclTextEditor->setBounds(100, 100, 200, 300);
+        kbmTextEditor->setBounds(400, 100, 200, 300);
     }
     
     repaint();

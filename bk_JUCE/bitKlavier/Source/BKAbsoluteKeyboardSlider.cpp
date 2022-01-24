@@ -236,7 +236,7 @@ void BKAbsoluteKeyboardSlider::mouseDown(const MouseEvent& e)
 
 void BKAbsoluteKeyboardSlider::bkTextFieldDidChange (TextEditor& textEditor)
 {
-
+    
 }
 
 
