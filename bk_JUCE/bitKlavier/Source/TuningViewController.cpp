@@ -288,7 +288,6 @@ absoluteKeyboard(false, false)
     sclTextEditor->setCaretVisible(true);
     sclTextEditor->setPopupMenuEnabled(true);
     sclTextEditor->setText(String());
-    sclTextEditor->setLookAndFeel(&textLAF);
     sclTextEditor->setName("SCLTXT");
     
     kbmTextEditor.reset(new BKTextEditor());
@@ -300,28 +299,29 @@ absoluteKeyboard(false, false)
     kbmTextEditor->setCaretVisible(true);
     kbmTextEditor->setPopupMenuEnabled(true);
     kbmTextEditor->setText(String());
-    kbmTextEditor->setLookAndFeel(&textLAF);
     kbmTextEditor->setName("KBMTXT");
     
     
     importButton.reset(new BKTextButton());
     addAndMakeVisible (importButton.get());
-    importButton->setButtonText (TRANS("Open"));
-    importButton->addListener (this);
-    importButton->setLookAndFeel(&buttonLAF);
-    
+    importButton->setButtonText (TRANS("Import"));
+   // importButton->addListener (this);
+
     exportButton.reset(new BKTextButton());
     addAndMakeVisible (exportButton.get());
     exportButton->setButtonText (TRANS("Export"));
-    exportButton->addListener (this);
-    exportButton->setLookAndFeel(&buttonLAF);
-    
+   // exportButton->addListener (this);
+
     resetButton.reset(new BKTextButton());
     addAndMakeVisible (resetButton.get());
     resetButton->setButtonText (TRANS("Reset"));
-    resetButton->addListener (this);
-    resetButton->setLookAndFeel(&buttonLAF);
+   // resetButton->addListener (this);
 
+    applyButton.reset(new BKTextButton());
+    addAndMakeVisible (applyButton.get());
+    applyButton->setButtonText (TRANS("Apply"));
+    //applyButton->addListener (this);
+    
     sclTextEditor->addListener(this);
     kbmTextEditor->addListener(this);
     
@@ -332,10 +332,84 @@ absoluteKeyboard(false, false)
     
     startTimerHz(30);
 }
+
+//void TuningViewController::buttonClicked(Button *b)
+//{
+//    TuningPreparation::Ptr prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
+//    Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+//    if (b == importButton.get())
+//    {
+//        FileChooser myChooser ("Load tuning from .scl file...",
+//                               File::getSpecialLocation (File::userHomeDirectory),
+//                               "*.scl");
+//
+//        if (myChooser.browseForFileToOpen())
+//        {
+//            File myFile (myChooser.getResult());
+//
+//            //File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
+//
+//            //user = user.getChildFile(myFile.getFileName());
+//
+//            tuning->loadScalaFile(myFile.getFullPathName().toStdString());
+//        }
+//
+//    } else if (b == exportButton.get())
+//    {
+//        try {
+//            Tunings::parseSCLData(tuning->currentScalaString.toStdString());
+//        } catch (Tunings::TuningError t) {
+//            AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Invalid Scala File"), TRANS(t.what()));
+//            return;
+//        }
+//
+//        FileChooser fc ("Export tuning to .scl file...",
+//                        File::getSpecialLocation(File::userDocumentsDirectory),
+//                        "*.scl");
+//        fc.launchAsync(FileBrowserComponent::saveMode, [this](const FileChooser& chooser)
+//                       {
+//            MemoryBlock data(sclTextEditor->getText().toUTF8(),sclTextEditor->getText().length() );
+//            if (!chooser.getResult().replaceWithData (data.getData(), data.getSize()))
+//                AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+//                                                  TRANS("Error whilst saving"),
+//                                                  TRANS("Couldn't write to the specified file!"));
+//
+//        });
+//    } else if (b == resetButton.get())
+//    {
+//
+//    } else if (b == applyButton.get())
+//    {
+//        Tunings::Scale s;
+//        try {
+//            s = Tunings::parseSCLData(tuning->currentScalaString.toStdString());
+//        } catch (Tunings::TuningError t) {
+//            AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Invalid Scala File"), TRANS(t.what()));
+//            return;
+//        }
+//        tuning->loadScalaScale(s);
+//    }
+//
+//}
+
+void TuningViewController::textEditorEscapeKeyPressed (TextEditor& tf)
+{
+//    String text = tf.getText();
+//    String name = tf.getName();
+//
+//    if (name == comment.getName())
+//    {
+//        DBG(text);
+//
+//        unifocusAllComponents();
+//    }
+    unfocusAllComponents();
+}
 void TuningViewController::bkTextFieldDidChange(TextEditor& textEditor)
 {
     if (textEditor.getName() == sclTextEditor->getName())
     {
+        
         
     } else if (textEditor.getName() == kbmTextEditor->getName())
     {
@@ -396,6 +470,7 @@ void TuningViewController::invisible(void)
     importButton->setVisible(false);
     exportButton->setVisible(false);
     resetButton->setVisible(false);
+    applyButton->setVisible(false);
 }
 
 void TuningViewController::displayShared(void)
@@ -738,17 +813,22 @@ void TuningViewController::displayTab(int tab)
                                      currentFundamental.getHeight()  );
     } else if (tab == 2)
     {
+        Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
+        tuning->currentScalaString = tuning->generateScalaString();
+        sclTextEditor->setText(tuning->currentScalaString);
         //scalaEditor.setVisible(true);
         //scalaEditor.setBoundsRelative(0.05f, 0.08f, 0.9f, 0.84f);
         //applyButton->setBounds (346, 298, 78, 24);
+        applyButton->setVisible(true);
         importButton->setVisible(true);
         exportButton->setVisible(true);
         resetButton->setVisible(true);
         sclTextEditor->setVisible(true);
         kbmTextEditor->setVisible(true);
-        importButton->setBounds (94, 298, 78, 24);
-        exportButton->setBounds (10, 298, 78, 24);
-        resetButton->setBounds (262, 298, 78, 24);
+        exportButton->setBounds (10, 50, 78, 24);
+        importButton->setBounds (94, 50, 78, 24);
+        applyButton->setBounds (178, 50, 78, 24);
+        resetButton->setBounds (262, 50, 78, 24);
         sclTextEditor->setBounds(100, 100, 200, 300);
         kbmTextEditor->setBounds(400, 100, 200, 300);
     }
@@ -1319,6 +1399,10 @@ TuningViewController(p, theGraph)
         tetherSliders[i]->addListener(this);
     }
     
+    importButton->addListener(this);
+    applyButton->addListener(this);
+    exportButton->addListener(this);
+    resetButton->addListener(this);
     adaptiveSystemsCB.addListener(this);
     rateSlider->addMyListener(this);
     dragSlider->addMyListener(this);
@@ -2036,6 +2120,62 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         }
         
         processor.gallery->setGalleryDirty(true);
+    } else if (b == importButton.get())
+    {
+        FileChooser myChooser ("Load tuning from .scl file...",
+                               File::getSpecialLocation (File::userHomeDirectory),
+                               "*.scl");
+        
+        if (myChooser.browseForFileToOpen())
+        {
+            File myFile (myChooser.getResult());
+
+            //File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
+
+            //user = user.getChildFile(myFile.getFileName());
+            
+            tuning->loadScalaFile(myFile.getFullPathName().toStdString());
+            processor.gallery->setGalleryDirty(true);
+            sclTextEditor->setText(tuning->currentScalaString);
+            update();
+        }
+        
+       
+    } else if (b == exportButton.get())
+    {
+        try {
+            Tunings::parseSCLData(tuning->currentScalaString.toStdString());
+        } catch (Tunings::TuningError t) {
+            AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Invalid Scala File"), TRANS(t.what()));
+            return;
+        }
+        
+        chooser  = std::make_unique<FileChooser>("Export tuning to .scl file...",
+                        File::getSpecialLocation(File::userDocumentsDirectory), "*.scl");
+        chooser->launchAsync(FileBrowserComponent::saveMode, [this](const FileChooser& chooser)
+                       {
+            MemoryBlock data(sclTextEditor->getText().toUTF8(),sclTextEditor->getText().length() );
+            if (!chooser.getResult().replaceWithData (data.getData(), data.getSize()))
+                AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                                                  TRANS("Error whilst saving"),
+                                                  TRANS("Couldn't write to the specified file!"));
+            
+        });
+    } else if (b == resetButton.get())
+    {
+        sclTextEditor->setText(tuning->currentScalaString);
+    } else if (b == applyButton.get())
+    {
+        Tunings::Scale s;
+        try {
+            s = Tunings::parseSCLData(sclTextEditor->getText().toStdString());
+        } catch (Tunings::TuningError t) {
+            AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Invalid Scala File"), TRANS(t.what()));
+            return;
+        }
+        tuning->loadScalaScale(s);
+        tuning->currentScalaString = sclTextEditor->getText();
+        update();
     }
     else {
         for (int i=0; i<springModeButtons.size(); i++)
@@ -2057,7 +2197,8 @@ void TuningPreparationEditor::buttonClicked (Button* b)
                 break;
             }
         }
-    }
+    } 
+    
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TuningModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //

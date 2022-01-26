@@ -138,9 +138,9 @@ protected:
     std::unique_ptr<BKTextButton> importButton;
     std::unique_ptr<BKTextButton> exportButton;
     std::unique_ptr<BKTextButton> resetButton;
-    BKTextFieldLAF textLAF;
-    BKButtonAndMenuLAF buttonLAF;
     virtual void bkTextFieldDidChange (TextEditor&) override;
+    void textEditorEscapeKeyPressed (TextEditor& tf) override;
+    std::unique_ptr<FileChooser> chooser;
 private:
   
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController)

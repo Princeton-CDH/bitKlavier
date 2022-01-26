@@ -17,7 +17,7 @@
 #include "Keymap.h"
 
 #include "SpringTuning.h"
-#include "tuning-library/include/Tunings.h"
+#include "Tunings.h"
 
 class TuningModification;
 
@@ -323,7 +323,13 @@ public:
         return tCustom.value;
     }
     
+    
+    
+    
     inline void setName(String n)                                           {name = n; } // DBG("set tuning name " + name);}
+    
+
+    
     inline void setScale(TuningSystem tuning)
     {
         if (tuning != AdaptiveTuning && tuning != AdaptiveAnchoredTuning)
@@ -590,42 +596,7 @@ public:
     int nToneRootOctave = 4;    //which octave; 4 by default, so C4
     
     Moddable<TuningAdaptiveSystemType> adaptiveType;
-    // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ SCALA READING ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-    inline void setState(Tunings::Scale s)
-    {
-        scalaBackend = Tunings::ScalaTuning(s);
-        currentScalaString = s.rawText;
-        auto offsets = Array<float>(12);
-
-        if (s.count != 12)
-        {
-            AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Scala Loading Error"), TRANS("Only 12 note scales supported"));
-        }
-        if(s.count == 12)
-        {
-            //subtract from equal temperament to get fractional midi representation
-            Tunings::Scale et = Tunings::evenTemperament12NoteScale();
-            for (int i = 0; i < 12; i++)
-            {
-                float micro = s.tones[i].cents;
-                float equal = et.tones[i].cents;
-                float offset = micro - equal;
-                offsets.set((i+1)%12,offset); //.scl format puts first interval as the first line so we shift the representation over
-            }
-            
-            
-        }
-        //put tuning name in TuningLibrary
-        
-        tFundamental.setValue(C);
-        tFundamentalOffset.setValue(0.);
-        tCustom.setValue(offsets);
-        setScale(CustomTuning);
-        print();
-    }
-    Tunings::ScalaTuning scalaBackend;
-    String currentScalaString;
-    String currentKBMString;
+   
 private:
     String name;
     
@@ -747,6 +718,13 @@ public:
     ValueTree getState(bool active = false);
     void setState(XmlElement*);
     void loadScalaFile(std::string fname);
+    void loadScalaScale(Tunings::Scale& s);
+    String currentScalaString;
+    
+    String currentKBMString;
+    
+    String generateScalaString();
+    
     ~Tuning() {};
     
     inline int getId() {return Id;}
