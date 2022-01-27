@@ -352,15 +352,24 @@ void Tuning::loadScalaFile(std::string fname)
 
 void Tuning::loadScalaScale(Tunings::Scale& s)
 {
-    auto scala = Tunings::ScalaTuning(s);
+    auto scala = Tunings::ScalaTuning(s, currentKBM);
     currentScalaString = s.rawText;
     auto offsets = Array<float>(12);
 
     if (s.count != 12)
     {
-        AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Scala Loading Error"), TRANS("Only 12 note scales supported"));
-    }
-    if(s.count == 12)
+        isAbsoluteTuning = true;
+        prep->tFundamental.setValue(C);
+        prep->tFundamentalOffset.setValue(0.);
+        prep->setScale(EqualTemperament);
+        Array<float> offsets;
+        offsets.ensureStorageAllocated(127);
+        for(int i = 0; i <= 127; i++)
+        {
+            offsets.set(i,(ftom(scala.frequencyForMidiNote(i))- i) * 100.f);
+        }
+        prep->setAbsoluteOffsetCents(offsets);
+    } else
     {
         //subtract from equal temperament to get fractional midi representation
         Tunings::Scale et = Tunings::evenTemperament12NoteScale();
@@ -371,15 +380,15 @@ void Tuning::loadScalaScale(Tunings::Scale& s)
             float offset = micro - equal;
             offsets.set((i+1)%12,offset); //.scl format puts first interval as the first line so we shift the representation over
         }
-        
+        prep->tFundamental.setValue(C);
+        prep->tFundamentalOffset.setValue(0.);
+        prep->tCustom.setValue(offsets);
+        prep->setScale(CustomTuning);
         
     }
     //put tuning name in TuningLibrary
 
-    prep->tFundamental.setValue(C);
-    prep->tFundamentalOffset.setValue(0.);
-    prep->tCustom.setValue(offsets);
-    prep->setScale(CustomTuning);
+    
 }
 
 String Tuning::generateScalaString()

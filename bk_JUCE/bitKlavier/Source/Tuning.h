@@ -720,8 +720,10 @@ public:
     void loadScalaFile(std::string fname);
     void loadScalaScale(Tunings::Scale& s);
     String currentScalaString;
-    
+    bool isAbsoluteTuning;
     String currentKBMString;
+    Tunings::Scale currentScale;
+    Tunings::KeyboardMapping currentKBM;
     
     String generateScalaString();
     

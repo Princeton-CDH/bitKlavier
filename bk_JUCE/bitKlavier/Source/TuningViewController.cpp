@@ -814,8 +814,10 @@ void TuningViewController::displayTab(int tab)
     } else if (tab == 2)
     {
         Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-        tuning->currentScalaString = tuning->generateScalaString();
+        if (!tuning->isAbsoluteTuning)
+            tuning->currentScalaString = tuning->generateScalaString();
         sclTextEditor->setText(tuning->currentScalaString);
+        kbmTextEditor->setText(tuning->currentKBM.rawText);
         //scalaEditor.setVisible(true);
         //scalaEditor.setBoundsRelative(0.05f, 0.08f, 0.9f, 0.84f);
         //applyButton->setBounds (346, 298, 78, 24);
@@ -2166,14 +2168,13 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         sclTextEditor->setText(tuning->currentScalaString);
     } else if (b == applyButton.get())
     {
-        Tunings::Scale s;
         try {
-            s = Tunings::parseSCLData(sclTextEditor->getText().toStdString());
+            tuning->currentScale = Tunings::parseSCLData(sclTextEditor->getText().toStdString());
         } catch (Tunings::TuningError t) {
             AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Invalid Scala File"), TRANS(t.what()));
             return;
         }
-        tuning->loadScalaScale(s);
+        tuning->loadScalaScale(tuning->currentScale);
         tuning->currentScalaString = sclTextEditor->getText();
         update();
     }
