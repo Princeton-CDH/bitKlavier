@@ -138,6 +138,7 @@ protected:
     std::unique_ptr<BKTextButton> importButton;
     std::unique_ptr<BKTextButton> exportButton;
     std::unique_ptr<BKTextButton> resetButton;
+    std::unique_ptr<BKTextButton> applyKBMButton;
     virtual void bkTextFieldDidChange (TextEditor&) override;
     void textEditorEscapeKeyPressed (TextEditor& tf) override;
     std::unique_ptr<FileChooser> chooser;

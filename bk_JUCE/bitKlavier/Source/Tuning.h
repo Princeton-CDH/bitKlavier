@@ -635,6 +635,7 @@ public:
     
 	Tuning(int Id, bool random = false) :
     Id(Id),
+    currentScale(Tunings::evenTemperament12NoteScale()),
     name("Tuning "+String(Id))
     {
 		prep = new TuningPreparation();
@@ -719,6 +720,7 @@ public:
     void setState(XmlElement*);
     void loadScalaFile(std::string fname);
     void loadScalaScale(Tunings::Scale& s);
+    void loadKBM(Tunings::KeyboardMapping& kbm);
     String currentScalaString;
     bool isAbsoluteTuning;
     String currentKBMString;

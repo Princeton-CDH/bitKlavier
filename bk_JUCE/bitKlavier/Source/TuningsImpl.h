@@ -678,14 +678,14 @@ inline KeyboardMapping::KeyboardMapping()
 {
     std::ostringstream oss;
     oss.imbue(std::locale("C"));
-    oss << "! Default KBM file\n  ! Size of map:";
+    oss << "! Default KBM file\n! Size of map:";
     oss << count << "\n" << "! MIDI range:\n"
         << firstMidi << "\n"
         << lastMidi << "\n" << "! Middle note:\n"
         << middleNote << "\n" << "! Reference note (MIDI number and frequency in Hz):\n"
         << tuningConstantNote << "\n"
-        << tuningFrequency << "\n" << "! Scale degree to consider as formal octave:\n"
-        << octaveDegrees << "\n" << "! Mapping. This is an empty mapping so list no keys\n";
+    << tuningFrequency << "\n" << "! Scale degree to consider as formal octave:\n";
+       // << octaveDegrees << "\n" << "! Mapping. This is an empty mapping so list no keys\n";
     rawText = oss.str();
 }
 

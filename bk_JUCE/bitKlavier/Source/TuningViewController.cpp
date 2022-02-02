@@ -320,6 +320,10 @@ absoluteKeyboard(false, false)
     applyButton.reset(new BKTextButton());
     addAndMakeVisible (applyButton.get());
     applyButton->setButtonText (TRANS("Apply"));
+    
+    applyKBMButton.reset(new BKTextButton());
+    addAndMakeVisible (applyKBMButton.get());
+    applyKBMButton->setButtonText (TRANS("Apply"));
     //applyButton->addListener (this);
     
     sclTextEditor->addListener(this);
@@ -822,11 +826,13 @@ void TuningViewController::displayTab(int tab)
         //scalaEditor.setBoundsRelative(0.05f, 0.08f, 0.9f, 0.84f);
         //applyButton->setBounds (346, 298, 78, 24);
         applyButton->setVisible(true);
+        applyKBMButton->setVisible(true);
         importButton->setVisible(true);
         exportButton->setVisible(true);
         resetButton->setVisible(true);
         sclTextEditor->setVisible(true);
         kbmTextEditor->setVisible(true);
+        applyKBMButton->setBounds(400, 50, 78, 24);
         exportButton->setBounds (10, 50, 78, 24);
         importButton->setBounds (94, 50, 78, 24);
         applyButton->setBounds (178, 50, 78, 24);
@@ -1403,6 +1409,7 @@ TuningViewController(p, theGraph)
     
     importButton->addListener(this);
     applyButton->addListener(this);
+    applyKBMButton->addListener(this);
     exportButton->addListener(this);
     resetButton->addListener(this);
     adaptiveSystemsCB.addListener(this);
@@ -2176,6 +2183,17 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         }
         tuning->loadScalaScale(tuning->currentScale);
         tuning->currentScalaString = sclTextEditor->getText();
+        update();
+    } else if (b == applyKBMButton.get())
+    {
+        try {
+            tuning->currentKBM = Tunings::parseKBMData(kbmTextEditor->getText().toStdString());
+        } catch (Tunings::TuningError t) {
+            AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Invalid KBM File"), TRANS(t.what()));
+            return;
+        }
+        tuning->loadKBM(tuning->currentKBM);
+        tuning->currentKBMString = kbmTextEditor->getText();
         update();
     }
     else {
