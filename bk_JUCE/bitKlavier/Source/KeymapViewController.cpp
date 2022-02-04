@@ -1496,10 +1496,10 @@ void KeymapViewController::bkButtonClicked (Button* b)
             endKeystrokesToggle.setAlpha(gDim);
             ignoreSustainToggle.setAlpha(gDim);
             sustainPedalKeysToggle.setAlpha(gDim);
-            
+            keymap->setIgnoreSustain(true);
+            ignoreSustainToggle.setToggleState(true, dontSendNotification);
             invertOnOffToggle.setEnabled(false);
             endKeystrokesToggle.setEnabled(false);
-            //ignoreSustainToggle.setState(true);
             ignoreSustainToggle.setEnabled(false);
             sustainPedalKeysToggle.setEnabled(false);
             
@@ -1509,7 +1509,8 @@ void KeymapViewController::bkButtonClicked (Button* b)
             endKeystrokesToggle.setAlpha(gBright);
             ignoreSustainToggle.setAlpha(gBright);
             sustainPedalKeysToggle.setAlpha(gBright);
-            
+            keymap->setIgnoreSustain(false);
+            ignoreSustainToggle.setToggleState(false, dontSendNotification);
             invertOnOffToggle.setEnabled(true);
             endKeystrokesToggle.setEnabled(true);
             //ignoreSustainToggle.setState(false);

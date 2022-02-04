@@ -762,26 +762,6 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
                     // Check that resonance is enabled as a target (should always be true until we add other targets)
                     if (km->getTargetStates()[i])
                     {
-//                        if (km->getIsToggle())
-//                        {
-////                            //note has been triggered
-////                            if ((toggleRelease = !km->getToggleState(noteNumber)))
-////                            {
-////                                // Apply curve, take the max of any overlapping cases, then filter
-////                                float v = jmax(releaseTargetVelocities.getUnchecked(i),
-////                                                                    km->applyVelocityCurve(velocity));
-////                                releaseTargetVelocities.set(i, v);
-////
-////                            }
-////                            else
-////                            {
-////                                float v = jmax(pressTargetVelocities.getUnchecked(i),
-////                                                                    km->applyVelocityCurve(velocity));
-////                                pressTargetVelocities.set(i, v);
-////                            }
-//                            km->toggleToggleState(noteNumber);
-//                            break;
-//                        }
                         // Collect inverted keymaps into one velocities array
                         if (km->isInverted())
                         {
@@ -1064,10 +1044,6 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                     // Check that Direct is enabled as a target (should always be true until we add other targets)
                     if (km->getTargetStates()[i])
                     {
-//                        if (km->getIsToggle())
-//                        {
-//                            break;
-//                        }
                         // Collect inverted keymaps into one velocities array
                         if (km->isInverted())
                         {
