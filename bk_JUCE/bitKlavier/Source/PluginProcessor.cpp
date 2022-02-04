@@ -689,6 +689,19 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                     {
                         reducedHarm.addIfNotAlreadyThere(h);
                     }
+                    
+                    if (km->getIsToggle())
+                    {
+                        if (km->getToggleState(noteNumber))
+                        {
+                            km->setTriggered(noteNumber, false);
+                        } else
+                        {
+                            km->setTriggered(noteNumber, true);
+                        }
+                        continue; //don't care about other behaviors because we know they are turned off
+                    }
+                    
                     // Toggleable keymap behaviors
                     if (!km->isInverted())
                     {
@@ -811,6 +824,16 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
                 {
                     reducedHarm.addIfNotAlreadyThere(h);
                 }
+                if (km->getIsToggle())
+                {
+                    if (km->getToggleState(noteNumber))
+                    {
+                        return; //if we just turned the note on we don't wan't to do any thing
+                    }
+                    //otherwise we just want to continue on our merry little way 
+                    continue; //don't care about other behaviors because we know they are turned off
+                }
+                
                 if (km->isInverted())
                 {
                     if (km->getAllNotesOff())

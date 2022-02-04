@@ -288,6 +288,7 @@ const String ptagKeymap_symmetricalWarp = "symmetricalWarp";
 const String ptagKeymap_scale = "scale";
 const String ptagKeymap_offset = "offset";
 const String ptagKeymap_velocityInvert = "velocityInvert";
+const String ptagKeymap_toggleKey = "toggleKey";
 
 typedef enum PitchClass {
     C = 0,
@@ -1305,9 +1306,12 @@ typedef enum KeymapTargetType
     TargetTypeBlendronicOpenCloseInput,
     TargetTypeBlendronicOpenCloseOutput,
     
-    TargetTypeResonance,
+    TargetTypeResonanceAdd,
+    TargetTypeResonanceRing,
+    
     TargetTypeTempo,
     TargetTypeTuning,
+    
     TargetTypeNil
 } KeymapTargetType;
 
@@ -1335,7 +1339,8 @@ static const std::vector<std::string> cKeymapTargetTypes = {
     "Open-Close Input",
     "Open-Close Output",
     // Resonance
-    "Resonance",
+    "Add",
+    "Ring",
     // Tempo
     "Tempo",
     // Tuning

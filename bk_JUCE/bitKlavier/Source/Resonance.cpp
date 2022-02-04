@@ -302,8 +302,7 @@ void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity)
                       false);
     }
 
-    // clear this held string's partials
-    sympStrings.remove(noteNumber);
+    
 }
 
 void ResonanceProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
@@ -315,7 +314,7 @@ void ResonanceProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
     if (fromPress)
     {
         aVels = bVels = &velocities.getReference(noteNumber);
-        for (int i = TargetTypeResonance; i < TargetTypeResonance+1; ++i)
+        for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
@@ -328,13 +327,19 @@ void ResonanceProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
         bVels = &invertVelocities.getReference(noteNumber);
     }
     
-    if (bVels->getUnchecked(TargetTypeResonance) < 0.f) return;
+    bool doRing = (bVels->getUnchecked(TargetTypeResonanceRing) >= 0.f);
+    bool doAdd = (bVels->getUnchecked(TargetTypeResonanceAdd) >= 0.f);
     
-    // resonate the currently available strings and their overlapping partials
-    ringSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonance));
-
-    // then, add this new string and its partials to the currently available sympathetic strings
-    addSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonance));
+    if (doRing)
+    {
+        // resonate the currently available strings and their overlapping partials
+        ringSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
+    }
+    if (doAdd)
+    {
+        // then, add this new string and its partials to the currently available sympathetic strings
+        addSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceAdd));
+    }
 }
 
 void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress)
@@ -346,7 +351,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     if (fromPress)
     {
         aVels = bVels = &invertVelocities.getReference(noteNumber);
-        for (int i = TargetTypeResonance; i < TargetTypeResonance+1; ++i)
+        for (int i = TargetTypeResonanceAdd; i < TargetTypeResonanceRing; ++i)
         {
             aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
         }
@@ -359,10 +364,20 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
         bVels = &velocities.getReference(noteNumber);
     }
     
-    if (bVels->getUnchecked(TargetTypeResonance) < 0.f) return;
+    bool doRing = (bVels->getUnchecked(TargetTypeResonanceRing) >= 0.f);
+    bool doAdd = (bVels->getUnchecked(TargetTypeResonanceAdd) >= 0.f);
     
-    // this will turn off all the resonace associated with this string/key, and then remove those from the currently available sympathetic strings
-    removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonance));
+    if (doRing)
+    {
+        // this will turn off all the resonace associated with this string/key, and then remove those from the currently available sympathetic strings
+        removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
+    }
+    
+    if (doAdd)
+    {
+        // clear this held string's partials
+        sympStrings.remove(noteNumber);
+    }
 }
 
 void ResonanceProcessor::prepareToPlay(double sr)

@@ -234,7 +234,7 @@ public:
         keysave.setProperty(ptagKeymap_endKeystrokes, allNotesOff ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_sustainPedalKeys, sustainPedalKeys ? 1 : 0, 0);
-        
+        keysave.setProperty(ptagKeymap_toggleKey, isToggle ? 1 : 0, 0);
         //keysave.setProperty(ptagKeymap_extendRange, rangeExtend, 0);
         keysave.setProperty(ptagKeymap_asymmetricalWarp, asym_k, 0);
         keysave.setProperty(ptagKeymap_symmetricalWarp, sym_k, 0);
@@ -287,7 +287,9 @@ public:
         targetStates.setUnchecked(TargetTypeDirect, true);
         targetStates.setUnchecked(TargetTypeTempo, true);
         targetStates.setUnchecked(TargetTypeTuning, true);
-        targetStates.setUnchecked(TargetTypeResonance, true);
+        targetStates.setUnchecked(TargetTypeResonanceAdd, true);
+        targetStates.setUnchecked(TargetTypeResonanceRing, true);
+
         
         inverted = e->getStringAttribute(ptagKeymap_inverted).getIntValue();
         
@@ -600,6 +602,13 @@ public:
     inline void setSustainPedalKeys(bool toSet) { sustainPedalKeys = toSet; }
     inline void toggleSustainPedalKeys() { sustainPedalKeys = !sustainPedalKeys; }
     
+    inline bool getIsToggle() { return isToggle; }
+    inline void setIsToggle(bool toSet) { isToggle = toSet; }
+    inline void toggleIsToggle() { isToggle = !isToggle; }
+    
+    inline bool getToggleState(int noteNumber) { return triggered.getUnchecked(noteNumber); }
+    //inline bool setToggleState(bool toSet) { trigger.setUnchecked(); }
+    inline void toggleToggleState(int noteNumber) { triggered.setUnchecked(noteNumber, !triggered.getUnchecked(noteNumber)); }
     // Velocity Curving getters & setters
     //inline float getRangeExtend() { return rangeExtend; }
     inline float getAsym_k() { return asym_k; }
@@ -639,6 +648,8 @@ private:
     bool harArrayMidiEdit;
     
     bool inverted;
+    bool isToggle;
+    Array<bool> toggleState;
     
     Array<bool> triggered;
     
