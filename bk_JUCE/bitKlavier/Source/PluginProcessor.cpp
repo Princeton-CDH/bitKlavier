@@ -695,11 +695,12 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                         if (km->getToggleState(noteNumber))
                         {
                             km->setTriggered(noteNumber, false);
+                            return;
                         } else
                         {
                             km->setTriggered(noteNumber, true);
+                            continue; //don't care about other behaviors because we know they are turned off
                         }
-                        continue; //don't care about other behaviors because we know they are turned off
                     }
                     
                     // Toggleable keymap behaviors
