@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGraph* theGraph) :
-    BKViewController(p, theGraph, 2),
+    BKViewController(p, theGraph, 3),
 #if JUCE_IOS
 gainsKeyboard(false, true),
 offsetsKeyboard(false, true)
@@ -80,6 +80,7 @@ offsetsKeyboard(false, true)
     closestKeyboard->setOctaveForMiddleC(5);
     addAndMakeVisible(*closestKeyboard);
     
+    
     fundamentalKeyboard = std::make_unique<BKKeymapKeyboardComponent> (fundamentalKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     fundamentalKeyboard->setName("fundamental");
 //    closestKeyboard.setAlpha(1);
@@ -90,6 +91,19 @@ offsetsKeyboard(false, true)
     fundamentalKeyboard->setOctaveForMiddleC(5);
     fundamentalKeyboard->setKeysInKeymap(0);
     addAndMakeVisible(*fundamentalKeyboard);
+    
+    addKeyboard = std::make_unique<BKKeymapKeyboardComponent> (addKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    addKeyboard->setName("add");
+    addKeyboard->setAvailableRange(9, 96);
+    addKeyboard->setOctaveForMiddleC(5);
+    addKeyboard->setKeysInKeymap(0);
+    addAndMakeVisible(*addKeyboard);
+    
+    ringKeyboard = std::make_unique<BKKeymapKeyboardComponent> (ringKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    ringKeyboard->setName("ring");
+    ringKeyboard->setOctaveForMiddleC(5);
+    ringKeyboard->setKeysInKeymap(0);
+    addAndMakeVisible(*ringKeyboard);
     
     addAndMakeVisible(&actionButton, ALL);
     actionButton.setButtonText("Action");
@@ -112,6 +126,9 @@ offsetsKeyboard(false, true)
     offsetsKeyboard.setOctaveForMiddleC(5);
     offsetsKeyboard.disableAllKeys();
     addAndMakeVisible(&offsetsKeyboard);
+    
+    
+
     
     closestKeyLabel.setText("Resonant Keys: ", dontSendNotification);
     closestKeyLabel.setJustificationType(Justification::right);
@@ -304,6 +321,41 @@ void ResonanceViewController::displayTab(int tab)
 
         area.removeFromBottom(10 * processor.paddingScalarY);
         
+    } else if (tab == 2)
+    {
+        iconImageComponent.setBounds(area);
+//        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        
+#if JUCE_IOS
+//        area.removeFromTop(gComponentComboBoxHeight);
+        area.reduce(0.f, area.getHeight() * 0.2f);
+#endif
+        area.removeFromBottom(40 * processor.paddingScalarY);
+        
+        float keyboardHeight = 80 * processor.paddingScalarY;
+        float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
+        
+        Rectangle<int> addKeyboardRow = area.removeFromBottom(keyboardHeight);
+        
+        //fundamentalLabel.setBounds(fundamentalKeyboardRow.removeFromLeft(columnWidth));
+        //fundamentalLabel.setVisible(true);
+        
+//        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12); //num white keys, gives error
+        
+        float keyWidth = addKeyboardRow.getWidth() / 50; // 62 is number of white keys
+        
+        DBG("Keyboard row width: " + String(addKeyboardRow.getWidth()));
+        DBG("Keyboard width" + String(fundamentalKeyboard->getWidth()));
+
+        addKeyboard->setKeyWidth(keyWidth);
+        addKeyboard->setBlackNoteLengthProportion(0.6);
+        addKeyboard->setBounds(addKeyboardRow);
+        addKeyboard->setVisible(true);
+        
+        area.removeFromBottom(processor.paddingScalarX * 10);
+        area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
+        
+
     }
 
     //all the display code is in displayShared for now, some will get moved here for when multiple tabs are implemented
@@ -364,6 +416,8 @@ void ResonanceViewController::invisible(void)
     
     closestKeyboard->setVisible(false);
     fundamentalKeyboard->setVisible(false);
+    addKeyboard->setVisible(false);
+    ringKeyboard->setVisible(false);
     
     gainsKeyboard.setVisible(false);
     offsetsKeyboard.setVisible(false);
@@ -375,7 +429,7 @@ void ResonanceViewController::invisible(void)
 
     closestKeyLabel.setVisible(false);
     fundamentalLabel.setVisible(false);
-
+    
 }
 //
 //void ResonanceViewController::mouseEnter(const MouseEvent& e)
@@ -405,9 +459,10 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     ADSRSlider->addMyListener(this);
     resonanceKeyboardState.addListener(this);
     fundamentalKeyboardState.addListener(this);
-    
+
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
+    
 
     startTimer(10);
 }
@@ -418,7 +473,6 @@ void ResonancePreparationEditor::update()
     ADSRSlider->setIsButtonOnly(true);
 
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
-
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentResonanceId, dontSendNotification);
@@ -438,12 +492,15 @@ void ResonancePreparationEditor::update()
         
         fundamentalKeyboard->setKeysInKeymap({prep->getFundamentalKey()});
         closestKeyboard->setKeysInKeymap(prep->getResonanceKeys());
+        //addKeyboard->setKeysInKeymap(prep->getSympStrings());
+        
         
         offsetsKeyboard.setKeys(prep->getResonanceKeys());
         offsetsKeyboard.setValues(prep->getOffsets());
         
         gainsKeyboard.setKeys(prep->getResonanceKeys());
         gainsKeyboard.setValues(prep->getGains());
+       
         
 //        for (int i = 0; i < NUM_KEYS; i++){
 //            if (prep->isActive(i + 24)) {
@@ -558,7 +615,10 @@ void ResonancePreparationEditor::timerCallback()
                 offsetsKeyboard.setValues(prep->getOffsets());
             if (prep->rGainsKeys.didChange())
                 gainsKeyboard.setValues(prep->getGains());
-            
+            if (currentTab == 2)
+            {
+                addKeyboard->setKeysInKeymap(prep->getHeldKeys());
+            }
         }
     }
 //    Resonance::Ptr rs = processor.gallery->getResonance(processor.updateState->currentId);

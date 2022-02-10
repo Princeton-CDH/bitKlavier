@@ -287,8 +287,6 @@ public:
         targetStates.setUnchecked(TargetTypeDirect, true);
         targetStates.setUnchecked(TargetTypeTempo, true);
         targetStates.setUnchecked(TargetTypeTuning, true);
-        targetStates.setUnchecked(TargetTypeResonanceAdd, true);
-        targetStates.setUnchecked(TargetTypeResonanceRing, true);
 
         
         inverted = e->getStringAttribute(ptagKeymap_inverted).getIntValue();

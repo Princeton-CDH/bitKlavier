@@ -540,7 +540,14 @@ public:
     inline void setMinStartTime(int inval) { rMinStartTimeMS = inval; }
     inline void setMaxStartTime(int inval) { rMaxStartTimeMS = inval; }
     inline void setMaxSympStrings(int inval) { rMaxSympStrings = inval; }
-
+    
+    
+    
+    // => current strings
+    // A queue to store the currently active notes in sympStrings
+    // so we can remove the oldest one when we exceed maxSympStrings
+    Array<int> activeHeldKeys;
+    Array<int> getHeldKeys() {return activeHeldKeys;}
 private:
 
     String name;
@@ -560,7 +567,8 @@ private:
     //Array<int> resonanceKeys;
     //HashMap<int, float> offsetsKeys;
     //HashMap<int, float> gainsKeys;
-
+    
+    
     JUCE_LEAK_DETECTOR(ResonancePreparation);
 };
 
@@ -775,6 +783,7 @@ public:
         return blendronic;
     }
 
+    Array<int> getSympStrings();
 private:
     CriticalSection lock;
     
@@ -792,7 +801,6 @@ private:
     void ringSympStrings(int noteNumber, float velocity);
     void addSympStrings(int noteNumber, float velocity);
     void removeSympStrings(int noteNumber, float velocity);
-
     // => sympStrings
     // data structure for pointing to all of the undamped strings and their partials
     //      outside map is indexed by held note (midiNoteNumber), inside array resizes depending on the number of partials
@@ -800,19 +808,6 @@ private:
     
     HashMap<int, Array<SympPartial::Ptr>> sympStrings;
 
-    // => partialStructure
-    // 2D array for partial structure
-    //      index is partial #
-    //      contents are interval from fundamental, gain, and offset from ET
-    //      by default, first 8 partials for conventional overtone series
-    //      user needs to be able to set these
-    //Array<float[3]> partialStructure;
-    //Array<Array<float>> partialStructure;
-    
-    // => current strings
-    // A queue to store the currently active notes in sympStrings
-    // so we can remove the oldest one when we exceed maxSympStrings
-    Array<int> activeSympStrings;
 
     JUCE_LEAK_DETECTOR(ResonanceProcessor);
 };

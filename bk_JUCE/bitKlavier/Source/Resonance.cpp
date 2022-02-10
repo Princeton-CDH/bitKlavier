@@ -254,9 +254,9 @@ void ResonanceProcessor::addSympStrings(int noteNumber, float velocity)
     if(sympStrings.size() > resonance->prep->getMaxSympStrings())
     {
         //DBG("Resonance: removing oldest sympathetic string");
-        int oldestString = activeSympStrings.getLast();
+        int oldestString = resonance->prep->activeHeldKeys.getLast();
         removeSympStrings(oldestString, velocity);
-        activeSympStrings.removeLast();
+        resonance->prep->activeHeldKeys.removeLast();
     }
     
     //DBG("Resonance: addingSympatheticString " + String(noteNumber));
@@ -272,10 +272,9 @@ void ResonanceProcessor::addSympStrings(int noteNumber, float velocity)
         // make a newPartial object, with gain and offset vals
         //DBG("Resonance: adding partial " + String(partialKey) + " to " + String(noteNumber));
         sympStrings.getReference(noteNumber).add(new SympPartial(noteNumber, partialKey, resonance->prep->getPartialStructure()[i][1], resonance->prep->getPartialStructure()[i][2]));
-        
-        // add to list of currently active strings, for voice management
-        activeSympStrings.insert(0, noteNumber);
     }
+    // add to list of currently active held keys
+    resonance->prep->activeHeldKeys.insert(0, noteNumber);
 
     //DBG("Resonance: number of partials = " + String(sympStrings[noteNumber].size()));
 }
@@ -304,6 +303,8 @@ void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity)
 
     
 }
+
+
 
 void ResonanceProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
@@ -377,6 +378,9 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     {
         // clear this held string's partials
         sympStrings.remove(noteNumber);
+        int index = (resonance->prep->activeHeldKeys.indexOf(noteNumber));
+        resonance->prep->activeHeldKeys.remove(index);
+
     }
 }
 
