@@ -310,7 +310,9 @@ void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity)
                       resonance->prep->getDefaultGainPtr(),
                       true, // need to test more here
                       false);
+
     }
+    sympStrings.remove(noteNumber);
 
     
 }
