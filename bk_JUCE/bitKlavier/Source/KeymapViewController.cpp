@@ -1490,33 +1490,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         keymap->setIsToggle(toggleKeysToggle.getToggleState());
         processor.updateState->editsMade = true;
-        if (toggleKeysToggle.getToggleState())
-        {
-            invertOnOffToggle.setAlpha(gDim);
-            endKeystrokesToggle.setAlpha(gDim);
-            ignoreSustainToggle.setAlpha(gDim);
-            sustainPedalKeysToggle.setAlpha(gDim);
-            keymap->setIgnoreSustain(true);
-            ignoreSustainToggle.setToggleState(true, dontSendNotification);
-            invertOnOffToggle.setEnabled(false);
-            endKeystrokesToggle.setEnabled(false);
-            ignoreSustainToggle.setEnabled(false);
-            sustainPedalKeysToggle.setEnabled(false);
-            
-        } else
-        {
-            invertOnOffToggle.setAlpha(gBright);
-            endKeystrokesToggle.setAlpha(gBright);
-            ignoreSustainToggle.setAlpha(gBright);
-            sustainPedalKeysToggle.setAlpha(gBright);
-            keymap->setIgnoreSustain(false);
-            ignoreSustainToggle.setToggleState(false, dontSendNotification);
-            invertOnOffToggle.setEnabled(true);
-            endKeystrokesToggle.setEnabled(true);
-            //ignoreSustainToggle.setState(false);
-            ignoreSustainToggle.setEnabled(true);
-            sustainPedalKeysToggle.setEnabled(true);
-        }
+        update();
 
     }
     /*
@@ -1781,7 +1755,36 @@ void KeymapViewController::update(void)
         {
             targetControlTBs[i]->setToggleState(km->getTargetStates()[i], dontSendNotification);
         }
+        
+        if (toggleKeysToggle.getToggleState())
+        {
+            invertOnOffToggle.setAlpha(gDim);
+            endKeystrokesToggle.setAlpha(gDim);
+            ignoreSustainToggle.setAlpha(gDim);
+            sustainPedalKeysToggle.setAlpha(gDim);
+            km->setIgnoreSustain(true);
+            ignoreSustainToggle.setToggleState(true, dontSendNotification);
+            invertOnOffToggle.setEnabled(false);
+            endKeystrokesToggle.setEnabled(false);
+            ignoreSustainToggle.setEnabled(false);
+            sustainPedalKeysToggle.setEnabled(false);
+            
+        } else
+        {
+            invertOnOffToggle.setAlpha(gBright);
+            endKeystrokesToggle.setAlpha(gBright);
+            ignoreSustainToggle.setAlpha(gBright);
+            sustainPedalKeysToggle.setAlpha(gBright);
+            km->setIgnoreSustain(false);
+            ignoreSustainToggle.setToggleState(false, dontSendNotification);
+            invertOnOffToggle.setEnabled(true);
+            endKeystrokesToggle.setEnabled(true);
+            //ignoreSustainToggle.setState(false);
+            ignoreSustainToggle.setEnabled(true);
+            sustainPedalKeysToggle.setEnabled(true);
+        }
     }
+    
     
     updateTargets();
     
