@@ -351,7 +351,7 @@ public:
         setAllNotesOff((bool) e->getIntAttribute(ptagKeymap_endKeystrokes, 0));
         setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
         setSustainPedalKeys((bool) e->getIntAttribute(ptagKeymap_sustainPedalKeys, 0));
-        
+        setIsToggle((bool)e->getIntAttribute(ptagKeymap_toggleKey, 0));
         // Not sure what value the second argument needs to be. Right now I'm using the default values, but these are the values that bK uses for velocity curving before the view controller is opened and the values update to what they were saved to be.
         //rangeExtend = (float) e->getDoubleAttribute(ptagKeymap_extendRange, 4);
         asym_k = (float) e->getDoubleAttribute(ptagKeymap_asymmetricalWarp, 1);
