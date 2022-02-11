@@ -101,6 +101,7 @@ offsetsKeyboard(false, true)
     
     ringKeyboard = std::make_unique<BKKeymapKeyboardComponent> (ringKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     ringKeyboard->setName("ring");
+    ringKeyboard->setAvailableRange(9, 96);
     ringKeyboard->setOctaveForMiddleC(5);
     ringKeyboard->setKeysInKeymap(0);
     addAndMakeVisible(*ringKeyboard);
@@ -149,6 +150,17 @@ offsetsKeyboard(false, true)
     offsetsLabel.setJustificationType(Justification::right);
     offsetsLabel.setTooltip("offset in cents from ET for this resonance");
     addAndMakeVisible(offsetsLabel);
+    
+    addLabel.setText("Held Keys: ", dontSendNotification);
+    addLabel.setJustificationType(Justification::right);
+    addLabel.setTooltip("Keys added to sympathetic resonance");
+    addAndMakeVisible(addLabel);
+    
+    ringLabel.setText("Ringing Keys: ", dontSendNotification);
+    ringLabel.setJustificationType(Justification::right);
+    ringLabel.setTooltip("Keys currently ringing");
+    addAndMakeVisible(ringLabel);
+    
     
     alternateMod.setButtonText ("alternate mod");
     alternateMod.setTooltip("activating this mod will alternate between modding and reseting attached preparations");
@@ -336,17 +348,18 @@ void ResonanceViewController::displayTab(int tab)
         float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
         
         Rectangle<int> addKeyboardRow = area.removeFromBottom(keyboardHeight);
+    
         
-        //fundamentalLabel.setBounds(fundamentalKeyboardRow.removeFromLeft(columnWidth));
-        //fundamentalLabel.setVisible(true);
+       
+        addLabel.setBounds(addKeyboardRow.removeFromLeft(columnWidth));
+        addLabel.setVisible(true);
         
-//        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12); //num white keys, gives error
-        
-        float keyWidth = addKeyboardRow.getWidth() / 50; // 62 is number of white keys
+        float keyWidth = addKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
         
         DBG("Keyboard row width: " + String(addKeyboardRow.getWidth()));
-        DBG("Keyboard width" + String(fundamentalKeyboard->getWidth()));
-
+        DBG("Keyboard width" + String(addKeyboard->getWidth()));
+        
+        
         addKeyboard->setKeyWidth(keyWidth);
         addKeyboard->setBlackNoteLengthProportion(0.6);
         addKeyboard->setBounds(addKeyboardRow);
@@ -355,6 +368,25 @@ void ResonanceViewController::displayTab(int tab)
         area.removeFromBottom(processor.paddingScalarX * 10);
         area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
         
+       
+        
+        Rectangle<int> ringKeyboardRow = area.removeFromBottom(keyboardHeight);
+        ringLabel.setBounds(ringKeyboardRow.removeFromLeft(columnWidth));
+        ringLabel.setVisible(true);
+        
+        keyWidth = ringKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
+        
+        DBG("Keyboard row width: " + String(ringKeyboardRow.getWidth()));
+        DBG("Keyboard width" + String(ringKeyboard->getWidth()));
+        
+        
+        ringKeyboard->setKeyWidth(keyWidth);
+        ringKeyboard->setBlackNoteLengthProportion(0.6);
+        ringKeyboard->setBounds(ringKeyboardRow);
+        ringKeyboard->setVisible(true);
+        
+        area.removeFromBottom(processor.paddingScalarX * 10);
+        area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
 
     }
 
@@ -618,6 +650,7 @@ void ResonancePreparationEditor::timerCallback()
             if (currentTab == 2)
             {
                 addKeyboard->setKeysInKeymap(prep->getHeldKeys());
+                ringKeyboard->setKeysInKeymap(prep->getRingingStrings());
             }
         }
     }

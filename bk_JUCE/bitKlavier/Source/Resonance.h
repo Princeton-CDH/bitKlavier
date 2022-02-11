@@ -548,6 +548,8 @@ public:
     // so we can remove the oldest one when we exceed maxSympStrings
     Array<int> activeHeldKeys;
     Array<int> getHeldKeys() {return activeHeldKeys;}
+    Array<int> getRingingStrings();
+    BKSynthesiser*              synth;
 private:
 
     String name;
@@ -788,7 +790,6 @@ private:
     CriticalSection lock;
     
     Resonance::Ptr              resonance;
-    BKSynthesiser*              synth;
     TuningProcessor::Ptr        tuning;
     GeneralSettings::Ptr        general;
     Keymap::PtrArr              keymaps;

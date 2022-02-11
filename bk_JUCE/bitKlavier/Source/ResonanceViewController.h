@@ -81,7 +81,8 @@ public:
     BKLabel fundamentalLabel;
     BKLabel gainsLabel;
     BKLabel offsetsLabel;
-
+    BKLabel addLabel;
+    BKLabel ringLabel;
 
     void paint(Graphics&) override;
     void resized() override;

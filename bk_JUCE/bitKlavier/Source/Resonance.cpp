@@ -52,6 +52,17 @@ void ResonancePreparation::performModification(ResonanceModification* r, Array<b
 
 }
 
+Array<int> ResonancePreparation::getRingingStrings()
+{
+    Array<int> arr;
+    ReferenceCountedArray<BKSynthesiserVoice>& voices = synth->getVoices();
+    for (auto voice : voices)
+    {
+        arr.add(voice->getCurrentlyPlayingNote());
+    }
+    return arr;
+}
+
 SympPartial::SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset) 
 {
     heldKey     = newHeldKey;
@@ -64,11 +75,11 @@ SympPartial::SympPartial(int newHeldKey, int newPartialKey, float newGain, float
 
 ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcessor::Ptr rTuning, GeneralSettings::Ptr rGeneral, BKSynthesiser* rMain):
     resonance(rResonance),
-    synth(rMain),
     tuning(rTuning),
     general(rGeneral),
     keymaps(Keymap::PtrArr())
 {
+    resonance->prep->synth = rMain;
     for (int j = 0; j < 128; j++)
     {
         velocities.add(Array<float>());
@@ -83,7 +94,7 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcesso
     if (!resonance->prep->rUseGlobalSoundSet.value)
     {
         String name = resonance->prep->rSoundSetName.value;
-        int Id = synth->processor.findPathAndLoadSamples(name);
+        int Id = resonance->prep->synth->processor.findPathAndLoadSamples(name);
         resonance->prep->setSoundSet(Id);
     }
     
@@ -143,17 +154,17 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                                         * (1. - velocity);
                     
                     //DBG("Resonance: found an overlapping partial, currentPlayPosition = "
-                        //+ String(currentSympPartial->playPosition  / (.001 *  synth->getSampleRate()))
+                        //+ String(currentSympPartial->playPosition  / (.001 *  resonance->prep->synth->getSampleRate()))
                         //+ " newPlayPosition = " + String(newPlayPosition));
                     
                     // only create a new resonance if it would be louder/brighter than what is currently there
-                    if (newPlayPosition < currentSympPartial->playPosition  / (.001 *  synth->getSampleRate()))
+                    if (newPlayPosition < currentSympPartial->playPosition  / (.001 *  resonance->prep->synth->getSampleRate()))
                     {
                         // set the playPosition for this new resonance
-                        currentSympPartial->playPosition = newPlayPosition * (.001 *  synth->getSampleRate());
+                        currentSympPartial->playPosition = newPlayPosition * (.001 *  resonance->prep->synth->getSampleRate());
                         
                         // turn off the current resonance here, if it's playing
-                        synth->keyOff(1,
+                        resonance->prep->synth->keyOff(1,
                                       ResonanceNote,
                                       resonance->prep->getSoundSet(),
                                       resonance->getId(),
@@ -189,7 +200,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                         //DBG("Resonance: ADSR release time = " + String(ADSRvals[3]));
                         if (!blendronic.isEmpty())
                         {
-                                synth->keyOn(
+                                resonance->prep->synth->keyOn(
                                 1,
                                 //noteNumber,
                                 currentSympPartial->heldKey,
@@ -217,7 +228,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                         }
                         else
                         {
-                                synth->keyOn(
+                                resonance->prep->synth->keyOn(
                                 1,
                                 //noteNumber,
                                 currentSympPartial->heldKey,
@@ -288,7 +299,7 @@ void ResonanceProcessor::removeSympStrings(int noteNumber, float velocity)
     {
         //DBG("Resonance: removing partial " + String(sympString->partialKey) + " of held key " + String(sympString->heldKey));
         
-        synth->keyOff(1,
+        resonance->prep->synth->keyOff(1,
                       ResonanceNote,
                       resonance->prep->getSoundSet(),
                       resonance->getId(),
