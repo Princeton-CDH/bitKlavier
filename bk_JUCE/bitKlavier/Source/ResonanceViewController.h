@@ -91,9 +91,9 @@ public:
 
     virtual void update(void) {};
 
-#if JUCE_IOS
-    void iWantTheBigOne(TextEditor*, String name) override;
-#endif
+//#if JUCE_IOS
+//    void iWantTheBigOne(TextEditor*, String name) override;
+//#endif
 
     void displayTab(int tab) override;
     void displayShared(void) override;
