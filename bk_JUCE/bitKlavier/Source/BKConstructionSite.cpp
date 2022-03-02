@@ -94,7 +94,7 @@ void BKConstructionSite::redraw(void)
     
     removeAllChildren();
     
-    graph->deselectAll();
+    //graph->deselectAll();
     graph->reconstruct();
     getParentComponent()->grabKeyboardFocus();
     
@@ -569,7 +569,7 @@ void BKConstructionSite::paste(bool cursorBasedOffset)
     
         pastemap[type]->set(oldId, newId);
 
-        newItem->setSelected(true);
+        graph->select(newItem);
         
         int newX = (newItem->getX()-offsetX) + (cursorBasedOffset ? lastEX : 0);
         int newY = (newItem->getY()-offsetY) + (cursorBasedOffset ? lastEY : 0);
@@ -581,6 +581,7 @@ void BKConstructionSite::paste(bool cursorBasedOffset)
         processor.currentPiano->add(newItem, false); // make sure not to configure yet or bad ids will cause a crash
         
         newItems.add(newItem);
+    
     }
     
     for (int i = 0; i < newItems.size(); i++)
@@ -617,8 +618,8 @@ void BKConstructionSite::paste(bool cursorBasedOffset)
         int newId = pastemap[item->getType()]->getReference(item->getId());
         //DBG(String(cPreparationTypes[item->getType()]) + " old: " + String(oldId) + " new: " + String(newId));
         item->setId(newId);
+        graph->select(item);
     }
-
     processor.currentPiano->configure();
     
     processor.saveGalleryToHistory("Paste");
