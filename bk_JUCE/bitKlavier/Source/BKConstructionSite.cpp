@@ -479,7 +479,7 @@ BKItem::PtrArr BKConstructionSite::duplicate(BKItem::PtrArr these)
     for (auto item : these)
     {
         BKItem* newItem = new BKItem(item->getType(), item->getId(), processor);
-        
+        newItem->setCommentText(item->getCommentText());
         // relying on mouse anyway
         newItem->setBounds(item->getX(),
                            item->getY(),

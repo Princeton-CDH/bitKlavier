@@ -156,6 +156,8 @@ BKItem::Ptr BKItem::duplicate(void)
     
     newItem->setContent(getContent());
     
+    newItem->setCommentText(getCommentText());
+    
     return newItem;
 }
 
