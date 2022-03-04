@@ -14,7 +14,7 @@
  * auto s = Tunings::readSCLFile( "./my-scale.scl" );
  * auto k = Tunings::readKBMFile( "./my-mapping.kbm" );
  *
- * Tunings::ScalaTuning t( s, k );
+ * Tunings::Tuning t( s, k );
  *
  * std::cout << "The frequency of C4 and A4 are "
  *           << t.frequencyForMidiNote( 60 ) << " and "
@@ -80,7 +80,7 @@ inline Tone toneFromString(const std::string &t, int lineno = -1);
  * features. Most importantly it has a count and a vector of Tones.
  *
  * In most normal use, you will simply pass around instances of this class
- * to a Tunings::ScalaTuning instance, but in some cases you may want to create
+ * to a Tunings::Tuning instance, but in some cases you may want to create
  * or inspect this class yourself. Especially if you are displaying this
  * class to your end users, you may want to use the rawText or count methods.
  */
@@ -164,6 +164,14 @@ Scale evenTemperament12NoteScale();
 Scale evenDivisionOfSpanByM(int Span, int M);
 
 /**
+ * evenDivisionOfCentsByM provides a scale which divides Cents into M
+ * steps. It is less frequently used than evenDivisionOfSpanByM for obvious
+ * reasons. If you want the last cents label labeled differently than the cents
+ * argument, pass in the associated optional label
+ */
+Scale evenDivisionOfCentsByM(float Cents, int M, const std::string &lastLabel = "");
+
+/**
  * readKBMStream returns a KeyboardMapping from a KBM input stream
  */
 KeyboardMapping readKBMStream(std::istream &inf);
@@ -197,7 +205,7 @@ KeyboardMapping tuneNoteTo(int midiNote, double freq);
 KeyboardMapping startScaleOnAndTuneNoteTo(int scaleStart, int midiNote, double freq);
 
 /**
- * The ScalaTuning class is the primary place where you will interact with this library.
+ * The Tuning class is the primary place where you will interact with this library.
  * It is constructed for a scale and mapping and then gives you the ability to
  * determine frequencies across and beyond the midi keyboard. Since modulation
  * can force key number well outside the [0,127] range in some of our synths we
@@ -208,21 +216,21 @@ KeyboardMapping startScaleOnAndTuneNoteTo(int scaleStart, int midiNote, double f
  * different Scale and Keyboard. If you want to tune to a different scale or mapping,
  * just construct a new instance.
  */
-class ScalaTuning
+class Tuning
 {
   public:
     // The number of notes we pre-compute
     constexpr static int N = 512;
 
     // Construct a tuning with even temperament and standard mapping
-    ScalaTuning();
+    Tuning();
 
     /**
      * Construct a tuning for a particular scale, mapping, or for both.
      */
-    ScalaTuning(const Scale &s);
-    ScalaTuning(const KeyboardMapping &k);
-    ScalaTuning(const Scale &s, const KeyboardMapping &k);
+    Tuning(const Scale &s);
+    Tuning(const KeyboardMapping &k);
+    Tuning(const Scale &s, const KeyboardMapping &k, bool allowTuningCenterOnUnmapped = false);
 
     /*
      * Skipped notes can either have nonsense values or interpolated values.
@@ -230,7 +238,7 @@ class ScalaTuning
      * for compatability, but this method will return a new tuning with correctly
      * interpolated skipped notes.
      */
-    ScalaTuning withSkippedNotesInterpolated() const;
+    Tuning withSkippedNotesInterpolated() const;
 
     /**
      * These three related functions provide you the information you
@@ -273,6 +281,7 @@ class ScalaTuning
   private:
     std::array<double, N> ptable, lptable;
     std::array<int, N> scalepositiontable;
+    bool allowTuningCenterOnUnmapped;
 };
 
 } // namespace Tunings

@@ -352,7 +352,7 @@ void Tuning::loadScalaFile(std::string fname)
 
 void Tuning::loadScalaScale(Tunings::Scale& s)
 {
-    auto scala = Tunings::ScalaTuning(s, currentKBM);
+    auto scala = Tunings::Tuning(s, currentKBM);
     currentScalaString = s.rawText;
     auto offsets = Array<float>(12);
 
@@ -392,10 +392,10 @@ void Tuning::loadScalaScale(Tunings::Scale& s)
 
 void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
 {
-    Tunings::ScalaTuning scala;
+    Tunings::Tuning scala;
     auto offsets = Array<float>(12);
     try {
-        scala = Tunings::ScalaTuning(currentScale, kbm);
+        scala = Tunings::Tuning(currentScale, kbm, true);
     }  catch (Tunings::TuningError t) {
         AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("KBM Loading Error"), TRANS(t.what()));
         return;
