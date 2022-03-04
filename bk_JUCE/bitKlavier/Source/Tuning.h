@@ -17,7 +17,7 @@
 #include "Keymap.h"
 
 #include "SpringTuning.h"
-
+#include "Tunings.h"
 
 class TuningModification;
 
@@ -323,7 +323,13 @@ public:
         return tCustom.value;
     }
     
+    
+    
+    
     inline void setName(String n)                                           {name = n; } // DBG("set tuning name " + name);}
+    
+
+    
     inline void setScale(TuningSystem tuning)
     {
         if (tuning != AdaptiveTuning && tuning != AdaptiveAnchoredTuning)
@@ -348,7 +354,7 @@ public:
     inline void setAdaptiveAnchorFundamental(PitchClass adaptiveAnchorFundamental)  { tAdaptiveAnchorFundamental = adaptiveAnchorFundamental;}
     inline void setAdaptiveClusterThresh(int adaptiveClusterThresh)  { tAdaptiveClusterThresh = adaptiveClusterThresh; }
     inline void setAdaptiveHistory(int adaptiveHistory)     { tAdaptiveHistory = adaptiveHistory; }
-    inline void setCustomScale(Array<float> tuning)
+    inline void setCustomScale(Array<float> tuning) //takes in fractional midi
     {
         if (tuning.size() > tCustom.value.size()) tuning.resize(tCustom.value.size());
         
@@ -562,6 +568,7 @@ public:
         print();
     }
     
+    
     bool modded = false;
     
     // basic tuning settings, for static tuning
@@ -589,7 +596,7 @@ public:
     int nToneRootOctave = 4;    //which octave; 4 by default, so C4
     
     Moddable<TuningAdaptiveSystemType> adaptiveType;
-    
+   
 private:
     String name;
     
@@ -628,6 +635,7 @@ public:
     
 	Tuning(int Id, bool random = false) :
     Id(Id),
+    currentScale(Tunings::evenTemperament12NoteScale()),
     name("Tuning "+String(Id))
     {
 		prep = new TuningPreparation();
@@ -710,6 +718,16 @@ public:
     
     ValueTree getState(bool active = false);
     void setState(XmlElement*);
+    void loadScalaFile(std::string fname);
+    void loadScalaScale(Tunings::Scale& s);
+    void loadKBM(Tunings::KeyboardMapping& kbm);
+    String currentScalaString;
+    bool isAbsoluteTuning;
+    String currentKBMString;
+    Tunings::Scale currentScale;
+    Tunings::KeyboardMapping currentKBM;
+    
+    String generateScalaString();
     
     ~Tuning() {};
     
@@ -944,6 +962,7 @@ public:
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     
+
 private:
     BKAudioProcessor& processor;
     
@@ -972,7 +991,7 @@ private:
     
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;
-    
+   
     JUCE_LEAK_DETECTOR(TuningProcessor);
 };
 

@@ -256,6 +256,8 @@
               file="Source/GraphicsConstants.h"/>
       </GROUP>
       <GROUP id="{754B7718-DE02-827A-21E1-1FB69E01DE50}" name="Utilities">
+        <FILE id="kWlunP" name="TuningsImpl.h" compile="0" resource="0" file="Source/TuningsImpl.h"/>
+        <FILE id="I0ECf1" name="Tunings.h" compile="0" resource="0" file="Source/Tunings.h"/>
         <FILE id="WuBRqX" name="Moddable.h" compile="0" resource="0" file="Source/Moddable.h"/>
         <GROUP id="{AEA67C46-9692-A274-A2D7-A2EB6AC3B59C}" name="SFZero">
           <GROUP id="{80C7D4AF-BB5C-5D82-478E-61C64C63A6C5}" name="sfzero">
