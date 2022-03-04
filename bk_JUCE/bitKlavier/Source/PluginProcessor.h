@@ -63,7 +63,7 @@ public:
     void loadGalleryFromPath(String path);
     void loadGalleryFromXml(XmlElement* xml, bool resetHistory = true);
     void loadJsonGalleryFromPath(String path);
-    void saveCurrentGalleryAs(void);
+    bool saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
     void createNewGallery(String name, std::shared_ptr<XmlElement> xml = nullptr);
     void renameGallery(String name);

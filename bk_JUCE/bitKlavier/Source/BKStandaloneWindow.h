@@ -721,6 +721,19 @@ public:
     //==============================================================================
     void closeButtonPressed() override
     {
+        if (pluginHolder->processor->gallery->isGalleryDirty()){
+            int result = AlertWindow::showYesNoCancelBox(juce::MessageBoxIconType::QuestionIcon, "Save", "Do you want to save your work?");
+            if (result == 0)
+            {
+                return;
+            }
+            else if(result == 1)
+            {
+                if (pluginHolder->processor->defaultLoaded)
+                    if(!pluginHolder->processor->saveCurrentGalleryAs()) return;
+                else pluginHolder->processor->saveCurrentGallery();
+            }
+        }
         pluginHolder->savePluginState();
         
         JUCEApplicationBase::quit();

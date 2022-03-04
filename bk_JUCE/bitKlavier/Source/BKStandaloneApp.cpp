@@ -77,6 +77,7 @@ namespace juce
         
         void shutdown() override
         {
+            
             mainWindow = nullptr;
             appProperties.saveIfNeeded();
         }

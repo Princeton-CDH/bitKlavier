@@ -689,6 +689,20 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                     {
                         reducedHarm.addIfNotAlreadyThere(h);
                     }
+                    
+                    if (km->getIsToggle())
+                    {
+                        if (km->getToggleState(noteNumber))
+                        {
+                            km->setTriggered(noteNumber, false);
+                            return;
+                        } else
+                        {
+                            km->setTriggered(noteNumber, true);
+                            continue; //don't care about other behaviors because we know they are turned off
+                        }
+                    }
+                    
                     // Toggleable keymap behaviors
                     if (!km->isInverted())
                     {
@@ -811,6 +825,16 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
                 {
                     reducedHarm.addIfNotAlreadyThere(h);
                 }
+                if (km->getIsToggle())
+                {
+                    if (km->getToggleState(noteNumber))
+                    {
+                        return; //if we just turned the note on we don't wan't to do any thing
+                    }
+                    //otherwise we just want to continue on our merry little way 
+                    continue; //don't care about other behaviors because we know they are turned off
+                }
+                
                 if (km->isInverted())
                 {
                     if (km->getAllNotesOff())
@@ -1700,7 +1724,7 @@ void BKAudioProcessor::exportCurrentGallery(void)
 
 }
 
-void BKAudioProcessor::saveCurrentGalleryAs(void)
+bool BKAudioProcessor::saveCurrentGalleryAs(void)
 {
     FileChooser myChooser ("Save gallery to file...",
                            lastGalleryPath,
@@ -1711,10 +1735,12 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
         File fileToSave = myChooser.getResult();
         if (!fileToSave.hasFileExtension("xml")) fileToSave = fileToSave.withFileExtension("xml");
         writeCurrentGalleryToURL(fileToSave.getFullPathName());
+        updateGalleries();
+        if (wrapperType == wrapperType_Standalone) getPluginHolder()->savePluginState();
+        return true;
+    } else { //code executes if user presses cancel
+        return false;
     }
-    
-    updateGalleries();
-    if (wrapperType == wrapperType_Standalone) getPluginHolder()->savePluginState();
 }
 
 void BKAudioProcessor::saveCurrentGallery(void)

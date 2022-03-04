@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGraph* theGraph) :
-    BKViewController(p, theGraph, 2),
+    BKViewController(p, theGraph, 3),
 #if JUCE_IOS
 gainsKeyboard(false, true),
 offsetsKeyboard(false, true)
@@ -80,6 +80,7 @@ offsetsKeyboard(false, true)
     closestKeyboard->setOctaveForMiddleC(5);
     addAndMakeVisible(*closestKeyboard);
     
+    
     fundamentalKeyboard = std::make_unique<BKKeymapKeyboardComponent> (fundamentalKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     fundamentalKeyboard->setName("fundamental");
 //    closestKeyboard.setAlpha(1);
@@ -90,6 +91,20 @@ offsetsKeyboard(false, true)
     fundamentalKeyboard->setOctaveForMiddleC(5);
     fundamentalKeyboard->setKeysInKeymap(0);
     addAndMakeVisible(*fundamentalKeyboard);
+    
+    addKeyboard = std::make_unique<BKKeymapKeyboardComponent> (addKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    addKeyboard->setName("add");
+    addKeyboard->setAvailableRange(9, 96);
+    addKeyboard->setOctaveForMiddleC(5);
+    addKeyboard->setKeysInKeymap(0);
+    addAndMakeVisible(*addKeyboard);
+    
+    ringKeyboard = std::make_unique<BKKeymapKeyboardComponent> (ringKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    ringKeyboard->setName("ring");
+    ringKeyboard->setAvailableRange(9, 96);
+    ringKeyboard->setOctaveForMiddleC(5);
+    ringKeyboard->setKeysInKeymap(0);
+    addAndMakeVisible(*ringKeyboard);
     
     addAndMakeVisible(&actionButton, ALL);
     actionButton.setButtonText("Action");
@@ -113,6 +128,9 @@ offsetsKeyboard(false, true)
     offsetsKeyboard.disableAllKeys();
     addAndMakeVisible(&offsetsKeyboard);
     
+    
+
+    
     closestKeyLabel.setText("Resonant Keys: ", dontSendNotification);
     closestKeyLabel.setJustificationType(Justification::right);
     closestKeyLabel.setTooltip("keys that should resonate when struck; partials");
@@ -132,6 +150,17 @@ offsetsKeyboard(false, true)
     offsetsLabel.setJustificationType(Justification::right);
     offsetsLabel.setTooltip("offset in cents from ET for this resonance");
     addAndMakeVisible(offsetsLabel);
+    
+    addLabel.setText("Held Keys: ", dontSendNotification);
+    addLabel.setJustificationType(Justification::centred);
+    addLabel.setTooltip("Keys added to sympathetic resonance");
+    addAndMakeVisible(addLabel);
+    
+    ringLabel.setText("Ringing Keys: ", dontSendNotification);
+    ringLabel.setJustificationType(Justification::centred);
+    ringLabel.setTooltip("Keys currently ringing");
+    addAndMakeVisible(ringLabel);
+    
     
     alternateMod.setButtonText ("alternate mod");
     alternateMod.setTooltip("activating this mod will alternate between modding and reseting attached preparations");
@@ -155,6 +184,16 @@ void ResonanceViewController::resized()
 
     //will have to put big '#if 0' here eventually
 }
+
+//#if JUCE_IOS
+//void ResonanceViewController::iWantTheBigOne(TextEditor* tf, String name)
+//{
+//    hideOrShow.setAlwaysOnTop(false);
+//    rightArrow.setAlwaysOnTop(false);
+//    leftArrow.setAlwaysOnTop(false);
+//    bigOne.display(tf, name, getBounds());
+//}
+//#endif
 
 void ResonanceViewController::displayTab(int tab)
 {
@@ -217,6 +256,96 @@ void ResonanceViewController::displayTab(int tab)
     }
     else if (tab == 1){
         iconImageComponent.setBounds(area);
+       //        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+               
+       #if JUCE_IOS
+       //        area.removeFromTop(gComponentComboBoxHeight);
+               area.reduce(0.f, area.getHeight() * 0.2f);
+       #endif
+               area.removeFromBottom(40 * processor.paddingScalarY);
+               
+               float keyboardHeight = 80 * processor.paddingScalarY;
+               float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
+               
+               Rectangle<int> fundamentalKeyboardRow = area.removeFromBottom(keyboardHeight);
+               
+               fundamentalLabel.setBounds(fundamentalKeyboardRow.removeFromLeft(columnWidth));
+               fundamentalLabel.setVisible(true);
+               
+       //        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12); //num white keys, gives error
+               
+               float keyWidth = fundamentalKeyboardRow.getWidth() / 31.; // 31 is number of white keys
+               
+               DBG("Keyboard row width: " + String(fundamentalKeyboardRow.getWidth()));
+               DBG("Keyboard width" + String(fundamentalKeyboard->getWidth()));
+
+               fundamentalKeyboard->setKeyWidth(keyWidth);
+               fundamentalKeyboard->setBlackNoteLengthProportion(0.6);
+               fundamentalKeyboard->setBounds(fundamentalKeyboardRow);
+               fundamentalKeyboard->setVisible(true);
+               
+               area.removeFromBottom(processor.paddingScalarX * 10);
+               area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
+               
+               Rectangle<int> closestKeyboardRow = area.removeFromBottom(keyboardHeight);
+               
+               closestKeyLabel.setBounds(closestKeyboardRow.removeFromLeft(columnWidth));
+               closestKeyLabel.setVisible(true);
+
+               closestKeyboard->setKeyWidth(keyWidth);
+               closestKeyboard->setBlackNoteLengthProportion(0.6);
+               closestKeyboard->setBounds(closestKeyboardRow);
+               closestKeyboard->setVisible(true);
+           
+               area.removeFromBottom(processor.paddingScalarY * 10);
+               area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
+
+               float multiHeight = 100 + processor.paddingScalarY;
+               
+               Rectangle<int> offsetsRow = area.removeFromBottom(multiHeight);
+               offsetsLabel.setBounds(offsetsRow.removeFromLeft(columnWidth));
+               offsetsLabel.setVisible(true);
+               
+       //        float sliderWidth = offsetsRow.getWidth()/ (NUM_KEYS * 1.);
+       //
+       //        DBG("Slider width:" + String(sliderWidth));
+       //        DBG("Offsets row width: " + String(offsetsRow.getWidth()));
+       //
+       //        float sum = 0;
+       //
+       //        for (int i = 0; i < NUM_KEYS; i++) {
+       //            offsetsArray[i]->setBounds(offsetsRow.removeFromLeft(sliderWidth));
+       //            sum += sliderWidth;
+       //            if (isActive[i])
+       //                offsetsArray[i]->setVisible(true);
+       //        }
+       //
+       //        DBG("slider width sum: " + String(sum));
+               
+               offsetsKeyboard.setBounds(offsetsRow);
+               offsetsKeyboard.setVisible(true);
+               
+               area.removeFromBottom(10 * processor.paddingScalarY);
+               
+               Rectangle<int> gainsRow = area.removeFromBottom(multiHeight);
+               
+               gainsLabel.setBounds(gainsRow.removeFromLeft(columnWidth));
+               gainsLabel.setVisible(true);
+               
+       //        for (int i = 0; i < NUM_KEYS; i++) {
+       //            gainsArray[i]->setBounds(gainsRow.removeFromLeft(sliderWidth));
+       //            if (isActive[i])
+       //                gainsArray[i]->setVisible(true);
+       //        }
+               
+               gainsKeyboard.setBounds(gainsRow);
+               gainsKeyboard.setVisible(true);
+
+               area.removeFromBottom(10 * processor.paddingScalarY);
+        
+    } else if (tab == 2)
+    {
+        iconImageComponent.setBounds(area);
 //        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         
 #if JUCE_IOS
@@ -228,82 +357,44 @@ void ResonanceViewController::displayTab(int tab)
         float keyboardHeight = 80 * processor.paddingScalarY;
         float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
         
-        Rectangle<int> fundamentalKeyboardRow = area.removeFromBottom(keyboardHeight);
+        Rectangle<int> addKeyboardRow = area.removeFromBottom(keyboardHeight * 2);
+        addLabel.setBounds(addKeyboardRow.removeFromTop(keyboardHeight * 0.5));
+        addLabel.setVisible(true);
         
-        fundamentalLabel.setBounds(fundamentalKeyboardRow.removeFromLeft(columnWidth));
-        fundamentalLabel.setVisible(true);
+        float keyWidth = addKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
         
-//        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12); //num white keys, gives error
+        DBG("Keyboard row width: " + String(addKeyboardRow.getWidth()));
+        DBG("Keyboard width" + String(addKeyboard->getWidth()));
         
-        float keyWidth = fundamentalKeyboardRow.getWidth() / 31.; // 31 is number of white keys 
         
-        DBG("Keyboard row width: " + String(fundamentalKeyboardRow.getWidth()));
-        DBG("Keyboard width" + String(fundamentalKeyboard->getWidth()));
-
-        fundamentalKeyboard->setKeyWidth(keyWidth);
-        fundamentalKeyboard->setBlackNoteLengthProportion(0.6);
-        fundamentalKeyboard->setBounds(fundamentalKeyboardRow);
-        fundamentalKeyboard->setVisible(true);
+        addKeyboard->setKeyWidth(keyWidth);
+        addKeyboard->setBlackNoteLengthProportion(0.6);
+        addKeyboard->setBounds(addKeyboardRow);
+        addKeyboard->setVisible(true);
         
         area.removeFromBottom(processor.paddingScalarX * 10);
         area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
         
-        Rectangle<int> closestKeyboardRow = area.removeFromBottom(keyboardHeight);
+       
         
-        closestKeyLabel.setBounds(closestKeyboardRow.removeFromLeft(columnWidth));
-        closestKeyLabel.setVisible(true);
-
-        closestKeyboard->setKeyWidth(keyWidth);
-        closestKeyboard->setBlackNoteLengthProportion(0.6);
-        closestKeyboard->setBounds(closestKeyboardRow);
-        closestKeyboard->setVisible(true);
-    
-        area.removeFromBottom(processor.paddingScalarY * 10);
+        Rectangle<int> ringKeyboardRow = area.removeFromBottom(keyboardHeight * 2);
+        ringLabel.setBounds(ringKeyboardRow.removeFromTop(keyboardHeight * 0.5));
+        ringLabel.setVisible(true);
+        
+        keyWidth = ringKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
+        
+        DBG("Keyboard row width: " + String(ringKeyboardRow.getWidth()));
+        DBG("Keyboard width" + String(ringKeyboard->getWidth()));
+        
+        
+        ringKeyboard->setKeyWidth(keyWidth);
+        ringKeyboard->setBlackNoteLengthProportion(0.6);
+        ringKeyboard->setBounds(ringKeyboardRow);
+        ringKeyboard->setVisible(true);
+        
+        area.removeFromBottom(processor.paddingScalarX * 10);
         area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
 
-        float multiHeight = 100 + processor.paddingScalarY;
-        
-        Rectangle<int> offsetsRow = area.removeFromBottom(multiHeight);
-        offsetsLabel.setBounds(offsetsRow.removeFromLeft(columnWidth));
-        offsetsLabel.setVisible(true);
-        
-//        float sliderWidth = offsetsRow.getWidth()/ (NUM_KEYS * 1.);
-//
-//        DBG("Slider width:" + String(sliderWidth));
-//        DBG("Offsets row width: " + String(offsetsRow.getWidth()));
-//
-//        float sum = 0;
-//
-//        for (int i = 0; i < NUM_KEYS; i++) {
-//            offsetsArray[i]->setBounds(offsetsRow.removeFromLeft(sliderWidth));
-//            sum += sliderWidth;
-//            if (isActive[i])
-//                offsetsArray[i]->setVisible(true);
-//        }
-//
-//        DBG("slider width sum: " + String(sum));
-        
-        offsetsKeyboard.setBounds(offsetsRow);
-        offsetsKeyboard.setVisible(true);
-        
-        area.removeFromBottom(10 * processor.paddingScalarY);
-        
-        Rectangle<int> gainsRow = area.removeFromBottom(multiHeight);
-        
-        gainsLabel.setBounds(gainsRow.removeFromLeft(columnWidth));
-        gainsLabel.setVisible(true);
-        
-//        for (int i = 0; i < NUM_KEYS; i++) {
-//            gainsArray[i]->setBounds(gainsRow.removeFromLeft(sliderWidth));
-//            if (isActive[i])
-//                gainsArray[i]->setVisible(true);
-//        }
-        
-        gainsKeyboard.setBounds(gainsRow);
-        gainsKeyboard.setVisible(true);
-
-        area.removeFromBottom(10 * processor.paddingScalarY);
-        
     }
 
     //all the display code is in displayShared for now, some will get moved here for when multiple tabs are implemented
@@ -364,6 +455,8 @@ void ResonanceViewController::invisible(void)
     
     closestKeyboard->setVisible(false);
     fundamentalKeyboard->setVisible(false);
+    addKeyboard->setVisible(false);
+    ringKeyboard->setVisible(false);
     
     gainsKeyboard.setVisible(false);
     offsetsKeyboard.setVisible(false);
@@ -375,7 +468,8 @@ void ResonanceViewController::invisible(void)
 
     closestKeyLabel.setVisible(false);
     fundamentalLabel.setVisible(false);
-
+    addLabel.setVisible(false);
+    ringLabel.setVisible(false);
 }
 //
 //void ResonanceViewController::mouseEnter(const MouseEvent& e)
@@ -405,9 +499,10 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     ADSRSlider->addMyListener(this);
     resonanceKeyboardState.addListener(this);
     fundamentalKeyboardState.addListener(this);
-    
+
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
+    
 
     startTimer(10);
 }
@@ -418,7 +513,6 @@ void ResonancePreparationEditor::update()
     ADSRSlider->setIsButtonOnly(true);
 
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
-
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentResonanceId, dontSendNotification);
@@ -438,12 +532,15 @@ void ResonancePreparationEditor::update()
         
         fundamentalKeyboard->setKeysInKeymap({prep->getFundamentalKey()});
         closestKeyboard->setKeysInKeymap(prep->getResonanceKeys());
+        //addKeyboard->setKeysInKeymap(prep->getSympStrings());
+        
         
         offsetsKeyboard.setKeys(prep->getResonanceKeys());
         offsetsKeyboard.setValues(prep->getOffsets());
         
         gainsKeyboard.setKeys(prep->getResonanceKeys());
         gainsKeyboard.setValues(prep->getGains());
+       
         
 //        for (int i = 0; i < NUM_KEYS; i++){
 //            if (prep->isActive(i + 24)) {
@@ -558,7 +655,11 @@ void ResonancePreparationEditor::timerCallback()
                 offsetsKeyboard.setValues(prep->getOffsets());
             if (prep->rGainsKeys.didChange())
                 gainsKeyboard.setValues(prep->getGains());
-            
+            if (currentTab == 2)
+            {
+                addKeyboard->setKeysInKeymap(prep->getHeldKeys());
+                ringKeyboard->setKeysInKeymap(prep->getRingingStrings());
+            }
         }
     }
 //    Resonance::Ptr rs = processor.gallery->getResonance(processor.updateState->currentId);

@@ -749,33 +749,37 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
     
     for (auto proc : rprocessor)
     {
+        //bool toggleRelease = false;
         bool ignoreSustain = !sustainPedalIsDepressed;
-        // For each Keymap in each Direct processor
+        // For each Keymap in each resonance processor
         for (auto km : proc->getKeymaps())
         {
             // Check that the keymap contains this note mapped from this harmonizer note
             // and that it uses this midi source
             if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
             {
-                // Check that Direct is enabled as a target (should always be true until we add other targets)
-                if (km->getTargetStates()[TargetTypeResonance])
-                {
-                    // Collect inverted keymaps into one velocities array
-                    if (km->isInverted())
+                for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; i++ ){
+                    // Check that resonance is enabled as a target (should always be true until we add other targets)
+                    if (km->getTargetStates()[i])
                     {
-                        // Apply curve, take the max of any overlapping cases, then filter
-                        float v = jmax(releaseTargetVelocities.getUnchecked(TargetTypeResonance),
-                                                            km->applyVelocityCurve(velocity));
-                        releaseTargetVelocities.set(TargetTypeResonance, v);
-                    }
-                    // Collect normal keymaps into another velocity array
-                    else
-                    {
-                        float v = jmax(pressTargetVelocities.getUnchecked(TargetTypeResonance),
-                                                            km->applyVelocityCurve(velocity));
-                        pressTargetVelocities.set(TargetTypeResonance, v);
+                        // Collect inverted keymaps into one velocities array
+                        if (km->isInverted())
+                        {
+                            // Apply curve, take the max of any overlapping cases, then filter
+                            float v = jmax(releaseTargetVelocities.getUnchecked(i),
+                                                                km->applyVelocityCurve(velocity));
+                            releaseTargetVelocities.set(i, v);
+                        }
+                        // Collect normal keymaps into another velocity array
+                        else
+                        {
+                            float v = jmax(pressTargetVelocities.getUnchecked(i),
+                                                                km->applyVelocityCurve(velocity));
+                            pressTargetVelocities.set(i, v);
+                        }
                     }
                 }
+            
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }
         }
@@ -1036,22 +1040,27 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
         {
             if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
             {
-                if (km->getTargetStates()[TargetTypeResonance])
-                {
-                    if (km->isInverted())
+                for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; i++ ){
+                    // Check that Direct is enabled as a target (should always be true until we add other targets)
+                    if (km->getTargetStates()[i])
                     {
-                        // Don't filter release velocities because they are not reliable.
-                        // The processor will internally ignore this release if the
-                        // last key press was filtered out.
-                        float v = jmax(pressTargetVelocities.getUnchecked(TargetTypeResonance),
-                                       km->applyVelocityCurve(velocity));
-                        pressTargetVelocities.setUnchecked(TargetTypeResonance, v);
-                    }
-                    else
-                    {
-                        float v = jmax(releaseTargetVelocities.getUnchecked(TargetTypeResonance),
-                                       km->applyVelocityCurve(velocity));
-                        releaseTargetVelocities.setUnchecked(TargetTypeResonance, v);
+                        // Collect inverted keymaps into one velocities array
+                        if (km->isInverted())
+                        {
+                            // Don't filter release velocities because they are not reliable.
+                            // The processor will internally ignore this release if the
+                            // last key press was filtered out.
+                            float v = jmax(releaseTargetVelocities.getUnchecked(i),
+                                                                km->applyVelocityCurve(velocity));
+                            pressTargetVelocities.setUnchecked(i, v);
+                        }
+                        // Collect normal keymaps into another velocity array
+                        else
+                        {
+                            float v = jmax(pressTargetVelocities.getUnchecked(i),
+                                                                km->applyVelocityCurve(velocity));
+                            releaseTargetVelocities.setUnchecked(i, v);
+                        }
                     }
                 }
                 if (km->getIgnoreSustain()) ignoreSustain = true;
@@ -1245,13 +1254,16 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
             {
                 if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
                 {
-                    if (km->getTargetStates()[TargetTypeResonance])
+                    for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; i++)
                     {
-                        hasActiveTarget = true;
-                        float v = km->applyVelocityCurve(velocity);
-                        targetVelocities.set(TargetTypeResonance, v);
+                        if (km->getTargetStates()[i])
+                        {
+                            hasActiveTarget = true;
+                            float v = km->applyVelocityCurve(velocity);
+                            targetVelocities.set(i, v);
+                        }
+                        if (!km->getIgnoreSustain()) allIgnoreSustain = false;
                     }
-                    if (!km->getIgnoreSustain()) allIgnoreSustain = false;
                 }
             }
             //local flag for keymap that isn't ignoring sustain
@@ -1369,10 +1381,13 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, in
         {
             if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
             {
-                if (km->getTargetStates()[TargetTypeResonance])
+                for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; i++)
                 {
-                    float v = km->applyVelocityCurve(velocity);
-                    targetVelocities.set(TargetTypeResonance, v);
+                    if (km->getTargetStates()[i])
+                    {
+                        float v = km->applyVelocityCurve(velocity);
+                        targetVelocities.set(i, v);
+                    }
                 }
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }

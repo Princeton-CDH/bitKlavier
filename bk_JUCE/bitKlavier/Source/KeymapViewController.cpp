@@ -258,7 +258,7 @@ BKViewController(p, theGraph, 4)
     targetControlTBs = OwnedArray<ToggleButton>();
     buttonsAndMenusLAF2.setToggleBoxTextToRightBool(false);
     //for (int i=TargetTypeDirect; i<=TargetTypeTuning; i++)
-    for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
+    for (int i=TargetTypeDirect; i<=TargetTypeResonanceRing; i++)
     {
         targetControlTBs.add(new ToggleButton()); // insert at the end of the array
         targetControlTBs.getLast()->setName(cKeymapTargetTypes[i]);
@@ -304,7 +304,20 @@ BKViewController(p, theGraph, 4)
     tempoTBGroup.setText("Tempo Targets");
     tempoTBGroup.setTextLabelPosition(Justification::centred);
     //addAndMakeVisible(tempoTBGroup);
-
+    
+    //border for Resonance Target Toggles
+    resonanceTBGroup.setName("resonanceGroup");
+    resonanceTBGroup.setText("ResonanceTargets");
+    resonanceTBGroup.setTextLabelPosition(Justification::centred);
+    addAndMakeVisible(resonanceTBGroup);
+    
+    toggleKeysToggle.setButtonText ("Toggle Keys");
+    toggleKeysToggle.setToggleState (false, dontSendNotification);
+    toggleKeysToggle.setLookAndFeel(&buttonsAndMenusLAF); // text to left
+    toggleKeysToggle.setTooltip("Pressing a key toggles on and off");
+    toggleKeysToggle.addListener(this);
+    addAndMakeVisible(&toggleKeysToggle, ALL);
+    
     invertOnOffToggle.setButtonText ("Invert Note On/Off");
     invertOnOffToggle.setToggleState (false, dontSendNotification);
     invertOnOffToggle.setLookAndFeel(&buttonsAndMenusLAF); // text to left
@@ -494,7 +507,37 @@ void KeymapViewController::displayTab(int tab)
         Rectangle<int> thirdColumn = area.removeFromLeft(area.getWidth() * 0.5);
         //area is now fourth column
         
+        // Resonance Targets
         
+        Rectangle<int> resonanceBox1 = leftColumn.removeFromTop(gComponentToggleBoxHeight + gYSpacing + 5 *gYSpacing);
+        
+        Rectangle<int> resonanceGroup1(resonanceBox1);
+        resonanceBox1.removeFromTop(4 * gYSpacing);
+        resonanceBox1.removeFromLeft(gXSpacing);
+        
+        for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceAdd; i++)
+        {
+            targetControlTBs[i]->setBounds(resonanceBox1.removeFromTop(gComponentToggleBoxHeight));
+            targetControlTBs[i]->setVisible(true);
+            resonanceBox1.removeFromTop(gYSpacing);
+        }
+        
+        Rectangle<int> resonanceBox2 = secondColumn.removeFromTop((gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
+        Rectangle<int> resonanceGroup2 = resonanceBox2;
+        resonanceBox2.removeFromTop(4 * gYSpacing);
+        resonanceBox2.removeFromLeft(gXSpacing);
+        for (int i = TargetTypeResonanceRing; i <= TargetTypeResonanceRing; i++)
+        {
+            targetControlTBs[i]->setBounds(resonanceBox2.removeFromTop(gComponentToggleBoxHeight));
+            targetControlTBs[i]->setVisible(true);
+            resonanceBox2.removeFromTop(gYSpacing);
+        }
+        resonanceTBGroup.setBounds(resonanceGroup1.getX(),
+                                    resonanceGroup1.getY(),
+                                    resonanceGroup2.getWidth() +
+                                    resonanceGroup1.getWidth(),
+                                    resonanceGroup1.getHeight());
+       resonanceTBGroup.setVisible(true);
         // Synchronic Targets
         //        leftColumn.removeFromTop(10 * gYSpacing * processor.paddingScalarY);
         Rectangle<int> synchronicBox1 = leftColumn.removeFromTop((TargetTypeSynchronicClear - TargetTypeSynchronic + 1) * (gComponentToggleBoxHeight + gYSpacing) + 5 * gYSpacing);
@@ -613,6 +656,9 @@ void KeymapViewController::displayTab(int tab)
                                     blendronicGroup1.getWidth(),
                                     blendronicGroup1.getHeight());
         blendronicTBGroup.setVisible(true);
+        
+        
+        
     }
 	else if (tab == 1)
     {
@@ -816,6 +862,9 @@ void KeymapViewController::displayTab(int tab)
         
         sustainPedalKeysToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
         sustainPedalKeysToggle.setVisible(true);
+        
+        toggleKeysToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
+        toggleKeysToggle.setVisible(true);
     }
 }
 
@@ -915,6 +964,7 @@ void KeymapViewController::invisible()
     midiEditToggle.setVisible(false);
     harMidiEditToggle.setVisible(false);
     harArrayMidiEditToggle.setVisible(false);
+    toggleKeysToggle.setVisible(false);
     keymapL.setVisible(false);
     keymapTF.setVisible(false);
     
@@ -954,7 +1004,7 @@ void KeymapViewController::invisible()
     blendronicTBGroup.setVisible(false);
     tuningTBGroup.setVisible(false);
     tempoTBGroup.setVisible(false);
-
+    resonanceTBGroup.setVisible(false);
     actionButton.setVisible(false);
 
     endKeystrokesToggle.setVisible(false);
@@ -1435,6 +1485,14 @@ void KeymapViewController::bkButtonClicked (Button* b)
         keymap->setInverted(invertOnOffToggle.getToggleState());
         processor.updateState->editsMade = true;
     }
+    else if (b == &toggleKeysToggle)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setIsToggle(toggleKeysToggle.getToggleState());
+        processor.updateState->editsMade = true;
+        update();
+
+    }
     /*
     else if (b == &enableHarmonizerToggle)
     {
@@ -1663,6 +1721,7 @@ void KeymapViewController::update(void)
         //harKey = km->getHarKey();
 
         selectCB.setSelectedId(processor.updateState->currentKeymapId, dontSendNotification);
+        toggleKeysToggle.setToggleState(km->getIsToggle(), dontSendNotification);
         invertOnOffToggle.setToggleState(km->isInverted(), dontSendNotification);
         midiEditToggle.setToggleState(km->getMidiEdit(), dontSendNotification);
         harMidiEditToggle.setToggleState(km->getHarMidiEdit(), dontSendNotification);
@@ -1691,11 +1750,41 @@ void KeymapViewController::update(void)
         velocityCurveGraph.setVelocityInvert(km->getVelocityInvert());
         velocityCurveGraph.repaint();
         
+        
         for (int i=TargetTypeDirect; i<=TargetTypeBlendronicOpenCloseOutput; i++)
         {
             targetControlTBs[i]->setToggleState(km->getTargetStates()[i], dontSendNotification);
         }
+        
+        if (toggleKeysToggle.getToggleState())
+        {
+            invertOnOffToggle.setAlpha(gDim);
+            endKeystrokesToggle.setAlpha(gDim);
+            ignoreSustainToggle.setAlpha(gDim);
+            sustainPedalKeysToggle.setAlpha(gDim);
+            km->setIgnoreSustain(true);
+            ignoreSustainToggle.setToggleState(true, dontSendNotification);
+            invertOnOffToggle.setEnabled(false);
+            endKeystrokesToggle.setEnabled(false);
+            ignoreSustainToggle.setEnabled(false);
+            sustainPedalKeysToggle.setEnabled(false);
+            
+        } else
+        {
+            invertOnOffToggle.setAlpha(gBright);
+            endKeystrokesToggle.setAlpha(gBright);
+            ignoreSustainToggle.setAlpha(gBright);
+            sustainPedalKeysToggle.setAlpha(gBright);
+            km->setIgnoreSustain(false);
+            ignoreSustainToggle.setToggleState(false, dontSendNotification);
+            invertOnOffToggle.setEnabled(true);
+            endKeystrokesToggle.setEnabled(true);
+            //ignoreSustainToggle.setState(false);
+            ignoreSustainToggle.setEnabled(true);
+            sustainPedalKeysToggle.setEnabled(true);
+        }
     }
+    
     
     updateTargets();
     
@@ -1916,6 +2005,27 @@ void KeymapViewController::updateTargets()
             }
             
             nostalgicTBGroup.setAlpha(gMedium);
+        }
+       //ADDING RESONANce
+        if (kmItem->getConnectionsOfType(PreparationTypeResonance).size() == 0)
+        {
+            for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; i++)
+            {
+                targetControlTBs[i]->setAlpha(gDim);
+                targetControlTBs[i]->setEnabled(false);
+                targetControlTBs[i]->setToggleState(false, sendNotification);
+            }
+            resonanceTBGroup.setAlpha(gDim);
+        }
+        else
+        {
+            for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; i++)
+            {
+                targetControlTBs[i]->setAlpha(gBright);
+                targetControlTBs[i]->setEnabled(true);
+                targetControlTBs[i]->setToggleState(km->getTargetStates()[i], dontSendNotification);
+            }
+            resonanceTBGroup.setAlpha(gMedium);
         }
     }
 }

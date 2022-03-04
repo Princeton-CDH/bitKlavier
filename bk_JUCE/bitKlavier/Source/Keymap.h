@@ -234,7 +234,7 @@ public:
         keysave.setProperty(ptagKeymap_endKeystrokes, allNotesOff ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_sustainPedalKeys, sustainPedalKeys ? 1 : 0, 0);
-        
+        keysave.setProperty(ptagKeymap_toggleKey, isToggle ? 1 : 0, 0);
         //keysave.setProperty(ptagKeymap_extendRange, rangeExtend, 0);
         keysave.setProperty(ptagKeymap_asymmetricalWarp, asym_k, 0);
         keysave.setProperty(ptagKeymap_symmetricalWarp, sym_k, 0);
@@ -287,7 +287,7 @@ public:
         targetStates.setUnchecked(TargetTypeDirect, true);
         targetStates.setUnchecked(TargetTypeTempo, true);
         targetStates.setUnchecked(TargetTypeTuning, true);
-        targetStates.setUnchecked(TargetTypeResonance, true);
+
         
         inverted = e->getStringAttribute(ptagKeymap_inverted).getIntValue();
         
@@ -351,7 +351,7 @@ public:
         setAllNotesOff((bool) e->getIntAttribute(ptagKeymap_endKeystrokes, 0));
         setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
         setSustainPedalKeys((bool) e->getIntAttribute(ptagKeymap_sustainPedalKeys, 0));
-        
+        setIsToggle((bool)e->getIntAttribute(ptagKeymap_toggleKey, 0));
         // Not sure what value the second argument needs to be. Right now I'm using the default values, but these are the values that bK uses for velocity curving before the view controller is opened and the values update to what they were saved to be.
         //rangeExtend = (float) e->getDoubleAttribute(ptagKeymap_extendRange, 4);
         asym_k = (float) e->getDoubleAttribute(ptagKeymap_asymmetricalWarp, 1);
@@ -600,6 +600,13 @@ public:
     inline void setSustainPedalKeys(bool toSet) { sustainPedalKeys = toSet; }
     inline void toggleSustainPedalKeys() { sustainPedalKeys = !sustainPedalKeys; }
     
+    inline bool getIsToggle() { return isToggle; }
+    inline void setIsToggle(bool toSet) { isToggle = toSet; }
+    inline void toggleIsToggle() { isToggle = !isToggle; }
+    
+    inline bool getToggleState(int noteNumber) { return triggered.getUnchecked(noteNumber); }
+    //inline bool setToggleState(bool toSet) { trigger.setUnchecked(); }
+    inline void toggleToggleState(int noteNumber) { triggered.setUnchecked(noteNumber, !triggered.getUnchecked(noteNumber)); }
     // Velocity Curving getters & setters
     //inline float getRangeExtend() { return rangeExtend; }
     inline float getAsym_k() { return asym_k; }
@@ -639,6 +646,8 @@ private:
     bool harArrayMidiEdit;
     
     bool inverted;
+    bool isToggle;
+    Array<bool> toggleState;
     
     Array<bool> triggered;
     

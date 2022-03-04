@@ -42,6 +42,8 @@ public:
     BKAbsoluteKeyboardSlider gainsKeyboard;
     BKAbsoluteKeyboardSlider offsetsKeyboard;
     
+    
+    
     //Array<bool> isActive;
     //bool isActive[52];
 
@@ -49,11 +51,15 @@ public:
 
     BKKeymapKeyboardState resonanceKeyboardState;
     BKKeymapKeyboardState fundamentalKeyboardState;
+    BKKeymapKeyboardState addKeyboardState;
+    BKKeymapKeyboardState ringKeyboardState;
     
     OwnedArray<ToggleButton> fundamentalButtons;
     
     std::unique_ptr<BKKeymapKeyboardComponent> closestKeyboard;
     std::unique_ptr<BKKeymapKeyboardComponent> fundamentalKeyboard;
+    std::unique_ptr<BKKeymapKeyboardComponent> addKeyboard;
+    std::unique_ptr<BKKeymapKeyboardComponent> ringKeyboard;
     //BKAbsoluteKeyboardSlider closestKeyboard;
     //BKAbsoluteKeyboardSlider fundamentalKeyboard;
 
@@ -75,7 +81,8 @@ public:
     BKLabel fundamentalLabel;
     BKLabel gainsLabel;
     BKLabel offsetsLabel;
-
+    BKLabel addLabel;
+    BKLabel ringLabel;
 
     void paint(Graphics&) override;
     void resized() override;
@@ -84,9 +91,9 @@ public:
 
     virtual void update(void) {};
 
-#if JUCE_IOS
-    void iWantTheBigOne(TextEditor*, String name) override;
-#endif
+//#if JUCE_IOS
+//    void iWantTheBigOne(TextEditor*, String name) override;
+//#endif
 
     void displayTab(int tab) override;
     void displayShared(void) override;
