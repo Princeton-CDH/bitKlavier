@@ -1678,6 +1678,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         }
         
         //updateComponentVisibility();
+        displayTab(currentTab);
         
     }
     else if (box == &adaptiveSystemsCB)
