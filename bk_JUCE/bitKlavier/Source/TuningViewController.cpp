@@ -475,6 +475,7 @@ void TuningViewController::invisible(void)
     exportButton->setVisible(false);
     resetButton->setVisible(false);
     applyButton->setVisible(false);
+    applyKBMButton->setVisible(false);
 }
 
 void TuningViewController::displayShared(void)
@@ -832,13 +833,53 @@ void TuningViewController::displayTab(int tab)
         resetButton->setVisible(true);
         sclTextEditor->setVisible(true);
         kbmTextEditor->setVisible(true);
-        applyKBMButton->setBounds(400, 50, 78, 24);
-        exportButton->setBounds (10, 50, 78, 24);
-        importButton->setBounds (94, 50, 78, 24);
-        applyButton->setBounds (178, 50, 78, 24);
-        resetButton->setBounds (262, 50, 78, 24);
-        sclTextEditor->setBounds(100, 100, 200, 300);
-        kbmTextEditor->setBounds(400, 100, 200, 300);
+        Rectangle<int> area (getBounds());
+        area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
+        area.removeFromRight(rightArrow.getWidth());
+        area.removeFromLeft(leftArrow.getWidth());
+        
+        Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth()* 0.5));
+        Rectangle<int> rightColumn (area);
+        //leftColumn.removeFromLeft(leftArrow.getWidth());
+        
+        //leftColumn.removeFromRight(processor.paddingScalarX * 20);
+        //leftColumn.removeFromLeft(processor.paddingScalarX * 20);
+        
+        leftColumn.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+        leftColumn.removeFromRight(gXSpacing);
+        rightColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+        rightColumn.removeFromLeft(gXSpacing * 2);
+        Rectangle<int> button = leftColumn.removeFromTop(gComponentComboBoxHeight);
+       
+        int tempwidth = button.getWidth() / 4.0;
+        
+        applyButton->setBounds(button.removeFromLeft(tempwidth));
+        button.removeFromLeft(gXSpacing);
+        importButton->setBounds(button.removeFromLeft(tempwidth));
+        button.removeFromLeft(gXSpacing);
+        exportButton->setBounds(button.removeFromLeft(tempwidth));
+        button.removeFromLeft(gXSpacing);
+        resetButton->setBounds(button.removeFromLeft(tempwidth));
+        leftColumn.removeFromBottom(2 * gYSpacing);
+        leftColumn.removeFromTop(2 * gYSpacing);
+        sclTextEditor->setBounds(leftColumn);
+        
+        button = rightColumn.removeFromTop(gComponentComboBoxHeight);
+        tempwidth = button.getWidth() / 4.0;
+        
+        applyKBMButton->setBounds(button.removeFromLeft(tempwidth));
+        
+        rightColumn.removeFromBottom(2 * gYSpacing);
+        rightColumn.removeFromTop(2 * gYSpacing);
+        kbmTextEditor->setBounds(rightColumn);
+//        applyButton->setBounds(
+//        applyKBMButton->setBounds(400, 50, 78, 24);
+//        exportButton->setBounds (10, 50, 78, 24);
+//        importButton->setBounds (94, 50, 78, 24);
+//        applyButton->setBounds (178, 50, 78, 24);
+//        resetButton->setBounds (262, 50, 78, 24);
+//        sclTextEditor->setBounds(100, 100, 200, 300);
+//        kbmTextEditor->setBounds(400, 100, 200, 300);
     }
     
     repaint();
