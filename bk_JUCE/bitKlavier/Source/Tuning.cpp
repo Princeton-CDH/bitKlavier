@@ -413,7 +413,7 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
         offsets.ensureStorageAllocated(127);
         for(int i = 0; i <= 127; i++)
         {
-            offsets.set(i,(ftom(scala.frequencyForMidiNote(i))- i) * 100.f);
+            offsets.set(i,(ftom(interp.frequencyForMidiNote(i))- i) * 100.f);
         }
         prep->setAbsoluteOffsetCents(offsets);
     } else
@@ -423,7 +423,7 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
         Tunings::Scale et = Tunings::evenTemperament12NoteScale();
         for (int i = 0; i < 12; i++)
         {
-            float freq = interp.frequencyForMidiNote(scala.keyboardMapping.middleNote + i);
+            float freq = interp.frequencyForMidiNote(interp.keyboardMapping.middleNote + i);
             float a = ftom(freq);
             float micro = (a - (interp.keyboardMapping.middleNote + i)) * 100.f;
 //            float equal = et.tones[(i+1)%12].cents;
