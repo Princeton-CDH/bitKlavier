@@ -499,7 +499,7 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     ADSRSlider->addMyListener(this);
     resonanceKeyboardState.addListener(this);
     fundamentalKeyboardState.addListener(this);
-
+    addKeyboardState.addListener(this);
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
     
@@ -957,6 +957,21 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
         //DBG("fundamental key toggled " + String(midiNoteNumber));
     }
     
+    else if (source == &addKeyboardState )
+    {
+        ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
+        if (prep->rActiveHeldKeys.arrayContains(midiNoteNumber))
+        {
+            // clear this held string's partial
+            prep->rActiveHeldKeys.arrayRemoveAllInstancesOf(midiNoteNumber);
+            proc->removeSympStrings(midiNoteNumber, 0);
+        } else
+        {
+            proc->addSympStrings(midiNoteNumber, 127);
+        }
+           
+        addKeyboard->setKeysInKeymap(prep->rActiveHeldKeys.value);
+    }
     update();
 
 }
@@ -1000,6 +1015,8 @@ ResonanceViewController(p, theGraph)
     //fundamentalKeyboard->addMyListener(this);
     resonanceKeyboardState.addListener(this);
     fundamentalKeyboardState.addListener(this);
+    
+    addKeyboardState.addListener(this);
     
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);

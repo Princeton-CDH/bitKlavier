@@ -53,7 +53,8 @@ public:
         rResonanceKeys(r->rResonanceKeys),
         rOffsetsKeys(r->rOffsetsKeys),
         rGainsKeys(r->rGainsKeys),
-        name(r->name)
+        name(r->name),
+        rActiveHeldKeys({})
     {
         setDefaultPartialStructure();
     }
@@ -76,7 +77,8 @@ public:
         rResonanceKeys({}),
         rOffsetsKeys({}),
         rGainsKeys({}),
-        name(newName)
+        name(newName),
+        rActiveHeldKeys({})
     {
         setDefaultPartialStructure();
     }
@@ -98,7 +100,8 @@ public:
     rFundamentalKey(0),
     rResonanceKeys({}),
     rOffsetsKeys({}),
-    rGainsKeys({})
+    rGainsKeys({}),
+    rActiveHeldKeys({})
     {
         setDefaultPartialStructure();
     }
@@ -122,7 +125,7 @@ public:
         rResonanceKeys          = r->rResonanceKeys;
         rOffsetsKeys            = r->rOffsetsKeys;
         rGainsKeys              = r->rGainsKeys;
-        
+        rActiveHeldKeys         = r->rActiveHeldKeys;
     }
 
     void performModification(ResonanceModification* r, Array<bool> dirty);
@@ -145,7 +148,8 @@ public:
                 rFundamentalKey         == r->rFundamentalKey &&
                 rResonanceKeys          == r->rResonanceKeys &&
                 rOffsetsKeys            == r->rOffsetsKeys &&
-                rGainsKeys              == r->rGainsKeys
+                rGainsKeys              == r->rGainsKeys &&
+                rActiveHeldKeys         == r->rActiveHeldKeys
                 );
 
     }
@@ -193,6 +197,7 @@ public:
         rResonanceKeys.step();
         rOffsetsKeys.step();
         rGainsKeys.step();
+        rActiveHeldKeys.step();
     }
     
     void resetModdables()
@@ -214,6 +219,7 @@ public:
         rResonanceKeys.reset();
         rOffsetsKeys.reset();
         rGainsKeys.reset();
+        rActiveHeldKeys.reset();
     }
 
     //accessors
@@ -368,6 +374,22 @@ public:
         updatePartialStructure();
     }
     
+    void setHeldKeys(Array<int> no)
+    {
+        for (int i : no)
+        {
+            if(!rActiveHeldKeys.arrayContains(i))
+                rActiveHeldKeys.addArrayValue(i);
+        }
+        
+    }
+    
+    
+    void addHeldKey(int no)
+    {
+        if(!rActiveHeldKeys.arrayContains(no))
+            rActiveHeldKeys.addArrayValue(no);
+    }
     int getFundamentalKey() { return rFundamentalKey.value; }
     Array<int> getResonanceKeys() { return rResonanceKeys.value; }
     Array<Array<float>> getPartialStructure() { return partialStructure; }
@@ -468,7 +490,7 @@ public:
         rResonanceKeys.getState(prep, StringArray(vtagResonance_resonanceKeys, ptagInt));
         rOffsetsKeys.getState(prep, StringArray(vtagResonance_offsets, ptagFloat));
         rGainsKeys.getState(prep, StringArray(vtagResonance_gains, ptagFloat));
-
+        rActiveHeldKeys.getState(prep, StringArray(vtagResonance_add, ptagInt));
         return prep;
     }
 
@@ -503,7 +525,7 @@ public:
         rOffsetsKeys.setState(e, StringArray(vtagResonance_offsets, ptagFloat), 0.);
         DBG("after setState - rOffsetsKeys: " + floatArrayToString(rOffsetsKeys.value));
         rGainsKeys.setState(e, StringArray(vtagResonance_gains, ptagFloat), 1.);
-        
+        rActiveHeldKeys.setState(e, StringArray(vtagResonance_add, ptagInt), 0);
         updatePartialStructure();
     }
     
@@ -533,6 +555,9 @@ public:
     Moddable<Array<float>> rOffsetsKeys;
     Moddable<Array<float>> rGainsKeys;
     
+    //
+
+    
     inline const int getMinStartTime() const noexcept { return rMinStartTimeMS.value; }
     inline const int getMaxStartTime() const noexcept { return rMaxStartTimeMS.value; }
     inline const int getMaxSympStrings() const noexcept { return rMaxSympStrings.value; }
@@ -546,8 +571,8 @@ public:
     // => current strings
     // A queue to store the currently active notes in sympStrings
     // so we can remove the oldest one when we exceed maxSympStrings
-    Array<int> activeHeldKeys;
-    Array<int> getHeldKeys() {return activeHeldKeys;}
+    Moddable<Array<int>> rActiveHeldKeys;
+    Array<int> getHeldKeys() {return rActiveHeldKeys.value;};
     Array<int> getRingingStrings();
     BKSynthesiser*              synth;
 private:
@@ -785,6 +810,8 @@ public:
         return blendronic;
     }
 
+    void addSympStrings(int noteNumber, float velocity);
+    void removeSympStrings(int noteNumber, float velocity);
     Array<int> getSympStrings();
 private:
     CriticalSection lock;
@@ -800,8 +827,8 @@ private:
     
     // basic API
     void ringSympStrings(int noteNumber, float velocity);
-    void addSympStrings(int noteNumber, float velocity);
-    void removeSympStrings(int noteNumber, float velocity);
+    
+    
     // => sympStrings
     // data structure for pointing to all of the undamped strings and their partials
     //      outside map is indexed by held note (midiNoteNumber), inside array resizes depending on the number of partials
