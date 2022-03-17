@@ -367,7 +367,7 @@ void Tuning::loadKBMFile(std::string fname)
 void Tuning::loadScalaScale(Tunings::Scale& s)
 {
     auto scala = Tunings::Tuning(s, currentKBM,true).withSkippedNotesInterpolated();
-    currentScalaString = s.rawText;
+    currentScalaString = scala.scale.rawText;
     auto offsets = Array<float>(12);
     
     if (s.count != 12)
@@ -404,6 +404,7 @@ void Tuning::loadScalaScale(Tunings::Scale& s)
             offsets.set(i,0);
         }
         prep->setAbsoluteOffsetCents(offsets);
+        isAbsoluteTuning = false;
     }
     //put tuning name in TuningLibrary
     for (int i = 0; i <= 127; i++)
@@ -427,6 +428,7 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
     {
         offsets.set(i,0);
     }
+    currentScalaString = scala.scale.rawText;
     prep->setAbsoluteOffsetCents(offsets);
    // auto interp = scala.withSkippedNotesInterpolated();
     
@@ -468,6 +470,7 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
             offsets.set(i,0);
         }
         prep->setAbsoluteOffsetCents(offsets);
+        isAbsoluteTuning = false;
     }
     
     for (int i = 0; i <= 127; i++)

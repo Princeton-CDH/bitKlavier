@@ -858,7 +858,7 @@ void TuningViewController::displayTab(int tab)
         importButton->setBounds(button.removeFromLeft(tempwidth));
         button.removeFromLeft(gXSpacing);
         
-        button.removeFromLeft(gXSpacing);
+       
         resetButton->setBounds(button.removeFromLeft(tempwidth));
         leftColumn.removeFromBottom(2 * gYSpacing);
         leftColumn.removeFromTop(2 * gYSpacing);
@@ -868,6 +868,7 @@ void TuningViewController::displayTab(int tab)
         tempwidth = button.getWidth() / 4.0;
         
         applyKBMButton->setBounds(button.removeFromLeft(tempwidth));
+        button.removeFromLeft(gXSpacing);
         importKBMButton->setBounds(button.removeFromLeft(tempwidth));
         rightColumn.removeFromBottom(2 * gYSpacing);
         rightColumn.removeFromTop(2 * gYSpacing);
@@ -2247,6 +2248,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         }
         tuning->loadKBM(tuning->currentKBM);
         tuning->currentKBMString = kbmTextEditor->getText();
+        
         update();
     }
     else {
