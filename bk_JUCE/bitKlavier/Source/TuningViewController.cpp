@@ -2215,6 +2215,14 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     } else if (b == resetButton.get())
     {
         sclTextEditor->setText(Tunings::evenTemperament12NoteScale().rawText);
+        tuning->currentScale = Tunings::evenTemperament12NoteScale();
+        tuning->currentScalaString = sclTextEditor->getText();
+        tuning->currentKBM = Tunings::KeyboardMapping();
+        tuning->currentKBMString = sclTextEditor->getText();
+        kbmTextEditor->setText(Tunings::KeyboardMapping().rawText);
+        tuning->loadScalaScale(tuning->currentScale);
+        tuning->prep->setScale(EqualTemperament);
+        update();
     } else if (b == applyButton.get())
     {
         try {

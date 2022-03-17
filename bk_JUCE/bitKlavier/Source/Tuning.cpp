@@ -355,16 +355,16 @@ void Tuning::loadScalaScale(Tunings::Scale& s)
     auto scala = Tunings::Tuning(s, currentKBM,true).withSkippedNotesInterpolated();
     currentScalaString = s.rawText;
     auto offsets = Array<float>(12);
-
+    
     if (s.count != 12)
     {
         isAbsoluteTuning = true;
         prep->tFundamental.setValue(C);
         prep->tFundamentalOffset.setValue(0.);
         prep->setScale(EqualTemperament);
-        Array<float> offsets;
+        //Array<float> offsets;
         offsets.ensureStorageAllocated(127);
-        for(int i = 0; i <= 127; i++)
+        for (int i = 0; i <= 127; i++)
         {
             offsets.set(i,(ftom(scala.frequencyForMidiNote(i))- i) * 100.f);
         }
@@ -384,7 +384,12 @@ void Tuning::loadScalaScale(Tunings::Scale& s)
         prep->tFundamentalOffset.setValue(0.);
         prep->tCustom.setValue(offsets);
         prep->setScale(CustomTuning);
-        
+        offsets.ensureStorageAllocated(127);
+        for (int i = 0; i <= 127; i++)
+        {
+            offsets.set(i,0);
+        }
+        prep->setAbsoluteOffsetCents(offsets);
     }
     //put tuning name in TuningLibrary
     for (int i = 0; i <= 127; i++)
@@ -403,7 +408,11 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
         AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("KBM Loading Error"), TRANS(t.what()));
         return;
     }
-    
+    for (int i = 0; i <= 127; i++)
+    {
+        offsets.set(i,0);
+    }
+    prep->setAbsoluteOffsetCents(offsets);
    // auto interp = scala.withSkippedNotesInterpolated();
     
     if (currentScale.count != 12)
@@ -438,7 +447,12 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
         prep->tFundamentalOffset.setValue(0.);
         prep->tCustom.setValue(offsets);
         prep->setScale(CustomTuning);
-        
+        offsets.ensureStorageAllocated(127);
+        for (int i = 0; i <= 127; i++)
+        {
+            offsets.set(i,0);
+        }
+        prep->setAbsoluteOffsetCents(offsets);
     }
     
     for (int i = 0; i <= 127; i++)
