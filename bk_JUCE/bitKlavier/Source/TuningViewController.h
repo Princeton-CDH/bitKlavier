@@ -136,12 +136,28 @@ protected:
     std::unique_ptr<BKTextEditor> kbmTextEditor;
     std::unique_ptr<BKTextButton> applyButton;
     std::unique_ptr<BKTextButton> importButton;
-    std::unique_ptr<BKTextButton> exportButton;
+    std::unique_ptr<BKTextButton> importKBMButton;
     std::unique_ptr<BKTextButton> resetButton;
     std::unique_ptr<BKTextButton> applyKBMButton;
     virtual void bkTextFieldDidChange (TextEditor&) override;
     void textEditorEscapeKeyPressed (TextEditor& tf) override;
     std::unique_ptr<FileChooser> chooser;
+    String lastFile;
+    void setLastFile (const FileChooser& fc)
+    {
+        lastFile = fc.getResult().getFullPathName();
+    }
+
+    File getLastFile() const
+    {
+        File f = File::getSpecialLocation (File::userDocumentsDirectory);;
+
+        if(!lastFile.isEmpty())
+            f = File(lastFile);
+        
+
+        return f;
+    }
 private:
   
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningViewController)

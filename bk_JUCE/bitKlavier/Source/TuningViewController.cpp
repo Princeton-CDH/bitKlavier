@@ -307,10 +307,10 @@ absoluteKeyboard(false, false)
     importButton->setButtonText (TRANS("Import"));
    // importButton->addListener (this);
 
-    exportButton.reset(new BKTextButton());
-    addAndMakeVisible (exportButton.get());
-    exportButton->setButtonText (TRANS("Export"));
-   // exportButton->addListener (this);
+    importKBMButton.reset(new BKTextButton());
+    addAndMakeVisible (importKBMButton.get());
+    importKBMButton->setButtonText (TRANS("Import"));
+   // importKBMButton->addListener (this);
 
     resetButton.reset(new BKTextButton());
     addAndMakeVisible (resetButton.get());
@@ -358,7 +358,7 @@ absoluteKeyboard(false, false)
 //            tuning->loadScalaFile(myFile.getFullPathName().toStdString());
 //        }
 //
-//    } else if (b == exportButton.get())
+//    } else if (b == importKBMButton.get())
 //    {
 //        try {
 //            Tunings::parseSCLData(tuning->currentScalaString.toStdString());
@@ -472,7 +472,7 @@ void TuningViewController::invisible(void)
     kbmTextEditor->setVisible(false);
     
     importButton->setVisible(false);
-    exportButton->setVisible(false);
+    importKBMButton->setVisible(false);
     resetButton->setVisible(false);
     applyButton->setVisible(false);
     applyKBMButton->setVisible(false);
@@ -829,7 +829,7 @@ void TuningViewController::displayTab(int tab)
         applyButton->setVisible(true);
         applyKBMButton->setVisible(true);
         importButton->setVisible(true);
-        exportButton->setVisible(true);
+        importKBMButton->setVisible(true);
         resetButton->setVisible(true);
         sclTextEditor->setVisible(true);
         kbmTextEditor->setVisible(true);
@@ -857,7 +857,7 @@ void TuningViewController::displayTab(int tab)
         button.removeFromLeft(gXSpacing);
         importButton->setBounds(button.removeFromLeft(tempwidth));
         button.removeFromLeft(gXSpacing);
-        exportButton->setBounds(button.removeFromLeft(tempwidth));
+        
         button.removeFromLeft(gXSpacing);
         resetButton->setBounds(button.removeFromLeft(tempwidth));
         leftColumn.removeFromBottom(2 * gYSpacing);
@@ -868,13 +868,13 @@ void TuningViewController::displayTab(int tab)
         tempwidth = button.getWidth() / 4.0;
         
         applyKBMButton->setBounds(button.removeFromLeft(tempwidth));
-        
+        importKBMButton->setBounds(button.removeFromLeft(tempwidth));
         rightColumn.removeFromBottom(2 * gYSpacing);
         rightColumn.removeFromTop(2 * gYSpacing);
         kbmTextEditor->setBounds(rightColumn);
 //        applyButton->setBounds(
 //        applyKBMButton->setBounds(400, 50, 78, 24);
-//        exportButton->setBounds (10, 50, 78, 24);
+//        importKBMButton->setBounds (10, 50, 78, 24);
 //        importButton->setBounds (94, 50, 78, 24);
 //        applyButton->setBounds (178, 50, 78, 24);
 //        resetButton->setBounds (262, 50, 78, 24);
@@ -1451,7 +1451,7 @@ TuningViewController(p, theGraph)
     importButton->addListener(this);
     applyButton->addListener(this);
     applyKBMButton->addListener(this);
-    exportButton->addListener(this);
+    importKBMButton->addListener(this);
     resetButton->addListener(this);
     adaptiveSystemsCB.addListener(this);
     rateSlider->addMyListener(this);
@@ -2174,11 +2174,12 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     } else if (b == importButton.get())
     {
         FileChooser myChooser ("Load tuning from .scl file...",
-                               File::getSpecialLocation (File::userHomeDirectory),
+                               getLastFile(),
                                "*.scl");
         
         if (myChooser.browseForFileToOpen())
         {
+            setLastFile(myChooser);
             File myFile (myChooser.getResult());
 
             //File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
@@ -2192,7 +2193,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         }
         
        
-    } else if (b == exportButton.get())
+    } else if (b == importKBMButton.get())
     {
         try {
             Tunings::parseSCLData(tuning->currentScalaString.toStdString());
@@ -2201,17 +2202,19 @@ void TuningPreparationEditor::buttonClicked (Button* b)
             return;
         }
         
-        chooser  = std::make_unique<FileChooser>("Export tuning to .scl file...",
-                        File::getSpecialLocation(File::userDocumentsDirectory), "*.scl");
-        chooser->launchAsync(FileBrowserComponent::saveMode, [this](const FileChooser& chooser)
-                       {
-            MemoryBlock data(sclTextEditor->getText().toUTF8(),sclTextEditor->getText().length() );
-            if (!chooser.getResult().replaceWithData (data.getData(), data.getSize()))
-                AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                                  TRANS("Error whilst saving"),
-                                                  TRANS("Couldn't write to the specified file!"));
-            
-        });
+        FileChooser myChooser ("Load keyboard mapping from kbm file...",
+                               getLastFile(),
+                               "*.kbm");
+        
+        if (myChooser.browseForFileToOpen())
+        {
+            setLastFile(myChooser);
+            File myFile (myChooser.getResult());
+            tuning->loadKBMFile(myFile.getFullPathName().toStdString());
+            processor.gallery->setGalleryDirty(true);
+            kbmTextEditor->setText(tuning->currentKBMString);
+            update();
+        }
     } else if (b == resetButton.get())
     {
         sclTextEditor->setText(Tunings::evenTemperament12NoteScale().rawText);

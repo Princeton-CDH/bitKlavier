@@ -721,6 +721,7 @@ public:
     void loadScalaFile(std::string fname);
     void loadScalaScale(Tunings::Scale& s);
     void loadKBM(Tunings::KeyboardMapping& kbm);
+    void loadKBMFile(std::string fname);
     String currentScalaString;
     bool isAbsoluteTuning;
     String currentKBMString;

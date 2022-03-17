@@ -351,6 +351,19 @@ void Tuning::loadScalaFile(std::string fname)
     loadScalaScale(s);
 }
 
+void Tuning::loadKBMFile(std::string fname)
+{
+    Tunings::KeyboardMapping kbm;
+    try {
+        kbm = Tunings::readKBMFile(fname);
+    } catch (Tunings::TuningError t) {
+        AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("KBM Loading Error"), TRANS(t.what()));
+        return;
+    }
+    currentKBM = kbm;
+    loadKBM(kbm);
+}
+
 void Tuning::loadScalaScale(Tunings::Scale& s)
 {
     auto scala = Tunings::Tuning(s, currentKBM,true).withSkippedNotesInterpolated();
@@ -402,6 +415,7 @@ void Tuning::loadScalaScale(Tunings::Scale& s)
 void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
 {
     Tunings::Tuning scala;
+    currentKBMString = kbm.rawText;
     auto offsets = Array<float>(12);
     try {
         scala = Tunings::Tuning(currentScale, kbm,true).withSkippedNotesInterpolated();
