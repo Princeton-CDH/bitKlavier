@@ -446,9 +446,9 @@ inline KeyboardMapping parseKBMData(const std::string &d)
     return res;
 }
 
-inline Tuning::Tuning() : Tunings::Tuning(evenTemperament12NoteScale(), KeyboardMapping()) {}
-inline Tuning::Tuning(const Scale &s) : Tunings::Tuning(s, KeyboardMapping()) {}
-inline Tuning::Tuning(const KeyboardMapping &k) : Tuning(evenTemperament12NoteScale(), k) {}
+inline Tuning::Tuning() : Tuning::Tuning(evenTemperament12NoteScale(), KeyboardMapping()) {}
+inline Tuning::Tuning(const Scale &s) : Tuning::Tuning(s, KeyboardMapping()) {}
+inline Tuning::Tuning(const KeyboardMapping &k) : Tuning::Tuning(evenTemperament12NoteScale(), k) {}
 
 inline Tuning::Tuning(const Scale &s, const KeyboardMapping &k, bool allowTuningCenterOnUnmapped)
     : allowTuningCenterOnUnmapped(allowTuningCenterOnUnmapped)

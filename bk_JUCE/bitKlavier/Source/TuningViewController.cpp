@@ -2214,7 +2214,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         });
     } else if (b == resetButton.get())
     {
-        sclTextEditor->setText(tuning->currentScalaString);
+        sclTextEditor->setText(Tunings::evenTemperament12NoteScale().rawText);
     } else if (b == applyButton.get())
     {
         try {

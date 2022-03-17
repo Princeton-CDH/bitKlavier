@@ -352,7 +352,7 @@ void Tuning::loadScalaFile(std::string fname)
 
 void Tuning::loadScalaScale(Tunings::Scale& s)
 {
-    auto scala = Tunings::Tuning(s, currentKBM);
+    auto scala = Tunings::Tuning(s, currentKBM,true).withSkippedNotesInterpolated();
     currentScalaString = s.rawText;
     auto offsets = Array<float>(12);
 
@@ -387,7 +387,10 @@ void Tuning::loadScalaScale(Tunings::Scale& s)
         
     }
     //put tuning name in TuningLibrary
-
+    for (int i = 0; i <= 127; i++)
+    {
+        DBG(String(i) + " : " + String(scala.frequencyForMidiNote(i)));
+    }
 }
 
 void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
@@ -395,13 +398,13 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
     Tunings::Tuning scala;
     auto offsets = Array<float>(12);
     try {
-        scala = Tunings::Tuning(currentScale, kbm, true);
+        scala = Tunings::Tuning(currentScale, kbm,true).withSkippedNotesInterpolated();
     }  catch (Tunings::TuningError t) {
         AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("KBM Loading Error"), TRANS(t.what()));
         return;
     }
     
-    auto interp = scala.withSkippedNotesInterpolated();
+   // auto interp = scala.withSkippedNotesInterpolated();
     
     if (currentScale.count != 12)
     {
@@ -413,19 +416,19 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
         offsets.ensureStorageAllocated(127);
         for(int i = 0; i <= 127; i++)
         {
-            offsets.set(i,(ftom(interp.frequencyForMidiNote(i))- i) * 100.f);
+            offsets.set(i,(ftom(scala.frequencyForMidiNote(i))- i) * 100.f);
         }
         prep->setAbsoluteOffsetCents(offsets);
     } else
     {
-        int fundamental = interp.keyboardMapping.middleNote % 12;
+        int fundamental = scala.keyboardMapping.middleNote % 12;
         //subtract from equal temperament to get fractional midi representation
         Tunings::Scale et = Tunings::evenTemperament12NoteScale();
         for (int i = 0; i < 12; i++)
         {
-            float freq = interp.frequencyForMidiNote(interp.keyboardMapping.middleNote + i);
+            float freq = scala.frequencyForMidiNote(scala.keyboardMapping.middleNote + i);
             float a = ftom(freq);
-            float micro = (a - (interp.keyboardMapping.middleNote + i)) * 100.f;
+            float micro = (a - (scala.keyboardMapping.middleNote + i)) * 100.f;
 //            float equal = et.tones[(i+1)%12].cents;
 //            float offset = micro - equal;
             offsets.set((i+1)%12,micro); //.scl format puts first interval as the first line so we shift the representation over
@@ -437,6 +440,12 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
         prep->setScale(CustomTuning);
         
     }
+    
+    for (int i = 0; i <= 127; i++)
+    {
+        DBG(String(i) + " : " + String(scala.frequencyForMidiNote(i)));
+    }
+
 }
 
 String Tuning::generateScalaString()
