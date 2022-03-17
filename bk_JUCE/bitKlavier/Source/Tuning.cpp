@@ -347,6 +347,7 @@ void Tuning::loadScalaFile(std::string fname)
         AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Scala Loading Error"), TRANS(t.what()));
         return;
     }
+    currentScale = s;
     loadScalaScale(s);
 }
 
