@@ -837,6 +837,7 @@ void TuningViewController::displayTab(int tab)
         area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
         area.removeFromRight(rightArrow.getWidth());
         area.removeFromLeft(leftArrow.getWidth());
+        Rectangle<int> resetRect = area.removeFromTop(gComponentComboBoxHeight);
         
         Rectangle<int> leftColumn (area.removeFromLeft(area.getWidth()* 0.5));
         Rectangle<int> rightColumn (area);
@@ -849,17 +850,21 @@ void TuningViewController::displayTab(int tab)
         leftColumn.removeFromRight(gXSpacing);
         rightColumn.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
         rightColumn.removeFromLeft(gXSpacing * 2);
+        
+        resetRect.removeFromLeft(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
+        resetRect.removeFromRight(gXSpacing + 2.*gPaddingConst * processor.paddingScalarX);
         Rectangle<int> button = leftColumn.removeFromTop(gComponentComboBoxHeight);
        
         int tempwidth = button.getWidth() / 4.0;
-        
+        resetRect.removeFromRight(tempwidth * 3.0);
+        resetRect.removeFromLeft(tempwidth * 3.0);
         applyButton->setBounds(button.removeFromLeft(tempwidth));
         button.removeFromLeft(gXSpacing);
         importButton->setBounds(button.removeFromLeft(tempwidth));
         button.removeFromLeft(gXSpacing);
         
-       
-        resetButton->setBounds(button.removeFromLeft(tempwidth));
+        resetButton->setBounds(resetRect);
+        
         leftColumn.removeFromBottom(2 * gYSpacing);
         leftColumn.removeFromTop(2 * gYSpacing);
         sclTextEditor->setBounds(leftColumn);
@@ -867,9 +872,9 @@ void TuningViewController::displayTab(int tab)
         button = rightColumn.removeFromTop(gComponentComboBoxHeight);
         tempwidth = button.getWidth() / 4.0;
         
-        applyKBMButton->setBounds(button.removeFromLeft(tempwidth));
-        button.removeFromLeft(gXSpacing);
-        importKBMButton->setBounds(button.removeFromLeft(tempwidth));
+        applyKBMButton->setBounds(button.removeFromRight(tempwidth));
+        button.removeFromRight(gXSpacing);
+        importKBMButton->setBounds(button.removeFromRight(tempwidth));
         rightColumn.removeFromBottom(2 * gYSpacing);
         rightColumn.removeFromTop(2 * gYSpacing);
         kbmTextEditor->setBounds(rightColumn);
