@@ -23,6 +23,30 @@
 ////////////////////////////////////////////////////////////////////////////////////
 
 class ResonanceModification;
+/*
+ SympPartial stores information about an individual partial of an undamped string
+*/
+class SympPartial : public ReferenceCountedObject
+{
+public:
+    typedef ReferenceCountedObjectPtr<SympPartial>   Ptr;
+    typedef Array<SympPartial::Ptr>                  PtrArr;
+    typedef Array<SympPartial::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<SympPartial>                  Arr;
+    typedef OwnedArray<SympPartial, CriticalSection> CSArr;
+    typedef HashMap<int, SympPartial::Ptr>           PtrMap; // not sure if this works
+
+    SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset);
+
+    int heldKey;                // midiNoteNumber for key that is held down; for the undamped string that has this partial
+    int partialKey;             // midiNoteNumber for nearest key to this partial; used to determine whether this partial gets excited
+    float gain;                 // gain multiplier for this partial
+    float offset;               // offset, in cents, from ET for this partial
+    uint64 playPosition;        // current play position for this resonance (samples)
+                                // ==> initialize to large number! perhaps 5 minutes * sampling rate, and cap it there in ProcessBlock
+
+    const uint64 maxPlayPosition = 5 * 60 * 96000; // really high number, longer than any of the samples
+};
 
 class ResonancePreparation : public ReferenceCountedObject
 {
@@ -60,7 +84,7 @@ public:
     }
 
     //constructor with input
-    ResonancePreparation(String newName, float defaultGain, float blendGain) :
+    ResonancePreparation(String newName, float defaultGain, float blendGain, int resoID) :
         rSoundSet(-1),
         rUseGlobalSoundSet(true),
         rSoundSetName(String()),
@@ -78,13 +102,14 @@ public:
         rOffsetsKeys({}),
         rGainsKeys({}),
         name(newName),
+        resoId(resoID),
         rActiveHeldKeys({})
     {
         setDefaultPartialStructure();
     }
 
     //empty constructor, values will need to be tweaked
-    ResonancePreparation(void) :
+    ResonancePreparation(int Id) :
     rSoundSet(-1),
     rUseGlobalSoundSet(true),
     rSoundSetName(String()),
@@ -101,7 +126,8 @@ public:
     rResonanceKeys({}),
     rOffsetsKeys({}),
     rGainsKeys({}),
-    rActiveHeldKeys({})
+    rActiveHeldKeys({}),
+    resoId(Id)
     {
         setDefaultPartialStructure();
     }
@@ -395,7 +421,7 @@ public:
     Array<Array<float>> getPartialStructure() { return partialStructure; }
     Array<float> getOffsets() { return rOffsetsKeys.value; }
     Array<float> getGains() { return rGainsKeys.value; }
-    
+    //Array<int> getHeld() {return rActiveHeldKeys.value; }
     void updatePartialStructure()
     {
         // => partialStructure
@@ -575,6 +601,22 @@ public:
     Array<int> getHeldKeys() {return rActiveHeldKeys.value;};
     Array<int> getRingingStrings();
     BKSynthesiser*              synth;
+    
+    //symp strings code
+    void addSympStrings(int noteNumber, float velocity);
+    void removeSympStrings(int noteNumber, float velocity);
+    Array<int> getSympStrings();
+    
+    
+    
+    // => sympStrings
+    // data structure for pointing to all of the undamped strings and their partials
+    //      outside map is indexed by held note (midiNoteNumber), inside array resizes depending on the number of partials
+    //      so this includes all of the partials for all of the currently undamped strings
+    
+    HashMap<int, Array<SympPartial::Ptr>> sympStrings;
+    
+    int resoId;
 private:
 
     String name;
@@ -626,7 +668,7 @@ public:
         Id(Id),
         name("Resonance " + String(Id))
     {
-        prep = new ResonancePreparation();
+        prep = new ResonancePreparation(Id);
         if (random) randomize();
         DBG("created Resonance with ID " + String(Id));
     }
@@ -644,7 +686,7 @@ public:
 
     inline void clear(void)
     {
-        prep = new ResonancePreparation();
+        prep = new ResonancePreparation(Id);
     }
 
     inline void copy(Resonance::Ptr from)
@@ -713,30 +755,6 @@ private:
 };
 
 
-/*
- SympPartial stores information about an individual partial of an undamped string
-*/
-class SympPartial : public ReferenceCountedObject
-{
-public:
-    typedef ReferenceCountedObjectPtr<SympPartial>   Ptr;
-    typedef Array<SympPartial::Ptr>                  PtrArr;
-    typedef Array<SympPartial::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<SympPartial>                  Arr;
-    typedef OwnedArray<SympPartial, CriticalSection> CSArr;
-    typedef HashMap<int, SympPartial::Ptr>           PtrMap; // not sure if this works
-
-    SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset);
-
-    int heldKey;                // midiNoteNumber for key that is held down; for the undamped string that has this partial
-    int partialKey;             // midiNoteNumber for nearest key to this partial; used to determine whether this partial gets excited
-    float gain;                 // gain multiplier for this partial
-    float offset;               // offset, in cents, from ET for this partial
-    uint64 playPosition;        // current play position for this resonance (samples)
-                                // ==> initialize to large number! perhaps 5 minutes * sampling rate, and cap it there in ProcessBlock
-
-    const uint64 maxPlayPosition = 5 * 60 * 96000; // really high number, longer than any of the samples
-};
 
 
 
@@ -810,9 +828,8 @@ public:
         return blendronic;
     }
 
-    void addSympStrings(int noteNumber, float velocity);
-    void removeSympStrings(int noteNumber, float velocity);
-    Array<int> getSympStrings();
+    // basic API
+    void ringSympStrings(int noteNumber, float velocity);
 private:
     CriticalSection lock;
     
@@ -825,16 +842,7 @@ private:
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;
     
-    // basic API
-    void ringSympStrings(int noteNumber, float velocity);
     
-    
-    // => sympStrings
-    // data structure for pointing to all of the undamped strings and their partials
-    //      outside map is indexed by held note (midiNoteNumber), inside array resizes depending on the number of partials
-    //      so this includes all of the partials for all of the currently undamped strings
-    
-    HashMap<int, Array<SympPartial::Ptr>> sympStrings;
 
 
     JUCE_LEAK_DETECTOR(ResonanceProcessor);

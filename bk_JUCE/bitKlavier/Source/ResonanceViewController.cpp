@@ -964,10 +964,10 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
         {
             // clear this held string's partial
             prep->rActiveHeldKeys.arrayRemoveAllInstancesOf(midiNoteNumber);
-            proc->removeSympStrings(midiNoteNumber, 0);
+            prep->removeSympStrings(midiNoteNumber, 0);
         } else
         {
-            proc->addSympStrings(midiNoteNumber, 127);
+            prep->addSympStrings(midiNoteNumber, 127);
         }
            
         addKeyboard->setKeysInKeymap(prep->rActiveHeldKeys.value);
@@ -1047,6 +1047,8 @@ void ResonanceModificationEditor::greyOutAllComponents()
     fundamentalKeyboard->setAlpha(gModAlpha);
     offsetsKeyboard.setDim(gModAlpha);
     gainsKeyboard.setDim(gModAlpha);
+    addKeyboard->setAlpha(gModAlpha);
+    ringKeyboard->setAlpha(gModAlpha);
 }
 
 void ResonanceModificationEditor::highlightModedComponents()
@@ -1063,6 +1065,7 @@ void ResonanceModificationEditor::highlightModedComponents()
     if(mod->getDirty(ResonanceOffsets))         offsetsKeyboard.setAlpha(1.);
     if(mod->getDirty(ResonanceGains))           gainsKeyboard.setBright();
     if(mod->getDirty(ResonanceADSR))            ADSRSlider->setBright();
+    if(mod->getDirty(ResonanceHeld))            addKeyboard->setAlpha(1.);
 }
 
 void ResonanceModificationEditor::update(void)
@@ -1093,7 +1096,7 @@ void ResonanceModificationEditor::update(void)
         offsetsKeyboard.setValues(mod->getOffsets());
         gainsKeyboard.setKeys(mod->getResonanceKeys());
         gainsKeyboard.setValues(mod->getGains());
-  
+        addKeyboard->setKeysInKeymap(mod->getHeldKeys());
         alternateMod.setToggleState(mod->altMod, dontSendNotification);
         
         //updateComponentVisibility();
@@ -1387,7 +1390,23 @@ void ResonanceModificationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState*
         
         //DBG("fundamental key toggled " + String(midiNoteNumber));
     }
-    
+    else if (source == &addKeyboardState )
+    {
+        addKeyboard->setAlpha(1.);
+        mod->setDirty(ResonanceHeld);
+        ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
+        if (mod->rActiveHeldKeys.arrayContains(midiNoteNumber))
+        {
+            // clear this held string's partial
+            mod->rActiveHeldKeys.arrayRemoveAllInstancesOf(midiNoteNumber);
+            mod->removeSympStrings(midiNoteNumber, 0);
+        } else
+        {
+            mod->addSympStrings(midiNoteNumber, 127);
+        }
+           
+        addKeyboard->setKeysInKeymap(mod->rActiveHeldKeys.value);
+    }
     update();
 
 }
