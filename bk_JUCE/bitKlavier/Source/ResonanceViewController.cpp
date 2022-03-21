@@ -695,12 +695,12 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
     }
     else if (action == 4)
     {
-        processor.reset(PreparationTypeTempo, processor.updateState->currentResonanceId);
+        processor.reset(PreparationTypeResonance, processor.updateState->currentResonanceId);
         vc->update();
     }
     else if (action == 5)
     {
-        processor.clear(PreparationTypeTempo, processor.updateState->currentResonanceId);
+        processor.clear(PreparationTypeResonance, processor.updateState->currentResonanceId);
         vc->update();
         processor.saveGalleryToHistory("Clear Resonance Preparation");
     }
@@ -965,8 +965,10 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
             // clear this held string's partial
             prep->rActiveHeldKeys.arrayRemoveAllInstancesOf(midiNoteNumber);
             prep->removeSympStrings(midiNoteNumber, 0);
+            prep->sympStrings.remove(midiNoteNumber);
         } else
         {
+            prep->addHeldKey(midiNoteNumber);
             prep->addSympStrings(midiNoteNumber, 127);
         }
            
@@ -1402,7 +1404,9 @@ void ResonanceModificationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState*
             mod->removeSympStrings(midiNoteNumber, 0);
         } else
         {
+            mod->addHeldKey(midiNoteNumber);
             mod->addSympStrings(midiNoteNumber, 127);
+            mod->sympStrings.remove(midiNoteNumber);
         }
            
         addKeyboard->setKeysInKeymap(mod->rActiveHeldKeys.value);

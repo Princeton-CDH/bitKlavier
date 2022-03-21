@@ -77,8 +77,9 @@ public:
         rResonanceKeys(r->rResonanceKeys),
         rOffsetsKeys(r->rOffsetsKeys),
         rGainsKeys(r->rGainsKeys),
-        name(r->name),
-        rActiveHeldKeys({})
+        rActiveHeldKeys(r->rActiveHeldKeys),
+        resoId(r->resoId),
+        name(r->name)
     {
         setDefaultPartialStructure();
     }
@@ -101,9 +102,9 @@ public:
         rResonanceKeys({}),
         rOffsetsKeys({}),
         rGainsKeys({}),
-        name(newName),
+        rActiveHeldKeys({}),
         resoId(resoID),
-        rActiveHeldKeys({})
+        name(newName)
     {
         setDefaultPartialStructure();
     }
@@ -245,7 +246,15 @@ public:
         rResonanceKeys.reset();
         rOffsetsKeys.reset();
         rGainsKeys.reset();
+        for (auto n : rActiveHeldKeys.value)
+        {
+            removeSympStrings(n, 0);
+        }
         rActiveHeldKeys.reset();
+        for (auto n : rActiveHeldKeys.value)
+        {
+            addSympStrings(n, 0);
+        }
     }
 
     //accessors
@@ -684,10 +693,8 @@ public:
         return copy;
     }
 
-    inline void clear(void)
-    {
-        prep = new ResonancePreparation(Id);
-    }
+    void clear(void);
+    
 
     inline void copy(Resonance::Ptr from)
     {

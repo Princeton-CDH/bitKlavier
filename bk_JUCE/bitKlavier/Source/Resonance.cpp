@@ -31,7 +31,19 @@ void ResonancePreparation::performModification(ResonanceModification* r, Array<b
     if (dirty[ResonanceClosestKeys]) rResonanceKeys.modify(r->rResonanceKeys, reverse);
     if (dirty[ResonanceOffsets]) rOffsetsKeys.modify(r->rOffsetsKeys, reverse);
     if (dirty[ResonanceGains]) rGainsKeys.modify(r->rGainsKeys, reverse);
-    if (dirty[ResonanceHeld]) rActiveHeldKeys.modify(r->rActiveHeldKeys,reverse);
+    if (dirty[ResonanceHeld])
+    {
+        for (auto n : rActiveHeldKeys.value)
+        {
+            removeSympStrings(n, 0);
+        }
+        
+        rActiveHeldKeys.modify(r->rActiveHeldKeys,reverse);
+        for (auto n : rActiveHeldKeys.value)
+        {
+            addSympStrings(n, 0);
+        }
+    }
     
     if (dirty[ResonanceADSR])
     {
@@ -269,7 +281,7 @@ void ResonancePreparation::addSympStrings(int noteNumber, float velocity)
     
     if(sympStrings.size() > getMaxSympStrings())
     {
-        //DBG("Resonance: removing oldest sympathetic string");
+        DBG("Resonance: removing oldest sympathetic string");
         int oldestString = rActiveHeldKeys.value.getLast();
         removeSympStrings(oldestString, velocity);
         rActiveHeldKeys.arrayRemoveAllInstancesOf(oldestString);
@@ -291,7 +303,8 @@ void ResonancePreparation::addSympStrings(int noteNumber, float velocity)
         sympStrings.getReference(noteNumber).add(new SympPartial(noteNumber, partialKey, getPartialStructure()[i][1], getPartialStructure()[i][2]));
     }
     // add to list of currently active held keys
-    addHeldKey(noteNumber);
+    if (!rActiveHeldKeys.value.contains(noteNumber))
+        rActiveHeldKeys.value.insert(0, noteNumber);
 
     //DBG("Resonance: number of partials = " + String(sympStrings[noteNumber].size()));
 }
@@ -318,7 +331,7 @@ void ResonancePreparation::removeSympStrings(int noteNumber, float velocity)
                       false);
 
     }
-    sympStrings.remove(noteNumber);
+    //
 
     
 }
@@ -396,10 +409,11 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     if (doAdd)
     {
         // clear this held string's partials
+        resonance->prep->removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
         resonance->prep->sympStrings.remove(noteNumber);
         
         resonance->prep->rActiveHeldKeys.arrayRemoveAllInstancesOf(noteNumber);
-        resonance->prep->removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
+        
     }
 }
 
@@ -419,3 +433,16 @@ void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
     }
 }
 
+void Resonance::clear()
+{
+    BKSynthesiser* synth_ = prep->synth;
+    int Id = -1;
+    if (!prep->rUseGlobalSoundSet.value)
+    {
+        String name = prep->rSoundSetName.value;
+        Id = synth_->processor.findPathAndLoadSamples(name);
+    }
+    prep = new ResonancePreparation(Id);
+    prep->synth = synth_;
+    if (Id != -1) prep->setSoundSet(Id);
+}
