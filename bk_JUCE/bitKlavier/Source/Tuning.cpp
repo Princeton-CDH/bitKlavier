@@ -442,7 +442,7 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
         offsets.ensureStorageAllocated(127);
         for(int i = 0; i <= 127; i++)
         {
-            offsets.set(i,(ftom(interp.frequencyForMidiNote(i))- i) * 100.f);
+            offsets.set(i,(ftom(scala.frequencyForMidiNote(i))- i) * 100.f);
         }
         prep->setAbsoluteOffsetCents(offsets);
     } else
