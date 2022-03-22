@@ -23,6 +23,30 @@
 ////////////////////////////////////////////////////////////////////////////////////
 
 class ResonanceModification;
+/*
+ SympPartial stores information about an individual partial of an undamped string
+*/
+class SympPartial : public ReferenceCountedObject
+{
+public:
+    typedef ReferenceCountedObjectPtr<SympPartial>   Ptr;
+    typedef Array<SympPartial::Ptr>                  PtrArr;
+    typedef Array<SympPartial::Ptr, CriticalSection> CSPtrArr;
+    typedef OwnedArray<SympPartial>                  Arr;
+    typedef OwnedArray<SympPartial, CriticalSection> CSArr;
+    typedef HashMap<int, SympPartial::Ptr>           PtrMap; // not sure if this works
+
+    SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset);
+
+    int heldKey;                // midiNoteNumber for key that is held down; for the undamped string that has this partial
+    int partialKey;             // midiNoteNumber for nearest key to this partial; used to determine whether this partial gets excited
+    float gain;                 // gain multiplier for this partial
+    float offset;               // offset, in cents, from ET for this partial
+    uint64 playPosition;        // current play position for this resonance (samples)
+                                // ==> initialize to large number! perhaps 5 minutes * sampling rate, and cap it there in ProcessBlock
+
+    const uint64 maxPlayPosition = 5 * 60 * 96000; // really high number, longer than any of the samples
+};
 
 class ResonancePreparation : public ReferenceCountedObject
 {
@@ -53,13 +77,15 @@ public:
         rResonanceKeys(r->rResonanceKeys),
         rOffsetsKeys(r->rOffsetsKeys),
         rGainsKeys(r->rGainsKeys),
+        rActiveHeldKeys(r->rActiveHeldKeys),
+        resoId(r->resoId),
         name(r->name)
     {
         setDefaultPartialStructure();
     }
 
     //constructor with input
-    ResonancePreparation(String newName, float defaultGain, float blendGain) :
+    ResonancePreparation(String newName, float defaultGain, float blendGain, int resoID) :
         rSoundSet(-1),
         rUseGlobalSoundSet(true),
         rSoundSetName(String()),
@@ -76,13 +102,15 @@ public:
         rResonanceKeys({}),
         rOffsetsKeys({}),
         rGainsKeys({}),
+        rActiveHeldKeys({}),
+        resoId(resoID),
         name(newName)
     {
         setDefaultPartialStructure();
     }
 
     //empty constructor, values will need to be tweaked
-    ResonancePreparation(void) :
+    ResonancePreparation(int Id) :
     rSoundSet(-1),
     rUseGlobalSoundSet(true),
     rSoundSetName(String()),
@@ -98,7 +126,9 @@ public:
     rFundamentalKey(0),
     rResonanceKeys({}),
     rOffsetsKeys({}),
-    rGainsKeys({})
+    rGainsKeys({}),
+    rActiveHeldKeys({}),
+    resoId(Id)
     {
         setDefaultPartialStructure();
     }
@@ -122,7 +152,7 @@ public:
         rResonanceKeys          = r->rResonanceKeys;
         rOffsetsKeys            = r->rOffsetsKeys;
         rGainsKeys              = r->rGainsKeys;
-        
+        rActiveHeldKeys         = r->rActiveHeldKeys;
     }
 
     void performModification(ResonanceModification* r, Array<bool> dirty);
@@ -145,7 +175,8 @@ public:
                 rFundamentalKey         == r->rFundamentalKey &&
                 rResonanceKeys          == r->rResonanceKeys &&
                 rOffsetsKeys            == r->rOffsetsKeys &&
-                rGainsKeys              == r->rGainsKeys
+                rGainsKeys              == r->rGainsKeys &&
+                rActiveHeldKeys         == r->rActiveHeldKeys
                 );
 
     }
@@ -193,6 +224,7 @@ public:
         rResonanceKeys.step();
         rOffsetsKeys.step();
         rGainsKeys.step();
+        rActiveHeldKeys.step();
     }
     
     void resetModdables()
@@ -214,6 +246,16 @@ public:
         rResonanceKeys.reset();
         rOffsetsKeys.reset();
         rGainsKeys.reset();
+        for (auto n : rActiveHeldKeys.value)
+        {
+            removeSympStrings(n, 0);
+            sympStrings.remove(n);
+        }
+        rActiveHeldKeys.reset();
+        for (auto n : rActiveHeldKeys.value)
+        {
+            addSympStrings(n, 0);
+        }
     }
 
     //accessors
@@ -368,12 +410,28 @@ public:
         updatePartialStructure();
     }
     
+    void setHeldKeys(Array<int> no)
+    {
+        for (int i : no)
+        {
+            if(!rActiveHeldKeys.arrayContains(i))
+                rActiveHeldKeys.addArrayValue(i);
+        }
+        
+    }
+    
+    
+    void addHeldKey(int no)
+    {
+        if(!rActiveHeldKeys.arrayContains(no))
+            rActiveHeldKeys.addArrayValue(no);
+    }
     int getFundamentalKey() { return rFundamentalKey.value; }
     Array<int> getResonanceKeys() { return rResonanceKeys.value; }
     Array<Array<float>> getPartialStructure() { return partialStructure; }
     Array<float> getOffsets() { return rOffsetsKeys.value; }
     Array<float> getGains() { return rGainsKeys.value; }
-    
+    //Array<int> getHeld() {return rActiveHeldKeys.value; }
     void updatePartialStructure()
     {
         // => partialStructure
@@ -468,7 +526,7 @@ public:
         rResonanceKeys.getState(prep, StringArray(vtagResonance_resonanceKeys, ptagInt));
         rOffsetsKeys.getState(prep, StringArray(vtagResonance_offsets, ptagFloat));
         rGainsKeys.getState(prep, StringArray(vtagResonance_gains, ptagFloat));
-
+        rActiveHeldKeys.getState(prep, StringArray(vtagResonance_add, ptagInt));
         return prep;
     }
 
@@ -503,7 +561,7 @@ public:
         rOffsetsKeys.setState(e, StringArray(vtagResonance_offsets, ptagFloat), 0.);
         DBG("after setState - rOffsetsKeys: " + floatArrayToString(rOffsetsKeys.value));
         rGainsKeys.setState(e, StringArray(vtagResonance_gains, ptagFloat), 1.);
-        
+        rActiveHeldKeys.setState(e, StringArray(vtagResonance_add, ptagInt), 0);
         updatePartialStructure();
     }
     
@@ -533,6 +591,9 @@ public:
     Moddable<Array<float>> rOffsetsKeys;
     Moddable<Array<float>> rGainsKeys;
     
+    //
+
+    
     inline const int getMinStartTime() const noexcept { return rMinStartTimeMS.value; }
     inline const int getMaxStartTime() const noexcept { return rMaxStartTimeMS.value; }
     inline const int getMaxSympStrings() const noexcept { return rMaxSympStrings.value; }
@@ -546,10 +607,26 @@ public:
     // => current strings
     // A queue to store the currently active notes in sympStrings
     // so we can remove the oldest one when we exceed maxSympStrings
-    Array<int> activeHeldKeys;
-    Array<int> getHeldKeys() {return activeHeldKeys;}
+    Moddable<Array<int>> rActiveHeldKeys;
+    Array<int> getHeldKeys() {return rActiveHeldKeys.value;};
     Array<int> getRingingStrings();
     BKSynthesiser*              synth;
+    
+    //symp strings code
+    void addSympStrings(int noteNumber, float velocity);
+    void removeSympStrings(int noteNumber, float velocity);
+    Array<int> getSympStrings();
+    
+    
+    
+    // => sympStrings
+    // data structure for pointing to all of the undamped strings and their partials
+    //      outside map is indexed by held note (midiNoteNumber), inside array resizes depending on the number of partials
+    //      so this includes all of the partials for all of the currently undamped strings
+    
+    HashMap<int, Array<SympPartial::Ptr>> sympStrings;
+    
+    int resoId;
 private:
 
     String name;
@@ -601,7 +678,7 @@ public:
         Id(Id),
         name("Resonance " + String(Id))
     {
-        prep = new ResonancePreparation();
+        prep = new ResonancePreparation(Id);
         if (random) randomize();
         DBG("created Resonance with ID " + String(Id));
     }
@@ -617,10 +694,8 @@ public:
         return copy;
     }
 
-    inline void clear(void)
-    {
-        prep = new ResonancePreparation();
-    }
+    void clear(void);
+    
 
     inline void copy(Resonance::Ptr from)
     {
@@ -688,30 +763,6 @@ private:
 };
 
 
-/*
- SympPartial stores information about an individual partial of an undamped string
-*/
-class SympPartial : public ReferenceCountedObject
-{
-public:
-    typedef ReferenceCountedObjectPtr<SympPartial>   Ptr;
-    typedef Array<SympPartial::Ptr>                  PtrArr;
-    typedef Array<SympPartial::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<SympPartial>                  Arr;
-    typedef OwnedArray<SympPartial, CriticalSection> CSArr;
-    typedef HashMap<int, SympPartial::Ptr>           PtrMap; // not sure if this works
-
-    SympPartial(int newHeldKey, int newPartialKey, float newGain, float newOffset);
-
-    int heldKey;                // midiNoteNumber for key that is held down; for the undamped string that has this partial
-    int partialKey;             // midiNoteNumber for nearest key to this partial; used to determine whether this partial gets excited
-    float gain;                 // gain multiplier for this partial
-    float offset;               // offset, in cents, from ET for this partial
-    uint64 playPosition;        // current play position for this resonance (samples)
-                                // ==> initialize to large number! perhaps 5 minutes * sampling rate, and cap it there in ProcessBlock
-
-    const uint64 maxPlayPosition = 5 * 60 * 96000; // really high number, longer than any of the samples
-};
 
 
 
@@ -785,7 +836,8 @@ public:
         return blendronic;
     }
 
-    Array<int> getSympStrings();
+    // basic API
+    void ringSympStrings(int noteNumber, float velocity);
 private:
     CriticalSection lock;
     
@@ -798,16 +850,7 @@ private:
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;
     
-    // basic API
-    void ringSympStrings(int noteNumber, float velocity);
-    void addSympStrings(int noteNumber, float velocity);
-    void removeSympStrings(int noteNumber, float velocity);
-    // => sympStrings
-    // data structure for pointing to all of the undamped strings and their partials
-    //      outside map is indexed by held note (midiNoteNumber), inside array resizes depending on the number of partials
-    //      so this includes all of the partials for all of the currently undamped strings
     
-    HashMap<int, Array<SympPartial::Ptr>> sympStrings;
 
 
     JUCE_LEAK_DETECTOR(ResonanceProcessor);

@@ -499,7 +499,7 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     ADSRSlider->addMyListener(this);
     resonanceKeyboardState.addListener(this);
     fundamentalKeyboardState.addListener(this);
-
+    addKeyboardState.addListener(this);
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
     
@@ -695,12 +695,12 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
     }
     else if (action == 4)
     {
-        processor.reset(PreparationTypeTempo, processor.updateState->currentResonanceId);
+        processor.reset(PreparationTypeResonance, processor.updateState->currentResonanceId);
         vc->update();
     }
     else if (action == 5)
     {
-        processor.clear(PreparationTypeTempo, processor.updateState->currentResonanceId);
+        processor.clear(PreparationTypeResonance, processor.updateState->currentResonanceId);
         vc->update();
         processor.saveGalleryToHistory("Clear Resonance Preparation");
     }
@@ -957,6 +957,23 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
         //DBG("fundamental key toggled " + String(midiNoteNumber));
     }
     
+    else if (source == &addKeyboardState )
+    {
+        ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
+        if (prep->rActiveHeldKeys.arrayContains(midiNoteNumber))
+        {
+            // clear this held string's partial
+            prep->rActiveHeldKeys.arrayRemoveAllInstancesOf(midiNoteNumber);
+            prep->removeSympStrings(midiNoteNumber, 0);
+            prep->sympStrings.remove(midiNoteNumber);
+        } else
+        {
+            prep->addHeldKey(midiNoteNumber);
+            prep->addSympStrings(midiNoteNumber, 127);
+        }
+           
+        addKeyboard->setKeysInKeymap(prep->rActiveHeldKeys.value);
+    }
     update();
 
 }
@@ -1001,6 +1018,8 @@ ResonanceViewController(p, theGraph)
     resonanceKeyboardState.addListener(this);
     fundamentalKeyboardState.addListener(this);
     
+    addKeyboardState.addListener(this);
+    
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
     
@@ -1030,6 +1049,8 @@ void ResonanceModificationEditor::greyOutAllComponents()
     fundamentalKeyboard->setAlpha(gModAlpha);
     offsetsKeyboard.setDim(gModAlpha);
     gainsKeyboard.setDim(gModAlpha);
+    addKeyboard->setAlpha(gModAlpha);
+    ringKeyboard->setAlpha(gModAlpha);
 }
 
 void ResonanceModificationEditor::highlightModedComponents()
@@ -1046,6 +1067,7 @@ void ResonanceModificationEditor::highlightModedComponents()
     if(mod->getDirty(ResonanceOffsets))         offsetsKeyboard.setAlpha(1.);
     if(mod->getDirty(ResonanceGains))           gainsKeyboard.setBright();
     if(mod->getDirty(ResonanceADSR))            ADSRSlider->setBright();
+    if(mod->getDirty(ResonanceHeld))            addKeyboard->setAlpha(1.);
 }
 
 void ResonanceModificationEditor::update(void)
@@ -1076,7 +1098,7 @@ void ResonanceModificationEditor::update(void)
         offsetsKeyboard.setValues(mod->getOffsets());
         gainsKeyboard.setKeys(mod->getResonanceKeys());
         gainsKeyboard.setValues(mod->getGains());
-  
+        addKeyboard->setKeysInKeymap(mod->getHeldKeys());
         alternateMod.setToggleState(mod->altMod, dontSendNotification);
         
         //updateComponentVisibility();
@@ -1370,7 +1392,25 @@ void ResonanceModificationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState*
         
         //DBG("fundamental key toggled " + String(midiNoteNumber));
     }
-    
+    else if (source == &addKeyboardState )
+    {
+        addKeyboard->setAlpha(1.);
+        mod->setDirty(ResonanceHeld);
+        ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
+        if (mod->rActiveHeldKeys.arrayContains(midiNoteNumber))
+        {
+            // clear this held string's partial
+            mod->rActiveHeldKeys.arrayRemoveAllInstancesOf(midiNoteNumber);
+            mod->removeSympStrings(midiNoteNumber, 0);
+        } else
+        {
+            mod->addHeldKey(midiNoteNumber);
+            mod->addSympStrings(midiNoteNumber, 127);
+            mod->sympStrings.remove(midiNoteNumber);
+        }
+           
+        addKeyboard->setKeysInKeymap(mod->rActiveHeldKeys.value);
+    }
     update();
 
 }

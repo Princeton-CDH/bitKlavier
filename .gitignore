@@ -1,4 +1,5 @@
 Builds/
+installer/
 JuceLibraryCode/
 *.DS_Store
 *.app

@@ -202,7 +202,7 @@ const String ptagResonance_fundamentalKey = "fundamentalKey";
 const String vtagResonance_resonanceKeys = "closestKeys";
 const String vtagResonance_offsets = "offsets";
 const String vtagResonance_gains = "gains";
-
+const String vtagResonance_add = "add";
 
 const String vtagTuning = "tuning";
 const String vtagModTuning = "modTuning";
@@ -926,6 +926,7 @@ static const std::vector<std::string> cDirectParameterTypes = {
      ResonanceOffsets,
      ResonanceGains,
      ResonanceADSR,
+     ResonanceHeld,
      ResonanceMaxSympStrings, 
      ResonanceUseGlobalSoundSet,
      ResonanceSoundSet,
@@ -956,7 +957,8 @@ static const std::vector<std::string> cResonanceParameterTypes = {
     "Closest Keys",
     "Offsets",
     "Gains",
-    "ADSR"
+    "ADSR",
+    "Held Keys"
 };
 
 

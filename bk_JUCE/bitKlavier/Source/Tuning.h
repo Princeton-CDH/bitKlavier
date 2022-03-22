@@ -634,8 +634,8 @@ public:
     }
     
 	Tuning(int Id, bool random = false) :
-    Id(Id),
     currentScale(Tunings::evenTemperament12NoteScale()),
+    Id(Id),
     name("Tuning "+String(Id))
     {
 		prep = new TuningPreparation();

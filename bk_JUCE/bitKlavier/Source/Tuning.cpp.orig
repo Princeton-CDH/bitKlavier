@@ -407,10 +407,10 @@ void Tuning::loadScalaScale(Tunings::Scale& s)
         isAbsoluteTuning = false;
     }
     //put tuning name in TuningLibrary
-//    for (int i = 0; i <= 127; i++)
-//    {
-//        DBG(String(i) + " : " + String(scala.frequencyForMidiNote(i)));
-//    }
+    for (int i = 0; i <= 127; i++)
+    {
+        DBG(String(i) + " : " + String(scala.frequencyForMidiNote(i)));
+    }
 }
 
 void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
@@ -452,7 +452,11 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
         Tunings::Scale et = Tunings::evenTemperament12NoteScale();
         for (int i = 0; i < 12; i++)
         {
+<<<<<<< HEAD
             float freq = scala.frequencyForMidiNote(scala.keyboardMapping.middleNote + i);
+=======
+            float freq = interp.frequencyForMidiNote(interp.keyboardMapping.middleNote + i);
+>>>>>>> feature/reso
             float a = ftom(freq);
             float micro = (a - (scala.keyboardMapping.middleNote + i)) * 100.f;
 //            float equal = et.tones[(i+1)%12].cents;
@@ -473,10 +477,10 @@ void Tuning::loadKBM(Tunings::KeyboardMapping& kbm)
         isAbsoluteTuning = false;
     }
     
-//    for (int i = 0; i <= 127; i++)
-//    {
-//        DBG(String(i) + " : " + String(scala.frequencyForMidiNote(i)));
-//    }
+    for (int i = 0; i <= 127; i++)
+    {
+        DBG(String(i) + " : " + String(scala.frequencyForMidiNote(i)));
+    }
 
 }
 
