@@ -36,6 +36,7 @@ void ResonancePreparation::performModification(ResonanceModification* r, Array<b
         for (auto n : rActiveHeldKeys.value)
         {
             removeSympStrings(n, 0);
+            sympStrings.remove(n);
         }
         
         rActiveHeldKeys.modify(r->rActiveHeldKeys,reverse);

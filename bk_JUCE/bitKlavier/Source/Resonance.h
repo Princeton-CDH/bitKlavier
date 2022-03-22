@@ -249,6 +249,7 @@ public:
         for (auto n : rActiveHeldKeys.value)
         {
             removeSympStrings(n, 0);
+            sympStrings.remove(n);
         }
         rActiveHeldKeys.reset();
         for (auto n : rActiveHeldKeys.value)
