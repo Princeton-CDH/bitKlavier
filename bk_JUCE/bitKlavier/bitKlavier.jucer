@@ -195,6 +195,8 @@
                 file="Source/galleries/Exercise Constraint.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
+          <FILE id="PW60gg" name="bitKlavier_x.png" compile="0" resource="1"
+                file="Source/icons/bitKlavier_x.png"/>
           <FILE id="suTd6x" name="hi_cut.png" compile="0" resource="1" file="Source/icons/hi_cut.png"/>
           <FILE id="K955yI" name="lo_cut.png" compile="0" resource="1" file="Source/icons/lo_cut.png"/>
           <FILE id="DtQaJB" name="peak.png" compile="0" resource="1" file="Source/icons/peak.png"/>
@@ -205,8 +207,6 @@
           <FILE id="A1o3FE" name="icon_iOS_72.png" compile="0" resource="1" file="Source/icons/icon_iOS_72.png"/>
           <FILE id="iHGLGD" name="icon_iOS_300.jpg" compile="0" resource="1"
                 file="Source/icons/icon_iOS_300.jpg"/>
-          <FILE id="Dl47P7" name="bitKlavier_x.png" compile="0" resource="1"
-                file="Source/bitKlavier_x.png"/>
           <FILE id="hXCh3E" name="Icon.icns" compile="0" resource="1" file="Source/icons/Icon.icns"/>
           <FILE id="puwr6J" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"/>
           <FILE id="XA1tC4" name="icon_win_large.png" compile="0" resource="1"

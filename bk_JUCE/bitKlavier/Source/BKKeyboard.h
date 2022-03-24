@@ -439,6 +439,17 @@ private:
     //==============================================================================
     friend class BKKeymapKeyboardUpDownButton;
     
+    Colour lineColour;
+    Colour textColour;
+    Colour shadowCol;
+    Colour blackNoteColour;
+    Colour whiteNoteColour;
+    Colour keyDownOverlayColour;
+    Colour keySeparatorLineColour;
+    Colour mouseOverKeyOverlayColour;
+    Colour upDownButtonBackgroundColour;
+    Colour upDownButtonArrowColour;
+    
     bool isKeymapKeyboard;
     
     int firstKeyDown, lastKeyDown;
