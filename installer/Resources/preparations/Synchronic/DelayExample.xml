@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<synchronic Id="1" name="Synchronic 1">
+  <params gain="1.0" numBeats="3" clusterMin="1" clusterMax="12" clusterCap="8"
+          clusterThresh="20.0" mode="0" beatsToSkip="0" transpUsesTuning="0"
+          numClusters="10" onOffMode="0" holdMin="0" holdMax="12000" velocityMin="0"
+          velocityMax="127" targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+          targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+          targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+          targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0"
+          synchronicUseGlobalSoundSet="1" synchronicSoundSet="">
+    <beatMultipliers f0="1.0"/>
+    <beatMultipliersStates b0="1" b1="0" b2="0" b3="0" b4="0" b5="0" b6="0" b7="0" b8="0"
+                           b9="0" b10="0" b11="0"/>
+    <lengthMultipliers f0="1.0"/>
+    <lengthMultipliersStates b0="1" b1="0" b2="0" b3="0" b4="0" b5="0" b6="0" b7="0" b8="0"
+                             b9="0" b10="0" b11="0"/>
+    <accentMultipliers f0="1.0" f1="0.5530000329017639" f2="0.2460000067949295"/>
+    <accentMultipliersStates b0="1" b1="1" b2="1" b3="0" b4="0" b5="0" b6="0" b7="0" b8="0"
+                             b9="0" b10="0" b11="0"/>
+    <transpOffsets>
+      <t0 f0="0.0"/>
+      <t1 f0="-2.0"/>
+      <t2 f0="-4.0"/>
+    </transpOffsets>
+    <transpOffsetsStates b0="1" b1="1" b2="1" b3="0" b4="0" b5="0" b6="0" b7="0" b8="0"
+                         b9="0" b10="0" b11="0"/>
+    <ADSRs>
+      <e0 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="1.0"/>
+      <e1 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      <e2 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      <e3 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      <e4 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      <e5 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      <e6 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      <e7 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      <e8 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      <e9 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      <e10 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      <e11 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+    </ADSRs>
+  </params>
+</synchronic>

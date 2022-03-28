@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<blendronic Id="1" name="2">
+  <params targetTypeBlendronicPatternSync="0" targetTypeBlendronicBeatSync="0"
+          targetTypeBlendronicClear="0" targetTypeBlendronicPausePlay="0"
+          targetTypeBlendronicOpenCloseInput="0" targetTypeBlendronicOpenCloseOutput="0"
+          outGain="1.0" delayBufferSize="4.0">
+    <beats f0="4.0" f1="3.0" f2="2.0" f3="3.0"/>
+    <delayLengths f0="4.0" f1="3.0" f2="2.0" f3="3.0"/>
+    <smoothLengths f0="50.0"/>
+    <feedbackCoefficients f0="0.949999988079071"/>
+  </params>
+</blendronic>
