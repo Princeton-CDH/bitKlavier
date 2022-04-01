@@ -401,11 +401,13 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     bool doRing = (bVels->getUnchecked(TargetTypeResonanceRing) >= 0.f);
     bool doAdd = (bVels->getUnchecked(TargetTypeResonanceAdd) >= 0.f);
     
+    /*
     if (doRing)
     {
         // this will turn off all the resonace associated with this string/key, and then remove those from the currently available sympathetic strings
         //resonance->prep->removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
     }
+     */
     
     if (doAdd)
     {
