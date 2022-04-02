@@ -398,7 +398,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
         bVels = &velocities.getReference(noteNumber);
     }
     
-    bool doRing = (bVels->getUnchecked(TargetTypeResonanceRing) >= 0.f);
+    // bool doRing = (bVels->getUnchecked(TargetTypeResonanceRing) >= 0.f);
     bool doAdd = (bVels->getUnchecked(TargetTypeResonanceAdd) >= 0.f);
     
     /*
