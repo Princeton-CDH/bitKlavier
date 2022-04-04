@@ -639,9 +639,9 @@ void BKPianoSamplerVoice::stopNote (float /*velocity*/, bool allowTailOff)
 {
     if (allowTailOff)
     {
-        //DBG("note type: " + cNoteTypes[getNoteType()]);
-        //adsr.setReleaseTime(0.003f);
-        //DBG("BKPianoSamplerVoice::stopNote, releaseTime = " + String(adsr.getReleaseTime()));
+        // DBG("note type: " + cNoteTypes[getNoteType()]);
+        // adsr.setReleaseTime(0.003f);
+        // DBG("BKPianoSamplerVoice::stopNote, releaseTime = " + String(adsr.getReleaseTime()));
         adsr.keyOff();
         sfzadsr.keyOff();
     }

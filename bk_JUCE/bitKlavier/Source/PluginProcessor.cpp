@@ -1063,6 +1063,7 @@ void BKAudioProcessor::sustainDeactivate(void)
         
         if(prevPiano != currentPiano) prevPiano->prepMap->sustainPedalReleased(sourcedNotesOn, true);
         
+        
         //turn off pedal down resonance
         pedalSynth.keyOff(channel,
                           PedalNote,
@@ -1074,6 +1075,7 @@ void BKAudioProcessor::sustainDeactivate(void)
                           1.,
                           nullptr,
                           true);
+        
         
         //play pedalUp sample
         pedalSynth.keyOn(channel,
@@ -1092,6 +1094,7 @@ void BKAudioProcessor::sustainDeactivate(void)
                          2000,
                          3,
                          3 );
+         
     }
 }
 
@@ -2056,17 +2059,17 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     }
     
     // NEED WAY TO TRIGGER RELEASE PEDAL SAMPLE FOR SFZ
-    else if (m.isSustainPedalOn())
+    else if (m.isSustainPedalOn() && !sustainIsDown)
     {
-        //DBG("m.isSustainPedalOn()");
+        DBG("m.isSustainPedalOn()");
         sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
         if (sustainInverted)    sustainDeactivate();
         else                    sustainActivate();
         
     }
-    else if (m.isSustainPedalOff())
+    else if (m.isSustainPedalOff() && sustainIsDown)
     {
-        //DBG("m.isSustainPedalOff()");
+        DBG("m.isSustainPedalOff()");
         sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
         if (sustainInverted)    sustainActivate();
         else                    sustainDeactivate();

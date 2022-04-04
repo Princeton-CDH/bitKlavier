@@ -1086,6 +1086,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
     }
     
     //do all keyReleased calls now
+    DBG("sustainPedalReleased: sustainedNotes.size() = " + String(sustainedNotes.size()));
     for(int n = 0; n < sustainedNotes.size(); ++n)
     {
         Note note = sustainedNotes.getUnchecked(n);

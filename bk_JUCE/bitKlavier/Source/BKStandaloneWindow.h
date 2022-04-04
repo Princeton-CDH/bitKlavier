@@ -729,8 +729,9 @@ public:
             }
             else if(result == 1)
             {
-                if (pluginHolder->processor->defaultLoaded)
+                if (pluginHolder->processor->defaultLoaded) {
                     if(!pluginHolder->processor->saveCurrentGalleryAs()) return;
+                }
                 else pluginHolder->processor->saveCurrentGallery();
             }
         }

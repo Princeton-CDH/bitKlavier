@@ -733,24 +733,11 @@ void BKSynthesiser::keyOff(const int midiChannel,
 
 	//DBG("BKSynthesiser::keyOff " + String(keyNoteNumber) + " " + String(midiNoteNumber) + " " + String(midiChannel));
 	const ScopedLock sl(lock);
-
+    
+    // DBG("BKSynthesiser::keyOff: starting for loop, size = " + String(voices.size()));
 	for (int i = voices.size(); --i >= 0;)
 	{
-        //DBG("BKSynthesiser::keyOff: in for loop");
-
 		BKSynthesiserVoice* const voice = voices.getUnchecked(i);
-
-		/*
-		if (nostalgicOff)
-		{
-			DBG(" ~ ~ ~ ~ ~ ~ ~ ~ ");
-			DBG(String((int)(voice->getCurrentlyPlayingNote() == midiNoteNumber)));
-			DBG(String((int)(voice->getCurrentlyPlayingKey() == keyNoteNumber)));
-			DBG(String((int)(voice->isPlayingChannel (midiChannel))));
-			DBG(String((int)(voice->layerId == layerToLayerId(type, layerId))));
-		}
-		 */
-
 
         //if (voice->layerId == layerToLayerId(type, layerId)) DBG("BKSynthesiser::keyOff FOUND PLAYING LAYER ");
 		if (voice->getCurrentlyPlayingNote() == midiNoteNumber
@@ -776,14 +763,14 @@ void BKSynthesiser::keyOff(const int midiChannel,
 						(voice->type == FixedLength) ||
 						voice->sostenutoPedalDown)))
 					{
-                        //DBG("BKSynthesiser::keyOff: stoppingVoice");
+                        // DBG("BKSynthesiser::keyOff: stoppingVoice");
 						stopVoice(voice, velocity, allowTailOff);
 					}
 				}
 			}
 		}
 	}
-
+    
 	int noteNumber = midiNoteNumber;
 
 	if (noteNumber > 127 || noteNumber < 0) return;

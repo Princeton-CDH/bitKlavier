@@ -196,8 +196,13 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
 		}
         
         //store synthNoteNumbers by noteNumber
-        keyPlayed[noteNumber].add(synthNoteNumber);
-        keyPlayedOffset[noteNumber].add(synthOffset);
+        //keyPlayed[noteNumber].add(synthNoteNumber);
+        //keyPlayedOffset[noteNumber].add(synthOffset);
+        
+        if (!keyPlayed[noteNumber].contains(synthNoteNumber)) {
+            keyPlayed[noteNumber].add(synthNoteNumber);
+            keyPlayedOffset[noteNumber].add(synthOffset);
+        }
         
     }
 }
@@ -228,13 +233,13 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
     
     if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
     
-    //DBG("DirectProcessor::keyReleased " + String(noteNumber));
+    DBG("DirectProcessor::keyReleased " + String(noteNumber) + " keyPlayed[noteNumber].size = " + String(keyPlayed[noteNumber].size()));
     for (int i = 0; i < keyPlayed[noteNumber].size(); i++)
     {
         int t = keyPlayed[noteNumber].getUnchecked(i);
         //float t_offset = keyPlayedOffset[noteNumber].getUnchecked(i);
         
-        //DBG("DirectProcessor::keyReleased sending keyOff");
+        // DBG("DirectProcessor::keyReleased sending keyOff");
         synth->keyOff(1,
                       MainNote,
                       direct->prep->getSoundSet(), //set
