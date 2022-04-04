@@ -1848,9 +1848,11 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
-        // if (currentPiano != nullptr) currentPiano->deconfigure();        
+        // if (currentPiano != nullptr) currentPiano->deconfigure();
+        String url;
         if (gallery != nullptr)
         {
+            url = gallery->getURL();
             for (auto piano : gallery->getPianos())
             {
                 piano->deconfigure();
@@ -1859,7 +1861,7 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
         }
         
         gallery = new Gallery(xml, *this);
-
+        if (url.isNotEmpty()) gallery->setURL(url);
         currentGallery = gallery->getName() + ".xml";
         
         initializeGallery();
