@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<direct Id="1" name="Plain">
-  <params gain="1.0" resGain="4.0" hammerGain="0.5">
-    <transposition f0="0.0"/>
-    <ADSR f0="300.0" f1="3.0" f2="1.0" f3="300.0"/>
-  </params>
-</direct>

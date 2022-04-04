@@ -1,6 +1,0 @@
-#!/bin/bash
-rsync -r --update "/tmp/bitklavier/bitklavier.app" /Applications
-rsync -r --update "/tmp/bitklavier" /Library/Application \Support/
-chown -R $USER:staff "/Library/Application Support/bitklavier"
-chown -R $USER:staff "/Applications/bitklavier.app"
-rm -rf "/tmp/bitklavier"

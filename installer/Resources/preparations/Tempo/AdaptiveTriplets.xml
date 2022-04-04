@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<tempo Id="1" name="17">
-  <params tempo="800.0" system="1" at1Mode="0" at1History="8" at1Subdivisions="3.0"
-          at1Min="51.0" at1Max="2000.0" subdivisions="1.0"/>
-</tempo>
