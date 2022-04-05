@@ -314,10 +314,10 @@ void ResonancePreparation::addSympStrings(int noteNumber, float velocity)
 void ResonancePreparation::removeSympStrings(int noteNumber, float velocity)
 {
     // turn off each partial associated with this string
-    //DBG("Resonance: removing partials of " + String(noteNumber));
+    DBG("Resonance: removing partials of " + String(noteNumber));
     for (auto sympString : sympStrings.getReference(noteNumber))
     {
-        //DBG("Resonance: removing partial " + String(sympString->partialKey) + " of held key " + String(sympString->heldKey));
+        DBG("Resonance: removing partial " + String(sympString->partialKey) + " of held key " + String(sympString->heldKey));
         
         synth->keyOff(1,
                       ResonanceNote,
@@ -398,25 +398,26 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
         bVels = &velocities.getReference(noteNumber);
     }
     
-    // bool doRing = (bVels->getUnchecked(TargetTypeResonanceRing) >= 0.f);
+    bool doRing = (bVels->getUnchecked(TargetTypeResonanceRing) >= 0.f);
     bool doAdd = (bVels->getUnchecked(TargetTypeResonanceAdd) >= 0.f);
     
     /*
-    if (doRing)
+    if (doRing && doAdd) // don't want to remove resonating strings if we aren't in doAdd target mode, so both need to be true
     {
-        // this will turn off all the resonace associated with this string/key, and then remove those from the currently available sympathetic strings
-        //resonance->prep->removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
+        // this will turn off all the resonance associated with this string/key, and then remove those from the currently available sympathetic strings
+        resonance->prep->removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
     }
      */
-    
-    if (doAdd)
+        
+    // if (doAdd)
+    if ( (doRing && doAdd) || doAdd) // don't want to remove resonating strings if we aren't in doAdd target mode, so doAdd always needs to be true
     {
         // clear this held string's partials
+        DBG("Resonance: clearing sympathetic string: " + String(noteNumber));
         resonance->prep->removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
         resonance->prep->sympStrings.remove(noteNumber);
         
         resonance->prep->rActiveHeldKeys.arrayRemoveAllInstancesOf(noteNumber);
-        
     }
 }
 

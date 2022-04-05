@@ -233,7 +233,7 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
     
     if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
     
-    DBG("DirectProcessor::keyReleased " + String(noteNumber) + " keyPlayed[noteNumber].size = " + String(keyPlayed[noteNumber].size()));
+    // DBG("DirectProcessor::keyReleased " + String(noteNumber) + " keyPlayed[noteNumber].size = " + String(keyPlayed[noteNumber].size()));
     for (int i = 0; i < keyPlayed[noteNumber].size(); i++)
     {
         int t = keyPlayed[noteNumber].getUnchecked(i);
@@ -367,7 +367,7 @@ float DirectProcessor::filterVelocity(float vel)
         }
     }
     
-    DBG("failed velocity check");
+    // DBG("failed velocity check");
     return -1.f;
 }
 
