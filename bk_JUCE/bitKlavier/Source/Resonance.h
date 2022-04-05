@@ -625,7 +625,7 @@ public:
     //      so this includes all of the partials for all of the currently undamped strings
     
     HashMap<int, Array<SympPartial::Ptr>> sympStrings;
-    
+    void setResoId(int Id) {resoId = Id;}
     int resoId;
 private:
 
@@ -749,7 +749,10 @@ public:
     ~Resonance() {};
 
     inline int getId() { return Id; }
-    inline void setId(int newId) { Id = newId; }
+    inline void setId(int newId) {
+        Id = newId;
+        prep->setResoId(Id);
+    }
     inline void setName(String newName) { name = newName; }
     inline String getName() const noexcept { return name; }
 
