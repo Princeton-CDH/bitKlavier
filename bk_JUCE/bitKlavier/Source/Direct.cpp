@@ -150,49 +150,53 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
             {
                 b->setClearDelayOnNextBeat(false);
             }
-            synth->keyOn(1,
-                         noteNumber,
-                         synthNoteNumber,
-                         synthOffset,
-                         aVels->getUnchecked(TargetTypeDirect),
-                         aGlobalGain,
-                         Forward,
-                         Normal,
-                         MainNote,
-                         direct->prep->getSoundSet(), //set
-                         direct->getId(),
-                         0,     // start
-                         0,     // length
-                         prep->dAttack.value,
-                         prep->dDecay.value,
-                         prep->dSustain.value,
-                         prep->dRelease.value,
-                         tuner,
-                         prep->getGainPtr(),
-                         prep->getBlendronicGainPtr(),
-                         blendronic);
+            if (*direct->prep->getGainPtr() > -80.) {
+                synth->keyOn(1,
+                             noteNumber,
+                             synthNoteNumber,
+                             synthOffset,
+                             aVels->getUnchecked(TargetTypeDirect),
+                             aGlobalGain,
+                             Forward,
+                             Normal,
+                             MainNote,
+                             direct->prep->getSoundSet(), //set
+                             direct->getId(),
+                             0,     // start
+                             0,     // length
+                             prep->dAttack.value,
+                             prep->dDecay.value,
+                             prep->dSustain.value,
+                             prep->dRelease.value,
+                             tuner,
+                             prep->getGainPtr(),
+                             prep->getBlendronicGainPtr(),
+                             blendronic);
+            }
 		}
 		else
 		{
-			synth->keyOn(1,
-                         noteNumber,
-                         synthNoteNumber,
-                         synthOffset,
-                         aVels->getUnchecked(TargetTypeDirect),
-                         aGlobalGain,
-                         Forward,
-                         Normal,
-                         MainNote,
-                         prep->getSoundSet(), //set
-                         direct->getId(),
-                         0,     // start
-                         0,     // length
-                         prep->dAttack.value,
-                         prep->dDecay.value,
-                         prep->dSustain.value,
-                         prep->dRelease.value,
-                         tuner,
-                         prep->getGainPtr());
+            if (*direct->prep->getGainPtr() > -80.) {
+                synth->keyOn(1,
+                             noteNumber,
+                             synthNoteNumber,
+                             synthOffset,
+                             aVels->getUnchecked(TargetTypeDirect),
+                             aGlobalGain,
+                             Forward,
+                             Normal,
+                             MainNote,
+                             prep->getSoundSet(), //set
+                             direct->getId(),
+                             0,     // start
+                             0,     // length
+                             prep->dAttack.value,
+                             prep->dDecay.value,
+                             prep->dSustain.value,
+                             prep->dRelease.value,
+                             tuner,
+                             prep->getGainPtr());
+            }
 		}
         
         //store synthNoteNumbers by noteNumber
@@ -298,45 +302,51 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
      */
     if (!soundfont)
     {
-        hammerSynth->keyOn  (1,
-                             noteNumber,
-                             t,
-                             0,
-                             aVels->getUnchecked(TargetTypeDirect),
-                             HAMMER_GAIN_SCALE,
-                             Forward,
-                             Normal,
-                             HammerNote,
-                             direct->prep->getSoundSet(), //set
-                             direct->getId(),
-                             0,
-                             2000,
-                             3,
-                             3,
-                             tuner,
-                             direct->prep->getHammerGainPtr());
+        if (*direct->prep->getHammerGainPtr() > -30.) { //-20dB threshold
+            // DBG("DirectProcessor::playReleaseSample, about to play hammer");
+            hammerSynth->keyOn  (1,
+                                 noteNumber,
+                                 t,
+                                 0,
+                                 aVels->getUnchecked(TargetTypeDirect),
+                                 HAMMER_GAIN_SCALE,
+                                 Forward,
+                                 Normal,
+                                 HammerNote,
+                                 direct->prep->getSoundSet(), //set
+                                 direct->getId(),
+                                 0,
+                                 2000,
+                                 3,
+                                 3,
+                                 tuner,
+                                 direct->prep->getHammerGainPtr());
+        }
         
-        float held = noteLengthTimers.getUnchecked(noteNumber) * (1. / synth->getSampleRate());
-        resonanceSynth->keyOn(1,
-                              noteNumber,
-                              t,
-                              t_offset,
-                              //aVels->getUnchecked(TargetTypeDirect),
-                              // resonance loudness should be set by attack velocity, not release velocity
-                              // and then scaled exponentially by how long the note is held
-                              bVels->getUnchecked(TargetTypeDirect) * exp(-1. * held / 2.), // 2 second "mean lifetime"
-                              RES_GAIN_SCALE,
-                              Forward,
-                              Normal,
-                              ResonanceNote,
-                              direct->prep->getSoundSet(), //set
-                              direct->getId(),
-                              0,
-                              2000,
-                              3,
-                              3,
-                              tuner,
-                              direct->prep->getResonanceGainPtr());
+        if (*direct->prep->getResonanceGainPtr() > -30.) {
+            float held = noteLengthTimers.getUnchecked(noteNumber) * (1. / synth->getSampleRate());
+            // DBG("DirectProcessor::playReleaseSample, about to play resonance");
+            resonanceSynth->keyOn(1,
+                                  noteNumber,
+                                  t,
+                                  t_offset,
+                                  //aVels->getUnchecked(TargetTypeDirect),
+                                  // resonance loudness should be set by attack velocity, not release velocity
+                                  // and then scaled exponentially by how long the note is held
+                                  bVels->getUnchecked(TargetTypeDirect) * exp(-1. * held / 2.), // 2 second "mean lifetime"
+                                  RES_GAIN_SCALE,
+                                  Forward,
+                                  Normal,
+                                  ResonanceNote,
+                                  direct->prep->getSoundSet(), //set
+                                  direct->getId(),
+                                  0,
+                                  2000,
+                                  3,
+                                  3,
+                                  tuner,
+                                  direct->prep->getResonanceGainPtr());
+        }
     }
 }
 
