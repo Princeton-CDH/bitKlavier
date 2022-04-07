@@ -708,8 +708,8 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        int Id = processor.updateState->currentTempoId;
-        Tempo::Ptr prep = processor.gallery->getTempo(Id);
+        int Id = processor.updateState->currentResonanceId;
+        Resonance::Ptr prep = processor.gallery->getResonance(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -733,8 +733,8 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        int Id = processor.updateState->currentTempoId;
-        Tempo::Ptr prep = processor.gallery->getTempo(Id);
+        int Id = processor.updateState->currentResonanceId;
+        Resonance::Ptr prep = processor.gallery->getResonance(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -755,9 +755,9 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
     else if (action >= 100)
     {
         int which = action - 100;
-        processor.importPreparation(PreparationTypeTempo, processor.updateState->currentTempoId, which);
+        processor.importPreparation(PreparationTypeResonance, processor.updateState->currentResonanceId, which);
         vc->update();
-        processor.saveGalleryToHistory("Import Tempo Preparation");
+        processor.saveGalleryToHistory("Import Resonance Preparation");
     }
 }
 
@@ -822,7 +822,14 @@ void ResonancePreparationEditor::bkMessageReceived(const String& message)
 
 void ResonancePreparationEditor::bkComboBoxDidChange(ComboBox* box)
 {
-    //will need to fill this in eventually, should be fine empty for now
+    String name = box->getName();
+    int Id = box->getSelectedId();
+    // int index = box->getSelectedItemIndex();
+    
+    if (name == "Resonance")
+    {
+        setCurrentId(Id);
+    }
 }
 
 void ResonancePreparationEditor::buttonClicked(Button* b)
@@ -923,7 +930,7 @@ void ResonancePreparationEditor::BKRangeSliderValueChanged(String name, double m
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
     
     if(name == startTimeSlider->getName()) {
-        DBG("got new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
+        //DBG("got new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
         prep->setMinStartTime(minval);
         prep->setMaxStartTime(maxval);
     }
@@ -1345,7 +1352,7 @@ void ResonanceModificationEditor::BKRangeSliderValueChanged(String name, double 
     ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
     
     if(name == startTimeSlider->getName()) {
-        DBG("modding new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
+        //DBG("modding new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
         mod->setMinStartTime(minval);
         mod->setMaxStartTime(maxval);
         
