@@ -282,9 +282,10 @@ void ResonancePreparation::addSympStrings(int noteNumber, float velocity)
     
     if(sympStrings.size() > getMaxSympStrings())
     {
-        //DBG("Resonance: removing oldest sympathetic string");
+        DBG("Resonance: removing oldest sympathetic string");
         int oldestString = rActiveHeldKeys.value.getLast();
         removeSympStrings(oldestString, velocity);
+        sympStrings.remove(oldestString); // just added
         rActiveHeldKeys.arrayRemoveAllInstancesOf(oldestString);
         //resonance->prep->rActiveHeldKeys.value.removeLast();
     }
@@ -413,7 +414,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     if ( (doRing && doAdd) || doAdd) // don't want to remove resonating strings if we aren't in doAdd target mode, so doAdd always needs to be true
     {
         // clear this held string's partials
-        //DBG("Resonance: clearing sympathetic string: " + String(noteNumber));
+        DBG("Resonance: clearing sympathetic string: " + String(noteNumber));
         resonance->prep->removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
         resonance->prep->sympStrings.remove(noteNumber);
         
