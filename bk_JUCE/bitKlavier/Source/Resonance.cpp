@@ -279,10 +279,15 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
 // this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
 void ResonancePreparation::addSympStrings(int noteNumber, float velocity)
 {
+    // don't add a symp string that is already there
+    if(getHeldKeys().contains(noteNumber)) return;
     
     if(sympStrings.size() > getMaxSympStrings())
     {
         DBG("Resonance: removing oldest sympathetic string");
+        // might want to offer some more options here:
+            // for instance, remove highest note (since that will have the fewest resonances in most cases)
+            // or remove quietest? probably harder...
         int oldestString = rActiveHeldKeys.value.getLast();
         removeSympStrings(oldestString, velocity);
         sympStrings.remove(oldestString); // just added
