@@ -438,6 +438,7 @@ void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
     {
         for (auto sympString : *heldNotePartials)
         {
+            if (sympString == nullptr) return;
             sympString->playPosition += numSamples;
         }
     }
