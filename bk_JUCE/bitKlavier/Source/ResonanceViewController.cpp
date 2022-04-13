@@ -940,6 +940,9 @@ void ResonancePreparationEditor::BKRangeSliderValueChanged(String name, double m
 
 void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) {
     
+    DBG("ResonancePreparationEditor::handleKeymapNoteToggled " + String(midiNoteNumber));
+    midiNoteNumber += 12;
+    
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
     
     if (source == &resonanceKeyboardState)
@@ -975,8 +978,8 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
             prep->sympStrings.remove(midiNoteNumber);
         } else
         {
-            prep->addHeldKey(midiNoteNumber);
             prep->addSympStrings(midiNoteNumber, 127);
+            prep->addHeldKey(midiNoteNumber);
         }
            
         addKeyboard->setKeysInKeymap(prep->rActiveHeldKeys.value);

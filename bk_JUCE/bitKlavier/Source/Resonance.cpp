@@ -145,7 +145,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
 
     for (HashMap<int, Array<SympPartial::Ptr>>::Iterator heldNotePartials (resonance->prep->sympStrings); heldNotePartials.next();)
     {
-        //DBG("Resonance::ringSympStrings: iterating through sympStrings");
+        DBG("Resonance::ringSympStrings: iterating through sympStrings");
         // indexed by heldNote (midiNoteNumber)
         // iterate through partials of incoming note (noteNumber) and see if they are contained in this set of heldNotePartials
         //for (int j = 0; j < partialStructure.size(); j++)
@@ -280,7 +280,10 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
 void ResonancePreparation::addSympStrings(int noteNumber, float velocity)
 {
     // don't add a symp string that is already there
-    if(getHeldKeys().contains(noteNumber)) return;
+    if(getHeldKeys().contains(noteNumber)) {
+        DBG("ResonancePreparation::addSympStrings, not adding new string as it is already there");
+        return;
+    }
     
     if(sympStrings.size() > getMaxSympStrings())
     {
@@ -295,7 +298,7 @@ void ResonancePreparation::addSympStrings(int noteNumber, float velocity)
         //resonance->prep->rActiveHeldKeys.value.removeLast();
     }
     
-    //DBG("Resonance: addingSympatheticString " + String(noteNumber));
+    DBG("Resonance: addingSympatheticString " + String(noteNumber));
     //for (int i = 0; i < partialStructure.size(); i++)
     //resonance->prep->getPartialStructure()
     for (int i = 0; i < getPartialStructure().size(); i++)
