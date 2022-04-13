@@ -326,6 +326,12 @@ absoluteKeyboard(false, false)
     applyKBMButton->setButtonText (TRANS("Apply"));
     //applyButton->addListener (this);
     
+    connectMTSButton.reset(new BKTextButton());
+    addAndMakeVisible(connectMTSButton.get());
+    connectMTSButton->setButtonText(TRANS("Connect to MTS Server"));
+    disconnectMTSButton.reset(new BKTextButton());
+    addAndMakeVisible(connectMTSButton.get());
+    disconnectMTSButton->setButtonText(TRANS("Disconnect from MTS Server"));
     sclTextEditor->addListener(this);
     kbmTextEditor->addListener(this);
     
@@ -2255,6 +2261,23 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         tuning->currentKBMString = kbmTextEditor->getText();
         
         update();
+    } else if (b == connectMTSButton.get())
+    {
+        
+        if (MTS_HasMaster(tuning->prep->client) || tuning->prep->client != nullptr)
+        {
+            MTS_DeregisterClient(tuning->prep->client);
+            tuning->prep->client = nullptr;
+        }
+        tuning->prep->client = MTS_RegisterClient();
+        
+    } else if (b == disconnectMTSButton.get())
+    {
+        if (MTS_HasMaster(tuning->prep->client))
+        {
+            MTS_DeregisterClient(tuning->prep->client);
+            tuning->prep->client = nullptr;
+        }
     }
     else {
         for (int i=0; i<springModeButtons.size(); i++)
