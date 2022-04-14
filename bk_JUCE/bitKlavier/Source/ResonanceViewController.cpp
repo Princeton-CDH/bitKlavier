@@ -365,7 +365,8 @@ void ResonanceViewController::displayTab(int tab)
         addLabel.setBounds(addKeyboardRow.removeFromTop(keyboardHeight * 0.5));
         addLabel.setVisible(true);
         
-        float keyWidth = addKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
+        //float keyWidth = addKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
+        float keyWidth = addKeyboardRow.getWidth() / 52.0; // 62 is number of white keys
         
         DBG("Keyboard row width: " + String(addKeyboardRow.getWidth()));
         DBG("Keyboard width" + String(addKeyboard->getWidth()));
@@ -385,7 +386,7 @@ void ResonanceViewController::displayTab(int tab)
         ringLabel.setBounds(ringKeyboardRow.removeFromTop(keyboardHeight * 0.5));
         ringLabel.setVisible(true);
         
-        keyWidth = ringKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
+        keyWidth = ringKeyboardRow.getWidth() / 52.0; // 62 is number of white keys
         
         DBG("Keyboard row width: " + String(ringKeyboardRow.getWidth()));
         DBG("Keyboard width" + String(ringKeyboard->getWidth()));
