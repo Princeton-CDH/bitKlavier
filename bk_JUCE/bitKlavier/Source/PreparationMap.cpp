@@ -853,6 +853,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                                        km->applyVelocityCurve(velocity));
                         releaseTargetVelocities.setUnchecked(TargetTypeDirect, v);
                     }
+                    // if (km->isSostenutoNote(noteNumber)) ignoreSustain = true;
                 }
                 if (km->getIgnoreSustain()) ignoreSustain = true;
             }

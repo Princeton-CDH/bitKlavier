@@ -646,7 +646,7 @@ private:
     bool harArrayMidiEdit;
     
     bool inverted;
-    bool isToggle;
+    
     Array<bool> toggleState;
     
     Array<bool> triggered;
@@ -679,6 +679,8 @@ private:
     bool allNotesOff;
     
     bool sustainPedalKeys;
+    
+    bool isToggle;
 
     JUCE_LEAK_DETECTOR (Keymap)
 };

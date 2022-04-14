@@ -47,6 +47,11 @@ public:
     void postRelease(int noteNumber, float velocity, int channel, int mappedFrom, String source = String("Default"));
     void clearKey(int noteNumber);
     void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }
+    void sustainPedalPressed(Array<int> sostenutoNotes)
+    {
+        sustainPedalIsDepressed = true;
+        // copy sostenutoNotes to all Keymaps that are in sostenuto mode
+    }
     void sustainPedalReleased(bool post);
     void sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post);
     void sustainPedalReleased() { sustainPedalReleased(false); };
