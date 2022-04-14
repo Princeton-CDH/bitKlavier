@@ -18,7 +18,7 @@
 
 #include "SpringTuning.h"
 #include "Tunings.h"
-#include "MTS-ESP/Client/libMTSClient.h"
+//#include "MTS-ESP/Client/libMTSClient.h"
 
 class TuningModification;
 
@@ -46,7 +46,7 @@ public:
     nToneSemitoneWidth(p->getNToneSemitoneWidth()),
     nToneRoot(p->getNToneRoot()),
     adaptiveType(p->getAdaptiveType()),
-    client(nullptr),
+    //client(nullptr),
     stuning(new SpringTuning(p->getSpringTuning()))
     {
 
@@ -227,7 +227,7 @@ public:
     nToneSemitoneWidth(semitoneWidth),
     nToneRoot(semitoneRoot),
     adaptiveType(AdaptiveNone),
-    client(nullptr),
+    //client(nullptr),
     stuning(new SpringTuning(st))
     {
         Array<float> arr;
@@ -261,7 +261,7 @@ public:
     nToneSemitoneWidth(100),
     nToneRoot(60),
     adaptiveType(AdaptiveNone),
-    client(nullptr),
+    //client(nullptr),
     stuning(new SpringTuning())
     {
         Array<float> arr;
@@ -271,8 +271,8 @@ public:
     
     ~TuningPreparation()
     {
-        if(MTS_HasMaster(client))
-            MTS_DeregisterClient(client);
+//        if(MTS_HasMaster(client))
+//            MTS_DeregisterClient(client);
     }
     
     inline const String getName() const noexcept {return name;}
@@ -418,6 +418,7 @@ public:
     {
         tAbsolute.set(abs);
     }
+    
     
     
     void print(void)
@@ -602,7 +603,7 @@ public:
     
     Moddable<TuningAdaptiveSystemType> adaptiveType;
    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MTS Tuning~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
-    MTSClient *client;
+    
 private:
     String name;
     
