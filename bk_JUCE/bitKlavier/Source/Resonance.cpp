@@ -276,11 +276,16 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
     }
 }
 
-// this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
 void ResonancePreparation::addSympStrings(int noteNumber, float velocity)
 {
+    addSympStrings(noteNumber, velocity, false);
+}
+
+// this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
+void ResonancePreparation::addSympStrings(int noteNumber, float velocity, bool ignoreRepeatedNotes)
+{
     // don't add a symp string that is already there
-    if(getHeldKeys().contains(noteNumber)) {
+    if(getHeldKeys().contains(noteNumber) && ignoreRepeatedNotes) {
         DBG("ResonancePreparation::addSympStrings, not adding new string as it is already there");
         return;
     }
@@ -381,7 +386,8 @@ void ResonanceProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
     if (doAdd)
     {
         // then, add this new string and its partials to the currently available sympathetic strings
-        resonance->prep->addSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceAdd));
+            // 3rd arg ignore repeated notes = true, so don't add this string if it's already there
+        resonance->prep->addSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceAdd), true);
     }
 }
 

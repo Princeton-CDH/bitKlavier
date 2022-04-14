@@ -614,6 +614,7 @@ public:
     
     //symp strings code
     void addSympStrings(int noteNumber, float velocity);
+    void addSympStrings(int noteNumber, float velocity, bool ignoreRepeatedNotes);
     void removeSympStrings(int noteNumber, float velocity);
     Array<int> getSympStrings();
     
