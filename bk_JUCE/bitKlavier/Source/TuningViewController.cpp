@@ -74,6 +74,7 @@ absoluteKeyboard(false, false)
     adaptiveSystemsCB.addItem("Adaptive 1", 2);
     adaptiveSystemsCB.addItem("Adaptive Anchored 1", 3);
     adaptiveSystemsCB.addItem("Spring", 4);
+    //adaptiveSystemsCB.addItem("MTSClient", 5);
     
     attachKeymap.setText("Attach a Keymap for Adaptive or Spiral/Springs!", dontSendNotification);
     addAndMakeVisible(attachKeymap);
@@ -325,6 +326,7 @@ absoluteKeyboard(false, false)
     addAndMakeVisible (applyKBMButton.get());
     applyKBMButton->setButtonText (TRANS("Apply"));
     //applyButton->addListener (this);
+    
     
     sclTextEditor->addListener(this);
     kbmTextEditor->addListener(this);
@@ -1623,23 +1625,7 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
     }
     else if (action == 8)
     {
-        FileChooser myChooser ("Load tuning from .scl file...",
-                               File::getSpecialLocation (File::userHomeDirectory),
-                               "*.scl");
-        
-        if (myChooser.browseForFileToOpen())
-        {
-            File myFile (myChooser.getResult());
-
-            //File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
-
-            //user = user.getChildFile(myFile.getFileName());
-            
-            int Id = processor.updateState->currentTuningId;
-            Tuning::Ptr prep = processor.gallery->getTuning(Id);
-            prep->loadScalaFile(myFile.getFullPathName().toStdString());
-            vc->update();
-        }
+        /////ADD MTS SERVER CODE
     }
     else if (action >= 100)
     {
@@ -1727,6 +1713,8 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
             prep->setScaleByName(scaleCB.getText());
         }
+        
+    
         
         customKeyboard.setValues(tuning->getCurrentScaleCents());
         

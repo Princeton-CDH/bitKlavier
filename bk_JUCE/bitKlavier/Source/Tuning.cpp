@@ -12,6 +12,7 @@
 #include "PluginProcessor.h"
 #include "Modification.h"
 
+
 void TuningPreparation::performModification(TuningModification* p, Array<bool> dirty)
 {
     bool reverse = p->altMod && modded;
@@ -125,7 +126,9 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
         
         return lastNoteOffset;
     }
-
+    
+    
+    
     //else do regular tunings
     Array<float> currentTuning;
     if(tuning->prep->getScale() == CustomTuning)

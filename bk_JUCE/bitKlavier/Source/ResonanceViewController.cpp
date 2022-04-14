@@ -75,7 +75,7 @@ offsetsKeyboard(false, true)
 //    closestKeyboard.setAlpha(1);
     //closestKeyboard->setAvailableRange(24, 24+NUM_KEYS);
     closestKeyboard->setAvailableRange(0, NUM_KEYS);
-    closestKeyboard->setOctaveForMiddleC(4);
+    //closestKeyboard->setOctaveForMiddleC(4);
     closestKeyboard->setScrollButtonsVisible(false);
     closestKeyboard->setOctaveForMiddleC(5);
     addAndMakeVisible(*closestKeyboard);
@@ -86,7 +86,7 @@ offsetsKeyboard(false, true)
 //    closestKeyboard.setAlpha(1);
     //fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS);
     fundamentalKeyboard->setAvailableRange(0, NUM_KEYS);
-    fundamentalKeyboard->setOctaveForMiddleC(4);
+    //fundamentalKeyboard->setOctaveForMiddleC(4);
     //fundamentalKeyboard.setScrollButtonsVisible(false);
     fundamentalKeyboard->setOctaveForMiddleC(5);
     fundamentalKeyboard->setKeysInKeymap(0);
@@ -94,15 +94,19 @@ offsetsKeyboard(false, true)
     
     addKeyboard = std::make_unique<BKKeymapKeyboardComponent> (addKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     addKeyboard->setName("add");
-    addKeyboard->setAvailableRange(9, 96);
-    addKeyboard->setOctaveForMiddleC(5);
+    addKeyboard->setScrollButtonsVisible(false);
+    addKeyboard->setAvailableRange(21, 108);
+    //addKeyboard->setOctaveForMiddleC(5);
+    addKeyboard->setOctaveForMiddleC(4);
     addKeyboard->setKeysInKeymap(0);
     addAndMakeVisible(*addKeyboard);
     
     ringKeyboard = std::make_unique<BKKeymapKeyboardComponent> (ringKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     ringKeyboard->setName("ring");
-    ringKeyboard->setAvailableRange(9, 96);
-    ringKeyboard->setOctaveForMiddleC(5);
+    ringKeyboard->setScrollButtonsVisible(false);
+    ringKeyboard->setAvailableRange(21, 108);
+    //ringKeyboard->setOctaveForMiddleC(5);
+    ringKeyboard->setOctaveForMiddleC(4);
     ringKeyboard->setKeysInKeymap(0);
     addAndMakeVisible(*ringKeyboard);
     
@@ -355,13 +359,14 @@ void ResonanceViewController::displayTab(int tab)
         area.removeFromBottom(40 * processor.paddingScalarY);
         
         float keyboardHeight = 80 * processor.paddingScalarY;
-        float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
+        // float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
         
         Rectangle<int> addKeyboardRow = area.removeFromBottom(keyboardHeight * 2);
         addLabel.setBounds(addKeyboardRow.removeFromTop(keyboardHeight * 0.5));
         addLabel.setVisible(true);
         
-        float keyWidth = addKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
+        //float keyWidth = addKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
+        float keyWidth = addKeyboardRow.getWidth() / 52.0; // 62 is number of white keys
         
         DBG("Keyboard row width: " + String(addKeyboardRow.getWidth()));
         DBG("Keyboard width" + String(addKeyboard->getWidth()));
@@ -381,7 +386,7 @@ void ResonanceViewController::displayTab(int tab)
         ringLabel.setBounds(ringKeyboardRow.removeFromTop(keyboardHeight * 0.5));
         ringLabel.setVisible(true);
         
-        keyWidth = ringKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
+        keyWidth = ringKeyboardRow.getWidth() / 52.0; // 62 is number of white keys
         
         DBG("Keyboard row width: " + String(ringKeyboardRow.getWidth()));
         DBG("Keyboard width" + String(ringKeyboard->getWidth()));
@@ -941,7 +946,6 @@ void ResonancePreparationEditor::BKRangeSliderValueChanged(String name, double m
 void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) {
     
     DBG("ResonancePreparationEditor::handleKeymapNoteToggled " + String(midiNoteNumber));
-    midiNoteNumber += 12;
     
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
     
@@ -949,7 +953,7 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
     {
         //closestKeyboard->setKeysInKeymap(prep->getKeys());
         //DBG("resonanceKeyboardState " + String(midiNoteNumber));
-        prep->toggleResonanceKey(midiNoteNumber);
+        prep->toggleResonanceKey(midiNoteNumber); // for some reason we're off an octave here
         closestKeyboard->setKeysInKeymap(prep->getResonanceKeys());
         
         offsetsKeyboard.setKeys(prep->getResonanceKeys());
@@ -1414,8 +1418,8 @@ void ResonanceModificationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState*
             mod->removeSympStrings(midiNoteNumber, 0);
         } else
         {
-            mod->addHeldKey(midiNoteNumber);
             mod->addSympStrings(midiNoteNumber, 127);
+            mod->addHeldKey(midiNoteNumber);
             mod->sympStrings.remove(midiNoteNumber);
         }
            

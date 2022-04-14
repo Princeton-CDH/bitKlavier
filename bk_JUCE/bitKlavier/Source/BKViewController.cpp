@@ -81,7 +81,7 @@ PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type, bool singl
     optionMenu.addSubMenu("Import...", exported);
     if (type == PreparationTypeTuning)
     {
-        optionMenu.addItem(8,"Import Scala");
+        optionMenu.addItem(8,"MTS Server");
     }
     optionMenu.addSeparator();
     optionMenu.addItem(4, "Reset");

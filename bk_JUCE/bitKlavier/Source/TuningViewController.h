@@ -131,7 +131,7 @@ protected:
     void displayTab(int tab) override;
     void displayShared(void) override;
     void invisible(void) override;
-   //SCALA
+    //SCALA
     std::unique_ptr<BKTextEditor> sclTextEditor;
     std::unique_ptr<BKTextEditor> kbmTextEditor;
     std::unique_ptr<BKTextButton> applyButton;
@@ -141,6 +141,10 @@ protected:
     std::unique_ptr<BKTextButton> applyKBMButton;
     virtual void bkTextFieldDidChange (TextEditor&) override;
     void textEditorEscapeKeyPressed (TextEditor& tf) override;
+    
+    //MTS
+    std::unique_ptr<BKTextButton> connectMTSButton;
+    std::unique_ptr<BKTextButton> disconnectMTSButton;
     std::unique_ptr<FileChooser> chooser;
     String lastFile;
     void setLastFile (const FileChooser& fc)
