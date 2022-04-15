@@ -998,9 +998,6 @@ void BKAudioProcessor::sustainActivate(void)
         DBG("SUSTAIN ON");
         
         currentPiano->prepMap->sustainPedalPressed();
-        // add currently depressed notes to potentialSostenutoNotes array here
-        // then, any Keymap that is in sostenuto mode would need to copy those to their sostenutoNotes array.
-    
         prevPiano->prepMap->sustainPedalPressed();
     
         //play pedalDown resonance

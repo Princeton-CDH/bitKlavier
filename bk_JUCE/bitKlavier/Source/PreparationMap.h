@@ -46,15 +46,12 @@ public:
     //void keyPartReleased(int noteNumber, float velocity, int channel, Keymap::PtrArr affectedKeymaps, bool soundfont = false, String source = String("Default"));
     void postRelease(int noteNumber, float velocity, int channel, int mappedFrom, String source = String("Default"));
     void clearKey(int noteNumber);
-    void sustainPedalPressed()  { sustainPedalIsDepressed = true;  }
-    void sustainPedalPressed(Array<int> sostenutoNotes)
-    {
-        sustainPedalIsDepressed = true;
-        // copy sostenutoNotes to all Keymaps that are in sostenuto mode
-    }
+    
+    void sustainPedalPressed();
     void sustainPedalReleased(bool post);
     void sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post);
     void sustainPedalReleased() { sustainPedalReleased(false); };
+    
     void attemptReattack(int noteNumber, int mappedFrom, String source = String("Default"));
     void attemptSustain(int noteNumber, float velocity, int channel, int mappedFrom,
                         bool fromPress, bool soundfont, String source = String("Default"));

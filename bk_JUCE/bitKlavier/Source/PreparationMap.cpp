@@ -509,6 +509,7 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
             if (km->containsNoteMapping(noteNumber, mappedFrom))
             {
                 km->addVelocity(noteNumber, velocity);
+                km->addToPotentialSostenutoNotes(noteNumber);
                 if (km->isInverted())
                 {
                     checkForSustain = true;
@@ -822,8 +823,10 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
         if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
         {
             km->removeVelocity(noteNumber);
+            km->removeFromPotentialSostenutoNotes(noteNumber);
             if (km->isInverted()) foundReattack = true;
             else foundSustain = true;
+
         }
     }
     if (foundSustain) attemptSustain(noteNumber, velocity, channel, mappedFrom, false, soundfont, source);
@@ -853,16 +856,16 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                                        km->applyVelocityCurve(velocity));
                         releaseTargetVelocities.setUnchecked(TargetTypeDirect, v);
                     }
-                    // if (km->isSostenutoNote(noteNumber)) ignoreSustain = true;
                 }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
+                // if (km->getIgnoreSustain()) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
         pressTargetVelocities.fill(-1.f);
         
         proc->playReleaseSample(noteNumber, releaseTargetVelocities, false, soundfont);
-        if (ignoreSustain && !noteDown)
+        if (ignoreSustain && !noteDown) // also !in activeSostenutoNotes
             proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
     }
@@ -885,7 +888,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                         releaseTargetVelocities.setUnchecked(TargetTypeTuning, velocity);
                     }
                 }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
+                // if (km->getIgnoreSustain()) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber))) ignoreSustain = true;
             }
         }
         
@@ -922,7 +926,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                         }
                     }
                 }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
+                // if (km->getIgnoreSustain()) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -958,7 +963,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                         }
                     }
                 }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
+                // if (km->getIgnoreSustain()) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -994,7 +1000,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                         }
                     }
                 }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
+                // if (km->getIgnoreSustain()) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -1023,7 +1030,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                         releaseTargetVelocities.setUnchecked(TargetTypeTempo, velocity);
                     }
                 }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
+                // if (km->getIgnoreSustain()) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -1064,7 +1072,8 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                         }
                     }
                 }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
+                //if (km->getIgnoreSustain()) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -1074,6 +1083,18 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
             proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
     }
+}
+
+void PreparationMap::sustainPedalPressed()
+{
+    sustainPedalIsDepressed = true;
+    
+    for (auto km : keymaps)
+    {
+        // tell each keymap to copy their potentialSostenutoNotes to activeSostenutoNotes
+        km->activateSostenuto();
+    }
+    
 }
 
 void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatAreDepressed, bool post)
@@ -1087,7 +1108,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
     }
     
     //do all keyReleased calls now
-    DBG("sustainPedalReleased: sustainedNotes.size() = " + String(sustainedNotes.size()));
+    // DBG("sustainPedalReleased: sustainedNotes.size() = " + String(sustainedNotes.size()));
     for(int n = 0; n < sustainedNotes.size(); ++n)
     {
         Note note = sustainedNotes.getUnchecked(n);
@@ -1109,6 +1130,7 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
         {
             hasActiveTarget = false;
             bool allIgnoreSustain = true;
+            // bool isSostenutoNote = false;
             for (auto km : proc->getKeymaps())
             {
                 if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
@@ -1120,10 +1142,11 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                         targetVelocities.set(TargetTypeDirect, v);
                     }
                     if (!km->getIgnoreSustain()) allIgnoreSustain = false;
+                    // if (km->isSostenutoNote(noteNumber)) isSostenutoNote = true;
                 }
             }
             //local flag for keymap that isn't ignoring sustain
-            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
+            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget) // && !isSostenutoNote
                 //don't turn off note if key is down!
                 proc->keyReleased(noteNumber, targetVelocities, false);
             targetVelocities.fill(-1.f);
@@ -1284,13 +1307,13 @@ void PreparationMap::sustainPedalReleased(bool post)
     OwnedArray<HashMap<String, int>> keysThatAreDepressed;
     keysThatAreDepressed.ensureStorageAllocated(128);
     for (int i = 0; i < 128; ++i)
-    keysThatAreDepressed.set(i, new HashMap<String, int>);
+        keysThatAreDepressed.set(i, new HashMap<String, int>);
     sustainPedalReleased(keysThatAreDepressed, post);
 }
 
 void PreparationMap::postRelease(int noteNumber, float velocity, int channel, int mappedFrom, String source)
 {
-    DBG("PreparationMap::postRelease " + String(noteNumber));
+    // DBG("PreparationMap::postRelease " + String(noteNumber));
     
     Array<float> targetVelocities;
     for (int i = 0; i < TargetTypeNil; i++)
@@ -1306,7 +1329,7 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, in
         newNote.channel = channel;
         newNote.mappedFrom = mappedFrom;
         newNote.source = source;
-        DBG("storing sustained note " + String(noteNumber));
+        // DBG("storing sustained note " + String(noteNumber));
         
         sustainedNotes.add(newNote);
     }
@@ -1324,12 +1347,13 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, in
                     targetVelocities.set(TargetTypeDirect, v);
                 }
                 if (km->getIgnoreSustain()) ignoreSustain = true;
+                // check sostenutoState here, set ignoreSustain = true if km->doSostenuto && km->activeSostenutoNotesInclude(noteNumber)
             }
         }
         proc->playReleaseSample(noteNumber, targetVelocities, false);
         if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain))
         {
-            DBG("PreparationMap::postRelease releasing noteNumnber: " + String(noteNumber));
+            // DBG("PreparationMap::postRelease releasing noteNumnber: " + String(noteNumber));
             proc->keyReleased(noteNumber, targetVelocities, false);
         }
         targetVelocities.fill(-1.f);
@@ -1426,7 +1450,7 @@ void PreparationMap::attemptReattack(int noteNumber, int mappedFrom, String sour
 {
     if(sustainPedalIsDepressed)
     {
-        //DBG("removing sustained note " + String(noteNumber));
+        // DBG("removing sustained note " + String(noteNumber));
         
         for(int i = 0; i < sustainedNotes.size(); ++i)
         {
@@ -1449,7 +1473,7 @@ void PreparationMap::attemptSustain(int noteNumber, float velocity, int channel,
         newNote.channel = channel;
         newNote.mappedFrom = mappedFrom;
         newNote.source = source;
-        //DBG("storing sustained note " + String(noteNumber));
+        // DBG("storing sustained note " + String(noteNumber));
         
         sustainedNotes.add(newNote);
         
