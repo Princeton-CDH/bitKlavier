@@ -83,6 +83,7 @@ private:
     ToggleButton harMidiEditToggle;
     ToggleButton harArrayMidiEditToggle;
     ToggleButton toggleKeysToggle;
+    ToggleButton sostenutoToggle;
     
     BKLabel     keymapL;
     BKTextEditor  keymapTF;

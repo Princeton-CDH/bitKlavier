@@ -176,6 +176,24 @@ public:
     inline void toggleHarArrayMidiEdit() { harArrayMidiEdit = !harArrayMidiEdit; }
     inline bool getHarArrayMidiEdit() { return harArrayMidiEdit; }
     
+    void addToPotentialSostenutoNotes(int midiNoteNumber) {
+        if (isSostenuto) potentialSostenutoNotes.addIfNotAlreadyThere(midiNoteNumber);
+        // DBG("potentialSostenutoNotes.size() = " + String(potentialSostenutoNotes.size()));
+    }
+    
+    void removeFromPotentialSostenutoNotes(int midiNoteNumber) {
+        
+        if(potentialSostenutoNotes.contains(midiNoteNumber)) {
+            potentialSostenutoNotes.remove(potentialSostenutoNotes.indexOf(midiNoteNumber));
+        }
+        // DBG("potentialSostenutoNotes.size() = " + String(potentialSostenutoNotes.size()));
+    }
+    
+    void copyPotentialToActiveSostenutoNotes() {
+        activeSostenutoNotes.clearQuick();
+        activeSostenutoNotes = potentialSostenutoNotes;
+    }
+    
     void print(void);
     
     inline ValueTree getState(void)
@@ -235,6 +253,8 @@ public:
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_sustainPedalKeys, sustainPedalKeys ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_toggleKey, isToggle ? 1 : 0, 0);
+        keysave.setProperty(ptagKeymap_sostenutoMode, isSostenuto ? 1 : 0, 0);
+        //ptagKeymap_sostenutoMode
         //keysave.setProperty(ptagKeymap_extendRange, rangeExtend, 0);
         keysave.setProperty(ptagKeymap_asymmetricalWarp, asym_k, 0);
         keysave.setProperty(ptagKeymap_symmetricalWarp, sym_k, 0);
@@ -352,6 +372,7 @@ public:
         setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
         setSustainPedalKeys((bool) e->getIntAttribute(ptagKeymap_sustainPedalKeys, 0));
         setIsToggle((bool)e->getIntAttribute(ptagKeymap_toggleKey, 0));
+        setIsSostenuto((bool)e->getIntAttribute(ptagKeymap_sostenutoMode, 0));
         // Not sure what value the second argument needs to be. Right now I'm using the default values, but these are the values that bK uses for velocity curving before the view controller is opened and the values update to what they were saved to be.
         //rangeExtend = (float) e->getDoubleAttribute(ptagKeymap_extendRange, 4);
         asym_k = (float) e->getDoubleAttribute(ptagKeymap_asymmetricalWarp, 1);
@@ -604,11 +625,24 @@ public:
     inline void setIsToggle(bool toSet) { isToggle = toSet; }
     inline void toggleIsToggle() { isToggle = !isToggle; }
     
+    inline bool getIsSostenuto()            { return isSostenuto; }
+    inline void setIsSostenuto(bool toSet)  { isSostenuto = toSet; }
+    inline void toggleIsSostenuto()         { isSostenuto = !isSostenuto; }
+    inline void activateSostenuto()         { if (isSostenuto) copyPotentialToActiveSostenutoNotes(); }
+    inline void deactivateSostenuto()       { if (isSostenuto) activeSostenutoNotes.clearQuick(); }
+    inline bool isUnsustainingSostenutoNote(int noteNumber)
+    {
+        if (isSostenuto) // we are in sostenuto mode, so any notes that are not activeSostenutoNotes should NOT sustain
+            if (activeSostenutoNotes.size() == 0) return true;
+            else return !activeSostenutoNotes.contains(noteNumber);
+        else return false; // we are not in sostenuto mode
+    }
+    
     inline bool getToggleState(int noteNumber) { return triggered.getUnchecked(noteNumber); }
     //inline bool setToggleState(bool toSet) { trigger.setUnchecked(); }
     inline void toggleToggleState(int noteNumber) { triggered.setUnchecked(noteNumber, !triggered.getUnchecked(noteNumber)); }
+    
     // Velocity Curving getters & setters
-    //inline float getRangeExtend() { return rangeExtend; }
     inline float getAsym_k() { return asym_k; }
     inline float getSym_k() { return sym_k; }
     inline float getScale() { return scale; }
@@ -646,7 +680,7 @@ private:
     bool harArrayMidiEdit;
     
     bool inverted;
-    bool isToggle;
+    
     Array<bool> toggleState;
     
     Array<bool> triggered;
@@ -656,6 +690,14 @@ private:
 
     Array<String> midiInputNames;
     Array<String> midiInputIdentifiers;
+    
+    // currently depressed keys in this keymap
+    //   that will be included in sostenuto notes when sustain pedal is depressed
+    Array<int> potentialSostenutoNotes;
+    
+    // notes that were depressed when sostenuto pedal was depressed
+    //   these are now active sostenuto notes and should be sustained
+    Array<int> activeSostenutoNotes;
     
     bool defaultSelected;
     bool onscreenSelected;
@@ -679,6 +721,10 @@ private:
     bool allNotesOff;
     
     bool sustainPedalKeys;
+    
+    bool isToggle;
+    
+    bool isSostenuto;
 
     JUCE_LEAK_DETECTOR (Keymap)
 };

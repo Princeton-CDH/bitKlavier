@@ -36,11 +36,12 @@ asym_k(1),
 sym_k(1),
 scale(1),
 offset(0),
-isToggle(false),
 velocityInvert(false),
 ignoreSustain(false),
 allNotesOff(false),
-sustainPedalKeys(false)
+sustainPedalKeys(false),
+isToggle(false),
+isSostenuto(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -100,7 +101,8 @@ velocityInvert(k->getVelocityInvert()),
 ignoreSustain(k->getIgnoreSustain()),
 allNotesOff(k->getAllNotesOff()),
 sustainPedalKeys(k->getSustainPedalKeys()),
-isToggle(k->getIsToggle())
+isToggle(k->getIsToggle()),
+isSostenuto(k->getIsSostenuto())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -166,7 +168,8 @@ velocityInvert(k->getVelocityInvert()),
 ignoreSustain(k->getIgnoreSustain()),
 allNotesOff(k->getAllNotesOff()),
 sustainPedalKeys(k->getSustainPedalKeys()),
-isToggle(k->getIsToggle())
+isToggle(k->getIsToggle()),
+isSostenuto(k->getIsSostenuto())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -234,7 +237,8 @@ velocityInvert(false),
 ignoreSustain(false),
 allNotesOff(false),
 sustainPedalKeys(false),
-isToggle(false)
+isToggle(false),
+isSostenuto(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)

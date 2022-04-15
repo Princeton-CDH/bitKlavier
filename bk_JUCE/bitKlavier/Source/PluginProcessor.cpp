@@ -991,13 +991,13 @@ void BKAudioProcessor::handlePianoPostRelease(Piano::Ptr piano, int noteNumber, 
 void BKAudioProcessor::sustainActivate(void)
 {
     DBG("BKAudioProcessor::sustainActivate");
+        
     if(!sustainIsDown)
     {
         sustainIsDown = true;
         DBG("SUSTAIN ON");
         
         currentPiano->prepMap->sustainPedalPressed();
-    
         prevPiano->prepMap->sustainPedalPressed();
     
         //play pedalDown resonance

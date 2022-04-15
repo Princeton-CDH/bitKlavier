@@ -187,11 +187,11 @@ public:
     OwnedArray<HashMap<String, int>>&   getSourcedNotesOn();
     OwnedArray<HashMap<String, float>>  sourcedNoteVelocities;
     
-    void                                noteOnUI (int noteNumber) { if(didLoadMainPianoSamples) notesOnUI.add(noteNumber); }
-    void                                noteOffUI(int noteNumber) { if(didLoadMainPianoSamples) notesOffUI.add(noteNumber); }
+    void noteOnUI (int noteNumber) { if(didLoadMainPianoSamples) notesOnUI.add(noteNumber); }
+    void noteOffUI(int noteNumber) { if(didLoadMainPianoSamples) notesOffUI.add(noteNumber); }
     
-    int                                 noteOnCount;
-    bool                                allNotesOff;
+    int noteOnCount;
+    bool allNotesOff;
     
     int count;
     
