@@ -253,6 +253,8 @@ public:
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_sustainPedalKeys, sustainPedalKeys ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_toggleKey, isToggle ? 1 : 0, 0);
+        keysave.setProperty(ptagKeymap_sostenutoMode, isSostenuto ? 1 : 0, 0);
+        //ptagKeymap_sostenutoMode
         //keysave.setProperty(ptagKeymap_extendRange, rangeExtend, 0);
         keysave.setProperty(ptagKeymap_asymmetricalWarp, asym_k, 0);
         keysave.setProperty(ptagKeymap_symmetricalWarp, sym_k, 0);
@@ -370,6 +372,7 @@ public:
         setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
         setSustainPedalKeys((bool) e->getIntAttribute(ptagKeymap_sustainPedalKeys, 0));
         setIsToggle((bool)e->getIntAttribute(ptagKeymap_toggleKey, 0));
+        setIsSostenuto((bool)e->getIntAttribute(ptagKeymap_sostenutoMode, 0));
         // Not sure what value the second argument needs to be. Right now I'm using the default values, but these are the values that bK uses for velocity curving before the view controller is opened and the values update to what they were saved to be.
         //rangeExtend = (float) e->getDoubleAttribute(ptagKeymap_extendRange, 4);
         asym_k = (float) e->getDoubleAttribute(ptagKeymap_asymmetricalWarp, 1);
@@ -630,7 +633,7 @@ public:
     inline bool isUnsustainingSostenutoNote(int noteNumber)
     {
         if (isSostenuto) // we are in sostenuto mode, so any notes that are not activeSostenutoNotes should NOT sustain
-            if (activeSostenutoNotes.size() == 0) return false;
+            if (activeSostenutoNotes.size() == 0) return true;
             else return !activeSostenutoNotes.contains(noteNumber);
         else return false; // we are not in sostenuto mode
     }

@@ -289,6 +289,7 @@ const String ptagKeymap_scale = "scale";
 const String ptagKeymap_offset = "offset";
 const String ptagKeymap_velocityInvert = "velocityInvert";
 const String ptagKeymap_toggleKey = "toggleKey";
+const String ptagKeymap_sostenutoMode = "sostenutoMode";
 
 typedef enum PitchClass {
     C = 0,

@@ -314,9 +314,16 @@ BKViewController(p, theGraph, 4)
     toggleKeysToggle.setButtonText ("Toggle Keys");
     toggleKeysToggle.setToggleState (false, dontSendNotification);
     toggleKeysToggle.setLookAndFeel(&buttonsAndMenusLAF); // text to left
-    toggleKeysToggle.setTooltip("Pressing a key toggles on and off");
+    toggleKeysToggle.setTooltip("Pressing a key toggles on and off (noteOff is ignored)");
     toggleKeysToggle.addListener(this);
     addAndMakeVisible(&toggleKeysToggle, ALL);
+    
+    sostenutoToggle.setButtonText ("Sostenuto Mode");
+    sostenutoToggle.setToggleState (false, dontSendNotification);
+    sostenutoToggle.setLookAndFeel(&buttonsAndMenusLAF); // text to left
+    sostenutoToggle.setTooltip("Sustain pedal behaves like a Sostenuto pedal");
+    sostenutoToggle.addListener(this);
+    addAndMakeVisible(&sostenutoToggle, ALL);
     
     invertOnOffToggle.setButtonText ("Invert Note On/Off");
     invertOnOffToggle.setToggleState (false, dontSendNotification);
@@ -865,6 +872,9 @@ void KeymapViewController::displayTab(int tab)
         
         toggleKeysToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
         toggleKeysToggle.setVisible(true);
+        
+        sostenutoToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
+        sostenutoToggle.setVisible(true);
     }
 }
 
@@ -965,6 +975,7 @@ void KeymapViewController::invisible()
     harMidiEditToggle.setVisible(false);
     harArrayMidiEditToggle.setVisible(false);
     toggleKeysToggle.setVisible(false);
+    sostenutoToggle.setVisible(false);
     keymapL.setVisible(false);
     keymapTF.setVisible(false);
     
@@ -1493,6 +1504,14 @@ void KeymapViewController::bkButtonClicked (Button* b)
         update();
 
     }
+    else if (b == &sostenutoToggle)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setIsSostenuto(sostenutoToggle.getToggleState());
+        processor.updateState->editsMade = true;
+        update();
+
+    }
     /*
     else if (b == &enableHarmonizerToggle)
     {
@@ -1722,6 +1741,7 @@ void KeymapViewController::update(void)
 
         selectCB.setSelectedId(processor.updateState->currentKeymapId, dontSendNotification);
         toggleKeysToggle.setToggleState(km->getIsToggle(), dontSendNotification);
+        sostenutoToggle.setToggleState(km->getIsSostenuto(), dontSendNotification);
         invertOnOffToggle.setToggleState(km->isInverted(), dontSendNotification);
         midiEditToggle.setToggleState(km->getMidiEdit(), dontSendNotification);
         harMidiEditToggle.setToggleState(km->getHarMidiEdit(), dontSendNotification);
@@ -1768,6 +1788,7 @@ void KeymapViewController::update(void)
             endKeystrokesToggle.setEnabled(false);
             ignoreSustainToggle.setEnabled(false);
             sustainPedalKeysToggle.setEnabled(false);
+            sostenutoToggle.setEnabled(false);
             
         } else
         {
@@ -1782,6 +1803,7 @@ void KeymapViewController::update(void)
             //ignoreSustainToggle.setState(false);
             ignoreSustainToggle.setEnabled(true);
             sustainPedalKeysToggle.setEnabled(true);
+            sostenutoToggle.setEnabled(true);
         }
     }
     
