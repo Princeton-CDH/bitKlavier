@@ -1762,8 +1762,8 @@ void KeymapViewController::update(void)
             endKeystrokesToggle.setAlpha(gDim);
             ignoreSustainToggle.setAlpha(gDim);
             sustainPedalKeysToggle.setAlpha(gDim);
-            km->setIgnoreSustain(true);
-            ignoreSustainToggle.setToggleState(true, dontSendNotification);
+            //km->setIgnoreSustain(true);
+            //ignoreSustainToggle.setToggleState(true, dontSendNotification);
             invertOnOffToggle.setEnabled(false);
             endKeystrokesToggle.setEnabled(false);
             ignoreSustainToggle.setEnabled(false);
@@ -1775,8 +1775,8 @@ void KeymapViewController::update(void)
             endKeystrokesToggle.setAlpha(gBright);
             ignoreSustainToggle.setAlpha(gBright);
             sustainPedalKeysToggle.setAlpha(gBright);
-            km->setIgnoreSustain(false);
-            ignoreSustainToggle.setToggleState(false, dontSendNotification);
+            //km->setIgnoreSustain(false);
+            //ignoreSustainToggle.setToggleState(false, dontSendNotification);
             invertOnOffToggle.setEnabled(true);
             endKeystrokesToggle.setEnabled(true);
             //ignoreSustainToggle.setState(false);
