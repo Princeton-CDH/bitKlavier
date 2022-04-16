@@ -2048,6 +2048,7 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     
     channel = m.getChannel();
     
+    // note msg handling
     if (m.isNoteOn()) //&& keystrokesEnabled.getValue())
     {
         //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
@@ -2060,7 +2061,17 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
         //didNoteOffs = true;
     }
     
-    // NEED WAY TO TRIGGER RELEASE PEDAL SAMPLE FOR SFZ
+    // sostenuto pedal handling
+    else if (m.isSostenutoPedalOn())
+    {
+        DBG("m.isSostenutoPedalOn()");
+    }
+    else if (m.isSostenutoPedalOff())
+    {
+        DBG("m.isSostenutoPedalOff()");
+    }
+    
+    // sustain pedal handling
     else if (m.isSustainPedalOn() && !sustainIsDown)
     {
         DBG("m.isSustainPedalOn()");
@@ -2076,6 +2087,8 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
         if (sustainInverted)    sustainActivate();
         else                    sustainDeactivate();
     }
+    
+    // anything else...
     else
     {
         mainPianoSynth.handleMidiEvent(m);
