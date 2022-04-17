@@ -810,11 +810,15 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
 
 void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, int mappedFrom, bool noteDown, bool soundfont, String source)
 {
-    //DBG("PreparationMap::keyReleased : " + String(noteNumber));
-    
-    /*iterate through keymaps inside each processor loop
+    /*
+     iterate through keymaps inside each processor loop
      set local flag to true if any ignore sustain
-     check against that flag or sustain pedal isn't depressed (then release key)*/
+     check against that flag or sustain pedal isn't depressed (then release key)
+     
+     see Keymap.h for notes about sostenuto implementation
+    */
+    
+    // DBG("PreparationMap::keyReleased : " + String(noteNumber));
     
     Array<float> pressTargetVelocities;
     Array<float> releaseTargetVelocities;
@@ -841,6 +845,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
             
             // see if this note is part of the sustained sostenuto-pedal controlled notes, so it shouldn't be cut off
             //      note that this is distinct from the situation where the user has set the sustain pedal to behave like a sostenuto pedal (in Keymap)
+            //      so we only do this when and actual sostenuto pedal is depressed
             if (sostenutoPedalIsDepressed) foundSostenuto = !km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed);
         }
     }
@@ -887,7 +892,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
         
         proc->playReleaseSample(noteNumber, releaseTargetVelocities, false, soundfont);
         
-        if (ignoreSustain && !noteDown && !foundSostenuto) // also !in activeSostenutoNotes
+        if (ignoreSustain && !noteDown && !foundSostenuto)
             proc->keyReleased(noteNumber, releaseTargetVelocities, false);
 
         releaseTargetVelocities.fill(-1.f);

@@ -185,6 +185,31 @@ public:
     inline void toggleHarArrayMidiEdit() { harArrayMidiEdit = !harArrayMidiEdit; }
     inline bool getHarArrayMidiEdit() { return harArrayMidiEdit; }
     
+    /*
+    Sostenuto Implementation Notes
+    two cases:
+     
+        1. an actual sostenuto pedal; most people don't have these!
+        2. the sustain pedal behaves like a sostenuto pedal
+     
+    in case (1), the sustain pedal might also be used, and so should behave as expected
+    in case (2), the user has selected "sostenuto mode" in Keymap
+     
+    Basic process:
+        - when any note in the Keymap is played, it is a potential sostenuto note, so it is stored
+        - when the sostenuto pedal is pressed (or the sustain pedal, when in "sostenuto mode"), the potential
+            sostenuto notes are now active sostenuto notes and should sustain even when their keys are released
+        - all non-active sostenuto notes should stop on keyRelease
+                - unless the sustain pedal is down (which is not possible in "sostenuto mode")
+        - when the sostenuto pedal (or sustain pedal in "sostenuto mode") is released, all active
+            sostenuto notes should be stopped
+                - unless their keys are still down!
+                - or if the sustain pedal is down!
+    
+    And of course this behavior needs to interface correctly with all the preparations and the harmonizer!
+     
+    */
+    
     void addToPotentialSostenutoNotes(int midiNoteNumber) {
         //if (isSostenuto) potentialSostenutoNotes.addIfNotAlreadyThere(midiNoteNumber);
         potentialSostenutoNotes.addIfNotAlreadyThere(midiNoteNumber);
