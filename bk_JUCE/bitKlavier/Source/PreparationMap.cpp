@@ -846,7 +846,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
             // see if this note is part of the sustained sostenuto-pedal controlled notes, so it shouldn't be cut off
             //      note that this is distinct from the situation where the user has set the sustain pedal to behave like a sostenuto pedal (in Keymap)
             //      so we only do this when and actual sostenuto pedal is depressed
-            if (sostenutoPedalIsDepressed) foundSostenuto = !km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed);
+            if (sostenutoPedalIsDepressed) foundSostenuto = !km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed);
         }
     }
     
@@ -884,7 +884,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                 // catch special cases where the user has either (in Keymap):
                 //      1. chosen to ignore the sustain pedal in a particular keymap, so that the note will cut off regardless of the sustain pedal
                 //      2. chosen to have the sustain pedal behave like a sostenuto pedal (so this is different than using an actual sostenuto pedal!)
-                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed))) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -917,7 +917,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                     }
                 }
                 // if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed))) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
             }
         }
         
@@ -955,7 +955,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                     }
                 }
                 // if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed))) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -992,7 +992,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                     }
                 }
                 // if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed))) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -1029,7 +1029,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                     }
                 }
                 // if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed))) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -1059,7 +1059,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                     }
                 }
                 // if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed))) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -1101,7 +1101,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
                     }
                 }
                 //if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed))) ignoreSustain = true;
+                if (km->getIgnoreSustain() || (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
             }
         }
         proc->keyPressed(noteNumber, pressTargetVelocities, false);
@@ -1126,10 +1126,16 @@ void PreparationMap::sostenutoPedalPressed() {
     }
 }
 
-void PreparationMap::sostenutoPedalReleased() {
+void PreparationMap::sostenutoPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed) { 
     if(sostenutoPedalIsDepressed) {
         DBG("sostenutoPedalReleased");
         sostenutoPedalIsDepressed = false;
+        
+        for (auto km : keymaps) {
+            km->deactivateSostenuto();
+        }
+        
+        sustainPedalReleased (keysThatArePressed, false, true); // last true indicates this is a sostenuto release
     }
 }
 
@@ -1139,13 +1145,14 @@ void PreparationMap::sustainPedalPressed()
     
     for (auto km : keymaps)
     {
-        // tell each keymap to copy their potentialSostenutoNotes to activeSostenutoNotes
+        // if a Keymap is in sostenuto mode, copy potentialSostenutoNotes to activeSostenutoNotes
+        //  not relevant to an actual sostenuto pedal
         if (km->getIsSostenuto()) km->activateSostenuto(); 
     }
     
 }
 
-void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatAreDepressed, bool post)
+void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatAreDepressed, bool post, bool fromSostenutoRelease)
 {
     sustainPedalIsDepressed = false;
     
@@ -1167,16 +1174,20 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
         String source = note.source;
         
         bool keyIsDepressed = keysThatAreDepressed.getUnchecked(noteNumber)->size() > 0;
+        bool isActiveSostenutoNote = false;
         
-        /*for each processor loop, add a keymap loop
+        /*
+         for each processor loop, add a keymap loop
          if the keymap contains the note and the source, if any aren't ignoring sustain, for that note/source, set flag to true
-         check against that flag for release*/
+         check against that flag for release
+        */
         
         bool hasActiveTarget;
         
         for (auto proc : dprocessor)
         {
             hasActiveTarget = false;
+            isActiveSostenutoNote = false;
             bool allIgnoreSustain = true;
             // bool isSostenutoNote = false;
             for (auto km : proc->getKeymaps())
@@ -1190,13 +1201,16 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                         targetVelocities.set(TargetTypeDirect, v);
                     }
                     if (!km->getIgnoreSustain()) allIgnoreSustain = false;
-                    // if (km->isSostenutoNote(noteNumber)) isSostenutoNote = true;
+                    if (sostenutoPedalIsDepressed) {
+                        isActiveSostenutoNote = !km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed);
+                    }
                 }
             }
             //local flag for keymap that isn't ignoring sustain
-            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget) // && !isSostenutoNote
-                //don't turn off note if key is down!
+            //if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
+            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget && !isActiveSostenutoNote)
                 proc->keyReleased(noteNumber, targetVelocities, false);
+            
             targetVelocities.fill(-1.f);
         }
         
@@ -1347,7 +1361,21 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
         }
     }
     
-    sustainedNotes.clearQuick();
+    if (!fromSostenutoRelease) sustainedNotes.clearQuick();
+    else {
+        for (auto km : keymaps)
+        {
+            for(int n = sustainedNotes.size() - 1; n >= 0; n--)
+            {
+                Note note = sustainedNotes.getUnchecked(n);
+                int noteNumber = note.noteNumber;
+                if (km->isUnsustainingSostenutoNote(noteNumber, false, sustainPedalIsDepressed) && !sustainPedalIsDepressed)
+                {
+                    sustainedNotes.remove(n);
+                }
+            }
+        }
+    }
 }
 
 void PreparationMap::sustainPedalReleased(bool post)

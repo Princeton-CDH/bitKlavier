@@ -691,21 +691,25 @@ public:
     inline void setIsSostenuto(bool toSet)  { isSostenuto = toSet; }
     inline void toggleIsSostenuto()         { isSostenuto = !isSostenuto; }
     inline void activateSostenuto()         { copyPotentialToActiveSostenutoNotes(); }
-    inline void deactivateSostenuto()       { if (isSostenuto) activeSostenutoNotes.clearQuick(); }
-    inline bool isUnsustainingSostenutoNote(int noteNumber, bool sostenutoPedalIsDepressed)
+    inline void deactivateSostenuto()       { activeSostenutoNotes.clearQuick(); }
+    inline bool isUnsustainingSostenutoNote(int noteNumber, bool sostenutoPedalIsDepressed, bool sustainPedalIsDepressed)
     {
         // need to check the case when
         //      isSostenuto is false (so not set in Keymap), and
         //      sostenutoPedalIsDepressed is true (so the user is pressing an actual sostenuto pedal), and
         //      sustainPedalIsDepressed is true (so the user is ALSO pressing a sustain pedal!)
         //   because in THIS case, the note should continue to sustain
+        if(!isSostenuto && sostenutoPedalIsDepressed && sustainPedalIsDepressed) return false;
         
-        if (isSostenuto || sostenutoPedalIsDepressed) { // we are in sostenuto mode, so any notes that are not activeSostenutoNotes should NOT sustain
+        // we are in sostenuto mode, so any notes that are not activeSostenutoNotes should NOT sustain
+        if (isSostenuto || sostenutoPedalIsDepressed) {
             DBG("isUnsustainingSostenutoNote? " + String((int)!activeSostenutoNotes.contains(noteNumber)));
             if (activeSostenutoNotes.size() == 0) return true;
             else return !activeSostenutoNotes.contains(noteNumber);
         }
-        else return false; // we are not in sostenuto mode
+        
+        // we are not in sostenuto mode
+        return false;
     }
     
     inline bool getToggleState(int noteNumber) { return triggered.getUnchecked(noteNumber); }
