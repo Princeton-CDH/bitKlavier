@@ -990,7 +990,7 @@ void BKAudioProcessor::handlePianoPostRelease(Piano::Ptr piano, int noteNumber, 
 
 void BKAudioProcessor::sustainActivate(void)
 {
-    DBG("BKAudioProcessor::sustainActivate");
+    // DBG("BKAudioProcessor::sustainActivate");
         
     if(!sustainIsDown)
     {
@@ -2051,30 +2051,34 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     // note msg handling
     if (m.isNoteOn()) //&& keystrokesEnabled.getValue())
     {
-        //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
+        // DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
         handleNoteOn(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
     }
     else if (m.isNoteOff())
     {
-        //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOff, channel = " + String(channel));
+        // DBG("BKAudioProcessor::handleIncomingMidiMessage noteOff, channel = " + String(channel));
         handleNoteOff(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
-        //didNoteOffs = true;
+        // didNoteOffs = true;
     }
     
     // sostenuto pedal handling
     else if (m.isSostenutoPedalOn())
     {
-        DBG("m.isSostenutoPedalOn()");
+        // DBG("m.isSostenutoPedalOn()");
+        currentPiano->prepMap->sostenutoPedalPressed();
+        prevPiano->prepMap->sostenutoPedalPressed();
     }
     else if (m.isSostenutoPedalOff())
     {
-        DBG("m.isSostenutoPedalOff()");
+        // DBG("m.isSostenutoPedalOff()");
+        currentPiano->prepMap->sostenutoPedalReleased();
+        prevPiano->prepMap->sostenutoPedalReleased();
     }
     
     // sustain pedal handling
     else if (m.isSustainPedalOn() && !sustainIsDown)
     {
-        DBG("m.isSustainPedalOn()");
+        // DBG("m.isSustainPedalOn()");
         sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
         if (sustainInverted)    sustainDeactivate();
         else                    sustainActivate();
@@ -2082,7 +2086,7 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     }
     else if (m.isSustainPedalOff() && sustainIsDown)
     {
-        DBG("m.isSustainPedalOff()");
+        // DBG("m.isSustainPedalOff()");
         sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
         if (sustainInverted)    sustainActivate();
         else                    sustainDeactivate();

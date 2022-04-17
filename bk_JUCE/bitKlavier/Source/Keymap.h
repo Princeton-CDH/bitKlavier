@@ -46,6 +46,15 @@ typedef enum OctType
     OctNil
 } OctType;
 
+struct Note
+{
+    int noteNumber;
+    float velocity;
+    int channel;
+    int mappedFrom; // tracks what key was played that triggered this note, for harmonizer purposes
+    String source;
+};
+
 typedef enum ChordType
 {
     MajorTriad = 0,
@@ -177,8 +186,23 @@ public:
     inline bool getHarArrayMidiEdit() { return harArrayMidiEdit; }
     
     void addToPotentialSostenutoNotes(int midiNoteNumber) {
-        if (isSostenuto) potentialSostenutoNotes.addIfNotAlreadyThere(midiNoteNumber);
+        //if (isSostenuto) potentialSostenutoNotes.addIfNotAlreadyThere(midiNoteNumber);
+        potentialSostenutoNotes.addIfNotAlreadyThere(midiNoteNumber);
         // DBG("potentialSostenutoNotes.size() = " + String(potentialSostenutoNotes.size()));
+    }
+    
+    void addToPotentialSostenutoNotes(Note newnote) {
+        /*
+         Note newNote;
+         newNote.noteNumber = noteNumber;
+         newNote.velocity = velocity;
+         newNote.channel = channel;
+         newNote.mappedFrom = mappedFrom;
+         newNote.source = source;
+         // DBG("storing sustained note " + String(noteNumber));
+         
+         sustainedNotes.add(newNote);
+         */
     }
     
     void removeFromPotentialSostenutoNotes(int midiNoteNumber) {
@@ -188,6 +212,19 @@ public:
         }
         // DBG("potentialSostenutoNotes.size() = " + String(potentialSostenutoNotes.size()));
     }
+    
+    void removeFromPotentialSostenutoNotes(Note removenote) {
+        /*
+         for(int i = 0; i < sustainedNotes.size(); ++i)
+         {
+             if(sustainedNotes.getUnchecked(i).noteNumber == noteNumber &&
+                (sustainedNotes.getUnchecked(i).source == source) &&
+                (sustainedNotes.getUnchecked(i).mappedFrom == mappedFrom))
+                 sustainedNotes.remove(i);
+         }
+         */
+    }
+
     
     void copyPotentialToActiveSostenutoNotes() {
         activeSostenutoNotes.clearQuick();
@@ -628,13 +665,21 @@ public:
     inline bool getIsSostenuto()            { return isSostenuto; }
     inline void setIsSostenuto(bool toSet)  { isSostenuto = toSet; }
     inline void toggleIsSostenuto()         { isSostenuto = !isSostenuto; }
-    inline void activateSostenuto()         { if (isSostenuto) copyPotentialToActiveSostenutoNotes(); }
+    inline void activateSostenuto()         { copyPotentialToActiveSostenutoNotes(); }
     inline void deactivateSostenuto()       { if (isSostenuto) activeSostenutoNotes.clearQuick(); }
-    inline bool isUnsustainingSostenutoNote(int noteNumber)
+    inline bool isUnsustainingSostenutoNote(int noteNumber, bool sostenutoPedalIsDepressed)
     {
-        if (isSostenuto) // we are in sostenuto mode, so any notes that are not activeSostenutoNotes should NOT sustain
+        // need to check the case when
+        //      isSostenuto is false (so not set in Keymap), and
+        //      sostenutoPedalIsDepressed is true (so the user is pressing an actual sostenuto pedal), and
+        //      sustainPedalIsDepressed is true (so the user is ALSO pressing a sustain pedal!)
+        //   because in THIS case, the note should continue to sustain
+        
+        if (isSostenuto || sostenutoPedalIsDepressed) { // we are in sostenuto mode, so any notes that are not activeSostenutoNotes should NOT sustain
+            DBG("isUnsustainingSostenutoNote? " + String((int)!activeSostenutoNotes.contains(noteNumber)));
             if (activeSostenutoNotes.size() == 0) return true;
             else return !activeSostenutoNotes.contains(noteNumber);
+        }
         else return false; // we are not in sostenuto mode
     }
     

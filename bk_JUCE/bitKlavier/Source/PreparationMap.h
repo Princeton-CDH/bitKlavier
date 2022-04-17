@@ -56,6 +56,9 @@ public:
     void attemptSustain(int noteNumber, float velocity, int channel, int mappedFrom,
                         bool fromPress, bool soundfont, String source = String("Default"));
     
+    void sostenutoPedalPressed();
+    void sostenutoPedalReleased();
+    
     inline bool keymapsContainNote(int noteNumber) {
         bool contains = false;
         for (auto km : keymaps) if (km->containsNote(noteNumber)) contains = true;
@@ -231,15 +234,8 @@ private:
     BKSynthesiser*              hammerSynth;
     
     bool sustainPedalIsDepressed;
+    bool sostenutoPedalIsDepressed;
 
-    struct Note
-    {
-        int noteNumber;
-        float velocity;
-        int channel;
-        int mappedFrom; // tracks what key was played that triggered this note, for harmonizer purposes
-        String source;
-    };
     Array<Note> sustainedNotes;
     
     
