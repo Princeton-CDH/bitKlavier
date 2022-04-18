@@ -49,9 +49,12 @@ public:
     
     void sustainPedalPressed();
     void sustainPedalReleased(bool post);
-    void sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post) { sustainPedalReleased(keysThatArePressed, post, false); }
-    void sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post, bool fromSostenutoRelease);
     void sustainPedalReleased() { sustainPedalReleased(false); };
+    void sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post) { pedalReleaseHandler(keysThatArePressed, post, false); }
+    void pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post, bool fromSostenutoRelease);
+    
+    template<typename P>
+    void pedalReleaseByProcess(P proc, int noteNumber, float velocity, int mappedFrom, String source, bool keyIsDepressed, bool post);
     
     void attemptReattack(int noteNumber, int mappedFrom, String source = String("Default"));
     void attemptSustain(int noteNumber, float velocity, int channel, int mappedFrom,

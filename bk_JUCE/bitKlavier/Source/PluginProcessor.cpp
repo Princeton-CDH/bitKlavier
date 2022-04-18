@@ -2065,7 +2065,7 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     else if (m.isSostenutoPedalOn())
     {
         // DBG("m.isSostenutoPedalOn()");
-        currentPiano->prepMap->sostenutoPedalPressed(); // pass sourcedNotesOn
+        currentPiano->prepMap->sostenutoPedalPressed();
         prevPiano->prepMap->sostenutoPedalPressed();
     }
     else if (m.isSostenutoPedalOff())
