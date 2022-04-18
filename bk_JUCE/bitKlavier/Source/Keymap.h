@@ -680,13 +680,17 @@ public:
         // isSostenuto is when the sustain pedal is set to behave like a sostenuto pedal
         // in these first two cases, that is not true, so we know that note is sustaining if the sustain pedal is pressed
         // and we also know that it is NOT sustaining if neither pedal is depressed
-        if(!isSostenuto && sustainPedalIsDepressed) return false;
-        if(!isSostenuto && !sustainPedalIsDepressed && !sostenutoPedalIsDepressed) return true;
+        //if(!isSostenuto && sustainPedalIsDepressed) return false;
+        //if(!isSostenuto && !sustainPedalIsDepressed && !sostenutoPedalIsDepressed) return true;
+        
+        if(!isSostenuto) {
+            if (sustainPedalIsDepressed) return false;
+            if (!sustainPedalIsDepressed && !sostenutoPedalIsDepressed) return true;
+        }
         
         // we are in sostenuto mode, either because of the sostenuto pedal being depressed or being in sostenuto mode
         // in this case, any notes that are not activeSostenutoNotes should NOT sustain
         if (isSostenuto || sostenutoPedalIsDepressed) {
-            
             // here we have no active sostenuto notes, so this must be an unsustaining note
             if (activeSostenutoNotes.size() == 0) return true;
             else {
