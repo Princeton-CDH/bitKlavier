@@ -509,18 +509,18 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
             if (km->containsNoteMapping(noteNumber, mappedFrom))
             {
                 km->addVelocity(noteNumber, velocity);
-                km->addToPotentialSostenutoNotes(noteNumber);
-                /*
-                 Note newNote;
-                 newNote.noteNumber = noteNumber;
-                 newNote.velocity = velocity;
-                 newNote.channel = channel;
-                 newNote.mappedFrom = mappedFrom;
-                 newNote.source = source;
-                 // DBG("storing sustained note " + String(noteNumber));
+                //km->addToPotentialSostenutoNotes(noteNumber); // need to add as Note, not noteNumnber, to store in sustainedNotes?
+                
+                Note newNote;
+                newNote.noteNumber = noteNumber;
+                newNote.velocity = velocity;
+                newNote.channel = channel;
+                newNote.mappedFrom = mappedFrom;
+                newNote.source = source;
+                // DBG("storing sustained note " + String(noteNumber));
                  
-                 km->addToPotentialSostenutoNotes(newNote);
-                 */
+                km->addToPotentialSostenutoNotes(newNote);
+                 
                 if (km->isInverted())
                 {
                     checkForSustain = true;
@@ -839,14 +839,25 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
         if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
         {
             km->removeVelocity(noteNumber);
-            km->removeFromPotentialSostenutoNotes(noteNumber);
+            
             if (km->isInverted()) foundReattack = true;
             else foundSustain = true;
+            
+            // need to remove this note from potential sostenuto notes
+            Note newNote;
+            newNote.noteNumber = noteNumber;
+            newNote.velocity = velocity;
+            newNote.channel = channel;
+            newNote.mappedFrom = mappedFrom;
+            newNote.source = source;
+            //km->removeFromPotentialSostenutoNotes(noteNumber);
+            km->removeFromPotentialSostenutoNotes(newNote);
             
             // see if this note is part of the sustained sostenuto-pedal controlled notes, so it shouldn't be cut off
             //      note that this is distinct from the situation where the user has set the sustain pedal to behave like a sostenuto pedal (in Keymap)
             //      so we only do this when and actual sostenuto pedal is depressed
-            if (sostenutoPedalIsDepressed) foundSostenuto = !km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed);
+            //if (sostenutoPedalIsDepressed) foundSostenuto = !km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed);
+            if (!km->getIsSostenuto()) foundSostenuto = !km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed);
         }
     }
     
@@ -1113,7 +1124,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
     }
 }
 
-void PreparationMap::sostenutoPedalPressed() {
+void PreparationMap::sostenutoPedalPressed() { // take sourcedNotesOn
     if(!sostenutoPedalIsDepressed) {
         DBG("sostenutoPedalPressed");
         sostenutoPedalIsDepressed = true;
@@ -1123,6 +1134,19 @@ void PreparationMap::sostenutoPedalPressed() {
             // tell each keymap to copy their potentialSostenutoNotes to activeSostenutoNotes
             km->activateSostenuto();
         }
+
+        /*
+         for each sourcedNoteOn
+         Note newNote;
+         newNote.noteNumber = noteNumber;
+         newNote.velocity = velocity;
+         newNote.channel = channel;
+         newNote.mappedFrom = mappedFrom;
+         newNote.source = source;
+         // DBG("storing sustained note " + String(noteNumber));
+         
+         sustainedNotes.add(newNote);
+         */
     }
 }
 
@@ -1154,7 +1178,7 @@ void PreparationMap::sustainPedalPressed()
 
 void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatAreDepressed, bool post, bool fromSostenutoRelease)
 {
-    sustainPedalIsDepressed = false;
+    if (!fromSostenutoRelease) sustainPedalIsDepressed = false;
     
     Array<float> targetVelocities;
     for (int i = 0; i < TargetTypeNil; i++)
@@ -1201,13 +1225,15 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                         targetVelocities.set(TargetTypeDirect, v);
                     }
                     if (!km->getIgnoreSustain()) allIgnoreSustain = false;
-                    if (sostenutoPedalIsDepressed) {
+                    if (km->getIsSostenuto()) km->deactivateSostenuto();
+                    //if (sostenutoPedalIsDepressed) {
                         isActiveSostenutoNote = !km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed);
-                    }
+                    //}
                 }
             }
             //local flag for keymap that isn't ignoring sustain
             //if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
+            // DBG("isActiveSostenutoNote = " + String((int)isActiveSostenutoNote));
             if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget && !isActiveSostenutoNote)
                 proc->keyReleased(noteNumber, targetVelocities, false);
             
@@ -1361,7 +1387,21 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
         }
     }
     
-    if (!fromSostenutoRelease) sustainedNotes.clearQuick();
+    for (auto km : keymaps)
+    {
+        for(int n = sustainedNotes.size() - 1; n >= 0; n--)
+        {
+            Note note = sustainedNotes.getUnchecked(n);
+            int noteNumber = note.noteNumber;
+            if (km->isUnsustainingSostenutoNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))
+            {
+                sustainedNotes.remove(n);
+                DBG("removing sustained note " + String(noteNumber));
+            }
+        }
+    }
+    /*
+    if (!fromSostenutoRelease) sustainedNotes.clearQuick(); // need to NOT clear currently active sostenutoNotes!
     else {
         for (auto km : keymaps)
         {
@@ -1372,10 +1412,12 @@ void PreparationMap::sustainPedalReleased(OwnedArray<HashMap<String, int>>& keys
                 if (km->isUnsustainingSostenutoNote(noteNumber, false, sustainPedalIsDepressed) && !sustainPedalIsDepressed)
                 {
                     sustainedNotes.remove(n);
+                    DBG("removing sustained note " + String(noteNumber));
                 }
             }
         }
     }
+     */
 }
 
 void PreparationMap::sustainPedalReleased(bool post)
