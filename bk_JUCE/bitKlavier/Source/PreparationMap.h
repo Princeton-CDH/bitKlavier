@@ -47,6 +47,9 @@ public:
     void postRelease(int noteNumber, float velocity, int channel, int mappedFrom, String source = String("Default"));
     void clearKey(int noteNumber);
     
+    template<typename P>
+    bool keyReleasedByProcess(P proc, int noteNumber, float velocity, int mappedFrom, String source, bool noteDown, bool soundfont, KeymapTargetType targetTypeStart, KeymapTargetType targetTypeEnd, Array<float>& pressTargetVelocities, Array<float>& releaseTargetVelocities);
+    
     void sustainPedalPressed();
     void sustainPedalReleased(bool post);
     void sustainPedalReleased() { sustainPedalReleased(false); };
@@ -54,7 +57,7 @@ public:
     void pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post, bool fromSostenutoRelease);
     
     template<typename P>
-    void pedalReleaseByProcess(P proc, int noteNumber, float velocity, int mappedFrom, String source, bool keyIsDepressed, bool post);
+    void pedalReleaseByProcess(P proc, int noteNumber, float velocity, int mappedFrom, String source, bool keyIsDepressed, bool post, KeymapTargetType targetTypeStart, KeymapTargetType targetTypeEnd);
     
     void attemptReattack(int noteNumber, int mappedFrom, String source = String("Default"));
     void attemptSustain(int noteNumber, float velocity, int channel, int mappedFrom,

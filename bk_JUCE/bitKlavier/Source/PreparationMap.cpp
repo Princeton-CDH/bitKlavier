@@ -800,6 +800,56 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
     // PERFORM MODIFICATION STUFF
 }
 
+template<typename P>
+bool PreparationMap::keyReleasedByProcess(P proc, int noteNumber, float velocity, int mappedFrom, String source, bool noteDown, bool soundfont, KeymapTargetType targetTypeStart, KeymapTargetType targetTypeEnd, Array<float>& pressTargetVelocities, Array<float>& releaseTargetVelocities)
+{
+    // will be true if the note should cut off, not sustained
+    //      as determined by sustain and sostenuto pedals, and/or whether this keymap is in ignoreSustain() mode
+    bool cutOffNote;
+    
+    for (auto km : proc->getKeymaps())
+    {
+        if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+        {
+            for (int i = targetTypeStart; i <= targetTypeEnd; i++)
+            {
+                if (km->getTargetStates()[i])
+                {
+                    if (km->isInverted())
+                    {
+                        // Don't filter release velocities because they are not reliable.
+                        // The processor will internally ignore this release if the
+                        // last key press was filtered out.
+                        float v = jmax(pressTargetVelocities.getUnchecked(i), km->applyVelocityCurve(velocity));
+                        pressTargetVelocities.setUnchecked(i, v);
+                    }
+                    else
+                    {
+                        float v = jmax(releaseTargetVelocities.getUnchecked(i), km->applyVelocityCurve(velocity));
+                        releaseTargetVelocities.setUnchecked(i, v);
+                        DBG("setting releaseTargetVelocities " + String(i) + " " + String(v));
+                    }
+                }
+            }
+
+            // determine whether this note should be sustaining or not, either because of the sustain or sostenuto pedals
+            //      factors include:
+            //          - whether this keymap is set to ignore the sustain pedal,
+            //          - whether this keymap is set so the sustain pedal behaves like a sostenuto pedal
+            //          - the somewhat confusing interaction between sustain and sostenuto pedals!
+            cutOffNote = km->isUnsustainingNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed);
+            if (km->getIgnoreSustain() || cutOffNote) cutOffNote = true;
+            else cutOffNote = false;
+
+        }
+    }
+    
+    // last argument indicates this is NOT from an actual key press
+    proc->keyPressed(noteNumber, pressTargetVelocities, false);
+    pressTargetVelocities.fill(-1.f);
+
+    return cutOffNote;
+}
 
 void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, int mappedFrom, bool noteDown, bool soundfont, String source)
 {
@@ -809,9 +859,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
      
      see Keymap.h for notes about sostenuto implementation
     */
-    
-    // DBG("PreparationMap::keyReleased : " + String(noteNumber));
-    
+
     Array<float> pressTargetVelocities;
     Array<float> releaseTargetVelocities;
     
@@ -825,6 +873,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
     // for keeping track of km->isInverted() stuff (when noteOn and noteOff swap roles)
     bool foundReattack = false;
     bool foundSustain = false;
+    bool cutOffNote;
     
     for (auto km : keymaps)
     {
@@ -855,6 +904,19 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
     
     for (auto proc : dprocessor)
     {
+        
+        // figure out whether this note should cut off or sustain, and do a bunch of other housekeeping
+        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeDirect, TargetTypeDirect, pressTargetVelocities, releaseTargetVelocities);
+        
+        // we're always going to play the release sample in Direct, regardless of sustain state, since hammer will release regardless
+        proc->playReleaseSample(noteNumber, releaseTargetVelocities, false, soundfont);
+        
+        // now, do the actual release/damping, as determined by cutOffNote
+        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
+        releaseTargetVelocities.fill(-1.f);
+        
+        
+        /*
         // will be true if the note should cut off, not sustained
         //      as determined by sustain and sostenuto pedals, and/or whether this keymap is in ignoreSustain() mode
         bool cutOffNote;
@@ -907,10 +969,20 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
 
         // store release velocities
         releaseTargetVelocities.fill(-1.f);
+         */
+         
+
     }
     
     for (auto proc : tprocessor)
     {
+        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeTuning, TargetTypeTuning, pressTargetVelocities, releaseTargetVelocities);
+        
+        // now, do the actual release/damping, as determined by cutOffNote
+        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
+        releaseTargetVelocities.fill(-1.f);
+        
+        /*
         bool ignoreSustain = !sustainPedalIsDepressed;
         for (auto km : proc->getKeymaps())
         {
@@ -938,10 +1010,18 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
         if (ignoreSustain && !noteDown)
             proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
+         */
     }
     
     for (auto proc : sprocessor)
     {
+        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeSynchronic, TargetTypeSynchronicRotate, pressTargetVelocities, releaseTargetVelocities);
+        
+        // now, do the actual release/damping, as determined by cutOffNote
+        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
+        releaseTargetVelocities.fill(-1.f);
+        
+        /*
         bool ignoreSustain = !sustainPedalIsDepressed;
         for (auto km : proc->getKeymaps())
         {
@@ -975,10 +1055,18 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
         if (ignoreSustain && !noteDown)
             proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
+         */
     }
     
     for (auto proc : nprocessor)
     {
+        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeNostalgic, TargetTypeNostalgicClear, pressTargetVelocities, releaseTargetVelocities);
+        
+        // now, do the actual release/damping, as determined by cutOffNote
+        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
+        releaseTargetVelocities.fill(-1.f);
+        
+        /*
         bool ignoreSustain = !sustainPedalIsDepressed;
         for (auto km : proc->getKeymaps())
         {
@@ -1012,10 +1100,18 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
         if (ignoreSustain && !noteDown)
             proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
+         */
     }
     
     for (auto proc : bprocessor)
     {
+        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeBlendronicPatternSync, TargetTypeBlendronicOpenCloseOutput, pressTargetVelocities, releaseTargetVelocities);
+
+        // now, do the actual release/damping, as determined by cutOffNote
+        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
+        releaseTargetVelocities.fill(-1.f);
+        
+        /*
         bool ignoreSustain = !sustainPedalIsDepressed;
         for (auto km : proc->getKeymaps())
         {
@@ -1049,10 +1145,18 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
         if (ignoreSustain && !noteDown)
             proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
+         */
     }
     
     for (auto proc : mprocessor)
     {
+        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeTempo, TargetTypeTempo, pressTargetVelocities, releaseTargetVelocities);
+
+        // now, do the actual release/damping, as determined by cutOffNote
+        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
+        releaseTargetVelocities.fill(-1.f);
+        
+        /*
         bool ignoreSustain = !sustainPedalIsDepressed;
         for (auto km : proc->getKeymaps())
         {
@@ -1079,10 +1183,19 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
         if (ignoreSustain && !noteDown)
             proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
+         */
     }
     
     for (auto proc : rprocessor)
     {
+        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeResonanceAdd, TargetTypeResonanceRing, pressTargetVelocities, releaseTargetVelocities);
+        
+        // now, do the actual release/damping, as determined by cutOffNote
+        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
+        releaseTargetVelocities.fill(-1.f);
+        
+        
+        /*
         bool ignoreSustain = !sustainPedalIsDepressed;
         for (auto km : proc->getKeymaps())
         {
@@ -1121,6 +1234,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
         if (ignoreSustain && !noteDown)
             proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
+         */
     }
 }
 
@@ -1164,7 +1278,7 @@ void PreparationMap::sustainPedalPressed()
 }
 
 template<typename P>
-void PreparationMap::pedalReleaseByProcess(P proc, int noteNumber, float velocity, int mappedFrom, String source, bool keyIsDepressed, bool post)
+void PreparationMap::pedalReleaseByProcess(P proc, int noteNumber, float velocity, int mappedFrom, String source, bool keyIsDepressed, bool post, KeymapTargetType targetTypeStart, KeymapTargetType targetTypeEnd)
 {
     bool hasActiveTarget = false;
     bool allIgnoreSustain = true;
@@ -1177,11 +1291,23 @@ void PreparationMap::pedalReleaseByProcess(P proc, int noteNumber, float velocit
     {
         if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
         {
-            if (km->getTargetStates()[TargetTypeDirect])
+            /*
+            if (km->getTargetStates()[targetType])
             {
                 hasActiveTarget = true;
                 float v = km->applyVelocityCurve(velocity);
-                targetVelocities.set(TargetTypeDirect, v);
+                targetVelocities.set(targetType, v);
+            }
+             */
+            
+            for (int i = targetTypeStart; i <= targetTypeEnd; i++)
+            {
+                if (km->getTargetStates()[i])
+                {
+                    hasActiveTarget = true;
+                    float v = km->applyVelocityCurve(velocity);
+                    targetVelocities.set(i, v);
+                }
             }
             
             if (!km->getIgnoreSustain()) allIgnoreSustain = false;
@@ -1229,7 +1355,7 @@ void PreparationMap::pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysT
         
         for (auto proc : dprocessor)
         {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false);
+            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeDirect, TargetTypeDirect);
             
             /*
             hasActiveTarget = false;
@@ -1262,7 +1388,7 @@ void PreparationMap::pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysT
         
         for (auto proc : tprocessor)
         {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false);
+            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeTuning, TargetTypeTuning);
             
             /*
             hasActiveTarget = false;
@@ -1288,7 +1414,7 @@ void PreparationMap::pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysT
         
         for (auto proc : mprocessor)
         {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false);
+            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeTempo, TargetTypeTempo);
             
             /*
             hasActiveTarget = false;
@@ -1315,7 +1441,7 @@ void PreparationMap::pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysT
         for (auto proc : sprocessor)
         {
             
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false);
+            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeSynchronic, TargetTypeSynchronicRotate);
             
             /*
             hasActiveTarget = false;
@@ -1344,7 +1470,7 @@ void PreparationMap::pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysT
         
         for (auto proc : nprocessor)
         {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, post);
+            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, post, TargetTypeNostalgic, TargetTypeNostalgicClear);
             
             /*
             hasActiveTarget = false;
@@ -1373,7 +1499,7 @@ void PreparationMap::pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysT
         
         for (auto proc : bprocessor)
         {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false);
+            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeBlendronicPatternSync, TargetTypeBlendronicOpenCloseOutput);
             
             /*
             hasActiveTarget = false;
@@ -1402,7 +1528,7 @@ void PreparationMap::pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysT
         
         for (auto proc : rprocessor)
         {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false);
+            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeResonanceAdd, TargetTypeResonanceRing);
             
             /*
             hasActiveTarget = false;
