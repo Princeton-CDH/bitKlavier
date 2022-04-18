@@ -47,14 +47,24 @@ public:
     void postRelease(int noteNumber, float velocity, int channel, int mappedFrom, String source = String("Default"));
     void clearKey(int noteNumber);
     
+    template<typename P>
+    bool keyReleasedByProcess(P proc, int noteNumber, float velocity, int mappedFrom, String source, bool noteDown, bool soundfont, KeymapTargetType targetTypeStart, KeymapTargetType targetTypeEnd, Array<float>& pressTargetVelocities, Array<float>& releaseTargetVelocities);
+    
     void sustainPedalPressed();
     void sustainPedalReleased(bool post);
-    void sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post);
     void sustainPedalReleased() { sustainPedalReleased(false); };
+    void sustainPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post) { pedalReleaseHandler(keysThatArePressed, post, false); }
+    void pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysThatArePressed, bool post, bool fromSostenutoRelease);
+    
+    template<typename P>
+    void pedalReleaseByProcess(P proc, int noteNumber, float velocity, int mappedFrom, String source, bool keyIsDepressed, bool post, KeymapTargetType targetTypeStart, KeymapTargetType targetTypeEnd);
     
     void attemptReattack(int noteNumber, int mappedFrom, String source = String("Default"));
     void attemptSustain(int noteNumber, float velocity, int channel, int mappedFrom,
                         bool fromPress, bool soundfont, String source = String("Default"));
+    
+    void sostenutoPedalPressed();
+    void sostenutoPedalReleased(OwnedArray<HashMap<String, int>>& keysThatArePressed);
     
     inline bool keymapsContainNote(int noteNumber) {
         bool contains = false;
@@ -231,15 +241,8 @@ private:
     BKSynthesiser*              hammerSynth;
     
     bool sustainPedalIsDepressed;
+    bool sostenutoPedalIsDepressed;
 
-    struct Note
-    {
-        int noteNumber;
-        float velocity;
-        int channel;
-        int mappedFrom; // tracks what key was played that triggered this note, for harmonizer purposes
-        String source;
-    };
     Array<Note> sustainedNotes;
     
     

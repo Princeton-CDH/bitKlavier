@@ -46,6 +46,15 @@ typedef enum OctType
     OctNil
 } OctType;
 
+struct Note
+{
+    int noteNumber;
+    float velocity;
+    int channel;
+    int mappedFrom; // tracks what key was played that triggered this note, for harmonizer purposes
+    String source;
+};
+
 typedef enum ChordType
 {
     MajorTriad = 0,
@@ -176,19 +185,49 @@ public:
     inline void toggleHarArrayMidiEdit() { harArrayMidiEdit = !harArrayMidiEdit; }
     inline bool getHarArrayMidiEdit() { return harArrayMidiEdit; }
     
-    void addToPotentialSostenutoNotes(int midiNoteNumber) {
-        if (isSostenuto) potentialSostenutoNotes.addIfNotAlreadyThere(midiNoteNumber);
-        // DBG("potentialSostenutoNotes.size() = " + String(potentialSostenutoNotes.size()));
+    /*
+    Sostenuto Implementation Notes
+    two cases:
+     
+        1. an actual sostenuto pedal; most people don't have these!
+        2. the sustain pedal behaves like a sostenuto pedal
+     
+    in case (1), the sustain pedal might also be used, and so should behave as expected
+    in case (2), the user has selected "sostenuto mode" in Keymap
+     
+    Basic process:
+        - when any note in the Keymap is played, it is a potential sostenuto note, so it is stored
+        - when the sostenuto pedal is pressed (or the sustain pedal, when in "sostenuto mode"), the potential
+            sostenuto notes are now active sostenuto notes and should sustain even when their keys are released
+        - all non-active sostenuto notes should stop on keyRelease
+                - unless the sustain pedal is down (which is not possible in "sostenuto mode")
+        - when the sostenuto pedal (or sustain pedal in "sostenuto mode") is released, all active
+            sostenuto notes should be stopped
+                - unless their keys are still down!
+                - or if the sustain pedal is down!
+    
+    And of course this behavior needs to interface correctly with all the preparations and the harmonizer!
+     
+    */
+
+    // any key that is currently down is a potential sostenuto note
+    void addToPotentialSostenutoNotes(Note newnote) {
+        potentialSostenutoNotes.add(newnote);
     }
     
-    void removeFromPotentialSostenutoNotes(int midiNoteNumber) {
+    // keys that are released are now longer potential sostenuto notes and should be removed
+    //      note that these will NOT be removed from currently active sostenuto notes
+    void removeFromPotentialSostenutoNotes(Note removenote) {
         
-        if(potentialSostenutoNotes.contains(midiNoteNumber)) {
-            potentialSostenutoNotes.remove(potentialSostenutoNotes.indexOf(midiNoteNumber));
+        for (int i = potentialSostenutoNotes.size() - 1; i >= 0; i--) {
+            if(potentialSostenutoNotes.getUnchecked(i).noteNumber == removenote.noteNumber &&
+               (potentialSostenutoNotes.getUnchecked(i).source == removenote.source) &&
+               (potentialSostenutoNotes.getUnchecked(i).mappedFrom == removenote.mappedFrom))
+                potentialSostenutoNotes.remove(i);
         }
-        // DBG("potentialSostenutoNotes.size() = " + String(potentialSostenutoNotes.size()));
     }
     
+    // when the sostentuto pedal is pressed, potential sostenuto notes are now active sostenuto notes
     void copyPotentialToActiveSostenutoNotes() {
         activeSostenutoNotes.clearQuick();
         activeSostenutoNotes = potentialSostenutoNotes;
@@ -628,14 +667,45 @@ public:
     inline bool getIsSostenuto()            { return isSostenuto; }
     inline void setIsSostenuto(bool toSet)  { isSostenuto = toSet; }
     inline void toggleIsSostenuto()         { isSostenuto = !isSostenuto; }
-    inline void activateSostenuto()         { if (isSostenuto) copyPotentialToActiveSostenutoNotes(); }
-    inline void deactivateSostenuto()       { if (isSostenuto) activeSostenutoNotes.clearQuick(); }
-    inline bool isUnsustainingSostenutoNote(int noteNumber)
+    inline void activateSostenuto()         { copyPotentialToActiveSostenutoNotes(); }
+    inline void deactivateSostenuto()       { activeSostenutoNotes.clearQuick(); }
+    
+    // this somewhat delicate function sorts out whether a note should be cut off or not
+    //      depending on the status of the sostenuto and sustain pedals
+    //      and also in case the sustain pedal is set to behave like a sostenuto pedal
+    //      lots of contingencies, depending on when and what order pedals were pressed,
+    //          what keys are held down at that time, etc...
+    inline bool isUnsustainingNote(int noteNumber, bool sostenutoPedalIsDepressed, bool sustainPedalIsDepressed)
     {
-        if (isSostenuto) // we are in sostenuto mode, so any notes that are not activeSostenutoNotes should NOT sustain
+        // isSostenuto is when the sustain pedal is set to behave like a sostenuto pedal
+        // in these first two cases, that is not true, so we know that note is sustaining if the sustain pedal is pressed
+        // and we also know that it is NOT sustaining if neither pedal is depressed
+        //if(!isSostenuto && sustainPedalIsDepressed) return false;
+        //if(!isSostenuto && !sustainPedalIsDepressed && !sostenutoPedalIsDepressed) return true;
+        
+        if(!isSostenuto) {
+            if (sustainPedalIsDepressed) return false;
+            if (!sustainPedalIsDepressed && !sostenutoPedalIsDepressed) return true;
+        }
+        
+        // we are in sostenuto mode, either because of the sostenuto pedal being depressed or being in sostenuto mode
+        // in this case, any notes that are not activeSostenutoNotes should NOT sustain
+        if (isSostenuto || sostenutoPedalIsDepressed) {
+            // here we have no active sostenuto notes, so this must be an unsustaining note
             if (activeSostenutoNotes.size() == 0) return true;
-            else return !activeSostenutoNotes.contains(noteNumber);
-        else return false; // we are not in sostenuto mode
+            else {
+                for (auto testNote : activeSostenutoNotes)
+                {
+                    // here we have an active sostenuto note, so it should sustain
+                    if (testNote.noteNumber == noteNumber) return false;
+                }
+                // if we get this far, then the note is not an active sustaining note and should be cut off
+                return true;
+            }
+        }
+        
+        // we are not in sostenuto mode, so note should sustain
+        return false;
     }
     
     inline bool getToggleState(int noteNumber) { return triggered.getUnchecked(noteNumber); }
@@ -693,11 +763,11 @@ private:
     
     // currently depressed keys in this keymap
     //   that will be included in sostenuto notes when sustain pedal is depressed
-    Array<int> potentialSostenutoNotes;
+    Array<Note> potentialSostenutoNotes;
     
     // notes that were depressed when sostenuto pedal was depressed
     //   these are now active sostenuto notes and should be sustained
-    Array<int> activeSostenutoNotes;
+    Array<Note> activeSostenutoNotes;
     
     bool defaultSelected;
     bool onscreenSelected;
