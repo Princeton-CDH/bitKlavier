@@ -256,6 +256,8 @@ public:
         {
             addSympStrings(n, 0);
         }
+        
+        updatePartialStructure();
     }
 
     //accessors
