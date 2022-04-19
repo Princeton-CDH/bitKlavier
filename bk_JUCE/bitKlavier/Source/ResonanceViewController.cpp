@@ -1078,7 +1078,7 @@ void ResonanceModificationEditor::highlightModedComponents()
     if(mod->getDirty(ResonanceFundamental))     fundamentalKeyboard->setAlpha(1.);
     if(mod->getDirty(ResonanceMaxSympStrings))  maxSympStringsSlider->setBright();
     if(mod->getDirty(ResonanceClosestKeys))     closestKeyboard->setAlpha(1.);
-    if(mod->getDirty(ResonanceOffsets))         offsetsKeyboard.setAlpha(1.);
+    if(mod->getDirty(ResonanceOffsets))         offsetsKeyboard.setBright();
     if(mod->getDirty(ResonanceGains))           gainsKeyboard.setBright();
     if(mod->getDirty(ResonanceADSR))            ADSRSlider->setBright();
     if(mod->getDirty(ResonanceHeld))            addKeyboard->setAlpha(1.);
