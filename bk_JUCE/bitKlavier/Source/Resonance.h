@@ -249,7 +249,7 @@ public:
         for (auto n : rActiveHeldKeys.value)
         {
             removeSympStrings(n, 0);
-            sympStrings.remove(n);
+            clearSympString(n);
         }
         rActiveHeldKeys.reset();
         for (auto n : rActiveHeldKeys.value)
@@ -460,7 +460,7 @@ public:
             //partialStructure.add(((static_cast<void>(i - rFundamentalKey.value)), static_cast<void>(rGainsKeys.value[i]), rOffsetsKeys.value[i]));
         }
         
-        printPartialStructure();
+        // printPartialStructure();
     }
     
     void setDefaultPartialStructure()
@@ -618,20 +618,27 @@ public:
     void addSympStrings(int noteNumber, float velocity);
     void addSympStrings(int noteNumber, float velocity, bool ignoreRepeatedNotes);
     void removeSympStrings(int noteNumber, float velocity);
-    Array<int> getSympStrings();
+    void clearSympString(int noteNumber)
+    {
+        const ScopedLock sl (lock);
+        sympStrings.remove(noteNumber);
+    }
     
+    Array<int> getSympStrings();
     
     
     // => sympStrings
     // data structure for pointing to all of the undamped strings and their partials
     //      outside map is indexed by held note (midiNoteNumber), inside array resizes depending on the number of partials
     //      so this includes all of the partials for all of the currently undamped strings
-    
     HashMap<int, Array<SympPartial::Ptr>> sympStrings;
+    
     void setResoId(int Id) {resoId = Id;}
     int resoId;
 private:
 
+    CriticalSection lock;
+    
     String name;
     
     // => partialStructure

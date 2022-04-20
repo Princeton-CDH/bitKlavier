@@ -36,7 +36,7 @@ void ResonancePreparation::performModification(ResonanceModification* r, Array<b
         for (auto n : rActiveHeldKeys.value)
         {
             removeSympStrings(n, 0);
-            sympStrings.remove(n);
+            clearSympString(n);
         }
         
         rActiveHeldKeys.modify(r->rActiveHeldKeys,reverse);
@@ -286,6 +286,8 @@ void ResonancePreparation::addSympStrings(int noteNumber, float velocity)
 // this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
 void ResonancePreparation::addSympStrings(int noteNumber, float velocity, bool ignoreRepeatedNotes)
 {
+    const ScopedLock sl (lock);
+    
     // don't add a symp string that is already there
     if(getHeldKeys().contains(noteNumber) && ignoreRepeatedNotes) {
         DBG("ResonancePreparation::addSympStrings, not adding new string as it is already there");
@@ -329,6 +331,8 @@ void ResonancePreparation::addSympStrings(int noteNumber, float velocity, bool i
 // this will turn off all the resonances associated with this string/key, and then remove those from the currently available sympathetic strings
 void ResonancePreparation::removeSympStrings(int noteNumber, float velocity)
 {
+    const ScopedLock sl (lock);
+    
     // turn off each partial associated with this string
     //DBG("Resonance: removing partials of " + String(noteNumber));
     for (auto sympString : sympStrings.getReference(noteNumber))
@@ -432,7 +436,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
         // clear this held string's partials
         DBG("Resonance: clearing sympathetic string: " + String(noteNumber));
         resonance->prep->removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
-        resonance->prep->sympStrings.remove(noteNumber);
+        resonance->prep->clearSympString(noteNumber);
         
         resonance->prep->rActiveHeldKeys.arrayRemoveAllInstancesOf(noteNumber);
     }
@@ -449,7 +453,7 @@ void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
     {
         for (auto sympString : *heldNotePartials)
         {
-            if (sympString == nullptr) return;
+            // if (sympString == nullptr) return; 
             sympString->playPosition += numSamples;
         }
     }
