@@ -669,7 +669,8 @@ private:
     //HashMap<int, float> offsetsKeys;
     //HashMap<int, float> gainsKeys;
     
-    uint64 currentTime;
+    // this is accessed by the audio thread as well as event thread(s), so making it atomic for thread safety
+    std::atomic<std::uint64_t> currentTime;
     
     JUCE_LEAK_DETECTOR(ResonancePreparation);
 };
