@@ -64,6 +64,9 @@ void ResonancePreparation::performModification(ResonanceModification* r, Array<b
     // If the mod didn't reverse, then it is modded
     modded = !reverse;
     
+    //
+    currentTime = 0;
+    
     updatePartialStructure();
 
 }
@@ -86,14 +89,17 @@ SympPartial::SympPartial(int newHeldKey, int newPartialKey, float newGain, float
     gain        = newGain;
     offset      = newOffset;
 
-    playPosition = maxPlayPosition;
+    //playPosition = maxPlayPosition;
 }
 
-ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcessor::Ptr rTuning, GeneralSettings::Ptr rGeneral, BKSynthesiser* rMain):
-    resonance(rResonance),
-    tuning(rTuning),
-    general(rGeneral),
-    keymaps(Keymap::PtrArr())
+ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance,
+                                       TuningProcessor::Ptr rTuning,
+                                       GeneralSettings::Ptr rGeneral,
+                                       BKSynthesiser* rMain):
+                                       resonance(rResonance),
+                                       tuning(rTuning),
+                                       general(rGeneral),
+                                       keymaps(Keymap::PtrArr())
 {
     resonance->prep->synth = rMain;
     for (int j = 0; j < 128; j++)
@@ -117,16 +123,6 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance, TuningProcesso
     {
         resonance->prep->addSympStrings(i, 127);
     }
-    /*
-    partialStructure.add({0,  1.0, 0});
-    partialStructure.add({12, 0.8, 0});
-    partialStructure.add({19, 0.7, 2});
-    partialStructure.add({24, 0.8, 0});
-    partialStructure.add({28, 0.6, -13.7});
-    partialStructure.add({31, 0.7, 2});
-    partialStructure.add({34, 0.5, -31.175});
-    partialStructure.add({36, 0.8, 0});
-    */
 
     DBG("Create rProc");
 }
@@ -140,28 +136,21 @@ ResonanceProcessor::~ResonanceProcessor()
 // N*M^2, where N is number of notes held, M is number of partials in partial structure
 void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
 {
-    // DBG("Resonance::ringSympStrings");
-    
     // resonate existing sympStrings
     // see if there is overlap with the newly pressed key's partials and any sympPartials
-
     for (HashMap<int, Array<SympPartial::Ptr>>::Iterator heldNotePartials (resonance->prep->sympStrings); heldNotePartials.next();)
     {
-        DBG("Resonance::ringSympStrings: iterating through sympStrings");
+        // DBG("Resonance::ringSympStrings: iterating through sympStrings");
         // indexed by heldNote (midiNoteNumber)
         // iterate through partials of incoming note (noteNumber) and see if they are contained in this set of heldNotePartials
-        //for (int j = 0; j < partialStructure.size(); j++)
         for (int j = 0; j < resonance->prep->getPartialStructure().size(); j++)
         {
-            //DBG("Resonance::ringSympStrings: iterating through partialStructure");
+            // DBG("Resonance::ringSympStrings: iterating through partialStructure");
             // strucknote (noteNumber) + partialKey offset (key closest to this partial)
-            //int currentStruckPartial = noteNumber + partialStructure.getReference(j)[0];
             int currentStruckPartial = noteNumber + resonance->prep->getPartialStructure().getReference(j)[0];
             
             for (auto currentSympPartial : *heldNotePartials)
             {
-                // DBG("Resonance::ringSympStrings: iterating through heldNotePartials");
-                //DBG("Resonance: currentStruckPartial = " + String(currentStruckPartial) + " heldKey = " + String(currentSympPartial->heldKey));
                 if (currentSympPartial->partialKey == currentStruckPartial)
                 {
                     // found an overlapping partial!
@@ -177,10 +166,14 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                         //+ " newPlayPosition = " + String(newPlayPosition));
                     
                     // only create a new resonance if it would be louder/brighter than what is currently there
-                    if (newPlayPosition < currentSympPartial->playPosition  / (.001 *  resonance->prep->synth->getSampleRate()))
+                    //      so, only if the newPlayPosition is less than the current play position
+                    //if (newPlayPosition < currentSympPartial->playPosition  / (.001 *  resonance->prep->synth->getSampleRate()))
+                    if (newPlayPosition < (currentSympPartial->getPlayPosition(resonance->prep->getCurrentTime()) / (.001 *  resonance->prep->synth->getSampleRate())))
                     {
-                        // set the playPosition for this new resonance
-                        currentSympPartial->playPosition = newPlayPosition * (.001 *  resonance->prep->synth->getSampleRate());
+                        // set the start time for this new resonance
+                        //currentSympPartial->playPosition = newPlayPosition * (.001 *  resonance->prep->synth->getSampleRate());
+                        currentSympPartial->setStartTime((uint64)(newPlayPosition * (.001 *  resonance->prep->synth->getSampleRate())),
+                                                         resonance->prep->getCurrentTime());
                         
                         // turn off the current resonance here, if it's playing
                         resonance->prep->synth->keyOff(1,
@@ -352,9 +345,6 @@ void ResonancePreparation::removeSympStrings(int noteNumber, float velocity)
                       false);
 
     }
-    //
-
-    
 }
 
 
@@ -449,14 +439,25 @@ void ResonanceProcessor::prepareToPlay(double sr)
 
 void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
 {
+    // should not be any thread safety issues with this...
+    resonance->prep->updateCurrentTime(numSamples);
+    
+    /*
     for (HashMap<int, Array<SympPartial::Ptr>>::Iterator heldNotePartials (resonance->prep->sympStrings); heldNotePartials.next();)
     {
         for (auto sympString : *heldNotePartials)
         {
             // if (sympString == nullptr) return; 
             sympString->playPosition += numSamples;
+            
+            // i think this is still not thread-safe, and I don't want to put a ScopeLock here on the audio thread
+            // instead: increment a prep->samplesFromStart value, which simply counts how many samples have passed since the proc started
+            // when a sympString starts, record samplesFromStart as stringStartSample
+            // and then sympString->playPosition = samplesFromStart - stringStartSample
+            // or some such. that way the processBlock doesn't need to access anything other than the prep
         }
     }
+     */
 }
 
 void Resonance::clear()

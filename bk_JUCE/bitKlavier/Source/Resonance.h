@@ -42,10 +42,18 @@ public:
     int partialKey;             // midiNoteNumber for nearest key to this partial; used to determine whether this partial gets excited
     float gain;                 // gain multiplier for this partial
     float offset;               // offset, in cents, from ET for this partial
-    uint64 playPosition;        // current play position for this resonance (samples)
+    //uint64 playPosition;        // current play position for this resonance (samples)
                                 // ==> initialize to large number! perhaps 5 minutes * sampling rate, and cap it there in ProcessBlock
 
-    const uint64 maxPlayPosition = 5 * 60 * 96000; // really high number, longer than any of the samples
+    //const uint64 maxPlayPosition = 5 * 60 * 96000; // really high number, longer than any of the samples
+    
+    uint64 startTime = 0;       // time, in samples, that this partial began playing
+    
+    // sets the time that this sample started playing, in samples since this processor started
+    void setStartTime(uint64 st, uint64 currentTime) { startTime = st + currentTime; }
+    
+    // gets current playback time (in samples) within the sample
+    uint64 getPlayPosition(uint64 currentTime) { return currentTime - startTime; }
 };
 
 class ResonancePreparation : public ReferenceCountedObject
@@ -434,6 +442,7 @@ public:
     Array<float> getOffsets() { return rOffsetsKeys.value; }
     Array<float> getGains() { return rGainsKeys.value; }
     //Array<int> getHeld() {return rActiveHeldKeys.value; }
+    
     void updatePartialStructure()
     {
         // => partialStructure
@@ -604,7 +613,8 @@ public:
     inline void setMaxStartTime(int inval) { rMaxStartTimeMS = inval; }
     inline void setMaxSympStrings(int inval) { rMaxSympStrings = inval; }
     
-    
+    inline void updateCurrentTime(uint64 numSamples) { currentTime += numSamples; }
+    uint64 getCurrentTime() { return currentTime; }
     
     // => current strings
     // A queue to store the currently active notes in sympStrings
@@ -635,6 +645,8 @@ public:
     
     void setResoId(int Id) {resoId = Id;}
     int resoId;
+    
+    
 private:
 
     CriticalSection lock;
@@ -657,6 +669,7 @@ private:
     //HashMap<int, float> offsetsKeys;
     //HashMap<int, float> gainsKeys;
     
+    uint64 currentTime;
     
     JUCE_LEAK_DETECTOR(ResonancePreparation);
 };
@@ -793,10 +806,10 @@ public:
     typedef OwnedArray<ResonanceProcessor>                  Arr;
     typedef OwnedArray<ResonanceProcessor, CriticalSection> CSArr;
 
-    ResonanceProcessor(Resonance::Ptr rResonance,
-        TuningProcessor::Ptr rTuning,
-        GeneralSettings::Ptr rGeneral,
-        BKSynthesiser* rMain
+    ResonanceProcessor( Resonance::Ptr rResonance,
+                        TuningProcessor::Ptr rTuning,
+                        GeneralSettings::Ptr rGeneral,
+                        BKSynthesiser* rMain
     );
     ~ResonanceProcessor();
     
@@ -849,8 +862,9 @@ public:
         return blendronic;
     }
 
-    // basic API
     void ringSympStrings(int noteNumber, float velocity);
+    
+    
 private:
     CriticalSection lock;
     
@@ -862,9 +876,6 @@ private:
     
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;
-    
-    
-
 
     JUCE_LEAK_DETECTOR(ResonanceProcessor);
 };
