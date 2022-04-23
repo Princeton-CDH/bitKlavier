@@ -63,10 +63,7 @@ void ResonancePreparation::performModification(ResonanceModification* r, Array<b
     
     // If the mod didn't reverse, then it is modded
     modded = !reverse;
-    
-    //
-    currentTime = 0;
-    
+
     updatePartialStructure();
 
 }
