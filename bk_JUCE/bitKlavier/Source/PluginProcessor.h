@@ -63,7 +63,7 @@ public:
     void loadGalleryFromPath(String path);
     void loadGalleryFromXml(XmlElement* xml, bool resetHistory = true);
     void loadJsonGalleryFromPath(String path);
-    void saveCurrentGalleryAs(void);
+    bool saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
     void createNewGallery(String name, std::shared_ptr<XmlElement> xml = nullptr);
     void renameGallery(String name);
@@ -187,11 +187,11 @@ public:
     OwnedArray<HashMap<String, int>>&   getSourcedNotesOn();
     OwnedArray<HashMap<String, float>>  sourcedNoteVelocities;
     
-    void                                noteOnUI (int noteNumber) { if(didLoadMainPianoSamples) notesOnUI.add(noteNumber); }
-    void                                noteOffUI(int noteNumber) { if(didLoadMainPianoSamples) notesOffUI.add(noteNumber); }
+    void noteOnUI (int noteNumber) { if(didLoadMainPianoSamples) notesOnUI.add(noteNumber); }
+    void noteOffUI(int noteNumber) { if(didLoadMainPianoSamples) notesOffUI.add(noteNumber); }
     
-    int                                 noteOnCount;
-    bool                                allNotesOff;
+    int noteOnCount;
+    bool allNotesOff;
     
     int count;
     

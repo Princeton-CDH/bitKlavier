@@ -202,7 +202,7 @@ const String ptagResonance_fundamentalKey = "fundamentalKey";
 const String vtagResonance_resonanceKeys = "closestKeys";
 const String vtagResonance_offsets = "offsets";
 const String vtagResonance_gains = "gains";
-
+const String vtagResonance_add = "add";
 
 const String vtagTuning = "tuning";
 const String vtagModTuning = "modTuning";
@@ -288,6 +288,8 @@ const String ptagKeymap_symmetricalWarp = "symmetricalWarp";
 const String ptagKeymap_scale = "scale";
 const String ptagKeymap_offset = "offset";
 const String ptagKeymap_velocityInvert = "velocityInvert";
+const String ptagKeymap_toggleKey = "toggleKey";
+const String ptagKeymap_sostenutoMode = "sostenutoMode";
 
 typedef enum PitchClass {
     C = 0,
@@ -925,6 +927,7 @@ static const std::vector<std::string> cDirectParameterTypes = {
      ResonanceOffsets,
      ResonanceGains,
      ResonanceADSR,
+     ResonanceHeld,
      ResonanceMaxSympStrings, 
      ResonanceUseGlobalSoundSet,
      ResonanceSoundSet,
@@ -955,7 +958,8 @@ static const std::vector<std::string> cResonanceParameterTypes = {
     "Closest Keys",
     "Offsets",
     "Gains",
-    "ADSR"
+    "ADSR",
+    "Held Keys"
 };
 
 
@@ -966,6 +970,7 @@ typedef enum TuningAdaptiveSystemType
     AdaptiveNormal,
     AdaptiveAnchored,
     AdaptiveSpring,
+    AdaptiveMTSClient,
     AdaptiveNil
     
 } TuningAdaptiveSystemType;
@@ -974,7 +979,8 @@ static const std::vector<std::string> cTuningAdaptiveTypes = {
     "Nonadaptive",
     "Adaptive Tuning",
     "Adaptive Anchored",
-    "Spring Tuning"
+    "Spring Tuning",
+    "MTS Client"
 };
 
 #pragma mark - Blendronic
@@ -1305,9 +1311,12 @@ typedef enum KeymapTargetType
     TargetTypeBlendronicOpenCloseInput,
     TargetTypeBlendronicOpenCloseOutput,
     
-    TargetTypeResonance,
+    TargetTypeResonanceAdd,
+    TargetTypeResonanceRing,
+    
     TargetTypeTempo,
     TargetTypeTuning,
+    
     TargetTypeNil
 } KeymapTargetType;
 
@@ -1335,7 +1344,8 @@ static const std::vector<std::string> cKeymapTargetTypes = {
     "Open-Close Input",
     "Open-Close Output",
     // Resonance
-    "Resonance",
+    "Add",
+    "Ring",
     // Tempo
     "Tempo",
     // Tuning

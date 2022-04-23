@@ -137,7 +137,6 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
     PianoSamplerNoteDirection noteDirection = Forward;
     float noteStartPos = 0.0;
     float noteLength = 0.0;
-    
  
     if (tempoPrep->getTempoSystem() == AdaptiveTempo1)
     {
@@ -811,9 +810,9 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             //get time until next beat => beat length scaled by beatMultiplier parameter
             
             numSamplesBeat = beatThresholdSamples *
-            prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
-            general->getPeriodMultiplier() *
-            tempo->getPeriodMultiplier();
+                                prep->sBeatMultipliers.value[cluster->getBeatMultiplierCounter()] *
+                                general->getPeriodMultiplier() *
+                                tempo->getPeriodMultiplier();
             
             //check to see if enough time has passed for next beat
             if (cluster->getPhasor() >= numSamplesBeat)

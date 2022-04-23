@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.0"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.1"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -195,6 +195,8 @@
                 file="Source/galleries/Exercise Constraint.xml"/>
         </GROUP>
         <GROUP id="{6F7CFDA8-D246-D5B9-B60B-EDBE0C6F3537}" name="icons">
+          <FILE id="PW60gg" name="bitKlavier_x.png" compile="0" resource="1"
+                file="Source/icons/bitKlavier_x.png"/>
           <FILE id="suTd6x" name="hi_cut.png" compile="0" resource="1" file="Source/icons/hi_cut.png"/>
           <FILE id="K955yI" name="lo_cut.png" compile="0" resource="1" file="Source/icons/lo_cut.png"/>
           <FILE id="DtQaJB" name="peak.png" compile="0" resource="1" file="Source/icons/peak.png"/>
@@ -205,8 +207,6 @@
           <FILE id="A1o3FE" name="icon_iOS_72.png" compile="0" resource="1" file="Source/icons/icon_iOS_72.png"/>
           <FILE id="iHGLGD" name="icon_iOS_300.jpg" compile="0" resource="1"
                 file="Source/icons/icon_iOS_300.jpg"/>
-          <FILE id="Dl47P7" name="bitKlavier_x.png" compile="0" resource="1"
-                file="Source/bitKlavier_x.png"/>
           <FILE id="hXCh3E" name="Icon.icns" compile="0" resource="1" file="Source/icons/Icon.icns"/>
           <FILE id="puwr6J" name="icon.png" compile="0" resource="1" file="Source/icons/icon.png"/>
           <FILE id="XA1tC4" name="icon_win_large.png" compile="0" resource="1"
@@ -256,6 +256,8 @@
               file="Source/GraphicsConstants.h"/>
       </GROUP>
       <GROUP id="{754B7718-DE02-827A-21E1-1FB69E01DE50}" name="Utilities">
+        <FILE id="kWlunP" name="TuningsImpl.h" compile="0" resource="0" file="Source/TuningsImpl.h"/>
+        <FILE id="I0ECf1" name="Tunings.h" compile="0" resource="0" file="Source/Tunings.h"/>
         <FILE id="WuBRqX" name="Moddable.h" compile="0" resource="0" file="Source/Moddable.h"/>
         <GROUP id="{AEA67C46-9692-A274-A2D7-A2EB6AC3B59C}" name="SFZero">
           <GROUP id="{80C7D4AF-BB5C-5D82-478E-61C64C63A6C5}" name="sfzero">

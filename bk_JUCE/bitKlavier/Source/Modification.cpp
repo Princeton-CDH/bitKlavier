@@ -583,7 +583,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
 
 ResonanceModification::ResonanceModification(BKAudioProcessor& processor, int Id):
 Modification(processor, Id, ResonanceParameterTypeNil),
-ResonancePreparation()
+ResonancePreparation(-1)
 {
 
 }

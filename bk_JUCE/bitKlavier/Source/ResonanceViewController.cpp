@@ -15,7 +15,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 ResonanceViewController::ResonanceViewController(BKAudioProcessor& p, BKItemGraph* theGraph) :
-    BKViewController(p, theGraph, 2),
+    BKViewController(p, theGraph, 3),
 #if JUCE_IOS
 gainsKeyboard(false, true),
 offsetsKeyboard(false, true)
@@ -75,21 +75,40 @@ offsetsKeyboard(false, true)
 //    closestKeyboard.setAlpha(1);
     //closestKeyboard->setAvailableRange(24, 24+NUM_KEYS);
     closestKeyboard->setAvailableRange(0, NUM_KEYS);
-    closestKeyboard->setOctaveForMiddleC(4);
+    //closestKeyboard->setOctaveForMiddleC(4);
     closestKeyboard->setScrollButtonsVisible(false);
     closestKeyboard->setOctaveForMiddleC(5);
     addAndMakeVisible(*closestKeyboard);
+    
     
     fundamentalKeyboard = std::make_unique<BKKeymapKeyboardComponent> (fundamentalKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
     fundamentalKeyboard->setName("fundamental");
 //    closestKeyboard.setAlpha(1);
     //fundamentalKeyboard->setAvailableRange(24, 24+NUM_KEYS);
     fundamentalKeyboard->setAvailableRange(0, NUM_KEYS);
-    fundamentalKeyboard->setOctaveForMiddleC(4);
+    //fundamentalKeyboard->setOctaveForMiddleC(4);
     //fundamentalKeyboard.setScrollButtonsVisible(false);
     fundamentalKeyboard->setOctaveForMiddleC(5);
     fundamentalKeyboard->setKeysInKeymap(0);
     addAndMakeVisible(*fundamentalKeyboard);
+    
+    addKeyboard = std::make_unique<BKKeymapKeyboardComponent> (addKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    addKeyboard->setName("add");
+    addKeyboard->setScrollButtonsVisible(false);
+    addKeyboard->setAvailableRange(21, 108);
+    //addKeyboard->setOctaveForMiddleC(5);
+    addKeyboard->setOctaveForMiddleC(4);
+    addKeyboard->setKeysInKeymap(0);
+    addAndMakeVisible(*addKeyboard);
+    
+    ringKeyboard = std::make_unique<BKKeymapKeyboardComponent> (ringKeyboardState, BKKeymapKeyboardComponent::horizontalKeyboard);
+    ringKeyboard->setName("ring");
+    ringKeyboard->setScrollButtonsVisible(false);
+    ringKeyboard->setAvailableRange(21, 108);
+    //ringKeyboard->setOctaveForMiddleC(5);
+    ringKeyboard->setOctaveForMiddleC(4);
+    ringKeyboard->setKeysInKeymap(0);
+    addAndMakeVisible(*ringKeyboard);
     
     addAndMakeVisible(&actionButton, ALL);
     actionButton.setButtonText("Action");
@@ -113,6 +132,9 @@ offsetsKeyboard(false, true)
     offsetsKeyboard.disableAllKeys();
     addAndMakeVisible(&offsetsKeyboard);
     
+    
+
+    
     closestKeyLabel.setText("Resonant Keys: ", dontSendNotification);
     closestKeyLabel.setJustificationType(Justification::right);
     closestKeyLabel.setTooltip("keys that should resonate when struck; partials");
@@ -132,6 +154,17 @@ offsetsKeyboard(false, true)
     offsetsLabel.setJustificationType(Justification::right);
     offsetsLabel.setTooltip("offset in cents from ET for this resonance");
     addAndMakeVisible(offsetsLabel);
+    
+    addLabel.setText("Held Keys: ", dontSendNotification);
+    addLabel.setJustificationType(Justification::centred);
+    addLabel.setTooltip("Keys added to sympathetic resonance");
+    addAndMakeVisible(addLabel);
+    
+    ringLabel.setText("Ringing Keys: ", dontSendNotification);
+    ringLabel.setJustificationType(Justification::centred);
+    ringLabel.setTooltip("Keys currently ringing");
+    addAndMakeVisible(ringLabel);
+    
     
     alternateMod.setButtonText ("alternate mod");
     alternateMod.setTooltip("activating this mod will alternate between modding and reseting attached preparations");
@@ -155,6 +188,16 @@ void ResonanceViewController::resized()
 
     //will have to put big '#if 0' here eventually
 }
+
+//#if JUCE_IOS
+//void ResonanceViewController::iWantTheBigOne(TextEditor* tf, String name)
+//{
+//    hideOrShow.setAlwaysOnTop(false);
+//    rightArrow.setAlwaysOnTop(false);
+//    leftArrow.setAlwaysOnTop(false);
+//    bigOne.display(tf, name, getBounds());
+//}
+//#endif
 
 void ResonanceViewController::displayTab(int tab)
 {
@@ -217,6 +260,96 @@ void ResonanceViewController::displayTab(int tab)
     }
     else if (tab == 1){
         iconImageComponent.setBounds(area);
+       //        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+               
+       #if JUCE_IOS
+       //        area.removeFromTop(gComponentComboBoxHeight);
+               area.reduce(0.f, area.getHeight() * 0.2f);
+       #endif
+               area.removeFromBottom(40 * processor.paddingScalarY);
+               
+               float keyboardHeight = 80 * processor.paddingScalarY;
+               float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
+               
+               Rectangle<int> fundamentalKeyboardRow = area.removeFromBottom(keyboardHeight);
+               
+               fundamentalLabel.setBounds(fundamentalKeyboardRow.removeFromLeft(columnWidth));
+               fundamentalLabel.setVisible(true);
+               
+       //        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12); //num white keys, gives error
+               
+               float keyWidth = fundamentalKeyboardRow.getWidth() / 31.; // 31 is number of white keys
+               
+               DBG("Keyboard row width: " + String(fundamentalKeyboardRow.getWidth()));
+               DBG("Keyboard width" + String(fundamentalKeyboard->getWidth()));
+
+               fundamentalKeyboard->setKeyWidth(keyWidth);
+               fundamentalKeyboard->setBlackNoteLengthProportion(0.6);
+               fundamentalKeyboard->setBounds(fundamentalKeyboardRow);
+               fundamentalKeyboard->setVisible(true);
+               
+               area.removeFromBottom(processor.paddingScalarX * 10);
+               area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
+               
+               Rectangle<int> closestKeyboardRow = area.removeFromBottom(keyboardHeight);
+               
+               closestKeyLabel.setBounds(closestKeyboardRow.removeFromLeft(columnWidth));
+               closestKeyLabel.setVisible(true);
+
+               closestKeyboard->setKeyWidth(keyWidth);
+               closestKeyboard->setBlackNoteLengthProportion(0.6);
+               closestKeyboard->setBounds(closestKeyboardRow);
+               closestKeyboard->setVisible(true);
+           
+               area.removeFromBottom(processor.paddingScalarY * 10);
+               area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
+
+               float multiHeight = 100 + processor.paddingScalarY;
+               
+               Rectangle<int> offsetsRow = area.removeFromBottom(multiHeight);
+               offsetsLabel.setBounds(offsetsRow.removeFromLeft(columnWidth));
+               offsetsLabel.setVisible(true);
+               
+       //        float sliderWidth = offsetsRow.getWidth()/ (NUM_KEYS * 1.);
+       //
+       //        DBG("Slider width:" + String(sliderWidth));
+       //        DBG("Offsets row width: " + String(offsetsRow.getWidth()));
+       //
+       //        float sum = 0;
+       //
+       //        for (int i = 0; i < NUM_KEYS; i++) {
+       //            offsetsArray[i]->setBounds(offsetsRow.removeFromLeft(sliderWidth));
+       //            sum += sliderWidth;
+       //            if (isActive[i])
+       //                offsetsArray[i]->setVisible(true);
+       //        }
+       //
+       //        DBG("slider width sum: " + String(sum));
+               
+               offsetsKeyboard.setBounds(offsetsRow);
+               offsetsKeyboard.setVisible(true);
+               
+               area.removeFromBottom(10 * processor.paddingScalarY);
+               
+               Rectangle<int> gainsRow = area.removeFromBottom(multiHeight);
+               
+               gainsLabel.setBounds(gainsRow.removeFromLeft(columnWidth));
+               gainsLabel.setVisible(true);
+               
+       //        for (int i = 0; i < NUM_KEYS; i++) {
+       //            gainsArray[i]->setBounds(gainsRow.removeFromLeft(sliderWidth));
+       //            if (isActive[i])
+       //                gainsArray[i]->setVisible(true);
+       //        }
+               
+               gainsKeyboard.setBounds(gainsRow);
+               gainsKeyboard.setVisible(true);
+
+               area.removeFromBottom(10 * processor.paddingScalarY);
+        
+    } else if (tab == 2)
+    {
+        iconImageComponent.setBounds(area);
 //        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
         
 #if JUCE_IOS
@@ -226,84 +359,47 @@ void ResonanceViewController::displayTab(int tab)
         area.removeFromBottom(40 * processor.paddingScalarY);
         
         float keyboardHeight = 80 * processor.paddingScalarY;
-        float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
+        // float columnWidth = area.getWidth() * 0.15 + processor.paddingScalarX;
         
-        Rectangle<int> fundamentalKeyboardRow = area.removeFromBottom(keyboardHeight);
+        Rectangle<int> addKeyboardRow = area.removeFromBottom(keyboardHeight * 2);
+        addLabel.setBounds(addKeyboardRow.removeFromTop(keyboardHeight * 0.5));
+        addLabel.setVisible(true);
         
-        fundamentalLabel.setBounds(fundamentalKeyboardRow.removeFromLeft(columnWidth));
-        fundamentalLabel.setVisible(true);
+        //float keyWidth = addKeyboardRow.getWidth() / 49.5; // 62 is number of white keys
+        float keyWidth = addKeyboardRow.getWidth() / 52.0; // 62 is number of white keys
         
-//        float keyWidth = fundamentalKeyboardRow.getWidth() / round((NUM_KEYS) * 7. / 12); //num white keys, gives error
+        DBG("Keyboard row width: " + String(addKeyboardRow.getWidth()));
+        DBG("Keyboard width" + String(addKeyboard->getWidth()));
         
-        float keyWidth = fundamentalKeyboardRow.getWidth() / 31.; // 31 is number of white keys 
         
-        DBG("Keyboard row width: " + String(fundamentalKeyboardRow.getWidth()));
-        DBG("Keyboard width" + String(fundamentalKeyboard->getWidth()));
-
-        fundamentalKeyboard->setKeyWidth(keyWidth);
-        fundamentalKeyboard->setBlackNoteLengthProportion(0.6);
-        fundamentalKeyboard->setBounds(fundamentalKeyboardRow);
-        fundamentalKeyboard->setVisible(true);
+        addKeyboard->setKeyWidth(keyWidth);
+        addKeyboard->setBlackNoteLengthProportion(0.6);
+        addKeyboard->setBounds(addKeyboardRow);
+        addKeyboard->setVisible(true);
         
         area.removeFromBottom(processor.paddingScalarX * 10);
         area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
         
-        Rectangle<int> closestKeyboardRow = area.removeFromBottom(keyboardHeight);
+       
         
-        closestKeyLabel.setBounds(closestKeyboardRow.removeFromLeft(columnWidth));
-        closestKeyLabel.setVisible(true);
-
-        closestKeyboard->setKeyWidth(keyWidth);
-        closestKeyboard->setBlackNoteLengthProportion(0.6);
-        closestKeyboard->setBounds(closestKeyboardRow);
-        closestKeyboard->setVisible(true);
-    
-        area.removeFromBottom(processor.paddingScalarY * 10);
+        Rectangle<int> ringKeyboardRow = area.removeFromBottom(keyboardHeight * 2);
+        ringLabel.setBounds(ringKeyboardRow.removeFromTop(keyboardHeight * 0.5));
+        ringLabel.setVisible(true);
+        
+        keyWidth = ringKeyboardRow.getWidth() / 52.0; // 62 is number of white keys
+        
+        DBG("Keyboard row width: " + String(ringKeyboardRow.getWidth()));
+        DBG("Keyboard width" + String(ringKeyboard->getWidth()));
+        
+        
+        ringKeyboard->setKeyWidth(keyWidth);
+        ringKeyboard->setBlackNoteLengthProportion(0.6);
+        ringKeyboard->setBounds(ringKeyboardRow);
+        ringKeyboard->setVisible(true);
+        
+        area.removeFromBottom(processor.paddingScalarX * 10);
         area.removeFromBottom(0.2 * keyboardHeight + gYSpacing);
 
-        float multiHeight = 100 + processor.paddingScalarY;
-        
-        Rectangle<int> offsetsRow = area.removeFromBottom(multiHeight);
-        offsetsLabel.setBounds(offsetsRow.removeFromLeft(columnWidth));
-        offsetsLabel.setVisible(true);
-        
-//        float sliderWidth = offsetsRow.getWidth()/ (NUM_KEYS * 1.);
-//
-//        DBG("Slider width:" + String(sliderWidth));
-//        DBG("Offsets row width: " + String(offsetsRow.getWidth()));
-//
-//        float sum = 0;
-//
-//        for (int i = 0; i < NUM_KEYS; i++) {
-//            offsetsArray[i]->setBounds(offsetsRow.removeFromLeft(sliderWidth));
-//            sum += sliderWidth;
-//            if (isActive[i])
-//                offsetsArray[i]->setVisible(true);
-//        }
-//
-//        DBG("slider width sum: " + String(sum));
-        
-        offsetsKeyboard.setBounds(offsetsRow);
-        offsetsKeyboard.setVisible(true);
-        
-        area.removeFromBottom(10 * processor.paddingScalarY);
-        
-        Rectangle<int> gainsRow = area.removeFromBottom(multiHeight);
-        
-        gainsLabel.setBounds(gainsRow.removeFromLeft(columnWidth));
-        gainsLabel.setVisible(true);
-        
-//        for (int i = 0; i < NUM_KEYS; i++) {
-//            gainsArray[i]->setBounds(gainsRow.removeFromLeft(sliderWidth));
-//            if (isActive[i])
-//                gainsArray[i]->setVisible(true);
-//        }
-        
-        gainsKeyboard.setBounds(gainsRow);
-        gainsKeyboard.setVisible(true);
-
-        area.removeFromBottom(10 * processor.paddingScalarY);
-        
     }
 
     //all the display code is in displayShared for now, some will get moved here for when multiple tabs are implemented
@@ -364,6 +460,8 @@ void ResonanceViewController::invisible(void)
     
     closestKeyboard->setVisible(false);
     fundamentalKeyboard->setVisible(false);
+    addKeyboard->setVisible(false);
+    ringKeyboard->setVisible(false);
     
     gainsKeyboard.setVisible(false);
     offsetsKeyboard.setVisible(false);
@@ -375,7 +473,8 @@ void ResonanceViewController::invisible(void)
 
     closestKeyLabel.setVisible(false);
     fundamentalLabel.setVisible(false);
-
+    addLabel.setVisible(false);
+    ringLabel.setVisible(false);
 }
 //
 //void ResonanceViewController::mouseEnter(const MouseEvent& e)
@@ -405,9 +504,10 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     ADSRSlider->addMyListener(this);
     resonanceKeyboardState.addListener(this);
     fundamentalKeyboardState.addListener(this);
-    
+    addKeyboardState.addListener(this);
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
+    
 
     startTimer(10);
 }
@@ -418,7 +518,6 @@ void ResonancePreparationEditor::update()
     ADSRSlider->setIsButtonOnly(true);
 
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
-
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentResonanceId, dontSendNotification);
@@ -438,12 +537,15 @@ void ResonancePreparationEditor::update()
         
         fundamentalKeyboard->setKeysInKeymap({prep->getFundamentalKey()});
         closestKeyboard->setKeysInKeymap(prep->getResonanceKeys());
+        //addKeyboard->setKeysInKeymap(prep->getSympStrings());
+        
         
         offsetsKeyboard.setKeys(prep->getResonanceKeys());
         offsetsKeyboard.setValues(prep->getOffsets());
         
         gainsKeyboard.setKeys(prep->getResonanceKeys());
         gainsKeyboard.setValues(prep->getGains());
+       
         
 //        for (int i = 0; i < NUM_KEYS; i++){
 //            if (prep->isActive(i + 24)) {
@@ -558,7 +660,11 @@ void ResonancePreparationEditor::timerCallback()
                 offsetsKeyboard.setValues(prep->getOffsets());
             if (prep->rGainsKeys.didChange())
                 gainsKeyboard.setValues(prep->getGains());
-            
+            if (currentTab == 2)
+            {
+                addKeyboard->setKeysInKeymap(prep->getHeldKeys());
+                ringKeyboard->setKeysInKeymap(prep->getRingingStrings());
+            }
         }
     }
 //    Resonance::Ptr rs = processor.gallery->getResonance(processor.updateState->currentId);
@@ -594,12 +700,12 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
     }
     else if (action == 4)
     {
-        processor.reset(PreparationTypeTempo, processor.updateState->currentResonanceId);
+        processor.reset(PreparationTypeResonance, processor.updateState->currentResonanceId);
         vc->update();
     }
     else if (action == 5)
     {
-        processor.clear(PreparationTypeTempo, processor.updateState->currentResonanceId);
+        processor.clear(PreparationTypeResonance, processor.updateState->currentResonanceId);
         vc->update();
         processor.saveGalleryToHistory("Clear Resonance Preparation");
     }
@@ -607,8 +713,8 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        int Id = processor.updateState->currentTempoId;
-        Tempo::Ptr prep = processor.gallery->getTempo(Id);
+        int Id = processor.updateState->currentResonanceId;
+        Resonance::Ptr prep = processor.gallery->getResonance(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -632,8 +738,8 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
     {
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
-        int Id = processor.updateState->currentTempoId;
-        Tempo::Ptr prep = processor.gallery->getTempo(Id);
+        int Id = processor.updateState->currentResonanceId;
+        Resonance::Ptr prep = processor.gallery->getResonance(Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -654,9 +760,9 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
     else if (action >= 100)
     {
         int which = action - 100;
-        processor.importPreparation(PreparationTypeTempo, processor.updateState->currentTempoId, which);
+        processor.importPreparation(PreparationTypeResonance, processor.updateState->currentResonanceId, which);
         vc->update();
-        processor.saveGalleryToHistory("Import Tempo Preparation");
+        processor.saveGalleryToHistory("Import Resonance Preparation");
     }
 }
 
@@ -721,7 +827,14 @@ void ResonancePreparationEditor::bkMessageReceived(const String& message)
 
 void ResonancePreparationEditor::bkComboBoxDidChange(ComboBox* box)
 {
-    //will need to fill this in eventually, should be fine empty for now
+    String name = box->getName();
+    int Id = box->getSelectedId();
+    // int index = box->getSelectedItemIndex();
+    
+    if (name == "Resonance")
+    {
+        setCurrentId(Id);
+    }
 }
 
 void ResonancePreparationEditor::buttonClicked(Button* b)
@@ -822,7 +935,7 @@ void ResonancePreparationEditor::BKRangeSliderValueChanged(String name, double m
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
     
     if(name == startTimeSlider->getName()) {
-        DBG("got new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
+        //DBG("got new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
         prep->setMinStartTime(minval);
         prep->setMaxStartTime(maxval);
     }
@@ -832,13 +945,15 @@ void ResonancePreparationEditor::BKRangeSliderValueChanged(String name, double m
 
 void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* source, int midiNoteNumber) {
     
+    DBG("ResonancePreparationEditor::handleKeymapNoteToggled " + String(midiNoteNumber));
+    
     ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
     
     if (source == &resonanceKeyboardState)
     {
         //closestKeyboard->setKeysInKeymap(prep->getKeys());
         //DBG("resonanceKeyboardState " + String(midiNoteNumber));
-        prep->toggleResonanceKey(midiNoteNumber);
+        prep->toggleResonanceKey(midiNoteNumber); // for some reason we're off an octave here
         closestKeyboard->setKeysInKeymap(prep->getResonanceKeys());
         
         offsetsKeyboard.setKeys(prep->getResonanceKeys());
@@ -856,6 +971,23 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
         //DBG("fundamental key toggled " + String(midiNoteNumber));
     }
     
+    else if (source == &addKeyboardState )
+    {
+        ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
+        if (prep->rActiveHeldKeys.arrayContains(midiNoteNumber))
+        {
+            // clear this held string's partial
+            prep->rActiveHeldKeys.arrayRemoveAllInstancesOf(midiNoteNumber);
+            prep->removeSympStrings(midiNoteNumber, 0);
+            prep->sympStrings.remove(midiNoteNumber);
+        } else
+        {
+            prep->addSympStrings(midiNoteNumber, 127);
+            prep->addHeldKey(midiNoteNumber);
+        }
+           
+        addKeyboard->setKeysInKeymap(prep->rActiveHeldKeys.value);
+    }
     update();
 
 }
@@ -900,6 +1032,8 @@ ResonanceViewController(p, theGraph)
     resonanceKeyboardState.addListener(this);
     fundamentalKeyboardState.addListener(this);
     
+    addKeyboardState.addListener(this);
+    
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
     
@@ -929,6 +1063,8 @@ void ResonanceModificationEditor::greyOutAllComponents()
     fundamentalKeyboard->setAlpha(gModAlpha);
     offsetsKeyboard.setDim(gModAlpha);
     gainsKeyboard.setDim(gModAlpha);
+    addKeyboard->setAlpha(gModAlpha);
+    ringKeyboard->setAlpha(gModAlpha);
 }
 
 void ResonanceModificationEditor::highlightModedComponents()
@@ -942,9 +1078,10 @@ void ResonanceModificationEditor::highlightModedComponents()
     if(mod->getDirty(ResonanceFundamental))     fundamentalKeyboard->setAlpha(1.);
     if(mod->getDirty(ResonanceMaxSympStrings))  maxSympStringsSlider->setBright();
     if(mod->getDirty(ResonanceClosestKeys))     closestKeyboard->setAlpha(1.);
-    if(mod->getDirty(ResonanceOffsets))         offsetsKeyboard.setAlpha(1.);
+    if(mod->getDirty(ResonanceOffsets))         offsetsKeyboard.setBright();
     if(mod->getDirty(ResonanceGains))           gainsKeyboard.setBright();
     if(mod->getDirty(ResonanceADSR))            ADSRSlider->setBright();
+    if(mod->getDirty(ResonanceHeld))            addKeyboard->setAlpha(1.);
 }
 
 void ResonanceModificationEditor::update(void)
@@ -975,7 +1112,7 @@ void ResonanceModificationEditor::update(void)
         offsetsKeyboard.setValues(mod->getOffsets());
         gainsKeyboard.setKeys(mod->getResonanceKeys());
         gainsKeyboard.setValues(mod->getGains());
-  
+        addKeyboard->setKeysInKeymap(mod->getHeldKeys());
         alternateMod.setToggleState(mod->altMod, dontSendNotification);
         
         //updateComponentVisibility();
@@ -1222,7 +1359,7 @@ void ResonanceModificationEditor::BKRangeSliderValueChanged(String name, double 
     ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
     
     if(name == startTimeSlider->getName()) {
-        DBG("modding new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
+        //DBG("modding new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
         mod->setMinStartTime(minval);
         mod->setMaxStartTime(maxval);
         
@@ -1269,7 +1406,25 @@ void ResonanceModificationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState*
         
         //DBG("fundamental key toggled " + String(midiNoteNumber));
     }
-    
+    else if (source == &addKeyboardState )
+    {
+        addKeyboard->setAlpha(1.);
+        mod->setDirty(ResonanceHeld);
+        ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
+        if (mod->rActiveHeldKeys.arrayContains(midiNoteNumber))
+        {
+            // clear this held string's partial
+            mod->rActiveHeldKeys.arrayRemoveAllInstancesOf(midiNoteNumber);
+            mod->removeSympStrings(midiNoteNumber, 0);
+        } else
+        {
+            mod->addSympStrings(midiNoteNumber, 127);
+            mod->addHeldKey(midiNoteNumber);
+            mod->sympStrings.remove(midiNoteNumber);
+        }
+           
+        addKeyboard->setKeysInKeymap(mod->rActiveHeldKeys.value);
+    }
     update();
 
 }

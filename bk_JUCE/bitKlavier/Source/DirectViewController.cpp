@@ -50,7 +50,7 @@ BKViewController(p, theGraph, 2)
     
     blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic send volume (dB)", cDirectBlendronicGain, -100, 24, 0, 0.01, "-inf");
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
-    blendronicGainSlider->setJustifyRight(false);
+    blendronicGainSlider->setJustifyRight(true);
     blendronicGainSlider->setToolTipString("Adjusts volume of Direct output to connected Blendronics");
     addAndMakeVisible(*blendronicGainSlider);
     
@@ -229,13 +229,9 @@ void DirectViewController::displayTab(int tab)
         area.removeFromBottom(processor.paddingScalarY * 30);
         ADSRSlider->setBounds(area.removeFromBottom(area.getHeight() * 0.35 + processor.paddingScalarY * 30));
         
-        area.removeFromTop(processor.paddingScalarY * 30);
-#if !JUCE_IOS
-        int width = area.getWidth();
-        area.removeFromLeft(processor.paddingScalarX * width / 4.);
-        area.removeFromRight(processor.paddingScalarX * width / 4.);
-#endif
-        blendronicGainSlider->setBounds(area.removeFromTop(gComponentStackedSliderHeight + processor.paddingScalarY * 30));
+        //area.removeFromTop(processor.paddingScalarY * 30);
+
+        blendronicGainSlider->setBounds(area);
         
     }
 }
@@ -377,7 +373,9 @@ void DirectViewController::resized()
         
         //areaSave.removeFromTop(gComponentComboBoxHeight * 2 + gYSpacing + 8.*gPaddingConst * processor.paddingScalarY);
         //ADSRSlider->setBounds(areaSave);
-        
+        areaSave.removeFromTop(processor.paddingScalarY * 30);
+
+        blendronicGainSlider->setBounds(areaSave);
         selectCB.toFront(false);
     }
 #endif

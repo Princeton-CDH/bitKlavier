@@ -62,7 +62,16 @@ canScroll (true),
 useMousePositionForVelocity (true),
 shouldCheckMousePos (false),
 keyMappingOctave (6),
-octaveNumForMiddleC (3)
+octaveNumForMiddleC (3),
+lineColour(juce::Colours::dimgrey),
+textColour(juce::Colours::floralwhite),
+shadowCol(juce::Colours::lightgrey),
+blackNoteColour(juce::Colours::black),
+keyDownOverlayColour(juce::Colours::yellow),
+keySeparatorLineColour(juce::Colours::dimgrey),
+mouseOverKeyOverlayColour(juce::Colours::yellow),
+upDownButtonBackgroundColour(juce::Colours::grey),
+upDownButtonArrowColour(juce::Colours::white)
 {
     firstKeyDown = -1; lastKeyDown = -1; lastKeySelected = -1;
     
@@ -179,7 +188,7 @@ void BKKeymapKeyboardComponent::setScrollButtonsVisible (const bool newCanScroll
 
 void BKKeymapKeyboardComponent::colourChanged()
 {
-    setOpaque (findColour (whiteNoteColourId).isOpaque());
+    setOpaque (whiteNoteColour.isOpaque());
     repaint();
 }
 
@@ -378,12 +387,10 @@ void BKKeymapKeyboardComponent::repaintNote (const int noteNum)
 
 void BKKeymapKeyboardComponent::paint (Graphics& g)
 {
-    g.fillAll (findColour (whiteNoteColourId));
+    g.fillAll (juce::Colours::white);
     
     Colour keyColour;
-    const Colour lineColour (findColour (keySeparatorLineColourId));
-    const Colour textColour (findColour (textLabelColourId));
-    
+
     for (int octave = 0; octave < 128; octave += 12)
     {
         for (int white = 0; white < 7; ++white)
@@ -425,7 +432,7 @@ void BKKeymapKeyboardComponent::paint (Graphics& g)
     getKeyPos (rangeEnd, x, w);
     x += w;
     
-    const Colour shadowCol (findColour (shadowColourId));
+    
     
     if (! shadowCol.isTransparent())
     {
@@ -453,7 +460,7 @@ void BKKeymapKeyboardComponent::paint (Graphics& g)
         }
     }
     
-    const Colour blackNoteColour (findColour (blackNoteColourId));
+    
     
     for (int octave = 0; octave < 128; octave += 12)
     {
@@ -462,7 +469,7 @@ void BKKeymapKeyboardComponent::paint (Graphics& g)
             const int noteNum = octave + blackNotes [black];
             
             if (state.isInKeymap(noteNum))
-                keyColour = findColour(keyDownOverlayColourId);
+                keyColour = keyDownOverlayColour;
             else
                 keyColour = blackNoteColour;
             
@@ -487,36 +494,29 @@ void BKKeymapKeyboardComponent::drawWhiteNote (int midiNoteNumber,
 {
     Colour c;
     if (disabledKeys.contains(midiNoteNumber))
-        c = findColour(shadowColourId);
+        c = shadowCol;
     else
     c = keyColour;
     
     float keyVal = keyValues.getUnchecked(midiNoteNumber);
-    //if(keyVal != 0.)
+
     if(keyVal != midRange)
     {
-        //if(keyVal > 0) c = c.overlaidWith (Colours::red.withSaturation ( sqrt(keyVal / 50.)) );
-        //else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt(keyVal * -1. / 50.)));
-        //DBG("keyVal = " + String(midRange - keyVal));
-        //if (isOver && !disabledKeys.contains(midiNoteNumber) && !isDown)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
-        //else
+        
         if(keyVal > midRange) c = c.overlaidWith (Colours::red.withSaturation ( sqrt((keyVal - midRange) / (maxRange - midRange))) );
         else c = c.overlaidWith (Colours::blue.withSaturation ( sqrt((midRange - keyVal) / (midRange - minRange))));
-
-        //if (isOver && !disabledKeys.contains(midiNoteNumber) && !isDown)  c = c.interpolatedWith (findColour (mouseOverKeyOverlayColourId), 0.5);
-        //if (isOver && !disabledKeys.contains(midiNoteNumber) && !isDown)  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
 
     }
     else
     {
-        if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
-        if (isOver && !disabledKeys.contains(midiNoteNumber))  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+        if (isDown)  c = c.overlaidWith (keyDownOverlayColour);
+        if (isOver && !disabledKeys.contains(midiNoteNumber))  c = c.overlaidWith (mouseOverKeyOverlayColour);
     }
     
     g.setColour (c);
     g.fillRect (x, y, w, h);
     
-    //const String text (getWhiteNoteText (midiNoteNumber));
+    
     String text (getWhiteNoteText (midiNoteNumber));
     
     if(fundamental >= 0) //meaning: rotating keyboard, or temperament
@@ -598,14 +598,14 @@ void BKKeymapKeyboardComponent::drawBlackNote (int midiNoteNumber,
 {
     Colour c;
     if (disabledKeys.contains(midiNoteNumber))
-        c = findColour(shadowColourId).withAlpha(1.f).withBrightness(0.3f);
+        c = juce::Colours::grey.withAlpha(1.f).withBrightness(0.3f);/*shadowColourId*/
     else
     c = noteFillColour;
     
     //Colour c (noteFillColour);
     
-    if (isDown)  c = c.overlaidWith (findColour (keyDownOverlayColourId));
-    if (isOver && !disabledKeys.contains(midiNoteNumber))  c = c.overlaidWith (findColour (mouseOverKeyOverlayColourId));
+    if (isDown)  c = c.overlaidWith(keyDownOverlayColour);
+    if (isOver && !disabledKeys.contains(midiNoteNumber))  c = c.overlaidWith (mouseOverKeyOverlayColour);
     
     g.setColour (c);
     g.fillRect (x, y, w, h);
@@ -685,7 +685,7 @@ void BKKeymapKeyboardComponent::drawUpDownButton (Graphics& g, int w, int h,
                                               const bool buttonDown,
                                               const bool movesOctavesUp)
 {
-    g.fillAll (findColour (upDownButtonBackgroundColourId));
+    g.fillAll (upDownButtonBackgroundColour);
     
     float angle;
     
@@ -699,9 +699,9 @@ void BKKeymapKeyboardComponent::drawUpDownButton (Graphics& g, int w, int h,
     
     Path path;
     path.addTriangle (0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.5f);
-    path.applyTransform (AffineTransform::rotation (float_Pi * 2.0f * angle, 0.5f, 0.5f));
+    path.applyTransform (AffineTransform::rotation (MathConstants<float>::pi * 2.0f * angle, 0.5f, 0.5f));
     
-    g.setColour (findColour (upDownButtonArrowColourId)
+    g.setColour (upDownButtonArrowColour
                  .withAlpha (buttonDown ? 1.0f : (mouseOver ? 0.6f : 0.4f)));
     
     g.fillPath (path, path.getTransformToScaleToFit (1.0f, 1.0f, w - 2.0f, h - 2.0f, true));

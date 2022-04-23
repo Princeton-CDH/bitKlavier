@@ -689,6 +689,20 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                     {
                         reducedHarm.addIfNotAlreadyThere(h);
                     }
+                    
+                    if (km->getIsToggle())
+                    {
+                        if (km->getToggleState(noteNumber))
+                        {
+                            km->setTriggered(noteNumber, false);
+                            return;
+                        } else
+                        {
+                            km->setTriggered(noteNumber, true);
+                            continue; //don't care about other behaviors because we know they are turned off
+                        }
+                    }
+                    
                     // Toggleable keymap behaviors
                     if (!km->isInverted())
                     {
@@ -811,6 +825,16 @@ void BKAudioProcessor::handleNoteOff(int noteNumber, float velocity, int channel
                 {
                     reducedHarm.addIfNotAlreadyThere(h);
                 }
+                if (km->getIsToggle())
+                {
+                    if (km->getToggleState(noteNumber))
+                    {
+                        return; //if we just turned the note on we don't wan't to do any thing
+                    }
+                    //otherwise we just want to continue on our merry little way 
+                    continue; //don't care about other behaviors because we know they are turned off
+                }
+                
                 if (km->isInverted())
                 {
                     if (km->getAllNotesOff())
@@ -966,14 +990,14 @@ void BKAudioProcessor::handlePianoPostRelease(Piano::Ptr piano, int noteNumber, 
 
 void BKAudioProcessor::sustainActivate(void)
 {
-    DBG("BKAudioProcessor::sustainActivate");
+    // DBG("BKAudioProcessor::sustainActivate");
+        
     if(!sustainIsDown)
     {
         sustainIsDown = true;
         DBG("SUSTAIN ON");
         
         currentPiano->prepMap->sustainPedalPressed();
-    
         prevPiano->prepMap->sustainPedalPressed();
     
         //play pedalDown resonance
@@ -1039,6 +1063,7 @@ void BKAudioProcessor::sustainDeactivate(void)
         
         if(prevPiano != currentPiano) prevPiano->prepMap->sustainPedalReleased(sourcedNotesOn, true);
         
+        
         //turn off pedal down resonance
         pedalSynth.keyOff(channel,
                           PedalNote,
@@ -1050,6 +1075,7 @@ void BKAudioProcessor::sustainDeactivate(void)
                           1.,
                           nullptr,
                           true);
+        
         
         //play pedalUp sample
         pedalSynth.keyOn(channel,
@@ -1068,6 +1094,7 @@ void BKAudioProcessor::sustainDeactivate(void)
                          2000,
                          3,
                          3 );
+         
     }
 }
 
@@ -1700,7 +1727,7 @@ void BKAudioProcessor::exportCurrentGallery(void)
 
 }
 
-void BKAudioProcessor::saveCurrentGalleryAs(void)
+bool BKAudioProcessor::saveCurrentGalleryAs(void)
 {
     FileChooser myChooser ("Save gallery to file...",
                            lastGalleryPath,
@@ -1711,10 +1738,12 @@ void BKAudioProcessor::saveCurrentGalleryAs(void)
         File fileToSave = myChooser.getResult();
         if (!fileToSave.hasFileExtension("xml")) fileToSave = fileToSave.withFileExtension("xml");
         writeCurrentGalleryToURL(fileToSave.getFullPathName());
+        updateGalleries();
+        if (wrapperType == wrapperType_Standalone) getPluginHolder()->savePluginState();
+        return true;
+    } else { //code executes if user presses cancel
+        return false;
     }
-    
-    updateGalleries();
-    if (wrapperType == wrapperType_Standalone) getPluginHolder()->savePluginState();
 }
 
 void BKAudioProcessor::saveCurrentGallery(void)
@@ -1819,9 +1848,11 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
-        // if (currentPiano != nullptr) currentPiano->deconfigure();        
+        // if (currentPiano != nullptr) currentPiano->deconfigure();
+        String url;
         if (gallery != nullptr)
         {
+            url = gallery->getURL();
             for (auto piano : gallery->getPianos())
             {
                 piano->deconfigure();
@@ -1830,7 +1861,7 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
         }
         
         gallery = new Gallery(xml, *this);
-
+        if (url.isNotEmpty()) gallery->setURL(url);
         currentGallery = gallery->getName() + ".xml";
         
         initializeGallery();
@@ -2017,34 +2048,51 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     
     channel = m.getChannel();
     
+    // note msg handling
     if (m.isNoteOn()) //&& keystrokesEnabled.getValue())
     {
-        //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
+        // DBG("BKAudioProcessor::handleIncomingMidiMessage noteOn, channel = " + String(channel));
         handleNoteOn(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
     }
     else if (m.isNoteOff())
     {
-        //DBG("BKAudioProcessor::handleIncomingMidiMessage noteOff, channel = " + String(channel));
+        // DBG("BKAudioProcessor::handleIncomingMidiMessage noteOff, channel = " + String(channel));
         handleNoteOff(noteNumber, velocity, channel, noteNumber, sourceIdentifier);
-        //didNoteOffs = true;
+        // didNoteOffs = true;
     }
     
-    // NEED WAY TO TRIGGER RELEASE PEDAL SAMPLE FOR SFZ
-    else if (m.isSustainPedalOn())
+    // sostenuto pedal handling
+    else if (m.isSostenutoPedalOn())
     {
-        //DBG("m.isSustainPedalOn()");
+        // DBG("m.isSostenutoPedalOn()");
+        currentPiano->prepMap->sostenutoPedalPressed();
+        prevPiano->prepMap->sostenutoPedalPressed();
+    }
+    else if (m.isSostenutoPedalOff())
+    {
+        // DBG("m.isSostenutoPedalOff()");
+        currentPiano->prepMap->sostenutoPedalReleased(sourcedNotesOn);
+        prevPiano->prepMap->sostenutoPedalReleased(sourcedNotesOn);
+    }
+    
+    // sustain pedal handling
+    else if (m.isSustainPedalOn() && !sustainIsDown)
+    {
+        // DBG("m.isSustainPedalOn()");
         sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
         if (sustainInverted)    sustainDeactivate();
         else                    sustainActivate();
         
     }
-    else if (m.isSustainPedalOff())
+    else if (m.isSustainPedalOff() && sustainIsDown)
     {
-        //DBG("m.isSustainPedalOff()");
+        // DBG("m.isSustainPedalOff()");
         sustainInverted = gallery->getGeneralSettings()->getInvertSustain();
         if (sustainInverted)    sustainActivate();
         else                    sustainDeactivate();
     }
+    
+    // anything else...
     else
     {
         mainPianoSynth.handleMidiEvent(m);

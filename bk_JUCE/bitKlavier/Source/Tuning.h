@@ -17,7 +17,8 @@
 #include "Keymap.h"
 
 #include "SpringTuning.h"
-
+#include "Tunings.h"
+//#include "MTS-ESP/Client/libMTSClient.h"
 
 class TuningModification;
 
@@ -45,6 +46,7 @@ public:
     nToneSemitoneWidth(p->getNToneSemitoneWidth()),
     nToneRoot(p->getNToneRoot()),
     adaptiveType(p->getAdaptiveType()),
+    //client(nullptr),
     stuning(new SpringTuning(p->getSpringTuning()))
     {
 
@@ -225,6 +227,7 @@ public:
     nToneSemitoneWidth(semitoneWidth),
     nToneRoot(semitoneRoot),
     adaptiveType(AdaptiveNone),
+    //client(nullptr),
     stuning(new SpringTuning(st))
     {
         Array<float> arr;
@@ -258,6 +261,7 @@ public:
     nToneSemitoneWidth(100),
     nToneRoot(60),
     adaptiveType(AdaptiveNone),
+    //client(nullptr),
     stuning(new SpringTuning())
     {
         Array<float> arr;
@@ -267,7 +271,8 @@ public:
     
     ~TuningPreparation()
     {
-        
+//        if(MTS_HasMaster(client))
+//            MTS_DeregisterClient(client);
     }
     
     inline const String getName() const noexcept {return name;}
@@ -323,7 +328,13 @@ public:
         return tCustom.value;
     }
     
+    
+    
+    
     inline void setName(String n)                                           {name = n; } // DBG("set tuning name " + name);}
+    
+
+    
     inline void setScale(TuningSystem tuning)
     {
         if (tuning != AdaptiveTuning && tuning != AdaptiveAnchoredTuning)
@@ -348,7 +359,7 @@ public:
     inline void setAdaptiveAnchorFundamental(PitchClass adaptiveAnchorFundamental)  { tAdaptiveAnchorFundamental = adaptiveAnchorFundamental;}
     inline void setAdaptiveClusterThresh(int adaptiveClusterThresh)  { tAdaptiveClusterThresh = adaptiveClusterThresh; }
     inline void setAdaptiveHistory(int adaptiveHistory)     { tAdaptiveHistory = adaptiveHistory; }
-    inline void setCustomScale(Array<float> tuning)
+    inline void setCustomScale(Array<float> tuning) //takes in fractional midi
     {
         if (tuning.size() > tCustom.value.size()) tuning.resize(tCustom.value.size());
         
@@ -407,6 +418,7 @@ public:
     {
         tAbsolute.set(abs);
     }
+    
     
     
     void print(void)
@@ -562,6 +574,7 @@ public:
         print();
     }
     
+    
     bool modded = false;
     
     // basic tuning settings, for static tuning
@@ -589,6 +602,7 @@ public:
     int nToneRootOctave = 4;    //which octave; 4 by default, so C4
     
     Moddable<TuningAdaptiveSystemType> adaptiveType;
+   //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MTS Tuning~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
     
 private:
     String name;
@@ -627,6 +641,7 @@ public:
     }
     
 	Tuning(int Id, bool random = false) :
+    currentScale(Tunings::evenTemperament12NoteScale()),
     Id(Id),
     name("Tuning "+String(Id))
     {
@@ -710,6 +725,17 @@ public:
     
     ValueTree getState(bool active = false);
     void setState(XmlElement*);
+    void loadScalaFile(std::string fname);
+    void loadScalaScale(Tunings::Scale& s);
+    void loadKBM(Tunings::KeyboardMapping& kbm);
+    void loadKBMFile(std::string fname);
+    String currentScalaString;
+    bool isAbsoluteTuning;
+    String currentKBMString;
+    Tunings::Scale currentScale;
+    Tunings::KeyboardMapping currentKBM;
+    
+    String generateScalaString();
     
     ~Tuning() {};
     
@@ -944,6 +970,7 @@ public:
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     
+
 private:
     BKAudioProcessor& processor;
     
@@ -972,7 +999,7 @@ private:
     
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;
-    
+   
     JUCE_LEAK_DETECTOR(TuningProcessor);
 };
 

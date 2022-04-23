@@ -39,7 +39,9 @@ offset(0),
 velocityInvert(false),
 ignoreSustain(false),
 allNotesOff(false),
-sustainPedalKeys(false)
+sustainPedalKeys(false),
+isToggle(false),
+isSostenuto(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -62,7 +64,8 @@ sustainPedalKeys(false)
     targetStates.setUnchecked(TargetTypeDirect, true);
     targetStates.setUnchecked(TargetTypeSynchronic, true);
     targetStates.setUnchecked(TargetTypeNostalgic, true);
-    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeResonanceAdd, true);
+    targetStates.setUnchecked(TargetTypeResonanceRing, true);
     targetStates.setUnchecked(TargetTypeTempo, true);
     targetStates.setUnchecked(TargetTypeTuning, true);
     
@@ -97,7 +100,9 @@ offset(k->getOffset()),
 velocityInvert(k->getVelocityInvert()),
 ignoreSustain(k->getIgnoreSustain()),
 allNotesOff(k->getAllNotesOff()),
-sustainPedalKeys(k->getSustainPedalKeys())
+sustainPedalKeys(k->getSustainPedalKeys()),
+isToggle(k->getIsToggle()),
+isSostenuto(k->getIsSostenuto())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -115,7 +120,8 @@ sustainPedalKeys(k->getSustainPedalKeys())
     targetStates.setUnchecked(TargetTypeDirect, true);
     targetStates.setUnchecked(TargetTypeSynchronic, true);
     targetStates.setUnchecked(TargetTypeNostalgic, true);
-    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeResonanceAdd, true);
+    targetStates.setUnchecked(TargetTypeResonanceRing, true);
     targetStates.setUnchecked(TargetTypeTempo, true);
     targetStates.setUnchecked(TargetTypeTuning, true);
     
@@ -161,7 +167,9 @@ offset(k->getOffset()),
 velocityInvert(k->getVelocityInvert()),
 ignoreSustain(k->getIgnoreSustain()),
 allNotesOff(k->getAllNotesOff()),
-sustainPedalKeys(k->getSustainPedalKeys())
+sustainPedalKeys(k->getSustainPedalKeys()),
+isToggle(k->getIsToggle()),
+isSostenuto(k->getIsSostenuto())
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -178,7 +186,8 @@ sustainPedalKeys(k->getSustainPedalKeys())
     targetStates.setUnchecked(TargetTypeDirect, true);
     targetStates.setUnchecked(TargetTypeSynchronic, true);
     targetStates.setUnchecked(TargetTypeNostalgic, true);
-    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeResonanceAdd, true);
+    targetStates.setUnchecked(TargetTypeResonanceRing, true);
     targetStates.setUnchecked(TargetTypeTempo, true);
     targetStates.setUnchecked(TargetTypeTuning, true);
     
@@ -227,7 +236,9 @@ offset(0),
 velocityInvert(false),
 ignoreSustain(false),
 allNotesOff(false),
-sustainPedalKeys(false)
+sustainPedalKeys(false),
+isToggle(false),
+isSostenuto(false)
 {
     keymap.ensureStorageAllocated(128);
     for (int i = 0; i < 128; i++)
@@ -243,7 +254,8 @@ sustainPedalKeys(false)
     targetStates.setUnchecked(TargetTypeDirect, true);
     targetStates.setUnchecked(TargetTypeSynchronic, true);
     targetStates.setUnchecked(TargetTypeNostalgic, true);
-    targetStates.setUnchecked(TargetTypeResonance, true);
+    targetStates.setUnchecked(TargetTypeResonanceAdd, true);
+    targetStates.setUnchecked(TargetTypeResonanceRing, true);
     targetStates.setUnchecked(TargetTypeTempo, true);
     targetStates.setUnchecked(TargetTypeTuning, true);
 

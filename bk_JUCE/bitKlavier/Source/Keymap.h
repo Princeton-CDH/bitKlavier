@@ -46,6 +46,15 @@ typedef enum OctType
     OctNil
 } OctType;
 
+struct Note
+{
+    int noteNumber;
+    float velocity;
+    int channel;
+    int mappedFrom; // tracks what key was played that triggered this note, for harmonizer purposes
+    String source;
+};
+
 typedef enum ChordType
 {
     MajorTriad = 0,
@@ -176,6 +185,54 @@ public:
     inline void toggleHarArrayMidiEdit() { harArrayMidiEdit = !harArrayMidiEdit; }
     inline bool getHarArrayMidiEdit() { return harArrayMidiEdit; }
     
+    /*
+    Sostenuto Implementation Notes
+    two cases:
+     
+        1. an actual sostenuto pedal; most people don't have these!
+        2. the sustain pedal behaves like a sostenuto pedal
+     
+    in case (1), the sustain pedal might also be used, and so should behave as expected
+    in case (2), the user has selected "sostenuto mode" in Keymap
+     
+    Basic process:
+        - when any note in the Keymap is played, it is a potential sostenuto note, so it is stored
+        - when the sostenuto pedal is pressed (or the sustain pedal, when in "sostenuto mode"), the potential
+            sostenuto notes are now active sostenuto notes and should sustain even when their keys are released
+        - all non-active sostenuto notes should stop on keyRelease
+                - unless the sustain pedal is down (which is not possible in "sostenuto mode")
+        - when the sostenuto pedal (or sustain pedal in "sostenuto mode") is released, all active
+            sostenuto notes should be stopped
+                - unless their keys are still down!
+                - or if the sustain pedal is down!
+    
+    And of course this behavior needs to interface correctly with all the preparations and the harmonizer!
+     
+    */
+
+    // any key that is currently down is a potential sostenuto note
+    void addToPotentialSostenutoNotes(Note newnote) {
+        potentialSostenutoNotes.add(newnote);
+    }
+    
+    // keys that are released are now longer potential sostenuto notes and should be removed
+    //      note that these will NOT be removed from currently active sostenuto notes
+    void removeFromPotentialSostenutoNotes(Note removenote) {
+        
+        for (int i = potentialSostenutoNotes.size() - 1; i >= 0; i--) {
+            if(potentialSostenutoNotes.getUnchecked(i).noteNumber == removenote.noteNumber &&
+               (potentialSostenutoNotes.getUnchecked(i).source == removenote.source) &&
+               (potentialSostenutoNotes.getUnchecked(i).mappedFrom == removenote.mappedFrom))
+                potentialSostenutoNotes.remove(i);
+        }
+    }
+    
+    // when the sostentuto pedal is pressed, potential sostenuto notes are now active sostenuto notes
+    void copyPotentialToActiveSostenutoNotes() {
+        activeSostenutoNotes.clearQuick();
+        activeSostenutoNotes = potentialSostenutoNotes;
+    }
+    
     void print(void);
     
     inline ValueTree getState(void)
@@ -234,7 +291,9 @@ public:
         keysave.setProperty(ptagKeymap_endKeystrokes, allNotesOff ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_sustainPedalKeys, sustainPedalKeys ? 1 : 0, 0);
-        
+        keysave.setProperty(ptagKeymap_toggleKey, isToggle ? 1 : 0, 0);
+        keysave.setProperty(ptagKeymap_sostenutoMode, isSostenuto ? 1 : 0, 0);
+        //ptagKeymap_sostenutoMode
         //keysave.setProperty(ptagKeymap_extendRange, rangeExtend, 0);
         keysave.setProperty(ptagKeymap_asymmetricalWarp, asym_k, 0);
         keysave.setProperty(ptagKeymap_symmetricalWarp, sym_k, 0);
@@ -287,7 +346,7 @@ public:
         targetStates.setUnchecked(TargetTypeDirect, true);
         targetStates.setUnchecked(TargetTypeTempo, true);
         targetStates.setUnchecked(TargetTypeTuning, true);
-        targetStates.setUnchecked(TargetTypeResonance, true);
+
         
         inverted = e->getStringAttribute(ptagKeymap_inverted).getIntValue();
         
@@ -351,7 +410,8 @@ public:
         setAllNotesOff((bool) e->getIntAttribute(ptagKeymap_endKeystrokes, 0));
         setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
         setSustainPedalKeys((bool) e->getIntAttribute(ptagKeymap_sustainPedalKeys, 0));
-        
+        setIsToggle((bool)e->getIntAttribute(ptagKeymap_toggleKey, 0));
+        setIsSostenuto((bool)e->getIntAttribute(ptagKeymap_sostenutoMode, 0));
         // Not sure what value the second argument needs to be. Right now I'm using the default values, but these are the values that bK uses for velocity curving before the view controller is opened and the values update to what they were saved to be.
         //rangeExtend = (float) e->getDoubleAttribute(ptagKeymap_extendRange, 4);
         asym_k = (float) e->getDoubleAttribute(ptagKeymap_asymmetricalWarp, 1);
@@ -600,8 +660,59 @@ public:
     inline void setSustainPedalKeys(bool toSet) { sustainPedalKeys = toSet; }
     inline void toggleSustainPedalKeys() { sustainPedalKeys = !sustainPedalKeys; }
     
+    inline bool getIsToggle() { return isToggle; }
+    inline void setIsToggle(bool toSet) { isToggle = toSet; }
+    inline void toggleIsToggle() { isToggle = !isToggle; }
+    
+    inline bool getIsSostenuto()            { return isSostenuto; }
+    inline void setIsSostenuto(bool toSet)  { isSostenuto = toSet; }
+    inline void toggleIsSostenuto()         { isSostenuto = !isSostenuto; }
+    inline void activateSostenuto()         { copyPotentialToActiveSostenutoNotes(); }
+    inline void deactivateSostenuto()       { activeSostenutoNotes.clearQuick(); }
+    
+    // this somewhat delicate function sorts out whether a note should be cut off or not
+    //      depending on the status of the sostenuto and sustain pedals
+    //      and also in case the sustain pedal is set to behave like a sostenuto pedal
+    //      lots of contingencies, depending on when and what order pedals were pressed,
+    //          what keys are held down at that time, etc...
+    inline bool isUnsustainingNote(int noteNumber, bool sostenutoPedalIsDepressed, bool sustainPedalIsDepressed)
+    {
+        // isSostenuto is when the sustain pedal is set to behave like a sostenuto pedal
+        // in these first two cases, that is not true, so we know that note is sustaining if the sustain pedal is pressed
+        // and we also know that it is NOT sustaining if neither pedal is depressed
+        //if(!isSostenuto && sustainPedalIsDepressed) return false;
+        //if(!isSostenuto && !sustainPedalIsDepressed && !sostenutoPedalIsDepressed) return true;
+        
+        if(!isSostenuto) {
+            if (sustainPedalIsDepressed) return false;
+            if (!sustainPedalIsDepressed && !sostenutoPedalIsDepressed) return true;
+        }
+        
+        // we are in sostenuto mode, either because of the sostenuto pedal being depressed or being in sostenuto mode
+        // in this case, any notes that are not activeSostenutoNotes should NOT sustain
+        if (isSostenuto || sostenutoPedalIsDepressed) {
+            // here we have no active sostenuto notes, so this must be an unsustaining note
+            if (activeSostenutoNotes.size() == 0) return true;
+            else {
+                for (auto testNote : activeSostenutoNotes)
+                {
+                    // here we have an active sostenuto note, so it should sustain
+                    if (testNote.noteNumber == noteNumber) return false;
+                }
+                // if we get this far, then the note is not an active sustaining note and should be cut off
+                return true;
+            }
+        }
+        
+        // we are not in sostenuto mode, so note should sustain
+        return false;
+    }
+    
+    inline bool getToggleState(int noteNumber) { return triggered.getUnchecked(noteNumber); }
+    //inline bool setToggleState(bool toSet) { trigger.setUnchecked(); }
+    inline void toggleToggleState(int noteNumber) { triggered.setUnchecked(noteNumber, !triggered.getUnchecked(noteNumber)); }
+    
     // Velocity Curving getters & setters
-    //inline float getRangeExtend() { return rangeExtend; }
     inline float getAsym_k() { return asym_k; }
     inline float getSym_k() { return sym_k; }
     inline float getScale() { return scale; }
@@ -640,6 +751,8 @@ private:
     
     bool inverted;
     
+    Array<bool> toggleState;
+    
     Array<bool> triggered;
     
     Array<Array<int>> harmonizerKeys;
@@ -647,6 +760,14 @@ private:
 
     Array<String> midiInputNames;
     Array<String> midiInputIdentifiers;
+    
+    // currently depressed keys in this keymap
+    //   that will be included in sostenuto notes when sustain pedal is depressed
+    Array<Note> potentialSostenutoNotes;
+    
+    // notes that were depressed when sostenuto pedal was depressed
+    //   these are now active sostenuto notes and should be sustained
+    Array<Note> activeSostenutoNotes;
     
     bool defaultSelected;
     bool onscreenSelected;
@@ -670,6 +791,10 @@ private:
     bool allNotesOff;
     
     bool sustainPedalKeys;
+    
+    bool isToggle;
+    
+    bool isSostenuto;
 
     JUCE_LEAK_DETECTOR (Keymap)
 };

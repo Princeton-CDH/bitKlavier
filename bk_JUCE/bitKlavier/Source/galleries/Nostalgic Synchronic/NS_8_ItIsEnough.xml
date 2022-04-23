@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="NS_8_ItIsEnough" sampleType="5" soundfontURL="_YamahaFull"
+<gallery name="NS_8_ItIsEnough" sampleType="3" soundfontURL="bitKlavierGrand_StageLidOmni_44k16b"
          soundfontInst="0" defaultPiano="1">
   <general globalGain="1.0" tempoMultiplier="1.0" tuningFund="440.0" invertSustain="0"
            noteOnSetsNoteOffVelocity="0"/>
+  <equalizer bypassed="1" lowCutBypassed="0" peak1Bypassed="0" peak2Bypassed="0"
+             peak3Bypassed="0" highCutBypassed="0" lowCutFreq="20.0" lowCutSlope="12"
+             peak1Freq="500.0" peak1Gain="0.0" peak1Quality="1.0" peak2Freq="1000.0"
+             peak2Gain="0.0" peak2Quality="1.0" peak3Freq="5000.0" peak3Gain="0.0"
+             peak3Quality="1.0" highCutFreq="20000.0" highCutSlope="12"/>
   <tempo Id="1" name="30bpm">
     <params tempo="30.0" tempo_inc="0.0" tempo_time="0" tempo_maxN="0" system="0"
             system_time="0" system_maxN="0" at1Mode="0" at1Mode_time="0"
@@ -2264,6 +2269,71 @@
       <feedbackCoefficientsStates_inc/>
     </params>
   </blendronic>
+  <resonance Id="-1" name="Resonance -1">
+    <params gain="1.059253692626953" gain_inc="0.0" gain_time="0" gain_maxN="0"
+            blendronicGain="1.0" blendronicGain_inc="0.0" blendronicGain_time="0"
+            blendronicGain_maxN="0" resonanceUseGlobalSoundSet="1" resonanceUseGlobalSoundSet_time="0"
+            resonanceUseGlobalSoundSet_maxN="0" resonanceSoundSet="" resonanceSoundSet_time="0"
+            resonanceSoundSet_maxN="0" starttimeMin="400" starttimeMin_inc="0"
+            starttimeMin_time="0" starttimeMin_maxN="0" starttimeMax="4000"
+            starttimeMax_inc="0" starttimeMax_time="0" starttimeMax_maxN="0"
+            maxSympStrings="8" maxSympStrings_inc="0" maxSympStrings_time="0"
+            maxSympStrings_maxN="0" fundamentalKey="0" fundamentalKey_inc="0"
+            fundamentalKey_time="0" fundamentalKey_maxN="0" closestKeys_time="0"
+            closestKeys_maxN="0" offsets_time="0" offsets_maxN="0" gains_time="0"
+            gains_maxN="0" add_time="0" add_maxN="0">
+      <ADSR f0="50" f0_inc="0" f0_time="0" f0_maxN="0" f1="3" f1_inc="0"
+            f1_time="0" f1_maxN="0" f2="1.0" f2_inc="0.0" f2_time="0" f2_maxN="0"
+            f3="50" f3_inc="0" f3_time="0" f3_maxN="0"/>
+      <closestKeys i0="0" i1="12" i2="19" i3="24" i4="28" i5="31" i6="34" i7="36"/>
+      <closestKeys_inc i0="0"/>
+      <offsets f0="0.0" f1="0.0" f2="0.0" f3="0.0" f4="0.0" f5="0.0" f6="0.0"
+               f7="0.0" f8="0.0" f9="0.0" f10="0.0" f11="0.0" f12="0.0" f13="0.0"
+               f14="0.0" f15="0.0" f16="0.0" f17="0.0" f18="0.0" f19="2.0" f20="0.0"
+               f21="0.0" f22="0.0" f23="0.0" f24="0.0" f25="0.0" f26="0.0" f27="0.0"
+               f28="-13.69999980926514" f29="0.0" f30="0.0" f31="2.0" f32="0.0"
+               f33="0.0" f34="-31.17499923706055" f35="0.0" f36="0.0" f37="0.0"
+               f38="0.0" f39="0.0" f40="0.0" f41="0.0" f42="0.0" f43="0.0" f44="0.0"
+               f45="0.0" f46="0.0" f47="0.0" f48="0.0" f49="0.0" f50="0.0" f51="0.0"
+               f52="0.0" f53="0.0" f54="0.0" f55="0.0" f56="0.0" f57="0.0" f58="0.0"
+               f59="0.0" f60="0.0" f61="0.0" f62="0.0" f63="0.0" f64="0.0" f65="0.0"
+               f66="0.0" f67="0.0" f68="0.0" f69="0.0" f70="0.0" f71="0.0" f72="0.0"
+               f73="0.0" f74="0.0" f75="0.0" f76="0.0" f77="0.0" f78="0.0" f79="0.0"
+               f80="0.0" f81="0.0" f82="0.0" f83="0.0" f84="0.0" f85="0.0" f86="0.0"
+               f87="0.0" f88="0.0" f89="0.0" f90="0.0" f91="0.0" f92="0.0" f93="0.0"
+               f94="0.0" f95="0.0" f96="0.0" f97="0.0" f98="0.0" f99="0.0" f100="0.0"
+               f101="0.0" f102="0.0" f103="0.0" f104="0.0" f105="0.0" f106="0.0"
+               f107="0.0" f108="0.0" f109="0.0" f110="0.0" f111="0.0" f112="0.0"
+               f113="0.0" f114="0.0" f115="0.0" f116="0.0" f117="0.0" f118="0.0"
+               f119="0.0" f120="0.0" f121="0.0" f122="0.0" f123="0.0" f124="0.0"
+               f125="0.0" f126="0.0" f127="0.0"/>
+      <offsets_inc f0="0.0"/>
+      <gains f0="1.0" f1="1.0" f2="1.0" f3="1.0" f4="1.0" f5="1.0" f6="1.0"
+             f7="1.0" f8="1.0" f9="1.0" f10="1.0" f11="1.0" f12="0.800000011920929"
+             f13="1.0" f14="1.0" f15="1.0" f16="1.0" f17="1.0" f18="1.0" f19="0.699999988079071"
+             f20="1.0" f21="1.0" f22="1.0" f23="1.0" f24="0.800000011920929"
+             f25="1.0" f26="1.0" f27="1.0" f28="0.6000000238418579" f29="1.0"
+             f30="1.0" f31="0.699999988079071" f32="1.0" f33="1.0" f34="0.5"
+             f35="1.0" f36="0.800000011920929" f37="1.0" f38="1.0" f39="1.0"
+             f40="1.0" f41="1.0" f42="1.0" f43="1.0" f44="1.0" f45="1.0" f46="1.0"
+             f47="1.0" f48="1.0" f49="1.0" f50="1.0" f51="1.0" f52="1.0" f53="1.0"
+             f54="1.0" f55="1.0" f56="1.0" f57="1.0" f58="1.0" f59="1.0" f60="1.0"
+             f61="1.0" f62="1.0" f63="1.0" f64="1.0" f65="1.0" f66="1.0" f67="1.0"
+             f68="1.0" f69="1.0" f70="1.0" f71="1.0" f72="1.0" f73="1.0" f74="1.0"
+             f75="1.0" f76="1.0" f77="1.0" f78="1.0" f79="1.0" f80="1.0" f81="1.0"
+             f82="1.0" f83="1.0" f84="1.0" f85="1.0" f86="1.0" f87="1.0" f88="1.0"
+             f89="1.0" f90="1.0" f91="1.0" f92="1.0" f93="1.0" f94="1.0" f95="1.0"
+             f96="1.0" f97="1.0" f98="1.0" f99="1.0" f100="1.0" f101="1.0"
+             f102="1.0" f103="1.0" f104="1.0" f105="1.0" f106="1.0" f107="1.0"
+             f108="1.0" f109="1.0" f110="1.0" f111="1.0" f112="1.0" f113="1.0"
+             f114="1.0" f115="1.0" f116="1.0" f117="1.0" f118="1.0" f119="1.0"
+             f120="1.0" f121="1.0" f122="1.0" f123="1.0" f124="1.0" f125="1.0"
+             f126="1.0" f127="1.0"/>
+      <gains_inc f0="0.0"/>
+      <add/>
+      <add_inc i0="0"/>
+    </params>
+  </resonance>
   <modSynchronic Id="1" name="1" alt="0">
     <dirty d0="0" d1="0" d2="0" d3="0" d4="0" d5="0" d6="0" d7="0" d8="0"
            d9="0" d10="0" d11="0" d12="0" d13="0" d14="0" d15="0" d16="0"
@@ -2336,6 +2406,113 @@
       <ADSRs_inc/>
     </params>
   </modSynchronic>
+  <modSynchronic Id="2" name="2" alt="0">
+    <dirty d0="0" d1="1" d2="0" d3="0" d4="0" d5="0" d6="0" d7="0" d8="0"
+           d9="0" d10="0" d11="0" d12="0" d13="0" d14="0" d15="0" d16="0"
+           d17="0" d18="0" d19="0" d20="0" d21="0" d22="0" d23="0" d24="0"/>
+    <params gain="1.0" gain_inc="0.0" gain_time="0" gain_maxN="0" blendronicGain="1.0"
+            blendronicGain_inc="0.0" blendronicGain_time="0" blendronicGain_maxN="0"
+            numBeats="7" numBeats_inc="0" numBeats_time="0" numBeats_maxN="0"
+            clusterMin="1" clusterMin_inc="0" clusterMin_time="0" clusterMin_maxN="0"
+            clusterMax="12" clusterMax_inc="0" clusterMax_time="0" clusterMax_maxN="0"
+            clusterCap="8" clusterCap_inc="0" clusterCap_time="0" clusterCap_maxN="0"
+            clusterThresh="500.0" clusterThresh_inc="0.0" clusterThresh_time="0"
+            clusterThresh_maxN="0" mode="0" mode_time="0" mode_maxN="0" beatsToSkip="0"
+            beatsToSkip_inc="0" beatsToSkip_time="0" beatsToSkip_maxN="0"
+            transpUsesTuning="0" transpUsesTuning_time="0" transpUsesTuning_maxN="0"
+            numClusters="1" numClusters_inc="0" numClusters_time="0" numClusters_maxN="0"
+            onOffMode="0" onOffMode_time="0" onOffMode_maxN="0" holdMin="0"
+            holdMin_inc="0" holdMin_time="0" holdMin_maxN="0" holdMax="12000"
+            holdMax_inc="0" holdMax_time="0" holdMax_maxN="0" velocityMin="0"
+            velocityMin_inc="0" velocityMin_time="0" velocityMin_maxN="0"
+            velocityMax="127" velocityMax_inc="0" velocityMax_time="0" velocityMax_maxN="0"
+            targetTypeSynchronicPatternSync="0" targetTypeSynchronicBeatSync="0"
+            targetTypeSynchronicAddNotes="0" targetTypeSynchronicClear="0"
+            targetTypeSynchronicPausePlay="0" targetTypeSynchronicDeleteOldest="0"
+            targetTypeSynchronicDeleteNewest="0" targetTypeSynchronicRotate="0"
+            beatMultipliers_time="0" beatMultipliers_maxN="0" beatMultipliersStates_time="0"
+            beatMultipliersStates_maxN="0" lengthMultipliers_time="0" lengthMultipliers_maxN="0"
+            lengthMultipliersStates_time="0" lengthMultipliersStates_maxN="0"
+            accentMultipliers_time="0" accentMultipliers_maxN="0" accentMultipliersStates_time="0"
+            accentMultipliersStates_maxN="0" transpOffsets_time="0" transpOffsets_maxN="0"
+            transpOffsetsStates_time="0" transpOffsetsStates_maxN="0" ADSRs_time="0"
+            ADSRs_maxN="0" synchronicUseGlobalSoundSet="1" synchronicUseGlobalSoundSet_time="0"
+            synchronicUseGlobalSoundSet_maxN="0" synchronicSoundSet="" synchronicSoundSet_time="0"
+            synchronicSoundSet_maxN="0">
+      <beatMultipliers f0="1.0"/>
+      <beatMultipliers_inc f0="0.0"/>
+      <beatMultipliersStates b0="1" b1="0" b2="0" b3="0" b4="0" b5="0" b6="0" b7="0" b8="0"
+                             b9="0" b10="0" b11="0"/>
+      <beatMultipliersStates_inc/>
+      <lengthMultipliers f0="1.0"/>
+      <lengthMultipliers_inc f0="0.0"/>
+      <lengthMultipliersStates b0="1" b1="0" b2="0" b3="0" b4="0" b5="0" b6="0" b7="0" b8="0"
+                               b9="0" b10="0" b11="0"/>
+      <lengthMultipliersStates_inc/>
+      <accentMultipliers f0="1.0"/>
+      <accentMultipliers_inc f0="0.0"/>
+      <accentMultipliersStates b0="1" b1="0" b2="0" b3="0" b4="0" b5="0" b6="0" b7="0" b8="0"
+                               b9="0" b10="0" b11="0"/>
+      <accentMultipliersStates_inc/>
+      <transpOffsets>
+        <t0 f0="0.0"/>
+      </transpOffsets>
+      <transpOffsets_inc/>
+      <transpOffsetsStates b0="1" b1="0" b2="0" b3="0" b4="0" b5="0" b6="0" b7="0" b8="0"
+                           b9="0" b10="0" b11="0"/>
+      <transpOffsetsStates_inc/>
+      <ADSRs>
+        <e0 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="1.0"/>
+        <e1 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e2 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e3 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e4 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e5 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e6 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e7 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e8 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e9 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e10 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+        <e11 f0="3.0" f1="3.0" f2="1.0" f3="30.0" f4="0.0"/>
+      </ADSRs>
+      <ADSRs_inc/>
+    </params>
+  </modSynchronic>
+  <modNostalgic Id="1" name="1" alt="0">
+    <dirty d0="0" d1="1" d2="1" d3="0" d4="1" d5="0" d6="0" d7="1" d8="1"
+           d9="0" d10="0" d11="0" d12="0" d13="0" d14="0" d15="0" d16="0"
+           d17="0" d18="0" d19="0" d20="0" d21="0" d22="0"/>
+    <params gain="0.6309573650360107" gain_inc="0.0" gain_time="0" gain_maxN="0"
+            blendronicGain="1.0" blendronicGain_inc="0.0" blendronicGain_time="0"
+            blendronicGain_maxN="0" waveDistance="400" waveDistance_inc="0"
+            waveDistance_time="0" waveDistance_maxN="0" undertow="10000"
+            undertow_inc="0" undertow_time="0" undertow_maxN="0" transposition_time="0"
+            transposition_maxN="0" transpUsesTuning="0" transpUsesTuning_time="0"
+            transpUsesTuning_maxN="0" lengthMultiplier="1.0" lengthMultiplier_inc="0.0"
+            lengthMultiplier_time="0" lengthMultiplier_maxN="0" beatsToSkip="4.0"
+            beatsToSkip_inc="0.0" beatsToSkip_time="0" beatsToSkip_maxN="0"
+            mode="1" mode_time="0" mode_maxN="0" holdMin="0.0" holdMin_inc="0.0"
+            holdMin_time="0" holdMin_maxN="0" holdMax="12000.0" holdMax_inc="0.0"
+            holdMax_time="0" holdMax_maxN="0" clusterMin="1" clusterMin_inc="0"
+            clusterMin_time="0" clusterMin_maxN="0" clusterThreshold="150"
+            clusterThreshold_inc="0" clusterThreshold_time="0" clusterThreshold_maxN="0"
+            velocityMin="0" velocityMin_inc="0" velocityMin_time="0" velocityMin_maxN="0"
+            velocityMax="127" velocityMax_inc="0" velocityMax_time="0" velocityMax_maxN="0"
+            keyOnReset="0" keyOnReset_time="0" keyOnReset_maxN="0" targetTypeNostalgicClearAll="0"
+            targetTypeNostalgicClearAll_time="0" targetTypeNostalgicClearAll_maxN="0"
+            nostalgicUseGlobalSoundSet="1" nostalgicUseGlobalSoundSet_time="0"
+            nostalgicUseGlobalSoundSet_maxN="0" nostalgicSoundSet="" nostalgicSoundSet_time="0"
+            nostalgicSoundSet_maxN="0">
+      <transposition f0="0.0"/>
+      <transposition_inc f0="0.0"/>
+      <reverseADSR f0="30" f0_inc="0" f0_time="0" f0_maxN="0" f1="3" f1_inc="0"
+                   f1_time="0" f1_maxN="0" f2="1.0" f2_inc="0.0" f2_time="0" f2_maxN="0"
+                   f3="50" f3_inc="0" f3_time="0" f3_maxN="0"/>
+      <undertowADSR f0="50" f0_inc="0" f0_time="0" f0_maxN="0" f1="3" f1_inc="0"
+                    f1_time="0" f1_maxN="0" f2="1.0" f2_inc="0.0" f2_time="0" f2_maxN="0"
+                    f3="2000" f3_inc="0" f3_time="0" f3_maxN="0"/>
+    </params>
+  </modNostalgic>
   <keymap Id="1" name="All" k0="0" k1="1" k2="2" k3="3" k4="4" k5="5" k6="6"
           k7="7" k8="8" k9="9" k10="10" k11="11" k12="12" k13="13" k14="14"
           k15="15" k16="16" k17="17" k18="18" k19="19" k20="20" k21="21"
@@ -2359,11 +2536,11 @@
           targetStates5="0" targetStates6="0" targetStates7="0" targetStates8="0"
           targetStates9="0" targetStates10="1" targetStates11="0" targetStates12="0"
           targetStates13="0" targetStates14="0" targetStates15="0" targetStates16="0"
-          targetStates17="0" targetStates18="0" targetStates19="0" inverted="0"
-          harmonizerPreTranspose="0" harmonizerPostTranspose="0" endKeystrokes="0"
-          ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
-          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
-          defSelected="1" osSelected="1">
+          targetStates17="0" targetStates18="0" targetStates19="0" targetStates20="1"
+          targetStates21="1" inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
     <midiInputs/>
     <midiInputIdentifiers/>
     <harmonizer>
@@ -2498,15 +2675,15 @@
     </harmonizer>
   </keymap>
   <keymap Id="2" name="NS8-1" k0="64" k1="68" k2="70" k3="71" k4="73" k5="75"
-          targetStates0="0" targetStates1="1" targetStates2="0" targetStates3="0"
+          targetStates0="1" targetStates1="1" targetStates2="0" targetStates3="0"
           targetStates4="0" targetStates5="0" targetStates6="0" targetStates7="0"
           targetStates8="0" targetStates9="0" targetStates10="1" targetStates11="0"
           targetStates12="0" targetStates13="0" targetStates14="0" targetStates15="0"
           targetStates16="0" targetStates17="0" targetStates18="0" targetStates19="0"
-          inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
-          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
-          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
-          defSelected="1" osSelected="1">
+          targetStates20="1" targetStates21="1" inverted="0" harmonizerPreTranspose="0"
+          harmonizerPostTranspose="0" endKeystrokes="0" ignoreSustain="0"
+          sustainPedalKeys="0" toggleKey="0" asymmetricalWarp="1.0" symmetricalWarp="1.0"
+          scale="1.0" offset="0.0" velocityInvert="0" defSelected="1" osSelected="1">
     <midiInputs/>
     <midiInputIdentifiers/>
     <harmonizer>
@@ -2642,13 +2819,14 @@
   </keymap>
   <keymap Id="3" name="NS8-2" k0="47" k1="48" k2="49" k3="50" k4="51" k5="52"
           k6="54" k7="55" k8="56" k9="57" k10="58" k11="59" k12="61" k13="62"
-          k14="63" k15="64" targetStates0="0" targetStates1="1" targetStates2="0"
+          k14="63" k15="64" targetStates0="1" targetStates1="1" targetStates2="0"
           targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
           targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="1"
           targetStates11="0" targetStates12="0" targetStates13="0" targetStates14="0"
           targetStates15="0" targetStates16="0" targetStates17="0" targetStates18="0"
-          targetStates19="0" inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
-          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
+          targetStates19="0" targetStates20="1" targetStates21="1" inverted="0"
+          harmonizerPreTranspose="0" harmonizerPostTranspose="0" endKeystrokes="0"
+          ignoreSustain="0" sustainPedalKeys="0" toggleKey="0" asymmetricalWarp="1.0"
           symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
           defSelected="1" osSelected="1">
     <midiInputs/>
@@ -2786,15 +2964,730 @@
   </keymap>
   <keymap Id="4" name="NS8-4" k0="47" k1="49" k2="51" k3="52" k4="54" k5="55"
           k6="56" k7="57" k8="58" k9="59" k10="61" k11="62" k12="63" k13="64"
-          targetStates0="0" targetStates1="1" targetStates2="0" targetStates3="0"
+          targetStates0="1" targetStates1="1" targetStates2="0" targetStates3="0"
           targetStates4="0" targetStates5="0" targetStates6="0" targetStates7="0"
           targetStates8="0" targetStates9="0" targetStates10="1" targetStates11="0"
           targetStates12="0" targetStates13="0" targetStates14="0" targetStates15="0"
           targetStates16="0" targetStates17="0" targetStates18="0" targetStates19="0"
+          targetStates20="1" targetStates21="1" inverted="0" harmonizerPreTranspose="0"
+          harmonizerPostTranspose="0" endKeystrokes="0" ignoreSustain="0"
+          sustainPedalKeys="0" toggleKey="0" asymmetricalWarp="1.0" symmetricalWarp="1.0"
+          scale="1.0" offset="0.0" velocityInvert="0" defSelected="1" osSelected="1">
+    <midiInputs/>
+    <midiInputIdentifiers/>
+    <harmonizer>
+      <t0 i0="0"/>
+      <t1 i0="1"/>
+      <t2 i0="2"/>
+      <t3 i0="3"/>
+      <t4 i0="4"/>
+      <t5 i0="5"/>
+      <t6 i0="6"/>
+      <t7 i0="7"/>
+      <t8 i0="8"/>
+      <t9 i0="9"/>
+      <t10 i0="10"/>
+      <t11 i0="11"/>
+      <t12 i0="12"/>
+      <t13 i0="13"/>
+      <t14 i0="14"/>
+      <t15 i0="15"/>
+      <t16 i0="16"/>
+      <t17 i0="17"/>
+      <t18 i0="18"/>
+      <t19 i0="19"/>
+      <t20 i0="20"/>
+      <t21 i0="21"/>
+      <t22 i0="22"/>
+      <t23 i0="23"/>
+      <t24 i0="24"/>
+      <t25 i0="25"/>
+      <t26 i0="26"/>
+      <t27 i0="27"/>
+      <t28 i0="28"/>
+      <t29 i0="29"/>
+      <t30 i0="30"/>
+      <t31 i0="31"/>
+      <t32 i0="32"/>
+      <t33 i0="33"/>
+      <t34 i0="34"/>
+      <t35 i0="35"/>
+      <t36 i0="36"/>
+      <t37 i0="37"/>
+      <t38 i0="38"/>
+      <t39 i0="39"/>
+      <t40 i0="40"/>
+      <t41 i0="41"/>
+      <t42 i0="42"/>
+      <t43 i0="43"/>
+      <t44 i0="44"/>
+      <t45 i0="45"/>
+      <t46 i0="46"/>
+      <t47 i0="47"/>
+      <t48 i0="48"/>
+      <t49 i0="49"/>
+      <t50 i0="50"/>
+      <t51 i0="51"/>
+      <t52 i0="52"/>
+      <t53 i0="53"/>
+      <t54 i0="54"/>
+      <t55 i0="55"/>
+      <t56 i0="56"/>
+      <t57 i0="57"/>
+      <t58 i0="58"/>
+      <t59 i0="59"/>
+      <t60 i0="60"/>
+      <t61 i0="61"/>
+      <t62 i0="62"/>
+      <t63 i0="63"/>
+      <t64 i0="64"/>
+      <t65 i0="65"/>
+      <t66 i0="66"/>
+      <t67 i0="67"/>
+      <t68 i0="68"/>
+      <t69 i0="69"/>
+      <t70 i0="70"/>
+      <t71 i0="71"/>
+      <t72 i0="72"/>
+      <t73 i0="73"/>
+      <t74 i0="74"/>
+      <t75 i0="75"/>
+      <t76 i0="76"/>
+      <t77 i0="77"/>
+      <t78 i0="78"/>
+      <t79 i0="79"/>
+      <t80 i0="80"/>
+      <t81 i0="81"/>
+      <t82 i0="82"/>
+      <t83 i0="83"/>
+      <t84 i0="84"/>
+      <t85 i0="85"/>
+      <t86 i0="86"/>
+      <t87 i0="87"/>
+      <t88 i0="88"/>
+      <t89 i0="89"/>
+      <t90 i0="90"/>
+      <t91 i0="91"/>
+      <t92 i0="92"/>
+      <t93 i0="93"/>
+      <t94 i0="94"/>
+      <t95 i0="95"/>
+      <t96 i0="96"/>
+      <t97 i0="97"/>
+      <t98 i0="98"/>
+      <t99 i0="99"/>
+      <t100 i0="100"/>
+      <t101 i0="101"/>
+      <t102 i0="102"/>
+      <t103 i0="103"/>
+      <t104 i0="104"/>
+      <t105 i0="105"/>
+      <t106 i0="106"/>
+      <t107 i0="107"/>
+      <t108 i0="108"/>
+      <t109 i0="109"/>
+      <t110 i0="110"/>
+      <t111 i0="111"/>
+      <t112 i0="112"/>
+      <t113 i0="113"/>
+      <t114 i0="114"/>
+      <t115 i0="115"/>
+      <t116 i0="116"/>
+      <t117 i0="117"/>
+      <t118 i0="118"/>
+      <t119 i0="119"/>
+      <t120 i0="120"/>
+      <t121 i0="121"/>
+      <t122 i0="122"/>
+      <t123 i0="123"/>
+      <t124 i0="124"/>
+      <t125 i0="125"/>
+      <t126 i0="126"/>
+      <t127 i0="127"/>
+    </harmonizer>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="1" targetStates1="1" targetStates2="0"
+          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
+          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="1"
+          targetStates11="0" targetStates12="0" targetStates13="0" targetStates14="0"
+          targetStates15="0" targetStates16="0" targetStates17="0" targetStates18="0"
+          targetStates19="0" targetStates20="1" targetStates21="1" inverted="0"
+          harmonizerPreTranspose="0" harmonizerPostTranspose="0" endKeystrokes="0"
+          ignoreSustain="0" sustainPedalKeys="0" toggleKey="0" asymmetricalWarp="1.0"
+          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
+          defSelected="1" osSelected="1">
+    <midiInputs/>
+    <midiInputIdentifiers/>
+    <harmonizer>
+      <t0 i0="0"/>
+      <t1 i0="1"/>
+      <t2 i0="2"/>
+      <t3 i0="3"/>
+      <t4 i0="4"/>
+      <t5 i0="5"/>
+      <t6 i0="6"/>
+      <t7 i0="7"/>
+      <t8 i0="8"/>
+      <t9 i0="9"/>
+      <t10 i0="10"/>
+      <t11 i0="11"/>
+      <t12 i0="12"/>
+      <t13 i0="13"/>
+      <t14 i0="14"/>
+      <t15 i0="15"/>
+      <t16 i0="16"/>
+      <t17 i0="17"/>
+      <t18 i0="18"/>
+      <t19 i0="19"/>
+      <t20 i0="20"/>
+      <t21 i0="21"/>
+      <t22 i0="22"/>
+      <t23 i0="23"/>
+      <t24 i0="24"/>
+      <t25 i0="25"/>
+      <t26 i0="26"/>
+      <t27 i0="27"/>
+      <t28 i0="28"/>
+      <t29 i0="29"/>
+      <t30 i0="30"/>
+      <t31 i0="31"/>
+      <t32 i0="32"/>
+      <t33 i0="33"/>
+      <t34 i0="34"/>
+      <t35 i0="35"/>
+      <t36 i0="36"/>
+      <t37 i0="37"/>
+      <t38 i0="38"/>
+      <t39 i0="39"/>
+      <t40 i0="40"/>
+      <t41 i0="41"/>
+      <t42 i0="42"/>
+      <t43 i0="43"/>
+      <t44 i0="44"/>
+      <t45 i0="45"/>
+      <t46 i0="46"/>
+      <t47 i0="47"/>
+      <t48 i0="48"/>
+      <t49 i0="49"/>
+      <t50 i0="50"/>
+      <t51 i0="51"/>
+      <t52 i0="52"/>
+      <t53 i0="53"/>
+      <t54 i0="54"/>
+      <t55 i0="55"/>
+      <t56 i0="56"/>
+      <t57 i0="57"/>
+      <t58 i0="58"/>
+      <t59 i0="59"/>
+      <t60 i0="60"/>
+      <t61 i0="61"/>
+      <t62 i0="62"/>
+      <t63 i0="63"/>
+      <t64 i0="64"/>
+      <t65 i0="65"/>
+      <t66 i0="66"/>
+      <t67 i0="67"/>
+      <t68 i0="68"/>
+      <t69 i0="69"/>
+      <t70 i0="70"/>
+      <t71 i0="71"/>
+      <t72 i0="72"/>
+      <t73 i0="73"/>
+      <t74 i0="74"/>
+      <t75 i0="75"/>
+      <t76 i0="76"/>
+      <t77 i0="77"/>
+      <t78 i0="78"/>
+      <t79 i0="79"/>
+      <t80 i0="80"/>
+      <t81 i0="81"/>
+      <t82 i0="82"/>
+      <t83 i0="83"/>
+      <t84 i0="84"/>
+      <t85 i0="85"/>
+      <t86 i0="86"/>
+      <t87 i0="87"/>
+      <t88 i0="88"/>
+      <t89 i0="89"/>
+      <t90 i0="90"/>
+      <t91 i0="91"/>
+      <t92 i0="92"/>
+      <t93 i0="93"/>
+      <t94 i0="94"/>
+      <t95 i0="95"/>
+      <t96 i0="96"/>
+      <t97 i0="97"/>
+      <t98 i0="98"/>
+      <t99 i0="99"/>
+      <t100 i0="100"/>
+      <t101 i0="101"/>
+      <t102 i0="102"/>
+      <t103 i0="103"/>
+      <t104 i0="104"/>
+      <t105 i0="105"/>
+      <t106 i0="106"/>
+      <t107 i0="107"/>
+      <t108 i0="108"/>
+      <t109 i0="109"/>
+      <t110 i0="110"/>
+      <t111 i0="111"/>
+      <t112 i0="112"/>
+      <t113 i0="113"/>
+      <t114 i0="114"/>
+      <t115 i0="115"/>
+      <t116 i0="116"/>
+      <t117 i0="117"/>
+      <t118 i0="118"/>
+      <t119 i0="119"/>
+      <t120 i0="120"/>
+      <t121 i0="121"/>
+      <t122 i0="122"/>
+      <t123 i0="123"/>
+      <t124 i0="124"/>
+      <t125 i0="125"/>
+      <t126 i0="126"/>
+      <t127 i0="127"/>
+    </harmonizer>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="1" targetStates1="1" targetStates2="0"
+          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
+          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="1"
+          targetStates11="0" targetStates12="0" targetStates13="0" targetStates14="0"
+          targetStates15="0" targetStates16="0" targetStates17="0" targetStates18="0"
+          targetStates19="0" targetStates20="1" targetStates21="1" inverted="0"
+          harmonizerPreTranspose="0" harmonizerPostTranspose="0" endKeystrokes="0"
+          ignoreSustain="0" sustainPedalKeys="0" toggleKey="0" asymmetricalWarp="1.0"
+          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
+          defSelected="1" osSelected="1">
+    <midiInputs/>
+    <midiInputIdentifiers/>
+    <harmonizer>
+      <t0 i0="0"/>
+      <t1 i0="1"/>
+      <t2 i0="2"/>
+      <t3 i0="3"/>
+      <t4 i0="4"/>
+      <t5 i0="5"/>
+      <t6 i0="6"/>
+      <t7 i0="7"/>
+      <t8 i0="8"/>
+      <t9 i0="9"/>
+      <t10 i0="10"/>
+      <t11 i0="11"/>
+      <t12 i0="12"/>
+      <t13 i0="13"/>
+      <t14 i0="14"/>
+      <t15 i0="15"/>
+      <t16 i0="16"/>
+      <t17 i0="17"/>
+      <t18 i0="18"/>
+      <t19 i0="19"/>
+      <t20 i0="20"/>
+      <t21 i0="21"/>
+      <t22 i0="22"/>
+      <t23 i0="23"/>
+      <t24 i0="24"/>
+      <t25 i0="25"/>
+      <t26 i0="26"/>
+      <t27 i0="27"/>
+      <t28 i0="28"/>
+      <t29 i0="29"/>
+      <t30 i0="30"/>
+      <t31 i0="31"/>
+      <t32 i0="32"/>
+      <t33 i0="33"/>
+      <t34 i0="34"/>
+      <t35 i0="35"/>
+      <t36 i0="36"/>
+      <t37 i0="37"/>
+      <t38 i0="38"/>
+      <t39 i0="39"/>
+      <t40 i0="40"/>
+      <t41 i0="41"/>
+      <t42 i0="42"/>
+      <t43 i0="43"/>
+      <t44 i0="44"/>
+      <t45 i0="45"/>
+      <t46 i0="46"/>
+      <t47 i0="47"/>
+      <t48 i0="48"/>
+      <t49 i0="49"/>
+      <t50 i0="50"/>
+      <t51 i0="51"/>
+      <t52 i0="52"/>
+      <t53 i0="53"/>
+      <t54 i0="54"/>
+      <t55 i0="55"/>
+      <t56 i0="56"/>
+      <t57 i0="57"/>
+      <t58 i0="58"/>
+      <t59 i0="59"/>
+      <t60 i0="60"/>
+      <t61 i0="61"/>
+      <t62 i0="62"/>
+      <t63 i0="63"/>
+      <t64 i0="64"/>
+      <t65 i0="65"/>
+      <t66 i0="66"/>
+      <t67 i0="67"/>
+      <t68 i0="68"/>
+      <t69 i0="69"/>
+      <t70 i0="70"/>
+      <t71 i0="71"/>
+      <t72 i0="72"/>
+      <t73 i0="73"/>
+      <t74 i0="74"/>
+      <t75 i0="75"/>
+      <t76 i0="76"/>
+      <t77 i0="77"/>
+      <t78 i0="78"/>
+      <t79 i0="79"/>
+      <t80 i0="80"/>
+      <t81 i0="81"/>
+      <t82 i0="82"/>
+      <t83 i0="83"/>
+      <t84 i0="84"/>
+      <t85 i0="85"/>
+      <t86 i0="86"/>
+      <t87 i0="87"/>
+      <t88 i0="88"/>
+      <t89 i0="89"/>
+      <t90 i0="90"/>
+      <t91 i0="91"/>
+      <t92 i0="92"/>
+      <t93 i0="93"/>
+      <t94 i0="94"/>
+      <t95 i0="95"/>
+      <t96 i0="96"/>
+      <t97 i0="97"/>
+      <t98 i0="98"/>
+      <t99 i0="99"/>
+      <t100 i0="100"/>
+      <t101 i0="101"/>
+      <t102 i0="102"/>
+      <t103 i0="103"/>
+      <t104 i0="104"/>
+      <t105 i0="105"/>
+      <t106 i0="106"/>
+      <t107 i0="107"/>
+      <t108 i0="108"/>
+      <t109 i0="109"/>
+      <t110 i0="110"/>
+      <t111 i0="111"/>
+      <t112 i0="112"/>
+      <t113 i0="113"/>
+      <t114 i0="114"/>
+      <t115 i0="115"/>
+      <t116 i0="116"/>
+      <t117 i0="117"/>
+      <t118 i0="118"/>
+      <t119 i0="119"/>
+      <t120 i0="120"/>
+      <t121 i0="121"/>
+      <t122 i0="122"/>
+      <t123 i0="123"/>
+      <t124 i0="124"/>
+      <t125 i0="125"/>
+      <t126 i0="126"/>
+      <t127 i0="127"/>
+    </harmonizer>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="1" targetStates1="1" targetStates2="0"
+          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
+          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="1"
+          targetStates11="0" targetStates12="0" targetStates13="0" targetStates14="0"
+          targetStates15="0" targetStates16="0" targetStates17="0" targetStates18="0"
+          targetStates19="0" targetStates20="1" targetStates21="1" inverted="0"
+          harmonizerPreTranspose="0" harmonizerPostTranspose="0" endKeystrokes="0"
+          ignoreSustain="0" sustainPedalKeys="0" toggleKey="0" asymmetricalWarp="1.0"
+          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
+          defSelected="1" osSelected="1">
+    <midiInputs/>
+    <midiInputIdentifiers/>
+    <harmonizer>
+      <t0 i0="0"/>
+      <t1 i0="1"/>
+      <t2 i0="2"/>
+      <t3 i0="3"/>
+      <t4 i0="4"/>
+      <t5 i0="5"/>
+      <t6 i0="6"/>
+      <t7 i0="7"/>
+      <t8 i0="8"/>
+      <t9 i0="9"/>
+      <t10 i0="10"/>
+      <t11 i0="11"/>
+      <t12 i0="12"/>
+      <t13 i0="13"/>
+      <t14 i0="14"/>
+      <t15 i0="15"/>
+      <t16 i0="16"/>
+      <t17 i0="17"/>
+      <t18 i0="18"/>
+      <t19 i0="19"/>
+      <t20 i0="20"/>
+      <t21 i0="21"/>
+      <t22 i0="22"/>
+      <t23 i0="23"/>
+      <t24 i0="24"/>
+      <t25 i0="25"/>
+      <t26 i0="26"/>
+      <t27 i0="27"/>
+      <t28 i0="28"/>
+      <t29 i0="29"/>
+      <t30 i0="30"/>
+      <t31 i0="31"/>
+      <t32 i0="32"/>
+      <t33 i0="33"/>
+      <t34 i0="34"/>
+      <t35 i0="35"/>
+      <t36 i0="36"/>
+      <t37 i0="37"/>
+      <t38 i0="38"/>
+      <t39 i0="39"/>
+      <t40 i0="40"/>
+      <t41 i0="41"/>
+      <t42 i0="42"/>
+      <t43 i0="43"/>
+      <t44 i0="44"/>
+      <t45 i0="45"/>
+      <t46 i0="46"/>
+      <t47 i0="47"/>
+      <t48 i0="48"/>
+      <t49 i0="49"/>
+      <t50 i0="50"/>
+      <t51 i0="51"/>
+      <t52 i0="52"/>
+      <t53 i0="53"/>
+      <t54 i0="54"/>
+      <t55 i0="55"/>
+      <t56 i0="56"/>
+      <t57 i0="57"/>
+      <t58 i0="58"/>
+      <t59 i0="59"/>
+      <t60 i0="60"/>
+      <t61 i0="61"/>
+      <t62 i0="62"/>
+      <t63 i0="63"/>
+      <t64 i0="64"/>
+      <t65 i0="65"/>
+      <t66 i0="66"/>
+      <t67 i0="67"/>
+      <t68 i0="68"/>
+      <t69 i0="69"/>
+      <t70 i0="70"/>
+      <t71 i0="71"/>
+      <t72 i0="72"/>
+      <t73 i0="73"/>
+      <t74 i0="74"/>
+      <t75 i0="75"/>
+      <t76 i0="76"/>
+      <t77 i0="77"/>
+      <t78 i0="78"/>
+      <t79 i0="79"/>
+      <t80 i0="80"/>
+      <t81 i0="81"/>
+      <t82 i0="82"/>
+      <t83 i0="83"/>
+      <t84 i0="84"/>
+      <t85 i0="85"/>
+      <t86 i0="86"/>
+      <t87 i0="87"/>
+      <t88 i0="88"/>
+      <t89 i0="89"/>
+      <t90 i0="90"/>
+      <t91 i0="91"/>
+      <t92 i0="92"/>
+      <t93 i0="93"/>
+      <t94 i0="94"/>
+      <t95 i0="95"/>
+      <t96 i0="96"/>
+      <t97 i0="97"/>
+      <t98 i0="98"/>
+      <t99 i0="99"/>
+      <t100 i0="100"/>
+      <t101 i0="101"/>
+      <t102 i0="102"/>
+      <t103 i0="103"/>
+      <t104 i0="104"/>
+      <t105 i0="105"/>
+      <t106 i0="106"/>
+      <t107 i0="107"/>
+      <t108 i0="108"/>
+      <t109 i0="109"/>
+      <t110 i0="110"/>
+      <t111 i0="111"/>
+      <t112 i0="112"/>
+      <t113 i0="113"/>
+      <t114 i0="114"/>
+      <t115 i0="115"/>
+      <t116 i0="116"/>
+      <t117 i0="117"/>
+      <t118 i0="118"/>
+      <t119 i0="119"/>
+      <t120 i0="120"/>
+      <t121 i0="121"/>
+      <t122 i0="122"/>
+      <t123 i0="123"/>
+      <t124 i0="124"/>
+      <t125 i0="125"/>
+      <t126 i0="126"/>
+      <t127 i0="127"/>
+    </harmonizer>
+  </keymap>
+  <keymap Id="-1" name="-1" targetStates0="1" targetStates1="1" targetStates2="0"
+          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
+          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="1"
+          targetStates11="0" targetStates12="0" targetStates13="0" targetStates14="0"
+          targetStates15="0" targetStates16="0" targetStates17="0" targetStates18="0"
+          targetStates19="0" targetStates20="1" targetStates21="1" inverted="0"
+          harmonizerPreTranspose="0" harmonizerPostTranspose="0" endKeystrokes="0"
+          ignoreSustain="0" sustainPedalKeys="0" toggleKey="0" asymmetricalWarp="1.0"
+          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
+          defSelected="1" osSelected="1">
+    <midiInputs/>
+    <midiInputIdentifiers/>
+    <harmonizer>
+      <t0 i0="0"/>
+      <t1 i0="1"/>
+      <t2 i0="2"/>
+      <t3 i0="3"/>
+      <t4 i0="4"/>
+      <t5 i0="5"/>
+      <t6 i0="6"/>
+      <t7 i0="7"/>
+      <t8 i0="8"/>
+      <t9 i0="9"/>
+      <t10 i0="10"/>
+      <t11 i0="11"/>
+      <t12 i0="12"/>
+      <t13 i0="13"/>
+      <t14 i0="14"/>
+      <t15 i0="15"/>
+      <t16 i0="16"/>
+      <t17 i0="17"/>
+      <t18 i0="18"/>
+      <t19 i0="19"/>
+      <t20 i0="20"/>
+      <t21 i0="21"/>
+      <t22 i0="22"/>
+      <t23 i0="23"/>
+      <t24 i0="24"/>
+      <t25 i0="25"/>
+      <t26 i0="26"/>
+      <t27 i0="27"/>
+      <t28 i0="28"/>
+      <t29 i0="29"/>
+      <t30 i0="30"/>
+      <t31 i0="31"/>
+      <t32 i0="32"/>
+      <t33 i0="33"/>
+      <t34 i0="34"/>
+      <t35 i0="35"/>
+      <t36 i0="36"/>
+      <t37 i0="37"/>
+      <t38 i0="38"/>
+      <t39 i0="39"/>
+      <t40 i0="40"/>
+      <t41 i0="41"/>
+      <t42 i0="42"/>
+      <t43 i0="43"/>
+      <t44 i0="44"/>
+      <t45 i0="45"/>
+      <t46 i0="46"/>
+      <t47 i0="47"/>
+      <t48 i0="48"/>
+      <t49 i0="49"/>
+      <t50 i0="50"/>
+      <t51 i0="51"/>
+      <t52 i0="52"/>
+      <t53 i0="53"/>
+      <t54 i0="54"/>
+      <t55 i0="55"/>
+      <t56 i0="56"/>
+      <t57 i0="57"/>
+      <t58 i0="58"/>
+      <t59 i0="59"/>
+      <t60 i0="60"/>
+      <t61 i0="61"/>
+      <t62 i0="62"/>
+      <t63 i0="63"/>
+      <t64 i0="64"/>
+      <t65 i0="65"/>
+      <t66 i0="66"/>
+      <t67 i0="67"/>
+      <t68 i0="68"/>
+      <t69 i0="69"/>
+      <t70 i0="70"/>
+      <t71 i0="71"/>
+      <t72 i0="72"/>
+      <t73 i0="73"/>
+      <t74 i0="74"/>
+      <t75 i0="75"/>
+      <t76 i0="76"/>
+      <t77 i0="77"/>
+      <t78 i0="78"/>
+      <t79 i0="79"/>
+      <t80 i0="80"/>
+      <t81 i0="81"/>
+      <t82 i0="82"/>
+      <t83 i0="83"/>
+      <t84 i0="84"/>
+      <t85 i0="85"/>
+      <t86 i0="86"/>
+      <t87 i0="87"/>
+      <t88 i0="88"/>
+      <t89 i0="89"/>
+      <t90 i0="90"/>
+      <t91 i0="91"/>
+      <t92 i0="92"/>
+      <t93 i0="93"/>
+      <t94 i0="94"/>
+      <t95 i0="95"/>
+      <t96 i0="96"/>
+      <t97 i0="97"/>
+      <t98 i0="98"/>
+      <t99 i0="99"/>
+      <t100 i0="100"/>
+      <t101 i0="101"/>
+      <t102 i0="102"/>
+      <t103 i0="103"/>
+      <t104 i0="104"/>
+      <t105 i0="105"/>
+      <t106 i0="106"/>
+      <t107 i0="107"/>
+      <t108 i0="108"/>
+      <t109 i0="109"/>
+      <t110 i0="110"/>
+      <t111 i0="111"/>
+      <t112 i0="112"/>
+      <t113 i0="113"/>
+      <t114 i0="114"/>
+      <t115 i0="115"/>
+      <t116 i0="116"/>
+      <t117 i0="117"/>
+      <t118 i0="118"/>
+      <t119 i0="119"/>
+      <t120 i0="120"/>
+      <t121 i0="121"/>
+      <t122 i0="122"/>
+      <t123 i0="123"/>
+      <t124 i0="124"/>
+      <t125 i0="125"/>
+      <t126 i0="126"/>
+      <t127 i0="127"/>
+    </harmonizer>
+  </keymap>
+  <keymap Id="5" name="A3" k0="57" targetStates0="1" targetStates1="1"
+          targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
+          targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
+          targetStates10="1" targetStates11="0" targetStates12="0" targetStates13="0"
+          targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
+          targetStates18="0" targetStates19="0" targetStates20="1" targetStates21="1"
           inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
-          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
-          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
-          defSelected="1" osSelected="1">
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
     <midiInputs/>
     <midiInputIdentifiers/>
     <harmonizer>
@@ -2928,583 +3821,16 @@
       <t127 i0="127"/>
     </harmonizer>
   </keymap>
-  <keymap Id="-1" name="-1" targetStates0="0" targetStates1="1" targetStates2="0"
-          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
-          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="1"
-          targetStates11="0" targetStates12="0" targetStates13="0" targetStates14="0"
-          targetStates15="0" targetStates16="0" targetStates17="0" targetStates18="0"
-          targetStates19="0" inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
-          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
-          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
-          defSelected="1" osSelected="1">
-    <midiInputs/>
-    <midiInputIdentifiers/>
-    <harmonizer>
-      <t0 i0="0"/>
-      <t1 i0="1"/>
-      <t2 i0="2"/>
-      <t3 i0="3"/>
-      <t4 i0="4"/>
-      <t5 i0="5"/>
-      <t6 i0="6"/>
-      <t7 i0="7"/>
-      <t8 i0="8"/>
-      <t9 i0="9"/>
-      <t10 i0="10"/>
-      <t11 i0="11"/>
-      <t12 i0="12"/>
-      <t13 i0="13"/>
-      <t14 i0="14"/>
-      <t15 i0="15"/>
-      <t16 i0="16"/>
-      <t17 i0="17"/>
-      <t18 i0="18"/>
-      <t19 i0="19"/>
-      <t20 i0="20"/>
-      <t21 i0="21"/>
-      <t22 i0="22"/>
-      <t23 i0="23"/>
-      <t24 i0="24"/>
-      <t25 i0="25"/>
-      <t26 i0="26"/>
-      <t27 i0="27"/>
-      <t28 i0="28"/>
-      <t29 i0="29"/>
-      <t30 i0="30"/>
-      <t31 i0="31"/>
-      <t32 i0="32"/>
-      <t33 i0="33"/>
-      <t34 i0="34"/>
-      <t35 i0="35"/>
-      <t36 i0="36"/>
-      <t37 i0="37"/>
-      <t38 i0="38"/>
-      <t39 i0="39"/>
-      <t40 i0="40"/>
-      <t41 i0="41"/>
-      <t42 i0="42"/>
-      <t43 i0="43"/>
-      <t44 i0="44"/>
-      <t45 i0="45"/>
-      <t46 i0="46"/>
-      <t47 i0="47"/>
-      <t48 i0="48"/>
-      <t49 i0="49"/>
-      <t50 i0="50"/>
-      <t51 i0="51"/>
-      <t52 i0="52"/>
-      <t53 i0="53"/>
-      <t54 i0="54"/>
-      <t55 i0="55"/>
-      <t56 i0="56"/>
-      <t57 i0="57"/>
-      <t58 i0="58"/>
-      <t59 i0="59"/>
-      <t60 i0="60"/>
-      <t61 i0="61"/>
-      <t62 i0="62"/>
-      <t63 i0="63"/>
-      <t64 i0="64"/>
-      <t65 i0="65"/>
-      <t66 i0="66"/>
-      <t67 i0="67"/>
-      <t68 i0="68"/>
-      <t69 i0="69"/>
-      <t70 i0="70"/>
-      <t71 i0="71"/>
-      <t72 i0="72"/>
-      <t73 i0="73"/>
-      <t74 i0="74"/>
-      <t75 i0="75"/>
-      <t76 i0="76"/>
-      <t77 i0="77"/>
-      <t78 i0="78"/>
-      <t79 i0="79"/>
-      <t80 i0="80"/>
-      <t81 i0="81"/>
-      <t82 i0="82"/>
-      <t83 i0="83"/>
-      <t84 i0="84"/>
-      <t85 i0="85"/>
-      <t86 i0="86"/>
-      <t87 i0="87"/>
-      <t88 i0="88"/>
-      <t89 i0="89"/>
-      <t90 i0="90"/>
-      <t91 i0="91"/>
-      <t92 i0="92"/>
-      <t93 i0="93"/>
-      <t94 i0="94"/>
-      <t95 i0="95"/>
-      <t96 i0="96"/>
-      <t97 i0="97"/>
-      <t98 i0="98"/>
-      <t99 i0="99"/>
-      <t100 i0="100"/>
-      <t101 i0="101"/>
-      <t102 i0="102"/>
-      <t103 i0="103"/>
-      <t104 i0="104"/>
-      <t105 i0="105"/>
-      <t106 i0="106"/>
-      <t107 i0="107"/>
-      <t108 i0="108"/>
-      <t109 i0="109"/>
-      <t110 i0="110"/>
-      <t111 i0="111"/>
-      <t112 i0="112"/>
-      <t113 i0="113"/>
-      <t114 i0="114"/>
-      <t115 i0="115"/>
-      <t116 i0="116"/>
-      <t117 i0="117"/>
-      <t118 i0="118"/>
-      <t119 i0="119"/>
-      <t120 i0="120"/>
-      <t121 i0="121"/>
-      <t122 i0="122"/>
-      <t123 i0="123"/>
-      <t124 i0="124"/>
-      <t125 i0="125"/>
-      <t126 i0="126"/>
-      <t127 i0="127"/>
-    </harmonizer>
-  </keymap>
-  <keymap Id="-1" name="-1" targetStates0="0" targetStates1="1" targetStates2="0"
-          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
-          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="1"
-          targetStates11="0" targetStates12="0" targetStates13="0" targetStates14="0"
-          targetStates15="0" targetStates16="0" targetStates17="0" targetStates18="0"
-          targetStates19="0" inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
-          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
-          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
-          defSelected="1" osSelected="1">
-    <midiInputs/>
-    <midiInputIdentifiers/>
-    <harmonizer>
-      <t0 i0="0"/>
-      <t1 i0="1"/>
-      <t2 i0="2"/>
-      <t3 i0="3"/>
-      <t4 i0="4"/>
-      <t5 i0="5"/>
-      <t6 i0="6"/>
-      <t7 i0="7"/>
-      <t8 i0="8"/>
-      <t9 i0="9"/>
-      <t10 i0="10"/>
-      <t11 i0="11"/>
-      <t12 i0="12"/>
-      <t13 i0="13"/>
-      <t14 i0="14"/>
-      <t15 i0="15"/>
-      <t16 i0="16"/>
-      <t17 i0="17"/>
-      <t18 i0="18"/>
-      <t19 i0="19"/>
-      <t20 i0="20"/>
-      <t21 i0="21"/>
-      <t22 i0="22"/>
-      <t23 i0="23"/>
-      <t24 i0="24"/>
-      <t25 i0="25"/>
-      <t26 i0="26"/>
-      <t27 i0="27"/>
-      <t28 i0="28"/>
-      <t29 i0="29"/>
-      <t30 i0="30"/>
-      <t31 i0="31"/>
-      <t32 i0="32"/>
-      <t33 i0="33"/>
-      <t34 i0="34"/>
-      <t35 i0="35"/>
-      <t36 i0="36"/>
-      <t37 i0="37"/>
-      <t38 i0="38"/>
-      <t39 i0="39"/>
-      <t40 i0="40"/>
-      <t41 i0="41"/>
-      <t42 i0="42"/>
-      <t43 i0="43"/>
-      <t44 i0="44"/>
-      <t45 i0="45"/>
-      <t46 i0="46"/>
-      <t47 i0="47"/>
-      <t48 i0="48"/>
-      <t49 i0="49"/>
-      <t50 i0="50"/>
-      <t51 i0="51"/>
-      <t52 i0="52"/>
-      <t53 i0="53"/>
-      <t54 i0="54"/>
-      <t55 i0="55"/>
-      <t56 i0="56"/>
-      <t57 i0="57"/>
-      <t58 i0="58"/>
-      <t59 i0="59"/>
-      <t60 i0="60"/>
-      <t61 i0="61"/>
-      <t62 i0="62"/>
-      <t63 i0="63"/>
-      <t64 i0="64"/>
-      <t65 i0="65"/>
-      <t66 i0="66"/>
-      <t67 i0="67"/>
-      <t68 i0="68"/>
-      <t69 i0="69"/>
-      <t70 i0="70"/>
-      <t71 i0="71"/>
-      <t72 i0="72"/>
-      <t73 i0="73"/>
-      <t74 i0="74"/>
-      <t75 i0="75"/>
-      <t76 i0="76"/>
-      <t77 i0="77"/>
-      <t78 i0="78"/>
-      <t79 i0="79"/>
-      <t80 i0="80"/>
-      <t81 i0="81"/>
-      <t82 i0="82"/>
-      <t83 i0="83"/>
-      <t84 i0="84"/>
-      <t85 i0="85"/>
-      <t86 i0="86"/>
-      <t87 i0="87"/>
-      <t88 i0="88"/>
-      <t89 i0="89"/>
-      <t90 i0="90"/>
-      <t91 i0="91"/>
-      <t92 i0="92"/>
-      <t93 i0="93"/>
-      <t94 i0="94"/>
-      <t95 i0="95"/>
-      <t96 i0="96"/>
-      <t97 i0="97"/>
-      <t98 i0="98"/>
-      <t99 i0="99"/>
-      <t100 i0="100"/>
-      <t101 i0="101"/>
-      <t102 i0="102"/>
-      <t103 i0="103"/>
-      <t104 i0="104"/>
-      <t105 i0="105"/>
-      <t106 i0="106"/>
-      <t107 i0="107"/>
-      <t108 i0="108"/>
-      <t109 i0="109"/>
-      <t110 i0="110"/>
-      <t111 i0="111"/>
-      <t112 i0="112"/>
-      <t113 i0="113"/>
-      <t114 i0="114"/>
-      <t115 i0="115"/>
-      <t116 i0="116"/>
-      <t117 i0="117"/>
-      <t118 i0="118"/>
-      <t119 i0="119"/>
-      <t120 i0="120"/>
-      <t121 i0="121"/>
-      <t122 i0="122"/>
-      <t123 i0="123"/>
-      <t124 i0="124"/>
-      <t125 i0="125"/>
-      <t126 i0="126"/>
-      <t127 i0="127"/>
-    </harmonizer>
-  </keymap>
-  <keymap Id="-1" name="-1" targetStates0="0" targetStates1="1" targetStates2="0"
-          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
-          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="1"
-          targetStates11="0" targetStates12="0" targetStates13="0" targetStates14="0"
-          targetStates15="0" targetStates16="0" targetStates17="0" targetStates18="0"
-          targetStates19="0" inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
-          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
-          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
-          defSelected="1" osSelected="1">
-    <midiInputs/>
-    <midiInputIdentifiers/>
-    <harmonizer>
-      <t0 i0="0"/>
-      <t1 i0="1"/>
-      <t2 i0="2"/>
-      <t3 i0="3"/>
-      <t4 i0="4"/>
-      <t5 i0="5"/>
-      <t6 i0="6"/>
-      <t7 i0="7"/>
-      <t8 i0="8"/>
-      <t9 i0="9"/>
-      <t10 i0="10"/>
-      <t11 i0="11"/>
-      <t12 i0="12"/>
-      <t13 i0="13"/>
-      <t14 i0="14"/>
-      <t15 i0="15"/>
-      <t16 i0="16"/>
-      <t17 i0="17"/>
-      <t18 i0="18"/>
-      <t19 i0="19"/>
-      <t20 i0="20"/>
-      <t21 i0="21"/>
-      <t22 i0="22"/>
-      <t23 i0="23"/>
-      <t24 i0="24"/>
-      <t25 i0="25"/>
-      <t26 i0="26"/>
-      <t27 i0="27"/>
-      <t28 i0="28"/>
-      <t29 i0="29"/>
-      <t30 i0="30"/>
-      <t31 i0="31"/>
-      <t32 i0="32"/>
-      <t33 i0="33"/>
-      <t34 i0="34"/>
-      <t35 i0="35"/>
-      <t36 i0="36"/>
-      <t37 i0="37"/>
-      <t38 i0="38"/>
-      <t39 i0="39"/>
-      <t40 i0="40"/>
-      <t41 i0="41"/>
-      <t42 i0="42"/>
-      <t43 i0="43"/>
-      <t44 i0="44"/>
-      <t45 i0="45"/>
-      <t46 i0="46"/>
-      <t47 i0="47"/>
-      <t48 i0="48"/>
-      <t49 i0="49"/>
-      <t50 i0="50"/>
-      <t51 i0="51"/>
-      <t52 i0="52"/>
-      <t53 i0="53"/>
-      <t54 i0="54"/>
-      <t55 i0="55"/>
-      <t56 i0="56"/>
-      <t57 i0="57"/>
-      <t58 i0="58"/>
-      <t59 i0="59"/>
-      <t60 i0="60"/>
-      <t61 i0="61"/>
-      <t62 i0="62"/>
-      <t63 i0="63"/>
-      <t64 i0="64"/>
-      <t65 i0="65"/>
-      <t66 i0="66"/>
-      <t67 i0="67"/>
-      <t68 i0="68"/>
-      <t69 i0="69"/>
-      <t70 i0="70"/>
-      <t71 i0="71"/>
-      <t72 i0="72"/>
-      <t73 i0="73"/>
-      <t74 i0="74"/>
-      <t75 i0="75"/>
-      <t76 i0="76"/>
-      <t77 i0="77"/>
-      <t78 i0="78"/>
-      <t79 i0="79"/>
-      <t80 i0="80"/>
-      <t81 i0="81"/>
-      <t82 i0="82"/>
-      <t83 i0="83"/>
-      <t84 i0="84"/>
-      <t85 i0="85"/>
-      <t86 i0="86"/>
-      <t87 i0="87"/>
-      <t88 i0="88"/>
-      <t89 i0="89"/>
-      <t90 i0="90"/>
-      <t91 i0="91"/>
-      <t92 i0="92"/>
-      <t93 i0="93"/>
-      <t94 i0="94"/>
-      <t95 i0="95"/>
-      <t96 i0="96"/>
-      <t97 i0="97"/>
-      <t98 i0="98"/>
-      <t99 i0="99"/>
-      <t100 i0="100"/>
-      <t101 i0="101"/>
-      <t102 i0="102"/>
-      <t103 i0="103"/>
-      <t104 i0="104"/>
-      <t105 i0="105"/>
-      <t106 i0="106"/>
-      <t107 i0="107"/>
-      <t108 i0="108"/>
-      <t109 i0="109"/>
-      <t110 i0="110"/>
-      <t111 i0="111"/>
-      <t112 i0="112"/>
-      <t113 i0="113"/>
-      <t114 i0="114"/>
-      <t115 i0="115"/>
-      <t116 i0="116"/>
-      <t117 i0="117"/>
-      <t118 i0="118"/>
-      <t119 i0="119"/>
-      <t120 i0="120"/>
-      <t121 i0="121"/>
-      <t122 i0="122"/>
-      <t123 i0="123"/>
-      <t124 i0="124"/>
-      <t125 i0="125"/>
-      <t126 i0="126"/>
-      <t127 i0="127"/>
-    </harmonizer>
-  </keymap>
-  <keymap Id="-1" name="-1" targetStates0="0" targetStates1="1" targetStates2="0"
-          targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
-          targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="1"
-          targetStates11="0" targetStates12="0" targetStates13="0" targetStates14="0"
-          targetStates15="0" targetStates16="0" targetStates17="0" targetStates18="0"
-          targetStates19="0" inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
-          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
-          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
-          defSelected="1" osSelected="1">
-    <midiInputs/>
-    <midiInputIdentifiers/>
-    <harmonizer>
-      <t0 i0="0"/>
-      <t1 i0="1"/>
-      <t2 i0="2"/>
-      <t3 i0="3"/>
-      <t4 i0="4"/>
-      <t5 i0="5"/>
-      <t6 i0="6"/>
-      <t7 i0="7"/>
-      <t8 i0="8"/>
-      <t9 i0="9"/>
-      <t10 i0="10"/>
-      <t11 i0="11"/>
-      <t12 i0="12"/>
-      <t13 i0="13"/>
-      <t14 i0="14"/>
-      <t15 i0="15"/>
-      <t16 i0="16"/>
-      <t17 i0="17"/>
-      <t18 i0="18"/>
-      <t19 i0="19"/>
-      <t20 i0="20"/>
-      <t21 i0="21"/>
-      <t22 i0="22"/>
-      <t23 i0="23"/>
-      <t24 i0="24"/>
-      <t25 i0="25"/>
-      <t26 i0="26"/>
-      <t27 i0="27"/>
-      <t28 i0="28"/>
-      <t29 i0="29"/>
-      <t30 i0="30"/>
-      <t31 i0="31"/>
-      <t32 i0="32"/>
-      <t33 i0="33"/>
-      <t34 i0="34"/>
-      <t35 i0="35"/>
-      <t36 i0="36"/>
-      <t37 i0="37"/>
-      <t38 i0="38"/>
-      <t39 i0="39"/>
-      <t40 i0="40"/>
-      <t41 i0="41"/>
-      <t42 i0="42"/>
-      <t43 i0="43"/>
-      <t44 i0="44"/>
-      <t45 i0="45"/>
-      <t46 i0="46"/>
-      <t47 i0="47"/>
-      <t48 i0="48"/>
-      <t49 i0="49"/>
-      <t50 i0="50"/>
-      <t51 i0="51"/>
-      <t52 i0="52"/>
-      <t53 i0="53"/>
-      <t54 i0="54"/>
-      <t55 i0="55"/>
-      <t56 i0="56"/>
-      <t57 i0="57"/>
-      <t58 i0="58"/>
-      <t59 i0="59"/>
-      <t60 i0="60"/>
-      <t61 i0="61"/>
-      <t62 i0="62"/>
-      <t63 i0="63"/>
-      <t64 i0="64"/>
-      <t65 i0="65"/>
-      <t66 i0="66"/>
-      <t67 i0="67"/>
-      <t68 i0="68"/>
-      <t69 i0="69"/>
-      <t70 i0="70"/>
-      <t71 i0="71"/>
-      <t72 i0="72"/>
-      <t73 i0="73"/>
-      <t74 i0="74"/>
-      <t75 i0="75"/>
-      <t76 i0="76"/>
-      <t77 i0="77"/>
-      <t78 i0="78"/>
-      <t79 i0="79"/>
-      <t80 i0="80"/>
-      <t81 i0="81"/>
-      <t82 i0="82"/>
-      <t83 i0="83"/>
-      <t84 i0="84"/>
-      <t85 i0="85"/>
-      <t86 i0="86"/>
-      <t87 i0="87"/>
-      <t88 i0="88"/>
-      <t89 i0="89"/>
-      <t90 i0="90"/>
-      <t91 i0="91"/>
-      <t92 i0="92"/>
-      <t93 i0="93"/>
-      <t94 i0="94"/>
-      <t95 i0="95"/>
-      <t96 i0="96"/>
-      <t97 i0="97"/>
-      <t98 i0="98"/>
-      <t99 i0="99"/>
-      <t100 i0="100"/>
-      <t101 i0="101"/>
-      <t102 i0="102"/>
-      <t103 i0="103"/>
-      <t104 i0="104"/>
-      <t105 i0="105"/>
-      <t106 i0="106"/>
-      <t107 i0="107"/>
-      <t108 i0="108"/>
-      <t109 i0="109"/>
-      <t110 i0="110"/>
-      <t111 i0="111"/>
-      <t112 i0="112"/>
-      <t113 i0="113"/>
-      <t114 i0="114"/>
-      <t115 i0="115"/>
-      <t116 i0="116"/>
-      <t117 i0="117"/>
-      <t118 i0="118"/>
-      <t119 i0="119"/>
-      <t120 i0="120"/>
-      <t121 i0="121"/>
-      <t122 i0="122"/>
-      <t123 i0="123"/>
-      <t124 i0="124"/>
-      <t125 i0="125"/>
-      <t126 i0="126"/>
-      <t127 i0="127"/>
-    </harmonizer>
-  </keymap>
-  <keymap Id="5" name="A3" k0="57" targetStates0="0" targetStates1="1"
+  <keymap Id="6" name="B1" k0="35" targetStates0="1" targetStates1="1"
           targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
           targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
           targetStates10="1" targetStates11="0" targetStates12="0" targetStates13="0"
           targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
-          targetStates18="0" targetStates19="0" inverted="0" harmonizerPreTranspose="0"
-          harmonizerPostTranspose="0" endKeystrokes="0" ignoreSustain="0"
-          sustainPedalKeys="0" asymmetricalWarp="1.0" symmetricalWarp="1.0"
-          scale="1.0" offset="0.0" velocityInvert="0" defSelected="1" osSelected="1">
+          targetStates18="0" targetStates19="0" targetStates20="1" targetStates21="1"
+          inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
     <midiInputs/>
     <midiInputIdentifiers/>
     <harmonizer>
@@ -3638,157 +3964,16 @@
       <t127 i0="127"/>
     </harmonizer>
   </keymap>
-  <keymap Id="6" name="B1" k0="35" targetStates0="0" targetStates1="1"
-          targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
-          targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
-          targetStates10="1" targetStates11="0" targetStates12="0" targetStates13="0"
-          targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
-          targetStates18="0" targetStates19="0" inverted="0" harmonizerPreTranspose="0"
-          harmonizerPostTranspose="0" endKeystrokes="0" ignoreSustain="0"
-          sustainPedalKeys="0" asymmetricalWarp="1.0" symmetricalWarp="1.0"
-          scale="1.0" offset="0.0" velocityInvert="0" defSelected="1" osSelected="1">
-    <midiInputs/>
-    <midiInputIdentifiers/>
-    <harmonizer>
-      <t0 i0="0"/>
-      <t1 i0="1"/>
-      <t2 i0="2"/>
-      <t3 i0="3"/>
-      <t4 i0="4"/>
-      <t5 i0="5"/>
-      <t6 i0="6"/>
-      <t7 i0="7"/>
-      <t8 i0="8"/>
-      <t9 i0="9"/>
-      <t10 i0="10"/>
-      <t11 i0="11"/>
-      <t12 i0="12"/>
-      <t13 i0="13"/>
-      <t14 i0="14"/>
-      <t15 i0="15"/>
-      <t16 i0="16"/>
-      <t17 i0="17"/>
-      <t18 i0="18"/>
-      <t19 i0="19"/>
-      <t20 i0="20"/>
-      <t21 i0="21"/>
-      <t22 i0="22"/>
-      <t23 i0="23"/>
-      <t24 i0="24"/>
-      <t25 i0="25"/>
-      <t26 i0="26"/>
-      <t27 i0="27"/>
-      <t28 i0="28"/>
-      <t29 i0="29"/>
-      <t30 i0="30"/>
-      <t31 i0="31"/>
-      <t32 i0="32"/>
-      <t33 i0="33"/>
-      <t34 i0="34"/>
-      <t35 i0="35"/>
-      <t36 i0="36"/>
-      <t37 i0="37"/>
-      <t38 i0="38"/>
-      <t39 i0="39"/>
-      <t40 i0="40"/>
-      <t41 i0="41"/>
-      <t42 i0="42"/>
-      <t43 i0="43"/>
-      <t44 i0="44"/>
-      <t45 i0="45"/>
-      <t46 i0="46"/>
-      <t47 i0="47"/>
-      <t48 i0="48"/>
-      <t49 i0="49"/>
-      <t50 i0="50"/>
-      <t51 i0="51"/>
-      <t52 i0="52"/>
-      <t53 i0="53"/>
-      <t54 i0="54"/>
-      <t55 i0="55"/>
-      <t56 i0="56"/>
-      <t57 i0="57"/>
-      <t58 i0="58"/>
-      <t59 i0="59"/>
-      <t60 i0="60"/>
-      <t61 i0="61"/>
-      <t62 i0="62"/>
-      <t63 i0="63"/>
-      <t64 i0="64"/>
-      <t65 i0="65"/>
-      <t66 i0="66"/>
-      <t67 i0="67"/>
-      <t68 i0="68"/>
-      <t69 i0="69"/>
-      <t70 i0="70"/>
-      <t71 i0="71"/>
-      <t72 i0="72"/>
-      <t73 i0="73"/>
-      <t74 i0="74"/>
-      <t75 i0="75"/>
-      <t76 i0="76"/>
-      <t77 i0="77"/>
-      <t78 i0="78"/>
-      <t79 i0="79"/>
-      <t80 i0="80"/>
-      <t81 i0="81"/>
-      <t82 i0="82"/>
-      <t83 i0="83"/>
-      <t84 i0="84"/>
-      <t85 i0="85"/>
-      <t86 i0="86"/>
-      <t87 i0="87"/>
-      <t88 i0="88"/>
-      <t89 i0="89"/>
-      <t90 i0="90"/>
-      <t91 i0="91"/>
-      <t92 i0="92"/>
-      <t93 i0="93"/>
-      <t94 i0="94"/>
-      <t95 i0="95"/>
-      <t96 i0="96"/>
-      <t97 i0="97"/>
-      <t98 i0="98"/>
-      <t99 i0="99"/>
-      <t100 i0="100"/>
-      <t101 i0="101"/>
-      <t102 i0="102"/>
-      <t103 i0="103"/>
-      <t104 i0="104"/>
-      <t105 i0="105"/>
-      <t106 i0="106"/>
-      <t107 i0="107"/>
-      <t108 i0="108"/>
-      <t109 i0="109"/>
-      <t110 i0="110"/>
-      <t111 i0="111"/>
-      <t112 i0="112"/>
-      <t113 i0="113"/>
-      <t114 i0="114"/>
-      <t115 i0="115"/>
-      <t116 i0="116"/>
-      <t117 i0="117"/>
-      <t118 i0="118"/>
-      <t119 i0="119"/>
-      <t120 i0="120"/>
-      <t121 i0="121"/>
-      <t122 i0="122"/>
-      <t123 i0="123"/>
-      <t124 i0="124"/>
-      <t125 i0="125"/>
-      <t126 i0="126"/>
-      <t127 i0="127"/>
-    </harmonizer>
-  </keymap>
-  <keymap Id="7" name="A0" k0="21" targetStates0="0" targetStates1="0"
+  <keymap Id="7" name="A0" k0="21" targetStates0="1" targetStates1="0"
           targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
           targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
           targetStates10="0" targetStates11="0" targetStates12="0" targetStates13="0"
           targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
-          targetStates18="0" targetStates19="0" inverted="0" harmonizerPreTranspose="0"
-          harmonizerPostTranspose="0" endKeystrokes="0" ignoreSustain="0"
-          sustainPedalKeys="0" asymmetricalWarp="1.0" symmetricalWarp="1.0"
-          scale="1.0" offset="0.0" velocityInvert="0" defSelected="1" osSelected="1">
+          targetStates18="0" targetStates19="0" targetStates20="1" targetStates21="1"
+          inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
     <midiInputs/>
     <midiInputIdentifiers/>
     <harmonizer>
@@ -3922,15 +4107,16 @@
       <t127 i0="127"/>
     </harmonizer>
   </keymap>
-  <keymap Id="8" name="C2" k0="36" targetStates0="0" targetStates1="1"
+  <keymap Id="8" name="C2" k0="36" targetStates0="1" targetStates1="1"
           targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
           targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
           targetStates10="1" targetStates11="0" targetStates12="0" targetStates13="0"
           targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
-          targetStates18="0" targetStates19="0" inverted="0" harmonizerPreTranspose="0"
-          harmonizerPostTranspose="0" endKeystrokes="0" ignoreSustain="0"
-          sustainPedalKeys="0" asymmetricalWarp="1.0" symmetricalWarp="1.0"
-          scale="1.0" offset="0.0" velocityInvert="0" defSelected="1" osSelected="1">
+          targetStates18="0" targetStates19="0" targetStates20="1" targetStates21="1"
+          inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
     <midiInputs/>
     <midiInputIdentifiers/>
     <harmonizer>
@@ -4064,15 +4250,16 @@
       <t127 i0="127"/>
     </harmonizer>
   </keymap>
-  <keymap Id="9" name="A2" k0="45" targetStates0="0" targetStates1="1"
+  <keymap Id="9" name="A2" k0="45" targetStates0="1" targetStates1="1"
           targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
           targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
           targetStates10="1" targetStates11="0" targetStates12="0" targetStates13="0"
           targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
-          targetStates18="0" targetStates19="0" inverted="0" harmonizerPreTranspose="0"
-          harmonizerPostTranspose="0" endKeystrokes="0" ignoreSustain="0"
-          sustainPedalKeys="0" asymmetricalWarp="1.0" symmetricalWarp="1.0"
-          scale="1.0" offset="0.0" velocityInvert="0" defSelected="1" osSelected="1">
+          targetStates18="0" targetStates19="0" targetStates20="1" targetStates21="1"
+          inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
     <midiInputs/>
     <midiInputIdentifiers/>
     <harmonizer>
@@ -4224,16 +4411,16 @@
           k105="106" k106="107" k107="108" k108="109" k109="110" k110="111"
           k111="112" k112="113" k113="114" k114="115" k115="116" k116="117"
           k117="118" k118="119" k119="120" k120="121" k121="122" k122="123"
-          k123="124" k124="125" k125="126" k126="127" targetStates0="0"
+          k123="124" k124="125" k125="126" k126="127" targetStates0="1"
           targetStates1="1" targetStates2="0" targetStates3="0" targetStates4="0"
           targetStates5="0" targetStates6="0" targetStates7="0" targetStates8="0"
           targetStates9="0" targetStates10="1" targetStates11="0" targetStates12="0"
           targetStates13="0" targetStates14="0" targetStates15="0" targetStates16="0"
-          targetStates17="0" targetStates18="0" targetStates19="0" inverted="0"
-          harmonizerPreTranspose="0" harmonizerPostTranspose="0" endKeystrokes="0"
-          ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
-          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
-          defSelected="1" osSelected="1">
+          targetStates17="0" targetStates18="0" targetStates19="0" targetStates20="1"
+          targetStates21="1" inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
     <midiInputs/>
     <midiInputIdentifiers/>
     <harmonizer>
@@ -4367,13 +4554,14 @@
       <t127 i0="127"/>
     </harmonizer>
   </keymap>
-  <keymap Id="11" name="26" targetStates0="0" targetStates1="1" targetStates2="0"
+  <keymap Id="11" name="26" targetStates0="1" targetStates1="1" targetStates2="0"
           targetStates3="0" targetStates4="0" targetStates5="0" targetStates6="0"
           targetStates7="0" targetStates8="0" targetStates9="0" targetStates10="1"
           targetStates11="0" targetStates12="0" targetStates13="0" targetStates14="0"
           targetStates15="0" targetStates16="0" targetStates17="0" targetStates18="0"
-          targetStates19="0" inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
-          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
+          targetStates19="0" targetStates20="1" targetStates21="1" inverted="0"
+          harmonizerPreTranspose="0" harmonizerPostTranspose="0" endKeystrokes="0"
+          ignoreSustain="0" sustainPedalKeys="0" toggleKey="0" asymmetricalWarp="1.0"
           symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
           defSelected="1" osSelected="1">
     <midiInputs/>
@@ -4532,11 +4720,11 @@
           targetStates5="0" targetStates6="0" targetStates7="0" targetStates8="0"
           targetStates9="0" targetStates10="1" targetStates11="0" targetStates12="0"
           targetStates13="0" targetStates14="0" targetStates15="0" targetStates16="0"
-          targetStates17="0" targetStates18="0" targetStates19="0" inverted="0"
-          harmonizerPreTranspose="0" harmonizerPostTranspose="0" endKeystrokes="0"
-          ignoreSustain="0" sustainPedalKeys="0" asymmetricalWarp="1.0"
-          symmetricalWarp="1.0" scale="1.0" offset="0.0" velocityInvert="0"
-          defSelected="1" osSelected="1">
+          targetStates17="0" targetStates18="0" targetStates19="0" targetStates20="1"
+          targetStates21="1" inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
     <midiInputs/>
     <midiInputIdentifiers/>
     <harmonizer>
@@ -4670,157 +4858,588 @@
       <t127 i0="127"/>
     </harmonizer>
   </keymap>
-  <keymap Id="13" name="A7" k0="105" targetStates0="0" targetStates1="1"
-          targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
-          targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
-          targetStates10="1" targetStates11="0" targetStates12="0" targetStates13="0"
-          targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
-          targetStates18="0" targetStates19="0" inverted="0" harmonizerPreTranspose="0"
-          harmonizerPostTranspose="0" endKeystrokes="0" ignoreSustain="0"
-          sustainPedalKeys="0" asymmetricalWarp="1.0" symmetricalWarp="1.0"
-          scale="1.0" offset="0.0" velocityInvert="0" defSelected="1" osSelected="1">
-    <midiInputs/>
-    <midiInputIdentifiers/>
-    <harmonizer>
-      <t0 i0="0"/>
-      <t1 i0="1"/>
-      <t2 i0="2"/>
-      <t3 i0="3"/>
-      <t4 i0="4"/>
-      <t5 i0="5"/>
-      <t6 i0="6"/>
-      <t7 i0="7"/>
-      <t8 i0="8"/>
-      <t9 i0="9"/>
-      <t10 i0="10"/>
-      <t11 i0="11"/>
-      <t12 i0="12"/>
-      <t13 i0="13"/>
-      <t14 i0="14"/>
-      <t15 i0="15"/>
-      <t16 i0="16"/>
-      <t17 i0="17"/>
-      <t18 i0="18"/>
-      <t19 i0="19"/>
-      <t20 i0="20"/>
-      <t21 i0="21"/>
-      <t22 i0="22"/>
-      <t23 i0="23"/>
-      <t24 i0="24"/>
-      <t25 i0="25"/>
-      <t26 i0="26"/>
-      <t27 i0="27"/>
-      <t28 i0="28"/>
-      <t29 i0="29"/>
-      <t30 i0="30"/>
-      <t31 i0="31"/>
-      <t32 i0="32"/>
-      <t33 i0="33"/>
-      <t34 i0="34"/>
-      <t35 i0="35"/>
-      <t36 i0="36"/>
-      <t37 i0="37"/>
-      <t38 i0="38"/>
-      <t39 i0="39"/>
-      <t40 i0="40"/>
-      <t41 i0="41"/>
-      <t42 i0="42"/>
-      <t43 i0="43"/>
-      <t44 i0="44"/>
-      <t45 i0="45"/>
-      <t46 i0="46"/>
-      <t47 i0="47"/>
-      <t48 i0="48"/>
-      <t49 i0="49"/>
-      <t50 i0="50"/>
-      <t51 i0="51"/>
-      <t52 i0="52"/>
-      <t53 i0="53"/>
-      <t54 i0="54"/>
-      <t55 i0="55"/>
-      <t56 i0="56"/>
-      <t57 i0="57"/>
-      <t58 i0="58"/>
-      <t59 i0="59"/>
-      <t60 i0="60"/>
-      <t61 i0="61"/>
-      <t62 i0="62"/>
-      <t63 i0="63"/>
-      <t64 i0="64"/>
-      <t65 i0="65"/>
-      <t66 i0="66"/>
-      <t67 i0="67"/>
-      <t68 i0="68"/>
-      <t69 i0="69"/>
-      <t70 i0="70"/>
-      <t71 i0="71"/>
-      <t72 i0="72"/>
-      <t73 i0="73"/>
-      <t74 i0="74"/>
-      <t75 i0="75"/>
-      <t76 i0="76"/>
-      <t77 i0="77"/>
-      <t78 i0="78"/>
-      <t79 i0="79"/>
-      <t80 i0="80"/>
-      <t81 i0="81"/>
-      <t82 i0="82"/>
-      <t83 i0="83"/>
-      <t84 i0="84"/>
-      <t85 i0="85"/>
-      <t86 i0="86"/>
-      <t87 i0="87"/>
-      <t88 i0="88"/>
-      <t89 i0="89"/>
-      <t90 i0="90"/>
-      <t91 i0="91"/>
-      <t92 i0="92"/>
-      <t93 i0="93"/>
-      <t94 i0="94"/>
-      <t95 i0="95"/>
-      <t96 i0="96"/>
-      <t97 i0="97"/>
-      <t98 i0="98"/>
-      <t99 i0="99"/>
-      <t100 i0="100"/>
-      <t101 i0="101"/>
-      <t102 i0="102"/>
-      <t103 i0="103"/>
-      <t104 i0="104"/>
-      <t105 i0="105"/>
-      <t106 i0="106"/>
-      <t107 i0="107"/>
-      <t108 i0="108"/>
-      <t109 i0="109"/>
-      <t110 i0="110"/>
-      <t111 i0="111"/>
-      <t112 i0="112"/>
-      <t113 i0="113"/>
-      <t114 i0="114"/>
-      <t115 i0="115"/>
-      <t116 i0="116"/>
-      <t117 i0="117"/>
-      <t118 i0="118"/>
-      <t119 i0="119"/>
-      <t120 i0="120"/>
-      <t121 i0="121"/>
-      <t122 i0="122"/>
-      <t123 i0="123"/>
-      <t124 i0="124"/>
-      <t125 i0="125"/>
-      <t126 i0="126"/>
-      <t127 i0="127"/>
-    </harmonizer>
-  </keymap>
-  <keymap Id="14" name="Keymap 14" targetStates0="0" targetStates1="0"
+  <keymap Id="13" name="A7" k0="105" targetStates0="1" targetStates1="0"
           targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
           targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
           targetStates10="0" targetStates11="0" targetStates12="0" targetStates13="0"
           targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
-          targetStates18="0" targetStates19="0" inverted="0" harmonizerPreTranspose="0"
-          harmonizerPostTranspose="0" endKeystrokes="0" ignoreSustain="0"
-          sustainPedalKeys="0" asymmetricalWarp="1.0" symmetricalWarp="1.0"
-          scale="1.0" offset="0.0" velocityInvert="0" defSelected="1" osSelected="1">
+          targetStates18="0" targetStates19="0" targetStates20="1" targetStates21="1"
+          inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
+    <midiInputs/>
+    <midiInputIdentifiers/>
+    <harmonizer>
+      <t0 i0="0"/>
+      <t1 i0="1"/>
+      <t2 i0="2"/>
+      <t3 i0="3"/>
+      <t4 i0="4"/>
+      <t5 i0="5"/>
+      <t6 i0="6"/>
+      <t7 i0="7"/>
+      <t8 i0="8"/>
+      <t9 i0="9"/>
+      <t10 i0="10"/>
+      <t11 i0="11"/>
+      <t12 i0="12"/>
+      <t13 i0="13"/>
+      <t14 i0="14"/>
+      <t15 i0="15"/>
+      <t16 i0="16"/>
+      <t17 i0="17"/>
+      <t18 i0="18"/>
+      <t19 i0="19"/>
+      <t20 i0="20"/>
+      <t21 i0="21"/>
+      <t22 i0="22"/>
+      <t23 i0="23"/>
+      <t24 i0="24"/>
+      <t25 i0="25"/>
+      <t26 i0="26"/>
+      <t27 i0="27"/>
+      <t28 i0="28"/>
+      <t29 i0="29"/>
+      <t30 i0="30"/>
+      <t31 i0="31"/>
+      <t32 i0="32"/>
+      <t33 i0="33"/>
+      <t34 i0="34"/>
+      <t35 i0="35"/>
+      <t36 i0="36"/>
+      <t37 i0="37"/>
+      <t38 i0="38"/>
+      <t39 i0="39"/>
+      <t40 i0="40"/>
+      <t41 i0="41"/>
+      <t42 i0="42"/>
+      <t43 i0="43"/>
+      <t44 i0="44"/>
+      <t45 i0="45"/>
+      <t46 i0="46"/>
+      <t47 i0="47"/>
+      <t48 i0="48"/>
+      <t49 i0="49"/>
+      <t50 i0="50"/>
+      <t51 i0="51"/>
+      <t52 i0="52"/>
+      <t53 i0="53"/>
+      <t54 i0="54"/>
+      <t55 i0="55"/>
+      <t56 i0="56"/>
+      <t57 i0="57"/>
+      <t58 i0="58"/>
+      <t59 i0="59"/>
+      <t60 i0="60"/>
+      <t61 i0="61"/>
+      <t62 i0="62"/>
+      <t63 i0="63"/>
+      <t64 i0="64"/>
+      <t65 i0="65"/>
+      <t66 i0="66"/>
+      <t67 i0="67"/>
+      <t68 i0="68"/>
+      <t69 i0="69"/>
+      <t70 i0="70"/>
+      <t71 i0="71"/>
+      <t72 i0="72"/>
+      <t73 i0="73"/>
+      <t74 i0="74"/>
+      <t75 i0="75"/>
+      <t76 i0="76"/>
+      <t77 i0="77"/>
+      <t78 i0="78"/>
+      <t79 i0="79"/>
+      <t80 i0="80"/>
+      <t81 i0="81"/>
+      <t82 i0="82"/>
+      <t83 i0="83"/>
+      <t84 i0="84"/>
+      <t85 i0="85"/>
+      <t86 i0="86"/>
+      <t87 i0="87"/>
+      <t88 i0="88"/>
+      <t89 i0="89"/>
+      <t90 i0="90"/>
+      <t91 i0="91"/>
+      <t92 i0="92"/>
+      <t93 i0="93"/>
+      <t94 i0="94"/>
+      <t95 i0="95"/>
+      <t96 i0="96"/>
+      <t97 i0="97"/>
+      <t98 i0="98"/>
+      <t99 i0="99"/>
+      <t100 i0="100"/>
+      <t101 i0="101"/>
+      <t102 i0="102"/>
+      <t103 i0="103"/>
+      <t104 i0="104"/>
+      <t105 i0="105"/>
+      <t106 i0="106"/>
+      <t107 i0="107"/>
+      <t108 i0="108"/>
+      <t109 i0="109"/>
+      <t110 i0="110"/>
+      <t111 i0="111"/>
+      <t112 i0="112"/>
+      <t113 i0="113"/>
+      <t114 i0="114"/>
+      <t115 i0="115"/>
+      <t116 i0="116"/>
+      <t117 i0="117"/>
+      <t118 i0="118"/>
+      <t119 i0="119"/>
+      <t120 i0="120"/>
+      <t121 i0="121"/>
+      <t122 i0="122"/>
+      <t123 i0="123"/>
+      <t124 i0="124"/>
+      <t125 i0="125"/>
+      <t126 i0="126"/>
+      <t127 i0="127"/>
+    </harmonizer>
+  </keymap>
+  <keymap Id="14" name="Keymap 14" targetStates0="1" targetStates1="0"
+          targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
+          targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
+          targetStates10="0" targetStates11="0" targetStates12="0" targetStates13="0"
+          targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
+          targetStates18="0" targetStates19="0" targetStates20="1" targetStates21="1"
+          inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
+    <midiInputs/>
+    <midiInputIdentifiers/>
+    <harmonizer>
+      <t0 i0="0"/>
+      <t1 i0="1"/>
+      <t2 i0="2"/>
+      <t3 i0="3"/>
+      <t4 i0="4"/>
+      <t5 i0="5"/>
+      <t6 i0="6"/>
+      <t7 i0="7"/>
+      <t8 i0="8"/>
+      <t9 i0="9"/>
+      <t10 i0="10"/>
+      <t11 i0="11"/>
+      <t12 i0="12"/>
+      <t13 i0="13"/>
+      <t14 i0="14"/>
+      <t15 i0="15"/>
+      <t16 i0="16"/>
+      <t17 i0="17"/>
+      <t18 i0="18"/>
+      <t19 i0="19"/>
+      <t20 i0="20"/>
+      <t21 i0="21"/>
+      <t22 i0="22"/>
+      <t23 i0="23"/>
+      <t24 i0="24"/>
+      <t25 i0="25"/>
+      <t26 i0="26"/>
+      <t27 i0="27"/>
+      <t28 i0="28"/>
+      <t29 i0="29"/>
+      <t30 i0="30"/>
+      <t31 i0="31"/>
+      <t32 i0="32"/>
+      <t33 i0="33"/>
+      <t34 i0="34"/>
+      <t35 i0="35"/>
+      <t36 i0="36"/>
+      <t37 i0="37"/>
+      <t38 i0="38"/>
+      <t39 i0="39"/>
+      <t40 i0="40"/>
+      <t41 i0="41"/>
+      <t42 i0="42"/>
+      <t43 i0="43"/>
+      <t44 i0="44"/>
+      <t45 i0="45"/>
+      <t46 i0="46"/>
+      <t47 i0="47"/>
+      <t48 i0="48"/>
+      <t49 i0="49"/>
+      <t50 i0="50"/>
+      <t51 i0="51"/>
+      <t52 i0="52"/>
+      <t53 i0="53"/>
+      <t54 i0="54"/>
+      <t55 i0="55"/>
+      <t56 i0="56"/>
+      <t57 i0="57"/>
+      <t58 i0="58"/>
+      <t59 i0="59"/>
+      <t60 i0="60"/>
+      <t61 i0="61"/>
+      <t62 i0="62"/>
+      <t63 i0="63"/>
+      <t64 i0="64"/>
+      <t65 i0="65"/>
+      <t66 i0="66"/>
+      <t67 i0="67"/>
+      <t68 i0="68"/>
+      <t69 i0="69"/>
+      <t70 i0="70"/>
+      <t71 i0="71"/>
+      <t72 i0="72"/>
+      <t73 i0="73"/>
+      <t74 i0="74"/>
+      <t75 i0="75"/>
+      <t76 i0="76"/>
+      <t77 i0="77"/>
+      <t78 i0="78"/>
+      <t79 i0="79"/>
+      <t80 i0="80"/>
+      <t81 i0="81"/>
+      <t82 i0="82"/>
+      <t83 i0="83"/>
+      <t84 i0="84"/>
+      <t85 i0="85"/>
+      <t86 i0="86"/>
+      <t87 i0="87"/>
+      <t88 i0="88"/>
+      <t89 i0="89"/>
+      <t90 i0="90"/>
+      <t91 i0="91"/>
+      <t92 i0="92"/>
+      <t93 i0="93"/>
+      <t94 i0="94"/>
+      <t95 i0="95"/>
+      <t96 i0="96"/>
+      <t97 i0="97"/>
+      <t98 i0="98"/>
+      <t99 i0="99"/>
+      <t100 i0="100"/>
+      <t101 i0="101"/>
+      <t102 i0="102"/>
+      <t103 i0="103"/>
+      <t104 i0="104"/>
+      <t105 i0="105"/>
+      <t106 i0="106"/>
+      <t107 i0="107"/>
+      <t108 i0="108"/>
+      <t109 i0="109"/>
+      <t110 i0="110"/>
+      <t111 i0="111"/>
+      <t112 i0="112"/>
+      <t113 i0="113"/>
+      <t114 i0="114"/>
+      <t115 i0="115"/>
+      <t116 i0="116"/>
+      <t117 i0="117"/>
+      <t118 i0="118"/>
+      <t119 i0="119"/>
+      <t120 i0="120"/>
+      <t121 i0="121"/>
+      <t122 i0="122"/>
+      <t123 i0="123"/>
+      <t124 i0="124"/>
+      <t125 i0="125"/>
+      <t126 i0="126"/>
+      <t127 i0="127"/>
+    </harmonizer>
+  </keymap>
+  <keymap Id="15" name="Keymap 15" targetStates0="1" targetStates1="0"
+          targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
+          targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
+          targetStates10="0" targetStates11="0" targetStates12="0" targetStates13="0"
+          targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
+          targetStates18="1" targetStates19="1" targetStates20="1" targetStates21="1"
+          inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
+    <midiInputs/>
+    <midiInputIdentifiers/>
+    <harmonizer>
+      <t0 i0="0"/>
+      <t1 i0="1"/>
+      <t2 i0="2"/>
+      <t3 i0="3"/>
+      <t4 i0="4"/>
+      <t5 i0="5"/>
+      <t6 i0="6"/>
+      <t7 i0="7"/>
+      <t8 i0="8"/>
+      <t9 i0="9"/>
+      <t10 i0="10"/>
+      <t11 i0="11"/>
+      <t12 i0="12"/>
+      <t13 i0="13"/>
+      <t14 i0="14"/>
+      <t15 i0="15"/>
+      <t16 i0="16"/>
+      <t17 i0="17"/>
+      <t18 i0="18"/>
+      <t19 i0="19"/>
+      <t20 i0="20"/>
+      <t21 i0="21"/>
+      <t22 i0="22"/>
+      <t23 i0="23"/>
+      <t24 i0="24"/>
+      <t25 i0="25"/>
+      <t26 i0="26"/>
+      <t27 i0="27"/>
+      <t28 i0="28"/>
+      <t29 i0="29"/>
+      <t30 i0="30"/>
+      <t31 i0="31"/>
+      <t32 i0="32"/>
+      <t33 i0="33"/>
+      <t34 i0="34"/>
+      <t35 i0="35"/>
+      <t36 i0="36"/>
+      <t37 i0="37"/>
+      <t38 i0="38"/>
+      <t39 i0="39"/>
+      <t40 i0="40"/>
+      <t41 i0="41"/>
+      <t42 i0="42"/>
+      <t43 i0="43"/>
+      <t44 i0="44"/>
+      <t45 i0="45"/>
+      <t46 i0="46"/>
+      <t47 i0="47"/>
+      <t48 i0="48"/>
+      <t49 i0="49"/>
+      <t50 i0="50"/>
+      <t51 i0="51"/>
+      <t52 i0="52"/>
+      <t53 i0="53"/>
+      <t54 i0="54"/>
+      <t55 i0="55"/>
+      <t56 i0="56"/>
+      <t57 i0="57"/>
+      <t58 i0="58"/>
+      <t59 i0="59"/>
+      <t60 i0="60"/>
+      <t61 i0="61"/>
+      <t62 i0="62"/>
+      <t63 i0="63"/>
+      <t64 i0="64"/>
+      <t65 i0="65"/>
+      <t66 i0="66"/>
+      <t67 i0="67"/>
+      <t68 i0="68"/>
+      <t69 i0="69"/>
+      <t70 i0="70"/>
+      <t71 i0="71"/>
+      <t72 i0="72"/>
+      <t73 i0="73"/>
+      <t74 i0="74"/>
+      <t75 i0="75"/>
+      <t76 i0="76"/>
+      <t77 i0="77"/>
+      <t78 i0="78"/>
+      <t79 i0="79"/>
+      <t80 i0="80"/>
+      <t81 i0="81"/>
+      <t82 i0="82"/>
+      <t83 i0="83"/>
+      <t84 i0="84"/>
+      <t85 i0="85"/>
+      <t86 i0="86"/>
+      <t87 i0="87"/>
+      <t88 i0="88"/>
+      <t89 i0="89"/>
+      <t90 i0="90"/>
+      <t91 i0="91"/>
+      <t92 i0="92"/>
+      <t93 i0="93"/>
+      <t94 i0="94"/>
+      <t95 i0="95"/>
+      <t96 i0="96"/>
+      <t97 i0="97"/>
+      <t98 i0="98"/>
+      <t99 i0="99"/>
+      <t100 i0="100"/>
+      <t101 i0="101"/>
+      <t102 i0="102"/>
+      <t103 i0="103"/>
+      <t104 i0="104"/>
+      <t105 i0="105"/>
+      <t106 i0="106"/>
+      <t107 i0="107"/>
+      <t108 i0="108"/>
+      <t109 i0="109"/>
+      <t110 i0="110"/>
+      <t111 i0="111"/>
+      <t112 i0="112"/>
+      <t113 i0="113"/>
+      <t114 i0="114"/>
+      <t115 i0="115"/>
+      <t116 i0="116"/>
+      <t117 i0="117"/>
+      <t118 i0="118"/>
+      <t119 i0="119"/>
+      <t120 i0="120"/>
+      <t121 i0="121"/>
+      <t122 i0="122"/>
+      <t123 i0="123"/>
+      <t124 i0="124"/>
+      <t125 i0="125"/>
+      <t126 i0="126"/>
+      <t127 i0="127"/>
+    </harmonizer>
+  </keymap>
+  <keymap Id="16" name="Keymap 16" targetStates0="1" targetStates1="0"
+          targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
+          targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
+          targetStates10="0" targetStates11="0" targetStates12="0" targetStates13="0"
+          targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
+          targetStates18="1" targetStates19="1" targetStates20="1" targetStates21="1"
+          inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
+    <midiInputs/>
+    <midiInputIdentifiers/>
+    <harmonizer>
+      <t0 i0="0"/>
+      <t1 i0="1"/>
+      <t2 i0="2"/>
+      <t3 i0="3"/>
+      <t4 i0="4"/>
+      <t5 i0="5"/>
+      <t6 i0="6"/>
+      <t7 i0="7"/>
+      <t8 i0="8"/>
+      <t9 i0="9"/>
+      <t10 i0="10"/>
+      <t11 i0="11"/>
+      <t12 i0="12"/>
+      <t13 i0="13"/>
+      <t14 i0="14"/>
+      <t15 i0="15"/>
+      <t16 i0="16"/>
+      <t17 i0="17"/>
+      <t18 i0="18"/>
+      <t19 i0="19"/>
+      <t20 i0="20"/>
+      <t21 i0="21"/>
+      <t22 i0="22"/>
+      <t23 i0="23"/>
+      <t24 i0="24"/>
+      <t25 i0="25"/>
+      <t26 i0="26"/>
+      <t27 i0="27"/>
+      <t28 i0="28"/>
+      <t29 i0="29"/>
+      <t30 i0="30"/>
+      <t31 i0="31"/>
+      <t32 i0="32"/>
+      <t33 i0="33"/>
+      <t34 i0="34"/>
+      <t35 i0="35"/>
+      <t36 i0="36"/>
+      <t37 i0="37"/>
+      <t38 i0="38"/>
+      <t39 i0="39"/>
+      <t40 i0="40"/>
+      <t41 i0="41"/>
+      <t42 i0="42"/>
+      <t43 i0="43"/>
+      <t44 i0="44"/>
+      <t45 i0="45"/>
+      <t46 i0="46"/>
+      <t47 i0="47"/>
+      <t48 i0="48"/>
+      <t49 i0="49"/>
+      <t50 i0="50"/>
+      <t51 i0="51"/>
+      <t52 i0="52"/>
+      <t53 i0="53"/>
+      <t54 i0="54"/>
+      <t55 i0="55"/>
+      <t56 i0="56"/>
+      <t57 i0="57"/>
+      <t58 i0="58"/>
+      <t59 i0="59"/>
+      <t60 i0="60"/>
+      <t61 i0="61"/>
+      <t62 i0="62"/>
+      <t63 i0="63"/>
+      <t64 i0="64"/>
+      <t65 i0="65"/>
+      <t66 i0="66"/>
+      <t67 i0="67"/>
+      <t68 i0="68"/>
+      <t69 i0="69"/>
+      <t70 i0="70"/>
+      <t71 i0="71"/>
+      <t72 i0="72"/>
+      <t73 i0="73"/>
+      <t74 i0="74"/>
+      <t75 i0="75"/>
+      <t76 i0="76"/>
+      <t77 i0="77"/>
+      <t78 i0="78"/>
+      <t79 i0="79"/>
+      <t80 i0="80"/>
+      <t81 i0="81"/>
+      <t82 i0="82"/>
+      <t83 i0="83"/>
+      <t84 i0="84"/>
+      <t85 i0="85"/>
+      <t86 i0="86"/>
+      <t87 i0="87"/>
+      <t88 i0="88"/>
+      <t89 i0="89"/>
+      <t90 i0="90"/>
+      <t91 i0="91"/>
+      <t92 i0="92"/>
+      <t93 i0="93"/>
+      <t94 i0="94"/>
+      <t95 i0="95"/>
+      <t96 i0="96"/>
+      <t97 i0="97"/>
+      <t98 i0="98"/>
+      <t99 i0="99"/>
+      <t100 i0="100"/>
+      <t101 i0="101"/>
+      <t102 i0="102"/>
+      <t103 i0="103"/>
+      <t104 i0="104"/>
+      <t105 i0="105"/>
+      <t106 i0="106"/>
+      <t107 i0="107"/>
+      <t108 i0="108"/>
+      <t109 i0="109"/>
+      <t110 i0="110"/>
+      <t111 i0="111"/>
+      <t112 i0="112"/>
+      <t113 i0="113"/>
+      <t114 i0="114"/>
+      <t115 i0="115"/>
+      <t116 i0="116"/>
+      <t117 i0="117"/>
+      <t118 i0="118"/>
+      <t119 i0="119"/>
+      <t120 i0="120"/>
+      <t121 i0="121"/>
+      <t122 i0="122"/>
+      <t123 i0="123"/>
+      <t124 i0="124"/>
+      <t125 i0="125"/>
+      <t126 i0="126"/>
+      <t127 i0="127"/>
+    </harmonizer>
+  </keymap>
+  <keymap Id="17" name="Keymap 17" targetStates0="1" targetStates1="0"
+          targetStates2="0" targetStates3="0" targetStates4="0" targetStates5="0"
+          targetStates6="0" targetStates7="0" targetStates8="0" targetStates9="0"
+          targetStates10="0" targetStates11="0" targetStates12="0" targetStates13="0"
+          targetStates14="0" targetStates15="0" targetStates16="0" targetStates17="0"
+          targetStates18="1" targetStates19="1" targetStates20="1" targetStates21="1"
+          inverted="0" harmonizerPreTranspose="0" harmonizerPostTranspose="0"
+          endKeystrokes="0" ignoreSustain="0" sustainPedalKeys="0" toggleKey="0"
+          asymmetricalWarp="1.0" symmetricalWarp="1.0" scale="1.0" offset="0.0"
+          velocityInvert="0" defSelected="1" osSelected="1">
     <midiInputs/>
     <midiInputIdentifiers/>
     <harmonizer>
@@ -4956,8 +5575,8 @@
   </keymap>
   <piano name="Etude8-1" Id="1">
     <item>
-      <item name="Tuning34" type="3" Id="1" piano="-1" active="1" X="395.5"
-            Y="127.5" W="55.0" H="119.0"/>
+      <item name="Tuning34" type="3" Id="1" piano="-1" active="1" X="278.5"
+            Y="123.5" W="55.0" H="119.0"/>
       <connections>
         <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="193.0"
               Y="267.0" W="132.0" H="62.0"/>
@@ -4984,7 +5603,7 @@
       </connections>
     </item>
     <item>
-      <item name="Keymap11" type="5" Id="1" piano="-1" active="1" X="288.5"
+      <item name="Keymap11" type="5" Id="1" piano="-1" active="1" X="278.5"
             Y="393.5" W="109.0" H="73.0"/>
       <connections>
         <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="193.0"
@@ -4994,7 +5613,7 @@
       </connections>
     </item>
     <item>
-      <item name="Tempo19" type="4" Id="1" piano="-1" active="1" X="556.5"
+      <item name="Tempo19" type="4" Id="1" piano="-1" active="1" X="517.5"
             Y="127.5" W="55.0" H="119.0"/>
       <connections>
         <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="517.0"
@@ -5002,7 +5621,7 @@
       </connections>
     </item>
     <item>
-      <item name="Keymap97" type="5" Id="2" piano="-1" active="1" X="532.5"
+      <item name="Keymap97" type="5" Id="2" piano="-1" active="1" X="517.5"
             Y="393.5" W="109.0" H="73.0"/>
       <connections>
         <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="517.0"
@@ -5010,83 +5629,125 @@
       </connections>
     </item>
     <item>
-      <item name="Keymap99" type="5" Id="5" piano="-1" active="1" X="760.5"
+      <item name="Keymap99" type="5" Id="5" piano="-1" active="1" X="751.5"
             Y="393.5" W="109.0" H="73.0"/>
       <connections>
         <item name="PianoMap30" type="12" Id="1" piano="2" active="1" X="751.0"
-              Y="229.0" W="134.0" H="140.0"/>
+              Y="267.0" W="134.0" H="140.0"/>
       </connections>
     </item>
     <item>
       <item name="PianoMap30" type="12" Id="1" piano="2" active="1" X="751.0"
-            Y="229.0" W="134.0" H="140.0"/>
+            Y="267.0" W="134.0" H="140.0"/>
     </item>
   </piano>
   <piano name="Etude8-2" Id="2">
     <item>
-      <item name="Tuning34" type="3" Id="1" piano="-1" active="1" X="444.5"
-            Y="115.5" W="55.0" H="119.0"/>
+      <item name="Tuning34" type="3" Id="1" piano="-1" active="1" X="348.5"
+            Y="102.5" W="55.0" H="119.0"/>
       <connections>
-        <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="245.0"
-              Y="262.0" W="132.0" H="62.0"/>
-        <item name="Nostalgic14" type="2" Id="1" piano="-1" active="1" X="404.0"
-              Y="262.0" W="132.0" H="62.0"/>
-        <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="548.0"
-              Y="262.0" W="132.0" H="62.0"/>
+        <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="205.0"
+              Y="242.0" W="132.0" H="62.0"/>
+        <item name="Nostalgic14" type="2" Id="1" piano="-1" active="1" X="348.0"
+              Y="242.0" W="132.0" H="62.0"/>
+        <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="492.0"
+              Y="242.0" W="132.0" H="62.0"/>
       </connections>
     </item>
     <item>
-      <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="245.0"
-            Y="262.0" W="132.0" H="62.0"/>
+      <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="205.0"
+            Y="242.0" W="132.0" H="62.0"/>
     </item>
     <item>
-      <item name="Nostalgic14" type="2" Id="1" piano="-1" active="1" X="404.0"
-            Y="262.0" W="132.0" H="62.0"/>
+      <item name="Nostalgic14" type="2" Id="1" piano="-1" active="1" X="348.0"
+            Y="242.0" W="132.0" H="62.0"/>
     </item>
     <item>
-      <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="548.0"
-            Y="262.0" W="132.0" H="62.0"/>
+      <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="492.0"
+            Y="242.0" W="132.0" H="62.0"/>
       <connections>
-        <item name="Nostalgic14" type="2" Id="1" piano="-1" active="1" X="404.0"
-              Y="262.0" W="132.0" H="62.0"/>
+        <item name="Nostalgic14" type="2" Id="1" piano="-1" active="1" X="348.0"
+              Y="242.0" W="132.0" H="62.0"/>
       </connections>
     </item>
     <item>
-      <item name="Tempo19" type="4" Id="1" piano="-1" active="1" X="586.5"
-            Y="106.5" W="55.0" H="119.0"/>
+      <item name="Tempo19" type="4" Id="1" piano="-1" active="1" X="492.5"
+            Y="95.5" W="55.0" H="119.0"/>
       <connections>
-        <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="548.0"
-              Y="262.0" W="132.0" H="62.0"/>
+        <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="492.0"
+              Y="242.0" W="132.0" H="62.0"/>
       </connections>
     </item>
     <item>
-      <item name="Keymap100" type="5" Id="3" piano="-1" active="1" X="564.5"
-            Y="398.5" W="109.0" H="73.0"/>
+      <item name="Keymap100" type="5" Id="3" piano="-1" active="1" X="492.5"
+            Y="412.5" W="109.0" H="73.0"/>
       <connections>
-        <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="548.0"
-              Y="262.0" W="132.0" H="62.0"/>
+        <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="492.0"
+              Y="242.0" W="132.0" H="62.0"/>
       </connections>
     </item>
     <item>
-      <item name="Keymap102" type="5" Id="13" piano="-1" active="1" X="779.5"
-            Y="403.5" W="109.0" H="73.0"/>
-      <connections>
-        <item name="PianoMap31" type="12" Id="2" piano="3" active="1" X="774.0"
-              Y="232.0" W="134.0" H="140.0"/>
-      </connections>
-    </item>
-    <item>
-      <item name="PianoMap31" type="12" Id="2" piano="3" active="1" X="774.0"
-            Y="232.0" W="134.0" H="140.0"/>
-    </item>
-    <item>
-      <item name="" type="5" Id="12" piano="0" active="1" X="325.5" Y="386.5"
+      <item name="" type="5" Id="12" piano="0" active="1" X="205.5" Y="412.5"
             W="109.0" H="73.0"/>
       <connections>
-        <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="245.0"
-              Y="262.0" W="132.0" H="62.0"/>
-        <item name="Nostalgic14" type="2" Id="1" piano="-1" active="1" X="404.0"
-              Y="262.0" W="132.0" H="62.0"/>
+        <item name="Direct11" type="0" Id="1" piano="-1" active="1" X="205.0"
+              Y="242.0" W="132.0" H="62.0"/>
+        <item name="Nostalgic14" type="2" Id="1" piano="-1" active="1" X="348.0"
+              Y="242.0" W="132.0" H="62.0"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="7" Id="2" piano="0" active="1" X="635.5" Y="242.0"
+            W="69.0" H="60.0"/>
+      <connections>
+        <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="492.0"
+              Y="242.0" W="132.0" H="62.0"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="6" piano="0" active="1" X="635.5" Y="412.5"
+            W="109.0" H="73.0"/>
+      <connections>
+        <item name="" type="7" Id="2" piano="0" active="1" X="635.5" Y="242.0"
+              W="69.0" H="60.0"/>
+      </connections>
+    </item>
+    <item>
+      <item name="Comment" type="15" text="Revision from original settings; ignore Etude8-3 and Etude8-4 changes in score now. Only need Etude8-1 and 2"
+            X="645.0" Y="150.0" W="170.0" H="92.0"/>
+    </item>
+    <item>
+      <item name="" type="8" Id="1" piano="0" active="1" X="348.5" Y="327.0"
+            W="69.0" H="60.0"/>
+      <connections>
+        <item name="Nostalgic14" type="2" Id="1" piano="-1" active="1" X="348.0"
+              Y="242.0" W="132.0" H="62.0"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="7" piano="0" active="1" X="348.5" Y="411.5"
+            W="109.0" H="73.0"/>
+      <connections>
+        <item name="" type="8" Id="1" piano="0" active="1" X="348.5" Y="327.0"
+              W="69.0" H="60.0"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="13" Id="1" piano="0" active="1" X="215.0" Y="117.0"
+            W="62.0" H="62.0"/>
+      <connections>
+        <item name="Nostalgic14" type="2" Id="1" piano="-1" active="1" X="348.0"
+              Y="242.0" W="132.0" H="62.0"/>
+        <item name="Synchronic23" type="1" Id="1" piano="-1" active="1" X="492.0"
+              Y="242.0" W="132.0" H="62.0"/>
+      </connections>
+    </item>
+    <item>
+      <item name="" type="5" Id="5" piano="0" active="1" X="98.5" Y="117.5"
+            W="109.0" H="73.0"/>
+      <connections>
+        <item name="" type="13" Id="1" piano="0" active="1" X="215.0" Y="117.0"
+              W="62.0" H="62.0"/>
       </connections>
     </item>
   </piano>
@@ -5149,12 +5810,12 @@
       <item name="Keymap105" type="5" Id="7" piano="-1" active="1" X="763.5"
             Y="420.5" W="109.0" H="73.0"/>
       <connections>
-        <item name="PianoMap32" type="12" Id="3" piano="4" active="1" X="754.0"
+        <item name="PianoMap32" type="12" Id="2" piano="4" active="1" X="754.0"
               Y="230.0" W="134.0" H="140.0"/>
       </connections>
     </item>
     <item>
-      <item name="PianoMap32" type="12" Id="3" piano="4" active="1" X="754.0"
+      <item name="PianoMap32" type="12" Id="2" piano="4" active="1" X="754.0"
             Y="230.0" W="134.0" H="140.0"/>
     </item>
   </piano>

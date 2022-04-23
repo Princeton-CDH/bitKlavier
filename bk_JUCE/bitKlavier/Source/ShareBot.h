@@ -11,7 +11,6 @@
 #pragma once
 
 #include "BKUtilities.h"
-    
 class ShareBot : public juce::Component
 {
 public:

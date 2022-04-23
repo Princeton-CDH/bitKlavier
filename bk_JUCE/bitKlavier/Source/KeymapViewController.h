@@ -82,6 +82,8 @@ private:
     ToggleButton midiEditToggle;
     ToggleButton harMidiEditToggle;
     ToggleButton harArrayMidiEditToggle;
+    ToggleButton toggleKeysToggle;
+    ToggleButton sostenutoToggle;
     
     BKLabel     keymapL;
     BKTextEditor  keymapTF;
@@ -157,6 +159,7 @@ private:
     PopupMenu getHarmonizerMenu(Array<int> keyHarmonization);
     
     OwnedArray<ToggleButton> targetControlTBs;
+    GroupComponent resonanceTBGroup;
     GroupComponent directTBGroup;
     GroupComponent synchronicTBGroup;
     GroupComponent nostalgicTBGroup;

@@ -1140,13 +1140,13 @@ ValueTree Piano::getState(void)
 		else if (type == PreparationTypeBlendronic)
 		{
 			itemVT.addChild(item->getState(), -1, 0);
-			//look for direct, nostalgic, and synchronic targets
+			//look for direct, nostalgic, and synchronic and resonance targets
 			for (auto target : item->getConnections())
 			{
 				BKPreparationType targetType = target->getType();
 
 				if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) ||
-                    targetType == PreparationTypeBlendronicMod)
+                    targetType == PreparationTypeBlendronicMod || targetType == PreparationTypeResonance)
 				{
 					connectionsVT.addChild(target->getState(), -1, 0);
 				}

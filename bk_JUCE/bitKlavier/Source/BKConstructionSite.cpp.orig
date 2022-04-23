@@ -94,7 +94,10 @@ void BKConstructionSite::redraw(void)
     
     removeAllChildren();
     
+<<<<<<< HEAD
+=======
     //graph->deselectAll();
+>>>>>>> feature/comment-box-paste
     graph->reconstruct();
     getParentComponent()->grabKeyboardFocus();
     
@@ -866,7 +869,7 @@ void BKConstructionSite::mouseHold(Component* frame, bool onItem)
             itemSource = itemToSelect;
             
             if (itemSource != nullptr)
-            {
+            {`
                 if ((itemSource->getType() != PreparationTypeComment) &&
                     (itemSource->getType() != PreparationTypePianoMap))
                 {
