@@ -445,6 +445,8 @@ void ResonanceProcessor::prepareToPlay(double sr)
 void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
 {
     // should not be any thread safety issues with this...
+    // NOTE: this might be necessary anymore, since it is only needed for determining whether to
+    //          ring a note that might already be sounding, which is currently commented out
     resonance->prep->updateCurrentTime(numSamples);
     
     /*
