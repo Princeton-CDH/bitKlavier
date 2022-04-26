@@ -827,7 +827,7 @@ bool PreparationMap::keyReleasedByProcess(P proc, int noteNumber, float velocity
                     {
                         float v = jmax(releaseTargetVelocities.getUnchecked(i), km->applyVelocityCurve(velocity));
                         releaseTargetVelocities.setUnchecked(i, v);
-                        DBG("setting releaseTargetVelocities " + String(i) + " " + String(v));
+                        // DBG("setting releaseTargetVelocities " + String(i) + " " + String(v));
                     }
                 }
             }

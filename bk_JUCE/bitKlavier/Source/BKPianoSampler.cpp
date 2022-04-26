@@ -1204,7 +1204,8 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             if(sourceSamplePosition >= playingSound->soundLength)
             {
                 //clearCurrentNote();
-                stopNote(0.0f, true);
+                //stopNote(0.0f, true);
+                stopNote(0.0f, false);
             }
         }
         else if (playDirection == Reverse)

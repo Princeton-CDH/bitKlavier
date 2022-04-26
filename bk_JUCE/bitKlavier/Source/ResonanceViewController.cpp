@@ -131,10 +131,7 @@ offsetsKeyboard(false, true)
     offsetsKeyboard.setOctaveForMiddleC(5);
     offsetsKeyboard.disableAllKeys();
     addAndMakeVisible(&offsetsKeyboard);
-    
-    
 
-    
     closestKeyLabel.setText("Resonant Keys: ", dontSendNotification);
     closestKeyLabel.setJustificationType(Justification::right);
     closestKeyLabel.setTooltip("keys that should resonate when struck; partials");
@@ -508,8 +505,7 @@ ResonancePreparationEditor::ResonancePreparationEditor(BKAudioProcessor& p, BKIt
     offsetsKeyboard.addMyListener(this);
     gainsKeyboard.addMyListener(this);
     
-
-    startTimer(10);
+    startTimer(500);
 }
 
 void ResonancePreparationEditor::update()

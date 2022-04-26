@@ -262,7 +262,7 @@ public:
         rActiveHeldKeys.reset();
         for (auto n : rActiveHeldKeys.value)
         {
-            addSympStrings(n, 0);
+            addSympStrings(n, 0, false);
         }
         
         updatePartialStructure();
