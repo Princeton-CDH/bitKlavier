@@ -485,6 +485,8 @@ public:
     Moddable<PitchClass> intervalFundamental; //one stored, including the mode
     
 private:
+    CriticalSection lock;
+    
     int numNotes; // number of enabled notes
     bool usingFundamentalForIntervalSprings; //only false when in "none" mode
     bool useLowestNoteForFundamental;

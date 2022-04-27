@@ -211,6 +211,8 @@ intervalFundamentalActive(PitchClass(12))
 
 void SpringTuning::setTetherTuning(Array<float> tuning)
 {
+    const ScopedLock sl (lock);
+    
     tetherTuning = tuning;
     
     for (int i = 0; i < 128; i++)
@@ -245,6 +247,8 @@ for the two particles associated with each spring.
 */
 void SpringTuning::simulate()
 {
+    const ScopedLock sl (lock);
+    
     // update particle positions based on current velocities
     for (auto particle : particleArray)
     {
@@ -272,6 +276,8 @@ void SpringTuning::simulate()
 
 void SpringTuning::setSpringWeight(int which, double weight)
 {
+    const ScopedLock sl (lock);
+    
     which += 1;
     
     springWeights[which] = weight;
@@ -296,7 +302,8 @@ double SpringTuning::getSpringWeight(int which)
 
 void SpringTuning::setTetherWeight(int which, double weight)
 {
-
+    const ScopedLock sl (lock);
+    
     // DBG("SpringTuning::setTetherWeight " + String(which) + " " + String(weight));
     Spring* spring = tetherSpringArray[which];
     
@@ -331,16 +338,19 @@ void SpringTuning::setTetherWeight(int which, double weight)
 
 double SpringTuning::getTetherWeight(int which)
 {
+    const ScopedLock sl (lock);
     return tetherSpringArray[which]->getStrength();
 }
 
 String SpringTuning::getTetherSpringName(int which)
 {
+    const ScopedLock sl (lock);
     return tetherSpringArray[which]->getName();
 }
 
 String SpringTuning::getSpringName(int which)
 {
+    const ScopedLock sl (lock);
     for (auto spring : springArray)
     {
         if (spring->getIntervalIndex() == which) return spring->getName();
@@ -355,15 +365,19 @@ void SpringTuning::toggleSpring()
 
 void SpringTuning::addParticle(int note)
 {
+    const ScopedLock sl (lock);
     particleArray[note]->setEnabled(true);
     tetherParticleArray[note]->setEnabled(true);
 }
+
 void SpringTuning::removeParticle(int note)
 {
+    const ScopedLock sl (lock);
     Particle* p = particleArray[note];
     p->setEnabled(false);
     tetherParticleArray[note]->setEnabled(false);
 }
+
 void SpringTuning::addNote(int note)
 {
     addParticle(note);
@@ -433,6 +447,8 @@ void SpringTuning::removeAllNotes(void)
 
 void SpringTuning::toggleNote(int noteIndex)
 {
+    const ScopedLock sl (lock);
+    
 	int convertedIndex = noteIndex; // just in case a midi value is passed accidentally
 
 	if (particleArray[convertedIndex]->getEnabled())
@@ -447,6 +463,8 @@ void SpringTuning::toggleNote(int noteIndex)
 
 void SpringTuning::findFundamental()
 {
+    const ScopedLock sl (lock);
+    
     //create sorted array of notes
     Array<int> enabledNotes;
     for (int i=127; i>=0; i--)
@@ -525,6 +543,8 @@ void SpringTuning::findFundamental()
 
 void SpringTuning::addSpring(Spring::Ptr spring)
 {
+    const ScopedLock sl (lock);
+    
     if (enabledSpringArray.contains(spring)) return;
     int interval = spring->getIntervalIndex();
     
@@ -538,6 +558,8 @@ void SpringTuning::addSpring(Spring::Ptr spring)
 
 void SpringTuning::addSpringsByNote(int note)
 {
+    const ScopedLock sl (lock);
+    
     for (auto p : particleArray)
     {
         int otherNote = p->getNote();
@@ -639,6 +661,8 @@ void SpringTuning::retuneIndividualSpring(Spring::Ptr spring)
 
 void SpringTuning::retuneAllActiveSprings(void)
 {
+    const ScopedLock sl (lock);
+    
     for (auto spring : enabledSpringArray)
     {
         retuneIndividualSpring(spring);
@@ -647,6 +671,8 @@ void SpringTuning::retuneAllActiveSprings(void)
 
 void SpringTuning::removeSpringsByNote(int note)
 {
+    const ScopedLock sl (lock);
+    
 	Particle* p = particleArray[note];
     
     int size = enabledSpringArray.size();
@@ -686,6 +712,8 @@ void SpringTuning::print()
 
 void SpringTuning::printParticles()
 {
+    const ScopedLock sl (lock);
+    
 	for (int i = 0; i < 128; i++)
 	{
 		if(particleArray[i]->getEnabled()) particleArray[i]->print();
@@ -694,6 +722,8 @@ void SpringTuning::printParticles()
 
 int SpringTuning::getLowestActiveParticle()
 {
+    const ScopedLock sl (lock);
+    
     int lowest = 0;
     
     while(lowest < particleArray.size())
@@ -708,6 +738,8 @@ int SpringTuning::getLowestActiveParticle()
 
 int SpringTuning::getHighestActiveParticle()
 {
+    const ScopedLock sl (lock);
+    
     int highest = particleArray.size() - 1;
     
     while(highest >= 0)
@@ -722,6 +754,8 @@ int SpringTuning::getHighestActiveParticle()
 
 void SpringTuning::printActiveParticles()
 {
+    const ScopedLock sl (lock);
+    
 	for (int i = 0; i < 128; i++)
 	{
 		if (particleArray[i]->getEnabled()) particleArray[i]->print();
@@ -730,6 +764,8 @@ void SpringTuning::printActiveParticles()
 
 void SpringTuning::printActiveSprings()
 {
+    const ScopedLock sl (lock);
+    
 	for (auto spring : springArray)
 	{
 		if (spring->getEnabled()) spring->print();
@@ -738,5 +774,6 @@ void SpringTuning::printActiveSprings()
 
 bool SpringTuning::checkEnabledParticle(int index)
 {
+    const ScopedLock sl (lock);
 	return particleArray[index]->getEnabled();
 }
