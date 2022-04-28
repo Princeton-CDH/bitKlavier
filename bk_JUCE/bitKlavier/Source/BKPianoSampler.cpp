@@ -283,8 +283,21 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         midi += (tuning->getTuning()->prep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
                  tuning->getTuning()->prep->getFundamentalOffset());
         
+        if(tuning->getTuning()->prep->isMTSMaster)
+        {
+            tuning->getTuning()->prep->MTSSetNoteTuning(sound->midiRootNote, mtof(midi + sound->transpose));
+        }
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
+                            sound->sourceSampleRate *
+                            generalSettings->getTuningRatio() /
+                            getSampleRate();
+    } else if (tuning->getTuning()->prep->hasMTSMaster())
+    {
+        float mn = (currentMidiNoteNumber  + sound->transpose);
+        double _mn = ftom(tuning->getTuning()->prep->getMTSFreq(mn));
+       
+        pitchRatio =   powf(2.0f, (_mn - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
                             sound->sourceSampleRate *
                             generalSettings->getTuningRatio() /
                             getSampleRate();

@@ -969,6 +969,7 @@ typedef enum TuningAdaptiveSystemType
     AdaptiveNormal,
     AdaptiveAnchored,
     AdaptiveSpring,
+    AdaptiveMTSClient,
     AdaptiveNil
     
 } TuningAdaptiveSystemType;
@@ -977,7 +978,8 @@ static const std::vector<std::string> cTuningAdaptiveTypes = {
     "Nonadaptive",
     "Adaptive Tuning",
     "Adaptive Anchored",
-    "Spring Tuning"
+    "Spring Tuning",
+    "MTSClient"
 };
 
 #pragma mark - Blendronic
