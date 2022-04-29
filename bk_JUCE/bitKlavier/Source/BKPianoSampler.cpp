@@ -285,7 +285,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         
         if(tuning->getTuning()->prep->isMTSMaster)
         {
-            tuning->getTuning()->prep->MTSSetNoteTuning(sound->midiRootNote, mtof(midi + sound->transpose));
+            tuning->getTuning()->prep->MTSSetNoteTuning( mtof(midi + sound->transpose), sound->midiRootNote);
         }
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *

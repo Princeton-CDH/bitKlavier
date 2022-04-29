@@ -785,7 +785,10 @@ public:
             double freq =  mtof(midiNoteNumber + lastNoteOffset);
             frequencies_in_hz[midiNoteNumber] = freq;
         }
-        
+        for (int i = 0; i < 128; i++)
+        {
+            DBG(String(i) + ": " + String(frequencies_in_hz[i]));
+        }
         MTS_SetNoteTunings(frequencies_in_hz);
     }
     
