@@ -814,7 +814,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         }
         
         // Check for adsr keyOffs
-        if ((playType != Normal) && ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE)))
+        if ((playType != Normal && playType != NormalFixedStart) && ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE)))
         {
             if (lengthTracker >= playLength)
             {
@@ -948,7 +948,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
                 break;
             }
             
-            if (playType != Normal && playType != NormalFixedStart) 
+            if (playType != Normal && playType != NormalFixedStart)
             {
                 if ((adsr.getState() != BKADSR::RELEASE) && (lengthTracker >= playLength))
                 {
