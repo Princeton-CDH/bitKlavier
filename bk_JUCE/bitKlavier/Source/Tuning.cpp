@@ -131,7 +131,7 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
         return lastNoteOffset;
     }
     
-    if (tuning->prep->hasMTSMaster() || tuning->prep->client != nullptr)
+    if (tuning->prep->hasMTSMaster() && tuning->prep->client != nullptr)
     {
         float freq = MTS_NoteToFrequency(tuning->prep->client, (char)midiNoteNumber, -1);
         float newmidi = ftom(freq);
@@ -144,8 +144,6 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
         //DBG("Midi: " + String(midiNoteNumber) + " Ratio: " + String(MTS_RetuningAsRatio(tuning->prep->client, (char)midiNoteNumber, -1)));
         //DBG(String(MTS_RetuningInSemitones(tuning->prep->client, (char)midiNoteNumber, -1)));
         //currentTuning = tuning->tuningLibrary.getUnchecked(tuning->prep->getScale());
-        if (tuning->prep->isMTSMaster)
-            MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
         return lastNoteOffset;
     }
     

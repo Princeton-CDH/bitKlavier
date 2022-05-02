@@ -1668,6 +1668,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     if (box == &selectCB)
     {
         setCurrentId(Id);
+        
     }
     else if (box == &scaleCB)
     {
@@ -1856,7 +1857,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     
     processor.gallery->setGalleryDirty(true);
-    
+    tuning->fillMTSMasterTunings();
     processor.updateState->editsMade = true;
     update();
 }
@@ -2011,7 +2012,6 @@ void TuningPreparationEditor::update(void)
         }
 
         displayTab(currentTab);
-        tuning->fillMTSMasterTunings();
     }
     
     //repaint();
@@ -2028,6 +2028,7 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
     {
         //DBG("updating absolute tuning vals");
         prep->setAbsoluteOffsetCents(values);
+        tuning->fillMTSMasterTunings();
     }
     else if(name == customKeyboard.getName())
     {
@@ -2043,6 +2044,7 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         prep->setCustomScaleCents(values);
         
         prep->getSpringTuning()->setIntervalTuning(values);
+        tuning->fillMTSMasterTunings();
         
     }
     processor.gallery->setGalleryDirty(true);
@@ -2086,23 +2088,28 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     if (slider == offsetSlider.get()) {
         DBG("got offset " + String(val));
         prep->setFundamentalOffset(val * 0.01);
+        tuning->fillMTSMasterTunings();
     }
     else if(slider == A1ClusterThresh.get()) {
         DBG("got A1ClusterThresh " + String(val));
         prep->setAdaptiveClusterThresh(val);
+        tuning->fillMTSMasterTunings();
     }
     else if(slider == A1ClusterMax.get()) {
         DBG("got A1ClusterMax " + String(val));
         prep->setAdaptiveHistory(val);
+        tuning->fillMTSMasterTunings();
     }
     else if(slider == nToneSemitoneWidthSlider.get()) {
         DBG("got nToneSemiToneSliderWidth " + String(val));
         prep->setNToneSemitoneWidth(val);
+        tuning->fillMTSMasterTunings();
     }
     else if (slider == rateSlider.get())
     {
         DBG("got rateSlider " + String(val));
         prep->getSpringTuning()->setRate(val);
+
     }
     else if (slider == dragSlider.get())
     {
@@ -2150,6 +2157,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         prep->setAdaptiveInversional(A1Inversional.getToggleState());
         
         processor.gallery->setGalleryDirty(true);
+        tuning->fillMTSMasterTunings();
     }
     else if (b == &showSpringsButton)
     {
@@ -2234,7 +2242,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
             sclTextEditor->setText(tuning->currentScalaString);
             update();
         }
-        
+        tuning->fillMTSMasterTunings();
        
     } else if (b == importKBMButton.get())
     {
@@ -2258,6 +2266,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
             kbmTextEditor->setText(tuning->currentKBMString);
             update();
         }
+        tuning->fillMTSMasterTunings();
     } else if (b == resetButton.get())
     {
         sclTextEditor->setText(Tunings::evenTemperament12NoteScale().rawText);
@@ -2269,6 +2278,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         tuning->loadScalaScale(tuning->currentScale);
         tuning->prep->setScale(EqualTemperament);
         update();
+        tuning->fillMTSMasterTunings();
     } else if (b == applyButton.get())
     {
         try {
@@ -2280,6 +2290,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         tuning->loadScalaScale(tuning->currentScale);
         tuning->currentScalaString = sclTextEditor->getText();
         update();
+        tuning->fillMTSMasterTunings();
     } else if (b == applyKBMButton.get())
     {
         try {
@@ -2292,6 +2303,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         tuning->currentKBMString = kbmTextEditor->getText();
         
         update();
+        tuning->fillMTSMasterTunings();
     }
     else if (b == MTSMasterConnectionButton.get())
     {

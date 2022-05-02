@@ -283,8 +283,9 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         midi += (tuning->getTuning()->prep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
                  tuning->getTuning()->prep->getFundamentalOffset());
         
-        if(tuning->getTuning()->prep->isMTSMaster)
+        if (tuning->getTuning()->prep->isMTSMaster)
         {
+            //DBG(String(mtof(midi + sound->transpose)));
             tuning->getTuning()->prep->MTSSetNoteTuning( mtof(midi + sound->transpose), sound->midiRootNote);
         }
         
