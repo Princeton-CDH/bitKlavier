@@ -948,7 +948,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
                 break;
             }
             
-            if (playType != Normal)
+            if (playType != Normal && playType != NormalFixedStart) 
             {
                 if ((adsr.getState() != BKADSR::RELEASE) && (lengthTracker >= playLength))
                 {
