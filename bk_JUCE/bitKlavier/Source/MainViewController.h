@@ -18,7 +18,7 @@
 
 #include "HeaderViewController.h"
 
-#include "PreparationPanel.h"
+
 
 class BKAudioProcessorEditor;
 class BKConstructionSite;
@@ -153,7 +153,7 @@ private:
     std::unique_ptr<BKLevelMeterComponent> levelMeterComponentR;
     BKLevelMeterComponent testmeterComponent;
     
-    std::unique_ptr<PreparationPanel> preparationPanel;
+
     
     std::unique_ptr<BKKeymapKeyboardComponent> keyboard;
     BKKeymapKeyboardState keyboardState;
@@ -188,7 +188,7 @@ private:
     void fillSampleCB();
     void fillInstrumentCB();
     
-    void drawPreparationPanel(void);
+
 
     int timerCallbackCount;
     

@@ -121,6 +121,7 @@ void Piano::deconfigure(void)
         modificationMap[key]->clearResets();
         modificationMap[key]->pianoMaps.clear();
     }
+    pianoConnections.clear();
 }
 
 #define DEFAULT_ID -1
@@ -831,6 +832,8 @@ void Piano::configurePianoMap(BKItem::Ptr map)
             modificationMap[key]->pianoMaps.add(pianoMap);
         }
     }
+    DBG("PIANOCONNECTIONS" + String(pianoMap.pianoTarget));
+    pianoConnections.add(pianoMap);
 }
 
 void Piano::configureModification(BKItem::Ptr map)

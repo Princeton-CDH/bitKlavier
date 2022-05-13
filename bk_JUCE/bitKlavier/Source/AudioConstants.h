@@ -523,6 +523,7 @@ typedef enum BKPreparationDisplay {
     DisplayAbout,
     DisplayComment,
     DisplayModdable,
+    DisplayGalleryStateView,
     DisplayNil,
 } BKPreparationDisplay;
 
@@ -547,6 +548,8 @@ static const std::vector<std::string> cDisplayNames = {
     "General",
     "About",
     "Comment",
+    "DisplayModdable",
+    "State View"
 };
 
 static const std::vector<std::string> cPianoName = {

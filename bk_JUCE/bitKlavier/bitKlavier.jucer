@@ -416,6 +416,10 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <FILE id="tSHvbi" name="GalleryStateViewController.cpp" compile="1"
+              resource="0" file="Source/GalleryStateViewController.cpp"/>
+        <FILE id="Wb2BTy" name="GalleryStateViewController.h" compile="0" resource="0"
+              file="Source/GalleryStateViewController.h"/>
         <FILE id="ybYtMd" name="ShareBot.h" compile="0" resource="0" file="Source/ShareBot.h"/>
         <FILE id="rnxxIN" name="ShareBot.mm" compile="1" resource="0" file="Source/ShareBot.mm"/>
         <FILE id="QpXmnO" name="BKViewController.cpp" compile="1" resource="0"
@@ -492,6 +496,15 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
+        <FILE id="UfoFDc" name="PianoObject.cpp" compile="1" resource="0" file="Source/PianoObject.cpp"/>
+        <FILE id="YtkZJs" name="PianoObject.h" compile="0" resource="0" file="Source/PianoObject.h"/>
+        <FILE id="Ai0mbx" name="BKPianoConnection.cpp" compile="1" resource="0"
+              file="Source/BKPianoConnection.cpp"/>
+        <FILE id="WyAJVd" name="BKPianoConnection.h" compile="0" resource="0"
+              file="Source/BKPianoConnection.h"/>
+        <FILE id="Mx6vy3" name="BKStateGraph.cpp" compile="1" resource="0"
+              file="Source/BKStateGraph.cpp"/>
+        <FILE id="f8RUJC" name="BKStateGraph.h" compile="0" resource="0" file="Source/BKStateGraph.h"/>
         <FILE id="udvcxb" name="VelocityCurveGraph.h" compile="0" resource="0"
               file="Source/VelocityCurveGraph.h"/>
         <FILE id="ZZYk56" name="EqualizerGraph.h" compile="0" resource="0"
@@ -507,12 +520,6 @@
         <GROUP id="{312ACC06-200C-E792-F54F-FC9ABB97A738}" name="BKSlider">
           <FILE id="mqhm7K" name="BKSlider.cpp" compile="1" resource="0" file="Source/BKSlider.cpp"/>
           <FILE id="NyvzY3" name="BKSlider.h" compile="0" resource="0" file="Source/BKSlider.h"/>
-        </GROUP>
-        <GROUP id="{B171AA30-1033-F14F-9FB7-D270B9262DF0}" name="PreparationPanel">
-          <FILE id="dkyu8M" name="PreparationPanel.cpp" compile="1" resource="0"
-                file="Source/PreparationPanel.cpp"/>
-          <FILE id="N0jhhR" name="PreparationPanel.h" compile="0" resource="0"
-                file="Source/PreparationPanel.h"/>
         </GROUP>
         <GROUP id="{610E162A-E853-BA5C-1FC8-181124B56AFB}" name="BKLevelMeter">
           <FILE id="dgg7xV" name="BKLevelMeter.cpp" compile="1" resource="0"
@@ -549,7 +556,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" customXcodeResourceFolders="" customPList=""
-               smallIcon="smHM8h" bigIcon="iHGLGD" vstLegacyFolder="../../../modules/VST_SDK/VST2_SDK">
+               smallIcon="smHM8h" bigIcon="iHGLGD" vstLegacyFolder="../../../../../VST2_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        cppLibType="" enablePluginBinaryCopyStep="1"/>

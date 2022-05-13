@@ -863,6 +863,7 @@ private:
 	Blendronic::PtrArr				    blendronic;
     Resonance::PtrArr                   resonance;
     
+    
     SynchronicModification::PtrArr      modSynchronic;
     DirectModification::PtrArr          modDirect;
     NostalgicModification::PtrArr       modNostalgic;

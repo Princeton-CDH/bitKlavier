@@ -115,8 +115,7 @@ equalizerButton("Equalizer")
 
     addAndMakeVisible(octaveSlider);
     
-    preparationPanel = std::make_unique<PreparationPanel>(processor);
-    addAndMakeVisible(*preparationPanel);
+
     
     addAndMakeVisible(header);
     

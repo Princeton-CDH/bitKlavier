@@ -94,11 +94,11 @@ public:
     Array<Reset> blendronicModResets;
     Array<Reset> resonanceModResets;
     
-    struct PianoMap
+    typedef struct PianoMap
     {
         int pianoTarget;
         Keymap::PtrArr keymaps;
-    };
+    }PianoMap;
     Array<PianoMap>             pianoMaps;
     
 private:

@@ -227,6 +227,8 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addItem(OPENOLD_ID, "Open (legacy)");
 #endif
     
+    galleryMenu.addItem(GALLERY_STATE_VIEW_ID, "State View");
+    
     galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     
@@ -552,6 +554,10 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     else if (result == OPEN_ID) // Load
     {
         processor.loadGalleryDialog();
+    }
+    else if (result == GALLERY_STATE_VIEW_ID)
+    {
+        processor.updateState->setCurrentDisplay(DisplayGalleryStateView);
     }
     else if (result == SETTINGS_ID) // open General settings
     {
@@ -920,7 +926,7 @@ void HeaderViewController::fillGalleryCB(void)
 
 void HeaderViewController::update(void)
 {
-    if (processor.updateState->currentDisplay == DisplayNil)
+    if (processor.updateState->currentDisplay == DisplayNil || processor.updateState->currentDisplay == DisplayGalleryStateView)
     {
         editB.setEnabled(true);
         pianoB.setEnabled(true);

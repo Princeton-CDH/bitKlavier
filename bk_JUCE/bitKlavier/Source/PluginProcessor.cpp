@@ -2014,7 +2014,7 @@ void BKAudioProcessor::initializeGallery()
                 bprocessor->setActive(true);
         }
     }
-
+    
     gallery->prepareToPlay(getSampleRate()); 
     
     updateUI();

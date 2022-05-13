@@ -371,6 +371,7 @@ public:
     
     
     void reset(void);
+    Array<Modifications::PianoMap> pianoConnections;
 private:
     BKAudioProcessor& processor;
     

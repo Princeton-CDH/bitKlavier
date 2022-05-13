@@ -25,6 +25,7 @@
 #include "TuningViewController.h"
 #include "TempoViewController.h"
 #include "ResonanceViewController.h"
+#include "GalleryStateViewController.h"
 
 #include "KeymapViewController.h"
 #include "GeneralViewController.h"
@@ -54,6 +55,7 @@ public:
     dvcm(p, theGraph),
     bvcm(p, theGraph),
     rvcm(p, theGraph),
+    gsvc(p, theGraph),
     processor(p)
     {
         
@@ -129,6 +131,8 @@ public:
         bvcm.setBounds(area);
         
         rvcm.setBounds(area);
+        
+        gsvc.setBounds(area);
         
 #if JUCE_IOS
         cvc.setBounds(5, 5, area.getWidth()-10, area.getHeight() * 0.5f);
@@ -264,7 +268,7 @@ public:
         removeChildComponent(&nvcm);
         removeChildComponent(&bvcm);
         removeChildComponent(&rvcm);
-        
+        removeChildComponent(&gsvc);
         if (type == DisplayKeymap)
         {
             addAndMakeVisible(&kvc);
@@ -375,7 +379,12 @@ public:
             addAndMakeVisible(&bvcm);
             bvcm.fillSelectCB(-1,-1);
             bvcm.update();
+        } else if (type == DisplayGalleryStateView)
+        {
+            addAndMakeVisible(&gsvc);
+            gsvc.update();
         }
+        
         
         //hideOrShow.toFront(false);
         
@@ -391,7 +400,7 @@ public:
     CommentViewController cvc;
     ModdableViewController movc;
     KeymapViewController kvc;
-    
+        
     TuningPreparationEditor tvc;
     TempoPreparationEditor ovc;
     SynchronicPreparationEditor svc;
@@ -408,6 +417,8 @@ public:
     BlendronicModificationEditor bvcm;
     ResonanceModificationEditor rvcm;
     
+    GalleryStateViewController gsvc;
+
 private:
     
     BKAudioProcessor& processor;
