@@ -2167,9 +2167,15 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         processor.gallery->setGalleryDirty(true);
     } else if (b == importButton.get())
     {
+#if JUCE_IOS
+        FileChooser myChooser ("Load tuning from .scl file...",
+                               getLastFile(),
+                               "*");
+#else
         FileChooser myChooser ("Load tuning from .scl file...",
                                getLastFile(),
                                "*.scl");
+#endif
         
         if (myChooser.browseForFileToOpen())
         {
@@ -2196,9 +2202,15 @@ void TuningPreparationEditor::buttonClicked (Button* b)
             return;
         }
         
+#if JUCE_IOS
         FileChooser myChooser ("Load keyboard mapping from kbm file...",
                                getLastFile(),
-                               "*.kbm");
+                               "*");
+#else
+       FileChooser myChooser ("Load keyboard mapping from kbm file...",
+                              getLastFile(),
+                              "*.kbm");
+#endif
         
         if (myChooser.browseForFileToOpen())
         {
