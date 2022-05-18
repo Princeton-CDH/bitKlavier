@@ -776,7 +776,7 @@ bool MainViewController::keyPressed (const KeyPress& e, Component*)
             {
                 Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
                 keymap->setMidiEdit(false);
-                processor.updateState->setCurrentDisplay(DisplayNil);
+                processor.updateState->setCurrentDisplay(processor.updateState->previousDisplay);
             }
             else processor.updateState->setCurrentDisplay(DisplayNil);
         }
@@ -1436,7 +1436,7 @@ void MainViewController::timerCallback()
         
         processor.updateState->previousDisplay = overtop.getCurrentDisplay();
         BKPreparationDisplay prevDisplay = processor.updateState->previousDisplay;
-        
+        DBG("Prev Display"  + String(prevDisplay));
         overtop.setCurrentDisplay(processor.updateState->currentDisplay);
         
         header.update();

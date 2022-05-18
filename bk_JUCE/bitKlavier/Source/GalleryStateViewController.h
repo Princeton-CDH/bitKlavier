@@ -38,11 +38,21 @@ public:
     void addPianoConnection(PianoObject* start, PianoObject* end)
     {
         DBG("\"" + start->piano->getName() + " \" connects to \" " + end->piano->getName() + "\"");
-        BKPianoConnection* connection = new BKPianoConnection(start->piano, end->piano);
+        DBG("\"" + String(start->piano->getId()) + " \" connects to \" " + String(end->piano->getId()) + "\"");
+        BKPianoConnection* connection = new BKPianoConnection(processor, start->piano, end->piano);
+        Point<float> startline(start->getX() + start->getWidth()/2, start->getY() + start->getHeight()/2);
+        Point<float> endline(end->getX() + end->getWidth()/2, end->getY() + end->getHeight()/2);
         
-        connection->setline(Point<float>(start->getX() + start->getWidth()/2, start->getY() + start->getHeight()/2), Point<float>(end->getX() + end->getWidth()/2, end->getY() + end->getHeight()/2));
+    
+        Line<int> tmpline = Line<int>(startline.toInt(), endline.toInt());
+        int length = tmpline.getLength();
+        DBG(endline.getDistanceFrom(endline));
+        connection->setBounds(startline.getX(), startline.getY(),length, 20);
+        connection->setline(startline,endline);
         addAndMakeVisible(connection);
         connection->toBack();
+        AffineTransform tt = AffineTransform::rotation(3 * Utilities::pi/2 + tmpline.getAngle(), startline.getX(), startline.getY());
+        connection->setTransform(tt);
         pianoConnections.emplace_back(connection);
     }
 //    void findPianoConnections()
@@ -56,6 +66,9 @@ public:
 //            
 //        }
 //    }
+    
+    void buttonClicked(Button *b) override;
+ 
     
 private:
     std::vector<std::unique_ptr<BKPianoConnection>> pianoConnections;

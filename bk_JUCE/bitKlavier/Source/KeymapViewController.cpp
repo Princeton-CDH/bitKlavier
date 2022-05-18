@@ -1436,7 +1436,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
         keymap->setMidiEdit(false);
         keymap->setHarMidiEdit(false);
         keymap->setHarArrayMidiEdit(false);
-        processor.updateState->setCurrentDisplay(DisplayNil);
+        processor.updateState->setCurrentDisplay(processor.updateState->previousDisplay);
         
     }
     else if(b->getName() == keyboardValsTextFieldOpen.getName())

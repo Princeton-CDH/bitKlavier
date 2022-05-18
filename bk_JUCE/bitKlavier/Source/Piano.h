@@ -370,6 +370,7 @@ public:
     void configureModification(BKItem::Ptr map);
     
     
+    
     void reset(void);
     Array<Modifications::PianoMap> pianoConnections;
 private:

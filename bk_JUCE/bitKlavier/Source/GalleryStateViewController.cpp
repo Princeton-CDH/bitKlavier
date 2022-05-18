@@ -28,12 +28,11 @@ void GalleryStateViewController::paint(Graphics& g)
     Rectangle<int> xbutton = leftColumn.removeFromTop(gComponentComboBoxHeight);
     hideOrShow.setBounds(xbutton.removeFromLeft(gComponentComboBoxHeight));
     
-    Point<float> center = getBounds().getCentre().toFloat();
    
-    for (int i = 0; i < pianos.size(); i++)
-    {
-        DBG("pianoPos" + String(pianos[i]->getX()) + "," + String(pianos[i]->getY()));
-    }
+//    for (int i = 0; i < pianos.size(); i++)
+//    {
+//        DBG("pianoPos" + String(pianos[i]->getX()) + "," + String(pianos[i]->getY()));
+//    }
     for (int i = 0; i < pianoConnections.size(); i++)
     {
 //        pianoConnections[i]->setBounds(pianoConnections[i]->line.getStartX(),
@@ -42,7 +41,7 @@ void GalleryStateViewController::paint(Graphics& g)
 //                                      pianoConnections[i]->line.getStartY() + pianoConnections[i]->line.getEndY());
         //pianoConnections[i]->setBounds(0,0, 300, 300);
         
-       pianoConnections[i]->setBounds(0,0,2000,2000);
+       //pianoConnections[i]->setBounds(0,0,2000,2000);
     }
 
     
@@ -61,10 +60,7 @@ void GalleryStateViewController::getAllPianoMaps()
     
 //    for (auto item : theGraph->getItems())
 //    {
-//        if (item->getType() == PreparationTypePianoMap)
-//        {
-//            int target = item->getPianoTarget();
-//        }
+//        
 //    }
     
     for (auto piano : processor.gallery->getPianos())
@@ -85,7 +81,7 @@ void GalleryStateViewController::getAllPianoMaps()
     for (int i = 0; i < pianos.size(); i++)
     {
 
-        Point<float> newPoint = Point<float>(300 * cos(2 * Utilities::pi * i/pianos.size()) + center.getX(), 300 * sin(2 * Utilities::pi * i/pianos.size()) + center.getY());
+        Point<float> newPoint = Point<float>(300 * cos(2 * Utilities::pi * i/pianos.size()) + center.getX(), 300 * sin(2 * Utilities::pi * i/pianos.size()) + center.getY() + 100);
         pianos[i]->setTopLeftPosition(newPoint.toInt());
 
     }
@@ -99,7 +95,7 @@ void GalleryStateViewController::getAllPianoMaps()
                 int target = item->getPianoTarget();
                 Piano::Ptr pianoTarget = processor.gallery->getPiano(target);
                 addPianoConnection(pianos[i].get(), pianos[getObjectFromPiano(pianoTarget)].get());
-                
+                //return;
             }
         }
     }
@@ -116,6 +112,7 @@ int GalleryStateViewController::getObjectFromPiano(Piano::Ptr pianoTarget)
             return i;
         }
     }
+    return -1;
 }
 
 void GalleryStateViewController::update()
@@ -127,3 +124,14 @@ void GalleryStateViewController::update()
    
     
 }
+
+void GalleryStateViewController::buttonClicked(Button *b)
+{
+    if (b == &hideOrShow)
+    {
+        processor.updateState->setCurrentDisplay(DisplayNil);
+        setSubWindowInFront(false);
+    }
+}
+
+

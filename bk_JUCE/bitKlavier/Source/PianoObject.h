@@ -37,6 +37,9 @@ public:
         placement = RectanglePlacement::centred;
 
         setSize(image.getWidth() *0.25, image.getHeight() *0.25);
+        addAndMakeVisible(name);
+        name.setText(String(piano->getId()) +  " " + piano->getName(), dontSendNotification);
+       // name.setText()
     }
     ~PianoObject(){};
     
@@ -58,5 +61,5 @@ public:
         return piano == rhs.piano;
     }
 private:
-    
+    BKLabel name;
 };
