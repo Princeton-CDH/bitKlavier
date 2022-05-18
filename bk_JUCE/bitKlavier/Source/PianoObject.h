@@ -14,6 +14,7 @@
 #include "Piano.h"
 #include "BKComponent.h"
 #include "PluginProcessor.h"
+#include "BKPianoConnection.h"
 class PianoObject : public BKDraggableComponent, ReferenceCountedObject {
 public:
 //    typedef ReferenceCountedArray<PianoObject, CriticalSection> PtrArr;

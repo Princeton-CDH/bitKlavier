@@ -28,7 +28,7 @@ public:
     
     BKItem(BKPreparationType type, int Id, BKAudioProcessor& p);
     
-    uint64 time, synchronicNotePlayTime;
+    uint64 synchronicNotePlayTime;
     void timerCallback(void) override;
     
     ~BKItem(void);
@@ -42,7 +42,6 @@ public:
     
     void resized(void) override;
     
-    void itemIsBeingDragged(const MouseEvent&) override;
     
     void keyPressedWhileSelected(const KeyPress&) override;
 

@@ -428,12 +428,6 @@ void BKItem::bkComboBoxDidChange    (ComboBox* cb)
     }
 }
 
-void BKItem::itemIsBeingDragged(const MouseEvent& e)
-{
-    wasJustDragged = true;
-}
-
-
 
 void BKItem::mouseDoubleClick(const MouseEvent& e)
 {
@@ -463,29 +457,6 @@ void BKItem::mouseDown(const MouseEvent& e)
     
     if (e.mods.isLeftButtonDown())
     {
-        if ((current == this) && !wasJustDragged)
-        {
-            if (time < PHATNESS)
-            {
-                if (type == PreparationTypePianoMap)
-                {
-                    menu.showPopup();
-                }
-                else
-                {
-                    processor.updateState->setCurrentDisplay(type, Id);
-                }
-            }
-            else
-            {
-                time = 0;
-            }
-        }
-        else
-        {
-            wasJustDragged = false;
-            time = 0;
-        }
         if (isDraggable)
         {
             prepareDrag(e);
@@ -582,7 +553,6 @@ void BKItem::setState(XmlElement* e)
 
 void BKItem::timerCallback()
 {
-    time++;
     if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
     {
         if (type == PreparationTypeKeymap ||

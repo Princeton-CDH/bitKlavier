@@ -48,12 +48,26 @@ public:
         int length = tmpline.getLength();
         DBG(endline.getDistanceFrom(endline));
         connection->setBounds(startline.getX(), startline.getY(),length, 20);
-        connection->setline(startline,endline);
+        connection->drawline();
         addAndMakeVisible(connection);
         connection->toBack();
         AffineTransform tt = AffineTransform::rotation(3 * Utilities::pi/2 + tmpline.getAngle(), startline.getX(), startline.getY());
         connection->setTransform(tt);
         pianoConnections.emplace_back(connection);
+    }
+    
+    void mouseMove (const MouseEvent& eo) override
+    {
+        MouseEvent e = eo.getEventRelativeTo(this);
+        
+        
+        
+        
+            e.getEventRelativeTo(this).x;
+            e.getEventRelativeTo(this).y;
+            
+            repaint();
+        
     }
 //    void findPianoConnections()
 //    {
@@ -69,8 +83,14 @@ public:
     
     void buttonClicked(Button *b) override;
  
+    void setCurrentPiano(PianoObject* piano) {currentPiano = piano;}
+    
+    void setCurrentConnection(BKPianoConnection* connection) {currentConnection = connection;}
     
 private:
+    
+    BKPianoConnection* currentConnection;
+    PianoObject* currentPiano;
     std::vector<std::unique_ptr<BKPianoConnection>> pianoConnections;
     std::vector<std::unique_ptr<PianoObject>> pianos;
 };

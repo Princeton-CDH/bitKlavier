@@ -14,24 +14,26 @@
 #include "BKLabel.h"
 #include "SpringTuningUtilities.h"
 #include "Piano.h"
-class BKPianoConnection : public BKComponent, ReferenceCountedObject
+#include "PluginProcessor.h"
+class BKPianoConnection : public BKDraggableComponent
 {
 public :
     
 //    typedef ReferenceCountedArray<BKPianoConnection, CriticalSection> PtrArr;
 //    typedef ReferenceCountedObjectPtr<BKPianoConnection> Ptr;
-    BKPianoConnection(BKAudioProcessor &p, Piano::Ptr start, Piano::Ptr end) : processor(p), start(start), end(end), isSelected(false)
+    BKPianoConnection(BKAudioProcessor &p, Piano::Ptr start, Piano::Ptr end) : processor(p), start(start), end(end), isSelected(false), BKDraggableComponent(true, false, true, 50, 50, 50, 50)
     {
         
-        
-        //addAndMakeVisible(t);
-        //t.setText("AYYE");
-        t.setColour(juce::Colours::white);
-        addAndMakeVisible(l);
-        l.setText("KEYS", dontSendNotification);
     };
     
-    void setline(Point<float> start, Point<float> end)
+   
+    
+    
+    
+    
+    
+    
+    void drawline()
     {
         Line<float> line = Line<float>(Point<float>(getLocalBounds().getX(), getLocalBounds().getY() + getLocalBounds().getHeight()/2),
                                        Point<float>(getLocalBounds().getX() + getLocalBounds().getWidth(), getLocalBounds().getY()+ getLocalBounds().getHeight()/2) );
@@ -56,7 +58,7 @@ public :
             g.setColour(Colours::antiquewhite);
            
         }
-       
+        //drawline();
         //g.drawRect(getLocalBounds(), 2);
         g.strokePath(p, PathStrokeType(0.5f));
         //Rectangle<float> r = p.getBounds();
@@ -78,9 +80,31 @@ public :
         
     }
     
+    void tryNewConnection(const MouseEvent &e)
+    {
+        
+    }
+    
+    void setSelected(bool select)
+    {
+        isSelected = select;
+    }
+    
+    bool getSelected(){return isSelected;}
+    
     void mouseDown(const MouseEvent &e) override
     {
-        //isSelected = true;
+//        GalleryStateViewController* gsv = ((GalleryStateViewController*)getParentComponent());
+//        BKPianoConnection.getCurrentPianoConnection
+//        if (e.mods.isCommandDown())
+//        {
+//            isSelected = true;
+//        }
+    }
+    
+    void mouseUp(const MouseEvent &e) override
+    {
+        
     }
 
     void mouseDoubleClick(const MouseEvent &e) override
