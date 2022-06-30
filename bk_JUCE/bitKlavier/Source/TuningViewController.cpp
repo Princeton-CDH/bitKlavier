@@ -494,7 +494,10 @@ void TuningViewController::invisible(void)
     resetButton->setVisible(false);
     applyButton->setVisible(false);
     applyKBMButton->setVisible(false);
+    
     //MTSConnectionLabel->setVisible(false);
+    MTSMasterConnectionLabel->setVisible(false);
+    
 }
 
 void TuningViewController::displayShared(void)
@@ -1250,6 +1253,8 @@ void TuningViewController::updateComponentVisibility(void)
 
     if (currentTab == 0)
     {
+        if (prep->isMTSMaster == true) MTSMasterConnectionLabel->setVisible(true);
+        
         if (adaptiveType == AdaptiveNone || AdaptiveSpring)
         {
             A1IntervalScaleCB.setVisible(false);
