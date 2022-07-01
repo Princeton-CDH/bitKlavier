@@ -18,7 +18,8 @@
 
 #include "SpringTuning.h"
 #include "Tunings.h"
-//#include "MTS-ESP/Client/libMTSClient.h"
+#include "MTS-ESP/Client/libMTSClient.h"
+#include "MTS-ESP/Master/libMTSMaster.h"
 
 class TuningModification;
 
@@ -371,6 +372,7 @@ public:
         }
 
         tCustom.set(tCustomCents);
+        
     }
     inline void setAbsoluteOffsets(Array<float> abs)
     {
@@ -603,7 +605,32 @@ public:
     
     Moddable<TuningAdaptiveSystemType> adaptiveType;
    //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~MTS Tuning~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~//
+    MTSClient *client;
+    bool isMTSMaster = false;
     
+    void MTSSetNoteTuning(double freq_in_hz, char midinote)
+    {
+        MTS_SetNoteTuning(freq_in_hz, midinote);
+    }
+    
+    bool hasMTSMaster()
+    {
+        return MTS_HasMaster(client);
+    }
+    
+    void deregisterMTS()
+    {
+        if(MTS_HasMaster(client)) MTS_DeregisterClient(client);
+        if(!MTS_CanRegisterMaster()) MTS_DeregisterMaster();
+    }
+    
+    double getMTSFreq(char mn)
+    {
+        double freq = MTS_NoteToFrequency(client, mn, -1);
+        //double sm = MTS_RetuningInSemitones(client, mn, -1);
+        //double ratio = MTS_RetuningAsRatio(client, mn, -1);
+        return freq;
+    }
 private:
     String name;
     
@@ -722,6 +749,49 @@ public:
 
     }
     
+    void fillMTSMasterTunings()
+    {
+        double frequencies_in_hz[128];
+        for (int midiNoteNumber = 0; midiNoteNumber < 128; midiNoteNumber++)
+        {
+            float lastNoteOffset;
+            //do nTone tuning if nToneSemitoneWidth != 100cents
+            if(prep->getNToneSemitoneWidth() != 100)
+            {
+                lastNoteOffset = .01 * (midiNoteNumber - prep->getNToneRoot()) * (prep->getNToneSemitoneWidth() - 100);
+                int midiNoteNumberTemp = round(midiNoteNumber + lastNoteOffset);
+                
+                Array<float> currentTuning;
+                if(prep->getScale() == CustomTuning) currentTuning = prep->getCustomScale();
+                else currentTuning = tuningLibrary.getUnchecked(prep->getScale());
+                
+                lastNoteOffset += (currentTuning[(midiNoteNumberTemp - prep->getFundamental()) % currentTuning.size()]
+                                  + prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                                  + prep->getFundamentalOffset());
+                
+                frequencies_in_hz[midiNoteNumber] = mtof(midiNoteNumber + lastNoteOffset);
+                continue;
+            }
+            
+            //else do regular tunings
+            Array<float> currentTuning;
+            if(prep->getScale() == CustomTuning)
+                currentTuning = prep->getCustomScale();
+            else
+                currentTuning = tuningLibrary.getUnchecked(prep->getScale());
+
+            lastNoteOffset = (currentTuning[(midiNoteNumber - prep->getFundamental()) % currentTuning.size()]
+                              + prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                              + prep->getFundamentalOffset());
+            double freq =  mtof(midiNoteNumber + lastNoteOffset);
+            frequencies_in_hz[midiNoteNumber] = freq;
+        }
+        for (int i = 0; i < 128; i++)
+        {
+            DBG(String(i) + ": " + String(frequencies_in_hz[i]));
+        }
+        MTS_SetNoteTunings(frequencies_in_hz);
+    }
     
     ValueTree getState(bool active = false);
     void setState(XmlElement*);

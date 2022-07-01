@@ -74,8 +74,7 @@ absoluteKeyboard(false, false)
     adaptiveSystemsCB.addItem("Adaptive 1", 2);
     adaptiveSystemsCB.addItem("Adaptive Anchored 1", 3);
     adaptiveSystemsCB.addItem("Spring", 4);
-    //adaptiveSystemsCB.addItem("MTSClient", 5);
-    
+    adaptiveSystemsCB.addItem("MTSClient", 5);
     attachKeymap.setText("Attach a Keymap for Adaptive or Spiral/Springs!", dontSendNotification);
     addAndMakeVisible(attachKeymap);
 
@@ -327,6 +326,22 @@ absoluteKeyboard(false, false)
     applyKBMButton->setButtonText (TRANS("Apply"));
     //applyButton->addListener (this);
     
+    MTSConnectionLabel.reset(new BKLabel());
+    addAndMakeVisible(MTSConnectionLabel.get());
+    MTSConnectionLabel->setLookAndFeel(&buttonsAndMenusLAF);
+    MTSConnectionLabel->setVisible(false);
+    
+    MTSMasterConnectionLabel.reset(new BKLabel());
+    addAndMakeVisible(MTSMasterConnectionLabel.get());
+    MTSMasterConnectionLabel->setLookAndFeel(&buttonsAndMenusLAF);
+    MTSMasterConnectionLabel->setVisible(false);
+    
+    MTSMasterConnectionButton.reset(new BKTextButton());
+    addAndMakeVisible(MTSMasterConnectionButton.get());
+    MTSMasterConnectionButton->setLookAndFeel(&buttonsAndMenusLAF);
+    MTSMasterConnectionButton->setVisible(true);
+    MTSMasterConnectionButton->setButtonText("Register MTSMaster");
+    
     
     sclTextEditor->addListener(this);
     kbmTextEditor->addListener(this);
@@ -426,6 +441,7 @@ void TuningViewController::bkTextFieldDidChange(TextEditor& textEditor)
 
 void TuningViewController::invisible(void)
 {
+
     currentFundamental.setVisible(false);
     absoluteKeyboard.setVisible(false);
     customKeyboard.setVisible(false);
@@ -468,8 +484,8 @@ void TuningViewController::invisible(void)
     tetherWeightSecondaryGlobalSlider->setVisible(false);
     
     
-    attachKeymap.setVisible(false); ///unsure why i need to do this but it otherwise doesn't go away on tab 2????
-    //scalaEditor.setVisible(false);
+    attachKeymap.setVisible(false);
+ 
     sclTextEditor->setVisible(false);
     kbmTextEditor->setVisible(false);
     
@@ -478,6 +494,7 @@ void TuningViewController::invisible(void)
     resetButton->setVisible(false);
     applyButton->setVisible(false);
     applyKBMButton->setVisible(false);
+    //MTSConnectionLabel->setVisible(false);
 }
 
 void TuningViewController::displayShared(void)
@@ -500,7 +517,11 @@ void TuningViewController::displayShared(void)
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
-    
+    MTSMasterConnectionLabel->setBounds(actionButton.getX(), actionButton.getBottom() + gYSpacing, actionButton.getWidth(), actionButton.getHeight());
+    MTSMasterConnectionButton->setBounds(actionButton.getRight() + gXSpacing,
+                                         actionButton.getY(),
+                                         actionButton.getWidth(),
+                                         actionButton.getHeight());
     alternateMod.setBounds(actionButton.getRight()+gXSpacing,
                            actionButton.getY(),
                            selectCB.getWidth() * 0.75,
@@ -516,6 +537,7 @@ void TuningViewController::displayShared(void)
     //adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(showSpringsButton.getWidth()));
     adaptiveSystemsCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 3.));
     modeSlice.removeFromLeft(gXSpacing);
+    MTSConnectionLabel->setBounds(adaptiveSystemsCB.getX(), adaptiveSystemsCB.getBottom() + gYSpacing, adaptiveSystemsCB.getWidth(), adaptiveSystemsCB.getHeight());
     //scaleCB.setBounds(modeSlice.removeFromLeft(modeSlice.getWidth() / 2.));
     scaleCB.setBounds(modeSlice.removeFromLeft(2. * modeSlice.getWidth() / 3. - 2.*gXSpacing));
     
@@ -1490,7 +1512,7 @@ TuningViewController(p, theGraph)
     nToneRootCB.addListener(this);
     nToneRootOctaveCB.addListener(this);
     nToneSemitoneWidthSlider->addMyListener(this);
-    
+    MTSMasterConnectionButton->addListener(this);
     update();
 }
 
@@ -1540,6 +1562,7 @@ void TuningPreparationEditor::setCurrentId(int Id)
 
 void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparationEditor* vc)
 {
+    
     if (vc == nullptr)
     {
         PopupMenu::dismissAllActiveMenus();
@@ -1623,10 +1646,6 @@ void TuningPreparationEditor::actionButtonCallback(int action, TuningPreparation
             processor.exportPreparation(PreparationTypeTuning, Id, name);
         }
     }
-    else if (action == 8)
-    {
-        /////ADD MTS SERVER CODE
-    }
     else if (action >= 100)
     {
         int which = action - 100;
@@ -1649,6 +1668,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     if (box == &selectCB)
     {
         setCurrentId(Id);
+        
     }
     else if (box == &scaleCB)
     {
@@ -1675,10 +1695,17 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     }
     else if (box == &adaptiveSystemsCB)
     {
+        highlightAllComponents();
+        enableAllComponents();
         TuningAdaptiveSystemType type = (TuningAdaptiveSystemType) index;
-        
+        MTSConnectionLabel->setVisible(false);
         prep->setAdaptiveType(type);
         
+        if (prep->client != nullptr)
+        {
+            MTS_DeregisterClient(prep->client);
+            prep->client = nullptr;
+        }
         // SpringTuning selected
         if (type == AdaptiveSpring)
         {
@@ -1708,6 +1735,26 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         }
         
         
+        if (type == AdaptiveMTSClient)
+        {
+            greyOutAllComponents();
+            disableAllComponents();
+            MTSConnectionLabel->setVisible(true);
+            MTSConnectionLabel->setText("Connecting to Server", dontSendNotification);
+            
+            prep->client = MTS_RegisterClient();
+            if (MTS_HasMaster(prep->client))
+            {
+                MTSConnectionLabel->setText("Connected", dontSendNotification);
+                greyOutAllComponents();
+                
+                
+            } else
+            {
+                MTSConnectionLabel->setText("Did not connect", dontSendNotification);
+            }
+        }
+        
         if (type == AdaptiveNone) // Non-adaptive
         {
             //redoing this so we index by tuning name, rather than index, so we don't lock the menu structure down
@@ -1719,6 +1766,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         customKeyboard.setValues(tuning->getCurrentScaleCents());
         
         updateComponentVisibility();
+    
     }
     else if (box == &fundamentalCB)
     {
@@ -1727,6 +1775,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         customKeyboard.setFundamental(index);
         
         //updateComponentVisibility();
+    
         
     }
     else if (box == &A1IntervalScaleCB)
@@ -1810,8 +1859,9 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
     
     
     processor.gallery->setGalleryDirty(true);
-    
+    tuning->fillMTSMasterTunings();
     processor.updateState->editsMade = true;
+    update();
 }
 
 
@@ -1964,7 +2014,6 @@ void TuningPreparationEditor::update(void)
         }
 
         displayTab(currentTab);
-
     }
     
     //repaint();
@@ -1981,6 +2030,7 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
     {
         //DBG("updating absolute tuning vals");
         prep->setAbsoluteOffsetCents(values);
+        tuning->fillMTSMasterTunings();
     }
     else if(name == customKeyboard.getName())
     {
@@ -1996,11 +2046,13 @@ void TuningPreparationEditor::keyboardSliderChanged(String name, Array<float> va
         prep->setCustomScaleCents(values);
         
         prep->getSpringTuning()->setIntervalTuning(values);
+        tuning->fillMTSMasterTunings();
         
     }
     processor.gallery->setGalleryDirty(true);
     
     processor.updateState->editsMade = true;
+    update();
 }
 
 void TuningPreparationEditor::sliderValueChanged (Slider* slider)
@@ -2038,23 +2090,28 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     if (slider == offsetSlider.get()) {
         DBG("got offset " + String(val));
         prep->setFundamentalOffset(val * 0.01);
+        tuning->fillMTSMasterTunings();
     }
     else if(slider == A1ClusterThresh.get()) {
         DBG("got A1ClusterThresh " + String(val));
         prep->setAdaptiveClusterThresh(val);
+        tuning->fillMTSMasterTunings();
     }
     else if(slider == A1ClusterMax.get()) {
         DBG("got A1ClusterMax " + String(val));
         prep->setAdaptiveHistory(val);
+        tuning->fillMTSMasterTunings();
     }
     else if(slider == nToneSemitoneWidthSlider.get()) {
         DBG("got nToneSemiToneSliderWidth " + String(val));
         prep->setNToneSemitoneWidth(val);
+        tuning->fillMTSMasterTunings();
     }
     else if (slider == rateSlider.get())
     {
         DBG("got rateSlider " + String(val));
         prep->getSpringTuning()->setRate(val);
+
     }
     else if (slider == dragSlider.get())
     {
@@ -2087,6 +2144,7 @@ void TuningPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     processor.gallery->setGalleryDirty(true);
     
     processor.updateState->editsMade = true;
+    update();
 }
 
 void TuningPreparationEditor::buttonClicked (Button* b)
@@ -2101,6 +2159,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         prep->setAdaptiveInversional(A1Inversional.getToggleState());
         
         processor.gallery->setGalleryDirty(true);
+        tuning->fillMTSMasterTunings();
     }
     else if (b == &showSpringsButton)
     {
@@ -2191,7 +2250,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
             sclTextEditor->setText(tuning->currentScalaString);
             update();
         }
-        
+        tuning->fillMTSMasterTunings();
        
     } else if (b == importKBMButton.get())
     {
@@ -2221,6 +2280,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
             kbmTextEditor->setText(tuning->currentKBMString);
             update();
         }
+        tuning->fillMTSMasterTunings();
     } else if (b == resetButton.get())
     {
         sclTextEditor->setText(Tunings::evenTemperament12NoteScale().rawText);
@@ -2232,6 +2292,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         tuning->loadScalaScale(tuning->currentScale);
         tuning->prep->setScale(EqualTemperament);
         update();
+        tuning->fillMTSMasterTunings();
     } else if (b == applyButton.get())
     {
         try {
@@ -2243,6 +2304,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         tuning->loadScalaScale(tuning->currentScale);
         tuning->currentScalaString = sclTextEditor->getText();
         update();
+        tuning->fillMTSMasterTunings();
     } else if (b == applyKBMButton.get())
     {
         try {
@@ -2255,6 +2317,38 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         tuning->currentKBMString = kbmTextEditor->getText();
         
         update();
+        tuning->fillMTSMasterTunings();
+    }
+    else if (b == MTSMasterConnectionButton.get())
+    {
+        if (MTSMasterConnectionButton->getButtonText() == "Disconnect MTS")
+        {
+            MTS_DeregisterMaster();
+            MTSMasterConnectionButton->setButtonText("Register MTSMaster");
+            MTSMasterConnectionLabel->setVisible(false);
+        }
+        else if (MTS_CanRegisterMaster())
+        {
+            MTS_RegisterMaster();
+            MTSMasterConnectionLabel->setText("MTS MASTER Mode", dontSendNotification);
+            MTSMasterConnectionLabel->setVisible(true);
+            MTSMasterConnectionButton->setButtonText("Disconnect MTS");
+            tuning->fillMTSMasterTunings();
+            prep->isMTSMaster = true;
+        } else if (MTS_HasIPC())
+        {
+            MTS_Reinitialize();
+            MTS_RegisterMaster();
+            MTSMasterConnectionLabel->setText("MTS MASTER Mode", dontSendNotification);
+            MTSMasterConnectionLabel->setVisible(true);
+            MTSMasterConnectionButton->setButtonText("Disconnect MTS");
+            tuning->fillMTSMasterTunings();
+            prep->isMTSMaster = true;
+        }
+        else
+        {
+            AlertWindow("MTS Master", "Error: Can't register Master because one already exists", MessageBoxIconType::WarningIcon);
+        }
     }
     else {
         for (int i=0; i<springModeButtons.size(); i++)
@@ -2278,6 +2372,244 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         }
     } 
     
+}
+
+void TuningPreparationEditor::highlightAllComponents()
+{
+    scaleCB.setAlpha(1);
+    fundamentalCB.setAlpha(1);
+    A1IntervalScaleCB.setAlpha(1);
+    A1Inversional.setAlpha(1);
+    A1AnchorScaleCB.setAlpha(1);
+    A1FundamentalCB.setAlpha(1);
+    A1ClusterThresh->setDim(1);
+    A1ClusterMax->setDim(1);
+    //absoluteKeyboard.setAlpha(1);
+    absoluteKeyboard.setDim(1);
+    //customKeyboard.setAlpha(1);
+    customKeyboard.setDim(1);
+    offsetSlider->setDim(1);
+    A1IntervalScaleLabel.setAlpha(1);
+    A1AnchorScaleLabel.setAlpha(1);
+    
+    nToneRootCB.setAlpha(1);
+    nToneRootOctaveCB.setAlpha(1);
+    nToneSemitoneWidthSlider->setDim(1);
+    
+    springScaleFundamentalCB.setAlpha(1);
+    
+    lastNote.setAlpha(1);
+    lastInterval.setAlpha(1);
+    
+    
+    for (int i = 0; i < 12; i++)
+    {
+        springSliders[i]->setAlpha(1);
+        springModeButtons[i]->setVisible(false);
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        tetherSliders[i]->setAlpha(1);
+    }
+    
+    adaptiveSystemsCB.setAlpha(1);
+    
+    rateSlider->setDim(1);
+    
+    dragSlider->setDim(1);
+    
+    intervalStiffnessSlider->setDim(1);
+    
+    tetherStiffnessSlider->setDim(1);
+    
+    springScaleCB.setAlpha(1);
+    
+    fundamentalSetsTether.setAlpha(1);
+    
+    tetherWeightGlobalSlider->setDim(1);
+    
+    tetherWeightSecondaryGlobalSlider->setDim(1);
+    sclTextEditor->setAlpha(1);
+    kbmTextEditor->setAlpha(1);
+    applyKBMButton->setAlpha(1);
+    applyButton->setAlpha(1);
+    resetButton->setAlpha(1);
+    importButton->setAlpha(1);
+    importKBMButton->setAlpha(1);
+}
+
+void TuningPreparationEditor::greyOutAllComponents()
+{
+    scaleCB.setAlpha(gModAlpha);
+    fundamentalCB.setAlpha(gModAlpha);
+    A1IntervalScaleCB.setAlpha(gModAlpha);
+    A1Inversional.setAlpha(gModAlpha);
+    A1AnchorScaleCB.setAlpha(gModAlpha);
+    A1FundamentalCB.setAlpha(gModAlpha);
+    A1ClusterThresh->setDim(gModAlpha);
+    A1ClusterMax->setDim(gModAlpha);
+    //absoluteKeyboard.setAlpha(gModAlpha);
+    absoluteKeyboard.setDim(gModAlpha);
+    //customKeyboard.setAlpha(gModAlpha);
+    customKeyboard.setDim(gModAlpha);
+    offsetSlider->setDim(gModAlpha);
+    A1IntervalScaleLabel.setAlpha(gModAlpha);
+    A1AnchorScaleLabel.setAlpha(gModAlpha);
+    
+    nToneRootCB.setAlpha(gModAlpha);
+    nToneRootOctaveCB.setAlpha(gModAlpha);
+    nToneSemitoneWidthSlider->setDim(gModAlpha);
+    
+    springScaleFundamentalCB.setAlpha(gModAlpha);
+    
+    lastNote.setAlpha(gModAlpha);
+    lastInterval.setAlpha(gModAlpha);
+    
+    
+    for (int i = 0; i < 12; i++)
+    {
+        springSliders[i]->setAlpha(gModAlpha);
+        springModeButtons[i]->setVisible(false);
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        tetherSliders[i]->setAlpha(gModAlpha);
+    }
+    
+    //adaptiveSystemsCB.setAlpha(gModAlpha);
+    
+    rateSlider->setDim(gModAlpha);
+    
+    dragSlider->setDim(gModAlpha);
+    
+    intervalStiffnessSlider->setDim(gModAlpha);
+    
+    tetherStiffnessSlider->setDim(gModAlpha);
+    
+    springScaleCB.setAlpha(gModAlpha);
+    
+    fundamentalSetsTether.setAlpha(gModAlpha);
+    
+    tetherWeightGlobalSlider->setDim(gModAlpha);
+    
+    tetherWeightSecondaryGlobalSlider->setDim(gModAlpha);
+    sclTextEditor->setAlpha(gModAlpha);
+    kbmTextEditor->setAlpha(gModAlpha);
+    applyKBMButton->setAlpha(gModAlpha);
+    applyButton->setAlpha(gModAlpha);
+    resetButton->setAlpha(gModAlpha);
+    importButton->setAlpha(gModAlpha);
+    importKBMButton->setAlpha(gModAlpha);
+}
+
+void TuningPreparationEditor::disableAllComponents()
+{
+    
+    for (int i = 0; i < 12; i++)
+    {
+        springSliders[i]->setEnabled(false);
+        springModeButtons[i]->setEnabled(false);
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        tetherSliders[i]->setEnabled(false);
+    }
+    
+    importButton->setEnabled(false);
+    applyButton->setEnabled(false);
+    applyKBMButton->setEnabled(false);
+    importKBMButton->setEnabled(false);
+    resetButton->setEnabled(false);
+    
+    sclTextEditor->setEnabled(false);
+    kbmTextEditor->setEnabled(false);
+    
+    //adaptiveSystemsCB.setEnabled(false);
+    rateSlider->setEnabled(false);
+    dragSlider->setEnabled(false);
+    intervalStiffnessSlider->setEnabled(false);
+    tetherStiffnessSlider->setEnabled(false);
+    tetherWeightGlobalSlider->setEnabled(false);
+    tetherWeightSecondaryGlobalSlider->setEnabled(false);
+    fundamentalSetsTether.setEnabled(false);
+    springScaleCB.setEnabled(false);
+    springScaleFundamentalCB.setEnabled(false);
+    showSpringsButton.setEnabled(false);
+    selectCB.setEnabled(false);
+    selectCB.setEnabled(false);
+    scaleCB.setEnabled(false);
+    fundamentalCB.setEnabled(false);
+    A1IntervalScaleCB.setEnabled(false);
+    A1Inversional.setEnabled(false);
+    A1AnchorScaleCB.setEnabled(false);
+    A1FundamentalCB.setEnabled(false);
+    A1ClusterThresh->setEnabled(false);
+    A1ClusterMax->setEnabled(false);
+    A1reset.setEnabled(false);
+    
+    absoluteKeyboard.setEnabled(false);
+    customKeyboard.setEnabled(false);
+    offsetSlider->setEnabled(false);
+    nToneRootCB.setEnabled(false);
+    nToneRootOctaveCB.setEnabled(false);
+    nToneSemitoneWidthSlider->setEnabled(false);
+}
+
+void TuningPreparationEditor::enableAllComponents()
+{
+    
+    for (int i = 0; i < 12; i++)
+    {
+        springSliders[i]->setEnabled(true);
+        springModeButtons[i]->setEnabled(true);
+    }
+    
+    for (int i = 0; i < 128; i++)
+    {
+        tetherSliders[i]->setEnabled(true);
+    }
+    
+    importButton->setEnabled(true);
+    applyButton->setEnabled(true);
+    applyKBMButton->setEnabled(true);
+    importKBMButton->setEnabled(true);
+    resetButton->setEnabled(true);
+    sclTextEditor->setEnabled(true);
+    kbmTextEditor->setEnabled(true);
+    
+    
+    //adaptiveSystemsCB.setEnabled(true);
+    rateSlider->setEnabled(true);
+    dragSlider->setEnabled(true);
+    intervalStiffnessSlider->setEnabled(true);
+    tetherStiffnessSlider->setEnabled(true);
+    tetherWeightGlobalSlider->setEnabled(true);
+    tetherWeightSecondaryGlobalSlider->setEnabled(true);
+    fundamentalSetsTether.setEnabled(true);
+    springScaleCB.setEnabled(true);
+    springScaleFundamentalCB.setEnabled(true);
+    showSpringsButton.setEnabled(true);
+    selectCB.setEnabled(true);
+    selectCB.setEnabled(true);
+    scaleCB.setEnabled(true);
+    fundamentalCB.setEnabled(true);
+    A1IntervalScaleCB.setEnabled(true);
+    A1Inversional.setEnabled(true);
+    A1AnchorScaleCB.setEnabled(true);
+    A1FundamentalCB.setEnabled(true);
+    A1ClusterThresh->setEnabled(true);
+    A1ClusterMax->setEnabled(true);
+    A1reset.setEnabled(true);
+    
+    absoluteKeyboard.setEnabled(true);
+    customKeyboard.setEnabled(true);
+    offsetSlider->setEnabled(true);
+    nToneRootCB.setEnabled(true);
+    nToneRootOctaveCB.setEnabled(true);
+    nToneSemitoneWidthSlider->setEnabled(true);
 }
 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ TuningModificationEditor ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ //
@@ -2412,6 +2744,13 @@ void TuningModificationEditor::greyOutAllComponents()
     tetherWeightGlobalSlider->setDim(gModAlpha);
     
     tetherWeightSecondaryGlobalSlider->setDim(gModAlpha);
+    sclTextEditor->setAlpha(gModAlpha);
+    kbmTextEditor->setAlpha(gModAlpha);
+    applyKBMButton->setAlpha(gModAlpha);
+    applyButton->setAlpha(gModAlpha);
+    resetButton->setAlpha(gModAlpha);
+    importButton->setAlpha(gModAlpha);
+    importKBMButton->setAlpha(gModAlpha);
 }
 
 void TuningModificationEditor::highlightModedComponents()

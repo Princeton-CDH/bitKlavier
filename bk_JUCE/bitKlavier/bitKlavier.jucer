@@ -18,6 +18,16 @@
               pluginVST3Category="Instrument" defines="JUCE_USE_CUSTOM_PLUGIN_STANDALONE_APP=1&#10;JUCE_MODAL_LOOPS_PERMITTED=1&#10;"
               jucerFormatVersion="1">
   <MAINGROUP id="s4R02g" name="bitKlavier">
+    <GROUP id="{3BA402F2-7D5B-8FF7-32B1-283D0C026508}" name="Client">
+      <FILE id="Ff97ol" name="libMTSClient.cpp" compile="1" resource="0"
+            file="Source/MTS-ESP/Client/libMTSClient.cpp"/>
+      <FILE id="gOor8D" name="libMTSClient.h" compile="0" resource="0" file="Source/MTS-ESP/Client/libMTSClient.h"/>
+    </GROUP>
+    <GROUP id="{5AAAD7F9-DCCA-0576-31F2-1C753B3137E5}" name="Master">
+      <FILE id="W31QNN" name="libMTSMaster.cpp" compile="1" resource="0"
+            file="Source/MTS-ESP/Master/libMTSMaster.cpp"/>
+      <FILE id="vGCLFC" name="libMTSMaster.h" compile="0" resource="0" file="Source/MTS-ESP/Master/libMTSMaster.h"/>
+    </GROUP>
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
         <GROUP id="{9410D6F7-7039-77FB-F92B-3580A2A099FE}" name="galleries">
@@ -549,7 +559,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" customXcodeResourceFolders="" customPList=""
-               smallIcon="smHM8h" bigIcon="iHGLGD" vstLegacyFolder="../../../modules/VST_SDK/VST2_SDK">
+               smallIcon="smHM8h" bigIcon="iHGLGD" vstLegacyFolder="../../../../../VST2_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        cppLibType="" enablePluginBinaryCopyStep="1"/>

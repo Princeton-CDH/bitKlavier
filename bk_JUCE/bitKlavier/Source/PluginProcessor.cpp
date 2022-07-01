@@ -433,11 +433,13 @@ BKAudioProcessor::~BKAudioProcessor()
     
     loader.removeAllJobs(true, 1000);
     
+    
 //    touchThread.stopThread(1000);
     
     for (auto item : clipboard)
         item->clearConnections();
     clipboard.clear();
+    gallery->deregisterMTS();
 }
 
 void BKAudioProcessor::deleteGallery(void)

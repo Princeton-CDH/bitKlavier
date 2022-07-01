@@ -169,7 +169,13 @@ public:
     inline const int getNumTuningMod(void) const noexcept {return modTuning.size();}
 	inline const int getNumBlendronicMod(void) const noexcept { return modBlendronic.size(); }
     
-    
+    inline void deregisterMTS()
+    {
+        for (auto t: tuning)
+        {
+            t->prep->deregisterMTS();
+        }
+    }
     
     inline const void setKeymap(int Id, Array<int> keys) const noexcept
     {
