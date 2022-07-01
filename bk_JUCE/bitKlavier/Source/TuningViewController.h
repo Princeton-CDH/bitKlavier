@@ -144,7 +144,6 @@ protected:
     
     //MTS
     std::unique_ptr<BKLabel> MTSConnectionLabel;
-    std::unique_ptr<BKLabel> MTSMasterConnectionLabel;
     std::unique_ptr<BKTextButton> MTSMasterConnectionButton;
     std::unique_ptr<FileChooser> chooser;
     String lastFile;

@@ -331,11 +331,6 @@ absoluteKeyboard(false, false)
     MTSConnectionLabel->setLookAndFeel(&buttonsAndMenusLAF);
     MTSConnectionLabel->setVisible(false);
     
-    MTSMasterConnectionLabel.reset(new BKLabel());
-    addAndMakeVisible(MTSMasterConnectionLabel.get());
-    MTSMasterConnectionLabel->setLookAndFeel(&buttonsAndMenusLAF);
-    MTSMasterConnectionLabel->setVisible(false);
-    
     MTSMasterConnectionButton.reset(new BKTextButton());
     addAndMakeVisible(MTSMasterConnectionButton.get());
     MTSMasterConnectionButton->setLookAndFeel(&buttonsAndMenusLAF);
@@ -517,7 +512,7 @@ void TuningViewController::displayShared(void)
                            selectCB.getY(),
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
-    MTSMasterConnectionLabel->setBounds(actionButton.getX(), actionButton.getBottom() + gYSpacing, actionButton.getWidth(), actionButton.getHeight());
+
     MTSMasterConnectionButton->setBounds(actionButton.getRight() + gXSpacing,
                                          actionButton.getY(),
                                          actionButton.getWidth(),
@@ -2325,13 +2320,11 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         {
             MTS_DeregisterMaster();
             MTSMasterConnectionButton->setButtonText("Register MTSMaster");
-            MTSMasterConnectionLabel->setVisible(false);
+    
         }
         else if (MTS_CanRegisterMaster())
         {
             MTS_RegisterMaster();
-            MTSMasterConnectionLabel->setText("MTS MASTER Mode", dontSendNotification);
-            MTSMasterConnectionLabel->setVisible(true);
             MTSMasterConnectionButton->setButtonText("Disconnect MTS");
             tuning->fillMTSMasterTunings();
             prep->isMTSMaster = true;
@@ -2339,8 +2332,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         {
             MTS_Reinitialize();
             MTS_RegisterMaster();
-            MTSMasterConnectionLabel->setText("MTS MASTER Mode", dontSendNotification);
-            MTSMasterConnectionLabel->setVisible(true);
+
             MTSMasterConnectionButton->setButtonText("Disconnect MTS");
             tuning->fillMTSMasterTunings();
             prep->isMTSMaster = true;
