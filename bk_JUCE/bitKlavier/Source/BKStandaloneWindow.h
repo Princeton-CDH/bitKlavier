@@ -16,7 +16,7 @@
 #include <stdlib.h>
 #include <crtdbg.h>
 #endif
-#endif 
+#endif
 
 #include "PluginProcessor.h"
     
@@ -73,7 +73,7 @@ public:
 #if JUCE_WINDOWS
 #ifdef _DEBUG
         _CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif 
+#endif
 #endif
         createPlugin();
         
@@ -99,7 +99,7 @@ public:
         processor->setMidiReady(true);
         reloadPluginState();
         startPlaying();
-        
+       
         startTimer (500);
     }
     
@@ -519,7 +519,29 @@ private:
         player.audioDeviceIOCallback (inputChannelData, numInputChannels,
                                       outputChannelData, numOutputChannels, numSamples);
     }
-    
+    //==============================================================================
+    void audioDeviceIOCallbackWithContext (const float** inputChannelData,
+                                           int numInputChannels,
+                                           float** outputChannelData,
+                                           int numOutputChannels,
+                                           int numSamples,
+                                           const AudioIODeviceCallbackContext& context) override
+    {
+        const bool inputMuted = shouldMuteInput.getValue();
+        if (inputMuted)
+        {
+            emptyBuffer.clear();
+            inputChannelData = emptyBuffer.getArrayOfReadPointers();
+        }
+
+        player.audioDeviceIOCallbackWithContext (inputChannelData,
+                                                 numInputChannels,
+                                                 outputChannelData,
+                                                 numOutputChannels,
+                                                 numSamples,
+                                                 context);
+    }
+
     void audioDeviceAboutToStart (AudioIODevice* device) override
     {
         emptyBuffer.setSize (device->getActiveInputChannels().countNumberOfSetBits(), device->getCurrentBufferSizeSamples());
