@@ -374,6 +374,29 @@ Array<File> BKAudioProcessor::getSoundfontsPaths()
     return directories;
 }
 
+Array<File> BKAudioProcessor::getGalleryPaths()
+{
+    Array<File> directories = galleryPaths
+    .findChildFiles(File::TypesOfFileToFind::findDirectories, true);
+    for (int i = 0; i < galleryPaths.getNumPaths(); ++i)
+    {
+        directories.add(galleryPaths[i]);
+    }
+#if JUCE_IOS
+    directories.add(File::getSpecialLocation(File::userDocumentsDirectory));
+#endif
+#if JUCE_MAC
+    directories.add(File::getSpecialLocation(File::globalApplicationsDirectory)
+                    .getChildFile("bitKlavier").getChildFile("galleries"));
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    directories.add(File::getSpecialLocation(File::userDocumentsDirectory)
+                    .getChildFile("bitKlavier").getChildFile("galleries"));
+#endif
+    
+    return directories;
+}
+
 Array<File> BKAudioProcessor::getCustomSamplesPaths()
 {
     Array<File> directories = customSamplesPaths

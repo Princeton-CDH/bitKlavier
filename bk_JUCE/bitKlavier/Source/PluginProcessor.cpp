@@ -1817,8 +1817,8 @@ void BKAudioProcessor::loadGalleryDialog(void)
     {
         File myFile (myChooser.getResult());
 
-        File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
-        user = user.getChildFile("bitKlavier/galleries/");
+        File user   (lastGalleryPath);
+        //user = user.getChildFile("bitKlavier/galleries/");
         
         user = user.getChildFile(myFile.getFileName());
         

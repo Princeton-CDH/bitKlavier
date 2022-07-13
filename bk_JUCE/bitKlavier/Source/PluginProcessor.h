@@ -157,10 +157,11 @@ public:
     // This is quite performance intensive with a lot of samples and currently doesn't seems worth doing
 //    SampleTouchThread touchThread;
     
+   
     File defaultSamplesPath;
     FileSearchPath soundfontsPaths;
     FileSearchPath customSamplesPaths;
-
+    FileSearchPath galleryPaths;
     void updateGalleries(void);
     
     void collectGalleries(void);
@@ -268,7 +269,7 @@ public:
     File getDefaultSamplesPath();
     Array<File> getSoundfontsPaths();
     Array<File> getCustomSamplesPaths();
-    
+    Array<File> getGalleryPaths();
     double getLevelL();
     double getLevelR();
 

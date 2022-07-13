@@ -84,6 +84,8 @@ private:
         soundfontPathButton("Add search path"),
         customPathLabel("Sample search paths:", "Sample search paths:"),
         customPathButton("Add search path"),
+        galleryPathLabel("Gallery search paths:", "Gallery search paths:"),
+        galleryPathButton("Add search path"),
         tooltipsLabel("Enable tooltips", "Enable tooltips"),
 		hotkeysLabel("Enable hotkeys", "Enable hotkeys"),
         memoryMappingLabel("Enable direct-from-disk sample playback", "Enable direct-from-disk sample playback")
@@ -123,6 +125,21 @@ private:
             soundfontPathEditor.setText(text, dontSendNotification);
             soundfontPathEditor.addListener(this);
             addAndMakeVisible(soundfontPathEditor);
+            //==============================================================================
+            galleryPathLabel.setTooltip("Set extra paths in which to search for galleries. bitKlavier will always search the galleries folder in the bitKlavier folder.");
+            galleryPathLabel.setJustificationType(Justification::topLeft);
+            addAndMakeVisible(galleryPathLabel);
+            
+            galleryPathButton.setTooltip("Open the file browser to select folders to add to the search paths list");
+            galleryPathButton.addListener(this);
+            addAndMakeVisible(galleryPathButton);
+            
+            galleryPathEditor.setTooltip("Set paths in which to search for soundfonts.");
+            galleryPathEditor.setMultiLine(true);
+            text = owner.processor.galleryPaths.toString().replace(";", "; ");
+            galleryPathEditor.setText(text, dontSendNotification);
+            galleryPathEditor.addListener(this);
+            addAndMakeVisible(galleryPathEditor);
             
             //==============================================================================
             
@@ -180,13 +197,19 @@ private:
             slice = r.removeFromTop(24);
             soundfontPathLabel.setBounds(slice.removeFromLeft(slice.getWidth()*0.6));
             soundfontPathButton.setBounds(slice.withHeight(25));
-            soundfontPathEditor.setBounds(r.removeFromTop(72));
+            soundfontPathEditor.setBounds(r.removeFromTop(48));
+            r.removeFromTop(24);
+            
+            slice = r.removeFromTop(24);
+            galleryPathLabel.setBounds(slice.removeFromLeft(slice.getWidth()*0.6));
+            galleryPathButton.setBounds(slice.withHeight(25));
+            galleryPathEditor.setBounds(r.removeFromTop(48));
             r.removeFromTop(24);
             
             slice = r.removeFromTop(24);
             customPathLabel.setBounds(slice.removeFromLeft(slice.getWidth()*0.6));
             customPathButton.setBounds(slice.withHeight(25));
-            customPathEditor.setBounds(r.removeFromTop(72));
+            customPathEditor.setBounds(r.removeFromTop(48));
             
             r.removeFromTop(24);
             slice = r.removeFromTop(24);
@@ -233,6 +256,23 @@ private:
                         owner.processor.soundfontsPaths.addIfNotAlreadyThere(result);
                     }
                     updateSoundfontsPaths();
+                });
+            }
+            if (b == &galleryPathButton)
+            {
+                fc = std::make_unique<FileChooser> ("Add folders...",
+                                                    File::getSpecialLocation (File::userHomeDirectory));
+                
+                fc->launchAsync (FileBrowserComponent::openMode |
+                                 FileBrowserComponent::canSelectDirectories |
+                                 FileBrowserComponent::canSelectMultipleItems,
+                                 [this] (const FileChooser& chooser)
+                                 {
+                    for (auto result : chooser.getResults())
+                    {
+                        owner.processor.galleryPaths.addIfNotAlreadyThere(result);
+                    }
+                    updateGalleryPaths();
                 });
             }
             if (b == &customPathButton)
@@ -292,6 +332,15 @@ private:
             owner.processor.collectSoundfonts();
         }
         
+        void updateGalleryPaths()
+        {
+            owner.processor.galleryPaths.removeRedundantPaths();
+            owner.processor.galleryPaths.removeNonExistentPaths();
+            String text = owner.processor.galleryPaths.toString().replace(";", "; ");
+            galleryPathEditor.setText(text, dontSendNotification);
+            owner.processor.collectGalleries();
+        }
+        
         void updateCustomSamplesPaths()
         {
             owner.processor.customSamplesPaths.removeRedundantPaths();
@@ -318,6 +367,10 @@ private:
         Label customPathLabel;
         TextButton customPathButton;
         TextEditor customPathEditor;
+        
+        Label galleryPathLabel;
+        TextButton galleryPathButton;
+        TextEditor galleryPathEditor;
         
         Label tooltipsLabel;
 		Label hotkeysLabel;
