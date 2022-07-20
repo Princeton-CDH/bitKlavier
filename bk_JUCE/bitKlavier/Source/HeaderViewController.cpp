@@ -736,19 +736,32 @@ void HeaderViewController::fillGalleryCB(void)
 		for (int i = 0; i < processor.galleryNames.size(); i++)
 		{
 			File thisFile(processor.galleryNames[i]);
-			String galleryName = thisFile.getFileName().upToFirstOccurrenceOf(".xml", false, false);
+			String galleryName = thisFile.getFileName().fromLastOccurrenceOf(File::getSeparatorString(), false, true).upToFirstOccurrenceOf(".xml", false, false);
 			String galleryPath = String(thisFile.getFullPathName());
 			int gallerySplitIndex = galleryPath.indexOf("galleries") + 10;
 			StringArray galleryFolders;
 			int divIndex = galleryPath.indexOfChar(gallerySplitIndex, divChar);
 			//split the filename into individual strings for folders
-			while (divIndex != -1)
-			{
-				//DBG("Adding " + galleryPath.substring(gallerySplitIndex, divIndex) + " to galleryFolders");
-				galleryFolders.add(galleryPath.substring(gallerySplitIndex, divIndex));
-				gallerySplitIndex = divIndex + 1;
-				divIndex = galleryPath.indexOfChar(gallerySplitIndex, divChar);
-			}
+            String parent = thisFile.getParentDirectory().getFileName();
+           
+            if (thisFile.getParentDirectory().getFileName() == "newgallstest")
+            {
+                DBG("Heasdfasdfasdfasdfasdfasy");
+            }
+            if (((divIndex == -1) && (parent != "galleries")) || !galleryPath.contains("galleries"))
+            {
+                galleryFolders.add(thisFile.getParentDirectory().getFileName());
+            }
+            else {
+                while (divIndex != -1)
+                {
+                    //DBG("Adding " + galleryPath.substring(gallerySplitIndex, divIndex) + " to galleryFolders");
+                    galleryFolders.add(galleryPath.substring(gallerySplitIndex, divIndex));
+                    gallerySplitIndex = divIndex + 1;
+                    divIndex = galleryPath.indexOfChar(gallerySplitIndex, divChar);
+                }
+                
+            }
 			if (!submenus.isEmpty())
 			{
 				StringRef poppedMenuName = nameStack[nameStack.size() - 1];

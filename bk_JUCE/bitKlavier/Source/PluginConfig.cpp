@@ -82,7 +82,7 @@ void BKAudioProcessor::getStateInformation (MemoryBlock& destData)
     settingsVT.setProperty("defaultSamplesSearchPath", defaultSamplesPath.getFullPathName(), 0);
     settingsVT.setProperty("soundfontsSearchPath", soundfontsPaths.toString(), 0);
     settingsVT.setProperty("sampleSearchPath", customSamplesPaths.toString(), 0);
-    
+    settingsVT.setProperty("gallerySearchPath", galleryPaths.toString(), 0);
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
@@ -170,6 +170,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             soundfontsPaths = userSettings->getStringAttribute("soundfontsSearchPath", soundfontsPaths.toString());
             
             customSamplesPaths = userSettings->getStringAttribute("sampleSearchPath", "");
+            galleryPaths = userSettings->getStringAttribute("gallerySearchPath", galleryPaths.toString());
         }
         else
         {
