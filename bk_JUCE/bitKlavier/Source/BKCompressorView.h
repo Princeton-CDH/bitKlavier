@@ -21,10 +21,13 @@ class BKCompressorView : public juce::Component, public Button::Listener, public
 public:
     BKCompressorView(CompressorProcessor& p) :
     processor(p),
-    powerButton("powerButton", DrawableButton::ButtonStyle::ImageOnButtonBackground)
+    powerButton("powerButton", DrawableButton::ButtonStyle::ImageOnButtonBackground),
+    backGroundApp(Colour(Constants::Colors::bg_App))
     {
         setLookAndFeel(&laf);
         startTimerHz(60);
+        setGUIState(true);
+        initWidgets();
     }
     ~BKCompressorView(){};
     void resized() override;
@@ -33,13 +36,17 @@ public:
 
 
 private:
+    BKButtonAndMenuLAF laf;
     void buttonClicked(Button* b) override;
     void LabeledSliderValueChanged(LabeledSlider* slider, String name, double val) override;
     CompressorProcessor &processor;
     void initWidgets();
     void setGUIState(bool powerButton);
-    BKButtonAndMenuLAF laf;
+    
+    
+    Colour backGroundApp;
     //Widgets
+
     MeterBackground meterbg;
     Meter meter;
 

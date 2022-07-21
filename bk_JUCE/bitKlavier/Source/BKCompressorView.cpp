@@ -44,32 +44,36 @@ void BKCompressorView::initWidgets()
     mixLSlider.setLabelText("Mix");
 
     addAndMakeVisible(lahButton);
-    lahButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
+    //lahButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
     lahButton.setButtonText("LookAhead");
     lahButton.setClickingTogglesState(true);
     lahButton.setToggleState(false, dontSendNotification);
+    lahButton.setLookAndFeel(&laf);
     //lahAttachment.reset(new AudioProcessorValueTreeState::ButtonAttachment(valueTreeState, "lookahead", lahButton));
 
     addAndMakeVisible(autoAttackButton);
-    autoAttackButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
+    //autoAttackButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
     autoAttackButton.setButtonText("AutoAttack");
     autoAttackButton.setClickingTogglesState(true);
     autoAttackButton.setToggleState(false, dontSendNotification);
     autoAttackButton.addListener(this);
+    autoAttackButton.setLookAndFeel(&laf);
     //autoAttackAttachment.reset(
         //new AudioProcessorValueTreeState::ButtonAttachment(valueTreeState, "autoattack", autoAttackButton));
 
     addAndMakeVisible(autoReleaseButton);
-    autoReleaseButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
+    //autoReleaseButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
     autoReleaseButton.setButtonText("AutoRelease");
     autoReleaseButton.setClickingTogglesState(true);
     autoReleaseButton.setToggleState(false, dontSendNotification);
     autoReleaseButton.addListener(this);
+    autoReleaseButton.setLookAndFeel(&laf);
     //autoReleaseAttachment.reset(
         //new AudioProcessorValueTreeState::ButtonAttachment(valueTreeState, "autorelease", autoReleaseButton));
 
     addAndMakeVisible(autoMakeupButton);
-    autoMakeupButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
+    //autoMakeupButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
+    autoMakeupButton.setLookAndFeel(&laf);
     autoMakeupButton.setButtonText("Makeup");
     autoMakeupButton.setClickingTogglesState(true);
     autoMakeupButton.setToggleState(false, dontSendNotification);
@@ -78,7 +82,8 @@ void BKCompressorView::initWidgets()
         //new AudioProcessorValueTreeState::ButtonAttachment(valueTreeState, "automakeup", autoMakeupButton));
 
     addAndMakeVisible(powerButton);
-    powerButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
+    //powerButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
+    powerButton.setLookAndFeel(&laf);
 //    powerButton.setImages(
 //        Drawable::createFromImageData(BinaryData::power_white_svg, BinaryData::power_white_svgSize).get());
     powerButton.setClickingTogglesState(true);
@@ -99,7 +104,7 @@ void BKCompressorView::paint(Graphics& g)
 void BKCompressorView::resized()
 {
     auto area = getLocalBounds().reduced(Constants::Margins::big);
-
+    
     const auto headerHeight = area.getHeight() / 10;
     const auto btnAreaWidth = area.getWidth() / 5;
     const auto btnBotHeight = area.getHeight() / 3;
@@ -133,7 +138,7 @@ void BKCompressorView::resized()
     leftBtnBox.items.add(FlexItem(releaseLSlider).withFlex(1).withMargin(knobMarginSmall));
     leftBtnBox.items.add(FlexItem(inGainLSlider).withFlex(1).withMargin(knobMarginSmall));
     leftBtnBox.performLayout(lBtnArea.toFloat());
-    attackLSlider.setBounds(lBtnArea);
+    
     FlexBox rightBtnBox;
     rightBtnBox.flexWrap = FlexBox::Wrap::noWrap;
     rightBtnBox.flexDirection = FlexBox::Direction::column;

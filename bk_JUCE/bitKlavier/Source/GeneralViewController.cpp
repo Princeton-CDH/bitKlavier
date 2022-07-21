@@ -427,6 +427,7 @@ compressorView(p.compressor)
     peak3QualitySlider->addMyListener(this);
     addAndMakeVisible(*peak3QualitySlider);
     
+    addAndMakeVisible(compressorView);
     // Set all parameters to saved or default values
     update();
     
@@ -480,6 +481,7 @@ void GeneralViewController::displayTab(int tab) {
     {
         //eqGraph.setVisible(true);
         compressorView.setVisible(true);
+        
     }
     
 }
@@ -688,7 +690,7 @@ void GeneralViewController::resized()
     compressorArea.removeFromRight(arrowSpace + 20);
     compressorArea.removeFromTop(20);
     compressorArea.removeFromBottom(10);
-    compressorView.setBounds(getLocalBounds());
+    compressorView.setBounds(compressorArea);
     // Update view
     displayShared();
     displayTab(currentTab);
