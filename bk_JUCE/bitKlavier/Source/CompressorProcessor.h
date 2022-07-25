@@ -22,8 +22,9 @@ public:
     void prepareToPlay(double sampleRate, int samplesPerBlock);
     void update();
     void process(AudioSampleBuffer& buffer);
-private:
     Compressor compressor;
+private:
+    
     LevelEnvelopeFollower inLevelFollower;
     LevelEnvelopeFollower outLevelFollower;
 };

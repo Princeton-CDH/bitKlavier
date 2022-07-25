@@ -82,6 +82,9 @@ public:
     ListenerList<Listener> listeners;
     void addMyListener(Listener* listener)     { listeners.add(listener);      }
     void removeMyListener(Listener* listener)  { listeners.remove(listener);   }
+    
+    float getValue() {return slider.getValue();}
+    ModSlider* getSlider() {return &slider;}
 private:
     ModSlider slider;
     Label sliderLabel;
