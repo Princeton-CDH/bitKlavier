@@ -2222,30 +2222,31 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     } else if (b == importButton.get())
     {
 #if JUCE_IOS
-        FileChooser myChooser ("Load tuning from .scl file...",
-                               getLastFile(),
-                               "*");
+        chooser = std::make_unique<FileChooser>("Load tuning from .scl file...", getLastFile());
+        
 #else
-        FileChooser myChooser ("Load tuning from .scl file...",
-                               getLastFile(),
-                               "*.scl");
+        chooser = std::make_unique<FileChooser>("Load tuning from .scl file...", getLastFile());
 #endif
         
-        if (myChooser.browseForFileToOpen())
-        {
-            setLastFile(myChooser);
-            File myFile (myChooser.getResult());
-
-            //File user   (File::getSpecialLocation(File::globalApplicationsDirectory));
-
-            //user = user.getChildFile(myFile.getFileName());
-            
+        chooser->launchAsync (FileBrowserComponent::openMode |
+                             FileBrowserComponent::canSelectFiles,
+                              [this] (const FileChooser& chooser)
+                              {
+            setLastFile(chooser);
+            File myFile (chooser.getResult());
+            Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
             tuning->loadScalaFile(myFile.getFullPathName().toStdString());
             processor.gallery->setGalleryDirty(true);
             sclTextEditor->setText(tuning->currentScalaString);
             update();
-        }
-        tuning->fillMTSMasterTunings();
+            tuning->fillMTSMasterTunings();
+        });
+        
+        
+      
+            
+    
+        
        
     } else if (b == importKBMButton.get())
     {
@@ -2257,25 +2258,25 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         }
         
 #if JUCE_IOS
-        FileChooser myChooser ("Load keyboard mapping from kbm file...",
-                               getLastFile(),
-                               "*");
+        chooser = std::make_unique<FileChooser>("Load mapping from .kbm file...", getLastFile());
 #else
-       FileChooser myChooser ("Load keyboard mapping from kbm file...",
-                              getLastFile(),
-                              "*.kbm");
+        chooser = std::make_unique<FileChooser>("Load mapping from .kbm file...", getLastFile());
 #endif
         
-        if (myChooser.browseForFileToOpen())
-        {
-            setLastFile(myChooser);
-            File myFile (myChooser.getResult());
+        chooser->launchAsync (FileBrowserComponent::openMode |
+                             FileBrowserComponent::canSelectFiles,
+                              [this] (const FileChooser& chooser)
+                              {
+            setLastFile(chooser);
+            File myFile (chooser.getResult());
+            Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
             tuning->loadKBMFile(myFile.getFullPathName().toStdString());
             processor.gallery->setGalleryDirty(true);
             kbmTextEditor->setText(tuning->currentKBMString);
             update();
-        }
-        tuning->fillMTSMasterTunings();
+            tuning->fillMTSMasterTunings();
+        });
+        
     } else if (b == resetButton.get())
     {
         sclTextEditor->setText(Tunings::evenTemperament12NoteScale().rawText);
