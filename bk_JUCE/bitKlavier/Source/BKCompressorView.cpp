@@ -204,7 +204,7 @@ void BKCompressorView::buttonClicked(Button* b)
     }
     else if (b == &autoReleaseButton)
     {
-        processor.compressor.setAutoRelease(b->isEnabled());
+        processor.compressor.setAutoRelease(!b->isEnabled());
         releaseLSlider.setEnabled(!releaseLSlider.isEnabled());
         if (!b->isEnabled())
         {
@@ -213,12 +213,12 @@ void BKCompressorView::buttonClicked(Button* b)
     }
     else if (b == &powerButton)
     {
-        processor.compressor.setPower(powerButton.getToggleState());
+        processor.compressor.setPower(!powerButton.getToggleState());
         setGUIState(powerButton.getToggleState());
     }
     else if (b == &lahButton)
     {
-        processor.compressor.setLookahead(lahButton.getToggleState());
+        processor.compressor.setLookahead(!lahButton.getToggleState());
     }
 }
 

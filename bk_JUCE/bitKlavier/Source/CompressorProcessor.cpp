@@ -35,7 +35,9 @@ void CompressorProcessor::process(AudioBuffer<float>& buffer)
     //const auto totalNumOutputChannels = getTotalNumOutputChannels();
     const auto numSamples = buffer.getNumSamples();
 
-
+    // Clear buffer
+        for (auto i = 0; i < buffer.getNumChannels(); ++i)
+            buffer.clear(i, 0, buffer.getNumSamples());
     //Update input peak metering
     inLevelFollower.updatePeak(buffer.getArrayOfReadPointers(), buffer.getNumChannels(), numSamples);
     currentInput.set(Decibels::gainToDecibels(inLevelFollower.getPeak()));
