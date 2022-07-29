@@ -2222,10 +2222,10 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     } else if (b == importButton.get())
     {
 #if JUCE_IOS
-        chooser = std::make_unique<FileChooser>("Load tuning from .scl file...", getLastFile());
+        chooser = std::make_unique<FileChooser>("Load tuning from .scl file...", getLastFile(), "*");
         
 #else
-        chooser = std::make_unique<FileChooser>("Load tuning from .scl file...", getLastFile());
+        chooser = std::make_unique<FileChooser>("Load tuning from .scl file...", getLastFile(),"*.scl");
 #endif
         
         chooser->launchAsync (FileBrowserComponent::openMode |
@@ -2258,9 +2258,9 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         }
         
 #if JUCE_IOS
-        chooser = std::make_unique<FileChooser>("Load mapping from .kbm file...", getLastFile());
+        chooser = std::make_unique<FileChooser>("Load mapping from .kbm file...", getLastFile(), "*");
 #else
-        chooser = std::make_unique<FileChooser>("Load mapping from .kbm file...", getLastFile());
+        chooser = std::make_unique<FileChooser>("Load mapping from .kbm file...", getLastFile(),"*.kbm");
 #endif
         
         chooser->launchAsync (FileBrowserComponent::openMode |
