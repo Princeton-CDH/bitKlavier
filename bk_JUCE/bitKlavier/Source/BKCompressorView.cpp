@@ -18,14 +18,16 @@ void BKCompressorView::initWidgets()
                                                                              Constants::Parameter::inputStart,
                                                                              Constants::Parameter::inputEnd,
                                                                              Constants::Parameter::inputInterval));
+    inGainLSlider.addMyListener(this);
     addAndMakeVisible(makeupGainLSlider);
+    
     //makeupGainLSlider.reset(valueTreeState, "makeup");
     makeupGainLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
                                                                                  Constants::Parameter::makeupStart,
                                                                                  Constants::Parameter::makeupEnd,
                                                                                   Constants::Parameter::makeupInterval));
     makeupGainLSlider.setLabelText("Makeup");
-
+    makeupGainLSlider.addMyListener(this);
     addAndMakeVisible(treshLSlider);
     //treshLSlider.reset(valueTreeState, "threshold");
     treshLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
@@ -33,7 +35,7 @@ void BKCompressorView::initWidgets()
                                                                                  Constants::Parameter::thresholdEnd,
                                                                                   Constants::Parameter::thresholdInterval));
     treshLSlider.setLabelText("Threshold");
-
+    treshLSlider.addMyListener(this);
     addAndMakeVisible(ratioLSlider);
     //ratioLSlider.reset(valueTreeState, "ratio");
     ratioLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
@@ -41,7 +43,7 @@ void BKCompressorView::initWidgets()
                                                                                  Constants::Parameter::ratioEnd,
                                                                                   Constants::Parameter::makeupInterval));
     ratioLSlider.setLabelText("Ratio");
-
+    ratioLSlider.addMyListener(this);
     addAndMakeVisible(kneeLSlider);
     //kneeLSlider.reset(valueTreeState, "knee");
     kneeLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
@@ -49,7 +51,7 @@ void BKCompressorView::initWidgets()
                                                                                  Constants::Parameter::kneeEnd,
                                                                                   Constants::Parameter::kneeInterval));
     kneeLSlider.setLabelText("Knee");
-
+    kneeLSlider.addMyListener(this);
     addAndMakeVisible(attackLSlider);
     //attackLSlider.reset(valueTreeState, "attack");
     attackLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
@@ -58,6 +60,8 @@ void BKCompressorView::initWidgets()
                                                                                   Constants::Parameter::attackInterval));
     attackLSlider.setLabelText("Attack");
 
+    attackLSlider.addMyListener(this);
+
     addAndMakeVisible(releaseLSlider);
     //releaseLSlider.reset(valueTreeState, "release");
     releaseLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
@@ -65,15 +69,16 @@ void BKCompressorView::initWidgets()
                                                                                  Constants::Parameter::releaseEnd,
                                                                                   Constants::Parameter::releaseInterval));
     releaseLSlider.setLabelText("Release");
-
+    releaseLSlider.addMyListener(this);
     addAndMakeVisible(mixLSlider);
     //mixLSlider.reset(valueTreeState, "mix");
-    makeupGainLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
+    mixLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
                                                                                  Constants::Parameter::mixStart,
                                                                                  Constants::Parameter::mixEnd,
                                                                                   Constants::Parameter::mixInterval));
+    
     mixLSlider.setLabelText("Mix");
-
+    mixLSlider.addMyListener(this);
     addAndMakeVisible(lahButton);
     //lahButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
     lahButton.setButtonText("LookAhead");
@@ -220,18 +225,14 @@ void BKCompressorView::buttonClicked(Button* b)
     {
         processor.compressor.setLookahead(!lahButton.getToggleState());
     }
+    else if (b == &autoMakeupButton)
+    {
+        processor.compressor.setAutoMakeup(!autoMakeupButton.getState());
+    }
 }
 
 void BKCompressorView::LabeledSliderValueChanged(LabeledSlider* slider, String name, double val)
 {
-    LabeledSlider inGainLSlider;
-    LabeledSlider makeupGainLSlider;
-    LabeledSlider treshLSlider;
-    LabeledSlider ratioLSlider;
-    LabeledSlider kneeLSlider;
-    LabeledSlider attackLSlider;
-    LabeledSlider releaseLSlider;
-    LabeledSlider mixLSlider;
     if (slider == &inGainLSlider)
     {
         processor.compressor.setInput(val);

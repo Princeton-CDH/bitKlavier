@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using SliderAttachment = std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment>;
 using ButtonAttachment = std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment>;
 
-class LabeledSlider : public Component
+class LabeledSlider : public Component, public Slider::Listener
 {
 public:
 
@@ -31,7 +31,7 @@ public:
         addAndMakeVisible(slider);
         slider.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
         slider.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-
+        slider.addListener(this);
         addAndMakeVisible(sliderLabel);
         sliderLabel.setJustificationType(Justification::centred);
     }
@@ -85,6 +85,14 @@ public:
     
     float getValue() {return slider.getValue();}
     ModSlider* getSlider() {return &slider;}
+    
+    void sliderValueChanged(Slider *slider) override
+    {
+        listeners.call(&LabeledSlider::Listener::LabeledSliderValueChanged,
+                       this,
+                       getName(),
+                       slider->getValue());
+    }
 private:
     ModSlider slider;
     Label sliderLabel;
