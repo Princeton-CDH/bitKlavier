@@ -796,6 +796,7 @@ public:
     ValueTree getState(bool active = false);
     void setState(XmlElement*);
     void loadScalaFile(std::string fname);
+    void loadScalaFile(File file);
     void loadScalaScale(Tunings::Scale& s);
     void loadKBM(Tunings::KeyboardMapping& kbm);
     void loadKBMFile(std::string fname);

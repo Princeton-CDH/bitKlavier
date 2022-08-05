@@ -744,10 +744,6 @@ void HeaderViewController::fillGalleryCB(void)
 			//split the filename into individual strings for folders
             String parent = thisFile.getParentDirectory().getFileName();
            
-            if (thisFile.getParentDirectory().getFileName() == "newgallstest")
-            {
-                DBG("Heasdfasdfasdfasdfasdfasy");
-            }
             if (((divIndex == -1) && (parent != "galleries")) || !galleryPath.contains("galleries"))
             {
                 galleryFolders.add(thisFile.getParentDirectory().getFileName());

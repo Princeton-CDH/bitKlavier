@@ -381,6 +381,22 @@ void Tuning::loadScalaFile(std::string fname)
     loadScalaScale(s);
 }
 
+void Tuning::loadScalaFile(File file)
+{
+    Tunings::Scale s;
+    String a = file.loadFileAsString();
+    DBG(a);
+    
+    try {
+        s = Tunings::parseSCLData(file.loadFileAsString().toStdString());
+    } catch (Tunings::TuningError t) {
+        AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Scala Loading Error"), TRANS(t.what()));
+        return;
+    }
+    currentScale = s;
+    loadScalaScale(s);
+}
+
 void Tuning::loadKBMFile(std::string fname)
 {
     Tunings::KeyboardMapping kbm;

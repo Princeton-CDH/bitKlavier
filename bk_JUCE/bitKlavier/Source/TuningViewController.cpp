@@ -2222,7 +2222,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     } else if (b == importButton.get())
     {
 #if JUCE_IOS
-        chooser = std::make_unique<FileChooser>("Load tuning from .scl file...", getLastFile(), "*");
+        chooser = std::make_unique<FileChooser>("Load tuning from .scl file...", getLastFile());
         
 #else
         chooser = std::make_unique<FileChooser>("Load tuning from .scl file...", getLastFile(),"*.scl");
@@ -2233,9 +2233,20 @@ void TuningPreparationEditor::buttonClicked (Button* b)
                               [this] (const FileChooser& chooser)
                               {
             setLastFile(chooser);
+            if (chooser.getResult() == File{})
+                return;
             File myFile (chooser.getResult());
+            auto results = chooser.getURLResults();
+            if (results.size() > 0)
+            {
+                auto url = results.getReference (0);
+                String data = url.readEntireTextStream();
+                DBG(data);
+            }
+            
             Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
-            tuning->loadScalaFile(myFile.getFullPathName().toStdString());
+            tuning->loadScalaFile(myFile);
+            //tuning->loadScalaFile(myFile.getFullPathName().toStdString());
             processor.gallery->setGalleryDirty(true);
             sclTextEditor->setText(tuning->currentScalaString);
             update();
