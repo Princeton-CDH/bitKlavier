@@ -423,7 +423,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     // Prepare EQ
     eq.setSampleRate(currentSampleRate);
     eq.prepareToPlay(samplesPerBlock);
-    
+    compressor.prepareToPlay(currentSampleRate, samplesPerBlock);
 //    if (loader.getNumJobs() == 0) touchThread.startThread(0);
 }
 
@@ -1199,7 +1199,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
 #endif
     // Apply EQ filters to the buffer
     eq.process(buffer);
-    
+    compressor.process(buffer);
     // store buffer for level calculation when needed
     levelBuf.copyFrom(0, 0, buffer, 0, 0, numSamples);
     if(levelBuf.getNumChannels() == 2) levelBuf.copyFrom(1, 0, buffer, 1, 0, numSamples);

@@ -30,6 +30,8 @@
 
 #include "ItemMapper.h"
 
+#include "CompressorProcessor.h"
+
 class StandalonePluginHolder;
 class BKAudioProcessorEditor;
 //class BKEqualizer;
@@ -112,6 +114,10 @@ public:
     // Equalizer
     BKEqualizer                         eq;
     inline BKEqualizer* getBKEqualizer() { return &eq; } // may need to move to gallery later
+    
+    // Equalizer
+    CompressorProcessor                        compressor;
+    inline CompressorProcessor* getCompressor() { return &compressor; } // may need to move to gallery later
     
     //sfzero::Synth                       synth;
     

@@ -331,6 +331,41 @@
               file="Source/BKReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
+        <GROUP id="{85E3E73E-3D8E-F2D0-B803-767C7CA30272}" name="compressor-dsp">
+          <GROUP id="{BAA97A9C-98B4-773B-C48F-7AD46CBB1389}" name="include">
+            <FILE id="KRAbMx" name="Compressor.h" compile="0" resource="0" file="Source/compressor-dsp/include/Compressor.h"/>
+            <FILE id="ClB36U" name="CrestFactor.h" compile="0" resource="0" file="Source/compressor-dsp/include/CrestFactor.h"/>
+            <FILE id="MFidFT" name="DelayLine.h" compile="0" resource="0" file="Source/compressor-dsp/include/DelayLine.h"/>
+            <FILE id="wVqGQL" name="EnvelopeFollower.h" compile="0" resource="0"
+                  file="Source/compressor-dsp/include/EnvelopeFollower.h"/>
+            <FILE id="UJMOqW" name="GainComputer.h" compile="0" resource="0" file="Source/compressor-dsp/include/GainComputer.h"/>
+            <FILE id="bNmZ4S" name="LevelDetector.h" compile="0" resource="0" file="Source/compressor-dsp/include/LevelDetector.h"/>
+            <FILE id="Q4ziOd" name="LevelEnvelopeFollower.h" compile="0" resource="0"
+                  file="Source/compressor-dsp/include/LevelEnvelopeFollower.h"/>
+            <FILE id="xcrHrW" name="LookAhead.h" compile="0" resource="0" file="Source/compressor-dsp/include/LookAhead.h"/>
+            <FILE id="Uikta7" name="SmoothingFilter.h" compile="0" resource="0"
+                  file="Source/compressor-dsp/include/SmoothingFilter.h"/>
+          </GROUP>
+          <FILE id="U75Jti" name="Compressor.cpp" compile="1" resource="0" file="Source/compressor-dsp/Compressor.cpp"/>
+          <FILE id="p4GaZD" name="CrestFactor.cpp" compile="1" resource="0" file="Source/compressor-dsp/CrestFactor.cpp"/>
+          <FILE id="JKvaya" name="DelayLine.cpp" compile="1" resource="0" file="Source/compressor-dsp/DelayLine.cpp"/>
+          <FILE id="S945d2" name="EnvelopeFollower.cpp" compile="1" resource="0"
+                file="Source/compressor-dsp/EnvelopeFollower.cpp"/>
+          <FILE id="j5zDn8" name="GainComputer.cpp" compile="1" resource="0"
+                file="Source/compressor-dsp/GainComputer.cpp"/>
+          <FILE id="HowZNz" name="LevelDetector.cpp" compile="1" resource="0"
+                file="Source/compressor-dsp/LevelDetector.cpp"/>
+          <FILE id="aj3bH0" name="LevelEnvelopeFollower.cpp" compile="1" resource="0"
+                file="Source/compressor-dsp/LevelEnvelopeFollower.cpp"/>
+          <FILE id="Ev593X" name="LookAhead.cpp" compile="1" resource="0" file="Source/compressor-dsp/LookAhead.cpp"/>
+          <FILE id="ufqYHQ" name="SIMDMath.h" compile="0" resource="0" file="Source/compressor-dsp/include/SIMDMath.h"/>
+          <FILE id="gjtOn5" name="SmoothingFilter.cpp" compile="1" resource="0"
+                file="Source/compressor-dsp/SmoothingFilter.cpp"/>
+        </GROUP>
+        <FILE id="Z62yxC" name="CompressorProcessor.cpp" compile="1" resource="0"
+              file="Source/CompressorProcessor.cpp"/>
+        <FILE id="pgqyNE" name="CompressorProcessor.h" compile="0" resource="0"
+              file="Source/CompressorProcessor.h"/>
         <GROUP id="{D95FF283-C159-D64C-6BE8-DFE35BF1BDDA}" name="Standalone">
           <FILE id="jhbR79" name="BKStandaloneApp.cpp" compile="1" resource="0"
                 file="Source/BKStandaloneApp.cpp"/>
@@ -426,6 +461,10 @@
         </GROUP>
       </GROUP>
       <GROUP id="{07677963-38EF-2F51-36FA-17646727446F}" name="Controller">
+        <FILE id="jfzYbA" name="BKCompressorController.cpp" compile="1" resource="0"
+              file="Source/BKCompressorController.cpp"/>
+        <FILE id="u2aEYe" name="BKCompressorController.h" compile="0" resource="0"
+              file="Source/BKCompressorController.h"/>
         <FILE id="ybYtMd" name="ShareBot.h" compile="0" resource="0" file="Source/ShareBot.h"/>
         <FILE id="rnxxIN" name="ShareBot.mm" compile="1" resource="0" file="Source/ShareBot.mm"/>
         <FILE id="QpXmnO" name="BKViewController.cpp" compile="1" resource="0"
@@ -502,6 +541,25 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
+        <GROUP id="{29161695-CDFF-C502-552E-69F230BE0B8E}" name="compressor-gui">
+          <GROUP id="{5A699B16-078C-571D-2195-D69328EDB1AB}" name="include">
+            <FILE id="SiTF27" name="Constants.h" compile="0" resource="0" file="Source/compressor-gui/include/Constants.h"/>
+            <FILE id="hFA0gq" name="LabeledSlider.h" compile="0" resource="0" file="Source/compressor-gui/include/LabeledSlider.h"/>
+            <FILE id="KZKm9j" name="Meter.h" compile="0" resource="0" file="Source/compressor-gui/include/Meter.h"/>
+            <FILE id="Q92rSc" name="MeterBackground.h" compile="0" resource="0"
+                  file="Source/compressor-gui/include/MeterBackground.h"/>
+            <FILE id="IcZVt8" name="MeterNeedle.h" compile="0" resource="0" file="Source/compressor-gui/include/MeterNeedle.h"/>
+            <FILE id="MnNVS7" name="ModSlider.h" compile="0" resource="0" file="Source/compressor-gui/include/ModSlider.h"/>
+          </GROUP>
+          <FILE id="S6f7IH" name="Meter.cpp" compile="1" resource="0" file="Source/compressor-gui/Meter.cpp"/>
+          <FILE id="M2ujga" name="MeterBackground.cpp" compile="1" resource="0"
+                file="Source/compressor-gui/MeterBackground.cpp"/>
+          <FILE id="RRrgBL" name="MeterNeedle.cpp" compile="1" resource="0" file="Source/compressor-gui/MeterNeedle.cpp"/>
+        </GROUP>
+        <FILE id="OTH4BU" name="BKCompressorView.cpp" compile="1" resource="0"
+              file="Source/BKCompressorView.cpp"/>
+        <FILE id="fi7VmP" name="BKCompressorView.h" compile="0" resource="0"
+              file="Source/BKCompressorView.h"/>
         <FILE id="udvcxb" name="VelocityCurveGraph.h" compile="0" resource="0"
               file="Source/VelocityCurveGraph.h"/>
         <FILE id="ZZYk56" name="EqualizerGraph.h" compile="0" resource="0"
