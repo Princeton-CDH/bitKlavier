@@ -35,6 +35,15 @@ public:
     // Sets the knee-width in dB (if > 0, 2nd order interpolation for soft knee)
     void setKnee(float);
 
+    
+    // Sets the threshold in dB
+    float getThreshold() {return threshold;}
+
+    // Sets the ratio in dB
+    float getRatio() {return ratio;}
+
+    // Sets the knee-width in dB (if > 0, 2nd order interpolation for soft knee)
+    float getKnee() {return knee;}
     // Applies characteristics to a given sample
     // returns attenuation
     float applyCompression(float&);

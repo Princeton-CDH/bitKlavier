@@ -22,18 +22,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using SliderAttachment = std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment>;
 using ButtonAttachment = std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment>;
 
-class LabeledSlider : public Component, public Slider::Listener
+class LabeledSlider : public Component, public Slider::Listener, public TextEditor::Listener
 {
 public:
 
     LabeledSlider() : slider(&sliderLabel)
     {
-        addAndMakeVisible(slider);
         slider.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-        slider.setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
+        slider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, sliderLabel.getFont().getHeight());
         slider.addListener(this);
+        addAndMakeVisible(slider);
         addAndMakeVisible(sliderLabel);
         sliderLabel.setJustificationType(Justification::centred);
+        
+
+    
     }
 
     LabeledSlider(Component* parent) : slider(&sliderLabel)
@@ -63,9 +66,12 @@ public:
         auto bounds = getLocalBounds().reduced(2);
         const auto fontHeight = sliderLabel.getFont().getHeight();
 
-        const auto labelBounds = bounds.removeFromBottom(fontHeight);
+        const auto labelBounds = bounds.removeFromTop(fontHeight);
+        const auto editorBounds = bounds.removeFromBottom(fontHeight);
         slider.setBounds(bounds);
         sliderLabel.setBounds(labelBounds);
+        
+        
     }
 
     void setHasModifier(bool mod) { slider.setHasModifiers(mod); }
@@ -93,7 +99,13 @@ public:
                        getName(),
                        slider->getValue());
     }
+    
+    void setStringEnding(String str) {
+        slider.setTextValueSuffix(str);
+    }
+    
 private:
+    BKTextEditor valueTF;
     ModSlider slider;
     Label sliderLabel;
     SliderAttachment sAttachment;

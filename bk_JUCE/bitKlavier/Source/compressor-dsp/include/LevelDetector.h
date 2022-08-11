@@ -45,6 +45,12 @@ public:
 
     // Sets auto release to enabled/disabled
     void setAutoRelease(bool isEnabled);
+    
+    // Gets auto attack to enabled/disabled
+    bool getAutoAttack() {return autoAttack;}
+
+    // Gets auto release to enabled/disabled
+    bool getAutoRelease() {return autoRelease;}
 
     // Gets current attack time constant
     double getAttack();

@@ -34,6 +34,22 @@ public:
     void paint(Graphics& g) override;
     void timerCallback() override;
 
+    void update()
+    {
+        inGainLSlider.getSlider()->setValue(processor.compressor.getInput());
+        makeupGainLSlider.getSlider()->setValue(processor.compressor.getMakeup());
+        treshLSlider.getSlider()->setValue(processor.compressor.getThreshold());
+        ratioLSlider.getSlider()->setValue(processor.compressor.getRatio());
+        kneeLSlider.getSlider()->setValue(processor.compressor.getKnee());
+        attackLSlider.getSlider()->setValue(processor.compressor.getAttack());
+        releaseLSlider.getSlider()->setValue(processor.compressor.getRelease());
+        mixLSlider.getSlider()->setValue(processor.compressor.getMix());
+        lahButton.setEnabled(!processor.compressor.getLookahead());
+        autoReleaseButton.setEnabled(!processor.compressor.getAutoRelease());
+        autoMakeupButton.setEnabled(!processor.compressor.getAutoMakeup());
+        autoAttackButton.setEnabled(!processor.compressor.getAutoAttack());
+        powerButton.setEnabled(!processor.compressor.getPower());
+    }
 
 private:
     BKButtonAndMenuLAF laf;

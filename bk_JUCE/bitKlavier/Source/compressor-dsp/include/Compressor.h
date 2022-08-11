@@ -88,6 +88,42 @@ public:
     // Processes input buffer
     void process(AudioBuffer<float>& buffer);
 
+    // Sets compressor to bypassed/not bypassed
+    bool getPower() {return bypassed;}
+
+    // Sets input in dB
+    float getInput() {return input;}
+
+    // Sets threshold in dB
+    float getThreshold() {return gainComputer.getThreshold();}
+
+    // Sets ratio in dB
+    float getRatio() {return gainComputer.getRatio();}
+
+    // Sets knee-width in dB (> 0 = soft knee)
+    float getKnee() {return gainComputer.getKnee();}
+
+    // Sets mix 0.0f - 1.0f
+    float getMix() {return mix;}
+
+    // Sets attack time in milliseconds
+    float getAttack() {return ballistics.getAttack();}
+
+    // Sets release time in milliseconds
+    float getRelease() {return ballistics.getRelease();}
+
+    // Sets auto attack to enabled = true or disabled = false
+    bool getAutoAttack() {return ballistics.getAutoAttack();}
+
+    // Sets auto release to enabled = true or disabled = false
+    bool getAutoRelease() {return ballistics.getAutoRelease();}
+    
+    // Sets auto makeup to enabled = true or disabled = false
+    bool getAutoMakeup() {return autoMakeupEnabled;}
+
+    // Enables lookahead
+    bool getLookahead() {return lookaheadEnabled;}
+
 private:
     inline void applyInputGain(AudioBuffer<float>&, int);
     inline float calculateAutoMakeup(const float*, int numSamples);

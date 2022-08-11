@@ -849,6 +849,8 @@ void GeneralViewController::update(void)
     eqGraph.setSampleRate(processor.getCurrentSampleRate());
     eqGraph.updateEQ(*eq);
     eqGraph.setAlpha(eq->getBypassed() ? 0.4f : 1.f);
+    
+    compressorView.update();
 }
 
 void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
