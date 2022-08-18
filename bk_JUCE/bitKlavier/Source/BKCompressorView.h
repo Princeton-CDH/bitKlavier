@@ -29,7 +29,11 @@ public:
         setGUIState(true);
         initWidgets();
     }
-    ~BKCompressorView(){};
+    ~BKCompressorView()
+    {
+        setLookAndFeel(nullptr);
+    };
+    
     void resized() override;
     void paint(Graphics& g) override;
     void timerCallback() override;
