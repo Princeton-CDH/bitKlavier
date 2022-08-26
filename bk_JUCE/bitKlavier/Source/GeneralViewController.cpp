@@ -160,7 +160,7 @@ void AboutViewController::bkButtonClicked (Button* b)
 GeneralViewController::GeneralViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
 BKViewController(p, theGraph, 3),
 processor(p),
-compressorView(p.compressor)
+compressorView(p.compressor, p)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     

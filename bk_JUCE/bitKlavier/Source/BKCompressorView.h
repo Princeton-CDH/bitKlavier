@@ -16,17 +16,18 @@
 #include "compressor-gui/include/Constants.h"
 #include "BKLookAndFeel.h"
 #include "CompressorProcessor.h"
-class BKCompressorView : public juce::Component, public Button::Listener, public LabeledSlider::Listener, public juce::Timer
+class BKCompressorView : public juce::Component, public LabeledSlider::Listener, public juce::Timer, BKListener
 {
 public:
-    BKCompressorView(CompressorProcessor& p) :
+    BKCompressorView(CompressorProcessor& p, BKAudioProcessor& bkp) :
     processor(p),
-    powerButton("powerButton", DrawableButton::ButtonStyle::ImageOnButtonBackground),
-    backGroundApp(Colour(Constants::Colors::bg_App))
+    bkp(bkp),
+    backGroundApp(Colour(Constants::Colors::bg_App)),
+    meter(&selectCB)
     {
         setLookAndFeel(&laf);
         startTimerHz(60);
-        setGUIState(true);
+        setGUIState(false);
         initWidgets();
     }
     ~BKCompressorView(){};
@@ -53,16 +54,30 @@ public:
 
 private:
     BKButtonAndMenuLAF laf;
-    void buttonClicked(Button* b) override;
+    void bkButtonClicked(Button* b) override;
+    void bkComboBoxDidChange(ComboBox* box) override {return;};
     void LabeledSliderValueChanged(LabeledSlider* slider, String name, double val) override;
+    void bkMessageReceived(const String& message) override {return;}
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+   
+    void actionListenerCallback (const String& message) override {};
     CompressorProcessor &processor;
+    BKAudioProcessor &bkp;
     void initWidgets();
     void setGUIState(bool powerButton);
-    
-    
+    void fillSelectCB(int last, int current);
+    static void actionButtonCallback(int action,BKCompressorView*);
+    StringArray compressorNames;
+    String name;
+    String url;
+    int numCompressorPresets = 0;
+    int selectedPresetId = 1;
+    const int builtInPresets = 2; 
+    PopupMenu getExportedPrepsMenu();
+    PopupMenu getPrepOptionMenu( bool singlePrep);
     Colour backGroundApp;
     //Widgets
-
+    BKComboBox selectCB;
     MeterBackground meterbg;
     Meter meter;
 
@@ -79,8 +94,9 @@ private:
     TextButton autoAttackButton;
     TextButton autoReleaseButton;
     TextButton autoMakeupButton;
-    DrawableButton powerButton;
-
+    TextButton powerButton;
+    TextButton actionButton;
+    
     std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> lahAttachment;
     std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> autoAttackAttachment;
     std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> autoReleaseAttachment;

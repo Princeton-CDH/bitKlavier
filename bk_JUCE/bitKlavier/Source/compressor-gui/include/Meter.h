@@ -28,7 +28,7 @@ class Meter : public Component
 public:
     enum Mode { IN = 1, OUT, GR };
 
-    Meter();
+    Meter(ComboBox* selectBox);
     void paint(Graphics& g) override;
     void resized() override;
     void setMode(int m);
@@ -37,10 +37,13 @@ public:
     int getMode();
     float getValue();
     void setGUIEnabled(bool state);
+    FlexBox mBox;
+    Rectangle<int> boxArea;
 private:
     MeterBackground meterBg;
     MeterNeedle needle;
     ComboBox modeBox;
+    ComboBox *selectBox;
     Colour backgroundDarkGrey;
     int meterMode;
     float valueInDecibel;

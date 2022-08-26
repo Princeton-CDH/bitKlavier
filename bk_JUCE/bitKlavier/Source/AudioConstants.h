@@ -409,6 +409,7 @@ typedef enum BKPreparationType {
     PreparationTypeReset,
     PreparationTypePiano,
     PreparationTypeComment,
+    PreparationTypeCompressor,
     BKPreparationTypeNil
 } BKPreparationType;
 
@@ -433,6 +434,7 @@ static const std::vector<BKPreparationType> cPreparationIdToType = {
     PreparationTypeBlendronicMod,
     PreparationTypeResonance,
     PreparationTypeResonanceMod,
+    PreparationTypeCompressor,
     BKPreparationTypeNil
 };
 
@@ -491,7 +493,8 @@ static const std::vector<std::string> cPreparationTypes = {
     "PianoMap",
     "Reset",
     "Piano",
-    "Comment"
+    "Comment",
+    "Compressor"
 };
 
 static const std::vector<std::string> cPreparationNames = {
@@ -514,7 +517,8 @@ static const std::vector<std::string> cPreparationNames = {
     "Piano Map",
     "Reset",
     "Piano",
-    "Comment"
+    "Comment",
+    "Compressor"
 };
 
 typedef enum BKPreparationDisplay {

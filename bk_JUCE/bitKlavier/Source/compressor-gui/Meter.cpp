@@ -19,7 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "include/Constants.h"
 
 
-Meter::Meter()
+Meter::Meter(ComboBox* selectBox) :
+selectBox(selectBox)
 {
     //Init vars
     startAngle = static_cast<float>(5.0f / 3.0f * MathConstants<float>::pi);
@@ -39,6 +40,7 @@ Meter::Meter()
     addAndMakeVisible(meterBg);
     addAndMakeVisible(needle);
 
+    addAndMakeVisible(selectBox);
     backgroundDarkGrey = Colour(Constants::Colors::bg_DarkGrey);
 }
 
@@ -52,14 +54,14 @@ void Meter::resized()
 {
     auto bounds = getLocalBounds();
     auto boxHeight = (bounds.getHeight() / 10) * 2;
-    auto boxArea = bounds.removeFromTop(boxHeight);
+    boxArea = bounds.removeFromTop(boxHeight);
     const FlexItem::Margin comboMargin = FlexItem::Margin(6.0f, 16.0f, 6.0f, 16.0f);
 
-    FlexBox mBox;
     mBox.flexWrap = FlexBox::Wrap::noWrap;
     mBox.flexDirection = FlexBox::Direction::row;
     mBox.justifyContent = FlexBox::JustifyContent::flexEnd;
     mBox.items.add(FlexItem(modeBox).withFlex(1).withMargin(comboMargin));
+    mBox.items.add(FlexItem(*selectBox).withFlex(1).withMargin(comboMargin));
     mBox.performLayout(boxArea.toFloat());
 
     meterBg.setBounds(bounds);
