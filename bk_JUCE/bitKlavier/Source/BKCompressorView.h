@@ -27,6 +27,7 @@ public:
     {
         setLookAndFeel(&laf);
         startTimerHz(60);
+        fillSelectCB(-1,-1);
         setGUIState(false);
         initWidgets();
     }
@@ -54,8 +55,20 @@ public:
         autoMakeupButton.setEnabled(!processor.compressor.getAutoMakeup());
         autoAttackButton.setEnabled(!processor.compressor.getAutoAttack());
         powerButton.setEnabled(!processor.compressor.getPower());
+        int a = compressorPresetNames.indexOf(getName());
+        selectCB.setSelectedItemIndex(a,dontSendNotification);
+        
     }
 
+    void setName(String _name)
+    {
+        processor.name = _name;
+    }
+    
+    String getName()
+    {
+        return processor.name;
+    }
 private:
     BKButtonAndMenuLAF laf;
     void bkButtonClicked(Button* b) override;
@@ -67,16 +80,17 @@ private:
     void actionListenerCallback (const String& message) override {};
     CompressorProcessor &processor;
     BKAudioProcessor &bkp;
+    int numDefaultPresets;
+    int indexOfFirstCompressorPreset;
     void initWidgets();
     void setGUIState(bool powerButton);
     void fillSelectCB(int last, int current);
     static void actionButtonCallback(int action,BKCompressorView*);
-    StringArray compressorNames;
-    String name;
+    StringArray compressorURLs;
+    StringArray compressorPresetNames;
     String url;
     int numCompressorPresets = 0;
     int selectedPresetId = 1;
-    const int builtInPresets = 2; 
     PopupMenu getExportedPrepsMenu();
     PopupMenu getPrepOptionMenu( bool singlePrep);
     Colour backGroundApp;
@@ -93,7 +107,6 @@ private:
     LabeledSlider attackLSlider;
     LabeledSlider releaseLSlider;
     LabeledSlider mixLSlider;
-
     TextButton lahButton;
     TextButton autoAttackButton;
     TextButton autoReleaseButton;

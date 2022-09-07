@@ -675,7 +675,7 @@ void HeaderViewController::loadDefaultGalleries(void)
         {
             resource = BinaryData::namedResourceList[i];
             
-            if (resource.contains("_xml"))
+            if (resource.contains("_xml") && !std::regex_match(resource.toStdString(),std::regex("^Compressor_.*$")))
             {
                 data = BinaryData::getNamedResource(BinaryData::namedResourceList[i], size);
                 

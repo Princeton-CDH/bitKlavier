@@ -80,7 +80,8 @@ lastIntervalTuning(0)
 
 TuningProcessor::~TuningProcessor()
 {
-    if(MTS_HasMaster(tuning->prep->client))
+    if(!MTS_CanRegisterMaster()) MTS_DeregisterMaster();
+    if(MTS_HasMaster(tuning->prep->client) && tuning->prep->client != nullptr)
         MTS_DeregisterClient(tuning->prep->client);
 }
 

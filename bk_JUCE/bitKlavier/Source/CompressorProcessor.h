@@ -9,7 +9,7 @@
 */
 #include "compressor-dsp/include/Compressor.h"
 #include "compressor-dsp/include/LevelEnvelopeFollower.h"
-#include "AudioConstants.h""
+#include "AudioConstants.h"
 #pragma once
 class CompressorProcessor
 {
@@ -24,7 +24,7 @@ public:
     void update();
     void process(AudioSampleBuffer& buffer);
     Compressor compressor;
-    
+    String name;
     inline void setState(XmlElement* e) {
         compressor.setLookahead(e->getBoolAttribute(ptagCompressor_lookAhead));
         compressor.setAutoAttack(e->getBoolAttribute(ptagCompressor_autoAttack));
@@ -40,11 +40,12 @@ public:
         compressor.setInput(e->getStringAttribute(ptagCompressor_inGain).getFloatValue());
         compressor.setRelease(e->getStringAttribute(ptagCompressor_release).getFloatValue());
         compressor.setAttack(e->getStringAttribute(ptagCompressor_attack).getFloatValue());
+        name = e->getStringAttribute("name");
     }
     
     inline ValueTree getState(void) {
         ValueTree vt(vtagCompressor);
-        
+        vt.setProperty("name", name,0);
         vt.setProperty(ptagCompressor_lookAhead, compressor.getLookahead(), 0);
         vt.setProperty(ptagCompressor_autoAttack, compressor.getAutoAttack(), 0);
         vt.setProperty(ptagCompressor_autoRelease, compressor.getAutoRelease(), 0);

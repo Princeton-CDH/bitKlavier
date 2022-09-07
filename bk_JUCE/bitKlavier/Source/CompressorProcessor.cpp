@@ -13,6 +13,7 @@ CompressorProcessor::CompressorProcessor(){
     gainReduction.set(0.0f);
     currentInput.set(-std::numeric_limits<float>::infinity());
     currentOutput.set(-std::numeric_limits<float>::infinity());
+    name = "Default";
 }
 void CompressorProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {

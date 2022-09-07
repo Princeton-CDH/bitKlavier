@@ -20,7 +20,7 @@ void BKCompressorView::initWidgets()
                                                                              Constants::Parameter::inputInterval));
     inGainLSlider.addMyListener(this);
     inGainLSlider.setStringEnding(" dB");
-    inGainLSlider.getSlider()->setValue(0.0f);
+    inGainLSlider.getSlider()->setDoubleClickReturnValue(true, 0.0f);
     addAndMakeVisible(makeupGainLSlider);
     
     //makeupGainLSlider.reset(valueTreeState, "makeup");
@@ -30,6 +30,7 @@ void BKCompressorView::initWidgets()
                                                                                   Constants::Parameter::makeupInterval));
     makeupGainLSlider.setLabelText("Makeup");
     makeupGainLSlider.addMyListener(this);
+    makeupGainLSlider.getSlider()->setDoubleClickReturnValue(true, 0.0f);
     makeupGainLSlider.setStringEnding(" dB");
     addAndMakeVisible(treshLSlider);
     //treshLSlider.reset(valueTreeState, "threshold");
@@ -40,6 +41,7 @@ void BKCompressorView::initWidgets()
     treshLSlider.setLabelText("Threshold");
     treshLSlider.addMyListener(this);
     treshLSlider.setStringEnding(" dB");
+    treshLSlider.getSlider()->setDoubleClickReturnValue(true, 0.0f);
     addAndMakeVisible(ratioLSlider);
     
     //ratioLSlider.reset(valueTreeState, "ratio");
@@ -50,7 +52,7 @@ void BKCompressorView::initWidgets()
     ratioLSlider.setLabelText("Ratio");
     ratioLSlider.addMyListener(this);
     ratioLSlider.setStringEnding(" : 1");
-    
+    ratioLSlider.getSlider()->setDoubleClickReturnValue(true, 1.0f);
     addAndMakeVisible(kneeLSlider);
     //kneeLSlider.reset(valueTreeState, "knee");
     kneeLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
@@ -59,6 +61,7 @@ void BKCompressorView::initWidgets()
                                                                                   Constants::Parameter::kneeInterval));
     kneeLSlider.setLabelText("Knee");
     kneeLSlider.addMyListener(this);
+    kneeLSlider.getSlider()->setDoubleClickReturnValue(true, 1.0f);
     addAndMakeVisible(attackLSlider);
     
     //attackLSlider.reset(valueTreeState, "attack");
@@ -69,6 +72,7 @@ void BKCompressorView::initWidgets()
     attackLSlider.setLabelText("Attack");
     attackLSlider.addMyListener(this);
     attackLSlider.setStringEnding(" ms");
+    attackLSlider.getSlider()->setDoubleClickReturnValue(true, 0.0f);
     addAndMakeVisible(releaseLSlider);
     
     //releaseLSlider.reset(valueTreeState, "release");
@@ -79,6 +83,7 @@ void BKCompressorView::initWidgets()
     releaseLSlider.setLabelText("Release");
     releaseLSlider.addMyListener(this);
     releaseLSlider.setStringEnding(" ms");
+    releaseLSlider.getSlider()->setDoubleClickReturnValue(true, 5.0f);
     addAndMakeVisible(mixLSlider);
     
     //mixLSlider.reset(valueTreeState, "mix");
@@ -89,6 +94,7 @@ void BKCompressorView::initWidgets()
     
     mixLSlider.setLabelText("Mix");
     mixLSlider.addMyListener(this);
+    mixLSlider.getSlider()->setDoubleClickReturnValue(true, 1.0f);
     addAndMakeVisible(lahButton);
     //lahButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
     lahButton.setButtonText("LookAhead");
@@ -151,25 +157,48 @@ void BKCompressorView::initWidgets()
     
     //selectCB.addMyListener(this);
     //addAndMakeVisible(selectCB);
-    name = "Default";
-    fillSelectCB(-1,-1);
+    setName("Default");
+    
 }
 
 void BKCompressorView::fillSelectCB(int last, int current)
 {
-    numCompressorPresets = 1;
+    //numCompressorPresets = 0;
+    numDefaultPresets = 0;
+    compressorPresetNames.clear();
     selectCB.clear(dontSendNotification);
-    selectCB.addItem("Default", numCompressorPresets++);
-    selectCB.addItem("Slammin'", numCompressorPresets++);
-    selectCB.setSelectedId(selectedPresetId);
+    int id = 1;
+    selectCB.addItem("Default",id++);
+    compressorPresetNames.add("Default");
+    numDefaultPresets++;
+    String resource,data,name;
+    int size;
+    for (int i = 0; i < BinaryData::namedResourceListSize; i++)
+    {
+        resource = BinaryData::namedResourceList[i];
+        
+        if (resource.contains("_xml") && std::regex_match(resource.toStdString(),std::regex("^Compressor_.*$")))
+        {
+            if (id == 2)
+                indexOfFirstCompressorPreset = i;
+            data = BinaryData::getNamedResource(BinaryData::namedResourceList[i], size);
+            
+            name = data.fromFirstOccurrenceOf("<compressor name=\"", false, true).upToFirstOccurrenceOf("\"", false, true);
+            compressorPresetNames.add(name);
+            selectCB.addItem(name, id++);
+            numDefaultPresets++;
+        }
+    }
     selectCB.addSeparator();
     File file;
     for (auto xmlIter : RangedDirectoryIterator(File(file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getChildFile("Compressor")), true, "*.xml"))
     {
         File newFile (xmlIter.getFile());
-        compressorNames.add(newFile.getFullPathName());
-        selectCB.addItem(newFile.getFileNameWithoutExtension(), numCompressorPresets++);
+        compressorURLs.add(newFile.getFullPathName());
+        compressorPresetNames.add(XmlDocument::parse(newFile)->getStringAttribute("name"));
+        selectCB.addItem(newFile.getFileNameWithoutExtension(), id++);
     }
+    selectCB.setSelectedId(selectedPresetId);
     //bkp.exportedPreparations
 }
 
@@ -182,7 +211,7 @@ void BKCompressorView::paint(Graphics& g)
 void BKCompressorView::resized()
 {
     auto area_init = getLocalBounds();
-    actionButton.setBounds(area_init.removeFromTop(area_init.getHeight()/10).removeFromLeft(area_init.getWidth()/10));
+    //actionButton.setBounds(area_init.removeFromTop(area_init.getHeight()/10).removeFromLeft(area_init.getWidth()/10));
     auto area = getLocalBounds().reduced(Constants::Margins::big);
  
     const auto headerHeight = area.getHeight() / 10;
@@ -203,6 +232,7 @@ void BKCompressorView::resized()
     headerBox.flexWrap = FlexBox::Wrap::noWrap;
     headerBox.flexDirection = FlexBox::Direction::row;
     headerBox.justifyContent = FlexBox::JustifyContent::spaceAround;
+    headerBox.items.add(FlexItem(actionButton).withFlex(2).withMargin(buttonMargin));
     headerBox.items.add(FlexItem(lahButton).withFlex(2).withMargin(buttonMargin));
     headerBox.items.add(FlexItem(autoAttackButton).withFlex(2).withMargin(buttonMargin));
     headerBox.items.add(FlexItem(autoReleaseButton).withFlex(2).withMargin(buttonMargin));
@@ -262,17 +292,17 @@ PopupMenu BKCompressorView::getPrepOptionMenu( bool singlePrep)
 {
     BKPopupMenu optionMenu;
     
-    optionMenu.addItem(1, "New");
-    optionMenu.addItem(2, "Duplicate");
+    //optionMenu.addItem(1, "New");
+    //optionMenu.addItem(2, "Duplicate");
     optionMenu.addItem(6, "Rename");
-    optionMenu.addItem(3, "Delete", !singlePrep);
-    optionMenu.addSeparator();
+    //optionMenu.addItem(3, "Delete", !singlePrep);
+    //optionMenu.addSeparator();
     optionMenu.addItem(7, "Export");
     
-    PopupMenu exported = getExportedPrepsMenu();
-    optionMenu.addSubMenu("Import...", exported);
-    optionMenu.addSeparator();
-    optionMenu.addItem(4, "Reset");
+    //PopupMenu exported = getExportedPrepsMenu();
+    //optionMenu.addSubMenu("Import...", exported);
+    //optionMenu.addSeparator();
+    //optionMenu.addItem(4, "Reset");
     
     return std::move(optionMenu);
 }
@@ -280,26 +310,19 @@ PopupMenu BKCompressorView::getPrepOptionMenu( bool singlePrep)
 void BKCompressorView::actionButtonCallback(int action, BKCompressorView* view)
 {
     
-    
-    if (action == 1) //new
+
+    if (action == 6) // rename
     {
-    }
-    else if (action == 2) //duplicate
-    {
-    }
-    else if (action == 3) //delete
-    {
-    }
-    else if (action == 4) //reset
-    {
-    }
-    else if (action == 6) // rename
-    {
+        if (view->selectCB.getSelectedItemIndex() < view->numDefaultPresets)
+        {
+            AlertWindow prompt("Error", "Cannot Rename Built-in Presets", AlertWindow::AlertIconType::WarningIcon);
+            return;
+        }
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
       
         
-        prompt.addTextEditor("name",view->name);
+        prompt.addTextEditor("name",view->getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -311,21 +334,21 @@ void BKCompressorView::actionButtonCallback(int action, BKCompressorView* view)
         if (result == 1)
         {
             //prep->setName(name);
-            String oldname = view->name;
+            String oldname = view->getName();
             String oldurl = view->url;
-            view->name = _name;
+            view->setName(_name);
             ValueTree preset = view->processor.getState();
-            preset.setProperty("name",view->name,0);
+            //preset.setProperty("name",view->name,0);
             std::unique_ptr<XmlElement> myXML = preset.createXml();
             File file;
 #if JUCE_IOS
-            file = file.getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/Compressor/" + view->name + ".xml";
+            file = file.getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/Compressor/" + view->getName() + ".xml";
 #endif
 #if JUCE_MAC
-            file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getFullPathName() + "/Compressor/" + view->name + ".xml";
+            file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getFullPathName() + "/Compressor/" + view->getName() + ".xml";
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-            file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getFullPathName() + "\\Compressor\\" + view->name + ".xml";
+            file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getFullPathName() + "\\Compressor\\" + view->getName() + ".xml";
 #endif
             
             myXML->writeTo(file, XmlElement::TextFormat());
@@ -342,7 +365,7 @@ void BKCompressorView::actionButtonCallback(int action, BKCompressorView* view)
         
        
         
-        prompt.addTextEditor("name", view->name);
+        prompt.addTextEditor("name", view->getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -355,55 +378,28 @@ void BKCompressorView::actionButtonCallback(int action, BKCompressorView* view)
         
         if (result == 1)
         {
-            view->name = name;
+            view->setName(name);
             //prep->setName(name);
             ValueTree preset = view->processor.getState();
-            preset.setProperty("name",view->name,0);
+            //preset.setProperty("name",view->name,0);
             std::unique_ptr<XmlElement> myXML = preset.createXml();
             File file;
 #if JUCE_IOS
-            file = file.getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/Compressor/" + view->name + ".xml";
+            file = file.getSpecialLocation(File::userDocumentsDirectory).getFullPathName() + "/Compressor/" + view->getName() + ".xml";
 #endif
 #if JUCE_MAC
-            file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getFullPathName() + "/Compressor/" + view->name + ".xml";
+            file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getFullPathName() + "/Compressor/" + view->getName() + ".xml";
 #endif
 #if JUCE_WINDOWS || JUCE_LINUX
-            file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getFullPathName() + "\\Compressor\\" + view->name + ".xml";
+            file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getFullPathName() + "\\Compressor\\" + view->getName() + ".xml";
 #endif
             
             myXML->writeTo(file, XmlElement::TextFormat());
             view->url = file.getFullPathName();
         }
-    }
-    else if (action >= 100) //import
-    {
-        File file;
+        view->selectedPresetId = view->selectCB.getNumItems() + 1;
         view->fillSelectCB(-1,-1);
-       
-           
-        
-        int which = action - 100;
-       
-        
-    #if JUCE_IOS
-        file  = file.getSpecialLocation(File::userDocumentsDirectory);
-    #endif
-    #if JUCE_MAC
-        file = file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier");
-    #endif
-    #if JUCE_WINDOWS || JUCE_LINUX
-        file = file.getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier");
-    #endif
-        
-        file = file.getChildFile("preparations");
-        file = file.getChildFile("compressor");
-        file = file.getChildFile(view->compressorNames.getReference(which));
-        view->selectedPresetId = which + view->builtInPresets + 1;
-        view->selectCB.setSelectedId(view->selectedPresetId);
-        view->name = file.getFileNameWithoutExtension();
-        view->processor.setState(XmlDocument::parse(file).get());
-        view->url = file.getFullPathName();
-        view->update();
+    
     }
 }
 
@@ -447,20 +443,27 @@ void BKCompressorView::comboBoxChanged(ComboBox* cb)
 {
     if(cb == &selectCB)
     {
-        int id = selectCB.getSelectedId();
-        if (id <= builtInPresets)
+        int id = selectCB.getSelectedItemIndex();
+        selectedPresetId = id;
+        if (id < numDefaultPresets )
         {
             ///load builtins
+            int index = id + indexOfFirstCompressorPreset;
+            int size;
+            String xmlData = CharPointer_UTF8 (BinaryData::getNamedResource(BinaryData::namedResourceList[index], size));
+            processor.setState(XmlDocument::parse(xmlData).get());
+            setName(selectCB.getItemText(id));
+
         } else
         {
-            
-            name = selectCB.getItemText(id);
-            id -= (builtInPresets +1);
-            url = compressorNames.getReference(id);
+
+            setName(selectCB.getItemText(id));
+            //id -= (numDefaultPresets +1);
+            url = compressorURLs.getReference(id - numDefaultPresets);
             processor.setState(XmlDocument::parse(File(url)).get());
-            
-            update();
+
         }
+        update();
     }
     return;
 }
