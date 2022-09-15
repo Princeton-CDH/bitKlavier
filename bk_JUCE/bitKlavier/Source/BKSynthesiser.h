@@ -153,7 +153,7 @@ public:
                             BKSynthesiserSound* sound,
                             float* dynamicGain,
 							float* blendronicGain,
-							BlendronicProcessor::PtrArr blendronic) = 0;
+							EffectProcessor::PtrArr blendronic) = 0;
     
     virtual void startNote (int midiNoteNumber,
                             float offset,
@@ -173,7 +173,7 @@ public:
                             BKSynthesiserSound* sound,
                             float* dynamicGain,
 							float* blendronicGain,
-							BlendronicProcessor::PtrArr blendronic) = 0;
+							EffectProcessor::PtrArr blendronic) = 0;
     
     /** Called to stop a note.
      
@@ -288,7 +288,7 @@ public:
     void setGeneralSettings(GeneralSettings::Ptr gen) {generalSettings = gen;}
     
     TuningProcessor::Ptr tuning;
-	BlendronicProcessor::PtrArr blendronic;
+	EffectProcessor::PtrArr effect;
     
     double currentSampleRate;
     
@@ -468,7 +468,7 @@ public:
                                         TuningProcessor::Ptr tuner = nullptr,
                                         float* dynamicGain = nullptr,
                                         float* blendronicGain = nullptr,
-                                        BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr());
+                                        EffectProcessor::PtrArr blendronic = EffectProcessor::PtrArr());
     
     virtual BKSynthesiserVoice* keyOn ( int midiChannel,
                                         int keyNoteNumber,
@@ -490,7 +490,7 @@ public:
                                         TuningProcessor::Ptr tuner = nullptr,
                                         float* dynamicGain = nullptr,
                                         float* blendronicGain = nullptr,
-                                        BlendronicProcessor::PtrArr blendronic = BlendronicProcessor::PtrArr()
+                                        EffectProcessor::PtrArr blendronic = EffectProcessor::PtrArr()
                                         );
     
     /** Triggers a note-off event.
@@ -670,9 +670,8 @@ public:
      */
     void setMinimumRenderingSubdivisionSize (int numSamples, bool shouldBeStrict = false) noexcept;
 
-	BlendronicDelay::Ptr createBlendronicDelay(float delayLength, int delayBufferSize, double sr, bool active = false);
-    void addBlendronicProcessor(BlendronicProcessor::Ptr bproc);
-    void removeBlendronicProcessor(int Id);
+    void addEffectProcessor(EffectProcessor::Ptr bproc);
+    void removeEffectProcessor(int Id);
     
 	void renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples);
 	void renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples);
@@ -752,7 +751,7 @@ protected:
                      TuningProcessor::Ptr tuner,
                      float* dynamicGain,
 					 float* blendronicGain,
-					 BlendronicProcessor::PtrArr blendronic);
+					 EffectProcessor::PtrArr blendronic);
     
     void startVoice (BKSynthesiserVoice* voice,
                      BKSynthesiserSound* sound,
@@ -776,7 +775,7 @@ protected:
                      TuningProcessor::Ptr tuner,
                      float* dynamicGain,
 					 float* blendronicGain,
-					 BlendronicProcessor::PtrArr blendronic);
+					 EffectProcessor::PtrArr blendronic);
     
     /** Stops a given voice.
      You should never need to call this, it's used internally by noteOff, but is protected
@@ -805,7 +804,7 @@ private:
     bool shouldStealNotes;
     BigInteger sustainPedalsDown;
 
-    Array<BlendronicProcessor::Ptr> bprocessors;
+    Array<EffectProcessor::Ptr> eprocessors;
     
 #if JUCE_CATCH_DEPRECATED_CODE_MISUSE
     // Note the new parameters for these methods.

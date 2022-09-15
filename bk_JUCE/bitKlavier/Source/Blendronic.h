@@ -36,7 +36,7 @@
 #include "Keymap.h"
 #include "BKSTK.h"
 #include "BlendronicDisplay.h"
-
+#include "Effects.h"
 
 // Forward declaration to allow include of Blendronic in BKSynthesiser
 class BKSynthesiser;
@@ -609,15 +609,15 @@ private:
  values it needs to behave as expected.
 */
 
-class BlendronicProcessor : public ReferenceCountedObject
+class BlendronicProcessor : public EffectProcessor
 {
 
 public:
-	typedef ReferenceCountedObjectPtr<BlendronicProcessor>   Ptr;
-	typedef Array<BlendronicProcessor::Ptr>                  PtrArr;
-	typedef Array<BlendronicProcessor::Ptr, CriticalSection> CSPtrArr;
-	typedef OwnedArray<BlendronicProcessor>                  Arr;
-	typedef OwnedArray<BlendronicProcessor, CriticalSection> CSArr;
+//	typedef ReferenceCountedObjectPtr<BlendronicProcessor>   Ptr;
+//	typedef Array<BlendronicProcessor::Ptr>                  PtrArr;
+//	typedef Array<BlendronicProcessor::Ptr, CriticalSection> CSPtrArr;
+//	typedef OwnedArray<BlendronicProcessor>                  Arr;
+//	typedef OwnedArray<BlendronicProcessor, CriticalSection> CSArr;
 
 	BlendronicProcessor(Blendronic::Ptr bBlendronic,
 		TempoProcessor::Ptr bTempo,
@@ -630,20 +630,20 @@ public:
 	BKSampleLoadType sampleType;
 
 	//begin timing played note length, called with noteOn
-	void keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+	void keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress) override;
 
 	//begin playing reverse note, called with noteOff
-	void keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+	void keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress) override;
 
-	void postRelease(int noteNumber, int midiChannel);
+	void postRelease(int noteNumber, int midiChannel) override;
 
-	void prepareToPlay(double sr);
+	void prepareToPlay(double sr) override;
 
 	//accessors
 	inline Blendronic::Ptr getBlendronic(void) const noexcept { return blendronic; }
 	inline TempoProcessor::Ptr getTempo(void) const noexcept { return tempo; }
 	inline BlendronicDelay* getDelay(void) const noexcept { return delay; }
-	inline int getId(void) const noexcept { return blendronic->getId(); }
+    inline int getId(void) const noexcept override { return blendronic->getId(); } //override;
     inline int getTempoId(void) const noexcept { return tempo->getId(); }
 	inline const float getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
     inline uint64 getSampleTime(void) const noexcept { return sampleTimer; }
@@ -653,10 +653,10 @@ public:
     inline int getDelayIndex(void) const noexcept { return delayIndex; }
     inline int getSmoothIndex(void) const noexcept { return smoothIndex; }
     inline int getFeedbackIndex(void) const noexcept { return feedbackIndex; }
-    inline BKSynthesiser* getSynth(void) const noexcept { return synth; }
+    
     inline Array<int> getKeysDepressed(void) const noexcept { return keysDepressed; }
     inline const AudioBuffer<float>* getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
-    inline const bool getActive() const noexcept { return blendronicActive; }
+    //inline const bool getActive() const noexcept { return blendronicActive; }
     inline const bool getInputState() const noexcept { return delay->getInputState(); }
     inline const bool getOutputState() const noexcept { return delay->getOutputState(); }
     inline const Array<uint64> getBeatPositionsInBuffer() const noexcept { return beatPositionsInBuffer; }
@@ -666,21 +666,20 @@ public:
     
 	//mutators
 	inline void setBlendronic(Blendronic::Ptr blend) { blendronic = blend; }
-	inline void setTempo(TempoProcessor::Ptr temp) { tempo = temp; }
     inline void setSampleTimer(uint64 sampleTime) { sampleTimer = sampleTime; }
     inline void setBeatIndex(int index) { beatIndex = index; }
     inline void setDelayIndex(int index) { delayIndex = index; }
     inline void setSmoothIndex(int index) { smoothIndex = index; }
     inline void setFeedbackIndex(int index) { feedbackIndex = index; }
-    inline void setClearDelayOnNextBeat(bool clear) { clearDelayOnNextBeat = clear; }
-    inline void setActive(bool newActive) { blendronicActive = newActive; }
-    inline void toggleActive() { blendronicActive = !blendronicActive; }
+    inline void setClearDelayOnNextBeat(bool clear) override { clearDelayOnNextBeat = clear; }
+    //inline void setActive(bool newActive) { blendronicActive = newActive; }
+    //inline void toggleActive() { blendronicActive = !blendronicActive; }
     inline void setInputState(bool inputState) { delay->setInputState(inputState); }
     inline void toggleInput() { delay->toggleInput(); }
     inline void setOutputState(bool inputState) { delay->setOutputState(inputState); }
     inline void toggleOutput() { delay->toggleOutput(); }
     
-    inline void reset(void)
+    inline void  reset(void) override
     {
         blendronic->prep->resetModdables();
         DBG("blendronic reset called");
@@ -691,46 +690,37 @@ public:
     
     void setDelayBufferSizeInSeconds(float size);
     
-    void tick(float* outputs);
+    void tick(float* outputs) override ;
     void updateDelayParameters();
 	void processBlock(int numSamples, int midiChannel);
     
-    inline void addKeymap(Keymap::Ptr keymap)
-    {
-        keymaps.add(keymap);
-    }
     
-    inline Keymap::PtrArr getKeymaps(void)
-    {
-        return keymaps;
-    }
     
     inline OwnedArray<BlendronicDisplay::ChannelInfo>* getAudioDisplayData(void) { return &audio; }
     
     inline BlendronicDisplay::ChannelInfo* getSmoothingDisplayData(void) { return smoothing.get(); }
     
-    Array<Array<float>>& getVelocities() { return velocities; }
-    Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
     
-    void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
-    void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
 
 private:
-    CriticalSection lock;
+    
     /* Private Functions */
 
+    BlendronicDelay::Ptr createBlendronicDelay(float delayLength, int delayBufferSize, double sr, bool active)
+    {
+        const ScopedLock sl (lock);
+        BlendronicDelay::Ptr delay = new BlendronicDelay(delayLength, delayLength, INFINITY, delayBufferSize, sr, active);
+        return delay;
+    }
 	void playNote(int channel, int note, float velocity);
     
     /* Private Variables */
     
     Blendronic::Ptr         blendronic;
-    BKSynthesiser*          synth;
-    TempoProcessor::Ptr     tempo;
-    GeneralSettings::Ptr    general;
+    //TempoProcessor::Ptr     tempo;
     BlendronicDelay::Ptr    delay;
-    Keymap::PtrArr          keymaps;
     
-    bool blendronicActive;
+    //bool blendronicActive;
     
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;

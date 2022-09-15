@@ -108,11 +108,11 @@ void Piano::deconfigure(void)
     sprocessor.clear();
     nprocessor.clear();
     tprocessor.clear();
-    for (auto b : bprocessor)
+    for (auto b : eprocessor)
     {
-        b->getSynth()->removeBlendronicProcessor(b->getId());
+        b->getSynth()->removeEffectProcessor(b->getId());
     }
-    bprocessor.clear();
+    eprocessor.clear();
     rprocessor.clear();
     
     for (int key = 0; key < 128; key++)
@@ -340,11 +340,14 @@ TempoProcessor::Ptr Piano::getTempoProcessor(int Id, bool add)
     return add ? addTempoProcessor(Id) : nullptr;
 }
 
-BlendronicProcessor::Ptr Piano::getBlendronicProcessor(int Id, bool add)
+EffectProcessor::Ptr Piano::getBlendronicProcessor(int Id, bool add)
 {
-	for (auto proc : bprocessor)
+	for (auto proc : eprocessor)
 	{
-		if (proc->getId() == Id) return proc;
+        if(proc->getType() == EffectType::EffectBlendronic)
+        {
+           if (proc->getId() == Id) return proc;
+        }
 	}
 
 	return add ? addBlendronicProcessor(Id) : nullptr;
@@ -411,15 +414,15 @@ TempoProcessor::Ptr Piano::addTempoProcessor(int thisId)
     return mproc;
 }
 
-BlendronicProcessor::Ptr Piano::addBlendronicProcessor(int thisId)
+EffectProcessor::Ptr Piano::addBlendronicProcessor(int thisId)
 {
 	BlendronicProcessor::Ptr bproc = new BlendronicProcessor(processor.gallery->getBlendronic(thisId),
                                                              defaultM,
                                                              processor.gallery->getGeneralSettings(),
                                                              &processor.mainPianoSynth);
 	bproc->prepareToPlay(processor.getCurrentSampleRate());
-	bprocessor.add(bproc);
-    processor.mainPianoSynth.addBlendronicProcessor(bproc);
+	eprocessor.add(bproc);
+    processor.mainPianoSynth.addEffectProcessor(bproc);
 
 	return bproc;
 }
@@ -543,7 +546,7 @@ void Piano::linkPreparationWithTempo(BKPreparationType thisType, int thisId, Tem
     }
     else if (thisType == PreparationTypeBlendronic)
     {
-        BlendronicProcessor::Ptr bproc = getBlendronicProcessor(thisId);
+        BlendronicProcessor* bproc = dynamic_cast<BlendronicProcessor*>(getBlendronicProcessor(thisId).get());
         
         bproc->setTempo(mproc);
     }
@@ -590,7 +593,7 @@ void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tu
 
 void Piano::linkPreparationWithBlendronic(BKPreparationType thisType, int thisId, Blendronic::Ptr thisBlend)
 {
-	BlendronicProcessor::Ptr bproc = getBlendronicProcessor(thisBlend->getId());
+	EffectProcessor::Ptr bproc = getBlendronicProcessor(thisBlend->getId());
 
 	if (thisType == PreparationTypeDirect)
 	{
@@ -640,8 +643,8 @@ void Piano::linkPreparationWithKeymap(BKPreparationType thisType, int thisId, in
     }
     else if (thisType == PreparationTypeBlendronic)
     {
-        BlendronicProcessor::Ptr bproc = getBlendronicProcessor(thisId);
-        prepMap->addBlendronicProcessor(bproc);
+        EffectProcessor::Ptr bproc = getBlendronicProcessor(thisId);
+        prepMap->addEffectProcessor(bproc);
     }
     else if (thisType == PreparationTypeTempo)
     {
@@ -1031,7 +1034,7 @@ void Piano::prepareToPlay(double sr)
     for (auto tproc : tprocessor)
         tproc->prepareToPlay(sampleRate);
 
-	for (auto bproc : bprocessor)
+	for (auto bproc : eprocessor)
 		bproc->prepareToPlay(sampleRate);
     
     for (auto rproc : rprocessor)

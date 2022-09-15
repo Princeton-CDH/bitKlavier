@@ -609,7 +609,7 @@ void BlendronicPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 void BlendronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     BlendronicPreparation::Ptr prep = processor.gallery->getBlendronicPreparation(processor.updateState->currentBlendronicId);
-    BlendronicProcessor::Ptr proc = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
+    BlendronicProcessor * proc = dynamic_cast<BlendronicProcessor *>(processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId).get());
     
     if (slider->getName() == gainSlider->getName())
     {
@@ -660,7 +660,7 @@ void BlendronicPreparationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplayBlendronic)
     {
-        BlendronicProcessor::Ptr proc = processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId);
+        BlendronicProcessor * proc =dynamic_cast<BlendronicProcessor*>(processor.currentPiano->getBlendronicProcessor(processor.updateState->currentBlendronicId).get());
         BlendronicPreparation::Ptr prep = processor.gallery->getBlendronicPreparation(processor.updateState->currentBlendronicId);
         
         if (prep != nullptr && proc != nullptr)

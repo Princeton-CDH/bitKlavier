@@ -44,12 +44,8 @@ void BlendronicPreparation::performModification(BlendronicModification* b, Array
 
 BlendronicProcessor::BlendronicProcessor(Blendronic::Ptr bBlendronic,
 	TempoProcessor::Ptr bTempo, GeneralSettings::Ptr bGeneral, BKSynthesiser* bMain):
-	blendronic(bBlendronic),
-    synth(bMain),
-	tempo(bTempo),
-	general(bGeneral),
-    keymaps(Keymap::PtrArr()),
-    blendronicActive(true),
+    EffectProcessor(bGeneral,bMain, EffectBlendronic, bTempo),
+    blendronic(bBlendronic),
 	sampleTimer(0),
 	beatIndex(0),
     delayIndex(0),
@@ -102,7 +98,7 @@ void BlendronicProcessor::tick(float* outputs)
     BlendronicPreparation::Ptr prep = blendronic->prep;
     TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
     
-    if (!blendronicActive) return;
+    if (!effectActive) return;
     if (tempoPrep->getSubdivisions() * tempoPrep->getTempo() == 0) return;
 
     // Update the pulse length in case tempo or subdiv changed
@@ -382,7 +378,7 @@ void BlendronicProcessor::prepareToPlay(double sr)
     
     if (delay == nullptr)
     {
-        delay = synth->createBlendronicDelay(prep->bDelayLengths.value[0], prep->delayBufferSizeInSeconds.value * synth->getSampleRate(), synth->getSampleRate(), true);
+        delay = createBlendronicDelay(prep->bDelayLengths.value[0], prep->delayBufferSizeInSeconds.value * synth->getSampleRate(), synth->getSampleRate(), true);
     }
     
     for (int i = 0; i < 1/*numChannels*/; ++i)

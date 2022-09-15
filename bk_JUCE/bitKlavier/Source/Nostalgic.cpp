@@ -65,13 +65,13 @@ void NostalgicPreparation::performModification(NostalgicModification* n, Array<b
 NostalgicProcessor::NostalgicProcessor(Nostalgic::Ptr nostalgic,
                                        TuningProcessor::Ptr tuning,
                                        SynchronicProcessor::Ptr synchronic,
-										BlendronicProcessor::PtrArr blend,
+                                       EffectProcessor::PtrArr effect,
                                        BKSynthesiser *s):
 synth(s),
 nostalgic(nostalgic),
 tuner(tuning),
 synchronic(synchronic),
-blendronic(blend),
+effects(effect),
 keymaps(Keymap::PtrArr())
 {
     if (!nostalgic->prep->nUseGlobalSoundSet.value)
@@ -203,7 +203,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                     String(synthNoteNumber) + " " +
                     String(synthOffset) + " " +
                     String(aVels->getUnchecked(0)));
-                if (!blendronic.isEmpty())
+                if (!effects.isEmpty())
                 {
                     synth->keyOn(1,
                                  noteNumber,
@@ -226,7 +226,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                                  tuner,
                                  prep->getGainPtr(),
                                  prep->getBlendronicGainPtr(),
-                                 blendronic);
+                                 effects);
 				}
 				else
 				{
@@ -365,7 +365,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                         DBG("Nostalgic::keyReleased duration, waveDistance : " + String(duration) + " " + String(prep->nWaveDistance.value));
                         
                         //play nostalgic note
-                        if (!blendronic.isEmpty())
+                        if (!effects.isEmpty())
                         {
                             synth->keyOn(1,
                                          note,
@@ -465,7 +465,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                     String(synthNoteNumber) + " " +
                     String(synthOffset));
                 
-                if (!blendronic.isEmpty())
+                if (!effects.isEmpty())
                 {
                     synth->keyOn(1,
                                  noteNumber,
@@ -610,7 +610,7 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
                     String(synthNoteNumber) + " " +
                     String(synthOffset));
                 
-				if (!blendronic.isEmpty())
+				if (!effects.isEmpty())
 				{
                     synth->keyOn(1,
                                  noteNumber,
@@ -633,7 +633,7 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
                                  tuner,
                                  prep->getGainPtr(),
                                  prep->getBlendronicGainPtr(),
-                                 blendronic);
+                                 effects);
                 }
 				else
 				{
@@ -919,7 +919,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                      */
                     NostalgicPreparation::Ptr prep = nostalgic->prep;
                     
-					if (!blendronic.isEmpty())
+					if (!effects.isEmpty())
 					{
                         synth->keyOn(midiChannel,
                                      thisNote->getNoteNumber(),
@@ -941,7 +941,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                                      tuner,
                                      prep->getGainPtr(),
                                      prep->getBlendronicGainPtr(),
-                                     blendronic);
+                                     effects);
 					}
 					else
 					{
@@ -965,7 +965,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                                      tuner,
                                      prep->getGainPtr(),
                                      prep->getBlendronicGainPtr(),
-                                     blendronic);
+                                     effects);
 					}
                 }
 

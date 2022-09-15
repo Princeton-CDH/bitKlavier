@@ -853,14 +853,20 @@ public:
         return keymaps;
     }
 
-    inline void addBlendronic(BlendronicProcessor::Ptr blend)
+    inline void addBlendronic(EffectProcessor::Ptr blend)
     {
-        blendronic.add(blend);
+        effects.add(blend);
     }
-
-    inline BlendronicProcessor::PtrArr getBlendronic(void) const noexcept
+    
+    inline EffectProcessor::PtrArr getBlendronic(void)
     {
-        return blendronic;
+        EffectProcessor::PtrArr blends;
+        for (auto e : effects)
+        {
+            if(e->getType() == EffectType::EffectBlendronic)
+                blends.add(e);
+        }
+        return blends;
     }
 
     void ringSympStrings(int noteNumber, float velocity);
@@ -873,7 +879,7 @@ private:
     TuningProcessor::Ptr        tuning;
     GeneralSettings::Ptr        general;
     Keymap::PtrArr              keymaps;
-    BlendronicProcessor::PtrArr blendronic;
+    EffectProcessor::PtrArr effects;
     
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;

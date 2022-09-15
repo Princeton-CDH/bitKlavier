@@ -46,7 +46,7 @@ void DirectPreparation::performModification(DirectModification* d, Array<bool> d
 
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
                                  TuningProcessor::Ptr tuning,
-                                 BlendronicProcessor::PtrArr blend,
+                                 EffectProcessor::PtrArr effect,
                                  BKSynthesiser *s,
                                  BKSynthesiser *res,
                                  BKSynthesiser *ham):
@@ -55,7 +55,7 @@ resonanceSynth(res),
 hammerSynth(ham),
 direct(direct),
 tuner(tuning),
-blendronic(blend),
+effects(effect),
 keymaps(Keymap::PtrArr())
 {
     // Only one Direct target right now, but will use structure for multiple in case we add more
@@ -144,11 +144,15 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
         synthOffset     -= (int)offset;
         
         // blendronic stuff, or not
-		if (!blendronic.isEmpty())
+		if (!effects.isEmpty())
 		{
-            for (auto b : blendronic)
+            for (auto b : effects)
             {
-                b->setClearDelayOnNextBeat(false);
+                if(b->getType() == EffectBlendronic)
+                {
+                    b->setClearDelayOnNextBeat(false); 
+                }
+
             }
             if (*direct->prep->getGainPtr() > -80.) {
                 synth->keyOn(1,
@@ -171,7 +175,7 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
                              tuner,
                              prep->getGainPtr(),
                              prep->getBlendronicGainPtr(),
-                             blendronic);
+                             effects);
             }
 		}
 		else

@@ -22,6 +22,7 @@
 #include "Tempo.h"
 #include "Tuning.h"
 #include "Blendronic.h"
+#include "Effects.h"
 #include "Resonance.h"
 
 class PreparationMap : public ReferenceCountedObject
@@ -110,7 +111,7 @@ public:
             prep.append(" ",1);
         }
 
-		for (auto p : bprocessor)
+		for (auto p : eprocessor)
 		{
 			prep.append("B", 1);
 			prep.append(String(p->getId()), 3);
@@ -169,11 +170,11 @@ public:
     TempoProcessor::Ptr         getTempoProcessor       (int Id);
     bool                        contains                (TempoProcessor::Ptr);
 
-	void                        addBlendronicProcessor(BlendronicProcessor::Ptr);
-	void                        setBlendronicProcessors(BlendronicProcessor::PtrArr);
-	BlendronicProcessor::PtrArr      getBlendronicProcessors(void);
-	BlendronicProcessor::Ptr         getBlendronicProcessor(int Id);
-	bool                        contains(BlendronicProcessor::Ptr);
+	void                        addEffectProcessor(EffectProcessor::Ptr);
+	//void                        setEffectProcessors(EffectProcessor::PtrArr);
+	EffectProcessor::PtrArr      getEffectProcessors(void);
+	EffectProcessor::Ptr         getEffectProcessor(int Id, EffectType type);
+	bool                        contains(EffectProcessor::Ptr);
 
     void                        addResonanceProcessor(ResonanceProcessor::Ptr);
     void                        setResonanceProcessors(ResonanceProcessor::PtrArr);
@@ -214,8 +215,8 @@ public:
         DBG("Tempo: " + intArrayToString(ps));
 
 		ps.clear();
-		for (auto p : bprocessor) ps.add(p->getId());
-		DBG("Blendronic: " + intArrayToString(ps));
+		for (auto p : eprocessor) ps.add(p->getId());
+		DBG("Effect: " + intArrayToString(ps));
 
         ps.clear();
         for (auto p : rprocessor) ps.add(p->getId());
@@ -230,7 +231,7 @@ private:
     DirectProcessor::PtrArr              dprocessor;
     SynchronicProcessor::PtrArr          sprocessor;
     NostalgicProcessor::PtrArr           nprocessor;
-    BlendronicProcessor::PtrArr          bprocessor;
+    EffectProcessor::PtrArr              eprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
     ResonanceProcessor::PtrArr           rprocessor;

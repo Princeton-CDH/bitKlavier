@@ -79,7 +79,7 @@ void SynchronicPreparation::performModification(SynchronicModification* s, Array
 SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TuningProcessor::Ptr tuning,
                                          TempoProcessor::Ptr tempo,
-										 BlendronicProcessor::PtrArr blend,
+										 EffectProcessor::PtrArr blend,
                                          BKSynthesiser* main,
                                          GeneralSettings::Ptr general):
 synth(main),
@@ -177,7 +177,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 
         int whichEnv = cluster->getEnvelopeCounter();
 		BKSynthesiserVoice* currentVoice;
-		if (!blendronic.isEmpty())
+		if (!effects.isEmpty())
 		{
             currentVoice =
                 synth->keyOn(1,
@@ -200,7 +200,7 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                              tuner,
                              prep->getGainPtr(),
                              prep->getBlendronicGainPtr(),
-                             blendronic);
+                             effects);
 		}
 		else
 		{

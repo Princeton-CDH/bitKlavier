@@ -222,7 +222,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      BKSynthesiserSound* s,
                                      float* dynamicGain,
 									 float* blendronicGain,
-									 BlendronicProcessor::PtrArr blendronic)
+									 EffectProcessor::PtrArr effect)
 {
     
     
@@ -244,7 +244,7 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
                                      s,
                                      dynamicGain,
 									 blendronicGain,
-									 blendronic);
+									 effect);
 }
 
 #define REVENV 0
@@ -342,7 +342,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
                                      BKSynthesiserSound* s,
                                      float* dynamicGain,
 									 float* blendGain,
-									 BlendronicProcessor::PtrArr blendronic)
+									 EffectProcessor::PtrArr effect)
 {
     if (BKPianoSamplerSound* const sound = dynamic_cast<BKPianoSamplerSound*> (s))
     {
@@ -644,7 +644,7 @@ void BKPianoSamplerVoice::startNote (const int midi,
         noteStartingPosition = sourceSamplePosition;
         noteEndPosition = playEndPosition;
 		blendronicGain = blendGain;
-		this->blendronic = blendronic;
+		this->effect = effect;
         
         float dg = 1.0f;
         if (dgain != nullptr) dg = Decibels::decibelsToGain(*dgain);
@@ -703,7 +703,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     
     int64 loopStart, loopEnd, start, end, soundLengthMinus1;
     
-    int numBlendronics = blendronic.size();
+    int numBlendronics = effect.size();
     /*
     Array<BKDelayL*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
@@ -711,7 +711,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
      */
     Array<BlendronicDelay*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
-        blendronicDelays.add(blendronic.getUnchecked(i)->getDelay());
+        blendronicDelays.add(dynamic_cast<BlendronicProcessor*>(effect.getUnchecked(i).get())->getDelay());
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
@@ -878,7 +878,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
     float* outL = outputBuffer.getWritePointer (0, startSample);
     float* outR = outputBuffer.getNumChannels() > 1 ? outputBuffer.getWritePointer (1, startSample) : nullptr;
    
-    int numBlendronics = blendronic.size();
+    int numBlendronics = effect.size();
     /*
     Array<BKDelayL*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
@@ -886,7 +886,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
      */
     Array<BlendronicDelay*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
-        blendronicDelays.add(blendronic.getUnchecked(i)->getDelay());
+        blendronicDelays.add(dynamic_cast<BlendronicProcessor*>(effect.getUnchecked(i).get())->getDelay());
     
     double bentRatio = pitchRatio * pitchbendMultiplier;
     
@@ -1097,17 +1097,15 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
 
     // Putting blendronics into a temp raw pointer array to avoid taking the extra time
     // to do ReferenceCountedObject stuff in the loop
-    int numBlendronics = blendronic.size();
-    
+    int numBlendronics = effect.size();
     /*
     Array<BKDelayL*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
         blendronicDelays.add(blendronic.getUnchecked(i)->getDelay()->getDelay().get());
      */
-    
     Array<BlendronicDelay*> blendronicDelays;
     for (int i = 0; i < numBlendronics; ++i)
-        blendronicDelays.add(blendronic.getUnchecked(i)->getDelay());
+        blendronicDelays.add(dynamic_cast<BlendronicProcessor*>(effect.getUnchecked(i).get())->getDelay());
     
     
     double bentRatio = pitchRatio * pitchbendMultiplier;

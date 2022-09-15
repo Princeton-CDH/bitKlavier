@@ -88,11 +88,14 @@ void PreparationMap::linkKeymapToPreparation(int keymapId, BKPreparationType thi
     }
     else if (thisType == PreparationTypeBlendronic)
     {
-        for (int i = 0; i < bprocessor.size(); ++i)
+        for (int i = 0; i < eprocessor.size(); ++i)
         {
-            if (bprocessor[i]->getId() == thisId)
+            if (eprocessor[i]->getType() == EffectType::EffectBlendronic)
             {
-                bprocessor[i]->addKeymap(getKeymap(keymapId));
+                if (eprocessor[i]->getId() == thisId)
+                {
+                    eprocessor[i]->addKeymap(getKeymap(keymapId));
+                }
             }
         }
     }
@@ -341,37 +344,40 @@ bool PreparationMap::contains(TempoProcessor::Ptr thisOne)
     
 }
 
-BlendronicProcessor::PtrArr     PreparationMap::getBlendronicProcessors(void)
+EffectProcessor::PtrArr     PreparationMap::getEffectProcessors(void)
 {
-    return bprocessor;
+    return eprocessor;
 }
 
-BlendronicProcessor::Ptr        PreparationMap::getBlendronicProcessor(int Id)
+EffectProcessor::Ptr        PreparationMap::getEffectProcessor(int Id, EffectType type)
 {
-    for (auto p : bprocessor)
+    for (auto p : eprocessor)
     {
-        if (p->getId() == Id) return p;
+        if (p->getType() == type)
+        {
+            if (p->getId() == Id) return p;
+        }
     }
     
     return nullptr;
 }
 
-void PreparationMap::setBlendronicProcessors(BlendronicProcessor::PtrArr p)
+//void PreparationMap::setBlendronicProcessors(BlendronicProcessor::PtrArr p)
+//{
+//    bprocessor = p;
+//    deactivateIfNecessary();
+//}
+//
+void PreparationMap::addEffectProcessor(EffectProcessor::Ptr p)
 {
-    bprocessor = p;
+    eprocessor.addIfNotAlreadyThere(p);
     deactivateIfNecessary();
 }
 
-void PreparationMap::addBlendronicProcessor(BlendronicProcessor::Ptr p)
-{
-    bprocessor.addIfNotAlreadyThere(p);
-    deactivateIfNecessary();
-}
 
-
-bool PreparationMap::contains(BlendronicProcessor::Ptr thisOne)
+bool PreparationMap::contains(EffectProcessor::Ptr thisOne)
 {
-    for (auto p : bprocessor)
+    for (auto p : eprocessor)
     {
         if (p->getId() == thisOne->getId())
         {
@@ -428,7 +434,7 @@ void PreparationMap::deactivateIfNecessary()
     dprocessor.size() == 0 &&
     tprocessor.size() == 0 &&
     mprocessor.size() == 0 &&
-    bprocessor.size() == 0 &&
+    eprocessor.size() == 0 &&
     rprocessor.size() == 0)
     {
         isActive = false;
@@ -465,8 +471,8 @@ void PreparationMap::processBlock(AudioSampleBuffer& buffer, int numSamples, int
         for (auto mproc : mprocessor)
             mproc->processBlock(numSamples, midiChannel);
 
-		for (auto bproc : bprocessor)
-			bproc->processBlock(numSamples, midiChannel);
+//		for (auto bproc : bprocessor)
+//			bproc->processBlock(numSamples, midiChannel);
         
         for (auto rproc : rprocessor)
             rproc->processBlock(numSamples, midiChannel);
@@ -591,47 +597,50 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
         releaseTargetVelocities.fill(-1.f);
     }
     
-    for (auto proc : bprocessor)
+    for (auto proc : eprocessor)
     {
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        for (auto km : proc->getKeymaps())
+        if (proc->getType() == EffectBlendronic)
         {
-            // Check that the the keymap contains the pressed note and uses the midi source of the note
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            bool ignoreSustain = !sustainPedalIsDepressed;
+            for (auto km : proc->getKeymaps())
             {
-                // For each target
-                for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
+                // Check that the the keymap contains the pressed note and uses the midi source of the note
+                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
                 {
-                    // Check that the target is enabled
-                    if (km->getTargetStates()[i])
+                    // For each target
+                    for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
                     {
-                        // If the keymap is inverted, this is a release
-                        if (km->isInverted())
+                        // Check that the target is enabled
+                        if (km->getTargetStates()[i])
                         {
-                            // Apply the curve and take the max velocity of any redundant cases
-                            float v = jmax(releaseTargetVelocities.getUnchecked(i),
-                                           km->applyVelocityCurve(velocity));
-                            releaseTargetVelocities.setUnchecked(i, v);
-                        }
-                        // Otherwise a press
-                        else
-                        {
-                            // Apply the curve and take the max velocity of any redundant cases
-                            float v = jmax(pressTargetVelocities.getUnchecked(i),
-                                           km->applyVelocityCurve(velocity));
-                            pressTargetVelocities.setUnchecked(i, v);
+                            // If the keymap is inverted, this is a release
+                            if (km->isInverted())
+                            {
+                                // Apply the curve and take the max velocity of any redundant cases
+                                float v = jmax(releaseTargetVelocities.getUnchecked(i),
+                                               km->applyVelocityCurve(velocity));
+                                releaseTargetVelocities.setUnchecked(i, v);
+                            }
+                            // Otherwise a press
+                            else
+                            {
+                                // Apply the curve and take the max velocity of any redundant cases
+                                float v = jmax(pressTargetVelocities.getUnchecked(i),
+                                               km->applyVelocityCurve(velocity));
+                                pressTargetVelocities.setUnchecked(i, v);
+                            }
                         }
                     }
+                    if (km->getIgnoreSustain()) ignoreSustain = true;
                 }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
             }
+            proc->keyPressed(noteNumber, pressTargetVelocities, true);
+            pressTargetVelocities.fill(-1.f);
+            
+            if (ignoreSustain && !noteDown)
+                proc->keyReleased(noteNumber, releaseTargetVelocities, true);
+            releaseTargetVelocities.fill(-1.f);
         }
-        proc->keyPressed(noteNumber, pressTargetVelocities, true);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
-        releaseTargetVelocities.fill(-1.f);
     }
     
     for (auto proc : dprocessor)
@@ -1103,7 +1112,7 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
          */
     }
     
-    for (auto proc : bprocessor)
+    for (auto proc : eprocessor)
     {
         cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeBlendronicPatternSync, TargetTypeBlendronicOpenCloseOutput, pressTargetVelocities, releaseTargetVelocities);
 
@@ -1497,7 +1506,7 @@ void PreparationMap::pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysT
              */
         }
         
-        for (auto proc : bprocessor)
+        for (auto proc : eprocessor)
         {
             pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeBlendronicPatternSync, TargetTypeBlendronicOpenCloseOutput);
             

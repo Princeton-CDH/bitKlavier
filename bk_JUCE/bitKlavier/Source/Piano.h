@@ -66,7 +66,7 @@ public:
     NostalgicProcessor::PtrArr           nprocessor;
     TempoProcessor::PtrArr               mprocessor;
     TuningProcessor::PtrArr              tprocessor;
-	BlendronicProcessor::PtrArr		     bprocessor;
+	EffectProcessor::PtrArr		         eprocessor;
     ResonanceProcessor::PtrArr           rprocessor;
 
     
@@ -78,7 +78,7 @@ public:
     SynchronicProcessor::Ptr    getSynchronicProcessor(int Id, bool add = true);
     TuningProcessor::Ptr        getTuningProcessor(int Id, bool add = true);
     TempoProcessor::Ptr         getTempoProcessor(int Id, bool add = true);
-	BlendronicProcessor::Ptr	getBlendronicProcessor(int Id, bool add = true);
+	EffectProcessor::Ptr	getBlendronicProcessor(int Id, bool add = true);
     ResonanceProcessor::Ptr     getResonanceProcessor(int Id, bool add = true);
 
     
@@ -87,8 +87,15 @@ public:
     inline SynchronicProcessor::PtrArr    getSynchronicProcessors(void) const noexcept { return sprocessor; }
     inline TuningProcessor::PtrArr      getTuningProcessors(void) const noexcept { return tprocessor; }
     inline TempoProcessor::PtrArr       getTempoProcessors(void) const noexcept { return mprocessor; }
-	inline BlendronicProcessor::PtrArr  getBlendronicProcessors(void) const noexcept
-    { return bprocessor; }
+	inline EffectProcessor::PtrArr  getBlendronicProcessors(void) const noexcept
+    { EffectProcessor::PtrArr blends;
+        for (auto e : eprocessor)
+        {
+            if(e->getType() == EffectType::EffectBlendronic)
+                blends.add(e);
+        }
+        return blends;
+     }
     inline ResonanceProcessor::PtrArr   getResonanceProcessors(void) const noexcept
     { return rprocessor; }
 
@@ -100,7 +107,7 @@ public:
     DirectProcessor::Ptr        addDirectProcessor(int thisId);
     TuningProcessor::Ptr        addTuningProcessor(int thisId);
     TempoProcessor::Ptr         addTempoProcessor(int thisId);
-	BlendronicProcessor::Ptr    addBlendronicProcessor(int thisId);
+	EffectProcessor::Ptr        addBlendronicProcessor(int thisId);
     ResonanceProcessor::Ptr     addResonanceProcessor(int thisId);
 
     
@@ -187,16 +194,16 @@ public:
         }
         
         {
-            BlendronicProcessor::PtrArr prevBlendronicProcessors = prevPiano->getBlendronicProcessors();
+            EffectProcessor::PtrArr prevBlendronicProcessors = prevPiano->getBlendronicProcessors();
             for(int i = 0; i < prevBlendronicProcessors.size(); i++)
             {
-                for(int j = 0; j < bprocessor.size(); j++)
+                for(int j = 0; j < eprocessor.size(); j++)
                 {
-                    if (bprocessor.getUnchecked(j)->getId() == prevBlendronicProcessors.getUnchecked(i)->getId())
+                    if (eprocessor.getUnchecked(j)->getId() == prevBlendronicProcessors.getUnchecked(i)->getId())
                     {
-                        bprocessor.getUnchecked(j)
+                        eprocessor.getUnchecked(j)
                         ->setVelocities(prevBlendronicProcessors.getUnchecked(i)->getVelocities());
-                        bprocessor.getUnchecked(j)
+                        eprocessor.getUnchecked(j)
                         ->setInvertVelocities(prevBlendronicProcessors.getUnchecked(i)->getInvertVelocities());
                         continue;
                     }
@@ -380,8 +387,8 @@ private:
     TuningProcessor::Ptr defaultT;
     TempoProcessor::Ptr defaultM;
     SynchronicProcessor::Ptr defaultS;
-    BlendronicProcessor::Ptr defaultB;
-    BlendronicProcessor::PtrArr defaultBA;
+    EffectProcessor::Ptr defaultB;
+    EffectProcessor::PtrArr defaultBA;
 	BlendronicDelay::Ptr defaultD;
     ResonanceProcessor::Ptr defaultR;
     

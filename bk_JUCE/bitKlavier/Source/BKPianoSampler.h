@@ -201,7 +201,7 @@ public:
                     BKSynthesiserSound* sound,
                     float* dynamicGain,
 					float* blendronicGain,
-					BlendronicProcessor::PtrArr blendronic
+					EffectProcessor::PtrArr effect
                     ) override;
     
     void startNote (int midiNoteNumber,
@@ -222,7 +222,7 @@ public:
                     BKSynthesiserSound* sound,
                     float* dynamicGain,
 					float* blendronicGain,
-					BlendronicProcessor::PtrArr blendronic
+					EffectProcessor::PtrArr effect
                     ) override;
     
     void updatePitch(const BKPianoSamplerSound* const sound);
@@ -306,7 +306,7 @@ private:
     BKADSR lastIn, lastOut;
 
 	float* blendronicGain;
-	BlendronicProcessor::PtrArr blendronic;
+	EffectProcessor::PtrArr effect;
     
     JUCE_LEAK_DETECTOR (BKPianoSamplerVoice)
 };

@@ -754,7 +754,7 @@ public:
     NostalgicProcessor(Nostalgic::Ptr nostalgic,
                        TuningProcessor::Ptr tuning,
                        SynchronicProcessor::Ptr synchronic,
-                       BlendronicProcessor::PtrArr blend,
+                       EffectProcessor::PtrArr effects,
                        BKSynthesiser *s);
     
     virtual ~NostalgicProcessor();
@@ -804,15 +804,21 @@ public:
         return synchronic->getId();
     }
 
-	inline void addBlendronic(BlendronicProcessor::Ptr blend)
-	{
-		blendronic.add(blend);
-	}
+    inline void addBlendronic(EffectProcessor::Ptr blend)
+    {
+        effects.add(blend);
+    }
 
-	inline BlendronicProcessor::PtrArr getBlendronic(void) const noexcept
-	{
-		return blendronic;
-	}
+    inline EffectProcessor::PtrArr getBlendronic(void)
+    {
+        EffectProcessor::PtrArr blends;
+        for (auto e : effects)
+        {
+            if(e->getType() == EffectType::EffectBlendronic)
+                blends.add(e);
+        }
+        return blends;
+    }
 
     inline void setTuning(TuningProcessor::Ptr p)
     {
@@ -876,7 +882,7 @@ private:
     Nostalgic::Ptr                  nostalgic;
     TuningProcessor::Ptr            tuner;
     SynchronicProcessor::Ptr        synchronic;
-	BlendronicProcessor::PtrArr		blendronic;
+	EffectProcessor::PtrArr		effects;
     
     Keymap::PtrArr              keymaps;
     

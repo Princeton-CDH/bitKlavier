@@ -2158,7 +2158,7 @@ void BKAudioProcessor::reset(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeBlendronic)
     {
-        BlendronicProcessor::Ptr proc = currentPiano->getBlendronicProcessor(Id, false);
+        BlendronicProcessor * proc = dynamic_cast<BlendronicProcessor*>(currentPiano->getBlendronicProcessor(Id, false).get());
         
         if (proc != nullptr) proc->reset();
     }
@@ -2245,7 +2245,7 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     {
         gallery->getBlendronic(Id)->clear();
         
-        BlendronicProcessor::Ptr proc = currentPiano->getBlendronicProcessor(Id, false);
+        EffectProcessor::Ptr proc = currentPiano->getBlendronicProcessor(Id, false);
         
         if (proc != nullptr) proc->reset();
     }

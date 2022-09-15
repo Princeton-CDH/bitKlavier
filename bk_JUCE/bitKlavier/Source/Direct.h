@@ -16,6 +16,7 @@
 #include "Keymap.h"
 #include "Tuning.h"
 #include "Blendronic.h"
+#include "Effects.h"
 
 class DirectModification;
 
@@ -488,7 +489,7 @@ public:
     
     
     DirectProcessor(Direct::Ptr direct,
-                    TuningProcessor::Ptr tuning, BlendronicProcessor::PtrArr blend,
+                    TuningProcessor::Ptr tuning, EffectProcessor::PtrArr effect,
                     BKSynthesiser *s, BKSynthesiser *res, BKSynthesiser *ham);
     
     ~DirectProcessor();
@@ -526,14 +527,20 @@ public:
         return tuner;
     }
     
-    inline void addBlendronic(BlendronicProcessor::Ptr blend)
+    inline void addBlendronic(EffectProcessor::Ptr blend)
     {
-        blendronic.add(blend);
+        effects.add(blend);
     }
     
-    inline BlendronicProcessor::PtrArr getBlendronic(void)
+    inline EffectProcessor::PtrArr getBlendronic(void)
     {
-        return blendronic;
+        EffectProcessor::PtrArr blends;
+        for (auto e : effects)
+        {
+            if(e->getType() == EffectType::EffectBlendronic)
+                blends.add(e);
+        }
+        return blends;
     }
     
     inline void addKeymap(Keymap::Ptr keymap)
@@ -565,7 +572,7 @@ private:
     
     Direct::Ptr             direct;
     TuningProcessor::Ptr    tuner;
-    BlendronicProcessor::PtrArr blendronic;
+    EffectProcessor::PtrArr effects;
     
     Keymap::PtrArr      keymaps;
     

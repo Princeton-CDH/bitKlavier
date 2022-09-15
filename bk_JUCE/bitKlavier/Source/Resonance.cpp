@@ -212,7 +212,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                         
                         Array<float> ADSRvals = resonance->prep->getADSRvals();
                         //DBG("Resonance: ADSR release time = " + String(ADSRvals[3]));
-                        if (!blendronic.isEmpty())
+                        if (!effects.isEmpty())
                         {
                                 resonance->prep->synth->keyOn(
                                 1,
@@ -238,7 +238,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                                 tuning,
                                 resonance->prep->getDefaultGainPtr(),
                                 resonance->prep->getBlendGainPtr(),
-                                blendronic);
+                                effects);
                         }
                         else
                         {

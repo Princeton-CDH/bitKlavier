@@ -195,37 +195,33 @@ void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool sho
     subBlockSubdivisionIsStrict = shouldBeStrict;
 }
 
-BlendronicDelay::Ptr BKSynthesiser::createBlendronicDelay(float delayLength, int delayBufferSize, double sr, bool active)
+
+
+void BKSynthesiser::addEffectProcessor(EffectProcessor::Ptr bproc)
 {
     const ScopedLock sl (lock);
-    BlendronicDelay::Ptr delay = new BlendronicDelay(delayLength, delayLength, INFINITY, delayBufferSize, sr, active);
-    return delay;
+    eprocessors.add(bproc);
 }
 
-void BKSynthesiser::addBlendronicProcessor(BlendronicProcessor::Ptr bproc)
-{
-    const ScopedLock sl (lock);
-    bprocessors.add(bproc);
-}
-
-void BKSynthesiser::removeBlendronicProcessor(int Id)
+void BKSynthesiser::removeEffectProcessor(int Id)
 {
     const ScopedLock sl (lock);
     
-    for (int i = 0; i < bprocessors.size(); ++i)
+    for (int i = 0; i < eprocessors.size(); ++i)
     {
-        if (bprocessors[i]->getId() == Id) bprocessors.remove(i);
+        if (eprocessors[i]->getId() == Id) eprocessors.remove(i);
     }
 }
 
 void BKSynthesiser::clearNextDelayBlock(int numSamples)
 {
-    for (auto b : bprocessors)
+    for (auto b : eprocessors)
     {
+        if (b->getType() == EffectBlendronic)
 		for (int i = 0; i < numSamples; i++)
 		{
-			b->getDelay()->getDelay()->scalePrevious(0, i, 0);
-			b->getDelay()->getDelay()->scalePrevious(0, i, 1);
+			dynamic_cast<BlendronicProcessor*>(b.get())->getDelay()->getDelay()->scalePrevious(0, i, 0);
+            dynamic_cast<BlendronicProcessor*>(b.get())->getDelay()->getDelay()->scalePrevious(0, i, 1);
 		}
     }
 }
@@ -240,8 +236,8 @@ void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSamp
 	float totalOutputL = 0.0f;
 	float totalOutputR = 0.0f;
     
-    BlendronicProcessor::PtrArr activebprocessors;
-    for (auto b : bprocessors)
+    EffectProcessor::PtrArr activebprocessors;
+    for (auto b : eprocessors)
     {
         if (b->getActive()) activebprocessors.add(b);
     }
@@ -284,8 +280,8 @@ void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSampl
     float totalOutputL = 0.0f;
 	float totalOutputR = 0.0f;
     
-    BlendronicProcessor::PtrArr activebprocessors;
-    for (auto b : bprocessors)
+    EffectProcessor::PtrArr activebprocessors;
+    for (auto b : eprocessors)
     {
         if (b->getActive()) activebprocessors.add(b);
     }
@@ -347,7 +343,8 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         if (numSamples >= 0)
         {
             const int samplesToNextMidiMessage = m.samplePosition - startSample;
-        
+            
+            //?????
             if (samplesToNextMidiMessage >= numSamples)
             {
                 clearNextDelayBlock(numSamples);
@@ -356,7 +353,7 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
                 handleMidiEvent (m.getMessage());
                 break;
             }
-            
+            //?????
             if (samplesToNextMidiMessage < ((firstEvent && ! subBlockSubdivisionIsStrict) ? 1 : minimumSubBlockSize))
             {
                 handleMidiEvent (m.getMessage());
@@ -466,7 +463,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
 	TuningProcessor::Ptr tuner,
     float* dynamicGain,
 	float* blendronicGain,
-	BlendronicProcessor::PtrArr blendronic)
+	EffectProcessor::PtrArr effect)
 {
                 return keyOn   ( midiChannel,
                                  keyNoteNumber,
@@ -488,7 +485,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn(const int midiChannel,
                                  tuner,
                                  dynamicGain,
                                  blendronicGain,
-								 blendronic);
+								effect);
 }
 		
 BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
@@ -511,7 +508,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                                           TuningProcessor::Ptr tuner,
                                           float* dynamicGain,
                                           float* blendronicGain,
-                                          BlendronicProcessor::PtrArr blendronic)
+                                          EffectProcessor::PtrArr effect)
 {
 	//DBG("BKSynthesiser::keyOn " + String(keyNoteNumber) + " " + String(midiNoteNumber));
 
@@ -571,7 +568,7 @@ BKSynthesiserVoice* BKSynthesiser::keyOn (const int midiChannel,
                        tuner,
                        dynamicGain,
                        blendronicGain,
-                       blendronic);
+                       effect);
 			
 			// voice to return;
             voiceToReturn = voice;
@@ -603,7 +600,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                                TuningProcessor::Ptr tuner,
                                float* dynamicGain,
                                float* blendronicGain,
-                               BlendronicProcessor::PtrArr blendronic
+                               EffectProcessor::PtrArr effect
 )
 {
     startVoice(voice,
@@ -628,7 +625,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                tuner,
                dynamicGain,
                blendronicGain,
-               blendronic);
+               effect);
 }
 
 
@@ -654,7 +651,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                                TuningProcessor::Ptr tuner,
                                float* dynamicGain,
                                float* blendronicGain,
-                               BlendronicProcessor::PtrArr blendronic
+                               EffectProcessor::PtrArr effect
 )
 {
 	//DBG("BKSynthesiser::startVoice " + String(keyNoteNumber) + " " + String(midiNoteNumber));
@@ -678,7 +675,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
 		voice->sustainPedalDown = sustainPedalsDown[midiChannel];
 		voice->tuning = tuner;
         voice->blendronicGain = blendronicGain;
-		voice->blendronic = blendronic;
+		voice->effect = effect;
 
 
 		float g = gain;
@@ -706,7 +703,7 @@ void BKSynthesiser::startVoice(BKSynthesiserVoice* const voice,
                          sound,
                          dynamicGain,
                          blendronicGain,
-                         blendronic);
+                         effect);
 	}
 }
 
@@ -823,7 +820,7 @@ void BKSynthesiser::keyOff(const int midiChannel,
                        nullptr,
                        dynamicGain,
                        nullptr,
-                       BlendronicProcessor::PtrArr());
+                       EffectProcessor::PtrArr());
 
 			// break;
 
