@@ -103,11 +103,11 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
             lastNoteTuning = midiNoteNumber + lastNoteOffset;
             lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
         }
-        if (tuning->prep->isMTSMaster)
-        {
-            DBG("Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
-            MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
-        }
+//        if (tuning->prep->isMTSMaster)
+//        {
+//            DBG("Master Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
+//            MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
+//        }
         return lastNoteOffset;
     }
     
@@ -131,11 +131,11 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
             lastNoteTuning = midiNoteNumber + lastNoteOffset;
             lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
         }
-        if (tuning->prep->isMTSMaster)
-        {
-            DBG("Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
-            MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
-        }
+//        if (tuning->prep->isMTSMaster)
+//        {
+//            DBG("Master Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
+//            MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
+//        }
         return lastNoteOffset;
     }
     
@@ -149,7 +149,7 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
             lastNoteTuning = midiNoteNumber + lastNoteOffset;
             lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
         }
-        DBG("Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
+        DBG("Client Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
         
         return lastNoteOffset;
     }
@@ -172,7 +172,7 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
     }
     if (tuning->prep->isMTSMaster && !tuning->prep->getSpringsActive())
     {
-        DBG("Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
+        DBG("MAster Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
         MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
     }
     return lastNoteOffset;

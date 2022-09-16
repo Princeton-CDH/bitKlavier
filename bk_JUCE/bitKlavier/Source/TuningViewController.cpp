@@ -1753,6 +1753,7 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
             } else
             {
                 AlertWindow::showMessageBox(MessageBoxIconType::WarningIcon, "Error", "Cannnot be both MTSClient and Master");
+                
             }
         }
         
