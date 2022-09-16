@@ -286,7 +286,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         if (tuning->getTuning()->prep->isMTSMaster)
         {
             
-            DBG("MidiRoot: " + String(currentMidiNoteNumber) + " Midi: " + String(midi) + " Freq: " + String(mtof(midi + sound->transpose)));
+            DBG("Springs MidiRoot: " + String(currentMidiNoteNumber) + " Midi: " + String(midi) + " Freq: " + String(mtof(midi + sound->transpose)));
             tuning->getTuning()->prep->MTSSetNoteTuning( mtof(midi), currentMidiNoteNumber);
         }
         

@@ -65,6 +65,7 @@ keymaps(Keymap::PtrArr()),
 lastNoteTuning(0),
 lastIntervalTuning(0)
 
+
 {
     for (int j = 0; j < 128; j++)
     {
