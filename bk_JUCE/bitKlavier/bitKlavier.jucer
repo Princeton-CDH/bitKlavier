@@ -259,8 +259,12 @@
                 file="Source/icons/mod_unassigned_icon.png"/>
         </GROUP>
         <GROUP id="{46A77271-6C9F-EC8E-1B96-E93C7D5FB77B}" name="presets">
-          <FILE id="qahXrg" name="Compressor_Default" compile="0" resource="1"
-                file="Source/presets/Compressor/Compressor_Default"/>
+          <FILE id="OZDSDh" name="Compressor_Agressive.xml" compile="0" resource="1"
+                file="Source/presets/Compressor/Compressor_Agressive.xml"/>
+          <FILE id="VZ2smL" name="Compressor_Brick Wall.xml" compile="0" resource="1"
+                file="Source/presets/Compressor/Compressor_Brick Wall.xml"/>
+          <FILE id="qahXrg" name="Compressor_Default.xml" compile="0" resource="1"
+                file="Source/presets/Compressor/Compressor_Default.xml"/>
         </GROUP>
       </GROUP>
       <GROUP id="{19157329-C279-4066-03E0-75F988B82181}" name="Constants">

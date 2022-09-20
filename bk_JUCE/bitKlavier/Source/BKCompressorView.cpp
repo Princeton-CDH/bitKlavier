@@ -48,7 +48,7 @@ void BKCompressorView::initWidgets()
     ratioLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
                                                                                  Constants::Parameter::ratioStart,
                                                                                  Constants::Parameter::ratioEnd,
-                                                                                  Constants::Parameter::makeupInterval));
+                                                                                  Constants::Parameter::ratioInterval));
     ratioLSlider.setLabelText("Ratio");
     ratioLSlider.addMyListener(this);
     ratioLSlider.setStringEnding(" : 1");
@@ -158,6 +158,10 @@ void BKCompressorView::initWidgets()
     //selectCB.addMyListener(this);
     //addAndMakeVisible(selectCB);
     setName("Default");
+    //int size;
+//    String xmlData = CharPointer_UTF8 (BinaryData::getNamedResource(BinaryData::namedResourceList[indexOfFirstCompressorPreset + 2], size));
+//    processor.setState(XmlDocument::parse(xmlData).get());
+    selectCB.setSelectedItemIndex(3);
     
 }
 
@@ -169,9 +173,6 @@ void BKCompressorView::fillSelectCB(int last, int current)
     compressorURLs.clear();
     selectCB.clear(dontSendNotification);
     int id = 1;
-    selectCB.addItem("Default",id++);
-    compressorPresetNames.add("Default");
-    numDefaultPresets++;
     String resource,data,name;
     int size;
     for (int i = 0; i < BinaryData::namedResourceListSize; i++)
@@ -180,7 +181,7 @@ void BKCompressorView::fillSelectCB(int last, int current)
         
         if (resource.contains("_xml") && std::regex_match(resource.toStdString(),std::regex("^Compressor_.*$")))
         {
-            if (id == 2)
+            if (id == 1)
                 indexOfFirstCompressorPreset = i;
             data = BinaryData::getNamedResource(BinaryData::namedResourceList[i], size);
             
