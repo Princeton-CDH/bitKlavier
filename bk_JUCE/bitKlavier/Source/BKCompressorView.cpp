@@ -187,18 +187,29 @@ void BKCompressorView::fillSelectCB(int last, int current)
             compressorPresetNames.add(name);
             selectCB.addItem(name, id++);
             numDefaultPresets++;
+            DBG("selectCB name: " + name + " " + String(id));
         }
     }
     selectCB.addSeparator();
     File file;
     for (auto xmlIter : RangedDirectoryIterator(File(file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getChildFile("Compressor")), true, "*.xml"))
     {
+        
         File newFile (xmlIter.getFile());
         compressorURLs.add(newFile.getFullPathName());
-        compressorPresetNames.add(XmlDocument::parse(newFile)->getStringAttribute("name"));
+        String newName = XmlDocument::parse(newFile)->getStringAttribute("name");
+        DBG("newName: " + newName + " " + String(id));
+        //DBG("URL: " + newFile.getFullPathName());
+        compressorPresetNames.add(newName);
+        if (newName == processor.name)
+        {
+            DBG(String(newName) +"this is the preset name");
+            selectedPresetId = id;
+        }
         selectCB.addItem(newFile.getFileNameWithoutExtension(), id++);
     }
-    selectCB.setSelectedId(selectedPresetId);
+    
+    selectCB.setSelectedId(selectedPresetId, dontSendNotification);
     //bkp.exportedPreparations
 }
 
@@ -445,6 +456,8 @@ void BKCompressorView::comboBoxChanged(ComboBox* cb)
     {
         int id = selectCB.getSelectedItemIndex();
         selectedPresetId = id;
+        if (id == -1)
+            return;
         if (id < numDefaultPresets )
         {
             ///load builtins
@@ -456,10 +469,12 @@ void BKCompressorView::comboBoxChanged(ComboBox* cb)
 
         } else
         {
-
+            DBG(String(id));
+            DBG("name: " + selectCB.getItemText(id));
             setName(selectCB.getItemText(id));
             //id -= (numDefaultPresets +1);
             url = compressorURLs.getReference(id - numDefaultPresets);
+            DBG("URL" + url);
             processor.setState(XmlDocument::parse(File(url)).get());
 
         }
