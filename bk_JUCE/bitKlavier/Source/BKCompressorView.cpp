@@ -166,6 +166,7 @@ void BKCompressorView::fillSelectCB(int last, int current)
     //numCompressorPresets = 0;
     numDefaultPresets = 0;
     compressorPresetNames.clear();
+    compressorURLs.clear();
     selectCB.clear(dontSendNotification);
     int id = 1;
     selectCB.addItem("Default",id++);
@@ -221,7 +222,6 @@ void BKCompressorView::paint(Graphics& g)
 
 void BKCompressorView::resized()
 {
-    auto area_init = getLocalBounds();
     //actionButton.setBounds(area_init.removeFromTop(area_init.getHeight()/10).removeFromLeft(area_init.getWidth()/10));
     auto area = getLocalBounds().reduced(Constants::Margins::big);
  
