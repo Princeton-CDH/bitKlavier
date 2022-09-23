@@ -294,7 +294,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
                             sound->sourceSampleRate *
                             generalSettings->getTuningRatio() /
                             getSampleRate();
-    } else if (tuning->getTuning()->prep->hasMTSMaster())
+    } else if (tuning != nullptr && tuning->getTuning()->prep->hasMTSMaster())
     {
         float mn = (currentMidiNoteNumber  + sound->transpose);
         float freq = tuning->getTuning()->prep->getMTSFreq(mn);
