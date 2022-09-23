@@ -23,7 +23,8 @@ public:
     processor(p),
     bkp(bkp),
     backGroundApp(Colour(Constants::Colors::bg_App)),
-    meter(&selectCB)
+    meter(&selectCB),
+    powerButton("powerButton", DrawableButton::ButtonStyle::ImageOnButtonBackground)
     {
         setLookAndFeel(&laf);
         startTimerHz(60);
@@ -112,7 +113,7 @@ private:
     TextButton autoAttackButton;
     TextButton autoReleaseButton;
     TextButton autoMakeupButton;
-    TextButton powerButton;
+    DrawableButton powerButton;
     TextButton actionButton;
     
     std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> lahAttachment;

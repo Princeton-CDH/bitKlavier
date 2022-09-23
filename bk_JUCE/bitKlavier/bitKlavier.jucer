@@ -29,6 +29,7 @@
       <FILE id="vGCLFC" name="libMTSMaster.h" compile="0" resource="0" file="Source/MTS-ESP/Master/libMTSMaster.h"/>
     </GROUP>
     <GROUP id="{3A625D3D-9CB7-0D85-C03F-F3729E0389A5}" name="Source">
+      <FILE id="Ot0zKG" name="power_white.svg" compile="0" resource="1" file="Source/power_white.svg"/>
       <GROUP id="{1E3013D4-6B2A-D996-A5C8-F92AE44A39F2}" name="Resources">
         <GROUP id="{9410D6F7-7039-77FB-F92B-3580A2A099FE}" name="galleries">
           <GROUP id="{B6FA1321-FBCA-C3B2-8ADC-1F597F69E3E5}" name="Examples">
