@@ -48,7 +48,7 @@ void BKCompressorView::initWidgets()
     ratioLSlider.getSlider()->setNormalisableRange(NormalisableRange<double>(
                                                                                  Constants::Parameter::ratioStart,
                                                                                  Constants::Parameter::ratioEnd,
-                                                                                  Constants::Parameter::makeupInterval));
+                                                                                  Constants::Parameter::ratioInterval));
     ratioLSlider.setLabelText("Ratio");
     ratioLSlider.addMyListener(this);
     ratioLSlider.setStringEnding(" : 1");
@@ -135,10 +135,10 @@ void BKCompressorView::initWidgets()
     
     powerButton.setButtonText("Bypass");
     addAndMakeVisible(powerButton);
-    //powerButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
+    powerButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
     powerButton.setLookAndFeel(&laf);
-//    powerButton.setImages(
-//        Drawable::createFromImageData(BinaryData::power_white_svg, BinaryData::power_white_svgSize).get());
+    powerButton.setImages(
+        Drawable::createFromImageData(BinaryData::power_white_svg, BinaryData::power_white_svgSize).get());
     powerButton.setClickingTogglesState(true);
     powerButton.setToggleState(true, dontSendNotification);
     powerButton.addListener(this);
@@ -158,6 +158,10 @@ void BKCompressorView::initWidgets()
     //selectCB.addMyListener(this);
     //addAndMakeVisible(selectCB);
     setName("Default");
+    //int size;
+//    String xmlData = CharPointer_UTF8 (BinaryData::getNamedResource(BinaryData::namedResourceList[indexOfFirstCompressorPreset + 2], size));
+//    processor.setState(XmlDocument::parse(xmlData).get());
+    selectCB.setSelectedItemIndex(3);
     
 }
 
@@ -166,11 +170,9 @@ void BKCompressorView::fillSelectCB(int last, int current)
     //numCompressorPresets = 0;
     numDefaultPresets = 0;
     compressorPresetNames.clear();
+    compressorURLs.clear();
     selectCB.clear(dontSendNotification);
     int id = 1;
-    selectCB.addItem("Default",id++);
-    compressorPresetNames.add("Default");
-    numDefaultPresets++;
     String resource,data,name;
     int size;
     for (int i = 0; i < BinaryData::namedResourceListSize; i++)
@@ -179,7 +181,7 @@ void BKCompressorView::fillSelectCB(int last, int current)
         
         if (resource.contains("_xml") && std::regex_match(resource.toStdString(),std::regex("^Compressor_.*$")))
         {
-            if (id == 2)
+            if (id == 1)
                 indexOfFirstCompressorPreset = i;
             data = BinaryData::getNamedResource(BinaryData::namedResourceList[i], size);
             
@@ -187,18 +189,29 @@ void BKCompressorView::fillSelectCB(int last, int current)
             compressorPresetNames.add(name);
             selectCB.addItem(name, id++);
             numDefaultPresets++;
+            DBG("selectCB name: " + name + " " + String(id));
         }
     }
     selectCB.addSeparator();
     File file;
     for (auto xmlIter : RangedDirectoryIterator(File(file.getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("preparations").getChildFile("Compressor")), true, "*.xml"))
     {
+        
         File newFile (xmlIter.getFile());
         compressorURLs.add(newFile.getFullPathName());
-        compressorPresetNames.add(XmlDocument::parse(newFile)->getStringAttribute("name"));
+        String newName = XmlDocument::parse(newFile)->getStringAttribute("name");
+        DBG("newName: " + newName + " " + String(id));
+        //DBG("URL: " + newFile.getFullPathName());
+        compressorPresetNames.add(newName);
+        if (newName == processor.name)
+        {
+            DBG(String(newName) +"this is the preset name");
+            selectedPresetId = id;
+        }
         selectCB.addItem(newFile.getFileNameWithoutExtension(), id++);
     }
-    selectCB.setSelectedId(selectedPresetId);
+    
+    selectCB.setSelectedId(selectedPresetId, dontSendNotification);
     //bkp.exportedPreparations
 }
 
@@ -210,14 +223,14 @@ void BKCompressorView::paint(Graphics& g)
 
 void BKCompressorView::resized()
 {
-    auto area_init = getLocalBounds();
     //actionButton.setBounds(area_init.removeFromTop(area_init.getHeight()/10).removeFromLeft(area_init.getWidth()/10));
     auto area = getLocalBounds().reduced(Constants::Margins::big);
- 
+    
+    auto bypassArea = area.removeFromRight(70);
     const auto headerHeight = area.getHeight() / 10;
     const auto btnAreaWidth = area.getWidth() / 5;
     const auto btnBotHeight = area.getHeight() / 3;
-
+    powerButton.setBounds(bypassArea.removeFromTop(20).removeFromRight(20));
     auto header = area.removeFromTop(headerHeight).reduced(Constants::Margins::small);
     auto lBtnArea = area.removeFromLeft(btnAreaWidth).reduced(Constants::Margins::small);
     auto rBtnArea = area.removeFromRight(btnAreaWidth).reduced(Constants::Margins::small);
@@ -237,7 +250,7 @@ void BKCompressorView::resized()
     headerBox.items.add(FlexItem(autoAttackButton).withFlex(2).withMargin(buttonMargin));
     headerBox.items.add(FlexItem(autoReleaseButton).withFlex(2).withMargin(buttonMargin));
     headerBox.items.add(FlexItem(autoMakeupButton).withFlex(2).withMargin(buttonMargin));
-    headerBox.items.add(FlexItem(powerButton).withFlex(1).withMargin(buttonMargin));
+    //headerBox.items.add(FlexItem(powerButton).withFlex(1).withMargin(buttonMargin));
     headerBox.performLayout(header.toFloat());
 
     FlexBox leftBtnBox;
@@ -445,6 +458,8 @@ void BKCompressorView::comboBoxChanged(ComboBox* cb)
     {
         int id = selectCB.getSelectedItemIndex();
         selectedPresetId = id;
+        if (id == -1)
+            return;
         if (id < numDefaultPresets )
         {
             ///load builtins
@@ -456,10 +471,12 @@ void BKCompressorView::comboBoxChanged(ComboBox* cb)
 
         } else
         {
-
+            DBG(String(id));
+            DBG("name: " + selectCB.getItemText(id));
             setName(selectCB.getItemText(id));
             //id -= (numDefaultPresets +1);
             url = compressorURLs.getReference(id - numDefaultPresets);
+            DBG("URL" + url);
             processor.setState(XmlDocument::parse(File(url)).get());
 
         }

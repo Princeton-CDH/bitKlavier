@@ -1732,21 +1732,28 @@ void TuningPreparationEditor::bkComboBoxDidChange (ComboBox* box)
         
         if (type == AdaptiveMTSClient)
         {
-            greyOutAllComponents();
-            disableAllComponents();
-            MTSConnectionLabel->setVisible(true);
-            MTSConnectionLabel->setText("Connecting to Server", dontSendNotification);
-            
-            prep->client = MTS_RegisterClient();
-            if (MTS_HasMaster(prep->client))
+            if(!prep->isMTSMaster)
             {
-                MTSConnectionLabel->setText("Connected", dontSendNotification);
                 greyOutAllComponents();
+                disableAllComponents();
+                MTSConnectionLabel->setVisible(true);
+                MTSConnectionLabel->setText("Connecting to Server", dontSendNotification);
                 
-                
+                prep->client = MTS_RegisterClient();
+                if (MTS_HasMaster(prep->client))
+                {
+                    MTSConnectionLabel->setText("Connected", dontSendNotification);
+                    greyOutAllComponents();
+                    
+                    
+                } else
+                {
+                    MTSConnectionLabel->setText("Did not connect", dontSendNotification);
+                }
             } else
             {
-                MTSConnectionLabel->setText("Did not connect", dontSendNotification);
+                AlertWindow::showMessageBox(MessageBoxIconType::WarningIcon, "Error", "Cannnot be both MTSClient and Master");
+                
             }
         }
         
@@ -2332,22 +2339,32 @@ void TuningPreparationEditor::buttonClicked (Button* b)
         {
             MTS_DeregisterMaster();
             MTSMasterConnectionButton->setButtonText("Register MTSMaster");
-    
+            prep->isMTSMaster = false;
         }
-        else if (MTS_CanRegisterMaster())
+        else if (MTS_CanRegisterMaster() && prep->client == nullptr)
         {
             MTS_RegisterMaster();
-            MTSMasterConnectionButton->setButtonText("Disconnect MTS");
-            tuning->fillMTSMasterTunings();
-            prep->isMTSMaster = true;
+            if(!MTS_CanRegisterMaster())
+            {
+                MTSMasterConnectionButton->setButtonText("Disconnect MTS");
+                tuning->fillMTSMasterTunings();
+                prep->isMTSMaster = true;
+            }
         } else if (MTS_HasIPC())
         {
-            MTS_Reinitialize();
-            MTS_RegisterMaster();
+            auto result = AlertWindow::showYesNoCancelBox(MessageBoxIconType::QuestionIcon, "Register MTS Master", "Registering as MTS Master will Deregister a currently running MTSMaster are you sure you would like to continue?");
+            if (result == 1)
+            {
+                MTS_Reinitialize();
+                MTS_RegisterMaster();
 
-            MTSMasterConnectionButton->setButtonText("Disconnect MTS");
-            tuning->fillMTSMasterTunings();
-            prep->isMTSMaster = true;
+                MTSMasterConnectionButton->setButtonText("Disconnect MTS");
+                tuning->fillMTSMasterTunings();
+                prep->isMTSMaster = true;
+            }
+        } else if (prep->client != nullptr)
+        {
+            
         }
         else
         {
@@ -3140,6 +3157,7 @@ void TuningModificationEditor::bkComboBoxDidChange (ComboBox* box)
             
             customKeyboard.setValues(cScale);
         }
+        
     }
     else if (box == &adaptiveSystemsCB)
     {

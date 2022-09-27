@@ -23,7 +23,8 @@ public:
     processor(p),
     bkp(bkp),
     backGroundApp(Colour(Constants::Colors::bg_App)),
-    meter(&selectCB)
+    meter(&selectCB),
+    powerButton("powerButton", DrawableButton::ButtonStyle::ImageOnButtonBackground)
     {
         setLookAndFeel(&laf);
         startTimerHz(60);
@@ -47,8 +48,9 @@ public:
         treshLSlider.getSlider()->setValue(processor.compressor.getThreshold());
         ratioLSlider.getSlider()->setValue(processor.compressor.getRatio());
         kneeLSlider.getSlider()->setValue(processor.compressor.getKnee());
-        attackLSlider.getSlider()->setValue(processor.compressor.getAttack());
-        releaseLSlider.getSlider()->setValue(processor.compressor.getRelease());
+        DBG("Compressor ATtack: " + String(processor.compressor.getAttack()));
+        attackLSlider.getSlider()->setValue(processor.compressor.getAttack()*1000.f);
+        releaseLSlider.getSlider()->setValue(processor.compressor.getRelease()*1000.f);
         mixLSlider.getSlider()->setValue(processor.compressor.getMix());
         lahButton.setEnabled(!processor.compressor.getLookahead());
         autoReleaseButton.setEnabled(!processor.compressor.getAutoRelease());
@@ -111,7 +113,7 @@ private:
     TextButton autoAttackButton;
     TextButton autoReleaseButton;
     TextButton autoMakeupButton;
-    TextButton powerButton;
+    DrawableButton powerButton;
     TextButton actionButton;
     
     std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment> lahAttachment;

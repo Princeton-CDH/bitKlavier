@@ -47,7 +47,7 @@ public:
     nToneSemitoneWidth(p->getNToneSemitoneWidth()),
     nToneRoot(p->getNToneRoot()),
     adaptiveType(p->getAdaptiveType()),
-    //client(nullptr),
+    client(nullptr),
     stuning(new SpringTuning(p->getSpringTuning()))
     {
 
@@ -228,7 +228,7 @@ public:
     nToneSemitoneWidth(semitoneWidth),
     nToneRoot(semitoneRoot),
     adaptiveType(AdaptiveNone),
-    //client(nullptr),
+    client(nullptr),
     stuning(new SpringTuning(st))
     {
         Array<float> arr;
@@ -262,7 +262,7 @@ public:
     nToneSemitoneWidth(100),
     nToneRoot(60),
     adaptiveType(AdaptiveNone),
-    //client(nullptr),
+    client(nullptr),
     stuning(new SpringTuning())
     {
         Array<float> arr;
@@ -751,46 +751,49 @@ public:
     
     void fillMTSMasterTunings()
     {
-        double frequencies_in_hz[128];
-        for (int midiNoteNumber = 0; midiNoteNumber < 128; midiNoteNumber++)
+        if(prep->isMTSMaster)
         {
-            float lastNoteOffset;
-            //do nTone tuning if nToneSemitoneWidth != 100cents
-            if(prep->getNToneSemitoneWidth() != 100)
+            double frequencies_in_hz[128];
+            for (int midiNoteNumber = 0; midiNoteNumber < 128; midiNoteNumber++)
             {
-                lastNoteOffset = .01 * (midiNoteNumber - prep->getNToneRoot()) * (prep->getNToneSemitoneWidth() - 100);
-                int midiNoteNumberTemp = round(midiNoteNumber + lastNoteOffset);
+                float lastNoteOffset;
+                //do nTone tuning if nToneSemitoneWidth != 100cents
+                if(prep->getNToneSemitoneWidth() != 100)
+                {
+                    lastNoteOffset = .01 * (midiNoteNumber - prep->getNToneRoot()) * (prep->getNToneSemitoneWidth() - 100);
+                    int midiNoteNumberTemp = round(midiNoteNumber + lastNoteOffset);
+                    
+                    Array<float> currentTuning;
+                    if(prep->getScale() == CustomTuning) currentTuning = prep->getCustomScale();
+                    else currentTuning = tuningLibrary.getUnchecked(prep->getScale());
+                    
+                    lastNoteOffset += (currentTuning[(midiNoteNumberTemp - prep->getFundamental()) % currentTuning.size()]
+                                      + prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                                      + prep->getFundamentalOffset());
+                    
+                    frequencies_in_hz[midiNoteNumber] = mtof(midiNoteNumber + lastNoteOffset);
+                    continue;
+                }
                 
+                //else do regular tunings
                 Array<float> currentTuning;
-                if(prep->getScale() == CustomTuning) currentTuning = prep->getCustomScale();
-                else currentTuning = tuningLibrary.getUnchecked(prep->getScale());
-                
-                lastNoteOffset += (currentTuning[(midiNoteNumberTemp - prep->getFundamental()) % currentTuning.size()]
+                if(prep->getScale() == CustomTuning)
+                    currentTuning = prep->getCustomScale();
+                else
+                    currentTuning = tuningLibrary.getUnchecked(prep->getScale());
+
+                lastNoteOffset = (currentTuning[(midiNoteNumber - prep->getFundamental()) % currentTuning.size()]
                                   + prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
                                   + prep->getFundamentalOffset());
-                
-                frequencies_in_hz[midiNoteNumber] = mtof(midiNoteNumber + lastNoteOffset);
-                continue;
+                double freq =  mtof(midiNoteNumber + lastNoteOffset);
+                frequencies_in_hz[midiNoteNumber] = freq;
             }
-            
-            //else do regular tunings
-            Array<float> currentTuning;
-            if(prep->getScale() == CustomTuning)
-                currentTuning = prep->getCustomScale();
-            else
-                currentTuning = tuningLibrary.getUnchecked(prep->getScale());
-
-            lastNoteOffset = (currentTuning[(midiNoteNumber - prep->getFundamental()) % currentTuning.size()]
-                              + prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
-                              + prep->getFundamentalOffset());
-            double freq =  mtof(midiNoteNumber + lastNoteOffset);
-            frequencies_in_hz[midiNoteNumber] = freq;
+            for (int i = 0; i < 128; i++)
+            {
+                DBG(String(i) + ": " + String(frequencies_in_hz[i]));
+            }
+            MTS_SetNoteTunings(frequencies_in_hz);
         }
-        for (int i = 0; i < 128; i++)
-        {
-            DBG(String(i) + ": " + String(frequencies_in_hz[i]));
-        }
-        MTS_SetNoteTunings(frequencies_in_hz);
     }
     
     ValueTree getState(bool active = false);

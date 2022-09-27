@@ -31,15 +31,15 @@ public:
         compressor.setAutoRelease(e->getBoolAttribute(ptagCompressor_autoRelease));
         compressor.setPower(e->getBoolAttribute(ptagCompressor_power));
         compressor.setAutoMakeup(e->getBoolAttribute(ptagCompressor_autoMakeup));
-        
+        DBG("Compressor ATtack: " + e->getStringAttribute(ptagCompressor_attack));
         compressor.setKnee(e->getStringAttribute(ptagCompressor_knee).getFloatValue());
         compressor.setRatio(e->getStringAttribute(ptagCompressor_ratio).getFloatValue());
         compressor.setMix(e->getStringAttribute(ptagCompressor_mix).getFloatValue());
         compressor.setMakeup(e->getStringAttribute(ptagCompressor_makeupGain).getFloatValue());
         compressor.setThreshold(e->getStringAttribute(ptagCompressor_thresh).getFloatValue());
-        compressor.setInput(e->getStringAttribute(ptagCompressor_inGain).getFloatValue());
-        compressor.setRelease(e->getStringAttribute(ptagCompressor_release).getFloatValue());
-        compressor.setAttack(e->getStringAttribute(ptagCompressor_attack).getFloatValue());
+        compressor.setInput(e->getStringAttribute(ptagCompressor_inGain).getFloatValue() );
+        compressor.setRelease(e->getStringAttribute(ptagCompressor_release).getFloatValue() *1000.f);
+        compressor.setAttack(e->getStringAttribute(ptagCompressor_attack).getFloatValue() *1000.f);
         name = e->getStringAttribute("name");
     }
     

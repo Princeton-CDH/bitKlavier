@@ -687,7 +687,7 @@ void GeneralViewController::resized()
     
     Rectangle<int> compressorArea(getLocalBounds());
     compressorArea.removeFromLeft(arrowSpace + 20);
-    compressorArea.removeFromRight(arrowSpace + 20);
+    //compressorArea.removeFromRight(arrowSpace + 20);
     compressorArea.removeFromTop(20);
     compressorArea.removeFromBottom(10);
     compressorView.setBounds(compressorArea);

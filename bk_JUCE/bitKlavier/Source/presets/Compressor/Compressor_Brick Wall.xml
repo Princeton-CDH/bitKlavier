@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<compressor name="Brick Wall" lookAhead="0" autoAttack="0" autoRelease="0" power="0"
+            autoMakeup="0" knee="0" inputGain="0"
+            makeupGain="0" attack="0.0f"
+            release="0.005" thresh="-3.0f" ratio="23.5"
+            mix="1"/>
