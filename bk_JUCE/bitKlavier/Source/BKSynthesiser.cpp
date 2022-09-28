@@ -65,13 +65,15 @@ return noteOnTime < other.noteOnTime;
 void BKSynthesiserVoice::renderNextBlock (AudioBuffer<double>& outputBuffer,
                                           int startSample, int numSamples)
 {
-    AudioBuffer<double> subBuffer (outputBuffer.getArrayOfWritePointers(),
-                                   outputBuffer.getNumChannels(),
-                                   startSample, numSamples);
-    
-    tempBuffer.makeCopyOf (subBuffer);
-    renderNextBlock (tempBuffer, 0, numSamples);
-    subBuffer.makeCopyOf (tempBuffer);
+    if (currentlyPlayingNote > -1) {
+        AudioBuffer<double> subBuffer (outputBuffer.getArrayOfWritePointers(),
+                                       outputBuffer.getNumChannels(),
+                                       startSample, numSamples);
+        
+        tempBuffer.makeCopyOf (subBuffer);
+        renderNextBlock (tempBuffer, 0, numSamples);
+        subBuffer.makeCopyOf (tempBuffer);
+    }
 }
     
 //==============================================================================
@@ -833,12 +835,12 @@ void BKSynthesiser::keyOff(const int midiChannel,
 void BKSynthesiser::allNotesOff(const int midiChannel, const bool allowTailOff)
 {
 	const ScopedLock sl(lock);
-
+    DBG("allNotesOff, num voices = " + String(voices.size()));
 	for (int i = voices.size(); --i >= 0;)
 	{
 		BKSynthesiserVoice* const voice = voices.getUnchecked(i);
 
-		if (midiChannel <= 0 || voice->isPlayingChannel(midiChannel))
+		//if (midiChannel <= 0 || voice->isPlayingChannel(midiChannel))
 			voice->stopNote(1.0f, allowTailOff);
 	}
 
@@ -1008,7 +1010,11 @@ BKSynthesiserVoice* BKSynthesiser::findFreeVoice(BKSynthesiserSound* soundToPlay
 		BKSynthesiserVoice* const voice = voices.getUnchecked(i);
 
 		if ((!voice->isVoiceActive()) && voice->canPlaySound(soundToPlay))
-			return voice;
+        {
+            // DBG("BKSynthesiser::findFreeVoice " + String (i));
+            return voice;
+        }
+			
 	}
 
 	if (stealIfNoneAvailable)

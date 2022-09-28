@@ -158,8 +158,9 @@ void AboutViewController::bkButtonClicked (Button* b)
 
 //==============================================================================
 GeneralViewController::GeneralViewController(BKAudioProcessor& p, BKItemGraph* theGraph):
-BKViewController(p, theGraph, 2),
-processor(p)
+BKViewController(p, theGraph, 3),
+processor(p),
+compressorView(p.compressor, p)
 {
     setLookAndFeel(&buttonsAndMenusLAF);
     
@@ -426,6 +427,7 @@ processor(p)
     peak3QualitySlider->addMyListener(this);
     addAndMakeVisible(*peak3QualitySlider);
     
+    addAndMakeVisible(compressorView);
     // Set all parameters to saved or default values
     update();
     
@@ -475,6 +477,11 @@ void GeneralViewController::displayTab(int tab) {
         peak3Icon.setVisible(true);
         eqGraph.setVisible(true);
         displayFilter(currentFilter);
+    } else if (tab == Tabs::compressor)
+    {
+        //eqGraph.setVisible(true);
+        compressorView.setVisible(true);
+        
     }
     
 }
@@ -502,6 +509,7 @@ void GeneralViewController::invisible() {
     peak3Button.setVisible(false);
     peak3Icon.setVisible(false);
     eqGraph.setVisible(false);
+    compressorView.setVisible(false);
     invisibleFilters();
 }
 
@@ -514,6 +522,7 @@ void GeneralViewController::resized()
     // Position settings UI components
     Rectangle<int> area (getLocalBounds());
     area.reduce(10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+
     
     Rectangle<int> leftColumn = area.removeFromLeft(area.getWidth() * 0.5);
     Rectangle<int> comboBoxSlice = leftColumn.removeFromTop(gComponentComboBoxHeight);
@@ -676,6 +685,12 @@ void GeneralViewController::resized()
         highCutSlope48.setBounds(zero);
     }
     
+    Rectangle<int> compressorArea(getLocalBounds());
+    compressorArea.removeFromLeft(arrowSpace + 20);
+    //compressorArea.removeFromRight(arrowSpace + 20);
+    compressorArea.removeFromTop(20);
+    compressorArea.removeFromBottom(10);
+    compressorView.setBounds(compressorArea);
     // Update view
     displayShared();
     displayTab(currentTab);
@@ -834,6 +849,8 @@ void GeneralViewController::update(void)
     eqGraph.setSampleRate(processor.getCurrentSampleRate());
     eqGraph.updateEQ(*eq);
     eqGraph.setAlpha(eq->getBypassed() ? 0.4f : 1.f);
+    
+    compressorView.update();
 }
 
 void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)

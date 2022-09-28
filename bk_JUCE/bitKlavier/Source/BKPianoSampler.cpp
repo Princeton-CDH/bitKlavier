@@ -283,8 +283,25 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         midi += (tuning->getTuning()->prep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
                  tuning->getTuning()->prep->getFundamentalOffset());
         
+        if (tuning->getTuning()->prep->isMTSMaster)
+        {
+            
+            DBG("Springs MidiRoot: " + String(currentMidiNoteNumber) + " Midi: " + String(midi) + " Freq: " + String(mtof(midi + sound->transpose)));
+            tuning->getTuning()->prep->MTSSetNoteTuning( mtof(midi), currentMidiNoteNumber);
+        }
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
+                            sound->sourceSampleRate *
+                            generalSettings->getTuningRatio() /
+                            getSampleRate();
+    } else if (tuning != nullptr && tuning->getTuning()->prep->hasMTSMaster())
+    {
+        float mn = (currentMidiNoteNumber  + sound->transpose);
+        float freq = tuning->getTuning()->prep->getMTSFreq(mn);
+        double _mn = ftom(freq);
+        //DBG(String(mtof(_mn + sound->transpose)));
+        DBG("pianoSampler midinote: " + String(currentMidiNoteNumber) + " Freq: " + String(freq) + " MTS Out midinote: " + String(_mn));
+        pitchRatio =   powf(2.0f, (_mn - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
                             sound->sourceSampleRate *
                             generalSettings->getTuningRatio() /
                             getSampleRate();
@@ -814,7 +831,7 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
         }
         
         // Check for adsr keyOffs
-        if ((playType != Normal) && ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE)))
+        if ((playType != Normal && playType != NormalFixedStart) && ((adsr.getState() != BKADSR::RELEASE) && (adsr.getState() != BKADSR::IDLE)))
         {
             if (lengthTracker >= playLength)
             {
@@ -948,7 +965,7 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
                 break;
             }
             
-            if (playType != Normal)
+            if (playType != Normal && playType != NormalFixedStart)
             {
                 if ((adsr.getState() != BKADSR::RELEASE) && (lengthTracker >= playLength))
                 {
@@ -1204,7 +1221,8 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
             if(sourceSamplePosition >= playingSound->soundLength)
             {
                 //clearCurrentNote();
-                stopNote(0.0f, true);
+                //stopNote(0.0f, true);
+                stopNote(0.0f, false);
             }
         }
         else if (playDirection == Reverse)

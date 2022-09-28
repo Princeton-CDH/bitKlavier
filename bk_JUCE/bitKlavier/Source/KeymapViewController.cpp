@@ -503,8 +503,8 @@ void KeymapViewController::displayTab(int tab)
         leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.25);
         area.removeFromTop((area.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.25);
 #else
-        leftColumn.removeFromTop((leftColumn.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
-        area.removeFromTop((area.getHeight() - maxTargetHeight) * processor.paddingScalarY * 0.5);
+        leftColumn.removeFromTop((maxTargetHeight) * processor.paddingScalarY * 0.5);
+        area.removeFromTop((maxTargetHeight) * processor.paddingScalarY * 0.5);
 #endif
         
         leftColumn.removeFromLeft(leftArrow.getWidth());

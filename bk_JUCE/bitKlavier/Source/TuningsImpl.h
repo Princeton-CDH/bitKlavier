@@ -184,7 +184,7 @@ inline Scale readSCLStream(std::istream &inf)
 inline Scale readSCLFile(std::string fname)
 {
     std::ifstream inf;
-    inf.open(fname);
+    inf.open(fname.c_str());
     if (!inf.is_open())
     {
         std::string s = "Unable to open file '" + fname + "'";

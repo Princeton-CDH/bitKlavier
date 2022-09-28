@@ -12,7 +12,7 @@
 
 #include "BKViewController.h"
 #include "EqualizerGraph.h"
-
+#include "BKCompressorView.h"
 class CommentViewController :
 public BKViewController
 {
@@ -102,14 +102,15 @@ private:
     
     enum Tabs {
         settings,
-        equalizer
+        equalizer,
+        compressor
     };
     
     int arrowSpace = 50; // amount of space needed for arrows
     
     BKAudioProcessor& processor;
     int currentNostalgicLayer;
-    
+    BKCompressorView compressorView;
     // Settings UI components
     ToggleButton invertSustainB;
     ToggleButton noteOnSetsNoteOffVelocityB;

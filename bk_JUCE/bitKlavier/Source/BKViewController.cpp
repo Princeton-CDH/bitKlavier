@@ -79,10 +79,6 @@ PopupMenu BKViewController::getPrepOptionMenu(BKPreparationType type, bool singl
     
     PopupMenu exported = getExportedPrepsMenu(type);
     optionMenu.addSubMenu("Import...", exported);
-    if (type == PreparationTypeTuning)
-    {
-        optionMenu.addItem(8,"MTS Server");
-    }
     optionMenu.addSeparator();
     optionMenu.addItem(4, "Reset");
     optionMenu.addItem(5, "Clear");

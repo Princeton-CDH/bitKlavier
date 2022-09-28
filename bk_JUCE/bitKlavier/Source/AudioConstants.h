@@ -291,6 +291,20 @@ const String ptagKeymap_velocityInvert = "velocityInvert";
 const String ptagKeymap_toggleKey = "toggleKey";
 const String ptagKeymap_sostenutoMode = "sostenutoMode";
 
+const String vtagCompressor = "compressor";
+const String ptagCompressor_knee = "knee";
+const String ptagCompressor_inGain = "inputGain";
+const String ptagCompressor_makeupGain = "makeupGain";
+const String ptagCompressor_attack = "attack";
+const String ptagCompressor_release = "release";
+const String ptagCompressor_thresh = "thresh";
+const String ptagCompressor_ratio = "ratio";
+const String ptagCompressor_mix = "mix";
+const String ptagCompressor_lookAhead = "lookAhead";
+const String ptagCompressor_autoAttack = "autoAttack";
+const String ptagCompressor_autoRelease = "autoRelease";
+const String ptagCompressor_autoMakeup = "autoMakeup";
+const String ptagCompressor_power = "power";
 typedef enum PitchClass {
     C = 0,
     CSharp,
@@ -395,6 +409,7 @@ typedef enum BKPreparationType {
     PreparationTypeReset,
     PreparationTypePiano,
     PreparationTypeComment,
+    PreparationTypeCompressor,
     BKPreparationTypeNil
 } BKPreparationType;
 
@@ -419,6 +434,7 @@ static const std::vector<BKPreparationType> cPreparationIdToType = {
     PreparationTypeBlendronicMod,
     PreparationTypeResonance,
     PreparationTypeResonanceMod,
+    PreparationTypeCompressor,
     BKPreparationTypeNil
 };
 
@@ -477,7 +493,8 @@ static const std::vector<std::string> cPreparationTypes = {
     "PianoMap",
     "Reset",
     "Piano",
-    "Comment"
+    "Comment",
+    "Compressor"
 };
 
 static const std::vector<std::string> cPreparationNames = {
@@ -500,7 +517,8 @@ static const std::vector<std::string> cPreparationNames = {
     "Piano Map",
     "Reset",
     "Piano",
-    "Comment"
+    "Comment",
+    "Compressor"
 };
 
 typedef enum BKPreparationDisplay {

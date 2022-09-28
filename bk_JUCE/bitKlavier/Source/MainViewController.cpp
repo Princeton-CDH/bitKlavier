@@ -26,7 +26,7 @@ timerCallbackCount(0),
 preferencesButton("Preferences"),
 globalSoundSetButton("Use global samples"),
 sustainPedalButton("Sustain Pedal"),
-equalizerButton("Equalizer")
+equalizerButton("Post FX")
 {
     if (processor.platform == BKIOS)    display = DisplayConstruction;
     else                                display = DisplayDefault;

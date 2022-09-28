@@ -30,6 +30,8 @@
 
 #include "ItemMapper.h"
 
+#include "CompressorProcessor.h"
+
 class StandalonePluginHolder;
 class BKAudioProcessorEditor;
 //class BKEqualizer;
@@ -113,6 +115,10 @@ public:
     BKEqualizer                         eq;
     inline BKEqualizer* getBKEqualizer() { return &eq; } // may need to move to gallery later
     
+    // Equalizer
+    CompressorProcessor                        compressor;
+    inline CompressorProcessor* getCompressor() { return &compressor; } // may need to move to gallery later
+    
     //sfzero::Synth                       synth;
     
     Piano::Ptr                          prevPiano;
@@ -157,10 +163,11 @@ public:
     // This is quite performance intensive with a lot of samples and currently doesn't seems worth doing
 //    SampleTouchThread touchThread;
     
+   
     File defaultSamplesPath;
     FileSearchPath soundfontsPaths;
     FileSearchPath customSamplesPaths;
-
+    FileSearchPath galleryPaths;
     void updateGalleries(void);
     
     void collectGalleries(void);
@@ -268,7 +275,7 @@ public:
     File getDefaultSamplesPath();
     Array<File> getSoundfontsPaths();
     Array<File> getCustomSamplesPaths();
-    
+    Array<File> getGalleryPaths();
     double getLevelL();
     double getLevelR();
 

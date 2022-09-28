@@ -925,15 +925,21 @@ void BKKeymapKeyboardComponent::mouseDrag (const MouseEvent& e)
 void BKKeymapKeyboardComponent::setKeysInKeymap(Array<int> keys)
 {
     Array<bool> keymap;
+    int voiceCounter = 0;
 
     for (int i = 0; i < 128; i++) keymap.add(false);
     
     for (auto key : keys)
     {
-        if (key >= 0) keymap.set(key, true);
+        if (key >= 0)
+        {
+            keymap.set(key, true);
+            voiceCounter++;
+        }
     }
     
     state.setKeymap(keymap);
+    DBG("num active voices = " + String(voiceCounter));
     
     repaint();
 }

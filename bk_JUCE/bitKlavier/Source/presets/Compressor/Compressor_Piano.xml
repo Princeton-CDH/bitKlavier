@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<compressor name="Piano" lookAhead="0" autoAttack="0" autoRelease="0" power="0"
+            autoMakeup="0" knee="0.699999988079071" inputGain="0.0" makeupGain="0.0"
+            attack="0.01999999955296516" release="0.05000000074505806" thresh="-20.0"
+            ratio="1.399999976158142" mix="1.0"/>

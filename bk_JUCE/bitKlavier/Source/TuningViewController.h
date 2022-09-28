@@ -143,8 +143,8 @@ protected:
     void textEditorEscapeKeyPressed (TextEditor& tf) override;
     
     //MTS
-    std::unique_ptr<BKTextButton> connectMTSButton;
-    std::unique_ptr<BKTextButton> disconnectMTSButton;
+    std::unique_ptr<BKLabel> MTSConnectionLabel;
+    std::unique_ptr<BKTextButton> MTSMasterConnectionButton;
     std::unique_ptr<FileChooser> chooser;
     String lastFile;
     void setLastFile (const FileChooser& fc)
@@ -203,7 +203,10 @@ private:
     void BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val) override;
     void keyboardSliderChanged(String name, Array<float> values) override;
     void sliderValueChanged (Slider* slider) override;
-    
+    void greyOutAllComponents();
+    void highlightAllComponents();
+    void disableAllComponents();
+    void enableAllComponents();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TuningPreparationEditor)
     
 };

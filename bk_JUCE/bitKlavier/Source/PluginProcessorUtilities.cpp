@@ -151,20 +151,9 @@ void BKAudioProcessor::collectGalleries(void)
 {
     galleryNames.clear();
     
-    File bkGalleries;
-    
-#if JUCE_IOS
-    bkGalleries = File::getSpecialLocation (File::userDocumentsDirectory);
-#endif
-#if JUCE_MAC
-    bkGalleries = File::getSpecialLocation(File::globalApplicationsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
-#endif
-#if JUCE_WINDOWS || JUCE_LINUX
-    //bkGalleries = File::getSpecialLocation(File::currentExecutableFile).getParentDirectory().getChildFile("galleries");
-    bkGalleries = File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("bitKlavier").getChildFile("galleries");
-#endif
-    
-    collectGalleriesFromFolder(bkGalleries);
+
+    for (auto path: getGalleryPaths())
+        collectGalleriesFromFolder(path);
 }
 
 void BKAudioProcessor::collectSoundfonts(void)

@@ -42,7 +42,7 @@ void ResonancePreparation::performModification(ResonanceModification* r, Array<b
         rActiveHeldKeys.modify(r->rActiveHeldKeys,reverse);
         for (auto n : rActiveHeldKeys.value)
         {
-            addSympStrings(n, 0);
+            addSympStrings(n, 0, false);
         }
     }
     
@@ -63,10 +63,7 @@ void ResonancePreparation::performModification(ResonanceModification* r, Array<b
     
     // If the mod didn't reverse, then it is modded
     modded = !reverse;
-    
-    //
-    currentTime = 0;
-    
+
     updatePartialStructure();
 
 }
@@ -121,7 +118,8 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance,
     }
     for (int i : resonance->prep->rActiveHeldKeys.value)
     {
-        resonance->prep->addSympStrings(i, 127);
+        //resonance->prep->addSympStrings(i, 127);
+        resonance->prep->addSympStrings(i, 127, false);
     }
 
     DBG("Create rProc");
@@ -168,7 +166,8 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                     // only create a new resonance if it would be louder/brighter than what is currently there
                     //      so, only if the newPlayPosition is less than the current play position
                     //if (newPlayPosition < currentSympPartial->playPosition  / (.001 *  resonance->prep->synth->getSampleRate()))
-                    if (newPlayPosition < (currentSympPartial->getPlayPosition(resonance->prep->getCurrentTime()) / (.001 *  resonance->prep->synth->getSampleRate())))
+                    // ** not convinced this is a good conditional; doesn't seem to help performance much, and is noticable sonically
+                    //if (newPlayPosition < (currentSympPartial->getPlayPosition(resonance->prep->getCurrentTime()) / (.001 *  resonance->prep->synth->getSampleRate())))
                     {
                         // set the start time for this new resonance
                         //currentSympPartial->playPosition = newPlayPosition * (.001 *  resonance->prep->synth->getSampleRate());
@@ -176,6 +175,8 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                                                          resonance->prep->getCurrentTime());
                         
                         // turn off the current resonance here, if it's playing
+                        // ** don't do the followign if not doing the conditional above
+                        /*
                         resonance->prep->synth->keyOff(1,
                                       ResonanceNote,
                                       resonance->prep->getSoundSet(),
@@ -187,6 +188,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                                       resonance->prep->getDefaultGainPtr(),
                                       true, // need to test more here
                                       false);
+                         */
 
                         // calculate the tuning gap between attached tuning and the tuning of this partial
                         // taking into account attached Tuning system, and defined partial structure (which may or may not be the same!)
@@ -273,7 +275,8 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
 
 void ResonancePreparation::addSympStrings(int noteNumber, float velocity)
 {
-    addSympStrings(noteNumber, velocity, false);
+    //addSympStrings(noteNumber, velocity, false);
+    addSympStrings(noteNumber, velocity, true);
 }
 
 // this will add this string and all its partials to the currently available sympathetic strings (sympStrings)
@@ -282,14 +285,15 @@ void ResonancePreparation::addSympStrings(int noteNumber, float velocity, bool i
     const ScopedLock sl (lock);
     
     // don't add a symp string that is already there
+    //DBG("Held Key already contains this note = " + String((int)getHeldKeys().contains(noteNumber)));
     if(getHeldKeys().contains(noteNumber) && ignoreRepeatedNotes) {
-        DBG("ResonancePreparation::addSympStrings, not adding new string as it is already there");
+        //DBG("ResonancePreparation::addSympStrings, not adding new string as it is already there");
         return;
     }
     
     if(sympStrings.size() > getMaxSympStrings())
     {
-        DBG("Resonance: removing oldest sympathetic string");
+        //DBG("Resonance: removing oldest sympathetic string");
         // might want to offer some more options here:
             // for instance, remove highest note (since that will have the fewest resonances in most cases)
             // or remove quietest? probably harder...
@@ -300,7 +304,7 @@ void ResonancePreparation::addSympStrings(int noteNumber, float velocity, bool i
         //resonance->prep->rActiveHeldKeys.value.removeLast();
     }
     
-    DBG("Resonance: addingSympatheticString " + String(noteNumber));
+    //DBG("Resonance: addingSympatheticString " + String(noteNumber));
     //for (int i = 0; i < partialStructure.size(); i++)
     //resonance->prep->getPartialStructure()
     for (int i = 0; i < getPartialStructure().size(); i++)
@@ -318,6 +322,7 @@ void ResonancePreparation::addSympStrings(int noteNumber, float velocity, bool i
     if (!rActiveHeldKeys.value.contains(noteNumber))
         rActiveHeldKeys.value.insert(0, noteNumber);
 
+    //DBG("num active held heys = " + String(rActiveHeldKeys.value.size()));
     //DBG("Resonance: number of partials = " + String(sympStrings[noteNumber].size()));
 }
 
@@ -424,7 +429,7 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     if ( (doRing && doAdd) || doAdd) // don't want to remove resonating strings if we aren't in doAdd target mode, so doAdd always needs to be true
     {
         // clear this held string's partials
-        DBG("Resonance: clearing sympathetic string: " + String(noteNumber));
+        // DBG("Resonance: clearing sympathetic string: " + String(noteNumber));
         resonance->prep->removeSympStrings(noteNumber, aVels->getUnchecked(TargetTypeResonanceRing));
         resonance->prep->clearSympString(noteNumber);
         
@@ -440,6 +445,8 @@ void ResonanceProcessor::prepareToPlay(double sr)
 void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
 {
     // should not be any thread safety issues with this...
+    // NOTE: this might be necessary anymore, since it is only needed for determining whether to
+    //          ring a note that might already be sounding, which is currently commented out
     resonance->prep->updateCurrentTime(numSamples);
     
     /*

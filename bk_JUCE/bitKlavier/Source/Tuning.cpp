@@ -65,6 +65,7 @@ keymaps(Keymap::PtrArr()),
 lastNoteTuning(0),
 lastIntervalTuning(0)
 
+
 {
     for (int j = 0; j < 128; j++)
     {
@@ -80,6 +81,9 @@ lastIntervalTuning(0)
 
 TuningProcessor::~TuningProcessor()
 {
+    if(!MTS_CanRegisterMaster()) MTS_DeregisterMaster();
+    if(MTS_HasMaster(tuning->prep->client) && tuning->prep->client != nullptr)
+        MTS_DeregisterClient(tuning->prep->client);
 }
 
 //returns offsets; main callback
@@ -99,7 +103,11 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
             lastNoteTuning = midiNoteNumber + lastNoteOffset;
             lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
         }
-
+//        if (tuning->prep->isMTSMaster)
+//        {
+//            DBG("Master Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
+//            MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
+//        }
         return lastNoteOffset;
     }
     
@@ -123,11 +131,28 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
             lastNoteTuning = midiNoteNumber + lastNoteOffset;
             lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
         }
-        
+//        if (tuning->prep->isMTSMaster)
+//        {
+//            DBG("Master Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
+//            MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
+//        }
         return lastNoteOffset;
     }
     
-    
+    if (tuning->prep->hasMTSMaster() && tuning->prep->client != nullptr)
+    {
+        float freq = MTS_NoteToFrequency(tuning->prep->client, (char)midiNoteNumber, -1);
+        float newmidi = ftom(freq);
+        lastNoteOffset = newmidi - midiNoteNumber ;
+        if (updateLastInterval)
+        {
+            lastNoteTuning = midiNoteNumber + lastNoteOffset;
+            lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
+        }
+        DBG("Client Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
+        
+        return lastNoteOffset;
+    }
     
     //else do regular tunings
     Array<float> currentTuning;
@@ -145,7 +170,11 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
         lastNoteTuning = midiNoteNumber + lastNoteOffset;
         lastIntervalTuning = lastNoteTuning - lastNoteTuningTemp;
     }
-    
+    if (tuning->prep->isMTSMaster && !tuning->prep->getSpringsActive())
+    {
+        DBG("MAster Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
+        MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
+    }
     return lastNoteOffset;
     
 }
@@ -346,6 +375,22 @@ void Tuning::loadScalaFile(std::string fname)
     Tunings::Scale s;
     try {
         s = Tunings::readSCLFile(fname);
+    } catch (Tunings::TuningError t) {
+        AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Scala Loading Error"), TRANS(t.what()));
+        return;
+    }
+    currentScale = s;
+    loadScalaScale(s);
+}
+
+void Tuning::loadScalaFile(File file)
+{
+    Tunings::Scale s;
+    String a = file.loadFileAsString();
+    DBG(a);
+    
+    try {
+        s = Tunings::parseSCLData(file.loadFileAsString().toStdString());
     } catch (Tunings::TuningError t) {
         AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, TRANS("Scala Loading Error"), TRANS(t.what()));
         return;
