@@ -135,10 +135,10 @@ void BKCompressorView::initWidgets()
     
     powerButton.setButtonText("Bypass");
     addAndMakeVisible(powerButton);
-    //powerButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
+    powerButton.setColour(TextButton::ColourIds::buttonColourId, Colour::fromRGB(245, 124, 0));
     powerButton.setLookAndFeel(&laf);
-//    powerButton.setImages(
-//        Drawable::createFromImageData(BinaryData::power_white_svg, BinaryData::power_white_svgSize).get());
+    powerButton.setImages(
+        Drawable::createFromImageData(BinaryData::power_white_svg, BinaryData::power_white_svgSize).get());
     powerButton.setClickingTogglesState(true);
     powerButton.setToggleState(true, dontSendNotification);
     powerButton.addListener(this);
@@ -225,11 +225,12 @@ void BKCompressorView::resized()
 {
     //actionButton.setBounds(area_init.removeFromTop(area_init.getHeight()/10).removeFromLeft(area_init.getWidth()/10));
     auto area = getLocalBounds().reduced(Constants::Margins::big);
- 
+    
+    auto bypassArea = area.removeFromRight(70);
     const auto headerHeight = area.getHeight() / 10;
     const auto btnAreaWidth = area.getWidth() / 5;
     const auto btnBotHeight = area.getHeight() / 3;
-
+    powerButton.setBounds(bypassArea.removeFromTop(20).removeFromRight(20));
     auto header = area.removeFromTop(headerHeight).reduced(Constants::Margins::small);
     auto lBtnArea = area.removeFromLeft(btnAreaWidth).reduced(Constants::Margins::small);
     auto rBtnArea = area.removeFromRight(btnAreaWidth).reduced(Constants::Margins::small);
@@ -249,7 +250,7 @@ void BKCompressorView::resized()
     headerBox.items.add(FlexItem(autoAttackButton).withFlex(2).withMargin(buttonMargin));
     headerBox.items.add(FlexItem(autoReleaseButton).withFlex(2).withMargin(buttonMargin));
     headerBox.items.add(FlexItem(autoMakeupButton).withFlex(2).withMargin(buttonMargin));
-    headerBox.items.add(FlexItem(powerButton).withFlex(1).withMargin(buttonMargin));
+    //headerBox.items.add(FlexItem(powerButton).withFlex(1).withMargin(buttonMargin));
     headerBox.performLayout(header.toFloat());
 
     FlexBox leftBtnBox;
