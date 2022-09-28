@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.2g"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.2k"
               bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -259,12 +259,16 @@
                 file="Source/icons/mod_unassigned_icon.png"/>
         </GROUP>
         <GROUP id="{46A77271-6C9F-EC8E-1B96-E93C7D5FB77B}" name="presets">
-          <FILE id="OZDSDh" name="Compressor_Agressive.xml" compile="0" resource="1"
-                file="Source/presets/Compressor/Compressor_Agressive.xml"/>
-          <FILE id="VZ2smL" name="Compressor_Brick Wall.xml" compile="0" resource="1"
-                file="Source/presets/Compressor/Compressor_Brick Wall.xml"/>
           <FILE id="qahXrg" name="Compressor_Default.xml" compile="0" resource="1"
                 file="Source/presets/Compressor/Compressor_Default.xml"/>
+          <FILE id="vYj23Y" name="Compressor_Piano.xml" compile="0" resource="1"
+                file="Source/presets/Compressor/Compressor_Piano.xml"/>
+          <FILE id="nWhNYL" name="Compressor_Piano2.xml" compile="0" resource="1"
+                file="Source/presets/Compressor/Compressor_Piano2.xml"/>
+          <FILE id="VZ2smL" name="Compressor_Brick Wall.xml" compile="0" resource="1"
+                file="Source/presets/Compressor/Compressor_Brick Wall.xml"/>
+          <FILE id="j9ER2g" name="Compressor_Aggressive.xml" compile="0" resource="1"
+                file="Source/presets/Compressor/Compressor_Aggressive.xml"/>
         </GROUP>
       </GROUP>
       <GROUP id="{19157329-C279-4066-03E0-75F988B82181}" name="Constants">
@@ -625,7 +629,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" customXcodeResourceFolders="" customPList=""
-               smallIcon="smHM8h" bigIcon="iHGLGD" vstLegacyFolder="../../../../../VST2_SDK">
+               smallIcon="smHM8h" bigIcon="iHGLGD" vstLegacyFolder="../../../modules/VST_SDK/VST2_SDK">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        cppLibType="" enablePluginBinaryCopyStep="1"/>
