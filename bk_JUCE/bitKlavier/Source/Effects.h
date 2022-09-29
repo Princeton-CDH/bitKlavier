@@ -62,6 +62,7 @@ public:
     inline void setTempo(TempoProcessor::Ptr temp) { tempo = temp; }
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
+    virtual void addSample(float input, int offset, int channel)=0;
 private:
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;

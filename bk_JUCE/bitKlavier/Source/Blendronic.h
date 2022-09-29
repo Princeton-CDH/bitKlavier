@@ -642,7 +642,6 @@ public:
 	//accessors
 	inline Blendronic::Ptr getBlendronic(void) const noexcept { return blendronic; }
 	inline TempoProcessor::Ptr getTempo(void) const noexcept { return tempo; }
-	inline BlendronicDelay* getDelay(void) const noexcept { return delay; }
     inline int getId(void) const noexcept override { return blendronic->getId(); } //override;
     inline int getTempoId(void) const noexcept { return tempo->getId(); }
 	inline const float getCurrentNumSamplesBeat(void) const noexcept { return numSamplesBeat; }
@@ -655,7 +654,6 @@ public:
     inline int getFeedbackIndex(void) const noexcept { return feedbackIndex; }
     
     inline Array<int> getKeysDepressed(void) const noexcept { return keysDepressed; }
-    inline const AudioBuffer<float>* getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
     //inline const bool getActive() const noexcept { return blendronicActive; }
     inline const bool getInputState() const noexcept { return delay->getInputState(); }
     inline const bool getOutputState() const noexcept { return delay->getOutputState(); }
@@ -700,12 +698,26 @@ public:
     
     inline BlendronicDisplay::ChannelInfo* getSmoothingDisplayData(void) { return smoothing.get(); }
     
+    void addSample(float input, int offset, int channel) override
+    {
+        getDelay()->addSample(input, offset, channel);
+    }
     
+    void clearNextDelayBlock(int numSamples)
+    {
+        for (int i = 0; i < numSamples; i++)
+        {
+            getDelay()->getDelay()->scalePrevious(0, i, 0);
+            getDelay()->getDelay()->scalePrevious(0, i, 1);
+        }
+    }
 
 private:
     
     /* Private Functions */
 
+    inline const AudioBuffer<float>* getDelayBuffer(void) const noexcept { return delay->getDelayBuffer(); }
+    inline BlendronicDelay* getDelay(void) const noexcept { return delay; }
     BlendronicDelay::Ptr createBlendronicDelay(float delayLength, int delayBufferSize, double sr, bool active)
     {
         const ScopedLock sl (lock);

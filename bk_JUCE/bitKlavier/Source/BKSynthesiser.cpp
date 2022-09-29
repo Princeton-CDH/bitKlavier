@@ -218,11 +218,8 @@ void BKSynthesiser::clearNextDelayBlock(int numSamples)
     for (auto b : eprocessors)
     {
         if (b->getType() == EffectBlendronic)
-		for (int i = 0; i < numSamples; i++)
-		{
-			dynamic_cast<BlendronicProcessor*>(b.get())->getDelay()->getDelay()->scalePrevious(0, i, 0);
-            dynamic_cast<BlendronicProcessor*>(b.get())->getDelay()->getDelay()->scalePrevious(0, i, 1);
-		}
+            dynamic_cast<BlendronicProcessor*>(b.get())->clearNextDelayBlock(numSamples);
+
     }
 }
 
