@@ -34,6 +34,7 @@
 
 class StandalonePluginHolder;
 class BKAudioProcessorEditor;
+//class BKPianoSamplerSound;
 //class BKEqualizer;
 
 //==============================================================================
@@ -106,9 +107,9 @@ public:
     std::unique_ptr<AudioSampleBuffer> sampleBuffer;
     
     // Synthesisers.
-    BKSynthesiser                       mainPianoSynth;
-    BKSynthesiser                       hammerReleaseSynth;
-    BKSynthesiser                       resonanceReleaseSynth;
+//    BKSynthesiser                       mainPianoSynth;
+//    BKSynthesiser                       hammerReleaseSynth;
+//    BKSynthesiser                       resonanceReleaseSynth;
     BKSynthesiser                       pedalSynth;
     
     // Equalizer
@@ -515,7 +516,22 @@ public:
         
         return loadSamples(type, path, subsound, false);
     }
+    OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> mainPianoSoundSet;
+    OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> resonanceReleaseSoundSet;
+    OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> hammerReleaseSoundSet;
+    OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> emptySoundSet;
     
+    void loadSoundSet(OwnedArray<ReferenceCountedArray<BKSynthesiserSound>>& soundSet,  BKSynthesiserSound* newSound, int loadingSoundSetId)
+    {
+        while (soundSet.size() - 1 < loadingSoundSetId)
+        {
+    //        soundSets.insertMultiple(soundSets.size(), ReferenceCountedArray<BKSynthesiserSound>(), set - (soundSets.size() - 1));
+            soundSet.ensureStorageAllocated(loadingSoundSetId + 1);
+            soundSet.add(new ReferenceCountedArray<BKSynthesiserSound>());
+        }
+        //synth->addSound(loadingSoundSetId, newSound);
+        soundSet.getUnchecked(loadingSoundSetId)->add (newSound);
+    }
 private:
     double currentSampleRate;
     

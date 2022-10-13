@@ -118,7 +118,7 @@ void Gallery::randomize()
 	Random::getSystemRandom().setSeedRandomly();
 
     GeneralSettings::Ptr dummyGeneral = new GeneralSettings();
-    BKSynthesiser* dummySynth = new BKSynthesiser(processor, dummyGeneral);
+    //BKSynthesiser* dummySynth = new BKSynthesiser(processor, dummyGeneral);
 
     //each piano
     for (int h = 0; h < Random::getSystemRandom().nextInt(Range<int>(1, 5)); h++)
@@ -147,25 +147,25 @@ void Gallery::randomize()
 			Blendronic::Ptr b = new Blendronic(-1, true);
 			addBlendronic(b);
 			int blendronicId = b->getId();
-			EffectProcessor::Ptr bProc = new BlendronicProcessor(b, mProc, dummyGeneral, dummySynth);
+			EffectProcessor::Ptr bProc = new BlendronicProcessor(b, mProc, dummyGeneral);
 			p->addBlendronicProcessor(blendronicId);
 
             Direct::Ptr d = new Direct(-1, true);
             addDirect(d);
             int directId = d->getId();
-            DirectProcessor::Ptr dProc = new DirectProcessor(d, tProc, bProc, dummySynth, dummySynth, dummySynth);
+            DirectProcessor::Ptr dProc = new DirectProcessor(d, tProc, processor, dummyGeneral);
             p->addDirectProcessor(directId);
 
             Synchronic::Ptr s = new Synchronic(-1, true);
             addSynchronic(s);
             int synchronicId = s->getId();
-            SynchronicProcessor::Ptr sProc = new SynchronicProcessor(s, tProc, mProc, bProc, dummySynth, dummyGeneral);
+            SynchronicProcessor::Ptr sProc = new SynchronicProcessor(s, tProc, mProc,processor, dummyGeneral);
             p->addSynchronicProcessor(synchronicId);
 
             Nostalgic::Ptr n = new Nostalgic(-1, true);
             addNostalgic(n);
             int nostalgicId = n->getId();
-            NostalgicProcessor::Ptr nProc = new NostalgicProcessor(n, tProc, sProc, bProc, dummySynth);
+            NostalgicProcessor::Ptr nProc = new NostalgicProcessor(n, tProc, sProc, processor);
             p->addNostalgicProcessor(nostalgicId);
 
             p->linkPreparationWithKeymap(PreparationTypeDirect, d->getId(), kp->getId());

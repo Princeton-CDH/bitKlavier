@@ -366,8 +366,9 @@ public:
     /** Creates a new BKSynthesiser.
      You'll need to add some sounds and voices before it'll make any sound.
      */
-    BKSynthesiser(BKAudioProcessor& processor, GeneralSettings::Ptr);
-    BKSynthesiser(BKAudioProcessor& processor);
+    BKSynthesiser(BKAudioProcessor& processor, GeneralSettings::Ptr, OwnedArray <ReferenceCountedArray<BKSynthesiserSound>>&);
+    BKSynthesiser(BKAudioProcessor& processor, OwnedArray <ReferenceCountedArray<BKSynthesiserSound>>&);
+
     
     void setGeneralSettings(GeneralSettings::Ptr gen);
     void updateGeneralSettings(GeneralSettings::Ptr gen);
@@ -421,7 +422,6 @@ public:
     
     /** Removes and deletes one of the sounds. */
     void removeSound (int set, int index);
-    
     //==============================================================================
     /** If set to true, then the synth will try to take over an existing voice if
      it runs out and needs to play another note.
@@ -673,9 +673,9 @@ public:
     void addEffectProcessor(EffectProcessor::Ptr bproc);
     void removeEffectProcessor(int Id);
     
-	void renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples);
-	void renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples);
-    void clearNextDelayBlock(int numSamples);
+	//void renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples);
+	//void renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples);
+    //void clearNextDelayBlock(int numSamples);
     
     /** Can be overridden to do custom handling of incoming midi events. */
     virtual void handleMidiEvent (const MidiMessage&);
@@ -692,7 +692,7 @@ protected:
     CriticalSection lock;
     
     ReferenceCountedArray<BKSynthesiserVoice> voices;
-    OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> soundSets;
+    OwnedArray<ReferenceCountedArray<BKSynthesiserSound>>& soundSets;
     
     /** The last pitch-wheel values for each midi channel. */
     int lastPitchWheelValues [16];

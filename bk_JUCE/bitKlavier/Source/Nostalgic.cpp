@@ -65,21 +65,25 @@ void NostalgicPreparation::performModification(NostalgicModification* n, Array<b
 NostalgicProcessor::NostalgicProcessor(Nostalgic::Ptr nostalgic,
                                        TuningProcessor::Ptr tuning,
                                        SynchronicProcessor::Ptr synchronic,
-                                       EffectProcessor::PtrArr effect,
-                                       BKSynthesiser *s):
-synth(s),
+                                       BKAudioProcessor& processor
+                                       /*BKSynthesiser *s */):
+//synth(s),
 nostalgic(nostalgic),
 tuner(tuning),
 synchronic(synchronic),
-effects(effect),
-keymaps(Keymap::PtrArr())
+keymaps(Keymap::PtrArr()),
+synth(new BKSynthesiser(processor, processor.gallery->getGeneralSettings(),processor.mainPianoSoundSet ))
 {
     if (!nostalgic->prep->nUseGlobalSoundSet.value)
     {
         // comes in as "soundfont.sf2.subsound1"
         String name = nostalgic->prep->nSoundSetName.value;
-        int Id = synth->processor.findPathAndLoadSamples(name);
+        int Id = processor.findPathAndLoadSamples(name);
         nostalgic->prep->setSoundSet(Id);
+    }
+    for (int i = 0; i < 300; i++)
+    {
+        synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
     }
     
     for (int j = 0; j < 128; j++)
@@ -203,33 +207,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                     String(synthNoteNumber) + " " +
                     String(synthOffset) + " " +
                     String(aVels->getUnchecked(0)));
-                if (!effects.isEmpty())
-                {
-                    synth->keyOn(1,
-                                 noteNumber,
-                                 synthNoteNumber,
-                                 synthOffset,
-                                 aVels->getUnchecked(TargetTypeNostalgic),
-                                 aGlobalGain,
-                                 Reverse,
-                                 FixedLengthFixedStart,
-                                 NostalgicNote,
-                                 prep->getSoundSet(), //set
-                                 nostalgic->getId(),
-                                 duration + prep->nWaveDistance.value,
-                                 duration,  // length
-                                 // duration + prep->nReverseRelease.value,
-                                 prep->nReverseAttack.value,
-                                 prep->nReverseDecay.value,
-                                 prep->nReverseSustain.value,
-                                 prep->nReverseRelease.value,
-                                 tuner,
-                                 prep->getGainPtr(),
-                                 prep->getBlendronicGainPtr(),
-                                 effects);
-				}
-				else
-				{
+               
                     synth->keyOn(1,
                                  noteNumber,
                                  synthNoteNumber,
@@ -250,7 +228,6 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                                  prep->nReverseRelease.value,
                                  tuner,
                                  prep->getGainPtr());
-                }
             }
             
             activeNotes.removeFirstMatchingValue(noteNumber);
@@ -364,9 +341,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                         
                         DBG("Nostalgic::keyReleased duration, waveDistance : " + String(duration) + " " + String(prep->nWaveDistance.value));
                         
-                        //play nostalgic note
-                        if (!effects.isEmpty())
-                        {
+                   
                             synth->keyOn(1,
                                          note,
                                          synthNoteNumber,
@@ -387,30 +362,6 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                                          prep->nReverseRelease.value,
                                          tuner,
                                          prep->getGainPtr());
-						}
-						else
-						{
-                            synth->keyOn(1,
-                                         note,
-                                         synthNoteNumber,
-                                         synthOffset,
-                                         aVels->getUnchecked(TargetTypeNostalgic),
-                                         aGlobalGain,
-                                         Reverse,
-                                         FixedLengthFixedStart,
-                                         NostalgicNote,
-                                         prep->getSoundSet(), //set
-                                         nostalgic->getId(),
-                                         duration + prep->nWaveDistance.value,
-                                         duration,  // length
-                                         // duration + prep->nReverseRelease.value,
-                                         prep->nReverseAttack.value,
-                                         prep->nReverseDecay.value,
-                                         prep->nReverseSustain.value,
-                                         prep->nReverseRelease.value,
-                                         tuner,
-                                         prep->getGainPtr());
-						}
                         
                         reverseNotes.insert(0, new NostalgicNoteStuff(note));
                         NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
@@ -465,31 +416,6 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                     String(synthNoteNumber) + " " +
                     String(synthOffset));
                 
-                if (!effects.isEmpty())
-                {
-                    synth->keyOn(1,
-                                 noteNumber,
-                                 synthNoteNumber,
-                                 synthOffset,
-                                 aVels->getUnchecked(TargetTypeNostalgic),
-                                 aGlobalGain,
-                                 Reverse,
-                                 FixedLengthFixedStart,
-                                 NostalgicNote,
-                                 prep->getSoundSet(), //set
-                                 nostalgic->getId(),
-                                 duration + prep->nWaveDistance.value,
-                                 duration,  // length
-                                 // duration + prep->nReverseRelease.value,
-                                 prep->nReverseAttack.value,
-                                 prep->nReverseDecay.value,
-                                 prep->nReverseSustain.value,
-                                 prep->nReverseRelease.value,
-                                 tuner,
-                                 prep->getGainPtr());
-				}
-				else
-				{
                     synth->keyOn(1,
                                  noteNumber,
                                  synthNoteNumber,
@@ -511,7 +437,6 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                                  tuner,
                                  prep->getGainPtr());
                     
-				}
             }
             
             reverseNotes.insert(0, new NostalgicNoteStuff(noteNumber));
@@ -609,34 +534,6 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
                 DBG("reverse note on noteNum/offset " +
                     String(synthNoteNumber) + " " +
                     String(synthOffset));
-                
-				if (!effects.isEmpty())
-				{
-                    synth->keyOn(1,
-                                 noteNumber,
-                                 synthNoteNumber,
-                                 synthOffset,
-                                 aVels->getUnchecked(TargetTypeNostalgic),
-                                 aGlobalGain,
-                                 Reverse,
-                                 FixedLengthFixedStart,
-                                 NostalgicNote,
-                                 prep->getSoundSet(), //set
-                                 nostalgic->getId(),
-                                 duration + prep->nWaveDistance.value,
-                                 duration,  // length
-                                 // duration + prep->nReverseRelease.value,
-                                 prep->nReverseAttack.value,
-                                 prep->nReverseDecay.value,
-                                 prep->nReverseSustain.value,
-                                 prep->nReverseRelease.value,
-                                 tuner,
-                                 prep->getGainPtr(),
-                                 prep->getBlendronicGainPtr(),
-                                 effects);
-                }
-				else
-				{
                     synth->keyOn(1,
                                  noteNumber,
                                  synthNoteNumber,
@@ -657,7 +554,6 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
                                  prep->nReverseRelease.value,
                                  tuner,
                                  prep->getGainPtr());
-				}
             }
             
             reverseNotes.insert(0, new NostalgicNoteStuff(noteNumber));
@@ -842,7 +738,7 @@ float NostalgicProcessor::filterVelocity(float vel)
 }
 
 //main scheduling function
-void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoadType type)
+void NostalgicProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type)
 {
     //cluster management
     if (inCluster)
@@ -919,32 +815,6 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                      */
                     NostalgicPreparation::Ptr prep = nostalgic->prep;
                     
-					if (!effects.isEmpty())
-					{
-                        synth->keyOn(midiChannel,
-                                     thisNote->getNoteNumber(),
-                                     synthNoteNumber,
-                                     synthOffset,
-                                     thisNote->getVelocityAtKeyOn(),
-                                     aGlobalGain,
-                                     Forward,
-                                     FixedLengthFixedStart,
-                                     NostalgicNote,
-                                     prep->getSoundSet(), //set
-                                     nostalgic->getId(),
-                                     noteOnPrep->nWaveDistance.value,                        //start position
-                                     noteOnPrep->nUndertow.value,                            //play length
-                                     prep->nUndertowAttack.value,
-                                     prep->nUndertowDecay.value,
-                                     prep->nUndertowSustain.value,
-                                     prep->nUndertowRelease.value,
-                                     tuner,
-                                     prep->getGainPtr(),
-                                     prep->getBlendronicGainPtr(),
-                                     effects);
-					}
-					else
-					{
 						synth->keyOn(midiChannel,
                                      thisNote->getNoteNumber(),
                                      synthNoteNumber,
@@ -963,10 +833,8 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                                      prep->nUndertowSustain.value,
                                      prep->nUndertowRelease.value,
                                      tuner,
-                                     prep->getGainPtr(),
-                                     prep->getBlendronicGainPtr(),
-                                     effects);
-					}
+                                     prep->getGainPtr()
+                                     );
                 }
 
                 undertowNotes.insert(0, new NostalgicNoteStuff(thisNote->getNoteNumber()));
@@ -984,6 +852,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
             reverseNotes.remove(i);
         }
     }
+    synth->renderNextBlock(buffer, midiMessages, 0, numSamples);
 }
 
 //increment timers for all active notes, and all currently reversing notes

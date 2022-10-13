@@ -387,9 +387,6 @@ private:
     TuningProcessor::Ptr defaultT;
     TempoProcessor::Ptr defaultM;
     SynchronicProcessor::Ptr defaultS;
-    EffectProcessor::Ptr defaultB;
-    EffectProcessor::PtrArr defaultBA;
-	BlendronicDelay::Ptr defaultD;
     ResonanceProcessor::Ptr defaultR;
     
     inline Array<int> getAllIds(Direct::PtrArr direct)

@@ -18,6 +18,7 @@
 #include "General.h"
 #include "Keymap.h"
 #include "Blendronic.h"
+#include "BKPianoSampler.h"
 
 class SynchronicModification;
 
@@ -1233,8 +1234,8 @@ public:
     SynchronicProcessor(Synchronic::Ptr synchronic,
                         TuningProcessor::Ptr tuning,
                         TempoProcessor::Ptr tempo,
-						EffectProcessor::PtrArr effect,
-                        BKSynthesiser* main,
+                        BKAudioProcessor &processor,
+                        //BKSynthesiser* main,
                         GeneralSettings::Ptr general);
     
     ~SynchronicProcessor();
@@ -1242,7 +1243,7 @@ public:
     inline const uint64 getNumSamplesBeat(void) const noexcept { return numSamplesBeat;    }
     
     BKSampleLoadType sampleType;
-    void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
+    void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type);
     void keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
     void keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
     float getTimeToBeatMS(float beatsToSkip);
@@ -1282,10 +1283,6 @@ public:
         tempo = newTempo;
     }
 
-	inline void addBlendronic(EffectProcessor::Ptr blend)
-	{
-		effects.add(blend);
-	}
     
     inline Synchronic::Ptr getSynchronic(void) const noexcept
     {
@@ -1302,16 +1299,6 @@ public:
         return tempo;
     }
 
-    inline EffectProcessor::PtrArr getBlendronic(void)
-    {
-        EffectProcessor::PtrArr blends;
-        for (auto e : effects)
-        {
-            if(e->getType() == EffectType::EffectBlendronic)
-                blends.add(e);
-        }
-        return blends;
-    }
     inline int getTuningId(void) const noexcept
     {
         return tuner->getId();
@@ -1327,9 +1314,10 @@ public:
 //        return blendronic->getId();
 //    }
 
-    inline void prepareToPlay(float sr, BKSynthesiser* main)
+    inline void prepareToPlay(float sr)
     {
-        synth = main;
+        //synth = main;
+        //ADDSYNTH (Do synth set sample rate)
     }
     //void  atReset();
     
@@ -1400,7 +1388,6 @@ private:
     Synchronic::Ptr synchronic;
     TuningProcessor::Ptr tuner;
     TempoProcessor::Ptr tempo;
-	EffectProcessor::PtrArr effects;
     
     Keymap::PtrArr      keymaps;
         

@@ -646,7 +646,13 @@ public:
     {
         for (auto p : resonance)
         {
+            DBG(String(p->getId()));
+        }
+        for (auto p : resonance)
+        {
+            DBG(String(p->getId()));
             if (p->getId() == Id) return p;
+            DBG("nope");
         }
         return nullptr;
     }

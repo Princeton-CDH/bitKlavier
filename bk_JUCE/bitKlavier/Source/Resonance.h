@@ -809,8 +809,8 @@ public:
 
     ResonanceProcessor( Resonance::Ptr rResonance,
                         TuningProcessor::Ptr rTuning,
-                        GeneralSettings::Ptr rGeneral,
-                        BKSynthesiser* rMain
+                        GeneralSettings::Ptr rGeneral
+                        //BKSynthesiser* rMain
     );
     ~ResonanceProcessor();
     
@@ -853,21 +853,7 @@ public:
         return keymaps;
     }
 
-    inline void addBlendronic(EffectProcessor::Ptr blend)
-    {
-        effects.add(blend);
-    }
-    
-    inline EffectProcessor::PtrArr getBlendronic(void)
-    {
-        EffectProcessor::PtrArr blends;
-        for (auto e : effects)
-        {
-            if(e->getType() == EffectType::EffectBlendronic)
-                blends.add(e);
-        }
-        return blends;
-    }
+   
 
     void ringSympStrings(int noteNumber, float velocity);
     
@@ -879,7 +865,6 @@ private:
     TuningProcessor::Ptr        tuning;
     GeneralSettings::Ptr        general;
     Keymap::PtrArr              keymaps;
-    EffectProcessor::PtrArr effects;
     
     Array<Array<float>> velocities;
     Array<Array<float>> invertVelocities;

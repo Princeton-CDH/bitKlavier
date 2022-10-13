@@ -9,7 +9,6 @@
  */
 
 #include "BKSynthesiser.h"
-
 #include "PluginProcessor.h"
 
 BKSynthesiserSound::BKSynthesiserSound(void) {}
@@ -77,32 +76,63 @@ void BKSynthesiserVoice::renderNextBlock (AudioBuffer<double>& outputBuffer,
 }
     
 //==============================================================================
-BKSynthesiser::BKSynthesiser(BKAudioProcessor& processor, GeneralSettings::Ptr gen):
+BKSynthesiser::BKSynthesiser(BKAudioProcessor& processor, GeneralSettings::Ptr gen, OwnedArray <ReferenceCountedArray<BKSynthesiserSound>>& soundSet):
 generalSettings(gen),
 processor(processor),
 pitchWheelValue(8192),
 lastNoteOnCounter (0),
 minimumSubBlockSize (32),
 subBlockSubdivisionIsStrict (false),
-shouldStealNotes (true)
+shouldStealNotes (true),
+soundSets(soundSet)
 {
     for (int i = 0; i < numElementsInArray (lastPitchWheelValues); ++i)
         lastPitchWheelValues[i] = 0x2000;
     
 }
     
-BKSynthesiser::BKSynthesiser(BKAudioProcessor& processor):
+BKSynthesiser::BKSynthesiser(BKAudioProcessor& processor,  OwnedArray <ReferenceCountedArray<BKSynthesiserSound>>& soundSet):
 processor(processor),
 pitchWheelValue(8192),
 lastNoteOnCounter (0),
 minimumSubBlockSize (32),
 subBlockSubdivisionIsStrict (false),
-shouldStealNotes (true)
+shouldStealNotes (true),
+soundSets(soundSet)
 {
     for (int i = 0; i < numElementsInArray (lastPitchWheelValues); ++i)
         lastPitchWheelValues[i] = 0x2000;
     
 }
+
+
+//BKSynthesiser::BKSynthesiser(BKAudioProcessor& processor, GeneralSettings::Ptr gen):
+//generalSettings(gen),
+//processor(processor),
+//pitchWheelValue(8192),
+//lastNoteOnCounter (0),
+//minimumSubBlockSize (32),
+//subBlockSubdivisionIsStrict (false),
+//shouldStealNotes (true),
+//soundSets(new OwnedArray<ReferenceCountedArray<BKSynthesiserSound>>())
+//{
+//    for (int i = 0; i < numElementsInArray (lastPitchWheelValues); ++i)
+//        lastPitchWheelValues[i] = 0x2000;
+//    
+//}
+//
+//BKSynthesiser::BKSynthesiser(BKAudioProcessor& processor):
+//processor(processor),
+//pitchWheelValue(8192),
+//lastNoteOnCounter (0),
+//minimumSubBlockSize (32),
+//subBlockSubdivisionIsStrict (false),
+//shouldStealNotes (true)
+//{
+//    for (int i = 0; i < numElementsInArray (lastPitchWheelValues); ++i)
+//        lastPitchWheelValues[i] = 0x2000;
+//    
+//}
 
 void BKSynthesiser::setGeneralSettings(GeneralSettings::Ptr gen)
 {
@@ -160,6 +190,11 @@ void BKSynthesiser::clearSounds(int set)
     soundSets.getUnchecked(set)->clear();
 }
 
+//void BKSynthesiser::setSoundSet( OwnedArray <ReferenceCountedArray<BKSynthesiserSound>>& soundSet)
+//{
+//    soundSets = soundSet;
+//}
+
 BKSynthesiserSound* BKSynthesiser::addSound (int set, const BKSynthesiserSound::Ptr& newSound)
 {
     //const ScopedLock sl (lock);
@@ -197,119 +232,119 @@ void BKSynthesiser::setMinimumRenderingSubdivisionSize (int numSamples, bool sho
 
 
 
-void BKSynthesiser::addEffectProcessor(EffectProcessor::Ptr bproc)
-{
-    const ScopedLock sl (lock);
-    eprocessors.add(bproc);
-}
-
-void BKSynthesiser::removeEffectProcessor(int Id)
-{
-    const ScopedLock sl (lock);
-    
-    for (int i = 0; i < eprocessors.size(); ++i)
-    {
-        if (eprocessors[i]->getId() == Id) eprocessors.remove(i);
-    }
-}
-
-void BKSynthesiser::clearNextDelayBlock(int numSamples)
-{
-    for (auto b : eprocessors)
-    {
-        if (b->getType() == EffectBlendronic)
-            dynamic_cast<BlendronicProcessor*>(b.get())->clearNextDelayBlock(numSamples);
-
-    }
-}
-
-
-void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples)
-{
-
-    double* outL = outputAudio.getWritePointer (0, startSample);
-    double* outR = outputAudio.getNumChannels() > 1 ? outputAudio.getWritePointer (1, startSample) : nullptr;
-    
-	float totalOutputL = 0.0f;
-	float totalOutputR = 0.0f;
-    
-    EffectProcessor::PtrArr activebprocessors;
-    for (auto b : eprocessors)
-    {
-        if (b->getActive()) activebprocessors.add(b);
-    }
-    
-	while (--numSamples >= 0)
-	{
-		totalOutputL = 0.0f;
-		totalOutputR = 0.0f;
-
-		for (auto b : activebprocessors)
-		{
-			if (b != nullptr)
-			{
-                float outputs[2];
-                b->tick(outputs);
-                totalOutputL += outputs[0];
-                totalOutputR += outputs[1];
-			}
-		}
-
-		if (outR != nullptr)
-		{
-			*outL++ += ((double) totalOutputL) * 1.0;
-			*outR++ += ((double) totalOutputR) * 1.0;
-		}
-		else
-		{
-			*outL++ += (((double)totalOutputL) + ((double)totalOutputR)) * 0.5;
-		}
-	}
-}
-
-
-void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples)
-{
-
-    float* outL = outputAudio.getWritePointer (0, startSample);
-    float* outR = outputAudio.getNumChannels() > 1 ? outputAudio.getWritePointer (1, startSample) : nullptr;
-    
-    float totalOutputL = 0.0f;
-	float totalOutputR = 0.0f;
-    
-    EffectProcessor::PtrArr activebprocessors;
-    for (auto b : eprocessors)
-    {
-        if (b->getActive()) activebprocessors.add(b);
-    }
-    
-    while (--numSamples >= 0)
-    {
-        totalOutputL = 0.0f;
-		totalOutputR = 0.0f;
-        
-        for (auto b : activebprocessors)
-        {
-			if (b != nullptr)
-			{
-                float outputs[2];
-                b->tick(outputs);
-                totalOutputL += outputs[0];
-                totalOutputR += outputs[1];
-			}
-        }
-
-        if (outR != nullptr)
-        {
-            *outL++ += (totalOutputL * 1.0f);
-            *outR++ += (totalOutputR * 1.0f);
-        }
-        else
-        {
-            *outL++ += ((totalOutputL + totalOutputR) * 0.5f);
-        }
-    }
-}
+//void BKSynthesiser::addEffectProcessor(EffectProcessor::Ptr bproc)
+//{
+//    const ScopedLock sl (lock);
+//    eprocessors.add(bproc);
+//}
+//
+//void BKSynthesiser::removeEffectProcessor(int Id)
+//{
+//    const ScopedLock sl (lock);
+//
+//    for (int i = 0; i < eprocessors.size(); ++i)
+//    {
+//        if (eprocessors[i]->getId() == Id) eprocessors.remove(i);
+//    }
+//}
+//
+//void BKSynthesiser::clearNextDelayBlock(int numSamples)
+//{
+//    for (auto b : eprocessors)
+//    {
+//        if (b->getType() == EffectBlendronic)
+//            dynamic_cast<BlendronicProcessor*>(b.get())->clearNextDelayBlock(numSamples);
+//
+//    }
+//}
+//
+//
+//void BKSynthesiser::renderDelays(AudioBuffer<double>& outputAudio, int startSample, int numSamples)
+//{
+//
+//    double* outL = outputAudio.getWritePointer (0, startSample);
+//    double* outR = outputAudio.getNumChannels() > 1 ? outputAudio.getWritePointer (1, startSample) : nullptr;
+//
+//	float totalOutputL = 0.0f;
+//	float totalOutputR = 0.0f;
+//
+//    EffectProcessor::PtrArr activebprocessors;
+//    for (auto b : eprocessors)
+//    {
+//        if (b->getActive()) activebprocessors.add(b);
+//    }
+//
+//	while (--numSamples >= 0)
+//	{
+//		totalOutputL = 0.0f;
+//		totalOutputR = 0.0f;
+//
+//		for (auto b : activebprocessors)
+//		{
+//			if (b != nullptr)
+//			{
+//                float outputs[2];
+//                b->tick(outputs);
+//                totalOutputL += outputs[0];
+//                totalOutputR += outputs[1];
+//			}
+//		}
+//
+//		if (outR != nullptr)
+//		{
+//			*outL++ += ((double) totalOutputL) * 1.0;
+//			*outR++ += ((double) totalOutputR) * 1.0;
+//		}
+//		else
+//		{
+//			*outL++ += (((double)totalOutputL) + ((double)totalOutputR)) * 0.5;
+//		}
+//	}
+//}
+//
+//
+//void BKSynthesiser::renderDelays(AudioBuffer<float>& outputAudio, int startSample, int numSamples)
+//{
+//
+//    float* outL = outputAudio.getWritePointer (0, startSample);
+//    float* outR = outputAudio.getNumChannels() > 1 ? outputAudio.getWritePointer (1, startSample) : nullptr;
+//
+//    float totalOutputL = 0.0f;
+//	float totalOutputR = 0.0f;
+//
+//    EffectProcessor::PtrArr activebprocessors;
+//    for (auto b : eprocessors)
+//    {
+//        if (b->getActive()) activebprocessors.add(b);
+//    }
+//
+//    while (--numSamples >= 0)
+//    {
+//        totalOutputL = 0.0f;
+//		totalOutputR = 0.0f;
+//
+//        for (auto b : activebprocessors)
+//        {
+//			if (b != nullptr)
+//			{
+//                float outputs[2];
+//                b->tick(outputs);
+//                totalOutputL += outputs[0];
+//                totalOutputR += outputs[1];
+//			}
+//        }
+//
+//        if (outR != nullptr)
+//        {
+//            *outL++ += (totalOutputL * 1.0f);
+//            *outR++ += (totalOutputR * 1.0f);
+//        }
+//        else
+//        {
+//            *outL++ += ((totalOutputL + totalOutputR) * 0.5f);
+//        }
+//    }
+//}
 
 //==============================================================================
 void BKSynthesiser::playbackSampleRateChanged ()
@@ -344,9 +379,9 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
             //?????
             if (samplesToNextMidiMessage >= numSamples)
             {
-                clearNextDelayBlock(numSamples);
+                //clearNextDelayBlock(numSamples);
                 renderVoices (outputAudio, startSample, numSamples);
-                renderDelays(outputAudio, startSample, numSamples);
+                //renderDelays(outputAudio, startSample, numSamples);
                 handleMidiEvent (m.getMessage());
                 break;
             }
@@ -359,9 +394,9 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
             
             firstEvent = false;
             
-            clearNextDelayBlock(samplesToNextMidiMessage);
+            //clearNextDelayBlock(samplesToNextMidiMessage);
             renderVoices(outputAudio, startSample, samplesToNextMidiMessage);
-            renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
+            //renderDelays(outputAudio, startSample, samplesToNextMidiMessage);
             handleMidiEvent (m.getMessage());
             
             startSample += samplesToNextMidiMessage;
@@ -370,9 +405,9 @@ void BKSynthesiser::processNextBlock (AudioBuffer<floatType>& outputAudio,
         else handleMidiEvent (m.getMessage());
     }
     
-    clearNextDelayBlock(numSamples);
+    //clearNextDelayBlock(numSamples);
     renderVoices(outputAudio, startSample, numSamples);
-    renderDelays(outputAudio, startSample, numSamples);
+    //renderDelays(outputAudio, startSample, numSamples);
     return;
 }
 

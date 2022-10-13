@@ -44,9 +44,11 @@ public:
     {
         
     }
+
 private:
     
     BKAudioProcessor& processor;
+   
     // Sample loading.
     AudioFormatManager formatManager;
     WavAudioFormat wavFormat;

@@ -40,7 +40,7 @@ public:
     void prepareToPlay (double sampleRate);
     
     BKSampleLoadType sampleType;
-    void processBlock(AudioSampleBuffer& buffer, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic = false);
+    void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic = false);
     
     void keyPressed(int noteNumber, float velocity, int channel, int mappedFrom, bool noteDown, bool soundfont = false, String source = String("Default"));
     void keyReleased(int noteNumber, float velocity, int channel, int mappedFrom, bool noteDown, bool soundfont = false, String source = String("Default"));

@@ -79,17 +79,20 @@ void SynchronicPreparation::performModification(SynchronicModification* s, Array
 SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TuningProcessor::Ptr tuning,
                                          TempoProcessor::Ptr tempo,
-										 EffectProcessor::PtrArr blend,
-                                         BKSynthesiser* main,
+                                         BKAudioProcessor &processor,
                                          GeneralSettings::Ptr general):
-synth(main),
 general(general),
 synchronic(synchronic),
 tuner(tuning),
 tempo(tempo),
 keymaps(Keymap::PtrArr()),
-notePlayed(false)
+notePlayed(false),
+synth(new BKSynthesiser(processor, general,processor.mainPianoSoundSet ))
 {
+    for (int i = 0; i < 300; i++)
+    {
+        synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
+    }
     if (!synchronic->prep->sUseGlobalSoundSet.value)
     {
         // comes in as "soundfont.sf2.subsound1"
@@ -177,55 +180,29 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 
         int whichEnv = cluster->getEnvelopeCounter();
 		BKSynthesiserVoice* currentVoice;
-		if (!effects.isEmpty())
-		{
-            currentVoice =
-                synth->keyOn(1,
-                             note,
-                             synthNoteNumber,
-                             synthOffset,
-                             velocity,
-                             aGlobalGain * prep->sAccentMultipliers.value[cluster->getAccentMultiplierCounter()],
-                             noteDirection,
-                             FixedLengthFixedStart,
-                             SynchronicNote,
-                             prep->getSoundSet(), //set
-                             synchronic->getId(),
-                             noteStartPos,  // start
-                             noteLength,
-                             prep->getAttack(whichEnv),
-                             prep->getDecay(whichEnv),
-                             prep->getSustain(whichEnv),
-                             prep->getRelease(whichEnv),
-                             tuner,
-                             prep->getGainPtr(),
-                             prep->getBlendronicGainPtr(),
-                             effects);
-		}
-		else
-		{
-			currentVoice =
-				synth->keyOn(1,
-                             note,
-                             synthNoteNumber,
-                             synthOffset,
-                             velocity,
-                             aGlobalGain * prep->sAccentMultipliers.value[cluster->getAccentMultiplierCounter()],
-                             noteDirection,
-                             FixedLengthFixedStart,
-                             SynchronicNote,
-                             prep->getSoundSet(), //set
-                             synchronic->getId(),
-                             noteStartPos,  // start
-                             noteLength,
-                             prep->getAttack(whichEnv),
-                             prep->getDecay(whichEnv),
-                             prep->getSustain(whichEnv),
-                             prep->getRelease(whichEnv),
-                             tuner,
-                             prep->getGainPtr());
-		}
-        
+		
+        currentVoice =
+            synth->keyOn(1,
+                         note,
+                         synthNoteNumber,
+                         synthOffset,
+                         velocity,
+                         aGlobalGain * prep->sAccentMultipliers.value[cluster->getAccentMultiplierCounter()],
+                         noteDirection,
+                         FixedLengthFixedStart,
+                         SynchronicNote,
+                         prep->getSoundSet(), //set
+                         synchronic->getId(),
+                         noteStartPos,  // start
+                         noteLength,
+                         prep->getAttack(whichEnv),
+                         prep->getDecay(whichEnv),
+                         prep->getSustain(whichEnv),
+                         prep->getRelease(whichEnv),
+                         tuner,
+                         prep->getGainPtr());
+		
+    
         notePlayed = true;
         if (prep->midiOutput.value != nullptr && currentVoice != nullptr)
         {
@@ -721,7 +698,7 @@ void SynchronicProcessor::keyReleased(int noteNumber, Array<float>& targetVeloci
 }
 
     
-void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoadType type)
+void SynchronicProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int channel, BKSampleLoadType type)
 {
     // don't do anything if we are paused!
     if (pausePlay) return;
@@ -894,6 +871,9 @@ void SynchronicProcessor::processBlock(int numSamples, int channel, BKSampleLoad
             voiceMidiValues.remove(i--);
         }
     }
+    
+    synth->renderNextBlock(buffer, midiMessages, 0, numSamples);
+   
 //    if (!midiBuffer.isEmpty()) prep->midiOutput.value->sendBlockOfMessagesNow(midiBuffer);
 }
 

@@ -340,6 +340,8 @@
               file="Source/BKReferenceCountedBuffer.h"/>
       </GROUP>
       <GROUP id="{E01F59AF-FEAD-7AEA-32C2-F665B05A05F1}" name="Model">
+        <FILE id="nXgvZL" name="SoundSource.cpp" compile="1" resource="0" file="Source/SoundSource.cpp"/>
+        <FILE id="uOKjQ3" name="SoundSource.h" compile="0" resource="0" file="Source/SoundSource.h"/>
         <FILE id="SEAnIf" name="Effects.h" compile="0" resource="0" file="Source/Effects.h"/>
         <GROUP id="{85E3E73E-3D8E-F2D0-B803-767C7CA30272}" name="compressor-dsp">
           <GROUP id="{BAA97A9C-98B4-773B-C48F-7AD46CBB1389}" name="include">

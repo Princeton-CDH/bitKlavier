@@ -209,9 +209,10 @@ void BKAudioProcessor::updateGalleries()
     updateState->setAllCurrentIdsTo(-1);
     
     gallery->getGeneralSettings();
-    mainPianoSynth.updateGeneralSettings(gallery->getGeneralSettings());
-    hammerReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
-    resonanceReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
+    //mainPianoSynth.updateGeneralSettings(gallery->getGeneralSettings());
+    //hammerReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
+    //resonanceReleaseSynth.updateGeneralSettings(gallery->getGeneralSettings());
+    // (PROCESSOR UPDATE)
     pedalSynth.updateGeneralSettings(gallery->getGeneralSettings());
     
     //clipboard.clear();

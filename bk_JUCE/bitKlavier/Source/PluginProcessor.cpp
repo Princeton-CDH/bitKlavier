@@ -100,10 +100,10 @@ public:
 BKAudioProcessor::BKAudioProcessor(void):
 updateState(new BKUpdateState()),
 loader(),
-mainPianoSynth(*this),
-hammerReleaseSynth(*this),
-resonanceReleaseSynth(*this),
-pedalSynth(*this),
+//mainPianoSynth(*this),
+//hammerReleaseSynth(*this),
+//resonanceReleaseSynth(*this),
+pedalSynth(*this, emptySoundSet),
 eq(),
 firstPedalDown(true),
 //touchThread(*this),
@@ -367,31 +367,32 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     //stk::Stk::setSampleRate(sampleRate);
 #endif
     //stk::Stk::setSampleRate(sampleRate); //crashes Logic Audio Unit Validation Tool
-    
-    mainPianoSynth.playbackSampleRateChanged();
-    hammerReleaseSynth.playbackSampleRateChanged();
-    resonanceReleaseSynth.playbackSampleRateChanged();
+    ////SET SAMPLERATE, GENERAL SETTINGS, clear VOICEs, addvoices for All processors********* (PROCESSOR UPDATE)
+//    mainPianoSynth.playbackSampleRateChanged();
+//    hammerReleaseSynth.playbackSampleRateChanged();
+//    resonanceReleaseSynth.playbackSampleRateChanged();
     pedalSynth.playbackSampleRateChanged();
-    
-    //mainPianoSynth.setGeneralSettings(gallery->getGeneralSettings());
-    resonanceReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
-    hammerReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
+//
+//    //mainPianoSynth.setGeneralSettings(gallery->getGeneralSettings());
+//    resonanceReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
+//    hammerReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
     pedalSynth.setGeneralSettings(gallery->getGeneralSettings());
 
-    mainPianoSynth.clearVoices();
-    resonanceReleaseSynth.clearVoices();
-    hammerReleaseSynth.clearVoices();
+//    mainPianoSynth.clearVoices();
+//    resonanceReleaseSynth.clearVoices();
+//    hammerReleaseSynth.clearVoices();
     pedalSynth.clearVoices();
 
-    // 88 or more seems to work well
-    for (int i = 0; i < 300; i++)
-    {
-        mainPianoSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
-    }
+//    // 88 or more seems to work well
+//    for (int i = 0; i < 300; i++)
+//    {
+//        mainPianoSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
+//    }
     for (int i = 0; i < 128; i++)
     {
-        resonanceReleaseSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
-        hammerReleaseSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
+//    {
+//        resonanceReleaseSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
+//        hammerReleaseSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
         pedalSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
     }
     
@@ -476,12 +477,14 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
 
 void BKAudioProcessor::clearBitKlavier(void)
 {
+    
+    ////TURN ALL NOTES OFF PROCESSORS (PROCESSOR UPDATE)
     for (int i = 0; i < 15; i++)
     {
-        hammerReleaseSynth.allNotesOff(i, true);
-        resonanceReleaseSynth.allNotesOff(i, true);
-        mainPianoSynth.allNotesOff(i, true);
-        pedalSynth.allNotesOff(i, true);
+//        hammerReleaseSynth.allNotesOff(i, true);
+//        resonanceReleaseSynth.allNotesOff(i, true);
+//        mainPianoSynth.allNotesOff(i, true);
+          pedalSynth.allNotesOff(i, true);
     }
 
     /*
@@ -1135,11 +1138,11 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     
     if (currentPiano->prepMap != nullptr)
     {
-        currentPiano->prepMap->processBlock(buffer, numSamples, channel, loadingSampleType, false);
+        currentPiano->prepMap->processBlock(buffer, midiMessages, numSamples, channel, loadingSampleType, false);
         
         // Process all active nostalgic preps in previous piano
         if(prevPiano != currentPiano)
-            prevPiano->prepMap->processBlock(buffer, numSamples, channel, loadingSampleType, true); // true for onlyNostalgic
+            prevPiano->prepMap->processBlock(buffer, midiMessages, numSamples, channel, loadingSampleType, true); // true for onlyNostalgic
     }
     
 	
@@ -1187,9 +1190,9 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
         if (!allNotesOff) allNotesOff = true;
     }
 
-    mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
-    hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
-    resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+    //mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+    //hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
+    //resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
 	pedalSynth.renderNextBlock(buffer, midiMessages, 0, numSamples);
     
 #if JUCE_IOS
@@ -2097,9 +2100,11 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     // anything else...
     else
     {
-        mainPianoSynth.handleMidiEvent(m);
-        hammerReleaseSynth.handleMidiEvent(m);
-        resonanceReleaseSynth.handleMidiEvent(m);
+        
+        //PROCESSORS HANDLE MIDI EVENT (PROCESSOR UPDATE)
+//        mainPianoSynth.handleMidiEvent(m);
+//        hammerReleaseSynth.handleMidiEvent(m);
+//        resonanceReleaseSynth.handleMidiEvent(m);
         pedalSynth.handleMidiEvent(m);
     }
 }

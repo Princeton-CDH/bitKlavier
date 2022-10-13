@@ -91,14 +91,14 @@ SympPartial::SympPartial(int newHeldKey, int newPartialKey, float newGain, float
 
 ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance,
                                        TuningProcessor::Ptr rTuning,
-                                       GeneralSettings::Ptr rGeneral,
-                                       BKSynthesiser* rMain):
-                                       resonance(rResonance),
+                                       GeneralSettings::Ptr rGeneral):
                                        tuning(rTuning),
+                                       resonance(rResonance),
                                        general(rGeneral),
                                        keymaps(Keymap::PtrArr())
 {
-    resonance->prep->synth = rMain;
+    ////ADDSYNTH
+    //resonance->prep->synth = rMain;
     for (int j = 0; j < 128; j++)
     {
         velocities.add(Array<float>());
@@ -211,38 +211,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                          */
                         
                         Array<float> ADSRvals = resonance->prep->getADSRvals();
-                        //DBG("Resonance: ADSR release time = " + String(ADSRvals[3]));
-                        if (!effects.isEmpty())
-                        {
-                                resonance->prep->synth->keyOn(
-                                1,
-                                //noteNumber,
-                                currentSympPartial->heldKey,
-                                currentStruckPartial,
-                                tuning->getOffset(currentSympPartial->heldKey, false) + currentSympPartial->offset * .01,
-                                // tuning->getOffset(noteNumber, false),
-                                1., // use max velocity sample for all resonance samples; intensity is set by newPlayPosition
-                                aGlobalGain * currentSympPartial->gain * (1. - 0.5 * tuningGap),
-                                //aGlobalGain,
-                                Forward,
-                                NormalFixedStart,
-                                ResonanceNote,
-                                resonance->prep->getSoundSet(), //set
-                                resonance->getId(),
-                                newPlayPosition,                //start position
-                                0,                              //play length
-                                ADSRvals[0],
-                                ADSRvals[1],
-                                ADSRvals[2],
-                                ADSRvals[3],
-                                tuning,
-                                resonance->prep->getDefaultGainPtr(),
-                                resonance->prep->getBlendGainPtr(),
-                                effects);
-                        }
-                        else
-                        {
-                                resonance->prep->synth->keyOn(
+                        resonance->prep->synth->keyOn(
                                 1,
                                 //noteNumber,
                                 currentSympPartial->heldKey,
@@ -265,7 +234,6 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                                 ADSRvals[3],
                                 tuning,
                                 resonance->prep->getDefaultGainPtr());
-                        }
                     }
                 }
             }

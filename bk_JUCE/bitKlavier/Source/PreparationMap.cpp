@@ -446,36 +446,36 @@ void PreparationMap::deactivateIfNecessary()
 }
 
 
-void PreparationMap::processBlock(AudioSampleBuffer& buffer, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic)
+void PreparationMap::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type, bool onlyNostalgic)
 {
     sampleType = type;
     if(onlyNostalgic) {
         for (auto nproc : nprocessor)
-            nproc->processBlock(numSamples, midiChannel, sampleType);
+            nproc->processBlock(buffer, midiMessages, numSamples, midiChannel, sampleType);
     }
     
     else
     {
         for (auto dproc : dprocessor)
-            dproc->processBlock(numSamples, midiChannel, sampleType);
+            dproc->processBlock(buffer, midiMessages, numSamples, midiChannel, sampleType);
         
         for (auto sproc : sprocessor)
-            sproc->processBlock(numSamples, midiChannel, sampleType);
-        
+            sproc->processBlock(buffer, midiMessages, numSamples, midiChannel, sampleType);
+//
         for (auto nproc : nprocessor)
-            nproc->processBlock(numSamples, midiChannel, sampleType);
-        
-        for (auto tproc : tprocessor)
-            tproc->processBlock(numSamples);
-        
-        for (auto mproc : mprocessor)
-            mproc->processBlock(numSamples, midiChannel);
+            nproc->processBlock(buffer, midiMessages, numSamples, midiChannel, sampleType);
 
-//		for (auto bproc : bprocessor)
-//			bproc->processBlock(numSamples, midiChannel);
-        
-        for (auto rproc : rprocessor)
-            rproc->processBlock(numSamples, midiChannel);
+//        for (auto tproc : tprocessor)
+//            tproc->processBlock(numSamples);
+//
+//        for (auto mproc : mprocessor)
+//            mproc->processBlock(numSamples, midiChannel);
+//
+////		for (auto bproc : bprocessor)
+////			bproc->processBlock(numSamples, midiChannel);
+//
+//        for (auto rproc : rprocessor)
+//            rproc->processBlock(numSamples, midiChannel);
 
     }
 }

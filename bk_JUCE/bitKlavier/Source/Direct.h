@@ -489,24 +489,21 @@ public:
     
     
     DirectProcessor(Direct::Ptr direct,
-                    TuningProcessor::Ptr tuning, EffectProcessor::PtrArr effect,
-                    BKSynthesiser *s, BKSynthesiser *res, BKSynthesiser *ham);
+                    TuningProcessor::Ptr tuning,
+                    BKAudioProcessor& processor, GeneralSettings::Ptr);
     
     ~DirectProcessor();
     
     BKSampleLoadType sampleType;
-    void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
+    void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type);
     
     void    keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
     void    keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
     void    playReleaseSample(int noteNumber, Array<float>& targetVelocities,
                               bool fromPress, bool soundfont = false);
     
-    inline void prepareToPlay(double sr, BKSynthesiser* main, BKSynthesiser* res, BKSynthesiser* hammer)
+    inline void prepareToPlay(double s)
     {
-        synth = main;
-        resonanceSynth = res;
-        hammerSynth = hammer;
     }
     
     inline void reset(void)
@@ -527,21 +524,6 @@ public:
         return tuner;
     }
     
-    inline void addBlendronic(EffectProcessor::Ptr blend)
-    {
-        effects.add(blend);
-    }
-    
-    inline EffectProcessor::PtrArr getBlendronic(void)
-    {
-        EffectProcessor::PtrArr blends;
-        for (auto e : effects)
-        {
-            if(e->getType() == EffectType::EffectBlendronic)
-                blends.add(e);
-        }
-        return blends;
-    }
     
     inline void addKeymap(Keymap::Ptr keymap)
     {
@@ -572,7 +554,6 @@ private:
     
     Direct::Ptr             direct;
     TuningProcessor::Ptr    tuner;
-    EffectProcessor::PtrArr effects;
     
     Keymap::PtrArr      keymaps;
     

@@ -754,14 +754,13 @@ public:
     NostalgicProcessor(Nostalgic::Ptr nostalgic,
                        TuningProcessor::Ptr tuning,
                        SynchronicProcessor::Ptr synchronic,
-                       EffectProcessor::PtrArr effects,
-                       BKSynthesiser *s);
+                       BKAudioProcessor& processor);
     
     virtual ~NostalgicProcessor();
     
     // called with every audio vector
     BKSampleLoadType sampleType;
-    void processBlock(int numSamples, int midiChannel, BKSampleLoadType type);
+    void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type);
     
     // begin timing played note length, called with noteOn
     void keyPressed(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress);
@@ -804,22 +803,7 @@ public:
         return synchronic->getId();
     }
 
-    inline void addBlendronic(EffectProcessor::Ptr blend)
-    {
-        effects.add(blend);
-    }
-
-    inline EffectProcessor::PtrArr getBlendronic(void)
-    {
-        EffectProcessor::PtrArr blends;
-        for (auto e : effects)
-        {
-            if(e->getType() == EffectType::EffectBlendronic)
-                blends.add(e);
-        }
-        return blends;
-    }
-
+   
     inline void setTuning(TuningProcessor::Ptr p)
     {
         tuner = p;
@@ -830,9 +814,10 @@ public:
         return tuner;
     }
     
-    void prepareToPlay(double sr, BKSynthesiser* main)
+    void prepareToPlay(double sr)
     {
-        synth = main;
+        //WHY DOES TUNING AHVING A SNYHT???A???
+        //synth = main;
     }
     
     void reset(void)
@@ -882,7 +867,6 @@ private:
     Nostalgic::Ptr                  nostalgic;
     TuningProcessor::Ptr            tuner;
     SynchronicProcessor::Ptr        synchronic;
-	EffectProcessor::PtrArr		effects;
     
     Keymap::PtrArr              keymaps;
     

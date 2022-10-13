@@ -621,8 +621,7 @@ public:
 
 	BlendronicProcessor(Blendronic::Ptr bBlendronic,
 		TempoProcessor::Ptr bTempo,
-		GeneralSettings::Ptr bGeneral,
-		BKSynthesiser* bMain
+		GeneralSettings::Ptr bGeneral
 		);
 	~BlendronicProcessor();
 

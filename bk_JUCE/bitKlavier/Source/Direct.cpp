@@ -10,6 +10,7 @@
 
 #include "Direct.h"
 #include "PluginProcessor.h"
+#include "BKPianoSampler.h"
 #include "Modification.h"
 
 void DirectPreparation::performModification(DirectModification* d, Array<bool> dirty)
@@ -46,18 +47,23 @@ void DirectPreparation::performModification(DirectModification* d, Array<bool> d
 
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
                                  TuningProcessor::Ptr tuning,
-                                 EffectProcessor::PtrArr effect,
-                                 BKSynthesiser *s,
-                                 BKSynthesiser *res,
-                                 BKSynthesiser *ham):
-synth(s),
-resonanceSynth(res),
-hammerSynth(ham),
+                                 BKAudioProcessor& processor, GeneralSettings::Ptr g) :
 direct(direct),
 tuner(tuning),
-effects(effect),
-keymaps(Keymap::PtrArr())
+keymaps(Keymap::PtrArr()),
+synth(new BKSynthesiser(processor, g,processor.mainPianoSoundSet )),
+resonanceSynth(new BKSynthesiser(processor, g,processor.resonanceReleaseSoundSet )),
+hammerSynth(new BKSynthesiser(processor, g,processor.hammerReleaseSoundSet ))
 {
+    for (int i = 0; i < 300; i++)
+    {
+        synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
+    }
+    for (int i = 0; i < 128; i++)
+    {
+        resonanceSynth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
+        hammerSynth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
+    }
     // Only one Direct target right now, but will use structure for multiple in case we add more
     for (int j = 0; j < 128; j++)
     {
@@ -144,68 +150,37 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
         synthOffset     -= (int)offset;
         
         // blendronic stuff, or not
-		if (!effects.isEmpty())
-		{
-            for (auto b : effects)
-            {
-                if(b->getType() == EffectBlendronic)
-                {
-                    b->setClearDelayOnNextBeat(false); 
-                }
-
-            }
-            if (*direct->prep->getGainPtr() > -80.) {
-                synth->keyOn(1,
-                             noteNumber,
-                             synthNoteNumber,
-                             synthOffset,
-                             aVels->getUnchecked(TargetTypeDirect),
-                             aGlobalGain,
-                             Forward,
-                             Normal,
-                             MainNote,
-                             direct->prep->getSoundSet(), //set
-                             direct->getId(),
-                             0,     // start
-                             0,     // length
-                             prep->dAttack.value,
-                             prep->dDecay.value,
-                             prep->dSustain.value,
-                             prep->dRelease.value,
-                             tuner,
-                             prep->getGainPtr(),
-                             prep->getBlendronicGainPtr(),
-                             effects);
-            }
-		}
-		else
-		{
-            if (*direct->prep->getGainPtr() > -80.) {
-                synth->keyOn(1,
-                             noteNumber,
-                             synthNoteNumber,
-                             synthOffset,
-                             aVels->getUnchecked(TargetTypeDirect),
-                             aGlobalGain,
-                             Forward,
-                             Normal,
-                             MainNote,
-                             prep->getSoundSet(), //set
-                             direct->getId(),
-                             0,     // start
-                             0,     // length
-                             prep->dAttack.value,
-                             prep->dDecay.value,
-                             prep->dSustain.value,
-                             prep->dRelease.value,
-                             tuner,
-                             prep->getGainPtr());
-            }
-		}
-        
-        //store synthNoteNumbers by noteNumber
-        //keyPlayed[noteNumber].add(synthNoteNumber);
-        //keyPlayedOffset[noteNumber].add(synthOffset);
+//		if (!effects.isEmpty())
+//		{
+//            for (auto b : effects)
+//            {
+//                if(b->getType() == EffectBlendronic)
+//                {
+//                    b->setClearDelayOnNextBeat(false);
+//                }
+//
+//            }
+        if (*direct->prep->getGainPtr() > -80.) {
+            synth->keyOn(1,
+                         noteNumber,
+                         synthNoteNumber,
+                         synthOffset,
+                         aVels->getUnchecked(TargetTypeDirect),
+                         aGlobalGain,
+                         Forward,
+                         Normal,
+                         MainNote,
+                         direct->prep->getSoundSet(), //set
+                         direct->getId(),
+                         0,     // start
+                         0,     // length
+                         prep->dAttack.value,
+                         prep->dDecay.value,
+                         prep->dSustain.value,
+                         prep->dRelease.value,
+                         tuner,
+                         prep->getGainPtr());
+        }
         
         if (!keyPlayed[noteNumber].contains(synthNoteNumber)) {
             keyPlayed[noteNumber].add(synthNoteNumber);
@@ -385,7 +360,7 @@ float DirectProcessor::filterVelocity(float vel)
     return -1.f;
 }
 
-void DirectProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoadType type)
+void DirectProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type)
 {
     sampleType = type;
     
@@ -395,6 +370,9 @@ void DirectProcessor::processBlock(int numSamples, int midiChannel, BKSampleLoad
         noteLengthTimers.set(activeNotes.getUnchecked(i),
                              noteLengthTimers.getUnchecked(activeNotes.getUnchecked(i)) + numSamples);
     }
+    synth->renderNextBlock(buffer, midiMessages, 0, numSamples);
+    resonanceSynth->renderNextBlock(buffer, midiMessages, 0, numSamples);
+    hammerSynth->renderNextBlock(buffer, midiMessages, 0, numSamples);
     //tuner->processor->incrementAdaptiveClusterTime(numSamples);
 }
 

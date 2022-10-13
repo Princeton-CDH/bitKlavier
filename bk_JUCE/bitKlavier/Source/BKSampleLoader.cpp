@@ -153,7 +153,6 @@ BKSampleLoader::JobStatus BKSampleLoader::runJob(void)
 BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType type)
 {
     WavAudioFormat wavFormat;
-    BKSynthesiser* synth = &processor.mainPianoSynth;
     
     File bkSamples = processor.getDefaultSamplesPath();
     
@@ -277,8 +276,11 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                                                         k+1, numLayers,
                                                         dBFSBelow);
                                 dBFSBelow = newSound->getDBFSLevel();
-                                synth->addSound(loadingSoundSetId, newSound);
+                                //const ScopedLock sl (lock);
+                                processor.loadSoundSet(processor.mainPianoSoundSet, newSound, loadingSoundSetId);
+                            
                             }
+                            
                             else DBG("File mapping failed");
                         }
                     }
@@ -303,7 +305,10 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
                                                     k+1, numLayers,
                                                     dBFSBelow);
                             dBFSBelow = newSound->getDBFSLevel();
-                            synth->addSound(loadingSoundSetId, newSound);
+                            //const ScopedLock sl (lock);
+                            processor.loadSoundSet(processor.mainPianoSoundSet, newSound, loadingSoundSetId);
+                          
+                           
                         }
                     }
                     
@@ -321,6 +326,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
         }
     }
     
+    //processor.mainPianoSoundSet = soundSets;
     processor.didLoadMainPianoSamples = true;
     
     return jobStatus;
@@ -329,7 +335,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadMainPianoSamples(BKSampleLoadType 
 BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
 {
     WavAudioFormat wavFormat;
-    BKSynthesiser* synth = &processor.resonanceReleaseSynth;
+    
+   
     
     File bkSamples = processor.getDefaultSamplesPath();
     
@@ -423,7 +430,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                                                         k+1, 3,
                                                         dBFSBelow);
                                 dBFSBelow = newSound->getDBFSLevel();
-                                synth->addSound(loadingSoundSetId, newSound);
+                                processor.loadSoundSet(processor.resonanceReleaseSoundSet, newSound, loadingSoundSetId);
+                                //synth->addSound(loadingSoundSetId, newSound);
                             }
                             else DBG("File mapping failed");
                         }
@@ -452,7 +460,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
                                                     k+1, 3,
                                                     dBFSBelow);
                             dBFSBelow = newSound->getDBFSLevel();
-                            synth->addSound(loadingSoundSetId, newSound);
+                            processor.loadSoundSet(processor.resonanceReleaseSoundSet, newSound, loadingSoundSetId);
+                            
                         }
                     }
                     
@@ -472,7 +481,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadResonanceReleaseSamples(void)
 BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
 {
     WavAudioFormat wavFormat;
-    BKSynthesiser* synth = &processor.hammerReleaseSynth;
+    
     
     File bkSamples = processor.getDefaultSamplesPath();
     
@@ -530,7 +539,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
                                                 0, velocityRange,
                                                 1, 1,
                                                 0.f);
-                        synth->addSound(loadingSoundSetId, newSound);
+                        processor.loadSoundSet(processor.hammerReleaseSoundSet, newSound, loadingSoundSetId);
                     }
                     else DBG("File mapping failed");
                 }
@@ -556,7 +565,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
                                             0, velocityRange,
                                             1, 1,
                                             0.f);
-                    synth->addSound(loadingSoundSetId, newSound);
+                    processor.loadSoundSet(processor.hammerReleaseSoundSet, newSound, loadingSoundSetId);
+                    
                 }
             }
             processor.progress += progressInc;
@@ -673,7 +683,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
 
 BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
 {
-    BKSynthesiser* synth = &processor.mainPianoSynth;
     
     processor.progress = 0.0;
     
@@ -826,8 +835,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
                                 vrange, n, 1,
                                 dBFSBelow, region);
         dBFSBelow = newSound->getDBFSLevel();
-        synth->addSound(loadingSoundSetId, newSound);
-//        n++;
+        processor.loadSoundSet(processor.mainPianoSoundSet, newSound, loadingSoundSetId);
     }
     
     processor.didLoadMainPianoSamples = true;
@@ -838,9 +846,9 @@ BKSampleLoader::JobStatus BKSampleLoader::loadSoundfontFromFile(File sfzFile)
 BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
 {
     WavAudioFormat wavFormat;
-    BKSynthesiser* mainSynth = &processor.mainPianoSynth;
-    BKSynthesiser* resSynth = &processor.resonanceReleaseSynth;
-    BKSynthesiser* hamSynth = &processor.hammerReleaseSynth;
+//    BKSynthesiser* mainSynth = &processor.mainPianoSynth;
+//    BKSynthesiser* resSynth = &processor.resonanceReleaseSynth;
+//    BKSynthesiser* hamSynth = &processor.hammerReleaseSynth;
     BKSynthesiser* pedalSynth = &processor.pedalSynth;
     
     File samples (loadingSoundfont);
@@ -991,7 +999,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                             k+1, numLayers,
                                                             dBFSBelow);
                                     dBFSBelow = newSound->getDBFSLevel();
-                                    mainSynth->addSound(loadingSoundSetId, newSound);
+                                    processor.loadSoundSet(processor.mainPianoSoundSet, newSound, loadingSoundSetId);
+                                    //mainSynth->addSound(loadingSoundSetId, newSound);
                                 }
                                 else DBG("File mapping failed");
                             }
@@ -1017,7 +1026,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                         k+1, numLayers,
                                                         dBFSBelow);
                                 dBFSBelow = newSound->getDBFSLevel();
-                                mainSynth->addSound(loadingSoundSetId, newSound);
+                                //mainSynth->addSound(loadingSoundSetId, newSound);
+                                processor.loadSoundSet(processor.mainPianoSoundSet, newSound, loadingSoundSetId);
                             }
                         }
                         
@@ -1118,7 +1128,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                             k+1, numResLayers,
                                                             dBFSBelow);
                                     dBFSBelow = newSound->getDBFSLevel();
-                                    resSynth->addSound(loadingSoundSetId, newSound);
+                                    processor.loadSoundSet(processor.resonanceReleaseSoundSet, newSound, loadingSoundSetId);
+                                    //resSynth->addSound(loadingSoundSetId, newSound);
                                 }
                                 else DBG("File mapping failed");
                             }
@@ -1147,7 +1158,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                         k+1, numResLayers,
                                                         dBFSBelow);
                                 dBFSBelow = newSound->getDBFSLevel();
-                                resSynth->addSound(loadingSoundSetId, newSound);
+                                processor.loadSoundSet(processor.resonanceReleaseSoundSet, newSound, loadingSoundSetId);
+                                //resSynth->addSound(loadingSoundSetId, newSound);
                             }
                         }
                         
@@ -1241,7 +1253,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                             k+1, 3,
                                                             dBFSBelow);
                                     dBFSBelow = newSound->getDBFSLevel();
-                                    resSynth->addSound(loadingSoundSetId, newSound);
+                                    processor.loadSoundSet(processor.resonanceReleaseSoundSet, newSound, loadingSoundSetId);
+                                    //resSynth->addSound(loadingSoundSetId, newSound);
                                 }
                                 else DBG("File mapping failed");
                             }
@@ -1270,7 +1283,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                         k+1, 3,
                                                         dBFSBelow);
                                 dBFSBelow = newSound->getDBFSLevel();
-                                resSynth->addSound(loadingSoundSetId, newSound);
+                                //resSynth->addSound(loadingSoundSetId, newSound);
+                                processor.loadSoundSet(processor.resonanceReleaseSoundSet, newSound, loadingSoundSetId);
                             }
                         }
                         
@@ -1376,7 +1390,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                     0, velocityRange,
                                                     1, 1,
                                                     0.f);
-                            hamSynth->addSound(loadingSoundSetId, newSound);
+                            processor.loadSoundSet(processor.hammerReleaseSoundSet, newSound, loadingSoundSetId);
+                            //hamSynth->addSound(loadingSoundSetId, newSound);
                         }
                         else DBG("File mapping failed");
                     }
@@ -1402,7 +1417,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                 0, velocityRange,
                                                 1, 1,
                                                 0.f);
-                        hamSynth->addSound(loadingSoundSetId, newSound);
+                        processor.loadSoundSet(processor.hammerReleaseSoundSet, newSound, loadingSoundSetId);
+                        //hamSynth->addSound(loadingSoundSetId, newSound);
                     }
                 }
                 processor.progress += progressInc;
@@ -1532,28 +1548,28 @@ SampleTouchThread::~SampleTouchThread() {}
 void SampleTouchThread::run()
 {
     
-    while (!threadShouldExit())
-    {
-        for (auto voice : processor.mainPianoSynth.getVoices())
-        {
-            if (BKPianoSamplerVoice* samplerVoice = dynamic_cast<BKPianoSamplerVoice*>(voice))
-            {
-                if (BKPianoSamplerSound* sound = dynamic_cast<BKPianoSamplerSound*>(samplerVoice->getCurrentlyPlayingSound().get()))
-                {
-                    if (MemoryMappedAudioFormatReader* reader = sound->getReader())
-                    {
-                        int position = samplerVoice->getSourceSamplePosition();
-                        while (position < reader->getMappedSection().getLength())
-                        {
-                            reader->touchSample(reader->getMappedSection().clipValue(position));
-                            position += processor.getBlockSize();
-                            if (threadShouldExit()) return;
-                        }
-                    }
-                }
-            }
-            if (threadShouldExit()) return;
-        }
+//    while (!threadShouldExit())
+//    {
+//        for (auto voice : processor.mainPianoSynth.getVoices())
+//        {
+//            if (BKPianoSamplerVoice* samplerVoice = dynamic_cast<BKPianoSamplerVoice*>(voice))
+//            {
+//                if (BKPianoSamplerSound* sound = dynamic_cast<BKPianoSamplerSound*>(samplerVoice->getCurrentlyPlayingSound().get()))
+//                {
+//                    if (MemoryMappedAudioFormatReader* reader = sound->getReader())
+//                    {
+//                        int position = samplerVoice->getSourceSamplePosition();
+//                        while (position < reader->getMappedSection().getLength())
+//                        {
+//                            reader->touchSample(reader->getMappedSection().clipValue(position));
+//                            position += processor.getBlockSize();
+//                            if (threadShouldExit()) return;
+//                        }
+//                    }
+//                }
+//            }
+//            if (threadShouldExit()) return;
+//        }
         
         Thread::wait(1);
         /*       for (auto set : processor.mainPianoSynth.getSounds())
@@ -1570,7 +1586,7 @@ void SampleTouchThread::run()
          if (threadShouldExit()) return;
          }
          }*/
-    }
+    //}
 }
 
 
