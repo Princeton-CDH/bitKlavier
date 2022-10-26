@@ -31,6 +31,7 @@ void TempoPreparation::performModification(TempoModification* s, Array<bool> dir
 }
 
 TempoProcessor::TempoProcessor(BKAudioProcessor& processor, Tempo::Ptr t):
+GenericProcessor(PreparationTypeTempo),
 processor(processor),
 tempo(t),
 keymaps(Keymap::PtrArr())
@@ -60,7 +61,7 @@ TempoProcessor::~TempoProcessor()
 {
 }
 
-void TempoProcessor::processBlock(int numSamples, int channel)
+void TempoProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type)
 {
     atTimer += numSamples;
 }

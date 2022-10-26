@@ -97,7 +97,7 @@ public:
     
     void resetPreparations(void);
 
-	void randomize();
+	//void randomize();
 	
     inline void addDefaultPrepIfNotThere(void)
     {
@@ -858,14 +858,14 @@ public:
     
     void addPiano(XmlElement* xml, OwnedArray<HashMap<int,int>>* map);
     
-    
+    GeneralSettings::Ptr                general; //HACK FOR INITIALIZATINONN
 private:
     BKAudioProcessor& processor;
     
     String url;
     String name;
     
-    GeneralSettings::Ptr                general;
+    
     
     Synchronic::PtrArr                  synchronic;
     Nostalgic::PtrArr                   nostalgic;

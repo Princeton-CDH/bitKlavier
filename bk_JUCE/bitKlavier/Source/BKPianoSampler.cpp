@@ -251,19 +251,19 @@ void BKPianoSamplerVoice::startNote (const int midiNoteNumber,
 void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
 {
     pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/6.0f); //whole-step range for pitchbend
-    
-    if (tuning != nullptr && tuning->getTuning()->prep->getSpringsActive())
+    TuningProcessor* tune = dynamic_cast<TuningProcessor*>(tuning.get());
+    if (tuning != nullptr && tune->getTuning()->prep->getSpringsActive())
     {
-        Particle::PtrArr particles = tuning->getTuning()->prep->getParticles();
+        Particle::PtrArr particles = tune->getTuning()->prep->getParticles();
  
         /*
         double x = particles[currentMidiNoteNumber]->getX();
         int octave = particles[currentMidiNoteNumber]->getOctave();
         double midi = Utilities::clip(0, ftom(Utilities::centsToFreq(x - 1200.0 * octave),
-                                              tuning->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
+                                              tune->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
         
-        midi += (tuning->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(currentMidiNoteNumber) +
-                 tuning->getTuning()->aPrep->getFundamentalOffset());
+        midi += (tune->getTuning()->aPrep->getAbsoluteOffsets().getUnchecked(currentMidiNoteNumber) +
+                 tune->getTuning()->aPrep->getFundamentalOffset());
          */
         
         
@@ -274,27 +274,27 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
         double transpOffset = (cookedNote - getCurrentlyPlayingKey()) * 100.;
         //DBG("BKPianoSamplerVoice::updatePitch cookedNote = " + String(cookedNote));
         double midi = Utilities::clip(0, ftom(Utilities::centsToFreq((x + transpOffset) - 1200.0 * octave),
-                                              tuning->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
+                                              tune->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
         //need to update centsToFreq to be movable to other As, non-440
         
-        midi += (tuning->getTuning()->prep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
-                 tuning->getTuning()->prep->getFundamentalOffset());
+        midi += (tune->getTuning()->prep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
+                 tune->getTuning()->prep->getFundamentalOffset());
         
-        if (tuning->getTuning()->prep->isMTSMaster)
+        if (tune->getTuning()->prep->isMTSMaster)
         {
             
             DBG("Springs MidiRoot: " + String(currentMidiNoteNumber) + " Midi: " + String(midi) + " Freq: " + String(mtof(midi + sound->transpose)));
-            tuning->getTuning()->prep->MTSSetNoteTuning( mtof(midi), currentMidiNoteNumber);
+            tune->getTuning()->prep->MTSSetNoteTuning( mtof(midi), currentMidiNoteNumber);
         }
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
                             sound->sourceSampleRate *
                             generalSettings->getTuningRatio() /
                             getSampleRate();
-    } else if (tuning != nullptr && tuning->getTuning()->prep->hasMTSMaster())
+    } else if (tuning != nullptr && tune->getTuning()->prep->hasMTSMaster())
     {
         float mn = (currentMidiNoteNumber  + sound->transpose);
-        float freq = tuning->getTuning()->prep->getMTSFreq(mn);
+        float freq = tune->getTuning()->prep->getMTSFreq(mn);
         double _mn = ftom(freq);
         //DBG(String(mtof(_mn + sound->transpose)));
         DBG("pianoSampler midinote: " + String(currentMidiNoteNumber) + " Freq: " + String(freq) + " MTS Out midinote: " + String(_mn));
@@ -303,7 +303,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
                             generalSettings->getTuningRatio() /
                             getSampleRate();
     }
-//    else if (tuning != nullptr && tuning->getTuning()->prep->hasMTSMaster())
+//    else if (tuning != nullptr && tune->getTuning()->prep->hasMTSMaster())
 //    {
 //        pitchRatio =    powf(2.0f, (cookedNote - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
 //                            sound->sourceSampleRate *

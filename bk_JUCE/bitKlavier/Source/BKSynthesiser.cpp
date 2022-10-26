@@ -170,7 +170,7 @@ void BKSynthesiser::clearVoices()
     voices.clear();
 }
 
-BKSynthesiserVoice* BKSynthesiser::addVoice (const BKSynthesiserVoice::Ptr& newVoice)
+BKSynthesiserVoice::Ptr BKSynthesiser::addVoice (const BKSynthesiserVoice::Ptr& newVoice)
 {
     //const ScopedLock sl (lock);
     newVoice->setCurrentPlaybackSampleRate (processor.getCurrentSampleRate());

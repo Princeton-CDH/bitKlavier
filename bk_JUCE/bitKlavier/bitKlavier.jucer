@@ -385,6 +385,10 @@
                 file="Source/BKStandaloneWindow.h"/>
         </GROUP>
         <GROUP id="{A7EA3278-0185-F32B-52C4-0F88EA1C92D3}" name="Processor">
+          <FILE id="tQ8AoG" name="GenericProcessor.cpp" compile="1" resource="0"
+                file="Source/GenericProcessor.cpp"/>
+          <FILE id="UuxPmj" name="GenericProcessor.h" compile="0" resource="0"
+                file="Source/GenericProcessor.h"/>
           <FILE id="MtCIvP" name="BKGalleryLoader.h" compile="0" resource="0"
                 file="Source/BKGalleryLoader.h"/>
           <FILE id="b94SqF" name="BKGalleryLoader.cpp" compile="1" resource="0"

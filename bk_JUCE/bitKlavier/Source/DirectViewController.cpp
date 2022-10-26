@@ -685,7 +685,7 @@ void DirectPreparationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplayDirect)
     {
-        DirectProcessor::Ptr dProcessor = processor.currentPiano->getDirectProcessor(processor.updateState->currentDirectId);
+        DirectProcessor* dProcessor = dynamic_cast<DirectProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentDirectId, PreparationTypeDirect).get());
         DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
         
         velocityMinMaxSlider->setDisplayValue(dProcessor->getLastVelocity() * 127.);

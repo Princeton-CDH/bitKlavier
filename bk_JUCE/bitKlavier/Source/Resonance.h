@@ -17,7 +17,8 @@
 #include "General.h"
 #include "Keymap.h"
 #include "Blendronic.h"
-
+#include "BKPianoSampler.h"
+#include "GenericProcessor.h"
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////RESONANCE PREPARATION///////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
@@ -622,7 +623,7 @@ public:
     Moddable<Array<int>> rActiveHeldKeys;
     Array<int> getHeldKeys() {return rActiveHeldKeys.value;};
     Array<int> getRingingStrings();
-    BKSynthesiser*              synth;
+    BKSynthesiser::Ptr              synth;
     
     //symp strings code
     void addSympStrings(int noteNumber, float velocity);
@@ -797,19 +798,20 @@ private:
 /////////////////////////RESONANCE PROCESSOR/////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
 
-class ResonanceProcessor : public ReferenceCountedObject
+class ResonanceProcessor : public GenericProcessor
 {
 
 public:
-    typedef ReferenceCountedObjectPtr<ResonanceProcessor>   Ptr;
-    typedef Array<ResonanceProcessor::Ptr>                  PtrArr;
-    typedef Array<ResonanceProcessor::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<ResonanceProcessor>                  Arr;
-    typedef OwnedArray<ResonanceProcessor, CriticalSection> CSArr;
+//    typedef ReferenceCountedObjectPtr<ResonanceProcessor>   Ptr;
+//    typedef Array<ResonanceProcessor::Ptr>                  PtrArr;
+//    typedef Array<ResonanceProcessor::Ptr, CriticalSection> CSPtrArr;
+//    typedef OwnedArray<ResonanceProcessor>                  Arr;
+//    typedef OwnedArray<ResonanceProcessor, CriticalSection> CSArr;
 
     ResonanceProcessor( Resonance::Ptr rResonance,
                         TuningProcessor::Ptr rTuning,
-                        GeneralSettings::Ptr rGeneral
+                        GeneralSettings::Ptr rGeneral,
+                        BKAudioProcessor& processor
                         //BKSynthesiser* rMain
     );
     ~ResonanceProcessor();
@@ -829,8 +831,8 @@ public:
     //probably not necessary but keeping just in case?
     //void postRelease(int noteNumber, int midiChannel);
 
-    void prepareToPlay(double sr);
 
+    void prepareToPlay(double sr);
     //accessors
     inline Resonance::Ptr getResonance(void) const noexcept { return resonance; }
     inline TuningProcessor::Ptr getTuning(void) const noexcept { return tuning; }
@@ -841,7 +843,7 @@ public:
     inline void setResonance(Resonance::Ptr res) { resonance = res; }
     inline void setTuning(TuningProcessor::Ptr tun) { tuning = tun; }
 
-    void processBlock(int numSamples, int midiChannel);
+    void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type);
 
     inline void addKeymap(Keymap::Ptr keymap)
     {
@@ -856,8 +858,35 @@ public:
    
 
     void ringSympStrings(int noteNumber, float velocity);
+    void handleMidiEvent (const MidiMessage& m)
+    {
+        resonance->prep->synth->handleMidiEvent(m);
+    }
+    inline void prepareToPlay(GeneralSettings::Ptr gen)
+    {
+        resonance->prep->synth->playbackSampleRateChanged();
+        resonance->prep->synth->setGeneralSettings(gen);
+        
+        resonance->prep->synth->clearVoices();
+        
+        for (int i = 0; i < 300; i++)
+        {
+            resonance->prep->synth->addVoice(new BKPianoSamplerVoice(gen));
+        }
+        DBG("Resonance PrepareToPlay");
+    }
     
-    
+    inline void allNotesOff()
+    {
+        for(int i = 0; i < 15; i++)
+        {
+            resonance->prep->synth->allNotesOff(i,true);
+        }
+    }
+    void copyProcessorState(GenericProcessor::Ptr)
+    {
+        
+    }
 private:
     CriticalSection lock;
     

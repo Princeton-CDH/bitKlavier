@@ -314,7 +314,7 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     
     repaint();
 }
-
+//CODE REFACTOR (DAVIS) creaete genericprocessor draw function that can be called for allpreptypes to remove if statements
 void BKItem::paint(Graphics& g)
 {
     g.setOpacity (1.0f);
@@ -346,9 +346,9 @@ void BKItem::paint(Graphics& g)
         }
         else if (type == PreparationTypeSynchronic)
         {
-            if (processor.currentPiano->getSynchronicProcessor(Id, false) != nullptr)
+            if (processor.currentPiano->getProcessorOfType(Id, PreparationTypeSynchronic, false) != nullptr)
             {
-                if (processor.currentPiano->getSynchronicProcessor(Id, false)->noteDidPlay())
+                if (dynamic_cast<SynchronicProcessor*>(processor.currentPiano->getProcessorOfType(Id, PreparationTypeSynchronic).get())->noteDidPlay())
                 {
                     synchronicNotePlayTime = 4;
                 }
@@ -362,9 +362,9 @@ void BKItem::paint(Graphics& g)
         }
         else if (type == PreparationTypeNostalgic)
         {
-            if (processor.currentPiano->getNostalgicProcessor(Id, false) != nullptr)
+            if (processor.currentPiano->getProcessorOfType(Id, PreparationTypeNostalgic, false) != nullptr)
             {
-                if (processor.currentPiano->getNostalgicProcessor(Id, false)->getNumReverseNotes() > 0)
+                if (dynamic_cast<NostalgicProcessor*>(processor.currentPiano->getProcessorOfType(Id, PreparationTypeNostalgic, false).get())->getNumReverseNotes() > 0)
                 {
                     g.setColour(Colours::blue.withAlpha(0.4f));
                     g.fillRect(getLocalBounds());

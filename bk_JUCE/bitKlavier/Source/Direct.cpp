@@ -10,7 +10,6 @@
 
 #include "Direct.h"
 #include "PluginProcessor.h"
-#include "BKPianoSampler.h"
 #include "Modification.h"
 
 void DirectPreparation::performModification(DirectModification* d, Array<bool> dirty)
@@ -48,12 +47,14 @@ void DirectPreparation::performModification(DirectModification* d, Array<bool> d
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
                                  TuningProcessor::Ptr tuning,
                                  BKAudioProcessor& processor, GeneralSettings::Ptr g) :
-direct(direct),
-tuner(tuning),
-keymaps(Keymap::PtrArr()),
+GenericProcessor(BKPreparationType::PreparationTypeDirect),
 synth(new BKSynthesiser(processor, g,processor.mainPianoSoundSet )),
 resonanceSynth(new BKSynthesiser(processor, g,processor.resonanceReleaseSoundSet )),
-hammerSynth(new BKSynthesiser(processor, g,processor.hammerReleaseSoundSet ))
+hammerSynth(new BKSynthesiser(processor, g,processor.hammerReleaseSoundSet )),
+pedalSynth(new BKSynthesiser(processor, g,processor.pedalReleaseSoundSet )),
+direct(direct),
+tuner(tuning),
+keymaps(Keymap::PtrArr())
 {
     for (int i = 0; i < 300; i++)
     {
@@ -63,6 +64,7 @@ hammerSynth(new BKSynthesiser(processor, g,processor.hammerReleaseSoundSet ))
     {
         resonanceSynth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
         hammerSynth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
+        pedalSynth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
     }
     // Only one Direct target right now, but will use structure for multiple in case we add more
     for (int j = 0; j < 128; j++)
@@ -92,11 +94,16 @@ hammerSynth(new BKSynthesiser(processor, g,processor.hammerReleaseSoundSet ))
 
 DirectProcessor::~DirectProcessor(void)
 {
-    
+    synth->clearVoices();
+    hammerSynth->clearVoices();
+    resonanceSynth->clearVoices();
+    pedalSynth->clearVoices();
 }
 
 void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
+    TuningProcessor* _tuner =  dynamic_cast<TuningProcessor*>(tuner.get());
+    
     activeNotes.addIfNotAlreadyThere(noteNumber);
     //noteLengthTimers.set(noteNumber, 0);
     
@@ -122,7 +129,7 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
     
     if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
     
-    tuner->getOffset(noteNumber, true);
+    _tuner->getOffset(noteNumber, true);
     
     DirectPreparation::Ptr prep = direct->prep;
     
@@ -139,9 +146,9 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
         
         // tune the transposition
         if (prep->dTranspUsesTuning.value) // use the Tuning setting
-            offset = t + tuner->getOffset(round(t) + noteNumber, false);
+            offset = t + _tuner->getOffset(round(t) + noteNumber, false);
         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
-            offset = t + tuner->getOffset(noteNumber, false);
+            offset = t + _tuner->getOffset(noteNumber, false);
         
         synthOffset = offset;
         
@@ -373,6 +380,7 @@ void DirectProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMe
     synth->renderNextBlock(buffer, midiMessages, 0, numSamples);
     resonanceSynth->renderNextBlock(buffer, midiMessages, 0, numSamples);
     hammerSynth->renderNextBlock(buffer, midiMessages, 0, numSamples);
+    pedalSynth->renderNextBlock(buffer, midiMessages, 0, numSamples);
     //tuner->processor->incrementAdaptiveClusterTime(numSamples);
 }
 

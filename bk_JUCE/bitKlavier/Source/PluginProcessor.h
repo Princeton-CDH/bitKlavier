@@ -110,7 +110,7 @@ public:
 //    BKSynthesiser                       mainPianoSynth;
 //    BKSynthesiser                       hammerReleaseSynth;
 //    BKSynthesiser                       resonanceReleaseSynth;
-    BKSynthesiser                       pedalSynth;
+   // BKSynthesiser                       pedalSynth;
     
     // Equalizer
     BKEqualizer                         eq;
@@ -520,6 +520,7 @@ public:
     OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> resonanceReleaseSoundSet;
     OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> hammerReleaseSoundSet;
     OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> emptySoundSet;
+    OwnedArray<ReferenceCountedArray<BKSynthesiserSound>> pedalReleaseSoundSet;
     
     void loadSoundSet(OwnedArray<ReferenceCountedArray<BKSynthesiserSound>>& soundSet,  BKSynthesiserSound* newSound, int loadingSoundSetId)
     {

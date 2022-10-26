@@ -730,7 +730,7 @@ void TuningViewController::displayTab(int tab)
             }
         }
         
-        TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+        TuningProcessor* tProcessor = dynamic_cast<TuningProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentTuningId, PreparationTypeTuning).get());
         bool keymapAttached = false;
         if (tProcessor->getKeymaps().size() > 0) keymapAttached = true;
         
@@ -925,7 +925,7 @@ void TuningViewController::paint (Graphics& g)
     //if (!showSprings || currentTab != 1) return;
     if (currentTab != 1) return;
     
-    TuningProcessor::Ptr tuning;
+    TuningProcessor* tuning;
     TuningPreparation::Ptr prep;
     TuningModification::Ptr mod;
     
@@ -939,12 +939,12 @@ void TuningViewController::paint (Graphics& g)
         if (targets.size())   tuningId = targets[0];
         else                  tuningId = -1;
         
-        tuning = processor.currentPiano->getTuningProcessor(tuningId);
+        tuning = dynamic_cast<TuningProcessor*>(processor.currentPiano->getProcessorOfType(tuningId, PreparationTypeTuning).get());
         prep = processor.gallery->getTuningPreparation(tuningId);
     }
     else
     {
-        tuning = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+        tuning = dynamic_cast<TuningProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentTuningId, PreparationTypeTuning).get());
         prep = processor.gallery->getTuningPreparation(processor.updateState->currentTuningId);
     }
     
@@ -1239,7 +1239,7 @@ void TuningViewController::updateComponentVisibility(void)
     
     TuningAdaptiveSystemType adaptiveType = prep->getAdaptiveType();
     
-    TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+    TuningProcessor* tProcessor = dynamic_cast<TuningProcessor *>(processor.currentPiano->getProcessorOfType(processor.updateState->currentTuningId, PreparationTypeTuning).get());
     bool keymapAttached = false;
     if (tProcessor->getKeymaps().size() > 0) keymapAttached = true;
 
@@ -1327,7 +1327,7 @@ void TuningViewController::timerCallback(void)
 {
     //if (processor.updateState->currentDisplay == DisplayTuning)
     {
-        TuningProcessor::Ptr tProcessor;
+        TuningProcessor* tProcessor;
         TuningPreparation::Ptr prep;
         Tuning::Ptr tuning;
         TuningModification::Ptr mod;
@@ -1346,7 +1346,7 @@ void TuningViewController::timerCallback(void)
             
         }
         
-        tProcessor = processor.currentPiano->getTuningProcessor(tuningId);
+        tProcessor = dynamic_cast<TuningProcessor*>(processor.currentPiano->getProcessorOfType(tuningId,PreparationTypeTuning).get());
         prep = processor.gallery->getTuningPreparation(tuningId);
         tuning = processor.gallery->getTuning(tuningId);
         
@@ -2175,7 +2175,7 @@ void TuningPreparationEditor::buttonClicked (Button* b)
     {
         DBG("resetting A1");
         
-        TuningProcessor::Ptr tProcessor = processor.currentPiano->getTuningProcessor(processor.updateState->currentTuningId);
+        TuningProcessor* tProcessor = dynamic_cast<TuningProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentTuningId,PreparationTypeTuning).get());
         tProcessor->adaptiveReset();
     }
     else if (b == &hideOrShow)

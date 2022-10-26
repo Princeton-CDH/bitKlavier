@@ -14,7 +14,7 @@
 #include "BKUtilities.h"
 #include "AudioConstants.h"
 #include "General.h"
-
+#include "GenericProcessor.h"
 #include "BKUpdateState.h"
 
 #include "Keymap.h"
@@ -353,21 +353,21 @@ TempoProcessor handles events (note messages, and timing) and updates
 values internally that other preparation can access as needed.
 */
 
-class TempoProcessor  : public ReferenceCountedObject
+class TempoProcessor  : public GenericProcessor
 {
     
 public:
-    typedef ReferenceCountedObjectPtr<TempoProcessor>   Ptr;
-    typedef Array<TempoProcessor::Ptr>                  PtrArr;
-    typedef Array<TempoProcessor::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<TempoProcessor>                  Arr;
-    typedef OwnedArray<TempoProcessor,CriticalSection>  CSArr;
+//    typedef ReferenceCountedObjectPtr<TempoProcessor>   Ptr;
+//    typedef Array<TempoProcessor::Ptr>                  PtrArr;
+//    typedef Array<TempoProcessor::Ptr, CriticalSection> CSPtrArr;
+//    typedef OwnedArray<TempoProcessor>                  Arr;
+//    typedef OwnedArray<TempoProcessor,CriticalSection>  CSArr;
     
     TempoProcessor(BKAudioProcessor& processor, Tempo::Ptr tempo);
     
     ~TempoProcessor();
     
-    void processBlock(int numSamples, int channel);
+    void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type);
     void keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
     void keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
     inline float getPeriodMultiplier(void)
@@ -428,7 +428,20 @@ public:
     
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
+    void copyProcessorState(GenericProcessor::Ptr copy)
+    {
+        
+    }
     
+    void prepareToPlay(GeneralSettings::Ptr)
+    {
+        
+    }
+
+    void handleMidiEvent (const MidiMessage& m)
+    {
+        
+    }
 private:
     BKAudioProcessor& processor;
     

@@ -19,7 +19,7 @@
 #include "Tuning.h"
 #include "Keymap.h"
 #include "Blendronic.h"
-
+#include "GenericProcessor.h"
 class NostalgicModification;
 
 class NostalgicPreparation : public ReferenceCountedObject
@@ -741,15 +741,15 @@ private:
  values it needs to behave as expected
  */
 
-class NostalgicProcessor : public ReferenceCountedObject
+class NostalgicProcessor : public GenericProcessor
 {
     
 public:
-    typedef ReferenceCountedObjectPtr<NostalgicProcessor>   Ptr;
-    typedef Array<NostalgicProcessor::Ptr>                  PtrArr;
-    typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<NostalgicProcessor>                  Arr;
-    typedef OwnedArray<NostalgicProcessor, CriticalSection> CSArr;
+//    typedef ReferenceCountedObjectPtr<NostalgicProcessor>   Ptr;
+//    typedef Array<NostalgicProcessor::Ptr>                  PtrArr;
+//    typedef Array<NostalgicProcessor::Ptr, CriticalSection> CSPtrArr;
+//    typedef OwnedArray<NostalgicProcessor>                  Arr;
+//    typedef OwnedArray<NostalgicProcessor, CriticalSection> CSArr;
     
     NostalgicProcessor(Nostalgic::Ptr nostalgic,
                        TuningProcessor::Ptr tuning,
@@ -766,7 +766,7 @@ public:
     void keyPressed(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress);
     
     // begin playing reverse note, called with noteOff
-    void keyReleased(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress, bool post = false);
+    void keyReleased(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress);
     
     void postRelease(int midiNoteNumber, int midiChannel);
     
@@ -861,8 +861,45 @@ public:
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     
+    void handleMidiEvent (const MidiMessage& m)
+    {
+        synth->handleMidiEvent(m);
+    }
+    
+    inline void prepareToPlay(GeneralSettings::Ptr gen)
+    {
+        synth->playbackSampleRateChanged();
+        synth->setGeneralSettings(gen);
+        
+        synth->clearVoices();
+        
+        for (int i = 0; i < 300; i++)
+        {
+            synth->addVoice(new BKPianoSamplerVoice(gen));
+        }
+       
+    }
+    
+    
+    inline void allNotesOff()
+    {
+        for(int i = 0; i < 15; i++)
+        {
+            synth->allNotesOff(i,true);
+        }
+    }
+    
+    void copyProcessorState(GenericProcessor::Ptr copy)
+    {
+        
+    }
+    void setPost(bool _post)
+    {
+        post = _post;
+    }
 private:
-    BKSynthesiser*              synth;
+    bool post;
+    BKSynthesiser::Ptr              synth;
     
     Nostalgic::Ptr                  nostalgic;
     TuningProcessor::Ptr            tuner;

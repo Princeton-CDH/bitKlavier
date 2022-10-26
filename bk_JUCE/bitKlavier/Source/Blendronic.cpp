@@ -96,7 +96,9 @@ BlendronicProcessor::~BlendronicProcessor()
 void BlendronicProcessor::tick(float* outputs)
 {
     BlendronicPreparation::Ptr prep = blendronic->prep;
-    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+    //SynchronicProcessor* _synchronic = dynamic_cast<SynchronicProcessor*>(synchronic.get());
+    TempoProcessor* _tempo = dynamic_cast<TempoProcessor*>(tempo.get());
+    TempoPreparation::Ptr tempoPrep = _tempo->getTempo()->prep;
     
     if (!effectActive) return;
     if (tempoPrep->getSubdivisions() * tempoPrep->getTempo() == 0) return;
@@ -104,7 +106,7 @@ void BlendronicProcessor::tick(float* outputs)
     // Update the pulse length in case tempo or subdiv changed
     // possible to put this behind conditional, so we aren't doing these operations ever tick?
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-    pulseLength *= (general->getPeriodMultiplier() * tempo->getPeriodMultiplier());
+    pulseLength *= (general->getPeriodMultiplier() * _tempo->getPeriodMultiplier());
     
     if (pulseLength != prevPulseLength) numSamplesBeat = prep->bBeats.value[beatIndex] * pulseLength * getSampleRate();
 
@@ -186,7 +188,8 @@ void BlendronicProcessor::processBlock(int numSamples, int midiChannel)
 void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
     BlendronicPreparation::Ptr prep = blendronic->prep;
-    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+    TempoProcessor* _tempo = dynamic_cast<TempoProcessor*>(tempo.get());
+    TempoPreparation::Ptr tempoPrep = _tempo->getTempo()->prep;
     
     // aVels will be used for velocity calculations; bVels will be used for conditionals
     Array<float> *aVels, *bVels;
@@ -280,7 +283,8 @@ void BlendronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
 void BlendronicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
     BlendronicPreparation::Ptr prep = blendronic->prep;
-    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+    TempoProcessor* _tempo = dynamic_cast<TempoProcessor*>(tempo.get());
+    TempoPreparation::Ptr tempoPrep = _tempo->getTempo()->prep;
 
     // aVels will be used for velocity calculations; bVels will be used for conditionals
     Array<float> *aVels, *bVels;
@@ -374,7 +378,8 @@ void BlendronicProcessor::postRelease(int noteNumber, int midiChannel)
 void BlendronicProcessor::prepareToPlay(double sr)
 {
     BlendronicPreparation::Ptr prep = blendronic->prep;
-    TempoPreparation::Ptr tempoPrep = tempo->getTempo()->prep;
+    TempoProcessor* _tempo = dynamic_cast<TempoProcessor*>(tempo.get());
+    TempoPreparation::Ptr tempoPrep = _tempo->getTempo()->prep;
     
     if (delay == nullptr)
     {
@@ -405,7 +410,7 @@ void BlendronicProcessor::prepareToPlay(double sr)
     feedbackIndex = 0;
     
     pulseLength = (60.0 / (tempoPrep->getSubdivisions() * tempoPrep->getTempo()));
-    pulseLength *= (general->getPeriodMultiplier() * tempo->getPeriodMultiplier());
+    pulseLength *= (general->getPeriodMultiplier() * _tempo->getPeriodMultiplier());
     numSamplesBeat = prep->bBeats.value[beatIndex] * getSampleRate() * pulseLength;
     numSamplesDelay = prep->bDelayLengths.value[delayIndex] * getSampleRate() * pulseLength;
     if (pulseLength == INFINITY)

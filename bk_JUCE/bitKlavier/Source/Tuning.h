@@ -20,7 +20,7 @@
 #include "Tunings.h"
 #include "MTS-ESP/Client/libMTSClient.h"
 #include "MTS-ESP/Master/libMTSMaster.h"
-
+#include "GenericProcessor.h"
 class TuningModification;
 
 class TuningPreparation : public ReferenceCountedObject
@@ -974,19 +974,19 @@ private:
  values internally that other preparation can access as needed.
  */
 
-class TuningProcessor : public ReferenceCountedObject
+class TuningProcessor : public GenericProcessor
 {
 public:
-    typedef ReferenceCountedObjectPtr<TuningProcessor>      Ptr;
-    typedef Array<TuningProcessor::Ptr>                     PtrArr;
-    typedef Array<TuningProcessor::Ptr, CriticalSection>    CSArr;
-    typedef OwnedArray<TuningProcessor>                          Arr;
-    typedef OwnedArray<TuningProcessor, CriticalSection>         CSPtrArr;
-    
+//    typedef ReferenceCountedObjectPtr<TuningProcessor>      Ptr;
+//    typedef Array<TuningProcessor::Ptr>                     PtrArr;
+//    typedef Array<TuningProcessor::Ptr, CriticalSection>    CSArr;
+//    typedef OwnedArray<TuningProcessor>                          Arr;
+//    typedef OwnedArray<TuningProcessor, CriticalSection>         CSPtrArr;
+//    
     TuningProcessor(BKAudioProcessor& processor, Tuning::Ptr tuning);
     ~TuningProcessor();
     
-    inline void prepareToPlay(double sr) { ; }
+    
     
     //returns tuning offsets; add to integer PitchClass
     float getOffset(int midiNoteNumber, bool updateLastInterval);
@@ -1000,8 +1000,7 @@ public:
     inline void setTuning(Tuning::Ptr newTuning) { tuning = newTuning;}
     inline Tuning::Ptr getTuning(void) const noexcept { return tuning; }
     
-    //for cluster timing
-    void processBlock(int numSamples);
+  
     
     //for global tuning adjustment, A442, etc...
     void setGlobalTuningReference(float tuningRef) { globalTuningReference = tuningRef;}
@@ -1043,8 +1042,22 @@ public:
     
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
+    void copyProcessorState(GenericProcessor::Ptr copy)
+    {
+        
+    }
     
+    void prepareToPlay(GeneralSettings::Ptr)
+    {
+        
+    }
 
+    void handleMidiEvent (const MidiMessage& m)
+    {
+        
+    }
+    
+    void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type);
 private:
     BKAudioProcessor& processor;
     

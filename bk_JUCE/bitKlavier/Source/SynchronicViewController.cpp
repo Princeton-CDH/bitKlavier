@@ -830,7 +830,7 @@ void SynchronicPreparationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplaySynchronic)
     {
-        SynchronicProcessor::Ptr sProcessor = processor.currentPiano->getSynchronicProcessor(processor.updateState->currentSynchronicId);
+        SynchronicProcessor* sProcessor = dynamic_cast<SynchronicProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentSynchronicId, PreparationTypeSynchronic).get());
         SynchronicPreparation::Ptr prep = processor.gallery->getSynchronicPreparation(processor.updateState->currentSynchronicId);
         
         // dim target comboboxes that aren't activated by a Keymap

@@ -583,7 +583,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadHammerReleaseSamples(void)
 BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
 {
     WavAudioFormat wavFormat;
-    BKSynthesiser* synth = &processor.pedalSynth;
     
     File bkSamples = processor.getDefaultSamplesPath();
     
@@ -641,7 +640,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
                                                 0, velocityRange,
                                                 1, 1,
                                                 0.f);
-                        synth->addSound(loadingSoundSetId, newSound);
+                        processor.loadSoundSet(processor.pedalReleaseSoundSet, newSound, loadingSoundSetId);
                     }
                     else DBG("File mapping failed");
                 }
@@ -667,7 +666,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadPedalSamples(void)
                                             0, velocityRange,
                                             1, 1,
                                             0.f);
-                    synth->addSound(loadingSoundSetId, newSound);
+                    processor.loadSoundSet(processor.pedalReleaseSoundSet, newSound, loadingSoundSetId);
                 }
             }
             processor.progress += progressInc;
@@ -849,7 +848,6 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
 //    BKSynthesiser* mainSynth = &processor.mainPianoSynth;
 //    BKSynthesiser* resSynth = &processor.resonanceReleaseSynth;
 //    BKSynthesiser* hamSynth = &processor.hammerReleaseSynth;
-    BKSynthesiser* pedalSynth = &processor.pedalSynth;
     
     File samples (loadingSoundfont);
     
@@ -1491,7 +1489,7 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                         0, velocityRange,
                                                         1, 1,
                                                         0.f);
-                                pedalSynth->addSound(loadingSoundSetId, newSound);
+                                processor.loadSoundSet(processor.pedalReleaseSoundSet, newSound, loadingSoundSetId);
                             }
                             else DBG("File mapping failed");
                         }
@@ -1517,7 +1515,8 @@ BKSampleLoader::JobStatus BKSampleLoader::loadCustomSamples()
                                                     0, velocityRange,
                                                     1, 1,
                                                     0.f);
-                            pedalSynth->addSound(loadingSoundSetId, newSound);
+                                                            processor.loadSoundSet(processor.pedalReleaseSoundSet, newSound, loadingSoundSetId);
+
                         }
                     }
                     processor.progress += progressInc;

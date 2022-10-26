@@ -68,6 +68,8 @@ NostalgicProcessor::NostalgicProcessor(Nostalgic::Ptr nostalgic,
                                        BKAudioProcessor& processor
                                        /*BKSynthesiser *s */):
 //synth(s),
+GenericProcessor(PreparationTypeNostalgic),
+post(false),
 nostalgic(nostalgic),
 tuner(tuning),
 synchronic(synchronic),
@@ -123,8 +125,10 @@ void NostalgicProcessor::postRelease(int midiNoteNumber, int midiChannel)
 }
 
 //begin reverse note; called when key is released
-void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress, bool post)
+void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
+    SynchronicProcessor* _synchronic = dynamic_cast<SynchronicProcessor*>(synchronic.get());
+    TuningProcessor* _tuner = dynamic_cast<TuningProcessor*>(tuner.get());
     NostalgicPreparation::Ptr prep = nostalgic->prep;
     
     // aVels will be used for velocity calculations; bVels will be used for conditionals
@@ -167,7 +171,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
         if (prep->nUndertow.value > 0) offRamp = aRampUndertowCrossMS;
         else offRamp = aRampNostalgicOffMS;
 
-        SynchronicSyncMode syncTargetMode = synchronic->getSynchronic()->prep->sMode.value;
+        SynchronicSyncMode syncTargetMode = _synchronic->getSynchronic()->prep->sMode.value;
         
         if (prep->nMode.value == SynchronicSync2)
         {
@@ -177,7 +181,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
             if (prep->nUndertow.value > 0) offRamp = aRampUndertowCrossMS;
             else offRamp = aRampNostalgicOffMS;
             
-            duration = synchronic->getTimeToBeatMS(prep->nBeatsToSkip.value) + offRamp + 30; // sum
+            duration = _synchronic->getTimeToBeatMS(prep->nBeatsToSkip.value) + offRamp + 30; // sum
             
             for (auto t : prep->nTransposition.value)
             {
@@ -192,9 +196,9 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                 
                 // tune the transposition
                 if (prep->nTranspUsesTuning.value) // use the Tuning setting
-                    offset = t + tuner->getOffset(round(t) + noteNumber, false);
+                    offset = t + _tuner->getOffset(round(t) + noteNumber, false);
                 else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
-                    offset = t + tuner->getOffset(noteNumber, false);
+                    offset = t + _tuner->getOffset(noteNumber, false);
                
                 synthOffset = offset;
 
@@ -237,7 +241,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
             reverseNotes.insert(0, new NostalgicNoteStuff(noteNumber));
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
             currentNote->setPrepAtKeyOn(prep);
-            currentNote->setTuningAtKeyOn(tuner->getOffset(noteNumber, false));
+            currentNote->setTuningAtKeyOn(_tuner->getOffset(noteNumber, false));
             currentNote->setVelocityAtKeyOn(aVels->getUnchecked(TargetTypeNostalgic));
             currentNote->setReverseStartPosition((duration + prep->nWaveDistance.value) * synth->getSampleRate()/1000.);
             currentNote->setReverseTargetLength((duration) * synth->getSampleRate()/1000.);
@@ -329,10 +333,10 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                         // tune the transposition
                         if (prep->nTranspUsesTuning.value) // use the Tuning setting
                              // offset = t + tuner->getOffset(round(t)  + midiNoteNumber, false);
-                            offset = t + tuner->getOffset(round(t)  + note, false);
+                            offset = t + _tuner->getOffset(round(t)  + note, false);
                         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
                              // offset = t + tuner->getOffset(midiNoteNumber, false);
-                            offset = t + tuner->getOffset(note, false);
+                            offset = t + _tuner->getOffset(note, false);
                         
                         synthOffset = offset;
                         
@@ -366,7 +370,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                         reverseNotes.insert(0, new NostalgicNoteStuff(note));
                         NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
                         currentNote->setPrepAtKeyOn(prep);
-                        currentNote->setTuningAtKeyOn(tuner->getOffset(note, false));
+                        currentNote->setTuningAtKeyOn(_tuner->getOffset(note, false));
                         currentNote->setVelocityAtKeyOn(aVels->getUnchecked(TargetTypeNostalgic));
                         currentNote->setReverseStartPosition((duration + prep->nWaveDistance.value) * synth->getSampleRate()/1000.);
                         currentNote->setReverseTargetLength((duration) * synth->getSampleRate()/1000.);
@@ -387,7 +391,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
         }
         else if(syncTargetMode == LastNoteOffSync || syncTargetMode == AnyNoteOffSync)
         {
-            duration = synchronic->getTimeToBeatMS(prep->nBeatsToSkip.value) + offRamp + 30; // sum
+            duration = _synchronic->getTimeToBeatMS(prep->nBeatsToSkip.value) + offRamp + 30; // sum
             
             for (auto t : prep->nTransposition.value)
             {
@@ -402,9 +406,9 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                  
                  // tune the transposition
                 if (prep->nTranspUsesTuning.value) // use the Tuning setting
-                     offset = t + tuner->getOffset(round(t) + noteNumber, false);
+                     offset = t + _tuner->getOffset(round(t) + noteNumber, false);
                 else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
-                     offset = t + tuner->getOffset(noteNumber, false);
+                     offset = t + _tuner->getOffset(noteNumber, false);
                 
                 synthOffset = offset;
                 
@@ -442,7 +446,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
             reverseNotes.insert(0, new NostalgicNoteStuff(noteNumber));
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
             currentNote->setPrepAtKeyOn(prep);
-            currentNote->setTuningAtKeyOn(tuner->getOffset(noteNumber, false));
+            currentNote->setTuningAtKeyOn(_tuner->getOffset(noteNumber, false));
             currentNote->setVelocityAtKeyOn(aVels->getUnchecked(TargetTypeNostalgic));// * prep->getGain());
             currentNote->setReverseStartPosition((duration + prep->nWaveDistance.value) * synth->getSampleRate()/1000.);
             //currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
@@ -456,6 +460,8 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
 //start timer for length of a particular note; called when key is pressed
 void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
+    SynchronicProcessor* _synchronic = dynamic_cast<SynchronicProcessor*>(synchronic.get());
+    TuningProcessor* _tuner = dynamic_cast<TuningProcessor*>(tuner.get());
     NostalgicPreparation::Ptr prep = nostalgic->prep;
     
     // aVels will be used for velocity calculations; bVels will be used for conditionals
@@ -502,11 +508,11 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
         else offRamp = aRampNostalgicOffMS;
         
         //get time in ms to target beat, summing over skipped beat lengths
-        SynchronicSyncMode syncTargetMode = synchronic->getMode();
+        SynchronicSyncMode syncTargetMode = _synchronic->getMode();
         
         if(syncTargetMode == FirstNoteOnSync || syncTargetMode == AnyNoteOnSync)
         {
-            duration = synchronic->getTimeToBeatMS(prep->nBeatsToSkip.value) + offRamp + 30; // sum
+            duration = _synchronic->getTimeToBeatMS(prep->nBeatsToSkip.value) + offRamp + 30; // sum
             
             for (auto t : prep->nTransposition.value)
             {
@@ -521,9 +527,9 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
                  
                 // tune the transposition
                 if (prep->nTranspUsesTuning.value) // use the Tuning setting
-                     offset = t + tuner->getOffset(round(t) + noteNumber, false);
+                     offset = t + _tuner->getOffset(round(t) + noteNumber, false);
                 else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
-                     offset = t + tuner->getOffset(noteNumber, false);
+                     offset = t + _tuner->getOffset(noteNumber, false);
                 
                 synthOffset = offset;
                 
@@ -559,7 +565,7 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
             reverseNotes.insert(0, new NostalgicNoteStuff(noteNumber));
             NostalgicNoteStuff* currentNote = reverseNotes.getUnchecked(0);
             currentNote->setPrepAtKeyOn(prep);
-            currentNote->setTuningAtKeyOn(tuner->getOffset(noteNumber, false));
+            currentNote->setTuningAtKeyOn(_tuner->getOffset(noteNumber, false));
             currentNote->setVelocityAtKeyOn(aVels->getUnchecked(TargetTypeNostalgic));
             currentNote->setReverseStartPosition((duration + prep->nWaveDistance.value) * synth->getSampleRate()/1000.);
             //currentNote->setReverseTargetLength((duration - aRampUndertowCrossMS) * sampleRate/1000.);
@@ -740,6 +746,8 @@ float NostalgicProcessor::filterVelocity(float vel)
 //main scheduling function
 void NostalgicProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type)
 {
+    SynchronicProcessor* _synchronic = dynamic_cast<SynchronicProcessor*>(synchronic.get());
+    TuningProcessor* _tuner = dynamic_cast<TuningProcessor*>(tuner.get());
     //cluster management
     if (inCluster)
     {
@@ -796,9 +804,9 @@ void NostalgicProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& mid
                       
                     // tune the transposition
                     if (noteOnPrep->nTranspUsesTuning.value) // use the Tuning setting
-                          offset = t + tuner->getOffset(round(t) + midiNoteNumber, false);
+                          offset = t + _tuner->getOffset(round(t) + midiNoteNumber, false);
                     else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
-                          offset = t + tuner->getOffset(midiNoteNumber, false);
+                          offset = t + _tuner->getOffset(midiNoteNumber, false);
                      
                     synthOffset = offset;
                      

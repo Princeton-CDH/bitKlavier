@@ -359,9 +359,10 @@ private:
  what the target playback rate is. This value is passed on to the voices so that
  they can pitch their output correctly.
  */
-class JUCE_API  BKSynthesiser
+class JUCE_API  BKSynthesiser : public ReferenceCountedObject
 {
 public:
+    typedef ReferenceCountedObjectPtr<BKSynthesiser>   Ptr;
     //==============================================================================
     /** Creates a new BKSynthesiser.
      You'll need to add some sounds and voices before it'll make any sound.
@@ -396,7 +397,7 @@ public:
      it later on when no longer needed. The caller should not retain a pointer to the
      voice.
      */
-    BKSynthesiserVoice* addVoice (const BKSynthesiserVoice::Ptr& newVoice);
+    BKSynthesiserVoice::Ptr addVoice (const BKSynthesiserVoice::Ptr& newVoice);
     
     /** Deletes one of the voices. */
     void removeVoice (int index);

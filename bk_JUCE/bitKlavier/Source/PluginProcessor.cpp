@@ -100,10 +100,6 @@ public:
 BKAudioProcessor::BKAudioProcessor(void):
 updateState(new BKUpdateState()),
 loader(),
-//mainPianoSynth(*this),
-//hammerReleaseSynth(*this),
-//resonanceReleaseSynth(*this),
-pedalSynth(*this, emptySoundSet),
 eq(),
 firstPedalDown(true),
 //touchThread(*this),
@@ -367,35 +363,8 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     //stk::Stk::setSampleRate(sampleRate);
 #endif
     //stk::Stk::setSampleRate(sampleRate); //crashes Logic Audio Unit Validation Tool
-    ////SET SAMPLERATE, GENERAL SETTINGS, clear VOICEs, addvoices for All processors********* (PROCESSOR UPDATE)
-//    mainPianoSynth.playbackSampleRateChanged();
-//    hammerReleaseSynth.playbackSampleRateChanged();
-//    resonanceReleaseSynth.playbackSampleRateChanged();
-    pedalSynth.playbackSampleRateChanged();
-//
-//    //mainPianoSynth.setGeneralSettings(gallery->getGeneralSettings());
-//    resonanceReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
-//    hammerReleaseSynth.setGeneralSettings(gallery->getGeneralSettings());
-    pedalSynth.setGeneralSettings(gallery->getGeneralSettings());
-
-//    mainPianoSynth.clearVoices();
-//    resonanceReleaseSynth.clearVoices();
-//    hammerReleaseSynth.clearVoices();
-    pedalSynth.clearVoices();
-
-//    // 88 or more seems to work well
-//    for (int i = 0; i < 300; i++)
-//    {
-//        mainPianoSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
-//    }
-    for (int i = 0; i < 128; i++)
-    {
-//    {
-//        resonanceReleaseSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
-//        hammerReleaseSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
-        pedalSynth.addVoice(new BKPianoSamplerVoice(gallery->getGeneralSettings()));
-    }
-    
+    currentPiano->prepMap->prepareToPlay(gallery->getGeneralSettings());
+    prevPiano->prepMap->prepareToPlay(gallery->getGeneralSettings());
     levelBuf.setSize(2, 25);
     
     gallery->prepareToPlay(currentSampleRate);
@@ -479,13 +448,14 @@ void BKAudioProcessor::clearBitKlavier(void)
 {
     
     ////TURN ALL NOTES OFF PROCESSORS (PROCESSOR UPDATE)
-    for (int i = 0; i < 15; i++)
-    {
-//        hammerReleaseSynth.allNotesOff(i, true);
-//        resonanceReleaseSynth.allNotesOff(i, true);
-//        mainPianoSynth.allNotesOff(i, true);
-          pedalSynth.allNotesOff(i, true);
-    }
+//    for (int i = 0; i < 15; i++)
+//    {
+////        hammerReleaseSynth.allNotesOff(i, true);
+////        resonanceReleaseSynth.allNotesOff(i, true);
+////        mainPianoSynth.allNotesOff(i, true);
+//          pedalSynth.allNotesOff(i, true);
+//    }
+    currentPiano->prepMap->allNotesOff();
 
     /*
     THIS DID NOT SOLVE ALL OFF ISSUES - PROBLEM IS PROBABLY SOMEWHERE IN NOSTALGIC?
@@ -1006,22 +976,7 @@ void BKAudioProcessor::sustainActivate(void)
         prevPiano->prepMap->sustainPedalPressed();
     
         //play pedalDown resonance
-        pedalSynth.keyOn(channel,
-                           //synthNoteNumber,
-                           21,
-                           21,
-                           0,
-                           0.02, //gain
-                           1.,
-                           Forward,
-                           Normal, //FixedLength,
-                           PedalNote,
-                           0, 
-                           0,
-                           0,
-                           20000,
-                           3,
-                           3 );
+       
     }
     
 }
@@ -1069,37 +1024,7 @@ void BKAudioProcessor::sustainDeactivate(void)
         if(prevPiano != currentPiano) prevPiano->prepMap->sustainPedalReleased(sourcedNotesOn, true);
         
         
-        //turn off pedal down resonance
-        pedalSynth.keyOff(channel,
-                          PedalNote,
-                          0,
-                          0,
-                          21,
-                          21,
-                          1.,
-                          1.,
-                          nullptr,
-                          true);
-        
-        
-        //play pedalUp sample
-        pedalSynth.keyOn(channel,
-                         //synthNoteNumber,
-                         22,
-                         22,
-                         0,
-                         0.03, //gain
-                         1.,
-                         Forward,
-                         Normal, //FixedLength,
-                         PedalNote,
-                         0,
-                         0,
-                         0,
-                         2000,
-                         3,
-                         3 );
-         
+       
     }
 }
 
@@ -1193,7 +1118,7 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
     //mainPianoSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     //hammerReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
     //resonanceReleaseSynth.renderNextBlock(buffer,midiMessages,0, numSamples);
-	pedalSynth.renderNextBlock(buffer, midiMessages, 0, numSamples);
+	//pedalSynth.renderNextBlock(buffer, midiMessages, 0, numSamples);
     
 #if JUCE_IOS
     buffer.applyGain(0, numSamples, 0.3 * gallery->getGeneralSettings()->getGlobalGain());
@@ -1240,7 +1165,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
         for (auto bprocessor : prevPiano->getBlendronicProcessors())
             bprocessor->setActive(false);
         
-        currentPiano->clearOldNotes(prevPiano); // to clearOldNotes so it doesn't playback shit from before
+        currentPiano->pianoSwitched(prevPiano); // to clearOldNotes so it doesn't playback shit from before
 //        currentPiano->configure();
         
         for (auto bprocessor : currentPiano->getBlendronicProcessors())
@@ -1267,6 +1192,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
 }
 
 // Reset
+/////THIS NEEDS TO CHANGE NOT SURE HOW (DAVIS _ CODE CLEANUP)
 void BKAudioProcessor::performResets(int noteNumber, String source)
 {
     for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->directResets)
@@ -1277,7 +1203,7 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             
             if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
-                currentPiano->getDirectProcessor(reset.prepId)->reset();
+                currentPiano->getProcessorOfType(reset.prepId,PreparationTypeDirect)->reset();
                 updateState->directPreparationDidChange = true;
                 break;
             }
@@ -1291,7 +1217,8 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             
             if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
-                currentPiano->getSynchronicProcessor(reset.prepId)->reset();
+                currentPiano->getProcessorOfType(reset.prepId,PreparationTypeSynchronic)->reset();
+                //currentPiano->getSynchronicProcessor(reset.prepId)->reset();
                 updateState->synchronicPreparationDidChange = true;
                 break;
             }
@@ -1305,7 +1232,8 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             
             if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
-                currentPiano->getNostalgicProcessor(reset.prepId)->reset();
+                currentPiano->getProcessorOfType(reset.prepId,PreparationTypeNostalgic)->reset();
+                //currentPiano->getNostalgicProcessor(reset.prepId)->reset();
                 updateState->nostalgicPreparationDidChange = true;
                 break;
             }
@@ -1319,26 +1247,28 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             
             if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
-                currentPiano->getResonanceProcessor(reset.prepId)->reset();
+                currentPiano->getProcessorOfType(reset.prepId,PreparationTypeNostalgic)->reset();
+                //currentPiano->getResonanceProcessor(reset.prepId)->reset();
                 updateState->resonancePreparationDidChange = true;
                 break;
             }
         }
     }
-    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->blendronicResets)
-    {
-        for (auto Id : reset.keymapIds)
-        {
-            Keymap::Ptr keymap = gallery->getKeymap(Id);
-            
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
-            {
-                currentPiano->getBlendronicProcessor(reset.prepId)->reset();
-                updateState->blendronicPreparationDidChange = true;
-                break;
-            }
-        }
-    }
+//    for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->blendronicResets)
+//    {
+//        for (auto Id : reset.keymapIds)
+//        {
+//            Keymap::Ptr keymap = gallery->getKeymap(Id);
+//
+//            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+//            {
+//                currentPiano->getProcessorOfType(reset.prepId,PreparationTypeBlendronic)->reset();
+//                //currentPiano->getBlendronicProcessor(reset.prepId)->reset();
+//                updateState->blendronicPreparationDidChange = true;
+//                break;
+//            }
+//        }
+//    }
     for (auto reset : currentPiano->modificationMap.getUnchecked(noteNumber)->tuningResets)
     {
         for (auto Id : reset.keymapIds)
@@ -1347,7 +1277,8 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             
             if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
-                currentPiano->getTuningProcessor(reset.prepId)->reset();
+                currentPiano->getProcessorOfType(reset.prepId,PreparationTypeTuning)->reset();
+                //currentPiano->getTuningProcessor(reset.prepId)->reset();
                 updateState->tuningPreparationDidChange = true;
                 break;
             }
@@ -1361,7 +1292,8 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             
             if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
-                currentPiano->getTempoProcessor(reset.prepId)->reset();
+                currentPiano->getProcessorOfType(reset.prepId,PreparationTypeTempo)->reset();
+                //currentPiano->getTempoProcessor(reset.prepId)->reset();
                 updateState->tempoPreparationDidChange = true;
                 break;
             }
@@ -1851,6 +1783,7 @@ void BKAudioProcessor::loadGalleryDialog(void)
 
 void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
 {
+    suspendProcessing(true);
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
         // if (currentPiano != nullptr) currentPiano->deconfigure();
@@ -1875,10 +1808,12 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
     }
 
     if (resetHistory) resetGalleryHistory();
+    suspendProcessing(false);
 }
 
 void BKAudioProcessor::loadGalleryFromPath(String path)
 {
+    suspendProcessing(true);
     updateState->loadedJson = false;
     
     if (path == "")
@@ -1900,6 +1835,7 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
 
         gallery->setURL(path);
     }
+    suspendProcessing(false);
 }
 
 void BKAudioProcessor::loadJsonGalleryDialog(void)
@@ -2100,12 +2036,9 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
     // anything else...
     else
     {
+        currentPiano->prepMap->handleMidiEvent(m);
+        prevPiano->prepMap->handleMidiEvent(m);
         
-        //PROCESSORS HANDLE MIDI EVENT (PROCESSOR UPDATE)
-//        mainPianoSynth.handleMidiEvent(m);
-//        hammerReleaseSynth.handleMidiEvent(m);
-//        resonanceReleaseSynth.handleMidiEvent(m);
-        pedalSynth.handleMidiEvent(m);
     }
 }
 
@@ -2143,47 +2076,9 @@ void BKAudioProcessor::hiResTimerCallback()
 
 void BKAudioProcessor::reset(BKPreparationType type, int Id)
 {
-    if (type == PreparationTypeDirect)
+    if (type < PreparationTypeKeymap)
     {
-        DirectProcessor::Ptr proc = currentPiano->getDirectProcessor(Id, false);
-        
-        if (proc != nullptr) proc->reset();
-    }
-    else if (type == PreparationTypeNostalgic)
-    {
-        NostalgicProcessor::Ptr proc = currentPiano->getNostalgicProcessor(Id, false);
-        
-        if (proc != nullptr) proc->reset();
-    }
-    else if (type == PreparationTypeSynchronic)
-    {
-        SynchronicProcessor::Ptr proc = currentPiano->getSynchronicProcessor(Id, false);
-        
-        if (proc != nullptr) proc->reset();
-    }
-    else if (type == PreparationTypeBlendronic)
-    {
-        BlendronicProcessor * proc = dynamic_cast<BlendronicProcessor*>(currentPiano->getBlendronicProcessor(Id, false).get());
-        
-        if (proc != nullptr) proc->reset();
-    }
-    else if (type == PreparationTypeResonance)
-    {
-        ResonanceProcessor::Ptr proc = currentPiano->getResonanceProcessor(Id, false);
-        
-        if (proc != nullptr) proc->reset();
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        TuningProcessor::Ptr proc = currentPiano->getTuningProcessor(Id, false);
-        
-        if (proc != nullptr) proc->reset();
-    }
-    else if (type == PreparationTypeTempo)
-    {
-        TempoProcessor::Ptr proc = currentPiano->getTempoProcessor(Id, false);
-        
-        if (proc != nullptr) proc->reset();
+        currentPiano->getProcessorOfType(Id, type);
     }
     else if (type == PreparationTypeKeymap)
     {
@@ -2219,14 +2114,14 @@ void BKAudioProcessor::reset(BKPreparationType type, int Id)
     }
     
 }
-
+//UPDATE (CODE CLEANUP)
 void BKAudioProcessor::clear(BKPreparationType type, int Id)
 {
     if (type == PreparationTypeDirect)
     {
         gallery->getDirect(Id)->clear();
         
-        DirectProcessor::Ptr proc = currentPiano->getDirectProcessor(Id, false);
+        DirectProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         
         if (proc != nullptr) proc->reset();
     }
@@ -2234,7 +2129,7 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     {
         gallery->getNostalgic(Id)->clear();
         
-        NostalgicProcessor::Ptr proc = currentPiano->getNostalgicProcessor(Id, false);
+        NostalgicProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         
         if (proc != nullptr) proc->reset();
     }
@@ -2242,7 +2137,7 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     {
         gallery->getSynchronic(Id)->clear();
         
-        SynchronicProcessor::Ptr proc = currentPiano->getSynchronicProcessor(Id, false);
+        SynchronicProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         
         if (proc != nullptr) proc->reset();
     }
@@ -2250,15 +2145,15 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     {
         gallery->getBlendronic(Id)->clear();
         
-        EffectProcessor::Ptr proc = currentPiano->getBlendronicProcessor(Id, false);
-        
-        if (proc != nullptr) proc->reset();
+//        EffectProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
+//        
+//        if (proc != nullptr) proc->reset();
     }
     else if (type == PreparationTypeResonance)
     {
         gallery->getResonance(Id)->clear();
         
-        ResonanceProcessor::Ptr proc = currentPiano->getResonanceProcessor(Id, false);
+        ResonanceProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         
         if (proc != nullptr) proc->reset();
     }
@@ -2266,7 +2161,7 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     {
         gallery->getTuning(Id)->clear();
         
-        TuningProcessor::Ptr proc = currentPiano->getTuningProcessor(Id, false);
+        TuningProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         
         if (proc != nullptr) proc->reset();
     }
@@ -2274,7 +2169,7 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     {
         gallery->getTempo(Id)->clear();
         
-        TempoProcessor::Ptr proc = currentPiano->getTempoProcessor(Id, false);
+        TempoProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         
         if (proc != nullptr) proc->reset();
     }

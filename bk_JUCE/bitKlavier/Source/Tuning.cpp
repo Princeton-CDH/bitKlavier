@@ -59,6 +59,7 @@ void TuningPreparation::performModification(TuningModification* p, Array<bool> d
 
 
 TuningProcessor::TuningProcessor(BKAudioProcessor& processor, Tuning::Ptr tuning):
+GenericProcessor(PreparationTypeTuning),
 processor(processor),
 tuning(tuning),
 keymaps(Keymap::PtrArr()),
@@ -186,11 +187,11 @@ int TuningProcessor::getAdaptiveClusterTimer()
 
 
 //for keeping track of current cluster size
-void TuningProcessor::processBlock(int numSamples)
+void TuningProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type)
 {
-    TuningAdaptiveSystemType type = tuning->prep->getAdaptiveType();
+    TuningAdaptiveSystemType _type = tuning->prep->getAdaptiveType();
     
-    if (type == AdaptiveNormal || type == AdaptiveAnchored) {
+    if (_type == AdaptiveNormal || _type == AdaptiveAnchored) {
         
         if(clusterTime <= (tuning->prep->getAdaptiveClusterThresh() * processor.getCurrentSampleRate() * 0.001))
             clusterTime += numSamples;

@@ -222,7 +222,7 @@ void TempoViewController::updateComponentVisibility()
 {
     if(modeCB.getText() == "Adaptive Tempo 1")
     {
-        TempoProcessor::Ptr mProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
+        TempoProcessor* mProcessor = dynamic_cast<TempoProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentTempoId, PreparationTypeTempo).get());
         
         bool keymapAttached = false;
         if (mProcessor->getKeymaps().size() > 0) keymapAttached = true;
@@ -313,7 +313,8 @@ void TempoPreparationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplayTempo)
     {
-        TempoProcessor::Ptr mProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
+        TempoProcessor* mProcessor = dynamic_cast<TempoProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentTempoId, PreparationTypeTempo).get());
+        
         TempoPreparation::Ptr prep = processor.gallery->getTempoPreparation(processor.updateState->currentTempoId);
         
         if (mProcessor != nullptr)
@@ -620,7 +621,7 @@ void TempoPreparationEditor::buttonClicked (Button* b)
     {
         DBG("resetting A1 tempo multiplier");
         
-        TempoProcessor::Ptr tProcessor = processor.currentPiano->getTempoProcessor(processor.updateState->currentTempoId);
+        TempoProcessor::Ptr tProcessor = processor.currentPiano->getProcessorOfType(processor.updateState->currentTempoId,PreparationTypeTempo);
         tProcessor->reset();
     }
     else if (b == &hideOrShow)

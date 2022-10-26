@@ -619,7 +619,7 @@ void ResonancePreparationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplayResonance)
     {
-        ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
+        ResonanceProcessor* proc = dynamic_cast<ResonanceProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentResonanceId, PreparationTypeResonance).get());
         ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
         
         if (prep != nullptr && proc != nullptr)
@@ -969,7 +969,6 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
     
     else if (source == &addKeyboardState )
     {
-        ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
         if (prep->rActiveHeldKeys.arrayContains(midiNoteNumber))
         {
             // clear this held string's partial
@@ -1406,7 +1405,7 @@ void ResonanceModificationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState*
     {
         addKeyboard->setAlpha(1.);
         mod->setDirty(ResonanceHeld);
-        ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
+        //ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
         if (mod->rActiveHeldKeys.arrayContains(midiNoteNumber))
         {
             // clear this held string's partial

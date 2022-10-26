@@ -1077,7 +1077,7 @@ void NostalgicPreparationEditor::timerCallback()
 {
     if (processor.updateState->currentDisplay == DisplayNostalgic)
     {
-        NostalgicProcessor::Ptr nProcessor = processor.currentPiano->getNostalgicProcessor(processor.updateState->currentNostalgicId);
+        NostalgicProcessor* nProcessor = dynamic_cast<NostalgicProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentNostalgicId, PreparationTypeNostalgic).get());
         NostalgicPreparation::Ptr prep = processor.gallery->getNostalgicPreparation(processor.updateState->currentNostalgicId);
         
         if (prep != nullptr && nProcessor != nullptr)

@@ -19,7 +19,7 @@
 #include "Keymap.h"
 #include "Blendronic.h"
 #include "BKPianoSampler.h"
-
+#include "GenericProcessor.h"
 class SynchronicModification;
 
 class SynchronicPreparation : public ReferenceCountedObject
@@ -1220,15 +1220,15 @@ private:
  multiple synchronic pulses all sharing the same settings
  */
 
-class SynchronicProcessor  : public ReferenceCountedObject
+class SynchronicProcessor  : public GenericProcessor
 {
     
 public:
-    typedef ReferenceCountedObjectPtr<SynchronicProcessor>   Ptr;
-    typedef Array<SynchronicProcessor::Ptr>                  PtrArr;
-    typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<SynchronicProcessor>                  Arr;
-    typedef OwnedArray<SynchronicProcessor,CriticalSection>  CSArr;
+//    typedef ReferenceCountedObjectPtr<SynchronicProcessor>   Ptr;
+//    typedef Array<SynchronicProcessor::Ptr>                  PtrArr;
+//    typedef Array<SynchronicProcessor::Ptr, CriticalSection> CSPtrArr;
+//    typedef OwnedArray<SynchronicProcessor>                  Arr;
+//    typedef OwnedArray<SynchronicProcessor,CriticalSection>  CSArr;
     
     
     SynchronicProcessor(Synchronic::Ptr synchronic,
@@ -1309,17 +1309,6 @@ public:
         return tempo->getId();
     }
 
-//    inline int getBlendronicId(void) const noexcept
-//    {
-//        return blendronic->getId();
-//    }
-
-    inline void prepareToPlay(float sr)
-    {
-        //synth = main;
-        //ADDSYNTH (Do synth set sample rate)
-    }
-    //void  atReset();
     
     inline void reset(void)
     {
@@ -1380,9 +1369,38 @@ public:
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     void swapClusterVelocities(Array<float>& swap) { clusterVelocities.swapWith(swap); }
+    void handleMidiEvent (const MidiMessage& m)
+    {
+        synth->handleMidiEvent(m);
+    }
+    inline void prepareToPlay(GeneralSettings::Ptr gen)
+    {
+        synth->playbackSampleRateChanged();
+        synth->setGeneralSettings(gen);
+        
+        synth->clearVoices();
+        
+        for (int i = 0; i < 300; i++)
+        {
+            synth->addVoice(new BKPianoSamplerVoice(gen));
+        }
+        DBG("syncrhonic preparetoplay");
+       
+    }
     
+    inline void allNotesOff()
+    {
+        for(int i = 0; i < 15; i++)
+        {
+           synth->allNotesOff(i,true);
+        }
+    }
+    void copyProcessorState(GenericProcessor::Ptr copy)
+    {
+        
+    }
 private:
-    BKSynthesiser* synth;
+    BKSynthesiser::Ptr synth;
     GeneralSettings::Ptr general;
     
     Synchronic::Ptr synchronic;

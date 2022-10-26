@@ -91,14 +91,21 @@ SympPartial::SympPartial(int newHeldKey, int newPartialKey, float newGain, float
 
 ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance,
                                        TuningProcessor::Ptr rTuning,
-                                       GeneralSettings::Ptr rGeneral):
+                                       GeneralSettings::Ptr rGeneral,
+                                       BKAudioProcessor &processor):
+                                       GenericProcessor(PreparationTypeResonance),
                                        tuning(rTuning),
                                        resonance(rResonance),
                                        general(rGeneral),
                                        keymaps(Keymap::PtrArr())
 {
     ////ADDSYNTH
-    //resonance->prep->synth = rMain;
+    resonance->prep->synth = new BKSynthesiser(processor, processor.gallery->getGeneralSettings(), processor.mainPianoSoundSet);
+    for (int i = 0; i < 300; i++)
+    {
+        resonance->prep->synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
+    }
+    
     for (int j = 0; j < 128; j++)
     {
         velocities.add(Array<float>());
@@ -113,7 +120,7 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance,
     if (!resonance->prep->rUseGlobalSoundSet.value)
     {
         String name = resonance->prep->rSoundSetName.value;
-        int Id = resonance->prep->synth->processor.findPathAndLoadSamples(name);
+        int Id = processor.findPathAndLoadSamples(name);
         resonance->prep->setSoundSet(Id);
     }
     for (int i : resonance->prep->rActiveHeldKeys.value)
@@ -134,6 +141,7 @@ ResonanceProcessor::~ResonanceProcessor()
 // N*M^2, where N is number of notes held, M is number of partials in partial structure
 void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
 {
+    TuningProcessor* _tuner =  dynamic_cast<TuningProcessor*>(tuning.get());
     // resonate existing sympStrings
     // see if there is overlap with the newly pressed key's partials and any sympPartials
     for (HashMap<int, Array<SympPartial::Ptr>>::Iterator heldNotePartials (resonance->prep->sympStrings); heldNotePartials.next();)
@@ -192,8 +200,8 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
 
                         // calculate the tuning gap between attached tuning and the tuning of this partial
                         // taking into account attached Tuning system, and defined partial structure (which may or may not be the same!)
-                        float tuningGap = fabs( tuning->getOffset(noteNumber, false)
-                                               - (tuning->getOffset(currentSympPartial->heldKey, false) + .01 * currentSympPartial->offset)
+                        float tuningGap = fabs( _tuner->getOffset(noteNumber, false)
+                                               - (_tuner->getOffset(currentSympPartial->heldKey, false) + .01 * currentSympPartial->offset)
                                               ) / .5; // in fractional note values
 
                         if (tuningGap > 2.) tuningGap = 2.;
@@ -216,7 +224,7 @@ void ResonanceProcessor::ringSympStrings(int noteNumber, float velocity)
                                 //noteNumber,
                                 currentSympPartial->heldKey,
                                 currentStruckPartial,
-                                tuning->getOffset(currentSympPartial->heldKey, false) + currentSympPartial->offset * .01,
+                                _tuner->getOffset(currentSympPartial->heldKey, false) + currentSympPartial->offset * .01,
                                 //tuning->getOffset(noteNumber, false),
                                 1.,
                                 aGlobalGain * currentSympPartial->gain * (1. - 0.5 * tuningGap),
@@ -405,12 +413,8 @@ void ResonanceProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
     }
 }
 
-void ResonanceProcessor::prepareToPlay(double sr)
-{
-    //TBD, might not be necessary?
-}
 
-void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
+void ResonanceProcessor::processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type)
 {
     // should not be any thread safety issues with this...
     // NOTE: this might be necessary anymore, since it is only needed for determining whether to
@@ -433,6 +437,7 @@ void ResonanceProcessor::processBlock(int numSamples, int midiChannel)
         }
     }
      */
+    resonance->prep->synth->renderNextBlock(buffer, midiMessages, 0, numSamples);
 }
 
 void Resonance::clear()

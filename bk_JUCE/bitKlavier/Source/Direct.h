@@ -17,7 +17,8 @@
 #include "Tuning.h"
 #include "Blendronic.h"
 #include "Effects.h"
-
+#include "BKPianoSampler.h"
+#include "GenericProcessor.h"
 class DirectModification;
 
 /*
@@ -477,16 +478,16 @@ private:
  values it needs to behave as expected.
  */
 
-class DirectProcessor : public ReferenceCountedObject
+class DirectProcessor : public GenericProcessor
 {
     
 public:
-    typedef ReferenceCountedObjectPtr<DirectProcessor>   Ptr;
-    typedef Array<DirectProcessor::Ptr>                  PtrArr;
-    typedef Array<DirectProcessor::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<DirectProcessor>                  Arr;
-    typedef OwnedArray<DirectProcessor, CriticalSection> CSArr;
-    
+//    typedef ReferenceCountedObjectPtr<DirectProcessor>   Ptr;
+//    typedef Array<DirectProcessor::Ptr>                  PtrArr;
+//    typedef Array<DirectProcessor::Ptr, CriticalSection> CSPtrArr;
+//    typedef OwnedArray<DirectProcessor>                  Arr;
+//    typedef OwnedArray<DirectProcessor, CriticalSection> CSArr;
+//    
     
     DirectProcessor(Direct::Ptr direct,
                     TuningProcessor::Ptr tuning,
@@ -495,15 +496,44 @@ public:
     ~DirectProcessor();
     
     BKSampleLoadType sampleType;
-    void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type);
+    void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type) override;
     
-    void    keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress);
-    void    keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress);
+    void    keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress) override;
+    void    keyReleased(int noteNumber, Array<float>& targetVelocities, bool fromPress) override;
     void    playReleaseSample(int noteNumber, Array<float>& targetVelocities,
                               bool fromPress, bool soundfont = false);
     
-    inline void prepareToPlay(double s)
+    inline void prepareToPlay(GeneralSettings::Ptr gen) override
     {
+        synth->playbackSampleRateChanged();
+        synth->setGeneralSettings(gen);
+        
+        hammerSynth->playbackSampleRateChanged();
+        hammerSynth->setGeneralSettings(gen);
+        
+        resonanceSynth->playbackSampleRateChanged();
+        resonanceSynth->setGeneralSettings(gen);
+        
+        pedalSynth->playbackSampleRateChanged();
+        pedalSynth->setGeneralSettings(gen);
+        
+        synth->clearVoices();
+        hammerSynth->clearVoices();
+        resonanceSynth->clearVoices();
+        pedalSynth->clearVoices();
+        
+        
+        for (int i = 0; i < 300; i++)
+        {
+            synth->addVoice(new BKPianoSamplerVoice(gen));
+        }
+        for (int i = 0; i < 128; i++)
+        {
+            resonanceSynth->addVoice(new BKPianoSamplerVoice(gen));
+            hammerSynth->addVoice(new BKPianoSamplerVoice(gen));
+            pedalSynth->addVoice(new BKPianoSamplerVoice(gen));
+        }
+        DBG("direct prepartoplay end");
     }
     
     inline void reset(void)
@@ -512,7 +542,7 @@ public:
         DBG("direct reset called");
     }
     
-    inline int getId(void) const noexcept { return direct->getId(); }
+    inline int getId(void)  const noexcept { return direct->getId(); }
     
     inline void setTuning(TuningProcessor::Ptr tuning)
     {
@@ -525,33 +555,71 @@ public:
     }
     
     
-    inline void addKeymap(Keymap::Ptr keymap)
-    {
-        keymaps.add(keymap);
-    }
     
-    inline Keymap::PtrArr getKeymaps(void)
-    {
-        return keymaps;
-    }
     
-    inline float getLastVelocity() const noexcept { return lastVelocity; }
     
     // Return vel if within range, else return -1.f
-    float filterVelocity(float vel);
-    void resetLastVelocity() { lastVelocityInRange = false; }
+    float filterVelocity(float vel) override;
     
     Array<Array<float>>& getVelocities() { return velocities; }
     Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
     
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
+    void sustainPedalPressed() 
+    {
+        pedalSynth->keyOn(1 ,
+                           //synthNoteNumber,
+                           21,
+                           21,
+                           0,
+                           0.02, //gain
+                           1.,
+                           Forward,
+                           Normal, //FixedLength,
+                           PedalNote,
+                           0,
+                           0,
+                           0,
+                           20000,
+                           3,
+                           3 );
+    }
+    
+    void handleMidiEvent (const MidiMessage& m) override
+    {
+        synth->handleMidiEvent(m);
+        resonanceSynth->handleMidiEvent(m);
+        hammerSynth->handleMidiEvent(m);
+        pedalSynth->handleMidiEvent(m);
+        
+    }
+    
+    inline void allNotesOff()
+    {
+        for(int i = 0; i < 15; i++)
+        {
+            synth->allNotesOff(i,true);
+            resonanceSynth->allNotesOff(i,true);
+            hammerSynth->allNotesOff(i,true);
+            pedalSynth->allNotesOff(i,true);
+        }
+    }
+    
+    inline BKSynthesiser* getPedalSynth()
+    {
+        return pedalSynth;
+    }
+    void copyProcessorState(GenericProcessor::Ptr copy)
+    {
+        
+    }
     
 private:
-    BKSynthesiser*      synth;
-    BKSynthesiser*      resonanceSynth;
-    BKSynthesiser*      hammerSynth;
-    
+    BKSynthesiser::Ptr      synth;
+    BKSynthesiser::Ptr  resonanceSynth;
+    BKSynthesiser::Ptr      hammerSynth;
+    BKSynthesiser::Ptr      pedalSynth;
     Direct::Ptr             direct;
     TuningProcessor::Ptr    tuner;
     
