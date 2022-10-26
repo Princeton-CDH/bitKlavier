@@ -78,17 +78,9 @@ bool PreparationMap::contains(Keymap::Ptr thisOne)
     return false;
 }
 
-void     PreparationMap::getProcessorsOfType(GenericProcessor::PtrArr p, BKPreparationType type)
+ ReferenceCountedArray<GenericProcessor>*    PreparationMap::getProcessorsOfType(BKPreparationType type)
 {
-    for (auto proc : *processors.getUnchecked(type))
-    {
-        if (proc->getType() == type)
-        {
-
-
-            p.add(proc);//p.add(dynamic_cast<DirectProcessor*>(proc.get()));
-        }
-    }
+     return processors.getUnchecked(type);
 }
 
 GenericProcessor::Ptr        PreparationMap::getProcessorOfType(int Id, BKPreparationType type)

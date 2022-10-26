@@ -287,9 +287,9 @@ GenericProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
 
 GenericProcessor::Ptr Piano::getProcessorOfType(int Id, BKPreparationType type, bool add)
 {
-    GenericProcessor::PtrArr processor;
-    prepMap->getProcessorsOfType(processor, BKPreparationType::PreparationTypeDirect);
-    for (auto proc : processor)
+    
+    ReferenceCountedArray<GenericProcessor>* _processor = prepMap->getProcessorsOfType(type);
+    for (auto proc : *_processor)
     {
         if (proc->getId() == Id) return proc;
     }

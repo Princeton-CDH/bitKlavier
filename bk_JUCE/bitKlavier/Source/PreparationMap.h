@@ -153,7 +153,7 @@ public:
     bool                        contains                (Keymap::Ptr);
     
  
-    void     getProcessorsOfType    (GenericProcessor::PtrArr, BKPreparationType);
+    ReferenceCountedArray<GenericProcessor>*     getProcessorsOfType    (BKPreparationType);
     GenericProcessor::Ptr        getProcessorOfType    (int Id, BKPreparationType);
     bool                        contains                (GenericProcessor::Ptr, BKPreparationType);
     void  clearProcessors() {
