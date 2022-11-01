@@ -31,7 +31,7 @@ void TempoPreparation::performModification(TempoModification* s, Array<bool> dir
 }
 
 TempoProcessor::TempoProcessor(BKAudioProcessor& processor, Tempo::Ptr t):
-GenericProcessor(PreparationTypeTempo),
+GenericProcessor(PreparationTypeTempo, TargetTypeTempo, TargetTypeTempo),
 processor(processor),
 tempo(t),
 keymaps(Keymap::PtrArr())

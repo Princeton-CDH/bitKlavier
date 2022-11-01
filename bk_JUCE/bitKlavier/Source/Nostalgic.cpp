@@ -68,7 +68,7 @@ NostalgicProcessor::NostalgicProcessor(Nostalgic::Ptr nostalgic,
                                        BKAudioProcessor& processor
                                        /*BKSynthesiser *s */):
 //synth(s),
-GenericProcessor(PreparationTypeNostalgic),
+GenericProcessor(PreparationTypeNostalgic, TargetTypeNostalgic, TargetTypeNostalgicClear),
 post(false),
 nostalgic(nostalgic),
 tuner(tuning),

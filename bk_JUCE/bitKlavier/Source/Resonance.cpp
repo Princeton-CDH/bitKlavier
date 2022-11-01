@@ -93,7 +93,7 @@ ResonanceProcessor::ResonanceProcessor(Resonance::Ptr rResonance,
                                        TuningProcessor::Ptr rTuning,
                                        GeneralSettings::Ptr rGeneral,
                                        BKAudioProcessor &processor):
-                                       GenericProcessor(PreparationTypeResonance),
+                                       GenericProcessor(PreparationTypeResonance, TargetTypeResonanceAdd, TargetTypeResonanceRing),
                                        tuning(rTuning),
                                        resonance(rResonance),
                                        general(rGeneral),

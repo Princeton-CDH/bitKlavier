@@ -252,7 +252,6 @@ public:
 //       }
      
    }
-    //NOT FIN
     void allNotesOff()
     {
         for (auto proc : processors)
@@ -260,17 +259,17 @@ public:
             if (proc->getFirst() != nullptr)
             {
                 if (proc->getFirst()->getType() < PreparationTypeNostalgic || proc->getFirst()->getType() == PreparationTypeResonance)
-                    //proc->allNotesOff();    rprocessor.addIfNotAlreadyThere(p);
+                    
                     for (auto p : *proc)
                     {
-                        int i =0; //HACK ADD NOTES OFF CODE
+                        p->allNotesOff();
                     }
                     return;
             }
         }
     }
     
-    void fillVelocities(Array<float> pressTargetVelocities, Array<float> releaseTargetVelocities, KeymapTargetType begin, KeymapTargetType end, float velocity, Keymap::Ptr km, int noteNumber, int mappedFrom, String source, bool &ignoreSustain, GenericProcessor::Ptr proc)
+    void fillVelocities(Array<float> &pressTargetVelocities, Array<float> &releaseTargetVelocities, KeymapTargetType begin, KeymapTargetType end, float velocity, Keymap::Ptr km, int noteNumber, int mappedFrom, String source, bool &ignoreSustain, GenericProcessor::Ptr proc)
     {
         
             if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))

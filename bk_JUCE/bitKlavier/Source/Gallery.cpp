@@ -78,9 +78,9 @@ url(String())
 
 
 
-void Gallery::prepareToPlay (double sampleRate)
+void Gallery::prepareToPlay ()
 {
-    for (auto piano : bkPianos) piano->prepareToPlay();
+    for (auto piano : bkPianos) piano->prepMap->prepareToPlay(general);
 }
 
 Gallery::~Gallery()

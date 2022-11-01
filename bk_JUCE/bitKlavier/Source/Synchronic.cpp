@@ -81,7 +81,7 @@ SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
                                          TempoProcessor::Ptr tempo,
                                          BKAudioProcessor &processor,
                                          GeneralSettings::Ptr general):
-GenericProcessor(PreparationTypeSynchronic),
+GenericProcessor(PreparationTypeSynchronic, TargetTypeSynchronic, TargetTypeSynchronicRotate),
 general(general),
 synchronic(synchronic),
 tuner(tuning),

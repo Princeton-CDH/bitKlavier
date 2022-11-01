@@ -59,7 +59,7 @@ void TuningPreparation::performModification(TuningModification* p, Array<bool> d
 
 
 TuningProcessor::TuningProcessor(BKAudioProcessor& processor, Tuning::Ptr tuning):
-GenericProcessor(PreparationTypeTuning),
+GenericProcessor(PreparationTypeTuning,TargetTypeTuning, TargetTypeTuning),
 processor(processor),
 tuning(tuning),
 keymaps(Keymap::PtrArr()),

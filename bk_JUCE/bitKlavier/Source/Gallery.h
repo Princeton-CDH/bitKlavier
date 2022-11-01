@@ -793,7 +793,7 @@ public:
         return bkKeymaps;
     }
     
-    void prepareToPlay (double sampleRate);
+    void prepareToPlay ();
 
     inline int getNewId(BKPreparationType type)
     {

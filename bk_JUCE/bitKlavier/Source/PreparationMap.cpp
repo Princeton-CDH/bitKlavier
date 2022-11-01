@@ -98,14 +98,6 @@ GenericProcessor::Ptr        PreparationMap::getProcessorOfType(int Id, BKPrepar
 bool PreparationMap::contains(GenericProcessor::Ptr thisOne, BKPreparationType type)
 {
     return processors.getUnchecked(type)->contains(thisOne);
-//    for (auto p : )
-//    {
-//        if (p->getId() == thisOne->getId())
-//        {
-//            return true;
-//        }
-//    }
-//    return false;
 }
 
 
@@ -197,256 +189,30 @@ void PreparationMap::keyPressed(int noteNumber, float velocity, int channel, int
     if (checkForSustain) attemptSustain(noteNumber, velocity, channel, mappedFrom, true, soundfont, source);
     if (checkForReattack) attemptReattack(noteNumber, mappedFrom, source);
     
-    for (auto proc : *processors[PreparationTypeTuning])
-    {
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                if (km->getTargetStates()[TargetTypeTuning])
-                {
-                    // tuning doesn't use velocity, so no need to apply curve
-                    if (km->isInverted())
-                    {
-                        releaseTargetVelocities.setUnchecked(TargetTypeTuning, velocity);
-                    }
-                    else
-                    {
-                        pressTargetVelocities.setUnchecked(TargetTypeTuning, velocity);
-                    }
-                }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
-            }
-        }
-        proc->keyPressed(noteNumber, pressTargetVelocities, true);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
-        releaseTargetVelocities.fill(-1.f);
-    }
-    
-    for (auto proc : *processors[PreparationTypeTempo])
-    {
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                if (km->getTargetStates()[TargetTypeTuning])
-                {
-                    // tempo doesn't use velocity, so no need to apply curve
-                    if (km->isInverted())
-                    {
-                        releaseTargetVelocities.setUnchecked(TargetTypeTempo, velocity);
-                    }
-                    else
-                    {
-                        pressTargetVelocities.setUnchecked(TargetTypeTempo, velocity);
-                    }
-                }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
-            }
-        }
-        proc->keyPressed(noteNumber, pressTargetVelocities, true);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
-        releaseTargetVelocities.fill(-1.f);
-    }
-    
-//    for (auto proc : eprocessor)
-//    {
-//        if (proc->getType() == EffectBlendronic)
-//        {
-//            bool ignoreSustain = !sustainPedalIsDepressed;
-//            for (auto km : proc->getKeymaps())
-//            {
-//                // Check that the the keymap contains the pressed note and uses the midi source of the note
-//                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-//                {
-//                    // For each target
-//                    for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
-//                    {
-//                        // Check that the target is enabled
-//                        if (km->getTargetStates()[i])
-//                        {
-//                            // If the keymap is inverted, this is a release
-//                            if (km->isInverted())
-//                            {
-//                                // Apply the curve and take the max velocity of any redundant cases
-//                                float v = jmax(releaseTargetVelocities.getUnchecked(i),
-//                                               km->applyVelocityCurve(velocity));
-//                                releaseTargetVelocities.setUnchecked(i, v);
-//                            }
-//                            // Otherwise a press
-//                            else
-//                            {
-//                                // Apply the curve and take the max velocity of any redundant cases
-//                                float v = jmax(pressTargetVelocities.getUnchecked(i),
-//                                               km->applyVelocityCurve(velocity));
-//                                pressTargetVelocities.setUnchecked(i, v);
-//                            }
-//                        }
-//                    }
-//                    if (km->getIgnoreSustain()) ignoreSustain = true;
-//                }
-//            }
-//            proc->keyPressed(noteNumber, pressTargetVelocities, true);
-//            pressTargetVelocities.fill(-1.f);
-//
-//            if (ignoreSustain && !noteDown)
-//                proc->keyReleased(noteNumber, releaseTargetVelocities, true);
-//            releaseTargetVelocities.fill(-1.f);
-//        }
-//    }
-    
-    for (auto proc : *processors[PreparationTypeDirect])
-    {
-        
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        proc->resetLastVelocity();
 
-        for (auto km : proc->getKeymaps())
+    for (auto procArr : processors){
+        for (auto proc : *procArr)
         {
-            // Check that the keymap contains this note mapped from this harmonizer note
-            // and that it uses this midi source
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                // Check that Direct is enabled as a target (should always be true until we add other targets)
-                if (km->getTargetStates()[TargetTypeDirect])
-                {
-                    // Collect inverted keymaps into one velocities array
-                    if (km->isInverted())
-                    {
-                        // Apply curve, take the max of any overlapping cases, then filter
-                        float v = proc->filterVelocity(jmax(releaseTargetVelocities.getUnchecked(TargetTypeDirect),
-                                                            km->applyVelocityCurve(velocity)));
-                        releaseTargetVelocities.set(TargetTypeDirect, v);
-                    }
-                    // Collect normal keymaps into another velocity array
-                    else
-                    {
-                        float v = proc->filterVelocity(jmax(pressTargetVelocities.getUnchecked(TargetTypeDirect),
-                                                            km->applyVelocityCurve(velocity)));
-                        pressTargetVelocities.set(TargetTypeDirect, v);
-                    }
-                }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
-            }
-        }
-        // Send the processor the velocities collected from normal keymaps and let it know this is a keypress
-        proc->keyPressed(noteNumber, pressTargetVelocities, true);
-        pressTargetVelocities.fill(-1.f);
-        
-        // Send the processor the velocities collected from inverted keymaps and let it know this is a keypress
-        dynamic_cast<DirectProcessor*>(proc)->playReleaseSample(noteNumber, releaseTargetVelocities, true, soundfont);
-        if (ignoreSustain && !noteDown) // Don't keyrelease if we're sustaining or the note isn't down
-            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
-        releaseTargetVelocities.fill(-1.f);
-    }
-    
-    for (auto proc : *processors[PreparationTypeSynchronic])
-    {
-        
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        proc->resetLastVelocity();
-        for (auto km : proc->getKeymaps())
-        {
-            fillVelocities(pressTargetVelocities, releaseTargetVelocities, TargetTypeSynchronic, TargetTypeSynchronicRotate,
-                           velocity, km, noteNumber, mappedFrom, source, ignoreSustain, proc);
-        }
-        proc->keyPressed(noteNumber, pressTargetVelocities, true);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
-        releaseTargetVelocities.fill(-1.f);
-    }
-    
-    for (auto proc : *processors[PreparationTypeNostalgic])
-    {
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        proc->resetLastVelocity();
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                for (int i = TargetTypeNostalgic; i <= TargetTypeNostalgicClear; i++)
-                {
-                    if (km->getTargetStates()[i])
-                    {
-                        if (km->isInverted())
-                        {
-                            float v = proc->filterVelocity(jmax(releaseTargetVelocities.getUnchecked(i),
-                                                                km->applyVelocityCurve(velocity)));
-                            releaseTargetVelocities.setUnchecked(i, v);
-                        }
-                        else
-                        {
-                            float v = proc->filterVelocity(jmax(pressTargetVelocities.getUnchecked(i),
-                                                                km->applyVelocityCurve(velocity)));
-                            pressTargetVelocities.setUnchecked(i, v);
-                        }
-                    }
-                }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
-            }
-        }
-        proc->keyPressed(noteNumber, pressTargetVelocities, true);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
-        releaseTargetVelocities.fill(-1.f);
-    }
-    
-    for (auto proc : *processors[PreparationTypeResonance])
-    {
-        //bool toggleRelease = false;
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        // For each Keymap in each resonance processor
-        for (auto km : proc->getKeymaps())
-        {
-            // Check that the keymap contains this note mapped from this harmonizer note
-            // and that it uses this midi source
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; i++ ){
-                    // Check that resonance is enabled as a target (should always be true until we add other targets)
-                    if (km->getTargetStates()[i])
-                    {
-                        // Collect inverted keymaps into one velocities array
-                        if (km->isInverted())
-                        {
-                            // Apply curve, take the max of any overlapping cases, then filter
-                            float v = jmax(releaseTargetVelocities.getUnchecked(i),
-                                                                km->applyVelocityCurve(velocity));
-                            releaseTargetVelocities.set(i, v);
-                        }
-                        // Collect normal keymaps into another velocity array
-                        else
-                        {
-                            float v = jmax(pressTargetVelocities.getUnchecked(i),
-                                                                km->applyVelocityCurve(velocity));
-                            pressTargetVelocities.set(i, v);
-                        }
-                    }
-                }
             
-                if (km->getIgnoreSustain()) ignoreSustain = true;
+            bool ignoreSustain = !sustainPedalIsDepressed;
+            proc->resetLastVelocity();
+            for (auto km : proc->getKeymaps())
+            {
+                fillVelocities(pressTargetVelocities, releaseTargetVelocities, proc->targetTypeStart, proc->targetTypeEnd,
+                               velocity, km, noteNumber, mappedFrom, source, ignoreSustain, proc);
             }
+            proc->keyPressed(noteNumber, pressTargetVelocities, true);
+            pressTargetVelocities.fill(-1.f);
+            
+            if (ignoreSustain && !noteDown)
+                proc->keyReleased(noteNumber, releaseTargetVelocities, true);
+            releaseTargetVelocities.fill(-1.f);
+            if( proc->getType() == PreparationTypeDirect)
+                dynamic_cast<DirectProcessor*>(proc)->playReleaseSample(noteNumber, releaseTargetVelocities, true, soundfont);
         }
-        // Send the processor the velocities collected from normal keymaps and let it know this is a keypress
-        proc->keyPressed(noteNumber, pressTargetVelocities, true);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown) // Don't keyrelease if we're sustaining or the note isn't down
-            proc->keyReleased(noteNumber, releaseTargetVelocities, true);
-        releaseTargetVelocities.fill(-1.f);
     }
+    
+ 
     
     // PERFORM MODIFICATION STUFF
 }
@@ -552,340 +318,21 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
     // sort out whether this is an actual release, or actually a noteOn becuase of isInverted()
     if (foundSustain) attemptSustain(noteNumber, velocity, channel, mappedFrom, false, soundfont, source);
     if (foundReattack) attemptReattack(noteNumber, mappedFrom, source);
-    
-    for (auto proc : *processors[PreparationTypeDirect])
-    {
-        
+    for (auto procArr : processors){
+        for (auto proc : *procArr)
+        {
         // figure out whether this note should cut off or sustain, and do a bunch of other housekeeping
-        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeDirect, TargetTypeDirect, pressTargetVelocities, releaseTargetVelocities);
+        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, proc->targetTypeStart, proc->targetTypeEnd, pressTargetVelocities, releaseTargetVelocities);
         
         // we're always going to play the release sample in Direct, regardless of sustain state, since hammer will release regardless
-        dynamic_cast<DirectProcessor*>(proc)->playReleaseSample(noteNumber, releaseTargetVelocities, false, soundfont);
+        if( proc->getType() == PreparationTypeDirect)
+                dynamic_cast<DirectProcessor*>(proc)->playReleaseSample(noteNumber, releaseTargetVelocities, false, soundfont);
         
         // now, do the actual release/damping, as determined by cutOffNote
         if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
         releaseTargetVelocities.fill(-1.f);
         
-        
-        /*
-        // will be true if the note should cut off, not sustained
-        //      as determined by sustain and sostenuto pedals, and/or whether this keymap is in ignoreSustain() mode
-        bool cutOffNote;
-        
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                if (km->getTargetStates()[TargetTypeDirect])
-                {
-                    if (km->isInverted())
-                    {
-                        // Don't filter release velocities because they are not reliable.
-                        // The processor will internally ignore this release if the
-                        // last key press was filtered out.
-                        float v = jmax(pressTargetVelocities.getUnchecked(TargetTypeDirect),
-                                       km->applyVelocityCurve(velocity));
-                        pressTargetVelocities.setUnchecked(TargetTypeDirect, v);
-                    }
-                    else
-                    {
-                        float v = jmax(releaseTargetVelocities.getUnchecked(TargetTypeDirect),
-                                       km->applyVelocityCurve(velocity));
-                        releaseTargetVelocities.setUnchecked(TargetTypeDirect, v);
-                    }
-                }
-
-                // determine whether this note should be sustaining or not, either because of the sustain or sostenuto pedals
-                //      factors include:
-                //          - whether this keymap is set to ignore the sustain pedal,
-                //          - whether this keymap is set so the sustain pedal behaves like a sostenuto pedal
-                //          - the somewhat confusing interaction between sustain and sostenuto pedals!
-                cutOffNote = km->isUnsustainingNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed);
-                if (km->getIgnoreSustain() || cutOffNote) cutOffNote = true;
-                else cutOffNote = false;
-
-            }
         }
-        
-        // last argument indicates this is NOT from an actual key press
-        proc->keyPressed(noteNumber, pressTargetVelocities, false);
-        pressTargetVelocities.fill(-1.f);
-        
-        // we're always going to play the release sample in Direct, regardless of sustain state, since hammer will release regardless
-        proc->playReleaseSample(noteNumber, releaseTargetVelocities, false, soundfont);
-        
-        // now, do the actual release/damping, as determined by cutOffNote
-        if (cutOffNote && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-
-        // store release velocities
-        releaseTargetVelocities.fill(-1.f);
-         */
-         
-
-    }
-    
-    for (auto proc : *processors[PreparationTypeTuning])
-    {
-        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeTuning, TargetTypeTuning, pressTargetVelocities, releaseTargetVelocities);
-        
-        // now, do the actual release/damping, as determined by cutOffNote
-        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-        
-        /*
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                if (km->getTargetStates()[TargetTypeTuning])
-                {
-                    if (km->isInverted())
-                    {
-                        pressTargetVelocities.setUnchecked(TargetTypeTuning, velocity);
-                    }
-                    else
-                    {
-                        releaseTargetVelocities.setUnchecked(TargetTypeTuning, velocity);
-                    }
-                }
-                // if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
-            }
-        }
-        
-        proc->keyPressed(noteNumber, pressTargetVelocities, false);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-         */
-    }
-    
-    for (auto proc : *processors[PreparationTypeSynchronic])
-    {
-        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeSynchronic, TargetTypeSynchronicRotate, pressTargetVelocities, releaseTargetVelocities);
-        
-        // now, do the actual release/damping, as determined by cutOffNote
-        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-        
-        /*
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
-                {
-                    if (km->getTargetStates()[i])
-                    {
-                        if (km->isInverted())
-                        {
-                            float v = jmax(pressTargetVelocities.getUnchecked(i),
-                                           km->applyVelocityCurve(velocity));
-                            pressTargetVelocities.setUnchecked(i, v);
-                        }
-                        else
-                        {
-                            float v = jmax(releaseTargetVelocities.getUnchecked(i),
-                                           km->applyVelocityCurve(velocity));
-                            releaseTargetVelocities.setUnchecked(i, v);
-                        }
-                    }
-                }
-                // if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
-            }
-        }
-        proc->keyPressed(noteNumber, pressTargetVelocities, false);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-         */
-    }
-    
-    for (auto proc : *processors[PreparationTypeNostalgic])
-    {
-        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeNostalgic, TargetTypeNostalgicClear, pressTargetVelocities, releaseTargetVelocities);
-        
-        // now, do the actual release/damping, as determined by cutOffNote
-        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-        
-        /*
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                for (int i = TargetTypeNostalgic; i <= TargetTypeNostalgicClear; i++)
-                {
-                    if (km->getTargetStates()[i])
-                    {
-                        if (km->isInverted())
-                        {
-                            float v = jmax(pressTargetVelocities.getUnchecked(i),
-                                           km->applyVelocityCurve(velocity));
-                            pressTargetVelocities.setUnchecked(i, v);
-                        }
-                        else
-                        {
-                            float v = jmax(releaseTargetVelocities.getUnchecked(i),
-                                           km->applyVelocityCurve(velocity));
-                            releaseTargetVelocities.setUnchecked(i, v);
-                        }
-                    }
-                }
-                // if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
-            }
-        }
-        proc->keyPressed(noteNumber, pressTargetVelocities, false);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-         */
-    }
-    
-//    for (auto proc : eprocessor)
-//    {
-//        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeBlendronicPatternSync, TargetTypeBlendronicOpenCloseOutput, pressTargetVelocities, releaseTargetVelocities);
-//
-//        // now, do the actual release/damping, as determined by cutOffNote
-//        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-//        releaseTargetVelocities.fill(-1.f);
-//    }
-        /*
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
-                {
-                    if (km->getTargetStates()[i])
-                    {
-                        if (km->isInverted())
-                        {
-                            float v = jmax(pressTargetVelocities.getUnchecked(i),
-                                           km->applyVelocityCurve(velocity));
-                            pressTargetVelocities.setUnchecked(i, v);
-                        }
-                        else
-                        {
-                            float v = jmax(releaseTargetVelocities.getUnchecked(i),
-                                           km->applyVelocityCurve(velocity));
-                            releaseTargetVelocities.setUnchecked(i, v);
-                        }
-                    }
-                }
-                // if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
-            }
-        }
-        proc->keyPressed(noteNumber, pressTargetVelocities, false);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-         */
-    
-    
-    for (auto proc : *processors[PreparationTypeTuning])
-    {
-        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeTempo, TargetTypeTempo, pressTargetVelocities, releaseTargetVelocities);
-
-        // now, do the actual release/damping, as determined by cutOffNote
-        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-        
-        /*
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                if (km->getTargetStates()[TargetTypeTempo])
-                {
-                    if (km->isInverted())
-                    {
-                        pressTargetVelocities.setUnchecked(TargetTypeTempo, velocity);
-                    }
-                    else
-                    {
-                        releaseTargetVelocities.setUnchecked(TargetTypeTempo, velocity);
-                    }
-                }
-                // if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
-            }
-        }
-        proc->keyPressed(noteNumber, pressTargetVelocities, false);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-         */
-    }
-    
-    for (auto proc : *processors[PreparationTypeResonance])
-    {
-        cutOffNote = keyReleasedByProcess(proc, noteNumber, velocity, mappedFrom, source, noteDown, soundfont, TargetTypeResonanceAdd, TargetTypeResonanceRing, pressTargetVelocities, releaseTargetVelocities);
-        
-        // now, do the actual release/damping, as determined by cutOffNote
-        if (cutOffNote && !noteDown) proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-        
-        
-        /*
-        bool ignoreSustain = !sustainPedalIsDepressed;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; i++ ){
-                    // Check that Direct is enabled as a target (should always be true until we add other targets)
-                    if (km->getTargetStates()[i])
-                    {
-                        // Collect inverted keymaps into one velocities array
-                        if (km->isInverted())
-                        {
-                            // Don't filter release velocities because they are not reliable.
-                            // The processor will internally ignore this release if the
-                            // last key press was filtered out.
-                            float v = jmax(releaseTargetVelocities.getUnchecked(i),
-                                                                km->applyVelocityCurve(velocity));
-                            pressTargetVelocities.setUnchecked(i, v);
-                        }
-                        // Collect normal keymaps into another velocity array
-                        else
-                        {
-                            float v = jmax(pressTargetVelocities.getUnchecked(i),
-                                                                km->applyVelocityCurve(velocity));
-                            releaseTargetVelocities.setUnchecked(i, v);
-                        }
-                    }
-                }
-                //if (km->getIgnoreSustain()) ignoreSustain = true;
-                if (km->getIgnoreSustain() || (km->isUnsustainingNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed))) ignoreSustain = true;
-            }
-        }
-        proc->keyPressed(noteNumber, pressTargetVelocities, false);
-        pressTargetVelocities.fill(-1.f);
-        
-        if (ignoreSustain && !noteDown)
-            proc->keyReleased(noteNumber, releaseTargetVelocities, false);
-        releaseTargetVelocities.fill(-1.f);
-         */
     }
 }
 
@@ -945,14 +392,6 @@ void PreparationMap::pedalReleaseByProcess(P proc, int noteNumber, float velocit
     {
         if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
         {
-            /*
-            if (km->getTargetStates()[targetType])
-            {
-                hasActiveTarget = true;
-                float v = km->applyVelocityCurve(velocity);
-                targetVelocities.set(targetType, v);
-            }
-             */
             
             for (int i = targetTypeStart; i <= targetTypeEnd; i++)
             {
@@ -1009,224 +448,48 @@ void PreparationMap::pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysT
          check against that flag for release
         */
         
-        for (auto proc : *processors[PreparationTypeDirect])
-        {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeDirect, TargetTypeDirect);
-            //turn off pedal down resonance
-         //HACK (CODE CLEANUP) DAVIS
-            dynamic_cast<DirectProcessor*>(proc)->getPedalSynth()->keyOff(1,
-                              PedalNote,
-                              0,
-                              0,
-                              21,
-                              21,
-                              1.,
-                              1.,
-                              nullptr,
-                              true);
-            
-            
-            
-             
-            /*
-            hasActiveTarget = false;
-            allIgnoreSustain = true;
-            isActiveSostenutoNote = false;
-            
-            for (auto km : proc->getKeymaps())
+        for (auto procArr : processors){
+            for (auto proc : *procArr)
             {
-                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+                pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, proc->targetTypeStart, proc->targetTypeEnd);
+                //turn off pedal down resonance
+             //HACK (CODE CLEANUP) DAVIS
+                if (proc->getType() == PreparationTypeDirect)
                 {
-                    if (km->getTargetStates()[TargetTypeDirect])
-                    {
-                        hasActiveTarget = true;
-                        float v = km->applyVelocityCurve(velocity);
-                        targetVelocities.set(TargetTypeDirect, v);
-                    }
-                    
-                    if (!km->getIgnoreSustain()) allIgnoreSustain = false;
-                    if (km->getIsSostenuto()) km->deactivateSostenuto();
-                    isActiveSostenutoNote = !km->isUnsustainingNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed);
+                    dynamic_cast<DirectProcessor*>(proc)->getPedalSynth()->keyOff(1,
+                                      PedalNote,
+                                      0,
+                                      0,
+                                      21,
+                                      21,
+                                      1.,
+                                      1.,
+                                      nullptr,
+                                      true);
+                    //play pedalUp sample
+                    dynamic_cast<DirectProcessor*>(proc)->getPedalSynth()->keyOn(1,
+                                     //synthNoteNumber,
+                                     22,
+                                     22,
+                                     0,
+                                     0.03, //gain
+                                     1.,
+                                     Forward,
+                                     Normal, //FixedLength,
+                                     PedalNote,
+                                     0,
+                                     0,
+                                     0,
+                                     2000,
+                                     3,
+                                     3 );
                 }
             }
-
-            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget && !isActiveSostenutoNote)
-                proc->keyReleased(noteNumber, targetVelocities, false);
-            
-            targetVelocities.fill(-1.f);
-             */
         }
         
-        for (auto proc : *processors[PreparationTypeTuning])
-        {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeTuning, TargetTypeTuning);
-            
-            /*
-            hasActiveTarget = false;
-            allIgnoreSustain = true;
-            for (auto km : proc->getKeymaps())
-            {
-                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-                {
-                    if (km->getTargetStates()[TargetTypeTuning])
-                    {
-                        hasActiveTarget = true;
-                        float v = km->applyVelocityCurve(velocity);
-                        targetVelocities.set(TargetTypeTuning, v);
-                    }
-                    if (!km->getIgnoreSustain()) allIgnoreSustain = false;
-                }
-            }
-            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
-                proc->keyReleased(noteNumber, targetVelocities, false);
-            targetVelocities.fill(-1.f);
-             */
-        }
         
-        for (auto proc : *processors[PreparationTypeTempo])
-        {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeTempo, TargetTypeTempo);
-            
-            /*
-            hasActiveTarget = false;
-            allIgnoreSustain = true;
-            for (auto km : proc->getKeymaps())
-            {
-                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-                {
-                    if (km->getTargetStates()[TargetTypeTempo])
-                    {
-                        hasActiveTarget = true;
-                        float v = km->applyVelocityCurve(velocity);
-                        targetVelocities.set(TargetTypeTempo, v);
-                    }
-                    if (!km->getIgnoreSustain()) allIgnoreSustain = false;
-                }
-            }
-            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
-                proc->keyReleased(noteNumber, targetVelocities, false);
-            targetVelocities.fill(-1.f);
-             */
-        }
-        
-        for (auto proc : *processors[PreparationTypeSynchronic])
-        {
-            
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeSynchronic, TargetTypeSynchronicRotate);
-            
-            /*
-            hasActiveTarget = false;
-            allIgnoreSustain = true;
-            for (auto km : proc->getKeymaps())
-            {
-                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-                {
-                    for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; i++)
-                    {
-                        if (km->getTargetStates()[i])
-                        {
-                            hasActiveTarget = true;
-                            float v = km->applyVelocityCurve(velocity);
-                            targetVelocities.set(i, v);
-                        }
-                    }
-                    if (!km->getIgnoreSustain()) allIgnoreSustain = false;
-                }
-            }
-            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
-                proc->keyReleased(noteNumber, targetVelocities, false);
-            targetVelocities.fill(-1.f);
-             */
-        }
-        
-        for (auto proc : *processors[PreparationTypeNostalgic])
-        {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, post, TargetTypeNostalgic, TargetTypeNostalgicClear);
-            
-            /*
-            hasActiveTarget = false;
-            allIgnoreSustain = true;
-            for (auto km : proc->getKeymaps())
-            {
-                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-                {
-                    for (int i = TargetTypeNostalgic; i <= TargetTypeNostalgicClear; i++)
-                    {
-                        if (km->getTargetStates()[i])
-                        {
-                            hasActiveTarget = true;
-                            float v = km->applyVelocityCurve(velocity);
-                            targetVelocities.set(i, v);
-                        }
-                    }
-                    if (!km->getIgnoreSustain()) allIgnoreSustain = false;
-                }
-            }
-            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
-                proc->keyReleased(noteNumber, targetVelocities, post);
-            targetVelocities.fill(-1.f);
-             */
-        }
-        
-//        for (auto proc : eprocessor)
-//        {
-//            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeBlendronicPatternSync, TargetTypeBlendronicOpenCloseOutput);
-//
-            /*
-            hasActiveTarget = false;
-            allIgnoreSustain = true;
-            for (auto km : proc->getKeymaps())
-            {
-                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-                {
-                    for (int i = TargetTypeBlendronicPatternSync; i <= TargetTypeBlendronicOpenCloseOutput; i++)
-                    {
-                        if (km->getTargetStates()[i])
-                        {
-                            hasActiveTarget = true;
-                            float v = km->applyVelocityCurve(velocity);
-                            targetVelocities.set(i, v);
-                        }
-                    }
-                    if (!km->getIgnoreSustain()) allIgnoreSustain = false;
-                }
-            }
-            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
-                proc->keyReleased(noteNumber, targetVelocities, false);
-            targetVelocities.fill(-1.f);
-             */
-        //}
-        
-        for (auto proc : *processors[PreparationTypeResonance])
-        {
-            pedalReleaseByProcess(proc, noteNumber, velocity, mappedFrom, source, keyIsDepressed, false, TargetTypeResonanceAdd, TargetTypeResonanceRing);
-            
-            /*
-            hasActiveTarget = false;
-            allIgnoreSustain = true;
-            for (auto km : proc->getKeymaps())
-            {
-                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-                {
-                    for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; i++)
-                    {
-                        if (km->getTargetStates()[i])
-                        {
-                            hasActiveTarget = true;
-                            float v = km->applyVelocityCurve(velocity);
-                            targetVelocities.set(i, v);
-                        }
-                        if (!km->getIgnoreSustain()) allIgnoreSustain = false;
-                    }
-                }
-            }
-            //local flag for keymap that isn't ignoring sustain
-            if (!keyIsDepressed && !allIgnoreSustain && hasActiveTarget)
-                //don't turn off note if key is down!
-                proc->keyReleased(noteNumber, targetVelocities, false);
-            targetVelocities.fill(-1.f);
-             */
-        }
+    
+       
     }
     
     for (auto km : keymaps)
@@ -1242,45 +505,7 @@ void PreparationMap::pedalReleaseHandler(OwnedArray<HashMap<String, int>>& keysT
             }
         }
     }
-    /*
-    if (!fromSostenutoRelease) sustainedNotes.clearQuick(); // need to NOT clear currently active sostenutoNotes!
-    else {
-        for (auto km : keymaps)
-        {
-            for(int n = sustainedNotes.size() - 1; n >= 0; n--)
-            {
-                Note note = sustainedNotes.getUnchecked(n);
-                int noteNumber = note.noteNumber;
-                if (km->isUnsustainingSostenutoNote(noteNumber, false, sustainPedalIsDepressed) && !sustainPedalIsDepressed)
-                {
-                    sustainedNotes.remove(n);
-                    DBG("removing sustained note " + String(noteNumber));
-                }
-            }
-        }
-    }
-     */
-    
-    for (auto d : *processors[PreparationTypeDirect])
-    {
-        //play pedalUp sample
-        dynamic_cast<DirectProcessor*>(d)->getPedalSynth()->keyOn(1,
-                         //synthNoteNumber,
-                         22,
-                         22,
-                         0,
-                         0.03, //gain
-                         1.,
-                         Forward,
-                         Normal, //FixedLength,
-                         PedalNote,
-                         0,
-                         0,
-                         0,
-                         2000,
-                         3,
-                         3 );
-    }
+   
 }
 
 void PreparationMap::sustainPedalReleased(bool post)
@@ -1314,116 +539,36 @@ void PreparationMap::postRelease(int noteNumber, float velocity, int channel, in
         
         sustainedNotes.add(newNote);
     }
-    
-    for (auto proc : *processors[PreparationTypeDirect])
-    {
-        bool ignoreSustain = false;
-        for (auto km : proc->getKeymaps())
+
+    for (auto procArr : processors){
+        for (auto proc : *procArr)
         {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            bool ignoreSustain = false;
+            for (auto km : proc->getKeymaps())
             {
-                if (km->getTargetStates()[TargetTypeDirect])
+                if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
                 {
-                    float v = km->applyVelocityCurve(velocity);
-                    targetVelocities.set(TargetTypeDirect, v);
-                }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
-                // check sostenutoState here, set ignoreSustain = true if km->doSostenuto && km->activeSostenutoNotesInclude(noteNumber)
-            }
-        }
-        dynamic_cast<DirectProcessor*>(proc)->playReleaseSample(noteNumber, targetVelocities, false);
-        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain))
-        {
-            // DBG("PreparationMap::postRelease releasing noteNumnber: " + String(noteNumber));
-            proc->keyReleased(noteNumber, targetVelocities, false);
-        }
-        targetVelocities.fill(-1.f);
-    }
-    
-    for (auto proc : *processors[PreparationTypeTuning])
-    {
-        bool ignoreSustain = false;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                if (km->getTargetStates()[TargetTypeTuning])
-                {
-                    float v = km->applyVelocityCurve(velocity);
-                    targetVelocities.set(TargetTypeDirect, v);
-                }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
-            }
-        }
-        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain)) proc->keyReleased(noteNumber, targetVelocities, false);
-        targetVelocities.fill(-1.f);
-    }
-    
-    for (auto proc : *processors[PreparationTypeNostalgic])
-    {
-        bool ignoreSustain = false;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
-            {
-                for (int i = TargetTypeNostalgic; i <= TargetTypeNostalgicClear; i++)
-                {
-                    if (km->getTargetStates()[i])
+                    for (int i = proc->targetTypeStart; i <= proc->targetTypeEnd; i++)
                     {
-                        float v = km->applyVelocityCurve(velocity);
-                        targetVelocities.set(i, v);
+                        if (km->getTargetStates()[i])
+                        {
+                            float v = km->applyVelocityCurve(velocity);
+                            targetVelocities.set(i, v);
+                        }
                     }
+                    if (km->getIgnoreSustain()) ignoreSustain = true;
                 }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
             }
-        }
-        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain)) proc->keyReleased(noteNumber, targetVelocities, true);
-        targetVelocities.fill(-1.f);
-    }
-    
-    for (auto proc : *processors[PreparationTypeResonance])
-    {
-        bool ignoreSustain = false;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            if(proc->getType() == PreparationTypeDirect)
             {
-                for (int i = TargetTypeResonanceAdd; i <= TargetTypeResonanceRing; i++)
-                {
-                    if (km->getTargetStates()[i])
-                    {
-                        float v = km->applyVelocityCurve(velocity);
-                        targetVelocities.set(i, v);
-                    }
-                }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
+                dynamic_cast<DirectProcessor*>(proc)->playReleaseSample(noteNumber, targetVelocities, false);
             }
-        }
-        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain))
-        {
-            proc->keyReleased(noteNumber, targetVelocities, false);
-        }
-        targetVelocities.fill(-1.f);
-    }
-    
-    for (auto proc : *processors[PreparationTypeSynchronic])
-    {
-        bool ignoreSustain = false;
-        for (auto km : proc->getKeymaps())
-        {
-            if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
+            if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain))
             {
-                if (km->getTargetStates()[TargetTypeTempo])
-                {
-                    float v = km->applyVelocityCurve(velocity);
-                    targetVelocities.set(TargetTypeTempo, v);
-                }
-                if (km->getIgnoreSustain()) ignoreSustain = true;
+                proc->keyReleased(noteNumber, targetVelocities, false);
             }
+            targetVelocities.fill(-1.f);
         }
-        if ((!sustainPedalIsDepressed) || (sustainPedalIsDepressed && ignoreSustain))
-            proc->keyReleased(noteNumber, targetVelocities, false);
-        targetVelocities.fill(-1.f);
     }
 }
 

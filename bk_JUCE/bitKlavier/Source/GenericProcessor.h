@@ -25,7 +25,7 @@ public:
     typedef OwnedArray<GenericProcessor, CriticalSection> CSArr;
     
     
-    GenericProcessor(BKPreparationType type) : type(type)
+    GenericProcessor(BKPreparationType type, KeymapTargetType start, KeymapTargetType end) : targetTypeStart(start), type(type), targetTypeEnd(end)
     {
         
     }
@@ -83,6 +83,14 @@ public:
     void pianoSwitched(Array<GenericProcessor::PtrArr> prevPiano) {}
     virtual void reset() = 0;
     virtual void sustainPedalPressed() {} //hack for direct fix later
+    virtual void allNotesOff(){}
+//    void handleKeyPress(int noteNumber, Array<float> pressTargetVelocities,
+//                        Array<float> releaseTargetVelocities, bool fromPress)
+//    {
+//
+//    }
+    KeymapTargetType targetTypeStart;
+    KeymapTargetType targetTypeEnd;
 protected:
     Keymap::PtrArr      keymaps;
     BKPreparationType type;
@@ -100,7 +108,6 @@ protected:
     
     float lastVelocity = 0.0f;
     bool lastVelocityInRange = false;
-    
 private:
 
     

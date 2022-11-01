@@ -367,7 +367,7 @@ void BKAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     prevPiano->prepMap->prepareToPlay(gallery->getGeneralSettings());
     levelBuf.setSize(2, 25);
     
-    gallery->prepareToPlay(currentSampleRate);
+    gallery->prepareToPlay();
     
     sustainIsDown = false;
     
@@ -446,32 +446,8 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
 
 void BKAudioProcessor::clearBitKlavier(void)
 {
-    
-    ////TURN ALL NOTES OFF PROCESSORS (PROCESSOR UPDATE)
-//    for (int i = 0; i < 15; i++)
-//    {
-////        hammerReleaseSynth.allNotesOff(i, true);
-////        resonanceReleaseSynth.allNotesOff(i, true);
-////        mainPianoSynth.allNotesOff(i, true);
-//          pedalSynth.allNotesOff(i, true);
-//    }
-    currentPiano->prepMap->allNotesOff();
 
-    /*
-    THIS DID NOT SOLVE ALL OFF ISSUES - PROBLEM IS PROBABLY SOMEWHERE IN NOSTALGIC?
-    for (auto piano : gallery->getPianos())
-    {
-        for (auto processor : piano->getNostalgicProcessors())
-        {
-            for (int i = 0; i < 15; i++)
-            {
-                processor->clearAll(i);
-            }
-        }
-    }
-    */
-    
-    //handleAllNotesOff();
+    currentPiano->prepMap->allNotesOff();
 
     for (auto map : sourcedNotesOn)
     {
@@ -1956,7 +1932,7 @@ void BKAudioProcessor::initializeGallery()
         }
     }
 
-    gallery->prepareToPlay(getSampleRate()); 
+    gallery->prepareToPlay(); 
     
     updateUI();
     

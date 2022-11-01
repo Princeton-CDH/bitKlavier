@@ -47,7 +47,7 @@ void DirectPreparation::performModification(DirectModification* d, Array<bool> d
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
                                  TuningProcessor::Ptr tuning,
                                  BKAudioProcessor& processor, GeneralSettings::Ptr g) :
-GenericProcessor(BKPreparationType::PreparationTypeDirect),
+GenericProcessor(BKPreparationType::PreparationTypeDirect, TargetTypeDirect, TargetTypeDirect),
 synth(new BKSynthesiser(processor, g,processor.mainPianoSoundSet )),
 resonanceSynth(new BKSynthesiser(processor, g,processor.resonanceReleaseSoundSet )),
 hammerSynth(new BKSynthesiser(processor, g,processor.hammerReleaseSoundSet )),
@@ -114,9 +114,10 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
     if (fromPress)
     {
         aVels = bVels = &velocities.getReference(noteNumber);
-        for (int i = TargetTypeDirect; i < TargetTypeDirect+1; ++i)
+        for (int i = targetTypeStart; i <= targetTypeEnd; ++i)
         {
-            aVels->setUnchecked(i, targetVelocities.getUnchecked(i));
+            float vel = targetVelocities.getUnchecked(i);
+            aVels->setUnchecked(i, vel);
         }
     }
     // If this an inverted release, aVels will be the incoming velocities,
