@@ -163,14 +163,6 @@ public:
         }
     }
 
-   
-
-//	void                        addEffectProcessor(EffectProcessor::Ptr);
-//	//void                        setEffectProcessors(EffectProcessor::PtrArr);
-//	EffectProcessor::PtrArr      getEffectProcessors(void);
-//	EffectProcessor::Ptr         getEffectProcessor(int Id, EffectType type);
-//	bool                        contains(EffectProcessor::Ptr);
-
 
     
     void addProcessor(GenericProcessor::Ptr p)
@@ -236,21 +228,6 @@ public:
            }
        }
      
-//       for (auto d : eprocessor)
-//       {
-//           d->handleMidiEvent(m);
-//       }
-//
-//       for (auto s : mprocessor)
-//       {
-//           s->handleMidiEvent(m);
-//       }
-//
-//       for (auto n : tprocessor)
-//       {
-//           n->handleMidiEvent(m);
-//       }
-     
    }
     void allNotesOff()
     {
@@ -300,20 +277,9 @@ private:
     // Keymaps for this PreparationMap
     Keymap::PtrArr                       keymaps;
     
-    // Processors
-//    DirectProcessor::PtrArr              dprocessor;
-//    SynchronicProcessor::PtrArr          sprocessor;
-//    NostalgicProcessor::PtrArr           nprocessor;
-//    EffectProcessor::PtrArr              eprocessor;
-//    TempoProcessor::PtrArr               mprocessor;
-//    TuningProcessor::PtrArr              tprocessor;
-//    ResonanceProcessor::PtrArr           rprocessor;
    
     OwnedArray<ReferenceCountedArray<GenericProcessor>> processors;
     // Pointers to synths (flown in from BKAudioProcessor)
-//    BKSynthesiser*              synth;
-//    BKSynthesiser*              resonanceSynth;
-//    BKSynthesiser*              hammerSynth;
     
     bool sustainPedalIsDepressed;
     bool sostenutoPedalIsDepressed;
