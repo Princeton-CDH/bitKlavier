@@ -79,7 +79,11 @@ public:
     inline BKPreparationType getType() const noexcept {return type;}
     
    
-    virtual void copyProcessorState(GenericProcessor::Ptr) = 0;
+    virtual void copyProcessorState(GenericProcessor::Ptr copy)
+    {
+        setVelocities(copy->getVelocities());
+        setInvertVelocities(copy->getInvertVelocities());
+    };
     void pianoSwitched(Array<GenericProcessor::PtrArr> prevPiano) {}
     virtual void reset() = 0;
     virtual void sustainPedalPressed() {} //hack for direct fix later

@@ -155,6 +155,23 @@ public:
  
     ReferenceCountedArray<GenericProcessor>*     getProcessorsOfType    (BKPreparationType);
     GenericProcessor::Ptr        getProcessorOfType    (int Id, BKPreparationType);
+    void copyProcessorStates(PreparationMap::Ptr prev)
+    {
+        for (int i = 0; i < BKPreparationType::PreparationTypeKeymap; i++)
+        {
+            ReferenceCountedArray<GenericProcessor>* prevProcessors = prev->getProcessorsOfType((BKPreparationType)i);
+            GenericProcessor::Ptr proc, prev;
+            for(int j = 0; j < prevProcessors->size(); j++)
+            {
+                prev = prevProcessors->getUnchecked(j);
+                if((proc = getProcessorOfType(prev->getId(), (BKPreparationType)i)) != nullptr)
+                {
+                    proc->copyProcessorState(prev);
+                    continue;
+                }
+            }
+        }
+    }
     bool                        contains                (GenericProcessor::Ptr, BKPreparationType);
     void  clearProcessors() {
         for (auto proc: processors)

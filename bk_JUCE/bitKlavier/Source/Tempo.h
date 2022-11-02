@@ -430,7 +430,12 @@ public:
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     void copyProcessorState(GenericProcessor::Ptr copy)
     {
-        
+        GenericProcessor::copyProcessorState(copy);
+        TempoProcessor* prev = dynamic_cast<TempoProcessor*>(copy.get());
+        setAtTimer(prev->getAtTimer());
+        setAtLastTime(prev->getAtLastTime());
+        setAtDeltaHistory(prev->getAtDeltaHistory());
+        setAdaptiveTempoPeriodMultiplier(prev->getAdaptiveTempoPeriodMultiplier());
     }
     
     void prepareToPlay(GeneralSettings::Ptr)

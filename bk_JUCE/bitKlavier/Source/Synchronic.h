@@ -1397,7 +1397,11 @@ public:
     }
     void copyProcessorState(GenericProcessor::Ptr copy)
     {
-        
+        GenericProcessor::copyProcessorState(copy);
+        setClusters(dynamic_cast<SynchronicProcessor*>(copy.get())->getClusters());
+        //setVelocities(copy->getVelocities());
+        //setInvertVelocities(copy->getInvertVelocities());
+        swapClusterVelocities(dynamic_cast<SynchronicProcessor*>(copy.get())->getClusterVelocities());
     }
 private:
     BKSynthesiser::Ptr synth;

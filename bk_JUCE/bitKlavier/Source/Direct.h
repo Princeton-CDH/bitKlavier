@@ -610,7 +610,7 @@ public:
     {
         return pedalSynth;
     }
-    void copyProcessorState(GenericProcessor::Ptr copy)
+    void copyProcessorState(GenericProcessor::Ptr copy) override
     {
         
     }

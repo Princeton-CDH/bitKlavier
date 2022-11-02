@@ -889,10 +889,6 @@ public:
         }
     }
     
-    void copyProcessorState(GenericProcessor::Ptr copy)
-    {
-        
-    }
     void setPost(bool _post)
     {
         post = _post;

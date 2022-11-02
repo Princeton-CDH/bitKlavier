@@ -1147,7 +1147,7 @@ void  BKAudioProcessor::setCurrentPiano(int which)
         for (auto bprocessor : currentPiano->getBlendronicProcessors())
             bprocessor->setActive(true);
         
-        currentPiano->copyProcessorStates(prevPiano);
+        //currentPiano->copyProcessorStates(prevPiano);
         
         updateState->pianoDidChangeForGraph = true;
         updateState->synchronicPreparationDidChange = true;

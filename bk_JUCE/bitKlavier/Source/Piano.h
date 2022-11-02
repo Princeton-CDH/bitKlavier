@@ -86,29 +86,28 @@ public:
 
     void pianoSwitched(Piano::Ptr prevPiano)
     {
-       ///processor.pianoSwitched
+       //Maintain order (clearOldNotes happens first)
+        clearOldNotes(prevPiano);
+        copyProcessorStates(prevPiano);
     }
     void clearOldNotes(Piano::Ptr prevPiano)
     {
-//        SynchronicProcessor::PtrArr sprocessors;
-//        getPreparationMap()->getSynchronicProcessors(sprocessors);
-//        SynchronicProcessor::PtrArr prevSprocessors;
-//        prevPiano->getPreparationMap()->getSynchronicProcessors(prevSprocessors);
-//
-//        for(int i = 0; i < sprocessors.size(); i++)
-//        {
-//            bool inPrevSproc = false;
-//            for(int j=0; j<prevSprocessors.size(); j++)
-//            {
-//                if(sprocessors.getUnchecked(i) == prevSprocessors.getUnchecked(j))
-//                    inPrevSproc = true;
-//            }
-//
-//            if(!inPrevSproc) {
-//                DBG("clearing old Synchronic notes");
-//                sprocessors.getUnchecked(i)->clearOldNotes(); //want to keep oldNotes if sProc is in previous piano
-//            }
-//        }
+        
+
+        for(auto currproc : *prepMap->getProcessorsOfType(PreparationTypeSynchronic))
+        {
+            bool inPrevSproc = false;
+            for(auto proc : *prevPiano->getPreparationMap()->getProcessorsOfType(PreparationTypeSynchronic))
+            {
+                if(currproc->getId() == proc->getId())
+                    inPrevSproc = true;
+            }
+
+            if(!inPrevSproc) {
+                DBG("clearing old Synchronic notes");
+                dynamic_cast<SynchronicProcessor*>(currproc)->clearOldNotes(); //want to keep oldNotes if sProc is in previous piano
+            }
+        }
     }
     
     // For when a piano switch occurs
@@ -117,122 +116,7 @@ public:
     // connected preparations) of the processor from the previous piano to keep continuity
     void copyProcessorStates (Piano::Ptr prevPiano)
     {
-//        {
-//            DirectProcessor::PtrArr prevDirectProcessors;
-//            = prevPiano->getDirectProcessors();
-//            for (int i = 0; i < prevDirectProcessors.size(); i++)
-//            {
-//                for (int j = 0; j < dprocessor.size(); j++)
-//                {
-//                    if (dprocessor.getUnchecked(j)->getId() == prevDirectProcessors.getUnchecked(i)->getId())
-//                    {
-//                        dprocessor.getUnchecked(j)
-//                        ->setVelocities(prevDirectProcessors.getUnchecked(i)->getVelocities());
-//                        dprocessor.getUnchecked(j)
-//                        ->setInvertVelocities(prevDirectProcessors.getUnchecked(i)->getInvertVelocities());
-//                        continue;
-//                    }
-//                }
-//            }
-//        }
-//
-//        {
-//            SynchronicProcessor::PtrArr prevSynchronicProcessors = prevPiano->getSynchronicProcessors();
-//            for (int i = 0; i < prevSynchronicProcessors.size(); i++)
-//            {
-//                for (int j = 0; j < sprocessor.size(); j++)
-//                {
-//                    if (sprocessor.getUnchecked(j)->getId() == prevSynchronicProcessors.getUnchecked(i)->getId())
-//                    {
-//                        SynchronicProcessor::Ptr s = sprocessor.getUnchecked(j);
-//                        s->setClusters(prevSynchronicProcessors.getUnchecked(i)->getClusters());
-//                        s->setVelocities(prevSynchronicProcessors.getUnchecked(i)->getVelocities());
-//                        s->setInvertVelocities(prevSynchronicProcessors.getUnchecked(i)->getInvertVelocities());
-//                        s->swapClusterVelocities(prevSynchronicProcessors.getUnchecked(i)->getClusterVelocities());
-//                        continue;
-//                    }
-//                }
-//            }
-//        }
-//
-//        {
-//            NostalgicProcessor::PtrArr prevNostalgicProcessors = prevPiano->getNostalgicProcessors();
-//            for (int i = 0; i < prevNostalgicProcessors.size(); i++)
-//            {
-//                for (int j = 0; j < nprocessor.size(); j++)
-//                {
-//                    if (nprocessor.getUnchecked(j)->getId() == prevNostalgicProcessors.getUnchecked(i)->getId())
-//                    {
-//                        nprocessor.getUnchecked(j)
-//                        ->setVelocities(prevNostalgicProcessors.getUnchecked(i)->getVelocities());
-//                        nprocessor.getUnchecked(j)
-//                        ->setInvertVelocities(prevNostalgicProcessors.getUnchecked(i)->getInvertVelocities());
-//                        continue;
-//                    }
-//                }
-//            }
-//        }
-//
-//        {
-//            EffectProcessor::PtrArr prevBlendronicProcessors = prevPiano->getBlendronicProcessors();
-//            for(int i = 0; i < prevBlendronicProcessors.size(); i++)
-//            {
-//                for(int j = 0; j < eprocessor.size(); j++)
-//                {
-//                    if (eprocessor.getUnchecked(j)->getId() == prevBlendronicProcessors.getUnchecked(i)->getId())
-//                    {
-//                        eprocessor.getUnchecked(j)
-//                        ->setVelocities(prevBlendronicProcessors.getUnchecked(i)->getVelocities());
-//                        eprocessor.getUnchecked(j)
-//                        ->setInvertVelocities(prevBlendronicProcessors.getUnchecked(i)->getInvertVelocities());
-//                        continue;
-//                    }
-//                }
-//            }
-//        }
-//
-//        {
-//            TempoProcessor::PtrArr prevTempoProcessors = prevPiano->getTempoProcessors();
-//            for (int i = 0; i < prevTempoProcessors.size(); i++)
-//            {
-//                for (int j = 0; j < mprocessor.size(); j++)
-//                {
-//                    if (mprocessor.getUnchecked(j)->getId() == prevTempoProcessors.getUnchecked(i)->getId())
-//                    {
-//                        mprocessor.getUnchecked(j)->setAtTimer(prevTempoProcessors.getUnchecked(i)->getAtTimer());
-//                        mprocessor.getUnchecked(j)->setAtLastTime(prevTempoProcessors.getUnchecked(i)->getAtLastTime());
-//                        mprocessor.getUnchecked(j)->setAtDeltaHistory(prevTempoProcessors.getUnchecked(i)->getAtDeltaHistory());
-//                        mprocessor.getUnchecked(j)->setAdaptiveTempoPeriodMultiplier(prevTempoProcessors.getUnchecked(i)->getAdaptiveTempoPeriodMultiplier());
-//                        mprocessor.getUnchecked(j)
-//                        ->setVelocities(prevTempoProcessors.getUnchecked(i)->getVelocities());
-//                        mprocessor.getUnchecked(j)
-//                        ->setInvertVelocities(prevTempoProcessors.getUnchecked(i)->getInvertVelocities());
-//                        continue;
-//                    }
-//                }
-//            }
-//        }
-//
-//        {
-//            TuningProcessor::PtrArr prevTuningProcessors = prevPiano->getTuningProcessors();
-//            for (int i = 0; i < prevTuningProcessors.size(); i++)
-//            {
-//                for (int j = 0; j < tprocessor.size(); j++)
-//                {
-//                    if (tprocessor.getUnchecked(j)->getId() == prevTuningProcessors.getUnchecked(i)->getId())
-//                    {
-//                        tprocessor.getUnchecked(j)->setAdaptiveHistoryCounter(prevTuningProcessors.getUnchecked(i)->getAdaptiveHistoryCounter());
-//                        tprocessor.getUnchecked(j)->setAdaptiveFundamentalFreq(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalFreq());
-//                        tprocessor.getUnchecked(j)->setAdaptiveFundamentalNote(prevTuningProcessors.getUnchecked(i)->getAdaptiveFundamentalNote());
-//                        tprocessor.getUnchecked(j)
-//                        ->setVelocities(prevTuningProcessors.getUnchecked(i)->getVelocities());
-//                        tprocessor.getUnchecked(j)
-//                        ->setInvertVelocities(prevTuningProcessors.getUnchecked(i)->getInvertVelocities());
-//                        continue;
-//                    }
-//                }
-//            }
-//        }
+        prepMap->copyProcessorStates(prevPiano->getPreparationMap());
     }
     
     int numPMaps;

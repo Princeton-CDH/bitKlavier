@@ -1044,6 +1044,12 @@ public:
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
     void copyProcessorState(GenericProcessor::Ptr copy)
     {
+        GenericProcessor::copyProcessorState(copy);
+        TuningProcessor* prev = dynamic_cast<TuningProcessor*>(copy.get());
+        
+        setAdaptiveHistoryCounter(prev->getAdaptiveHistoryCounter());
+        setAdaptiveFundamentalFreq(prev->getAdaptiveFundamentalFreq());
+        setAdaptiveFundamentalNote(prev->getAdaptiveFundamentalNote());
         
     }
     
