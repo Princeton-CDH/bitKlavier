@@ -253,82 +253,6 @@ private:
     SynchronicProcessor::Ptr defaultS;
     ResonanceProcessor::Ptr defaultR;
     
-    inline Array<int> getAllIds(Direct::PtrArr direct)
-    {
-        Array<int> which;
-        for (auto p : direct)
-        {
-            which.add(p->getId());
-        }
-        
-        return which;
-    }
-    
-    inline Array<int> getAllIds(Tempo::PtrArr direct)
-    {
-        Array<int> which;
-        for (auto p : direct)
-        {
-            which.add(p->getId());
-        }
-        
-        return which;
-    }
-    
-    inline Array<int> getAllIds(Tuning::PtrArr direct)
-    {
-        Array<int> which;
-        for (auto p : direct)
-        {
-            which.add(p->getId());
-        }
-        
-        return which;
-    }
-    
-    inline Array<int> getAllIds(Nostalgic::PtrArr direct)
-    {
-        Array<int> which;
-        for (auto p : direct)
-        {
-            which.add(p->getId());
-        }
-        
-        return which;
-    }
-    
-    inline Array<int> getAllIds(Synchronic::PtrArr direct)
-    {
-        Array<int> which;
-        for (auto p : direct)
-        {
-            which.add(p->getId());
-        }
-        
-        return which;
-    }
-    
-	inline Array<int> getAllIds(Blendronic::PtrArr direct)
-	{
-		Array<int> which;
-		for (auto p : direct)
-		{
-			which.add(p->getId());
-		}
-
-		return which;
-	}
-
-    inline Array<int> getAllIds(Resonance::PtrArr resonance)
-    {
-        Array<int> which;
-        for (auto p : resonance)
-        {
-            which.add(p->getId());
-        }
-        
-        return which;
-    }
     
     void configureDirectModification(DirectModification::Ptr, Array<int> whichKeymaps, Array<int> whichPreps);
     
@@ -346,19 +270,6 @@ private:
 
     JUCE_LEAK_DETECTOR(Piano)
 };
-
-/*class PianoComparator : public ReferenceCountedObject
- {
- public:
- //currently compares by name as to enable "reodering" by changing name
- int compareElements(Piano::Ptr first, Piano::Ptr second)
- {
- int compareResult = first->getName().compare(second->getName());
- if (compareResult > 1) return 1;
- else if (compareResult < 1) return -1;
- else return 0;
- }
- };*/
 
 
 #endif  // Piano_H_INCLUDED

@@ -27,7 +27,7 @@ resizer(new ResizableCornerComponent (this, constrain.get()))
     addAndMakeVisible(fullChild);
     
     setPianoTarget(0);
-    
+    validConnections = cValidConnections[type];
     if (type == PreparationTypeTuning)
     {
         setImage(ImageCache::getFromMemory(BinaryData::tuning_icon_png, BinaryData::tuning_icon_pngSize));
@@ -257,7 +257,7 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
     }
     
     type = newType;
-    
+    validConnections = cValidConnections[type];
     if (type == PreparationTypeGenericMod)
     {
         setImage(ImageCache::getFromMemory(BinaryData::mod_unassigned_icon_png, BinaryData::mod_unassigned_icon_pngSize));
@@ -713,8 +713,8 @@ bool BKItemGraph::connect(BKItem* item1, BKItem* item2)
     BKPreparationType item2Type = item2->getType();
     
     // Check if its a valid connection
-    if (!(isValidConnection(item1Type, item2Type))) return false;
-    
+    //if (!(isValidConnection(item1Type, item2Type))) return false;
+    if (!item1->canConnect(item2Type)) return false;
     // If connecting a modification, set its type
     if (item1Type == PreparationTypeGenericMod)
     {
@@ -812,47 +812,47 @@ bool BKItemGraph::connect(BKItem* item1, BKItem* item2)
             tune->removeConnection(item2);
         }
     }
-    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeDirect)
-    {
-        Keymap::Ptr km = processor.gallery->getKeymap(item1->getId());
-        BKItem::PtrArr connections = item1->getConnectionsOfType(item2Type);
-        if (connections.size() == 0) km->setTarget(TargetTypeDirect, true);
-    }
-    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeDirect)
-    {
-        Keymap::Ptr km = processor.gallery->getKeymap(item2->getId());
-        BKItem::PtrArr connections = item2->getConnectionsOfType(item1Type);
-        if (connections.size() == 0) km->setTarget(TargetTypeDirect, true);
-    }
-    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeSynchronic)
-    {
-        Keymap::Ptr km = processor.gallery->getKeymap(item1->getId());
-        BKItem::PtrArr connections = item1->getConnectionsOfType(item2Type);
-        if (connections.size() == 0) km->setTarget(TargetTypeSynchronic, true);
-    }
-    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeSynchronic)
-    {
-        Keymap::Ptr km = processor.gallery->getKeymap(item2->getId());
-        BKItem::PtrArr connections = item2->getConnectionsOfType(item1Type);
-        if (connections.size() == 0) km->setTarget(TargetTypeSynchronic, true);
-    }
-    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeNostalgic)
-    {
-        Keymap::Ptr km = processor.gallery->getKeymap(item1->getId());
-        BKItem::PtrArr connections = item1->getConnectionsOfType(item2Type);
-        if (connections.size() == 0) km->setTarget(TargetTypeNostalgic, true);
-    }
-    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeNostalgic)
-    {
-        Keymap::Ptr km = processor.gallery->getKeymap(item2->getId());
-        BKItem::PtrArr connections = item2->getConnectionsOfType(item1Type);
-        if (connections.size() == 0) km->setTarget(TargetTypeNostalgic, true);
-    }
+//    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeDirect)
+//    {
+//        Keymap::Ptr km = processor.gallery->getKeymap(item1->getId());
+//        BKItem::PtrArr connections = item1->getConnectionsOfType(item2Type);
+//        if (connections.size() == 0) km->setTarget(TargetTypeDirect, true);
+//    }
+//    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeDirect)
+//    {
+//        Keymap::Ptr km = processor.gallery->getKeymap(item2->getId());
+//        BKItem::PtrArr connections = item2->getConnectionsOfType(item1Type);
+//        if (connections.size() == 0) km->setTarget(TargetTypeDirect, true);
+//    }
+//    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeSynchronic)
+//    {
+//        Keymap::Ptr km = processor.gallery->getKeymap(item1->getId());
+//        BKItem::PtrArr connections = item1->getConnectionsOfType(item2Type);
+//        if (connections.size() == 0) km->setTarget(TargetTypeSynchronic, true);
+//    }
+//    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeSynchronic)
+//    {
+//        Keymap::Ptr km = processor.gallery->getKeymap(item2->getId());
+//        BKItem::PtrArr connections = item2->getConnectionsOfType(item1Type);
+//        if (connections.size() == 0) km->setTarget(TargetTypeSynchronic, true);
+//    }
+//    else if (item1Type == PreparationTypeKeymap && item2Type == PreparationTypeNostalgic)
+//    {
+//        Keymap::Ptr km = processor.gallery->getKeymap(item1->getId());
+//        BKItem::PtrArr connections = item1->getConnectionsOfType(item2Type);
+//        if (connections.size() == 0) km->setTarget(TargetTypeNostalgic, true);
+//    }
+//    else if (item2Type == PreparationTypeKeymap && item1Type == PreparationTypeNostalgic)
+//    {
+//        Keymap::Ptr km = processor.gallery->getKeymap(item2->getId());
+//        BKItem::PtrArr connections = item2->getConnectionsOfType(item1Type);
+//        if (connections.size() == 0) km->setTarget(TargetTypeNostalgic, true);
+//    }
     
     // Add the connections
     item1->addConnection(item2);
     item2->addConnection(item1);
-
+    //processor.currentPiano->addConnection(item1, item2);
     processor.currentPiano->configure();
     
     return true;
@@ -902,6 +902,19 @@ bool BKItemGraph::disconnect(BKItem* item1, BKItem* item2)
     processor.currentPiano->configure();
     
     return changed;
+}
+
+static void setVerticalRotatedWithBounds (Component& component, bool clockWiseRotation, Rectangle<int> verticalBounds, float angle)
+{
+        //auto angle = MathConstants<float>::pi / 2.0f;
+
+        if (! clockWiseRotation)
+            angle *= -1.0f;
+
+        component.setTransform ({});
+        component.setSize (verticalBounds.getHeight(), verticalBounds.getWidth());
+        component.setCentrePosition (0, 0);
+        component.setTransform (AffineTransform::rotation (angle).translated (verticalBounds.getCentreX(), verticalBounds.getCentreY()));
 }
 
 Array<Line<int>> BKItemGraph::getLines(void)

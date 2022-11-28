@@ -14,7 +14,7 @@
 #include "BKUtilities.h"
 #include "BKComponent.h"
 #include "BKListener.h"
-
+#include "BKPianoConnection.h"
 #include "ItemMapper.h"
 
 class BKAudioProcessor;
@@ -118,6 +118,7 @@ public:
     
     inline bool isConnectedTo(BKItem::Ptr thisItem)
     {
+        //return connections.contains(item);
         for (auto item : connections)
         {
             if ((item->getType() == thisItem->getType()) && (item->getId() == thisItem->getId()))
@@ -251,8 +252,9 @@ public:
     void configurePianoCB(void);
     void configureComment(void);
 
+//    BKPianoConnection::PtrArr connectionsTo;
+//    BKPianoConnection::PtrArr connectionsFrom;
     BKItem::PtrArr connections;
-    
     bool resizing, wasJustDragged;
     
     void setCommentText(String text) { comment.setText(text);}
@@ -260,12 +262,16 @@ public:
     
     std::shared_ptr<XmlElement> getContent(void) { return content;}
     void setContent(std::shared_ptr<XmlElement> xml) {content = xml;}
-    
+    bool canConnect (BKPreparationType type)
+    {
+        if (std::find(validConnections.begin(), validConnections.end(), type) == validConnections.end()) return false;
+        return true;
+    }
 private:
     
     BKAudioProcessor& processor;
     Label label;
-    
+    std::vector<BKPreparationType> validConnections;
     std::unique_ptr<ComponentBoundsConstrainer> constrain;
     
     std::unique_ptr<ResizableCornerComponent> resizer;
@@ -280,6 +286,7 @@ private:
     Component fullChild;
     
     std::shared_ptr<XmlElement> content;
+    
     
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKItem)

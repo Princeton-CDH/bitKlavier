@@ -461,7 +461,179 @@ static const std::vector<BKPreparationId> cPreparationTypeToId = {
     PreparationIdComment,
     BKPreparationIdNil
 };
-
+static const std::vector<std::vector<BKPreparationType>> cValidConnections =
+{
+   
+    { //PreparationTypeDirect
+        PreparationTypeKeymap,
+        PreparationTypeTuning,
+        PreparationTypeBlendronic,
+        PreparationTypeDirectMod,
+        PreparationTypeGenericMod,
+        PreparationTypeReset
+    },
+    { //PreparationTypeSynchronic
+        PreparationTypeKeymap,
+        PreparationTypeTuning,
+        PreparationTypeBlendronic,
+        PreparationTypeSynchronicMod,
+        PreparationTypeGenericMod,
+        PreparationTypeNostalgic,
+        PreparationTypeTempo,
+        PreparationTypeReset
+    },
+    { //PreparationTypeNostalgic
+        PreparationTypeKeymap,
+        PreparationTypeTuning,
+        PreparationTypeBlendronic,
+        PreparationTypeNostalgicMod,
+        PreparationTypeGenericMod,
+        PreparationTypeSynchronic,
+        PreparationTypeReset
+    },
+    
+    { //PreparationTypeBlendronic
+        PreparationTypeKeymap,
+        PreparationTypeSynchronic,
+        PreparationTypeDirect,
+        PreparationTypeNostalgic,
+        PreparationTypeResonance,
+        PreparationTypeTempo,
+        PreparationTypeBlendronicMod,
+        PreparationTypeGenericMod,
+        PreparationTypeReset
+    },
+    {//PreparationTypeResonance
+        PreparationTypeKeymap,
+        PreparationTypeResonanceMod,
+        PreparationTypeGenericMod,
+        PreparationTypeBlendronic,
+        PreparationTypeTuning,
+        PreparationTypeGenericMod,
+        PreparationTypeReset
+    },
+    { //PreparationTypeTuning
+        PreparationTypeKeymap,
+        PreparationTypeSynchronic,
+        PreparationTypeDirect,
+        PreparationTypeNostalgic,
+        PreparationTypeResonance,
+        PreparationTypeTuningMod,
+        PreparationTypeGenericMod,
+        PreparationTypeReset
+    },
+    { //PreparationTypeTempo
+        PreparationTypeKeymap,
+        PreparationTypeSynchronic,
+        PreparationTypeBlendronic,
+        PreparationTypeTempoMod,
+        PreparationTypeGenericMod,
+        PreparationTypeReset
+    },
+    { //PreparationTypeKeymap
+        PreparationTypeDirect,
+        PreparationTypeSynchronic,
+        PreparationTypeNostalgic,
+        PreparationTypeTuning,
+        PreparationTypeTempo,
+        PreparationTypeDirectMod,
+        PreparationTypeSynchronicMod,
+        PreparationTypeNostalgicMod,
+        PreparationTypeTuningMod,
+        PreparationTypeTempoMod,
+        PreparationTypeGenericMod,
+        PreparationTypePianoMap,
+        PreparationTypeReset,
+        PreparationTypePiano,
+        PreparationTypeComment,
+        PreparationTypeBlendronic,
+        PreparationTypeBlendronicMod,
+        PreparationTypeResonance,
+        PreparationTypeResonanceMod,
+        PreparationTypeCompressor,
+        BKPreparationTypeNil
+    },
+    { //PreparationTypeDirectMod
+        PreparationTypeKeymap,
+        PreparationTypeDirect,
+        PreparationTypeReset
+    },
+    { //PreparationTypeSynchronicMod
+        PreparationTypeKeymap,
+        PreparationTypeSynchronic,
+        PreparationTypeReset
+    },
+    { //PreparationTypeNostalgicMod
+        PreparationTypeKeymap,
+        PreparationTypeNostalgic,
+        PreparationTypeReset
+    },
+    { //PreparationTypeBlendronicMod
+        PreparationTypeKeymap,
+        PreparationTypeBlendronic,
+        PreparationTypeReset
+    },
+    
+    { //PreparationTypeResonanceMod
+        PreparationTypeKeymap,
+        PreparationTypeResonance,
+        PreparationTypeReset
+    },
+    
+    { //PreparationTypeTuningMod
+        PreparationTypeKeymap,
+        PreparationTypeTuning,
+        PreparationTypeReset
+    },
+    { //PreparationTypeTempoMod
+        PreparationTypeKeymap,
+        PreparationTypeTuning,
+        PreparationTypeReset
+    },
+    { //PreparationTypeGenericMod
+        PreparationTypeDirect,
+        PreparationTypeSynchronic,
+        PreparationTypeNostalgic,
+        PreparationTypeTuning,
+        PreparationTypeTempo,
+        PreparationTypeKeymap,
+        PreparationTypeBlendronic,
+        PreparationTypeResonance,
+    },
+    { //PreparationTypePianoMap
+        PreparationTypeKeymap
+    },
+    { //PreparationTypeReset
+        PreparationTypeDirect,
+        PreparationTypeSynchronic,
+        PreparationTypeNostalgic,
+        PreparationTypeTuning,
+        PreparationTypeTempo,
+        PreparationTypeKeymap,
+        PreparationTypeDirectMod,
+        PreparationTypeSynchronicMod,
+        PreparationTypeNostalgicMod,
+        PreparationTypeTuningMod,
+        PreparationTypeTempoMod,
+        PreparationTypeBlendronic,
+        PreparationTypeBlendronicMod,
+        PreparationTypeResonance,
+        PreparationTypeResonanceMod
+    },
+    {
+        //piano
+    },
+    {
+        //comment
+    },
+    {//compresso
+        
+    }
+    
+   
+    
+    
+};
 inline BKPreparationType modToPrepType(BKPreparationType modType)
 {
     return ((modType >= PreparationTypeDirectMod && modType <= PreparationTypeTempoMod) ? (BKPreparationType)(modType - PreparationTypeDirectMod) : BKPreparationTypeNil);

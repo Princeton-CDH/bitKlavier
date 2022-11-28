@@ -444,7 +444,115 @@ void Piano::add(BKItem::Ptr item, bool configureIfAdded)
 {
     bool added = items.addIfNotAlreadyThere(item);
     
-    if (added && configureIfAdded)  configure();
+    if (added && configureIfAdded)
+    {
+        BKPreparationType type = item->getType();
+        int Id = item->getId();
+        
+        // Connect keymaps to everything
+        // Connect tunings, tempos, synchronics to preparations
+        // Connect mods and resets to all their targets
+        // Configure piano maps
+        // ... should be all configured if done in that order ...
+        if (type == PreparationTypeKeymap)
+        {
+            Keymap::Ptr keymap = processor.gallery->getKeymap(Id);
+            prepMap->addKeymap(keymap);
+            
+            BKItem::PtrArr connex = item->getConnections();
+            for (auto target : connex)
+            {
+                BKPreparationType targetType = target->getType();
+                int targetId = target->getId();
+                
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeTempo))
+                {
+                    // DBG(String(targetType) + " linked with keymap");
+                    linkPreparationWithKeymap(targetType, targetId, Id);
+                }
+            }
+            //testing by linking all the keymaps with the test resonance
+            //linkPreparationWithKeymap(PreparationTypeResonance, 11111, Id);
+            connex.clear();
+        }
+        else if (type == PreparationTypeTuning)
+        {
+            // Look for synchronic, direct, nostalgic, blendronic, and resonance targets
+            for (auto target : item->getConnections())
+            {
+                BKPreparationType targetType = target->getType();
+                int targetId = target->getId();
+                DBG("linking preparation type to tuning: " + String(targetType));
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) || targetType == PreparationTypeResonance)
+                {
+                    linkPreparationWithTuning(targetType, targetId, processor.gallery->getTuning(Id));
+                }
+            }
+            /*if (!testLinkedWithTuning)
+            {
+                linkPreparationWithTuning(PreparationTypeResonance, 11111, processor.gallery->getTuning(Id));
+                testLinkedWithTuning = true;
+            }*/
+        }
+        else if (type == PreparationTypeTempo)
+        {
+            // Look for synchronic targets
+            for (auto target : item->getConnections())
+            {
+                BKPreparationType targetType = target->getType();
+                int targetId = target->getId();
+                
+                if (targetType == PreparationTypeSynchronic || targetType == PreparationTypeBlendronic)
+                {
+                    linkPreparationWithTempo(targetType, targetId, processor.gallery->getTempo(Id));
+                }
+            }
+        }
+        else if (type == PreparationTypeSynchronic)
+        {
+            // Look for nostalgic targets
+            for (auto target : item->getConnections())
+            {
+                BKPreparationType targetType = target->getType();
+                int targetId = target->getId();
+                
+                if (targetType == PreparationTypeNostalgic)
+                {
+                    linkNostalgicWithSynchronic(processor.gallery->getNostalgic(targetId), processor.gallery->getSynchronic(Id));
+                }
+            }
+        }
+        else if (type == PreparationTypeBlendronic)
+        {
+            //look for direct, nostalgic, and synchronic targets
+            for (auto target : item->getConnections())
+            {
+                BKPreparationType targetType = target->getType();
+                int targetId = target->getId();
+
+                if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) ||
+                    targetType == PreparationTypeResonance)
+                {
+                    linkPreparationWithBlendronic(targetType, targetId, processor.gallery->getBlendronic(Id));
+                }
+            }
+        }
+        
+        // These three cases used to be handling in the keymap case as keymap connections, but
+        // they handle all connected keymaps internally so that was redundant. Should be fine here.
+        else if (type >= PreparationTypeDirectMod && type <= PreparationTypeTempoMod)
+        {
+            configureModification(item);
+        }
+        else if (type == PreparationTypePianoMap)
+        {
+            configurePianoMap(item);
+        }
+        else if (type == PreparationTypeReset)
+        {
+            configureReset(item);
+        }
+    }//configure();
 }
 
 void Piano::remove(BKItem::Ptr item)
