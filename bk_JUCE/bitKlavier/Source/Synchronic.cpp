@@ -174,6 +174,8 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 
         synthNoteNumber += (int)offset;
         synthOffset     -= (int)offset;
+        
+        if (synthNoteNumber > 108) continue;
 
         int whichEnv = cluster->getEnvelopeCounter();
 		BKSynthesiserVoice* currentVoice;
