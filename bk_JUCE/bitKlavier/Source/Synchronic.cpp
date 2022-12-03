@@ -174,14 +174,15 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 
         synthNoteNumber += (int)offset;
         synthOffset     -= (int)offset;
-        
-        if (synthNoteNumber > 108) continue;
 
         int whichEnv = cluster->getEnvelopeCounter();
 		BKSynthesiserVoice* currentVoice;
-		if (!blendronic.isEmpty())
-		{
-            currentVoice =
+        
+        if (synthNoteNumber <= 108) {
+            
+            if (!blendronic.isEmpty())
+            {
+                currentVoice =
                 synth->keyOn(1,
                              note,
                              synthNoteNumber,
@@ -203,11 +204,11 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                              prep->getGainPtr(),
                              prep->getBlendronicGainPtr(),
                              blendronic);
-		}
-		else
-		{
-			currentVoice =
-				synth->keyOn(1,
+            }
+            else
+            {
+                currentVoice =
+                synth->keyOn(1,
                              note,
                              synthNoteNumber,
                              synthOffset,
@@ -226,7 +227,8 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                              prep->getRelease(whichEnv),
                              tuner,
                              prep->getGainPtr());
-		}
+            }
+        }
         
         notePlayed = true;
         if (prep->midiOutput.value != nullptr && currentVoice != nullptr)
