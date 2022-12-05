@@ -178,7 +178,8 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
         int whichEnv = cluster->getEnvelopeCounter();
 		BKSynthesiserVoice* currentVoice;
         
-        if (synthNoteNumber <= 108) {
+        if (synthNoteNumber <= 108)
+        {
             
             if (!blendronic.isEmpty())
             {

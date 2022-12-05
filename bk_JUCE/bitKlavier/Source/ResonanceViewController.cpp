@@ -40,11 +40,13 @@ offsetsKeyboard(false, true)
     defGainSlider = std::make_unique<BKSingleSlider>("volume (dBFS)", cResonanceDefGain, -100, 24, 0, 0.01, "-inf");
     defGainSlider->setJustifyRight(false);
     defGainSlider->setToolTipString("Adjusts overall volume of resonant notes");
+    defGainSlider->displaySliderVisible(false);
     addAndMakeVisible(*defGainSlider);
     
     blendGainSlider = std::make_unique<BKSingleSlider>("blendronic gain (dBFS)", cBlendronicOutGain, -100, 24, 0, 0.01, "-inf");
     blendGainSlider->setJustifyRight(false);
     blendGainSlider->setToolTipString("Adjusts volume sent to blendronic, if attached");
+    blendGainSlider->displaySliderVisible(false);
     addAndMakeVisible(*blendGainSlider);
 
 //    startTimeSlider = std::make_unique<BKSingleSlider>("start time (ms)", cResonanceStartTime, -4000, 4000, 2000, 1);
