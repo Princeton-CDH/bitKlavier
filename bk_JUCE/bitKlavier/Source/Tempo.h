@@ -14,11 +14,11 @@
 #include "BKUtilities.h"
 #include "AudioConstants.h"
 #include "General.h"
-#include "GenericProcessor.h"
 #include "BKUpdateState.h"
 
 #include "Keymap.h"
 
+#include "GenericProcessor.h"
 class TempoModification;
 
 class TempoPreparation : public ReferenceCountedObject
@@ -448,7 +448,6 @@ public:
         
     }
 private:
-    BKAudioProcessor& processor;
     
     GeneralSettings::Ptr general;
     

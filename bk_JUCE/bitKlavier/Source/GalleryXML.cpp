@@ -10,10 +10,10 @@
 
 #include "PluginProcessor.h"
 
-void Gallery::addFromXML(XmlElement* xml)
-{
-    
-}
+//void Gallery::addFromXML(XmlElement* xml)
+//{
+//    
+//}
 
 int Gallery::transformId(BKPreparationType type, int oldId)
 {
@@ -223,14 +223,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
             }
             else if (e->hasTagName( vtagResonance))
             {
-                addResonanceWithId(0);
-                
-                resonance.getLast()->setState(e);
-                
-                int oldId = resonance.getLast()->getId();
-                int newId = transformId(PreparationTypeResonance, oldId);
-                
-                resonance.getLast()->setId(newId);
+                setPrepStateFromXML(BKPreparationType::PreparationTypeResonance);
             }
             else if (e->hasTagName( vtagModResonance))
             {

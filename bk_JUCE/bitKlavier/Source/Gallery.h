@@ -19,7 +19,7 @@
 #include "Piano.h"
 
 #include "BKGraph.h"
-
+#include "GenericObject.h"
 class BKAudioProcessor;
 
 class Gallery : public ReferenceCountedObject
@@ -59,8 +59,7 @@ public:
 		s += "\nblendronic";
 		for (auto item : blendronic) s += (" " + String(item->getId()));
 
-        s += "\nresonance";
-        for (auto item : resonance) s += (" " + String(item->getId()));
+        
         
         s += "\nkeymap";
         for (auto item : bkKeymaps) s += (" " + String(item->getId()));
@@ -86,6 +85,15 @@ public:
 		s += "\nblendronicmod";
 		for (auto item : modBlendronic) s += (" " + String(item->getId()));
         
+        for (auto objArray : genericObj)
+        {
+            s += "\n";
+            s += cPreparationvTags[objArray->getLast()->getType()];
+            for (auto item : *objArray)
+            {
+                s += (" " + String(item->getId()));
+            }
+        }
         DBG("\n~ ~ ~ ~ ~ GALLERY ~ ~ ~ ~ ~ ~");
         DBG(s);
         DBG("\n");
@@ -130,8 +138,17 @@ public:
 		if (add) addBlendronicWithId(-1);
 
         add = true;
-        for (auto p : resonance) { if (p->getId() == -1) { add = false; break; } }
-        if (add) addResonanceWithId(-1);
+        for (auto objArray : genericObj)
+        {
+            if (objArray->isEmpty()) continue;
+            for (auto obj : *objArray)
+            {
+                if (obj->getId() == -1) { add = false; break; }
+            }
+            if (add) addGenericObject(objArray->getLast()->getType(),-1);
+            
+        }
+        
     }
     
     inline const int getNumPianos(void) const noexcept {return bkPianos.size();}
@@ -160,7 +177,6 @@ public:
     inline const int getNumTempo(void) const noexcept {return tempo.size();}
     inline const int getNumTuning(void) const noexcept {return tuning.size();}
 	inline const int getNumBlendronic(void) const noexcept { return blendronic.size(); }
-    inline const int getNumResonance(void) const noexcept { return resonance.size(); }
     inline const int getNumSynchronicMod(void) const noexcept {return modSynchronic.size();}
     inline const int getNumNostalgicMod(void) const noexcept {return modNostalgic.size();}
     inline const int getNumResonanceMod(void) const noexcept {return modResonance.size();}
@@ -239,11 +255,6 @@ public:
         return blendronic;
     }
 
-    inline const Resonance::PtrArr getAllResonance(void) const noexcept
-    {
-        return resonance;
-    }
-    
     inline const Tempo::PtrArr getAllTempo(void) const noexcept
     {
         return tempo;
@@ -323,11 +334,13 @@ public:
 		return nullptr;
 	}
 
-    inline Resonance::Ptr matches(ResonancePreparation::Ptr prep)
+    inline GenericObject::Ptr matches(GenericObject::Ptr obj)
     {
-        for (auto p : resonance)
+        if (obj->prep->getType() != obj->getType()) return nullptr;
+            
+        for (auto p : *genericObj[obj->getType()])
         {
-            if (p->prep->compare(prep)) return p;
+            if (p->prep->compare(obj->prep)) return p;
         }
         return nullptr;
     }
@@ -416,17 +429,6 @@ public:
 		return names;
 	}
 
-    inline const StringArray getAllResonanceNames(void) const noexcept
-    {
-        StringArray names;
-
-        for (auto prep : resonance)
-        {
-            names.add(prep->getName());
-        }
-
-        return names;
-    }
     
     inline const StringArray getAllDirectModNames(void) const noexcept
     {
@@ -572,15 +574,8 @@ public:
 		}
 		return nullptr;
 	}
-
-    inline const ResonancePreparation::Ptr getResonancePreparation(int Id) const noexcept
-    {
-        for (auto p : resonance)
-        {
-            if (p->getId() == Id)   return p->prep;
-        }
-        return nullptr;
-    }
+ 
+    
     
     inline const Synchronic::Ptr getSynchronic(int Id) const noexcept
     {
@@ -642,20 +637,6 @@ public:
 		return nullptr;
 	}
 
-    inline const Resonance::Ptr getResonance(int Id) const noexcept
-    {
-        for (auto p : resonance)
-        {
-            DBG(String(p->getId()));
-        }
-        for (auto p : resonance)
-        {
-            DBG(String(p->getId()));
-            if (p->getId() == Id) return p;
-            DBG("nope");
-        }
-        return nullptr;
-    }
     
     inline const SynchronicModification::Ptr getSynchronicModification(int Id) const noexcept
     {
@@ -839,7 +820,6 @@ public:
     void addDirectWithId(int Id);
     void addKeymapWithId(int Id);
 	void addBlendronicWithId(int Id);
-    void addResonanceWithId(int Id);
     
     inline void setURL(String newURL) { url = newURL; }
     
@@ -859,6 +839,35 @@ public:
     void addPiano(XmlElement* xml, OwnedArray<HashMap<int,int>>* map);
     
     GeneralSettings::Ptr                general; //HACK FOR INITIALIZATINONN
+    
+    void stepModdables()
+    {
+        for (auto objArray: genericObj)
+        {
+            for (auto obj : *objArray)
+            {
+                obj->prep->stepModdables();
+            }
+            
+        }
+    }
+    
+    
+    ReferenceCountedArray<GenericObject>*  getAllObjectsOfType(BKPreparationType thisType)
+    {
+        return genericObj.getUnchecked(thisType);
+    }
+    
+    GenericObject::Ptr getObjectOfType(BKPreparationType thisType, int Id)
+    {
+        for (auto p : *genericObj[thisType])
+        {
+            if (p->getId() == Id)
+            {
+                return p;
+            }
+        }
+    }
 private:
     BKAudioProcessor& processor;
     
@@ -873,7 +882,8 @@ private:
     Tuning::PtrArr                      tuning;
     Tempo::PtrArr                       tempo;
 	Blendronic::PtrArr				    blendronic;
-    Resonance::PtrArr                   resonance;
+    
+    OwnedArray<ReferenceCountedArray<GenericObject>> genericObj;
     
     SynchronicModification::PtrArr      modSynchronic;
     DirectModification::PtrArr          modDirect;
@@ -888,6 +898,11 @@ private:
 
     int defaultPianoId;
     bool isDirty;
+    
+    int addGenericObject(BKPreparationType thisType);
+    void addGenericObject(BKPreparationType thisType, GenericObject::Ptr);
+    void addGenericObject(BKPreparationType thisType, GenericPreparation::Ptr);
+    GenericObject::Ptr addGenericObject(BKPreparationType thisType, int Id);
     
     
     void addSynchronic(void);
@@ -910,9 +925,6 @@ private:
 	void addBlendronic(Blendronic::Ptr);
 	void addBlendronic(BlendronicPreparation::Ptr);
 
-    void addResonance(void);
-    void addResonance(Resonance::Ptr);
-    void addResonance(ResonancePreparation::Ptr);
 
     void addDirect(void);
     void addDirect(Direct::Ptr);
@@ -970,8 +982,18 @@ private:
     
     int transformId(BKPreparationType type, int oldId);
     
-    void addFromXML(XmlElement* xml);
+    //void addFromXML(XmlElement* xml);
     void addFromValueTree(ValueTree vt);
+    void setPrepStateFromXML(XmlElement* e, BKPreparationType type)
+    {
+        GenericObject::Ptr prep  = addGenericObject(type, 0);
+        prep->setState(e);
+        
+        int oldId = prep->getId();
+        int newId = transformId(type, oldId);
+        
+        prep->setId(newId);
+    }
     
     JUCE_LEAK_DETECTOR(Gallery);
 };

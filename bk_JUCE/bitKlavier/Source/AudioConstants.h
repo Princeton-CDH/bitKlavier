@@ -305,6 +305,32 @@ const String ptagCompressor_autoAttack = "autoAttack";
 const String ptagCompressor_autoRelease = "autoRelease";
 const String ptagCompressor_autoMakeup = "autoMakeup";
 const String ptagCompressor_power = "power";
+static const std::vector<String> cPreparationvTags = {
+    vtagDirect,
+    vtagSynchronic,
+    vtagNostalgic,
+    vtagBlendronic,
+    vtagResonance,
+    vtagTuning,
+    vtagTempo,
+    vtagKeymap
+};
+static const std::vector<String> cPreparationModvTags = {
+    vtagModDirect,
+    vtagModSynchronic,
+    vtagModNostalgic,
+    vtagModBlendronic,
+    vtagModResonance,
+    vtagModTuning,
+    vtagModTempo,
+    "GenericMod",
+    vtagPianoMap,
+    vtagReset,
+    vtagPiano,
+    "comment",
+    vtagCompressor
+};
+
 typedef enum PitchClass {
     C = 0,
     CSharp,

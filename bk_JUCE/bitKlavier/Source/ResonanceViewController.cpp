@@ -513,7 +513,8 @@ void ResonancePreparationEditor::update()
     if (processor.updateState->currentResonanceId < 0) return;
     ADSRSlider->setIsButtonOnly(true);
 
-    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentResonanceId, dontSendNotification);
@@ -590,10 +591,11 @@ void ResonancePreparationEditor::update()
 void ResonancePreparationEditor::fillSelectCB(int last, int current)
 {   selectCB.clear(dontSendNotification);
     
-    for (auto prep : processor.gallery->getAllResonance())
+    for (auto obj : *processor.gallery->getAllObjectsOfType(BKPreparationType::PreparationTypeResonance))
     {
-        int Id = prep->getId();;
-        String name = prep->getName();
+        
+        int Id = obj->getId();
+        String name = obj->getName();
         
         if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("ResonanceMod"+String(Id), Id);
@@ -620,8 +622,8 @@ void ResonancePreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayResonance)
     {
         ResonanceProcessor* proc = dynamic_cast<ResonanceProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentResonanceId, PreparationTypeResonance).get());
-        ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
-        
+        GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+        ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
         if (prep != nullptr && proc != nullptr)
         {
             if (prep->rDefaultGain.didChange())
@@ -710,9 +712,9 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentResonanceId;
-        Resonance::Ptr prep = processor.gallery->getResonance(Id);
+        GenericObject::Ptr obj = processor.gallery->getObjectOfType(PreparationTypeResonance, Id);
         
-        prompt.addTextEditor("name", prep->getName());
+        prompt.addTextEditor("name", obj->getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -723,7 +725,7 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
         
         if (result == 1)
         {
-            prep->setName(name);
+            obj->setName(name);
             vc->fillSelectCB(Id, Id);
             processor.saveGalleryToHistory("Rename Resonance Preparation");
         }
@@ -735,9 +737,9 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentResonanceId;
-        Resonance::Ptr prep = processor.gallery->getResonance(Id);
+        GenericObject::Ptr obj = processor.gallery->getObjectOfType(PreparationTypeResonance, Id);
         
-        prompt.addTextEditor("name", prep->getName());
+        prompt.addTextEditor("name", obj->getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -771,16 +773,12 @@ void ResonancePreparationEditor::closeSubWindow()
 
 int ResonancePreparationEditor::addPreparation(void)
 {
-    processor.gallery->add(PreparationTypeResonance);
-
-    return processor.gallery->getAllResonance().getLast()->getId();
+    return processor.gallery->add(PreparationTypeResonance);
 }
 
 int ResonancePreparationEditor::duplicatePreparation(void)
 {
-    processor.gallery->duplicate(PreparationTypeResonance, processor.updateState->currentResonanceId);
-
-    return processor.gallery->getAllResonance().getLast()->getId();
+    return  processor.gallery->duplicate(PreparationTypeResonance, processor.updateState->currentResonanceId);;
 }
 
 void ResonancePreparationEditor::setCurrentId(int Id)
@@ -846,7 +844,7 @@ void ResonancePreparationEditor::buttonClicked(Button* b)
     }
     else if (b == &actionButton)
     {
-        bool single = processor.gallery->getAllResonance().size() == 2;
+        bool single = processor.gallery->getAllObjectsOfType(PreparationTypeResonance)->size() == 2;
         getPrepOptionMenu(PreparationTypeResonance, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
@@ -875,7 +873,8 @@ void ResonancePreparationEditor::BKEditableComboBoxChanged(String name, BKEditab
 
 void ResonancePreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
 
     if (name == defGainSlider->getName())
     {
@@ -900,7 +899,8 @@ void ResonancePreparationEditor::BKStackedSliderValueChanged(String name, Array<
 {
     DBG("received overtone slider " + name);
 
-    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
 
     //prep->setDistances(val);
 
@@ -911,7 +911,8 @@ void ResonancePreparationEditor::BKADSRSliderValueChanged(String name, int attac
 {
     DBG("received ADSR slider " + name);
 
-    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
 
     prep->setADSRvals(attack, decay, sustain, release);
 
@@ -928,8 +929,8 @@ void ResonancePreparationEditor::BKADSRButtonStateChanged(String name, bool mod,
 
 void ResonancePreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
-    
+    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
     if(name == startTimeSlider->getName()) {
         //DBG("got new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
         prep->setMinStartTime(minval);
@@ -943,7 +944,8 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
     
     DBG("ResonancePreparationEditor::handleKeymapNoteToggled " + String(midiNoteNumber));
     
-    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
     
     if (source == &resonanceKeyboardState)
     {
@@ -989,7 +991,8 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
 
 void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
-    ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(processor.updateState->currentResonanceId);
+    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
  
     if(name == gainsKeyboard.getName())
     {

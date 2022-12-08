@@ -385,10 +385,6 @@
                 file="Source/BKStandaloneWindow.h"/>
         </GROUP>
         <GROUP id="{A7EA3278-0185-F32B-52C4-0F88EA1C92D3}" name="Processor">
-          <FILE id="tQ8AoG" name="GenericProcessor.cpp" compile="1" resource="0"
-                file="Source/GenericProcessor.cpp"/>
-          <FILE id="UuxPmj" name="GenericProcessor.h" compile="0" resource="0"
-                file="Source/GenericProcessor.h"/>
           <FILE id="MtCIvP" name="BKGalleryLoader.h" compile="0" resource="0"
                 file="Source/BKGalleryLoader.h"/>
           <FILE id="b94SqF" name="BKGalleryLoader.cpp" compile="1" resource="0"
@@ -428,6 +424,17 @@
                 file="Source/PreparationMap.h"/>
         </GROUP>
         <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparation">
+          <FILE id="bksKDZ" name="GenericObject.cpp" compile="1" resource="0"
+                file="Source/GenericObject.cpp"/>
+          <FILE id="lxaOsX" name="GenericObject.h" compile="0" resource="0" file="Source/GenericObject.h"/>
+          <FILE id="tQ8AoG" name="GenericProcessor.cpp" compile="1" resource="0"
+                file="Source/GenericProcessor.cpp"/>
+          <FILE id="UuxPmj" name="GenericProcessor.h" compile="0" resource="0"
+                file="Source/GenericProcessor.h"/>
+          <FILE id="gxez63" name="GenericPreparation.cpp" compile="1" resource="0"
+                file="Source/GenericPreparation.cpp"/>
+          <FILE id="spMd7J" name="GenericPreparation.h" compile="0" resource="0"
+                file="Source/GenericPreparation.h"/>
           <FILE id="VFgtPR" name="Modification.cpp" compile="1" resource="0"
                 file="Source/Modification.cpp"/>
           <FILE id="xHx6az" name="Modification.h" compile="0" resource="0" file="Source/Modification.h"/>

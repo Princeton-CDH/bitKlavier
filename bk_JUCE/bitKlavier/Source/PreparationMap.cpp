@@ -58,7 +58,7 @@ void PreparationMap::linkKeymapToPreparation(int keymapId, BKPreparationType thi
 {
     for(auto proc : *processors[thisType])
     {
-        if(proc->getType() == thisType)
+        if(proc->getId() == thisId)
         {
             proc->addKeymap(getKeymap(keymapId));
             return;

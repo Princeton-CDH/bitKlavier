@@ -14,6 +14,8 @@
 #include "Keymap.h"
 //#include "Piano.h"
 #include "AudioConstants.h"
+//class GenericObject;
+class BKAudioProcessor;
 class GenericProcessor : public ReferenceCountedObject
 {
     
@@ -25,10 +27,15 @@ public:
     typedef OwnedArray<GenericProcessor, CriticalSection> CSArr;
     
     
-    GenericProcessor(BKPreparationType type, KeymapTargetType start, KeymapTargetType end) : targetTypeStart(start), type(type), targetTypeEnd(end)
+    GenericProcessor(BKAudioProcessor& processor, BKPreparationType type, KeymapTargetType start, KeymapTargetType end) : targetTypeStart(start), type(type), targetTypeEnd(end), processor(processor)
     {
         
     }
+    
+//    GenericProcessor(BKAudioProcessor& processor, ReferenceCountedObjectPtr<GenericObject> obj, BKPreparationType type, KeymapTargetType start, KeymapTargetType end) : targetTypeStart(start), type(type), targetTypeEnd(end), processor(processor)
+//    {
+//
+//    }
     
     ~GenericProcessor()
     {}
@@ -96,6 +103,8 @@ public:
     KeymapTargetType targetTypeStart;
     KeymapTargetType targetTypeEnd;
 protected:
+    //ReferenceCountedObjectPtr<GenericObject>             obj;
+    BKAudioProcessor& processor;
     Keymap::PtrArr      keymaps;
     BKPreparationType type;
     //need to keep track of the actual notes played and their offsets when a particular key is pressed

@@ -11,6 +11,7 @@
 #ifndef TUNING_H_INCLUDED
 #define TUNING_H_INCLUDED
 
+#include "GenericProcessor.h"
 #include "BKUtilities.h"
 #include "AudioConstants.h"
 
@@ -20,7 +21,6 @@
 #include "Tunings.h"
 #include "MTS-ESP/Client/libMTSClient.h"
 #include "MTS-ESP/Master/libMTSMaster.h"
-#include "GenericProcessor.h"
 class TuningModification;
 
 class TuningPreparation : public ReferenceCountedObject
@@ -1042,9 +1042,9 @@ public:
     
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
-    void copyProcessorState(GenericProcessor::Ptr copy)
+    void copyProcessorState(TuningProcessor::Ptr copy)
     {
-        GenericProcessor::copyProcessorState(copy);
+        TuningProcessor::copyProcessorState(copy);
         TuningProcessor* prev = dynamic_cast<TuningProcessor*>(copy.get());
         
         setAdaptiveHistoryCounter(prev->getAdaptiveHistoryCounter());
@@ -1065,7 +1065,6 @@ public:
     
     void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type);
 private:
-    BKAudioProcessor& processor;
     
     Tuning::Ptr tuning;
     

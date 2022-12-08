@@ -47,7 +47,7 @@ void DirectPreparation::performModification(DirectModification* d, Array<bool> d
 DirectProcessor::DirectProcessor(Direct::Ptr direct,
                                  TuningProcessor::Ptr tuning,
                                  BKAudioProcessor& processor, GeneralSettings::Ptr g) :
-GenericProcessor(BKPreparationType::PreparationTypeDirect, TargetTypeDirect, TargetTypeDirect),
+GenericProcessor(processor, BKPreparationType::PreparationTypeDirect, TargetTypeDirect, TargetTypeDirect),
 synth(new BKSynthesiser(processor, g,processor.mainPianoSoundSet )),
 resonanceSynth(new BKSynthesiser(processor, g,processor.resonanceReleaseSoundSet )),
 hammerSynth(new BKSynthesiser(processor, g,processor.hammerReleaseSoundSet )),

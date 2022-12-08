@@ -237,7 +237,7 @@ public:
         
     }
     
-    inline ResonanceModification::Ptr duplicate(void)
+    inline ResonanceModification::Ptr duplicateMod(void)
     {
         ResonanceModification::Ptr mod = new ResonanceModification(processor, -1);
         

@@ -482,12 +482,12 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
 	}
     else if (type == PreparationTypeResonance)
     {
-        Resonance::Ptr p = new Resonance(-1);
-        p->setState(xml);
-        addResonance(p);
-        if (p->getName() == "Resonance " + String(oldId))
-            p->setName("Resonance " + String(p->getId()));
-        else p->setName(iterateName(PreparationTypeResonance, p->getName()));
+        Resonance::Preparation p = new ResonancePreparation();
+        GenericObject::Ptr obj = new GenericObject(p, xml);
+        addGenericObject(type, obj);
+//        if (p->getName() == "Resonance " + String(oldId))
+//            p->setName("Resonance " + String(p->getId()));
+//        else p->setName(iterateName(PreparationTypeResonance, p->getName()));
         return p->getId();
     }
     else if (type == PreparationTypeKeymap)
@@ -641,15 +641,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
 		String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " (" + String(numWithSameNameAs(PreparationTypeBlendronic, newId)) + ")";
 		newOne->setName(newName);
 	}
-    else if (type == PreparationTypeResonance)
-    {
-        Resonance::Ptr toCopy = getResonance(Id);
-        Resonance::Ptr newOne = toCopy->duplicate();
-        addResonance(newOne);
-        newId = newOne->getId();
-        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " (" + String(numWithSameNameAs(PreparationTypeResonance, newId)) + ")";
-        newOne->setName(newName);
-    }
+    
     else if (type == PreparationTypeKeymap)
     {
         Keymap::Ptr toCopy = getKeymap(Id);
@@ -730,6 +722,15 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         newId = newOne->getId();
         String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypePiano, newId))+")";
         newOne->setName(newName);
+    } else
+    {
+        GenericObject::Ptr toCopy = getGenericPrep(type, Id);
+        GenericObject::Ptr newOne = toCopy->duplicate();
+        addGenericPrep(type, newOne);
+        newId = newOne->getId();
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " (" + String(numWithSameNameAs(PreparationTypeResonance, newId)) + ")";
+        newOne->setName(newName);
+        
     }
     
     prepareToPlay();
@@ -773,11 +774,7 @@ int Gallery::add(BKPreparationType type)
 		addBlendronic();
 		newId = blendronic.getLast()->getId();
 	}
-    else if (type == PreparationTypeResonance)
-    {
-        addResonance();
-        newId = resonance.getLast()->getId();
-    }
+    
     else if (type == PreparationTypeKeymap)
     {
         addKeymap();
@@ -822,6 +819,9 @@ int Gallery::add(BKPreparationType type)
     {
         addPiano();
         newId = bkPianos.getLast()->getId();
+    } else
+    {
+        newId = addGenericObject(type);
     }
     
     prepareToPlay();
@@ -1104,10 +1104,6 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
 	{
 		addBlendronicWithId(Id);
 	}
-    else if (type == PreparationTypeResonance)
-    {
-        addResonanceWithId(Id);
-    }
     else if (type == PreparationTypeKeymap)
     {
         addKeymapWithId(Id);
@@ -1143,6 +1139,10 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
     else if (type == PreparationTypePiano)
     {
         addPianoWithId(Id);
+    }
+    else //resonance
+    {
+        addGenericPrep(type, Id);
     }
     
     prepareToPlay();
@@ -1230,28 +1230,80 @@ void Gallery::addBlendronic(Blendronic::Ptr p)
     blendronic.add(p);
 }
 
-void Gallery::addResonanceWithId(int Id)
+
+
+int Gallery::addGenericObject(BKPreparationType thisType)
 {
-    resonance.add(new Resonance(Id));
+    int newId = getNewId(thisType);
+    addGenericObject(thisType,newId);
+    return newId;
+    //genericPrep[thisType].add(newId);
 }
 
-void Gallery::addResonance(void)
+void Gallery::addGenericObject(BKPreparationType thisType, GenericObject::Ptr newObj)
 {
-    int newId = getNewId(PreparationTypeResonance);
-    resonance.add(new Resonance(newId));
+    genericObj[thisType].add(newObj);
 }
 
-void Gallery::addResonance(Resonance::Ptr p)
+void Gallery::addGenericObject(BKPreparationType thisType, GenericPreparation::Ptr newPrep)
 {
-    int newId = getNewId(PreparationTypeResonance);
-    p->setId(newId);
-    resonance.add(p);
+    genericObj[thisType].add(new GenericObject(newPrep));
 }
 
-void Gallery::addResonance(ResonancePreparation::Ptr res)
+GenericObject::Ptr Gallery::addGenericObject(BKPreparationType thisType, int newId)
 {
-    int newId = getNewId(PreparationTypeResonance);
-    resonance.add(new Resonance(res, newId));
+    GenericObject::Ptr obj;
+    if (type == PreparationTypeDirect)
+    {
+    }
+    else if (type == PreparationTypeSynchronic)
+    {
+    }
+    else if (type == PreparationTypeNostalgic)
+    {
+    }
+    else if (type == PreparationTypeTuning)
+    {
+    }
+    else if (type == PreparationTypeTempo)
+    {
+    }
+    else if (type == PreparationTypeBlendronic)
+    {
+    }
+    else if (type == PreparationTypeResonance)
+    {
+        prep = new ResonancePreparation(newId)
+        genericObj[thisType].add(new GenericObject(obj, Id);
+    }
+    else if (type == PreparationTypeKeymap)
+    {
+    }
+    if (type == PreparationTypeDirectMod)
+    {
+    }
+    else if (type == PreparationTypeSynchronicMod)
+    {
+    }
+    else if (type == PreparationTypeNostalgicMod)
+    {
+    }
+    else if (type == PreparationTypeResonanceMod)
+    {
+    }
+    else if (type == PreparationTypeTuningMod)
+    {
+    }
+    else if (type == PreparationTypeTempoMod)
+    {
+    }
+    else if (type == PreparationTypeBlendronicMod)
+    {
+    }
+    else if (type == PreparationTypePiano)
+    {
+    }
+    return obj;
 }
 
 void Gallery::addTempo(void)

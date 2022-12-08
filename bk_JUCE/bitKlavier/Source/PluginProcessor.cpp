@@ -580,26 +580,6 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 {
     bool activeSource = false;
     
-    /*
-    // Check PianoMap for whether piano should change due to key strike.
-    for (auto mpmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
-    {
-        for (auto keymap : mpmap.keymaps)
-        {
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
-            {
-                int whichPiano = mpmap.pianoTarget;
-                if (whichPiano > 0 && whichPiano != currentPiano->getId())
-                {
-                    DBG("change piano to " + String(whichPiano));
-                    setCurrentPiano(whichPiano);
-                }
-                break;
-            }
-        }
-    }
-     */
-    
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     if (pmap == nullptr) return;
     
@@ -2020,6 +2000,9 @@ void BKAudioProcessor::handleIncomingMidiMessage(MidiInput* source, const MidiMe
 
 void BKAudioProcessor::hiResTimerCallback()
 {
+    
+    gallery->stepModdables();
+    
     for (auto d : gallery->getAllDirect())
     {
         d->prep->stepModdables();
