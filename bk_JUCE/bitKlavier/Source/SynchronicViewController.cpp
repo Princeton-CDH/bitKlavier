@@ -197,6 +197,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     gainSlider->setToolTipString("Overall volume of Synchronic pulse");
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
+    gainSlider->displaySliderVisible(false);
     addAndMakeVisible(*gainSlider, ALL);
     
     numClusterSlider = std::make_unique<BKSingleSlider>("num layers", cSynchronicNumClusters, 1, 10, 1, 1);
@@ -213,6 +214,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     blendronicGainSlider->setToolTipString("Volume of Synchronic output to connected Blendronics");
     blendronicGainSlider->setJustifyRight(false);
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
+    blendronicGainSlider->displaySliderVisible(false);
     addAndMakeVisible(*blendronicGainSlider, ALL);
     
 #if JUCE_IOS
