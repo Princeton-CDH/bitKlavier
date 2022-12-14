@@ -428,7 +428,7 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (item->getType() == PreparationTypeResonance)
         {
-            rPrep = processor.gallery->getResonancePreparation(item->getId());
+            rPrep = processor.gallery->getPreparationOfType(PreparationTypeResonance, item->getId());
             resonanceSelected = true;
         }
         // Modifications
@@ -513,8 +513,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (resonanceSelected)
         {
-            rPrep->rSoundSet.set(soundSetId);
-            rPrep->rSoundSetName.set(soundSetName);
+            rPrep->soundSet.set(soundSetId);
+            rPrep->soundSetName.set(soundSetName);
         }
         else if (directModSelected)
         {
@@ -536,8 +536,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (resonanceModSelected)
         {
-            rMod->rSoundSet.set(soundSetId);
-            rMod->rSoundSetName.set(soundSetName);
+            rMod->prep->soundSet.set(soundSetId);
+            rMod->prep->soundSetName.set(soundSetName);
             rMod->setDirty(ResonanceSoundSet);
         }
         
@@ -574,8 +574,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             String sfname = processor.loadedSoundSets[rPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
-            rPrep->rSoundSet.set(soundSetId);
-            rPrep->rSoundSetName.set(soundSetName);
+            rPrep->soundSet.set(soundSetId);
+            rPrep->soundSetName.set(soundSetName);
         }
         // Modifications
         else if (directModSelected)
@@ -607,11 +607,11 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (resonanceModSelected)
         {
-            String sfname = processor.loadedSoundSets[rMod->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
+            String sfname = processor.loadedSoundSets[rMod->prep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
-            rMod->rSoundSet.set(soundSetId);
-            rMod->rSoundSetName.set(soundSetName);
+            rMod->prep->soundSet.set(soundSetId);
+            rMod->prep->soundSetName.set(soundSetName);
             rMod->setDirty(ResonanceSoundSet);
         }
         else
@@ -1228,9 +1228,9 @@ void MainViewController::timerCallback()
         {
             soundItemSelected = true;
             globalSoundSetButton.setVisible(true);
-            ResonancePreparation::Ptr prep = processor.gallery->getResonancePreparation(item->getId());
+            ResonancePreparation::Ptr prep = processor.gallery->getPreparationOfType(PreparationTypeResonance, item->getId());
             if (prep != nullptr)
-                globalSoundSetButton.setToggleState(prep->rUseGlobalSoundSet.value, dontSendNotification);
+                globalSoundSetButton.setToggleState(prep->useGlobalSoundSet.value, dontSendNotification);
         }
         // Modifications
         else if (item->getType() == PreparationTypeDirectMod)
@@ -1279,7 +1279,7 @@ void MainViewController::timerCallback()
             ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(item->getId());
             if (mod != nullptr)
             {
-                globalSoundSetButton.setToggleState(mod->rUseGlobalSoundSet.value, dontSendNotification);
+                globalSoundSetButton.setToggleState(mod->prep->useGlobalSoundSet.value, dontSendNotification);
                 globalSoundSetButton.setAlpha(mod->getDirty(ResonanceUseGlobalSoundSet) ? 1. : gModAlpha);
                 sampleCB.setAlpha(mod->getDirty(ResonanceSoundSet) ? 1. : gModAlpha);
                 instrumentCB.setAlpha(mod->getDirty(ResonanceSoundSet) ? 1. : gModAlpha);

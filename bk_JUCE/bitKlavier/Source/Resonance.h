@@ -20,7 +20,6 @@
 #include "BKPianoSampler.h"
 #include "GenericProcessor.h"
 #include "GenericPreparation.h"
-#include "GenericObject.h"
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////RESONANCE PREPARATION///////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////
@@ -69,41 +68,12 @@ public:
 //    typedef OwnedArray<ResonancePreparation>                  Arr;
 //    typedef OwnedArray<ResonancePreparation, CriticalSection> CSArr;
 
-
-    //copy constructor
-    ResonancePreparation(ResonancePreparation::Ptr r, int* _id, String* name) :
-        rSoundSet(dynamic_cast<ResonancePreparation*>(r.get())->rSoundSet),
-        rUseGlobalSoundSet(dynamic_cast<ResonancePreparation*>(r.get())->rUseGlobalSoundSet),
-        rSoundSetName(dynamic_cast<ResonancePreparation*>(r.get())->rSoundSetName),
-        rAttack(dynamic_cast<ResonancePreparation*>(r.get())->rAttack),
-        rDecay(dynamic_cast<ResonancePreparation*>(r.get())->rDecay),
-        rRelease(dynamic_cast<ResonancePreparation*>(r.get())->rRelease),
-        rSustain(dynamic_cast<ResonancePreparation*>(r.get())->rSustain),
-        rDefaultGain(dynamic_cast<ResonancePreparation*>(r.get())->rDefaultGain),
-        rBlendronicGain(dynamic_cast<ResonancePreparation*>(r.get())->rBlendronicGain),
-        rMinStartTimeMS(dynamic_cast<ResonancePreparation*>(r.get())->rMinStartTimeMS),
-        rMaxStartTimeMS(dynamic_cast<ResonancePreparation*>(r.get())->rMaxStartTimeMS),
-        rMaxSympStrings(dynamic_cast<ResonancePreparation*>(r.get())->rMaxSympStrings),
-        rFundamentalKey(dynamic_cast<ResonancePreparation*>(r.get())->rFundamentalKey),
-        rResonanceKeys(dynamic_cast<ResonancePreparation*>(r.get())->rResonanceKeys),
-        rOffsetsKeys(dynamic_cast<ResonancePreparation*>(r.get())->rOffsetsKeys),
-        rGainsKeys(dynamic_cast<ResonancePreparation*>(r.get())->rGainsKeys),
-        rActiveHeldKeys(dynamic_cast<ResonancePreparation*>(r.get())->rActiveHeldKeys),
-        GenericPreparation(BKPreparationType::PreparationTypeResonance, _id, name)
-    {
-        setDefaultPartialStructure();
-    }
-
     //constructor with input
-    ResonancePreparation(String newName, float defaultGain, float blendGain, int resoID,  int* _id, String* name) :
-        rSoundSet(-1),
-        rUseGlobalSoundSet(true),
-        rSoundSetName(String()),
+    ResonancePreparation(String newName, float defaultGain, float blendGain, int Id) :
         rAttack(50),
         rDecay(3),
         rRelease(50),
         rSustain(1.),
-        rDefaultGain(defaultGain, true),
         rBlendronicGain(blendGain, true),
         rMinStartTimeMS(400),
         rMaxStartTimeMS(4000),
@@ -113,21 +83,17 @@ public:
         rOffsetsKeys({}),
         rGainsKeys({}),
         rActiveHeldKeys({}),
-        GenericPreparation(BKPreparationType::PreparationTypeResonance, _id, name)
+        GenericPreparation(BKPreparationType::PreparationTypeResonance, Id, newName, defaultGain)
     {
         setDefaultPartialStructure();
     }
 
     //empty constructor, values will need to be tweaked
-    ResonancePreparation( int* _id, String* name) :
-    rSoundSet(-1),
-    rUseGlobalSoundSet(true),
-    rSoundSetName(String()),
+    ResonancePreparation( int Id, String name) :
     rAttack(50),
     rDecay(3),
     rRelease(50),
     rSustain(1.),
-    rDefaultGain(0.5, true),
     rBlendronicGain(0.0, true),
     rMinStartTimeMS(400),
     rMaxStartTimeMS(4000),
@@ -137,23 +103,45 @@ public:
     rOffsetsKeys({}),
     rGainsKeys({}),
     rActiveHeldKeys({}),
-    GenericPreparation(BKPreparationType::PreparationTypeResonance, _id, name)
+    GenericPreparation(BKPreparationType::PreparationTypeResonance, Id, name)
     {
         setDefaultPartialStructure();
     }
+    
+    //empty constructor, values will need to be tweaked
+    ResonancePreparation( int Id) :
+    rAttack(50),
+    rDecay(3),
+    rRelease(50),
+    rSustain(1.),
+    rBlendronicGain(0.0, true),
+    rMinStartTimeMS(400),
+    rMaxStartTimeMS(4000),
+    rMaxSympStrings(8),
+    rFundamentalKey(0),
+    rResonanceKeys({}),
+    rOffsetsKeys({}),
+    rGainsKeys({}),
+    rActiveHeldKeys({}),
+    GenericPreparation(BKPreparationType::PreparationTypeResonance, Id)
+    {
+        setDefaultPartialStructure();
+    }
+    
+    ~ResonancePreparation(){};
 
     // copy, modify, compare, randomize
     void copy(ResonancePreparation::Ptr r) override
     {
         ResonancePreparation* _r = dynamic_cast<ResonancePreparation*>(r.get());
-        rSoundSet               = _r->rSoundSet;
-        rUseGlobalSoundSet      = _r->rUseGlobalSoundSet;
-        rSoundSetName           = _r->rSoundSetName;
+        soundSet               = r->soundSet;
+        useGlobalSoundSet      = r->useGlobalSoundSet;
+        soundSetName           = r->soundSetName;
         rAttack                 = _r->rAttack;
         rDecay                  = _r->rDecay;
         rRelease                = _r->rRelease;
         rSustain                = _r->rSustain;
-        rDefaultGain            = _r->rDefaultGain;
+        defaultGain            = r->defaultGain;
         rBlendronicGain         = _r->rBlendronicGain;
         rMinStartTimeMS         = _r->rMinStartTimeMS;
         rMaxStartTimeMS         = _r->rMaxStartTimeMS;
@@ -163,22 +151,23 @@ public:
         rOffsetsKeys            = _r->rOffsetsKeys;
         rGainsKeys              = _r->rGainsKeys;
         rActiveHeldKeys         = _r->rActiveHeldKeys;
+        GenericPreparation::copy(r);
     }
 
-    void performModification(ResonanceModification* r, Array<bool> dirty);
+    void performModification(ResonanceModification*, Array<bool>);
 
     bool compare(ResonancePreparation::Ptr r) override
     {
         ResonancePreparation* _r = dynamic_cast<ResonancePreparation*>(r.get());
         return (
-                rSoundSet               == _r->rSoundSet &&
-                rUseGlobalSoundSet      == _r->rUseGlobalSoundSet &&
-                rSoundSetName           == _r->rSoundSetName &&
+                soundSet               == r->soundSet &&
+                useGlobalSoundSet      == r->useGlobalSoundSet &&
+                soundSetName           == r->soundSetName &&
                 rAttack                 == _r->rAttack &&
                 rDecay                  == _r->rDecay &&
                 rRelease                == _r->rRelease &&
                 rSustain                == _r->rSustain &&
-                rDefaultGain            == _r->rDefaultGain &&
+                defaultGain            == r->defaultGain &&
                 rBlendronicGain         == _r->rBlendronicGain &&
                 rMinStartTimeMS         == _r->rMinStartTimeMS &&
                 rMaxStartTimeMS         == _r->rMaxStartTimeMS &&
@@ -192,7 +181,7 @@ public:
 
     }
 
-    inline void randomize()
+    inline void randomize() override
     {
         Random::getSystemRandom().setSeedRandomly();
 
@@ -217,16 +206,16 @@ public:
         //etc etc etc
     }
     
-    void stepModdables()
+    void stepModdables() override
     {
-        rSoundSet.step();
-        rUseGlobalSoundSet.step();
-        rSoundSetName.step();
+        soundSet.step();
+        useGlobalSoundSet.step();
+        soundSetName.step();
         rAttack.step();
         rDecay.step();
         rRelease.step();
         rSustain.step();
-        rDefaultGain.step();
+        defaultGain.step();
         rBlendronicGain.step();
         rMinStartTimeMS.step();
         rMaxStartTimeMS.step();
@@ -241,14 +230,14 @@ public:
     void resetModdables() override
     {
         DBG("resetting Resonance Moddables");
-        rSoundSet.reset();
-        rUseGlobalSoundSet.reset();
-        rSoundSetName.reset();
+        soundSet.reset();
+        useGlobalSoundSet.reset();
+        soundSetName.reset();
         rAttack.reset();
         rDecay.reset();
         rRelease.reset();
         rSustain.reset();
-        rDefaultGain.reset();
+        defaultGain.reset();
         rBlendronicGain.reset();
         rMinStartTimeMS.reset();
         rMaxStartTimeMS.reset();
@@ -272,8 +261,8 @@ public:
     }
 
     //accessors
-    inline const String getName() const noexcept { return name; }
-    inline const float getDefGain() const noexcept { return rDefaultGain.value; }
+    //inline const String getName() const noexcept { return name; }
+    
     inline const float getBlendGain() const noexcept { return rBlendronicGain.value; }
     inline const Array<float> getADSRvals() const noexcept
     {
@@ -284,13 +273,12 @@ public:
 
         };
     }
-    inline int getSoundSet() { return rUseGlobalSoundSet.value ? -1 : rSoundSet.value; }
-    inline float* getDefaultGainPtr() { return &rDefaultGain.value; }
+    
     inline float* getBlendGainPtr() { return &rBlendronicGain.value; }
 
     //mutators
-    inline void setName(String n) { name = n; }
-    inline void setDefGain(float gainToSet) { rDefaultGain = gainToSet; }
+    //inline void setName(String n) { name = n; }
+   
     inline void setBlendGain(float gainToSet) { rBlendronicGain = gainToSet; }
     inline void setADSRvals(Array<float> vals)
     {
@@ -306,7 +294,7 @@ public:
         rSustain = sustain;
         rRelease = release;
     }
-    inline void setSoundSet(int Id) { rSoundSet = Id; }
+    
     
     void setFundamentalKey(int nf)
     {
@@ -513,11 +501,16 @@ public:
     {
     }
 
-    ValueTree getState(void)
+    ValueTree getState(void) override
     {
+        
+        ValueTree vt(vtagResonance);
+        
+        vt.setProperty( "Id",getId(), 0);
+        vt.setProperty( "name", getName(), 0);
         ValueTree prep("params");
 
-        rDefaultGain.getState(prep, ptagResonance_gain);
+        defaultGain.getState(prep, ptagResonance_gain);
         rBlendronicGain.getState(prep, ptagResonance_blendronicGain);
         
         ValueTree ADSRvals( vtagResonance_ADSR);
@@ -528,8 +521,8 @@ public:
         rRelease.getState(ADSRvals, ptagFloat + String(count));
         prep.addChild(ADSRvals, -1, 0);
         
-        rUseGlobalSoundSet.getState(prep, ptagResonance_useGlobalSoundSet);
-        rSoundSetName.getState(prep, ptagResonance_soundSet);
+        useGlobalSoundSet.getState(prep, ptagResonance_useGlobalSoundSet);
+        soundSetName.getState(prep, ptagResonance_soundSet);
         
         rMinStartTimeMS.getState(prep, ptagResonance_starttimeMin);
         rMaxStartTimeMS.getState(prep, ptagResonance_starttimeMax);
@@ -541,12 +534,33 @@ public:
         rOffsetsKeys.getState(prep, StringArray(vtagResonance_offsets, ptagFloat));
         rGainsKeys.getState(prep, StringArray(vtagResonance_gains, ptagFloat));
         rActiveHeldKeys.getState(prep, StringArray(vtagResonance_add, ptagInt));
+        vt.addChild(prep, -1, 0);
         return prep;
     }
 
-    void setState(XmlElement* e)
+    void setState(XmlElement* e) override
     {
-        rDefaultGain.setState(e, ptagResonance_gain, 1.0f);
+        
+        setId(e->getStringAttribute("Id").getIntValue());
+        
+        String n = e->getStringAttribute("name");
+
+        if (n != String())     setName(n);
+        else                   setName(String(getId()));
+
+
+        e = e->getChildByName("params");
+
+//        if (params != nullptr)
+//        {
+//            prep->setState(params);
+//        }
+//        else
+//        {
+//            prep->setState(e);
+//        }
+        
+        defaultGain.setState(e, ptagResonance_gain, 1.0f);
         rBlendronicGain.setState(e, ptagResonance_blendronicGain, 1.0f);
         
         XmlElement* sub = e->getChildByName(vtagResonance_ADSR);
@@ -559,8 +573,8 @@ public:
             rRelease.setState(sub, ptagFloat + String(count), 30);
         }
         
-        rUseGlobalSoundSet.setState(e, ptagResonance_useGlobalSoundSet, true);
-        rSoundSetName.setState(e, ptagResonance_soundSet, String());
+        useGlobalSoundSet.setState(e, ptagResonance_useGlobalSoundSet, true);
+        soundSetName.setState(e, ptagResonance_soundSet, String());
         
         rMinStartTimeMS.setState(e, ptagResonance_starttimeMin, 400);
         rMaxStartTimeMS.setState(e, ptagResonance_starttimeMax, 4000);
@@ -579,14 +593,11 @@ public:
     
     bool modded = false;
 
-    Moddable<int> rSoundSet;
-    Moddable<bool> rUseGlobalSoundSet;
-    Moddable<String> rSoundSetName;
 
     Moddable<int> rAttack, rDecay, rRelease; //ADSR in MS
     Moddable<float> rSustain;
 
-    Moddable<float> rDefaultGain; //shortcut until list of overtone gains is implemented
+    
     Moddable<float> rBlendronicGain;
 
     Moddable<int> rMinStartTimeMS;
@@ -635,7 +646,7 @@ public:
         sympStrings.remove(noteNumber);
     }
     
-    Array<int> getSympStrings();
+    
     
     
     // => sympStrings
@@ -643,13 +654,38 @@ public:
     //      outside map is indexed by held note (midiNoteNumber), inside array resizes depending on the number of partials
     //      so this includes all of the partials for all of the currently undamped strings
     HashMap<int, Array<SympPartial::Ptr>> sympStrings;
+    void clear() override
+    {
+        rAttack = 50;
+        rDecay = 3;
+        rRelease = 50;
+        rSustain = 1.f;
+        rBlendronicGain = 0.0f;
+        rMinStartTimeMS = 400;
+        rMaxStartTimeMS = 4000;
+        rMaxSympStrings = 8;
+        rFundamentalKey = 0;
+        rResonanceKeys = {};
+        rOffsetsKeys = {};
+        rGainsKeys = {};
+        rActiveHeldKeys = {};
+        soundSet = -1;
+        useGlobalSoundSet = true;
+        soundSetName = String();
+        defaultGain = 0.5f;
+    }
     
+    ResonancePreparation::Ptr duplicate() override
+    {
+        ResonancePreparation::Ptr prep = new ResonancePreparation(getId());
+        prep->copy(this);
+        return prep;
+    }
 private:
-    GenericObject::Ptr obj;
 
     CriticalSection lock;
     
-    String name;
+    //String name;
     
     // => partialStructure
     // 2D array for partial structure
@@ -692,7 +728,7 @@ public:
 //    typedef OwnedArray<ResonanceProcessor>                  Arr;
 //    typedef OwnedArray<ResonanceProcessor, CriticalSection> CSArr;
 
-    ResonanceProcessor( GenericObject::Ptr rResonance,
+    ResonanceProcessor( ResonancePreparation::Ptr rResonance,
                         TuningProcessor::Ptr rTuning,
                         GeneralSettings::Ptr rGeneral,
                         BKAudioProcessor &processor
@@ -701,7 +737,7 @@ public:
     
     inline void reset(void)
     {
-        obj->prep->resetModdables();
+        prep->resetModdables();
         DBG("resonance reset called");
     }
 
@@ -717,13 +753,13 @@ public:
 
     void prepareToPlay(double sr);
     //accessors
-    ResonancePreparation* getResonance(void) const noexcept { return dynamic_cast<ResonancePreparation*>(obj->prep.get()); }
+    ResonancePreparation* getResonance(void) const noexcept { return dynamic_cast<ResonancePreparation*>(prep.get()); }
     inline TuningProcessor::Ptr getTuning(void) const noexcept { return tuning; }
-    inline int getId(void) const noexcept { return obj->getId(); }
+    inline int getId(void) const noexcept { return prep->getId(); }
     inline int getTuningId(void) const noexcept { return tuning->getId(); }
    
     //mutators
-    inline void setResonance(ResonancePreparation::Ptr res) { obj->prep = res; }
+    inline void setResonance(ResonancePreparation::Ptr res) { prep = res; }
     inline void setTuning(TuningProcessor::Ptr tun) { tuning = tun; }
 
     void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type);
@@ -774,7 +810,6 @@ public:
     }
 private:
     CriticalSection lock;
-    GenericObject::Ptr obj;
     
     TuningProcessor::Ptr        tuning;
     GeneralSettings::Ptr        general;

@@ -582,31 +582,31 @@ void NostalgicModification::setStateOld(XmlElement* e)
 }
 
 ResonanceModification::ResonanceModification(BKAudioProcessor& processor, int Id):
-Modification(processor, Id, ResonanceParameterTypeNil)
-
+Modification(processor, Id, ResonanceParameterTypeNil),
+prep(new ResonancePreparation(-1))
 {
-
+    
 }
 
 ValueTree ResonanceModification::getState(void)
 {
     
-    ValueTree prep(vtagModResonance);
+    ValueTree _prep(vtagModResonance);
     
-    prep.setProperty( "Id", Id, 0);
-    prep.setProperty( "name", getName(), 0);
-    prep.setProperty("alt", altMod, 0);
+    _prep.setProperty( "Id", Id, 0);
+    _prep.setProperty( "name", _getName(), 0);
+    _prep.setProperty("alt", altMod, 0);
     ValueTree dirtyVT( "dirty");
     int count = 0;
     for (auto b : dirty)
     {
         dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
     }
-    prep.addChild(dirtyVT, -1, 0);
+    _prep.addChild(dirtyVT, -1, 0);
     
-    prep.addChild(ResonancePreparation::getState(), -1, 0);
+    _prep.addChild(prep->getState(), -1, 0);
     
-    return prep;
+    return _prep;
 }
 
 void ResonanceModification::setState(XmlElement* e)
@@ -618,8 +618,8 @@ void ResonanceModification::setState(XmlElement* e)
     
     altMod = e->getBoolAttribute("alt", false);
     
-    if (n != String())     setName(n);
-    else                        setName(String(Id));
+    if (n != String())     _setName(n);
+    else                        _setName(String(Id));
     
     XmlElement* dirtyXml = e->getChildByName("dirty");
     XmlElement* paramsXml = e->getChildByName("params");
@@ -638,13 +638,14 @@ void ResonanceModification::setState(XmlElement* e)
             }
         }
         
-        ResonancePreparation::setState(paramsXml);
-        if (!rUseGlobalSoundSet.value)
+        prep->setState(paramsXml);
+    
+        if (!prep->useGlobalSoundSet.value)
         {
             // comes in as "soundfont.sf2.subsound1"
-            String name = rSoundSetName.value;
+            String name = prep->soundSetName.value;
             int Id = processor.findPathAndLoadSamples(name);
-            setSoundSet(Id);
+            prep->setSoundSet(Id);
         }
     }
     /*

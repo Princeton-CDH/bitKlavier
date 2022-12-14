@@ -1458,8 +1458,8 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    ResonancePreparation::Ptr prep = gallery->getResonance(target)->prep;
-                    prep->performModification(mod, mod->getDirty());
+                    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(gallery->getPreparationOfType(PreparationTypeResonance, target).get());
+                    //prep->performModification(mod, mod->getDirty());
                 }
                 updateState->resonancePreparationDidChange = true;
                 break;
@@ -2011,9 +2011,9 @@ void BKAudioProcessor::hiResTimerCallback()
     {
         n->prep->stepModdables();
     }
-    for (auto r : gallery->getAllResonance())
+    for (auto r : *gallery->getAllPreparationsOfType(PreparationTypeResonance))
     {
-        r->prep->stepModdables();
+        r->stepModdables();
     }
     for (auto s : gallery->getAllSynchronic())
     {
@@ -2110,7 +2110,7 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeResonance)
     {
-        gallery->getResonance(Id)->clear();
+        gallery->getPreparationOfType(PreparationTypeResonance, Id)->clear();
         
         ResonanceProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         

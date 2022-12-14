@@ -424,9 +424,6 @@
                 file="Source/PreparationMap.h"/>
         </GROUP>
         <GROUP id="{BE0ACC3D-1AC5-1BB6-2D3E-F52EFBCC8E45}" name="Preparation">
-          <FILE id="bksKDZ" name="GenericObject.cpp" compile="1" resource="0"
-                file="Source/GenericObject.cpp"/>
-          <FILE id="lxaOsX" name="GenericObject.h" compile="0" resource="0" file="Source/GenericObject.h"/>
           <FILE id="tQ8AoG" name="GenericProcessor.cpp" compile="1" resource="0"
                 file="Source/GenericProcessor.cpp"/>
           <FILE id="UuxPmj" name="GenericProcessor.h" compile="0" resource="0"

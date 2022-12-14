@@ -24,10 +24,21 @@
 class Modification
 {
 public:
+    Modification(BKAudioProcessor& processor, int Id, String name, int numParams):
+    altMod(false),
+    processor(processor),
+    Id(Id),
+    name(name)
+    {
+        dirty.ensureStorageAllocated(numParams);
+        for (int i = 0; i < numParams; i++) dirty.add(false);
+    }
+    
     Modification(BKAudioProcessor& processor, int Id, int numParams):
     altMod(false),
     processor(processor),
-    Id(Id)
+    Id(Id),
+    name()
     {
         dirty.ensureStorageAllocated(numParams);
         for (int i = 0; i < numParams; i++) dirty.add(false);
@@ -37,7 +48,8 @@ public:
     {
         
     }
-    
+    inline void _setName(String name) {name = name;}
+    inline String _getName() {return name; }
     inline void setId(int I){ Id = I; }
     inline void setTargets(Array<int> targ) { targets = targ; }
 
@@ -94,7 +106,7 @@ public:
     
 protected:
     BKAudioProcessor& processor;
-    
+    String name;
     int             Id;
     
     Array<int>      targets;
@@ -131,7 +143,7 @@ public:
     
     inline void copy (DirectModification::Ptr mod)
     {
-        setName(mod->getName() + "copy");
+        _setName(mod->_getName() + "copy");
         altMod = mod->altMod;
         DirectPreparation::copy(mod);
     }
@@ -170,7 +182,7 @@ public:
     
     inline void copy (SynchronicModification::Ptr mod)
     {
-        setName(mod->getName() + "copy");
+        _setName(mod->_getName() + "copy");
         altMod = mod->altMod;
         SynchronicPreparation::copy(mod);
     }
@@ -209,7 +221,7 @@ public:
     
     inline void copy (NostalgicModification::Ptr mod)
     {
-        setName(mod->getName() + "copy");
+        _setName(mod->_getName() + "copy");
         altMod = mod->altMod;
         NostalgicPreparation::copy(mod);
     }
@@ -224,8 +236,8 @@ private:
 };
 
 class ResonanceModification :
-public Modification,
-public ResonancePreparation
+public ReferenceCountedObject,
+public Modification
 {
 public:
     typedef ReferenceCountedObjectPtr<ResonanceModification>   Ptr;
@@ -248,15 +260,18 @@ public:
     
     inline void copy (ResonanceModification::Ptr mod)
     {
-        setName(mod->getName() + "copy");
+        _setName(mod->_getName() + "copy");
         altMod = mod->altMod;
-        ResonancePreparation::copy(mod);
+        prep->copy(mod->getPrep());
     }
     
     ValueTree getState(void);
     void setState(XmlElement* e);
     // void setStateOld(XmlElement* e);
-    
+    ResonancePreparation::Ptr getPrep() {return prep;}
+    ResonancePreparation* getPrepPtr() {return dynamic_cast<ResonancePreparation*>(prep.get());}
+    void resetModdables() {prep->resetModdables();}
+    ResonancePreparation::Ptr prep;
 private:
     
     JUCE_LEAK_DETECTOR(ResonanceModification)
@@ -289,7 +304,7 @@ public:
     
     inline void copy (TuningModification::Ptr mod)
     {
-        setName(mod->getName() + "copy");
+        _setName(mod->getName() + "copy");
         altMod = mod->altMod;
         TuningPreparation::copy(mod);
     }
@@ -322,8 +337,8 @@ public:
         
         altMod = e->getBoolAttribute("alt", false);
         
-        if (n != String())     setName(n);
-        else                        setName(String(Id));
+        if (n != String())     _setName(n);
+        else                        _setName(String(Id));
         
         XmlElement* dirtyXml = e->getChildByName("dirty");
         XmlElement* paramsXml = e->getChildByName("params");
@@ -399,7 +414,7 @@ public:
     
     inline void copy (TempoModification::Ptr mod)
     {
-        setName(mod->getName() + "copy");
+        _setName(mod->getName() + "copy");
         altMod = mod->altMod;
         TempoPreparation::copy(mod);
     }
@@ -432,8 +447,8 @@ public:
         
         altMod = e->getBoolAttribute("alt", false);
         
-        if (n != String())     setName(n);
-        else                        setName(String(Id));
+        if (n != String())     _setName(n);
+        else                        _setName(String(Id));
         
         XmlElement* dirtyXml = e->getChildByName("dirty");
         XmlElement* paramsXml = e->getChildByName("params");
@@ -492,7 +507,7 @@ public:
 
 	inline void copy(BlendronicModification::Ptr mod)
 	{
-		setName(mod->getName() + "copy");
+		_setName(mod->getName() + "copy");
         altMod = mod->altMod;
 		BlendronicPreparation::copy(mod);
 	}
@@ -526,8 +541,8 @@ public:
 
         altMod = e->getBoolAttribute("alt", false);
         
-        if (n != String())     setName(n);
-		else                   setName(String(Id));
+        if (n != String())     _setName(n);
+		else                   _setName(String(Id));
 
 		XmlElement* dirtyXml = e->getChildByName("dirty");
 		XmlElement* paramsXml = e->getChildByName("params");

@@ -14,7 +14,7 @@
 #include "Keymap.h"
 //#include "Piano.h"
 #include "AudioConstants.h"
-//class GenericObject;
+#include "GenericPreparation.h"
 class BKAudioProcessor;
 class GenericProcessor : public ReferenceCountedObject
 {
@@ -26,6 +26,11 @@ public:
     typedef OwnedArray<GenericProcessor>                  Arr;
     typedef OwnedArray<GenericProcessor, CriticalSection> CSArr;
     
+    
+    GenericProcessor(BKAudioProcessor& processor, BKPreparationType type, GenericPreparation::Ptr prep, KeymapTargetType start, KeymapTargetType end) : targetTypeStart(start), type(type), targetTypeEnd(end), processor(processor), prep(prep)
+    {
+        
+    }
     
     GenericProcessor(BKAudioProcessor& processor, BKPreparationType type, KeymapTargetType start, KeymapTargetType end) : targetTypeStart(start), type(type), targetTypeEnd(end), processor(processor)
     {
@@ -103,7 +108,7 @@ public:
     KeymapTargetType targetTypeStart;
     KeymapTargetType targetTypeEnd;
 protected:
-    //ReferenceCountedObjectPtr<GenericObject>             obj;
+    GenericPreparation::Ptr         prep;
     BKAudioProcessor& processor;
     Keymap::PtrArr      keymaps;
     BKPreparationType type;

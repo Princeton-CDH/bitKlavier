@@ -19,7 +19,6 @@
 #include "Piano.h"
 
 #include "BKGraph.h"
-#include "GenericObject.h"
 class BKAudioProcessor;
 
 class Gallery : public ReferenceCountedObject
@@ -85,11 +84,11 @@ public:
 		s += "\nblendronicmod";
 		for (auto item : modBlendronic) s += (" " + String(item->getId()));
         
-        for (auto objArray : genericObj)
+        for (auto prepArray : genericPrep)
         {
             s += "\n";
-            s += cPreparationvTags[objArray->getLast()->getType()];
-            for (auto item : *objArray)
+            s += cPreparationvTags[prepArray->getLast()->getType()];
+            for (auto item : *prepArray)
             {
                 s += (" " + String(item->getId()));
             }
@@ -138,14 +137,14 @@ public:
 		if (add) addBlendronicWithId(-1);
 
         add = true;
-        for (auto objArray : genericObj)
+        for (auto prepArray : genericPrep)
         {
-            if (objArray->isEmpty()) continue;
-            for (auto obj : *objArray)
+            if (prepArray->isEmpty()) continue;
+            for (auto prep : *prepArray)
             {
-                if (obj->getId() == -1) { add = false; break; }
+                if (prep->getId() == -1) { add = false; break; }
             }
-            if (add) addGenericObject(objArray->getLast()->getType(),-1);
+            if (add) addGenericPreparation(prepArray->getLast()->getType(),-1);
             
         }
         
@@ -334,13 +333,13 @@ public:
 		return nullptr;
 	}
 
-    inline GenericObject::Ptr matches(GenericObject::Ptr obj)
+    inline GenericPreparation::Ptr matches(GenericPreparation::Ptr prep)
     {
-        if (obj->prep->getType() != obj->getType()) return nullptr;
+        if (prep->getType() != prep->getType()) return nullptr;
             
-        for (auto p : *genericObj[obj->getType()])
+        for (auto p : *genericPrep[prep->getType()])
         {
-            if (p->prep->compare(obj->prep)) return p;
+            if (p->compare(prep)) return p;
         }
         return nullptr;
     }
@@ -460,7 +459,7 @@ public:
         
         for (auto mod : modResonance)
         {
-            names.add(mod->getName());
+            names.add(mod->_getName());
         }
         
         return names;
@@ -842,25 +841,25 @@ public:
     
     void stepModdables()
     {
-        for (auto objArray: genericObj)
+        for (auto prepArray: genericPrep)
         {
-            for (auto obj : *objArray)
+            for (auto prep : *prepArray)
             {
-                obj->prep->stepModdables();
+                prep->stepModdables();
             }
             
         }
     }
     
     
-    ReferenceCountedArray<GenericObject>*  getAllObjectsOfType(BKPreparationType thisType)
+    ReferenceCountedArray<GenericPreparation>*  getAllPreparationsOfType(BKPreparationType thisType)
     {
-        return genericObj.getUnchecked(thisType);
+        return genericPrep.getUnchecked(thisType);
     }
     
-    GenericObject::Ptr getObjectOfType(BKPreparationType thisType, int Id)
+    GenericPreparation::Ptr getPreparationOfType(BKPreparationType thisType, int Id)
     {
-        for (auto p : *genericObj[thisType])
+        for (auto p : *genericPrep[thisType])
         {
             if (p->getId() == Id)
             {
@@ -868,6 +867,10 @@ public:
             }
         }
     }
+    
+    
+    void removePreparationOfType(BKPreparationType thisType, int Id);
+    
 private:
     BKAudioProcessor& processor;
     
@@ -883,7 +886,7 @@ private:
     Tempo::PtrArr                       tempo;
 	Blendronic::PtrArr				    blendronic;
     
-    OwnedArray<ReferenceCountedArray<GenericObject>> genericObj;
+    OwnedArray<ReferenceCountedArray<GenericPreparation>> genericPrep;
     
     SynchronicModification::PtrArr      modSynchronic;
     DirectModification::PtrArr          modDirect;
@@ -899,10 +902,10 @@ private:
     int defaultPianoId;
     bool isDirty;
     
-    int addGenericObject(BKPreparationType thisType);
-    void addGenericObject(BKPreparationType thisType, GenericObject::Ptr);
-    void addGenericObject(BKPreparationType thisType, GenericPreparation::Ptr);
-    GenericObject::Ptr addGenericObject(BKPreparationType thisType, int Id);
+    int addGenericPreparation(BKPreparationType thisType);
+    int addGenericPreparation(BKPreparationType thisType, XmlElement *xml);
+    void addGenericPreparation(BKPreparationType thisType, GenericPreparation::Ptr);
+    GenericPreparation::Ptr addGenericPreparation(BKPreparationType thisType, int Id);
     
     
     void addSynchronic(void);
@@ -986,7 +989,7 @@ private:
     void addFromValueTree(ValueTree vt);
     void setPrepStateFromXML(XmlElement* e, BKPreparationType type)
     {
-        GenericObject::Ptr prep  = addGenericObject(type, 0);
+        GenericPreparation::Ptr prep  = addGenericPreparation(type, 0);
         prep->setState(e);
         
         int oldId = prep->getId();

@@ -359,7 +359,7 @@ EffectProcessor::Ptr Piano::addBlendronicProcessor(int thisId)
 
 GenericProcessor::Ptr Piano::addResonanceProcessor(int thisId)
 {
-    ResonanceProcessor::Ptr rproc = new ResonanceProcessor(processor.gallery->getObjectOfType(PreparationTypeResonance, Id), defaultT, processor.gallery->getGeneralSettings(), processor/*, &processor.mainPianoSynth*/);
+    ResonanceProcessor::Ptr rproc = new ResonanceProcessor(processor.gallery->getPreparationOfType(PreparationTypeResonance, Id), defaultT, processor.gallery->getGeneralSettings(), processor/*, &processor.mainPianoSynth*/);
     rproc->prepareToPlay(processor.gallery->getGeneralSettings());
     prepMap->addProcessor(rproc);
     return rproc;

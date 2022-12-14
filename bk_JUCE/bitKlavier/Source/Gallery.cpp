@@ -22,7 +22,7 @@ processor(p)
     }
     for (int i = 0; i < PreparationTypeKeymap; i ++)
     {
-        genericObj.add(new ReferenceCountedArray<GenericObject>());
+        genericPrep.add(new ReferenceCountedArray<GenericPreparation>());
     }
     // DBG("idmap size: " + String(idmap.size()));
     
@@ -103,8 +103,8 @@ void Gallery::resetPreparations(void)
     for (int i = synchronic.size(); --i >= 0; )
         synchronic[i]->prep->resetModdables();
     
-    for (int i = resonance.size(); --i >= 0; )
-        resonance[i]->prep->resetModdables();
+//    for (int i = genericPrep[PreparationTypeResonance]->size(); --i >= 0; )
+//        genericPrep[PreparationTypeResonance]->prep->resetModdables();
     
     for (int i = tuning.size(); --i >= 0; )
         tuning[i]->prep->resetModdables();
@@ -115,11 +115,11 @@ void Gallery::resetPreparations(void)
 	for (int i = blendronic.size(); --i >= 0; )
         blendronic[i]->prep->resetModdables();
     
-    for (auto objArr : genericObj)
+    for (auto objArr : genericPrep)
     {
-        for (auto obj : objArr )
+        for (auto obj : *objArr )
         {
-            obj->prep->resetModdables();
+            obj->resetModdables();
         }
     }
 }

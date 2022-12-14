@@ -1313,15 +1313,15 @@ ModdableBase* ModdableViewController::getCurrentModdable()
         ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
 
         if (processor.updateState->currentModdableIdentifier == cResonanceDefGain)
-            return &mod->rDefaultGain;
+            return &mod->prep->defaultGain;
         else if (processor.updateState->currentModdableIdentifier == cResonanceMinStartTime)
-            return &mod->rMinStartTimeMS;
+            return &dynamic_cast<ResonancePreparation*>(mod->prep.get())->rMinStartTimeMS;
         else if (processor.updateState->currentModdableIdentifier == cResonanceMaxStartTime)
-            return &mod->rMaxStartTimeMS;
+            return &dynamic_cast<ResonancePreparation*>(mod->prep.get())->rMaxStartTimeMS;
         else if (processor.updateState->currentModdableIdentifier == cResonanceBlendronicGain)
-            return &mod->rBlendronicGain;
+            return &dynamic_cast<ResonancePreparation*>(mod->prep.get())->rBlendronicGain;
         else if (processor.updateState->currentModdableIdentifier == cResonanceMaxSympStrings)
-            return &mod->rMaxSympStrings;
+            return &dynamic_cast<ResonancePreparation*>(mod->prep.get())->rMaxSympStrings;
 
     }
     else if (processor.updateState->previousDisplay == DisplaySynchronicMod)

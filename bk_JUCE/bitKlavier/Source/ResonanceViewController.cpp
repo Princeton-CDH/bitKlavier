@@ -9,7 +9,7 @@
 */
 
 #include "ResonanceViewController.h"
-
+#include "GenericPreparation.h"
 ////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////ResonanceViewController/////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -513,8 +513,8 @@ void ResonancePreparationEditor::update()
     if (processor.updateState->currentResonanceId < 0) return;
     ADSRSlider->setIsButtonOnly(true);
 
-    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
-    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
+    GenericPreparation::Ptr _prep = processor.gallery->getPreparationOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(_prep.get());
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentResonanceId, dontSendNotification);
@@ -591,11 +591,11 @@ void ResonancePreparationEditor::update()
 void ResonancePreparationEditor::fillSelectCB(int last, int current)
 {   selectCB.clear(dontSendNotification);
     
-    for (auto obj : *processor.gallery->getAllObjectsOfType(BKPreparationType::PreparationTypeResonance))
+    for (auto prep : *processor.gallery->getAllPreparationsOfType(BKPreparationType::PreparationTypeResonance))
     {
         
-        int Id = obj->getId();
-        String name = obj->getName();
+        int Id = prep->getId();
+        String name = prep->getName();
         
         if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("ResonanceMod"+String(Id), Id);
@@ -622,12 +622,12 @@ void ResonancePreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayResonance)
     {
         ResonanceProcessor* proc = dynamic_cast<ResonanceProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentResonanceId, PreparationTypeResonance).get());
-        GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
-        ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
+        GenericPreparation::Ptr _prep = processor.gallery->getPreparationOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+        ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(_prep.get());
         if (prep != nullptr && proc != nullptr)
         {
-            if (prep->rDefaultGain.didChange())
-                defGainSlider->setValue(prep->rDefaultGain.value, dontSendNotification);
+            if (prep->defaultGain.didChange())
+                defGainSlider->setValue(prep->defaultGain.value, dontSendNotification);
             if (prep->rBlendronicGain.didChange())
                 blendGainSlider->setValue(prep->rBlendronicGain.value, dontSendNotification);
             
@@ -712,9 +712,9 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentResonanceId;
-        GenericObject::Ptr obj = processor.gallery->getObjectOfType(PreparationTypeResonance, Id);
+        GenericPreparation::Ptr prep = processor.gallery->getPreparationOfType(PreparationTypeResonance, Id);
         
-        prompt.addTextEditor("name", obj->getName());
+        prompt.addTextEditor("name", prep->getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -725,7 +725,7 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
         
         if (result == 1)
         {
-            obj->setName(name);
+            prep->setName(name);
             vc->fillSelectCB(Id, Id);
             processor.saveGalleryToHistory("Rename Resonance Preparation");
         }
@@ -737,9 +737,9 @@ void ResonancePreparationEditor::actionButtonCallback(int action, ResonancePrepa
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentResonanceId;
-        GenericObject::Ptr obj = processor.gallery->getObjectOfType(PreparationTypeResonance, Id);
+        GenericPreparation::Ptr prep = processor.gallery->getPreparationOfType(PreparationTypeResonance, Id);
         
-        prompt.addTextEditor("name", obj->getName());
+        prompt.addTextEditor("name", prep->getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -844,7 +844,7 @@ void ResonancePreparationEditor::buttonClicked(Button* b)
     }
     else if (b == &actionButton)
     {
-        bool single = processor.gallery->getAllObjectsOfType(PreparationTypeResonance)->size() == 2;
+        bool single = processor.gallery->getAllPreparationsOfType(PreparationTypeResonance)->size() == 2;
         getPrepOptionMenu(PreparationTypeResonance, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
@@ -873,8 +873,8 @@ void ResonancePreparationEditor::BKEditableComboBoxChanged(String name, BKEditab
 
 void ResonancePreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
-    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
+    GenericPreparation::Ptr _prep = processor.gallery->getPreparationOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(_prep.get());
 
     if (name == defGainSlider->getName())
     {
@@ -899,8 +899,8 @@ void ResonancePreparationEditor::BKStackedSliderValueChanged(String name, Array<
 {
     DBG("received overtone slider " + name);
 
-    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
-    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
+    GenericPreparation::Ptr _prep = processor.gallery->getPreparationOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(_prep.get());
 
     //prep->setDistances(val);
 
@@ -911,8 +911,8 @@ void ResonancePreparationEditor::BKADSRSliderValueChanged(String name, int attac
 {
     DBG("received ADSR slider " + name);
 
-    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
-    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
+    GenericPreparation::Ptr _prep = processor.gallery->getPreparationOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(_prep.get());
 
     prep->setADSRvals(attack, decay, sustain, release);
 
@@ -929,8 +929,8 @@ void ResonancePreparationEditor::BKADSRButtonStateChanged(String name, bool mod,
 
 void ResonancePreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
-    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
+    GenericPreparation::Ptr _prep = processor.gallery->getPreparationOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(_prep.get());
     if(name == startTimeSlider->getName()) {
         //DBG("got new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
         prep->setMinStartTime(minval);
@@ -944,8 +944,8 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
     
     DBG("ResonancePreparationEditor::handleKeymapNoteToggled " + String(midiNoteNumber));
     
-    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
-    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
+    GenericPreparation::Ptr _prep = processor.gallery->getPreparationOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(_prep.get());
     
     if (source == &resonanceKeyboardState)
     {
@@ -991,8 +991,8 @@ void ResonancePreparationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState* 
 
 void ResonancePreparationEditor::keyboardSliderChanged(String name, Array<float> values)
 {
-    GenericObject::Ptr obj = processor.gallery->getObjectOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
-    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(obj->prep.get());
+    GenericPreparation::Ptr _prep = processor.gallery->getPreparationOfType(BKPreparationType::PreparationTypeResonance, processor.updateState->currentResonanceId);
+    ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(_prep.get());
  
     if(name == gainsKeyboard.getName())
     {
@@ -1089,8 +1089,8 @@ void ResonanceModificationEditor::update(void)
     
     selectCB.setSelectedId(processor.updateState->currentModResonanceId, dontSendNotification);
     
-    ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
-    
+    ResonanceModification::Ptr _mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
+    ResonancePreparation* mod = dynamic_cast<ResonancePreparation*>(_mod->getPrep().get());
     if (mod != nullptr)
     {
         greyOutAllComponents();
@@ -1098,7 +1098,7 @@ void ResonanceModificationEditor::update(void)
         
         selectCB.setSelectedId(processor.updateState->currentModResonanceId, dontSendNotification);
         
-        defGainSlider->setValue(mod->rDefaultGain.value, dontSendNotification);
+        defGainSlider->setValue(mod->defaultGain.value, dontSendNotification);
         startTimeSlider->setMinValue(mod->rMinStartTimeMS.value, dontSendNotification);
         startTimeSlider->setMaxValue(mod->rMaxStartTimeMS.value, dontSendNotification);
         blendGainSlider->setValue(mod->rBlendronicGain.value, dontSendNotification);
@@ -1111,7 +1111,7 @@ void ResonanceModificationEditor::update(void)
         gainsKeyboard.setKeys(mod->getResonanceKeys());
         gainsKeyboard.setValues(mod->getGains());
         addKeyboard->setKeysInKeymap(mod->getHeldKeys());
-        alternateMod.setToggleState(mod->altMod, dontSendNotification);
+        alternateMod.setToggleState(_mod->altMod, dontSendNotification);
         
         //updateComponentVisibility();
     }
@@ -1126,7 +1126,7 @@ void ResonanceModificationEditor::fillSelectCB(int last, int current)
     for (auto prep : processor.gallery->getResonanceModifications())
     {
         int Id = prep->getId();;
-        String name = prep->getName();
+        String name = prep->_getName();
         
         if (name != String())  selectCB.addItem(name, Id);
         else selectCB.addItem("ResonanceMod"+String(Id), Id);
@@ -1242,7 +1242,7 @@ void ResonanceModificationEditor::actionButtonCallback(int action, ResonanceModi
         int Id = processor.updateState->currentModResonanceId;
         ResonanceModification::Ptr prep = processor.gallery->getResonanceModification(Id);
         
-        prompt.addTextEditor("name", prep->getName());
+        prompt.addTextEditor("name", prep->_getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -1253,7 +1253,7 @@ void ResonanceModificationEditor::actionButtonCallback(int action, ResonanceModi
         
         if (result == 1)
         {
-            prep->setName(name);
+            prep->_setName(name);
             vc->fillSelectCB(Id, Id);
             processor.saveGalleryToHistory("Rename Resonance Modification");
         }
@@ -1267,7 +1267,7 @@ void ResonanceModificationEditor::actionButtonCallback(int action, ResonanceModi
         int Id = processor.updateState->currentModResonanceId;
         ResonanceModification::Ptr prep = processor.gallery->getResonanceModification(Id);
         
-        prompt.addTextEditor("name", prep->getName());
+        prompt.addTextEditor("name", prep->_getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -1310,7 +1310,7 @@ void ResonanceModificationEditor::BKEditableComboBoxChanged(String name, BKEdita
 {
     ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
     
-    mod->setName(name);
+    mod->_setName(name);
     
     updateModification();
     
@@ -1321,12 +1321,12 @@ void ResonanceModificationEditor::BKEditableComboBoxChanged(String name, BKEdita
 void ResonanceModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
     
-    ResonanceModification::Ptr mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
-    
+    ResonanceModification::Ptr _mod = processor.gallery->getResonanceModification(processor.updateState->currentModResonanceId);
+    ResonanceModification* mod = dynamic_cast<ResonanceModification*>(_mod.get());
     if (name == defGainSlider->getName())
     {
         DBG("modding resonant note volume to " + String(val));
-        mod->setDefGain(val);
+        mod->getPrepPtr()->setDefGain(val);
         
         mod->setDirty(ResonanceGain);
         defGainSlider->setBright();
@@ -1334,7 +1334,7 @@ void ResonanceModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     else if (name == blendGainSlider->getName())
     {
         DBG("modding blendronic gain to " + String(val));
-        mod->setBlendGain(val);
+        mod->getPrepPtr()->setBlendGain(val);
         
         mod->setDirty(ResonanceBlendronicGain);
         blendGainSlider->setBright();
@@ -1342,7 +1342,7 @@ void ResonanceModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     else if (name == maxSympStringsSlider->getName())
     {
         DBG("modding max symp strings to " + String(val));
-        mod->setMaxSympStrings(val);
+        mod->getPrepPtr()->setMaxSympStrings(val);
         
         mod->setDirty(ResonanceMaxSympStrings);
         maxSympStringsSlider->setBright();
@@ -1358,8 +1358,8 @@ void ResonanceModificationEditor::BKRangeSliderValueChanged(String name, double 
     
     if(name == startTimeSlider->getName()) {
         //DBG("modding new AdaptiveTempo 1 time diff min/max " + String(minval) + " " + String(maxval));
-        mod->setMinStartTime(minval);
-        mod->setMaxStartTime(maxval);
+        mod->getPrepPtr()->setMinStartTime(minval);
+        mod->getPrepPtr()->setMaxStartTime(maxval);
         
         mod->setDirty(ResonanceMinStartTime);
         mod->setDirty(ResonanceMaxStartTime);
@@ -1378,18 +1378,18 @@ void ResonanceModificationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState*
     {
         //closestKeyboard->setKeysInKeymap(prep->getKeys());
         //DBG("resonanceKeyboardState " + String(midiNoteNumber));
-        mod->toggleResonanceKey(midiNoteNumber);
-        closestKeyboard->setKeysInKeymap(mod->getResonanceKeys());
+        mod->getPrepPtr()->toggleResonanceKey(midiNoteNumber);
+        closestKeyboard->setKeysInKeymap(mod->getPrepPtr()->getResonanceKeys());
         mod->setDirty(ResonanceClosestKeys);
         closestKeyboard->setAlpha(1.);
         
-        offsetsKeyboard.setKeys(mod->getResonanceKeys());
-        offsetsKeyboard.setValues(mod->getOffsets());
+        offsetsKeyboard.setKeys(mod->getPrepPtr()->getResonanceKeys());
+        offsetsKeyboard.setValues(mod->getPrepPtr()->getOffsets());
         mod->setDirty(ResonanceOffsets);
         offsetsKeyboard.setBright();
         
-        gainsKeyboard.setKeys(mod->getResonanceKeys());
-        gainsKeyboard.setValues(mod->getGains());
+        gainsKeyboard.setKeys(mod->getPrepPtr()->getResonanceKeys());
+        gainsKeyboard.setValues(mod->getPrepPtr()->getGains());
         mod->setDirty(ResonanceGains);
         gainsKeyboard.setBright();
          
@@ -1397,7 +1397,7 @@ void ResonanceModificationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState*
     }
     else if (source == &fundamentalKeyboardState)
     {
-        mod->setFundamentalKey(midiNoteNumber);
+        mod->getPrepPtr()->setFundamentalKey(midiNoteNumber);
         fundamentalKeyboard->setKeysInKeymap({midiNoteNumber});
         mod->setDirty(ResonanceFundamental);
         fundamentalKeyboard->setAlpha(1.);
@@ -1409,19 +1409,19 @@ void ResonanceModificationEditor::handleKeymapNoteToggled(BKKeymapKeyboardState*
         addKeyboard->setAlpha(1.);
         mod->setDirty(ResonanceHeld);
         //ResonanceProcessor::Ptr proc = processor.currentPiano->getResonanceProcessor(processor.updateState->currentResonanceId);
-        if (mod->rActiveHeldKeys.arrayContains(midiNoteNumber))
+        if (mod->getPrepPtr()->rActiveHeldKeys.arrayContains(midiNoteNumber))
         {
             // clear this held string's partial
-            mod->rActiveHeldKeys.arrayRemoveAllInstancesOf(midiNoteNumber);
-            mod->removeSympStrings(midiNoteNumber, 0);
+            mod->getPrepPtr()->rActiveHeldKeys.arrayRemoveAllInstancesOf(midiNoteNumber);
+            mod->getPrepPtr()->removeSympStrings(midiNoteNumber, 0);
         } else
         {
-            mod->addSympStrings(midiNoteNumber, 127);
-            mod->addHeldKey(midiNoteNumber);
-            mod->sympStrings.remove(midiNoteNumber);
+            mod->getPrepPtr()->addSympStrings(midiNoteNumber, 127);
+            mod->getPrepPtr()->addHeldKey(midiNoteNumber);
+            mod->getPrepPtr()->sympStrings.remove(midiNoteNumber);
         }
            
-        addKeyboard->setKeysInKeymap(mod->rActiveHeldKeys.value);
+        addKeyboard->setKeysInKeymap(mod->getPrepPtr()->rActiveHeldKeys.value);
     }
     update();
 
@@ -1434,7 +1434,7 @@ void ResonanceModificationEditor::keyboardSliderChanged(String name, Array<float
     if(name == gainsKeyboard.getName())
     {
         DBG("modding gain vals");
-        mod->setGains(values);
+        mod->getPrepPtr()->setGains(values);
         
         mod->setDirty(ResonanceGains);
         gainsKeyboard.setBright();
@@ -1442,7 +1442,7 @@ void ResonanceModificationEditor::keyboardSliderChanged(String name, Array<float
     else if(name == offsetsKeyboard.getName())
     {
         DBG("modding offset vals");
-        mod->setOffsets(values);
+        mod->getPrepPtr()->setOffsets(values);
         
         mod->setDirty(ResonanceOffsets);
         offsetsKeyboard.setBright();
@@ -1466,7 +1466,7 @@ void ResonanceModificationEditor::BKADSRSliderValueChanged(String name, int atta
     
     Array<float> newvals = {(float)attack, (float)decay, sustain, (float)release};
     
-    mod->setADSRvals(newvals);
+    mod->getPrepPtr()->setADSRvals(newvals);
     mod->setDirty(ResonanceADSR);
     
     ADSRSlider->setBright();

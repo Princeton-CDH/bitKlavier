@@ -80,7 +80,7 @@ ValueTree  Gallery::getState(void)
     
     for (int i = 0; i < blendronic.size(); i++)     galleryVT.addChild( blendronic[i]->getState(), -1, 0);
     
-    for (int i = 0; i < resonance.size(); i++)      galleryVT.addChild( resonance[i]->getState(), -1, 0);
+    for (int i = 0; i < genericPrep[PreparationTypeResonance]->size(); i++)      galleryVT.addChild( genericPrep[PreparationTypeResonance]->getUnchecked(i)->getState(), -1, 0);
     
     for (int i = 0; i < modTempo.size(); i++)       galleryVT.addChild( modTempo[i]->getState(), -1, 0);
     
@@ -223,7 +223,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
             }
             else if (e->hasTagName( vtagResonance))
             {
-                setPrepStateFromXML(BKPreparationType::PreparationTypeResonance);
+                setPrepStateFromXML(e,BKPreparationType::PreparationTypeResonance);
             }
             else if (e->hasTagName( vtagModResonance))
             {
