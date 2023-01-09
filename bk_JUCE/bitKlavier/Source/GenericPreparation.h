@@ -25,8 +25,8 @@ public:
     GenericPreparation(BKPreparationType prep, int Id, bool random = false) :
     Id(Id),
     type(prep),
-    name(String(cPreparationNames[type]) + " " + String(Id)),
-    prepvTag(cPreparationvTags[type]),
+    name(cPreparationNames[prep] + " " + std::to_string(Id)),
+    prepvTag(cPreparationvTags[prep]),
     soundSet(-1),
     useGlobalSoundSet(true),
     soundSetName(String()),

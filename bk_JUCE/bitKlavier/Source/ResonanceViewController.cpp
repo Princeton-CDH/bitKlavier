@@ -1084,7 +1084,7 @@ void ResonanceModificationEditor::highlightModedComponents()
 
 void ResonanceModificationEditor::update(void)
 {
-    
+    //return;
     if (processor.updateState->currentModResonanceId < 0) return;
     
     selectCB.setSelectedId(processor.updateState->currentModResonanceId, dontSendNotification);

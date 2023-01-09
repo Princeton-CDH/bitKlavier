@@ -260,6 +260,7 @@ public:
         currentModBlendronicId = val;
         currentModTempoId = val;
         currentModTuningId = val;
+        currentModResonanceId = val;
         
         currentKeymapId = val;
     }

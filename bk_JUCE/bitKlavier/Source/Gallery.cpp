@@ -41,7 +41,10 @@ processor(p)
         used.add( Array<int>( {-1} ) );
         idmap.add(new HashMap<int,int>());
     }
-    
+    for (int i = 0; i < PreparationTypeKeymap; i ++)
+    {
+        genericPrep.add(new ReferenceCountedArray<GenericPreparation>());
+    }
     // DBG("idmap size: " + String(idmap.size()));
     
     general = new GeneralSettings();
@@ -62,7 +65,10 @@ url(String())
         idcounts[i] = 1;
         idmap.add(new HashMap<int,int>());
     }
-    
+    for (int i = 0; i < PreparationTypeKeymap; i ++)
+    {
+        genericPrep.add(new ReferenceCountedArray<GenericPreparation>());
+    }
     // DBG("idmap size: " + String(idmap.size()));
     
     general = new GeneralSettings();

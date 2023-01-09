@@ -1879,6 +1879,7 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
 
 void BKAudioProcessor::initializeGallery()
 {
+    suspendProcessing(true);
     prevPiano = gallery->getPianos().getFirst();
     
     int defPiano = gallery->getDefaultPiano();
@@ -1917,6 +1918,7 @@ void BKAudioProcessor::initializeGallery()
     updateUI();
     
     updateGalleries();
+    suspendProcessing(false);
 }
 
 Array<MidiDeviceInfo> BKAudioProcessor::getMidiOutputDevices()

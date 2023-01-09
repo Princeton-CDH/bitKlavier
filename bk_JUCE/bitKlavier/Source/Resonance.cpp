@@ -100,6 +100,7 @@ ResonanceProcessor::ResonanceProcessor(ResonancePreparation::Ptr rResonance,
                                        keymaps(Keymap::PtrArr())
 {
     ////ADDSYNTH
+    ///
     ResonancePreparation* _prep = dynamic_cast<ResonancePreparation*>(prep.get());
     _prep->synth = new BKSynthesiser(processor, processor.gallery->getGeneralSettings(), processor.mainPianoSoundSet);
     for (int i = 0; i < 300; i++)

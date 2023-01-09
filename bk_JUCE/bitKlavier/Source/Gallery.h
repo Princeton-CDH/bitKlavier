@@ -87,6 +87,7 @@ public:
         for (auto prepArray : genericPrep)
         {
             s += "\n";
+            if(prepArray->isEmpty()) continue;
             s += cPreparationvTags[prepArray->getLast()->getType()];
             for (auto item : *prepArray)
             {
@@ -137,6 +138,13 @@ public:
 		if (add) addBlendronicWithId(-1);
 
         add = true;
+        
+        for (auto p : *genericPrep[PreparationTypeResonance])
+        {
+            if (p->getId() == -1) { add = false; break; }
+        }
+        if (add) addGenericPreparation(PreparationTypeResonance,-1);
+        
         for (auto prepArray : genericPrep)
         {
             if (prepArray->isEmpty()) continue;
@@ -866,6 +874,7 @@ public:
                 return p;
             }
         }
+        return nullptr;
     }
     
     
