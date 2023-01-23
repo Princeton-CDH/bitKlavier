@@ -769,8 +769,8 @@ private:
     //   these are now active sostenuto notes and should be sustained
     Array<Note> activeSostenutoNotes;
     
-    bool defaultSelected;
-    bool onscreenSelected;
+    bool defaultSelected = 1;
+    bool onscreenSelected = 1;
     
     int harKey;
     int harPreTranspose;
