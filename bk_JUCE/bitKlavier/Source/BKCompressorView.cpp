@@ -282,6 +282,7 @@ void BKCompressorView::resized()
     
     FlexBox meterBox;
     meterBox.flexWrap = FlexBox::Wrap::noWrap;
+    meterBox.flexDirection = FlexBox::Direction::row;
     meterBox.justifyContent = FlexBox::JustifyContent::spaceAround;
     meterBox.items.add(FlexItem(meter).withFlex(1).withMargin(Constants::Margins::big));
     meterBox.performLayout(area.toFloat());
