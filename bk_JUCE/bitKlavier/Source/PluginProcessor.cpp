@@ -1414,7 +1414,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    DirectPreparation::Ptr prep = gallery->getDirect(target)->prep;
+                    DirectPreparation* prep = dynamic_cast<DirectPreparation*>(gallery->getPreparationOfType(PreparationTypeDirect, target).get());
                     prep->performModification(mod, mod->getDirty());
                 }
                 updateState->directPreparationDidChange = true;
@@ -1459,7 +1459,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 for (auto target : targets)
                 {
                     ResonancePreparation* prep = dynamic_cast<ResonancePreparation*>(gallery->getPreparationOfType(PreparationTypeResonance, target).get());
-                    //prep->performModification(mod, mod->getDirty());
+                    prep->performModification(mod, mod->getDirty());
                 }
                 updateState->resonancePreparationDidChange = true;
                 break;
@@ -2005,9 +2005,9 @@ void BKAudioProcessor::hiResTimerCallback()
     
     gallery->stepModdables();
     
-    for (auto d : gallery->getAllDirect())
+    for (auto d : *gallery->getAllPreparationsOfType(PreparationTypeDirect))
     {
-        d->prep->stepModdables();
+        d->stepModdables();
     }
     for (auto n : gallery->getAllNostalgic())
     {
@@ -2080,7 +2080,7 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
 {
     if (type == PreparationTypeDirect)
     {
-        gallery->getDirect(Id)->clear();
+        gallery->getPreparationOfType(PreparationTypeDirect, Id)->clear();
         
         DirectProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         

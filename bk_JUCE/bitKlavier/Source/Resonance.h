@@ -535,7 +535,7 @@ public:
         rGainsKeys.getState(prep, StringArray(vtagResonance_gains, ptagFloat));
         rActiveHeldKeys.getState(prep, StringArray(vtagResonance_add, ptagInt));
         vt.addChild(prep, -1, 0);
-        return prep;
+        return vt;
     }
 
     void setState(XmlElement* e) override

@@ -120,7 +120,7 @@ private:
 
 class DirectModification :
 public Modification,
-public DirectPreparation
+public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<DirectModification>   Ptr;
@@ -145,13 +145,16 @@ public:
     {
         _setName(mod->_getName() + "copy");
         altMod = mod->altMod;
-        DirectPreparation::copy(mod);
+        prep->copy(mod->getPrep());
     }
     
+    DirectPreparation::Ptr getPrep() {return prep;}
+    DirectPreparation* getPrepPtr() {return dynamic_cast<DirectPreparation*>(prep.get());}
+    void resetModdables() {prep->resetModdables();}
     ValueTree getState(void);
     void setState(XmlElement* e);
     void setStateOld(XmlElement* e);
-    
+    DirectPreparation::Ptr prep;
 private:
 
     JUCE_LEAK_DETECTOR(DirectModification)

@@ -40,10 +40,10 @@ public:
     
     inline void print(void)
     {
-        String s = "direct";
-        for (auto item : direct) s += (" " + String(item->getId()));
+        String s = "";
+        //for (auto item : direct) s += (" " + String(item->getId()));
         
-        s += "\nnostalgic";
+        s += "nostalgic";
         for (auto item : nostalgic) s += (" " + String(item->getId()));
         
         s += "\nsynchronic";
@@ -125,9 +125,7 @@ public:
         for (auto p : nostalgic) { if (p->getId() == -1) { add = false; break;} }
         if (add) addNostalgicWithId(-1);
         
-        add = true;
-        for (auto p : direct) { if (p->getId() == -1) { add = false; break;} }
-        if (add) addDirectWithId(-1);
+        
         
         add = true;
         for (auto p : bkKeymaps) { if (p->getId() == -1) { add = false; break;} }
@@ -144,6 +142,12 @@ public:
             if (p->getId() == -1) { add = false; break; }
         }
         if (add) addGenericPreparation(PreparationTypeResonance,-1);
+        
+        for (auto p : *genericPrep[PreparationTypeDirect])
+        {
+            if (p->getId() == -1) { add = false; break; }
+        }
+        if (add) addGenericPreparation(PreparationTypeDirect,-1);
         
         for (auto prepArray : genericPrep)
         {
@@ -180,7 +184,6 @@ public:
     
     inline const int getNumSynchronic(void) const noexcept {return synchronic.size();}
     inline const int getNumNostalgic(void) const noexcept {return nostalgic.size();}
-    inline const int getNumDirect(void) const noexcept {return direct.size();}
     inline const int getNumTempo(void) const noexcept {return tempo.size();}
     inline const int getNumTuning(void) const noexcept {return tuning.size();}
 	inline const int getNumBlendronic(void) const noexcept { return blendronic.size(); }
@@ -237,10 +240,6 @@ public:
         return names;
     }
     
-    inline const Direct::PtrArr getAllDirect(void) const noexcept
-    {
-        return direct;
-    }
     
     inline const Tuning::PtrArr getAllTuning(void) const noexcept
     {
@@ -296,14 +295,6 @@ public:
         return nullptr;
     }
     
-    inline Direct::Ptr matches(DirectPreparation::Ptr prep)
-    {
-        for (auto p : direct)
-        {
-            if (p->prep->compare(prep)) return p;
-        }
-        return nullptr;
-    }
     
     inline Synchronic::Ptr matches(SynchronicPreparation::Ptr prep)
     {
@@ -364,18 +355,6 @@ public:
         return names;
     }
     
-    inline const StringArray getAllDirectNames(void) const noexcept
-    {
-        StringArray names;
-        
-        for (auto prep : direct)
-        {
-            names.add(prep->getName());
-        }
-        
-        return names;
-    }
-    
     inline const StringArray getAllTuningNames(void) const noexcept
     {
         StringArray names;
@@ -397,6 +376,17 @@ public:
             names.add(prep->getName());
         }
         
+        return names;
+    }
+    
+    
+    inline const StringArray getAllPreparationNamesOfType(BKPreparationType thisType)
+    {
+        StringArray names;
+        for (auto p : *genericPrep[thisType])
+        {
+            names.add(p->getName());
+        }
         return names;
     }
     
@@ -443,7 +433,7 @@ public:
         
         for (auto mod : modDirect)
         {
-            names.add(mod->getName());
+            names.add(mod->_getName());
         }
         
         return names;
@@ -521,15 +511,6 @@ public:
 		return names;
 	}
     
-    inline const DirectPreparation::Ptr getDirectPreparation(int Id) const noexcept
-    {
-        
-        for (auto p : direct)
-        {
-            if (p->getId() == Id)   return p->prep;
-        }
-        return nullptr;
-    }
     
     
     inline const SynchronicPreparation::Ptr getSynchronicPreparation(int Id) const noexcept
@@ -598,16 +579,6 @@ public:
     {
 
         for (auto p : nostalgic)
-        {
-            if (p->getId() == Id)   return p;
-        }
-        return nullptr;
-    }
-    
-    inline const Direct::Ptr getDirect(int Id) const noexcept
-    {
-
-        for (auto p : direct)
         {
             if (p->getId() == Id)   return p;
         }
@@ -824,7 +795,6 @@ public:
     void addNostalgicWithId(int Id);
     void addTuningWithId(int Id);
     void addTempoWithId(int Id);
-    void addDirectWithId(int Id);
     void addKeymapWithId(int Id);
 	void addBlendronicWithId(int Id);
     
@@ -890,7 +860,6 @@ private:
     
     Synchronic::PtrArr                  synchronic;
     Nostalgic::PtrArr                   nostalgic;
-    Direct::PtrArr                      direct;
     Tuning::PtrArr                      tuning;
     Tempo::PtrArr                       tempo;
 	Blendronic::PtrArr				    blendronic;
@@ -938,10 +907,6 @@ private:
 	void addBlendronic(BlendronicPreparation::Ptr);
 
 
-    void addDirect(void);
-    void addDirect(Direct::Ptr);
-    void addDirect(DirectPreparation::Ptr);
-    
     void addKeymap(void);
     void addKeymap(Keymap::Ptr);
     inline const int getNumKeymaps(void) const noexcept {return bkKeymaps.size();}
@@ -976,13 +941,11 @@ private:
     void addResonanceMod(ResonanceModification::Ptr);
 	void addBlendronicMod(BlendronicModification::Ptr);
     
-    void removeDirect(int Id);
     void removeSynchronic(int Id);
     void removeNostalgic(int Id);
     void removeTuning(int Id);
     void removeTempo(int Id);
 	void removeBlendronic(int Id);
-    void removeResonance(int Id);
     void removeKeymap(int Id);
     void removeDirectModification(int Id);
     void removeNostalgicModification(int Id);

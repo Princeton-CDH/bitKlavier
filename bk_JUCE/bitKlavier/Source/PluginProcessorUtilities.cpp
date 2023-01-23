@@ -224,7 +224,7 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
 {
     if (type == PreparationTypeDirect)
     {
-        return gallery->getDirect(Id)->getState();
+        return gallery->getPreparationOfType(PreparationTypeDirect,Id)->getState();
     }
     else if (type == PreparationTypeDirectMod)
     {
@@ -297,18 +297,18 @@ void BKAudioProcessor::setPreparationState(BKPreparationType type, int Id, XmlEl
 {
     if (type == PreparationTypeDirect)
     {
-        Direct::Ptr prep = gallery->getDirect(Id);
-        String name = prep->getName();
-        prep->setState(xml);
-        prep->setName(name);
-        prep->setId(Id);
+        GenericPreparation::Ptr obj = gallery->getPreparationOfType(PreparationTypeDirect, Id);
+        String name = obj->getName();
+        obj->setState(xml);
+        obj->setName(name);
+        obj->setId(Id);
     }
     else if (type == PreparationTypeDirectMod)
     {
         DirectModification::Ptr prep = gallery->getDirectModification(Id);
-        String name = prep->getName();
+        String name = prep->_getName();
         prep->setState(xml);
-        prep->setName(name);
+        prep->_setName(name);
         prep->setId(Id);
     }
     else if (type == PreparationTypeNostalgic)

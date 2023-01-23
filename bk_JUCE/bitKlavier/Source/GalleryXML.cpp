@@ -72,7 +72,7 @@ ValueTree  Gallery::getState(void)
     
     for (int i = 0; i < tuning.size(); i++)         galleryVT.addChild( tuning[i]->getState(), -1, 0);
     
-    for (int i = 0; i < direct.size(); i++)         galleryVT.addChild( direct[i]->getState(), -1, 0);
+    //for (int i = 0; i < direct.size(); i++)         galleryVT.addChild( direct[i]->getState(), -1, 0);
     
     for (int i = 0; i < synchronic.size(); i++)     galleryVT.addChild( synchronic[i]->getState(), -1, 0);
     
@@ -81,6 +81,8 @@ ValueTree  Gallery::getState(void)
     for (int i = 0; i < blendronic.size(); i++)     galleryVT.addChild( blendronic[i]->getState(), -1, 0);
     
     for (int i = 0; i < genericPrep[PreparationTypeResonance]->size(); i++)      galleryVT.addChild( genericPrep[PreparationTypeResonance]->getUnchecked(i)->getState(), -1, 0);
+    
+    for (int i = 0; i < genericPrep[PreparationTypeDirect]->size(); i++)      galleryVT.addChild( genericPrep[PreparationTypeDirect]->getUnchecked(i)->getState(), -1, 0);
     
     for (int i = 0; i < modTempo.size(); i++)       galleryVT.addChild( modTempo[i]->getState(), -1, 0);
     
@@ -178,14 +180,14 @@ void Gallery::setStateFromXML(XmlElement* xml)
             }
             else if (e->hasTagName( vtagDirect))
             {
-                addDirectWithId(0);
+                GenericPreparation::Ptr direct = addGenericPreparation(PreparationTypeDirect,0);
                 
-                direct.getLast()->setState(e);
+                direct->setState(e);
                 
-                int oldId = direct.getLast()->getId();
+                int oldId = direct->getId();
                 int newId = transformId(PreparationTypeDirect, oldId);
                 
-                direct.getLast()->setId(newId);
+                direct->setId(newId);
             }
             else if (e->hasTagName( vtagModDirect))
             {

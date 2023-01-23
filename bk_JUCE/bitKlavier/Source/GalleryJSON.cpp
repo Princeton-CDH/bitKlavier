@@ -47,14 +47,14 @@ void Gallery::setStateFromJson(var myJson)
     Keymap::Ptr defaultKeymap = bkKeymaps.getLast();
     
     int pianoMapId = 1;
-    
-    addDirect();
+    addGenericPreparation(PreparationTypeDirect, getNewId(PreparationTypeDirect));
+    //addDirect();
     addTuning();
     addTempo();
     addSynchronic();
     addNostalgic();
 
-    Direct::Ptr defaultDirect = direct.getLast();
+    DirectPreparation::Ptr defaultDirect = genericPrep[PreparationTypeDirect]->getLast();
     Tuning::Ptr defaultTuning = tuning.getLast();
     Tempo::Ptr defaultTempo = tempo.getLast();
     Synchronic::Ptr defaultSynchronic = synchronic.getLast();
@@ -650,15 +650,15 @@ void Gallery::setStateFromJson(var myJson)
                 
                 if (isLayer)
                 {
-                    DirectPreparation::Ptr dPrep = new DirectPreparation();
-                    
+                    DirectPreparation::Ptr prep = new DirectPreparation(getNewId(PreparationTypeDirect));
+                    DirectPreparation* dPrep = dynamic_cast<DirectPreparation*>(prep.get());
                     if (!isOld)
                     {
                         float dGain     = jsonGetValue(dx+"directGain");
                         // float dOverlay  = jsonGetValue(dx+"directOverlay");
                         float dTransp   = jsonGetValue(dx+"directTransp");
                         
-                        dPrep->dGain.set(dGain);
+                        dPrep->defaultGain.set(dGain);
                         
                         Array<float> transp;
                         transp.add(dTransp);
@@ -672,17 +672,17 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     else
                     {
-                        dPrep->dGain.set(0.0f);
+                        dPrep->defaultGain.set(0.0f);
                         
                         DBG("keys: " + intArrayToString(keys) +
                             " OFF");
                     }
                     
-                    Direct::Ptr thisDirect = matches(dPrep);
+                    DirectPreparation::Ptr thisDirect = matches(dPrep);
                     if (thisDirect == nullptr)
                     {
-                        addDirect(dPrep);
-                        thisDirect = direct.getLast();
+                        addGenericPreparation(PreparationTypeDirect,dPrep);
+                        thisDirect = dPrep;
                         
                     }
                     

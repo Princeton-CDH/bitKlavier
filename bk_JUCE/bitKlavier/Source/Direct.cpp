@@ -12,12 +12,13 @@
 #include "PluginProcessor.h"
 #include "Modification.h"
 
-void DirectPreparation::performModification(DirectModification* d, Array<bool> dirty)
+void DirectPreparation::performModification(DirectModification* _d, Array<bool> dirty)
 {
     // Should the mod be reversed?
-    bool reverse = d->altMod && modded;
+    DirectPreparation* d = dynamic_cast<DirectPreparation*>(_d->getPrep().get());
+    bool reverse = _d->altMod && modded;
     
-    if (dirty[DirectGain]) dGain.modify(d->dGain, reverse);
+    if (dirty[DirectGain]) defaultGain.modify(d->defaultGain, reverse);
     if (dirty[DirectResGain]) dResonanceGain.modify(d->dResonanceGain, reverse);
     if (dirty[DirectHammerGain]) dHammerGain.modify(d->dHammerGain, reverse);
     if (dirty[DirectBlendronicGain]) dBlendronicGain.modify(d->dBlendronicGain, reverse);
@@ -44,18 +45,18 @@ void DirectPreparation::performModification(DirectModification* d, Array<bool> d
 
 }
 
-DirectProcessor::DirectProcessor(Direct::Ptr direct,
+DirectProcessor::DirectProcessor(DirectPreparation::Ptr direct,
                                  TuningProcessor::Ptr tuning,
                                  BKAudioProcessor& processor, GeneralSettings::Ptr g) :
-GenericProcessor(processor, BKPreparationType::PreparationTypeDirect, TargetTypeDirect, TargetTypeDirect),
+GenericProcessor(processor, BKPreparationType::PreparationTypeDirect,direct, TargetTypeDirect, TargetTypeDirect),
 synth(new BKSynthesiser(processor, g,processor.mainPianoSoundSet )),
 resonanceSynth(new BKSynthesiser(processor, g,processor.resonanceReleaseSoundSet )),
 hammerSynth(new BKSynthesiser(processor, g,processor.hammerReleaseSoundSet )),
 pedalSynth(new BKSynthesiser(processor, g,processor.pedalReleaseSoundSet )),
-direct(direct),
 tuner(tuning),
 keymaps(Keymap::PtrArr())
 {
+    DirectPreparation* _prep = dynamic_cast<DirectPreparation*>(prep.get());
     for (int i = 0; i < 300; i++)
     {
         synth->addVoice(new BKPianoSamplerVoice(processor.gallery->getGeneralSettings()));
@@ -78,11 +79,11 @@ keymaps(Keymap::PtrArr())
         }
     }
     
-    if (!direct->prep->dUseGlobalSoundSet.value)
+    if (!_prep->dUseGlobalSoundSet.value)
     {
-        String name = direct->prep->dSoundSetName.value;
+        String name = _prep->dSoundSetName.value;
         int Id = synth->processor.findPathAndLoadSamples(name);
-        direct->prep->setSoundSet(Id);
+        _prep->setSoundSet(Id);
     }
     
     noteLengthTimers.ensureStorageAllocated(128);
@@ -103,7 +104,8 @@ DirectProcessor::~DirectProcessor(void)
 void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities, bool fromPress)
 {
     TuningProcessor* _tuner =  dynamic_cast<TuningProcessor*>(tuner.get());
-    
+    DirectPreparation* _prep = dynamic_cast<DirectPreparation*>(prep.get());
+
     activeNotes.addIfNotAlreadyThere(noteNumber);
     //noteLengthTimers.set(noteNumber, 0);
     
@@ -132,9 +134,9 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
     
     _tuner->getOffset(noteNumber, true);
     
-    DirectPreparation::Ptr prep = direct->prep;
     
-    for (auto t : prep->dTransposition.value)
+    
+    for (auto t : _prep->dTransposition.value)
     {
         // synthNoteNumber is what determines what sample is chosen
         // without transposition or extreme tuning, this will be the same as noteNumber
@@ -146,7 +148,7 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
         float synthOffset; // offset from actual sample played, always less than 1.
         
         // tune the transposition
-        if (prep->dTranspUsesTuning.value) // use the Tuning setting
+        if (_prep->dTranspUsesTuning.value) // use the Tuning setting
             offset = t + _tuner->getOffset(round(t) + noteNumber, false);
         else  // or set it absolutely, tuning only the note that is played (default, and original behavior)
             offset = t + _tuner->getOffset(noteNumber, false);
@@ -168,7 +170,7 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
 //                }
 //
 //            }
-        if (*direct->prep->getGainPtr() > -80.) {
+        if (_prep->getDefGain() > -80.) {
             synth->keyOn(1,
                          noteNumber,
                          synthNoteNumber,
@@ -178,16 +180,16 @@ void DirectProcessor::keyPressed(int noteNumber, Array<float>& targetVelocities,
                          Forward,
                          Normal,
                          MainNote,
-                         direct->prep->getSoundSet(), //set
-                         direct->getId(),
+                         _prep->getSoundSet(), //set
+                         prep->getId(),
                          0,     // start
                          0,     // length
-                         prep->dAttack.value,
-                         prep->dDecay.value,
-                         prep->dSustain.value,
-                         prep->dRelease.value,
+                         _prep->dAttack.value,
+                         _prep->dDecay.value,
+                         _prep->dSustain.value,
+                         _prep->dRelease.value,
                          tuner,
-                         prep->getGainPtr());
+                         prep->getDefaultGainPtr());
         }
         
         if (!keyPlayed[noteNumber].contains(synthNoteNumber)) {
@@ -233,13 +235,13 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
         // DBG("DirectProcessor::keyReleased sending keyOff");
         synth->keyOff(1,
                       MainNote,
-                      direct->prep->getSoundSet(), //set
-                      direct->getId(),
+                      prep->getSoundSet(), //set
+                      prep->getId(),
                       noteNumber,
                       t,
                       aVels->getUnchecked(TargetTypeDirect),
                       aGlobalGain,
-                      direct->prep->getGainPtr(),
+                      prep->getDefaultGainPtr(),
                       true);
     }
 
@@ -287,9 +289,11 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
      }
      else
      */
+    DirectPreparation* _prep = dynamic_cast<DirectPreparation*>(prep.get());
+
     if (!soundfont)
     {
-        if (*direct->prep->getHammerGainPtr() > -30.) { //-20dB threshold
+        if (*_prep->getHammerGainPtr() > -30.) { //-20dB threshold
             // DBG("DirectProcessor::playReleaseSample, about to play hammer");
             hammerSynth->keyOn  (1,
                                  noteNumber,
@@ -300,17 +304,17 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
                                  Forward,
                                  Normal,
                                  HammerNote,
-                                 direct->prep->getSoundSet(), //set
-                                 direct->getId(),
+                                 prep->getSoundSet(), //set
+                                 prep->getId(),
                                  0,
                                  2000,
                                  3,
                                  3,
                                  tuner,
-                                 direct->prep->getHammerGainPtr());
+                                 _prep->getHammerGainPtr());
         }
         
-        if (*direct->prep->getResonanceGainPtr() > -30.) {
+        if (*_prep->getResonanceGainPtr() > -30.) {
             float held = noteLengthTimers.getUnchecked(noteNumber) * (1. / synth->getSampleRate());
             // DBG("DirectProcessor::playReleaseSample, about to play resonance");
             resonanceSynth->keyOn(1,
@@ -325,29 +329,30 @@ void DirectProcessor::playReleaseSample(int noteNumber, Array<float>& targetVelo
                                   Forward,
                                   Normal,
                                   ResonanceNote,
-                                  direct->prep->getSoundSet(), //set
-                                  direct->getId(),
+                                  prep->getSoundSet(), //set
+                                  prep->getId(),
                                   0,
                                   2000,
                                   3,
                                   3,
                                   tuner,
-                                  direct->prep->getResonanceGainPtr());
+                                  _prep->getResonanceGainPtr());
         }
     }
 }
 
 float DirectProcessor::filterVelocity(float vel)
 {
-    DirectPreparation::Ptr prep = direct->prep;
+    //DirectPreparation::Ptr prep = direct->prep;
     
     if (!lastVelocityInRange) lastVelocity = vel;
     
     int velocity = vel*127.f;
-    
-    if(prep->velocityMin.value <= prep->velocityMax.value)
+    DirectPreparation* _prep = dynamic_cast<DirectPreparation*>(prep.get());
+
+    if(_prep->velocityMin.value <= _prep->velocityMax.value)
     {
-        if (velocity >= prep->velocityMin.value && velocity <= prep->velocityMax.value)
+        if (velocity >= _prep->velocityMin.value && velocity <= _prep->velocityMax.value)
         {
             lastVelocityInRange = true;
             lastVelocity = vel;
@@ -356,7 +361,7 @@ float DirectProcessor::filterVelocity(float vel)
     }
     else
     {
-        if (velocity >= prep->velocityMin.value || velocity <= prep->velocityMax.value)
+        if (velocity >= _prep->velocityMin.value || velocity <= _prep->velocityMax.value)
         {
             lastVelocityInRange = true;
             lastVelocity = vel;

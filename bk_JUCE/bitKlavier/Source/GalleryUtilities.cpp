@@ -128,13 +128,7 @@ void Gallery::removeNostalgic(int Id)
     }
 }
 
-void Gallery::removeDirect(int Id)
-{
-    for (int i = direct.size(); --i >= 0; )
-    {
-        if (direct[i]->getId() == Id) direct.remove(i);
-    }
-}
+
 
 void Gallery::removeTuning(int Id) 
 {
@@ -187,7 +181,11 @@ void Gallery::remove(BKPreparationType type, int Id)
 {
     if (type == PreparationTypeDirect)
     {
-        removeDirect(Id);
+        removePreparationOfType(type, Id);
+    }
+    else if (type == PreparationTypeResonance)
+    {
+        remove(type, Id);
     }
     else if (type == PreparationTypeSynchronic)
     {
@@ -259,7 +257,7 @@ String Gallery::iterateName(BKPreparationType type, String name)
     
     if (type == PreparationTypeDirect)
     {
-        for (auto p : direct)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : *genericPrep[PreparationTypeDirect]) if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
     }
     else if (type == PreparationTypeSynchronic)
     {
@@ -291,7 +289,7 @@ String Gallery::iterateName(BKPreparationType type, String name)
     }
     if (type == PreparationTypeDirectMod)
     {
-        for (auto p : modDirect)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : modDirect)   if (p->_getName() == name || p->_getName().startsWith(name+" (")) num++;
     }
     else if (type == PreparationTypeSynchronicMod)
     {
@@ -334,8 +332,8 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
     String name;
     if (type == PreparationTypeDirect)
     {
-        name = getDirect(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
-        for (auto p : direct)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+        name = getPreparationOfType(PreparationTypeDirect,Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+        for (auto p : *genericPrep[PreparationTypeDirect])   if (p->getName() == name || p->getName().startsWith(name + " ")) num++;
     }
     else if (type == PreparationTypeSynchronic)
     {
@@ -369,10 +367,10 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
     }
     if (type == PreparationTypeDirectMod)
     {
-         name = getDirectModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+         name = getDirectModification(Id)->_getName().upToFirstOccurrenceOf(" (", false, false);
         for (auto p : modDirect)
         {
-            if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+            if (p->_getName() == name || p->_getName().startsWith(name+" ")) num++;
         }
     }
     else if (type == PreparationTypeSynchronicMod)
@@ -424,13 +422,7 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
 {
     if (type == PreparationTypeDirect)
     {
-        Direct::Ptr p = new Direct(-1);
-        p->setState(xml);
-        addDirect(p);
-        if (p->getName() == "Direct " + String(oldId))
-            p->setName("Direct " + String(p->getId()));
-        else p->setName(iterateName(PreparationTypeDirect, p->getName()));
-        return p->getId();
+        return addGenericPreparation(PreparationTypeResonance, xml);
     }
     else if (type == PreparationTypeSynchronic)
     {
@@ -506,9 +498,9 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         DirectModification::Ptr p = new DirectModification(processor, -1);
         p->setState(xml);
         addDirectMod(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
-        else p->setName(iterateName(PreparationTypeDirectMod, p->getName()));
+        if (p->_getName() == String(oldId))
+            p->_setName(String(p->getId()));
+        else p->_setName(iterateName(PreparationTypeDirectMod, p->_getName()));
         return p->getId();
     }
     else if (type == PreparationTypeSynchronicMod)
@@ -588,16 +580,8 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
 int Gallery::duplicate(BKPreparationType type, int Id)
 {
     int newId = -1;
-    if (type == PreparationTypeDirect)
-    {
-        Direct::Ptr toCopy = getDirect(Id);
-        Direct::Ptr newOne = toCopy->duplicate();
-        addDirect(newOne);
-        newId = newOne->getId();
-        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeDirect, newId))+")";
-        newOne->setName(newName);
-    }
-    else if (type == PreparationTypeSynchronic)
+  
+    if (type == PreparationTypeSynchronic)
     {
         Synchronic::Ptr toCopy = getSynchronic(Id);
         Synchronic::Ptr newOne = toCopy->duplicate();
@@ -658,8 +642,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         DirectModification::Ptr newOne = toCopy->duplicate();
         addDirectMod(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeDirectMod, newId))+")";
-        newOne->setName(newName);
+        String newName = toCopy->_getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeDirectMod, newId))+")";
+        newOne->_setName(newName);
     }
     else if (type == PreparationTypeSynchronicMod)
     {
@@ -745,12 +729,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
 int Gallery::add(BKPreparationType type)
 {
     int newId = -1;
-    if (type == PreparationTypeDirect)
-    {
-        addDirect();
-        newId = direct.getLast()->getId();
-    }
-    else if (type == PreparationTypeSynchronic)
+    
+    if (type == PreparationTypeSynchronic)
     {
         addSynchronic();
         newId = synchronic.getLast()->getId();
@@ -834,7 +814,7 @@ int Gallery::add(BKPreparationType type)
 
 int Gallery::getNum(BKPreparationType type)
 {
-    return  (type == PreparationTypeDirect) ? direct.size() :
+    return  (type == PreparationTypeDirect) ? genericPrep[PreparationTypeResonance]->size() :
     (type == PreparationTypeNostalgic) ? nostalgic.size() :
     (type == PreparationTypeSynchronic) ? synchronic.size() :
     (type == PreparationTypeTuning) ? tuning.size() :
@@ -1019,7 +999,7 @@ void Gallery::copy(BKPreparationType type, int from, int to)
 {
     if (type == PreparationTypeDirect)
     {
-        direct.getUnchecked(to)->copy(direct.getUnchecked(from));
+        genericPrep[PreparationTypeDirect]->getUnchecked(to)->copy(genericPrep[PreparationTypeDirect]->getUnchecked(from));
     }
     else if (type == PreparationTypeSynchronic)
     {
@@ -1081,11 +1061,8 @@ void Gallery::copy(BKPreparationType type, int from, int to)
 
 void Gallery::addTypeWithId(BKPreparationType type, int Id)
 {
-    if (type == PreparationTypeDirect)
-    {
-        addDirectWithId(Id);
-    }
-    else if (type == PreparationTypeSynchronic)
+    
+    if (type == PreparationTypeSynchronic)
     {
         addSynchronicWithId(Id);
     }
@@ -1261,6 +1238,8 @@ GenericPreparation::Ptr Gallery::addGenericPreparation(BKPreparationType type, i
     GenericPreparation::Ptr prep;
     if (type == PreparationTypeDirect)
     {
+        prep = new DirectPreparation(newId);
+        genericPrep[type]->add(prep);
     }
     else if (type == PreparationTypeSynchronic)
     {
@@ -1337,29 +1316,6 @@ void Gallery::addTempo(Tempo::Ptr p)
 }
 
 
-void Gallery::addDirect(Direct::Ptr p)
-{
-    int newId = getNewId(PreparationTypeDirect);
-    p->setId(newId);
-    direct.add(p);
-}
-
-void Gallery::addDirect(void)
-{
-    int newId = getNewId(PreparationTypeDirect);
-    direct.add(new Direct(newId));
-}
-
-void Gallery::addDirectWithId(int Id)
-{
-    direct.add(new Direct(Id));
-}
-
-void Gallery::addDirect(DirectPreparation::Ptr drct)
-{
-    int newId = getNewId(PreparationTypeDirect);
-    direct.add(new Direct(drct, newId));
-}
 
 
 // Deletes unused preparations
@@ -1381,12 +1337,9 @@ void Gallery::clean(void)
     
     
     Array<int> thisUsed = used.getUnchecked(PreparationTypeDirect);
-    for (int i = direct.size(); --i >= 0;)
+    for (int i = genericPrep[PreparationTypeDirect]->size(); --i >= 0;)
     {
-        if (!thisUsed.contains(direct[i]->getId()))
-        {
-            direct.remove(i);
-        }
+        if (!thisUsed.contains(genericPrep[PreparationTypeDirect]->getUnchecked(i)->getId())) genericPrep[PreparationTypeResonance]->remove(i);
     }
     
     thisUsed = used.getUnchecked(PreparationTypeSynchronic);
@@ -1431,7 +1384,7 @@ void Gallery::clean(void)
         if (!thisUsed.contains(bkKeymaps[i]->getId())) bkKeymaps.remove(i);
     }
     
-    thisUsed = used.getUnchecked(PreparationTypeDirect);
+    thisUsed = used.getUnchecked(PreparationTypeDirectMod);
     for (int i = modDirect.size(); --i >= 0;)
     {
         if (!thisUsed.contains(modDirect[i]->getId())) modDirect.remove(i);

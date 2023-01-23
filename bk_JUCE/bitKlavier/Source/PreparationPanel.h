@@ -48,8 +48,9 @@ private:
         processor(p),
         type(t)
         {
-            if (type == PreparationTypeDirect)
-                setPreparations(processor.gallery->getAllDirectNames());
+            if (type == PreparationTypeDirect || type == PreparationTypeResonance)
+                setPreparations(processor.gallery->getAllPreparationNamesOfType(t));
+                //setPreparations(processor.gallery->getAllDirectNames());
             else if (type == PreparationTypeSynchronic)
                 setPreparations(processor.gallery->getAllSynchronicNames());
             else if (type == PreparationTypeNostalgic)

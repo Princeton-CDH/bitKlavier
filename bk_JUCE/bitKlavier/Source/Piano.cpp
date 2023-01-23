@@ -312,7 +312,7 @@ GenericProcessor::Ptr Piano::addNostalgicProcessor(int thisId)
 
 GenericProcessor::Ptr Piano::addDirectProcessor(int thisId)
 {
-    DirectProcessor::Ptr dproc = new DirectProcessor(processor.gallery->getDirect(thisId),
+    DirectProcessor::Ptr dproc = new DirectProcessor(processor.gallery->getPreparationOfType(PreparationTypeDirect, thisId),
                                                      defaultT,
                                                      processor,
                                                      processor.gallery->getGeneralSettings()                                                     /*&processor.mainPianoSynth,

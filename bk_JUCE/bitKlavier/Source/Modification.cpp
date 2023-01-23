@@ -13,29 +13,30 @@
 
 
 DirectModification::DirectModification(BKAudioProcessor& processor, int Id):
-Modification(processor, Id, DirectParameterTypeNil)
+Modification(processor, Id, DirectParameterTypeNil),
+prep(new DirectPreparation(-1))
 {
     
 }
 
 ValueTree DirectModification::getState(void)
 {
-    ValueTree prep(vtagModDirect);
+    ValueTree _prep(vtagModDirect);
     
-    prep.setProperty( "Id", Id, 0);
-    prep.setProperty( "name", getName(), 0);
-    prep.setProperty("alt", altMod, 0);
+    _prep.setProperty( "Id", Id, 0);
+    _prep.setProperty( "name", _getName(), 0);
+    _prep.setProperty("alt", altMod, 0);
     ValueTree dirtyVT( "dirty");
     int count = 0;
     for (auto b : dirty)
     {
         dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
     }
-    prep.addChild(dirtyVT, -1, 0);
+    _prep.addChild(dirtyVT, -1, 0);
     
-    prep.addChild(DirectPreparation::getState(), -1, 0);
+    _prep.addChild(prep->getState(), -1, 0);
     
-    return prep;
+    return _prep;
 }
 
 void DirectModification::setState(XmlElement* e)
@@ -46,8 +47,8 @@ void DirectModification::setState(XmlElement* e)
     
     altMod = e->getBoolAttribute("alt", false);
     
-    if (n != String())     setName(n);
-    else                        setName(String(Id));
+    if (n != String())     _setName(n);
+    else                        _setName(String(Id));
     
     XmlElement* dirtyXml = e->getChildByName("dirty");
     XmlElement* paramsXml = e->getChildByName("params");
@@ -66,13 +67,13 @@ void DirectModification::setState(XmlElement* e)
             }
         }
         
-        DirectPreparation::setState(paramsXml);
-        if (!dUseGlobalSoundSet.value)
+        prep->setState(paramsXml);
+        if (!prep->useGlobalSoundSet.value)
         {
             // comes in as "soundfont.sf2.subsound1"
-            String name = dSoundSetName.value;
+            String name = prep->soundSetName.value;
             int Id = processor.findPathAndLoadSamples(name);
-            setSoundSet(Id);
+            prep->setSoundSet(Id);
         }
     }
     else
@@ -86,30 +87,30 @@ void DirectModification::setStateOld(XmlElement* e)
     reset();
     
     float f;
-    
+    DirectPreparation* d = dynamic_cast<DirectPreparation*>(prep.get());
     String p = e->getStringAttribute(ptagDirect_gain);
     if (p != "")
     {
         // Assuming everything in here is for backwards compatibility
         // should be fine to always set mod time to 0
-        dGain.setMod(p.getFloatValue());
-        dGain.setTime(0);
+        prep->defaultGain.setMod(p.getFloatValue());
+        prep->defaultGain.setTime(0);
         setDirty(DirectGain);
     }
     
     p = e->getStringAttribute(ptagDirect_hammerGain);
     if (p != "")
     {
-        dHammerGain.setMod(p.getFloatValue());
-        dHammerGain.setTime(0);
+        d->dHammerGain.setMod(p.getFloatValue());
+        d->dHammerGain.setTime(0);
         setDirty(DirectHammerGain);
     }
     
     p = e->getStringAttribute(ptagDirect_resGain);
     if (p != "")
     {
-        dResonanceGain.setMod(p.getFloatValue());
-        dResonanceGain.setTime(0);
+        d->dResonanceGain.setMod(p.getFloatValue());
+        d->dResonanceGain.setTime(0);
         setDirty(DirectResGain);
     }
     
@@ -131,7 +132,7 @@ void DirectModification::setStateOld(XmlElement* e)
                 }
             }
             
-            dTransposition.set(transp);
+            d->dTransposition.set(transp);
             setDirty(DirectTransposition);
         }
         else if (sub->hasTagName(vtagDirect_ADSR))
@@ -149,7 +150,7 @@ void DirectModification::setStateOld(XmlElement* e)
                 }
             }
             
-            setADSRvals(envelope);
+            d->setADSRvals(envelope);
             setDirty(DirectADSR);
         }
     }

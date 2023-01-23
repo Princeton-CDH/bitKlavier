@@ -418,14 +418,15 @@ void DirectPreparationEditor::update()
     setSubWindowInFront(false);
     ADSRSlider->setIsButtonOnly(true);
     
-    DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
-    
+    DirectPreparation::Ptr _prep = processor.gallery->getPreparationOfType(PreparationTypeDirect, processor.updateState->currentDirectId);
+  
+    DirectPreparation* prep = dynamic_cast<DirectPreparation*>(_prep.get());
     if (prep != nullptr)
     {
         selectCB.setSelectedId(processor.updateState->currentDirectId, dontSendNotification);
     
         transpositionSlider->setValue(prep->dTransposition.value, dontSendNotification);
-        gainSlider->setValue(prep->dGain.value, dontSendNotification);
+        gainSlider->setValue(prep->defaultGain.value, dontSendNotification);
         resonanceGainSlider->setValue(prep->dResonanceGain.value, dontSendNotification);
         hammerGainSlider->setValue(prep->dHammerGain.value, dontSendNotification);
         blendronicGainSlider->setValue(prep->dBlendronicGain.value, dontSendNotification);
@@ -449,16 +450,16 @@ void DirectPreparationEditor::bkMessageReceived (const String& message)
 
 int DirectPreparationEditor::addPreparation(void)
 {
-    processor.gallery->add(PreparationTypeDirect);
+    return processor.gallery->add(PreparationTypeDirect);
     
-    return processor.gallery->getAllDirect().getLast()->getId();
+   // return processor.gallery->getAllDirect().getLast()->getId();
 }
 
 int DirectPreparationEditor::duplicatePreparation(void)
 {
-    processor.gallery->duplicate(PreparationTypeDirect, processor.updateState->currentDirectId);
+    return processor.gallery->duplicate(PreparationTypeDirect, processor.updateState->currentDirectId);
     
-    return processor.gallery->getAllDirect().getLast()->getId();
+    //return processor.gallery->getAllDirect().getLast()->getId();
 }
 
 void DirectPreparationEditor::deleteCurrent(void)
@@ -534,7 +535,7 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentDirectId;
-        Direct::Ptr prep = processor.gallery->getDirect(Id);
+        DirectPreparation::Ptr prep = processor.gallery->getPreparationOfType(PreparationTypeDirect, Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -559,7 +560,7 @@ void DirectPreparationEditor::actionButtonCallback(int action, DirectPreparation
         AlertWindow prompt("", "", AlertWindow::AlertIconType::QuestionIcon);
         
         int Id = processor.updateState->currentDirectId;
-        Direct::Ptr prep = processor.gallery->getDirect(Id);
+        DirectPreparation::Ptr prep = processor.gallery->getPreparationOfType(PreparationTypeDirect,Id);
         
         prompt.addTextEditor("name", prep->getName());
         
@@ -601,7 +602,7 @@ void DirectPreparationEditor::bkComboBoxDidChange (ComboBox* box)
 
 void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableComboBox* cb)
 {
-    Direct::Ptr direct = processor.gallery->getDirect(processor.updateState->currentDirectId);
+    DirectPreparation::Ptr direct = processor.gallery->getPreparationOfType(PreparationTypeDirect, processor.updateState->currentDirectId);
     direct->setName(name);
     
     fillSelectCB(0, processor.updateState->currentDirectId);
@@ -611,8 +612,8 @@ void DirectPreparationEditor::BKEditableComboBoxChanged(String name, BKEditableC
 
 void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
-    
+    DirectPreparation::Ptr _prep = processor.gallery->getPreparationOfType(PreparationTypeDirect, processor.updateState->currentDirectId);
+    DirectPreparation* prep = dynamic_cast<DirectPreparation*>(_prep.get());
     if (prep == nullptr) return;
     
     if(slider->getName() == resonanceGainSlider->getName())
@@ -628,7 +629,7 @@ void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
     else if(slider->getName() == gainSlider->getName())
     {
         //DBG("gain " + String(val));
-        prep->dGain.set(val);
+        prep->defaultGain.set(val);
     }
     else if(slider->getName() == blendronicGainSlider->getName())
     {
@@ -641,8 +642,8 @@ void DirectPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider,
 
 void DirectPreparationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
-    
+    DirectPreparation::Ptr _prep = processor.gallery->getPreparationOfType(PreparationTypeDirect, processor.updateState->currentDirectId);
+    DirectPreparation* prep = dynamic_cast<DirectPreparation*>(_prep.get());
     if(name == "velocity min/max") {
         DBG("got new velocity min/max " + String(minval) + " " + String(maxval));
         prep->velocityMin.set(minval);
@@ -654,8 +655,8 @@ void DirectPreparationEditor::BKRangeSliderValueChanged(String name, double minv
 
 void DirectPreparationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
-    DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
-    
+    DirectPreparation::Ptr _prep = processor.gallery->getPreparationOfType(PreparationTypeDirect, processor.updateState->currentDirectId);
+    DirectPreparation* prep = dynamic_cast<DirectPreparation*>(_prep.get());
     prep->dTransposition.set(val);
     
     processor.updateState->editsMade = true;
@@ -665,8 +666,8 @@ void DirectPreparationEditor::BKADSRSliderValueChanged(String name, int attack, 
 {
     DBG("BKADSRSliderValueChanged received");
     
-    DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
-    
+    DirectPreparation::Ptr _prep = processor.gallery->getPreparationOfType(PreparationTypeDirect, processor.updateState->currentDirectId);
+    DirectPreparation* prep = dynamic_cast<DirectPreparation*>(_prep.get());
     prep->dAttack.set(attack);
     prep->dDecay.set(decay);
     prep->dSustain.set(sustain);
@@ -686,7 +687,8 @@ void DirectPreparationEditor::timerCallback()
     if (processor.updateState->currentDisplay == DisplayDirect)
     {
         DirectProcessor* dProcessor = dynamic_cast<DirectProcessor*>(processor.currentPiano->getProcessorOfType(processor.updateState->currentDirectId, PreparationTypeDirect).get());
-        DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
+        DirectPreparation::Ptr _prep = processor.gallery->getPreparationOfType(PreparationTypeDirect, processor.updateState->currentDirectId);
+        DirectPreparation* prep = dynamic_cast<DirectPreparation*>(_prep.get());
         
         velocityMinMaxSlider->setDisplayValue(dProcessor->getLastVelocity() * 127.);
         //DBG("sProcessor->getLastVelocity() = " + String(dProcessor->getLastVelocity()));
@@ -694,8 +696,8 @@ void DirectPreparationEditor::timerCallback()
         if (prep != nullptr && dProcessor != nullptr)
         {
             if (prep->dTransposition.didChange()) transpositionSlider->setValue(prep->dTransposition.value, dontSendNotification);
-            if (prep->dGain.didChange())
-                gainSlider->setValue(prep->dGain.value, dontSendNotification);
+            if (prep->defaultGain.didChange())
+                gainSlider->setValue(prep->defaultGain.value, dontSendNotification);
             if (prep->dResonanceGain.didChange()) resonanceGainSlider->setValue(prep->dResonanceGain.value, dontSendNotification);
             if (prep->dHammerGain.didChange()) hammerGainSlider->setValue(prep->dHammerGain.value, dontSendNotification);
             if (prep->dBlendronicGain.didChange()) blendronicGainSlider->setValue(prep->dBlendronicGain.value, dontSendNotification);
@@ -724,7 +726,7 @@ void DirectPreparationEditor::fillSelectCB(int last, int current)
 {
     selectCB.clear(dontSendNotification);
     
-    for (auto prep : processor.gallery->getAllDirect())
+    for (auto prep : *processor.gallery->getAllPreparationsOfType(PreparationTypeDirect))
     {
         int Id = prep->getId();
         
@@ -766,7 +768,7 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &actionButton)
     {
-        bool single = processor.gallery->getAllDirect().size() == 2;
+        bool single = processor.gallery->getAllPreparationsOfType(PreparationTypeDirect)->size() == 2;
         getPrepOptionMenu(PreparationTypeDirect, single).showMenuAsync (PopupMenu::Options().withTargetComponent (&actionButton), ModalCallbackFunction::forComponent (actionButtonCallback, this) );
     }
     else if (b == &rightArrow)
@@ -787,7 +789,8 @@ void DirectPreparationEditor::buttonClicked (Button* b)
     }
     else if (b == &transpUsesTuning)
     {
-        DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(processor.updateState->currentDirectId);
+        DirectPreparation::Ptr _prep = processor.gallery->getPreparationOfType(PreparationTypeDirect, processor.updateState->currentDirectId);
+        DirectPreparation* prep = dynamic_cast<DirectPreparation*>(_prep.get());
         DBG("Direct transpUsesTuning = " + String((int)b->getToggleState()));
         prep->setTranspUsesTuning(b->getToggleState());
         
@@ -860,21 +863,21 @@ void DirectModificationEditor::update(void)
     
     selectCB.setSelectedId(processor.updateState->currentModDirectId, dontSendNotification);
     
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
-    
+    DirectModification::Ptr _mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    DirectPreparation* mod = dynamic_cast<DirectPreparation*>(_mod->getPrep().get());
     if (mod != nullptr)
     {
         greyOutAllComponents();
         highlightModedComponents();
         
         transpositionSlider->setValue(mod->dTransposition.value, dontSendNotification);
-        gainSlider->setValue(mod->dGain.value, dontSendNotification);
+        gainSlider->setValue(mod->defaultGain.value, dontSendNotification);
         resonanceGainSlider->setValue(mod->dResonanceGain.value, dontSendNotification);
         hammerGainSlider->setValue(mod->dHammerGain.value, dontSendNotification);
         blendronicGainSlider->setValue(mod->dBlendronicGain.value, dontSendNotification);
         ADSRSlider->setValue(mod->getADSRvals(), dontSendNotification);
         transpUsesTuning.setToggleState(mod->dTranspUsesTuning.value, dontSendNotification);
-        alternateMod.setToggleState(mod->altMod, dontSendNotification);
+        alternateMod.setToggleState(_mod->altMod, dontSendNotification);
         velocityMinMaxSlider->setMinValue(mod->velocityMin.value, dontSendNotification);
         velocityMinMaxSlider->setMaxValue(mod->velocityMax.value, dontSendNotification);
     }
@@ -887,7 +890,7 @@ void DirectModificationEditor::fillSelectCB(int last, int current)
     for (auto prep : processor.gallery->getDirectModifications())
     {
         int Id = prep->getId();;
-        String name = prep->getName();
+        String name = prep->_getName();
         
         if (name != String())  selectCB.addItem(name, Id);
         else                        selectCB.addItem("DirectMod"+String(Id), Id);
@@ -1003,7 +1006,7 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
         int Id = processor.updateState->currentModDirectId;
         DirectModification::Ptr prep = processor.gallery->getDirectModification(Id);
         
-        prompt.addTextEditor("name", prep->getName());
+        prompt.addTextEditor("name", prep->_getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -1014,7 +1017,7 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
         
         if (result == 1)
         {
-            prep->setName(name);
+            prep->_setName(name);
             vc->fillSelectCB(Id, Id);
             processor.saveGalleryToHistory("Rename Direct Modification");
         }
@@ -1028,7 +1031,7 @@ void DirectModificationEditor::actionButtonCallback(int action, DirectModificati
         int Id = processor.updateState->currentModDirectId;
         DirectModification::Ptr prep = processor.gallery->getDirectModification(Id);
         
-        prompt.addTextEditor("name", prep->getName());
+        prompt.addTextEditor("name", prep->_getName());
         
         prompt.addButton("Ok", 1, KeyPress(KeyPress::returnKey));
         prompt.addButton("Cancel", 2, KeyPress(KeyPress::escapeKey));
@@ -1071,7 +1074,7 @@ void DirectModificationEditor::BKEditableComboBoxChanged(String name, BKEditable
 {
     DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
     
-    mod->setName(name);
+    mod->_setName(name);
     
     updateModification();
     
@@ -1081,34 +1084,34 @@ void DirectModificationEditor::BKEditableComboBoxChanged(String name, BKEditable
 
 void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider, String name, double val)
 {
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
-    
+    DirectModification::Ptr _mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    DirectPreparation* mod = dynamic_cast<DirectPreparation*>(_mod->getPrep().get());
     if(slider->getName() == resonanceGainSlider->getName())
     {
         mod->dResonanceGain.set(val);
         
-        mod->setDirty(DirectResGain);
+        _mod->setDirty(DirectResGain);
         resonanceGainSlider->setBright();
     }
     else if(slider->getName() == hammerGainSlider->getName())
     {
         mod->dHammerGain.set(val);
         
-        mod->setDirty(DirectHammerGain);
+        _mod->setDirty(DirectHammerGain);
         hammerGainSlider->setBright();
     }
     else if(slider->getName() == gainSlider->getName())
     {
-        mod->dGain.set(val);
+        mod->defaultGain.set(val);
         
-        mod->setDirty(DirectGain);
+        _mod->setDirty(DirectGain);
         gainSlider->setBright();
     }
     else if(slider->getName() == blendronicGainSlider->getName())
     {
         mod->dBlendronicGain.set(val);
         
-        mod->setDirty(DirectBlendronicGain);
+        _mod->setDirty(DirectBlendronicGain);
         blendronicGainSlider->setBright();
     }
     
@@ -1117,15 +1120,15 @@ void DirectModificationEditor::BKSingleSliderValueChanged(BKSingleSlider* slider
 
 void DirectModificationEditor::BKRangeSliderValueChanged(String name, double minval, double maxval)
 {
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
-    
+    DirectModification::Ptr _mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    DirectPreparation* mod = dynamic_cast<DirectPreparation*>(_mod->getPrep().get());
     if (name == "velocity min/max")
     {
         mod->velocityMin.set(minval);
-        mod->setDirty(DirectVelocityMin);
+        _mod->setDirty(DirectVelocityMin);
         
         mod->velocityMax.set(maxval);
-        mod->setDirty(DirectVelocityMax);
+        _mod->setDirty(DirectVelocityMax);
         
         velocityMinMaxSlider->setBright();
     }
@@ -1137,10 +1140,10 @@ void DirectModificationEditor::BKRangeSliderValueChanged(String name, double min
 void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<float> val)
 {
     
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
-    
+    DirectModification::Ptr _mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    DirectPreparation* mod = dynamic_cast<DirectPreparation*>(_mod->getPrep().get());
     mod->dTransposition.set(val);
-    mod->setDirty(DirectTransposition);
+    _mod->setDirty(DirectTransposition);
     
     transpositionSlider->setBright();
     
@@ -1149,12 +1152,12 @@ void DirectModificationEditor::BKStackedSliderValueChanged(String name, Array<fl
 
 void DirectModificationEditor::BKADSRSliderValueChanged(String name, int attack, int decay, float sustain, int release)
 {
-    DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
-    
+    DirectModification::Ptr _mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+    DirectPreparation* mod = dynamic_cast<DirectPreparation*>(_mod->getPrep().get());
     Array<float> newvals = {(float)attack, (float)decay, sustain, (float)release};
     
     mod->setADSRvals(newvals);
-    mod->setDirty(DirectADSR);
+    _mod->setDirty(DirectADSR);
     
     ADSRSlider->setBright();
     
@@ -1204,9 +1207,10 @@ void DirectModificationEditor::buttonClicked (Button* b)
     }
     else if (b == &transpUsesTuning)
     {
-        DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+        DirectModification::Ptr _mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
+        DirectPreparation* mod = dynamic_cast<DirectPreparation*>(_mod->getPrep().get());
         mod->setTranspUsesTuning(transpUsesTuning.getToggleState());
-        mod->setDirty(DirectTranspUsesTuning);
+        _mod->setDirty(DirectTranspUsesTuning);
         transpUsesTuning.setAlpha(1.);
     }
     else if (b == &alternateMod)

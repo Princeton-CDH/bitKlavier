@@ -1283,13 +1283,13 @@ ModdableBase* ModdableViewController::getCurrentModdable()
         DirectModification::Ptr mod = processor.gallery->getDirectModification(processor.updateState->currentModDirectId);
         
         if (processor.updateState->currentModdableIdentifier == cDirectGain)
-            return &mod->dGain;
+            return &mod->prep->defaultGain;
         else if (processor.updateState->currentModdableIdentifier == cDirectResonanceGain)
-            return &mod->dResonanceGain;
+            return &dynamic_cast<DirectPreparation*>(mod->prep.get())->dResonanceGain;
         else if (processor.updateState->currentModdableIdentifier == cDirectHammerGain)
-            return &mod->dHammerGain;
+            return &dynamic_cast<DirectPreparation*>(mod->prep.get())->dHammerGain;
         else if (processor.updateState->currentModdableIdentifier == cDirectBlendronicGain)
-            return &mod->dBlendronicGain;
+            return &dynamic_cast<DirectPreparation*>(mod->prep.get())->dBlendronicGain;
     }
     else if (processor.updateState->previousDisplay == DisplayNostalgicMod)
     {

@@ -32,35 +32,17 @@ class DirectModification;
  to the static state).
  */
 
-class DirectPreparation : public ReferenceCountedObject
+class DirectPreparation : public GenericPreparation
 {
 public:
-    typedef ReferenceCountedObjectPtr<DirectPreparation>   Ptr;
-    typedef Array<DirectPreparation::Ptr>                  PtrArr;
-    typedef Array<DirectPreparation::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<DirectPreparation>                  Arr;
-    typedef OwnedArray<DirectPreparation, CriticalSection> CSArr;
+//    typedef ReferenceCountedObjectPtr<DirectPreparation>   Ptr;
+//    typedef Array<DirectPreparation::Ptr>                  PtrArr;
+//    typedef Array<DirectPreparation::Ptr, CriticalSection> CSPtrArr;
+//    typedef OwnedArray<DirectPreparation>                  Arr;
+//    typedef OwnedArray<DirectPreparation, CriticalSection> CSArr;
     
-    DirectPreparation(DirectPreparation::Ptr d) :
-    dGain(d->dGain),
-    dResonanceGain(d->dResonanceGain),
-    dHammerGain(d->dHammerGain),
-    dBlendronicGain(d->dBlendronicGain),
-    dAttack(d->dAttack),
-    dDecay(d->dDecay),
-    dRelease(d->dRelease),
-    dSustain(d->dSustain),
-    dTransposition(d->dTransposition),
-    dTranspUsesTuning(d->dTranspUsesTuning),
-    dUseGlobalSoundSet(d->dUseGlobalSoundSet),
-    dSoundSet(d->getSoundSet()),
-    dSoundSetName(d->dSoundSetName),
-    velocityMin(d->velocityMin),
-    velocityMax(d->velocityMax)
-    {
-    }
     
-    DirectPreparation(Array<float> transp,
+    DirectPreparation(String newName, int Id, Array<float> transp,
                       float gain,
                       bool resAndHammer,
                       float resGain,
@@ -71,7 +53,6 @@ public:
                       float sust,
                       int rel):
     modded(false),
-    dGain(gain, true),
     dResonanceGain(resGain, true),
     dHammerGain(hamGain, true),
     dBlendronicGain(blendGain, true),
@@ -85,14 +66,14 @@ public:
     dSoundSet(-1),
     dSoundSetName(String()),
     velocityMin(0),
-    velocityMax(127)
+    velocityMax(127),
+    GenericPreparation(BKPreparationType::PreparationTypeDirect, Id, newName)
     {
 
     }
     
-    DirectPreparation(void):
+    DirectPreparation(int Id):
     modded(false),
-    dGain(0.0, true),
     dResonanceGain(-6.0, true),
     dHammerGain(-6.0, true),
     dBlendronicGain(0.0, true),
@@ -106,7 +87,8 @@ public:
     dSoundSet(-1),
     dSoundSetName(String()),
     velocityMin(0),
-    velocityMax(127)
+    velocityMax(127),
+    GenericPreparation(BKPreparationType::PreparationTypeDirect, Id)
     {
         
     }
@@ -118,21 +100,23 @@ public:
     
     inline void copy(DirectPreparation::Ptr d)
     {
-        dGain = d->dGain;
-        dResonanceGain = d->dResonanceGain;
-        dHammerGain = d->dHammerGain;
-        dBlendronicGain = d->dBlendronicGain;
-        dAttack = d->dAttack;
-        dDecay = d->dDecay;
-        dSustain = d->dSustain;
-        dRelease = d->dRelease;
-        dTransposition = d->dTransposition;
-        dTranspUsesTuning = d->dTranspUsesTuning;
-        dUseGlobalSoundSet = d->dUseGlobalSoundSet;
-        dSoundSet = d->getSoundSet();
-        dSoundSetName = d->dSoundSetName;
-        velocityMin = d->velocityMin;
-        velocityMax = d->velocityMax;
+        DirectPreparation* _d = dynamic_cast<DirectPreparation*>(d.get());
+        defaultGain = d->defaultGain;
+        dResonanceGain = _d->dResonanceGain;
+        dHammerGain = _d->dHammerGain;
+        dBlendronicGain = _d->dBlendronicGain;
+        dAttack = _d->dAttack;
+        dDecay = _d->dDecay;
+        dSustain = _d->dSustain;
+        dRelease = _d->dRelease;
+        dTransposition = _d->dTransposition;
+        dTranspUsesTuning = _d->dTranspUsesTuning;
+        useGlobalSoundSet = _d->dUseGlobalSoundSet;
+        soundSet = d->getSoundSet();
+        
+        soundSetName = d->soundSetName;
+        velocityMin = _d->velocityMin;
+        velocityMax = _d->velocityMax;
     }
     
     // Using a raw pointer here instead of ReferenceCountedObjectPtr (Ptr)
@@ -141,7 +125,7 @@ public:
     
     void stepModdables()
     {
-        dGain.step();
+        defaultGain.step();
         dResonanceGain.step();
         dHammerGain.step();
         dBlendronicGain.step();
@@ -166,7 +150,7 @@ public:
     
     void resetModdables()
     {
-        dGain.reset();
+        defaultGain.reset();
         dResonanceGain.reset();
         dHammerGain.reset();
         dBlendronicGain.reset();
@@ -191,16 +175,17 @@ public:
     
     inline bool compare(DirectPreparation::Ptr d)
     {
-        return  (dTransposition         ==      d->dTransposition       )   &&
-        (dTranspUsesTuning      ==      d->dTranspUsesTuning    )   &&
-        (dGain                  ==      d->dGain           )   &&
-        (dResonanceGain         ==      d->dResonanceGain  )   &&
-        (dHammerGain            ==      d->dHammerGain     )   &&
-        (dBlendronicGain        ==      d->dBlendronicGain )   &&
-        (dAttack                ==      d->dAttack         )   &&
-        (dDecay                 ==      d->dDecay          )   &&
-        (dSustain               ==      d->dSustain        )   &&
-        (dRelease               ==      d->dRelease        )   ;
+        DirectPreparation* _d = dynamic_cast<DirectPreparation*>(d.get());
+        return  (dTransposition         ==      _d->dTransposition       )   &&
+        (dTranspUsesTuning      ==      _d->dTranspUsesTuning    )   &&
+        (defaultGain                  ==      d->defaultGain           )   &&
+        (dResonanceGain         ==      _d->dResonanceGain  )   &&
+        (dHammerGain            ==      _d->dHammerGain     )   &&
+        (dBlendronicGain        ==      _d->dBlendronicGain )   &&
+        (dAttack                ==      _d->dAttack         )   &&
+        (dDecay                 ==      _d->dDecay          )   &&
+        (dSustain               ==      _d->dSustain        )   &&
+        (dRelease               ==      _d->dRelease        )   ;
     }
     
     // for unit-testing
@@ -220,7 +205,7 @@ public:
         }
         dTransposition.set(dt);
         
-        dGain = r[idx++];
+        defaultGain = r[idx++];
         dResonanceGain = r[idx++];
         dHammerGain = r[idx++];
         dBlendronicGain = r[idx++];
@@ -233,7 +218,7 @@ public:
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
-    inline float* getGainPtr() { return &dGain.value; }
+    //inline float* getGainPtr() { return &defaultGain.value; }
     inline float* getResonanceGainPtr() { return &(dResonanceGain.value); }
     inline float* getHammerGainPtr() { return &(dHammerGain.value); }
     inline float* getBlendronicGainPtr() { return &(dBlendronicGain.value); }
@@ -253,7 +238,7 @@ public:
     void print(void)
     {
         DBG("dTransposition: "  + floatArrayToString(dTransposition.value));
-        DBG("dGain: "           + String(dGain.value));
+        DBG("dGain: "           + String(defaultGain.value));
         DBG("dResGain: "        + String(dResonanceGain.value));
         DBG("dHammerGain: "     + String(dHammerGain.value));
         DBG("dBlendronicGain: " + String(dBlendronicGain.value));
@@ -265,9 +250,13 @@ public:
     
     ValueTree getState(void)
     {
+        ValueTree vt(vtagResonance);
+        
+        vt.setProperty( "Id",getId(), 0);
+        vt.setProperty( "name", getName(), 0);
         ValueTree prep( "params" );
         
-        dGain.getState(prep, ptagDirect_gain);
+        defaultGain.getState(prep, ptagDirect_gain);
         dResonanceGain.getState(prep, ptagDirect_resGain);
         dHammerGain.getState(prep, ptagDirect_hammerGain);
         dBlendronicGain.getState(prep, ptagDirect_blendronicGain);
@@ -288,13 +277,27 @@ public:
         
         velocityMin.getState(prep, ptagDirect_velocityMin);
         velocityMax.getState(prep, ptagDirect_velocityMax);
-        
-        return prep;
+        vt.addChild(prep, -1, 0);
+        return vt;
     }
     
-    void setState(XmlElement* e)
+    void setState(XmlElement* _e)
     {
-        dGain.setState(e, ptagDirect_gain, 1.0f);
+        setId(_e->getStringAttribute("Id").getIntValue());
+        
+        String n = _e->getStringAttribute("name");
+
+        if (n != String())     setName(n);
+        else                   setName(String(getId()));
+
+
+        XmlElement *e = _e->getChildByName("params");
+        if (e == nullptr)
+        {
+            e = _e;
+        }
+        
+        defaultGain.setState(e, ptagDirect_gain, 1.0f);
         dResonanceGain.setState(e, ptagDirect_resGain, 1.0f);
         dHammerGain.setState(e, ptagDirect_hammerGain, 1.0f);
         dBlendronicGain.setState(e, ptagDirect_blendronicGain, 1.0f);
@@ -320,16 +323,13 @@ public:
         }
     }
     
-    void setSoundSet(int Id) { dSoundSet = Id; }
-    int getSoundSet() { return dUseGlobalSoundSet.value ? -1 : dSoundSet.value; }
+   
     
     bool modded = false;
     
     // output gain multiplier
-    Moddable<float> dGain;
     // gain multipliers for release resonance and hammer
-    Moddable<float> dResonanceGain, dHammerGain;
-    Moddable<float> dBlendronicGain;
+    Moddable<float> dResonanceGain, dHammerGain, dBlendronicGain;
     
     // ADSR, in ms, or gain multiplier for sustain
     Moddable<int> dAttack, dDecay, dRelease;
@@ -358,119 +358,6 @@ private:
 };
 
 
-class Direct : public ReferenceCountedObject
-{
-    
-public:
-    typedef ReferenceCountedObjectPtr<Direct>   Ptr;
-    typedef Array<Direct::Ptr>                  PtrArr;
-    typedef Array<Direct::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<Direct>                  Arr;
-    typedef OwnedArray<Direct, CriticalSection> CSArr;
-    
-    
-    Direct(DirectPreparation::Ptr d,
-           int Id):
-    prep(new DirectPreparation(d)),
-    Id(Id),
-    name("Direct "+String(Id))
-    {
-        
-    }
-    
-    Direct(int Id, bool random = false):
-    Id(Id),
-    name("Direct "+String(Id))
-    {
-        prep = new DirectPreparation();
-        if (random) randomize();
-    };
-    
-    inline void clear(void)
-    {
-        prep       = new DirectPreparation();
-    }
-    
-    inline Direct::Ptr duplicate()
-    {
-        DirectPreparation::Ptr copyPrep = new DirectPreparation(prep);
-        
-        Direct::Ptr copy = new Direct(copyPrep, -1);
-        
-        copy->setName(name);
-        
-        return copy;
-    }
-    
-    inline ValueTree getState()//bool active = false)
-    {
-        ValueTree vt(vtagDirect);
-        
-        vt.setProperty( "Id",Id, 0);
-        vt.setProperty( "name",                          name, 0);
-        
-        vt.addChild(prep->getState(), -1, 0);
-        
-        return vt;
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        Id = e->getStringAttribute("Id").getIntValue();
-        
-        String n = e->getStringAttribute("name");
-        
-        if (n != String())     name = n;
-        else                   name = String(Id);
-        
-        
-        XmlElement* params = e->getChildByName("params");
-        
-        if (params != nullptr)
-        {
-            prep->setState(params);
-        }
-        else
-        {
-            prep->setState(e);
-        }
-    }
-    
-    ~Direct() {};
-    
-    inline int getId() {return Id;}
-    inline void setId(int newId) { Id = newId;}
-    
-    DirectPreparation::Ptr      prep;
-    
-    inline void copy(Direct::Ptr from)
-    {
-        prep->copy(from->prep);
-    }
-    
-    inline void randomize()
-    {
-        clear();
-        Random::getSystemRandom().setSeedRandomly();
-        prep->randomize();
-        Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
-        name = "random";
-    }
-    
-    inline String getName(void) const noexcept {return name;}
-    inline void setName(String newName)
-    {
-        name = newName;
-    }
-    
-private:
-    int Id;
-    String name;;
-    
-    JUCE_LEAK_DETECTOR(Direct)
-};
-
-
 /*
  DirectProcessor does the main work, including processing a block
  of samples and sending it out. It connects Keymap, Tuning, and
@@ -489,7 +376,7 @@ public:
 //    typedef OwnedArray<DirectProcessor, CriticalSection> CSArr;
 //    
     
-    DirectProcessor(Direct::Ptr direct,
+    DirectProcessor(DirectPreparation::Ptr direct,
                     TuningProcessor::Ptr tuning,
                     BKAudioProcessor& processor, GeneralSettings::Ptr);
     
@@ -538,11 +425,11 @@ public:
     
     inline void reset(void)
     {
-        direct->prep->resetModdables();
+        prep->resetModdables();
         DBG("direct reset called");
     }
     
-    inline int getId(void)  const noexcept { return direct->getId(); }
+    inline int getId(void)  const noexcept { return prep->getId(); }
     
     inline void setTuning(TuningProcessor::Ptr tuning)
     {
@@ -620,7 +507,6 @@ private:
     BKSynthesiser::Ptr  resonanceSynth;
     BKSynthesiser::Ptr      hammerSynth;
     BKSynthesiser::Ptr      pedalSynth;
-    Direct::Ptr             direct;
     TuningProcessor::Ptr    tuner;
     
     Keymap::PtrArr      keymaps;

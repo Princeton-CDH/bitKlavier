@@ -413,7 +413,7 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
-            dPrep = processor.gallery->getDirectPreparation(item->getId());
+            dPrep = processor.gallery->getPreparationOfType(item->getType(),item->getId());
             directSelected = true;
         }
         else if (item->getType() == PreparationTypeSynchronic)
@@ -498,8 +498,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
         if (directSelected)
         {
-            dPrep->dSoundSet.set(soundSetId);
-            dPrep->dSoundSetName.set(soundSetName);
+            dPrep->soundSet.set(soundSetId);
+            dPrep->soundSetName.set(soundSetName);
         }
         else if (synchronicSelected)
         {
@@ -518,8 +518,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (directModSelected)
         {
-            dMod->dSoundSet.set(soundSetId);
-            dMod->dSoundSetName.set(soundSetName);
+            dMod->prep->soundSet.set(soundSetId);
+            dMod->prep->soundSetName.set(soundSetName);
             dMod->setDirty(DirectSoundSet);
         }
         else if (synchronicModSelected)
@@ -550,8 +550,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             String sfname = processor.loadedSoundSets[dPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
-            dPrep->dSoundSet.set(soundSetId);
-            dPrep->dSoundSetName.set(soundSetName);
+            dPrep->soundSet.set(soundSetId);
+            dPrep->soundSetName.set(soundSetName);
         }
         else if (synchronicSelected)
         {
@@ -580,11 +580,11 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         // Modifications
         else if (directModSelected)
         {
-            String sfname = processor.loadedSoundSets[dMod->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
+            String sfname = processor.loadedSoundSets[dMod->prep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
-            dMod->dSoundSet.set(soundSetId);
-            dMod->dSoundSetName.set(soundSetName);
+            dMod->prep->soundSet.set(soundSetId);
+            dMod->prep->soundSetName.set(soundSetName);
             dMod->setDirty(DirectSoundSet);
         }
         else if (synchronicModSelected)
@@ -637,13 +637,13 @@ void MainViewController::bkButtonClicked (Button* b)
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
-            DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(item->getId());
-            bool toggle = !prep->dUseGlobalSoundSet.value;
-            prep->dUseGlobalSoundSet.set(toggle);
-            if (prep->dSoundSet.value < 0)
+            DirectPreparation::Ptr prep = processor.gallery->getPreparationOfType(PreparationTypeDirect,item->getId());
+            bool toggle = !prep->useGlobalSoundSet.value;
+            prep->useGlobalSoundSet.set(toggle);
+            if (prep->soundSet.value < 0)
             {
-                prep->dSoundSet.set(processor.globalSoundSetId);
-                prep->dSoundSetName.set(globalSoundSetName);
+                prep->soundSet.set(processor.globalSoundSetId);
+                prep->soundSetName.set(globalSoundSetName);
             }
         }
         else if (item->getType() == PreparationTypeSynchronic)
@@ -672,13 +672,13 @@ void MainViewController::bkButtonClicked (Button* b)
         else if (item->getType() == PreparationTypeDirectMod)
         {
             DirectModification::Ptr mod = processor.gallery->getDirectModification(item->getId());
-            bool toggle = !mod->dUseGlobalSoundSet.value;
-            mod->dUseGlobalSoundSet.set(toggle);
+            bool toggle = !mod->prep->useGlobalSoundSet.value;
+            mod->prep->useGlobalSoundSet.set(toggle);
             mod->setDirty(DirectUseGlobalSoundSet);
-            if (mod->dSoundSet.value < 0)
+            if (mod->prep->soundSet.value < 0)
             {
-                mod->dSoundSet.set(processor.globalSoundSetId);
-                mod->dSoundSetName.set(globalSoundSetName);
+                mod->prep->soundSet.set(processor.globalSoundSetId);
+                mod->prep->soundSetName.set(globalSoundSetName);
                 mod->setDirty(DirectSoundSet);
             }
         }
@@ -994,7 +994,7 @@ void MainViewController::fillSampleCB()
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
-            DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(item->getId());
+            DirectPreparation::Ptr prep = processor.gallery->getPreparationOfType(PreparationTypeDirect,item->getId());
             if (prep != nullptr) idx = prep->getSoundSet();
         }
         else if (item->getType() == PreparationTypeSynchronic)
@@ -1011,7 +1011,7 @@ void MainViewController::fillSampleCB()
         else if (item->getType() == PreparationTypeDirectMod)
         {
             DirectModification::Ptr mod = processor.gallery->getDirectModification(item->getId());
-            if (mod != nullptr) idx = mod->getSoundSet();
+            if (mod != nullptr) idx = mod->prep->getSoundSet();
         }
         else if (item->getType() == PreparationTypeSynchronicMod)
         {
@@ -1086,7 +1086,7 @@ void MainViewController::fillInstrumentCB()
         BKItem* item = construction.getSelectedItems().getUnchecked(0);
         if (item->getType() == PreparationTypeDirect)
         {
-            DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(item->getId());
+            DirectPreparation::Ptr prep = processor.gallery->getPreparationOfType(PreparationTypeDirect,item->getId());
             if (prep != nullptr) idx = prep->getSoundSet();
         }
         else if (item->getType() == PreparationTypeSynchronic)
@@ -1103,7 +1103,7 @@ void MainViewController::fillInstrumentCB()
         else if (item->getType() == PreparationTypeDirectMod)
         {
             DirectModification::Ptr mod = processor.gallery->getDirectModification(item->getId());
-            if (mod != nullptr) idx = mod->getSoundSet();
+            if (mod != nullptr) idx = mod->prep->getSoundSet();
         }
         else if (item->getType() == PreparationTypeSynchronicMod)
         {
@@ -1204,9 +1204,9 @@ void MainViewController::timerCallback()
         {
             soundItemSelected = true;
             globalSoundSetButton.setVisible(true);
-            DirectPreparation::Ptr prep = processor.gallery->getDirectPreparation(item->getId());
+            DirectPreparation::Ptr prep = processor.gallery->getPreparationOfType(PreparationTypeDirect,item->getId());
             if (prep != nullptr)
-                globalSoundSetButton.setToggleState(prep->dUseGlobalSoundSet.value, dontSendNotification);
+                globalSoundSetButton.setToggleState(prep->useGlobalSoundSet.value, dontSendNotification);
         }
         else if (item->getType() == PreparationTypeSynchronic)
         {
@@ -1240,7 +1240,7 @@ void MainViewController::timerCallback()
             DirectModification::Ptr mod = processor.gallery->getDirectModification(item->getId());
             if (mod != nullptr)
             {
-                globalSoundSetButton.setToggleState(mod->dUseGlobalSoundSet.value, dontSendNotification);
+                globalSoundSetButton.setToggleState(mod->prep->useGlobalSoundSet.value, dontSendNotification);
                 globalSoundSetButton.setAlpha(mod->getDirty(DirectUseGlobalSoundSet) ? 1. : gModAlpha);
                 sampleCB.setAlpha(mod->getDirty(DirectSoundSet) ? 1. : gModAlpha);
                 instrumentCB.setAlpha(mod->getDirty(DirectSoundSet) ? 1. : gModAlpha);
