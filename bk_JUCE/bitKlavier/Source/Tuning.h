@@ -536,6 +536,7 @@ public:
         
         tFundamental.setState(e, ptagTuning_fundamental, C);
         tFundamentalOffset.setState(e, ptagTuning_offset, 0.);
+        
         tAdaptiveIntervalScale.setState(e, ptagTuning_adaptiveIntervalScale, JustTuning);
         tAdaptiveAnchorScale.setState(e, ptagTuning_adaptiveAnchorScale, EqualTemperament);
         tAdaptiveHistory.setState(e, ptagTuning_adaptiveHistory, 4);
@@ -562,7 +563,26 @@ public:
         for(int i=0; i<12; i++) arr.add(0.);
         tCustom.setState(e, StringArray(vtagTuning_customScale, ptagFloat), arr);
         if (tCustom.value.isEmpty()) tCustom = arr;
-        
+        bool multiplyBy100 = true;
+        for (int i=0; i<12; i++)
+        {
+         
+            if (std::abs(tCustom.value[i]) > 1.f )
+            {
+                multiplyBy100 = false;
+                break;
+            }
+        }
+        Array<float> arr2;
+        if (multiplyBy100)
+        {
+            for (int i = 0; i <12; i++)
+            {
+                arr2.add(tCustom.value[i] * 100.f);
+            }
+            tCustom = arr2;
+        }
+            
         arr.clear();
         for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(0.);
         tAbsolute.setState(e, StringArray(vTagTuning_absoluteOffsets, ptagFloat), arr);
