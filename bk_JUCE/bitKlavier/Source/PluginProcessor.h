@@ -129,7 +129,7 @@ public:
     
     StringArray                         galleryNames;
     String                              currentGallery;
-    
+    String                              currentGalleryPath;
     // Full path names of soundfonts in no particular order
     StringArray                         soundfontNames;
     

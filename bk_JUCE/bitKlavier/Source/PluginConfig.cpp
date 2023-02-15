@@ -196,7 +196,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
         }
         else
         {
-            String currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
+            currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
             currentGallery = galleryXML->getStringAttribute("name");
             
             DBG("loading gallery and piano from plugin state: setStateInformation() "

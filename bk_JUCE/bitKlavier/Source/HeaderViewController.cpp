@@ -810,7 +810,7 @@ void HeaderViewController::fillGalleryCB(void)
 				galleryCB.addItem(galleryName, ++id);
 				DBG("Successfully added " + galleryName + " to main menu");
 			}
-			if (thisFile.getFileName() == processor.currentGallery)
+			if (thisFile.getFullPathName() == processor.currentGalleryPath)
 			{
 				index = i;
 				lastGalleryCBId = id;
@@ -839,7 +839,7 @@ void HeaderViewController::fillGalleryCB(void)
 
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
-        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
+//        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
     }
 }
 
@@ -906,7 +906,7 @@ void HeaderViewController::fillGalleryCB(void)
                 }
             }
             
-            if (thisFile.getFileName() == processor.currentGallery)
+            if (thisFile.getFullPathName() == processor.currentGalleryPath)
             {
                 index = i;
                 lastGalleryCBId = id;
@@ -922,7 +922,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
-        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
+//        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
     }
 }
 #endif
@@ -1117,7 +1117,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 
                 processor.defaultLoaded = true;
                 processor.defaultName = BinaryData::namedResourceList[index];
-                
+                processor.currentGalleryPath = processor.defaultName;
                 processor.loadGalleryFromXml(XmlDocument::parse(xmlData).get());
             }
             else
@@ -1137,7 +1137,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 
                 processor.defaultLoaded = false;
                 processor.defaultName = "";
-         
+                processor.currentGalleryPath = path;
                 if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
                 else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
                 

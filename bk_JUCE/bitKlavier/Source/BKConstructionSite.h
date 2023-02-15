@@ -153,6 +153,10 @@ public:
     bool edittingComment;
     
     OwnedArray<HashMap<int,int>> pastemap;
+    BKItemGraph* getGraph()
+    {
+        return graph;
+    }
 private:
     
     OwnedArray<TouchEvent> touches;

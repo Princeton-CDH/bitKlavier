@@ -140,7 +140,7 @@ private:
     
     HeaderViewController header;
     BKConstructionSite  construction;
-
+    Viewport constructionPort;
     BKOvertop overtop;
     std::unique_ptr<DropShadower> overtopShadow;
     

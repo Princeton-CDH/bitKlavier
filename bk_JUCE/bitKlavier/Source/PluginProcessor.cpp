@@ -574,8 +574,17 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
     
     if (xml != nullptr)
     {
+        if (gallery != nullptr)
+        {
+            //url = gallery->getURL();
+            for (auto piano : gallery->getPianos())
+            {
+                piano->deconfigure();
+            }
+            clearBitKlavier();
+        }
         currentGallery = myFile.getFileName();
-        
+        currentGalleryPath = myFile.getFullPathName();
         DBG("new gallery: " + currentGallery);
 
         gallery = new Gallery(xml.get(), *this);
@@ -587,6 +596,7 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
         
         initializeGallery();
         
+        clearBitKlavier();
         gallery->setGalleryDirty(false);
         
         defaultLoaded = false;
@@ -1952,7 +1962,7 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         }
         
         currentGallery = user.getFileName();
-        
+        currentGalleryPath = user.getFullPathName();
         var myJson = JSON::parse(user);
         
         gallery = new Gallery(myJson, *this);
@@ -1972,7 +1982,7 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
     File myFile (path);
     
     currentGallery = myFile.getFileName();
-    
+    currentGalleryPath = myFile.getFullPathName();
     var myJson = JSON::parse(myFile);
     
     gallery = new Gallery(myJson, *this);
