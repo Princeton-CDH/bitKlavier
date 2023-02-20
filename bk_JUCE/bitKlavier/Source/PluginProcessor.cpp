@@ -751,7 +751,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     
     // Second pass, post harmonization
     String key = source + "n" + String(mappedFrom);
-    bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
+    
     
     if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
     {
@@ -759,7 +759,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
         sourcedNotesOn.getUnchecked(noteNumber)->set(key, noteNumber);
         sourcedNoteVelocities.getUnchecked(noteNumber)->set(key, velocity);
     }
-
+    bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
     if (!activeSource) return;
     
     // Check PianoMap for whether piano should change due to key strike.

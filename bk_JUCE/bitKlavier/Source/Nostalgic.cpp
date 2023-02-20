@@ -386,7 +386,9 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                                          prep->nReverseSustain.value,
                                          prep->nReverseRelease.value,
                                          tuner,
-                                         prep->getGainPtr());
+                                         prep->getGainPtr(),
+                                         prep->getBlendronicGainPtr(),
+                                         blendronic);
 						}
 						else
 						{
@@ -486,7 +488,9 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
                                  prep->nReverseSustain.value,
                                  prep->nReverseRelease.value,
                                  tuner,
-                                 prep->getGainPtr());
+                                 prep->getGainPtr(),
+                                 prep->getBlendronicGainPtr(),
+                                 blendronic);
 				}
 				else
 				{
@@ -918,7 +922,7 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                         String(noteOnPrep->nUndertow.value));
                      */
                     NostalgicPreparation::Ptr prep = nostalgic->prep;
-                    
+                   ///WHY ARE THESE THJE SAME?
 					if (!blendronic.isEmpty())
 					{
                         synth->keyOn(midiChannel,
@@ -963,9 +967,9 @@ void NostalgicProcessor::processBlock(int numSamples, int midiChannel, BKSampleL
                                      prep->nUndertowSustain.value,
                                      prep->nUndertowRelease.value,
                                      tuner,
-                                     prep->getGainPtr(),
-                                     prep->getBlendronicGainPtr(),
-                                     blendronic);
+                                     prep->getGainPtr());
+//                                     prep->getBlendronicGainPtr(),
+//                                     blendronic);
 					}
                 }
 

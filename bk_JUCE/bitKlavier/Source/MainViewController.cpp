@@ -123,6 +123,7 @@ equalizerButton("Post FX")
     addAndMakeVisible(construction);
     constructionPort.setViewedComponent(&construction, false);
     constructionPort.setLookAndFeel(&laf);
+    constructionPort.setScrollBarsShown(false, false, true, true);
     
     addAndMakeVisible(constructionPort);
     addChildComponent(overtop);
