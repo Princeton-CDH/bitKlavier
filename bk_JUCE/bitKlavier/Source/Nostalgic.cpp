@@ -123,6 +123,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
 {
     NostalgicPreparation::Ptr prep = nostalgic->prep;
     
+    
     // aVels will be used for velocity calculations; bVels will be used for conditionals
     Array<float> *aVels, *bVels;
     // If this is an inverted key press, aVels and bVels are the same

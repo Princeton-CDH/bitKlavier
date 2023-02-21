@@ -1492,6 +1492,7 @@ void BKRangeSlider::setMinValue(double newval, NotificationType notify)
     minSlider.setValue(newval, notify);
     minValueTF.setText(String(minSlider.getValue()), dontSendNotification);
     rescaleMinSlider();
+   // displaySlider->setRange(sliderMin, sliderMax, sliderIncrement);
 }
 
 
@@ -1501,6 +1502,7 @@ void BKRangeSlider::setMaxValue(double newval, NotificationType notify)
     maxSlider.setValue(newval, notify);
     maxValueTF.setText(String(maxSlider.getValue()), dontSendNotification);
     rescaleMaxSlider();
+    
 }
 
 
@@ -1518,6 +1520,7 @@ void BKRangeSlider::sliderValueChanged (Slider *slider)
                 if(isMinAlwaysLessThanMax)
                     if(maxSlider.getValue() < minSlider.getValue())
                         setMinValue(maxSlider.getValue(), dontSendNotification);
+                displaySlider->setRange(0,invisibleSlider.getValue(), sliderIncrement);
             }
             else
             {
@@ -1673,6 +1676,7 @@ void BKRangeSlider::rescaleMinSlider()
         maxSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
         minSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
         invisibleSlider.setRange(sliderMin, maxSlider.getMaximum(), sliderIncrement);
+        
     }
 }
 
@@ -1687,6 +1691,7 @@ void BKRangeSlider::rescaleMaxSlider()
         maxSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
         minSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
         invisibleSlider.setRange(minSlider.getMinimum(), sliderMax, sliderIncrement);
+        
     }
 }
 
