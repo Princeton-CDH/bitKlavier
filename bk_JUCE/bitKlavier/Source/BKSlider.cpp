@@ -1520,7 +1520,7 @@ void BKRangeSlider::sliderValueChanged (Slider *slider)
                 if(isMinAlwaysLessThanMax)
                     if(maxSlider.getValue() < minSlider.getValue())
                         setMinValue(maxSlider.getValue(), dontSendNotification);
-                displaySlider->setRange(0,invisibleSlider.getValue(), sliderIncrement);
+                //displaySlider->setRange(0,invisibleSlider.getValue(), sliderIncrement);
             }
             else
             {

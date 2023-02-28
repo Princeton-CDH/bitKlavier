@@ -1087,8 +1087,11 @@ void NostalgicPreparationEditor::timerCallback()
             currentPlayPositions.addArray(currentUndertowPositions);
             
             nDisplaySlider.updateSliderPositions(currentPlayPositions);
-            
-            holdTimeMinMaxSlider->setDisplayValue(nProcessor->getHoldTime());
+            //float max = holdTimeMinMaxSlider->getMaxValue() ;
+            if( nProcessor->getHoldTime() < prep->holdMax.value )
+               holdTimeMinMaxSlider->setDisplayValue(nProcessor->getHoldTime());
+            else
+                holdTimeMinMaxSlider->setDisplayValue(0);
             if(nProcessor->getNumActiveNotes())
             {
                 velocityMinMaxSlider->setDisplayValue(nProcessor->getLastVelocity() * 127.);

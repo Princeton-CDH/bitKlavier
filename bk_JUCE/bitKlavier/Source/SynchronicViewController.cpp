@@ -895,7 +895,7 @@ void SynchronicPreparationEditor::timerCallback()
         if(cluster->getBeatCounter() < prep->sNumBeats.value && sProcessor->getPlayCluster())
             howManySlider->setDisplayValue(cluster->getBeatCounter());
         else howManySlider->setDisplayValue(0);
-        
+        float timer = sProcessor->getClusterThresholdTimer();
         if(sProcessor->getClusterThresholdTimer() < prep->sClusterThresh.value)
              clusterThreshSlider->setDisplayValue(sProcessor->getClusterThresholdTimer());
         else clusterThreshSlider->setDisplayValue(0);
@@ -1098,7 +1098,7 @@ void SynchronicPreparationEditor::BKSingleSliderValueChanged(BKSingleSlider* sli
     else if(name == "cluster threshold")
     {
         DBG("got new cluster threshold " + String(val));
-        prep->sClusterThresh.set(val);
+        prep->setClusterThresh(val);
     }
     else if(name == "cluster thickness")
     {
