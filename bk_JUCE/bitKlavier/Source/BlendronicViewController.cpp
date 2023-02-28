@@ -25,6 +25,7 @@ BKViewController(p, theGraph, 3)
     gainSlider = std::make_unique<BKSingleSlider>("volume (dB)", cBlendronicOutGain, -100, 24, 0, 0.01, "-inf");
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(true);
+    gainSlider->displaySliderVisible(false);
     gainSlider->setToolTipString("Adjusts overall volume of blendronic");
     addAndMakeVisible(*gainSlider);
     
