@@ -1873,7 +1873,16 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
         }
         
         gallery = new Gallery(xml, *this);
-        if (url.isNotEmpty()) gallery->setURL(url);
+        if (url.isNotEmpty()) {
+            gallery->setURL(url);
+            
+            File newf(url);
+        
+            if (gallery->getName() != newf.getFileName())
+            {
+                gallery->setName(newf.getFileName().upToFirstOccurrenceOf(".xml", false, false));
+            }
+        }
         currentGallery = gallery->getName() + ".xml";
         
         initializeGallery();

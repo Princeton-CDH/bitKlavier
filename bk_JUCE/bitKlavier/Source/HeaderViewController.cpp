@@ -325,7 +325,7 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
             processor.currentPiano->setName(name);
             
             hvc->fillPianoCB();
-            
+            //processor.setClipboard(clipboard)
             processor.saveGalleryToHistory("Linked Copy Piano");
         }
     }

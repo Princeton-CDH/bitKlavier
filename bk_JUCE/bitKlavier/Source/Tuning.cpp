@@ -53,6 +53,7 @@ void TuningPreparation::performModification(TuningModification* p, Array<bool> d
     }
     
     modded = !reverse;
+    p->_modded = modded;
 }
 
 

@@ -126,7 +126,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
     if (xml != nullptr)
     {
         name = xml->getStringAttribute("name");
-        
+        //if (name != )
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
         
         // iterate through its sub-elements

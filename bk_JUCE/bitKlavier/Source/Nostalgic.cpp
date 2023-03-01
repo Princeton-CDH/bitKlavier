@@ -60,6 +60,7 @@ void NostalgicPreparation::performModification(NostalgicModification* n, Array<b
     
     // If the mod didn't reverse, then it is modded
     modded = !reverse;
+    n->_modded = modded;
 }
 
 NostalgicProcessor::NostalgicProcessor(Nostalgic::Ptr nostalgic,

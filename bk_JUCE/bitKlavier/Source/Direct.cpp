@@ -41,6 +41,7 @@ void DirectPreparation::performModification(DirectModification* d, Array<bool> d
     
     // If the mod didn't reverse, then it is modded
     modded = !reverse;
+    d->_modded = modded;
 
 }
 

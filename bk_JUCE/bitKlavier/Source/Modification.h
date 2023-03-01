@@ -89,9 +89,9 @@ public:
     {
         keymaps = km;
     }
-    
+   
     bool altMod;
-    
+    bool _modded = false;
 protected:
     BKAudioProcessor& processor;
     

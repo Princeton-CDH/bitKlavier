@@ -36,6 +36,7 @@ void BlendronicPreparation::performModification(BlendronicModification* b, Array
     if (dirty[BlendronicDelayBufferSize]) delayBufferSizeInSeconds.modify(b->delayBufferSizeInSeconds, reverse);
     
     modded = !reverse;
+    b->_modded = modded;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////

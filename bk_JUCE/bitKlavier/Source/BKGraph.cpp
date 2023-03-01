@@ -371,6 +371,163 @@ void BKItem::paint(Graphics& g)
                 }
             }
         }
+        else if (type == PreparationTypeDirectMod)
+        {
+            g.setFont(32.0f);
+            DirectModification *mod = processor.gallery->getDirectModification(Id);
+           
+            if(mod->altMod)
+            {
+                g.setColour(Colours::antiquewhite);
+               if (mod->_modded)
+               {
+                   // g.setFont("32.0f");
+                    g.drawText("b", getLocalBounds(), juce::Justification::centred, true);
+               }
+                else
+                {
+                   
+                   // g.setFont("32.0f");
+                    g.drawText("a", getLocalBounds(), juce::Justification::centred, true);
+                }
+              
+
+            }
+            
+        } else if (type == PreparationTypeSynchronicMod)
+        {
+            g.setFont(32.0f);
+            SynchronicModification *mod = processor.gallery->getSynchronicModification(Id);
+           
+            if(mod->altMod)
+            {
+                g.setColour(Colours::antiquewhite);
+               if (mod->_modded)
+               {
+                   // g.setFont("32.0f");
+                    g.drawText("b", getLocalBounds(), juce::Justification::centred, true);
+               }
+                else
+                {
+                   
+                   // g.setFont("32.0f");
+                    g.drawText("a", getLocalBounds(), juce::Justification::centred, true);
+                }
+              
+
+            }
+        }else if (type == PreparationTypeNostalgicMod)
+        {
+            g.setFont(32.0f);
+            NostalgicModification *mod = processor.gallery->getNostalgicModification(Id);
+           
+            if(mod->altMod)
+            {
+                g.setColour(Colours::antiquewhite);
+               if (mod->_modded)
+               {
+                   // g.setFont("32.0f");
+                    g.drawText("b", getLocalBounds(), juce::Justification::centred, true);
+               }
+                else
+                {
+                   
+                   // g.setFont("32.0f");
+                    g.drawText("a", getLocalBounds(), juce::Justification::centred, true);
+                }
+              
+
+            }
+        }else if (type == PreparationTypeBlendronicMod)
+        {
+            g.setFont(32.0f);
+            BlendronicModification *mod = processor.gallery->getBlendronicModification(Id);
+           
+            if(mod->altMod)
+            {
+                g.setColour(Colours::antiquewhite);
+               if (mod->_modded)
+               {
+                   // g.setFont("32.0f");
+                    g.drawText("b", getLocalBounds(), juce::Justification::centred, true);
+               }
+                else
+                {
+                   
+                   // g.setFont("32.0f");
+                    g.drawText("a", getLocalBounds(), juce::Justification::centred, true);
+                }
+              
+
+            }
+        }else if (type == PreparationTypeResonanceMod)
+        {
+            g.setFont(32.0f);
+            ResonanceModification *mod = processor.gallery->getResonanceModification(Id);
+           
+            if(mod->altMod)
+            {
+                g.setColour(Colours::antiquewhite);
+               if (mod->_modded)
+               {
+                   // g.setFont("32.0f");
+                    g.drawText("b", getLocalBounds(), juce::Justification::centred, true);
+               }
+                else
+                {
+                   
+                   // g.setFont("32.0f");
+                    g.drawText("a", getLocalBounds(), juce::Justification::centred, true);
+                }
+              
+
+            }
+        }else if (type == PreparationTypeTuningMod)
+        {
+            g.setFont(32.0f);
+            TuningModification *mod = processor.gallery->getTuningModification(Id);
+           
+            if(mod->altMod)
+            {
+                g.setColour(Colours::antiquewhite);
+               if (mod->_modded)
+               {
+                   // g.setFont("32.0f");
+                    g.drawText("b", getLocalBounds(), juce::Justification::centred, true);
+               }
+                else
+                {
+                   
+                   // g.setFont("32.0f");
+                    g.drawText("a", getLocalBounds(), juce::Justification::centred, true);
+                }
+              
+
+            }
+        }else if (type == PreparationTypeTempoMod)
+        {
+            g.setFont(32.0f);
+            TempoModification *mod = processor.gallery->getTempoModification(Id);
+           
+            if(mod->altMod)
+            {
+                g.setColour(Colours::antiquewhite);
+               if (mod->_modded)
+               {
+                   // g.setFont("32.0f");
+                    g.drawText("b", getLocalBounds(), juce::Justification::centred, true);
+               }
+                else
+                {
+                   
+                   // g.setFont("32.0f");
+                    g.drawText("a", getLocalBounds(), juce::Justification::centred, true);
+                }
+              
+
+            }
+        }
+       
     }
 }
 
@@ -588,7 +745,7 @@ void BKItem::timerCallback()
         if (type == PreparationTypeKeymap ||
             type == PreparationTypeSynchronic ||
             type == PreparationTypeNostalgic ||
-            type == PreparationTypeResonance)
+            type == PreparationTypeResonance || (type >= PreparationTypeDirectMod && type <= PreparationTypeGenericMod) )
         {
             repaint();
         }

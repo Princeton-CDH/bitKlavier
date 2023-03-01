@@ -74,6 +74,7 @@ void SynchronicPreparation::performModification(SynchronicModification* s, Array
     }
     
     modded = !reverse;
+    s->_modded = modded;
 }
 
 SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
