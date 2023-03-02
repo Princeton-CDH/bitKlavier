@@ -1124,7 +1124,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
        wrapperType == wrapperType_VST3) //check this on setup; if(isPlugIn) {...
     {
         playHead = this->getPlayHead();
-        playHead->getCurrentPosition (currentPositionInfo);
+        // playHead->getCurrentPosition (currentPositionInfo);
+        playHead->getPosition ();
         hostTempo = currentPositionInfo.bpm;
 
         // hostTempo
