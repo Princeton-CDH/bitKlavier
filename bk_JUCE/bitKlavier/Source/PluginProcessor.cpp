@@ -208,7 +208,7 @@ void BKAudioProcessor::loadGalleries()
     defaultLoaded = true;
     defaultName = "Basic_Piano_xml";
     
-    loadGalleryFromXml(XmlDocument::parse(xmlData).get());
+    loadGalleryFromXml(XmlDocument::parse(xmlData).get(),"");
     
 
 #if JUCE_IOS
@@ -465,7 +465,7 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     
     myXML->writeTo(myFile, XmlElement::TextFormat());
     
-    loadGalleryFromXml(myXML.get(), false);
+    loadGalleryFromXml(myXML.get(),newURL, false );
     
     gallery->setURL(newURL);
     
@@ -565,6 +565,11 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
     {
         xml->setAttribute("name", galleryName);
         xml->writeTo(myFile, XmlElement::TextFormat());
+    }
+    
+    if (xml->getStringAttribute("name") != myFile.getFileName().upToFirstOccurrenceOf(".xml", false , false))
+    {
+        xml->setAttribute("name", myFile.getFileName().upToFirstOccurrenceOf(".xml", false , false));
     }
     
     xml->writeTo(myFile, XmlElement::TextFormat());
@@ -1856,15 +1861,14 @@ void BKAudioProcessor::loadGalleryDialog(void)
     
 }
 
-void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
+void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, String path, bool resetHistory)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
         // if (currentPiano != nullptr) currentPiano->deconfigure();
-        String url;
+        
         if (gallery != nullptr)
         {
-            url = gallery->getURL();
             for (auto piano : gallery->getPianos())
             {
                 piano->deconfigure();
@@ -1873,15 +1877,18 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
         }
         
         gallery = new Gallery(xml, *this);
-        if (url.isNotEmpty()) {
-            gallery->setURL(url);
-            
-            File newf(url);
+        //gallery->setName(path);
         
-            if (gallery->getName() != newf.getFileName())
+    
+        if (path.isNotEmpty()) {
+            gallery->setURL(path);
+            
+            File newf(path);
+        
+            if (gallery->getName() != newf.getFileName().upToFirstOccurrenceOf(".xml",false,false))
             {
-                gallery->setName(newf.getFileName().upToFirstOccurrenceOf(".xml", false, false));
-            }
+            renameGallery(newf.getFileName());
+           }
         }
         currentGallery = gallery->getName() + ".xml";
         
@@ -1904,7 +1911,7 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
         defaultLoaded = true;
         defaultName = "Basic_Piano_xml";
         
-        loadGalleryFromXml(XmlDocument::parse(xmlData).get());
+        loadGalleryFromXml(XmlDocument::parse(xmlData).get(),path);
     }
     else
     {
@@ -1912,9 +1919,9 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
 
         std::unique_ptr<XmlElement> xml = XmlDocument::parse(myFile);
 
-        loadGalleryFromXml(xml.get());
+        loadGalleryFromXml(xml.get(), path);
 
-        gallery->setURL(path);
+        
     }
 }
 

@@ -63,7 +63,7 @@ public:
     void loadGalleryDialog(void);
     void loadJsonGalleryDialog(void);
     void loadGalleryFromPath(String path);
-    void loadGalleryFromXml(XmlElement* xml, bool resetHistory = true);
+    void loadGalleryFromXml(XmlElement* xml, String path, bool resetHistory = true);
     void loadJsonGalleryFromPath(String path);
     bool saveCurrentGalleryAs(void);
     void saveCurrentGallery(void);
@@ -454,7 +454,7 @@ public:
         undoDepth++;
         XmlElement* galleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).get();
         
-        loadGalleryFromXml(galleryVT, false);
+        loadGalleryFromXml(galleryVT, "",false);
         
 //        currentPiano->setState(galleryVT.createXml().get(), &gallery->idmap, gallery->idcounts);
 //        currentPiano->configure();
@@ -468,7 +468,7 @@ public:
         undoDepth--;
         XmlElement* galleryVT = galleryHistory.getUnchecked(galleryHistory.size() - 1 - undoDepth).get();
         
-        loadGalleryFromXml(galleryVT, false);
+        loadGalleryFromXml(galleryVT, "", false);
         
 //        currentPiano->setState(galleryVT.createXml().get(), &gallery->idmap, gallery->idcounts);
 //        currentPiano->configure();
