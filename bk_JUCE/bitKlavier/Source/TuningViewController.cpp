@@ -513,8 +513,8 @@ void TuningViewController::displayShared(void)
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
 
-    MTSMasterConnectionButton->setBounds(actionButton.getRight() + gXSpacing,
-                                         actionButton.getY(),
+    MTSMasterConnectionButton->setBounds(selectCB.getX(),
+                                         selectCB.getY() + selectCB.getHeight() + gYSpacing,
                                          actionButton.getWidth(),
                                          actionButton.getHeight());
     alternateMod.setBounds(actionButton.getRight()+gXSpacing,
