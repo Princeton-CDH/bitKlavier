@@ -67,7 +67,7 @@ public:
         const auto fontHeight = sliderLabel.getFont().getHeight();
 
         const auto labelBounds = bounds.removeFromTop(fontHeight);
-        const auto editorBounds = bounds.removeFromBottom(fontHeight);
+        // const auto editorBounds = bounds.removeFromBottom(fontHeight);
         slider.setBounds(bounds);
         sliderLabel.setBounds(labelBounds);
         

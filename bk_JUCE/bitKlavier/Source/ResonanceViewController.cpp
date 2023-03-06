@@ -37,13 +37,13 @@ offsetsKeyboard(false, true)
     selectCB.setTooltip("Select from available saved preparation settings");
     addAndMakeVisible(selectCB);
 
-    defGainSlider = std::make_unique<BKSingleSlider>("volume (dBFS)", cResonanceDefGain, -100, 24, 0, 0.01, "-inf");
+    defGainSlider = std::make_unique<BKSingleSlider>("volume (dB)", cResonanceDefGain, -100, 24, 0, 0.01, "-inf");
     defGainSlider->setJustifyRight(false);
     defGainSlider->setToolTipString("Adjusts overall volume of resonant notes");
     defGainSlider->displaySliderVisible(false);
     addAndMakeVisible(*defGainSlider);
     
-    blendGainSlider = std::make_unique<BKSingleSlider>("blendronic gain (dBFS)", cBlendronicOutGain, -100, 24, 0, 0.01, "-inf");
+    blendGainSlider = std::make_unique<BKSingleSlider>("blendronic gain (dB)", cBlendronicOutGain, -100, 24, 0, 0.01, "-inf");
     blendGainSlider->setJustifyRight(false);
     blendGainSlider->setToolTipString("Adjusts volume sent to blendronic, if attached");
     blendGainSlider->displaySliderVisible(false);

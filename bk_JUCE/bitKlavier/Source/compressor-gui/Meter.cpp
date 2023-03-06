@@ -56,7 +56,7 @@ void Meter::resized()
     auto bounds = getLocalBounds();
     auto boxHeight = (bounds.getHeight() / 10) * 2;
     boxArea = bounds.removeFromTop(boxHeight);
-    const FlexItem::Margin comboMargin = FlexItem::Margin(3.0f, 8.0f, 3.0f, 8.0f);
+    // const FlexItem::Margin comboMargin = FlexItem::Margin(3.0f, 8.0f, 3.0f, 8.0f);
     auto modeBoxArea = boxArea.removeFromLeft(boxArea.getWidth()/2);
     modeBoxArea.reduce(2,2);
     modeBox.setBounds(modeBoxArea);
