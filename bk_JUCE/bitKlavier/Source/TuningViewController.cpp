@@ -489,6 +489,7 @@ void TuningViewController::invisible(void)
     resetButton->setVisible(false);
     applyButton->setVisible(false);
     applyKBMButton->setVisible(false);
+    MTSMasterConnectionButton->setVisible(false);
     //MTSConnectionLabel->setVisible(false);
 }
 
@@ -513,10 +514,7 @@ void TuningViewController::displayShared(void)
                            selectCB.getWidth() * 0.5,
                            selectCB.getHeight());
 
-    MTSMasterConnectionButton->setBounds(selectCB.getX(),
-                                         selectCB.getY() + selectCB.getHeight() + gYSpacing,
-                                         actionButton.getWidth(),
-                                         actionButton.getHeight());
+   
     alternateMod.setBounds(actionButton.getRight()+gXSpacing,
                            actionButton.getY(),
                            selectCB.getWidth() * 0.75,
@@ -576,6 +574,7 @@ void TuningViewController::displayTab(int tab)
         A1AnchorScaleLabel.setVisible(true);
         A1AnchorScaleCB.setVisible(true);
         A1FundamentalCB.setVisible(true);
+        MTSMasterConnectionButton->setVisible(true);
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
@@ -663,7 +662,10 @@ void TuningViewController::displayTab(int tab)
         A1AnchorScaleCB.setBounds(A1AnchorScaleCBSlice.removeFromLeft(tempwidth));
         A1AnchorScaleCBSlice.removeFromLeft(gXSpacing);
         A1FundamentalCB.setBounds(A1AnchorScaleCBSlice);
-        
+        MTSMasterConnectionButton->setBounds(selectCB.getX(),
+                                             selectCB.getY() + selectCB.getHeight() + gYSpacing,
+                                             actionButton.getWidth(),
+                                             actionButton.getHeight());
         updateComponentVisibility();
 
     }
