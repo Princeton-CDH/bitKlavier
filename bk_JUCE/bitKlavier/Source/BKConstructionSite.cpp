@@ -118,8 +118,17 @@ void BKConstructionSite::move(int which, bool fine)
         changeX = fine ? -2 : -10;
     
     for (auto item : graph->getSelectedItems())
+    {
         item->setTopLeftPosition(item->getX() + changeX, item->getY() + changeY);
-    
+//        if (item->getX() + changeX > maxX)
+//        {
+//            maxX = item->getX() + changeX;
+//        }
+//        if (item->getY() + changeY > maxY)
+//        {
+//            maxY = item->getY() + changeY;
+//        }
+    }
     if (!graph->getSelectedItems().isEmpty()) processor.saveGalleryToHistory("Move");
     
     repaint();
@@ -301,6 +310,8 @@ void BKConstructionSite::pianoMapDidChange(BKItem* thisItem)
 
 void BKConstructionSite::draw(void)
 {
+    
+    int offset = 0;
     for (auto item : processor.currentPiano->getItems())
     {
         addExistingItem(item);
@@ -323,7 +334,7 @@ void BKConstructionSite::draw(void)
                 int X = 10 + (row * 155);
                 int Y = 50 + (col * 25);
                 
-                item->setTopLeftPosition(X, Y);
+                item->setTopLeftPosition(X+offset,Y+offset);
                 
                 keymapCount++;
             }
@@ -336,7 +347,7 @@ void BKConstructionSite::draw(void)
                 int X = 10 + (row * 155);
                 int Y = 350 + (col * 25);
                 
-                item->setTopLeftPosition(X, Y);
+                item->setTopLeftPosition(X+offset,Y+offset);
                 
                 prepCount++;
                 
@@ -351,7 +362,7 @@ void BKConstructionSite::draw(void)
                 int Y = 500 + (col * 25);
                 
                 
-                item->setTopLeftPosition(X, Y);
+                item->setTopLeftPosition(X+offset,Y+offset);
                 
                 ttCount++;
 
@@ -366,7 +377,7 @@ void BKConstructionSite::draw(void)
                 int Y = 200 + (col * 25);
                 
                 
-                item->setTopLeftPosition(X, Y);
+                item->setTopLeftPosition(X+offset,Y+offset);
                 
                 modCount++;
 
@@ -380,7 +391,7 @@ void BKConstructionSite::draw(void)
                 int X = 10 + (row * 155);
                 int Y = 350 + (col * 25);
                 
-                item->setTopLeftPosition(X, Y);
+                item->setTopLeftPosition(X+offset,Y+offset);
                 
                 otherCount++;
             }
@@ -451,6 +462,14 @@ void BKConstructionSite::addItem(BKPreparationType type, bool center)
         toAdd->setTopLeftPosition(lastX, lastY);
     }
 #endif
+//    if (lastX > maxX)
+//    {
+//        maxX = lastX;
+//    }
+//    if (lastY > maxY)
+//    {
+//        maxY = lastY;
+//    }
     
     lastX += 10; lastY += 10;
     

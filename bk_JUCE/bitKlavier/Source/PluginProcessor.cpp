@@ -208,7 +208,7 @@ void BKAudioProcessor::loadGalleries()
     defaultLoaded = true;
     defaultName = "Basic_Piano_xml";
     
-    loadGalleryFromXml(XmlDocument::parse(xmlData).get());
+    loadGalleryFromXml(XmlDocument::parse(xmlData).get(),"");
     
 
 #if JUCE_IOS
@@ -465,7 +465,7 @@ void BKAudioProcessor::writeCurrentGalleryToURL(String newURL)
     
     myXML->writeTo(myFile, XmlElement::TextFormat());
     
-    loadGalleryFromXml(myXML.get(), false);
+    loadGalleryFromXml(myXML.get(),newURL, false );
     
     gallery->setURL(newURL);
     
@@ -567,6 +567,11 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
         xml->writeTo(myFile, XmlElement::TextFormat());
     }
     
+    if (xml->getStringAttribute("name") != myFile.getFileName().upToFirstOccurrenceOf(".xml", false , false))
+    {
+        xml->setAttribute("name", myFile.getFileName().upToFirstOccurrenceOf(".xml", false , false));
+    }
+    
     xml->writeTo(myFile, XmlElement::TextFormat());
     
     galleryNames.add(myFile.getFullPathName());
@@ -574,8 +579,17 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
     
     if (xml != nullptr)
     {
+        if (gallery != nullptr)
+        {
+            //url = gallery->getURL();
+            for (auto piano : gallery->getPianos())
+            {
+                piano->deconfigure();
+            }
+            clearBitKlavier();
+        }
         currentGallery = myFile.getFileName();
-        
+        currentGalleryPath = myFile.getFullPathName();
         DBG("new gallery: " + currentGallery);
 
         gallery = new Gallery(xml.get(), *this);
@@ -587,6 +601,7 @@ void BKAudioProcessor::createNewGallery(String name, std::shared_ptr<XmlElement>
         
         initializeGallery();
         
+        clearBitKlavier();
         gallery->setGalleryDirty(false);
         
         defaultLoaded = false;
@@ -741,7 +756,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     
     // Second pass, post harmonization
     String key = source + "n" + String(mappedFrom);
-    bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
+    
     
     if (activeSource || getDefaultMidiInputIdentifiers().contains(source))
     {
@@ -749,7 +764,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
         sourcedNotesOn.getUnchecked(noteNumber)->set(key, noteNumber);
         sourcedNoteVelocities.getUnchecked(noteNumber)->set(key, velocity);
     }
-
+    bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
     if (!activeSource) return;
     
     // Check PianoMap for whether piano should change due to key strike.
@@ -1114,7 +1129,8 @@ void BKAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi
        wrapperType == wrapperType_VST3) //check this on setup; if(isPlugIn) {...
     {
         playHead = this->getPlayHead();
-        playHead->getCurrentPosition (currentPositionInfo);
+        // playHead->getCurrentPosition (currentPositionInfo);
+        playHead->getPosition ();
         hostTempo = currentPositionInfo.bpm;
 
         // hostTempo
@@ -1846,15 +1862,14 @@ void BKAudioProcessor::loadGalleryDialog(void)
     
 }
 
-void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
+void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, String path, bool resetHistory)
 {
     if (xml != nullptr /*&& xml->hasTagName ("foobar")*/)
     {
         // if (currentPiano != nullptr) currentPiano->deconfigure();
-        String url;
+        
         if (gallery != nullptr)
         {
-            url = gallery->getURL();
             for (auto piano : gallery->getPianos())
             {
                 piano->deconfigure();
@@ -1863,7 +1878,19 @@ void BKAudioProcessor::loadGalleryFromXml(XmlElement* xml, bool resetHistory)
         }
         
         gallery = new Gallery(xml, *this);
-        if (url.isNotEmpty()) gallery->setURL(url);
+        //gallery->setName(path);
+        
+    
+        if (path.isNotEmpty()) {
+            gallery->setURL(path);
+            
+            File newf(path);
+        
+            if (gallery->getName() != newf.getFileName().upToFirstOccurrenceOf(".xml",false,false))
+            {
+            renameGallery(newf.getFileName());
+           }
+        }
         currentGallery = gallery->getName() + ".xml";
         
         initializeGallery();
@@ -1885,7 +1912,7 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
         defaultLoaded = true;
         defaultName = "Basic_Piano_xml";
         
-        loadGalleryFromXml(XmlDocument::parse(xmlData).get());
+        loadGalleryFromXml(XmlDocument::parse(xmlData).get(),path);
     }
     else
     {
@@ -1893,9 +1920,9 @@ void BKAudioProcessor::loadGalleryFromPath(String path)
 
         std::unique_ptr<XmlElement> xml = XmlDocument::parse(myFile);
 
-        loadGalleryFromXml(xml.get());
+        loadGalleryFromXml(xml.get(), path);
 
-        gallery->setURL(path);
+        
     }
 }
 
@@ -1952,7 +1979,7 @@ void BKAudioProcessor::loadJsonGalleryDialog(void)
         }
         
         currentGallery = user.getFileName();
-        
+        currentGalleryPath = user.getFullPathName();
         var myJson = JSON::parse(user);
         
         gallery = new Gallery(myJson, *this);
@@ -1972,7 +1999,7 @@ void BKAudioProcessor::loadJsonGalleryFromPath(String path)
     File myFile (path);
     
     currentGallery = myFile.getFileName();
-    
+    currentGalleryPath = myFile.getFullPathName();
     var myJson = JSON::parse(myFile);
     
     gallery = new Gallery(myJson, *this);

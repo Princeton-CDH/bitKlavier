@@ -731,7 +731,10 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypePiano, newId))+")";
         newOne->setName(newName);
     }
-    
+    if(type == PreparationTypeComment)
+    {
+        
+    }
     prepareToPlay(processor.getCurrentSampleRate());
     
     setGalleryDirty(true);

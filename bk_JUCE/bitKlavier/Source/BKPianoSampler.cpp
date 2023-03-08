@@ -394,7 +394,10 @@ void BKPianoSamplerVoice::startNote (const int midi,
         
         //actual maxLength, based on soundfile size, leaving enough samples for release
         double maxLength = sound->soundLength - adsrRelease * pitchRatio;
-        
+        if (maxLength <= 0)
+        {
+            maxLength = sound->soundLength;
+        }
         if (playDirection == Forward)
         {
             if (playType == Normal)

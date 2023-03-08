@@ -81,12 +81,14 @@ BKViewController(p, theGraph, 3)
     gainSlider->setToolTipString("Volume multiplier for Nostalgic notes");
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
+    gainSlider->displaySliderVisible(false);
     addAndMakeVisible(*gainSlider);
     
     blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic send volume (dB)", cNostalgicBlendronicGain, -100, 24, 0, 0.01, "-inf");
     blendronicGainSlider->setToolTipString("Volume multiplier for Nostalgic output to connected Blendronics");
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
     blendronicGainSlider->setJustifyRight(false);
+    blendronicGainSlider->displaySliderVisible(false);
     addAndMakeVisible(*blendronicGainSlider);
     
     addAndMakeVisible(actionButton);
@@ -1087,8 +1089,11 @@ void NostalgicPreparationEditor::timerCallback()
             currentPlayPositions.addArray(currentUndertowPositions);
             
             nDisplaySlider.updateSliderPositions(currentPlayPositions);
-            
-            holdTimeMinMaxSlider->setDisplayValue(nProcessor->getHoldTime());
+            //float max = holdTimeMinMaxSlider->getMaxValue() ;
+            if( nProcessor->getHoldTime() < prep->holdMax.value )
+               holdTimeMinMaxSlider->setDisplayValue(nProcessor->getHoldTime());
+            else
+                holdTimeMinMaxSlider->setDisplayValue(0);
             if(nProcessor->getNumActiveNotes())
             {
                 velocityMinMaxSlider->setDisplayValue(nProcessor->getLastVelocity() * 127.);

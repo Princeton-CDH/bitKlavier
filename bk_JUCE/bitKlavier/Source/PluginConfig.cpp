@@ -192,11 +192,11 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             
             String xmlData = BinaryData::getNamedResource(defaultName.toUTF8(), size);
             
-            loadGalleryFromXml(XmlDocument::parse(xmlData).get());
+            loadGalleryFromXml(XmlDocument::parse(xmlData).get(), "");
         }
         else
         {
-            String currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
+            currentGalleryPath = galleryXML->getStringAttribute("galleryPath");
             currentGallery = galleryXML->getStringAttribute("name");
             
             DBG("loading gallery and piano from plugin state: setStateInformation() "
@@ -221,7 +221,7 @@ void BKAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
             defaultLoaded = true;
             defaultName = "Basic_Piano_xml";
             
-            loadGalleryFromXml(XmlDocument::parse(xmlData).get());
+            loadGalleryFromXml(XmlDocument::parse(xmlData).get(), "");
         }
         else initializeGallery();
         

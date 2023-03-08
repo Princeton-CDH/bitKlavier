@@ -325,7 +325,7 @@ void HeaderViewController::pianoMenuCallback(int res, HeaderViewController* hvc)
             processor.currentPiano->setName(name);
             
             hvc->fillPianoCB();
-            
+            //processor.setClipboard(clipboard)
             processor.saveGalleryToHistory("Linked Copy Piano");
         }
     }
@@ -737,6 +737,8 @@ void HeaderViewController::fillGalleryCB(void)
 		{
 			File thisFile(processor.galleryNames[i]);
 			String galleryName = thisFile.getFileName().fromLastOccurrenceOf(File::getSeparatorString(), false, true).upToFirstOccurrenceOf(".xml", false, false);
+          
+            
 			String galleryPath = String(thisFile.getFullPathName());
 			int gallerySplitIndex = galleryPath.indexOf("galleries") + 10;
 			StringArray galleryFolders;
@@ -810,7 +812,7 @@ void HeaderViewController::fillGalleryCB(void)
 				galleryCB.addItem(galleryName, ++id);
 				DBG("Successfully added " + galleryName + " to main menu");
 			}
-			if (thisFile.getFileName() == processor.currentGallery)
+			if (thisFile.getFullPathName() == processor.currentGalleryPath)
 			{
 				index = i;
 				lastGalleryCBId = id;
@@ -906,7 +908,7 @@ void HeaderViewController::fillGalleryCB(void)
                 }
             }
             
-            if (thisFile.getFileName() == processor.currentGallery)
+            if (thisFile.getFullPathName() == processor.currentGalleryPath)
             {
                 index = i;
                 lastGalleryCBId = id;
@@ -922,7 +924,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
-        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
+//        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
     }
 }
 #endif
@@ -1117,8 +1119,8 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 
                 processor.defaultLoaded = true;
                 processor.defaultName = BinaryData::namedResourceList[index];
-                
-                processor.loadGalleryFromXml(XmlDocument::parse(xmlData).get());
+                processor.currentGalleryPath = processor.defaultName;
+                processor.loadGalleryFromXml(XmlDocument::parse(xmlData).get(),"");
             }
             else
             {
@@ -1137,7 +1139,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
                 
                 processor.defaultLoaded = false;
                 processor.defaultName = "";
-         
+                processor.currentGalleryPath = path;
                 if (path.endsWith(".xml"))          processor.loadGalleryFromPath(path);
                 else  if (path.endsWith(".json"))   processor.loadJsonGalleryFromPath(path);
                 

@@ -28,6 +28,7 @@ void TempoPreparation::performModification(TempoModification* s, Array<bool> dir
     if (dirty[AT1Mode]) at1Mode.modify(s->at1Mode, reverse);
     
     modded = !reverse;
+    s->_modded = modded;
 }
 
 TempoProcessor::TempoProcessor(BKAudioProcessor& processor, Tempo::Ptr t):

@@ -121,8 +121,11 @@ equalizerButton("Post FX")
     addAndMakeVisible(header);
     
     addAndMakeVisible(construction);
-
+    constructionPort.setViewedComponent(&construction, false);
+    constructionPort.setLookAndFeel(&laf);
+    constructionPort.setScrollBarsShown(false, false, true, true);
     
+    addAndMakeVisible(constructionPort);
     addChildComponent(overtop);
     
     juce::Point<int> myshadowOffset(2, 2);
@@ -210,7 +213,7 @@ void MainViewController::paint (Graphics& g)
     
     g.setColour(Colours::antiquewhite);
     
-    Rectangle<float> bounds = construction.getBounds().toFloat();
+    Rectangle<float> bounds = constructionPort.getBounds().toFloat();
     bounds.expand(2.0f,2.0f);
     g.drawRoundedRectangle(bounds, 2.0f, 0.5f);
     
@@ -221,6 +224,23 @@ void MainViewController::paint (Graphics& g)
     bounds.expand(1, 1);
     bounds.translate(0, -5);
     g.drawRoundedRectangle(bounds, 2.0, 0.5f);
+    int maxX = construction.getRight(), maxY=construction.getBottom();
+    for (BKItem * item : construction.getGraph()->getItems())
+    {
+        if (item->getRight() > maxX)
+        {
+            maxX = item->getRight();
+        }
+        if (item->getBottom() > maxY)
+        {
+            maxY = item->getBottom();
+        }
+    }
+    Rectangle<int> area = construction.getBoundsInParent();
+    
+    area = area.withWidth(maxX);
+    area = area.withHeight(maxY);
+    construction.setBounds(area);
 }
 
 void MainViewController::toggleDisplay(void)
@@ -314,8 +334,25 @@ void MainViewController::resized()
     
     area.reduce(2, 2);
     area.removeFromLeft(1);
-    construction.setBounds(area);
     
+    
+    constructionPort.setBounds(area);
+    //area.expand(200,200);
+    int maxX = area.getRight(), maxY=area.getBottom();
+    for (BKItem * item : construction.getGraph()->getItems())
+    {
+        if (item->getRight() > maxX)
+        {
+            maxX = item->getRight();
+        }
+        if (item->getBottom() > maxY)
+        {
+            maxY = item->getBottom();
+        }
+    }
+    area = area.withWidth(maxX);
+    area = area.withHeight(maxY);
+    construction.setBounds(area);
     undoStatus.setFont(undoStatus.getFont().withHeight(area.getHeight() * 0.05f));
     undoStatus.setBounds(area.getX() + gXSpacing, area.getY() + gXSpacing, area.getWidth() * 0.5,  undoStatus.getFont().getHeight());
 
@@ -336,12 +373,13 @@ void MainViewController::resized()
         octaveSlider.setVisible(true);
         keyboardComponent->setVisible(true);
                                
-        construction.setVisible(false);
+        //construction.setVisible(false);
+        constructionPort.setVisible(false);
     }
     else if (display == DisplayConstruction)
     {
         construction.setVisible(true);
-        
+        constructionPort.setVisible(true);
         Rectangle<int> sampleCBSlice = area.removeFromBottom(area.getHeight() * 0.1);
         int width = sampleCBSlice.getWidth() * 0.25;
         sampleCBSlice.removeFromLeft(width);

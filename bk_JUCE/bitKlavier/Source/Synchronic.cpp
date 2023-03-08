@@ -74,6 +74,7 @@ void SynchronicPreparation::performModification(SynchronicModification* s, Array
     }
     
     modded = !reverse;
+    s->_modded = modded;
 }
 
 SynchronicProcessor::SynchronicProcessor(Synchronic::Ptr synchronic,
@@ -177,9 +178,13 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
 
         int whichEnv = cluster->getEnvelopeCounter();
 		BKSynthesiserVoice* currentVoice;
-		if (!blendronic.isEmpty())
-		{
-            currentVoice =
+        
+        if (synthNoteNumber <= 108)
+        {
+            
+            if (!blendronic.isEmpty())
+            {
+                currentVoice =
                 synth->keyOn(1,
                              note,
                              synthNoteNumber,
@@ -201,11 +206,11 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                              prep->getGainPtr(),
                              prep->getBlendronicGainPtr(),
                              blendronic);
-		}
-		else
-		{
-			currentVoice =
-				synth->keyOn(1,
+            }
+            else
+            {
+                currentVoice =
+                synth->keyOn(1,
                              note,
                              synthNoteNumber,
                              synthOffset,
@@ -224,7 +229,8 @@ void SynchronicProcessor::playNote(int channel, int note, float velocity, Synchr
                              prep->getRelease(whichEnv),
                              tuner,
                              prep->getGainPtr());
-		}
+            }
+        }
         
         notePlayed = true;
         if (prep->midiOutput.value != nullptr && currentVoice != nullptr)

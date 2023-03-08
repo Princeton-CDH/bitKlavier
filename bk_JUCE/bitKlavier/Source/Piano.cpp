@@ -50,6 +50,10 @@ Piano::Ptr Piano::duplicate(bool withSameId)
         newItem->setCommentText(item->getCommentText());
         
         newItem->setTopLeftPosition(item->getPosition());
+        if(item->getType() == PreparationTypeComment)
+        {
+            newItem->setSize(item->getWidth(), item->getHeight());
+        }
         newItem->setName(item->getName());
         
         copyPiano->add(newItem);

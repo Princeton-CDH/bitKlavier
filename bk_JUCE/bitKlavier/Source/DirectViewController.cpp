@@ -33,24 +33,28 @@ BKViewController(p, theGraph, 2)
     gainSlider = std::make_unique<BKSingleSlider>("main volume (dB)", cDirectGain, -100, 24, 0, 0.01, "-inf");
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
+    gainSlider->displaySliderVisible(false);
     gainSlider->setToolTipString("Adjusts overall volume of keyboard");
     addAndMakeVisible(*gainSlider);
     
     resonanceGainSlider = std::make_unique<BKSingleSlider>("resonance volume (dB)", cDirectResonanceGain, -100, 24, -12, 0.01, "-inf");
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(true);
+    resonanceGainSlider->displaySliderVisible(false);
     resonanceGainSlider->setToolTipString("Adjusts overall resonance/reverb based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*resonanceGainSlider);
     
     hammerGainSlider = std::make_unique<BKSingleSlider>("hammers volume (dB)", cDirectHammerGain, -100, 24, 0, 0.01, "-inf");
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
     hammerGainSlider->setJustifyRight(true);
+    hammerGainSlider->displaySliderVisible(false);
     hammerGainSlider->setToolTipString("Adjusts mechanical noise sample based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*hammerGainSlider);
     
     blendronicGainSlider = std::make_unique<BKSingleSlider>("blendronic send volume (dB)", cDirectBlendronicGain, -100, 24, 0, 0.01, "-inf");
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
     blendronicGainSlider->setJustifyRight(true);
+    blendronicGainSlider->displaySliderVisible(false);
     blendronicGainSlider->setToolTipString("Adjusts volume of Direct output to connected Blendronics");
     addAndMakeVisible(*blendronicGainSlider);
     

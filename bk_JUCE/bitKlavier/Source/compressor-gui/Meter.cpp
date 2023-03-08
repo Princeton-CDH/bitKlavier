@@ -35,6 +35,7 @@ selectBox(selectBox)
     modeBox.addItem("Gain Reduction", 3);
     modeBox.setJustificationType(Justification::centred);
     modeBox.setSelectedId(3);
+    
     modeBox.onChange = [this] { modeBoxChanged(); };
     addAndMakeVisible(modeBox);
     addAndMakeVisible(meterBg);
@@ -55,14 +56,18 @@ void Meter::resized()
     auto bounds = getLocalBounds();
     auto boxHeight = (bounds.getHeight() / 10) * 2;
     boxArea = bounds.removeFromTop(boxHeight);
-    const FlexItem::Margin comboMargin = FlexItem::Margin(6.0f, 16.0f, 6.0f, 16.0f);
-
-    mBox.flexWrap = FlexBox::Wrap::noWrap;
-    mBox.flexDirection = FlexBox::Direction::row;
-    mBox.justifyContent = FlexBox::JustifyContent::flexEnd;
-    mBox.items.add(FlexItem(modeBox).withFlex(1).withMargin(comboMargin));
-    mBox.items.add(FlexItem(*selectBox).withFlex(1).withMargin(comboMargin));
-    mBox.performLayout(boxArea.toFloat());
+    // const FlexItem::Margin comboMargin = FlexItem::Margin(3.0f, 8.0f, 3.0f, 8.0f);
+    auto modeBoxArea = boxArea.removeFromLeft(boxArea.getWidth()/2);
+    modeBoxArea.reduce(2,2);
+    modeBox.setBounds(modeBoxArea);
+    boxArea.reduce(2,2);
+    selectBox->setBounds(boxArea);
+//    mBox.flexWrap = FlexBox::Wrap::noWrap;
+//    mBox.flexDirection = FlexBox::Direction::row;
+//    mBox.justifyContent = FlexBox::JustifyContent::flexStart;
+//    mBox.items.add(FlexItem(modeBox).withFlex(1).withMargin(comboMargin));
+//    mBox.items.add(FlexItem(*selectBox).withFlex(1).withMargin(comboMargin));
+//    mBox.performLayout(boxArea.toFloat());
 
     meterBg.setBounds(bounds);
     needle.setBounds(bounds);
