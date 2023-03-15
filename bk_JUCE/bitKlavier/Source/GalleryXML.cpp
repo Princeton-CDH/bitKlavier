@@ -46,7 +46,7 @@ ValueTree  Gallery::getState(void)
     galleryVT.setProperty("sampleType", processor.globalSampleType, 0);
 
     File soundfont(processor.globalSoundfont);
-    if (soundfont.exists()) galleryVT.setProperty("soundfontURL", soundfont.getFileName(), 0);
+    if (soundfont.exists()) galleryVT.setProperty("soundfontURL", soundfont.getFullPathName(), 0);
     else galleryVT.setProperty("soundfontURL", processor.globalSoundfont, 0);
 
     galleryVT.setProperty("soundfontInst", processor.globalInstrument, 0);
@@ -125,6 +125,13 @@ void Gallery::setStateFromXML(XmlElement* xml)
     
     if (xml != nullptr)
     {
+        //// load global sound font
+        processor.globalSampleType = (BKSampleLoadType)xml->getStringAttribute("sampleType").getIntValue();
+        processor.globalSoundfont = xml->getStringAttribute("soundfontURL");
+        File soundfont(processor.globalSoundfont);
+
+        processor.globalInstrument = (int) xml->getStringAttribute("soundfontInst").getIntValue();
+        processor.loadSamples(processor.globalSampleType, processor.globalSoundfont, processor.globalInstrument);
         name = xml->getStringAttribute("name");
         //if (name != )
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
