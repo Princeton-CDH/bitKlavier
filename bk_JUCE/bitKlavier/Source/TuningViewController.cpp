@@ -839,6 +839,7 @@ void TuningViewController::displayTab(int tab)
                                      currentFundamental.getHeight()  );
     } else if (tab == 2)
     {
+
         Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         if (!tuning->isAbsoluteTuning)
             tuning->currentScalaString = tuning->generateScalaString();
@@ -907,6 +908,10 @@ void TuningViewController::displayTab(int tab)
 //        resetButton->setBounds (262, 50, 78, 24);
 //        sclTextEditor->setBounds(100, 100, 200, 300);
 //        kbmTextEditor->setBounds(400, 100, 200, 300);
+#if JUCE_IOS
+        importButton->setVisible(true);
+        importKBMButton->setVisible(true);
+#endif
     }
     
     repaint();

@@ -334,8 +334,10 @@ void MainViewController::resized()
     
     area.reduce(2, 2);
     area.removeFromLeft(1);
-    
-    
+#if JUCE_IOS
+        
+    area.reduce(20,20);
+#endif
     constructionPort.setBounds(area);
     //area.expand(200,200);
     int maxX = area.getRight(), maxY=area.getBottom();

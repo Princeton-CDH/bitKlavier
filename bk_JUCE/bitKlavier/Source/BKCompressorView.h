@@ -16,7 +16,12 @@
 #include "compressor-gui/include/Constants.h"
 #include "BKLookAndFeel.h"
 #include "CompressorProcessor.h"
-class BKCompressorView : public juce::Component, public LabeledSlider::Listener, public juce::Timer, BKListener
+#include "BKViewController.h"
+class BKCompressorView : public juce::Component, public LabeledSlider::Listener, public juce::Timer, BKListener,
+#if JUCE_IOS
+public WantsBigOne::Listener,
+#endif
+public BigOne::Listener
 {
 public:
     BKCompressorView(CompressorProcessor& p, BKAudioProcessor& bkp) :
@@ -24,13 +29,14 @@ public:
     bkp(bkp),
     backGroundApp(Colour(Constants::Colors::bg_App)),
     meter(&selectCB),
+    bigOne(bkp),
     powerButton("powerButton", DrawableButton::ButtonStyle::ImageOnButtonBackground)
     {
         setLookAndFeel(&laf);
         startTimerHz(60);
         fillSelectCB(-1,-1);
         setGUIState(false);
-        initWidgets();
+        initWidgets();addChildComponent(bigOne);;
     }
     ~BKCompressorView()
     {
@@ -100,7 +106,7 @@ private:
     BKComboBox selectCB;
     MeterBackground meterbg;
     Meter meter;
-
+    BigOne bigOne;
     LabeledSlider inGainLSlider;
     LabeledSlider makeupGainLSlider;
     LabeledSlider treshLSlider;

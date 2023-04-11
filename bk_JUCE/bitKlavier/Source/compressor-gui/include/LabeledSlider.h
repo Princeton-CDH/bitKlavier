@@ -22,7 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using SliderAttachment = std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment>;
 using ButtonAttachment = std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment>;
 
-class LabeledSlider : public Component, public Slider::Listener, public TextEditor::Listener
+class LabeledSlider : public Component, public Slider::Listener, public TextEditor::Listener,
+#if JUCE_IOS
+public WantsBigOne
+#endif
 {
 public:
 
@@ -104,6 +107,16 @@ public:
         slider.setTextValueSuffix(str);
     }
     
+    void mouseDown(const MouseEvent& e)
+    {
+#if JUCE_IOS
+    if (e.eventComponent != &slider)
+    {
+        hasBigOne = true;
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &valueTF, slider.getName());
+    }
+#endif
+    }
 private:
     BKTextEditor valueTF;
     ModSlider slider;
