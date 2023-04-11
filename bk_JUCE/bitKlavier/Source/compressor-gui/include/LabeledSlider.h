@@ -22,9 +22,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using SliderAttachment = std::unique_ptr<AudioProcessorValueTreeState::SliderAttachment>;
 using ButtonAttachment = std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment>;
 
-class LabeledSlider : public Component, public Slider::Listener, public TextEditor::Listener,
+class LabeledSlider : public Component, public Slider::Listener, public TextEditor::Listener
 #if JUCE_IOS
-public WantsBigOne
+,public WantsBigOne
 #endif
 {
 public:
