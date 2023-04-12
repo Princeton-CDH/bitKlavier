@@ -74,7 +74,9 @@ absoluteKeyboard(false, false)
     adaptiveSystemsCB.addItem("Adaptive 1", 2);
     adaptiveSystemsCB.addItem("Adaptive Anchored 1", 3);
     adaptiveSystemsCB.addItem("Spring", 4);
+#if !JUCE_IOS
     adaptiveSystemsCB.addItem("MTSClient", 5);
+#endif
     attachKeymap.setText("Attach a Keymap for Adaptive or Spiral/Springs!", dontSendNotification);
     addAndMakeVisible(attachKeymap);
 
@@ -334,7 +336,9 @@ absoluteKeyboard(false, false)
     MTSMasterConnectionButton.reset(new BKTextButton());
     addAndMakeVisible(MTSMasterConnectionButton.get());
     MTSMasterConnectionButton->setLookAndFeel(&buttonsAndMenusLAF);
+#if !JUCE_IOS
     MTSMasterConnectionButton->setVisible(true);
+#endif
     MTSMasterConnectionButton->setButtonText("Register MTSMaster");
     
     
@@ -574,7 +578,9 @@ void TuningViewController::displayTab(int tab)
         A1AnchorScaleLabel.setVisible(true);
         A1AnchorScaleCB.setVisible(true);
         A1FundamentalCB.setVisible(true);
+#if !JUCE_IOS
         MTSMasterConnectionButton->setVisible(true);
+#endif
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
@@ -850,8 +856,7 @@ void TuningViewController::displayTab(int tab)
         //applyButton->setBounds (346, 298, 78, 24);
         applyButton->setVisible(true);
         applyKBMButton->setVisible(true);
-        importButton->setVisible(true);
-        importKBMButton->setVisible(true);
+
         resetButton->setVisible(true);
         sclTextEditor->setVisible(true);
         kbmTextEditor->setVisible(true);
@@ -908,7 +913,7 @@ void TuningViewController::displayTab(int tab)
 //        resetButton->setBounds (262, 50, 78, 24);
 //        sclTextEditor->setBounds(100, 100, 200, 300);
 //        kbmTextEditor->setBounds(400, 100, 200, 300);
-#if JUCE_IOS
+#if !JUCE_IOS
         importButton->setVisible(true);
         importKBMButton->setVisible(true);
 #endif
@@ -2777,6 +2782,7 @@ void TuningModificationEditor::greyOutAllComponents()
     applyKBMButton->setAlpha(gModAlpha);
     applyButton->setAlpha(gModAlpha);
     resetButton->setAlpha(gModAlpha);
+
     importButton->setAlpha(gModAlpha);
     importKBMButton->setAlpha(gModAlpha);
 }

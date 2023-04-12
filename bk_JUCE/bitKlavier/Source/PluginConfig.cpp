@@ -444,7 +444,7 @@ FileSearchPath BKAudioProcessor::getCustomSamplesSearchPath()
 
 #if JUCE_IOS
    
-    returnPath.add(File::getSpecialLocation(File::userDocumentsDirectory);
+    returnPath.add(File::getSpecialLocation(File::userDocumentsDirectory));
 #endif
 #if JUCE_MAC
     returnPath.add(File::getSpecialLocation(File::globalApplicationsDirectory)
