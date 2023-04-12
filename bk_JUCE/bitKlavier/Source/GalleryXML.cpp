@@ -126,9 +126,37 @@ void Gallery::setStateFromXML(XmlElement* xml)
     if (xml != nullptr)
     {
         //// load global sound font
-        processor.globalSampleType = (BKSampleLoadType)xml->getStringAttribute("sampleType").getIntValue();
-        processor.globalSoundfont = xml->getStringAttribute("soundfontURL");
-        File soundfont(processor.globalSoundfont);
+        if(xml->hasAttribute("sampleType"))
+        {
+            processor.globalSampleType = (BKSampleLoadType)xml->getStringAttribute("sampleType").getIntValue();
+        } else
+        {
+            processor.globalSampleType = BKLoadHeavy;
+        }
+        if(xml->hasAttribute("soundfontURL") && processor.globalSampleType >= BKLoadSoundfont)
+        {
+            processor.globalSoundfont = xml->getStringAttribute("soundfontURL");
+            
+            File soundfont(processor.globalSoundfont);
+            if (soundfont != File())
+            {
+                String name = processor.globalSoundfont.fromLastOccurrenceOf("/", false, true);
+                Array<File> files = processor.getSoundfontsSearchPath().findChildFiles(File::findFiles, true, name);
+                if (files.isEmpty() && processor.globalSampleType > BKLoadSoundfont)
+                {
+                    files = processor.getCustomSamplesSearchPath().findChildFiles(File::findFiles, true, name);
+                    
+                }
+                
+                if (files.isEmpty())
+                {
+                    AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, "File Not Found!", "Could not find file '" + name + "' please check that it is in the custom sample or soundfont search path");
+                    processor.globalSampleType = BKLoadLite;
+                    processor.globalSoundfont = "default.sf2";
+                }
+            }
+        }
+        
 
         processor.globalInstrument = (int) xml->getStringAttribute("soundfontInst").getIntValue();
         processor.loadSamples(processor.globalSampleType, processor.globalSoundfont, processor.globalInstrument);

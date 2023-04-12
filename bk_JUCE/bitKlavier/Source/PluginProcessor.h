@@ -275,6 +275,8 @@ public:
     File getDefaultSamplesPath();
     Array<File> getSoundfontsPaths();
     Array<File> getCustomSamplesPaths();
+    FileSearchPath getSoundfontsSearchPath();
+    FileSearchPath getCustomSamplesSearchPath();
     Array<File> getGalleryPaths();
     double getLevelL();
     double getLevelR();
