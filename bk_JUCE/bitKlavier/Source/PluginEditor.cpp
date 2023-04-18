@@ -65,6 +65,9 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 
 void BKAudioProcessorEditor::resized()
 {
+    //juce::DocumentWindow::resized();
+               
+  
     processor.paddingScalarX = (float)(getWidth() - DEFAULT_MIN_WIDTH) / (DEFAULT_WIDTH - DEFAULT_MIN_WIDTH);
     processor.paddingScalarY = (float)(getHeight() - DEFAULT_MIN_HEIGHT) / (DEFAULT_HEIGHT - DEFAULT_MIN_HEIGHT);
     
