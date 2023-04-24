@@ -32,7 +32,7 @@ public:
     LabeledSlider() : slider(&sliderLabel)
     {
         slider.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-        slider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, sliderLabel.getFont().getHeight());
+        slider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, sliderLabel.getFont().getHeight()+6);
         slider.addListener(this);
         addAndMakeVisible(slider);
         addAndMakeVisible(sliderLabel);
@@ -69,7 +69,7 @@ public:
         auto bounds = getLocalBounds().reduced(2);
         const auto fontHeight = sliderLabel.getFont().getHeight();
 
-        const auto labelBounds = bounds.removeFromTop(fontHeight);
+        const auto labelBounds = bounds.removeFromTop(fontHeight+6);
         // const auto editorBounds = bounds.removeFromBottom(fontHeight);
         slider.setBounds(bounds);
         sliderLabel.setBounds(labelBounds);
