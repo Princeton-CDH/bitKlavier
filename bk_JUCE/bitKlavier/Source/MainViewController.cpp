@@ -303,7 +303,7 @@ void MainViewController::resized()
 
         float unit = footerSlice.getWidth() * 0.25;
         
-        preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), footerSlice.getWidth()/8, footerSlice.getHeight());
+        preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), footerSlice.getWidth()/8, footerSlice.getHeight()/4);
         
         equalizerButton.setBounds(footerSlice.getWidth() -  footerSlice.getWidth()/8, footerSlice.getY(), footerSlice.getWidth()/8, footerSlice.getHeight()/4);
 
