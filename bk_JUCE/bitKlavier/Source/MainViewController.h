@@ -122,6 +122,7 @@ public:
     Slider octaveSlider;
     //void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
     
+    void fillSampleCB();
 private:
 
 #define MVC_REFRESH_RATE 20
@@ -185,7 +186,6 @@ private:
     
     void bkComboBoxDidChange(ComboBox* cb) override;
     
-    void fillSampleCB();
     void fillInstrumentCB();
     
     void drawPreparationPanel(void);

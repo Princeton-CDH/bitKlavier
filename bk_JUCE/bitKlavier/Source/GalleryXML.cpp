@@ -46,8 +46,8 @@ ValueTree  Gallery::getState(void)
     galleryVT.setProperty("sampleType", processor.globalSampleType, 0);
 
     File soundfont(processor.globalSoundfont);
-    if (soundfont.exists()) galleryVT.setProperty("soundfontURL", soundfont.getFullPathName(), 0);
-    else galleryVT.setProperty("soundfontURL", processor.globalSoundfont, 0);
+    if (soundfont.exists()) galleryVT.setProperty("soundfontURL", soundfont.getFileName(), 0);
+    else galleryVT.setProperty("soundfontURL", processor.globalSoundfont.fromLastOccurrenceOf("/", false, true), 0);
 
     galleryVT.setProperty("soundfontInst", processor.globalInstrument, 0);
     
@@ -135,22 +135,25 @@ void Gallery::setStateFromXML(XmlElement* xml)
         }
         if(xml->hasAttribute("soundfontURL") && processor.globalSampleType >= BKLoadSoundfont)
         {
-            processor.globalSoundfont = xml->getStringAttribute("soundfontURL");
+            String soundfont = xml->getStringAttribute("soundfontURL");
             
-            File soundfont(processor.globalSoundfont);
-            if (soundfont != File())
+            //File soundfont(processor.globalSoundfont);
+            if (soundfont != "")
             {
-                String name = processor.globalSoundfont.fromLastOccurrenceOf("/", false, true);
-                Array<File> files = processor.getSoundfontsSearchPath().findChildFiles(File::findFiles, true, name);
+                if(soundfont.contains("/"))
+                {
+                    soundfont = soundfont.fromLastOccurrenceOf("/", false, true);
+                }
+                Array<File> files = processor.getSoundfontsSearchPath().findChildFiles(File::findFiles, true,soundfont);
                 if (files.isEmpty() && processor.globalSampleType > BKLoadSoundfont)
                 {
-                    files = processor.getCustomSamplesSearchPath().findChildFiles(File::findFiles, true, name);
+                    files = processor.getCustomSamplesSearchPath().findChildFiles(File::findFiles, true, soundfont);
                     
                 }
                 
                 if (files.isEmpty())
                 {
-                    AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, "File Not Found!", "Could not find file '" + name + "' please check that it is in the custom sample or soundfont search path");
+                    AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, "File Not Found!", "Could not find file '" + soundfont + "' please check that it is in the custom sample or soundfont search path");
                     processor.globalSampleType = BKLoadLite;
                     processor.globalSoundfont = "default.sf2";
                 }

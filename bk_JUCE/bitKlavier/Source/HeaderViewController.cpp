@@ -11,7 +11,7 @@
 #include "PluginEditor.h"
 
 #include "HeaderViewController.h"
-
+#include "MainViewController.h"
 
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
@@ -552,6 +552,8 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     else if (result == OPEN_ID) // Load
     {
         processor.loadGalleryDialog();
+        //auto comp = getParentComponent();
+        
     }
     else if (result == SETTINGS_ID) // open General settings
     {
@@ -646,6 +648,7 @@ void HeaderViewController::bkButtonClicked (Button* b)
     else if (b == &galleryB)
     {
         getGalleryMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&galleryB), ModalCallbackFunction::forComponent (galleryMenuCallback, this) );
+        
     }
 }
 
@@ -1154,5 +1157,8 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         {
             cb->setSelectedId(lastGalleryCBId, dontSendNotification);
         }
+        MainViewController* mvc = dynamic_cast<MainViewController*> (getParentComponent());
+        if(mvc)
+            mvc->fillSampleCB();
     }
 }

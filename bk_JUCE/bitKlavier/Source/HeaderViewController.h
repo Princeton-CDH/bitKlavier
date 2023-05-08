@@ -26,6 +26,7 @@
 #include "ShareBot.h"
 #endif
 
+
 class HeaderViewController : public BKComponent,
 public BKListener
 {
