@@ -148,7 +148,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 if (files.isEmpty() && processor.globalSampleType > BKLoadSoundfont)
                 {
                     files = processor.getCustomSamplesSearchPath().findChildFiles(File::findFiles, true, soundfont);
-                    
+
                 }
                 
                 if (files.isEmpty())
@@ -156,8 +156,15 @@ void Gallery::setStateFromXML(XmlElement* xml)
                     AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, "File Not Found!", "Could not find file '" + soundfont + "' please check that it is in the custom sample or soundfont search path");
                     processor.globalSampleType = BKLoadLite;
                     processor.globalSoundfont = "default.sf2";
+                } else
+                {
+                    processor.globalSoundfont = files.getFirst().getFullPathName();
                 }
             }
+        } else
+        {
+            processor.globalSampleType = BKLoadLite;
+            processor.globalSoundfont = "default.sf2";
         }
         
 
