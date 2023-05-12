@@ -147,7 +147,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 Array<File> files = processor.getSoundfontsSearchPath().findChildFiles(File::findFiles, true,soundfont);
                 if (files.isEmpty() && processor.globalSampleType > BKLoadSoundfont)
                 {
-                    files = processor.getCustomSamplesSearchPath().findChildFiles(File::findFiles, true, soundfont);
+                    files = processor.getCustomSamplesSearchPath().findChildFiles(File::findDirectories, true, soundfont);
 
                 }
                 
