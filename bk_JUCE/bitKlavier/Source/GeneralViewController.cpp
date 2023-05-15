@@ -1258,6 +1258,7 @@ void ModdableViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, 
     }
     if (name == incSlider->getName())
     {
+        DBG("Moddable setting inc to " + String(val));
         mod->setInc(val);
     }
     if (name == maxIncSlider->getName())

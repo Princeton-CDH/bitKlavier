@@ -129,6 +129,7 @@ public:
     {
         if (shouldInc)
         {
+            DBG("incrementing by " + String(m.inc));
             mod += (m.inc * m.n);
             if (m.n < m.maxN || m.maxN == 0) m.n++;
         }
