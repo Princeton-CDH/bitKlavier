@@ -1128,7 +1128,7 @@ minDisplay(minDisplay)
     showName.setTooltip("tooltip text");
     addAndMakeVisible(showName);
     
-    valueTF.setText(String(sliderDefault), dontSendNotification);
+    valueTF.setText(String(sliderDefault, 2, false), dontSendNotification);
     valueTF.addListener(this);
     valueTF.setSelectAllWhenFocused(true);
 #if JUCE_IOS

@@ -1165,6 +1165,7 @@ BKViewController(p, theGraph, 1)
     incSlider = std::make_unique<BKSingleSlider>("mod increment", "mod increment", -2.0f, 2.0f, 0.0, 0.001);
     incSlider->setToolTipString("how much to increment the mod value on each time the mod is triggered");
     incSlider->setJustifyRight(false);
+    incSlider->setSliderTextResolution(2);
     incSlider->addMyListener(this);
     addAndMakeVisible(*incSlider);
     
