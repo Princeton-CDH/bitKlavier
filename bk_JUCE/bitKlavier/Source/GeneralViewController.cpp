@@ -1244,7 +1244,12 @@ void ModdableViewController::update(void)
     if (mod == nullptr) return;
     
     timeSlider->setValue(mod->getTime(), dontSendNotification);
-    incSlider->setValue(mod->getInc(), dontSendNotification);
+    if (processor.updateState->currentModdableIdentifier == cTuningFundamentalOffset)
+        incSlider->setValue(mod->getInc() * 100, dontSendNotification);
+    else
+        incSlider->setValue(mod->getInc(), dontSendNotification);
+
+    
     maxIncSlider->setValue(mod->getMaxNumberOfInc(), dontSendNotification);
 }
 
@@ -1260,7 +1265,10 @@ void ModdableViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, 
     if (name == incSlider->getName())
     {
         DBG("Moddable setting inc to " + String(val));
-        mod->setInc(val);
+        if (processor.updateState->currentModdableIdentifier == cTuningFundamentalOffset)
+            mod->setInc(val * 0.01);
+        else
+            mod->setInc(val);
     }
     if (name == maxIncSlider->getName())
     {
