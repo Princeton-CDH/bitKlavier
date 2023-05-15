@@ -234,8 +234,9 @@ absoluteKeyboard(false, false)
     customKeyboard.setFundamental(0);
     addAndMakeVisible(customKeyboard);
     
-    offsetSlider = std::make_unique<BKSingleSlider>("offset: ", cTuningFundamentalOffset, -100, 100, 0, 0.1);
+    offsetSlider = std::make_unique<BKSingleSlider>("offset: ", cTuningFundamentalOffset, -100, 100, 0.0, 0.1);
     offsetSlider->displaySliderVisible(false);
+    offsetSlider->setSliderTextResolution(2);
     offsetSlider->setToolTipString("Raise or lower the entire temperament in cents");
     addAndMakeVisible(*offsetSlider);
     
