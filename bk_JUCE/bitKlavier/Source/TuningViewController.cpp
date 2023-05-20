@@ -988,7 +988,8 @@ void TuningViewController::paint (Graphics& g)
                                       tuning->getGlobalTuningReference());
             else
             {
-                midi = tuning->getOffset(a->getNote(), false);
+                //midi = tuning->getOffset(a->getNote(), false);
+                midi = tuning->getLastOffset(a->getNote());
                 midi += a->getNote();
             }
             
@@ -1009,7 +1010,8 @@ void TuningViewController::paint (Graphics& g)
             Particle* b = s->getB();
             if(springsOn) midi = ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())), tuning->getGlobalTuningReference());
             else {
-                midi = tuning->getOffset(b->getNote(), false);
+                //midi = tuning->getOffset(b->getNote(), false);
+                midi = tuning->getLastOffset(b->getNote());
                 midi += b->getNote();
             }
             
@@ -1063,7 +1065,8 @@ void TuningViewController::paint (Graphics& g)
                 midi += ((p->getOctave() - 5) * 12.0);
             }
             else {
-                midi = tuning->getOffset(p->getNote(), false);
+                //midi = tuning->getOffset(p->getNote(), false);
+                midi = tuning->getLastOffset(p->getNote());
                 //DBG("midiOffset = " + String(midi) + " for note: " + String(p->getNote() % 12));
                 midi += p->getNote();
             }
