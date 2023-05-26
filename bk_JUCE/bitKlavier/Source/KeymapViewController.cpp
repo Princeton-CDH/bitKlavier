@@ -399,6 +399,7 @@ BKViewController(p, theGraph, 4)
                                                     offsetDefault, 0.01);
     offsetSlider->setToolTipString("Adjust the offset of the velocity map");
     offsetSlider->addMyListener(this);
+    offsetSlider->setSliderTextResolution(2);
     addAndMakeVisible(*offsetSlider);
     
     velocityInvertToggle.setButtonText("Invert");
