@@ -281,6 +281,7 @@ const String ptagKeymap_harmonizerPreTranspose = "harmonizerPreTranspose";
 const String ptagKeymap_harmonizerPostTranspose = "harmonizerPostTranspose";
 const String ptagKeymap_endKeystrokes = "endKeystrokes";
 const String ptagKeymap_ignoreSustain = "ignoreSustain";
+const String ptagKeymap_ignoreNoteOff = "ignoreNoteOff";
 const String ptagKeymap_sustainPedalKeys = "sustainPedalKeys";
 const String ptagKeymap_extendRange = "extendRange";
 const String ptagKeymap_asymmetricalWarp = "asymmetricalWarp";
