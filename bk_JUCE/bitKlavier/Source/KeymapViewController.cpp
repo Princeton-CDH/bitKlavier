@@ -353,6 +353,13 @@ BKViewController(p, theGraph, 4)
     sustainPedalKeysToggle.addListener(this);
     addAndMakeVisible(&sustainPedalKeysToggle, ALL);
     
+    ignoreNoteOffToggle.setButtonText("Ignore NoteOff");
+    ignoreNoteOffToggle.setToggleState(false, dontSendNotification);
+    ignoreNoteOffToggle.setLookAndFeel(&buttonsAndMenusLAF);
+    ignoreNoteOffToggle.setTooltip("Toggle whether to ignore the note off messages for this keymap");
+    ignoreNoteOffToggle.addListener(this);
+    addAndMakeVisible(&ignoreNoteOffToggle, ALL);
+    
     //======================================================================================
     // Velocity curving
     // this is merely setup code to initialize the various UI elements (sliders, button, etc.)
@@ -854,7 +861,7 @@ void KeymapViewController::displayTab(int tab)
     
     else if (tab == 3)
     {
-        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 10 * processor.paddingScalarY + 4);
+        area.reduce(x0 + 10 * processor.paddingScalarX + 4, 8 * processor.paddingScalarY + 4);
         area.removeFromTop(gComponentComboBoxHeight);
         
         area.reduce(area.getWidth() * 0.2f, area.getHeight() * 0.2f);
@@ -876,6 +883,9 @@ void KeymapViewController::displayTab(int tab)
         
         sostenutoToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing));
         sostenutoToggle.setVisible(true);
+        
+        ignoreNoteOffToggle.setBounds(area.removeFromTop(gComponentComboBoxHeight + 2 * gYSpacing)); 
+        ignoreNoteOffToggle.setVisible(true);
     }
 }
 
@@ -1022,6 +1032,7 @@ void KeymapViewController::invisible()
     endKeystrokesToggle.setVisible(false);
     ignoreSustainToggle.setVisible(false);
     sustainPedalKeysToggle.setVisible(false);
+    ignoreNoteOffToggle.setVisible(false);
 
     harmonizerMenuButton.setVisible(false);
 
@@ -1578,6 +1589,12 @@ void KeymapViewController::bkButtonClicked (Button* b)
         keymap->setSustainPedalKeys(sustainPedalKeysToggle.getToggleState());
         processor.updateState->editsMade = true;
     }
+    else if (b == &ignoreNoteOffToggle)
+    {
+        Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
+        keymap->setIgnoreNoteOff(ignoreNoteOffToggle.getToggleState());
+        processor.updateState->editsMade = true;
+    }
     else if (b == &velocityInvertToggle) {
         Keymap::Ptr keymap = processor.gallery->getKeymap(processor.updateState->currentKeymapId);
         bool newVelocityInvert = velocityInvertToggle.getToggleState();
@@ -1750,6 +1767,7 @@ void KeymapViewController::update(void)
         endKeystrokesToggle.setToggleState(km->getAllNotesOff(), dontSendNotification);
         ignoreSustainToggle.setToggleState(km->getIgnoreSustain(), dontSendNotification);
         sustainPedalKeysToggle.setToggleState(km->getSustainPedalKeys(), dontSendNotification);
+        ignoreNoteOffToggle.setToggleState(km->getIgnoreNoteOff(), dontSendNotification);
         keymapTF.setText( intArrayToString(km->keys()));
         harAllKeymapTF.setText(km->getHarmonizerTextForDisplay());
         harArrayKeymapTF.setText(intArrayToString(km->getHarmonizationForKey(true, false)));
@@ -1783,12 +1801,14 @@ void KeymapViewController::update(void)
             endKeystrokesToggle.setAlpha(gDim);
             ignoreSustainToggle.setAlpha(gDim);
             sustainPedalKeysToggle.setAlpha(gDim);
+            ignoreNoteOffToggle.setAlpha(gDim);
             //km->setIgnoreSustain(true);
             //ignoreSustainToggle.setToggleState(true, dontSendNotification);
             invertOnOffToggle.setEnabled(false);
             endKeystrokesToggle.setEnabled(false);
             ignoreSustainToggle.setEnabled(false);
             sustainPedalKeysToggle.setEnabled(false);
+            ignoreNoteOffToggle.setEnabled(false);
             sostenutoToggle.setEnabled(false);
             
         } else
@@ -1797,6 +1817,7 @@ void KeymapViewController::update(void)
             endKeystrokesToggle.setAlpha(gBright);
             ignoreSustainToggle.setAlpha(gBright);
             sustainPedalKeysToggle.setAlpha(gBright);
+            ignoreNoteOffToggle.setAlpha(gBright);
             //km->setIgnoreSustain(false);
             //ignoreSustainToggle.setToggleState(false, dontSendNotification);
             invertOnOffToggle.setEnabled(true);
@@ -1804,6 +1825,7 @@ void KeymapViewController::update(void)
             //ignoreSustainToggle.setState(false);
             ignoreSustainToggle.setEnabled(true);
             sustainPedalKeysToggle.setEnabled(true);
+            ignoreNoteOffToggle.setEnabled(true);
             sostenutoToggle.setEnabled(true);
         }
     }
