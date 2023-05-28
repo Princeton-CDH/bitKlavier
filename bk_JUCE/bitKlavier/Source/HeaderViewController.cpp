@@ -245,7 +245,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     shareMenu.addItem(SHARE_MESSAGE_ID, "Messages");
     galleryMenu.addSeparator();
-    shareMenu.addItem(SHARE_FACEBOOK_ID, "Facebook");
+    //shareMenu.addItem(SHARE_FACEBOOK_ID, "Facebook");
     // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     galleryMenu.addSeparator();
     galleryMenu.addSubMenu("Share", shareMenu);
