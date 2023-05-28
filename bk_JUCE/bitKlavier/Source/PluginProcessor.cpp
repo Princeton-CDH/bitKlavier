@@ -1651,7 +1651,9 @@ void BKAudioProcessor::importSoundfont(void)
                          {
                              auto url = results.getReference (0);
                              
-                             std::unique_ptr<InputStream> wi (url.createInputStream (false));
+                             std::unique_ptr<InputStream> wi (url.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+                                                                                     .withConnectionTimeoutMs (1000)
+                                                                                     .withNumRedirectsToFollow (0)));
                              
                              if (wi != nullptr)
                              {
@@ -1691,7 +1693,9 @@ void BKAudioProcessor::importCurrentGallery(void)
          {
              auto url = results.getReference (0);
             
-             if (url.createInputStream (false) != nullptr)
+             if (url.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+                                        .withConnectionTimeoutMs (1000)
+                                        .withNumRedirectsToFollow (0)) != nullptr)
              {
                  std::shared_ptr<XmlElement> xml = url.readEntireXmlStream();
                 
