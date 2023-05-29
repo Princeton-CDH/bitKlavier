@@ -163,7 +163,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
             }
         } else
         {
-            processor.globalSampleType = BKLoadLite;
+            //processor.globalSampleType = BKLoadLite;
             processor.globalSoundfont = "default.sf2";
         }
         
