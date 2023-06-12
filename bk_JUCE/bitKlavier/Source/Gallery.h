@@ -19,7 +19,7 @@
 #include "Piano.h"
 
 #include "BKGraph.h"
-
+#include "juce-draggableListBox/Source/MyListComponent.h"
 class BKAudioProcessor;
 
 class Gallery : public ReferenceCountedObject
@@ -851,11 +851,55 @@ public:
     int idcounts[BKPreparationTypeNil];
     
     void addPiano(XmlElement* xml, OwnedArray<HashMap<int,int>>* map);
+   
+    MyListBoxItemData& getPianoIteratorOrder()
+    {
+        return pianoIteratorOrder;
+    }
     
+//    Piano::Ptr findPianoWithName(String name)
+//    {
+//        for (auto piano : bkPianos)
+//        {
+//            if(piano->getName() == name)
+//            {
+//                return piano;
+//            }
+//        }
+//        return nullptr;
+//    }
     
+//    void setPianoIteratorOrder(std::vector<String> order)
+//    {
+//        pianoIteratorOrder.clear();
+//        for (auto name : order)
+//        {
+//            pianoIteratorOrder.add(findPianoWithName(name));
+//        }
+//        
+//        DBG("Piano Iterator Order");
+//        for (auto piano : pianoIteratorOrder)
+//        {
+//            DBG(piano->getName());
+//        }
+//    }
+    Keymap::Ptr getIteratorUpKeymap()
+    {
+        return iteratorUpKeymap;
+    }
+    
+    Keymap::Ptr getIteratorDownKeymap()
+    {
+        return iteratorDownKeymap;
+    }
+    int currentPianoIndex = 0;
+    bool iteratorIsEnabled = true;
 private:
     BKAudioProcessor& processor;
     
+    
+    
+    MyListBoxItemData pianoIteratorOrder;
     String url;
     String name;
     
@@ -880,6 +924,10 @@ private:
     Keymap::PtrArr                      bkKeymaps;
     Piano::PtrArr                       bkPianos;
 
+    
+    Keymap::Ptr                         iteratorUpKeymap;
+    Keymap::Ptr                         iteratorDownKeymap;
+    
     int defaultPianoId;
     bool isDirty;
     

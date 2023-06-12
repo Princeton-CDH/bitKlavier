@@ -260,7 +260,7 @@ public:
     
     std::shared_ptr<XmlElement> getContent(void) { return content;}
     void setContent(std::shared_ptr<XmlElement> xml) {content = xml;}
-    
+    bool isDisabled = false;
 private:
     
     BKAudioProcessor& processor;

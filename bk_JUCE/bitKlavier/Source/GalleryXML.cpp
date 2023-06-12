@@ -104,8 +104,10 @@ ValueTree  Gallery::getState(void)
         galleryVT.addChild( bkPianos[piano]->getState(), -1, 0);
     }
     
+    
     galleryVT.setProperty("defaultPiano", getDefaultPiano(), 0);
     
+    galleryVT.addChild(pianoIteratorOrder.getState(), -1, 0);
     return galleryVT;
 }
 
@@ -378,6 +380,13 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 Piano::Ptr thisPiano = bkPianos[which++];
                 
                 thisPiano->setState(e, &idmap, idcounts);
+            }
+        }
+        for (auto e : xml->getChildIterator())
+        {
+            if(e->hasTagName(vtagPianoIterator))
+            {
+                pianoIteratorOrder.setState(e, bkPianos);
             }
         }
     }

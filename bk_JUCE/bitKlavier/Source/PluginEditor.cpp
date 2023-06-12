@@ -100,6 +100,19 @@ void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
     window->setTitleBarTextCentred(false);
 }
 
+void BKAudioProcessorEditor::showPianoIteratorDialog(Button *button)
+{
+    DocumentWindow* doc = new BKDocumentWindow("Piano Iterator", Colours::transparentBlack, DocumentWindow::TitleBarButtons::allButtons, true );
+    bKIterator = new BKListBoxComponent(processor);
+    
+    doc->setAlwaysOnTop(true);
+    addAndMakeVisible(doc);
+    doc->addToDesktop();
+    doc->setContentOwned(bKIterator,true);
+    doc->setResizable(true, true);
+    doc->setLookAndFeel(&laf);
+}
+
 void BKAudioProcessorEditor::showGenSettings(int tab) {
     mvc.getOvertop()->gvc.setTab(tab); // 0 for settings, 1 for equalizer
     processor.updateState->setCurrentDisplay(DisplayGeneral);

@@ -1,3 +1,6 @@
 [submodule "bk_JUCE/bitKlavier/Source/MTS-ESP"]
 	path = bk_JUCE/bitKlavier/Source/MTS-ESP
 	url = git@github.com:ODDSound/MTS-ESP.git
+[submodule "bk_JUCE/bitKlavier/Source/juce-draggableListBox"]
+	path = bk_JUCE/bitKlavier/Source/juce-draggableListBox
+	url = git@github.com:davispolito/juce-draggableListBox.git

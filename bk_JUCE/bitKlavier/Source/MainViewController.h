@@ -197,7 +197,7 @@ private:
     bool isAddingFromMidiInput;
     
     TextButton preferencesButton;
-    
+    TextButton pianoIteratorButton;
     ToggleButton globalSoundSetButton;
 
     ToggleButton sustainPedalButton;

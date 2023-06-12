@@ -24,6 +24,7 @@ overtop(p, &theGraph),
 splash(p),
 timerCallbackCount(0),
 preferencesButton("Preferences"),
+pianoIteratorButton("Piano Iterator"),
 globalSoundSetButton("Use global samples"),
 sustainPedalButton("Sustain Pedal"),
 equalizerButton("Post FX")
@@ -137,6 +138,10 @@ equalizerButton("Post FX")
     preferencesButton.setTriggeredOnMouseDown (true);
     preferencesButton.setLookAndFeel(&windowLAF);
     addAndMakeVisible (preferencesButton);
+    pianoIteratorButton.addListener(this);
+    pianoIteratorButton.setTriggeredOnMouseDown(true);
+    pianoIteratorButton.setLookAndFeel(&windowLAF);
+    addAndMakeVisible(pianoIteratorButton);
     
     // Equalizer
     equalizerButton.addListener(this);
@@ -177,6 +182,7 @@ MainViewController::~MainViewController()
     globalSoundSetButton.removeListener(this);
     sustainPedalButton.removeListener(this);
     preferencesButton.removeListener(this);
+    pianoIteratorButton.removeListener(this);
     equalizerButton.removeListener(this);
     mainSlider.removeListener(this);
     sampleCB.removeListener(this);
@@ -193,6 +199,7 @@ MainViewController::~MainViewController()
     globalSoundSetButton.setLookAndFeel(nullptr);
     //sustainPedalButton.setLookAndFeel(nullptr);
     preferencesButton.setLookAndFeel(nullptr);
+    pianoIteratorButton.setLookAndFeel(nullptr);
     equalizerButton.setLookAndFeel(nullptr);
     keyboardComponent = nullptr;
     
@@ -304,7 +311,7 @@ void MainViewController::resized()
         float unit = footerSlice.getWidth() * 0.25;
         
         preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), footerSlice.getWidth()/8, footerSlice.getHeight()/4);
-        
+        pianoIteratorButton.setBounds(preferencesButton.getRight(), footerSlice.getY(), footerSlice.getWidth()/8, footerSlice.getHeight()/4);
         equalizerButton.setBounds(footerSlice.getWidth() -  footerSlice.getWidth()/8, footerSlice.getY(), footerSlice.getWidth()/8, footerSlice.getHeight()/4);
 
 		//original spacing to restore once tooltips/keystrokes/hotkeys get moved to a separate menu
@@ -673,7 +680,11 @@ void MainViewController::bkButtonClicked (Button* b)
     {
         editor.showBKSettingsDialog(b);
     }
-    if (b == &globalSoundSetButton)
+    else if(b == &pianoIteratorButton)
+    {
+        editor.showPianoIteratorDialog(b);
+    }
+    else if (b == &globalSoundSetButton)
     {
         String globalSoundSetName =
         processor.loadedSoundSets[processor.globalSoundSetId]
@@ -754,11 +765,11 @@ void MainViewController::bkButtonClicked (Button* b)
             }
         }
     }
-    if (b == &sustainPedalButton)
+    else if (b == &sustainPedalButton)
     {
         processor.setSustainFromMenu(sustainPedalButton.getToggleState());
     }
-    if (b == &equalizerButton) {
+    else if (b == &equalizerButton) {
         editor.showGenSettings(1);
     }
 }
@@ -1500,6 +1511,20 @@ void MainViewController::timerCallback()
             }
         }   
     }
+    if (state->updateIterator && state->iteratorViewActive)
+    {
+        editor.bKIterator->setListBoxRow(state->currentIteratorPiano);
+        state->updateIterator = false;
+    }
+    
+//    if (processor.gallery->iteratorIsEnabled)
+//    {
+//        for(auto item : theGraph)
+//        {
+//            if(item.get)
+//        }
+//    }
+    
     
     levelMeterComponentL->updateLevel(processor.getLevelL());
     //levelMeterComponentR->updateLevel(processor.getLevelL());

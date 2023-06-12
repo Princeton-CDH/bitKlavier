@@ -25,6 +25,7 @@ void BKAudioProcessor::updateUI(void)
     updateState->keymapDidChange = true;
     
     updateState->editsMade = false;
+    updateState->updateIterator = true;
 }
 
 OwnedArray<HashMap<String, int>>& BKAudioProcessor::getSourcedNotesOn()

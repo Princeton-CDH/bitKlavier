@@ -63,7 +63,7 @@ const String ptagEqualizer_highCutSlope = "highCutSlope";
 const String vtagPiano = "piano";
 const String vtagPrepMap = "prepMap";
 const String ptagPrepMap_keymapId = "keymapId";
-
+const String vtagPianoIterator = "pianoIterator";
 const String vtagPrepMap_directPreps = "directPrepIds";
 const String vtagPrepMap_synchronicPreps = "synchronicPrepIds";
 const String vtagPrepMap_nostalgicPreps = "nostalgicPrepIds";

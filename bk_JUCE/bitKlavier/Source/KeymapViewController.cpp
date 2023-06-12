@@ -1335,7 +1335,7 @@ void KeymapViewController::midiInputSelectCallback(int result, KeymapViewControl
         }
         else keymap->addMidiInputSource(device);
     }
-
+    //allows menu to stay open after being clicked
     vc->getMidiInputSelectMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(vc->midiInputSelectButton), ModalCallbackFunction::forComponent(midiInputSelectCallback, vc));
     
     processor.updateState->editsMade = true;
@@ -1483,6 +1483,7 @@ void KeymapViewController::bkButtonClicked (Button* b)
     else if (b == &midiInputSelectButton)
     {
         getMidiInputSelectMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&midiInputSelectButton), ModalCallbackFunction::forComponent(midiInputSelectCallback, this));
+
     }
     else if (b == &harmonizerMenuButton)
     {
