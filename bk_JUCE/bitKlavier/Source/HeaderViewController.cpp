@@ -12,7 +12,7 @@
 
 #include "HeaderViewController.h"
 #include "MainViewController.h"
-
+#include <ranges>
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
 construction(c)
@@ -1104,6 +1104,13 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         update();
         
         processor.saveGalleryToHistory("Change Piano");
+        
+        std::vector<Piano::Ptr>::iterator it =  std::find_if(processor.gallery->getPianoIteratorOrder().modelData.begin(),processor.gallery->getPianoIteratorOrder().modelData.end(), [&](const auto& val)
+                             { return val->getId() == Id;});
+        DBG("index" + String( std::distance(processor.gallery->getPianoIteratorOrder().modelData.begin(), it)));
+        processor.gallery->currentPianoIndex = std::distance(processor.gallery->getPianoIteratorOrder().modelData.begin(), it);
+        processor.updateState->currentIteratorPiano = processor.gallery->currentPianoIndex;
+        processor.updateState->updateIterator = true;
     }
     else if (name == "galleryCB")
     {

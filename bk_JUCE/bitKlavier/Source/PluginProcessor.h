@@ -251,7 +251,7 @@ public:
 
     //==============================================================================
     
-    inline BKAudioProcessorEditor* getBKEditor() { return editor; }
+    BKAudioProcessorEditor* getBKEditor();
     
     const String getName() const override;
 

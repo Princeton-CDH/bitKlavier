@@ -123,6 +123,10 @@ public:
     //void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
     
     void fillSampleCB();
+    void fillPianoCB()
+    {
+        header.fillPianoCB();
+    }
 private:
 
 #define MVC_REFRESH_RATE 20

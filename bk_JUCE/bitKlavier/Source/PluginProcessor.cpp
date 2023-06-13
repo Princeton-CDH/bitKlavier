@@ -2204,7 +2204,10 @@ void BKAudioProcessor::hiResTimerCallback()
         b->prep->stepModdables();
     }
 }
-
+BKAudioProcessorEditor* BKAudioProcessor::getBKEditor()
+{
+    return editor;
+}
 void BKAudioProcessor::reset(BKPreparationType type, int Id)
 {
     if (type == PreparationTypeDirect)
