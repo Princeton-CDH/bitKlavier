@@ -481,7 +481,7 @@ public:
     int findPathAndLoadSamples(String name)
     {
         // name comes in as "soundfont.sf2.subsound1"
-        BKSampleLoadType type = BKLoadLite;
+        BKSampleLoadType type = BKLoadHeavy;
         String path;
         int subsound = 0;
         

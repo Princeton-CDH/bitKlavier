@@ -46,7 +46,7 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
             File file(path);
             if (!file.exists())
             {
-                type = BKLoadLite;
+                type = BKLoadHeavy;
             }
         }
     }

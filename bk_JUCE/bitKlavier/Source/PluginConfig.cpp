@@ -129,8 +129,8 @@ void BKAudioProcessor::loadSamplesStartup(void)
         }
         else
         {
-            globalSampleType = BKLoadLite;
-            loadSamples(BKLoadLite);
+            globalSampleType = BKLoadHeavy;
+            loadSamples(BKLoadHeavy);
         }
     }
     else

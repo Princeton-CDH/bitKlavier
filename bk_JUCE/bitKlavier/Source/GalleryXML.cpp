@@ -154,7 +154,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 if (files.isEmpty())
                 {
                     AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, "File Not Found!", "Could not find file '" + soundfont + "' please check that it is in the custom sample or soundfont search path");
-                    processor.globalSampleType = BKLoadLite;
+                    processor.globalSampleType = BKLoadHeavy;
                     processor.globalSoundfont = "default.sf2";
                 } else
                 {
