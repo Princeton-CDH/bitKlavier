@@ -74,7 +74,7 @@ ValueTree  Gallery::getState(void)
     
     //for (int i = 0; i < direct.size(); i++)         galleryVT.addChild( direct[i]->getState(), -1, 0);
     
-    for (int i = 0; i < synchronic.size(); i++)     galleryVT.addChild( synchronic[i]->getState(), -1, 0);
+    for (int i = 0; i < genericPrep[PreparationTypeSynchronic]->size(); i++)      galleryVT.addChild( genericPrep[PreparationTypeSynchronic]->getUnchecked(i)->getState(), -1, 0);
     
     for (int i = 0; i < nostalgic.size(); i++)      galleryVT.addChild( nostalgic[i]->getState(), -1, 0);
     
@@ -202,14 +202,25 @@ void Gallery::setStateFromXML(XmlElement* xml)
             }
             else if (e->hasTagName( vtagSynchronic))
             {
-                addSynchronicWithId(0);
-                
-                synchronic.getLast()->setState(e);
-                
-                int oldId = synchronic.getLast()->getId();
-                int newId = transformId(PreparationTypeSynchronic, oldId);
-                
-                synchronic.getLast()->setId(newId);
+                DBG(name);
+                GenericPreparation::Ptr synchronic = new SynchronicPreparation(e); //addGenericPreparation(PreparationTypeSynchronic,0);
+                bool add = true;
+                DBG(name + " " + String(synchronic->getId()));
+                for(auto* prep : *getAllPreparationsOfType(PreparationTypeSynchronic))
+                {
+                    if(prep->getId() == synchronic->getId())
+                    {
+                        add = false;
+                        break;
+                    }
+                }
+                if(add) addGenericPreparation(PreparationTypeSynchronic, synchronic);
+//                synchronic->setState(e);
+//
+//                int oldId = synchronic->getId();
+//                int newId = transformId(PreparationTypeSynchronic, oldId);
+//
+//                synchronic->setId(newId);
             }
             else if (e->hasTagName( vtagModSynchronic))
             {

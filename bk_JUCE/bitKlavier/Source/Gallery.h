@@ -45,9 +45,7 @@ public:
         
         s += "nostalgic";
         for (auto item : nostalgic) s += (" " + String(item->getId()));
-        
-        s += "\nsynchronic";
-        for (auto item : synchronic) s += (" " + String(item->getId()));
+    
         
         s += "\ntuning";
         for (auto item : tuning) s += (" " + String(item->getId()));
@@ -117,9 +115,9 @@ public:
         for (auto p : tuning) { if (p->getId() == -1) { add = false; break;} }
         if (add) addTuningWithId(-1);
         
-        add = true;
-        for (auto p : synchronic) { if (p->getId() == -1) { add = false; break;} }
-        if (add) addSynchronicWithId(-1);
+//        add = true;
+//        for (auto p : synchronic) { if (p->getId() == -1) { add = false; break;} }
+//        if (add) addSynchronicWithId(-1);
         
         add = true;
         for (auto p : nostalgic) { if (p->getId() == -1) { add = false; break;} }
@@ -142,6 +140,7 @@ public:
             if (p->getId() == -1) { add = false; break; }
         }
         if (add) addGenericPreparation(PreparationTypeResonance,-1);
+        add = true;
         
         for (auto p : *genericPrep[PreparationTypeDirect])
         {
@@ -149,8 +148,16 @@ public:
         }
         if (add) addGenericPreparation(PreparationTypeDirect,-1);
         
+        add = true;
+        for (auto p : *genericPrep[PreparationTypeSynchronic])
+        {
+            if (p->getId() == -1) { add = false; break; }
+        }
+        if (add) addGenericPreparation(PreparationTypeSynchronic,-1);
+        add = true;
         for (auto prepArray : genericPrep)
         {
+            add = true;
             if (prepArray->isEmpty()) continue;
             for (auto prep : *prepArray)
             {
@@ -182,7 +189,6 @@ public:
     inline const bool isGalleryDirty(void) const noexcept {return isDirty; }
     void setGalleryDirty(bool dirt) {isDirty = dirt;}
     
-    inline const int getNumSynchronic(void) const noexcept {return synchronic.size();}
     inline const int getNumNostalgic(void) const noexcept {return nostalgic.size();}
     inline const int getNumTempo(void) const noexcept {return tempo.size();}
     inline const int getNumTuning(void) const noexcept {return tuning.size();}
@@ -246,10 +252,6 @@ public:
         return tuning;
     }
     
-    inline const Synchronic::PtrArr getAllSynchronic(void) const noexcept
-    {
-        return synchronic;
-    }
     
     inline const Nostalgic::PtrArr getAllNostalgic(void) const noexcept
     {
@@ -296,14 +298,6 @@ public:
     }
     
     
-    inline Synchronic::Ptr matches(SynchronicPreparation::Ptr prep)
-    {
-        for (auto p : synchronic)
-        {
-            if (p->prep->compare(prep)) return p;
-        }
-        return nullptr;
-    }
     
     inline Nostalgic::Ptr matches(NostalgicPreparation::Ptr prep)
     {
@@ -367,17 +361,7 @@ public:
         return names;
     }
     
-    inline const StringArray getAllSynchronicNames(void) const noexcept
-    {
-        StringArray names;
-        
-        for (auto prep : synchronic)
-        {
-            names.add(prep->getName());
-        }
-        
-        return names;
-    }
+
     
     
     inline const StringArray getAllPreparationNamesOfType(BKPreparationType thisType)
@@ -469,7 +453,7 @@ public:
         
         for (auto mod : modSynchronic)
         {
-            names.add(mod->getName());
+            names.add(mod->_getName());
         }
         
         return names;
@@ -510,18 +494,6 @@ public:
 
 		return names;
 	}
-    
-    
-    
-    inline const SynchronicPreparation::Ptr getSynchronicPreparation(int Id) const noexcept
-    {
-        for (auto p : synchronic)
-        {
-            if (p->getId() == Id)   return p->prep;
-        }
-        return nullptr;
-    }
-    
     
     inline const NostalgicPreparation::Ptr getNostalgicPreparation(int Id) const noexcept
     {
@@ -565,15 +537,7 @@ public:
  
     
     
-    inline const Synchronic::Ptr getSynchronic(int Id) const noexcept
-    {
-
-        for (auto p : synchronic)
-        {
-            if (p->getId() == Id)   return p;
-        }
-        return nullptr;
-    }
+    
     
     inline const Nostalgic::Ptr getNostalgic(int Id) const noexcept
     {
@@ -791,7 +755,6 @@ public:
     
     void clean(void);
     
-    void addSynchronicWithId(int Id);
     void addNostalgicWithId(int Id);
     void addTuningWithId(int Id);
     void addTempoWithId(int Id);
@@ -844,7 +807,7 @@ public:
                 return p;
             }
         }
-        return nullptr;
+        return addGenericPreparation(thisType, Id);
     }
     
     
@@ -858,7 +821,6 @@ private:
     
     
     
-    Synchronic::PtrArr                  synchronic;
     Nostalgic::PtrArr                   nostalgic;
     Tuning::PtrArr                      tuning;
     Tempo::PtrArr                       tempo;
@@ -886,9 +848,6 @@ private:
     GenericPreparation::Ptr addGenericPreparation(BKPreparationType thisType, int Id);
     
     
-    void addSynchronic(void);
-    void addSynchronic(Synchronic::Ptr);
-    void addSynchronic(SynchronicPreparation::Ptr);
     
     void addNostalgic(void);
     void addNostalgic(Nostalgic::Ptr);
@@ -941,7 +900,6 @@ private:
     void addResonanceMod(ResonanceModification::Ptr);
 	void addBlendronicMod(BlendronicModification::Ptr);
     
-    void removeSynchronic(int Id);
     void removeNostalgic(int Id);
     void removeTuning(int Id);
     void removeTempo(int Id);

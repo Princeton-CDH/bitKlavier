@@ -124,7 +124,7 @@ void Piano::deconfigure(void)
 void Piano::configure(void)
 {
     deconfigure();
-    
+    processor.gallery->addDefaultPrepIfNotThere();
     defaultT = getProcessorOfType(DEFAULT_ID, PreparationTypeTuning);
     
     defaultM = getProcessorOfType(DEFAULT_ID, PreparationTypeTempo);
@@ -133,7 +133,7 @@ void Piano::configure(void)
     
     //defaultB = getBlendronicProcessor(DEFAULT_ID);
 
-    defaultR = getProcessorOfType(DEFAULT_ID, PreparationTypeResonance);
+    //defaultR = getProcessorOfType(DEFAULT_ID, PreparationTypeResonance);
     
     //test of resonance preparation - make a default resonance and link it to a piano and tuning
     //ResonancePreparation::Ptr testResPrep = new ResonancePreparation();
@@ -233,7 +233,7 @@ void Piano::configure(void)
                 
                 if (targetType == PreparationTypeNostalgic)
                 {
-                    linkNostalgicWithSynchronic(processor.gallery->getNostalgic(targetId), processor.gallery->getSynchronic(Id));
+                    linkNostalgicWithSynchronic(processor.gallery->getNostalgic(targetId), processor.gallery->getPreparationOfType(PreparationTypeSynchronic,Id));
                 }
             }
         }
@@ -273,7 +273,7 @@ void Piano::configure(void)
 
 GenericProcessor::Ptr Piano::addSynchronicProcessor(int thisId)
 {
-    SynchronicProcessor::Ptr sproc = new SynchronicProcessor(processor.gallery->getSynchronic(thisId),
+    SynchronicProcessor::Ptr sproc = new SynchronicProcessor(processor.gallery->getPreparationOfType(PreparationTypeSynchronic,thisId),
                                         defaultT,
                                         defaultM,
                                         processor,
@@ -518,7 +518,7 @@ void Piano::add(BKItem::Ptr item, bool configureIfAdded)
                 
                 if (targetType == PreparationTypeNostalgic)
                 {
-                    linkNostalgicWithSynchronic(processor.gallery->getNostalgic(targetId), processor.gallery->getSynchronic(Id));
+                    linkNostalgicWithSynchronic(processor.gallery->getNostalgic(targetId), processor.gallery->getPreparationOfType(PreparationTypeSynchronic,Id));
                 }
             }
         }
@@ -590,7 +590,7 @@ void Piano::linkPreparationWithTempo(BKPreparationType thisType, int thisId, Tem
 //    }
 }
 
-void Piano::linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, Synchronic::Ptr synchronic)
+void Piano::linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, SynchronicPreparation::Ptr synchronic)
 {
     NostalgicProcessor::Ptr proc = getProcessorOfType(nostalgic->getId(), PreparationTypeNostalgic);
     

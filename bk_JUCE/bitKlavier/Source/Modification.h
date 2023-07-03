@@ -162,7 +162,7 @@ private:
 
 class SynchronicModification :
 public Modification,
-public SynchronicPreparation
+public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<SynchronicModification>   Ptr;
@@ -187,15 +187,17 @@ public:
     {
         _setName(mod->_getName() + "copy");
         altMod = mod->altMod;
-        SynchronicPreparation::copy(mod);
+        prep->copy(mod->getPrep());
     }
-    
+    void resetModdables() {prep->resetModdables();}
     ValueTree getState(void);
     void setState(XmlElement* e);
     void setStateOld(XmlElement* e);
+    SynchronicPreparation::Ptr getPrep() {return prep;}
+    SynchronicPreparation* getPrepPtr() {return dynamic_cast<SynchronicPreparation*>(prep.get());}
     
 private:
-    
+    SynchronicPreparation::Ptr prep;
     JUCE_LEAK_DETECTOR(SynchronicModification)
 };
 

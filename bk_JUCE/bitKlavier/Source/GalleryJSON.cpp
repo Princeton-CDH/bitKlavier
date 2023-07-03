@@ -48,16 +48,18 @@ void Gallery::setStateFromJson(var myJson)
     
     int pianoMapId = 1;
     addGenericPreparation(PreparationTypeDirect, getNewId(PreparationTypeDirect));
+    addGenericPreparation(PreparationTypeSynchronic, getNewId(PreparationTypeSynchronic));
     //addDirect();
     addTuning();
     addTempo();
-    addSynchronic();
+    //addSynchronic();
     addNostalgic();
 
     DirectPreparation::Ptr defaultDirect = genericPrep[PreparationTypeDirect]->getLast();
     Tuning::Ptr defaultTuning = tuning.getLast();
     Tempo::Ptr defaultTempo = tempo.getLast();
-    Synchronic::Ptr defaultSynchronic = synchronic.getLast();
+    //Synchronic::Ptr defaultSynchronic = synchronic.getLast();
+    SynchronicPreparation::Ptr defaultSynchronic = genericPrep[PreparationTypeSynchronic]->getLast();
     Nostalgic::Ptr defaultNostalgic = nostalgic.getLast();
     
     
@@ -72,7 +74,7 @@ void Gallery::setStateFromJson(var myJson)
             Tuning::Ptr directTuning;
             Tuning::Ptr synchronicTuning;
             Tuning::Ptr nostalgicTuning;
-            Synchronic::Ptr synchronicTarget;
+            SynchronicPreparation::Ptr synchronicTarget;
             Nostalgic::Ptr nostalgicTarget;
             BKItem* directTuningItem;
             BKItem* nostalgicTuningItem;
@@ -237,8 +239,8 @@ void Gallery::setStateFromJson(var myJson)
                     }
                     tId = synchronicTuning->getId();
                     
-                    SynchronicPreparation::Ptr syncPrep = new SynchronicPreparation();
-                    
+                    SynchronicPreparation::Ptr prep = new SynchronicPreparation(getNewId(PreparationTypeSynchronic));
+                    SynchronicPreparation* syncPrep = dynamic_cast<SynchronicPreparation*>(prep.get());
                     Array<float> accents;
                     var am =  jsonGetProperty(sx+"accentsList");
                     for (int c = 0; c < am.size(); c++) accents.add(am[c]);
@@ -336,11 +338,11 @@ void Gallery::setStateFromJson(var myJson)
                     
                     syncPrep->sLengthMultipliers.set(lens);
                     
-                    Synchronic::Ptr thisSynchronic = matches(syncPrep);
+                    SynchronicPreparation::Ptr thisSynchronic = matches(syncPrep);
                     if (thisSynchronic == nullptr)
                     {
-                        addSynchronic(syncPrep);
-                        thisSynchronic = synchronic.getLast();
+                        addGenericPreparation(PreparationTypeSynchronic, syncPrep);
+                        thisSynchronic = getAllPreparationsOfType(PreparationTypeSynchronic)->getLast();
                     }
                     synchronicTarget = thisSynchronic;
                     sId = thisSynchronic->getId();
@@ -518,7 +520,7 @@ void Gallery::setStateFromJson(var myJson)
                     
                     if (!isOld) reverseSyncTarget = jsonGetValue(nx+"reverseSyncTarget");
                     
-                    Synchronic::Ptr thisSynchronic;
+                    SynchronicPreparation::Ptr thisSynchronic;
                     
                     if (reverseSyncMode)
                     {

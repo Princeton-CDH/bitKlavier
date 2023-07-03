@@ -1480,7 +1480,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    SynchronicPreparation::Ptr prep = gallery->getSynchronic(target)->prep;
+                    SynchronicPreparation* prep = dynamic_cast<SynchronicPreparation*>( gallery->getPreparationOfType(PreparationTypeSynchronic, target).get());
                     prep->performModification(mod, mod->getDirty());
                 }
                 updateState->synchronicPreparationDidChange = true;
@@ -2017,9 +2017,9 @@ void BKAudioProcessor::hiResTimerCallback()
     {
         r->stepModdables();
     }
-    for (auto s : gallery->getAllSynchronic())
+    for (auto s : *gallery->getAllPreparationsOfType(PreparationTypeSynchronic))
     {
-        s->prep->stepModdables();
+        s->stepModdables();
     }
     for (auto t : gallery->getAllTuning())
     {
@@ -2096,7 +2096,7 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeSynchronic)
     {
-        gallery->getSynchronic(Id)->clear();
+        gallery->getPreparationOfType(PreparationTypeSynchronic, Id)->clear();
         
         SynchronicProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         

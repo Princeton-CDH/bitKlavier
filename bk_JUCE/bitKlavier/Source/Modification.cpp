@@ -159,29 +159,29 @@ void DirectModification::setStateOld(XmlElement* e)
 
 SynchronicModification::SynchronicModification(BKAudioProcessor& processor, int Id):
 Modification(processor, Id, SynchronicParameterTypeNil),
-SynchronicPreparation()
+prep(new SynchronicPreparation(-1))
 {
 
 }
 
 ValueTree SynchronicModification::getState(void)
 {
-    ValueTree prep(vtagModSynchronic);
+    ValueTree _prep(vtagModSynchronic);
     
-    prep.setProperty( "Id", Id, 0);
-    prep.setProperty( "name", getName(), 0);
-    prep.setProperty("alt", altMod, 0);
+    _prep.setProperty( "Id", Id, 0);
+    _prep.setProperty( "name", _getName(), 0);
+    _prep.setProperty("alt", altMod, 0);
     ValueTree dirtyVT( "dirty");
     int count = 0;
     for (auto b : dirty)
     {
         dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
     }
-    prep.addChild(dirtyVT, -1, 0);
+    _prep.addChild(dirtyVT, -1, 0);
     
-    prep.addChild(SynchronicPreparation::getState(), -1, 0);
+    _prep.addChild(prep->getState(), -1, 0);
     
-    return prep;
+    return _prep;
 }
 
 void SynchronicModification::setState(XmlElement* e)
@@ -192,8 +192,8 @@ void SynchronicModification::setState(XmlElement* e)
     
     altMod = e->getBoolAttribute("alt", false);
     
-    if (n != String())     setName(n);
-    else                        setName(String(Id));
+    if (n != String())     _setName(n);
+    else                        _setName(String(Id));
     
     XmlElement* dirtyXml = e->getChildByName("dirty");
     XmlElement* paramsXml = e->getChildByName("params");
@@ -212,13 +212,13 @@ void SynchronicModification::setState(XmlElement* e)
             }
         }
         
-        SynchronicPreparation::setState(paramsXml);
-        if (!sUseGlobalSoundSet.value)
+        prep->setState(paramsXml);
+        if (!prep->useGlobalSoundSet.value)
         {
             // comes in as "soundfont.sf2.subsound1"
-            String name = sSoundSetName.value;
+            String name = prep->soundSetName.value;
             int Id = processor.findPathAndLoadSamples(name);
-            setSoundSet(Id);
+            prep->setSoundSet(Id);
         }
     }
     else
@@ -232,53 +232,53 @@ void SynchronicModification::setStateOld(XmlElement* e)
     reset();
     
     float f;
-    
+    SynchronicPreparation* _prep = getPrepPtr();
     String p = e->getStringAttribute(ptagSynchronic_numBeats);
     if (p != "")
     {
-        sNumBeats.set(p.getIntValue());
+        _prep->sNumBeats.set(p.getIntValue());
         setDirty(SynchronicNumPulses);
     }
     
     p = e->getStringAttribute(ptagSynchronic_clusterMin);
     if (p != "")
     {
-        sClusterMin.set(p.getIntValue());
+        _prep->sClusterMin.set(p.getIntValue());
         setDirty(SynchronicClusterMin);
     }
     
     p = e->getStringAttribute(ptagSynchronic_clusterMax);
     if (p != "")
     {
-        sClusterMax.set(p.getIntValue());
+        _prep->sClusterMax.set(p.getIntValue());
         setDirty(SynchronicClusterMax);
     }
     
     p = e->getStringAttribute(ptagSynchronic_clusterThresh);
     if (p != "")
     {
-        setClusterThresh(p.getFloatValue());
+        _prep->setClusterThresh(p.getFloatValue());
         setDirty(SynchronicClusterThresh);
     }
     
     p = e->getStringAttribute(ptagSynchronic_mode);
     if (p != "")
     {
-        sMode.set((SynchronicSyncMode) p.getIntValue());
+        _prep->sMode.set((SynchronicSyncMode) p.getIntValue());
         setDirty(SynchronicMode);
     }
     
     p = e->getStringAttribute(ptagSynchronic_beatsToSkip);
     if (p != "")
     {
-        sBeatsToSkip.set(p.getIntValue());
+        _prep->sBeatsToSkip.set(p.getIntValue());
         setDirty(SynchronicBeatsToSkip);
     }
     
     p = e->getStringAttribute(ptagSynchronic_gain);
     if (p != "")
     {
-        sGain.set(p.getFloatValue());
+        prep->defaultGain.set(p.getFloatValue());
         setDirty(SynchronicGain);
     }
     
@@ -300,7 +300,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 }
             }
             
-            sBeatMultipliers.set(beats);
+            _prep->sBeatMultipliers.set(beats);
             setDirty(SynchronicBeatMultipliers);
             
         }
@@ -319,7 +319,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 }
             }
             
-            sAccentMultipliers.set(accents);
+            _prep->sAccentMultipliers.set(accents);
             setDirty(SynchronicAccentMultipliers);
             
         }
@@ -338,7 +338,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 }
             }
             
-            sLengthMultipliers.set(lens);
+            _prep->sLengthMultipliers.set(lens);
             setDirty(SynchronicLengthMultipliers);
             
         }
@@ -366,7 +366,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 }
             }
             
-            sTransposition.set(atransp);
+            _prep->sTransposition.set(atransp);
             setDirty(SynchronicTranspOffsets);
             
         }
@@ -394,7 +394,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
                 }
             }
             
-            sADSRs.set(aenvs);
+            _prep->sADSRs.set(aenvs);
             setDirty(SynchronicADSRs);
         }
     }

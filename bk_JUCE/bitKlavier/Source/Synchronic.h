@@ -22,128 +22,13 @@
 #include "GenericProcessor.h"
 class SynchronicModification;
 
-class SynchronicPreparation : public ReferenceCountedObject
+class SynchronicPreparation : public GenericPreparation
 {
     
 public:
-    typedef ReferenceCountedObjectPtr<SynchronicPreparation>   Ptr;
-    typedef Array<SynchronicPreparation::Ptr>                  PtrArr;
-    typedef Array<SynchronicPreparation::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<SynchronicPreparation>                  Arr;
-    typedef OwnedArray<SynchronicPreparation, CriticalSection> CSArr;
-    
-    // Copy Constructor
-    SynchronicPreparation(SynchronicPreparation::Ptr s) :
-    sGain(s->sGain),
-    sBlendronicGain(s->sBlendronicGain),
-    sTempo(s->sTempo),
-    sNumBeats(s->sNumBeats),
-    sClusterMin(s->sClusterMin),
-    sClusterMax(s->sClusterMax),
-    sClusterCap(s->sClusterCap),
-    numClusters(s->numClusters),
-    holdMin(s->holdMin),
-    holdMax(s->holdMax),
-    velocityMin(s->velocityMin),
-    velocityMax(s->velocityMax),
-    sMode(s->sMode),
-    sBeatsToSkip(s->sBeatsToSkip),
-    onOffMode(s->onOffMode),
-    sBeatMultipliers(s->sBeatMultipliers),
-    sAccentMultipliers(s->sAccentMultipliers),
-    sLengthMultipliers(s->sLengthMultipliers),
-    sTransposition(s->sTransposition),
-    sBeatMultipliersStates(s->sBeatMultipliersStates),
-    sAccentMultipliersStates(s->sAccentMultipliersStates),
-    sLengthMultipliersStates(s->sLengthMultipliersStates),
-    sTranspositionStates(s->sTranspositionStates),
-    sTranspUsesTuning(s->sTranspUsesTuning),
-    sADSRs(s->sADSRs),
-    sClusterThresh(s->sClusterThresh),
-    sClusterThreshSec(s->sClusterThreshSec),
-    sReleaseVelocitySetsSynchronic(s->sReleaseVelocitySetsSynchronic),
-    midiOutput(s->midiOutput),
-    sUseGlobalSoundSet(s->sUseGlobalSoundSet),
-    sSoundSet(s->sSoundSet),
-    sSoundSetName(s->sSoundSetName),
-    targetTypeSynchronicPatternSync(s->getTargetTypeSynchronicPatternSync()),
-    targetTypeSynchronicBeatSync(s->getTargetTypeSynchronicBeatSync()),
-    targetTypeSynchronicAddNotes(s->getTargetTypeSynchronicAddNotes()),
-    targetTypeSynchronicPausePlay(s->getTargetTypeSynchronicPausePlay()),
-    targetTypeSynchronicClear(s->getTargetTypeSynchronicClear()),
-    targetTypeSynchronicDeleteOldest(s->getTargetTypeSynchronicDeleteOldest()),
-    targetTypeSynchronicDeleteNewest(s->getTargetTypeSynchronicDeleteNewest()),
-    targetTypeSynchronicRotate(s->getTargetTypeSynchronicRotate())
-    {
-    }
-    
-                        
-    SynchronicPreparation(int numBeats,
-                          int clusterMin,
-                          int clusterMax,
-                          float clusterThresh,
-                          SynchronicSyncMode mode,
-                          bool velocityMode,
-                          int beatsToSkip,
-                          Array<float> beatMultipliers,
-                          Array<float> accentMultipliers,
-                          Array<float> lengthMultipliers,
-                          Array<Array<float>> transp):
-    sGain(1.0f),
-    sBlendronicGain(1.0f),
-    sTempo(120),
-    sNumBeats(numBeats),
-    sClusterMin(clusterMin),
-    sClusterMax(clusterMax),
-    sClusterCap(8),
-    numClusters(1),
-    holdMin(0),
-    holdMax(12000),
-    velocityMin(0),
-    velocityMax(127),
-    sMode(mode),
-    sBeatsToSkip(beatsToSkip),
-    onOffMode(KeyOn),
-    sBeatMultipliers(beatMultipliers),
-    sAccentMultipliers(accentMultipliers),
-    sLengthMultipliers(lengthMultipliers),
-    sTransposition(transp),
-    sBeatMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    sAccentMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    sLengthMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    sTranspositionStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
-    sTranspUsesTuning(false),
-    sADSRs(Array<Array<float>>(0.0f)),
-    sClusterThresh(clusterThresh),
-    sClusterThreshSec(.001 * sClusterThresh.base),
-    sReleaseVelocitySetsSynchronic(velocityMode),
-    midiOutput(nullptr),
-    sUseGlobalSoundSet(true),
-    sSoundSet(-1),
-    sSoundSetName(String()),
-    targetTypeSynchronicPatternSync(NoteOn),
-    targetTypeSynchronicBeatSync(NoteOn),
-    targetTypeSynchronicAddNotes(NoteOn),
-    targetTypeSynchronicPausePlay(NoteOn),
-    targetTypeSynchronicClear(NoteOn),
-    targetTypeSynchronicDeleteOldest(NoteOn),
-    targetTypeSynchronicDeleteNewest(NoteOn),
-    targetTypeSynchronicRotate(NoteOn)
-    {
-        Array<Array<float>> aa;
-        for (int i = 0; i < 12; ++i)
-        {
-            // A D S R active
-            Array<float> a(3, 3, 1, 30, float(i == 0));
-            aa.add(a);
-        }
-        sADSRs.set(aa);
-    }
 
-    
-    SynchronicPreparation(void):
-    sGain(0.0, true),
-    sBlendronicGain(0.0, true),
+    // Copy Constructor
+    SynchronicPreparation(int newId, SynchronicPreparation::Ptr s) :
     sTempo(120.f),
     sNumBeats(20),
     sClusterMin(1),
@@ -181,7 +66,117 @@ public:
     targetTypeSynchronicClear(NoteOn),
     targetTypeSynchronicDeleteOldest(NoteOn),
     targetTypeSynchronicDeleteNewest(NoteOn),
-    targetTypeSynchronicRotate(NoteOn)
+    targetTypeSynchronicRotate(NoteOn),
+    GenericPreparation(BKPreparationType::PreparationTypeSynchronic, newId)
+    {
+        copy(s);
+    }
+    
+                        
+    SynchronicPreparation(int newId, int numBeats,
+                          int clusterMin,
+                          int clusterMax,
+                          float clusterThresh,
+                          SynchronicSyncMode mode,
+                          bool velocityMode,
+                          int beatsToSkip,
+                          Array<float> beatMultipliers,
+                          Array<float> accentMultipliers,
+                          Array<float> lengthMultipliers,
+                          Array<Array<float>> transp):
+    sTempo(120),
+    sNumBeats(numBeats),
+    sClusterMin(clusterMin),
+    sClusterMax(clusterMax),
+    sClusterCap(8),
+    numClusters(1),
+    holdMin(0),
+    holdMax(12000),
+    velocityMin(0),
+    velocityMax(127),
+    sMode(mode),
+    sBeatsToSkip(beatsToSkip),
+    onOffMode(KeyOn),
+    sBeatMultipliers(beatMultipliers),
+    sAccentMultipliers(accentMultipliers),
+    sLengthMultipliers(lengthMultipliers),
+    sTransposition(transp),
+    sBeatMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sAccentMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sLengthMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sTranspositionStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sTranspUsesTuning(false),
+    sADSRs(Array<Array<float>>(0.0f)),
+    sClusterThresh(clusterThresh),
+    sClusterThreshSec(.001 * sClusterThresh.base),
+    sReleaseVelocitySetsSynchronic(velocityMode),
+    midiOutput(nullptr),
+    sUseGlobalSoundSet(true),
+    sSoundSet(-1),
+    sSoundSetName(String()),
+    targetTypeSynchronicPatternSync(NoteOn),
+    targetTypeSynchronicBeatSync(NoteOn),
+    targetTypeSynchronicAddNotes(NoteOn),
+    targetTypeSynchronicPausePlay(NoteOn),
+    targetTypeSynchronicClear(NoteOn),
+    targetTypeSynchronicDeleteOldest(NoteOn),
+    targetTypeSynchronicDeleteNewest(NoteOn),
+    targetTypeSynchronicRotate(NoteOn),
+    GenericPreparation(BKPreparationType::PreparationTypeDirect, newId)
+    {
+        Array<Array<float>> aa;
+        for (int i = 0; i < 12; ++i)
+        {
+            // A D S R active
+            Array<float> a(3, 3, 1, 30, float(i == 0));
+            aa.add(a);
+        }
+        sADSRs.set(aa);
+    }
+
+    
+
+    SynchronicPreparation(int newId):
+
+    sTempo(120.f),
+    sNumBeats(20),
+    sClusterMin(1),
+    sClusterMax(12),
+    sClusterCap(8), //8 in original bK, but behavior is different here?
+    numClusters(1),
+    holdMin(0),
+    holdMax(12000),
+    velocityMin(0),
+    velocityMax(127),
+    sMode(FirstNoteOnSync),
+    sBeatsToSkip(0),
+    onOffMode(KeyOn),
+    sBeatMultipliers(Array<float>({1.0})),
+    sAccentMultipliers(Array<float>({1.0})),
+    sLengthMultipliers(Array<float>({1.0})),
+    sTransposition(Array<Array<float>>(0.0f)),
+    sBeatMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sAccentMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sLengthMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sTranspositionStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sTranspUsesTuning(false),
+    sADSRs(Array<Array<float>>(0.0f)),
+    sClusterThresh(500),
+    sClusterThreshSec(.001 * sClusterThresh.base),
+    sReleaseVelocitySetsSynchronic(false),
+    midiOutput(nullptr),
+    sUseGlobalSoundSet(true),
+    sSoundSet(-1),
+    sSoundSetName(String()),
+    targetTypeSynchronicPatternSync(NoteOn),
+    targetTypeSynchronicBeatSync(NoteOn),
+    targetTypeSynchronicAddNotes(NoteOn),
+    targetTypeSynchronicPausePlay(NoteOn),
+    targetTypeSynchronicClear(NoteOn),
+    targetTypeSynchronicDeleteOldest(NoteOn),
+    targetTypeSynchronicDeleteNewest(NoteOn),
+    targetTypeSynchronicRotate(NoteOn),
+    GenericPreparation(BKPreparationType::PreparationTypeSynchronic, newId)
     {
         Array<Array<float>> aa;
         for (int i = 0; i < 12; ++i)
@@ -193,64 +188,119 @@ public:
         sADSRs.set(aa);
     }
     
+    
+    SynchronicPreparation(XmlElement *e):
+
+    sTempo(120.f),
+    sNumBeats(20),
+    sClusterMin(1),
+    sClusterMax(12),
+    sClusterCap(8), //8 in original bK, but behavior is different here?
+    numClusters(1),
+    holdMin(0),
+    holdMax(12000),
+    velocityMin(0),
+    velocityMax(127),
+    sMode(FirstNoteOnSync),
+    sBeatsToSkip(0),
+    onOffMode(KeyOn),
+    sBeatMultipliers(Array<float>({1.0})),
+    sAccentMultipliers(Array<float>({1.0})),
+    sLengthMultipliers(Array<float>({1.0})),
+    sTransposition(Array<Array<float>>(0.0f)),
+    sBeatMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sAccentMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sLengthMultipliersStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sTranspositionStates(Array<bool>({true, false, false, false, false, false, false, false, false, false, false, false, })),
+    sTranspUsesTuning(false),
+    sADSRs(Array<Array<float>>(0.0f)),
+    sClusterThresh(500),
+    sClusterThreshSec(.001 * sClusterThresh.base),
+    sReleaseVelocitySetsSynchronic(false),
+    midiOutput(nullptr),
+    sUseGlobalSoundSet(true),
+    sSoundSet(-1),
+    sSoundSetName(String()),
+    targetTypeSynchronicPatternSync(NoteOn),
+    targetTypeSynchronicBeatSync(NoteOn),
+    targetTypeSynchronicAddNotes(NoteOn),
+    targetTypeSynchronicPausePlay(NoteOn),
+    targetTypeSynchronicClear(NoteOn),
+    targetTypeSynchronicDeleteOldest(NoteOn),
+    targetTypeSynchronicDeleteNewest(NoteOn),
+    targetTypeSynchronicRotate(NoteOn),
+    GenericPreparation(BKPreparationType::PreparationTypeSynchronic, e)
+    {
+        setState(e);
+        Array<Array<float>> aa;
+        for (int i = 0; i < 12; ++i)
+        {
+            // A D S R active
+            Array<float> a(3, 3, 1, 30, float(i == 0));
+            aa.add(a);
+        }
+        sADSRs.set(aa);
+    }
     inline void copy(SynchronicPreparation::Ptr s)
     {
-        sNumBeats = s->sNumBeats;
-        sClusterMin = s->sClusterMin;
-        sClusterMax = s->sClusterMax;
-        sClusterCap = s->sClusterCap;
-        sMode = s->sMode;
-        sBeatsToSkip = s->sBeatsToSkip;
-        sBeatMultipliers = s->sBeatMultipliers;
-        sAccentMultipliers = s->sAccentMultipliers;
-        sLengthMultipliers = s->sLengthMultipliers;
-        sGain = s->sGain;
-        sBlendronicGain = s->sBlendronicGain;
+        SynchronicPreparation* _s = dynamic_cast<SynchronicPreparation*>(s.get());
         
-        sTransposition = s->sTransposition;
-        sClusterThresh = s->sClusterThresh;
-        sClusterThreshSec = s->sClusterThreshSec;
-        sReleaseVelocitySetsSynchronic = s->sReleaseVelocitySetsSynchronic;
         
-        sBeatMultipliersStates = s->sBeatMultipliersStates;
-        sAccentMultipliersStates = s->sAccentMultipliersStates;
-        sLengthMultipliersStates = s->sLengthMultipliersStates;
-        sTranspositionStates = s->sTranspositionStates;
+        sNumBeats = _s->sNumBeats;
+        sClusterMin = _s->sClusterMin;
+        sClusterMax = _s->sClusterMax;
+        sClusterCap = _s->sClusterCap;
+        sMode = _s->sMode;
+        sBeatsToSkip = _s->sBeatsToSkip;
+        sBeatMultipliers = _s->sBeatMultipliers;
+        sAccentMultipliers = _s->sAccentMultipliers;
+        sLengthMultipliers = _s->sLengthMultipliers;
         
-        sTranspUsesTuning = s->sTranspUsesTuning;
         
-        sADSRs = s->sADSRs;
+        sTransposition = _s->sTransposition;
+        sClusterThresh = _s->sClusterThresh;
+        sClusterThreshSec = _s->sClusterThreshSec;
+        sReleaseVelocitySetsSynchronic = _s->sReleaseVelocitySetsSynchronic;
         
-        numClusters = s->numClusters;
-        onOffMode = s->onOffMode;
+        sBeatMultipliersStates = _s->sBeatMultipliersStates;
+        sAccentMultipliersStates = _s->sAccentMultipliersStates;
+        sLengthMultipliersStates = _s->sLengthMultipliersStates;
+        sTranspositionStates = _s->sTranspositionStates;
         
-        holdMin = s->holdMin;
-        holdMax = s->holdMax;
+        sTranspUsesTuning = _s->sTranspUsesTuning;
         
-        velocityMin = s->velocityMin;
-        velocityMax = s->velocityMax;
+        sADSRs = _s->sADSRs;
         
-        targetTypeSynchronicPatternSync = s->getTargetTypeSynchronicPatternSync();
-        targetTypeSynchronicBeatSync = s->getTargetTypeSynchronicBeatSync();
-        targetTypeSynchronicAddNotes = s->getTargetTypeSynchronicAddNotes();
-        targetTypeSynchronicPausePlay = s->getTargetTypeSynchronicPausePlay();
-        targetTypeSynchronicClear = s->getTargetTypeSynchronicClear();
-        targetTypeSynchronicDeleteOldest = s->getTargetTypeSynchronicDeleteOldest();
-        targetTypeSynchronicDeleteNewest = s->getTargetTypeSynchronicDeleteNewest();
-        targetTypeSynchronicRotate = s->getTargetTypeSynchronicRotate();
+        numClusters = _s->numClusters;
+        onOffMode = _s->onOffMode;
         
-        midiOutput = s->midiOutput;
+        holdMin = _s->holdMin;
+        holdMax = _s->holdMax;
         
-        sUseGlobalSoundSet = s->sUseGlobalSoundSet;
-        sSoundSet = s->sSoundSet;
+        velocityMin = _s->velocityMin;
+        velocityMax = _s->velocityMax;
+        
+        targetTypeSynchronicPatternSync = _s->getTargetTypeSynchronicPatternSync();
+        targetTypeSynchronicBeatSync = _s->getTargetTypeSynchronicBeatSync();
+        targetTypeSynchronicAddNotes = _s->getTargetTypeSynchronicAddNotes();
+        targetTypeSynchronicPausePlay = _s->getTargetTypeSynchronicPausePlay();
+        targetTypeSynchronicClear = _s->getTargetTypeSynchronicClear();
+        targetTypeSynchronicDeleteOldest = _s->getTargetTypeSynchronicDeleteOldest();
+        targetTypeSynchronicDeleteNewest = _s->getTargetTypeSynchronicDeleteNewest();
+        targetTypeSynchronicRotate = _s->getTargetTypeSynchronicRotate();
+        
+        midiOutput = _s->midiOutput;
+        
+        sUseGlobalSoundSet = _s->sUseGlobalSoundSet;
+        sSoundSet = _s->sSoundSet;
+        GenericPreparation::copy(s);
     }
     
     void performModification(SynchronicModification* s, Array<bool> dirty);
    
     void stepModdables()
     {
-        sGain.step();
-        sBlendronicGain.step();
+        defaultGain.step();
         
         sTempo.step();
         sNumBeats.step();
@@ -297,8 +347,7 @@ public:
     
     void resetModdables()
     {
-        sGain.reset();
-        sBlendronicGain.reset();
+        defaultGain.reset();
         
         sTempo.reset();
         sNumBeats.reset();
@@ -345,6 +394,7 @@ public:
     
     bool compare(SynchronicPreparation::Ptr s)
     {
+        SynchronicPreparation* _s = dynamic_cast<SynchronicPreparation*>(s.get());
         bool lens = true;
         bool accents = true;
         bool beats = true;
@@ -355,36 +405,36 @@ public:
         bool beatsStates = true;
         bool transpStates = true;
         
-        for (int i = s->sLengthMultipliers.value.size(); --i>=0;)
+        for (int i = _s->sLengthMultipliers.value.size(); --i>=0;)
         {
-            if (s->sLengthMultipliers.value[i] != sLengthMultipliers.value[i])
+            if (_s->sLengthMultipliers.value[i] != sLengthMultipliers.value[i])
             {
                 lens = false;
                 break;
             }
         }
         
-        for (int i = s->sAccentMultipliers.value.size(); --i>=0;)
+        for (int i = _s->sAccentMultipliers.value.size(); --i>=0;)
         {
-            if (s->sAccentMultipliers.value[i] != sAccentMultipliers.value[i])
+            if (_s->sAccentMultipliers.value[i] != sAccentMultipliers.value[i])
             {
                 accents = false;
                 break;
             }
         }
         
-        for (int i = s->sBeatMultipliers.value.size(); --i>=0;)
+        for (int i = _s->sBeatMultipliers.value.size(); --i>=0;)
         {
-            if (s->sBeatMultipliers.value[i] != sBeatMultipliers.value[i])
+            if (_s->sBeatMultipliers.value[i] != sBeatMultipliers.value[i])
             {
                 beats = false;
                 break;
             }
         }
         
-        for (int i  = s->sTransposition.value.size(); --i >= 0;)
+        for (int i  = _s->sTransposition.value.size(); --i >= 0;)
         {
-            Array<float> transposition = s->sTransposition.value[i];
+            Array<float> transposition = _s->sTransposition.value[i];
             for (int j = transposition.size(); --j >= 0;)
             {
                 if (transposition[j] != sTransposition.value[i][j])
@@ -395,45 +445,45 @@ public:
             }
         }
         
-        for (int i = s->sLengthMultipliersStates.value.size(); --i>=0;)
+        for (int i = _s->sLengthMultipliersStates.value.size(); --i>=0;)
         {
-            if (s->sLengthMultipliersStates.value[i] != sLengthMultipliersStates.value[i])
+            if (_s->sLengthMultipliersStates.value[i] != sLengthMultipliersStates.value[i])
             {
                 lensStates = false;
                 break;
             }
         }
         
-        for (int i = s->sAccentMultipliersStates.value.size(); --i>=0;)
+        for (int i = _s->sAccentMultipliersStates.value.size(); --i>=0;)
         {
-            if (s->sAccentMultipliersStates.value[i] != sAccentMultipliersStates.value[i])
+            if (_s->sAccentMultipliersStates.value[i] != sAccentMultipliersStates.value[i])
             {
                 accentsStates = false;
                 break;
             }
         }
         
-        for (int i = s->sBeatMultipliersStates.value.size(); --i>=0;)
+        for (int i = _s->sBeatMultipliersStates.value.size(); --i>=0;)
         {
-            if (s->sBeatMultipliersStates.value[i] != sBeatMultipliersStates.value[i])
+            if (_s->sBeatMultipliersStates.value[i] != sBeatMultipliersStates.value[i])
             {
                 beatsStates = false;
                 break;
             }
         }
         
-        for (int i = s->sTranspositionStates.value.size(); --i>=0;)
+        for (int i = _s->sTranspositionStates.value.size(); --i>=0;)
         {
-            if (s->sTranspositionStates.value[i] != sTranspositionStates.value[i])
+            if (_s->sTranspositionStates.value[i] != sTranspositionStates.value[i])
             {
                 transpStates = false;
                 break;
             }
         }
         
-        for (int i  = s->sADSRs.value.size(); --i >= 0;)
+        for (int i  = _s->sADSRs.value.size(); --i >= 0;)
         {
-            Array<float> adsr = s->sADSRs.value[i];
+            Array<float> adsr = _s->sADSRs.value[i];
             for (int j = adsr.size(); --j >= 0;)
             {
                 if (adsr[j] != sADSRs.value[i][j])
@@ -444,33 +494,32 @@ public:
             }
         }
         
-        return (sNumBeats == s->sNumBeats &&
-                sClusterMin == s->sClusterMin &&
-                sClusterMax == s->sClusterMax &&
-                sClusterCap == s->sClusterCap &&
-                sMode == s->sMode &&
+        return (sNumBeats == _s->sNumBeats &&
+                sClusterMin == _s->sClusterMin &&
+                sClusterMax == _s->sClusterMax &&
+                sClusterCap == _s->sClusterCap &&
+                sMode == _s->sMode &&
                 transp && lens && accents && beats && adsr &&
                 transpStates && lensStates && accentsStates && beatsStates &&
-                sGain == s->sGain &&
-                sBlendronicGain == s->sBlendronicGain &&
-                sTranspUsesTuning == s->sTranspUsesTuning &&
-                sClusterThresh == s->sClusterThresh &&
-                sClusterThreshSec == s->sClusterThreshSec &&
-                sReleaseVelocitySetsSynchronic == s->sReleaseVelocitySetsSynchronic &&
-                numClusters == s->numClusters &&
-                onOffMode == s->onOffMode &&
-                holdMin == s->holdMin &&
-                holdMax == s->holdMax &&
-                velocityMin == s->velocityMin &&
-                velocityMax == s->velocityMax &&
-                targetTypeSynchronicPatternSync == s->getTargetTypeSynchronicPatternSync() &&
-                targetTypeSynchronicBeatSync == s->getTargetTypeSynchronicBeatSync() &&
-                targetTypeSynchronicAddNotes == s->getTargetTypeSynchronicAddNotes() &&
-                targetTypeSynchronicPausePlay == s->getTargetTypeSynchronicPausePlay()) &&
-                targetTypeSynchronicClear == s->getTargetTypeSynchronicClear() &&
-                targetTypeSynchronicDeleteOldest == s->getTargetTypeSynchronicDeleteOldest() &&
-                targetTypeSynchronicDeleteNewest == s->getTargetTypeSynchronicDeleteNewest() &&
-                targetTypeSynchronicRotate == s->getTargetTypeSynchronicRotate() ;
+                defaultGain == s->defaultGain &&
+                sTranspUsesTuning == _s->sTranspUsesTuning &&
+                sClusterThresh == _s->sClusterThresh &&
+                sClusterThreshSec == _s->sClusterThreshSec &&
+                sReleaseVelocitySetsSynchronic == _s->sReleaseVelocitySetsSynchronic &&
+                numClusters == _s->numClusters &&
+                onOffMode == _s->onOffMode &&
+                holdMin == _s->holdMin &&
+                holdMax == _s->holdMax &&
+                velocityMin == _s->velocityMin &&
+                velocityMax == _s->velocityMax &&
+                targetTypeSynchronicPatternSync == _s->getTargetTypeSynchronicPatternSync() &&
+                targetTypeSynchronicBeatSync == _s->getTargetTypeSynchronicBeatSync() &&
+                targetTypeSynchronicAddNotes == _s->getTargetTypeSynchronicAddNotes() &&
+                targetTypeSynchronicPausePlay == _s->getTargetTypeSynchronicPausePlay()) &&
+                targetTypeSynchronicClear == _s->getTargetTypeSynchronicClear() &&
+                targetTypeSynchronicDeleteOldest == _s->getTargetTypeSynchronicDeleteOldest() &&
+                targetTypeSynchronicDeleteNewest == _s->getTargetTypeSynchronicDeleteNewest() &&
+                targetTypeSynchronicRotate == _s->getTargetTypeSynchronicRotate() ;
     }
 
     // for unit-testing
@@ -518,8 +567,7 @@ public:
 		}
         sLengthMultipliers.set(fa);
         
-		sGain = r[idx++] * 10;
-        sBlendronicGain = r[idx++] * 2;
+		defaultGain = r[idx++] * 10;
         
         Array<Array<float>> faa;
 		for (int i = 0; i < Random::getSystemRandom().nextInt(10); ++i)
@@ -560,8 +608,6 @@ public:
         else return sBeatsToSkip.value;
     }
     
-    inline float* getGainPtr() { return &sGain.value; }
-    inline float* getBlendronicGainPtr() { return &sBlendronicGain.value; }
     
     inline const int getAttack(int which) const noexcept    {return sADSRs.value[which][0];}
     inline const int getDecay(int which) const noexcept     {return sADSRs.value[which][1];}
@@ -673,8 +719,7 @@ public:
     {
         ValueTree prep("params");
         
-        sGain.getState(prep, ptagSynchronic_gain);
-        sBlendronicGain.getState(prep, ptagSynchronic_blendronicGain);
+        defaultGain.getState(prep, ptagSynchronic_gain);
         
         sNumBeats.getState(prep, ptagSynchronic_numBeats);
         sClusterMin.getState(prep, ptagSynchronic_clusterMin);
@@ -726,12 +771,23 @@ public:
         return prep;
     }
     
-    void setState(XmlElement* e)
+    void setState(XmlElement* _e)
     {
+        setId(_e->getStringAttribute("Id").getIntValue());
         
-        sGain.setState(e, ptagSynchronic_gain, 1.0f);
-        sBlendronicGain.setState(e, ptagSynchronic_blendronicGain, 1.0f);
-        
+        String n = _e->getStringAttribute("name");
+
+        if (n != String())     setName(n);
+        else                   setName(String(getId()));
+
+
+        XmlElement *e = _e->getChildByName("params");
+        if (e == nullptr)
+        {
+            e = _e;
+        }
+        defaultGain.setState(e, ptagSynchronic_gain, 1.0f);
+       
         sNumBeats.setState(e, ptagSynchronic_numBeats, 20);
         sClusterMin.setState(e, ptagSynchronic_clusterMin, 1);
         sClusterMax.setState(e, ptagSynchronic_clusterMax, 12);
@@ -818,8 +874,6 @@ public:
     
     bool modded = false;
     
-    Moddable<float> sGain;
-    Moddable<float> sBlendronicGain;
     
     Moddable<float> sTempo;
     Moddable<int> sNumBeats,sClusterMin,sClusterMax;
@@ -880,119 +934,6 @@ private:
 };
 
 
-class Synchronic : public ReferenceCountedObject
-{
-    
-public:
-    typedef ReferenceCountedObjectPtr<Synchronic>   Ptr;
-    typedef Array<Synchronic::Ptr>                  PtrArr;
-    typedef Array<Synchronic::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<Synchronic>                  Arr;
-    typedef OwnedArray<Synchronic, CriticalSection> CSArr;
-    
-    Synchronic(SynchronicPreparation::Ptr prep,
-               int Id):
-    prep(new SynchronicPreparation(prep)),
-    Id(Id),
-    name("Synchronic "+String(Id))
-    {
-        
-    }
-    
-	Synchronic(int Id, bool random = false) :
-    Id(Id),
-    name("Synchronic "+String(Id))
-    {
-		prep = new SynchronicPreparation();
-		if (random) randomize();
-    }
-    
-    inline Synchronic::Ptr duplicate()
-    {
-        SynchronicPreparation::Ptr copyPrep = new SynchronicPreparation(prep);
-        
-        Synchronic::Ptr copy = new Synchronic(copyPrep, -1);
-        
-        copy->setName(name);
-        
-        return copy;
-    }
-    
-    inline void clear(void)
-    {
-        prep       = new SynchronicPreparation();
-    }
-
-    inline void copy(Synchronic::Ptr from)
-    {
-        prep->copy(from->prep);
-    }
-
-	inline void randomize()
-	{
-		clear();
-		prep->randomize();
-		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
-		name = "random";
-	}
-
-    inline ValueTree getState(bool active = false)
-    {
-        ValueTree vt(vtagSynchronic);
-        
-        vt.setProperty( "Id",Id, 0);
-        vt.setProperty( "name", name, 0);
-        
-        vt.addChild(prep->getState(), -1, 0);
-        
-        return vt;
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        Id = e->getStringAttribute("Id").getIntValue();
-        
-        String n = e->getStringAttribute("name");
-        
-        if (n != String())     name = n;
-        else                        name = String(Id);
-        
-        
-        XmlElement* params = e->getChildByName("params");
-        
-        if (params != nullptr)
-        {
-            prep->setState(params);
-        }
-        else
-        {
-            prep->setState(e);
-        }
-    }
-    
-    ~Synchronic() {};
-    
-    inline int getId() {return Id;}
-    inline void setId(int newId) { Id = newId;}
-    
-    SynchronicPreparation::Ptr      prep;
-
-    inline String getName(void) const noexcept {return name;}
-    
-    inline void setName(String newName)
-    {
-        name = newName;
-    }
-    
-private:
-    int Id;
-    String name;
-    
-    
-    JUCE_LEAK_DETECTOR(Synchronic)
-};
-
-
 /*
  This class enables layers of Synchronic pulses by
  maintaining a set of counters moving through all the
@@ -1008,7 +949,8 @@ public:
     typedef Array<SynchronicCluster::Ptr>                  PtrArr;
     
     SynchronicCluster(SynchronicPreparation::Ptr prep) :
-    prep(prep)
+    prep(prep),
+    _prep(dynamic_cast<SynchronicPreparation*>(prep.get()))
     {
         phasor = 0;
         envelopeCounter = 0;
@@ -1036,7 +978,7 @@ public:
     
     int getLengthMultiplierCounterForDisplay()
     {
-        int tempsize = prep->sLengthMultipliers.value.size();
+        int tempsize = _prep->sLengthMultipliers.value.size();
         //int counter = getLengthMultiplierCounter() - 1;
         int counter = getLengthMultiplierCounter() ;
         
@@ -1048,7 +990,7 @@ public:
     
     int getBeatMultiplierCounterForDisplay()
     {
-        int tempsize = prep->sBeatMultipliers.value.size();
+        int tempsize = _prep->sBeatMultipliers.value.size();
         int counter = getBeatMultiplierCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
@@ -1059,7 +1001,7 @@ public:
     
     int getAccentMultiplierCounterForDisplay()
     {
-        int tempsize = prep->sAccentMultipliers.value.size();
+        int tempsize = _prep->sAccentMultipliers.value.size();
         int counter = getAccentMultiplierCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
@@ -1070,7 +1012,7 @@ public:
     
     int getTranspCounterForDisplay()
     {
-        int tempsize = prep->sTransposition.value.size();
+        int tempsize = _prep->sTransposition.value.size();
         int counter = getTranspCounter() ;
         
         if(counter < 0) counter = tempsize - 1;
@@ -1100,27 +1042,27 @@ public:
         phasor -= numSamplesBeat;
         
         //increment parameter counters
-        if (++lengthMultiplierCounter   >= prep->sLengthMultipliers.value.size())     lengthMultiplierCounter = 0;
-        if (++accentMultiplierCounter   >= prep->sAccentMultipliers.value.size())     accentMultiplierCounter = 0;
-        if (++transpCounter             >= prep->sTransposition.value.size())         transpCounter = 0;
-        if (++envelopeCounter           >= prep->sADSRs.value.size())             envelopeCounter = 0;
+        if (++lengthMultiplierCounter   >= _prep->sLengthMultipliers.value.size())     lengthMultiplierCounter = 0;
+        if (++accentMultiplierCounter   >= _prep->sAccentMultipliers.value.size())     accentMultiplierCounter = 0;
+        if (++transpCounter             >= _prep->sTransposition.value.size())         transpCounter = 0;
+        if (++envelopeCounter           >= _prep->sADSRs.value.size())             envelopeCounter = 0;
         
-        while(prep->sADSRs.value[envelopeCounter][4] == 0) //skip untoggled envelopes
+        while(_prep->sADSRs.value[envelopeCounter][4] == 0) //skip untoggled envelopes
         {
             envelopeCounter++;
-            if (envelopeCounter >= prep->sADSRs.value.size()) envelopeCounter = 0;
+            if (envelopeCounter >= _prep->sADSRs.value.size()) envelopeCounter = 0;
         }
     }
     
     inline void postStep ()
     {
-        if (++beatMultiplierCounter >= prep->sBeatMultipliers.value.size())
+        if (++beatMultiplierCounter >= _prep->sBeatMultipliers.value.size())
         {
             //increment beat and beatMultiplier counters, for next beat; check maxes and adjust
             beatMultiplierCounter = 0;
         }
         
-        if (++beatCounter >= (prep->sNumBeats.value + prep->sBeatsToSkip.value))
+        if (++beatCounter >= (_prep->sNumBeats.value + _prep->sBeatsToSkip.value))
         {
             shouldPlay = false;
         }
@@ -1128,19 +1070,19 @@ public:
     
     inline void resetPatternPhase()
     {
-        int skipBeats = prep->sBeatsToSkip.value - 1;
+        int skipBeats = _prep->sBeatsToSkip.value - 1;
         int idx = (skipBeats < -1) ? -1 : skipBeats;
         
-        if(prep->sBeatMultipliers.value.size() > 0)
-            beatMultiplierCounter = mod(idx, prep->sBeatMultipliers.value.size());
-        if(prep->sLengthMultipliers.value.size() > 0)
-            lengthMultiplierCounter = mod(idx, prep->sLengthMultipliers.value.size());
-        if(prep->sAccentMultipliers.value.size() > 0)
-            accentMultiplierCounter = mod(idx, prep->sAccentMultipliers.value.size());
-        if(prep->sTransposition.value.size() > 0)
-            transpCounter = mod(idx, prep->sTransposition.value.size());
-        if(prep->sADSRs.value.size() > 0)
-            envelopeCounter = mod(idx, prep->sADSRs.value.size());
+        if(_prep->sBeatMultipliers.value.size() > 0)
+            beatMultiplierCounter = mod(idx, _prep->sBeatMultipliers.value.size());
+        if(_prep->sLengthMultipliers.value.size() > 0)
+            lengthMultiplierCounter = mod(idx, _prep->sLengthMultipliers.value.size());
+        if(_prep->sAccentMultipliers.value.size() > 0)
+            accentMultiplierCounter = mod(idx, _prep->sAccentMultipliers.value.size());
+        if(_prep->sTransposition.value.size() > 0)
+            transpCounter = mod(idx, _prep->sTransposition.value.size());
+        if(_prep->sADSRs.value.size() > 0)
+            envelopeCounter = mod(idx, _prep->sADSRs.value.size());
 
         // DBG("beatMultiplierCounter = " + String(beatMultiplierCounter));
 
@@ -1196,7 +1138,7 @@ private:
     int beatCounter;  //beat (or pulse) counter; max set by users -- sNumBeats
     
     SynchronicPreparation::Ptr prep;
-    
+    SynchronicPreparation* _prep;
     //parameter field counters
     int beatMultiplierCounter;   //beat length (time between beats) multipliers
     int accentMultiplierCounter; //accent multipliers
@@ -1231,7 +1173,7 @@ public:
 //    typedef OwnedArray<SynchronicProcessor,CriticalSection>  CSArr;
     
     
-    SynchronicProcessor(Synchronic::Ptr synchronic,
+    SynchronicProcessor(SynchronicPreparation::Ptr synchronic,
                         TuningProcessor::Ptr tuning,
                         TempoProcessor::Ptr tempo,
                         BKAudioProcessor &processor,
@@ -1264,14 +1206,10 @@ public:
         return lastVelocity;
     }
     
-    inline const SynchronicSyncMode getMode() const noexcept {return synchronic->prep->sMode.value; }
+    inline const SynchronicSyncMode getMode() const noexcept {return dynamic_cast<SynchronicPreparation*>(prep.get())->sMode.value; }
 
-    inline int getId(void) const noexcept { return synchronic->getId(); }
+    inline int getId(void) const noexcept { return prep->getId(); }
     
-    inline void setSynchronic(Synchronic::Ptr newSynchronic)
-    {
-        synchronic = newSynchronic;
-    }
     
     inline void setTuning(TuningProcessor::Ptr tuning)
     {
@@ -1284,10 +1222,6 @@ public:
     }
 
     
-    inline Synchronic::Ptr getSynchronic(void) const noexcept
-    {
-        return synchronic;
-    }
     
     inline TuningProcessor::Ptr getTuning(void) const noexcept
     {
@@ -1312,7 +1246,7 @@ public:
     
     inline void reset(void)
     {
-        synchronic->prep->resetModdables();
+        dynamic_cast<SynchronicPreparation*>(prep.get())->resetModdables();
     }
     
     void clearOldNotes()
@@ -1397,7 +1331,7 @@ public:
     }
     void copyProcessorState(GenericProcessor::Ptr copy)
     {
-        GenericProcessor::copyProcessorState(copy);
+        //GenericProcessor::copyProcessorState(copy);
         setClusters(dynamic_cast<SynchronicProcessor*>(copy.get())->getClusters());
         //setVelocities(copy->getVelocities());
         //setInvertVelocities(copy->getInvertVelocities());
@@ -1407,7 +1341,6 @@ private:
     BKSynthesiser::Ptr synth;
     GeneralSettings::Ptr general;
     
-    Synchronic::Ptr synchronic;
     TuningProcessor::Ptr tuner;
     TempoProcessor::Ptr tempo;
     

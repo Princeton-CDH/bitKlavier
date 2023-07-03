@@ -100,11 +100,11 @@ public:
     virtual void reset() = 0;
     virtual void sustainPedalPressed() {} //hack for direct fix later
     virtual void allNotesOff(){}
-//    void handleKeyPress(int noteNumber, Array<float> pressTargetVelocities,
-//                        Array<float> releaseTargetVelocities, bool fromPress)
-//    {
-//
-//    }
+    
+    GenericPreparation::Ptr getPrep()
+    {
+        return prep;
+    }
     KeymapTargetType targetTypeStart;
     KeymapTargetType targetTypeEnd;
 protected:

@@ -171,7 +171,7 @@ void NostalgicProcessor::keyReleased(int noteNumber, Array<float>& targetVelocit
         if (prep->nUndertow.value > 0) offRamp = aRampUndertowCrossMS;
         else offRamp = aRampNostalgicOffMS;
 
-        SynchronicSyncMode syncTargetMode = _synchronic->getSynchronic()->prep->sMode.value;
+        SynchronicSyncMode syncTargetMode = dynamic_cast<SynchronicPreparation*>(_synchronic->getPrep().get())->sMode.value;
         
         if (prep->nMode.value == SynchronicSync2)
         {

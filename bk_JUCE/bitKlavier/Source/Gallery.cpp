@@ -106,8 +106,8 @@ void Gallery::resetPreparations(void)
     for (int i = nostalgic.size(); --i >= 0; )
         nostalgic[i]->prep->resetModdables();
     
-    for (int i = synchronic.size(); --i >= 0; )
-        synchronic[i]->prep->resetModdables();
+//    for (int i = synchronic.size(); --i >= 0; )
+//        synchronic[i]->prep->resetModdables();
     
 //    for (int i = genericPrep[PreparationTypeResonance]->size(); --i >= 0; )
 //        genericPrep[PreparationTypeResonance]->prep->resetModdables();

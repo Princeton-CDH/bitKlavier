@@ -242,7 +242,7 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     
     else if (type == PreparationTypeSynchronic)
     {
-        return gallery->getSynchronic(Id)->getState(true);
+        return gallery->getPreparationOfType(PreparationTypeSynchronic, Id)->getState();
     }
     else if (type == PreparationTypeSynchronicMod)
     {
@@ -329,19 +329,19 @@ void BKAudioProcessor::setPreparationState(BKPreparationType type, int Id, XmlEl
     }
     else if (type == PreparationTypeSynchronic)
     {
-        Synchronic::Ptr prep = gallery->getSynchronic(Id);
-        String name = prep->getName();
-        prep->setState(xml);
-        prep->setName(name);
-        prep->setId(Id);
+        GenericPreparation::Ptr obj = gallery->getPreparationOfType(PreparationTypeSynchronic, Id);
+        String name = obj->getName();
+        obj->setState(xml);
+        obj->setName(name);
+        obj->setId(Id);
     }
     else if (type == PreparationTypeSynchronicMod)
     {
         SynchronicModification::Ptr prep = gallery->getSynchronicModification(Id);
-        String name = prep->getName();
+        String name = prep->_getName();
         prep->setState(xml);
-        prep->setName(name);
-        prep->setId(Id);
+        prep->_setName(name);
+        prep->setId(Id);;
     }
     
     else if (type == PreparationTypeResonance)

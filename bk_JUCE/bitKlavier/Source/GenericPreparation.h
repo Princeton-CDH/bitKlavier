@@ -65,7 +65,19 @@ public:
     
    
     
+    GenericPreparation(BKPreparationType prep, XmlElement* e,  bool random = false) :
     
+    type(prep),
+    
+    prepvTag(cPreparationvTags[prep]),
+    soundSet(-1),
+    useGlobalSoundSet(true),
+    soundSetName(String()),
+    defaultGain(0.5, true)
+    {
+        if (random) randomize();
+        
+    }
     virtual GenericPreparation::Ptr duplicate(){};
     
     virtual ValueTree getState(){};//bool active = false)

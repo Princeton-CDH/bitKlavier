@@ -1329,17 +1329,15 @@ ModdableBase* ModdableViewController::getCurrentModdable()
         SynchronicModification::Ptr mod = processor.gallery->getSynchronicModification(processor.updateState->currentModSynchronicId);
         
         if (processor.updateState->currentModdableIdentifier == cSynchronicGain)
-            return &mod->sGain;
-        else if (processor.updateState->currentModdableIdentifier == cSynchronicBlendronicGain)
-            return &mod->sBlendronicGain;
+            return &mod->getPrep()->defaultGain;
         else if (processor.updateState->currentModdableIdentifier == cSynchronicNumBeats)
-            return &mod->sNumBeats;
+            return &mod->getPrepPtr()->sNumBeats;
         else if (processor.updateState->currentModdableIdentifier == cSynchronicClusterThresh)
-            return &mod->sClusterThresh;
+            return &mod->getPrepPtr()->sClusterThresh;
         else if (processor.updateState->currentModdableIdentifier == cSynchronicClusterCap)
-            return &mod->sClusterCap;
+            return &mod->getPrepPtr()->sClusterCap;
         else if (processor.updateState->currentModdableIdentifier == cSynchronicNumClusters)
-            return &mod->numClusters;
+            return &mod->getPrepPtr()->numClusters;
     }
     else if (processor.updateState->previousDisplay == DisplayBlendronicMod)
     {

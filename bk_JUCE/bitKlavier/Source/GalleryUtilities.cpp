@@ -112,13 +112,7 @@ void Gallery::removeBlendronicModification(int Id)
 	}
 }
 
-void Gallery::removeSynchronic(int Id)
-{
-    for (int i = synchronic.size(); --i >= 0; )
-    {
-        if (synchronic[i]->getId() == Id) synchronic.remove(i);
-    }
-}
+
 
 void Gallery::removeNostalgic(int Id) 
 {
@@ -189,7 +183,7 @@ void Gallery::remove(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeSynchronic)
     {
-        removeSynchronic(Id);
+        removePreparationOfType(type, Id);
     }
     else if (type == PreparationTypeNostalgic)
     {
@@ -261,7 +255,7 @@ String Gallery::iterateName(BKPreparationType type, String name)
     }
     else if (type == PreparationTypeSynchronic)
     {
-        for (auto p : synchronic)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : *genericPrep[PreparationTypeSynchronic]) if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
     }
     else if (type == PreparationTypeNostalgic)
     {
@@ -293,7 +287,7 @@ String Gallery::iterateName(BKPreparationType type, String name)
     }
     else if (type == PreparationTypeSynchronicMod)
     {
-        for (auto p : modSynchronic) if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : modSynchronic) if (p->_getName() == name || p->_getName().startsWith(name+" (")) num++;
     }
     else if (type == PreparationTypeNostalgicMod)
     {
@@ -337,8 +331,8 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeSynchronic)
     {
-         name = getSynchronic(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
-        for (auto p : synchronic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+        name = getPreparationOfType(PreparationTypeSynchronic,Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+        for (auto p : *genericPrep[PreparationTypeSynchronic])   if (p->getName() == name || p->getName().startsWith(name + " ")) num++;
     }
     else if (type == PreparationTypeNostalgic)
     {
@@ -375,8 +369,8 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeSynchronicMod)
     {
-         name = getSynchronicModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
-        for (auto p : modSynchronic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+         name = getSynchronicModification(Id)->_getName().upToFirstOccurrenceOf(" (", false, false);
+        for (auto p : modSynchronic)   if (p->_getName() == name || p->_getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeNostalgicMod)
     {
@@ -426,13 +420,7 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
     }
     else if (type == PreparationTypeSynchronic)
     {
-        Synchronic::Ptr p = new Synchronic(-1);
-        p->setState(xml);
-        addSynchronic(p);
-        if (p->getName() == "Synchronic " + String(oldId))
-            p->setName("Synchronic " + String(p->getId()));
-        else p->setName(iterateName(PreparationTypeSynchronic, p->getName()));
-        return p->getId();
+        return addGenericPreparation(PreparationTypeResonance, xml);
     }
     else if (type == PreparationTypeNostalgic)
     {
@@ -508,9 +496,9 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         SynchronicModification::Ptr p = new SynchronicModification(processor, -1);
         p->setState(xml);
         addSynchronicMod(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
-        else p->setName(iterateName(PreparationTypeSynchronicMod, p->getName()));
+        if (p->_getName() == String(oldId))
+            p->_setName(String(p->getId()));
+        else p->_setName(iterateName(PreparationTypeSynchronicMod, p->_getName()));
         return p->getId();
     }
     else if (type == PreparationTypeNostalgicMod)
@@ -581,16 +569,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
 {
     int newId = -1;
   
-    if (type == PreparationTypeSynchronic)
-    {
-        Synchronic::Ptr toCopy = getSynchronic(Id);
-        Synchronic::Ptr newOne = toCopy->duplicate();
-        addSynchronic(newOne);
-        newId = newOne->getId();
-        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeSynchronic, newId))+")";
-        newOne->setName(newName);
-    }
-    else if (type == PreparationTypeNostalgic)
+    
+    if (type == PreparationTypeNostalgic)
     {
         Nostalgic::Ptr toCopy = getNostalgic(Id);
         Nostalgic::Ptr newOne = toCopy->duplicate();
@@ -651,8 +631,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         SynchronicModification::Ptr newOne = toCopy->duplicate();
         addSynchronicMod(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeSynchronicMod, newId))+")";
-        newOne->setName(newName);
+        String newName = toCopy->_getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeSynchronicMod, newId))+")";
+        newOne->_setName(newName);
     }
     else if (type == PreparationTypeNostalgicMod)
     {
@@ -713,7 +693,7 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         GenericPreparation::Ptr newOne = toCopy->duplicate();
         addGenericPreparation(type, newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " (" + String(numWithSameNameAs(PreparationTypeResonance, newId)) + ")";
+        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " (" + String(numWithSameNameAs(type, newId)) + ")";
         newOne->setName(newName);
         
     }
@@ -730,12 +710,8 @@ int Gallery::add(BKPreparationType type)
 {
     int newId = -1;
     
-    if (type == PreparationTypeSynchronic)
-    {
-        addSynchronic();
-        newId = synchronic.getLast()->getId();
-    }
-    else if (type == PreparationTypeNostalgic)
+   
+    if (type == PreparationTypeNostalgic)
     {
         addNostalgic();
         newId = nostalgic.getLast()->getId();
@@ -814,9 +790,9 @@ int Gallery::add(BKPreparationType type)
 
 int Gallery::getNum(BKPreparationType type)
 {
-    return  (type == PreparationTypeDirect) ? genericPrep[PreparationTypeResonance]->size() :
+    return  (type == PreparationTypeDirect) ? genericPrep[PreparationTypeDirect]->size() :
     (type == PreparationTypeNostalgic) ? nostalgic.size() :
-    (type == PreparationTypeSynchronic) ? synchronic.size() :
+    (type == PreparationTypeSynchronic) ? genericPrep[PreparationTypeSynchronic]->size() :
     (type == PreparationTypeTuning) ? tuning.size() :
     (type == PreparationTypeTempo) ? tempo.size() :
 	(type == PreparationTypeBlendronic) ? blendronic.size() :
@@ -977,24 +953,6 @@ void Gallery::addKeymap(Keymap::Ptr k)
     bkKeymaps.add(k);
 }
 
-void Gallery::addSynchronic(void)
-{
-    int newId = getNewId(PreparationTypeSynchronic);
-    synchronic.add(new Synchronic(newId));
-}
-
-void Gallery::addSynchronic(Synchronic::Ptr p)
-{
-    int newId = getNewId(PreparationTypeSynchronic);
-    p->setId(newId);
-    synchronic.add(p);
-}
-
-void Gallery::addSynchronicWithId(int Id)
-{
-    synchronic.add(new Synchronic(Id));
-}
-
 void Gallery::copy(BKPreparationType type, int from, int to)
 {
     if (type == PreparationTypeDirect)
@@ -1003,7 +961,7 @@ void Gallery::copy(BKPreparationType type, int from, int to)
     }
     else if (type == PreparationTypeSynchronic)
     {
-        synchronic.getUnchecked(to)->copy(synchronic.getUnchecked(from));
+        genericPrep[PreparationTypeDirect]->getUnchecked(to)->copy(genericPrep[PreparationTypeDirect]->getUnchecked(from));
     }
     else if (type == PreparationTypeNostalgic)
     {
@@ -1062,11 +1020,8 @@ void Gallery::copy(BKPreparationType type, int from, int to)
 void Gallery::addTypeWithId(BKPreparationType type, int Id)
 {
     
-    if (type == PreparationTypeSynchronic)
-    {
-        addSynchronicWithId(Id);
-    }
-    else if (type == PreparationTypeNostalgic)
+  
+    if (type == PreparationTypeNostalgic)
     {
         addNostalgicWithId(Id);
     }
@@ -1118,7 +1073,7 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
     {
         addPianoWithId(Id);
     }
-    else //resonance
+    else //resonance,direct,sync
     {
         addGenericPreparation(type, Id);
     }
@@ -1129,11 +1084,7 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
 }
 
 
-void Gallery::addSynchronic(SynchronicPreparation::Ptr sync)
-{
-    int newId = getNewId(PreparationTypeSynchronic);
-    synchronic.add(new Synchronic(sync, newId));
-}
+
 
 
 void Gallery::addNostalgic(void)
@@ -1243,6 +1194,9 @@ GenericPreparation::Ptr Gallery::addGenericPreparation(BKPreparationType type, i
     }
     else if (type == PreparationTypeSynchronic)
     {
+        DBG(String(newId));
+        prep = new SynchronicPreparation(newId);
+        genericPrep[type]->add(prep);
     }
     else if (type == PreparationTypeNostalgic)
     {
@@ -1339,13 +1293,12 @@ void Gallery::clean(void)
     Array<int> thisUsed = used.getUnchecked(PreparationTypeDirect);
     for (int i = genericPrep[PreparationTypeDirect]->size(); --i >= 0;)
     {
-        if (!thisUsed.contains(genericPrep[PreparationTypeDirect]->getUnchecked(i)->getId())) genericPrep[PreparationTypeResonance]->remove(i);
+        if (!thisUsed.contains(genericPrep[PreparationTypeDirect]->getUnchecked(i)->getId())) genericPrep[PreparationTypeDirect]->remove(i);
     }
     
-    thisUsed = used.getUnchecked(PreparationTypeSynchronic);
-    for (int i = synchronic.size(); --i >= 0;)
+    for (int i = genericPrep[PreparationTypeDirect]->size(); --i >= 0;)
     {
-        if (!thisUsed.contains(synchronic[i]->getId())) synchronic.remove(i);
+        if (!thisUsed.contains(genericPrep[PreparationTypeDirect]->getUnchecked(i)->getId())) genericPrep[PreparationTypeDirect]->remove(i);
     }
     
     thisUsed = used.getUnchecked(PreparationTypeNostalgic);

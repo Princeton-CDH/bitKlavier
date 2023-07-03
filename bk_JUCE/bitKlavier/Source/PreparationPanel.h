@@ -52,7 +52,7 @@ private:
                 setPreparations(processor.gallery->getAllPreparationNamesOfType(t));
                 //setPreparations(processor.gallery->getAllDirectNames());
             else if (type == PreparationTypeSynchronic)
-                setPreparations(processor.gallery->getAllSynchronicNames());
+                setPreparations(processor.gallery->getAllPreparationNamesOfType(t));
             else if (type == PreparationTypeNostalgic)
                 setPreparations(processor.gallery->getAllNostalgicNames());
             else if (type == PreparationTypeTempo)
