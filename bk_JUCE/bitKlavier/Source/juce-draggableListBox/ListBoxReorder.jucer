@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="kfxwhq" name="ListBoxReorder" projectType="guiapp" version="1.0.0"
+              bundleIdentifier="com.yourcompany.ListBoxReorder" includeBinaryInAppConfig="1"
+              jucerVersion="5.4.3">
+  <MAINGROUP id="rPu9OT" name="ListBoxReorder">
+    <GROUP id="{DF261840-DAED-589F-C182-B6C3064BD21B}" name="Source">
+      <FILE id="l7PGJa" name="MyListComponent.cpp" compile="1" resource="0"
+            file="Source/MyListComponent.cpp"/>
+      <FILE id="m1LIyM" name="MyListComponent.h" compile="0" resource="0"
+            file="Source/MyListComponent.h"/>
+      <FILE id="whyzV1" name="DraggableListBox.cpp" compile="1" resource="0"
+            file="Source/DraggableListBox.cpp"/>
+      <FILE id="vZKFgi" name="DraggableListBox.h" compile="0" resource="0"
+            file="Source/DraggableListBox.h"/>
+      <FILE id="BMIWxU" name="MainComponent.cpp" compile="1" resource="0"
+            file="Source/MainComponent.cpp"/>
+      <FILE id="ruCE7o" name="MainComponent.h" compile="0" resource="0" file="Source/MainComponent.h"/>
+      <FILE id="AoQklY" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+    </GROUP>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="ListBoxReorder"
+                       cppLanguageStandard="c++17" cppLibType="libc++"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="ListBoxReorder"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_events" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_video" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../Dropbox/CharlesShared/JUCE-4_3_1/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+    <VS2017 targetFolder="Builds/VisualStudio2017">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_video" path="../../juce"/>
+        <MODULEPATH id="juce_opengl" path="../../juce"/>
+        <MODULEPATH id="juce_gui_extra" path="../../juce"/>
+        <MODULEPATH id="juce_gui_basics" path="../../juce"/>
+        <MODULEPATH id="juce_graphics" path="../../juce"/>
+        <MODULEPATH id="juce_events" path="../../juce"/>
+        <MODULEPATH id="juce_data_structures" path="../../juce"/>
+        <MODULEPATH id="juce_cryptography" path="../../juce"/>
+        <MODULEPATH id="juce_core" path="../../juce"/>
+        <MODULEPATH id="juce_audio_processors" path="../../juce"/>
+        <MODULEPATH id="juce_audio_formats" path="../../juce"/>
+        <MODULEPATH id="juce_audio_devices" path="../../juce"/>
+        <MODULEPATH id="juce_audio_basics" path="../../juce"/>
+      </MODULEPATHS>
+    </VS2017>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+    <MODULE id="juce_video" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>
+  </MODULES>
+  <JUCEOPTIONS/>
+  <LIVE_SETTINGS>
+    <WINDOWS/>
+  </LIVE_SETTINGS>
+</JUCERPROJECT>
