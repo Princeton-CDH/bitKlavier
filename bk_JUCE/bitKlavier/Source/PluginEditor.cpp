@@ -102,15 +102,15 @@ void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
 
 void BKAudioProcessorEditor::showPianoIteratorDialog(Button *button)
 {
-    DocumentWindow* doc = new BKDocumentWindow("Piano Iterator", Colours::transparentBlack, DocumentWindow::TitleBarButtons::allButtons, true );
+    iteratorDoc = new BKDocumentWindow("Piano Iterator", Colours::transparentBlack, DocumentWindow::TitleBarButtons::allButtons, true );
     bKIterator = new BKListBoxComponent(processor);
     
-    doc->setAlwaysOnTop(true);
-    addAndMakeVisible(doc);
-    doc->addToDesktop();
-    doc->setContentOwned(bKIterator,true);
-    doc->setResizable(true, true);
-    doc->setLookAndFeel(&laf);
+    iteratorDoc->setAlwaysOnTop(true);
+    addAndMakeVisible(iteratorDoc);
+    iteratorDoc->addToDesktop();
+    iteratorDoc->setContentOwned(bKIterator,true);
+    iteratorDoc->setResizable(true, true);
+    iteratorDoc->setLookAndFeel(&laf);
 }
 
 void BKAudioProcessorEditor::showGenSettings(int tab) {

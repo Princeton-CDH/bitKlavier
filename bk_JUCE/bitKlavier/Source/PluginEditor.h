@@ -54,6 +54,7 @@ public:
     MainViewController& getMainViewController() { return mvc; }
     void showPianoIteratorDialog(Button *button);
     BKListBoxComponent *bKIterator;
+    DocumentWindow* iteratorDoc = nullptr;
 private:
     
     // This reference is provided as a quick way for your editor to

@@ -27,7 +27,7 @@ struct MyListBoxItemData : public DraggableListBoxItemData
             
             
     }
-    
+
     int getNumItems() override
     {
         return int(modelData.size());
