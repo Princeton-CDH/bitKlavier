@@ -781,9 +781,10 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
         {
             if (gallery->currentPianoIndex < 0)
             {
-                gallery->currentPianoIndex = 0;
+                // gallery->currentPianoIndex = 0;
+                gallery->currentPianoIndex = gallery->getPianoIteratorOrder().modelData.size() - 1;
             }
-            if (gallery->currentPianoIndex > gallery->getPianoIteratorOrder().modelData.size())
+            if (gallery->currentPianoIndex >= gallery->getPianoIteratorOrder().modelData.size())
             {
                 gallery->currentPianoIndex = 0;
             }
