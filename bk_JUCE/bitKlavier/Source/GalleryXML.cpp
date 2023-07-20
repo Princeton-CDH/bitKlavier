@@ -108,6 +108,8 @@ ValueTree  Gallery::getState(void)
     galleryVT.setProperty("defaultPiano", getDefaultPiano(), 0);
     
     galleryVT.addChild(pianoIteratorOrder.getState(), -1, 0);
+    galleryVT.addChild(iteratorUpKeymap->getState(), -1, 0);
+    galleryVT.addChild(iteratorDownKeymap->getState(), -1,0);
     return galleryVT;
 }
 
@@ -387,6 +389,17 @@ void Gallery::setStateFromXML(XmlElement* xml)
             if(e->hasTagName(vtagPianoIterator))
             {
                 pianoIteratorOrder.setState(e, bkPianos);
+            }
+        }
+        for( auto e : xml->getChildIterator())
+        {
+            if(e->hasTagName("upkeymap"))
+            {
+                iteratorUpKeymap->setState(e);
+            }
+            if(e->hasTagName("downkeymap"))
+            {
+                iteratorDownKeymap->setState(e);
             }
         }
     }
