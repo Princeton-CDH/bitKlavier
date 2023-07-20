@@ -22,7 +22,7 @@
 #include "GenericProcessor.h"
 class NostalgicModification;
 
-class NostalgicPreparation : public ReferenceCountedObject
+class NostalgicPreparation : public GenericPreparation
 {
 public:
     typedef ReferenceCountedObjectPtr<NostalgicPreparation>   Ptr;
@@ -32,85 +32,9 @@ public:
     typedef OwnedArray<NostalgicPreparation, CriticalSection> CSArr;
     
     
-    NostalgicPreparation(NostalgicPreparation::Ptr n) :
-    nGain(n->nGain),
-    nBlendronicGain(n->nBlendronicGain),
-    nWaveDistance(n->nWaveDistance),
-    nUndertow(n->nUndertow),
-    nTransposition(n->nTransposition),
-    nTranspUsesTuning(n->nTranspUsesTuning),
-    nLengthMultiplier(n->nLengthMultiplier),
-    nBeatsToSkip(n->nBeatsToSkip),
-    nMode(n->nMode),
-    nReverseAttack(n->nReverseAttack),
-    nReverseDecay(n->nReverseDecay),
-    nReverseRelease(n->nReverseRelease),
-    nReverseSustain(n->nReverseSustain),
-    nUndertowAttack(n->nUndertowAttack),
-    nUndertowDecay(n->nUndertowDecay),
-    nUndertowRelease(n->nUndertowRelease),
-    nUndertowSustain(n->nUndertowSustain),
-    holdMin(n->holdMin),
-    holdMax(n->holdMax),
-    clusterMin(n->clusterMin),
-    clusterThreshold(n->clusterThreshold),
-    velocityMin(n->velocityMin),
-    velocityMax(n->velocityMax),
-    keyOnReset(n->keyOnReset),
-    targetTypeNostalgicClear(n->targetTypeNostalgicClear),
-    nUseGlobalSoundSet(n->nUseGlobalSoundSet),
-    nSoundSet(n->nSoundSet),
-    nSoundSetName(n->nSoundSetName)
-    {
-    }
-    
-    NostalgicPreparation(int waveDistance,
-                         int undertow,
-                         Array<float> transposition,
-                         float gain,
-                         float blendGain,
-                         float lengthMultiplier,
-                         float beatsToSkip,
-                         NostalgicSyncMode mode,
-                         TuningSystem tuning,
-                         PitchClass basePitch,
-                         Tuning::Ptr t):
+    NostalgicPreparation(int newId, NostalgicPreparation::Ptr n) :
+    GenericPreparation(BKPreparationType::PreparationTypeNostalgic, newId),
     modded(false),
-    nGain(gain, true),
-    nBlendronicGain(blendGain, true),
-    nWaveDistance(waveDistance),
-    nUndertow(undertow),
-    nTransposition(transposition),
-    nTranspUsesTuning(false),
-    nLengthMultiplier(lengthMultiplier),
-    nBeatsToSkip(beatsToSkip),
-    nMode(mode),
-    nReverseAttack(30),
-    nReverseDecay(3),
-    nReverseRelease(50),
-    nReverseSustain(1.),
-    nUndertowAttack(50),
-    nUndertowDecay(3),
-    nUndertowRelease(2000),
-    nUndertowSustain(1.),
-    holdMin(0),
-    holdMax(12000),
-    clusterMin(1),
-    clusterThreshold(150),
-    velocityMin(0),
-    velocityMax(127),
-    keyOnReset(false),
-    targetTypeNostalgicClear(NoteOn),
-    nUseGlobalSoundSet(true),
-    nSoundSet(-1),
-    nSoundSetName(String())
-    {
-    }
-    
-    NostalgicPreparation(void):
-    modded(false),
-    nGain(0.0, true),
-    nBlendronicGain(0.0, true),
     nWaveDistance(0),
     nUndertow(0),
     nTransposition(Array<float>({0.0})),
@@ -133,10 +57,76 @@ public:
     velocityMin(0),
     velocityMax(127),
     keyOnReset(false),
-    targetTypeNostalgicClear(NoteOn),
-    nUseGlobalSoundSet(true),
-    nSoundSet(-1),
-    nSoundSetName(String())
+    targetTypeNostalgicClear(NoteOn)
+    {
+        copy(n);
+    }
+    
+    NostalgicPreparation(int newId, int waveDistance,
+                         int undertow,
+                         Array<float> transposition,
+                         float gain,
+                         float lengthMultiplier,
+                         float beatsToSkip,
+                         NostalgicSyncMode mode,
+                         TuningSystem tuning,
+                         PitchClass basePitch,
+                         Tuning::Ptr t):
+    GenericPreparation(BKPreparationType::PreparationTypeNostalgic, newId),
+    modded(false),
+    nWaveDistance(waveDistance),
+    nUndertow(undertow),
+    nTransposition(transposition),
+    nTranspUsesTuning(false),
+    nLengthMultiplier(lengthMultiplier),
+    nBeatsToSkip(beatsToSkip),
+    nMode(mode),
+    nReverseAttack(30),
+    nReverseDecay(3),
+    nReverseRelease(50),
+    nReverseSustain(1.),
+    nUndertowAttack(50),
+    nUndertowDecay(3),
+    nUndertowRelease(2000),
+    nUndertowSustain(1.),
+    holdMin(0),
+    holdMax(12000),
+    clusterMin(1),
+    clusterThreshold(150),
+    velocityMin(0),
+    velocityMax(127),
+    keyOnReset(false),
+    targetTypeNostalgicClear(NoteOn)
+    {
+        defaultGain = gain;
+    }
+    
+    NostalgicPreparation(int newId):
+    GenericPreparation(BKPreparationType::PreparationTypeNostalgic, newId),
+    modded(false),
+    nWaveDistance(0),
+    nUndertow(0),
+    nTransposition(Array<float>({0.0})),
+    nTranspUsesTuning(false),
+    nLengthMultiplier(1.0),
+    nBeatsToSkip(0.0),
+    nMode(NoteLengthSync),
+    nReverseAttack(30),
+    nReverseDecay(3),
+    nReverseRelease(50),
+    nReverseSustain(1.),
+    nUndertowAttack(50),
+    nUndertowDecay(3),
+    nUndertowRelease(2000),
+    nUndertowSustain(1.),
+    holdMin(0),
+    holdMax(12000),
+    clusterMin(1),
+    clusterThreshold(150),
+    velocityMin(0),
+    velocityMax(127),
+    keyOnReset(false),
+    targetTypeNostalgicClear(NoteOn)
     {
 
     }
@@ -148,41 +138,40 @@ public:
     
     inline void copy(NostalgicPreparation::Ptr n)
     {
-        nWaveDistance = n->nWaveDistance;
-        nUndertow = n->nUndertow;
-        nTransposition = n->nTransposition;
-        nTranspUsesTuning = n->nTranspUsesTuning;
-        nGain = n->nGain;
-        nBlendronicGain = n->nBlendronicGain;
-        nLengthMultiplier = n->nLengthMultiplier;
-        nBeatsToSkip = n->nBeatsToSkip;
-        nMode = n->nMode;
-        nReverseAttack = n->nReverseAttack;
-        nReverseDecay = n->nReverseDecay;
-        nReverseSustain = n->nReverseSustain;
-        nReverseRelease = n->nReverseRelease;
-        nUndertowAttack = n->nUndertowAttack;
-        nUndertowDecay = n->nUndertowDecay;
-        nUndertowSustain = n->nUndertowSustain;
-        nUndertowRelease = n->nUndertowRelease;
-        holdMin = n->holdMin;
-        holdMax = n->holdMax;
-        clusterMin = n->clusterMin;
-        clusterThreshold = n->clusterThreshold;
-        keyOnReset = n->keyOnReset;
-        velocityMin = n->velocityMin;
-        velocityMax = n->velocityMax;
-        targetTypeNostalgicClear = n->targetTypeNostalgicClear;
-        nUseGlobalSoundSet = n->nUseGlobalSoundSet;
-        nSoundSet = n->nSoundSet;
+        NostalgicPreparation* _n = dynamic_cast<NostalgicPreparation*>(n.get());
+        nWaveDistance = _n->nWaveDistance;
+        nUndertow = _n->nUndertow;
+        nTransposition = _n->nTransposition;
+        nTranspUsesTuning = _n->nTranspUsesTuning;
+        defaultGain = _n->defaultGain;
+        nLengthMultiplier = _n->nLengthMultiplier;
+        nBeatsToSkip = _n->nBeatsToSkip;
+        nMode = _n->nMode;
+        nReverseAttack = _n->nReverseAttack;
+        nReverseDecay = _n->nReverseDecay;
+        nReverseSustain = _n->nReverseSustain;
+        nReverseRelease = _n->nReverseRelease;
+        nUndertowAttack = _n->nUndertowAttack;
+        nUndertowDecay = _n->nUndertowDecay;
+        nUndertowSustain = _n->nUndertowSustain;
+        nUndertowRelease = _n->nUndertowRelease;
+        holdMin = _n->holdMin;
+        holdMax = _n->holdMax;
+        clusterMin = _n->clusterMin;
+        clusterThreshold = _n->clusterThreshold;
+        keyOnReset = _n->keyOnReset;
+        velocityMin = _n->velocityMin;
+        velocityMax = _n->velocityMax;
+        targetTypeNostalgicClear = _n->targetTypeNostalgicClear;
+        
+        GenericPreparation::copy(s);
     }
     
     void performModification(NostalgicModification* n, Array<bool> dirty);
     
     void stepModdables()
     {
-        nGain.step();
-        nBlendronicGain.step();
+        defaultGain.step();
         nWaveDistance.step();
         nUndertow.step();
         nTransposition.step();
@@ -209,15 +198,14 @@ public:
         velocityMax.step();
         
         keyOnReset.step();
-        nUseGlobalSoundSet.step();
-        nSoundSet.step();
-        nSoundSetName.step();
+        soundSet.step();
+        soundSet.step();
+        soundSetName.step();
     }
     
     void resetModdables()
     {
-        nGain.reset();
-        nBlendronicGain.reset();
+        defaultGain.reset();
         nWaveDistance.reset();
         nUndertow.reset();
         nTransposition.reset();
@@ -244,9 +232,9 @@ public:
         velocityMax.reset();
         
         keyOnReset.reset();
-        nUseGlobalSoundSet.reset();
-        nSoundSet.reset();
-        nSoundSetName.reset();
+        soundSet.reset();
+        soundSet.reset();
+        soundSetName.reset();
     }
     
     inline bool compare (NostalgicPreparation::Ptr n)
@@ -255,8 +243,7 @@ public:
                 nUndertow == n->nUndertow &&
                 nTransposition == n->nTransposition &&
                 nTranspUsesTuning == n->nTranspUsesTuning &&
-                nGain == n->nGain &&
-                nBlendronicGain == n->nBlendronicGain &&
+                defaultGain == n->defaultGain &&
                 nLengthMultiplier == n->nLengthMultiplier &&
                 nBeatsToSkip == n->nBeatsToSkip &&
                 nReverseAttack == n->nReverseAttack &&
@@ -297,8 +284,7 @@ public:
         }
         nTransposition.set(dt);
 
-		nGain = r[idx++] * 10.0f;
-        nBlendronicGain = r[idx++] * 2.0f;
+		defaultGain = r[idx++] * 10.0f;
 		nLengthMultiplier = r[idx++] * 10.0f;
 		nBeatsToSkip = r[idx++] * 10.0f;
 		nMode = (NostalgicSyncMode)(int)(r[idx++] * NostalgicSyncModeNil);
@@ -321,8 +307,6 @@ public:
     inline const String getName() const noexcept {return name;}
     inline void setName(String n){name = n;}
     
-    inline float* getGainPtr()                                             {return &nGain.value;       }
-    inline float* getBlendronicGainPtr()                                   {return &nBlendronicGain.value;}
     
     inline const Array<float> getReverseADSRvals() const noexcept
     {
@@ -369,10 +353,7 @@ public:
         DBG("nWaveDistance: " + String(nWaveDistance.value));
         DBG("nUndertow: " + String(nUndertow.value));
         DBG("nTransposition: " + floatArrayToString(nTransposition.value));
-        DBG("nGain: " + String(nGain.value));
-        DBG("nBlendronicGain: " + String(nBlendronicGain.value));
-        DBG("nGain: " + String(nGain.value));
-        DBG("nBlendronicGain: " + String(nBlendronicGain.value));
+        DBG("defaultGain: " + String(defaultGain.value));
         DBG("nLengthMultiplier: " + String(nLengthMultiplier.value));
         DBG("nBeatsToSkip: " + String(nBeatsToSkip.value));
         DBG("nMode: " + String(nMode.value));
@@ -382,8 +363,7 @@ public:
     {
         ValueTree prep("params");
         
-        nGain.getState(prep, ptagNostalgic_gain);
-        nBlendronicGain.getState(prep, ptagNostalgic_blendronicGain);
+        defaultGain.getState(prep, ptagNostalgic_gain);
         
         nWaveDistance.getState(prep, ptagNostalgic_waveDistance);
         nUndertow.getState(prep, ptagNostalgic_undertow);
@@ -424,16 +404,28 @@ public:
         nUndertowRelease.getState(undertowADSRvals, ptagFloat + String(count));
         prep.addChild(undertowADSRvals, -1, 0);
         
-        nUseGlobalSoundSet.getState(prep, ptagNostalgic_useGlobalSoundSet);
-        nSoundSetName.getState(prep, ptagNostalgic_soundSet);
+        soundSet.getState(prep, ptagNostalgic_useGlobalSoundSet);
+        soundSetName.getState(prep, ptagNostalgic_soundSet);
         
         return prep;
     }
     
-    void setState(XmlElement* e)
+    void setState(XmlElement* _e)
     {
-        nGain.setState(e, ptagNostalgic_gain, 1.0f);
-        nBlendronicGain.setState(e, ptagNostalgic_blendronicGain, 1.0f);
+        setId(_e->getStringAttribute("Id").getIntValue());
+        
+        String n = _e->getStringAttribute("name");
+
+        if (n != String())     setName(n);
+        else                   setName(String(getId()));
+
+
+        XmlElement *e = _e->getChildByName("params");
+        if (e == nullptr)
+        {
+            e = _e;
+        }
+        defaultGain.setState(e, ptagNostalgic_gain, 1.0f);
         
         nWaveDistance.setState(e, ptagNostalgic_waveDistance, 0);
         nUndertow.setState(e, ptagNostalgic_undertow, 0);
@@ -457,8 +449,8 @@ public:
         
         targetTypeNostalgicClear.setState(e, ptagNostalgic_targetClearAll, NoteOn);
         
-        nUseGlobalSoundSet.setState(e, ptagNostalgic_useGlobalSoundSet, true);
-        nSoundSetName.setState(e, ptagNostalgic_soundSet, String());
+        soundSet.setState(e, ptagNostalgic_useGlobalSoundSet, true);
+        soundSetName.setState(e, ptagNostalgic_soundSet, String());
         
         nTransposition.setState(e, StringArray(vtagNostalgic_transposition, ptagFloat), Array<float>(0.0f));
         
@@ -483,13 +475,8 @@ public:
         }
     }
     
-    inline void setSoundSet(int Id) { nSoundSet = Id; }
-    inline int getSoundSet() { return nUseGlobalSoundSet.value ? -1 : nSoundSet.value; }
 
     bool modded = false;
-    
-    Moddable<float> nGain;                        // gain multiplier
-    Moddable<float> nBlendronicGain;
     
     Moddable<int> nWaveDistance;  //ms; distance from beginning of sample to stop reverse playback and begin undertow
     Moddable<int> nUndertow;      //ms; length of time to play forward after directional change
@@ -524,9 +511,6 @@ public:
     // Is this supposed to be moddable?
     Moddable<TargetNoteMode> targetTypeNostalgicClear;
     
-    Moddable<bool> nUseGlobalSoundSet;
-    Moddable<int> nSoundSet;
-    Moddable<String> nSoundSetName;
 private:
     String name;
     
@@ -619,120 +603,6 @@ private:
 
 
 
-class Nostalgic : public ReferenceCountedObject
-{
-    
-public:
-    typedef ReferenceCountedObjectPtr<Nostalgic>   Ptr;
-    typedef Array<Nostalgic::Ptr>                  PtrArr;
-    typedef Array<Nostalgic::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<Nostalgic>                  Arr;
-    typedef OwnedArray<Nostalgic, CriticalSection> CSArr;
-    
-    
-    Nostalgic(NostalgicPreparation::Ptr prep,
-              int Id):
-    prep(new NostalgicPreparation(prep)),
-    name("Nostalgic "+String(Id)),
-    Id(Id)
-    {
-    }
-    
-    
-    Nostalgic(int Id, bool random = false):
-    name("Nostalgic "+String(Id)),
-    Id(Id)
-    {
-        prep = new NostalgicPreparation();
-		if (random) randomize();
-    }
-    
-    inline void clear(void)
-    {
-        prep       = new NostalgicPreparation();
-    }
-    
-    inline Nostalgic::Ptr duplicate()
-    {
-        NostalgicPreparation::Ptr copyPrep = new NostalgicPreparation(prep);
-        
-        Nostalgic::Ptr copy = new Nostalgic(copyPrep, -1);
-        
-        copy->setName(name);
-        
-        return copy;
-    }
-    
-    ~Nostalgic() {};
-    
-    inline void copy(Nostalgic::Ptr from)
-    {
-        prep->copy(from->prep);
-    }
-    
-    inline ValueTree getState(bool active = false)
-    {
-        ValueTree vt(vtagNostalgic);
-        
-        vt.setProperty( "Id",Id, 0);
-        vt.setProperty( "name",                          name, 0);
-        
-        vt.addChild(prep->getState(), -1, 0);
-        
-        return vt;
-    }
-    
-    inline void setState(XmlElement* e)
-    {
-        Id = e->getStringAttribute("Id").getIntValue();
-        
-        String n = e->getStringAttribute("name");
-        
-        if (n != String())     name = n;
-        else                        name = String(Id);
-        
-        
-        XmlElement* params = e->getChildByName("params");
-        
-        if (params != nullptr)
-        {
-            prep->setState(params);
-        }
-        else
-        {
-            prep->setState(e);
-        }
-    }
-    
-    inline int getId() {return Id;}
-    inline void setId(int newId) { Id = newId;}
-    
-    NostalgicPreparation::Ptr      prep;
-    
-    inline String getName(void) const noexcept {return name;}
-    
-    inline void setName(String newName)
-    {
-        name = newName;
-    }
-
-    // for unit-testing
-	inline void randomize()
-	{
-		clear();
-		prep->randomize();
-		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
-		name = "random";
-	}
-    
-private:
-    
-    String name;
-    int Id;
-    
-    JUCE_LEAK_DETECTOR(Nostalgic)
-};
-
 
 /*
  NostalgicProcessor does the main work, including processing a block
@@ -751,7 +621,7 @@ public:
 //    typedef OwnedArray<NostalgicProcessor>                  Arr;
 //    typedef OwnedArray<NostalgicProcessor, CriticalSection> CSArr;
     
-    NostalgicProcessor(Nostalgic::Ptr nostalgic,
+    NostalgicProcessor(NostalgicPreparation::Ptr nostalgic,
                        TuningProcessor::Ptr tuning,
                        SynchronicProcessor::Ptr synchronic,
                        BKAudioProcessor& processor);
@@ -778,15 +648,6 @@ public:
         synth = main;
     }
     
-    inline void setNostalgic(Nostalgic::Ptr nost)
-    {
-        nostalgic = nost;
-    }
-    
-    inline Nostalgic::Ptr getNostalgic(void) const noexcept
-    {
-        return nostalgic;
-    }
     
     inline void setSynchronic(SynchronicProcessor::Ptr sync)
     {
@@ -897,7 +758,6 @@ private:
     bool post;
     BKSynthesiser::Ptr              synth;
     
-    Nostalgic::Ptr                  nostalgic;
     TuningProcessor::Ptr            tuner;
     SynchronicProcessor::Ptr        synchronic;
     

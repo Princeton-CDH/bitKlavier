@@ -203,7 +203,7 @@ private:
 
 class NostalgicModification :
 public Modification,
-public NostalgicPreparation
+public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<NostalgicModification>   Ptr;
@@ -228,15 +228,16 @@ public:
     {
         _setName(mod->_getName() + "copy");
         altMod = mod->altMod;
-        NostalgicPreparation::copy(mod);
+        prep->copy(mod);
     }
     
     ValueTree getState(void);
     void setState(XmlElement* e);
     void setStateOld(XmlElement* e);
-    
+    NostalgicPreparation::Ptr getPrep() {return prep;}
+    NostalgicPreparation* getPrepPtr() {return dynamic_cast<NostalgicPreparation*>(prep.get());}
 private:
-    
+    NostalgicPreparation::Ptr prep;
     JUCE_LEAK_DETECTOR(NostalgicModification)
 };
 

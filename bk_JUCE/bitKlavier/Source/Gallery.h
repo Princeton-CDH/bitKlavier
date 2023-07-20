@@ -43,10 +43,6 @@ public:
         String s = "";
         //for (auto item : direct) s += (" " + String(item->getId()));
         
-        s += "nostalgic";
-        for (auto item : nostalgic) s += (" " + String(item->getId()));
-    
-        
         s += "\ntuning";
         for (auto item : tuning) s += (" " + String(item->getId()));
         
@@ -115,16 +111,6 @@ public:
         for (auto p : tuning) { if (p->getId() == -1) { add = false; break;} }
         if (add) addTuningWithId(-1);
         
-//        add = true;
-//        for (auto p : synchronic) { if (p->getId() == -1) { add = false; break;} }
-//        if (add) addSynchronicWithId(-1);
-        
-        add = true;
-        for (auto p : nostalgic) { if (p->getId() == -1) { add = false; break;} }
-        if (add) addNostalgicWithId(-1);
-        
-        
-        
         add = true;
         for (auto p : bkKeymaps) { if (p->getId() == -1) { add = false; break;} }
         if (add) addKeymapWithId(-1);
@@ -140,6 +126,13 @@ public:
             if (p->getId() == -1) { add = false; break; }
         }
         if (add) addGenericPreparation(PreparationTypeResonance,-1);
+        add = true;
+        
+        for (auto p : *genericPrep[PreparationTypeNostalgic])
+        {
+            if (p->getId() == -1) { add = false; break; }
+        }
+        if (add) addGenericPreparation(PreparationTypeNostalgic,-1);
         add = true;
         
         for (auto p : *genericPrep[PreparationTypeDirect])
@@ -189,7 +182,6 @@ public:
     inline const bool isGalleryDirty(void) const noexcept {return isDirty; }
     void setGalleryDirty(bool dirt) {isDirty = dirt;}
     
-    inline const int getNumNostalgic(void) const noexcept {return nostalgic.size();}
     inline const int getNumTempo(void) const noexcept {return tempo.size();}
     inline const int getNumTuning(void) const noexcept {return tuning.size();}
 	inline const int getNumBlendronic(void) const noexcept { return blendronic.size(); }
@@ -253,11 +245,6 @@ public:
     }
     
     
-    inline const Nostalgic::PtrArr getAllNostalgic(void) const noexcept
-    {
-        return nostalgic;
-    }
-    
     inline const Blendronic::PtrArr getAllBlendronic(void) const noexcept
     {
         return blendronic;
@@ -291,17 +278,6 @@ public:
     inline Tuning::Ptr matches(TuningPreparation::Ptr prep)
     {
         for (auto p : tuning)
-        {
-            if (p->prep->compare(prep)) return p;
-        }
-        return nullptr;
-    }
-    
-    
-    
-    inline Nostalgic::Ptr matches(NostalgicPreparation::Ptr prep)
-    {
-        for (auto p : nostalgic)
         {
             if (p->prep->compare(prep)) return p;
         }
@@ -374,17 +350,7 @@ public:
         return names;
     }
     
-    inline const StringArray getAllNostalgicNames(void) const noexcept
-    {
-        StringArray names;
-        
-        for (auto prep : nostalgic)
-        {
-            names.add(prep->getName());
-        }
-        
-        return names;
-    }
+    
     
     inline const StringArray getAllTempoNames(void) const noexcept
     {
@@ -429,7 +395,7 @@ public:
         
         for (auto mod : modNostalgic)
         {
-            names.add(mod->getName());
+            names.add(mod->_getName());
         }
         
         return names;
@@ -495,15 +461,7 @@ public:
 		return names;
 	}
     
-    inline const NostalgicPreparation::Ptr getNostalgicPreparation(int Id) const noexcept
-    {
- 
-        for (auto p : nostalgic)
-        {
-            if (p->getId() == Id)   return p->prep;
-        }
-        return nullptr;
-    }
+    
     
     inline const TuningPreparation::Ptr getTuningPreparation(int Id) const noexcept
     {
@@ -539,19 +497,10 @@ public:
     
     
     
-    inline const Nostalgic::Ptr getNostalgic(int Id) const noexcept
-    {
-
-        for (auto p : nostalgic)
-        {
-            if (p->getId() == Id)   return p;
-        }
-        return nullptr;
-    }
+   
     
     inline const Tuning::Ptr getTuning(int Id) const noexcept
     {
-
         for (auto p : tuning)
         {
             if (p->getId() == Id)   return p;
@@ -821,7 +770,6 @@ private:
     
     
     
-    Nostalgic::PtrArr                   nostalgic;
     Tuning::PtrArr                      tuning;
     Tempo::PtrArr                       tempo;
 	Blendronic::PtrArr				    blendronic;
@@ -849,9 +797,6 @@ private:
     
     
     
-    void addNostalgic(void);
-    void addNostalgic(Nostalgic::Ptr);
-    void addNostalgic(NostalgicPreparation::Ptr);
     
     void addTuning(void);
     void addTuning(Tuning::Ptr);

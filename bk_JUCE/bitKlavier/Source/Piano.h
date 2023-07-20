@@ -177,7 +177,7 @@ public:
     
     void linkPreparationWithTempo(BKPreparationType thisType, int thisId, Tempo::Ptr thisTempo);
     
-    void linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, SynchronicPreparation::Ptr synchronic);
+    void linkNostalgicWithSynchronic(NostalgicPreparation::Ptr nostalgic, SynchronicPreparation::Ptr synchronic);
     
     void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
     

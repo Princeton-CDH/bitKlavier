@@ -402,29 +402,29 @@ void SynchronicModification::setStateOld(XmlElement* e)
 
 NostalgicModification::NostalgicModification(BKAudioProcessor& processor, int Id):
 Modification(processor, Id, NostalgicParameterTypeNil),
-NostalgicPreparation()
+NostalgicPreparation(new NostalgicPreparation(-1))
 {
 
 }
 
 ValueTree NostalgicModification::getState(void)
 {
-    ValueTree prep(vtagModNostalgic);
+    ValueTree _prep(vtagModNostalgic);
     
-    prep.setProperty( "Id", Id, 0);
-    prep.setProperty( "name", getName(), 0);
-    prep.setProperty("alt", altMod, 0);
+    _prep.setProperty( "Id", Id, 0);
+    _prep.setProperty( "name", _getName(), 0);
+    _prep.setProperty("alt", altMod, 0);
     ValueTree dirtyVT( "dirty");
     int count = 0;
     for (auto b : dirty)
     {
         dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
     }
-    prep.addChild(dirtyVT, -1, 0);
+    _prep.addChild(dirtyVT, -1, 0);
     
-    prep.addChild(NostalgicPreparation::getState(), -1, 0);
+    _prep.addChild(prep->getState(), -1, 0);
     
-    return prep;
+    return _prep;
 }
 
 void NostalgicModification::setState(XmlElement* e)
@@ -435,8 +435,8 @@ void NostalgicModification::setState(XmlElement* e)
     
     altMod = e->getBoolAttribute("alt", false);
     
-    if (n != String())     setName(n);
-    else                        setName(String(Id));
+    if (n != String())     _setName(n);
+    else                        _setName(String(Id));
     
     XmlElement* dirtyXml = e->getChildByName("dirty");
     XmlElement* paramsXml = e->getChildByName("params");
@@ -473,20 +473,20 @@ void NostalgicModification::setState(XmlElement* e)
 void NostalgicModification::setStateOld(XmlElement* e)
 {
     reset();
-    
+    NostalgicPreparation* _prep = getPrepPtr();
     float f;
     
     String p = e->getStringAttribute(ptagNostalgic_waveDistance);
     if (p != "")
     {
-        nWaveDistance.set(p.getIntValue());
+        _prep->nWaveDistance.set(p.getIntValue());
         setDirty(NostalgicWaveDistance);
     }
     
     p = e->getStringAttribute(ptagNostalgic_undertow);
     if (p != "")
     {
-        nUndertow.set(p.getIntValue());
+        _prep->nUndertow.set(p.getIntValue());
         setDirty(NostalgicUndertow);
     }
     
@@ -507,7 +507,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
                 }
             }
             
-            nTransposition.set(transp);
+            _prep->nTransposition.set(transp);
             setDirty(NostalgicTransposition);
             
         }
@@ -527,7 +527,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
                 }
             }
             
-            setReverseADSRvals(revADSR);
+            _prep->setReverseADSRvals(revADSR);
             setDirty(NostalgicReverseADSR);
             
         }
@@ -547,7 +547,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
                 }
             }
             
-            setUndertowADSRvals(undADSR);
+            _prep->setUndertowADSRvals(undADSR);
             setDirty(NostalgicUndertowADSR);
             
         }
@@ -556,28 +556,28 @@ void NostalgicModification::setStateOld(XmlElement* e)
     p = e->getStringAttribute(ptagNostalgic_lengthMultiplier);
     if (p != "")
     {
-        nLengthMultiplier.set(p.getFloatValue());
+        _prep->nLengthMultiplier.set(p.getFloatValue());
         setDirty(NostalgicLengthMultiplier);
     }
     
     p = e->getStringAttribute(ptagNostalgic_beatsToSkip);
     if (p != "")
     {
-        nBeatsToSkip.set(p.getFloatValue());
+        _prep->nBeatsToSkip.set(p.getFloatValue());
         setDirty(NostalgicBeatsToSkip);
     }
     
     p = e->getStringAttribute(ptagNostalgic_gain);
     if (p != "")
     {
-        nGain.set(p.getFloatValue());
+        _prep->nGain.set(p.getFloatValue());
         setDirty(NostalgicGain);
     }
     
     p = e->getStringAttribute(ptagNostalgic_mode);
     if (p != "")
     {
-        nMode.set((NostalgicSyncMode) p.getIntValue());
+        _prep->nMode.set((NostalgicSyncMode) p.getIntValue());
         setDirty(NostalgicMode);
     }
 }

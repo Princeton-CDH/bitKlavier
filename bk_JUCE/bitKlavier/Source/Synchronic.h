@@ -291,8 +291,7 @@ public:
         
         midiOutput = _s->midiOutput;
         
-        sUseGlobalSoundSet = _s->sUseGlobalSoundSet;
-        sSoundSet = _s->sSoundSet;
+       
         GenericPreparation::copy(s);
     }
     
@@ -913,9 +912,7 @@ public:
     
     Moddable<std::shared_ptr<MidiOutput>> midiOutput;
     
-    Moddable<bool> sUseGlobalSoundSet;
-    Moddable<int> sSoundSet;
-    Moddable<String> sSoundSetName;
+  
     
 private:
     String name;
