@@ -80,9 +80,9 @@ BKListBoxComponent::BKListBoxComponent(BKAudioProcessor &p)
     
     if(wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
         addAndMakeVisible(midiInputSelectButton);
+    upKeyboard->setKeysInKeymap(p.gallery->getIteratorUpKeymap()->keys());
     
-    
-   
+    downKeyboard->setKeysInKeymap(p.gallery->getIteratorDownKeymap()->keys());
     
     //addAndMakeVisible(midiInputSelectButton);
     addAndMakeVisible(listBox);

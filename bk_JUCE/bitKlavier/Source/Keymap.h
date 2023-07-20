@@ -237,8 +237,14 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree keysave( vtagKeymap );
+        ValueTree keysave;
         
+        if ( Id == 255)
+            keysave = ValueTree( "upkeymap" );
+        else if (Id == 256)
+            keysave = ValueTree( "downkeymap");
+        else
+            keysave = ValueTree(vtagKeymap);
         keysave.setProperty( "Id",Id, 0);
         
         keysave.setProperty("name",name,0);

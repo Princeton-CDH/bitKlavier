@@ -22,8 +22,8 @@ processor(p)
     }
     
     // DBG("idmap size: " + String(idmap.size()));
-    iteratorUpKeymap = new Keymap(p);
-    iteratorDownKeymap = new Keymap(p);
+    iteratorUpKeymap = new Keymap(p, 255);
+    iteratorDownKeymap = new Keymap(p, 256);
     general = new GeneralSettings();
     
     addDefaultPrepIfNotThere();
@@ -41,8 +41,8 @@ processor(p)
     }
     
     // DBG("idmap size: " + String(idmap.size()));
-    iteratorUpKeymap = new Keymap(p);
-    iteratorDownKeymap = new Keymap(p);
+    iteratorUpKeymap = new Keymap(p, 255);
+    iteratorDownKeymap = new Keymap(p, 256);
     general = new GeneralSettings();
     setStateFromXML(xml);
     
@@ -62,8 +62,8 @@ url(String())
     }
     
     // DBG("idmap size: " + String(idmap.size()));
-    iteratorUpKeymap = new Keymap(p);
-    iteratorDownKeymap = new Keymap(p);
+    iteratorUpKeymap = new Keymap(p, 255);
+    iteratorDownKeymap = new Keymap(p, 256);
     general = new GeneralSettings();
 
     addDefaultPrepIfNotThere();
