@@ -797,7 +797,10 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
                 DBG("Piano Name: " + piano->getName() + " Piano ID" + String(piano->getId()));
             }
             Piano::Ptr whichPiano = gallery->getPianoIteratorOrder().modelData[gallery->currentPianoIndex];
-            if (whichPiano->getId() > 0 && whichPiano->getId() != currentPiano->getId() && gallery->currentPianoIndex > 0)
+            
+            // DT: i'm not sure why we are avoiding piano = 0? it's not loading in bK as expected, when we move back to it, so i have removed that in the conditional, which i think means that the "else" will never be reached, but let me know if i'm missing something.
+            //if (whichPiano->getId() > 0 && whichPiano->getId() != currentPiano->getId() && gallery->currentPianoIndex > 0)
+            if (whichPiano->getId() != currentPiano->getId())
             {
                 DBG("change piano to " + String(whichPiano->getName()));
                 setCurrentPiano(whichPiano->getId());
