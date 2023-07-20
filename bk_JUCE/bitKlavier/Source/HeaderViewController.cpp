@@ -12,7 +12,6 @@
 
 #include "HeaderViewController.h"
 #include "MainViewController.h"
-#include <ranges>
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
 construction(c)
@@ -995,7 +994,7 @@ void HeaderViewController::fillPianoCB(void)
         if (name != String())  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());
     }*/
-
+    if (processor.currentPiano == nullptr) jassert("bad");
     pianoCB.setSelectedId(processor.currentPiano->getId(), dontSendNotification);
 }
 
@@ -1015,6 +1014,12 @@ bool HeaderViewController::handleGalleryChange(void)
     bool shouldSwitch = false;
     
     galleryIsDirtyAlertResult = 2;
+    
+    if(processor.gallery->iteratorIsEnabled)
+    {
+        int iterPianos = processor.gallery->getPianoIteratorOrder().getNumItems();
+        if(iterPianos > 0) processor.gallery->setGalleryDirty(true);
+    }
     
     if(processor.gallery->isGalleryDirty())
     {
@@ -1167,5 +1172,10 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         MainViewController* mvc = dynamic_cast<MainViewController*> (getParentComponent());
         if(mvc)
             mvc->fillSampleCB();
+        if(processor.getBKEditor()->iteratorDoc != nullptr)
+        {
+            processor.getBKEditor()->iteratorDoc->closeButtonPressed();
+            processor.getBKEditor()->iteratorDoc = nullptr;
+        }
     }
 }

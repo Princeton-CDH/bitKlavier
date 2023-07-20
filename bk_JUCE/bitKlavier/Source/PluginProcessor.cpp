@@ -769,13 +769,17 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     
     if (gallery->iteratorIsEnabled){
         int prevPiano = gallery->currentPianoIndex;
+        int currNumPianos = gallery->getPianoIteratorOrder().getNumItems();
+        
         if (gallery->getIteratorUpKeymap()->keys().contains(noteNumber) && gallery->getIteratorUpKeymap()->getAllMidiInputIdentifiers().contains(source))
         {
-            gallery->currentPianoIndex++;
+            if (prevPiano == currNumPianos - 1) gallery->currentPianoIndex = 0;
+            else gallery->currentPianoIndex++;
         }
         if (gallery->getIteratorDownKeymap()->keys().contains(noteNumber) && gallery->getIteratorDownKeymap()->getAllMidiInputIdentifiers().contains(source))
         {
-            gallery->currentPianoIndex--;
+            if (prevPiano == 0) gallery->currentPianoIndex  = currNumPianos - 1;
+            else gallery->currentPianoIndex--;
         }
         if (prevPiano !=  gallery->currentPianoIndex)
         {

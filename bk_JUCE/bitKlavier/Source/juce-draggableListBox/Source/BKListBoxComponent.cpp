@@ -105,6 +105,7 @@ void BKListBoxComponent::bkButtonClicked(Button *b)
     if (b == &midiInputSelectButton)
     {
         getMidiInputSelectMenu().showMenuAsync(PopupMenu::Options().withTargetComponent(&midiInputSelectButton), ModalCallbackFunction::forComponent(midiInputSelectCallback, this));
+
     }
 }
 
@@ -165,7 +166,7 @@ PopupMenu BKListBoxComponent::getPianoOptionMenu()
 
 void BKListBoxComponent::pianoOptionMenuCallback(int res, BKListBoxComponent* bkl)
 {
-    if (bkl == nullptr)
+    if (bkl == nullptr || res == 0)
     {
         PopupMenu::dismissAllActiveMenus();
         return;
@@ -173,7 +174,11 @@ void BKListBoxComponent::pianoOptionMenuCallback(int res, BKListBoxComponent* bk
     
     BKAudioProcessor& processor = bkl->p;
     
+    jassert(bkl != nullptr);
+    
     bkl->itemData.modelData.push_back( processor.gallery->getPianos()[res-1]);
+    
+//    jassert(bkl->listBox != nullptr);
     bkl->listBox.updateContent();
 //    processor.gallery->setPianoIteratorOrder(bkl->itemData.modelData);
 }
