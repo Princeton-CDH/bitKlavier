@@ -227,6 +227,9 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
 #endif
     
     galleryMenu.addSeparator();
+    galleryMenu.addItem(ITERATOR_ID, "Piano Iterator");
+    
+    galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     
 #if JUCE_IOS
@@ -553,6 +556,11 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
         processor.loadGalleryDialog();
         //auto comp = getParentComponent();
         
+    }
+    else if (result == ITERATOR_ID) // open Piano Iterator
+    {
+        DBG("iterator button check");
+        processor.getBKEditor()->showPianoIteratorDialog();
     }
     else if (result == SETTINGS_ID) // open General settings
     {
@@ -1017,6 +1025,7 @@ bool HeaderViewController::handleGalleryChange(void)
     
     if(processor.gallery->iteratorIsEnabled)
     {
+    
         int iterPianos = processor.gallery->getPianoIteratorOrder().getNumItems();
         if(iterPianos > 0) processor.gallery->setGalleryDirty(true);
     }

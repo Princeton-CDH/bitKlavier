@@ -27,7 +27,7 @@ processor(p)
     general = new GeneralSettings();
     
     addDefaultPrepIfNotThere();
-    
+    disableEnablePianoMapper();
     isDirty = false;
 }
 
@@ -47,8 +47,10 @@ processor(p)
     setStateFromXML(xml);
     
     addDefaultPrepIfNotThere();
-    
+    disableEnablePianoMapper();
     isDirty = false;
+    
+    
 }
 
 Gallery::Gallery(var myJson, BKAudioProcessor& p):
@@ -76,6 +78,7 @@ url(String())
     }
     
     isDirty = false;
+    
 }
 
 

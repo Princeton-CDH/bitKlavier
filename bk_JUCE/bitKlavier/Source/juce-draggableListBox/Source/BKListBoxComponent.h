@@ -120,36 +120,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BKListBoxComponent)
 };
 
-//==============================================================================
-/**
- An effect filter that simple makes image monochrome.
- (This will only work on images/components that aren't opaque, of course).
- @see Component::setComponentEffect
- */
-class MonochromeEffect  : public ImageEffectFilter
-{
-public:
-    //==============================================================================
-    /** Creates a default drop-shadow effect.
-     To customise the shadow's appearance, use the setShadowProperties() method.
-     @param backgroundColour (optional) - for some alpha values you might prefer a background (such as black).
-     */
-    MonochromeEffect(juce::Colour backgroundColour = juce::Colours::transparentBlack) { bgColour_ = backgroundColour; }
 
-    /** Destructor. */
-    ~MonochromeEffect() {}
-
-    //==============================================================================
-    /** @internal */
-    void applyEffect (juce::Image& image, juce::Graphics& g, float scaleFactor, float alpha)
-    {
-        g.fillAll(bgColour_);
-        image.desaturate();
-        g.setOpacity (alpha);
-        g.drawImageAt (image, 0, 0);
-    }
-private:
-    //==============================================================================
-    juce::Colour bgColour_;
-    JUCE_LEAK_DETECTOR (MonochromeEffect)
-};

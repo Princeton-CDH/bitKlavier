@@ -100,8 +100,11 @@ void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
     window->setTitleBarTextCentred(false);
 }
 
-void BKAudioProcessorEditor::showPianoIteratorDialog(Button *button)
+void BKAudioProcessorEditor::showPianoIteratorDialog()
 {
+    // check if DocumentWindow already exists
+    if (processor.updateState->iteratorViewActive) return;
+    
     iteratorDoc = new BKDocumentWindow("Piano Iterator", Colours::transparentBlack, DocumentWindow::TitleBarButtons::allButtons, true );
     bKIterator = new BKListBoxComponent(processor);
     

@@ -110,6 +110,7 @@ ValueTree  Gallery::getState(void)
     galleryVT.addChild(pianoIteratorOrder.getState(), -1, 0);
     galleryVT.addChild(iteratorUpKeymap->getState(), -1, 0);
     galleryVT.addChild(iteratorDownKeymap->getState(), -1,0);
+    galleryVT.setProperty("iteratorIsEnabled",iteratorIsEnabled,0);
     return galleryVT;
 }
 
@@ -177,7 +178,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
         name = xml->getStringAttribute("name");
         //if (name != )
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
-        
+        iteratorIsEnabled = xml->getStringAttribute("iteratorIsEnabled").getIntValue();
         // iterate through its sub-elements
         for (auto e : xml->getChildIterator())
         {
@@ -401,6 +402,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
             {
                 iteratorDownKeymap->setState(e);
             }
+            
         }
     }
 }

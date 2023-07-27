@@ -3,12 +3,6 @@
 MyListComponent::MyListComponent(DraggableListBox& lb, MyListBoxItemData& data, int rn)
     : DraggableListBoxItem(lb, data, rn)
 {
-    actionBtn.setButtonText("Action");
-    actionBtn.onClick = [this]()
-    {
-        ((MyListBoxItemData&)modelData).doItemAction(rowNum);
-    };
-    addAndMakeVisible(actionBtn);
 
     deleteBtn.setButtonText("Delete");
     deleteBtn.onClick = [this]()

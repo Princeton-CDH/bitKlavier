@@ -48,7 +48,6 @@ public:
     
 private:
     BKAudioProcessor& processor;
-    
     int galleryIsDirtyAlertResult;
     
 

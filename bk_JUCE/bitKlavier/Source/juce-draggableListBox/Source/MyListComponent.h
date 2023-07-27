@@ -5,6 +5,7 @@
 struct MyListBoxItemData : public DraggableListBoxItemData
 {
     std::vector<Piano::Ptr> modelData;
+    bool isOn;
     ValueTree getState()
     {
         ValueTree listBoxVt(vtagPianoIterator);
@@ -14,6 +15,8 @@ struct MyListBoxItemData : public DraggableListBoxItemData
             _piano.setProperty("id", piano->getId(),0);
             listBoxVt.addChild(_piano,-1,0);
         }
+        
+        listBoxVt.setProperty("isOn", isOn, 0);
         return listBoxVt;
         
     }

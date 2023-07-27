@@ -52,7 +52,10 @@ public:
     void showGenSettings(int tab);
     
     MainViewController& getMainViewController() { return mvc; }
-    void showPianoIteratorDialog(Button *button);
+    
+    // void showPianoIteratorDialog(Button *button);
+    void showPianoIteratorDialog();
+    
     BKListBoxComponent *bKIterator;
     DocumentWindow* iteratorDoc = nullptr;
 private:

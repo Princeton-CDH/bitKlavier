@@ -100,6 +100,9 @@
 #define RESONANCE_EDIT_ID 60
 #define RESONANCEMOD_EDIT_ID 61
 
+// adding to put iterator in gallery dropdown menu
+#define ITERATOR_ID 62
+
 #define SOUNDFONT_ID 1000
 
 #define MIDIOUT_ID 2000

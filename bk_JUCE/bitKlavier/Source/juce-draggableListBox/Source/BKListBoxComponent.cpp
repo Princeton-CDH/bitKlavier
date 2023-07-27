@@ -16,41 +16,16 @@ BKListBoxComponent::BKListBoxComponent(BKAudioProcessor &p)
     };
     iteratorOnOff.setButtonText("Iterator On/Off");
     iteratorOnOff.setTooltip("Turning on Piano Iterator will disable Piano Mapper Objects");
+    iteratorOnOff.setToggleState(p.gallery->iteratorIsEnabled, sendNotificationSync);
+   
+  
     iteratorOnOff.onClick = [this]()
     {
         this->p.gallery->iteratorIsEnabled = iteratorOnOff.getToggleState();
-        if(this->p.gallery->iteratorIsEnabled)
-        {
-            for (auto piano : this->p.gallery->getPianos())
-            {
-                for (auto item : piano->getItems())
-                {
-                   if(item->getType() == PreparationTypePianoMap)
-                   {
-                       item->isDisabled = true;
-                       item->setInterceptsMouseClicks(true, false);
-                       item->setComponentEffect(new MonochromeEffect());
-                   }
-                }
-            }
-        }
-        else
-        {
-            for (auto piano : this->p.gallery->getPianos())
-            {
-                for (auto item : piano->getItems())
-                {
-                   if(item->getType() == PreparationTypePianoMap)
-                   {
-                       item->isDisabled = false;
-                       item->setInterceptsMouseClicks(true, true);
-                       item->setComponentEffect(nullptr);
-                       
-                   }
-                }
-            }
-        }
+        this->p.gallery->disableEnablePianoMapper();
     };
+    
+    iteratorOnOff.onClick();
     addAndMakeVisible(addBtn);
     listBox.setMultipleSelectionEnabled(true);
     listBox.setModel(&listBoxModel);
