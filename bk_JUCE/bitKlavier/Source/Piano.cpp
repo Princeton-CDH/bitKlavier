@@ -200,7 +200,7 @@ void Piano::configure(void)
                 DBG("linking preparation type to tuning: " + String(targetType));
                 if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) || targetType == PreparationTypeResonance)
                 {
-                    linkPreparationWithTuning(targetType, targetId, processor.gallery->getTuning(Id));
+                    linkPreparationWithTuning(targetType, targetId,  processor.gallery->getPreparationOfType(PreparationTypeTuning, Id));
                 }
             }
             /*if (!testLinkedWithTuning)
@@ -233,7 +233,7 @@ void Piano::configure(void)
                 
                 if (targetType == PreparationTypeNostalgic)
                 {
-                    linkNostalgicWithSynchronic(processor.gallery->getNostalgic(targetId), processor.gallery->getPreparationOfType(PreparationTypeSynchronic,Id));
+                    linkNostalgicWithSynchronic(processor.gallery->getPreparationOfType(PreparationTypeNostalgic, targetId), processor.gallery->getPreparationOfType(PreparationTypeSynchronic,Id));
                 }
             }
         }
@@ -300,7 +300,7 @@ GenericProcessor::Ptr Piano::getProcessorOfType(int Id, BKPreparationType type, 
 
 GenericProcessor::Ptr Piano::addNostalgicProcessor(int thisId)
 {
-    NostalgicProcessor::Ptr nproc = new NostalgicProcessor(processor.gallery->getNostalgic(thisId),
+    NostalgicProcessor::Ptr nproc = new NostalgicProcessor(processor.gallery->getPreparationOfType(PreparationTypeNostalgic, thisId),
                                        defaultT,
                                        defaultS,
                                        processor
@@ -330,7 +330,7 @@ GenericProcessor::Ptr Piano::addDirectProcessor(int thisId)
 
 GenericProcessor::Ptr Piano::addTuningProcessor(int thisId)
 {
-    TuningProcessor::Ptr tproc = new TuningProcessor(processor, processor.gallery->getTuning(thisId));
+    TuningProcessor::Ptr tproc = new TuningProcessor(processor, processor.gallery->getPreparationOfType(PreparationTypeTuning,thisId));
     tproc->prepareToPlay(processor.gallery->getGeneralSettings());
     prepMap->addProcessor(tproc);
     return tproc;
@@ -485,7 +485,7 @@ void Piano::add(BKItem::Ptr item, bool configureIfAdded)
                 DBG("linking preparation type to tuning: " + String(targetType));
                 if ((targetType >= PreparationTypeDirect && targetType <= PreparationTypeNostalgic) || targetType == PreparationTypeResonance)
                 {
-                    linkPreparationWithTuning(targetType, targetId, processor.gallery->getTuning(Id));
+                    linkPreparationWithTuning(targetType, targetId, processor.gallery->getPreparationOfType(PreparationTypeTuning,Id));
                 }
             }
             /*if (!testLinkedWithTuning)
@@ -518,7 +518,7 @@ void Piano::add(BKItem::Ptr item, bool configureIfAdded)
                 
                 if (targetType == PreparationTypeNostalgic)
                 {
-                    linkNostalgicWithSynchronic(processor.gallery->getNostalgic(targetId), processor.gallery->getPreparationOfType(PreparationTypeSynchronic,Id));
+                    linkNostalgicWithSynchronic(processor.gallery->getPreparationOfType(PreparationTypeNostalgic,targetId), processor.gallery->getPreparationOfType(PreparationTypeSynchronic,Id));
                 }
             }
         }
@@ -590,14 +590,14 @@ void Piano::linkPreparationWithTempo(BKPreparationType thisType, int thisId, Tem
 //    }
 }
 
-void Piano::linkNostalgicWithSynchronic(Nostalgic::Ptr nostalgic, SynchronicPreparation::Ptr synchronic)
+void Piano::linkNostalgicWithSynchronic(NostalgicPreparation::Ptr nostalgic, SynchronicPreparation::Ptr synchronic)
 {
     NostalgicProcessor::Ptr proc = getProcessorOfType(nostalgic->getId(), PreparationTypeNostalgic);
     
     dynamic_cast<NostalgicProcessor*>(proc.get())->setSynchronic(getProcessorOfType(synchronic->getId(), PreparationTypeSynchronic));
 }
 
-void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning)
+void Piano::linkPreparationWithTuning(BKPreparationType thisType, int thisId, TuningPreparation::Ptr thisTuning)
 {
     TuningProcessor::Ptr tproc = getProcessorOfType(thisTuning->getId(),PreparationTypeTuning);
     

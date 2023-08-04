@@ -228,7 +228,7 @@ public:
     {
         _setName(mod->_getName() + "copy");
         altMod = mod->altMod;
-        prep->copy(mod);
+        prep->copy(mod->getPrep());
     }
     
     ValueTree getState(void);
@@ -287,7 +287,7 @@ private:
 
 class TuningModification :
 public Modification,
-public TuningPreparation
+public ReferenceCountedObject
 {
 public:
     typedef ReferenceCountedObjectPtr<TuningModification>   Ptr;
@@ -310,29 +310,29 @@ public:
     
     inline void copy (TuningModification::Ptr mod)
     {
-        _setName(mod->getName() + "copy");
+        _setName(mod->_getName() + "copy");
         altMod = mod->altMod;
-        TuningPreparation::copy(mod);
+        prep->copy(mod->getPrep());
     }
     
     inline ValueTree getState(void)
     {
-        ValueTree prep(vtagModTuning);
+        ValueTree _prep(vtagModTuning);
         
-        prep.setProperty( "Id", Id, 0);
-        prep.setProperty( "name", getName(), 0);
-        prep.setProperty("alt", altMod, 0);
+        _prep.setProperty( "Id", Id, 0);
+        _prep.setProperty( "name", _getName(), 0);
+        _prep.setProperty("alt", altMod, 0);
         ValueTree dirtyVT( "dirty");
         int count = 0;
         for (auto b : dirty)
         {
             dirtyVT.setProperty( "d" + String(count++), (int)b, 0);
         }
-        prep.addChild(dirtyVT, -1, 0);
+        _prep.addChild(dirtyVT, -1, 0);
         
-        prep.addChild(TuningPreparation::getState(), -1, 0);
+        _prep.addChild(prep->getState(), -1, 0);
         
-        return prep;
+        return _prep;
     }
     
     inline void setState(XmlElement* e)
@@ -363,13 +363,18 @@ public:
                 }
             }
             
-            TuningPreparation::setState(paramsXml);
+            prep->setState(paramsXml);
         }
         else
         {
             setStateOld(e);
         }
     }
+    
+    TuningPreparation::Ptr getPrep() {return prep;}
+    TuningPreparation* getPrepPtr() {return dynamic_cast<TuningPreparation*>(prep.get());}
+    void resetModdables() {prep->resetModdables();}
+    TuningPreparation::Ptr prep;
     
     void setStateOld(XmlElement* e);
     

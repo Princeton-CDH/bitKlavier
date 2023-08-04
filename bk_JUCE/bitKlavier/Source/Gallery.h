@@ -43,8 +43,7 @@ public:
         String s = "";
         //for (auto item : direct) s += (" " + String(item->getId()));
         
-        s += "\ntuning";
-        for (auto item : tuning) s += (" " + String(item->getId()));
+      
         
         s += "\ntempo";
         for (auto item : tempo) s += (" " + String(item->getId()));
@@ -108,10 +107,6 @@ public:
         if (add) addTempoWithId(-1);
         
         add = true;
-        for (auto p : tuning) { if (p->getId() == -1) { add = false; break;} }
-        if (add) addTuningWithId(-1);
-        
-        add = true;
         for (auto p : bkKeymaps) { if (p->getId() == -1) { add = false; break;} }
         if (add) addKeymapWithId(-1);
 
@@ -126,6 +121,15 @@ public:
             if (p->getId() == -1) { add = false; break; }
         }
         if (add) addGenericPreparation(PreparationTypeResonance,-1);
+        
+        add = true;
+        
+        for (auto p : *genericPrep[PreparationTypeTuning])
+        {
+            if (p->getId() == -1) { add = false; break; }
+        }
+        if (add) addGenericPreparation(PreparationTypeTuning,-1);
+        
         add = true;
         
         for (auto p : *genericPrep[PreparationTypeNostalgic])
@@ -183,7 +187,6 @@ public:
     void setGalleryDirty(bool dirt) {isDirty = dirt;}
     
     inline const int getNumTempo(void) const noexcept {return tempo.size();}
-    inline const int getNumTuning(void) const noexcept {return tuning.size();}
 	inline const int getNumBlendronic(void) const noexcept { return blendronic.size(); }
     inline const int getNumSynchronicMod(void) const noexcept {return modSynchronic.size();}
     inline const int getNumNostalgicMod(void) const noexcept {return modNostalgic.size();}
@@ -195,9 +198,9 @@ public:
     
     inline void deregisterMTS()
     {
-        for (auto t: tuning)
+        for (auto t: *getAllPreparationsOfType(BKPreparationType::PreparationTypeTuning))
         {
-            t->prep->deregisterMTS();
+            dynamic_cast<TuningPreparation*>(t)->deregisterMTS();
         }
     }
     
@@ -239,11 +242,7 @@ public:
     }
     
     
-    inline const Tuning::PtrArr getAllTuning(void) const noexcept
-    {
-        return tuning;
-    }
-    
+
     
     inline const Blendronic::PtrArr getAllBlendronic(void) const noexcept
     {
@@ -255,15 +254,7 @@ public:
         return tempo;
     }
     
-    inline TuningModification::Ptr matches(TuningModification::Ptr mod)
-    {
-        for (auto p : modTuning)
-        {
-            if (p->compare(mod)) return p;
-        }
-        
-        return nullptr;
-    }
+ 
     
     inline Keymap::Ptr matches(Keymap::Ptr keymap)
     {
@@ -275,15 +266,7 @@ public:
         return nullptr;
     }
     
-    inline Tuning::Ptr matches(TuningPreparation::Ptr prep)
-    {
-        for (auto p : tuning)
-        {
-            if (p->prep->compare(prep)) return p;
-        }
-        return nullptr;
-    }
-    
+  
     inline Tempo::Ptr matches(TempoPreparation::Ptr prep)
     {
         for (auto p : tempo)
@@ -320,18 +303,6 @@ public:
         for (auto keymap : bkKeymaps)
         {
             names.add(keymap->getName());
-        }
-        
-        return names;
-    }
-    
-    inline const StringArray getAllTuningNames(void) const noexcept
-    {
-        StringArray names;
-        
-        for (auto prep : tuning)
-        {
-            names.add(prep->getName());
         }
         
         return names;
@@ -443,7 +414,7 @@ public:
         
         for (auto mod : modTuning)
         {
-            names.add(mod->getName());
+            names.add(mod->_getName());
         }
         
         return names;
@@ -463,15 +434,7 @@ public:
     
     
     
-    inline const TuningPreparation::Ptr getTuningPreparation(int Id) const noexcept
-    {
-
-        for (auto p : tuning)
-        {
-            if (p->getId() == Id)   return p->prep;
-        }
-        return nullptr;
-    }
+ 
     
     inline const TempoPreparation::Ptr getTempoPreparation(int Id) const noexcept
     {
@@ -493,21 +456,7 @@ public:
 		return nullptr;
 	}
  
-    
-    
-    
-    
-   
-    
-    inline const Tuning::Ptr getTuning(int Id) const noexcept
-    {
-        for (auto p : tuning)
-        {
-            if (p->getId() == Id)   return p;
-        }
-        return nullptr;
-    }
-    
+
     inline const Tempo::Ptr getTempo(int Id) const noexcept
     {
 
@@ -704,8 +653,6 @@ public:
     
     void clean(void);
     
-    void addNostalgicWithId(int Id);
-    void addTuningWithId(int Id);
     void addTempoWithId(int Id);
     void addKeymapWithId(int Id);
 	void addBlendronicWithId(int Id);
@@ -770,7 +717,7 @@ private:
     
     
     
-    Tuning::PtrArr                      tuning;
+    
     Tempo::PtrArr                       tempo;
 	Blendronic::PtrArr				    blendronic;
     
@@ -797,10 +744,7 @@ private:
     
     
     
-    
-    void addTuning(void);
-    void addTuning(Tuning::Ptr);
-    void addTuning(TuningPreparation::Ptr);
+
     
     void addTempo(void);
     void addTempo(Tempo::Ptr);
@@ -846,7 +790,6 @@ private:
 	void addBlendronicMod(BlendronicModification::Ptr);
     
     void removeNostalgic(int Id);
-    void removeTuning(int Id);
     void removeTempo(int Id);
 	void removeBlendronic(int Id);
     void removeKeymap(int Id);

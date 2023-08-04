@@ -56,9 +56,6 @@ public:
     sClusterThreshSec(.001 * sClusterThresh.base),
     sReleaseVelocitySetsSynchronic(false),
     midiOutput(nullptr),
-    sUseGlobalSoundSet(true),
-    sSoundSet(-1),
-    sSoundSetName(String()),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
@@ -111,9 +108,6 @@ public:
     sClusterThreshSec(.001 * sClusterThresh.base),
     sReleaseVelocitySetsSynchronic(velocityMode),
     midiOutput(nullptr),
-    sUseGlobalSoundSet(true),
-    sSoundSet(-1),
-    sSoundSetName(String()),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
@@ -165,9 +159,6 @@ public:
     sClusterThreshSec(.001 * sClusterThresh.base),
     sReleaseVelocitySetsSynchronic(false),
     midiOutput(nullptr),
-    sUseGlobalSoundSet(true),
-    sSoundSet(-1),
-    sSoundSetName(String()),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
@@ -190,7 +181,6 @@ public:
     
     
     SynchronicPreparation(XmlElement *e):
-
     sTempo(120.f),
     sNumBeats(20),
     sClusterMin(1),
@@ -218,9 +208,6 @@ public:
     sClusterThreshSec(.001 * sClusterThresh.base),
     sReleaseVelocitySetsSynchronic(false),
     midiOutput(nullptr),
-    sUseGlobalSoundSet(true),
-    sSoundSet(-1),
-    sSoundSetName(String()),
     targetTypeSynchronicPatternSync(NoteOn),
     targetTypeSynchronicBeatSync(NoteOn),
     targetTypeSynchronicAddNotes(NoteOn),
@@ -339,9 +326,9 @@ public:
         
         midiOutput.step();
         
-        sUseGlobalSoundSet.step();
-        sSoundSet.step();
-        sSoundSetName.step();
+        useGlobalSoundSet.step();
+        soundSet.step();
+        soundSetName.step();
     }
     
     void resetModdables()
@@ -386,9 +373,9 @@ public:
         
         midiOutput.reset();
         
-        sUseGlobalSoundSet.reset();
-        sSoundSet.reset();
-        sSoundSetName.reset();
+        useGlobalSoundSet.reset();
+        soundSet.reset();
+        soundSetName.reset();
     }
     
     bool compare(SynchronicPreparation::Ptr s)
@@ -761,8 +748,8 @@ public:
 
         sADSRs.getState(prep, StringArray(vtagSynchronic_ADSRs, "e", ptagFloat));
         
-        sUseGlobalSoundSet.getState(prep, ptagSynchronic_useGlobalSoundSet);
-        sSoundSetName.getState(prep, ptagSynchronic_soundSet);
+        useGlobalSoundSet.getState(prep, ptagSynchronic_useGlobalSoundSet);
+        soundSetName.getState(prep, ptagSynchronic_soundSet);
         
         if (midiOutput.value != nullptr)
             prep.setProperty( ptagSynchronic_midiOutput, midiOutput.value->getIdentifier(), 0);
@@ -806,8 +793,8 @@ public:
         onOffMode.setState(e, "onOffMode", KeyOn);
         
         sTranspUsesTuning.setState(e, ptagSynchronic_transpUsesTuning, false);
-        sUseGlobalSoundSet.setState(e, ptagSynchronic_useGlobalSoundSet, true);
-        sSoundSetName.setState(e, ptagSynchronic_soundSet, String());
+        useGlobalSoundSet.setState(e, ptagSynchronic_useGlobalSoundSet, true);
+        soundSetName.setState(e, ptagSynchronic_soundSet, String());
 
         sBeatMultipliers.setState(e, StringArray(vtagSynchronic_beatMults, ptagFloat), 1.0);
         // for pre-v.2.5.2, when we didn't save beatstates
@@ -868,8 +855,7 @@ public:
         setTargetTypeSynchronicRotate((TargetNoteMode)i);
     }
     
-    inline void setSoundSet(int Id) { sSoundSet = Id; }
-    inline int getSoundSet(void) { return sUseGlobalSoundSet.value ? -1 : sSoundSet.value; }
+   
     
     bool modded = false;
     

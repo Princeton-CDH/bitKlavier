@@ -402,7 +402,7 @@ void SynchronicModification::setStateOld(XmlElement* e)
 
 NostalgicModification::NostalgicModification(BKAudioProcessor& processor, int Id):
 Modification(processor, Id, NostalgicParameterTypeNil),
-NostalgicPreparation(new NostalgicPreparation(-1))
+prep(new NostalgicPreparation(-1))
 {
 
 }
@@ -455,13 +455,13 @@ void NostalgicModification::setState(XmlElement* e)
             }
         }
         
-        NostalgicPreparation::setState(paramsXml);
-        if (!nUseGlobalSoundSet.value)
+        prep->setState(paramsXml);
+        if (!prep->useGlobalSoundSet.value)
         {
             // comes in as "soundfont.sf2.subsound1"
-            String name = nSoundSetName.value;
+            String name = prep->soundSetName.value;
             int Id = processor.findPathAndLoadSamples(name);
-            setSoundSet(Id);
+            prep->setSoundSet(Id);
         }
     }
     else
@@ -570,7 +570,7 @@ void NostalgicModification::setStateOld(XmlElement* e)
     p = e->getStringAttribute(ptagNostalgic_gain);
     if (p != "")
     {
-        _prep->nGain.set(p.getFloatValue());
+        _prep->defaultGain.set(p.getFloatValue());
         setDirty(NostalgicGain);
     }
     
@@ -723,7 +723,7 @@ void TempoModification::setStateOld(XmlElement* e)
 
 TuningModification::TuningModification(BKAudioProcessor& processor, int Id):
 Modification(processor, Id, TuningParameterTypeNil),
-TuningPreparation()
+prep(new TuningPreparation(-1))
 {
     //Array<bool> tetherWeightsActive;
     //Array<bool> springWeightsActive;
@@ -737,88 +737,88 @@ void TuningModification::setStateOld(XmlElement* e)
     reset();
     
     String p; float f;
-    
+    TuningPreparation* _prep = getPrepPtr();
     p = e->getStringAttribute( ptagTuning_scale);
     if (p != "")
     {
-        setScale((TuningSystem) p.getIntValue());
+        _prep->setScale((TuningSystem) p.getIntValue());
         setDirty(TuningScale);
     }
    
     p = e->getStringAttribute( ptagTuning_fundamental);
     if (p != "")
     {
-        setFundamental((PitchClass) p.getIntValue());
+        _prep->setFundamental((PitchClass) p.getIntValue());
         setDirty(TuningFundamental);
     }
     
     p = e->getStringAttribute( ptagTuning_offset);
     if (p != "")
     {
-        setFundamentalOffset(p.getFloatValue());
+        _prep->setFundamentalOffset(p.getFloatValue());
         setDirty(TuningOffset);
     }
     
     p = e->getStringAttribute( ptagTuning_adaptiveIntervalScale);
     if (p != "")
     {
-        setAdaptiveIntervalScale((TuningSystem) p.getIntValue());
+        _prep->setAdaptiveIntervalScale((TuningSystem) p.getIntValue());
         setDirty(TuningA1IntervalScale);
     }
     
     p = e->getStringAttribute( ptagTuning_adaptiveHistory);
     if (p != "")
     {
-        setAdaptiveHistory( p.getIntValue());
+        _prep->setAdaptiveHistory( p.getIntValue());
         setDirty(TuningA1History);
     }
     
     p = e->getStringAttribute( ptagTuning_adaptiveInversional);
     if (p != "")
     {
-        setAdaptiveInversional( (bool)p.getIntValue());
+        _prep->setAdaptiveInversional( (bool)p.getIntValue());
         setDirty(TuningA1Inversional);
     }
     
     p = e->getStringAttribute( ptagTuning_adaptiveClusterThresh);
     if (p != "")
     {
-        setAdaptiveClusterThresh(p.getIntValue());
+        _prep->setAdaptiveClusterThresh(p.getIntValue());
         setDirty(TuningA1ClusterThresh);
     }
     
     p = e->getStringAttribute( ptagTuning_adaptiveAnchorFund);
     if (p != "")
     {
-        setAdaptiveAnchorFundamental( (PitchClass) p.getIntValue());
+        _prep->setAdaptiveAnchorFundamental( (PitchClass) p.getIntValue());
         setDirty(TuningA1AnchorFundamental);
     }
     
     p = e->getStringAttribute( ptagTuning_nToneRootCB);
     if (p != "")
     {
-        setNToneRootPC(p.getIntValue());
+        _prep->setNToneRootPC(p.getIntValue());
         setDirty(TuningNToneRootCB);
     }
     
     p = e->getStringAttribute( ptagTuning_nToneRootOctaveCB);
     if (p != "")
     {
-        setNToneRootOctave(p.getIntValue());
+        _prep->setNToneRootOctave(p.getIntValue());
         setDirty(TuningNToneRootOctaveCB);
     }
     
     p = e->getStringAttribute( ptagTuning_nToneSemitoneWidth);
     if (p != "")
     {
-        setNToneSemitoneWidth(p.getFloatValue());
+        _prep->setNToneSemitoneWidth(p.getFloatValue());
         setDirty(TuningNToneSemitoneWidth);
     }
     
     p = e->getStringAttribute( "adaptiveSystem");
     if (p != "")
     {
-        setAdaptiveType((TuningAdaptiveSystemType) p.getIntValue());
+        _prep->setAdaptiveType((TuningAdaptiveSystemType) p.getIntValue());
         setDirty(TuningAdaptiveSystem);
     }
 
@@ -836,49 +836,49 @@ void TuningModification::setStateOld(XmlElement* e)
     p = e->getStringAttribute( ptagTuning_tetherStiffness);
     if (p != "")
     {
-        getSpringTuning()->setTetherStiffness(p.getFloatValue());
+        _prep->getSpringTuning()->setTetherStiffness(p.getFloatValue());
         setDirty(TuningSpringTetherStiffness);
     }
     
     p = e->getStringAttribute( ptagTuning_intervalStiffness);
     if (p != "")
     {
-        getSpringTuning()->setIntervalStiffness(p.getDoubleValue());
+        _prep->getSpringTuning()->setIntervalStiffness(p.getDoubleValue());
         setDirty(TuningSpringIntervalStiffness);
     }
     
     p = e->getStringAttribute( "tetherWeightGlobal");
     if (p != "")
     {
-        getSpringTuning()->setTetherWeightGlobal(p.getDoubleValue());
+        _prep->getSpringTuning()->setTetherWeightGlobal(p.getDoubleValue());
         setDirty(TuningTetherWeightGlobal);
     }
     
     p = e->getStringAttribute( "tetherWeightGlobal2");
     if (p != "")
     {
-        getSpringTuning()->setTetherWeightSecondaryGlobal(p.getDoubleValue());
+        _prep->getSpringTuning()->setTetherWeightSecondaryGlobal(p.getDoubleValue());
         setDirty(TuningTetherWeightGlobal2);
     }
     
     p = e->getStringAttribute( "fundamentalSetsTether");
     if (p != "")
     {
-        getSpringTuning()->setFundamentalSetsTether((bool)p.getIntValue());
+        _prep->getSpringTuning()->setFundamentalSetsTether((bool)p.getIntValue());
         setDirty(TuningFundamentalSetsTether);
     }
     
     p = e->getStringAttribute( ptagTuning_rate);
     if (p != "")
     {
-        getSpringTuning()->setRate(p.getDoubleValue());
+        _prep->getSpringTuning()->setRate(p.getDoubleValue());
         setDirty(TuningSpringRate);
     }
     
     p = e->getStringAttribute( ptagTuning_drag);
     if (p != "")
     {
-        getSpringTuning()->setDrag(p.getDoubleValue());
+        _prep->getSpringTuning()->setDrag(p.getDoubleValue());
         setDirty(TuningSpringDrag);
     }
     
@@ -886,27 +886,27 @@ void TuningModification::setStateOld(XmlElement* e)
     bool springs = (bool) p.getIntValue();
     if (p != "")
     {
-        getSpringTuning()->setActive(springs);
+        _prep->getSpringTuning()->setActive(springs);
         setDirty(TuningSpringActive);
     }
     
     if (springs)
     {
-        setAdaptiveType(AdaptiveSpring);
+        _prep->setAdaptiveType(AdaptiveSpring);
         setDirty(TuningAdaptiveSystem);
     }
     
     p = e->getStringAttribute( ptagTuning_intervalScale);
     if (p != "")
     {
-        getSpringTuning()->setScaleId((TuningSystem)p.getIntValue());
+        _prep->getSpringTuning()->setScaleId((TuningSystem)p.getIntValue());
         setDirty(TuningSpringIntervalScale);
     }
     
     p = e->getStringAttribute( ptagTuning_intervalScaleFundamental);
     if (p != "")
     {
-        getSpringTuning()->setIntervalFundamental((PitchClass)p.getIntValue());
+        _prep->getSpringTuning()->setIntervalFundamental((PitchClass)p.getIntValue());
         setDirty(TuningSpringIntervalFundamental);
     }
     
@@ -949,7 +949,7 @@ void TuningModification::setStateOld(XmlElement* e)
                 weights.add(val);
             }
             
-            getSpringTuning()->setTetherWeights(weights);
+            _prep->getSpringTuning()->setTetherWeights(weights);
             setDirty(TuningSpringTetherWeights);
         }
         else if (sub->hasTagName("sw"))
@@ -964,7 +964,7 @@ void TuningModification::setStateOld(XmlElement* e)
                 weights.add(val);
             }
             
-            getSpringTuning()->setSpringWeights(weights);
+            _prep->getSpringTuning()->setSpringWeights(weights);
             setDirty(TuningSpringIntervalWeights);
         }
         else if (sub->hasTagName(vtagTuning_customScale))
@@ -983,7 +983,7 @@ void TuningModification::setStateOld(XmlElement* e)
                 dirty = true;
             }
             
-            setCustomScale(scale);
+            _prep->setCustomScale(scale);
             if (dirty) setDirty(TuningCustomScale);
         }
         else if (sub->hasTagName(vTagTuning_absoluteOffsets))
@@ -997,7 +997,7 @@ void TuningModification::setStateOld(XmlElement* e)
                 absolute.set(k, f);
             }
             
-            setAbsoluteOffsets(absolute);
+            _prep->setAbsoluteOffsets(absolute);
             setDirty(TuningAbsoluteOffsets);
         }
     }

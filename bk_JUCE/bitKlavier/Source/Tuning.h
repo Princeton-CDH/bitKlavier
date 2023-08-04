@@ -23,38 +23,40 @@
 #include "MTS-ESP/Master/libMTSMaster.h"
 class TuningModification;
 
-class TuningPreparation : public ReferenceCountedObject
+class TuningPreparation : public GenericPreparation
 {
 public:
-    typedef ReferenceCountedObjectPtr<TuningPreparation>    Ptr;
-    typedef Array<TuningPreparation::Ptr>                   PtrArr;
-    typedef Array<TuningPreparation::Ptr, CriticalSection>  CSPtrArr;
-    typedef OwnedArray<TuningPreparation>                        Arr;
-    typedef OwnedArray<TuningPreparation, CriticalSection>       CSArr;
-    
-    TuningPreparation(TuningPreparation::Ptr p):
-    tScale(p->getScale()),
-    tFundamental(p->getFundamental()),
-    tFundamentalOffset(p->getFundamentalOffset()),
-    tAdaptiveIntervalScale(p->getAdaptiveIntervalScale()),
-    tAdaptiveInversional(p->getAdaptiveInversional()),
-    tAdaptiveAnchorScale(p->getAdaptiveAnchorScale()),
-    tAdaptiveAnchorFundamental(p->getAdaptiveAnchorFundamental()),
-    tAdaptiveClusterThresh(p->getAdaptiveClusterThresh()),
-    tAdaptiveHistory(p->getAdaptiveHistory()),
-    tCustom(p->getCustomScale()),
-    tAbsolute(p->getAbsoluteOffsets()),
-    nToneSemitoneWidth(p->getNToneSemitoneWidth()),
-    nToneRoot(p->getNToneRoot()),
-    adaptiveType(p->getAdaptiveType()),
-    client(nullptr),
-    stuning(new SpringTuning(p->getSpringTuning()))
-    {
 
+    
+    TuningPreparation(int newId, TuningPreparation::Ptr p):
+    tScale(EqualTemperament),
+    tFundamental(C),
+    tFundamentalOffset(0.),
+    tAdaptiveIntervalScale(JustTuning),
+    tAdaptiveInversional(true),
+    tAdaptiveAnchorScale(EqualTemperament),
+    tAdaptiveAnchorFundamental(C),
+    tAdaptiveClusterThresh(100),
+    tAdaptiveHistory(4),
+    tCustom({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}),
+    tAbsolute(Array<float>()),
+    nToneSemitoneWidth(100),
+    nToneRoot(60),
+    adaptiveType(AdaptiveNone),
+    client(nullptr),
+    stuning(new SpringTuning()),
+    GenericPreparation(BKPreparationType::PreparationTypeTuning, newId)
+    {
+        setupTuningLibrary();
+        copy(p);
+        
+        
     }
     
-    inline void copy(TuningPreparation::Ptr p)
+    inline void copy(TuningPreparation::Ptr _p)
     {
+        TuningPreparation* p = dynamic_cast<TuningPreparation*>(_p.get());
+
         tScale = p->getScale();
         tFundamental = p->getFundamental();
         tFundamentalOffset = p->getFundamentalOffset();
@@ -79,6 +81,7 @@ public:
         {
             stuning->setActive(false);
         }
+        GenericPreparation::copy(_p);
     }
     
     void performModification(TuningModification* p, Array<bool> dirty);
@@ -122,11 +125,12 @@ public:
         stuning->resetModdables();
     }
 
-    inline bool compare (TuningPreparation::Ptr p)
+    inline bool compare (TuningPreparation::Ptr _p)
     {
         bool custom = true;
         bool absolute = true;
-        
+        TuningPreparation* p = dynamic_cast<TuningPreparation*>(_p.get());
+
         for (int i = p->getCustomScale().size(); --i>=0;)
         {
             if (p->getCustomScale()[i] != getCustomScale()[i])
@@ -213,7 +217,8 @@ public:
                       Array<float> customScale,
                       float semitoneWidth,
                       int semitoneRoot,
-                      SpringTuning::Ptr st):
+                      SpringTuning::Ptr st,
+                      int newId):
     tScale(whichTuning),
     tFundamental(fundamental),
     tFundamentalOffset(fundamentalOffset),
@@ -229,8 +234,10 @@ public:
     nToneRoot(semitoneRoot),
     adaptiveType(AdaptiveNone),
     client(nullptr),
-    stuning(new SpringTuning(st))
+    stuning(new SpringTuning(st)),
+    GenericPreparation(BKPreparationType::PreparationTypeTuning, newId)
     {
+        setupTuningLibrary();
         Array<float> arr;
         for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(0.);
         tAbsolute.set(arr);
@@ -245,9 +252,10 @@ public:
             setAdaptiveType(AdaptiveAnchored);
             setScale(EqualTemperament);
         }
+        
     }
     
-    TuningPreparation(void):
+    TuningPreparation(int newId):
     tScale(EqualTemperament),
     tFundamental(C),
     tFundamentalOffset(0.),
@@ -263,11 +271,42 @@ public:
     nToneRoot(60),
     adaptiveType(AdaptiveNone),
     client(nullptr),
-    stuning(new SpringTuning())
+    stuning(new SpringTuning()),
+    GenericPreparation(BKPreparationType::PreparationTypeTuning, newId)
     {
+        setupTuningLibrary();
         Array<float> arr;
         for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(0.);
         tAbsolute.set(arr);
+        
+    }
+    
+    
+    TuningPreparation(XmlElement *e):
+    tScale(EqualTemperament),
+    tFundamental(C),
+    tFundamentalOffset(0.),
+    tAdaptiveIntervalScale(JustTuning),
+    tAdaptiveInversional(true),
+    tAdaptiveAnchorScale(EqualTemperament),
+    tAdaptiveAnchorFundamental(C),
+    tAdaptiveClusterThresh(100),
+    tAdaptiveHistory(4),
+    tCustom({0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}),
+    tAbsolute(Array<float>()),
+    nToneSemitoneWidth(100),
+    nToneRoot(60),
+    adaptiveType(AdaptiveNone),
+    client(nullptr),
+    stuning(new SpringTuning()),
+    GenericPreparation(BKPreparationType::PreparationTypeTuning, e)
+    {
+        setupTuningLibrary();
+        Array<float> arr;
+        for(int i=0; i<ABSOLUTE_OFFSET_SIZE; i++) arr.add(0.);
+        tAbsolute.set(arr);
+        setState(e);
+       
     }
     
     ~TuningPreparation()
@@ -483,6 +522,10 @@ public:
     
     inline ValueTree getState(void)
     {
+        ValueTree vt(vtagTuning);
+        
+        vt.setProperty( "Id", getId(), 0);
+        vt.setProperty( "name", name, 0);
         ValueTree prep("params");
         
         tScale.getState(prep, ptagTuning_scale);
@@ -508,12 +551,25 @@ public:
         tAbsolute.getState(prep, StringArray(vTagTuning_absoluteOffsets, ptagFloat));
         
         prep.addChild(getSpringTuning()->getState(), -1, 0);
-        
-        return prep;
+        vt.addChild(prep, -1, 0);
+        return vt;
     }
     
-    inline void setState(XmlElement* e)
-    {        
+    inline void setState(XmlElement* _e)
+    {
+        setId(_e->getStringAttribute("Id").getIntValue());
+        
+        String n = _e->getStringAttribute("name");
+
+        if (n != String())     setName(n);
+        else                   setName(String(getId()));
+
+
+        XmlElement *e = _e->getChildByName("params");
+        if (e == nullptr)
+        {
+            e = _e;
+        }
         tScale.setState(e, ptagTuning_scale, EqualTemperament);
         
         if (tScale.value == AdaptiveTuning)
@@ -631,79 +687,10 @@ public:
         //double ratio = MTS_RetuningAsRatio(client, mn, -1);
         return freq;
     }
-private:
-    String name;
-    
-    // SPRING TUNING STUFF
-    SpringTuning::Ptr stuning;
-
-    JUCE_LEAK_DETECTOR(TuningPreparation);
-};
-
-
-class Tuning : public ReferenceCountedObject
-{
-    
-public:
-    typedef ReferenceCountedObjectPtr<Tuning>   Ptr;
-    typedef Array<Tuning::Ptr>                  PtrArr;
-    typedef Array<Tuning::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<Tuning>                  Arr;
-    typedef OwnedArray<Tuning, CriticalSection> CSArr;
-    
-    
-    Tuning(TuningPreparation::Ptr prep,
-           int Id,
-           SpringTuning::Ptr st = nullptr):
-    prep(new TuningPreparation(prep)),
-    Id(Id),
-    name("Tuning "+String(Id))
-    {
-        tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
-        for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
-        
-        setupTuningLibrary();
-        
-        prep->getSpringTuning()->stop();
-    }
-    
-	Tuning(int Id, bool random = false) :
-    currentScale(Tunings::evenTemperament12NoteScale()),
-    Id(Id),
-    name("Tuning "+String(Id))
-    {
-		prep = new TuningPreparation();
-        
-		if (random) randomize();
-        
-        tuningLibrary.ensureStorageAllocated((int)cTuningSystemNames.size());
-        for(int i=0; i<cTuningSystemNames.size(); i++) tuningLibrary.insert(EqualTemperament, tEqualTuning);
-        
-        setupTuningLibrary();
-        
-        prep->getSpringTuning()->stop();
-    }
-    
-    inline Tuning::Ptr duplicate()
-    {
-        TuningPreparation::Ptr copyPrep = new TuningPreparation(prep);
-        
-        Tuning::Ptr copy = new Tuning(copyPrep, -1);
-        
-        copy->prep->getSpringTuning()->stop();
-        
-        copy->setName(name );
-        
-        return copy;
-    }
-    
-    inline void clear(void)
-    {
-        prep       = new TuningPreparation();
-    }
     
     void setupTuningLibrary()
     {
+        
         //bK originals
         tuningLibrary.set(PartialTuning, tPartialTuning);
         tuningLibrary.set(JustTuning, tJustTuning);
@@ -751,25 +738,25 @@ public:
     
     void fillMTSMasterTunings()
     {
-        if(prep->isMTSMaster)
+        if(isMTSMaster)
         {
             double frequencies_in_hz[128];
             for (int midiNoteNumber = 0; midiNoteNumber < 128; midiNoteNumber++)
             {
                 float lastNoteOffset;
                 //do nTone tuning if nToneSemitoneWidth != 100cents
-                if(prep->getNToneSemitoneWidth() != 100)
+                if(getNToneSemitoneWidth() != 100)
                 {
-                    lastNoteOffset = .01 * (midiNoteNumber - prep->getNToneRoot()) * (prep->getNToneSemitoneWidth() - 100);
+                    lastNoteOffset = .01 * (midiNoteNumber - getNToneRoot()) * (getNToneSemitoneWidth() - 100);
                     int midiNoteNumberTemp = round(midiNoteNumber + lastNoteOffset);
                     
                     Array<float> currentTuning;
-                    if(prep->getScale() == CustomTuning) currentTuning = prep->getCustomScale();
-                    else currentTuning = tuningLibrary.getUnchecked(prep->getScale());
+                    if(getScale() == CustomTuning) currentTuning = getCustomScale();
+                    else currentTuning = tuningLibrary.getUnchecked(getScale());
                     
-                    lastNoteOffset += (currentTuning[(midiNoteNumberTemp - prep->getFundamental()) % currentTuning.size()]
-                                      + prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
-                                      + prep->getFundamentalOffset());
+                    lastNoteOffset += (currentTuning[(midiNoteNumberTemp - getFundamental()) % currentTuning.size()]
+                                      + getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                                      + getFundamentalOffset());
                     
                     frequencies_in_hz[midiNoteNumber] = mtof(midiNoteNumber + lastNoteOffset);
                     continue;
@@ -777,14 +764,14 @@ public:
                 
                 //else do regular tunings
                 Array<float> currentTuning;
-                if(prep->getScale() == CustomTuning)
-                    currentTuning = prep->getCustomScale();
+                if(getScale() == CustomTuning)
+                    currentTuning = getCustomScale();
                 else
-                    currentTuning = tuningLibrary.getUnchecked(prep->getScale());
+                    currentTuning = tuningLibrary.getUnchecked(getScale());
 
-                lastNoteOffset = (currentTuning[(midiNoteNumber - prep->getFundamental()) % currentTuning.size()]
-                                  + prep->getAbsoluteOffsets().getUnchecked(midiNoteNumber)
-                                  + prep->getFundamentalOffset());
+                lastNoteOffset = (currentTuning[(midiNoteNumber - getFundamental()) % currentTuning.size()]
+                                  + getAbsoluteOffsets().getUnchecked(midiNoteNumber)
+                                  + getFundamentalOffset());
                 double freq =  mtof(midiNoteNumber + lastNoteOffset);
                 frequencies_in_hz[midiNoteNumber] = freq;
             }
@@ -796,8 +783,6 @@ public:
         }
     }
     
-    ValueTree getState(bool active = false);
-    void setState(XmlElement*);
     void loadScalaFile(std::string fname);
     void loadScalaFile(File file);
     void loadScalaScale(Tunings::Scale& s);
@@ -811,58 +796,24 @@ public:
     
     String generateScalaString();
     
-    ~Tuning() {};
-    
-    inline int getId() {return Id;}
-    inline void setId(int newId) { Id = newId;}
-    
-    TuningPreparation::Ptr      prep;
-    
-    void reset()
-    {
-        prep->resetModdables();
-        DBG("resetting tuning");
-    }
-    
-    inline void copy(Tuning::Ptr from)
-    {
-        prep->copy(from->prep);
-    }
-
-	inline void randomize()
-	{
-		clear();
-		prep->randomize();
-        
-		Id = Random::getSystemRandom().nextInt(Range<int>(1, 1000));
-		name = "random";
-	}
-    
     inline TuningSystem getCurrentScaleId(void)
     {
-        return prep->getScale();
+        return getScale();
     }
     
     inline SpringTuning::Ptr getCurrentSpringTuning(void)
     {
-        return prep->getSpringTuning();
-    }
-    
-    inline String getName(void) const noexcept {return name;}
-    
-    inline void setName(String newName)
-    {
-        name = newName;
+        return getSpringTuning();
     }
     
     Array<float> getCurrentScale()
     {
-        if(prep->getScale() == CustomTuning)
+        if(getScale() == CustomTuning)
         {
-            return prep->getCustomScale();
+            return getCustomScale();
         }
         
-        return getTuningOffsets(prep->getScale());
+        return getTuningOffsets(getScale());
     }
     
     Array<float> getScale(int which)
@@ -871,7 +822,7 @@ public:
         
         if (tuning == CustomTuning)
         {
-            return prep->getCustomScale();
+            return getCustomScale();
         }
         
         return getTuningOffsets(tuning);
@@ -907,19 +858,19 @@ public:
     Array<Array<float>> tuningLibrary;
     
 private:
-    int Id;
     String name;
-
     
+    // SPRING TUNING STUFF
+    SpringTuning::Ptr stuning;
     Array<float> getTuningOffsets(TuningSystem which) {return tuningLibrary.getUnchecked(which); }
     
     
     const Array<float> tEqualTuning     = Array<float>( {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.} );
-	const Array<float> tJustTuning      = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731 });
-	const Array<float> tPartialTuning   = Array<float>({ 0., .117313, .039101, -.331291, -.13686, -.019547, -.486824, .019547, .405273, -.15641, -.311745, -.506371 });
-	const Array<float> tDuodeneTuning   = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.097763, .019547, .136864, -.15641, -.039101, -.11731 });
-	const Array<float> tOtonalTuning    = Array<float>({ 0., .049553, .039101, -.02872, -.13686, -.292191, -.486824, .019547, .405273, .058647, -.311745, -.11731 } );
-	const Array<float> tUtonalTuning    = Array<float>({ 0., .117313, .311745, .156414, -.405273, -.019547, .486824, .292191, .136864, .024847, -.039101, -.049553 } );
+    const Array<float> tJustTuning      = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.174873, .019547, .136864, -.15641, -.311745, -.11731 });
+    const Array<float> tPartialTuning   = Array<float>({ 0., .117313, .039101, -.331291, -.13686, -.019547, -.486824, .019547, .405273, -.15641, -.311745, -.506371 });
+    const Array<float> tDuodeneTuning   = Array<float>({ 0., .117313, .039101, .156414, -.13686, -.019547, -.097763, .019547, .136864, -.15641, -.039101, -.11731 });
+    const Array<float> tOtonalTuning    = Array<float>({ 0., .049553, .039101, -.02872, -.13686, -.292191, -.486824, .019547, .405273, .058647, -.311745, -.11731 } );
+    const Array<float> tUtonalTuning    = Array<float>({ 0., .117313, .311745, .156414, -.405273, -.019547, .486824, .292191, .136864, .024847, -.039101, -.049553 } );
     
     //historical temperaments
     const Array<float> tPythagorean     = Array<float>({ 0., 0.13685, 0.0391, -0.05865, 0.0782, -0.01955, 0.1173, 0.01955, 0.1564, 0.05865, -0.0391, 0.09775} );
@@ -963,10 +914,10 @@ private:
     const Array<float> tSymmetric               = Array<float>({0, 0.11731285269777758, 0.039100017307748376, 0.15641287000552553, -0.13686286135165177, -0.019550008653875465, 0., 0.019550008653873192, 0.13686286135165232, -0.15641287000552553, -0.03910001730774866, -0.117312852697778 });
     const Array<float> tWellTunedPiano          = Array<float>({0, 0.7664590993067458, 0.039100017307748376, -0.603931861963627, 0.7078090733451233, -0.564831844655879, 0.746909090652872, 0.019550008653873192, -0.6234818706175008, 0.6882590646912502, -0.5843818533097533, 0.727359081999 });
     const Array<float> tHarrisonStrict          = Array<float>({0, -0.3703909612703742, 0.039100017307748376, -0.05865002596162355, -0.13686286135165177, -0.019550008653875465, -0.3899409699242483, 0.019550008653873192, -0.07820003461549846, -0.15641287000552553, -0.03910001730774866, -0.117312852697778 });
-    
-    
-    JUCE_LEAK_DETECTOR(Tuning)
+    JUCE_LEAK_DETECTOR(TuningPreparation);
 };
+
+
 
 
 /*
@@ -983,7 +934,7 @@ public:
 //    typedef OwnedArray<TuningProcessor>                          Arr;
 //    typedef OwnedArray<TuningProcessor, CriticalSection>         CSPtrArr;
 //    
-    TuningProcessor(BKAudioProcessor& processor, Tuning::Ptr tuning);
+    TuningProcessor(BKAudioProcessor& processor, TuningPreparation::Ptr tuning);
     ~TuningProcessor();
     
     
@@ -995,12 +946,10 @@ public:
     void keyPressed(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress);
     void keyReleased(int midiNoteNumber, Array<float>& targetVelocities, bool fromPress);
     
-    inline int getId(void) const noexcept { return tuning->getId(); }
+    inline int getId(void) const noexcept { return prep->getId(); }
     
-    inline void setTuning(Tuning::Ptr newTuning) { tuning = newTuning;}
-    inline Tuning::Ptr getTuning(void) const noexcept { return tuning; }
+    inline void setTuning(TuningPreparation::Ptr newTuning) { prep = newTuning;}
     
-  
     
     //for global tuning adjustment, A442, etc...
     void setGlobalTuningReference(float tuningRef) { globalTuningReference = tuningRef;}
@@ -1024,7 +973,7 @@ public:
     inline void reset(void)
     {
         adaptiveReset();
-        tuning->prep->resetModdables();
+        prep->resetModdables();
     }
     
     inline void addKeymap(Keymap::Ptr keymap)
@@ -1065,8 +1014,6 @@ public:
     
     void processBlock(AudioSampleBuffer& buffer, MidiBuffer& midiMessages, int numSamples, int midiChannel, BKSampleLoadType type);
 private:
-    
-    Tuning::Ptr tuning;
     
     Keymap::PtrArr keymaps;
 

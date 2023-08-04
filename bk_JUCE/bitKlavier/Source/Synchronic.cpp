@@ -65,12 +65,12 @@ void SynchronicPreparation::performModification(SynchronicModification* s, Array
     
     if (dirty[SynchronicMidiOutput]) midiOutput.modify(s->getPrepPtr()->midiOutput, reverse);
     
-    if (dirty[SynchronicUseGlobalSoundSet]) sUseGlobalSoundSet.modify(s->getPrep()->useGlobalSoundSet, reverse);
+    if (dirty[SynchronicUseGlobalSoundSet]) useGlobalSoundSet.modify(s->getPrep()->useGlobalSoundSet, reverse);
     
     if (dirty[SynchronicSoundSet])
     {
-        sSoundSet.modify(s->getPrep()->soundSet, reverse);
-        sSoundSetName.modify(s->getPrep()->soundSetName, reverse);
+        soundSet.modify(s->getPrep()->soundSet, reverse);
+        soundSetName.modify(s->getPrep()->soundSetName, reverse);
     }
     
     modded = !reverse;

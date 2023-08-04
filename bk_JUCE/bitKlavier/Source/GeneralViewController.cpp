@@ -1296,17 +1296,17 @@ ModdableBase* ModdableViewController::getCurrentModdable()
         NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(processor.updateState->currentModNostalgicId);
         
         if (processor.updateState->currentModdableIdentifier == cNostalgicGain)
-            return &mod->nGain;
+            return &mod->getPrep()->defaultGain;
         else if (processor.updateState->currentModdableIdentifier == cNostalgicBlendronicGain)
-            return &mod->nBlendronicGain;
+            return &mod->getPrep()->defaultGain;
         else if (processor.updateState->currentModdableIdentifier == cNostalgicLengthMultiplier)
-            return &mod->nLengthMultiplier;
+            return &mod->getPrepPtr()->nLengthMultiplier;
         else if (processor.updateState->currentModdableIdentifier == cNostalgicBeatsToSkip)
-            return &mod->nBeatsToSkip;
+            return &mod->getPrepPtr()->nBeatsToSkip;
         else if (processor.updateState->currentModdableIdentifier == cNostalgicClusterMin)
-            return &mod->clusterMin;
+            return &mod->getPrepPtr()->clusterMin;
         else if (processor.updateState->currentModdableIdentifier == cNostalgicClusterThreshold)
-            return &mod->clusterThreshold;
+            return &mod->getPrepPtr()->clusterThreshold;
     }
     else if (processor.updateState->previousDisplay == DisplayResonanceMod)
     {
@@ -1351,26 +1351,26 @@ ModdableBase* ModdableViewController::getCurrentModdable()
         TuningModification::Ptr mod = processor.gallery->getTuningModification(processor.updateState->currentModTuningId);
         
         if (processor.updateState->currentModdableIdentifier == cSpringTuningRate)
-            return &mod->getSpringTuning()->rate;
+            return &mod->getPrepPtr()->getSpringTuning()->rate;
         else if (processor.updateState->currentModdableIdentifier == cSpringTuningDrag)
-            return &mod->getSpringTuning()->drag;
+            return &mod->getPrepPtr()->getSpringTuning()->drag;
         else if (processor.updateState->currentModdableIdentifier == cSpringTuningStiffness)
             //return &mod->getSpringTuning()->stiffness;
-            return &mod->getSpringTuning()->tetherStiffness;
+            return &mod->getPrepPtr()->getSpringTuning()->tetherStiffness;
         else if (processor.updateState->currentModdableIdentifier == cSpringTuningIntervalStiffness)
-            return &mod->getSpringTuning()->intervalStiffness;
+            return &mod->getPrepPtr()->getSpringTuning()->intervalStiffness;
         else if (processor.updateState->currentModdableIdentifier == cSpringTuningTetherWeight)
-            return &mod->getSpringTuning()->tetherWeightGlobal;
+            return &mod->getPrepPtr()->getSpringTuning()->tetherWeightGlobal;
         else if (processor.updateState->currentModdableIdentifier == cSpringTuningTetherWeightSecondary)
-            return &mod->getSpringTuning()->tetherWeightSecondaryGlobal;
+            return &mod->getPrepPtr()->getSpringTuning()->tetherWeightSecondaryGlobal;
         else if (processor.updateState->currentModdableIdentifier == cTuningAdaptiveClusterThresh)
-            return &mod->tAdaptiveClusterThresh;
+            return &mod->getPrepPtr()->tAdaptiveClusterThresh;
         else if (processor.updateState->currentModdableIdentifier == cTuningAdaptiveHistory)
-            return &mod->tAdaptiveHistory;
+            return &mod->getPrepPtr()->tAdaptiveHistory;
         else if (processor.updateState->currentModdableIdentifier == cTuningToneSemitoneWidth)
-            return &mod->nToneSemitoneWidth;
+            return &mod->getPrepPtr()->nToneSemitoneWidth;
         else if (processor.updateState->currentModdableIdentifier == cTuningFundamentalOffset)
-            return &mod->tFundamentalOffset;
+            return &mod->getPrepPtr()->tFundamentalOffset;
     }
     else if (processor.updateState->previousDisplay == DisplayTempoMod)
     {

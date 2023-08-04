@@ -717,13 +717,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
 
     //add note to springTuning, if only for Graph display
     //this could be a bad idea, in that a user may want to have only some keys (via a keymap) go to Spring tuning
-    /*
-    for ( auto t : currentPiano->getTuningProcessors())
-    {
-        t->getTuning()->getCurrentSpringTuning()->addNote(noteNumber);
-        //t->getTuning()->getSpringTuning()->addNote(noteNumber);
-    }
-    */
+  
     //keeping out for now; I just think it's better to be consistent, and even though it can be easy to forget
     //that you need to connect a Keymap to Tuning to get adaptive/spring tunings, it also allows you
     //control over which keys are going to spring tuning, which i can imagine being useful sometimes.
@@ -1293,7 +1287,7 @@ void BKAudioProcessor::performResets(int noteNumber, String source)
             
             if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
             {
-                gallery->getNostalgicModification(reset.prepId)->resetModdables();
+                gallery->getNostalgicModification(reset.prepId)->getPrep()->resetModdables();
                 updateState->nostalgicPreparationDidChange = true;
                 break;
             }
@@ -1372,7 +1366,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    TuningPreparation::Ptr prep = gallery->getTuning(target)->prep;
+                    TuningPreparation* prep = dynamic_cast<TuningPreparation*>(gallery->getPreparationOfType(PreparationTypeTuning, target).get());
                     prep->performModification(mod, mod->getDirty());
                 }
                 updateState->tuningPreparationDidChange = true;
@@ -1435,7 +1429,7 @@ void BKAudioProcessor::performModifications(int noteNumber, String source)
                 Array<int> targets = mod->getTargets();
                 for (auto target : targets)
                 {
-                    NostalgicPreparation::Ptr prep = gallery->getNostalgic(target)->prep;
+                    NostalgicPreparation* prep = dynamic_cast<NostalgicPreparation*>(gallery->getPreparationOfType(PreparationTypeNostalgic, target).get());
                     prep->performModification(mod, mod->getDirty());
                 }
                 updateState->nostalgicPreparationDidChange = true;
@@ -2009,9 +2003,9 @@ void BKAudioProcessor::hiResTimerCallback()
     {
         d->stepModdables();
     }
-    for (auto n : gallery->getAllNostalgic())
+    for (auto n : *gallery->getAllPreparationsOfType(PreparationTypeNostalgic))
     {
-        n->prep->stepModdables();
+        n->stepModdables();
     }
     for (auto r : *gallery->getAllPreparationsOfType(PreparationTypeResonance))
     {
@@ -2021,9 +2015,9 @@ void BKAudioProcessor::hiResTimerCallback()
     {
         s->stepModdables();
     }
-    for (auto t : gallery->getAllTuning())
+    for (auto t : *gallery->getAllPreparationsOfType(PreparationTypeTuning))
     {
-        t->prep->stepModdables();
+        t->stepModdables();
     }
     for (auto m : gallery->getAllTempo())
     {
@@ -2088,7 +2082,8 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeNostalgic)
     {
-        gallery->getNostalgic(Id)->clear();
+        gallery->getPreparationOfType(PreparationTypeNostalgic, Id)->clear();
+        
         
         NostalgicProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         
@@ -2120,7 +2115,8 @@ void BKAudioProcessor::clear(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeTuning)
     {
-        gallery->getTuning(Id)->clear();
+        gallery->getPreparationOfType(PreparationTypeTuning, Id)->clear();
+        
         
         TuningProcessor::Ptr proc = currentPiano->getProcessorOfType(Id, type, false);
         

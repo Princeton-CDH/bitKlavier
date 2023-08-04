@@ -49,18 +49,16 @@ void Gallery::setStateFromJson(var myJson)
     int pianoMapId = 1;
     addGenericPreparation(PreparationTypeDirect, getNewId(PreparationTypeDirect));
     addGenericPreparation(PreparationTypeSynchronic, getNewId(PreparationTypeSynchronic));
-    //addDirect();
-    addTuning();
+    addGenericPreparation(PreparationTypeTuning, getNewId(PreparationTypeSynchronic));
     addTempo();
-    //addSynchronic();
-    addNostalgic();
+    addGenericPreparation(PreparationTypeNostalgic, getNewId(PreparationTypeSynchronic));
 
     DirectPreparation::Ptr defaultDirect = genericPrep[PreparationTypeDirect]->getLast();
-    Tuning::Ptr defaultTuning = tuning.getLast();
+    TuningPreparation::Ptr defaultTuning = genericPrep[PreparationTypeTuning]->getLast();
     Tempo::Ptr defaultTempo = tempo.getLast();
     //Synchronic::Ptr defaultSynchronic = synchronic.getLast();
     SynchronicPreparation::Ptr defaultSynchronic = genericPrep[PreparationTypeSynchronic]->getLast();
-    Nostalgic::Ptr defaultNostalgic = nostalgic.getLast();
+    NostalgicPreparation::Ptr defaultNostalgic = genericPrep[PreparationTypeNostalgic]->getLast();
     
     
 
@@ -71,11 +69,11 @@ void Gallery::setStateFromJson(var myJson)
         if (piano.equals(0)) break;
         else
         {
-            Tuning::Ptr directTuning;
-            Tuning::Ptr synchronicTuning;
-            Tuning::Ptr nostalgicTuning;
+            TuningPreparation::Ptr directTuning;
+            TuningPreparation::Ptr synchronicTuning;
+            TuningPreparation::Ptr nostalgicTuning;
             SynchronicPreparation::Ptr synchronicTarget;
-            Nostalgic::Ptr nostalgicTarget;
+            NostalgicPreparation* nostalgicTarget;
             BKItem* directTuningItem;
             BKItem* nostalgicTuningItem;
             BKItem* synchronicTuningItem;
@@ -108,7 +106,9 @@ void Gallery::setStateFromJson(var myJson)
     
             for (int c = 0; c < cvar.size(); c++) custom.set(c, cvar[c]);
         
-            TuningPreparation::Ptr defaultTuning = new TuningPreparation();
+            TuningPreparation::Ptr _defaultTuning = new TuningPreparation(getNewId(PreparationTypeTuning));
+            
+            TuningPreparation* defaultTuning = dynamic_cast<TuningPreparation*>(_defaultTuning.get());
             
             defaultTuning->setScale((TuningSystem)scale);
             
@@ -128,12 +128,12 @@ void Gallery::setStateFromJson(var myJson)
             
             defaultTuning->setFundamentalOffset(offset);
             
-            directTuning = matches(defaultTuning);
+            directTuning = matches(_defaultTuning);
             
             if (directTuning == nullptr)
             {
-                addTuning(defaultTuning);
-                directTuning = tuning.getLast();
+                addGenericPreparation(PreparationTypeTuning, defaultTuning);
+                directTuning = defaultTuning;
             }
             
             
@@ -226,16 +226,17 @@ void Gallery::setStateFromJson(var myJson)
                     PitchClass metroFundamental = (PitchClass)int(jsonGetValue("synchronic::metroFundamentalMenu"));
                     TuningSystem metroTuning = (TuningSystem)int(jsonGetValue("synchronic::metroTuningMenu"));
                     
-                    TuningPreparation::Ptr tuningPrep = new TuningPreparation(defaultTuning);
+                    TuningPreparation::Ptr _tuningPrep = new TuningPreparation(getNewId(PreparationTypeTuning), defaultTuning);
+                    TuningPreparation* tuningPrep = dynamic_cast<TuningPreparation*>(_tuningPrep.get());
                     tuningPrep->setScale(metroTuning);
                     tuningPrep->setFundamental((PitchClass)((12-metroFundamental)%12));
                     
                     
-                    synchronicTuning = matches(tuningPrep);
+                    synchronicTuning = matches(_tuningPrep);
                     if (synchronicTuning == nullptr)
                     {
-                        addTuning(tuningPrep);
-                        synchronicTuning = tuning.getLast();
+                        addGenericPreparation(PreparationTypeTuning, tuningPrep);
+                        synchronicTuning = _tuningPrep;
                     }
                     tId = synchronicTuning->getId();
                     
@@ -474,24 +475,28 @@ void Gallery::setStateFromJson(var myJson)
                     PitchClass revFundamental = (PitchClass)int(jsonGetValue("nostalgic::reverseFundamentalMenu"));
                     TuningSystem revTuning = (TuningSystem)int(jsonGetValue("nostalgic::reverseTuningMenu"));
                     
-                    TuningPreparation::Ptr tunePrep = new TuningPreparation(defaultTuning);
-                    tunePrep->setScale(revTuning);
-                    tunePrep->setFundamental((PitchClass)((12-revFundamental)%12));
+                    TuningPreparation::Ptr _tuningPrep = new TuningPreparation(getNewId(PreparationTypeTuning), defaultTuning);
+                    TuningPreparation* tuningPrep = dynamic_cast<TuningPreparation*>(_tuningPrep.get());
+                    tuningPrep->setScale(revTuning);
+                    tuningPrep->setFundamental((PitchClass)((12-revFundamental)%12));
                     
-                    nostalgicTuning = matches(tunePrep);
                     
-                    if (nostalgicTuning == nullptr)
+                    nostalgicTuning = matches(_tuningPrep);
+                    if (synchronicTuning == nullptr)
                     {
-                        addTuning(tunePrep);
-                        nostalgicTuning = tuning.getLast();
+                        addGenericPreparation(PreparationTypeTuning, tuningPrep);
+                        nostalgicTuning = _tuningPrep;
+                        
                     }
+                    
+                  
                     tId = nostalgicTuning->getId();
                     
-                    NostalgicPreparation::Ptr nostPrep = new NostalgicPreparation();
-                    
+                    NostalgicPreparation::Ptr _nostPrep = new NostalgicPreparation(getNewId(PreparationTypeNostalgic));
+                    NostalgicPreparation* nostPrep = dynamic_cast<NostalgicPreparation*>(_nostPrep.get());
                     float gain = jsonGetValue(nx+"gain");
                     
-                    nostPrep->nGain.set(gain);
+                    nostPrep->defaultGain.set(gain);
                     
                     float memoryMult = jsonGetValue(nx+"memoryMult");
                     
@@ -532,11 +537,11 @@ void Gallery::setStateFromJson(var myJson)
                         thisSynchronic = defaultSynchronic;
                     }
                     
-                    Nostalgic::Ptr thisNostalgic = matches(nostPrep);
+                    NostalgicPreparation::Ptr thisNostalgic = matches(_nostPrep);
                     if (thisNostalgic == nullptr)
                     {
-                        addNostalgic(nostPrep);
-                        thisNostalgic = nostalgic.getLast();
+                        addGenericPreparation(PreparationTypeNostalgic, thisNostalgic);
+                        
                     }
                     nId = thisNostalgic->getId();
                     
@@ -858,14 +863,12 @@ void Gallery::setStateFromJson(var myJson)
                         int noteNumber = notenum.getIntValue();
                         
                         
-                        TuningModification::Ptr testMod = new TuningModification(processor, -1);
+                        TuningModification::Ptr testMod = new TuningModification(processor, getNewId(PreparationTypeTuningMod));
                         
-                        testMod->setFundamental(fund);
-                        testMod->setScale(tscale);
-                        
-                        TuningModification::Ptr thisTuningMod = matches(testMod);
-                        
-                        if (thisTuningMod == nullptr)
+                        testMod->getPrepPtr()->setFundamental(fund);
+                        testMod->getPrepPtr()->setScale(tscale);
+                        TuningModification::Ptr thisTuningMod;
+                        if (testMod == nullptr)
                         {
                             addTuningMod(testMod);
                             thisTuningMod = modTuning.getLast();

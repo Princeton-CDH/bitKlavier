@@ -252,9 +252,10 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
 {
     pitchbendMultiplier = powf(2.0f, (pitchWheel/ 8192.0f - 1.0f)/6.0f); //whole-step range for pitchbend
     TuningProcessor* tune = dynamic_cast<TuningProcessor*>(tuning.get());
-    if (tuning != nullptr && tune->getTuning()->prep->getSpringsActive())
+    TuningPreparation* tunePrep = dynamic_cast<TuningPreparation*>(tune->getPrep().get());
+    if (tuning != nullptr && tunePrep->getSpringsActive())
     {
-        Particle::PtrArr particles = tune->getTuning()->prep->getParticles();
+        Particle::PtrArr particles = tunePrep->getParticles();
  
         /*
         double x = particles[currentMidiNoteNumber]->getX();
@@ -277,24 +278,24 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
                                               tune->getGlobalTuningReference()), 128) - 60.0 + (octave * 12.0);
         //need to update centsToFreq to be movable to other As, non-440
         
-        midi += (tune->getTuning()->prep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
-                 tune->getTuning()->prep->getFundamentalOffset());
+        midi += (tunePrep->getAbsoluteOffsets().getUnchecked(getCurrentlyPlayingKey()) +
+                 tunePrep->getFundamentalOffset());
         
-        if (tune->getTuning()->prep->isMTSMaster)
+        if (tunePrep->isMTSMaster)
         {
             
             DBG("Springs MidiRoot: " + String(currentMidiNoteNumber) + " Midi: " + String(midi) + " Freq: " + String(mtof(midi + sound->transpose)));
-            tune->getTuning()->prep->MTSSetNoteTuning( mtof(midi), currentMidiNoteNumber);
+            tunePrep->MTSSetNoteTuning( mtof(midi), currentMidiNoteNumber);
         }
         
         pitchRatio =    powf(2.0f, (midi - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
                             sound->sourceSampleRate *
                             generalSettings->getTuningRatio() /
                             getSampleRate();
-    } else if (tuning != nullptr && tune->getTuning()->prep->hasMTSMaster())
+    } else if (tuning != nullptr && tunePrep->hasMTSMaster())
     {
         float mn = (currentMidiNoteNumber  + sound->transpose);
-        float freq = tune->getTuning()->prep->getMTSFreq(mn);
+        float freq = tunePrep->getMTSFreq(mn);
         double _mn = ftom(freq);
         //DBG(String(mtof(_mn + sound->transpose)));
         DBG("pianoSampler midinote: " + String(currentMidiNoteNumber) + " Freq: " + String(freq) + " MTS Out midinote: " + String(_mn));

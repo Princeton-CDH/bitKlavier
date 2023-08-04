@@ -25,11 +25,11 @@ class NostalgicModification;
 class NostalgicPreparation : public GenericPreparation
 {
 public:
-    typedef ReferenceCountedObjectPtr<NostalgicPreparation>   Ptr;
-    typedef Array<NostalgicPreparation::Ptr>                  PtrArr;
-    typedef Array<NostalgicPreparation::Ptr, CriticalSection> CSPtrArr;
-    typedef OwnedArray<NostalgicPreparation>                  Arr;
-    typedef OwnedArray<NostalgicPreparation, CriticalSection> CSArr;
+//    typedef ReferenceCountedObjectPtr<NostalgicPreparation>   Ptr;
+//    typedef Array<NostalgicPreparation::Ptr>                  PtrArr;
+//    typedef Array<NostalgicPreparation::Ptr, CriticalSection> CSPtrArr;
+//    typedef OwnedArray<NostalgicPreparation>                  Arr;
+//    typedef OwnedArray<NostalgicPreparation, CriticalSection> CSArr;
     
     
     NostalgicPreparation(int newId, NostalgicPreparation::Ptr n) :
@@ -71,7 +71,7 @@ public:
                          NostalgicSyncMode mode,
                          TuningSystem tuning,
                          PitchClass basePitch,
-                         Tuning::Ptr t):
+                         TuningPreparation::Ptr t):
     GenericPreparation(BKPreparationType::PreparationTypeNostalgic, newId),
     modded(false),
     nWaveDistance(waveDistance),
@@ -164,7 +164,7 @@ public:
         velocityMax = _n->velocityMax;
         targetTypeNostalgicClear = _n->targetTypeNostalgicClear;
         
-        GenericPreparation::copy(s);
+        GenericPreparation::copy(n);
     }
     
     void performModification(NostalgicModification* n, Array<bool> dirty);
@@ -237,8 +237,9 @@ public:
         soundSetName.reset();
     }
     
-    inline bool compare (NostalgicPreparation::Ptr n)
+    inline bool compare (NostalgicPreparation::Ptr _n)
     {
+        NostalgicPreparation* n = dynamic_cast<NostalgicPreparation*>(_n.get());
         return (nWaveDistance == n->nWaveDistance &&
                 nUndertow == n->nUndertow &&
                 nTransposition == n->nTransposition &&
@@ -683,10 +684,11 @@ public:
     
     void reset(void)
     {
-        nostalgic->prep->resetModdables();
+        dynamic_cast<NostalgicPreparation*>(prep.get())->resetModdables();
+        //nostalgic->prep->resetModdables();
     }
     
-    inline int getId(void) const noexcept { return nostalgic->getId(); }
+    inline int getId(void) const noexcept { return prep->getId(); }
     
     Array<int> getPlayPositions();
     Array<int> getUndertowPositions();

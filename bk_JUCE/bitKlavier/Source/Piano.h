@@ -179,7 +179,7 @@ public:
     
     void linkNostalgicWithSynchronic(NostalgicPreparation::Ptr nostalgic, SynchronicPreparation::Ptr synchronic);
     
-    void linkPreparationWithTuning(BKPreparationType thisType, int thisId, Tuning::Ptr thisTuning);
+    void linkPreparationWithTuning(BKPreparationType thisType, int thisId, TuningPreparation::Ptr thisTuning);
     
     void linkPreparationWithBlendronic(BKPreparationType thisType, int thisId, Blendronic::Ptr thisBlend);
     

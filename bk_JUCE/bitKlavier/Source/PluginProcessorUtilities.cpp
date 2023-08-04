@@ -233,7 +233,7 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     
     else if (type == PreparationTypeNostalgic)
     {
-        return gallery->getNostalgic(Id)->getState(true);
+        return gallery->getPreparationOfType(PreparationTypeNostalgic,Id)->getState();
     }
     else if (type == PreparationTypeNostalgicMod)
     {
@@ -269,7 +269,7 @@ ValueTree BKAudioProcessor::getPreparationState(BKPreparationType type, int Id)
     
     else if (type == PreparationTypeTuning)
     {
-        return gallery->getTuning(Id)->getState(true);
+        return gallery->getPreparationOfType(PreparationTypeTuning,Id)->getState();
     }
     else if (type == PreparationTypeTuningMod)
     {
@@ -313,18 +313,18 @@ void BKAudioProcessor::setPreparationState(BKPreparationType type, int Id, XmlEl
     }
     else if (type == PreparationTypeNostalgic)
     {
-        Nostalgic::Ptr prep = gallery->getNostalgic(Id);
-        String name = prep->getName();
-        prep->setState(xml);
-        prep->setName(name);
-        prep->setId(Id);
+        GenericPreparation::Ptr obj = gallery->getPreparationOfType(PreparationTypeNostalgic, Id);
+        String name = obj->getName();
+        obj->setState(xml);
+        obj->setName(name);
+        obj->setId(Id);
     }
     else if (type == PreparationTypeNostalgicMod)
     {
         NostalgicModification::Ptr prep = gallery->getNostalgicModification(Id);
-        String name = prep->getName();
+        String name = prep->_getName();
         prep->setState(xml);
-        prep->setName(name);
+        prep->_setName(name);
         prep->setId(Id);
     }
     else if (type == PreparationTypeSynchronic)
@@ -380,18 +380,18 @@ void BKAudioProcessor::setPreparationState(BKPreparationType type, int Id, XmlEl
     }
     else if (type == PreparationTypeTuning)
     {
-        Tuning::Ptr prep = gallery->getTuning(Id);
-        String name = prep->getName();
-        prep->setState(xml);
-        prep->setName(name);
-        prep->setId(Id);
+        GenericPreparation::Ptr obj = gallery->getPreparationOfType(PreparationTypeTuning, Id);
+        String name = obj->getName();
+        obj->setState(xml);
+        obj->setName(name);
+        obj->setId(Id);
     }
     else if (type == PreparationTypeTuningMod)
     {
         TuningModification::Ptr prep = gallery->getTuningModification(Id);
-        String name = prep->getName();
+        String name = prep->_getName();
         prep->setState(xml);
-        prep->setName(name);
+        prep->_setName(name);
         prep->setId(Id);
     }
     else if (type == PreparationTypeTempo)

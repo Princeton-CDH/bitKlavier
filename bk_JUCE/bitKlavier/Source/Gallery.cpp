@@ -100,20 +100,6 @@ Gallery::~Gallery()
 void Gallery::resetPreparations(void)
 {
     // Optimizations can be made here. Don't need to iterate through EVERY preparation.
-//    for (int i = direct.size(); --i >= 0; )
-//        direct[i]->prep->resetModdables();
-    
-    for (int i = nostalgic.size(); --i >= 0; )
-        nostalgic[i]->prep->resetModdables();
-    
-//    for (int i = synchronic.size(); --i >= 0; )
-//        synchronic[i]->prep->resetModdables();
-    
-//    for (int i = genericPrep[PreparationTypeResonance]->size(); --i >= 0; )
-//        genericPrep[PreparationTypeResonance]->prep->resetModdables();
-    
-    for (int i = tuning.size(); --i >= 0; )
-        tuning[i]->prep->resetModdables();
     
     for (int i = tempo.size(); --i >= 0; )
         tempo[i]->prep->resetModdables();

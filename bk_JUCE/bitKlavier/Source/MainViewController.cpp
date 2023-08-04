@@ -423,7 +423,7 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
-            nPrep = processor.gallery->getNostalgicPreparation(item->getId());
+            nPrep = processor.gallery->getPreparationOfType(item->getType(),item->getId());
             nostalgicSelected = true;
         }
         else if (item->getType() == PreparationTypeResonance)
@@ -508,8 +508,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (nostalgicSelected)
         {
-            nPrep->nSoundSet.set(soundSetId);
-            nPrep->nSoundSetName.set(soundSetName);
+            nPrep->soundSet.set(soundSetId);
+            nPrep->soundSetName.set(soundSetName);
         }
         else if (resonanceSelected)
         {
@@ -530,8 +530,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (nostalgicModSelected)
         {
-            nMod->nSoundSet.set(soundSetId);
-            nMod->nSoundSetName.set(soundSetName);
+            nMod->getPrep()->soundSet.set(soundSetId);
+            nMod->getPrep()->soundSetName.set(soundSetName);
             nMod->setDirty(NostalgicSoundSet);
         }
         else if (resonanceModSelected)
@@ -566,8 +566,8 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
             String sfname = processor.loadedSoundSets[nPrep->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
-            nPrep->nSoundSet.set(soundSetId);
-            nPrep->nSoundSetName.set(soundSetName);
+            nPrep->soundSet.set(soundSetId);
+            nPrep->soundSetName.set(soundSetName);
         }
         else if (resonanceSelected)
         {
@@ -598,11 +598,11 @@ void MainViewController::bkComboBoxDidChange(ComboBox* cb)
         }
         else if (nostalgicModSelected)
         {
-            String sfname = processor.loadedSoundSets[nMod->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
+            String sfname = processor.loadedSoundSets[nMod->getPrep()->getSoundSet()].upToLastOccurrenceOf(".subsound", false, false);
             int soundSetId = processor.loadSamples(BKLoadSoundfont, sfname, cb->getSelectedItemIndex(), false);
             String soundSetName = processor.loadedSoundSets[soundSetId].fromLastOccurrenceOf(File::getSeparatorString(), false, false);
-            nMod->nSoundSet.set(soundSetId);
-            nMod->nSoundSetName.set(soundSetName);
+            nMod->getPrep()->soundSet.set(soundSetId);
+            nMod->getPrep()->soundSetName.set(soundSetName);
             nMod->setDirty(NostalgicSoundSet);
         }
         else if (resonanceModSelected)
@@ -659,13 +659,13 @@ void MainViewController::bkButtonClicked (Button* b)
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
-            NostalgicPreparation::Ptr prep = processor.gallery->getNostalgicPreparation(item->getId());
-            bool toggle = !prep->nUseGlobalSoundSet.value;
-            prep->nUseGlobalSoundSet.set(toggle);
-            if (prep->nSoundSet.value < 0)
+            NostalgicPreparation::Ptr prep = processor.gallery->getPreparationOfType(item->getType(), item->getId());
+            bool toggle = !prep->useGlobalSoundSet.value;
+            prep->useGlobalSoundSet.set(toggle);
+            if (prep->soundSet.value < 0)
             {
-                prep->nSoundSet.set(processor.globalSoundSetId);
-                prep->nSoundSetName.set(globalSoundSetName);
+                prep->soundSet.set(processor.globalSoundSetId);
+                prep->soundSetName.set(globalSoundSetName);
             }
         }
         // Modifications
@@ -698,13 +698,13 @@ void MainViewController::bkButtonClicked (Button* b)
         else if (item->getType() == PreparationTypeNostalgicMod)
         {
             NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(item->getId());
-            bool toggle = !mod->nUseGlobalSoundSet.value;
-            mod->nUseGlobalSoundSet.set(toggle);
+            bool toggle = !mod->getPrep()->useGlobalSoundSet.value;
+            mod->getPrep()->useGlobalSoundSet.set(toggle);
             mod->setDirty(NostalgicUseGlobalSoundSet);
-            if (mod->nSoundSet.value < 0)
+            if (mod->getPrep()->soundSet.value < 0)
             {
-                mod->nSoundSet.set(processor.globalSoundSetId);
-                mod->nSoundSetName.set(globalSoundSetName);
+                mod->getPrep()->soundSet.set(processor.globalSoundSetId);
+                mod->getPrep()->soundSetName.set(globalSoundSetName);
                 mod->setDirty(NostalgicSoundSet);
             }
         }
@@ -1004,7 +1004,7 @@ void MainViewController::fillSampleCB()
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
-            NostalgicPreparation::Ptr prep = processor.gallery->getNostalgicPreparation(item->getId());
+            NostalgicPreparation::Ptr prep = processor.gallery->getPreparationOfType(item->getType(), item->getId());
             if (prep != nullptr) idx = prep->getSoundSet();
         }
         // Modifications
@@ -1021,7 +1021,7 @@ void MainViewController::fillSampleCB()
         else if (item->getType() == PreparationTypeNostalgicMod)
         {
             NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(item->getId());
-            if (mod != nullptr) idx = mod->getSoundSet();
+            if (mod != nullptr) idx = mod->getPrep()->getSoundSet();
         }
     }
     if (idx < 0) idx = processor.globalSoundSetId;
@@ -1096,7 +1096,7 @@ void MainViewController::fillInstrumentCB()
         }
         else if (item->getType() == PreparationTypeNostalgic)
         {
-            NostalgicPreparation::Ptr prep = processor.gallery->getNostalgicPreparation(item->getId());
+            NostalgicPreparation::Ptr prep = processor.gallery->getPreparationOfType(item->getType(), item->getId());
             if (prep != nullptr) idx = prep->getSoundSet();
         }
         // Modifications
@@ -1113,7 +1113,7 @@ void MainViewController::fillInstrumentCB()
         else if (item->getType() == PreparationTypeNostalgicMod)
         {
             NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(item->getId());
-            if (mod != nullptr) idx = mod->getSoundSet();
+            if (mod != nullptr) idx = mod->getPrep()->getSoundSet();
         }
     }
     if (idx < 0) idx = processor.globalSoundSetId;
@@ -1220,9 +1220,9 @@ void MainViewController::timerCallback()
         {
             soundItemSelected = true;
             globalSoundSetButton.setVisible(true);
-            NostalgicPreparation::Ptr prep = processor.gallery->getNostalgicPreparation(item->getId());
+            NostalgicPreparation::Ptr prep = processor.gallery->getPreparationOfType(item->getType(), item->getId());
             if (prep != nullptr)
-                globalSoundSetButton.setToggleState(prep->nUseGlobalSoundSet.value, dontSendNotification);
+                globalSoundSetButton.setToggleState(prep->useGlobalSoundSet.value, dontSendNotification);
         }
         else if (item->getType() == PreparationTypeResonance)
         {
@@ -1266,7 +1266,7 @@ void MainViewController::timerCallback()
             NostalgicModification::Ptr mod = processor.gallery->getNostalgicModification(item->getId());
             if (mod != nullptr)
             {
-                globalSoundSetButton.setToggleState(mod->nUseGlobalSoundSet.value, dontSendNotification);
+                globalSoundSetButton.setToggleState(mod->getPrep()->useGlobalSoundSet.value, dontSendNotification);
                 globalSoundSetButton.setAlpha(mod->getDirty(NostalgicUseGlobalSoundSet) ? 1. : gModAlpha);
                 sampleCB.setAlpha(mod->getDirty(NostalgicSoundSet) ? 1. : gModAlpha);
                 instrumentCB.setAlpha(mod->getDirty(NostalgicSoundSet) ? 1. : gModAlpha);

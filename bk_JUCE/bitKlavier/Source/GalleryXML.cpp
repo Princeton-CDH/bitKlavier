@@ -51,16 +51,6 @@ ValueTree  Gallery::getState(void)
 
     galleryVT.setProperty("soundfontInst", processor.globalInstrument, 0);
     
-    // We don't do anything with these on loading so don't see why should we save them?
-//    ValueTree idCountVT( "idcounts");
-//
-//    for (int i = 0; i < BKPreparationTypeNil; i++)
-//    {
-//        idCountVT.setProperty( "i"+String(i), idcounts[i], 0);
-//    }
-//
-//    galleryVT.addChild(idCountVT, -1, 0);
-    
     galleryVT.addChild(general->getState(), -1, 0);
     
     galleryVT.addChild(processor.getBKEqualizer()->getState(), -1, 0);
@@ -70,17 +60,19 @@ ValueTree  Gallery::getState(void)
     // Tempo and Tuning must be first of the preparations.
     for (int i = 0; i < tempo.size(); i++)          galleryVT.addChild( tempo[i]->getState(), -1, 0);
     
-    for (int i = 0; i < tuning.size(); i++)         galleryVT.addChild( tuning[i]->getState(), -1, 0);
     
-    //for (int i = 0; i < direct.size(); i++)         galleryVT.addChild( direct[i]->getState(), -1, 0);
     
     for (int i = 0; i < genericPrep[PreparationTypeSynchronic]->size(); i++)      galleryVT.addChild( genericPrep[PreparationTypeSynchronic]->getUnchecked(i)->getState(), -1, 0);
-    
-    for (int i = 0; i < nostalgic.size(); i++)      galleryVT.addChild( nostalgic[i]->getState(), -1, 0);
     
     for (int i = 0; i < blendronic.size(); i++)     galleryVT.addChild( blendronic[i]->getState(), -1, 0);
     
     for (int i = 0; i < genericPrep[PreparationTypeResonance]->size(); i++)      galleryVT.addChild( genericPrep[PreparationTypeResonance]->getUnchecked(i)->getState(), -1, 0);
+    
+    for (int i = 0; i < genericPrep[PreparationTypeNostalgic]->size(); i++)      galleryVT.addChild( genericPrep[PreparationTypeNostalgic]->getUnchecked(i)->getState(), -1, 0);
+    
+    for (int i = 0; i < genericPrep[PreparationTypeTuning]->size(); i++)      galleryVT.addChild( genericPrep[PreparationTypeTuning]->getUnchecked(i)->getState(), -1, 0);
+    
+    
     
     for (int i = 0; i < genericPrep[PreparationTypeDirect]->size(); i++)      galleryVT.addChild( genericPrep[PreparationTypeDirect]->getUnchecked(i)->getState(), -1, 0);
     
@@ -158,14 +150,19 @@ void Gallery::setStateFromXML(XmlElement* xml)
             }
             else if (e->hasTagName( vtagTuning))
             {
-                addTuningWithId(0);
-                
-                tuning.getLast()->setState(e);
-                
-                int oldId = tuning.getLast()->getId();
-                int newId = transformId(PreparationTypeTuning, oldId);
-                
-                tuning.getLast()->setId(newId);
+                DBG(name);
+                GenericPreparation::Ptr tuning = new TuningPreparation(e); //addGenericPreparation(PreparationTypeSynchronic,0);
+                bool add = true;
+                DBG(name + " " + String(tuning->getId()));
+                for(auto* prep : *getAllPreparationsOfType(PreparationTypeTuning))
+                {
+                    if(prep->getId() == tuning->getId())
+                    {
+                        add = false;
+                        break;
+                    }
+                }
+                if(add) addGenericPreparation(PreparationTypeTuning, tuning);
             }
             else if (e->hasTagName( vtagModTuning))
             {
@@ -276,14 +273,7 @@ void Gallery::setStateFromXML(XmlElement* xml)
             }
             else if (e->hasTagName( vtagNostalgic))
             {
-                addNostalgicWithId(0);
-                
-                nostalgic.getLast()->setState(e);
-                
-                int oldId = nostalgic.getLast()->getId();
-                int newId = transformId(PreparationTypeNostalgic, oldId);
-                
-                nostalgic.getLast()->setId(newId);
+                setPrepStateFromXML(e,BKPreparationType::PreparationTypeNostalgic);
             }
             else if (e->hasTagName( vtagModNostalgic))
             {

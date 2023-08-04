@@ -113,25 +113,6 @@ void Gallery::removeBlendronicModification(int Id)
 }
 
 
-
-void Gallery::removeNostalgic(int Id) 
-{
-    for (int i = nostalgic.size(); --i >= 0; )
-    {
-        if (nostalgic[i]->getId() == Id) nostalgic.remove(i);
-    }
-}
-
-
-
-void Gallery::removeTuning(int Id) 
-{
-    for (int i = tuning.size(); --i >= 0; )
-    {
-        if (tuning[i]->getId() == Id) tuning.remove(i);
-    }
-}
-
 void Gallery::removeTempo(int Id) 
 {
     for (int i = tempo.size(); --i >= 0; )
@@ -179,7 +160,7 @@ void Gallery::remove(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeResonance)
     {
-        remove(type, Id);
+        removePreparationOfType(type, Id);
     }
     else if (type == PreparationTypeSynchronic)
     {
@@ -187,11 +168,11 @@ void Gallery::remove(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeNostalgic)
     {
-        removeNostalgic(Id);
+        removePreparationOfType(type, Id);
     }
     else if (type == PreparationTypeTuning)
     {
-        removeTuning(Id);
+        removePreparationOfType(type, Id);
     }
     else if (type == PreparationTypeTempo)
     {
@@ -259,11 +240,11 @@ String Gallery::iterateName(BKPreparationType type, String name)
     }
     else if (type == PreparationTypeNostalgic)
     {
-        for (auto p : nostalgic)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : *genericPrep[PreparationTypeNostalgic]) if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
     }
     else if (type == PreparationTypeTuning)
     {
-        for (auto p : tuning)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : *genericPrep[PreparationTypeTuning]) if (p->getName() == name || p->getName().startsWith(name + " (")) num++;
     }
     else if (type == PreparationTypeTempo)
     {
@@ -291,11 +272,11 @@ String Gallery::iterateName(BKPreparationType type, String name)
     }
     else if (type == PreparationTypeNostalgicMod)
     {
-        for (auto p : modNostalgic) if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : modNostalgic) if (p->_getName() == name || p->_getName().startsWith(name+" (")) num++;
     }
     else if (type == PreparationTypeTuningMod)
     {
-        for (auto p : modTuning)   if (p->getName() == name || p->getName().startsWith(name+" (")) num++;
+        for (auto p : modTuning)   if (p->_getName() == name || p->_getName().startsWith(name+" (")) num++;
     }
     else if (type == PreparationTypeTempoMod)
     {
@@ -336,13 +317,13 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeNostalgic)
     {
-         name = getNostalgic(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
-        for (auto p : nostalgic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+        name = getPreparationOfType(PreparationTypeNostalgic,Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+        for (auto p : *genericPrep[PreparationTypeNostalgic])   if (p->getName() == name || p->getName().startsWith(name + " ")) num++;
     }
     else if (type == PreparationTypeTuning)
     {
-         name = getTuning(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
-        for (auto p : tuning)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+        name = getPreparationOfType(PreparationTypeTuning,Id)->getName().upToFirstOccurrenceOf(" (", false, false);
+        for (auto p : *genericPrep[PreparationTypeTuning])   if (p->getName() == name || p->getName().startsWith(name + " ")) num++;
     }
     else if (type == PreparationTypeTempo)
     {
@@ -374,13 +355,13 @@ int Gallery::numWithSameNameAs(BKPreparationType type, int Id)
     }
     else if (type == PreparationTypeNostalgicMod)
     {
-         name = getNostalgicModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
-        for (auto p : modNostalgic)   if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+         name = getNostalgicModification(Id)->_getName().upToFirstOccurrenceOf(" (", false, false);
+        for (auto p : modNostalgic)   if (p->_getName() == name || p->_getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeTuningMod)
     {
-         name = getTuningModification(Id)->getName().upToFirstOccurrenceOf(" (", false, false);
-        for (auto p : modTuning)     if (p->getName() == name || p->getName().startsWith(name+" ")) num++;
+         name = getTuningModification(Id)->_getName().upToFirstOccurrenceOf(" (", false, false);
+        for (auto p : modTuning)     if (p->_getName() == name || p->_getName().startsWith(name+" ")) num++;
     }
     else if (type == PreparationTypeTempoMod)
     {
@@ -424,23 +405,11 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
     }
     else if (type == PreparationTypeNostalgic)
     {
-        Nostalgic::Ptr p = new Nostalgic(-1);
-        p->setState(xml);
-        addNostalgic(p);
-        if (p->getName() == "Nostalgic " + String(oldId))
-            p->setName("Nostalgic " + String(p->getId()));
-        else p->setName(iterateName(PreparationTypeNostalgic, p->getName()));
-        return p->getId();
+        return addGenericPreparation(PreparationTypeNostalgic, xml);
     }
     else if (type == PreparationTypeTuning)
     {
-        Tuning::Ptr p = new Tuning(-1);
-        p->setState(xml);
-        addTuning(p);
-        if (p->getName() == "Tuning " + String(oldId))
-            p->setName("Tuning " + String(p->getId()));
-        else p->setName(iterateName(PreparationTypeTuning, p->getName()));
-        return p->getId();
+        return addGenericPreparation(PreparationTypeTuning, xml);
     }
     else if (type == PreparationTypeTempo)
     {
@@ -506,9 +475,9 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         NostalgicModification::Ptr p = new NostalgicModification(processor, -1);
         p->setState(xml);
         addNostalgicMod(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
-        else p->setName(iterateName(PreparationTypeNostalgicMod, p->getName()));
+        if (p->_getName() == String(oldId))
+            p->_setName(String(p->getId()));
+        else p->_setName(iterateName(PreparationTypeNostalgicMod, p->_getName()));
         return p->getId();
     }
     else if (type == PreparationTypeResonanceMod)
@@ -526,9 +495,9 @@ int Gallery::addCopy(BKPreparationType type, XmlElement* xml, int oldId)
         TuningModification::Ptr p = new TuningModification(processor, -1);
         p->setState(xml);
         addTuningMod(p);
-        if (p->getName() == String(oldId))
-            p->setName(String(p->getId()));
-        else p->setName(iterateName(PreparationTypeTuningMod, p->getName()));
+        if (p->_getName() == String(oldId))
+            p->_setName(String(p->getId()));
+        else p->_setName(iterateName(PreparationTypeTuningMod, p->_getName()));
         return p->getId();
     }
     else if (type == PreparationTypeTempoMod)
@@ -570,25 +539,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
     int newId = -1;
   
     
-    if (type == PreparationTypeNostalgic)
-    {
-        Nostalgic::Ptr toCopy = getNostalgic(Id);
-        Nostalgic::Ptr newOne = toCopy->duplicate();
-        addNostalgic(newOne);
-        newId = newOne->getId();
-        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeNostalgic, newId))+")";
-        newOne->setName(newName);
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        Tuning::Ptr toCopy = getTuning(Id);
-        Tuning::Ptr newOne = toCopy->duplicate();
-        addTuning(newOne);
-        newId = newOne->getId();
-        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTuning, newId))+")";
-        newOne->setName(newName);
-    }
-    else if (type == PreparationTypeTempo)
+    
+    if (type == PreparationTypeTempo)
     {
         Tempo::Ptr toCopy = getTempo(Id);
         Tempo::Ptr newOne = toCopy->duplicate();
@@ -640,8 +592,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         NostalgicModification::Ptr newOne = toCopy->duplicate();
         addNostalgicMod(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeNostalgicMod, newId))+")";
-        newOne->setName(newName);
+        String newName = toCopy->_getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeNostalgicMod, newId))+")";
+        newOne->_setName(newName);
     }
     else if (type == PreparationTypeResonanceMod)
     {
@@ -658,8 +610,8 @@ int Gallery::duplicate(BKPreparationType type, int Id)
         TuningModification::Ptr newOne = toCopy->duplicate();
         addTuningMod(newOne);
         newId = newOne->getId();
-        String newName = toCopy->getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTuningMod, newId))+")";
-        newOne->setName(newName);
+        String newName = toCopy->_getName().upToFirstOccurrenceOf(" (", false, false) + " ("+String(numWithSameNameAs(PreparationTypeTuningMod, newId))+")";
+        newOne->_setName(newName);
     }
     else if (type == PreparationTypeTempoMod)
     {
@@ -711,17 +663,8 @@ int Gallery::add(BKPreparationType type)
     int newId = -1;
     
    
-    if (type == PreparationTypeNostalgic)
-    {
-        addNostalgic();
-        newId = nostalgic.getLast()->getId();
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        addTuning();
-        newId = tuning.getLast()->getId();
-    }
-    else if (type == PreparationTypeTempo)
+    
+    if (type == PreparationTypeTempo)
     {
         addTempo();
         newId = tempo.getLast()->getId();
@@ -791,9 +734,9 @@ int Gallery::add(BKPreparationType type)
 int Gallery::getNum(BKPreparationType type)
 {
     return  (type == PreparationTypeDirect) ? genericPrep[PreparationTypeDirect]->size() :
-    (type == PreparationTypeNostalgic) ? nostalgic.size() :
+    (type == PreparationTypeNostalgic) ? genericPrep[PreparationTypeNostalgic]->size()  :
     (type == PreparationTypeSynchronic) ? genericPrep[PreparationTypeSynchronic]->size() :
-    (type == PreparationTypeTuning) ? tuning.size() :
+    (type == PreparationTypeTuning) ? genericPrep[PreparationTypeTuning]->size()  :
     (type == PreparationTypeTempo) ? tempo.size() :
 	(type == PreparationTypeBlendronic) ? blendronic.size() :
     (type == PreparationTypeResonance) ? genericPrep[PreparationTypeResonance]->size() :
@@ -961,11 +904,11 @@ void Gallery::copy(BKPreparationType type, int from, int to)
     }
     else if (type == PreparationTypeSynchronic)
     {
-        genericPrep[PreparationTypeDirect]->getUnchecked(to)->copy(genericPrep[PreparationTypeDirect]->getUnchecked(from));
+        genericPrep[PreparationTypeSynchronic]->getUnchecked(to)->copy(genericPrep[PreparationTypeSynchronic]->getUnchecked(from));
     }
     else if (type == PreparationTypeNostalgic)
     {
-        nostalgic.getUnchecked(to)->copy(nostalgic.getUnchecked(from));
+        genericPrep[PreparationTypeNostalgic]->getUnchecked(to)->copy(genericPrep[PreparationTypeNostalgic]->getUnchecked(from));
     }
     else if (type == PreparationTypeBlendronic)
     {
@@ -977,7 +920,7 @@ void Gallery::copy(BKPreparationType type, int from, int to)
     }
     else if (type == PreparationTypeTuning)
     {
-        tuning.getUnchecked(to)->copy(tuning.getUnchecked(from));
+        genericPrep[PreparationTypeTuning]->getUnchecked(to)->copy(genericPrep[PreparationTypeTuning]->getUnchecked(from));
     }
     else if (type == PreparationTypeTempo)
     {
@@ -1021,15 +964,7 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
 {
     
   
-    if (type == PreparationTypeNostalgic)
-    {
-        addNostalgicWithId(Id);
-    }
-    else if (type == PreparationTypeTuning)
-    {
-        addTuningWithId(Id);
-    }
-    else if (type == PreparationTypeTempo)
+    if (type == PreparationTypeTempo)
     {
         addTempoWithId(Id);
     }
@@ -1073,7 +1008,7 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
     {
         addPianoWithId(Id);
     }
-    else //resonance,direct,sync
+    else //resonance,direct,sync, nostalgic, tuning
     {
         addGenericPreparation(type, Id);
     }
@@ -1083,57 +1018,6 @@ void Gallery::addTypeWithId(BKPreparationType type, int Id)
     setGalleryDirty(true);
 }
 
-
-
-
-
-void Gallery::addNostalgic(void)
-{
-    int newId = getNewId(PreparationTypeNostalgic);
-    nostalgic.add(new Nostalgic(newId));
-}
-
-void Gallery::addNostalgic(Nostalgic::Ptr p)
-{
-    int newId = getNewId(PreparationTypeNostalgic);
-    p->setId(newId);
-    nostalgic.add(p);
-}
-
-void Gallery::addNostalgicWithId(int Id)
-{
-    nostalgic.add(new Nostalgic(Id));
-}
-
-void Gallery::addNostalgic(NostalgicPreparation::Ptr nost)
-{
-    int newId = getNewId(PreparationTypeNostalgic);
-    nostalgic.add(new Nostalgic(nost, newId));
-}
-
-void Gallery::addTuning(void)
-{
-    int newId = getNewId(PreparationTypeTuning);
-    tuning.add(new Tuning(newId));
-}
-
-void Gallery::addTuningWithId(int Id)
-{
-    tuning.add(new Tuning(Id));
-}
-
-void Gallery::addTuning(TuningPreparation::Ptr tune)
-{
-    int newId = getNewId(PreparationTypeTuning);
-    tuning.add(new Tuning(tune, newId));
-}
-
-void Gallery::addTuning(Tuning::Ptr p)
-{
-    int newId = getNewId(PreparationTypeTuning);
-    p->setId(newId);
-    tuning.add(p);
-}
 
 void Gallery::addBlendronic(void)
 {
@@ -1200,9 +1084,17 @@ GenericPreparation::Ptr Gallery::addGenericPreparation(BKPreparationType type, i
     }
     else if (type == PreparationTypeNostalgic)
     {
+        DBG(String(newId));
+        prep = new NostalgicPreparation(newId);
+        genericPrep[type]->add(prep);
+
     }
     else if (type == PreparationTypeTuning)
     {
+        DBG(String(newId));
+        prep = new TuningPreparation(newId);
+        genericPrep[type]->add(prep);
+
     }
     else if (type == PreparationTypeTempo)
     {
@@ -1296,16 +1188,18 @@ void Gallery::clean(void)
         if (!thisUsed.contains(genericPrep[PreparationTypeDirect]->getUnchecked(i)->getId())) genericPrep[PreparationTypeDirect]->remove(i);
     }
     
-    for (int i = genericPrep[PreparationTypeDirect]->size(); --i >= 0;)
+    thisUsed = used.getUnchecked(PreparationTypeSynchronic);
+    for (int i = genericPrep[PreparationTypeSynchronic]->size(); --i >= 0;)
     {
-        if (!thisUsed.contains(genericPrep[PreparationTypeDirect]->getUnchecked(i)->getId())) genericPrep[PreparationTypeDirect]->remove(i);
+        if (!thisUsed.contains(genericPrep[PreparationTypeSynchronic]->getUnchecked(i)->getId())) genericPrep[PreparationTypeSynchronic]->remove(i);
     }
     
     thisUsed = used.getUnchecked(PreparationTypeNostalgic);
-    for (int i = nostalgic.size(); --i >= 0;)
+    for (int i = genericPrep[PreparationTypeNostalgic]->size(); --i >= 0;)
     {
-        if (!thisUsed.contains(nostalgic[i]->getId())) nostalgic.remove(i);
+        if (!thisUsed.contains(genericPrep[PreparationTypeNostalgic]->getUnchecked(i)->getId())) genericPrep[PreparationTypeNostalgic]->remove(i);
     }
+    
     
     thisUsed = used.getUnchecked(PreparationTypeResonance);
     for (int i = genericPrep[PreparationTypeResonance]->size(); --i >= 0;)
@@ -1319,10 +1213,10 @@ void Gallery::clean(void)
         if (!thisUsed.contains(tempo[i]->getId())) tempo.remove(i);
     }
     
-    thisUsed = used.getUnchecked(PreparationTypeTuning);
-    for (int i = tuning.size(); --i >= 0;)
+    thisUsed = used.getUnchecked(PreparationTypeTempo);
+    for (int i = genericPrep[PreparationTypeResonance]->size(); --i >= 0;)
     {
-        if (!thisUsed.contains(tuning[i]->getId())) tuning.remove(i);
+        if (!thisUsed.contains(genericPrep[PreparationTypeTempo]->getUnchecked(i)->getId())) genericPrep[PreparationTypeTempo]->remove(i);
     }
 
 	thisUsed = used.getUnchecked(PreparationTypeBlendronic);

@@ -54,11 +54,11 @@ private:
             else if (type == PreparationTypeSynchronic)
                 setPreparations(processor.gallery->getAllPreparationNamesOfType(t));
             else if (type == PreparationTypeNostalgic)
-                setPreparations(processor.gallery->getAllNostalgicNames());
+                setPreparations(processor.gallery->getAllPreparationNamesOfType(t));
             else if (type == PreparationTypeTempo)
                 setPreparations(processor.gallery->getAllTempoNames());
             else if (type == PreparationTypeTuning)
-                setPreparations(processor.gallery->getAllTuningNames());
+                setPreparations(processor.gallery->getAllPreparationNamesOfType(t));
             else if (type == PreparationTypeKeymap)
                 setPreparations(processor.gallery->getAllKeymapNames());
             else if (type == PreparationTypePianoMap)
