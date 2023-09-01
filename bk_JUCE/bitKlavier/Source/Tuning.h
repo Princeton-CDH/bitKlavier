@@ -1060,6 +1060,10 @@ public:
     
     Array<Array<float>>& getVelocities() { return velocities; }
     Array<Array<float>>& getInvertVelocities() { return invertVelocities; }
+    float getLastOffset(int midiNoteNumber) {
+        DBG("returnng lastOffset " + String(midiNoteNumber) + " : " + String(lastOffsets.getUnchecked(midiNoteNumber)));
+        return lastOffsets.getUnchecked(midiNoteNumber);
+    }
     
     void setVelocities(Array<Array<float>>& newVel) { velocities = newVel; }
     void setInvertVelocities(Array<Array<float>>& newVel) { invertVelocities = newVel; }
@@ -1077,6 +1081,7 @@ private:
         return mtof(interval + 60., globalTuningReference) / mtof(60., globalTuningReference);
     }
     float   lastNote[128];
+    Array<float> lastOffsets;
     
     float lastNoteTuning;
     float lastIntervalTuning;

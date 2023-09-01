@@ -162,7 +162,7 @@ void ShareBot::share(String galleryPath, int where)
     
     if (where == 0) service = NSSharingServiceNameComposeEmail;
     else if (where == 1) service = NSSharingServiceNameComposeMessage;
-    else if (where == 2) service = NSSharingServiceNamePostOnFacebook;
+    //else if (where == 2) service = NSSharingServiceNamePostOnFacebook;
     
     if (bot != nil) {
         [bot share:url to:service];

@@ -198,6 +198,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     gainSlider->setJustifyRight(false);
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->displaySliderVisible(false);
+    gainSlider->setSliderTextResolution(2);
     addAndMakeVisible(*gainSlider, ALL);
     
     numClusterSlider = std::make_unique<BKSingleSlider>("num layers", cSynchronicNumClusters, 1, 10, 1, 1);
@@ -215,6 +216,7 @@ BKViewController(p, theGraph, 3) // third argument => number of tabs
     blendronicGainSlider->setJustifyRight(false);
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
     blendronicGainSlider->displaySliderVisible(false);
+    blendronicGainSlider->setSliderTextResolution(2);
     addAndMakeVisible(*blendronicGainSlider, ALL);
     
 #if JUCE_IOS

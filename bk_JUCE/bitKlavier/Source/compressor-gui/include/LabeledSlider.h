@@ -107,7 +107,7 @@ public:
         slider.setTextValueSuffix(str);
     }
     
-    void mouseDown(const MouseEvent& e)
+    void mouseDown(const MouseEvent& e) override
     {
 #if JUCE_IOS
     if (e.eventComponent != &slider)

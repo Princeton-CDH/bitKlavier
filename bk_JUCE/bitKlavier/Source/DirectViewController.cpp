@@ -34,6 +34,7 @@ BKViewController(p, theGraph, 2)
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
     gainSlider->displaySliderVisible(false);
+    gainSlider->setSliderTextResolution(2);
     gainSlider->setToolTipString("Adjusts overall volume of keyboard");
     addAndMakeVisible(*gainSlider);
     
@@ -41,6 +42,7 @@ BKViewController(p, theGraph, 2)
     resonanceGainSlider->setSkewFactorFromMidPoint(1.);
     resonanceGainSlider->setJustifyRight(true);
     resonanceGainSlider->displaySliderVisible(false);
+    resonanceGainSlider->setSliderTextResolution(2);
     resonanceGainSlider->setToolTipString("Adjusts overall resonance/reverb based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*resonanceGainSlider);
     
@@ -48,6 +50,7 @@ BKViewController(p, theGraph, 2)
     hammerGainSlider->setSkewFactorFromMidPoint(1.);
     hammerGainSlider->setJustifyRight(true);
     hammerGainSlider->displaySliderVisible(false);
+    hammerGainSlider->setSliderTextResolution(2);
     hammerGainSlider->setToolTipString("Adjusts mechanical noise sample based on keyOff velocity; change to keyOn velocity in Gallery>settings");
     addAndMakeVisible(*hammerGainSlider);
     
@@ -55,6 +58,7 @@ BKViewController(p, theGraph, 2)
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
     blendronicGainSlider->setJustifyRight(true);
     blendronicGainSlider->displaySliderVisible(false);
+    blendronicGainSlider->setSliderTextResolution(2);
     blendronicGainSlider->setToolTipString("Adjusts volume of Direct output to connected Blendronics");
     addAndMakeVisible(*blendronicGainSlider);
     

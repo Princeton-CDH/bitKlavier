@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="Houseboat" sampleType="1" soundfontURL="" soundfontInst="0"
+<gallery name="Houseboat" sampleType="3" soundfontURL="" soundfontInst="0"
          defaultPiano="1">
   <general globalGain="1.0" tempoMultiplier="1.0" tuningFund="256.0" invertSustain="0"
            noteOnSetsNoteOffVelocity="0"/>

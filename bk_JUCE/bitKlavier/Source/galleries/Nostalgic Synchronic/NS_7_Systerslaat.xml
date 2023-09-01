@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<gallery name="NS_7_Systerslaat" sampleType="1" soundfontURL="" soundfontInst="813183008"
+<gallery name="NS_7_Systerslaat" sampleType="3" soundfontURL="" soundfontInst="813183008"
          defaultPiano="1">
   <general globalGain="1.0" tempoMultiplier="1.0" tuningFund="440.0" invertSustain="0"
            noteOnSetsNoteOffVelocity="0"/>

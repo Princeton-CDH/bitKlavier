@@ -46,7 +46,16 @@ private:
 
 //==============================================================================
 BKKeymapKeyboardComponent::BKKeymapKeyboardComponent (BKKeymapKeyboardState& s, Orientation o)
-: state (s),
+: lineColour(juce::Colours::dimgrey),
+textColour(juce::Colours::floralwhite),
+shadowCol(juce::Colours::lightgrey),
+blackNoteColour(juce::Colours::black),
+keyDownOverlayColour(juce::Colours::yellow),
+keySeparatorLineColour(juce::Colours::dimgrey),
+mouseOverKeyOverlayColour(juce::Colours::yellow),
+upDownButtonBackgroundColour(juce::Colours::grey),
+upDownButtonArrowColour(juce::Colours::white),
+state (s),
 blackNoteLengthRatio (0.7f),
 xOffset (0),
 keyWidth (16.0f),
@@ -62,16 +71,7 @@ canScroll (true),
 useMousePositionForVelocity (true),
 shouldCheckMousePos (false),
 keyMappingOctave (6),
-octaveNumForMiddleC (3),
-lineColour(juce::Colours::dimgrey),
-textColour(juce::Colours::floralwhite),
-shadowCol(juce::Colours::lightgrey),
-blackNoteColour(juce::Colours::black),
-keyDownOverlayColour(juce::Colours::yellow),
-keySeparatorLineColour(juce::Colours::dimgrey),
-mouseOverKeyOverlayColour(juce::Colours::yellow),
-upDownButtonBackgroundColour(juce::Colours::grey),
-upDownButtonArrowColour(juce::Colours::white)
+octaveNumForMiddleC (3)
 {
     firstKeyDown = -1; lastKeyDown = -1; lastKeySelected = -1;
     

@@ -81,6 +81,7 @@ BKViewController(p, theGraph, 3)
     gainSlider->setToolTipString("Volume multiplier for Nostalgic notes");
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(false);
+    gainSlider->setSliderTextResolution(2);
     gainSlider->displaySliderVisible(false);
     addAndMakeVisible(*gainSlider);
     
@@ -88,6 +89,7 @@ BKViewController(p, theGraph, 3)
     blendronicGainSlider->setToolTipString("Volume multiplier for Nostalgic output to connected Blendronics");
     blendronicGainSlider->setSkewFactorFromMidPoint(1.);
     blendronicGainSlider->setJustifyRight(false);
+    blendronicGainSlider->setSliderTextResolution(2);
     blendronicGainSlider->displaySliderVisible(false);
     addAndMakeVisible(*blendronicGainSlider);
     

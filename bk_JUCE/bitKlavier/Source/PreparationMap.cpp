@@ -837,9 +837,13 @@ bool PreparationMap::keyReleasedByProcess(P proc, int noteNumber, float velocity
             //          - whether this keymap is set to ignore the sustain pedal,
             //          - whether this keymap is set so the sustain pedal behaves like a sostenuto pedal
             //          - the somewhat confusing interaction between sustain and sostenuto pedals!
+            
             cutOffNote = km->isUnsustainingNote(noteNumber, sostenutoPedalIsDepressed, sustainPedalIsDepressed);
             if (km->getIgnoreSustain() || cutOffNote) cutOffNote = true;
             else cutOffNote = false;
+            
+            // don't cutoff if we're ignoring noteOff! overrides other factors
+            if (km->getIgnoreNoteOff()) cutOffNote = false;
 
         }
     }
@@ -879,22 +883,24 @@ void PreparationMap::keyReleased(int noteNumber, float velocity, int channel, in
     {
         if (km->containsNoteMapping(noteNumber, mappedFrom) && (km->getAllMidiInputIdentifiers().contains(source)))
         {
-            km->removeVelocity(noteNumber);
-            
-            // set states in case in noteOn/Off inverted mode
-            if (km->isInverted()) foundReattack = true;
-            else foundSustain = true;
-            
-            // need to remove this note from potential sostenuto notes
-            //      at the moment, we're not considering isInverted when thinking about sostenuto
-            //      might address later
-            Note newNote;
-            newNote.noteNumber = noteNumber;
-            newNote.velocity = velocity;
-            newNote.channel = channel;
-            newNote.mappedFrom = mappedFrom;
-            newNote.source = source;
-            km->removeFromPotentialSostenutoNotes(newNote);
+            if (!km->getIgnoreNoteOff()) {// put this in prior conditional &&
+                km->removeVelocity(noteNumber);
+                
+                // set states in case in noteOn/Off inverted mode
+                if (km->isInverted()) foundReattack = true;
+                else foundSustain = true;
+                
+                // need to remove this note from potential sostenuto notes
+                //      at the moment, we're not considering isInverted when thinking about sostenuto
+                //      might address later
+                Note newNote;
+                newNote.noteNumber = noteNumber;
+                newNote.velocity = velocity;
+                newNote.channel = channel;
+                newNote.mappedFrom = mappedFrom;
+                newNote.source = source;
+                km->removeFromPotentialSostenutoNotes(newNote);
+            }
         }
     }
     
