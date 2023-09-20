@@ -282,6 +282,7 @@ bool SynchronicProcessor::holdCheck(int noteNumber)
     SynchronicPreparation::Ptr prep = synchronic->prep;
     
     uint64 hold = holdTimers.getUnchecked(noteNumber) * (1000.0 / synth->getSampleRate());
+    DBG("holdCheck val = " + String(holdTimers.getUnchecked(noteNumber)));
     
     if(prep->holdMin.value <= prep->holdMax.value)
     {
@@ -307,17 +308,18 @@ void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
 {
     SynchronicPreparation::Ptr prep = synchronic->prep;
     
-    lastKeyPressed = noteNumber;
-    
-    // reset the timer for hold time checks
-    holdTimers.set(noteNumber, 0);
-    
+    //lastKeyPressed = noteNumber; // should this only happen when fromPress == true?
+
     // aVels will be used for velocity calculations; bVels will be used for conditionals
     Array<float> *aVels, *bVels;
     // If this is an actual key press (not an inverted release) aVels and bVels are the same
     // We'll save and use the incoming velocity values
     if (fromPress)
     {
+        // reset the timer for hold time checks
+        holdTimers.set(noteNumber, 0);
+        lastKeyPressed = noteNumber;
+        
         aVels = bVels = &velocities.getReference(noteNumber);
         for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; ++i)
         {
