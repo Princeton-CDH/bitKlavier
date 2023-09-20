@@ -317,8 +317,8 @@ void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
     if (fromPress)
     {
         // reset the timer for hold time checks
-        holdTimers.set(noteNumber, 0);
-        lastKeyPressed = noteNumber;
+        //holdTimers.set(noteNumber, 0);
+        //lastKeyPressed = noteNumber;
         
         aVels = bVels = &velocities.getReference(noteNumber);
         for (int i = TargetTypeSynchronic; i <= TargetTypeSynchronicRotate; ++i)
@@ -333,6 +333,11 @@ void SynchronicProcessor::keyPressed(int noteNumber, Array<float>& targetVelocit
         aVels = &targetVelocities;
         bVels = &invertVelocities.getReference(noteNumber);
     }
+    
+    if (bVels->getUnchecked(TargetTypeSynchronic) < 0.f) return;
+    
+    holdTimers.set(noteNumber, 0);
+    lastKeyPressed = noteNumber;
        
     bool doCluster = bVels->getUnchecked(TargetTypeSynchronic) >= 0.f; // primary Synchronic mode
     bool doPatternSync = bVels->getUnchecked(TargetTypeSynchronicPatternSync) >= 0.f; // resetting pattern phases
