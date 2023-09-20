@@ -38,6 +38,7 @@ const String ptagGeneral_resAndHammer = "resAndHammer";
 const String ptagGeneral_invertSustain = "invertSustain";
 const String ptagGeneral_noteOnSetsNoteOffVelocity = "noteOnSetsNoteOffVelocity";
 const String ptagGeneral_tuningFund = "tuningFund";
+const String ptagGeneral_pedalGain = "pedalGain";
 
 const String vtagEqualizer = "equalizer";
 const String ptagEqualizer_bypassed = "bypassed";

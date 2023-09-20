@@ -170,6 +170,10 @@ compressorView(p.compressor, p)
     A4tuningReferenceFrequencySlider->addMyListener(this);
     addAndMakeVisible(*A4tuningReferenceFrequencySlider);
     
+    pedalGainSlider = std::make_unique<BKSingleSlider>("pedal volume (dB)",ptagGeneral_pedalGain, -100, 24, 0, 0.01, "-inf");
+    pedalGainSlider->setJustifyRight(false);
+    pedalGainSlider->addMyListener(this);
+    addAndMakeVisible(*pedalGainSlider);
     tempoMultiplierSlider = std::make_unique<BKSingleSlider>("tempo multiplier", "tempo multiplier", 0.25, 4., 1., 0.01);
     tempoMultiplierSlider->setSkewFactorFromMidPoint(1.);
     tempoMultiplierSlider->setJustifyRight(false);
@@ -192,6 +196,7 @@ compressorView(p.compressor, p)
 #if JUCE_IOS
     tempoMultiplierSlider->addWantsBigOneListener(this);
     A4tuningReferenceFrequencySlider->addWantsBigOneListener(this);
+    pedalGainSlider->addWantsBigOneListener(this)
 #endif
     
     // Equalizer UI components setup
@@ -461,6 +466,7 @@ void GeneralViewController::displayTab(int tab) {
         tempoMultiplierSlider->setVisible(true);
         invertSustainB.setVisible(true);
         noteOnSetsNoteOffVelocityB.setVisible(true);
+        pedalGainSlider->setVisible(true);
     }
     else if (tab == Tabs::equalizer) {
         bypassToggle.setVisible(true);
@@ -494,6 +500,7 @@ void GeneralViewController::displayShared() {
 void GeneralViewController::invisible() {
     A4tuningReferenceFrequencySlider->setVisible(false);
     tempoMultiplierSlider->setVisible(false);
+    pedalGainSlider->setVisible(false);
     invertSustainB.setVisible(false);
     noteOnSetsNoteOffVelocityB.setVisible(false);
     bypassToggle.setVisible(false);
@@ -542,7 +549,10 @@ void GeneralViewController::resized()
     tempoMultiplierSlider->setBounds(settingsArea.getX(), A4tuningReferenceFrequencySlider->getBottom(),
                                      settingsArea.getWidth(),
                                      settingsArea.getHeight() / numSettings);
-    invertSustainB.setBounds(settingsArea.getX(), tempoMultiplierSlider->getBottom(),
+    pedalGainSlider->setBounds(settingsArea.getX(), tempoMultiplierSlider->getBottom(),
+                             settingsArea.getWidth(),
+                             settingsArea.getHeight() / numSettings);
+    invertSustainB.setBounds(settingsArea.getX(), pedalGainSlider->getBottom(),
                              settingsArea.getWidth(),
                              settingsArea.getHeight() / numSettings);
     noteOnSetsNoteOffVelocityB.setBounds(settingsArea.getX(), invertSustainB.getBottom(),
@@ -808,6 +818,7 @@ void GeneralViewController::update(void)
     GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
     
     A4tuningReferenceFrequencySlider->setValue(gen->getTuningFundamental(), dontSendNotification);
+    pedalGainSlider->setValue(gen->getPedalGain(), dontSendNotification);
     tempoMultiplierSlider->setValue(gen->getTempoMultiplier(), dontSendNotification);
     noteOnSetsNoteOffVelocityB.setToggleState(gen->getNoteOnSetsNoteOffVelocity(), dontSendNotification);
     invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
@@ -867,6 +878,10 @@ void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, S
     {
         DBG("general tempo multiplier " + String(val));
         gen->setTempoMultiplier(val);
+    }
+    else if(name == pedalGainSlider->getName())
+    {
+        gen->setPedalGain(val);
     }
     else if (slider == lowCutFreqSlider.get()) {
         float lowCutFreq = lowCutFreqSlider->getValue();

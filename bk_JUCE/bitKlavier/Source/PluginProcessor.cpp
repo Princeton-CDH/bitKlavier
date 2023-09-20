@@ -1073,8 +1073,8 @@ void BKAudioProcessor::sustainActivate(void)
                            21,
                            21,
                            0,
-                           0.02, //gain
-                           1.,
+                           0.02, //vel
+                         Decibels::decibelsToGain(gallery->getGeneralSettings()->getPedalGain()),//gain
                            Forward,
                            Normal, //FixedLength,
                            PedalNote,
@@ -1139,7 +1139,7 @@ void BKAudioProcessor::sustainDeactivate(void)
                           21,
                           21,
                           1.,
-                          1.,
+                          Decibels::decibelsToGain(gallery->getGeneralSettings()->getPedalGain()),
                           nullptr,
                           true);
         
@@ -1150,8 +1150,8 @@ void BKAudioProcessor::sustainDeactivate(void)
                          22,
                          22,
                          0,
-                         0.03, //gain
-                         1.,
+                         0.03, //vel
+                         Decibels::decibelsToGain(gallery->getGeneralSettings()->getPedalGain()),
                          Forward,
                          Normal, //FixedLength,
                          PedalNote,
