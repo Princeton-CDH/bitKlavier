@@ -196,7 +196,7 @@ compressorView(p.compressor, p)
 #if JUCE_IOS
     tempoMultiplierSlider->addWantsBigOneListener(this);
     A4tuningReferenceFrequencySlider->addWantsBigOneListener(this);
-    pedalGainSlider->addWantsBigOneListener(this)
+    pedalGainSlider->addWantsBigOneListener(this);
 #endif
     
     // Equalizer UI components setup

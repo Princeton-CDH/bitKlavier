@@ -1181,7 +1181,7 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         MainViewController* mvc = dynamic_cast<MainViewController*> (getParentComponent());
         if(mvc)
             mvc->fillSampleCB();
-        if(processor.getBKEditor()->iteratorDoc != nullptr)
+        if(processor.getBKEditor()->iteratorDoc != nullptr && processor.updateState->iteratorViewActive != false)
         {
             processor.getBKEditor()->iteratorDoc->closeButtonPressed();
             processor.getBKEditor()->iteratorDoc = nullptr;
