@@ -173,6 +173,7 @@ compressorView(p.compressor, p)
     pedalGainSlider = std::make_unique<BKSingleSlider>("pedal volume (dB)",ptagGeneral_pedalGain, -100, 24, 0, 0.01, "-inf");
     pedalGainSlider->setJustifyRight(false);
     pedalGainSlider->addMyListener(this);
+    pedalGainSlider->setSliderTextResolution(2);
     addAndMakeVisible(*pedalGainSlider);
     tempoMultiplierSlider = std::make_unique<BKSingleSlider>("tempo multiplier", "tempo multiplier", 0.25, 4., 1., 0.01);
     tempoMultiplierSlider->setSkewFactorFromMidPoint(1.);

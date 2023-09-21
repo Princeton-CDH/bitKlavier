@@ -236,6 +236,8 @@ void DirectProcessor::keyReleased(int noteNumber, Array<float>& targetVelocities
         bVels = &velocities.getReference(noteNumber);
     }
     
+    DBG("Direct::keyreleased called");
+    
     if (bVels->getUnchecked(TargetTypeDirect) < 0.f) return;
     
     // DBG("DirectProcessor::keyReleased " + String(noteNumber) + " keyPlayed[noteNumber].size = " + String(keyPlayed[noteNumber].size()));
