@@ -1,6 +1,6 @@
 # bitKlavier: the prepared digital piano
 
-Developed by Dan Trueman, Michael Mulshine, Matt Wang, Davis Polito, Theo Trevisan, Katie Chou, and Jeff Gordon.
+Developed by Dan Trueman, Michael Mulshine, Matt Wang, Davis Polito, Theo Trevisan, Katie Chou, Jeff Gordon, and Camy Streuly.
 
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3667650.svg)](https://doi.org/10.5281/zenodo.3667650)
