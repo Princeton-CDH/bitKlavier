@@ -26,6 +26,7 @@
 #include "ShareBot.h"
 #endif
 
+
 class HeaderViewController : public BKComponent,
 public BKListener
 {
@@ -47,7 +48,6 @@ public:
     
 private:
     BKAudioProcessor& processor;
-    
     int galleryIsDirtyAlertResult;
     
 

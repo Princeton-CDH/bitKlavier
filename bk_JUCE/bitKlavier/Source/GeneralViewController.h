@@ -112,6 +112,7 @@ private:
     int currentNostalgicLayer;
     BKCompressorView compressorView;
     // Settings UI components
+    std::unique_ptr<BKSingleSlider> pedalGainSlider;
     ToggleButton invertSustainB;
     ToggleButton noteOnSetsNoteOffVelocityB;
     std::unique_ptr<BKSingleSlider> A4tuningReferenceFrequencySlider;
@@ -224,6 +225,8 @@ public:
 #endif
     
 private:
+    
+    
     
     std::unique_ptr<BKSingleSlider> timeSlider;
     std::unique_ptr<BKSingleSlider> incSlider;

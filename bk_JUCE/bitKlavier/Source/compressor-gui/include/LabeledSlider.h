@@ -23,13 +23,16 @@ using SliderAttachment = std::unique_ptr<AudioProcessorValueTreeState::SliderAtt
 using ButtonAttachment = std::unique_ptr<AudioProcessorValueTreeState::ButtonAttachment>;
 
 class LabeledSlider : public Component, public Slider::Listener, public TextEditor::Listener
+#if JUCE_IOS
+,public WantsBigOne
+#endif
 {
 public:
 
     LabeledSlider() : slider(&sliderLabel)
     {
         slider.setSliderStyle(Slider::SliderStyle::RotaryHorizontalVerticalDrag);
-        slider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, sliderLabel.getFont().getHeight());
+        slider.setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxBelow, false, 80, sliderLabel.getFont().getHeight()+6);
         slider.addListener(this);
         addAndMakeVisible(slider);
         addAndMakeVisible(sliderLabel);
@@ -66,7 +69,7 @@ public:
         auto bounds = getLocalBounds().reduced(2);
         const auto fontHeight = sliderLabel.getFont().getHeight();
 
-        const auto labelBounds = bounds.removeFromTop(fontHeight);
+        const auto labelBounds = bounds.removeFromTop(fontHeight+6);
         // const auto editorBounds = bounds.removeFromBottom(fontHeight);
         slider.setBounds(bounds);
         sliderLabel.setBounds(labelBounds);
@@ -104,6 +107,16 @@ public:
         slider.setTextValueSuffix(str);
     }
     
+    void mouseDown(const MouseEvent& e) override
+    {
+#if JUCE_IOS
+    if (e.eventComponent != &slider)
+    {
+        hasBigOne = true;
+        WantsBigOne::listeners.call(&WantsBigOne::Listener::iWantTheBigOne, &valueTF, slider.getName());
+    }
+#endif
+    }
 private:
     BKTextEditor valueTF;
     ModSlider slider;

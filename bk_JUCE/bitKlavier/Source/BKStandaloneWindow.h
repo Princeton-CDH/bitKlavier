@@ -691,6 +691,8 @@ private:
         processor->setDefaultMidiInputIdentifiers(identifiers);
         
         saveAudioDeviceState();
+        
+        
     }
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (StandalonePluginHolder)
@@ -840,6 +842,22 @@ public:
     void resized() override
     {
         DocumentWindow::resized();
+     
+                   
+        auto contentComp = getContentComponent();
+               
+        if(contentComp != nullptr)
+        {
+           auto safeAreaBorder = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay()->safeAreaInsets;
+           auto contentBorder = getContentComponentBorder();
+           juce::BorderSize<int> totalBorder(
+                                       safeAreaBorder.getTop() + contentBorder.getTop(),
+                                       safeAreaBorder.getLeft() + contentBorder.getLeft(),
+                                       safeAreaBorder.getBottom() + contentBorder.getBottom(),
+                                       safeAreaBorder.getRight() + contentBorder.getRight()
+                                       );
+           getContentComponent()->setBoundsInset(totalBorder);
+        }
         audioMidiButton.setBounds(3, 6, 100, getTitleBarHeight() - 6);
     }
     

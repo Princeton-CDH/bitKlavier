@@ -318,6 +318,11 @@ void BKItem::setItemType(BKPreparationType newType, bool create)
 void BKItem::paint(Graphics& g)
 {
     g.setOpacity (1.0f);
+    if (isDisabled)
+    {
+        g.setOpacity(0.5f);
+    }
+    
     g.drawImage (image, getLocalBounds().toFloat(), placement);
     
     if (isSelected)
@@ -330,6 +335,7 @@ void BKItem::paint(Graphics& g)
         g.setColour(Colours::transparentWhite);
         g.drawRect(getLocalBounds(),0);
     }
+   
     
     if (processor.wrapperType == juce::AudioPluginInstance::wrapperType_Standalone)
     {
@@ -595,7 +601,7 @@ void BKItem::itemIsBeingDragged(const MouseEvent& e)
 void BKItem::mouseDoubleClick(const MouseEvent& e)
 {
 //#if !JUCE_IOS
-    if (type == PreparationTypePianoMap)
+    if (type == PreparationTypePianoMap && !isDisabled)
     {
         menu.showPopup();
     }
@@ -624,7 +630,7 @@ void BKItem::mouseDown(const MouseEvent& e)
         {
             if (time < PHATNESS)
             {
-                if (type == PreparationTypePianoMap)
+                if (type == PreparationTypePianoMap && !isDisabled)
                 {
                     menu.showPopup();
                 }

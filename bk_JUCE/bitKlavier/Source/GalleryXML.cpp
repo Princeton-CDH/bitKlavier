@@ -47,7 +47,7 @@ ValueTree  Gallery::getState(void)
 
     File soundfont(processor.globalSoundfont);
     if (soundfont.exists()) galleryVT.setProperty("soundfontURL", soundfont.getFileName(), 0);
-    else galleryVT.setProperty("soundfontURL", processor.globalSoundfont, 0);
+    else galleryVT.setProperty("soundfontURL", processor.globalSoundfont.fromLastOccurrenceOf("/", false, true), 0);
 
     galleryVT.setProperty("soundfontInst", processor.globalInstrument, 0);
     
@@ -104,8 +104,13 @@ ValueTree  Gallery::getState(void)
         galleryVT.addChild( bkPianos[piano]->getState(), -1, 0);
     }
     
+    
     galleryVT.setProperty("defaultPiano", getDefaultPiano(), 0);
     
+    galleryVT.addChild(pianoIteratorOrder.getState(), -1, 0);
+    galleryVT.addChild(iteratorUpKeymap->getState(), -1, 0);
+    galleryVT.addChild(iteratorDownKeymap->getState(), -1,0);
+    galleryVT.setProperty("iteratorIsEnabled",iteratorIsEnabled,0);
     return galleryVT;
 }
 
@@ -125,10 +130,55 @@ void Gallery::setStateFromXML(XmlElement* xml)
     
     if (xml != nullptr)
     {
+        //// load global sound font
+        if(xml->hasAttribute("sampleType"))
+        {
+            processor.globalSampleType = (BKSampleLoadType)xml->getStringAttribute("sampleType").getIntValue();
+        } else
+        {
+            processor.globalSampleType = BKLoadHeavy;
+        }
+        if(xml->hasAttribute("soundfontURL") && processor.globalSampleType >= BKLoadSoundfont)
+        {
+            String soundfont = xml->getStringAttribute("soundfontURL");
+            
+            //File soundfont(processor.globalSoundfont);
+            if (soundfont != "")
+            {
+                if(soundfont.contains("/"))
+                {
+                    soundfont = soundfont.fromLastOccurrenceOf("/", false, true);
+                }
+                Array<File> files = processor.getSoundfontsSearchPath().findChildFiles(File::findFiles, true,soundfont);
+                if (files.isEmpty() && processor.globalSampleType > BKLoadSoundfont)
+                {
+                    files = processor.getCustomSamplesSearchPath().findChildFiles(File::findDirectories, true, soundfont);
+
+                }
+                
+                if (files.isEmpty())
+                {
+                    AlertWindow::showMessageBox(juce::MessageBoxIconType::WarningIcon, "File Not Found!", "Could not find file '" + soundfont + "' please check that it is in the custom sample or soundfont search path");
+                    processor.globalSampleType = BKLoadHeavy;
+                    processor.globalSoundfont = "default.sf2";
+                } else
+                {
+                    processor.globalSoundfont = files.getFirst().getFullPathName();
+                }
+            }
+        } else
+        {
+            //processor.globalSampleType = BKLoadLite;
+            processor.globalSoundfont = "default.sf2";
+        }
+        
+
+        processor.globalInstrument = (int) xml->getStringAttribute("soundfontInst").getIntValue();
+        processor.loadSamples(processor.globalSampleType, processor.globalSoundfont, processor.globalInstrument);
         name = xml->getStringAttribute("name");
         //if (name != )
         setDefaultPiano(xml->getStringAttribute("defaultPiano").getIntValue());
-        
+        iteratorIsEnabled = xml->getStringAttribute("iteratorIsEnabled").getIntValue();
         // iterate through its sub-elements
         for (auto e : xml->getChildIterator())
         {
@@ -334,6 +384,25 @@ void Gallery::setStateFromXML(XmlElement* xml)
                 
                 thisPiano->setState(e, &idmap, idcounts);
             }
+        }
+        for (auto e : xml->getChildIterator())
+        {
+            if(e->hasTagName(vtagPianoIterator))
+            {
+                pianoIteratorOrder.setState(e, bkPianos);
+            }
+        }
+        for( auto e : xml->getChildIterator())
+        {
+            if(e->hasTagName("upkeymap"))
+            {
+                iteratorUpKeymap->setState(e);
+            }
+            if(e->hasTagName("downkeymap"))
+            {
+                iteratorDownKeymap->setState(e);
+            }
+            
         }
     }
 }

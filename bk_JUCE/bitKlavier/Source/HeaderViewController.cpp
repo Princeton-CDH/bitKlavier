@@ -11,8 +11,7 @@
 #include "PluginEditor.h"
 
 #include "HeaderViewController.h"
-
-
+#include "MainViewController.h"
 HeaderViewController::HeaderViewController (BKAudioProcessor& p, BKConstructionSite* c):
 processor (p),
 construction(c)
@@ -228,6 +227,9 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
 #endif
     
     galleryMenu.addSeparator();
+    galleryMenu.addItem(ITERATOR_ID, "Piano Iterator");
+    
+    galleryMenu.addSeparator();
     galleryMenu.addItem(CLEAN_ID, "Clean");
     
 #if JUCE_IOS
@@ -245,7 +247,7 @@ PopupMenu HeaderViewController::getGalleryMenu(void)
     galleryMenu.addSeparator();
     shareMenu.addItem(SHARE_MESSAGE_ID, "Messages");
     galleryMenu.addSeparator();
-    shareMenu.addItem(SHARE_FACEBOOK_ID, "Facebook");
+    //shareMenu.addItem(SHARE_FACEBOOK_ID, "Facebook");
     // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
     galleryMenu.addSeparator();
     galleryMenu.addSubMenu("Share", shareMenu);
@@ -552,6 +554,13 @@ void HeaderViewController::galleryMenuCallback(int result, HeaderViewController*
     else if (result == OPEN_ID) // Load
     {
         processor.loadGalleryDialog();
+        //auto comp = getParentComponent();
+        
+    }
+    else if (result == ITERATOR_ID) // open Piano Iterator
+    {
+        DBG("iterator button check");
+        processor.getBKEditor()->showPianoIteratorDialog();
     }
     else if (result == SETTINGS_ID) // open General settings
     {
@@ -646,6 +655,7 @@ void HeaderViewController::bkButtonClicked (Button* b)
     else if (b == &galleryB)
     {
         getGalleryMenu().showMenuAsync (PopupMenu::Options().withTargetComponent (&galleryB), ModalCallbackFunction::forComponent (galleryMenuCallback, this) );
+        
     }
 }
 
@@ -924,7 +934,7 @@ void HeaderViewController::fillGalleryCB(void)
         
         // THIS IS WHERE NAME OF GALLERY DISPLAYED IS SET
         galleryCB.setSelectedId(lastGalleryCBId, NotificationType::dontSendNotification);
-//        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
+        galleryCB.setText(processor.gallery->getName().upToFirstOccurrenceOf(".xml", false, true), NotificationType::dontSendNotification);
     }
 }
 #endif
@@ -992,7 +1002,7 @@ void HeaderViewController::fillPianoCB(void)
         if (name != String())  pianoCB.addItem(name,  piano->getId());
         else                        pianoCB.addItem("Piano" + String(piano->getId()), piano->getId());
     }*/
-
+    if (processor.currentPiano == nullptr) jassert("bad");
     pianoCB.setSelectedId(processor.currentPiano->getId(), dontSendNotification);
 }
 
@@ -1012,6 +1022,13 @@ bool HeaderViewController::handleGalleryChange(void)
     bool shouldSwitch = false;
     
     galleryIsDirtyAlertResult = 2;
+    
+    if(processor.gallery->iteratorIsEnabled)
+    {
+    
+        int iterPianos = processor.gallery->getPianoIteratorOrder().getNumItems();
+        if(iterPianos > 0) processor.gallery->setGalleryDirty(true);
+    }
     
     if(processor.gallery->isGalleryDirty())
     {
@@ -1101,6 +1118,13 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         update();
         
         processor.saveGalleryToHistory("Change Piano");
+        
+        std::vector<Piano::Ptr>::iterator it =  std::find_if(processor.gallery->getPianoIteratorOrder().modelData.begin(),processor.gallery->getPianoIteratorOrder().modelData.end(), [&](const auto& val)
+                             { return val->getId() == Id;});
+        DBG("index" + String( std::distance(processor.gallery->getPianoIteratorOrder().modelData.begin(), it)));
+        processor.gallery->currentPianoIndex = std::distance(processor.gallery->getPianoIteratorOrder().modelData.begin(), it);
+        processor.updateState->currentIteratorPiano = processor.gallery->currentPianoIndex;
+        processor.updateState->updateIterator = true;
     }
     else if (name == "galleryCB")
     {
@@ -1153,6 +1177,14 @@ void HeaderViewController::bkComboBoxDidChange (ComboBox* cb)
         else
         {
             cb->setSelectedId(lastGalleryCBId, dontSendNotification);
+        }
+        MainViewController* mvc = dynamic_cast<MainViewController*> (getParentComponent());
+        if(mvc)
+            mvc->fillSampleCB();
+        if(processor.getBKEditor()->iteratorDoc != nullptr && processor.updateState->iteratorViewActive != false)
+        {
+            processor.getBKEditor()->iteratorDoc->closeButtonPressed();
+            processor.getBKEditor()->iteratorDoc = nullptr;
         }
     }
 }

@@ -26,6 +26,7 @@ BKViewController(p, theGraph, 3)
     gainSlider->setSkewFactorFromMidPoint(1.);
     gainSlider->setJustifyRight(true);
     gainSlider->displaySliderVisible(false);
+    gainSlider->setSliderTextResolution(2);
     gainSlider->setToolTipString("Adjusts overall volume of blendronic");
     addAndMakeVisible(*gainSlider);
     

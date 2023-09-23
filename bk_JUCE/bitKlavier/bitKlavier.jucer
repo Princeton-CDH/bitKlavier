@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.3"
-              bundleIdentifier="com.manyarrowsmusic.bitKlavier" includeBinaryInAppConfig="1"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.4"
+              bundleIdentifier="edu.princeton.bitklavier.polito" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
               pluginManufacturer="Many Arrows Music" pluginManufacturerCode="Manu"
@@ -554,6 +554,22 @@
         </GROUP>
       </GROUP>
       <GROUP id="{E98AFB64-DE96-83A1-81DC-1FA2D8D37DB8}" name="View">
+        <GROUP id="{31F81691-6796-A586-8AF4-59C33A6C7474}" name="DraggableListBox">
+          <FILE id="SPwvpq" name="DraggableListBox.cpp" compile="1" resource="0"
+                file="Source/juce-draggableListBox/Source/DraggableListBox.cpp"/>
+          <FILE id="ycArUC" name="DraggableListBox.h" compile="0" resource="0"
+                file="Source/juce-draggableListBox/Source/DraggableListBox.h"/>
+          <FILE id="O5P6L2" name="BKListBoxComponent.cpp" compile="1" resource="0"
+                file="Source/juce-draggableListBox/Source/BKListBoxComponent.cpp"/>
+          <FILE id="TAWT5H" name="BKListBoxComponent.h" compile="0" resource="0"
+                file="Source/juce-draggableListBox/Source/BKListBoxComponent.h"/>
+          <FILE id="jMPgdz" name="MyListComponent.cpp" compile="1" resource="0"
+                file="Source/juce-draggableListBox/Source/MyListComponent.cpp"/>
+          <FILE id="DD4KvM" name="MyListComponent.h" compile="0" resource="0"
+                file="Source/juce-draggableListBox/Source/MyListComponent.h"/>
+          <FILE id="LBOXvG" name="ReorderFunctions.h" compile="0" resource="0"
+                file="Source/juce-draggableListBox/Source/ReorderFunctions.h"/>
+        </GROUP>
         <GROUP id="{29161695-CDFF-C502-552E-69F230BE0B8E}" name="compressor-gui">
           <GROUP id="{5A699B16-078C-571D-2195-D69328EDB1AB}" name="include">
             <FILE id="SiTF27" name="Constants.h" compile="0" resource="0" file="Source/compressor-gui/include/Constants.h"/>
@@ -635,7 +651,7 @@
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="bitKlavier"
                        cppLibType="" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="bitKlavier"
-                       osxCompatibility="10.11 SDK" enablePluginBinaryCopyStep="1" macOSDeploymentTarget="10.11"/>
+                       osxCompatibility="10.13 SDK" enablePluginBinaryCopyStep="1" macOSDeploymentTarget="10.13"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>

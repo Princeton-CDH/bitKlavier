@@ -25,6 +25,7 @@ void BKAudioProcessor::updateUI(void)
     updateState->keymapDidChange = true;
     
     updateState->editsMade = false;
+    updateState->updateIterator = true;
 }
 
 OwnedArray<HashMap<String, int>>& BKAudioProcessor::getSourcedNotesOn()
@@ -46,7 +47,7 @@ int BKAudioProcessor::loadSamples(BKSampleLoadType type, String path, int subsou
             File file(path);
             if (!file.exists())
             {
-                type = BKLoadLite;
+                type = BKLoadHeavy;
             }
         }
     }

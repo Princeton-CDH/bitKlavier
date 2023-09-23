@@ -237,8 +237,14 @@ public:
     
     inline ValueTree getState(void)
     {
-        ValueTree keysave( vtagKeymap );
+        ValueTree keysave;
         
+        if ( Id == 255)
+            keysave = ValueTree( "upkeymap" );
+        else if (Id == 256)
+            keysave = ValueTree( "downkeymap");
+        else
+            keysave = ValueTree(vtagKeymap);
         keysave.setProperty( "Id",Id, 0);
         
         keysave.setProperty("name",name,0);
@@ -290,6 +296,7 @@ public:
 
         keysave.setProperty(ptagKeymap_endKeystrokes, allNotesOff ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_ignoreSustain, ignoreSustain ? 1 : 0, 0);
+        keysave.setProperty(ptagKeymap_ignoreNoteOff, ignoreNoteOff ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_sustainPedalKeys, sustainPedalKeys ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_toggleKey, isToggle ? 1 : 0, 0);
         keysave.setProperty(ptagKeymap_sostenutoMode, isSostenuto ? 1 : 0, 0);
@@ -409,6 +416,7 @@ public:
 
         setAllNotesOff((bool) e->getIntAttribute(ptagKeymap_endKeystrokes, 0));
         setIgnoreSustain((bool) e->getIntAttribute(ptagKeymap_ignoreSustain, 0));
+        setIgnoreNoteOff((bool) e->getIntAttribute(ptagKeymap_ignoreNoteOff, 0));
         setSustainPedalKeys((bool) e->getIntAttribute(ptagKeymap_sustainPedalKeys, 0));
         setIsToggle((bool)e->getIntAttribute(ptagKeymap_toggleKey, 0));
         setIsSostenuto((bool)e->getIntAttribute(ptagKeymap_sostenutoMode, 0));
@@ -656,6 +664,10 @@ public:
     inline void setIgnoreSustain(bool toSet) { ignoreSustain = toSet; }
     inline void toggleIgnoreSustain() { ignoreSustain = !ignoreSustain; }
     
+    inline bool getIgnoreNoteOff() { return ignoreNoteOff; }
+    inline void setIgnoreNoteOff(bool toSet) { ignoreNoteOff = toSet; }
+    inline void toggleIgnoreNoteOff() { ignoreNoteOff = !ignoreNoteOff; }
+    
     inline bool getSustainPedalKeys() { return sustainPedalKeys; }
     inline void setSustainPedalKeys(bool toSet) { sustainPedalKeys = toSet; }
     inline void toggleSustainPedalKeys() { sustainPedalKeys = !sustainPedalKeys; }
@@ -787,6 +799,8 @@ private:
     bool velocitiesChanged = false;
 
     bool ignoreSustain;
+    
+    bool ignoreNoteOff;
     
     bool allNotesOff;
     

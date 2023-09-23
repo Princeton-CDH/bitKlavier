@@ -26,6 +26,7 @@ public:
         tempoMultiplier(1.0),
         periodMultiplier(1.0),
         invertSustain(false),
+        pedalGain(1.0),
         noteOnSetsNoteOffVelocity(true)
     {
 
@@ -53,6 +54,8 @@ public:
         f = e->getStringAttribute( ptagGeneral_tuningFund ).getFloatValue();
         setTuningFundamental(f);
         
+        f = e->getStringAttribute( ptagGeneral_pedalGain).getFloatValue();
+        setPedalGain(f);
         b = (bool) e->getStringAttribute( ptagGeneral_invertSustain ).getIntValue();
         setInvertSustain(b);
         
@@ -70,7 +73,7 @@ public:
         generalVT.setProperty( ptagGeneral_tuningFund,       getTuningFundamental(), 0);
         generalVT.setProperty( ptagGeneral_invertSustain,    getInvertSustain(), 0);
         generalVT.setProperty( ptagGeneral_noteOnSetsNoteOffVelocity,    getNoteOnSetsNoteOffVelocity(), 0);
-        
+        generalVT.setProperty(ptagGeneral_pedalGain, getPedalGain(), 0);
         return generalVT;
         
     }
@@ -81,6 +84,7 @@ public:
     const float getPeriodMultiplier(void)   const noexcept  { return periodMultiplier;      };
     const float getGlobalGain(void)         const noexcept  { return globalGain;            };
     const bool  getInvertSustain(void)      const noexcept  { return invertSustain;         };
+    const float getPedalGain()            const noexcept  { return pedalGain;           };
     const bool  getNoteOnSetsNoteOffVelocity(void)      const noexcept  { return noteOnSetsNoteOffVelocity; };
     
     void setTuningFundamental(float val)    {
@@ -94,11 +98,12 @@ public:
     void setInvertSustain(bool inv)         { invertSustain = inv;}
     void setNoteOnSetsNoteOffVelocity(bool inv)         { noteOnSetsNoteOffVelocity = inv;}
     
+    void setPedalGain(float val)          { pedalGain = val;}
 private:
     
     float tuningFundamental; //Hz
     float tuningRatio;
-    
+    float pedalGain;
     float tempoMultiplier;
     float periodMultiplier;
     

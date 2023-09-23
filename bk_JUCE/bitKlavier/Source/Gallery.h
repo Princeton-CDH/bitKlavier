@@ -19,7 +19,7 @@
 #include "Piano.h"
 
 #include "BKGraph.h"
-
+#include "juce-draggableListBox/Source/MyListComponent.h"
 class BKAudioProcessor;
 
 class Gallery : public ReferenceCountedObject
@@ -146,8 +146,73 @@ public:
     void addTypeWithId(BKPreparationType type, int Id);
     void remove(BKPreparationType type, int Id);
     int  getNum(BKPreparationType type);
-    
-    
+    //==============================================================================
+    /**
+     An effect filter that simple makes image monochrome.
+     (This will only work on images/components that aren't opaque, of course).
+     @see Component::setComponentEffect
+     */
+    class MonochromeEffect  : public ImageEffectFilter
+    {
+    public:
+        //==============================================================================
+        /** Creates a default drop-shadow effect.
+         To customise the shadow's appearance, use the setShadowProperties() method.
+         @param backgroundColour (optional) - for some alpha values you might prefer a background (such as black).
+         */
+        MonochromeEffect(juce::Colour backgroundColour = juce::Colours::transparentBlack) { bgColour_ = backgroundColour; }
+
+        /** Destructor. */
+        ~MonochromeEffect() {}
+
+        //==============================================================================
+        /** @internal */
+        void applyEffect (juce::Image& image, juce::Graphics& g, float scaleFactor, float alpha)
+        {
+            g.fillAll(bgColour_);
+            image.desaturate();
+            g.setOpacity (alpha);
+            g.drawImageAt (image, 0, 0);
+        }
+    private:
+        //==============================================================================
+        juce::Colour bgColour_;
+        JUCE_LEAK_DETECTOR (MonochromeEffect)
+    };
+    void disableEnablePianoMapper()
+    {
+        if(iteratorIsEnabled)
+        {
+            for (auto piano : getPianos())
+            {
+                for (auto item : piano->getItems())
+                {
+                   if(item->getType() == PreparationTypePianoMap)
+                   {
+                       item->isDisabled = true;
+                       item->setInterceptsMouseClicks(true, false);
+                       item->setComponentEffect(new MonochromeEffect());
+                   }
+                }
+            }
+        }
+        else
+        {
+            for (auto piano : getPianos())
+            {
+                for (auto item : piano->getItems())
+                {
+                   if(item->getType() == PreparationTypePianoMap)
+                   {
+                       item->isDisabled = false;
+                       item->setInterceptsMouseClicks(true, true);
+                       item->setComponentEffect(nullptr);
+                       
+                   }
+                }
+            }
+        }
+    }
     
     
     
@@ -851,11 +916,54 @@ public:
     int idcounts[BKPreparationTypeNil];
     
     void addPiano(XmlElement* xml, OwnedArray<HashMap<int,int>>* map);
+   
+    MyListBoxItemData& getPianoIteratorOrder()
+    {
+        return pianoIteratorOrder;
+    }
     
+//    Piano::Ptr findPianoWithName(String name)
+//    {
+//        for (auto piano : bkPianos)
+//        {
+//            if(piano->getName() == name)
+//            {
+//                return piano;
+//            }
+//        }
+//        return nullptr;
+//    }
     
+//    void setPianoIteratorOrder(std::vector<String> order)
+//    {
+//        pianoIteratorOrder.clear();
+//        for (auto name : order)
+//        {
+//            pianoIteratorOrder.add(findPianoWithName(name));
+//        }
+//        
+//        DBG("Piano Iterator Order");
+//        for (auto piano : pianoIteratorOrder)
+//        {
+//            DBG(piano->getName());
+//        }
+//    }
+    Keymap::Ptr getIteratorUpKeymap()
+    {
+        return iteratorUpKeymap;
+    }
+    
+    Keymap::Ptr getIteratorDownKeymap()
+    {
+        return iteratorDownKeymap;
+    }
+    int currentPianoIndex = 0;
+    bool iteratorIsEnabled = false;
 private:
     BKAudioProcessor& processor;
     
+    
+    MyListBoxItemData pianoIteratorOrder;
     String url;
     String name;
     
@@ -880,6 +988,10 @@ private:
     Keymap::PtrArr                      bkKeymaps;
     Piano::PtrArr                       bkPianos;
 
+    
+    Keymap::Ptr                         iteratorUpKeymap;
+    Keymap::Ptr                         iteratorDownKeymap;
+    
     int defaultPianoId;
     bool isDirty;
     

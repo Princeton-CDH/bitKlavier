@@ -22,11 +22,12 @@ processor(p)
     }
     
     // DBG("idmap size: " + String(idmap.size()));
-    
+    iteratorUpKeymap = new Keymap(p, 255);
+    iteratorDownKeymap = new Keymap(p, 256);
     general = new GeneralSettings();
     
     addDefaultPrepIfNotThere();
-    
+    disableEnablePianoMapper();
     isDirty = false;
 }
 
@@ -40,14 +41,16 @@ processor(p)
     }
     
     // DBG("idmap size: " + String(idmap.size()));
-    
+    iteratorUpKeymap = new Keymap(p, 255);
+    iteratorDownKeymap = new Keymap(p, 256);
     general = new GeneralSettings();
-
     setStateFromXML(xml);
     
     addDefaultPrepIfNotThere();
-    
+    disableEnablePianoMapper();
     isDirty = false;
+    
+    
 }
 
 Gallery::Gallery(var myJson, BKAudioProcessor& p):
@@ -61,7 +64,8 @@ url(String())
     }
     
     // DBG("idmap size: " + String(idmap.size()));
-    
+    iteratorUpKeymap = new Keymap(p, 255);
+    iteratorDownKeymap = new Keymap(p, 256);
     general = new GeneralSettings();
 
     addDefaultPrepIfNotThere();
@@ -74,6 +78,7 @@ url(String())
     }
     
     isDirty = false;
+    
 }
 
 

@@ -257,17 +257,21 @@ void MainViewController::resized()
 
     splash.setBounds(getLocalBounds());
     
-#if JUCE_IOS
-    headerHeight = processor.screenHeight * 0.125;
-    headerHeight = (headerHeight > 60) ? 60 : headerHeight;
-    
-    sidebarWidth = processor.screenWidth * 0.075;
-    sidebarWidth = (sidebarWidth > 45) ? 45 : sidebarWidth;
-#else
+//#if JUCE_IOS
+//    headerHeight = processor.screenHeight * 0.125;
+//    headerHeight = (headerHeight > 60) ? 60 : headerHeight;
+//
+//    sidebarWidth = processor.screenWidth * 0.075;
+//    sidebarWidth = (sidebarWidth > 45) ? 45 : sidebarWidth;
+//
+//    footerHeight = processor.screenHeight * 0.08;
+//    footerHeight = (footerHeight > 40) ? 40 : footerHeight;
+//#else
     headerHeight = 40;
     sidebarWidth = 30;
-#endif
     footerHeight = 65;
+//#endif
+    
     
     
     Rectangle<int> area (getLocalBounds());
@@ -295,16 +299,15 @@ void MainViewController::resized()
     {
         Rectangle<int> footerSlice = area.removeFromBottom(footerHeight + footerHeight * processor.paddingScalarY + gYSpacing);
         
-        footerSlice.reduce(gXSpacing * 0.5f, gYSpacing);
+       // footerSlice.reduce(gXSpacing * 0.5f, gYSpacing);
 
         float unit = footerSlice.getWidth() * 0.25;
         
-        preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), 100, 20);
-        
-        equalizerButton.setBounds(footerSlice.getWidth() - 100, footerSlice.getY(), 100, 20);
+        preferencesButton.setBounds (footerSlice.getX(), footerSlice.getY(), footerSlice.getWidth()/8, footerSlice.getHeight()/4);
+        equalizerButton.setBounds(footerSlice.getWidth() -  footerSlice.getWidth()/8, footerSlice.getY(), footerSlice.getWidth()/8, footerSlice.getHeight()/4);
 
 		//original spacing to restore once tooltips/keystrokes/hotkeys get moved to a separate menu
-		sampleCB.setBounds(unit, footerSlice.getY(), unit - 0.5 * gXSpacing, 20);
+		sampleCB.setBounds(unit, footerSlice.getY(), unit - 0.5 * gXSpacing, footerSlice.getHeight()/4);
 		instrumentCB.setBounds(2 * unit + 0.5 * gXSpacing, sampleCB.getY(), sampleCB.getWidth(), sampleCB.getHeight());
         
         globalSoundSetButton.setBounds(instrumentCB.getRight()+0.5*gXSpacing, sampleCB.getY(), 120, 20);
@@ -334,8 +337,10 @@ void MainViewController::resized()
     
     area.reduce(2, 2);
     area.removeFromLeft(1);
-    
-    
+//#if JUCE_IOS
+//        
+//    area.reduce(20,20);
+//#endif
     constructionPort.setBounds(area);
     //area.expand(200,200);
     int maxX = area.getRight(), maxY=area.getBottom();
@@ -350,9 +355,10 @@ void MainViewController::resized()
             maxY = item->getBottom();
         }
     }
-    area = area.withWidth(maxX);
-    area = area.withHeight(maxY);
-    construction.setBounds(area);
+    auto constructionArea = area;
+    constructionArea = constructionArea.withWidth(maxX);
+    constructionArea = constructionArea.withHeight(maxY);
+    construction.setBounds(constructionArea);
     undoStatus.setFont(undoStatus.getFont().withHeight(area.getHeight() * 0.05f));
     undoStatus.setBounds(area.getX() + gXSpacing, area.getY() + gXSpacing, area.getWidth() * 0.5,  undoStatus.getFont().getHeight());
 
@@ -666,7 +672,7 @@ void MainViewController::bkButtonClicked (Button* b)
     {
         editor.showBKSettingsDialog(b);
     }
-    if (b == &globalSoundSetButton)
+    else if (b == &globalSoundSetButton)
     {
         String globalSoundSetName =
         processor.loadedSoundSets[processor.globalSoundSetId]
@@ -747,11 +753,11 @@ void MainViewController::bkButtonClicked (Button* b)
             }
         }
     }
-    if (b == &sustainPedalButton)
+    else if (b == &sustainPedalButton)
     {
         processor.setSustainFromMenu(sustainPedalButton.getToggleState());
     }
-    if (b == &equalizerButton) {
+    else if (b == &equalizerButton) {
         editor.showGenSettings(1);
     }
 }
@@ -1493,6 +1499,20 @@ void MainViewController::timerCallback()
             }
         }   
     }
+    if (state->updateIterator && state->iteratorViewActive)
+    {
+        editor.bKIterator->setListBoxRow(state->currentIteratorPiano);
+        state->updateIterator = false;
+    }
+    
+//    if (processor.gallery->iteratorIsEnabled)
+//    {
+//        for(auto item : theGraph)
+//        {
+//            if(item.get)
+//        }
+//    }
+    
     
     levelMeterComponentL->updateLevel(processor.getLevelL());
     //levelMeterComponentR->updateLevel(processor.getLevelL());

@@ -129,8 +129,8 @@ void BKAudioProcessor::loadSamplesStartup(void)
         }
         else
         {
-            globalSampleType = BKLoadLite;
-            loadSamples(BKLoadLite);
+            globalSampleType = BKLoadHeavy;
+            loadSamples(BKLoadHeavy);
         }
     }
     else
@@ -375,6 +375,28 @@ Array<File> BKAudioProcessor::getSoundfontsPaths()
     return directories;
 }
 
+FileSearchPath BKAudioProcessor::getSoundfontsSearchPath()
+{
+    FileSearchPath returnPath = soundfontsPaths;
+
+    
+#if JUCE_IOS
+    returnPath.add(File::getSpecialLocation(File::invokedExecutableFile)
+                    .getParentDirectory().getChildFile("soundfonts"));
+    returnPath.add(File::getSpecialLocation(File::userDocumentsDirectory));
+#endif
+#if JUCE_MAC
+    returnPath.add(File::getSpecialLocation(File::globalApplicationsDirectory)
+                    .getChildFile("bitKlavier").getChildFile("soundfonts"));
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    returnPath.add(File::getSpecialLocation(File::userDocumentsDirectory)
+                    .getChildFile("bitKlavier").getChildFile("soundfonts"));
+#endif
+    
+    return returnPath;
+}
+
 Array<File> BKAudioProcessor::getGalleryPaths()
 {
     Array<File> directories = galleryPaths
@@ -414,4 +436,23 @@ Array<File> BKAudioProcessor::getCustomSamplesPaths()
 #endif
     
     return directories;
+}
+
+FileSearchPath BKAudioProcessor::getCustomSamplesSearchPath()
+{
+    FileSearchPath returnPath = customSamplesPaths;
+
+#if JUCE_IOS
+   
+    returnPath.add(File::getSpecialLocation(File::userDocumentsDirectory));
+#endif
+#if JUCE_MAC
+    returnPath.add(File::getSpecialLocation(File::globalApplicationsDirectory)
+                    .getChildFile("bitKlavier").getChildFile("samples"));
+#endif
+#if JUCE_WINDOWS || JUCE_LINUX
+    returnPath.directories.add(File::getSpecialLocation(File::userDocumentsDirectory)
+                    .getChildFile("bitKlavier").getChildFile("samples"));
+#endif
+    return returnPath;
 }

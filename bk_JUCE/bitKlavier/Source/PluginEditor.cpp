@@ -65,6 +65,9 @@ void BKAudioProcessorEditor::paint (Graphics& g)
 
 void BKAudioProcessorEditor::resized()
 {
+    //juce::DocumentWindow::resized();
+               
+  
     processor.paddingScalarX = (float)(getWidth() - DEFAULT_MIN_WIDTH) / (DEFAULT_WIDTH - DEFAULT_MIN_WIDTH);
     processor.paddingScalarY = (float)(getHeight() - DEFAULT_MIN_HEIGHT) / (DEFAULT_HEIGHT - DEFAULT_MIN_HEIGHT);
     
@@ -95,6 +98,22 @@ void BKAudioProcessorEditor::showBKSettingsDialog(Button* button)
     window->setLookAndFeel(&laf);
     window->setTitleBarButtonsRequired(DocumentWindow::TitleBarButtons::closeButton, false);
     window->setTitleBarTextCentred(false);
+}
+
+void BKAudioProcessorEditor::showPianoIteratorDialog()
+{
+    // check if DocumentWindow already exists
+    if (processor.updateState->iteratorViewActive) return;
+    
+    iteratorDoc = new BKDocumentWindow("Piano Iterator", Colours::transparentBlack, DocumentWindow::TitleBarButtons::allButtons, true );
+    bKIterator = new BKListBoxComponent(processor);
+    
+    iteratorDoc->setAlwaysOnTop(true);
+    addAndMakeVisible(iteratorDoc);
+    iteratorDoc->addToDesktop();
+    iteratorDoc->setContentOwned(bKIterator,true);
+    iteratorDoc->setResizable(true, true);
+    iteratorDoc->setLookAndFeel(&laf);
 }
 
 void BKAudioProcessorEditor::showGenSettings(int tab) {

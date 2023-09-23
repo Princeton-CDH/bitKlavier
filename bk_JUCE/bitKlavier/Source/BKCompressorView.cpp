@@ -220,7 +220,6 @@ void BKCompressorView::paint(Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (Colours::black);   // clear the background
 }
-
 void BKCompressorView::resized()
 {
     //actionButton.setBounds(area_init.removeFromTop(area_init.getHeight()/10).removeFromLeft(area_init.getWidth()/10));

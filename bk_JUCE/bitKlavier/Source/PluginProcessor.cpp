@@ -668,7 +668,7 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     
     PreparationMap::Ptr pmap = currentPiano->getPreparationMap();
     if (pmap == nullptr) return;
-    
+   
     // This array will hold all the notes to play based on harmonization without duplicates
     Array<int> reducedHarm;
     // Go through all the keymaps
@@ -767,20 +767,70 @@ void BKAudioProcessor::handleNoteOn(int noteNumber, float velocity, int channel,
     bool noteDown = sourcedNotesOn.getUnchecked(noteNumber)->size() > 0;
     if (!activeSource) return;
     
-    // Check PianoMap for whether piano should change due to key strike.
-    for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
-    {
-        for (auto keymap : pmap.keymaps)
+    if (gallery->iteratorIsEnabled){
+        int prevPiano = gallery->currentPianoIndex;
+        int currNumPianos = gallery->getPianoIteratorOrder().getNumItems();
+        
+        if (gallery->getIteratorUpKeymap()->keys().contains(noteNumber) && gallery->getIteratorUpKeymap()->getAllMidiInputIdentifiers().contains(source))
         {
-            if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
+            if (prevPiano == currNumPianos - 1) gallery->currentPianoIndex = 0;
+            else gallery->currentPianoIndex++;
+        }
+        if (gallery->getIteratorDownKeymap()->keys().contains(noteNumber) && gallery->getIteratorDownKeymap()->getAllMidiInputIdentifiers().contains(source))
+        {
+            if (prevPiano == 0) gallery->currentPianoIndex  = currNumPianos - 1;
+            else gallery->currentPianoIndex--;
+        }
+        if (prevPiano !=  gallery->currentPianoIndex)
+        {
+            if (gallery->currentPianoIndex < 0)
             {
-                int whichPiano = pmap.pianoTarget;
-                if (whichPiano > 0 && whichPiano != currentPiano->getId())
+                // gallery->currentPianoIndex = 0;
+                gallery->currentPianoIndex = gallery->getPianoIteratorOrder().modelData.size() - 1;
+            }
+            if (gallery->currentPianoIndex >= gallery->getPianoIteratorOrder().modelData.size())
+            {
+                gallery->currentPianoIndex = 0;
+            }
+            for(auto piano : gallery->getPianoIteratorOrder().modelData)
+            {
+                DBG("Piano Name: " + piano->getName() + " Piano ID" + String(piano->getId()));
+            }
+            Piano::Ptr whichPiano = gallery->getPianoIteratorOrder().modelData[gallery->currentPianoIndex];
+            
+            // DT: i'm not sure why we are avoiding piano = 0? it's not loading in bK as expected, when we move back to it, so i have removed that in the conditional, which i think means that the "else" will never be reached, but let me know if i'm missing something.
+            //if (whichPiano->getId() > 0 && whichPiano->getId() != currentPiano->getId() && gallery->currentPianoIndex > 0)
+            if (whichPiano->getId() != currentPiano->getId())
+            {
+                DBG("change piano to " + String(whichPiano->getName()));
+                setCurrentPiano(whichPiano->getId());
+                updateState->updateIterator = true;
+                updateState->currentIteratorPiano = gallery->currentPianoIndex;
+            } else
+            {
+                DBG("Increment Iterator without loading new piano");
+                updateState->updateIterator = true;
+                updateState->currentIteratorPiano = gallery->currentPianoIndex;
+            }
+        }
+        
+    } else
+    {
+        // Check PianoMap for whether piano should change due to key strike.
+        for (auto pmap : currentPiano->modificationMap.getUnchecked(noteNumber)->pianoMaps)
+        {
+            for (auto keymap : pmap.keymaps)
+            {
+                if (keymap->keys().contains(noteNumber) && keymap->getAllMidiInputIdentifiers().contains(source))
                 {
-                    DBG("change piano to " + String(whichPiano));
-                    setCurrentPiano(whichPiano);
+                    int whichPiano = pmap.pianoTarget;
+                    if (whichPiano > 0 && whichPiano != currentPiano->getId())
+                    {
+                        DBG("change piano to " + String(whichPiano));
+                        setCurrentPiano(whichPiano);
+                    }
+                    break;
                 }
-                break;
             }
         }
     }
@@ -1023,8 +1073,8 @@ void BKAudioProcessor::sustainActivate(void)
                            21,
                            21,
                            0,
-                           0.02, //gain
-                           1.,
+                           0.02, //vel
+                         Decibels::decibelsToGain(gallery->getGeneralSettings()->getPedalGain()),//gain
                            Forward,
                            Normal, //FixedLength,
                            PedalNote,
@@ -1089,7 +1139,7 @@ void BKAudioProcessor::sustainDeactivate(void)
                           21,
                           21,
                           1.,
-                          1.,
+                          Decibels::decibelsToGain(gallery->getGeneralSettings()->getPedalGain()),
                           nullptr,
                           true);
         
@@ -1100,8 +1150,8 @@ void BKAudioProcessor::sustainDeactivate(void)
                          22,
                          22,
                          0,
-                         0.03, //gain
-                         1.,
+                         0.03, //vel
+                         Decibels::decibelsToGain(gallery->getGeneralSettings()->getPedalGain()),
                          Forward,
                          Normal, //FixedLength,
                          PedalNote,
@@ -1651,7 +1701,9 @@ void BKAudioProcessor::importSoundfont(void)
                          {
                              auto url = results.getReference (0);
                              
-                             std::unique_ptr<InputStream> wi (url.createInputStream (false));
+                             std::unique_ptr<InputStream> wi (url.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+                                                                                     .withConnectionTimeoutMs (1000)
+                                                                                     .withNumRedirectsToFollow (0)));
                              
                              if (wi != nullptr)
                              {
@@ -1691,7 +1743,9 @@ void BKAudioProcessor::importCurrentGallery(void)
          {
              auto url = results.getReference (0);
             
-             if (url.createInputStream (false) != nullptr)
+             if (url.createInputStream (URL::InputStreamOptions (URL::ParameterHandling::inAddress)
+                                        .withConnectionTimeoutMs (1000)
+                                        .withNumRedirectsToFollow (0)) != nullptr)
              {
                  std::shared_ptr<XmlElement> xml = url.readEntireXmlStream();
                 
@@ -2162,7 +2216,10 @@ void BKAudioProcessor::hiResTimerCallback()
         b->prep->stepModdables();
     }
 }
-
+BKAudioProcessorEditor* BKAudioProcessor::getBKEditor()
+{
+    return editor;
+}
 void BKAudioProcessor::reset(BKPreparationType type, int Id)
 {
     if (type == PreparationTypeDirect)

@@ -74,7 +74,9 @@ absoluteKeyboard(false, false)
     adaptiveSystemsCB.addItem("Adaptive 1", 2);
     adaptiveSystemsCB.addItem("Adaptive Anchored 1", 3);
     adaptiveSystemsCB.addItem("Spring", 4);
+#if !JUCE_IOS
     adaptiveSystemsCB.addItem("MTSClient", 5);
+#endif
     attachKeymap.setText("Attach a Keymap for Adaptive or Spiral/Springs!", dontSendNotification);
     addAndMakeVisible(attachKeymap);
 
@@ -232,8 +234,9 @@ absoluteKeyboard(false, false)
     customKeyboard.setFundamental(0);
     addAndMakeVisible(customKeyboard);
     
-    offsetSlider = std::make_unique<BKSingleSlider>("offset: ", cTuningFundamentalOffset, -100, 100, 0, 0.1);
+    offsetSlider = std::make_unique<BKSingleSlider>("offset: ", cTuningFundamentalOffset, -100, 100, 0.0, 0.1);
     offsetSlider->displaySliderVisible(false);
+    offsetSlider->setSliderTextResolution(2);
     offsetSlider->setToolTipString("Raise or lower the entire temperament in cents");
     addAndMakeVisible(*offsetSlider);
     
@@ -334,7 +337,9 @@ absoluteKeyboard(false, false)
     MTSMasterConnectionButton.reset(new BKTextButton());
     addAndMakeVisible(MTSMasterConnectionButton.get());
     MTSMasterConnectionButton->setLookAndFeel(&buttonsAndMenusLAF);
+#if !JUCE_IOS
     MTSMasterConnectionButton->setVisible(true);
+#endif
     MTSMasterConnectionButton->setButtonText("Register MTSMaster");
     
     
@@ -574,7 +579,9 @@ void TuningViewController::displayTab(int tab)
         A1AnchorScaleLabel.setVisible(true);
         A1AnchorScaleCB.setVisible(true);
         A1FundamentalCB.setVisible(true);
+#if !JUCE_IOS
         MTSMasterConnectionButton->setVisible(true);
+#endif
         
         Rectangle<int> area (getBounds());
         area.removeFromTop(selectCB.getHeight() + 50 * processor.paddingScalarY + 4 + gYSpacing);
@@ -839,6 +846,7 @@ void TuningViewController::displayTab(int tab)
                                      currentFundamental.getHeight()  );
     } else if (tab == 2)
     {
+
         Tuning::Ptr tuning = processor.gallery->getTuning(processor.updateState->currentTuningId);
         if (!tuning->isAbsoluteTuning)
             tuning->currentScalaString = tuning->generateScalaString();
@@ -849,8 +857,7 @@ void TuningViewController::displayTab(int tab)
         //applyButton->setBounds (346, 298, 78, 24);
         applyButton->setVisible(true);
         applyKBMButton->setVisible(true);
-        importButton->setVisible(true);
-        importKBMButton->setVisible(true);
+
         resetButton->setVisible(true);
         sclTextEditor->setVisible(true);
         kbmTextEditor->setVisible(true);
@@ -907,6 +914,10 @@ void TuningViewController::displayTab(int tab)
 //        resetButton->setBounds (262, 50, 78, 24);
 //        sclTextEditor->setBounds(100, 100, 200, 300);
 //        kbmTextEditor->setBounds(400, 100, 200, 300);
+#if !JUCE_IOS
+        importButton->setVisible(true);
+        importKBMButton->setVisible(true);
+#endif
     }
     
     repaint();
@@ -977,7 +988,8 @@ void TuningViewController::paint (Graphics& g)
                                       tuning->getGlobalTuningReference());
             else
             {
-                midi = tuning->getOffset(a->getNote(), false);
+                //midi = tuning->getOffset(a->getNote(), false);
+                midi = tuning->getLastOffset(a->getNote());
                 midi += a->getNote();
             }
             
@@ -998,7 +1010,8 @@ void TuningViewController::paint (Graphics& g)
             Particle* b = s->getB();
             if(springsOn) midi = ftom(Utilities::centsToFreq(b->getX() - (1200.0 * b->getOctave())), tuning->getGlobalTuningReference());
             else {
-                midi = tuning->getOffset(b->getNote(), false);
+                //midi = tuning->getOffset(b->getNote(), false);
+                midi = tuning->getLastOffset(b->getNote());
                 midi += b->getNote();
             }
             
@@ -1052,7 +1065,8 @@ void TuningViewController::paint (Graphics& g)
                 midi += ((p->getOctave() - 5) * 12.0);
             }
             else {
-                midi = tuning->getOffset(p->getNote(), false);
+                //midi = tuning->getOffset(p->getNote(), false);
+                midi = tuning->getLastOffset(p->getNote());
                 //DBG("midiOffset = " + String(midi) + " for note: " + String(p->getNote() % 12));
                 midi += p->getNote();
             }
@@ -2772,6 +2786,7 @@ void TuningModificationEditor::greyOutAllComponents()
     applyKBMButton->setAlpha(gModAlpha);
     applyButton->setAlpha(gModAlpha);
     resetButton->setAlpha(gModAlpha);
+
     importButton->setAlpha(gModAlpha);
     importKBMButton->setAlpha(gModAlpha);
 }

@@ -50,6 +50,9 @@ public:
     
     int  currentKeymapId = 1;
     
+    bool updateIterator = false;
+    int currentIteratorPiano = 0;
+    bool iteratorViewActive = false;
     bool idDidChange = false;
     bool galleriesUpdated = false;
     bool directDidChange = false;

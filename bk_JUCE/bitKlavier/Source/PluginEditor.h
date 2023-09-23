@@ -17,7 +17,7 @@
 
 #include "MainViewController.h"
 
-
+#include "juce-draggableListBox/Source/BKListBoxComponent.h"
 
 //==============================================================================
 /**
@@ -53,7 +53,13 @@ public:
     
     MainViewController& getMainViewController() { return mvc; }
     
+    // void showPianoIteratorDialog(Button *button);
+    void showPianoIteratorDialog();
+    
+    BKListBoxComponent *bKIterator;
+    DocumentWindow* iteratorDoc = nullptr;
 private:
+    
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it
     
@@ -70,7 +76,23 @@ private:
     std::unique_ptr<TooltipWindow> tipwindow;
     
     BKWindowLAF laf;
-    
+    class BKDocumentWindow : public DocumentWindow
+    {
+    public:
+        BKDocumentWindow (const String& name,
+                        Colour backgroundColour,
+                        int requiredButtons,
+                        bool addToDesktop = true)
+         : DocumentWindow(name,backgroundColour,requiredButtons,addToDesktop)
+        {
+            setWantsKeyboardFocus(true);
+        }
+        void closeButtonPressed()
+        {
+            delete this;
+        }
+
+    };
     class PreferencesComponent : public Component,
                                  public Button::Listener,
                                  public TextEditor::Listener
@@ -180,6 +202,18 @@ private:
         void paint (Graphics& g) override
         {
             g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));
+        }
+        
+        void focusLost(FocusChangeType     cause) override
+        {
+            DBG("clicked outside");
+        }
+        
+        virtual bool canModalEventBeSentToComponent    (    const Component *     targetComponent    )override
+
+        {
+            DBG("let the clicks through");
+            return true;
         }
         
         void resized() override
@@ -353,6 +387,7 @@ private:
     private:
         //==============================================================================
         BKAudioProcessorEditor& owner;
+        
         
         std::unique_ptr<FileChooser> fc;
         

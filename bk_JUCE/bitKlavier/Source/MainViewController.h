@@ -122,6 +122,11 @@ public:
     Slider octaveSlider;
     //void setSliderLookAndFeel(BKButtonAndMenuLAF *laf);
     
+    void fillSampleCB();
+    void fillPianoCB()
+    {
+        header.fillPianoCB();
+    }
 private:
 
 #define MVC_REFRESH_RATE 20
@@ -185,7 +190,6 @@ private:
     
     void bkComboBoxDidChange(ComboBox* cb) override;
     
-    void fillSampleCB();
     void fillInstrumentCB();
     
     void drawPreparationPanel(void);
@@ -197,7 +201,6 @@ private:
     bool isAddingFromMidiInput;
     
     TextButton preferencesButton;
-    
     ToggleButton globalSoundSetButton;
 
     ToggleButton sustainPedalButton;

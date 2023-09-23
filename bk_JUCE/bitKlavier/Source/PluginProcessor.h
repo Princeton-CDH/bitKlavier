@@ -251,7 +251,7 @@ public:
 
     //==============================================================================
     
-    inline BKAudioProcessorEditor* getBKEditor() { return editor; }
+    BKAudioProcessorEditor* getBKEditor();
     
     const String getName() const override;
 
@@ -275,6 +275,8 @@ public:
     File getDefaultSamplesPath();
     Array<File> getSoundfontsPaths();
     Array<File> getCustomSamplesPaths();
+    FileSearchPath getSoundfontsSearchPath();
+    FileSearchPath getCustomSamplesSearchPath();
     Array<File> getGalleryPaths();
     double getLevelL();
     double getLevelR();
@@ -479,7 +481,7 @@ public:
     int findPathAndLoadSamples(String name)
     {
         // name comes in as "soundfont.sf2.subsound1"
-        BKSampleLoadType type = BKLoadLite;
+        BKSampleLoadType type = BKLoadHeavy;
         String path;
         int subsound = 0;
         

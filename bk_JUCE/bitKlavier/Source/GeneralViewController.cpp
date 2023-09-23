@@ -110,7 +110,7 @@ BKViewController(p, theGraph, 1)
     about.setMultiLine(true);
     String astring = "Welcome to bitKlavier v";
     astring.append(JucePlugin_VersionString, 8);
-    astring += "! www.bitKlavier.com\n--\nbitKlavier was created by\nDan Trueman\nMike Mulshine\nMatt Wang\nDavis Polito\nTheo Trevisan\nKatie Chou\nJeff Gordon";
+    astring += "! www.bitKlavier.com\n--\nbitKlavier was created by\nDan Trueman\nMike Mulshine\nMatt Wang\nDavis Polito\nTheo Trevisan\nKatie Chou\nJeff Gordon\nCami Streuly";
     about.setText(astring);
 
     image = ImageCache::getFromMemory(BinaryData::icon_png, BinaryData::icon_pngSize);
@@ -170,6 +170,11 @@ compressorView(p.compressor, p)
     A4tuningReferenceFrequencySlider->addMyListener(this);
     addAndMakeVisible(*A4tuningReferenceFrequencySlider);
     
+    pedalGainSlider = std::make_unique<BKSingleSlider>("pedal volume (dB)",ptagGeneral_pedalGain, -100, 24, 0, 0.01, "-inf");
+    pedalGainSlider->setJustifyRight(false);
+    pedalGainSlider->addMyListener(this);
+    pedalGainSlider->setSliderTextResolution(2);
+    addAndMakeVisible(*pedalGainSlider);
     tempoMultiplierSlider = std::make_unique<BKSingleSlider>("tempo multiplier", "tempo multiplier", 0.25, 4., 1., 0.01);
     tempoMultiplierSlider->setSkewFactorFromMidPoint(1.);
     tempoMultiplierSlider->setJustifyRight(false);
@@ -192,6 +197,7 @@ compressorView(p.compressor, p)
 #if JUCE_IOS
     tempoMultiplierSlider->addWantsBigOneListener(this);
     A4tuningReferenceFrequencySlider->addWantsBigOneListener(this);
+    pedalGainSlider->addWantsBigOneListener(this);
 #endif
     
     // Equalizer UI components setup
@@ -461,6 +467,7 @@ void GeneralViewController::displayTab(int tab) {
         tempoMultiplierSlider->setVisible(true);
         invertSustainB.setVisible(true);
         noteOnSetsNoteOffVelocityB.setVisible(true);
+        pedalGainSlider->setVisible(true);
     }
     else if (tab == Tabs::equalizer) {
         bypassToggle.setVisible(true);
@@ -494,6 +501,7 @@ void GeneralViewController::displayShared() {
 void GeneralViewController::invisible() {
     A4tuningReferenceFrequencySlider->setVisible(false);
     tempoMultiplierSlider->setVisible(false);
+    pedalGainSlider->setVisible(false);
     invertSustainB.setVisible(false);
     noteOnSetsNoteOffVelocityB.setVisible(false);
     bypassToggle.setVisible(false);
@@ -542,7 +550,10 @@ void GeneralViewController::resized()
     tempoMultiplierSlider->setBounds(settingsArea.getX(), A4tuningReferenceFrequencySlider->getBottom(),
                                      settingsArea.getWidth(),
                                      settingsArea.getHeight() / numSettings);
-    invertSustainB.setBounds(settingsArea.getX(), tempoMultiplierSlider->getBottom(),
+    pedalGainSlider->setBounds(settingsArea.getX(), tempoMultiplierSlider->getBottom(),
+                             settingsArea.getWidth(),
+                             settingsArea.getHeight() / numSettings);
+    invertSustainB.setBounds(settingsArea.getX(), pedalGainSlider->getBottom(),
                              settingsArea.getWidth(),
                              settingsArea.getHeight() / numSettings);
     noteOnSetsNoteOffVelocityB.setBounds(settingsArea.getX(), invertSustainB.getBottom(),
@@ -808,6 +819,7 @@ void GeneralViewController::update(void)
     GeneralSettings::Ptr gen = processor.gallery->getGeneralSettings();
     
     A4tuningReferenceFrequencySlider->setValue(gen->getTuningFundamental(), dontSendNotification);
+    pedalGainSlider->setValue(gen->getPedalGain(), dontSendNotification);
     tempoMultiplierSlider->setValue(gen->getTempoMultiplier(), dontSendNotification);
     noteOnSetsNoteOffVelocityB.setToggleState(gen->getNoteOnSetsNoteOffVelocity(), dontSendNotification);
     invertSustainB.setToggleState(gen->getInvertSustain(), dontSendNotification);
@@ -867,6 +879,10 @@ void GeneralViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, S
     {
         DBG("general tempo multiplier " + String(val));
         gen->setTempoMultiplier(val);
+    }
+    else if(name == pedalGainSlider->getName())
+    {
+        gen->setPedalGain(val);
     }
     else if (slider == lowCutFreqSlider.get()) {
         float lowCutFreq = lowCutFreqSlider->getValue();
@@ -1165,6 +1181,7 @@ BKViewController(p, theGraph, 1)
     incSlider = std::make_unique<BKSingleSlider>("mod increment", "mod increment", -2.0f, 2.0f, 0.0, 0.001);
     incSlider->setToolTipString("how much to increment the mod value on each time the mod is triggered");
     incSlider->setJustifyRight(false);
+    incSlider->setSliderTextResolution(2);
     incSlider->addMyListener(this);
     addAndMakeVisible(*incSlider);
     
@@ -1243,7 +1260,12 @@ void ModdableViewController::update(void)
     if (mod == nullptr) return;
     
     timeSlider->setValue(mod->getTime(), dontSendNotification);
-    incSlider->setValue(mod->getInc(), dontSendNotification);
+    if (processor.updateState->currentModdableIdentifier == cTuningFundamentalOffset)
+        incSlider->setValue(mod->getInc() * 100, dontSendNotification);
+    else
+        incSlider->setValue(mod->getInc(), dontSendNotification);
+
+    
     maxIncSlider->setValue(mod->getMaxNumberOfInc(), dontSendNotification);
 }
 
@@ -1258,7 +1280,11 @@ void ModdableViewController::BKSingleSliderValueChanged(BKSingleSlider* slider, 
     }
     if (name == incSlider->getName())
     {
-        mod->setInc(val);
+        DBG("Moddable setting inc to " + String(val));
+        if (processor.updateState->currentModdableIdentifier == cTuningFundamentalOffset)
+            mod->setInc(val * 0.01);
+        else
+            mod->setInc(val);
     }
     if (name == maxIncSlider->getName())
     {

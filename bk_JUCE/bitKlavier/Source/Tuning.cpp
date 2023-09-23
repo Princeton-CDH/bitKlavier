@@ -72,6 +72,7 @@ lastIntervalTuning(0)
     {
         velocities.add(Array<float>());
         invertVelocities.add(Array<float>());
+        lastOffsets.add(0.);
         for (int i = 0; i < TargetTypeNil; ++i)
         {
             velocities.getReference(j).add(-1.f);
@@ -109,6 +110,7 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
 //            DBG("Master Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
 //            MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
 //        }
+        if(updateLastInterval) lastOffsets.set(midiNoteNumber, lastNoteOffset);
         return lastNoteOffset;
     }
     
@@ -137,6 +139,7 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
 //            DBG("Master Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
 //            MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
 //        }
+        if(updateLastInterval) lastOffsets.set(midiNoteNumber, lastNoteOffset);
         return lastNoteOffset;
     }
     
@@ -152,6 +155,7 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
         }
         DBG("Client Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
         
+        if(updateLastInterval) lastOffsets.set(midiNoteNumber, lastNoteOffset);
         return lastNoteOffset;
     }
     
@@ -176,6 +180,7 @@ float TuningProcessor::getOffset(int midiNoteNumber, bool updateLastInterval)
         DBG("MAster Midinote: "+String(midiNoteNumber) + "New MidiNote: " + String(midiNoteNumber + lastNoteOffset));
         MTS_SetNoteTuning((double)mtof(midiNoteNumber + lastNoteOffset), (char)midiNoteNumber);
     }
+    if(updateLastInterval) lastOffsets.set(midiNoteNumber, lastNoteOffset);
     return lastNoteOffset;
     
 }
