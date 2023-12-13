@@ -743,7 +743,8 @@ void NostalgicProcessor::keyPressed(int noteNumber, Array<float>& targetVelociti
                                            64,
                                            aGlobalGain,
                                            prep->getGainPtr(),
-                                           false, // THIS NEEDS TO BE FALSE ATM TO GET RID OF UNDERTOW NOTES : because our processsPiano doesn't distinguish between true keyOn/Offs from keyboard and these under the hood keyOn/Offs (which don't correspond with Off/On from keyboard)
+                                           true,
+                                           //false, // THIS NEEDS TO BE FALSE ATM TO GET RID OF UNDERTOW NOTES : because our processsPiano doesn't distinguish between true keyOn/Offs from keyboard and these under the hood keyOn/Offs (which don't correspond with Off/On from keyboard)
                                            true); // true for nostalgicOff
                         }
                     }
