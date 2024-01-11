@@ -296,12 +296,13 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
                             getSampleRate();
     } else if (tuning != nullptr && tuning->getTuning()->prep->hasMTSMaster())
     {
-        float mn = (currentMidiNoteNumber  + sound->transpose);
-        float freq = tuning->getTuning()->prep->getMTSFreq(mn);
-        double _mn = ftom(freq);
+//        float mn = (currentMidiNoteNumber  + sound->transpose);
+//        float freq = tuning->getTuning()->prep->getMTSFreq(mn);
+//        double _mn = ftom(freq);
+        float freq = mtof(currentMidiNoteNumber);
         //DBG(String(mtof(_mn + sound->transpose)));
-        DBG("pianoSampler midinote: " + String(currentMidiNoteNumber) + " Freq: " + String(freq) + " MTS Out midinote: " + String(_mn));
-        pitchRatio =   powf(2.0f, (_mn - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
+        DBG("pianoSampler midinote: " + String(currentMidiNoteNumber) + " Freq: " + String(freq));
+        pitchRatio =   powf(2.0f, (currentMidiNoteNumber - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
                             sound->sourceSampleRate *
                             generalSettings->getTuningRatio() /
                             getSampleRate();
