@@ -294,7 +294,7 @@ void BKPianoSamplerVoice::updatePitch(const BKPianoSamplerSound* const sound)
                             sound->sourceSampleRate *
                             generalSettings->getTuningRatio() /
                             getSampleRate();
-    }                            getSampleRate();
+    }                            
     else
     {
         pitchRatio =    powf(2.0f, (cookedNote - (float)sound->midiRootNote + sound->transpose) / 12.0f) *
