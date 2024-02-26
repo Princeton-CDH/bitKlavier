@@ -772,6 +772,37 @@ public:
             centreWithSize (getWidth(), getHeight());
         }
 #endif
+        const auto windowScreenBounds = [this]() -> Rectangle<int>
+                {
+                    const auto width = getWidth();
+                    const auto height = getHeight();
+
+                    const auto& displays = Desktop::getInstance().getDisplays();
+
+                    if (auto* props = pluginHolder->settings.get())
+                    {
+                        constexpr int defaultValue = -100;
+
+                        const auto x = props->getIntValue ("windowX", defaultValue);
+                        const auto y = props->getIntValue ("windowY", defaultValue);
+
+                        if (x != defaultValue && y != defaultValue)
+                        {
+                            const auto screenLimits = displays.getDisplayForRect ({ x, y, width, height })->userArea;
+
+                            return { jlimit (screenLimits.getX(), jmax (screenLimits.getX(), screenLimits.getRight()  - width),  x),
+                                     jlimit (screenLimits.getY(), jmax (screenLimits.getY(), screenLimits.getBottom() - height), y),
+                                     width, height };
+                        }
+                    }
+
+                    const auto displayArea = displays.getPrimaryDisplay()->userArea;
+
+                    return { displayArea.getCentreX() - width / 2,
+                             displayArea.getCentreY() - height / 2,
+                             width, height };
+                }();
+        setBoundsConstrained (windowScreenBounds);
     }
     
     ~StandaloneFilterWindow() override
@@ -844,20 +875,20 @@ public:
         DocumentWindow::resized();
      
                    
-        auto contentComp = getContentComponent();
-               
-        if(contentComp != nullptr)
-        {
-           auto safeAreaBorder = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay()->safeAreaInsets;
-           auto contentBorder = getContentComponentBorder();
-           juce::BorderSize<int> totalBorder(
-                                       safeAreaBorder.getTop() + contentBorder.getTop(),
-                                       safeAreaBorder.getLeft() + contentBorder.getLeft(),
-                                       safeAreaBorder.getBottom() + contentBorder.getBottom(),
-                                       safeAreaBorder.getRight() + contentBorder.getRight()
-                                       );
-           getContentComponent()->setBoundsInset(totalBorder);
-        }
+//        auto contentComp = getContentComponent();
+//               
+//        if(contentComp != nullptr)
+//        {
+//           auto safeAreaBorder = juce::Desktop::getInstance().getDisplays().getPrimaryDisplay()->safeAreaInsets;
+//           auto contentBorder = getContentComponentBorder();
+//           juce::BorderSize<int> totalBorder(
+//                                       safeAreaBorder.getTop() + contentBorder.getTop(),
+//                                       safeAreaBorder.getLeft() + contentBorder.getLeft(),
+//                                       safeAreaBorder.getBottom() + contentBorder.getBottom(),
+//                                       safeAreaBorder.getRight() + contentBorder.getRight()
+//                                       );
+//           getContentComponent()->setBoundsInset(totalBorder);
+//        }
         audioMidiButton.setBounds(3, 6, 100, getTitleBarHeight() - 6);
     }
     
