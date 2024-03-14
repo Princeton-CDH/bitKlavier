@@ -710,7 +710,8 @@ void BKPianoSamplerVoice::processSoundfontLoop(AudioSampleBuffer& outputBuffer,
     
     float dg = 1.0f;
     if (dgain != nullptr) dg = Decibels::decibelsToGain(*dgain);
-    float bg = aGlobalGain * dg;
+    float bg = 1.;
+    //float bg = aGlobalGain * dg;
     if (blendronicGain != nullptr) bg *= Decibels::decibelsToGain(*blendronicGain);
     
     gainEnv.setTarget(dg);
@@ -877,7 +878,8 @@ void BKPianoSamplerVoice::processSoundfontNoLoop(AudioSampleBuffer& outputBuffer
     
     float dg = 1.0f;
     if (dgain != nullptr) dg = Decibels::decibelsToGain(*dgain);
-    float bg = aGlobalGain * dg;
+    float bg = 1.;
+    //float bg = aGlobalGain * dg;
     if (blendronicGain != nullptr) bg *= Decibels::decibelsToGain(*blendronicGain);
     
     gainEnv.setTarget(dg);
@@ -1099,7 +1101,8 @@ void BKPianoSamplerVoice::processPiano(AudioSampleBuffer& outputBuffer,
     
     float dg = 1.0f;
     if (dgain != nullptr) dg = Decibels::decibelsToGain(*dgain);
-    float bg = aGlobalGain * dg;
+    //float bg = aGlobalGain * dg;
+    float bg = 1.;
     if (blendronicGain != nullptr) bg *= Decibels::decibelsToGain(*blendronicGain);
     
     gainEnv.setTarget(dg);
