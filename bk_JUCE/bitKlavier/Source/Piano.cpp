@@ -954,17 +954,26 @@ void Piano::configureBlendronicModification(BlendronicModification::Ptr mod, Arr
 	mod->setTargets(whichPreps);
     
     Keymap::PtrArr keymaps;
+    Keymap::Ptr lastKeymap;
     for (auto keymap : whichKeymaps)
     {
         Keymap::Ptr thisKeymap = processor.gallery->getKeymap(keymap);
+       if(thisKeymap == nullptr)
+       {
+           DBG("nullkeymap");
+           return;
+       }
+        lastKeymap = thisKeymap;
         keymaps.add(thisKeymap);
+        DBG("keymap " + String(keymap));
     }
     
     mod->setKeymaps(keymaps);
 
 	for (auto keymap : whichKeymaps)
 	{
-		for (auto key : processor.gallery->getKeymap(keymap)->keys())
+        Keymap::Ptr kmap = processor.gallery->getKeymap(keymap);
+		for (auto key : kmap->keys())
 		{
 			modificationMap[key]->addBlendronicModification(mod);
 		}
