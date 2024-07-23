@@ -678,7 +678,7 @@ void HeaderViewController::loadDefaultGalleries(void)
         
         int size;
         
-        PopupMenu mikroetudes_menu, ns_etudes_menu, bk_examples_menu, machines_menu;
+        PopupMenu mikroetudes_menu, ns_etudes_menu, bk_examples_menu, machines_menu, preludes_menu, commissions_menu;
         
         //data = BinaryData::Basic_Piano_xml;
         for (int i = 0; i < BinaryData::namedResourceListSize; i++)
@@ -695,6 +695,8 @@ void HeaderViewController::loadDefaultGalleries(void)
                 else if (processor.ns_etudes.contains(name))                ns_etudes_menu.addItem(id++, name);
                 else if (processor.bk_examples.contains(name))              bk_examples_menu.addItem(id++, name);
                 else if (processor.machines_for_listening.contains(name))   machines_menu.addItem(id++, name);
+                else if (processor.preludes.contains(name))                 preludes_menu.addItem(id++, name);
+                else if (processor.commissions.contains(name))              commissions_menu.addItem(id++, name);
                 else                                                        galleryCB.addItem(name, id++);
                 
             }
@@ -704,6 +706,8 @@ void HeaderViewController::loadDefaultGalleries(void)
         popupRoot->addSubMenu("Nostalgic Synchronic", ns_etudes_menu);
         popupRoot->addSubMenu("Mikroetudes", mikroetudes_menu);
         popupRoot->addSubMenu("Machines for Listening", machines_menu);
+        popupRoot->addSubMenu("Preludes", preludes_menu);
+        popupRoot->addSubMenu("Commissions", commissions_menu);
         
         galleryCB.addSeparator();
         

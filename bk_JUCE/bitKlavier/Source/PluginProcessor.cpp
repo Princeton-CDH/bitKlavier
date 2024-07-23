@@ -336,6 +336,38 @@ void BKAudioProcessor::loadGalleries()
         "Machines for Listening (49key)",
         "Machines for Listening"
     });
+    
+    preludes = StringArray({
+        "Prelude_1",
+        "Prelude_2",
+        "Prelude_3",
+        "Prelude_4",
+        "Prelude_5",
+        "Prelude_6",
+        "Prelude_7",
+        "Prelude_8",
+        "Prelude_9",
+        "Prelude_10",
+        "Prelude_11",
+        "Prelude_12"
+    });
+    
+    commissions = StringArray({
+        "Beck_Held",
+        "Douthitt_SleepersWalk",
+        "Fishman_Swoop",
+        "Fishman_Dive",
+        "Fishman_Float",
+        "Herron_Orchesography",
+        "Pascal_Synchronic",
+        "Pascal_MonkCircles",
+        "May_SoShrunkMySinews",
+        "May_SwiftMessengers",
+        "Socolofsky_Northwing",
+        "Bora_Etude1_Quickening",
+        "Bora_Etude2_Wreckoning",
+        "Bora_Etude3_BlueSmoke"
+    });
 }
 
 void BKAudioProcessor::openSoundfont(void)

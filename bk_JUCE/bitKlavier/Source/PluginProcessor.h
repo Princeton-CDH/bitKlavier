@@ -125,7 +125,7 @@ public:
     Piano::Ptr                          currentPiano;
     Piano::PtrArr                       prevPianos;
     
-    StringArray mikroetudes, ns_etudes, bk_examples, machines_for_listening;
+    StringArray mikroetudes, ns_etudes, bk_examples, machines_for_listening, preludes, commissions;
     
     StringArray                         galleryNames;
     String                              currentGallery;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.45"
+<JUCERPROJECT id="R4yQHh" name="bitKlavier" projectType="audioplug" version="3.5"
               bundleIdentifier="edu.princeton.bitklavier.polito" includeBinaryInAppConfig="1"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="1" buildRTAS="0"
               buildAAX="0" pluginName="bitKlavier" pluginDesc="A prepared digital piano. "
@@ -197,6 +197,65 @@
                   resource="1" file="Source/galleries/Machines for Listening/Machines for Listening (49key).xml"/>
             <FILE id="opVdLm" name="Machines for Listening.xml" compile="0" resource="1"
                   file="Source/galleries/Machines for Listening/Machines for Listening.xml"/>
+          </GROUP>
+          <GROUP id="{4DB2AC79-FDE5-6110-8536-51D26CD77B0F}" name="Preludes">
+            <FILE id="rKtmgE" name="Prelude_1.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_1.xml"/>
+            <FILE id="QLDW0G" name="Prelude_2.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_2.xml"/>
+            <FILE id="R5Vsa6" name="Prelude_3.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_3.xml"/>
+            <FILE id="aQns6e" name="Prelude_4.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_4.xml"/>
+            <FILE id="EGeo4B" name="Prelude_5.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_5.xml"/>
+            <FILE id="v97ZF8" name="Prelude_6.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_6.xml"/>
+            <FILE id="Abg64A" name="Prelude_7.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_7.xml"/>
+            <FILE id="YFVXGz" name="Prelude_8.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_8.xml"/>
+            <FILE id="MhcGTz" name="Prelude_9.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_9.xml"/>
+            <FILE id="uzK0xX" name="Prelude_10.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_10.xml"/>
+            <FILE id="ZZhveJ" name="Prelude_11.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_11.xml"/>
+            <FILE id="bOC5dS" name="Prelude_12.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Preludes/Prelude_12.xml"/>
+          </GROUP>
+          <GROUP id="{A10CEB0B-899A-E31C-5D0D-851C7DD31505}" name="Commissions">
+            <GROUP id="{2049E3E0-660E-1FF2-2D83-0CA60C4E5662}" name="Annika Socolofsky">
+              <FILE id="T7V6ph" name="Socolofsky_Northwing.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Annika Socolofsky/Socolofsky_Northwing.xml"/>
+            </GROUP>
+            <GROUP id="{453A7089-62FA-7CF2-E5EE-B8AF3A868A9A}" name="Bora Yoon">
+              <FILE id="EJ2fjv" name="Bora_Etude1_Quickening.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Bora Yoon/Bora_Etude1_Quickening.xml"/>
+              <FILE id="XJyUQd" name="Bora_Etude2_Wreckoning.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Bora Yoon/Bora_Etude2_Wreckoning.xml"/>
+              <FILE id="Di5eHE" name="Bora_Etude3_BlueSmoke.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Bora Yoon/Bora_Etude3_BlueSmoke.xml"/>
+            </GROUP>
+            <GROUP id="{F4FD20BD-02F3-934C-7A92-8ACC0B408DEA}" name="Chris Douthitt">
+              <FILE id="FHaKuT" name="Douthitt_SleepersWalk.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Chris Douthitt/Douthitt_SleepersWalk.xml"/>
+            </GROUP>
+            <GROUP id="{2F3B4AD8-4651-BD1E-BF99-B34FDD95A862}" name="Jenny Beck">
+              <FILE id="HPqYKp" name="Beck_Held.xml" compile="0" resource="1" file="/Applications/bitklavier/galleries/Commissions/Jenny Beck/Beck_Held.xml"/>
+            </GROUP>
+            <GROUP id="{F573E391-8631-2D6C-3266-CCBD0F20F46A}" name="Molly Herron">
+              <FILE id="jdHZYg" name="Herron_Orchesography.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Molly Herron/Herron_Orchesography.xml"/>
+            </GROUP>
+            <GROUP id="{ABECA328-4588-3F64-9727-60EF6CDB6C10}" name="Nate May">
+              <FILE id="hqPqCY" name="May_SoShrunkMySinews.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Nate May/May_SoShrunkMySinews.xml"/>
+              <FILE id="QjrG8W" name="May_SwiftMessengers.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Nate May/May_SwiftMessengers.xml"/>
+            </GROUP>
+            <GROUP id="{330E1ADF-C1B8-34E8-07B4-14ABBC5B02ED}" name="Noah Fishman">
+              <FILE id="yButtp" name="Fishman_Dive.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Noah Fishman/Fishman_Dive.xml"/>
+              <FILE id="Mam1W8" name="Fishman_Float.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Noah Fishman/Fishman_Float.xml"/>
+              <FILE id="ETTza8" name="Fishman_Swoop.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Noah Fishman/Fishman_Swoop.xml"/>
+            </GROUP>
+            <GROUP id="{CEC16FF5-FEA8-E184-12E6-0495E344FA72}" name="Pascal Le Boeuf">
+              <FILE id="VSiBcu" name="Pascal_MonkCircles.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Pascal Le Boeuf/Pascal_MonkCircles.xml"/>
+              <FILE id="dVHtx5" name="Pascal_Synchronic.xml" compile="0" resource="1"
+                    file="/Applications/bitklavier/galleries/Commissions/Pascal Le Boeuf/Pascal_Synchronic.xml"/>
+            </GROUP>
           </GROUP>
           <FILE id="askqrZ" name="Basic Piano.xml" compile="0" resource="1" file="Source/galleries/Basic Piano.xml"/>
           <FILE id="wtEnXB" name="Mike's Gallery.xml" compile="0" resource="1"
